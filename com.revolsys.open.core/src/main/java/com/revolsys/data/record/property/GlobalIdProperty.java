@@ -4,21 +4,20 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 
 public class GlobalIdProperty extends AbstractRecordDefinitionProperty {
+  static final String PROPERTY_NAME = "http://revolsys.com/gis/globalId";
+
   public static GlobalIdProperty getProperty(final Record object) {
     final RecordDefinition recordDefinition = object.getRecordDefinition();
     return getProperty(recordDefinition);
   }
 
-  public static GlobalIdProperty getProperty(
-    final RecordDefinition recordDefinition) {
+  public static GlobalIdProperty getProperty(final RecordDefinition recordDefinition) {
     if (recordDefinition == null) {
       return null;
     } else {
       return recordDefinition.getProperty(PROPERTY_NAME);
     }
   }
-
-  static final String PROPERTY_NAME = "http://revolsys.com/gis/globalId";
 
   private String fieldName;
 

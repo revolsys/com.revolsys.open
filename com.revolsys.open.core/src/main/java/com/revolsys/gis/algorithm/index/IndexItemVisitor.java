@@ -18,8 +18,7 @@ public class IndexItemVisitor implements ItemVisitor {
 
   private final BoundingBoxDoubleGf envelope;
 
-  public IndexItemVisitor(final BoundingBoxDoubleGf envelope,
-    final Visitor<Record> visitor) {
+  public IndexItemVisitor(final BoundingBoxDoubleGf envelope, final Visitor<Record> visitor) {
     this.envelope = envelope;
     this.visitor = visitor;
   }

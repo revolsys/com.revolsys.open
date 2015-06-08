@@ -16,8 +16,7 @@ public class EventsEnabledState implements AutoCloseable {
 
   private final boolean eventsEnabled;
 
-  public EventsEnabledState(final EventsEnabler eventsEnabler,
-    final boolean eventsEnabled) {
+  public EventsEnabledState(final EventsEnabler eventsEnabler, final boolean eventsEnabled) {
     this.eventsEnabler = eventsEnabler;
     this.eventsEnabled = eventsEnabled;
     this.originalEventsEnabled = eventsEnabler.setEventsEnabled(eventsEnabled);

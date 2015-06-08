@@ -6,9 +6,9 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.util.MathUtil;
 
 public class BoundingBoxUtil {
-  public static boolean covers(final double minX1, final double minY1,
-    final double maxX1, final double maxY1, final double minX2,
-    final double minY2, final double maxX2, final double maxY2) {
+  public static boolean covers(final double minX1, final double minY1, final double maxX1,
+    final double maxY1, final double minX2, final double minY2, final double maxX2,
+    final double maxY2) {
     return minX2 >= minX1 && maxX2 <= maxX1 && minY2 >= minY1 && maxY2 <= maxY1;
   }
 
@@ -25,8 +25,7 @@ public class BoundingBoxUtil {
     return newBounds;
   }
 
-  public static double[] createBounds(final GeometryFactory geometryFactory,
-    final double... bounds) {
+  public static double[] createBounds(final GeometryFactory geometryFactory, final double... bounds) {
     final int axisCount = bounds.length;
     final double[] newBounds = createBounds(axisCount);
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
@@ -42,8 +41,8 @@ public class BoundingBoxUtil {
     return newBounds;
   }
 
-  public static double[] createBounds(final GeometryFactory geometryFactory,
-    final int axisCount, Point point) {
+  public static double[] createBounds(final GeometryFactory geometryFactory, final int axisCount,
+    Point point) {
     point = point.convert(geometryFactory, axisCount);
     final double[] bounds = createBounds(axisCount);
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
@@ -59,8 +58,7 @@ public class BoundingBoxUtil {
     return bounds;
   }
 
-  public static double[] createBounds(final GeometryFactory geometryFactory,
-    final Point point) {
+  public static double[] createBounds(final GeometryFactory geometryFactory, final Point point) {
     final int axisCount = point.getAxisCount();
     return createBounds(geometryFactory, axisCount, point);
   }
@@ -90,17 +88,15 @@ public class BoundingBoxUtil {
     return createBounds(axisCount, point);
   }
 
-  public static void expand(final double[] bounds, final int axisCount,
-    final double... coordinates) {
-    for (int axisIndex = 0; axisIndex < axisCount
-      && axisIndex < coordinates.length; axisIndex++) {
+  public static void expand(final double[] bounds, final int axisCount, final double... coordinates) {
+    for (int axisIndex = 0; axisIndex < axisCount && axisIndex < coordinates.length; axisIndex++) {
       final double coordinate = coordinates[axisIndex];
       expand(bounds, axisCount, axisIndex, coordinate);
     }
   }
 
-  public static void expand(final double[] bounds, final int axisCount,
-    final int axisIndex, final double coordinate) {
+  public static void expand(final double[] bounds, final int axisCount, final int axisIndex,
+    final double coordinate) {
     if (!MathUtil.isNanOrInfinite(coordinate)) {
       final double min = bounds[axisIndex];
       if (coordinate < min || Double.isNaN(min)) {
@@ -113,16 +109,15 @@ public class BoundingBoxUtil {
     }
   }
 
-  public static void expand(final double[] bounds, final int axisCount,
-    final Point point) {
+  public static void expand(final double[] bounds, final int axisCount, final Point point) {
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
       final double value = point.getCoordinate(axisIndex);
       expand(bounds, axisCount, axisIndex, value);
     }
   }
 
-  public static void expand(final GeometryFactory geometryFactory,
-    final double[] bounds, final double... values) {
+  public static void expand(final GeometryFactory geometryFactory, final double[] bounds,
+    final double... values) {
     final int axisCount = bounds.length / 2;
     for (int i = 0; i < values.length; i++) {
       final double value = values[i];
@@ -131,8 +126,8 @@ public class BoundingBoxUtil {
     }
   }
 
-  public static void expand(final GeometryFactory geometryFactory,
-    final double[] bounds, final int axisIndex, double coordinate) {
+  public static void expand(final GeometryFactory geometryFactory, final double[] bounds,
+    final int axisIndex, double coordinate) {
     if (geometryFactory != null) {
       coordinate = geometryFactory.makePrecise(axisIndex, coordinate);
     }
@@ -149,9 +144,8 @@ public class BoundingBoxUtil {
     }
   }
 
-  public static void expand(final GeometryFactory geometryFactory,
-    final double[] bounds, final int axisCount, final int axisIndex,
-    double coordinate) {
+  public static void expand(final GeometryFactory geometryFactory, final double[] bounds,
+    final int axisCount, final int axisIndex, double coordinate) {
     if (geometryFactory != null) {
       coordinate = geometryFactory.makePrecise(axisIndex, coordinate);
     }
@@ -167,8 +161,8 @@ public class BoundingBoxUtil {
     }
   }
 
-  public static void expand(final GeometryFactory geometryFactory,
-    final double[] bounds, Point point) {
+  public static void expand(final GeometryFactory geometryFactory, final double[] bounds,
+    Point point) {
     final int axisCount = bounds.length / 2;
     point = point.convert(geometryFactory, axisCount);
     final int count = Math.min(axisCount, point.getAxisCount());
@@ -180,18 +174,15 @@ public class BoundingBoxUtil {
     }
   }
 
-  public static void expandX(final double[] bounds, final int axisCount,
-    final double value) {
+  public static void expandX(final double[] bounds, final int axisCount, final double value) {
     expand(bounds, axisCount, 0, value);
   }
 
-  public static void expandY(final double[] bounds, final int axisCount,
-    final double value) {
+  public static void expandY(final double[] bounds, final int axisCount, final double value) {
     expand(bounds, axisCount, 1, value);
   }
 
-  public static void expandZ(final double[] bounds, final int axisCount,
-    final double value) {
+  public static void expandZ(final double[] bounds, final int axisCount, final double value) {
     expand(bounds, axisCount, 2, value);
   }
 
@@ -231,8 +222,8 @@ public class BoundingBoxUtil {
    * @param point
    * @return
    */
-  public static boolean intersects(final double p1X, final double p1Y,
-    final double p2X, final double p2Y, final double qX, final double qY) {
+  public static boolean intersects(final double p1X, final double p1Y, final double p2X,
+    final double p2Y, final double qX, final double qY) {
     if (qX >= (p1X < p2X ? p1X : p2X) && qX <= (p1X > p2X ? p1X : p2X)
       && qY >= (p1Y < p2Y ? p1Y : p2Y) && qY <= (p1Y > p2Y ? p1Y : p2Y)) {
       return true;
@@ -241,8 +232,7 @@ public class BoundingBoxUtil {
     }
   }
 
-  public static boolean intersects(final double[] bounds1,
-    final double[] bounds2) {
+  public static boolean intersects(final double[] bounds1, final double[] bounds2) {
     final int axisCount1 = bounds1.length / 2;
     final double minX1 = bounds1[0];
     final double minY1 = bounds1[1];
@@ -266,8 +256,7 @@ public class BoundingBoxUtil {
    * @param point
    * @return
    */
-  public static boolean intersects(final Point lineStart, final Point lineEnd,
-    final Point point) {
+  public static boolean intersects(final Point lineStart, final Point lineEnd, final Point point) {
     final double x1 = lineStart.getX();
     final double y1 = lineStart.getY();
     final double x2 = lineEnd.getX();
@@ -289,8 +278,8 @@ public class BoundingBoxUtil {
    * @param q2 another extremal point of the envelope Q
    * @return <code>true</code> if Q intersects P
    */
-  public static boolean intersects(final Point line1Start,
-    final Point line1End, final Point line2Start, final Point line2End) {
+  public static boolean intersects(final Point line1Start, final Point line1End,
+    final Point line2Start, final Point line2End) {
     final double line1x1 = line1Start.getX();
     final double line1y1 = line1Start.getY();
     final double line1x2 = line1End.getX();
@@ -300,13 +289,11 @@ public class BoundingBoxUtil {
     final double line2y1 = line2Start.getY();
     final double line2x2 = line2End.getX();
     final double line2y2 = line2End.getY();
-    return intersectsMinMax(line1x1, line1y1, line1x2, line1y2, line2x1,
-      line2y1, line2x2, line2y2);
+    return intersectsMinMax(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1, line2x2, line2y2);
   }
 
-  public static boolean intersectsMinMax(final double p1X, final double p1Y,
-    final double p2X, final double p2Y, final double q1X, final double q1Y,
-    final double q2X, final double q2Y) {
+  public static boolean intersectsMinMax(final double p1X, final double p1Y, final double p2X,
+    final double p2Y, final double q1X, final double q1Y, final double q2X, final double q2Y) {
     double minp = Math.min(p1X, p2X);
     double maxq = Math.max(q1X, q2X);
     if (minp > maxq) {

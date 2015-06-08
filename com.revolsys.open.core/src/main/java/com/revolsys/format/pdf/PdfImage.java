@@ -41,8 +41,7 @@ public class PdfImage extends JaiGeoReferencedImage {
       @SuppressWarnings("unchecked")
       final List<PDPage> pages = document.getDocumentCatalog().getAllPages();
       if (pages.isEmpty()) {
-        throw new RuntimeException("PDF file " + imageResource
-          + " doesn't contain any pages");
+        throw new RuntimeException("PDF file " + imageResource + " doesn't contain any pages");
       } else {
         if (pages.size() > 1) {
           LoggerFactory.getLogger(getClass()).warn(
@@ -50,11 +49,9 @@ public class PdfImage extends JaiGeoReferencedImage {
         }
         final PDPage page = pages.get(0);
         final COSDictionary pageDictionary = page.getCOSDictionary();
-        final Rectangle2D mediaBox = PdfUtil.findRectangle(pageDictionary,
-          COSName.MEDIA_BOX);
+        final Rectangle2D mediaBox = PdfUtil.findRectangle(pageDictionary, COSName.MEDIA_BOX);
         final int resolution = 72;
-        BufferedImage image = page.convertToImage(BufferedImage.TYPE_INT_ARGB,
-          resolution);
+        BufferedImage image = page.convertToImage(BufferedImage.TYPE_INT_ARGB, resolution);
         final COSDictionary viewport = PdfUtil.getPageViewport(pageDictionary);
         if (viewport != null) {
           final Rectangle2D bbox = PdfUtil.findRectangle(viewport, COSName.BBOX);
@@ -63,8 +60,8 @@ public class PdfImage extends JaiGeoReferencedImage {
             final double boxY = bbox.getY();
             final int boxWidth = (int)bbox.getWidth();
             final int boxHeight = (int)bbox.getHeight();
-            final BufferedImage viewportImage = new BufferedImage(boxWidth,
-              boxHeight, BufferedImage.TYPE_INT_ARGB);
+            final BufferedImage viewportImage = new BufferedImage(boxWidth, boxHeight,
+              BufferedImage.TYPE_INT_ARGB);
             final Graphics2D graphics = (Graphics2D)viewportImage.getGraphics();
             final double translateY = -(mediaBox.getHeight() - (boxHeight + boxY));
             graphics.translate(-boxX, translateY);

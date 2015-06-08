@@ -11,8 +11,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 
-public class RecordLayerTableRowSorter extends
-  TableSortController<RecordLayerTableModel> {
+public class RecordLayerTableRowSorter extends TableSortController<RecordLayerTableModel> {
 
   private final AbstractRecordLayer layer;
 
@@ -26,7 +25,7 @@ public class RecordLayerTableRowSorter extends
   public Comparator<?> getComparator(final int columnIndex) {
     final RecordLayerTableModel model = getModel();
     final String fieldName = model.getFieldName(columnIndex);
-    final RecordDefinition recordDefinition = layer.getRecordDefinition();
+    final RecordDefinition recordDefinition = this.layer.getRecordDefinition();
     final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
     if (codeTable == null) {
       final Class<?> columnClass = model.getColumnClass(columnIndex);

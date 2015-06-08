@@ -21,58 +21,11 @@ import com.revolsys.util.Property;
 
 public class GeometryStyle extends MarkerStyle {
 
-  public static GeometryStyle createStyle() {
-    final GeometryStyle style = new GeometryStyle();
-    Color color;
-    synchronized (COLORS) {
-      colorIndex = (colorIndex + 1) % COLORS.size();
-      color = COLORS.get(colorIndex);
-    }
-    style.setLineColor(color);
-    style.setPolygonFill(WebColors.setAlpha(color, 127));
-    return style;
-  }
-
-  public static GeometryStyle line(final Color color) {
-    final GeometryStyle style = new GeometryStyle();
-    style.setLineColor(color);
-    return style;
-  }
-
-  public static GeometryStyle line(final Color color, final double lineWidth) {
-    final GeometryStyle style = new GeometryStyle();
-    style.setLineColor(color);
-    style.setLineWidth(Measure.valueOf(lineWidth, NonSI.PIXEL));
-    return style;
-  }
-
-  public static GeometryStyle polygon(final Color lineColor,
-    final Color fillColor) {
-    final GeometryStyle style = new GeometryStyle();
-    style.setLineColor(lineColor);
-    style.setPolygonFill(fillColor);
-    return style;
-  }
-
-  public static GeometryStyle polygon(final Color lineColor,
-    final int lineWidth, final Color fillColor) {
-    final GeometryStyle style = new GeometryStyle();
-    style.setLineColor(lineColor);
-    style.setLineWidth(Measure.valueOf(lineWidth, NonSI.PIXEL));
-    style.setPolygonFill(fillColor);
-    return style;
-  }
-
   private static int colorIndex = -1;
 
-  public static final List<Color> COLORS = Arrays.asList(WebColors.Maroon,
-    WebColors.Olive, WebColors.Green, WebColors.Teal, WebColors.Navy,
-    WebColors.Purple, WebColors.Red, WebColors.Yellow, WebColors.Lime,
-    WebColors.Aqua, WebColors.Blue, WebColors.Fuchsia);
-
-  private double lineDashOffset = 0;
-
-  private List<Double> lineDashArray = Collections.emptyList();
+  public static final List<Color> COLORS = Arrays.asList(WebColors.Maroon, WebColors.Olive,
+    WebColors.Green, WebColors.Teal, WebColors.Navy, WebColors.Purple, WebColors.Red,
+    WebColors.Yellow, WebColors.Lime, WebColors.Aqua, WebColors.Blue, WebColors.Fuchsia);
 
   static {
     // addProperty("backgroundColor", Color.class);
@@ -88,8 +41,7 @@ public class GeometryStyle extends MarkerStyle {
     addProperty("lineCap", LineCap.class, LineCap.ROUND);
     addProperty("lineClip", Boolean.class, true);
     addProperty("lineColor", Color.class, new Color(128, 128, 128));
-    addProperty("lineCompOp", CompositionOperation.class,
-      CompositionOperation.src_over);
+    addProperty("lineCompOp", CompositionOperation.class, CompositionOperation.src_over);
     addProperty("lineDashOffset", Double.class, 0);
     addProperty("lineDashArray", List.class, Collections.emptyList());
     addProperty("lineGamma", Double.class, 1.0);
@@ -117,8 +69,7 @@ public class GeometryStyle extends MarkerStyle {
     // addProperty("pointTransform", String.class);
     // addProperty("polygon", String.class);
     addProperty("polygonClip", Boolean.class, true);
-    addProperty("polygonCompOp", CompositionOperation.class,
-      CompositionOperation.src_over);
+    addProperty("polygonCompOp", CompositionOperation.class, CompositionOperation.src_over);
     addProperty("polygonFill", Color.class, new Color(128, 128, 128));
     addProperty("polygonFillOpacity", Integer.class, 255);
     addProperty("polygonGamma", Double.class, 1.0);
@@ -172,6 +123,51 @@ public class GeometryStyle extends MarkerStyle {
     // addProperty("srs", String.class);
 
   }
+
+  public static GeometryStyle createStyle() {
+    final GeometryStyle style = new GeometryStyle();
+    Color color;
+    synchronized (COLORS) {
+      colorIndex = (colorIndex + 1) % COLORS.size();
+      color = COLORS.get(colorIndex);
+    }
+    style.setLineColor(color);
+    style.setPolygonFill(WebColors.setAlpha(color, 127));
+    return style;
+  }
+
+  public static GeometryStyle line(final Color color) {
+    final GeometryStyle style = new GeometryStyle();
+    style.setLineColor(color);
+    return style;
+  }
+
+  public static GeometryStyle line(final Color color, final double lineWidth) {
+    final GeometryStyle style = new GeometryStyle();
+    style.setLineColor(color);
+    style.setLineWidth(Measure.valueOf(lineWidth, NonSI.PIXEL));
+    return style;
+  }
+
+  public static GeometryStyle polygon(final Color lineColor, final Color fillColor) {
+    final GeometryStyle style = new GeometryStyle();
+    style.setLineColor(lineColor);
+    style.setPolygonFill(fillColor);
+    return style;
+  }
+
+  public static GeometryStyle polygon(final Color lineColor, final int lineWidth,
+    final Color fillColor) {
+    final GeometryStyle style = new GeometryStyle();
+    style.setLineColor(lineColor);
+    style.setLineWidth(Measure.valueOf(lineWidth, NonSI.PIXEL));
+    style.setPolygonFill(fillColor);
+    return style;
+  }
+
+  private double lineDashOffset = 0;
+
+  private List<Double> lineDashArray = Collections.emptyList();
 
   private LineCap lineCap = LineCap.ROUND;
 
@@ -403,8 +399,7 @@ public class GeometryStyle extends MarkerStyle {
 
   public void setLineOpacity(final double lineOpacity) {
     if (lineOpacity < 0 || lineOpacity > 1) {
-      throw new IllegalArgumentException(
-          "Line opacity must be between 0.0 - 1.0");
+      throw new IllegalArgumentException("Line opacity must be between 0.0 - 1.0");
     } else {
       this.lineOpacity = (int)(255 * lineOpacity);
       this.lineColor = WebColors.setAlpha(this.lineColor, this.lineOpacity);
@@ -428,8 +423,7 @@ public class GeometryStyle extends MarkerStyle {
     final Color color = getLineColor();
     graphics.setColor(color);
     final Unit<Length> unit = this.lineWidth.getUnit();
-    final float width = (float)Viewport2D.toDisplayValue(viewport,
-      this.lineWidth);
+    final float width = (float)Viewport2D.toDisplayValue(viewport, this.lineWidth);
 
     final float dashOffset = (float)Viewport2D.toDisplayValue(viewport,
       Measure.valueOf(this.lineDashOffset, unit));
@@ -450,8 +444,8 @@ public class GeometryStyle extends MarkerStyle {
 
     final int lineCap = this.lineCap.getAwtValue();
     final int lineJoin = this.lineJoin.getAwtValue();
-    final BasicStroke basicStroke = new BasicStroke(width, lineCap, lineJoin,
-      this.lineMiterlimit, dashArray, dashOffset);
+    final BasicStroke basicStroke = new BasicStroke(width, lineCap, lineJoin, this.lineMiterlimit,
+      dashArray, dashOffset);
     graphics.setStroke(basicStroke);
   }
 
@@ -482,12 +476,10 @@ public class GeometryStyle extends MarkerStyle {
 
   public void setPolygonFillOpacity(final double polygonFillOpacity) {
     if (polygonFillOpacity < 0 || polygonFillOpacity > 1) {
-      throw new IllegalArgumentException(
-          "Polygon fill opacity must be between 0.0 - 1.0");
+      throw new IllegalArgumentException("Polygon fill opacity must be between 0.0 - 1.0");
     } else {
       this.polygonFillOpacity = (int)(255 * polygonFillOpacity);
-      this.polygonFill = WebColors.setAlpha(this.polygonFill,
-        this.polygonFillOpacity);
+      this.polygonFill = WebColors.setAlpha(this.polygonFill, this.polygonFillOpacity);
     }
   }
 
@@ -496,8 +488,7 @@ public class GeometryStyle extends MarkerStyle {
       throw new IllegalArgumentException("Fill opacity must be between 0 - 255");
     } else {
       this.polygonFillOpacity = polygonFillOpacity;
-      this.polygonFill = WebColors.setAlpha(this.polygonFill,
-        this.polygonFillOpacity);
+      this.polygonFill = WebColors.setAlpha(this.polygonFill, this.polygonFillOpacity);
     }
   }
 

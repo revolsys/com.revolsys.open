@@ -8,13 +8,12 @@ import javax.swing.Icon;
 import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.util.ExceptionUtil;
 
-public class InvokeMethodComponentFactory<T extends Component> extends
-AbstractComponentFactory<T> {
+public class InvokeMethodComponentFactory<T extends Component> extends AbstractComponentFactory<T> {
 
   private Callable<T> callable;
 
-  public InvokeMethodComponentFactory(final Object object,
-    final String methodName, final Object... parameters) {
+  public InvokeMethodComponentFactory(final Object object, final String methodName,
+    final Object... parameters) {
     this.callable = new InvokeMethodCallable<T>(object, methodName, parameters);
   }
 

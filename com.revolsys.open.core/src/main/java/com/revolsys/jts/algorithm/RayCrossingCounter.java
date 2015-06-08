@@ -143,14 +143,13 @@ public class RayCrossingCounter implements Visitor<LineSegment> {
     this(point.getX(), point.getY());
   }
 
-  public void countSegment(final double x1, final double y1, final double x2,
-    final double y2) {
-    if (x1 < x && x2 < x) {
+  public void countSegment(final double x1, final double y1, final double x2, final double y2) {
+    if (x1 < this.x && x2 < this.x) {
       // check if the segment is strictly to the left of the test point
-    } else if (x == x2 && y == y2) {
+    } else if (this.x == x2 && this.y == y2) {
       // check if the point is equal to the current ring vertex
-      pointOnSegment = true;
-    } else if (y1 == y && y2 == y) {
+      this.pointOnSegment = true;
+    } else if (y1 == this.y && y2 == this.y) {
       /**
        * For horizontal segments, check if the point is on the segment. Otherwise,
        * horizontal segments are not counted.
@@ -161,10 +160,10 @@ public class RayCrossingCounter implements Visitor<LineSegment> {
         minX = x2;
         maxX = x1;
       }
-      if (x >= minX && x <= maxX) {
-        pointOnSegment = true;
+      if (this.x >= minX && this.x <= maxX) {
+        this.pointOnSegment = true;
       }
-    } else if (y1 > y && y2 <= y || y2 > y && y1 <= y) {
+    } else if (y1 > this.y && y2 <= this.y || y2 > this.y && y1 <= this.y) {
       /**
        * Evaluate all non-horizontal segments which cross a horizontal ray to the
        * right of the test pt. To avoid double-counting shared vertices, we use
@@ -177,10 +176,10 @@ public class RayCrossingCounter implements Visitor<LineSegment> {
        * </ul>
        */
       // translate the segment so that the test point lies on the origin
-      final double deltaX1 = x1 - x;
-      final double deltaY1 = y1 - y;
-      final double deltaX2 = x2 - x;
-      final double deltaY2 = y2 - y;
+      final double deltaX1 = x1 - this.x;
+      final double deltaY1 = y1 - this.y;
+      final double deltaX2 = x2 - this.x;
+      final double deltaY2 = y2 - this.y;
 
       /**
        * The translated segment straddles the x-axis. Compute the sign of the
@@ -190,10 +189,9 @@ public class RayCrossingCounter implements Visitor<LineSegment> {
       // double xIntSign = RobustDeterminant.signOfDet2x2(x1, y1, x2, y2) / (y2
       // - y1);
       // MD - faster & more robust computation?
-      double xIntSign = RobustDeterminant.signOfDet2x2(deltaX1, deltaY1,
-        deltaX2, deltaY2);
+      double xIntSign = RobustDeterminant.signOfDet2x2(deltaX1, deltaY1, deltaX2, deltaY2);
       if (xIntSign == 0.0) {
-        pointOnSegment = true;
+        this.pointOnSegment = true;
       } else {
         if (deltaY2 < deltaY1) {
           xIntSign = -xIntSign;
@@ -205,7 +203,7 @@ public class RayCrossingCounter implements Visitor<LineSegment> {
         // + " = " + xIntSign);
         // The segment crosses the ray if the sign is strictly positive.
         if (xIntSign > 0.0) {
-          crossingCount++;
+          this.crossingCount++;
         }
       }
     }
@@ -243,24 +241,24 @@ public class RayCrossingCounter implements Visitor<LineSegment> {
    * @return the Location of the point
    */
   public Location getLocation() {
-    if (pointOnSegment) {
+    if (this.pointOnSegment) {
       return Location.BOUNDARY;
     }
 
     // The point is in the interior of the ring if the number of X-crossings is
     // odd.
-    if (crossingCount % 2 == 1) {
+    if (this.crossingCount % 2 == 1) {
       return Location.INTERIOR;
     }
     return Location.EXTERIOR;
   }
 
   public double getX() {
-    return x;
+    return this.x;
   }
 
   public double getY() {
-    return y;
+    return this.y;
   }
 
   /**
@@ -273,7 +271,7 @@ public class RayCrossingCounter implements Visitor<LineSegment> {
    * @return true if the point lies exactly on a segment
    */
   public boolean isOnSegment() {
-    return pointOnSegment;
+    return this.pointOnSegment;
   }
 
   /**

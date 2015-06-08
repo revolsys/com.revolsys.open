@@ -22,15 +22,13 @@ import com.revolsys.jts.util.GeometricShapeFactory;
  * Tests all geometries with both 2 and 3 dimensions and both byte orderings.
  */
 public class WKBTest extends TestCase {
+  static CoordinateSequenceComparator comp2 = new CoordinateSequenceComparator(2);
+
+  static CoordinateSequenceComparator comp3 = new CoordinateSequenceComparator(3);
+
   public static void main(final String args[]) {
     TestRunner.run(WKBTest.class);
   }
-
-  static CoordinateSequenceComparator comp2 = new CoordinateSequenceComparator(
-    2);
-
-  static CoordinateSequenceComparator comp3 = new CoordinateSequenceComparator(
-    3);
 
   private final GeometryFactory geomFactory = GeometryFactory.floating3();
 
@@ -45,8 +43,8 @@ public class WKBTest extends TestCase {
     super(name);
   }
 
-  void runGeometry(final Geometry g, final int dimension, final int byteOrder,
-    final boolean toHex, final int srid) throws IOException, ParseException {
+  void runGeometry(final Geometry g, final int dimension, final int byteOrder, final boolean toHex,
+    final int srid) throws IOException, ParseException {
     boolean includeSRID = false;
     if (srid >= 0) {
       includeSRID = true;
@@ -74,15 +72,14 @@ public class WKBTest extends TestCase {
     }
   }
 
-  private void runWKBTest(final Geometry g, final int dimension,
-    final boolean toHex) throws IOException, ParseException {
+  private void runWKBTest(final Geometry g, final int dimension, final boolean toHex)
+    throws IOException, ParseException {
     runWKBTest(g, dimension, ByteOrderValues.LITTLE_ENDIAN, toHex);
     runWKBTest(g, dimension, ByteOrderValues.BIG_ENDIAN, toHex);
   }
 
-  private void runWKBTest(final Geometry g, final int dimension,
-    final int byteOrder, final boolean toHex) throws IOException,
-    ParseException {
+  private void runWKBTest(final Geometry g, final int dimension, final int byteOrder,
+    final boolean toHex) throws IOException, ParseException {
     runGeometry(g, dimension, byteOrder, toHex, 100);
     runGeometry(g, dimension, byteOrder, toHex, 0);
     runGeometry(g, dimension, byteOrder, toHex, 101010);
@@ -94,8 +91,7 @@ public class WKBTest extends TestCase {
     runWKBTestPackedCoordinate(wkt);
   }
 
-  private void runWKBTestCoordinateArray(final String wkt) throws IOException,
-  ParseException {
+  private void runWKBTestCoordinateArray(final String wkt) throws IOException, ParseException {
     final GeometryFactory geomFactory = GeometryFactory.floating3();
     final WKTReader rdr = new WKTReader(geomFactory);
     final Geometry g = rdr.read(wkt);
@@ -107,8 +103,7 @@ public class WKBTest extends TestCase {
     runWKBTest(g, 3, false);
   }
 
-  private void runWKBTestPackedCoordinate(final String wkt) throws IOException,
-  ParseException {
+  private void runWKBTestPackedCoordinate(final String wkt) throws IOException, ParseException {
     final GeometryFactory geomFactory = GeometryFactory.floating(0, 2);
     final WKTReader rdr = new WKTReader(geomFactory);
     final Geometry g = rdr.read(wkt);
@@ -119,8 +114,7 @@ public class WKBTest extends TestCase {
   }
 
   public void testBigPolygon() throws IOException, ParseException {
-    final GeometricShapeFactory shapeFactory = new GeometricShapeFactory(
-      this.geomFactory);
+    final GeometricShapeFactory shapeFactory = new GeometricShapeFactory(this.geomFactory);
     shapeFactory.setBase(new PointDouble((double)0, 0, Point.NULL_ORDINATE));
     shapeFactory.setSize(1000);
     shapeFactory.setNumPoints(1000);

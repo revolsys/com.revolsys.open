@@ -117,8 +117,7 @@ public class DERelationshipClass extends DETable {
     this.isComposite = isComposite;
   }
 
-  public void setDestinationClassKeys(
-    final List<RelationshipClassKey> destinationClassKeys) {
+  public void setDestinationClassKeys(final List<RelationshipClassKey> destinationClassKeys) {
     this.destinationClassKeys = destinationClassKeys;
   }
 
@@ -134,8 +133,7 @@ public class DERelationshipClass extends DETable {
     this.notification = notification;
   }
 
-  public void setOriginClassKeys(
-    final List<RelationshipClassKey> originClassKeys) {
+  public void setOriginClassKeys(final List<RelationshipClassKey> originClassKeys) {
     this.originClassKeys = originClassKeys;
   }
 
@@ -147,8 +145,7 @@ public class DERelationshipClass extends DETable {
     this.isReflexive = isReflexive;
   }
 
-  public void setRelationshipRules(
-    final List<RelationshipRule> relationshipRules) {
+  public void setRelationshipRules(final List<RelationshipRule> relationshipRules) {
     this.relationshipRules = relationshipRules;
   }
 

@@ -6,8 +6,7 @@ import java.util.List;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.visitor.CreateListVisitor;
 
-public abstract class AbstractPointSpatialIndex<T> implements
-PointSpatialIndex<T> {
+public abstract class AbstractPointSpatialIndex<T> implements PointSpatialIndex<T> {
 
   @Override
   public List<T> find(final BoundingBox envelope) {

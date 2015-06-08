@@ -29,8 +29,8 @@ public class RelateTest extends TestCase {
     super(name);
   }
 
-  void runRelateTest(final String wkt1, final String wkt2,
-    final String expectedIM) throws ParseException {
+  void runRelateTest(final String wkt1, final String wkt2, final String expectedIM)
+    throws ParseException {
     final Geometry g1 = this.rdr.read(wkt1);
     final Geometry g2 = this.rdr.read(wkt2);
     final IntersectionMatrix im = RelateOp.relate(g1, g2);

@@ -9,8 +9,8 @@ import javax.swing.AbstractListModel;
 
 import com.revolsys.util.Property;
 
-public class ExternalListModel<T> extends AbstractListModel implements
-Serializable, PropertyChangeListener {
+public class ExternalListModel<T> extends AbstractListModel implements Serializable,
+  PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   private final List<T> list;

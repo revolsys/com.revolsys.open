@@ -220,8 +220,7 @@ class BufferSubgraph implements Comparable {
 
     // only compute string append if assertion would fail
     if (startEdge == null) {
-      throw new TopologyException("unable to find edge to compute depths at "
-          + n.getCoordinate());
+      throw new TopologyException("unable to find edge to compute depths at " + n.getCoordinate());
     }
 
     ((DirectedEdgeStar)n.getEdges()).computeDepths(startEdge);

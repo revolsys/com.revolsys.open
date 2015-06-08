@@ -16,9 +16,8 @@ import com.revolsys.data.record.schema.RecordDefinitionFactory;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 
-public class JsonResourceRecordDefinitionFactory extends
-AbstractObjectWithProperties implements ApplicationContextAware,
-RecordDefinitionFactory {
+public class JsonResourceRecordDefinitionFactory extends AbstractObjectWithProperties implements
+  ApplicationContextAware, RecordDefinitionFactory {
 
   private final Map<String, RecordDefinition> recordDefinitionMap = new HashMap<String, RecordDefinition>();
 
@@ -44,14 +43,13 @@ RecordDefinitionFactory {
         this.recordDefinitionMap.put(name, recordDefinition);
       }
     } catch (final IOException e) {
-      throw new IllegalArgumentException("Unable to get resources for "
-          + this.locationPattern);
+      throw new IllegalArgumentException("Unable to get resources for " + this.locationPattern);
     }
   }
 
   @Override
   public void setApplicationContext(final ApplicationContext applicationContext)
-      throws BeansException {
+    throws BeansException {
     this.applicationContext = applicationContext;
   }
 

@@ -4,8 +4,7 @@ import java.io.IOException;
 
 import org.springframework.core.io.Resource;
 
-public class ByteArrayResource extends
-org.springframework.core.io.ByteArrayResource {
+public class ByteArrayResource extends org.springframework.core.io.ByteArrayResource {
 
   private final String filename;
 
@@ -14,8 +13,7 @@ org.springframework.core.io.ByteArrayResource {
     this.filename = filename;
   }
 
-  public ByteArrayResource(final String filename, final byte[] data,
-    final String description) {
+  public ByteArrayResource(final String filename, final byte[] data, final String description) {
     super(data, description);
     this.filename = filename;
   }

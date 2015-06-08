@@ -45,12 +45,11 @@ public abstract class AbstractLayerTreeNode extends ListTreeNode {
   }
 
   @Override
-  public Component getTreeCellRendererComponent(Component renderer,
-    final JTree tree, final Object value, final boolean selected,
-    final boolean expanded, final boolean leaf, final int row,
-    final boolean hasFocus) {
-    renderer = super.getTreeCellRendererComponent(renderer, tree, value,
-      selected, expanded, leaf, row, hasFocus);
+  public Component getTreeCellRendererComponent(Component renderer, final JTree tree,
+    final Object value, final boolean selected, final boolean expanded, final boolean leaf,
+    final int row, final boolean hasFocus) {
+    renderer = super.getTreeCellRendererComponent(renderer, tree, value, selected, expanded, leaf,
+      row, hasFocus);
     if (isUserObjectInitialized()) {
       final Layer layer = getLayer();
 

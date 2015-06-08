@@ -16,8 +16,9 @@ import com.revolsys.io.Writer;
 
 public class RecordLog {
 
-  public static void error(final Class<?> logCategory, final String message,
-    final Record object) {
+  private static final String KEY = RecordLog.class.getName();
+
+  public static void error(final Class<?> logCategory, final String message, final Record object) {
     final RecordLog recordLog = getForThread();
     if (object == null) {
       final Logger log = LoggerFactory.getLogger(logCategory);
@@ -25,8 +26,7 @@ public class RecordLog {
     } else if (recordLog == null) {
       final RecordDefinition recordDefinition = object.getRecordDefinition();
       final Logger log = LoggerFactory.getLogger(logCategory);
-      log.error(message + "\t" + recordDefinition.getPath()
-        + object.getIdentifier());
+      log.error(message + "\t" + recordDefinition.getPath() + object.getIdentifier());
     } else {
       recordLog.error(message, object);
     }
@@ -37,8 +37,7 @@ public class RecordLog {
     return recordLog;
   }
 
-  public static void info(final Class<?> logCategory, final String message,
-    final Record object) {
+  public static void info(final Class<?> logCategory, final String message, final Record object) {
     final RecordLog recordLog = getForThread();
     if (object == null) {
       final Logger log = LoggerFactory.getLogger(logCategory);
@@ -46,8 +45,7 @@ public class RecordLog {
     } else if (recordLog == null) {
       final RecordDefinition recordDefinition = object.getRecordDefinition();
       final Logger log = LoggerFactory.getLogger(logCategory);
-      log.info(message + "\t" + recordDefinition.getPath()
-        + object.getIdentifier());
+      log.info(message + "\t" + recordDefinition.getPath() + object.getIdentifier());
     } else {
       recordLog.info(message, object);
     }
@@ -62,8 +60,7 @@ public class RecordLog {
     return recordLog;
   }
 
-  public static void warn(final Class<?> logCategory, final String message,
-    final Record object) {
+  public static void warn(final Class<?> logCategory, final String message, final Record object) {
     final RecordLog recordLog = getForThread();
     if (object == null) {
       final Logger log = LoggerFactory.getLogger(logCategory);
@@ -71,14 +68,11 @@ public class RecordLog {
     } else if (recordLog == null) {
       final RecordDefinition recordDefinition = object.getRecordDefinition();
       final Logger log = LoggerFactory.getLogger(logCategory);
-      log.warn(message + "\t" + recordDefinition.getPath()
-        + object.getIdentifier());
+      log.warn(message + "\t" + recordDefinition.getPath() + object.getIdentifier());
     } else {
       recordLog.warn(message, object);
     }
   }
-
-  private static final String KEY = RecordLog.class.getName();
 
   private Writer<Record> writer;
 
@@ -101,8 +95,7 @@ public class RecordLog {
     return logRecordDefinition;
   }
 
-  private RecordDefinition getLogRecordDefinition(
-    final RecordDefinition recordDefinition) {
+  private RecordDefinition getLogRecordDefinition(final RecordDefinition recordDefinition) {
     RecordDefinitionImpl logRecordDefinition = this.logRecordDefinitionMap.get(recordDefinition);
     if (logRecordDefinition == null) {
       final String path = recordDefinition.getPath();
@@ -116,8 +109,7 @@ public class RecordLog {
       }
       final String logTypeName = Path.toPath(parentPath, logTableName);
       logRecordDefinition = new RecordDefinitionImpl(logTypeName);
-      logRecordDefinition.addField("LOGMESSAGE", DataTypes.STRING, 255,
-        true);
+      logRecordDefinition.addField("LOGMESSAGE", DataTypes.STRING, 255, true);
       logRecordDefinition.addField("LOGLEVEL", DataTypes.STRING, 10, true);
       for (final FieldDefinition attribute : recordDefinition.getFields()) {
         final FieldDefinition logAttribute = new FieldDefinition(attribute);
@@ -137,8 +129,7 @@ public class RecordLog {
     log("INFO", message, object);
   }
 
-  private void log(final String logLevel, final Object message,
-    final Record object) {
+  private void log(final String logLevel, final Object message, final Record object) {
     if (this.writer != null) {
       final RecordDefinition logRecordDefinition = getLogRecordDefinition(object);
       final Record logObject = new ArrayRecord(logRecordDefinition, object);

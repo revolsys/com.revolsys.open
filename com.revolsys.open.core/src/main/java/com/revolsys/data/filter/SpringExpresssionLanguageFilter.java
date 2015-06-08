@@ -13,8 +13,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.filter.Filter;
 import com.revolsys.io.map.MapSerializer;
 
-public class SpringExpresssionLanguageFilter implements Filter<Record>,
-MapSerializer {
+public class SpringExpresssionLanguageFilter implements Filter<Record>, MapSerializer {
   private static SpelParserConfiguration EXPRESSION_CONFIGURATION = new SpelParserConfiguration(
     true, true);
 

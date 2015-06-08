@@ -14,12 +14,11 @@ import com.revolsys.gis.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 
-public class GmlIoFactory extends AbstractRecordAndGeometryWriterFactory
-implements GeometryReaderFactory {
+public class GmlIoFactory extends AbstractRecordAndGeometryWriterFactory implements
+  GeometryReaderFactory {
   public GmlIoFactory() {
     super(GmlConstants.FORMAT_DESCRIPTION, true, true);
-    addMediaTypeAndFileExtension(GmlConstants.MEDIA_TYPE,
-      GmlConstants.FILE_EXTENSION);
+    addMediaTypeAndFileExtension(GmlConstants.MEDIA_TYPE, GmlConstants.FILE_EXTENSION);
   }
 
   @Override
@@ -30,8 +29,7 @@ implements GeometryReaderFactory {
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream,
-    final Charset charset) {
+    final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
     return new GmlRecordWriter(recordDefinition, writer);
   }

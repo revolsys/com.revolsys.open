@@ -51,13 +51,13 @@ public class XBaseFieldDefinition {
 
   private double precisionScale;
 
-  public XBaseFieldDefinition(final String name, final String fullName,
-    final char type, final int length) {
+  public XBaseFieldDefinition(final String name, final String fullName, final char type,
+    final int length) {
     this(name, fullName, type, length, 0);
   }
 
-  public XBaseFieldDefinition(final String name, final String fullName,
-    final char type, final int length, final int decimalPlaces) {
+  public XBaseFieldDefinition(final String name, final String fullName, final char type,
+    final int length, final int decimalPlaces) {
     this.name = name;
     this.fullName = fullName;
     this.type = type;

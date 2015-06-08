@@ -46,9 +46,12 @@ import com.revolsys.jts.io.WKTReader;
  */
 public class OrientationIndexTest extends TestCase {
 
-  public static boolean isAllOrientationsEqual(final double p0x,
-    final double p0y, final double p1x, final double p1y, final double p2x,
-    final double p2y) {
+  private static WKTReader reader = new WKTReader();
+
+  // private CGAlgorithms rcga = new CGAlgorithms();
+
+  public static boolean isAllOrientationsEqual(final double p0x, final double p0y,
+    final double p1x, final double p1y, final double p2x, final double p2y) {
     final Point[] pts = {
       new PointDouble(p0x, p0y, Point.NULL_ORDINATE),
       new PointDouble(p1x, p1y, Point.NULL_ORDINATE),
@@ -56,8 +59,6 @@ public class OrientationIndexTest extends TestCase {
     };
     return isAllOrientationsEqual(pts);
   }
-
-  // private CGAlgorithms rcga = new CGAlgorithms();
 
   /**
    * Tests whether the orientations around a triangle of points
@@ -78,8 +79,6 @@ public class OrientationIndexTest extends TestCase {
     TestRunner.run(OrientationIndexTest.class);
   }
 
-  private static WKTReader reader = new WKTReader();
-
   public OrientationIndexTest(final String name) {
     super(name);
   }
@@ -87,11 +86,9 @@ public class OrientationIndexTest extends TestCase {
   public void testCCW2() throws Exception {
     // experimental case - can't make it fail
     final Point[] pts2 = {
-      new PointDouble(1.0000000000004998, -7.989685402102996,
-        Point.NULL_ORDINATE),
-        new PointDouble(10.0, -7.004368924503866, Point.NULL_ORDINATE),
-        new PointDouble(1.0000000000005, -7.989685402102996,
-          Point.NULL_ORDINATE),
+      new PointDouble(1.0000000000004998, -7.989685402102996, Point.NULL_ORDINATE),
+      new PointDouble(10.0, -7.004368924503866, Point.NULL_ORDINATE),
+      new PointDouble(1.0000000000005, -7.989685402102996, Point.NULL_ORDINATE),
     };
     assertTrue(isAllOrientationsEqual(pts2));
   }

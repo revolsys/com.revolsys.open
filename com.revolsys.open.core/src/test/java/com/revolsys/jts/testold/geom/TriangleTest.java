@@ -49,23 +49,21 @@ import com.revolsys.jts.io.WKTReader;
  */
 public class TriangleTest extends TestCase {
 
+  private static final double TOLERANCE = 1E-5;
+
   public static void main(final String args[]) {
     TestRunner.run(TriangleTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.floating(0,
-    2);
+  private final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
-
-  private static final double TOLERANCE = 1E-5;
 
   public TriangleTest(final String name) {
     super(name);
   }
 
-  public void checkAcute(final String wkt, final boolean expectedValue)
-      throws Exception {
+  public void checkAcute(final String wkt, final boolean expectedValue) throws Exception {
     final Polygon g = (Polygon)this.reader.read(wkt);
     final Triangle t = createTriangle(g);
     final boolean isAcute = t.isAcute();
@@ -73,8 +71,7 @@ public class TriangleTest extends TestCase {
     assertEquals(expectedValue, isAcute);
   }
 
-  public void checkArea(final String wkt, final double expectedValue)
-      throws Exception {
+  public void checkArea(final String wkt, final double expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
 
     final Triangle t = createTriangle(g);
@@ -87,8 +84,7 @@ public class TriangleTest extends TestCase {
 
   }
 
-  public void checkArea3D(final String wkt, final double expectedValue)
-      throws Exception {
+  public void checkArea3D(final String wkt, final double expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
     final Triangle t = createTriangle(g);
     final double area3D = t.area3D();
@@ -96,8 +92,7 @@ public class TriangleTest extends TestCase {
     assertEquals(expectedValue, area3D, TOLERANCE);
   }
 
-  public void checkCentroid(final String wkt, final Point expectedValue)
-      throws Exception {
+  public void checkCentroid(final String wkt, final Point expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
 
     final Triangle t = createTriangle(g);
@@ -112,8 +107,7 @@ public class TriangleTest extends TestCase {
     assertEquals(expectedValue.toString(), centroid.toString());
   }
 
-  public void checkCircumCentre(final String wkt,
-    final Point expectedValue) throws Exception {
+  public void checkCircumCentre(final String wkt, final Point expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
 
     final Triangle t = createTriangle(g);
@@ -129,8 +123,8 @@ public class TriangleTest extends TestCase {
     assertEquals(expectedValue.toString(), circumcentre.toString());
   }
 
-  public void checkInterpolateZ(final String wkt, final Point p,
-    final double expectedValue) throws Exception {
+  public void checkInterpolateZ(final String wkt, final Point p, final double expectedValue)
+    throws Exception {
     final Geometry g = this.reader.read(wkt);
 
     final Triangle t = createTriangle(g);
@@ -139,8 +133,7 @@ public class TriangleTest extends TestCase {
     assertEquals(expectedValue, z, 0.000001);
   }
 
-  public void checkLongestSideLength(final String wkt,
-    final double expectedValue) throws Exception {
+  public void checkLongestSideLength(final String wkt, final double expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
 
     final Triangle t = createTriangle(g);
@@ -168,9 +161,8 @@ public class TriangleTest extends TestCase {
   }
 
   public Triangle createTriangle(final LineString line) {
-    final Triangle t = new Triangle(line.getVertex(0).clonePoint(),
-      line.getVertex(1).clonePoint(), line.getVertex(2)
-      .clonePoint());
+    final Triangle t = new Triangle(line.getVertex(0).clonePoint(), line.getVertex(1).clonePoint(),
+      line.getVertex(2).clonePoint());
     return t;
   }
 
@@ -201,58 +193,50 @@ public class TriangleTest extends TestCase {
   }
 
   public void testArea3D() throws Exception {
-    checkArea3D("POLYGON((0 0 10, 100 0 110, 100 100 110, 0 0 10))",
-      7071.067811865475);
-    checkArea3D("POLYGON((0 0 10, 100 0 10, 50 100 110, 0 0 10))",
-      7071.067811865475);
+    checkArea3D("POLYGON((0 0 10, 100 0 110, 100 100 110, 0 0 10))", 7071.067811865475);
+    checkArea3D("POLYGON((0 0 10, 100 0 10, 50 100 110, 0 0 10))", 7071.067811865475);
   }
 
   public void testCentroid() throws Exception {
     // right triangle
     checkCentroid("POLYGON((10 10, 20 20, 20 10, 10 10))", new PointDouble(
-      (10.0 + 20.0 + 20.0) / 3.0, (10.0 + 20.0 + 10.0) / 3.0,
-      Point.NULL_ORDINATE));
+      (10.0 + 20.0 + 20.0) / 3.0, (10.0 + 20.0 + 10.0) / 3.0, Point.NULL_ORDINATE));
     // CCW right tri
     checkCentroid("POLYGON((10 10, 20 10, 20 20, 10 10))", new PointDouble(
-      (10.0 + 20.0 + 20.0) / 3.0, (10.0 + 10.0 + 20.0) / 3.0,
-      Point.NULL_ORDINATE));
+      (10.0 + 20.0 + 20.0) / 3.0, (10.0 + 10.0 + 20.0) / 3.0, Point.NULL_ORDINATE));
     // acute
     checkCentroid("POLYGON((10 10, 20 10, 15 20, 10 10))", new PointDouble(
-      (10.0 + 20.0 + 15.0) / 3.0, (10.0 + 10.0 + 20.0) / 3.0,
-      Point.NULL_ORDINATE));
+      (10.0 + 20.0 + 15.0) / 3.0, (10.0 + 10.0 + 20.0) / 3.0, Point.NULL_ORDINATE));
   }
 
   public void testCircumCentre() throws Exception {
     // right triangle
-    checkCircumCentre("POLYGON((10 10, 20 20, 20 10, 10 10))", new PointDouble(
-      15.0, 15.0, Point.NULL_ORDINATE));
+    checkCircumCentre("POLYGON((10 10, 20 20, 20 10, 10 10))", new PointDouble(15.0, 15.0,
+      Point.NULL_ORDINATE));
     // CCW right tri
-    checkCircumCentre("POLYGON((10 10, 20 10, 20 20, 10 10))", new PointDouble(
-      15.0, 15.0, Point.NULL_ORDINATE));
+    checkCircumCentre("POLYGON((10 10, 20 10, 20 20, 10 10))", new PointDouble(15.0, 15.0,
+      Point.NULL_ORDINATE));
     // acute
-    checkCircumCentre("POLYGON((10 10, 20 10, 15 20, 10 10))", new PointDouble(
-      15.0, 13.75, Point.NULL_ORDINATE));
+    checkCircumCentre("POLYGON((10 10, 20 10, 15 20, 10 10))", new PointDouble(15.0, 13.75,
+      Point.NULL_ORDINATE));
   }
 
   public void testInterpolateZ() throws Exception {
-    checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)", new PointDouble(1.5,
-      1.5, Point.NULL_ORDINATE), 5);
-    checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)", new PointDouble(1.2,
-      1.2, Point.NULL_ORDINATE), 2);
-    checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)", new PointDouble(0.0,
-      0, Point.NULL_ORDINATE), -10);
+    checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)", new PointDouble(1.5, 1.5,
+      Point.NULL_ORDINATE), 5);
+    checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)", new PointDouble(1.2, 1.2,
+      Point.NULL_ORDINATE), 2);
+    checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)", new PointDouble(0.0, 0,
+      Point.NULL_ORDINATE), -10);
   }
 
   public void testLongestSideLength() throws Exception {
     // right triangle
-    checkLongestSideLength("POLYGON((10 10 1, 20 20 2, 20 10 3, 10 10 1))",
-      14.142135623730951);
+    checkLongestSideLength("POLYGON((10 10 1, 20 20 2, 20 10 3, 10 10 1))", 14.142135623730951);
     // CCW right tri
-    checkLongestSideLength("POLYGON((10 10 1, 20 10 2, 20 20 3, 10 10 1))",
-      14.142135623730951);
+    checkLongestSideLength("POLYGON((10 10 1, 20 10 2, 20 20 3, 10 10 1))", 14.142135623730951);
     // acute
-    checkLongestSideLength("POLYGON((10 10 1, 20 10 2, 15 20 3, 10 10 1))",
-      11.180339887498949);
+    checkLongestSideLength("POLYGON((10 10 1, 20 10 2, 15 20 3, 10 10 1))", 11.180339887498949);
   }
 
 }

@@ -25,6 +25,10 @@ import com.revolsys.util.Property;
 
 public class IoFactoryRegistry {
 
+  private static final Logger LOG = LoggerFactory.getLogger(IoFactoryRegistry.class);
+
+  private static IoFactoryRegistry instance = new IoFactoryRegistry();
+
   public static void clearInstance() {
     instance = null;
   }
@@ -48,10 +52,6 @@ public class IoFactoryRegistry {
       return instance;
     }
   }
-
-  private static final Logger LOG = LoggerFactory.getLogger(IoFactoryRegistry.class);
-
-  private static IoFactoryRegistry instance = new IoFactoryRegistry();
 
   private final Map<Class<? extends IoFactory>, Set<String>> classFileExtensions = new HashMap<>();
 
@@ -89,8 +89,7 @@ public class IoFactoryRegistry {
                   final IoFactory factory = ((Class<IoFactory>)factoryClass).newInstance();
                   addFactory(factory);
                 } else {
-                  LOG.error(factoryClassName + " is not a subclass of "
-                      + IoFactory.class);
+                  LOG.error(factoryClassName + " is not a subclass of " + IoFactory.class);
                 }
               } catch (final Throwable e) {
                 LOG.error("Unable to load: " + factoryClassName, e);
@@ -102,8 +101,7 @@ public class IoFactoryRegistry {
         }
       }
     } catch (final IOException e) {
-      LOG.error("Unable to load META-INF/com.revolsys.io.MapWriter.properties",
-        e);
+      LOG.error("Unable to load META-INF/com.revolsys.io.MapWriter.properties", e);
     }
   }
 
@@ -116,8 +114,7 @@ public class IoFactoryRegistry {
   }
 
   @SuppressWarnings("unchecked")
-  private void addFactory(final IoFactory factory,
-    final Class<? extends IoFactory> factoryClass) {
+  private void addFactory(final IoFactory factory, final Class<? extends IoFactory> factoryClass) {
     final Class<?>[] interfaces = factoryClass.getInterfaces();
     for (final Class<?> factoryInterface : interfaces) {
       if (IoFactory.class.isAssignableFrom(factoryInterface)) {
@@ -125,13 +122,11 @@ public class IoFactoryRegistry {
         final Set<IoFactory> factories = getFactories(ioInterface);
         if (factories.add(factory)) {
           for (final String fileExtension : factory.getFileExtensions()) {
-            Maps.addToTreeSet(this.classFileExtensions, ioInterface,
-              fileExtension);
+            Maps.addToTreeSet(this.classFileExtensions, ioInterface, fileExtension);
             final Map<String, IoFactory> factoriesByFileExtension = getFactoriesByFileExtensionMap(ioInterface);
             factoriesByFileExtension.put(fileExtension, factory);
             for (final String mediaType : factory.getMediaTypes()) {
-              this.extensionMimeTypeMap.put(fileExtension.toLowerCase(),
-                mediaType);
+              this.extensionMimeTypeMap.put(fileExtension.toLowerCase(), mediaType);
             }
           }
           final Map<String, IoFactory> factoriesByMediaType = getFactoriesByMediaType(ioInterface);
@@ -173,8 +168,8 @@ public class IoFactoryRegistry {
     return this.factories;
   }
 
-  public <F extends IoFactory> List<F> getFactoriesByFileExtension(
-    final Class<F> factoryClass, final List<String> fileExtensions) {
+  public <F extends IoFactory> List<F> getFactoriesByFileExtension(final Class<F> factoryClass,
+    final List<String> fileExtensions) {
     if (fileExtensions == null) {
       return Collections.emptyList();
     } else {
@@ -199,8 +194,7 @@ public class IoFactoryRegistry {
       Map<String, IoFactory> factoriesByFileExtension = this.classFactoriesByFileExtension.get(factoryClass);
       if (factoriesByFileExtension == null) {
         factoriesByFileExtension = new TreeMap<String, IoFactory>();
-        this.classFactoriesByFileExtension.put(factoryClass,
-          factoriesByFileExtension);
+        this.classFactoriesByFileExtension.put(factoryClass, factoriesByFileExtension);
       }
       return (Map<String, F>)factoriesByFileExtension;
     }
@@ -221,8 +215,8 @@ public class IoFactoryRegistry {
     }
   }
 
-  public <F extends IoFactory> F getFactoryByFileExtension(
-    final Class<F> factoryClass, final String fileExtension) {
+  public <F extends IoFactory> F getFactoryByFileExtension(final Class<F> factoryClass,
+    final String fileExtension) {
     if (fileExtension == null) {
       return null;
     } else {
@@ -231,8 +225,8 @@ public class IoFactoryRegistry {
     }
   }
 
-  public <F extends IoFactory> F getFactoryByFileName(
-    final Class<F> factoryClass, final String fileName) {
+  public <F extends IoFactory> F getFactoryByFileName(final Class<F> factoryClass,
+    final String fileName) {
     if (fileName == null) {
       return null;
     } else {
@@ -246,8 +240,8 @@ public class IoFactoryRegistry {
     }
   }
 
-  public <F extends IoFactory> F getFactoryByMediaType(
-    final Class<F> factoryClass, final String mediaType) {
+  public <F extends IoFactory> F getFactoryByMediaType(final Class<F> factoryClass,
+    final String mediaType) {
     if (mediaType == null) {
       return null;
     } else if (mediaType.contains("/")) {
@@ -258,8 +252,8 @@ public class IoFactoryRegistry {
     }
   }
 
-  public <F extends IoFactory> F getFactoryByResource(
-    final Class<F> factoryClass, final Resource resource) {
+  public <F extends IoFactory> F getFactoryByResource(final Class<F> factoryClass,
+    final Resource resource) {
     String fileName;
     if (resource == null) {
       return null;
@@ -276,19 +270,16 @@ public class IoFactoryRegistry {
     return getFactoryByFileName(factoryClass, fileName);
   }
 
-  public Set<String> getFileExtensions(
-    final Class<? extends IoFactory> factoryClass) {
+  public Set<String> getFileExtensions(final Class<? extends IoFactory> factoryClass) {
     if (factoryClass == null) {
       return Collections.emptySet();
     } else {
       final Set<String> emptySet = Collections.<String> emptySet();
-      return Maps.get(this.classFileExtensions, factoryClass,
-        emptySet);
+      return Maps.get(this.classFileExtensions, factoryClass, emptySet);
     }
   }
 
-  public <F extends IoFactory> Set<String> getMediaTypes(
-    final Class<F> factoryClass) {
+  public <F extends IoFactory> Set<String> getMediaTypes(final Class<F> factoryClass) {
     if (factoryClass == null) {
       return Collections.emptySet();
     } else {
@@ -297,13 +288,12 @@ public class IoFactoryRegistry {
     }
   }
 
-  public boolean isFileExtensionSupported(
-    final Class<? extends IoFactory> factoryClass, final String fileExtension) {
+  public boolean isFileExtensionSupported(final Class<? extends IoFactory> factoryClass,
+    final String fileExtension) {
     if (factoryClass == null || fileExtension == null) {
       return false;
     } else {
-      return getFileExtensions(factoryClass).contains(
-        fileExtension.toLowerCase());
+      return getFileExtensions(factoryClass).contains(fileExtension.toLowerCase());
     }
   }
 

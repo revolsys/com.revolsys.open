@@ -23,8 +23,7 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.util.JexlUtil;
 
-public class CreateObjectsWithinDistanceOfGeometry extends
-BaseInOutProcess<Record, Record> {
+public class CreateObjectsWithinDistanceOfGeometry extends BaseInOutProcess<Record, Record> {
 
   private Map<String, Object> attributes = new HashMap<String, Object>();
 
@@ -84,18 +83,15 @@ BaseInOutProcess<Record, Record> {
         Geometry geometry = record.getGeometryValue();
         if (geometry != null) {
           final JexlContext context = new HashMapContext();
-          final Map<String, Object> vars = new HashMap<String, Object>(
-              this.attributes);
+          final Map<String, Object> vars = new HashMap<String, Object>(this.attributes);
           vars.putAll(record);
           vars.put("typePath", recordDefinition.getPath());
           context.setVars(vars);
           final String typePath = (String)JexlUtil.evaluateExpression(context,
             this.typePathTemplateExpression);
-          newRecordDefinition = new RecordDefinitionImpl(typePath,
-            recordDefinition.getFields());
+          newRecordDefinition = new RecordDefinitionImpl(typePath, recordDefinition.getFields());
           if (this.distance > 0) {
-            final BufferParameters parameters = new BufferParameters(1, 3, 2,
-              1.0D);
+            final BufferParameters parameters = new BufferParameters(1, 3, 2, 1.0D);
             geometry = Buffer.buffer(geometry, this.distance, parameters);
           }
           geometry = DouglasPeuckerSimplifier.simplify(geometry, 2D);
@@ -104,8 +100,7 @@ BaseInOutProcess<Record, Record> {
         }
       }
 
-      this.recordDefinitionGeometryMap.put(recordDefinition,
-        recordDefinitionGeometries);
+      this.recordDefinitionGeometryMap.put(recordDefinition, recordDefinitionGeometries);
     }
     return recordDefinitionGeometries;
   }
@@ -132,8 +127,7 @@ BaseInOutProcess<Record, Record> {
   }
 
   @Override
-  protected void process(final Channel<Record> in, final Channel<Record> out,
-    final Record object) {
+  protected void process(final Channel<Record> in, final Channel<Record> out, final Record object) {
     if (this.writeOriginal) {
       out.write(object);
     }
@@ -170,13 +164,12 @@ BaseInOutProcess<Record, Record> {
   public void setTypeNameTemplate(final String typePathTemplate) {
     this.typePathTemplate = typePathTemplate;
     try {
-      this.typePathTemplateExpression = JexlUtil.createExpression(
-        typePathTemplate, "%\\{([^\\}]+)\\}");
+      this.typePathTemplateExpression = JexlUtil.createExpression(typePathTemplate,
+        "%\\{([^\\}]+)\\}");
     } catch (final Exception e) {
-      throw new IllegalArgumentException(new StringBuilder().append(
-          "Invalid type name template: ")
-          .append(typePathTemplate)
-          .toString(), e);
+      throw new IllegalArgumentException(new StringBuilder().append("Invalid type name template: ")
+        .append(typePathTemplate)
+        .toString(), e);
     }
   }
 

@@ -80,6 +80,8 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     }
   }
 
+  private static final String KEY = IndexedPointInAreaLocator.class.getName();
+
   public static IndexedPointInAreaLocator get(final Geometry geometry) {
     IndexedPointInAreaLocator locator = GeometryProperties.getGeometryProperty(geometry, KEY);
     if (locator == null) {
@@ -88,8 +90,6 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     }
     return locator;
   }
-
-  private static final String KEY = IndexedPointInAreaLocator.class.getName();
 
   private final IntervalIndexedGeometry index;
 

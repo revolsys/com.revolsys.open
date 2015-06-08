@@ -46,8 +46,7 @@ public class DivElementContainer extends ElementContainer {
     this.cssClass = cssClass;
   }
 
-  public DivElementContainer(final String id, final String cssClass,
-    final Element element) {
+  public DivElementContainer(final String id, final String cssClass, final Element element) {
     this(id, cssClass);
     this.add(element);
   }

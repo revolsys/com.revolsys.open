@@ -11,8 +11,7 @@ import com.revolsys.jts.geom.LineString;
  */
 public final class MatchDistance {
 
-  private static double farLength(final Geometry a, final Geometry b,
-    final double tolerance) {
+  private static double farLength(final Geometry a, final Geometry b, final double tolerance) {
     final Geometry farA = a.difference(b.buffer(tolerance));
     final double farALen = farA.getLength();
     return farALen;
@@ -101,10 +100,8 @@ public final class MatchDistance {
     double nearnessFrac = nearnessFraction(a, b, tolerance);
 
     if (trimLines) {
-      final LineString trimmedA = MaximalNearestSubline.getMaximalNearestSubline(
-        a, b);
-      final LineString trimmedB = MaximalNearestSubline.getMaximalNearestSubline(
-        b, a);
+      final LineString trimmedA = MaximalNearestSubline.getMaximalNearestSubline(a, b);
+      final LineString trimmedB = MaximalNearestSubline.getMaximalNearestSubline(b, a);
       final double trimmedNF = nearnessFraction(trimmedA, trimmedB, tolerance);
       // choose the largest fraction
       // (it can happen that the original nearness is greater, if the lines are
@@ -151,10 +148,8 @@ public final class MatchDistance {
    * @see MaximalNearestSubline
    */
   public static double trimmedDistance(final LineString a, final LineString b) {
-    final LineString trimA = MaximalNearestSubline.getMaximalNearestSubline(a,
-      b);
-    final LineString trimB = MaximalNearestSubline.getMaximalNearestSubline(b,
-      a);
+    final LineString trimA = MaximalNearestSubline.getMaximalNearestSubline(a, b);
+    final LineString trimB = MaximalNearestSubline.getMaximalNearestSubline(b, a);
     return VertexHausdorffDistance.distance(trimA, trimB);
   }
 

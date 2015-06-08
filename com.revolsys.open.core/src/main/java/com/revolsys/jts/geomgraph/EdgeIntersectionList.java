@@ -64,10 +64,8 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
    * The input segmentIndex and dist are expected to be normalized.
    * @return the EdgeIntersection found or added
    */
-  public EdgeIntersection add(final Point intPt, final int segmentIndex,
-    final double dist) {
-    final EdgeIntersection eiNew = new EdgeIntersection(intPt, segmentIndex,
-      dist);
+  public EdgeIntersection add(final Point intPt, final int segmentIndex, final double dist) {
+    final EdgeIntersection eiNew = new EdgeIntersection(intPt, segmentIndex, dist);
     final EdgeIntersection ei = (EdgeIntersection)this.nodeMap.get(eiNew);
     if (ei != null) {
       return ei;
@@ -124,8 +122,7 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
     // (This check is needed because the distance metric is not totally
     // reliable!)
     // The check for point equality is 2D only - Z values are ignored
-    final boolean useIntPt1 = ei1.dist > 0.0
-        || !ei1.coord.equals(2,lastSegStartPt);
+    final boolean useIntPt1 = ei1.dist > 0.0 || !ei1.coord.equals(2, lastSegStartPt);
     if (!useIntPt1) {
       npts--;
     }

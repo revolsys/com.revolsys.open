@@ -26,32 +26,25 @@ public class Preference {
 
   private final JComponent fieldComponent;
 
-  public Preference(final String applicationName, final String path,
-    final String propertyName, final Class<?> valueClass,
-    final Object defaultValue) {
-    this(applicationName, path, propertyName, valueClass, defaultValue,
-      (JComponent)null);
+  public Preference(final String applicationName, final String path, final String propertyName,
+    final Class<?> valueClass, final Object defaultValue) {
+    this(applicationName, path, propertyName, valueClass, defaultValue, (JComponent)null);
   }
 
-  public Preference(final String applicationName, final String path,
-    final String propertyName, final Class<?> valueClass,
-    final Object defaultValue, final Field field) {
-    this(applicationName, path, propertyName, valueClass, defaultValue,
-      (JComponent)field);
+  public Preference(final String applicationName, final String path, final String propertyName,
+    final Class<?> valueClass, final Object defaultValue, final Field field) {
+    this(applicationName, path, propertyName, valueClass, defaultValue, (JComponent)field);
   }
 
-  public Preference(final String applicationName, final String path,
-    final String propertyName, final Class<?> valueClass,
-    final Object defaultValue, final JComponent field) {
+  public Preference(final String applicationName, final String path, final String propertyName,
+    final Class<?> valueClass, final Object defaultValue, final JComponent field) {
     this.applicationName = applicationName;
     this.path = path;
     this.propertyName = propertyName;
     this.valueClass = valueClass;
-    this.savedValue = OS.getPreference(applicationName, path, propertyName,
-      defaultValue);
+    this.savedValue = OS.getPreference(applicationName, path, propertyName, defaultValue);
     if (field == null) {
-      this.fieldComponent = SwingUtil.createField(valueClass, propertyName,
-        defaultValue);
+      this.fieldComponent = SwingUtil.createField(valueClass, propertyName, defaultValue);
     } else {
       this.fieldComponent = field;
     }

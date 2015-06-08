@@ -45,6 +45,7 @@ public class PreparedMultiPoint extends AbstractMultiPoint {
    *
    */
   private static final long serialVersionUID = 1L;
+
   private final MultiPoint multiPoint;
 
   public PreparedMultiPoint(final MultiPoint multiPoint) {

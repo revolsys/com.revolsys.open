@@ -16,8 +16,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.ZipUtil;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 
-public class ZipRecordReader extends DelegatingReader<Record> implements
-RecordReader {
+public class ZipRecordReader extends DelegatingReader<Record> implements RecordReader {
   private RecordReader reader;
 
   private File directory;
@@ -29,16 +28,15 @@ RecordReader {
       final String zipEntryName = baseName + "." + fileExtension;
       this.directory = ZipUtil.unzipFile(resource);
       if (!openFile(resource, factory, zipEntryName)) {
-        final String[] files = this.directory.list(new ExtensionFilenameFilter(
-          fileExtension));
+        final String[] files = this.directory.list(new ExtensionFilenameFilter(fileExtension));
         if (files != null && files.length == 1) {
           openFile(resource, factory, files[0]);
         }
       }
       if (this.reader == null) {
         close();
-        throw new IllegalArgumentException("No *." + fileExtension
-          + " exists in zip file " + resource);
+        throw new IllegalArgumentException("No *." + fileExtension + " exists in zip file "
+          + resource);
       } else {
         setReader(this.reader);
       }
@@ -57,17 +55,16 @@ RecordReader {
     return this.reader.getRecordDefinition();
   }
 
-  protected boolean openFile(final Resource resource,
-    final RecordFactory factory, final String zipEntryName) {
+  protected boolean openFile(final Resource resource, final RecordFactory factory,
+    final String zipEntryName) {
     final File file = new File(this.directory, zipEntryName);
     if (file.exists()) {
       final FileSystemResource fileResource = new FileSystemResource(file);
-      this.reader = RecordIo.recordReader(
-        fileResource, factory);
+      this.reader = RecordIo.recordReader(fileResource, factory);
       if (this.reader == null) {
         close();
-        throw new IllegalArgumentException("Cannot create reader for file "
-            + zipEntryName + " in zip file " + resource);
+        throw new IllegalArgumentException("Cannot create reader for file " + zipEntryName
+          + " in zip file " + resource);
       } else {
         return true;
       }

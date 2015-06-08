@@ -64,8 +64,7 @@ public class FuzzyPointLocator {
 
   private final PointLocator ptLocator = new PointLocator();
 
-  public FuzzyPointLocator(final Geometry g,
-    final double boundaryDistanceTolerance) {
+  public FuzzyPointLocator(final Geometry g, final double boundaryDistanceTolerance) {
     this.g = g;
     this.boundaryDistanceTolerance = boundaryDistanceTolerance;
     this.linework = extractLinework(g);

@@ -9,12 +9,12 @@ import org.apache.commons.collections4.set.MapBackedSet;
 import com.revolsys.data.hash.HashEquals;
 
 public class CustomHashMap<K, V> extends HashedMap<K, V> {
+  private static final long serialVersionUID = 1L;
+
   public static <T> Set<T> set(final HashEquals hashEquals) {
     final CustomHashMap<T, Void> map = new CustomHashMap<>(hashEquals);
     return MapBackedSet.mapBackedSet(map);
   }
-
-  private static final long serialVersionUID = 1L;
 
   private final HashEquals hashEquals;
 
@@ -33,8 +33,7 @@ public class CustomHashMap<K, V> extends HashedMap<K, V> {
     this.hashEquals = hashEquals;
   }
 
-  public CustomHashMap(final HashEquals hashEquals,
-    final Map<? extends K, ? extends V> map) {
+  public CustomHashMap(final HashEquals hashEquals, final Map<? extends K, ? extends V> map) {
     super(map);
     this.hashEquals = hashEquals;
   }

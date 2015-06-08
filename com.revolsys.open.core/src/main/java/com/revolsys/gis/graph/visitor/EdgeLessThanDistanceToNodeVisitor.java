@@ -12,10 +12,9 @@ import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
 
-public class EdgeLessThanDistanceToNodeVisitor<T> extends
-DelegatingVisitor<Edge<T>> {
-  public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
-    final Node<T> node, final double maxDistance) {
+public class EdgeLessThanDistanceToNodeVisitor<T> extends DelegatingVisitor<Edge<T>> {
+  public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph, final Node<T> node,
+    final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
     final Point point = node;
     BoundingBox env = new BoundingBoxDoubleGf(point);
@@ -32,8 +31,8 @@ DelegatingVisitor<Edge<T>> {
 
   private final Node<T> node;
 
-  public EdgeLessThanDistanceToNodeVisitor(final Node<T> node,
-    final double maxDistance, final Visitor<Edge<T>> matchVisitor) {
+  public EdgeLessThanDistanceToNodeVisitor(final Node<T> node, final double maxDistance,
+    final Visitor<Edge<T>> matchVisitor) {
     super(matchVisitor);
     this.node = node;
     this.maxDistance = maxDistance;

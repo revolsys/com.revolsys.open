@@ -46,8 +46,7 @@ import com.revolsys.jts.testold.algorithm.PerturbedGridPolygonBuilder;
 
 public class SimpleRayCrossingStressTest extends TestCase {
 
-  static class SimpleRayCrossingPointInAreaLocator implements
-  PointOnGeometryLocator {
+  static class SimpleRayCrossingPointInAreaLocator implements PointOnGeometryLocator {
     private final Geometry geom;
 
     public SimpleRayCrossingPointInAreaLocator(final Geometry geom) {
@@ -77,17 +76,14 @@ public class SimpleRayCrossingStressTest extends TestCase {
     final GeometryFactory geomFactory = GeometryFactory.fixed(0, 1.0);
     // GeometryFactoryI geomFactory = new GeometryFactoryI();
 
-    final PerturbedGridPolygonBuilder gridBuilder = new PerturbedGridPolygonBuilder(
-      geomFactory);
+    final PerturbedGridPolygonBuilder gridBuilder = new PerturbedGridPolygonBuilder(geomFactory);
     gridBuilder.setNumLines(20);
     gridBuilder.setLineWidth(10.0);
     final Geometry area = gridBuilder.getGeometry();
 
-    final SimpleRayCrossingPointInAreaLocator pia = new SimpleRayCrossingPointInAreaLocator(
-      area);
+    final SimpleRayCrossingPointInAreaLocator pia = new SimpleRayCrossingPointInAreaLocator(area);
 
-    final PointInAreaStressTester gridTester = new PointInAreaStressTester(
-      geomFactory, area);
+    final PointInAreaStressTester gridTester = new PointInAreaStressTester(geomFactory, area);
     gridTester.setNumPoints(100000);
     gridTester.setPIA(pia);
 

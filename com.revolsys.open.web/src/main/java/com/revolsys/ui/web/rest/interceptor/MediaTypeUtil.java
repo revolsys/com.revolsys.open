@@ -19,10 +19,30 @@ import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.Property;
 
 public class MediaTypeUtil {
-  public static void addMediaType(final List<MediaType> mediaTypes,
-    final String extension) {
-    final MediaType mediaType = getMediaTypeFromParameter(
-      extensionToMediaTypeMap, extension);
+  private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
+
+  private static final String ACCEPT_HEADER = "Accept";
+
+  public static final String CONTENT_TYPE_HEADER = "Content-type";
+
+  private static Map<String, MediaType> extensionToMediaTypeMap = new HashMap<String, MediaType>();
+
+  private static Map<MediaType, String> mediaTypeToExtensionMap = new HashMap<MediaType, String>();
+
+  static {
+    for (final Entry<String, String> entry : IoFactoryRegistry.getInstance()
+      .getExtensionMimeTypeMap()
+      .entrySet()) {
+      final String exetension = entry.getKey();
+      final String mimeType = entry.getValue();
+      final MediaType mediaType = MediaType.parseMediaType(mimeType);
+      extensionToMediaTypeMap.put(exetension, mediaType);
+      mediaTypeToExtensionMap.put(mediaType, exetension);
+    }
+  }
+
+  public static void addMediaType(final List<MediaType> mediaTypes, final String extension) {
+    final MediaType mediaType = getMediaTypeFromParameter(extensionToMediaTypeMap, extension);
     if (mediaType != null) {
       mediaTypes.add(mediaType);
     }
@@ -46,8 +66,7 @@ public class MediaTypeUtil {
     return "html";
   }
 
-  public static List<MediaType> getAcceptedMediaTypes(
-    final HttpServletRequest request) {
+  public static List<MediaType> getAcceptedMediaTypes(final HttpServletRequest request) {
     final List<MediaType> mediaTypes = new ArrayList<MediaType>();
 
     String format = (String)request.getAttribute("format");
@@ -70,27 +89,24 @@ public class MediaTypeUtil {
     return mediaTypes;
   }
 
-  public static List<MediaType> getAcceptedMediaTypes(
-    final HttpServletRequest request,
-    final Map<String, MediaType> extensionToMediaTypeMap,
-    final List<String> mediaTypeOrder, final UrlPathHelper urlPathHelper,
-    final String parameterName, final MediaType defaultMediaType) {
+  public static List<MediaType> getAcceptedMediaTypes(final HttpServletRequest request,
+    final Map<String, MediaType> extensionToMediaTypeMap, final List<String> mediaTypeOrder,
+    final UrlPathHelper urlPathHelper, final String parameterName, final MediaType defaultMediaType) {
 
     final List<MediaType> mediaTypes = new ArrayList<MediaType>();
     for (final String source : mediaTypeOrder) {
       if (source.equals("pathExtension")) {
         final String requestUri = urlPathHelper.getRequestUri(request);
         final String filename = WebUtils.extractFullFilenameFromUrlPath(requestUri);
-        final MediaType mediaType = getMediaTypeFromFilename(
-          extensionToMediaTypeMap, filename);
+        final MediaType mediaType = getMediaTypeFromFilename(extensionToMediaTypeMap, filename);
         if (mediaType != null) {
           mediaTypes.add(mediaType);
         }
       } else if (source.equals("attribute")) {
         final String parameterValue = (String)request.getAttribute(parameterName);
         if (Property.hasValue(parameterValue)) {
-          final MediaType mediaType = getMediaTypeFromParameter(
-            extensionToMediaTypeMap, parameterValue);
+          final MediaType mediaType = getMediaTypeFromParameter(extensionToMediaTypeMap,
+            parameterValue);
           if (mediaType != null) {
             mediaTypes.add(mediaType);
           }
@@ -98,8 +114,8 @@ public class MediaTypeUtil {
       } else if (source.equals("parameter")) {
         final String parameterValue = request.getParameter(parameterName);
         if (Property.hasValue(parameterValue)) {
-          final MediaType mediaType = getMediaTypeFromParameter(
-            extensionToMediaTypeMap, parameterValue);
+          final MediaType mediaType = getMediaTypeFromParameter(extensionToMediaTypeMap,
+            parameterValue);
           if (mediaType != null) {
             mediaTypes.add(mediaType);
           }
@@ -158,30 +174,27 @@ public class MediaTypeUtil {
   }
 
   public static MediaType getRequestMediaType(final HttpServletRequest request,
-    final Map<String, MediaType> extensionToMediaTypeMap,
-    final List<String> mediaTypeOrder, final UrlPathHelper urlPathHelper,
-    final String parameterName, final MediaType defaultMediaType,
-    final String fileName) {
+    final Map<String, MediaType> extensionToMediaTypeMap, final List<String> mediaTypeOrder,
+    final UrlPathHelper urlPathHelper, final String parameterName,
+    final MediaType defaultMediaType, final String fileName) {
     for (final String source : mediaTypeOrder) {
       if (source.equals("fileName")) {
-        final MediaType mediaType = getMediaTypeFromFilename(
-          extensionToMediaTypeMap, fileName);
+        final MediaType mediaType = getMediaTypeFromFilename(extensionToMediaTypeMap, fileName);
         if (mediaType != null) {
           return mediaType;
         }
       } else if (source.equals("pathExtension")) {
         final String requestUri = urlPathHelper.getRequestUri(request);
         final String pathFileName = WebUtils.extractFullFilenameFromUrlPath(requestUri);
-        final MediaType mediaType = getMediaTypeFromFilename(
-          extensionToMediaTypeMap, pathFileName);
+        final MediaType mediaType = getMediaTypeFromFilename(extensionToMediaTypeMap, pathFileName);
         if (mediaType != null) {
           return mediaType;
         }
       } else if (source.equals("attribute")) {
         final String parameterValue = (String)request.getAttribute(parameterName);
         if (Property.hasValue(parameterValue)) {
-          final MediaType mediaType = getMediaTypeFromParameter(
-            extensionToMediaTypeMap, parameterValue);
+          final MediaType mediaType = getMediaTypeFromParameter(extensionToMediaTypeMap,
+            parameterValue);
           if (mediaType != null) {
             return mediaType;
           }
@@ -189,8 +202,8 @@ public class MediaTypeUtil {
       } else if (source.equals("parameter")) {
         if (request.getParameter(parameterName) != null) {
           final String parameterValue = request.getParameter(parameterName);
-          final MediaType mediaType = getMediaTypeFromParameter(
-            extensionToMediaTypeMap, parameterValue);
+          final MediaType mediaType = getMediaTypeFromParameter(extensionToMediaTypeMap,
+            parameterValue);
           if (mediaType != null) {
             return mediaType;
           }
@@ -266,35 +279,12 @@ public class MediaTypeUtil {
       for (final MediaType acceptedMediaType : mediaTypes) {
         if (acceptedMediaType.includes(mediaType)) {
           return true;
-        } else if (!acceptedMediaType.isWildcardType()
-            && !acceptedMediaType.isWildcardSubtype()) {
+        } else if (!acceptedMediaType.isWildcardType() && !acceptedMediaType.isWildcardSubtype()) {
           return false;
         }
       }
       return false;
 
-    }
-  }
-
-  private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
-
-  private static final String ACCEPT_HEADER = "Accept";
-
-  public static final String CONTENT_TYPE_HEADER = "Content-type";
-
-  private static Map<String, MediaType> extensionToMediaTypeMap = new HashMap<String, MediaType>();
-
-  private static Map<MediaType, String> mediaTypeToExtensionMap = new HashMap<MediaType, String>();
-
-  static {
-    for (final Entry<String, String> entry : IoFactoryRegistry.getInstance()
-        .getExtensionMimeTypeMap()
-        .entrySet()) {
-      final String exetension = entry.getKey();
-      final String mimeType = entry.getValue();
-      final MediaType mediaType = MediaType.parseMediaType(mimeType);
-      extensionToMediaTypeMap.put(exetension, mediaType);
-      mediaTypeToExtensionMap.put(mediaType, exetension);
     }
   }
 }

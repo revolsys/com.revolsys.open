@@ -50,14 +50,17 @@ import com.revolsys.util.Property;
 
 public class TextStyleRenderer extends AbstractRecordLayerRenderer {
 
+  public static final AffineTransform NOOP_TRANSFORM = AffineTransform.getTranslateInstance(0, 0);
+
+  private static final Icon ICON = Icons.getIcon("style_text");
+
   public static String getLabel(final Record object, final TextStyle style) {
     if (object == null) {
       return "Text";
     } else {
       final StringBuffer label = new StringBuffer();
       final String labelPattern = style.getTextName();
-      final Matcher matcher = Pattern.compile("\\[([\\w.]+)\\]").matcher(
-        labelPattern);
+      final Matcher matcher = Pattern.compile("\\[([\\w.]+)\\]").matcher(labelPattern);
       while (matcher.find()) {
         final String propertyName = matcher.group(1);
         final Object value = object.getValueByPath(propertyName);
@@ -81,16 +84,14 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
       return new PointWithOrientation(new PointDouble(0.0, 0.0), 0);
     }
     final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
-    if (viewportGeometryFactory != null && geometry != null
-        && !geometry.isEmpty()) {
+    if (viewportGeometryFactory != null && geometry != null && !geometry.isEmpty()) {
       final GeometryFactory geometryFactory = geometry.getGeometryFactory();
 
       Point point = null;
 
       double orientation = style.getTextOrientation();
       final String placementType = style.getTextPlacementType();
-      final Matcher matcher = Pattern.compile("point\\((.*)\\)").matcher(
-        placementType);
+      final Matcher matcher = Pattern.compile("point\\((.*)\\)").matcher(placementType);
       final int vertexCount = geometry.getVertexCount();
       if (vertexCount == 1) {
         point = geometry.getPoint();
@@ -112,8 +113,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
               index++;
             }
             point = geometry.getVertex(index).convert(viewportGeometryFactory);
-            final Point p2 = geometry.getVertex(index - 1).convert(
-              viewportGeometryFactory);
+            final Point p2 = geometry.getVertex(index - 1).convert(viewportGeometryFactory);
             final double angle = Math.toDegrees(p2.angle2d(point));
             orientation += angle;
           } else {
@@ -122,8 +122,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
               index--;
             }
             point = geometry.getVertex(index).convert(viewportGeometryFactory);
-            final Point p2 = geometry.getVertex(index + 1).convert(
-              viewportGeometryFactory);
+            final Point p2 = geometry.getVertex(index + 1).convert(viewportGeometryFactory);
             final double angle = Math.toDegrees(point.angle2d(p2));
             orientation += angle;
           }
@@ -132,14 +131,11 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
           return getTextLocationCenter(viewportGeometryFactory, geometry, style);
         }
         if (point == null) {
-          point = getTextLocationCenter(viewportGeometryFactory, geometry,
-            style);
+          point = getTextLocationCenter(viewportGeometryFactory, geometry, style);
           if (!viewport.getBoundingBox().covers(point)) {
             Geometry clippedGeometry = geometry;
             try {
-              clippedGeometry = viewport.getBoundingBox()
-                  .toPolygon()
-                  .intersection(geometry);
+              clippedGeometry = viewport.getBoundingBox().toPolygon().intersection(geometry);
             } catch (final Throwable t) {
             }
             if (!clippedGeometry.isEmpty()) {
@@ -151,22 +147,19 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
                   final double area = part.getArea();
                   if (area > maxArea) {
                     maxArea = area;
-                    point = getTextLocationCenter(viewportGeometryFactory,
-                      geometry, style);
+                    point = getTextLocationCenter(viewportGeometryFactory, geometry, style);
                   }
                 } else if (part instanceof LineString) {
                   if (maxArea == 0) {
                     final double length = part.getLength();
                     if (length > maxLength) {
                       maxLength = length;
-                      point = getTextLocationCenter(viewportGeometryFactory,
-                        geometry, style);
+                      point = getTextLocationCenter(viewportGeometryFactory, geometry, style);
                     }
                   }
                 } else if (part instanceof Point) {
                   if (maxArea == 0 && maxLength == 0) {
-                    point = getTextLocationCenter(viewportGeometryFactory,
-                      geometry, style);
+                    point = getTextLocationCenter(viewportGeometryFactory, geometry, style);
                   }
                 }
               }
@@ -191,8 +184,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   public static PointWithOrientation getTextLocationCenter(
-    final GeometryFactory viewportGeometryFactory, final Geometry geometry,
-    final TextStyle style) {
+    final GeometryFactory viewportGeometryFactory, final Geometry geometry, final TextStyle style) {
 
     double orientation = style.getTextOrientation();
     Point point = null;
@@ -223,19 +215,16 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
     return new PointWithOrientation(point, orientation);
   }
 
-  public static final void renderText(final Viewport2D viewport,
-    final Graphics2D graphics, final Record object, final Geometry geometry,
-    final TextStyle style) {
+  public static final void renderText(final Viewport2D viewport, final Graphics2D graphics,
+    final Record object, final Geometry geometry, final TextStyle style) {
     final String label = getLabel(object, style);
     renderText(viewport, graphics, label, geometry, style);
   }
 
-  public static void renderText(final Viewport2D viewport,
-    final Graphics2D graphics, final String label, final Geometry geometry,
-    final TextStyle style) {
+  public static void renderText(final Viewport2D viewport, final Graphics2D graphics,
+    final String label, final Geometry geometry, final TextStyle style) {
     if (Property.hasValue(label) && geometry != null || viewport == null) {
-      final PointWithOrientation point = getTextLocation(viewport, geometry,
-        style);
+      final PointWithOrientation point = getTextLocation(viewport, geometry, style);
       if (point != null) {
         final double orientation = point.getOrientation();
 
@@ -274,16 +263,14 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
           double maxWidth = 0;
           final String[] lines = label.split("[\\r\\n]");
           for (final String line : lines) {
-            final Rectangle2D bounds = fontMetrics.getStringBounds(line,
-              graphics);
+            final Rectangle2D bounds = fontMetrics.getStringBounds(line, graphics);
             final double width = bounds.getWidth();
             maxWidth = Math.max(width, maxWidth);
           }
           final int descent = fontMetrics.getDescent();
           final int ascent = fontMetrics.getAscent();
           final int leading = fontMetrics.getLeading();
-          final double maxHeight = lines.length * (ascent + descent)
-              + (lines.length - 1) * leading;
+          final double maxHeight = lines.length * (ascent + descent) + (lines.length - 1) * leading;
           final String verticalAlignment = style.getTextVerticalAlignment();
           if ("top".equals(verticalAlignment)) {
           } else if ("middle".equals(verticalAlignment)) {
@@ -326,15 +313,13 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
           for (final String line : lines) {
             graphics.translate(0, ascent);
             final AffineTransform lineTransform = graphics.getTransform();
-            final Rectangle2D bounds = fontMetrics.getStringBounds(line,
-              graphics);
+            final Rectangle2D bounds = fontMetrics.getStringBounds(line, graphics);
             final double width = bounds.getWidth();
             final double height = bounds.getHeight();
 
             if ("right".equals(horizontalAlignment)) {
               graphics.translate(-width, 0);
-            } else if ("center".equals(horizontalAlignment)
-                || "auto".equals(horizontalAlignment)) {
+            } else if ("center".equals(horizontalAlignment) || "auto".equals(horizontalAlignment)) {
               graphics.translate(-width / 2, 0);
             }
             graphics.translate(dx, 0);
@@ -349,9 +334,8 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
             if (textBoxOpacity > 0 && textBoxColor != null) {
               graphics.setPaint(textBoxColor);
               final double cornerSize = Math.max(height / 2, 5);
-              final RoundRectangle2D.Double box = new RoundRectangle2D.Double(
-                bounds.getX() - 3, bounds.getY() - 1, width + 6, height + 2,
-                cornerSize, cornerSize);
+              final RoundRectangle2D.Double box = new RoundRectangle2D.Double(bounds.getX() - 3,
+                bounds.getY() - 1, width + 6, height + 2, cornerSize, cornerSize);
               graphics.fill(box);
             }
 
@@ -361,15 +345,13 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
               Measure.valueOf(radius, unit));
             if (textHaloRadius > 0) {
               final Stroke savedStroke = graphics.getStroke();
-              final Stroke outlineStroke = new BasicStroke(
-                (float)(textHaloRadius + 1), BasicStroke.CAP_BUTT,
-                BasicStroke.JOIN_BEVEL);
+              final Stroke outlineStroke = new BasicStroke((float)(textHaloRadius + 1),
+                BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
               graphics.setColor(style.getTextHaloFill());
               graphics.setStroke(outlineStroke);
               final Font font = graphics.getFont();
               final FontRenderContext fontRenderContext = graphics.getFontRenderContext();
-              final TextLayout textLayout = new TextLayout(line, font,
-                fontRenderContext);
+              final TextLayout textLayout = new TextLayout(line, font, fontRenderContext);
               final Shape outlineShape = textLayout.getOutline(NOOP_TRANSFORM);
               graphics.draw(outlineShape);
               graphics.setStroke(savedStroke);
@@ -400,20 +382,14 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
     }
   }
 
-  public static final AffineTransform NOOP_TRANSFORM = AffineTransform.getTranslateInstance(
-    0, 0);
-
-  private static final Icon ICON = Icons.getIcon("style_text");
-
   private TextStyle style;
 
-  public TextStyleRenderer(final AbstractRecordLayer layer,
-    final LayerRenderer<?> parent) {
+  public TextStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
     this(layer, parent, Collections.<String, Object> emptyMap());
   }
 
-  public TextStyleRenderer(final AbstractRecordLayer layer,
-    final LayerRenderer<?> parent, final Map<String, Object> textStyle) {
+  public TextStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
+    final Map<String, Object> textStyle) {
     super("textStyle", "Text Style", layer, parent, textStyle);
     this.style = new TextStyle(textStyle);
     setIcon(ICON);
@@ -436,9 +412,8 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   @Override
-  public void renderRecord(final Viewport2D viewport,
-    final BoundingBox visibleArea, final AbstractLayer layer,
-    final LayerRecord object) {
+  public void renderRecord(final Viewport2D viewport, final BoundingBox visibleArea,
+    final AbstractLayer layer, final LayerRecord object) {
     final Geometry geometry = object.getGeometryValue();
     viewport.drawText(object, geometry, this.style);
   }

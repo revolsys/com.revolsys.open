@@ -14,8 +14,7 @@ public class ElementKeySerializer extends AbstractKeySerializer {
     this(element, name, null);
   }
 
-  public ElementKeySerializer(final QName element, final String name,
-    final String label) {
+  public ElementKeySerializer(final QName element, final String name, final String label) {
     super(name);
     this.element = element;
     if (label != null) {

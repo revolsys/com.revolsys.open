@@ -29,8 +29,7 @@ import com.revolsys.spring.InputStreamResource;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
-public class GeometryHttpMessageConverter extends
-AbstractHttpMessageConverter<Geometry> {
+public class GeometryHttpMessageConverter extends AbstractHttpMessageConverter<Geometry> {
   private static final Logger LOG = LoggerFactory.getLogger(GeometryHttpMessageConverter.class);
 
   private GeometryFactory geometryFactory = GeometryFactory.floating3(4326);
@@ -38,9 +37,9 @@ AbstractHttpMessageConverter<Geometry> {
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
   public GeometryHttpMessageConverter() {
-    super(Geometry.class, IoFactoryRegistry.getInstance().getMediaTypes(
-      GeometryReaderFactory.class), IoFactoryRegistry.getInstance()
-      .getMediaTypes(GeometryWriterFactory.class));
+    super(Geometry.class, IoFactoryRegistry.getInstance()
+      .getMediaTypes(GeometryReaderFactory.class), IoFactoryRegistry.getInstance().getMediaTypes(
+      GeometryWriterFactory.class));
   }
 
   public GeometryFactory getGeometryFactory() {
@@ -48,9 +47,8 @@ AbstractHttpMessageConverter<Geometry> {
   }
 
   @Override
-  public Geometry read(final Class<? extends Geometry> clazz,
-    final HttpInputMessage inputMessage) throws IOException,
-    HttpMessageNotReadableException {
+  public Geometry read(final Class<? extends Geometry> clazz, final HttpInputMessage inputMessage)
+    throws IOException, HttpMessageNotReadableException {
     final HttpHeaders headers = inputMessage.getHeaders();
     final MediaType mediaType = headers.getContentType();
     try {
@@ -59,13 +57,11 @@ AbstractHttpMessageConverter<Geometry> {
         charset = StandardCharsets.UTF_8;
       }
       final InputStream body = inputMessage.getBody();
-      final String mediaTypeString = mediaType.getType() + "/"
-          + mediaType.getSubtype();
+      final String mediaTypeString = mediaType.getType() + "/" + mediaType.getSubtype();
       final GeometryReaderFactory readerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
         GeometryReaderFactory.class, mediaTypeString);
       if (readerFactory == null) {
-        throw new HttpMessageNotReadableException("Cannot read data in format"
-            + mediaType);
+        throw new HttpMessageNotReadableException("Cannot read data in format" + mediaType);
       } else {
         final Reader<Geometry> reader = readerFactory.createGeometryReader(new InputStreamResource(
           "geometryUpload", body));
@@ -85,8 +81,7 @@ AbstractHttpMessageConverter<Geometry> {
       }
     } catch (final Throwable e) {
       LOG.error("Error reading data using " + mediaType, e);
-      throw new HttpMessageNotReadableException("Error reading data using"
-          + mediaType);
+      throw new HttpMessageNotReadableException("Error reading data using" + mediaType);
     }
   }
 
@@ -96,8 +91,7 @@ AbstractHttpMessageConverter<Geometry> {
 
   @Override
   public void write(final Geometry geometry, final MediaType mediaType,
-    final HttpOutputMessage outputMessage) throws IOException,
-    HttpMessageNotWritableException {
+    final HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
     if (!HttpServletUtils.getResponse().isCommitted()) {
       MediaType actualMediaType;
       if (mediaType == null) {
@@ -106,20 +100,19 @@ AbstractHttpMessageConverter<Geometry> {
         actualMediaType = mediaType;
       }
       if (actualMediaType != null) {
-        final Charset charset = HttpServletUtils.setContentTypeWithCharset(
-          outputMessage, actualMediaType);
+        final Charset charset = HttpServletUtils.setContentTypeWithCharset(outputMessage,
+          actualMediaType);
         final OutputStream body = outputMessage.getBody();
         final String mediaTypeString = actualMediaType.getType() + "/"
-            + actualMediaType.getSubtype();
+          + actualMediaType.getSubtype();
         final GeometryWriterFactory writerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
           GeometryWriterFactory.class, mediaTypeString);
         if (writerFactory == null) {
-          throw new IllegalArgumentException("Media type " + actualMediaType
-            + " not supported");
+          throw new IllegalArgumentException("Media type " + actualMediaType + " not supported");
         } else {
           final String baseName = HttpServletUtils.getRequestBaseFileName();
-          final Writer<Geometry> writer = writerFactory.createGeometryWriter(
-            baseName, body, charset);
+          final Writer<Geometry> writer = writerFactory.createGeometryWriter(baseName, body,
+            charset);
           writer.write(geometry);
           writer.close();
         }

@@ -9,6 +9,11 @@ import javax.measure.unit.Unit;
 
 public class LinearUnit implements Serializable {
   /**
+   *
+   */
+  private static final long serialVersionUID = 4000991484199279234L;
+
+  /**
    * Get the linear unit representing the conversion factor from
    * {@link SI#METER}.
    *
@@ -30,8 +35,7 @@ public class LinearUnit implements Serializable {
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
-  public static Unit<Length> getUnit(final Unit<Length> baseUnit,
-    final double conversionFactor) {
+  public static Unit<Length> getUnit(final Unit<Length> baseUnit, final double conversionFactor) {
     Unit<Length> unit;
     if (baseUnit == null) {
       unit = SI.METRE;
@@ -56,11 +60,6 @@ public class LinearUnit implements Serializable {
 
   }
 
-  /**
-   *
-   */
-  private static final long serialVersionUID = 4000991484199279234L;
-
   private final Authority authority;
 
   private final LinearUnit baseUnit;
@@ -73,19 +72,17 @@ public class LinearUnit implements Serializable {
 
   private Unit<Length> unit;
 
-  public LinearUnit(final String name, final double conversionFactor,
-    final Authority authority) {
+  public LinearUnit(final String name, final double conversionFactor, final Authority authority) {
     this(name, null, conversionFactor, authority, false);
   }
 
-  public LinearUnit(final String name, final LinearUnit baseUnit,
-    final double conversionFactor, final Authority authority) {
+  public LinearUnit(final String name, final LinearUnit baseUnit, final double conversionFactor,
+    final Authority authority) {
     this(name, baseUnit, conversionFactor, authority, false);
   }
 
-  public LinearUnit(final String name, final LinearUnit baseUnit,
-    final double conversionFactor, final Authority authority,
-    final boolean deprecated) {
+  public LinearUnit(final String name, final LinearUnit baseUnit, final double conversionFactor,
+    final Authority authority, final boolean deprecated) {
     this.name = name;
     this.baseUnit = baseUnit;
     this.conversionFactor = conversionFactor;

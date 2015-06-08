@@ -6,8 +6,7 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 import com.revolsys.parallel.channel.store.Buffer;
 
-public abstract class AbstractOutProcess<T> extends AbstractProcess implements
-OutProcess<T> {
+public abstract class AbstractOutProcess<T> extends AbstractProcess implements OutProcess<T> {
 
   private int outBufferSize = 0;
 

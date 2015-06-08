@@ -5,8 +5,7 @@ import com.revolsys.jts.geom.vertex.Vertex;
 public class VertexCoordinateError extends VertexError {
   private final int axisIndex;
 
-  public VertexCoordinateError(final String message, final Vertex vertex,
-    final int axisIndex) {
+  public VertexCoordinateError(final String message, final Vertex vertex, final int axisIndex) {
     super(message, vertex);
     this.axisIndex = axisIndex;
   }

@@ -14,8 +14,8 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class OnLineNodeVisitor<T> implements Visitor<Node<T>> {
-  public static <T> List<Node<T>> getNodes(final Graph<T> graph,
-    final LineString line, final double maxDistance) {
+  public static <T> List<Node<T>> getNodes(final Graph<T> graph, final LineString line,
+    final double maxDistance) {
     if (line == null) {
       return Collections.emptyList();
     } else {
@@ -23,8 +23,7 @@ public class OnLineNodeVisitor<T> implements Visitor<Node<T>> {
       BoundingBox env = line.getBoundingBox();
       env = env.expand(maxDistance);
       final IdObjectIndex<Node<T>> index = graph.getNodeIndex();
-      final OnLineNodeVisitor<T> visitor = new OnLineNodeVisitor<T>(line,
-          results);
+      final OnLineNodeVisitor<T> visitor = new OnLineNodeVisitor<T>(line, results);
       index.visit(env, visitor);
       return results.getList();
     }
@@ -34,8 +33,7 @@ public class OnLineNodeVisitor<T> implements Visitor<Node<T>> {
 
   private final Visitor<Node<T>> matchVisitor;
 
-  public OnLineNodeVisitor(final LineString line,
-    final Visitor<Node<T>> matchVisitor) {
+  public OnLineNodeVisitor(final LineString line, final Visitor<Node<T>> matchVisitor) {
     this.line = line;
     this.matchVisitor = matchVisitor;
   }

@@ -58,12 +58,9 @@ public class IntervalTest extends TestCase {
   }
 
   public void testExpandToInclude() {
-    assertEquals(new Interval(3, 8),
-      new Interval(3, 4).expandToInclude(new Interval(7, 8)));
-    assertEquals(new Interval(3, 7),
-      new Interval(3, 7).expandToInclude(new Interval(4, 5)));
-    assertEquals(new Interval(3, 8),
-      new Interval(3, 7).expandToInclude(new Interval(4, 8)));
+    assertEquals(new Interval(3, 8), new Interval(3, 4).expandToInclude(new Interval(7, 8)));
+    assertEquals(new Interval(3, 7), new Interval(3, 7).expandToInclude(new Interval(4, 5)));
+    assertEquals(new Interval(3, 8), new Interval(3, 7).expandToInclude(new Interval(4, 8)));
   }
 
   public void testGetCentre() {

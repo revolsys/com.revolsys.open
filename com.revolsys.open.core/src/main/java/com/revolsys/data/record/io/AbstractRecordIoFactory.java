@@ -16,8 +16,8 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.SpringUtil;
 
-public abstract class AbstractRecordIoFactory extends
-AbstractRecordReaderFactory implements RecordWriterFactory {
+public abstract class AbstractRecordIoFactory extends AbstractRecordReaderFactory implements
+  RecordWriterFactory {
 
   private final boolean geometrySupported;
 
@@ -38,8 +38,8 @@ AbstractRecordReaderFactory implements RecordWriterFactory {
    * @return The writer.
    */
   @Override
-  public Writer<Record> createRecordWriter(
-    final RecordDefinition recordDefinition, final Resource resource) {
+  public Writer<Record> createRecordWriter(final RecordDefinition recordDefinition,
+    final Resource resource) {
     final OutputStream out = SpringUtil.getOutputStream(resource);
     final String fileName = resource.getFilename();
     final String baseName = FileUtil.getBaseName(fileName);
@@ -49,8 +49,7 @@ AbstractRecordReaderFactory implements RecordWriterFactory {
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream) {
-    return createRecordWriter(baseName, recordDefinition, outputStream,
-      StandardCharsets.UTF_8);
+    return createRecordWriter(baseName, recordDefinition, outputStream, StandardCharsets.UTF_8);
   }
 
   @Override
@@ -59,8 +58,7 @@ AbstractRecordReaderFactory implements RecordWriterFactory {
   }
 
   @Override
-  public boolean isCoordinateSystemSupported(
-    final CoordinateSystem coordinateSystem) {
+  public boolean isCoordinateSystemSupported(final CoordinateSystem coordinateSystem) {
     return this.coordinateSystems.contains(coordinateSystem);
   }
 
@@ -69,14 +67,11 @@ AbstractRecordReaderFactory implements RecordWriterFactory {
     return this.geometrySupported;
   }
 
-  protected void setCoordinateSystems(
-    final CoordinateSystem... coordinateSystems) {
-    setCoordinateSystems(new LinkedHashSet<CoordinateSystem>(
-        Arrays.asList(coordinateSystems)));
+  protected void setCoordinateSystems(final CoordinateSystem... coordinateSystems) {
+    setCoordinateSystems(new LinkedHashSet<CoordinateSystem>(Arrays.asList(coordinateSystems)));
   }
 
-  protected void setCoordinateSystems(
-    final Set<CoordinateSystem> coordinateSystems) {
+  protected void setCoordinateSystems(final Set<CoordinateSystem> coordinateSystems) {
     this.coordinateSystems = coordinateSystems;
   }
 }

@@ -121,16 +121,15 @@ public class PreparedGeometryOperation implements GeometryOperation {
    * @see GeometryOperation#invoke
    */
   @Override
-  public Result invoke(final String opName, final Geometry geometry,
-    final Object[] args) throws Exception {
+  public Result invoke(final String opName, final Geometry geometry, final Object[] args)
+    throws Exception {
     if (!isPreparedOp(opName)) {
       return this.chainOp.invoke(opName, geometry, args);
     }
     return invokePreparedOp(opName, geometry, args);
   }
 
-  private Result invokePreparedOp(final String opName, final Geometry geometry,
-    final Object[] args) {
+  private Result invokePreparedOp(final String opName, final Geometry geometry, final Object[] args) {
     final Geometry g2 = (Geometry)args[0];
     if (opName.equals("intersects")) {
       return new BooleanResult(PreparedGeometryOp.intersects(geometry, g2));
@@ -139,8 +138,7 @@ public class PreparedGeometryOperation implements GeometryOperation {
       return new BooleanResult(PreparedGeometryOp.contains(geometry, g2));
     }
     if (opName.equals("containsProperly")) {
-      return new BooleanResult(
-        PreparedGeometryOp.containsProperly(geometry, g2));
+      return new BooleanResult(PreparedGeometryOp.containsProperly(geometry, g2));
     }
     if (opName.equals("covers")) {
       return new BooleanResult(PreparedGeometryOp.covers(geometry, g2));

@@ -179,8 +179,7 @@ public class MinimumClearance {
       return this.minPts;
     }
 
-    private double segmentDistance(final FacetSequence fs1,
-      final FacetSequence fs2) {
+    private double segmentDistance(final FacetSequence fs1, final FacetSequence fs2) {
       for (int i1 = 0; i1 < fs1.getVertexCount(); i1++) {
         for (int i2 = 1; i2 < fs2.getVertexCount(); i2++) {
 
@@ -210,8 +209,7 @@ public class MinimumClearance {
       this.minPts[1] = new PointDouble(seg.closestPoint(p));
     }
 
-    private double vertexDistance(final FacetSequence fs1,
-      final FacetSequence fs2) {
+    private double vertexDistance(final FacetSequence fs1, final FacetSequence fs2) {
       for (int i1 = 0; i1 < fs1.getVertexCount(); i1++) {
         for (int i2 = 0; i2 < fs2.getVertexCount(); i2++) {
           final Point p1 = fs1.getCoordinate(i1);
@@ -295,8 +293,7 @@ public class MinimumClearance {
 
     final Object[] nearest = geomTree.nearestNeighbour(new MinClearanceDistance());
     final MinClearanceDistance mcd = new MinClearanceDistance();
-    this.minClearance = mcd.distance((FacetSequence)nearest[0],
-      (FacetSequence)nearest[1]);
+    this.minClearance = mcd.distance((FacetSequence)nearest[0], (FacetSequence)nearest[1]);
     this.minClearancePts = mcd.getCoordinates();
   }
 

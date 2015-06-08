@@ -15,8 +15,7 @@ import com.revolsys.visitor.CreateListVisitor;
 
 public class EdgeIntersectsLinearlyEdgeVisitor<T> implements Visitor<Edge<T>> {
 
-  public static <T> List<Edge<T>> getEdges(final Graph<T> graph,
-    final Edge<T> edge) {
+  public static <T> List<Edge<T>> getEdges(final Graph<T> graph, final Edge<T> edge) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
     final LineString line = edge.getLine();
     final BoundingBox env = line.getBoundingBox();
@@ -32,8 +31,7 @@ public class EdgeIntersectsLinearlyEdgeVisitor<T> implements Visitor<Edge<T>> {
 
   private final Visitor<Edge<T>> matchVisitor;
 
-  public EdgeIntersectsLinearlyEdgeVisitor(final Edge<T> edge,
-    final Visitor<Edge<T>> matchVisitor) {
+  public EdgeIntersectsLinearlyEdgeVisitor(final Edge<T> edge, final Visitor<Edge<T>> matchVisitor) {
     this.edge = edge;
     this.matchVisitor = matchVisitor;
   }

@@ -33,8 +33,7 @@ public class EdgeEvent<T> extends EventObject {
     this.typePath = edge.getTypeName();
   }
 
-  public EdgeEvent(final Edge<T> edge, final String ruleName,
-    final String action) {
+  public EdgeEvent(final Edge<T> edge, final String ruleName, final String action) {
     super(edge);
     this.line = edge.getLine();
     this.typePath = edge.getTypeName();
@@ -42,8 +41,8 @@ public class EdgeEvent<T> extends EventObject {
     this.action = action;
   }
 
-  public EdgeEvent(final Edge<T> edge, final String ruleName,
-    final String action, final String notes) {
+  public EdgeEvent(final Edge<T> edge, final String ruleName, final String action,
+    final String notes) {
     super(edge);
     this.line = edge.getLine();
     this.typePath = edge.getTypeName();

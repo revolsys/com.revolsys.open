@@ -58,8 +58,7 @@ public class SnapIfNeededOverlayOp {
     return overlayOp(g0, g1, OverlayOp.INTERSECTION);
   }
 
-  public static Geometry overlayOp(final Geometry g0, final Geometry g1,
-    final int opCode) {
+  public static Geometry overlayOp(final Geometry g0, final Geometry g1, final int opCode) {
     final SnapIfNeededOverlayOp op = new SnapIfNeededOverlayOp(g0, g1);
     return op.getResultGeometry(opCode);
   }

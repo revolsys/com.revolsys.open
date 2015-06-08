@@ -29,9 +29,9 @@ public class CopyRecords extends AbstractProcess {
   public CopyRecords() {
   }
 
-  public CopyRecords(final RecordStore sourceRecordStore,
-    final String typePath, final Map<String, Boolean> orderBy,
-    final RecordStore targetRecordStore, final boolean hasSequence) {
+  public CopyRecords(final RecordStore sourceRecordStore, final String typePath,
+    final Map<String, Boolean> orderBy, final RecordStore targetRecordStore,
+    final boolean hasSequence) {
     this.sourceRecordStore = sourceRecordStore;
     this.typePath = typePath;
     this.orderBy = orderBy;
@@ -39,11 +39,10 @@ public class CopyRecords extends AbstractProcess {
     this.hasSequence = hasSequence;
   }
 
-  public CopyRecords(final RecordStore sourceRecordStore,
-    final String typePath, final RecordStore targetRecordStore,
-    final boolean hasSequence) {
-    this(sourceRecordStore, typePath, new HashMap<String, Boolean>(),
-      targetRecordStore, hasSequence);
+  public CopyRecords(final RecordStore sourceRecordStore, final String typePath,
+    final RecordStore targetRecordStore, final boolean hasSequence) {
+    this(sourceRecordStore, typePath, new HashMap<String, Boolean>(), targetRecordStore,
+      hasSequence);
   }
 
   public Map<String, Boolean> getOrderBy() {
@@ -77,8 +76,7 @@ public class CopyRecords extends AbstractProcess {
         try {
           final RecordDefinition targetRecordDefinition = this.targetRecordStore.getRecordDefinition(this.typePath);
           if (targetRecordDefinition == null) {
-            LoggerFactory.getLogger(getClass()).error(
-              "Cannot find target table: " + this.typePath);
+            LoggerFactory.getLogger(getClass()).error("Cannot find target table: " + this.typePath);
           } else {
             if (this.hasSequence) {
               final String idFieldName = targetRecordDefinition.getIdFieldName();
@@ -103,8 +101,7 @@ public class CopyRecords extends AbstractProcess {
         reader.close();
       }
     } catch (final Throwable e) {
-      throw new RuntimeException("Unable to copy records for " + this.typePath,
-        e);
+      throw new RuntimeException("Unable to copy records for " + this.typePath, e);
     }
   }
 

@@ -19,15 +19,12 @@ import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.marker.ImageMarker;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 
-public class WikipediaBoundingBoxLayerWorker extends
-AbstractSwingWorker<List<LayerRecord>, Void> {
+public class WikipediaBoundingBoxLayerWorker extends AbstractSwingWorker<List<LayerRecord>, Void> {
 
-  public static BoundingBoxRecordLayer create(
-    final Map<String, Object> properties) {
+  public static BoundingBoxRecordLayer create(final Map<String, Object> properties) {
     final GeometryFactory wgs84 = GeometryFactory.floating3(4326);
-    final BoundingBoxRecordLayer layer1 = new BoundingBoxRecordLayer(
-      "wikipedia", "Wikipedia Articles", WikipediaBoundingBoxLayerWorker.class,
-      wgs84);
+    final BoundingBoxRecordLayer layer1 = new BoundingBoxRecordLayer("wikipedia",
+      "Wikipedia Articles", WikipediaBoundingBoxLayerWorker.class, wgs84);
 
     final BufferedImage image = Icons.getImage("wikipedia");
     final ImageMarker marker = new ImageMarker(image);
@@ -61,8 +58,7 @@ AbstractSwingWorker<List<LayerRecord>, Void> {
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
     if (coordinateSystem instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem projCs = (ProjectedCoordinateSystem)coordinateSystem;
-      geometryFactory = projCs.getGeographicCoordinateSystem()
-          .getGeometryFactory();
+      geometryFactory = projCs.getGeographicCoordinateSystem().getGeometryFactory();
       boundingBox = boundingBox.convert(geometryFactory);
     }
     final List<LayerRecord> results = (List)this.geoNamesService.getWikipediaArticles(boundingBox);
@@ -74,7 +70,7 @@ AbstractSwingWorker<List<LayerRecord>, Void> {
       String text;
       if (thumbnailImage != null) {
         text = "<html><b>" + title + "</b><br /><img src=\"" + thumbnailImage
-            + "\" /><br /></html>";
+          + "\" /><br /></html>";
       } else {
         text = "<html><b>" + title + "</b><br /></html>";
       }

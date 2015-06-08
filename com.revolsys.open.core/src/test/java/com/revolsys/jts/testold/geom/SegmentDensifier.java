@@ -36,8 +36,7 @@ public class SegmentDensifier {
     return this.inputLine.getGeometryFactory().lineString(newPts);
   }
 
-  private void densify(final Point p0, final Point p1,
-    final double segLength) {
+  private void densify(final Point p0, final Point p1, final double segLength) {
     final double origLen = p1.distance(p0);
     final int nPtsToAdd = (int)Math.floor(origLen / segLength);
 
@@ -47,8 +46,8 @@ public class SegmentDensifier {
     final double segLenFrac = segLength / origLen;
     for (int i = 0; i <= nPtsToAdd; i++) {
       final double addedPtFrac = i * segLenFrac;
-      final Point pt = new PointDouble(p0.getX() + addedPtFrac * delx,
-        p0.getY() + addedPtFrac * dely, Point.NULL_ORDINATE);
+      final Point pt = new PointDouble(p0.getX() + addedPtFrac * delx, p0.getY() + addedPtFrac
+        * dely, Point.NULL_ORDINATE);
       this.newCoords.add(pt, false);
     }
     this.newCoords.add(new PointDouble(p1), false);

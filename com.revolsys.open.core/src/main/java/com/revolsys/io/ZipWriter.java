@@ -19,8 +19,7 @@ public class ZipWriter<T> extends DelegatingWriter<T> {
 
   private final OutputStream out;
 
-  public ZipWriter(final File tempDirectory, final Writer<T> writer,
-    final OutputStream out) {
+  public ZipWriter(final File tempDirectory, final Writer<T> writer, final OutputStream out) {
     super(writer);
     this.tempDirectory = tempDirectory;
     this.out = out;

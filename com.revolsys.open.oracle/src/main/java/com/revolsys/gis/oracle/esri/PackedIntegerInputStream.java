@@ -41,8 +41,7 @@ public class PackedIntegerInputStream extends InputStream {
   }
 
   @Override
-  public int read(final byte[] b, final int off, final int len)
-      throws IOException {
+  public int read(final byte[] b, final int off, final int len) throws IOException {
     return this.in.read(b, off, len);
   }
 

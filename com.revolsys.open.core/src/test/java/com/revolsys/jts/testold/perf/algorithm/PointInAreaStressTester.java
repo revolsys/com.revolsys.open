@@ -64,8 +64,7 @@ public class PointInAreaStressTester {
 
   private final int[] locationCount = new int[3];
 
-  public PointInAreaStressTester(final GeometryFactory geomFactory,
-    final Geometry area) {
+  public PointInAreaStressTester(final GeometryFactory geomFactory, final Geometry area) {
     this.geomFactory = geomFactory;
     this.area = area;
 
@@ -100,10 +99,8 @@ public class PointInAreaStressTester {
       for (int j = 0; j < ptGridWidth; j++) {
 
         // compute test point
-        final double x = this.geomFactory.makePrecise(0, areaEnv.getMinX() + i
-          * xStep);
-        final double y = this.geomFactory.makePrecise(1, areaEnv.getMinY() + j
-          * yStep);
+        final double x = this.geomFactory.makePrecise(0, areaEnv.getMinX() + i * xStep);
+        final double y = this.geomFactory.makePrecise(1, areaEnv.getMinY() + j * yStep);
         final Point pt = new PointDouble(x, y);
 
         final boolean isEqual = testPIA(pt);
@@ -146,8 +143,7 @@ public class PointInAreaStressTester {
 
     this.locationCount[loc1.getIndex()]++;
 
-    if ((loc1 == Location.BOUNDARY || loc2 == Location.BOUNDARY)
-        && this.ignoreBoundaryResults) {
+    if ((loc1 == Location.BOUNDARY || loc2 == Location.BOUNDARY) && this.ignoreBoundaryResults) {
       return true;
     }
 

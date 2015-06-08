@@ -53,7 +53,7 @@ public class PbfFieldDecoder {
    */
   public double decodeLatitude(final long rawLatitude) {
     return COORDINATE_SCALING_FACTOR
-        * (this.coordLatitudeOffset + this.coordGranularity * rawLatitude);
+      * (this.coordLatitudeOffset + this.coordGranularity * rawLatitude);
   }
 
   /**
@@ -65,7 +65,7 @@ public class PbfFieldDecoder {
    */
   public double decodeLongitude(final long rawLongitude) {
     return COORDINATE_SCALING_FACTOR
-        * (this.coordLongitudeOffset + this.coordGranularity * rawLongitude);
+      * (this.coordLongitudeOffset + this.coordGranularity * rawLongitude);
   }
 
   /**

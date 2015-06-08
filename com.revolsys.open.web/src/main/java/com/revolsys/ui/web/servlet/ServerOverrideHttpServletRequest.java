@@ -17,8 +17,7 @@ public class ServerOverrideHttpServletRequest extends HttpServletRequestWrapper 
 
   private int serverPort;
 
-  public ServerOverrideHttpServletRequest(final String serverUrl,
-    final HttpServletRequest request) {
+  public ServerOverrideHttpServletRequest(final String serverUrl, final HttpServletRequest request) {
     super(request);
 
     try {
@@ -31,8 +30,7 @@ public class ServerOverrideHttpServletRequest extends HttpServletRequestWrapper 
         this.serverUrl = this.scheme + "://" + this.serverName;
         this.secureServerUrl = "https://" + this.serverName;
       } else {
-        this.serverUrl = this.scheme + "://" + this.serverName + ":"
-            + this.serverPort;
+        this.serverUrl = this.scheme + "://" + this.serverName + ":" + this.serverPort;
         this.secureServerUrl = "https://" + this.serverName;
       }
     } catch (final MalformedURLException e) {

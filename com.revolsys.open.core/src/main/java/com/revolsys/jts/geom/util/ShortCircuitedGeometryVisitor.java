@@ -42,17 +42,16 @@ import com.revolsys.jts.geom.GeometryCollection;
  *
  * @version 1.7
  */
-public abstract class ShortCircuitedGeometryVisitor
-{
+public abstract class ShortCircuitedGeometryVisitor {
   private boolean isDone = false;
 
   public ShortCircuitedGeometryVisitor() {
   }
 
   public void applyTo(final Geometry geom) {
-    for (int i = 0; i < geom.getGeometryCount() && ! this.isDone; i++) {
+    for (int i = 0; i < geom.getGeometryCount() && !this.isDone; i++) {
       final Geometry element = geom.getGeometry(i);
-      if (! (element instanceof GeometryCollection)) {
+      if (!(element instanceof GeometryCollection)) {
         visit(element);
         if (isDone()) {
           this.isDone = true;

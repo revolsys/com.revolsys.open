@@ -17,15 +17,15 @@ import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
 
 public class NodeOnEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
-  public static <T> List<Edge<T>> getEdges(final Graph<T> graph,
-    final Node<T> node, final double maxDistance) {
+  public static <T> List<Edge<T>> getEdges(final Graph<T> graph, final Node<T> node,
+    final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
     final Point point = node;
     BoundingBox boundingBox = new BoundingBoxDoubleGf(point);
     boundingBox = boundingBox.expand(maxDistance);
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
-    final NodeOnEdgeVisitor<T> visitor = new NodeOnEdgeVisitor<T>(node,
-        boundingBox, maxDistance, results);
+    final NodeOnEdgeVisitor<T> visitor = new NodeOnEdgeVisitor<T>(node, boundingBox, maxDistance,
+      results);
     index.visit(boundingBox, visitor);
     final List<Edge<T>> edges = results.getList();
     Collections.sort(edges);

@@ -1,5 +1,4 @@
 
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -33,7 +32,6 @@
  *     www.vividsolutions.com
  */
 package com.revolsys.jts.algorithm;
-
 
 /**
  * Stub version of RobustCGAlgorithms for backwards compatibility.

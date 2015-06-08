@@ -10,6 +10,8 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 
 public class GeometryEqualsExact3d implements Equals<Geometry> {
+  public static final Set<String> USER_DATA_EXCLUDE = new TreeSet<String>();
+
   public static void addExclude(final String name) {
     USER_DATA_EXCLUDE.add(name);
   }
@@ -23,8 +25,6 @@ public class GeometryEqualsExact3d implements Equals<Geometry> {
       return geometry1.equals(3, geometry2);
     }
   }
-
-  public static final Set<String> USER_DATA_EXCLUDE = new TreeSet<String>();
 
   private EqualsRegistry equalsRegistry;
 
@@ -61,8 +61,8 @@ public class GeometryEqualsExact3d implements Equals<Geometry> {
   }
 
   @SuppressWarnings("rawtypes")
-  public boolean userDataEquals(final Geometry geometry1,
-    final Geometry geometry2, Collection<String> exclude) {
+  public boolean userDataEquals(final Geometry geometry1, final Geometry geometry2,
+    Collection<String> exclude) {
     Object userData1 = geometry1.getUserData();
     Object userData2 = geometry2.getUserData();
     if (userData1 == null) {

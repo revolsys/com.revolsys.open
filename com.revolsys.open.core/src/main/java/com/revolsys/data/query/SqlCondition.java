@@ -28,8 +28,7 @@ public class SqlCondition extends Condition {
     this(sql, Arrays.asList(parameterAttribute), Arrays.asList(parameterValue));
   }
 
-  public SqlCondition(final String sql,
-    final List<FieldDefinition> parameterAttributes,
+  public SqlCondition(final String sql, final List<FieldDefinition> parameterAttributes,
     final List<Object> parameterValues) {
     this.sql = sql;
     this.parameterValues = new ArrayList<Object>(parameterValues);
@@ -62,7 +61,8 @@ public class SqlCondition extends Condition {
   }
 
   @Override
-  public void appendDefaultSql(final Query query, final RecordStore recordStore, final StringBuilder buffer) {
+  public void appendDefaultSql(final Query query, final RecordStore recordStore,
+    final StringBuilder buffer) {
     buffer.append(this.sql);
   }
 
@@ -101,8 +101,7 @@ public class SqlCondition extends Condition {
     if (obj instanceof SqlCondition) {
       final SqlCondition sqlCondition = (SqlCondition)obj;
       if (EqualsRegistry.equal(sqlCondition.getSql(), this.getSql())) {
-        if (EqualsRegistry.equal(sqlCondition.getParameterValues(),
-          this.getParameterValues())) {
+        if (EqualsRegistry.equal(sqlCondition.getParameterValues(), this.getParameterValues())) {
           return true;
         }
       }

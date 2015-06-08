@@ -45,10 +45,8 @@ import com.revolsys.jts.geom.Point;
  * @version 1.7
  */
 class DouglasPeuckerLineSimplifier {
-  public static Point[] simplify(final LineString pts,
-    final double distanceTolerance) {
-    final DouglasPeuckerLineSimplifier simp = new DouglasPeuckerLineSimplifier(
-      pts);
+  public static Point[] simplify(final LineString pts, final double distanceTolerance) {
+    final DouglasPeuckerLineSimplifier simp = new DouglasPeuckerLineSimplifier(pts);
     simp.setDistanceTolerance(distanceTolerance);
     return simp.simplify();
   }
@@ -98,8 +96,7 @@ class DouglasPeuckerLineSimplifier {
     double maxDistance = -1.0;
     int maxIndex = i;
     for (int k = i + 1; k < j; k++) {
-      final double distance = LineSegmentUtil.distanceLinePoint(p0, p1,
-        this.pts.getPoint(k));
+      final double distance = LineSegmentUtil.distanceLinePoint(p0, p1, this.pts.getPoint(k));
       if (distance > maxDistance) {
         maxDistance = distance;
         maxIndex = k;

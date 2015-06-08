@@ -86,10 +86,8 @@ public class GeometryCombiner {
    * @param g2 a geometry to combine
    * @return the combined geometry
    */
-  public static Geometry combine(final Geometry g0, final Geometry g1,
-    final Geometry g2) {
-    final GeometryCombiner combiner = new GeometryCombiner(createList(g0, g1,
-      g2));
+  public static Geometry combine(final Geometry g0, final Geometry g1, final Geometry g2) {
+    final GeometryCombiner combiner = new GeometryCombiner(createList(g0, g1, g2));
     return combiner.combine();
   }
 
@@ -100,8 +98,7 @@ public class GeometryCombiner {
    * @param obj1
    * @return a List containing the two items
    */
-  private static List<Geometry> createList(final Geometry obj0,
-    final Geometry obj1) {
+  private static List<Geometry> createList(final Geometry obj0, final Geometry obj1) {
     final List<Geometry> list = new ArrayList<Geometry>();
     list.add(obj0);
     list.add(obj1);
@@ -115,8 +112,8 @@ public class GeometryCombiner {
    * @param obj1
    * @return a List containing the two items
    */
-  private static List<Geometry> createList(final Geometry obj0,
-    final Geometry obj1, final Geometry obj2) {
+  private static List<Geometry> createList(final Geometry obj0, final Geometry obj1,
+    final Geometry obj2) {
     final List<Geometry> list = new ArrayList<Geometry>();
     list.add(obj0);
     list.add(obj1);
@@ -130,8 +127,7 @@ public class GeometryCombiner {
    * @param geoms
    * @return a GeometryFactory
    */
-  public static GeometryFactory extractFactory(
-    final Collection<? extends Geometry> geoms) {
+  public static GeometryFactory extractFactory(final Collection<? extends Geometry> geoms) {
     if (geoms.isEmpty()) {
       return null;
     }

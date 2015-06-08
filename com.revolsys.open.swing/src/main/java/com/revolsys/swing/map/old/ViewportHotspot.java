@@ -9,8 +9,7 @@ public class ViewportHotspot {
 
   private final String url;
 
-  public ViewportHotspot(final Point coordinate, final String text,
-    final String url) {
+  public ViewportHotspot(final Point coordinate, final String text, final String url) {
     this.coordinate = coordinate;
     this.text = text;
     this.url = url;

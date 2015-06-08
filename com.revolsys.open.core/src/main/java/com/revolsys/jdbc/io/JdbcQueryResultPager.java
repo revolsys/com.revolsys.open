@@ -112,8 +112,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
   @Override
   public List<Record> getList() {
     if (this.results == null) {
-      throw new IllegalStateException(
-          "The page number must be set using setPageNumber");
+      throw new IllegalStateException("The page number must be set using setPageNumber");
     }
     return this.results;
   }
@@ -239,8 +238,8 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
           ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
         this.statement.setFetchSize(this.pageSize);
 
-        this.resultSet = JdbcQueryIterator.getResultSet(this.recordDefinition,
-          this.statement, this.query);
+        this.resultSet = JdbcQueryIterator.getResultSet(this.recordDefinition, this.statement,
+          this.query);
         this.resultSet.last();
         this.numResults = this.resultSet.getRow();
       } catch (final SQLException e) {
@@ -338,9 +337,8 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
         if (this.resultSet.absolute(this.pageNumber * this.pageSize + 1)) {
           int i = 0;
           do {
-            final Record object = JdbcQueryIterator.getNextRecord(
-              this.recordStore, this.recordDefinition,
-              this.recordDefinition.getFields(), this.recordFactory,
+            final Record object = JdbcQueryIterator.getNextRecord(this.recordStore,
+              this.recordDefinition, this.recordDefinition.getFields(), this.recordFactory,
               this.resultSet);
             this.results.add(object);
             i++;

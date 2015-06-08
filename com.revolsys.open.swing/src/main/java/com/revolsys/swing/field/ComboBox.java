@@ -24,12 +24,12 @@ import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.ExceptionUtil;
 
 public class ComboBox extends JComboBox implements Field {
+  private static final long serialVersionUID = 1L;
+
   public static <V> DefaultComboBoxModel<V> model(final Collection<V> items) {
     final Vector<V> vector = new Vector<V>(items);
     return new DefaultComboBoxModel<>(vector);
   }
-
-  private static final long serialVersionUID = 1L;
 
   private final FieldSupport support;
 

@@ -34,8 +34,7 @@ import com.revolsys.collection.Visitor;
  * @author Paul Austin
  * @param <T> The type of object being read.
  */
-public abstract class AbstractReader<T> extends AbstractObjectWithProperties
-implements Reader<T> {
+public abstract class AbstractReader<T> extends AbstractObjectWithProperties implements Reader<T> {
 
   /**
    * Read all items and return a List containing the items.

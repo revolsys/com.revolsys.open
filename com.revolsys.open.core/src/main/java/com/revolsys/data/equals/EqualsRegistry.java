@@ -26,8 +26,7 @@ public class EqualsRegistry implements Equals<Object> {
     return EqualsInstance.INSTANCE.equals(object1, object2, exclude);
   }
 
-  public static boolean equal(final Object object1, final Object object2,
-    final String... exclude) {
+  public static boolean equal(final Object object1, final Object object2, final String... exclude) {
     return equal(object1, object2, Arrays.asList(exclude));
   }
 
@@ -63,8 +62,7 @@ public class EqualsRegistry implements Equals<Object> {
   }
 
   @Override
-  public boolean equals(final Object object1, final Object object2,
-    final Collection<String> exclude) {
+  public boolean equals(final Object object1, final Object object2, final Collection<String> exclude) {
     if (object1 == null) {
       if (object2 == null) {
         return true;

@@ -12,6 +12,8 @@ import javax.crypto.spec.PBEParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class PasswordUtil {
+  private static final Pattern PATTERN = Pattern.compile("\\{(\\w+)\\}(.+)");
+
   public static String decrypt(final String encryptedString) {
     final Matcher matcher = PATTERN.matcher(encryptedString);
     if (matcher.matches()) {
@@ -55,7 +57,7 @@ public class PasswordUtil {
   public static String decryptSqlDeveloper(final String encryptedPassword) {
     if (encryptedPassword.length() % 2 != 0) {
       throw new IllegalArgumentException(
-          "Password must consist of hex pairs.  Length is odd (not even).");
+        "Password must consist of hex pairs.  Length is odd (not even).");
     } else {
 
       final byte[] secret = new byte[encryptedPassword.length() / 2];
@@ -67,8 +69,8 @@ public class PasswordUtil {
     }
   }
 
-  public static byte[] encrypt(final byte[] data, final char[] password,
-    final byte[] salt, final int noIterations) {
+  public static byte[] encrypt(final byte[] data, final char[] password, final byte[] salt,
+    final int noIterations) {
     try {
       final String method = "PBEWithMD5AndTripleDES";
       final SecretKeyFactory kf = SecretKeyFactory.getInstance(method);
@@ -85,6 +87,4 @@ public class PasswordUtil {
   public static String encrypt(final String password) {
     return "{BASE64}" + Base64.encode(password);
   }
-
-  private static final Pattern PATTERN = Pattern.compile("\\{(\\w+)\\}(.+)");
 }

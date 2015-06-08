@@ -23,8 +23,8 @@ public class FileSystemsTreeNode extends ListTreeNode {
   private static final MenuFactory MENU = new MenuFactory("File Systems");
 
   static {
-    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh",
-      "arrow_refresh", "refresh");
+    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh", "arrow_refresh",
+      "refresh");
     MENU.addMenuItem("default", refresh);
   }
 

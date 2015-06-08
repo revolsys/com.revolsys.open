@@ -21,7 +21,7 @@ import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.util.Property;
 
 public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode implements
-RecordStoreConnectionMapProxy {
+  RecordStoreConnectionMapProxy {
 
   public static final ImageIcon ICON_SCHEMA = Icons.getIcon("folder_table");
 
@@ -30,8 +30,8 @@ RecordStoreConnectionMapProxy {
   private static final MenuFactory MENU = new MenuFactory("Record Store Schema");
 
   static {
-    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh",
-      "arrow_refresh", "refresh");
+    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh", "arrow_refresh",
+      "refresh");
     MENU.addMenuItem("default", refresh);
   }
 
@@ -39,8 +39,7 @@ RecordStoreConnectionMapProxy {
 
   private final String schemaPath;
 
-  public RecordStoreSchemaTreeNode(final Map<String, Object> connectionMap,
-    final String schemaPath) {
+  public RecordStoreSchemaTreeNode(final Map<String, Object> connectionMap, final String schemaPath) {
     super(schemaPath);
     this.connectionMap = connectionMap;
     setType("Record Store Record Schema");

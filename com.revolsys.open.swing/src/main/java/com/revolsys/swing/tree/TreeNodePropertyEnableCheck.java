@@ -18,13 +18,12 @@ public class TreeNodePropertyEnableCheck extends AbstractEnableCheck {
     this(propertyName, true);
   }
 
-  public TreeNodePropertyEnableCheck(final String propertyName,
-    final Object value) {
+  public TreeNodePropertyEnableCheck(final String propertyName, final Object value) {
     this(propertyName, value, false);
   }
 
-  public TreeNodePropertyEnableCheck(final String propertyName,
-    final Object value, final boolean inverse) {
+  public TreeNodePropertyEnableCheck(final String propertyName, final Object value,
+    final boolean inverse) {
     this.propertyName = propertyName;
     this.value = value;
     this.inverse = inverse;

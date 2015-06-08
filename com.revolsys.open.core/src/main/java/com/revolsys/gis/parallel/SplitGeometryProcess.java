@@ -14,8 +14,7 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
-public class SplitGeometryProcess extends
-BaseInOutProcess<Record, Record> {
+public class SplitGeometryProcess extends BaseInOutProcess<Record, Record> {
   /** The statistics to record the number new observations created. */
   private Statistics createdStatistics;
 
@@ -30,8 +29,7 @@ BaseInOutProcess<Record, Record> {
 
   private GeometryFactory geometryFactory;
 
-  protected Record createSplitObject(final Record object,
-    final LineString newLine) {
+  protected Record createSplitObject(final Record object, final LineString newLine) {
     return Records.copy(object, newLine);
   }
 
@@ -67,8 +65,7 @@ BaseInOutProcess<Record, Record> {
   }
 
   @Override
-  protected void postRun(final Channel<Record> in,
-    final Channel<Record> out) {
+  protected void postRun(final Channel<Record> in, final Channel<Record> out) {
     if (this.createdStatistics != null) {
       this.createdStatistics.disconnect();
     }
@@ -78,8 +75,7 @@ BaseInOutProcess<Record, Record> {
   }
 
   @Override
-  protected void preRun(final Channel<Record> in,
-    final Channel<Record> out) {
+  protected void preRun(final Channel<Record> in, final Channel<Record> out) {
     if (this.createdStatistics != null) {
       this.createdStatistics.connect();
     }
@@ -89,8 +85,7 @@ BaseInOutProcess<Record, Record> {
   }
 
   @Override
-  protected void process(final Channel<Record> in,
-    final Channel<Record> out, final Record object) {
+  protected void process(final Channel<Record> in, final Channel<Record> out, final Record object) {
     final Geometry geometry = object.getGeometryValue();
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
@@ -144,11 +139,10 @@ BaseInOutProcess<Record, Record> {
     this.tolerance = tolerance;
   }
 
-  protected List<Record> split(final Record object,
-    final LineString line) {
+  protected List<Record> split(final Record object, final LineString line) {
     final List<Record> newObjects = new ArrayList<Record>();
-    final List<LineString> newLines = LineStringUtil.split(this.geometryFactory,
-      line, this.index, this.tolerance);
+    final List<LineString> newLines = LineStringUtil.split(this.geometryFactory, line, this.index,
+      this.tolerance);
     if (newLines.size() == 1) {
       final LineString newLine = newLines.get(0);
       if (newLine == line) {

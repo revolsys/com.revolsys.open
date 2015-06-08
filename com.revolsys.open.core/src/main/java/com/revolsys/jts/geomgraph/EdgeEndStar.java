@@ -172,8 +172,7 @@ abstract public class EdgeEndStar {
       final EdgeEnd e = (EdgeEnd)it.next();
       final Label label = e.getLabel();
       for (int geomi = 0; geomi < 2; geomi++) {
-        if (label.isLine(geomi)
-            && label.getLocation(geomi) == Location.BOUNDARY) {
+        if (label.isLine(geomi) && label.getLocation(geomi) == Location.BOUNDARY) {
           hasDimensionalCollapseEdge[geomi] = true;
         }
       }
@@ -235,8 +234,7 @@ abstract public class EdgeEndStar {
     return this.edgeList;
   }
 
-  private Location getLocation(final int geomIndex, final Point p,
-    final GeometryGraph[] geom) {
+  private Location getLocation(final int geomIndex, final Point p, final GeometryGraph[] geom) {
     // compute location only on demand
     if (this.ptInAreaLocation[geomIndex] == Location.NONE) {
       this.ptInAreaLocation[geomIndex] = SimplePointInAreaLocator.locate(p,
@@ -303,8 +301,7 @@ abstract public class EdgeEndStar {
     for (final Iterator it = iterator(); it.hasNext();) {
       final EdgeEnd e = (EdgeEnd)it.next();
       final Label label = e.getLabel();
-      if (label.isArea(geomIndex)
-          && label.getLocation(geomIndex, Position.LEFT) != Location.NONE) {
+      if (label.isArea(geomIndex) && label.getLocation(geomIndex, Position.LEFT) != Location.NONE) {
         startLoc = label.getLocation(geomIndex, Position.LEFT);
       }
     }
@@ -330,12 +327,10 @@ abstract public class EdgeEndStar {
         if (rightLoc != Location.NONE) {
           // Debug.print(rightLoc != currLoc, this);
           if (rightLoc != currLoc) {
-            throw new TopologyException("side location conflict",
-              e.getCoordinate());
+            throw new TopologyException("side location conflict", e.getCoordinate());
           }
           if (leftLoc == Location.NONE) {
-            Assert.shouldNeverReachHere("found single null side (at "
-                + e.getCoordinate() + ")");
+            Assert.shouldNeverReachHere("found single null side (at " + e.getCoordinate() + ")");
           }
           currLoc = leftLoc;
         } else {
@@ -345,9 +340,8 @@ abstract public class EdgeEndStar {
            *  the other geometry (which is determined by the current location).
            *  Assign both sides to be the current location.
            */
-          Assert.isTrue(
-            label.getLocation(geomIndex, Position.LEFT) == Location.NONE,
-              "found single null side");
+          Assert.isTrue(label.getLocation(geomIndex, Position.LEFT) == Location.NONE,
+            "found single null side");
           label.setLocation(geomIndex, Position.RIGHT, currLoc);
           label.setLocation(geomIndex, Position.LEFT, currLoc);
         }

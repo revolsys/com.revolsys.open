@@ -32,8 +32,7 @@ public class StringClob implements Clob {
   }
 
   @Override
-  public Reader getCharacterStream(final long offset, final long length)
-      throws SQLException {
+  public Reader getCharacterStream(final long offset, final long length) throws SQLException {
     return new StringReader(this.string.substring((int)offset - 1, (int)length));
   }
 
@@ -73,8 +72,8 @@ public class StringClob implements Clob {
   }
 
   @Override
-  public int setString(final long pos, final String string, final int i,
-    final int j) throws SQLException {
+  public int setString(final long pos, final String string, final int i, final int j)
+    throws SQLException {
     throw new UnsupportedOperationException("Cannot modify Clob");
   }
 

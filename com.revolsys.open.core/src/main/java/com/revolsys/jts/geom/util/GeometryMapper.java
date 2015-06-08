@@ -48,16 +48,14 @@ import com.revolsys.jts.geom.GeometryCollection;
  * @author Martin Davis
  *
  */
-public class GeometryMapper
-{
+public class GeometryMapper {
   /**
    * An interface for geometry functions used for mapping.
    *
    * @author Martin Davis
    *
    */
-  public interface MapOp
-  {
+  public interface MapOp {
     /**
      * Computes a new geometry value.
      *
@@ -67,11 +65,10 @@ public class GeometryMapper
     Geometry map(Geometry g);
   }
 
-  public static Collection map(final Collection geoms, final MapOp op)
-  {
+  public static Collection map(final Collection geoms, final MapOp op) {
     final List mapped = new ArrayList();
-    for (final Iterator i = geoms.iterator(); i.hasNext(); ) {
-      final Geometry g = (Geometry) i.next();
+    for (final Iterator i = geoms.iterator(); i.hasNext();) {
+      final Geometry g = (Geometry)i.next();
       final Geometry gr = op.map(g);
       if (gr != null) {
         mapped.add(gr);
@@ -92,8 +89,7 @@ public class GeometryMapper
    * @param op the mapping operation
    * @return a result collection or geometry of most specific type
    */
-  public static Geometry map(final Geometry geom, final MapOp op)
-  {
+  public static Geometry map(final Geometry geom, final MapOp op) {
     final List mapped = new ArrayList();
     for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry g = op.map(geom.getGeometry(i));

@@ -32,7 +32,6 @@
  */
 package com.revolsys.jtstest.testrunner;
 
-
 /**
  *  Converts test File's to TestCase's and runs them.
  *

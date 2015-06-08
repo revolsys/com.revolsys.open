@@ -36,25 +36,23 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.Property;
 
-public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
-RecordIterator {
+public class OsmPbfRecordIterator extends AbstractIterator<Record> implements RecordIterator {
+
+  private static final int DATE_GRANULARITY = 1000;
+
+  private static final int GRANULARITY = 100;
 
   public static Date toDate(final long time) {
     return new Date(DATE_GRANULARITY * time);
   }
 
-  public static double toDegrees(final double offset, final double granularity,
-    final long value) {
+  public static double toDegrees(final double offset, final double granularity, final long value) {
     return 0.000000001 * (offset + granularity * value);
   }
 
   public static double toDegrees(final long value) {
     return 0.000000001 * GRANULARITY * value;
   }
-
-  private static final int DATE_GRANULARITY = 1000;
-
-  private static final int GRANULARITY = 100;
 
   private final ProtocolBufferInputStream blobHeaderIn = new ProtocolBufferInputStream();
 
@@ -107,12 +105,11 @@ RecordIterator {
     }
   }
 
-  private void addTags(final OsmElement element, final List<String> keys,
-    final List<String> values) {
+  private void addTags(final OsmElement element, final List<String> keys, final List<String> values) {
 
     if (keys.size() != values.size()) {
-      throw new RuntimeException("Number of tag keys (" + keys.size()
-        + ") and tag values (" + values.size() + ") don't match");
+      throw new RuntimeException("Number of tag keys (" + keys.size() + ") and tag values ("
+        + values.size() + ") don't match");
     }
 
     final Iterator<String> valueIterator = values.iterator();
@@ -203,8 +200,7 @@ RecordIterator {
     }
   }
 
-  private void parseBlock(final ProtocolBufferInputStream in)
-      throws IOException {
+  private void parseBlock(final ProtocolBufferInputStream in) throws IOException {
     boolean running = true;
     this.strings = new ArrayList<>();
     double lonOffset = 0;
@@ -217,35 +213,34 @@ RecordIterator {
       switch (tag) {
         case 0:
           running = false;
-          break;
+        break;
         case 10:
           readStrings(in, this.strings);
-          break;
+        break;
         case 18:
           parseOsmElement(in);
-          break;
+        break;
         case 136:
           granularity = in.readInt32();
-          break;
+        break;
         case 144:
           dateGranularity = in.readInt32();
-          break;
+        break;
         case 152:
           latOffset = in.readInt64();
-          break;
+        break;
         case 160:
           lonOffset = in.readInt64();
-          break;
+        break;
         default:
           this.blobIn.skipField(tag);
           running = false;
-          break;
+        break;
       }
     }
   }
 
-  private DenseInfo parseDenseInfo(final ProtocolBufferInputStream input)
-      throws IOException {
+  private DenseInfo parseDenseInfo(final ProtocolBufferInputStream input) throws IOException {
     final DenseInfo info = new DenseInfo();
     final int inLength = input.startLengthDelimited();
 
@@ -255,52 +250,51 @@ RecordIterator {
       switch (tag) {
         case 0:
           running = false;
-          break;
+        break;
         case 8:
           input.readInt(info.versions);
-          break;
+        break;
         case 10:
           input.readInts(info.versions);
-          break;
+        break;
         case 16:
           input.readLong(info.timestamps);
-          break;
+        break;
         case 18:
           input.readLongs(info.timestamps);
-          break;
+        break;
         case 24:
           input.readLong(info.changesets);
         case 26:
           input.readLongs(info.changesets);
         case 32:
           input.readInt(info.uids);
-          break;
+        break;
         case 34:
           input.readInts(info.uids);
-          break;
+        break;
         case 40:
           readStringById(input, info.userNames);
-          break;
+        break;
         case 42:
           readStringsByIds(input, info.userNames);
-          break;
+        break;
         case 48:
           input.readBool(info.visibles);
-          break;
+        break;
         case 50:
           input.readBools(info.visibles);
-          break;
+        break;
         default:
           input.skipField(tag);
-          break;
+        break;
       }
     }
     input.endLengthDelimited(inLength);
     return info;
   }
 
-  private void parseDenseNodes(final ProtocolBufferInputStream in)
-      throws IOException {
+  private void parseDenseNodes(final ProtocolBufferInputStream in) throws IOException {
 
     final List<Long> ids = new ArrayList<>();
     final List<Double> latitudes = new ArrayList<>();
@@ -315,44 +309,43 @@ RecordIterator {
       switch (tag) {
         case 0:
           running = false;
-          break;
+        break;
         case 8:
           in.readLong(ids);
-          break;
+        break;
         case 10:
           in.readLongs(ids);
-          break;
+        break;
         case 42:
           denseInfo = parseDenseInfo(in);
-          break;
+        break;
         case 64:
           readDegreesById(in, latitudes);
-          break;
+        break;
         case 66:
           readDegreesByIds(in, latitudes);
-          break;
+        break;
         case 72:
           readDegreesById(in, longitudes);
-          break;
+        break;
         case 74:
           readDegreesByIds(in, longitudes);
-          break;
+        break;
         case 80:
           readStringById(in, keysAndValues);
-          break;
+        break;
         case 82:
           readStringsByIds(in, keysAndValues);
-          break;
+        break;
         default:
           in.skipField(tag);
-          break;
+        break;
       }
     }
     in.endLengthDelimited(inLength);
     if (ids.size() != latitudes.size() || ids.size() != longitudes.size()) {
-      throw new RuntimeException("Number of ids (" + ids.size()
-        + "), latitudes (" + latitudes.size() + "), and longitudes ("
-        + longitudes.size() + ") don't match");
+      throw new RuntimeException("Number of ids (" + ids.size() + "), latitudes ("
+        + latitudes.size() + "), and longitudes (" + longitudes.size() + ") don't match");
     }
     if (denseInfo == null && keysAndValues.isEmpty()) {
       for (int i = 0; i < ids.size(); i++) {
@@ -381,7 +374,7 @@ RecordIterator {
           }
           if (!keysAndValuesIterator.hasNext()) {
             throw new RuntimeException(
-                "The PBF DenseInfo keys/values list contains a key with no corresponding value.");
+              "The PBF DenseInfo keys/values list contains a key with no corresponding value.");
           }
           if (node == null) {
             node = new OsmNode();
@@ -407,8 +400,8 @@ RecordIterator {
     }
   }
 
-  private void parseInfo(final ProtocolBufferInputStream input,
-    final OsmElement element) throws IOException {
+  private void parseInfo(final ProtocolBufferInputStream input, final OsmElement element)
+    throws IOException {
     final int inLength = input.startLengthDelimited();
 
     boolean running = true;
@@ -417,43 +410,42 @@ RecordIterator {
       switch (tag) {
         case 0:
           running = false;
-          break;
+        break;
         case 8:
           final int version = input.readInt32();
           element.setVersion(version);
-          break;
+        break;
         case 16:
           final long time = input.readInt64();
           final Date timestamp = toDate(time);
           element.setTimestamp(timestamp);
-          break;
+        break;
         case 24:
           final long changeset = input.readInt64();
           element.setChangeset(changeset);
-          break;
+        break;
         case 32:
           final int uid = input.readInt32();
           element.setUid(uid);
-          break;
+        break;
         case 40:
           final int userSid = input.readUInt32();
           final String userName = getString(userSid);
           element.setUser(userName);
-          break;
+        break;
         case 48:
           final boolean visible = input.readBool();
           element.setVisible(visible);
-          break;
+        break;
         default:
           input.skipField(tag);
-          break;
+        break;
       }
     }
     input.endLengthDelimited(inLength);
   }
 
-  private void parseNode(final ProtocolBufferInputStream input)
-      throws IOException {
+  private void parseNode(final ProtocolBufferInputStream input) throws IOException {
 
     final OsmNode node = new OsmNode();
     final List<String> keys = new ArrayList<>();
@@ -467,32 +459,32 @@ RecordIterator {
       switch (tag) {
         case 0:
           running = false;
-          break;
+        break;
         case 8:
           final long id = input.readInt64();
           node.setId(id);
-          break;
+        break;
         case 16:
           readStringById(input, keys);
-          break;
+        break;
         case 18:
           readStringsByIds(input, keys);
-          break;
+        break;
         case 24:
           readStringById(input, values);
-          break;
+        break;
         case 26:
           readStringsByIds(input, values);
-          break;
+        break;
         case 34:
           parseInfo(input, node);
-          break;
+        break;
         case 64:
           lat = toDegrees(input.readSInt64());
-          break;
+        break;
         case 72:
           lon = toDegrees(input.readSInt64());
-          break;
+        break;
       }
     }
     input.endLengthDelimited(inLength);
@@ -502,8 +494,7 @@ RecordIterator {
     this.currentRecords.add(node);
   }
 
-  private void parseOsmElement(final ProtocolBufferInputStream in)
-      throws IOException {
+  private void parseOsmElement(final ProtocolBufferInputStream in) throws IOException {
     final int inLength = in.startLengthDelimited();
     boolean running = true;
     while (running) {
@@ -511,16 +502,16 @@ RecordIterator {
       switch (tag) {
         case 0:
           running = false;
-          break;
+        break;
         case 10:
           parseNode(in);
-          break;
+        break;
         case 18:
           parseDenseNodes(in);
-          break;
+        break;
         case 26:
           parseWay(in);
-          break;
+        break;
         case 34: {
           parseRelation(in);
           break;
@@ -536,14 +527,13 @@ RecordIterator {
         }
         default:
           in.skipField(tag);
-          break;
+        break;
       }
     }
     in.endLengthDelimited(inLength);
   }
 
-  private void parseRelation(final ProtocolBufferInputStream input)
-      throws IOException {
+  private void parseRelation(final ProtocolBufferInputStream input) throws IOException {
 
     final OsmRelation relation = new OsmRelation();
     final List<String> keys = new ArrayList<>();
@@ -560,44 +550,44 @@ RecordIterator {
       switch (tag) {
         case 0:
           running = false;
-          break;
+        break;
         case 8:
           final long id = input.readInt64();
           relation.setId(id);
-          break;
+        break;
         case 16:
           readStringById(input, keys);
-          break;
+        break;
         case 18:
           readStringsByIds(input, keys);
-          break;
+        break;
         case 24:
           readStringById(input, values);
-          break;
+        break;
         case 26:
           readStringsByIds(input, values);
-          break;
+        break;
         case 34:
           parseInfo(input, relation);
-          break;
+        break;
         case 64:
           readStrings(input, memberRoles);
-          break;
+        break;
         case 66:
           readStringsByIds(input, memberRoles);
-          break;
+        break;
         case 72:
           input.readLong(memberIds);
-          break;
+        break;
         case 74:
           input.readLongs(memberIds);
-          break;
+        break;
         case 80:
           input.readEnum(memberTypes);
-          break;
+        break;
         case 82:
           input.readEnums(memberTypes);
-          break;
+        break;
       }
     }
     input.endLengthDelimited(inLength);
@@ -613,11 +603,11 @@ RecordIterator {
       switch (memberType) {
         case 0:
           geometry = this.nodePoints.get(memberId);
-          break;
+        break;
 
         case 1:
           geometry = this.wayGeometries.get(memberId);
-          break;
+        break;
         default:
           throw new RuntimeException("Unknown member type " + memberType);
       }
@@ -644,8 +634,7 @@ RecordIterator {
     }
   }
 
-  private void parseWay(final ProtocolBufferInputStream input)
-      throws IOException {
+  private void parseWay(final ProtocolBufferInputStream input) throws IOException {
 
     final OsmWay way = new OsmWay();
     final List<String> keys = new ArrayList<>();
@@ -659,32 +648,32 @@ RecordIterator {
       switch (tag) {
         case 0:
           running = false;
-          break;
+        break;
         case 8:
           wayId = input.readInt64();
           way.setId(wayId);
-          break;
+        break;
         case 16:
           readStringById(input, keys);
-          break;
+        break;
         case 18:
           readStringsByIds(input, keys);
-          break;
+        break;
         case 24:
           readStringById(input, values);
-          break;
+        break;
         case 26:
           readStringsByIds(input, values);
-          break;
+        break;
         case 34:
           parseInfo(input, way);
-          break;
+        break;
         case 64:
           input.readLong(nodeIds);
-          break;
+        break;
         case 66:
           input.readLongs(nodeIds);
-          break;
+        break;
       }
     }
     input.endLengthDelimited(inLength);
@@ -721,8 +710,7 @@ RecordIterator {
     }
   }
 
-  private void processOsmHeader(final byte[] data)
-      throws InvalidProtocolBufferException {
+  private void processOsmHeader(final byte[] data) throws InvalidProtocolBufferException {
     // Osmformat.HeaderBlock header = Osmformat.HeaderBlock.parseFrom(data);
     //
     // // Build the list of active and unsupported features in the file.
@@ -813,16 +801,16 @@ RecordIterator {
         switch (tag) {
           case 0:
             running = false;
-            break;
+          break;
           case 10:
             raw = this.blobIn.readBytes();
-            break;
+          break;
           case 16:
             rawSize = this.blobIn.readInt32();
-            break;
+          break;
           case 26:
             zlibData = this.blobIn.readBytes();
-            break;
+          break;
           case 34:
             throw new RuntimeException("LZMA not supported");
           case 42:
@@ -830,7 +818,7 @@ RecordIterator {
           default:
             this.blobIn.skipField(tag);
             running = false;
-            break;
+          break;
         }
       }
 
@@ -846,13 +834,12 @@ RecordIterator {
           throw new RuntimeException("Unable to decompress PBF blob.", e);
         }
         if (!inflater.finished()) {
-          throw new RuntimeException(
-              "PBF blob contains incomplete compressed data.");
+          throw new RuntimeException("PBF blob contains incomplete compressed data.");
         }
         return blobData;
       } else {
         throw new RuntimeException(
-            "PBF blob uses unsupported compression, only raw or zlib may be used.");
+          "PBF blob uses unsupported compression, only raw or zlib may be used.");
       }
     } finally {
       this.blobIn.setInputStream(null);
@@ -887,7 +874,7 @@ RecordIterator {
           }
           default:
             this.blobHeaderIn.skipField(tag);
-            break;
+          break;
         }
       }
 
@@ -896,15 +883,15 @@ RecordIterator {
     }
   }
 
-  private void readDegreesById(final ProtocolBufferInputStream in,
-    final List<Double> numbers) throws IOException {
+  private void readDegreesById(final ProtocolBufferInputStream in, final List<Double> numbers)
+    throws IOException {
     final long number = in.readSInt64();
     final double degrees = toDegrees(number);
     numbers.add(degrees);
   }
 
-  private void readDegreesByIds(final ProtocolBufferInputStream in,
-    final List<Double> numbers) throws IOException {
+  private void readDegreesByIds(final ProtocolBufferInputStream in, final List<Double> numbers)
+    throws IOException {
     final int length = in.readRawVarint32();
     final int oldLength = in.pushLimit(length);
     int number = 0;
@@ -917,15 +904,15 @@ RecordIterator {
     in.popLimit(oldLength);
   }
 
-  private void readStringById(final ProtocolBufferInputStream in,
-    final List<String> strings) throws IOException {
+  private void readStringById(final ProtocolBufferInputStream in, final List<String> strings)
+    throws IOException {
     final int stringId = in.readUInt32();
     final String string = getString(stringId);
     strings.add(string);
   }
 
-  protected void readStrings(final ProtocolBufferInputStream in,
-    final List<String> strings) throws IOException {
+  protected void readStrings(final ProtocolBufferInputStream in, final List<String> strings)
+    throws IOException {
     final int inLength = in.startLengthDelimited();
     while (true) {
       final int tag = in.readTag();
@@ -936,16 +923,16 @@ RecordIterator {
         case 10:
           final String string = in.readString();
           strings.add(string);
-          break;
+        break;
         default:
           this.blobIn.skipField(tag);
-          break;
+        break;
       }
     }
   }
 
-  private void readStringsByIds(final ProtocolBufferInputStream in,
-    final List<String> strings) throws IOException {
+  private void readStringsByIds(final ProtocolBufferInputStream in, final List<String> strings)
+    throws IOException {
     final int length = in.readRawVarint32();
     final int oldLength = in.pushLimit(length);
     while (in.getBytesUntilLimit() > 0) {

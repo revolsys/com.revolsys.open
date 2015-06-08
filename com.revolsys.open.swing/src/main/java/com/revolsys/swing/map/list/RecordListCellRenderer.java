@@ -22,11 +22,9 @@ public class RecordListCellRenderer extends DefaultListCellRenderer {
   }
 
   @Override
-  public Component getListCellRendererComponent(final JList list,
-    final Object cellValue, final int index, final boolean isSelected,
-    final boolean cellHasFocus) {
-    super.getListCellRendererComponent(list, cellValue, index, isSelected,
-      cellHasFocus);
+  public Component getListCellRendererComponent(final JList list, final Object cellValue,
+    final int index, final boolean isSelected, final boolean cellHasFocus) {
+    super.getListCellRendererComponent(list, cellValue, index, isSelected, cellHasFocus);
     if (cellValue instanceof Record) {
       final Record object = (Record)cellValue;
       final Object value = object.getValue(this.fieldName);

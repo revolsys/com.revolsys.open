@@ -85,8 +85,7 @@ public class SelectionFunctions {
     return a.getGeometryFactory().buildGeometry(selected);
   }
 
-  private static Geometry select(final Geometry geom,
-    final GeometryPredicate pred) {
+  private static Geometry select(final Geometry geom, final GeometryPredicate pred) {
     final List selected = new ArrayList();
     for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry g = geom.getGeometry(i);

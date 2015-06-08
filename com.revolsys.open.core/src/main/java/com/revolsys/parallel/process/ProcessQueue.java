@@ -10,8 +10,7 @@ import com.revolsys.parallel.channel.store.Buffer;
 public class ProcessQueue {
   private final Buffer<Process> processBuffer = new Buffer<Process>(200);
 
-  private final Channel<Process> processChannel = new Channel<Process>(
-      this.processBuffer);
+  private final Channel<Process> processChannel = new Channel<Process>(this.processBuffer);
 
   private final Set<ProcessQueueWorker> workers = Collections.synchronizedSet(new HashSet<ProcessQueueWorker>());
 

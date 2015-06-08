@@ -16,11 +16,11 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  * @version 1.7
  */
 public class ValidClosedRingTest extends TestCase {
+  private static WKTReader rdr = new WKTReader();
+
   public static void main(final String[] args) {
     junit.textui.TestRunner.run(ValidClosedRingTest.class);
   }
-
-  private static WKTReader rdr = new WKTReader();
 
   public ValidClosedRingTest(final String name) {
     super(name);

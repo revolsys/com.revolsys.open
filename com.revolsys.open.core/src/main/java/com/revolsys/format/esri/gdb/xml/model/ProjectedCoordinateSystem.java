@@ -6,8 +6,7 @@ public class ProjectedCoordinateSystem extends SpatialReference {
   public ProjectedCoordinateSystem() {
   }
 
-  public ProjectedCoordinateSystem(final GeometryFactory geometryFactory,
-    final String wkt) {
+  public ProjectedCoordinateSystem(final GeometryFactory geometryFactory, final String wkt) {
     super(geometryFactory, wkt);
   }
 

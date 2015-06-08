@@ -39,6 +39,8 @@ import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.util.Property;
 
 public final class JdbcUtils {
+  private static final Logger LOG = Logger.getLogger(JdbcUtils.class);
+
   public static void addColumnNames(final StringBuilder sql,
     final RecordDefinition recordDefinition, final String tablePrefix) {
     for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
@@ -67,8 +69,8 @@ public final class JdbcUtils {
     }
   }
 
-  public static void addFieldName(final StringBuilder sql,
-    final String tablePrefix, final FieldDefinition attribute) {
+  public static void addFieldName(final StringBuilder sql, final String tablePrefix,
+    final FieldDefinition attribute) {
     if (attribute instanceof JdbcFieldDefinition) {
       final JdbcFieldDefinition jdbcAttribute = (JdbcFieldDefinition)attribute;
       jdbcAttribute.addColumnName(sql, tablePrefix);
@@ -77,12 +79,10 @@ public final class JdbcUtils {
     }
   }
 
-  public static void addOrderBy(final StringBuilder sql,
-    final Map<String, Boolean> orderBy) {
+  public static void addOrderBy(final StringBuilder sql, final Map<String, Boolean> orderBy) {
     if (!orderBy.isEmpty()) {
       sql.append(" ORDER BY ");
-      for (final Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet()
-          .iterator(); iterator.hasNext();) {
+      for (final Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet().iterator(); iterator.hasNext();) {
         final Entry<String, Boolean> entry = iterator.next();
         final String column = entry.getKey();
         sql.append(column);
@@ -152,9 +152,8 @@ public final class JdbcUtils {
   }
 
   public static String createSelectSql(final RecordDefinition recordDefinition,
-    final String tablePrefix, final String fromClause,
-    final boolean lockResults, final List<String> fieldNames,
-    final Query query, final Map<String, Boolean> orderBy) {
+    final String tablePrefix, final String fromClause, final boolean lockResults,
+    final List<String> fieldNames, final Query query, final Map<String, Boolean> orderBy) {
     final String typePath = recordDefinition.getPath();
     final StringBuilder sql = new StringBuilder();
     sql.append("SELECT ");
@@ -181,11 +180,11 @@ public final class JdbcUtils {
     return sql.toString();
   }
 
-  public static void delete(final Connection connection,
-    final String tableName, final String idColumn, final Object id) {
+  public static void delete(final Connection connection, final String tableName,
+    final String idColumn, final Object id) {
 
     final String sql = "DELETE FROM " + cleanObjectName(tableName) + " WHERE "
-        + cleanObjectName(idColumn) + " = ?";
+      + cleanObjectName(idColumn) + " = ?";
     try {
       final PreparedStatement statement = connection.prepareStatement(sql);
       try {
@@ -200,14 +199,13 @@ public final class JdbcUtils {
       }
     } catch (final SQLException e) {
       LOG.error("Invalid table name or id column: " + sql, e);
-      throw new IllegalArgumentException("Invalid table name or id column: "
-          + sql);
+      throw new IllegalArgumentException("Invalid table name or id column: " + sql);
     }
 
   }
 
-  public static int executeUpdate(final Connection connection,
-    final String sql, final Object... parameters) throws SQLException {
+  public static int executeUpdate(final Connection connection, final String sql,
+    final Object... parameters) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
       setParameters(statement, parameters);
@@ -217,8 +215,8 @@ public final class JdbcUtils {
     }
   }
 
-  public static int executeUpdate(final DataSource dataSource,
-    final String sql, final Object... parameters) {
+  public static int executeUpdate(final DataSource dataSource, final String sql,
+    final Object... parameters) {
     final Connection connection = getConnection(dataSource);
     try {
       return executeUpdate(connection, sql, parameters);
@@ -229,16 +227,22 @@ public final class JdbcUtils {
     }
   }
 
-  public static int executeUpdate(final JdbcRecordStore recordStore,
-    final String sql, final Object... parameters) {
+  public static int executeUpdate(final JdbcRecordStore recordStore, final String sql,
+    final Object... parameters) {
     try (
-        final JdbcConnection connection = recordStore.getJdbcConnection()) {
+      final JdbcConnection connection = recordStore.getJdbcConnection()) {
       try {
         return executeUpdate(connection, sql, parameters);
       } catch (final SQLException e) {
         throw connection.getException("Update", sql, e);
       }
     }
+  }
+
+  public static BigDecimal[] getBigDecimalArray(final ResultSet resultSet, final int index)
+    throws SQLException {
+    final Array array = resultSet.getArray(index);
+    return (BigDecimal[])array.getArray();
   }
 
   public static Connection getConnection(final DataSource dataSource) {
@@ -258,13 +262,11 @@ public final class JdbcUtils {
   }
 
   public static DataAccessException getException(final DataSource dataSource,
-    final Connection connection, final String task, final String sql,
-    final SQLException e) {
+    final Connection connection, final String task, final String sql, final SQLException e) {
     if (dataSource == null) {
       return new SQLStateSQLExceptionTranslator().translate(task, sql, e);
     } else {
-      return new SQLErrorCodeSQLExceptionTranslator(dataSource).translate(task,
-        sql, e);
+      return new SQLErrorCodeSQLExceptionTranslator(dataSource).translate(task, sql, e);
     }
   }
 
@@ -277,10 +279,7 @@ public final class JdbcUtils {
         if (connection == null) {
           if (dataSource.getClass().getName().toLowerCase().contains("oracle")) {
             return "Oracle";
-          } else if (dataSource.getClass()
-              .getName()
-              .toLowerCase()
-              .contains("postgres")) {
+          } else if (dataSource.getClass().getName().toLowerCase().contains("postgres")) {
             return "PostgreSQL";
           } else {
             return null;
@@ -290,8 +289,7 @@ public final class JdbcUtils {
           return metaData.getDatabaseProductName();
         }
       } catch (final SQLException e) {
-        throw new IllegalArgumentException(
-          "Unable to get database product name", e);
+        throw new IllegalArgumentException("Unable to get database product name", e);
       } finally {
         release(connection, dataSource);
       }
@@ -329,8 +327,7 @@ public final class JdbcUtils {
         // throw new IllegalArgumentException("Unknown table name " +
         // tableName);
       }
-      final List<String> fieldNames = new ArrayList<String>(
-          query.getFieldNames());
+      final List<String> fieldNames = new ArrayList<String>(query.getFieldNames());
       if (fieldNames.isEmpty()) {
         final List<String> recordDefinitionFieldNames = recordDefinition.getFieldNames();
         if (recordDefinitionFieldNames.isEmpty()) {
@@ -341,8 +338,8 @@ public final class JdbcUtils {
       }
       final String fromClause = query.getFromClause();
       final boolean lockResults = query.isLockResults();
-      sql = createSelectSql(recordDefinition, "T", fromClause, lockResults,
-        fieldNames, query, orderBy);
+      sql = createSelectSql(recordDefinition, "T", fromClause, lockResults, fieldNames, query,
+        orderBy);
     } else {
       if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
         final StringBuilder newSql = new StringBuilder("SELECT ");
@@ -365,8 +362,8 @@ public final class JdbcUtils {
     return tableName;
   }
 
-  public static void lockTable(final Connection connection,
-    final String tableName) throws SQLException {
+  public static void lockTable(final Connection connection, final String tableName)
+    throws SQLException {
     final String sql = "LOCK TABLE " + tableName + " IN SHARE MODE";
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
@@ -376,12 +373,11 @@ public final class JdbcUtils {
     }
   }
 
-  public static void lockTable(final RecordStore recordStore,
-    final String typePath) {
+  public static void lockTable(final RecordStore recordStore, final String typePath) {
     if (recordStore instanceof JdbcRecordStore) {
       final JdbcRecordStore jdbcRecordStore = (JdbcRecordStore)recordStore;
       try (
-          final JdbcConnection connection = jdbcRecordStore.getJdbcConnection()) {
+        final JdbcConnection connection = jdbcRecordStore.getJdbcConnection()) {
         final String tableName = getQualifiedTableName(typePath);
         final String sql = "LOCK TABLE " + tableName + " IN SHARE MODE";
         executeUpdate(connection, sql);
@@ -392,8 +388,7 @@ public final class JdbcUtils {
 
   }
 
-  public static Map<String, Object> readMap(final ResultSet rs)
-      throws SQLException {
+  public static Map<String, Object> readMap(final ResultSet rs) throws SQLException {
     final Map<String, Object> values = new LinkedHashMap<String, Object>();
     final ResultSetMetaData metaData = rs.getMetaData();
     for (int i = 1; i <= metaData.getColumnCount(); i++) {
@@ -404,8 +399,7 @@ public final class JdbcUtils {
     return values;
   }
 
-  public static void release(final Connection connection,
-    final DataSource dataSource) {
+  public static void release(final Connection connection, final DataSource dataSource) {
     if (dataSource != null && connection != null) {
       DataSourceUtils.releaseConnection(connection, dataSource);
     }
@@ -431,9 +425,8 @@ public final class JdbcUtils {
     }
   }
 
-  public static Date selectDate(final DataSource dataSource,
-    final Connection connection, final String sql, final Object... parameters)
-        throws SQLException {
+  public static Date selectDate(final DataSource dataSource, final Connection connection,
+    final String sql, final Object... parameters) throws SQLException {
     if (dataSource == null) {
       return selectDate(connection, sql, parameters);
     } else {
@@ -456,8 +449,8 @@ public final class JdbcUtils {
     return selectInt(null, connection, sql, parameters);
   }
 
-  public static int selectInt(final DataSource dataSource,
-    Connection connection, final String sql, final Object... parameters) {
+  public static int selectInt(final DataSource dataSource, Connection connection, final String sql,
+    final Object... parameters) {
     if (dataSource != null) {
       connection = getConnection(dataSource);
     }
@@ -494,16 +487,16 @@ public final class JdbcUtils {
 
   }
 
-  public static int selectInt(final JdbcRecordStore recordStore,
-    final String sql, final Object... parameters) {
+  public static int selectInt(final JdbcRecordStore recordStore, final String sql,
+    final Object... parameters) {
     try (
-        JdbcConnection connection = recordStore.getJdbcConnection()) {
+      JdbcConnection connection = recordStore.getJdbcConnection()) {
       try (
-          final PreparedStatement statement = connection.prepareStatement(sql)) {
+        final PreparedStatement statement = connection.prepareStatement(sql)) {
         setParameters(statement, parameters);
 
         try (
-            final ResultSet resultSet = statement.executeQuery()) {
+          final ResultSet resultSet = statement.executeQuery()) {
           if (resultSet.next()) {
             return resultSet.getInt(1);
           } else {
@@ -516,9 +509,8 @@ public final class JdbcUtils {
     }
   }
 
-  public static <T> List<T> selectList(final Connection connection,
-    final String sql, final int columnIndex, final Object... parameters)
-        throws SQLException {
+  public static <T> List<T> selectList(final Connection connection, final String sql,
+    final int columnIndex, final Object... parameters) throws SQLException {
     final List<T> results = new ArrayList<T>();
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
@@ -559,9 +551,8 @@ public final class JdbcUtils {
     }
   }
 
-  public static long selectLong(final DataSource dataSource,
-    final Connection connection, final String sql, final Object... parameters)
-        throws SQLException {
+  public static long selectLong(final DataSource dataSource, final Connection connection,
+    final String sql, final Object... parameters) throws SQLException {
     if (dataSource == null) {
       return selectLong(connection, sql, parameters);
     } else {
@@ -579,16 +570,16 @@ public final class JdbcUtils {
     }
   }
 
-  public static long selectLong(final JdbcRecordStore recordStore,
-    final String sql, final Object... parameters) {
+  public static long selectLong(final JdbcRecordStore recordStore, final String sql,
+    final Object... parameters) {
     try (
-        JdbcConnection connection = recordStore.getJdbcConnection()) {
+      JdbcConnection connection = recordStore.getJdbcConnection()) {
       try (
-          final PreparedStatement statement = connection.prepareStatement(sql)) {
+        final PreparedStatement statement = connection.prepareStatement(sql)) {
         setParameters(statement, parameters);
 
         try (
-            final ResultSet resultSet = statement.executeQuery()) {
+          final ResultSet resultSet = statement.executeQuery()) {
           if (resultSet.next()) {
             return resultSet.getLong(1);
           } else {
@@ -601,8 +592,8 @@ public final class JdbcUtils {
     }
   }
 
-  public static Map<String, Object> selectMap(final Connection connection,
-    final String sql, final Object... parameters) throws SQLException {
+  public static Map<String, Object> selectMap(final Connection connection, final String sql,
+    final Object... parameters) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
       setParameters(statement, parameters);
@@ -612,7 +603,7 @@ public final class JdbcUtils {
           return readMap(resultSet);
         } else {
           throw new IllegalArgumentException("Value not found for " + sql + " "
-              + Arrays.asList(parameters));
+            + Arrays.asList(parameters));
         }
       } finally {
         close(resultSet);
@@ -622,8 +613,8 @@ public final class JdbcUtils {
     }
   }
 
-  public static Map<String, Object> selectMap(final DataSource dataSource,
-    final String sql, final Object... parameters) throws SQLException {
+  public static Map<String, Object> selectMap(final DataSource dataSource, final String sql,
+    final Object... parameters) throws SQLException {
     final Connection connection = getConnection(dataSource);
     try {
       return selectMap(connection, sql, parameters);
@@ -632,22 +623,21 @@ public final class JdbcUtils {
     }
   }
 
-  public static Map<String, Object> selectMap(
-    final JdbcRecordStore recordStore, final String sql,
+  public static Map<String, Object> selectMap(final JdbcRecordStore recordStore, final String sql,
     final Object... parameters) {
     try (
-        JdbcConnection connection = recordStore.getJdbcConnection()) {
+      JdbcConnection connection = recordStore.getJdbcConnection()) {
       try (
-          final PreparedStatement statement = connection.prepareStatement(sql)) {
+        final PreparedStatement statement = connection.prepareStatement(sql)) {
         setParameters(statement, parameters);
 
         try (
-            final ResultSet resultSet = statement.executeQuery()) {
+          final ResultSet resultSet = statement.executeQuery()) {
           if (resultSet.next()) {
             return readMap(resultSet);
           } else {
-            throw new IllegalArgumentException("Value not found for " + sql
-              + " " + Arrays.asList(parameters));
+            throw new IllegalArgumentException("Value not found for " + sql + " "
+              + Arrays.asList(parameters));
           }
         }
       } catch (final SQLException e) {
@@ -656,13 +646,13 @@ public final class JdbcUtils {
     }
   }
 
-  public static String selectString(final Connection connection,
-    final String sql, final Object... parameters) throws SQLException {
+  public static String selectString(final Connection connection, final String sql,
+    final Object... parameters) throws SQLException {
     try (
-        final PreparedStatement statement = connection.prepareStatement(sql)) {
+      final PreparedStatement statement = connection.prepareStatement(sql)) {
       setParameters(statement, parameters);
       try (
-          final ResultSet resultSet = statement.executeQuery()) {
+        final ResultSet resultSet = statement.executeQuery()) {
         if (resultSet.next()) {
           return resultSet.getString(1);
         } else {
@@ -672,9 +662,8 @@ public final class JdbcUtils {
     }
   }
 
-  public static String selectString(final DataSource dataSource,
-    final Connection connection, final String sql, final Object... parameters)
-        throws SQLException {
+  public static String selectString(final DataSource dataSource, final Connection connection,
+    final String sql, final Object... parameters) throws SQLException {
     if (dataSource == null) {
       return selectString(connection, sql, parameters);
     } else {
@@ -682,8 +671,8 @@ public final class JdbcUtils {
     }
   }
 
-  public static String selectString(final DataSource dataSource,
-    final String sql, final Object... parameters) throws SQLException {
+  public static String selectString(final DataSource dataSource, final String sql,
+    final Object... parameters) throws SQLException {
     final Connection connection = getConnection(dataSource);
     try {
       return selectString(connection, sql, parameters);
@@ -692,24 +681,24 @@ public final class JdbcUtils {
     }
   }
 
-  public static String selectString(final JdbcRecordStore recordStore,
-    final String sql, final Object... parameters) throws SQLException {
+  public static String selectString(final JdbcRecordStore recordStore, final String sql,
+    final Object... parameters) throws SQLException {
     try (
-        JdbcConnection connection = recordStore.getJdbcConnection()) {
+      JdbcConnection connection = recordStore.getJdbcConnection()) {
       return selectString(connection, sql, parameters);
     }
   }
 
-  public static void setParameters(final PreparedStatement statement,
-    final Object... parameters) throws SQLException {
+  public static void setParameters(final PreparedStatement statement, final Object... parameters)
+    throws SQLException {
     int index = 1;
     for (final Object parameter : parameters) {
       index = setValue(statement, index, parameter);
     }
   }
 
-  public static void setPreparedStatementParameters(
-    final PreparedStatement statement, final Query query) {
+  public static void setPreparedStatementParameters(final PreparedStatement statement,
+    final Query query) {
     int index = 1;
     for (final Object parameter : query.getParameters()) {
       final JdbcFieldDefinition attribute = JdbcFieldDefinition.createField(parameter);
@@ -725,26 +714,18 @@ public final class JdbcUtils {
     }
   }
 
-  public static int setValue(final PreparedStatement statement,
-    final int index, final Object value) throws SQLException {
+  public static int setValue(final PreparedStatement statement, final int index, final Object value)
+    throws SQLException {
     final JdbcFieldDefinition attribute = JdbcFieldDefinition.createField(value);
     return attribute.setPreparedStatementValue(statement, index, value);
-  }
-
-  private static final Logger LOG = Logger.getLogger(JdbcUtils.class);
-
-  private JdbcUtils() {
-
-  }
-
-  public static BigDecimal[] getBigDecimalArray(final ResultSet resultSet,
-    final int index) throws SQLException {
-    final Array array = resultSet.getArray(index);
-    return (BigDecimal[])array.getArray();
   }
 
   public static Struct struct(final Connection connection, final String type, final Object... args)
     throws SQLException {
     return connection.createStruct(type, args);
+  }
+
+  private JdbcUtils() {
+
   }
 }

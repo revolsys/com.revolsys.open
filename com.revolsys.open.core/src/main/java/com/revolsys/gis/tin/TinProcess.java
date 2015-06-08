@@ -43,9 +43,9 @@ public class TinProcess extends BaseInOutProcess<Record, Record> {
   private String getId() {
     final GeometryFactory geometryFactory = this.boundingBox.getGeometryFactory();
     final String string = MathUtil.toString(this.boundingBox.getMinX()) + "_"
-        + MathUtil.toString(this.boundingBox.getMinY()) + "_"
-        + MathUtil.toString(this.boundingBox.getMaxX()) + "_"
-        + MathUtil.toString(this.boundingBox.getMaxY());
+      + MathUtil.toString(this.boundingBox.getMinY()) + "_"
+      + MathUtil.toString(this.boundingBox.getMaxX()) + "_"
+      + MathUtil.toString(this.boundingBox.getMaxY());
     if (geometryFactory == null) {
       return string;
     } else {
@@ -123,8 +123,7 @@ public class TinProcess extends BaseInOutProcess<Record, Record> {
   }
 
   @Override
-  protected void postRun(final Channel<Record> in,
-    final Channel<Record> out) {
+  protected void postRun(final Channel<Record> in, final Channel<Record> out) {
     if (this.tin == null) {
       LOG.info("Tin not created as there were no features");
     }
@@ -139,8 +138,7 @@ public class TinProcess extends BaseInOutProcess<Record, Record> {
   }
 
   @Override
-  protected void process(final Channel<Record> in,
-    final Channel<Record> out, final Record object) {
+  protected void process(final Channel<Record> in, final Channel<Record> out, final Record object) {
     if (this.tin == null) {
       loadTin();
     }
@@ -198,8 +196,7 @@ public class TinProcess extends BaseInOutProcess<Record, Record> {
     this.tinReader = tinReader;
   }
 
-  public void setUpdatedAttributeValues(
-    final Map<String, Object> updatedAttributeValues) {
+  public void setUpdatedAttributeValues(final Map<String, Object> updatedAttributeValues) {
     this.updatedAttributeValues = updatedAttributeValues;
   }
 }

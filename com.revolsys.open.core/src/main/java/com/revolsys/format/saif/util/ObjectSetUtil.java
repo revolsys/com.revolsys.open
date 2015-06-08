@@ -25,6 +25,11 @@ import java.io.File;
 import com.revolsys.io.FileUtil;
 
 public final class ObjectSetUtil {
+  public static final String[] OBJECT_SUBSET_NUMBERS = {
+    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i",
+    "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
+  };
+
   public static String getObjectSubsetName(final String prefix, final int index) {
     return prefix + getObjectSubsetNumber(index) + ".osn";
   }
@@ -43,12 +48,6 @@ public final class ObjectSetUtil {
   public static String getObjectSubsetPrefix(final String fileName) {
     return fileName.replaceAll("(\\d\\d)?.osn$", "");
   }
-
-  public static final String[] OBJECT_SUBSET_NUMBERS = {
-    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e",
-    "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
-    "u", "v", "w", "x", "y", "z"
-  };
 
   private ObjectSetUtil() {
   }

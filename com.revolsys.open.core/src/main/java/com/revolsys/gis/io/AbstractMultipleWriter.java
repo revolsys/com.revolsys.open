@@ -29,8 +29,7 @@ public abstract class AbstractMultipleWriter extends AbstractRecordWriter {
     }
   }
 
-  protected abstract Writer<Record> createWriter(
-    final RecordDefinition recordDefinition);
+  protected abstract Writer<Record> createWriter(final RecordDefinition recordDefinition);
 
   private Writer<Record> getWriter(final RecordDefinition recordDefinition) {
     Writer<Record> writer = this.writers.get(recordDefinition);

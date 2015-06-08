@@ -15,8 +15,7 @@ public class ReaderProcess extends AbstractOutProcess<Record> {
 
   }
 
-  public ReaderProcess(final Channel<Record> out,
-    final RecordIterator reader) {
+  public ReaderProcess(final Channel<Record> out, final RecordIterator reader) {
     super(out);
     this.reader = reader;
   }

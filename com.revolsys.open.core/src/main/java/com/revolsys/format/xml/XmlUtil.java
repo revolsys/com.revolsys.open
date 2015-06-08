@@ -5,8 +5,7 @@ import javax.xml.namespace.QName;
 
 public class XmlUtil {
 
-  public static QName getXmlQName(final NamespaceContext context,
-    final String value) {
+  public static QName getXmlQName(final NamespaceContext context, final String value) {
     if (value == null) {
       return null;
     } else {

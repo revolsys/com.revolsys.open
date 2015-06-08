@@ -51,16 +51,14 @@ public class RectanglePredicateTest extends TestCase {
 
   public void testAngleOnBoundary() throws Exception {
     final String[] onBoundary = {
-      "POLYGON ((10 10, 30 10, 30 30, 10 30, 10 10))",
-      "LINESTRING (10 30, 10 10, 30 10)"
+      "POLYGON ((10 10, 30 10, 30 30, 10 30, 10 10))", "LINESTRING (10 30, 10 10, 30 10)"
     };
     runRectanglePred(onBoundary);
   }
 
   public void testShortAngleOnBoundary() throws Exception {
     final String[] onBoundary = {
-      "POLYGON ((10 10, 30 10, 30 30, 10 30, 10 10))",
-      "LINESTRING (10 25, 10 10, 25 10)"
+      "POLYGON ((10 10, 30 10, 30 30, 10 30, 10 10))", "LINESTRING (10 25, 10 10, 25 10)"
     };
     runRectanglePred(onBoundary);
   }

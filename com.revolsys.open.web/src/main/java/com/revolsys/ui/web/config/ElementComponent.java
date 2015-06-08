@@ -35,8 +35,7 @@ public class ElementComponent extends Component {
     setAttribute(component.attribute);
   }
 
-  public ElementComponent(final String area, final String name,
-    final String attribute) {
+  public ElementComponent(final String area, final String name, final String attribute) {
     super(area, name);
     setAttribute(attribute);
   }
@@ -68,8 +67,7 @@ public class ElementComponent extends Component {
   }
 
   @Override
-  public void includeComponent(final PageContext context)
-      throws ServletException, IOException {
+  public void includeComponent(final PageContext context) throws ServletException, IOException {
     final Object object = context.findAttribute(this.attribute);
     if (object instanceof Element) {
       final Element element = (Element)object;

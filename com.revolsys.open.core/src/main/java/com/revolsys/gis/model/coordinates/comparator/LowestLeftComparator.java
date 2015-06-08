@@ -8,8 +8,7 @@ import com.revolsys.jts.geom.Point;
  * Compare the coordinates, lowest Y first if equal then X comparison.
  */
 public class LowestLeftComparator implements Comparator<Point> {
-  public static int compareCoordinates(final Point point1,
-    final Point point2) {
+  public static int compareCoordinates(final Point point1, final Point point2) {
     final Double x1 = point1.getX();
     final Double y1 = point1.getY();
     final Double x2 = point2.getX();

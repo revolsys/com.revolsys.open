@@ -44,27 +44,6 @@ import com.revolsys.logging.log4j.ThreadLocalFileAppender;
 import com.revolsys.parallel.process.ProcessNetwork;
 
 public class ProcessorPipelineTool {
-  private static Throwable getBeanExceptionCause(final BeanCreationException e) {
-    Throwable cause = e.getCause();
-    while (cause instanceof BeanCreationException
-        || cause instanceof MethodInvocationException
-        || cause instanceof PropertyAccessException) {
-      final Throwable newCause = cause.getCause();
-      if (newCause != null) {
-        cause = newCause;
-      }
-    }
-    return cause;
-  }
-
-  /**
-   * @param args
-   */
-  public static void main(final String[] args) {
-    final ProcessorPipelineTool app = new ProcessorPipelineTool();
-    app.start(args);
-  }
-
   private static final String EXCLUDE_PATTERN = "exclude";
 
   private static final String EXCLUDE_PATTERN_OPTION = "x";
@@ -90,6 +69,26 @@ public class ProcessorPipelineTool {
   private static final String SOURCE_FILE_EXTENSION_OPTION = "e";
 
   private static final String SOURCE_FLE_EXTENSION = "sourceFileExtension";
+
+  private static Throwable getBeanExceptionCause(final BeanCreationException e) {
+    Throwable cause = e.getCause();
+    while (cause instanceof BeanCreationException || cause instanceof MethodInvocationException
+      || cause instanceof PropertyAccessException) {
+      final Throwable newCause = cause.getCause();
+      if (newCause != null) {
+        cause = newCause;
+      }
+    }
+    return cause;
+  }
+
+  /**
+   * @param args
+   */
+  public static void main(final String[] args) {
+    final ProcessorPipelineTool app = new ProcessorPipelineTool();
+    app.start(args);
+  }
 
   private CommandLine commandLine;
 
@@ -117,39 +116,36 @@ public class ProcessorPipelineTool {
 
   private void createOptions() {
     final Option script = new Option(SCRIPT_OPTION, SCRIPT, true,
-        "the script file that defines the processor pipeline");
+      "the script file that defines the processor pipeline");
     script.setRequired(true);
     this.options.addOption(script);
 
-    final Option sourceDirectory = new Option(SOURCE_DIRECTORY_OPTION,
-      SOURCE_DIRECTORY, true, "the location of the source files to process");
+    final Option sourceDirectory = new Option(SOURCE_DIRECTORY_OPTION, SOURCE_DIRECTORY, true,
+      "the location of the source files to process");
     sourceDirectory.setRequired(false);
     this.options.addOption(sourceDirectory);
 
     final Option sourceFileExtension = new Option(SOURCE_FILE_EXTENSION_OPTION,
-      SOURCE_FLE_EXTENSION, true,
-        "the file extension of the source files (e.g. .saf)");
+      SOURCE_FLE_EXTENSION, true, "the file extension of the source files (e.g. .saf)");
     sourceFileExtension.setRequired(false);
     this.options.addOption(sourceFileExtension);
 
-    final Option outputDirectory = new Option(OUTPUT_DIRECTORY_OPTION,
-      OUTPUT_DIRECTORY, true, "the directory to write processed files to");
+    final Option outputDirectory = new Option(OUTPUT_DIRECTORY_OPTION, OUTPUT_DIRECTORY, true,
+      "the directory to write processed files to");
     outputDirectory.setRequired(false);
     this.options.addOption(outputDirectory);
 
-    final Option logDirectory = new Option(LOG_DIRECTORY_OPTION, LOG_DIRECTORY,
-      true, "the directory to write log files to");
+    final Option logDirectory = new Option(LOG_DIRECTORY_OPTION, LOG_DIRECTORY, true,
+      "the directory to write log files to");
     logDirectory.setRequired(false);
     this.options.addOption(logDirectory);
 
-    final Option excludePattern = new Option(EXCLUDE_PATTERN_OPTION,
-      EXCLUDE_PATTERN, true,
-        "exclude files matching a regular expression (e.g. '.*_back.zip");
+    final Option excludePattern = new Option(EXCLUDE_PATTERN_OPTION, EXCLUDE_PATTERN, true,
+      "exclude files matching a regular expression (e.g. '.*_back.zip");
     excludePattern.setRequired(false);
     this.options.addOption(excludePattern);
 
-    final Option property = new Option("D", "property=value", true,
-        "use value for given property");
+    final Option property = new Option("D", "property=value", true, "use value for given property");
     property.setValueSeparator('=');
     this.options.addOption(property);
   }
@@ -171,12 +167,10 @@ public class ProcessorPipelineTool {
 
       }
       if (this.commandLine.hasOption(SOURCE_DIRECTORY_OPTION)) {
-        this.sourceDirectory = new File(
-          this.commandLine.getOptionValue(SOURCE_DIRECTORY_OPTION));
+        this.sourceDirectory = new File(this.commandLine.getOptionValue(SOURCE_DIRECTORY_OPTION));
         if (!this.sourceDirectory.isDirectory()) {
-          System.err.println("Source directory '"
-              + this.sourceDirectory.getAbsolutePath()
-              + "' does not exist or is not a directory");
+          System.err.println("Source directory '" + this.sourceDirectory.getAbsolutePath()
+            + "' does not exist or is not a directory");
           return false;
         }
       }
@@ -184,18 +178,15 @@ public class ProcessorPipelineTool {
         this.sourceFileExtension = this.commandLine.getOptionValue(SOURCE_FILE_EXTENSION_OPTION);
       }
       if (this.commandLine.hasOption(OUTPUT_DIRECTORY_OPTION)) {
-        this.targetDirectory = new File(
-          this.commandLine.getOptionValue(OUTPUT_DIRECTORY_OPTION));
+        this.targetDirectory = new File(this.commandLine.getOptionValue(OUTPUT_DIRECTORY_OPTION));
         if (!this.targetDirectory.isDirectory()) {
-          System.err.println("Target directory '"
-              + this.targetDirectory.getAbsolutePath()
-              + "' does not exist or is not a directory");
+          System.err.println("Target directory '" + this.targetDirectory.getAbsolutePath()
+            + "' does not exist or is not a directory");
           return false;
         }
       }
       if (this.commandLine.hasOption(LOG_DIRECTORY_OPTION)) {
-        this.logDirectory = new File(
-          this.commandLine.getOptionValue(LOG_DIRECTORY_OPTION));
+        this.logDirectory = new File(this.commandLine.getOptionValue(LOG_DIRECTORY_OPTION));
         if (!this.logDirectory.isDirectory()) {
           System.err.println("Log directory '" + this.logDirectory.getAbsolutePath()
             + "' does not exist or is not a directory");
@@ -210,13 +201,13 @@ public class ProcessorPipelineTool {
       this.excludePattern = this.commandLine.getOptionValue(EXCLUDE_PATTERN_OPTION);
       if (this.sourceDirectory != null) {
         if (this.targetDirectory == null) {
-          System.err.println("A " + OUTPUT_DIRECTORY + " must be specified if "
-              + SOURCE_DIRECTORY + " is specified");
+          System.err.println("A " + OUTPUT_DIRECTORY + " must be specified if " + SOURCE_DIRECTORY
+            + " is specified");
           return false;
         }
         if (this.sourceFileExtension == null) {
-          System.err.println("A " + SOURCE_FLE_EXTENSION
-            + " must be specified if " + SOURCE_DIRECTORY + " is specified");
+          System.err.println("A " + SOURCE_FLE_EXTENSION + " must be specified if "
+            + SOURCE_DIRECTORY + " is specified");
           return false;
         }
       } else {
@@ -235,32 +226,28 @@ public class ProcessorPipelineTool {
       System.err.println("Missing " + e.getMessage() + " argument");
       return false;
     } catch (final ParseException e) {
-      System.err.println("Unable to process command line arguments: "
-          + e.getMessage());
+      System.err.println("Unable to process command line arguments: " + e.getMessage());
       return false;
     }
   }
 
-  private void processDirectory(final File sourceDirectory,
-    final File targetDirectory, final File logDirectory,
-    final String sourceFileExtension) {
-    System.out.println("Processing directory '"
-        + sourceDirectory.getAbsolutePath() + "'");
+  private void processDirectory(final File sourceDirectory, final File targetDirectory,
+    final File logDirectory, final String sourceFileExtension) {
+    System.out.println("Processing directory '" + sourceDirectory.getAbsolutePath() + "'");
     final File[] files = sourceDirectory.listFiles();
     for (final File file : files) {
       final String fileName = FileUtil.getFileName(file);
       if (file.isDirectory()) {
-        processDirectory(file, new File(targetDirectory, fileName), new File(
-          logDirectory, fileName), sourceFileExtension);
+        processDirectory(file, new File(targetDirectory, fileName),
+          new File(logDirectory, fileName), sourceFileExtension);
       } else if (fileName.endsWith(sourceFileExtension)) {
-        processFile(file, new File(targetDirectory, fileName), new File(
-          logDirectory, fileName + ".log"));
+        processFile(file, new File(targetDirectory, fileName), new File(logDirectory, fileName
+          + ".log"));
       }
     }
   }
 
-  private void processFile(final File sourceFile, final File targetFile,
-    final File logFile) {
+  private void processFile(final File sourceFile, final File targetFile, final File logFile) {
     final long startTime = System.currentTimeMillis();
     if (this.excludePattern != null) {
       try {
@@ -281,13 +268,12 @@ public class ProcessorPipelineTool {
       localAppender.setLocalFile(logFile.getAbsolutePath());
     }
     log.info("Processing file '" + sourceFile + "' to '" + targetFile + "'");
-    System.out.println("Processing file '" + sourceFile + "' to '" + targetFile
-      + "'");
+    System.out.println("Processing file '" + sourceFile + "' to '" + targetFile + "'");
 
     System.setProperty("sourceFile", sourceFile.getAbsolutePath());
     System.setProperty("targetFile", targetFile.getAbsolutePath());
     final BeanFactory beans = new FileSystemXmlApplicationContext("file:"
-        + this.scriptFile.getAbsolutePath());
+      + this.scriptFile.getAbsolutePath());
     try {
       final File parentFile = targetFile.getParentFile();
       if (parentFile != null) {

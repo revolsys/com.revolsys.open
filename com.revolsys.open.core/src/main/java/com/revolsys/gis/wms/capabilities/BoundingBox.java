@@ -1,6 +1,5 @@
 package com.revolsys.gis.wms.capabilities;
 
-
 public class BoundingBox {
   private String srs;
 

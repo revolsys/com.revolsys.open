@@ -22,6 +22,12 @@ import com.revolsys.util.Property;
 
 public class JdbcFactoryRegistry {
 
+  private static JdbcFactoryRegistry instance;
+
+  private static final Logger LOG = LoggerFactory.getLogger(JdbcFactoryRegistry.class);
+
+  private static Map<ApplicationContext, WeakReference<JdbcFactoryRegistry>> factoriesByApplicationContext = new WeakHashMap<ApplicationContext, WeakReference<JdbcFactoryRegistry>>();
+
   public static void clearInstance() {
     instance = null;
   }
@@ -31,8 +37,7 @@ public class JdbcFactoryRegistry {
     return jdbcFactoryRegistry.getDatabaseFactory(dataSource);
   }
 
-  public static JdbcDatabaseFactory databaseFactory(
-    final Map<String, ? extends Object> config) {
+  public static JdbcDatabaseFactory databaseFactory(final Map<String, ? extends Object> config) {
     final JdbcFactoryRegistry jdbcFactoryRegistry = JdbcFactoryRegistry.getFactory();
     return jdbcFactoryRegistry.getDatabaseFactory(config);
   }
@@ -63,8 +68,7 @@ public class JdbcFactoryRegistry {
     }
   }
 
-  public static JdbcFactoryRegistry getFactory(
-    final ApplicationContext applicationContext) {
+  public static JdbcFactoryRegistry getFactory(final ApplicationContext applicationContext) {
     synchronized (factoriesByApplicationContext) {
       final WeakReference<JdbcFactoryRegistry> reference = factoriesByApplicationContext.get(applicationContext);
       JdbcFactoryRegistry jdbcFactoryRegistry;
@@ -90,12 +94,6 @@ public class JdbcFactoryRegistry {
     }
   }
 
-  private static JdbcFactoryRegistry instance;
-
-  private static final Logger LOG = LoggerFactory.getLogger(JdbcFactoryRegistry.class);
-
-  private static Map<ApplicationContext, WeakReference<JdbcFactoryRegistry>> factoriesByApplicationContext = new WeakHashMap<ApplicationContext, WeakReference<JdbcFactoryRegistry>>();
-
   private Map<String, JdbcDatabaseFactory> databaseFactoriesByProductName = new HashMap<String, JdbcDatabaseFactory>();
 
   private JdbcFactoryRegistry() {
@@ -111,8 +109,7 @@ public class JdbcFactoryRegistry {
     return getDatabaseFactory(productName);
   }
 
-  public JdbcDatabaseFactory getDatabaseFactory(
-    final Map<String, ? extends Object> config) {
+  public JdbcDatabaseFactory getDatabaseFactory(final Map<String, ? extends Object> config) {
     final String url = (String)config.get("url");
     if (url == null) {
       throw new IllegalArgumentException("The url parameter must be specified");
@@ -122,23 +119,20 @@ public class JdbcFactoryRegistry {
           return databaseFactory;
         }
       }
-      throw new IllegalArgumentException("Data Source Factory not found for "
-          + url);
+      throw new IllegalArgumentException("Data Source Factory not found for " + url);
     }
   }
 
   public JdbcDatabaseFactory getDatabaseFactory(final String productName) {
     final JdbcDatabaseFactory databaseFactory = this.databaseFactoriesByProductName.get(productName);
     if (databaseFactory == null) {
-      throw new IllegalArgumentException("Record Store not found for "
-          + productName);
+      throw new IllegalArgumentException("Record Store not found for " + productName);
     } else {
       return databaseFactory;
     }
   }
 
-  private void loadFactories(final ClassLoader classLoader,
-    final Resource resource) {
+  private void loadFactories(final ClassLoader classLoader, final Resource resource) {
     try {
       for (final Map<String, Object> factoryDefinition : AbstractMapReaderFactory.mapReader(resource)) {
         final String jdbcFactoryClassName = (String)factoryDefinition.get("jdbcFactoryClassName");

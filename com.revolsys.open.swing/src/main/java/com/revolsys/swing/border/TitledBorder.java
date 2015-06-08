@@ -17,6 +17,7 @@ public class TitledBorder extends AbstractBorder {
    *
    */
   private static final long serialVersionUID = 1L;
+
   private final String title;
 
   public TitledBorder(final String title) {
@@ -38,8 +39,8 @@ public class TitledBorder extends AbstractBorder {
   }
 
   @Override
-  public void paintBorder(final Component c, final Graphics g, final int x,
-    final int y, final int width, final int height) {
+  public void paintBorder(final Component c, final Graphics g, final int x, final int y,
+    final int width, final int height) {
     final Graphics2D graphics = (Graphics2D)g;
     final int boxX = x + 2;
     final int boxY = y + 2;

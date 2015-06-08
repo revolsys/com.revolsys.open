@@ -13,10 +13,9 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.visitor.CreateListVisitor;
 
-public class NodeLessThanDistanceOfGeometryVisitor<T> implements
-Visitor<Node<T>> {
-  public static <T> List<Node<T>> getNodes(final Graph<T> graph,
-    final Geometry geometry, final double maxDistance) {
+public class NodeLessThanDistanceOfGeometryVisitor<T> implements Visitor<Node<T>> {
+  public static <T> List<Node<T>> getNodes(final Graph<T> graph, final Geometry geometry,
+    final double maxDistance) {
     if (geometry == null) {
       return Collections.emptyList();
     } else {
@@ -25,7 +24,7 @@ Visitor<Node<T>> {
       env = env.expand(maxDistance);
       final IdObjectIndex<Node<T>> index = graph.getNodeIndex();
       final NodeLessThanDistanceOfGeometryVisitor<T> visitor = new NodeLessThanDistanceOfGeometryVisitor<T>(
-          geometry, maxDistance, results);
+        geometry, maxDistance, results);
       index.visit(env, visitor);
       return results.getList();
     }
@@ -39,8 +38,8 @@ Visitor<Node<T>> {
 
   private final GeometryFactory geometryFactory;
 
-  public NodeLessThanDistanceOfGeometryVisitor(final Geometry geometry,
-    final double maxDistance, final Visitor<Node<T>> matchVisitor) {
+  public NodeLessThanDistanceOfGeometryVisitor(final Geometry geometry, final double maxDistance,
+    final Visitor<Node<T>> matchVisitor) {
     this.geometry = geometry;
     this.maxDistance = maxDistance;
     this.matchVisitor = matchVisitor;

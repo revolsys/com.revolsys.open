@@ -41,11 +41,9 @@ import com.revolsys.jts.geom.LineString;
  * @author Martin Davis
  * @version 1.7
  */
-public class OrientedCoordinateArray implements
-Comparable<OrientedCoordinateArray> {
-  private static int compareOriented(final LineString points1,
-    final boolean orientation1, final LineString points2,
-    final boolean orientation2) {
+public class OrientedCoordinateArray implements Comparable<OrientedCoordinateArray> {
+  private static int compareOriented(final LineString points1, final boolean orientation1,
+    final LineString points2, final boolean orientation2) {
     final int dir1 = orientation1 ? 1 : -1;
     final int dir2 = orientation2 ? 1 : -1;
     final int limit1 = orientation1 ? points1.getVertexCount() : -1;

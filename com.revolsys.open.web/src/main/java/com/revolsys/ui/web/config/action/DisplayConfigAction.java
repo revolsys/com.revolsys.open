@@ -30,8 +30,7 @@ public class DisplayConfigAction implements Action {
 
   private static final Logger log = Logger.getLogger(DisplayConfigAction.class);
 
-  private void addMenu(final ElementContainer menusView, final String name,
-    final Menu menu) {
+  private void addMenu(final ElementContainer menusView, final String name, final Menu menu) {
     // TODO Auto-generated method stub
 
   }
@@ -55,12 +54,10 @@ public class DisplayConfigAction implements Action {
       final SiteNodeController controller = siteNode.getController();
       if (controller instanceof PageController) {
         final PageController pageController = (PageController)controller;
-        final ElementContainer pageView = new ElementContainer(
-          new DefinitionListLayout());
+        final ElementContainer pageView = new ElementContainer(new DefinitionListLayout());
         nodeView.add(pageView);
         pageView.add("Actions");
-        final ElementContainer actionsView = new ElementContainer(
-          new UnorderedListLayout());
+        final ElementContainer actionsView = new ElementContainer(new UnorderedListLayout());
         pageView.add(actionsView);
         for (final Iterator actions = pageController.getActions().iterator(); actions.hasNext();) {
           final Action action = (Action)actions.next();
@@ -68,12 +65,9 @@ public class DisplayConfigAction implements Action {
         }
 
         pageView.add("Menus");
-        final ElementContainer menusView = new ElementContainer(
-          new UnorderedListLayout());
+        final ElementContainer menusView = new ElementContainer(new UnorderedListLayout());
         pageView.add(menusView);
-        for (final Iterator menus = pageController.getMenus()
-            .entrySet()
-            .iterator(); menus.hasNext();) {
+        for (final Iterator menus = pageController.getMenus().entrySet().iterator(); menus.hasNext();) {
           final Map.Entry entry = (Entry)menus.next();
           final String name = (String)entry.getKey();
           final Menu menu = (Menu)entry.getValue();
@@ -84,8 +78,7 @@ public class DisplayConfigAction implements Action {
       }
       final Collection nodes = siteNode.getNodes();
       if (!nodes.isEmpty()) {
-        final ElementContainer childNodesView = new ElementContainer(
-          new UnorderedListLayout());
+        final ElementContainer childNodesView = new ElementContainer(new UnorderedListLayout());
         nodeView.add(childNodesView);
         for (final Iterator nodeIter = nodes.iterator(); nodeIter.hasNext();) {
           final SiteNode childNode = (SiteNode)nodeIter.next();
@@ -101,8 +94,8 @@ public class DisplayConfigAction implements Action {
   }
 
   @Override
-  public void process(final HttpServletRequest request,
-    final HttpServletResponse response) throws IOException, ServletException {
+  public void process(final HttpServletRequest request, final HttpServletResponse response)
+    throws IOException, ServletException {
     final DivElementContainer view = new DivElementContainer();
     addSite(view, (Site)request.getAttribute("site"));
     request.setAttribute("view", view);

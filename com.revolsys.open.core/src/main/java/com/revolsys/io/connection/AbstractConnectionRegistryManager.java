@@ -5,11 +5,10 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AbstractConnectionRegistryManager<T extends ConnectionRegistry<V>, V>
-implements ConnectionRegistryManager<T> {
+public class AbstractConnectionRegistryManager<T extends ConnectionRegistry<V>, V> implements
+  ConnectionRegistryManager<T> {
 
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-    this);
+  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   private final List<T> registries = new ArrayList<T>();
 
@@ -33,8 +32,7 @@ implements ConnectionRegistryManager<T> {
       if (index != -1) {
         index = getVisibleConnectionRegistries().indexOf(registry);
         if (index != -1) {
-          this.propertyChangeSupport.fireIndexedPropertyChange("registries", index,
-            null, registry);
+          this.propertyChangeSupport.fireIndexedPropertyChange("registries", index, null, registry);
         }
       }
     }
@@ -103,13 +101,11 @@ implements ConnectionRegistryManager<T> {
         if (index != -1) {
           this.registries.remove(registry);
           registry.setConnectionManager(null);
-          registry.getPropertyChangeSupport()
-          .removePropertyChangeListener(this);
+          registry.getPropertyChangeSupport().removePropertyChangeListener(this);
         }
       }
       if (index != -1) {
-        this.propertyChangeSupport.fireIndexedPropertyChange("registries", index,
-          registry, null);
+        this.propertyChangeSupport.fireIndexedPropertyChange("registries", index, registry, null);
       }
     }
   }

@@ -109,8 +109,7 @@ public class CheckBoxField extends Field {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    HtmlUtil.serializeCheckBox(out, getName(), this.selectedValue, isSelected(),
-      this.onClick);
+    HtmlUtil.serializeCheckBox(out, getName(), this.selectedValue, isSelected(), this.onClick);
   }
 
   public void setFalseValue(final Object falseValue) {

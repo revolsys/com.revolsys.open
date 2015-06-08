@@ -19,9 +19,8 @@ public class RecordRowTableCellRenderer extends DefaultTableCellRenderer {
   }
 
   @Override
-  public Component getTableCellRendererComponent(final JTable table,
-    final Object value, final boolean isSelected, final boolean hasFocus,
-    final int rowIndex, final int columnIndex) {
+  public Component getTableCellRendererComponent(final JTable table, final Object value,
+    final boolean isSelected, final boolean hasFocus, final int rowIndex, final int columnIndex) {
     final RecordRowTableModel model = (RecordRowTableModel)table.getModel();
 
     final boolean selected = model.isSelected(isSelected, rowIndex, columnIndex);
@@ -32,8 +31,8 @@ public class RecordRowTableCellRenderer extends DefaultTableCellRenderer {
     } else {
       displayValue = model.toDisplayValue(rowIndex, columnIndex, value);
     }
-    super.getTableCellRendererComponent(table, displayValue, selected,
-      hasFocus, rowIndex, columnIndex);
+    super.getTableCellRendererComponent(table, displayValue, selected, hasFocus, rowIndex,
+      columnIndex);
     if (BigDecimalStringConverter.isNumber(displayValue)) {
       setHorizontalAlignment(SwingConstants.RIGHT);
       setHorizontalTextPosition(SwingConstants.RIGHT);

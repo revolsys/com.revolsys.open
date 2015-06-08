@@ -29,8 +29,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
-public class CsvRecordIterator extends AbstractIterator<Record> implements
-  RecordIterator {
+public class CsvRecordIterator extends AbstractIterator<Record> implements RecordIterator {
 
   private final char fieldSeparator;
 
@@ -62,20 +61,18 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
     this(resource, new ArrayRecordFactory(), fieldSeparator);
   }
 
-  public CsvRecordIterator(final Resource resource,
-    final RecordFactory recordFactory) {
+  public CsvRecordIterator(final Resource resource, final RecordFactory recordFactory) {
     this(resource, recordFactory, CsvConstants.FIELD_SEPARATOR);
   }
 
-  public CsvRecordIterator(final Resource resource,
-    final RecordFactory recordFactory, final char fieldSeparator) {
+  public CsvRecordIterator(final Resource resource, final RecordFactory recordFactory,
+    final char fieldSeparator) {
     this.resource = resource;
     this.recordFactory = recordFactory;
     this.fieldSeparator = fieldSeparator;
   }
 
-  private void createRecordDefinition(final String[] fieldNames)
-    throws IOException {
+  private void createRecordDefinition(final String[] fieldNames) throws IOException {
     this.hasPointFields = Property.hasValue(this.pointXFieldName)
       && Property.hasValue(this.pointYFieldName);
     if (this.hasPointFields) {
@@ -108,14 +105,12 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
           type = DataTypes.MULTI_POINT;
           isGeometryField = true;
         } else if ("LINE_STRING".equalsIgnoreCase(fieldName)
-          || "LINESTRING".equalsIgnoreCase(fieldName)
-          || "LINE".equalsIgnoreCase(fieldName)) {
+          || "LINESTRING".equalsIgnoreCase(fieldName) || "LINE".equalsIgnoreCase(fieldName)) {
           type = DataTypes.LINE_STRING;
           isGeometryField = true;
         } else if ("MULTI_LINESTRING".equalsIgnoreCase(fieldName)
           || "MULTILINESTRING".equalsIgnoreCase(fieldName)
-          || "MULTILINE".equalsIgnoreCase(fieldName)
-          || "MULTI_LINE".equalsIgnoreCase(fieldName)) {
+          || "MULTILINE".equalsIgnoreCase(fieldName) || "MULTI_LINE".equalsIgnoreCase(fieldName)) {
           type = DataTypes.MULTI_LINE_STRING;
           isGeometryField = true;
         } else if ("POLYGON".equalsIgnoreCase(fieldName)) {
@@ -135,14 +130,12 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
     }
     if (this.hasPointFields) {
       if (geometryField == null) {
-        geometryField = new FieldDefinition(this.geometryColumnName,
-          this.geometryType, true);
+        geometryField = new FieldDefinition(this.geometryColumnName, this.geometryType, true);
         fields.add(geometryField);
       }
     }
     if (geometryField != null) {
-      geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY,
-        this.geometryFactory);
+      geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY, this.geometryFactory);
     }
     final RecordStoreSchema schema = getProperty("schema");
     String typePath = getProperty("typePath");
@@ -156,8 +149,7 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
         typePath = schemaPath + typePath;
       }
     }
-    this.recordDefinition = new RecordDefinitionImpl(schema, typePath,
-      getProperties(), fields);
+    this.recordDefinition = new RecordDefinitionImpl(schema, typePath, getProperties(), fields);
   }
 
   /**
@@ -196,8 +188,7 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
         this.geometryType = geometryType;
       }
 
-      this.in = new BufferedReader(
-        FileUtil.createUtf8Reader(this.resource.getInputStream()));
+      this.in = new BufferedReader(FileUtil.createUtf8Reader(this.resource.getInputStream()));
       final String[] line = readNextRecord();
       createRecordDefinition(line);
     } catch (final IOException e) {
@@ -251,8 +242,7 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
    * @return the comma-tokenized list of elements, or null if nextLine is null
    * @throws IOException if bad things happen during the read
    */
-  private String[] parseLine(final String nextLine, final boolean readLine)
-    throws IOException {
+  private String[] parseLine(final String nextLine, final boolean readLine) throws IOException {
     String line = nextLine;
     if (line.length() == 0) {
       return new String[0];
@@ -280,8 +270,7 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
               i++;
             } else {
               inQuotes = !inQuotes;
-              if (i > 2 && line.charAt(i - 1) != this.fieldSeparator
-                && line.length() > i + 1
+              if (i > 2 && line.charAt(i - 1) != this.fieldSeparator && line.length() > i + 1
                 && line.charAt(i + 1) != this.fieldSeparator) {
                 sb.append(c);
               }
@@ -325,8 +314,7 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
         value = record[i];
         if (value != null) {
           final DataType dataType = this.recordDefinition.getFieldType(i);
-          final Object convertedValue = StringConverterRegistry.toObject(
-            dataType, value);
+          final Object convertedValue = StringConverterRegistry.toObject(dataType, value);
           object.setValue(i, convertedValue);
         }
       }

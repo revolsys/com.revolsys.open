@@ -47,8 +47,7 @@ public class MemoryPageManager implements PageManager {
     if (this.freePages.contains(page)) {
       throw new IllegalArgumentException("Page does not exist " + index);
     } else if (this.pagesInUse.contains(page)) {
-      throw new IllegalArgumentException("Page is currently being used "
-          + index);
+      throw new IllegalArgumentException("Page is currently being used " + index);
     } else {
       page.setOffset(0);
       this.pagesInUse.add(page);

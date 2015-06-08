@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -52,14 +51,17 @@ public class Interval {
     this.min = min;
     this.max = max;
   }
+
   public Interval(final Interval other) {
     this(other.min, other.max);
   }
 
   @Override
   public boolean equals(final Object o) {
-    if (! (o instanceof Interval)) { return false; }
-    final Interval other = (Interval) o;
+    if (!(o instanceof Interval)) {
+      return false;
+    }
+    final Interval other = (Interval)o;
     return this.min == other.min && this.max == other.max;
   }
 
@@ -72,7 +74,10 @@ public class Interval {
     return this;
   }
 
-  public double getCentre() { return (this.min+this.max)/2; }
+  public double getCentre() {
+    return (this.min + this.max) / 2;
+  }
+
   public boolean intersects(final Interval other) {
     return !(other.min > this.max || other.max < this.min);
   }

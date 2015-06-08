@@ -21,30 +21,16 @@ import com.revolsys.swing.tree.MenuSourceRunnable;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractMultipleRenderer extends
-AbstractRecordLayerRenderer {
-  protected static void addMenuItem(final MenuFactory menu, final String type,
-    final Class<?> rendererClass) {
-    final String iconName = ("style_" + type + "_go").toLowerCase();
-    final ImageIcon icon = Icons.getIcon(iconName);
-
-    final EnableCheck enableCheck = new MenuSourcePropertyEnableCheck(
-      "class", rendererClass, true);
-    final InvokeMethodAction action = MenuSourceRunnable.createAction(
-      "Convert to " + type + " Style", icon, enableCheck, "convertTo" + type
-      + "Style");
-    menu.addMenuItem("convert", action);
-  }
-
+public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRenderer {
   static {
     final MenuFactory menu = MenuFactory.getMenu(AbstractMultipleRenderer.class);
 
-    for (final String type : Arrays.asList("Geometry", "Text", "Marker",
-      "Multiple", "Filter", "Scale")) {
+    for (final String type : Arrays.asList("Geometry", "Text", "Marker", "Multiple", "Filter",
+      "Scale")) {
       final String iconName = ("style_" + type + "_add").toLowerCase();
       final ImageIcon icon = Icons.getIcon(iconName);
-      final InvokeMethodAction action = MenuSourceRunnable.createAction(
-        "Add " + type + " Style", icon, null, "add" + type + "Style");
+      final InvokeMethodAction action = MenuSourceRunnable.createAction("Add " + type + " Style",
+        icon, null, "add" + type + "Style");
       menu.addMenuItem("add", action);
     }
 
@@ -53,19 +39,29 @@ AbstractRecordLayerRenderer {
     addMenuItem(menu, "Scale", ScaleMultipleRenderer.class);
   }
 
+  protected static void addMenuItem(final MenuFactory menu, final String type,
+    final Class<?> rendererClass) {
+    final String iconName = ("style_" + type + "_go").toLowerCase();
+    final ImageIcon icon = Icons.getIcon(iconName);
+
+    final EnableCheck enableCheck = new MenuSourcePropertyEnableCheck("class", rendererClass, true);
+    final InvokeMethodAction action = MenuSourceRunnable.createAction("Convert to " + type
+      + " Style", icon, enableCheck, "convertTo" + type + "Style");
+    menu.addMenuItem("convert", action);
+  }
+
   private List<AbstractRecordLayerRenderer> renderers = new ArrayList<AbstractRecordLayerRenderer>();
 
-  public AbstractMultipleRenderer(final String type,
-    final AbstractRecordLayer layer, final LayerRenderer<?> parent,
-    final Map<String, Object> style) {
+  public AbstractMultipleRenderer(final String type, final AbstractRecordLayer layer,
+    final LayerRenderer<?> parent, final Map<String, Object> style) {
     super(type, "Styles", layer, parent, style);
     @SuppressWarnings("unchecked")
     final List<Map<String, Object>> styles = (List<Map<String, Object>>)style.get("styles");
     if (styles != null) {
       final List<AbstractRecordLayerRenderer> renderers = new ArrayList<AbstractRecordLayerRenderer>();
       for (final Map<String, Object> childStyle : styles) {
-        final AbstractRecordLayerRenderer renderer = AbstractRecordLayerRenderer.getRenderer(
-          layer, this, childStyle);
+        final AbstractRecordLayerRenderer renderer = AbstractRecordLayerRenderer.getRenderer(layer,
+          this, childStyle);
         renderers.add(renderer);
       }
       setRenderers(renderers);
@@ -73,22 +69,19 @@ AbstractRecordLayerRenderer {
   }
 
   public FilterMultipleRenderer addFilterStyle() {
-    final FilterMultipleRenderer renderer = new FilterMultipleRenderer(
-      getLayer(), this);
+    final FilterMultipleRenderer renderer = new FilterMultipleRenderer(getLayer(), this);
     addRenderer(renderer);
     return renderer;
   }
 
   public GeometryStyleRenderer addGeometryStyle() {
-    final GeometryStyleRenderer renderer = new GeometryStyleRenderer(
-      getLayer(), this);
+    final GeometryStyleRenderer renderer = new GeometryStyleRenderer(getLayer(), this);
     addRenderer(renderer);
     return renderer;
   }
 
   public MarkerStyleRenderer addMarkerStyle() {
-    final MarkerStyleRenderer renderer = new MarkerStyleRenderer(getLayer(),
-      this);
+    final MarkerStyleRenderer renderer = new MarkerStyleRenderer(getLayer(), this);
     addRenderer(renderer);
     return renderer;
   }
@@ -128,8 +121,7 @@ AbstractRecordLayerRenderer {
   }
 
   public ScaleMultipleRenderer addScaleStyle() {
-    final ScaleMultipleRenderer renderer = new ScaleMultipleRenderer(
-      getLayer(), this);
+    final ScaleMultipleRenderer renderer = new ScaleMultipleRenderer(getLayer(), this);
     addRenderer(renderer);
     return renderer;
   }
@@ -156,8 +148,7 @@ AbstractRecordLayerRenderer {
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
     final Map<String, Object> style = toMap();
     style.remove("styles");
-    final FilterMultipleRenderer newRenderer = new FilterMultipleRenderer(
-      layer, parent, style);
+    final FilterMultipleRenderer newRenderer = new FilterMultipleRenderer(layer, parent, style);
     newRenderer.setRenderers(JavaBeanUtil.clone(renderers));
     final String name = getName();
     if (name.equals("Multiple Style")) {
@@ -175,8 +166,7 @@ AbstractRecordLayerRenderer {
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
     final Map<String, Object> style = toMap();
     style.remove("styles");
-    final MultipleRenderer newRenderer = new MultipleRenderer(layer, parent,
-      style);
+    final MultipleRenderer newRenderer = new MultipleRenderer(layer, parent, style);
     newRenderer.setRenderers(JavaBeanUtil.clone(renderers));
     final String name = getName();
     if (name.equals("Filter Style")) {
@@ -194,8 +184,7 @@ AbstractRecordLayerRenderer {
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
     final Map<String, Object> style = toMap();
     style.remove("styles");
-    final ScaleMultipleRenderer newRenderer = new ScaleMultipleRenderer(layer,
-      parent, style);
+    final ScaleMultipleRenderer newRenderer = new ScaleMultipleRenderer(layer, parent, style);
     newRenderer.setRenderers(JavaBeanUtil.clone(renderers));
     final String name = getName();
     if (name.equals("Filter Style")) {
@@ -249,8 +238,7 @@ AbstractRecordLayerRenderer {
     }
   }
 
-  public boolean hasRendererWithSameName(final LayerRenderer<?> renderer,
-    final String name) {
+  public boolean hasRendererWithSameName(final LayerRenderer<?> renderer, final String name) {
     for (final AbstractRecordLayerRenderer otherRenderer : this.renderers) {
       if (renderer != otherRenderer) {
         final String layerName = otherRenderer.getName();
@@ -291,8 +279,7 @@ AbstractRecordLayerRenderer {
     }
   }
 
-  public void setRenderers(
-    final List<? extends AbstractRecordLayerRenderer> renderers) {
+  public void setRenderers(final List<? extends AbstractRecordLayerRenderer> renderers) {
     synchronized (this.renderers) {
       for (final AbstractRecordLayerRenderer renderer : this.renderers) {
         renderer.setParent(null);

@@ -74,15 +74,11 @@ public final class ArcSdeConstants {
     DATA_TYPE_MAP.put(MULTI_POLYGON, DataTypes.MULTI_POLYGON);
 
     GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.POINT, ST_GEOMETRY_POINT);
-    GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.MULTI_POINT,
-      ST_GEOMETRY_MULTI_POINT);
-    GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.LINE_STRING,
-      ST_GEOMETRY_LINESTRING);
-    GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.MULTI_LINE_STRING,
-      ST_GEOMETRY_MULTI_LINESTRING);
+    GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.MULTI_POINT, ST_GEOMETRY_MULTI_POINT);
+    GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.LINE_STRING, ST_GEOMETRY_LINESTRING);
+    GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.MULTI_LINE_STRING, ST_GEOMETRY_MULTI_LINESTRING);
     GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.POLYGON, ST_GEOMETRY_POLYGON);
-    GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.MULTI_POLYGON,
-      ST_GEOMETRY_MULTI_POLYGON);
+    GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.MULTI_POLYGON, ST_GEOMETRY_MULTI_POLYGON);
   }
 
   public static DataType getGeometryDataType(final int geometryType) {
@@ -98,8 +94,7 @@ public final class ArcSdeConstants {
     final DataType dataType = geometry.getDataType();
     final Integer type = GEOMETRY_DATA_TYPE_ST_TYPE.get(dataType);
     if (type == null) {
-      throw new IllegalArgumentException("Unsupported geometry type "
-        + dataType);
+      throw new IllegalArgumentException("Unsupported geometry type " + dataType);
     } else {
       return type;
     }

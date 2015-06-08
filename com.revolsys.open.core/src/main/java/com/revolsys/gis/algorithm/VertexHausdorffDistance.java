@@ -76,8 +76,8 @@ public class VertexHausdorffDistance {
     computeMaxPointDistance(seg1, seg0, this.ptDist);
   }
 
-  private void computeMaxPointDistance(final Geometry pointGeom,
-    final Geometry geom, final PointPairDistance ptDist) {
+  private void computeMaxPointDistance(final Geometry pointGeom, final Geometry geom,
+    final PointPairDistance ptDist) {
     ptDist.setMaximum(ptDist);
     final EuclideanDistanceToPoint euclideanDist = new EuclideanDistanceToPoint();
     final PointPairDistance maxPtDist = new PointPairDistance();
@@ -98,8 +98,8 @@ public class VertexHausdorffDistance {
    * @param seg1 the line segment containing the closest point
    * @param ptDist the point pair and distance to be updated
    */
-  private void computeMaxPointDistance(final LineSegment seg0,
-    final LineSegment seg1, final PointPairDistance ptDist) {
+  private void computeMaxPointDistance(final LineSegment seg0, final LineSegment seg1,
+    final PointPairDistance ptDist) {
     final Point closestPt0 = seg0.closestPoint(seg1.getP0());
     ptDist.setMaximum(closestPt0, seg1.getP0());
     final Point closestPt1 = seg0.closestPoint(seg1.getP1());

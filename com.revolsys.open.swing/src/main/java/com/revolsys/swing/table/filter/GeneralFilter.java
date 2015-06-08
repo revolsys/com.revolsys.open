@@ -40,6 +40,5 @@ public abstract class GeneralFilter extends RowFilter<Object, Object> {
     return false;
   }
 
-  protected abstract boolean include(
-    Entry<? extends Object, ? extends Object> value, int index);
+  protected abstract boolean include(Entry<? extends Object, ? extends Object> value, int index);
 }

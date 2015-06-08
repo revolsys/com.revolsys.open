@@ -44,8 +44,8 @@ public class JmxUtil {
     return getJmxConnector(connectorString, "", "");
   }
 
-  public static JMXConnector getJmxConnector(final String connectorString,
-    final String userName, final String password) {
+  public static JMXConnector getJmxConnector(final String connectorString, final String userName,
+    final String password) {
     final HashMap<String, String[]> environment = new HashMap<String, String[]>();
     final String[] jmxCredentials = new String[] {
       userName, password
@@ -67,9 +67,8 @@ public class JmxUtil {
     return jmxConnector;
   }
 
-  public static MBeanAttributeInfo getMBeanAttribute(
-    final MBeanServerConnection connection, final String nameString,
-    final String attributeName) {
+  public static MBeanAttributeInfo getMBeanAttribute(final MBeanServerConnection connection,
+    final String nameString, final String attributeName) {
     MBeanAttributeInfo attribute = null;
     ObjectName objectName;
     try {
@@ -100,15 +99,14 @@ public class JmxUtil {
   }
 
   @SuppressWarnings("unchecked")
-  public static Map<String, MBeanAttributeInfo[]> getMBeanAttributes(
-    final MBeanServer mBeanServer, final String objectNameString) {
+  public static Map<String, MBeanAttributeInfo[]> getMBeanAttributes(final MBeanServer mBeanServer,
+    final String objectNameString) {
     Map<String, MBeanAttributeInfo[]> attributesMap = null;
     Set<ObjectName> objectNames;
     try {
-      objectNames = mBeanServer.queryNames(new ObjectName(objectNameString),
-        null);
+      objectNames = mBeanServer.queryNames(new ObjectName(objectNameString), null);
       attributesMap = new TreeMap<String, MBeanAttributeInfo[]>();
-      for (ObjectName objectName : objectNames) {
+      for (final ObjectName objectName : objectNames) {
         MBeanInfo mBeanInfo;
         mBeanInfo = mBeanServer.getMBeanInfo(objectName);
         final MBeanAttributeInfo[] attributes = mBeanInfo.getAttributes();
@@ -134,10 +132,9 @@ public class JmxUtil {
     Map<String, MBeanAttributeInfo[]> attributesMap = null;
     Set<ObjectName> objectNames;
     try {
-      objectNames = connection.queryNames(new ObjectName(objectNameString),
-        null);
+      objectNames = connection.queryNames(new ObjectName(objectNameString), null);
       attributesMap = new TreeMap<String, MBeanAttributeInfo[]>();
-      for (ObjectName objectName : objectNames) {
+      for (final ObjectName objectName : objectNames) {
         MBeanInfo mBeanInfo;
         mBeanInfo = connection.getMBeanInfo(objectName);
         final MBeanAttributeInfo[] attributes = mBeanInfo.getAttributes();
@@ -159,9 +156,8 @@ public class JmxUtil {
     return attributesMap;
   }
 
-  public static Object getMBeanAttributeValue(
-    final MBeanServerConnection connection, final ObjectName objName,
-    final String attributeName) {
+  public static Object getMBeanAttributeValue(final MBeanServerConnection connection,
+    final ObjectName objName, final String attributeName) {
     Object attributeValue = "Unavailable";
     try {
       attributeValue = connection.getAttribute(objName, attributeName);
@@ -184,15 +180,13 @@ public class JmxUtil {
     return attributeValue;
   }
 
-  public static Object getMBeanAttributeValue(
-    final MBeanServerConnection connection, final String nameString,
-    final String attributeName) {
+  public static Object getMBeanAttributeValue(final MBeanServerConnection connection,
+    final String nameString, final String attributeName) {
     Object attributeValue = null;
     ObjectName objName;
     try {
       objName = new ObjectName(nameString);
-      attributeValue = getMBeanAttributeValue(connection, objName,
-        attributeName);
+      attributeValue = getMBeanAttributeValue(connection, objName, attributeName);
     } catch (final MalformedObjectNameException e) {
       e.printStackTrace();
     } catch (final NullPointerException e) {
@@ -202,8 +196,7 @@ public class JmxUtil {
     return attributeValue;
   }
 
-  public static MBeanServerConnection getMbeanServerConnection(
-    final JMXConnector jmxConnector) {
+  public static MBeanServerConnection getMbeanServerConnection(final JMXConnector jmxConnector) {
 
     MBeanServerConnection mBeanServerConnection = null;
     if (jmxConnector != null) {
@@ -216,8 +209,7 @@ public class JmxUtil {
     return mBeanServerConnection;
   }
 
-  public static void printAttributesMapValues(
-    final MBeanServerConnection connection,
+  public static void printAttributesMapValues(final MBeanServerConnection connection,
     final Map<String, MBeanAttributeInfo[]> attributesMap) {
     for (final String objectNameStr : attributesMap.keySet()) {
       System.out.println("\nobjectName=" + objectNameStr);
@@ -232,8 +224,7 @@ public class JmxUtil {
           System.out.print(" type=" + attributeType);
           if (attribute.isReadable()) {
             Object attributeValue = null;
-            attributeValue = JmxUtil.getMBeanAttributeValue(connection,
-              objectName, attributeName);
+            attributeValue = JmxUtil.getMBeanAttributeValue(connection, objectName, attributeName);
             if (attributeValue != null) {
               System.out.print(" value=" + attributeValue);
             }
@@ -248,17 +239,11 @@ public class JmxUtil {
     }
   }
 
-  public static void printAttributeValue(
-    final MBeanServerConnection connection, final String objectNameString,
-    final MBeanAttributeInfo attribute) {
+  public static void printAttributeValue(final MBeanServerConnection connection,
+    final String objectNameString, final MBeanAttributeInfo attribute) {
     final String attributeName = attribute.getName();
-    System.out.println("objectName="
-        + objectNameString
-        + " "
-        + attributeName
-        + "="
-        + JmxUtil.getMBeanAttributeValue(connection, objectNameString,
-          attributeName));
+    System.out.println("objectName=" + objectNameString + " " + attributeName + "="
+      + JmxUtil.getMBeanAttributeValue(connection, objectNameString, attributeName));
 
   }
 }

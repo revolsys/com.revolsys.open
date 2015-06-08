@@ -15,8 +15,7 @@ public class SetRecordValuesUndo extends AbstractUndoableEdit {
 
   private final Map<String, Object> newValues = new HashMap<String, Object>();
 
-  public SetRecordValuesUndo(final LayerRecord record,
-    final Map<String, Object> newValues) {
+  public SetRecordValuesUndo(final LayerRecord record, final Map<String, Object> newValues) {
     this.record = record;
     if (record != null) {
       this.originalValues.putAll(record);

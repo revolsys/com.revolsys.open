@@ -84,8 +84,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     ConvertUtils.register(new Converter() {
 
       @Override
-      public Object convert(
-        @SuppressWarnings("rawtypes") final Class paramClass,
+      public Object convert(@SuppressWarnings("rawtypes") final Class paramClass,
         final Object paramObject) {
         if (paramObject == null) {
           return null;
@@ -182,7 +181,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   private GeometryFactory geometryFactory;
 
   public BoundingBoxDoubleGf() {
-    bounds = null;
+    this.bounds = null;
   }
 
   /**
@@ -192,11 +191,11 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
    */
   public BoundingBoxDoubleGf(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
-    bounds = null;
+    this.bounds = null;
   }
 
-  public BoundingBoxDoubleGf(final GeometryFactory geometryFactory,
-    final int axisCount, final double... bounds) {
+  public BoundingBoxDoubleGf(final GeometryFactory geometryFactory, final int axisCount,
+    final double... bounds) {
     this.geometryFactory = geometryFactory;
     if (bounds == null || bounds.length == 0 || axisCount < 1) {
       this.bounds = null;
@@ -204,8 +203,8 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
       this.bounds = BoundingBoxUtil.createBounds(axisCount);
       BoundingBoxUtil.expand(geometryFactory, this.bounds, bounds);
     } else {
-      throw new IllegalArgumentException("Expecting a multiple of " + axisCount
-        + " not " + bounds.length);
+      throw new IllegalArgumentException("Expecting a multiple of " + axisCount + " not "
+        + bounds.length);
     }
   }
 
@@ -227,8 +226,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     this.bounds = bounds;
   }
 
-  public BoundingBoxDoubleGf(final GeometryFactory geometryFactory,
-    final LineString points) {
+  public BoundingBoxDoubleGf(final GeometryFactory geometryFactory, final LineString points) {
     this.geometryFactory = geometryFactory;
     double[] bounds = null;
     if (points != null) {
@@ -244,8 +242,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     this.bounds = bounds;
   }
 
-  public BoundingBoxDoubleGf(final GeometryFactory geometryFactory,
-    final Point... points) {
+  public BoundingBoxDoubleGf(final GeometryFactory geometryFactory, final Point... points) {
     this(geometryFactory, CollectionUtil.toList(points));
   }
 
@@ -295,13 +292,12 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     } else if (factory == geometryFactory) {
       return this;
     } else if (factory == null || factory.getCoordinateSystem() == null) {
-      return new BoundingBoxDoubleGf(geometryFactory, getAxisCount(),
-        getBounds());
+      return new BoundingBoxDoubleGf(geometryFactory, getAxisCount(), getBounds());
     } else if (isEmpty()) {
       return new BoundingBoxDoubleGf(geometryFactory);
     } else {
-      final CoordinatesOperation operation = ProjectionFactory.getCoordinatesOperation(
-        factory, geometryFactory);
+      final CoordinatesOperation operation = ProjectionFactory.getCoordinatesOperation(factory,
+        geometryFactory);
       if (operation != null) {
 
         double xStep = getWidth() / 10;
@@ -355,8 +351,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   }
 
   @Override
-  public BoundingBox convert(GeometryFactory geometryFactory,
-    final int axisCount) {
+  public BoundingBox convert(GeometryFactory geometryFactory, final int axisCount) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
     if (geometryFactory == null || sourceGeometryFactory == null) {
       return this;
@@ -401,8 +396,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     final double minY2 = getMinY();
     final double maxX2 = getMaxX();
     final double maxY2 = getMaxY();
-    return BoundingBoxUtil.covers(minX1, minY1, maxX1, maxY1, minX2, minY2,
-      maxX2, maxY2);
+    return BoundingBoxUtil.covers(minX1, minY1, maxX1, maxY1, minX2, minY2, maxX2, maxY2);
   }
 
   /**
@@ -651,9 +645,8 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     }
   }
 
-  private void expand(final GeometryFactory geometryFactory,
-    final double[] bounds, final CoordinatesOperation operation,
-    final double[] to, final double... from) {
+  private void expand(final GeometryFactory geometryFactory, final double[] bounds,
+    final CoordinatesOperation operation, final double[] to, final double... from) {
 
     operation.perform(2, from, 2, to);
     BoundingBoxUtil.expand(geometryFactory, bounds, to);
@@ -721,8 +714,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
         final double maxX = Math.max(getMaxX(), convertedOther.getMaxX());
         final double minY = Math.min(getMinY(), convertedOther.getMinY());
         final double maxY = Math.max(getMaxY(), convertedOther.getMaxY());
-        return new BoundingBoxDoubleGf(geometryFactory, 2, minX, minY, maxX,
-          maxY);
+        return new BoundingBoxDoubleGf(geometryFactory, 2, minX, minY, maxX, maxY);
       }
     }
   }
@@ -734,8 +726,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       if (isEmpty()) {
-        return new BoundingBoxDoubleGf(geometryFactory, coordinates.length,
-          coordinates);
+        return new BoundingBoxDoubleGf(geometryFactory, coordinates.length, coordinates);
       } else {
         final double[] bounds = getBounds();
         final int axisCount = getAxisCount();
@@ -802,10 +793,10 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
   @Override
   public int getAxisCount() {
-    if (bounds == null) {
+    if (this.bounds == null) {
       return 0;
     } else {
-      return bounds.length / 2;
+      return this.bounds.length / 2;
     }
   }
 
@@ -819,17 +810,17 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
   @Override
   public double[] getBounds() {
-    if (bounds == null) {
-      return bounds;
+    if (this.bounds == null) {
+      return this.bounds;
     } else {
-      return bounds.clone();
+      return this.bounds.clone();
     }
   }
 
   @Override
   public double[] getBounds(final int axisCount) {
-    if (bounds == null) {
-      return bounds;
+    if (this.bounds == null) {
+      return this.bounds;
     } else {
       final double[] bounds = new double[2 * axisCount];
       for (int i = 0; i < axisCount; i++) {
@@ -843,11 +834,11 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   @Override
   public Point getCentre() {
     if (isEmpty()) {
-      return geometryFactory.point();
+      return this.geometryFactory.point();
     } else {
       final double centreX = getCentreX();
       final double centreY = getCentreY();
-      return geometryFactory.point(centreX, centreY);
+      return this.geometryFactory.point(centreX, centreY);
     }
   }
 
@@ -911,13 +902,12 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     final double maxX = getMaxX();
     final double minY = getMinY();
     final double maxY = getMaxY();
-    return new LineStringDouble(2, maxX, minY, minX, minY, minX, maxY, maxX,
-      maxY);
+    return new LineStringDouble(2, maxX, minY, minX, minY, minX, maxY, maxX, maxY);
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   /**
@@ -947,10 +937,10 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
   @Override
   public double getMax(final int axisIndex) {
-    if (bounds == null || axisIndex >= getAxisCount()) {
+    if (this.bounds == null || axisIndex >= getAxisCount()) {
       return Double.NaN;
     } else {
-      return BoundingBoxUtil.getMax(bounds, axisIndex);
+      return BoundingBoxUtil.getMax(this.bounds, axisIndex);
     }
   }
 
@@ -965,8 +955,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
-  public <Q extends Quantity> double getMaximum(final int axisIndex,
-    final Unit convertUnit) {
+  public <Q extends Quantity> double getMaximum(final int axisIndex, final Unit convertUnit) {
     final Measurable<Quantity> max = getMaximum(axisIndex);
     return max.doubleValue(convertUnit);
   }
@@ -995,10 +984,10 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
   @Override
   public double getMin(final int axisIndex) {
-    if (bounds == null) {
+    if (this.bounds == null) {
       return Double.NaN;
     } else {
-      return BoundingBoxUtil.getMin(bounds, axisIndex);
+      return BoundingBoxUtil.getMin(this.bounds, axisIndex);
     }
   }
 
@@ -1013,8 +1002,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
-  public <Q extends Quantity> double getMinimum(final int axisIndex,
-    final Unit convertUnit) {
+  public <Q extends Quantity> double getMinimum(final int axisIndex, final Unit convertUnit) {
     final Measurable<Quantity> min = getMinimum(axisIndex);
     return min.doubleValue(convertUnit);
   }
@@ -1045,7 +1033,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   public Point getRandomPointWithin() {
     final double x = getMinX() + getWidth() * Math.random();
     final double y = getMinY() + getHeight() * Math.random();
-    return geometryFactory.point(x, y);
+    return this.geometryFactory.point(x, y);
   }
 
   @Override
@@ -1130,16 +1118,14 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   public BoundingBox intersection(final BoundingBox boundingBox) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
-    if (isEmpty() || convertedBoundingBox.isEmpty()
-      || !intersects(convertedBoundingBox)) {
+    if (isEmpty() || convertedBoundingBox.isEmpty() || !intersects(convertedBoundingBox)) {
       return new BoundingBoxDoubleGf(geometryFactory);
     } else {
       final double intMinX = Math.max(getMinX(), convertedBoundingBox.getMinX());
       final double intMinY = Math.max(getMinY(), convertedBoundingBox.getMinY());
       final double intMaxX = Math.min(getMaxX(), convertedBoundingBox.getMaxX());
       final double intMaxY = Math.min(getMaxY(), convertedBoundingBox.getMaxY());
-      return new BoundingBoxDoubleGf(geometryFactory, 2, intMinX, intMinY,
-        intMaxX, intMaxY);
+      return new BoundingBoxDoubleGf(geometryFactory, 2, intMinX, intMinY, intMaxX, intMaxY);
     }
   }
 
@@ -1330,8 +1316,8 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
       } else if (width == 0 || height == 0) {
         return geometryFactory.lineString(2, minX, minY, maxX, maxY);
       } else {
-        return geometryFactory.polygon(geometryFactory.linearRing(2, minX,
-          minY, minX, maxY, maxX, maxY, maxX, minY, minX, minY));
+        return geometryFactory.polygon(geometryFactory.linearRing(2, minX, minY, minX, maxY, maxX,
+          maxY, maxX, minY, minX, minY));
       }
     }
   }
@@ -1410,24 +1396,21 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
         CoordinatesListUtil.setCoordinates(coordinates, 2, i, maxX, minY);
         i++;
         for (int j = 0; j < numX - 1; j++) {
-          CoordinatesListUtil.setCoordinates(coordinates, 2, i, maxX - j
-            * xStep, minY);
+          CoordinatesListUtil.setCoordinates(coordinates, 2, i, maxX - j * xStep, minY);
           i++;
         }
         CoordinatesListUtil.setCoordinates(coordinates, 2, i, minX, minY);
         i++;
 
         for (int j = 0; j < numY - 1; j++) {
-          CoordinatesListUtil.setCoordinates(coordinates, 2, i, minX, minY + j
-            * yStep);
+          CoordinatesListUtil.setCoordinates(coordinates, 2, i, minX, minY + j * yStep);
           i++;
         }
         CoordinatesListUtil.setCoordinates(coordinates, 2, i, minX, maxY);
         i++;
 
         for (int j = 0; j < numX - 1; j++) {
-          CoordinatesListUtil.setCoordinates(coordinates, 2, i, minX + j
-            * xStep, maxY);
+          CoordinatesListUtil.setCoordinates(coordinates, 2, i, minX + j * xStep, maxY);
           i++;
         }
 
@@ -1435,8 +1418,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
         i++;
 
         for (int j = 0; j < numY - 1; j++) {
-          CoordinatesListUtil.setCoordinates(coordinates, 2, i, maxX, minY
-            + (numY - j) * yStep);
+          CoordinatesListUtil.setCoordinates(coordinates, 2, i, maxX, minY + (numY - j) * yStep);
           i++;
         }
         CoordinatesListUtil.setCoordinates(coordinates, 2, i, maxX, minY);
@@ -1449,8 +1431,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
           return (Polygon)polygon.convert(geometryFactory);
         }
       } catch (final IllegalArgumentException e) {
-        LoggerFactory.getLogger(getClass()).error(
-          "Unable to convert to polygon: " + this, e);
+        LoggerFactory.getLogger(getClass()).error("Unable to convert to polygon: " + this, e);
         return geometryFactory.polygon();
       }
     }

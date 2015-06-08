@@ -46,8 +46,7 @@ public class HtmlUiBuilderKeyView extends Element implements SetObject {
    * @param object The object to serialize.
    * @param key The key to serialize on the builder.
    */
-  public HtmlUiBuilderKeyView(final HtmlUiBuilder builder, final Object object,
-    final String key) {
+  public HtmlUiBuilderKeyView(final HtmlUiBuilder builder, final Object object, final String key) {
     this.builder = builder;
     this.object = object;
     this.key = key;

@@ -57,60 +57,55 @@ public class LineSegmentDouble extends AbstractLineSegment {
    *
    */
   private static final long serialVersionUID = 1L;
+
   private double[] coordinates;
 
   public LineSegmentDouble() {
     this.coordinates = null;
   }
 
-  protected LineSegmentDouble(final GeometryFactory geometryFactory,
-    final int axisCount, final double... coordinates) {
+  protected LineSegmentDouble(final GeometryFactory geometryFactory, final int axisCount,
+    final double... coordinates) {
     if (coordinates == null || coordinates.length == 0 || axisCount < 1) {
       this.coordinates = null;
-    } else if (coordinates.length % axisCount == 0
-        && coordinates.length / 2 == axisCount) {
+    } else if (coordinates.length % axisCount == 0 && coordinates.length / 2 == axisCount) {
       this.coordinates = coordinates;
       if (coordinates != null && geometryFactory != null) {
         int coordinateIndex = 0;
         for (int vertexIndex = 0; vertexIndex < 2; vertexIndex++) {
           for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
             final double value = coordinates[coordinateIndex];
-            coordinates[coordinateIndex] = geometryFactory.makePrecise(
-              axisIndex, value);
+            coordinates[coordinateIndex] = geometryFactory.makePrecise(axisIndex, value);
             coordinateIndex++;
           }
         }
       }
     } else {
-      throw new IllegalArgumentException("(coordinates.length) "
-          + coordinates.length + " != 2 * " + axisCount + " (axisCount)");
+      throw new IllegalArgumentException("(coordinates.length) " + coordinates.length + " != 2 * "
+        + axisCount + " (axisCount)");
     }
   }
 
-  protected LineSegmentDouble(final GeometryFactory geometryFactory,
-    final LineString line) {
+  protected LineSegmentDouble(final GeometryFactory geometryFactory, final LineString line) {
     this(geometryFactory, line.getVertex(0), line.getVertex(-1));
   }
 
-  protected LineSegmentDouble(final GeometryFactory geometryFactory,
-    final Point point1, final Point point2) {
+  protected LineSegmentDouble(final GeometryFactory geometryFactory, final Point point1,
+    final Point point2) {
     final int axisCount = geometryFactory.getAxisCount();
     this.coordinates = new double[axisCount * 2];
-    CoordinatesListUtil.setCoordinates(geometryFactory, this.coordinates, axisCount,
-      0, point1);
-    CoordinatesListUtil.setCoordinates(geometryFactory, this.coordinates, axisCount,
-      1, point2);
+    CoordinatesListUtil.setCoordinates(geometryFactory, this.coordinates, axisCount, 0, point1);
+    CoordinatesListUtil.setCoordinates(geometryFactory, this.coordinates, axisCount, 1, point2);
   }
 
   public LineSegmentDouble(final int axisCount, final double... coordinates) {
     if (coordinates == null || coordinates.length == 0 || axisCount < 1) {
       this.coordinates = null;
-    } else if (coordinates.length % axisCount == 0
-        && coordinates.length / 2 == axisCount) {
+    } else if (coordinates.length % axisCount == 0 && coordinates.length / 2 == axisCount) {
       this.coordinates = coordinates;
     } else {
-      throw new IllegalArgumentException("(coordinates.length) "
-          + coordinates.length + " != 2 * " + axisCount + " (axisCount)");
+      throw new IllegalArgumentException("(coordinates.length) " + coordinates.length + " != 2 * "
+        + axisCount + " (axisCount)");
     }
   }
 
@@ -135,15 +130,13 @@ public class LineSegmentDouble extends AbstractLineSegment {
   }
 
   @Override
-  protected LineSegment createLineSegment(
-    final GeometryFactory geometryFactory, final int axisCount,
-    final double... coordinates) {
+  protected LineSegment createLineSegment(final GeometryFactory geometryFactory,
+    final int axisCount, final double... coordinates) {
     return new LineSegmentDouble(axisCount, coordinates);
   }
 
   @Override
-  protected Point createPoint(final GeometryFactory geometryFactory,
-    final double... coordinates) {
+  protected Point createPoint(final GeometryFactory geometryFactory, final double... coordinates) {
     return new PointDouble(coordinates);
   }
 

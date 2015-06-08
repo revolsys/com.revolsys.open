@@ -165,8 +165,7 @@ public class ConvexHull {
    * Create a new convex hull construction for the input {@link Geometry}.
    */
   public ConvexHull(final Geometry geometry) {
-    this(UniqueCoordinateArrayFilter.getUniquePointsArray(geometry),
-      geometry.getGeometryFactory());
+    this(UniqueCoordinateArrayFilter.getUniquePointsArray(geometry), geometry.getGeometryFactory());
   }
 
   /**
@@ -195,8 +194,7 @@ public class ConvexHull {
         continue;
       }
       if (previousDistinctCoordinate != null
-          && isBetween(previousDistinctCoordinate, currentCoordinate,
-            nextCoordinate)) {
+        && isBetween(previousDistinctCoordinate, currentCoordinate, nextCoordinate)) {
         continue;
       }
       cleanedRing.add(currentCoordinate);
@@ -216,29 +214,25 @@ public class ConvexHull {
       if (inputPts[i].getX() < pts[0].getX()) {
         pts[0] = inputPts[i];
       }
-      if (inputPts[i].getX() - inputPts[i].getY() < pts[1].getX()
-          - pts[1].getY()) {
+      if (inputPts[i].getX() - inputPts[i].getY() < pts[1].getX() - pts[1].getY()) {
         pts[1] = inputPts[i];
       }
       if (inputPts[i].getY() > pts[2].getY()) {
         pts[2] = inputPts[i];
       }
-      if (inputPts[i].getX() + inputPts[i].getY() > pts[3].getX()
-          + pts[3].getY()) {
+      if (inputPts[i].getX() + inputPts[i].getY() > pts[3].getX() + pts[3].getY()) {
         pts[3] = inputPts[i];
       }
       if (inputPts[i].getX() > pts[4].getX()) {
         pts[4] = inputPts[i];
       }
-      if (inputPts[i].getX() - inputPts[i].getY() > pts[5].getX()
-          - pts[5].getY()) {
+      if (inputPts[i].getX() - inputPts[i].getY() > pts[5].getX() - pts[5].getY()) {
         pts[5] = inputPts[i];
       }
       if (inputPts[i].getY() < pts[6].getY()) {
         pts[6] = inputPts[i];
       }
-      if (inputPts[i].getX() + inputPts[i].getY() < pts[7].getX()
-          + pts[7].getY()) {
+      if (inputPts[i].getX() + inputPts[i].getY() < pts[7].getX() + pts[7].getY()) {
         pts[7] = inputPts[i];
       }
     }
@@ -316,8 +310,7 @@ public class ConvexHull {
     for (int i = 3; i < c.length; i++) {
       p = ps.pop();
       // check for empty stack to guard against robustness problems
-      while (!ps.empty()
-          && CGAlgorithmsDD.orientationIndex(ps.peek(), p, c[i]) > 0) {
+      while (!ps.empty() && CGAlgorithmsDD.orientationIndex(ps.peek(), p, c[i]) > 0) {
         p = ps.pop();
       }
       p = ps.push(p);
@@ -416,8 +409,8 @@ public class ConvexHull {
     // the same minimum y coordinate choose the one with the minimu x.
     // This focal point is put in array location pts[0].
     for (int i = 1; i < pts.length; i++) {
-      if (pts[i].getY() < pts[0].getY()
-          || pts[i].getY() == pts[0].getY() && pts[i].getX() < pts[0].getX()) {
+      if (pts[i].getY() < pts[0].getY() || pts[i].getY() == pts[0].getY()
+        && pts[i].getX() < pts[0].getX()) {
         t = pts[0];
         pts[0] = pts[i];
         pts[i] = t;

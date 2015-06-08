@@ -33,7 +33,6 @@
 
 package com.revolsys.jts.triangulate;
 
-
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.segment.LineSegment;
 
@@ -58,7 +57,8 @@ public class NonEncroachingSplitPointFinder implements ConstraintSplitPointFinde
     return projPt;
   }
 
-  public NonEncroachingSplitPointFinder() {}
+  public NonEncroachingSplitPointFinder() {
+  }
 
   /**
    * A basic strategy for finding split points when nothing extra is known about the geometry of

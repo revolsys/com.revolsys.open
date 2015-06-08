@@ -37,13 +37,11 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
       shortName = shortNameProperty.getShortName();
     }
     if (Property.hasValue(shortName) && shortNameProperty.isUseForSequence()) {
-      final String sequenceName = schema + "." + shortName.toLowerCase()
-          + "_seq";
+      final String sequenceName = schema + "." + shortName.toLowerCase() + "_seq";
       return sequenceName;
     } else {
       final String tableName = Path.getName(typePath).toLowerCase();
-      final String idFieldName = recordDefinition.getIdFieldName()
-          .toLowerCase();
+      final String idFieldName = recordDefinition.getIdFieldName().toLowerCase();
       return schema + "." + tableName + "_" + idFieldName + "_seq";
     }
   }
@@ -93,8 +91,7 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
     }
   }
 
-  public void writeAlterOwner(final String objectType, final String objectName,
-    final String owner) {
+  public void writeAlterOwner(final String objectType, final String objectName, final String owner) {
     final PrintWriter out = getOut();
     out.print("ALTER ");
     out.print(objectType);
@@ -217,8 +214,7 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
   }
 
   @Override
-  public void writeResetSequence(final RecordDefinition recordDefinition,
-    final List<Record> values) {
+  public void writeResetSequence(final RecordDefinition recordDefinition, final List<Record> values) {
     final PrintWriter out = getOut();
     Long nextValue = 0L;
     for (final Record object : values) {

@@ -6,11 +6,11 @@ import com.revolsys.util.Locals;
 
 public class BatchUpdate implements AutoCloseable {
 
+  private static ThreadLocal<Set<LayerRecord>> RECORDS = new ThreadLocal<>();
+
   public static boolean isUpdating(final LayerRecord record) {
     return Locals.setContains(RECORDS, record);
   }
-
-  private static ThreadLocal<Set<LayerRecord>> RECORDS = new ThreadLocal<>();
 
   private final boolean added;
 

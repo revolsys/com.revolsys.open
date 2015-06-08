@@ -363,21 +363,6 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
   }
 
   /**
-   * Returns index for hash code h.
-   *
-   * @param h
-   * @param length
-   * @return The index for the hash integer for the given length
-   */
-  static int indexFor(final int h, final int length) {
-    return h & length - 1;
-  }
-
-  transient volatile Set<Integer> keySet = null;
-
-  transient volatile Collection<T> values = null;
-
-  /**
    * The default initial capacity - MUST be a power of two.
    */
   static final int DEFAULT_INITIAL_CAPACITY = 16;
@@ -388,12 +373,29 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
    */
   static final int MAXIMUM_CAPACITY = 1 << 30;
 
-  // internal utilities
-
   /**
    * The load factor used when none specified in constructor.
    */
   static final float DEFAULT_LOAD_FACTOR = 0.75f;
+
+  private static final long serialVersionUID = 362498820763181265L;
+
+  /**
+   * Returns index for hash code h.
+   *
+   * @param h
+   * @param length
+   * @return The index for the hash integer for the given length
+   */
+  static int indexFor(final int h, final int length) {
+    return h & length - 1;
+  }
+
+  // internal utilities
+
+  transient volatile Set<Integer> keySet = null;
+
+  transient volatile Collection<T> values = null;
 
   /**
    * The table, resized as necessary. Length MUST Always be a power of two.
@@ -429,8 +431,6 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
   transient volatile int modCount;
 
   private transient Set<IntEntry<T>> entrySet = null;
-
-  private static final long serialVersionUID = 362498820763181265L;
 
   /**
    * Constructs an empty <tt>HashMap</tt> with the default initial capacity (16)
@@ -468,14 +468,14 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
   public IntHashMap(int initialCapacity, final float loadFactor) {
     if (initialCapacity < 0) {
       throw new IllegalArgumentException("Illegal initial capacity: " + //$NON-NLS-1$
-          initialCapacity);
+        initialCapacity);
     }
     if (initialCapacity > MAXIMUM_CAPACITY) {
       initialCapacity = MAXIMUM_CAPACITY;
     }
     if (loadFactor <= 0 || Float.isNaN(loadFactor)) {
       throw new IllegalArgumentException("Illegal load factor: " + //$NON-NLS-1$
-          loadFactor);
+        loadFactor);
     }
 
     // Find a power of 2 >= initialCapacity
@@ -501,8 +501,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
    * @param bucketIndex
    */
   void addEntry(final int key, final T value, final int bucketIndex) {
-    this.table[bucketIndex] = new IntEntry<T>(key, value,
-        this.table[bucketIndex]);
+    this.table[bucketIndex] = new IntEntry<T>(key, value, this.table[bucketIndex]);
     if (this.size++ >= this.threshold) {
       resize(2 * this.table.length);
     }
@@ -632,8 +631,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
    * @param bucketIndex
    */
   void createEntry(final int key, final T value, final int bucketIndex) {
-    this.table[bucketIndex] = new IntEntry<T>(key, value,
-        this.table[bucketIndex]);
+    this.table[bucketIndex] = new IntEntry<T>(key, value, this.table[bucketIndex]);
     this.size++;
   }
 
@@ -848,7 +846,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
   }
 
   void putAllForCreate(final IntHashMap<T> m) {
-    for (IntEntry<T> e : m.entryIntSet()) {
+    for (final IntEntry<T> e : m.entryIntSet()) {
       putForCreate(e.getIntKey(), e.getValue());
     }
   }
@@ -915,8 +913,8 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
    * @throws ClassNotFoundException
    */
   @SuppressWarnings("unchecked")
-  private void readObject(final java.io.ObjectInputStream s)
-      throws IOException, ClassNotFoundException {
+  private void readObject(final java.io.ObjectInputStream s) throws IOException,
+    ClassNotFoundException {
     // Read in the threshold, loadfactor, and any hidden stuff
     s.defaultReadObject();
 
@@ -1123,8 +1121,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
    *             in the order that they are returned by
    *             <tt>entrySet().iterator()</tt>.
    */
-  private void writeObject(final java.io.ObjectOutputStream s)
-      throws IOException {
+  private void writeObject(final java.io.ObjectOutputStream s) throws IOException {
     // Write out the threshold, loadfactor, and any hidden stuff
     s.defaultWriteObject();
 

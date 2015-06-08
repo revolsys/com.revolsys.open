@@ -15,8 +15,7 @@ public class AttributesEqualOrNullFilter implements Filter<Record> {
       final Object value1 = Records.getFieldByPath(object1, fieldName);
       final Object value2 = Records.getFieldByPath(object2, fieldName);
 
-      if (value1 != null && value2 != null
-          && !EqualsInstance.INSTANCE.equals(value1, value2)) {
+      if (value1 != null && value2 != null && !EqualsInstance.INSTANCE.equals(value1, value2)) {
         return false;
       }
     }
@@ -32,14 +31,12 @@ public class AttributesEqualOrNullFilter implements Filter<Record> {
 
   private final Record object;
 
-  public AttributesEqualOrNullFilter(final Record object,
-    final Collection<String> fieldNames) {
+  public AttributesEqualOrNullFilter(final Record object, final Collection<String> fieldNames) {
     this.fieldNames = fieldNames;
     this.object = object;
   }
 
-  public AttributesEqualOrNullFilter(final Record object,
-    final String... fieldNames) {
+  public AttributesEqualOrNullFilter(final Record object, final String... fieldNames) {
     this(object, Arrays.asList(fieldNames));
   }
 

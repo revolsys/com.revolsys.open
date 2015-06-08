@@ -20,14 +20,6 @@ import com.revolsys.util.CaseConverter;
 
 public class RecordStoreTableTreeNode extends BaseTreeNode {
 
-  public static Icon getIcon(final String geometryType) {
-    Icon icon = ICONS_GEOMETRY.get(geometryType);
-    if (icon == null) {
-      icon = ICON_TABLE;
-    }
-    return icon;
-  }
-
   public static final ImageIcon ICON_TABLE = Icons.getIcon("table");
 
   public static Map<String, Icon> ICONS_GEOMETRY = new HashMap<String, Icon>();
@@ -42,6 +34,14 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
     ICONS_GEOMETRY.put("GeometryCollection", Icons.getIcon("table_geometry"));
 
     MENU.addMenuItem("default", TreeNodeRunnable.createAction("Add Layer", "map_add", "addLayer"));
+  }
+
+  public static Icon getIcon(final String geometryType) {
+    Icon icon = ICONS_GEOMETRY.get(geometryType);
+    if (icon == null) {
+      icon = ICON_TABLE;
+    }
+    return icon;
   }
 
   private final Map<String, Object> connectionMap;

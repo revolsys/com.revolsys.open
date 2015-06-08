@@ -10,12 +10,11 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class NodeWithinBoundingBoxVisitor<T> implements Visitor<Node<T>> {
-  public static <T> List<Node<T>> getNodes(final Graph<T> graph,
-    final BoundingBox boundingBox) {
+  public static <T> List<Node<T>> getNodes(final Graph<T> graph, final BoundingBox boundingBox) {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
     final IdObjectIndex<Node<T>> index = graph.getNodeIndex();
     final NodeWithinBoundingBoxVisitor<T> visitor = new NodeWithinBoundingBoxVisitor<T>(
-        boundingBox, results);
+      boundingBox, results);
     index.visit(boundingBox, visitor);
     return results.getList();
   }

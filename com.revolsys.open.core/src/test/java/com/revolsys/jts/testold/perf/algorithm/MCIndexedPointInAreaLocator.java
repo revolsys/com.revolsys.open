@@ -62,8 +62,7 @@ class MCIndexedGeometry {
 
   private void addLine(final LineString points) {
     final SegmentString segStr = new BasicSegmentString(points, null);
-    final List<MonotoneChain> segChains = MonotoneChainBuilder.getChains(
-      segStr.getPoints(), segStr);
+    final List<MonotoneChain> segChains = MonotoneChainBuilder.getChains(segStr.getPoints(), segStr);
     for (final MonotoneChain mc : segChains) {
       this.index.insert(mc.getEnvelope(), mc);
     }
@@ -122,9 +121,8 @@ public class MCIndexedPointInAreaLocator implements PointOnGeometryLocator {
     this.index = new MCIndexedGeometry(g);
   }
 
-  private void countSegs(final RayCrossingCounter rcc,
-    final BoundingBox rayEnv, final List monoChains,
-    final MCSegmentCounter mcSegCounter) {
+  private void countSegs(final RayCrossingCounter rcc, final BoundingBox rayEnv,
+    final List monoChains, final MCSegmentCounter mcSegCounter) {
     for (final Iterator i = monoChains.iterator(); i.hasNext();) {
       final MonotoneChain mc = (MonotoneChain)i.next();
       mc.select(rayEnv, mcSegCounter);

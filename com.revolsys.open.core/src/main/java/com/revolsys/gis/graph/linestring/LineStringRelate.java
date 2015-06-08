@@ -36,8 +36,7 @@ public class LineStringRelate {
     this(line1, line2, 1);
   }
 
-  public LineStringRelate(final LineString line1, final LineString line2,
-    final double tolerance) {
+  public LineStringRelate(final LineString line1, final LineString line2, final double tolerance) {
     this.line1 = line1;
     this.line2 = line2;
     final GeometryFactory geometryFactory = line1.getGeometryFactory();
@@ -46,10 +45,10 @@ public class LineStringRelate {
 
     final Map<Point, Point> movedNodes = new HashMap<Point, Point>();
     final InvokeMethodVisitor<Node<LineSegment>> moveNodesVisitor1 = new InvokeMethodVisitor<Node<LineSegment>>(
-        this.graph2, "movePointsWithinTolerance", movedNodes, tolerance);
+      this.graph2, "movePointsWithinTolerance", movedNodes, tolerance);
     this.graph1.visitNodes(moveNodesVisitor1);
     final InvokeMethodVisitor<Node<LineSegment>> moveNodesVisitor2 = new InvokeMethodVisitor<Node<LineSegment>>(
-        this.graph1, "movePointsWithinTolerance", movedNodes, tolerance);
+      this.graph1, "movePointsWithinTolerance", movedNodes, tolerance);
     this.graph2.visitNodes(moveNodesVisitor2);
 
     final int i = 0;
@@ -75,8 +74,8 @@ public class LineStringRelate {
     return this.line2;
   }
 
-  public Point getMovedCoordinate(final Map<Point, Point> movedNodes,
-    final LineString line, final int i) {
+  public Point getMovedCoordinate(final Map<Point, Point> movedNodes, final LineString line,
+    final int i) {
     final Point coordinates = line.getVertex(i);
     if (movedNodes.containsKey(coordinates)) {
       return movedNodes.get(coordinates);
@@ -95,8 +94,7 @@ public class LineStringRelate {
       if (outEdges.isEmpty()) {
         previousNode = null;
       } else if (outEdges.size() > 1) {
-        System.err.println("Cannot handle overlaps\n" + getLine1() + "\n "
-            + getLine2());
+        System.err.println("Cannot handle overlaps\n" + getLine1() + "\n " + getLine2());
         final GeometryFactory factory = this.line1.getGeometryFactory();
         return factory.multiLineString();
       } else {
@@ -118,7 +116,7 @@ public class LineStringRelate {
         previousNode = nextNode;
       }
 
-    } while (previousNode != null && !previousNode.equals(2,this.fromPoint1));
+    } while (previousNode != null && !previousNode.equals(2, this.fromPoint1));
     if (currentCoordinates.size() > 0) {
       final List<Point> points = new ArrayList<>();
       intersections.add(points);
@@ -143,8 +141,7 @@ public class LineStringRelate {
     return isContains(this.graph1, this.graph2);
   }
 
-  private boolean isContains(final Graph<LineSegment> graph1,
-    final Graph<LineSegment> graph2) {
+  private boolean isContains(final Graph<LineSegment> graph1, final Graph<LineSegment> graph2) {
     for (final Edge<LineSegment> edge : graph2.getEdges()) {
       final Node<LineSegment> fromNode = edge.getFromNode();
       final Node<LineSegment> toNode = edge.getToNode();
@@ -200,8 +197,7 @@ public class LineStringRelate {
     }
   }
 
-  private boolean isOverlaps(final LineStringGraph graph1,
-    final LineStringGraph graph2) {
+  private boolean isOverlaps(final LineStringGraph graph1, final LineStringGraph graph2) {
     for (final Edge<LineSegment> edge : graph1.getEdges()) {
       final Node<LineSegment> fromNode = edge.getFromNode();
       final Node<LineSegment> toNode = edge.getToNode();
@@ -212,8 +208,8 @@ public class LineStringRelate {
     return false;
   }
 
-  private boolean isWithin(final LineStringGraph graph, final Point fromPoint,
-    final Point toPoint, final Point point, final double maxDistance) {
+  private boolean isWithin(final LineStringGraph graph, final Point fromPoint, final Point toPoint,
+    final Point point, final double maxDistance) {
     if (point.distance(fromPoint) < maxDistance) {
       return false;
     } else if (point.distance(toPoint) < maxDistance) {

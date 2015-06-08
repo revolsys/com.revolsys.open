@@ -20,6 +20,12 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 
 public class BaseTreeNodeLoadingIcon implements ImageObserver {
+  private static final BaseTreeNodeLoadingIcon INSTANCE = new BaseTreeNodeLoadingIcon();
+
+  private static final ImageIcon ICON = createIcon();
+
+  private static final Set<BaseTreeNode> NODES = MapBackedSet.mapBackedSet(new WeakHashMap<BaseTreeNode, Object>());
+
   public static synchronized void addNode(final BaseTreeNode node) {
     if (node != null) {
       NODES.add(node);
@@ -51,18 +57,12 @@ public class BaseTreeNodeLoadingIcon implements ImageObserver {
     }
   }
 
-  private static final BaseTreeNodeLoadingIcon INSTANCE = new BaseTreeNodeLoadingIcon();
-
-  private static final ImageIcon ICON = createIcon();
-
-  private static final Set<BaseTreeNode> NODES = MapBackedSet.mapBackedSet(new WeakHashMap<BaseTreeNode, Object>());
-
   public BaseTreeNodeLoadingIcon() {
   }
 
   @Override
-  public boolean imageUpdate(final Image image, final int flags, final int x,
-    final int y, final int width, final int height) {
+  public boolean imageUpdate(final Image image, final int flags, final int x, final int y,
+    final int width, final int height) {
     if ((flags & (FRAMEBITS | ALLBITS)) != 0) {
       for (final BaseTreeNode node : getNodes()) {
         final JTree tree = node.getTree();

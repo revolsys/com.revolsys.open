@@ -19,19 +19,17 @@ import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.util.UrlProxy;
 import com.revolsys.util.UrlUtil;
 
-public class FolderConnectionTreeNode extends LazyLoadTreeNode implements
-UrlProxy {
+public class FolderConnectionTreeNode extends LazyLoadTreeNode implements UrlProxy {
   private static final MenuFactory MENU = new MenuFactory("Folder Connection");
 
   static {
-    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh",
-      "arrow_refresh", NODE_EXISTS, "refresh");
+    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh", "arrow_refresh",
+      NODE_EXISTS, "refresh");
     MENU.addMenuItem("default", refresh);
 
-    final EnableCheck readOnly = new TreeNodePropertyEnableCheck("readOnly",
-      false);
-    MENU.addMenuItem("default", TreeNodeRunnable.createAction(
-      "Delete Folder Connection", "delete", readOnly, "deleteConnection"));
+    final EnableCheck readOnly = new TreeNodePropertyEnableCheck("readOnly", false);
+    MENU.addMenuItem("default", TreeNodeRunnable.createAction("Delete Folder Connection", "delete",
+      readOnly, "deleteConnection"));
   }
 
   public FolderConnectionTreeNode(final FolderConnection connection) {
@@ -43,11 +41,9 @@ UrlProxy {
 
   public void deleteConnection() {
     final FolderConnection connection = getUserData();
-    final int confirm = JOptionPane.showConfirmDialog(
-      SwingUtil.getActiveWindow(),
-      "Delete folder connection '" + connection.getName()
-      + "'? This action cannot be undone.", "Delete Layer",
-      JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
+    final int confirm = JOptionPane.showConfirmDialog(SwingUtil.getActiveWindow(),
+      "Delete folder connection '" + connection.getName() + "'? This action cannot be undone.",
+      "Delete Layer", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
     if (confirm == JOptionPane.OK_OPTION) {
       connection.delete();
     }
@@ -78,8 +74,7 @@ UrlProxy {
   @Override
   public URL getUrl() {
     final String name = getName();
-    final String urlstring = "folderconnection://"
-        + UrlUtil.percentEncode(name) + "/";
+    final String urlstring = "folderconnection://" + UrlUtil.percentEncode(name) + "/";
     try {
       final URL url = new URL(urlstring);
       return url;

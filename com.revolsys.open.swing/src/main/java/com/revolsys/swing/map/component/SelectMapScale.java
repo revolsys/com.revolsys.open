@@ -20,8 +20,8 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
-public class SelectMapScale extends JComboBox implements ItemListener,
-PropertyChangeListener, ActionListener {
+public class SelectMapScale extends JComboBox implements ItemListener, PropertyChangeListener,
+  ActionListener {
   private static final long serialVersionUID = 1L;
 
   private final Reference<MapPanel> map;
@@ -31,11 +31,10 @@ PropertyChangeListener, ActionListener {
     this.map = new WeakReference<MapPanel>(map);
 
     setEditable(true);
-    final InvokeMethodStringConverter renderer = new InvokeMethodStringConverter(
-      MapScale.class, "formatScale");
+    final InvokeMethodStringConverter renderer = new InvokeMethodStringConverter(MapScale.class,
+      "formatScale");
     renderer.setHorizontalAlignment(SwingConstants.RIGHT);
-    final SelectMapScaleEditor editor = new SelectMapScaleEditor(getEditor(),
-      renderer);
+    final SelectMapScaleEditor editor = new SelectMapScaleEditor(getEditor(), renderer);
     setEditor(editor);
     setRenderer(renderer);
     addItemListener(this);
@@ -95,8 +94,8 @@ PropertyChangeListener, ActionListener {
           currentScale = ((Number)currentValue).doubleValue();
         } else if (Property.hasValue(currentValue)) {
           final String scaleString = currentValue.toString()
-              .replaceAll("1:", "")
-              .replaceAll("[^0-9\\.]+", "");
+            .replaceAll("1:", "")
+            .replaceAll("[^0-9\\.]+", "");
           if (Property.hasValue(scaleString)) {
             try {
               currentScale = Double.valueOf(scaleString);

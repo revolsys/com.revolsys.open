@@ -32,18 +32,17 @@ public class DetailView extends Element {
     this(serializer, null, null);
   }
 
-  public DetailView(final LabelValueListSerializer serializer,
-    final String cssClass) {
+  public DetailView(final LabelValueListSerializer serializer, final String cssClass) {
     this(serializer, cssClass, null);
   }
 
-  public DetailView(final LabelValueListSerializer serializer,
-    final String cssClass, final String title) {
+  public DetailView(final LabelValueListSerializer serializer, final String cssClass,
+    final String title) {
     this(serializer, cssClass, title, 1);
   }
 
-  public DetailView(final LabelValueListSerializer serializer,
-    final String cssClass, final String title, final int numColumns) {
+  public DetailView(final LabelValueListSerializer serializer, final String cssClass,
+    final String title, final int numColumns) {
     this.serializer = serializer;
     if (cssClass != null && cssClass.trim().length() > 0) {
       this.cssClass += " " + cssClass;

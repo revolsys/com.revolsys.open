@@ -9,9 +9,8 @@ import com.revolsys.jts.geom.impl.PointDouble;
  */
 public class LineStringLocation implements Comparable<LineStringLocation> {
 
-  public static int compareLocationValues(final int segmentIndex0,
-    final double segmentFraction0, final int segmentIndex1,
-    final double segmentFraction1) {
+  public static int compareLocationValues(final int segmentIndex0, final double segmentFraction0,
+    final int segmentIndex1, final double segmentFraction1) {
     // compare segments
     if (segmentIndex0 < segmentIndex1) {
       return -1;
@@ -41,8 +40,7 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
    * @param length the length to the desired point
    * @return the {@link Coordinates} of the desired point
    */
-  public static Point pointAlongSegmentByFraction(final Point p0,
-    final Point p1, final double frac) {
+  public static Point pointAlongSegmentByFraction(final Point p0, final Point p1, final double frac) {
     if (frac <= 0.0) {
       return p0;
     }

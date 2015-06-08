@@ -34,9 +34,8 @@ public class RestDoclet {
 
   public static int optionLength(String optionName) {
     optionName = optionName.toLowerCase();
-    if (optionName.equals("-d") || optionName.equals("-doctitle")
-        || optionName.equals("-docid") || optionName.equals("-htmlfooter")
-        || optionName.equals("-htmlheader")) {
+    if (optionName.equals("-d") || optionName.equals("-doctitle") || optionName.equals("-docid")
+      || optionName.equals("-htmlfooter") || optionName.equals("-htmlheader")) {
       return 2;
     }
     return -1;
@@ -60,12 +59,10 @@ public class RestDoclet {
           file.mkdirs();
         }
         if (!file.isDirectory()) {
-          docerrorreporter.printError("Destination not a directory"
-              + file.getPath());
+          docerrorreporter.printError("Destination not a directory" + file.getPath());
           return false;
         } else if (!file.canWrite()) {
-          docerrorreporter.printError("Destination directory not writable "
-              + file.getPath());
+          docerrorreporter.printError("Destination directory not writable " + file.getPath());
           return false;
         }
       } else if (argName.equals("-htmlheader")) {
@@ -102,9 +99,8 @@ public class RestDoclet {
     this.root = root;
   }
 
-  public void addResponseStatusDescription(
-    final Map<String, List<String>> responseCodes, final String code,
-    final String description) {
+  public void addResponseStatusDescription(final Map<String, List<String>> responseCodes,
+    final String code, final String description) {
     List<String> descriptions = responseCodes.get(code);
     if (descriptions == null) {
       descriptions = new ArrayList<String>();
@@ -136,8 +132,7 @@ public class RestDoclet {
   }
 
   public void documentationClass(final ClassDoc classDoc) {
-    if (DocletUtil.hasAnnotation(classDoc,
-        "org.springframework.stereotype.Controller")) {
+    if (DocletUtil.hasAnnotation(classDoc, "org.springframework.stereotype.Controller")) {
       this.writer.startTag(HtmlUtil.DIV);
       this.writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass open");
 
@@ -159,7 +154,7 @@ public class RestDoclet {
   public void documentationMethod(final ClassDoc classDoc) {
     for (final MethodDoc method : classDoc.methods()) {
       final AnnotationDesc requestMapping = DocletUtil.getAnnotation(method,
-          "org.springframework.web.bind.annotation.RequestMapping");
+        "org.springframework.web.bind.annotation.RequestMapping");
       if (requestMapping != null) {
         this.writer.startTag(HtmlUtil.DIV);
         this.writer.attribute(HtmlUtil.ATTR_CLASS, "javaMethod");
@@ -185,8 +180,7 @@ public class RestDoclet {
   }
 
   @SuppressWarnings("unchecked")
-  private <T> T getElementValue(final AnnotationDesc annotation,
-    final String name) {
+  private <T> T getElementValue(final AnnotationDesc annotation, final String name) {
     for (final ElementValuePair pair : annotation.elementValues()) {
       if (pair.element().name().equals(name)) {
         return (T)pair.value().value();
@@ -200,9 +194,9 @@ public class RestDoclet {
     for (final Parameter parameter : method.parameters()) {
       final AnnotationDesc[] annotations = parameter.annotations();
       if (DocletUtil.hasAnnotation(annotations,
-          "org.springframework.web.bind.annotation.RequestParam")
-          || DocletUtil.hasAnnotation(annotations,
-              "org.springframework.web.bind.annotation.RequestBody")) {
+        "org.springframework.web.bind.annotation.RequestParam")
+        || DocletUtil.hasAnnotation(annotations,
+          "org.springframework.web.bind.annotation.RequestBody")) {
         parameters.add(parameter);
       }
     }
@@ -213,9 +207,9 @@ public class RestDoclet {
       this.writer.element(
         HtmlUtil.P,
         "The resource supports the following parameters. "
-            + "For HTTP get requests these must be specified using query string parameters. "
-            + "For HTTP POST requests these can be specified using query string, application/x-www-form-urlencoded parameters or multipart/form-data unless otherwise specified. "
-            + "Array values [] can be specified by including the parameter multiple times in the request.");
+          + "For HTTP get requests these must be specified using query string parameters. "
+          + "For HTTP POST requests these can be specified using query string, application/x-www-form-urlencoded parameters or multipart/form-data unless otherwise specified. "
+          + "Array values [] can be specified by including the parameter multiple times in the request.");
 
       this.writer.startTag(HtmlUtil.DIV);
       this.writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable");
@@ -236,19 +230,16 @@ public class RestDoclet {
       for (final Parameter parameter : parameters) {
         this.writer.startTag(HtmlUtil.TR);
         final String name = parameter.name();
-        final AnnotationDesc requestParam = DocletUtil.getAnnotation(
-          parameter.annotations(),
-            "org.springframework.web.bind.annotation.RequestParam");
-        final AnnotationDesc requestBody = DocletUtil.getAnnotation(
-          parameter.annotations(),
-            "org.springframework.web.bind.annotation.RequestBody");
+        final AnnotationDesc requestParam = DocletUtil.getAnnotation(parameter.annotations(),
+          "org.springframework.web.bind.annotation.RequestParam");
+        final AnnotationDesc requestBody = DocletUtil.getAnnotation(parameter.annotations(),
+          "org.springframework.web.bind.annotation.RequestBody");
         String paramName = name;
         String defaultValue = "-";
         String typeName = parameter.typeName();
         typeName = typeName.replaceAll("java.util.List<([^>]+)>", "$1\\[\\]");
         typeName = typeName.replaceFirst("^java.lang.", "");
-        typeName = typeName.replaceAll(
-          "org.springframework.web.multipart.MultipartFile", "File");
+        typeName = typeName.replaceAll("org.springframework.web.multipart.MultipartFile", "File");
 
         boolean required = true;
         if (requestParam != null) {
@@ -260,8 +251,7 @@ public class RestDoclet {
           if (defaultValue == null) {
             defaultValue = "-";
           }
-          required = Boolean.FALSE != (Boolean)getElementValue(requestParam,
-              "required");
+          required = Boolean.FALSE != (Boolean)getElementValue(requestParam, "required");
         }
         if (requestBody != null) {
           required = true;
@@ -287,8 +277,7 @@ public class RestDoclet {
         } else {
           this.writer.element(HtmlUtil.TD, "No");
         }
-        DocletUtil.descriptionTd(this.writer, method.containingClass(),
-          descriptions, name);
+        DocletUtil.descriptionTd(this.writer, method.containingClass(), descriptions, name);
         this.writer.endTag(HtmlUtil.TR);
       }
       this.writer.endTag(HtmlUtil.TBODY);
@@ -303,7 +292,7 @@ public class RestDoclet {
     if (methods != null && methods.length > 0) {
       this.writer.element(HtmlUtil.H4, "HTTP Request Methods");
       this.writer.element(HtmlUtil.P,
-          "The resource can be accessed using the following HTTP request methods.");
+        "The resource can be accessed using the following HTTP request methods.");
       this.writer.startTag(HtmlUtil.UL);
       for (final AnnotationValue value : methods) {
         final FieldDoc method = (FieldDoc)value.value();
@@ -324,8 +313,7 @@ public class RestDoclet {
         if (index != -1) {
           final String status = text.substring(0, index);
           final String description = text.substring(index + 1).trim();
-          addResponseStatusDescription(responseStatusDescriptions, status,
-            description);
+          addResponseStatusDescription(responseStatusDescriptions, status, description);
         }
       }
     }
@@ -333,15 +321,15 @@ public class RestDoclet {
       responseStatusDescriptions,
       "500",
       "<p><b>Internal Server Error</b></p>"
-          + "<p>This error indicates that there was an unexpected error on the server. "
-          + "This is sometimes temporary so try again after a few minutes. "
-          + "The problem could also be caused by bad input data so verify all input parameters and files. "
-          + "If the problem persists contact the support desk with exact details of the parameters you were using.</p>");
+        + "<p>This error indicates that there was an unexpected error on the server. "
+        + "This is sometimes temporary so try again after a few minutes. "
+        + "The problem could also be caused by bad input data so verify all input parameters and files. "
+        + "If the problem persists contact the support desk with exact details of the parameters you were using.</p>");
     if (!responseStatusDescriptions.isEmpty()) {
       this.writer.element(HtmlUtil.H4, "HTTP Status Codes");
       this.writer.element(
         HtmlUtil.P,
-          "The resource will return one of the following status codes. The HTML error page may include an error message. The descriptions of the messages and the cause are described below.");
+        "The resource will return one of the following status codes. The HTML error page may include an error message. The descriptions of the messages and the cause are described below.");
       this.writer.startTag(HtmlUtil.DIV);
       this.writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable");
 
@@ -443,7 +431,7 @@ public class RestDoclet {
     final List<Parameter> parameters = new ArrayList<Parameter>();
     for (final Parameter parameter : method.parameters()) {
       if (DocletUtil.hasAnnotation(parameter.annotations(),
-          "org.springframework.web.bind.annotation.PathVariable")) {
+        "org.springframework.web.bind.annotation.PathVariable")) {
         parameters.add(parameter);
       }
     }
@@ -452,7 +440,7 @@ public class RestDoclet {
       this.writer.element(HtmlUtil.H4, "URI Template Parameters");
       this.writer.element(
         HtmlUtil.P,
-          "The URI templates support the following parameters which must be replaced with values as described below.");
+        "The URI templates support the following parameters which must be replaced with values as described below.");
       this.writer.startTag(HtmlUtil.DIV);
       this.writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable");
 
@@ -473,8 +461,7 @@ public class RestDoclet {
         final String name = parameter.name();
         this.writer.element(HtmlUtil.TD, "{" + name + "}");
         this.writer.element(HtmlUtil.TD, parameter.typeName());
-        DocletUtil.descriptionTd(this.writer, method.containingClass(),
-          descriptions, name);
+        DocletUtil.descriptionTd(this.writer, method.containingClass(), descriptions, name);
 
         this.writer.endTag(HtmlUtil.TR);
       }
@@ -486,13 +473,12 @@ public class RestDoclet {
   }
 
   public void uriTemplates(final AnnotationDesc requestMapping) {
-    final AnnotationValue[] uriTemplates = getElementValue(requestMapping,
-        "value");
+    final AnnotationValue[] uriTemplates = getElementValue(requestMapping, "value");
     if (uriTemplates.length > 0) {
       this.writer.element(HtmlUtil.H4, "URI Templates");
       this.writer.element(
         HtmlUtil.P,
-          "The URI templates define the paths that can be appended to the base URL of the service to access this resource.");
+        "The URI templates define the paths that can be appended to the base URL of the service to access this resource.");
 
       for (final AnnotationValue uriTemplate : uriTemplates) {
         this.writer.element(HtmlUtil.PRE, uriTemplate.value());

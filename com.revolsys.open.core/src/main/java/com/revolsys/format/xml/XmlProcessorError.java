@@ -43,8 +43,8 @@ public class XmlProcessorError {
    * @param relatedInformation Additional information about the error.
    * @param location The location of the error.
    */
-  public XmlProcessorError(final String message,
-    final Object relatedInformation, final Location location) {
+  public XmlProcessorError(final String message, final Object relatedInformation,
+    final Location location) {
     this.message = message;
     this.relatedInformation = relatedInformation;
     if (relatedInformation instanceof Throwable) {
@@ -98,8 +98,8 @@ public class XmlProcessorError {
   @Override
   public String toString() {
     if (this.location != null) {
-      return "[" + this.location.getLineNumber() + ", " + this.location.getColumnNumber()
-          + "] " + this.message;
+      return "[" + this.location.getLineNumber() + ", " + this.location.getColumnNumber() + "] "
+        + this.message;
     } else {
       return this.message;
 

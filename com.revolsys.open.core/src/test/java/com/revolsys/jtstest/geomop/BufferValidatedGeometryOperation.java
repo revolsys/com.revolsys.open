@@ -103,10 +103,8 @@ public class BufferValidatedGeometryOperation implements GeometryOperation {
     }
   }
 
-  private void checkDistance(final Geometry geom, final double distance,
-    final Geometry buffer) {
-    final BufferResultValidator bufValidator = new BufferResultValidator(geom,
-      distance, buffer);
+  private void checkDistance(final Geometry geom, final double distance, final Geometry buffer) {
+    final BufferResultValidator bufValidator = new BufferResultValidator(geom, distance, buffer);
     if (!bufValidator.isValid()) {
       final String errorMsg = bufValidator.getErrorMessage();
       final Point errorLoc = bufValidator.getErrorLocation();
@@ -137,8 +135,8 @@ public class BufferValidatedGeometryOperation implements GeometryOperation {
    * @see GeometryOperation#invoke
    */
   @Override
-  public Result invoke(final String opName, final Geometry geometry,
-    final Object[] args) throws Exception {
+  public Result invoke(final String opName, final Geometry geometry, final Object[] args)
+    throws Exception {
     final boolean isBufferOp = opName.equalsIgnoreCase("buffer");
     // if not a buffer op, do the default
     if (!isBufferOp) {
@@ -159,8 +157,7 @@ public class BufferValidatedGeometryOperation implements GeometryOperation {
     return null;
   }
 
-  private Result invokeBufferOpValidated(final Geometry geometry,
-    final Object[] args) {
+  private Result invokeBufferOpValidated(final Geometry geometry, final Object[] args) {
     Geometry result = null;
 
     result = invokeBuffer(geometry);
@@ -179,8 +176,7 @@ public class BufferValidatedGeometryOperation implements GeometryOperation {
   }
 
   private boolean isEmptyBufferExpected(final Geometry geom) {
-    final boolean isNegativeBufferOfNonAreal = geom.getDimension() < 2
-        && this.distance <= 0.0;
+    final boolean isNegativeBufferOfNonAreal = geom.getDimension() < 2 && this.distance <= 0.0;
     return isNegativeBufferOfNonAreal;
   }
 

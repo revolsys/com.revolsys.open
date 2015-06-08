@@ -42,13 +42,11 @@ public class BreadcrumbController implements Controller {
   }
 
   @Override
-  public ModelAndView handleRequest(
-    final HttpServletRequest request,
+  public ModelAndView handleRequest(final HttpServletRequest request,
     final HttpServletResponse response) throws Exception {
     final String path = this.urlPathHelper.getOriginatingRequestUri(request);
     final String contextPath = this.urlPathHelper.getOriginatingContextPath(request);
-    final PathBreadcrumbView view = new PathBreadcrumbView(contextPath, path,
-      this.addSlash);
+    final PathBreadcrumbView view = new PathBreadcrumbView(contextPath, path, this.addSlash);
     final PrintWriter writer = response.getWriter();
     view.serialize(writer, false);
     writer.flush();

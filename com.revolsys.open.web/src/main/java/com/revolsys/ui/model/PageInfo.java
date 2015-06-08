@@ -39,8 +39,7 @@ public class PageInfo extends AbstractDocumentedObject {
     this.parameters.putAll(pageInfo.getParametersMap());
     this.mediaTypes.addAll(pageInfo.getMediaTypes());
     this.inputContentTypes.addAll(pageInfo.getInputContentTypes());
-    this.attributes = new LinkedHashMap<String, Object>(
-        pageInfo.getFields());
+    this.attributes = new LinkedHashMap<String, Object>(pageInfo.getFields());
   }
 
   public PageInfo(final String title) {
@@ -51,8 +50,7 @@ public class PageInfo extends AbstractDocumentedObject {
     this(title, description, "get");
   }
 
-  public PageInfo(final String title, final String description,
-    final String... methods) {
+  public PageInfo(final String title, final String description, final String... methods) {
     setTitle(title);
     setDescription(description);
     this.methods.addAll(Arrays.asList(methods));

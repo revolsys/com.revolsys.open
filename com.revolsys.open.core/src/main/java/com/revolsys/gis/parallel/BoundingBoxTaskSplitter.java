@@ -69,13 +69,12 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
         for (int j = 0; j < this.numX; j++) {
           double x = this.boundingBox.getMinX();
           for (int i = 0; i < this.numX; i++) {
-            final BoundingBox cellBoundingBox = new BoundingBoxDoubleGf(geometryFactory,
-              2, x, y, x + xInc, y + yInc);
+            final BoundingBox cellBoundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, x, y, x
+              + xInc, y + yInc);
             if (this.preparedBoundary == null
-                || this.preparedBoundary.intersects(cellBoundingBox.toPolygon(50))) {
+              || this.preparedBoundary.intersects(cellBoundingBox.toPolygon(50))) {
               if (this.logScriptInfo) {
-                this.log.info("Processing bounding box "
-                    + cellBoundingBox.toPolygon(1));
+                this.log.info("Processing bounding box " + cellBoundingBox.toPolygon(1));
               }
               execute(cellBoundingBox);
             }

@@ -1,6 +1,4 @@
 
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -41,6 +39,7 @@ package com.revolsys.jts.geomgraph.index;
 public class MonotoneChain {
 
   MonotoneChainEdge mce;
+
   int chainIndex;
 
   public MonotoneChain(final MonotoneChainEdge mce, final int chainIndex) {
@@ -48,8 +47,7 @@ public class MonotoneChain {
     this.chainIndex = chainIndex;
   }
 
-  public void computeIntersections(final MonotoneChain mc, final SegmentIntersector si)
-  {
+  public void computeIntersections(final MonotoneChain mc, final SegmentIntersector si) {
     this.mce.computeIntersectsForChain(this.chainIndex, mc.mce, mc.chainIndex, si);
   }
 }

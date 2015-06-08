@@ -39,7 +39,6 @@ package com.revolsys.jts.index;
  * @version 1.7
  */
 
-public interface ItemVisitor
-{
+public interface ItemVisitor {
   void visitItem(Object item);
 }

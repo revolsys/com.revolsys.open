@@ -45,6 +45,8 @@ import com.revolsys.jts.io.WKTReader;
  * @version 1.7
  */
 public class WKTOrWKBReader {
+  private static final int MAX_CHARS_TO_CHECK = 6;
+
   private static boolean isHex(final String str, final int maxCharsToTest) {
     for (int i = 0; i < maxCharsToTest && i < str.length(); i++) {
       final char ch = str.charAt(i);
@@ -65,8 +67,6 @@ public class WKTOrWKBReader {
     }
     return false;
   }
-
-  private static final int MAX_CHARS_TO_CHECK = 6;
 
   private final WKTReader wktReader;
 

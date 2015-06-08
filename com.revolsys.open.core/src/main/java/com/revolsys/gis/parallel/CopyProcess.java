@@ -48,9 +48,8 @@ public class CopyProcess extends BaseInOutProcess<Record, Record> {
     return targetObject;
   }
 
-  private void copyAttribute(final Record sourceObject,
-    final String sourceFieldName, final Record targetObject,
-    final String targetFieldName) {
+  private void copyAttribute(final Record sourceObject, final String sourceFieldName,
+    final Record targetObject, final String targetFieldName) {
     Object value = sourceObject.getValueByPath(sourceFieldName);
     final Map<Object, Object> valueMap = this.valueMaps.get(targetFieldName);
     if (valueMap != null) {
@@ -92,8 +91,7 @@ public class CopyProcess extends BaseInOutProcess<Record, Record> {
   }
 
   @Override
-  protected void process(final Channel<Record> in, final Channel<Record> out,
-    final Record object) {
+  protected void process(final Channel<Record> in, final Channel<Record> out, final Record object) {
     final Record targetObject = copy(object);
     out.write(targetObject);
   }
@@ -106,8 +104,7 @@ public class CopyProcess extends BaseInOutProcess<Record, Record> {
     this.recordDefinition = recordDefinition;
   }
 
-  public void setRecordDefinitionFactory(
-    final RecordDefinitionFactory recordDefinitionFactory) {
+  public void setRecordDefinitionFactory(final RecordDefinitionFactory recordDefinitionFactory) {
     this.recordDefinitionFactory = recordDefinitionFactory;
   }
 

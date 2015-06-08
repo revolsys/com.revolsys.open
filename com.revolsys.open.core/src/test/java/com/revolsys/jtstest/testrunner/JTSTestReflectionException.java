@@ -6,9 +6,12 @@ package com.revolsys.jtstest.testrunner;
  * @author Martin Davis
  * @version 1.7
  */
-public class JTSTestReflectionException
-extends Exception
-{
+public class JTSTestReflectionException extends Exception {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private static String createMessage(final String opName, final Object[] args) {
     String msg = "Could not find Geometry method: " + opName + "(";
     for (int j = 0; j < args.length; j++) {
@@ -20,11 +23,6 @@ extends Exception
     msg += ")";
     return msg;
   }
-
-  /**
-   *
-   */
-  private static final long serialVersionUID = 1L;
 
   public JTSTestReflectionException(final String message) {
     super(message);

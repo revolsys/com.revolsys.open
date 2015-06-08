@@ -43,24 +43,22 @@ public class InvokeMethodTableModelListener implements TableModelListener {
 
   private final boolean invokeLater;
 
-  public InvokeMethodTableModelListener(final Object object,
-    final String methodName) {
+  public InvokeMethodTableModelListener(final Object object, final String methodName) {
     this(object, methodName, new Object[0]);
   }
 
-  public InvokeMethodTableModelListener(final Object object,
-    final String methodName, final boolean invokeLater) {
+  public InvokeMethodTableModelListener(final Object object, final String methodName,
+    final boolean invokeLater) {
     this(object, methodName, new Object[0], invokeLater);
   }
 
-  public InvokeMethodTableModelListener(final Object object,
-    final String methodName, final Object[] parameters) {
+  public InvokeMethodTableModelListener(final Object object, final String methodName,
+    final Object[] parameters) {
     this(object, methodName, parameters, false);
   }
 
-  public InvokeMethodTableModelListener(final Object object,
-    final String methodName, final Object[] parameters,
-    final boolean invokeLater) {
+  public InvokeMethodTableModelListener(final Object object, final String methodName,
+    final Object[] parameters, final boolean invokeLater) {
     this.runnable = new InvokeMethodRunnable(object, methodName, parameters);
     this.invokeLater = invokeLater;
   }

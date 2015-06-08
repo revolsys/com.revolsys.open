@@ -39,22 +39,23 @@ import java.io.IOException;
  * {@link InStream},
  * with the representation being in either common byte ordering.
  */
-public class ByteOrderDataInStream
-{
+public class ByteOrderDataInStream {
   private int byteOrder = ByteOrderValues.BIG_ENDIAN;
+
   private InStream stream;
+
   // buffers to hold primitive datatypes
   private final byte[] buf1 = new byte[1];
+
   private final byte[] buf4 = new byte[4];
+
   private final byte[] buf8 = new byte[8];
 
-  public ByteOrderDataInStream()
-  {
+  public ByteOrderDataInStream() {
     this.stream = null;
   }
 
-  public ByteOrderDataInStream(final InStream stream)
-  {
+  public ByteOrderDataInStream(final InStream stream) {
     this.stream = stream;
   }
 
@@ -63,45 +64,37 @@ public class ByteOrderDataInStream
    *
    * @return the byte read
    */
-  public byte readByte()
-      throws IOException
-  {
+  public byte readByte() throws IOException {
     this.stream.read(this.buf1);
     return this.buf1[0];
   }
-  public double readDouble()
-      throws IOException
-  {
+
+  public double readDouble() throws IOException {
     this.stream.read(this.buf8);
     return ByteOrderValues.getDouble(this.buf8, this.byteOrder);
   }
 
-  public int readInt()
-      throws IOException
-  {
+  public int readInt() throws IOException {
     this.stream.read(this.buf4);
     return ByteOrderValues.getInt(this.buf4, this.byteOrder);
   }
 
-  public long readLong()
-      throws IOException
-  {
+  public long readLong() throws IOException {
     this.stream.read(this.buf8);
     return ByteOrderValues.getLong(this.buf8, this.byteOrder);
   }
+
   /**
    * Allows a single ByteOrderDataInStream to be reused
    * on multiple InStreams.
    *
    * @param stream
    */
-  public void setInStream(final InStream stream)
-  {
+  public void setInStream(final InStream stream) {
     this.stream = stream;
   }
 
-  public void setOrder(final int byteOrder)
-  {
+  public void setOrder(final int byteOrder) {
     this.byteOrder = byteOrder;
   }
 

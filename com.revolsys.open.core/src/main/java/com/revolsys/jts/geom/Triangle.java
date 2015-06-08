@@ -57,8 +57,7 @@ public class Triangle {
    *          a vertex of the triangle
    * @return the angle bisector cut point
    */
-  public static Point angleBisector(final Point a,
-    final Point b, final Point c) {
+  public static Point angleBisector(final Point a, final Point b, final Point c) {
     /**
      * Uses the fact that the lengths of the parts of the split segment are
      * proportional to the lengths of the adjacent triangle sides
@@ -69,8 +68,8 @@ public class Triangle {
     final double dx = c.getX() - a.getX();
     final double dy = c.getY() - a.getY();
 
-    final Point splitPt = new PointDouble(a.getX() + frac * dx, a.getY()
-      + frac * dy, Point.NULL_ORDINATE);
+    final Point splitPt = new PointDouble(a.getX() + frac * dx, a.getY() + frac * dy,
+      Point.NULL_ORDINATE);
     return splitPt;
   }
 
@@ -87,10 +86,9 @@ public class Triangle {
    *
    * @see #signedArea(Coordinate, Coordinate, Coordinate)
    */
-  public static double area(final Point a, final Point b,
-    final Point c) {
+  public static double area(final Point a, final Point b, final Point c) {
     return Math.abs(((c.getX() - a.getX()) * (b.getY() - a.getY()) - (b.getX() - a.getX())
-        * (c.getY() - a.getY())) / 2);
+      * (c.getY() - a.getY())) / 2);
   }
 
   /**
@@ -110,18 +108,17 @@ public class Triangle {
    */
   /*
    * // original non-robust algorithm public static Coordinate
-   * circumcentre(Point a, Point b, Point c) { // compute the
-   * perpendicular bisector of chord ab HCoordinate cab =
-   * perpendicularBisector(a, b); // compute the perpendicular bisector of chord
-   * bc HCoordinate cbc = perpendicularBisector(b, c); // compute the
-   * intersection of the bisectors (circle radii) HCoordinate hcc = new
-   * HCoordinate(cab, cbc); Point cc = null; try { cc = new
-   * Coordinate(hcc.getX(), hcc.getY()); } catch (NotRepresentableException ex)
-   * { // MD - not sure what we can do to prevent this (robustness problem) //
-   * Idea - can we condition which edges we choose? throw new
-   * IllegalStateException(ex.getMessage()); } //System.out.println("Acc = " +
-   * a.distance(cc) + ", Bcc = " + b.distance(cc) + ", Ccc = " + c.distance(cc)
-   * ); return cc; }
+   * circumcentre(Point a, Point b, Point c) { // compute the perpendicular
+   * bisector of chord ab HCoordinate cab = perpendicularBisector(a, b); //
+   * compute the perpendicular bisector of chord bc HCoordinate cbc =
+   * perpendicularBisector(b, c); // compute the intersection of the bisectors
+   * (circle radii) HCoordinate hcc = new HCoordinate(cab, cbc); Point cc =
+   * null; try { cc = new Coordinate(hcc.getX(), hcc.getY()); } catch
+   * (NotRepresentableException ex) { // MD - not sure what we can do to prevent
+   * this (robustness problem) // Idea - can we condition which edges we choose?
+   * throw new IllegalStateException(ex.getMessage()); }
+   * //System.out.println("Acc = " + a.distance(cc) + ", Bcc = " +
+   * b.distance(cc) + ", Ccc = " + c.distance(cc) ); return cc; }
    */
 
   /**
@@ -136,8 +133,7 @@ public class Triangle {
    *          a vertex of the triangle
    * @return the 3D area of the triangle
    */
-  public static double area3D(final Point a, final Point b,
-    final Point c) {
+  public static double area3D(final Point a, final Point b, final Point c) {
     /**
      * Uses the formula 1/2 * | u x v | where u,v are the side vectors of the
      * triangle x is the vector cross-product
@@ -180,8 +176,7 @@ public class Triangle {
    *          a vertex of the triangle
    * @return the centroid of the triangle
    */
-  public static Point centroid(final Point a, final Point b,
-    final Point c) {
+  public static Point centroid(final Point a, final Point b, final Point c) {
     final double x = (a.getX() + b.getX() + c.getX()) / 3;
     final double y = (a.getY() + b.getY() + c.getY()) / 3;
     return new PointDouble(x, y, Point.NULL_ORDINATE);
@@ -209,8 +204,7 @@ public class Triangle {
    *          a vertx of the triangle
    * @return the circumcentre of the triangle
    */
-  public static Point circumcentre(final Point a,
-    final Point b, final Point c) {
+  public static Point circumcentre(final Point a, final Point b, final Point c) {
     final double cx = c.getX();
     final double cy = c.getY();
     final double ax = a.getX() - cx;
@@ -242,8 +236,7 @@ public class Triangle {
    *          the [1,1] entry of the matrix
    * @return the determinant
    */
-  private static double det(final double m00, final double m01,
-    final double m10, final double m11) {
+  private static double det(final double m00, final double m01, final double m10, final double m11) {
     return m00 * m11 - m01 * m10;
   }
 
@@ -264,20 +257,15 @@ public class Triangle {
    *          a vertx of the triangle
    * @return the point which is the incentre of the triangle
    */
-  public static Point inCentre(final Point a, final Point b,
-    final Point c) {
+  public static Point inCentre(final Point a, final Point b, final Point c) {
     // the lengths of the sides, labelled by their opposite vertex
     final double len0 = b.distance(c);
     final double len1 = a.distance(c);
     final double len2 = a.distance(b);
     final double circum = len0 + len1 + len2;
 
-    final double inCentreX = (len0 * a.getX() + len1 * b.getX() + len2
-        * c.getX())
-        / circum;
-    final double inCentreY = (len0 * a.getY() + len1 * b.getY() + len2
-        * c.getY())
-        / circum;
+    final double inCentreX = (len0 * a.getX() + len1 * b.getX() + len2 * c.getX()) / circum;
+    final double inCentreY = (len0 * a.getY() + len1 * b.getY() + len2 * c.getY()) / circum;
     return new PointDouble(inCentreX, inCentreY, Point.NULL_ORDINATE);
   }
 
@@ -300,8 +288,7 @@ public class Triangle {
    *          a vertex of a triangle, with a Z ordinate
    * @return the computed Z-value (elevation) of the point
    */
-  public static double interpolateZ(final Point p, final Point v0,
-    final Point v1, final Point v2) {
+  public static double interpolateZ(final Point p, final Point v0, final Point v1, final Point v2) {
     final double x0 = v0.getX();
     final double y0 = v0.getY();
     final double a = v1.getX() - x0;
@@ -313,8 +300,7 @@ public class Triangle {
     final double dy = p.getY() - y0;
     final double t = (d * dx - b * dy) / det;
     final double u = (-c * dx + a * dy) / det;
-    final double z = v0.getZ() + t * (v1.getZ() - v0.getZ()) + u
-        * (v2.getZ() - v0.getZ());
+    final double z = v0.getZ() + t * (v1.getZ() - v0.getZ()) + u * (v2.getZ() - v0.getZ());
     return z;
   }
 
@@ -334,8 +320,7 @@ public class Triangle {
    *          a vertex of the triangle
    * @return true if the triangle is acute
    */
-  public static boolean isAcute(final Point a, final Point b,
-    final Point c) {
+  public static boolean isAcute(final Point a, final Point b, final Point c) {
     if (!Angle.isAcute(a, b, c)) {
       return false;
     }
@@ -359,8 +344,7 @@ public class Triangle {
    *          a vertex of the triangle
    * @return the length of the longest side of the triangle
    */
-  public static double longestSideLength(final Point a,
-    final Point b, final Point c) {
+  public static double longestSideLength(final Point a, final Point b, final Point c) {
     final double lenAB = a.distance(b);
     final double lenBC = b.distance(c);
     final double lenCA = c.distance(a);
@@ -384,15 +368,12 @@ public class Triangle {
    *          another point
    * @return the perpendicular bisector, as an HCoordinate
    */
-  public static HCoordinate perpendicularBisector(final Point a,
-    final Point b) {
+  public static HCoordinate perpendicularBisector(final Point a, final Point b) {
     // returns the perpendicular bisector of the line segment ab
     final double dx = b.getX() - a.getX();
     final double dy = b.getY() - a.getY();
-    final HCoordinate l1 = new HCoordinate(a.getX() + dx / 2.0, a.getY() + dy
-      / 2.0, 1.0);
-    final HCoordinate l2 = new HCoordinate(a.getX() - dy + dx / 2.0, a.getY()
-      + dx + dy / 2.0, 1.0);
+    final HCoordinate l1 = new HCoordinate(a.getX() + dx / 2.0, a.getY() + dy / 2.0, 1.0);
+    final HCoordinate l2 = new HCoordinate(a.getX() - dy + dx / 2.0, a.getY() + dx + dy / 2.0, 1.0);
     return new HCoordinate(l1, l2);
   }
 
@@ -415,15 +396,14 @@ public class Triangle {
    *
    * @see CGAlgorithms#orientationIndex(Coordinate, Coordinate, Coordinate)
    */
-  public static double signedArea(final Point a, final Point b,
-    final Point c) {
+  public static double signedArea(final Point a, final Point b, final Point c) {
     /**
      * Uses the formula 1/2 * | u x v | where u,v are the side vectors of the
      * triangle x is the vector cross-product For 2D vectors, this formual
      * simplifies to the expression below
      */
     return ((c.getX() - a.getX()) * (b.getY() - a.getY()) - (b.getX() - a.getX())
-        * (c.getY() - a.getY())) / 2;
+      * (c.getY() - a.getY())) / 2;
   }
 
   /**
@@ -441,8 +421,7 @@ public class Triangle {
    * @param p2
    *          a vertex
    */
-  public Triangle(final Point p0, final Point p1,
-    final Point p2) {
+  public Triangle(final Point p0, final Point p1, final Point p2) {
     this.p0 = p0;
     this.p1 = p1;
     this.p2 = p2;

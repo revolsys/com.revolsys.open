@@ -11,8 +11,7 @@ import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.LayoutStyle;
 
 public class GroupLayoutUtil {
-  public static GroupLayout getLayout(final Container container,
-    final boolean containerGaps) {
+  public static GroupLayout getLayout(final Container container, final boolean containerGaps) {
     LayoutManager layout = container.getLayout();
     if (!(layout instanceof GroupLayout)) {
       layout = new GroupLayout(container);
@@ -25,15 +24,14 @@ public class GroupLayoutUtil {
     return groupLayout;
   }
 
-  public static void makeColumns(final Container container,
-    final boolean containerGaps) {
+  public static void makeColumns(final Container container, final boolean containerGaps) {
     final GroupLayout groupLayout = getLayout(container, containerGaps);
 
     makeColumns(container, groupLayout, container.getComponentCount());
   }
 
-  public static void makeColumns(final Container container,
-    final GroupLayout groupLayout, final int numColumns) {
+  public static void makeColumns(final Container container, final GroupLayout groupLayout,
+    final int numColumns) {
     final int componentCount = container.getComponentCount();
     final int numRows = (int)Math.ceil(componentCount / (double)numColumns);
 
@@ -46,8 +44,8 @@ public class GroupLayoutUtil {
         final int componentIndex = rowIndex * numColumns + columnIndex;
         if (componentIndex < componentCount) {
           final Component component = container.getComponent(componentIndex);
-          columnGroup.addComponent(component, GroupLayout.DEFAULT_SIZE,
-            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE);
+          columnGroup.addComponent(component, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
+            GroupLayout.PREFERRED_SIZE);
         }
       }
     }
@@ -61,22 +59,22 @@ public class GroupLayoutUtil {
         final int componentIndex = rowIndex * numColumns + columnIndex;
         if (componentIndex < componentCount) {
           final Component component = container.getComponent(componentIndex);
-          rowGroup.addComponent(component, GroupLayout.DEFAULT_SIZE,
-            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE);
+          rowGroup.addComponent(component, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
+            GroupLayout.PREFERRED_SIZE);
         }
       }
     }
   }
 
-  public static void makeColumns(final Container container,
-    final int numColumns, final boolean containerGaps) {
+  public static void makeColumns(final Container container, final int numColumns,
+    final boolean containerGaps) {
     final GroupLayout groupLayout = getLayout(container, containerGaps);
 
     makeColumns(container, groupLayout, numColumns);
   }
 
-  public static void makeColumns(final LayoutStyle layoutStyle,
-    final Container container, final int numColumns) {
+  public static void makeColumns(final LayoutStyle layoutStyle, final Container container,
+    final int numColumns) {
     final GroupLayout groupLayout = getLayout(container, true);
     groupLayout.setAutoCreateContainerGaps(false);
     groupLayout.setAutoCreateGaps(true);

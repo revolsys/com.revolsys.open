@@ -35,8 +35,7 @@ import org.springframework.web.servlet.mvc.Controller;
 public class PathViewController implements Controller {
 
   public static boolean include(final HttpServletRequest request,
-    final HttpServletResponse response, final Object object)
-        throws IOException, ServletException {
+    final HttpServletResponse response, final Object object) throws IOException, ServletException {
     if (object == null) {
       return false;
     } else {

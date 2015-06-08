@@ -37,8 +37,7 @@ public class TileLoadTask implements Runnable {
       this.mapTile.loadImage(this.geometryFactory);
       this.renderer.setLoaded(this);
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).error(
-        "Unable to load " + this.mapTile, e);
+      LoggerFactory.getLogger(getClass()).error("Unable to load " + this.mapTile, e);
     }
   }
 

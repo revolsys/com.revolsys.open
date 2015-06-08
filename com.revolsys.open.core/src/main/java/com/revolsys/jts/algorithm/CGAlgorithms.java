@@ -47,6 +47,36 @@ import com.revolsys.jts.geom.segment.Segment;
 public class CGAlgorithms {
 
   /**
+   * A value that indicates an orientation of clockwise, or a right turn.
+   */
+  public static final int CLOCKWISE = -1;
+
+  /**
+   * A value that indicates an orientation of clockwise, or a right turn.
+   */
+  public static final int RIGHT = CLOCKWISE;
+
+  /**
+   * A value that indicates an orientation of counterclockwise, or a left turn.
+   */
+  public static final int COUNTERCLOCKWISE = 1;
+
+  /**
+   * A value that indicates an orientation of counterclockwise, or a left turn.
+   */
+  public static final int LEFT = COUNTERCLOCKWISE;
+
+  /**
+   * A value that indicates an orientation of collinear, or no turn (straight).
+   */
+  public static final int COLLINEAR = 0;
+
+  /**
+   * A value that indicates an orientation of collinear, or no turn (straight).
+   */
+  public static final int STRAIGHT = COLLINEAR;
+
+  /**
    * Computes the perpendicular distance from a point p to the (infinite) line
    * containing the points AB
    *
@@ -58,18 +88,17 @@ public class CGAlgorithms {
    *          another point of the line (must be different to A)
    * @return the distance from p to line AB
    */
-  public static double distancePointLinePerpendicular(final Point p,
-    final Point A, final Point B) {
+  public static double distancePointLinePerpendicular(final Point p, final Point A, final Point B) {
     // use comp.graphics.algorithms Frequently Asked Questions method
     /*
      * (2) s = (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay) ----------------------------- L^2
      * Then the distance from C to P = |s|*L.
      */
-    final double len2 = (B.getX() - A.getX()) * (B.getX() - A.getX())
-        + (B.getY() - A.getY()) * (B.getY() - A.getY());
+    final double len2 = (B.getX() - A.getX()) * (B.getX() - A.getX()) + (B.getY() - A.getY())
+      * (B.getY() - A.getY());
     final double s = ((A.getY() - p.getY()) * (B.getX() - A.getX()) - (A.getX() - p.getX())
-        * (B.getY() - A.getY()))
-        / len2;
+      * (B.getY() - A.getY()))
+      / len2;
 
     return Math.abs(s) * Math.sqrt(len2);
   }
@@ -97,7 +126,7 @@ public class CGAlgorithms {
     // sanity check
     if (nPts < 3) {
       throw new IllegalArgumentException(
-          "Ring has fewer than 4 points, so orientation cannot be determined");
+        "Ring has fewer than 4 points, so orientation cannot be determined");
     }
 
     // find highest point
@@ -184,36 +213,6 @@ public class CGAlgorithms {
   public static boolean isPointInRing(final Point point, final LineString ring) {
     return RayCrossingCounter.locatePointInRing(point, ring) != Location.EXTERIOR;
   }
-
-  /**
-   * A value that indicates an orientation of clockwise, or a right turn.
-   */
-  public static final int CLOCKWISE = -1;
-
-  /**
-   * A value that indicates an orientation of clockwise, or a right turn.
-   */
-  public static final int RIGHT = CLOCKWISE;
-
-  /**
-   * A value that indicates an orientation of counterclockwise, or a left turn.
-   */
-  public static final int COUNTERCLOCKWISE = 1;
-
-  /**
-   * A value that indicates an orientation of counterclockwise, or a left turn.
-   */
-  public static final int LEFT = COUNTERCLOCKWISE;
-
-  /**
-   * A value that indicates an orientation of collinear, or no turn (straight).
-   */
-  public static final int COLLINEAR = 0;
-
-  /**
-   * A value that indicates an orientation of collinear, or no turn (straight).
-   */
-  public static final int STRAIGHT = COLLINEAR;
 
   public CGAlgorithms() {
   }

@@ -139,8 +139,7 @@ public class SegmentNodeList {
     final SegmentNode ei = (SegmentNode)this.nodeMap.get(eiNew);
     if (ei != null) {
       // debugging sanity check
-      Assert.isTrue(ei.coord.equals(2,intPt),
-          "Found equal nodes with different coordinates");
+      Assert.isTrue(ei.coord.equals(2, intPt), "Found equal nodes with different coordinates");
       // if (! ei.coord.equals2D(intPt))
       // Debug.println("Found equal nodes with different coordinates");
 
@@ -224,8 +223,7 @@ public class SegmentNodeList {
     // (This check is needed because the distance metric is not totally
     // reliable!)
     // The check for point equality is 2D only - Z values are ignored
-    final boolean useIntPt1 = ei1.isInterior()
-        || !ei1.coord.equals(2,lastSegStartPt);
+    final boolean useIntPt1 = ei1.isInterior() || !ei1.coord.equals(2, lastSegStartPt);
     if (!useIntPt1) {
       npts--;
     }
@@ -240,19 +238,17 @@ public class SegmentNodeList {
       CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, point);
     }
     if (useIntPt1) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++,
-        ei1.coord);
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, ei1.coord);
     }
 
-    final LineStringDouble points = new LineStringDouble(axisCount,
-      coordinates);
+    final LineStringDouble points = new LineStringDouble(axisCount, coordinates);
     return new NodedSegmentString(points, this.edge.getData());
   }
 
-  private boolean findCollapseIndex(final SegmentNode ei0,
-    final SegmentNode ei1, final int[] collapsedVertexIndex) {
+  private boolean findCollapseIndex(final SegmentNode ei0, final SegmentNode ei1,
+    final int[] collapsedVertexIndex) {
     // only looking for equal nodes
-    if (!ei0.coord.equals(2,ei1.coord)) {
+    if (!ei0.coord.equals(2, ei1.coord)) {
       return false;
     }
 
@@ -274,13 +270,12 @@ public class SegmentNodeList {
    * Adds nodes for any collapsed edge pairs
    * which are pre-existing in the vertex list.
    */
-  private void findCollapsesFromExistingVertices(
-    final List collapsedVertexIndexes) {
+  private void findCollapsesFromExistingVertices(final List collapsedVertexIndexes) {
     for (int i = 0; i < this.edge.size() - 2; i++) {
       final Point p0 = this.edge.getCoordinate(i);
       final Point p1 = this.edge.getCoordinate(i + 1);
       final Point p2 = this.edge.getCoordinate(i + 2);
-      if (p0.equals(2,p2)) {
+      if (p0.equals(2, p2)) {
         // add base of collapse as node
         collapsedVertexIndexes.add(new Integer(i + 1));
       }
@@ -302,8 +297,7 @@ public class SegmentNodeList {
     SegmentNode eiPrev = (SegmentNode)it.next();
     while (it.hasNext()) {
       final SegmentNode ei = (SegmentNode)it.next();
-      final boolean isCollapsed = findCollapseIndex(eiPrev, ei,
-        collapsedVertexIndex);
+      final boolean isCollapsed = findCollapseIndex(eiPrev, ei, collapsedVertexIndex);
       if (isCollapsed) {
         collapsedVertexIndexes.add(new Integer(collapsedVertexIndex[0]));
       }

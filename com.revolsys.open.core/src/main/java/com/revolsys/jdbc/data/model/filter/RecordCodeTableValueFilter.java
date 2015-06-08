@@ -28,14 +28,12 @@ public class RecordCodeTableValueFilter implements Filter<Record> {
   public RecordCodeTableValueFilter() {
   }
 
-  public RecordCodeTableValueFilter(final String fieldName,
-    final List<Object> values) {
+  public RecordCodeTableValueFilter(final String fieldName, final List<Object> values) {
     this.fieldName = fieldName;
     this.values.addAll(values);
   }
 
-  public RecordCodeTableValueFilter(final String fieldName,
-    final Object... values) {
+  public RecordCodeTableValueFilter(final String fieldName, final Object... values) {
     this(fieldName, Arrays.asList(values));
   }
 

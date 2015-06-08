@@ -21,8 +21,7 @@ public class CodeTableObjectToStringConverter extends ObjectToStringConverter {
     if (value == null || value == CodeTableComboBoxModel.NULL) {
       return null;
     } else {
-      final List<Object> values = this.codeTable.getValues(SingleIdentifier.create(
-        value));
+      final List<Object> values = this.codeTable.getValues(SingleIdentifier.create(value));
       if (values == null || values.isEmpty()) {
         return null;
       } else {

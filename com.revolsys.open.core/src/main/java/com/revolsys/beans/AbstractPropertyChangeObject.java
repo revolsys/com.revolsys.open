@@ -7,17 +7,14 @@ import java.beans.PropertyChangeSupport;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
-public class AbstractPropertyChangeObject implements
-PropertyChangeSupportProxy, Cloneable {
-  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-    this);
+public class AbstractPropertyChangeObject implements PropertyChangeSupportProxy, Cloneable {
+  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   public void addListener(final PropertyChangeListener listener) {
     Property.addListener(this, listener);
   }
 
-  public void addListener(final String propertyName,
-    final PropertyChangeListener listener) {
+  public void addListener(final String propertyName, final PropertyChangeListener listener) {
     Property.addListener(this, propertyName, listener);
   }
 
@@ -39,12 +36,11 @@ PropertyChangeSupportProxy, Cloneable {
 
   protected void firePropertyChange(final String propertyName, final int index,
     final Object oldValue, final Object newValue) {
-    this.propertyChangeSupport.fireIndexedPropertyChange(propertyName, index,
-      oldValue, newValue);
+    this.propertyChangeSupport.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
   }
 
-  protected void firePropertyChange(final String propertyName,
-    final Object oldValue, final Object newValue) {
+  protected void firePropertyChange(final String propertyName, final Object oldValue,
+    final Object newValue) {
     this.propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
   }
 
@@ -57,8 +53,7 @@ PropertyChangeSupportProxy, Cloneable {
     Property.removeListener(this, listener);
   }
 
-  public void removeListener(final String propertyName,
-    final PropertyChangeListener listener) {
+  public void removeListener(final String propertyName, final PropertyChangeListener listener) {
     Property.removeListener(this, propertyName, listener);
   }
 }

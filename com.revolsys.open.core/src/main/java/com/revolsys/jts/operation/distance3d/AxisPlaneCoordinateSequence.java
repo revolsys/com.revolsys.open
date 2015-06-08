@@ -51,6 +51,23 @@ import com.revolsys.jts.geom.impl.AbstractLineString;
 public class AxisPlaneCoordinateSequence extends AbstractLineString {
 
   /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
+  private static final int[] XY_INDEX = new int[] {
+    0, 1
+  };
+
+  private static final int[] XZ_INDEX = new int[] {
+    0, 2
+  };
+
+  private static final int[] YZ_INDEX = new int[] {
+    1, 2
+  };
+
+  /**
    * Creates a wrapper projecting to the XY plane.
    *
    * @param seq the sequence to be projected
@@ -83,23 +100,6 @@ public class AxisPlaneCoordinateSequence extends AbstractLineString {
   public static LineString projectToYZ(final LineString seq) {
     return new AxisPlaneCoordinateSequence(seq, YZ_INDEX);
   }
-
-  /**
-   *
-   */
-  private static final long serialVersionUID = 1L;
-
-  private static final int[] XY_INDEX = new int[] {
-    0, 1
-  };
-
-  private static final int[] XZ_INDEX = new int[] {
-    0, 2
-  };
-
-  private static final int[] YZ_INDEX = new int[] {
-    1, 2
-  };
 
   private final LineString seq;
 

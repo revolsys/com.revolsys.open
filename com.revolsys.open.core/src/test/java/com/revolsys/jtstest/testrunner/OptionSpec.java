@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -61,6 +60,7 @@ public class OptionSpec {
   public final static int NARGS_ZERO_OR_ONE = -3;
 
   public final static String OPTION_FREE_ARGS = "**FREE_ARGS**"; // option name
+
   // for free
   // args
 
@@ -103,13 +103,13 @@ public class OptionSpec {
       // args must be ok
     } else if (this.nAllowedArgs == NARGS_ONE_OR_MORE) {
       if (args.length <= 0) {
-        throw new ParseException("option " + this.name
-          + ": expected one or more args, found " + args.length);
+        throw new ParseException("option " + this.name + ": expected one or more args, found "
+          + args.length);
       }
     } else if (this.nAllowedArgs == NARGS_ZERO_OR_ONE) {
       if (args.length > 1) {
-        throw new ParseException("option " + this.name
-          + ": expected zero or one arg, found " + args.length);
+        throw new ParseException("option " + this.name + ": expected zero or one arg, found "
+          + args.length);
       }
     } else if (args.length != this.nAllowedArgs) {
       throw new ParseException("option " + this.name + ": expected " + this.nAllowedArgs

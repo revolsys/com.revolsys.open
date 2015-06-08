@@ -26,9 +26,8 @@ import com.revolsys.util.ObjectProcessor;
  *
  * @author Paul Austin
  */
-public class RecordPseudoNodeRemovalVisitor extends
-AbstractNodeListenerVisitor<Record> implements FilterProxy<Node<Record>>,
-ObjectProcessor<RecordGraph> {
+public class RecordPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<Record> implements
+  FilterProxy<Node<Record>>, ObjectProcessor<RecordGraph> {
 
   private Filter<Node<Record>> filter;
 
@@ -56,8 +55,7 @@ ObjectProcessor<RecordGraph> {
     this.mergedStatistics.connect();
   }
 
-  private void mergeEdgePairs(final Node<Record> node,
-    final List<EdgePair<Record>> edgePairs) {
+  private void mergeEdgePairs(final Node<Record> node, final List<EdgePair<Record>> edgePairs) {
     if (edgePairs != null) {
       for (final EdgePair<Record> edgePair : edgePairs) {
         final Edge<Record> edge1 = edgePair.getEdge1();
@@ -70,8 +68,8 @@ ObjectProcessor<RecordGraph> {
     }
   }
 
-  protected Edge<Record> mergeEdges(final Node<Record> node,
-    final Edge<Record> edge1, final Edge<Record> edge2) {
+  protected Edge<Record> mergeEdges(final Node<Record> node, final Edge<Record> edge1,
+    final Edge<Record> edge2) {
     final Record object1 = edge1.getObject();
 
     final Record object2 = edge2.getObject();
@@ -86,8 +84,7 @@ ObjectProcessor<RecordGraph> {
     return newEdge;
   }
 
-  protected Record mergeObjects(final Node<Record> node, final Record object1,
-    final Record object2) {
+  protected Record mergeObjects(final Node<Record> node, final Record object1, final Record object2) {
     return DirectionalAttributes.merge(node, object1, object2);
   }
 

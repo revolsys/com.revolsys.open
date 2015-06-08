@@ -27,16 +27,15 @@ import com.revolsys.util.JavaBeanUtil;
 
 public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
 
+  private static final Logger LOG = LoggerFactory.getLogger(EsriGdbXmlSerializer.class);
+
   public static String toString(final Object object) {
     final StringWriter writer = new StringWriter();
-    final EsriGdbXmlSerializer serializer = new EsriGdbXmlSerializer(null,
-      writer);
+    final EsriGdbXmlSerializer serializer = new EsriGdbXmlSerializer(null, writer);
     serializer.serialize(object);
     writer.flush();
     return writer.toString();
   }
-
-  private static final Logger LOG = LoggerFactory.getLogger(EsriGdbXmlSerializer.class);
 
   private final Map<Class<?>, Set<QName>> classPropertyTagNamesMap = new HashMap<Class<?>, Set<QName>>();
 
@@ -68,9 +67,9 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     addTagNameXsiTagName(METADATA, XML_PROPERTY_SET);
     addTagNameChildTagName(METADATA, XML_DOC);
 
-    addClassProperties(SpatialReference.class, SPATIAL_REFERENCE, null, WKT,
-      X_ORIGIN, Y_ORIGIN, XY_SCALE, Z_ORIGIN, Z_SCALE, M_ORIGIN, M_SCALE,
-      XY_TOLERANCE, Z_TOLERANCE, M_TOLERANCE, HIGH_PRECISION, WKID);
+    addClassProperties(SpatialReference.class, SPATIAL_REFERENCE, null, WKT, X_ORIGIN, Y_ORIGIN,
+      XY_SCALE, Z_ORIGIN, Z_SCALE, M_ORIGIN, M_SCALE, XY_TOLERANCE, Z_TOLERANCE, M_TOLERANCE,
+      HIGH_PRECISION, WKID);
 
     addClassProperties(GeographicCoordinateSystem.class, SPATIAL_REFERENCE,
       GEOGRAPHIC_COORDINATE_SYSTEM);
@@ -78,37 +77,34 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     addClassProperties(ProjectedCoordinateSystem.class, SPATIAL_REFERENCE,
       PROJECTED_COORDINATE_SYSTEM);
 
-    addClassProperties(GeometryDef.class, GEOMETRY_DEF, GEOMETRY_DEF,
-      AVG_NUM_POINTS, GEOMETRY_TYPE, HAS_M, HAS_Z, SPATIAL_REFERENCE,
-      GRID_SIZE_0, GRID_SIZE_1, GRID_SIZE_2);
+    addClassProperties(GeometryDef.class, GEOMETRY_DEF, GEOMETRY_DEF, AVG_NUM_POINTS,
+      GEOMETRY_TYPE, HAS_M, HAS_Z, SPATIAL_REFERENCE, GRID_SIZE_0, GRID_SIZE_1, GRID_SIZE_2);
 
-    addClassProperties(Domain.class, DOMAIN, null, DOMAIN_NAME, FIELD_TYPE,
-      MERGE_POLICY, SPLIT_POLICY, DESCRIPTION, OWNER, CODED_VALUES);
+    addClassProperties(Domain.class, DOMAIN, null, DOMAIN_NAME, FIELD_TYPE, MERGE_POLICY,
+      SPLIT_POLICY, DESCRIPTION, OWNER, CODED_VALUES);
 
     addClassProperties(CodedValueDomain.class, DOMAIN, CODED_VALUE_DOMAIN);
     addTagNameXsiTagName(CODED_VALUES, ARRAY_OF_CODED_VALUE);
 
     addClassProperties(CodedValue.class, CODED_VALUE, CODED_VALUE, NAME, CODE);
 
-    addClassProperties(Field.class, FIELD, FIELD, NAME, TYPE, IS_NULLABLE,
-      LENGTH, PRECISION, SCALE, REQUIRED, EDIATBLE, DOMAIN_FIXED, GEOMETRY_DEF,
-      ALIAS_NAME, MODEL_NAME, DEFAULT_VALUE, DOMAIN);
+    addClassProperties(Field.class, FIELD, FIELD, NAME, TYPE, IS_NULLABLE, LENGTH, PRECISION,
+      SCALE, REQUIRED, EDIATBLE, DOMAIN_FIXED, GEOMETRY_DEF, ALIAS_NAME, MODEL_NAME, DEFAULT_VALUE,
+      DOMAIN);
 
     addTagNameXsiTagName(FIELD_ARRAY, ARRAY_OF_FIELD);
 
     addTagNameXsiTagName(FIELDS, FIELDS);
     addTagNameChildTagName(FIELDS, FIELD_ARRAY);
 
-    addClassProperties(Index.class, INDEX, INDEX, NAME, IS_UNIQUE,
-      IS_ASCENDING, FIELDS);
+    addClassProperties(Index.class, INDEX, INDEX, NAME, IS_UNIQUE, IS_ASCENDING, FIELDS);
 
     addTagNameXsiTagName(INDEX_ARRAY, ARRAY_OF_INDEX);
 
     addTagNameXsiTagName(INDEXES, INDEXES);
     addTagNameChildTagName(INDEXES, INDEX_ARRAY);
 
-    addClassProperties(PropertySetProperty.class, PROPERTY_SET_PROPERTY, null,
-      KEY, VALUE);
+    addClassProperties(PropertySetProperty.class, PROPERTY_SET_PROPERTY, null, KEY, VALUE);
 
     addTagNameXsiTagName(PROPERTY_ARRAY, ARRAY_OF_PROPERTY_SET_PROPERTY);
 
@@ -120,53 +116,45 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
 
     addTagNameListElementTagName(SUBTYPES, SUBTYPE);
 
-    addClassProperties(Subtype.class, SUBTYPE, null, SUBTYPE_NAME,
-      SUBTYPE_CODE, FIELD_INFOS);
+    addClassProperties(Subtype.class, SUBTYPE, null, SUBTYPE_NAME, SUBTYPE_CODE, FIELD_INFOS);
 
-    addClassProperties(SubtypeFieldInfo.class, SUBTYPE_FIELD_INFO, null,
-      FIELD_NAME, DOMAIN_NAME, DEFAULT_VALUE);
+    addClassProperties(SubtypeFieldInfo.class, SUBTYPE_FIELD_INFO, null, FIELD_NAME, DOMAIN_NAME,
+      DEFAULT_VALUE);
 
-    addClassProperties(EnvelopeN.class, ENVELOPE, ENVELOPE_N, X_MIN, Y_MIN,
-      X_MAX, Y_MAX, Z_MIN, Z_MAX, M_MIN, M_MAX, SPATIAL_REFERENCE);
+    addClassProperties(EnvelopeN.class, ENVELOPE, ENVELOPE_N, X_MIN, Y_MIN, X_MAX, Y_MAX, Z_MIN,
+      Z_MAX, M_MIN, M_MAX, SPATIAL_REFERENCE);
     addTagNameXsiTagName(CONTROLLER_MEMBERSHIPS, ARRAY_OF_CONTROLLER_MEMBERSHIP);
 
-    addClassProperties(DataElement.class, DATA_ELEMENT, DATA_ELEMENT,
-      CATALOG_PATH, NAME, CHILDREN_EXPANDED, FULL_PROPS_RETRIEVED,
-      METADATA_RETRIEVED, METADATA, CHILDREN);
+    addClassProperties(DataElement.class, DATA_ELEMENT, DATA_ELEMENT, CATALOG_PATH, NAME,
+      CHILDREN_EXPANDED, FULL_PROPS_RETRIEVED, METADATA_RETRIEVED, METADATA, CHILDREN);
 
-    addClassProperties(DEDataset.class, DATA_ELEMENT, DE_DATASET, DATASET_TYPE,
-      DSID, VERSIONED, CAN_VERSION, CONFIGURATION_KEYWORD);
+    addClassProperties(DEDataset.class, DATA_ELEMENT, DE_DATASET, DATASET_TYPE, DSID, VERSIONED,
+      CAN_VERSION, CONFIGURATION_KEYWORD);
 
-    addClassProperties(DEGeoDataset.class, DATA_ELEMENT, DE_GEO_DATASET,
-      EXTENT, SPATIAL_REFERENCE);
+    addClassProperties(DEGeoDataset.class, DATA_ELEMENT, DE_GEO_DATASET, EXTENT, SPATIAL_REFERENCE);
 
-    addClassProperties(DEFeatureDataset.class, DATA_ELEMENT,
-      DE_FEATURE_DATASET, EXTENT, SPATIAL_REFERENCE);
-
-    addClassProperties(DETable.class, DATA_ELEMENT, DE_TABLE, HAS_OID,
-      OBJECT_ID_FIELD_NAME, FIELDS, INDEXES, CLSID, EXTCLSID,
-      RELATIONSHIP_CLASS_NAMES, ALIAS_NAME, MODEL_NAME, HAS_GLOBAL_ID,
-      GLOBAL_ID_FIELD_NAME, RASTER_FIELD_NAME, EXTENSION_PROPERTIES,
-      SUBTYPE_FIELD_NAME, DEFAULT_SUBTYPE_CODE, SUBTYPES,
-      CONTROLLER_MEMBERSHIPS);
-
-    addClassProperties(DEFeatureClass.class, DATA_ELEMENT, DE_FEATURE_CLASS,
-      FEATURE_TYPE, SHAPE_TYPE, SHAPE_FIELD_NAME, HAS_M, HAS_Z,
-      HAS_SPATIAL_INDEX, AREA_FIELD_NAME, LENGTH_FIELD_NAME, EXTENT,
+    addClassProperties(DEFeatureDataset.class, DATA_ELEMENT, DE_FEATURE_DATASET, EXTENT,
       SPATIAL_REFERENCE);
+
+    addClassProperties(DETable.class, DATA_ELEMENT, DE_TABLE, HAS_OID, OBJECT_ID_FIELD_NAME,
+      FIELDS, INDEXES, CLSID, EXTCLSID, RELATIONSHIP_CLASS_NAMES, ALIAS_NAME, MODEL_NAME,
+      HAS_GLOBAL_ID, GLOBAL_ID_FIELD_NAME, RASTER_FIELD_NAME, EXTENSION_PROPERTIES,
+      SUBTYPE_FIELD_NAME, DEFAULT_SUBTYPE_CODE, SUBTYPES, CONTROLLER_MEMBERSHIPS);
+
+    addClassProperties(DEFeatureClass.class, DATA_ELEMENT, DE_FEATURE_CLASS, FEATURE_TYPE,
+      SHAPE_TYPE, SHAPE_FIELD_NAME, HAS_M, HAS_Z, HAS_SPATIAL_INDEX, AREA_FIELD_NAME,
+      LENGTH_FIELD_NAME, EXTENT, SPATIAL_REFERENCE);
 
     addTagNameXsiTagName(DATASET_DEFINITIONS, ARRAY_OF_DATA_ELEMENT);
     addTagNameXsiTagName(DOMAINS, ARRAY_OF_DOMAIN);
 
-    addClassProperties(WorkspaceDefinition.class, WORKSPACE_DEFINITION,
-      WORKSPACE_DEFINITION, WORKSPACE_TYPE, VERSION, DOMAINS,
-      DATASET_DEFINITIONS, METADATA);
+    addClassProperties(WorkspaceDefinition.class, WORKSPACE_DEFINITION, WORKSPACE_DEFINITION,
+      WORKSPACE_TYPE, VERSION, DOMAINS, DATASET_DEFINITIONS, METADATA);
 
     addTagNameListElementTagName(WORKSPACE_DATA, DATASET_DATA);
     addTagNameXsiTagName(WORKSPACE_DATA, WORKSPACE_DATA);
 
-    addClassProperties(Workspace.class, WORKSPACE, null, WORKSPACE_DEFINITION,
-      WORKSPACE_DATA);
+    addClassProperties(Workspace.class, WORKSPACE, null, WORKSPACE_DEFINITION, WORKSPACE_DATA);
 
     this.classTypeNameMap.put(Byte.class, XmlConstants.XS_BYTE);
     this.classTypeNameMap.put(Short.class, XmlConstants.XS_SHORT);
@@ -196,9 +184,8 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     this.writeFirstNamespace = true;
   }
 
-  private void addClassProperties(final Class<?> objectClass,
-    final QName tagName, final QName xsiTagName,
-    final Collection<QName> propertyNames) {
+  private void addClassProperties(final Class<?> objectClass, final QName tagName,
+    final QName xsiTagName, final Collection<QName> propertyNames) {
     this.classTagNameMap.put(objectClass, tagName);
     addClassXsiTagName(objectClass, xsiTagName);
     final Set<QName> allPropertyNames = new LinkedHashSet<QName>();
@@ -207,26 +194,24 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     this.classPropertyTagNamesMap.put(objectClass, allPropertyNames);
   }
 
-  private void addClassProperties(final Class<?> objectClass,
-    final QName tagName, final QName xsiTagName, final QName... propertyNames) {
-    addClassProperties(objectClass, tagName, xsiTagName,
-      Arrays.asList(propertyNames));
+  private void addClassProperties(final Class<?> objectClass, final QName tagName,
+    final QName xsiTagName, final QName... propertyNames) {
+    addClassProperties(objectClass, tagName, xsiTagName, Arrays.asList(propertyNames));
   }
 
-  protected void addClassPropertyMethod(final Class<?> objectClass,
-    final QName propertyName, final String methodName) {
+  protected void addClassPropertyMethod(final Class<?> objectClass, final QName propertyName,
+    final String methodName) {
     Map<QName, Method> classMethods = this.classPropertyMethodMap.get(objectClass);
     if (classMethods == null) {
       classMethods = new HashMap<QName, Method>();
       this.classPropertyMethodMap.put(objectClass, classMethods);
     }
-    final Method method = JavaBeanUtil.getMethod(EsriGdbXmlSerializer.class,
-      methodName, Object.class);
+    final Method method = JavaBeanUtil.getMethod(EsriGdbXmlSerializer.class, methodName,
+      Object.class);
     classMethods.put(propertyName, method);
   }
 
-  private void addClassXsiTagName(final Class<?> objectClass,
-    final QName tagName) {
+  private void addClassXsiTagName(final Class<?> objectClass, final QName tagName) {
     if (tagName != null) {
       this.classXsiTagNameMap.put(objectClass, tagName);
     }
@@ -244,13 +229,11 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
 
   }
 
-  private void addTagNameChildTagName(final QName tagName,
-    final QName xsiTagName) {
+  private void addTagNameChildTagName(final QName tagName, final QName xsiTagName) {
     this.tagNameChildTagNameMap.put(tagName, xsiTagName);
   }
 
-  private void addTagNameListElementTagName(final QName tagName,
-    final QName xsiTagName) {
+  private void addTagNameListElementTagName(final QName tagName, final QName xsiTagName) {
     this.tagNameListElementTagNameMap.put(tagName, xsiTagName);
   }
 
@@ -272,8 +255,7 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     this.out.endTag();
   }
 
-  private Method getClassPropertyMethod(final Class<?> objectClass,
-    final QName propertyName) {
+  private Method getClassPropertyMethod(final Class<?> objectClass, final QName propertyName) {
     final Map<QName, Method> propertyMethodMap = this.classPropertyMethodMap.get(objectClass);
     if (propertyMethodMap == null) {
       return null;
@@ -300,8 +282,7 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
   }
 
   @SuppressWarnings("rawtypes")
-  private void serializeObjectProperties(final QName tagName,
-    final Object object) {
+  private void serializeObjectProperties(final QName tagName, final Object object) {
     if (object != null) {
       final Class<? extends Object> objectClass = object.getClass();
       final Collection<QName> propertyTagNames = this.classPropertyTagNamesMap.get(objectClass);
@@ -333,14 +314,12 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
       } else {
         for (final QName propertyTagName : propertyTagNames) {
           String propertyName = propertyTagName.getLocalPart();
-          if (propertyName.length() > 1
-              && Character.isLowerCase(propertyName.charAt(1))) {
+          if (propertyName.length() > 1 && Character.isLowerCase(propertyName.charAt(1))) {
             propertyName = CaseConverter.toLowerFirstChar(propertyName);
           }
           final Object value = JavaBeanUtil.getProperty(object, propertyName);
           if (this.writeNull || value != null) {
-            final Method method = getClassPropertyMethod(objectClass,
-              propertyTagName);
+            final Method method = getClassPropertyMethod(objectClass, propertyTagName);
             if (method == null) {
               if (!startTag(propertyTagName)) {
                 writeXsiTypeAttribute(propertyTagName, value);
@@ -376,8 +355,7 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     return hasXsi;
   }
 
-  private void writeXsiTypeAttribute(final QName tagName,
-    final Class<? extends Object> objectClass) {
+  private void writeXsiTypeAttribute(final QName tagName, final Class<? extends Object> objectClass) {
     QName xsiTagName = this.classXsiTagNameMap.get(objectClass);
     if (xsiTagName == null) {
       if (this.xsiTypeTypeNames.contains(tagName)) {

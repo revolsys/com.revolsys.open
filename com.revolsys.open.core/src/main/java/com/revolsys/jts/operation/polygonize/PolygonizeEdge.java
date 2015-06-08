@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -32,7 +31,6 @@
  *     www.vividsolutions.com
  */
 
-
 package com.revolsys.jts.operation.polygonize;
 
 import com.revolsys.jts.geom.LineString;
@@ -43,14 +41,14 @@ import com.revolsys.jts.planargraph.Edge;
  *
  * @version 1.7
  */
-class PolygonizeEdge
-extends Edge
-{
+class PolygonizeEdge extends Edge {
   private final LineString line;
 
-  public PolygonizeEdge(final LineString line)
-  {
+  public PolygonizeEdge(final LineString line) {
     this.line = line;
   }
-  public LineString getLine() { return this.line; }
+
+  public LineString getLine() {
+    return this.line;
+  }
 }

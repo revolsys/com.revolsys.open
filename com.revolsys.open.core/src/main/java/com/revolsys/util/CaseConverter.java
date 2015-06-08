@@ -8,17 +8,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class CaseConverter {
+  public static final String LOWER_CAMEL_CASE_RE = "";
+
   public static String captialize(final String text) {
-    return Character.toUpperCase(text.charAt(0))
-        + text.substring(1).toLowerCase();
+    return Character.toUpperCase(text.charAt(0)) + text.substring(1).toLowerCase();
   }
 
   public static List<String> splitWords(final String text) {
     if (text == null) {
       return Collections.emptyList();
     } else {
-      final Pattern p = Pattern.compile("([\\p{Lu}\\d']+)$" + "|"
-          + "([\\p{Lu}\\d']+)[ _]" + "|" + "([\\p{L}\\d'][^\\p{Lu} _]*)");
+      final Pattern p = Pattern.compile("([\\p{Lu}\\d']+)$" + "|" + "([\\p{Lu}\\d']+)[ _]" + "|"
+        + "([\\p{L}\\d'][^\\p{Lu} _]*)");
       final Matcher m = p.matcher(text);
       final List<String> words = new ArrayList<String>();
       while (m.find()) {
@@ -110,7 +111,7 @@ public final class CaseConverter {
   public static String toUpperCamelCase(final String text) {
     final List<String> words = splitWords(text);
     final StringBuilder result = new StringBuilder();
-    for (String word : words) {
+    for (final String word : words) {
       result.append(captialize(word));
     }
     return result.toString();
@@ -137,8 +138,6 @@ public final class CaseConverter {
     }
     return result.toString();
   }
-
-  public static final String LOWER_CAMEL_CASE_RE = "";
 
   private CaseConverter() {
   }

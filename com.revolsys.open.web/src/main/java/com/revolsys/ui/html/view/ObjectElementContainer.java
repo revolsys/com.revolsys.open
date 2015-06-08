@@ -24,9 +24,7 @@ public class ObjectElementContainer extends ElementContainer {
   private Object object;
 
   @Override
-  public Object getInitialValue(
-    final Field field,
-    final HttpServletRequest request) {
+  public Object getInitialValue(final Field field, final HttpServletRequest request) {
     if (this.object != null) {
       final String propertyName = field.getName();
       return JavaBeanUtil.getProperty(this.object, propertyName);

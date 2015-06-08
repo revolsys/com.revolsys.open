@@ -32,6 +32,110 @@ import com.revolsys.jts.geom.Polygon;
 
 public final class DataTypes {
 
+  public static final DataType OBJECT = new SimpleDataType("object", Object.class);
+
+  public static final DataType ANY_URI = new SimpleDataType("anyURI", URI.class);
+
+  public static final DataType BASE64_BINARY = new SimpleDataType("base64Binary", byte[].class);
+
+  public static final DataType BOOLEAN = new SimpleDataType("boolean", Boolean.class);
+
+  public static final DataType BYTE = new SimpleDataType("byte", Byte.class);
+
+  static final Map<String, DataType> CLASS_TYPE_MAP = new HashMap<String, DataType>();
+
+  public static final DataType COLLECTION = new CollectionDataType("Collection", Collection.class,
+    OBJECT);
+
+  public static final DataType DATA_OBJECT = new SimpleDataType("Record", Record.class);
+
+  public static final DataType DATE = new SimpleDataType("date", java.util.Date.class);
+
+  public static final DataType DATE_TIME = new SimpleDataType("dateTime", Timestamp.class);
+
+  public static final DataType DECIMAL = new SimpleDataType("decimal", BigDecimal.class);
+
+  public static final DataType DOUBLE = new SimpleDataType("double", Double.class);
+
+  public static final DataType DURATION = new SimpleDataType("duration", Date.class);
+
+  public static final DataType FLOAT = new SimpleDataType("float", Float.class);
+
+  public static final DataType GEOMETRY = new SimpleDataType("Geometry", Geometry.class);
+
+  public static final DataType GEOMETRY_COLLECTION = new SimpleDataType("GeometryCollection",
+    GeometryCollection.class);
+
+  public static final DataType INT = new SimpleDataType("int", Integer.class);
+
+  public static final DataType INTEGER = new SimpleDataType("integer", BigInteger.class);
+
+  public static final DataType LINE_STRING = new SimpleDataType("LineString", LineString.class);
+
+  public static final DataType LINEAR_RING = new SimpleDataType("LinearRing", LinearRing.class);
+
+  public static final DataType LIST = new CollectionDataType("List", List.class, OBJECT);
+
+  private static final Logger LOG = Logger.getLogger(DataTypes.class);
+
+  public static final DataType LONG = new SimpleDataType("long", Long.class);
+
+  public static final DataType MAP = new SimpleDataType("Map", Map.class);
+
+  public static final DataType MULTI_LINE_STRING = new SimpleDataType("MultiLineString",
+    MultiLineString.class);
+
+  public static final DataType MULTI_POINT = new SimpleDataType("MultiPoint", MultiPoint.class);
+
+  public static final DataType MULTI_POLYGON = new SimpleDataType("MultiPolygon",
+    MultiPolygon.class);
+
+  static final Map<String, DataType> NAME_TYPE_MAP = new HashMap<String, DataType>();
+
+  public static final DataType POINT = new SimpleDataType("Point", Point.class);
+
+  public static final DataType POLYGON = new SimpleDataType("Polygon", Polygon.class);
+
+  public static final DataType QNAME = new SimpleDataType("QName", QName.class);
+
+  public static final DataType RELATION = new CollectionDataType("Relation", Collection.class,
+    OBJECT);
+
+  public static final DataType SET = new CollectionDataType("Set", Set.class, OBJECT);
+
+  public static final DataType SHORT = new SimpleDataType("short", Short.class);
+
+  public static final DataType STRING = new SimpleDataType("string", String.class);
+
+  public static final DataType URL = new SimpleDataType("url", java.net.URL.class);
+
+  public static final DataType BLOB = new SimpleDataType("blob", Blob.class);
+
+  public static final DataType COLOR = new SimpleDataType("color", Color.class);
+
+  static {
+    final Field[] fields = DataTypes.class.getDeclaredFields();
+    for (final Field field : fields) {
+      if (Modifier.isStatic(field.getModifiers())) {
+        if (DataType.class.isAssignableFrom(field.getType())) {
+          try {
+            final DataType type = (DataType)field.get(null);
+            register(type);
+          } catch (final Throwable e) {
+            LOG.error("Error registering type " + field.getName(), e);
+          }
+        }
+      }
+    }
+    register(Boolean.TYPE, BOOLEAN);
+    register(Byte.TYPE, BYTE);
+    register(Short.TYPE, SHORT);
+    register(Integer.TYPE, INT);
+    register(Long.TYPE, LONG);
+    register(Float.TYPE, FLOAT);
+    register(Double.TYPE, DOUBLE);
+  }
+
   public static DataType getType(final Class<?> clazz) {
     final String className = clazz.getName();
     final DataType type = CLASS_TYPE_MAP.get(className);
@@ -85,129 +189,6 @@ public final class DataTypes {
   public static void register(final String name, final Class<?> javaClass) {
     final DataType type = new SimpleDataType(name, javaClass);
     register(type);
-  }
-
-  public static final DataType OBJECT = new SimpleDataType("object",
-    Object.class);
-
-  public static final DataType ANY_URI = new SimpleDataType("anyURI", URI.class);
-
-  public static final DataType BASE64_BINARY = new SimpleDataType(
-    "base64Binary", byte[].class);
-
-  public static final DataType BOOLEAN = new SimpleDataType("boolean",
-    Boolean.class);
-
-  public static final DataType BYTE = new SimpleDataType("byte", Byte.class);
-
-  static final Map<String, DataType> CLASS_TYPE_MAP = new HashMap<String, DataType>();
-
-  public static final DataType COLLECTION = new CollectionDataType(
-    "Collection", Collection.class, OBJECT);
-
-  public static final DataType DATA_OBJECT = new SimpleDataType("Record",
-    Record.class);
-
-  public static final DataType DATE = new SimpleDataType("date",
-    java.util.Date.class);
-
-  public static final DataType DATE_TIME = new SimpleDataType("dateTime",
-    Timestamp.class);
-
-  public static final DataType DECIMAL = new SimpleDataType("decimal",
-    BigDecimal.class);
-
-  public static final DataType DOUBLE = new SimpleDataType("double",
-    Double.class);
-
-  public static final DataType DURATION = new SimpleDataType("duration",
-    Date.class);
-
-  public static final DataType FLOAT = new SimpleDataType("float", Float.class);
-
-  public static final DataType GEOMETRY = new SimpleDataType("Geometry",
-    Geometry.class);
-
-  public static final DataType GEOMETRY_COLLECTION = new SimpleDataType(
-    "GeometryCollection", GeometryCollection.class);
-
-  public static final DataType INT = new SimpleDataType("int", Integer.class);
-
-  public static final DataType INTEGER = new SimpleDataType("integer",
-    BigInteger.class);
-
-  public static final DataType LINE_STRING = new SimpleDataType("LineString",
-    LineString.class);
-
-  public static final DataType LINEAR_RING = new SimpleDataType("LinearRing",
-    LinearRing.class);
-
-  public static final DataType LIST = new CollectionDataType("List",
-    List.class, OBJECT);
-
-  private static final Logger LOG = Logger.getLogger(DataTypes.class);
-
-  public static final DataType LONG = new SimpleDataType("long", Long.class);
-
-  public static final DataType MAP = new SimpleDataType("Map", Map.class);
-
-  public static final DataType MULTI_LINE_STRING = new SimpleDataType(
-    "MultiLineString", MultiLineString.class);
-
-  public static final DataType MULTI_POINT = new SimpleDataType("MultiPoint",
-    MultiPoint.class);
-
-  public static final DataType MULTI_POLYGON = new SimpleDataType(
-    "MultiPolygon", MultiPolygon.class);
-
-  static final Map<String, DataType> NAME_TYPE_MAP = new HashMap<String, DataType>();
-
-  public static final DataType POINT = new SimpleDataType("Point", Point.class);
-
-  public static final DataType POLYGON = new SimpleDataType("Polygon",
-    Polygon.class);
-
-  public static final DataType QNAME = new SimpleDataType("QName", QName.class);
-
-  public static final DataType RELATION = new CollectionDataType("Relation",
-    Collection.class, OBJECT);
-
-  public static final DataType SET = new CollectionDataType("Set", Set.class,
-    OBJECT);
-
-  public static final DataType SHORT = new SimpleDataType("short", Short.class);
-
-  public static final DataType STRING = new SimpleDataType("string",
-    String.class);
-
-  public static final DataType URL = new SimpleDataType("url",
-    java.net.URL.class);
-
-  public static final DataType BLOB = new SimpleDataType("blob", Blob.class);
-
-  public static final DataType COLOR = new SimpleDataType("color", Color.class);
-
-  static {
-    final Field[] fields = DataTypes.class.getDeclaredFields();
-    for (final Field field : fields) {
-      if (Modifier.isStatic(field.getModifiers())) {
-        if (DataType.class.isAssignableFrom(field.getType())) {
-          try {
-            final DataType type = (DataType)field.get(null);
-            register(type);
-          } catch (final Throwable e) {
-            LOG.error("Error registering type " + field.getName(), e);
-          }
-        }
-      }
-    }
-    register(Boolean.TYPE, BOOLEAN);
-    register(Byte.TYPE, BYTE);
-    register(Short.TYPE, SHORT);
-    register(Integer.TYPE, INT);
-    register(Long.TYPE, LONG);
-    register(Float.TYPE, FLOAT);
-    register(Double.TYPE, DOUBLE);
   }
 
   private DataTypes() {

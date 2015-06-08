@@ -9,8 +9,7 @@ public class StatisticsIterator implements Iterator<Record> {
 
   private Statistics statistics;
 
-  public StatisticsIterator(final Iterator<Record> iterator,
-    final Statistics statistics) {
+  public StatisticsIterator(final Iterator<Record> iterator, final Statistics statistics) {
     this.iterator = iterator;
     setStatistics(statistics);
   }

@@ -75,8 +75,8 @@ class TaggedLinesSimplifier {
       this.inputIndex.add((TaggedLineString)i.next());
     }
     for (final Iterator i = taggedLines.iterator(); i.hasNext();) {
-      final TaggedLineStringSimplifier tlss = new TaggedLineStringSimplifier(
-        this.inputIndex, this.outputIndex);
+      final TaggedLineStringSimplifier tlss = new TaggedLineStringSimplifier(this.inputIndex,
+        this.outputIndex);
       tlss.setDistanceTolerance(this.distanceTolerance);
       tlss.simplify((TaggedLineString)i.next());
     }

@@ -95,8 +95,7 @@ public class ActionConfig {
       } catch (final ClassNotFoundException cnfe) {
         throw new ActionInitException("Unable to find class: " + this.type, cnfe);
       } catch (final InstantiationException ie) {
-        throw new ActionInitException("Unable to instantiate class: " + this.type,
-          ie);
+        throw new ActionInitException("Unable to instantiate class: " + this.type, ie);
       } catch (final IllegalAccessException ie) {
         throw new ActionInitException("Unable to access class: " + this.type, ie);
       }

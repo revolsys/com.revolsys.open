@@ -73,7 +73,7 @@ public class Config implements Serializable {
     final String name = component.getName();
     if (this.components.containsKey(name)) {
       throw new IllegalArgumentException(new StringBuilder(
-          "Duplicate Component definition with name ").append(name).toString());
+        "Duplicate Component definition with name ").append(name).toString());
     }
     this.components.put(name, component);
   }
@@ -85,8 +85,8 @@ public class Config implements Serializable {
     addComponent(layout);
     final String name = layout.getName();
     if (this.layouts.containsKey(name)) {
-      throw new IllegalArgumentException(new StringBuilder(
-          "Duplicate Layout definition with name ").append(name).toString());
+      throw new IllegalArgumentException(
+        new StringBuilder("Duplicate Layout definition with name ").append(name).toString());
     }
     this.layouts.put(name, layout);
   }
@@ -94,8 +94,8 @@ public class Config implements Serializable {
   public void addMenu(final Menu menu) {
     final String name = menu.getName();
     if (this.menus.containsKey(name)) {
-      throw new IllegalArgumentException(new StringBuilder(
-          "Duplicate Menu definition with name ").append(name).toString());
+      throw new IllegalArgumentException(
+        new StringBuilder("Duplicate Menu definition with name ").append(name).toString());
     }
     this.menus.put(name, menu);
   }
@@ -150,7 +150,7 @@ public class Config implements Serializable {
     if (o instanceof Config) {
       final Config c = (Config)o;
       if (c.components.equals(this.components) && c.layouts.equals(this.layouts)
-          && c.pages.equals(this.pages) && c.menus.equals(this.menus)) {
+        && c.pages.equals(this.pages) && c.menus.equals(this.menus)) {
         return true;
       }
     }
@@ -169,9 +169,9 @@ public class Config implements Serializable {
     final Component component = (Component)this.components.get(name);
     if (component == null) {
       throw new IllegalArgumentException(new StringBuilder(
-          "There does not exist a Component definition with name '").append(name)
-          .append("'")
-          .toString());
+        "There does not exist a Component definition with name '").append(name)
+        .append("'")
+        .toString());
     }
     return component;
   }
@@ -184,9 +184,9 @@ public class Config implements Serializable {
     final Layout layout = (Layout)this.layouts.get(name);
     if (layout == null) {
       throw new IllegalArgumentException(new StringBuilder(
-          "There does not exist a Component definition with name '").append(name)
-          .append("'")
-          .toString());
+        "There does not exist a Component definition with name '").append(name)
+        .append("'")
+        .toString());
     }
     return layout;
   }
@@ -249,7 +249,7 @@ public class Config implements Serializable {
   @Override
   public int hashCode() {
     return this.components.hashCode() + (this.layouts.hashCode() << 2)
-        + (this.pages.hashCode() << 4) + (this.menus.hashCode() << 6);
+      + (this.pages.hashCode() << 4) + (this.menus.hashCode() << 6);
   }
 
   public void setBasePath(final String basePath) {

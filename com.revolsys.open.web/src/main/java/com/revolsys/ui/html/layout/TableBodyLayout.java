@@ -38,8 +38,7 @@ public class TableBodyLayout implements ElementContainerLayout {
     this(null, numColumns);
   }
 
-  public TableBodyLayout(final String cssClass, final int numColumns,
-    final String... cssClasses) {
+  public TableBodyLayout(final String cssClass, final int numColumns, final String... cssClasses) {
     this.cssClass = cssClass;
     this.numColumns = numColumns;
     for (final String colCss : cssClasses) {
@@ -57,9 +56,7 @@ public class TableBodyLayout implements ElementContainerLayout {
     }
   }
 
-  private void serializeTbody(
-    final XmlWriter out,
-    final ElementContainer container) {
+  private void serializeTbody(final XmlWriter out, final ElementContainer container) {
     out.startTag(HtmlUtil.TBODY);
     if (this.cssClass != null) {
       out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);

@@ -20,8 +20,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
    */
   private static final long serialVersionUID = 1L;
 
-  public static double[] ensureExtent(final double[] bounds,
-    final double minExtent) {
+  public static double[] ensureExtent(final double[] bounds, final double minExtent) {
     double minX = bounds[0];
     double maxX = bounds[2];
     double minY = bounds[1];
@@ -152,8 +151,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   public List<T> query(final BoundingBox boundingBox, final String methodName,
     final Object... parameters) {
-    final InvokeMethodFilter<T> filter = new InvokeMethodFilter<T>(methodName,
-        parameters);
+    final InvokeMethodFilter<T> filter = new InvokeMethodFilter<T>(methodName, parameters);
     return query(boundingBox, filter);
   }
 

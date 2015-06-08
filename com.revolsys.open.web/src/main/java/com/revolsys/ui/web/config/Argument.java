@@ -39,8 +39,8 @@ public class Argument {
   /** The initialization parameters for the argument. */
   private final HashMap parameters = new HashMap();
 
-  public Argument(final String name, final Class type,
-    final String defaultValue, final boolean required, final boolean inheritable) {
+  public Argument(final String name, final Class type, final String defaultValue,
+    final boolean required, final boolean inheritable) {
     this.name = name;
     this.type = type;
     this.defaultValue = defaultValue;
@@ -52,8 +52,7 @@ public class Argument {
           String.class
         });
       } catch (final NoSuchMethodException e) {
-        throw new IllegalArgumentException(
-          type.getName()
+        throw new IllegalArgumentException(type.getName()
           + " must have a constructor that takes a java.lang.String as an argument");
       }
     }

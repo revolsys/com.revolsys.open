@@ -12,14 +12,12 @@ public class OsnConverterRegistry {
   private GeometryFactory geometryFactory;
 
   public OsnConverterRegistry() {
-    final GeometryFactory geometryFactory = GeometryFactory.fixedNoSrid(
-      1.0, 1.0);
+    final GeometryFactory geometryFactory = GeometryFactory.fixedNoSrid(1.0, 1.0);
     init(geometryFactory);
   }
 
   public OsnConverterRegistry(final int srid) {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed(
-      srid, 1.0, 1.0);
+    final GeometryFactory geometryFactory = GeometryFactory.fixed(srid, 1.0, 1.0);
 
     init(geometryFactory);
   }
@@ -48,18 +46,12 @@ public class OsnConverterRegistry {
     addConverter("Date", new DateConverter());
     addConverter("SpatialObject", new SpatialObjectConverter(this));
     addConverter(SaifConstants.ARC, new ArcConverter(geometryFactory));
-    addConverter(SaifConstants.ORIENTED_ARC, new OrientedArcConverter(
-      geometryFactory, this));
-    addConverter(SaifConstants.ARC_DIRECTED, new ArcDirectedConverter(
-      geometryFactory));
-    addConverter(SaifConstants.CONTOUR, new ContourConverter(geometryFactory,
-      this));
+    addConverter(SaifConstants.ORIENTED_ARC, new OrientedArcConverter(geometryFactory, this));
+    addConverter(SaifConstants.ARC_DIRECTED, new ArcDirectedConverter(geometryFactory));
+    addConverter(SaifConstants.CONTOUR, new ContourConverter(geometryFactory, this));
     addConverter(SaifConstants.POINT, new PointConverter(geometryFactory));
-    addConverter(SaifConstants.ALIGNED_POINT, new AlignedPointConverter(
-      geometryFactory));
-    addConverter(SaifConstants.TEXT_LINE, new TextLineConverter(
-      geometryFactory, this));
-    addConverter(SaifConstants.TEXT_ON_CURVE, new TextOnCurveConverter(
-      geometryFactory, this));
+    addConverter(SaifConstants.ALIGNED_POINT, new AlignedPointConverter(geometryFactory));
+    addConverter(SaifConstants.TEXT_LINE, new TextLineConverter(geometryFactory, this));
+    addConverter(SaifConstants.TEXT_ON_CURVE, new TextOnCurveConverter(geometryFactory, this));
   }
 }

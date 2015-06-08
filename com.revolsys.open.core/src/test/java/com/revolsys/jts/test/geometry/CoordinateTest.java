@@ -10,8 +10,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 
 public class CoordinateTest extends TestCase {
-  public static void assertEquals(final Point point,
-    final double... coordinates) {
+  public static void assertEquals(final Point point, final double... coordinates) {
     for (int i = 0; i < coordinates.length; i++) {
       final double value = point.getCoordinate(i);
       final double expected = coordinates[i];
@@ -28,8 +27,8 @@ public class CoordinateTest extends TestCase {
     failNotEqual("Not Equal 3D Inverse", inverseEqual, point2, point1);
   }
 
-  public static void failNotEqual(final String message, final boolean equal,
-    final Object value1, final Object value2) {
+  public static void failNotEqual(final String message, final boolean equal, final Object value1,
+    final Object value2) {
     if (!equal) {
       failNotEquals(message, value1, value2);
     }

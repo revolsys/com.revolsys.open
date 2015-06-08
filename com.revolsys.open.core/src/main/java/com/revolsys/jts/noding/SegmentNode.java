@@ -46,19 +46,19 @@ public class SegmentNode implements Comparable {
   public final Point coord; // the point of intersection
 
   public final int segmentIndex; // the index of the containing line segment in
+
   // the parent edge
 
   private final int segmentOctant;
 
   private final boolean isInterior;
 
-  public SegmentNode(final NodedSegmentString segString,
-    final Point coord, final int segmentIndex,
+  public SegmentNode(final NodedSegmentString segString, final Point coord, final int segmentIndex,
     final int segmentOctant) {
     this.coord = new PointDouble(coord);
     this.segmentIndex = segmentIndex;
     this.segmentOctant = segmentOctant;
-    this.isInterior = !coord.equals(2,segString.getCoordinate(segmentIndex));
+    this.isInterior = !coord.equals(2, segString.getCoordinate(segmentIndex));
   }
 
   /**
@@ -77,7 +77,7 @@ public class SegmentNode implements Comparable {
       return 1;
     }
 
-    if (this.coord.equals(2,other.coord)) {
+    if (this.coord.equals(2, other.coord)) {
       return 0;
     }
 

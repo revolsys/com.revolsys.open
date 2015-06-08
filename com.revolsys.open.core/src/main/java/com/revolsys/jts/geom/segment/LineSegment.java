@@ -48,6 +48,7 @@ public interface LineSegment extends LineString {
    *
    * @return the distance from this segment to the given point
    */
+  @Override
   double distance(Point p);
 
   double distanceAlong(final double x, final double y);

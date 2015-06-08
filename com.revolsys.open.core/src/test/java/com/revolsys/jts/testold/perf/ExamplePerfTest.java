@@ -21,12 +21,12 @@ public class ExamplePerfTest extends PerformanceTestCase {
   }
 
   public void runExample1() {
-    //  System.out.println("Iter # " + this.iter++);
+    // System.out.println("Iter # " + this.iter++);
     // do test work here
   }
 
   public void runExample2() {
-    //  System.out.println("Iter # " + this.iter++);
+    // System.out.println("Iter # " + this.iter++);
     // do test work here
   }
 

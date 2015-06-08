@@ -12,23 +12,20 @@ import com.revolsys.jdbc.field.JdbcFieldDefinition;
 
 public class ArcSdeObjectIdJdbcFieldDefinition extends JdbcFieldDefinition {
   public static void replaceAttribute(final String schemaName,
-    final RecordDefinition recordDefinition, final Integer registrationId,
-    final String rowIdColumn) {
+    final RecordDefinition recordDefinition, final Integer registrationId, final String rowIdColumn) {
     final JdbcFieldDefinition objectIdAttribute = (JdbcFieldDefinition)recordDefinition.getField(rowIdColumn);
     if (objectIdAttribute != null
-        && !(objectIdAttribute instanceof ArcSdeObjectIdJdbcFieldDefinition)) {
+      && !(objectIdAttribute instanceof ArcSdeObjectIdJdbcFieldDefinition)) {
       final String name = objectIdAttribute.getName();
       final String description = objectIdAttribute.getDescription();
       final Map<String, Object> properties = objectIdAttribute.getProperties();
 
       final ArcSdeObjectIdJdbcFieldDefinition newObjectIdAttribute = new ArcSdeObjectIdJdbcFieldDefinition(
-        objectIdAttribute.getDbName(), name, description, properties,
-        schemaName, registrationId);
+        objectIdAttribute.getDbName(), name, description, properties, schemaName, registrationId);
       newObjectIdAttribute.setRecordDefinition(recordDefinition);
       final RecordDefinitionImpl recordDefinitionImpl = (RecordDefinitionImpl)recordDefinition;
       recordDefinitionImpl.replaceField(objectIdAttribute, newObjectIdAttribute);
-      if (recordDefinition.getIdFieldName() == null
-          && recordDefinition.getIdFieldNames().isEmpty()) {
+      if (recordDefinition.getIdFieldName() == null && recordDefinition.getIdFieldNames().isEmpty()) {
         recordDefinitionImpl.setIdFieldName(name);
       }
     }
@@ -41,8 +38,8 @@ public class ArcSdeObjectIdJdbcFieldDefinition extends JdbcFieldDefinition {
   private final String schemaName;
 
   public ArcSdeObjectIdJdbcFieldDefinition(final String dbName, final String name,
-    final String description, final Map<String, Object> properties,
-    final String schemaName, final long registrationId) {
+    final String description, final Map<String, Object> properties, final String schemaName,
+    final long registrationId) {
     super(dbName, name, DataTypes.INT, -1, 19, 0, true, description, properties);
     this.schemaName = schemaName;
     this.registrationId = registrationId;
@@ -53,8 +50,7 @@ public class ArcSdeObjectIdJdbcFieldDefinition extends JdbcFieldDefinition {
    * function.
    */
   @Override
-  public void addInsertStatementPlaceHolder(final StringBuilder sql,
-    final boolean generateKeys) {
+  public void addInsertStatementPlaceHolder(final StringBuilder sql, final boolean generateKeys) {
     sql.append(" sde.version_user_ddl.next_row_id('");
     sql.append(this.schemaName);
     sql.append("', ");
@@ -64,8 +60,8 @@ public class ArcSdeObjectIdJdbcFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public ArcSdeObjectIdJdbcFieldDefinition clone() {
-    return new ArcSdeObjectIdJdbcFieldDefinition(getDbName(), getName(),
-      getDescription(), getProperties(), this.schemaName, this.registrationId);
+    return new ArcSdeObjectIdJdbcFieldDefinition(getDbName(), getName(), getDescription(),
+      getProperties(), this.schemaName, this.registrationId);
   }
 
   /**

@@ -23,8 +23,7 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 import com.revolsys.parallel.channel.MultiInputSelector;
 
-public class RunnableChannelExecutor extends ThreadPoolExecutor implements
-Process, BeanNameAware {
+public class RunnableChannelExecutor extends ThreadPoolExecutor implements Process, BeanNameAware {
   private String beanName;
 
   private List<Channel<Runnable>> channels = new ArrayList<Channel<Runnable>>();
@@ -36,8 +35,7 @@ Process, BeanNameAware {
   private final AtomicInteger taskCount = new AtomicInteger();
 
   public RunnableChannelExecutor() {
-    super(0, 100, 60, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
-      new NamedThreadFactory());
+    super(0, 100, 60, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new NamedThreadFactory());
   }
 
   @Override

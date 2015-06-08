@@ -17,8 +17,7 @@ public class GeometryCollectionSegment extends AbstractSegment {
 
   private Segment segment;
 
-  public GeometryCollectionSegment(final Geometry geometry,
-    final int... segmentId) {
+  public GeometryCollectionSegment(final Geometry geometry, final int... segmentId) {
     super(geometry);
     setSegmentId(segmentId);
   }
@@ -87,8 +86,7 @@ public class GeometryCollectionSegment extends AbstractSegment {
         partIndex++;
         segment = null;
       }
-      while (segment == null
-          && partIndex < geometryCollection.getGeometryCount()) {
+      while (segment == null && partIndex < geometryCollection.getGeometryCount()) {
         if (partIndex >= 0) {
           final Geometry part = geometryCollection.getGeometry(partIndex);
           if (part != null) {
@@ -145,8 +143,7 @@ public class GeometryCollectionSegment extends AbstractSegment {
         this.partIndex++;
         this.segment = null;
       }
-      while (this.segment == null
-          && this.partIndex < geometryCollection.getGeometryCount()) {
+      while (this.segment == null && this.partIndex < geometryCollection.getGeometryCount()) {
         if (this.partIndex >= 0) {
           final Geometry part = geometryCollection.getGeometry(this.partIndex);
           if (part != null) {

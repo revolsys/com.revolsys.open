@@ -10,6 +10,7 @@ public class PointWithOrientation extends PointDouble {
    *
    */
   private static final long serialVersionUID = 1L;
+
   private final double orientation;
 
   public PointWithOrientation(final Point point, final double orientation) {

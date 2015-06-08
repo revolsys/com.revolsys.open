@@ -51,8 +51,7 @@ import com.revolsys.jts.index.strtree.STRtree;
  *
  * @version 1.7
  */
-public class MCIndexSegmentSetMutualIntersector implements
-SegmentSetMutualIntersector {
+public class MCIndexSegmentSetMutualIntersector implements SegmentSetMutualIntersector {
   public class SegmentOverlapAction extends MonotoneChainOverlapAction {
     private SegmentIntersector si = null;
 
@@ -61,8 +60,8 @@ SegmentSetMutualIntersector {
     }
 
     @Override
-    public void overlap(final MonotoneChain mc1, final int start1,
-      final MonotoneChain mc2, final int start2) {
+    public void overlap(final MonotoneChain mc1, final int start1, final MonotoneChain mc2,
+      final int start2) {
       final SegmentString ss1 = (SegmentString)mc1.getContext();
       final SegmentString ss2 = (SegmentString)mc2.getContext();
       this.si.processIntersections(ss1, start1, ss2, start2);
@@ -87,8 +86,7 @@ SegmentSetMutualIntersector {
   }
 
   private void addToIndex(final SegmentString segStr) {
-    final List segChains = MonotoneChainBuilder.getChains(segStr.getPoints(),
-      segStr);
+    final List segChains = MonotoneChainBuilder.getChains(segStr.getPoints(), segStr);
     for (final Iterator i = segChains.iterator(); i.hasNext();) {
       final MonotoneChain mc = (MonotoneChain)i.next();
       this.index.insert(mc.getEnvelope(), mc);
@@ -96,8 +94,7 @@ SegmentSetMutualIntersector {
   }
 
   private void addToMonoChains(final SegmentString segStr, final List monoChains) {
-    final List segChains = MonotoneChainBuilder.getChains(segStr.getPoints(),
-      segStr);
+    final List segChains = MonotoneChainBuilder.getChains(segStr.getPoints(), segStr);
     for (final Iterator i = segChains.iterator(); i.hasNext();) {
       final MonotoneChain mc = (MonotoneChain)i.next();
       monoChains.add(mc);
@@ -123,10 +120,8 @@ SegmentSetMutualIntersector {
     this.index.build();
   }
 
-  private void intersectChains(final List monoChains,
-    final SegmentIntersector segInt) {
-    final MonotoneChainOverlapAction overlapAction = new SegmentOverlapAction(
-      segInt);
+  private void intersectChains(final List monoChains, final SegmentIntersector segInt) {
+    final MonotoneChainOverlapAction overlapAction = new SegmentOverlapAction(segInt);
 
     for (final Iterator i = monoChains.iterator(); i.hasNext();) {
       final MonotoneChain queryChain = (MonotoneChain)i.next();
@@ -150,8 +145,7 @@ SegmentSetMutualIntersector {
    * @param the segment intersector to use
    */
   @Override
-  public void process(final Collection segStrings,
-    final SegmentIntersector segInt) {
+  public void process(final Collection segStrings, final SegmentIntersector segInt) {
     final List monoChains = new ArrayList();
     for (final Iterator i = segStrings.iterator(); i.hasNext();) {
       addToMonoChains((SegmentString)i.next(), monoChains);

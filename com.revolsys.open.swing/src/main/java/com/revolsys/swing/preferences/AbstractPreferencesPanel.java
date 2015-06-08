@@ -10,8 +10,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 
-public abstract class AbstractPreferencesPanel extends JPanel implements
-PreferencesPanel {
+public abstract class AbstractPreferencesPanel extends JPanel implements PreferencesPanel {
   private static final long serialVersionUID = 1L;
 
   private final String title;
@@ -22,8 +21,8 @@ PreferencesPanel {
     super(new BorderLayout());
     this.title = title;
     if (instructions != null) {
-      final JLabel instructionsLabel = new JLabel(
-        "<html><p style=\"color:#666666\">" + instructions + "</p></html>");
+      final JLabel instructionsLabel = new JLabel("<html><p style=\"color:#666666\">"
+        + instructions + "</p></html>");
       add(instructionsLabel, BorderLayout.NORTH);
     }
     add(this.fieldPanel, BorderLayout.CENTER);

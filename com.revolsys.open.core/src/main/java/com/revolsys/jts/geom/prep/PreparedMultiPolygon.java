@@ -89,8 +89,8 @@ public class PreparedMultiPolygon extends AbstractMultiPolygon {
       if (this.isRectangle) {
         return RectangleContains.contains(getMultiPolygon(), g);
       } else {
-        final PreparedPolygonContains contains = new PreparedPolygonContains(
-          this, getMultiPolygon());
+        final PreparedPolygonContains contains = new PreparedPolygonContains(this,
+          getMultiPolygon());
         return contains.contains(g);
       }
     } else {
@@ -118,8 +118,7 @@ public class PreparedMultiPolygon extends AbstractMultiPolygon {
        * If any segments intersect, result is false.
        */
       final List<NodedSegmentString> lineSegStr = SegmentStringUtil.extractSegmentStrings(geometry);
-      final boolean segsIntersect = getIntersectionFinder().intersects(
-        lineSegStr);
+      final boolean segsIntersect = getIntersectionFinder().intersects(lineSegStr);
       if (segsIntersect) {
         return false;
       }
@@ -232,8 +231,7 @@ public class PreparedMultiPolygon extends AbstractMultiPolygon {
   public boolean intersects(final Geometry geometry) {
     if (envelopesIntersect(geometry)) {
       if (this.isRectangle) {
-        return RectangleIntersects.intersects(getMultiPolygon().getPolygon(0),
-          geometry);
+        return RectangleIntersects.intersects(getMultiPolygon().getPolygon(0), geometry);
       } else {
         /**
          * Do point-in-poly tests first, since they are cheaper and may result in a
@@ -260,8 +258,7 @@ public class PreparedMultiPolygon extends AbstractMultiPolygon {
           // only request intersection finder if there are segments
           // (i.e. NOT for point inputs)
           if (lineSegStr.size() > 0) {
-            final boolean segsIntersect = getIntersectionFinder().intersects(
-              lineSegStr);
+            final boolean segsIntersect = getIntersectionFinder().intersects(lineSegStr);
             if (segsIntersect) {
               return true;
             }

@@ -56,6 +56,20 @@ import com.revolsys.jts.geom.impl.PointDouble;
  * @author Martin Davis
  */
 public class Vertex {
+  public static final int LEFT = 0;
+
+  public static final int RIGHT = 1;
+
+  public static final int BEYOND = 2;
+
+  public static final int BEHIND = 3;
+
+  public static final int BETWEEN = 4;
+
+  public static final int ORIGIN = 5;
+
+  public static final int DESTINATION = 6;
+
   /**
    * Computes the interpolated Z-value for a point p lying on the segment p0-p1
    *
@@ -64,8 +78,7 @@ public class Vertex {
    * @param p1
    * @return the interpolated Z value
    */
-  public static double interpolateZ(final Point p, final Point p0,
-    final Point p1) {
+  public static double interpolateZ(final Point p, final Point p0, final Point p1) {
     final double segLen = p0.distance(p1);
     final double ptLen = p.distance(p0);
     final double dz = p1.getZ() - p0.getZ();
@@ -86,8 +99,7 @@ public class Vertex {
    * @param v2 a vertex of a triangle containing the p
    * @return the interpolated Z-value (height) of the point
    */
-  public static double interpolateZ(final Point p, final Point v0,
-    final Point v1, final Point v2) {
+  public static double interpolateZ(final Point p, final Point v0, final Point v1, final Point v2) {
     final double x0 = v0.getX();
     final double y0 = v0.getY();
     final double a = v1.getX() - x0;
@@ -99,24 +111,9 @@ public class Vertex {
     final double dy = p.getY() - y0;
     final double t = (d * dx - b * dy) / det;
     final double u = (-c * dx + a * dy) / det;
-    final double z = v0.getZ() + t * (v1.getZ() - v0.getZ()) + u
-        * (v2.getZ() - v0.getZ());
+    final double z = v0.getZ() + t * (v1.getZ() - v0.getZ()) + u * (v2.getZ() - v0.getZ());
     return z;
   }
-
-  public static final int LEFT = 0;
-
-  public static final int RIGHT = 1;
-
-  public static final int BEYOND = 2;
-
-  public static final int BEHIND = 3;
-
-  public static final int BETWEEN = 4;
-
-  public static final int ORIGIN = 5;
-
-  public static final int DESTINATION = 6;
 
   private final Point p;
 
@@ -138,10 +135,8 @@ public class Vertex {
     // returns the perpendicular bisector of the line segment ab
     final double dx = b.getX() - a.getX();
     final double dy = b.getY() - a.getY();
-    final HCoordinate l1 = new HCoordinate(a.getX() + dx / 2.0, a.getY() + dy
-      / 2.0, 1.0);
-    final HCoordinate l2 = new HCoordinate(a.getX() - dy + dx / 2.0, a.getY()
-      + dx + dy / 2.0, 1.0);
+    final HCoordinate l1 = new HCoordinate(a.getX() + dx / 2.0, a.getY() + dy / 2.0, 1.0);
+    final HCoordinate l2 = new HCoordinate(a.getX() - dy + dx / 2.0, a.getY() + dx + dy / 2.0, 1.0);
     return new HCoordinate(l1, l2);
   }
 
@@ -237,8 +232,7 @@ public class Vertex {
   }
 
   private double distance(final Vertex v1, final Vertex v2) {
-    return Math.sqrt(Math.pow(v2.getX() - v1.getX(), 2.0)
-      + Math.pow(v2.getY() - v1.getY(), 2.0));
+    return Math.sqrt(Math.pow(v2.getX() - v1.getX(), 2.0) + Math.pow(v2.getY() - v1.getY(), 2.0));
   }
 
   /**
@@ -292,8 +286,7 @@ public class Vertex {
    * For this vertex enclosed in a triangle defined by three vertices v0, v1 and v2, interpolate
    * a z value from the surrounding vertices.
    */
-  public double interpolateZValue(final Vertex v0, final Vertex v1,
-    final Vertex v2) {
+  public double interpolateZValue(final Vertex v0, final Vertex v1, final Vertex v2) {
     final double x0 = v0.getX();
     final double y0 = v0.getY();
     final double a = v1.getX() - x0;
@@ -305,8 +298,7 @@ public class Vertex {
     final double dy = this.getY() - y0;
     final double t = (d * dx - b * dy) / det;
     final double u = (-c * dx + a * dy) / det;
-    final double z = v0.getZ() + t * (v1.getZ() - v0.getZ()) + u
-        * (v2.getZ() - v0.getZ());
+    final double z = v0.getZ() + t * (v1.getZ() - v0.getZ()) + u * (v2.getZ() - v0.getZ());
     return z;
   }
 
@@ -331,11 +323,11 @@ public class Vertex {
     // is equal to the signed area of the triangle
 
     return (b.p.getX() - this.p.getX()) * (c.p.getY() - this.p.getY())
-        - (b.p.getY() - this.p.getY()) * (c.p.getX() - this.p.getX()) > 0;
+      - (b.p.getY() - this.p.getY()) * (c.p.getX() - this.p.getX()) > 0;
 
-        // original rolled code
-        // boolean isCCW = triArea(this, b, c) > 0;
-        // return isCCW;
+    // original rolled code
+    // boolean isCCW = triArea(this, b, c) > 0;
+    // return isCCW;
 
   }
 

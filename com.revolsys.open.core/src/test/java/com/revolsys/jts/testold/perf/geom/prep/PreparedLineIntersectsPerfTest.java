@@ -41,11 +41,6 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.util.Stopwatch;
 
 public class PreparedLineIntersectsPerfTest {
-  public static void main(final String[] args) {
-    final PreparedLineIntersectsPerfTest test = new PreparedLineIntersectsPerfTest();
-    test.test();
-  }
-
   static final int MAX_ITER = 1;
 
   static final int NUM_AOI_PTS = 2000;
@@ -55,6 +50,11 @@ public class PreparedLineIntersectsPerfTest {
   static final int NUM_LINE_PTS = 10;
 
   static GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+
+  public static void main(final String[] args) {
+    final PreparedLineIntersectsPerfTest test = new PreparedLineIntersectsPerfTest();
+    test.test();
+  }
 
   TestDataBuilder builder = new TestDataBuilder();
 
@@ -97,8 +97,8 @@ public class PreparedLineIntersectsPerfTest {
     this.builder.setTestDimension(1);
     final Geometry target = this.builder.createSineStar(nPts).getBoundary();
 
-    final List lines = this.builder.createTestGeoms(target.getBoundingBox(),
-      NUM_LINES, 1.0, NUM_LINE_PTS);
+    final List lines = this.builder.createTestGeoms(target.getBoundingBox(), NUM_LINES, 1.0,
+      NUM_LINE_PTS);
 
     // System.out.println();
     // System.out.println("Running with " + nPts + " points");

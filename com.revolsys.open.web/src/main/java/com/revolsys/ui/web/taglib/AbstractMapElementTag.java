@@ -62,8 +62,8 @@ public abstract class AbstractMapElementTag extends SimpleTagSupport {
       final JspContext jspContext = getJspContext();
       final JspWriter out = jspContext.getOut();
       final ExpressionEvaluator expressionEvaluator = jspContext.getExpressionEvaluator();
-      final Object t = expressionEvaluator.evaluate(this.mapExpression,
-        Object.class, jspContext.getVariableResolver(), null);
+      final Object t = expressionEvaluator.evaluate(this.mapExpression, Object.class,
+        jspContext.getVariableResolver(), null);
       if (t instanceof Map) {
         final Map map = (Map)t;
         if (map != null) {
@@ -87,8 +87,7 @@ public abstract class AbstractMapElementTag extends SimpleTagSupport {
     return this.key;
   }
 
-  protected abstract void serializeObject(Writer out, Object object)
-      throws IOException;
+  protected abstract void serializeObject(Writer out, Object object) throws IOException;
 
   /**
    * @param key The key to set.

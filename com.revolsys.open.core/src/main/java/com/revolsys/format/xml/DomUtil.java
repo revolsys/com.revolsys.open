@@ -45,8 +45,7 @@ public class DomUtil {
     }
   }
 
-  public static List<Double> getDoubleList(final Document doc,
-    final String elemName) {
+  public static List<Double> getDoubleList(final Document doc, final String elemName) {
     final List<Double> values = new ArrayList<Double>();
     final NodeList nodes = doc.getElementsByTagName(elemName);
     for (int i = 0; i < nodes.getLength(); i++) {
@@ -61,8 +60,7 @@ public class DomUtil {
     return values;
   }
 
-  public static Element getFirstChildElement(final Node parent,
-    final String elemName) {
+  public static Element getFirstChildElement(final Node parent, final String elemName) {
     for (Node child = parent.getFirstChild(); child != null; child = child.getNextSibling()) {
       final short nodeType = child.getNodeType();
       if (nodeType == Node.ELEMENT_NODE) {

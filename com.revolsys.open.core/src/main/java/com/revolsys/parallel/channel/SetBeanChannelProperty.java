@@ -5,8 +5,7 @@ import org.springframework.beans.factory.BeanNameAware;
 import com.revolsys.parallel.channel.store.Buffer;
 import com.revolsys.spring.config.SetBeanProperties;
 
-public class SetBeanChannelProperty<T> extends SetBeanProperties implements
-BeanNameAware {
+public class SetBeanChannelProperty<T> extends SetBeanProperties implements BeanNameAware {
   private int bufferSize;
 
   private String inBeanName;

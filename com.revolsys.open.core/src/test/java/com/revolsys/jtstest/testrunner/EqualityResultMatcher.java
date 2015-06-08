@@ -52,13 +52,11 @@ public class EqualityResultMatcher implements ResultMatcher {
    * @return true if the actual and expected results are considered equal
    */
   @Override
-  public boolean isMatch(final Geometry geom, final String opName,
-    final Object[] args, final Result actualResult,
-    final Result expectedResult, final double tolerance) {
+  public boolean isMatch(final Geometry geom, final String opName, final Object[] args,
+    final Result actualResult, final Result expectedResult, final double tolerance) {
     final boolean equals = actualResult.equals(expectedResult, tolerance);
     if (!equals) {
-      Assert.failNotEquals(opName, expectedResult.getResult(),
-        actualResult.getResult());
+      Assert.failNotEquals(opName, expectedResult.getResult(), actualResult.getResult());
     }
     return equals;
   }

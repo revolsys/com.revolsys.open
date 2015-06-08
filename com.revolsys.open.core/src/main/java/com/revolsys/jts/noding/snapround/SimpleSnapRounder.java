@@ -81,8 +81,7 @@ public class SimpleSnapRounder implements Noder {
    * @param inputSegmentStrings a Collection of NodedSegmentStrings
    */
   @Override
-  public void computeNodes(
-    final Collection<NodedSegmentString> inputSegmentStrings) {
+  public void computeNodes(final Collection<NodedSegmentString> inputSegmentStrings) {
     this.nodedSegStrings = inputSegmentStrings;
     snapRound(inputSegmentStrings, this.li);
 
@@ -94,16 +93,14 @@ public class SimpleSnapRounder implements Noder {
    * Computes nodes introduced as a result of snapping segments to snap points (hot pixels)
    * @param li
    */
-  private void computeSnaps(final Collection segStrings,
-    final Collection snapPts) {
+  private void computeSnaps(final Collection segStrings, final Collection snapPts) {
     for (final Iterator i0 = segStrings.iterator(); i0.hasNext();) {
       final NodedSegmentString ss = (NodedSegmentString)i0.next();
       computeSnaps(ss, snapPts);
     }
   }
 
-  private void computeSnaps(final NodedSegmentString ss,
-    final Collection<Point> snapPts) {
+  private void computeSnaps(final NodedSegmentString ss, final Collection<Point> snapPts) {
     for (final Point snapPt : snapPts) {
       final HotPixel hotPixel = new HotPixel(snapPt, this.scaleFactor, this.li);
       for (int i = 0; i < ss.size() - 1; i++) {
@@ -163,10 +160,8 @@ public class SimpleSnapRounder implements Noder {
    *
    * @return a list of Point for the intersections
    */
-  private List findInteriorIntersections(final Collection segStrings,
-    final LineIntersector li) {
-    final InteriorIntersectionFinderAdder intFinderAdder = new InteriorIntersectionFinderAdder(
-      li);
+  private List findInteriorIntersections(final Collection segStrings, final LineIntersector li) {
+    final InteriorIntersectionFinderAdder intFinderAdder = new InteriorIntersectionFinderAdder(li);
     final SinglePassNoder noder = new MCIndexNoder();
     noder.setSegmentIntersector(intFinderAdder);
     noder.computeNodes(segStrings);

@@ -6,6 +6,7 @@ public class IdObjectNode<T> extends AbstractNode<T> {
    *
    */
   private static final long serialVersionUID = 1L;
+
   private Object[] ids;
 
   public IdObjectNode() {
@@ -16,14 +17,12 @@ public class IdObjectNode<T> extends AbstractNode<T> {
   }
 
   @Override
-  protected AbstractNode<T> createNode(final int level,
-    final double... newBounds) {
+  protected AbstractNode<T> createNode(final int level, final double... newBounds) {
     return new IdObjectNode<T>(level, newBounds);
   }
 
   @Override
-  protected void doAdd(final QuadTree<T> tree, final double[] bounds,
-    final T item) {
+  protected void doAdd(final QuadTree<T> tree, final double[] bounds, final T item) {
     final Object id = ((IdObjectQuadTree<T>)tree).getId(item);
     if (this.ids == null) {
       this.ids = new Object[] {

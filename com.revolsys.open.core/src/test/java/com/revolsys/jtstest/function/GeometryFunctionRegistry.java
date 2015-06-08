@@ -135,8 +135,7 @@ public class GeometryFunctionRegistry {
     this.sortedFunctions.put(func.getName(), func);
     this.categorizedFunctions.put(func.getCategory(), func.getName(), func);
     if (hasGeometryResult(func)) {
-      this.categorizedGeometryFunctions.put(func.getCategory(), func.getName(),
-        func);
+      this.categorizedGeometryFunctions.put(func.getCategory(), func.getName(), func);
     }
   }
 
@@ -147,9 +146,7 @@ public class GeometryFunctionRegistry {
    */
   public void add(final String geomFuncClassname) throws ClassNotFoundException {
     Class geomFuncClass = null;
-    geomFuncClass = this.getClass()
-        .getClassLoader()
-        .loadClass(geomFuncClassname);
+    geomFuncClass = this.getClass().getClassLoader().loadClass(geomFuncClassname);
     add(geomFuncClass);
   }
 
@@ -210,8 +207,7 @@ public class GeometryFunctionRegistry {
     for (final Iterator i = this.functions.iterator(); i.hasNext();) {
       final GeometryFunction func = (GeometryFunction)i.next();
       final String funcName = func.getName();
-      if (funcName.equalsIgnoreCase(name)
-          && func.getParameterTypes().length == argCount) {
+      if (funcName.equalsIgnoreCase(name) && func.getParameterTypes().length == argCount) {
         return func;
       }
     }

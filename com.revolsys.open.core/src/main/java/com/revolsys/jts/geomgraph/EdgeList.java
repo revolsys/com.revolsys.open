@@ -63,8 +63,7 @@ public class EdgeList implements Iterable<Edge> {
    */
   public void add(final Edge edge) {
     this.edges.add(edge);
-    final OrientedCoordinateArray oca = new OrientedCoordinateArray(
-      edge.getPoints());
+    final OrientedCoordinateArray oca = new OrientedCoordinateArray(edge.getPoints());
     this.ocaMap.put(oca, edge);
   }
 
@@ -97,8 +96,7 @@ public class EdgeList implements Iterable<Edge> {
    *          null otherwise
    */
   public Edge findEqualEdge(final Edge e) {
-    final OrientedCoordinateArray oca = new OrientedCoordinateArray(
-      e.getPoints());
+    final OrientedCoordinateArray oca = new OrientedCoordinateArray(e.getPoints());
     // will return null if no edge matches
     final Edge matchEdge = this.ocaMap.get(oca);
     return matchEdge;

@@ -48,9 +48,8 @@ public class NullResultMatcher implements ResultMatcher {
    * @return true always
    */
   @Override
-  public boolean isMatch(final Geometry geom, final String opName,
-    final Object[] args, final Result actualResult,
-    final Result expectedResult, final double tolerance) {
+  public boolean isMatch(final Geometry geom, final String opName, final Object[] args,
+    final Result actualResult, final Result expectedResult, final double tolerance) {
     return true;
   }
 

@@ -73,6 +73,10 @@ import com.revolsys.jts.geom.impl.LineStringDouble;
  *
  */
 public class BufferInputLineSimplifier {
+  private static final int DELETE = 1;
+
+  private static final int NUM_PTS_TO_CHECK = 10;
+
   /**
    * Simplify the input coordinate list.
    * If the distance tolerance is positive,
@@ -84,16 +88,10 @@ public class BufferInputLineSimplifier {
    * @param distanceTol simplification distance tolerance to use
    * @return the simplified coordinate list
    */
-  public static LineString simplify(final LineString inputLine,
-    final double distanceTol) {
-    final BufferInputLineSimplifier simp = new BufferInputLineSimplifier(
-      inputLine);
+  public static LineString simplify(final LineString inputLine, final double distanceTol) {
+    final BufferInputLineSimplifier simp = new BufferInputLineSimplifier(inputLine);
     return simp.simplify(distanceTol);
   }
-
-  private static final int DELETE = 1;
-
-  private static final int NUM_PTS_TO_CHECK = 10;
 
   private final LineString inputLine;
 
@@ -112,8 +110,7 @@ public class BufferInputLineSimplifier {
   private LineString collapseLine() {
     final int axisCount = this.inputLine.getAxisCount();
     final int vertexCount = this.inputLine.getVertexCount();
-    final double[] coordinates = new double[(vertexCount - this.deleteCount)
-                                            * axisCount];
+    final double[] coordinates = new double[(vertexCount - this.deleteCount) * axisCount];
     int j = 0;
     for (int i = 0; i < vertexCount; i++) {
       if (this.isDeleted[i] != DELETE) {
@@ -176,15 +173,13 @@ public class BufferInputLineSimplifier {
     return next;
   }
 
-  private boolean isConcave(final Point p0, final Point p1,
-    final Point p2) {
+  private boolean isConcave(final Point p0, final Point p1, final Point p2) {
     final int orientation = CGAlgorithmsDD.orientationIndex(p0, p1, p2);
     final boolean isConcave = orientation == this.angleOrientation;
     return isConcave;
   }
 
-  private boolean isDeletable(final int i0, final int i1, final int i2,
-    final double distanceTol) {
+  private boolean isDeletable(final int i0, final int i1, final int i2, final double distanceTol) {
     final Point p0 = this.inputLine.getPoint(i0);
     final Point p1 = this.inputLine.getPoint(i1);
     final Point p2 = this.inputLine.getPoint(i2);
@@ -202,8 +197,7 @@ public class BufferInputLineSimplifier {
     return isShallowSampled(p0, p1, i0, i2, distanceTol);
   }
 
-  private boolean isShallow(final Point p0, final Point p1,
-    final Point p2, final double distanceTol) {
+  private boolean isShallow(final Point p0, final Point p1, final Point p2, final double distanceTol) {
     final double dist = LineSegmentUtil.distanceLinePoint(p0, p2, p1);
     return dist < distanceTol;
   }
@@ -220,8 +214,8 @@ public class BufferInputLineSimplifier {
    * @param distanceTol distance tolerance
    * @return
    */
-  private boolean isShallowSampled(final Point p0, final Point p2,
-    final int i0, final int i2, final double distanceTol) {
+  private boolean isShallowSampled(final Point p0, final Point p2, final int i0, final int i2,
+    final double distanceTol) {
     // check every n'th point to see if it is within tolerance
     int inc = (i2 - i0) / NUM_PTS_TO_CHECK;
     if (inc <= 0) {

@@ -88,6 +88,10 @@ import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 
 public class SwingUtil {
+  public static final Font FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 11);
+
+  public static final Font BOLD_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 11);
+
   public static void addAction(final JComponent component, final KeyStroke keyStroke,
     final String actionKey, final Object object, final String methodName,
     final Object... parameters) {
@@ -898,9 +902,5 @@ public class SwingUtil {
 
     JOptionPane.showMessageDialog(window, scrollPane, title, JOptionPane.ERROR_MESSAGE);
   }
-
-  public static final Font FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 11);
-
-  public static final Font BOLD_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 11);
 
 }

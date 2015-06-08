@@ -9,31 +9,6 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 
 public class WebColors {
-  public static int colorToRGB(final int alpha, final int red, final int green,
-    final int blue) {
-    int rgba = alpha;
-    rgba <<= 8;
-    rgba += red;
-    rgba <<= 8;
-    rgba += green;
-    rgba <<= 8;
-    rgba += blue;
-    return rgba;
-  }
-
-  public static String getName(final Color color) {
-    final Color newColor = new Color(color.getRed(), color.getGreen(),
-      color.getBlue());
-    return COLOR_NAMES.get(newColor);
-  }
-
-  public static Color setAlpha(final Color color, final int alpha) {
-    final int red = color.getRed();
-    final int green = color.getGreen();
-    final int blue = color.getBlue();
-    return new Color(red, green, blue, alpha);
-  }
-
   private static final Map<Color, String> COLOR_NAMES = new LinkedHashMap<Color, String>();
 
   public static final Color AliceBlue = new Color(240, 248, 255);
@@ -328,12 +303,35 @@ public class WebColors {
             final Color color = (Color)field.get(null);
             COLOR_NAMES.put(color, field.getName());
           } catch (final Throwable e) {
-            LoggerFactory.getLogger(WebColors.class).error(
-              "Unable to get field value: " + field, e);
+            LoggerFactory.getLogger(WebColors.class)
+              .error("Unable to get field value: " + field, e);
           }
         }
       }
     }
+  }
+
+  public static int colorToRGB(final int alpha, final int red, final int green, final int blue) {
+    int rgba = alpha;
+    rgba <<= 8;
+    rgba += red;
+    rgba <<= 8;
+    rgba += green;
+    rgba <<= 8;
+    rgba += blue;
+    return rgba;
+  }
+
+  public static String getName(final Color color) {
+    final Color newColor = new Color(color.getRed(), color.getGreen(), color.getBlue());
+    return COLOR_NAMES.get(newColor);
+  }
+
+  public static Color setAlpha(final Color color, final int alpha) {
+    final int red = color.getRed();
+    final int green = color.getGreen();
+    final int blue = color.getBlue();
+    return new Color(red, green, blue, alpha);
   }
 
 }

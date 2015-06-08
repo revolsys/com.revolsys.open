@@ -12,13 +12,12 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.visitor.CreateListVisitor;
 
-public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements
-Visitor<Node<T>> {
-  public static <T> List<Node<T>> getNodes(final Graph<T> graph,
-    final Point point, final double maxDistance) {
+public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements Visitor<Node<T>> {
+  public static <T> List<Node<T>> getNodes(final Graph<T> graph, final Point point,
+    final double maxDistance) {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
-    final Visitor<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<T>(
-        point, maxDistance, results);
+    final Visitor<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<T>(point,
+      maxDistance, results);
     BoundingBox envelope = new BoundingBoxDoubleGf(point);
     envelope = envelope.expand(maxDistance);
     final IdObjectIndex<Node<T>> nodeIndex = graph.getNodeIndex();
@@ -34,9 +33,8 @@ Visitor<Node<T>> {
 
   private final double maxDistance;
 
-  public NodeLessThanDistanceOfCoordinatesVisitor(
-    final Point coordinates, final double maxDistance,
-    final Visitor<Node<T>> matchVisitor) {
+  public NodeLessThanDistanceOfCoordinatesVisitor(final Point coordinates,
+    final double maxDistance, final Visitor<Node<T>> matchVisitor) {
     this.coordinates = coordinates;
     this.maxDistance = maxDistance;
     this.matchVisitor = matchVisitor;

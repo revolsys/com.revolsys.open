@@ -24,6 +24,22 @@ import com.revolsys.util.Property;
 
 public class ShapeMarker extends AbstractMarker {
 
+  private static final Map<String, Shape> SHAPES = new TreeMap<String, Shape>();
+
+  static {
+    SHAPES.put("square", square(1));
+    SHAPES.put("rectangle", square(1));
+    SHAPES.put("circle", circle(1));
+    SHAPES.put("ellipse", circle(1));
+    SHAPES.put("triangle", triangle(1));
+    SHAPES.put("star", star(1));
+    SHAPES.put("cross", cross(1));
+    SHAPES.put("x", x(1));
+    SHAPES.put("arrow", arrow(1));
+    SHAPES.put("solidArrow", solidArrow(1));
+    SHAPES.put("diamond", diamond(1));
+  }
+
   /**
    * Get an arrow shape pointing right for the size of the graphic.
    *
@@ -144,22 +160,6 @@ public class ShapeMarker extends AbstractMarker {
     return path;
   }
 
-  private static final Map<String, Shape> SHAPES = new TreeMap<String, Shape>();
-
-  static {
-    SHAPES.put("square", square(1));
-    SHAPES.put("rectangle", square(1));
-    SHAPES.put("circle", circle(1));
-    SHAPES.put("ellipse", circle(1));
-    SHAPES.put("triangle", triangle(1));
-    SHAPES.put("star", star(1));
-    SHAPES.put("cross", cross(1));
-    SHAPES.put("x", x(1));
-    SHAPES.put("arrow", arrow(1));
-    SHAPES.put("solidArrow", solidArrow(1));
-    SHAPES.put("diamond", diamond(1));
-  }
-
   private String name;
 
   private Shape shape;
@@ -176,8 +176,7 @@ public class ShapeMarker extends AbstractMarker {
       } else {
         scale = 1 / height;
       }
-      final AffineTransform transform = AffineTransform.getTranslateInstance(
-        -bounds.x, -bounds.y);
+      final AffineTransform transform = AffineTransform.getTranslateInstance(-bounds.x, -bounds.y);
       transform.concatenate(AffineTransform.getScaleInstance(scale, scale));
       this.shape = new GeneralPath(shape).createTransformedShape(transform);
     }
@@ -204,11 +203,9 @@ public class ShapeMarker extends AbstractMarker {
   @Override
   public Icon getIcon(final MarkerStyle style) {
     final Shape shape = getShape();
-    final AffineTransform shapeTransform = AffineTransform.getScaleInstance(16,
-      16);
+    final AffineTransform shapeTransform = AffineTransform.getScaleInstance(16, 16);
 
-    final BufferedImage image = new BufferedImage(16, 16,
-      BufferedImage.TYPE_INT_ARGB);
+    final BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
     final Graphics2D graphics = image.createGraphics();
     final Shape newShape = new GeneralPath(shape).createTransformedShape(shapeTransform);
     if (style.setMarkerFillStyle(null, graphics)) {
@@ -239,9 +236,8 @@ public class ShapeMarker extends AbstractMarker {
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Graphics2D graphics,
-    final MarkerStyle style, final double modelX, final double modelY,
-    double orientation) {
+  public void render(final Viewport2D viewport, final Graphics2D graphics, final MarkerStyle style,
+    final double modelX, final double modelY, double orientation) {
 
     final AffineTransform savedTransform = graphics.getTransform();
     try {
@@ -254,11 +250,9 @@ public class ShapeMarker extends AbstractMarker {
         orientation = 0;
       }
 
-      translateMarker(viewport, graphics, style, modelX, modelY, mapWidth,
-        mapHeight, orientation);
+      translateMarker(viewport, graphics, style, modelX, modelY, mapWidth, mapHeight, orientation);
 
-      final AffineTransform shapeTransform = AffineTransform.getScaleInstance(
-        mapWidth, mapHeight);
+      final AffineTransform shapeTransform = AffineTransform.getScaleInstance(mapWidth, mapHeight);
       final Shape newShape = new GeneralPath(this.getShape()).createTransformedShape(shapeTransform);
       if (style.setMarkerFillStyle(viewport, graphics)) {
         graphics.fill(newShape);

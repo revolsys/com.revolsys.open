@@ -29,8 +29,7 @@ public class AttributeValueNotNullFilter implements Filter<Record> {
    */
   @Override
   public boolean accept(final Record object) {
-    final Object propertyValue = Records.getFieldByPath(object,
-      this.fieldName);
+    final Object propertyValue = Records.getFieldByPath(object, this.fieldName);
     return propertyValue != null;
   }
 

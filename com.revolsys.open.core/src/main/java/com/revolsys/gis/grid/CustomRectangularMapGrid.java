@@ -50,8 +50,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     return this.geometryFactory;
   }
 
-  public double getGridValue(final double origin, final double gridSize,
-    final double value) {
+  public double getGridValue(final double origin, final double gridSize, final double value) {
     final int xIndex = (int)Math.floor((value - origin) / gridSize);
     final double minX = origin + xIndex * gridSize;
     return minX;

@@ -73,8 +73,7 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
           out.startTag(HtmlUtil.TBODY);
           boolean odd = true;
           boolean first = true;
-          for (final Iterator<Entry<Object, Object>> entries = map.entrySet()
-              .iterator(); entries.hasNext();) {
+          for (final Iterator<Entry<Object, Object>> entries = map.entrySet().iterator(); entries.hasNext();) {
             final Entry<Object, Object> entry = entries.next();
             out.startTag(HtmlUtil.TR);
             String cssClass = "";

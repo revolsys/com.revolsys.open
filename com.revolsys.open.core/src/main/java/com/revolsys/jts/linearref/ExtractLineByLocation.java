@@ -55,8 +55,8 @@ class ExtractLineByLocation {
    * @param end the end location
    * @return the extracted subline
    */
-  public static Geometry extract(final Geometry line,
-    final LinearLocation start, final LinearLocation end) {
+  public static Geometry extract(final Geometry line, final LinearLocation start,
+    final LinearLocation end) {
     final ExtractLineByLocation ls = new ExtractLineByLocation(line);
     return ls.extract(start, end);
   }
@@ -74,10 +74,8 @@ class ExtractLineByLocation {
    * @param end
    * @return a linear geometry
    */
-  private Geometry computeLinear(final LinearLocation start,
-    final LinearLocation end) {
-    final LinearGeometryBuilder builder = new LinearGeometryBuilder(
-      this.line.getGeometryFactory());
+  private Geometry computeLinear(final LinearLocation start, final LinearLocation end) {
+    final LinearGeometryBuilder builder = new LinearGeometryBuilder(this.line.getGeometryFactory());
     builder.setFixInvalidLines(true);
 
     if (!start.isVertex()) {
@@ -85,8 +83,7 @@ class ExtractLineByLocation {
     }
 
     for (final LinearIterator it = new LinearIterator(this.line, start); it.hasNext(); it.next()) {
-      if (end.compareLocationValues(it.getComponentIndex(),
-        it.getVertexIndex(), 0.0) < 0) {
+      if (end.compareLocationValues(it.getComponentIndex(), it.getVertexIndex(), 0.0) < 0) {
         break;
       }
 

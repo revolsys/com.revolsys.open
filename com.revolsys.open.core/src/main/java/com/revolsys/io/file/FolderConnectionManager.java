@@ -14,8 +14,16 @@ import com.revolsys.io.connection.AbstractConnectionRegistryManager;
 import com.revolsys.util.OS;
 
 public class FolderConnectionManager extends
-AbstractConnectionRegistryManager<FolderConnectionRegistry, FolderConnection>
-implements URLStreamHandlerFactory {
+  AbstractConnectionRegistryManager<FolderConnectionRegistry, FolderConnection> implements
+  URLStreamHandlerFactory {
+
+  private static final FolderConnectionManager INSTANCE;
+
+  static {
+    INSTANCE = new FolderConnectionManager();
+    final File directory = OS.getApplicationDataDirectory("com.revolsys.gis/Folder Connections");
+    INSTANCE.addConnectionRegistry("User", new FileSystemResource(directory));
+  }
 
   public static FolderConnectionManager get() {
     return INSTANCE;
@@ -39,30 +47,20 @@ implements URLStreamHandlerFactory {
     return null;
   }
 
-  private static final FolderConnectionManager INSTANCE;
-
-  static {
-    INSTANCE = new FolderConnectionManager();
-    final File directory = OS.getApplicationDataDirectory("com.revolsys.gis/Folder Connections");
-    INSTANCE.addConnectionRegistry("User", new FileSystemResource(directory));
-  }
-
   public FolderConnectionManager() {
     super("Folder Connections");
   }
 
-  public synchronized FolderConnectionRegistry addConnectionRegistry(
-    final String name) {
-    final FolderConnectionRegistry registry = new FolderConnectionRegistry(
-      this, name);
+  public synchronized FolderConnectionRegistry addConnectionRegistry(final String name) {
+    final FolderConnectionRegistry registry = new FolderConnectionRegistry(this, name);
     addConnectionRegistry(registry);
     return registry;
   }
 
-  public synchronized FolderConnectionRegistry addConnectionRegistry(
-    final String name, final Resource resource) {
-    final FolderConnectionRegistry registry = new FolderConnectionRegistry(
-      this, name, resource, false);
+  public synchronized FolderConnectionRegistry addConnectionRegistry(final String name,
+    final Resource resource) {
+    final FolderConnectionRegistry registry = new FolderConnectionRegistry(this, name, resource,
+      false);
     addConnectionRegistry(registry);
     return registry;
   }

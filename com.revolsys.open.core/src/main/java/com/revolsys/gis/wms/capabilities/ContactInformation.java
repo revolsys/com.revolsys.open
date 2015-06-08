@@ -41,18 +41,15 @@ public class ContactInformation {
     this.contactAddress = contactAddress;
   }
 
-  public void setContactElectronicMailAddress(
-    final String contactElectronicMailAddress) {
+  public void setContactElectronicMailAddress(final String contactElectronicMailAddress) {
     this.contactElectronicMailAddress = contactElectronicMailAddress;
   }
 
-  public void setContactFacsimileTelephone(
-    final String contactFacsimileTelephone) {
+  public void setContactFacsimileTelephone(final String contactFacsimileTelephone) {
     this.contactFacsimileTelephone = contactFacsimileTelephone;
   }
 
-  public void setContactPersonPrimary(
-    final ContactPersonPrimary contactPersonPrimary) {
+  public void setContactPersonPrimary(final ContactPersonPrimary contactPersonPrimary) {
     this.contactPersonPrimary = contactPersonPrimary;
   }
 

@@ -16,8 +16,7 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.file.FileTreeNode;
 
-public class BaseTreeCellRenderer extends DefaultTreeCellRenderer implements
-ImageObserver {
+public class BaseTreeCellRenderer extends DefaultTreeCellRenderer implements ImageObserver {
   private static final ImageIcon ICON_MISSING = Icons.getIcon("error");
 
   private static final long serialVersionUID = 1L;
@@ -40,11 +39,11 @@ ImageObserver {
   }
 
   @Override
-  public Component getTreeCellRendererComponent(final JTree tree,
-    final Object value, final boolean selected, final boolean expanded,
-    final boolean leaf, final int row, final boolean hasFocus) {
-    final Component renderer = super.getTreeCellRendererComponent(tree, value,
-      selected, expanded, leaf, row, hasFocus);
+  public Component getTreeCellRendererComponent(final JTree tree, final Object value,
+    final boolean selected, final boolean expanded, final boolean leaf, final int row,
+    final boolean hasFocus) {
+    final Component renderer = super.getTreeCellRendererComponent(tree, value, selected, expanded,
+      leaf, row, hasFocus);
 
     if (value instanceof BaseTreeNode) {
       final BaseTreeNode node = (BaseTreeNode)value;
@@ -53,8 +52,8 @@ ImageObserver {
         if (node.isUserObjectInitialized()) {
 
           if (node.isExists()) {
-            return node.getTreeCellRendererComponent(renderer, tree, value,
-              selected, expanded, leaf, row, hasFocus);
+            return node.getTreeCellRendererComponent(renderer, tree, value, selected, expanded,
+              leaf, row, hasFocus);
           } else {
             setIcon(ICON_MISSING);
             setForeground(WebColors.Red);

@@ -152,8 +152,7 @@ public class InteriorIntersectionFinder implements SegmentIntersector {
      *
      */
     if (this.isCheckEndSegmentsOnly) {
-      final boolean isEndSegPresent = isEndSegment(e0, segIndex0)
-          || isEndSegment(e1, segIndex1);
+      final boolean isEndSegPresent = isEndSegment(e0, segIndex0) || isEndSegment(e1, segIndex1);
       if (!isEndSegPresent) {
         return;
       }

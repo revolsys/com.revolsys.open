@@ -60,11 +60,10 @@ public class GuiUtil {
    */
   public static void center(final Component componentToMove, final Component componentToCenterOn) {
     final Dimension componentToCenterOnSize = componentToCenterOn.getSize();
-    componentToMove.setLocation(
-      componentToCenterOn.getX()
+    componentToMove.setLocation(componentToCenterOn.getX()
       + (componentToCenterOnSize.width - componentToMove.getWidth()) / 2,
-      componentToCenterOn.getY()
-      + (componentToCenterOnSize.height - componentToMove.getHeight()) / 2);
+      componentToCenterOn.getY() + (componentToCenterOnSize.height - componentToMove.getHeight())
+        / 2);
   }
 
   /**
@@ -72,8 +71,7 @@ public class GuiUtil {
    */
   public static void centerOnScreen(final Component componentToMove) {
     final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    componentToMove.setLocation(
-      (screenSize.width - componentToMove.getWidth()) / 2,
+    componentToMove.setLocation((screenSize.width - componentToMove.getWidth()) / 2,
       (screenSize.height - componentToMove.getHeight()) / 2);
   }
 
@@ -84,12 +82,12 @@ public class GuiUtil {
     center(componentToMove, SwingUtilities.windowForComponent(componentToMove));
   }
 
-  //Save the contents of the cell that the user is in the middle of editing
-  //From Question of the Week No. 23
-  //http://developer.java.sun.com/developer/qow/archive/23/
+  // Save the contents of the cell that the user is in the middle of editing
+  // From Question of the Week No. 23
+  // http://developer.java.sun.com/developer/qow/archive/23/
   public static void commitChanges(final JTable table) {
     if (table.isEditing()) {
-      final String text = ((JTextComponent) table.getEditorComponent()).getText();
+      final String text = ((JTextComponent)table.getEditorComponent()).getText();
       table.setValueAt(text, table.getEditingRow(), table.getEditingColumn());
       table.getCellEditor().cancelCellEditing();
     }
@@ -120,10 +118,10 @@ public class GuiUtil {
     for (int i = 0; i < container.getComponentCount(); i++) {
       final Component component = container.getComponent(i);
       if (component instanceof JComponent) {
-        formatTooltip((JComponent) component);
+        formatTooltip((JComponent)component);
       }
       if (component instanceof Container) {
-        formatTooltips((Container) component);
+        formatTooltips((Container)component);
       }
     }
   }
@@ -136,12 +134,12 @@ public class GuiUtil {
   public static File[] getSelectedFiles(final JFileChooser chooser) {
     // Although JFileChooser won't give us this information,
     // we need it...
-    Container c1 = (Container) chooser.getComponent(3);
+    Container c1 = (Container)chooser.getComponent(3);
     JList list = null;
     while (c1 != null) {
-      final Container c = (Container) c1.getComponent(0);
+      final Container c = (Container)c1.getComponent(0);
       if (c instanceof JList) {
-        list = (JList) c;
+        list = (JList)c;
         break;
       }
       c1 = c;
@@ -150,7 +148,7 @@ public class GuiUtil {
     final File[] files = new File[entries.length];
     for (int k = 0; k < entries.length; k++) {
       if (entries[k] instanceof File) {
-        files[k] = (File) entries[k];
+        files[k] = (File)entries[k];
       }
     }
     return files;
@@ -160,8 +158,8 @@ public class GuiUtil {
    * Runs r in the event dispatch thread, which may be the current thread.
    * Waits for r to finish before returning.
    */
-  public static void invokeAndWait(final Runnable r)
-      throws InterruptedException, java.lang.reflect.InvocationTargetException {
+  public static void invokeAndWait(final Runnable r) throws InterruptedException,
+    java.lang.reflect.InvocationTargetException {
     if (SwingUtilities.isEventDispatchThread()) {
       r.run();
     } else {
@@ -173,7 +171,7 @@ public class GuiUtil {
    * Workaround for bug: can't re-show internal frames. See bug parade 4138031.
    */
   public static void show(final JInternalFrame internalFrame, final JDesktopPane desktopPane)
-      throws PropertyVetoException {
+    throws PropertyVetoException {
     if (!desktopPane.isAncestorOf(internalFrame)) {
       desktopPane.add(internalFrame);
     }

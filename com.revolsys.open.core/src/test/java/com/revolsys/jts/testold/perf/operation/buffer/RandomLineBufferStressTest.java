@@ -56,8 +56,7 @@ public class RandomLineBufferStressTest {
 
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.floating(0,
-    2);
+  private final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
 
   WKTReader rdr = new WKTReader(this.geometryFactory);
 
@@ -88,8 +87,8 @@ public class RandomLineBufferStressTest {
   void run(final int numPts) throws Exception {
     final double lineScale = 1.0;
 
-    final Geometry line = RandomOffsetLineStringGenerator.generate(lineScale,
-      numPts, this.geometryFactory);
+    final Geometry line = RandomOffsetLineStringGenerator.generate(lineScale, numPts,
+      this.geometryFactory);
     // System.out.println();
     // System.out.println(line);
 
@@ -98,8 +97,8 @@ public class RandomLineBufferStressTest {
     runCase(line, .1, lineScale, numPts);
   }
 
-  void runCase(final Geometry line, final double dist, final double lineScale,
-    final int numPts) throws Exception {
+  void runCase(final Geometry line, final double dist, final double lineScale, final int numPts)
+    throws Exception {
     // System.out.println("Running case " + this.caseCount + "  (line scale = "
     // + lineScale + "  buffer dist = " + dist + "  num pts = " + numPts +
     // " )");

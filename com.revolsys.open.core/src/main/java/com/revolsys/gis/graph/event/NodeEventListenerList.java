@@ -4,16 +4,16 @@ import java.util.LinkedHashSet;
 
 import com.revolsys.gis.graph.Node;
 
-public class NodeEventListenerList<T> extends LinkedHashSet<NodeEventListener>
-implements NodeEventListener<T> {
+public class NodeEventListenerList<T> extends LinkedHashSet<NodeEventListener> implements
+  NodeEventListener<T> {
 
   /**
    *
    */
   private static final long serialVersionUID = 491848000001273343L;
 
-  public void nodeEvent(final Node<T> node, final String typePath,
-    final String ruleName, final String action, final String notes) {
+  public void nodeEvent(final Node<T> node, final String typePath, final String ruleName,
+    final String action, final String notes) {
     if (!isEmpty()) {
       nodeEvent(new NodeEvent<T>(node, typePath, ruleName, action, notes));
     }

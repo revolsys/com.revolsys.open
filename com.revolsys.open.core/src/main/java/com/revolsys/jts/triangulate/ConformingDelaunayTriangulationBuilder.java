@@ -72,8 +72,8 @@ public class ConformingDelaunayTriangulationBuilder {
   private static void createConstraintSegments(final LineString line,
     final List<Segment> constraintSegs) {
     for (final com.revolsys.jts.geom.segment.Segment segment : line.segments()) {
-      constraintSegs.add(new Segment(segment.getPoint(0).clonePoint(),
-        segment.getPoint(1).clonePoint()));
+      constraintSegs.add(new Segment(segment.getPoint(0).clonePoint(), segment.getPoint(1)
+        .clonePoint()));
     }
   }
 
@@ -105,8 +105,8 @@ public class ConformingDelaunayTriangulationBuilder {
     }
     final List sites = createSiteVertices(this.siteCoords);
 
-    final ConformingDelaunayTriangulator cdt = new ConformingDelaunayTriangulator(
-      sites, this.tolerance);
+    final ConformingDelaunayTriangulator cdt = new ConformingDelaunayTriangulator(sites,
+      this.tolerance);
 
     cdt.setConstraints(segments, new ArrayList(this.constraintVertexMap.values()));
 
@@ -115,8 +115,7 @@ public class ConformingDelaunayTriangulationBuilder {
     this.subdiv = cdt.getSubdivision();
   }
 
-  private List<ConstraintVertex> createSiteVertices(
-    final Collection<Point> coords) {
+  private List<ConstraintVertex> createSiteVertices(final Collection<Point> coords) {
     final List<ConstraintVertex> verts = new ArrayList<>();
     for (final Point coord : coords) {
       if (this.constraintVertexMap.containsKey(coord)) {

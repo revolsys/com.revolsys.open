@@ -8,9 +8,9 @@ import com.revolsys.gis.model.LineSegmentTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-  CoordinateTest.class, BoundingBoxTest.class, PointTest.class,
-  LineStringTest.class, PolygonTest.class, MultiPointTest.class,
-  MultiLineStringTest.class, MultiPolygonTest.class, LineSegmentTest.class
+  CoordinateTest.class, BoundingBoxTest.class, PointTest.class, LineStringTest.class,
+  PolygonTest.class, MultiPointTest.class, MultiLineStringTest.class, MultiPolygonTest.class,
+  LineSegmentTest.class
 })
 public class GeometrySuite {
 }

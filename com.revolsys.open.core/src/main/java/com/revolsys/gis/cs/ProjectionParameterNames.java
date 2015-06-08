@@ -5,19 +5,6 @@ import java.util.TreeMap;
 
 public class ProjectionParameterNames {
 
-  public static String getParameterName(String name) {
-    name = name.toLowerCase().replaceAll(" ", "_");
-    String alias = ALIASES.get(name);
-    if (alias == null) {
-      alias = name.intern();
-      ALIASES.put(alias, alias);
-      // System.out.println(alias);
-      return alias;
-    } else {
-      return alias;
-    }
-  }
-
   private static final String RECTIFIED_GRID_ANGLE = "rectified_grid_angle";
 
   private static final Map<String, String> ALIASES = new TreeMap<>();
@@ -135,5 +122,18 @@ public class ProjectionParameterNames {
     ALIASES.put(ANGLE_FROM_RECTIFIED_TO_SKEW_GRID, RECTIFIED_GRID_ANGLE);
 
     ALIASES.put(ZONE_WIDTH, ZONE_WIDTH);
+  }
+
+  public static String getParameterName(String name) {
+    name = name.toLowerCase().replaceAll(" ", "_");
+    String alias = ALIASES.get(name);
+    if (alias == null) {
+      alias = name.intern();
+      ALIASES.put(alias, alias);
+      // System.out.println(alias);
+      return alias;
+    } else {
+      return alias;
+    }
   }
 }

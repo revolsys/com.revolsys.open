@@ -7,8 +7,7 @@ public class GmlIoTest {
 
   public static Test suite() {
     final TestSuite suite = new TestSuite("GML Geometry");
-    IoTestSuite.addGeometryTestSuites(suite, "GML", IoTestSuite.class,
-      "doWriteReadTest", "gml");
+    IoTestSuite.addGeometryTestSuites(suite, "GML", IoTestSuite.class, "doWriteReadTest", "gml");
     return suite;
   }
 }

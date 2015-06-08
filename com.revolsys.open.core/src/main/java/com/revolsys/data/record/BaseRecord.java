@@ -41,8 +41,7 @@ public abstract class BaseRecord extends AbstractRecord implements Serializable 
     return this.state;
   }
 
-  private void readObject(final ObjectInputStream ois)
-      throws ClassNotFoundException, IOException {
+  private void readObject(final ObjectInputStream ois) throws ClassNotFoundException, IOException {
     final int recordDefinitionInstanceId = ois.readInt();
     this.recordDefinition = RecordDefinitionImpl.getRecordDefinition(recordDefinitionInstanceId);
     ois.defaultReadObject();

@@ -21,8 +21,8 @@ public abstract class MapTile {
 
   private final int height;
 
-  public MapTile(final BoundingBox boundingBox, final int width,
-    final int height, final double resolution) {
+  public MapTile(final BoundingBox boundingBox, final int width, final int height,
+    final double resolution) {
     this.boundingBox = boundingBox;
     this.width = width;
     this.height = height;

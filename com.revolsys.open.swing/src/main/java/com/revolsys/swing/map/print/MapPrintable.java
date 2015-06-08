@@ -21,8 +21,7 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 
 public class MapPrintable implements Printable {
-  private double millimetre = Measure.valueOf(1, SI.MILLIMETRE).doubleValue(
-    NonSI.INCH.divide(72));
+  private double millimetre = Measure.valueOf(1, SI.MILLIMETRE).doubleValue(NonSI.INCH.divide(72));
 
   private final Rectangle2D contentRect;
 
@@ -45,9 +44,8 @@ public class MapPrintable implements Printable {
   private final double scale;
 
   public MapPrintable(final Project map, final int column, final int row,
-    final BoundingBox boundingBox, final Rectangle2D contentRect,
-    final int dpi, final double rulerSizePixels, final double minorDivisions,
-    final double scale) {
+    final BoundingBox boundingBox, final Rectangle2D contentRect, final int dpi,
+    final double rulerSizePixels, final double minorDivisions, final double scale) {
     this.map = map;
     this.column = column;
     this.row = row;
@@ -55,8 +53,7 @@ public class MapPrintable implements Printable {
     this.contentRect = contentRect;
     this.dpi = dpi;
     this.rulerSizePixels = rulerSizePixels;
-    this.millimetre = Measure.valueOf(1, SI.MILLIMETRE).doubleValue(
-      NonSI.INCH.divide(dpi));
+    this.millimetre = Measure.valueOf(1, SI.MILLIMETRE).doubleValue(NonSI.INCH.divide(dpi));
     this.minorDivisions = minorDivisions;
     this.majorDivisions = minorDivisions * 5;
     this.scale = scale;
@@ -65,22 +62,19 @@ public class MapPrintable implements Printable {
   private void drawFooter(final Graphics2D graphics2d) {
     graphics2d.setFont(new Font("Arial", Font.PLAIN, 12));
     final String sheetName = (char)('A' + this.column) + "" + this.row;
-    final String text = this.boundingBox.getCoordinateSystem().getName() + " - 1:"
-        + this.scale + " - " + sheetName;
+    final String text = this.boundingBox.getCoordinateSystem().getName() + " - 1:" + this.scale
+      + " - " + sheetName;
 
-    graphics2d.drawString(text, 0,
-      (float)(this.contentRect.getMaxY() + this.rulerSizePixels * 2));
+    graphics2d.drawString(text, 0, (float)(this.contentRect.getMaxY() + this.rulerSizePixels * 2));
   }
 
-  private void drawRuler(final PrintViewport2D viewport,
-    final Graphics2D graphics2d) {
+  private void drawRuler(final PrintViewport2D viewport, final Graphics2D graphics2d) {
     final double unit = viewport.getModelUnitsPerViewUnit();
     final float lineWidth = (float)(unit * this.millimetre / 10);
     // final boolean savedUseModelCoordinates = viewport.setUseModelCoordinates(
     // true, graphics2d);
     try {
-      graphics2d.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_BUTT,
-        BasicStroke.JOIN_BEVEL));
+      graphics2d.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
 
       final double rulerHeight = unit * this.rulerSizePixels;
 
@@ -110,14 +104,12 @@ public class MapPrintable implements Printable {
               x + unit * this.millimetre, minY - unit * this.millimetre * 4.5
             }, 0, coord, 0, 1);
 
-            graphics2d.drawString(String.valueOf((int)x), (float)coord[0],
-              (float)coord[1]);
+            graphics2d.drawString(String.valueOf((int)x), (float)coord[0], (float)coord[1]);
             modelToScreenTransform.transform(new double[] {
               x + unit * this.millimetre, maxY + unit * this.millimetre * 2.25
             }, 0, coord, 0, 1);
 
-            graphics2d.drawString(String.valueOf((int)x), (float)coord[0],
-              (float)coord[1]);
+            graphics2d.drawString(String.valueOf((int)x), (float)coord[0], (float)coord[1]);
           } finally {
             // viewport.setUseModelCoordinates(saved2, graphics2d);
           }
@@ -125,10 +117,8 @@ public class MapPrintable implements Printable {
           graphics2d.setColor(Color.LIGHT_GRAY);
           currentRulerHeight = rulerHeight / 3;
         }
-        graphics2d.draw(new Line2D.Double(x, minY - currentRulerHeight, x, minY
-          - lineWidth));
-        graphics2d.draw(new Line2D.Double(x, maxY + lineWidth, x, maxY
-          + currentRulerHeight));
+        graphics2d.draw(new Line2D.Double(x, minY - currentRulerHeight, x, minY - lineWidth));
+        graphics2d.draw(new Line2D.Double(x, maxY + lineWidth, x, maxY + currentRulerHeight));
       }
 
       final int startYIndex = (int)Math.ceil(minY / this.minorDivisions);
@@ -147,14 +137,12 @@ public class MapPrintable implements Printable {
             modelToScreenTransform.transform(new double[] {
               minX - unit * this.millimetre * 2.25, y + unit * this.millimetre
             }, 0, coord, 0, 1);
-            drawString(graphics2d, String.valueOf((int)y), coord[0], coord[1],
-              -Math.PI / 2);
+            drawString(graphics2d, String.valueOf((int)y), coord[0], coord[1], -Math.PI / 2);
 
             modelToScreenTransform.transform(new double[] {
               maxX + unit * this.millimetre * 4.5, y + unit * this.millimetre
             }, 0, coord, 0, 1);
-            drawString(graphics2d, String.valueOf((int)y), coord[0], coord[1],
-              -Math.PI / 2);
+            drawString(graphics2d, String.valueOf((int)y), coord[0], coord[1], -Math.PI / 2);
           } finally {
             // viewport.setUseModelCoordinates(saved2, graphics2d);
           }
@@ -162,24 +150,22 @@ public class MapPrintable implements Printable {
           graphics2d.setColor(Color.LIGHT_GRAY);
           currentRulerHeight = rulerHeight / 2;
         }
-        graphics2d.draw(new Line2D.Double(minX - currentRulerHeight, y, minX
-          - lineWidth, y));
-        graphics2d.draw(new Line2D.Double(maxX + lineWidth, y, maxX
-          + currentRulerHeight, y));
+        graphics2d.draw(new Line2D.Double(minX - currentRulerHeight, y, minX - lineWidth, y));
+        graphics2d.draw(new Line2D.Double(maxX + lineWidth, y, maxX + currentRulerHeight, y));
       }
 
       graphics2d.setColor(Color.BLACK);
-      graphics2d.draw(new Rectangle2D.Double(minX - rulerHeight, minY
-        - rulerHeight, width + 2 * rulerHeight, height + 2 * rulerHeight));
-      graphics2d.draw(new Rectangle2D.Double(minX - lineWidth,
-        minY - lineWidth, width + lineWidth * 2, height + lineWidth * 2));
+      graphics2d.draw(new Rectangle2D.Double(minX - rulerHeight, minY - rulerHeight, width + 2
+        * rulerHeight, height + 2 * rulerHeight));
+      graphics2d.draw(new Rectangle2D.Double(minX - lineWidth, minY - lineWidth, width + lineWidth
+        * 2, height + lineWidth * 2));
     } finally {
       // viewport.setUseModelCoordinates(savedUseModelCoordinates, graphics2d);
     }
   }
 
-  private void drawString(final Graphics2D graphics2d, final String label,
-    final double x, final double y, final double rotation) {
+  private void drawString(final Graphics2D graphics2d, final String label, final double x,
+    final double y, final double rotation) {
     final AffineTransform savedTransform = graphics2d.getTransform();
     graphics2d.translate(x, y);
     graphics2d.rotate(rotation);
@@ -188,13 +174,13 @@ public class MapPrintable implements Printable {
   }
 
   @Override
-  public int print(final Graphics graphics, final PageFormat pageFormat,
-    final int pageIndex) throws PrinterException {
+  public int print(final Graphics graphics, final PageFormat pageFormat, final int pageIndex)
+    throws PrinterException {
     final Graphics2D graphics2d = (Graphics2D)graphics;
-    final PrintViewport2D viewport = new PrintViewport2D(this.map, graphics2d,
-      pageFormat, this.boundingBox, this.contentRect, this.dpi);
-    graphics2d.translate(pageFormat.getImageableX() * this.dpi / 72.0,
-      pageFormat.getImageableX() * this.dpi / 72.0);
+    final PrintViewport2D viewport = new PrintViewport2D(this.map, graphics2d, pageFormat,
+      this.boundingBox, this.contentRect, this.dpi);
+    graphics2d.translate(pageFormat.getImageableX() * this.dpi / 72.0, pageFormat.getImageableX()
+      * this.dpi / 72.0);
     drawFooter(graphics2d);
 
     graphics2d.translate(this.contentRect.getMinX(), this.contentRect.getMinY());
@@ -210,8 +196,7 @@ public class MapPrintable implements Printable {
     final float lineWidth = (float)(unit * this.millimetre / 5);
     // final boolean saved = viewport.setUseModelCoordinates(true, graphics2d);
     try {
-      graphics2d.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_BUTT,
-        BasicStroke.JOIN_BEVEL));
+      graphics2d.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
 
       final double minX = this.boundingBox.getMinX();
       final double maxX = this.boundingBox.getMaxX();

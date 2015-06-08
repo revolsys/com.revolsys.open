@@ -1,7 +1,6 @@
 package com.revolsys.gis.graph.attribute;
 
-public abstract class AbstractObjectAttributeProxy<T, O> implements
-ObjectAttributeProxy<T, O> {
+public abstract class AbstractObjectAttributeProxy<T, O> implements ObjectAttributeProxy<T, O> {
   private transient T value;
 
   @Override

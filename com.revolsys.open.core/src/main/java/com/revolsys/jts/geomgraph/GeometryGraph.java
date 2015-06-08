@@ -82,10 +82,9 @@ public class GeometryGraph extends PlanarGraph {
    * Location.INTERIOR; }
    */
 
-  public static Location determineBoundary(
-    final BoundaryNodeRule boundaryNodeRule, final int boundaryCount) {
-    return boundaryNodeRule.isInBoundary(boundaryCount) ? Location.BOUNDARY
-      : Location.INTERIOR;
+  public static Location determineBoundary(final BoundaryNodeRule boundaryNodeRule,
+    final int boundaryCount) {
+    return boundaryNodeRule.isInBoundary(boundaryCount) ? Location.BOUNDARY : Location.INTERIOR;
   }
 
   private final Geometry geometry;
@@ -106,6 +105,7 @@ public class GeometryGraph extends PlanarGraph {
   private boolean useBoundaryDeterminationRule = true;
 
   private final int argIndex; // the index of this geometry as an argument to a
+
   // spatial function (used for labelling)
 
   private Collection<Node> boundaryNodes;
@@ -171,8 +171,7 @@ public class GeometryGraph extends PlanarGraph {
     insertEdge(edge);
     // insert the endpoint as a node, to mark that it is on the boundary
     insertPoint(this.argIndex, edge.getCoordinate(0), Location.BOUNDARY);
-    insertPoint(this.argIndex, edge.getCoordinate(edge.getNumPoints() - 1),
-      Location.BOUNDARY);
+    insertPoint(this.argIndex, edge.getCoordinate(edge.getNumPoints() - 1), Location.BOUNDARY);
   }
 
   private void addLineString(final LineString line) {
@@ -194,8 +193,7 @@ public class GeometryGraph extends PlanarGraph {
        * This allows for the case that the node already exists and is a boundary point.
        */
       insertBoundaryPoint(this.argIndex, cleanLine.getPoint(0));
-      insertBoundaryPoint(this.argIndex,
-        cleanLine.getPoint(cleanLine.getVertexCount() - 1));
+      insertBoundaryPoint(this.argIndex, cleanLine.getPoint(cleanLine.getVertexCount() - 1));
     }
   }
 
@@ -228,8 +226,7 @@ public class GeometryGraph extends PlanarGraph {
    * If the ring is in the opposite orientation,
    * the left and right locations must be interchanged.
    */
-  private void addPolygonRing(final LinearRing ring, final Location cwLeft,
-    final Location cwRight) {
+  private void addPolygonRing(final LinearRing ring, final Location cwLeft, final Location cwRight) {
     // don't bother adding empty holes
     if (ring.isEmpty()) {
       return;
@@ -248,8 +245,8 @@ public class GeometryGraph extends PlanarGraph {
       left = cwRight;
       right = cwLeft;
     }
-    final Edge e = new Edge(coordinatesList, new Label(this.argIndex,
-      Location.BOUNDARY, left, right));
+    final Edge e = new Edge(coordinatesList, new Label(this.argIndex, Location.BOUNDARY, left,
+      right));
     this.lineEdgeMap.put(ring, e);
 
     insertEdge(e);
@@ -263,8 +260,7 @@ public class GeometryGraph extends PlanarGraph {
    * is a boundary) then insert it as a potential boundary node.
    * Otherwise, just add it as a regular node.
    */
-  private void addSelfIntersectionNode(final int argIndex, final Point coord,
-    final Location loc) {
+  private void addSelfIntersectionNode(final int argIndex, final Point coord, final Location loc) {
     // if this node is already a boundary node, don't change it
     if (isBoundaryNode(argIndex, coord)) {
       return;
@@ -287,8 +283,7 @@ public class GeometryGraph extends PlanarGraph {
 
   public SegmentIntersector computeEdgeIntersections(final GeometryGraph g,
     final LineIntersector li, final boolean includeProper) {
-    final SegmentIntersector si = new SegmentIntersector(li, includeProper,
-      true);
+    final SegmentIntersector si = new SegmentIntersector(li, includeProper, true);
     si.setBoundaryNodes(this.getBoundaryNodes(), g.getBoundaryNodes());
 
     final EdgeSetIntersector esi = createEdgeSetIntersector();
@@ -314,7 +309,7 @@ public class GeometryGraph extends PlanarGraph {
     final EdgeSetIntersector esi = createEdgeSetIntersector();
     // optimized test for Polygons and Rings
     if (!computeRingSelfNodes
-        && (this.geometry instanceof LinearRing || this.geometry instanceof Polygon || this.geometry instanceof MultiPolygon)) {
+      && (this.geometry instanceof LinearRing || this.geometry instanceof Polygon || this.geometry instanceof MultiPolygon)) {
       esi.computeIntersections(this.edges, si, false);
     } else {
       esi.computeIntersections(this.edges, si, true);
@@ -424,8 +419,7 @@ public class GeometryGraph extends PlanarGraph {
     lbl.setLocation(argIndex, newLoc);
   }
 
-  private void insertPoint(final int argIndex, final Point coord,
-    final Location onLocation) {
+  private void insertPoint(final int argIndex, final Point coord, final Location onLocation) {
     final NodeMap nodes = getNodeMap();
     final Node n = nodes.addNode(coord);
     final Label lbl = n.getLabel();

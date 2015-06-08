@@ -81,9 +81,7 @@ public class HttpServletRequestJexlContext implements JexlContext {
         if (HttpServletRequestJexlContext.this.servletContext != null) {
           for (final Enumeration<String> names = HttpServletRequestJexlContext.this.servletContext.getAttributeNames(); names.hasMoreElements();) {
             final String name = names.nextElement();
-            map.put(
-              name,
-              HttpServletRequestJexlContext.this.servletContext.getAttribute(name));
+            map.put(name, HttpServletRequestJexlContext.this.servletContext.getAttribute(name));
           }
         }
         final Map<String, Object> attributes = HttpServletRequestJexlContext.this.localAttributes.get();
@@ -91,8 +89,7 @@ public class HttpServletRequestJexlContext implements JexlContext {
           map.putAll(attributes);
         }
         map.put("request", request);
-        map.put(
-          "requestURI",
+        map.put("requestURI",
           HttpServletRequestJexlContext.this.urlPathHelper.getOriginatingRequestUri(request));
         return map.entrySet();
       }

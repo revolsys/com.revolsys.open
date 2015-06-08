@@ -41,6 +41,21 @@ import com.revolsys.util.MathUtil;
  * Unless otherwise noted, methods in this class express angles in radians.
  */
 public class Angle {
+  public static final double PI_TIMES_2 = 2.0 * Math.PI;
+
+  public static final double PI_OVER_2 = Math.PI / 2.0;
+
+  public static final double PI_OVER_4 = Math.PI / 4.0;
+
+  /** Constant representing counterclockwise orientation */
+  public static final int COUNTERCLOCKWISE = CGAlgorithms.COUNTERCLOCKWISE;
+
+  /** Constant representing clockwise orientation */
+  public static final int CLOCKWISE = CGAlgorithms.CLOCKWISE;
+
+  /** Constant representing no orientation */
+  public static final int NONE = CGAlgorithms.COLLINEAR;
+
   /**
    * Calculate the angle of a coordinates
    *
@@ -64,8 +79,8 @@ public class Angle {
    * @param y3 The third y coordinate.
    * @return The distance.
    */
-  public static double angle(final double x1, final double y1, final double x2,
-    final double y2, final double x3, final double y3) {
+  public static double angle(final double x1, final double y1, final double x2, final double y2,
+    final double x3, final double y3) {
     final double angle1 = angle2d(x2, x1, y2, y1);
     final double angle2 = angle2d(x2, x3, y2, y3);
     return angleDiff(angle1, angle2);
@@ -94,8 +109,7 @@ public class Angle {
     return angle(x1, y1, x2, y2, x3, y3);
   }
 
-  public static double angle2d(final double x1, final double x2,
-    final double y1, final double y2) {
+  public static double angle2d(final double x1, final double x2, final double y1, final double y2) {
     final double dx = x2 - x1;
     final double dy = y2 - y1;
     return Math.atan2(dy, dx);
@@ -110,8 +124,7 @@ public class Angle {
    * @param tip2 the tip of the other vector
    * @return the angle between tail-tip1 and tail-tip2
    */
-  public static double angleBetween(final Point tip1, final Point tail,
-    final Point tip2) {
+  public static double angleBetween(final Point tip1, final Point tail, final Point tip2) {
     final double a1 = tail.angle2d(tip1);
     final double a2 = tail.angle2d(tip2);
 
@@ -132,8 +145,7 @@ public class Angle {
    * @param tip2 the tip of v2
    * @return the angle between v1 and v2, relative to v1
    */
-  public static double angleBetweenOriented(final Point tip1, final Point tail,
-    final Point tip2) {
+  public static double angleBetweenOriented(final Point tip1, final Point tail, final Point tip2) {
     final double a1 = tail.angle2d(tip1);
     final double a2 = tail.angle2d(tip2);
     final double angDel = a2 - a1;
@@ -148,8 +160,8 @@ public class Angle {
     return angDel;
   }
 
-  public static double angleDegrees(final double x1, final double y1,
-    final double x2, final double y2) {
+  public static double angleDegrees(final double x1, final double y1, final double x2,
+    final double y2) {
     final double width = x2 - x1;
     final double height = y2 - y1;
     if (width == 0) {
@@ -191,8 +203,7 @@ public class Angle {
     return delAngle;
   }
 
-  public static double angleDiff(final double angle1, final double angle2,
-    final boolean clockwise) {
+  public static double angleDiff(final double angle1, final double angle2, final boolean clockwise) {
     if (clockwise) {
       if (angle2 < angle1) {
         final double angle = angle2 + Math.PI * 2 - angle1;
@@ -222,8 +233,8 @@ public class Angle {
     return diff;
   }
 
-  public static double angleNorthDegrees(final double x1, final double y1,
-    final double x2, final double y2) {
+  public static double angleNorthDegrees(final double x1, final double y1, final double x2,
+    final double y2) {
     final double angle = angleDegrees(x1, y1, x2, y2);
     return MathUtil.getNorthClockwiseAngle(angle);
   }
@@ -287,8 +298,7 @@ public class Angle {
    *          the next point of the ring
    * @return the interior angle based at <code>p1</code>
    */
-  public static double interiorAngle(final Point p0, final Point p1,
-    final Point p2) {
+  public static double interiorAngle(final Point p0, final Point p1, final Point p2) {
     final double anglePrev = p1.angle2d(p0);
     final double angleNext = p1.angle2d(p2);
     return Math.abs(angleNext - anglePrev);
@@ -409,19 +419,4 @@ public class Angle {
   public static double toRadians(final double angleDegrees) {
     return angleDegrees * Math.PI / 180.0;
   }
-
-  public static final double PI_TIMES_2 = 2.0 * Math.PI;
-
-  public static final double PI_OVER_2 = Math.PI / 2.0;
-
-  public static final double PI_OVER_4 = Math.PI / 4.0;
-
-  /** Constant representing counterclockwise orientation */
-  public static final int COUNTERCLOCKWISE = CGAlgorithms.COUNTERCLOCKWISE;
-
-  /** Constant representing clockwise orientation */
-  public static final int CLOCKWISE = CGAlgorithms.CLOCKWISE;
-
-  /** Constant representing no orientation */
-  public static final int NONE = CGAlgorithms.COLLINEAR;
 }

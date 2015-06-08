@@ -56,8 +56,7 @@ import com.revolsys.jts.triangulate.quadedge.QuadEdgeSubdivision;
  *
  */
 public class VoronoiDiagramBuilder {
-  private static Geometry clipGeometryCollection(final Geometry geom,
-    final BoundingBox clipEnv) {
+  private static Geometry clipGeometryCollection(final Geometry geom, final BoundingBox clipEnv) {
     final GeometryFactory r = geom.getGeometryFactory();
     final Geometry clipPoly = clipEnv.toGeometry();
     final List<Geometry> clipped = new ArrayList<Geometry>();
@@ -105,8 +104,7 @@ public class VoronoiDiagramBuilder {
     final BoundingBoxDoubleGf siteEnv = DelaunayTriangulationBuilder.envelope(this.siteCoords);
     this.diagramEnv = siteEnv;
     // add a buffer around the final envelope
-    final double expandBy = Math.max(this.diagramEnv.getWidth(),
-      this.diagramEnv.getHeight());
+    final double expandBy = Math.max(this.diagramEnv.getWidth(), this.diagramEnv.getHeight());
     this.diagramEnv = this.diagramEnv.expand(expandBy);
     if (this.clipEnv != null) {
       this.diagramEnv.expandToInclude(this.clipEnv);

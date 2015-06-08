@@ -33,14 +33,13 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 
-public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
-AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
+public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Record>>
+  implements ObjectProcessor<RecordGraph> {
 
   private static final Logger LOG = LoggerFactory.getLogger(LinearIntersectionNotEqualLineEdgeCleanupVisitor.class);
 
-  private Set<String> equalExcludeAttributes = new HashSet<String>(
-      Arrays.asList(RecordEquals.EXCLUDE_ID,
-        RecordEquals.EXCLUDE_GEOMETRY));
+  private Set<String> equalExcludeAttributes = new HashSet<String>(Arrays.asList(
+    RecordEquals.EXCLUDE_ID, RecordEquals.EXCLUDE_GEOMETRY));
 
   private Statistics duplicateStatistics;
 
@@ -72,8 +71,7 @@ AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
     this.duplicateStatistics.connect();
   }
 
-  private boolean middleCoordinatesEqual(final LineString points1,
-    final LineString points2) {
+  private boolean middleCoordinatesEqual(final LineString points1, final LineString points2) {
     if (points1.getVertexCount() == points2.getVertexCount()) {
       for (int i = 1; i < points2.getVertexCount(); i++) {
         if (!points1.equalsVertex(2, i, points1, i)) {
@@ -97,8 +95,7 @@ AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
     throw new IllegalArgumentException("Cannot override comparator");
   }
 
-  public void setEqualExcludeAttributes(
-    final Collection<String> equalExcludeAttributes) {
+  public void setEqualExcludeAttributes(final Collection<String> equalExcludeAttributes) {
     setEqualExcludeAttributes(new HashSet<String>(equalExcludeAttributes));
   }
 
@@ -122,8 +119,7 @@ AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
 
     final AndFilter<Edge<Record>> attributeAndGeometryFilter = new AndFilter<Edge<Record>>();
 
-    attributeAndGeometryFilter.addFilter(new EdgeTypeNameFilter<Record>(
-        typePath));
+    attributeAndGeometryFilter.addFilter(new EdgeTypeNameFilter<Record>(typePath));
 
     final Filter<Edge<Record>> filter = getFilter();
     if (filter != null) {
@@ -131,17 +127,15 @@ AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
     }
 
     final Filter<Record> notEqualLineFilter = new NotFilter<Record>(
-        new RecordGeometryFilter<LineString>(
-            new EqualFilter<LineString>(line)));
+      new RecordGeometryFilter<LineString>(new EqualFilter<LineString>(line)));
 
     final RecordGeometryFilter<LineString> linearIntersectionFilter = new RecordGeometryFilter<LineString>(
-        new LinearIntersectionFilter(line));
+      new LinearIntersectionFilter(line));
 
-    attributeAndGeometryFilter.addFilter(new EdgeObjectFilter<Record>(
-        new AndFilter<Record>(notEqualLineFilter, linearIntersectionFilter)));
+    attributeAndGeometryFilter.addFilter(new EdgeObjectFilter<Record>(new AndFilter<Record>(
+      notEqualLineFilter, linearIntersectionFilter)));
 
-    final List<Edge<Record>> intersectingEdges = graph.getEdges(
-      attributeAndGeometryFilter, line);
+    final List<Edge<Record>> intersectingEdges = graph.getEdges(attributeAndGeometryFilter, line);
 
     if (!intersectingEdges.isEmpty()) {
       if (intersectingEdges.size() == 1 && line.getLength() > 10) {
@@ -159,8 +153,8 @@ AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
                 return true;
               }
             }
-            final boolean lastEqual = line.equalsVertex(2,
-              line.getVertexCount() - 1, line2, line.getVertexCount() - 1);
+            final boolean lastEqual = line.equalsVertex(2, line.getVertexCount() - 1, line2,
+              line.getVertexCount() - 1);
             if (!lastEqual) {
               final Node<Record> toNode1 = edge.getToNode();
               final Node<Record> toNode2 = edge2.getToNode();

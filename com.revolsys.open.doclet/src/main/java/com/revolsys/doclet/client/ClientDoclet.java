@@ -35,9 +35,9 @@ public class ClientDoclet {
 
   public static int optionLength(String optionName) {
     optionName = optionName.toLowerCase();
-    if (optionName.equals("-d") || optionName.equals("-doctitle")
-        || optionName.equals("-docid") || optionName.equals("-htmlfooter")
-        || optionName.equals("-htmlheader") || optionName.equals("-packagesOpen")) {
+    if (optionName.equals("-d") || optionName.equals("-doctitle") || optionName.equals("-docid")
+      || optionName.equals("-htmlfooter") || optionName.equals("-htmlheader")
+      || optionName.equals("-packagesOpen")) {
       return 2;
     }
     return -1;
@@ -61,12 +61,10 @@ public class ClientDoclet {
           file.mkdirs();
         }
         if (!file.isDirectory()) {
-          docerrorreporter.printError("Destination not a directory"
-              + file.getPath());
+          docerrorreporter.printError("Destination not a directory" + file.getPath());
           return false;
         } else if (!file.canWrite()) {
-          docerrorreporter.printError("Destination directory not writable "
-              + file.getPath());
+          docerrorreporter.printError("Destination directory not writable " + file.getPath());
           return false;
         }
       } else if (argName.equals("-htmlheader")) {
@@ -80,10 +78,8 @@ public class ClientDoclet {
           return false;
         }
       } else if (argName.equals("-packagesOpen")) {
-        if (!"true".equalsIgnoreCase(option[1])
-            && !"false".equalsIgnoreCase(option[1])) {
-          docerrorreporter.printError("PackagesOpen must be true or false not "
-              + option[1]);
+        if (!"true".equalsIgnoreCase(option[1]) && !"false".equalsIgnoreCase(option[1])) {
+          docerrorreporter.printError("PackagesOpen must be true or false not " + option[1]);
           return false;
         }
       }
@@ -112,9 +108,8 @@ public class ClientDoclet {
     this.root = root;
   }
 
-  public void addResponseStatusDescription(
-    final Map<String, List<String>> responseCodes, final String code,
-    final String description) {
+  public void addResponseStatusDescription(final Map<String, List<String>> responseCodes,
+    final String code, final String description) {
     List<String> descriptions = responseCodes.get(code);
     if (descriptions == null) {
       descriptions = new ArrayList<String>();
@@ -531,8 +526,7 @@ public class ClientDoclet {
         DocletUtil.typeNameLink(this.writer, type);
         this.writer.endTagLn(HtmlUtil.TD);
 
-        DocletUtil.descriptionTd(this.writer, method.containingClass(),
-          descriptions, name);
+        DocletUtil.descriptionTd(this.writer, method.containingClass(), descriptions, name);
         this.writer.endTagLn(HtmlUtil.TR);
       }
       this.writer.endTagLn(HtmlUtil.TBODY);

@@ -22,6 +22,43 @@ import com.revolsys.util.Property;
 @SuppressWarnings("unchecked")
 public class MapObjectFactoryRegistry {
 
+  public static final Map<String, MapObjectFactory> TYPE_NAME_TO_FACTORY = new HashMap<String, MapObjectFactory>();
+
+  static {
+    try {
+      final ClassLoader classLoader = MapObjectFactoryRegistry.class.getClassLoader();
+      final String resourceName = "META-INF/" + MapObjectFactory.class.getName() + ".json";
+      final Enumeration<URL> resources = classLoader.getResources(resourceName);
+      while (resources.hasMoreElements()) {
+        final URL resource = resources.nextElement();
+        try {
+          final Map<String, Object> config = JsonParser.getMap(resource.openStream());
+          final List<Map<String, Object>> factories = (List<Map<String, Object>>)config.get("factories");
+          for (final Map<String, Object> factoryConfig : factories) {
+            try {
+              final String name = (String)factoryConfig.get("typeName");
+              final String description = (String)factoryConfig.get("description");
+              final String typeClassName = (String)factoryConfig.get("typeClass");
+              final String methodName = (String)factoryConfig.get("methodName");
+              final Class<?> factoryClass = Class.forName(typeClassName, false, classLoader);
+              final InvokeMethodMapObjectFactory factory = new InvokeMethodMapObjectFactory(name,
+                description, factoryClass, methodName);
+              addFactory(factory);
+            } catch (final Throwable e) {
+              LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error(
+                "Unable to add factory: " + factoryConfig, e);
+            }
+          }
+        } catch (final Throwable e) {
+          LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error(
+            "Unable to read resource: " + resource, e);
+        }
+      }
+    } catch (final Throwable e) {
+      LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error("Unable to read resources", e);
+    }
+  }
+
   public static void addFactory(final MapObjectFactory factory) {
     final String typeName = factory.getTypeName();
     TYPE_NAME_TO_FACTORY.put(typeName, factory);
@@ -35,8 +72,7 @@ public class MapObjectFactoryRegistry {
   public static <V> V toObject(final Map<String, ? extends Object> map) {
     final String typeClass = Maps.getString(map, "typeClass");
     if (Property.hasValue(typeClass)) {
-      final Constructor<V> configConstructor = JavaBeanUtil.getConstructor(
-        typeClass, Map.class);
+      final Constructor<V> configConstructor = JavaBeanUtil.getConstructor(typeClass, Map.class);
       final V object;
       if (configConstructor == null) {
         object = (V)JavaBeanUtil.createInstance(typeClass);
@@ -48,8 +84,7 @@ public class MapObjectFactoryRegistry {
       final String type = Maps.getString(map, "type");
       final MapObjectFactory objectFactory = TYPE_NAME_TO_FACTORY.get(type);
       if (objectFactory == null) {
-        LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error(
-          "No factory for " + type);
+        LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error("No factory for " + type);
         return null;
       } else {
         return (V)objectFactory.toObject(map);
@@ -82,49 +117,8 @@ public class MapObjectFactoryRegistry {
     JsonMapIoFactory.write(properties, file, true);
   }
 
-  public static void write(final Resource resource,
-    final MapSerializer serializer) {
+  public static void write(final Resource resource, final MapSerializer serializer) {
     final Map<String, Object> properties = serializer.toMap();
     JsonMapIoFactory.write(properties, resource, true);
-  }
-
-  public static final Map<String, MapObjectFactory> TYPE_NAME_TO_FACTORY = new HashMap<String, MapObjectFactory>();
-
-  static {
-    try {
-      final ClassLoader classLoader = MapObjectFactoryRegistry.class.getClassLoader();
-      final String resourceName = "META-INF/"
-          + MapObjectFactory.class.getName() + ".json";
-      final Enumeration<URL> resources = classLoader.getResources(resourceName);
-      while (resources.hasMoreElements()) {
-        final URL resource = resources.nextElement();
-        try {
-          final Map<String, Object> config = JsonParser.getMap(resource.openStream());
-          final List<Map<String, Object>> factories = (List<Map<String, Object>>)config.get("factories");
-          for (final Map<String, Object> factoryConfig : factories) {
-            try {
-              final String name = (String)factoryConfig.get("typeName");
-              final String description = (String)factoryConfig.get("description");
-              final String typeClassName = (String)factoryConfig.get("typeClass");
-              final String methodName = (String)factoryConfig.get("methodName");
-              final Class<?> factoryClass = Class.forName(typeClassName, false,
-                classLoader);
-              final InvokeMethodMapObjectFactory factory = new InvokeMethodMapObjectFactory(
-                name, description, factoryClass, methodName);
-              addFactory(factory);
-            } catch (final Throwable e) {
-              LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error(
-                "Unable to add factory: " + factoryConfig, e);
-            }
-          }
-        } catch (final Throwable e) {
-          LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error(
-            "Unable to read resource: " + resource, e);
-        }
-      }
-    } catch (final Throwable e) {
-      LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error(
-        "Unable to read resources", e);
-    }
   }
 }

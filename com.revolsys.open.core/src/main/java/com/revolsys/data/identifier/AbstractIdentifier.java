@@ -136,8 +136,7 @@ public abstract class AbstractIdentifier implements Identifier {
   }
 
   @Override
-  public void setIdentifier(final Map<String, Object> record,
-    final List<String> fieldNames) {
+  public void setIdentifier(final Map<String, Object> record, final List<String> fieldNames) {
     final List<Object> values = getValues();
     if (fieldNames.size() == values.size()) {
       for (int i = 0; i < fieldNames.size(); i++) {
@@ -146,14 +145,13 @@ public abstract class AbstractIdentifier implements Identifier {
         record.put(fieldName, value);
       }
     } else {
-      throw new IllegalArgumentException("Attribute names count for "
-          + fieldNames + " != count for values " + values);
+      throw new IllegalArgumentException("Attribute names count for " + fieldNames
+        + " != count for values " + values);
     }
   }
 
   @Override
-  public void setIdentifier(final Map<String, Object> record,
-    final String... fieldNames) {
+  public void setIdentifier(final Map<String, Object> record, final String... fieldNames) {
     setIdentifier(record, Arrays.asList(fieldNames));
   }
 

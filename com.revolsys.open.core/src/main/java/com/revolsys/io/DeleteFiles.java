@@ -30,8 +30,7 @@ public class DeleteFiles {
           if (file.isDirectory()) {
             if (this.deleteDirectories) {
               if (!FileUtil.deleteDirectory(file, true)) {
-                throw new RuntimeException("Unable to delete directory: "
-                    + file);
+                throw new RuntimeException("Unable to delete directory: " + file);
               }
             }
           } else if (file.exists()) {

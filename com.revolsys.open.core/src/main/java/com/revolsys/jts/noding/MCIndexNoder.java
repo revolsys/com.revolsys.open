@@ -60,8 +60,8 @@ public class MCIndexNoder extends SinglePassNoder {
     }
 
     @Override
-    public void overlap(final MonotoneChain mc1, final int start1,
-      final MonotoneChain mc2, final int start2) {
+    public void overlap(final MonotoneChain mc1, final int start1, final MonotoneChain mc2,
+      final int start2) {
       final SegmentString ss1 = (SegmentString)mc1.getContext();
       final SegmentString ss2 = (SegmentString)mc2.getContext();
       this.si.processIntersections(ss1, start1, ss2, start2);
@@ -85,8 +85,7 @@ public class MCIndexNoder extends SinglePassNoder {
   }
 
   private void add(final SegmentString segStr) {
-    final List<MonotoneChain> segChains = MonotoneChainBuilder.getChains(
-      segStr.getPoints(), segStr);
+    final List<MonotoneChain> segChains = MonotoneChainBuilder.getChains(segStr.getPoints(), segStr);
     for (final MonotoneChain mc : segChains) {
       mc.setId(this.idCounter++);
       this.index.insert(mc.getEnvelope(), mc);
@@ -124,8 +123,7 @@ public class MCIndexNoder extends SinglePassNoder {
 
   @SuppressWarnings("unchecked")
   private void intersectChains() {
-    final MonotoneChainOverlapAction overlapAction = new SegmentOverlapAction(
-      this.segInt);
+    final MonotoneChainOverlapAction overlapAction = new SegmentOverlapAction(this.segInt);
 
     for (final MonotoneChain queryChain : this.monoChains) {
       final List<MonotoneChain> overlapChains = this.index.query(queryChain.getEnvelope());

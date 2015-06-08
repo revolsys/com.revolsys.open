@@ -53,8 +53,7 @@ public class GeometryOperationValidator {
     testExpectedResult();
   }
 
-  public GeometryOperationValidator testEmpty(final boolean isEmpty)
-      throws Exception {
+  public GeometryOperationValidator testEmpty(final boolean isEmpty) throws Exception {
     final String failureCondition = isEmpty ? "not empty" : "empty";
     Assert.assertTrue("simplified geometry is " + failureCondition,
       this.ioGeometry[1].isEmpty() == isEmpty);
@@ -66,8 +65,7 @@ public class GeometryOperationValidator {
       return;
     }
     final Geometry expectedGeom = rdr.read(this.wktExpected);
-    Assert.assertTrue("Expected result not found",
-      expectedGeom.equals(2,this.ioGeometry[1]));
+    Assert.assertTrue("Expected result not found", expectedGeom.equals(2, this.ioGeometry[1]));
 
   }
 
@@ -76,14 +74,12 @@ public class GeometryOperationValidator {
       return this;
     }
     Assert.assertTrue("simplified geometry has different structure than input",
-      SameStructureTester.isSameStructure(this.ioGeometry[0],
-        this.ioGeometry[1]));
+      SameStructureTester.isSameStructure(this.ioGeometry[0], this.ioGeometry[1]));
     return this;
   }
 
   public GeometryOperationValidator testValid() throws Exception {
-    Assert.assertTrue("simplified geometry is not valid",
-      this.ioGeometry[1].isValid());
+    Assert.assertTrue("simplified geometry is not valid", this.ioGeometry[1].isValid());
     return this;
   }
 }

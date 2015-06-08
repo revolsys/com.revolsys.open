@@ -25,13 +25,13 @@ import com.revolsys.parallel.process.ProcessNetwork;
 import com.revolsys.spring.factory.Parameter;
 
 public class ScriptExecutorRunnable extends AbstractRunnable {
+  private static final Logger LOG = LoggerFactory.getLogger(ScriptExecutorRunnable.class);
+
   private static Throwable getBeanExceptionCause(final BeanCreationException e) {
     Throwable cause = e.getCause();
-    while (cause instanceof BeanCreationException
-        || cause instanceof MethodInvocationException
-        || cause instanceof PropertyAccessException
-        || cause instanceof PropertyBatchUpdateException
-        || cause instanceof InvalidPropertyException) {
+    while (cause instanceof BeanCreationException || cause instanceof MethodInvocationException
+      || cause instanceof PropertyAccessException || cause instanceof PropertyBatchUpdateException
+      || cause instanceof InvalidPropertyException) {
       Throwable newCause;
       if (cause instanceof PropertyBatchUpdateException) {
         final PropertyBatchUpdateException batchEx = (PropertyBatchUpdateException)cause;
@@ -48,8 +48,6 @@ public class ScriptExecutorRunnable extends AbstractRunnable {
     return cause;
   }
 
-  private static final Logger LOG = LoggerFactory.getLogger(ScriptExecutorRunnable.class);
-
   private Map<String, Object> attributes = new LinkedHashMap<String, Object>();
 
   private Map<String, Object> beans = new LinkedHashMap<String, Object>();
@@ -62,8 +60,7 @@ public class ScriptExecutorRunnable extends AbstractRunnable {
     this.script = script;
   }
 
-  public ScriptExecutorRunnable(final String script,
-    final Map<String, Object> attributes) {
+  public ScriptExecutorRunnable(final String script, final Map<String, Object> attributes) {
     this.script = script;
     this.attributes = attributes;
   }
@@ -111,8 +108,7 @@ public class ScriptExecutorRunnable extends AbstractRunnable {
       ThreadSharedAttributes.setAttributes(this.attributes);
 
       final GenericApplicationContext applicationContext = new GenericApplicationContext();
-      applicationContext.getBeanFactory().addPropertyEditorRegistrar(
-        new ResourceEditorRegistrar());
+      applicationContext.getBeanFactory().addPropertyEditorRegistrar(new ResourceEditorRegistrar());
 
       for (final Entry<String, Object> entry : this.beans.entrySet()) {
         final String key = entry.getKey();
@@ -127,8 +123,7 @@ public class ScriptExecutorRunnable extends AbstractRunnable {
         }
       }
 
-      final XmlBeanDefinitionReader beanReader = new XmlBeanDefinitionReader(
-        applicationContext);
+      final XmlBeanDefinitionReader beanReader = new XmlBeanDefinitionReader(applicationContext);
       if (new File(this.script).exists()) {
         beanReader.loadBeanDefinitions("file:" + this.script);
       } else {

@@ -21,8 +21,8 @@ import com.revolsys.jts.geom.segment.LineSegmentDouble;
 public class RandomOffsetLineStringGenerator {
   public static Geometry generate(final double maxSegLen, final int numPts,
     final GeometryFactory fact) {
-    final RandomOffsetLineStringGenerator rlg = new RandomOffsetLineStringGenerator(
-      maxSegLen, numPts);
+    final RandomOffsetLineStringGenerator rlg = new RandomOffsetLineStringGenerator(maxSegLen,
+      numPts);
     return rlg.generate(fact);
   }
 
@@ -44,8 +44,7 @@ public class RandomOffsetLineStringGenerator {
 
   private Point endPoint;
 
-  public RandomOffsetLineStringGenerator(final double maxSegLen,
-    final int numPts) {
+  public RandomOffsetLineStringGenerator(final double maxSegLen, final int numPts) {
     this.maxSegLen = maxSegLen;
 
     this.exponent2 = (int)(Math.log(numPts) / Math.log(2));
@@ -57,8 +56,7 @@ public class RandomOffsetLineStringGenerator {
     this.numPts = pow2(this.exponent2) + 1;
   }
 
-  private Point computeRandomOffset(final Point p0,
-    final Point p1, final double segFrac) {
+  private Point computeRandomOffset(final Point p0, final Point p1, final double segFrac) {
     final double len = p0.distance(p1);
     final double len2 = len / 2;
     final double offsetLen = len * Math.random() - len2;
@@ -82,8 +80,7 @@ public class RandomOffsetLineStringGenerator {
       } else {
         segEndPoint = this.pts[i + inc];
       }
-      this.pts[midIndex] = computeRandomOffset(this.pts[i], segEndPoint,
-        segFrac);
+      this.pts[midIndex] = computeRandomOffset(this.pts[i], segEndPoint, segFrac);
     }
   }
 
@@ -103,8 +100,8 @@ public class RandomOffsetLineStringGenerator {
     this.pts[0] = new PointDouble();
 
     final double ang = Math.PI * Math.random();
-    this.endPoint = new PointDouble(this.maxSegLen * Math.cos(ang),
-      this.maxSegLen * Math.sin(ang), Point.NULL_ORDINATE);
+    this.endPoint = new PointDouble(this.maxSegLen * Math.cos(ang), this.maxSegLen * Math.sin(ang),
+      Point.NULL_ORDINATE);
     this.pts[this.numPts - 1] = this.endPoint;
 
     int interval = this.numPts / 2;

@@ -7,11 +7,9 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
 
 public class CGAlgorithmFunctions {
-  public static int orientationIndex(final Geometry segment,
-    final Geometry ptGeom) {
+  public static int orientationIndex(final Geometry segment, final Geometry ptGeom) {
     if (segment.getVertexCount() != 2 || ptGeom.getVertexCount() != 1) {
-      throw new IllegalArgumentException(
-          "A must have two points and B must have one");
+      throw new IllegalArgumentException("A must have two points and B must have one");
     }
     final Point[] segPt = CoordinatesListUtil.getCoordinateArray(segment);
 
@@ -20,11 +18,9 @@ public class CGAlgorithmFunctions {
     return index;
   }
 
-  public static int orientationIndexDD(final Geometry segment,
-    final Geometry ptGeom) {
+  public static int orientationIndexDD(final Geometry segment, final Geometry ptGeom) {
     if (segment.getVertexCount() != 2 || ptGeom.getVertexCount() != 1) {
-      throw new IllegalArgumentException(
-          "A must have two points and B must have one");
+      throw new IllegalArgumentException("A must have two points and B must have one");
     }
     final Point[] segPt = CoordinatesListUtil.getCoordinateArray(segment);
 
@@ -33,8 +29,7 @@ public class CGAlgorithmFunctions {
     return index;
   }
 
-  public static Geometry segmentIntersection(final Geometry g1,
-    final Geometry g2) {
+  public static Geometry segmentIntersection(final Geometry g1, final Geometry g2) {
     final Point[] pt1 = CoordinatesListUtil.getCoordinateArray(g1);
     final Point[] pt2 = CoordinatesListUtil.getCoordinateArray(g2);
     final RobustLineIntersector ri = new RobustLineIntersector();
@@ -55,8 +50,7 @@ public class CGAlgorithmFunctions {
     return null;
   }
 
-  public static Geometry segmentIntersectionDD(final Geometry g1,
-    final Geometry g2) {
+  public static Geometry segmentIntersectionDD(final Geometry g1, final Geometry g2) {
     final Point[] pt1 = CoordinatesListUtil.getCoordinateArray(g1);
     final Point[] pt2 = CoordinatesListUtil.getCoordinateArray(g2);
 
@@ -68,8 +62,7 @@ public class CGAlgorithmFunctions {
       return g1.getGeometryFactory().point();
     }
 
-    final Point intPt = CGAlgorithmsDD.intersection(pt1[0], pt1[1],
-      pt2[0], pt2[1]);
+    final Point intPt = CGAlgorithmsDD.intersection(pt1[0], pt1[1], pt2[0], pt2[1]);
     return g1.getGeometryFactory().point(intPt);
   }
 

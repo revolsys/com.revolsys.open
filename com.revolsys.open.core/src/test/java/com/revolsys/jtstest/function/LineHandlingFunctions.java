@@ -50,8 +50,8 @@ public class LineHandlingFunctions {
     return LineDissolver.dissolve(geom);
   }
 
-  private static LineString extractChain(final LineString line,
-    final int index, final int maxChainSize) {
+  private static LineString extractChain(final LineString line, final int index,
+    final int maxChainSize) {
     int size = maxChainSize + 1;
     if (index + size > line.getVertexCount()) {
       size = line.getVertexCount() - index;
@@ -87,10 +87,9 @@ public class LineHandlingFunctions {
     for (final Iterator it = lines.iterator(); it.hasNext();) {
       final LineString line = (LineString)it.next();
       for (int i = 1; i < line.getVertexCount(); i++) {
-        final LineString seg = g.getGeometryFactory().lineString(
-          new Point[] {
-            line.getPoint(i - 1), line.getPoint(i)
-          });
+        final LineString seg = g.getGeometryFactory().lineString(new Point[] {
+          line.getPoint(i - 1), line.getPoint(i)
+        });
         segments.add(seg);
       }
     }

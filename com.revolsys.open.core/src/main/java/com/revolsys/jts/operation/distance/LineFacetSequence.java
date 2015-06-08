@@ -96,8 +96,8 @@ public class LineFacetSequence implements FacetSequence {
         final double line2X2 = facetSeq.getCoordinate(i + 1, 0);
         final double line2Y2 = facetSeq.getCoordinate(i + 1, 1);
 
-        final double dist = LineSegmentUtil.distanceLineLine(line1X1, line1Y1,
-          line1X2, line1Y2, line2X1, line2Y1, line2X2, line2Y2);
+        final double dist = LineSegmentUtil.distanceLineLine(line1X1, line1Y1, line1X2, line1Y2,
+          line2X1, line2Y1, line2X2, line2Y2);
         if (dist == 0.0) {
           return 0.0;
         } else if (dist < minDistance) {

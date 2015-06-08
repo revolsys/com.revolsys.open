@@ -46,6 +46,8 @@ import com.revolsys.jts.geom.impl.PointDouble;
  */
 public class OctagonalEnvelope {
 
+  private static double SQRT2 = Math.sqrt(2.0);
+
   private static double computeA(final double x, final double y) {
     return x + y;
   }
@@ -53,8 +55,6 @@ public class OctagonalEnvelope {
   private static double computeB(final double x, final double y) {
     return x - y;
   }
-
-  private static double SQRT2 = Math.sqrt(2.0);
 
   // initialize in the null state
   private double minX = Double.NaN;
@@ -122,8 +122,8 @@ public class OctagonalEnvelope {
     }
 
     return other.minX >= this.minX && other.maxX <= this.maxX && other.minY >= this.minY
-        && other.maxY <= this.maxY && other.minA >= this.minA && other.maxA <= this.maxA
-        && other.minB >= this.minB && other.maxB <= this.maxB;
+      && other.maxY <= this.maxY && other.minA >= this.minA && other.maxA <= this.maxA
+      && other.minB >= this.minB && other.maxB <= this.maxB;
   }
 
   public void expandBy(final double distance) {
@@ -371,7 +371,8 @@ public class OctagonalEnvelope {
     if (isNull()) {
       return true;
     }
-    return this.minX <= this.maxX && this.minY <= this.maxY && this.minA <= this.maxA && this.minB <= this.maxB;
+    return this.minX <= this.maxX && this.minY <= this.maxY && this.minA <= this.maxA
+      && this.minB <= this.maxB;
   }
 
   /**
@@ -396,15 +397,15 @@ public class OctagonalEnvelope {
     final Point px11 = new PointDouble(geometryFactory.makePrecise(0, this.maxX),
       geometryFactory.makePrecise(1, this.maxA - this.maxX));
 
-    final Point py00 = new PointDouble(geometryFactory.makePrecise(0, this.minA
-      - this.minY), geometryFactory.makePrecise(1, this.minY));
-    final Point py01 = new PointDouble(geometryFactory.makePrecise(0, this.minY
-      + this.maxB), geometryFactory.makePrecise(1, this.minY));
+    final Point py00 = new PointDouble(geometryFactory.makePrecise(0, this.minA - this.minY),
+      geometryFactory.makePrecise(1, this.minY));
+    final Point py01 = new PointDouble(geometryFactory.makePrecise(0, this.minY + this.maxB),
+      geometryFactory.makePrecise(1, this.minY));
 
-    final Point py10 = new PointDouble(geometryFactory.makePrecise(0, this.maxY
-      + this.minB), geometryFactory.makePrecise(1, this.maxY));
-    final Point py11 = new PointDouble(geometryFactory.makePrecise(0, this.maxA
-      - this.maxY), geometryFactory.makePrecise(1, this.maxY));
+    final Point py10 = new PointDouble(geometryFactory.makePrecise(0, this.maxY + this.minB),
+      geometryFactory.makePrecise(1, this.maxY));
+    final Point py11 = new PointDouble(geometryFactory.makePrecise(0, this.maxA - this.maxY),
+      geometryFactory.makePrecise(1, this.maxY));
 
     final CoordinateList coordList = new CoordinateList();
     coordList.add(px00, false);

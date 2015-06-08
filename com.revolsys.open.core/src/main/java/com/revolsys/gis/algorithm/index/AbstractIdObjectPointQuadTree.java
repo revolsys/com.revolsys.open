@@ -6,8 +6,8 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Point;
 
-public abstract class AbstractIdObjectPointQuadTree<T> extends
-AbstractPointSpatialIndex<T> implements IdObjectIndex<T> {
+public abstract class AbstractIdObjectPointQuadTree<T> extends AbstractPointSpatialIndex<T>
+  implements IdObjectIndex<T> {
 
   private final PointSpatialIndex<Integer> index = new PointQuadTree<Integer>();
 
@@ -53,15 +53,14 @@ AbstractPointSpatialIndex<T> implements IdObjectIndex<T> {
 
   @Override
   public void visit(final BoundingBox envelope, final Visitor<T> visitor) {
-    final IdObjectIndexEnvelopeVisitor<T> itemVisitor = new IdObjectIndexEnvelopeVisitor<T>(
-        this, envelope, visitor);
+    final IdObjectIndexEnvelopeVisitor<T> itemVisitor = new IdObjectIndexEnvelopeVisitor<T>(this,
+      envelope, visitor);
     this.index.visit(envelope, itemVisitor);
   }
 
   @Override
   public void visit(final Visitor<T> visitor) {
-    final IdObjectIndexVisitor<T> itemVisitor = new IdObjectIndexVisitor<T>(
-        this, visitor);
+    final IdObjectIndexVisitor<T> itemVisitor = new IdObjectIndexVisitor<T>(this, visitor);
     this.index.visit(itemVisitor);
   }
 

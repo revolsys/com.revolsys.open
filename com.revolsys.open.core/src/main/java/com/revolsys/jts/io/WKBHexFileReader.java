@@ -54,16 +54,20 @@ import com.revolsys.jts.geom.Geometry;
  * @author Martin Davis
  *
  */
-public class WKBHexFileReader
-{
-  private File file = null;
-  private Reader reader;
-  private final WKBReader wkbReader;
-  private int count = 0;
-  private int limit = -1;
-  private int offset = 0;
-
+public class WKBHexFileReader {
   private static final int MAX_LOOKAHEAD = 1000;
+
+  private File file = null;
+
+  private Reader reader;
+
+  private final WKBReader wkbReader;
+
+  private int count = 0;
+
+  private int limit = -1;
+
+  private int offset = 0;
 
   /**
    * Creates a new <tt>WKBHexFileReader</tt> given the <tt>File</tt> to read from
@@ -72,8 +76,7 @@ public class WKBHexFileReader
    * @param file the <tt>File</tt> to read from
    * @param wkbReader the geometry reader to use
    */
-  public WKBHexFileReader(final File file, final WKBReader wkbReader)
-  {
+  public WKBHexFileReader(final File file, final WKBReader wkbReader) {
     this.file = file;
     this.wkbReader = wkbReader;
   }
@@ -84,8 +87,7 @@ public class WKBHexFileReader
    * @param reader the reader to read from
    * @param wkbReader the geometry reader to use
    */
-  public WKBHexFileReader(final Reader reader, final WKBReader wkbReader)
-  {
+  public WKBHexFileReader(final Reader reader, final WKBReader wkbReader) {
     this.reader = reader;
     this.wkbReader = wkbReader;
   }
@@ -96,17 +98,14 @@ public class WKBHexFileReader
    * @param filename the name of the file to read from
    * @param wkbReader the geometry reader to use
    */
-  public WKBHexFileReader(final String filename, final WKBReader wkbReader)
-  {
+  public WKBHexFileReader(final String filename, final WKBReader wkbReader) {
     this(new File(filename), wkbReader);
   }
 
   /**
    * Tests if reader is at EOF.
    */
-  private boolean isAtEndOfFile(final BufferedReader bufferedReader)
-      throws IOException
-  {
+  private boolean isAtEndOfFile(final BufferedReader bufferedReader) throws IOException {
     bufferedReader.mark(MAX_LOOKAHEAD);
 
     final StreamTokenizer tokenizer = new StreamTokenizer(bufferedReader);
@@ -119,8 +118,7 @@ public class WKBHexFileReader
     return false;
   }
 
-  private boolean isAtLimit(final List geoms)
-  {
+  private boolean isAtLimit(final List geoms) {
     if (this.limit < 0) {
       return false;
     }
@@ -139,9 +137,7 @@ public class WKBHexFileReader
    * @throws IOException if an I/O exception was encountered
    * @throws ParseException if an error occured reading a geometry
    */
-  public List read()
-      throws IOException, ParseException
-  {
+  public List read() throws IOException, ParseException {
     // do this here so that constructors don't throw exceptions
     if (this.file != null) {
       this.reader = new FileReader(this.file);
@@ -160,10 +156,9 @@ public class WKBHexFileReader
     }
   }
 
-  private List read(final BufferedReader bufferedReader) throws IOException,
-  ParseException {
+  private List read(final BufferedReader bufferedReader) throws IOException, ParseException {
     final List geoms = new ArrayList();
-    while (! isAtEndOfFile(bufferedReader) && ! isAtLimit(geoms)) {
+    while (!isAtEndOfFile(bufferedReader) && !isAtLimit(geoms)) {
       final String line = bufferedReader.readLine().trim();
       if (line.length() == 0) {
         continue;
@@ -182,8 +177,7 @@ public class WKBHexFileReader
    *
    * @param limit the maximum number of geometries to read
    */
-  public void setLimit(final int limit)
-  {
+  public void setLimit(final int limit) {
     this.limit = limit;
   }
 
@@ -192,8 +186,7 @@ public class WKBHexFileReader
    *
    * @param offset the number of geometries to skip
    */
-  public void setOffset(final int offset)
-  {
+  public void setOffset(final int offset) {
     this.offset = offset;
   }
 }

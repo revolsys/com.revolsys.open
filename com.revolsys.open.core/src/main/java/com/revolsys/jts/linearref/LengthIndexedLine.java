@@ -136,12 +136,11 @@ public class LengthIndexedLine {
    *    (positive is to the left, negative is to the right)
    * @return the Point at the given index
    */
-  public Point extractPoint(final double index,
-    final double offsetDistance) {
+  public Point extractPoint(final double index, final double offsetDistance) {
     final LinearLocation loc = LengthLocationMap.getLocation(this.linearGeom, index);
     final LinearLocation locLow = loc.toLowest(this.linearGeom);
-    return locLow.getSegment(this.linearGeom).pointAlongOffset(
-      locLow.getSegmentFraction(), offsetDistance);
+    return locLow.getSegment(this.linearGeom).pointAlongOffset(locLow.getSegmentFraction(),
+      offsetDistance);
   }
 
   /**
@@ -217,8 +216,7 @@ public class LengthIndexedLine {
    * @return a pair of indices for the start and end of the subline.
    */
   public double[] indicesOf(final Geometry subLine) {
-    final LinearLocation[] locIndex = LocationIndexOfLine.indicesOf(this.linearGeom,
-      subLine);
+    final LinearLocation[] locIndex = LocationIndexOfLine.indicesOf(this.linearGeom, subLine);
     final double[] index = new double[] {
       LengthLocationMap.getLength(this.linearGeom, locIndex[0]),
       LengthLocationMap.getLength(this.linearGeom, locIndex[1])
@@ -240,8 +238,7 @@ public class LengthIndexedLine {
     return LengthLocationMap.getLocation(this.linearGeom, index);
   }
 
-  private LinearLocation locationOf(final double index,
-    final boolean resolveLower) {
+  private LinearLocation locationOf(final double index, final boolean resolveLower) {
     return LengthLocationMap.getLocation(this.linearGeom, index, resolveLower);
   }
 

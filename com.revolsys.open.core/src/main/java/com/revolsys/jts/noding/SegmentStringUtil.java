@@ -54,8 +54,7 @@ public class SegmentStringUtil {
    * @param geom the geometry to extract from
    * @return a List of SegmentStrings
    */
-  public static List<NodedSegmentString> extractSegmentStrings(
-    final Geometry geom) {
+  public static List<NodedSegmentString> extractSegmentStrings(final Geometry geom) {
     final List<NodedSegmentString> segments = new ArrayList<>();
     final List<LineString> lines = geom.getGeometryComponents(LineString.class);
     for (final LineString line : lines) {

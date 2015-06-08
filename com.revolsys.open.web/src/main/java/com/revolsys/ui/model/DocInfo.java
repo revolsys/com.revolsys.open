@@ -20,8 +20,7 @@ public class DocInfo {
     this.description = docInfo.getDescription();
   }
 
-  public DocInfo(final Locale locale, final String title,
-    final String description) {
+  public DocInfo(final Locale locale, final String title, final String description) {
     this.locale = locale;
     this.title = title;
     this.description = description;

@@ -20,11 +20,11 @@ import com.revolsys.jts.noding.snapround.GeometryNoder;
  */
 public class SnapRoundingTest extends TestCase {
 
+  static final double SNAP_TOLERANCE = 1.0;
+
   public static void main(final String args[]) {
     TestRunner.run(SnapRoundingTest.class);
   }
-
-  static final double SNAP_TOLERANCE = 1.0;
 
   WKTReader rdr = new WKTReader();
 
@@ -72,12 +72,11 @@ public class SnapRoundingTest extends TestCase {
     return true;
   }
 
-  private boolean isSnapped(final Point v, final Point p0,
-    final Point p1) {
-    if (v.equals(2,p0)) {
+  private boolean isSnapped(final Point v, final Point p0, final Point p1) {
+    if (v.equals(2, p0)) {
       return true;
     }
-    if (v.equals(2,p1)) {
+    if (v.equals(2, p1)) {
       return true;
     }
     final LineSegment seg = new LineSegmentDouble(p0, p1);
@@ -123,16 +122,14 @@ public class SnapRoundingTest extends TestCase {
 
   public void testBadNoding1Extract() {
     final String[] badNoding1Extract = {
-      "LINESTRING ( 82 55, 101 74 )", "LINESTRING ( 94 68, 99 71 )",
-      "LINESTRING ( 85 57, 88 62 )"
+      "LINESTRING ( 82 55, 101 74 )", "LINESTRING ( 94 68, 99 71 )", "LINESTRING ( 85 57, 88 62 )"
     };
     runRounding(badNoding1Extract);
   }
 
   public void testBadNoding1ExtractShift() {
     final String[] badNoding1ExtractShift = {
-      "LINESTRING ( 0 0, 19 19 )", "LINESTRING ( 12 13, 17 16 )",
-      "LINESTRING ( 3 2, 6 7 )"
+      "LINESTRING ( 0 0, 19 19 )", "LINESTRING ( 12 13, 17 16 )", "LINESTRING ( 3 2, 6 7 )"
     };
     runRounding(badNoding1ExtractShift);
   }

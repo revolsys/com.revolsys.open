@@ -14,8 +14,7 @@ public class RecordGeometryAreaComparitor implements Comparator<Record> {
   public RecordGeometryAreaComparitor() {
   }
 
-  public RecordGeometryAreaComparitor(final boolean decending,
-    final boolean clockwise) {
+  public RecordGeometryAreaComparitor(final boolean decending, final boolean clockwise) {
     this.decending = decending;
     this.clockwise = clockwise;
   }

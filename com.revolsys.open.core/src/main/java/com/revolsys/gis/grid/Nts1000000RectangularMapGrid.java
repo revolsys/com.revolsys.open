@@ -16,10 +16,10 @@ import com.revolsys.util.Property;
 
 public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
 
-  private final GeometryFactory geometryFactory = GeometryFactory.wgs84();
+  private static final Pattern NAME_PATTERN = Pattern.compile("^" + NtsConstants.REGEX_1000000
+    + ".*");
 
-  private static final Pattern NAME_PATTERN = Pattern.compile("^"
-      + NtsConstants.REGEX_1000000 + ".*");
+  private final GeometryFactory geometryFactory = GeometryFactory.wgs84();
 
   private double precisionScale = 1;
 
@@ -44,8 +44,8 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
   public BoundingBox getBoundingBox(final String mapTileName) {
     final double lat = getLatitude(mapTileName);
     final double lon = getLongitude(mapTileName);
-    return new BoundingBoxDoubleGf(getGeometryFactory(), 2, lon, lat, lon
-      - this.tileWidth, lat + this.tileHeight);
+    return new BoundingBoxDoubleGf(getGeometryFactory(), 2, lon, lat, lon - this.tileWidth, lat
+      + this.tileHeight);
   }
 
   @Override
@@ -108,12 +108,10 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
    * @param north The number of sheets north.
    * @return The new map sheet.
    */
-  public String getMapTileName(final String sheet, final int east,
-    final int north) {
+  public String getMapTileName(final String sheet, final int east, final int north) {
     final double sourceLon = getLongitude(sheet);
     final double sourceLat = getLatitude(sheet);
-    final double lon = MathUtil.makePrecise(this.precisionScale, sourceLon
-      + east * getTileWidth());
+    final double lon = MathUtil.makePrecise(this.precisionScale, sourceLon + east * getTileWidth());
     final double lat = sourceLat + north * getTileHeight();
     return getMapTileName(lon, lat);
   }
@@ -127,8 +125,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
         return block;
       }
     }
-    throw new IllegalArgumentException(mapTileName
-      + " does not start with a valid NTS block");
+    throw new IllegalArgumentException(mapTileName + " does not start with a valid NTS block");
   }
 
   @Override
@@ -136,8 +133,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
     final String mapTileName = getMapTileName(x, y);
     final String formattedMapTileName = getFormattedMapTileName(mapTileName);
     final BoundingBox boundingBox = getBoundingBox(mapTileName);
-    return new SimpleRectangularMapTile(this, formattedMapTileName,
-      mapTileName, boundingBox);
+    return new SimpleRectangularMapTile(this, formattedMapTileName, mapTileName, boundingBox);
   }
 
   @Override
@@ -147,8 +143,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
     final double lat = boundingBox.getMinY();
     final String name = getMapTileName(lon, lat);
     final String formattedMapTileName = getFormattedMapTileName(mapTileName);
-    return new SimpleRectangularMapTile(this, formattedMapTileName, name,
-      boundingBox);
+    return new SimpleRectangularMapTile(this, formattedMapTileName, name, boundingBox);
   }
 
   @Override
@@ -175,8 +170,8 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
     final int max = 100;
     if (numX > max || numY > max) {
       LoggerFactory.getLogger(getClass()).error(
-        "Request would return too many tiles width=" + numX + " (max=" + max
-        + ") height=" + numY + "(max=" + max + ").");
+        "Request would return too many tiles width=" + numX + " (max=" + max + ") height=" + numY
+          + "(max=" + max + ").");
       return tiles;
     }
     for (int y = 0; y < numY; y++) {

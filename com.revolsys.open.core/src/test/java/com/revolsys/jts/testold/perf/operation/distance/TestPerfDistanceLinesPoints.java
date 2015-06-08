@@ -109,8 +109,8 @@ public class TestPerfDistanceLinesPoints {
     final double yinc = extent.getHeight() / nPtsSide;
     for (int i = 0; i < nPtsSide; i++) {
       for (int j = 0; j < nPtsSide; j++) {
-        pts[index++] = geomFact.point(new PointDouble(extent.getMinX() + i
-          * xinc, extent.getMinY() + j * yinc, Point.NULL_ORDINATE));
+        pts[index++] = geomFact.point(new PointDouble(extent.getMinX() + i * xinc, extent.getMinY()
+          + j * yinc, Point.NULL_ORDINATE));
       }
     }
     return pts;
@@ -147,7 +147,7 @@ public class TestPerfDistanceLinesPoints {
   }
 
   public void test(final Geometry[] pts, final Geometry target) {
-    if (verbose) {
+    if (this.verbose) {
       // System.out.println("Query points = " + pts.length
       // + "     Target points = " + target.getVertexCount());
       // if (! verbose) System.out.print(num + ", ");
@@ -158,12 +158,11 @@ public class TestPerfDistanceLinesPoints {
     for (int i = 0; i < MAX_ITER; i++) {
       computeDistance(pts, target);
     }
-    if (!verbose) {
+    if (!this.verbose) {
       // System.out.println(sw.getTimeString());
     }
-    if (verbose) {
-      final String name = USE_INDEXED_DIST ? "IndexedFacetDistance"
-        : "Distance";
+    if (this.verbose) {
+      final String name = USE_INDEXED_DIST ? "IndexedFacetDistance" : "Distance";
       // System.out.println(name + " - Run time: " + sw.getTimeString());
       // System.out.println("       (Distance = " + dist + ")\n");
       // System.out.println();

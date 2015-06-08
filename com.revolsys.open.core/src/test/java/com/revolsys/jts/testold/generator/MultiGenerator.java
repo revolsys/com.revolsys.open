@@ -46,12 +46,6 @@ import com.revolsys.jts.geom.GeometryFactory;
  */
 public class MultiGenerator extends GeometryGenerator {
 
-  private GeometryGenerator generator = null;
-
-  private int numberGeometries = 2;
-
-  private final int generationAlgorithm = 0;
-
   /**
    * Grid style blocks
    */
@@ -66,6 +60,12 @@ public class MultiGenerator extends GeometryGenerator {
    * Horizontal strips
    */
   public static final int HORZ = 2;
+
+  private GeometryGenerator generator = null;
+
+  private int numberGeometries = 2;
+
+  private final int generationAlgorithm = 0;
 
   /**
    * @param generator
@@ -112,19 +112,19 @@ public class MultiGenerator extends GeometryGenerator {
         grid.setNumberRows(nrow);
         grid.setNumberColumns(ncol);
 
-        break;
+      break;
       case VERT:
 
         grid.setNumberRows(1);
         grid.setNumberColumns(this.numberGeometries);
 
-        break;
+      break;
       case HORZ:
 
         grid.setNumberRows(this.numberGeometries);
         grid.setNumberColumns(1);
 
-        break;
+      break;
       default:
         throw new IllegalStateException("Invalid Alg. Specified");
     }

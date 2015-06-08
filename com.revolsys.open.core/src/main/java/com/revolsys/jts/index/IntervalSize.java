@@ -14,6 +14,14 @@ package com.revolsys.jts.index;
 public class IntervalSize {
 
   /**
+   * This value is chosen to be a few powers of 2 less than the
+   * number of bits available in the double representation (i.e. 53).
+   * This should allow enough extra precision for simple computations to be correct,
+   * at least for comparison purposes.
+   */
+  public static final int MIN_BINARY_EXPONENT = -50;
+
+  /**
    * Computes whether the interval [min, max] is effectively zero width.
    * I.e. the width of the interval is so much less than the
    * location of the interval that the midpoint of the interval cannot be
@@ -30,12 +38,4 @@ public class IntervalSize {
     final int level = DoubleBits.exponent(scaledInterval);
     return level <= MIN_BINARY_EXPONENT;
   }
-
-  /**
-   * This value is chosen to be a few powers of 2 less than the
-   * number of bits available in the double representation (i.e. 53).
-   * This should allow enough extra precision for simple computations to be correct,
-   * at least for comparison purposes.
-   */
-  public static final int MIN_BINARY_EXPONENT = -50;
 }

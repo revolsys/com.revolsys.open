@@ -20,8 +20,7 @@ import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.util.JavaBeanUtil;
 
-public class MarkerStylePanel extends BaseStylePanel implements
-PropertyChangeListener {
+public class MarkerStylePanel extends BaseStylePanel implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   private final MarkerStyleRenderer geometryStyleRenderer;

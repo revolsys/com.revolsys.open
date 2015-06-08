@@ -17,13 +17,11 @@ public interface RecordReaderFactory extends IoFactory {
 
   Reader<Record> createDirectoryRecordReader(File file);
 
-  Reader<Record> createDirectoryRecordReader(File file,
-    RecordFactory factory);
+  Reader<Record> createDirectoryRecordReader(File file, RecordFactory factory);
 
   RecordReader createRecordReader(Resource resource);
 
-  RecordReader createRecordReader(Resource resource,
-    RecordFactory factory);
+  RecordReader createRecordReader(Resource resource, RecordFactory factory);
 
   Set<CoordinateSystem> getCoordinateSystems();
 

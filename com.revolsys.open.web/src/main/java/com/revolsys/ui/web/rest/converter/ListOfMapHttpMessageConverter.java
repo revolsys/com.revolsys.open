@@ -18,27 +18,23 @@ import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
-public class ListOfMapHttpMessageConverter extends
-AbstractHttpMessageConverter<ArrayListOfMap> {
+public class ListOfMapHttpMessageConverter extends AbstractHttpMessageConverter<ArrayListOfMap> {
 
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
   public ListOfMapHttpMessageConverter() {
-    super(ArrayListOfMap.class, null, IoFactoryRegistry.getInstance()
-      .getMediaTypes(MapWriterFactory.class));
+    super(ArrayListOfMap.class, null, IoFactoryRegistry.getInstance().getMediaTypes(
+      MapWriterFactory.class));
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public void write(final ArrayListOfMap list, final MediaType mediaType,
-    final HttpOutputMessage outputMessage) throws IOException,
-    HttpMessageNotWritableException {
+    final HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
     if (!HttpServletUtils.getResponse().isCommitted()) {
-      final Charset charset = HttpServletUtils.setContentTypeWithCharset(
-        outputMessage, mediaType);
+      final Charset charset = HttpServletUtils.setContentTypeWithCharset(outputMessage, mediaType);
       final OutputStream body = outputMessage.getBody();
-      final String mediaTypeString = mediaType.getType() + "/"
-          + mediaType.getSubtype();
+      final String mediaTypeString = mediaType.getType() + "/" + mediaType.getSubtype();
       final MapWriterFactory writerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
         MapWriterFactory.class, mediaTypeString);
       final MapWriter writer = writerFactory.getMapWriter(body, charset);

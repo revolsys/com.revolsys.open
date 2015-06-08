@@ -18,16 +18,16 @@ public class StaticMethodValuesFilter<T> implements Filter<T> {
   public StaticMethodValuesFilter() {
   }
 
-  public StaticMethodValuesFilter(final Class<?> methodClass,
-    final String methodName, final Collection<? extends Object> values) {
+  public StaticMethodValuesFilter(final Class<?> methodClass, final String methodName,
+    final Collection<? extends Object> values) {
     this.methodClass = methodClass;
     this.methodName = methodName;
     this.values = values;
     initialize();
   }
 
-  public StaticMethodValuesFilter(final Class<?> methodClass,
-    final String methodName, final Object... values) {
+  public StaticMethodValuesFilter(final Class<?> methodClass, final String methodName,
+    final Object... values) {
     this(methodClass, methodName, Arrays.asList(values));
   }
 
@@ -68,15 +68,15 @@ public class StaticMethodValuesFilter<T> implements Filter<T> {
       final String name = method.getName();
       if (name.equals(this.methodName) && method.getParameterTypes().length == 1) {
         if (this.method != null) {
-          throw new IllegalArgumentException("Multiple method match for "
-              + this.methodClass + "." + this.methodName);
+          throw new IllegalArgumentException("Multiple method match for " + this.methodClass + "."
+            + this.methodName);
         }
         this.method = method;
       }
     }
     if (this.method == null) {
-      throw new IllegalArgumentException("No method match for " + this.methodClass
-        + "." + this.methodName);
+      throw new IllegalArgumentException("No method match for " + this.methodClass + "."
+        + this.methodName);
     }
   }
 
@@ -96,7 +96,7 @@ public class StaticMethodValuesFilter<T> implements Filter<T> {
   public String toString() {
     if (this.values.size() == 1) {
       return this.methodClass.getName() + "." + this.methodName + "(object)="
-          + this.values.iterator().next();
+        + this.values.iterator().next();
     } else {
       return this.methodClass.getName() + "." + this.methodName + "(object) in " + this.values;
     }

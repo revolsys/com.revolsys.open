@@ -48,8 +48,8 @@ public class LineStartsSharesStartOrEndFilter implements Filter<LineString> {
       return false;
     } else {
       for (int vertexIndex = 0; vertexIndex < vertexCount2; vertexIndex++) {
-        if (!this.line.equalsVertex(2, vertexCount1 - 1 - vertexIndex, line,
-          vertexCount2 - 1 - vertexIndex)) {
+        if (!this.line.equalsVertex(2, vertexCount1 - 1 - vertexIndex, line, vertexCount2 - 1
+          - vertexIndex)) {
           return false;
         }
       }

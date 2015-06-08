@@ -17,13 +17,12 @@ import com.revolsys.io.MapWriterFactory;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.SpringUtil;
 
-public class KmzIoFactory extends AbstractRecordAndGeometryWriterFactory
-implements MapWriterFactory, GeometryReaderFactory {
+public class KmzIoFactory extends AbstractRecordAndGeometryWriterFactory implements
+  MapWriterFactory, GeometryReaderFactory {
 
   public KmzIoFactory() {
     super(Kml22Constants.KMZ_FORMAT_DESCRIPTION, true, true);
-    addMediaTypeAndFileExtension(Kml22Constants.KMZ_MEDIA_TYPE,
-      Kml22Constants.KMZ_FILE_EXTENSION);
+    addMediaTypeAndFileExtension(Kml22Constants.KMZ_MEDIA_TYPE, Kml22Constants.KMZ_FILE_EXTENSION);
   }
 
   @Override
@@ -34,8 +33,7 @@ implements MapWriterFactory, GeometryReaderFactory {
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream,
-    final Charset charset) {
+    final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
     return new KmzRecordWriter(outputStream, charset);
   }
 
@@ -71,8 +69,7 @@ implements MapWriterFactory, GeometryReaderFactory {
   }
 
   @Override
-  public boolean isCoordinateSystemSupported(
-    final CoordinateSystem coordinateSystem) {
+  public boolean isCoordinateSystemSupported(final CoordinateSystem coordinateSystem) {
     return KmlIoFactory.COORDINATE_SYSTEMS.contains(coordinateSystem);
   }
 

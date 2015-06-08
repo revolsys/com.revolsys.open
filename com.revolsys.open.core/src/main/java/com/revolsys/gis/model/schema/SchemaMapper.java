@@ -24,8 +24,7 @@ public class SchemaMapper {
    * @param from The type.
    * @param to The mapped type.
    */
-  public void addFieldMapping(final FieldDefinition from,
-    final FieldDefinition to) {
+  public void addFieldMapping(final FieldDefinition from, final FieldDefinition to) {
     this.attributeMapping.put(from, to);
     this.attributeMapping.put(to, from);
   }
@@ -36,8 +35,8 @@ public class SchemaMapper {
    * @param from The attribute.
    * @param to The mapped type.
    */
-  public void addFieldMapping(final RecordDefinition fromClass,
-    final String fromName, final RecordDefinition toClass, final String toName) {
+  public void addFieldMapping(final RecordDefinition fromClass, final String fromName,
+    final RecordDefinition toClass, final String toName) {
     final FieldDefinition fromAttribute = fromClass.getField(fromName);
     final FieldDefinition toAttribute = toClass.getField(toName);
     addFieldMapping(fromAttribute, toAttribute);
@@ -49,8 +48,7 @@ public class SchemaMapper {
    * @param from The type.
    * @param converter The converter.
    */
-  public void addTypeConverter(final RecordDefinition type,
-    final ObjectConverter converter) {
+  public void addTypeConverter(final RecordDefinition type, final ObjectConverter converter) {
     this.typeConverter.put(type, converter);
   }
 
@@ -60,8 +58,7 @@ public class SchemaMapper {
    * @param from The type.
    * @param to The mapped type.
    */
-  public void addTypeMapping(final RecordDefinition from,
-    final RecordDefinition to) {
+  public void addTypeMapping(final RecordDefinition from, final RecordDefinition to) {
     this.typeMapping.put(from, to);
     this.typeMapping.put(to, from);
   }

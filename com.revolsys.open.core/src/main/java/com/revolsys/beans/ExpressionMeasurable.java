@@ -22,8 +22,8 @@ public class ExpressionMeasurable<Q extends Quantity> extends Measure<Q> {
 
   private JexlContext context;
 
-  protected ExpressionMeasurable(final Expression expression,
-    final JexlContext context, final Unit<Q> unit) {
+  protected ExpressionMeasurable(final Expression expression, final JexlContext context,
+    final Unit<Q> unit) {
     this.expression = expression;
     this.context = context;
     this.unit = unit;
@@ -33,15 +33,14 @@ public class ExpressionMeasurable<Q extends Quantity> extends Measure<Q> {
     try {
       this.expression = JexlUtil.createExpression(expression);
     } catch (final Exception e) {
-      throw new IllegalArgumentException("Expression " + expression
-        + " is not valid", e);
+      throw new IllegalArgumentException("Expression " + expression + " is not valid", e);
     }
     this.unit = unit;
   }
 
   @Override
   public BigDecimal decimalValue(final Unit<Q> arg0, final MathContext arg1)
-      throws ArithmeticException {
+    throws ArithmeticException {
     throw new UnsupportedOperationException();
   }
 
@@ -67,8 +66,7 @@ public class ExpressionMeasurable<Q extends Quantity> extends Measure<Q> {
       return Double.NaN;
     } else {
       try {
-        return Double.valueOf(JexlUtil.evaluateExpression(this.context, this.expression)
-          .toString());
+        return Double.valueOf(JexlUtil.evaluateExpression(this.context, this.expression).toString());
       } catch (final NullPointerException e) {
         return 0.0;
       }

@@ -144,20 +144,17 @@ public class OsnIterator implements Iterator<Object> {
 
   private Object value;
 
-  public OsnIterator(final File directory, final String fileName)
-      throws IOException {
+  public OsnIterator(final File directory, final String fileName) throws IOException {
     this(fileName, new ObjectSetInputStream(directory, fileName));
   }
 
-  public OsnIterator(final String fileName, final InputStream in)
-      throws IOException {
+  public OsnIterator(final String fileName, final InputStream in) throws IOException {
     this.in = new BufferedInputStream(in);
     this.fileName = fileName;
     this.scopeStack.push(IN_DOCUMENT);
   }
 
-  public OsnIterator(final ZipFile zipFile, final String fileName)
-      throws IOException {
+  public OsnIterator(final ZipFile zipFile, final String fileName) throws IOException {
     this(fileName, new ObjectSetInputStream(zipFile, fileName));
   }
 
@@ -529,12 +526,10 @@ public class OsnIterator implements Iterator<Object> {
   }
 
   public String nextStringValue() {
-    if (this.eventType != OsnIterator.TEXT_VALUE
-        && this.eventType != OsnIterator.ENUM_TAG) {
+    if (this.eventType != OsnIterator.TEXT_VALUE && this.eventType != OsnIterator.ENUM_TAG) {
       if (this.eventType == END_OBJECT) {
         return null;
-      } else if (next() != OsnIterator.TEXT_VALUE
-          && this.eventType != OsnIterator.ENUM_TAG) {
+      } else if (next() != OsnIterator.TEXT_VALUE && this.eventType != OsnIterator.ENUM_TAG) {
         throwParseError("Excepecting an text value");
       }
     }
@@ -542,16 +537,12 @@ public class OsnIterator implements Iterator<Object> {
   }
 
   public Object nextValue() {
-    if (this.eventType != OsnIterator.BOOLEAN_VALUE
-        && this.eventType != OsnIterator.NUMERIC_VALUE
-        && this.eventType != OsnIterator.TEXT_VALUE
-        && this.eventType != OsnIterator.ENUM_TAG) {
+    if (this.eventType != OsnIterator.BOOLEAN_VALUE && this.eventType != OsnIterator.NUMERIC_VALUE
+      && this.eventType != OsnIterator.TEXT_VALUE && this.eventType != OsnIterator.ENUM_TAG) {
       if (this.eventType == END_OBJECT) {
         return null;
-      } else if (next() != OsnIterator.TEXT_VALUE
-          && this.eventType != OsnIterator.NUMERIC_VALUE
-          && this.eventType != OsnIterator.BOOLEAN_VALUE
-          && this.eventType != OsnIterator.ENUM_TAG) {
+      } else if (next() != OsnIterator.TEXT_VALUE && this.eventType != OsnIterator.NUMERIC_VALUE
+        && this.eventType != OsnIterator.BOOLEAN_VALUE && this.eventType != OsnIterator.ENUM_TAG) {
         throwParseError("Excepecting a value");
       }
     }
@@ -689,14 +680,12 @@ public class OsnIterator implements Iterator<Object> {
   public void throwParseError(final String message) {
     final int startIndex = Math.max(this.bufferIndex - 40, 0);
     final int endIndex = Math.min(80, this.bufferLength - 1 - startIndex);
-    throw new ParseException(toString(), message + " got '"
-        + (char)this.currentCharacter + "' context="
-        + new String(this.buffer, startIndex, endIndex));
+    throw new ParseException(toString(), message + " got '" + (char)this.currentCharacter
+      + "' context=" + new String(this.buffer, startIndex, endIndex));
   }
 
   @Override
   public String toString() {
-    return this.fileName + "[" + this.lineNumber + "," + this.columnNumber
-        + "]";
+    return this.fileName + "[" + this.lineNumber + "," + this.columnNumber + "]";
   }
 }

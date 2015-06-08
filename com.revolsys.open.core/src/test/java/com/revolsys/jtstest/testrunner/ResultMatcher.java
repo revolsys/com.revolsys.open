@@ -24,6 +24,6 @@ public interface ResultMatcher {
    * @param tolerance the tolerance for the test
    * @return true if the actual and expected results match
    */
-  boolean isMatch(Geometry geom, String opName, Object[] args,
-    Result actualResult, Result expectedResult, double tolerance);
+  boolean isMatch(Geometry geom, String opName, Object[] args, Result actualResult,
+    Result expectedResult, double tolerance);
 }

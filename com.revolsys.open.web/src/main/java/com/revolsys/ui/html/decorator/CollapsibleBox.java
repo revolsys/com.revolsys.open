@@ -24,8 +24,7 @@ public class CollapsibleBox implements Decorator {
     this.open = open;
   }
 
-  public CollapsibleBox(final String title, final String style,
-    final boolean open) {
+  public CollapsibleBox(final String title, final String style, final boolean open) {
     this.title = title;
     this.style = style;
     this.open = open;

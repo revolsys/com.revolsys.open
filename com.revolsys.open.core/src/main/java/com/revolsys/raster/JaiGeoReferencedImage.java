@@ -12,8 +12,7 @@ public class JaiGeoReferencedImage extends AbstractGeoReferencedImage {
   public JaiGeoReferencedImage(final Resource imageResource) {
     setImageResource(imageResource);
 
-    final PlanarImage jaiImage = JAI.create("fileload",
-      getFile().getAbsolutePath());
+    final PlanarImage jaiImage = JAI.create("fileload", getFile().getAbsolutePath());
     setRenderedImage(jaiImage);
 
     loadImageMetaData();

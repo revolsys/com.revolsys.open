@@ -48,9 +48,8 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   private CoordinatesProjection coordinatesProjection;
 
   public ProjectedCoordinateSystem(final int id, final String name,
-    final GeographicCoordinateSystem geographicCoordinateSystem,
-    final Area area, final Projection projection,
-    final Map<String, Object> parameters, final LinearUnit linearUnit,
+    final GeographicCoordinateSystem geographicCoordinateSystem, final Area area,
+    final Projection projection, final Map<String, Object> parameters, final LinearUnit linearUnit,
     final List<Axis> axis, final Authority authority, final boolean deprecated) {
     this.id = id;
     this.name = name;
@@ -68,9 +67,8 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   }
 
   public ProjectedCoordinateSystem(final int id, final String name,
-    final GeographicCoordinateSystem geographicCoordinateSystem,
-    final Projection projection, final Map<String, Object> parameters,
-    final LinearUnit linearUnit, final List<Axis> axis,
+    final GeographicCoordinateSystem geographicCoordinateSystem, final Projection projection,
+    final Map<String, Object> parameters, final LinearUnit linearUnit, final List<Axis> axis,
     final Authority authority) {
     this.id = id;
     this.name = name;
@@ -102,13 +100,11 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
       return true;
     } else if (object instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem cs = (ProjectedCoordinateSystem)object;
-      if (!EqualsRegistry.equal(this.geographicCoordinateSystem,
-        cs.geographicCoordinateSystem)) {
+      if (!EqualsRegistry.equal(this.geographicCoordinateSystem, cs.geographicCoordinateSystem)) {
         return false;
       } else if (!EqualsRegistry.equal(this.projection, cs.projection)) {
         return false;
-      } else if (!EqualsRegistry.equal(this.normalizedParameters,
-        cs.normalizedParameters)) {
+      } else if (!EqualsRegistry.equal(this.normalizedParameters, cs.normalizedParameters)) {
         return false;
       } else if (!EqualsRegistry.equal(this.linearUnit, cs.linearUnit)) {
         return false;
@@ -141,8 +137,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
         return false;
       } else if (!EqualsRegistry.equal(this.name, cs.name)) {
         return false;
-      } else if (!EqualsRegistry.equal(this.normalizedParameters,
-        cs.normalizedParameters)) {
+      } else if (!EqualsRegistry.equal(this.normalizedParameters, cs.normalizedParameters)) {
         return false;
       } else if (!EqualsRegistry.equal(this.projection, cs.projection)) {
         return false;
@@ -164,8 +159,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     BoundingBox boundingBox;
     final GeometryFactory geographicGeometryFactory = this.geographicCoordinateSystem.getGeometryFactory();
     if (this.area == null) {
-      boundingBox = new BoundingBoxDoubleGf(geographicGeometryFactory, 2, -180, -90, 180,
-        90);
+      boundingBox = new BoundingBoxDoubleGf(geographicGeometryFactory, 2, -180, -90, 180, 90);
     } else {
       final BoundingBoxDoubleGf latLonBounds = this.area.getLatLonBounds();
       boundingBox = latLonBounds.convert(geographicGeometryFactory);

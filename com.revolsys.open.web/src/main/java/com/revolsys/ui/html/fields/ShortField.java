@@ -9,8 +9,7 @@ public class ShortField extends NumberField {
     this(name, required, null);
   }
 
-  public ShortField(final String name, final boolean required,
-    final Object defaultValue) {
+  public ShortField(final String name, final boolean required, final Object defaultValue) {
     super(name, 6, 6, defaultValue, required, Short.MIN_VALUE, Short.MAX_VALUE);
     setCssClass("short");
   }

@@ -48,8 +48,7 @@ import com.revolsys.jts.geom.Geometry;
  * @author mbdavis
  *
  */
-public interface SimilarityMeasure
-{
+public interface SimilarityMeasure {
 
   double measure(Geometry g1, Geometry g2);
 }

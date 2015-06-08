@@ -7,6 +7,12 @@ import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 
 public class FileUnionPerfTest {
+  static final int MAX_ITER = 1;
+
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+
+  static WKTReader wktRdr = new WKTReader(geometryFactory);
+
   public static void main(final String[] args) {
     final FileUnionPerfTest test = new FileUnionPerfTest();
     try {
@@ -15,13 +21,6 @@ public class FileUnionPerfTest {
       ex.printStackTrace();
     }
   }
-
-  static final int MAX_ITER = 1;
-
-  private static final GeometryFactory geometryFactory = GeometryFactory.floating(
-    0, 2);
-
-  static WKTReader wktRdr = new WKTReader(geometryFactory);
 
   GeometryFactory factory = GeometryFactory.floating3();
 

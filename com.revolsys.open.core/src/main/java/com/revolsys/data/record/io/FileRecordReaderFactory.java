@@ -7,8 +7,7 @@ import org.springframework.core.io.Resource;
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.RecordFactory;
 
-public class FileRecordReaderFactory extends
-AbstractFactoryBean<RecordReader> {
+public class FileRecordReaderFactory extends AbstractFactoryBean<RecordReader> {
 
   private RecordFactory factory = new ArrayRecordFactory();
 
@@ -20,8 +19,7 @@ AbstractFactoryBean<RecordReader> {
   }
 
   @Override
-  protected void destroyInstance(final RecordReader reader)
-      throws Exception {
+  protected void destroyInstance(final RecordReader reader) throws Exception {
     reader.close();
     this.factory = null;
     this.resource = null;

@@ -90,8 +90,8 @@ public class TestDataBuilder {
     return poly;
   }
 
-  public List createTestGeoms(final BoundingBox env, final int nItems,
-    final double size, final int nPts) {
+  public List createTestGeoms(final BoundingBox env, final int nItems, final double size,
+    final int nPts) {
     final int nCells = (int)Math.sqrt(nItems);
 
     final List geoms = new ArrayList();
@@ -100,8 +100,8 @@ public class TestDataBuilder {
     final double yInc = width / nCells;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
-        final Point base = new PointDouble(env.getMinX() + i * xInc,
-          env.getMinY() + j * yInc, Point.NULL_ORDINATE);
+        final Point base = new PointDouble(env.getMinX() + i * xInc, env.getMinY() + j * yInc,
+          Point.NULL_ORDINATE);
         final Geometry line = createLine(base, size, nPts);
         geoms.add(line);
       }

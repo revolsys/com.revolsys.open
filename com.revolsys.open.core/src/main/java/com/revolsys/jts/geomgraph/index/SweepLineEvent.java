@@ -1,6 +1,4 @@
 
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -38,17 +36,21 @@ package com.revolsys.jts.geomgraph.index;
 /**
  * @version 1.7
  */
-public class SweepLineEvent
-implements Comparable
-{
+public class SweepLineEvent implements Comparable {
   private static final int INSERT = 1;
+
   private static final int DELETE = 2;
 
-  private Object label;    // used for red-blue intersection detection
+  private Object label; // used for red-blue intersection detection
+
   private final double xValue;
+
   private final int eventType;
+
   private SweepLineEvent insertEvent = null; // null if this is an INSERT event
+
   private int deleteEventIndex;
+
   private Object obj;
 
   /**
@@ -57,8 +59,7 @@ implements Comparable
    * @param x the event location
    * @param insertEvent the corresponding INSERT event
    */
-  public SweepLineEvent(final double x, final SweepLineEvent insertEvent)
-  {
+  public SweepLineEvent(final double x, final SweepLineEvent insertEvent) {
     this.eventType = DELETE;
     this.xValue = x;
     this.insertEvent = insertEvent;
@@ -71,8 +72,7 @@ implements Comparable
    * @param x the event location
    * @param obj the object being inserted
    */
-  public SweepLineEvent(final Object label, final double x, final Object obj)
-  {
+  public SweepLineEvent(final Object label, final double x, final Object obj) {
     this.eventType = INSERT;
     this.label = label;
     this.xValue = x;
@@ -87,37 +87,52 @@ implements Comparable
    */
   @Override
   public int compareTo(final Object o) {
-    final SweepLineEvent pe = (SweepLineEvent) o;
+    final SweepLineEvent pe = (SweepLineEvent)o;
     if (this.xValue < pe.xValue) {
-      return  -1;
+      return -1;
     }
     if (this.xValue > pe.xValue) {
-      return   1;
+      return 1;
     }
     if (this.eventType < pe.eventType) {
-      return  -1;
+      return -1;
     }
     if (this.eventType > pe.eventType) {
-      return   1;
+      return 1;
     }
     return 0;
   }
-  public int getDeleteEventIndex() { return this.deleteEventIndex; }
-  public SweepLineEvent getInsertEvent() { return this.insertEvent; }
-  public Object getObject() { return this.obj; }
-  public boolean isDelete() { return this.eventType == DELETE; }
 
-  public boolean isInsert() { return this.eventType == INSERT; }
+  public int getDeleteEventIndex() {
+    return this.deleteEventIndex;
+  }
 
-  public boolean isSameLabel(final SweepLineEvent ev)
-  {
+  public SweepLineEvent getInsertEvent() {
+    return this.insertEvent;
+  }
+
+  public Object getObject() {
+    return this.obj;
+  }
+
+  public boolean isDelete() {
+    return this.eventType == DELETE;
+  }
+
+  public boolean isInsert() {
+    return this.eventType == INSERT;
+  }
+
+  public boolean isSameLabel(final SweepLineEvent ev) {
     // no label set indicates single group
     if (this.label == null) {
       return false;
     }
     return this.label == ev.label;
   }
-  public void setDeleteEventIndex(final int deleteEventIndex) { this.deleteEventIndex = deleteEventIndex; }
 
+  public void setDeleteEventIndex(final int deleteEventIndex) {
+    this.deleteEventIndex = deleteEventIndex;
+  }
 
 }

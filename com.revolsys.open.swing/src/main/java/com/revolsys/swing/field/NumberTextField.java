@@ -26,6 +26,8 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public class NumberTextField extends JXTextField implements Field, DocumentListener, FocusListener {
+  private static final long serialVersionUID = 1L;
+
   public static Number createMaximumValue(final DataType dataType, final int length, final int scale) {
     final Class<?> javaClass = dataType.getJavaClass();
     final StringBuilder text = new StringBuilder(length);
@@ -123,8 +125,6 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
     }
     return length;
   }
-
-  private static final long serialVersionUID = 1L;
 
   private final DataType dataType;
 

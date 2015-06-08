@@ -9,8 +9,7 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
-public class ClipGeometryProcess extends
-BaseInOutProcess<Record, Record> {
+public class ClipGeometryProcess extends BaseInOutProcess<Record, Record> {
 
   private Polygon clipPolygon;
 
@@ -22,13 +21,11 @@ BaseInOutProcess<Record, Record> {
   }
 
   @Override
-  protected void process(final Channel<Record> in,
-    final Channel<Record> out, final Record object) {
+  protected void process(final Channel<Record> in, final Channel<Record> out, final Record object) {
     final Geometry geometry = object.getGeometryValue();
     if (geometry != null) {
       final Geometry intersection = geometry.intersection(this.clipPolygon);
-      if (!intersection.isEmpty()
-          && intersection.getClass() == geometry.getClass()) {
+      if (!intersection.isEmpty() && intersection.getClass() == geometry.getClass()) {
         if (intersection instanceof LineString) {
           final LineString original = (LineString)geometry;
           LineString lineString = (LineString)intersection;

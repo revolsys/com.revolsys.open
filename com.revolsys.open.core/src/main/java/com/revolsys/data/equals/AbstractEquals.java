@@ -6,11 +6,10 @@ import java.util.Collection;
 
 public abstract class AbstractEquals<T> implements Equals<T> {
   private Reference<EqualsRegistry> equalsRegistry = new WeakReference<EqualsRegistry>(
-      EqualsInstance.INSTANCE);
+    EqualsInstance.INSTANCE);
 
   @Override
-  public boolean equals(final T object1, final T object2,
-    final Collection<String> exclude) {
+  public boolean equals(final T object1, final T object2, final Collection<String> exclude) {
     if (object1 == null) {
       return object2 == null;
     } else if (object2 == null) {
@@ -20,8 +19,7 @@ public abstract class AbstractEquals<T> implements Equals<T> {
     }
   }
 
-  protected abstract boolean equalsNotNull(T object1, T object2,
-    Collection<String> exclude);
+  protected abstract boolean equalsNotNull(T object1, T object2, Collection<String> exclude);
 
   public EqualsRegistry getEqualsRegistry() {
     return this.equalsRegistry.get();

@@ -107,6 +107,14 @@ import com.revolsys.util.MathUtil;
 public class Buffer {
 
   /**
+   * A number of digits of precision which leaves some computational "headroom"
+   * for floating point operations.
+   *
+   * This value should be less than the decimal precision of double-precision values (16).
+   */
+  private static int MAX_PRECISION_DIGITS = 12;
+
+  /**
    * Computes the buffer of a geometry for a given buffer distance.
    *
    * @param g the geometry to buffer
@@ -133,16 +141,14 @@ public class Buffer {
     final GeometryFactory geometryFactory = geometry.getGeometryFactory();
     try {
       final MCIndexNoder noder = new MCIndexNoder();
-      final LineIntersector li = new RobustLineIntersector(
-        geometryFactory.getScaleXY());
+      final LineIntersector li = new RobustLineIntersector(geometryFactory.getScaleXY());
       noder.setSegmentIntersector(new IntersectionAdder(li));
       return buffer(noder, geometryFactory, geometry, distance, parameters);
     } catch (final RuntimeException e) {
       if (geometryFactory.isFloating()) {
         return bufferReducedPrecision(geometry, distance, parameters);
       } else {
-        return bufferFixedPrecision(geometryFactory, geometry, distance,
-          parameters);
+        return bufferFixedPrecision(geometryFactory, geometry, distance, parameters);
       }
 
     }
@@ -186,19 +192,17 @@ public class Buffer {
   }
 
   public static Geometry buffer(final Geometry geometry, final double distance,
-    final int quadrantSegments, final int endCapStyle, final int joinStyle,
-    final double mitreLimit) {
-    return buffer(geometry, distance, new BufferParameters(quadrantSegments,
-      endCapStyle, joinStyle, mitreLimit));
+    final int quadrantSegments, final int endCapStyle, final int joinStyle, final double mitreLimit) {
+    return buffer(geometry, distance, new BufferParameters(quadrantSegments, endCapStyle,
+      joinStyle, mitreLimit));
   }
 
-  private static Geometry buffer(final Noder noder,
-    final GeometryFactory precisionModel, final Geometry geometry,
-    final double distance, final BufferParameters parameters) {
+  private static Geometry buffer(final Noder noder, final GeometryFactory precisionModel,
+    final Geometry geometry, final double distance, final BufferParameters parameters) {
     final GeometryFactory geometryFactory = geometry.getGeometryFactory();
 
-    final OffsetCurveSetBuilder curveSetBuilder = new OffsetCurveSetBuilder(
-      geometry, distance, precisionModel, parameters);
+    final OffsetCurveSetBuilder curveSetBuilder = new OffsetCurveSetBuilder(geometry, distance,
+      precisionModel, parameters);
 
     final List<NodedSegmentString> curves = curveSetBuilder.getCurves();
     if (curves.size() == 0) {
@@ -224,27 +228,24 @@ public class Buffer {
     }
   }
 
-  private static Geometry bufferFixedPrecision(
-    final GeometryFactory precisionModel, final Geometry geometry,
-    final double distance, final BufferParameters parameters) {
+  private static Geometry bufferFixedPrecision(final GeometryFactory precisionModel,
+    final Geometry geometry, final double distance, final BufferParameters parameters) {
     final MCIndexSnapRounder rounder = new MCIndexSnapRounder(1.0);
     final double scale = precisionModel.getScale(0);
     final Noder noder = new ScaledNoder(rounder, scale);
     return Buffer.buffer(noder, precisionModel, geometry, distance, parameters);
   }
 
-  private static Geometry bufferReducedPrecision(final Geometry geometry,
-    final double distance, final BufferParameters parameters) {
+  private static Geometry bufferReducedPrecision(final Geometry geometry, final double distance,
+    final BufferParameters parameters) {
     TopologyException saveException = null;
     // try and compute with decreasing precision
     for (int precDigits = MAX_PRECISION_DIGITS; precDigits >= 0; precDigits--) {
       try {
-        final double sizeBasedScaleFactor = precisionScaleFactor(geometry,
-          distance, precDigits);
-        final GeometryFactory precisionModel = geometry.getGeometryFactory()
-            .convertScales(sizeBasedScaleFactor);
-        return bufferFixedPrecision(precisionModel, geometry, distance,
-          parameters);
+        final double sizeBasedScaleFactor = precisionScaleFactor(geometry, distance, precDigits);
+        final GeometryFactory precisionModel = geometry.getGeometryFactory().convertScales(
+          sizeBasedScaleFactor);
+        return bufferFixedPrecision(precisionModel, geometry, distance, parameters);
       } catch (final TopologyException e) {
 
         saveException = e;
@@ -278,14 +279,14 @@ public class Buffer {
     }
   }
 
-  private static void computeNodedEdges(final Noder noder,
-    final EdgeList edges, final List<NodedSegmentString> segments) {
+  private static void computeNodedEdges(final Noder noder, final EdgeList edges,
+    final List<NodedSegmentString> segments) {
     noder.computeNodes(segments);
     final Collection<NodedSegmentString> nodedSegments = noder.getNodedSubstrings();
     for (final SegmentString segment : nodedSegments) {
       final int vertexCount = segment.size();
       if (vertexCount > 2 || vertexCount == 2
-          && !segment.getCoordinate(0).equals(2, segment.getCoordinate(1))) {
+        && !segment.getCoordinate(0).equals(2, segment.getCoordinate(1))) {
         final Label oldLabel = (Label)segment.getData();
         final Label label = new Label(oldLabel);
         final LineString points = segment.getPoints();
@@ -335,13 +336,12 @@ public class Buffer {
    * @param stabbingRayLeftPt the left-hand origin of the stabbing line
    * @return a List of {@link DepthSegments} intersecting the stabbing line
    */
-  private static List<DepthSegment> findStabbedSegments(
-    final Collection<BufferSubgraph> graphs, final Point stabbingRayLeftPt) {
+  private static List<DepthSegment> findStabbedSegments(final Collection<BufferSubgraph> graphs,
+    final Point stabbingRayLeftPt) {
     final List<DepthSegment> segments = new ArrayList<DepthSegment>();
     for (final BufferSubgraph graph : graphs) {
       final BoundingBox env = graph.getEnvelope();
-      if (stabbingRayLeftPt.getY() >= env.getMinY()
-          && stabbingRayLeftPt.getY() <= env.getMaxY()) {
+      if (stabbingRayLeftPt.getY() >= env.getMinY() && stabbingRayLeftPt.getY() <= env.getMaxY()) {
         final List<DirectedEdge> edges = graph.getDirectedEdges();
         for (final DirectedEdge edge : edges) {
           if (edge.isForward()) {
@@ -361,9 +361,9 @@ public class Buffer {
    * @param stabbingRayLeftPt the left-hand origin of the stabbing line
    * @param stabbedSegments the current list of {@link DepthSegments} intersecting the stabbing line
    */
-  private static void findStabbedSegments(
-    final Collection<BufferSubgraph> subgraphs, final Point stabbingRayLeftPt,
-    final DirectedEdge dirEdge, final List<DepthSegment> stabbedSegments) {
+  private static void findStabbedSegments(final Collection<BufferSubgraph> subgraphs,
+    final Point stabbingRayLeftPt, final DirectedEdge dirEdge,
+    final List<DepthSegment> stabbedSegments) {
     final Edge edge = dirEdge.getEdge();
     for (int i = 0; i < edge.getNumPoints() - 1; i++) {
       final Point p1 = edge.getCoordinate(i);
@@ -396,8 +396,7 @@ public class Buffer {
       }
 
       // skip if stabbing ray is right of the segment
-      if (CGAlgorithmsDD.orientationIndex(seg.getP0(), seg.getP1(),
-        stabbingRayLeftPt) == CGAlgorithms.RIGHT) {
+      if (CGAlgorithmsDD.orientationIndex(seg.getP0(), seg.getP1(), stabbingRayLeftPt) == CGAlgorithms.RIGHT) {
         continue;
       }
 
@@ -412,8 +411,7 @@ public class Buffer {
     }
   }
 
-  private static int getDepth(final Collection<BufferSubgraph> subgraphs,
-    final Point p) {
+  private static int getDepth(final Collection<BufferSubgraph> subgraphs, final Point p) {
     final List<DepthSegment> stabbedSegments = findStabbedSegments(subgraphs, p);
     // if no segments on stabbing line subgraph must be outside all others.
     if (stabbedSegments.size() == 0) {
@@ -478,8 +476,8 @@ public class Buffer {
    *
    * @return a scale factor for the buffer computation
    */
-  private static double precisionScaleFactor(final Geometry geometry,
-    final double distance, final int maxPrecisionDigits) {
+  private static double precisionScaleFactor(final Geometry geometry, final double distance,
+    final int maxPrecisionDigits) {
     final BoundingBox boundingBox = geometry.getBoundingBox();
     final double envMax = MathUtil.max(Math.abs(boundingBox.getMaxX()),
       Math.abs(boundingBox.getMaxY()), Math.abs(boundingBox.getMinX()),
@@ -495,13 +493,5 @@ public class Buffer {
     final double scaleFactor = Math.pow(10.0, minUnitLog10);
     return scaleFactor;
   }
-
-  /**
-   * A number of digits of precision which leaves some computational "headroom"
-   * for floating point operations.
-   *
-   * This value should be less than the decimal precision of double-precision values (16).
-   */
-  private static int MAX_PRECISION_DIGITS = 12;
 
 }

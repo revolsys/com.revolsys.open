@@ -11,8 +11,7 @@ import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 
-public class SetCodeTableId extends
-AbstractSourceToTargetProcess<Record, Record> {
+public class SetCodeTableId extends AbstractSourceToTargetProcess<Record, Record> {
   private final CodeTable codeTable;
 
   private final Map<String, Converter<Record, Object>> codeTableValueConverters = new HashMap<String, Converter<Record, Object>>();
@@ -45,8 +44,8 @@ AbstractSourceToTargetProcess<Record, Record> {
           if (codeTableValueName == null) {
             sourceValue = targetCodeTable.getId(sourceValue);
           } else {
-            sourceValue = targetCodeTable.getId(Collections.singletonMap(
-              codeTableValueName, sourceValue));
+            sourceValue = targetCodeTable.getId(Collections.singletonMap(codeTableValueName,
+              sourceValue));
           }
         }
       }

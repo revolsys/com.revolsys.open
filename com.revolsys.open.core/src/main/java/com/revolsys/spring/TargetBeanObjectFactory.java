@@ -20,8 +20,7 @@ class TargetBeanObjectFactory implements ObjectFactory, Serializable {
 
   private final String targetBeanName;
 
-  public TargetBeanObjectFactory(final BeanFactory beanFactory,
-    final String targetBeanName) {
+  public TargetBeanObjectFactory(final BeanFactory beanFactory, final String targetBeanName) {
     this.beanFactory = beanFactory;
     this.targetBeanName = targetBeanName;
   }

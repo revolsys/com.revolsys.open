@@ -17,8 +17,8 @@ import com.revolsys.util.MathUtil;
 
 public class TinReader {
 
-  public static TriangulatedIrregularNetwork read(
-    final BoundingBox boundingBox, final Resource resource) {
+  public static TriangulatedIrregularNetwork read(final BoundingBox boundingBox,
+    final Resource resource) {
     final TinReader tinReader = new TinReader(boundingBox, resource);
     try {
       final TriangulatedIrregularNetwork tin = tinReader.read();
@@ -28,8 +28,8 @@ public class TinReader {
     }
   }
 
-  public static TriangulatedIrregularNetwork read(
-    final GeometryFactory geometryFactory, final Resource resource) {
+  public static TriangulatedIrregularNetwork read(final GeometryFactory geometryFactory,
+    final Resource resource) {
     final TinReader tinReader = new TinReader(geometryFactory, resource);
     try {
       final TriangulatedIrregularNetwork tin = tinReader.read();
@@ -55,8 +55,7 @@ public class TinReader {
     }
   }
 
-  public TinReader(final GeometryFactory geometryFactory,
-    final Resource resource) {
+  public TinReader(final GeometryFactory geometryFactory, final Resource resource) {
     this.geometryFactory = geometryFactory;
     this.in = SpringUtil.getBufferedReader(resource);
     final String line = readLine();
@@ -100,8 +99,7 @@ public class TinReader {
     if (this.boundingBox != null) {
       boundingBox = this.boundingBox;
     }
-    final TriangulatedIrregularNetwork tin = new TriangulatedIrregularNetwork(
-      boundingBox, true);
+    final TriangulatedIrregularNetwork tin = new TriangulatedIrregularNetwork(boundingBox, true);
 
     if (line.startsWith("ENDT")) {
       tin.insertNodes(nodeIdMap.values());
@@ -119,8 +117,8 @@ public class TinReader {
           final int index = (int)indexes[j];
           points[j] = nodeIdMap.get(index);
           if (points[j] == null) {
-            throw new IllegalArgumentException(
-              "Unable to get coordinates for triangle " + i + " vert " + index);
+            throw new IllegalArgumentException("Unable to get coordinates for triangle " + i
+              + " vert " + index);
           }
         }
         final Triangle triangle = new Triangle(points);

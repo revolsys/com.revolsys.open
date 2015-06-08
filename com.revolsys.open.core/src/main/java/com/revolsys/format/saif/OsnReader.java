@@ -39,9 +39,8 @@ public class OsnReader implements RecordIterator {
 
   private ZipFile zipFile;
 
-  public OsnReader(final RecordDefinitionFactory recordDefinitionFactory,
-    final File directory, final String fileName, final int srid)
-        throws IOException {
+  public OsnReader(final RecordDefinitionFactory recordDefinitionFactory, final File directory,
+    final String fileName, final int srid) throws IOException {
     this.recordDefinitionFactory = recordDefinitionFactory;
     this.directory = directory;
     this.fileName = fileName;
@@ -49,9 +48,8 @@ public class OsnReader implements RecordIterator {
     open();
   }
 
-  public OsnReader(final RecordDefinitionFactory recordDefinitionFactory,
-    final ZipFile zipFile, final String fileName, final int srid)
-        throws IOException {
+  public OsnReader(final RecordDefinitionFactory recordDefinitionFactory, final ZipFile zipFile,
+    final String fileName, final int srid) throws IOException {
     this.recordDefinitionFactory = recordDefinitionFactory;
     this.fileName = fileName;
     this.zipFile = zipFile;
@@ -168,8 +166,7 @@ public class OsnReader implements RecordIterator {
         if (eventType == OsnIterator.START_DEFINITION) {
           this.nextChecked = true;
           return true;
-        } else if (eventType != OsnIterator.END_DOCUMENT
-            && eventType != OsnIterator.END_SET) {
+        } else if (eventType != OsnIterator.END_DOCUMENT && eventType != OsnIterator.END_SET) {
           this.osnIterator.throwParseError("Excepecting start of an object");
         }
       }
@@ -209,8 +206,7 @@ public class OsnReader implements RecordIterator {
    * @param endEventType The event type indicating the end of a collection.
    * @throws IOException If an I/O error occurs.
    */
-  private void processCollection(final Collection<Object> collection,
-    final Object endEventType) {
+  private void processCollection(final Collection<Object> collection, final Object endEventType) {
     while (this.osnIterator.getEventType() != endEventType) {
       final Object value = getExpression();
       if (value != null || this.osnIterator.getEventType() == OsnIterator.NULL_VALUE) {
@@ -221,8 +217,7 @@ public class OsnReader implements RecordIterator {
 
   @Override
   public void remove() {
-    throw new UnsupportedOperationException(
-        "Removing SAIF objects is not supported");
+    throw new UnsupportedOperationException("Removing SAIF objects is not supported");
   }
 
   /**
@@ -250,7 +245,7 @@ public class OsnReader implements RecordIterator {
           this.osnIterator.nextStringValue();
           final String fieldName = this.osnIterator.nextFieldName();
           if (fieldName != null
-              && (fieldName.equals("geoComponents") || fieldName.equals("annotationComponents"))) {
+            && (fieldName.equals("geoComponents") || fieldName.equals("annotationComponents"))) {
             if (this.osnIterator.next() == OsnIterator.START_SET) {
               return true;
             } else {

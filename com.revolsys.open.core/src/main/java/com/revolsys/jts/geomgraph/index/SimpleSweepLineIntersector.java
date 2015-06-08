@@ -63,8 +63,7 @@ public class SimpleSweepLineIntersector extends EdgeSetIntersector {
   private void add(final Edge edge, final Object edgeSet) {
     for (int i = 0; i < edge.getNumPoints() - 1; i++) {
       final SweepLineSegment ss = new SweepLineSegment(edge, i);
-      final SweepLineEvent insertEvent = new SweepLineEvent(edgeSet,
-        ss.getMinX(), null);
+      final SweepLineEvent insertEvent = new SweepLineEvent(edgeSet, ss.getMinX(), null);
       this.events.add(insertEvent);
       this.events.add(new SweepLineEvent(ss.getMaxX(), insertEvent));
     }
@@ -86,16 +85,15 @@ public class SimpleSweepLineIntersector extends EdgeSetIntersector {
   }
 
   @Override
-  public void computeIntersections(final List edges0, final List edges1,
-    final SegmentIntersector si) {
+  public void computeIntersections(final List edges0, final List edges1, final SegmentIntersector si) {
     add(edges0, edges0);
     add(edges1, edges1);
     computeIntersections(si);
   }
 
   @Override
-  public void computeIntersections(final List edges,
-    final SegmentIntersector si, final boolean testAllSegments) {
+  public void computeIntersections(final List edges, final SegmentIntersector si,
+    final boolean testAllSegments) {
     if (testAllSegments) {
       add(edges, null);
     } else {
@@ -132,8 +130,8 @@ public class SimpleSweepLineIntersector extends EdgeSetIntersector {
     }
   }
 
-  private void processOverlaps(final int start, final int end,
-    final SweepLineEvent ev0, final SegmentIntersector si) {
+  private void processOverlaps(final int start, final int end, final SweepLineEvent ev0,
+    final SegmentIntersector si) {
     final SweepLineSegment ss0 = (SweepLineSegment)ev0.getObject();
     /**
      * Since we might need to test for self-intersections,

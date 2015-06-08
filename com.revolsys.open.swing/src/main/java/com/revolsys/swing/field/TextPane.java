@@ -22,6 +22,10 @@ import com.revolsys.util.Property;
 public class TextPane extends JEditorPane implements Field, FocusListener {
   private static final long serialVersionUID = 1L;
 
+  static {
+    DefaultSyntaxKit.initKit();
+  }
+
   private final String fieldName;
 
   private String fieldValue;
@@ -29,10 +33,6 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
   private String errorMessage;
 
   private String originalToolTip;
-
-  static {
-    DefaultSyntaxKit.initKit();
-  }
 
   private final CascadingUndoManager undoManager = new CascadingUndoManager();
 

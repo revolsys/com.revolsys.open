@@ -13,22 +13,21 @@ public class JdbcLongFieldDefinition extends JdbcFieldDefinition {
     super(name, name, DataTypes.LONG, 0, 0, 0, false, null, null);
   }
 
-  public JdbcLongFieldDefinition(final String dbName, final String name,
-    final int sqlType, final int length, final boolean required,
-    final String description, final Map<String, Object> properties) {
-    super(dbName, name, DataTypes.LONG, sqlType, length, 0, required,
-      description, properties);
+  public JdbcLongFieldDefinition(final String dbName, final String name, final int sqlType,
+    final int length, final boolean required, final String description,
+    final Map<String, Object> properties) {
+    super(dbName, name, DataTypes.LONG, sqlType, length, 0, required, description, properties);
   }
 
   @Override
   public JdbcLongFieldDefinition clone() {
-    return new JdbcLongFieldDefinition(getDbName(), getName(), getSqlType(),
-      getLength(), isRequired(), getDescription(), getProperties());
+    return new JdbcLongFieldDefinition(getDbName(), getName(), getSqlType(), getLength(),
+      isRequired(), getDescription(), getProperties());
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet,
-    final int columnIndex, final Record object) throws SQLException {
+  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final Record object) throws SQLException {
     final long longValue = resultSet.getLong(columnIndex);
     if (!resultSet.wasNull()) {
       setValue(object, Long.valueOf(longValue));
@@ -37,8 +36,8 @@ public class JdbcLongFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setPreparedStatementValue(final PreparedStatement statement,
-    final int parameterIndex, final Object value) throws SQLException {
+  public int setPreparedStatementValue(final PreparedStatement statement, final int parameterIndex,
+    final Object value) throws SQLException {
     if (value == null) {
       statement.setNull(parameterIndex, getSqlType());
     } else {

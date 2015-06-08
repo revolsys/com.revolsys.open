@@ -22,15 +22,14 @@ import org.springframework.core.io.Resource;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.MathUtil;
 
-public class JsonParser implements Iterator<JsonParser.EventType>,
-AutoCloseable {
+public class JsonParser implements Iterator<JsonParser.EventType>, AutoCloseable {
   public enum EventType {
     booleanValue, colon, comma, endArray, endDocument, endObject, nullValue, number, startArray, startDocument, startObject, string, unknown
   }
 
   public static List<Object> getArray(final JsonParser parser) {
     if (parser.getEvent() == EventType.startArray || parser.hasNext()
-        && parser.next() == EventType.startArray) {
+      && parser.next() == EventType.startArray) {
       EventType event = parser.getEvent();
       final List<Object> list = new ArrayList<Object>();
       do {
@@ -48,15 +47,14 @@ AutoCloseable {
       }
       return list;
     } else {
-      throw new IllegalStateException("Exepecting start array, not:"
-          + parser.getEvent());
+      throw new IllegalStateException("Exepecting start array, not:" + parser.getEvent());
     }
 
   }
 
   public static double[] getDoubleArray(final JsonParser parser) {
     if (parser.getEvent() == EventType.startArray || parser.hasNext()
-        && parser.next() == EventType.startArray) {
+      && parser.next() == EventType.startArray) {
       EventType event = parser.getEvent();
       final List<Number> list = new ArrayList<Number>();
       do {
@@ -78,8 +76,7 @@ AutoCloseable {
     } else if (parser.getEvent() == EventType.nullValue) {
       return null;
     } else {
-      throw new IllegalStateException("Exepecting start array, not: "
-          + parser.getEvent());
+      throw new IllegalStateException("Exepecting start array, not: " + parser.getEvent());
     }
   }
 
@@ -88,7 +85,7 @@ AutoCloseable {
       return null;
     } else {
       try (
-          final JsonParser parser = new JsonParser(in)) {
+        final JsonParser parser = new JsonParser(in)) {
         if (parser.next() == EventType.startDocument) {
           return getMap(parser);
         } else {
@@ -100,7 +97,7 @@ AutoCloseable {
 
   public static Map<String, Object> getMap(final JsonParser parser) {
     if (parser.getEvent() == EventType.startObject || parser.hasNext()
-        && parser.next() == EventType.startObject) {
+      && parser.next() == EventType.startObject) {
       EventType event = parser.getEvent();
       final Map<String, Object> map = new LinkedHashMap<String, Object>();
       do {
@@ -111,8 +108,7 @@ AutoCloseable {
               if (parser.hasNext()) {
                 final Object value = getValue(parser);
                 if (value instanceof EventType) {
-                  throw new IllegalStateException("Exepecting a value, not:"
-                      + value);
+                  throw new IllegalStateException("Exepecting a value, not:" + value);
                 }
                 map.put(key, value);
               }
@@ -128,8 +124,7 @@ AutoCloseable {
       }
       return map;
     } else {
-      throw new IllegalStateException("Exepecting end object, not:"
-          + parser.getEvent());
+      throw new IllegalStateException("Exepecting end object, not:" + parser.getEvent());
     }
 
   }
@@ -149,7 +144,7 @@ AutoCloseable {
 
   public static String getString(final JsonParser parser) {
     if (parser.getEvent() == EventType.string || parser.hasNext()
-        && parser.next() == EventType.string) {
+      && parser.next() == EventType.string) {
       return parser.getValue();
     } else {
       throw new IllegalStateException("Expecting a string");
@@ -258,8 +253,7 @@ AutoCloseable {
    * @param parser The parser.
    * @param fieldName The name of the attribute to skip through.
    */
-  public static void skipToAttribute(final JsonParser parser,
-    final String fieldName) {
+  public static void skipToAttribute(final JsonParser parser, final String fieldName) {
     while (parser.hasNext()) {
       final EventType eventType = parser.next();
       if (eventType == EventType.string) {
@@ -360,29 +354,29 @@ AutoCloseable {
         case ',':
           this.nextEvent = EventType.comma;
           this.currentCharacter = this.reader.read();
-          break;
+        break;
         case ':':
           this.nextEvent = EventType.colon;
           this.currentCharacter = this.reader.read();
-          break;
+        break;
         case '{':
           this.nextEvent = EventType.startObject;
           this.currentCharacter = this.reader.read();
           this.depth++;
-          break;
+        break;
         case '}':
           this.nextEvent = EventType.endObject;
           this.currentCharacter = this.reader.read();
           this.depth--;
-          break;
+        break;
         case '[':
           this.nextEvent = EventType.startArray;
           this.currentCharacter = this.reader.read();
-          break;
+        break;
         case ']':
           this.nextEvent = EventType.endArray;
           this.currentCharacter = this.reader.read();
-          break;
+        break;
         case 't':
           for (int i = 0; i < 3; i++) {
             this.currentCharacter = this.reader.read();
@@ -390,7 +384,7 @@ AutoCloseable {
           this.nextEvent = EventType.booleanValue;
           this.nextValue = Boolean.TRUE;
           this.currentCharacter = this.reader.read();
-          break;
+        break;
         case 'f':
           for (int i = 0; i < 4; i++) {
             this.currentCharacter = this.reader.read();
@@ -398,7 +392,7 @@ AutoCloseable {
           this.nextEvent = EventType.booleanValue;
           this.nextValue = Boolean.FALSE;
           this.currentCharacter = this.reader.read();
-          break;
+        break;
         case 'n':
           for (int i = 0; i < 3; i++) {
             this.currentCharacter = this.reader.read();
@@ -406,21 +400,21 @@ AutoCloseable {
           this.nextEvent = EventType.nullValue;
           this.nextValue = null;
           this.currentCharacter = this.reader.read();
-          break;
+        break;
         case '"':
           this.nextEvent = EventType.string;
 
           processString();
           this.currentCharacter = this.reader.read();
-          break;
+        break;
         case '-':
           this.nextEvent = EventType.number;
 
           processNumber();
-          break;
+        break;
         case -1:
           this.nextEvent = EventType.endDocument;
-          break;
+        break;
         default:
           if (this.currentCharacter >= '0' && this.currentCharacter <= '9') {
             this.nextEvent = EventType.number;
@@ -428,7 +422,7 @@ AutoCloseable {
           } else {
             this.nextEvent = EventType.unknown;
           }
-          break;
+        break;
       }
     } catch (final IOException e) {
       this.nextEvent = EventType.endDocument;
@@ -490,22 +484,22 @@ AutoCloseable {
         switch (this.currentCharacter) {
           case 'n':
             text.append('\n');
-            break;
+          break;
           case 'r':
             text.append('\r');
-            break;
+          break;
           case 't':
             text.append('\t');
-            break;
+          break;
           case 'b':
             text.setLength(text.length() - 1);
-            break;
+          break;
           case 'u':
-            // TODO process hex
-            break;
+          // TODO process hex
+          break;
           default:
             text.append((char)this.currentCharacter);
-            break;
+          break;
         }
       } else {
         text.append((char)this.currentCharacter);

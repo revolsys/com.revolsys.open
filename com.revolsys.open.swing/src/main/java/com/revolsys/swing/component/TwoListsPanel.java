@@ -23,11 +23,11 @@ public class TwoListsPanel<T> extends JPanel {
 
   private final JList leftList;
 
-  private final JButton moveLeftButton = new InvokeMethodAction(
-    Icons.getIcon("arrow_left"), this, "moveSelectedLeft").createButton();
+  private final JButton moveLeftButton = new InvokeMethodAction(Icons.getIcon("arrow_left"), this,
+    "moveSelectedLeft").createButton();
 
-  private final JButton moveRightButton = new InvokeMethodAction(
-    Icons.getIcon("arrow_right"), this, "moveSelectedLeft").createButton();
+  private final JButton moveRightButton = new InvokeMethodAction(Icons.getIcon("arrow_right"),
+    this, "moveSelectedLeft").createButton();
 
   private final JList rightList;
 
@@ -51,8 +51,7 @@ public class TwoListsPanel<T> extends JPanel {
     leftConstraints.setY(Spring.constant(5));
 
     final Constraints moveRightConstraints = layout.getConstraints(this.moveRightButton);
-    final Spring buttonLeft = Spring.sum(leftConstraints.getWidth(),
-      Spring.constant(10));
+    final Spring buttonLeft = Spring.sum(leftConstraints.getWidth(), Spring.constant(10));
     moveRightConstraints.setX(buttonLeft);
     moveRightConstraints.setY(Spring.constant(5));
     moveRightConstraints.setWidth(Spring.constant(30));
@@ -62,8 +61,7 @@ public class TwoListsPanel<T> extends JPanel {
       Spring.sum(moveRightConstraints.getWidth(), Spring.constant(5))));
     rightConstraints.setY(Spring.constant(5));
 
-    final Spring maxHeight = Spring.max(leftConstraints.getHeight(),
-      rightConstraints.getHeight());
+    final Spring maxHeight = Spring.max(leftConstraints.getHeight(), rightConstraints.getHeight());
 
     leftConstraints.setHeight(maxHeight);
     rightConstraints.setHeight(maxHeight);
@@ -123,8 +121,7 @@ public class TwoListsPanel<T> extends JPanel {
     list.setVisibleRowCount(-1);
     list.setLayoutOrientation(JList.VERTICAL);
     list.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-    list.addListSelectionListener(new InvokeMethodListSelectionListener(this,
-        "updateSelection"));
+    list.addListSelectionListener(new InvokeMethodListSelectionListener(this, "updateSelection"));
     // list.setPreferredSize(new Dimension(300, 600));
     return list;
   }

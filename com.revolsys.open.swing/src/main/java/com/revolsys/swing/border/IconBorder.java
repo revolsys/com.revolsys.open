@@ -142,8 +142,7 @@ public class IconBorder implements Border, Serializable {
    *             if {@code iconPosition} is not a valid position.
    * @see #EMPTY_ICON
    */
-  public IconBorder(final Icon validIcon, final int iconPosition,
-    final int padding) {
+  public IconBorder(final Icon validIcon, final int iconPosition, final int padding) {
     setIcon(validIcon);
     setPadding(padding);
     setIconPosition(iconPosition);
@@ -154,8 +153,7 @@ public class IconBorder implements Border, Serializable {
    * the given postion LEADING/TRAILING this method has no effect for other
    * position values
    */
-  private int bidiDecodeLeadingTrailing(final ComponentOrientation c,
-    final int position) {
+  private int bidiDecodeLeadingTrailing(final ComponentOrientation c, final int position) {
     if (position == SwingConstants.TRAILING) {
       if (!c.isLeftToRight()) {
         return SwingConstants.WEST;
@@ -177,8 +175,8 @@ public class IconBorder implements Border, Serializable {
   @Override
   public Insets getBorderInsets(final Component c) {
     final int horizontalInset = this.icon.getIconWidth() + 2 * this.padding;
-    final int iconPosition = bidiDecodeLeadingTrailing(
-      c.getComponentOrientation(), this.iconPosition);
+    final int iconPosition = bidiDecodeLeadingTrailing(c.getComponentOrientation(),
+      this.iconPosition);
     if (iconPosition == SwingConstants.EAST) {
       return new Insets(0, 0, 0, horizontalInset);
     }
@@ -229,7 +227,7 @@ public class IconBorder implements Border, Serializable {
       case SwingConstants.EAST:
       case SwingConstants.WEST:
         result = true;
-        break;
+      break;
       default:
         result = false;
     }
@@ -241,10 +239,10 @@ public class IconBorder implements Border, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public void paintBorder(final Component c, final Graphics g, final int x,
-    final int y, final int width, final int height) {
-    final int iconPosition = bidiDecodeLeadingTrailing(
-      c.getComponentOrientation(), this.iconPosition);
+  public void paintBorder(final Component c, final Graphics g, final int x, final int y,
+    final int width, final int height) {
+    final int iconPosition = bidiDecodeLeadingTrailing(c.getComponentOrientation(),
+      this.iconPosition);
     if (iconPosition == SwingConstants.NORTH_EAST) {
       this.iconBounds.y = y + this.padding;
       this.iconBounds.x = x + width - this.padding - this.icon.getIconWidth();

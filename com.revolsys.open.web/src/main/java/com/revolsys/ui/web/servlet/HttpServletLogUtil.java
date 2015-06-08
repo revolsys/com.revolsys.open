@@ -9,16 +9,14 @@ import org.slf4j.Logger;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public final class HttpServletLogUtil {
-  public static void logRequestException(final Logger log,
-    final HttpServletRequest request, final Throwable exception) {
+  public static void logRequestException(final Logger log, final HttpServletRequest request,
+    final Throwable exception) {
     logRequestException(log, request, exception, null);
   }
 
-  public static void logRequestException(final Logger log,
-    final HttpServletRequest request, final Throwable exception,
-    final String[] headerNames) {
-    if (!(exception instanceof IOException)
-        && !exception.getMessage().contains("Broken pipe")) {
+  public static void logRequestException(final Logger log, final HttpServletRequest request,
+    final Throwable exception, final String[] headerNames) {
+    if (!(exception instanceof IOException) && !exception.getMessage().contains("Broken pipe")) {
       if (request.getAttribute("LogException") != exception) {
         final StringBuilder text = new StringBuilder();
         final String message = exception.getMessage();
@@ -59,8 +57,7 @@ public final class HttpServletLogUtil {
     }
   }
 
-  public static void logRequestException(final Logger log,
-    final Throwable exception) {
+  public static void logRequestException(final Logger log, final Throwable exception) {
     final HttpServletRequest request = HttpServletUtils.getRequest();
     logRequestException(log, request, exception, null);
   }

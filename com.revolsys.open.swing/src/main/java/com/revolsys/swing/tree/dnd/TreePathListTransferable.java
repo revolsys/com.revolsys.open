@@ -20,8 +20,8 @@ public class TreePathListTransferable implements Transferable {
   public static final DataFlavor[] FLAVORS;
   static {
     try {
-      final String mimeType = DataFlavor.javaJVMLocalObjectMimeType
-          + ";class=\"" + TreePathListTransferable.class.getName() + "\"";
+      final String mimeType = DataFlavor.javaJVMLocalObjectMimeType + ";class=\""
+        + TreePathListTransferable.class.getName() + "\"";
       FLAVOR = new DataFlavor(mimeType);
     } catch (final ClassNotFoundException e) {
       throw new RuntimeException("Flavour not supported");
@@ -68,8 +68,8 @@ public class TreePathListTransferable implements Transferable {
   }
 
   @Override
-  public Object getTransferData(final DataFlavor flavor)
-      throws UnsupportedFlavorException, IOException {
+  public Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException,
+    IOException {
     if (isDataFlavorSupported(flavor)) {
       return this;
     } else {

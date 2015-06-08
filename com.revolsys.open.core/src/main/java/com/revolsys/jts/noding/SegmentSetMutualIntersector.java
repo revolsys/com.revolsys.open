@@ -56,8 +56,7 @@ import java.util.Collection;
  * @author Martin Davis
  * @version 1.10
  */
-public interface SegmentSetMutualIntersector
-{
+public interface SegmentSetMutualIntersector {
   /**
    * Computes the intersections with a given set of {@link SegmentString}s,
    * using the supplied {@link SegmentIntersector}.

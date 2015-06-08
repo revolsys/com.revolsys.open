@@ -40,8 +40,7 @@ public class ParseException extends RuntimeException {
     this.location = location;
   }
 
-  public ParseException(final String location, final String message,
-    final Throwable cause) {
+  public ParseException(final String location, final String message, final Throwable cause) {
     super(message, cause);
     this.location = location;
   }

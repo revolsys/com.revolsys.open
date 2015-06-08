@@ -4,16 +4,15 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.jts.geom.Point;
 
-public class NodeWithinDistanceOfCoordinateVisitor<T> implements
-Visitor<Node<T>> {
+public class NodeWithinDistanceOfCoordinateVisitor<T> implements Visitor<Node<T>> {
   private final Point coordinates;
 
   private final Visitor<Node<T>> matchVisitor;
 
   private final double maxDistance;
 
-  public NodeWithinDistanceOfCoordinateVisitor(final Point coordinates,
-    final double maxDistance, final Visitor<Node<T>> matchVisitor) {
+  public NodeWithinDistanceOfCoordinateVisitor(final Point coordinates, final double maxDistance,
+    final Visitor<Node<T>> matchVisitor) {
     this.coordinates = coordinates;
     this.maxDistance = maxDistance;
     this.matchVisitor = matchVisitor;

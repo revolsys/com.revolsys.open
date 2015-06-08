@@ -20,9 +20,9 @@ public class OsmWay extends OsmElement {
   public OsmWay() {
   }
 
-  public OsmWay(final long id, final boolean visible, final int version,
-    final long changeset, final Date timestamp, final String user,
-    final int uid, final Map<String, String> tags, final Geometry geometry) {
+  public OsmWay(final long id, final boolean visible, final int version, final long changeset,
+    final Date timestamp, final String user, final int uid, final Map<String, String> tags,
+    final Geometry geometry) {
     super(id, visible, version, changeset, timestamp, user, uid, tags);
     setGeometryValue(geometry);
   }
@@ -61,16 +61,15 @@ public class OsmWay extends OsmElement {
   public boolean isArea() {
     if ("yes".equals(getString("area"))) {
       return true;
-    } else if (Arrays.asList("bare_rock", "fell", "glacier, landuse=grass",
-      "grassland", "heath", "mud", "scree", "sand", "scrub", "tree", "wetland",
-        "wood").contains(getTag("natural"))) {
+    } else if (Arrays.asList("bare_rock", "fell", "glacier, landuse=grass", "grassland", "heath",
+      "mud", "scree", "sand", "scrub", "tree", "wetland", "wood").contains(getTag("natural"))) {
       return true;
     }
     return false;
   }
 
-  private void parseNodRef(final OsmDocument document,
-    final List<Point> points, final XMLStreamReader in) {
+  private void parseNodRef(final OsmDocument document, final List<Point> points,
+    final XMLStreamReader in) {
     final long nodeId = StaxUtils.getLongAttribute(in, null, "ref");
     final Point point = document.getNodePoint(nodeId);
     if (point != null && !point.isEmpty()) {

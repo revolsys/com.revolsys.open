@@ -58,8 +58,8 @@ public class PointInRingTest extends AbstractPointInRingTest {
   }
 
   @Override
-  protected void runPtInRing(final Location expectedLoc, final Point pt,
-    final String wkt) throws Exception {
+  protected void runPtInRing(final Location expectedLoc, final Point pt, final String wkt)
+    throws Exception {
     // isPointInRing is not defined for pts on boundary
     if (expectedLoc == Location.BOUNDARY) {
       return;
@@ -67,8 +67,7 @@ public class PointInRingTest extends AbstractPointInRingTest {
 
     final Polygon geom = (Polygon)this.reader.read(wkt);
     final boolean expected = expectedLoc == Location.INTERIOR;
-    assertEquals(expected,
-      CGAlgorithms.isPointInRing(pt, geom.getShell()));
+    assertEquals(expected, CGAlgorithms.isPointInRing(pt, geom.getShell()));
   }
 
 }

@@ -9,8 +9,8 @@ import com.revolsys.ui.html.serializer.key.AbstractKeySerializer;
 import com.revolsys.ui.html.serializer.type.TypeSerializer;
 import com.revolsys.util.Property;
 
-public class BuilderSerializer extends AbstractKeySerializer implements
-TypeSerializer, HtmlUiBuilderAware<HtmlUiBuilder<?>> {
+public class BuilderSerializer extends AbstractKeySerializer implements TypeSerializer,
+  HtmlUiBuilderAware<HtmlUiBuilder<?>> {
   /** The HTML UI Builder */
   private HtmlUiBuilder<?> builder;
 

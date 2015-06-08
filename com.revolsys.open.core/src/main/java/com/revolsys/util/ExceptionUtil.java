@@ -7,8 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.slf4j.LoggerFactory;
 
 public final class ExceptionUtil {
-  public static void log(final Class<?> clazz, final String message,
-    final Throwable exception) {
+  public static void log(final Class<?> clazz, final String message, final Throwable exception) {
     LoggerFactory.getLogger(clazz).error(message, exception);
   }
 

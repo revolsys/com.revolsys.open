@@ -37,8 +37,7 @@ public class Sort extends BaseInOutProcess<Record, Record> {
   }
 
   @Override
-  protected void process(final Channel<Record> in, final Channel<Record> out,
-    final Record object) {
+  protected void process(final Channel<Record> in, final Channel<Record> out, final Record object) {
     this.objects.add(object);
   }
 

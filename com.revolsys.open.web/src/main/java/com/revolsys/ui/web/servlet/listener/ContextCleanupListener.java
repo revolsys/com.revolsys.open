@@ -34,8 +34,8 @@ public class ContextCleanupListener implements ServletContextListener {
           try {
             ((DisposableBean)attrValue).destroy();
           } catch (final Throwable e) {
-            System.err.println("Couldn't invoke destroy method of attribute with name '"
-                + attrName + "'");
+            System.err.println("Couldn't invoke destroy method of attribute with name '" + attrName
+              + "'");
           }
         } else {
           servletContext.removeAttribute(attrName);
@@ -46,8 +46,7 @@ public class ContextCleanupListener implements ServletContextListener {
 
   @Override
   public void contextDestroyed(final ServletContextEvent event) {
-    final ClassLoader contextClassLoader = Thread.currentThread()
-        .getContextClassLoader();
+    final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     IoFactoryRegistry.clearInstance();
     JdbcFactoryRegistry.clearInstance();
     StringConverterRegistry.clearInstance();
@@ -69,7 +68,6 @@ public class ContextCleanupListener implements ServletContextListener {
   @Override
   public void contextInitialized(final ServletContextEvent event) {
     Log4jWebConfigurer.initLogging(event.getServletContext());
-    CachedIntrospectionResults.acceptClassLoader(Thread.currentThread()
-      .getContextClassLoader());
+    CachedIntrospectionResults.acceptClassLoader(Thread.currentThread().getContextClassLoader());
   }
 }

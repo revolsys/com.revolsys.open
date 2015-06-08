@@ -15,8 +15,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
-public abstract class AbstractHttpMessageConverter<T> implements
-HttpMessageConverter<T> {
+public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConverter<T> {
 
   public static List<MediaType> getMediaTypes(final Collection<?> contentTypes) {
     final List<MediaType> mediaTypes = new ArrayList<MediaType>();
@@ -117,10 +116,8 @@ HttpMessageConverter<T> {
   }
 
   @Override
-  public T read(
-    final Class<? extends T> clazz,
-    final HttpInputMessage inputMessage) throws IOException,
-    HttpMessageNotReadableException {
+  public T read(final Class<? extends T> clazz, final HttpInputMessage inputMessage)
+    throws IOException, HttpMessageNotReadableException {
     return null;
   }
 
@@ -138,10 +135,7 @@ HttpMessageConverter<T> {
   }
 
   @Override
-  public void write(
-    final T object,
-    final MediaType contentType,
-    final HttpOutputMessage outputMessage) throws IOException,
-    HttpMessageNotWritableException {
+  public void write(final T object, final MediaType contentType,
+    final HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
   }
 }

@@ -7,8 +7,7 @@ public final class IdObjectIndexVisitor<T> implements Visitor<Integer> {
 
   private final Visitor<T> visitor;
 
-  public IdObjectIndexVisitor(final IdObjectIndex<T> index,
-    final Visitor<T> visitor) {
+  public IdObjectIndexVisitor(final IdObjectIndex<T> index, final Visitor<T> visitor) {
     this.index = index;
     this.visitor = visitor;
   }

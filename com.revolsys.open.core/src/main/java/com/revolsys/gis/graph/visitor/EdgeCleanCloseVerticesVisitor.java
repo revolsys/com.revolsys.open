@@ -25,20 +25,18 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
 
   private final double minDistance;
 
-  public EdgeCleanCloseVerticesVisitor(final Graph<T> graph,
-    final double minDistance) {
+  public EdgeCleanCloseVerticesVisitor(final Graph<T> graph, final double minDistance) {
     this.graph = graph;
     this.minDistance = minDistance;
   }
 
-  public EdgeCleanCloseVerticesVisitor(final Graph<T> graph,
-    final double minDistance, final Visitor<Edge<T>> visitor) {
+  public EdgeCleanCloseVerticesVisitor(final Graph<T> graph, final double minDistance,
+    final Visitor<Edge<T>> visitor) {
     this.graph = graph;
     this.minDistance = minDistance;
   }
 
-  private double getAngle(final Edge<T> edge, final LineString line,
-    final int index) {
+  private double getAngle(final Edge<T> edge, final LineString line, final int index) {
     if (index + index - 1 < 0 || index + index + 1 >= line.getVertexCount()) {
       return Double.NaN;
     } else {
@@ -100,21 +98,14 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
 
           }
           if (fixed) {
-            this.coordinateListeners.coordinateEvent(
-              new PointDouble(x2, y2),
-              typePath,
-              "Short Segment",
-              "Fixed",
-              distance + " " + Math.toDegrees(previousAngle) + " "
-                  + Math.toDegrees(angle) + " " + Math.toDegrees(nextAngle));
+            this.coordinateListeners.coordinateEvent(new PointDouble(x2, y2), typePath,
+              "Short Segment", "Fixed",
+              distance + " " + Math.toDegrees(previousAngle) + " " + Math.toDegrees(angle) + " "
+                + Math.toDegrees(nextAngle));
           } else {
-            this.coordinateListeners.coordinateEvent(
-              new PointDouble(x2, y2),
-              typePath,
-              "Short Segment",
-              "Review",
-              distance + " " + Math.toDegrees(previousAngle) + " "
-                  + Math.toDegrees(angle) + " " + Math.toDegrees(nextAngle));
+            this.coordinateListeners.coordinateEvent(new PointDouble(x2, y2), typePath,
+              "Short Segment", "Review", distance + " " + Math.toDegrees(previousAngle) + " "
+                + Math.toDegrees(angle) + " " + Math.toDegrees(nextAngle));
           }
         }
         x1 = x2;
@@ -123,20 +114,17 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
       if (!removeIndicies.isEmpty()) {
         final int axisCount = line.getAxisCount();
         final double[] newCoordinates = new double[(vertexCount - removeIndicies.size())
-                                                   * axisCount];
+          * axisCount];
         int k = 0;
         for (int j = 0; j < vertexCount; j++) {
           if (!removeIndicies.contains(j)) {
-            CoordinatesListUtil.setCoordinates(newCoordinates, axisCount, k,
-              line, j);
+            CoordinatesListUtil.setCoordinates(newCoordinates, axisCount, k, line, j);
             k++;
           }
         }
-        final LineString newLine = geometryFactory.lineString(axisCount,
-          newCoordinates);
+        final LineString newLine = geometryFactory.lineString(axisCount, newCoordinates);
         final Edge<T> newEdge = this.graph.replaceEdge(edge, newLine);
-        this.edgeListeners.edgeEvent(newEdge, "Edge close indicies",
-          EdgeEvent.EDGE_CHANGED, null);
+        this.edgeListeners.edgeEvent(newEdge, "Edge close indicies", EdgeEvent.EDGE_CHANGED, null);
       }
     }
     return true;

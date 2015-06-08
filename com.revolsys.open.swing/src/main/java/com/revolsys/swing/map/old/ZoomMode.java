@@ -11,8 +11,7 @@ public interface ZoomMode {
    * @param boundingBox The bounding box.
    * @return The bounding box.
    */
-  BoundingBox getBoundingBox(ComponentViewport2D viewport,
-    BoundingBox boundingBox);
+  BoundingBox getBoundingBox(ComponentViewport2D viewport, BoundingBox boundingBox);
 
   /**
    * Zoom the map so that the specified bounding box is visible.
@@ -32,8 +31,7 @@ public interface ZoomMode {
    * @param x2 The second x coordinate.
    * @param y2 The second y coordinate.
    */
-  void zoom(ComponentViewport2D viewport, double x1, double y1, double x2,
-    double y2);
+  void zoom(ComponentViewport2D viewport, double x1, double y1, double x2, double y2);
 
   /**
    * Zoom the map in one level at the view coordinate, with the model coordinate

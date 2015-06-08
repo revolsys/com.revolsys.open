@@ -32,6 +32,10 @@ import com.revolsys.swing.map.layer.record.style.panel.MarkerStylePanel;
 
 public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
 
+  private static final Geometry EMPTY_GEOMETRY = GeometryFactory.floating3().geometry();
+
+  private static final Icon ICON = Icons.getIcon("style_marker");
+
   public static Geometry getGeometry(final Viewport2D viewport, final Geometry geometry) {
     final BoundingBox viewExtent = viewport.getBoundingBox();
     if (geometry != null) {
@@ -302,10 +306,6 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
       }
     }
   }
-
-  private static final Geometry EMPTY_GEOMETRY = GeometryFactory.floating3().geometry();
-
-  private static final Icon ICON = Icons.getIcon("style_marker");
 
   private MarkerStyle style;
 

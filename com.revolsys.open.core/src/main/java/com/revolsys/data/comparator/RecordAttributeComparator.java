@@ -18,8 +18,7 @@ public class RecordAttributeComparator implements Comparator<Record> {
   public RecordAttributeComparator() {
   }
 
-  public RecordAttributeComparator(final boolean sortAsceding,
-    final String... fieldNames) {
+  public RecordAttributeComparator(final boolean sortAsceding, final String... fieldNames) {
     this(Arrays.asList(fieldNames));
     this.invert = !sortAsceding;
   }
@@ -44,12 +43,9 @@ public class RecordAttributeComparator implements Comparator<Record> {
     return 0;
   }
 
-  public int compare(final Record object1, final Record object2,
-    final String fieldName) {
-    final Comparable<Object> value1 = Records.getFieldByPath(object1,
-      fieldName);
-    final Comparable<Object> value2 = Records.getFieldByPath(object2,
-      fieldName);
+  public int compare(final Record object1, final Record object2, final String fieldName) {
+    final Comparable<Object> value1 = Records.getFieldByPath(object1, fieldName);
+    final Comparable<Object> value2 = Records.getFieldByPath(object2, fieldName);
     if (value1 == null) {
       if (value2 == null) {
         return 0;

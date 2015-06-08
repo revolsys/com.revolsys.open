@@ -38,7 +38,8 @@ public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
       Point previousMatchCoordinate = matchCoords.getPoint(0);
       for (int j = 1; j < coords.getVertexCount(); j++) {
         final Point matchCoordinate = matchCoords.getPoint(i);
-        final double distance = LineSegmentUtil.distanceLineLine(previousCoordinate, coordinate, previousMatchCoordinate, matchCoordinate);
+        final double distance = LineSegmentUtil.distanceLineLine(previousCoordinate, coordinate,
+          previousMatchCoordinate, matchCoordinate);
         if (distance <= this.maxDistance) {
           final double angle1 = Angle.normalizePositive(previousCoordinate.angle2d(coordinate));
           final double angle2 = Angle.normalizePositive(previousMatchCoordinate.angle2d(matchCoordinate));

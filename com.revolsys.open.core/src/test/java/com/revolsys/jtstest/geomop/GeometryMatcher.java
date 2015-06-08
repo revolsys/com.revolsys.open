@@ -41,8 +41,8 @@ import com.revolsys.jts.geom.Geometry;
  * @author mbdavis
  *
  */
-public interface GeometryMatcher
-{
+public interface GeometryMatcher {
   boolean match(Geometry a, Geometry b);
+
   void setTolerance(double tolerance);
 }

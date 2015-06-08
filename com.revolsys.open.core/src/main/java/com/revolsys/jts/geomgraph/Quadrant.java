@@ -1,6 +1,4 @@
 
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -50,15 +48,22 @@ import com.revolsys.jts.geom.Point;
  *
  * @version 1.7
  */
-public class Quadrant
-{
+public class Quadrant {
+  public static final int NE = 0;
+
+  public static final int NW = 1;
+
+  public static final int SW = 2;
+
+  public static final int SE = 3;
+
   /**
    * Returns the right-hand quadrant of the halfplane defined by the two quadrants,
    * or -1 if the quadrants are opposite, or the quadrant if they are identical.
    */
-  public static int commonHalfPlane(final int quad1, final int quad2)
-  {
-    // if quadrants are the same they do not determine a unique common halfplane.
+  public static int commonHalfPlane(final int quad1, final int quad2) {
+    // if quadrants are the same they do not determine a unique common
+    // halfplane.
     // Simply return one of the two possibilities
     if (quad1 == quad2) {
       return quad1;
@@ -75,32 +80,33 @@ public class Quadrant
     if (min == 0 && max == 3) {
       return 3;
     }
-    // in general, the halfplane index is the minimum of the two adjacent quadrants
+    // in general, the halfplane index is the minimum of the two adjacent
+    // quadrants
     return min;
   }
+
   /**
    * Returns whether the given quadrant lies within the given halfplane (specified
    * by its right-hand quadrant).
    */
-  public static boolean isInHalfPlane(final int quad, final int halfPlane)
-  {
+  public static boolean isInHalfPlane(final int quad, final int halfPlane) {
     if (halfPlane == SE) {
       return quad == SE || quad == SW;
     }
     return quad == halfPlane || quad == halfPlane + 1;
   }
+
   /**
    * Returns true if the given quadrant is 0 or 1.
    */
-  public static boolean isNorthern(final int quad)
-  {
+  public static boolean isNorthern(final int quad) {
     return quad == NE || quad == NW;
   }
+
   /**
    * Returns true if the quadrants are 1 and 3, or 2 and 4
    */
-  public static boolean isOpposite(final int quad1, final int quad2)
-  {
+  public static boolean isOpposite(final int quad1, final int quad2) {
     if (quad1 == quad2) {
       return false;
     }
@@ -118,10 +124,10 @@ public class Quadrant
    *
    * @throws IllegalArgumentException if the displacements are both 0
    */
-  public static int quadrant(final double dx, final double dy)
-  {
+  public static int quadrant(final double dx, final double dy) {
     if (dx == 0.0 && dy == 0.0) {
-      throw new IllegalArgumentException("Cannot compute the quadrant for point ( "+ dx + ", " + dy + " )" );
+      throw new IllegalArgumentException("Cannot compute the quadrant for point ( " + dx + ", "
+        + dy + " )");
     }
     if (dx >= 0.0) {
       if (dy >= 0.0) {
@@ -129,8 +135,7 @@ public class Quadrant
       } else {
         return SE;
       }
-    }
-    else {
+    } else {
       if (dy >= 0.0) {
         return NW;
       } else {
@@ -144,10 +149,10 @@ public class Quadrant
    *
    * @throws IllegalArgumentException if the points are equal
    */
-  public static int quadrant(final Point p0, final Point p1)
-  {
+  public static int quadrant(final Point p0, final Point p1) {
     if (p1.getX() == p0.getX() && p1.getY() == p0.getY()) {
-      throw new IllegalArgumentException("Cannot compute the quadrant for two identical points " + p0);
+      throw new IllegalArgumentException("Cannot compute the quadrant for two identical points "
+        + p0);
     }
 
     if (p1.getX() >= p0.getX()) {
@@ -156,8 +161,7 @@ public class Quadrant
       } else {
         return SE;
       }
-    }
-    else {
+    } else {
       if (p1.getY() >= p0.getY()) {
         return NW;
       } else {
@@ -165,12 +169,4 @@ public class Quadrant
       }
     }
   }
-
-  public static final int NE = 0;
-
-  public static final int NW = 1;
-
-  public static final int SW = 2;
-
-  public static final int SE = 3;
 }

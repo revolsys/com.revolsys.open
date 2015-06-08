@@ -20,8 +20,7 @@ public class KmzRecordWriter extends AbstractRecordWriter {
 
   public KmzRecordWriter(final OutputStream out, final Charset charset) {
     try {
-      final BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(
-        out);
+      final BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(out);
       this.zipOut = new ZipOutputStream(bufferedOutputStream);
       final ZipEntry entry = new ZipEntry("doc.kml");
       this.zipOut.putNextEntry(entry);

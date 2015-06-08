@@ -62,8 +62,7 @@ public class LineStringImplTest extends TestCase {
     return new TestSuite(LineStringImplTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0,
-    1000.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1000.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 
@@ -138,8 +137,7 @@ public class LineStringImplTest extends TestCase {
 
   public void testFiveZeros() {
     final GeometryFactory factory = GeometryFactory.floating(0, 2);
-    final LineString line = factory.lineString(2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-      0.0, 0.0, 0.0, 0.0);
+    final LineString line = factory.lineString(2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
     final boolean closed = line.isClosed();
     assertTrue(closed);
   }
@@ -174,8 +172,7 @@ public class LineStringImplTest extends TestCase {
 
   public void testLinearRingConstructor() throws Exception {
     try {
-      final LinearRing ring = GeometryFactory.floating3().linearRing(2, 0.0, 0,
-        10.0, 10, 0.0, 0);
+      final LinearRing ring = GeometryFactory.floating3().linearRing(2, 0.0, 0, 10.0, 10, 0.0, 0);
       assertTrue(false);
     } catch (final IllegalArgumentException e) {
       assertTrue(true);
@@ -185,10 +182,8 @@ public class LineStringImplTest extends TestCase {
   public void testUnclosedLinearRing() {
     try {
       this.geometryFactory.linearRing(new Point[] {
-        new PointDouble(0.0, 0, Point.NULL_ORDINATE),
-        new PointDouble(1.0, 0, Point.NULL_ORDINATE),
-        new PointDouble(1.0, 1, Point.NULL_ORDINATE),
-        new PointDouble(2.0, 1, Point.NULL_ORDINATE)
+        new PointDouble(0.0, 0, Point.NULL_ORDINATE), new PointDouble(1.0, 0, Point.NULL_ORDINATE),
+        new PointDouble(1.0, 1, Point.NULL_ORDINATE), new PointDouble(2.0, 1, Point.NULL_ORDINATE)
       });
       assertTrue(false);
     } catch (final Exception e) {

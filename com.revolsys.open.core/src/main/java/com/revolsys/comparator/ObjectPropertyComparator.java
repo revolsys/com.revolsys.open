@@ -16,8 +16,7 @@ public class ObjectPropertyComparator<V> implements Comparator<V> {
   public ObjectPropertyComparator() {
   }
 
-  public ObjectPropertyComparator(final boolean sortAsceding,
-    final String... fieldNames) {
+  public ObjectPropertyComparator(final boolean sortAsceding, final String... fieldNames) {
     this(Arrays.asList(fieldNames));
     this.invert = !sortAsceding;
   }
@@ -42,8 +41,7 @@ public class ObjectPropertyComparator<V> implements Comparator<V> {
     return 0;
   }
 
-  public int compare(final Object object1, final Object object2,
-    final String fieldName) {
+  public int compare(final Object object1, final Object object2, final String fieldName) {
     final Comparable<Object> value1 = Property.get(object1, fieldName);
     final Comparable<Object> value2 = Property.get(object2, fieldName);
     if (value1 == null) {

@@ -7,8 +7,8 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionFactory;
 import com.revolsys.io.AbstractObjectWithProperties;
 
-public class MoepRecordDefinitionFactory extends AbstractObjectWithProperties
-implements RecordDefinitionFactory {
+public class MoepRecordDefinitionFactory extends AbstractObjectWithProperties implements
+  RecordDefinitionFactory {
   private static final Map<String, RecordDefinition> RECORD_DEFINITION_CACHE = new HashMap<String, RecordDefinition>();
 
   @Override

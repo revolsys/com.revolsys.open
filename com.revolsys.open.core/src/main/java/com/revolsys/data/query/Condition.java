@@ -4,8 +4,7 @@ import java.util.Map;
 
 import com.revolsys.filter.Filter;
 
-public abstract class Condition extends QueryValue implements
-Filter<Map<String, Object>> {
+public abstract class Condition extends QueryValue implements Filter<Map<String, Object>> {
 
   public static boolean accept(final Filter<Map<String, Object>> condition,
     final Map<String, Object> record) {

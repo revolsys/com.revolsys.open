@@ -6,8 +6,7 @@ import java.util.Map.Entry;
 
 import com.revolsys.data.record.Record;
 
-public class SetValues extends
-AbstractSourceToTargetProcess<Record, Record> {
+public class SetValues extends AbstractSourceToTargetProcess<Record, Record> {
   private Map<String, ? extends Object> values = Collections.emptyMap();
 
   public SetValues(final Map<String, ? extends Object> values) {

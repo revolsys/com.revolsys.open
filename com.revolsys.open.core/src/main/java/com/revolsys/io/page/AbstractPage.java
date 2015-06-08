@@ -61,8 +61,7 @@ public abstract class AbstractPage implements Page {
   @Override
   public byte readByte() {
     if (getOffset() + 1 > getSize()) {
-      throw new ArrayIndexOutOfBoundsException(
-          "Unable to read past end of record");
+      throw new ArrayIndexOutOfBoundsException("Unable to read past end of record");
     }
     final int b1 = readNextByte();
     return (byte)b1;
@@ -99,8 +98,7 @@ public abstract class AbstractPage implements Page {
   @Override
   public int readInt() {
     if (getOffset() + 4 > getSize()) {
-      throw new ArrayIndexOutOfBoundsException(
-          "Unable to read past end of record");
+      throw new ArrayIndexOutOfBoundsException("Unable to read past end of record");
     } else {
       final int b1 = readNextByte();
       final int b2 = readNextByte();
@@ -114,8 +112,7 @@ public abstract class AbstractPage implements Page {
   @Override
   public long readLong() {
     if (getOffset() + 8 > getSize()) {
-      throw new ArrayIndexOutOfBoundsException(
-          "Unable to read past end of record");
+      throw new ArrayIndexOutOfBoundsException("Unable to read past end of record");
     } else {
       final int b1 = readNextByte();
       final int b2 = readNextByte();
@@ -125,9 +122,9 @@ public abstract class AbstractPage implements Page {
       final int b6 = readNextByte();
       final int b7 = readNextByte();
       final int b8 = readNextByte();
-      return ((long)b1 << 56) + ((long)(b2 & 255) << 48)
-          + ((long)(b3 & 255) << 40) + ((long)(b4 & 255) << 32)
-          + ((long)(b5 & 255) << 24) + ((b6 & 255) << 16) + ((b7 & 255) << 8) + ((b8 & 255) << 0);
+      return ((long)b1 << 56) + ((long)(b2 & 255) << 48) + ((long)(b3 & 255) << 40)
+        + ((long)(b4 & 255) << 32) + ((long)(b5 & 255) << 24) + ((b6 & 255) << 16)
+        + ((b7 & 255) << 8) + ((b8 & 255) << 0);
 
     }
   }
@@ -137,8 +134,7 @@ public abstract class AbstractPage implements Page {
   @Override
   public short readShort() {
     if (getOffset() + 2 > getSize()) {
-      throw new ArrayIndexOutOfBoundsException(
-          "Unable to read past end of record");
+      throw new ArrayIndexOutOfBoundsException("Unable to read past end of record");
     } else {
       final int b1 = readNextByte();
       final int b2 = readNextByte();
@@ -149,8 +145,7 @@ public abstract class AbstractPage implements Page {
   @Override
   public void writeByte(final byte b) {
     if (getOffset() > getSize()) {
-      throw new ArrayIndexOutOfBoundsException(
-          "Unable to write past end of record");
+      throw new ArrayIndexOutOfBoundsException("Unable to write past end of record");
     } else {
       writeByte((int)b);
     }
@@ -186,8 +181,7 @@ public abstract class AbstractPage implements Page {
   @Override
   public void writeInt(final int i) {
     if (getOffset() + 4 > getSize()) {
-      throw new ArrayIndexOutOfBoundsException(
-          "Unable to write past end of record");
+      throw new ArrayIndexOutOfBoundsException("Unable to write past end of record");
     } else {
       writeByte(i >>> 24 & 0xFF);
       writeByte(i >>> 16 & 0xFF);
@@ -199,8 +193,7 @@ public abstract class AbstractPage implements Page {
   @Override
   public final void writeLong(final long l) {
     if (getOffset() + 4 > getSize()) {
-      throw new ArrayIndexOutOfBoundsException(
-          "Unable to write past end of record");
+      throw new ArrayIndexOutOfBoundsException("Unable to write past end of record");
     } else {
       writeByte((byte)(l >>> 56));
       writeByte((byte)(l >>> 48));
@@ -216,8 +209,7 @@ public abstract class AbstractPage implements Page {
   @Override
   public final void writeShort(final short s) {
     if (getOffset() + 2 > getSize()) {
-      throw new ArrayIndexOutOfBoundsException(
-          "Unable to write past end of record");
+      throw new ArrayIndexOutOfBoundsException("Unable to write past end of record");
     } else {
       writeByte(s >>> 8 & 0xFF);
       writeByte(s >>> 0 & 0xFF);

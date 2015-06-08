@@ -66,8 +66,7 @@ public class FactorZoomMode implements ZoomMode {
    * @param boundingBox The bounding box.
    */
   @Override
-  public void zoom(final ComponentViewport2D viewport,
-    final BoundingBox boundingBox) {
+  public void zoom(final ComponentViewport2D viewport, final BoundingBox boundingBox) {
     final BoundingBox newBoundingBox = getBoundingBox(viewport, boundingBox);
     viewport.setBoundingBox(newBoundingBox);
   }
@@ -83,8 +82,8 @@ public class FactorZoomMode implements ZoomMode {
    * @param y2 The second y coordinate.
    */
   @Override
-  public void zoom(final ComponentViewport2D viewport, final double x1,
-    final double y1, final double x2, final double y2) {
+  public void zoom(final ComponentViewport2D viewport, final double x1, final double y1,
+    final double x2, final double y2) {
     final double viewWidth = viewport.getViewWidthPixels();
     final double viewHeight = viewport.getViewHeightPixels();
 
@@ -106,14 +105,13 @@ public class FactorZoomMode implements ZoomMode {
    * @param y The y coordinate.
    * @param factor The multiplication factor to zoom by.
    */
-  private void zoomAndRecentre(final ComponentViewport2D viewport,
-    final double x, final double y, final double factor) {
+  private void zoomAndRecentre(final ComponentViewport2D viewport, final double x, final double y,
+    final double factor) {
     final double[] ordinates = viewport.toModelCoordinates(x, y);
     final double mapX = ordinates[0];
     final double mapY = ordinates[1];
 
-    final double scale = Math.min(viewport.getScale() * factor,
-      viewport.getMaxScale());
+    final double scale = Math.min(viewport.getScale() * factor, viewport.getMaxScale());
     final double width = viewport.getModelWidth(scale);
     final double height = viewport.getModelHeight(scale);
 
@@ -123,8 +121,7 @@ public class FactorZoomMode implements ZoomMode {
     final double y1 = mapY - height / 2;
     final double x2 = x1 + width;
     final double y2 = y1 + height;
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1,
-      x2, y2);
+    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
     viewport.setBoundingBox(boundingBox);
   }
 
@@ -137,8 +134,7 @@ public class FactorZoomMode implements ZoomMode {
    * @param y The y coordinate.
    */
   @Override
-  public void zoomIn(final ComponentViewport2D viewport, final double x,
-    final double y) {
+  public void zoomIn(final ComponentViewport2D viewport, final double x, final double y) {
     zoomProportional(viewport, x, y, 1 / this.factor);
   }
 
@@ -151,8 +147,7 @@ public class FactorZoomMode implements ZoomMode {
    * @param y The y coordinate.
    */
   @Override
-  public void zoomInAndRecentre(final ComponentViewport2D viewport,
-    final double x, final double y) {
+  public void zoomInAndRecentre(final ComponentViewport2D viewport, final double x, final double y) {
     zoomAndRecentre(viewport, x, y, 1 / this.factor);
   }
 
@@ -165,8 +160,7 @@ public class FactorZoomMode implements ZoomMode {
    * @param y The y coordinate.
    */
   @Override
-  public void zoomOut(final ComponentViewport2D viewport, final double x,
-    final double y) {
+  public void zoomOut(final ComponentViewport2D viewport, final double x, final double y) {
     zoomProportional(viewport, x, y, this.factor);
   }
 
@@ -179,8 +173,7 @@ public class FactorZoomMode implements ZoomMode {
    * @param y The y coordinate.
    */
   @Override
-  public void zoomOutAndRecentre(final ComponentViewport2D viewport,
-    final double x, final double y) {
+  public void zoomOutAndRecentre(final ComponentViewport2D viewport, final double x, final double y) {
     zoomAndRecentre(viewport, x, y, this.factor);
   }
 
@@ -193,14 +186,13 @@ public class FactorZoomMode implements ZoomMode {
    * @param y The y coordinate.
    * @param factor The multiplication factor to zoom by.
    */
-  private void zoomProportional(final ComponentViewport2D viewport,
-    final double x, final double y, final double factor) {
+  private void zoomProportional(final ComponentViewport2D viewport, final double x, final double y,
+    final double factor) {
     final double[] ordinates = viewport.toModelCoordinates(x, y);
     final double mapX = ordinates[0];
     final double mapY = ordinates[1];
 
-    final double scale = Math.min(viewport.getScale() * factor,
-      viewport.getMaxScale());
+    final double scale = Math.min(viewport.getScale() * factor, viewport.getMaxScale());
     final double width = viewport.getModelWidth(scale);
     final double height = viewport.getModelHeight(scale);
 
@@ -215,8 +207,7 @@ public class FactorZoomMode implements ZoomMode {
     final double y1 = mapY - height * yProportion;
     final double x2 = x1 + width;
     final double y2 = y1 + height;
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1,
-      x2, y2);
+    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
     viewport.setBoundingBox(boundingBox);
   }
 }

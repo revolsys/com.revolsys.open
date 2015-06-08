@@ -57,10 +57,9 @@ public class SegmentPointComparator {
    * 0 the two nodes are equal;
    * 1 node1 occurs first
    */
-  public static int compare(final int octant, final Point p0, final Point p1)
-  {
+  public static int compare(final int octant, final Point p0, final Point p1) {
     // nodes can only be equal if their coordinates are equal
-    if (p0.equals(2,p1)) {
+    if (p0.equals(2, p1)) {
       return 0;
     }
 
@@ -68,21 +67,28 @@ public class SegmentPointComparator {
     final int ySign = relativeSign(p0.getY(), p1.getY());
 
     switch (octant) {
-      case 0: return compareValue(xSign, ySign);
-      case 1: return compareValue(ySign, xSign);
-      case 2: return compareValue(ySign, -xSign);
-      case 3: return compareValue(-xSign, ySign);
-      case 4: return compareValue(-xSign, -ySign);
-      case 5: return compareValue(-ySign, -xSign);
-      case 6: return compareValue(-ySign, xSign);
-      case 7: return compareValue(xSign, -ySign);
+      case 0:
+        return compareValue(xSign, ySign);
+      case 1:
+        return compareValue(ySign, xSign);
+      case 2:
+        return compareValue(ySign, -xSign);
+      case 3:
+        return compareValue(-xSign, ySign);
+      case 4:
+        return compareValue(-xSign, -ySign);
+      case 5:
+        return compareValue(-ySign, -xSign);
+      case 6:
+        return compareValue(-ySign, xSign);
+      case 7:
+        return compareValue(xSign, -ySign);
     }
     Assert.shouldNeverReachHere("invalid octant value");
     return 0;
   }
 
-  private static int compareValue(final int compareSign0, final int compareSign1)
-  {
+  private static int compareValue(final int compareSign0, final int compareSign1) {
     if (compareSign0 < 0) {
       return -1;
     }
@@ -99,8 +105,7 @@ public class SegmentPointComparator {
 
   }
 
-  public static int relativeSign(final double x0, final double x1)
-  {
+  public static int relativeSign(final double x0, final double x1) {
     if (x0 < x1) {
       return -1;
     }

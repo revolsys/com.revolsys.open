@@ -20,8 +20,7 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
   public static final RecordDefinition RECORD_DEFINITION;
 
   static {
-    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
-      "/osm/record");
+    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl("/osm/record");
     recordDefinition.addField("id", DataTypes.LONG);
     recordDefinition.addField("visible", DataTypes.BOOLEAN);
     recordDefinition.addField("version", DataTypes.INT);
@@ -57,9 +56,8 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
   public OsmElement() {
   }
 
-  public OsmElement(final long id, final boolean visible, final int version,
-    final long changeset, final Date timestamp, final String user,
-    final int uid, final Map<String, String> tags) {
+  public OsmElement(final long id, final boolean visible, final int version, final long changeset,
+    final Date timestamp, final String user, final int uid, final Map<String, String> tags) {
     this.id = id;
     this.visible = visible;
     this.version = version;
@@ -75,12 +73,12 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
   }
 
   public OsmElement(final XMLStreamReader in) {
-    id = StaxUtils.getLongAttribute(in, null, "id");
-    visible = StaxUtils.getBooleanAttribute(in, null, "visible");
-    version = StaxUtils.getIntAttribute(in, null, "version");
-    changeset = StaxUtils.getIntAttribute(in, null, "changeset");
-    user = in.getAttributeValue(null, "user");
-    uid = StaxUtils.getIntAttribute(in, null, "uid");
+    this.id = StaxUtils.getLongAttribute(in, null, "id");
+    this.visible = StaxUtils.getBooleanAttribute(in, null, "visible");
+    this.version = StaxUtils.getIntAttribute(in, null, "version");
+    this.changeset = StaxUtils.getIntAttribute(in, null, "changeset");
+    this.user = in.getAttributeValue(null, "user");
+    this.uid = StaxUtils.getIntAttribute(in, null, "uid");
   }
 
   public synchronized void addTag(final String key, final String value) {
@@ -88,24 +86,21 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
       if (key.length() <= 255) {
         if (Property.hasValue(value)) {
           if (value.length() <= 255) {
-            if (tags.isEmpty()) {
-              tags = new HashMap<>();
+            if (this.tags.isEmpty()) {
+              this.tags = new HashMap<>();
             }
-            tags.put(key, value);
+            this.tags.put(key, value);
           } else {
-            throw new IllegalArgumentException("Value length " + key.length()
-              + " must be <= 255");
+            throw new IllegalArgumentException("Value length " + key.length() + " must be <= 255");
           }
         } else {
           removeTag(key);
         }
       } else {
-        throw new IllegalArgumentException("Value length " + value.length()
-          + " must be <= 255");
+        throw new IllegalArgumentException("Value length " + value.length() + " must be <= 255");
       }
     } else {
-      throw new IllegalArgumentException(
-        "Key cannot be null or the emptry string");
+      throw new IllegalArgumentException("Key cannot be null or the emptry string");
     }
   }
 
@@ -121,17 +116,17 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
   }
 
   public long getChangeset() {
-    return changeset;
+    return this.changeset;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Geometry> T getGeometryValue() {
-    return (T)geometry;
+    return (T)this.geometry;
   }
 
   public long getId() {
-    return id;
+    return this.id;
   }
 
   @Override
@@ -145,27 +140,27 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
   }
 
   public String getTag(final String name) {
-    if (tags == null) {
+    if (this.tags == null) {
       return null;
     } else {
-      return tags.get(name);
+      return this.tags.get(name);
     }
   }
 
   public Map<String, String> getTags() {
-    return new HashMap<>(tags);
+    return new HashMap<>(this.tags);
   }
 
   public Date getTimestamp() {
-    return timestamp;
+    return this.timestamp;
   }
 
   public int getUid() {
-    return uid;
+    return this.uid;
   }
 
   public String getUser() {
-    return user;
+    return this.user;
   }
 
   @SuppressWarnings("unchecked")
@@ -174,55 +169,55 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
     Object value = null;
     switch (index) {
       case 0:
-        value = id;
+        value = this.id;
       break;
       case 1:
-        value = visible;
+        value = this.visible;
       break;
       case 2:
-        value = version;
+        value = this.version;
       break;
       case 3:
-        value = changeset;
+        value = this.changeset;
       break;
       case 4:
-        value = timestamp;
+        value = this.timestamp;
       break;
       case 5:
-        value = user;
+        value = this.user;
       break;
       case 6:
-        value = uid;
+        value = this.uid;
       break;
       case 7:
-        value = tags;
+        value = this.tags;
       break;
       case 8:
-        value = geometry;
+        value = this.geometry;
       break;
     }
     return (V)value;
   }
 
   public int getVersion() {
-    return version;
+    return this.version;
   }
 
   @Override
   public int hashCode() {
-    return (int)(id ^ id >>> 32);
+    return (int)(this.id ^ this.id >>> 32);
   }
 
   public boolean hasTags() {
-    return tags != null && !tags.isEmpty();
+    return this.tags != null && !this.tags.isEmpty();
   }
 
   public boolean isTagged() {
-    return tags != null && !tags.isEmpty();
+    return this.tags != null && !this.tags.isEmpty();
   }
 
   public boolean isVisible() {
-    return visible;
+    return this.visible;
   }
 
   protected void parseTag(final XMLStreamReader in) {
@@ -233,10 +228,10 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
   }
 
   public void removeTag(final String key) {
-    if (tags.containsKey(key)) {
-      tags.remove(key);
-      if (tags.isEmpty()) {
-        tags = Collections.emptyMap();
+    if (this.tags.containsKey(key)) {
+      this.tags.remove(key);
+      if (this.tags.isEmpty()) {
+        this.tags = Collections.emptyMap();
       }
     }
   }

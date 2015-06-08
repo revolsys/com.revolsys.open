@@ -37,8 +37,7 @@ public class XmlConfigLoader {
 
   private final XmlProcessorContext context = new SimpleXmlProcessorContext();
 
-  public XmlConfigLoader(final URL configFileUrl,
-    final ServletContext servletContext) {
+  public XmlConfigLoader(final URL configFileUrl, final ServletContext servletContext) {
     if (configFileUrl == null) {
       throw new IllegalArgumentException("A config file must be specified");
     }
@@ -69,8 +68,7 @@ public class XmlConfigLoader {
       this.context.addError(e.getMessage(), e, null);
     }
     if (!this.context.getErrors().isEmpty()) {
-      throw new InvalidConfigException("Configuration file is invalid",
-        this.context.getErrors());
+      throw new InvalidConfigException("Configuration file is invalid", this.context.getErrors());
     }
     return config;
   }

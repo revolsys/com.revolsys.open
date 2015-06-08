@@ -8,10 +8,10 @@ package com.revolsys.jtstest.util;
  * @author mbdavis
  *
  */
-public class GeometryTextCleaner
-{
-  private static String clean(final String input, final String allowedSymbols)
-  {
+public class GeometryTextCleaner {
+  public static final String WKT_SYMBOLS = "(),.-";
+
+  private static String clean(final String input, final String allowedSymbols) {
     final StringBuilder buf = new StringBuilder();
     for (int i = 0; i < input.length(); i++) {
       final char c = input.charAt(i);
@@ -22,13 +22,11 @@ public class GeometryTextCleaner
     return buf.toString();
   }
 
-  public static String cleanWKT(final String input)
-  {
+  public static String cleanWKT(final String input) {
     return clean(input, WKT_SYMBOLS);
   }
 
-  private static boolean isAllowed(final char c, final String allowedSymbols)
-  {
+  private static boolean isAllowed(final char c, final String allowedSymbols) {
     if (Character.isWhitespace(c)) {
       return true;
     }
@@ -40,7 +38,5 @@ public class GeometryTextCleaner
     }
     return false;
   }
-
-  public static final String WKT_SYMBOLS = "(),.-";
 
 }

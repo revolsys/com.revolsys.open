@@ -22,12 +22,6 @@ import com.revolsys.util.MathUtil;
 
 public class OsmOverpassLayer extends AbstractRecordLayer {
 
-  public static AbstractLayer create(final Map<String, Object> properties) {
-    return new OsmOverpassLayer(properties);
-  }
-
-  private String serverUrl = "http://api.openstreetmap.org/";
-
   private static final int TILE_SCALE_X = 50;
 
   private static final double TILE_WIDTH = 1.0 / TILE_SCALE_X;
@@ -35,6 +29,12 @@ public class OsmOverpassLayer extends AbstractRecordLayer {
   private static final int TILE_SCALE_Y = 50;
 
   private static final double TILE_HEIGHT = 1.0 / TILE_SCALE_Y;
+
+  public static AbstractLayer create(final Map<String, Object> properties) {
+    return new OsmOverpassLayer(properties);
+  }
+
+  private String serverUrl = "http://api.openstreetmap.org/";
 
   private Map<BoundingBox, OsmDocument> boundingBoxTileMap = new HashMap<>();
 
@@ -98,26 +98,20 @@ public class OsmOverpassLayer extends AbstractRecordLayer {
   public List<BoundingBox> getTileBoundingBoxes(BoundingBox boundingBox) {
     boundingBox = boundingBox.convert(OsmConstants.WGS84_2D);
     final List<BoundingBox> boundingBoxes = new ArrayList<>();
-    final double minX = Math.floor(boundingBox.getMinX() * TILE_SCALE_X)
-        / TILE_SCALE_X;
-    final double minY = Math.floor(boundingBox.getMinY() * TILE_SCALE_Y)
-        / TILE_SCALE_Y;
-    final double maxX = Math.ceil(boundingBox.getMaxX() * TILE_SCALE_X)
-        / TILE_SCALE_X;
-    final double maxY = Math.ceil(boundingBox.getMaxY() * TILE_SCALE_Y)
-        / TILE_SCALE_Y;
+    final double minX = Math.floor(boundingBox.getMinX() * TILE_SCALE_X) / TILE_SCALE_X;
+    final double minY = Math.floor(boundingBox.getMinY() * TILE_SCALE_Y) / TILE_SCALE_Y;
+    final double maxX = Math.ceil(boundingBox.getMaxX() * TILE_SCALE_X) / TILE_SCALE_X;
+    final double maxY = Math.ceil(boundingBox.getMaxY() * TILE_SCALE_Y) / TILE_SCALE_Y;
     int indexY = 0;
     for (double y = minY; y < maxY;) {
       int indexX = 0;
       indexY++;
-      final double nextY = MathUtil.makePrecise(TILE_SCALE_Y, minY + indexY
-        * TILE_HEIGHT);
+      final double nextY = MathUtil.makePrecise(TILE_SCALE_Y, minY + indexY * TILE_HEIGHT);
       for (double x = minX; x < maxX;) {
         indexX++;
-        final double nextX = MathUtil.makePrecise(TILE_SCALE_X, minX + indexX
-          * TILE_WIDTH);
-        final BoundingBoxDoubleGf tileBoundingBox = new BoundingBoxDoubleGf(
-          OsmConstants.WGS84_2D, 2, x, y, nextX, nextY);
+        final double nextX = MathUtil.makePrecise(TILE_SCALE_X, minX + indexX * TILE_WIDTH);
+        final BoundingBoxDoubleGf tileBoundingBox = new BoundingBoxDoubleGf(OsmConstants.WGS84_2D,
+          2, x, y, nextX, nextY);
         boundingBoxes.add(tileBoundingBox);
         x = nextX;
       }

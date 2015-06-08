@@ -7,8 +7,8 @@ public class GeoJsonIoTest {
 
   public static Test suite() {
     final TestSuite suite = new TestSuite("GeoJson Geometry");
-    IoTestSuite.addGeometryTestSuites(suite, "GeoJson", IoTestSuite.class,
-      "doWriteReadTest", "geojson");
+    IoTestSuite.addGeometryTestSuites(suite, "GeoJson", IoTestSuite.class, "doWriteReadTest",
+      "geojson");
     return suite;
   }
 }

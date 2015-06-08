@@ -21,11 +21,11 @@ import com.revolsys.jts.testold.junit.GeometryUtils;
  *
  */
 public class CascadedPolygonUnionTest extends TestCase {
+  private static CascadedPolygonUnionTester tester = new CascadedPolygonUnionTester();
+
   public static void main(final String[] args) {
     junit.textui.TestRunner.run(CascadedPolygonUnionTest.class);
   }
-
-  private static CascadedPolygonUnionTester tester = new CascadedPolygonUnionTester();
 
   GeometryFactory geomFact = GeometryFactory.floating3();
 
@@ -37,8 +37,7 @@ public class CascadedPolygonUnionTest extends TestCase {
     final List geoms = new ArrayList();
     for (int i = 0; i < num; i++) {
       for (int j = 0; j < num; j++) {
-        final Point pt = new PointDouble((double)i, j,
-          Point.NULL_ORDINATE);
+        final Point pt = new PointDouble((double)i, j, Point.NULL_ORDINATE);
         final Geometry ptGeom = this.geomFact.point(pt);
         final Geometry disc = ptGeom.buffer(radius);
         geoms.add(disc);

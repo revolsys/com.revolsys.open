@@ -15,8 +15,8 @@ public class TestDirectory extends TestSuite {
 
   public TestDirectory parent;
 
-  public TestDirectory(final TestDirectory parent, final int index,
-    final File directory, final String name) throws Throwable {
+  public TestDirectory(final TestDirectory parent, final int index, final File directory,
+    final String name) throws Throwable {
     this.parent = parent;
     this.index = index;
     if (parent == null) {
@@ -28,8 +28,7 @@ public class TestDirectory extends TestSuite {
     int runIndex = 1;
     for (final File file : directory.listFiles()) {
       if (file.isDirectory()) {
-        final Test test = new TestDirectory(this, runIndex, file,
-          file.getName());
+        final Test test = new TestDirectory(this, runIndex, file, file.getName());
         addTest(test);
       } else if (file.isFile()) {
         TestFile testRun;

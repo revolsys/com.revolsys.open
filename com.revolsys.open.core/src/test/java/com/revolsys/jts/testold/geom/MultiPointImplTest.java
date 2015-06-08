@@ -61,8 +61,7 @@ public class MultiPointImplTest extends TestCase {
     return new TestSuite(MultiPointImplTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0,
-    1000.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1000.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 
@@ -109,8 +108,7 @@ public class MultiPointImplTest extends TestCase {
     assertTrue(g instanceof Point);
     final Point p = (Point)g;
     final Point internal = p.getPoint();
-    final Point externalCoordinate = new PointDouble(
-      internal.getX(), internal.getY());
+    final Point externalCoordinate = new PointDouble(internal.getX(), internal.getY());
     assertEquals(3.333, externalCoordinate.getX(), 1E-10);
     assertEquals(4.444, externalCoordinate.getY(), 1E-10);
   }

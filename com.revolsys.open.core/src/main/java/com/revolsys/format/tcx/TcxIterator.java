@@ -52,14 +52,13 @@ public class TcxIterator implements RecordIterator {
     this(StaxUtils.createXmlReader(in));
   }
 
-  public TcxIterator(final Reader in, final RecordFactory recordFactory,
-    final String path) {
+  public TcxIterator(final Reader in, final RecordFactory recordFactory, final String path) {
     this(StaxUtils.createXmlReader(in));
     this.typePath = path;
   }
 
-  public TcxIterator(final Resource resource,
-    final RecordFactory recordFactory, final String path) throws IOException {
+  public TcxIterator(final Resource resource, final RecordFactory recordFactory, final String path)
+    throws IOException {
     this(StaxUtils.createXmlReader(resource));
     this.typePath = path;
     this.baseName = FileUtil.getBaseName(resource.getFilename());
@@ -108,11 +107,8 @@ public class TcxIterator implements RecordIterator {
     // try {
     do {
       // this.currentRecord = parseRecord();
-    } while (this.currentRecord != null
-        && this.typePath != null
-        && !this.currentRecord.getRecordDefinition()
-        .getPath()
-        .equals(this.typePath));
+    } while (this.currentRecord != null && this.typePath != null
+      && !this.currentRecord.getRecordDefinition().getPath().equals(this.typePath));
     this.loadNextObject = false;
     if (this.currentRecord == null) {
       close();

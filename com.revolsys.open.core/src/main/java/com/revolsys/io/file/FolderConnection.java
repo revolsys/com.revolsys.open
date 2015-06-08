@@ -18,8 +18,8 @@ public class FolderConnection implements MapSerializer {
 
   private FolderConnectionRegistry registry;
 
-  public FolderConnection(final FolderConnectionRegistry registry,
-    final String name, final File file) {
+  public FolderConnection(final FolderConnectionRegistry registry, final String name,
+    final File file) {
     this.registry = registry;
     setNameAndFile(name, file);
   }

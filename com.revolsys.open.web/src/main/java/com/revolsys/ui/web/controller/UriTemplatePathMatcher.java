@@ -28,9 +28,7 @@ public class UriTemplatePathMatcher implements PathMatcher {
   }
 
   @Override
-  public Map<String, String> extractUriTemplateVariables(
-    final String pattern,
-    final String path) {
+  public Map<String, String> extractUriTemplateVariables(final String pattern, final String path) {
     final Map<String, String> variables = new LinkedHashMap<String, String>();
     return variables;
   }

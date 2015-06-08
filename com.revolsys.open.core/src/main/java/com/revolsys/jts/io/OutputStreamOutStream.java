@@ -38,18 +38,15 @@ import java.io.OutputStream;
 /**
  * An adapter to allow an {@link OutputStream} to be used as an {@link OutStream}
  */
-public class OutputStreamOutStream
-implements OutStream
-{
+public class OutputStreamOutStream implements OutStream {
   private final OutputStream os;
 
-  public OutputStreamOutStream(final OutputStream os)
-  {
+  public OutputStreamOutStream(final OutputStream os) {
     this.os = os;
   }
+
   @Override
-  public void write(final byte[] buf, final int len) throws IOException
-  {
+  public void write(final byte[] buf, final int len) throws IOException {
     this.os.write(buf, 0, len);
   }
 }

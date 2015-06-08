@@ -14,14 +14,13 @@ import com.revolsys.ui.web.utils.HttpServletUtils;
 public class SavedRequestFilter extends OncePerRequestFilter {
 
   @Override
-  protected void doFilterInternal(
-    final HttpServletRequest request,
-    final HttpServletResponse response,
-    final FilterChain filterChain) throws ServletException, IOException {
+  protected void doFilterInternal(final HttpServletRequest request,
+    final HttpServletResponse response, final FilterChain filterChain) throws ServletException,
+    IOException {
     final HttpServletRequest savedRequest = HttpServletUtils.getRequest();
     final HttpServletResponse savedResponse = HttpServletUtils.getResponse();
     try {
-      HttpServletUtils.setRequestAndResponse(request,response);
+      HttpServletUtils.setRequestAndResponse(request, response);
       filterChain.doFilter(request, response);
     } finally {
       if (savedRequest == null) {

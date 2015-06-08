@@ -104,8 +104,8 @@ public class IndexedNestedRingTester {
           continue;
         }
 
-        final Point innerRingPt = IsValidOp.findPtNotNode(
-          innerRing.vertices(), searchRing, this.graph);
+        final Point innerRingPt = IsValidOp.findPtNotNode(innerRing.vertices(), searchRing,
+          this.graph);
 
         /**
          * If no non-node pts can be found, this means
@@ -121,8 +121,7 @@ public class IndexedNestedRingTester {
           continue;
         }
 
-        final boolean isInside = CGAlgorithms.isPointInRing(innerRingPt,
-          searchRing);
+        final boolean isInside = CGAlgorithms.isPointInRing(innerRingPt, searchRing);
         if (isInside) {
           this.nestedPt = innerRingPt;
           return false;

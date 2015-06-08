@@ -23,17 +23,15 @@ public class MarkerField extends ValueField implements PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
-  private final ComboBox comboBox = new ComboBox("marker",
-    new DefaultComboBoxModel(new Vector<Marker>(ShapeMarker.getMarkers())),
-    null, new DefaultListCellRenderer() {
+  private final ComboBox comboBox = new ComboBox("marker", new DefaultComboBoxModel(
+    new Vector<Marker>(ShapeMarker.getMarkers())), null, new DefaultListCellRenderer() {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public Component getListCellRendererComponent(final JList list,
-      final Object value, final int index, final boolean isSelected,
-      final boolean cellHasFocus) {
-      final Component component = super.getListCellRendererComponent(list,
-        value, index, isSelected, cellHasFocus);
+    public Component getListCellRendererComponent(final JList list, final Object value,
+      final int index, final boolean isSelected, final boolean cellHasFocus) {
+      final Component component = super.getListCellRendererComponent(list, value, index,
+        isSelected, cellHasFocus);
       setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5));
       final ShapeMarker marker = (ShapeMarker)value;
       setIcon(new ShapeIcon(marker.getShape(), 16, 16));

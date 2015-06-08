@@ -73,13 +73,12 @@ public class PolygonBuilder {
    * The graph is assumed to contain one or more polygons,
    * possibly with holes.
    */
-  public void add(final Collection<DirectedEdge> dirEdges,
-    final Collection<Node> nodes) {
+  public void add(final Collection<DirectedEdge> dirEdges, final Collection<Node> nodes) {
     PlanarGraph.linkResultDirectedEdges(nodes);
     final List<MaximalEdgeRing> maxEdgeRings = buildMaximalEdgeRings(dirEdges);
     final List<EdgeRing> freeHoleList = new ArrayList<>();
-    final List<MaximalEdgeRing> edgeRings = buildMinimalEdgeRings(maxEdgeRings,
-      this.shellList, freeHoleList);
+    final List<MaximalEdgeRing> edgeRings = buildMinimalEdgeRings(maxEdgeRings, this.shellList,
+      freeHoleList);
     sortShellsAndHoles(edgeRings, this.shellList, freeHoleList);
     placeFreeHoles(this.shellList, freeHoleList);
   }
@@ -96,8 +95,7 @@ public class PolygonBuilder {
   /**
    * for all DirectedEdges in result, form them into MaximalEdgeRings
    */
-  private List<MaximalEdgeRing> buildMaximalEdgeRings(
-    final Collection<DirectedEdge> dirEdges) {
+  private List<MaximalEdgeRing> buildMaximalEdgeRings(final Collection<DirectedEdge> dirEdges) {
     final List<MaximalEdgeRing> maxEdgeRings = new ArrayList<>();
     for (final DirectedEdge de : dirEdges) {
       if (de.isInResult() && de.getLabel().isArea()) {
@@ -112,9 +110,8 @@ public class PolygonBuilder {
     return maxEdgeRings;
   }
 
-  private List<MaximalEdgeRing> buildMinimalEdgeRings(
-    final List<MaximalEdgeRing> maxEdgeRings, final List<EdgeRing> shellList,
-    final List<EdgeRing> freeHoleList) {
+  private List<MaximalEdgeRing> buildMinimalEdgeRings(final List<MaximalEdgeRing> maxEdgeRings,
+    final List<EdgeRing> shellList, final List<EdgeRing> freeHoleList) {
     final List<MaximalEdgeRing> edgeRings = new ArrayList<>();
     for (final MaximalEdgeRing er : maxEdgeRings) {
       if (er.getMaxNodeDegree() > 2) {
@@ -163,8 +160,7 @@ public class PolygonBuilder {
    * @return containing EdgeRing, if there is one
    * or null if no containing EdgeRing is found
    */
-  private EdgeRing findEdgeRingContaining(final EdgeRing testEr,
-    final List<EdgeRing> shellList) {
+  private EdgeRing findEdgeRingContaining(final EdgeRing testEr, final List<EdgeRing> shellList) {
     final LinearRing testRing = testEr.getLinearRing();
     final BoundingBox testEnv = testRing.getBoundingBox();
     final Point testPt = testRing.getPoint(0);
@@ -237,15 +233,13 @@ public class PolygonBuilder {
    *
    * @throws TopologyException if a hole cannot be assigned to a shell
    */
-  private void placeFreeHoles(final List<EdgeRing> shellList,
-    final List<EdgeRing> freeHoleList) {
+  private void placeFreeHoles(final List<EdgeRing> shellList, final List<EdgeRing> freeHoleList) {
     for (final EdgeRing hole : freeHoleList) {
       // only place this hole if it doesn't yet have a shell
       if (hole.getShell() == null) {
         final EdgeRing shell = findEdgeRingContaining(hole, shellList);
         if (shell == null) {
-          throw new TopologyException("unable to assign hole to a shell",
-            hole.getCoordinate(0));
+          throw new TopologyException("unable to assign hole to a shell", hole.getCoordinate(0));
         }
         // Assert.isTrue(shell != null, "unable to assign hole to a shell");
         hole.setShell(shell);
@@ -264,8 +258,7 @@ public class PolygonBuilder {
    * PIP test
    * </ul>
    */
-  private void placePolygonHoles(final EdgeRing shell,
-    final List<MinimalEdgeRing> minEdgeRings) {
+  private void placePolygonHoles(final EdgeRing shell, final List<MinimalEdgeRing> minEdgeRings) {
     for (final MinimalEdgeRing er : minEdgeRings) {
       if (er.isHole()) {
         er.setShell(shell);

@@ -19,8 +19,7 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public class WktRecordIterator extends AbstractIterator<Record>
-implements RecordIterator {
+public class WktRecordIterator extends AbstractIterator<Record> implements RecordIterator {
 
   private RecordFactory factory;
 
@@ -30,11 +29,9 @@ implements RecordIterator {
 
   private RecordDefinition recordDefinition;
 
-  public WktRecordIterator(final RecordFactory factory,
-    final Resource resource) throws IOException {
+  public WktRecordIterator(final RecordFactory factory, final Resource resource) throws IOException {
     this.factory = factory;
-    this.in = new BufferedReader(
-      FileUtil.createUtf8Reader(resource.getInputStream()));
+    this.in = new BufferedReader(FileUtil.createUtf8Reader(resource.getInputStream()));
     this.recordDefinition = Records.createGeometryRecordDefinition();
   }
 
@@ -60,8 +57,7 @@ implements RecordIterator {
         if (geometryFactory == null) {
           geometryFactory = GeometryFactory.floating3();
         }
-        geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY,
-          geometryFactory);
+        geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
       }
     }
     this.wktParser = new WktParser(geometryFactory);

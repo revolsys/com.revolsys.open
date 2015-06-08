@@ -271,7 +271,7 @@ public class DirectedEdge extends GraphComponent implements Comparable {
     final int lastDotPos = className.lastIndexOf('.');
     final String name = className.substring(lastDotPos + 1);
     out.print("  " + name + ": " + this.p0 + " - " + this.p1 + " " + this.quadrant + ":"
-        + this.angle);
+      + this.angle);
   }
 
   /**

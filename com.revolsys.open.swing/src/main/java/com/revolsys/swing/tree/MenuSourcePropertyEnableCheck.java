@@ -12,8 +12,7 @@ import com.revolsys.util.Property;
 
 public class MenuSourcePropertyEnableCheck extends AbstractEnableCheck {
 
-  public static MenuSourcePropertyEnableCheck create(
-    final Map<String, Object> config) {
+  public static MenuSourcePropertyEnableCheck create(final Map<String, Object> config) {
     return new MenuSourcePropertyEnableCheck(config);
   }
 
@@ -33,13 +32,12 @@ public class MenuSourcePropertyEnableCheck extends AbstractEnableCheck {
     this(propertyName, true);
   }
 
-  public MenuSourcePropertyEnableCheck(final String propertyName,
-    final Object value) {
+  public MenuSourcePropertyEnableCheck(final String propertyName, final Object value) {
     this(propertyName, value, false);
   }
 
-  public MenuSourcePropertyEnableCheck(final String propertyName,
-    final Object value, final boolean inverse) {
+  public MenuSourcePropertyEnableCheck(final String propertyName, final Object value,
+    final boolean inverse) {
     this.propertyName = propertyName;
     this.value = value;
     this.inverse = inverse;

@@ -1,6 +1,4 @@
 
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -53,8 +51,7 @@ import java.util.List;
  *
  * @version 1.7
  */
-public abstract class EdgeSetIntersector
-{
+public abstract class EdgeSetIntersector {
   public EdgeSetIntersector() {
   }
 
@@ -71,8 +68,7 @@ public abstract class EdgeSetIntersector
    * @param si the SegmentIntersector to use
    * @param testAllSegments true if self-intersections are to be tested as well
    */
-  abstract public void computeIntersections(List edges, SegmentIntersector si, boolean testAllSegments);
-
-
+  abstract public void computeIntersections(List edges, SegmentIntersector si,
+    boolean testAllSegments);
 
 }

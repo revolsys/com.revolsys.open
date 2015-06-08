@@ -8,8 +8,7 @@ import com.revolsys.gis.graph.event.EdgeEventListenerList;
 import com.revolsys.gis.graph.event.NodeEventListener;
 import com.revolsys.gis.graph.event.NodeEventListenerList;
 
-public abstract class AbstractNodeListenerVisitor<T> implements
-Visitor<Node<T>> {
+public abstract class AbstractNodeListenerVisitor<T> implements Visitor<Node<T>> {
 
   private final EdgeEventListenerList<T> edgeListeners = new EdgeEventListenerList<T>();
 
@@ -23,8 +22,8 @@ Visitor<Node<T>> {
     this.nodeListeners.add(listener);
   }
 
-  public void edgeEvent(final Edge<T> edge, final String path,
-    final String ruleName, final String action, final String notes) {
+  public void edgeEvent(final Edge<T> edge, final String path, final String ruleName,
+    final String action, final String notes) {
     this.edgeListeners.edgeEvent(edge, ruleName, action, notes);
   }
 
@@ -36,8 +35,8 @@ Visitor<Node<T>> {
     return this.nodeListeners;
   }
 
-  public void nodeEvent(final Node<T> node, final String typePath,
-    final String ruleName, final String action, final String notes) {
+  public void nodeEvent(final Node<T> node, final String typePath, final String ruleName,
+    final String action, final String notes) {
     this.nodeListeners.nodeEvent(node, typePath, ruleName, action, notes);
   }
 }

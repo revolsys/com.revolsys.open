@@ -13,12 +13,12 @@ import org.springframework.web.util.WebUtils;
 
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
-public class DispatcherServlet extends
-org.springframework.web.servlet.DispatcherServlet {
+public class DispatcherServlet extends org.springframework.web.servlet.DispatcherServlet {
   /**
    *
    */
   private static final long serialVersionUID = 1L;
+
   private static final Logger LOG = LoggerFactory.getLogger(DispatcherServlet.class);
 
   @Override
@@ -36,8 +36,8 @@ org.springframework.web.servlet.DispatcherServlet {
   }
 
   @Override
-  protected void doService(final HttpServletRequest request,
-    final HttpServletResponse response) throws Exception {
+  protected void doService(final HttpServletRequest request, final HttpServletResponse response)
+    throws Exception {
     final HttpServletRequest savedRequest = HttpServletUtils.getRequest();
     final HttpServletResponse savedResponse = HttpServletUtils.getResponse();
     try {

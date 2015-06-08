@@ -54,8 +54,7 @@ import com.revolsys.jts.precision.MinimumClearance;
  *
  */
 public class TestCaseGeometryFunctions {
-  public static Geometry bufferMitredJoin(final Geometry g,
-    final double distance) {
+  public static Geometry bufferMitredJoin(final Geometry g, final double distance) {
     final BufferParameters bufParams = new BufferParameters();
     bufParams.setJoinStyle(BufferParameters.JOIN_MITRE);
 

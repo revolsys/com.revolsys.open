@@ -40,8 +40,7 @@ import java.io.IOException;
  * but with a narrower interface to make it easier to implement.
  *
  */
-public interface InStream
-{
+public interface InStream {
   /**
    * Reads <code>buf.length</code> bytes from the input stream
    * and stores them in the supplied buffer.

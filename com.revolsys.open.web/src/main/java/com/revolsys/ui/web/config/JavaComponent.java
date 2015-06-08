@@ -58,8 +58,7 @@ public class JavaComponent extends Component {
     this.properties.putAll(component.properties);
   }
 
-  public JavaComponent(final String area, final String name,
-    final String className) {
+  public JavaComponent(final String area, final String name, final String className) {
     super(area, name);
     setClassName(className);
   }
@@ -91,8 +90,7 @@ public class JavaComponent extends Component {
   }
 
   @Override
-  public void includeComponent(final PageContext context)
-      throws ServletException, IOException {
+  public void includeComponent(final PageContext context) throws ServletException, IOException {
     Object instance;
     try {
       instance = this.componentClass.newInstance();
@@ -123,8 +121,7 @@ public class JavaComponent extends Component {
       throw new ServletException("Unable to set component properties", e);
     } catch (final InvocationTargetException e) {
       log.error("Unable to set component properties", e.getCause());
-      throw new ServletException("Unable to set component properties",
-        e.getCause());
+      throw new ServletException("Unable to set component properties", e.getCause());
     }
     try {
       final Writer out = context.getOut();
@@ -151,22 +148,20 @@ public class JavaComponent extends Component {
       throw new IllegalArgumentException(e.getMessage());
     }
     try {
-      this.setPropertyMethod = this.componentClass.getMethod("setProperty",
-        SET_PROPERTY_ARGS);
+      this.setPropertyMethod = this.componentClass.getMethod("setProperty", SET_PROPERTY_ARGS);
     } catch (final NoSuchMethodException e) {
       throw new IllegalArgumentException(
         "Class "
-            + className
-            + " must have a method with the signature 'public void setProperty(String name, Object value)'");
+          + className
+          + " must have a method with the signature 'public void setProperty(String name, Object value)'");
     }
     try {
-      this.serializeMethod = this.componentClass.getMethod("serialize",
-        SERIALIZE_METHOD_ARGS);
+      this.serializeMethod = this.componentClass.getMethod("serialize", SERIALIZE_METHOD_ARGS);
     } catch (final NoSuchMethodException e) {
       throw new IllegalArgumentException(
         "Class "
-            + className
-            + " must have a method with the signature 'public void serialize(Writer out) throws IOException'");
+          + className
+          + " must have a method with the signature 'public void serialize(Writer out) throws IOException'");
     }
   }
 

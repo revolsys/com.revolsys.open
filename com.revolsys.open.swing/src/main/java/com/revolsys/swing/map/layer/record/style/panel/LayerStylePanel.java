@@ -25,8 +25,7 @@ import com.revolsys.swing.tree.node.layer.LayerRendererTreeNode;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
-public class LayerStylePanel extends ValueField implements MouseListener,
-PropertyChangeListener {
+public class LayerStylePanel extends ValueField implements MouseListener, PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -50,8 +49,7 @@ PropertyChangeListener {
     this.rootRenderer.setEditing(true);
     Property.addListener(this.rootRenderer, this);
 
-    this.rootNode = new ListTreeNode(new LayerRendererTreeNode(
-      this.rootRenderer));
+    this.rootNode = new ListTreeNode(new LayerRendererTreeNode(this.rootRenderer));
 
     this.tree = new BaseTree(this.rootNode);
     this.tree.setRootVisible(false);
@@ -62,8 +60,8 @@ PropertyChangeListener {
     setEditStylePanel(this.rootRenderer);
 
     final JScrollPane treeScroll = new JScrollPane(this.tree);
-    final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-      treeScroll, this.editStyleContainer);
+    final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, treeScroll,
+      this.editStyleContainer);
 
     splitPane.setDividerLocation(200);
     setPreferredSize(new Dimension(810, 600));
@@ -72,8 +70,7 @@ PropertyChangeListener {
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    if (e.getClickCount() == 1 && SwingUtil.isLeftButtonAndNoModifiers(e)
-        && e.getClickCount() == 1) {
+    if (e.getClickCount() == 1 && SwingUtil.isLeftButtonAndNoModifiers(e) && e.getClickCount() == 1) {
       final int x = e.getX();
       final int y = e.getY();
       final TreePath path = this.tree.getPathForLocation(x, y);
@@ -115,14 +112,12 @@ PropertyChangeListener {
       saveStylePanel();
       final LayerRenderer<? extends Layer> oldRenderer = (LayerRenderer<? extends Layer>)event.getOldValue();
       final LayerRenderer<? extends Layer> newRenderer = (LayerRenderer<? extends Layer>)event.getNewValue();
-      if (oldRenderer == this.rootRenderer && newRenderer != null
-          && newRenderer != oldRenderer) {
+      if (oldRenderer == this.rootRenderer && newRenderer != null && newRenderer != oldRenderer) {
         Property.removeListener(oldRenderer, this);
         this.rootNode.removeNode(0);
 
         Property.addListener(newRenderer, this);
-        final LayerRendererTreeNode newNode = new LayerRendererTreeNode(
-          newRenderer);
+        final LayerRendererTreeNode newNode = new LayerRendererTreeNode(newRenderer);
         this.rootNode.addNode(newNode);
         this.tree.expandAllNodes();
 

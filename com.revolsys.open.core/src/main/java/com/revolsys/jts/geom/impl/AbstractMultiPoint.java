@@ -18,8 +18,7 @@ import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.MultiPointVertex;
 import com.revolsys.jts.geom.vertex.Vertex;
 
-public abstract class AbstractMultiPoint extends AbstractGeometryCollection
-  implements MultiPoint {
+public abstract class AbstractMultiPoint extends AbstractGeometryCollection implements MultiPoint {
 
   /**
    *
@@ -28,8 +27,7 @@ public abstract class AbstractMultiPoint extends AbstractGeometryCollection
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V appendVertex(final Point newPoint,
-    final int... geometryId) {
+  public <V extends Geometry> V appendVertex(final Point newPoint, final int... geometryId) {
     if (newPoint == null || newPoint.isEmpty()) {
       return (V)this;
     } else {
@@ -57,8 +55,7 @@ public abstract class AbstractMultiPoint extends AbstractGeometryCollection
   }
 
   @Override
-  protected double doDistance(final Geometry geometry,
-    final double terminateDistance) {
+  protected double doDistance(final Geometry geometry, final double terminateDistance) {
     double minDistance = Double.MAX_VALUE;
     for (final Point point : getPoints()) {
       final double distance = geometry.distance(point, terminateDistance);
@@ -185,14 +182,12 @@ public abstract class AbstractMultiPoint extends AbstractGeometryCollection
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V moveVertex(Point newPoint,
-    final int... vertexId) {
+  public <V extends Geometry> V moveVertex(Point newPoint, final int... vertexId) {
     if (newPoint == null || newPoint.isEmpty()) {
       return (V)this;
     } else if (vertexId.length <= 2) {
       if (isEmpty()) {
-        throw new IllegalArgumentException(
-          "Cannot move vertex for empty MultiPoint");
+        throw new IllegalArgumentException("Cannot move vertex for empty MultiPoint");
       } else {
         final int partIndex = vertexId[0];
         final int partCount = getGeometryCount();
@@ -204,15 +199,13 @@ public abstract class AbstractMultiPoint extends AbstractGeometryCollection
           points.set(partIndex, newPoint);
           return (V)geometryFactory.multiPoint(points);
         } else {
-          throw new IllegalArgumentException(
-            "Part index must be between 0 and " + partCount + " not "
-              + partIndex);
+          throw new IllegalArgumentException("Part index must be between 0 and " + partCount
+            + " not " + partIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException(
-        "Vertex id's for MultiPoint must have length 1. "
-          + Arrays.toString(vertexId));
+      throw new IllegalArgumentException("Vertex id's for MultiPoint must have length 1. "
+        + Arrays.toString(vertexId));
     }
   }
 

@@ -47,11 +47,11 @@ import com.revolsys.jts.triangulate.DelaunayTriangulationBuilder;
  */
 public class DelaunayTest extends TestCase {
 
+  static final double COMPARISON_TOLERANCE = 1.0e-7;
+
   public static void main(final String args[]) {
     TestRunner.run(DelaunayTest.class);
   }
-
-  static final double COMPARISON_TOLERANCE = 1.0e-7;
 
   private final GeometryFactory geomFact = GeometryFactory.floating3();
 
@@ -61,8 +61,8 @@ public class DelaunayTest extends TestCase {
     super(name);
   }
 
-  void runDelaunay(final String sitesWKT, final boolean computeTriangles,
-    final String expectedWKT) throws ParseException {
+  void runDelaunay(final String sitesWKT, final boolean computeTriangles, final String expectedWKT)
+    throws ParseException {
     final Geometry sites = this.reader.read(sitesWKT);
     final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
     builder.setSites(sites);
@@ -73,7 +73,7 @@ public class DelaunayTest extends TestCase {
     } else {
       result = builder.getEdges(this.geomFact);
     }
-    //  System.out.println(result);
+    // System.out.println(result);
 
     Geometry expected = this.reader.read(expectedWKT);
     result = result.normalize();
@@ -81,8 +81,7 @@ public class DelaunayTest extends TestCase {
     assertTrue(expected.equalsExact(result, COMPARISON_TOLERANCE));
   }
 
-  void runDelaunayEdges(final String sitesWKT, final String expectedWKT)
-      throws ParseException {
+  void runDelaunayEdges(final String sitesWKT, final String expectedWKT) throws ParseException {
     runDelaunay(sitesWKT, false, expectedWKT);
   }
 

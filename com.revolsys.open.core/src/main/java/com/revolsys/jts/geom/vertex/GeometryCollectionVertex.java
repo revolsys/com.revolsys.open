@@ -15,8 +15,7 @@ public class GeometryCollectionVertex extends AbstractVertex {
 
   private Vertex vertex;
 
-  public GeometryCollectionVertex(final Geometry geometry,
-    final int... vertexId) {
+  public GeometryCollectionVertex(final Geometry geometry, final int... vertexId) {
     super(geometry);
     setVertexId(vertexId);
   }
@@ -88,8 +87,7 @@ public class GeometryCollectionVertex extends AbstractVertex {
         partIndex++;
         vertex = null;
       }
-      while (vertex == null
-          && partIndex < geometryCollection.getGeometryCount()) {
+      while (vertex == null && partIndex < geometryCollection.getGeometryCount()) {
         if (partIndex >= 0) {
           final Geometry part = geometryCollection.getGeometry(partIndex);
           if (part != null) {
@@ -141,8 +139,7 @@ public class GeometryCollectionVertex extends AbstractVertex {
         this.partIndex++;
         this.vertex = null;
       }
-      while (this.vertex == null
-          && this.partIndex < geometryCollection.getGeometryCount()) {
+      while (this.vertex == null && this.partIndex < geometryCollection.getGeometryCount()) {
         if (this.partIndex >= 0) {
           final Geometry part = geometryCollection.getGeometry(this.partIndex);
           if (part != null) {
@@ -176,8 +173,7 @@ public class GeometryCollectionVertex extends AbstractVertex {
     if (vertexId.length > 0) {
       this.partIndex = vertexId[0];
       final Geometry geometryCollection = getGeometryCollection();
-      if (this.partIndex >= 0
-          && this.partIndex < geometryCollection.getGeometryCount()) {
+      if (this.partIndex >= 0 && this.partIndex < geometryCollection.getGeometryCount()) {
         final Geometry part = geometryCollection.getGeometry(this.partIndex);
         if (part != null) {
           final int[] partVertexId = new int[vertexId.length - 1];

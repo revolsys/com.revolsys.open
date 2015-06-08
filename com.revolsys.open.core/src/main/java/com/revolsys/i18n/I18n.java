@@ -10,8 +10,14 @@ import java.util.ResourceBundle;
 import com.revolsys.beans.AbstractPropertyChangeObject;
 
 public final class I18n extends AbstractPropertyChangeObject {
-  public static CharSequence getCharSequence(final Class<?> clazz,
-    final String key) {
+  private static final I18n NULL_INSTANCE = new I18n();
+
+  /** The map from category names to I18n instances. */
+  private static Map<String, WeakReference<I18n>> instances = new HashMap<String, WeakReference<I18n>>();
+
+  private static Locale locale = Locale.getDefault();
+
+  public static CharSequence getCharSequence(final Class<?> clazz, final String key) {
     final I18n i18n = I18n.getInstance(clazz);
     String fullKey;
     if (key != null && key.trim().length() > 0) {
@@ -22,8 +28,7 @@ public final class I18n extends AbstractPropertyChangeObject {
     return new I18nCharSequence(i18n, fullKey);
   }
 
-  private static I18n getExactInstance(final ClassLoader classLoader,
-    final String resourcePath) {
+  private static I18n getExactInstance(final ClassLoader classLoader, final String resourcePath) {
     synchronized (instances) {
       WeakReference<I18n> i18nRef = instances.get(resourcePath);
       I18n i18n = null;
@@ -45,8 +50,7 @@ public final class I18n extends AbstractPropertyChangeObject {
     return getInstance(classLoader, className);
   }
 
-  private static I18n getInstance(final ClassLoader classLoader,
-    final String resourceName) {
+  private static I18n getInstance(final ClassLoader classLoader, final String resourceName) {
     synchronized (instances) {
       final String resourcePath = resourceName.replace('.', '/');
       try {
@@ -56,8 +60,7 @@ public final class I18n extends AbstractPropertyChangeObject {
       } catch (final MissingResourceException e) {
         try {
 
-          final I18n i18n = getExactInstance(classLoader, resourcePath
-            + "/i18n");
+          final I18n i18n = getExactInstance(classLoader, resourcePath + "/i18n");
           return i18n;
         } catch (final MissingResourceException e2) {
 
@@ -91,13 +94,6 @@ public final class I18n extends AbstractPropertyChangeObject {
       }
     }
   }
-
-  private static final I18n NULL_INSTANCE = new I18n();
-
-  /** The map from category names to I18n instances. */
-  private static Map<String, WeakReference<I18n>> instances = new HashMap<String, WeakReference<I18n>>();
-
-  private static Locale locale = Locale.getDefault();
 
   private ResourceBundle resourceBundle;
 
@@ -145,8 +141,8 @@ public final class I18n extends AbstractPropertyChangeObject {
 
   private void loadResourceBundle() {
     final ClassLoader classLoader = this.classLoaderReference.get();
-    this.resourceBundle = ResourceBundle.getBundle(this.resourcePath,
-      Locale.getDefault(), classLoader);
+    this.resourceBundle = ResourceBundle.getBundle(this.resourcePath, Locale.getDefault(),
+      classLoader);
   }
 
   @Override

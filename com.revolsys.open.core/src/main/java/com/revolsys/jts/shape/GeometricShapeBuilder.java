@@ -80,10 +80,10 @@ public abstract class GeometricShapeBuilder {
     final double radius = getRadius();
 
     final Point centre = getCentre();
-    final Point p0 = new PointDouble(centre.getX() - radius,
-      centre.getY() - radius, Point.NULL_ORDINATE);
-    final Point p1 = new PointDouble(centre.getX() + radius,
-      centre.getY() - radius, Point.NULL_ORDINATE);
+    final Point p0 = new PointDouble(centre.getX() - radius, centre.getY() - radius,
+      Point.NULL_ORDINATE);
+    final Point p1 = new PointDouble(centre.getX() + radius, centre.getY() - radius,
+      Point.NULL_ORDINATE);
     return new LineSegmentDouble(p0, p1);
   }
 
@@ -91,8 +91,8 @@ public abstract class GeometricShapeBuilder {
     final double radius = getRadius();
 
     final Point centre = getCentre();
-    return new BoundingBoxDoubleGf(2, centre.getX() - radius, centre.getY() - radius,
-      centre.getX() + radius, centre.getY() + radius);
+    return new BoundingBoxDoubleGf(2, centre.getX() - radius, centre.getY() - radius, centre.getX()
+      + radius, centre.getY() + radius);
   }
 
   public void setExtent(final BoundingBox extent) {

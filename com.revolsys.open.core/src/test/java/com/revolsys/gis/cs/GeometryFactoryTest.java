@@ -15,21 +15,7 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.LineStringDouble;
 
 public class GeometryFactoryTest {
-  public static void assertCopyGeometry(final Geometry geometry,
-    final LineString... pointsList) {
-    // assertCoordinatesListEqual(geometry, pointsList);
-    final Geometry copy = geometry.copy(GEOMETRY_FACTORY);
-    final Class<? extends Geometry> geometryClass = geometry.getClass();
-    Assert.assertEquals("Geometry class", geometryClass, copy.getClass());
-    Assert.assertEquals("Geometry", geometry, copy);
-    // assertCoordinatesListEqual(copy, pointsList);
-
-    final Geometry copy2 = GEOMETRY_FACTORY.geometry(geometryClass, geometry);
-    Assert.assertEquals("Geometry class", geometryClass, copy2.getClass());
-    Assert.assertEquals("Geometry", geometry, copy2);
-    // assertCoordinatesListEqual(copy2, pointsList);
-    assertCreateGeometryCollection(geometry, pointsList);
-  }
+  private static GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(3857, 1.0);
 
   // public static void assertCoordinatesListEqual(final Geometry geometry,
   // final LineString... pointsList) {
@@ -43,6 +29,21 @@ public class GeometryFactoryTest {
   // Assert.assertEquals("Coordinates not equal", points, geometryPoints);
   // }
   // }
+
+  public static void assertCopyGeometry(final Geometry geometry, final LineString... pointsList) {
+    // assertCoordinatesListEqual(geometry, pointsList);
+    final Geometry copy = geometry.copy(GEOMETRY_FACTORY);
+    final Class<? extends Geometry> geometryClass = geometry.getClass();
+    Assert.assertEquals("Geometry class", geometryClass, copy.getClass());
+    Assert.assertEquals("Geometry", geometry, copy);
+    // assertCoordinatesListEqual(copy, pointsList);
+
+    final Geometry copy2 = GEOMETRY_FACTORY.geometry(geometryClass, geometry);
+    Assert.assertEquals("Geometry class", geometryClass, copy2.getClass());
+    Assert.assertEquals("Geometry", geometry, copy2);
+    // assertCoordinatesListEqual(copy2, pointsList);
+    assertCreateGeometryCollection(geometry, pointsList);
+  }
 
   public static void assertCreateGeometryCollection(final Geometry geometry,
     final LineString... pointsList) {
@@ -64,8 +65,7 @@ public class GeometryFactoryTest {
       Assert.assertEquals("Geometry", geometry, copy);
       // assertCoordinatesListEqual(collection, pointsList);
 
-      final Geometry copy2 = GEOMETRY_FACTORY.geometry(geometryClass,
-        collection);
+      final Geometry copy2 = GEOMETRY_FACTORY.geometry(geometryClass, collection);
       Assert.assertEquals("Geometry class", geometryClass, copy2.getClass());
       Assert.assertEquals("Geometry", geometry, copy2);
       // assertCoordinatesListEqual(copy2, pointsList);
@@ -80,12 +80,10 @@ public class GeometryFactoryTest {
   private static void testCreateGeometry() {
     final LineString pointPoints = new LineStringDouble(2, 0.0, 0);
     final LineString point2Points = new LineStringDouble(2, 20.0, 20);
-    final LineString ringPoints = new LineStringDouble(2, 0.0, 0, 0, 100, 100,
-      100, 100, 0, 0, 0);
-    final LineString ring2Points = new LineStringDouble(2, 20.0, 20, 20, 80,
-      80, 80, 80, 20, 20, 20);
-    final LineString ring3Points = new LineStringDouble(2, 120.0, 120, 120,
-      180, 180, 180, 180, 120, 120, 120);
+    final LineString ringPoints = new LineStringDouble(2, 0.0, 0, 0, 100, 100, 100, 100, 0, 0, 0);
+    final LineString ring2Points = new LineStringDouble(2, 20.0, 20, 20, 80, 80, 80, 80, 20, 20, 20);
+    final LineString ring3Points = new LineStringDouble(2, 120.0, 120, 120, 180, 180, 180, 180,
+      120, 120, 120);
 
     final Point point = GEOMETRY_FACTORY.point(pointPoints);
     assertCopyGeometry(point, pointPoints);
@@ -105,26 +103,21 @@ public class GeometryFactoryTest {
     final MultiPoint multiPoint = GEOMETRY_FACTORY.multiPoint(pointPoints);
     assertCopyGeometry(multiPoint, pointPoints);
 
-    final MultiPoint multiPoint2 = GEOMETRY_FACTORY.multiPoint(pointPoints,
-      point2Points);
+    final MultiPoint multiPoint2 = GEOMETRY_FACTORY.multiPoint(pointPoints, point2Points);
     assertCopyGeometry(multiPoint2, pointPoints, point2Points);
 
     final MultiLineString multiLineString = GEOMETRY_FACTORY.multiLineString(ringPoints);
     assertCopyGeometry(multiLineString, ringPoints);
 
-    final MultiLineString multiLineString2 = GEOMETRY_FACTORY.multiLineString(
-      ringPoints, ring2Points);
+    final MultiLineString multiLineString2 = GEOMETRY_FACTORY.multiLineString(ringPoints,
+      ring2Points);
     assertCopyGeometry(multiLineString2, ringPoints, ring2Points);
 
     final MultiPolygon multiPolygon = GEOMETRY_FACTORY.multiPolygon(ringPoints);
     assertCopyGeometry(multiPolygon, ringPoints);
 
-    final MultiPolygon multiPolygon2 = GEOMETRY_FACTORY.multiPolygon(
-      ringPoints, ring3Points);
+    final MultiPolygon multiPolygon2 = GEOMETRY_FACTORY.multiPolygon(ringPoints, ring3Points);
     assertCopyGeometry(multiPolygon2, ringPoints, ring3Points);
 
   }
-
-  private static GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(3857,
-    1.0);
 }

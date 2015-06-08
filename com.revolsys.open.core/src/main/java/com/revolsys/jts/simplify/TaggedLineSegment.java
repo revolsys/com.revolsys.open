@@ -55,8 +55,8 @@ class TaggedLineSegment extends LineSegmentDouble {
 
   private final int index;
 
-  public TaggedLineSegment(final Geometry parent, final int index,
-    final int axisCount, final double... coordinates) {
+  public TaggedLineSegment(final Geometry parent, final int index, final int axisCount,
+    final double... coordinates) {
     super(axisCount, coordinates);
     this.parent = parent;
     this.index = index;
@@ -66,19 +66,16 @@ class TaggedLineSegment extends LineSegmentDouble {
     this(p0, p1, null, -1);
   }
 
-  public TaggedLineSegment(final Point p0, final Point p1,
-    final Geometry parent, final int index) {
+  public TaggedLineSegment(final Point p0, final Point p1, final Geometry parent, final int index) {
     super(p0, p1);
     this.parent = parent;
     this.index = index;
   }
 
   @Override
-  protected LineSegment createLineSegment(
-    final GeometryFactory geometryFactory, final int axisCount,
-    final double... coordinates) {
-    return new LineSegmentDoubleGF(this.parent.getGeometryFactory(), axisCount,
-      coordinates);
+  protected LineSegment createLineSegment(final GeometryFactory geometryFactory,
+    final int axisCount, final double... coordinates) {
+    return new LineSegmentDoubleGF(this.parent.getGeometryFactory(), axisCount, coordinates);
   }
 
   public int getIndex() {

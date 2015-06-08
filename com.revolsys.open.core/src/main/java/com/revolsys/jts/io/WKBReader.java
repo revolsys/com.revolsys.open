@@ -70,8 +70,9 @@ import com.revolsys.jts.geom.impl.LineStringDouble;
  * @see WKBWriter for a formal format specification
  */
 public class WKBReader {
-  public static LineString createClosedRing(final LineString seq,
-    final int size) {
+  private static final String INVALID_GEOM_TYPE_MSG = "Invalid geometry type encountered in ";
+
+  public static LineString createClosedRing(final LineString seq, final int size) {
     final int axisCount = seq.getAxisCount();
     final double[] coordinates = new double[size * axisCount];
     final int n = seq.getVertexCount();
@@ -106,10 +107,8 @@ public class WKBReader {
       return createClosedRing(seq, 4);
     }
 
-    final boolean isClosed = seq.getCoordinate(0, Geometry.X) == seq.getCoordinate(
-      n - 1, Geometry.X)
-      && seq.getCoordinate(0, Geometry.Y) == seq.getCoordinate(n - 1,
-        Geometry.Y);
+    final boolean isClosed = seq.getCoordinate(0, Geometry.X) == seq.getCoordinate(n - 1,
+      Geometry.X) && seq.getCoordinate(0, Geometry.Y) == seq.getCoordinate(n - 1, Geometry.Y);
     if (isClosed) {
       return seq;
     }
@@ -126,8 +125,7 @@ public class WKBReader {
     // fill remaining coordinates with end point, if it exists
     if (n > 0) {
       for (int i = n; i < size; i++) {
-        CoordinatesListUtil.setCoordinates(coordinates, axisCount, i, seq,
-          n - 1, 1);
+        CoordinatesListUtil.setCoordinates(coordinates, axisCount, i, seq, n - 1, 1);
       }
     }
     return new LineStringDouble(axisCount, coordinates);
@@ -178,8 +176,7 @@ public class WKBReader {
    * @param cs2 a LineString
    * @return true if the sequences are equal in the common dimensions
    */
-  public static boolean isEqual(final LineString cs1,
-    final LineString cs2) {
+  public static boolean isEqual(final LineString cs1, final LineString cs2) {
     final int cs1Size = cs1.getVertexCount();
     final int cs2Size = cs2.getVertexCount();
     if (cs1Size != cs2Size) {
@@ -223,13 +220,9 @@ public class WKBReader {
       return false;
     }
     // test if closed
-    return seq.getCoordinate(0, Geometry.X) == seq.getCoordinate(n - 1,
-      Geometry.X)
-      && seq.getCoordinate(0, Geometry.Y) == seq.getCoordinate(n - 1,
-        Geometry.Y);
+    return seq.getCoordinate(0, Geometry.X) == seq.getCoordinate(n - 1, Geometry.X)
+      && seq.getCoordinate(0, Geometry.Y) == seq.getCoordinate(n - 1, Geometry.Y);
   }
-
-  private static final String INVALID_GEOM_TYPE_MSG = "Invalid geometry type encountered in ";
 
   private final GeometryFactory factory;
 
@@ -271,8 +264,7 @@ public class WKBReader {
     try {
       return read(new ByteArrayInStream(bytes));
     } catch (final IOException ex) {
-      throw new RuntimeException("Unexpected IOException caught: "
-          + ex.getMessage());
+      throw new RuntimeException("Unexpected IOException caught: " + ex.getMessage());
     }
   }
 
@@ -301,8 +293,7 @@ public class WKBReader {
     }
   }
 
-  private LineString readCoordinateSequence(final int size)
-      throws IOException {
+  private LineString readCoordinateSequence(final int size) throws IOException {
     final double[] coordinates = new double[size * this.inputDimension];
 
     for (int i = 0; i < size; i++) {
@@ -314,8 +305,7 @@ public class WKBReader {
     return new LineStringDouble(this.inputDimension, coordinates);
   }
 
-  private LineString readCoordinateSequenceLineString(final int size)
-      throws IOException {
+  private LineString readCoordinateSequenceLineString(final int size) throws IOException {
     final LineString seq = readCoordinateSequence(size);
     if (this.isStrict) {
       return seq;
@@ -326,8 +316,7 @@ public class WKBReader {
     return WKBReader.extend(seq, 2);
   }
 
-  private LineString readCoordinateSequenceRing(final int size)
-      throws IOException {
+  private LineString readCoordinateSequenceRing(final int size) throws IOException {
     final LineString seq = readCoordinateSequence(size);
     if (this.isStrict) {
       return seq;
@@ -349,8 +338,7 @@ public class WKBReader {
     } else if (byteOrderWKB == WKBConstants.wkbXDR) {
       this.dis.setOrder(ByteOrderValues.BIG_ENDIAN);
     } else if (this.isStrict) {
-      throw new ParseException("Unknown geometry byte order (not NDR or XDR): "
-          + byteOrderWKB);
+      throw new ParseException("Unknown geometry byte order (not NDR or XDR): " + byteOrderWKB);
     }
     // if not strict and not XDR or NDR, then we just use the dis default set at
     // the
@@ -382,25 +370,25 @@ public class WKBReader {
     switch (geometryType) {
       case WKBConstants.wkbPoint:
         geom = readPoint();
-        break;
+      break;
       case WKBConstants.wkbLineString:
         geom = readLineString();
-        break;
+      break;
       case WKBConstants.wkbPolygon:
         geom = readPolygon();
-        break;
+      break;
       case WKBConstants.wkbMultiPoint:
         geom = readMultiPoint();
-        break;
+      break;
       case WKBConstants.wkbMultiLineString:
         geom = readMultiLineString();
-        break;
+      break;
       case WKBConstants.wkbMultiPolygon:
         geom = readMultiPolygon();
-        break;
+      break;
       case WKBConstants.wkbGeometryCollection:
         geom = readGeometryCollection();
-        break;
+      break;
       default:
         throw new ParseException("Unknown WKB type " + geometryType);
     }
@@ -408,8 +396,7 @@ public class WKBReader {
     return geom;
   }
 
-  private GeometryCollection readGeometryCollection() throws IOException,
-  ParseException {
+  private GeometryCollection readGeometryCollection() throws IOException, ParseException {
     final int numGeom = this.dis.readInt();
     final List<Geometry> geoms = new ArrayList<Geometry>();
     for (int i = 0; i < numGeom; i++) {
@@ -431,8 +418,7 @@ public class WKBReader {
     return this.factory.lineString(pts);
   }
 
-  private MultiLineString readMultiLineString() throws IOException,
-  ParseException {
+  private MultiLineString readMultiLineString() throws IOException, ParseException {
     final int numGeom = this.dis.readInt();
     final LineString[] geoms = new LineString[numGeom];
     for (int i = 0; i < numGeom; i++) {

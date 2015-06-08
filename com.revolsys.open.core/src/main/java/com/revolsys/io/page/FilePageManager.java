@@ -33,8 +33,7 @@ public class FilePageManager implements PageManager {
     try {
       this.randomAccessFile = new RandomAccessFile(file, "rw");
     } catch (final FileNotFoundException e) {
-      throw new IllegalArgumentException("Unable to open file "
-          + file.getAbsolutePath(), e);
+      throw new IllegalArgumentException("Unable to open file " + file.getAbsolutePath(), e);
     }
   }
 
@@ -83,8 +82,7 @@ public class FilePageManager implements PageManager {
           page = loadPage(index);
         }
         if (this.pagesInUse.contains(page)) {
-          throw new IllegalArgumentException("Page is currently being used "
-              + index);
+          throw new IllegalArgumentException("Page is currently being used " + index);
         } else {
           this.pagesInUse.add(page);
           page.setOffset(0);

@@ -28,11 +28,10 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   private JComponent swingEditor;
 
-  public FileGdbDomainCodeTable(final FileGdbRecordStore recordStore,
-    final CodedValueDomain domain) {
+  public FileGdbDomainCodeTable(final FileGdbRecordStore recordStore, final CodedValueDomain domain) {
     this.recordStore = recordStore;
     this.domain = domain;
-    name = domain.getDomainName();
+    this.name = domain.getDomainName();
   }
 
   @Override
@@ -62,40 +61,40 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   private Identifier createValue(final String name) {
-    synchronized (recordStore) {
-      final Identifier id = domain.addCodedValue(name);
-      recordStore.alterDomain(domain);
-      LOG.info(domain.getDomainName() + " created code " + id + "=" + name);
+    synchronized (this.recordStore) {
+      final Identifier id = this.domain.addCodedValue(name);
+      this.recordStore.alterDomain(this.domain);
+      LOG.info(this.domain.getDomainName() + " created code " + id + "=" + name);
       return id;
     }
   }
 
   @Override
   public Map<Identifier, List<Object>> getCodes() {
-    return domain.getCodes();
+    return this.domain.getCodes();
   }
 
   public Domain getDomain() {
-    return domain;
+    return this.domain;
   }
 
   @Override
   public List<String> getFieldAliases() {
-    return domain.getFieldAliases();
+    return this.domain.getFieldAliases();
   }
 
   @Override
   public Identifier getId(final Map<String, ? extends Object> values) {
-    final Identifier id = domain.getId(values);
+    final Identifier id = this.domain.getId(values);
     if (id == null) {
-      return createValue(domain.getName(values));
+      return createValue(this.domain.getName(values));
     }
     return id;
   }
 
   @Override
   public Identifier getId(final Object... values) {
-    final Identifier id = domain.getId(values);
+    final Identifier id = this.domain.getId(values);
     if (id == null) {
       return createValue((String)values[0]);
     }
@@ -114,28 +113,28 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   @Override
   public String getIdFieldName() {
-    return domain.getIdFieldName();
+    return this.domain.getIdFieldName();
   }
 
   @Override
   public Map<String, ? extends Object> getMap(final Identifier id) {
-    return domain.getMap(id);
+    return this.domain.getMap(id);
   }
 
   @Override
   public String getName() {
-    return name;
+    return this.name;
   }
 
   @Override
   public JComponent getSwingEditor() {
-    return swingEditor;
+    return this.swingEditor;
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <V> V getValue(final Identifier id) {
-    return (V)domain.getValue(id);
+    return (V)this.domain.getValue(id);
   }
 
   @Override
@@ -145,12 +144,12 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   @Override
   public List<String> getValueFieldNames() {
-    return domain.getValueFieldNames();
+    return this.domain.getValueFieldNames();
   }
 
   @Override
   public List<Object> getValues(final Identifier id) {
-    return domain.getValues(id);
+    return this.domain.getValues(id);
   }
 
   @Override
@@ -173,6 +172,6 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   @Override
   public String toString() {
-    return domain.toString();
+    return this.domain.toString();
   }
 }

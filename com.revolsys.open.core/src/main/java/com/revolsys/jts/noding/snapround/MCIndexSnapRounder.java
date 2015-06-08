@@ -91,8 +91,7 @@ public class MCIndexSnapRounder implements Noder {
   }
 
   @Override
-  public void computeNodes(
-    final Collection<NodedSegmentString> inputSegmentStrings) {
+  public void computeNodes(final Collection<NodedSegmentString> inputSegmentStrings) {
     this.nodedSegStrings = inputSegmentStrings;
     this.noder = new MCIndexNoder();
     this.pointSnapper = new MCIndexPointSnapper(this.noder.getIndex());
@@ -137,10 +136,8 @@ public class MCIndexSnapRounder implements Noder {
    *
    * @return a list of Point for the intersections
    */
-  private List findInteriorIntersections(final Collection segStrings,
-    final LineIntersector li) {
-    final InteriorIntersectionFinderAdder intFinderAdder = new InteriorIntersectionFinderAdder(
-      li);
+  private List findInteriorIntersections(final Collection segStrings, final LineIntersector li) {
+    final InteriorIntersectionFinderAdder intFinderAdder = new InteriorIntersectionFinderAdder(li);
     this.noder.setSegmentIntersector(intFinderAdder);
     this.noder.computeNodes(segStrings);
     return intFinderAdder.getInteriorIntersections();

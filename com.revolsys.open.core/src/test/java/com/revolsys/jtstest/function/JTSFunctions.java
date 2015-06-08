@@ -12,6 +12,18 @@ import com.revolsys.jts.operation.buffer.BufferParameters;
 import com.revolsys.jts.util.GeometricShapeFactory;
 
 public class JTSFunctions {
+  private static final double HEIGHT = 70;
+
+  private static final double WIDTH = 150; // 125;
+
+  private static final double J_WIDTH = 30;
+
+  private static final double J_RADIUS = J_WIDTH - 5;
+
+  private static final double S_RADIUS = HEIGHT / 4;
+
+  private static final double T_WIDTH = WIDTH - 2 * S_RADIUS - J_WIDTH;
+
   private static Geometry create_J(final Geometry g) {
     final GeometryFactory gf = FunctionsUtil.getFactoryOrDefault(g);
 
@@ -31,8 +43,8 @@ public class JTSFunctions {
 
     final CoordinateList coordList = new CoordinateList();
     coordList.add(jTop, false);
-    coordList.add(CoordinatesListUtil.getCoordinateArray(jArc.reverse()),
-      false, 1, jArc.getVertexCount() - 1);
+    coordList.add(CoordinatesListUtil.getCoordinateArray(jArc.reverse()), false, 1,
+      jArc.getVertexCount() - 1);
     coordList.add(jBottom, false);
 
     return gf.lineString(coordList.toCoordinateArray());
@@ -44,12 +56,10 @@ public class JTSFunctions {
     final double centreX = WIDTH - S_RADIUS;
 
     final Point[] top = new Point[] {
-      new PointDouble(WIDTH, HEIGHT),
-      new PointDouble(centreX, HEIGHT)
+      new PointDouble(WIDTH, HEIGHT), new PointDouble(centreX, HEIGHT)
     };
     final Point[] bottom = new Point[] {
-      new PointDouble(centreX, 0),
-      new PointDouble(WIDTH - 2 * S_RADIUS, 0)
+      new PointDouble(centreX, 0), new PointDouble(WIDTH - 2 * S_RADIUS, 0)
     };
 
     final GeometricShapeFactory gsf = new GeometricShapeFactory(gf);
@@ -62,8 +72,7 @@ public class JTSFunctions {
     gsf2.setCentre(new PointDouble(centreX, S_RADIUS));
     gsf2.setSize(2 * S_RADIUS);
     gsf2.setNumPoints(10);
-    final LineString arcBottom = gsf2.createArc(1.5 * Math.PI, Math.PI)
-        .reverse();
+    final LineString arcBottom = gsf2.createArc(1.5 * Math.PI, Math.PI).reverse();
 
     final CoordinateList coordList = new CoordinateList();
     coordList.add(top, false);
@@ -81,12 +90,10 @@ public class JTSFunctions {
     final GeometryFactory gf = FunctionsUtil.getFactoryOrDefault(g);
 
     final Point[] tTop = new Point[] {
-      new PointDouble(J_WIDTH, HEIGHT),
-      new PointDouble(WIDTH - S_RADIUS - 5, HEIGHT)
+      new PointDouble(J_WIDTH, HEIGHT), new PointDouble(WIDTH - S_RADIUS - 5, HEIGHT)
     };
     final Point[] tBottom = new Point[] {
-      new PointDouble(J_WIDTH + 0.5 * T_WIDTH, HEIGHT),
-      new PointDouble(J_WIDTH + 0.5 * T_WIDTH, 0)
+      new PointDouble(J_WIDTH + 0.5 * T_WIDTH, HEIGHT), new PointDouble(J_WIDTH + 0.5 * T_WIDTH, 0)
     };
     final LineString[] lines = new LineString[] {
       gf.lineString(tTop), gf.lineString(tBottom)
@@ -108,17 +115,5 @@ public class JTSFunctions {
   public static Geometry logoLines(final Geometry g) {
     return create_J(g).union(create_T(g)).union(create_S(g));
   }
-
-  private static final double HEIGHT = 70;
-
-  private static final double WIDTH = 150; // 125;
-
-  private static final double J_WIDTH = 30;
-
-  private static final double J_RADIUS = J_WIDTH - 5;
-
-  private static final double S_RADIUS = HEIGHT / 4;
-
-  private static final double T_WIDTH = WIDTH - 2 * S_RADIUS - J_WIDTH;
 
 }

@@ -14,24 +14,23 @@ import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 
-public class GeoReferencedImageLayerRenderer extends
-AbstractLayerRenderer<GeoReferencedImageLayer> {
+public class GeoReferencedImageLayerRenderer extends AbstractLayerRenderer<GeoReferencedImageLayer> {
 
-  public static void render(final Viewport2D viewport,
-    final Graphics2D graphics, final GeoReferencedImage image,
-    final boolean useTransform) {
+  private static final GeometryStyle STYLE_DIFFERENT_COORDINATE_SYSTEM = GeometryStyle.line(
+    WebColors.Red, 4);
+
+  public static void render(final Viewport2D viewport, final Graphics2D graphics,
+    final GeoReferencedImage image, final boolean useTransform) {
     if (image != null) {
       final BoundingBox viewBoundingBox = viewport.getBoundingBox();
       final int viewWidth = viewport.getViewWidthPixels();
       final int viewHeight = viewport.getViewHeightPixels();
-      image.drawImage(graphics, viewBoundingBox, viewWidth, viewHeight,
-        useTransform);
+      image.drawImage(graphics, viewBoundingBox, viewWidth, viewHeight, useTransform);
     }
   }
 
-  public static void renderAlpha(final Graphics2D graphics,
-    final Viewport2D viewport, final GeoReferencedImage image,
-    final double alpha, final boolean useTransform) {
+  public static void renderAlpha(final Graphics2D graphics, final Viewport2D viewport,
+    final GeoReferencedImage image, final double alpha, final boolean useTransform) {
     final Composite composite = graphics.getComposite();
     try {
       AlphaComposite alphaComposite = AlphaComposite.SrcOver;
@@ -47,23 +46,18 @@ AbstractLayerRenderer<GeoReferencedImageLayer> {
 
   public static void renderDifferentCoordinateSystem(final Viewport2D viewport,
     final BoundingBox boundingBox, final Graphics2D graphics) {
-    if (!boundingBox.getGeometryFactory().isSameCoordinateSystem(
-      viewport.getGeometryFactory())) {
-      GeometryStyleRenderer.renderOutline(viewport, graphics,
-        boundingBox.toPolygon(0), STYLE_DIFFERENT_COORDINATE_SYSTEM);
+    if (!boundingBox.getGeometryFactory().isSameCoordinateSystem(viewport.getGeometryFactory())) {
+      GeometryStyleRenderer.renderOutline(viewport, graphics, boundingBox.toPolygon(0),
+        STYLE_DIFFERENT_COORDINATE_SYSTEM);
     }
   }
-
-  private static final GeometryStyle STYLE_DIFFERENT_COORDINATE_SYSTEM = GeometryStyle.line(
-    WebColors.Red, 4);
 
   public GeoReferencedImageLayerRenderer(final GeoReferencedImageLayer layer) {
     super("raster", layer);
   }
 
   @Override
-  public void render(final Viewport2D viewport,
-    final GeoReferencedImageLayer layer) {
+  public void render(final Viewport2D viewport, final GeoReferencedImageLayer layer) {
     final double scale = viewport.getScale();
     if (layer.isVisible(scale)) {
       if (!layer.isEditable()) {
@@ -75,8 +69,7 @@ AbstractLayerRenderer<GeoReferencedImageLayer> {
           }
           final Graphics2D graphics = viewport.getGraphics();
           if (graphics != null) {
-            renderAlpha(graphics, viewport, image, layer.getOpacity() / 255.0,
-              true);
+            renderAlpha(graphics, viewport, image, layer.getOpacity() / 255.0, true);
             renderDifferentCoordinateSystem(viewport, boundingBox, graphics);
           }
         }

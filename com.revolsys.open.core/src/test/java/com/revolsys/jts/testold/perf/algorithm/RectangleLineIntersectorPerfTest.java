@@ -74,9 +74,9 @@ public class RectangleLineIntersectorPerfTest {
   }
 
   private BoundingBox createRectangle() {
-    final BoundingBox rectEnv = new BoundingBoxDoubleGf(new PointDouble(this.baseX,
-      this.baseY, Point.NULL_ORDINATE), new PointDouble(this.baseX
-        + this.rectSize, this.baseY + this.rectSize, Point.NULL_ORDINATE));
+    final BoundingBox rectEnv = new BoundingBoxDoubleGf(new PointDouble(this.baseX, this.baseY,
+      Point.NULL_ORDINATE), new PointDouble(this.baseX + this.rectSize, this.baseY + this.rectSize,
+      Point.NULL_ORDINATE));
     return rectEnv;
   }
 
@@ -101,8 +101,7 @@ public class RectangleLineIntersectorPerfTest {
     }
     // System.out.println("# pts: " + this.pts.length);
 
-    final RectangleLineIntersector rectSegIntersector = new RectangleLineIntersector(
-      this.rectEnv);
+    final RectangleLineIntersector rectSegIntersector = new RectangleLineIntersector(this.rectEnv);
     final SimpleRectangleIntersector rectSideIntersector = new SimpleRectangleIntersector(
       this.rectEnv);
 
@@ -169,14 +168,10 @@ class SimpleRectangleIntersector {
   }
 
   private void initCorners(final BoundingBox rectEnv) {
-    this.corner[0] = new PointDouble(rectEnv.getMaxX(), rectEnv.getMaxY(),
-      Point.NULL_ORDINATE);
-    this.corner[1] = new PointDouble(rectEnv.getMinX(), rectEnv.getMaxY(),
-      Point.NULL_ORDINATE);
-    this.corner[2] = new PointDouble(rectEnv.getMinX(), rectEnv.getMinY(),
-      Point.NULL_ORDINATE);
-    this.corner[3] = new PointDouble(rectEnv.getMaxX(), rectEnv.getMinY(),
-      Point.NULL_ORDINATE);
+    this.corner[0] = new PointDouble(rectEnv.getMaxX(), rectEnv.getMaxY(), Point.NULL_ORDINATE);
+    this.corner[1] = new PointDouble(rectEnv.getMinX(), rectEnv.getMaxY(), Point.NULL_ORDINATE);
+    this.corner[2] = new PointDouble(rectEnv.getMinX(), rectEnv.getMinY(), Point.NULL_ORDINATE);
+    this.corner[3] = new PointDouble(rectEnv.getMaxX(), rectEnv.getMinY(), Point.NULL_ORDINATE);
   }
 
   public boolean intersects(final Point p0, final Point p1) {

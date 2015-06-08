@@ -12,8 +12,8 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.Reader;
 
-public class RecordDefinitionConvertRecordReader extends AbstractReader<Record>
-implements RecordReader, Iterator<Record> {
+public class RecordDefinitionConvertRecordReader extends AbstractReader<Record> implements
+  RecordReader, Iterator<Record> {
 
   private final RecordDefinition recordDefinition;
 
@@ -62,8 +62,7 @@ implements RecordReader, Iterator<Record> {
         final Object value = source.getValue(name);
         if (value != null) {
           final DataType dataType = this.recordDefinition.getFieldType(name);
-          final Object convertedValue = StringConverterRegistry.toObject(
-            dataType, value);
+          final Object convertedValue = StringConverterRegistry.toObject(dataType, value);
           target.setValue(name, convertedValue);
         }
       }

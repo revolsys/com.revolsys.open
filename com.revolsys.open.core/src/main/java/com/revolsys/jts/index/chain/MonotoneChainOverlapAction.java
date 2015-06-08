@@ -57,8 +57,8 @@ public class MonotoneChainOverlapAction {
    * @param start1 the index of the start of the overlapping segment from mc1
    * @param start2 the index of the start of the overlapping segment from mc2
    */
-  public void overlap(final MonotoneChain mc1, final int start1,
-    final MonotoneChain mc2, final int start2) {
+  public void overlap(final MonotoneChain mc1, final int start1, final MonotoneChain mc2,
+    final int start2) {
     final LineSegment overlapSeg1 = mc1.getLineSegment(start1);
     final LineSegment overlapSeg2 = mc2.getLineSegment(start2);
     overlap(overlapSeg1, overlapSeg2);

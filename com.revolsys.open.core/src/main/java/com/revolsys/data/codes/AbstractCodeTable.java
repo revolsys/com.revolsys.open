@@ -22,13 +22,12 @@ import com.revolsys.util.CompareUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractCodeTable implements Closeable,
-  PropertyChangeSupportProxy, CodeTable, Cloneable {
+public abstract class AbstractCodeTable implements Closeable, PropertyChangeSupportProxy,
+  CodeTable, Cloneable {
 
   private boolean capitalizeWords = false;
 
-  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-    this);
+  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   private Map<Identifier, List<Object>> idValueCache = new LinkedHashMap<>();
 
@@ -55,25 +54,24 @@ public abstract class AbstractCodeTable implements Closeable,
     this.capitalizeWords = capitalizeWords;
   }
 
-  protected synchronized void addValue(final Identifier id,
-    final List<Object> values) {
+  protected synchronized void addValue(final Identifier id, final List<Object> values) {
     if (id instanceof Number) {
       final Number number = (Number)id;
       final long longValue = number.longValue();
-      if (longValue > maxId) {
-        maxId = longValue;
+      if (longValue > this.maxId) {
+        this.maxId = longValue;
       }
     }
-    identifiers.add(id);
-    idValueCache.put(id, values);
-    idIdCache.put(id, id);
-    valueIdCache.put(values, id);
-    valueIdCache.put(getNormalizedValues(values), id);
+    this.identifiers.add(id);
+    this.idValueCache.put(id, values);
+    this.idIdCache.put(id, id);
+    this.valueIdCache.put(values, id);
+    this.valueIdCache.put(getNormalizedValues(values), id);
     String lowerId = id.toString();
-    if (!caseSensitive) {
+    if (!this.caseSensitive) {
       lowerId = lowerId.toLowerCase();
     }
-    stringIdMap.put(lowerId, id);
+    this.stringIdMap.put(lowerId, id);
   }
 
   protected void addValue(final Identifier id, final Object... values) {
@@ -82,8 +80,7 @@ public abstract class AbstractCodeTable implements Closeable,
 
   }
 
-  protected synchronized void addValues(
-    final Map<Identifier, List<Object>> valueMap) {
+  protected synchronized void addValues(final Map<Identifier, List<Object>> valueMap) {
 
     for (final Entry<Identifier, List<Object>> entry : valueMap.entrySet()) {
       final Identifier id = entry.getKey();
@@ -96,10 +93,10 @@ public abstract class AbstractCodeTable implements Closeable,
   public AbstractCodeTable clone() {
     try {
       final AbstractCodeTable clone = (AbstractCodeTable)super.clone();
-      clone.identifiers = new ArrayList<>(identifiers);
-      clone.idValueCache = new LinkedHashMap<>(idValueCache);
-      clone.idIdCache = new LinkedHashMap<>(idIdCache);
-      clone.valueIdCache = new LinkedHashMap<>(valueIdCache);
+      clone.identifiers = new ArrayList<>(this.identifiers);
+      clone.idValueCache = new LinkedHashMap<>(this.idValueCache);
+      clone.idIdCache = new LinkedHashMap<>(this.idIdCache);
+      clone.valueIdCache = new LinkedHashMap<>(this.valueIdCache);
       return clone;
     } catch (final CloneNotSupportedException e) {
       throw new RuntimeException(e);
@@ -109,13 +106,13 @@ public abstract class AbstractCodeTable implements Closeable,
   @Override
   @PreDestroy
   public void close() {
-    propertyChangeSupport = null;
-    identifiers.clear();
-    idValueCache.clear();
-    idIdCache.clear();
-    stringIdMap.clear();
-    valueIdCache.clear();
-    swingEditor = null;
+    this.propertyChangeSupport = null;
+    this.identifiers.clear();
+    this.idValueCache.clear();
+    this.idIdCache.clear();
+    this.stringIdMap.clear();
+    this.valueIdCache.clear();
+    this.swingEditor = null;
   }
 
   @Override
@@ -137,7 +134,7 @@ public abstract class AbstractCodeTable implements Closeable,
 
   @Override
   public Map<Identifier, List<Object>> getCodes() {
-    return Collections.unmodifiableMap(idValueCache);
+    return Collections.unmodifiableMap(this.idValueCache);
   }
 
   @Override
@@ -155,16 +152,16 @@ public abstract class AbstractCodeTable implements Closeable,
       if (id == null) {
         return null;
       } else {
-        final Identifier cachedId = idIdCache.get(id);
+        final Identifier cachedId = this.idIdCache.get(id);
         if (cachedId != null) {
           return cachedId;
         } else {
           String lowerId = id.toString();
-          if (!caseSensitive) {
+          if (!this.caseSensitive) {
             lowerId = lowerId.toLowerCase();
           }
-          if (stringIdMap.containsKey(lowerId)) {
-            return stringIdMap.get(lowerId);
+          if (this.stringIdMap.containsKey(lowerId)) {
+            return this.stringIdMap.get(lowerId);
           }
         }
       }
@@ -175,7 +172,7 @@ public abstract class AbstractCodeTable implements Closeable,
     if (id == null && loadValues) {
       synchronized (this) {
         id = loadId(values, true);
-        if (id != null && !idValueCache.containsKey(id)) {
+        if (id != null && !this.idValueCache.containsKey(id)) {
           addValue(id, values);
         }
       }
@@ -203,30 +200,29 @@ public abstract class AbstractCodeTable implements Closeable,
 
   protected Identifier getIdByValue(final List<Object> valueList) {
     processValues(valueList);
-    Identifier id = valueIdCache.get(valueList);
+    Identifier id = this.valueIdCache.get(valueList);
     if (id == null) {
       final List<Object> normalizedValues = getNormalizedValues(valueList);
-      id = valueIdCache.get(normalizedValues);
+      id = this.valueIdCache.get(normalizedValues);
     }
     return id;
   }
 
   @Override
   public List<Identifier> getIdentifiers() {
-    return Collections.unmodifiableList(identifiers);
+    return Collections.unmodifiableList(this.identifiers);
   }
 
   public Identifier getIdExact(final List<Object> values) {
     return getIdExact(values, true);
   }
 
-  public Identifier getIdExact(final List<Object> values,
-    final boolean loadValues) {
-    Identifier id = valueIdCache.get(values);
+  public Identifier getIdExact(final List<Object> values, final boolean loadValues) {
+    Identifier id = this.valueIdCache.get(values);
     if (id == null && loadValues) {
       synchronized (this) {
         id = loadId(values, false);
-        return valueIdCache.get(values);
+        return this.valueIdCache.get(values);
       }
     }
     return id;
@@ -239,7 +235,7 @@ public abstract class AbstractCodeTable implements Closeable,
   }
 
   public Map<Identifier, List<Object>> getIdValueCache() {
-    return idValueCache;
+    return this.idValueCache;
   }
 
   @Override
@@ -260,11 +256,11 @@ public abstract class AbstractCodeTable implements Closeable,
 
   @Override
   public String getName() {
-    return name;
+    return this.name;
   }
 
   protected synchronized long getNextId() {
-    return ++maxId;
+    return ++this.maxId;
   }
 
   List<Object> getNormalizedValues(final List<Object> values) {
@@ -284,12 +280,12 @@ public abstract class AbstractCodeTable implements Closeable,
 
   @Override
   public PropertyChangeSupport getPropertyChangeSupport() {
-    return propertyChangeSupport;
+    return this.propertyChangeSupport;
   }
 
   @Override
   public JComponent getSwingEditor() {
-    return swingEditor;
+    return this.swingEditor;
   }
 
   @Override
@@ -309,7 +305,7 @@ public abstract class AbstractCodeTable implements Closeable,
   }
 
   protected List<Object> getValueById(Object id) {
-    if (valueIdCache.containsKey(Collections.singletonList(id))) {
+    if (this.valueIdCache.containsKey(Collections.singletonList(id))) {
       if (id instanceof SingleIdentifier) {
         final SingleIdentifier identifier = (SingleIdentifier)id;
         return Collections.singletonList(identifier.getValue(0));
@@ -317,15 +313,15 @@ public abstract class AbstractCodeTable implements Closeable,
         return Collections.singletonList(id);
       }
     } else {
-      List<Object> values = idValueCache.get(id);
+      List<Object> values = this.idValueCache.get(id);
       if (values == null) {
         String lowerId = id.toString();
-        if (!caseSensitive) {
+        if (!this.caseSensitive) {
           lowerId = lowerId.toLowerCase();
         }
-        if (stringIdMap.containsKey(lowerId)) {
-          id = stringIdMap.get(lowerId);
-          values = idValueCache.get(id);
+        if (this.stringIdMap.containsKey(lowerId)) {
+          id = this.stringIdMap.get(lowerId);
+          values = this.idValueCache.get(id);
         }
       }
       return values;
@@ -359,15 +355,15 @@ public abstract class AbstractCodeTable implements Closeable,
   }
 
   public boolean isCapitalizeWords() {
-    return capitalizeWords;
+    return this.capitalizeWords;
   }
 
   public boolean isCaseSensitive() {
-    return caseSensitive;
+    return this.caseSensitive;
   }
 
   public boolean isEmpty() {
-    return idIdCache.isEmpty();
+    return this.idIdCache.isEmpty();
   }
 
   @Override
@@ -402,14 +398,14 @@ public abstract class AbstractCodeTable implements Closeable,
 
   @Override
   public synchronized void refresh() {
-    identifiers.clear();
-    idValueCache.clear();
-    stringIdMap.clear();
-    valueIdCache.clear();
+    this.identifiers.clear();
+    this.idValueCache.clear();
+    this.stringIdMap.clear();
+    this.valueIdCache.clear();
   }
 
   public void setCapitalizeWords(final boolean capitalizedWords) {
-    capitalizeWords = capitalizedWords;
+    this.capitalizeWords = capitalizedWords;
   }
 
   public void setCaseSensitive(final boolean caseSensitive) {

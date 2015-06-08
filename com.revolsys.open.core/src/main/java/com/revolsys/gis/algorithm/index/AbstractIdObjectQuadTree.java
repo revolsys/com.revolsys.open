@@ -60,8 +60,8 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
 
   @Override
   public void visit(final BoundingBox envelope, final Visitor<T> visitor) {
-    final IdObjectIndexItemVisitor<T> itemVisitor = new IdObjectIndexItemVisitor<T>(
-        this, envelope, visitor);
+    final IdObjectIndexItemVisitor<T> itemVisitor = new IdObjectIndexItemVisitor<T>(this, envelope,
+      visitor);
     this.index.visit(envelope, itemVisitor);
   }
 

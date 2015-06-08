@@ -133,11 +133,10 @@ public class PageController implements SiteNodeController {
     if (o instanceof PageController) {
       final PageController p = (PageController)o;
       if (super.equals(o)
-          && p.menuId == this.menuId
-          && p.getPath().equals(getPath())
-          && (p.title == this.title || p.title != null && this.title != null
-          && p.title.equals(this.title))
-          && p.properties.equals(this.properties)) {
+        && p.menuId == this.menuId
+        && p.getPath().equals(getPath())
+        && (p.title == this.title || p.title != null && this.title != null
+          && p.title.equals(this.title)) && p.properties.equals(this.properties)) {
         return true;
       }
     }
@@ -155,17 +154,15 @@ public class PageController implements SiteNodeController {
    * @exception IOException if an input output error occurs when handling the
    *              request
    */
-  public void forward(final ServletContext servletContext,
-    final HttpServletRequest request, final HttpServletResponse response,
-    final String path) throws ServletException, IOException {
+  public void forward(final ServletContext servletContext, final HttpServletRequest request,
+    final HttpServletResponse response, final String path) throws ServletException, IOException {
     if (!response.isCommitted()) {
       servletContext.getRequestDispatcher(path).forward(request, response);
     }
   }
 
   public String getAbsolutePath() {
-    return WebUiContext.get().getConfig().getBasePath()
-        + this.node.getFullPath();
+    return WebUiContext.get().getConfig().getBasePath() + this.node.getFullPath();
   }
 
   /**
@@ -310,9 +307,8 @@ public class PageController implements SiteNodeController {
     return super.hashCode() + (getPath().hashCode() << 2);
   }
 
-  public void invokeActions(final ServletContext servletContext,
-    final HttpServletRequest request, final HttpServletResponse response)
-        throws IOException, ServletException {
+  public void invokeActions(final ServletContext servletContext, final HttpServletRequest request,
+    final HttpServletResponse response) throws IOException, ServletException {
     final Iterator actions = getActions().iterator();
     while (actions.hasNext()) {
       final Action action = (Action)actions.next();
@@ -325,9 +321,8 @@ public class PageController implements SiteNodeController {
   }
 
   @Override
-  public void process(final ServletContext servletContext,
-    final HttpServletRequest request, final HttpServletResponse response)
-        throws IOException, ServletException {
+  public void process(final ServletContext servletContext, final HttpServletRequest request,
+    final HttpServletResponse response) throws IOException, ServletException {
     // WebUiContext.set(new WebUiContext(config, request.getContextPath(), this,
     // request, response, null));
     if (isSecure() && !this.secure) {
@@ -357,8 +352,7 @@ public class PageController implements SiteNodeController {
    * @param request
    * @throws PageNotFoundException
    */
-  private void processArguments(final HttpServletRequest request)
-      throws ActionException {
+  private void processArguments(final HttpServletRequest request) throws ActionException {
     for (final Iterator arguments = getArguments().iterator(); arguments.hasNext();) {
       final Argument argument = (Argument)arguments.next();
       final String name = argument.getName();
@@ -372,8 +366,7 @@ public class PageController implements SiteNodeController {
         try {
           value = argument.valueOf(stringValue);
         } catch (final NumberFormatException e) {
-          throw new PageNotFoundException(
-            "Page argument is not a valid number: " + name);
+          throw new PageNotFoundException("Page argument is not a valid number: " + name);
         }
       }
       if (value != null) {
@@ -389,8 +382,7 @@ public class PageController implements SiteNodeController {
    * @param request
    * @throws PageNotFoundException
    */
-  private void processAttributes(final HttpServletRequest request)
-      throws ActionException {
+  private void processAttributes(final HttpServletRequest request) throws ActionException {
     for (final Iterator attributes = getFields().iterator(); attributes.hasNext();) {
       final Attribute attribute = (Attribute)attributes.next();
       final String name = attribute.getName();

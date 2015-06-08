@@ -24,11 +24,10 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 
-public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
-Externalizable {
+public class Edge<T> implements AttributedObject, Comparable<Edge<T>>, Externalizable {
 
-  public static <T> void addEdgeToEdgesByLine(
-    final Map<LineString, Set<Edge<T>>> lineEdgeMap, final Edge<T> edge) {
+  public static <T> void addEdgeToEdgesByLine(final Map<LineString, Set<Edge<T>>> lineEdgeMap,
+    final Edge<T> edge) {
     final LineString line = edge.getLine();
     for (final Entry<LineString, Set<Edge<T>>> entry : lineEdgeMap.entrySet()) {
       final LineString keyLine = entry.getKey();
@@ -62,8 +61,7 @@ Externalizable {
     lineEdgeMap.put(line, edges);
   }
 
-  public static <T> Set<Edge<T>> getEdges(final Collection<Edge<T>> edges,
-    final LineString line) {
+  public static <T> Set<Edge<T>> getEdges(final Collection<Edge<T>> edges, final LineString line) {
     final Set<Edge<T>> newEdges = new LinkedHashSet<Edge<T>>();
     for (final Edge<T> edge : edges) {
       if (LineStringUtil.equalsIgnoreDirection2d(line, edge.getLine())) {
@@ -73,8 +71,7 @@ Externalizable {
     return newEdges;
   }
 
-  public static <T> List<Edge<T>> getEdges(final List<Edge<T>> edges,
-    final Filter<Edge<T>> filter) {
+  public static <T> List<Edge<T>> getEdges(final List<Edge<T>> edges, final Filter<Edge<T>> filter) {
     final List<Edge<T>> filteredEdges = new ArrayList<Edge<T>>();
     for (final Edge<T> edge : edges) {
       if (filter.accept(edge)) {
@@ -84,8 +81,8 @@ Externalizable {
     return filteredEdges;
   }
 
-  public static <T> Set<Edge<T>> getEdges(
-    final Map<LineString, Set<Edge<T>>> lineEdgeMap, final LineString line) {
+  public static <T> Set<Edge<T>> getEdges(final Map<LineString, Set<Edge<T>>> lineEdgeMap,
+    final LineString line) {
     for (final Entry<LineString, Set<Edge<T>>> entry : lineEdgeMap.entrySet()) {
       final LineString keyLine = entry.getKey();
       if (LineStringUtil.equalsIgnoreDirection2d(line, keyLine)) {
@@ -96,8 +93,7 @@ Externalizable {
     return null;
   }
 
-  public static <T> Map<LineString, Set<Edge<T>>> getEdgesByLine(
-    final List<Edge<T>> edges) {
+  public static <T> Map<LineString, Set<Edge<T>>> getEdgesByLine(final List<Edge<T>> edges) {
     final Map<LineString, Set<Edge<T>>> edgesByLine = new HashMap<LineString, Set<Edge<T>>>();
     for (final Edge<T> edge : edges) {
       addEdgeToEdgesByLine(edgesByLine, edge);
@@ -105,8 +101,8 @@ Externalizable {
     return edgesByLine;
   }
 
-  public static <T> Map<LineString, Set<Edge<T>>> getEdgesByLine(
-    final Node<T> node, final List<Edge<T>> edges) {
+  public static <T> Map<LineString, Set<Edge<T>>> getEdgesByLine(final Node<T> node,
+    final List<Edge<T>> edges) {
     final Map<LineString, Set<Edge<T>>> edgesByLine = new HashMap<LineString, Set<Edge<T>>>();
     for (final Edge<T> edge : edges) {
       addEdgeToEdgesByLine(node, edgesByLine, edge);
@@ -114,8 +110,8 @@ Externalizable {
     return edgesByLine;
   }
 
-  public static <T> List<Edge<T>> getEdgesMatchingObjectFilter(
-    final List<Edge<T>> edges, final Filter<T> filter) {
+  public static <T> List<Edge<T>> getEdgesMatchingObjectFilter(final List<Edge<T>> edges,
+    final Filter<T> filter) {
     final List<Edge<T>> filteredEdges = new ArrayList<Edge<T>>();
     for (final Edge<T> edge : edges) {
       if (!edge.isRemoved()) {
@@ -151,8 +147,7 @@ Externalizable {
    * @param edges The list of edges.
    * @return The map of type name to list of edges.
    */
-  public static <T> Map<String, List<Edge<T>>> getTypeNameEdgesMap(
-    final List<Edge<T>> edges) {
+  public static <T> Map<String, List<Edge<T>>> getTypeNameEdgesMap(final List<Edge<T>> edges) {
     final Map<String, List<Edge<T>>> edgesByTypeName = new HashMap<String, List<Edge<T>>>();
     for (final Edge<T> edge : edges) {
       final String typePath = edge.getTypeName();
@@ -166,8 +161,8 @@ Externalizable {
     return edgesByTypeName;
   }
 
-  public static <T> boolean hasEdgeMatchingObjectFilter(
-    final List<Edge<T>> edges, final Filter<T> filter) {
+  public static <T> boolean hasEdgeMatchingObjectFilter(final List<Edge<T>> edges,
+    final Filter<T> filter) {
     for (final Edge<T> edge : edges) {
       final T object = edge.getObject();
       if (filter.accept(object)) {
@@ -183,8 +178,8 @@ Externalizable {
     }
   }
 
-  public static <T> void setEdgesAttribute(final List<Edge<T>> edges,
-    final String fieldName, final Object value) {
+  public static <T> void setEdgesAttribute(final List<Edge<T>> edges, final String fieldName,
+    final Object value) {
     for (final Edge<T> edge : edges) {
       edge.setAttribute(fieldName, value);
     }
@@ -202,8 +197,7 @@ Externalizable {
   public Edge() {
   }
 
-  public Edge(final int id, final Graph<T> graph, final Node<T> fromNode,
-    final Node<T> toNode) {
+  public Edge(final int id, final Graph<T> graph, final Node<T> fromNode, final Node<T> toNode) {
     this.id = id;
     this.graph = graph;
     this.fromNodeId = fromNode.getId();
@@ -405,8 +399,7 @@ Externalizable {
       return Double.NaN;
     } else {
       final LineString points = line;
-      return CoordinatesListUtil.angleToPrevious(points,
-        points.getVertexCount() - 1);
+      return CoordinatesListUtil.angleToPrevious(points, points.getVertexCount() - 1);
     }
   }
 
@@ -453,8 +446,7 @@ Externalizable {
         return false;
       }
     }
-    throw new IllegalArgumentException("Node " + node
-      + " is not part of the edge.");
+    throw new IllegalArgumentException("Node " + node + " is not part of the edge.");
   }
 
   public boolean isLessThanDistance(final Node<T> node, final double distance) {
@@ -480,8 +472,7 @@ Externalizable {
   }
 
   @Override
-  public void readExternal(final ObjectInput in) throws IOException,
-  ClassNotFoundException {
+  public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
     final int graphId = in.readInt();
     this.graph = Graph.getGraph(graphId);
     this.id = in.readInt();
@@ -533,8 +524,7 @@ Externalizable {
     return this.graph.splitEdge(this, splitPoints);
   }
 
-  public <V extends Point> List<Edge<T>> split(final Collection<V> points,
-    final double maxDistance) {
+  public <V extends Point> List<Edge<T>> split(final Collection<V> points, final double maxDistance) {
     return this.graph.splitEdge(this, points, maxDistance);
   }
 

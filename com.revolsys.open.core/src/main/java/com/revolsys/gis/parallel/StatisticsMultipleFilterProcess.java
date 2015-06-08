@@ -9,8 +9,7 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.MultipleFilterProcess;
 
-public class StatisticsMultipleFilterProcess extends
-MultipleFilterProcess<Record> {
+public class StatisticsMultipleFilterProcess extends MultipleFilterProcess<Record> {
 
   private final Map<Filter<Record>, Statistics> statisticsMap = new HashMap<Filter<Record>, Statistics>();
 
@@ -41,8 +40,8 @@ MultipleFilterProcess<Record> {
   }
 
   @Override
-  protected boolean processFilter(final Record object,
-    final Filter<Record> filter, final Channel<Record> filterOut) {
+  protected boolean processFilter(final Record object, final Filter<Record> filter,
+    final Channel<Record> filterOut) {
     if (super.processFilter(object, filter, filterOut)) {
       if (this.useStatistics) {
         Statistics stats = this.statisticsMap.get(filter);

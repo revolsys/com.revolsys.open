@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -48,8 +47,7 @@ import com.revolsys.jts.geomgraph.EdgeRing;
  */
 public class MinimalEdgeRing extends EdgeRing {
 
-  public MinimalEdgeRing(final DirectedEdge start,
-    final GeometryFactory geometryFactory) {
+  public MinimalEdgeRing(final DirectedEdge start, final GeometryFactory geometryFactory) {
     super(start, geometryFactory);
   }
 

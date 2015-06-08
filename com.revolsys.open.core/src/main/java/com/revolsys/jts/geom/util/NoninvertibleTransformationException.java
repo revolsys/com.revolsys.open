@@ -39,19 +39,17 @@ package com.revolsys.jts.geom.util;
  *
  * @author Martin Davis
  */
-public class NoninvertibleTransformationException
-extends Exception
-{
+public class NoninvertibleTransformationException extends Exception {
   /**
    *
    */
   private static final long serialVersionUID = 1L;
-  public NoninvertibleTransformationException()
-  {
+
+  public NoninvertibleTransformationException() {
     super();
   }
-  public NoninvertibleTransformationException(final String msg)
-  {
+
+  public NoninvertibleTransformationException(final String msg) {
     super(msg);
   }
 }

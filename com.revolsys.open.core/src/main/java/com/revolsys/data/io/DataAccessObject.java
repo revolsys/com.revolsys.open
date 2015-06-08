@@ -29,8 +29,8 @@ public interface DataAccessObject<T> {
   <V> List<V> list(final String propertyName, final Map<String, Object> where,
     final Map<String, Boolean> orderBy);
 
-  List<String> list(String propertyName, Map<String, Object> where,
-    Map<String, Boolean> order, int limit);
+  List<String> list(String propertyName, Map<String, Object> where, Map<String, Boolean> order,
+    int limit);
 
   T load(long id);
 
@@ -42,8 +42,7 @@ public interface DataAccessObject<T> {
 
   void merge(T object);
 
-  ResultPager<T> page(final Map<String, Object> where,
-    final Map<String, Boolean> orderBy);
+  ResultPager<T> page(final Map<String, Object> where, final Map<String, Boolean> orderBy);
 
   void persist(T object);
 

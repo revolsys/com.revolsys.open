@@ -17,25 +17,23 @@ public class InvokeMethodTreeSelectionListener implements TreeSelectionListener 
 
   private final boolean invokeLater;
 
-  public InvokeMethodTreeSelectionListener(final Object object,
-    final String methodName) {
+  public InvokeMethodTreeSelectionListener(final Object object, final String methodName) {
     this(object, methodName, new Object[0]);
   }
 
-  public InvokeMethodTreeSelectionListener(final Object object,
-    final String methodName, final boolean invokeLater) {
+  public InvokeMethodTreeSelectionListener(final Object object, final String methodName,
+    final boolean invokeLater) {
     this(object, methodName, invokeLater, new Object[0]);
   }
 
-  public InvokeMethodTreeSelectionListener(final Object object,
-    final String methodName, final boolean invokeLater,
-    final Object... parameters) {
+  public InvokeMethodTreeSelectionListener(final Object object, final String methodName,
+    final boolean invokeLater, final Object... parameters) {
     this.runnable = new InvokeMethodRunnable(object, methodName, parameters);
     this.invokeLater = invokeLater;
   }
 
-  public InvokeMethodTreeSelectionListener(final Object object,
-    final String methodName, final Object... parameters) {
+  public InvokeMethodTreeSelectionListener(final Object object, final String methodName,
+    final Object... parameters) {
     this(object, methodName, false, parameters);
   }
 

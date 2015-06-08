@@ -12,8 +12,7 @@ import org.jdesktop.swingx.JXBusyLabel;
 
 import com.revolsys.swing.SwingUtil;
 
-public class SwingWorkerProgressBar extends JPanel implements
-PropertyChangeListener {
+public class SwingWorkerProgressBar extends JPanel implements PropertyChangeListener {
   private static final long serialVersionUID = -5112492385171847107L;
 
   private final JXBusyLabel busyLabel = new JXBusyLabel(new Dimension(16, 16));
@@ -21,8 +20,7 @@ PropertyChangeListener {
   public SwingWorkerProgressBar() {
     super(new BorderLayout(2, 2));
     this.busyLabel.setDelay(200);
-    Invoke.getPropertyChangeSupport()
-    .addPropertyChangeListener("workers", this);
+    Invoke.getPropertyChangeSupport().addPropertyChangeListener("workers", this);
     add(this.busyLabel, BorderLayout.WEST);
   }
 
@@ -42,7 +40,6 @@ PropertyChangeListener {
   @Override
   public void removeNotify() {
     super.removeNotify();
-    Invoke.getPropertyChangeSupport().removePropertyChangeListener("workers",
-      this);
+    Invoke.getPropertyChangeSupport().removePropertyChangeListener("workers", this);
   }
 }

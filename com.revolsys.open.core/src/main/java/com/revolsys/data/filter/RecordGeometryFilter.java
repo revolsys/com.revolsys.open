@@ -24,8 +24,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.filter.Filter;
 import com.revolsys.jts.geom.Geometry;
 
-public class RecordGeometryFilter<G extends Geometry> implements
-Filter<Record> {
+public class RecordGeometryFilter<G extends Geometry> implements Filter<Record> {
   private Filter<G> filter;
 
   public RecordGeometryFilter() {

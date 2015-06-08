@@ -61,8 +61,7 @@ import com.revolsys.jts.geomgraph.Node;
  */
 public class MaximalEdgeRing extends EdgeRing {
 
-  public MaximalEdgeRing(final DirectedEdge start,
-    final GeometryFactory geometryFactory) {
+  public MaximalEdgeRing(final DirectedEdge start, final GeometryFactory geometryFactory) {
     super(start, geometryFactory);
   }
 

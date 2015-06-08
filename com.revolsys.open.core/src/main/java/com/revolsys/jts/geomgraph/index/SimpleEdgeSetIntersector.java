@@ -52,8 +52,7 @@ public class SimpleEdgeSetIntersector extends EdgeSetIntersector {
   }
 
   @Override
-  public void computeIntersections(final List edges0, final List edges1,
-    final SegmentIntersector si) {
+  public void computeIntersections(final List edges0, final List edges1, final SegmentIntersector si) {
     this.nOverlaps = 0;
 
     for (final Iterator i0 = edges0.iterator(); i0.hasNext();) {
@@ -66,8 +65,8 @@ public class SimpleEdgeSetIntersector extends EdgeSetIntersector {
   }
 
   @Override
-  public void computeIntersections(final List edges,
-    final SegmentIntersector si, final boolean testAllSegments) {
+  public void computeIntersections(final List edges, final SegmentIntersector si,
+    final boolean testAllSegments) {
     this.nOverlaps = 0;
 
     for (final Iterator i0 = edges.iterator(); i0.hasNext();) {
@@ -86,8 +85,7 @@ public class SimpleEdgeSetIntersector extends EdgeSetIntersector {
    * This has n^2 performance, and is about 100 times slower than using
    * monotone chains.
    */
-  private void computeIntersects(final Edge e0, final Edge e1,
-    final SegmentIntersector si) {
+  private void computeIntersects(final Edge e0, final Edge e1, final SegmentIntersector si) {
     for (int i0 = 0; i0 < e0.getNumPoints() - 1; i0++) {
       for (int i1 = 0; i1 < e1.getNumPoints() - 1; i1++) {
         si.addIntersections(e0, i0, e1, i1);

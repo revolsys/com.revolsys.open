@@ -10,8 +10,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 
 public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
-  public XmlGeometryFieldType(final FieldType esriFieldType,
-    final DataType dataType) {
+  public XmlGeometryFieldType(final FieldType esriFieldType, final DataType dataType) {
     super(dataType, "xs:" + dataType.getName(), esriFieldType);
   }
 
@@ -46,8 +45,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     out.endTag(PATH_ARRAY);
   }
 
-  private void writeMultiLineString(final XmlWriter out,
-    final MultiLineString multiLine) {
+  private void writeMultiLineString(final XmlWriter out, final MultiLineString multiLine) {
     final boolean hasZ;
     if (multiLine.isEmpty()) {
       hasZ = false;
@@ -68,8 +66,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     out.endTag(PATH_ARRAY);
   }
 
-  public void writePath(final XmlWriter out, final LineString line,
-    final boolean hasZ) {
+  public void writePath(final XmlWriter out, final LineString line, final boolean hasZ) {
     out.startTag(PATH);
     out.attribute(XsiConstants.TYPE, PATH_TYPE);
 
@@ -83,8 +80,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     writePoint(out, point, hasZ);
   }
 
-  public void writePoint(final XmlWriter out, final Point coordinates,
-    final boolean hasZ) {
+  public void writePoint(final XmlWriter out, final Point coordinates, final boolean hasZ) {
     out.element(X, coordinates.getX());
     out.element(Y, coordinates.getY());
     if (hasZ) {
@@ -92,8 +88,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     }
   }
 
-  public void writePointArray(final XmlWriter out, final LineString line,
-    final boolean hasZ) {
+  public void writePointArray(final XmlWriter out, final LineString line, final boolean hasZ) {
     out.startTag(POINT_ARRAY);
     out.attribute(XsiConstants.TYPE, POINT_ARRAY_TYPE);
 
@@ -129,8 +124,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     out.endTag(RING_ARRAY);
   }
 
-  private void writeRing(final XmlWriter out, final LineString line,
-    final boolean hasZ) {
+  private void writeRing(final XmlWriter out, final LineString line, final boolean hasZ) {
     out.startTag(RING);
     out.attribute(XsiConstants.TYPE, RING_TYPE);
 

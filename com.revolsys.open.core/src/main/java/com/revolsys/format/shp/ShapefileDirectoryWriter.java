@@ -85,8 +85,7 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
         final File childDirectory = new File(this.directory, schemaName);
         if (!childDirectory.mkdirs()) {
           if (!childDirectory.isDirectory()) {
-            throw new IllegalArgumentException("Unable to create directory "
-                + childDirectory);
+            throw new IllegalArgumentException("Unable to create directory " + childDirectory);
           }
         }
         return childDirectory;
@@ -118,10 +117,9 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
     if (writer == null) {
       final File directory = getDirectory(recordDefinition);
       directory.mkdirs();
-      final File file = new File(directory, getFileName(recordDefinition)
-        + this.nameSuffix + ".shp");
-      writer = RecordIo.recordWriter(recordDefinition,
-        new FileSystemResource(file));
+      final File file = new File(directory, getFileName(recordDefinition) + this.nameSuffix
+        + ".shp");
+      writer = RecordIo.recordWriter(recordDefinition, new FileSystemResource(file));
 
       ((XbaseRecordWriter)writer).setUseZeroForNull(this.useZeroForNull);
       final Geometry geometry = object.getGeometryValue();
@@ -129,8 +127,7 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
         setProperty(IoConstants.GEOMETRY_FACTORY, geometry.getGeometryFactory());
       }
       this.writers.put(path, writer);
-      this.recordDefinitionMap.put(path,
-        ((ShapefileRecordWriter)writer).getRecordDefinition());
+      this.recordDefinitionMap.put(path, ((ShapefileRecordWriter)writer).getRecordDefinition());
     }
     return writer;
   }
@@ -146,8 +143,7 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
   public void setDirectory(final File baseDirectory) {
     this.directory = baseDirectory;
     baseDirectory.mkdirs();
-    this.statistics = new Statistics("Write Shape "
-        + baseDirectory.getAbsolutePath());
+    this.statistics = new Statistics("Write Shape " + baseDirectory.getAbsolutePath());
     this.statistics.connect();
   }
 
@@ -166,8 +162,7 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
     }
   }
 
-  public void setUseNamespaceAsSubDirectory(
-    final boolean useNamespaceAsSubDirectory) {
+  public void setUseNamespaceAsSubDirectory(final boolean useNamespaceAsSubDirectory) {
     this.useNamespaceAsSubDirectory = useNamespaceAsSubDirectory;
   }
 

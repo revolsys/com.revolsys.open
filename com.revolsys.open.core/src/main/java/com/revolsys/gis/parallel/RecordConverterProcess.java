@@ -40,8 +40,7 @@ public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
   //
   // private Statistics ignoredStatistics = new Statistics("Ignored");
 
-  public void addTypeConverter(final String typePath,
-    final Converter<Record, Record> converter) {
+  public void addTypeConverter(final String typePath, final Converter<Record, Record> converter) {
     this.typeConverterMap.put(typePath, converter);
   }
 
@@ -162,8 +161,7 @@ public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
         final Map<String, String> attributeMapping = (Map<String, String>)map.get("attributeMapping");
 
         final RecordDefinition targetRecordDefinition = getTargetRecordDefinition(targetTypeName);
-        final SimpleRecordConveter converter = new SimpleRecordConveter(
-          targetRecordDefinition);
+        final SimpleRecordConveter converter = new SimpleRecordConveter(targetRecordDefinition);
         converter.addProcessor(new CopyValues(attributeMapping));
         addTypeConverter(sourceTypeName, converter);
       }
@@ -171,8 +169,7 @@ public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
   }
 
   @Override
-  protected void process(final Channel<Record> in, final Channel<Record> out,
-    final Record source) {
+  protected void process(final Channel<Record> in, final Channel<Record> out, final Record source) {
     final Record target = convert(source);
     if (target == null) {
       // ignoredStatistics.add(source);
@@ -184,13 +181,11 @@ public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
     }
   }
 
-  public void setDefaultConverter(
-    final Converter<Record, Record> defaultConverter) {
+  public void setDefaultConverter(final Converter<Record, Record> defaultConverter) {
     this.defaultConverter = defaultConverter;
   }
 
-  public void setSimpleMapping(
-    final Map<Object, Map<String, Object>> simpleMapping) {
+  public void setSimpleMapping(final Map<Object, Map<String, Object>> simpleMapping) {
     this.simpleMapping = simpleMapping;
   }
 
@@ -206,8 +201,7 @@ public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
     this.targetRecordDefinitionFactory = targetRecordDefinitionFactory;
   }
 
-  public void setTypeConverterMap(
-    final Map<String, Converter<Record, Record>> typeConverterMap) {
+  public void setTypeConverterMap(final Map<String, Converter<Record, Record>> typeConverterMap) {
     this.typeConverterMap = typeConverterMap;
   }
 

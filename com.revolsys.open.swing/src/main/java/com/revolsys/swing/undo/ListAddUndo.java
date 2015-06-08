@@ -38,7 +38,8 @@ public class ListAddUndo extends AbstractUndoableEdit {
   @Override
   public boolean canUndo() {
     if (super.canUndo()) {
-      if (this.index > -1 && this.index < this.list.size() && this.list.get(this.index) == this.value) {
+      if (this.index > -1 && this.index < this.list.size()
+        && this.list.get(this.index) == this.value) {
         return true;
       }
     }

@@ -10,13 +10,15 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 
 public class EqualIgnoreAttributes extends AbstractRecordDefinitionProperty {
+  public static final String PROPERTY_NAME = EqualIgnoreAttributes.class.getName()
+    + ".propertyName";
+
   public static EqualIgnoreAttributes getProperty(final Record object) {
     final RecordDefinition recordDefinition = object.getRecordDefinition();
     return getProperty(recordDefinition);
   }
 
-  public static EqualIgnoreAttributes getProperty(
-    final RecordDefinition recordDefinition) {
+  public static EqualIgnoreAttributes getProperty(final RecordDefinition recordDefinition) {
     EqualIgnoreAttributes property = recordDefinition.getProperty(PROPERTY_NAME);
     if (property == null) {
       property = new EqualIgnoreAttributes();
@@ -24,9 +26,6 @@ public class EqualIgnoreAttributes extends AbstractRecordDefinitionProperty {
     }
     return property;
   }
-
-  public static final String PROPERTY_NAME = EqualIgnoreAttributes.class.getName()
-      + ".propertyName";
 
   private Set<String> fieldNames = new LinkedHashSet<String>();
 

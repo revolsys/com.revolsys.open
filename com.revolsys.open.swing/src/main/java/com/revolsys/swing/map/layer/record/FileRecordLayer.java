@@ -40,8 +40,7 @@ public class FileRecordLayer extends ListRecordLayer {
   }
 
   @Override
-  protected ValueField createPropertiesTabGeneralPanelSource(
-    final BasePanel parent) {
+  protected ValueField createPropertiesTabGeneralPanelSource(final BasePanel parent) {
     final ValueField panel = super.createPropertiesTabGeneralPanelSource(parent);
 
     final String url = getUrl();
@@ -88,8 +87,7 @@ public class FileRecordLayer extends ListRecordLayer {
       if (this.resource.exists()) {
         final RecordReader reader = RecordIo.recordReader(this.resource);
         if (reader == null) {
-          LoggerFactory.getLogger(getClass()).error(
-            "Cannot find reader for: " + this.resource);
+          LoggerFactory.getLogger(getClass()).error("Cannot find reader for: " + this.resource);
           return false;
         } else {
           try {

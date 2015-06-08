@@ -47,6 +47,14 @@ import junit.framework.Assert;
  * @version 1.7
  */
 public class Parameters {
+  private static List arguments = null;
+
+  private static List requiredKeys = new Vector();
+
+  private static List allowedKeys = new Vector();
+
+  private static Parameters instance = null;
+
   /**
    * Returns the singleton. Be sure to call #setParameters first.
    */
@@ -62,8 +70,8 @@ public class Parameters {
    * Sets the command-line arguments. reqdKeys may be set to null if there
    * are no required command-line arguments. Same with optionalKeys.
    */
-  public static void setParameters(final String[] args,
-    final String[] reqdKeys, final String[] optionalKeys) {
+  public static void setParameters(final String[] args, final String[] reqdKeys,
+    final String[] optionalKeys) {
     arguments = Arrays.asList(args);
     if (reqdKeys != null) {
       requiredKeys = StringUtil.toLowerCase(Arrays.asList(reqdKeys));
@@ -76,14 +84,6 @@ public class Parameters {
     }
   }
 
-  private static List arguments = null;
-
-  private static List requiredKeys = new Vector();
-
-  private static List allowedKeys = new Vector();
-
-  private static Parameters instance = null;
-
   // //////////////////////////////////////////////////////////////////////////////
   private final Hashtable hashtable = new Hashtable();
 
@@ -95,8 +95,7 @@ public class Parameters {
       String arg = (String)i.next();
       arg = arg.toLowerCase();
       if (!arg.startsWith("-")) {
-        throw new IllegalArgumentException(
-          "Command-line argument does not start with '-': " + arg);
+        throw new IllegalArgumentException("Command-line argument does not start with '-': " + arg);
       }
       final int colonIndex = arg.indexOf(":");
       String key;
@@ -109,9 +108,8 @@ public class Parameters {
         value = "";
       }
       if (!allowedKeys.contains(key)) {
-        throw new IllegalArgumentException(
-          "Unrecognized command-line argument: " + arg.substring(1)
-          + ". Valid arguments are: "
+        throw new IllegalArgumentException("Unrecognized command-line argument: "
+          + arg.substring(1) + ". Valid arguments are: "
           + StringUtil.toCommaDelimitedString(allowedKeys));
       }
       this.hashtable.put(key, value);
@@ -119,8 +117,8 @@ public class Parameters {
     for (final Iterator i = requiredKeys.iterator(); i.hasNext();) {
       final String requiredKey = (String)i.next();
       if (!this.hashtable.containsKey(requiredKey)) {
-        throw new IllegalArgumentException(
-          "Required command-line argument is missing: " + requiredKey);
+        throw new IllegalArgumentException("Required command-line argument is missing: "
+          + requiredKey);
       }
     }
   }

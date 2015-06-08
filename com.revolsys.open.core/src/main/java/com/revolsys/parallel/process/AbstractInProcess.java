@@ -6,8 +6,7 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 import com.revolsys.parallel.channel.store.Buffer;
 
-public abstract class AbstractInProcess<T> extends AbstractProcess implements
-InProcess<T> {
+public abstract class AbstractInProcess<T> extends AbstractProcess implements InProcess<T> {
 
   private int inBufferSize = 0;
 

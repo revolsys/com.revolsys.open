@@ -14,17 +14,15 @@ import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
 
-public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>>
-implements Filter<Edge<LineSegment>> {
-  public static List<Edge<LineSegment>> getEdges(
-    final Graph<LineSegment> graph, final LineSegment lineSegment,
-    final double maxDistance) {
+public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>> implements
+  Filter<Edge<LineSegment>> {
+  public static List<Edge<LineSegment>> getEdges(final Graph<LineSegment> graph,
+    final LineSegment lineSegment, final double maxDistance) {
     final CreateListVisitor<Edge<LineSegment>> results = new CreateListVisitor<Edge<LineSegment>>();
     BoundingBox envelope = lineSegment.getBoundingBox();
     envelope = envelope.expand(maxDistance);
     final IdObjectIndex<Edge<LineSegment>> edgeIndex = graph.getEdgeIndex();
-    edgeIndex.visit(envelope, new EdgeLessThanDistance(lineSegment,
-      maxDistance, results));
+    edgeIndex.visit(envelope, new EdgeLessThanDistance(lineSegment, maxDistance, results));
     return results.getList();
   }
 
@@ -39,14 +37,13 @@ implements Filter<Edge<LineSegment>> {
 
   private final double maxDistance;
 
-  public EdgeLessThanDistance(final LineSegment lineSegment,
-    final double maxDistance) {
+  public EdgeLessThanDistance(final LineSegment lineSegment, final double maxDistance) {
     this.lineSegment = lineSegment;
     this.maxDistance = maxDistance;
   }
 
-  public EdgeLessThanDistance(final LineSegment lineSegment,
-    final double maxDistance, final Visitor<Edge<LineSegment>> matchVisitor) {
+  public EdgeLessThanDistance(final LineSegment lineSegment, final double maxDistance,
+    final Visitor<Edge<LineSegment>> matchVisitor) {
     super(matchVisitor);
     this.lineSegment = lineSegment;
     this.maxDistance = maxDistance;

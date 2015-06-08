@@ -27,14 +27,13 @@ public class Spheroid implements Serializable {
 
   private double semiMinorAxis;
 
-  public Spheroid(final String name, final double semiMajorAxis,
-    final double inverseFlattening, final Authority authority) {
+  public Spheroid(final String name, final double semiMajorAxis, final double inverseFlattening,
+    final Authority authority) {
     this(name, semiMajorAxis, Double.NaN, inverseFlattening, authority, false);
   }
 
-  public Spheroid(final String name, final double semiMajorAxis,
-    final double semiMinorAxis, final double inverseFlattening,
-    final Authority authority, final boolean deprecated) {
+  public Spheroid(final String name, final double semiMajorAxis, final double semiMinorAxis,
+    final double inverseFlattening, final Authority authority, final boolean deprecated) {
     this.name = name;
     this.semiMajorAxis = semiMajorAxis;
     this.inverseFlattening = inverseFlattening;
@@ -43,8 +42,7 @@ public class Spheroid implements Serializable {
     this.deprecated = deprecated;
 
     if (Double.isNaN(inverseFlattening)) {
-      this.inverseFlattening = semiMajorAxis
-          / (semiMajorAxis - this.semiMinorAxis);
+      this.inverseFlattening = semiMajorAxis / (semiMajorAxis - this.semiMinorAxis);
     }
     final double f = 1.0 / this.inverseFlattening;
 
@@ -64,9 +62,8 @@ public class Spheroid implements Serializable {
   public boolean equals(final Object object) {
     if (object instanceof Spheroid) {
       final Spheroid spheroid = (Spheroid)object;
-      if (Double.doubleToLongBits(MathUtil.makePrecise(1000000.0,
-        this.inverseFlattening)) != Double.doubleToLongBits(MathUtil.makePrecise(
-          1000000.0, spheroid.inverseFlattening))) {
+      if (Double.doubleToLongBits(MathUtil.makePrecise(1000000.0, this.inverseFlattening)) != Double.doubleToLongBits(MathUtil.makePrecise(
+        1000000.0, spheroid.inverseFlattening))) {
         return false;
       } else if (Double.doubleToLongBits(this.semiMajorAxis) != Double.doubleToLongBits(spheroid.semiMajorAxis)) {
         return false;
@@ -129,8 +126,7 @@ public class Spheroid implements Serializable {
     final int prime = 31;
     int result = 1;
     long temp;
-    temp = Double.doubleToLongBits(MathUtil.makePrecise(1000000.0,
-      this.inverseFlattening));
+    temp = Double.doubleToLongBits(MathUtil.makePrecise(1000000.0, this.inverseFlattening));
     result = prime * result + (int)(temp ^ temp >>> 32);
     temp = Double.doubleToLongBits(this.semiMajorAxis);
     result = prime * result + (int)(temp ^ temp >>> 32);
@@ -142,8 +138,7 @@ public class Spheroid implements Serializable {
   }
 
   public double meridianRadiusOfCurvature(final double latitude) {
-    final double er = 1.0 - this.eccentricitySquared * Math.sin(latitude)
-        * Math.sin(latitude);
+    final double er = 1.0 - this.eccentricitySquared * Math.sin(latitude) * Math.sin(latitude);
     final double el = Math.pow(er, 1.5);
     final double m0 = this.semiMajorAxis * (1.0 - this.eccentricitySquared) / el;
     return m0;
@@ -153,7 +148,7 @@ public class Spheroid implements Serializable {
     final double t1 = this.semiMajorAxis * this.semiMajorAxis;
     final double t2 = t1 * Math.cos(latitude) * Math.cos(latitude);
     final double t3 = this.semiMinorAxis * this.semiMinorAxis * Math.sin(latitude)
-        * Math.sin(latitude);
+      * Math.sin(latitude);
     final double n0 = t1 / Math.sqrt(t2 + t3);
     return n0;
   }

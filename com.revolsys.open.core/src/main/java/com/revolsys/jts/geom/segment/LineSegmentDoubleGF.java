@@ -13,20 +13,19 @@ public class LineSegmentDoubleGF extends LineSegmentDouble {
   public LineSegmentDoubleGF() {
   }
 
-  public LineSegmentDoubleGF(final GeometryFactory geometryFactory,
-    final int axisCount, final double... coordinates) {
+  public LineSegmentDoubleGF(final GeometryFactory geometryFactory, final int axisCount,
+    final double... coordinates) {
     super(geometryFactory, axisCount, coordinates);
     setGeometryFactory(geometryFactory);
   }
 
-  public LineSegmentDoubleGF(final GeometryFactory geometryFactory,
-    final LineString line) {
+  public LineSegmentDoubleGF(final GeometryFactory geometryFactory, final LineString line) {
     super(geometryFactory, line);
     setGeometryFactory(geometryFactory);
   }
 
-  public LineSegmentDoubleGF(final GeometryFactory geometryFactory,
-    final Point point1, final Point point2) {
+  public LineSegmentDoubleGF(final GeometryFactory geometryFactory, final Point point1,
+    final Point point2) {
     super(geometryFactory, point1, point2);
     setGeometryFactory(geometryFactory);
   }
@@ -49,15 +48,13 @@ public class LineSegmentDoubleGF extends LineSegmentDouble {
   }
 
   @Override
-  protected LineSegment createLineSegment(
-    final GeometryFactory geometryFactory, final int axisCount,
-    final double... coordinates) {
+  protected LineSegment createLineSegment(final GeometryFactory geometryFactory,
+    final int axisCount, final double... coordinates) {
     return new LineSegmentDoubleGF(geometryFactory, axisCount, coordinates);
   }
 
   @Override
-  protected Point createPoint(final GeometryFactory geometryFactory,
-    final double... coordinates) {
+  protected Point createPoint(final GeometryFactory geometryFactory, final double... coordinates) {
     return new PointDoubleGf(geometryFactory, coordinates);
   }
 

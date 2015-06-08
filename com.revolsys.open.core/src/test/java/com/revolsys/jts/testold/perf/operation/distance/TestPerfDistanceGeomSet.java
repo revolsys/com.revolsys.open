@@ -8,12 +8,6 @@ import com.revolsys.jts.geom.util.SineStarFactory;
 import com.revolsys.jts.util.Stopwatch;
 
 public class TestPerfDistanceGeomSet {
-  public static void main(final String[] args) {
-    final TestPerfDistanceGeomSet test = new TestPerfDistanceGeomSet();
-    // test.test();
-    test.test();
-  }
-
   static final int MAX_ITER = 1;
 
   static final int NUM_GEOM = 100;
@@ -21,6 +15,12 @@ public class TestPerfDistanceGeomSet {
   static final double GEOM_SIZE = 1;
 
   static final double MAX_X = 100;
+
+  public static void main(final String[] args) {
+    final TestPerfDistanceGeomSet test = new TestPerfDistanceGeomSet();
+    // test.test();
+    test.test();
+  }
 
   boolean testFailed = false;
 
@@ -53,8 +53,7 @@ public class TestPerfDistanceGeomSet {
     return geoms;
   }
 
-  Geometry[] createRandomCircles(final int numGeom, final int nPtsMin,
-    final int nPtsMax) {
+  Geometry[] createRandomCircles(final int numGeom, final int nPtsMin, final int nPtsMax) {
     final int nPtsRange = nPtsMax - nPtsMin + 1;
     final Geometry[] geoms = new Geometry[numGeom];
     for (int i = 0; i < numGeom; i++) {
@@ -102,11 +101,11 @@ public class TestPerfDistanceGeomSet {
       testAll(geom);
     }
     if (!this.verbose) {
-      //  System.out.println(sw.getTimeString());
+      // System.out.println(sw.getTimeString());
     }
     if (this.verbose) {
-      //  System.out.println("Finished in " + sw.getTimeString());
-      //  System.out.println("       (Distance = " + dist + ")");
+      // System.out.println("Finished in " + sw.getTimeString());
+      // System.out.println("       (Distance = " + dist + ")");
     }
   }
 
@@ -117,7 +116,7 @@ public class TestPerfDistanceGeomSet {
     // Geometry[] geom = createSineStarsRandomLocation(nPts);
 
     if (this.verbose) {
-      //  System.out.println("Running with " + num + " points");
+      // System.out.println("Running with " + num + " points");
     }
     if (!this.verbose) {
       System.out.print(num + ", ");

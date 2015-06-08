@@ -17,8 +17,7 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
-public class QueryFilterField extends ValueField implements
-PropertyChangeListener {
+public class QueryFilterField extends ValueField implements PropertyChangeListener {
 
   /**
    *
@@ -31,19 +30,19 @@ PropertyChangeListener {
 
   private final AbstractRecordLayer layer;
 
-  public QueryFilterField(final AbstractRecordLayer layer,
-    final String fieldName, final String query) {
+  public QueryFilterField(final AbstractRecordLayer layer, final String fieldName,
+    final String query) {
     super(new VerticalLayout());
     this.layer = layer;
     this.queryField = new TextArea(fieldName, query, 5, 30);
     Property.addListener(this.queryField, fieldName, this);
     final ToolBar toolBar = new ToolBar();
 
-    toolBar.addButtonTitleIcon("search", "Advanced Search", "filter_edits",
-      this, "showAdvancedFilter");
+    toolBar.addButtonTitleIcon("search", "Advanced Search", "filter_edits", this,
+      "showAdvancedFilter");
 
-    this.clearButton = toolBar.addButtonTitleIcon("search", "Clear Filter",
-      "filter_delete", this.queryField, "setFieldValue", "");
+    this.clearButton = toolBar.addButtonTitleIcon("search", "Clear Filter", "filter_delete",
+      this.queryField, "setFieldValue", "");
     this.clearButton.setEnabled(Property.hasValue(this.queryField.getText()));
 
     add(toolBar);
@@ -97,8 +96,8 @@ PropertyChangeListener {
   }
 
   @Override
-  public void setFieldInvalid(final String message,
-    final Color foregroundColor, final Color backgroundColor) {
+  public void setFieldInvalid(final String message, final Color foregroundColor,
+    final Color backgroundColor) {
     this.queryField.setFieldInvalid(message, foregroundColor, backgroundColor);
   }
 
@@ -123,8 +122,8 @@ PropertyChangeListener {
   }
 
   public void showAdvancedFilter() {
-    final QueryWhereConditionField advancedFilter = new QueryWhereConditionField(
-      this.layer, this, this.queryField.getText());
+    final QueryWhereConditionField advancedFilter = new QueryWhereConditionField(this.layer, this,
+      this.queryField.getText());
     advancedFilter.showDialog(this);
   }
 

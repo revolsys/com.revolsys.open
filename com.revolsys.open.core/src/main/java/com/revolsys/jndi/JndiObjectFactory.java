@@ -28,8 +28,7 @@ public class JndiObjectFactory extends AbstractFactoryBean<Object> {
       initialEnvironment.put(Context.INITIAL_CONTEXT_FACTORY, initialFactory);
     }
     Object savedObject;
-    if (initialFactory == null
-        && !NamingManager.hasInitialContextFactoryBuilder()) {
+    if (initialFactory == null && !NamingManager.hasInitialContextFactoryBuilder()) {
       final SimpleNamingContextBuilder builder = SimpleNamingContextBuilder.emptyActivatedContextBuilder();
       synchronized (this.beanName.intern()) {
         savedObject = beanFactory.getBean(this.beanName);

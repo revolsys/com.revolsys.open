@@ -6,8 +6,7 @@ import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.JavaBeanUtil;
 
 public class BooleanImageKeySerializer extends AbstractKeySerializer {
-  public static boolean serialize(final XmlWriter out, final Object object,
-    final String name) {
+  public static boolean serialize(final XmlWriter out, final Object object, final String name) {
     final Object value = JavaBeanUtil.getBooleanValue(object, name);
     String text;
     String imageName;

@@ -28,10 +28,8 @@ public class MapGridGeometrySheetFilter implements Filter<Record> {
       final Geometry geometry = object.getGeometryValue();
       if (geometry != null) {
         final Geometry geographicsGeometry = geometry.convert(GeometryFactory.floating3(4326));
-        final Point centroid = geographicsGeometry.getCentroid()
-            .getPoint();
-        final String geometrySheet = this.grid.getMapTileName(centroid.getX(),
-          centroid.getY());
+        final Point centroid = geographicsGeometry.getCentroid().getPoint();
+        final String geometrySheet = this.grid.getMapTileName(centroid.getX(), centroid.getY());
         if (geometrySheet != null) {
           if (this.sheet.equals(geometrySheet) == !this.inverse) {
             return true;

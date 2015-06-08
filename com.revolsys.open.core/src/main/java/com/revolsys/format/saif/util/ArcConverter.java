@@ -22,8 +22,7 @@ public class ArcConverter implements OsnConverter {
     this.geometryFactory = geometryFactory;
   }
 
-  public ArcConverter(final GeometryFactory geometryFactory,
-    final String geometryType) {
+  public ArcConverter(final GeometryFactory geometryFactory, final String geometryType) {
     this.geometryFactory = geometryFactory;
     this.geometryType = geometryType;
   }
@@ -76,15 +75,14 @@ public class ArcConverter implements OsnConverter {
     return geometry;
   }
 
-  protected void readAttribute(final OsnIterator iterator,
-    final String fieldName, final Map<String, Object> values) {
+  protected void readAttribute(final OsnIterator iterator, final String fieldName,
+    final Map<String, Object> values) {
     final Object value = iterator.nextValue();
     values.put(fieldName, value);
   }
 
   @Override
-  public void write(final OsnSerializer serializer, final Object object)
-      throws IOException {
+  public void write(final OsnSerializer serializer, final Object object) throws IOException {
     final boolean writeAttributes = true;
     write(serializer, object, writeAttributes);
   }
@@ -126,15 +124,14 @@ public class ArcConverter implements OsnConverter {
       serializer.endCollection();
       serializer.endAttribute();
       if (writeAttributes) {
-        writeAttributes(serializer,
-          GeometryProperties.getGeometryProperties(line));
+        writeAttributes(serializer, GeometryProperties.getGeometryProperties(line));
       }
       serializer.endObject();
     }
   }
 
-  protected void writeAttribute(final OsnSerializer serializer,
-    final Map<String, Object> values, final String name) throws IOException {
+  protected void writeAttribute(final OsnSerializer serializer, final Map<String, Object> values,
+    final String name) throws IOException {
     final Object value = values.get(name);
     if (value != null) {
       serializer.endLine();
@@ -142,8 +139,8 @@ public class ArcConverter implements OsnConverter {
     }
   }
 
-  protected void writeAttributes(final OsnSerializer serializer,
-    final Map<String, Object> values) throws IOException {
+  protected void writeAttributes(final OsnSerializer serializer, final Map<String, Object> values)
+    throws IOException {
     writeEnumAttribute(serializer, values, "qualifier");
   }
 

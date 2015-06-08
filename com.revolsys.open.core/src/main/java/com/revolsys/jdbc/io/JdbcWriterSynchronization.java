@@ -3,8 +3,7 @@ package com.revolsys.jdbc.io;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-public class JdbcWriterSynchronization extends
-TransactionSynchronizationAdapter {
+public class JdbcWriterSynchronization extends TransactionSynchronizationAdapter {
 
   private final JdbcWriterResourceHolder writerHolder;
 

@@ -20,14 +20,12 @@ import com.revolsys.io.Writer;
 public class GpxReaderFactory extends AbstractRecordAndGeometryIoFactory {
   public GpxReaderFactory() {
     super("GPS Exchange Format", false, false);
-    addMediaTypeAndFileExtension(GpxConstants.MEDIA_TYPE,
-      GpxConstants.FILE_EXTENSION);
+    addMediaTypeAndFileExtension(GpxConstants.MEDIA_TYPE, GpxConstants.FILE_EXTENSION);
     setCustomAttributionSupported(false);
   }
 
-  public RecordReader createRecordReader(
-    final RecordDefinition recordDefinition, final Resource resource,
-    final RecordFactory factory) {
+  public RecordReader createRecordReader(final RecordDefinition recordDefinition,
+    final Resource resource, final RecordFactory factory) {
     throw new UnsupportedOperationException();
   }
 
@@ -39,22 +37,18 @@ public class GpxReaderFactory extends AbstractRecordAndGeometryIoFactory {
    * @return The reader for the file.
    */
   @Override
-  public RecordReader createRecordReader(final Resource resource,
-    final RecordFactory recordFactory) {
+  public RecordReader createRecordReader(final Resource resource, final RecordFactory recordFactory) {
     try {
-      final RecordIterator iterator = new GpxIterator(resource, recordFactory,
-        null);
+      final RecordIterator iterator = new GpxIterator(resource, recordFactory, null);
       return new RecordIteratorReader(iterator);
     } catch (final IOException e) {
-      throw new IllegalArgumentException("Unable to open resource " + resource,
-        e);
+      throw new IllegalArgumentException("Unable to open resource " + resource, e);
     }
   }
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream,
-    final Charset charset) {
+    final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
     return new GpxWriter(writer);
   }

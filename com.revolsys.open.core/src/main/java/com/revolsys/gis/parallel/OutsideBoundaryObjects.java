@@ -23,8 +23,7 @@ public class OutsideBoundaryObjects {
   }
 
   public boolean boundaryContains(final Geometry geometry) {
-    return geometry == null || this.boundary == null
-        || this.preparedBoundary.contains(geometry);
+    return geometry == null || this.boundary == null || this.preparedBoundary.contains(geometry);
   }
 
   public boolean boundaryContains(final Record object) {

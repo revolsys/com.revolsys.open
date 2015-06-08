@@ -105,8 +105,8 @@ public class SaifWriter extends AbstractRecordWriter {
     setFile(file);
   }
 
-  public SaifWriter(final File file,
-    final RecordDefinitionFactory recordDefinitionFactory) throws IOException {
+  public SaifWriter(final File file, final RecordDefinitionFactory recordDefinitionFactory)
+    throws IOException {
     this(file);
     setRecordDefinitionFactory(recordDefinitionFactory);
   }
@@ -115,8 +115,7 @@ public class SaifWriter extends AbstractRecordWriter {
     this(new File(fileName));
   }
 
-  public void addCompositeTypeName(final String typePath,
-    final String compositeTypeName) {
+  public void addCompositeTypeName(final String typePath, final String compositeTypeName) {
     this.compositeTypeNames.put(String.valueOf(typePath), compositeTypeName);
   }
 
@@ -137,8 +136,7 @@ public class SaifWriter extends AbstractRecordWriter {
     if (this.tempDirectory != null) {
       try {
         if (log.isInfoEnabled()) {
-          log.info("Closing SAIF archive '" + this.file.getCanonicalPath()
-            + "'");
+          log.info("Closing SAIF archive '" + this.file.getCanonicalPath() + "'");
         }
         createExports();
         createMissingDirObject("InternallyReferencedObjects", "internal.dir");
@@ -186,31 +184,28 @@ public class SaifWriter extends AbstractRecordWriter {
 
   private void createExports() throws IOException {
     final File exportsFile = new File(this.tempDirectory, "exports.dir");
-    final OsnSerializer exportsSerializer = createSerializer("/ExportedObject",
-      exportsFile, Long.MAX_VALUE);
+    final OsnSerializer exportsSerializer = createSerializer("/ExportedObject", exportsFile,
+      Long.MAX_VALUE);
     exportsSerializer.startObject("/ExportedObjects");
     exportsSerializer.fieldName("handles");
     exportsSerializer.startCollection("Set");
-    writeExport(exportsSerializer, "GlobalMetadata", "GlobalMetadata",
-        "globmeta.osn");
+    writeExport(exportsSerializer, "GlobalMetadata", "GlobalMetadata", "globmeta.osn");
     for (final Map<String, Object> export : this.exports.values()) {
       final String compositeType = (String)export.get("compositeType");
       final String referenceId = (String)export.get("referenceId");
       final String objectSubset = (String)export.get("objectSubset");
       String compositeTypeName = Path.getName(compositeType);
-      final String compositeNamespace = Path.getPath(compositeType).replaceAll(
-        "/", "");
+      final String compositeNamespace = Path.getPath(compositeType).replaceAll("/", "");
       if (Property.hasValue(compositeNamespace)) {
         compositeTypeName += "::" + compositeNamespace;
       }
-      writeExport(exportsSerializer, referenceId, compositeTypeName,
-        objectSubset);
+      writeExport(exportsSerializer, referenceId, compositeTypeName, objectSubset);
     }
     exportsSerializer.close();
   }
 
-  private void createMissingDirObject(final String typePath,
-    final String fileName) throws IOException {
+  private void createMissingDirObject(final String typePath, final String fileName)
+    throws IOException {
     if (!this.serializers.containsKey(typePath)) {
       final File file = new File(this.tempDirectory, fileName);
       final PrintStream out = new PrintStream(new FileOutputStream(file));
@@ -228,39 +223,30 @@ public class SaifWriter extends AbstractRecordWriter {
       try {
         addExport(GLOBAL_METADATA, GLOBAL_METADATA, "globmeta.osn");
         final File metaFile = new File(this.tempDirectory, "globmeta.osn");
-        final OsnSerializer serializer = createSerializer(GLOBAL_METADATA,
-          metaFile, Long.MAX_VALUE);
+        final OsnSerializer serializer = createSerializer(GLOBAL_METADATA, metaFile, Long.MAX_VALUE);
         serializer.startObject("/GlobalMetadata");
         serializer.attribute("objectIdentifier", "GlobalMetadata", true);
 
         serializer.fieldName("creationTime");
         serializer.startObject("/TimeStamp");
         final Date creationTimestamp = new Date(System.currentTimeMillis());
-        serializer.attribute("year", new BigDecimal(
-          creationTimestamp.getYear() + 1900), true);
-        serializer.attribute("month",
-          new BigDecimal(creationTimestamp.getMonth() + 1), true);
-        serializer.attribute("day",
-          new BigDecimal(creationTimestamp.getDate()), true);
-        serializer.attribute("hour",
-          new BigDecimal(creationTimestamp.getHours()), true);
-        serializer.attribute("minute",
-          new BigDecimal(creationTimestamp.getMinutes()), true);
-        serializer.attribute("second",
-          new BigDecimal(creationTimestamp.getSeconds()), true);
+        serializer.attribute("year", new BigDecimal(creationTimestamp.getYear() + 1900), true);
+        serializer.attribute("month", new BigDecimal(creationTimestamp.getMonth() + 1), true);
+        serializer.attribute("day", new BigDecimal(creationTimestamp.getDate()), true);
+        serializer.attribute("hour", new BigDecimal(creationTimestamp.getHours()), true);
+        serializer.attribute("minute", new BigDecimal(creationTimestamp.getMinutes()), true);
+        serializer.attribute("second", new BigDecimal(creationTimestamp.getSeconds()), true);
         serializer.endObject();
 
         serializer.fieldName("saifProfile");
         serializer.startObject("/Profile");
-        serializer.attribute("authority", "Government of British Columbia",
-          true);
+        serializer.attribute("authority", "Government of British Columbia", true);
         serializer.attribute("idName", "SAIFLite", true);
         serializer.attribute("version", "Release 1.1", true);
         serializer.endObject();
 
         serializer.attribute("saifRelease", "SAIF 3.2", true);
-        serializer.attribute("toolkitVersion",
-          "SAIF Toolkit Version 1.4.0 (May 05, 1997)", true);
+        serializer.attribute("toolkitVersion", "SAIF Toolkit Version 1.4.0 (May 05, 1997)", true);
 
         serializer.fieldName("userProfile");
         serializer.startObject("/UserProfile");
@@ -283,10 +269,9 @@ public class SaifWriter extends AbstractRecordWriter {
     }
   }
 
-  protected OsnSerializer createSerializer(final String typePath,
-    final File file, final long maxSize) throws IOException {
-    final OsnSerializer serializer = new OsnSerializer(typePath, file, maxSize,
-      this.converters);
+  protected OsnSerializer createSerializer(final String typePath, final File file,
+    final long maxSize) throws IOException {
+    final OsnSerializer serializer = new OsnSerializer(typePath, file, maxSize, this.converters);
     serializer.setIndentEnabled(this.indentEnabled);
     return serializer;
   }
@@ -372,11 +357,11 @@ public class SaifWriter extends AbstractRecordWriter {
           if (this.maxSubsetSize != Long.MAX_VALUE) {
             FileUtil.deleteFiles(this.tempDirectory,
               ObjectSetUtil.getObjectSubsetPrefix(objectSubsetName) + "...osn");
-            serializer = createSerializer(typePath, new File(
-              this.tempDirectory, objectSubsetName), this.maxSubsetSize);
+            serializer = createSerializer(typePath, new File(this.tempDirectory, objectSubsetName),
+              this.maxSubsetSize);
           } else {
-            serializer = createSerializer(typePath, new File(
-              this.tempDirectory, objectSubsetName), Long.MAX_VALUE);
+            serializer = createSerializer(typePath, new File(this.tempDirectory, objectSubsetName),
+              Long.MAX_VALUE);
           }
           if (compositeType.isInstanceOf(this.annotatedSpatialDataSetType)) {
             serializer.startObject(compositeType.getPath());
@@ -400,17 +385,16 @@ public class SaifWriter extends AbstractRecordWriter {
           addExport(typePath, compositeType.getPath(), objectSubsetName);
           this.serializers.put(typePath, serializer);
         } else if (typePath.equals("/ImportedObjects")) {
-          serializer = createSerializer("/ImportedObject", new File(
-            this.tempDirectory, "imports.dir"), Long.MAX_VALUE);
+          serializer = createSerializer("/ImportedObject", new File(this.tempDirectory,
+            "imports.dir"), Long.MAX_VALUE);
           this.serializers.put(typePath, serializer);
-        } else if (Path.getName(typePath).endsWith(
-            "InternallyReferencedObjects")) {
-          serializer = createSerializer("/InternallyReferencedObject",
-            new File(this.tempDirectory, "internal.dir"), Long.MAX_VALUE);
+        } else if (Path.getName(typePath).endsWith("InternallyReferencedObjects")) {
+          serializer = createSerializer("/InternallyReferencedObject", new File(this.tempDirectory,
+            "internal.dir"), Long.MAX_VALUE);
           this.serializers.put(typePath, serializer);
         } else if (Path.getName(typePath).endsWith("GlobalMetadata")) {
-          serializer = createSerializer(GLOBAL_METADATA, new File(
-            this.tempDirectory, "globmeta.osn"), Long.MAX_VALUE);
+          serializer = createSerializer(GLOBAL_METADATA, new File(this.tempDirectory,
+            "globmeta.osn"), Long.MAX_VALUE);
           addExport(typePath, typePath, "globmeta.osn");
           this.serializers.put(typePath, serializer);
         }
@@ -429,16 +413,15 @@ public class SaifWriter extends AbstractRecordWriter {
     if (!this.initialized) {
       this.initialized = true;
       if (this.schemaResource != null) {
-        final InputStream in = getClass().getResourceAsStream(
-          this.schemaResource);
+        final InputStream in = getClass().getResourceAsStream(this.schemaResource);
         if (in != null) {
           FileUtil.copy(in, new File(this.tempDirectory, "clasdefs.csn"));
         }
       }
       if (this.schemaFileNames != null) {
         try {
-          final OutputStream out = new FileOutputStream(new File(
-            this.tempDirectory, "clasdefs.csn"));
+          final OutputStream out = new FileOutputStream(
+            new File(this.tempDirectory, "clasdefs.csn"));
           try {
             for (final Resource resource : this.schemaFileNames) {
               final InputStream in = resource.getInputStream();
@@ -590,9 +573,8 @@ public class SaifWriter extends AbstractRecordWriter {
     }
   }
 
-  public void writeExport(final OsnSerializer exportsSerializer,
-    final String referenceId, final String compositeTypeName,
-    final String objectSubset) throws IOException {
+  public void writeExport(final OsnSerializer exportsSerializer, final String referenceId,
+    final String compositeTypeName, final String objectSubset) throws IOException {
     exportsSerializer.startObject("ExportedObjectHandle");
     exportsSerializer.attribute("referenceID", referenceId, true);
     exportsSerializer.attribute("type", compositeTypeName, true);

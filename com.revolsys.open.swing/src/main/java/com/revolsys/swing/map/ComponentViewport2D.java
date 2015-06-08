@@ -23,8 +23,7 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
-public class ComponentViewport2D extends Viewport2D implements
-PropertyChangeListener {
+public class ComponentViewport2D extends Viewport2D implements PropertyChangeListener {
 
   private final JComponent component;
 
@@ -56,8 +55,7 @@ PropertyChangeListener {
    * @param scale The scale.
    * @return The bounding box.
    */
-  public BoundingBox getBoundingBox(final double x, final double y,
-    final double scale) {
+  public BoundingBox getBoundingBox(final double x, final double y, final double scale) {
     final double width = getModelWidth(scale);
     final double height = getModelHeight(scale);
 
@@ -65,8 +63,7 @@ PropertyChangeListener {
     final double y1 = y - height / 2;
     final double x2 = x1 + width;
     final double y2 = y1 + height;
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(
-      getGeometryFactory(), 2, x1, y1, x2, y2);
+    final BoundingBox boundingBox = new BoundingBoxDoubleGf(getGeometryFactory(), 2, x1, y1, x2, y2);
     return boundingBox;
   }
 
@@ -80,12 +77,12 @@ PropertyChangeListener {
    * @param y2 The second y value.
    * @return The bounding box.
    */
-  public BoundingBox getBoundingBox(final double x1, final double y1,
-    final double x2, final double y2) {
+  public BoundingBox getBoundingBox(final double x1, final double y1, final double x2,
+    final double y2) {
     final double[] c1 = toModelCoordinates(x1, y1);
     final double[] c2 = toModelCoordinates(x2, y2);
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(
-      getGeometryFactory(), 2, c1[0], c1[1], c2[0], c2[1]);
+    final BoundingBox boundingBox = new BoundingBoxDoubleGf(getGeometryFactory(), 2, c1[0], c1[1],
+      c2[0], c2[1]);
 
     // Clip the bounding box with the map's visible area
     BoundingBox intersection = boundingBox.intersection(boundingBox);
@@ -122,7 +119,7 @@ PropertyChangeListener {
 
   public double getMaxScale() {
     final BoundingBox areaBoundingBox = getGeometryFactory().getCoordinateSystem()
-        .getAreaBoundingBox();
+      .getAreaBoundingBox();
     final Measurable<Length> areaWidth = areaBoundingBox.getWidthLength();
     final Measurable<Length> areaHeight = areaBoundingBox.getHeightLength();
 
@@ -143,8 +140,7 @@ PropertyChangeListener {
     return height;
   }
 
-  public <Q extends Quantity> Unit<Q> getModelToScreenUnit(
-    final Unit<Q> modelUnit) {
+  public <Q extends Quantity> Unit<Q> getModelToScreenUnit(final Unit<Q> modelUnit) {
     final double viewWidth = getViewWidthPixels();
     final double modelWidth = getModelWidth();
     return modelUnit.times(viewWidth).divide(modelWidth);
@@ -168,8 +164,7 @@ PropertyChangeListener {
    * @param y2 The second y value.
    * @return The rectangle.
    */
-  public Rectangle getRectangle(final int x1, final int y1, final int x2,
-    final int y2) {
+  public Rectangle getRectangle(final int x1, final int y1, final int x2, final int y2) {
     final int x3 = Math.min(getViewWidthPixels() - 1, Math.max(0, x2));
     final int y3 = Math.min(getViewHeightPixels() - 1, Math.max(0, y2));
 
@@ -181,14 +176,12 @@ PropertyChangeListener {
   }
 
   public Unit<Length> getScaleUnit(final double scale) {
-    final Unit<Length> lengthUnit = getGeometryFactory().getCoordinateSystem()
-        .getLengthUnit();
+    final Unit<Length> lengthUnit = getGeometryFactory().getCoordinateSystem().getLengthUnit();
     final Unit<Length> scaleUnit = lengthUnit.divide(scale);
     return scaleUnit;
   }
 
-  public <Q extends Quantity> Unit<Q> getScreenToModelUnit(
-    final Unit<Q> modelUnit) {
+  public <Q extends Quantity> Unit<Q> getScreenToModelUnit(final Unit<Q> modelUnit) {
     final double viewWidth = getViewWidthPixels();
     final double modelWidth = getModelWidth();
     return modelUnit.times(modelWidth).divide(viewWidth);
@@ -205,8 +198,8 @@ PropertyChangeListener {
      * units.
      */
     if (modelWidth == 0 && modelHeight == 0) {
-      validBoundingBox = validBoundingBox.expand(
-        getModelUnitsPerViewUnit() * 50, getModelUnitsPerViewUnit() * 50);
+      validBoundingBox = validBoundingBox.expand(getModelUnitsPerViewUnit() * 50,
+        getModelUnitsPerViewUnit() * 50);
       modelWidth = validBoundingBox.getWidth();
       modelHeight = validBoundingBox.getHeight();
     }
@@ -221,10 +214,9 @@ PropertyChangeListener {
     if (logUnits < 0 && Math.abs(Math.floor(logUnits)) > this.maxDecimalDigits) {
       modelUnitsPerViewUnit = 2 * Math.pow(10, -this.maxDecimalDigits);
       final double minModelWidth = getViewWidthPixels() * modelUnitsPerViewUnit;
-      final double minModelHeight = getViewHeightPixels()
-          * modelUnitsPerViewUnit;
-      validBoundingBox = validBoundingBox.expand(
-        (minModelWidth - modelWidth) / 2, (minModelHeight - modelHeight) / 2);
+      final double minModelHeight = getViewHeightPixels() * modelUnitsPerViewUnit;
+      validBoundingBox = validBoundingBox.expand((minModelWidth - modelWidth) / 2,
+        (minModelHeight - modelHeight) / 2);
     }
     return validBoundingBox;
   }
@@ -273,8 +265,8 @@ PropertyChangeListener {
         Math.max(logMaxX, logMaxY)));
       this.maxIntegerDigits = (int)Math.floor(maxLog + 1);
       this.maxDecimalDigits = 15 - this.maxIntegerDigits;
-      getPropertyChangeSupport().firePropertyChange("geometryFactory",
-        oldGeometryFactory, geometryFactory);
+      getPropertyChangeSupport().firePropertyChange("geometryFactory", oldGeometryFactory,
+        geometryFactory);
       final BoundingBox boundingBox = getBoundingBox();
       if (boundingBox != null) {
         final BoundingBox newBoundingBox = boundingBox.convert(geometryFactory);
@@ -298,9 +290,8 @@ PropertyChangeListener {
 
   public void translate(final double dx, final double dy) {
     final BoundingBox boundingBox = getBoundingBox();
-    final BoundingBox newBoundingBox = new BoundingBoxDoubleGf(
-      boundingBox.getGeometryFactory(), 2, boundingBox.getMinX() + dx,
-      boundingBox.getMinY() + dy, boundingBox.getMaxX() + dx,
+    final BoundingBox newBoundingBox = new BoundingBoxDoubleGf(boundingBox.getGeometryFactory(), 2,
+      boundingBox.getMinX() + dx, boundingBox.getMinY() + dy, boundingBox.getMaxX() + dx,
       boundingBox.getMaxY() + dy);
     setBoundingBox(newBoundingBox);
 
@@ -320,10 +311,8 @@ PropertyChangeListener {
       }
       final Insets insets = this.component.getInsets();
 
-      final int viewWidth = this.component.getWidth() - insets.left
-          - insets.right;
-      final int viewHeight = this.component.getHeight() - insets.top
-          - insets.bottom;
+      final int viewWidth = this.component.getWidth() - insets.left - insets.right;
+      final int viewHeight = this.component.getHeight() - insets.top - insets.bottom;
 
       setViewWidth(viewWidth);
       setViewHeight(viewHeight);

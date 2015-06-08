@@ -8,8 +8,7 @@ import com.revolsys.util.Cancellable;
 
 public class CancelIterable<T> extends AbstractIterator<T> {
 
-  public static <V> Iterable<V> i(final Cancellable cancellable,
-    final Iterable<V> iterable) {
+  public static <V> Iterable<V> i(final Cancellable cancellable, final Iterable<V> iterable) {
     if (cancellable == null) {
       return iterable;
     } else {
@@ -21,8 +20,7 @@ public class CancelIterable<T> extends AbstractIterator<T> {
 
   private Iterator<T> iterator;
 
-  public CancelIterable(final Cancellable cancellable,
-    final Iterable<T> iterable) {
+  public CancelIterable(final Cancellable cancellable, final Iterable<T> iterable) {
     this.cancellable = cancellable;
     this.iterator = iterable.iterator();
   }

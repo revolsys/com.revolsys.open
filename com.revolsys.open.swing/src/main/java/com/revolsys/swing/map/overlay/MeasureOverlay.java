@@ -44,12 +44,14 @@ public class MeasureOverlay extends AbstractOverlay {
    */
   private static final long serialVersionUID = 1L;
 
-  private static final Geometry EMPTY_GEOMETRY = GeometryFactory.wgs84()
-      .geometry();
+  private static final Geometry EMPTY_GEOMETRY = GeometryFactory.wgs84().geometry();
 
   public static final String MEASURE = "Measure";
 
   private static final Cursor CURSOR = Icons.getCursor("cursor_ruler", 8, 7);
+
+  private static final SelectedRecordsRenderer MEASURE_RENDERER = new SelectedRecordsRenderer(
+    WebColors.Black, WebColors.Magenta);
 
   private Geometry measureGeometry = EMPTY_GEOMETRY;
 
@@ -61,14 +63,11 @@ public class MeasureOverlay extends AbstractOverlay {
 
   private List<CloseLocation> mouseOverLocations = Collections.emptyList();
 
-  private static final SelectedRecordsRenderer MEASURE_RENDERER = new SelectedRecordsRenderer(
-    WebColors.Black, WebColors.Magenta);
-
   public MeasureOverlay(final MapPanel map) {
     super(map);
     setOverlayActionCursor(MEASURE, CURSOR);
-    addOverlayActionOverride(MEASURE, ZoomOverlay.ACTION_PAN,
-      ZoomOverlay.ACTION_ZOOM, ZoomOverlay.ACTION_ZOOM_BOX);
+    addOverlayActionOverride(MEASURE, ZoomOverlay.ACTION_PAN, ZoomOverlay.ACTION_ZOOM,
+      ZoomOverlay.ACTION_ZOOM_BOX);
   }
 
   private void cancel() {
@@ -148,8 +147,7 @@ public class MeasureOverlay extends AbstractOverlay {
     return this.mouseOverLocations;
   }
 
-  protected Geometry getVertexGeometry(final MouseEvent event,
-    final CloseLocation location) {
+  protected Geometry getVertexGeometry(final MouseEvent event, final CloseLocation location) {
     final Geometry geometry = location.getGeometry();
 
     int previousPointOffset;
@@ -203,8 +201,7 @@ public class MeasureOverlay extends AbstractOverlay {
       if (isOverlayAction(MEASURE) && !this.dragged) {
         cancel();
       }
-    } else if (keyCode == KeyEvent.VK_BACK_SPACE
-        || keyCode == KeyEvent.VK_DELETE) {
+    } else if (keyCode == KeyEvent.VK_BACK_SPACE || keyCode == KeyEvent.VK_DELETE) {
       if (!getMouseOverLocations().isEmpty()) {
         final Geometry geometry = deleteVertex();
         setMeasureGeometry(geometry);
@@ -337,8 +334,8 @@ public class MeasureOverlay extends AbstractOverlay {
     if (isOverlayAction(MEASURE)) {
 
       final BoundingBox boundingBox = getHotspotBoundingBox();
-      final CloseLocation location = findCloseLocation(null, null,
-        this.measureGeometry, boundingBox);
+      final CloseLocation location = findCloseLocation(null, null, this.measureGeometry,
+        boundingBox);
       final List<CloseLocation> locations = new ArrayList<>();
       if (location != null) {
         locations.add(location);
@@ -448,20 +445,20 @@ public class MeasureOverlay extends AbstractOverlay {
           unitString = coordinateSystem.getUnit().toString();
         }
       }
-      MEASURE_RENDERER.paintSelected(viewport, graphics,
-        viewportGeometryFactory, this.measureGeometry);
+      MEASURE_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
+        this.measureGeometry);
       final double length = viewportGeometryFactory.makeXyPrecise(this.length);
       final double area = viewportGeometryFactory.makeXyPrecise(this.area);
-      final String label = "Length:\t" + MathUtil.toString(length) + unitString
-          + "\n    Area:\t" + MathUtil.toString(area) + unitString;
+      final String label = "Length:\t" + MathUtil.toString(length) + unitString + "\n    Area:\t"
+        + MathUtil.toString(area) + unitString;
       final TextStyle MEASURE_TEXT_STYLE = new TextStyle();
       MEASURE_TEXT_STYLE.setTextHorizontalAlignment("left");
       MEASURE_TEXT_STYLE.setTextVerticalAlignment("top");
       MEASURE_TEXT_STYLE.setTextDx(Measure.valueOf(-15, NonSI.PIXEL));
       MEASURE_TEXT_STYLE.setTextDy(Measure.valueOf(-10, NonSI.PIXEL));
       // MEASURE_TEXT_STYLE.setTextBoxOpacity(128);
-      TextStyleRenderer.renderText(viewport, graphics, label,
-        this.measureGeometry, MEASURE_TEXT_STYLE);
+      TextStyleRenderer.renderText(viewport, graphics, label, this.measureGeometry,
+        MEASURE_TEXT_STYLE);
     }
     drawXorGeometry(graphics);
   }
@@ -506,8 +503,7 @@ public class MeasureOverlay extends AbstractOverlay {
     }
   }
 
-  protected boolean setMouseOverLocations(
-    final List<CloseLocation> mouseOverLocations) {
+  protected boolean setMouseOverLocations(final List<CloseLocation> mouseOverLocations) {
     if (this.mouseOverLocations.equals(mouseOverLocations)) {
       return !this.mouseOverLocations.isEmpty();
     } else {

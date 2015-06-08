@@ -1,6 +1,4 @@
 
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -48,9 +46,7 @@ import com.revolsys.jts.geomgraph.EdgeEndStar;
  *
  * @version 1.7
  */
-public class EdgeEndBundleStar
-extends EdgeEndStar
-{
+public class EdgeEndBundleStar extends EdgeEndStar {
   /**
    * Creates a new empty EdgeEndBundleStar
    */
@@ -65,14 +61,12 @@ extends EdgeEndStar
    * <br>
    */
   @Override
-  public void insert(final EdgeEnd e)
-  {
-    EdgeEndBundle eb = (EdgeEndBundle) this.edgeMap.get(e);
+  public void insert(final EdgeEnd e) {
+    EdgeEndBundle eb = (EdgeEndBundle)this.edgeMap.get(e);
     if (eb == null) {
       eb = new EdgeEndBundle(e);
       insertEdgeEnd(e, eb);
-    }
-    else {
+    } else {
       eb.insert(e);
     }
   }
@@ -80,10 +74,9 @@ extends EdgeEndStar
   /**
    * Update the IM with the contribution for the EdgeStubs around the node.
    */
-  void updateIM(final IntersectionMatrix im)
-  {
-    for (final Iterator it = iterator(); it.hasNext(); ) {
-      final EdgeEndBundle esb = (EdgeEndBundle) it.next();
+  void updateIM(final IntersectionMatrix im) {
+    for (final Iterator it = iterator(); it.hasNext();) {
+      final EdgeEndBundle esb = (EdgeEndBundle)it.next();
       esb.updateIM(im);
     }
   }

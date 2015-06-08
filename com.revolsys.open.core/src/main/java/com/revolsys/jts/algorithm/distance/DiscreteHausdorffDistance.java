@@ -81,8 +81,7 @@ public class DiscreteHausdorffDistance {
     return dist.distance();
   }
 
-  public static double distance(final Geometry g0, final Geometry g1,
-    final double densifyFrac) {
+  public static double distance(final Geometry g0, final Geometry g1, final double densifyFrac) {
     final DiscreteHausdorffDistance dist = new DiscreteHausdorffDistance(g0, g1);
     dist.setDensifyFraction(densifyFrac);
     return dist.distance();
@@ -109,8 +108,8 @@ public class DiscreteHausdorffDistance {
     computeOrientedDistance(g1, g0, this.ptDist);
   }
 
-  private void computeOrientedDistance(final Geometry discreteGeom,
-    final Geometry geom, final PointPairDistance ptDist) {
+  private void computeOrientedDistance(final Geometry discreteGeom, final Geometry geom,
+    final PointPairDistance ptDist) {
     final PointPairDistance maxPtDist = new PointPairDistance();
     final PointPairDistance minPtDist = new PointPairDistance();
     for (final Vertex vertex : discreteGeom.vertices()) {

@@ -18,11 +18,9 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.io.Writer;
 
 public class JsonRecordIoFactory extends AbstractRecordAndGeometryWriterFactory {
-  public static final Record toRecord(final RecordDefinition recordDefinition,
-    final String string) {
+  public static final Record toRecord(final RecordDefinition recordDefinition, final String string) {
     final StringReader in = new StringReader(string);
-    final JsonRecordIterator iterator = new JsonRecordIterator(recordDefinition, in,
-      true);
+    final JsonRecordIterator iterator = new JsonRecordIterator(recordDefinition, in, true);
     try {
       if (iterator.hasNext()) {
         return iterator.next();
@@ -53,10 +51,8 @@ public class JsonRecordIoFactory extends AbstractRecordAndGeometryWriterFactory 
   public static final String toString(final Record object) {
     final RecordDefinition recordDefinition = object.getRecordDefinition();
     final StringWriter writer = new StringWriter();
-    final JsonRecordWriter recordWriter = new JsonRecordWriter(recordDefinition,
-      writer);
-    recordWriter.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY,
-      Boolean.TRUE);
+    final JsonRecordWriter recordWriter = new JsonRecordWriter(recordDefinition, writer);
+    recordWriter.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, Boolean.TRUE);
     recordWriter.write(object);
     recordWriter.close();
     return writer.toString();
@@ -65,8 +61,7 @@ public class JsonRecordIoFactory extends AbstractRecordAndGeometryWriterFactory 
   public static String toString(final RecordDefinition recordDefinition,
     final List<? extends Map<String, Object>> list) {
     final StringWriter writer = new StringWriter();
-    final JsonRecordWriter recordWriter = new JsonRecordWriter(recordDefinition,
-      writer);
+    final JsonRecordWriter recordWriter = new JsonRecordWriter(recordDefinition, writer);
     for (final Map<String, Object> map : list) {
       final Record object = new ArrayRecord(recordDefinition);
       object.setValues(map);
@@ -90,8 +85,7 @@ public class JsonRecordIoFactory extends AbstractRecordAndGeometryWriterFactory 
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream,
-    final Charset charset) {
+    final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
     return new JsonRecordWriter(recordDefinition, writer);
   }

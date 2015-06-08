@@ -51,8 +51,8 @@ public class DaoMethodSelectField extends SelectField {
   @Override
   public void initialize(final Form form, final HttpServletRequest request) {
     try {
-      final List<Object> options = (List<Object>)MethodUtils.invokeMethod(
-        this.dataAccessObject, this.methodName, this.methodArguments.toArray());
+      final List<Object> options = (List<Object>)MethodUtils.invokeMethod(this.dataAccessObject,
+        this.methodName, this.methodArguments.toArray());
       for (final Object option : options) {
         addOption(option, option.toString());
       }

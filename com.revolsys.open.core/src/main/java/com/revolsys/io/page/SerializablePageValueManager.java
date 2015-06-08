@@ -35,8 +35,7 @@ public class SerializablePageValueManager<T> implements PageValueManager<T> {
       final byte[] sizeBytes = MethodPageValueManager.getValueIntBytes(size);
       final byte[] bytes = new byte[valueBytes.length + sizeBytes.length];
       System.arraycopy(sizeBytes, 0, bytes, 0, sizeBytes.length);
-      System.arraycopy(valueBytes, 0, bytes, sizeBytes.length,
-        valueBytes.length);
+      System.arraycopy(valueBytes, 0, bytes, sizeBytes.length, valueBytes.length);
       return bytes;
     } catch (final Exception e) {
       return (byte[])ExceptionUtil.throwUncheckedException(e);
@@ -47,8 +46,7 @@ public class SerializablePageValueManager<T> implements PageValueManager<T> {
   @SuppressWarnings("unchecked")
   public <V extends T> V getValue(final byte[] bytes) {
     try {
-      final ByteArrayInputStream bIn = new ByteArrayInputStream(bytes, 4,
-        bytes.length - 4);
+      final ByteArrayInputStream bIn = new ByteArrayInputStream(bytes, 4, bytes.length - 4);
       final ObjectInputStream in = new ObjectInputStream(bIn);
       return (V)in.readObject();
     } catch (final Exception e) {

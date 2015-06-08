@@ -102,8 +102,7 @@ public class XhtmlMapWriter extends AbstractMapWriter {
       if (isWritable(value)) {
         this.out.startTag(HtmlUtil.TR);
         // TODO case converter on key name
-        this.out.element(HtmlUtil.TH,
-          CaseConverter.toCapitalizedWords(key.toString()));
+        this.out.element(HtmlUtil.TH, CaseConverter.toCapitalizedWords(key.toString()));
         this.out.startTag(HtmlUtil.TD);
         if (value instanceof URI) {
           HtmlUtil.serializeA(this.out, null, value, value);

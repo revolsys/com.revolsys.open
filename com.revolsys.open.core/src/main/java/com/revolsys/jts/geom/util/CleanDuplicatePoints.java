@@ -109,8 +109,7 @@ public class CleanDuplicatePoints {
           final double x = ring.getX(i);
           final double y = ring.getY(i);
           if (x != previousX || y != previousY) {
-            CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++,
-              ring, i);
+            CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++, ring, i);
           }
           previousX = x;
           previousY = y;
@@ -144,8 +143,7 @@ public class CleanDuplicatePoints {
           final double x = line.getX(i);
           final double y = line.getY(i);
           if (x != previousX || y != previousY) {
-            CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++,
-              line, i);
+            CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++, line, i);
           }
           previousX = x;
           previousY = y;

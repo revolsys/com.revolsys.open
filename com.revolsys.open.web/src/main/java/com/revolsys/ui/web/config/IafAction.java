@@ -52,8 +52,7 @@ public abstract class IafAction {
    * @throws ServletException If there was an error running the action.
    * @throws IOException If an I/O error occurred.
    */
-  public abstract void process(
-    HttpServletRequest request,
-    HttpServletResponse response) throws ServletException, IOException;
+  public abstract void process(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException;
 
 }

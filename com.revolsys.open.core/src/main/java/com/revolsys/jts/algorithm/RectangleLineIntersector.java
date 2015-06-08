@@ -81,14 +81,10 @@ public class RectangleLineIntersector {
      * relative to the Left side of the rectangle.
      * Index 0 is the left side, 1 is the right side.
      */
-    this.diagUp0 = new PointDouble(rectEnv.getMinX(), rectEnv.getMinY(),
-      Point.NULL_ORDINATE);
-    this.diagUp1 = new PointDouble(rectEnv.getMaxX(), rectEnv.getMaxY(),
-      Point.NULL_ORDINATE);
-    this.diagDown0 = new PointDouble(rectEnv.getMinX(), rectEnv.getMaxY(),
-      Point.NULL_ORDINATE);
-    this.diagDown1 = new PointDouble(rectEnv.getMaxX(), rectEnv.getMinY(),
-      Point.NULL_ORDINATE);
+    this.diagUp0 = new PointDouble(rectEnv.getMinX(), rectEnv.getMinY(), Point.NULL_ORDINATE);
+    this.diagUp1 = new PointDouble(rectEnv.getMaxX(), rectEnv.getMaxY(), Point.NULL_ORDINATE);
+    this.diagDown0 = new PointDouble(rectEnv.getMinX(), rectEnv.getMaxY(), Point.NULL_ORDINATE);
+    this.diagDown1 = new PointDouble(rectEnv.getMaxX(), rectEnv.getMinY(), Point.NULL_ORDINATE);
   }
 
   /**

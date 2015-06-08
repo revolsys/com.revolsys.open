@@ -5,19 +5,17 @@ import org.springframework.core.io.Resource;
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.IoFactoryRegistry;
 
-public abstract class AbstractGeoReferencedImageFactory extends
-AbstractIoFactory implements GeoReferencedImageFactory {
+public abstract class AbstractGeoReferencedImageFactory extends AbstractIoFactory implements
+  GeoReferencedImageFactory {
 
-  public static GeoReferencedImageFactory getGeoReferencedImageFactory(
-    final Resource resource) {
+  public static GeoReferencedImageFactory getGeoReferencedImageFactory(final Resource resource) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
     final GeoReferencedImageFactory factory = ioFactoryRegistry.getFactoryByResource(
       GeoReferencedImageFactory.class, resource);
     return factory;
   }
 
-  public static GeoReferencedImageFactory getGeoReferencedImageFactory(
-    final String fileName) {
+  public static GeoReferencedImageFactory getGeoReferencedImageFactory(final String fileName) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
     final GeoReferencedImageFactory factory = ioFactoryRegistry.getFactoryByFileName(
       GeoReferencedImageFactory.class, fileName);
@@ -32,8 +30,7 @@ AbstractIoFactory implements GeoReferencedImageFactory {
     return getGeoReferencedImageFactory(fileName) != null;
   }
 
-  public static GeoReferencedImage loadGeoReferencedImage(
-    final Resource resource) {
+  public static GeoReferencedImage loadGeoReferencedImage(final Resource resource) {
     final GeoReferencedImageFactory factory = getGeoReferencedImageFactory(resource);
     if (factory == null) {
       return null;

@@ -35,8 +35,7 @@ public class Equals2DFilter<T extends Geometry> implements Filter<T> {
 
   @Override
   public boolean accept(final T geometry) {
-    if (Geometry2DEquals.INSTANCE.equals(this.geometry, geometry,
-      Collections.<String> emptySet())) {
+    if (Geometry2DEquals.INSTANCE.equals(this.geometry, geometry, Collections.<String> emptySet())) {
       return true;
     } else {
       return false;

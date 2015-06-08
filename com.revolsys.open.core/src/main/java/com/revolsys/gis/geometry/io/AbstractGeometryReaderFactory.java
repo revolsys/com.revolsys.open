@@ -12,8 +12,8 @@ import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.IoFactoryRegistry;
 
-public abstract class AbstractGeometryReaderFactory extends AbstractIoFactory
-implements GeometryReaderFactory {
+public abstract class AbstractGeometryReaderFactory extends AbstractIoFactory implements
+  GeometryReaderFactory {
   public static GeometryReader geometryReader(final Resource resource) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
     final GeometryReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
@@ -46,19 +46,15 @@ implements GeometryReaderFactory {
   }
 
   @Override
-  public boolean isCoordinateSystemSupported(
-    final CoordinateSystem coordinateSystem) {
+  public boolean isCoordinateSystemSupported(final CoordinateSystem coordinateSystem) {
     return this.coordinateSystems.contains(coordinateSystem);
   }
 
-  protected void setCoordinateSystems(
-    final CoordinateSystem... coordinateSystems) {
-    setCoordinateSystems(new LinkedHashSet<CoordinateSystem>(
-        Arrays.asList(coordinateSystems)));
+  protected void setCoordinateSystems(final CoordinateSystem... coordinateSystems) {
+    setCoordinateSystems(new LinkedHashSet<CoordinateSystem>(Arrays.asList(coordinateSystems)));
   }
 
-  protected void setCoordinateSystems(
-    final Set<CoordinateSystem> coordinateSystems) {
+  protected void setCoordinateSystems(final Set<CoordinateSystem> coordinateSystems) {
     this.coordinateSystems = coordinateSystems;
   }
 }

@@ -301,9 +301,7 @@ public final class SiteNode implements Comparable, Cloneable {
    * @param path The path.
    * @param controller The controller.
    */
-  public void setController(
-    final String path,
-    final SiteNodeController controller) {
+  public void setController(final String path, final SiteNodeController controller) {
     SiteNode controllerNode = controller.getNode();
     // If the controller's node already has a parent clone it.
     if (controllerNode.hasParent()) {

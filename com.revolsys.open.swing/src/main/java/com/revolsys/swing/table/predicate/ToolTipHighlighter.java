@@ -24,8 +24,7 @@ public class ToolTipHighlighter extends AbstractHighlighter {
   }
 
   @Override
-  protected Component doHighlight(final Component component,
-    final ComponentAdapter adapter) {
+  protected Component doHighlight(final Component component, final ComponentAdapter adapter) {
     adapter.getComponent().setToolTipText(this.text);
     return component;
   }

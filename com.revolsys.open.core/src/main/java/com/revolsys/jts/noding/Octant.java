@@ -34,6 +34,7 @@
 package com.revolsys.jts.noding;
 
 import com.revolsys.jts.geom.Point;
+
 /**
  * Methods for computing and working with octants of the Cartesian plane
  * Octants are numbered as follows:
@@ -55,10 +56,10 @@ public class Octant {
    * Returns the octant of a directed line segment (specified as x and y
    * displacements, which cannot both be 0).
    */
-  public static int octant(final double dx, final double dy)
-  {
+  public static int octant(final double dx, final double dy) {
     if (dx == 0.0 && dy == 0.0) {
-      throw new IllegalArgumentException("Cannot compute the octant for point ( "+ dx + ", " + dy + " )" );
+      throw new IllegalArgumentException("Cannot compute the octant for point ( " + dx + ", " + dy
+        + " )");
     }
 
     final double adx = Math.abs(dx);
@@ -71,24 +72,21 @@ public class Octant {
         } else {
           return 1;
         }
-      }
-      else { // dy < 0
+      } else { // dy < 0
         if (adx >= ady) {
           return 7;
         } else {
           return 6;
         }
       }
-    }
-    else { // dx < 0
+    } else { // dx < 0
       if (dy >= 0) {
         if (adx >= ady) {
           return 3;
         } else {
           return 2;
         }
-      }
-      else { // dy < 0
+      } else { // dy < 0
         if (adx >= ady) {
           return 4;
         } else {
@@ -101,8 +99,7 @@ public class Octant {
   /**
    * Returns the octant of a directed line segment from p0 to p1.
    */
-  public static int octant(final Point p0, final Point p1)
-  {
+  public static int octant(final Point p0, final Point p1) {
     final double dx = p1.getX() - p0.getX();
     final double dy = p1.getY() - p0.getY();
     if (dx == 0.0 && dy == 0.0) {

@@ -39,6 +39,37 @@ import com.revolsys.util.Property;
 public abstract class AbstractRecordLayerRenderer extends
   AbstractLayerRenderer<AbstractRecordLayer> {
 
+  private static final AcceptAllFilter<Record> DEFAULT_FILTER = new AcceptAllFilter<Record>();
+
+  private static final Map<String, Constructor<? extends AbstractRecordLayerRenderer>> RENDERER_CONSTRUCTORS = new HashMap<>();
+
+  static {
+    addRendererClass("geometryStyle", GeometryStyleRenderer.class);
+    addRendererClass("textStyle", TextStyleRenderer.class);
+    addRendererClass("markerStyle", MarkerStyleRenderer.class);
+    addRendererClass("multipleStyle", MultipleRenderer.class);
+    addRendererClass("scaleStyle", ScaleMultipleRenderer.class);
+    addRendererClass("filterStyle", FilterMultipleRenderer.class);
+
+    final MenuFactory menu = MenuFactory.getMenu(AbstractRecordLayerRenderer.class);
+    menu.addMenuItem("layer", MenuSourceRunnable.createAction("View/Edit Style", "palette",
+      new MenuSourcePropertyEnableCheck("editing", false), "showProperties"));
+    menu.addMenuItem("layer", MenuSourceRunnable.createAction("Delete", "delete",
+      new MenuSourcePropertyEnableCheck("parent", null, true), "delete"));
+
+    menu.addComponentFactory("scale", new TreeItemScaleMenu(true, null));
+    menu.addComponentFactory("scale", new TreeItemScaleMenu(false, null));
+
+    for (final String type : Arrays.asList("Multiple", "Filter", "Scale")) {
+      final String iconName = ("style_" + type + "_wrap").toLowerCase();
+      final ImageIcon icon = Icons.getIcon(iconName);
+      final InvokeMethodAction action = MenuSourceRunnable.createAction("Wrap With " + type
+        + " Style", icon, null, "wrapWith" + type + "Style");
+      menu.addMenuItem("wrap", action);
+    }
+
+  }
+
   public static void addRendererClass(final String name,
     final Class<? extends AbstractRecordLayerRenderer> clazz) {
     try {
@@ -108,37 +139,6 @@ public abstract class AbstractRecordLayerRenderer extends
   public static LayerRenderer<AbstractRecordLayer> getRenderer(final AbstractLayer layer,
     final Map<String, Object> style) {
     return getRenderer(layer, null, style);
-  }
-
-  private static final AcceptAllFilter<Record> DEFAULT_FILTER = new AcceptAllFilter<Record>();
-
-  private static final Map<String, Constructor<? extends AbstractRecordLayerRenderer>> RENDERER_CONSTRUCTORS = new HashMap<>();
-
-  static {
-    addRendererClass("geometryStyle", GeometryStyleRenderer.class);
-    addRendererClass("textStyle", TextStyleRenderer.class);
-    addRendererClass("markerStyle", MarkerStyleRenderer.class);
-    addRendererClass("multipleStyle", MultipleRenderer.class);
-    addRendererClass("scaleStyle", ScaleMultipleRenderer.class);
-    addRendererClass("filterStyle", FilterMultipleRenderer.class);
-
-    final MenuFactory menu = MenuFactory.getMenu(AbstractRecordLayerRenderer.class);
-    menu.addMenuItem("layer", MenuSourceRunnable.createAction("View/Edit Style", "palette",
-      new MenuSourcePropertyEnableCheck("editing", false), "showProperties"));
-    menu.addMenuItem("layer", MenuSourceRunnable.createAction("Delete", "delete",
-      new MenuSourcePropertyEnableCheck("parent", null, true), "delete"));
-
-    menu.addComponentFactory("scale", new TreeItemScaleMenu(true, null));
-    menu.addComponentFactory("scale", new TreeItemScaleMenu(false, null));
-
-    for (final String type : Arrays.asList("Multiple", "Filter", "Scale")) {
-      final String iconName = ("style_" + type + "_wrap").toLowerCase();
-      final ImageIcon icon = Icons.getIcon(iconName);
-      final InvokeMethodAction action = MenuSourceRunnable.createAction("Wrap With " + type
-        + " Style", icon, null, "wrapWith" + type + "Style");
-      menu.addMenuItem("wrap", action);
-    }
-
   }
 
   private Filter<Record> filter = DEFAULT_FILTER;

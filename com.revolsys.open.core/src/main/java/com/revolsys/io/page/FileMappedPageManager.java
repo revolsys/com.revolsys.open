@@ -39,8 +39,7 @@ public class FileMappedPageManager implements PageManager {
       this.randomAccessFile = new RandomAccessFile(file, "rw");
       this.fileChannel = this.randomAccessFile.getChannel();
     } catch (final FileNotFoundException e) {
-      throw new IllegalArgumentException("Unable to open file "
-          + file.getAbsolutePath(), e);
+      throw new IllegalArgumentException("Unable to open file " + file.getAbsolutePath(), e);
     }
   }
 
@@ -54,8 +53,7 @@ public class FileMappedPageManager implements PageManager {
           final long offset = (long)index * this.pageSize;
           this.randomAccessFile.setLength(offset + this.pageSize);
           final FileChannel channel = this.randomAccessFile.getChannel();
-          final MappedByteBuffer buffer = channel.map(MapMode.READ_WRITE,
-            offset, this.pageSize);
+          final MappedByteBuffer buffer = channel.map(MapMode.READ_WRITE, offset, this.pageSize);
           page = new FileMappedPage(this, index, buffer);
 
           this.pages.put(page.getIndex(), page);
@@ -94,8 +92,7 @@ public class FileMappedPageManager implements PageManager {
           page = loadPage(index);
         }
         if (this.pagesInUse.contains(page)) {
-          throw new IllegalArgumentException("Page is currently being used "
-              + index);
+          throw new IllegalArgumentException("Page is currently being used " + index);
         } else {
           this.pagesInUse.add(page);
           page.setOffset(0);
@@ -112,8 +109,8 @@ public class FileMappedPageManager implements PageManager {
 
   private Page loadPage(final int index) {
     try {
-      final MappedByteBuffer buffer = this.fileChannel.map(MapMode.READ_WRITE,
-        (long)index * this.pageSize, this.pageSize);
+      final MappedByteBuffer buffer = this.fileChannel.map(MapMode.READ_WRITE, (long)index
+        * this.pageSize, this.pageSize);
       final Page page = new FileMappedPage(this, index, buffer);
       this.pages.put(index, page);
       return page;

@@ -70,7 +70,7 @@ public class BoundaryTest extends TestCase {
     Geometry boundary = op.getBoundary();
     boundary = boundary.normalize();
     // System.out.println("Computed Boundary = " + boundary);
-    assertTrue(boundary.equals(2,expected));
+    assertTrue(boundary.equals(2, expected));
   }
 
   /**
@@ -81,25 +81,22 @@ public class BoundaryTest extends TestCase {
   public void test1() throws Exception {
     final String a = "MULTILINESTRING ((0 0, 10 10), (10 10, 20 20))";
     // under MultiValent, the common point is the only point on the boundary
-    runBoundaryTest(a, BoundaryNodeRule.MULTIVALENT_ENDPOINT_BOUNDARY_RULE,
-        "POINT (10 10)");
+    runBoundaryTest(a, BoundaryNodeRule.MULTIVALENT_ENDPOINT_BOUNDARY_RULE, "POINT (10 10)");
   }
 
   public void test2LinesTouchAtEndpoint2() throws Exception {
     final String a = "MULTILINESTRING ((0 0, 10 10), (10 10, 20 20))";
 
     // under Mod-2, the common point is not on the boundary
-    runBoundaryTest(a, BoundaryNodeRule.MOD2_BOUNDARY_RULE,
-        "MULTIPOINT ((0 0), (20 20))");
+    runBoundaryTest(a, BoundaryNodeRule.MOD2_BOUNDARY_RULE, "MULTIPOINT ((0 0), (20 20))");
     // under Endpoint, the common point is on the boundary
     runBoundaryTest(a, BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE,
-        "MULTIPOINT ((0 0), (10 10), (20 20))");
+      "MULTIPOINT ((0 0), (10 10), (20 20))");
     // under MonoValent, the common point is not on the boundary
     runBoundaryTest(a, BoundaryNodeRule.MONOVALENT_ENDPOINT_BOUNDARY_RULE,
-        "MULTIPOINT ((0 0), (20 20))");
+      "MULTIPOINT ((0 0), (20 20))");
     // under MultiValent, the common point is the only point on the boundary
-    runBoundaryTest(a, BoundaryNodeRule.MULTIVALENT_ENDPOINT_BOUNDARY_RULE,
-        "POINT (10 10)");
+    runBoundaryTest(a, BoundaryNodeRule.MULTIVALENT_ENDPOINT_BOUNDARY_RULE, "POINT (10 10)");
   }
 
   public void test3LinesTouchAtEndpoint2() throws Exception {
@@ -107,17 +104,16 @@ public class BoundaryTest extends TestCase {
 
     // under Mod-2, the common point is on the boundary (3 mod 2 = 1)
     runBoundaryTest(a, BoundaryNodeRule.MOD2_BOUNDARY_RULE,
-        "MULTIPOINT ((0 0), (10 10), (10 20), (20 20))");
+      "MULTIPOINT ((0 0), (10 10), (10 20), (20 20))");
     // under Endpoint, the common point is on the boundary (it is an endpoint)
     runBoundaryTest(a, BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE,
-        "MULTIPOINT ((0 0), (10 10), (10 20), (20 20))");
+      "MULTIPOINT ((0 0), (10 10), (10 20), (20 20))");
     // under MonoValent, the common point is not on the boundary (it has valence
     // > 1)
     runBoundaryTest(a, BoundaryNodeRule.MONOVALENT_ENDPOINT_BOUNDARY_RULE,
-        "MULTIPOINT ((0 0), (10 20), (20 20))");
+      "MULTIPOINT ((0 0), (10 20), (20 20))");
     // under MultiValent, the common point is the only point on the boundary
-    runBoundaryTest(a, BoundaryNodeRule.MULTIVALENT_ENDPOINT_BOUNDARY_RULE,
-        "POINT (10 10)");
+    runBoundaryTest(a, BoundaryNodeRule.MULTIVALENT_ENDPOINT_BOUNDARY_RULE, "POINT (10 10)");
   }
 
   public void testMultiLineStringWithRingTouchAtEndpoint() throws Exception {
@@ -125,12 +121,10 @@ public class BoundaryTest extends TestCase {
 
     // under Mod-2, the ring has no boundary, so the line intersects the
     // interior ==> not simple
-    runBoundaryTest(a, BoundaryNodeRule.MOD2_BOUNDARY_RULE,
-        "MULTIPOINT ((100 100), (100 200))");
+    runBoundaryTest(a, BoundaryNodeRule.MOD2_BOUNDARY_RULE, "MULTIPOINT ((100 100), (100 200))");
     // under Endpoint, the ring has a boundary point, so the line does NOT
     // intersect the interior ==> simple
-    runBoundaryTest(a, BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE,
-        "MULTIPOINT ((100 100), (100 200))");
+    runBoundaryTest(a, BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE, "MULTIPOINT ((100 100), (100 200))");
   }
 
   public void testRing() throws Exception {
@@ -138,8 +132,7 @@ public class BoundaryTest extends TestCase {
 
     // rings are simple under all rules
     runBoundaryTest(a, BoundaryNodeRule.MOD2_BOUNDARY_RULE, "MULTIPOINT EMPTY");
-    runBoundaryTest(a, BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE,
-        "POINT (100 100)");
+    runBoundaryTest(a, BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE, "POINT (100 100)");
   }
 
 }

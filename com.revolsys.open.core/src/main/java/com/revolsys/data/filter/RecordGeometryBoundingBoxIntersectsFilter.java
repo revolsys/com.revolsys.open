@@ -29,22 +29,19 @@ import com.revolsys.filter.FilterUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 
-public class RecordGeometryBoundingBoxIntersectsFilter implements
-Filter<Record> {
+public class RecordGeometryBoundingBoxIntersectsFilter implements Filter<Record> {
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
-  public static <D extends Record> List<D> filter(
-    final Collection<D> collection, final BoundingBox boundingBox) {
-    final Filter filter = new RecordGeometryBoundingBoxIntersectsFilter(
-      boundingBox);
+  public static <D extends Record> List<D> filter(final Collection<D> collection,
+    final BoundingBox boundingBox) {
+    final Filter filter = new RecordGeometryBoundingBoxIntersectsFilter(boundingBox);
     return FilterUtil.filter(collection, filter);
   }
 
   private final BoundingBox boundingBox;
 
-  public RecordGeometryBoundingBoxIntersectsFilter(
-    final BoundingBox boundingBox) {
+  public RecordGeometryBoundingBoxIntersectsFilter(final BoundingBox boundingBox) {
     this.boundingBox = boundingBox;
   }
 

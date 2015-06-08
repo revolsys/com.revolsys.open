@@ -25,8 +25,7 @@ public class LineStringDouble extends AbstractLineString {
     this(points.size(), axisCount);
     int i = 0;
     for (final Point point : points) {
-      CoordinatesListUtil.setCoordinates(this.coordinates, axisCount, i++,
-        point);
+      CoordinatesListUtil.setCoordinates(this.coordinates, axisCount, i++, point);
     }
   }
 
@@ -48,8 +47,7 @@ public class LineStringDouble extends AbstractLineString {
     this.axisCount = (byte)axisCount;
   }
 
-  public LineStringDouble(final int axisCount, final int vertexCount,
-    final double... coordinates) {
+  public LineStringDouble(final int axisCount, final int vertexCount, final double... coordinates) {
     if (coordinates == null || coordinates.length == 0) {
       this.axisCount = 2;
       this.coordinates = null;
@@ -58,15 +56,13 @@ public class LineStringDouble extends AbstractLineString {
       this.axisCount = (byte)axisCount;
       final int coordinateCount = vertexCount * axisCount;
       if (coordinates.length % axisCount != 0) {
-        throw new IllegalArgumentException("coordinates.length="
-            + coordinates.length + " must be a multiple of axisCount="
-            + axisCount);
+        throw new IllegalArgumentException("coordinates.length=" + coordinates.length
+          + " must be a multiple of axisCount=" + axisCount);
       } else if (coordinateCount == coordinates.length) {
         this.coordinates = coordinates;
       } else if (coordinateCount > coordinates.length) {
-        throw new IllegalArgumentException("axisCount=" + axisCount
-          + " * vertexCount=" + vertexCount + " > coordinates.length="
-          + coordinates.length);
+        throw new IllegalArgumentException("axisCount=" + axisCount + " * vertexCount="
+          + vertexCount + " > coordinates.length=" + coordinates.length);
       } else {
         this.coordinates = new double[coordinateCount];
         System.arraycopy(coordinates, 0, this.coordinates, 0, coordinateCount);
@@ -76,12 +72,11 @@ public class LineStringDouble extends AbstractLineString {
 
   public LineStringDouble(final int axisCount, final LineString points) {
     this(points.getVertexCount(), axisCount);
-    CoordinatesListUtil.setCoordinates(this.coordinates, axisCount, 0, points,
-      0, points.getVertexCount());
+    CoordinatesListUtil.setCoordinates(this.coordinates, axisCount, 0, points, 0,
+      points.getVertexCount());
   }
 
-  public LineStringDouble(final int axisCount,
-    final List<? extends Number> coordinates) {
+  public LineStringDouble(final int axisCount, final List<? extends Number> coordinates) {
     this(axisCount, MathUtil.toDoubleArray(coordinates));
   }
 

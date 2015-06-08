@@ -32,6 +32,21 @@ import com.revolsys.io.FileUtil;
  * @version 1.0
  */
 public final class Country implements Serializable {
+  /** The unique serial version UID for the class. */
+  private static final long serialVersionUID = -3530333279679048002L;
+
+  private static List<Country> countries;
+
+  private static Map<String, Country> countryCodeAlpha2Map = new HashMap<String, Country>();
+
+  private static Map<String, Country> countryPhoneCodeMap = new HashMap<String, Country>();
+
+  private static Map<String, Country> countryNameMap = new HashMap<String, Country>();
+
+  static {
+    loadCountryCodes();
+  }
+
   /**
    * Get the list of all countries.
    *
@@ -108,8 +123,7 @@ public final class Country implements Serializable {
       countries = new ArrayList<Country>();
       final InputStream in = Country.class.getResourceAsStream("CountryCodes.txt");
       if (in != null) {
-        final BufferedReader lineReader = new BufferedReader(
-          FileUtil.createUtf8Reader(in));
+        final BufferedReader lineReader = new BufferedReader(FileUtil.createUtf8Reader(in));
         try {
           String line = lineReader.readLine();
           for (line = lineReader.readLine(); line != null; line = lineReader.readLine()) {
@@ -134,9 +148,8 @@ public final class Country implements Serializable {
             if (columns.hasMoreTokens()) {
               phoneInternationalFormat = columns.nextToken();
             }
-            final Country country = new Country(num, alpha2, alpha3, name,
-              phoneCode, phoneRegEx, phoneNationalFormat,
-              phoneInternationalFormat);
+            final Country country = new Country(num, alpha2, alpha3, name, phoneCode, phoneRegEx,
+              phoneNationalFormat, phoneInternationalFormat);
             countries.add(country);
             countryCodeAlpha2Map.put(country.getCodeAplha2(), country);
             countryNameMap.put(name.toUpperCase(), country);
@@ -149,17 +162,6 @@ public final class Country implements Serializable {
     }
 
   }
-
-  /** The unique serial version UID for the class. */
-  private static final long serialVersionUID = -3530333279679048002L;
-
-  private static List<Country> countries;
-
-  private static Map<String, Country> countryCodeAlpha2Map = new HashMap<String, Country>();
-
-  private static Map<String, Country> countryPhoneCodeMap = new HashMap<String, Country>();
-
-  private static Map<String, Country> countryNameMap = new HashMap<String, Country>();
 
   private final short codeNum;
 
@@ -177,22 +179,17 @@ public final class Country implements Serializable {
 
   private String phoneInternationalFormat;
 
-  static {
-    loadCountryCodes();
-  }
-
-  private Country(final short codeNum, final String codeAplha2,
-    final String codeAlpha3, final String name) {
+  private Country(final short codeNum, final String codeAplha2, final String codeAlpha3,
+    final String name) {
     this.codeNum = codeNum;
     this.codeAplha2 = codeAplha2.toUpperCase().intern();
     this.codeAlpha3 = codeAlpha3.toUpperCase().intern();
     this.name = name.intern();
   }
 
-  private Country(final short codeNum, final String codeAplha2,
-    final String codeAlpha3, final String name, final String phoneCode,
-    final String phoneRegEx, final String phoneNationalFormat,
-    final String phoneInternationalFormat) {
+  private Country(final short codeNum, final String codeAplha2, final String codeAlpha3,
+    final String name, final String phoneCode, final String phoneRegEx,
+    final String phoneNationalFormat, final String phoneInternationalFormat) {
     this.codeNum = codeNum;
     this.codeAplha2 = codeAplha2.toUpperCase().intern();
     this.codeAlpha3 = codeAlpha3.toUpperCase().intern();

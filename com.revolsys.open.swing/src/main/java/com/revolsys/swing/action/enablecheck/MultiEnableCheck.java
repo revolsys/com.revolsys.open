@@ -7,8 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public abstract class MultiEnableCheck extends AbstractEnableCheck implements
-Iterable<EnableCheck> {
+public abstract class MultiEnableCheck extends AbstractEnableCheck implements Iterable<EnableCheck> {
 
   private List<EnableCheck> enableChecks = new ArrayList<>();
 
@@ -48,8 +47,7 @@ Iterable<EnableCheck> {
     return this.enableChecks.iterator();
   }
 
-  public void setEnableChecks(
-    final Collection<? extends EnableCheck> enableChecks) {
+  public void setEnableChecks(final Collection<? extends EnableCheck> enableChecks) {
     this.enableChecks = new ArrayList<EnableCheck>(enableChecks);
     isEnabled();
   }

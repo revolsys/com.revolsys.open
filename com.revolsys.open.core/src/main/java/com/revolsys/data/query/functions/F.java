@@ -9,23 +9,21 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 
 public class F {
-  public static WithinDistance dWithin(final FieldDefinition attribute,
-    final Geometry geometry, final double distance) {
-    return new WithinDistance(new Column(attribute), new Value(attribute,
-      geometry), new Value(distance));
-  }
-
-  public static WithinDistance dWithin(final String name,
-    final Geometry geometry, double distance) {
-    if (distance < 0) {
-      distance = 0;
-    }
-    return new WithinDistance(new Column(name), new Value(geometry), new Value(
+  public static WithinDistance dWithin(final FieldDefinition attribute, final Geometry geometry,
+    final double distance) {
+    return new WithinDistance(new Column(attribute), new Value(attribute, geometry), new Value(
       distance));
   }
 
-  public static EnvelopeIntersects envelopeIntersects(
-    final FieldDefinition attribute, final BoundingBox boundingBox) {
+  public static WithinDistance dWithin(final String name, final Geometry geometry, double distance) {
+    if (distance < 0) {
+      distance = 0;
+    }
+    return new WithinDistance(new Column(name), new Value(geometry), new Value(distance));
+  }
+
+  public static EnvelopeIntersects envelopeIntersects(final FieldDefinition attribute,
+    final BoundingBox boundingBox) {
     if (attribute == null) {
       return null;
     } else {
@@ -35,14 +33,14 @@ public class F {
     }
   }
 
-  public static EnvelopeIntersects envelopeIntersects(
-    final FieldDefinition attribute, final Geometry geometry) {
+  public static EnvelopeIntersects envelopeIntersects(final FieldDefinition attribute,
+    final Geometry geometry) {
     return new EnvelopeIntersects(new Column(attribute), new Value(attribute,
       geometry.getBoundingBox()));
   }
 
-  public static EnvelopeIntersects envelopeIntersects(
-    final RecordDefinition recordDefinition, final BoundingBox boundingBox) {
+  public static EnvelopeIntersects envelopeIntersects(final RecordDefinition recordDefinition,
+    final BoundingBox boundingBox) {
     final FieldDefinition attribute = recordDefinition.getGeometryField();
     return envelopeIntersects(attribute, boundingBox);
   }
@@ -57,13 +55,13 @@ public class F {
     return new Lower(value);
   }
 
-  public static RegexpReplace regexpReplace(final QueryValue value,
-    final String pattern, final String replace) {
+  public static RegexpReplace regexpReplace(final QueryValue value, final String pattern,
+    final String replace) {
     return new RegexpReplace(value, pattern, replace);
   }
 
-  public static RegexpReplace regexpReplace(final QueryValue value,
-    final String pattern, final String replace, final String flags) {
+  public static RegexpReplace regexpReplace(final QueryValue value, final String pattern,
+    final String replace, final String flags) {
     return new RegexpReplace(value, pattern, replace, flags);
   }
 

@@ -126,8 +126,7 @@ public class OffsetCurveSetBuilder {
    * <br>Left: Location.EXTERIOR
    * <br>Right: Location.INTERIOR
    */
-  private void addCurve(final LineString points, final Location leftLoc,
-    final Location rightLoc) {
+  private void addCurve(final LineString points, final Location leftLoc, final Location rightLoc) {
     if (points != null && points.getVertexCount() >= 2) {
       final Label label = new Label(0, Location.BOUNDARY, leftLoc, rightLoc);
       final NodedSegmentString segment = new NodedSegmentString(points, label);
@@ -178,8 +177,8 @@ public class OffsetCurveSetBuilder {
       return;
     }
 
-    addPolygonRing(shellCoord, shellClockwise, offsetDistance, offsetSide,
-      Location.EXTERIOR, Location.INTERIOR);
+    addPolygonRing(shellCoord, shellClockwise, offsetDistance, offsetSide, Location.EXTERIOR,
+      Location.INTERIOR);
 
     for (int i = 0; i < p.getHoleCount(); i++) {
       final LinearRing hole = p.getHole(i);
@@ -193,8 +192,8 @@ public class OffsetCurveSetBuilder {
         // the interior of the polygon lies on their opposite side
         // (on the left, if the hole is oriented CCW)
         final int opposite = Position.opposite(offsetSide);
-        addPolygonRing(holeCoord, holeClockwise, offsetDistance, opposite,
-          Location.INTERIOR, Location.EXTERIOR);
+        addPolygonRing(holeCoord, holeClockwise, offsetDistance, opposite, Location.INTERIOR,
+          Location.EXTERIOR);
       }
     }
   }
@@ -213,11 +212,9 @@ public class OffsetCurveSetBuilder {
    * @param cwRightLoc the location on the R side of the ring (if it is CW)
    */
   private void addPolygonRing(final LineString points, final boolean clockwise,
-    final double offsetDistance, int side, final Location cwLeftLoc,
-    final Location cwRightLoc) {
+    final double offsetDistance, int side, final Location cwLeftLoc, final Location cwRightLoc) {
     // don't bother adding ring if it is "flat" and will disappear in the output
-    if (offsetDistance == 0.0
-        && points.getVertexCount() < LinearRing.MINIMUM_VALID_SIZE) {
+    if (offsetDistance == 0.0 && points.getVertexCount() < LinearRing.MINIMUM_VALID_SIZE) {
       return;
     }
 
@@ -228,8 +225,7 @@ public class OffsetCurveSetBuilder {
       rightLoc = cwLeftLoc;
       side = Position.opposite(side);
     }
-    final LineString curve = this.curveBuilder.getRingCurve(points, side,
-      offsetDistance);
+    final LineString curve = this.curveBuilder.getRingCurve(points, side, offsetDistance);
     addCurve(curve, leftLoc, rightLoc);
   }
 
@@ -254,8 +250,7 @@ public class OffsetCurveSetBuilder {
    * @param offsetDistance
    * @return
    */
-  private boolean isErodedCompletely(final LinearRing ring,
-    final double bufferDistance) {
+  private boolean isErodedCompletely(final LinearRing ring, final double bufferDistance) {
     // degenerate ring has no area
     if (ring.getVertexCount() < 4) {
       return bufferDistance < 0;
@@ -296,11 +291,10 @@ public class OffsetCurveSetBuilder {
    */
   private boolean isTriangleErodedCompletely(final LinearRing triangleCoord,
     final double bufferDistance) {
-    final Triangle tri = new Triangle(triangleCoord.getVertex(0),
-      triangleCoord.getVertex(1), triangleCoord.getVertex(2));
+    final Triangle tri = new Triangle(triangleCoord.getVertex(0), triangleCoord.getVertex(1),
+      triangleCoord.getVertex(2));
     final Point inCentre = tri.inCentre();
-    final double distToCentre = LineSegmentUtil.distanceLinePoint(tri.p0,
-      tri.p1, inCentre);
+    final double distToCentre = LineSegmentUtil.distanceLinePoint(tri.p0, tri.p1, inCentre);
     return distToCentre < Math.abs(bufferDistance);
   }
 

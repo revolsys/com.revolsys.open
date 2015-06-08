@@ -54,25 +54,21 @@ public class EsriCoordinateSystems {
     }
   }
 
-  public static void createPrjFile(final File file,
-    final GeometryFactory geometryFactory) {
+  public static void createPrjFile(final File file, final GeometryFactory geometryFactory) {
     final FileSystemResource resource = new FileSystemResource(file);
     createPrjFile(resource, geometryFactory);
   }
 
-  public static void createPrjFile(final Resource resource,
-    final GeometryFactory geometryFactory) {
+  public static void createPrjFile(final Resource resource, final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem != null) {
         final int srid = coordinateSystem.getId();
-        final Resource prjResource = SpringUtil.getResourceWithExtension(
-          resource, "prj");
+        final Resource prjResource = SpringUtil.getResourceWithExtension(resource, "prj");
         if (!(prjResource instanceof NonExistingResource)) {
           try (
             final OutputStream out = SpringUtil.getOutputStream(prjResource);
-            final PrintWriter writer = new PrintWriter(
-              FileUtil.createUtf8Writer(out));) {
+            final PrintWriter writer = new PrintWriter(FileUtil.createUtf8Writer(out));) {
             final CoordinateSystem esriCoordinateSystem = CoordinateSystems.getCoordinateSystem(new QName(
               "ESRI", String.valueOf(srid)));
             EsriCsWktWriter.write(writer, esriCoordinateSystem, -1);
@@ -85,8 +81,7 @@ public class EsriCoordinateSystems {
     }
   }
 
-  public static CoordinateSystem getCoordinateSystem(
-    final CoordinateSystem coordinateSystem) {
+  public static CoordinateSystem getCoordinateSystem(final CoordinateSystem coordinateSystem) {
     if (coordinateSystem == null) {
       return null;
     } else {
@@ -143,8 +138,7 @@ public class EsriCoordinateSystems {
    * @return
    */
   public static GeometryFactory getGeometryFactory(final Resource resource) {
-    final Resource projResource = SpringUtil.getResourceWithExtension(resource,
-      "prj");
+    final Resource projResource = SpringUtil.getResourceWithExtension(resource, "prj");
     if (projResource.exists()) {
       try {
         final CoordinateSystem coordinateSystem = getCoordinateSystem(projResource);

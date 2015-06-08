@@ -36,14 +36,12 @@ public class AttributesEqualIgnoreCaseFilter implements Filter<Record> {
 
   private final Record object;
 
-  public AttributesEqualIgnoreCaseFilter(final Record object,
-    final Collection<String> fieldNames) {
+  public AttributesEqualIgnoreCaseFilter(final Record object, final Collection<String> fieldNames) {
     this.fieldNames = fieldNames;
     this.object = object;
   }
 
-  public AttributesEqualIgnoreCaseFilter(final Record object,
-    final String... fieldNames) {
+  public AttributesEqualIgnoreCaseFilter(final Record object, final String... fieldNames) {
     this(object, Arrays.asList(fieldNames));
   }
 

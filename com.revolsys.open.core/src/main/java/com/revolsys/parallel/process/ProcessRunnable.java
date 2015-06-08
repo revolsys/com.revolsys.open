@@ -7,8 +7,7 @@ public class ProcessRunnable extends AbstractRunnable {
 
   private final Process process;
 
-  public ProcessRunnable(final ProcessNetwork processManager,
-    final Process process) {
+  public ProcessRunnable(final ProcessNetwork processManager, final Process process) {
     this.processManager = processManager;
     this.process = process;
   }

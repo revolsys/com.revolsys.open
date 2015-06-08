@@ -15,11 +15,11 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.SpringLayoutUtil;
 
 public class DashField extends ValueField implements ItemListener {
+  private static final long serialVersionUID = -1435164163638312884L;
+
   private static List<Double> createDash(final Double... dashArray) {
     return Arrays.asList(dashArray);
   }
-
-  private static final long serialVersionUID = -1435164163638312884L;
 
   private final JComboBox<List<Double>> dashField;
 

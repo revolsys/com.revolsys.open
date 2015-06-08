@@ -60,8 +60,8 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.MultipleUndo;
 
-public class EditGeometryOverlay extends AbstractOverlay implements
-PropertyChangeListener, MouseListener, MouseMotionListener {
+public class EditGeometryOverlay extends AbstractOverlay implements PropertyChangeListener,
+  MouseListener, MouseMotionListener {
 
   private class AddGeometryUndoEdit extends AbstractUndoableEdit {
 
@@ -82,8 +82,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
     @Override
     public boolean canRedo() {
       if (super.canRedo()) {
-        if (GeometryEqualsExact3d.equal(this.oldGeometry,
-          EditGeometryOverlay.this.addGeometry)) {
+        if (GeometryEqualsExact3d.equal(this.oldGeometry, EditGeometryOverlay.this.addGeometry)) {
           return true;
         }
       }
@@ -93,8 +92,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
     @Override
     public boolean canUndo() {
       if (super.canUndo()) {
-        if (GeometryEqualsExact3d.equal(this.newGeometry,
-          EditGeometryOverlay.this.addGeometry)) {
+        if (GeometryEqualsExact3d.equal(this.newGeometry, EditGeometryOverlay.this.addGeometry)) {
           return true;
         }
       }
@@ -164,13 +162,11 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
     setOverlayActionCursor(ACTION_MOVE_GEOMETRY, CURSOR_MOVE);
     setOverlayActionCursor(ACTION_EDIT_GEOMETRY_VERTICES, CURSOR_NODE_EDIT);
 
-    addOverlayActionOverride(ACTION_ADD_GEOMETRY, ZoomOverlay.ACTION_PAN,
-      ZoomOverlay.ACTION_ZOOM, ZoomOverlay.ACTION_ZOOM_BOX,
-      ACTION_MOVE_GEOMETRY);
-    addOverlayActionOverride(ACTION_MOVE_GEOMETRY, ZoomOverlay.ACTION_PAN,
-      ZoomOverlay.ACTION_ZOOM);
-    addOverlayActionOverride(ACTION_EDIT_GEOMETRY_VERTICES,
-      ZoomOverlay.ACTION_PAN, ZoomOverlay.ACTION_ZOOM, ACTION_MOVE_GEOMETRY);
+    addOverlayActionOverride(ACTION_ADD_GEOMETRY, ZoomOverlay.ACTION_PAN, ZoomOverlay.ACTION_ZOOM,
+      ZoomOverlay.ACTION_ZOOM_BOX, ACTION_MOVE_GEOMETRY);
+    addOverlayActionOverride(ACTION_MOVE_GEOMETRY, ZoomOverlay.ACTION_PAN, ZoomOverlay.ACTION_ZOOM);
+    addOverlayActionOverride(ACTION_EDIT_GEOMETRY_VERTICES, ZoomOverlay.ACTION_PAN,
+      ZoomOverlay.ACTION_ZOOM, ACTION_MOVE_GEOMETRY);
   }
 
   /**
@@ -194,12 +190,11 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
         setAddGeometryDataType(geometryField.getType());
         setMapCursor(CURSOR_NODE_ADD);
 
-        if (Arrays.asList(DataTypes.POINT, DataTypes.LINE_STRING,
-          DataTypes.MULTI_POINT, DataTypes.MULTI_LINE_STRING).contains(
-            this.addGeometryDataType)) {
+        if (Arrays.asList(DataTypes.POINT, DataTypes.LINE_STRING, DataTypes.MULTI_POINT,
+          DataTypes.MULTI_LINE_STRING).contains(this.addGeometryDataType)) {
           this.addGeometryPartIndex = new int[0];
-        } else if (Arrays.asList(DataTypes.MULTI_POLYGON, DataTypes.POLYGON)
-            .contains(this.addGeometryDataType)) {
+        } else if (Arrays.asList(DataTypes.MULTI_POLYGON, DataTypes.POLYGON).contains(
+          this.addGeometryDataType)) {
           this.addGeometryPartIndex = new int[] {
             0
           };
@@ -212,8 +207,8 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
     }
   }
 
-  private void addRecords(final List<LayerRecord> results,
-    final LayerGroup group, final Geometry boundingBox) {
+  private void addRecords(final List<LayerRecord> results, final LayerGroup group,
+    final Geometry boundingBox) {
     final double scale = getViewport().getScale();
     final List<Layer> layers = group.getLayers();
     Collections.reverse(layers);
@@ -236,8 +231,8 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
     }
   }
 
-  protected void addSelectedObjects(final List<LayerRecord> objects,
-    final LayerGroup group, final BoundingBox boundingBox) {
+  protected void addSelectedObjects(final List<LayerRecord> objects, final LayerGroup group,
+    final BoundingBox boundingBox) {
     final double scale = getViewport().getScale();
     for (final Layer layer : group.getLayers()) {
       if (layer instanceof LayerGroup) {
@@ -253,8 +248,8 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
     }
   }
 
-  protected boolean addSnapLayers(final Set<AbstractRecordLayer> layers,
-    final Project project, final AbstractRecordLayer layer, final double scale) {
+  protected boolean addSnapLayers(final Set<AbstractRecordLayer> layers, final Project project,
+    final AbstractRecordLayer layer, final double scale) {
     if (layer != null) {
       if (layer.isSnapToAllLayers()) {
         return true;
@@ -311,7 +306,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
           geometry = line.appendVertex(newPoint, geometryPartIndex);
         }
       } else if (DataTypes.POLYGON.equals(geometryDataType)
-          || DataTypes.MULTI_POLYGON.equals(geometryDataType)) {
+        || DataTypes.MULTI_POLYGON.equals(geometryDataType)) {
         if (geometry instanceof Point) {
           final Point point = (Point)geometry;
           geometry = geometryFactory.lineString(point, newPoint);
@@ -319,8 +314,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
           final LineString line = (LineString)geometry;
           final Point p0 = line.getPoint(0);
           final Point p1 = line.getPoint(1);
-          final LinearRing ring = geometryFactory.linearRing(Arrays.asList(p0,
-            p1, newPoint, p0));
+          final LinearRing ring = geometryFactory.linearRing(Arrays.asList(p0, p1, newPoint, p0));
           geometry = geometryFactory.polygon(ring);
         } else if (geometry instanceof Polygon) {
           final Polygon polygon = (Polygon)geometry;
@@ -367,11 +361,9 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
 
   }
 
-  protected void fireActionPerformed(final ActionListener listener,
-    final String command) {
+  protected void fireActionPerformed(final ActionListener listener, final String command) {
     if (listener != null) {
-      final ActionEvent actionEvent = new ActionEvent(this, this.actionId++,
-        command);
+      final ActionEvent actionEvent = new ActionEvent(this, this.actionId++, command);
       listener.actionPerformed(actionEvent);
     }
   }
@@ -385,8 +377,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
   }
 
   public Point getClosestPoint(final GeometryFactory geometryFactory,
-    final LineSegment closestSegment, final Point point,
-    final double maxDistance) {
+    final LineSegment closestSegment, final Point point, final double maxDistance) {
     final LineSegment segment = closestSegment.convert(geometryFactory);
     final Point fromPoint = segment.getPoint(0);
     final Point toPoint = segment.getPoint(1);
@@ -407,14 +398,11 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
   }
 
   public DataType getGeometryPartDataType(final DataType dataType) {
-    if (Arrays.asList(DataTypes.POINT, DataTypes.MULTI_POINT)
-        .contains(dataType)) {
+    if (Arrays.asList(DataTypes.POINT, DataTypes.MULTI_POINT).contains(dataType)) {
       return DataTypes.POINT;
-    } else if (Arrays.asList(DataTypes.LINE_STRING, DataTypes.MULTI_LINE_STRING)
-        .contains(dataType)) {
+    } else if (Arrays.asList(DataTypes.LINE_STRING, DataTypes.MULTI_LINE_STRING).contains(dataType)) {
       return DataTypes.LINE_STRING;
-    } else if (Arrays.asList(DataTypes.POLYGON, DataTypes.MULTI_POLYGON)
-        .contains(dataType)) {
+    } else if (Arrays.asList(DataTypes.POLYGON, DataTypes.MULTI_POLYGON).contains(dataType)) {
       return DataTypes.POLYGON;
     } else {
       return DataTypes.GEOMETRY;
@@ -425,8 +413,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
     return getGraphics();
   }
 
-  public Point getLineNextVertex(final LineString line, final int vertexIndex,
-    final int offset) {
+  public Point getLineNextVertex(final LineString line, final int vertexIndex, final int offset) {
     final int nextVertexIndex = vertexIndex + offset;
     if (nextVertexIndex < line.getVertexCount()) {
       return line.getPoint(nextVertexIndex);
@@ -435,8 +422,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
     }
   }
 
-  public Point getLinePreviousVertex(final LineString line,
-    final int vertexIndex, final int offset) {
+  public Point getLinePreviousVertex(final LineString line, final int vertexIndex, final int offset) {
     final int previousVertexIndex = vertexIndex + offset;
     if (previousVertexIndex < 0) {
       return null;
@@ -477,8 +463,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
     return new ArrayList<AbstractRecordLayer>(layers);
   }
 
-  protected Geometry getVertexGeometry(final MouseEvent event,
-    final CloseLocation location) {
+  protected Geometry getVertexGeometry(final MouseEvent event, final CloseLocation location) {
     final Geometry geometry = location.getGeometry();
     final DataType geometryDataType = DataTypes.getType(geometry);
     final DataType geometryPartDataType = getGeometryPartDataType(geometryDataType);
@@ -502,7 +487,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
       Point nextPoint = null;
 
       if (DataTypes.LINE_STRING.equals(geometryPartDataType)
-          || DataTypes.POLYGON.equals(geometryPartDataType)) {
+        || DataTypes.POLYGON.equals(geometryPartDataType)) {
         if (previousPointOffset == 0) {
           previousPoint = vertex;
         } else {
@@ -526,8 +511,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
   }
 
   protected boolean isEditable(final AbstractRecordLayer recordLayer) {
-    return recordLayer.isExists() && recordLayer.isVisible()
-        && recordLayer.isCanEditRecords();
+    return recordLayer.isExists() && recordLayer.isVisible() && recordLayer.isCanEditRecords();
   }
 
   protected boolean isGeometryValid(final Geometry geometry) {
@@ -590,8 +574,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
       }
     } else if (keyCode == KeyEvent.VK_ALT) {
       if (!this.dragged) {
-        if (!getMouseOverLocations().isEmpty()
-            && !this.editGeometryVerticesStart) {
+        if (!getMouseOverLocations().isEmpty() && !this.editGeometryVerticesStart) {
           if (setOverlayAction(ACTION_MOVE_GEOMETRY)) {
             updateMouseOverLocations();
           }
@@ -626,8 +609,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
           }
         }
       }
-    } else if (keyCode == KeyEvent.VK_BACK_SPACE
-        || keyCode == KeyEvent.VK_DELETE) {
+    } else if (keyCode == KeyEvent.VK_BACK_SPACE || keyCode == KeyEvent.VK_DELETE) {
       if (!getMouseOverLocations().isEmpty()) {
         final MultipleUndo edit = new MultipleUndo();
         for (final CloseLocation location : getMouseOverLocations()) {
@@ -639,8 +621,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
               if (newGeometry.isEmpty()) {
                 Toolkit.getDefaultToolkit().beep();
               } else {
-                final UndoableEdit geometryEdit = setGeometry(location,
-                  newGeometry);
+                final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
                 edit.addEdit(geometryEdit);
               }
             } catch (final Throwable t) {
@@ -710,8 +691,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
             if (this.addGeometry.isEmpty()) {
               setAddGeometry(point);
             } else {
-              final int[] toVertexId = AbstractGeometry.createVertexId(
-                this.addGeometryPartIndex, 0);
+              final int[] toVertexId = AbstractGeometry.createVertexId(this.addGeometryPartIndex, 0);
               final Point previousPoint = this.addGeometry.getToVertex(toVertexId);
               if (!point.equals(previousPoint)) {
                 final Geometry newGeometry = appendVertex(point);
@@ -746,8 +726,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
           setXorGeometry(null);
           event.consume();
           if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
-            final int[] toVertexId = AbstractGeometry.createVertexId(
-              this.addGeometryPartIndex, 0);
+            final int[] toVertexId = AbstractGeometry.createVertexId(this.addGeometryPartIndex, 0);
             final Point previousPoint = this.addGeometry.getToVertex(toVertexId);
             if (!point.equals(previousPoint)) {
               final Geometry newGeometry = appendVertex(point);
@@ -839,12 +818,11 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
 
   protected boolean modeAddGeometryMove(final MouseEvent event) {
     if (this.addGeometry != null) {
-      if (isOverlayAction(ACTION_ADD_GEOMETRY)
-          || isOverlayAction(ACTION_MOVE_GEOMETRY)) {
+      if (isOverlayAction(ACTION_ADD_GEOMETRY) || isOverlayAction(ACTION_MOVE_GEOMETRY)) {
 
         final BoundingBox boundingBox = getHotspotBoundingBox();
-        final CloseLocation location = findCloseLocation(this.addLayer, null,
-          this.addGeometry, boundingBox);
+        final CloseLocation location = findCloseLocation(this.addLayer, null, this.addGeometry,
+          boundingBox);
         final List<CloseLocation> locations = new ArrayList<>();
         if (location != null) {
           locations.add(location);
@@ -893,8 +871,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
     if (!hasSnapPoint(boundingBox)) {
       setMapCursor(CURSOR_NODE_ADD);
     }
-    final int[] firstVertexId = AbstractGeometry.createVertexId(
-      this.addGeometryPartIndex, 0);
+    final int[] firstVertexId = AbstractGeometry.createVertexId(this.addGeometryPartIndex, 0);
     Geometry xorGeometry = null;
 
     if (DataTypes.POINT.equals(this.addGeometryPartDataType)) {
@@ -935,8 +912,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
   }
 
   protected boolean modeEditGeometryVerticesDrag(final MouseEvent event) {
-    if (this.editGeometryVerticesStart
-        && isOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES)) {
+    if (this.editGeometryVerticesStart && isOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES)) {
       this.dragged = true;
 
       final BoundingBox boundingBox = getHotspotBoundingBox(event);
@@ -1003,13 +979,12 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
 
   protected boolean modeEditGeometryVerticesMove(final MouseEvent event) {
     if (canOverrideOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES)
-        || isOverlayAction(ACTION_MOVE_GEOMETRY)) {
+      || isOverlayAction(ACTION_MOVE_GEOMETRY)) {
       final BoundingBox boundingBox = getHotspotBoundingBox(event);
       final List<LayerRecord> selectedRecords = getSelectedRecords(boundingBox);
       final List<CloseLocation> closeLocations = new ArrayList<CloseLocation>();
       for (final LayerRecord record : selectedRecords) {
-        final CloseLocation closeLocation = findCloseLocation(record,
-          boundingBox);
+        final CloseLocation closeLocation = findCloseLocation(record, boundingBox);
         if (closeLocation != null) {
           closeLocations.add(closeLocation);
         }
@@ -1083,8 +1058,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
   }
 
   protected boolean modeMoveGeometryStart(final MouseEvent event) {
-    if (isOverlayAction(ACTION_MOVE_GEOMETRY)
-        && event.getButton() == MouseEvent.BUTTON1) {
+    if (isOverlayAction(ACTION_MOVE_GEOMETRY) && event.getButton() == MouseEvent.BUTTON1) {
       this.moveGeometryStart = this.moveGeometryEnd = getEventPoint();
       this.moveGeometryLocations = getMouseOverLocations();
       clearMouseOverLocations();
@@ -1096,8 +1070,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
   @Override
   public void mouseClicked(final MouseEvent event) {
     if (modeAddGeometryClick(event)) {
-    } else if (SwingUtil.isLeftButtonAndNoModifiers(event)
-        && event.getClickCount() == 2) {
+    } else if (SwingUtil.isLeftButtonAndNoModifiers(event) && event.getClickCount() == 2) {
       final List<LayerRecord> records = new ArrayList<LayerRecord>();
       final BoundingBox boundingBox = getHotspotBoundingBox(event);
       final Geometry boundary = boundingBox.toPolygon().prepare();
@@ -1117,9 +1090,9 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
         JOptionPane.showMessageDialog(
           this,
           "There are too many "
-              + size
-              + " selected to view. Maximum 10. Select fewer records or move mouse to middle of geometry.",
-              "Too Many Selected Records", JOptionPane.ERROR_MESSAGE);
+            + size
+            + " selected to view. Maximum 10. Select fewer records or move mouse to middle of geometry.",
+          "Too Many Selected Records", JOptionPane.ERROR_MESSAGE);
         event.consume();
       }
     }
@@ -1173,8 +1146,8 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
             final double deltaY = to.getY() - from.getY();
             Geometry geometry = location.getGeometry();
             geometry = geometry.move(deltaX, deltaY);
-            MOVE_GEOMETRY_RENDERER.paintSelected(viewport, graphics,
-              viewportGeometryFactory, geometry);
+            MOVE_GEOMETRY_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
+              geometry);
           }
         }
       } finally {
@@ -1236,8 +1209,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
     this.addGeometryPartDataType = getGeometryPartDataType(dataType);
   }
 
-  protected UndoableEdit setGeometry(final CloseLocation location,
-    final Geometry newGeometry) {
+  protected UndoableEdit setGeometry(final CloseLocation location, final Geometry newGeometry) {
     if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
       if (GeometryEqualsExact3d.equal(newGeometry, this.addGeometry)) {
         return null;
@@ -1253,14 +1225,12 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
         return null;
       } else {
         final AbstractRecordLayer layer = location.getLayer();
-        return layer.createPropertyEdit(object, geometryFieldName, oldValue,
-          newGeometry);
+        return layer.createPropertyEdit(object, geometryFieldName, oldValue, newGeometry);
       }
     }
   }
 
-  protected boolean setMouseOverLocations(
-    final List<CloseLocation> mouseOverLocations) {
+  protected boolean setMouseOverLocations(final List<CloseLocation> mouseOverLocations) {
     if (this.mouseOverLocations.equals(mouseOverLocations)) {
       return !this.mouseOverLocations.isEmpty();
     } else {
@@ -1276,8 +1246,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
   protected boolean splitLineKeyPress(final KeyEvent e) {
     final int keyCode = e.getKeyCode();
     if (keyCode == KeyEvent.VK_K) {
-      if (!isOverlayAction(ACTION_ADD_GEOMETRY)
-          && !getMouseOverLocations().isEmpty()) {
+      if (!isOverlayAction(ACTION_ADD_GEOMETRY) && !getMouseOverLocations().isEmpty()) {
         for (final CloseLocation mouseLocation : getMouseOverLocations()) {
           final LayerRecord record = mouseLocation.getRecord();
           final AbstractRecordLayer layer = record.getLayer();

@@ -40,8 +40,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
     super(typePath, title);
   }
 
-  public RecordHtmlUiBuilder(final String typePath, final String title,
-    final String pluralTitle) {
+  public RecordHtmlUiBuilder(final String typePath, final String title, final String pluralTitle) {
     super(typePath, title, pluralTitle);
   }
 
@@ -52,14 +51,13 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
     setIdPropertyName(idPropertyName);
   }
 
-  public Object createDataTableHandler(final HttpServletRequest request,
-    final String pageName) {
+  public Object createDataTableHandler(final HttpServletRequest request, final String pageName) {
     final Map<String, Object> parameters = Collections.emptyMap();
     return createDataTableHandler(request, pageName, parameters);
   }
 
-  public Object createDataTableHandler(final HttpServletRequest request,
-    final String pageName, final Map<String, Object> parameters) {
+  public Object createDataTableHandler(final HttpServletRequest request, final String pageName,
+    final Map<String, Object> parameters) {
     if (isDataTableCallback(request)) {
       return createDataTableMap(request, pageName, parameters);
     } else {
@@ -69,9 +67,8 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
     }
   }
 
-  public Object createDataTableHandlerOrRedirect(
-    final HttpServletRequest request, final HttpServletResponse response,
-    final String pageName, final Object parentBuilder,
+  public Object createDataTableHandlerOrRedirect(final HttpServletRequest request,
+    final HttpServletResponse response, final String pageName, final Object parentBuilder,
     final String parentPageName, final Map<String, Object> parameters) {
     if (isDataTableCallback(request)) {
       return createDataTableMap(request, pageName, parameters);
@@ -81,9 +78,8 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
   }
 
   @SuppressWarnings("unchecked")
-  public Map<String, Object> createDataTableMap(
-    final HttpServletRequest request, final String pageName,
-    final Map<String, Object> parameters) {
+  public Map<String, Object> createDataTableMap(final HttpServletRequest request,
+    final String pageName, final Map<String, Object> parameters) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     Query query = (Query)parameters.get("query");
     if (query == null) {
@@ -96,8 +92,8 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
     return createDataTableMap(request, pageName, query);
   }
 
-  protected Map<String, Object> createDataTableMap(
-    final HttpServletRequest request, final String pageName, final Query query) {
+  protected Map<String, Object> createDataTableMap(final HttpServletRequest request,
+    final String pageName, final Query query) {
     final String search = request.getParameter("search[value]");
     final List<String> columnNames = new ArrayList<>();
     final List<KeySerializer> serializers = getSerializers(pageName, "list");
@@ -109,8 +105,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
         final String columnName = JavaBeanUtil.getFirstName(serializer.getKey());
         columnNames.add(columnName);
         if (Property.hasValue(search)) {
-          if (HttpServletUtils.getBooleanParameter(request, "columns[" + i
-            + "][searchable]")) {
+          if (HttpServletUtils.getBooleanParameter(request, "columns[" + i + "][searchable]")) {
             or.add(Q.iLike("T." + columnName, search));
           }
         }
@@ -121,15 +116,13 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
     if (!or.isEmpty()) {
       query.and(or);
     }
-    final Map<String, Boolean> orderBy = getDataTableSortOrder(columnNames,
-      request);
+    final Map<String, Boolean> orderBy = getDataTableSortOrder(columnNames, request);
     query.setOrderBy(orderBy);
 
     return createDataTableMap(request, getRecordStore(), query, pageName);
   }
 
-  public Object createDataTableMap(final String pageName,
-    final Map<String, Object> parameters) {
+  public Object createDataTableMap(final String pageName, final Map<String, Object> parameters) {
     final HttpServletRequest request = HttpServletUtils.getRequest();
     return createDataTableMap(request, pageName, parameters);
   }

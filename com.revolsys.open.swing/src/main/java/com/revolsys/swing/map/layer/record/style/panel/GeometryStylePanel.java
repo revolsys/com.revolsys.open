@@ -22,8 +22,7 @@ import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.util.JavaBeanUtil;
 
-public class GeometryStylePanel extends BaseStylePanel implements
-PropertyChangeListener {
+public class GeometryStylePanel extends BaseStylePanel implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   private final GeometryStyleRenderer geometryStyleRenderer;
@@ -101,8 +100,8 @@ PropertyChangeListener {
   }
 
   protected void addGeometryPreview(final DataType geometryDataType) {
-    final GeometryStylePreview linePreview = new GeometryStylePreview(
-      this.geometryStyle, geometryDataType);
+    final GeometryStylePreview linePreview = new GeometryStylePreview(this.geometryStyle,
+      geometryDataType);
     this.previews.add(linePreview);
   }
 

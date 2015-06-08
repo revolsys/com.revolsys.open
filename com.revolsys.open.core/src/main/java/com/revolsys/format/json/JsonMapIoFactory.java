@@ -25,8 +25,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.Property;
 
-public class JsonMapIoFactory extends AbstractMapReaderFactory implements
-MapWriterFactory {
+public class JsonMapIoFactory extends AbstractMapReaderFactory implements MapWriterFactory {
   public static Map<String, Object> toMap(final File file) {
     if (file == null) {
       return new LinkedHashMap<String, Object>();
@@ -36,8 +35,7 @@ MapWriterFactory {
     }
   }
 
-  public static Map<String, Object> toMap(final File directory,
-    final String path) {
+  public static Map<String, Object> toMap(final File directory, final String path) {
     if (directory == null || path == null) {
       return new LinkedHashMap<String, Object>();
     } else {
@@ -58,7 +56,7 @@ MapWriterFactory {
       try {
         final java.io.Reader reader = FileUtil.createUtf8Reader(in);
         try (
-            final JsonMapIterator iterator = new JsonMapIterator(reader, true)) {
+          final JsonMapIterator iterator = new JsonMapIterator(reader, true)) {
           if (iterator.hasNext()) {
             return iterator.next();
           } else {
@@ -72,8 +70,7 @@ MapWriterFactory {
   }
 
   public static final Map<String, Object> toMap(final Resource resource) {
-    if (resource != null
-        && (!(resource instanceof FileSystemResource) || resource.exists())) {
+    if (resource != null && (!(resource instanceof FileSystemResource) || resource.exists())) {
       try {
         final InputStream in = resource.getInputStream();
         return toMap(in);
@@ -117,8 +114,7 @@ MapWriterFactory {
   public static Map<String, Object> toObjectMap(final String string) {
     if (Property.hasValue(string)) {
       final StringReader reader = new StringReader(string);
-      final Reader<Map<String, Object>> mapReader = new JsonMapReader(reader,
-        true);
+      final Reader<Map<String, Object>> mapReader = new JsonMapReader(reader, true);
       for (final Map<String, Object> map : mapReader) {
         return map;
       }
@@ -139,50 +135,47 @@ MapWriterFactory {
   public static String toString(final Map<String, ? extends Object> values) {
     final StringWriter writer = new StringWriter();
     try (
-        final JsonWriter jsonWriter = new JsonWriter(writer, false)) {
+      final JsonWriter jsonWriter = new JsonWriter(writer, false)) {
       jsonWriter.write(values);
     }
     return writer.toString();
   }
 
-  public static String toString(final Map<String, ? extends Object> values,
-    final boolean indent) {
+  public static String toString(final Map<String, ? extends Object> values, final boolean indent) {
     final StringWriter writer = new StringWriter();
     try (
-        final JsonWriter jsonWriter = new JsonWriter(writer, indent)) {
+      final JsonWriter jsonWriter = new JsonWriter(writer, indent)) {
       jsonWriter.write(values);
     }
     return writer.toString();
   }
 
-  public static void write(final Map<String, ? extends Object> object,
-    final File file) {
+  public static void write(final Map<String, ? extends Object> object, final File file) {
     final FileSystemResource resource = new FileSystemResource(file);
     write(object, resource);
   }
 
-  public static void write(final Map<String, ? extends Object> object,
-    final File file, final boolean indent) {
+  public static void write(final Map<String, ? extends Object> object, final File file,
+    final boolean indent) {
     final FileSystemResource resource = new FileSystemResource(file);
     write(object, resource, indent);
   }
 
-  public static void write(final Map<String, ? extends Object> object,
-    final Resource resource) {
+  public static void write(final Map<String, ? extends Object> object, final Resource resource) {
     try (
-        final Writer writer = SpringUtil.getWriter(resource);
-        final JsonMapWriter out = new JsonMapWriter(writer);) {
+      final Writer writer = SpringUtil.getWriter(resource);
+      final JsonMapWriter out = new JsonMapWriter(writer);) {
       out.setSingleObject(true);
       out.write(object);
     } catch (final IOException e) {
     }
   }
 
-  public static void write(final Map<String, ? extends Object> object,
-    final Resource resource, final boolean indent) {
+  public static void write(final Map<String, ? extends Object> object, final Resource resource,
+    final boolean indent) {
     try (
-        final Writer writer = SpringUtil.getWriter(resource);
-        final JsonMapWriter out = new JsonMapWriter(writer, indent);) {
+      final Writer writer = SpringUtil.getWriter(resource);
+      final JsonMapWriter out = new JsonMapWriter(writer, indent);) {
       out.setSingleObject(true);
       out.write(object);
     } catch (final IOException e) {

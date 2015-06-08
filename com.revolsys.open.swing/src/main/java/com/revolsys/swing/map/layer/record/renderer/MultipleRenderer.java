@@ -26,28 +26,25 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
 
   private static final Icon ICON = Icons.getIcon("style_multiple");
 
-  public MultipleRenderer(final AbstractRecordLayer layer,
-    final LayerRenderer<?> parent) {
+  public MultipleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
     this(layer, parent, Collections.<String, Object> emptyMap());
   }
 
-  public MultipleRenderer(final AbstractRecordLayer layer,
-    final LayerRenderer<?> parent, final Map<String, Object> multipleStyle) {
+  public MultipleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
+    final Map<String, Object> multipleStyle) {
     super("multipleStyle", layer, parent, multipleStyle);
     setIcon(ICON);
   }
 
   public void addStyle(final GeometryStyle style) {
-    final GeometryStyleRenderer renderer = new GeometryStyleRenderer(
-      getLayer(), this, style);
+    final GeometryStyleRenderer renderer = new GeometryStyleRenderer(getLayer(), this, style);
     addRenderer(renderer);
   }
 
   // Needed for filter styles
   @Override
-  public void renderRecord(final Viewport2D viewport,
-    final BoundingBox visibleArea, final AbstractLayer layer,
-    final LayerRecord record) {
+  public void renderRecord(final Viewport2D viewport, final BoundingBox visibleArea,
+    final AbstractLayer layer, final LayerRecord record) {
     if (isVisible(record)) {
       for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
         final long scale = (long)viewport.getScale();
@@ -56,10 +53,8 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
             renderer.renderRecord(viewport, visibleArea, layer, record);
           } catch (final TopologyException e) {
           } catch (final Throwable e) {
-            ExceptionUtil.log(
-              getClass(),
-              "Unabled to render " + layer.getName() + " #"
-                  + record.getIdentifier(), e);
+            ExceptionUtil.log(getClass(),
+              "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
           }
         }
       }
@@ -67,8 +62,8 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
   }
 
   @Override
-  protected void renderRecords(final Viewport2D viewport,
-    final AbstractRecordLayer layer, final List<LayerRecord> records) {
+  protected void renderRecords(final Viewport2D viewport, final AbstractRecordLayer layer,
+    final List<LayerRecord> records) {
     final List<LayerRecord> visibleRecords = new ArrayList<>();
     for (final LayerRecord record : records) {
       if (isVisible(record) && !layer.isHidden(record)) {
@@ -88,8 +83,8 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
   }
 
   @Override
-  public void renderSelectedRecord(final Viewport2D viewport,
-    final AbstractLayer layer, final LayerRecord object) {
+  public void renderSelectedRecord(final Viewport2D viewport, final AbstractLayer layer,
+    final LayerRecord object) {
     if (isVisible(object)) {
       for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
         final long scale = (long)viewport.getScale();
@@ -97,10 +92,8 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
           try {
             renderer.renderSelectedRecord(viewport, layer, object);
           } catch (final Throwable e) {
-            ExceptionUtil.log(
-              getClass(),
-              "Unabled to render " + layer.getName() + " #"
-                  + object.getIdentifier(), e);
+            ExceptionUtil.log(getClass(),
+              "Unabled to render " + layer.getName() + " #" + object.getIdentifier(), e);
           }
         }
       }

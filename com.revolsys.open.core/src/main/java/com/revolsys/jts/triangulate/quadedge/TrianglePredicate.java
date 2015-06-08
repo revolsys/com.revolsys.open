@@ -71,24 +71,26 @@ public class TrianglePredicate {
    * @param p the point to test
    * @return true if this point is inside the circle defined by the points a, b, c
    */
-  public static boolean isInCircleCC(final Point a, final Point b,
-    final Point c, final Point p) {
+  public static boolean isInCircleCC(final Point a, final Point b, final Point c, final Point p) {
     final Point cc = Triangle.circumcentre(a, b, c);
     final double ccRadius = a.distance(cc);
     final double pRadiusDiff = p.distance(cc) - ccRadius;
     return pRadiusDiff <= 0;
   }
 
-  public static boolean isInCircleDDFast(final Point a,
-    final Point b, final Point c, final Point p) {
-    final DD aTerm = DD.sqr(a.getX()).selfAdd(DD.sqr(a.getY())).selfMultiply(triAreaDDFast(
-      b, c, p));
-    final DD bTerm = DD.sqr(b.getX()).selfAdd(DD.sqr(b.getY())).selfMultiply(triAreaDDFast(
-      a, c, p));
-    final DD cTerm = DD.sqr(c.getX()).selfAdd(DD.sqr(c.getY())).selfMultiply(triAreaDDFast(
-      a, b, p));
-    final DD pTerm = DD.sqr(p.getX()).selfAdd(DD.sqr(p.getY())).selfMultiply(triAreaDDFast(
-      a, b, c));
+  public static boolean isInCircleDDFast(final Point a, final Point b, final Point c, final Point p) {
+    final DD aTerm = DD.sqr(a.getX())
+      .selfAdd(DD.sqr(a.getY()))
+      .selfMultiply(triAreaDDFast(b, c, p));
+    final DD bTerm = DD.sqr(b.getX())
+      .selfAdd(DD.sqr(b.getY()))
+      .selfMultiply(triAreaDDFast(a, c, p));
+    final DD cTerm = DD.sqr(c.getX())
+      .selfAdd(DD.sqr(c.getY()))
+      .selfMultiply(triAreaDDFast(a, b, p));
+    final DD pTerm = DD.sqr(p.getX())
+      .selfAdd(DD.sqr(p.getY()))
+      .selfMultiply(triAreaDDFast(a, b, c));
 
     final DD sum = aTerm.selfSubtract(bTerm).selfAdd(cTerm).selfSubtract(pTerm);
     final boolean isInCircle = sum.doubleValue() > 0;
@@ -96,8 +98,8 @@ public class TrianglePredicate {
     return isInCircle;
   }
 
-  public static boolean isInCircleDDNormalized(final Point a,
-    final Point b, final Point c, final Point p) {
+  public static boolean isInCircleDDNormalized(final Point a, final Point b, final Point c,
+    final Point p) {
     final DD adx = DD.valueOf(a.getX()).selfSubtract(p.getX());
     final DD ady = DD.valueOf(a.getY()).selfSubtract(p.getY());
     final DD bdx = DD.valueOf(b.getX()).selfSubtract(p.getX());
@@ -113,8 +115,8 @@ public class TrianglePredicate {
     final DD clift = cdx.multiply(cdx).selfAdd(cdy.multiply(cdy));
 
     final DD sum = alift.selfMultiply(bcdet)
-        .selfAdd(blift.selfMultiply(cadet))
-        .selfAdd(clift.selfMultiply(abdet));
+      .selfAdd(blift.selfMultiply(cadet))
+      .selfAdd(clift.selfMultiply(abdet));
 
     final boolean isInCircle = sum.doubleValue() > 0;
 
@@ -132,8 +134,7 @@ public class TrianglePredicate {
    * @param p the point to test
    * @return true if this point is inside the circle defined by the points a, b, c
    */
-  public static boolean isInCircleDDSlow(final Point a,
-    final Point b, final Point c, final Point p) {
+  public static boolean isInCircleDDSlow(final Point a, final Point b, final Point c, final Point p) {
     final DD px = DD.valueOf(p.getX());
     final DD py = DD.valueOf(p.getY());
     final DD ax = DD.valueOf(a.getX());
@@ -143,14 +144,18 @@ public class TrianglePredicate {
     final DD cx = DD.valueOf(c.getX());
     final DD cy = DD.valueOf(c.getY());
 
-    final DD aTerm = ax.multiply(ax).add(ay.multiply(ay)).multiply(triAreaDDSlow(
-      bx, by, cx, cy, px, py));
-    final DD bTerm = bx.multiply(bx).add(by.multiply(by)).multiply(triAreaDDSlow(
-      ax, ay, cx, cy, px, py));
-    final DD cTerm = cx.multiply(cx).add(cy.multiply(cy)).multiply(triAreaDDSlow(
-      ax, ay, bx, by, px, py));
-    final DD pTerm = px.multiply(px).add(py.multiply(py)).multiply(triAreaDDSlow(
-      ax, ay, bx, by, cx, cy));
+    final DD aTerm = ax.multiply(ax)
+      .add(ay.multiply(ay))
+      .multiply(triAreaDDSlow(bx, by, cx, cy, px, py));
+    final DD bTerm = bx.multiply(bx)
+      .add(by.multiply(by))
+      .multiply(triAreaDDSlow(ax, ay, cx, cy, px, py));
+    final DD cTerm = cx.multiply(cx)
+      .add(cy.multiply(cy))
+      .multiply(triAreaDDSlow(ax, ay, bx, by, px, py));
+    final DD pTerm = px.multiply(px)
+      .add(py.multiply(py))
+      .multiply(triAreaDDSlow(ax, ay, bx, by, cx, cy));
 
     final DD sum = aTerm.subtract(bTerm).add(cTerm).subtract(pTerm);
     final boolean isInCircle = sum.doubleValue() > 0;
@@ -170,12 +175,13 @@ public class TrianglePredicate {
    * @param p the point to test
    * @return true if this point is inside the circle defined by the points a, b, c
    */
-  public static boolean isInCircleNonRobust(final Point a,
-    final Point b, final Point c, final Point p) {
+  public static boolean isInCircleNonRobust(final Point a, final Point b, final Point c,
+    final Point p) {
     final boolean isInCircle = (a.getX() * a.getX() + a.getY() * a.getY()) * triArea(b, c, p)
-        - (b.getX() * b.getX() + b.getY() * b.getY()) * triArea(a, c, p) + (c.getX() * c.getX() + c.getY() * c.getY())
-        * triArea(a, b, p) - (p.getX() * p.getX() + p.getY() * p.getY()) * triArea(a, b, c) > 0;
-        return isInCircle;
+      - (b.getX() * b.getX() + b.getY() * b.getY()) * triArea(a, c, p)
+      + (c.getX() * c.getX() + c.getY() * c.getY()) * triArea(a, b, p)
+      - (p.getX() * p.getX() + p.getY() * p.getY()) * triArea(a, b, c) > 0;
+    return isInCircle;
   }
 
   /**
@@ -195,8 +201,8 @@ public class TrianglePredicate {
    * @param p the point to test
    * @return true if this point is inside the circle defined by the points a, b, c
    */
-  public static boolean isInCircleNormalized(final Point a,
-    final Point b, final Point c, final Point p) {
+  public static boolean isInCircleNormalized(final Point a, final Point b, final Point c,
+    final Point p) {
     final double adx = a.getX() - p.getX();
     final double ady = a.getY() - p.getY();
     final double bdx = b.getX() - p.getX();
@@ -226,8 +232,7 @@ public class TrianglePredicate {
    * @param p the point to test
    * @return true if this point is inside the circle defined by the points a, b, c
    */
-  public static boolean isInCircleRobust(final Point a,
-    final Point b, final Point c, final Point p) {
+  public static boolean isInCircleRobust(final Point a, final Point b, final Point c, final Point p) {
     // checkRobustInCircle(a, b, c, p);
     // return isInCircleNonRobust(a, b, c, p);
     return isInCircleNormalized(a, b, c, p);
@@ -241,21 +246,20 @@ public class TrianglePredicate {
    * @param b a vertex of the triangle
    * @param c a vertex of the triangle
    */
-  private static double triArea(final Point a, final Point b,
-    final Point c) {
-    return (b.getX() - a.getX()) * (c.getY() - a.getY()) - (b.getY() - a.getY()) * (c.getX() - a.getX());
+  private static double triArea(final Point a, final Point b, final Point c) {
+    return (b.getX() - a.getX()) * (c.getY() - a.getY()) - (b.getY() - a.getY())
+      * (c.getX() - a.getX());
   }
 
-  public static DD triAreaDDFast(final Point a, final Point b,
-    final Point c) {
+  public static DD triAreaDDFast(final Point a, final Point b, final Point c) {
 
     final DD t1 = DD.valueOf(b.getX())
-        .selfSubtract(a.getX())
-        .selfMultiply(DD.valueOf(c.getY()).selfSubtract(a.getY()));
+      .selfSubtract(a.getX())
+      .selfMultiply(DD.valueOf(c.getY()).selfSubtract(a.getY()));
 
     final DD t2 = DD.valueOf(b.getY())
-        .selfSubtract(a.getY())
-        .selfMultiply(DD.valueOf(c.getX()).selfSubtract(a.getX()));
+      .selfSubtract(a.getY())
+      .selfMultiply(DD.valueOf(c.getX()).selfSubtract(a.getX()));
 
     return t1.selfSubtract(t2);
   }
@@ -272,10 +276,11 @@ public class TrianglePredicate {
    * @param cx the x ordinate of a vertex of the triangle
    * @param cy the y ordinate of a vertex of the triangle
    */
-  public static DD triAreaDDSlow(final DD ax, final DD ay, final DD bx,
-    final DD by, final DD cx, final DD cy) {
-    return bx.subtract(ax).multiply(cy.subtract(ay)).subtract(by.subtract(ay)
-      .multiply(cx.subtract(ax)));
+  public static DD triAreaDDSlow(final DD ax, final DD ay, final DD bx, final DD by, final DD cx,
+    final DD cy) {
+    return bx.subtract(ax)
+      .multiply(cy.subtract(ay))
+      .subtract(by.subtract(ay).multiply(cx.subtract(ax)));
   }
 
 }

@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -51,8 +50,7 @@ public class CommonBits {
    * @param i the bit to extract
    * @return the value of the extracted bit
    */
-  public static int getBit(final long bits, final int i)
-  {
+  public static int getBit(final long bits, final int i) {
     final long mask = 1L << i;
     return (bits & mask) != 0 ? 1 : 0;
   }
@@ -68,11 +66,9 @@ public class CommonBits {
    * @param num2 the second number
    * @return the number of common most-significant mantissa bits
    */
-  public static int numCommonMostSigMantissaBits(final long num1, final long num2)
-  {
+  public static int numCommonMostSigMantissaBits(final long num1, final long num2) {
     int count = 0;
-    for (int i = 52; i >= 0; i--)
-    {
+    for (int i = 52; i >= 0; i--) {
       if (getBit(num1, i) != getBit(num2, i)) {
         return count;
       }
@@ -88,8 +84,7 @@ public class CommonBits {
    * @param num
    * @return the bit pattern for the sign and exponent
    */
-  public static long signExpBits(final long num)
-  {
+  public static long signExpBits(final long num) {
     return num >> 52;
   }
 
@@ -99,24 +94,25 @@ public class CommonBits {
    * @param bits the bitstring to alter
    * @return the zeroed bitstring
    */
-  public static long zeroLowerBits(final long bits, final int nBits)
-  {
+  public static long zeroLowerBits(final long bits, final int nBits) {
     final long invMask = (1L << nBits) - 1L;
-    final long mask = ~ invMask;
+    final long mask = ~invMask;
     final long zeroed = bits & mask;
     return zeroed;
   }
 
   private boolean isFirst = true;
+
   private int commonMantissaBitsCount = 53;
+
   private long commonBits = 0;
+
   private long commonSignExp;
 
   public CommonBits() {
   }
 
-  public void add(final double num)
-  {
+  public void add(final double num) {
     final long numBits = Double.doubleToLongBits(num);
     if (this.isFirst) {
       this.commonBits = numBits;
@@ -131,30 +127,28 @@ public class CommonBits {
       return;
     }
 
-    //    System.out.println(toString(commonBits));
-    //    System.out.println(toString(numBits));
+    // System.out.println(toString(commonBits));
+    // System.out.println(toString(numBits));
     this.commonMantissaBitsCount = numCommonMostSigMantissaBits(this.commonBits, numBits);
     this.commonBits = zeroLowerBits(this.commonBits, 64 - (12 + this.commonMantissaBitsCount));
-    //    System.out.println(toString(commonBits));
+    // System.out.println(toString(commonBits));
   }
 
-  public double getCommon()
-  {
+  public double getCommon() {
     return Double.longBitsToDouble(this.commonBits);
   }
+
   /**
    * A representation of the Double bits formatted for easy readability
    */
-  public String toString(final long bits)
-  {
+  public String toString(final long bits) {
     final double x = Double.longBitsToDouble(bits);
     final String numStr = Long.toBinaryString(bits);
-    final String padStr = "0000000000000000000000000000000000000000000000000000000000000000" + numStr;
+    final String padStr = "0000000000000000000000000000000000000000000000000000000000000000"
+      + numStr;
     final String bitStr = padStr.substring(padStr.length() - 64);
-    final String str = bitStr.substring(0, 1) + "  "
-        + bitStr.substring(1, 12) + "(exp) "
-        + bitStr.substring(12)
-        + " [ " + x + " ]";
+    final String str = bitStr.substring(0, 1) + "  " + bitStr.substring(1, 12) + "(exp) "
+      + bitStr.substring(12) + " [ " + x + " ]";
     return str;
   }
 

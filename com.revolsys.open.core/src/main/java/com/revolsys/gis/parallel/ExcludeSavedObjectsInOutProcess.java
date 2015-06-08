@@ -14,13 +14,12 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
-public class ExcludeSavedObjectsInOutProcess extends
-BaseInOutProcess<Record, Record> {
+public class ExcludeSavedObjectsInOutProcess extends BaseInOutProcess<Record, Record> {
 
   private Set<String> originalIds = new HashSet<String>();
 
   private StatisticsMap statistics = new StatisticsMap(
-      "Excluded as already loaded from previous area");
+    "Excluded as already loaded from previous area");
 
   @Override
   protected void destroy() {
@@ -49,14 +48,12 @@ BaseInOutProcess<Record, Record> {
   }
 
   @Override
-  protected void process(final Channel<Record> in,
-    final Channel<Record> out, final Record object) {
+  protected void process(final Channel<Record> in, final Channel<Record> out, final Record object) {
     final String id = getId(object);
     if (id == null) {
       out.write(object);
     } else if (this.originalIds.contains(id.toString())) {
-      this.statistics.add("Excluded as already loaded from previous area",
-        object);
+      this.statistics.add("Excluded as already loaded from previous area", object);
     } else {
       final Set<String> ids = Collections.singleton(id);
       final Geometry geometry = object.getGeometryValue();

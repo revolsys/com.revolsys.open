@@ -9,6 +9,7 @@ public class ObjectException extends RuntimeException {
    *
    */
   private static final long serialVersionUID = 1L;
+
   private final Object object;
 
   public ObjectException(final Object object) {
@@ -20,8 +21,7 @@ public class ObjectException extends RuntimeException {
     this.object = object;
   }
 
-  public ObjectException(final Object object, final String message,
-    final Throwable cause) {
+  public ObjectException(final Object object, final String message, final Throwable cause) {
     super(message, cause);
     this.object = object;
   }

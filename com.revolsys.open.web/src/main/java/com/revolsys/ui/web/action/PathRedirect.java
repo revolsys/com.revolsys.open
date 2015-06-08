@@ -24,9 +24,8 @@ public class PathRedirect extends IafAction {
   }
 
   @Override
-  public void process(
-    final HttpServletRequest request,
-    final HttpServletResponse response) throws ActionException, IOException {
+  public void process(final HttpServletRequest request, final HttpServletResponse response)
+    throws ActionException, IOException {
     response.sendRedirect(this.basePath + this.path);
   }
 

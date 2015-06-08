@@ -33,9 +33,8 @@ public class SvgMarker extends AbstractMarker {
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Graphics2D graphics,
-    final MarkerStyle style, final double modelX, final double modelY,
-    double orientation) {
+  public void render(final Viewport2D viewport, final Graphics2D graphics, final MarkerStyle style,
+    final double modelX, final double modelY, double orientation) {
 
     final AffineTransform savedTransform = graphics.getTransform();
     final Measure<Length> markerWidth = style.getMarkerWidth();

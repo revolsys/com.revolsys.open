@@ -91,17 +91,16 @@ public class DistanceOp {
   }
 
   private boolean computeContainmentDistance() {
-    if (computeContainmentDistance(geometry1, geometry2)) {
+    if (computeContainmentDistance(this.geometry1, this.geometry2)) {
       return true;
-    } else if (computeContainmentDistance(geometry2, geometry1)) {
+    } else if (computeContainmentDistance(this.geometry2, this.geometry1)) {
       return true;
     } else {
       return false;
     }
   }
 
-  private boolean computeContainmentDistance(final Geometry geometry1,
-    final Geometry geometry2) {
+  private boolean computeContainmentDistance(final Geometry geometry1, final Geometry geometry2) {
     final List<Polygon> polys = geometry1.getGeometries(Polygon.class);
     if (polys.size() > 0) {
       final List<Point> insidePoints = ConnectedElementLocationFilter.getPoints(geometry2);
@@ -112,8 +111,7 @@ public class DistanceOp {
     return false;
   }
 
-  private boolean computeContainmentDistance(final List<Point> points,
-    final List<Polygon> polygons) {
+  private boolean computeContainmentDistance(final List<Point> points, final List<Polygon> polygons) {
     for (final Point point : points) {
       for (final Polygon polygon : polygons) {
         if (computeContainmentDistance(point, polygon)) {
@@ -124,11 +122,10 @@ public class DistanceOp {
     return false;
   }
 
-  private boolean computeContainmentDistance(final Point point,
-    final Polygon poly) {
+  private boolean computeContainmentDistance(final Point point, final Polygon poly) {
     // if pt is not in exterior, distance to geom is 0
     if (Location.EXTERIOR != poly.locate(point)) {
-      minDistance = 0.0;
+      this.minDistance = 0.0;
       return true;
     } else {
       return false;
@@ -145,13 +142,13 @@ public class DistanceOp {
      * Geometries are not wholly inside, so compute distance from lines and points
      * of one to lines and points of the other
      */
-    final List<LineString> lines0 = geometry1.getGeometryComponents(LineString.class);
-    final List<LineString> lines1 = geometry2.getGeometryComponents(LineString.class);
+    final List<LineString> lines0 = this.geometry1.getGeometryComponents(LineString.class);
+    final List<LineString> lines1 = this.geometry2.getGeometryComponents(LineString.class);
 
     if (!computeLinesLines(lines0, lines1)) {
-      final List<Point> points1 = geometry2.getGeometries(Point.class);
+      final List<Point> points1 = this.geometry2.getGeometries(Point.class);
       if (!computeLinesPoints(lines0, points1)) {
-        final List<Point> points0 = geometry1.getGeometries(Point.class);
+        final List<Point> points0 = this.geometry1.getGeometries(Point.class);
         if (!computeLinesPoints(lines1, points0)) {
           computePointsPoints(points0, points1);
         }
@@ -160,12 +157,12 @@ public class DistanceOp {
   }
 
   private boolean computeLineLine(final LineString line1, final LineString line2) {
-    if (minDistance == Double.MAX_VALUE
-      || line1.getBoundingBox().distance(line2.getBoundingBox()) <= minDistance) {
+    if (this.minDistance == Double.MAX_VALUE
+      || line1.getBoundingBox().distance(line2.getBoundingBox()) <= this.minDistance) {
       final double distance = line1.distance(line2);
-      if (distance < minDistance) {
-        minDistance = distance;
-        if (minDistance <= terminateDistance) {
+      if (distance < this.minDistance) {
+        this.minDistance = distance;
+        if (this.minDistance <= this.terminateDistance) {
           return true;
         }
       }
@@ -174,12 +171,12 @@ public class DistanceOp {
   }
 
   private boolean computeLinePoint(final LineString line, final Point point) {
-    if (minDistance == Double.MAX_VALUE
-      || line.getBoundingBox().distance(point) <= minDistance) {
-      final double distance = line.distance(point, terminateDistance);
-      if (distance < minDistance) {
-        minDistance = distance;
-        if (minDistance <= terminateDistance) {
+    if (this.minDistance == Double.MAX_VALUE
+      || line.getBoundingBox().distance(point) <= this.minDistance) {
+      final double distance = line.distance(point, this.terminateDistance);
+      if (distance < this.minDistance) {
+        this.minDistance = distance;
+        if (this.minDistance <= this.terminateDistance) {
           return true;
         }
       }
@@ -187,8 +184,7 @@ public class DistanceOp {
     return false;
   }
 
-  private boolean computeLinesLines(final List<LineString> lines1,
-    final List<LineString> lines2) {
+  private boolean computeLinesLines(final List<LineString> lines1, final List<LineString> lines2) {
     for (final LineString line1 : lines1) {
       for (final LineString line2 : lines2) {
         if (computeLineLine(line1, line2)) {
@@ -199,8 +195,7 @@ public class DistanceOp {
     return false;
   }
 
-  private boolean computeLinesPoints(final List<LineString> lines,
-    final List<Point> points) {
+  private boolean computeLinesPoints(final List<LineString> lines, final List<Point> points) {
     for (final LineString line : lines) {
       for (final Point point : points) {
         if (computeLinePoint(line, point)) {
@@ -211,14 +206,13 @@ public class DistanceOp {
     return false;
   }
 
-  private boolean computePointsPoints(final List<Point> points1,
-    final List<Point> points2) {
+  private boolean computePointsPoints(final List<Point> points1, final List<Point> points2) {
     for (final Point point1 : points1) {
       for (final Point point2 : points2) {
         final double distance = point1.distance(point2);
-        if (distance < minDistance) {
-          minDistance = distance;
-          if (minDistance <= terminateDistance) {
+        if (distance < this.minDistance) {
+          this.minDistance = distance;
+          if (this.minDistance <= this.terminateDistance) {
             return true;
           }
         }
@@ -235,17 +229,17 @@ public class DistanceOp {
    * @throws IllegalArgumentException if either input geometry is null
    */
   public double distance() {
-    if (!computed) {
-      if (geometry1.isEmpty() || geometry2.isEmpty()) {
-        minDistance = 0;
+    if (!this.computed) {
+      if (this.geometry1.isEmpty() || this.geometry2.isEmpty()) {
+        this.minDistance = 0;
       } else {
-        computed = true;
+        this.computed = true;
         if (!computeContainmentDistance()) {
           computeFacetDistance();
         }
       }
     }
-    return minDistance;
+    return this.minDistance;
   }
 
 }

@@ -31,11 +31,10 @@ public class ResultPagerListCellRenderer extends DefaultListCellRenderer {
   }
 
   @Override
-  public Component getListCellRendererComponent(final JList list,
-    final Object value, final int index, final boolean isSelected,
-    final boolean cellHasFocus) {
-    final Component component = super.getListCellRendererComponent(list, value,
-      index, isSelected, cellHasFocus);
+  public Component getListCellRendererComponent(final JList list, final Object value,
+    final int index, final boolean isSelected, final boolean cellHasFocus) {
+    final Component component = super.getListCellRendererComponent(list, value, index, isSelected,
+      cellHasFocus);
     String label;
     if (value == ResultPagerComboBoxModel.NULL || value == null) {
       label = "-";
@@ -44,8 +43,7 @@ public class ResultPagerListCellRenderer extends DefaultListCellRenderer {
     } else {
       final List<String> values = new ArrayList<String>();
       for (final String fieldName : this.fieldNames) {
-        final String text = StringConverterRegistry.toString(Property.get(
-          value, fieldName));
+        final String text = StringConverterRegistry.toString(Property.get(value, fieldName));
         values.add(text);
       }
       label = CollectionUtil.toString(values);

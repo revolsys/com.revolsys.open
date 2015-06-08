@@ -48,11 +48,6 @@ import com.revolsys.jts.util.GeometricShapeFactory;
 import com.revolsys.jts.util.Stopwatch;
 
 public class PreparedPolygonIntersectsPerfTest {
-  public static void main(final String[] args) {
-    final PreparedPolygonIntersectsPerfTest test = new PreparedPolygonIntersectsPerfTest();
-    test.test();
-  }
-
   static final int MAX_ITER = 10;
 
   static final int NUM_AOI_PTS = 2000;
@@ -61,10 +56,14 @@ public class PreparedPolygonIntersectsPerfTest {
 
   static final int NUM_LINE_PTS = 100;
 
-  private static final GeometryFactory geometryFactory = GeometryFactory.floating(
-    0, 2);
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
 
   static WKTReader wktRdr = new WKTReader(geometryFactory);
+
+  public static void main(final String[] args) {
+    final PreparedPolygonIntersectsPerfTest test = new PreparedPolygonIntersectsPerfTest();
+    test.test();
+  }
 
   Stopwatch sw = new Stopwatch();
 
@@ -94,8 +93,7 @@ public class PreparedPolygonIntersectsPerfTest {
     return circle.getBoundary();
   }
 
-  List createLines(final BoundingBox env, final int nItems, final double size,
-    final int nPts) {
+  List createLines(final BoundingBox env, final int nItems, final double size, final int nPts) {
     final int nCells = (int)Math.sqrt(nItems);
 
     final List geoms = new ArrayList();
@@ -104,8 +102,8 @@ public class PreparedPolygonIntersectsPerfTest {
     final double yInc = width / nCells;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
-        final Point base = new PointDouble(env.getMinX() + i * xInc,
-          env.getMinY() + j * yInc, Point.NULL_ORDINATE);
+        final Point base = new PointDouble(env.getMinX() + i * xInc, env.getMinY() + j * yInc,
+          Point.NULL_ORDINATE);
         final Geometry line = createLine(base, size, nPts);
         geoms.add(line);
       }
@@ -153,14 +151,13 @@ public class PreparedPolygonIntersectsPerfTest {
 
   public void test(final int nPts) {
     // Geometry poly = createCircle(new PointDouble((double)0, 0), 100, nPts);
-    final Geometry sinePoly = createSineStar(new PointDouble((double)0, 0,
-      Point.NULL_ORDINATE), 100, nPts);
+    final Geometry sinePoly = createSineStar(new PointDouble((double)0, 0, Point.NULL_ORDINATE),
+      100, nPts);
     // System.out.println(poly);
     // Geometry target = sinePoly.getBoundary();
     final Geometry target = sinePoly;
 
-    final List lines = createLines(target.getBoundingBox(), NUM_LINES, 1.0,
-      NUM_LINE_PTS);
+    final List lines = createLines(target.getBoundingBox(), NUM_LINES, 1.0, NUM_LINE_PTS);
 
     // System.out.println();
     // System.out.println("Running with " + nPts + " points");
@@ -181,8 +178,7 @@ public class PreparedPolygonIntersectsPerfTest {
     return count;
   }
 
-  public int testPrepGeomCached(final int iter, final Geometry g,
-    final List lines) {
+  public int testPrepGeomCached(final int iter, final Geometry g, final List lines) {
     if (iter == 0) {
       // System.out.println("Using cached Prepared Geometry");
     }
@@ -210,8 +206,7 @@ public class PreparedPolygonIntersectsPerfTest {
    * @param lines
    * @return the count
    */
-  public int testPrepGeomNotCached(final int iter, final Geometry g,
-    final List lines) {
+  public int testPrepGeomNotCached(final int iter, final Geometry g, final List lines) {
     if (iter == 0) {
       // System.out.println("Using NON-CACHED Prepared Geometry");
     }

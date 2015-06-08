@@ -42,8 +42,7 @@ import java.util.List;
  * @author mbdavis
  *
  */
-public class QuadEdgeUtil
-{
+public class QuadEdgeUtil {
   /**
    * Gets all edges which are incident on the origin of the given edge.
    *

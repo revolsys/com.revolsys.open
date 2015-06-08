@@ -10,8 +10,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.io.Writer;
 
-public class EsriGeodatabaseXmlRecordWriterFactory extends
-AbstractRecordAndGeometryWriterFactory {
+public class EsriGeodatabaseXmlRecordWriterFactory extends AbstractRecordAndGeometryWriterFactory {
   public EsriGeodatabaseXmlRecordWriterFactory() {
     super(EsriGeodatabaseXmlConstants.FORMAT_DESCRIPTION, true, true);
     addMediaTypeAndFileExtension(EsriGeodatabaseXmlConstants.MEDIA_TYPE,
@@ -21,10 +20,8 @@ AbstractRecordAndGeometryWriterFactory {
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream,
-    final Charset charset) {
-    final OutputStreamWriter writer = new OutputStreamWriter(outputStream,
-      charset);
+    final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
+    final OutputStreamWriter writer = new OutputStreamWriter(outputStream, charset);
     return new EsriGeodatabaseXmlRecordWriter(recordDefinition, writer);
   }
 }

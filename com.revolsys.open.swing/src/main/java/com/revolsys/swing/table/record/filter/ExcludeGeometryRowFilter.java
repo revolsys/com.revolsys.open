@@ -10,8 +10,7 @@ import com.revolsys.swing.table.record.model.AbstractRecordTableModel;
 public class ExcludeGeometryRowFilter extends RowFilter<TableModel, Integer> {
 
   @Override
-  public boolean include(
-    final Entry<? extends TableModel, ? extends Integer> entry) {
+  public boolean include(final Entry<? extends TableModel, ? extends Integer> entry) {
     final TableModel model = entry.getModel();
     if (model instanceof AbstractRecordTableModel) {
       final AbstractRecordTableModel recordModel = (AbstractRecordTableModel)entry.getModel();

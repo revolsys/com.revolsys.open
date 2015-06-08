@@ -5,8 +5,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public abstract class AbstractSegment extends AbstractLineSegment implements
-Segment {
+public abstract class AbstractSegment extends AbstractLineSegment implements Segment {
   private static final long serialVersionUID = 1L;
 
   protected final Geometry geometry;
@@ -32,8 +31,7 @@ Segment {
     final double[] coordinates = new double[axisCount * 2];
     for (int vertexIndex = 0; vertexIndex < 2; vertexIndex++) {
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-        coordinates[vertexIndex * axisCount + axisIndex] = getCoordinate(
-          vertexIndex, axisIndex);
+        coordinates[vertexIndex * axisCount + axisIndex] = getCoordinate(vertexIndex, axisIndex);
       }
     }
     return coordinates;

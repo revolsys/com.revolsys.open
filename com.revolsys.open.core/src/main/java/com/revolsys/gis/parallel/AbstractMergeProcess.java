@@ -9,8 +9,7 @@ import com.revolsys.parallel.channel.MultiInputSelector;
 import com.revolsys.parallel.channel.store.Buffer;
 import com.revolsys.parallel.process.AbstractInOutProcess;
 
-public abstract class AbstractMergeProcess extends
-AbstractInOutProcess<Record, Record> {
+public abstract class AbstractMergeProcess extends AbstractInOutProcess<Record, Record> {
 
   private static final int OTHER_INDEX = 1;
 
@@ -24,8 +23,8 @@ AbstractInOutProcess<Record, Record> {
     return true;
   }
 
-  private void addObjectFromOtherChannel(final Channel<Record>[] channels,
-    final boolean[] guard, final Record[] objects, final int channelIndex) {
+  private void addObjectFromOtherChannel(final Channel<Record>[] channels, final boolean[] guard,
+    final Record[] objects, final int channelIndex) {
     int otherIndex;
     if (channelIndex == SOURCE_INDEX) {
       otherIndex = OTHER_INDEX;
@@ -60,9 +59,8 @@ AbstractInOutProcess<Record, Record> {
    */
   protected abstract void addOtherObject(Record object);
 
-  private RecordDefinition addSavedObjects(
-    final RecordDefinition currentType, final String currentTypeName,
-    final Channel<Record> out, final boolean[] guard,
+  private RecordDefinition addSavedObjects(final RecordDefinition currentType,
+    final String currentTypeName, final Channel<Record> out, final boolean[] guard,
     final Record[] objects) {
     final Record sourceObject = objects[SOURCE_INDEX];
     final Record otherObject = objects[OTHER_INDEX];
@@ -105,8 +103,7 @@ AbstractInOutProcess<Record, Record> {
         return currentType;
       } else {
         processObjects(currentType, out);
-        final int nameCompare = sourceTypeName.toString().compareTo(
-          otherTypeName.toString());
+        final int nameCompare = sourceTypeName.toString().compareTo(otherTypeName.toString());
         if (nameCompare < 0) {
           // If the first feature type name is < second feature type
           // name
@@ -159,8 +156,7 @@ AbstractInOutProcess<Record, Record> {
       if (this.otherInBufferSize < 1) {
         setOtherIn(new Channel<Record>());
       } else {
-        final Buffer<Record> buffer = new Buffer<Record>(
-            this.otherInBufferSize);
+        final Buffer<Record> buffer = new Buffer<Record>(this.otherInBufferSize);
         setOtherIn(new Channel<Record>(buffer));
       }
     }
@@ -171,8 +167,7 @@ AbstractInOutProcess<Record, Record> {
     return this.otherInBufferSize;
   }
 
-  protected abstract void processObjects(RecordDefinition currentType,
-    Channel<Record> out);
+  protected abstract void processObjects(RecordDefinition currentType, Channel<Record> out);
 
   @Override
   @SuppressWarnings("unchecked")
@@ -270,10 +265,8 @@ AbstractInOutProcess<Record, Record> {
                 }
               } else {
                 objects[channelIndex] = object;
-                addObjectFromOtherChannel(channels, guard, objects,
-                  channelIndex);
-                currentType = addSavedObjects(currentType, currentTypeName,
-                  out, guard, objects);
+                addObjectFromOtherChannel(channels, guard, objects, channelIndex);
+                currentType = addSavedObjects(currentType, currentTypeName, out, guard, objects);
                 if (currentType != null) {
                   currentTypeName = currentType.getPath();
                 }
@@ -289,8 +282,7 @@ AbstractInOutProcess<Record, Record> {
         }
       } finally {
         try {
-          while (addSavedObjects(currentType, currentTypeName, out, guard,
-            objects) != null) {
+          while (addSavedObjects(currentType, currentTypeName, out, guard, objects) != null) {
           }
           processObjects(currentType, out);
         } finally {

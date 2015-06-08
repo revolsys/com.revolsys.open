@@ -32,20 +32,17 @@ import com.revolsys.junit.InvokeMethodTestCase;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-  ShapefileIoTest.class, GeoJsonIoTest.class, GmlIoTest.class, KmlIoTest.class,
-  WktlIoTest.class
+  ShapefileIoTest.class, GeoJsonIoTest.class, GmlIoTest.class, KmlIoTest.class, WktlIoTest.class
 })
 public class IoTestSuite {
 
-  public static void addGeometryTestSuites(final TestSuite suite,
-    final String namePrefix, final Object methodObject,
-    final String methodName, final Object... extraParameters) {
-    final List<DataType> geometryDataTypes = Arrays.asList(DataTypes.POINT,
-      DataTypes.LINE_STRING, DataTypes.POLYGON, DataTypes.MULTI_POINT,
-      DataTypes.MULTI_LINE_STRING, DataTypes.MULTI_POLYGON);
+  public static void addGeometryTestSuites(final TestSuite suite, final String namePrefix,
+    final Object methodObject, final String methodName, final Object... extraParameters) {
+    final List<DataType> geometryDataTypes = Arrays.asList(DataTypes.POINT, DataTypes.LINE_STRING,
+      DataTypes.POLYGON, DataTypes.MULTI_POINT, DataTypes.MULTI_LINE_STRING,
+      DataTypes.MULTI_POLYGON);
     for (final DataType dataType : geometryDataTypes) {
-      final TestSuite dataTypeSuite = new TestSuite(namePrefix + " "
-          + dataType.toString());
+      final TestSuite dataTypeSuite = new TestSuite(namePrefix + " " + dataType.toString());
       suite.addTest(dataTypeSuite);
       for (int axisCount = 2; axisCount < 5; axisCount++) {
         int maxGeometryCount = 1;
@@ -66,17 +63,15 @@ public class IoTestSuite {
               maxRingCount = 0;
             }
             for (int ringCount = 0; ringCount <= maxRingCount; ringCount++) {
-              final GeometryFactory geometryFactory = GeometryFactory.fixed(
-                4326, axisCount, 0.0, 0.0);
+              final GeometryFactory geometryFactory = GeometryFactory.fixed(4326, axisCount, 0.0,
+                0.0);
               double delta = 1.0;
               if (geometryFactory.isProjected()) {
                 delta = 1000.0;
               }
-              final Geometry geometry = GeometryTestUtil.geometry(
-                geometryFactory, dataType, geometryCount, ringCount,
-                vertexCount, delta);
-              String name = namePrefix + " " + dataType + " A=" + axisCount
-                  + " G=" + geometryCount;
+              final Geometry geometry = GeometryTestUtil.geometry(geometryFactory, dataType,
+                geometryCount, ringCount, vertexCount, delta);
+              String name = namePrefix + " " + dataType + " A=" + axisCount + " G=" + geometryCount;
               if (maxVertexCount > 2) {
                 name += " V=" + vertexCount;
               }
@@ -90,8 +85,8 @@ public class IoTestSuite {
               for (final Object parameter : extraParameters) {
                 parameters.add(parameter);
               }
-              final TestCase testCase = new InvokeMethodTestCase(name,
-                methodObject, methodName, parameters);
+              final TestCase testCase = new InvokeMethodTestCase(name, methodObject, methodName,
+                parameters);
               dataTypeSuite.addTest(testCase);
             }
           }
@@ -103,20 +98,18 @@ public class IoTestSuite {
   public static void doWriteReadTest(final GeometryFactory geometryFactory,
     final DataType dataType, final Geometry geometry, final String fileExtension) {
     final String geometryTypeString = dataType.toString();
-    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
-      geometryTypeString);
+    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(geometryTypeString);
     recordDefinition.addField("ID", DataTypes.INT, true);
     recordDefinition.addField("GEOMETRY", dataType, true);
     recordDefinition.setGeometryFactory(geometryFactory);
-    final File file = new File("/tmp/revolsystest/io/" + fileExtension + "/"
-        + geometryTypeString + "_" + geometryFactory.getAxisCount() + "_"
-        + geometry.getVertexCount() + "." + fileExtension);
+    final File file = new File("/tmp/revolsystest/io/" + fileExtension + "/" + geometryTypeString
+      + "_" + geometryFactory.getAxisCount() + "_" + geometry.getVertexCount() + "."
+      + fileExtension);
     file.delete();
     file.getParentFile().mkdirs();
     final FileSystemResource resource = new FileSystemResource(file);
     try (
-        Writer<Record> writer = RecordIo.recordWriter(
-          recordDefinition, resource)) {
+      Writer<Record> writer = RecordIo.recordWriter(recordDefinition, resource)) {
       writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
       writer.setProperty(IoConstants.GEOMETRY_TYPE, dataType);
 
@@ -126,7 +119,7 @@ public class IoTestSuite {
       writer.write(record);
     }
     try (
-        Reader<Geometry> reader = AbstractGeometryReaderFactory.geometryReader(resource)) {
+      Reader<Geometry> reader = AbstractGeometryReaderFactory.geometryReader(resource)) {
       reader.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
       final List<Geometry> geometries = reader.read();
       Assert.assertEquals("Geometry Count", 1, geometries.size());
@@ -138,7 +131,7 @@ public class IoTestSuite {
         if (!actual.equals(axisCount, geometry)) {
           // Allow for conversion of multi part to single part
           if (geometry.getGeometryCount() != 1
-              || !actual.equals(axisCount, geometry.getGeometry(0))) {
+            || !actual.equals(axisCount, geometry.getGeometry(0))) {
             TestUtil.failNotEquals("Geometry Equal Exact", geometry, actual);
           }
         }

@@ -24,8 +24,7 @@ public class AttributeValueClassFilter implements Filter<Record> {
    */
   @Override
   public boolean accept(final Record object) {
-    final Object propertyValue = Records.getFieldByPath(object,
-      this.fieldName);
+    final Object propertyValue = Records.getFieldByPath(object, this.fieldName);
     return this.type.isInstance(propertyValue);
   }
 

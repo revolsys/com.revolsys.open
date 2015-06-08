@@ -24,8 +24,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.filter.Filter;
 import com.revolsys.jts.geom.Geometry;
 
-public class RecordGeometryEquals2DExactFilter implements
-Filter<Record> {
+public class RecordGeometryEquals2DExactFilter implements Filter<Record> {
   private final Geometry geometry;
 
   public RecordGeometryEquals2DExactFilter(final Geometry geometry) {
@@ -35,7 +34,7 @@ Filter<Record> {
   @Override
   public boolean accept(final Record object) {
     final Geometry matchGeometry = object.getGeometryValue();
-    if (this.geometry.equals(2,matchGeometry)) {
+    if (this.geometry.equals(2, matchGeometry)) {
       return true;
     } else {
       return false;

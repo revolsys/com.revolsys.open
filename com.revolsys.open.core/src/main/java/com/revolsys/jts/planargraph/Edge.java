@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -43,9 +42,7 @@ package com.revolsys.jts.planargraph;
  *
  * @version 1.7
  */
-public class Edge
-extends GraphComponent
-{
+public class Edge extends GraphComponent {
 
   /**
    * The two DirectedEdges associated with this Edge.
@@ -57,8 +54,7 @@ extends GraphComponent
    * Constructs an Edge whose DirectedEdges are not yet set. Be sure to call
    * {@link #setDirectedEdges(DirectedEdge, DirectedEdge)}
    */
-  public Edge()
-  {
+  public Edge() {
   }
 
   /**
@@ -66,8 +62,7 @@ extends GraphComponent
    * DirectedEdge: sets the Edge, sets the symmetric DirectedEdge, and adds
    * this Edge to its from-Node.
    */
-  public Edge(final DirectedEdge de0, final DirectedEdge de1)
-  {
+  public Edge(final DirectedEdge de0, final DirectedEdge de1) {
     setDirectedEdges(de0, de1);
   }
 
@@ -75,8 +70,7 @@ extends GraphComponent
    * Returns one of the DirectedEdges associated with this Edge.
    * @param i 0 or 1.  0 returns the forward directed edge, 1 returns the reverse
    */
-  public DirectedEdge getDirEdge(final int i)
-  {
+  public DirectedEdge getDirEdge(final int i) {
     return this.dirEdge[i];
   }
 
@@ -84,8 +78,7 @@ extends GraphComponent
    * Returns the {@link DirectedEdge} that starts from the given node, or null if the
    * node is not one of the two nodes associated with this Edge.
    */
-  public DirectedEdge getDirEdge(final Node fromNode)
-  {
+  public DirectedEdge getDirEdge(final Node fromNode) {
     if (this.dirEdge[0].getFromNode() == fromNode) {
       return this.dirEdge[0];
     }
@@ -101,8 +94,7 @@ extends GraphComponent
    * If <code>node</code> is one of the two nodes associated with this Edge,
    * returns the other node; otherwise returns null.
    */
-  public Node getOppositeNode(final Node node)
-  {
+  public Node getOppositeNode(final Node node) {
     if (this.dirEdge[0].getFromNode() == node) {
       return this.dirEdge[0].getToNode();
     }
@@ -120,8 +112,7 @@ extends GraphComponent
    * @return <code>true</code> if this edge is removed
    */
   @Override
-  public boolean isRemoved()
-  {
+  public boolean isRemoved() {
     return this.dirEdge == null;
   }
 
@@ -136,9 +127,10 @@ extends GraphComponent
    * Initializes this Edge's two DirectedEdges, and for each DirectedEdge: sets the
    * Edge, sets the symmetric DirectedEdge, and adds this Edge to its from-Node.
    */
-  public void setDirectedEdges(final DirectedEdge de0, final DirectedEdge de1)
-  {
-    this.dirEdge = new DirectedEdge[] { de0, de1 };
+  public void setDirectedEdges(final DirectedEdge de0, final DirectedEdge de1) {
+    this.dirEdge = new DirectedEdge[] {
+      de0, de1
+    };
     de0.setEdge(this);
     de1.setEdge(this);
     de0.setSym(de1);

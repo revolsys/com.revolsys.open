@@ -84,8 +84,7 @@ public class UnionInteracting {
     boolean interactsWithAny = false;
     for (int i = 0; i < this.g1.getGeometryCount(); i++) {
       final Geometry elem1 = this.g1.getGeometry(i);
-      final boolean interacts = elem1.getBoundingBox().intersects(
-        elem0.getBoundingBox());
+      final boolean interacts = elem1.getBoundingBox().intersects(elem0.getBoundingBox());
       if (interacts) {
         this.interacts1[i] = true;
       }
@@ -96,8 +95,8 @@ public class UnionInteracting {
     return interactsWithAny;
   }
 
-  private Geometry extractElements(final Geometry geom,
-    final boolean[] interacts, final boolean isInteracting) {
+  private Geometry extractElements(final Geometry geom, final boolean[] interacts,
+    final boolean isInteracting) {
     final List extractedGeoms = new ArrayList();
     for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry elem = geom.getGeometry(i);
@@ -134,8 +133,7 @@ public class UnionInteracting {
     final Geometry disjoint0 = extractElements(this.g0, this.interacts0, false);
     final Geometry disjoint1 = extractElements(this.g1, this.interacts1, false);
 
-    final Geometry overallUnion = GeometryCombiner.combine(union, disjoint0,
-      disjoint1);
+    final Geometry overallUnion = GeometryCombiner.combine(union, disjoint0, disjoint1);
 
     return overallUnion;
 

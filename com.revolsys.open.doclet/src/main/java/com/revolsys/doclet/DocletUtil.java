@@ -32,12 +32,18 @@ import com.sun.javadoc.WildcardType;
 
 public class DocletUtil {
 
+  private static final Map<String, String> PACKAGE_URLS = new LinkedHashMap<String, String>();
+
+  static {
+    addPackageUrl("java.", "http://docs.oracle.com/javase/6/docs/api/");
+    addPackageUrl("com.revolsys.jts.", "http://tsusiatsoftware.net/jts/javadoc/");
+  }
+
   public static void addPackageUrl(final String packagePrefix, final String url) {
     PACKAGE_URLS.put(packagePrefix, url);
   }
 
-  public static void anchor(final XmlWriter writer, final String name,
-    final String title) {
+  public static void anchor(final XmlWriter writer, final String name, final String title) {
     writer.startTag(HtmlUtil.A);
     writer.attribute(HtmlUtil.ATTR_NAME, name);
     writer.text(title);
@@ -45,22 +51,21 @@ public class DocletUtil {
   }
 
   public static void copyFiles(final String destDir) {
-    for (final String name : Arrays.asList("javadoc.css", "javadoc.js",
-      "javadoc.js", "prettify.js", "prettify.css")) {
-      FileUtil.copy(
-        DocletUtil.class.getResourceAsStream("/com/revolsys/doclet/" + name),
-        new File(destDir, name));
+    for (final String name : Arrays.asList("javadoc.css", "javadoc.js", "javadoc.js",
+      "prettify.js", "prettify.css")) {
+      FileUtil.copy(DocletUtil.class.getResourceAsStream("/com/revolsys/doclet/" + name), new File(
+        destDir, name));
     }
   }
 
-  public static void description(final XmlWriter writer,
-    final ClassDoc containingClass, final Doc doc) {
+  public static void description(final XmlWriter writer, final ClassDoc containingClass,
+    final Doc doc) {
     final Tag[] tags = doc.inlineTags();
     description(writer, containingClass, tags);
   }
 
-  public static void description(final XmlWriter writer,
-    final ClassDoc containingClass, final Tag[] tags) {
+  public static void description(final XmlWriter writer, final ClassDoc containingClass,
+    final Tag[] tags) {
     if (tags != null && tags.length > 0) {
       for (final Tag tag : tags) {
         final String kind = tag.kind();
@@ -74,9 +79,8 @@ public class DocletUtil {
     }
   }
 
-  public static void descriptionTd(final XmlWriter writer,
-    final ClassDoc containingClass, final Map<String, Tag[]> descriptions,
-    final String name) {
+  public static void descriptionTd(final XmlWriter writer, final ClassDoc containingClass,
+    final Map<String, Tag[]> descriptions, final String name) {
     writer.startTag(HtmlUtil.TD);
     writer.attribute(HtmlUtil.ATTR_CLASS, "description");
     final Tag[] description = descriptions.get(name);
@@ -84,8 +88,7 @@ public class DocletUtil {
     writer.endTagLn(HtmlUtil.TD);
   }
 
-  public static void documentationReturn(final XmlWriter writer,
-    final MethodDoc method) {
+  public static void documentationReturn(final XmlWriter writer, final MethodDoc method) {
     final Type type = method.returnType();
     if (type != null && !"void".equals(type.qualifiedTypeName())) {
       Tag[] descriptionTags = null;
@@ -129,8 +132,7 @@ public class DocletUtil {
     }
   }
 
-  public static AnnotationDesc getAnnotation(
-    final AnnotationDesc[] annotations, final String name) {
+  public static AnnotationDesc getAnnotation(final AnnotationDesc[] annotations, final String name) {
     for (final AnnotationDesc annotation : annotations) {
       final AnnotationTypeDoc annotationType = annotation.annotationType();
       final String annotationName = qualifiedName(annotationType);
@@ -141,8 +143,7 @@ public class DocletUtil {
     return null;
   }
 
-  public static AnnotationDesc getAnnotation(final ProgramElementDoc doc,
-    final String name) {
+  public static AnnotationDesc getAnnotation(final ProgramElementDoc doc, final String name) {
     final AnnotationDesc[] annotations = doc.annotations();
     return getAnnotation(annotations, name);
   }
@@ -153,15 +154,14 @@ public class DocletUtil {
       if (qualifiedTypeName.startsWith(packagePrefix)) {
         final String baseUrl = entry.getValue();
         final String url = baseUrl + qualifiedTypeName.replaceAll("\\.", "/")
-            + ".html?is-external=true";
+          + ".html?is-external=true";
         return url;
       }
     }
     return null;
   }
 
-  public static Map<String, Tag[]> getParameterDescriptions(
-    final ExecutableMemberDoc method) {
+  public static Map<String, Tag[]> getParameterDescriptions(final ExecutableMemberDoc method) {
     final Map<String, Tag[]> descriptions = new HashMap<String, Tag[]>();
     for (final ParamTag tag : method.paramTags()) {
       final String parameterName = tag.parameterName();
@@ -171,14 +171,12 @@ public class DocletUtil {
     return descriptions;
   }
 
-  public static boolean hasAnnotation(final AnnotationDesc[] annotations,
-    final String name) {
+  public static boolean hasAnnotation(final AnnotationDesc[] annotations, final String name) {
     final AnnotationDesc annotation = getAnnotation(annotations, name);
     return annotation != null;
   }
 
-  public static boolean hasAnnotation(final ProgramElementDoc doc,
-    final String name) {
+  public static boolean hasAnnotation(final ProgramElementDoc doc, final String name) {
     final AnnotationDesc annotation = getAnnotation(doc, name);
     return annotation != null;
   }
@@ -188,16 +186,14 @@ public class DocletUtil {
     writer.element(HtmlUtil.TITLE, docTitle);
     for (final String url : Arrays.asList(
       "https://code.jquery.com/ui/1.11.2/themes/cupertino/jquery-ui.css",
-      "https://cdn.datatables.net/1.10.4/css/jquery.dataTables.min.css",
-      "prettify.css", "javadoc.css")) {
+      "https://cdn.datatables.net/1.10.4/css/jquery.dataTables.min.css", "prettify.css",
+      "javadoc.css")) {
       HtmlUtil.serializeCss(writer, url);
 
     }
-    for (final String url : Arrays.asList(
-      "https://code.jquery.com/jquery-1.11.1.min.js",
+    for (final String url : Arrays.asList("https://code.jquery.com/jquery-1.11.1.min.js",
       "https://code.jquery.com/ui/1.11.2/jquery-ui.min.js",
-      "https://cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js",
-      "prettify.js", "javadoc.js")) {
+      "https://cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js", "prettify.js", "javadoc.js")) {
       HtmlUtil.serializeScriptLink(writer, url);
     }
     writer.endTagLn(HtmlUtil.HEAD);
@@ -206,14 +202,12 @@ public class DocletUtil {
   public static boolean isTypeIncluded(final Type type) {
     final ClassDoc classDoc = type.asClassDoc();
     final ClassDoc annotationDoc = type.asAnnotationTypeDoc();
-    final boolean included = annotationDoc != null
-        && annotationDoc.isIncluded() || classDoc != null
-        && classDoc.isIncluded();
+    final boolean included = annotationDoc != null && annotationDoc.isIncluded()
+      || classDoc != null && classDoc.isIncluded();
     return included;
   }
 
-  public static void label(final XmlWriter writer, final String label,
-    final boolean code) {
+  public static void label(final XmlWriter writer, final String label, final boolean code) {
     if (code) {
       writer.startTag(HtmlUtil.CODE);
     }
@@ -223,8 +217,8 @@ public class DocletUtil {
     }
   }
 
-  public static void link(final XmlWriter writer, final String url,
-    final String label, final boolean code) {
+  public static void link(final XmlWriter writer, final String url, final String label,
+    final boolean code) {
     final boolean hasUrl = StringUtils.hasText(url);
     if (hasUrl) {
       writer.startTag(HtmlUtil.A);
@@ -271,8 +265,8 @@ public class DocletUtil {
     }
   }
 
-  public static void seeTag(final XmlWriter writer,
-    final ClassDoc containingClass, final SeeTag seeTag) {
+  public static void seeTag(final XmlWriter writer, final ClassDoc containingClass,
+    final SeeTag seeTag) {
     final String name = seeTag.name();
     if (name.startsWith("@link") || name.equals("@see")) {
       final boolean code = !name.equalsIgnoreCase("@linkplain");
@@ -327,8 +321,7 @@ public class DocletUtil {
             if (referencedMember instanceof ExecutableMemberDoc) {
               if (referencedMemberName.indexOf('(') < 0) {
                 final ExecutableMemberDoc executableDoc = (ExecutableMemberDoc)referencedMember;
-                referencedMemberName = referencedMemberName
-                    + executableDoc.signature();
+                referencedMemberName = referencedMemberName + executableDoc.signature();
               }
               if (StringUtils.hasText(referencedMemberName)) {
                 label = referencedMemberName;
@@ -353,8 +346,8 @@ public class DocletUtil {
     }
   }
 
-  public static void tagWithAnchor(final XmlWriter writer, final QName tag,
-    final String name, final String title) {
+  public static void tagWithAnchor(final XmlWriter writer, final QName tag, final String name,
+    final String title) {
     writer.startTag(tag);
     writer.attribute(HtmlUtil.ATTR_CLASS, "title");
     writer.startTag(HtmlUtil.A);
@@ -371,8 +364,7 @@ public class DocletUtil {
     writer.endTagLn(HtmlUtil.DIV);
   }
 
-  public static void title(final XmlWriter writer, final String name,
-    final String title) {
+  public static void title(final XmlWriter writer, final String name, final String title) {
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "title");
     anchor(writer, name, title);
@@ -437,13 +429,5 @@ public class DocletUtil {
       }
     }
     writer.text(type.dimension());
-  }
-
-  private static final Map<String, String> PACKAGE_URLS = new LinkedHashMap<String, String>();
-
-  static {
-    addPackageUrl("java.", "http://docs.oracle.com/javase/6/docs/api/");
-    addPackageUrl("com.revolsys.jts.",
-        "http://tsusiatsoftware.net/jts/javadoc/");
   }
 }

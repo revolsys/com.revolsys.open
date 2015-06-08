@@ -68,8 +68,7 @@ public class InteriorPointLine {
   }
 
   private void add(final double x, final double y) {
-    final double dist = MathUtil.distance(this.centroid.getX(), this.centroid.getY(), x,
-      y);
+    final double dist = MathUtil.distance(this.centroid.getX(), this.centroid.getY(), x, y);
     if (dist < this.minDistance) {
       this.interiorPoint = new PointDouble(x, y);
       this.minDistance = dist;

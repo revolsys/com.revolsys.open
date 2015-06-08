@@ -75,6 +75,15 @@ import com.revolsys.jts.index.strtree.STRtree;
  */
 public class CascadedPolygonUnion {
   /**
+   * The effectiveness of the index is somewhat sensitive
+   * to the node capacity.
+   * Testing indicates that a smaller capacity is better.
+   * For an STRtree, 4 is probably a good number (since
+   * this produces 2x2 "squares").
+   */
+  private static final int STRTREE_NODE_CAPACITY = 4;
+
+  /**
    * Gets the element at a given list index, or
    * null if the index is out of range.
    *
@@ -132,15 +141,6 @@ public class CascadedPolygonUnion {
   private GeometryFactory geomFactory = null;
 
   /**
-   * The effectiveness of the index is somewhat sensitive
-   * to the node capacity.
-   * Testing indicates that a smaller capacity is better.
-   * For an STRtree, 4 is probably a good number (since
-   * this produces 2x2 "squares").
-   */
-  private static final int STRTREE_NODE_CAPACITY = 4;
-
-  /**
    * Creates a new instance to union
    * the given collection of {@link Geometry}s.
    *
@@ -192,12 +192,10 @@ public class CascadedPolygonUnion {
     }
   }
 
-
-
   // =======================================
 
-  private Geometry extractByEnvelope(final BoundingBox env,
-    final Geometry geom, final List disjointGeoms) {
+  private Geometry extractByEnvelope(final BoundingBox env, final Geometry geom,
+    final List disjointGeoms) {
     final List intersectingGeoms = new ArrayList();
     for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry elem = geom.getGeometry(i);
@@ -377,8 +375,8 @@ public class CascadedPolygonUnion {
    * @param common the intersection of the envelopes of the inputs
    * @return the union of the inputs
    */
-  private Geometry unionUsingEnvelopeIntersection(final Geometry g0,
-    final Geometry g1, final BoundingBox common) {
+  private Geometry unionUsingEnvelopeIntersection(final Geometry g0, final Geometry g1,
+    final BoundingBox common) {
     final List disjointPolys = new ArrayList();
 
     final Geometry g0Int = extractByEnvelope(common, g0, disjointPolys);

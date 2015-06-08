@@ -147,9 +147,8 @@ public class UnaryUnionOp {
    * or an empty GEOMETRYCOLLECTION if no geometries were provided in the input,
    * or <code>null</code> if no GeometryFactory was provided
    */
-  private static Geometry union(final GeometryFactory geometryFactory,
-    final List<Point> points, final List<LineString> lines,
-    final List<Polygon> polygons) {
+  private static Geometry union(final GeometryFactory geometryFactory, final List<Point> points,
+    final List<LineString> lines, final List<Polygon> polygons) {
     if (geometryFactory == null) {
       return null;
     } else {
@@ -211,8 +210,7 @@ public class UnaryUnionOp {
    * @param geometry a geometry
    * @return the union of the input geometry
    */
-  private static Geometry unionNoOpt(final GeometryFactory geometryFactory,
-    final Geometry geometry) {
+  private static Geometry unionNoOpt(final GeometryFactory geometryFactory, final Geometry geometry) {
     final Geometry empty = geometryFactory.point();
     return SnapIfNeededOverlayOp.overlayOp(geometry, empty, OverlayOp.UNION);
   }
@@ -226,8 +224,7 @@ public class UnaryUnionOp {
    * @return the union of the input(s)
    * or null if both inputs are null
    */
-  private static Geometry unionWithNull(final Geometry geometry1,
-    final Geometry g1) {
+  private static Geometry unionWithNull(final Geometry geometry1, final Geometry g1) {
     if (geometry1 == null && g1 == null) {
       return null;
     } else if (g1 == null) {

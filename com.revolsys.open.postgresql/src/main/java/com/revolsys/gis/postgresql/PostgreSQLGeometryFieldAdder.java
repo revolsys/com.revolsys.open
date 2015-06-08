@@ -40,10 +40,9 @@ public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
   }
 
   @Override
-  public FieldDefinition addField(final RecordDefinitionImpl recordDefinition,
-    final String dbName, final String name, final String dataTypeName,
-    final int sqlType, final int length, final int scale,
-    final boolean required, final String description) {
+  public FieldDefinition addField(final RecordDefinitionImpl recordDefinition, final String dbName,
+    final String name, final String dataTypeName, final int sqlType, final int length,
+    final int scale, final boolean required, final String description) {
     final String typePath = recordDefinition.getPath();
     String owner = this.recordStore.getDatabaseSchemaName(Path.getPath(typePath));
     if (!Property.hasValue(owner)) {
@@ -57,14 +56,13 @@ public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
       int axisCount = 3;
       try {
         final String sql = "select SRID, TYPE, COORD_DIMENSION from GEOMETRY_COLUMNS where UPPER(F_TABLE_SCHEMA) = UPPER(?) AND UPPER(F_TABLE_NAME) = UPPER(?) AND UPPER(F_GEOMETRY_COLUMN) = UPPER(?)";
-        final Map<String, Object> values = JdbcUtils.selectMap(
-          this.recordStore, sql, owner, tableName, columnName);
+        final Map<String, Object> values = JdbcUtils.selectMap(this.recordStore, sql, owner,
+          tableName, columnName);
         srid = (Integer)values.get("srid");
         type = (String)values.get("type");
         axisCount = (Integer)values.get("coord_dimension");
       } catch (final IllegalArgumentException e) {
-        LOG.warn("Cannot get geometry column metadata for " + typePath + "."
-            + columnName);
+        LOG.warn("Cannot get geometry column metadata for " + typePath + "." + columnName);
       }
 
       final DataType dataType = DATA_TYPE_MAP.get(type);
@@ -73,18 +71,17 @@ public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
       if (storeGeometryFactory == null) {
         geometryFactory = GeometryFactory.floating(srid, axisCount);
       } else {
-        geometryFactory = GeometryFactory.fixed(srid, axisCount,
-          storeGeometryFactory.getScaleXY(), storeGeometryFactory.getScaleZ());
+        geometryFactory = GeometryFactory.fixed(srid, axisCount, storeGeometryFactory.getScaleXY(),
+          storeGeometryFactory.getScaleZ());
       }
-      final FieldDefinition field = new PostgreSQLGeometryJdbcFieldDefinition(
-        dbName, name, dataType, required, description, null, srid, axisCount,
-        geometryFactory);
+      final FieldDefinition field = new PostgreSQLGeometryJdbcFieldDefinition(dbName, name,
+        dataType, required, description, null, srid, axisCount, geometryFactory);
       recordDefinition.addField(field);
       field.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
       return field;
     } catch (final Throwable e) {
-      LOG.error("Attribute not registered in GEOMETRY_COLUMN table " + owner
-        + "." + tableName + "." + name, e);
+      LOG.error("Attribute not registered in GEOMETRY_COLUMN table " + owner + "." + tableName
+        + "." + name, e);
       return null;
     }
   }

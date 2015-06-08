@@ -40,9 +40,9 @@ import java.util.ArrayList;
  * @author Martin Davis
  *
  */
-public class PriorityQueue
-{
+public class PriorityQueue {
   private int size; // Number of elements in queue
+
   private final ArrayList items; // The queue binary heap array
 
   /**
@@ -60,8 +60,7 @@ public class PriorityQueue
    * Duplicates are allowed.
    * @param x the item to insert.
    */
-  public void add(final Comparable x)
-  {
+  public void add(final Comparable x) {
     // increase the size of the items heap to create a hole for the new item
     this.items.add(null);
 
@@ -83,10 +82,8 @@ public class PriorityQueue
    * Establish heap from an arbitrary arrangement of items.
    */
   /*
-   private void buildHeap( ) {
-   for( int i = currentSize / 2; i > 0; i-- )
-   reorder( i );
-   }
+   * private void buildHeap( ) { for( int i = currentSize / 2; i > 0; i-- )
+   * reorder( i ); }
    */
 
   /**
@@ -109,8 +106,7 @@ public class PriorityQueue
    * Remove the smallest item from the priority queue.
    * @return the smallest item, or null if empty
    */
-  public Object poll()
-  {
+  public Object poll() {
     if (isEmpty()) {
       return null;
     }
@@ -127,18 +123,17 @@ public class PriorityQueue
    *
    * @param hole the index at which the percolate begins.
    */
-  private void reorder(int hole)
-  {
+  private void reorder(int hole) {
     int child;
     final Object tmp = this.items.get(hole);
 
     for (; hole * 2 <= this.size; hole = child) {
       child = hole * 2;
       if (child != this.size
-          && ((Comparable) this.items.get(child + 1)).compareTo(this.items.get(child)) < 0) {
+        && ((Comparable)this.items.get(child + 1)).compareTo(this.items.get(child)) < 0) {
         child++;
       }
-      if (((Comparable) this.items.get(child)).compareTo(tmp) < 0) {
+      if (((Comparable)this.items.get(child)).compareTo(tmp) < 0) {
         this.items.set(hole, this.items.get(child));
       } else {
         break;

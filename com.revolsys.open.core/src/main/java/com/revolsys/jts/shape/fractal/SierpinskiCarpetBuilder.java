@@ -59,8 +59,8 @@ public class SierpinskiCarpetBuilder extends GeometricShapeBuilder {
     super(geomFactory);
   }
 
-  private void addHoles(final int n, final double originX,
-    final double originY, final double width, final List<LinearRing> holeList) {
+  private void addHoles(final int n, final double originX, final double originY,
+    final double width, final List<LinearRing> holeList) {
     if (n < 0) {
       return;
     }
@@ -71,22 +71,17 @@ public class SierpinskiCarpetBuilder extends GeometricShapeBuilder {
     addHoles(n2, originX + 2 * widthThird, originY, widthThird, holeList);
 
     addHoles(n2, originX, originY + widthThird, widthThird, holeList);
-    addHoles(n2, originX + 2 * widthThird, originY + widthThird, widthThird,
-      holeList);
+    addHoles(n2, originX + 2 * widthThird, originY + widthThird, widthThird, holeList);
 
     addHoles(n2, originX, originY + 2 * widthThird, widthThird, holeList);
-    addHoles(n2, originX + widthThird, originY + 2 * widthThird, widthThird,
-      holeList);
-    addHoles(n2, originX + 2 * widthThird, originY + 2 * widthThird,
-      widthThird, holeList);
+    addHoles(n2, originX + widthThird, originY + 2 * widthThird, widthThird, holeList);
+    addHoles(n2, originX + 2 * widthThird, originY + 2 * widthThird, widthThird, holeList);
 
     // add the centre hole
-    holeList.add(createSquareHole(originX + widthThird, originY + widthThird,
-      widthThird));
+    holeList.add(createSquareHole(originX + widthThird, originY + widthThird, widthThird));
   }
 
-  private LinearRing createSquareHole(final double x, final double y,
-    final double width) {
+  private LinearRing createSquareHole(final double x, final double y, final double width) {
     final Point[] pts = new Point[] {
       new PointDouble(x, y, Point.NULL_ORDINATE),
       new PointDouble(x + width, y, Point.NULL_ORDINATE),

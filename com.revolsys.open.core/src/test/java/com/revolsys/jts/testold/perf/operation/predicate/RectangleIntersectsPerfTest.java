@@ -48,11 +48,6 @@ import com.revolsys.jts.util.GeometricShapeFactory;
 import com.revolsys.jts.util.Stopwatch;
 
 public class RectangleIntersectsPerfTest {
-  public static void main(final String[] args) {
-    final RectangleIntersectsPerfTest test = new RectangleIntersectsPerfTest();
-    test.test();
-  }
-
   static final int MAX_ITER = 10;
 
   static final int NUM_AOI_PTS = 2000;
@@ -61,10 +56,14 @@ public class RectangleIntersectsPerfTest {
 
   static final int NUM_LINE_PTS = 1000;
 
-  private static final GeometryFactory geometryFactory = GeometryFactory.floating(
-    0, 2);
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
 
   static WKTReader wktRdr = new WKTReader(geometryFactory);
+
+  public static void main(final String[] args) {
+    final RectangleIntersectsPerfTest test = new RectangleIntersectsPerfTest();
+    test.test();
+  }
 
   Stopwatch sw = new Stopwatch();
 
@@ -95,8 +94,7 @@ public class RectangleIntersectsPerfTest {
    * @param rectSize
    * @return
    */
-  List<Geometry> createRectangles(final BoundingBox env, final int nRect,
-    final double rectSize) {
+  List<Geometry> createRectangles(final BoundingBox env, final int nRect, final double rectSize) {
     final int nSide = 1 + (int)Math.sqrt(nRect);
     final double dx = env.getWidth() / nSide;
     final double dy = env.getHeight() / nSide;
@@ -106,8 +104,7 @@ public class RectangleIntersectsPerfTest {
       for (int j = 0; j < nSide; j++) {
         final double baseX = env.getMinX() + i * dx;
         final double baseY = env.getMinY() + j * dy;
-        final BoundingBox envRect = new BoundingBoxDoubleGf(2, baseX, baseY, baseX + dx,
-          baseY + dy);
+        final BoundingBox envRect = new BoundingBoxDoubleGf(2, baseX, baseY, baseX + dx, baseY + dy);
         final Geometry rect = envRect.toGeometry();
         rectList.add(rect);
       }
@@ -115,8 +112,7 @@ public class RectangleIntersectsPerfTest {
     return rectList;
   }
 
-  Geometry createSineStar(final Point origin, final double size,
-    final int nPts) {
+  Geometry createSineStar(final Point origin, final double size, final int nPts) {
     final SineStarFactory gsf = new SineStarFactory();
     gsf.setCentre(origin);
     gsf.setSize(size);
@@ -158,8 +154,7 @@ public class RectangleIntersectsPerfTest {
 
   void test(final int nPts) {
     final double size = 100;
-    final Point origin = new PointDouble((double)0, 0,
-      Point.NULL_ORDINATE);
+    final Point origin = new PointDouble((double)0, 0, Point.NULL_ORDINATE);
     final Geometry sinePoly = createSineStar(origin, size, nPts).getBoundary();
     GeometryFactory geometryFactory = sinePoly.getGeometryFactory();
     geometryFactory = GeometryFactory.fixed(geometryFactory.getSrid(),
@@ -179,10 +174,8 @@ public class RectangleIntersectsPerfTest {
     testRectangles(target, 100, 5);
   }
 
-  void testRectangles(final Geometry target, final int nRect,
-    final double rectSize) {
-    final Collection<Geometry> rects = createRectangles(
-      target.getBoundingBox(), nRect, rectSize);
+  void testRectangles(final Geometry target, final int nRect, final double rectSize) {
+    final Collection<Geometry> rects = createRectangles(target.getBoundingBox(), nRect, rectSize);
     test(rects, target);
   }
 

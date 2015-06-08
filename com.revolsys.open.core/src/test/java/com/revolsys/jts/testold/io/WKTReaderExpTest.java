@@ -32,14 +32,14 @@ public class WKTReaderExpTest extends TestCase {
     try {
       final Geometry g = this.rdr.read(wkt);
     } catch (final ParseException ex) {
-      //  System.out.println(ex.getMessage());
+      // System.out.println(ex.getMessage());
       threwParseEx = true;
     }
     assertTrue(threwParseEx);
   }
 
-  private void readGoodCheckCoordinate(final String wkt, final double x,
-    final double y) throws IOException, ParseException {
+  private void readGoodCheckCoordinate(final String wkt, final double x, final double y)
+    throws IOException, ParseException {
     final Geometry g = this.rdr.read(wkt);
     final Point pt = g.getPoint();
     assertEquals(pt.getX(), x, 0.0001);

@@ -72,7 +72,7 @@ public class Base64EncodingWriter extends java.io.PrintWriter {
 
   private void writeBuffer() {
     final int inBuff = this.buffer[0] << 24 >>> 8 | this.buffer[1] << 24 >>> 16
-        | this.buffer[2] << 24 >>> 24;
+      | this.buffer[2] << 24 >>> 24;
     write(Base64Constants.URL_SAFE_ALPHABET[inBuff >>> 18]);
     write(Base64Constants.URL_SAFE_ALPHABET[inBuff >>> 12 & 0x3f]);
     write(Base64Constants.URL_SAFE_ALPHABET[inBuff >>> 6 & 0x3f]);

@@ -38,8 +38,8 @@ public class FieldSupport {
 
   private boolean updating = false;
 
-  public FieldSupport(final Field field, final JComponent component,
-    final String name, final Object value) {
+  public FieldSupport(final Field field, final JComponent component, final String name,
+    final Object value) {
     this.field = field;
     this.name = name;
     this.value = value;
@@ -54,8 +54,7 @@ public class FieldSupport {
     this.originalTooltipText = this.component.getToolTipText();
     this.iconBorder = new IconBorder(null);
     final Border originalBorder = this.component.getBorder();
-    this.component.setBorder(BorderFactory.createCompoundBorder(originalBorder,
-      this.iconBorder));
+    this.component.setBorder(BorderFactory.createCompoundBorder(originalBorder, this.iconBorder));
   }
 
   public FieldSupport(final Field field, final String name, final Object value) {
@@ -95,8 +94,8 @@ public class FieldSupport {
     return Property.hasValue(this.errorMessage);
   }
 
-  public void setFieldInvalid(final String message,
-    final Color foregroundColor, final Color backgroundColor) {
+  public void setFieldInvalid(final String message, final Color foregroundColor,
+    final Color backgroundColor) {
     this.updating = true;
     try {
       this.component.setForeground(foregroundColor);
@@ -148,8 +147,7 @@ public class FieldSupport {
     if (!EqualsRegistry.equal(oldValue, value)) {
       this.value = value;
       this.field.firePropertyChange(this.name, oldValue, value);
-      SetFieldValueUndoableEdit.create(this.undoManager.getParent(),
-        this.field, oldValue, value);
+      SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this.field, oldValue, value);
     }
   }
 }

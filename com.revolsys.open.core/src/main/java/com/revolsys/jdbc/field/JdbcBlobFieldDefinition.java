@@ -15,24 +15,23 @@ import com.revolsys.data.types.DataTypes;
 import com.revolsys.jdbc.LocalBlob;
 
 public class JdbcBlobFieldDefinition extends JdbcFieldDefinition {
-  public JdbcBlobFieldDefinition(final String dbName, final String name,
-    final int sqlType, final int length, final boolean required,
-    final String description, final Map<String, Object> properties) {
-    super(dbName, name, DataTypes.BLOB, sqlType, length, 0, required,
-      description, properties);
+  public JdbcBlobFieldDefinition(final String dbName, final String name, final int sqlType,
+    final int length, final boolean required, final String description,
+    final Map<String, Object> properties) {
+    super(dbName, name, DataTypes.BLOB, sqlType, length, 0, required, description, properties);
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet,
-    final int columnIndex, final Record object) throws SQLException {
+  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final Record object) throws SQLException {
     final Blob value = resultSet.getBlob(columnIndex);
     object.setValue(getIndex(), value);
     return columnIndex + 1;
   }
 
   @Override
-  public int setPreparedStatementValue(final PreparedStatement statement,
-    final int parameterIndex, final Object value) throws SQLException {
+  public int setPreparedStatementValue(final PreparedStatement statement, final int parameterIndex,
+    final Object value) throws SQLException {
     if (value == null) {
       final int sqlType = getSqlType();
       statement.setNull(parameterIndex, sqlType);

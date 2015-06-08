@@ -90,8 +90,7 @@ public class MinimumBoundingCircle {
     return min;
   }
 
-  private static Point pointWithMinAngleWithSegment(
-    final Point[] pts, final Point P, final Point Q) {
+  private static Point pointWithMinAngleWithSegment(final Point[] pts, final Point P, final Point Q) {
     double minAng = Double.MAX_VALUE;
     Point minAngPt = null;
     for (final Point p : pts) {
@@ -113,8 +112,7 @@ public class MinimumBoundingCircle {
 
   }
 
-  private static Point pointWitMinAngleWithX(final Point[] pts,
-    final Point P) {
+  private static Point pointWitMinAngleWithX(final Point[] pts, final Point P) {
     double minSin = Double.MAX_VALUE;
     Point minAngPt = null;
     for (final Point p : pts) {
@@ -176,20 +174,19 @@ public class MinimumBoundingCircle {
     switch (this.extremalPts.length) {
       case 0:
         this.centre = null;
-        break;
+      break;
       case 1:
         this.centre = this.extremalPts[0];
-        break;
+      break;
       case 2:
         this.centre = new PointDouble(
           (this.extremalPts[0].getX() + this.extremalPts[1].getX()) / 2.0,
-          (this.extremalPts[0].getY() + this.extremalPts[1].getY()) / 2.0,
-          Point.NULL_ORDINATE);
-        break;
+          (this.extremalPts[0].getY() + this.extremalPts[1].getY()) / 2.0, Point.NULL_ORDINATE);
+      break;
       case 3:
         this.centre = Triangle.circumcentre(this.extremalPts[0], this.extremalPts[1],
           this.extremalPts[2]);
-        break;
+      break;
     }
   }
 
@@ -216,7 +213,7 @@ public class MinimumBoundingCircle {
 
     // strip duplicate final point, if any
     Point[] pts = hullPts;
-    if (hullPts[0].equals(2,hullPts[hullPts.length - 1])) {
+    if (hullPts[0].equals(2, hullPts[hullPts.length - 1])) {
       pts = new Point[hullPts.length - 1];
       CoordinateArrays.copyDeep(hullPts, 0, pts, 0, hullPts.length - 1);
     }

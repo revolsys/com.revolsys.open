@@ -132,9 +132,8 @@ public class FastNodingValidator {
     }
 
     final Point[] intSegs = this.segInt.getIntersectionSegments();
-    return "found non-noded intersection between "
-    + EWktWriter.lineString(intSegs[0], intSegs[1]) + " and "
-    + EWktWriter.lineString(intSegs[2], intSegs[3]);
+    return "found non-noded intersection between " + EWktWriter.lineString(intSegs[0], intSegs[1])
+      + " and " + EWktWriter.lineString(intSegs[2], intSegs[3]);
   }
 
   public List getIntersections() {

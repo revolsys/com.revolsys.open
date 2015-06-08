@@ -21,14 +21,12 @@ import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.util.Property;
 
-public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
-implements PropertyChangeListener {
+public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode implements
+  PropertyChangeListener {
 
-  private static final MenuFactory MENU = new MenuFactory(
-    "Folder Connection Registry");
+  private static final MenuFactory MENU = new MenuFactory("Folder Connection Registry");
 
-  public FolderConnectionRegistryTreeNode(
-    final FolderConnectionRegistry registry) {
+  public FolderConnectionRegistryTreeNode(final FolderConnectionRegistry registry) {
     super(registry);
     setType("Folder Connections");
     setName(registry.getName());
@@ -72,8 +70,7 @@ implements PropertyChangeListener {
     final FolderConnectionRegistry registry = getRegistry();
     final List<FolderConnection> conections = registry.getConections();
     for (final FolderConnection connection : conections) {
-      final FolderConnectionTreeNode child = new FolderConnectionTreeNode(
-        connection);
+      final FolderConnectionTreeNode child = new FolderConnectionTreeNode(connection);
       children.add(child);
     }
     return children;

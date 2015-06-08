@@ -22,8 +22,7 @@ public class MinimumClearanceTest extends TestCase {
     super(name);
   }
 
-  private void runTest(final String wkt, final double expectedValue)
-      throws ParseException {
+  private void runTest(final String wkt, final double expectedValue) throws ParseException {
     final Geometry g = this.reader.read(wkt);
     final double rp = MinimumClearance.getDistance(g);
     assertEquals(expectedValue, rp);

@@ -41,8 +41,7 @@ import java.util.Iterator;
  *
  * @version 1.7
  */
-public class SimpleSegmentSetMutualIntersector implements
-SegmentSetMutualIntersector {
+public class SimpleSegmentSetMutualIntersector implements SegmentSetMutualIntersector {
   private final Collection baseSegStrings;
 
   /**
@@ -84,8 +83,7 @@ SegmentSetMutualIntersector {
    * @param the segment intersector to use
    */
   @Override
-  public void process(final Collection segStrings,
-    final SegmentIntersector segInt) {
+  public void process(final Collection segStrings, final SegmentIntersector segInt) {
     for (final Iterator i = this.baseSegStrings.iterator(); i.hasNext();) {
       final SegmentString baseSS = (SegmentString)i.next();
       for (final Iterator j = segStrings.iterator(); j.hasNext();) {

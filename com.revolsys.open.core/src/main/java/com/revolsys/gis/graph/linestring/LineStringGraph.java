@@ -40,8 +40,11 @@ import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 
 public class LineStringGraph extends Graph<LineSegment> {
-  public static Edge<LineSegment> getFirstEdge(
-    final Collection<Edge<LineSegment>> edges) {
+  private static final String INDEX = "INDEX";
+
+  private static final CollectionComparator<Integer> INDEX_COMPARATOR = new CollectionComparator<Integer>();
+
+  public static Edge<LineSegment> getFirstEdge(final Collection<Edge<LineSegment>> edges) {
     final Iterator<Edge<LineSegment>> iterator = edges.iterator();
     if (iterator.hasNext()) {
       Edge<LineSegment> edge = iterator.next();
@@ -60,10 +63,6 @@ public class LineStringGraph extends Graph<LineSegment> {
     }
   }
 
-  private static final String INDEX = "INDEX";
-
-  private static final CollectionComparator<Integer> INDEX_COMPARATOR = new CollectionComparator<Integer>();
-
   private GeometryFactory geometryFactory;
 
   private LineString points;
@@ -72,8 +71,7 @@ public class LineStringGraph extends Graph<LineSegment> {
 
   private BoundingBox envelope;
 
-  public LineStringGraph(final GeometryFactory geometryFactory,
-    final LineString line) {
+  public LineStringGraph(final GeometryFactory geometryFactory, final LineString line) {
     super(false);
     setGeometryFactory(geometryFactory);
     setLineString(line);
@@ -126,7 +124,7 @@ public class LineStringGraph extends Graph<LineSegment> {
   public List<LineString> getLines() {
     removeDuplicateEdges();
     final EdgeAttributeValueComparator<LineSegment> comparator = new EdgeAttributeValueComparator<LineSegment>(
-        "INDEX");
+      "INDEX");
     final List<LineString> lines = new ArrayList<LineString>();
     final int axisCount = this.geometryFactory.getAxisCount();
     List<Point> points = new ArrayList<>();
@@ -178,14 +176,12 @@ public class LineStringGraph extends Graph<LineSegment> {
       final Node<LineSegment> fromNode = edge.getFromNode();
       final Node<LineSegment> toNode = edge.getToNode();
       final LineSegment lineSegment = edge.getObject();
-      final PointOnLineSegment coordinatesFilter = new PointOnLineSegment(
-        lineSegment, tolerance);
+      final PointOnLineSegment coordinatesFilter = new PointOnLineSegment(lineSegment, tolerance);
       final NodeCoordinatesFilter<LineSegment> nodeFilter = new NodeCoordinatesFilter<LineSegment>(
-          coordinatesFilter);
+        coordinatesFilter);
       final NodeDistanceComparator<LineSegment> comparator = new NodeDistanceComparator<LineSegment>(
-          fromNode);
-      final List<Node<LineSegment>> nodes = graph1.getNodes(nodeFilter,
-        comparator);
+        fromNode);
+      final List<Node<LineSegment>> nodes = graph1.getNodes(nodeFilter, comparator);
       for (final Iterator<Node<LineSegment>> iterator = nodes.iterator(); iterator.hasNext();) {
         final Node<LineSegment> node = iterator.next();
         if (node.equals(2, fromNode)) {
@@ -218,8 +214,7 @@ public class LineStringGraph extends Graph<LineSegment> {
           final LineSegment lineSegment2 = edge2.getObject();
           final Geometry intersections = ((LineSegment)lineSegment1.convert(getGeometryFactory())).getIntersection(lineSegment2);
           for (final Point intersection : intersections.vertices()) {
-            if (!lineSegment1.isEndPoint(intersection)
-                && !lineSegment2.isEndPoint(intersection)) {
+            if (!lineSegment1.isEndPoint(intersection) && !lineSegment2.isEndPoint(intersection)) {
               intersectionPoints.add(intersection);
             }
           }
@@ -254,13 +249,11 @@ public class LineStringGraph extends Graph<LineSegment> {
 
   public boolean hasTouchingEdges(final Node<LineSegment> node) {
     final GeometryFactory precisionModel = getPrecisionModel();
-    final List<Edge<LineSegment>> edges = findEdges(node,
-      precisionModel.getScaleXY());
+    final List<Edge<LineSegment>> edges = findEdges(node, precisionModel.getScaleXY());
     for (final Edge<LineSegment> edge : edges) {
       final Point lineStart = edge.getFromNode();
       final Point lineEnd = edge.getToNode();
-      if (LineSegmentUtil.isPointOnLineMiddle(precisionModel, lineStart,
-        lineEnd, node)) {
+      if (LineSegmentUtil.isPointOnLineMiddle(precisionModel, lineStart, lineEnd, node)) {
         return true;
       }
     }
@@ -284,10 +277,9 @@ public class LineStringGraph extends Graph<LineSegment> {
       Point previousPoint = fromPoint;
       for (int i = 1; i < numPoints; i++) {
         final Point nextPoint = points.getPoint(i);
-        final LineSegment line1 = new LineSegmentDoubleGF(previousPoint,
-          nextPoint);
-        final List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(
-          this, line1, maxDistance);
+        final LineSegment line1 = new LineSegmentDoubleGF(previousPoint, nextPoint);
+        final List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(this, line1,
+          maxDistance);
         for (final Edge<LineSegment> edge2 : edges) {
           final LineSegment line2 = edge2.getObject();
           final Geometry intersections = line1.getIntersection(line2);
@@ -355,9 +347,8 @@ public class LineStringGraph extends Graph<LineSegment> {
     for (final Edge<LineSegment> edge : getEdges()) {
       final LineSegment line = edge.getObject();
       final EdgeObjectFilter<LineSegment> filter = new EdgeObjectFilter<LineSegment>(
-          new LineSegmentIntersectingFilter(line));
-      final List<Edge<LineSegment>> edges = getEdges(filter,
-        line.getBoundingBox());
+        new LineSegmentIntersectingFilter(line));
+      final List<Edge<LineSegment>> edges = getEdges(filter, line.getBoundingBox());
       for (final Edge<LineSegment> edge2 : edges) {
         final LineSegment line2 = edge2.getObject();
         final Geometry intersections = line.getIntersection(line2);
@@ -374,18 +365,17 @@ public class LineStringGraph extends Graph<LineSegment> {
   }
 
   @Override
-  public void nodeMoved(final Node<LineSegment> node,
-    final Node<LineSegment> newNode) {
+  public void nodeMoved(final Node<LineSegment> node, final Node<LineSegment> newNode) {
     if (this.fromPoint.equals(2, node)) {
       this.fromPoint = new PointDouble(newNode);
     }
   }
 
   private void removeDuplicateEdges() {
-    final Visitor<Edge<LineSegment>> visitor = new InvokeMethodVisitor<Edge<LineSegment>>(
-        this, "removeDuplicateEdges");
+    final Visitor<Edge<LineSegment>> visitor = new InvokeMethodVisitor<Edge<LineSegment>>(this,
+      "removeDuplicateEdges");
     final Comparator<Edge<LineSegment>> comparator = new EdgeAttributeValueComparator<LineSegment>(
-        INDEX);
+      INDEX);
     visitEdges(comparator, visitor);
   }
 
@@ -427,8 +417,7 @@ public class LineStringGraph extends Graph<LineSegment> {
     for (final LineSegment lineSegment : points.segments()) {
       final Point from = lineSegment.getPoint(0);
       final Point to = lineSegment.getPoint(1);
-      final Edge<LineSegment> edge = addEdge((LineSegment)lineSegment.clone(),
-        from, to);
+      final Edge<LineSegment> edge = addEdge((LineSegment)lineSegment.clone(), from, to);
 
       edge.setAttribute(INDEX, Arrays.asList(index++));
     }
@@ -438,19 +427,17 @@ public class LineStringGraph extends Graph<LineSegment> {
 
   public void splitCrossingEdges() {
     final Comparator<Edge<LineSegment>> comparator = new EdgeAttributeValueComparator<LineSegment>(
-        INDEX);
-    final Visitor<Edge<LineSegment>> visitor = new InvokeMethodVisitor<Edge<LineSegment>>(
-        this, "splitCrossingEdges");
+      INDEX);
+    final Visitor<Edge<LineSegment>> visitor = new InvokeMethodVisitor<Edge<LineSegment>>(this,
+      "splitCrossingEdges");
     visitEdges(comparator, visitor);
   }
 
   public boolean splitCrossingEdges(final Edge<LineSegment> edge1) {
     final LineSegment line1 = edge1.getObject();
     final Filter<LineSegment> lineFilter = new CrossingLineSegmentFilter(line1);
-    final Filter<Edge<LineSegment>> filter = new EdgeObjectFilter<LineSegment>(
-        lineFilter);
-    final List<Edge<LineSegment>> edges = getEdges(filter,
-      line1.getBoundingBox());
+    final Filter<Edge<LineSegment>> filter = new EdgeObjectFilter<LineSegment>(lineFilter);
+    final List<Edge<LineSegment>> edges = getEdges(filter, line1.getBoundingBox());
 
     if (!edges.isEmpty()) {
       final List<Point> points = new ArrayList<Point>();
@@ -471,14 +458,13 @@ public class LineStringGraph extends Graph<LineSegment> {
   }
 
   @Override
-  public <V extends Point> List<Edge<LineSegment>> splitEdge(
-    final Edge<LineSegment> edge, final Collection<V> nodes) {
+  public <V extends Point> List<Edge<LineSegment>> splitEdge(final Edge<LineSegment> edge,
+    final Collection<V> nodes) {
     final List<Edge<LineSegment>> newEdges = new ArrayList<Edge<LineSegment>>();
     if (!edge.isRemoved()) {
       final Node<LineSegment> fromNode = edge.getFromNode();
       final Node<LineSegment> toNode = edge.getToNode();
-      final CoordinatesDistanceComparator comparator = new CoordinatesDistanceComparator(
-        fromNode);
+      final CoordinatesDistanceComparator comparator = new CoordinatesDistanceComparator(fromNode);
       final Set<Point> newPoints = new TreeSet<Point>(comparator);
       for (final Point point : nodes) {
         newPoints.add(point);
@@ -489,10 +475,8 @@ public class LineStringGraph extends Graph<LineSegment> {
       int i = 0;
       Point previousPoint = fromNode;
       for (final Point point : newPoints) {
-        final LineSegment lineSegment = new LineSegmentDoubleGF(previousPoint,
-          point);
-        final Edge<LineSegment> newEdge = addEdge(lineSegment, previousPoint,
-          point);
+        final LineSegment lineSegment = new LineSegmentDoubleGF(previousPoint, point);
+        final Edge<LineSegment> newEdge = addEdge(lineSegment, previousPoint, point);
         final List<Integer> newIndecies = new ArrayList<Integer>(index);
         newIndecies.add(i++);
         newEdge.setAttribute(INDEX, newIndecies);
@@ -505,8 +489,7 @@ public class LineStringGraph extends Graph<LineSegment> {
     return newEdges;
   }
 
-  public <V extends Point> void splitEdges(
-    final Map<Edge<LineSegment>, List<V>> pointsOnEdge1) {
+  public <V extends Point> void splitEdges(final Map<Edge<LineSegment>, List<V>> pointsOnEdge1) {
     for (final Entry<Edge<LineSegment>, List<V>> entry : pointsOnEdge1.entrySet()) {
       final Edge<LineSegment> edge = entry.getKey();
       final List<V> nodes = entry.getValue();

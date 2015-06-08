@@ -35,8 +35,8 @@ public class MacApplicationListenerHandler implements InvocationHandler {
   }
 
   @Override
-  public Object invoke(final Object proxy, final Method method,
-    final Object[] args) throws Throwable {
+  public Object invoke(final Object proxy, final Method method, final Object[] args)
+    throws Throwable {
     if (method.getName().equals("openFiles")) {
       final Object event = args[0];
       openFiles(event);

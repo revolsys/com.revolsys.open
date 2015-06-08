@@ -14,8 +14,8 @@ import com.revolsys.jts.geom.GeometryFactory;
 
 public class TestUtil {
 
-  public static boolean assertEqualsExact(final int axisCount,
-    final Geometry expectedGeometry, final Geometry actualGeometry) {
+  public static boolean assertEqualsExact(final int axisCount, final Geometry expectedGeometry,
+    final Geometry actualGeometry) {
     if (actualGeometry.equals(axisCount, expectedGeometry)) {
       return true;
     } else {
@@ -28,15 +28,15 @@ public class TestUtil {
     boolean valid = true;
     final Resource resource = new ClassPathResource(file, clazz);
     try (
-        Reader<Record> reader = RecordIo.recordReader(resource)) {
+      Reader<Record> reader = RecordIo.recordReader(resource)) {
       int i = 0;
       for (final Record object : reader) {
         final int srid = object.getInteger("srid");
         final int axisCount = object.getInteger("axisCount");
         final double scaleXy = object.getInteger("scaleXy");
         final double scaleZ = object.getInteger("scaleZ");
-        final GeometryFactory geometryFactory = GeometryFactory.fixed(srid,
-          axisCount, scaleXy, scaleZ);
+        final GeometryFactory geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXy,
+          scaleZ);
         final String wkt = object.getValue("wkt");
         final Geometry geometry = geometryFactory.geometry(wkt);
         valid &= equalsExpectedWkt(i, object, geometry);
@@ -44,11 +44,10 @@ public class TestUtil {
         GeometryFactory otherGeometryFactory;
         if (coordinateSystem instanceof ProjectedCoordinateSystem) {
           final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
-          otherGeometryFactory = GeometryFactory.fixed(
-            projectedCoordinateSystem.getId(), axisCount, scaleXy, scaleZ);
+          otherGeometryFactory = GeometryFactory.fixed(projectedCoordinateSystem.getId(),
+            axisCount, scaleXy, scaleZ);
         } else {
-          otherGeometryFactory = GeometryFactory.fixed(3005, axisCount,
-            scaleXy, scaleZ);
+          otherGeometryFactory = GeometryFactory.fixed(3005, axisCount, scaleXy, scaleZ);
         }
         final Geometry convertedGeometry = geometry.convert(otherGeometryFactory);
         final Geometry convertedBackGeometry = convertedGeometry.convert(geometryFactory);
@@ -61,30 +60,27 @@ public class TestUtil {
     }
   }
 
-  public static boolean equalsExact(final int axisCount,
-    final Geometry actualGeometry, final Geometry expectedGeometry) {
+  public static boolean equalsExact(final int axisCount, final Geometry actualGeometry,
+    final Geometry expectedGeometry) {
     if (actualGeometry.equals(axisCount, expectedGeometry)) {
       return true;
     } else {
-      System.err.println("Equals Exact\t" + expectedGeometry + "\t"
-          + actualGeometry);
+      System.err.println("Equals Exact\t" + expectedGeometry + "\t" + actualGeometry);
       return false;
     }
   }
 
-  public static boolean equalsExpectedGeometry(final int i,
-    final Geometry actualGeometry, final Geometry expectedGeometry) {
+  public static boolean equalsExpectedGeometry(final int i, final Geometry actualGeometry,
+    final Geometry expectedGeometry) {
     final int actualSrid = actualGeometry.getSrid();
     final int expectedSrid = expectedGeometry.getSrid();
     if (actualSrid != expectedSrid) {
-      System.err.println(i + "\tEquals Srid\t" + expectedSrid + "\t"
-          + actualSrid);
+      System.err.println(i + "\tEquals Srid\t" + expectedSrid + "\t" + actualSrid);
       return false;
     } else if (actualGeometry.equals(2, expectedGeometry)) {
       return true;
     } else {
-      System.err.println(i + "\tEquals Exact\t" + expectedGeometry + "\t"
-          + actualGeometry);
+      System.err.println(i + "\tEquals Exact\t" + expectedGeometry + "\t" + actualGeometry);
       return false;
     }
   }
@@ -97,13 +93,11 @@ public class TestUtil {
     return equalsExpectedGeometry(i, actualGeometry, expectedGeometry);
   }
 
-  public static void failNotEquals(final String message, final Object expected,
-    final Object actual) {
+  public static void failNotEquals(final String message, final Object expected, final Object actual) {
     Assert.fail(format(message, expected, actual));
   }
 
-  public static String format(final String message, final Object expected,
-    final Object actual) {
+  public static String format(final String message, final Object expected, final Object actual) {
     String formatted = "";
     if (message != null && !message.equals("")) {
       formatted = message + " ";
@@ -111,19 +105,15 @@ public class TestUtil {
     final String expectedString = String.valueOf(expected);
     final String actualString = String.valueOf(actual);
     if (expectedString.equals(actualString)) {
-      return formatted + "expected: "
-          + formatClassAndValue(expected, expectedString) + " but was: "
-          + formatClassAndValue(actual, actualString);
+      return formatted + "expected: " + formatClassAndValue(expected, expectedString)
+        + " but was: " + formatClassAndValue(actual, actualString);
     } else {
-      return formatted + "expected:<" + expectedString + "> but was:<"
-          + actualString + ">";
+      return formatted + "expected:<" + expectedString + "> but was:<" + actualString + ">";
     }
   }
 
-  public static String formatClassAndValue(final Object value,
-    final String valueString) {
-    final String className = value == null ? "null" : value.getClass()
-      .getName();
+  public static String formatClassAndValue(final Object value, final String valueString) {
+    final String className = value == null ? "null" : value.getClass().getName();
     return className + "<" + valueString + ">";
   }
 

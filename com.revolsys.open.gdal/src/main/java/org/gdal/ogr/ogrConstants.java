@@ -8,7 +8,6 @@
 
 package org.gdal.ogr;
 
-
 public interface ogrConstants {
   public final static int wkb25DBit = 0x80000000;
 

@@ -13,15 +13,14 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 
-public class MappedLocation extends AbstractPropertyChangeObject implements
-MapSerializer {
-  public static Point targetPointToPixel(final BoundingBox boundingBox,
-    final Point point, final int imageWidth, final int imageHeight) {
+public class MappedLocation extends AbstractPropertyChangeObject implements MapSerializer {
+  public static Point targetPointToPixel(final BoundingBox boundingBox, final Point point,
+    final int imageWidth, final int imageHeight) {
     return toImagePoint(boundingBox, point, imageWidth, imageHeight);
   }
 
-  public static Point toImagePoint(final BoundingBox boundingBox,
-    Point modelPoint, final int imageWidth, final int imageHeight) {
+  public static Point toImagePoint(final BoundingBox boundingBox, Point modelPoint,
+    final int imageWidth, final int imageHeight) {
     modelPoint = modelPoint.convert(boundingBox.getGeometryFactory(), 2);
     final double modelX = modelPoint.getX();
     final double modelY = modelPoint.getY();
@@ -40,14 +39,12 @@ MapSerializer {
   }
 
   public static double[] toModelCoordinates(final GeoReferencedImage image,
-    final BoundingBox boundingBox, final boolean useTransform,
-    final double... coordinates) {
+    final BoundingBox boundingBox, final boolean useTransform, final double... coordinates) {
     double[] targetCoordinates;
     if (useTransform) {
       targetCoordinates = new double[10];
       final AffineTransform transform = image.getAffineTransformation(boundingBox);
-      transform.transform(coordinates, 0, targetCoordinates, 0,
-        coordinates.length / 2);
+      transform.transform(coordinates, 0, targetCoordinates, 0, coordinates.length / 2);
     } else {
       targetCoordinates = coordinates.clone();
     }
@@ -56,8 +53,7 @@ MapSerializer {
     for (int vertexIndex = 0; vertexIndex < coordinates.length / 2; vertexIndex++) {
       final int vertexOffset = vertexIndex * 2;
       final double xPercent = targetCoordinates[vertexOffset] / imageWidth;
-      final double yPercent = (imageHeight - targetCoordinates[vertexOffset + 1])
-          / imageHeight;
+      final double yPercent = (imageHeight - targetCoordinates[vertexOffset + 1]) / imageHeight;
 
       final double modelWidth = boundingBox.getWidth();
       final double modelHeight = boundingBox.getHeight();
@@ -97,12 +93,11 @@ MapSerializer {
     return this.sourcePixel;
   }
 
-  public Point getSourcePoint(final GeoReferencedImage image,
-    final BoundingBox boundingBox, final boolean useTransform) {
+  public Point getSourcePoint(final GeoReferencedImage image, final BoundingBox boundingBox,
+    final boolean useTransform) {
     final Point sourcePixel = getSourcePixel();
-    final double[] sourcePoint = toModelCoordinates(image, boundingBox,
-      useTransform, sourcePixel.getX(),
-      image.getImageHeight() - sourcePixel.getY());
+    final double[] sourcePoint = toModelCoordinates(image, boundingBox, useTransform,
+      sourcePixel.getX(), image.getImageHeight() - sourcePixel.getY());
     final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
     return geometryFactory.point(sourcePoint[0], sourcePoint[1]);
   }
@@ -124,9 +119,8 @@ MapSerializer {
     final BoundingBox boundingBox, final boolean useTransform) {
 
     final Point sourcePixel = getSourcePixel();
-    final double[] sourcePoint = toModelCoordinates(image, boundingBox,
-      useTransform, sourcePixel.getX(),
-      image.getImageHeight() - sourcePixel.getY());
+    final double[] sourcePoint = toModelCoordinates(image, boundingBox, useTransform,
+      sourcePixel.getX(), image.getImageHeight() - sourcePixel.getY());
     final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
     final double sourceX = sourcePoint[0];
     final double sourceY = sourcePoint[1];
@@ -137,13 +131,11 @@ MapSerializer {
     return geometryFactory.lineString(2, sourceX, sourceY, targetX, targetY);
   }
 
-  public Point getTargetPixel(final BoundingBox boundingBox,
-    final int imageWidth, final int imageHeight) {
+  public Point getTargetPixel(final BoundingBox boundingBox, final int imageWidth,
+    final int imageHeight) {
     final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-    final Point targetPointCoordinates = (Point)this.targetPoint.convert(
-      geometryFactory, 2);
-    return targetPointToPixel(boundingBox, targetPointCoordinates, imageWidth,
-      imageHeight);
+    final Point targetPointCoordinates = (Point)this.targetPoint.convert(geometryFactory, 2);
+    return targetPointToPixel(boundingBox, targetPointCoordinates, imageWidth, imageHeight);
   }
 
   public Point getTargetPoint() {

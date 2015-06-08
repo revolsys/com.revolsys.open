@@ -18,16 +18,14 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.filter.Filter;
 
 public final class CollectionUtil {
-  public static <V> void addAllIfNotNull(final Collection<V> collection,
-    final Collection<V> values) {
+  public static <V> void addAllIfNotNull(final Collection<V> collection, final Collection<V> values) {
     if (collection != null && values != null) {
       collection.addAll(values);
     }
 
   }
 
-  public static <V> boolean addIfNotNull(final Collection<V> collection,
-    final V value) {
+  public static <V> boolean addIfNotNull(final Collection<V> collection, final V value) {
     if (value == null) {
       return false;
     } else {
@@ -35,14 +33,12 @@ public final class CollectionUtil {
     }
   }
 
-  public static void append(final StringBuilder string,
-    final Collection<? extends Object> values) {
+  public static void append(final StringBuilder string, final Collection<? extends Object> values) {
     append(string, values, ",");
   }
 
-  public static void append(final StringBuilder buffer,
-    final Collection<? extends Object> values, final boolean skipNulls,
-    final String separator) {
+  public static void append(final StringBuilder buffer, final Collection<? extends Object> values,
+    final boolean skipNulls, final String separator) {
     boolean first = true;
     for (final Object value : values) {
       final String string = StringConverterRegistry.toString(value);
@@ -59,8 +55,8 @@ public final class CollectionUtil {
     }
   }
 
-  public static void append(final StringBuilder buffer,
-    final Collection<? extends Object> values, final String separator) {
+  public static void append(final StringBuilder buffer, final Collection<? extends Object> values,
+    final String separator) {
     boolean first = true;
     for (final Object value : values) {
       if (value != null) {
@@ -117,8 +113,8 @@ public final class CollectionUtil {
     return list;
   }
 
-  public static <V> boolean collectionContains(
-    final Map<Object, Collection<V>> map, final Object key, final V value) {
+  public static <V> boolean collectionContains(final Map<Object, Collection<V>> map,
+    final Object key, final V value) {
     if (map == null) {
       return false;
     } else {
@@ -131,8 +127,7 @@ public final class CollectionUtil {
     }
   }
 
-  public static boolean containsAny(final Collection<?> collection1,
-    final Collection<?> collection2) {
+  public static boolean containsAny(final Collection<?> collection1, final Collection<?> collection2) {
     for (final Object value : collection1) {
       if (collection2.contains(value)) {
         return true;
@@ -141,8 +136,7 @@ public final class CollectionUtil {
     return false;
   }
 
-  public static <T> boolean containsReference(
-    final List<WeakReference<T>> list, final T object) {
+  public static <T> boolean containsReference(final List<WeakReference<T>> list, final T object) {
     for (int i = 0; i < list.size(); i++) {
       final WeakReference<T> reference = list.get(i);
       final T value = reference.get();
@@ -186,8 +180,8 @@ public final class CollectionUtil {
    * @param collection
    * @param filter
    */
-  public static <V, C extends Collection<V>> void filter(
-    final Collection<V> collection, final Filter<V> filter) {
+  public static <V, C extends Collection<V>> void filter(final Collection<V> collection,
+    final Filter<V> filter) {
     for (final Iterator<V> iterator = collection.iterator(); iterator.hasNext();) {
       final V record = iterator.next();
       if (!filter.accept(record)) {
@@ -208,8 +202,7 @@ public final class CollectionUtil {
     throw new ArrayIndexOutOfBoundsException(index);
   }
 
-  public static <K, V> int getCollectionSize(
-    final Map<K, ? extends Collection<V>> map, final K key) {
+  public static <K, V> int getCollectionSize(final Map<K, ? extends Collection<V>> map, final K key) {
     final Collection<V> values = map.get(key);
     if (values == null) {
       return 0;
@@ -261,8 +254,7 @@ public final class CollectionUtil {
     return list;
   }
 
-  public static <T> void removeReference(final List<WeakReference<T>> list,
-    final T object) {
+  public static <T> void removeReference(final List<WeakReference<T>> list, final T object) {
     for (int i = 0; i < list.size(); i++) {
       final WeakReference<T> reference = list.get(i);
       final T value = reference.get();
@@ -321,8 +313,7 @@ public final class CollectionUtil {
     }
   }
 
-  public static <K, V> boolean setContains(final Map<K, Set<V>> map,
-    final K key, final V value) {
+  public static <K, V> boolean setContains(final Map<K, Set<V>> map, final K key, final V value) {
     if (map == null) {
       return false;
     } else {
@@ -337,8 +328,7 @@ public final class CollectionUtil {
 
   public static <K extends Comparable<K>, V extends Comparable<V>> Map<K, V> sortByValues(
     final Map<K, V> map) {
-    final MapValueComparator<K, V> comparator = new MapValueComparator<K, V>(
-      map);
+    final MapValueComparator<K, V> comparator = new MapValueComparator<K, V>(map);
     final Map<K, V> sortedMap = new TreeMap<K, V>(comparator);
     sortedMap.putAll(map);
     return new LinkedHashMap<K, V>(sortedMap);
@@ -443,8 +433,8 @@ public final class CollectionUtil {
     }
   }
 
-  public static String toString(final boolean skipNulls,
-    final String separator, final Collection<? extends Object> values) {
+  public static String toString(final boolean skipNulls, final String separator,
+    final Collection<? extends Object> values) {
     if (values == null) {
       return null;
     } else {
@@ -454,8 +444,8 @@ public final class CollectionUtil {
     }
   }
 
-  public static String toString(final boolean skipNulls,
-    final String separator, final Object... values) {
+  public static String toString(final boolean skipNulls, final String separator,
+    final Object... values) {
     return toString(skipNulls, separator, Arrays.asList(values));
   }
 
@@ -479,8 +469,7 @@ public final class CollectionUtil {
    * @param values The values.
    * @return The string.
    */
-  public static String toString(final String separator,
-    final Collection<? extends Object> values) {
+  public static String toString(final String separator, final Collection<? extends Object> values) {
     if (values == null) {
       return null;
     } else {

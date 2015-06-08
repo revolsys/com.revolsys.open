@@ -16,8 +16,7 @@ public interface GeometryWriterFactory extends IoFactory {
 
   Writer<Geometry> createGeometryWriter(String baseName, OutputStream out);
 
-  Writer<Geometry> createGeometryWriter(String baseName, OutputStream out,
-    Charset charset);
+  Writer<Geometry> createGeometryWriter(String baseName, OutputStream out, Charset charset);
 
   Set<CoordinateSystem> getCoordinateSystems();
 

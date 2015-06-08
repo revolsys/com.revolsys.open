@@ -34,12 +34,10 @@ public class AttributesBeanConfigurer extends BeanConfigurrer {
 
   @SuppressWarnings("unchecked")
   protected void addFields(final Map<String, Object> attributes,
-    final ConfigurableListableBeanFactory beanFactory,
-    final BeanDefinition beanDefinition, final String beanName,
-    final String beanClassName) {
+    final ConfigurableListableBeanFactory beanFactory, final BeanDefinition beanDefinition,
+    final String beanName, final String beanClassName) {
     if (beanClassName != null) {
-      if (beanClassName.equals(AttributeMap.class.getName())
-          || beanName.endsWith("-AttributeMap")) {
+      if (beanClassName.equals(AttributeMap.class.getName()) || beanName.endsWith("-AttributeMap")) {
         processPlaceholderAttributes(beanFactory, beanName, attributes);
         final Map<String, Object> otherAttributes = (Map<String, Object>)beanFactory.getBean(beanName);
         processPlaceholderAttributes(beanFactory, otherAttributes);
@@ -61,8 +59,8 @@ public class AttributesBeanConfigurer extends BeanConfigurrer {
   }
 
   @Override
-  public void postProcessBeanFactory(
-    final ConfigurableListableBeanFactory beanFactory) throws BeansException {
+  public void postProcessBeanFactory(final ConfigurableListableBeanFactory beanFactory)
+    throws BeansException {
     final Map<String, Object> allAttributes = new LinkedHashMap<String, Object>();
     final Map<String, Object> threadAttributes = ThreadSharedAttributes.getFields();
     allAttributes.putAll(threadAttributes);
@@ -91,11 +89,11 @@ public class AttributesBeanConfigurer extends BeanConfigurrer {
           if (beanClassName.equals(TargetBeanFactoryBean.class.getName())) {
             final MutablePropertyValues propertyValues = bd.getPropertyValues();
             final BeanDefinition targetBeanDefinition = (BeanDefinition)propertyValues.getPropertyValue(
-                "targetBeanDefinition")
-                .getValue();
+              "targetBeanDefinition")
+              .getValue();
             final String targetBeanClassName = targetBeanDefinition.getBeanClassName();
-            addFields(allAttributes, beanFactory, targetBeanDefinition,
-              beanName, targetBeanClassName);
+            addFields(allAttributes, beanFactory, targetBeanDefinition, beanName,
+              targetBeanClassName);
           }
         }
       }

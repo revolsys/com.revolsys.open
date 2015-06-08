@@ -78,8 +78,7 @@ public class GeometryNoder {
     this.scale = scale;
   }
 
-  private List<LineString> extractLines(
-    final Collection<? extends Geometry> geometries) {
+  private List<LineString> extractLines(final Collection<? extends Geometry> geometries) {
     final List<LineString> lines = new ArrayList<>();
     for (final Geometry geometry : geometries) {
       final List<LineString> geometryLines = geometry.getGeometryComponents(LineString.class);
@@ -124,8 +123,7 @@ public class GeometryNoder {
     this.isValidityChecked = isValidityChecked;
   }
 
-  private List<LineString> toLineStrings(
-    final Collection<NodedSegmentString> segStrings) {
+  private List<LineString> toLineStrings(final Collection<NodedSegmentString> segStrings) {
     final List<LineString> lines = new ArrayList<>();
     for (final NodedSegmentString ss : segStrings) {
       if (ss.size() > 1) {
@@ -135,8 +133,7 @@ public class GeometryNoder {
     return lines;
   }
 
-  private List<NodedSegmentString> toSegmentStrings(
-    final Collection<LineString> lines) {
+  private List<NodedSegmentString> toSegmentStrings(final Collection<LineString> lines) {
     final List<NodedSegmentString> segStrings = new ArrayList<>();
     for (final LineString line : lines) {
       segStrings.add(new NodedSegmentString(line, null));

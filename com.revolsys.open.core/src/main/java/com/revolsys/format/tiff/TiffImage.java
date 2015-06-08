@@ -34,63 +34,13 @@ import com.sun.media.jai.codec.ImageCodec;
 
 @SuppressWarnings("deprecation")
 public class TiffImage extends JaiGeoReferencedImage {
-  private static void addGeoKey(final Map<Integer, Object> geoKeys,
-    final XTIFFDirectory dir, final int keyId, final int tiffTag,
-    final int valueCount, final int valueOrOffset) {
-    int type = XTIFFField.TIFF_SHORT;
-    Object value = null;
-    if (tiffTag > 0) {
-      // Values are in another tag:
-      final XTIFFField values = dir.getField(tiffTag);
-      if (values != null) {
-        type = values.getType();
-        if (type == XTIFFField.TIFF_ASCII) {
-          final String string = values.getAsString(0).substring(valueOrOffset,
-            valueOrOffset + valueCount - 1);
-          value = string;
-        } else if (type == XTIFFField.TIFF_DOUBLE) {
-          final double number = values.getAsDouble(valueOrOffset);
-          value = number;
-        }
-      } else {
-        throw new IllegalArgumentException("GeoTIFF tag not found");
-      }
-    } else {
-      // value is SHORT, stored in valueOrOffset
-      type = XTIFFField.TIFF_SHORT;
-      value = (short)valueOrOffset;
-    }
-
-    geoKeys.put(keyId, value);
-  }
-
-  private static Map<Integer, Object> getGeoKeys(final XTIFFDirectory dir) {
-    final Map<Integer, Object> geoKeys = new LinkedHashMap<Integer, Object>();
-
-    final XTIFFField geoKeyTag = dir.getField(XTIFF.TIFFTAG_GEO_KEY_DIRECTORY);
-
-    if (geoKeyTag != null) {
-      final char[] keys = geoKeyTag.getAsChars();
-      for (int i = 4; i < keys.length; i += 4) {
-        final int keyId = keys[i];
-        final int tiffTag = keys[i + 1];
-        final int valueCount = keys[i + 2];
-        final int valueOrOffset = keys[i + 3];
-        addGeoKey(geoKeys, dir, keyId, tiffTag, valueCount, valueOrOffset);
-      }
-
-    }
-    return geoKeys;
-  }
-
   private static final int TAG_X_RESOLUTION = 282;
 
   private static final int TAG_Y_RESOLUTION = 283;
 
   static {
     try {
-      final OperationRegistry reg = JAI.getDefaultInstance()
-          .getOperationRegistry();
+      final OperationRegistry reg = JAI.getDefaultInstance().getOperationRegistry();
       ImageCodec.unregisterCodec("tiff");
       reg.unregisterOperationDescriptor("tiff");
 
@@ -173,12 +123,60 @@ public class TiffImage extends JaiGeoReferencedImage {
     // LambertConicConformal.class);
   }
 
+  private static void addGeoKey(final Map<Integer, Object> geoKeys, final XTIFFDirectory dir,
+    final int keyId, final int tiffTag, final int valueCount, final int valueOrOffset) {
+    int type = XTIFFField.TIFF_SHORT;
+    Object value = null;
+    if (tiffTag > 0) {
+      // Values are in another tag:
+      final XTIFFField values = dir.getField(tiffTag);
+      if (values != null) {
+        type = values.getType();
+        if (type == XTIFFField.TIFF_ASCII) {
+          final String string = values.getAsString(0).substring(valueOrOffset,
+            valueOrOffset + valueCount - 1);
+          value = string;
+        } else if (type == XTIFFField.TIFF_DOUBLE) {
+          final double number = values.getAsDouble(valueOrOffset);
+          value = number;
+        }
+      } else {
+        throw new IllegalArgumentException("GeoTIFF tag not found");
+      }
+    } else {
+      // value is SHORT, stored in valueOrOffset
+      type = XTIFFField.TIFF_SHORT;
+      value = (short)valueOrOffset;
+    }
+
+    geoKeys.put(keyId, value);
+  }
+
+  private static Map<Integer, Object> getGeoKeys(final XTIFFDirectory dir) {
+    final Map<Integer, Object> geoKeys = new LinkedHashMap<Integer, Object>();
+
+    final XTIFFField geoKeyTag = dir.getField(XTIFF.TIFFTAG_GEO_KEY_DIRECTORY);
+
+    if (geoKeyTag != null) {
+      final char[] keys = geoKeyTag.getAsChars();
+      for (int i = 4; i < keys.length; i += 4) {
+        final int keyId = keys[i];
+        final int tiffTag = keys[i + 1];
+        final int valueCount = keys[i + 2];
+        final int valueOrOffset = keys[i + 3];
+        addGeoKey(geoKeys, dir, keyId, tiffTag, valueCount, valueOrOffset);
+      }
+
+    }
+    return geoKeys;
+  }
+
   public TiffImage(final Resource imageResource) {
     super(imageResource);
   }
 
-  private void addDoubleParameter(final Map<String, Object> parameters,
-    final String name, final Map<Integer, Object> geoKeys, final int key) {
+  private void addDoubleParameter(final Map<String, Object> parameters, final String name,
+    final Map<Integer, Object> geoKeys, final int key) {
     final Double value = getDouble(geoKeys, key);
     if (value != null) {
       parameters.put(name, value);
@@ -194,8 +192,8 @@ public class TiffImage extends JaiGeoReferencedImage {
     }
   }
 
-  private double getFieldAsDouble(final XTIFFDirectory directory,
-    final int fieldIndex, final double defaultValue) {
+  private double getFieldAsDouble(final XTIFFDirectory directory, final int fieldIndex,
+    final double defaultValue) {
     final XTIFFField field = directory.getField(fieldIndex);
     if (field == null) {
       return defaultValue;
@@ -204,8 +202,7 @@ public class TiffImage extends JaiGeoReferencedImage {
     }
   }
 
-  private int getInteger(final Map<Integer, Object> map, final int key,
-    final int defaultValue) {
+  private int getInteger(final Map<Integer, Object> map, final int key, final int defaultValue) {
     final Number value = (Number)map.get(key);
     if (value == null) {
       return defaultValue;
@@ -226,8 +223,7 @@ public class TiffImage extends JaiGeoReferencedImage {
       return null;
     } else {
       final Authority projectionAuthority = new EpsgAuthority(projectionId);
-      final Projection projection = new Projection(projectionName,
-        projectionAuthority);
+      final Projection projection = new Projection(projectionName, projectionAuthority);
       return projection;
     }
   }
@@ -239,18 +235,15 @@ public class TiffImage extends JaiGeoReferencedImage {
 
   private boolean loadGeoTiffMetaData(final XTIFFDirectory directory) {
     try {
-      final int xResolution = (int)getFieldAsDouble(directory,
-        TAG_X_RESOLUTION, 1);
-      final int yResolution = (int)getFieldAsDouble(directory,
-        TAG_Y_RESOLUTION, 1);
+      final int xResolution = (int)getFieldAsDouble(directory, TAG_X_RESOLUTION, 1);
+      final int yResolution = (int)getFieldAsDouble(directory, TAG_Y_RESOLUTION, 1);
       setDpi(xResolution, yResolution);
     } catch (final Throwable e) {
       ExceptionUtil.log(getClass(), e);
     }
     GeometryFactory geometryFactory = null;
     final Map<Integer, Object> geoKeys = getGeoKeys(directory);
-    int coordinateSystemId = getInteger(geoKeys,
-      PROJECTED_COORDINATE_SYSTEM_ID, 0);
+    int coordinateSystemId = getInteger(geoKeys, PROJECTED_COORDINATE_SYSTEM_ID, 0);
     if (coordinateSystemId == 0) {
       coordinateSystemId = getInteger(geoKeys, GEOGRAPHIC_TYPE_GEO_KEY, 0);
       if (coordinateSystemId != 0) {
@@ -266,33 +259,27 @@ public class TiffImage extends JaiGeoReferencedImage {
           final Area area = null;
 
           final Map<String, Object> parameters = new LinkedHashMap<String, Object>();
-          addDoubleParameter(parameters,
-            ProjectionParameterNames.STANDARD_PARALLEL_1, geoKeys,
+          addDoubleParameter(parameters, ProjectionParameterNames.STANDARD_PARALLEL_1, geoKeys,
             STANDARD_PARALLEL_1_KEY);
-          addDoubleParameter(parameters,
-            ProjectionParameterNames.STANDARD_PARALLEL_2, geoKeys,
+          addDoubleParameter(parameters, ProjectionParameterNames.STANDARD_PARALLEL_2, geoKeys,
             STANDARD_PARALLEL_2_KEY);
-          addDoubleParameter(parameters,
-            ProjectionParameterNames.LONGITUDE_OF_CENTER, geoKeys,
+          addDoubleParameter(parameters, ProjectionParameterNames.LONGITUDE_OF_CENTER, geoKeys,
             LONGITUDE_OF_CENTER_2_KEY);
-          addDoubleParameter(parameters,
-            ProjectionParameterNames.LATITUDE_OF_CENTER, geoKeys,
+          addDoubleParameter(parameters, ProjectionParameterNames.LATITUDE_OF_CENTER, geoKeys,
             LATITUDE_OF_CENTER_2_KEY);
-          addDoubleParameter(parameters,
-            ProjectionParameterNames.FALSE_EASTING, geoKeys, FALSE_EASTING_KEY);
-          addDoubleParameter(parameters,
-            ProjectionParameterNames.FALSE_NORTHING, geoKeys,
+          addDoubleParameter(parameters, ProjectionParameterNames.FALSE_EASTING, geoKeys,
+            FALSE_EASTING_KEY);
+          addDoubleParameter(parameters, ProjectionParameterNames.FALSE_NORTHING, geoKeys,
             FALSE_NORTHING_KEY);
 
           final LinearUnit linearUnit = getLinearUnit(geoKeys);
           final List<Axis> axis = null;
           final Authority authority = null;
           final ProjectedCoordinateSystem coordinateSystem = new ProjectedCoordinateSystem(
-            coordinateSystemId, name, geographicCoordinateSystem, area,
-            projection, parameters, linearUnit, axis, authority, false);
+            coordinateSystemId, name, geographicCoordinateSystem, area, projection, parameters,
+            linearUnit, axis, authority, false);
           final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystem);
-          geometryFactory = GeometryFactory.floating(
-            epsgCoordinateSystem.getId(), 2);
+          geometryFactory = GeometryFactory.floating(epsgCoordinateSystem.getId(), 2);
         }
       }
     } else {
@@ -329,7 +316,7 @@ public class TiffImage extends JaiGeoReferencedImage {
         if (rasterXOffset != 0 && rasterYOffset != 0) {
           // These should be 0, not sure what to do if they are not
           throw new IllegalArgumentException(
-              "Exepectig 0 for the raster x,y tie points in a GeoTIFF");
+            "Exepectig 0 for the raster x,y tie points in a GeoTIFF");
         }
         // double rasterZOffset = fieldModelTiePoints.getAsDouble(2);
         // setTopLeftRasterPoint(new PointDouble(
@@ -357,11 +344,10 @@ public class TiffImage extends JaiGeoReferencedImage {
     final RenderedImage image = getRenderedImage();
     final Object tiffDirectory = image.getProperty("tiff.directory");
     if (tiffDirectory == null) {
-      throw new IllegalArgumentException(
-          "This is not a (geo)tiff file. Missing TIFF directory.");
+      throw new IllegalArgumentException("This is not a (geo)tiff file. Missing TIFF directory.");
     } else {
       if (!(tiffDirectory instanceof XTIFFDirectory)
-          || !loadGeoTiffMetaData((XTIFFDirectory)tiffDirectory)) {
+        || !loadGeoTiffMetaData((XTIFFDirectory)tiffDirectory)) {
       }
     }
   }

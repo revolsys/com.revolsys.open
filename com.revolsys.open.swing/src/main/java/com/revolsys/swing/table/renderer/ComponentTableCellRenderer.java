@@ -8,19 +8,16 @@ import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-public class ComponentTableCellRenderer implements TableCellRenderer,
-MouseListener {
+public class ComponentTableCellRenderer implements TableCellRenderer, MouseListener {
 
   private JComponent component;
 
   @Override
-  public Component getTableCellRendererComponent(final JTable table,
-    final Object value, final boolean isSelected, final boolean hasFocus,
-    final int row, final int column) {
+  public Component getTableCellRendererComponent(final JTable table, final Object value,
+    final boolean isSelected, final boolean hasFocus, final int row, final int column) {
     if (this.component instanceof TableCellRenderer) {
       final TableCellRenderer renderer = (TableCellRenderer)this.component;
-      return renderer.getTableCellRendererComponent(table, value, isSelected,
-        hasFocus, row, column);
+      return renderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
     } else {
       return this.component;
     }

@@ -62,11 +62,10 @@ public class AffineTransformationFactory {
    * @param dest1 the end point of the destination baseline
    * @return the computed transformation
    */
-  public static AffineTransformation createFromBaseLines(final Point src0,
-    final Point src1, final Point dest0, final Point dest1) {
-    final Point rotPt = new PointDouble(src0.getX() + dest1.getX()
-      - dest0.getX(), src0.getY() + dest1.getY() - dest0.getY(),
-      Point.NULL_ORDINATE);
+  public static AffineTransformation createFromBaseLines(final Point src0, final Point src1,
+    final Point dest0, final Point dest1) {
+    final Point rotPt = new PointDouble(src0.getX() + dest1.getX() - dest0.getX(), src0.getY()
+      + dest1.getY() - dest0.getY(), Point.NULL_ORDINATE);
 
     final double ang = Angle.angleBetweenOriented(src1, src0, rotPt);
 
@@ -80,8 +79,8 @@ public class AffineTransformationFactory {
 
     final double scale = destDist / srcDist;
 
-    final AffineTransformation trans = AffineTransformation.translationInstance(
-      -src0.getX(), -src0.getY());
+    final AffineTransformation trans = AffineTransformation.translationInstance(-src0.getX(),
+      -src0.getY());
     trans.rotate(ang);
     trans.scale(scale, scale);
     trans.translate(dest0.getX(), dest0.getY());
@@ -100,8 +99,7 @@ public class AffineTransformationFactory {
    *          the end point of the control vector
    * @return the computed transformation
    */
-  public static AffineTransformation createFromControlVectors(final Point src0,
-    final Point dest0) {
+  public static AffineTransformation createFromControlVectors(final Point src0, final Point dest0) {
     final double dx = dest0.getX() - src0.getX();
     final double dy = dest0.getY() - src0.getY();
     return AffineTransformation.translationInstance(dx, dy);
@@ -122,10 +120,10 @@ public class AffineTransformationFactory {
    * @return the computed transformation
    * @return null if the control vectors do not determine a well-defined transformation
    */
-  public static AffineTransformation createFromControlVectors(final Point src0,
-    final Point src1, final Point dest0, final Point dest1) {
-    final Point rotPt = new PointDouble(dest1.getX() - dest0.getX(),
-      dest1.getY() - dest0.getY(), Point.NULL_ORDINATE);
+  public static AffineTransformation createFromControlVectors(final Point src0, final Point src1,
+    final Point dest0, final Point dest1) {
+    final Point rotPt = new PointDouble(dest1.getX() - dest0.getX(), dest1.getY() - dest0.getY(),
+      Point.NULL_ORDINATE);
 
     final double ang = Angle.angleBetweenOriented(src1, src0, rotPt);
 
@@ -138,8 +136,8 @@ public class AffineTransformationFactory {
 
     final double scale = destDist / srcDist;
 
-    final AffineTransformation trans = AffineTransformation.translationInstance(
-      -src0.getX(), -src0.getY());
+    final AffineTransformation trans = AffineTransformation.translationInstance(-src0.getX(),
+      -src0.getY());
     trans.rotate(ang);
     trans.scale(scale, scale);
     trans.translate(dest0.getX(), dest0.getY());
@@ -160,11 +158,10 @@ public class AffineTransformationFactory {
    * @param dest2
    * @return the computed transformation
    */
-  public static AffineTransformation createFromControlVectors(final Point src0,
-    final Point src1, final Point src2, final Point dest0, final Point dest1,
-    final Point dest2) {
-    final AffineTransformationBuilder builder = new AffineTransformationBuilder(
-      src0, src1, src2, dest0, dest1, dest2);
+  public static AffineTransformation createFromControlVectors(final Point src0, final Point src1,
+    final Point src2, final Point dest0, final Point dest1, final Point dest2) {
+    final AffineTransformationBuilder builder = new AffineTransformationBuilder(src0, src1, src2,
+      dest0, dest1, dest2);
     return builder.getTransformation();
   }
 
@@ -181,11 +178,9 @@ public class AffineTransformationFactory {
    *           if the control vector arrays are too short, long or of different
    *           lengths
    */
-  public static AffineTransformation createFromControlVectors(
-    final Point[] src, final Point[] dest) {
+  public static AffineTransformation createFromControlVectors(final Point[] src, final Point[] dest) {
     if (src.length != dest.length) {
-      throw new IllegalArgumentException(
-          "Src and Dest arrays are not the same length");
+      throw new IllegalArgumentException("Src and Dest arrays are not the same length");
     }
     if (src.length <= 0) {
       throw new IllegalArgumentException("Too few control points");
@@ -201,8 +196,7 @@ public class AffineTransformationFactory {
       return createFromControlVectors(src[0], src[1], dest[0], dest[1]);
     }
 
-    return createFromControlVectors(src[0], src[1], src[2], dest[0], dest[1],
-      dest[2]);
+    return createFromControlVectors(src[0], src[1], src[2], dest[0], dest[1], dest[2]);
   }
 
 }

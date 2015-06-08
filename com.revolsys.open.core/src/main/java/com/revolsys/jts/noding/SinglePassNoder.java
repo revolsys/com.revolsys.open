@@ -62,8 +62,7 @@ public abstract class SinglePassNoder implements Noder {
    * @param segStrings a collection of {@link SegmentString}s to node
    */
   @Override
-  public abstract void computeNodes(
-    Collection<NodedSegmentString> segStrings);
+  public abstract void computeNodes(Collection<NodedSegmentString> segStrings);
 
   /**
    * Returns a {@link Collection} of fully noded {@link SegmentString}s.

@@ -26,9 +26,7 @@ abstract class ServletAnnotationMappingUtils {
    *          {@link RequestMapping#headers()}
    * @param request the current HTTP request to check
    */
-  public static boolean checkHeaders(
-    final String[] headers,
-    final HttpServletRequest request) {
+  public static boolean checkHeaders(final String[] headers, final HttpServletRequest request) {
     if (!ObjectUtils.isEmpty(headers)) {
       for (final String header : headers) {
         final int separator = header.indexOf('=');
@@ -48,10 +46,10 @@ abstract class ServletAnnotationMappingUtils {
             final List<MediaType> valueMediaTypes = MediaType.parseMediaTypes(value);
             boolean found = false;
             for (final Iterator<MediaType> valIter = valueMediaTypes.iterator(); valIter.hasNext()
-                && !found;) {
+              && !found;) {
               final MediaType valueMediaType = valIter.next();
               for (final Iterator<MediaType> reqIter = requestMediaTypes.iterator(); reqIter.hasNext()
-                  && !found;) {
+                && !found;) {
                 final MediaType requestMediaType = reqIter.next();
                 if (valueMediaType.includes(requestMediaType)) {
                   found = true;
@@ -78,9 +76,7 @@ abstract class ServletAnnotationMappingUtils {
    *          {@link RequestMapping#params()}
    * @param request the current HTTP request to check
    */
-  public static boolean checkParameters(
-    final String[] params,
-    final HttpServletRequest request) {
+  public static boolean checkParameters(final String[] params, final HttpServletRequest request) {
     if (!ObjectUtils.isEmpty(params)) {
       for (final String param : params) {
         final int separator = param.indexOf('=');
@@ -110,8 +106,7 @@ abstract class ServletAnnotationMappingUtils {
    * @param methods the HTTP request methods to check against
    * @param request the current HTTP request to check
    */
-  public static boolean checkRequestMethod(
-    final RequestMethod[] methods,
+  public static boolean checkRequestMethod(final RequestMethod[] methods,
     final HttpServletRequest request) {
     if (ObjectUtils.isEmpty(methods)) {
       return true;
@@ -125,8 +120,7 @@ abstract class ServletAnnotationMappingUtils {
   }
 
   private static boolean isMediaTypeHeader(final String headerName) {
-    return "Accept".equalsIgnoreCase(headerName)
-        || "Content-Type".equalsIgnoreCase(headerName);
+    return "Accept".equalsIgnoreCase(headerName) || "Content-Type".equalsIgnoreCase(headerName);
   }
 
 }

@@ -44,7 +44,8 @@ import java.util.Collection;
  */
 public class LastFoundQuadEdgeLocator implements QuadEdgeLocator {
   private final QuadEdgeSubdivision subdiv;
-  private QuadEdge            lastEdge = null;
+
+  private QuadEdge lastEdge = null;
 
   public LastFoundQuadEdgeLocator(final QuadEdgeSubdivision subdiv) {
     this.subdiv = subdiv;
@@ -54,7 +55,7 @@ public class LastFoundQuadEdgeLocator implements QuadEdgeLocator {
   private QuadEdge findEdge() {
     final Collection edges = this.subdiv.getEdges();
     // assume there is an edge - otherwise will get an exception
-    return (QuadEdge) edges.iterator().next();
+    return (QuadEdge)edges.iterator().next();
   }
 
   private void init() {
@@ -67,7 +68,7 @@ public class LastFoundQuadEdgeLocator implements QuadEdgeLocator {
    */
   @Override
   public QuadEdge locate(final Vertex v) {
-    if (! this.lastEdge.isLive()) {
+    if (!this.lastEdge.isLive()) {
       init();
     }
 

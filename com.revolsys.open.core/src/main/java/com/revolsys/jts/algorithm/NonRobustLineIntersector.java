@@ -66,8 +66,8 @@ public class NonRobustLineIntersector extends LineIntersector {
    * the same direction as p1-p2 DO_INTERSECT : the inputLines intersect in a
    * single point only, pa
    */
-  private int computeCollinearIntersection(final Point p1,
-    final Point p2, final Point p3, final Point p4) {
+  private int computeCollinearIntersection(final Point p1, final Point p2, final Point p3,
+    final Point p4) {
     double r1;
     double r2;
     double r3;
@@ -120,8 +120,7 @@ public class NonRobustLineIntersector extends LineIntersector {
   }
 
   @Override
-  protected int computeIntersect(final Point p1, final Point p2,
-    final Point p3, final Point p4) {
+  protected int computeIntersect(final Point p1, final Point p2, final Point p3, final Point p4) {
     double a1;
     double b1;
     double c1;
@@ -220,8 +219,7 @@ public class NonRobustLineIntersector extends LineIntersector {
   }
 
   @Override
-  public void computeIntersection(final Point p, final Point p1,
-    final Point p2) {
+  public void computeIntersection(final Point p, final Point p1, final Point p2) {
     double a1;
     double b1;
     double c1;
@@ -274,8 +272,7 @@ public class NonRobustLineIntersector extends LineIntersector {
    *  of the line from p1 to p2.
    *  This is equal to the 'distance' of p along p1-p2
    */
-  private double rParameter(final Point p1, final Point p2,
-    final Point p) {
+  private double rParameter(final Point p1, final Point p2, final Point p) {
     double r;
     // compute maximum delta, for numerical stability
     // also handle case of p1-p2 being vertical or horizontal

@@ -16,6 +16,8 @@ import com.revolsys.swing.tree.node.BaseTreeNode;
 
 public class TreeTransferHandler extends TransferHandler {
 
+  private static final long serialVersionUID = 1L;
+
   public static boolean isDndCopyAction(final TransferSupport support) {
     final int dropAction = support.getDropAction();
     return (dropAction & DnDConstants.ACTION_COPY) == DnDConstants.ACTION_COPY;
@@ -34,8 +36,6 @@ public class TreeTransferHandler extends TransferHandler {
     final int dropAction = support.getDropAction();
     return dropAction == DnDConstants.ACTION_NONE;
   }
-
-  private static final long serialVersionUID = 1L;
 
   public TreeTransferHandler() {
   }
@@ -63,8 +63,7 @@ public class TreeTransferHandler extends TransferHandler {
       final JTree tree = (JTree)c;
       final TreePath[] selectedPaths = tree.getSelectionPaths();
       if (selectedPaths != null) {
-        final TreePathListTransferable transferable = new TreePathListTransferable(
-          selectedPaths);
+        final TreePathListTransferable transferable = new TreePathListTransferable(selectedPaths);
         return transferable;
       }
     }
@@ -72,8 +71,8 @@ public class TreeTransferHandler extends TransferHandler {
   }
 
   @Override
-  protected void exportDone(final JComponent component,
-    final Transferable transferable, final int action) {
+  protected void exportDone(final JComponent component, final Transferable transferable,
+    final int action) {
     if (isDndMoveAction(action)) {
       try {
         final Object data = transferable.getTransferData(TreePathListTransferable.FLAVOR);

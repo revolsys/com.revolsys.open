@@ -16,8 +16,7 @@ public class UniqueCoordinateArrayFilter {
     return getUniquePoints(vertices);
   }
 
-  public static List<Point> getUniquePoints(
-    final Iterable<? extends Point> coordinates) {
+  public static List<Point> getUniquePoints(final Iterable<? extends Point> coordinates) {
     final Set<Point> set = new TreeSet<>();
     final List<Point> points = new ArrayList<>();
     for (final Point point : coordinates) {
@@ -35,8 +34,7 @@ public class UniqueCoordinateArrayFilter {
     return points.toArray(new Point[points.size()]);
   }
 
-  public static Point[] getUniquePointsArray(
-    final Iterable<? extends Point> coordinates) {
+  public static Point[] getUniquePointsArray(final Iterable<? extends Point> coordinates) {
     final List<Point> points = getUniquePoints(coordinates);
     return points.toArray(new Point[points.size()]);
   }

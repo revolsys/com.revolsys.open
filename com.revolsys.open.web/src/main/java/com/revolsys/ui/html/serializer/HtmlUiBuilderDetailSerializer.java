@@ -29,8 +29,7 @@ public class HtmlUiBuilderDetailSerializer implements LabelValueListSerializer {
 
   private Object object;
 
-  public HtmlUiBuilderDetailSerializer(final HtmlUiBuilder builder,
-    final List keys) {
+  public HtmlUiBuilderDetailSerializer(final HtmlUiBuilder builder, final List keys) {
     this.builder = builder;
     this.keys = keys;
     if (keys != null) {

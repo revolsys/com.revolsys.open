@@ -66,10 +66,9 @@ public class TopologyValidationError extends AbstractGeometryValidationError {
    * Messages corresponding to error codes
    */
   public static final String[] errMsg = {
-    "Topology Validation Error", "Repeated Point", "Hole lies outside shell",
-    "Holes are nested", "Interior is disconnected", "Self-intersection",
-    "Ring Self-intersection", "Nested shells", "Duplicate Rings",
-    "Too few distinct points in geometry component", "Invalid Coordinate",
+    "Topology Validation Error", "Repeated Point", "Hole lies outside shell", "Holes are nested",
+    "Interior is disconnected", "Self-intersection", "Ring Self-intersection", "Nested shells",
+    "Duplicate Rings", "Too few distinct points in geometry component", "Invalid Coordinate",
     "Ring is not closed"
   };
 

@@ -28,8 +28,7 @@ public class XmlRecordWriter extends AbstractRecordWriter {
 
   private boolean opened;
 
-  public XmlRecordWriter(final RecordDefinition recordDefinition,
-    final java.io.Writer out) {
+  public XmlRecordWriter(final RecordDefinition recordDefinition, final java.io.Writer out) {
     this.recordDefinition = recordDefinition;
     if (out instanceof XmlWriter) {
       this.out = (XmlWriter)out;
@@ -144,8 +143,7 @@ public class XmlRecordWriter extends AbstractRecordWriter {
           this.out.endTag();
         } else {
           final DataType dataType = this.recordDefinition.getFieldType(i);
-          final String string = StringConverterRegistry.toString(dataType,
-            value);
+          final String string = StringConverterRegistry.toString(dataType, value);
           this.out.nillableElement(tagName, string);
         }
       }

@@ -71,8 +71,7 @@ import com.revolsys.jts.util.Assert;
  */
 public class ConnectedInteriorTester {
 
-  public static Point findDifferentPoint(final LineString line,
-    final Point point) {
+  public static Point findDifferentPoint(final LineString line, final Point point) {
     for (final Vertex vertex : line.vertices()) {
       if (!vertex.equals(point)) {
         return vertex.clonePoint();

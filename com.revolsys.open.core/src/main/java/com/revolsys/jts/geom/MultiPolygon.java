@@ -54,6 +54,7 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   @Override
   MultiPolygon normalize();
 
+  @Override
   Iterable<Polygon> polygons();
 
   /**

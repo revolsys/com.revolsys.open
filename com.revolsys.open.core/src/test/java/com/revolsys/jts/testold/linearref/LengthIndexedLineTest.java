@@ -18,8 +18,8 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
     super(name);
   }
 
-  private void checkExtractLine(final String wkt, final double start,
-    final double end, final String expected) {
+  private void checkExtractLine(final String wkt, final double start, final double end,
+    final String expected) {
     final Geometry linearGeom = read(wkt);
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
     final Geometry result = indexedLine.extractLine(start, end);
@@ -27,16 +27,15 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   }
 
   @Override
-  protected Point extractOffsetAt(final Geometry linearGeom,
-    final Point testPt, final double offsetDistance) {
+  protected Point extractOffsetAt(final Geometry linearGeom, final Point testPt,
+    final double offsetDistance) {
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
     final double index = indexedLine.indexOf(testPt);
     return indexedLine.extractPoint(index, offsetDistance);
   }
 
   @Override
-  protected boolean indexOfAfterCheck(final Geometry linearGeom,
-    final Point testPt) {
+  protected boolean indexOfAfterCheck(final Geometry linearGeom, final Point testPt) {
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
 
     // check locations are consecutive
@@ -60,8 +59,8 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   }
 
   @Override
-  protected boolean indexOfAfterCheck(final Geometry linearGeom,
-    final Point testPt, final Point checkPt) {
+  protected boolean indexOfAfterCheck(final Geometry linearGeom, final Point testPt,
+    final Point checkPt) {
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
 
     // check that computed location is after check location
@@ -75,8 +74,7 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   }
 
   @Override
-  protected Geometry indicesOfThenExtract(final Geometry linearGeom,
-    final Geometry subLine) {
+  protected Geometry indicesOfThenExtract(final Geometry linearGeom, final Geometry subLine) {
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
     final double[] loc = indexedLine.indicesOf(subLine);
     final Geometry result = indexedLine.extractLine(loc[0], loc[1]);
@@ -90,8 +88,7 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   public void testComputeZ() {
     final Geometry linearGeom = read("LINESTRING (0 0 0, 10 10 10)");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
-    final double projIndex = indexedLine.project(new PointDouble((double)5, 5,
-      Point.NULL_ORDINATE));
+    final double projIndex = indexedLine.project(new PointDouble((double)5, 5, Point.NULL_ORDINATE));
     final Point projPt = indexedLine.extractPoint(projIndex);
     // System.out.println(projPt);
     assertTrue(projPt.equals(3, new PointDouble(5.0, 5, 5)));
@@ -104,35 +101,33 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   public void testComputeZNaN() {
     final Geometry linearGeom = read("LINESTRING (0 0, 10 10 10)");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
-    final double projIndex = indexedLine.project(new PointDouble((double)5, 5,
-      Point.NULL_ORDINATE));
+    final double projIndex = indexedLine.project(new PointDouble((double)5, 5, Point.NULL_ORDINATE));
     final Point projPt = indexedLine.extractPoint(projIndex);
     assertTrue(Double.isNaN(projPt.getZ()));
   }
 
   public void testExtractLineBeyondRange() {
-    checkExtractLine("LINESTRING (0 0, 10 10)", -100, 100,
-        "LINESTRING (0 0, 10 10)");
+    checkExtractLine("LINESTRING (0 0, 10 10)", -100, 100, "LINESTRING (0 0, 10 10)");
   }
 
   public void testExtractLineBothIndicesAtEndpoint() {
-    checkExtractLine("MULTILINESTRING ((0 0, 10 0), (20 0, 25 0, 30 0))", 10,
-      10, "LINESTRING (10 0, 10 0)");
+    checkExtractLine("MULTILINESTRING ((0 0, 10 0), (20 0, 25 0, 30 0))", 10, 10,
+      "LINESTRING (10 0, 10 0)");
   }
 
   public void testExtractLineBothIndicesAtEndpointNegative() {
-    checkExtractLine("MULTILINESTRING ((0 0, 10 0), (20 0, 25 0, 30 0))", -10,
-      10, "LINESTRING (10 0, 10 0)");
+    checkExtractLine("MULTILINESTRING ((0 0, 10 0), (20 0, 25 0, 30 0))", -10, 10,
+      "LINESTRING (10 0, 10 0)");
   }
 
   public void testExtractLineBothIndicesAtEndpointXXX() {
-    checkExtractLine("MULTILINESTRING ((0 0, 10 0), (20 0, 25 0, 30 0))", -10,
-      10, "LINESTRING (10 0, 10 0)");
+    checkExtractLine("MULTILINESTRING ((0 0, 10 0), (20 0, 25 0, 30 0))", -10, 10,
+      "LINESTRING (10 0, 10 0)");
   }
 
   public void testExtractLineIndexAtEndpoint() {
-    checkExtractLine("MULTILINESTRING ((0 0, 10 0), (20 0, 25 0, 30 0))", 10,
-      -1, "LINESTRING (20 0, 25 0, 29 0)");
+    checkExtractLine("MULTILINESTRING ((0 0, 10 0), (20 0, 25 0, 30 0))", 10, -1,
+      "LINESTRING (20 0, 25 0, 29 0)");
   }
 
   /**
@@ -140,15 +135,13 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
    * and that zero-length extracts return the lowest extracted zero-length line
    */
   public void testExtractLineIndexAtEndpointWithZeroLenComponents() {
+    checkExtractLine("MULTILINESTRING ((0 0, 10 0), (10 0, 10 0), (20 0, 25 0, 30 0))", 10, -1,
+      "LINESTRING (20 0, 25 0, 29 0)");
+    checkExtractLine("MULTILINESTRING ((0 0, 10 0), (10 0, 10 0), (20 0, 25 0, 30 0))", 5, 10,
+      "LINESTRING (5 0, 10 0)");
     checkExtractLine(
-      "MULTILINESTRING ((0 0, 10 0), (10 0, 10 0), (20 0, 25 0, 30 0))", 10,
-      -1, "LINESTRING (20 0, 25 0, 29 0)");
-    checkExtractLine(
-      "MULTILINESTRING ((0 0, 10 0), (10 0, 10 0), (20 0, 25 0, 30 0))", 5, 10,
-        "LINESTRING (5 0, 10 0)");
-    checkExtractLine(
-      "MULTILINESTRING ((0 0, 10 0), (10 0, 10 0), (10 0, 10 0), (20 0, 25 0, 30 0))",
-      10, 10, "LINESTRING (10 0, 10 0)");
+      "MULTILINESTRING ((0 0, 10 0), (10 0, 10 0), (10 0, 10 0), (20 0, 25 0, 30 0))", 10, 10,
+      "LINESTRING (10 0, 10 0)");
     checkExtractLine(
       "MULTILINESTRING ((0 0, 10 0), (10 0, 10 0), (10 0, 10 0), (10 0, 10 0), (20 0, 25 0, 30 0))",
       10, -10, "LINESTRING (10 0, 10 0)");
@@ -167,8 +160,8 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   }
 
   public void testExtractLineReverseMulti() {
-    checkExtractLine("MULTILINESTRING ((0 0, 10 0), (20 0, 25 0, 30 0))", 19,
-      1, "MULTILINESTRING ((29 0, 25 0, 20 0), (10 0, 1 0))");
+    checkExtractLine("MULTILINESTRING ((0 0, 10 0), (20 0, 25 0, 30 0))", 19, 1,
+      "MULTILINESTRING ((29 0, 25 0, 20 0), (10 0, 1 0))");
   }
 
   public void testExtractPointBeyondRange() {
@@ -188,13 +181,13 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   @Override
   public void testOffsetStartPointRepeatedPoint() {
     runOffsetTest("LINESTRING (0 0, 10 10, 10 10, 20 20)", "POINT(0 0)", 1.0,
-        "POINT (-0.7071067811865475 0.7071067811865475)");
+      "POINT (-0.7071067811865475 0.7071067811865475)");
     runOffsetTest("LINESTRING (0 0, 10 10, 10 10, 20 20)", "POINT(0 0)", -1.0,
-        "POINT (0.7071067811865475 -0.7071067811865475)");
+      "POINT (0.7071067811865475 -0.7071067811865475)");
     runOffsetTest("LINESTRING (0 0, 10 10, 10 10, 20 20)", "POINT(10 10)", 5.0,
-        "POINT (6.464466094067262 13.535533905932738)");
-    runOffsetTest("LINESTRING (0 0, 10 10, 10 10, 20 20)", "POINT(10 10)",
-      -5.0, "POINT (13.535533905932738 6.464466094067262)");
+      "POINT (6.464466094067262 13.535533905932738)");
+    runOffsetTest("LINESTRING (0 0, 10 10, 10 10, 20 20)", "POINT(10 10)", -5.0,
+      "POINT (13.535533905932738 6.464466094067262)");
   }
 
   /**
@@ -203,8 +196,7 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   public void testProjectExtractPoint() {
     final Geometry linearGeom = read("MULTILINESTRING ((0 2, 0 0), (-1 1, 1 1))");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
-    final double index = indexedLine.project(new PointDouble((double)1, 0,
-      Point.NULL_ORDINATE));
+    final double index = indexedLine.project(new PointDouble((double)1, 0, Point.NULL_ORDINATE));
     final Point pt = indexedLine.extractPoint(index);
     assertTrue(pt.equals(new PointDouble((double)0, 0, Point.NULL_ORDINATE)));
   }
@@ -212,8 +204,7 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   public void testProjectPointWithDuplicateCoords() {
     final Geometry linearGeom = read("LINESTRING (0 0, 10 0, 10 0, 20 0)");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
-    final double projIndex = indexedLine.project(new PointDouble((double)10, 1,
-      Point.NULL_ORDINATE));
+    final double projIndex = indexedLine.project(new PointDouble((double)10, 1, Point.NULL_ORDINATE));
     assertTrue(projIndex == 10.0);
   }
 

@@ -20,8 +20,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.LineStringDouble;
 
-public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
-implements GeoJsonConstants {
+public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> implements GeoJsonConstants {
 
   private GeometryFactory geometryFactory;
 
@@ -107,12 +106,11 @@ implements GeoJsonConstants {
   private int readCoordinatesList(final List<Double> coordinates) {
     int axisCount = 0;
     if (this.in.getEvent() == EventType.startArray || this.in.hasNext()
-        && this.in.next() == EventType.startArray) {
+      && this.in.next() == EventType.startArray) {
       EventType event = this.in.next();
       if (event != EventType.endArray) {
         do {
-          axisCount = Math.max(axisCount,
-            readCoordinatesListCoordinates(coordinates));
+          axisCount = Math.max(axisCount, readCoordinatesListCoordinates(coordinates));
           event = this.in.next();
         } while (event == EventType.comma);
       }
@@ -120,8 +118,7 @@ implements GeoJsonConstants {
         throw new IllegalStateException("Exepecting end array, not: " + event);
       }
     } else {
-      throw new IllegalStateException("Exepecting start array, not: "
-          + this.in.getEvent());
+      throw new IllegalStateException("Exepecting start array, not: " + this.in.getEvent());
     }
     return axisCount;
   }
@@ -135,7 +132,7 @@ implements GeoJsonConstants {
   private int readCoordinatesListCoordinates(final List<Double> values) {
     int numAxis = 0;
     if (this.in.getEvent() == EventType.startArray || this.in.hasNext()
-        && this.in.next() == EventType.startArray) {
+      && this.in.next() == EventType.startArray) {
       EventType event = this.in.getEvent();
       do {
         final Object value = JsonParser.getValue(this.in);
@@ -155,15 +152,13 @@ implements GeoJsonConstants {
 
       return numAxis;
     } else {
-      throw new IllegalStateException("Exepecting start array, not: "
-          + this.in.getEvent());
+      throw new IllegalStateException("Exepecting start array, not: " + this.in.getEvent());
     }
   }
 
-  private List<LineString> readCoordinatesListList(final boolean cogo,
-    final boolean ring) {
+  private List<LineString> readCoordinatesListList(final boolean cogo, final boolean ring) {
     if (this.in.getEvent() == EventType.startArray || this.in.hasNext()
-        && this.in.next() == EventType.startArray) {
+      && this.in.next() == EventType.startArray) {
       EventType event = this.in.next();
       final List<LineString> coordinatesLists = new ArrayList<LineString>();
       if (event != EventType.endArray) {
@@ -177,14 +172,13 @@ implements GeoJsonConstants {
       }
       return coordinatesLists;
     } else {
-      throw new IllegalStateException("Exepecting start array, not: "
-          + this.in.getEvent());
+      throw new IllegalStateException("Exepecting start array, not: " + this.in.getEvent());
     }
   }
 
   private List<List<LineString>> readCoordinatesListListList(final boolean cogo) {
     if (this.in.getEvent() == EventType.startArray || this.in.hasNext()
-        && this.in.next() == EventType.startArray) {
+      && this.in.next() == EventType.startArray) {
       EventType event = this.in.next();
       final List<List<LineString>> coordinatesLists = new ArrayList<List<LineString>>();
       if (event != EventType.endArray) {
@@ -198,8 +192,7 @@ implements GeoJsonConstants {
       }
       return coordinatesLists;
     } else {
-      throw new IllegalStateException("Exepecting start array, not: "
-          + this.in.getEvent());
+      throw new IllegalStateException("Exepecting start array, not: " + this.in.getEvent());
     }
   }
 
@@ -221,7 +214,7 @@ implements GeoJsonConstants {
         }
       }
     } while (this.in.getEvent() != EventType.endObject
-        && this.in.getEvent() != EventType.endDocument);
+      && this.in.getEvent() != EventType.endDocument);
     return factory;
   }
 
@@ -265,14 +258,14 @@ implements GeoJsonConstants {
         factory = readCoordinateSystem();
       }
     } while (this.in.getEvent() != EventType.endObject
-        && this.in.getEvent() != EventType.endDocument);
+      && this.in.getEvent() != EventType.endDocument);
 
     return factory.geometry(geometries);
   }
 
   private List<Geometry> readGeometryList() {
     if (this.in.getEvent() == EventType.startArray || this.in.hasNext()
-        && this.in.next() == EventType.startArray) {
+      && this.in.next() == EventType.startArray) {
       EventType event = this.in.next();
       final List<Geometry> geometries = new ArrayList<Geometry>();
       if (event != EventType.endArray) {
@@ -287,8 +280,7 @@ implements GeoJsonConstants {
       }
       return geometries;
     } else {
-      throw new IllegalStateException("Exepecting start array, not: "
-          + this.in.getEvent());
+      throw new IllegalStateException("Exepecting start array, not: " + this.in.getEvent());
     }
   }
 
@@ -303,7 +295,7 @@ implements GeoJsonConstants {
         factory = readCoordinateSystem();
       }
     } while (this.in.getEvent() != EventType.endObject
-        && this.in.getEvent() != EventType.endDocument);
+      && this.in.getEvent() != EventType.endDocument);
 
     if (points == null) {
       return factory.lineString();
@@ -325,7 +317,7 @@ implements GeoJsonConstants {
         factory = readCoordinateSystem();
       }
     } while (this.in.getEvent() != EventType.endObject
-        && this.in.getEvent() != EventType.endDocument);
+      && this.in.getEvent() != EventType.endDocument);
     int axisCount = 2;
     for (final LineString points : lineStrings) {
       axisCount = Math.max(axisCount, points.getAxisCount());
@@ -345,7 +337,7 @@ implements GeoJsonConstants {
         factory = readCoordinateSystem();
       }
     } while (this.in.getEvent() != EventType.endObject
-        && this.in.getEvent() != EventType.endDocument);
+      && this.in.getEvent() != EventType.endDocument);
     int axisCount = 2;
     for (final LineString points : pointsList) {
       axisCount = Math.max(axisCount, points.getAxisCount());
@@ -366,7 +358,7 @@ implements GeoJsonConstants {
         factory = readCoordinateSystem();
       }
     } while (this.in.getEvent() != EventType.endObject
-        && this.in.getEvent() != EventType.endDocument);
+      && this.in.getEvent() != EventType.endDocument);
     int axisCount = 2;
     if (polygonRings != null) {
       for (final List<LineString> rings : polygonRings) {
@@ -393,7 +385,7 @@ implements GeoJsonConstants {
         factory = readCoordinateSystem();
       }
     } while (this.in.getEvent() != EventType.endObject
-        && this.in.getEvent() != EventType.endDocument);
+      && this.in.getEvent() != EventType.endDocument);
     if (coordinates == null) {
       return factory.point();
     } else {
@@ -414,7 +406,7 @@ implements GeoJsonConstants {
 
   private List<LineString> readPointCoordinatesListList() {
     if (this.in.getEvent() == EventType.startArray || this.in.hasNext()
-        && this.in.next() == EventType.startArray) {
+      && this.in.next() == EventType.startArray) {
       EventType event = this.in.next();
       final List<LineString> coordinatesLists = new ArrayList<LineString>();
       if (event != EventType.endArray) {
@@ -428,8 +420,7 @@ implements GeoJsonConstants {
       }
       return coordinatesLists;
     } else {
-      throw new IllegalStateException("Exepecting start array, not: "
-          + this.in.getEvent());
+      throw new IllegalStateException("Exepecting start array, not: " + this.in.getEvent());
     }
   }
 
@@ -444,7 +435,7 @@ implements GeoJsonConstants {
         factory = readCoordinateSystem();
       }
     } while (this.in.getEvent() != EventType.endObject
-        && this.in.getEvent() != EventType.endDocument);
+      && this.in.getEvent() != EventType.endDocument);
     int axisCount = 2;
     for (final LineString points : rings) {
       axisCount = Math.max(axisCount, points.getAxisCount());

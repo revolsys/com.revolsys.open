@@ -13,8 +13,7 @@ public class Lists {
     }
   }
 
-  static <V> void addAll(final List<V> list,
-    @SuppressWarnings("unchecked") final V... values) {
+  static <V> void addAll(final List<V> list, @SuppressWarnings("unchecked") final V... values) {
     for (final V value : values) {
       list.add(value);
     }
@@ -26,8 +25,7 @@ public class Lists {
    * @param value
    * @return
    */
-  public static <V> boolean addNotContains(final List<V> list, final int index,
-    final V value) {
+  public static <V> boolean addNotContains(final List<V> list, final int index, final V value) {
     if (Property.hasValue(value)) {
       if (!list.contains(value)) {
         list.add(index, value);
@@ -74,8 +72,7 @@ public class Lists {
    * @param value
    * @return
    */
-  public static <V> boolean addNotEmpty(final List<V> list, final int index,
-    final V value) {
+  public static <V> boolean addNotEmpty(final List<V> list, final int index, final V value) {
     if (Property.hasValue(value)) {
       list.add(index, value);
       return true;
@@ -104,8 +101,7 @@ public class Lists {
     return list;
   }
 
-  public static <V> List<V> array(
-    @SuppressWarnings("unchecked") final V... values) {
+  public static <V> List<V> array(@SuppressWarnings("unchecked") final V... values) {
     final List<V> list = new ArrayList<>();
     addAll(list, values);
     return list;

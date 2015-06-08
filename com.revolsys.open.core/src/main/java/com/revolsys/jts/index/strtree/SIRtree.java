@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -56,8 +55,7 @@ public class SIRtree extends AbstractSTRtree {
   private final Comparator comparator = new Comparator() {
     @Override
     public int compare(final Object o1, final Object o2) {
-      return compareDoubles(
-        ((Interval)((Boundable)o1).getBounds()).getCentre(),
+      return compareDoubles(((Interval)((Boundable)o1).getBounds()).getCentre(),
         ((Interval)((Boundable)o2).getBounds()).getCentre());
     }
   };
@@ -72,7 +70,9 @@ public class SIRtree extends AbstractSTRtree {
   /**
    * Constructs an SIRtree with the default node capacity.
    */
-  public SIRtree() { this(10); }
+  public SIRtree() {
+    this(10);
+  }
 
   /**
    * Constructs an SIRtree with the given maximum number of child nodes that
@@ -93,12 +93,11 @@ public class SIRtree extends AbstractSTRtree {
       @Override
       protected Object computeBounds() {
         Interval bounds = null;
-        for (final Iterator i = getChildBoundables().iterator(); i.hasNext(); ) {
-          final Boundable childBoundable = (Boundable) i.next();
+        for (final Iterator i = getChildBoundables().iterator(); i.hasNext();) {
+          final Boundable childBoundable = (Boundable)i.next();
           if (bounds == null) {
             bounds = new Interval((Interval)childBoundable.getBounds());
-          }
-          else {
+          } else {
             bounds.expandToInclude((Interval)childBoundable.getBounds());
           }
         }

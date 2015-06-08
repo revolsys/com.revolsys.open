@@ -69,10 +69,9 @@ public class CentralEndpointIntersector {
     return new PointDouble(averageX, averageY);
   }
 
-  public static Point getIntersection(final Point p00,
-    final Point p01, final Point p10, final Point p11) {
-    final CentralEndpointIntersector intor = new CentralEndpointIntersector(
-      p00, p01, p10, p11);
+  public static Point getIntersection(final Point p00, final Point p01, final Point p10,
+    final Point p11) {
+    final CentralEndpointIntersector intor = new CentralEndpointIntersector(p00, p01, p10, p11);
     return intor.getIntersection();
   }
 
@@ -80,8 +79,8 @@ public class CentralEndpointIntersector {
 
   private Point intPt = null;
 
-  public CentralEndpointIntersector(final Point p00,
-    final Point p01, final Point p10, final Point p11) {
+  public CentralEndpointIntersector(final Point p00, final Point p01, final Point p10,
+    final Point p11) {
     this.pts = new Point[] {
       p00, p01, p10, p11
     };
@@ -103,8 +102,7 @@ public class CentralEndpointIntersector {
    * @param q2 a potential result point
    * @return the point closest to the input point p
    */
-  private Point findNearestPoint(final Point p,
-    final Point[] pts) {
+  private Point findNearestPoint(final Point p, final Point[] pts) {
     double minDist = Double.MAX_VALUE;
     Point result = null;
     for (final Point pt : pts) {

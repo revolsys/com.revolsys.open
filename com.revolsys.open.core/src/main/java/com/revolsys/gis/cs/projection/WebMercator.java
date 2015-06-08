@@ -8,14 +8,12 @@ public class WebMercator extends AbstractCoordinatesProjection {
   }
 
   @Override
-  public void inverse(final double x, final double y,
-    final double[] targetCoordinates, final int targetOffset,
-    final int targetAxisCount) {
+  public void inverse(final double x, final double y, final double[] targetCoordinates,
+    final int targetOffset, final int targetAxisCount) {
     final double lon = x / 20037508.34 * 180;
     double lat = y / 20037508.34 * 180;
 
-    lat = 180 / Math.PI
-        * (2 * Math.atan(Math.exp(lat * Math.PI / 180)) - Math.PI / 2);
+    lat = 180 / Math.PI * (2 * Math.atan(Math.exp(lat * Math.PI / 180)) - Math.PI / 2);
 
     targetCoordinates[targetOffset * targetAxisCount] = Math.toRadians(lon);
     targetCoordinates[targetOffset * targetAxisCount + 1] = Math.toRadians(lat);
@@ -23,8 +21,7 @@ public class WebMercator extends AbstractCoordinatesProjection {
 
   @Override
   public void project(final double xDegrees, final double yDegrees,
-    final double[] targetCoordinates, final int targetOffset,
-    final int targetAxisCount) {
+    final double[] targetCoordinates, final int targetOffset, final int targetAxisCount) {
     final double lon = Math.toDegrees(xDegrees);
     final double lat = Math.toDegrees(yDegrees);
 

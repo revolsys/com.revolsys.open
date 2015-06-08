@@ -43,8 +43,7 @@ public class GpxWriter extends AbstractRecordWriter {
 
     this.out.startTag(GpxConstants.GPX_ELEMENT);
     this.out.attribute(GpxConstants.VERSION_ATTRIBUTE, "1.1");
-    this.out.attribute(GpxConstants.CREATOR_ATTRIBUTE,
-        "Revolution Systems Inc. - GIS");
+    this.out.attribute(GpxConstants.CREATOR_ATTRIBUTE, "Revolution Systems Inc. - GIS");
   }
 
   @Override
@@ -106,23 +105,19 @@ public class GpxWriter extends AbstractRecordWriter {
     final Object time = object.getValue("timestamp");
     if (time != null) {
       if (time instanceof Date) {
-        final DateFormat timestampFormat = new SimpleDateFormat(
-            "yyyy-MM-dd'T'HH:mm:ss'Z'");
+        final DateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         timestampFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        this.out.element(GpxConstants.TIME_ELEMENT,
-          timestampFormat.format(time));
+        this.out.element(GpxConstants.TIME_ELEMENT, timestampFormat.format(time));
       } else {
         this.out.element(GpxConstants.TIME_ELEMENT, time.toString());
       }
     }
     writeElement(object, GpxConstants.NAME_ELEMENT, this.nameAttribute);
     writeElement(object, GpxConstants.COMMENT_ELEMENT, this.commentAttribute);
-    writeElement(object, GpxConstants.DESCRIPTION_ELEMENT,
-      this.descriptionAttribute);
+    writeElement(object, GpxConstants.DESCRIPTION_ELEMENT, this.descriptionAttribute);
   }
 
-  private void writeElement(final Record object, final QName tag,
-    final String fieldName) {
+  private void writeElement(final Record object, final QName tag, final String fieldName) {
     final String name = object.getValue(fieldName);
     if (name != null && name.length() > 0) {
       this.out.element(tag, name);
@@ -144,8 +139,7 @@ public class GpxWriter extends AbstractRecordWriter {
       if (coordinatesList.getAxisCount() > 2) {
         final double elevation = coordinates.getCoordinate(2);
         if (!Double.isNaN(elevation)) {
-          this.out.element(GpxConstants.ELEVATION_ELEMENT,
-            String.valueOf(elevation));
+          this.out.element(GpxConstants.ELEVATION_ELEMENT, String.valueOf(elevation));
         }
       }
       this.out.endTag(GpxConstants.TRACK_POINT_ELEMENT);
@@ -163,8 +157,7 @@ public class GpxWriter extends AbstractRecordWriter {
     if (point.getAxisCount() > 2) {
       final double elevation = geoCoordinate.getZ();
       if (!Double.isNaN(elevation)) {
-        this.out.element(GpxConstants.ELEVATION_ELEMENT,
-          String.valueOf(elevation));
+        this.out.element(GpxConstants.ELEVATION_ELEMENT, String.valueOf(elevation));
       }
     }
     writeAttributes(wayPoint);

@@ -57,8 +57,7 @@ public class EdgeEndBundle extends EdgeEnd {
   private final List edgeEnds = new ArrayList();
 
   public EdgeEndBundle(final BoundaryNodeRule boundaryNodeRule, final EdgeEnd e) {
-    super(e.getEdge(), e.getCoordinate(), e.getDirectedCoordinate(), new Label(
-      e.getLabel()));
+    super(e.getEdge(), e.getCoordinate(), e.getDirectedCoordinate(), new Label(e.getLabel()));
     insert(e);
     /*
      * if (boundaryNodeRule != null) this.boundaryNodeRule = boundaryNodeRule;
@@ -121,8 +120,7 @@ public class EdgeEndBundle extends EdgeEnd {
    * <li> otherwise, the attribute is NULL.
    * </ul>
    */
-  private void computeLabelOn(final int geomIndex,
-    final BoundaryNodeRule boundaryNodeRule) {
+  private void computeLabelOn(final int geomIndex, final BoundaryNodeRule boundaryNodeRule) {
     // compute the ON location value
     int boundaryCount = 0;
     boolean foundInterior = false;

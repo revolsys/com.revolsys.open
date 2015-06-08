@@ -39,8 +39,7 @@ package com.revolsys.jts.math;
  * @author Martin Davis
  *
  */
-public class Matrix
-{
+public class Matrix {
   /**
    * Solves a system of equations using Gaussian Elimination.
    * In order to avoid overhead the algorithm runs in-place
@@ -54,36 +53,35 @@ public class Matrix
    *
    * @throws IllegalArgumentException if the matrix is the wrong size
    */
-  public static double[] solve( final double[][] a, final double[] b )
-  {
+  public static double[] solve(final double[][] a, final double[] b) {
     final int n = b.length;
-    if ( a.length != n || a[0].length != n ) {
+    if (a.length != n || a[0].length != n) {
       throw new IllegalArgumentException("Matrix A is incorrectly sized");
     }
 
     // Use Gaussian Elimination with partial pivoting.
     // Iterate over each row
-    for (int i = 0; i < n; i++ ) {
+    for (int i = 0; i < n; i++) {
       // Find the largest pivot in the rows below the current one.
       int maxElementRow = i;
-      for (int j = i + 1; j < n; j++ ) {
-        if ( Math.abs( a[j][i] ) > Math.abs( a[maxElementRow][i] ) ) {
+      for (int j = i + 1; j < n; j++) {
+        if (Math.abs(a[j][i]) > Math.abs(a[maxElementRow][i])) {
           maxElementRow = j;
         }
       }
 
-      if ( a[maxElementRow][i] == 0.0 ) {
+      if (a[maxElementRow][i] == 0.0) {
         return null;
       }
 
       // Exchange current row and maxElementRow in A and b.
-      swapRows(a, i, maxElementRow );
-      swapRows(b, i, maxElementRow );
+      swapRows(a, i, maxElementRow);
+      swapRows(b, i, maxElementRow);
 
       // Eliminate using row i
-      for (int j = i + 1; j < n; j++ ) {
+      for (int j = i + 1; j < n; j++) {
         final double rowFactor = a[j][i] / a[i][i];
-        for (int k = n - 1; k >= i; k-- ) {
+        for (int k = n - 1; k >= i; k--) {
           a[j][k] -= a[i][k] * rowFactor;
         }
         b[j] -= b[i] * rowFactor;
@@ -95,18 +93,17 @@ public class Matrix
      * The solution vector is determined by back-substitution.
      */
     final double[] solution = new double[n];
-    for (int j = n - 1; j >= 0; j-- ) {
+    for (int j = n - 1; j >= 0; j--) {
       double t = 0.0;
-      for (int k = j + 1; k < n; k++ ) {
+      for (int k = j + 1; k < n; k++) {
         t += a[j][k] * solution[k];
       }
-      solution[j] = ( b[j] - t ) / a[j][j];
+      solution[j] = (b[j] - t) / a[j][j];
     }
     return solution;
   }
 
-  private static void swapRows(final double[] m, final int i, final int j)
-  {
+  private static void swapRows(final double[] m, final int i, final int j) {
     if (i == j) {
       return;
     }
@@ -115,8 +112,7 @@ public class Matrix
     m[j] = temp;
   }
 
-  private static void swapRows(final double[][] m, final int i, final int j)
-  {
+  private static void swapRows(final double[][] m, final int i, final int j) {
     if (i == j) {
       return;
     }

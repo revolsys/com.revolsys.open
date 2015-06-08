@@ -32,22 +32,20 @@ public class ThreadLocalFileAppender extends FileAppender {
     super();
   }
 
-  public ThreadLocalFileAppender(final Layout layout, final String filename)
-      throws IOException {
+  public ThreadLocalFileAppender(final Layout layout, final String filename) throws IOException {
     setLayout(layout);
     setFile(filename);
   }
 
-  public ThreadLocalFileAppender(final Layout layout, final String filename,
-    final boolean append) throws IOException {
+  public ThreadLocalFileAppender(final Layout layout, final String filename, final boolean append)
+    throws IOException {
     setLayout(layout);
     setFile(filename);
     setAppend(append);
   }
 
-  public ThreadLocalFileAppender(final Layout layout, final String filename,
-    final boolean append, final boolean bufferedIO, final int bufferSize)
-        throws IOException {
+  public ThreadLocalFileAppender(final Layout layout, final String filename, final boolean append,
+    final boolean bufferedIO, final int bufferSize) throws IOException {
     super(layout, filename, append, bufferedIO, bufferSize);
   }
 

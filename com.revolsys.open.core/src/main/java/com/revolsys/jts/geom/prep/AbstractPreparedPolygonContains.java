@@ -66,8 +66,8 @@ import com.revolsys.jts.noding.SegmentStringUtil;
  *
  */
 abstract class AbstractPreparedPolygonContains {
-  public static boolean isAllTestComponentsInTarget(
-    final PointOnGeometryLocator pointLocator, final Geometry geometry) {
+  public static boolean isAllTestComponentsInTarget(final PointOnGeometryLocator pointLocator,
+    final Geometry geometry) {
     for (final Vertex vertex : geometry.vertices()) {
       final Location loc = pointLocator.locate(vertex);
       if (loc == Location.EXTERIOR) {
@@ -124,8 +124,8 @@ abstract class AbstractPreparedPolygonContains {
    * @param geom a geometry to test
    * @return true if any component of the argument intersects the prepared area geometry
    */
-  public static boolean isAnyTestComponentInTarget(
-    final PointOnGeometryLocator pointLocator, final Geometry geometry) {
+  public static boolean isAnyTestComponentInTarget(final PointOnGeometryLocator pointLocator,
+    final Geometry geometry) {
     for (final Vertex vertex : geometry.vertices()) {
       final Location loc = pointLocator.locate(vertex);
       if (loc != Location.EXTERIOR) {
@@ -173,8 +173,7 @@ abstract class AbstractPreparedPolygonContains {
 
   private final Geometry originalGeometry;
 
-  public AbstractPreparedPolygonContains(final Geometry preparedPolygon,
-    final Geometry polygon) {
+  public AbstractPreparedPolygonContains(final Geometry preparedPolygon, final Geometry polygon) {
     this.preparedGeometry = preparedPolygon;
     this.originalGeometry = polygon;
   }
@@ -193,8 +192,7 @@ abstract class AbstractPreparedPolygonContains {
      *
      * If a point of any test components does not lie in target, result is false
      */
-    final boolean isAllInTargetArea = isAllTestComponentsInTarget(
-      getPointLocator(), geometry);
+    final boolean isAllInTargetArea = isAllTestComponentsInTarget(getPointLocator(), geometry);
     if (!isAllInTargetArea) {
       return false;
     }
@@ -208,8 +206,8 @@ abstract class AbstractPreparedPolygonContains {
      * which implies not contained.
      */
     if (this.requireSomePointInInterior && geometry.getDimension() == 0) {
-      final boolean isAnyInTargetInterior = isAnyTestComponentInTargetInterior(
-        getPointLocator(), geometry);
+      final boolean isAnyInTargetInterior = isAnyTestComponentInTargetInterior(getPointLocator(),
+        geometry);
       return isAnyInTargetInterior;
     }
 
@@ -274,8 +272,8 @@ abstract class AbstractPreparedPolygonContains {
      */
     if (geometry instanceof Polygonal) {
       // TODO: generalize this to handle GeometryCollections
-      final boolean isTargetInTestArea = isAnyTargetComponentInAreaTest(
-        geometry, this.preparedGeometry);
+      final boolean isTargetInTestArea = isAnyTargetComponentInAreaTest(geometry,
+        this.preparedGeometry);
       if (isTargetInTestArea) {
         return false;
       }
@@ -333,8 +331,7 @@ abstract class AbstractPreparedPolygonContains {
     }
   }
 
-  private boolean isProperIntersectionImpliesNotContainedSituation(
-    final Geometry testGeom) {
+  private boolean isProperIntersectionImpliesNotContainedSituation(final Geometry testGeom) {
     /**
      * If the test geometry is polygonal we have the A/A situation.
      * In this case, a proper intersection indicates that

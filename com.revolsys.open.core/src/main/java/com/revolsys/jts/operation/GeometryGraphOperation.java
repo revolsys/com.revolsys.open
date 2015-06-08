@@ -54,8 +54,8 @@ public class GeometryGraphOperation {
 
   public GeometryGraphOperation(final Geometry g0, final Geometry g1) {
     this(g0, g1, BoundaryNodeRule.OGC_SFS_BOUNDARY_RULE
-      // BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE
-        );
+    // BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE
+    );
   }
 
   public GeometryGraphOperation(final Geometry g0, final Geometry g1,

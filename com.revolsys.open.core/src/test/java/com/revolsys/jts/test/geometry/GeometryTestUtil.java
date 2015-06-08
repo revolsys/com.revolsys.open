@@ -20,8 +20,7 @@ import com.revolsys.jts.geom.Polygon;
 
 public class GeometryTestUtil {
 
-  public static double[] coordinates(final GeometryFactory geometryFactory,
-    final double delta) {
+  public static double[] coordinates(final GeometryFactory geometryFactory, final double delta) {
     final int axisCount = geometryFactory.getAxisCount();
     final double[] coordinates = new double[axisCount];
     double x;
@@ -51,8 +50,8 @@ public class GeometryTestUtil {
   }
 
   public static Geometry geometry(final GeometryFactory geometryFactory,
-    final DataType geometryDataType, final int geometryCount,
-    final int ringCount, final int vertexCount, final double delta) {
+    final DataType geometryDataType, final int geometryCount, final int ringCount,
+    final int vertexCount, final double delta) {
     if (DataTypes.POINT.equals(geometryDataType)) {
       if (geometryCount == 0) {
         return geometryFactory.point();
@@ -83,8 +82,8 @@ public class GeometryTestUtil {
 
   }
 
-  public static LineString lineString(final GeometryFactory geometryFactory,
-    final int vertexCount, final double delta) {
+  public static LineString lineString(final GeometryFactory geometryFactory, final int vertexCount,
+    final double delta) {
     final int axisCount = geometryFactory.getAxisCount();
     final double[] coordinates = new double[axisCount * vertexCount];
     for (int i = 0; i < vertexCount; i++) {
@@ -94,13 +93,12 @@ public class GeometryTestUtil {
     return geometryFactory.lineString(axisCount, coordinates);
   }
 
-  public static MultiLineString multiLineString(
-    final GeometryFactory geometryFactory, final int geometryCount,
-    final int vertexCount, final double delta) {
+  public static MultiLineString multiLineString(final GeometryFactory geometryFactory,
+    final int geometryCount, final int vertexCount, final double delta) {
     final List<Geometry> geometries = new ArrayList<>();
     for (int i = 0; i < geometryCount; i++) {
-      final Geometry geometry = lineString(geometryFactory, vertexCount + i,
-        delta * (vertexCount + i * 3));
+      final Geometry geometry = lineString(geometryFactory, vertexCount + i, delta
+        * (vertexCount + i * 3));
       geometries.add(geometry);
     }
     return geometryFactory.multiLineString(geometries);
@@ -117,27 +115,24 @@ public class GeometryTestUtil {
     return multiPoint;
   }
 
-  public static MultiPolygon multiPolygon(
-    final GeometryFactory geometryFactory, final int geometryCount,
-    final int ringCount, final double delta) {
+  public static MultiPolygon multiPolygon(final GeometryFactory geometryFactory,
+    final int geometryCount, final int ringCount, final double delta) {
     final List<Geometry> geometries = new ArrayList<>();
     for (int i = 0; i < geometryCount; i++) {
-      final Geometry geometry = polygon(geometryFactory, ringCount, delta
-        * (i + 1));
+      final Geometry geometry = polygon(geometryFactory, ringCount, delta * (i + 1));
       geometries.add(geometry);
     }
     final MultiPolygon multiGeometry = geometryFactory.multiPolygon(geometries);
     return multiGeometry;
   }
 
-  public static Point point(final GeometryFactory geometryFactory,
-    final double delta) {
+  public static Point point(final GeometryFactory geometryFactory, final double delta) {
     final double[] coordinates = coordinates(geometryFactory, delta);
     return geometryFactory.point(coordinates);
   }
 
-  public static Polygon polygon(final GeometryFactory geometryFactory,
-    final int ringCount, final double delta) {
+  public static Polygon polygon(final GeometryFactory geometryFactory, final int ringCount,
+    final double delta) {
     final int axisCount = geometryFactory.getAxisCount();
     final List<LinearRing> rings = new ArrayList<>();
     for (int ringIndex = 0; ringIndex < ringCount; ringIndex++) {
@@ -162,8 +157,7 @@ public class GeometryTestUtil {
         } else if (vertexIndex == 3) {
           point[0] += size;
         }
-        CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex,
-          point);
+        CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex, point);
       }
       LinearRing ring = geometryFactory.linearRing(axisCount, coordinates);
       if (ringIndex > 0) {

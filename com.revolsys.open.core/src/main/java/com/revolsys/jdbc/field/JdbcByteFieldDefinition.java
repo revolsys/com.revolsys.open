@@ -9,22 +9,21 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.types.DataTypes;
 
 public class JdbcByteFieldDefinition extends JdbcFieldDefinition {
-  public JdbcByteFieldDefinition(final String dbName, final String name,
-    final int sqlType, final int length, final boolean required,
-    final String description, final Map<String, Object> properties) {
-    super(dbName, name, DataTypes.BYTE, sqlType, length, 0, required,
-      description, properties);
+  public JdbcByteFieldDefinition(final String dbName, final String name, final int sqlType,
+    final int length, final boolean required, final String description,
+    final Map<String, Object> properties) {
+    super(dbName, name, DataTypes.BYTE, sqlType, length, 0, required, description, properties);
   }
 
   @Override
   public JdbcByteFieldDefinition clone() {
-    return new JdbcByteFieldDefinition(getDbName(), getName(), getSqlType(),
-      getLength(), isRequired(), getDescription(), getProperties());
+    return new JdbcByteFieldDefinition(getDbName(), getName(), getSqlType(), getLength(),
+      isRequired(), getDescription(), getProperties());
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet,
-    final int columnIndex, final Record object) throws SQLException {
+  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final Record object) throws SQLException {
     final byte byteValue = resultSet.getByte(columnIndex);
     if (!resultSet.wasNull()) {
       setValue(object, Byte.valueOf(byteValue));
@@ -33,8 +32,8 @@ public class JdbcByteFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setPreparedStatementValue(final PreparedStatement statement,
-    final int parameterIndex, final Object value) throws SQLException {
+  public int setPreparedStatementValue(final PreparedStatement statement, final int parameterIndex,
+    final Object value) throws SQLException {
     if (value == null) {
       statement.setNull(parameterIndex, getSqlType());
     } else {

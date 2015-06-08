@@ -29,26 +29,22 @@ public class QueryValueTest {
 
   public QueryValueTest() {
     this.recordDefinition = new RecordDefinitionImpl("Test");
-    this.idField = this.recordDefinition.addField("ID", DataTypes.INT,
-      true);
-    this.nameAttribute = this.recordDefinition.addField("NAME",
-      DataTypes.STRING, 255, true);
-    this.descriptionAttribute = this.recordDefinition.addField(
-      "DESCRIPTION", DataTypes.STRING, 255, false);
+    this.idField = this.recordDefinition.addField("ID", DataTypes.INT, true);
+    this.nameAttribute = this.recordDefinition.addField("NAME", DataTypes.STRING, 255, true);
+    this.descriptionAttribute = this.recordDefinition.addField("DESCRIPTION", DataTypes.STRING,
+      255, false);
 
     this.record = new ArrayRecord(this.recordDefinition);
     this.record.setValue("ID", 10);
     this.record.setValue("NAME", "foobar");
   }
 
-  public void assertConditionFalse(final Condition trueCondition1,
-    final Record record) {
+  public void assertConditionFalse(final Condition trueCondition1, final Record record) {
     final boolean result1 = trueCondition1.accept(record);
     Assert.assertFalse(result1);
   }
 
-  public void assertConditionTrue(final Condition trueCondition1,
-    final Record record) {
+  public void assertConditionTrue(final Condition trueCondition1, final Record record) {
     final boolean result1 = trueCondition1.accept(record);
     Assert.assertTrue(result1);
   }
@@ -129,19 +125,18 @@ public class QueryValueTest {
 
   @SuppressWarnings("unchecked")
   private void testILike() {
-    for (final Object like : Arrays.asList(10, "%10", "10%", "%10%", "%1%",
-        "%0%")) {
+    for (final Object like : Arrays.asList(10, "%10", "10%", "%10%", "%1%", "%0%")) {
       final Condition trueCondition = Q.iLike(this.idField, like);
       assertConditionTrue(trueCondition, this.record);
     }
-    for (final String like : Arrays.asList("%Foobar", "fooBar%", "%foObar%",
-      "%fOo%", "%bAr%", "%o%B%")) {
+    for (final String like : Arrays.asList("%Foobar", "fooBar%", "%foObar%", "%fOo%", "%bAr%",
+      "%o%B%")) {
       final Condition trueCondition = Q.iLike(this.nameAttribute, like);
       assertConditionTrue(trueCondition, this.record);
     }
 
-    for (final String like : Arrays.asList("%Foobar1", "Foobar1%", "%Foobar1%",
-      "%Foo1%", "%Bar1%", "%a%b%")) {
+    for (final String like : Arrays.asList("%Foobar1", "Foobar1%", "%Foobar1%", "%Foo1%", "%Bar1%",
+      "%a%b%")) {
       final Condition falseCondition = Q.iLike(this.nameAttribute, like);
       assertConditionFalse(falseCondition, this.record);
     }
@@ -195,19 +190,18 @@ public class QueryValueTest {
 
   @SuppressWarnings("unchecked")
   private void testLike() {
-    for (final Object like : Arrays.asList(10, "%10", "10%", "%10%", "%1%",
-        "%0%")) {
+    for (final Object like : Arrays.asList(10, "%10", "10%", "%10%", "%1%", "%0%")) {
       final Condition trueCondition = Q.like(this.idField, like);
       assertConditionTrue(trueCondition, this.record);
     }
-    for (final String like : Arrays.asList("%foobar", "foobar%", "%foobar%",
-      "%foo%", "%bar%", "%o%b%")) {
+    for (final String like : Arrays.asList("%foobar", "foobar%", "%foobar%", "%foo%", "%bar%",
+      "%o%b%")) {
       final Condition trueCondition = Q.like(this.nameAttribute, like);
       assertConditionTrue(trueCondition, this.record);
     }
 
-    for (final String like : Arrays.asList("%Foobar", "Foobar%", "%Foobar%",
-      "%Foo%", "%Bar%", "%O%b%")) {
+    for (final String like : Arrays.asList("%Foobar", "Foobar%", "%Foobar%", "%Foo%", "%Bar%",
+      "%O%b%")) {
       final Condition falseCondition = Q.like(this.nameAttribute, like);
       assertConditionFalse(falseCondition, this.record);
     }

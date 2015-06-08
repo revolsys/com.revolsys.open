@@ -34,8 +34,8 @@ public class BigDecimalAttributeValidator implements FieldValueValidator {
   public BigDecimalAttributeValidator() {
   }
 
-  public BigDecimalAttributeValidator(final BigDecimal minValue,
-    final BigDecimal maxValue, final boolean decimal) {
+  public BigDecimalAttributeValidator(final BigDecimal minValue, final BigDecimal maxValue,
+    final boolean decimal) {
     this.minValue = new BigDecimal(String.valueOf(minValue));
     this.maxValue = new BigDecimal(String.valueOf(maxValue));
     this.decimal = decimal;
@@ -45,8 +45,7 @@ public class BigDecimalAttributeValidator implements FieldValueValidator {
     this.decimal = decimal;
   }
 
-  public BigDecimalAttributeValidator(final double minValue,
-    final double maxValue) {
+  public BigDecimalAttributeValidator(final double minValue, final double maxValue) {
     this.minValue = new BigDecimal(String.valueOf(minValue));
     this.maxValue = new BigDecimal(String.valueOf(maxValue));
     this.decimal = true;

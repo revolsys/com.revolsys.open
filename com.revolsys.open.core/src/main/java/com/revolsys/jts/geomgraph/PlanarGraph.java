@@ -264,14 +264,14 @@ public class PlanarGraph {
    * E.g. the segments are parallel and in the same quadrant
    * (as opposed to parallel and opposite!).
    */
-  private boolean matchInSameDirection(final Point p0,
-    final Point p1, final Point ep0, final Point ep1) {
+  private boolean matchInSameDirection(final Point p0, final Point p1, final Point ep0,
+    final Point ep1) {
     if (!p0.equals(ep0)) {
       return false;
     }
 
     if (CGAlgorithmsDD.orientationIndex(p0, p1, ep1) == CGAlgorithms.COLLINEAR
-        && Quadrant.quadrant(p0, p1) == Quadrant.quadrant(ep0, ep1)) {
+      && Quadrant.quadrant(p0, p1) == Quadrant.quadrant(ep0, ep1)) {
       return true;
     }
     return false;

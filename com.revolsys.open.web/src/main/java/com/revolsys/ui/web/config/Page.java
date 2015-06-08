@@ -85,8 +85,7 @@ public class Page extends Component {
     this.attributesMap.putAll(page.attributesMap);
   }
 
-  public Page(final String name, final String title, final String path,
-    final boolean secure) {
+  public Page(final String name, final String title, final String path, final boolean secure) {
     super(name);
     setTitle(title);
     setPath(path);
@@ -177,11 +176,10 @@ public class Page extends Component {
     if (o instanceof Page) {
       final Page p = (Page)o;
       if (super.equals(o)
-          && p.menuId == this.menuId
-          && p.path.equals(this.path)
-          && (p.title == this.title || p.title != null && this.title != null
-          && p.title.equals(this.title))
-          && p.properties.equals(this.properties)) {
+        && p.menuId == this.menuId
+        && p.path.equals(this.path)
+        && (p.title == this.title || p.title != null && this.title != null
+          && p.title.equals(this.title)) && p.properties.equals(this.properties)) {
         return true;
       }
     }
@@ -233,8 +231,7 @@ public class Page extends Component {
   }
 
   public String getFullUrl(final Map<String, ? extends Object> parameters) {
-    final Map<String, Object> uriParameters = new HashMap<String, Object>(
-        parameters);
+    final Map<String, Object> uriParameters = new HashMap<String, Object>(parameters);
     final HttpServletRequest request = HttpServletUtils.getRequest();
     if (request != null) {
 
@@ -350,8 +347,7 @@ public class Page extends Component {
     }
   }
 
-  public Map<String, Object> getUriTemplateVariables(
-    final Map<String, Object> parameters) {
+  public Map<String, Object> getUriTemplateVariables(final Map<String, Object> parameters) {
     final HttpServletRequest request = HttpServletUtils.getRequest();
     final Map<String, String> pathVariables = HttpServletUtils.getPathVariables();
     final Map<String, Object> uriTemplateVariables = new HashMap<String, Object>();

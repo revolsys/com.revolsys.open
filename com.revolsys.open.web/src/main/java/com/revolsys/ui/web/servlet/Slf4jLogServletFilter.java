@@ -23,9 +23,7 @@ public class Slf4jLogServletFilter implements Filter {
   }
 
   @Override
-  public void doFilter(
-    final ServletRequest request,
-    final ServletResponse response,
+  public void doFilter(final ServletRequest request, final ServletResponse response,
     final FilterChain chain) throws IOException, ServletException {
     try {
       chain.doFilter(request, response);

@@ -7,8 +7,8 @@ import com.revolsys.data.record.Record;
 import com.revolsys.io.DelegatingObjectWithProperties;
 import com.revolsys.jts.geom.Geometry;
 
-public class RecordGeometryIterator extends DelegatingObjectWithProperties
-implements Iterator<Geometry> {
+public class RecordGeometryIterator extends DelegatingObjectWithProperties implements
+  Iterator<Geometry> {
   private Iterator<Record> iterator;
 
   public RecordGeometryIterator(final Iterator<Record> iterator) {

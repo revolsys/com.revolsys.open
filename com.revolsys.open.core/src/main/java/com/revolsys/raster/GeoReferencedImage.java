@@ -14,15 +14,14 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public interface GeoReferencedImage extends MapSerializer,
-PropertyChangeListener {
+public interface GeoReferencedImage extends MapSerializer, PropertyChangeListener {
 
   void cancelChanges();
 
   void deleteTiePoint(MappedLocation tiePoint);
 
-  void drawImage(Graphics2D graphics, BoundingBox viewBoundingBox,
-    int viewWidth, int viewHeight, boolean useTransform);
+  void drawImage(Graphics2D graphics, BoundingBox viewBoundingBox, int viewWidth, int viewHeight,
+    boolean useTransform);
 
   AffineTransform getAffineTransformation(BoundingBox boundingBox);
 
@@ -36,8 +35,7 @@ PropertyChangeListener {
 
   GeoReferencedImage getImage(final CoordinateSystem coordinateSystem);
 
-  GeoReferencedImage getImage(final CoordinateSystem coordinateSystem,
-    final double resolution);
+  GeoReferencedImage getImage(final CoordinateSystem coordinateSystem, final double resolution);
 
   GeoReferencedImage getImage(final GeometryFactory geometryFactory);
 
@@ -71,8 +69,8 @@ PropertyChangeListener {
 
   void setBoundingBox(final BoundingBox boundingBox);
 
-  void setBoundingBox(final double x1, final double y1,
-    final double pixelWidth, final double pixelHeight);
+  void setBoundingBox(final double x1, final double y1, final double pixelWidth,
+    final double pixelHeight);
 
   void setDpi(final int... dpi);
 

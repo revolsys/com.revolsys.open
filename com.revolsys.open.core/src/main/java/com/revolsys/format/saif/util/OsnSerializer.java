@@ -99,13 +99,13 @@ public class OsnSerializer {
     this.lineSeparator = "\r\n";
   }
 
-  public void attribute(final String name, final double value,
-    final boolean endLine) throws IOException {
+  public void attribute(final String name, final double value, final boolean endLine)
+    throws IOException {
     attribute(name, new BigDecimal(value), endLine);
   }
 
-  public void attribute(final String name, final Object value,
-    final boolean endLine) throws IOException {
+  public void attribute(final String name, final Object value, final boolean endLine)
+    throws IOException {
     fieldName(name);
     attributeValue(value);
     if (endLine || this.indentEnabled) {
@@ -114,8 +114,8 @@ public class OsnSerializer {
 
   }
 
-  public void attributeEnum(final String name, final String value,
-    final boolean endLine) throws IOException {
+  public void attributeEnum(final String name, final String value, final boolean endLine)
+    throws IOException {
     fieldName(name);
     write(value);
     endAttribute();
@@ -140,8 +140,7 @@ public class OsnSerializer {
           endLine();
         }
         this.scope.removeLast();
-      } else if (scope != DOCUMENT_SCOPE
-          && (scope instanceof Record || scope instanceof String)) {
+      } else if (scope != DOCUMENT_SCOPE && (scope instanceof Record || scope instanceof String)) {
         endObject();
       } else {
         if (this.indentEnabled) {
@@ -209,8 +208,7 @@ public class OsnSerializer {
 
   private void openFile() throws IOException {
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Creating object subset '" + FileUtil.getFileName(this.file)
-        + "'");
+      LOG.debug("Creating object subset '" + FileUtil.getFileName(this.file) + "'");
     }
     this.out = new BufferedOutputStream(new FileOutputStream(this.file), 4096);
   }
@@ -219,8 +217,7 @@ public class OsnSerializer {
     this.out.flush();
     this.out.close();
     this.index++;
-    final String fileName = ObjectSetUtil.getObjectSubsetName(this.prefix,
-      this.index);
+    final String fileName = ObjectSetUtil.getObjectSubsetName(this.prefix, this.index);
     this.file = new File(this.file.getParentFile(), fileName);
     this.size = 0;
     openFile();
@@ -261,8 +258,7 @@ public class OsnSerializer {
   }
 
   private void serialize(final Geometry geometry) throws IOException {
-    final String type = (String)GeometryProperties.getGeometryProperty(
-      geometry, "type");
+    final String type = (String)GeometryProperties.getGeometryProperty(geometry, "type");
     OsnConverter converter = this.converters.getConverter(type);
     if (converter == null) {
       if (geometry instanceof Point) {
@@ -301,8 +297,7 @@ public class OsnSerializer {
     write('"');
   }
 
-  public void serializeAttribute(final String name, final Object value)
-      throws IOException {
+  public void serializeAttribute(final String name, final Object value) throws IOException {
     fieldName(name);
     if (value instanceof Geometry && name.equals("position")) {
       startObject(SPATIAL_OBJECT);
@@ -337,12 +332,12 @@ public class OsnSerializer {
           if (i < attributeCount - 1) {
             endLine();
           } else if (type.getName().equals("/Coord3D")) {
-            for (Object parent : this.scope) {
+            for (final Object parent : this.scope) {
               if (parent instanceof Record) {
                 final Record parentObject = (Record)parent;
                 if (parentObject.getRecordDefinition()
-                    .getName()
-                    .equals(SaifConstants.TEXT_ON_CURVE)) {
+                  .getName()
+                  .equals(SaifConstants.TEXT_ON_CURVE)) {
                   endLine();
                 }
               }
@@ -355,8 +350,8 @@ public class OsnSerializer {
     }
   }
 
-  private void serializeCollection(final String name,
-    final Collection<Object> collection) throws IOException {
+  private void serializeCollection(final String name, final Collection<Object> collection)
+    throws IOException {
     startCollection(name);
     for (final Object value : collection) {
       serializeValue(value);
@@ -458,8 +453,7 @@ public class OsnSerializer {
     write(b, 0, b.length);
   }
 
-  public void write(final byte[] b, final int off, final int len)
-      throws IOException {
+  public void write(final byte[] b, final int off, final int len) throws IOException {
     this.out.write(b, off, len);
     this.size += len;
   }

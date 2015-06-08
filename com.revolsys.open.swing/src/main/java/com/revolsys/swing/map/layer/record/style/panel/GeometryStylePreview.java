@@ -18,6 +18,8 @@ import com.revolsys.data.types.DataTypes;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 
 public class GeometryStylePreview extends JPanel {
+  private static final long serialVersionUID = 1L;
+
   public static GeneralPath getLineShape(final int size) {
     final GeneralPath path = new GeneralPath();
     path.moveTo(0.19 * size, 0.19 * size);
@@ -41,16 +43,13 @@ public class GeometryStylePreview extends JPanel {
     return path;
   }
 
-  private static final long serialVersionUID = 1L;
-
   private Shape shape = getLineShape(100);
 
   private final GeometryStyle geometryStyle;
 
   private final DataType geometryDataType;
 
-  public GeometryStylePreview(final GeometryStyle geometryStyle,
-    final DataType geometryDataType) {
+  public GeometryStylePreview(final GeometryStyle geometryStyle, final DataType geometryDataType) {
     final Dimension size = new Dimension(100, 100);
     setPreferredSize(size);
     setMinimumSize(size);
@@ -73,8 +72,7 @@ public class GeometryStylePreview extends JPanel {
     final Paint paint = graphics.getPaint();
     final Stroke stroke = graphics.getStroke();
     try {
-      graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_ON);
+      graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
       if (DataTypes.POLYGON.equals(this.geometryDataType)) {
         this.geometryStyle.setFillStyle(null, graphics);

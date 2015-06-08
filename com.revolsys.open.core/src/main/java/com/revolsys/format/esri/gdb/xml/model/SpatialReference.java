@@ -8,8 +8,9 @@ import com.revolsys.jts.geom.GeometryFactory;
 
 public class SpatialReference {
 
-  public static SpatialReference get(final GeometryFactory geometryFactory,
-    final String wkt) {
+  private static final double FLOATING_SCALE = 11258999068426.238;
+
+  public static SpatialReference get(final GeometryFactory geometryFactory, final String wkt) {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem instanceof com.revolsys.gis.cs.GeographicCoordinateSystem) {
@@ -20,8 +21,6 @@ public class SpatialReference {
     }
     return null;
   }
-
-  private static final double FLOATING_SCALE = 11258999068426.238;
 
   private String wkt;
 
@@ -60,8 +59,7 @@ public class SpatialReference {
   public SpatialReference() {
   }
 
-  protected SpatialReference(final GeometryFactory geometryFactory,
-    final String wkt) {
+  protected SpatialReference(final GeometryFactory geometryFactory, final String wkt) {
     this.geometryFactory = geometryFactory;
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
@@ -112,11 +110,10 @@ public class SpatialReference {
       final CoordinateSystem coordinateSystem = getCoordinateSystem();
       if (coordinateSystem != null) {
         if (this.xYScale == FLOATING_SCALE) {
-          this.geometryFactory = GeometryFactory.fixed(
-            coordinateSystem.getId(), 0.0, this.zScale);
+          this.geometryFactory = GeometryFactory.fixed(coordinateSystem.getId(), 0.0, this.zScale);
         } else {
-          this.geometryFactory = GeometryFactory.fixed(
-            coordinateSystem.getId(), this.xYScale, this.zScale);
+          this.geometryFactory = GeometryFactory.fixed(coordinateSystem.getId(), this.xYScale,
+            this.zScale);
         }
       }
     }

@@ -16,11 +16,10 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class OgrVrtWriter {
-  public static void write(final File file,
-    final RecordDefinition recordDefinition, final String dataSource)
-        throws IOException {
+  public static void write(final File file, final RecordDefinition recordDefinition,
+    final String dataSource) throws IOException {
     try (
-        XmlWriter writer = new XmlWriter(new FileWriter(file))) {
+      XmlWriter writer = new XmlWriter(new FileWriter(file))) {
       writer.setIndent(true);
       writer.startDocument("UTF-8", "1.0");
       writer.startTag("OGRVRTDataSource");
@@ -58,11 +57,11 @@ public class OgrVrtWriter {
           writer.startTag("Field");
           writer.attribute("name", fieldName);
           String type = "String";
-          if (Arrays.asList(DataTypes.BYTE, DataTypes.SHORT, DataTypes.INT,
-            DataTypes.LONG, DataTypes.INTEGER).contains(fieldType)) {
+          if (Arrays.asList(DataTypes.BYTE, DataTypes.SHORT, DataTypes.INT, DataTypes.LONG,
+            DataTypes.INTEGER).contains(fieldType)) {
             type = "Integer";
-          } else if (Arrays.asList(DataTypes.FLOAT, DataTypes.DOUBLE,
-            DataTypes.DECIMAL).contains(fieldType)) {
+          } else if (Arrays.asList(DataTypes.FLOAT, DataTypes.DOUBLE, DataTypes.DECIMAL).contains(
+            fieldType)) {
             type = "Real";
           } else if (DataTypes.DATE.equals(type)) {
             type = "Date";

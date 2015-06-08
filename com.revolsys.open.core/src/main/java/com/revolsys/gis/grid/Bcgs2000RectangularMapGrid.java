@@ -4,8 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Bcgs2000RectangularMapGrid extends Bcgs20000RectangularMapGrid {
-  private static final Pattern NAME_PATTERN = Pattern.compile("^"
-      + BcgsConstants.REGEX_2000 + ".*");
+  private static final Pattern NAME_PATTERN = Pattern.compile("^" + BcgsConstants.REGEX_2000 + ".*");
 
   public Bcgs2000RectangularMapGrid() {
     this(BcgsConstants.WIDTH_2000, BcgsConstants.HEIGHT_2000);
@@ -24,8 +23,7 @@ public class Bcgs2000RectangularMapGrid extends Bcgs20000RectangularMapGrid {
       final String letter = matcher.group(2);
       final String number20k = matcher.group(3);
       final String number2k = matcher.group(4);
-      final double latitude = getLatitude(blockName, letter, number20k,
-        number2k);
+      final double latitude = getLatitude(blockName, letter, number20k, number2k);
       return latitude;
     } else {
       throw new IllegalArgumentException(mapTileName
@@ -33,8 +31,8 @@ public class Bcgs2000RectangularMapGrid extends Bcgs20000RectangularMapGrid {
     }
   }
 
-  protected double getLatitude(final String blockName, final String letter,
-    final String number20k, final String number2k) {
+  protected double getLatitude(final String blockName, final String letter, final String number20k,
+    final String number2k) {
     double latitude = getLatitude(blockName, letter, number20k);
 
     final int number = Integer.parseInt(number2k);
@@ -51,8 +49,7 @@ public class Bcgs2000RectangularMapGrid extends Bcgs20000RectangularMapGrid {
       final String letter = matcher.group(2);
       final String numberString = matcher.group(3);
       final String number2k = matcher.group(4);
-      final double longitude = getLongitude(blockName, letter, numberString,
-        number2k);
+      final double longitude = getLongitude(blockName, letter, numberString, number2k);
       return longitude;
     } else {
       throw new IllegalArgumentException(mapTileName

@@ -90,8 +90,7 @@ public class PreparedPolygon extends AbstractPolygon {
       if (this.isRectangle) {
         return RectangleContains.contains(getPolygon(), g);
       } else {
-        final PreparedPolygonContains contains = new PreparedPolygonContains(
-          this, getPolygon());
+        final PreparedPolygonContains contains = new PreparedPolygonContains(this, getPolygon());
         return contains.contains(g);
       }
     } else {
@@ -119,8 +118,7 @@ public class PreparedPolygon extends AbstractPolygon {
        * If any segments intersect, result is false.
        */
       final List<NodedSegmentString> lineSegStr = SegmentStringUtil.extractSegmentStrings(geometry);
-      final boolean segsIntersect = getIntersectionFinder().intersects(
-        lineSegStr);
+      final boolean segsIntersect = getIntersectionFinder().intersects(lineSegStr);
       if (segsIntersect) {
         return false;
       }
@@ -256,8 +254,7 @@ public class PreparedPolygon extends AbstractPolygon {
           // only request intersection finder if there are segments
           // (i.e. NOT for point inputs)
           if (lineSegStr.size() > 0) {
-            final boolean segsIntersect = getIntersectionFinder().intersects(
-              lineSegStr);
+            final boolean segsIntersect = getIntersectionFinder().intersects(lineSegStr);
             if (segsIntersect) {
               return true;
             }

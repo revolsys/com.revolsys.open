@@ -51,11 +51,11 @@ import com.revolsys.jts.operation.IsSimpleOp;
  * @version 1.7
  */
 public class IsSimpleTest extends TestCase {
+  private static final double TOLERANCE = 0.00005;
+
   public static void main(final String args[]) {
     TestRunner.run(IsSimpleTest.class);
   }
-
-  private static final double TOLERANCE = 0.00005;
 
   private final GeometryFactory fact = GeometryFactory.floating3();
 
@@ -66,7 +66,7 @@ public class IsSimpleTest extends TestCase {
   }
 
   private void runIsSimpleTest(final String wkt, final boolean expectedResult)
-      throws ParseException {
+    throws ParseException {
     runIsSimpleTest(wkt, expectedResult, null);
   }
 
@@ -111,8 +111,7 @@ public class IsSimpleTest extends TestCase {
 
   public void testCross() throws Exception {
     final String a = "MULTILINESTRING ((20 120, 120 20), (20 20, 120 120))";
-    runIsSimpleTest(a, false, new PointDouble((double)70, 70,
-      Point.NULL_ORDINATE));
+    runIsSimpleTest(a, false, new PointDouble((double)70, 70, Point.NULL_ORDINATE));
   }
 
   public void testMultiLineStringWithRingTouchAtEndpoint() throws Exception {
@@ -120,8 +119,7 @@ public class IsSimpleTest extends TestCase {
 
     // under Mod-2, the ring has no boundary, so the line intersects the
     // interior ==> not simple
-    runIsSimpleTest(a, false, new PointDouble((double)100, 100,
-      Point.NULL_ORDINATE));
+    runIsSimpleTest(a, false, new PointDouble((double)100, 100, Point.NULL_ORDINATE));
   }
 
   public void testRing() throws Exception {

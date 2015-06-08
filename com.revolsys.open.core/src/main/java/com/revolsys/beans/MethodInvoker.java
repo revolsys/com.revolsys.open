@@ -23,8 +23,7 @@ public class MethodInvoker extends AbstractRunnable {
    * @param method The method to invoke.
    * @param parameters The parameters to pass to the method.
    */
-  public MethodInvoker(final Method method, final Object object,
-    final Object... parameters) {
+  public MethodInvoker(final Method method, final Object object, final Object... parameters) {
     this.object = object;
     this.method = method;
     this.parameters = parameters;

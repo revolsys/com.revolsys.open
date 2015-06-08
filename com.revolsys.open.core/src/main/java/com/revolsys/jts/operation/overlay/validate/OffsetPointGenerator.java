@@ -76,9 +76,8 @@ public class OffsetPointGenerator {
    * @param p0 the first point of the segment to offset from
    * @param p1 the second point of the segment to offset from
    */
-  private void computeOffsetPoints(final double x1, final double y1,
-    final double x2, final double y2, final double offsetDistance,
-    final List<Point> offsetPts) {
+  private void computeOffsetPoints(final double x1, final double y1, final double x2,
+    final double y2, final double offsetDistance, final List<Point> offsetPts) {
     final double dx = x2 - x1;
     final double dy = y2 - y1;
     final double len = Math.sqrt(dx * dx + dy * dy);
@@ -101,8 +100,8 @@ public class OffsetPointGenerator {
     }
   }
 
-  private void extractPoints(final LineString line,
-    final double offsetDistance, final List<Point> offsetPts) {
+  private void extractPoints(final LineString line, final double offsetDistance,
+    final List<Point> offsetPts) {
     for (final Segment segment : line.segments()) {
       final double x1 = segment.getX(0);
       final double y1 = segment.getY(0);

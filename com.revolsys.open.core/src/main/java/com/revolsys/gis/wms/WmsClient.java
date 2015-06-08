@@ -37,8 +37,7 @@ public class WmsClient {
     this(new URL(url));
   }
 
-  public WmsClient(final String name, final String url)
-      throws MalformedURLException {
+  public WmsClient(final String name, final String url) throws MalformedURLException {
     this(name, new URL(url));
   }
 
@@ -58,24 +57,21 @@ public class WmsClient {
     return this.capabilities;
   }
 
-  public Image getMapImage(final List<String> layers,
-    final List<String> styles, final String srid, final BoundingBox envelope,
-    final String format, final int width, final int height) throws IOException {
-    final URL mapUrl = getMapUrl(layers, styles, srid, envelope, format, width,
-      height);
+  public Image getMapImage(final List<String> layers, final List<String> styles, final String srid,
+    final BoundingBox envelope, final String format, final int width, final int height)
+    throws IOException {
+    final URL mapUrl = getMapUrl(layers, styles, srid, envelope, format, width, height);
     final URLConnection connection = mapUrl.openConnection();
     final String userInfo = mapUrl.getUserInfo();
     if (userInfo != null) {
-      connection.setRequestProperty("Authorization",
-        "Basic " + Base64.encode(userInfo));
+      connection.setRequestProperty("Authorization", "Basic " + Base64.encode(userInfo));
     }
     final InputStream in = connection.getInputStream();
     return ImageIO.read(in);
   }
 
-  public URL getMapUrl(final List<String> layers, final List<String> styles,
-    final String srid, final BoundingBox envelope, final String format,
-    final int width, final int height) {
+  public URL getMapUrl(final List<String> layers, final List<String> styles, final String srid,
+    final BoundingBox envelope, final String format, final int width, final int height) {
     final String version = getCapabilities().getVersion();
     final Map<String, Object> parameters = new LinkedHashMap<String, Object>();
     if (version.equals("1.0.0")) {
@@ -102,8 +98,8 @@ public class WmsClient {
     } else {
       parameters.put(WmsParameters.SRS, srid);
     }
-    final String bbox = envelope.getMinX() + "," + envelope.getMinY() + ","
-        + envelope.getMaxX() + "," + envelope.getMaxY();
+    final String bbox = envelope.getMinX() + "," + envelope.getMinY() + "," + envelope.getMaxX()
+      + "," + envelope.getMaxY();
     parameters.put(WmsParameters.BBOX, bbox);
     parameters.put(WmsParameters.WIDTH, width);
     parameters.put(WmsParameters.HEIGHT, height);
@@ -164,8 +160,7 @@ public class WmsClient {
       context.addError(e.getMessage(), e, null);
     }
     if (!context.getErrors().isEmpty()) {
-      throw new IllegalArgumentException("Capabilities file is invalid"
-          + context.getErrors());
+      throw new IllegalArgumentException("Capabilities file is invalid" + context.getErrors());
     }
   }
 

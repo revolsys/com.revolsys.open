@@ -52,9 +52,8 @@ public class JdbcCodeTable extends AbstractCodeTable {
   public JdbcCodeTable() {
   }
 
-  public JdbcCodeTable(final String tableName, final String sequenceName,
-    final String idColumn, final boolean capitalizeWords,
-    final boolean loadAll, final String... valueColumns) {
+  public JdbcCodeTable(final String tableName, final String sequenceName, final String idColumn,
+    final boolean capitalizeWords, final boolean loadAll, final String... valueColumns) {
     super(capitalizeWords);
     this.tableName = tableName;
     this.sequenceName = sequenceName;
@@ -63,9 +62,8 @@ public class JdbcCodeTable extends AbstractCodeTable {
     this.loadAll = loadAll;
   }
 
-  public JdbcCodeTable(final String tableName, final String sequenceName,
-    final String idColumn, final List<String> columnAliases,
-    final boolean capitalizeWords, final boolean loadAll,
+  public JdbcCodeTable(final String tableName, final String sequenceName, final String idColumn,
+    final List<String> columnAliases, final boolean capitalizeWords, final boolean loadAll,
     final String... valueColumns) {
     super(capitalizeWords);
     this.tableName = tableName;
@@ -76,9 +74,8 @@ public class JdbcCodeTable extends AbstractCodeTable {
     this.loadAll = loadAll;
   }
 
-  public JdbcCodeTable(final String tableName, final String sequenceName,
-    final String idColumn, final Map<String, String> auditColumns,
-    final boolean capitalizeWords, final boolean loadAll,
+  public JdbcCodeTable(final String tableName, final String sequenceName, final String idColumn,
+    final Map<String, String> auditColumns, final boolean capitalizeWords, final boolean loadAll,
     final List<String> valueColumns) {
     super(capitalizeWords);
     this.tableName = tableName;
@@ -89,8 +86,8 @@ public class JdbcCodeTable extends AbstractCodeTable {
     this.loadAll = loadAll;
   }
 
-  public JdbcCodeTable(final String tableName, final String sequenceName,
-    final String idColumn, final String... valueColumns) {
+  public JdbcCodeTable(final String tableName, final String sequenceName, final String idColumn,
+    final String... valueColumns) {
     this.tableName = tableName;
     this.idColumn = idColumn;
     this.sequenceName = sequenceName;
@@ -99,9 +96,8 @@ public class JdbcCodeTable extends AbstractCodeTable {
 
   @Override
   public AbstractCodeTable clone() {
-    final JdbcCodeTable codeTable = new JdbcCodeTable(this.tableName,
-      this.sequenceName, this.idColumn, this.auditColumns, isCapitalizeWords(),
-      this.loadAll, this.valueColumns);
+    final JdbcCodeTable codeTable = new JdbcCodeTable(this.tableName, this.sequenceName,
+      this.idColumn, this.auditColumns, isCapitalizeWords(), this.loadAll, this.valueColumns);
     codeTable.setColumnAliases(this.columnAliases);
     return codeTable;
   }
@@ -110,12 +106,12 @@ public class JdbcCodeTable extends AbstractCodeTable {
     try {
       init();
       try (
-          final Connection connection = this.recordStore.getJdbcConnection()) {
+        final Connection connection = this.recordStore.getJdbcConnection()) {
         JdbcUtils.lockTable(connection, this.tableName);
         Object id = loadId(values, false);
         if (id == null) {
           try (
-              final PreparedStatement statement = connection.prepareStatement(this.insertSql)) {
+            final PreparedStatement statement = connection.prepareStatement(this.insertSql)) {
             id = this.recordStore.getNextPrimaryKey(this.sequenceName);
             int index = 1;
             index = JdbcUtils.setValue(statement, index, id);
@@ -134,8 +130,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
         }
       }
     } catch (final SQLException e) {
-      throw new RuntimeException(this.tableName + ": Unable to create ID for  "
-          + values, e);
+      throw new RuntimeException(this.tableName + ": Unable to create ID for  " + values, e);
     }
 
   }
@@ -172,12 +167,11 @@ public class JdbcCodeTable extends AbstractCodeTable {
   protected synchronized void init() {
     if (!this.initialized) {
 
-      this.allSql = "SELECT " + this.idColumn + ", "
-          + toString(this.valueColumns) + " FROM " + this.tableName;
-      this.valueByIdSql = "SELECT " + toString(this.valueColumns) + " FROM "
-          + this.tableName + " WHERE " + this.idColumn + " = ?";
-      this.idByValueSql = "SELECT " + this.idColumn + " FROM " + this.tableName
-          + " WHERE ";
+      this.allSql = "SELECT " + this.idColumn + ", " + toString(this.valueColumns) + " FROM "
+        + this.tableName;
+      this.valueByIdSql = "SELECT " + toString(this.valueColumns) + " FROM " + this.tableName
+        + " WHERE " + this.idColumn + " = ?";
+      this.idByValueSql = "SELECT " + this.idColumn + " FROM " + this.tableName + " WHERE ";
       this.insertSql = "INSERT INTO " + this.tableName + " (" + this.idColumn;
       for (int i = 0; i < this.valueColumns.size(); i++) {
         final String columnName = this.valueColumns.get(i);
@@ -210,9 +204,9 @@ public class JdbcCodeTable extends AbstractCodeTable {
   private void loadAll() {
     try {
       try (
-          JdbcConnection connection = this.recordStore.getJdbcConnection();
-          final PreparedStatement statement = connection.prepareStatement(this.allSql);
-          final ResultSet rs = statement.executeQuery()) {
+        JdbcConnection connection = this.recordStore.getJdbcConnection();
+        final PreparedStatement statement = connection.prepareStatement(this.allSql);
+        final ResultSet rs = statement.executeQuery()) {
         while (rs.next()) {
           final Identifier id = SingleIdentifier.create(rs.getLong(1));
           final List<Object> values = new ArrayList<Object>();
@@ -223,8 +217,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
         }
       }
     } catch (final SQLException e) {
-      throw new RuntimeException("Unable to load all values for: "
-          + this.tableName, e);
+      throw new RuntimeException("Unable to load all values for: " + this.tableName, e);
     }
   }
 
@@ -238,15 +231,15 @@ public class JdbcCodeTable extends AbstractCodeTable {
     } else {
       try {
         try (
-            JdbcConnection connection = this.recordStore.getJdbcConnection();
-            final PreparedStatement statement = connection.prepareStatement(this.idByValueSql)) {
+          JdbcConnection connection = this.recordStore.getJdbcConnection();
+          final PreparedStatement statement = connection.prepareStatement(this.idByValueSql)) {
           int index = 1;
           for (int i = 0; i < this.valueColumns.size(); i++) {
             final Object value = values.get(i);
             index = JdbcUtils.setValue(statement, index, value);
           }
           try (
-              final ResultSet resultSet = statement.executeQuery()) {
+            final ResultSet resultSet = statement.executeQuery()) {
             if (resultSet.next()) {
               id = SingleIdentifier.create(resultSet.getLong(1));
             }
@@ -273,12 +266,12 @@ public class JdbcCodeTable extends AbstractCodeTable {
     } else {
       try {
         try (
-            JdbcConnection connection = this.recordStore.getJdbcConnection();
-            final PreparedStatement statement = connection.prepareStatement(this.valueByIdSql);) {
+          JdbcConnection connection = this.recordStore.getJdbcConnection();
+          final PreparedStatement statement = connection.prepareStatement(this.valueByIdSql);) {
           JdbcUtils.setValue(statement, 1, id);
 
           try (
-              final ResultSet rs = statement.executeQuery()) {
+            final ResultSet rs = statement.executeQuery()) {
             if (rs.next()) {
               final int numColumns = rs.getMetaData().getColumnCount();
               values = new ArrayList<Object>();
@@ -289,8 +282,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
           }
         }
       } catch (final SQLException e) {
-        throw new IllegalArgumentException(this.tableName + " " + id
-          + " does not exist", e);
+        throw new IllegalArgumentException(this.tableName + " " + id + " does not exist", e);
       }
     }
     return values;

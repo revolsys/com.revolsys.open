@@ -60,8 +60,7 @@ public class FieldLabelDecorator implements Decorator {
     if (field.hasValidationErrors()) {
       out.startTag(HtmlUtil.DIV);
       out.attribute(HtmlUtil.ATTR_CLASS, "errors");
-      for (final Iterator validationErrors = field.getValidationErrors()
-          .iterator(); validationErrors.hasNext();) {
+      for (final Iterator validationErrors = field.getValidationErrors().iterator(); validationErrors.hasNext();) {
         final String error = (String)validationErrors.next();
         out.text(error);
         if (validationErrors.hasNext()) {

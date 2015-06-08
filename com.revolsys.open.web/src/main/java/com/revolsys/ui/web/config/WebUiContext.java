@@ -27,6 +27,12 @@ import org.apache.commons.jexl.JexlContext;
 import org.apache.log4j.Logger;
 
 public class WebUiContext {
+  private static final ThreadLocal<WebUiContext> local = new ThreadLocal<WebUiContext>();
+
+  private static final Logger log = Logger.getLogger(WebUiContext.class);
+
+  private static ServletContext servletContext;
+
   public static WebUiContext get() {
     final WebUiContext context = local.get();
     return context;
@@ -43,12 +49,6 @@ public class WebUiContext {
   public static void setServletContext(final ServletContext servletContext) {
     WebUiContext.servletContext = servletContext;
   }
-
-  private static final ThreadLocal<WebUiContext> local = new ThreadLocal<WebUiContext>();
-
-  private static final Logger log = Logger.getLogger(WebUiContext.class);
-
-  private static ServletContext servletContext;
 
   private Config config;
 
@@ -67,9 +67,8 @@ public class WebUiContext {
   public WebUiContext() {
   }
 
-  public WebUiContext(final Config config, final String contextPath,
-    final Page page, final HttpServletRequest request,
-    final HttpServletResponse response) {
+  public WebUiContext(final Config config, final String contextPath, final Page page,
+    final HttpServletRequest request, final HttpServletResponse response) {
     this.config = config;
     this.contextPath = contextPath;
     this.page = page;
@@ -85,8 +84,8 @@ public class WebUiContext {
     try {
       return expression.evaluate(jexlContext);
     } catch (final Exception e) {
-      log.error("Unable to evaluate expression " + expression.getExpression()
-        + ": " + e.getMessage(), e);
+      log.error(
+        "Unable to evaluate expression " + expression.getExpression() + ": " + e.getMessage(), e);
       return null;
     }
   }
@@ -95,8 +94,7 @@ public class WebUiContext {
     try {
       return evaluateExpression(ExpressionFactory.createExpression(expression));
     } catch (final Exception e) {
-      log.error(
-        "Unable to create expression " + expression + ": " + e.getMessage(), e);
+      log.error("Unable to create expression " + expression + ": " + e.getMessage(), e);
       return null;
     }
   }

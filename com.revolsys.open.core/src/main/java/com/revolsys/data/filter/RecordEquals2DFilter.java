@@ -25,8 +25,7 @@ public class RecordEquals2DFilter implements Filter<Record> {
     this(searchObject, null);
   }
 
-  public RecordEquals2DFilter(final Record searchObject,
-    final Collection<String> equalExclude) {
+  public RecordEquals2DFilter(final Record searchObject, final Collection<String> equalExclude) {
     this.searchObject = searchObject;
     if (equalExclude != null) {
       this.equalExclude.addAll(equalExclude);

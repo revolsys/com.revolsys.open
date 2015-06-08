@@ -11,8 +11,7 @@ import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.util.Property;
 
-public class ToggleButton extends JToggleButton implements
-PropertyChangeListener {
+public class ToggleButton extends JToggleButton implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   private EnableCheck enableCheck;

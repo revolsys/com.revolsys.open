@@ -14,8 +14,7 @@ public class FileCacheResponse extends CacheResponse {
 
   private final Map<String, List<String>> headers;
 
-  public FileCacheResponse(final File file,
-    final Map<String, List<String>> headers) {
+  public FileCacheResponse(final File file, final Map<String, List<String>> headers) {
     this.file = file;
     this.headers = headers;
   }

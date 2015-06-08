@@ -26,16 +26,15 @@ public class SegmentPointComparatorFullTest extends TestCase {
     super(name);
   }
 
-  private void checkNodePosition(final LineSegment seg, final Point p0,
-    final Point p1, final int expectedPositionValue) {
+  private void checkNodePosition(final LineSegment seg, final Point p0, final Point p1,
+    final int expectedPositionValue) {
     final int octant = Octant.octant(seg.getP0(), seg.getP1());
     final int posValue = SegmentPointComparator.compare(octant, p0, p1);
     // System.out.println(octant + " " + p0 + " " + p1 + " " + posValue);
     assertTrue(posValue == expectedPositionValue);
   }
 
-  private void checkPointsAtDistance(final LineSegment seg, final double dist0,
-    final double dist1) {
+  private void checkPointsAtDistance(final LineSegment seg, final double dist0, final double dist1) {
     final Point p0 = computePoint(seg, dist0);
     final Point p1 = computePoint(seg, dist1);
     if (p0.equals(p1)) {
@@ -47,8 +46,7 @@ public class SegmentPointComparatorFullTest extends TestCase {
   }
 
   private void checkSegment(final double x, final double y) {
-    final Point seg0 = new PointDouble((double)0, 0,
-      Point.NULL_ORDINATE);
+    final Point seg0 = new PointDouble((double)0, 0, Point.NULL_ORDINATE);
     final Point seg1 = new PointDouble(x, y, Point.NULL_ORDINATE);
     final LineSegment seg = new LineSegmentDouble(seg0, seg1);
 
@@ -68,8 +66,8 @@ public class SegmentPointComparatorFullTest extends TestCase {
     final double dx = seg.getP1().getX() - seg.getP0().getX();
     final double dy = seg.getP1().getY() - seg.getP0().getY();
     final double len = seg.getLength();
-    final Point pt = new PointDouble(MathUtil.makePrecise(1.0, dist
-      * dx / len), MathUtil.makePrecise(1.0, dist * dy / len));
+    final Point pt = new PointDouble(MathUtil.makePrecise(1.0, dist * dx / len),
+      MathUtil.makePrecise(1.0, dist * dy / len));
     return pt;
   }
 

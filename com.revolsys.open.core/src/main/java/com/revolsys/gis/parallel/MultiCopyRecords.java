@@ -40,23 +40,21 @@ public class MultiCopyRecords implements Process {
       if ("copyRecords".equals(type)) {
         final String typePath = (String)processDefinition.get("typePath");
         if (Property.hasValue(typePath)) {
-          final boolean hasSequence = Maps.getBool(processDefinition,
-              "hasSequence");
-          final Map<String, Boolean> orderBy = Maps.get(
-            processDefinition, "orderBy",
+          final boolean hasSequence = Maps.getBool(processDefinition, "hasSequence");
+          final Map<String, Boolean> orderBy = Maps.get(processDefinition, "orderBy",
             Collections.<String, Boolean> emptyMap());
-          final CopyRecords copy = new CopyRecords(this.sourceRecordStore,
-            typePath, orderBy, this.targetRecordStore, hasSequence);
+          final CopyRecords copy = new CopyRecords(this.sourceRecordStore, typePath, orderBy,
+            this.targetRecordStore, hasSequence);
           return copy;
         } else {
           LoggerFactory.getLogger(getClass()).error(
-              "Parameter 'typePath' required for type='copyRecords'");
+            "Parameter 'typePath' required for type='copyRecords'");
         }
       } else if ("sequential".equals(type)) {
         final List<Map<String, Object>> processList = (List<Map<String, Object>>)processDefinition.get("processes");
         if (processList == null) {
           LoggerFactory.getLogger(getClass()).error(
-              "Parameter 'processes' required for type='sequential'");
+            "Parameter 'processes' required for type='sequential'");
         } else {
           final Sequential processes = new Sequential();
           createProcesses(processes, processList);
@@ -66,7 +64,7 @@ public class MultiCopyRecords implements Process {
         final List<Map<String, Object>> processList = (List<Map<String, Object>>)processDefinition.get("processes");
         if (processList == null) {
           LoggerFactory.getLogger(getClass()).error(
-              "Parameter 'processes' required for type='parallel'");
+            "Parameter 'processes' required for type='parallel'");
         } else {
           final Parallel processes = new Parallel();
           createProcesses(processes, processList);
@@ -75,8 +73,7 @@ public class MultiCopyRecords implements Process {
 
       } else {
         LoggerFactory.getLogger(getClass()).error(
-          "Parameter type=" + type
-          + " not in 'copyRecords', 'sequential', 'copyRecords'");
+          "Parameter type=" + type + " not in 'copyRecords', 'sequential', 'copyRecords'");
       }
       return null;
     }

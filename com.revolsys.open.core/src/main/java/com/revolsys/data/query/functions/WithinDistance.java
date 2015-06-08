@@ -20,8 +20,8 @@ public class WithinDistance extends Condition {
 
   private QueryValue distanceValue;
 
-  public WithinDistance(final QueryValue geometry1Value,
-    final QueryValue geometry2Value, final QueryValue distanceValue) {
+  public WithinDistance(final QueryValue geometry1Value, final QueryValue geometry2Value,
+    final QueryValue distanceValue) {
     this.geometry1Value = geometry1Value;
     this.geometry2Value = geometry2Value;
     this.distanceValue = distanceValue;
@@ -29,8 +29,7 @@ public class WithinDistance extends Condition {
 
   @Override
   public boolean accept(final Map<String, Object> record) {
-    if (this.geometry1Value == null || this.geometry2Value == null
-        || this.distanceValue == null) {
+    if (this.geometry1Value == null || this.geometry2Value == null || this.distanceValue == null) {
       return false;
     } else {
       final Geometry geometry1 = this.geometry1Value.getValue(record);
@@ -47,10 +46,9 @@ public class WithinDistance extends Condition {
   }
 
   @Override
-  public void appendDefaultSql(final Query query,
-    final RecordStore recordStore, final StringBuilder sql) {
-    if (this.geometry1Value == null || this.geometry2Value == null
-        || this.distanceValue == null) {
+  public void appendDefaultSql(final Query query, final RecordStore recordStore,
+    final StringBuilder sql) {
+    if (this.geometry1Value == null || this.geometry2Value == null || this.distanceValue == null) {
       sql.append("1 = 0");
     } else {
       sql.append("ST_DWithin(");
@@ -121,15 +119,14 @@ public class WithinDistance extends Condition {
 
   @Override
   public List<QueryValue> getQueryValues() {
-    return Arrays.asList(this.geometry1Value, this.geometry2Value,
-      this.distanceValue);
+    return Arrays.asList(this.geometry1Value, this.geometry2Value, this.distanceValue);
   }
 
   @Override
   public String toString() {
-    return "DWithin(" + StringConverterRegistry.toString(this.geometry1Value)
-        + "," + StringConverterRegistry.toString(this.geometry2Value) + ","
-        + StringConverterRegistry.toString(this.distanceValue) + ")";
+    return "DWithin(" + StringConverterRegistry.toString(this.geometry1Value) + ","
+      + StringConverterRegistry.toString(this.geometry2Value) + ","
+      + StringConverterRegistry.toString(this.distanceValue) + ")";
   }
 
 }

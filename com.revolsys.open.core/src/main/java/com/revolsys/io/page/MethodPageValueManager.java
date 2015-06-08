@@ -58,9 +58,9 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
     final int b6 = bytes[5] & 0xFF;
     final int b7 = bytes[6] & 0xFF;
     final int b8 = bytes[7] & 0xFF;
-    return ((long)b1 << 56) + ((long)(b2 & 255) << 48)
-        + ((long)(b3 & 255) << 40) + ((long)(b4 & 255) << 32)
-        + ((long)(b5 & 255) << 24) + ((b6 & 255) << 16) + ((b7 & 255) << 8) + ((b8 & 255) << 0);
+    return ((long)b1 << 56) + ((long)(b2 & 255) << 48) + ((long)(b3 & 255) << 40)
+      + ((long)(b4 & 255) << 32) + ((long)(b5 & 255) << 24) + ((b6 & 255) << 16)
+      + ((b7 & 255) << 8) + ((b8 & 255) << 0);
   }
 
   public static byte[] getShortBytes(final Page page) {
@@ -143,8 +143,7 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
     final byte[] sizeBytes = getValueIntBytes(size);
     final byte[] bytes = new byte[stringBytes.length + sizeBytes.length];
     System.arraycopy(sizeBytes, 0, bytes, 0, sizeBytes.length);
-    System.arraycopy(stringBytes, 0, bytes, sizeBytes.length,
-      stringBytes.length);
+    System.arraycopy(stringBytes, 0, bytes, sizeBytes.length, stringBytes.length);
     return bytes;
   }
 
@@ -160,12 +159,11 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
   }
 
   protected MethodPageValueManager(final String typePath) {
-    this(typePath, "getValue" + typePath + "Bytes", "get" + typePath + "Value",
-      "get" + typePath + "Bytes");
+    this(typePath, "getValue" + typePath + "Bytes", "get" + typePath + "Value", "get" + typePath
+      + "Bytes");
   }
 
-  protected MethodPageValueManager(final String typePath,
-    final String byteArrayWriteMethodName,
+  protected MethodPageValueManager(final String typePath, final String byteArrayWriteMethodName,
     final String byteArrayReadMethodName, final String pageReadMethodName) {
     for (final Method method : getClass().getMethods()) {
       if (method.getName().equals(byteArrayWriteMethodName)) {

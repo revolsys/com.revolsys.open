@@ -65,6 +65,5 @@ public interface GeometryOperation {
    * @return the result of the operation
    * @throws Exception if some error was encountered trying to find or process the operation
    */
-  Result invoke(String opName, Geometry geometry, Object[] args)
-      throws Exception;
+  Result invoke(String opName, Geometry geometry, Object[] args) throws Exception;
 }

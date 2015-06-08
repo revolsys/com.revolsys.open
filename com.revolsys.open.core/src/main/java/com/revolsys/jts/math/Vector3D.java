@@ -90,15 +90,14 @@ public class Vector3D {
    * @param D
    * @return the dot product
    */
-  public static double dot(final Point A, final Point B, final Point C, final Point D)
-  {
+  public static double dot(final Point A, final Point B, final Point C, final Point D) {
     final double ABx = B.getX() - A.getX();
     final double ABy = B.getY() - A.getY();
     final double ABz = B.getZ() - A.getZ();
     final double CDx = D.getX() - C.getX();
     final double CDy = D.getY() - C.getY();
     final double CDz = D.getZ() - C.getZ();
-    return ABx*CDx + ABy*CDy + ABz*CDz;
+    return ABx * CDx + ABy * CDy + ABz * CDz;
   }
 
   public static double length(final Point v) {
@@ -109,7 +108,9 @@ public class Vector3D {
     final double len = length(v);
     return new PointDouble(v.getX() / len, v.getY() / len, v.getZ() / len);
   }
+
   private final double x;
+
   private final double y;
 
   private final double z;
@@ -135,7 +136,6 @@ public class Vector3D {
   private Vector3D divide(final double d) {
     return create(this.x / d, this.y / d, this.z / d);
   }
-
 
   /**
    * Computes the dot-product of two vectors
@@ -171,6 +171,7 @@ public class Vector3D {
     }
     return create(0.0, 0.0, 0.0);
   }
+
   /**
    * Gets a string representation of this vector
    *
@@ -180,6 +181,5 @@ public class Vector3D {
   public String toString() {
     return "[" + this.x + ", " + this.y + ", " + this.z + "]";
   }
-
 
 }

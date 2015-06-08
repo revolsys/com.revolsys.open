@@ -58,6 +58,8 @@ import com.revolsys.util.ExceptionUtil;
  * @version 1.7
  */
 public class StringUtil {
+  public final static String newLine = System.getProperty("line.separator");
+
   /**
    * Capitalizes the given string.
    *
@@ -79,8 +81,7 @@ public class StringUtil {
    *  Returns true if substring is indeed a substring of string.
    *  Case-insensitive.
    */
-  public static boolean containsIgnoreCase(final String string,
-    final String substring) {
+  public static boolean containsIgnoreCase(final String string, final String substring) {
     return contains(string.toLowerCase(), substring.toLowerCase());
   }
 
@@ -147,22 +148,22 @@ public class StringUtil {
       switch (c) {
         case '<':
           sb.append("&lt;");
-          break;
+        break;
         case '>':
           sb.append("&gt;");
-          break;
+        break;
         case '&':
           sb.append("&amp;");
-          break;
+        break;
         case '"':
           sb.append("&quot;");
-          break;
+        break;
         case '\n':
           sb.append("<BR>");
-          break;
+        break;
         default:
           sb.append(c);
-          break;
+        break;
       }
     }
     return sb.toString();
@@ -247,8 +248,7 @@ public class StringUtil {
    *  in s starting at start. Ignores text within pairs of parentheses. Returns
    *  -1 if no occurrence is found.
    */
-  public static int indexOfIgnoreParentheses(final char c, final String s,
-    final int start) {
+  public static int indexOfIgnoreParentheses(final char c, final String s, final int start) {
     int level = 0;
     for (int i = start; i < s.length(); i++) {
       final char other = s.charAt(i);
@@ -279,8 +279,7 @@ public class StringUtil {
    *  Pads the String with the given character until it has the given length. If
    *  original is longer than the given length, returns original.
    */
-  public static String leftPad(final String original, final int length,
-    final char padChar) {
+  public static String leftPad(final String original, final int length, final char padChar) {
     if (original.length() >= length) {
       return original;
     }
@@ -357,8 +356,7 @@ public class StringUtil {
   /**
    *  Returns a string with all occurrences of oldChar replaced by newStr
    */
-  public static String replace(final String str, final char oldChar,
-    final String newStr) {
+  public static String replace(final String str, final char oldChar, final String newStr) {
     final StringBuilder buf = new StringBuilder();
     for (int i = 0; i < str.length(); i++) {
       final char ch = str.charAt(i);
@@ -376,8 +374,8 @@ public class StringUtil {
    *  newSubstring. Set all to true to replace all occurrences, or false to
    *  replace the first occurrence only.
    */
-  public static String replace(final String original,
-    final String oldSubstring, final String newSubstring, final boolean all) {
+  public static String replace(final String original, final String oldSubstring,
+    final String newSubstring, final boolean all) {
     final StringBuilder b = new StringBuilder(original);
     replace(b, oldSubstring, newSubstring, all);
     return b.toString();
@@ -388,8 +386,8 @@ public class StringUtil {
    *  StringBuilder orig if all is true, or only the first instance if all is
    *  false. Posted by Steve Chapel <schapel@breakthr.com> on UseNet
    */
-  public static void replace(final StringBuilder orig, final String o,
-    final String n, final boolean all) {
+  public static void replace(final StringBuilder orig, final String o, final String n,
+    final boolean all) {
     if (orig == null || o == null || o.length() == 0 || n == null) {
       throw new IllegalArgumentException("Null or zero-length String");
     }
@@ -412,8 +410,8 @@ public class StringUtil {
    *  Returns original with all occurrences of oldSubstring replaced by
    *  newSubstring
    */
-  public static String replaceAll(final String original,
-    final String oldSubstring, final String newSubstring) {
+  public static String replaceAll(final String original, final String oldSubstring,
+    final String newSubstring) {
     return replace(original, oldSubstring, newSubstring, true);
   }
 
@@ -421,8 +419,8 @@ public class StringUtil {
    *  Returns original with the first occurrenc of oldSubstring replaced by
    *  newSubstring
    */
-  public static String replaceFirst(final String original,
-    final String oldSubstring, final String newSubstring) {
+  public static String replaceFirst(final String original, final String oldSubstring,
+    final String newSubstring) {
     return replace(original, oldSubstring, newSubstring, false);
   }
 
@@ -430,8 +428,7 @@ public class StringUtil {
    *  Pads the String with the given character until it has the given length. If
    *  original is longer than the given length, returns original.
    */
-  public static String rightPad(final String original, final int length,
-    final char padChar) {
+  public static String rightPad(final String original, final int length, final char padChar) {
     if (original.length() >= length) {
       return original;
     }
@@ -565,7 +562,5 @@ public class StringUtil {
     }
     return b.toString();
   }
-
-  public final static String newLine = System.getProperty("line.separator");
 
 }

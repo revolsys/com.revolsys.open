@@ -20,8 +20,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.util.Property;
 
-public class RecordStoreQueryReader extends IteratorReader<Record> implements
-RecordReader {
+public class RecordStoreQueryReader extends IteratorReader<Record> implements RecordReader {
 
   private AbstractRecordStore recordStore;
 
@@ -64,13 +63,12 @@ RecordReader {
         query.and(new SqlCondition(this.whereClause));
       }
       if (this.boundingBox != null) {
-        final FieldDefinition geometryField = query.getRecordDefinition()
-            .getGeometryField();
+        final FieldDefinition geometryField = query.getRecordDefinition().getGeometryField();
         query.and(F.envelopeIntersects(geometryField, this.boundingBox));
       }
 
-      final AbstractIterator<Record> iterator = this.recordStore.createIterator(
-        query, getProperties());
+      final AbstractIterator<Record> iterator = this.recordStore.createIterator(query,
+        getProperties());
       return iterator;
     }
     throw new NoSuchElementException();

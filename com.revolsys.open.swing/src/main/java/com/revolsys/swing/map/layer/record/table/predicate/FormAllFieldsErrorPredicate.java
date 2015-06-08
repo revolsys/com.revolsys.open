@@ -21,36 +21,32 @@ public class FormAllFieldsErrorPredicate implements HighlightPredicate {
 
   public static void add(final RecordLayerForm form, final BaseJTable table) {
     final LayerRecordTableModel model = table.getTableModel();
-    final FormAllFieldsErrorPredicate predicate = new FormAllFieldsErrorPredicate(
-      form, model);
+    final FormAllFieldsErrorPredicate predicate = new FormAllFieldsErrorPredicate(form, model);
     addErrorHighlighters(table, predicate);
   }
 
-  public static void addErrorHighlighters(final JXTable table,
-    final HighlightPredicate predicate) {
+  public static void addErrorHighlighters(final JXTable table, final HighlightPredicate predicate) {
 
-    table.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(
-      predicate, HighlightPredicate.EVEN), WebColors.setAlpha(
-        WebColors.LightCoral, 127), WebColors.Black, WebColors.Red, Color.WHITE));
+    table.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(predicate,
+      HighlightPredicate.EVEN), WebColors.setAlpha(WebColors.LightCoral, 127), WebColors.Black,
+      WebColors.Red, Color.WHITE));
 
-    table.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(
-      predicate, HighlightPredicate.ODD), WebColors.LightCoral,
-      WebColors.Black, WebColors.DarkRed, WebColors.White));
+    table.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(predicate,
+      HighlightPredicate.ODD), WebColors.LightCoral, WebColors.Black, WebColors.DarkRed,
+      WebColors.White));
   }
 
   private final LayerRecordTableModel model;
 
   private final Reference<RecordLayerForm> form;
 
-  public FormAllFieldsErrorPredicate(final RecordLayerForm form,
-    final LayerRecordTableModel model) {
+  public FormAllFieldsErrorPredicate(final RecordLayerForm form, final LayerRecordTableModel model) {
     this.form = new WeakReference<>(form);
     this.model = model;
   }
 
   @Override
-  public boolean isHighlighted(final Component renderer,
-    final ComponentAdapter adapter) {
+  public boolean isHighlighted(final Component renderer, final ComponentAdapter adapter) {
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
       final String fieldName = this.model.getFieldName(rowIndex);

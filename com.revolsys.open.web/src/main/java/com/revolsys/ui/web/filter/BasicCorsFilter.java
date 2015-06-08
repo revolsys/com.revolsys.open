@@ -33,27 +33,23 @@ public class BasicCorsFilter extends OncePerRequestFilter {
 
   public BasicCorsFilter() {
     setAllowedMethods(Arrays.asList("DELETE", "GET", "POST", "PUT"));
-    setAllowedHeaders(Arrays.asList("Accept-Encoding", "Accept",
-        "Accept-Language"));
+    setAllowedHeaders(Arrays.asList("Accept-Encoding", "Accept", "Accept-Language"));
     setMaxAge(3600);
   }
 
   @Override
   protected void doFilterInternal(final HttpServletRequest request,
-    final HttpServletResponse response, final FilterChain filterChain)
-        throws ServletException, IOException {
+    final HttpServletResponse response, final FilterChain filterChain) throws ServletException,
+    IOException {
     final String method = request.getMethod();
     final String origin = request.getHeader("Origin");
     final String requestMethod = request.getHeader("Access-Control-Request-Method");
     response.addHeader("Access-Control-Allow-Origin", "*");
-    if ("OPTIONS".equals(method) && Property.hasValue(origin)
-        && Property.hasValue(requestMethod)) {
-      response.addHeader("Access-Control-Allow-Methods",
-        this.allowedMethodsString);
+    if ("OPTIONS".equals(method) && Property.hasValue(origin) && Property.hasValue(requestMethod)) {
+      response.addHeader("Access-Control-Allow-Methods", this.allowedMethodsString);
       final String requestHeaders = request.getHeader("Access-Control-Request-Headers");
       if (Property.hasValue(requestHeaders)) {
-        response.addHeader("Access-Control-Allow-Headers",
-          this.allowedHeadersString);
+        response.addHeader("Access-Control-Allow-Headers", this.allowedHeadersString);
       }
       response.addHeader("Access-Control-Max-Age", this.maxAgeString);
     }

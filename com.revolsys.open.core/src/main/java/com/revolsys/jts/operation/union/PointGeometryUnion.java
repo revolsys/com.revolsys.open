@@ -55,8 +55,7 @@ import com.revolsys.jts.geom.util.GeometryCombiner;
  */
 public class PointGeometryUnion {
   public static Geometry union(final Puntal pointGeom, final Geometry otherGeom) {
-    final PointGeometryUnion unioner = new PointGeometryUnion(pointGeom,
-      otherGeom);
+    final PointGeometryUnion unioner = new PointGeometryUnion(pointGeom, otherGeom);
     return unioner.union();
   }
 

@@ -43,8 +43,8 @@ public class ILike extends BinaryCondition {
   }
 
   @Override
-  public void appendDefaultSql(final Query query,
-    final RecordStore recordStore, final StringBuilder buffer) {
+  public void appendDefaultSql(final Query query, final RecordStore recordStore,
+    final StringBuilder buffer) {
     final QueryValue left = getLeft();
     final QueryValue right = getRight();
 

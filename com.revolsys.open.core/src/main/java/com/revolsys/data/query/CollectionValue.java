@@ -27,8 +27,7 @@ public class CollectionValue extends QueryValue {
     this(null, values);
   }
 
-  public CollectionValue(final FieldDefinition attribute,
-    final Collection<? extends Object> values) {
+  public CollectionValue(final FieldDefinition attribute, final Collection<? extends Object> values) {
     setAttribute(attribute);
     for (final Object value : values) {
       QueryValue queryValue;
@@ -43,8 +42,8 @@ public class CollectionValue extends QueryValue {
   }
 
   @Override
-  public void appendDefaultSql(final Query query,
-    final RecordStore recordStore, final StringBuilder buffer) {
+  public void appendDefaultSql(final Query query, final RecordStore recordStore,
+    final StringBuilder buffer) {
     buffer.append('(');
     for (int i = 0; i < this.queryValues.size(); i++) {
       if (i > 0) {
@@ -77,8 +76,7 @@ public class CollectionValue extends QueryValue {
           jdbcAttribute = JdbcFieldDefinition.createField(value);
         }
         try {
-          index = jdbcAttribute.setPreparedStatementValue(statement, index,
-            value);
+          index = jdbcAttribute.setPreparedStatementValue(statement, index, value);
         } catch (final SQLException e) {
           ExceptionUtil.throwIfUnchecked(e);
         }
@@ -100,8 +98,7 @@ public class CollectionValue extends QueryValue {
   public boolean equals(final Object obj) {
     if (obj instanceof CollectionValue) {
       final CollectionValue condition = (CollectionValue)obj;
-      return EqualsRegistry.equal(condition.getQueryValues(),
-        this.getQueryValues());
+      return EqualsRegistry.equal(condition.getQueryValues(), this.getQueryValues());
     } else {
       return false;
     }

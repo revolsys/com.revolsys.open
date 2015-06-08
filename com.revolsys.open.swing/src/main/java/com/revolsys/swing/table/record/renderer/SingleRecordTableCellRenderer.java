@@ -31,9 +31,8 @@ public class SingleRecordTableCellRenderer implements TableCellRenderer {
   }
 
   @Override
-  public Component getTableCellRendererComponent(final JTable table,
-    final Object value, final boolean isSelected, final boolean hasFocus,
-    int rowIndex, int columnIndex) {
+  public Component getTableCellRendererComponent(final JTable table, final Object value,
+    final boolean isSelected, final boolean hasFocus, int rowIndex, int columnIndex) {
     if (table instanceof JXTable) {
       final JXTable jxTable = (JXTable)table;
       rowIndex = jxTable.convertRowIndexToModel(rowIndex);

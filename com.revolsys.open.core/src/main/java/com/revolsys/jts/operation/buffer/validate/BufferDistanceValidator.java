@@ -92,8 +92,8 @@ public class BufferDistanceValidator {
 
   private Geometry errorIndicator = null;
 
-  public BufferDistanceValidator(final Geometry input,
-    final double bufDistance, final Geometry result) {
+  public BufferDistanceValidator(final Geometry input, final double bufDistance,
+    final Geometry result) {
     this.input = input;
     this.bufDistance = bufDistance;
     this.result = result;
@@ -110,25 +110,23 @@ public class BufferDistanceValidator {
    * @param bufCurve a geometry
    * @param maxDist the maximum distance that a buffer result can be from the input
    */
-  private void checkMaximumDistance(final Geometry input,
-    final Geometry bufCurve, final double maxDist) {
+  private void checkMaximumDistance(final Geometry input, final Geometry bufCurve,
+    final double maxDist) {
     // BufferCurveMaximumDistanceFinder maxDistFinder = new
     // BufferCurveMaximumDistanceFinder(input);
     // maxDistanceFound = maxDistFinder.findDistance(bufCurve);
 
-    final DiscreteHausdorffDistance haus = new DiscreteHausdorffDistance(
-      bufCurve, input);
+    final DiscreteHausdorffDistance haus = new DiscreteHausdorffDistance(bufCurve, input);
     haus.setDensifyFraction(0.25);
-    maxDistanceFound = haus.orientedDistance();
+    this.maxDistanceFound = haus.orientedDistance();
 
-    if (maxDistanceFound > maxDist) {
-      isValid = false;
+    if (this.maxDistanceFound > maxDist) {
+      this.isValid = false;
       final Point[] pts = haus.getCoordinates();
-      errorLocation = pts[1];
-      errorIndicator = input.getGeometryFactory().lineString(pts);
-      errMsg = "Distance between buffer curve and input is too large " + "("
-        + maxDistanceFound + " at " + EWktWriter.lineString(pts[0], pts[1])
-        + ")";
+      this.errorLocation = pts[1];
+      this.errorIndicator = input.getGeometryFactory().lineString(pts);
+      this.errMsg = "Distance between buffer curve and input is too large " + "("
+        + this.maxDistanceFound + " at " + EWktWriter.lineString(pts[0], pts[1]) + ")";
     }
   }
 
@@ -139,19 +137,18 @@ public class BufferDistanceValidator {
    * @param g2 a geometry
    * @param minDist the minimum distance the geometries should be separated by
    */
-  private void checkMinimumDistance(final Geometry g1, final Geometry g2,
-    final double minDist) {
+  private void checkMinimumDistance(final Geometry g1, final Geometry g2, final double minDist) {
     final DistanceWithPoints distOp = new DistanceWithPoints(g1, g2, minDist);
-    minDistanceFound = distOp.distance();
+    this.minDistanceFound = distOp.distance();
 
-    if (minDistanceFound < minDist) {
-      isValid = false;
+    if (this.minDistanceFound < minDist) {
+      this.isValid = false;
       final List<Point> pts = distOp.nearestPoints();
-      errorLocation = pts.get(1);
-      errorIndicator = g1.getGeometryFactory().lineString(pts);
-      errMsg = "Distance between buffer curve and input is too small " + "("
-        + minDistanceFound + " at "
-        + EWktWriter.lineString(pts.get(0), errorLocation) + " )";
+      this.errorLocation = pts.get(1);
+      this.errorIndicator = g1.getGeometryFactory().lineString(pts);
+      this.errMsg = "Distance between buffer curve and input is too small " + "("
+        + this.minDistanceFound + " at " + EWktWriter.lineString(pts.get(0), this.errorLocation)
+        + " )";
     }
   }
 
@@ -159,26 +156,26 @@ public class BufferDistanceValidator {
     // Assert: only polygonal inputs can be checked for negative buffers
 
     // MD - could generalize this to handle GCs too
-    if (!(input instanceof Polygon || input instanceof MultiPolygon || input instanceof GeometryCollection)) {
+    if (!(this.input instanceof Polygon || this.input instanceof MultiPolygon || this.input instanceof GeometryCollection)) {
       return;
     }
-    final Geometry inputCurve = getPolygonLines(input);
-    checkMinimumDistance(inputCurve, result, minValidDistance);
-    if (!isValid) {
+    final Geometry inputCurve = getPolygonLines(this.input);
+    checkMinimumDistance(inputCurve, this.result, this.minValidDistance);
+    if (!this.isValid) {
       return;
     }
 
-    checkMaximumDistance(inputCurve, result, maxValidDistance);
+    checkMaximumDistance(inputCurve, this.result, this.maxValidDistance);
   }
 
   private void checkPositiveValid() {
-    final Geometry bufCurve = result.getBoundary();
-    checkMinimumDistance(input, bufCurve, minValidDistance);
-    if (!isValid) {
+    final Geometry bufCurve = this.result.getBoundary();
+    checkMinimumDistance(this.input, bufCurve, this.minValidDistance);
+    if (!this.isValid) {
       return;
     }
 
-    checkMaximumDistance(input, bufCurve, maxValidDistance);
+    checkMaximumDistance(this.input, bufCurve, this.maxValidDistance);
   }
 
   /**
@@ -191,15 +188,15 @@ public class BufferDistanceValidator {
    * or null if no error was found
    */
   public Geometry getErrorIndicator() {
-    return errorIndicator;
+    return this.errorIndicator;
   }
 
   public Point getErrorLocation() {
-    return errorLocation;
+    return this.errorLocation;
   }
 
   public String getErrorMessage() {
-    return errMsg;
+    return this.errMsg;
   }
 
   private Geometry getPolygonLines(final Geometry geometry) {
@@ -212,27 +209,27 @@ public class BufferDistanceValidator {
   }
 
   public boolean isValid() {
-    final double posDistance = Math.abs(bufDistance);
+    final double posDistance = Math.abs(this.bufDistance);
     final double distDelta = MAX_DISTANCE_DIFF_FRAC * posDistance;
-    minValidDistance = posDistance - distDelta;
-    maxValidDistance = posDistance + distDelta;
+    this.minValidDistance = posDistance - distDelta;
+    this.maxValidDistance = posDistance + distDelta;
 
     // can't use this test if either is empty
-    if (input.isEmpty() || result.isEmpty()) {
+    if (this.input.isEmpty() || this.result.isEmpty()) {
       return true;
     }
 
-    if (bufDistance > 0.0) {
+    if (this.bufDistance > 0.0) {
       checkPositiveValid();
     } else {
       checkNegativeValid();
     }
     if (VERBOSE) {
-      System.out.println("Min Dist= " + minDistanceFound + "  err= "
-        + (1.0 - minDistanceFound / bufDistance) + "  Max Dist= "
-        + maxDistanceFound + "  err= " + (maxDistanceFound / bufDistance - 1.0));
+      System.out.println("Min Dist= " + this.minDistanceFound + "  err= "
+        + (1.0 - this.minDistanceFound / this.bufDistance) + "  Max Dist= " + this.maxDistanceFound
+        + "  err= " + (this.maxDistanceFound / this.bufDistance - 1.0));
     }
-    return isValid;
+    return this.isValid;
   }
 
   /*

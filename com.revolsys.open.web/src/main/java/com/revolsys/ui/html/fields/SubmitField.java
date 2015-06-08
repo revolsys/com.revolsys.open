@@ -31,8 +31,7 @@ public class SubmitField extends Field {
     super(name, required);
   }
 
-  public SubmitField(final String name, final boolean required,
-    final Object value) {
+  public SubmitField(final String name, final boolean required, final Object value) {
     super(name, required);
     setValue(value);
   }

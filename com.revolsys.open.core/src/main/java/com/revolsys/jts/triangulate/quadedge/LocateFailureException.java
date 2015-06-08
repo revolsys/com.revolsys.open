@@ -35,9 +35,12 @@ package com.revolsys.jts.triangulate.quadedge;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDouble;
 
-public class LocateFailureException
-extends RuntimeException
-{
+public class LocateFailureException extends RuntimeException {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private static String msgWithSpatial(final String msg, final LineSegment seg) {
     if (seg != null) {
       return msg + " [ " + seg + " ]";
@@ -45,18 +48,11 @@ extends RuntimeException
     return msg;
   }
 
-  /**
-   *
-   */
-  private static final long serialVersionUID = 1L;
-
   private LineSegment seg = null;
 
   public LocateFailureException(final LineSegment seg) {
-    super(
-      "Locate failed to converge (at edge: "
-          + seg
-          + ").  Possible causes include invalid Subdivision topology or very close sites");
+    super("Locate failed to converge (at edge: " + seg
+      + ").  Possible causes include invalid Subdivision topology or very close sites");
     this.seg = new LineSegmentDouble(seg);
   }
 

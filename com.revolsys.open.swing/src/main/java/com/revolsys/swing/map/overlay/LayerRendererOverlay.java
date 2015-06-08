@@ -26,9 +26,11 @@ import com.revolsys.util.Property;
 /**
  * <p>A lightweight component that users the {@link Layer}'s {@link LayerRenderer} to render the layer.</p>
  */
-public class LayerRendererOverlay extends JComponent implements
-PropertyChangeListener {
+public class LayerRendererOverlay extends JComponent implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
+
+  private static final Collection<String> IGNORE_PROPERTY_NAMES = new HashSet<>(Arrays.asList(
+    "selectionCount", "hasHighlightedRecords", "highlightedCount", "scale"));
 
   private Layer layer;
 
@@ -41,10 +43,6 @@ PropertyChangeListener {
   private LayerRendererOverlaySwingWorker imageWorker;
 
   private boolean loadImage = true;
-
-  private static final Collection<String> IGNORE_PROPERTY_NAMES = new HashSet<>(
-      Arrays.asList("selectionCount", "hasHighlightedRecords",
-        "highlightedCount", "scale"));
 
   public LayerRendererOverlay(final MapPanel mapPanel) {
     this(mapPanel, null);
@@ -91,10 +89,9 @@ PropertyChangeListener {
           final BoundingBox boundingBox = this.viewport.getBoundingBox();
           final int viewWidthPixels = this.viewport.getViewWidthPixels();
           final int viewHeightPixels = this.viewport.getViewHeightPixels();
-          final GeoReferencedImage loadImage = new BufferedGeoReferencedImage(
-            boundingBox, viewWidthPixels, viewHeightPixels);
-          this.imageWorker = new LayerRendererOverlaySwingWorker(this,
-            loadImage);
+          final GeoReferencedImage loadImage = new BufferedGeoReferencedImage(boundingBox,
+            viewWidthPixels, viewHeightPixels);
+          this.imageWorker = new LayerRendererOverlaySwingWorker(this, loadImage);
           Invoke.worker(this.imageWorker);
         }
       }
@@ -115,8 +112,8 @@ PropertyChangeListener {
   }
 
   public void redraw() {
-    if (this.layer != null && getWidth() > 0 && getHeight() > 0
-        && this.layer.isExists() && this.layer.isVisible()) {
+    if (this.layer != null && getWidth() > 0 && getHeight() > 0 && this.layer.isExists()
+      && this.layer.isVisible()) {
       synchronized (this.loadSync) {
         this.loadImage = true;
         if (this.imageWorker != null) {
@@ -135,8 +132,7 @@ PropertyChangeListener {
   }
 
   private void render(final Graphics2D graphics) {
-    GeoReferencedImageLayerRenderer.render(this.viewport, graphics, this.image,
-      false);
+    GeoReferencedImageLayerRenderer.render(this.viewport, graphics, this.image, false);
   }
 
   public void setImage(final LayerRendererOverlaySwingWorker imageWorker) {

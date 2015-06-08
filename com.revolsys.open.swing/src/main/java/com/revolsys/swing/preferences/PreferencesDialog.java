@@ -17,13 +17,13 @@ import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.field.Field;
 
 public class PreferencesDialog extends JDialog {
-  public static PreferencesDialog get() {
-    return INSTANCE;
-  }
-
   private static final long serialVersionUID = 1L;
 
   private static final PreferencesDialog INSTANCE = new PreferencesDialog();
+
+  public static PreferencesDialog get() {
+    return INSTANCE;
+  }
 
   private final JTabbedPane tabs = new JTabbedPane();
 
@@ -49,16 +49,14 @@ public class PreferencesDialog extends JDialog {
     }
   }
 
-  public void addPreference(final String title, final String applicationName,
-    final String path, final String propertyName, final Class<?> valueClass,
-    final Object defaultValue) {
-    addPreference(title, applicationName, path, propertyName, valueClass,
-      defaultValue, null);
+  public void addPreference(final String title, final String applicationName, final String path,
+    final String propertyName, final Class<?> valueClass, final Object defaultValue) {
+    addPreference(title, applicationName, path, propertyName, valueClass, defaultValue, null);
   }
 
-  public void addPreference(final String title, final String applicationName,
-    final String path, final String propertyName, final Class<?> valueClass,
-    final Object defaultValue, final Field field) {
+  public void addPreference(final String title, final String applicationName, final String path,
+    final String propertyName, final Class<?> valueClass, final Object defaultValue,
+    final Field field) {
     PreferencesPanel panel = this.panels.get(title);
     if (panel == null) {
       panel = new SimplePreferencesPanel(title);
@@ -66,8 +64,8 @@ public class PreferencesDialog extends JDialog {
     }
     if (panel instanceof SimplePreferencesPanel) {
       final SimplePreferencesPanel simplePanel = (SimplePreferencesPanel)panel;
-      simplePanel.addPreference(applicationName, path, propertyName,
-        valueClass, defaultValue, field);
+      simplePanel.addPreference(applicationName, path, propertyName, valueClass, defaultValue,
+        field);
     }
   }
 

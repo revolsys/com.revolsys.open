@@ -39,10 +39,8 @@ package com.revolsys.jts.algorithm.match;
  * @author Martin Davis
  *
  */
-public class SimilarityMeasureCombiner
-{
-  public static double combine(final double measure1, final double measure2)
-  {
+public class SimilarityMeasureCombiner {
+  public static double combine(final double measure1, final double measure2) {
     return Math.min(measure1, measure2);
   }
 

@@ -48,8 +48,7 @@ public class SweepLineSegment {
     this.ptIndex = ptIndex;
   }
 
-  public void computeIntersections(final SweepLineSegment ss,
-    final SegmentIntersector si) {
+  public void computeIntersections(final SweepLineSegment ss, final SegmentIntersector si) {
     si.addIntersections(this.edge, this.ptIndex, ss.edge, ss.ptIndex);
   }
 

@@ -54,16 +54,16 @@ public class Segment {
   /**
    * Creates a new instance for the given ordinates.
    */
-  public Segment(final double x1, final double y1, final double z1,
-    final double x2, final double y2, final double z2) {
+  public Segment(final double x1, final double y1, final double z1, final double x2,
+    final double y2, final double z2) {
     this(new PointDouble(x1, y1, z1), new PointDouble(x2, y2, z2));
   }
 
   /**
    * Creates a new instance for the given ordinates,  with associated external data.
    */
-  public Segment(final double x1, final double y1, final double z1,
-    final double x2, final double y2, final double z2, final Object data) {
+  public Segment(final double x1, final double y1, final double z1, final double x2,
+    final double y2, final double z2, final Object data) {
     this(new PointDouble(x1, y1, z1), new PointDouble(x2, y2, z2), data);
   }
 

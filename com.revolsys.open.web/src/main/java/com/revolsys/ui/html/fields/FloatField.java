@@ -9,10 +9,8 @@ public class FloatField extends NumberField {
     this(name, required, null);
   }
 
-  public FloatField(final String name, final boolean required,
-    final Object defaultValue) {
-    super(name, 22, 19, defaultValue, required, Float.MIN_VALUE,
-      Float.MAX_VALUE);
+  public FloatField(final String name, final boolean required, final Object defaultValue) {
+    super(name, 22, 19, defaultValue, required, Float.MIN_VALUE, Float.MAX_VALUE);
   }
 
   @Override

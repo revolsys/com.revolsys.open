@@ -123,8 +123,7 @@ public class RectangleContains {
    * @param p1 an endpoint of the segment
    * @return true if the line segment is contained in the boundary
    */
-  private boolean isLineSegmentContainedInBoundary(final Point p0,
-    final Point p1) {
+  private boolean isLineSegmentContainedInBoundary(final Point p0, final Point p1) {
     if (p0.equals(p1)) {
       return isPointContainedInBoundary(p0);
     }
@@ -180,9 +179,8 @@ public class RectangleContains {
      *
      * This code assumes that the point lies in the rectangle envelope
      */
-    return point.getX() == this.rectEnv.getMinX()
-        || point.getX() == this.rectEnv.getMaxX() || point.getY() == this.rectEnv.getMinY()
-        || point.getY() == this.rectEnv.getMaxY();
+    return point.getX() == this.rectEnv.getMinX() || point.getX() == this.rectEnv.getMaxX()
+      || point.getY() == this.rectEnv.getMinY() || point.getY() == this.rectEnv.getMaxY();
   }
 
 }

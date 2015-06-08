@@ -15,8 +15,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.CollectionUtil;
 
-public class SimpleRecordConveter implements
-Converter<Record, Record> {
+public class SimpleRecordConveter implements Converter<Record, Record> {
   private RecordDefinition recordDefinition;
 
   private RecordFactory factory;
@@ -41,8 +40,7 @@ Converter<Record, Record> {
     this(recordDefinition, Arrays.asList(processors));
   }
 
-  public void addProcessor(
-    final SourceToTargetProcess<Record, Record> processor) {
+  public void addProcessor(final SourceToTargetProcess<Record, Record> processor) {
     this.processors.add(processor);
   }
 
@@ -68,8 +66,7 @@ Converter<Record, Record> {
     return this.recordDefinition;
   }
 
-  public void setProcessors(
-    final List<SourceToTargetProcess<Record, Record>> processors) {
+  public void setProcessors(final List<SourceToTargetProcess<Record, Record>> processors) {
     this.processors = processors;
   }
 
@@ -81,6 +78,6 @@ Converter<Record, Record> {
   @Override
   public String toString() {
     return this.recordDefinition.getPath() + "\n  "
-        + CollectionUtil.toString("\n  ", this.processors);
+      + CollectionUtil.toString("\n  ", this.processors);
   }
 }

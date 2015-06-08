@@ -5,8 +5,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.linearref.LengthIndexedLine;
 
 public class LinearReferencingFunctions {
-  public static Geometry extractLine(final Geometry g, final double start,
-    final double end) {
+  public static Geometry extractLine(final Geometry g, final double start, final double end) {
     final LengthIndexedLine ll = new LengthIndexedLine(g);
     return ll.extractLine(start, end);
   }

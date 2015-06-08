@@ -136,14 +136,25 @@ import com.revolsys.util.CaseConverter;
  * @author Paul Austin
  */
 public abstract class XmlProcessor {
+  static {
+    registerEnumConverter(Enum.class);
+  }
+
+  /** The arguments a processor method must have. */
+  private static final Class<?>[] PROCESS_METHOD_ARGS = new Class[] {
+    XMLStreamReader.class
+  };
+
+  /** The cache of processor classes to method caches. */
+  private static final Map<Class<?>, Map<String, Method>> PROCESSOR_METHOD_CACHE = new HashMap<Class<?>, Map<String, Method>>();
+
   /**
    * Create the cache of process methods from the specified class.
    *
    * @param processorClass The XmlPorcessor class.
    * @return The map of method names to process methods.
    */
-  private static Map<String, Method> getMethodCache(
-    final Class<?> processorClass) {
+  private static Map<String, Method> getMethodCache(final Class<?> processorClass) {
     Map<String, Method> methodCache = PROCESSOR_METHOD_CACHE.get(processorClass);
     if (methodCache == null) {
       methodCache = new HashMap<String, Method>();
@@ -168,18 +179,6 @@ public abstract class XmlProcessor {
     final EnumConverter enumConverter = new EnumConverter();
     convertUtils.register(enumConverter, enumClass);
   }
-
-  static {
-    registerEnumConverter(Enum.class);
-  }
-
-  /** The arguments a processor method must have. */
-  private static final Class<?>[] PROCESS_METHOD_ARGS = new Class[] {
-    XMLStreamReader.class
-  };
-
-  /** The cache of processor classes to method caches. */
-  private static final Map<Class<?>, Map<String, Method>> PROCESSOR_METHOD_CACHE = new HashMap<Class<?>, Map<String, Method>>();
 
   /** The context for processing of the XML Document. */
   private XmlProcessorContext context = new SimpleXmlProcessorContext();
@@ -206,8 +205,7 @@ public abstract class XmlProcessor {
     this.methodCache = getMethodCache(getClass());
   }
 
-  public XmlProcessor(final String namespaceUri,
-    final Map<String, Class<?>> tagNameClassMap) {
+  public XmlProcessor(final String namespaceUri, final Map<String, Class<?>> tagNameClassMap) {
     this(namespaceUri);
     this.tagNameClassMap = tagNameClassMap;
   }
@@ -238,16 +236,15 @@ public abstract class XmlProcessor {
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T parseObject(final XMLStreamReader parser,
-    final Class<? extends T> objectClass) throws XMLStreamException,
-    IOException {
+  public <T> T parseObject(final XMLStreamReader parser, final Class<? extends T> objectClass)
+    throws XMLStreamException, IOException {
     try {
       if (objectClass == null) {
         Object object = null;
         while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
           if (object != null) {
-            throw new IllegalArgumentException(
-              "Expecting a single child element " + parser.getLocation());
+            throw new IllegalArgumentException("Expecting a single child element "
+              + parser.getLocation());
           }
           object = process(parser);
         }
@@ -266,8 +263,7 @@ public abstract class XmlProcessor {
             final Object value = process(parser);
             try {
               String propertyName;
-              if (tagName.length() > 1
-                  && Character.isLowerCase(tagName.charAt(1))) {
+              if (tagName.length() > 1 && Character.isLowerCase(tagName.charAt(1))) {
                 propertyName = CaseConverter.toLowerFirstChar(tagName);
               } else {
                 propertyName = tagName;
@@ -351,8 +347,7 @@ public abstract class XmlProcessor {
    * @throws XMLStreamException If an exception processing the XML occurs.
    */
   @SuppressWarnings("unchecked")
-  public <T> T process(final XMLStreamReader parser) throws XMLStreamException,
-  IOException {
+  public <T> T process(final XMLStreamReader parser) throws XMLStreamException, IOException {
     final QName element = parser.getName();
 
     final String tagName = element.getLocalPart();

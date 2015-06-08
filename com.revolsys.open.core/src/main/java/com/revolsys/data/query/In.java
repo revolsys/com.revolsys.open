@@ -62,8 +62,8 @@ public class In extends Condition {
   }
 
   @Override
-  public void appendDefaultSql(final Query query,
-    final RecordStore recordStore, final StringBuilder buffer) {
+  public void appendDefaultSql(final Query query, final RecordStore recordStore,
+    final StringBuilder buffer) {
     if (this.left == null) {
       buffer.append("NULL");
     } else {
@@ -123,6 +123,6 @@ public class In extends Condition {
   @Override
   public String toString() {
     return StringConverterRegistry.toString(this.left) + " IN "
-        + StringConverterRegistry.toString(this.values);
+      + StringConverterRegistry.toString(this.values);
   }
 }

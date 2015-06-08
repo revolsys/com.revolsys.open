@@ -14,12 +14,10 @@ public class ChannelOutEdgeVisitor<T> implements Visitor<Edge<T>> {
     graph.visitEdges(visitor);
   }
 
-  public static <T> void write(final Graph<T> graph, final Filter<T> filter,
-    final Channel<T> out) {
+  public static <T> void write(final Graph<T> graph, final Filter<T> filter, final Channel<T> out) {
     final Visitor<Edge<T>> visitor = new ChannelOutEdgeVisitor<T>(out);
     final EdgeObjectFilter<T> edgeFilter = new EdgeObjectFilter<T>(filter);
-    final Visitor<Edge<T>> filterVisitor = new DelegatingVisitor<Edge<T>>(
-        edgeFilter, visitor);
+    final Visitor<Edge<T>> filterVisitor = new DelegatingVisitor<Edge<T>>(edgeFilter, visitor);
     graph.visitEdges(filterVisitor);
   }
 

@@ -34,34 +34,29 @@ public class PdfUtil {
     array.add(COSInteger.get(number));
   }
 
-  public static COSArray findArray(final COSDictionary dictionary,
-    final COSName key) {
+  public static COSArray findArray(final COSDictionary dictionary, final COSName key) {
     final COSBase item = dictionary.getDictionaryObject(key);
     if (item == null) {
       return null;
     } else if (item instanceof COSArray) {
       return (COSArray)item;
     } else {
-      throw new IllegalArgumentException("Expecting COSArray not "
-          + item.getClass());
+      throw new IllegalArgumentException("Expecting COSArray not " + item.getClass());
     }
   }
 
-  public static COSArray findArray(final COSDictionary dictionary,
-    final String key) {
+  public static COSArray findArray(final COSDictionary dictionary, final String key) {
     final COSBase item = dictionary.getDictionaryObject(key);
     if (item == null) {
       return null;
     } else if (item instanceof COSArray) {
       return (COSArray)item;
     } else {
-      throw new IllegalArgumentException("Expecting COSArray not "
-          + item.getClass());
+      throw new IllegalArgumentException("Expecting COSArray not " + item.getClass());
     }
   }
 
-  public static Rectangle2D findRectangle(final COSDictionary dictionary,
-    final COSName key) {
+  public static Rectangle2D findRectangle(final COSDictionary dictionary, final COSName key) {
     final COSArray bbox = PdfUtil.findArray(dictionary, key);
     if (bbox == null) {
       return null;
@@ -84,8 +79,7 @@ public class PdfUtil {
     return array;
   }
 
-  public static COSArray getArray(final COSDictionary dictionary,
-    final String key) {
+  public static COSArray getArray(final COSDictionary dictionary, final String key) {
     final COSBase item = dictionary.getDictionaryObject(key);
     if (item == null) {
       final COSArray array = new COSArray();
@@ -94,13 +88,11 @@ public class PdfUtil {
     } else if (item instanceof COSArray) {
       return (COSArray)item;
     } else {
-      throw new IllegalArgumentException("Expecting COSArray not "
-          + item.getClass());
+      throw new IllegalArgumentException("Expecting COSArray not " + item.getClass());
     }
   }
 
-  public static COSDictionary getDictionary(final COSDictionary dictionary,
-    final String key) {
+  public static COSDictionary getDictionary(final COSDictionary dictionary, final String key) {
     final COSBase item = dictionary.getDictionaryObject(key);
     if (item == null) {
       final COSDictionary childDictionary = new COSDictionary();
@@ -109,8 +101,7 @@ public class PdfUtil {
     } else if (item instanceof COSDictionary) {
       return (COSDictionary)item;
     } else {
-      throw new IllegalArgumentException("Expecting COSDictionary not "
-          + item.getClass());
+      throw new IllegalArgumentException("Expecting COSDictionary not " + item.getClass());
     }
   }
 
@@ -143,8 +134,7 @@ public class PdfUtil {
     return null;
   }
 
-  public static List<Point2D> getPoints(final COSDictionary dictionary,
-    final String key) {
+  public static List<Point2D> getPoints(final COSDictionary dictionary, final String key) {
     final COSArray array = PdfUtil.findArray(dictionary, key);
     final List<Point2D> points = new ArrayList<Point2D>();
     if (array != null) {
@@ -194,8 +184,8 @@ public class PdfUtil {
     return new BoundingBoxDoubleGf();
   }
 
-  public static boolean hasNameValue(final COSDictionary dictionary,
-    final String key, final String value) {
+  public static boolean hasNameValue(final COSDictionary dictionary, final String key,
+    final String value) {
     final String name = dictionary.getNameAsString(key);
     return value.equals(name);
   }

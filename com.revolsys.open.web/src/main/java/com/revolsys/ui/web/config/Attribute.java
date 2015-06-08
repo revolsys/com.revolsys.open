@@ -39,8 +39,8 @@ public class Attribute {
 
   private Object value;
 
-  public Attribute(final Config config, final String name, final Class type,
-    final String value, final boolean inheritable, final Class loaderClass) {
+  public Attribute(final Config config, final String name, final Class type, final String value,
+    final boolean inheritable, final Class loaderClass) {
     this.config = config;
     this.name = name;
     this.inheritable = inheritable;
@@ -67,8 +67,7 @@ public class Attribute {
         }
 
       } catch (final NoSuchMethodException e) {
-        throw new IllegalArgumentException(
-          type.getName()
+        throw new IllegalArgumentException(type.getName()
           + " must have a constructor that takes a java.lang.String as an argument");
       }
     }

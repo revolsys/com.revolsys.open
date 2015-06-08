@@ -28,8 +28,7 @@ public class ProjectionImageFilter extends WholeImageFilter {
 
   public ProjectionImageFilter(final BoundingBox imageBoundingBox,
     final CoordinateSystem destCoordinateSystem, final double resolution) {
-    this(imageBoundingBox, destCoordinateSystem.getGeometryFactory(),
-      resolution);
+    this(imageBoundingBox, destCoordinateSystem.getGeometryFactory(), resolution);
   }
 
   public ProjectionImageFilter(final BoundingBox sourceBoundingBox,
@@ -48,17 +47,16 @@ public class ProjectionImageFilter extends WholeImageFilter {
     if (this.destWidth < 1 || this.destHeight < 1) {
       return source;
     } else {
-      final BufferedImage dest = new BufferedImage(this.destWidth,
-        this.destHeight, BufferedImage.TYPE_INT_ARGB);
+      final BufferedImage dest = new BufferedImage(this.destWidth, this.destHeight,
+        BufferedImage.TYPE_INT_ARGB);
       return super.filter(source, dest);
     }
   }
 
   @Override
-  protected int[] filterPixels(final int imageWidth, final int imageHeight,
-    final int[] inPixels, final Rectangle transformedSpace) {
-    final int[] outPixels = new int[transformedSpace.width
-                                    * transformedSpace.height];
+  protected int[] filterPixels(final int imageWidth, final int imageHeight, final int[] inPixels,
+    final Rectangle transformedSpace) {
+    final int[] outPixels = new int[transformedSpace.width * transformedSpace.height];
 
     final double minX = this.sourceBoundingBox.getMinX();
     final double minY = this.sourceBoundingBox.getMinY();

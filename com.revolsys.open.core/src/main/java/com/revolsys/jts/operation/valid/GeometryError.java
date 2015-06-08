@@ -7,8 +7,7 @@ public class GeometryError extends AbstractGeometryValidationError {
 
   private final Geometry errorGeometry;
 
-  public GeometryError(final String message, final Geometry geometry,
-    final Geometry errorGeometry) {
+  public GeometryError(final String message, final Geometry geometry, final Geometry errorGeometry) {
     super(message, geometry);
     this.errorGeometry = errorGeometry;
   }

@@ -55,8 +55,8 @@ public class LineMergeDirectedEdge extends DirectedEdge {
    *                  whether this DirectedEdge's direction is the same as or
    *                  opposite to that of the parent Edge (if any)
    */
-  public LineMergeDirectedEdge(final Node from, final Node to,
-    final Point directionPt, final boolean edgeDirection) {
+  public LineMergeDirectedEdge(final Node from, final Node to, final Point directionPt,
+    final boolean edgeDirection) {
     super(from, to, directionPt, edgeDirection);
   }
 

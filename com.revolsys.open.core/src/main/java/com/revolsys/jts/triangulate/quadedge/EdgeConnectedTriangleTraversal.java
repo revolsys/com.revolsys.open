@@ -45,7 +45,8 @@ import java.util.LinkedList;
 public class EdgeConnectedTriangleTraversal {
   private final LinkedList triQueue = new LinkedList();
 
-  public EdgeConnectedTriangleTraversal() {}
+  public EdgeConnectedTriangleTraversal() {
+  }
 
   /**
    * Called to initialize the traversal queue with a given set of {@link QuadEdgeTriangle}s
@@ -73,7 +74,7 @@ public class EdgeConnectedTriangleTraversal {
   private void process(final QuadEdgeTriangle currTri, final TraversalVisitor visitor) {
     currTri.getNeighbours();
     for (int i = 0; i < 3; i++) {
-      final QuadEdgeTriangle neighTri = (QuadEdgeTriangle) currTri.getEdge(i).sym().getData();
+      final QuadEdgeTriangle neighTri = (QuadEdgeTriangle)currTri.getEdge(i).sym().getData();
       if (neighTri == null) {
         continue;
       }
@@ -88,7 +89,7 @@ public class EdgeConnectedTriangleTraversal {
    */
   public void visitAll(final TraversalVisitor visitor) {
     while (!this.triQueue.isEmpty()) {
-      final QuadEdgeTriangle tri = (QuadEdgeTriangle) this.triQueue.removeFirst();
+      final QuadEdgeTriangle tri = (QuadEdgeTriangle)this.triQueue.removeFirst();
       process(tri, visitor);
     }
   }

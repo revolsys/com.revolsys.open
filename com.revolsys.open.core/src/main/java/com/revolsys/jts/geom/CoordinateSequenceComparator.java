@@ -46,9 +46,7 @@ import java.util.Comparator;
  * coordinate values, any or all methods can be overridden.
  *
  */
-public class CoordinateSequenceComparator
-implements Comparator
-{
+public class CoordinateSequenceComparator implements Comparator {
   /**
    * Compare two <code>double</code>s, allowing for NaN values.
    * NaN is treated as being less than any valid number.
@@ -57,8 +55,7 @@ implements Comparator
    * @param b a <code>double</code>
    * @return -1, 0, or 1 depending on whether a is less than, equal to or greater than b
    */
-  public static int compare(final double a, final double b)
-  {
+  public static int compare(final double a, final double b) {
     if (a < b) {
       return -1;
     }
@@ -87,8 +84,7 @@ implements Comparator
   /**
    * Creates a comparator which will test all dimensions.
    */
-  public CoordinateSequenceComparator()
-  {
+  public CoordinateSequenceComparator() {
     this.dimensionLimit = Integer.MAX_VALUE;
   }
 
@@ -97,8 +93,7 @@ implements Comparator
    *
    * @param dimensionLimit the number of dimensions to test
    */
-  public CoordinateSequenceComparator(final int dimensionLimit)
-  {
+  public CoordinateSequenceComparator(final int dimensionLimit) {
     this.dimensionLimit = dimensionLimit;
   }
 
@@ -110,10 +105,9 @@ implements Comparator
    * @return -1, 0, or 1 depending on whether o1 is less than, equal to, or greater than o2
    */
   @Override
-  public int compare(final Object o1, final Object o2)
-  {
-    final LineString s1 = (LineString) o1;
-    final LineString s2 = (LineString) o2;
+  public int compare(final Object o1, final Object o2) {
+    final LineString s1 = (LineString)o1;
+    final LineString s2 = (LineString)o2;
 
     final int size1 = s1.getVertexCount();
     final int size2 = s2.getVertexCount();
@@ -132,7 +126,7 @@ implements Comparator
     }
 
     // lower dimension is less than higher
-    if (! dimLimited) {
+    if (!dimLimited) {
       if (dim1 < dim2) {
         return -1;
       }
@@ -170,8 +164,8 @@ implements Comparator
    * @param dimension the number of dimensiosn to test
    * @return -1, 0, or 1 depending on whether s1[i] is less than, equal to, or greater than s2[i]
    */
-  protected int compareCoordinate(final LineString s1, final LineString s2, final int i, final int dimension)
-  {
+  protected int compareCoordinate(final LineString s1, final LineString s2, final int i,
+    final int dimension) {
     for (int d = 0; d < dimension; d++) {
       final double ord1 = s1.getCoordinate(i, d);
       final double ord2 = s2.getCoordinate(i, d);

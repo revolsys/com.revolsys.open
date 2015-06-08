@@ -8,12 +8,11 @@ import java.util.Collection;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 
-public class PropertyChangeArrayList<T> extends ArrayList<T> implements
-PropertyChangeListener, PropertyChangeSupportProxy {
+public class PropertyChangeArrayList<T> extends ArrayList<T> implements PropertyChangeListener,
+  PropertyChangeSupportProxy {
   private static final long serialVersionUID = 1L;
 
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-    this);
+  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   public PropertyChangeArrayList() {
   }
@@ -27,8 +26,7 @@ PropertyChangeListener, PropertyChangeSupportProxy {
     if (object != null && !contains(object)) {
       super.add(index, object);
       addListener(object);
-      this.propertyChangeSupport.fireIndexedPropertyChange("objects", index, null,
-        object);
+      this.propertyChangeSupport.fireIndexedPropertyChange("objects", index, null, object);
     }
   }
 
@@ -97,8 +95,7 @@ PropertyChangeListener, PropertyChangeSupportProxy {
   public T remove(final int index) {
     final T object = super.remove(index);
     removeListener(object);
-    this.propertyChangeSupport.fireIndexedPropertyChange("objects", index, object,
-      null);
+    this.propertyChangeSupport.fireIndexedPropertyChange("objects", index, object, null);
     return object;
   }
 
@@ -139,8 +136,7 @@ PropertyChangeListener, PropertyChangeSupportProxy {
     final T oldValue = super.set(index, value);
     if (value != oldValue) {
       removeListener(oldValue);
-      this.propertyChangeSupport.fireIndexedPropertyChange("objects", index,
-        oldValue, value);
+      this.propertyChangeSupport.fireIndexedPropertyChange("objects", index, oldValue, value);
       addListener(value);
     }
     return oldValue;

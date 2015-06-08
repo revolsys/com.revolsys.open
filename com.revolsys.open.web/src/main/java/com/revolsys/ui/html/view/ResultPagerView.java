@@ -30,8 +30,8 @@ public class ResultPagerView extends Element {
    * @param newBaseUrl The base URL.
    * @param newParameters The parameters to include in the URLs.
    */
-  public ResultPagerView(final ResultPager<?> resultPager,
-    final String newBaseUrl, final Map<String, Object> newParameters) {
+  public ResultPagerView(final ResultPager<?> resultPager, final String newBaseUrl,
+    final Map<String, Object> newParameters) {
     this.pager = resultPager;
     this.baseUrl = newBaseUrl;
     this.parameters.putAll(newParameters);
@@ -46,10 +46,7 @@ public class ResultPagerView extends Element {
    * @param contents The contents of the link.
    * @throws IOException If there was an exception serializing.
    */
-  private void pageLink(
-    final XmlWriter out,
-    final int pageNumber,
-    final String title,
+  private void pageLink(final XmlWriter out, final int pageNumber, final String title,
     final String contents) {
     this.parameters.put("page", String.valueOf(pageNumber));
     final String url = UrlUtil.getUrl(this.baseUrl, this.parameters);
@@ -124,8 +121,7 @@ public class ResultPagerView extends Element {
         }
       } else {
         final int currentPageNumber = this.pager.getPageNumber();
-        final int fromPage = Math.max(1,
-          Math.min(currentPageNumber - 3, numPages - 6));
+        final int fromPage = Math.max(1, Math.min(currentPageNumber - 3, numPages - 6));
         final int toPage = Math.min(numPages, fromPage + 6);
         if (fromPage > 1) {
           HtmlUtil.serializeSpan(out, "pageGap", "...");

@@ -29,16 +29,16 @@ public class DirectoryRecordStoreWriter extends AbstractRecordWriter {
         switch (state) {
           case Modified:
             this.recordStore.update(record);
-            break;
+          break;
           case Persisted:
             this.recordStore.update(record);
-            break;
+          break;
           case Deleted:
             this.recordStore.delete(record);
-            break;
+          break;
           default:
             this.recordStore.insert(record);
-            break;
+          break;
         }
       } catch (final RuntimeException e) {
         throw e;

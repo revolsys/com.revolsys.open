@@ -27,8 +27,19 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 
-public class MoepBinaryIterator extends AbstractObjectWithProperties implements
-Iterator<Record> {
+public class MoepBinaryIterator extends AbstractObjectWithProperties implements Iterator<Record> {
+  private static final int COMPLEX_LINE = 3;
+
+  private static final int CONSTRUCTION_COMPLEX_LINE = 5;
+
+  private static final int CONSTRUCTION_LINE = 4;
+
+  private static final int POINT = 1;
+
+  private static final int SIMPLE_LINE = 2;
+
+  private static final int TEXT = 6;
+
   private static double getAngle(final double angle) {
     double orientation = (90 - angle) % 360;
     if (orientation < 0) {
@@ -42,36 +53,23 @@ Iterator<Record> {
     final Number angle = object.getValue(MoepConstants.ANGLE);
     if (angle != null) {
       final double orientation = getAngle(angle.doubleValue());
-      GeometryProperties.setGeometryProperty(geometry, "orientation",
-        orientation);
+      GeometryProperties.setGeometryProperty(geometry, "orientation", orientation);
     }
-    GeometryProperties.setGeometryProperty(object.getGeometryValue(),
-      MoepConstants.TEXT_GROUP, object.getValue(MoepConstants.TEXT_GROUP));
-    GeometryProperties.setGeometryProperty(object.getGeometryValue(),
-      MoepConstants.TEXT_INDEX, object.getValue(MoepConstants.TEXT_INDEX));
+    GeometryProperties.setGeometryProperty(object.getGeometryValue(), MoepConstants.TEXT_GROUP,
+      object.getValue(MoepConstants.TEXT_GROUP));
+    GeometryProperties.setGeometryProperty(object.getGeometryValue(), MoepConstants.TEXT_INDEX,
+      object.getValue(MoepConstants.TEXT_INDEX));
     GeometryProperties.setGeometryProperty(object.getGeometryValue(), "text",
       object.getValue(MoepConstants.TEXT));
-    GeometryProperties.setGeometryProperty(object.getGeometryValue(),
-      "textType", SaifConstants.TEXT_LINE);
-    GeometryProperties.setGeometryProperty(object.getGeometryValue(),
-      "fontName", object.getValue(MoepConstants.FONT_NAME));
-    GeometryProperties.setGeometryProperty(object.getGeometryValue(),
-      "characterHeight", object.getValue(MoepConstants.FONT_SIZE));
+    GeometryProperties.setGeometryProperty(object.getGeometryValue(), "textType",
+      SaifConstants.TEXT_LINE);
+    GeometryProperties.setGeometryProperty(object.getGeometryValue(), "fontName",
+      object.getValue(MoepConstants.FONT_NAME));
+    GeometryProperties.setGeometryProperty(object.getGeometryValue(), "characterHeight",
+      object.getValue(MoepConstants.FONT_SIZE));
     GeometryProperties.setGeometryProperty(object.getGeometryValue(), "other",
       object.getValue(MoepConstants.FONT_WEIGHT));
   }
-
-  private static final int COMPLEX_LINE = 3;
-
-  private static final int CONSTRUCTION_COMPLEX_LINE = 5;
-
-  private static final int CONSTRUCTION_LINE = 4;
-
-  private static final int POINT = 1;
-
-  private static final int SIMPLE_LINE = 2;
-
-  private static final int TEXT = 6;
 
   private char actionName;
 
@@ -103,36 +101,35 @@ Iterator<Record> {
 
   private final String mapsheet;
 
-  public MoepBinaryIterator(final MoepDirectoryReader directoryReader,
-    final String fileName, final InputStream in,
-    final RecordFactory recordFactory) {
+  public MoepBinaryIterator(final MoepDirectoryReader directoryReader, final String fileName,
+    final InputStream in, final RecordFactory recordFactory) {
     this.directoryReader = directoryReader;
     this.recordFactory = recordFactory;
     switch (fileName.charAt(fileName.length() - 5)) {
       case 'd':
         this.originalFileType = "dem";
-        break;
+      break;
       case 'm':
         this.originalFileType = "contours";
-        break;
+      break;
       case 'n':
         this.originalFileType = "nonPositional";
-        break;
+      break;
       case 'p':
         this.originalFileType = "planimetric";
-        break;
+      break;
       case 'g':
         this.originalFileType = "toponymy";
-        break;
+      break;
       case 'w':
         this.originalFileType = "woodedArea";
-        break;
+      break;
       case 's':
         this.originalFileType = "supplimentary";
-        break;
+      break;
       default:
         this.originalFileType = "unknown";
-        break;
+      break;
     }
     this.in = new BufferedInputStream(in, 10000);
     this.mapsheet = getMapsheetFromFileName(fileName);
@@ -214,8 +211,7 @@ Iterator<Record> {
         final String featureCode = readString(10);
         if (!featureCode.startsWith("HA9000")) {
           this.actionName = featureCode.charAt(6);
-          this.featureCode = featureCode.substring(0, 6) + "0"
-              + featureCode.substring(7);
+          this.featureCode = featureCode.substring(0, 6) + "0" + featureCode.substring(7);
         } else {
           this.actionName = 'W';
           this.featureCode = featureCode;
@@ -243,17 +239,17 @@ Iterator<Record> {
             final int angle = angleInt / 10000;
             object.setValue(MoepConstants.ANGLE, angle);
           }
-          break;
+        break;
         case CONSTRUCTION_LINE:
         case CONSTRUCTION_COMPLEX_LINE:
           object.setValue(MoepConstants.DISPLAY_TYPE, "constructionLine");
           readLineString(extraParams, object);
-          break;
+        break;
         case SIMPLE_LINE:
         case COMPLEX_LINE:
           object.setValue(MoepConstants.DISPLAY_TYPE, "primaryLine");
           readLineString(extraParams, object);
-          break;
+        break;
         case TEXT:
           object.setValue(MoepConstants.DISPLAY_TYPE, "primary");
           final Point textPoint = readPoint(this.in);
@@ -280,8 +276,7 @@ Iterator<Record> {
               object.setValue(MoepConstants.FONT_WEIGHT, "0");
             }
             if (attribute.length() > 5) {
-              final String textGroup = new String(attribute.substring(4, 9)
-                .trim());
+              final String textGroup = new String(attribute.substring(4, 9).trim());
               object.setValue(MoepConstants.TEXT_GROUP, textGroup);
             }
           }
@@ -289,25 +284,25 @@ Iterator<Record> {
           object.setValue(MoepConstants.TEXT, text);
 
           setGeometryProperties(object);
-          break;
+        break;
       }
 
       switch (this.actionName) {
         case 'W':
           setAdmissionHistory(object, this.actionName);
-          break;
+        break;
         case 'Z':
           setAdmissionHistory(object, this.actionName);
-          break;
+        break;
         case 'X':
           setRetirementHistory(object, this.actionName);
-          break;
+        break;
         case 'Y':
           setRetirementHistory(object, this.actionName);
-          break;
+        break;
         default:
           setAdmissionHistory(object, 'W');
-          break;
+        break;
       }
       this.currentRecord = object;
       this.loadNextObject = false;
@@ -347,8 +342,8 @@ Iterator<Record> {
     return this.factory.lineString(2, coords);
   }
 
-  private void readCoordinate(final InputStream in, final double[] coords,
-    final int index, final int axisCount) throws IOException {
+  private void readCoordinate(final InputStream in, final double[] coords, final int index,
+    final int axisCount) throws IOException {
     for (int i = 0; i < 2; i++) {
       int coordinate;
       if (this.coordinateBytes == 2) {
@@ -386,8 +381,7 @@ Iterator<Record> {
 
   }
 
-  private void readLineString(final int extraParams, final Record object)
-      throws IOException {
+  private void readLineString(final int extraParams, final Record object) throws IOException {
     int numCoords = 0;
     if (extraParams == 2 || extraParams == 4) {
       numCoords = readLEShort(this.in);
@@ -434,35 +428,27 @@ Iterator<Record> {
   public void remove() {
   }
 
-  private void setAdmissionHistory(final Record object,
-    final char reasonForChange) {
+  private void setAdmissionHistory(final Record object, final char reasonForChange) {
     if (this.directoryReader != null) {
-      object.setValue(MoepConstants.ADMIT_SOURCE_DATE,
-        this.directoryReader.getSubmissionDate());
+      object.setValue(MoepConstants.ADMIT_SOURCE_DATE, this.directoryReader.getSubmissionDate());
       object.setValue(MoepConstants.ADMIT_INTEGRATION_DATE,
         this.directoryReader.getIntegrationDate());
-      object.setValue(MoepConstants.ADMIT_REVISION_KEY,
-        this.directoryReader.getRevisionKey());
+      object.setValue(MoepConstants.ADMIT_REVISION_KEY, this.directoryReader.getRevisionKey());
       object.setValue(MoepConstants.ADMIT_SPECIFICATIONS_RELEASE,
         this.directoryReader.getSpecificationsRelease());
     }
-    object.setValue(MoepConstants.ADMIT_REASON_FOR_CHANGE,
-      String.valueOf(reasonForChange));
+    object.setValue(MoepConstants.ADMIT_REASON_FOR_CHANGE, String.valueOf(reasonForChange));
   }
 
-  private void setRetirementHistory(final Record object,
-    final char reasonForChange) {
+  private void setRetirementHistory(final Record object, final char reasonForChange) {
     if (this.directoryReader != null) {
-      object.setValue(MoepConstants.RETIRE_SOURCE_DATE,
-        this.directoryReader.getSubmissionDate());
+      object.setValue(MoepConstants.RETIRE_SOURCE_DATE, this.directoryReader.getSubmissionDate());
       object.setValue(MoepConstants.RETIRE_INTEGRATION_DATE,
         this.directoryReader.getIntegrationDate());
-      object.setValue(MoepConstants.RETIRE_REVISION_KEY,
-        this.directoryReader.getRevisionKey());
+      object.setValue(MoepConstants.RETIRE_REVISION_KEY, this.directoryReader.getRevisionKey());
       object.setValue(MoepConstants.RETIRE_SPECIFICATIONS_RELEASE,
         this.directoryReader.getSpecificationsRelease());
     }
-    object.setValue(MoepConstants.RETIRE_REASON_FOR_CHANGE,
-      String.valueOf(reasonForChange));
+    object.setValue(MoepConstants.RETIRE_REASON_FOR_CHANGE, String.valueOf(reasonForChange));
   }
 }

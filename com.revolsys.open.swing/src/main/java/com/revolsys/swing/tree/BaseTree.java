@@ -26,18 +26,18 @@ import com.revolsys.swing.tree.dnd.TreeTransferHandler;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 
-public class BaseTree extends JTree implements MouseListener,
-TreeWillExpandListener, TreeExpansionListener {
+public class BaseTree extends JTree implements MouseListener, TreeWillExpandListener,
+  TreeExpansionListener {
+  private static final long serialVersionUID = 1L;
+
+  private static Reference<BaseTreeNode> menuNode = new EmptyReference<>();
+
   @SuppressWarnings("unchecked")
   public static <V extends BaseTreeNode> V getMenuNode() {
     return (V)menuNode.get();
   }
 
-  private static final long serialVersionUID = 1L;
-
   private boolean menuEnabled = true;
-
-  private static Reference<BaseTreeNode> menuNode = new EmptyReference<>();
 
   public BaseTree(final BaseTreeNode root) {
     super(new DefaultTreeModel(root, true));
@@ -223,8 +223,7 @@ TreeWillExpandListener, TreeExpansionListener {
       if (path != null) {
 
         TreePath[] selectionPaths = getSelectionPaths();
-        if (selectionPaths == null
-            || !Arrays.asList(selectionPaths).contains(path)) {
+        if (selectionPaths == null || !Arrays.asList(selectionPaths).contains(path)) {
           selectionPaths = new TreePath[] {
             path
           };
@@ -264,13 +263,11 @@ TreeWillExpandListener, TreeExpansionListener {
   }
 
   @Override
-  public void treeWillCollapse(final TreeExpansionEvent event)
-      throws ExpandVetoException {
+  public void treeWillCollapse(final TreeExpansionEvent event) throws ExpandVetoException {
   }
 
   @Override
-  public void treeWillExpand(final TreeExpansionEvent event)
-      throws ExpandVetoException {
+  public void treeWillExpand(final TreeExpansionEvent event) throws ExpandVetoException {
     final TreePath path = event.getPath();
     final Object node = path.getLastPathComponent();
     if (node instanceof LazyLoadTreeNode) {

@@ -50,17 +50,19 @@ import java.util.Vector;
  *
  * @version 1.7
  */
-public class FileUtil
-{
+public class FileUtil {
+  public static final String EXTENSION_SEPARATOR = ".";
+
   /**
    * Copies the source file to the destination filename.
    * Posted by Mark Thornton <mthorn@cix.compulink.co.uk> on Usenet.
    */
   public static void copyFile(final File source, final File destination) throws IOException {
     final RandomAccessFile out = new RandomAccessFile(destination, "rw");
-    //Tell the OS in advance how big the file will be. This may reduce fragmentation
+    // Tell the OS in advance how big the file will be. This may reduce
+    // fragmentation
     out.setLength(source.length());
-    //copy the content
+    // copy the content
     final FileInputStream in = new FileInputStream(source);
     final byte[] buffer = new byte[16384];
     while (true) {
@@ -93,8 +95,7 @@ public class FileUtil
     return directory.exists();
   }
 
-  public static String extension(final String path)
-  {
+  public static String extension(final String path) {
     final String name = name(path);
     final int extIndex = name.lastIndexOf(EXTENSION_SEPARATOR.charAt(0));
     if (extIndex < 0) {
@@ -106,7 +107,8 @@ public class FileUtil
   /**
    * Returns a List of the String's in the text file, one per line.
    */
-  public static List getContents(final String textFileName) throws FileNotFoundException, IOException {
+  public static List getContents(final String textFileName) throws FileNotFoundException,
+    IOException {
     final List contents = new Vector();
     final FileReader fileReader = new FileReader(textFileName);
     final BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -118,8 +120,7 @@ public class FileUtil
     return contents;
   }
 
-  public static String name(final String path)
-  {
+  public static String name(final String path) {
     final File file = new File(path);
     return file.getName();
   }
@@ -130,9 +131,7 @@ public class FileUtil
    * @return text file contents
    * @throws IOException
    */
-  public static String readText(final File file)
-      throws IOException
-  {
+  public static String readText(final File file) throws IOException {
     String thisLine;
     final StringBuilder strb = new StringBuilder("");
 
@@ -145,16 +144,15 @@ public class FileUtil
     return result;
   }
 
-  public static String readText(final String filename)
-      throws IOException
-  {
+  public static String readText(final String filename) throws IOException {
     return readText(new File(filename));
   }
 
   /**
    * Saves the String with the given filename
    */
-  public static void setContents(final String textFileName, final String contents) throws IOException {
+  public static void setContents(final String textFileName, final String contents)
+    throws IOException {
     final FileWriter fileWriter = new FileWriter(textFileName, false);
     final BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
     bufferedWriter.write(contents);
@@ -162,6 +160,4 @@ public class FileUtil
     bufferedWriter.close();
     fileWriter.close();
   }
-
-  public static final String EXTENSION_SEPARATOR = ".";
 }

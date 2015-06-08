@@ -46,13 +46,12 @@ public class TableLayout implements ElementContainerLayout {
     this(cssClass, numColumns, null);
   }
 
-  public TableLayout(final String cssClass, final int numColumns,
-    final List titles) {
+  public TableLayout(final String cssClass, final int numColumns, final List titles) {
     this(cssClass, numColumns, titles, Collections.EMPTY_LIST);
   }
 
-  public TableLayout(final String cssClass, final int numColumns,
-    final List titles, final List cssClasses) {
+  public TableLayout(final String cssClass, final int numColumns, final List titles,
+    final List cssClasses) {
     this.cssClass = cssClass;
     this.numColumns = numColumns;
     this.titles = titles;
@@ -81,9 +80,7 @@ public class TableLayout implements ElementContainerLayout {
     }
   }
 
-  private void serializeTbody(
-    final XmlWriter out,
-    final ElementContainer container) {
+  private void serializeTbody(final XmlWriter out, final ElementContainer container) {
     out.startTag(HtmlUtil.TBODY);
     final List elementList = container.getElements();
     int i = 0;

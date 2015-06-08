@@ -29,8 +29,7 @@ public class HtmlUiBuilderPropertyReadOnlyField extends Field {
    * @param name
    * @param required
    */
-  public HtmlUiBuilderPropertyReadOnlyField(final String name,
-    final boolean required) {
+  public HtmlUiBuilderPropertyReadOnlyField(final String name, final boolean required) {
     super(name, false);
     setReadOnly(true);
   }

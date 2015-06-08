@@ -17,23 +17,18 @@ import com.revolsys.jts.io.WKTFileReader;
 import com.revolsys.jts.io.WKTReader;
 
 public class IOUtil {
-  private static String cleanHex(final String hexStuff) {
-    return hexStuff.replaceAll("[^0123456789ABCDEFabcdef]", "");
-  }
-
   public static Geometry readGeometriesFromFile(final String filename,
     final GeometryFactory geomFact) throws Exception, IOException {
     final String ext = FileUtil.extension(filename);
     if (ext.equalsIgnoreCase(".shp")) {
       try (
-          GeometryReader reader = AbstractGeometryReaderFactory.geometryReader(new FileSystemResource(
-            filename))) {
+        GeometryReader reader = AbstractGeometryReaderFactory.geometryReader(new FileSystemResource(
+          filename))) {
         final List<Geometry> geometries = reader.read();
         if (geometries.isEmpty()) {
           return geomFact.geometryCollection();
         } else {
-          final GeometryFactory geometryFactory = geometries.get(0)
-              .getGeometryFactory();
+          final GeometryFactory geometryFactory = geometries.get(0).getGeometryFactory();
           return geometryFactory.geometryCollection(geometries);
         }
       }
@@ -47,8 +42,7 @@ public class IOUtil {
   public static Geometry readGeometriesFromWKBHexString(final String wkb,
     final GeometryFactory geomFact) throws ParseException, IOException {
     final WKBReader reader = new WKBReader(geomFact);
-    final WKBHexFileReader fileReader = new WKBHexFileReader(new StringReader(
-      wkb), reader);
+    final WKBHexFileReader fileReader = new WKBHexFileReader(new StringReader(wkb), reader);
     final List geomList = fileReader.read();
 
     if (geomList.size() == 1) {
@@ -75,8 +69,7 @@ public class IOUtil {
   public static Geometry readGeometriesFromWKTString(final String wkt,
     final GeometryFactory geomFact) throws ParseException, IOException {
     final WKTReader reader = new WKTReader(geomFact);
-    final WKTFileReader fileReader = new WKTFileReader(new StringReader(wkt),
-      reader);
+    final WKTFileReader fileReader = new WKTFileReader(new StringReader(wkt), reader);
     final List geomList = fileReader.read();
 
     if (geomList.size() == 1) {

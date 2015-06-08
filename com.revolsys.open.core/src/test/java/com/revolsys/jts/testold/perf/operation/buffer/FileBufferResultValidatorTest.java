@@ -74,8 +74,7 @@ public class FileBufferResultValidatorTest extends TestCase {
 
   void runBuffer(final Geometry g, final double dist) {
     final Geometry buf = g.buffer(dist);
-    final BufferResultValidator validator = new BufferResultValidator(g, dist,
-      buf);
+    final BufferResultValidator validator = new BufferResultValidator(g, dist, buf);
 
     if (!validator.isValid()) {
       final String msg = validator.getErrorMessage();

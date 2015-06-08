@@ -145,11 +145,11 @@ public class WKTReader {
 
   private static final String NAN_SYMBOL = "NaN";
 
+  private static final boolean ALLOW_OLD_JTS_MULTIPOINT_SYNTAX = true;
+
   private final GeometryFactory geometryFactory;
 
   private StreamTokenizer tokenizer;
-
-  private static final boolean ALLOW_OLD_JTS_MULTIPOINT_SYNTAX = true;
 
   /**
    * Creates a reader that creates objects using the default {@link GeometryFactory}.
@@ -196,8 +196,7 @@ public class WKTReader {
     return coordinates.toArray(array);
   }
 
-  private Point[] getCoordinatesNoLeftParen() throws IOException,
-  ParseException {
+  private Point[] getCoordinatesNoLeftParen() throws IOException, ParseException {
     String nextToken = null;
     final ArrayList coordinates = new ArrayList();
     coordinates.add(getPreciseCoordinate());
@@ -448,8 +447,7 @@ public class WKTReader {
    *      token was encountered
    *@throws  IOException     if an I/O error occurs
    */
-  private GeometryCollection readGeometryCollectionText() throws IOException,
-  ParseException {
+  private GeometryCollection readGeometryCollectionText() throws IOException, ParseException {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
       return this.geometryFactory.geometryCollection();
@@ -558,8 +556,8 @@ public class WKTReader {
    *@throws  IOException     if an I/O error occurs
    *@throws  ParseException  if an unexpected token was encountered
    */
-  private com.revolsys.jts.geom.MultiLineString readMultiLineStringText()
-      throws IOException, ParseException {
+  private com.revolsys.jts.geom.MultiLineString readMultiLineStringText() throws IOException,
+    ParseException {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
       return this.geometryFactory.multiLineString(new LineString[] {});
@@ -626,8 +624,7 @@ public class WKTReader {
    *@throws  IOException     if an I/O error occurs
    *@throws  ParseException  if an unexpected token was encountered
    */
-  private MultiPolygon readMultiPolygonText() throws IOException,
-  ParseException {
+  private MultiPolygon readMultiPolygonText() throws IOException, ParseException {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
       return this.geometryFactory.multiPolygon(new Polygon[] {});

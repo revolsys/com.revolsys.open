@@ -63,14 +63,14 @@ public class DistanceToPointFinder {
     }
   }
 
-  public static void computeDistance(final LineSegment segment,
-    final Point pt, final PointPairDistance ptDist) {
+  public static void computeDistance(final LineSegment segment, final Point pt,
+    final PointPairDistance ptDist) {
     final Point closestPt = segment.closestPoint(pt);
     ptDist.setMinimum(closestPt, pt);
   }
 
-  public static void computeDistance(final LineString line,
-    final Point pt, final PointPairDistance ptDist) {
+  public static void computeDistance(final LineString line, final Point pt,
+    final PointPairDistance ptDist) {
     for (final Segment segment : line.segments()) {
       // this is somewhat inefficient - could do better
       final Point closestPt = segment.closestPoint(pt);

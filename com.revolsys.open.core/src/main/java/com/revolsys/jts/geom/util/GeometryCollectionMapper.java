@@ -49,8 +49,7 @@ import com.revolsys.jts.geom.util.GeometryMapper.MapOp;
  *
  */
 public class GeometryCollectionMapper {
-  public static GeometryCollection map(final GeometryCollection gc,
-    final MapOp op) {
+  public static GeometryCollection map(final GeometryCollection gc, final MapOp op) {
     final GeometryCollectionMapper mapper = new GeometryCollectionMapper(op);
     return mapper.map(gc);
   }

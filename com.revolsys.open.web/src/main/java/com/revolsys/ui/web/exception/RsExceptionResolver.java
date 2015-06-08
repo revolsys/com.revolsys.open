@@ -19,13 +19,11 @@ public class RsExceptionResolver implements HandlerExceptionResolver {
     try {
       if (exception instanceof PageNotFoundException) {
         final PageNotFoundException pageNotFound = (PageNotFoundException)exception;
-        response.sendError(HttpServletResponse.SC_NOT_FOUND,
-          pageNotFound.getMessage());
+        response.sendError(HttpServletResponse.SC_NOT_FOUND, pageNotFound.getMessage());
         return new ModelAndView();
       } else if (exception instanceof IllegalArgumentException) {
         final IllegalArgumentException illegalArgument = (IllegalArgumentException)exception;
-        response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-          illegalArgument.getMessage());
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST, illegalArgument.getMessage());
         return new ModelAndView();
       } else if (exception instanceof RedirectException) {
         final RedirectException redirect = (RedirectException)exception;
@@ -37,8 +35,8 @@ public class RsExceptionResolver implements HandlerExceptionResolver {
         if (cause == null) {
           cause = exception;
         }
-        response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-          "Invalid HTTP multi-part request: " + cause.getMessage());
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid HTTP multi-part request: "
+          + cause.getMessage());
         return new ModelAndView();
       }
     } catch (final IOException e) {

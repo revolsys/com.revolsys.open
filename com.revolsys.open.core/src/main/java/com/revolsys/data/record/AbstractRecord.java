@@ -33,8 +33,8 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractRecord extends AbstractMap<String, Object>
-  implements Record, Cloneable {
+public abstract class AbstractRecord extends AbstractMap<String, Object> implements Record,
+  Cloneable {
 
   /**
    * Create a clone of the object.
@@ -334,8 +334,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
       return (T)getValue(index);
     } catch (final NullPointerException e) {
       LoggerFactory.getLogger(getClass()).warn(
-        "Attribute " + recordDefinition.getPath() + "." + name
-          + " does not exist");
+        "Attribute " + recordDefinition.getPath() + "." + name + " does not exist");
       return null;
     }
   }
@@ -355,8 +354,8 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
           if (propertyValue == null) {
             return null;
           } else if (i + 1 < propertyPath.length) {
-            final CodeTable codeTable = this.getRecordDefinition()
-              .getCodeTableByFieldName(propertyName);
+            final CodeTable codeTable = this.getRecordDefinition().getCodeTableByFieldName(
+              propertyName);
             if (codeTable != null) {
               propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
             }
@@ -366,16 +365,15 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
         }
       } else if (propertyValue instanceof Geometry) {
         final Geometry geometry = (Geometry)propertyValue;
-        propertyValue = GeometryProperties.getGeometryProperty(geometry,
-          propertyName);
+        propertyValue = GeometryProperties.getGeometryProperty(geometry, propertyName);
       } else if (propertyValue instanceof Map) {
         final Map<String, Object> map = (Map<String, Object>)propertyValue;
         propertyValue = map.get(propertyName);
         if (propertyValue == null) {
           return null;
         } else if (i + 1 < propertyPath.length) {
-          final CodeTable codeTable = this.getRecordDefinition()
-            .getCodeTableByFieldName(propertyName);
+          final CodeTable codeTable = this.getRecordDefinition().getCodeTableByFieldName(
+            propertyName);
           if (codeTable != null) {
             propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
           }
@@ -384,8 +382,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
         try {
           propertyValue = JavaBeanUtil.getProperty(propertyValue, propertyName);
         } catch (final IllegalArgumentException e) {
-          LoggerFactory.getLogger(getClass()).error(
-            "Path does not exist " + path, e);
+          LoggerFactory.getLogger(getClass()).error("Path does not exist " + path, e);
           return null;
         }
       }
@@ -394,8 +391,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   }
 
   @Override
-  public Map<String, Object> getValueMap(
-    final Collection<? extends CharSequence> fieldNames) {
+  public Map<String, Object> getValueMap(final Collection<? extends CharSequence> fieldNames) {
     final Map<String, Object> values = new HashMap<String, Object>();
     for (final CharSequence name : fieldNames) {
       final Object value = getValue(name);
@@ -509,14 +505,12 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   @Override
   public void setIdValue(final Object id) {
     final int index = this.getRecordDefinition().getIdFieldIndex();
-    if (this.getState() == RecordState.New
-      || this.getState() == RecordState.Initalizing) {
+    if (this.getState() == RecordState.New || this.getState() == RecordState.Initalizing) {
       setValue(index, id);
     } else {
       final Object oldId = getValue(index);
       if (oldId != null && !EqualsRegistry.equal(id, oldId)) {
-        throw new IllegalStateException(
-          "Cannot change the ID on a persisted object");
+        throw new IllegalStateException("Cannot change the ID on a persisted object");
       }
     }
   }
@@ -540,12 +534,10 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
 
       } else {
         final CharSequence key = name.subSequence(0, dotIndex);
-        final CharSequence subKey = name.subSequence(dotIndex + 1,
-          name.length());
+        final CharSequence subKey = name.subSequence(dotIndex + 1, name.length());
         final Object objectValue = getValue(key);
         if (objectValue == null) {
-          final DataType fieldType = this.getRecordDefinition().getFieldType(
-            key);
+          final DataType fieldType = this.getRecordDefinition().getFieldType(key);
           if (fieldType != null) {
             if (fieldType.getJavaClass() == Record.class) {
               final String typePath = fieldType.getName();
@@ -594,13 +586,12 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
       codeTableFieldName = name.substring(0, dotIndex);
       codeTableValueName = name.substring(dotIndex + 1);
     }
-    final CodeTable codeTable = this.getRecordDefinition()
-      .getCodeTableByFieldName(codeTableFieldName);
+    final CodeTable codeTable = this.getRecordDefinition().getCodeTableByFieldName(
+      codeTableFieldName);
     if (codeTable == null) {
       if (dotIndex != -1) {
         LoggerFactory.getLogger(getClass()).debug(
-          "Cannot get code table for " + this.getRecordDefinition().getPath()
-            + "." + name);
+          "Cannot get code table for " + this.getRecordDefinition().getPath() + "." + name);
         return false;
       }
       updated = setValue(name, value);
@@ -622,8 +613,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
           targetValue = Value.getValue(id);
         }
       } else {
-        targetValue = codeTable.getId(Collections.singletonMap(
-          codeTableValueName, value));
+        targetValue = codeTable.getId(Collections.singletonMap(codeTableValueName, value));
       }
       if (targetValue == null) {
         targetValue = value;
@@ -634,8 +624,8 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   }
 
   @Override
-  public <T> T setValueByPath(final CharSequence attributePath,
-    final Record source, final String sourceAttributePath) {
+  public <T> T setValueByPath(final CharSequence attributePath, final Record source,
+    final String sourceAttributePath) {
     @SuppressWarnings("unchecked")
     final T value = (T)source.getValueByPath(sourceAttributePath);
     setValueByPath(attributePath, value);
@@ -645,8 +635,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   @Override
   public void setValues(final Map<String, ? extends Object> values) {
     if (values != null) {
-      for (final Entry<String, Object> defaultValue : new LinkedHashMap<String, Object>(
-        values).entrySet()) {
+      for (final Entry<String, Object> defaultValue : new LinkedHashMap<String, Object>(values).entrySet()) {
         final String name = defaultValue.getKey();
         final Object value = defaultValue.getValue();
         setValue(name, value);
@@ -655,8 +644,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   }
 
   @Override
-  public void setValues(final Map<String, Object> record,
-    final Collection<String> attributesNames) {
+  public void setValues(final Map<String, Object> record, final Collection<String> attributesNames) {
     for (final String fieldName : attributesNames) {
       final Object oldValue = getValue(fieldName);
       Object newValue = record.get(fieldName);
@@ -668,8 +656,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   }
 
   @Override
-  public void setValues(final Map<String, Object> record,
-    final String... fieldNames) {
+  public void setValues(final Map<String, Object> record, final String... fieldNames) {
     setValues(record, Arrays.asList(fieldNames));
   }
 
@@ -685,8 +672,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   @Override
   public void setValuesByPath(final Map<String, ? extends Object> values) {
     if (values != null) {
-      for (final Entry<String, Object> defaultValue : new LinkedHashMap<String, Object>(
-        values).entrySet()) {
+      for (final Entry<String, Object> defaultValue : new LinkedHashMap<String, Object>(values).entrySet()) {
         final String name = defaultValue.getKey();
         final Object value = defaultValue.getValue();
         setValueByPath(name, value);
@@ -707,10 +693,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
     for (int i = 0; i < this.getRecordDefinition().getFieldCount(); i++) {
       final Object value = getValue(i);
       if (value != null) {
-        s.append(this.getRecordDefinition().getFieldName(i))
-          .append('=')
-          .append(value)
-          .append('\n');
+        s.append(this.getRecordDefinition().getFieldName(i)).append('=').append(value).append('\n');
       }
     }
     s.append(')');
@@ -724,8 +707,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
         this.setState(RecordState.Modified);
       break;
       case Deleted:
-        throw new IllegalStateException(
-          "Cannot modify an object which has been deleted");
+        throw new IllegalStateException("Cannot modify an object which has been deleted");
     }
   }
 

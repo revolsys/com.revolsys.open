@@ -23,23 +23,18 @@ public class OutsideBorderHighlighter extends AbstractHighlighter {
 
   private final boolean compound;
 
-  public OutsideBorderHighlighter(final HighlightPredicate predicate,
-    final Color color, final int thickness, final boolean compound,
-    final boolean inner) {
+  public OutsideBorderHighlighter(final HighlightPredicate predicate, final Color color,
+    final int thickness, final boolean compound, final boolean inner) {
     super(predicate);
-    this.topBorder = BorderFactory.createMatteBorder(thickness, thickness, 0,
-      thickness, color);
-    this.middleBorder = BorderFactory.createMatteBorder(0, thickness, 0,
-      thickness, color);
-    this.bottomBorder = BorderFactory.createMatteBorder(0, thickness,
-      thickness, thickness, color);
+    this.topBorder = BorderFactory.createMatteBorder(thickness, thickness, 0, thickness, color);
+    this.middleBorder = BorderFactory.createMatteBorder(0, thickness, 0, thickness, color);
+    this.bottomBorder = BorderFactory.createMatteBorder(0, thickness, thickness, thickness, color);
     this.compound = compound;
     this.inner = inner;
   }
 
   @Override
-  protected boolean canHighlight(final Component component,
-    final ComponentAdapter adapter) {
+  protected boolean canHighlight(final Component component, final ComponentAdapter adapter) {
     return component instanceof JComponent;
   }
 
@@ -47,8 +42,7 @@ public class OutsideBorderHighlighter extends AbstractHighlighter {
    * {@inheritDoc}
    */
   @Override
-  protected Component doHighlight(final Component renderer,
-    final ComponentAdapter adapter) {
+  protected Component doHighlight(final Component renderer, final ComponentAdapter adapter) {
     Border border;
     if (adapter.row == 0) {
       border = this.topBorder;

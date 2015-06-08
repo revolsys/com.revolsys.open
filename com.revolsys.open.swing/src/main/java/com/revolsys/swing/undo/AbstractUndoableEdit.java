@@ -7,8 +7,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoableEdit;
 
-public abstract class AbstractUndoableEdit implements UndoableEdit,
-Serializable {
+public abstract class AbstractUndoableEdit implements UndoableEdit, Serializable {
   private static final long serialVersionUID = 1L;
 
   private boolean hasBeenDone = false;
@@ -106,8 +105,7 @@ Serializable {
 
   @Override
   public String toString() {
-    return super.toString() + " hasBeenDone: " + this.hasBeenDone + " alive: "
-        + this.alive;
+    return super.toString() + " hasBeenDone: " + this.hasBeenDone + " alive: " + this.alive;
   }
 
   @Override

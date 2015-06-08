@@ -9,18 +9,18 @@ import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.testold.junit.GeometryUtils;
 
 public class DiscreteHausdorffDistanceTest extends TestCase {
+  private static final double TOLERANCE = 0.00001;
+
   public static void main(final String args[]) {
     TestRunner.run(DiscreteHausdorffDistanceTest.class);
   }
-
-  private static final double TOLERANCE = 0.00001;
 
   public DiscreteHausdorffDistanceTest(final String name) {
     super(name);
   }
 
-  private void runTest(final String wkt1, final String wkt2,
-    final double expectedDistance) throws ParseException {
+  private void runTest(final String wkt1, final String wkt2, final double expectedDistance)
+    throws ParseException {
     final Geometry g1 = GeometryUtils.readWKT(wkt1);
     final Geometry g2 = GeometryUtils.readWKT(wkt2);
 
@@ -28,14 +28,12 @@ public class DiscreteHausdorffDistanceTest extends TestCase {
     assertEquals(distance, expectedDistance, TOLERANCE);
   }
 
-  private void runTest(final String wkt1, final String wkt2,
-    final double densifyFrac, final double expectedDistance)
-        throws ParseException {
+  private void runTest(final String wkt1, final String wkt2, final double densifyFrac,
+    final double expectedDistance) throws ParseException {
     final Geometry g1 = GeometryUtils.readWKT(wkt1);
     final Geometry g2 = GeometryUtils.readWKT(wkt2);
 
-    final double distance = DiscreteHausdorffDistance.distance(g1, g2,
-      densifyFrac);
+    final double distance = DiscreteHausdorffDistance.distance(g1, g2, densifyFrac);
     assertEquals(distance, expectedDistance, TOLERANCE);
   }
 
@@ -58,11 +56,10 @@ public class DiscreteHausdorffDistanceTest extends TestCase {
    * @throws Exception
    */
   public void testLinesShowingDiscretenessEffect() throws Exception {
-    runTest("LINESTRING (130 0, 0 0, 0 150)",
-      "LINESTRING (10 10, 10 150, 130 10)", 14.142135623730951);
+    runTest("LINESTRING (130 0, 0 0, 0 150)", "LINESTRING (10 10, 10 150, 130 10)",
+      14.142135623730951);
     // densifying provides accurate HD
-    runTest("LINESTRING (130 0, 0 0, 0 150)",
-      "LINESTRING (10 10, 10 150, 130 10)", 0.5, 70.0);
+    runTest("LINESTRING (130 0, 0 0, 0 150)", "LINESTRING (10 10, 10 150, 130 10)", 0.5, 70.0);
   }
 
 }

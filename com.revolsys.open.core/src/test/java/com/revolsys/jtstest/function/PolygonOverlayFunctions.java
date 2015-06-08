@@ -11,8 +11,8 @@ import com.revolsys.jts.operation.polygonize.Polygonizer;
 
 public class PolygonOverlayFunctions {
 
-  public static Geometry overlaySnapRounded(final Geometry g1,
-    final Geometry g2, final double precisionTol) {
+  public static Geometry overlaySnapRounded(final Geometry g1, final Geometry g2,
+    final double precisionTol) {
     final GeometryFactory geometryFactory = g1.getGeometryFactory();
 
     final List<LineString> lines = g1.getGeometries(LineString.class);
@@ -22,8 +22,7 @@ public class PolygonOverlayFunctions {
     }
     final List nodedLinework = new GeometryNoder(precisionTol).node(lines);
     // union the noded linework to remove duplicates
-    final Geometry nodedDedupedLinework = geometryFactory.buildGeometry(
-      nodedLinework).union();
+    final Geometry nodedDedupedLinework = geometryFactory.buildGeometry(nodedLinework).union();
 
     // polygonize the result
     final Polygonizer polygonizer = new Polygonizer();

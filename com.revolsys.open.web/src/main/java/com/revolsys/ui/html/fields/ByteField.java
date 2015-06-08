@@ -9,8 +9,7 @@ public class ByteField extends NumberField {
     this(name, required, null);
   }
 
-  public ByteField(final String name, final boolean required,
-    final Object defaultValue) {
+  public ByteField(final String name, final boolean required, final Object defaultValue) {
     super(name, 4, 4, defaultValue, required, Byte.MIN_VALUE, Byte.MAX_VALUE);
     setCssClass("byte");
   }

@@ -24,9 +24,7 @@ public interface SiteNodeController extends Cloneable {
 
   String getPath();
 
-  void process(
-    ServletContext servletConfig,
-    HttpServletRequest request,
+  void process(ServletContext servletConfig, HttpServletRequest request,
     HttpServletResponse response) throws IOException, ServletException;
 
   void setNode(SiteNode node);

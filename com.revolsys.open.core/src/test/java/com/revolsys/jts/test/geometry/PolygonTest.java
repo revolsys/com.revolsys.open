@@ -15,20 +15,18 @@ import com.revolsys.jts.geom.vertex.Vertex;
 
 public class PolygonTest {
 
-  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating(
-    4326, 2);
+  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating(4326, 2);
 
-  private static final List<Point> EXTERIOR_1 = Arrays.<Point> asList(
-    new PointDouble(0.0, 0.0), new PointDouble(10.0, 0.0), new PointDouble(
-      10.0, 10.0), new PointDouble(0.0, 10.0), new PointDouble(0.0, 0));
+  private static final List<Point> EXTERIOR_1 = Arrays.<Point> asList(new PointDouble(0.0, 0.0),
+    new PointDouble(10.0, 0.0), new PointDouble(10.0, 10.0), new PointDouble(0.0, 10.0),
+    new PointDouble(0.0, 0));
 
-  private static final List<Point> INTERIOR_2 = Arrays.<Point> asList(
-    new PointDouble(2.0, 2.0), new PointDouble(8.0, 2.0), new PointDouble(8.0,
-      8.0), new PointDouble(2.0, 8.0), new PointDouble(2.0, 2.0));
+  private static final List<Point> INTERIOR_2 = Arrays.<Point> asList(new PointDouble(2.0, 2.0),
+    new PointDouble(8.0, 2.0), new PointDouble(8.0, 8.0), new PointDouble(2.0, 8.0),
+    new PointDouble(2.0, 2.0));
 
   private static final Polygon WITH_HOLE = GEOMETRY_FACTORY.polygon(
-    GEOMETRY_FACTORY.linearRing(EXTERIOR_1),
-    GEOMETRY_FACTORY.linearRing(INTERIOR_2));
+    GEOMETRY_FACTORY.linearRing(EXTERIOR_1), GEOMETRY_FACTORY.linearRing(INTERIOR_2));
 
   @Test
   public void testFromFile() {

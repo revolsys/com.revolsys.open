@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -67,14 +66,12 @@ import java.util.List;
  *
  * @version 1.7
  */
-public class Bintree
-{
+public class Bintree {
   /**
    * Ensure that the Interval for the inserted item has non-zero extents.
    * Use the current minExtent to pad it, if necessary
    */
-  public static Interval ensureExtent(final Interval itemInterval, final double minExtent)
-  {
+  public static Interval ensureExtent(final Interval itemInterval, final double minExtent) {
     double min = itemInterval.getMin();
     double max = itemInterval.getMax();
     // has a non-zero extent
@@ -91,6 +88,7 @@ public class Bintree
   }
 
   private final Root root;
+
   /**
    *  Statistics
    *
@@ -103,44 +101,38 @@ public class Bintree
    **/
   private double minExtent = 1.0;
 
-  public Bintree()
-  {
+  public Bintree() {
     this.root = new Root();
   }
 
-  private void collectStats(final Interval interval)
-  {
+  private void collectStats(final Interval interval) {
     final double del = interval.getWidth();
     if (del < this.minExtent && del > 0.0) {
       this.minExtent = del;
     }
   }
-  public int depth()
-  {
+
+  public int depth() {
     if (this.root != null) {
       return this.root.depth();
     }
     return 0;
   }
-  public void insert(final Interval itemInterval, final Object item)
-  {
+
+  public void insert(final Interval itemInterval, final Object item) {
     collectStats(itemInterval);
     final Interval insertInterval = ensureExtent(itemInterval, this.minExtent);
-    //int oldSize = size();
+    // int oldSize = size();
     this.root.insert(insertInterval, item);
-    /* DEBUG
-int newSize = size();
-System.out.println("BinTree: size = " + newSize + "   node size = " + nodeSize());
-if (newSize <= oldSize) {
-      System.out.println("Lost item!");
-      root.insert(insertInterval, item);
-      System.out.println("reinsertion size = " + size());
-}
+    /*
+     * DEBUG int newSize = size(); System.out.println("BinTree: size = " +
+     * newSize + "   node size = " + nodeSize()); if (newSize <= oldSize) {
+     * System.out.println("Lost item!"); root.insert(insertInterval, item);
+     * System.out.println("reinsertion size = " + size()); }
      */
   }
 
-  public Iterator iterator()
-  {
+  public Iterator iterator() {
     final List foundItems = new ArrayList();
     this.root.addAllItems(foundItems);
     return foundItems.iterator();
@@ -151,16 +143,14 @@ if (newSize <= oldSize) {
    *
    * @return the number of nodes in the tree
    */
-  public int nodeSize()
-  {
+  public int nodeSize() {
     if (this.root != null) {
       return this.root.nodeSize();
     }
     return 0;
   }
 
-  public List query(final double x)
-  {
+  public List query(final double x) {
     return query(new Interval(x, x));
   }
 
@@ -171,8 +161,7 @@ if (newSize <= oldSize) {
    *
    * min and max may be the same value
    */
-  public List query(final Interval interval)
-  {
+  public List query(final Interval interval) {
     /**
      * the items that are matched are all items in intervals
      * which overlap the query interval
@@ -190,8 +179,7 @@ if (newSize <= oldSize) {
    * @param interval a query nterval, or null
    * @param resultItems the candidate items found
    */
-  public void query(final Interval interval, final Collection foundItems)
-  {
+  public void query(final Interval interval, final Collection foundItems) {
     this.root.addAllItemsFromOverlapping(interval, foundItems);
   }
 
@@ -202,14 +190,12 @@ if (newSize <= oldSize) {
    * @param item the item to remove
    * @return <code>true</code> if the item was found (and thus removed)
    */
-  public boolean remove(final Interval itemInterval, final Object item)
-  {
+  public boolean remove(final Interval itemInterval, final Object item) {
     final Interval insertInterval = ensureExtent(itemInterval, this.minExtent);
     return this.root.remove(insertInterval, item);
   }
 
-  public int size()
-  {
+  public int size() {
     if (this.root != null) {
       return this.root.size();
     }

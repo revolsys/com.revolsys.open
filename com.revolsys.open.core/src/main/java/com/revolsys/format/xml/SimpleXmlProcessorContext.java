@@ -94,8 +94,8 @@ public class SimpleXmlProcessorContext implements XmlProcessorContext {
    * @param location The location of the error.
    */
   @Override
-  public void report(final String message, final String errorType,
-    final Object relatedInformation, final Location location) {
+  public void report(final String message, final String errorType, final Object relatedInformation,
+    final Location location) {
     addError(new XmlProcessorError(message, relatedInformation, location));
   }
 

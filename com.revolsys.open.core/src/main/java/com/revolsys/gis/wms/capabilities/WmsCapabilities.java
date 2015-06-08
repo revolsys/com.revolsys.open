@@ -77,8 +77,7 @@ public class WmsCapabilities {
     return getLayer(name) != null;
   }
 
-  public boolean isSrsSupported(final String srsId,
-    final List<String> layerNames) {
+  public boolean isSrsSupported(final String srsId, final List<String> layerNames) {
     final WmsLayer layer = this.capability.getLayer();
     return isSrsSupported(srsId, layer, layerNames, false);
   }

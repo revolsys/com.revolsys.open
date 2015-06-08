@@ -1,6 +1,14 @@
 package com.revolsys.gis.grid;
 
 public class GridUtil {
+  private static final int HUNDREDTH_GRID_SQUARE = 10;
+
+  private static final int QUARTER_GRID_SQUARE = 2;
+
+  public static final int SIXTEENTH_GRID_SQUARE = 4;
+
+  public static final int TWELTH_GRID_HEIGHT = 3;
+
   public static String formatSheetNumber100(final int sheetNumber) {
     if (sheetNumber < 10) {
       return "00" + sheetNumber;
@@ -11,14 +19,13 @@ public class GridUtil {
     }
   }
 
-  public static char getLetter12(final double x, final double y,
-    final double width, final double height) {
+  public static char getLetter12(final double x, final double y, final double width,
+    final double height) {
     final double xSheet = (x + 180) / width;
     final int col = 3 - (int)(Math.floor(xSheet - 0.00000000001) % SIXTEENTH_GRID_SQUARE);
 
     final double ySheet = (y + 90) / height;
-    final int row = (int)Math.floor(ySheet + 0.00000000001)
-        % TWELTH_GRID_HEIGHT;
+    final int row = (int)Math.floor(ySheet + 0.00000000001) % TWELTH_GRID_HEIGHT;
 
     if (row % 2 == 0) {
       return (char)('a' + row * SIXTEENTH_GRID_SQUARE + col);
@@ -27,14 +34,13 @@ public class GridUtil {
     }
   }
 
-  public static char getLetter16(final double x, final double y,
-    final double width, final double height) {
+  public static char getLetter16(final double x, final double y, final double width,
+    final double height) {
     final double xSheet = (x + 180) / width;
     final int col = (int)(Math.ceil(xSheet - 0.00000000001) % SIXTEENTH_GRID_SQUARE);
 
     final double ySheet = (y + 90) / height;
-    final int row = (int)Math.floor(ySheet + 0.00000000001)
-        % SIXTEENTH_GRID_SQUARE;
+    final int row = (int)Math.floor(ySheet + 0.00000000001) % SIXTEENTH_GRID_SQUARE;
 
     if (row % 2 == 0) {
       return (char)('a' + row * SIXTEENTH_GRID_SQUARE + col);
@@ -66,14 +72,13 @@ public class GridUtil {
     return num / SIXTEENTH_GRID_SQUARE;
   }
 
-  public static char getLetter4(final double x, final double y,
-    final double width, final double height) {
+  public static char getLetter4(final double x, final double y, final double width,
+    final double height) {
     final double xSheet = (x + 180) / width;
     final int col = (int)(Math.ceil(xSheet - 0.00000000001) % QUARTER_GRID_SQUARE);
 
     final double ySheet = (y + 90) / height;
-    final int row = (int)Math.floor(ySheet + 0.00000000001)
-        % QUARTER_GRID_SQUARE;
+    final int row = (int)Math.floor(ySheet + 0.00000000001) % QUARTER_GRID_SQUARE;
 
     if (row % 2 == 0) {
       return (char)('a' + row * QUARTER_GRID_SQUARE + col);
@@ -123,14 +128,13 @@ public class GridUtil {
     return num / SIXTEENTH_GRID_SQUARE;
   }
 
-  public static String getNumber100(final double x, final double y,
-    final double width, final double height) {
+  public static String getNumber100(final double x, final double y, final double width,
+    final double height) {
     final double xSheet = (x + 180) / width;
     final int col = (int)(Math.ceil(xSheet - 0.00000000001 - 1) % HUNDREDTH_GRID_SQUARE);
 
     final double ySheet = (y + 90) / height;
-    final int row = (int)Math.floor(ySheet + 0.00000000001)
-        % HUNDREDTH_GRID_SQUARE;
+    final int row = (int)Math.floor(ySheet + 0.00000000001) % HUNDREDTH_GRID_SQUARE;
 
     final int sheetNumber = row * HUNDREDTH_GRID_SQUARE + col + 1;
     return formatSheetNumber100(sheetNumber);
@@ -199,12 +203,4 @@ public class GridUtil {
   public static int getNumberRow4(final String num) {
     return getNumberRow4(Integer.parseInt(num));
   }
-
-  private static final int HUNDREDTH_GRID_SQUARE = 10;
-
-  private static final int QUARTER_GRID_SQUARE = 2;
-
-  public static final int SIXTEENTH_GRID_SQUARE = 4;
-
-  public static final int TWELTH_GRID_HEIGHT = 3;
 }

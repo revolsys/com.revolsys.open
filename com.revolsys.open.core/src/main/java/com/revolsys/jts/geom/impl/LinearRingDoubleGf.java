@@ -59,8 +59,7 @@ import com.revolsys.jts.geom.vertex.Vertex;
  *
  * @version 1.7
  */
-public class LinearRingDoubleGf extends LineStringDoubleGf implements
-LinearRing {
+public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing {
   private static final long serialVersionUID = -4261142084085851829L;
 
   public LinearRingDoubleGf(final GeometryFactory factory) {
@@ -83,20 +82,18 @@ LinearRing {
     if (isClosed()) {
       final int vertexCount = getVertexCount();
       if (vertexCount >= 1 && vertexCount < MINIMUM_VALID_SIZE) {
-        throw new IllegalArgumentException(
-          "Invalid number of points in LinearRing (found " + vertexCount
-          + " - must be 0 or >= 4)");
+        throw new IllegalArgumentException("Invalid number of points in LinearRing (found "
+          + vertexCount + " - must be 0 or >= 4)");
       }
     } else {
-      throw new IllegalArgumentException(
-          "Points of LinearRing do not form a closed linestring");
+      throw new IllegalArgumentException("Points of LinearRing do not form a closed linestring");
     }
   }
 
-  public LinearRingDoubleGf(final GeometryFactory geometryFactory,
-    final int axisCount, final int vertexCount, final double... coordinates) {
-    super(geometryFactory, axisCount, getNewCoordinates(geometryFactory,
-      axisCount, vertexCount, coordinates));
+  public LinearRingDoubleGf(final GeometryFactory geometryFactory, final int axisCount,
+    final int vertexCount, final double... coordinates) {
+    super(geometryFactory, axisCount, getNewCoordinates(geometryFactory, axisCount, vertexCount,
+      coordinates));
 
   }
 
@@ -110,26 +107,22 @@ LinearRing {
    * @throws IllegalArgumentException if the ring is not closed, or has too few points
    *
    */
-  public LinearRingDoubleGf(final GeometryFactory factory,
-    final LineString points) {
+  public LinearRingDoubleGf(final GeometryFactory factory, final LineString points) {
     super(factory, points);
     if (isClosed()) {
       final int vertexCount = getVertexCount();
       if (vertexCount >= 1 && vertexCount < MINIMUM_VALID_SIZE) {
-        throw new IllegalArgumentException(
-          "Invalid number of points in LinearRing (found " + vertexCount
-          + " - must be 0 or >= 4)");
+        throw new IllegalArgumentException("Invalid number of points in LinearRing (found "
+          + vertexCount + " - must be 0 or >= 4)");
       }
     } else {
-      throw new IllegalArgumentException(
-          "Points of LinearRing do not form a closed linestring");
+      throw new IllegalArgumentException("Points of LinearRing do not form a closed linestring");
     }
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V appendVertex(Point newPoint,
-    final int... geometryId) {
+  public <V extends Geometry> V appendVertex(Point newPoint, final int... geometryId) {
     if (newPoint == null || newPoint.isEmpty()) {
       return (V)this;
     } else if (geometryId.length == 0) {
@@ -141,22 +134,18 @@ LinearRing {
         final int vertexCount = getVertexCount();
         final double[] coordinates = getCoordinates();
         final int axisCount = getAxisCount();
-        final double[] newCoordinates = new double[axisCount
-                                                   * (vertexCount + 1)];
+        final double[] newCoordinates = new double[axisCount * (vertexCount + 1)];
         final Vertex fromPoint = getVertex(0);
         final int length = (vertexCount - 1) * axisCount;
         System.arraycopy(coordinates, 0, newCoordinates, 0, length);
-        CoordinatesListUtil.setCoordinates(newCoordinates, axisCount,
-          vertexCount - 1, newPoint);
-        CoordinatesListUtil.setCoordinates(newCoordinates, axisCount,
-          vertexCount, fromPoint);
+        CoordinatesListUtil.setCoordinates(newCoordinates, axisCount, vertexCount - 1, newPoint);
+        CoordinatesListUtil.setCoordinates(newCoordinates, axisCount, vertexCount, fromPoint);
 
         return (V)geometryFactory.linearRing(axisCount, newCoordinates);
       }
     } else {
-      throw new IllegalArgumentException(
-        "Geometry id's for LinearRings must have length 0. "
-            + Arrays.toString(geometryId));
+      throw new IllegalArgumentException("Geometry id's for LinearRings must have length 0. "
+        + Arrays.toString(geometryId));
     }
   }
 
@@ -182,38 +171,33 @@ LinearRing {
   @Override
   public LineString deleteVertex(final int vertexIndex) {
     if (isEmpty()) {
-      throw new IllegalArgumentException(
-          "Cannot delete vertex for empty LinearRing");
+      throw new IllegalArgumentException("Cannot delete vertex for empty LinearRing");
     } else {
       final int vertexCount = getVertexCount();
       if (vertexCount <= 4) {
-        throw new IllegalArgumentException(
-            "LineString must have a minimum of 4 vertices");
+        throw new IllegalArgumentException("LineString must have a minimum of 4 vertices");
       } else if (vertexIndex >= 0 && vertexIndex < vertexCount) {
         final GeometryFactory geometryFactory = getGeometryFactory();
 
         final double[] coordinates = getCoordinates();
         final int axisCount = getAxisCount();
-        final double[] newCoordinates = new double[axisCount
-                                                   * (vertexCount - 1)];
+        final double[] newCoordinates = new double[axisCount * (vertexCount - 1)];
         if (vertexIndex == 0 || vertexIndex == vertexCount - 1) {
-          System.arraycopy(coordinates, axisCount, newCoordinates, 0,
-            (vertexCount - 2) * axisCount);
-          System.arraycopy(coordinates, axisCount, newCoordinates,
-            (vertexCount - 2) * axisCount, axisCount);
+          System.arraycopy(coordinates, axisCount, newCoordinates, 0, (vertexCount - 2) * axisCount);
+          System.arraycopy(coordinates, axisCount, newCoordinates, (vertexCount - 2) * axisCount,
+            axisCount);
         } else {
           final int beforeLength = vertexIndex * axisCount;
           System.arraycopy(coordinates, 0, newCoordinates, 0, beforeLength);
 
           final int sourceIndex = (vertexIndex + 1) * axisCount;
           final int afterLength = (vertexCount - vertexIndex - 1) * axisCount;
-          System.arraycopy(coordinates, sourceIndex, newCoordinates,
-            vertexIndex * axisCount, afterLength);
+          System.arraycopy(coordinates, sourceIndex, newCoordinates, vertexIndex * axisCount,
+            afterLength);
         }
         return geometryFactory.linearRing(axisCount, newCoordinates);
       } else {
-        throw new IllegalArgumentException(
-          "Vertex index must be between 0 and " + vertexCount);
+        throw new IllegalArgumentException("Vertex index must be between 0 and " + vertexCount);
       }
     }
   }
@@ -231,8 +215,7 @@ LinearRing {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V insertVertex(Point newPoint,
-    final int... vertexId) {
+  public <V extends Geometry> V insertVertex(Point newPoint, final int... vertexId) {
     if (vertexId.length == 1) {
       final GeometryFactory geometryFactory = getGeometryFactory();
       if (newPoint == null || newPoint.isEmpty()) {
@@ -248,28 +231,25 @@ LinearRing {
           newPoint = newPoint.convert(geometryFactory);
           final double[] coordinates = getCoordinates();
           final int axisCount = getAxisCount();
-          final double[] newCoordinates = new double[axisCount
-                                                     * (vertexCount + 1)];
+          final double[] newCoordinates = new double[axisCount * (vertexCount + 1)];
 
           final int beforeLength = vertexIndex * axisCount;
           System.arraycopy(coordinates, 0, newCoordinates, 0, beforeLength);
 
-          CoordinatesListUtil.setCoordinates(newCoordinates, axisCount,
-            vertexIndex, newPoint);
+          CoordinatesListUtil.setCoordinates(newCoordinates, axisCount, vertexIndex, newPoint);
 
           final int afterSourceIndex = vertexIndex * axisCount;
           final int afterNewIndex = (vertexIndex + 1) * axisCount;
           final int afterLength = (vertexCount - vertexIndex) * axisCount;
-          System.arraycopy(coordinates, afterSourceIndex, newCoordinates,
-            afterNewIndex, afterLength);
+          System.arraycopy(coordinates, afterSourceIndex, newCoordinates, afterNewIndex,
+            afterLength);
 
           return (V)geometryFactory.linearRing(axisCount, newCoordinates);
         }
       }
     } else {
-      throw new IllegalArgumentException("Geometry id's for "
-          + getGeometryType() + " must have length 1. "
-          + Arrays.toString(vertexId));
+      throw new IllegalArgumentException("Geometry id's for " + getGeometryType()
+        + " must have length 1. " + Arrays.toString(vertexId));
     }
   }
 
@@ -306,8 +286,7 @@ LinearRing {
     if (newPoint == null || newPoint.isEmpty()) {
       return this;
     } else if (isEmpty()) {
-      throw new IllegalArgumentException(
-          "Cannot move vertex for empty LinearRing");
+      throw new IllegalArgumentException("Cannot move vertex for empty LinearRing");
     } else {
       final int vertexCount = getVertexCount();
 
@@ -317,18 +296,14 @@ LinearRing {
         final double[] coordinates = getCoordinates();
         final int axisCount = getAxisCount();
         if (vertexIndex == 0 || vertexIndex == vertexCount - 1) {
-          CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0,
-            newPoint);
-          CoordinatesListUtil.setCoordinates(coordinates, axisCount,
-            vertexCount - 1, newPoint);
+          CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, newPoint);
+          CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexCount - 1, newPoint);
         } else {
-          CoordinatesListUtil.setCoordinates(coordinates, axisCount,
-            vertexIndex, newPoint);
+          CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex, newPoint);
         }
         return geometryFactory.linearRing(axisCount, coordinates);
       } else {
-        throw new IllegalArgumentException(
-          "Vertex index must be between 0 and " + vertexCount);
+        throw new IllegalArgumentException("Vertex index must be between 0 and " + vertexCount);
       }
     }
   }
@@ -340,14 +315,12 @@ LinearRing {
     final double[] coordinates = new double[vertexCount * axisCount];
     for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-        final int coordinateIndex = (vertexCount - 1 - vertexIndex) * axisCount
-            + axisIndex;
+        final int coordinateIndex = (vertexCount - 1 - vertexIndex) * axisCount + axisIndex;
         coordinates[coordinateIndex] = getCoordinate(vertexIndex, axisIndex);
       }
     }
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final LinearRing reverseLine = geometryFactory.linearRing(axisCount,
-      coordinates);
+    final LinearRing reverseLine = geometryFactory.linearRing(axisCount, coordinates);
     GeometryProperties.copyUserData(this, reverseLine);
     return reverseLine;
 

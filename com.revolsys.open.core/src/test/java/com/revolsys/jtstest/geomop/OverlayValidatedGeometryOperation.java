@@ -56,6 +56,8 @@ import com.revolsys.jtstest.testrunner.Result;
  *
  */
 public class OverlayValidatedGeometryOperation implements GeometryOperation {
+  private static final double AREA_DIFF_TOL = 5.0;
+
   public static double areaDiff(final Geometry g0, final Geometry g1) {
     final double areaA = g0.getArea();
     final double areaAdiffB = g0.difference(g1).getArea();
@@ -63,8 +65,8 @@ public class OverlayValidatedGeometryOperation implements GeometryOperation {
     return areaA - areaAdiffB - areaAintB;
   }
 
-  public static Geometry invokeGeometryOverlayMethod(final int opCode,
-    final Geometry g0, final Geometry g1) {
+  public static Geometry invokeGeometryOverlayMethod(final int opCode, final Geometry g0,
+    final Geometry g1) {
     switch (opCode) {
       case OverlayOp.INTERSECTION:
         return g0.intersection(g1);
@@ -94,8 +96,6 @@ public class OverlayValidatedGeometryOperation implements GeometryOperation {
     return -1;
   }
 
-  private static final double AREA_DIFF_TOL = 5.0;
-
   private final boolean returnEmptyGC = true;
 
   private GeometryMethodOperation chainOp = new GeometryMethodOperation();
@@ -118,8 +118,7 @@ public class OverlayValidatedGeometryOperation implements GeometryOperation {
     final double areaDiff = areaDiff(g0, g1);
     // System.out.println("Area diff = " + areaDiff);
     if (Math.abs(areaDiff) > AREA_DIFF_TOL) {
-      final String msg = "Operation result is invalid [AreaTest] (" + areaDiff
-          + ")";
+      final String msg = "Operation result is invalid [AreaTest] (" + areaDiff + ")";
       reportError(msg);
     }
   }
@@ -140,8 +139,8 @@ public class OverlayValidatedGeometryOperation implements GeometryOperation {
    * @see GeometryOperation#invoke
    */
   @Override
-  public Result invoke(final String opName, final Geometry geometry,
-    final Object[] args) throws Exception {
+  public Result invoke(final String opName, final Geometry geometry, final Object[] args)
+    throws Exception {
     final int opCode = overlayOpCode(opName);
 
     // if not an overlay op, do the default
@@ -161,8 +160,8 @@ public class OverlayValidatedGeometryOperation implements GeometryOperation {
    * @return the result
    * @throws Exception
    */
-  public Result invokeValidatedOverlayOp(final int opCode, final Geometry g0,
-    final Object[] args) throws Exception {
+  public Result invokeValidatedOverlayOp(final int opCode, final Geometry g0, final Object[] args)
+    throws Exception {
     Geometry result = null;
     final Geometry g1 = (Geometry)args[0];
 
@@ -190,13 +189,12 @@ public class OverlayValidatedGeometryOperation implements GeometryOperation {
 
   private void validate(final int opCode, final Geometry g0, final Geometry g1,
     final Geometry result) {
-    final OverlayResultValidator validator = new OverlayResultValidator(g0, g1,
-      result);
+    final OverlayResultValidator validator = new OverlayResultValidator(g0, g1, result);
     // check if computed result is valid
     if (!validator.isValid(opCode)) {
       final Point invalidLoc = validator.getInvalidLocation();
       final String msg = "Operation result is invalid [OverlayResultValidator] ( "
-          + EWktWriter.point(invalidLoc) + " )";
+        + EWktWriter.point(invalidLoc) + " )";
       reportError(msg);
     }
   }

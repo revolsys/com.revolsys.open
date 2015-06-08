@@ -46,13 +46,12 @@ public class XbaseSchemaReader {
         final int length = this.in.read();
         this.in.skipBytes(15);
         b = this.in.read();
-        final XBaseFieldDefinition field = new XBaseFieldDefinition(
-          fieldName.toString(), fieldName.toString(), fieldType, length);
+        final XBaseFieldDefinition field = new XBaseFieldDefinition(fieldName.toString(),
+          fieldName.toString(), fieldType, length);
         if (this.fieldDefinitions != null) {
           this.fieldDefinitions.add(field);
         }
-        this.recordDefinition.addField(fieldName.toString(),
-          field.getDataType(), length, true);
+        this.recordDefinition.addField(fieldName.toString(), field.getDataType(), length, true);
       }
     }
     return this.recordDefinition;

@@ -8,8 +8,8 @@ import javax.swing.JToggleButton;
 
 import com.revolsys.swing.action.InvokeMethodAction;
 
-public class InvokeMethodActionToolBarButtonFactory extends InvokeMethodAction
-implements ToolBarButtonFactory {
+public class InvokeMethodActionToolBarButtonFactory extends InvokeMethodAction implements
+  ToolBarButtonFactory {
   private static final long serialVersionUID = -5626990626102421865L;
 
   private boolean checkBox;
@@ -17,93 +17,87 @@ implements ToolBarButtonFactory {
   public InvokeMethodActionToolBarButtonFactory() {
   }
 
-  public InvokeMethodActionToolBarButtonFactory(final boolean checkBox,
-    final CharSequence name, final boolean invokeLater, final Object object,
-    final String methodName, final Object... parameters) {
+  public InvokeMethodActionToolBarButtonFactory(final boolean checkBox, final CharSequence name,
+    final boolean invokeLater, final Object object, final String methodName,
+    final Object... parameters) {
     super(name, invokeLater, object, methodName, parameters);
     this.checkBox = checkBox;
   }
 
-  public InvokeMethodActionToolBarButtonFactory(final boolean checkBox,
-    final CharSequence name, final Icon icon, final boolean invokeLater,
-    final Object object, final String methodName, final Object... parameters) {
+  public InvokeMethodActionToolBarButtonFactory(final boolean checkBox, final CharSequence name,
+    final Icon icon, final boolean invokeLater, final Object object, final String methodName,
+    final Object... parameters) {
     super(name, icon, invokeLater, object, methodName, parameters);
     this.checkBox = checkBox;
   }
 
-  public InvokeMethodActionToolBarButtonFactory(final boolean checkBox,
-    final CharSequence name, final Icon icon, final Object object,
-    final String methodName, final Object... parameters) {
+  public InvokeMethodActionToolBarButtonFactory(final boolean checkBox, final CharSequence name,
+    final Icon icon, final Object object, final String methodName, final Object... parameters) {
     super(name, icon, object, methodName, parameters);
     this.checkBox = checkBox;
   }
 
-  public InvokeMethodActionToolBarButtonFactory(final boolean checkBox,
-    final CharSequence name, final Object object, final String methodName,
-    final Object... parameters) {
+  public InvokeMethodActionToolBarButtonFactory(final boolean checkBox, final CharSequence name,
+    final Object object, final String methodName, final Object... parameters) {
     super(name, object, methodName, parameters);
     this.checkBox = checkBox;
   }
 
-  public InvokeMethodActionToolBarButtonFactory(final boolean checkBox,
-    final Icon icon, final boolean invokeLater, final Object object,
-    final String methodName, final Object... parameters) {
+  public InvokeMethodActionToolBarButtonFactory(final boolean checkBox, final Icon icon,
+    final boolean invokeLater, final Object object, final String methodName,
+    final Object... parameters) {
     super(icon, invokeLater, object, methodName, parameters);
     this.checkBox = checkBox;
   }
 
-  public InvokeMethodActionToolBarButtonFactory(final boolean checkBox,
-    final Icon icon, final Object object, final String methodName,
-    final Object... parameters) {
+  public InvokeMethodActionToolBarButtonFactory(final boolean checkBox, final Icon icon,
+    final Object object, final String methodName, final Object... parameters) {
     super(icon, object, methodName, parameters);
     this.checkBox = checkBox;
   }
 
-  public InvokeMethodActionToolBarButtonFactory(final CharSequence name,
-    final boolean invokeLater, final Object object, final String methodName,
-    final Object... parameters) {
+  public InvokeMethodActionToolBarButtonFactory(final CharSequence name, final boolean invokeLater,
+    final Object object, final String methodName, final Object... parameters) {
     super(name, invokeLater, object, methodName, parameters);
   }
 
   public InvokeMethodActionToolBarButtonFactory(final CharSequence name,
-    final CharSequence toolTip, final Icon icon, final boolean invokeLater,
-    final Object object, final String methodName, final Object... parameters) {
+    final CharSequence toolTip, final Icon icon, final boolean invokeLater, final Object object,
+    final String methodName, final Object... parameters) {
     super(name, icon, invokeLater, object, methodName, parameters);
     setToolTip(toolTip);
   }
 
   public InvokeMethodActionToolBarButtonFactory(final CharSequence name,
-    final CharSequence toolTip, final Icon icon, final Object object,
-    final String methodName, final Object... parameters) {
-    super(name, icon, object, methodName, parameters);
-    setToolTip(toolTip);
-  }
-
-  public InvokeMethodActionToolBarButtonFactory(final CharSequence name,
-    final Icon icon, final boolean invokeLater, final Object object,
-    final String methodName, final Object... parameters) {
-    super(name, icon, invokeLater, object, methodName, parameters);
-  }
-
-  public InvokeMethodActionToolBarButtonFactory(final CharSequence name,
-    final Icon icon, final Object object, final String methodName,
+    final CharSequence toolTip, final Icon icon, final Object object, final String methodName,
     final Object... parameters) {
     super(name, icon, object, methodName, parameters);
+    setToolTip(toolTip);
   }
 
-  public InvokeMethodActionToolBarButtonFactory(final CharSequence name,
+  public InvokeMethodActionToolBarButtonFactory(final CharSequence name, final Icon icon,
+    final boolean invokeLater, final Object object, final String methodName,
+    final Object... parameters) {
+    super(name, icon, invokeLater, object, methodName, parameters);
+  }
+
+  public InvokeMethodActionToolBarButtonFactory(final CharSequence name, final Icon icon,
     final Object object, final String methodName, final Object... parameters) {
+    super(name, icon, object, methodName, parameters);
+  }
+
+  public InvokeMethodActionToolBarButtonFactory(final CharSequence name, final Object object,
+    final String methodName, final Object... parameters) {
     super(name, object, methodName, parameters);
   }
 
-  public InvokeMethodActionToolBarButtonFactory(final Icon icon,
-    final boolean invokeLater, final Object object, final String methodName,
-    final Object... parameters) {
+  public InvokeMethodActionToolBarButtonFactory(final Icon icon, final boolean invokeLater,
+    final Object object, final String methodName, final Object... parameters) {
     super(icon, invokeLater, object, methodName, parameters);
   }
 
-  public InvokeMethodActionToolBarButtonFactory(final Icon icon,
-    final Object object, final String methodName, final Object... parameters) {
+  public InvokeMethodActionToolBarButtonFactory(final Icon icon, final Object object,
+    final String methodName, final Object... parameters) {
     super(icon, object, methodName, parameters);
   }
 

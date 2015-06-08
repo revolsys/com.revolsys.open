@@ -27,6 +27,9 @@ import org.apache.commons.jexl.context.HashMapContext;
 import com.revolsys.util.JexlUtil;
 
 public final class PhoneNumber {
+  /** The default country to use if one was not specified. */
+  private static Country defaultCountry = Country.getCountry("US");
+
   /**
    * Format the phone number using the format for the default country. If the
    * phone number does not match the specification for that country the first
@@ -71,9 +74,7 @@ public final class PhoneNumber {
    *          format.
    * @return The formatted phone number.
    */
-  public static String format(
-    final String phoneNumber,
-    final Country country,
+  public static String format(final String phoneNumber, final Country country,
     final boolean international) {
     String formattedNumber = null;
     if (phoneNumber == null) {
@@ -126,10 +127,7 @@ public final class PhoneNumber {
    * @param format The format specification.
    * @return The formatted phone number.
    */
-  public static String format(
-    final String phoneNumber,
-    final String regex,
-    final String format) {
+  public static String format(final String phoneNumber, final String regex, final String format) {
     if (phoneNumber != null && regex != null && format != null) {
       final Pattern pattern = Pattern.compile(regex);
       final Matcher matcher = pattern.matcher(phoneNumber);
@@ -142,16 +140,15 @@ public final class PhoneNumber {
         try {
           expression = JexlUtil.createExpression(format);
         } catch (final Exception e) {
-          throw new IllegalArgumentException(regex
-            + " is not a valid regular expression: " + e.getMessage());
+          throw new IllegalArgumentException(regex + " is not a valid regular expression: "
+            + e.getMessage());
         }
         final HashMapContext context = new HashMapContext();
         context.setVars(values);
         try {
           return (String)expression.evaluate(context);
         } catch (final Exception e) {
-          throw new IllegalArgumentException(format
-            + " is not a valid format: " + e.getMessage());
+          throw new IllegalArgumentException(format + " is not a valid format: " + e.getMessage());
         }
       }
     }
@@ -175,9 +172,6 @@ public final class PhoneNumber {
     }
     return phoneNumber;
   }
-
-  /** The default country to use if one was not specified. */
-  private static Country defaultCountry = Country.getCountry("US");
 
   /**
    * Construct a new PhoneNumber.

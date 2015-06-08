@@ -29,18 +29,17 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 
-public class EqualTypeAndLineEdgeCleanupVisitor extends
-AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
+public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Record>> implements
+  ObjectProcessor<RecordGraph> {
 
   /** Flag indicating that the edge has been processed. */
   private static final String EDGE_PROCESSED = EqualTypeAndLineEdgeCleanupVisitor.class.getName()
-      + ".processed";
+    + ".processed";
 
   private Statistics duplicateStatistics;
 
-  private Set<String> equalExcludeAttributes = new HashSet<String>(
-      Arrays.asList(RecordEquals.EXCLUDE_ID,
-        RecordEquals.EXCLUDE_GEOMETRY));
+  private Set<String> equalExcludeAttributes = new HashSet<String>(Arrays.asList(
+    RecordEquals.EXCLUDE_ID, RecordEquals.EXCLUDE_GEOMETRY));
 
   @PreDestroy
   public void destroy() {
@@ -50,8 +49,7 @@ AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
     this.duplicateStatistics = null;
   }
 
-  public boolean fixMissingZValues(final LineString line1,
-    final LineString line2) {
+  public boolean fixMissingZValues(final LineString line1, final LineString line2) {
     final LineString points1 = line1;
     final LineString points2 = line2;
     final int axisCount = points1.getAxisCount();
@@ -79,8 +77,8 @@ AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
     }
   }
 
-  public boolean fixZValues(final LineString points1, final int index1,
-    final LineString points2, final int index2) {
+  public boolean fixZValues(final LineString points1, final int index1, final LineString points2,
+    final int index2) {
     // TODO
     // final double z1 = points1.getZ(index2);
     // final double z2 = points2.getZ(index1);
@@ -134,13 +132,12 @@ AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
     graph.visitEdges(this);
   }
 
-  private void processEqualEdge(final Edge<Record> edge1,
-    final Edge<Record> edge2) {
+  private void processEqualEdge(final Edge<Record> edge1, final Edge<Record> edge2) {
     final Record object1 = edge1.getObject();
     final Record object2 = edge2.getObject();
 
-    final boolean equalAttributes = EqualsInstance.INSTANCE.equals(object1,
-      object2, this.equalExcludeAttributes);
+    final boolean equalAttributes = EqualsInstance.INSTANCE.equals(object1, object2,
+      this.equalExcludeAttributes);
 
     final LineString line1 = edge1.getLine();
     int compare = 0;
@@ -163,16 +160,14 @@ AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
           if (equalZ) {
             removeDuplicate(edge2, edge1);
           } else {
-            RecordLog.error(getClass(),
-              "Equal geometry with different coordinates or Z-values", object1);
+            RecordLog.error(getClass(), "Equal geometry with different coordinates or Z-values",
+              object1);
           }
         } else {
-          RecordLog.error(getClass(),
-            "Equal geometry with different attributes: ", object1);
+          RecordLog.error(getClass(), "Equal geometry with different attributes: ", object1);
         }
       } else {
-        RecordLog.error(getClass(),
-          "Equal geometry with different attributes: ", object1);
+        RecordLog.error(getClass(), "Equal geometry with different attributes: ", object1);
       }
     } else {
       removeDuplicate(edge2, edge1);
@@ -195,16 +190,14 @@ AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
     }
   }
 
-  protected void removeDuplicate(final Edge<Record> removeEdge,
-    final Edge<Record> keepEdge) {
+  protected void removeDuplicate(final Edge<Record> removeEdge, final Edge<Record> keepEdge) {
     removeEdge.remove();
     if (this.duplicateStatistics != null) {
       this.duplicateStatistics.add(removeEdge.getObject());
     }
   }
 
-  public void setEqualExcludeAttributes(
-    final Collection<String> equalExcludeAttributes) {
+  public void setEqualExcludeAttributes(final Collection<String> equalExcludeAttributes) {
     setEqualExcludeAttributes(new HashSet<String>(equalExcludeAttributes));
   }
 
@@ -223,8 +216,7 @@ AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
 
       final AndFilter<Edge<Record>> attributeAndGeometryFilter = new AndFilter<Edge<Record>>();
 
-      attributeAndGeometryFilter.addFilter(new EdgeTypeNameFilter<Record>(
-          typePath));
+      attributeAndGeometryFilter.addFilter(new EdgeTypeNameFilter<Record>(typePath));
 
       final Filter<Edge<Record>> filter = getFilter();
       if (filter != null) {
@@ -232,17 +224,15 @@ AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
       }
 
       final Filter<Record> equalLineFilter = new RecordGeometryFilter<LineString>(
-          new LineEqualIgnoreDirectionFilter(line, 2));
-      final EdgeObjectFilter<Record> edgeFilter = new EdgeObjectFilter<Record>(
-          equalLineFilter);
+        new LineEqualIgnoreDirectionFilter(line, 2));
+      final EdgeObjectFilter<Record> edgeFilter = new EdgeObjectFilter<Record>(equalLineFilter);
       attributeAndGeometryFilter.addFilter(edgeFilter);
 
       final List<Edge<Record>> equalEdges;
       if (getComparator() == null) {
         equalEdges = graph.getEdges(attributeAndGeometryFilter, line);
       } else {
-        equalEdges = graph.getEdges(attributeAndGeometryFilter,
-          getComparator(), line);
+        equalEdges = graph.getEdges(attributeAndGeometryFilter, getComparator(), line);
       }
       processEqualEdges(equalEdges);
     }

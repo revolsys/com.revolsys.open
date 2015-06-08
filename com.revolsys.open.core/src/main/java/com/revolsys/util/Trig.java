@@ -6,8 +6,7 @@ public class Trig {
     return Math.cos(angle) * length;
   }
 
-  public static double adjacent(final double value, final double angle,
-    final double length) {
+  public static double adjacent(final double value, final double angle, final double length) {
     return value + adjacent(angle, length);
   }
 
@@ -15,8 +14,7 @@ public class Trig {
     return Math.sin(angle) * length;
   }
 
-  public static double opposite(final double value, final double angle,
-    final double length) {
+  public static double opposite(final double value, final double angle, final double length) {
     return value + opposite(angle, length);
   }
 

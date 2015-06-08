@@ -9,6 +9,7 @@ public class LineStringVertex extends AbstractVertex {
    *
    */
   private static final long serialVersionUID = 1L;
+
   private int vertexIndex;
 
   public LineStringVertex(final LineString line, final int... vertexId) {

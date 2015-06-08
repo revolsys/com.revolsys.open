@@ -8,6 +8,7 @@ public class ObjectPropertyException extends ObjectException {
    *
    */
   private static final long serialVersionUID = 1L;
+
   private final String propertyName;
 
   public ObjectPropertyException(final Object object, final String propertyName) {
@@ -15,20 +16,20 @@ public class ObjectPropertyException extends ObjectException {
     this.propertyName = propertyName;
   }
 
-  public ObjectPropertyException(final Object object,
-    final String propertyName, final String message) {
+  public ObjectPropertyException(final Object object, final String propertyName,
+    final String message) {
     super(object, message);
     this.propertyName = propertyName;
   }
 
-  public ObjectPropertyException(final Object object,
-    final String propertyName, final String message, final Throwable cause) {
+  public ObjectPropertyException(final Object object, final String propertyName,
+    final String message, final Throwable cause) {
     super(object, message, cause);
     this.propertyName = propertyName;
   }
 
-  public ObjectPropertyException(final Object object,
-    final String propertyName, final Throwable cause) {
+  public ObjectPropertyException(final Object object, final String propertyName,
+    final Throwable cause) {
     super(object, cause);
     this.propertyName = propertyName;
   }

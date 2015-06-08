@@ -37,12 +37,10 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     }
     if (Property.hasValue(shortName) && shortNameProperty.isUseForSequence()) {
       final String schema = JdbcUtils.getSchemaName(typePath);
-      final String sequenceName = schema + "." + shortName.toUpperCase()
-          + "_SEQ";
+      final String sequenceName = schema + "." + shortName.toUpperCase() + "_SEQ";
       return sequenceName;
     } else {
-      final String tableName = JdbcUtils.getQualifiedTableName(typePath)
-          .toUpperCase();
+      final String tableName = JdbcUtils.getQualifiedTableName(typePath).toUpperCase();
       return tableName + "_SEQ";
     }
   }
@@ -92,8 +90,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     }
   }
 
-  public void writeAlterOwner(final String objectType, final String objectName,
-    final String owner) {
+  public void writeAlterOwner(final String objectType, final String objectName, final String owner) {
     final PrintWriter out = getOut();
     out.print("ALTER ");
     out.print(objectType);
@@ -196,8 +193,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       out.print("),");
       out.println("3005);");
 
-      final int geometryType = OracleSdoGeometryFieldAdder.getGeometryTypeId(
-        dataType, axisCount);
+      final int geometryType = OracleSdoGeometryFieldAdder.getGeometryTypeId(dataType, axisCount);
       out.print("INSERT INTO OGIS_GEOMETRY_COLUMNS(F_TABLE_SCHEMA,F_TABLE_NAME,F_GEOMETRY_COLUMN,G_TABLE_SCHEMA,G_TABLE_NAME,GEOMETRY_TYPE,COORD_DIMENSION,SRID) VALUES ('");
       out.print(schemaName.toUpperCase());
       out.print("', '");
@@ -220,8 +216,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
   }
 
   @Override
-  public void writeResetSequence(final RecordDefinition recordDefinition,
-    final List<Record> values) {
+  public void writeResetSequence(final RecordDefinition recordDefinition, final List<Record> values) {
     final PrintWriter out = getOut();
     Long nextValue = 0L;
     for (final Record object : values) {

@@ -31,8 +31,7 @@ public class BaseFrame extends JFrame implements WindowListener {
     this(title, true);
   }
 
-  public BaseFrame(final String title, final boolean iniaitlize)
-      throws HeadlessException {
+  public BaseFrame(final String title, final boolean iniaitlize) throws HeadlessException {
     super(title);
     if (iniaitlize) {
       init();

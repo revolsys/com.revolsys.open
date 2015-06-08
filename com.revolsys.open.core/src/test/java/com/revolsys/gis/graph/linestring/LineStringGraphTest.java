@@ -8,13 +8,10 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 
 public class LineStringGraphTest {
-  GeometryFactory geometryFactory = GeometryFactory.fixed(
-    3005, 1000.0);
+  GeometryFactory geometryFactory = GeometryFactory.fixed(3005, 1000.0);
 
-  public void checkLines(final List<LineString> actualLines,
-    final String... expectedLines) {
-    Assert.assertEquals("Number of lines", expectedLines.length,
-      actualLines.size());
+  public void checkLines(final List<LineString> actualLines, final String... expectedLines) {
+    Assert.assertEquals("Number of lines", expectedLines.length, actualLines.size());
     for (int i = 0; i < expectedLines.length; i++) {
       final LineString expectedLine = this.geometryFactory.geometry(expectedLines[i]);
       final LineString actualLine = actualLines.get(i);
@@ -26,8 +23,7 @@ public class LineStringGraphTest {
     final LineString line = this.geometryFactory.geometry("LINESTRING(844000 1343000,844010 1343000,844020 1343000,844010 1343000)");
     final LineStringGraph graph = new LineStringGraph(line);
     final List<LineString> lines = graph.getLines();
-    checkLines(lines,
-        "LINESTRING(844000 1343000,844010 1343000,844020 1343000)");
+    checkLines(lines, "LINESTRING(844000 1343000,844010 1343000,844020 1343000)");
   }
 
   public void testCleanupFigure8WithOverlap() {
@@ -35,12 +31,10 @@ public class LineStringGraphTest {
     final LineStringGraph graph = new LineStringGraph(line);
     graph.splitEdgesCloseToNodes();
     final List<LineString> lines = graph.getLines();
-    checkLines(
-      lines,
-      "LINESTRING(844000 1343000,844100 1343000)",
+    checkLines(lines, "LINESTRING(844000 1343000,844100 1343000)",
       "LINESTRING(844100 1343000,844200 1343000)",
       "LINESTRING(844200 1343000,844300 1343000,844300 1343100,844200 1343100,844200 1343000)",
-        "LINESTRING(844100 1343000,844100 1343100,844000 1343100,844000 1343000)");
+      "LINESTRING(844100 1343000,844100 1343100,844000 1343100,844000 1343000)");
   }
 
   public void testCleanupLoopSegmentOverlap() {
@@ -48,12 +42,10 @@ public class LineStringGraphTest {
     final LineStringGraph graph = new LineStringGraph(line);
     final List<LineString> lines = graph.getLines();
 
-    checkLines(
-      lines,
-      "LINESTRING(844000 1343000,844010 1343000)",
+    checkLines(lines, "LINESTRING(844000 1343000,844010 1343000)",
       "LINESTRING(844010 1343000,844020 1343000)",
       "LINESTRING(844020 1343000,844020 1343010,844010 1343010,844010 1343000)",
-        "LINESTRING(844020 1343000,844030 1343000)");
+      "LINESTRING(844020 1343000,844030 1343000)");
 
   }
 
@@ -61,8 +53,7 @@ public class LineStringGraphTest {
     final LineString line = this.geometryFactory.geometry("LINESTRING(844000 1343000,844010 1343000,844020 1343000,844010 1343000,844020 1343000,844030 1343000)");
     final LineStringGraph graph = new LineStringGraph(line);
     final List<LineString> lines = graph.getLines();
-    checkLines(lines,
-        "LINESTRING(844000 1343000,844010 1343000,844020 1343000,844030 1343000)");
+    checkLines(lines, "LINESTRING(844000 1343000,844010 1343000,844020 1343000,844030 1343000)");
 
   }
 
@@ -71,8 +62,7 @@ public class LineStringGraphTest {
     final LineStringGraph graph = new LineStringGraph(line);
     final List<LineString> lines = graph.getLines();
     checkLines(lines, "LINESTRING(844000 1343000,844010 1343000)",
-      "LINESTRING(844010 1343000,844010 1343010)",
-        "LINESTRING(844010 1343000,844100 1343000)");
+      "LINESTRING(844010 1343000,844010 1343010)", "LINESTRING(844010 1343000,844100 1343000)");
   }
 
   /**
@@ -85,10 +75,8 @@ public class LineStringGraphTest {
     lineGraph.splitEdgesCloseToNodes();
     lineGraph.splitCrossingEdges();
     final List<LineString> lines = lineGraph.getLines();
-    checkLines(
-      lines,
-      "LINESTRING(844100 1343000,844000 1343000)",
-        "LINESTRING(844100 1343000,844200 1343000,844200 1343100,844100 1343100,844100 1343000)");
+    checkLines(lines, "LINESTRING(844100 1343000,844000 1343000)",
+      "LINESTRING(844100 1343000,844200 1343000,844200 1343100,844100 1343100,844100 1343000)");
   }
 
   public void testCleanupSplitCrossingEdgesMiddle() {
@@ -96,11 +84,9 @@ public class LineStringGraphTest {
     final LineStringGraph graph = new LineStringGraph(line);
     graph.splitCrossingEdges();
     final List<LineString> lines = graph.getLines();
-    checkLines(
-      lines,
-      "LINESTRING(844000 1343000,844050 1343050)",
+    checkLines(lines, "LINESTRING(844000 1343000,844050 1343050)",
       "LINESTRING(844050 1343050,844100 1343100,844000 1343100,844050 1343050)",
-        "LINESTRING(844050 1343050,844100 1343000)");
+      "LINESTRING(844050 1343050,844100 1343000)");
   }
 
   public void testCleanupSplitEdgesCloseToNodes() {
@@ -108,10 +94,8 @@ public class LineStringGraphTest {
     final LineStringGraph graph = new LineStringGraph(line);
     graph.splitEdgesCloseToNodes();
     final List<LineString> lines = graph.getLines();
-    checkLines(
-      lines,
-      "LINESTRING(844000 1343000.001,844050 1343000.001)",
-        "LINESTRING(844050 1343000.001,844100 1343000,844100 1343010,844050 1343000.001)");
+    checkLines(lines, "LINESTRING(844000 1343000.001,844050 1343000.001)",
+      "LINESTRING(844050 1343000.001,844100 1343000,844100 1343010,844050 1343000.001)");
   }
 
   public void testCleanupStartOverlapWithPShapeAtEnd() {
@@ -119,10 +103,8 @@ public class LineStringGraphTest {
     final LineStringGraph graph = new LineStringGraph(line);
     graph.splitEdgesCloseToNodes();
     final List<LineString> lines = graph.getLines();
-    checkLines(
-      lines,
-      "LINESTRING(844000 1343000,844100 1343000)",
-        "LINESTRING(844100 1343000,844200 1343000,844200 1343100,844100 1343100,844100 1343000)");
+    checkLines(lines, "LINESTRING(844000 1343000,844100 1343000)",
+      "LINESTRING(844100 1343000,844200 1343000,844200 1343100,844100 1343100,844100 1343000)");
   }
 
   public void testCleanupWholeSegmentOverlap() {

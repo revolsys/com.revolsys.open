@@ -24,8 +24,7 @@ public class InvokeMethodEnableCheck extends AbstractEnableCheck {
     this(object, methodName, true);
   }
 
-  public InvokeMethodEnableCheck(final Object object, final String methodName,
-    final Object value) {
+  public InvokeMethodEnableCheck(final Object object, final String methodName, final Object value) {
     this(false, object, methodName, value);
   }
 

@@ -47,14 +47,16 @@ public class Plane3D {
    * Enums for the 3 coordinate planes
    */
   public static final int XY_PLANE = 1;
+
   public static final int YZ_PLANE = 2;
+
   public static final int XZ_PLANE = 3;
 
   private final Vector3D normal;
+
   private final Point basePt;
 
-  public Plane3D(final Vector3D normal, final Point basePt)
-  {
+  public Plane3D(final Vector3D normal, final Point basePt) {
     this.normal = normal;
     this.basePt = basePt;
   }

@@ -85,8 +85,8 @@ public class Label {
    * Construct a Label with On, Left and Right locations for both Geometries.
    * Initialize the locations for the given Geometry index.
    */
-  public Label(final int geomIndex, final Location onLoc,
-    final Location leftLoc, final Location rightLoc) {
+  public Label(final int geomIndex, final Location onLoc, final Location leftLoc,
+    final Location rightLoc) {
     this.elt[0] = new TopologyLocation(Location.NONE, Location.NONE, Location.NONE);
     this.elt[1] = new TopologyLocation(Location.NONE, Location.NONE, Location.NONE);
     this.elt[geomIndex].setLocations(onLoc, leftLoc, rightLoc);
@@ -113,8 +113,7 @@ public class Label {
    * Construct a Label with On, Left and Right locations for both Geometries.
    * Initialize the locations for both Geometries to the given values.
    */
-  public Label(final Location onLoc, final Location leftLoc,
-    final Location rightLoc) {
+  public Label(final Location onLoc, final Location leftLoc, final Location rightLoc) {
     this.elt[0] = new TopologyLocation(onLoc, leftLoc, rightLoc);
     this.elt[1] = new TopologyLocation(onLoc, leftLoc, rightLoc);
   }
@@ -165,7 +164,7 @@ public class Label {
 
   public boolean isEqualOnSide(final Label lbl, final int side) {
     return this.elt[0].isEqualOnSide(lbl.elt[0], side)
-        && this.elt[1].isEqualOnSide(lbl.elt[1], side);
+      && this.elt[1].isEqualOnSide(lbl.elt[1], side);
   }
 
   public boolean isLine(final int geomIndex) {
@@ -203,8 +202,7 @@ public class Label {
     setAllLocationsIfNull(1, location);
   }
 
-  public void setLocation(final int geomIndex, final int posIndex,
-    final Location location) {
+  public void setLocation(final int geomIndex, final int posIndex, final Location location) {
     this.elt[geomIndex].setLocation(posIndex, location);
   }
 

@@ -19,8 +19,7 @@ public class MultiPolygonVertex extends AbstractVertex {
 
   private int ringIndex;
 
-  public MultiPolygonVertex(final MultiPolygon multiPolygon,
-    final int... vertexId) {
+  public MultiPolygonVertex(final MultiPolygon multiPolygon, final int... vertexId) {
     super(multiPolygon);
     setVertexId(vertexId);
   }
@@ -45,8 +44,8 @@ public class MultiPolygonVertex extends AbstractVertex {
         newVertexIndex -= ring.getVertexCount();
       }
       if (newVertexIndex < ring.getVertexCount() - 1) {
-        return new MultiPolygonVertex(getMultiPolygon(), this.partIndex,
-          this.ringIndex, newVertexIndex);
+        return new MultiPolygonVertex(getMultiPolygon(), this.partIndex, this.ringIndex,
+          newVertexIndex);
       }
     }
     return null;
@@ -61,8 +60,8 @@ public class MultiPolygonVertex extends AbstractVertex {
         newVertexIndex = ring.getVertexCount() - 2;
       }
       if (newVertexIndex >= 0) {
-        return new MultiPolygonVertex(getMultiPolygon(), this.partIndex,
-          this.ringIndex, newVertexIndex);
+        return new MultiPolygonVertex(getMultiPolygon(), this.partIndex, this.ringIndex,
+          newVertexIndex);
       }
     }
     return null;

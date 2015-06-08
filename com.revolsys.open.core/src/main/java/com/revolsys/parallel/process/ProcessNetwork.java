@@ -25,7 +25,7 @@ import com.revolsys.spring.TargetBeanFactoryBean;
 import com.revolsys.spring.TargetBeanProcess;
 
 public class ProcessNetwork implements BeanPostProcessor,
-ApplicationListener<ContextRefreshedEvent> {
+  ApplicationListener<ContextRefreshedEvent> {
 
   public static void startAndWait(final Process... processes) {
     final ProcessNetwork processNetwork = new ProcessNetwork(processes);
@@ -131,8 +131,8 @@ ApplicationListener<ContextRefreshedEvent> {
   }
 
   @Override
-  public Object postProcessAfterInitialization(final Object bean,
-    final String beanName) throws BeansException {
+  public Object postProcessAfterInitialization(final Object bean, final String beanName)
+    throws BeansException {
     if (this.parent == null) {
       if (bean instanceof TargetBeanFactoryBean) {
         final TargetBeanFactoryBean targetBean = (TargetBeanFactoryBean)bean;
@@ -179,8 +179,8 @@ ApplicationListener<ContextRefreshedEvent> {
   }
 
   @Override
-  public Object postProcessBeforeInitialization(final Object bean,
-    final String beanName) throws BeansException {
+  public Object postProcessBeforeInitialization(final Object bean, final String beanName)
+    throws BeansException {
     return bean;
   }
 
@@ -228,8 +228,7 @@ ApplicationListener<ContextRefreshedEvent> {
       synchronized (this.sync) {
         this.running = true;
         if (this.processes != null) {
-          for (final Process process : new ArrayList<Process>(
-              this.processes.keySet())) {
+          for (final Process process : new ArrayList<Process>(this.processes.keySet())) {
             process.setProcessNetwork(this);
             start(process);
           }
@@ -253,8 +252,7 @@ ApplicationListener<ContextRefreshedEvent> {
           }
           final Runnable runnable = new ProcessRunnable(this, runProcess);
           final String name = runProcess.toString();
-          final Runnable appenderRunnable = new ThreadLocalAppenderRunnable(
-            runnable);
+          final Runnable appenderRunnable = new ThreadLocalAppenderRunnable(runnable);
           thread = new Thread(this.threadGroup, appenderRunnable, name);
           this.processes.put(runProcess, thread);
           if (!thread.isAlive()) {
@@ -288,8 +286,7 @@ ApplicationListener<ContextRefreshedEvent> {
       while (!threads.isEmpty() && System.currentTimeMillis() < maxWait) {
         for (final Iterator<Thread> threadIter = threads.iterator(); threadIter.hasNext();) {
           final Thread thread = threadIter.next();
-          if (thread == null || !thread.isAlive()
-              || Thread.currentThread() == thread) {
+          if (thread == null || !thread.isAlive() || Thread.currentThread() == thread) {
             threadIter.remove();
           } else {
             try {

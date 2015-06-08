@@ -45,8 +45,7 @@ public class FilterableTableView extends ElementContainer {
     this.cssClass = cssClass;
   }
 
-  public FilterableTableView(final KeySerializerTableSerializer model,
-    final String cssClass) {
+  public FilterableTableView(final KeySerializerTableSerializer model, final String cssClass) {
     this.model = model;
     this.cssClass = cssClass;
   }
@@ -61,8 +60,8 @@ public class FilterableTableView extends ElementContainer {
   @Override
   public void initialize(final HttpServletRequest request) {
     if (this.searchFields != null) {
-      final ElementContainer searchContainer = new ElementContainer(
-        new TableBodyLayout("search", this.model.getColumnCount()));
+      final ElementContainer searchContainer = new ElementContainer(new TableBodyLayout("search",
+        this.model.getColumnCount()));
       add(searchContainer);
       for (final KeySerializer serializer : this.model.getSerializers()) {
         final String name = serializer.getName();
@@ -126,10 +125,7 @@ public class FilterableTableView extends ElementContainer {
     }
   }
 
-  protected void serializeFooterRow(
-    final XmlWriter out,
-    final int row,
-    final int rowCount) {
+  protected void serializeFooterRow(final XmlWriter out, final int row, final int rowCount) {
     final int colCount = this.model.getColumnCount();
     out.startTag(HtmlUtil.TR);
     String rowCss = "";
@@ -186,10 +182,7 @@ public class FilterableTableView extends ElementContainer {
     out.endTag(HtmlUtil.THEAD);
   }
 
-  protected void serializeRow(
-    final XmlWriter out,
-    final int row,
-    final int rowCount) {
+  protected void serializeRow(final XmlWriter out, final int row, final int rowCount) {
     final int colCount = this.model.getColumnCount();
     out.startTag(HtmlUtil.TR);
     String rowCss = "";

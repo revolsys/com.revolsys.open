@@ -50,8 +50,7 @@ public class ExtensionFilenameFilter implements FilenameFilter, FileFilter {
    * @param extensions The file extensions.
    * @param readOnly Flag indicating if the filter can be modified.
    */
-  public ExtensionFilenameFilter(final boolean readOnly,
-    final String... extensions) {
+  public ExtensionFilenameFilter(final boolean readOnly, final String... extensions) {
     this(Arrays.asList(extensions), readOnly);
   }
 
@@ -70,8 +69,7 @@ public class ExtensionFilenameFilter implements FilenameFilter, FileFilter {
    * @param extensions The file extensions.
    * @param readOnly Flag indicating if the filter can be modified.
    */
-  public ExtensionFilenameFilter(final Collection<String> extensions,
-    final boolean readOnly) {
+  public ExtensionFilenameFilter(final Collection<String> extensions, final boolean readOnly) {
     addExtensions(extensions);
     this.readOnly = readOnly;
   }

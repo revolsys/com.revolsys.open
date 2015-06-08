@@ -28,22 +28,26 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.vertex.Vertex;
 
 public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
-  public static boolean canMergeObjects(final Point point,
-    final Record object1, final Record object2) {
+  public static final String PROPERTY_NAME = DirectionalAttributes.class.getName()
+    + ".propertyName";
+
+  private static final Logger LOG = LoggerFactory.getLogger(DirectionalAttributes.class);
+
+  public static boolean canMergeObjects(final Point point, final Record object1,
+    final Record object2) {
     final Set<String> excludes = Collections.emptySet();
     final DirectionalAttributes property = DirectionalAttributes.getProperty(object1);
     return property.canMerge(point, object1, object2, excludes);
   }
 
-  public static boolean canMergeObjects(final Point point,
-    final Record object1, final Record object2,
-    final Set<String> equalExcludeAttributes) {
+  public static boolean canMergeObjects(final Point point, final Record object1,
+    final Record object2, final Set<String> equalExcludeAttributes) {
     final DirectionalAttributes property = DirectionalAttributes.getProperty(object1);
     return property.canMerge(point, object1, object2, equalExcludeAttributes);
   }
 
-  public static void edgeSplitAttributes(final LineString line,
-    final Point point, final List<Edge<Record>> edges) {
+  public static void edgeSplitAttributes(final LineString line, final Point point,
+    final List<Edge<Record>> edges) {
     if (!edges.isEmpty()) {
       final Edge<Record> firstEdge = edges.get(0);
       final Record object = firstEdge.getObject();
@@ -57,18 +61,16 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     return equalsObjects(object1, object2, excludes);
   }
 
-  public static boolean equalsObjects(final Record object1,
-    final Record object2, final Collection<String> equalExcludeAttributes) {
+  public static boolean equalsObjects(final Record object1, final Record object2,
+    final Collection<String> equalExcludeAttributes) {
     final DirectionalAttributes property = DirectionalAttributes.getProperty(object1);
     return property.equals(object1, object2, equalExcludeAttributes);
   }
 
-  public static Set<String> getCantMergeAttributesObjects(final Point point,
-    final Record object1, final Record object2,
-    final Set<String> equalExcludeAttributes) {
+  public static Set<String> getCantMergeAttributesObjects(final Point point, final Record object1,
+    final Record object2, final Set<String> equalExcludeAttributes) {
     final DirectionalAttributes property = DirectionalAttributes.getProperty(object1);
-    return property.getCantMergeAttributes(point, object1, object2,
-      equalExcludeAttributes);
+    return property.getCantMergeAttributes(point, object1, object2, equalExcludeAttributes);
   }
 
   public static DirectionalAttributes getProperty(final Record object) {
@@ -76,8 +78,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     return getProperty(recordDefinition);
   }
 
-  public static DirectionalAttributes getProperty(
-    final RecordDefinition recordDefinition) {
+  public static DirectionalAttributes getProperty(final RecordDefinition recordDefinition) {
     DirectionalAttributes property = recordDefinition.getProperty(PROPERTY_NAME);
     if (property == null) {
       property = new DirectionalAttributes();
@@ -97,8 +98,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     return recordDefinition.getProperty(PROPERTY_NAME) != null;
   }
 
-  public static Record merge(final Point point, final Record object1,
-    final Record object2) {
+  public static Record merge(final Point point, final Record object1, final Record object2) {
     final DirectionalAttributes property = DirectionalAttributes.getProperty(object1);
     return property.getMergedObject(point, object1, object2);
   }
@@ -108,8 +108,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     return property.getMergedObject(object1, object2);
   }
 
-  public static Record mergeLongest(final Point point, final Record object1,
-    final Record object2) {
+  public static Record mergeLongest(final Point point, final Record object1, final Record object2) {
     final DirectionalAttributes property = DirectionalAttributes.getProperty(object1);
     return property.getMergedObjectReverseLongest(point, object1, object2);
   }
@@ -123,11 +122,6 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     final DirectionalAttributes property = getProperty(object);
     property.reverseAttributesAndGeometry(object);
   }
-
-  public static final String PROPERTY_NAME = DirectionalAttributes.class.getName()
-      + ".propertyName";
-
-  private static final Logger LOG = LoggerFactory.getLogger(DirectionalAttributes.class);
 
   private final Map<String, String> endFieldNamePairs = new HashMap<String, String>();
 
@@ -161,26 +155,21 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
   }
 
   public void addEndAndSideAttributePairs(final String startLeftFieldName,
-    final String startRightFieldName, final String endLeftFieldName,
-    final String endRightFieldName) {
-    this.endAndSideFieldNamePairs.add(Arrays.asList(startLeftFieldName,
-      startRightFieldName, endLeftFieldName, endRightFieldName));
+    final String startRightFieldName, final String endLeftFieldName, final String endRightFieldName) {
+    this.endAndSideFieldNamePairs.add(Arrays.asList(startLeftFieldName, startRightFieldName,
+      endLeftFieldName, endRightFieldName));
     addEndAttributePairInternal(startLeftFieldName, endLeftFieldName);
     addEndAttributePairInternal(startRightFieldName, endRightFieldName);
-    addFieldNamePair(this.reverseFieldNameMap, startLeftFieldName,
-      endRightFieldName);
-    addFieldNamePair(this.reverseFieldNameMap, endLeftFieldName,
-      startRightFieldName);
+    addFieldNamePair(this.reverseFieldNameMap, startLeftFieldName, endRightFieldName);
+    addFieldNamePair(this.reverseFieldNameMap, endLeftFieldName, startRightFieldName);
   }
 
-  public void addEndAttributePair(final String startFieldName,
-    final String endFieldName) {
+  public void addEndAttributePair(final String startFieldName, final String endFieldName) {
     addEndAttributePairInternal(startFieldName, endFieldName);
     addFieldNamePair(this.reverseFieldNameMap, startFieldName, endFieldName);
   }
 
-  private void addEndAttributePairInternal(final String startFieldName,
-    final String endFieldName) {
+  private void addEndAttributePairInternal(final String startFieldName, final String endFieldName) {
     addFieldNamePair(this.endFieldNamePairs, startFieldName, endFieldName);
     this.startFieldNames.add(startFieldName);
     this.endFieldNames.add(endFieldName);
@@ -194,8 +183,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
    * @param fromFieldName The from attribute name.
    * @param toFieldName The to attribute name.
    */
-  private void addFieldNamePair(final Map<String, String> namePairs,
-    final String fromFieldName, final String toFieldName) {
+  private void addFieldNamePair(final Map<String, String> namePairs, final String fromFieldName,
+    final String toFieldName) {
     final String fromPair = namePairs.get(fromFieldName);
     if (fromPair == null) {
       final String toPair = namePairs.get(toFieldName);
@@ -203,47 +192,43 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
         namePairs.put(fromFieldName, toFieldName);
         namePairs.put(toFieldName, fromFieldName);
       } else if (toPair.equals(fromFieldName)) {
-        throw new IllegalArgumentException("Cannot override mapping "
-            + toFieldName + "=" + toPair + " to " + fromFieldName);
+        throw new IllegalArgumentException("Cannot override mapping " + toFieldName + "=" + toPair
+          + " to " + fromFieldName);
       }
     } else if (fromPair.equals(toFieldName)) {
-      throw new IllegalArgumentException("Cannot override mapping "
-          + fromFieldName + "=" + fromPair + " to " + toFieldName);
+      throw new IllegalArgumentException("Cannot override mapping " + fromFieldName + "="
+        + fromPair + " to " + toFieldName);
     }
   }
 
-  public void addSideAttributePair(final String leftFieldName,
-    final String rightFieldName) {
+  public void addSideAttributePair(final String leftFieldName, final String rightFieldName) {
     addFieldNamePair(this.sideFieldNamePairs, leftFieldName, rightFieldName);
     this.sideFieldNames.add(leftFieldName);
     this.sideFieldNames.add(rightFieldName);
     addFieldNamePair(this.reverseFieldNameMap, leftFieldName, rightFieldName);
   }
 
-  protected void addValue(final Map<Object, Object> map, final Object key,
-    final Object value) {
+  protected void addValue(final Map<Object, Object> map, final Object key, final Object value) {
     final Object oldValue = map.get(key);
     if (oldValue != null && !oldValue.equals(value)) {
-      throw new IllegalArgumentException("Cannot override mapping " + key + "="
-          + oldValue + " with " + value);
+      throw new IllegalArgumentException("Cannot override mapping " + key + "=" + oldValue
+        + " with " + value);
     }
     map.put(key, value);
   }
 
-  public boolean canMerge(final Point point, final Record object1,
-    final Record object2, final Collection<String> equalExcludeAttributes) {
-    final boolean[] forwardsIndicators = getForwardsIndicators(point, object1,
-      object2);
+  public boolean canMerge(final Point point, final Record object1, final Record object2,
+    final Collection<String> equalExcludeAttributes) {
+    final boolean[] forwardsIndicators = getForwardsIndicators(point, object1, object2);
 
     if (forwardsIndicators != null) {
       final RecordDefinition recordDefinition = getRecordDefinition();
       final EqualIgnoreAttributes equalIgnore = EqualIgnoreAttributes.getProperty(recordDefinition);
       for (final String fieldName : recordDefinition.getFieldNames()) {
-        if (!RecordEquals.isFieldIgnored(recordDefinition,
-          equalExcludeAttributes, fieldName)
+        if (!RecordEquals.isFieldIgnored(recordDefinition, equalExcludeAttributes, fieldName)
           && !equalIgnore.isFieldIgnored(fieldName)) {
-          if (!canMerge(fieldName, point, object1, object2,
-            equalExcludeAttributes, forwardsIndicators)) {
+          if (!canMerge(fieldName, point, object1, object2, equalExcludeAttributes,
+            forwardsIndicators)) {
             return false;
           }
         }
@@ -254,9 +239,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     }
   }
 
-  public boolean canMerge(final String fieldName, final Point point,
-    final Record object1, final Record object2,
-    final Collection<String> equalExcludeAttributes,
+  public boolean canMerge(final String fieldName, final Point point, final Record object1,
+    final Record object2, final Collection<String> equalExcludeAttributes,
     final boolean[] forwardsIndicators) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (fieldName.equals(recordDefinition.getGeometryFieldName())) {
@@ -273,13 +257,12 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
         if (line1Forwards != line2Forwards) {
           final Object value1 = object1.getValue(fieldName);
           final Object value2 = getDirectionalAttributeValue(object2, fieldName);
-          if (EqualsInstance.INSTANCE.equals(value1, value2,
-            equalExcludeAttributes)) {
+          if (EqualsInstance.INSTANCE.equals(value1, value2, equalExcludeAttributes)) {
             return true;
           } else {
             if (LOG.isDebugEnabled()) {
-              LOG.debug("Different values (" + fieldName + "=" + value1
-                + ") != (" + fieldName + " = " + value2 + ")");
+              LOG.debug("Different values (" + fieldName + "=" + value1 + ") != (" + fieldName
+                + " = " + value2 + ")");
               LOG.debug(object1.toString());
               LOG.debug(object2.toString());
             }
@@ -287,40 +270,36 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
           }
         }
       } else if (isStartAttribute(fieldName)) {
-        return canMergeStartAttribute(fieldName, object1, line1Forwards,
-          object2, line2Forwards, equalExcludeAttributes);
+        return canMergeStartAttribute(fieldName, object1, line1Forwards, object2, line2Forwards,
+          equalExcludeAttributes);
       } else if (isEndAttribute(fieldName)) {
-        return canMergeEndAttribute(fieldName, object1, line1Forwards, object2,
-          line2Forwards, equalExcludeAttributes);
+        return canMergeEndAttribute(fieldName, object1, line1Forwards, object2, line2Forwards,
+          equalExcludeAttributes);
       } else if (isSideAttribute(fieldName)) {
         if (line1Forwards != line2Forwards) {
           final String oppositeFieldName = getSideAttributePair(fieldName);
           if (oppositeFieldName == null) { // only check the pair once
             return true;
           } else {
-            return equals(object1, fieldName, object2, oppositeFieldName,
-              equalExcludeAttributes);
+            return equals(object1, fieldName, object2, oppositeFieldName, equalExcludeAttributes);
           }
         }
       }
-      return equals(object1, fieldName, object2, fieldName,
-        equalExcludeAttributes);
+      return equals(object1, fieldName, object2, fieldName, equalExcludeAttributes);
     }
   }
 
-  protected boolean canMergeEndAttribute(final String endFieldName,
-    final Record object1, final boolean line1Forwards, final Record object2,
-    final boolean line2Forwards, final Collection<String> equalExcludeAttributes) {
+  protected boolean canMergeEndAttribute(final String endFieldName, final Record object1,
+    final boolean line1Forwards, final Record object2, final boolean line2Forwards,
+    final Collection<String> equalExcludeAttributes) {
     final String startFieldName = this.endFieldNamePairs.get(endFieldName);
     if (line1Forwards) {
       if (line2Forwards) {
         // -->*--> true true
-        return isNull(object1, endFieldName, object2, startFieldName,
-          equalExcludeAttributes);
+        return isNull(object1, endFieldName, object2, startFieldName, equalExcludeAttributes);
       } else {
         // -->*<-- true false
-        return isNull(object1, endFieldName, object2, endFieldName,
-          equalExcludeAttributes);
+        return isNull(object1, endFieldName, object2, endFieldName, equalExcludeAttributes);
       }
     } else {
       if (line2Forwards) {
@@ -328,21 +307,19 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
         return true;
       } else {
         // <--*<-- false false
-        return isNull(object1, startFieldName, object2, endFieldName,
-          equalExcludeAttributes);
+        return isNull(object1, startFieldName, object2, endFieldName, equalExcludeAttributes);
       }
     }
   }
 
-  protected boolean canMergeStartAttribute(final String startFieldName,
-    final Record object1, final boolean line1Forwards, final Record object2,
-    final boolean line2Forwards, final Collection<String> equalExcludeAttributes) {
+  protected boolean canMergeStartAttribute(final String startFieldName, final Record object1,
+    final boolean line1Forwards, final Record object2, final boolean line2Forwards,
+    final Collection<String> equalExcludeAttributes) {
     final String endFieldName = this.endFieldNamePairs.get(startFieldName);
     if (line1Forwards) {
       if (line2Forwards) {
         // -->*--> true true
-        return isNull(object1, endFieldName, object2, startFieldName,
-          equalExcludeAttributes);
+        return isNull(object1, endFieldName, object2, startFieldName, equalExcludeAttributes);
       } else {
         // -->*<-- true false
         return true;
@@ -350,12 +327,10 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     } else {
       if (line2Forwards) {
         // <--*--> false true
-        return isNull(object1, startFieldName, object2, startFieldName,
-          equalExcludeAttributes);
+        return isNull(object1, startFieldName, object2, startFieldName, equalExcludeAttributes);
       } else {
         // <--*<-- false false
-        return isNull(object1, startFieldName, object2, endFieldName,
-          equalExcludeAttributes);
+        return isNull(object1, startFieldName, object2, endFieldName, equalExcludeAttributes);
       }
     }
   }
@@ -377,8 +352,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     final RecordDefinition recordDefinition = getRecordDefinition();
     final EqualIgnoreAttributes equalIgnore = EqualIgnoreAttributes.getProperty(recordDefinition);
     for (final String fieldName : recordDefinition.getFieldNames()) {
-      if (!equalExcludeAttributes.contains(fieldName)
-          && !equalIgnore.isFieldIgnored(fieldName)) {
+      if (!equalExcludeAttributes.contains(fieldName) && !equalIgnore.isFieldIgnored(fieldName)) {
         if (!equals(fieldName, object1, object2, equalExcludeAttributes)) {
           return false;
         }
@@ -387,17 +361,16 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     return true;
   }
 
-  protected boolean equals(final Record object1, final String name1,
-    final Record object2, final String name2,
-    final Collection<String> equalExcludeAttributes) {
+  protected boolean equals(final Record object1, final String name1, final Record object2,
+    final String name2, final Collection<String> equalExcludeAttributes) {
     final Object value1 = object1.getValue(name1);
     final Object value2 = object2.getValue(name2);
     if (EqualsInstance.INSTANCE.equals(value1, value2, equalExcludeAttributes)) {
       return true;
     } else {
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Different values (" + name1 + "=" + value1 + ") != ("
-            + name2 + " = " + value2 + ")");
+        LOG.debug("Different values (" + name1 + "=" + value1 + ") != (" + name2 + " = " + value2
+          + ")");
         LOG.debug(object1.toString());
         LOG.debug(object2.toString());
       }
@@ -405,8 +378,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     }
   }
 
-  protected boolean equals(final String fieldName, final Record object1,
-    final Record object2, final Collection<String> equalExcludeAttributes) {
+  protected boolean equals(final String fieldName, final Record object1, final Record object2,
+    final Collection<String> equalExcludeAttributes) {
     final LineString line1 = object1.getGeometryValue();
     final LineString line2 = object2.getGeometryValue();
     final RecordDefinition recordDefinition = getRecordDefinition();
@@ -427,13 +400,12 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     if (reverseEquals) {
       return equalsReverse(fieldName, object1, object2, equalExcludeAttributes);
     } else {
-      return equals(object1, fieldName, object2, fieldName,
-        equalExcludeAttributes);
+      return equals(object1, fieldName, object2, fieldName, equalExcludeAttributes);
     }
   }
 
-  private boolean equalsReverse(final String fieldName, final Record object1,
-    final Record object2, final Collection<String> equalExcludeAttributes) {
+  private boolean equalsReverse(final String fieldName, final Record object1, final Record object2,
+    final Collection<String> equalExcludeAttributes) {
     if (hasDirectionalAttributeValues(fieldName)) {
       final Object value1 = object1.getValue(fieldName);
       final Object value2 = getDirectionalAttributeValue(object2, fieldName);
@@ -441,8 +413,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
         return true;
       } else {
         if (LOG.isDebugEnabled()) {
-          LOG.debug("Different values (" + fieldName + "=" + value1 + ") != ("
-              + fieldName + " = " + value2 + ")");
+          LOG.debug("Different values (" + fieldName + "=" + value1 + ") != (" + fieldName + " = "
+            + value2 + ")");
           LOG.debug(object1.toString());
           LOG.debug(object2.toString());
         }
@@ -451,29 +423,24 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     } else {
       final String reverseFieldName = getReverseFieldName(fieldName);
       if (reverseFieldName == null) {
-        return equals(object1, fieldName, object2, fieldName,
-          equalExcludeAttributes);
+        return equals(object1, fieldName, object2, fieldName, equalExcludeAttributes);
       } else {
-        return equals(object1, fieldName, object2, reverseFieldName,
-          equalExcludeAttributes);
+        return equals(object1, fieldName, object2, reverseFieldName, equalExcludeAttributes);
       }
     }
   }
 
-  public Set<String> getCantMergeAttributes(final Point point,
-    final Record object1, final Record object2,
-    final Collection<String> equalExcludeAttributes) {
+  public Set<String> getCantMergeAttributes(final Point point, final Record object1,
+    final Record object2, final Collection<String> equalExcludeAttributes) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    final boolean[] forwardsIndicators = getForwardsIndicators(point, object1,
-      object2);
+    final boolean[] forwardsIndicators = getForwardsIndicators(point, object1, object2);
     if (forwardsIndicators != null) {
       final Set<String> fieldNames = new LinkedHashSet<String>();
       final EqualIgnoreAttributes equalIgnore = EqualIgnoreAttributes.getProperty(recordDefinition);
       for (final String fieldName : recordDefinition.getFieldNames()) {
-        if (!equalExcludeAttributes.contains(fieldName)
-            && !equalIgnore.isFieldIgnored(fieldName)) {
-          if (!canMerge(fieldName, point, object1, object2,
-            equalExcludeAttributes, forwardsIndicators)) {
+        if (!equalExcludeAttributes.contains(fieldName) && !equalIgnore.isFieldIgnored(fieldName)) {
+          if (!canMerge(fieldName, point, object1, object2, equalExcludeAttributes,
+            forwardsIndicators)) {
             fieldNames.add(fieldName);
           }
         }
@@ -485,8 +452,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     }
   }
 
-  protected Object getDirectionalAttributeValue(
-    final Map<String, ? extends Object> object, final String fieldName) {
+  protected Object getDirectionalAttributeValue(final Map<String, ? extends Object> object,
+    final String fieldName) {
     final Object value = object.get(fieldName);
 
     final Map<Object, Object> valueMap = this.directionalAttributeValues.get(fieldName);
@@ -515,8 +482,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     return this.endFieldNames;
   }
 
-  protected boolean[] getForwardsIndicators(final Point point,
-    final Record object1, final Record object2) {
+  protected boolean[] getForwardsIndicators(final Point point, final Record object1,
+    final Record object2) {
     final LineString line1 = object1.getGeometryValue();
     final LineString line2 = object2.getGeometryValue();
 
@@ -529,17 +496,16 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
       forwards[0] = false;
       forwards[1] = true;
     } else if (line1.equalsVertex(2, vertexCount1 - 1, line2, vertexCount2 - 1)
-        && line1.equalsVertex(2, lastPointIndex1, point)) {
+      && line1.equalsVertex(2, lastPointIndex1, point)) {
       // -->*<-- true false
       forwards[0] = true;
       forwards[1] = false;
     } else if (line1.equalsVertex(2, vertexCount1 - 1, line2, 0)
-        && line1.equalsVertex(2, lastPointIndex1, point)) {
+      && line1.equalsVertex(2, lastPointIndex1, point)) {
       // -->*--> true true
       forwards[0] = true;
       forwards[1] = true;
-    } else if (line1.equalsVertex(2, 0, line2, vertexCount2 - 1)
-        && line1.equalsVertex(2, 0, point)) {
+    } else if (line1.equalsVertex(2, 0, line2, vertexCount2 - 1) && line1.equalsVertex(2, 0, point)) {
       // <--*<-- false false
       forwards[0] = false;
       forwards[1] = false;
@@ -549,8 +515,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     return forwards;
   }
 
-  public Map<String, Object> getMergedMap(final Point point,
-    final Record object1, Record object2) {
+  public Map<String, Object> getMergedMap(final Point point, final Record object1, Record object2) {
     final LineString line1 = object1.getGeometryValue();
     LineString line2 = object2.getGeometryValue();
 
@@ -589,8 +554,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
       }
     }
 
-    final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
-        object1);
+    final Map<String, Object> newValues = new LinkedHashMap<String, Object>(object1);
     setStartAttributes(startObject, newValues);
     setEndAttributes(endObject, newValues);
     final RecordDefinition recordDefinition = object1.getRecordDefinition();
@@ -608,8 +572,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
    * @param object2
    * @return
    */
-  public Record getMergedObject(final Point point, final Record object1,
-    Record object2) {
+  public Record getMergedObject(final Point point, final Record object1, Record object2) {
     final LineString line1 = object1.getGeometryValue();
     LineString line2 = object2.getGeometryValue();
 
@@ -628,19 +591,18 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
       endObject = object1;
       newLine = line1.merge(point, line2);
     } else if (line1.equalsVertex(2, lastPoint1, line2, lastPoint2)
-        && line1.equalsVertex(2, lastPoint1, point)) {
+      && line1.equalsVertex(2, lastPoint1, point)) {
       object2 = getReverse(object2);
       line2 = object2.getGeometryValue();
       startObject = object1;
       endObject = object2;
       newLine = line1.merge(point, line2);
     } else if (line1.equalsVertex(2, lastPoint1, line2, 0)
-        && line1.equalsVertex(2, lastPoint1, point)) {
+      && line1.equalsVertex(2, lastPoint1, point)) {
       startObject = object1;
       endObject = object2;
       newLine = line1.merge(point, line2);
-    } else if (line1.equalsVertex(2, 0, line2, lastPoint2)
-        && line1.equalsVertex(2, 0, point)) {
+    } else if (line1.equalsVertex(2, 0, line2, lastPoint2) && line1.equalsVertex(2, 0, point)) {
       startObject = object2;
       endObject = object1;
       newLine = line2.merge(point, line1);
@@ -717,8 +679,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     return newObject;
   }
 
-  public Record getMergedObjectReverseLongest(final Point point,
-    final Record object1, final Record object2) {
+  public Record getMergedObjectReverseLongest(final Point point, final Record object1,
+    final Record object2) {
     final LineString line1 = object1.getGeometryValue();
     final LineString line2 = object2.getGeometryValue();
     if (line1.getLength() >= line2.getLength()) {
@@ -737,8 +699,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
    * @param object2
    * @return
    */
-  public Record getMergedObjectReverseLongest(final Record object1,
-    final Record object2) {
+  public Record getMergedObjectReverseLongest(final Record object1, final Record object2) {
     final LineString line1 = object1.getGeometryValue();
     final LineString line2 = object2.getGeometryValue();
     if (line1.getLength() >= line2.getLength()) {
@@ -759,10 +720,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     return reverse;
   }
 
-  public Map<String, Object> getReverseAttributes(
-    final Map<String, Object> object) {
-    final Map<String, Object> reverse = new LinkedHashMap<String, Object>(
-        object);
+  public Map<String, Object> getReverseAttributes(final Map<String, Object> object) {
+    final Map<String, Object> reverse = new LinkedHashMap<String, Object>(object);
     for (final Entry<String, String> pair : this.reverseFieldNameMap.entrySet()) {
       final String fromFieldName = pair.getKey();
       final String toFieldName = pair.getValue();
@@ -776,8 +735,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     return reverse;
   }
 
-  public Map<String, Object> getReverseAttributesAndGeometry(
-    final Map<String, Object> object) {
+  public Map<String, Object> getReverseAttributesAndGeometry(final Map<String, Object> object) {
     final Map<String, Object> reverse = getReverseAttributes(object);
     final String geometryFieldName = getRecordDefinition().getGeometryFieldName();
     if (geometryFieldName != null) {
@@ -792,8 +750,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
   }
 
   public Map<String, Object> getReverseGeometry(final Map<String, Object> object) {
-    final Map<String, Object> reverse = new LinkedHashMap<String, Object>(
-        object);
+    final Map<String, Object> reverse = new LinkedHashMap<String, Object>(object);
     final String geometryFieldName = getRecordDefinition().getGeometryFieldName();
     if (geometryFieldName != null) {
       final Geometry geometry = getReverseLine(object);
@@ -826,8 +783,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
   }
 
   public boolean hasDirectionalAttributes() {
-    return !this.directionalAttributeValues.isEmpty()
-        || !this.reverseFieldNameMap.isEmpty();
+    return !this.directionalAttributeValues.isEmpty() || !this.reverseFieldNameMap.isEmpty();
   }
 
   public boolean hasDirectionalAttributeValues(final String fieldName) {
@@ -838,17 +794,16 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     return this.endFieldNames.contains(fieldName);
   }
 
-  protected boolean isNull(final Record object1, final String name1,
-    final Record object2, final String name2,
-    final Collection<String> equalExcludeAttributes) {
+  protected boolean isNull(final Record object1, final String name1, final Record object2,
+    final String name2, final Collection<String> equalExcludeAttributes) {
     final Object value1 = object1.getValue(name1);
     final Object value2 = object2.getValue(name2);
     if (value1 == null && value2 == null) {
       return true;
     } else {
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Both values not null (" + name1 + "=" + value1 + ") != ("
-            + name2 + " = " + value2 + ")");
+        LOG.debug("Both values not null (" + name1 + "=" + value1 + ") != (" + name2 + " = "
+          + value2 + ")");
         LOG.debug(object1.toString());
         LOG.debug(object2.toString());
       }
@@ -897,20 +852,18 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     }
   }
 
-  public void setEndAndSideFieldNamePairs(
-    final List<List<String>> endAndSideAttributePairs) {
+  public void setEndAndSideFieldNamePairs(final List<List<String>> endAndSideAttributePairs) {
     for (final List<String> endAndSideAttributePair : endAndSideAttributePairs) {
       final String startLeftFieldName = endAndSideAttributePair.get(0);
       final String startRightFieldName = endAndSideAttributePair.get(1);
       final String endLeftFieldName = endAndSideAttributePair.get(2);
       final String endRightFieldName = endAndSideAttributePair.get(3);
-      addEndAndSideAttributePairs(startLeftFieldName, startRightFieldName,
-        endLeftFieldName, endRightFieldName);
+      addEndAndSideAttributePairs(startLeftFieldName, startRightFieldName, endLeftFieldName,
+        endRightFieldName);
     }
   }
 
-  public void setEndAttributes(final Record source,
-    final Map<String, Object> newObject) {
+  public void setEndAttributes(final Record source, final Map<String, Object> newObject) {
     for (final String fieldName : this.endFieldNames) {
       final Object value = source.getValue(fieldName);
       newObject.put(fieldName, value);
@@ -937,8 +890,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     }
   }
 
-  public void setSplitAttributes(final LineString line, final Point point,
-    final Record object) {
+  public void setSplitAttributes(final LineString line, final Point point, final Record object) {
     final LineString newLine = object.getGeometryValue();
     if (newLine != null) {
       final boolean firstPoint = newLine.equalsVertex(2, 0, point);
@@ -953,8 +905,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     }
   }
 
-  public void setStartAttributes(final Record source,
-    final Map<String, Object> newObject) {
+  public void setStartAttributes(final Record source, final Map<String, Object> newObject) {
     for (final String fieldName : this.startFieldNames) {
       final Object value = source.getValue(fieldName);
       newObject.put(fieldName, value);

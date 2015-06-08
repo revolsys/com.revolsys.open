@@ -190,8 +190,7 @@ public class NamedChannelBundle<T> {
             }
           } else if (timeout > 0) {
             long waitTime = maxTime - System.currentTimeMillis();
-            while (queue == null && waitTime > 0
-                && readerNotifyCount == this.readerNotifyCount) {
+            while (queue == null && waitTime > 0 && readerNotifyCount == this.readerNotifyCount) {
               ThreadUtil.pause(this.monitor, waitTime);
               if (isClosed()) {
                 throw new ClosedException();

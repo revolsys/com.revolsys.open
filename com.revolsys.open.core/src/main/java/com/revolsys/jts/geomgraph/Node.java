@@ -172,13 +172,13 @@ public class Node extends GraphComponent {
     switch (loc) {
       case BOUNDARY:
         newLoc = Location.INTERIOR;
-        break;
+      break;
       case INTERIOR:
         newLoc = Location.BOUNDARY;
-        break;
+      break;
       default:
         newLoc = Location.BOUNDARY;
-        break;
+      break;
     }
     this.label.setLocation(argIndex, newLoc);
   }

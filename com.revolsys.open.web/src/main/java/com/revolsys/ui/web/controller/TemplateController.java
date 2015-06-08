@@ -60,8 +60,7 @@ public class TemplateController extends AbstractController {
       Object attributeValue = attribute.getValue();
       if (attributeValue instanceof String) {
         attributeValue = ((String)attributeValue).replaceAll("\\[PATH\\]", path);
-        attributeValue = ((String)attributeValue).replaceAll(
-          "\\[PATH-NO-EXT\\]", pathNoExt);
+        attributeValue = ((String)attributeValue).replaceAll("\\[PATH-NO-EXT\\]", pathNoExt);
       }
       view.addObject(attributeName, attributeValue);
     }

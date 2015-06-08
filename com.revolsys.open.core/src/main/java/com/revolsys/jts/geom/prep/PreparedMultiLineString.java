@@ -117,8 +117,7 @@ public class PreparedMultiLineString extends AbstractMultiLineString {
       // point
       // inputs)
       if (lineSegStr.size() > 0) {
-        final boolean segsIntersect = getIntersectionFinder().intersects(
-          lineSegStr);
+        final boolean segsIntersect = getIntersectionFinder().intersects(lineSegStr);
         // MD - performance testing
         // boolean segsIntersect = false;
         if (segsIntersect) {

@@ -58,11 +58,10 @@ public class RayCrossingCounterTest extends AbstractPointInRingTest {
   }
 
   @Override
-  protected void runPtInRing(final Location expectedLoc, final Point pt,
-    final String wkt) throws Exception {
+  protected void runPtInRing(final Location expectedLoc, final Point pt, final String wkt)
+    throws Exception {
     final Polygon geom = (Polygon)this.reader.read(wkt);
-    assertEquals(expectedLoc,
-      RayCrossingCounter.locatePointInRing(pt, geom.getShell()));
+    assertEquals(expectedLoc, RayCrossingCounter.locatePointInRing(pt, geom.getShell()));
   }
 
 }

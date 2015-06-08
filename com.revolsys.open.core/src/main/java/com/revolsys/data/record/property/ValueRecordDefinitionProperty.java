@@ -1,7 +1,6 @@
 package com.revolsys.data.record.property;
 
-public class ValueRecordDefinitionProperty extends
-AbstractRecordDefinitionProperty {
+public class ValueRecordDefinitionProperty extends AbstractRecordDefinitionProperty {
 
   private Object value;
 

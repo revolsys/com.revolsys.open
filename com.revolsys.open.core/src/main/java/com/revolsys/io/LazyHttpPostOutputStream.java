@@ -29,7 +29,7 @@ public class LazyHttpPostOutputStream extends OutputStream {
     this.in = this.connection.getInputStream();
     if (this.connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
       throw new RuntimeException("Result data not accepted by server "
-          + this.connection.getResponseCode() + " " + this.connection.getResponseMessage());
+        + this.connection.getResponseCode() + " " + this.connection.getResponseMessage());
     }
     this.in.close();
   }
@@ -54,8 +54,7 @@ public class LazyHttpPostOutputStream extends OutputStream {
   }
 
   @Override
-  public void write(final byte[] b, final int off, final int len)
-      throws IOException {
+  public void write(final byte[] b, final int off, final int len) throws IOException {
     if (this.out == null) {
       init();
     }

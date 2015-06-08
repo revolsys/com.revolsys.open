@@ -21,7 +21,7 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public class MapPointerLocation extends JLabel implements MouseMotionListener,
-PropertyChangeListener {
+  PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -61,8 +61,7 @@ PropertyChangeListener {
   public void mouseMoved(final MouseEvent e) {
     final int x = e.getX();
     final int y = e.getY();
-    final Point mapPoint = this.viewport.toModelPointRounded(
-      this.geometryFactory, x, y);
+    final Point mapPoint = this.viewport.toModelPointRounded(this.geometryFactory, x, y);
     if (!mapPoint.isEmpty()) {
       final double projectedX = mapPoint.getX();
       final String textX = MathUtil.toString(projectedX);

@@ -60,8 +60,7 @@ public class ConnectedElementLocationFilter {
   public static List<GeometryLocation> getLocations(final Geometry geometry) {
     final List<GeometryLocation> locations = new ArrayList<GeometryLocation>();
     for (final Geometry part : geometry.geometries()) {
-      if (part instanceof Point || part instanceof LineString
-        || part instanceof Polygon) {
+      if (part instanceof Point || part instanceof LineString || part instanceof Polygon) {
         locations.add(new GeometryLocation(part, 0, part.getPoint()));
       }
     }
@@ -85,8 +84,7 @@ public class ConnectedElementLocationFilter {
     } else {
       final List<Point> points = new ArrayList<>();
       for (final Geometry part : geometry.geometries()) {
-        if (part instanceof Point || part instanceof LineString
-          || part instanceof Polygon) {
+        if (part instanceof Point || part instanceof LineString || part instanceof Polygon) {
           points.add(part.getPoint());
         }
       }

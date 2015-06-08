@@ -34,8 +34,7 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
 
   private boolean wrap = true;
 
-  public XhtmlRecordWriter(final RecordDefinition recordDefinition,
-    final Writer out) {
+  public XhtmlRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
     this.recordDefinition = recordDefinition;
     this.out = new XmlWriter(out);
   }
@@ -87,8 +86,7 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
         final Object value = object.getValue(key);
         if (isWritable(value)) {
           this.out.startTag(HtmlUtil.TR);
-          this.out.element(HtmlUtil.TH,
-            CaseConverter.toCapitalizedWords(key.toString()));
+          this.out.element(HtmlUtil.TH, CaseConverter.toCapitalizedWords(key.toString()));
           this.out.startTag(HtmlUtil.TD);
           if (value == null) {
             this.out.text("-");
@@ -211,8 +209,8 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
 
     @SuppressWarnings("unchecked")
     final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
-    final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-        .getConverter(dataTypeClass);
+    final StringConverter<Object> converter = StringConverterRegistry.getInstance().getConverter(
+      dataTypeClass);
     if (converter == null) {
       this.out.text(value);
     } else {

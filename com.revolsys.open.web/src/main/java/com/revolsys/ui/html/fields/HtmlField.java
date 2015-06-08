@@ -33,8 +33,7 @@ public class HtmlField extends Field {
     super(name, required);
   }
 
-  public HtmlField(final String name, final int maxLength,
-    final boolean required) {
+  public HtmlField(final String name, final int maxLength, final boolean required) {
     this(name, required);
     this.maxLength = maxLength;
   }
@@ -43,20 +42,19 @@ public class HtmlField extends Field {
     final String defaultValue, final boolean required) {
     this(name, maxLength, defaultValue, required);
     if (minLength <= maxLength) {
-      throw new IllegalArgumentException("minLength (" + minLength
-        + ") must be <= maxLength (" + minLength + ")");
+      throw new IllegalArgumentException("minLength (" + minLength + ") must be <= maxLength ("
+        + minLength + ")");
     }
     this.minLength = minLength;
   }
 
-  public HtmlField(final String name, final int maxLength,
-    final String defaultValue, final boolean required) {
+  public HtmlField(final String name, final int maxLength, final String defaultValue,
+    final boolean required) {
     this(name, defaultValue, required);
     this.maxLength = maxLength;
   }
 
-  public HtmlField(final String name, final String defaultValue,
-    final boolean required) {
+  public HtmlField(final String name, final String defaultValue, final boolean required) {
     this(name, required);
     this.inputValue = defaultValue;
   }
@@ -118,10 +116,7 @@ public class HtmlField extends Field {
     return valid;
   }
 
-  private void serializeBlockFormatOption(
-    final XmlWriter out,
-    final String tag,
-    final String title) {
+  private void serializeBlockFormatOption(final XmlWriter out, final String tag, final String title) {
     out.startTag(HtmlUtil.OPTION);
     out.attribute(HtmlUtil.ATTR_VALUE, tag);
     out.text(title);
@@ -158,8 +153,7 @@ public class HtmlField extends Field {
 
     out.startTag(HtmlUtil.SCRIPT);
     out.attribute(HtmlUtil.ATTR_TYPE, "text/javascript");
-    out.text("var " + getName() + "IafHtml = new HtmlField('" + getName()
-      + "');");
+    out.text("var " + getName() + "IafHtml = new HtmlField('" + getName() + "');");
     out.endTag(HtmlUtil.SCRIPT);
 
     out.endTag(HtmlUtil.DIV);
@@ -209,30 +203,23 @@ public class HtmlField extends Field {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "group ");
     serializeToolbarButton(out, "bold", "Bold", getName() + "IafHtml.bold()");
-    serializeToolbarButton(out, "italic", "Italic", getName()
-      + "IafHtml.italic()");
-    serializeToolbarButton(out, "underline", "Underline", getName()
-      + "IafHtml.underline()");
-    serializeToolbarButton(out, "superscript", "Superscript", getName()
-      + "IafHtml.superscript()");
-    serializeToolbarButton(out, "subscript", "Subscript", getName()
-      + "IafHtml.subscript()");
+    serializeToolbarButton(out, "italic", "Italic", getName() + "IafHtml.italic()");
+    serializeToolbarButton(out, "underline", "Underline", getName() + "IafHtml.underline()");
+    serializeToolbarButton(out, "superscript", "Superscript", getName() + "IafHtml.superscript()");
+    serializeToolbarButton(out, "subscript", "Subscript", getName() + "IafHtml.subscript()");
     out.endTag(HtmlUtil.DIV);
 
     // Link and Image decoration group
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "group ");
-    serializeToolbarButton(out, "createLink", "Create Link", getName()
-      + "IafHtml.createLink()");
-    serializeToolbarButton(out, "unlink", "Remove Link", getName()
-      + "IafHtml.unLink()");
+    serializeToolbarButton(out, "createLink", "Create Link", getName() + "IafHtml.createLink()");
+    serializeToolbarButton(out, "unlink", "Remove Link", getName() + "IafHtml.unLink()");
     out.endTag(HtmlUtil.DIV);
 
     // Paragraph style group
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "group ");
-    serializeToolbarButton(out, "orderedList", "Numbered List", getName()
-      + "IafHtml.orderedList()");
+    serializeToolbarButton(out, "orderedList", "Numbered List", getName() + "IafHtml.orderedList()");
     serializeToolbarButton(out, "unorderedList", "Bulleted List", getName()
       + "IafHtml.unorderedList()");
     serializeBlockFormatToolbarList(out);
@@ -241,11 +228,8 @@ public class HtmlField extends Field {
     out.endTag(HtmlUtil.DIV);
   }
 
-  private void serializeToolbarButton(
-    final XmlWriter out,
-    final String cssClass,
-    final String title,
-    final String onClick) {
+  private void serializeToolbarButton(final XmlWriter out, final String cssClass,
+    final String title, final String onClick) {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "button " + cssClass);
     out.attribute(HtmlUtil.ATTR_TITLE, title);

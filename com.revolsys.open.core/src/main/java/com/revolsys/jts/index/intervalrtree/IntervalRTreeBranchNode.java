@@ -39,17 +39,14 @@ public class IntervalRTreeBranchNode<V> extends IntervalRTreeNode<V> {
 
   private final IntervalRTreeNode<V> node2;
 
-  public IntervalRTreeBranchNode(final IntervalRTreeNode<V> node1,
-    final IntervalRTreeNode<V> node2) {
-    super(Math.min(node1.getMin(), node2.getMin()), Math.max(node1.getMax(),
-      node2.getMax()));
+  public IntervalRTreeBranchNode(final IntervalRTreeNode<V> node1, final IntervalRTreeNode<V> node2) {
+    super(Math.min(node1.getMin(), node2.getMin()), Math.max(node1.getMax(), node2.getMax()));
     this.node1 = node1;
     this.node2 = node2;
   }
 
   @Override
-  public void query(final double queryMin, final double queryMax,
-    final Visitor<V> visitor) {
+  public void query(final double queryMin, final double queryMax, final Visitor<V> visitor) {
     if (intersects(queryMin, queryMax)) {
       if (this.node1 != null) {
         this.node1.query(queryMin, queryMax, visitor);

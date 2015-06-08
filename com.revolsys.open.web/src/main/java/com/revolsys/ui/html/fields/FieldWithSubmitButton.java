@@ -11,8 +11,7 @@ public class FieldWithSubmitButton extends Field {
 
   private final Field field;
 
-  public FieldWithSubmitButton(final Field field, final String name,
-    final String submitTitle) {
+  public FieldWithSubmitButton(final Field field, final String name, final String submitTitle) {
     super(name, false);
     this.field = field;
     setValue(submitTitle);

@@ -28,15 +28,14 @@ public class NodeEvent<T> extends EventObject {
     super(node);
   }
 
-  public NodeEvent(final Node<T> node, final String ruleName,
-    final String action) {
+  public NodeEvent(final Node<T> node, final String ruleName, final String action) {
     super(node);
     this.ruleName = ruleName;
     this.action = action;
   }
 
-  public NodeEvent(final Node<T> node, final String typePath,
-    final String ruleName, final String action, final String notes) {
+  public NodeEvent(final Node<T> node, final String typePath, final String ruleName,
+    final String action, final String notes) {
     super(node);
     this.typePath = typePath;
     this.ruleName = ruleName;

@@ -63,8 +63,7 @@ public class JmxService {
    * @param attributeId The name of the attribute.
    * @return The attribute value.
    */
-  public Object getAttribute(final String serverId, final String objectId,
-    final String attributeId) {
+  public Object getAttribute(final String serverId, final String objectId, final String attributeId) {
     if (hasAttribute(serverId, objectId, attributeId)) {
       final MBeanServerConnection connection = getConnection(serverId);
       try {
@@ -74,17 +73,16 @@ public class JmxService {
       } catch (final InstanceNotFoundException e) {
         return "Unavailable";
       } catch (final MalformedObjectNameException e) {
-        throw new IllegalArgumentException("MBean name not valid " + serverId
-          + " " + objectId);
+        throw new IllegalArgumentException("MBean name not valid " + serverId + " " + objectId);
       } catch (final AttributeNotFoundException e) {
-        throw new IllegalArgumentException("MBean attribute not found "
-            + serverId + " " + objectId + "." + attributeId);
+        throw new IllegalArgumentException("MBean attribute not found " + serverId + " " + objectId
+          + "." + attributeId);
       } catch (final Throwable e) {
         return ExceptionUtil.throwUncheckedException(e);
       }
     } else {
-      throw new IllegalArgumentException("Attribute not configured " + serverId
-        + " " + objectId + "." + attributeId);
+      throw new IllegalArgumentException("Attribute not configured " + serverId + " " + objectId
+        + "." + attributeId);
     }
   }
 
@@ -117,25 +115,20 @@ public class JmxService {
    * @param objectId The name of the object.
    * @return The attribute values.
    */
-  public List<FieldDefinition> getAttributes(final String serverId,
-    final String objectId) {
+  public List<FieldDefinition> getAttributes(final String serverId, final String objectId) {
     final MBeanServerConnection connection = getConnection(serverId);
     try {
-      final String[] attributeNames = getAttributeNames(serverId, objectId).toArray(
-        new String[0]);
+      final String[] attributeNames = getAttributeNames(serverId, objectId).toArray(new String[0]);
       final ObjectName objectName = getObjectName(serverId, objectId);
       final List<FieldDefinition> attributeValues = new ArrayList<>();
-      for (final Object attribute : connection.getAttributes(objectName,
-        attributeNames)) {
+      for (final Object attribute : connection.getAttributes(objectName, attributeNames)) {
         attributeValues.add((FieldDefinition)attribute);
       }
       return attributeValues;
     } catch (final InstanceNotFoundException e) {
-      throw new IllegalArgumentException("MBean not found " + serverId + " "
-          + objectId);
+      throw new IllegalArgumentException("MBean not found " + serverId + " " + objectId);
     } catch (final MalformedObjectNameException e) {
-      throw new IllegalArgumentException("MBean name not valid " + serverId
-        + " " + objectId);
+      throw new IllegalArgumentException("MBean name not valid " + serverId + " " + objectId);
     } catch (final Throwable e) {
       return ExceptionUtil.throwUncheckedException(e);
     }
@@ -153,8 +146,7 @@ public class JmxService {
     final Map<String, Object> server = getServerParams(serverId);
     final MBeanServerConnection connection = (MBeanServerConnection)server.get("connection");
     if (connection == null) {
-      throw new IllegalArgumentException("Connection for server " + serverId
-        + " not found");
+      throw new IllegalArgumentException("Connection for server " + serverId + " not found");
     } else {
       return connection;
     }
@@ -171,7 +163,7 @@ public class JmxService {
    *           valid.
    */
   private ObjectName getObjectName(final String serverId, final String objectId)
-      throws MalformedObjectNameException {
+    throws MalformedObjectNameException {
     final Map<String, Object> object = getObjectParams(serverId, objectId);
     final String objectName = (String)object.get("objectName");
     return new ObjectName(objectName);
@@ -203,8 +195,7 @@ public class JmxService {
    * @param objectId The name of the object.
    * @return The server parameters.
    */
-  private Map<String, Object> getObjectParams(final String serverId,
-    final String objectId) {
+  private Map<String, Object> getObjectParams(final String serverId, final String objectId) {
     final List<Map<String, Object>> objectNames = getObjectParams(serverId);
     for (final Map<String, Object> object : objectNames) {
       final String objectLabel = (String)object.get("objectLabel");
@@ -213,8 +204,8 @@ public class JmxService {
       }
     }
 
-    throw new IllegalArgumentException("Object for server " + serverId + " "
-        + objectId + " not found");
+    throw new IllegalArgumentException("Object for server " + serverId + " " + objectId
+      + " not found");
   }
 
   /**
@@ -225,8 +216,8 @@ public class JmxService {
    * @param operationId The name of the operation.
    * @return The operations values.
    */
-  public MBeanOperationInfo getOperation(final String serverId,
-    final String objectId, final String operationId) {
+  public MBeanOperationInfo getOperation(final String serverId, final String objectId,
+    final String operationId) {
     if (hasOperation(serverId, objectId, operationId)) {
       final MBeanServerConnection connection = getConnection(serverId);
 
@@ -239,20 +230,18 @@ public class JmxService {
             return operation;
           }
         }
-        throw new IllegalArgumentException("MBean Operation not found "
-            + serverId + " " + objectId + "." + operationId);
+        throw new IllegalArgumentException("MBean Operation not found " + serverId + " " + objectId
+          + "." + operationId);
       } catch (final InstanceNotFoundException e) {
-        throw new IllegalArgumentException("MBean not found " + serverId + " "
-            + objectId);
+        throw new IllegalArgumentException("MBean not found " + serverId + " " + objectId);
       } catch (final MalformedObjectNameException e) {
-        throw new IllegalArgumentException("MBean name not valid " + serverId
-          + " " + objectId);
+        throw new IllegalArgumentException("MBean name not valid " + serverId + " " + objectId);
       } catch (final Throwable e) {
         return ExceptionUtil.throwUncheckedException(e);
       }
     } else {
-      throw new IllegalArgumentException("Operation not configured " + serverId
-        + " " + objectId + "." + operationId);
+      throw new IllegalArgumentException("Operation not configured " + serverId + " " + objectId
+        + "." + operationId);
     }
   }
 
@@ -264,8 +253,7 @@ public class JmxService {
    * @return The attribute names.
    */
   @SuppressWarnings("unchecked")
-  public List<String> getOperationNames(final String serverId,
-    final String objectId) {
+  public List<String> getOperationNames(final String serverId, final String objectId) {
     final Map<String, Object> object = getObjectParams(serverId, objectId);
     final List<Map<String, Object>> operations = (List<Map<String, Object>>)object.get("operations");
     if (operations == null) {
@@ -290,8 +278,7 @@ public class JmxService {
    * @param objectId The name of the object.
    * @return The operations values.
    */
-  public List<MBeanOperationInfo> getOperations(final String serverId,
-    final String objectId) {
+  public List<MBeanOperationInfo> getOperations(final String serverId, final String objectId) {
     final MBeanServerConnection connection = getConnection(serverId);
     try {
       final ObjectName objectName = getObjectName(serverId, objectId);
@@ -306,11 +293,9 @@ public class JmxService {
       }
       return operations;
     } catch (final InstanceNotFoundException e) {
-      throw new IllegalArgumentException("MBean not found " + serverId + " "
-          + objectId);
+      throw new IllegalArgumentException("MBean not found " + serverId + " " + objectId);
     } catch (final MalformedObjectNameException e) {
-      throw new IllegalArgumentException("MBean name not valid " + serverId
-        + " " + objectId);
+      throw new IllegalArgumentException("MBean name not valid " + serverId + " " + objectId);
     } catch (final Throwable e) {
       return ExceptionUtil.throwUncheckedException(e);
     }
@@ -341,8 +326,7 @@ public class JmxService {
    * @param attributeId The name of the attribute.
    * @return True if the attribute exists.
    */
-  public boolean hasAttribute(final String serverId, final String objectId,
-    final String attributeId) {
+  public boolean hasAttribute(final String serverId, final String objectId, final String attributeId) {
     return getAttributeNames(serverId, objectId).contains(attributeId);
   }
 
@@ -355,8 +339,7 @@ public class JmxService {
    * @param operationId The name of the operation.
    * @return True if the operation exists.
    */
-  public boolean hasOperation(final String serverId, final String objectId,
-    final String operationId) {
+  public boolean hasOperation(final String serverId, final String objectId, final String operationId) {
     return getOperationNames(serverId, objectId).contains(operationId);
   }
 
@@ -372,8 +355,7 @@ public class JmxService {
   public Object invokeOperation(final String serverId, final String objectId,
     final String operationId, final Map<String, String> parameters) {
     try {
-      final MBeanOperationInfo operation = getOperation(serverId, objectId,
-        operationId);
+      final MBeanOperationInfo operation = getOperation(serverId, objectId, operationId);
       final MBeanServerConnection connection = getConnection(serverId);
       final ObjectName objectName = getObjectName(serverId, objectId);
       final MBeanParameterInfo[] parameterInfos = operation.getSignature();
@@ -387,14 +369,11 @@ public class JmxService {
         values[i] = parameters.get(name);
       }
 
-      return connection.invoke(objectName, operation.getName(), values,
-        signature);
+      return connection.invoke(objectName, operation.getName(), values, signature);
     } catch (final InstanceNotFoundException e) {
-      throw new IllegalArgumentException("MBean not found " + serverId + " "
-          + objectId);
+      throw new IllegalArgumentException("MBean not found " + serverId + " " + objectId);
     } catch (final MalformedObjectNameException e) {
-      throw new IllegalArgumentException("MBean name not valid " + serverId
-        + " " + objectId);
+      throw new IllegalArgumentException("MBean name not valid " + serverId + " " + objectId);
     } catch (final Throwable e) {
       return ExceptionUtil.throwUncheckedException(e);
     }
@@ -473,8 +452,7 @@ public class JmxService {
    */
   public void writeAttributes(final MapWriter mapWriter, final String serverId,
     final String objectId) {
-    final String[] attributeNames = getAttributeNames(serverId, objectId).toArray(
-      new String[0]);
+    final String[] attributeNames = getAttributeNames(serverId, objectId).toArray(new String[0]);
     for (final String attributeId : attributeNames) {
       writeAttribute(mapWriter, serverId, objectId, attributeId);
     }
@@ -490,8 +468,7 @@ public class JmxService {
    * @param returnValue The value returned from invoking the method.
    */
   public void writeOperation(final MapWriter mapWriter, final String serverId,
-    final String objectId, final MBeanOperationInfo operation,
-    final Object returnValue) {
+    final String objectId, final MBeanOperationInfo operation, final Object returnValue) {
 
     final Map<String, Object> attributeMap = new LinkedHashMap<String, Object>();
     attributeMap.put("serverId", serverId);
@@ -523,8 +500,7 @@ public class JmxService {
    */
   public void writeOperation(final MapWriter mapWriter, final String serverId,
     final String objectId, final String operationId) {
-    final MBeanOperationInfo operation = getOperation(serverId, objectId,
-      operationId);
+    final MBeanOperationInfo operation = getOperation(serverId, objectId, operationId);
     writeOperation(mapWriter, serverId, objectId, operation, null);
   }
 
@@ -539,8 +515,7 @@ public class JmxService {
    */
   public void writeOperation(final MapWriter mapWriter, final String serverId,
     final String objectId, final String operationId, final Object returnValue) {
-    final MBeanOperationInfo operation = getOperation(serverId, objectId,
-      operationId);
+    final MBeanOperationInfo operation = getOperation(serverId, objectId, operationId);
     writeOperation(mapWriter, serverId, objectId, operation, returnValue);
   }
 
@@ -581,8 +556,7 @@ public class JmxService {
    */
   public void writeOperations(final MapWriter mapWriter, final String serverId,
     final String objectId) {
-    final List<MBeanOperationInfo> operations = getOperations(serverId,
-      objectId);
+    final List<MBeanOperationInfo> operations = getOperations(serverId, objectId);
     for (final MBeanOperationInfo operation : operations) {
       writeOperation(mapWriter, serverId, objectId, operation, null);
     }

@@ -44,8 +44,7 @@ public class InvokeMethodVisitor<T> implements Visitor<T> {
     System.arraycopy(parameters, 0, this.parameters, 0, parameters.length);
     for (final Method method : object.getClass().getMethods()) {
       final String name = method.getName();
-      if (name.equals(methodName)
-          && method.getParameterTypes().length == this.parameters.length) {
+      if (name.equals(methodName) && method.getParameterTypes().length == this.parameters.length) {
         this.method = method;
       }
     }

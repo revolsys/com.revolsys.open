@@ -45,14 +45,14 @@ import com.revolsys.jts.geom.impl.PointDouble;
  */
 public class ConstraintEnforcementException extends RuntimeException {
 
+  private static final long serialVersionUID = 386496846550080140L;
+
   private static String msgWithCoord(final String msg, final Point pt) {
     if (pt != null) {
       return msg + " [ " + EWktWriter.point(pt) + " ]";
     }
     return msg;
   }
-
-  private static final long serialVersionUID = 386496846550080140L;
 
   private Point pt = null;
 

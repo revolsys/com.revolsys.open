@@ -29,8 +29,7 @@ public class ObjectPropertyValuesController implements Controller {
   }
 
   @Override
-  public ModelAndView handleRequest(
-    final HttpServletRequest request,
+  public ModelAndView handleRequest(final HttpServletRequest request,
     final HttpServletResponse response) throws Exception {
     final String path = request.getPathInfo();
     final int index = path.lastIndexOf('/');
@@ -48,10 +47,8 @@ public class ObjectPropertyValuesController implements Controller {
 
       final Map<String, Object> where = new HashMap<String, Object>();
       where.put(propertyName, "%" + query + "%");
-      final Map<String, Boolean> order = Collections.singletonMap(propertyName,
-        true);
-      final List<String> results = this.dataAccessObject.list(propertyName, where,
-        order, max);
+      final Map<String, Boolean> order = Collections.singletonMap(propertyName, true);
+      final List<String> results = this.dataAccessObject.list(propertyName, where, order, max);
       response.setContentType("text/plain");
       final PrintWriter writer = response.getWriter();
       for (final String result : results) {

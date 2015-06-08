@@ -63,8 +63,7 @@ public abstract class IntervalRTreeNode<V> {
     return true;
   }
 
-  public abstract void query(double queryMin, double queryMax,
-    Visitor<V> visitor);
+  public abstract void query(double queryMin, double queryMax, Visitor<V> visitor);
 
   @Override
   public String toString() {

@@ -39,6 +39,30 @@ import org.apache.log4j.spi.RootLogger;
  */
 public class ContextClassLoaderRepositorySelector implements RepositorySelector {
   /**
+   * The deault repository to use when one hasn't been created for the class
+   * loader.
+   */
+  private static final LoggerRepository defaultRepository;
+
+  /** The gaurd used to set the respository selector on the LogManager. */
+  private static final Object GUARD;
+
+  /** The map of class loaders to logging hierarchies. */
+  private static final Map repositories = new HashMap();
+
+  static {
+    try {
+      GUARD = LogManager.getRootLogger();
+      defaultRepository = LogManager.getLoggerRepository();
+      final RepositorySelector selector = new ContextClassLoaderRepositorySelector();
+      LogManager.setRepositorySelector(selector, GUARD);
+    } catch (final RuntimeException e) {
+      e.printStackTrace();
+      throw e;
+    }
+  }
+
+  /**
    * Add a new hierarchy for the current thread context class loader if one does
    * not exist or return the previous hierarchy.
    *
@@ -85,30 +109,6 @@ public class ContextClassLoaderRepositorySelector implements RepositorySelector 
     final Hierarchy hierarchy = (Hierarchy)repositories.remove(classLoader);
     if (hierarchy != null) {
       hierarchy.shutdown();
-    }
-  }
-
-  /**
-   * The deault repository to use when one hasn't been created for the class
-   * loader.
-   */
-  private static final LoggerRepository defaultRepository;
-
-  /** The gaurd used to set the respository selector on the LogManager. */
-  private static final Object GUARD;
-
-  /** The map of class loaders to logging hierarchies. */
-  private static final Map repositories = new HashMap();
-
-  static {
-    try {
-      GUARD = LogManager.getRootLogger();
-      defaultRepository = LogManager.getLoggerRepository();
-      final RepositorySelector selector = new ContextClassLoaderRepositorySelector();
-      LogManager.setRepositorySelector(selector, GUARD);
-    } catch (final RuntimeException e) {
-      e.printStackTrace();
-      throw e;
     }
   }
 

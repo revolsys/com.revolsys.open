@@ -18,18 +18,17 @@ public class LayerFormRecordPropertyEnableCheck extends AbstractEnableCheck {
 
   private boolean inverse = false;
 
-  public LayerFormRecordPropertyEnableCheck(final RecordLayerForm form,
-    final String propertyName) {
+  public LayerFormRecordPropertyEnableCheck(final RecordLayerForm form, final String propertyName) {
     this(form, propertyName, true);
   }
 
-  public LayerFormRecordPropertyEnableCheck(final RecordLayerForm form,
-    final String propertyName, final Object value) {
+  public LayerFormRecordPropertyEnableCheck(final RecordLayerForm form, final String propertyName,
+    final Object value) {
     this(form, propertyName, value, false);
   }
 
-  public LayerFormRecordPropertyEnableCheck(final RecordLayerForm form,
-    final String propertyName, final Object value, final boolean inverse) {
+  public LayerFormRecordPropertyEnableCheck(final RecordLayerForm form, final String propertyName,
+    final Object value, final boolean inverse) {
     this.form = new WeakReference<>(form);
     Property.addListener(form, propertyName, this);
     this.propertyName = propertyName;
@@ -49,8 +48,7 @@ public class LayerFormRecordPropertyEnableCheck extends AbstractEnableCheck {
   @Override
   public boolean isEnabled() {
     final LayerRecord record = getRecord();
-    final Object value = JavaBeanUtil.getSimpleProperty(record,
-      this.propertyName);
+    final Object value = JavaBeanUtil.getSimpleProperty(record, this.propertyName);
     final boolean equal = EqualsRegistry.equal(value, this.value);
     if (equal == !this.inverse) {
       return enabled();

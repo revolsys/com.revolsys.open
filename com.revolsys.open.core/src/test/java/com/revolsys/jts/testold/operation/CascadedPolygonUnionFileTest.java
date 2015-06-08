@@ -24,20 +24,18 @@ public class CascadedPolygonUnionFileTest extends TestCase {
     super(name);
   }
 
-  private void runTestResource(final String file, final double minimumMeasure)
-      throws IOException, ParseException {
+  private void runTestResource(final String file, final double minimumMeasure) throws IOException,
+    ParseException {
     final List<Geometry> geometries = InteriorPointTest.getTestGeometries(file);
     assertTrue(tester.test(geometries, minimumMeasure));
   }
 
   public void testAfrica2() throws Exception {
-    runTestResource("africa.wkt",
-      CascadedPolygonUnionTester.MIN_SIMILARITY_MEAURE);
+    runTestResource("africa.wkt", CascadedPolygonUnionTester.MIN_SIMILARITY_MEAURE);
   }
 
   public void XtestEurope() throws Exception {
-    runTestResource("europe.wkt",
-      CascadedPolygonUnionTester.MIN_SIMILARITY_MEAURE);
+    runTestResource("europe.wkt", CascadedPolygonUnionTester.MIN_SIMILARITY_MEAURE);
   }
 
 }

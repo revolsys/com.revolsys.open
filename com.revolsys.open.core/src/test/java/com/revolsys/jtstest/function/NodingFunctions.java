@@ -37,8 +37,7 @@ public class NodingFunctions {
     return FunctionsUtil.getFactoryOrDefault(null).multiPoint(pts);
   }
 
-  private static List<NodedSegmentString> createNodedSegmentStrings(
-    final Geometry geom) {
+  private static List<NodedSegmentString> createNodedSegmentStrings(final Geometry geom) {
     final List<NodedSegmentString> segs = new ArrayList<>();
     final List<LineString> lines = geom.getGeometries(LineString.class);
     for (final LineString line : lines) {
@@ -61,8 +60,7 @@ public class NodingFunctions {
     int index = 0;
     for (final Iterator i = segStrings.iterator(); i.hasNext();) {
       final SegmentString ss = (SegmentString)i.next();
-      final LineString line = FunctionsUtil.getFactoryOrDefault(null)
-          .lineString(ss.getPoints());
+      final LineString line = FunctionsUtil.getFactoryOrDefault(null).lineString(ss.getPoints());
       lines[index++] = line;
     }
     return FunctionsUtil.getFactoryOrDefault(null).multiLineString(lines);
@@ -70,15 +68,13 @@ public class NodingFunctions {
 
   public static Geometry MCIndexNoding(final Geometry geom) {
     final List segs = createNodedSegmentStrings(geom);
-    final Noder noder = new MCIndexNoder(new IntersectionAdder(
-      new RobustLineIntersector()));
+    final Noder noder = new MCIndexNoder(new IntersectionAdder(new RobustLineIntersector()));
     noder.computeNodes(segs);
     final Collection nodedSegStrings = noder.getNodedSubstrings();
     return fromSegmentStrings(nodedSegStrings);
   }
 
-  public static Geometry MCIndexNodingWithPrecision(final Geometry geom,
-    final double scaleFactor) {
+  public static Geometry MCIndexNodingWithPrecision(final Geometry geom, final double scaleFactor) {
     final List segs = createNodedSegmentStrings(geom);
 
     final LineIntersector li = new RobustLineIntersector(scaleFactor);
@@ -97,11 +93,9 @@ public class NodingFunctions {
    * @param scaleFactor
    * @return the noded geometry
    */
-  public static Geometry scaledNoding(final Geometry geom,
-    final double scaleFactor) {
+  public static Geometry scaledNoding(final Geometry geom, final double scaleFactor) {
     final List segs = createSegmentStrings(geom);
-    final Noder noder = new ScaledNoder(new MCIndexSnapRounder(1.0),
-      scaleFactor);
+    final Noder noder = new ScaledNoder(new MCIndexSnapRounder(1.0), scaleFactor);
     noder.computeNodes(segs);
     final Collection nodedSegStrings = noder.getNodedSubstrings();
     return fromSegmentStrings(nodedSegStrings);

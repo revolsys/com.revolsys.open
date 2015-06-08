@@ -7,11 +7,9 @@ import com.revolsys.jts.geom.LineString;
 
 public class LineEqualWithinDistance implements Filter<LineString> {
 
-  public static Filter<Record> getFilter(final Record object,
-    final double maxDistance) {
+  public static Filter<Record> getFilter(final Record object, final double maxDistance) {
     final LineString line = object.getGeometryValue();
-    final LineEqualWithinDistance lineFilter = new LineEqualWithinDistance(
-      line, maxDistance);
+    final LineEqualWithinDistance lineFilter = new LineEqualWithinDistance(line, maxDistance);
     return new RecordGeometryFilter<LineString>(lineFilter);
   }
 
@@ -26,8 +24,7 @@ public class LineEqualWithinDistance implements Filter<LineString> {
 
   @Override
   public boolean accept(final LineString line2) {
-    final LineStringRelate relate = new LineStringRelate(this.line, line2,
-      this.maxDistance);
+    final LineStringRelate relate = new LineStringRelate(this.line, line2, this.maxDistance);
     return relate.isEqual();
   }
 }

@@ -56,8 +56,7 @@ public class DETable extends DEDataset {
     }
   }
 
-  public void addIndex(final Field field, final boolean unique,
-    final String indexName) {
+  public void addIndex(final Field field, final boolean unique, final String indexName) {
     final Index index = new Index();
     index.setName(indexName);
     index.setIsUnique(unique);
@@ -152,8 +151,7 @@ public class DETable extends DEDataset {
     this.clsid = clsid;
   }
 
-  public void setControllerMemberships(
-    final List<ControllerMembership> controllerMemberships) {
+  public void setControllerMemberships(final List<ControllerMembership> controllerMemberships) {
     this.controllerMemberships = controllerMemberships;
   }
 
@@ -165,8 +163,7 @@ public class DETable extends DEDataset {
     this.extclsid = extclsid;
   }
 
-  public void setExtensionProperties(
-    final List<PropertySetProperty> extensionProperties) {
+  public void setExtensionProperties(final List<PropertySetProperty> extensionProperties) {
     this.extensionProperties = extensionProperties;
   }
 
@@ -206,8 +203,7 @@ public class DETable extends DEDataset {
     this.rasterFieldName = rasterFieldName;
   }
 
-  public void setRelationshipClassNames(
-    final List<String> relationshipClassNames) {
+  public void setRelationshipClassNames(final List<String> relationshipClassNames) {
     this.relationshipClassNames = relationshipClassNames;
   }
 

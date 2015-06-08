@@ -12,8 +12,8 @@ import com.revolsys.util.Property;
 
 public class ColorStringConverter implements StringConverter<Color> {
 
-  private static int fromHex(final String string, final int start,
-    final int end, final int defaultValue) {
+  private static int fromHex(final String string, final int start, final int end,
+    final int defaultValue) {
     if (end <= string.length()) {
       try {
         String text = string.substring(start, end);
@@ -64,8 +64,7 @@ public class ColorStringConverter implements StringConverter<Color> {
       final Color color = new Color(red, green, blue, alpha);
       return color;
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(WebColors.class).error(
-        "Not a valid rgba color " + string, e);
+      LoggerFactory.getLogger(WebColors.class).error("Not a valid rgba color " + string, e);
       return Color.BLACK;
     }
   }
@@ -79,8 +78,7 @@ public class ColorStringConverter implements StringConverter<Color> {
       final Color color = new Color(red, green, blue, 255);
       return color;
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(WebColors.class).error(
-        "Not a valid rgb color " + string, e);
+      LoggerFactory.getLogger(WebColors.class).error("Not a valid rgb color " + string, e);
       return Color.BLACK;
     }
   }
@@ -89,8 +87,7 @@ public class ColorStringConverter implements StringConverter<Color> {
     if (Property.hasValue(colorName)) {
       for (final Field field : WebColors.class.getFields()) {
         final String fieldName = field.getName();
-        if (Modifier.isStatic(field.getModifiers())
-            && Modifier.isPublic(field.getModifiers())) {
+        if (Modifier.isStatic(field.getModifiers()) && Modifier.isPublic(field.getModifiers())) {
           if (fieldName.equalsIgnoreCase(colorName)) {
             try {
               return (Color)field.get(WebColors.class);
@@ -138,8 +135,7 @@ public class ColorStringConverter implements StringConverter<Color> {
       } else {
         final Color color = getWebColor(string);
         if (color == null) {
-          LoggerFactory.getLogger(getClass()).error(
-            "Not a valid color " + string);
+          LoggerFactory.getLogger(getClass()).error("Not a valid color " + string);
           return Color.BLACK;
         } else {
           return color;
@@ -159,11 +155,10 @@ public class ColorStringConverter implements StringConverter<Color> {
       } else {
         final int alpha = color.getAlpha();
         if (alpha == 255) {
-          return "rgb(" + color.getRed() + "," + color.getGreen() + ","
-              + color.getBlue() + ")";
+          return "rgb(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ")";
         } else {
-          return "rgba(" + color.getRed() + "," + color.getGreen() + ","
-              + color.getBlue() + "," + alpha / 255.0 + ")";
+          return "rgba(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ","
+            + alpha / 255.0 + ")";
         }
       }
     } else {

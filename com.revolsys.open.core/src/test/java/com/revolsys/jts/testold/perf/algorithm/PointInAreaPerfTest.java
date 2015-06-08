@@ -66,8 +66,7 @@ public class PointInAreaPerfTest {
     // PointInAreaLocator pia = new IntervalIndexedPointInAreaLocator(area);
     // PointInAreaLocator pia = new SimplePointInAreaLocator(area);
 
-    final PointInAreaPerfTester perfTester = new PointInAreaPerfTester(
-      geomFactory, area);
+    final PointInAreaPerfTester perfTester = new PointInAreaPerfTester(geomFactory, area);
     perfTester.setNumPoints(50000);
     perfTester.setPIA(pia);
     perfTester.run();

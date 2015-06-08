@@ -32,8 +32,7 @@ public class MavenRepositoryCache extends MavenRepository {
     super(root);
   }
 
-  public MavenRepositoryCache(final Resource root,
-    final String... repositoryUrls) {
+  public MavenRepositoryCache(final Resource root, final String... repositoryUrls) {
     super(root);
     for (String repository : repositoryUrls) {
       if (!repository.endsWith("/")) {
@@ -48,10 +47,9 @@ public class MavenRepositoryCache extends MavenRepository {
     this(null, repositoryUrls);
   }
 
-  public boolean copyRepositoryResource(final Resource resource,
-    final MavenRepository repository, final String path, final String sha1Digest) {
-    final Resource repositoryResource = SpringUtil.getResource(
-      repository.getRoot(), path);
+  public boolean copyRepositoryResource(final Resource resource, final MavenRepository repository,
+    final String path, final String sha1Digest) {
+    final Resource repositoryResource = SpringUtil.getResource(repository.getRoot(), path);
     if (repositoryResource.exists()) {
       try {
         if (Property.hasValue(sha1Digest)) {
@@ -85,19 +83,18 @@ public class MavenRepositoryCache extends MavenRepository {
   }
 
   @Override
-  protected Resource handleMissingResource(final Resource resource,
-    final String groupId, final String artifactId, final String type,
-    final String classifier, final String version, final String algorithm) {
+  protected Resource handleMissingResource(final Resource resource, final String groupId,
+    final String artifactId, final String type, final String classifier, final String version,
+    final String algorithm) {
     if (version.endsWith("-SNAPSHOT")) {
       final TreeMap<String, MavenRepository> versionsByRepository = new TreeMap<String, MavenRepository>();
 
       for (final MavenRepository repository : this.repositories) {
-        final Map<String, Object> mavenMetadata = repository.getMavenMetadata(
-          groupId, artifactId, version);
+        final Map<String, Object> mavenMetadata = repository.getMavenMetadata(groupId, artifactId,
+          version);
         final String snapshotVersion = getSnapshotVersion(mavenMetadata);
         if (snapshotVersion != null) {
-          final String timestampVersion = version.replaceAll("SNAPSHOT$",
-            snapshotVersion);
+          final String timestampVersion = version.replaceAll("SNAPSHOT$", snapshotVersion);
           versionsByRepository.put(timestampVersion, repository);
         }
       }
@@ -105,30 +102,28 @@ public class MavenRepositoryCache extends MavenRepository {
         final Entry<String, MavenRepository> entry = versionsByRepository.lastEntry();
         final String timestampVersion = entry.getKey();
 
-        final String path = getPath(groupId, artifactId, version, type,
-          classifier, timestampVersion, algorithm);
+        final String path = getPath(groupId, artifactId, version, type, classifier,
+          timestampVersion, algorithm);
         final Resource cachedResource = SpringUtil.getResource(getRoot(), path);
         if (cachedResource.exists()) {
           return cachedResource;
         } else {
 
           final MavenRepository repository = entry.getValue();
-          final String sha1Digest = repository.getSha1(groupId, artifactId,
-            type, classifier, version, algorithm);
+          final String sha1Digest = repository.getSha1(groupId, artifactId, type, classifier,
+            version, algorithm);
 
-          if (copyRepositoryResource(cachedResource, repository, path,
-            sha1Digest)) {
+          if (copyRepositoryResource(cachedResource, repository, path, sha1Digest)) {
             return cachedResource;
           }
         }
 
       }
     }
-    final String path = getPath(groupId, artifactId, version, type, classifier,
-      version, algorithm);
+    final String path = getPath(groupId, artifactId, version, type, classifier, version, algorithm);
     for (final MavenRepository repository : this.repositories) {
-      final String sha1Digest = repository.getSha1(groupId, artifactId, type,
-        classifier, version, algorithm);
+      final String sha1Digest = repository.getSha1(groupId, artifactId, type, classifier, version,
+        algorithm);
       if (copyRepositoryResource(resource, repository, path, sha1Digest)) {
         return resource;
       }
@@ -153,18 +148,15 @@ public class MavenRepositoryCache extends MavenRepository {
         final File file = root.getFile();
         if (!file.exists()) {
           if (!file.mkdirs()) {
-            throw new IllegalArgumentException(
-              "Cannot create maven cache directory " + file);
+            throw new IllegalArgumentException("Cannot create maven cache directory " + file);
           }
         } else if (!file.isDirectory()) {
-          throw new IllegalArgumentException(
-            "Maven cache is not a directory directory " + file);
+          throw new IllegalArgumentException("Maven cache is not a directory directory " + file);
         }
         final FileSystemResource fileResource = new FileSystemResource(file);
         super.setRoot(fileResource);
       } catch (final IOException e) {
-        throw new IllegalArgumentException(
-          "Maven cache must resolve to a local directory " + root);
+        throw new IllegalArgumentException("Maven cache must resolve to a local directory " + root);
       }
     }
   }

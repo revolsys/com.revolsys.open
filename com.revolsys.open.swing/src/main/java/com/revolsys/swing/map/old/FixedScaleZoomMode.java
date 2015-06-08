@@ -15,18 +15,16 @@ import com.revolsys.swing.map.ComponentViewport2D;
 import com.revolsys.swing.map.Viewport2D;
 
 public class FixedScaleZoomMode implements ZoomMode {
-  public static final FixedScaleZoomMode METRIC = new FixedScaleZoomMode(100,
-    250, 500, 1000, 2500, 5000, 10000, 20000, 50000, 100000, 250000, 500000,
-    1000000, 2500000, 5000000, 10000000, 25000000, 50000000, 100000000,
-    250000000);
+  public static final FixedScaleZoomMode METRIC = new FixedScaleZoomMode(100, 250, 500, 1000, 2500,
+    5000, 10000, 20000, 50000, 100000, 250000, 500000, 1000000, 2500000, 5000000, 10000000,
+    25000000, 50000000, 100000000, 250000000);
 
   /** The ordered list of scales. */
   private final List<Double> scales = new ArrayList<Double>();
 
   public FixedScaleZoomMode() {
-    this(1693.0, 3385.0, 6771.0, 14000.0, 27000.0, 54000.0, 108000.0, 217000.0,
-      433000.0, 867000.0, 2000000.0, 3000000.0, 7000000.0, 14000000.0,
-      28000000.0, 55000000.0, 111000000.0);
+    this(1693.0, 3385.0, 6771.0, 14000.0, 27000.0, 54000.0, 108000.0, 217000.0, 433000.0, 867000.0,
+      2000000.0, 3000000.0, 7000000.0, 14000000.0, 28000000.0, 55000000.0, 111000000.0);
   }
 
   public FixedScaleZoomMode(final double... scales) {
@@ -37,8 +35,7 @@ public class FixedScaleZoomMode implements ZoomMode {
     Collections.reverse(this.scales);
   }
 
-  private double getBestScale(final ComponentViewport2D viewport,
-    final double scale) {
+  private double getBestScale(final ComponentViewport2D viewport, final double scale) {
     double maxScale = viewport.getMaxScale();
     maxScale = getScale(maxScale, true);
     final double newScale = Math.min(scale, maxScale);
@@ -116,7 +113,8 @@ public class FixedScaleZoomMode implements ZoomMode {
         // y1 = ay2 - height;
         // y2 = ay2;
         // }
-        // boundingBox2 = new BoundingBoxDoubleGf(coordinateSystem, x1, y1, x2, y2);
+        // boundingBox2 = new BoundingBoxDoubleGf(coordinateSystem, x1, y1, x2,
+        // y2);
         return boundingBox2;
       }
       return newBoundingBox;
@@ -124,8 +122,7 @@ public class FixedScaleZoomMode implements ZoomMode {
     return boundingBox;
   }
 
-  private double getNextScale(final ComponentViewport2D viewport,
-    final boolean larger) {
+  private double getNextScale(final ComponentViewport2D viewport, final boolean larger) {
     final double scale = viewport.getScale();
     return getNextScale(scale, larger);
 
@@ -166,8 +163,7 @@ public class FixedScaleZoomMode implements ZoomMode {
     }
   }
 
-  protected double getScale(final ComponentViewport2D viewport,
-    final BoundingBox newBoundingBox) {
+  protected double getScale(final ComponentViewport2D viewport, final BoundingBox newBoundingBox) {
     final Measurable<Length> viewWidth = viewport.getViewWidthLength();
     final Measurable<Length> viewHeight = viewport.getViewHeightLength();
     final Measurable<Length> modelWidth = newBoundingBox.getWidthLength();
@@ -229,8 +225,7 @@ public class FixedScaleZoomMode implements ZoomMode {
    * @param boundingBox The bounding box.
    */
   @Override
-  public void zoom(final ComponentViewport2D viewport,
-    final BoundingBox boundingBox) {
+  public void zoom(final ComponentViewport2D viewport, final BoundingBox boundingBox) {
     final BoundingBox newBoundingBox = getBoundingBox(viewport, boundingBox);
     viewport.setBoundingBox(newBoundingBox);
   }
@@ -246,8 +241,8 @@ public class FixedScaleZoomMode implements ZoomMode {
    * @param y2 The second y coordinate.
    */
   @Override
-  public void zoom(final ComponentViewport2D viewport, final double x1,
-    final double y1, final double x2, final double y2) {
+  public void zoom(final ComponentViewport2D viewport, final double x1, final double y1,
+    final double x2, final double y2) {
     final double viewWidth = viewport.getViewWidthPixels();
     final double viewHeight = viewport.getViewHeightPixels();
 
@@ -260,8 +255,7 @@ public class FixedScaleZoomMode implements ZoomMode {
     final double x = boundingBox.getCentreX();
     final double y = boundingBox.getCentreY();
     final Measurable<Length> modelWidth = boundingBox.getWidthLength();
-    double scale = Viewport2D.getScale(viewport.getViewWidthLength(),
-      modelWidth);
+    double scale = Viewport2D.getScale(viewport.getViewWidthLength(), modelWidth);
     scale = getNextScale(scale, false);
     final double newScale = getBestScale(viewport, scale);
     final BoundingBox boundingBox1 = viewport.getBoundingBox(x, y, newScale);
@@ -277,8 +271,8 @@ public class FixedScaleZoomMode implements ZoomMode {
    * @param y The y coordinate.
    * @param scale The new map scale.
    */
-  private void zoomAndRecentre(final ComponentViewport2D viewport,
-    final double x, final double y, final double scale) {
+  private void zoomAndRecentre(final ComponentViewport2D viewport, final double x, final double y,
+    final double scale) {
     final double newScale = getBestScale(viewport, scale);
     final BoundingBox boundingBox = viewport.getBoundingBox(x, y, newScale);
     viewport.setBoundingBox(boundingBox);
@@ -293,8 +287,7 @@ public class FixedScaleZoomMode implements ZoomMode {
    * @param y The y coordinate.
    */
   @Override
-  public void zoomIn(final ComponentViewport2D viewport, final double x,
-    final double y) {
+  public void zoomIn(final ComponentViewport2D viewport, final double x, final double y) {
     final double scale = getNextScale(viewport, true);
     zoomProportional(viewport, x, y, scale);
   }
@@ -308,8 +301,7 @@ public class FixedScaleZoomMode implements ZoomMode {
    * @param y The y coordinate.
    */
   @Override
-  public void zoomInAndRecentre(final ComponentViewport2D viewport,
-    final double x, final double y) {
+  public void zoomInAndRecentre(final ComponentViewport2D viewport, final double x, final double y) {
     final double scale = getNextScale(viewport, true);
     final double[] coord = viewport.toModelCoordinates(x, y);
     zoomAndRecentre(viewport, coord[0], coord[1], scale);
@@ -324,8 +316,7 @@ public class FixedScaleZoomMode implements ZoomMode {
    * @param y The y coordinate.
    */
   @Override
-  public void zoomOut(final ComponentViewport2D viewport, final double x,
-    final double y) {
+  public void zoomOut(final ComponentViewport2D viewport, final double x, final double y) {
     final double scale = getNextScale(viewport, false);
     zoomProportional(viewport, x, y, scale);
   }
@@ -339,8 +330,7 @@ public class FixedScaleZoomMode implements ZoomMode {
    * @param y The y coordinate.
    */
   @Override
-  public void zoomOutAndRecentre(final ComponentViewport2D viewport,
-    final double x, final double y) {
+  public void zoomOutAndRecentre(final ComponentViewport2D viewport, final double x, final double y) {
     final double scale = getNextScale(viewport, false);
     final double[] coord = viewport.toModelCoordinates(x, y);
     zoomAndRecentre(viewport, coord[0], coord[1], scale);
@@ -355,8 +345,8 @@ public class FixedScaleZoomMode implements ZoomMode {
    * @param y The y coordinate.
    * @param scale The new map scale.
    */
-  private void zoomProportional(final ComponentViewport2D viewport,
-    final double x, final double y, final double scale) {
+  private void zoomProportional(final ComponentViewport2D viewport, final double x, final double y,
+    final double scale) {
     final GeometryFactory geometryFactory = viewport.getGeometryFactory();
 
     final double newScale = getBestScale(viewport, scale);
@@ -377,8 +367,7 @@ public class FixedScaleZoomMode implements ZoomMode {
     final double y1 = mapY - height * yProportion;
     final double x2 = x1 + width;
     final double y2 = y1 + height;
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1,
-      x2, y2);
+    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
     viewport.setBoundingBox(boundingBox);
   }
 }

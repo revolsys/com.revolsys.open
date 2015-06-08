@@ -41,9 +41,8 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<Record>> {
    * @param index The index of the line in the graph.
    * @return The split lines.
    */
-  private List<LineString> getSplitLines(
-    final LineMatchGraph<LineSegmentMatch> graph, final LineString line,
-    final int index) {
+  private List<LineString> getSplitLines(final LineMatchGraph<LineSegmentMatch> graph,
+    final LineString line, final int index) {
     final Point startCoordinate = line.getPoint();
     Node<LineSegmentMatch> currentNode = graph.findNode(startCoordinate);
     final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<Edge<LineSegmentMatch>>();
@@ -56,18 +55,16 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<Record>> {
     while (currentNode != null) {
       final Point coordinate = currentNode;
       coordinates.add(coordinate);
-      final Edge<LineSegmentMatch> edge = graph.getUnprocessedEdgeWithSegment(
-        currentNode, index, processedEdges);
+      final Edge<LineSegmentMatch> edge = graph.getUnprocessedEdgeWithSegment(currentNode, index,
+        processedEdges);
       if (edge != null) {
         final LineSegmentMatch lineEdge = edge.getObject();
         boolean hasMatches = lineEdge.hasMatches(index);
         if (!hasMatches) {
           final Node<LineSegmentMatch> endNode = edge.getOppositeNode(currentNode);
-          for (final Edge<LineSegmentMatch> matchEdge : Node.getEdgesBetween(
-            currentNode, endNode)) {
+          for (final Edge<LineSegmentMatch> matchEdge : Node.getEdgesBetween(currentNode, endNode)) {
             if (matchEdge != edge) {
-              final List<LineSegment> segments = matchEdge.getObject()
-                  .getSegments();
+              final List<LineSegment> segments = matchEdge.getObject().getSegments();
               for (int i = 0; i < segments.size(); i++) {
                 if (i != index) {
                   final LineSegment segment = segments.get(i);
@@ -120,10 +117,8 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<Record>> {
    * @param line2 The second line.
    * @return The split lines.
    */
-  private List<List<LineString>> getSplitLines(final LineString line1,
-    final LineString line2) {
-    final LineMatchGraph<LineSegmentMatch> graph = new LineMatchGraph<LineSegmentMatch>(
-        line1);
+  private List<List<LineString>> getSplitLines(final LineString line1, final LineString line2) {
+    final LineMatchGraph<LineSegmentMatch> graph = new LineMatchGraph<LineSegmentMatch>(line1);
     graph.add(line2);
     final List<List<LineString>> lines = new ArrayList<List<LineString>>();
     final List<LineString> lines1 = getSplitLines(graph, line1, 0);
@@ -149,7 +144,7 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<Record>> {
       edge.getGraph(), edge);
     if (!intersectEdges.isEmpty()) {
       final Filter<Edge<Record>> edgeEqualFilter = new LineFilter<Record>(
-          new EqualFilter<LineString>(line));
+        new EqualFilter<LineString>(line));
       FilterUtil.remove(intersectEdges, edgeEqualFilter);
       for (final Edge<Record> edge2 : intersectEdges) {
         if (!edge2.isRemoved()) {

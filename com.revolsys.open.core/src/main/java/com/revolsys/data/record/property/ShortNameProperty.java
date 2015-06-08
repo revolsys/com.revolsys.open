@@ -4,6 +4,8 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 
 public class ShortNameProperty extends AbstractRecordDefinitionProperty {
+  static final String PROPERTY_NAME = "http://revolsys.com/gis/shortName";
+
   public static ShortNameProperty getProperty(final Record object) {
     final RecordDefinition recordDefinition = object.getRecordDefinition();
     return getProperty(recordDefinition);
@@ -30,8 +32,6 @@ public class ShortNameProperty extends AbstractRecordDefinitionProperty {
       return property.getShortName();
     }
   }
-
-  static final String PROPERTY_NAME = "http://revolsys.com/gis/shortName";
 
   private boolean useForSequence = true;
 

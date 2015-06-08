@@ -21,8 +21,7 @@ import com.revolsys.util.Property;
 
 public class OsmDocument implements OsmConstants {
 
-  public static OsmDocument create(final String serverUrl,
-    BoundingBox boundingBox) {
+  public static OsmDocument create(final String serverUrl, BoundingBox boundingBox) {
     if (boundingBox != null) {
       boundingBox = boundingBox.convert(OsmConstants.WGS84_2D);
       if (!boundingBox.isEmpty()) {
@@ -235,16 +234,16 @@ public class OsmDocument implements OsmConstants {
     final double minY = StaxUtils.getDoubleAttribute(in, null, "minlat");
     final double maxX = StaxUtils.getDoubleAttribute(in, null, "maxlon");
     final double maxY = StaxUtils.getDoubleAttribute(in, null, "maxlat");
-    final BoundingBoxDoubleGf boundingBox = new BoundingBoxDoubleGf(WGS84_2D,
-      2, minX, minY, maxX, maxY);
+    final BoundingBoxDoubleGf boundingBox = new BoundingBoxDoubleGf(WGS84_2D, 2, minX, minY, maxX,
+      maxY);
     setBounds(boundingBox);
     StaxUtils.skipSubTree(in);
   }
 
   private void parseDocument(final XMLStreamReader in) {
     if (StaxUtils.skipToStartElement(in, OsmConstants.OSM)) {
-      for (final String fieldName : Arrays.asList("version", "generator",
-        "copyright", "attribution", "license")) {
+      for (final String fieldName : Arrays.asList("version", "generator", "copyright",
+        "attribution", "license")) {
         final String value = in.getAttributeValue(null, fieldName);
         Property.set(this, fieldName, value);
       }

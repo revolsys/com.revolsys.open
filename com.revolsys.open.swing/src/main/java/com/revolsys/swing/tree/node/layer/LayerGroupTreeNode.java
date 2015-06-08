@@ -27,8 +27,7 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 
-public class LayerGroupTreeNode extends AbstractLayerTreeNode implements
-MouseListener {
+public class LayerGroupTreeNode extends AbstractLayerTreeNode implements MouseListener {
 
   public static final Icon ICON = Icons.getIcon("folder");
 
@@ -65,8 +64,8 @@ MouseListener {
 
   @SuppressWarnings("unchecked")
   @Override
-  public boolean dndImportData(final TransferSupport support, final int index)
-      throws IOException, UnsupportedFlavorException {
+  public boolean dndImportData(final TransferSupport support, final int index) throws IOException,
+    UnsupportedFlavorException {
     final LayerGroup group = getGroup();
     if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
       final Transferable transferable = support.getTransferable();
@@ -107,8 +106,7 @@ MouseListener {
 
   @Override
   protected List<Class<?>> getChildClasses() {
-    return Arrays.<Class<?>> asList(AbstractLayer.class, LayerGroup.class,
-      Layer.class);
+    return Arrays.<Class<?>> asList(AbstractLayer.class, LayerGroup.class, Layer.class);
   }
 
   public LayerGroup getGroup() {
@@ -136,8 +134,7 @@ MouseListener {
   }
 
   @Override
-  public boolean isDndCanImport(final TreePath path,
-    final TransferSupport support) {
+  public boolean isDndCanImport(final TreePath path, final TransferSupport support) {
     if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
       support.setDropAction(DnDConstants.ACTION_COPY);
       support.setShowDropLocation(true);

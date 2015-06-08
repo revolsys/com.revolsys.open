@@ -22,8 +22,7 @@ import java.util.List;
 import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 
-public class HtmlUiBuilderCollectionTableSerializer implements
-RowsTableSerializer {
+public class HtmlUiBuilderCollectionTableSerializer implements RowsTableSerializer {
   private final int colCount;
 
   private final List keys;
@@ -34,8 +33,7 @@ RowsTableSerializer {
 
   private final List rows = new ArrayList();
 
-  public HtmlUiBuilderCollectionTableSerializer(final HtmlUiBuilder builder,
-    final List keys) {
+  public HtmlUiBuilderCollectionTableSerializer(final HtmlUiBuilder builder, final List keys) {
     this.builder = builder;
     this.keys = keys;
     this.colCount = keys.size();
@@ -76,10 +74,7 @@ RowsTableSerializer {
   }
 
   @Override
-  public void serializeBodyCell(
-    final XmlWriter out,
-    final int row,
-    final int col) {
+  public void serializeBodyCell(final XmlWriter out, final int row, final int col) {
     if (col < this.colCount) {
       final Object object = this.rows.get(row);
       this.builder.serialize(out, object, (String)this.keys.get(col));
@@ -89,10 +84,7 @@ RowsTableSerializer {
   }
 
   @Override
-  public void serializeFooterCell(
-    final XmlWriter out,
-    final int row,
-    final int col) {
+  public void serializeFooterCell(final XmlWriter out, final int row, final int col) {
   }
 
   @Override

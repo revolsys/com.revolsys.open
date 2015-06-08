@@ -33,8 +33,8 @@ import com.revolsys.util.Property;
  * @see Record
  * @see RecordDefinition
  */
-public class FieldDefinition extends AbstractObjectWithProperties implements
-  Cloneable, MapSerializer {
+public class FieldDefinition extends AbstractObjectWithProperties implements Cloneable,
+  MapSerializer {
 
   public static FieldDefinition create(final Map<String, Object> properties) {
     return new FieldDefinition(properties);
@@ -78,15 +78,15 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
   }
 
   public FieldDefinition(final FieldDefinition attribute) {
-    name = attribute.getName();
-    title = attribute.getTitle();
-    description = attribute.getDescription();
-    type = attribute.getType();
-    required = attribute.isRequired();
-    length = attribute.getLength();
-    scale = attribute.getScale();
-    minValue = attribute.getMinValue();
-    maxValue = attribute.getMaxValue();
+    this.name = attribute.getName();
+    this.title = attribute.getTitle();
+    this.description = attribute.getDescription();
+    this.type = attribute.getType();
+    this.required = attribute.isRequired();
+    this.length = attribute.getLength();
+    this.scale = attribute.getScale();
+    this.minValue = attribute.getMinValue();
+    this.maxValue = attribute.getMaxValue();
     final Map<String, Object> properties = attribute.getProperties();
     setProperties(properties);
   }
@@ -96,26 +96,26 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
   }
 
   public FieldDefinition(final Map<String, Object> properties) {
-    name = Maps.getString(properties, "name");
-    title = Maps.getString(properties, "title");
-    if (!Property.hasValue(title)) {
-      title = CaseConverter.toCapitalizedWords(name);
+    this.name = Maps.getString(properties, "name");
+    this.title = Maps.getString(properties, "title");
+    if (!Property.hasValue(this.title)) {
+      this.title = CaseConverter.toCapitalizedWords(this.name);
     }
-    description = Maps.getString(properties, "description");
-    type = DataTypes.getType(Maps.getString(properties, "dataType"));
-    required = Maps.getBool(properties, "required");
-    length = Maps.getInteger(properties, "length", 0);
-    scale = Maps.getInteger(properties, "scale", 0);
-    minValue = properties.get("minValue");
-    if (minValue == null) {
-      minValue = MathUtil.getMinValue(getTypeClass());
+    this.description = Maps.getString(properties, "description");
+    this.type = DataTypes.getType(Maps.getString(properties, "dataType"));
+    this.required = Maps.getBool(properties, "required");
+    this.length = Maps.getInteger(properties, "length", 0);
+    this.scale = Maps.getInteger(properties, "scale", 0);
+    this.minValue = properties.get("minValue");
+    if (this.minValue == null) {
+      this.minValue = MathUtil.getMinValue(getTypeClass());
     } else {
-      minValue = StringConverterRegistry.toString(type, minValue);
+      this.minValue = StringConverterRegistry.toString(this.type, this.minValue);
     }
-    if (maxValue == null) {
-      maxValue = MathUtil.getMaxValue(getTypeClass());
+    if (this.maxValue == null) {
+      this.maxValue = MathUtil.getMaxValue(getTypeClass());
     } else {
-      maxValue = StringConverterRegistry.toString(type, maxValue);
+      this.maxValue = StringConverterRegistry.toString(this.type, this.maxValue);
     }
   }
 
@@ -127,8 +127,7 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
    * @param required The flag indicating if a value is required for the
    *          attribute.
    */
-  public FieldDefinition(final String name, final DataType type,
-    final boolean required) {
+  public FieldDefinition(final String name, final DataType type, final boolean required) {
     this(name, type, 0, 0, required, null, null);
   }
 
@@ -142,13 +141,13 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public FieldDefinition(final String name, final DataType type,
-    final boolean required, final Map<String, Object> properties) {
+  public FieldDefinition(final String name, final DataType type, final boolean required,
+    final Map<String, Object> properties) {
     this(name, type, 0, 0, required, properties);
   }
 
-  public FieldDefinition(final String name, final DataType dataType,
-    final boolean required, final String description) {
+  public FieldDefinition(final String name, final DataType dataType, final boolean required,
+    final String description) {
     this(name, dataType, 0, 0, required, description, null);
   }
 
@@ -161,8 +160,8 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
    * @param required The flag indicating if a value is required for the
    *          attribute.
    */
-  public FieldDefinition(final String name, final DataType type,
-    final int length, final boolean required) {
+  public FieldDefinition(final String name, final DataType type, final int length,
+    final boolean required) {
     this(name, type, length, 0, required, null, null);
   }
 
@@ -177,14 +176,13 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public FieldDefinition(final String name, final DataType type,
-    final int length, final boolean required,
-    final Map<String, Object> properties) {
+  public FieldDefinition(final String name, final DataType type, final int length,
+    final boolean required, final Map<String, Object> properties) {
     this(name, type, length, 0, required, properties);
   }
 
-  public FieldDefinition(final String name, final DataType type,
-    final int length, final boolean required, final String description) {
+  public FieldDefinition(final String name, final DataType type, final int length,
+    final boolean required, final String description) {
     this(name, type, length, 0, required, description, null);
   }
 
@@ -197,8 +195,8 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public FieldDefinition(final String name, final DataType type,
-    final Integer length, final Integer scale, final Boolean required) {
+  public FieldDefinition(final String name, final DataType type, final Integer length,
+    final Integer scale, final Boolean required) {
     this(name, type, length, scale, required, "");
   }
 
@@ -213,9 +211,8 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public FieldDefinition(final String name, final DataType type,
-    final Integer length, final Integer scale, final Boolean required,
-    final Map<String, Object> properties) {
+  public FieldDefinition(final String name, final DataType type, final Integer length,
+    final Integer scale, final Boolean required, final Map<String, Object> properties) {
     this(name, type, length, scale, required, null, properties);
 
   }
@@ -231,11 +228,10 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public FieldDefinition(final String name, final DataType type,
-    final Integer length, final Integer scale, final Boolean required,
-    final String description) {
+  public FieldDefinition(final String name, final DataType type, final Integer length,
+    final Integer scale, final Boolean required, final String description) {
     this.name = name;
-    title = CaseConverter.toCapitalizedWords(name);
+    this.title = CaseConverter.toCapitalizedWords(name);
     this.description = description;
     this.type = type;
     if (required != null) {
@@ -248,8 +244,8 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
       this.scale = scale;
     }
     this.description = description;
-    minValue = MathUtil.getMinValue(getTypeClass());
-    maxValue = MathUtil.getMaxValue(getTypeClass());
+    this.minValue = MathUtil.getMinValue(getTypeClass());
+    this.maxValue = MathUtil.getMaxValue(getTypeClass());
   }
 
   /**
@@ -263,11 +259,11 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public FieldDefinition(final String name, final DataType type,
-    final Integer length, final Integer scale, final Boolean required,
-    final String description, final Map<String, Object> properties) {
+  public FieldDefinition(final String name, final DataType type, final Integer length,
+    final Integer scale, final Boolean required, final String description,
+    final Map<String, Object> properties) {
     this.name = name;
-    title = CaseConverter.toCapitalizedWords(name);
+    this.title = CaseConverter.toCapitalizedWords(name);
     this.type = type;
     if (required != null) {
       this.required = required;
@@ -280,23 +276,23 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
     }
     this.description = description;
     final Class<?> typeClass = getTypeClass();
-    minValue = MathUtil.getMinValue(typeClass);
-    maxValue = MathUtil.getMaxValue(typeClass);
+    this.minValue = MathUtil.getMinValue(typeClass);
+    this.maxValue = MathUtil.getMaxValue(typeClass);
     setProperties(properties);
   }
 
   public void addAllowedValue(final Object value, final Object text) {
-    allowedValues.put(value, text);
+    this.allowedValues.put(value, text);
   }
 
   public void appendType(final StringBuilder string) {
-    string.append(type);
-    if (length > 0) {
+    string.append(this.type);
+    if (this.length > 0) {
       string.append('(');
-      string.append(length);
-      if (scale > 0) {
+      string.append(this.length);
+      if (this.scale > 0) {
         string.append(',');
-        string.append(scale);
+        string.append(this.scale);
       }
       string.append(')');
     }
@@ -308,38 +304,38 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
   }
 
   public <V> V convert(final Object value) {
-    return StringConverterRegistry.toObject(type, value);
+    return StringConverterRegistry.toObject(this.type, value);
   }
 
   @Override
   public boolean equals(final Object object) {
     if (object instanceof FieldDefinition) {
       final FieldDefinition attribute = (FieldDefinition)object;
-      return name.equals(attribute.getName());
+      return this.name.equals(attribute.getName());
     } else {
       return false;
     }
   }
 
   public Map<Object, Object> getAllowedValues() {
-    return allowedValues;
+    return this.allowedValues;
   }
 
   public CodeTable getCodeTable() {
-    return codeTable;
+    return this.codeTable;
   }
 
   @SuppressWarnings("unchecked")
   public <T> T getDefaultValue() {
-    return (T)defaultValue;
+    return (T)this.defaultValue;
   }
 
   public String getDescription() {
-    return description;
+    return this.description;
   }
 
   public int getIndex() {
-    return index;
+    return this.index;
   }
 
   /**
@@ -349,18 +345,18 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
    * @return The maximum length of an attribute value.
    */
   public int getLength() {
-    return length;
+    return this.length;
   }
 
   public int getMaxStringLength() {
     int length = this.length;
-    if (scale > 0) {
+    if (this.scale > 0) {
       length += 1;
-      length += scale;
+      length += this.scale;
     }
-    if (Number.class.isAssignableFrom(type.getJavaClass())) {
+    if (Number.class.isAssignableFrom(this.type.getJavaClass())) {
       length += 1;
-    } else if (DataTypes.DATE.equals(type)) {
+    } else if (DataTypes.DATE.equals(this.type)) {
       return 10;
     }
     return length;
@@ -368,12 +364,12 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
 
   @SuppressWarnings("unchecked")
   public <V> V getMaxValue() {
-    return (V)maxValue;
+    return (V)this.maxValue;
   }
 
   @SuppressWarnings("unchecked")
   public <V> V getMinValue() {
-    return (V)minValue;
+    return (V)this.minValue;
   }
 
   /**
@@ -382,14 +378,14 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
    * @return The name of the attribute.
    */
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public RecordDefinition getRecordDefinition() {
-    if (recordDefinition == null) {
+    if (this.recordDefinition == null) {
       return null;
     } else {
-      return recordDefinition.get();
+      return this.recordDefinition.get();
     }
   }
 
@@ -399,7 +395,7 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
    * @return The maximum number of decimal places.
    */
   public int getScale() {
-    return scale;
+    return this.scale;
   }
 
   public String getSimpleType() {
@@ -410,15 +406,15 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
     } else if (CharSequence.class.isAssignableFrom(getTypeClass())) {
       typeName = "CHARACTER";
     } else {
-      typeName = type.getName().toUpperCase();
+      typeName = this.type.getName().toUpperCase();
     }
     string.append(typeName);
-    if (length > 0) {
+    if (this.length > 0) {
       string.append('(');
-      string.append(length);
-      if (scale > 0) {
+      string.append(this.length);
+      if (this.scale > 0) {
         string.append(',');
-        string.append(scale);
+        string.append(this.scale);
       }
       string.append(')');
     }
@@ -426,7 +422,7 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
   }
 
   public String getTitle() {
-    return title;
+    return this.title;
   }
 
   /**
@@ -435,7 +431,7 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
    * @return The data type of the attribute value.
    */
   public DataType getType() {
-    return type;
+    return this.type;
   }
 
   /**
@@ -444,10 +440,10 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
    * @return The data type of the attribute value.
    */
   public Class<?> getTypeClass() {
-    if (type == null) {
+    if (this.type == null) {
       return Object.class;
     } else {
-      return type.getJavaClass();
+      return this.type.getJavaClass();
     }
   }
 
@@ -469,7 +465,7 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
    */
   @Override
   public int hashCode() {
-    return name.hashCode();
+    return this.name.hashCode();
   }
 
   /**
@@ -478,7 +474,7 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
    * @return True if a value is required, false otherwise.
    */
   public boolean isRequired() {
-    return required;
+    return this.required;
   }
 
   public void setAllowedValues(final Collection<?> allowedValues) {
@@ -520,8 +516,7 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
   }
 
   protected void setRecordDefinition(final RecordDefinition recordDefinition) {
-    this.recordDefinition = new WeakReference<RecordDefinition>(
-      recordDefinition);
+    this.recordDefinition = new WeakReference<RecordDefinition>(recordDefinition);
   }
 
   public void setRequired(final boolean required) {
@@ -571,14 +566,13 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
     MapSerializerUtil.add(map, "minValue", getMinValue(), null);
     MapSerializerUtil.add(map, "maxValue", getMaxValue(), null);
     MapSerializerUtil.add(map, "defaultValue", getDefaultValue(), null);
-    MapSerializerUtil.add(map, "allowedValues", getAllowedValues(),
-      Collections.emptyMap());
+    MapSerializerUtil.add(map, "allowedValues", getAllowedValues(), Collections.emptyMap());
     return map;
   }
 
   @Override
   public String toString() {
-    final StringBuilder string = new StringBuilder(name);
+    final StringBuilder string = new StringBuilder(this.name);
     string.append(':');
     appendType(string);
     return string.toString();
@@ -588,8 +582,7 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
     final String fieldName = getName();
 
     if (isRequired()) {
-      if (value == null || value instanceof String
-        && !Property.hasValue((String)value)) {
+      if (value == null || value instanceof String && !Property.hasValue((String)value)) {
         throw new IllegalArgumentException(fieldName + " is required");
       }
     }
@@ -601,12 +594,12 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
         try {
           value = StringConverterRegistry.toObject(fieldType, value);
         } catch (final Throwable t) {
-          throw new IllegalArgumentException(fieldName + "='" + value
-            + "' is not a valid " + fieldType.getValidationName());
+          throw new IllegalArgumentException(fieldName + "='" + value + "' is not a valid "
+            + fieldType.getValidationName());
         }
         if (value == null) {
-          throw new IllegalArgumentException(fieldName + "='" + value
-            + "' is not a valid " + fieldType.getValidationName());
+          throw new IllegalArgumentException(fieldName + "='" + value + "' is not a valid "
+            + fieldType.getValidationName());
         }
       }
       if (value != null) {
@@ -617,8 +610,8 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
           final int length = bigNumber.precision();
           if (maxLength > 0) {
             if (length > maxLength) {
-              throw new IllegalArgumentException(fieldName + "=" + value
-                + " length " + length + " > " + maxLength);
+              throw new IllegalArgumentException(fieldName + "=" + value + " length " + length
+                + " > " + maxLength);
             }
           }
 
@@ -626,22 +619,20 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
           final int maxScale = getScale();
           if (maxScale > 0) {
             if (scale > maxScale) {
-              throw new IllegalArgumentException(fieldName + "=" + value
-                + " scale " + scale + " > " + maxScale);
+              throw new IllegalArgumentException(fieldName + "=" + value + " scale " + scale
+                + " > " + maxScale);
             }
           }
           final Number minValue = getMinValue();
           if (minValue != null) {
             if (NumericComparator.numericCompare(number, minValue) < 0) {
-              throw new IllegalArgumentException(fieldName + "=" + value
-                + " > " + minValue);
+              throw new IllegalArgumentException(fieldName + "=" + value + " > " + minValue);
             }
           }
           final Number maxValue = getMaxValue();
           if (maxValue != null) {
             if (NumericComparator.numericCompare(number, maxValue) > 0) {
-              throw new IllegalArgumentException(fieldName + "=" + value
-                + " < " + maxValue);
+              throw new IllegalArgumentException(fieldName + "=" + value + " < " + maxValue);
             }
           }
         } else if (value instanceof String) {
@@ -649,15 +640,15 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
           final int length = string.length();
           if (maxLength > 0) {
             if (length > maxLength) {
-              throw new IllegalArgumentException(fieldName + "=" + value
-                + " length " + length + " > " + maxLength);
+              throw new IllegalArgumentException(fieldName + "=" + value + " length " + length
+                + " > " + maxLength);
             }
           }
         }
-        if (!allowedValues.isEmpty()) {
-          if (!allowedValues.containsKey(value)) {
-            throw new IllegalArgumentException(fieldName + "=" + value
-              + " not in (" + CollectionUtil.toString(",", allowedValues) + ")");
+        if (!this.allowedValues.isEmpty()) {
+          if (!this.allowedValues.containsKey(value)) {
+            throw new IllegalArgumentException(fieldName + "=" + value + " not in ("
+              + CollectionUtil.toString(",", this.allowedValues) + ")");
           }
         }
       }

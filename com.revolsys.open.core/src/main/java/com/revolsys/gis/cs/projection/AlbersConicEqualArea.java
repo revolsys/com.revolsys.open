@@ -147,15 +147,15 @@ public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
    * lambda =
    */
   @Override
-  public void inverse(final double x, final double y,
-    final double[] targetCoordinates, final int targetOffset,
-    final int targetAxisCount) {
+  public void inverse(final double x, final double y, final double[] targetCoordinates,
+    final int targetOffset, final int targetAxisCount) {
     final double dX = x - this.x0;
     final double dY = y - this.y0;
     final double theta = Math.atan(dX / (this.rho0 - dY));
     final double rho = Math.sqrt(dX * dX + Math.pow(this.rho0 - dY, 2.0));
-    final double q = (this.c - rho * rho * this.n * this.n / (this.semiMajorAxis * this.semiMajorAxis))
-        / this.n;
+    final double q = (this.c - rho * rho * this.n * this.n
+      / (this.semiMajorAxis * this.semiMajorAxis))
+      / this.n;
     final double lambda = this.lambda0 + theta / this.n;
     double li = Math.asin(q / 2.0);
     if (!Double.isNaN(li)) {
@@ -166,11 +166,11 @@ public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
         final double sinLi = Math.sin(li);
 
         final double j1 = Math.pow(1.0 - this.ee * Math.pow(sinLi, 2.0), 2.0)
-            / (2.0 * Math.cos(li));
+          / (2.0 * Math.cos(li));
         final double k1 = q / (1.0 - this.ee);
         final double k2 = sinLi / (1.0 - this.ee * Math.pow(sinLi, 2.0));
         final double k3 = 1.0 / (2.0 * this.e)
-            * Math.log((1.0 - this.e * sinLi) / (1.0 + this.e * sinLi));
+          * Math.log((1.0 - this.e * sinLi) / (1.0 + this.e * sinLi));
         final double lip1 = li + j1 * (k1 - k2 + k3);
         delta = Math.abs(lip1 - li);
         li = lip1;
@@ -215,9 +215,8 @@ public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
    * </pre>
    */
   @Override
-  public void project(final double lambda, final double phi,
-    final double[] targetCoordinates, final int targetOffset,
-    final int targetAxisCount) {
+  public void project(final double lambda, final double phi, final double[] targetCoordinates,
+    final int targetOffset, final int targetAxisCount) {
     final double q = q(phi);
     final double lminusl0 = lambda - this.lambda0;
     final double theta = this.n * lminusl0;
@@ -249,8 +248,8 @@ public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
     final double sinPhi = Math.sin(phi);
     final double eSinPhi = this.e * sinPhi;
     final double q = (1.0 - this.ee)
-        * (sinPhi / (1.0 - this.ee * sinPhi * sinPhi) - 1.0 / (2.0 * this.e)
-            * Math.log((1.0 - eSinPhi) / (1.0 + eSinPhi)));
+      * (sinPhi / (1.0 - this.ee * sinPhi * sinPhi) - 1.0 / (2.0 * this.e)
+        * Math.log((1.0 - eSinPhi) / (1.0 + eSinPhi)));
     return q;
   }
 }

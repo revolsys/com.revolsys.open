@@ -14,10 +14,9 @@ public class OsmNode extends OsmElement {
   public OsmNode() {
   }
 
-  public OsmNode(final long id, final boolean visible, final int version,
-    final long changeset, final Date timestamp, final String user,
-    final int uid, final Map<String, String> tags, final double x,
-    final double y) {
+  public OsmNode(final long id, final boolean visible, final int version, final long changeset,
+    final Date timestamp, final String user, final int uid, final Map<String, String> tags,
+    final double x, final double y) {
     super(id, visible, version, changeset, timestamp, user, uid, tags);
     setGeometryValue(OsmConstants.WGS84_2D.point(x, y));
   }

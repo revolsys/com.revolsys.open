@@ -64,6 +64,10 @@ import com.revolsys.visitor.CreateListVisitor;
 
 public class Graph<T> {
 
+  private static final AtomicInteger GRAPH_IDS = new AtomicInteger();
+
+  private static Map<Integer, WeakReference<Graph<?>>> graphs = new HashMap<Integer, WeakReference<Graph<?>>>();
+
   @SuppressWarnings("unchecked")
   public static <V> Graph<V> getGraph(final int id) {
     final WeakReference<Graph<?>> reference = graphs.get(id);
@@ -79,10 +83,6 @@ public class Graph<T> {
       }
     }
   }
-
-  private static final AtomicInteger GRAPH_IDS = new AtomicInteger();
-
-  private static Map<Integer, WeakReference<Graph<?>>> graphs = new HashMap<Integer, WeakReference<Graph<?>>>();
 
   private final int id = GRAPH_IDS.incrementAndGet();
 
@@ -153,8 +153,7 @@ public class Graph<T> {
    * @param to
    * @return
    */
-  protected Edge<T> addEdge(final T object, final LineString line,
-    final Point from, final Point to) {
+  protected Edge<T> addEdge(final T object, final LineString line, final Point from, final Point to) {
     if (this.inMemory && getEdgeCount() >= this.maxEdgesInMemory) {
       this.edgeAttributesById = BPlusTreeMap.createIntSeralizableTempDisk(this.edgeAttributesById);
       // TODO edgIds
@@ -166,9 +165,8 @@ public class Graph<T> {
       // TODO nodeIndex
       this.nodeAttributesById = BPlusTreeMap.createIntSeralizableTempDisk(this.nodeAttributesById);
       this.nodesById = BPlusTreeMap.createIntSeralizableTempDisk(this.nodesById);
-      this.nodesIdsByCoordinates = BPlusTreeMap.createTempDisk(
-        this.nodesIdsByCoordinates, new SerializablePageValueManager<Point>(),
-        PageValueManager.INT);
+      this.nodesIdsByCoordinates = BPlusTreeMap.createTempDisk(this.nodesIdsByCoordinates,
+        new SerializablePageValueManager<Point>(), PageValueManager.INT);
       this.inMemory = false;
     }
     final Node<T> fromNode = getNode(from);
@@ -240,8 +238,8 @@ public class Graph<T> {
     return false;
   }
 
-  public Edge<T> createEdge(final GeometryFactory geometryFactory,
-    final T object, final LineString points) {
+  public Edge<T> createEdge(final GeometryFactory geometryFactory, final T object,
+    final LineString points) {
     final LineString newLine = geometryFactory.lineString(points);
     final T newObject = clone(object, newLine);
     final Edge<T> newEdge = addEdge(newObject, newLine);
@@ -303,13 +301,11 @@ public class Graph<T> {
    * @see IsPointOnLineEdgeFilter
    */
   public List<Node<T>> findNodes(final Edge<T> edge, final double distance) {
-    final IsPointOnLineEdgeFilter<T> filter = new IsPointOnLineEdgeFilter<T>(
-        edge, distance);
+    final IsPointOnLineEdgeFilter<T> filter = new IsPointOnLineEdgeFilter<T>(edge, distance);
 
     final Node<T> fromNode = edge.getFromNode();
 
-    final Comparator<Node<T>> comparator = new NodeDistanceComparator<T>(
-        fromNode);
+    final Comparator<Node<T>> comparator = new NodeDistanceComparator<T>(fromNode);
 
     final com.revolsys.jts.geom.BoundingBox envelope = filter.getEnvelope();
     return getNodes(filter, comparator, envelope);
@@ -328,8 +324,8 @@ public class Graph<T> {
       return Collections.emptyList();
     } else {
       final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
-      final Visitor<Node<T>> visitor = new NodeWithinDistanceOfGeometryVisitor<T>(
-          geometry, distance, results);
+      final Visitor<Node<T>> visitor = new NodeWithinDistanceOfGeometryVisitor<T>(geometry,
+        distance, results);
       BoundingBox envelope = geometry.getBoundingBox();
       envelope = envelope.expand(distance);
       getNodeIndex().visit(envelope, visitor);
@@ -360,8 +356,8 @@ public class Graph<T> {
    */
   public List<Node<T>> findNodes(final Point point, final double distance) {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
-    final Visitor<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<T>(
-        point, distance, results);
+    final Visitor<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<T>(point, distance,
+      results);
     BoundingBox envelope = new BoundingBoxDoubleGf(point);
     envelope = envelope.expand(distance);
     getNodeIndex().visit(envelope, visitor);
@@ -453,8 +449,7 @@ public class Graph<T> {
   }
 
   public List<LineString> getEdgeLines() {
-    final List<Integer> edgeIds = new ArrayList<Integer>(
-        this.edgesById.keySet());
+    final List<Integer> edgeIds = new ArrayList<Integer>(this.edgesById.keySet());
     return new EdgeLineList(this, edgeIds);
   }
 
@@ -463,8 +458,7 @@ public class Graph<T> {
   }
 
   public List<Edge<T>> getEdges() {
-    final List<Integer> edgeIds = new ArrayList<Integer>(
-        this.edgesById.keySet());
+    final List<Integer> edgeIds = new ArrayList<Integer>(this.edgesById.keySet());
     return new EdgeList<T>(this, edgeIds);
   }
 
@@ -495,8 +489,7 @@ public class Graph<T> {
 
   public List<Edge<T>> getEdges(final Filter<Edge<T>> filter,
     final com.revolsys.jts.geom.BoundingBox envelope) {
-    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>(
-        filter);
+    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>(filter);
     final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
     edgeIndex.visit(envelope, results);
     final List<Edge<T>> edges = results.getList();
@@ -505,8 +498,7 @@ public class Graph<T> {
 
   }
 
-  public List<Edge<T>> getEdges(final Filter<Edge<T>> filter,
-    final Comparator<Edge<T>> comparator) {
+  public List<Edge<T>> getEdges(final Filter<Edge<T>> filter, final Comparator<Edge<T>> comparator) {
     final List<Edge<T>> targetEdges = getEdges(filter);
     if (comparator != null) {
       Collections.sort(targetEdges, comparator);
@@ -514,11 +506,9 @@ public class Graph<T> {
     return targetEdges;
   }
 
-  public List<Edge<T>> getEdges(final Filter<Edge<T>> filter,
-    final Comparator<Edge<T>> comparator,
+  public List<Edge<T>> getEdges(final Filter<Edge<T>> filter, final Comparator<Edge<T>> comparator,
     final com.revolsys.jts.geom.BoundingBox envelope) {
-    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>(
-        filter);
+    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>(filter);
     final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
     edgeIndex.visit(envelope, results);
     final List<Edge<T>> targetEdges = results.getList();
@@ -531,14 +521,13 @@ public class Graph<T> {
 
   }
 
-  public List<Edge<T>> getEdges(final Filter<Edge<T>> filter,
-    final Comparator<Edge<T>> comparator, final Geometry geometry) {
+  public List<Edge<T>> getEdges(final Filter<Edge<T>> filter, final Comparator<Edge<T>> comparator,
+    final Geometry geometry) {
     final com.revolsys.jts.geom.BoundingBox envelope = geometry.getBoundingBox();
     return getEdges(filter, comparator, envelope);
   }
 
-  public List<Edge<T>> getEdges(final Filter<Edge<T>> filter,
-    final Geometry geometry) {
+  public List<Edge<T>> getEdges(final Filter<Edge<T>> filter, final Geometry geometry) {
     final com.revolsys.jts.geom.BoundingBox envelope = geometry.getBoundingBox();
     return getEdges(filter, envelope);
   }
@@ -639,8 +628,7 @@ public class Graph<T> {
   }
 
   public List<Node<T>> getNodes() {
-    final List<Integer> nodeIds = new ArrayList<Integer>(
-        this.nodesIdsByCoordinates.values());
+    final List<Integer> nodeIds = new ArrayList<Integer>(this.nodesIdsByCoordinates.values());
     return new NodeList<T>(this, nodeIds);
   }
 
@@ -667,8 +655,7 @@ public class Graph<T> {
 
   }
 
-  public List<Node<T>> getNodes(final Filter<Node<T>> filter,
-    final Comparator<Node<T>> comparator) {
+  public List<Node<T>> getNodes(final Filter<Node<T>> filter, final Comparator<Node<T>> comparator) {
     final List<Node<T>> targetNodes = getNodes(filter);
     if (comparator != null) {
       Collections.sort(targetNodes, comparator);
@@ -676,11 +663,9 @@ public class Graph<T> {
     return targetNodes;
   }
 
-  public List<Node<T>> getNodes(final Filter<Node<T>> filter,
-    final Comparator<Node<T>> comparator,
+  public List<Node<T>> getNodes(final Filter<Node<T>> filter, final Comparator<Node<T>> comparator,
     final com.revolsys.jts.geom.BoundingBox envelope) {
-    final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>(
-        filter);
+    final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>(filter);
     final IdObjectIndex<Node<T>> nodeIndex = getNodeIndex();
     nodeIndex.visit(envelope, results);
     final List<Node<T>> nodes = results.getList();
@@ -763,8 +748,7 @@ public class Graph<T> {
    * @param edge1
    * @param edge2
    */
-  public Edge<T> merge(final Node<T> node, final Edge<T> edge1,
-    final Edge<T> edge2) {
+  public Edge<T> merge(final Node<T> node, final Edge<T> edge1, final Edge<T> edge2) {
     if (edge1 != edge2 && edge1.hasNode(node) && edge2.hasNode(node)) {
       final Map<String, Object> attributes1 = edge1.getFields();
       final Map<String, Object> attributes2 = edge2.getFields();
@@ -811,19 +795,16 @@ public class Graph<T> {
     final Node<Record> toNode, final Point newPoint) {
     if (!fromNode.isRemoved() && !toNode.isRemoved()) {
       if (!fromNode.equals(toNode)) {
-        final List<Edge<Record>> edges = NodeAttributes.getEdgesByType(
-          fromNode, typePath);
+        final List<Edge<Record>> edges = NodeAttributes.getEdgesByType(fromNode, typePath);
 
         for (final Edge<Record> edge : edges) {
           if (!edge.isRemoved()) {
             final LineString line = edge.getLine();
             LineString newLine;
             if (line.getPoint().equals(fromNode)) {
-              newLine = line.subLine(newPoint, 1, line.getVertexCount() - 1,
-                null);
+              newLine = line.subLine(newPoint, 1, line.getVertexCount() - 1, null);
             } else {
-              newLine = line.subLine(null, 0, line.getVertexCount() - 1,
-                newPoint);
+              newLine = line.subLine(null, 0, line.getVertexCount() - 1, newPoint);
             }
             final Graph<Record> graph = edge.getGraph();
             graph.replaceEdge(edge, newLine);
@@ -833,14 +814,14 @@ public class Graph<T> {
     }
   }
 
-  public boolean moveNodesToMidpoint(final String typePath,
-    final Node<Record> node1, final Node<Record> node2) {
+  public boolean moveNodesToMidpoint(final String typePath, final Node<Record> node1,
+    final Node<Record> node2) {
     final Point point1 = node1.get3dCoordinates(typePath);
     final Point point2 = node2.get3dCoordinates(typePath);
 
     final Graph<Record> graph = node1.getGraph();
-    final Point midPoint = LineSegmentUtil.midPoint(
-      GeometryFactory.fixed(0, 1000.0, 1.0), node2, node1);
+    final Point midPoint = LineSegmentUtil.midPoint(GeometryFactory.fixed(0, 1000.0, 1.0), node2,
+      node1);
     final double x = midPoint.getX();
     final double y = midPoint.getY();
     final double z1 = point1.getZ();
@@ -856,7 +837,7 @@ public class Graph<T> {
     final Point newPoint = new PointDouble(x, y, z);
     final Node<Record> newNode = graph.getNode(midPoint);
     if (!Node.hasEdgesBetween(typePath, node1, newNode)
-        && !Node.hasEdgesBetween(typePath, node2, newNode)) {
+      && !Node.hasEdgesBetween(typePath, node2, newNode)) {
       if (node1.equals(2, newNode)) {
         moveNode(typePath, node2, node1, newPoint);
       } else if (node2.equals(2, newNode)) {
@@ -905,11 +886,10 @@ public class Graph<T> {
     return true;
   }
 
-  public void moveToMidpoint(final Map<Point, Point> movedNodes,
-    final Graph<T> graph1, final Node<T> node1, final Node<T> node2) {
+  public void moveToMidpoint(final Map<Point, Point> movedNodes, final Graph<T> graph1,
+    final Node<T> node1, final Node<T> node2) {
     final GeometryFactory precisionModel = graph1.getPrecisionModel();
-    final Point midPoint = LineSegmentUtil.midPoint(precisionModel, node1,
-      node2);
+    final Point midPoint = LineSegmentUtil.midPoint(precisionModel, node1, node2);
     if (!node1.equals(2, midPoint)) {
       if (movedNodes != null) {
         movedNodes.put(node1.clonePoint(), midPoint);
@@ -937,8 +917,7 @@ public class Graph<T> {
     index.visit(env, visitor);
   }
 
-  public void queryEdges(final EdgeVisitor<T> visitor,
-    final Visitor<Edge<T>> matchVisitor) {
+  public void queryEdges(final EdgeVisitor<T> visitor, final Visitor<Edge<T>> matchVisitor) {
     visitor.setVisitor(matchVisitor);
     queryEdges(visitor);
   }
@@ -971,8 +950,7 @@ public class Graph<T> {
       for (final Edge<T> edge : edges) {
         remove(edge);
       }
-      this.nodeListeners.nodeEvent(node, null, null, NodeEvent.NODE_REMOVED,
-        null);
+      this.nodeListeners.nodeEvent(node, null, null, NodeEvent.NODE_REMOVED, null);
       final int nodeId = node.getId();
       this.nodesById.remove(nodeId);
       this.nodeAttributesById.remove(nodeId);
@@ -1018,8 +996,7 @@ public class Graph<T> {
     }
   }
 
-  public List<Edge<T>> replaceEdge(final Edge<T> edge,
-    final List<LineString> lines) {
+  public List<Edge<T>> replaceEdge(final Edge<T> edge, final List<LineString> lines) {
     if (!edge.isRemoved()) {
       final List<Edge<T>> edges = new ArrayList<Edge<T>>();
       final T object = edge.getObject();
@@ -1035,8 +1012,7 @@ public class Graph<T> {
     }
   }
 
-  protected void setEdgeAttribute(final int edgeId, final String name,
-    final Object value) {
+  protected void setEdgeAttribute(final int edgeId, final String name, final Object value) {
     Map<String, Object> attributes = this.edgeAttributesById.get(edgeId);
     if (attributes == null) {
       attributes = new HashMap<String, Object>();
@@ -1045,8 +1021,7 @@ public class Graph<T> {
     attributes.put(name, value);
   }
 
-  protected void setEdgeAttributes(final int edgeId,
-    final Map<String, Object> attributes) {
+  protected void setEdgeAttributes(final int edgeId, final Map<String, Object> attributes) {
     Map<String, Object> edgeAttributes = this.edgeAttributesById.get(edgeId);
     if (edgeAttributes == null) {
       edgeAttributes = new HashMap<String, Object>();
@@ -1064,8 +1039,7 @@ public class Graph<T> {
     this.maxEdgesInMemory = maxEdgesInMemory;
   }
 
-  protected void setNodeAttribute(final int edgeId, final String name,
-    final Object value) {
+  protected void setNodeAttribute(final int edgeId, final String name, final Object value) {
     Map<String, Object> nodeAttributes = this.nodeAttributesById.get(edgeId);
     if (nodeAttributes == null) {
       nodeAttributes = new HashMap<String, Object>();
@@ -1074,8 +1048,7 @@ public class Graph<T> {
     nodeAttributes.put(name, value);
   }
 
-  protected void setNodeAttributes(final int edgeId,
-    final Map<String, Object> attributes) {
+  protected void setNodeAttributes(final int edgeId, final Map<String, Object> attributes) {
     Map<String, Object> nodeAttributes = this.nodeAttributesById.get(edgeId);
     if (nodeAttributes == null) {
       nodeAttributes = new HashMap<String, Object>();
@@ -1088,8 +1061,7 @@ public class Graph<T> {
     this.precisionModel = precisionModel;
   }
 
-  public <V extends Point> List<Edge<T>> splitEdge(final Edge<T> edge,
-    final Collection<V> nodes) {
+  public <V extends Point> List<Edge<T>> splitEdge(final Edge<T> edge, final Collection<V> nodes) {
     return splitEdge(edge, nodes, 0.0);
   }
 
@@ -1134,15 +1106,13 @@ public class Graph<T> {
             final double y1 = points.getY(segmentIndex);
             final double x2 = points.getX(i);
             final double y2 = points.getY(i);
-            final double segmentDistance = LineSegmentUtil.distanceLinePoint(
-              x1, y1, x2, y2, x, y);
+            final double segmentDistance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
             if (segmentDistance == 0) {
               nodeDistanceMap.put(node, segmentDistance);
               nodeSegment.put(node, segmentIndex);
               nodeIter.remove();
             } else {
-              final double projectionFactor = LineSegmentUtil.projectionFactor(
-                x1, y1, x2, y2, x, y);
+              final double projectionFactor = LineSegmentUtil.projectionFactor(x1, y1, x2, y2, x, y);
               if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
                 final Double closestDistance = nodeDistanceMap.get(node);
                 if (closestDistance == null) {
@@ -1166,8 +1136,7 @@ public class Graph<T> {
         Set<Point> splitNodes = segmentSplitNodes.get(index);
         if (splitNodes == null) {
           final Point point = points.getPoint(index);
-          splitNodes = new TreeSet<Point>(new CoordinatesDistanceComparator(
-            point));
+          splitNodes = new TreeSet<Point>(new CoordinatesDistanceComparator(point));
           segmentSplitNodes.put(index, splitNodes);
           splitIndexes.add(index);
         }
@@ -1180,8 +1149,8 @@ public class Graph<T> {
         Point startPoint = null;
         for (final Integer index : splitIndexes) {
           if (splitVertices.contains(index)) {
-            final LineString newPoints = points.subLine(startPoint, startIndex,
-              index - startIndex + 1, null);
+            final LineString newPoints = points.subLine(startPoint, startIndex, index - startIndex
+              + 1, null);
             newLines.add(newPoints);
             startPoint = null;
             startIndex = index;
@@ -1212,11 +1181,9 @@ public class Graph<T> {
 
               final LineString newPoints;
               if (startIndex > index) {
-                newPoints = new LineStringDouble(points.getAxisCount(),
-                  startPoint, point);
+                newPoints = new LineStringDouble(points.getAxisCount(), startPoint, point);
               } else {
-                newPoints = points.subLine(startPoint, startIndex, index
-                  - startIndex + 1, point);
+                newPoints = points.subLine(startPoint, startIndex, index - startIndex + 1, point);
               }
               newLines.add(newPoints);
               startPoint = point;
@@ -1231,8 +1198,7 @@ public class Graph<T> {
         if (newLines.size() > 1) {
           final List<Edge<T>> newEdges = new ArrayList<Edge<T>>();
           for (final LineString edgePoints : newLines) {
-            final Edge<T> newEdge = createEdge(geometryFactory, object,
-              edgePoints);
+            final Edge<T> newEdge = createEdge(geometryFactory, object, edgePoints);
             newEdges.add(newEdge);
           }
           edge.remove();
@@ -1258,8 +1224,7 @@ public class Graph<T> {
       if (segmentIndex != -1) {
         List<LineString> lines;
         final int coordinateIndex = result.get("coordinateIndex").intValue();
-        final int coordinateDistance = result.get("coordinateDistance")
-            .intValue();
+        final int coordinateDistance = result.get("coordinateDistance").intValue();
         final int segmentDistance = result.get("segmentDistance").intValue();
         if (coordinateIndex == 0) {
           if (coordinateDistance == 0) {
@@ -1299,8 +1264,7 @@ public class Graph<T> {
             if (CoordinatesUtil.isAcute(cn1, cn, point)) {
               lines = LineStringUtil.split(line, segmentIndex, point);
             } else if (edge.getToNode().getDegree() == 1) {
-              final LineString newLine = line.insertVertex(point,
-                line.getVertexCount());
+              final LineString newLine = line.insertVertex(point, line.getVertexCount());
               lines = Collections.singletonList(newLine);
             } else {
               return Collections.singletonList(edge);
@@ -1322,13 +1286,12 @@ public class Graph<T> {
     return splitEdge(edge, Arrays.asList(nodes));
   }
 
-  public void visitEdges(final Comparator<Edge<T>> comparator,
-    final Visitor<Edge<T>> visitor) {
+  public void visitEdges(final Comparator<Edge<T>> comparator, final Visitor<Edge<T>> visitor) {
     visitEdges(null, comparator, visitor);
   }
 
-  public void visitEdges(final Filter<Edge<T>> filter,
-    final Comparator<Edge<T>> comparator, final Visitor<Edge<T>> visitor) {
+  public void visitEdges(final Filter<Edge<T>> filter, final Comparator<Edge<T>> comparator,
+    final Visitor<Edge<T>> visitor) {
     final LinkedList<Edge<T>> edges = new LinkedList<Edge<T>>(getEdges(filter));
     if (comparator != null) {
       Collections.sort(edges, comparator);
@@ -1367,8 +1330,7 @@ public class Graph<T> {
     }
   }
 
-  public void visitEdges(final Filter<Edge<T>> filter,
-    final Visitor<Edge<T>> visitor) {
+  public void visitEdges(final Filter<Edge<T>> filter, final Visitor<Edge<T>> visitor) {
     visitEdges(filter, null, visitor);
   }
 
@@ -1392,8 +1354,8 @@ public class Graph<T> {
   }
 
   // TODO make this work with cached nodes
-  public void visitNodes(final Filter<Node<T>> filter,
-    final Comparator<Node<T>> comparator, final Visitor<Node<T>> visitor) {
+  public void visitNodes(final Filter<Node<T>> filter, final Comparator<Node<T>> comparator,
+    final Visitor<Node<T>> visitor) {
     final List<Node<T>> nodes = new LinkedList<Node<T>>();
     if (filter == null) {
       nodes.addAll(getNodes());
@@ -1440,8 +1402,7 @@ public class Graph<T> {
     }
   }
 
-  public void visitNodes(final Filter<Node<T>> filter,
-    final Visitor<Node<T>> visitor) {
+  public void visitNodes(final Filter<Node<T>> filter, final Visitor<Node<T>> visitor) {
     visitNodes(filter, null, visitor);
   }
 
@@ -1458,8 +1419,7 @@ public class Graph<T> {
     visitNodes(filter, comparator, visitor);
   }
 
-  public void visitNodes(final Visitor<Node<T>> visitor,
-    final Comparator<Node<T>> comparator) {
+  public void visitNodes(final Visitor<Node<T>> visitor, final Comparator<Node<T>> comparator) {
     visitNodes(null, comparator, visitor);
   }
 }

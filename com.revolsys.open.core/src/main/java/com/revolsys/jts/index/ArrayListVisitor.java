@@ -38,19 +38,19 @@ import java.util.ArrayList;
 /**
  * @version 1.7
  */
-public class ArrayListVisitor
-implements ItemVisitor
-{
+public class ArrayListVisitor implements ItemVisitor {
 
   private final ArrayList items = new ArrayList();
+
   public ArrayListVisitor() {
   }
 
-  public ArrayList getItems() { return this.items; }
+  public ArrayList getItems() {
+    return this.items;
+  }
 
   @Override
-  public void visitItem(final Object item)
-  {
+  public void visitItem(final Object item) {
     this.items.add(item);
   }
 

@@ -17,8 +17,7 @@ public class AttributeFilter<T extends AttributedObject> implements Filter<T> {
     this.inverse = false;
   }
 
-  public AttributeFilter(final String fieldName, final Object value,
-    final boolean inverse) {
+  public AttributeFilter(final String fieldName, final Object value, final boolean inverse) {
     this.fieldName = fieldName;
     this.value = value;
     this.inverse = inverse;

@@ -12,15 +12,14 @@ import com.revolsys.parallel.ThreadInterruptedException;
 
 public final class JavaProcess {
 
-  public static Process exec(final File logFile,
-    final List<String> javaArguments, final Class<?> klass) {
+  public static Process exec(final File logFile, final List<String> javaArguments,
+    final Class<?> klass) {
     return exec(logFile, javaArguments, klass, Collections.<String> emptyList());
   }
 
-  public static Process exec(File logFile, final List<String> javaArguments,
-    final Class<?> klass, final List<String> programArguments) {
-    final ProcessBuilder builder = processBuilder(javaArguments, klass,
-      programArguments);
+  public static Process exec(File logFile, final List<String> javaArguments, final Class<?> klass,
+    final List<String> programArguments) {
+    final ProcessBuilder builder = processBuilder(javaArguments, klass, programArguments);
 
     logFile = FileUtil.getFile(logFile);
     logFile.getParentFile().mkdirs();
@@ -33,15 +32,13 @@ public final class JavaProcess {
     }
   }
 
-  public static Process exec(final List<String> javaArguments,
-    final Class<?> klass) {
+  public static Process exec(final List<String> javaArguments, final Class<?> klass) {
     return exec(javaArguments, klass, Collections.<String> emptyList());
   }
 
-  public static Process exec(final List<String> javaArguments,
-    final Class<?> klass, final List<String> programArguments) {
-    final ProcessBuilder builder = processBuilder(javaArguments, klass,
-      programArguments);
+  public static Process exec(final List<String> javaArguments, final Class<?> klass,
+    final List<String> programArguments) {
+    final ProcessBuilder builder = processBuilder(javaArguments, klass, programArguments);
 
     try {
       return builder.start();
@@ -50,13 +47,13 @@ public final class JavaProcess {
     }
   }
 
-  public static Process exec(final List<String> javaArguments,
-    final Class<?> klass, final String... programArguments) {
+  public static Process exec(final List<String> javaArguments, final Class<?> klass,
+    final String... programArguments) {
     return exec(javaArguments, klass, Arrays.asList(programArguments));
   }
 
-  public static int execAndWait(final List<String> javaArguments,
-    final Class<?> klass, final List<String> programArguments) {
+  public static int execAndWait(final List<String> javaArguments, final Class<?> klass,
+    final List<String> programArguments) {
     final Process process = exec(javaArguments, klass, programArguments);
     try {
       process.waitFor();
@@ -66,12 +63,10 @@ public final class JavaProcess {
     return process.exitValue();
   }
 
-  protected static ProcessBuilder processBuilder(
-    final List<String> javaArguments, final Class<?> klass,
-    final List<String> programArguments) {
+  protected static ProcessBuilder processBuilder(final List<String> javaArguments,
+    final Class<?> klass, final List<String> programArguments) {
     final String javaHome = System.getProperty("java.home");
-    final String javaBin = javaHome + File.separator + "bin" + File.separator
-        + "java";
+    final String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
 
     final List<String> params = new ArrayList<String>();
     params.add(javaBin);
@@ -83,8 +78,7 @@ public final class JavaProcess {
     final String libraryPath = System.getProperty("java.library.path");
     params.add("-Djava.library.path=" + libraryPath);
 
-    final List<String> inputArguments = ManagementFactory.getRuntimeMXBean()
-        .getInputArguments();
+    final List<String> inputArguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
     for (final String argument : inputArguments) {
       if (argument.startsWith("-D")) {
         params.add(argument);

@@ -22,8 +22,9 @@ import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.record.row.RecordRowTable;
 import com.revolsys.util.Reorderable;
 
-public class RecordListTableModel extends RecordRowTableModel implements
-Reorderable {
+public class RecordListTableModel extends RecordRowTableModel implements Reorderable {
+  private static final long serialVersionUID = 1L;
+
   public static TablePanel createPanel(final AbstractRecordLayer layer) {
     return createPanel(layer.getRecordDefinition(), new ArrayList<Record>(),
       layer.getFieldNamesSet());
@@ -31,15 +32,13 @@ Reorderable {
 
   public static TablePanel createPanel(final AbstractRecordLayer layer,
     final Collection<? extends Record> records) {
-    return createPanel(layer.getRecordDefinition(), records,
-      layer.getFieldNames());
+    return createPanel(layer.getRecordDefinition(), records, layer.getFieldNames());
   }
 
   public static TablePanel createPanel(final RecordDefinition recordDefinition,
-    final Collection<? extends Record> records,
-    final Collection<String> fieldNames) {
-    final RecordListTableModel model = new RecordListTableModel(
-      recordDefinition, records, fieldNames);
+    final Collection<? extends Record> records, final Collection<String> fieldNames) {
+    final RecordListTableModel model = new RecordListTableModel(recordDefinition, records,
+      fieldNames);
     final JTable table = new RecordRowTable(model);
     return new TablePanel(table);
   }
@@ -49,13 +48,10 @@ Reorderable {
     return createPanel(recordDefinition, records, Arrays.asList(fieldNames));
   }
 
-  private static final long serialVersionUID = 1L;
-
   private final List<Record> records = new ArrayList<>();
 
   public RecordListTableModel(final RecordDefinition recordDefinition,
-    final Collection<? extends Record> records,
-    final Collection<String> columnNames) {
+    final Collection<? extends Record> records, final Collection<String> columnNames) {
     super(recordDefinition, columnNames);
     if (records != null) {
       this.records.addAll(records);
@@ -193,15 +189,13 @@ Reorderable {
   }
 
   @Override
-  public void setValueAt(final Object value, final int rowIndex,
-    final int columnIndex) {
+  public void setValueAt(final Object value, final int rowIndex, final int columnIndex) {
     final Record record = getRecord(rowIndex);
     if (record != null) {
       final String name = getColumnName(columnIndex);
       final Object oldValue = record.getValueByPath(name);
       record.setValue(name, value);
-      final PropertyChangeEvent event = new PropertyChangeEvent(record, name,
-        oldValue, value);
+      final PropertyChangeEvent event = new PropertyChangeEvent(record, name, oldValue, value);
       getPropertyChangeSupport().firePropertyChange(event);
     }
   }

@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -32,6 +31,7 @@
  *     www.vividsolutions.com
  */
 package com.revolsys.jts.index.strtree;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,9 @@ public abstract class AbstractNode implements Boundable, Serializable {
   private static final long serialVersionUID = 6493722185909573708L;
 
   private final ArrayList childBoundables = new ArrayList();
+
   private Object bounds = null;
+
   private int level;
 
   /**
@@ -129,8 +131,7 @@ public abstract class AbstractNode implements Boundable, Serializable {
    *
    * @return true if there are boundables at this node
    */
-  public boolean isEmpty()
-  {
+  public boolean isEmpty() {
     return this.childBoundables.isEmpty();
   }
 
@@ -139,8 +140,7 @@ public abstract class AbstractNode implements Boundable, Serializable {
    *
    * @return the count of boundables at this node
    */
-  public int size()
-  {
+  public int size() {
     return this.childBoundables.size();
   }
 }

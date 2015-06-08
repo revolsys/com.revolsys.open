@@ -24,20 +24,18 @@ public class CodeTableListCellRenderer extends DefaultListCellRenderer {
   }
 
   @Override
-  public Component getListCellRendererComponent(final JList list, Object value,
-    final int index, final boolean isSelected, final boolean cellHasFocus) {
+  public Component getListCellRendererComponent(final JList list, Object value, final int index,
+    final boolean isSelected, final boolean cellHasFocus) {
     if (value == null || value == CodeTableComboBoxModel.NULL) {
       value = "-";
     } else if (index >= 0) {
-      final List<Object> values = this.codeTable.getValues(SingleIdentifier.create(
-        value));
+      final List<Object> values = this.codeTable.getValues(SingleIdentifier.create(value));
       if (values == null || values.isEmpty()) {
         value = "-";
       } else {
         value = CollectionUtil.toString(":", values);
       }
     }
-    return super.getListCellRendererComponent(list, value, index, isSelected,
-      cellHasFocus);
+    return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
   }
 }

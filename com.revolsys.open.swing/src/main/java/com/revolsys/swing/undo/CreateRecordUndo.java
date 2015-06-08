@@ -13,8 +13,7 @@ public class CreateRecordUndo extends AbstractUndoableEdit {
 
   private final AbstractRecordLayer layer;
 
-  public CreateRecordUndo(final AbstractRecordLayer layer,
-    final Record record) {
+  public CreateRecordUndo(final AbstractRecordLayer layer, final Record record) {
     this.layer = layer;
     this.record = record;
   }

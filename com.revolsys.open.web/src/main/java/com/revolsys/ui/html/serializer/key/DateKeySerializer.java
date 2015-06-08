@@ -77,8 +77,7 @@ public class DateKeySerializer extends AbstractKeySerializer {
     } catch (final SecurityException e) {
       throw new RuntimeException(e.getMessage(), e);
     } catch (final NoSuchFieldException e) {
-      throw new IllegalArgumentException(styleName
-        + " is not a valid DateFormat style");
+      throw new IllegalArgumentException(styleName + " is not a valid DateFormat style");
     } catch (final IllegalAccessException e) {
       throw new RuntimeException(e.getMessage(), e);
     }

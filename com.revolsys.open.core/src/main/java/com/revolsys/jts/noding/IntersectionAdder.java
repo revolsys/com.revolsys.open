@@ -136,8 +136,8 @@ public class IntersectionAdder implements SegmentIntersector {
    * Note that closed edges require a special check for the point shared by the beginning
    * and end segments.
    */
-  private boolean isTrivialIntersection(final SegmentString e0,
-    final int segIndex0, final SegmentString e1, final int segIndex1) {
+  private boolean isTrivialIntersection(final SegmentString e0, final int segIndex0,
+    final SegmentString e1, final int segIndex1) {
     if (e0 == e1) {
       if (this.li.getIntersectionNum() == 1) {
         if (isAdjacentSegments(segIndex0, segIndex1)) {
@@ -145,8 +145,8 @@ public class IntersectionAdder implements SegmentIntersector {
         }
         if (e0.isClosed()) {
           final int maxSegIndex = e0.size() - 1;
-          if (segIndex0 == 0 && segIndex1 == maxSegIndex
-              || segIndex1 == 0 && segIndex0 == maxSegIndex) {
+          if (segIndex0 == 0 && segIndex1 == maxSegIndex || segIndex1 == 0
+            && segIndex0 == maxSegIndex) {
             return true;
           }
         }

@@ -53,17 +53,21 @@ import com.revolsys.jts.geom.Geometry;
  * @author Martin Davis
  *
  */
-public class WKTFileReader
-{
-  private File file = null;
-  private Reader reader;
-  //  private Reader fileReader = new FileReader(file);
-  private final WKTReader wktReader;
-  private int count = 0;
-  private int limit = -1;
-  private int offset = 0;
-
+public class WKTFileReader {
   private static final int MAX_LOOKAHEAD = 1000;
+
+  private File file = null;
+
+  private Reader reader;
+
+  // private Reader fileReader = new FileReader(file);
+  private final WKTReader wktReader;
+
+  private int count = 0;
+
+  private int limit = -1;
+
+  private int offset = 0;
 
   /**
    * Creates a new <tt>WKTFileReader</tt> given the <tt>File</tt> to read from
@@ -72,8 +76,7 @@ public class WKTFileReader
    * @param file the <tt>File</tt> to read from
    * @param wktReader the geometry reader to use
    */
-  public WKTFileReader(final File file, final WKTReader wktReader)
-  {
+  public WKTFileReader(final File file, final WKTReader wktReader) {
     this.file = file;
     this.wktReader = wktReader;
   }
@@ -84,8 +87,7 @@ public class WKTFileReader
    * @param reader the reader to read from
    * @param wktReader the geometry reader to use
    */
-  public WKTFileReader(final Reader reader, final WKTReader wktReader)
-  {
+  public WKTFileReader(final Reader reader, final WKTReader wktReader) {
     this.reader = reader;
     this.wktReader = wktReader;
   }
@@ -96,17 +98,14 @@ public class WKTFileReader
    * @param filename the name of the file to read from
    * @param wktReader the geometry reader to use
    */
-  public WKTFileReader(final String filename, final WKTReader wktReader)
-  {
+  public WKTFileReader(final String filename, final WKTReader wktReader) {
     this(new File(filename), wktReader);
   }
 
   /**
    * Tests if reader is at EOF.
    */
-  private boolean isAtEndOfFile(final BufferedReader bufferedReader)
-      throws IOException
-  {
+  private boolean isAtEndOfFile(final BufferedReader bufferedReader) throws IOException {
     bufferedReader.mark(MAX_LOOKAHEAD);
 
     final StreamTokenizer tokenizer = new StreamTokenizer(bufferedReader);
@@ -119,8 +118,7 @@ public class WKTFileReader
     return false;
   }
 
-  private boolean isAtLimit(final List geoms)
-  {
+  private boolean isAtLimit(final List geoms) {
     if (this.limit < 0) {
       return false;
     }
@@ -139,9 +137,7 @@ public class WKTFileReader
    * @throws IOException if an I/O exception was encountered
    * @throws ParseException if an error occured reading a geometry
    */
-  public List read()
-      throws IOException, ParseException
-  {
+  public List read() throws IOException, ParseException {
     // do this here so that constructors don't throw exceptions
     if (this.file != null) {
       this.reader = new FileReader(this.file);
@@ -160,10 +156,9 @@ public class WKTFileReader
     }
   }
 
-  private List read(final BufferedReader bufferedReader) throws IOException,
-  ParseException {
+  private List read(final BufferedReader bufferedReader) throws IOException, ParseException {
     final List geoms = new ArrayList();
-    while (! isAtEndOfFile(bufferedReader) && ! isAtLimit(geoms)) {
+    while (!isAtEndOfFile(bufferedReader) && !isAtLimit(geoms)) {
       final Geometry g = this.wktReader.read(bufferedReader);
       if (this.count >= this.offset) {
         geoms.add(g);
@@ -178,8 +173,7 @@ public class WKTFileReader
    *
    * @param limit the maximum number of geometries to read
    */
-  public void setLimit(final int limit)
-  {
+  public void setLimit(final int limit) {
     this.limit = limit;
   }
 
@@ -188,8 +182,7 @@ public class WKTFileReader
    *
    * @param offset the number of geometries to skip
    */
-  public void setOffset(final int offset)
-  {
+  public void setOffset(final int offset) {
     this.offset = offset;
   }
 }

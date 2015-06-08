@@ -42,50 +42,42 @@ public class BufferTest extends TestCase {
     final TestSuite suite = new TestSuite("Buffer");
     int i = 0;
     try (
-        Reader<Map<String, Object>> reader = AbstractMapReaderFactory.mapReader(new ClassPathResource(
-            "/com/revolsys/jts/test/geometry/operation/buffer.csv"))) {
+      Reader<Map<String, Object>> reader = AbstractMapReaderFactory.mapReader(new ClassPathResource(
+        "/com/revolsys/jts/test/geometry/operation/buffer.csv"))) {
       for (final Map<String, Object> map : reader) {
         i++;
         final int srid = Maps.getInteger(map, "srid", 0);
         final int axisCount = Maps.getInteger(map, "axisCount", 2);
         final double scaleXy = Maps.getDouble(map, "scaleXy", 0.0);
         final double scaleZ = Maps.getDouble(map, "scaleZ", 0.0);
-        final GeometryFactory geometryFactory = GeometryFactory.fixed(
-          srid, axisCount, scaleXy, scaleZ);
+        final GeometryFactory geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXy,
+          scaleZ);
 
         final String sourceWkt = (String)map.get("sourceWkt");
         final Geometry sourceGeometry = geometryFactory.geometry(sourceWkt);
 
-        final double distance = Maps.getDouble(map, "bufferDistance",
-          0.0);
+        final double distance = Maps.getDouble(map, "bufferDistance", 0.0);
 
-        final int quadrantSegments = Maps.getInteger(map,
-          "quadrantSegments", BufferParameters.DEFAULT_QUADRANT_SEGMENTS);
-        final int endCapStyle = Maps.getInteger(map, "endCapStyle",
-          BufferParameters.CAP_ROUND);
-        final int joinStyle = Maps.getInteger(map, "joinStyle",
-          BufferParameters.JOIN_ROUND);
+        final int quadrantSegments = Maps.getInteger(map, "quadrantSegments",
+          BufferParameters.DEFAULT_QUADRANT_SEGMENTS);
+        final int endCapStyle = Maps.getInteger(map, "endCapStyle", BufferParameters.CAP_ROUND);
+        final int joinStyle = Maps.getInteger(map, "joinStyle", BufferParameters.JOIN_ROUND);
         final double mitreLimit = Maps.getDouble(map, "mitreLimit",
           BufferParameters.DEFAULT_MITRE_LIMIT);
 
-        final BufferParameters parameters = new BufferParameters(
-          quadrantSegments, endCapStyle, joinStyle, mitreLimit);
+        final BufferParameters parameters = new BufferParameters(quadrantSegments, endCapStyle,
+          joinStyle, mitreLimit);
 
-        final Boolean expectedEmpty = Maps.getBoolean(map,
-            "expectedEmpty");
-        final Boolean expectedHoles = Maps.getBoolean(map,
-            "expectedHoles");
-        final Boolean expectedContains = Maps.getBoolean(map,
-            "expectedContains");
-        final Double expectedArea = Maps.getDouble(map,
-            "expectedArea");
+        final Boolean expectedEmpty = Maps.getBoolean(map, "expectedEmpty");
+        final Boolean expectedHoles = Maps.getBoolean(map, "expectedHoles");
+        final Boolean expectedContains = Maps.getBoolean(map, "expectedContains");
+        final Double expectedArea = Maps.getDouble(map, "expectedArea");
 
         final String expectedWkt = (String)map.get("expectedWkt");
         final Geometry expectedGeometry = geometryFactory.geometry(expectedWkt);
 
-        final BufferTest test = new BufferTest(i, sourceGeometry, distance,
-          parameters, expectedEmpty, expectedHoles, expectedContains,
-          expectedArea, expectedGeometry);
+        final BufferTest test = new BufferTest(i, sourceGeometry, distance, parameters,
+          expectedEmpty, expectedHoles, expectedContains, expectedArea, expectedGeometry);
         suite.addTest(test);
 
       }
@@ -109,11 +101,9 @@ public class BufferTest extends TestCase {
 
   private final Double expectedArea;
 
-  public BufferTest(final int index, final Geometry source,
-    final double distance, final BufferParameters parameters,
-    final Boolean expectedEmpty, final Boolean expectedHoles,
-    final Boolean expectedContains, final Double expectedArea,
-    final Geometry expected) {
+  public BufferTest(final int index, final Geometry source, final double distance,
+    final BufferParameters parameters, final Boolean expectedEmpty, final Boolean expectedHoles,
+    final Boolean expectedContains, final Double expectedArea, final Geometry expected) {
     super(String.valueOf(index));
     this.source = source;
     this.distance = distance;
@@ -150,15 +140,13 @@ public class BufferTest extends TestCase {
       Assert.assertEquals(message("Area", actual), this.expectedArea, area, 0);
     }
     if (this.expected != null) {
-      if (!actual.equals(2,this.expected)) {
-        TestUtil.failNotEquals(message("Geometry Equal", actual), this.expected,
-          actual);
+      if (!actual.equals(2, this.expected)) {
+        TestUtil.failNotEquals(message("Geometry Equal", actual), this.expected, actual);
       }
     }
     if (this.expectedContains != null) {
       final boolean contains = contains(actual, this.source);
-      Assert.assertEquals(message("Contains", actual), this.expectedContains,
-        contains);
+      Assert.assertEquals(message("Contains", actual), this.expectedContains, contains);
     }
     if (this.expectedHoles != null) {
       final boolean hasHoles = hasHoles(actual);

@@ -34,8 +34,27 @@ import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.util.Property;
 
 public final class EpsgCoordinateSystems {
-  private static void addCoordinateSystem(
-    final CoordinateSystem coordinateSystem) {
+  private static Set<CoordinateSystem> coordinateSystems;
+
+  private static IntHashMap<List<CoordinateSystem>> coordinateSystemsByCoordinateSystem = new IntHashMap<>();
+
+  private static Map<Integer, CoordinateSystem> coordinateSystemsById = new TreeMap<Integer, CoordinateSystem>();
+
+  private static Map<String, CoordinateSystem> coordinateSystemsByName = new TreeMap<String, CoordinateSystem>();
+
+  private static Map<String, Projection> projectionsByName = new TreeMap<String, Projection>();
+
+  private static Map<Integer, Projection> projectionsByCode = new TreeMap<Integer, Projection>();
+
+  private static boolean initialized = false;
+
+  private static int nextSrid = 2000000;
+
+  private static final IntHashMap<LinearUnit> linearUnits = new IntHashMap<>();
+
+  private static Map<String, LinearUnit> linearUnitsByName = new TreeMap<String, LinearUnit>();
+
+  private static void addCoordinateSystem(final CoordinateSystem coordinateSystem) {
     final Integer id = coordinateSystem.getId();
     final String name = coordinateSystem.getName();
     coordinateSystemsById.put(id, coordinateSystem);
@@ -78,8 +97,7 @@ public final class EpsgCoordinateSystems {
                   matchedCoordinateSystem = coordinateSystem3;
                   matchCoordinateSystemId = srid3;
                 } else if (srid3 < matchCoordinateSystemId) {
-                  if (!coordinateSystem3.isDeprecated()
-                      || matchedCoordinateSystem.isDeprecated()) {
+                  if (!coordinateSystem3.isDeprecated() || matchedCoordinateSystem.isDeprecated()) {
                     matchedCoordinateSystem = coordinateSystem3;
                     matchCoordinateSystemId = srid3;
                   }
@@ -102,9 +120,8 @@ public final class EpsgCoordinateSystems {
               final Datum datum = geographicCs.getDatum();
               final PrimeMeridian primeMeridian = geographicCs.getPrimeMeridian();
               final AngularUnit angularUnit = geographicCs.getAngularUnit();
-              final GeographicCoordinateSystem newCs = new GeographicCoordinateSystem(
-                srid, name, datum, primeMeridian, angularUnit, axis, area,
-                authority, deprecated);
+              final GeographicCoordinateSystem newCs = new GeographicCoordinateSystem(srid, name,
+                datum, primeMeridian, angularUnit, axis, area, authority, deprecated);
               addCoordinateSystem(newCs);
               return newCs;
             } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
@@ -114,9 +131,8 @@ public final class EpsgCoordinateSystems {
               final Projection projection = projectedCs.getProjection();
               final Map<String, Object> parameters = projectedCs.getParameters();
               final LinearUnit linearUnit = projectedCs.getLinearUnit();
-              final ProjectedCoordinateSystem newCs = new ProjectedCoordinateSystem(
-                srid, name, geographicCs, area, projection, parameters,
-                linearUnit, axis, authority, deprecated);
+              final ProjectedCoordinateSystem newCs = new ProjectedCoordinateSystem(srid, name,
+                geographicCs, area, projection, parameters, linearUnit, axis, authority, deprecated);
               addCoordinateSystem(newCs);
               return newCs;
             }
@@ -129,14 +145,12 @@ public final class EpsgCoordinateSystems {
   }
 
   @SuppressWarnings("unchecked")
-  public static <C extends CoordinateSystem> C getCoordinateSystem(
-    final Geometry geometry) {
+  public static <C extends CoordinateSystem> C getCoordinateSystem(final Geometry geometry) {
     return (C)getCoordinateSystem(geometry.getSrid());
   }
 
   @SuppressWarnings("unchecked")
-  public static <C extends CoordinateSystem> C getCoordinateSystem(
-    final int crsId) {
+  public static <C extends CoordinateSystem> C getCoordinateSystem(final int crsId) {
     initialize();
     final CoordinateSystem coordinateSystem = coordinateSystemsById.get(crsId);
     return (C)coordinateSystem;
@@ -308,7 +322,7 @@ public final class EpsgCoordinateSystems {
         final ProjectedCoordinateSystem worldMercator = (ProjectedCoordinateSystem)coordinateSystemsById.get(3857);
         coordinateSystemsById.put(900913, worldMercator);
         coordinateSystems = Collections.unmodifiableSet(new LinkedHashSet<CoordinateSystem>(
-            coordinateSystemsById.values()));
+          coordinateSystemsById.values()));
         initialized = true;
       } catch (final Throwable t) {
         t.printStackTrace();
@@ -335,8 +349,8 @@ public final class EpsgCoordinateSystems {
             final boolean deprecated = Boolean.parseBoolean(values.get(4));
             final AngularUnit baseUnit = angularUnits.get(baseId);
             final EpsgAuthority authority = new EpsgAuthority(id);
-            final AngularUnit unit = new AngularUnit(name, baseUnit,
-              conversionFactor, authority, deprecated);
+            final AngularUnit unit = new AngularUnit(name, baseUnit, conversionFactor, authority,
+              deprecated);
             angularUnits.put(id, unit);
           }
         }
@@ -368,8 +382,8 @@ public final class EpsgCoordinateSystems {
             final boolean deprecated = Boolean.parseBoolean(values.get(6));
             final Authority authority = new EpsgAuthority(code);
 
-            final Area area = new Area(name, new BoundingBoxDoubleGf(2, minX,
-              minY, maxX, maxY), authority, deprecated);
+            final Area area = new Area(name, new BoundingBoxDoubleGf(2, minX, minY, maxX, maxY),
+              authority, deprecated);
             areas.put(code, area);
           }
         }
@@ -435,8 +449,7 @@ public final class EpsgCoordinateSystems {
             final Spheroid spheroid = spheroids.get(spheroidId);
             final PrimeMeridian primeMeridian = primeMeridians.get(primeMeridianId);
             final EpsgAuthority authority = new EpsgAuthority(id);
-            final Datum datum = new Datum(name, spheroid, primeMeridian,
-              authority, deprecated);
+            final Datum datum = new Datum(name, spheroid, primeMeridian, authority, deprecated);
             datums.put(id, datum);
           }
         }
@@ -447,8 +460,7 @@ public final class EpsgCoordinateSystems {
     return datums;
   }
 
-  private static void loadGeographicCoordinateSystems(
-    final Map<Integer, AngularUnit> angularUnits,
+  private static void loadGeographicCoordinateSystems(final Map<Integer, AngularUnit> angularUnits,
     final Map<Integer, List<Axis>> axisMap, final Map<Integer, Area> areas) {
     final Map<Integer, Datum> datums = loadDatums();
     final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/geographic.csv");
@@ -472,8 +484,8 @@ public final class EpsgCoordinateSystems {
             final AngularUnit angularUnit = angularUnits.get(unitId);
             final List<Axis> axis = axisMap.get(axisId);
             final Area area = areas.get(areaId);
-            final GeographicCoordinateSystem coordinateSystem = new GeographicCoordinateSystem(
-              id, name, datum, angularUnit, axis, area, authority, deprecated);
+            final GeographicCoordinateSystem coordinateSystem = new GeographicCoordinateSystem(id,
+              name, datum, angularUnit, axis, area, authority, deprecated);
             addCoordinateSystem(coordinateSystem);
           }
         }
@@ -500,8 +512,8 @@ public final class EpsgCoordinateSystems {
             final boolean deprecated = Boolean.parseBoolean(values.get(4));
             final LinearUnit baseUnit = linearUnits.get(baseId);
             final EpsgAuthority authority = new EpsgAuthority(id);
-            final LinearUnit unit = new LinearUnit(name, baseUnit,
-              conversionFactor, authority, deprecated);
+            final LinearUnit unit = new LinearUnit(name, baseUnit, conversionFactor, authority,
+              deprecated);
             linearUnits.put(id, unit);
             linearUnitsByName.put(name, unit);
           }
@@ -529,8 +541,8 @@ public final class EpsgCoordinateSystems {
             final double longitude = getDouble(values.get(2));
             final boolean deprecated = Boolean.parseBoolean(values.get(3));
             final EpsgAuthority authority = new EpsgAuthority(id);
-            final PrimeMeridian primeMeridian = new PrimeMeridian(name,
-              longitude, authority, deprecated);
+            final PrimeMeridian primeMeridian = new PrimeMeridian(name, longitude, authority,
+              deprecated);
             primeMeridians.put(id, primeMeridian);
           }
         }
@@ -541,9 +553,8 @@ public final class EpsgCoordinateSystems {
     return primeMeridians;
   }
 
-  private static void loadProjectedCoordinateSystems(
-    final Map<Integer, List<Axis>> axisMap, final Map<Integer, Area> areas,
-    final Map<Integer, LinearUnit> linearUnits) {
+  private static void loadProjectedCoordinateSystems(final Map<Integer, List<Axis>> axisMap,
+    final Map<Integer, Area> areas, final Map<Integer, LinearUnit> linearUnits) {
     final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/projected.csv");
     if (resource != null) {
       try {
@@ -568,21 +579,20 @@ public final class EpsgCoordinateSystems {
               final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)referencedCoordinateSystem;
               EpsgAuthority authority = new EpsgAuthority(id);
               final LinearUnit linearUnit = linearUnits.get(unitId);
-              final Projection projection = getProjection(methodCode,
-                methodName);
+              final Projection projection = getProjection(methodCode, methodName);
               final Map<String, Object> parameters = getParameters(parametersString);
               final List<Axis> axis = axisMap.get(axisId);
               final Area area = areas.get(areaId);
-              final ProjectedCoordinateSystem coordinateSystem = new ProjectedCoordinateSystem(
-                id, name, geographicCoordinateSystem, area, projection,
-                parameters, linearUnit, axis, authority, deprecated);
+              final ProjectedCoordinateSystem coordinateSystem = new ProjectedCoordinateSystem(id,
+                name, geographicCoordinateSystem, area, projection, parameters, linearUnit, axis,
+                authority, deprecated);
 
               addCoordinateSystem(coordinateSystem);
               if (id == 3857) {
                 authority = new EpsgAuthority(102100);
-                final ProjectedCoordinateSystem webMercator = new ProjectedCoordinateSystem(
-                  102100, name, geographicCoordinateSystem, area, projection,
-                  parameters, linearUnit, axis, authority, deprecated);
+                final ProjectedCoordinateSystem webMercator = new ProjectedCoordinateSystem(102100,
+                  name, geographicCoordinateSystem, area, projection, parameters, linearUnit, axis,
+                  authority, deprecated);
 
                 addCoordinateSystem(webMercator);
               }
@@ -614,8 +624,8 @@ public final class EpsgCoordinateSystems {
             final double inverseFlattening = getDouble(values.get(4));
             final boolean deprecated = Boolean.parseBoolean(values.get(5));
             final EpsgAuthority authority = new EpsgAuthority(id);
-            final Spheroid spheroid = new Spheroid(name, semiMajorAxis,
-              semiMinorAxis, inverseFlattening, authority, deprecated);
+            final Spheroid spheroid = new Spheroid(name, semiMajorAxis, semiMinorAxis,
+              inverseFlattening, authority, deprecated);
             spheroids.put(id, spheroid);
           }
         }
@@ -629,26 +639,6 @@ public final class EpsgCoordinateSystems {
   public static CoordinateSystem wgs84() {
     return EpsgCoordinateSystems.<CoordinateSystem> getCoordinateSystem(4326);
   }
-
-  private static Set<CoordinateSystem> coordinateSystems;
-
-  private static IntHashMap<List<CoordinateSystem>> coordinateSystemsByCoordinateSystem = new IntHashMap<>();
-
-  private static Map<Integer, CoordinateSystem> coordinateSystemsById = new TreeMap<Integer, CoordinateSystem>();
-
-  private static Map<String, CoordinateSystem> coordinateSystemsByName = new TreeMap<String, CoordinateSystem>();
-
-  private static Map<String, Projection> projectionsByName = new TreeMap<String, Projection>();
-
-  private static Map<Integer, Projection> projectionsByCode = new TreeMap<Integer, Projection>();
-
-  private static boolean initialized = false;
-
-  private static int nextSrid = 2000000;
-
-  private static final IntHashMap<LinearUnit> linearUnits = new IntHashMap<>();
-
-  private static Map<String, LinearUnit> linearUnitsByName = new TreeMap<String, LinearUnit>();
 
   private EpsgCoordinateSystems() {
   }

@@ -59,14 +59,12 @@ public class GeometryGraph extends Graph<LineSegment> {
     }
   }
 
-  public void addEdge(final Node<LineSegment> fromNode,
-    final Node<LineSegment> toNode) {
+  public void addEdge(final Node<LineSegment> fromNode, final Node<LineSegment> toNode) {
     final LineSegment lineSegment = new LineSegmentDoubleGF(fromNode, toNode);
     addEdge(lineSegment, fromNode, toNode);
   }
 
-  private void addEdges(final LineString points,
-    final Map<String, Object> attributes) {
+  private void addEdges(final LineString points, final Map<String, Object> attributes) {
     this.startPoints.add(new PointDouble(points.getPoint(0), 2));
     int index = 0;
     for (LineSegment lineSegment : points.segments()) {
@@ -142,10 +140,10 @@ public class GeometryGraph extends Graph<LineSegment> {
       Point previousPoint = fromPoint;
       for (int i = 1; i < numPoints; i++) {
         final Point nextPoint = points.getPoint(i);
-        final LineSegment line1 = new LineSegmentDoubleGF(getGeometryFactory(),
-          previousPoint, nextPoint);
-        final List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(
-          this, line1, this.maxDistance);
+        final LineSegment line1 = new LineSegmentDoubleGF(getGeometryFactory(), previousPoint,
+          nextPoint);
+        final List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(this, line1,
+          this.maxDistance);
         for (final Edge<LineSegment> edge2 : edges) {
           final LineSegment line2 = edge2.getObject();
           final Geometry segmentIntersection = line1.getIntersection(line2);
@@ -253,7 +251,7 @@ public class GeometryGraph extends Graph<LineSegment> {
   public Geometry getGeometry() {
     removeDuplicateLineEdges();
     final EdgeAttributeValueComparator<LineSegment> comparator = new EdgeAttributeValueComparator<LineSegment>(
-        "geometryIndex", "partIndex", "segmentIndex");
+      "geometryIndex", "partIndex", "segmentIndex");
     final List<Geometry> geometries = new ArrayList<Geometry>(this.points);
     final GeometryFactory geometryFactory = getGeometryFactory();
     final int axisCount = geometryFactory.getAxisCount();
@@ -316,10 +314,9 @@ public class GeometryGraph extends Graph<LineSegment> {
       Point previousPoint = fromPoint;
       for (int i = 1; i < numPoints; i++) {
         final Point nextPoint = points.getPoint(i);
-        final LineSegment line1 = new LineSegmentDoubleGF(previousPoint,
-          nextPoint);
-        final List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(
-          this, line1, maxDistance);
+        final LineSegment line1 = new LineSegmentDoubleGF(previousPoint, nextPoint);
+        final List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(this, line1,
+          maxDistance);
         for (final Edge<LineSegment> edge2 : edges) {
           final LineSegment line2 = edge2.getObject();
           final Geometry intersections = line1.getIntersection(line2);
@@ -390,10 +387,10 @@ public class GeometryGraph extends Graph<LineSegment> {
   }
 
   public void removeDuplicateLineEdges() {
-    final Visitor<Edge<LineSegment>> visitor = new InvokeMethodVisitor<Edge<LineSegment>>(
-        this, "removeDuplicateLineEdges");
+    final Visitor<Edge<LineSegment>> visitor = new InvokeMethodVisitor<Edge<LineSegment>>(this,
+      "removeDuplicateLineEdges");
     final Comparator<Edge<LineSegment>> comparator = new EdgeAttributeValueComparator<LineSegment>(
-        "geometryIndex", "partIndex", "segmentIndex");
+      "geometryIndex", "partIndex", "segmentIndex");
     visitEdges(comparator, visitor);
   }
 

@@ -9,8 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.raster.TiledImageLayerRenderer;
 
-public abstract class AbstractTiledImageLayer extends AbstractLayer implements
-BaseMapLayer {
+public abstract class AbstractTiledImageLayer extends AbstractLayer implements BaseMapLayer {
 
   private boolean hasError = false;
 
@@ -59,8 +58,7 @@ BaseMapLayer {
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
-    map.keySet().removeAll(
-      Arrays.asList("readOnly", "querySupported", "selectSupported"));
+    map.keySet().removeAll(Arrays.asList("readOnly", "querySupported", "selectSupported"));
     return map;
   }
 }

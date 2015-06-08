@@ -27,12 +27,10 @@ public class PathForwardAction implements Action {
   }
 
   @Override
-  public void process(
-    final HttpServletRequest request,
-    final HttpServletResponse response) throws IOException, ServletException {
+  public void process(final HttpServletRequest request, final HttpServletResponse response)
+    throws IOException, ServletException {
     final RequestDispatcher requestDispatcher = request.getRequestDispatcher(this.path);
-    Logger.getLogger(PathForwardAction.class).debug(
-      this.path + '=' + requestDispatcher);
+    Logger.getLogger(PathForwardAction.class).debug(this.path + '=' + requestDispatcher);
     if (requestDispatcher != null) {
       requestDispatcher.forward(request, response);
     }

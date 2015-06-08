@@ -13,16 +13,14 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 
-public class OsmPbfRecordIoFactory extends
-AbstractRecordAndGeometryReaderFactory {
+public class OsmPbfRecordIoFactory extends AbstractRecordAndGeometryReaderFactory {
   public OsmPbfRecordIoFactory() {
     super("Open Street Map PBF", true);
     addMediaTypeAndFileExtension("application/x-pbf+osm", "osm.pbf");
   }
 
   @Override
-  public RecordReader createRecordReader(final Resource resource,
-    final RecordFactory recordFactory) {
+  public RecordReader createRecordReader(final Resource resource, final RecordFactory recordFactory) {
     final OsmPbfRecordIterator iterator = new OsmPbfRecordIterator(resource);
     return new RecordIteratorReader(iterator);
   }
@@ -33,8 +31,7 @@ AbstractRecordAndGeometryReaderFactory {
   }
 
   @Override
-  public boolean isCoordinateSystemSupported(
-    final CoordinateSystem coordinateSystem) {
+  public boolean isCoordinateSystemSupported(final CoordinateSystem coordinateSystem) {
     return coordinateSystem instanceof GeographicCoordinateSystem;
   }
 

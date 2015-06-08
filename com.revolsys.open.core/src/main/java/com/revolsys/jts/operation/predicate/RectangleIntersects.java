@@ -101,12 +101,12 @@ class EnvelopeIntersectsVisitor extends ShortCircuitedGeometryVisitor {
      * about the presence of an intersection.
      */
     if (elementEnv.getMinX() >= this.rectEnv.getMinX()
-        && elementEnv.getMaxX() <= this.rectEnv.getMaxX()) {
+      && elementEnv.getMaxX() <= this.rectEnv.getMaxX()) {
       this.intersects = true;
       return;
     }
     if (elementEnv.getMinY() >= this.rectEnv.getMinY()
-        && elementEnv.getMaxY() <= this.rectEnv.getMaxY()) {
+      && elementEnv.getMaxY() <= this.rectEnv.getMaxY()) {
       this.intersects = true;
       return;
     }
@@ -237,8 +237,7 @@ public class RectangleIntersects {
      * Test if rectangle envelope intersects any component envelope.
      * This handles Point components as well
      */
-    final EnvelopeIntersectsVisitor visitor = new EnvelopeIntersectsVisitor(
-      this.rectEnv);
+    final EnvelopeIntersectsVisitor visitor = new EnvelopeIntersectsVisitor(this.rectEnv);
     visitor.applyTo(geom);
     if (visitor.intersects()) {
       return true;
@@ -247,8 +246,7 @@ public class RectangleIntersects {
     /**
      * Test if any rectangle vertex is contained in the target geometry
      */
-    final GeometryContainsPointVisitor ecpVisitor = new GeometryContainsPointVisitor(
-      this.rectangle);
+    final GeometryContainsPointVisitor ecpVisitor = new GeometryContainsPointVisitor(this.rectangle);
     ecpVisitor.applyTo(geom);
     if (ecpVisitor.containsPoint()) {
       return true;

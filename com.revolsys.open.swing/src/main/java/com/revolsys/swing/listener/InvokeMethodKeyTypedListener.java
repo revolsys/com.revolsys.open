@@ -43,24 +43,22 @@ public class InvokeMethodKeyTypedListener extends KeyAdapter {
 
   private final boolean invokeLater;
 
-  public InvokeMethodKeyTypedListener(final Object object,
-    final String methodName) {
+  public InvokeMethodKeyTypedListener(final Object object, final String methodName) {
     this(object, methodName, new Object[0]);
   }
 
-  public InvokeMethodKeyTypedListener(final Object object,
-    final String methodName, final boolean invokeLater) {
+  public InvokeMethodKeyTypedListener(final Object object, final String methodName,
+    final boolean invokeLater) {
     this(object, methodName, new Object[0], invokeLater);
   }
 
-  public InvokeMethodKeyTypedListener(final Object object,
-    final String methodName, final Object... parameters) {
+  public InvokeMethodKeyTypedListener(final Object object, final String methodName,
+    final Object... parameters) {
     this(object, methodName, parameters, false);
   }
 
-  public InvokeMethodKeyTypedListener(final Object object,
-    final String methodName, final Object[] parameters,
-    final boolean invokeLater) {
+  public InvokeMethodKeyTypedListener(final Object object, final String methodName,
+    final Object[] parameters, final boolean invokeLater) {
     this.runnable = new InvokeMethodRunnable(object, methodName, parameters);
     this.invokeLater = invokeLater;
   }

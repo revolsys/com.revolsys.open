@@ -64,8 +64,7 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
               }, 0, coord, 0, 1);
               int x = (int)(coord[0] - metrics.stringWidth(tileName) / 2);
               int y = (int)(coord[1] + metrics.getHeight() / 2);
-              final Rectangle2D bounds = metrics.getStringBounds(tileName,
-                graphics);
+              final Rectangle2D bounds = metrics.getStringBounds(tileName, graphics);
               final double width = bounds.getWidth();
               final double height = bounds.getHeight();
 
@@ -85,8 +84,8 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
               }
 
               graphics.setColor(WebColors.LightGray);
-              graphics.fill(new Rectangle2D.Double(x - 2,
-                y + bounds.getY() - 1, width + 4, height + 2));
+              graphics.fill(new Rectangle2D.Double(x - 2, y + bounds.getY() - 1, width + 4,
+                height + 2));
 
               graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                 RenderingHints.VALUE_TEXT_ANTIALIAS_ON);

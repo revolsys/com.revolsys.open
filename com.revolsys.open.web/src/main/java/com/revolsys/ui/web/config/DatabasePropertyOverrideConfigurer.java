@@ -63,9 +63,8 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
    * @param mapKey The key in the map to set.
    * @param value The value to set.
    */
-  protected void applyMapPropertyValue(
-    final ConfigurableListableBeanFactory factory, final String beanName,
-    final String propertyName, final String mapKey, final String value) {
+  protected void applyMapPropertyValue(final ConfigurableListableBeanFactory factory,
+    final String beanName, final String propertyName, final String mapKey, final String value) {
     this.beanNames.add(beanName);
     final BeanDefinition bd = factory.getBeanDefinition(beanName);
     final MutablePropertyValues values = bd.getPropertyValues();
@@ -76,8 +75,8 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
         final Map map = (Map)objectValue;
         map.put(mapKey, value);
       } else {
-        throw new BeanInitializationException("Bean property [" + beanName
-          + "." + propertyName + "] is not a Map");
+        throw new BeanInitializationException("Bean property [" + beanName + "." + propertyName
+          + "] is not a Map");
       }
     } else {
       final Map<String, Object> map = new HashMap<>();
@@ -94,9 +93,8 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
    * @param propertyName The name of the property.
    * @param value The value to set.
    */
-  protected void applyPropertyValue(
-    final ConfigurableListableBeanFactory factory, final String beanName,
-    final String propertyName, final String value) {
+  protected void applyPropertyValue(final ConfigurableListableBeanFactory factory,
+    final String beanName, final String propertyName, final String value) {
     this.beanNames.add(beanName);
     final BeanDefinition bd = factory.getBeanDefinition(beanName);
     final MutablePropertyValues values = bd.getPropertyValues();
@@ -123,8 +121,8 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
    * @param key The key used to set the property.
    * @param value The value to set. @ If there was an problem setting the value.
    */
-  protected void processKey(final ConfigurableListableBeanFactory factory,
-    final String key, final String value) {
+  protected void processKey(final ConfigurableListableBeanFactory factory, final String key,
+    final String value) {
     final Matcher mapProperetyValueMatcher = MAP_PROPERTY_VALUE_PATTERN.matcher(key);
     if (mapProperetyValueMatcher.matches()) {
       final String beanName = mapProperetyValueMatcher.group(1);
@@ -153,15 +151,14 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
    *          problem setting the values.
    */
   @Override
-  protected void processProperties(
-    final ConfigurableListableBeanFactory beanFactory, final Map properties) {
+  protected void processProperties(final ConfigurableListableBeanFactory beanFactory,
+    final Map properties) {
     for (final Iterator en = properties.keySet().iterator(); en.hasNext();) {
       final String key = (String)en.next();
       try {
         processKey(beanFactory, key, (String)properties.get(key));
       } catch (final BeansException ex) {
-        final String msg = "Could not process key [" + key
-            + "] in PropertyOverrideConfigurer";
+        final String msg = "Could not process key [" + key + "] in PropertyOverrideConfigurer";
         if (this.ignoreInvalidKeys) {
           if (getLog().isDebugEnabled()) {
             getLog().debug(msg, ex);

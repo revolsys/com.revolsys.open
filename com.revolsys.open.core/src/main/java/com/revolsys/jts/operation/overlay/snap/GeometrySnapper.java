@@ -66,6 +66,8 @@ import com.revolsys.jts.geom.vertex.Vertex;
  * @version 1.7
  */
 public class GeometrySnapper {
+  private static final double SNAP_PRECISION_FACTOR = 1e-9;
+
   /**
    * Estimates the snap tolerance for a Geometry, taking into account its precision model.
    *
@@ -94,10 +96,8 @@ public class GeometrySnapper {
     return snapTolerance;
   }
 
-  public static double computeOverlaySnapTolerance(final Geometry g0,
-    final Geometry g1) {
-    return Math.min(computeOverlaySnapTolerance(g0),
-      computeOverlaySnapTolerance(g1));
+  public static double computeOverlaySnapTolerance(final Geometry g0, final Geometry g1) {
+    return Math.min(computeOverlaySnapTolerance(g0), computeOverlaySnapTolerance(g1));
   }
 
   public static double computeSizeBasedSnapTolerance(final Geometry g) {
@@ -115,8 +115,7 @@ public class GeometrySnapper {
    * @param snapTolerance the tolerance to use
    * @return the snapped geometries
    */
-  public static Geometry[] snap(final Geometry g0, final Geometry g1,
-    final double snapTolerance) {
+  public static Geometry[] snap(final Geometry g0, final Geometry g1, final double snapTolerance) {
     final Geometry[] snapGeom = new Geometry[2];
     final GeometrySnapper snapper0 = new GeometrySnapper(g0);
     snapGeom[0] = snapper0.snapTo(g1, snapTolerance);
@@ -146,13 +145,11 @@ public class GeometrySnapper {
    *@param cleanResult whether the result should be made valid
    * @return a new snapped Geometry
    */
-  public static Geometry snapToSelf(final Geometry geom,
-    final double snapTolerance, final boolean cleanResult) {
+  public static Geometry snapToSelf(final Geometry geom, final double snapTolerance,
+    final boolean cleanResult) {
     final GeometrySnapper snapper0 = new GeometrySnapper(geom);
     return snapper0.snapToSelf(snapTolerance, cleanResult);
   }
-
-  private static final double SNAP_PRECISION_FACTOR = 1e-9;
 
   private final Geometry srcGeom;
 
@@ -163,17 +160,6 @@ public class GeometrySnapper {
    */
   public GeometrySnapper(final Geometry srcGeom) {
     this.srcGeom = srcGeom;
-  }
-
-  private double computeMinimumSegmentLength(final Point[] pts) {
-    double minSegLen = Double.MAX_VALUE;
-    for (int i = 0; i < pts.length - 1; i++) {
-      final double segLen = pts[i].distance(pts[i + 1]);
-      if (segLen < minSegLen) {
-        minSegLen = segLen;
-      }
-    }
-    return minSegLen;
   }
 
   private Point[] extractTargetCoordinates(final Geometry geometry) {
@@ -197,8 +183,7 @@ public class GeometrySnapper {
   public Geometry snapTo(final Geometry snapGeom, final double snapTolerance) {
     final Point[] snapPts = extractTargetCoordinates(snapGeom);
 
-    final SnapTransformer snapTrans = new SnapTransformer(snapTolerance,
-      snapPts);
+    final SnapTransformer snapTrans = new SnapTransformer(snapTolerance, snapPts);
     return snapTrans.transform(this.srcGeom);
   }
 
@@ -214,12 +199,10 @@ public class GeometrySnapper {
    *@param cleanResult whether the result should be made valid
    * @return a new snapped Geometry
    */
-  public Geometry snapToSelf(final double snapTolerance,
-    final boolean cleanResult) {
+  public Geometry snapToSelf(final double snapTolerance, final boolean cleanResult) {
     final Point[] snapPts = extractTargetCoordinates(this.srcGeom);
 
-    final SnapTransformer snapTrans = new SnapTransformer(snapTolerance,
-      snapPts, true);
+    final SnapTransformer snapTrans = new SnapTransformer(snapTolerance, snapPts, true);
     final Geometry snappedGeom = snapTrans.transform(this.srcGeom);
     Geometry result = snappedGeom;
     if (cleanResult && result instanceof Polygonal) {
@@ -243,23 +226,20 @@ class SnapTransformer extends GeometryTransformer {
     this.snapPts = snapPts;
   }
 
-  SnapTransformer(final double snapTolerance, final Point[] snapPts,
-    final boolean isSelfSnap) {
+  SnapTransformer(final double snapTolerance, final Point[] snapPts, final boolean isSelfSnap) {
     this.snapTolerance = snapTolerance;
     this.snapPts = snapPts;
     this.isSelfSnap = isSelfSnap;
   }
 
   private Point[] snapLine(final LineString srcPts, final Point[] snapPts) {
-    final LineStringSnapper snapper = new LineStringSnapper(srcPts,
-      this.snapTolerance);
+    final LineStringSnapper snapper = new LineStringSnapper(srcPts, this.snapTolerance);
     snapper.setAllowSnappingToSourceVertices(this.isSelfSnap);
     return snapper.snapTo(snapPts);
   }
 
   @Override
-  protected LineString transformCoordinates(final LineString coords,
-    final Geometry parent) {
+  protected LineString transformCoordinates(final LineString coords, final Geometry parent) {
     final Point[] newPts = snapLine(coords, this.snapPts);
     return new LineStringDouble(newPts);
   }

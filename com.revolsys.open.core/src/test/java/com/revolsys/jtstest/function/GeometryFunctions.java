@@ -49,6 +49,8 @@ import com.revolsys.jts.geom.Polygonal;
  *
  */
 public class GeometryFunctions {
+  public static String lengthDescription = "Computes the length of perimeter of a Geometry";
+
   public static double area(final Geometry g) {
     return g.getArea();
   }
@@ -145,6 +147,4 @@ public class GeometryFunctions {
   public static Geometry reverse(final Geometry g) {
     return g.reverse();
   }
-
-  public static String lengthDescription = "Computes the length of perimeter of a Geometry";
 }

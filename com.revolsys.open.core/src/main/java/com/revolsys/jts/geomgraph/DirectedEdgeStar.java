@@ -70,8 +70,7 @@ public class DirectedEdgeStar extends EdgeEndStar {
     final int startDepth = de.getDepth(Position.LEFT);
     final int targetLastDepth = de.getDepth(Position.RIGHT);
     // compute the depths from this edge up to the end of the edge array
-    final int nextDepth = computeDepths(edgeIndex + 1, this.edgeList.size(),
-      startDepth);
+    final int nextDepth = computeDepths(edgeIndex + 1, this.edgeList.size(), startDepth);
     // compute the depths for the initial part of the array
     final int lastDepth = computeDepths(0, edgeIndex, nextDepth);
     if (lastDepth != targetLastDepth) {
@@ -84,8 +83,7 @@ public class DirectedEdgeStar extends EdgeEndStar {
    *
    * @return the last depth assigned (from the R side of the last edge visited)
    */
-  private int computeDepths(final int startIndex, final int endIndex,
-    final int startDepth) {
+  private int computeDepths(final int startIndex, final int endIndex, final int startDepth) {
     int currDepth = startDepth;
     for (int i = startIndex; i < endIndex; i++) {
       final DirectedEdge nextDe = (DirectedEdge)this.edgeList.get(i);
@@ -313,21 +311,20 @@ public class DirectedEdgeStar extends EdgeEndStar {
           }
           incoming = nextIn;
           state = this.LINKING_TO_OUTGOING;
-          break;
+        break;
         case LINKING_TO_OUTGOING:
           if (nextOut.getEdgeRing() != er) {
             continue;
           }
           incoming.setNextMin(nextOut);
           state = this.SCANNING_FOR_INCOMING;
-          break;
+        break;
       }
     }
     // print(System.out);
     if (state == this.LINKING_TO_OUTGOING) {
       Assert.isTrue(firstOut != null, "found null for first outgoing dirEdge");
-      Assert.isTrue(firstOut.getEdgeRing() == er,
-          "unable to link last incoming dirEdge");
+      Assert.isTrue(firstOut.getEdgeRing() == er, "unable to link last incoming dirEdge");
       incoming.setNextMin(firstOut);
     }
   }
@@ -381,27 +378,25 @@ public class DirectedEdgeStar extends EdgeEndStar {
           }
           incoming = nextIn;
           state = this.LINKING_TO_OUTGOING;
-          break;
+        break;
         case LINKING_TO_OUTGOING:
           if (!nextOut.isInResult()) {
             continue;
           }
           incoming.setNext(nextOut);
           state = this.SCANNING_FOR_INCOMING;
-          break;
+        break;
       }
     }
     // Debug.print(this);
     if (state == this.LINKING_TO_OUTGOING) {
       // Debug.print(firstOut == null, this);
       if (firstOut == null) {
-        throw new TopologyException("no outgoing dirEdge found",
-          getCoordinate());
+        throw new TopologyException("no outgoing dirEdge found", getCoordinate());
       }
       // Assert.isTrue(firstOut != null, "no outgoing dirEdge found (at " +
       // getCoordinate() );
-      Assert.isTrue(firstOut.isInResult(),
-          "unable to link last incoming dirEdge");
+      Assert.isTrue(firstOut.isInResult(), "unable to link last incoming dirEdge");
       incoming.setNext(firstOut);
     }
   }

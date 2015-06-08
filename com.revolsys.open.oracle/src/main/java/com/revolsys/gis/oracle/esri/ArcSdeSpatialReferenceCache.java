@@ -17,8 +17,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 
 public class ArcSdeSpatialReferenceCache {
 
-  public static ArcSdeSpatialReferenceCache get(
-    final AbstractJdbcRecordStore recordStore) {
+  public static ArcSdeSpatialReferenceCache get(final AbstractJdbcRecordStore recordStore) {
     ArcSdeSpatialReferenceCache spatialReferences = recordStore.getProperty("esriSpatialReferences");
     if (spatialReferences == null) {
       spatialReferences = new ArcSdeSpatialReferenceCache(recordStore);
@@ -33,8 +32,8 @@ public class ArcSdeSpatialReferenceCache {
 
   }
 
-  public static ArcSdeSpatialReference getSpatialReference(
-    final RecordStoreSchema schema, final int esriSrid) {
+  public static ArcSdeSpatialReference getSpatialReference(final RecordStoreSchema schema,
+    final int esriSrid) {
     return get(schema).getSpatialReference(esriSrid);
   }
 
@@ -49,8 +48,7 @@ public class ArcSdeSpatialReferenceCache {
     this.recordStore = recordStore;
   }
 
-  public synchronized ArcSdeSpatialReference getSpatialReference(
-    final int esriSrid) {
+  public synchronized ArcSdeSpatialReference getSpatialReference(final int esriSrid) {
     ArcSdeSpatialReference spatialReference = this.spatialReferences.get(esriSrid);
     if (spatialReference == null) {
       spatialReference = getSpatialReference(
@@ -65,15 +63,14 @@ public class ArcSdeSpatialReferenceCache {
     return spatialReference;
   }
 
-  protected ArcSdeSpatialReference getSpatialReference(final String sql,
-    final int esriSrid) {
+  protected ArcSdeSpatialReference getSpatialReference(final String sql, final int esriSrid) {
     try {
       try (
-          final Connection connection = this.recordStore.getJdbcConnection();
-          PreparedStatement statement = connection.prepareStatement(sql);) {
+        final Connection connection = this.recordStore.getJdbcConnection();
+        PreparedStatement statement = connection.prepareStatement(sql);) {
         statement.setInt(1, esriSrid);
         try (
-            ResultSet resultSet = statement.executeQuery()) {
+          ResultSet resultSet = statement.executeQuery()) {
           if (resultSet.next()) {
             final String name = resultSet.getString(2);
             final BigDecimal xOffset = resultSet.getBigDecimal(3);
@@ -91,15 +88,15 @@ public class ArcSdeSpatialReferenceCache {
               final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
               srid = esriCoordinateSystem.getId();
               if (srid <= 0) {
-                geometryFactory = GeometryFactory.fixed(coordinateSystem, 3,
-                  scale.doubleValue(), zScale.doubleValue());
+                geometryFactory = GeometryFactory.fixed(coordinateSystem, 3, scale.doubleValue(),
+                  zScale.doubleValue());
               } else {
-                geometryFactory = GeometryFactory.fixed(srid, 3,
-                  scale.doubleValue(), zScale.doubleValue());
+                geometryFactory = GeometryFactory.fixed(srid, 3, scale.doubleValue(),
+                  zScale.doubleValue());
               }
             } else {
-              geometryFactory = GeometryFactory.fixed(srid, 3,
-                scale.doubleValue(), zScale.doubleValue());
+              geometryFactory = GeometryFactory.fixed(srid, 3, scale.doubleValue(),
+                zScale.doubleValue());
             }
 
             final ArcSdeSpatialReference spatialReference = new ArcSdeSpatialReference(

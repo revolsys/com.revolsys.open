@@ -111,8 +111,7 @@ public class LineStringSnapper {
    * @return the index of the snapped segment
    * or -1 if no segment snaps to the snap point
    */
-  private int findSegmentIndexToSnap(final Point snapPt,
-    final CoordinateList srcCoords) {
+  private int findSegmentIndexToSnap(final Point snapPt, final CoordinateList srcCoords) {
     double minDist = Double.MAX_VALUE;
     int snapIndex = -1;
     for (int i = 0; i < srcCoords.size() - 1; i++) {
@@ -141,8 +140,7 @@ public class LineStringSnapper {
     return snapIndex;
   }
 
-  public void setAllowSnappingToSourceVertices(
-    final boolean allowSnappingToSourceVertices) {
+  public void setAllowSnappingToSourceVertices(final boolean allowSnappingToSourceVertices) {
     this.allowSnappingToSourceVertices = allowSnappingToSourceVertices;
   }
 
@@ -160,8 +158,7 @@ public class LineStringSnapper {
    * @param srcCoords the coordinates of the source linestring to be snapped
    * @param snapPts the target snap vertices
    */
-  private void snapSegments(final CoordinateList srcCoords,
-    final Point[] snapPts) {
+  private void snapSegments(final CoordinateList srcCoords, final Point[] snapPts) {
     // guard against empty input
     if (snapPts.length == 0) {
       return;
@@ -214,8 +211,7 @@ public class LineStringSnapper {
    * @param srcCoords the points to snap
    * @param snapPts the points to snap to
    */
-  private void snapVertices(final CoordinateList srcCoords,
-    final Point[] snapPts) {
+  private void snapVertices(final CoordinateList srcCoords, final Point[] snapPts) {
     // try snapping vertices
     // if src is a ring then don't snap final vertex
     final int end = this.isClosed ? srcCoords.size() - 1 : srcCoords.size();

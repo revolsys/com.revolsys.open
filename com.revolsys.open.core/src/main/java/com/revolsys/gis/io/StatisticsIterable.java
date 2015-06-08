@@ -40,16 +40,14 @@ public class StatisticsIterable implements Iterable<Record>, BeanNameAware {
   @PostConstruct
   public void init() {
     if (this.statistics == null) {
-      setStatistics(new Statistics("Read " + this.statsName + " "
-          + this.iterable.toString()));
+      setStatistics(new Statistics("Read " + this.statsName + " " + this.iterable.toString()));
     }
   }
 
   @Override
   public Iterator<Record> iterator() {
     if (this.statistics == null) {
-      setStatistics(new Statistics("Read " + this.statsName + " "
-          + this.iterable.toString()));
+      setStatistics(new Statistics("Read " + this.statsName + " " + this.iterable.toString()));
     }
     return new StatisticsIterator(this.iterable.iterator(), this.statistics);
   }

@@ -48,8 +48,6 @@ import com.revolsys.jts.geom.Geometry;
  */
 @SuppressWarnings("deprecation")
 public class BufferResultMatcher implements ResultMatcher {
-  private final ResultMatcher defaultMatcher = new EqualityResultMatcher();
-
   private static final double MAX_RELATIVE_AREA_DIFFERENCE = 1.0E-3;
 
   private static final double MAX_HAUSDORFF_DISTANCE_FACTOR = 100;
@@ -60,18 +58,17 @@ public class BufferResultMatcher implements ResultMatcher {
    */
   private static final double MIN_DISTANCE_TOLERANCE = 1.0e-8;
 
-  public boolean isBoundaryHausdorffDistanceInTolerance(
-    final Geometry actualBuffer, final Geometry expectedBuffer,
-    final double distance) {
+  private final ResultMatcher defaultMatcher = new EqualityResultMatcher();
+
+  public boolean isBoundaryHausdorffDistanceInTolerance(final Geometry actualBuffer,
+    final Geometry expectedBuffer, final double distance) {
     final Geometry actualBdy = actualBuffer.getBoundary();
     final Geometry expectedBdy = expectedBuffer.getBoundary();
 
-    final DiscreteHausdorffDistance haus = new DiscreteHausdorffDistance(
-      actualBdy, expectedBdy);
+    final DiscreteHausdorffDistance haus = new DiscreteHausdorffDistance(actualBdy, expectedBdy);
     haus.setDensifyFraction(0.25);
     final double maxDistanceFound = haus.orientedDistance();
-    double expectedDistanceTol = Math.abs(distance)
-        / MAX_HAUSDORFF_DISTANCE_FACTOR;
+    double expectedDistanceTol = Math.abs(distance) / MAX_HAUSDORFF_DISTANCE_FACTOR;
     if (expectedDistanceTol < MIN_DISTANCE_TOLERANCE) {
       expectedDistanceTol = MIN_DISTANCE_TOLERANCE;
     }
@@ -81,8 +78,8 @@ public class BufferResultMatcher implements ResultMatcher {
     return true;
   }
 
-  public boolean isBufferResultMatch(final Geometry actualBuffer,
-    final Geometry expectedBuffer, final double distance) {
+  public boolean isBufferResultMatch(final Geometry actualBuffer, final Geometry expectedBuffer,
+    final double distance) {
     if (actualBuffer.isEmpty() && expectedBuffer.isEmpty()) {
       return true;
     }
@@ -98,8 +95,7 @@ public class BufferResultMatcher implements ResultMatcher {
       return false;
     }
 
-    if (!isBoundaryHausdorffDistanceInTolerance(actualBuffer, expectedBuffer,
-      distance)) {
+    if (!isBoundaryHausdorffDistanceInTolerance(actualBuffer, expectedBuffer, distance)) {
       return false;
     }
 
@@ -113,27 +109,23 @@ public class BufferResultMatcher implements ResultMatcher {
    * @return true if the actual and expected results are considered equal
    */
   @Override
-  public boolean isMatch(final Geometry geom, final String opName,
-    final Object[] args, final Result actualResult,
-    final Result expectedResult, final double tolerance) {
+  public boolean isMatch(final Geometry geom, final String opName, final Object[] args,
+    final Result actualResult, final Result expectedResult, final double tolerance) {
     if (!opName.equalsIgnoreCase("buffer")) {
-      return this.defaultMatcher.isMatch(geom, opName, args, actualResult,
-        expectedResult, tolerance);
+      return this.defaultMatcher.isMatch(geom, opName, args, actualResult, expectedResult,
+        tolerance);
     }
 
     final double distance = Double.parseDouble((String)args[0]);
-    final boolean match = isBufferResultMatch(
-      ((GeometryResult)actualResult).getGeometry(),
+    final boolean match = isBufferResultMatch(((GeometryResult)actualResult).getGeometry(),
       ((GeometryResult)expectedResult).getGeometry(), distance);
     if (!match) {
-      Assert.failNotEquals(opName, expectedResult.getResult(),
-        actualResult.getResult());
+      Assert.failNotEquals(opName, expectedResult.getResult(), actualResult.getResult());
     }
     return match;
   }
 
-  public boolean isSymDiffAreaInTolerance(final Geometry actualBuffer,
-    final Geometry expectedBuffer) {
+  public boolean isSymDiffAreaInTolerance(final Geometry actualBuffer, final Geometry expectedBuffer) {
     final double area = expectedBuffer.getArea();
     final Geometry diff = actualBuffer.symDifference(expectedBuffer);
     // System.out.println(diff);

@@ -68,8 +68,7 @@ public class MonotoneChainEdge {
     this.startIndex = mcb.getChainStartIndices(edge);
   }
 
-  public void computeIntersects(final MonotoneChainEdge mce,
-    final SegmentIntersector si) {
+  public void computeIntersects(final MonotoneChainEdge mce, final SegmentIntersector si) {
     for (int i = 0; i < this.startIndex.length - 1; i++) {
       for (int j = 0; j < mce.startIndex.length - 1; j++) {
         computeIntersectsForChain(i, mce, j, si);
@@ -78,8 +77,7 @@ public class MonotoneChainEdge {
   }
 
   private void computeIntersectsForChain(final int start0, final int end0,
-    final MonotoneChainEdge mce, final int start1, final int end1,
-    final SegmentIntersector ei) {
+    final MonotoneChainEdge mce, final int start1, final int end1, final SegmentIntersector ei) {
     final Point p00 = this.edge.getCoordinate(start0);
     final Point p01 = this.edge.getCoordinate(end0);
     final Point p10 = mce.edge.getCoordinate(start1);
@@ -121,12 +119,10 @@ public class MonotoneChainEdge {
     }
   }
 
-  public void computeIntersectsForChain(final int chainIndex0,
-    final MonotoneChainEdge mce, final int chainIndex1,
-    final SegmentIntersector si) {
-    computeIntersectsForChain(this.startIndex[chainIndex0],
-      this.startIndex[chainIndex0 + 1], mce, mce.startIndex[chainIndex1],
-      mce.startIndex[chainIndex1 + 1], si);
+  public void computeIntersectsForChain(final int chainIndex0, final MonotoneChainEdge mce,
+    final int chainIndex1, final SegmentIntersector si) {
+    computeIntersectsForChain(this.startIndex[chainIndex0], this.startIndex[chainIndex0 + 1], mce,
+      mce.startIndex[chainIndex1], mce.startIndex[chainIndex1 + 1], si);
   }
 
   public double getMaxX(final int chainIndex) {

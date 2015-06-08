@@ -42,14 +42,12 @@ import com.revolsys.jts.operation.overlay.snap.GeometrySnapper;
  *
  */
 public class SnappingFunctions {
-  public static Geometry snapAtoB(final Geometry g, final Geometry g2,
-    final double distance) {
+  public static Geometry snapAtoB(final Geometry g, final Geometry g2, final double distance) {
     final Geometry[] snapped = GeometrySnapper.snap(g, g2, distance);
     return snapped[0];
   }
 
-  public static Geometry snapToSelfAndClean(final Geometry g,
-    final double distance) {
+  public static Geometry snapToSelfAndClean(final Geometry g, final double distance) {
     return GeometrySnapper.snapToSelf(g, distance, true);
   }
 

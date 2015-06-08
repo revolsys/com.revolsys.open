@@ -54,10 +54,17 @@ import com.revolsys.jts.geom.Polygon;
  * @author Martin Davis
  */
 public class BufferResultValidator {
-  public static boolean isValid(final Geometry g, final double distance,
-    final Geometry result) {
-    final BufferResultValidator validator = new BufferResultValidator(g,
-      distance, result);
+  private static boolean VERBOSE = false;
+
+  /**
+   * Maximum allowable fraction of buffer distance the
+   * actual distance can differ by.
+   * 1% sometimes causes an error - 1.2% should be safe.
+   */
+  private static final double MAX_ENV_DIFF_FRAC = .012;
+
+  public static boolean isValid(final Geometry g, final double distance, final Geometry result) {
+    final BufferResultValidator validator = new BufferResultValidator(g, distance, result);
     if (validator.isValid()) {
       return true;
     }
@@ -74,24 +81,13 @@ public class BufferResultValidator {
    * @return an appropriate error message
    * or null if the buffer is valid
    */
-  public static String isValidMsg(final Geometry g, final double distance,
-    final Geometry result) {
-    final BufferResultValidator validator = new BufferResultValidator(g,
-      distance, result);
+  public static String isValidMsg(final Geometry g, final double distance, final Geometry result) {
+    final BufferResultValidator validator = new BufferResultValidator(g, distance, result);
     if (!validator.isValid()) {
       return validator.getErrorMessage();
     }
     return null;
   }
-
-  private static boolean VERBOSE = false;
-
-  /**
-   * Maximum allowable fraction of buffer distance the
-   * actual distance can differ by.
-   * 1% sometimes causes an error - 1.2% should be safe.
-   */
-  private static final double MAX_ENV_DIFF_FRAC = .012;
 
   private final Geometry input;
 
@@ -107,8 +103,7 @@ public class BufferResultValidator {
 
   private Geometry errorIndicator = null;
 
-  public BufferResultValidator(final Geometry input, final double distance,
-    final Geometry result) {
+  public BufferResultValidator(final Geometry input, final double distance, final Geometry result) {
     this.input = input;
     this.distance = distance;
     this.result = result;
@@ -132,8 +127,8 @@ public class BufferResultValidator {
   }
 
   private void checkDistance() {
-    final BufferDistanceValidator distValid = new BufferDistanceValidator(
-      this.input, this.distance, this.result);
+    final BufferDistanceValidator distValid = new BufferDistanceValidator(this.input,
+      this.distance, this.result);
     if (!distValid.isValid()) {
       this.isValid = false;
       this.errorMsg = distValid.getErrorMessage();
@@ -241,7 +236,6 @@ public class BufferResultValidator {
     if (!VERBOSE) {
       return;
     }
-    System.out.println("Check " + checkName + ": "
-        + (this.isValid ? "passed" : "FAILED"));
+    System.out.println("Check " + checkName + ": " + (this.isValid ? "passed" : "FAILED"));
   }
 }

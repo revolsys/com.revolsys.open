@@ -5,8 +5,7 @@ public class ByteArrayPage extends AbstractPage {
 
   private int offset = 0;
 
-  public ByteArrayPage(final PageManager pageManager, final int index,
-    final int size) {
+  public ByteArrayPage(final PageManager pageManager, final int index, final int size) {
     super(pageManager, index);
     this.content = new byte[size];
   }

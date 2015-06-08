@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -42,6 +41,8 @@ import com.revolsys.jts.geom.Location;
  */
 public class Depth {
 
+  private final static int NULL_VALUE = -1;
+
   public static int depthAtLocation(final Location location) {
     if (location == Location.EXTERIOR) {
       return 0;
@@ -51,8 +52,6 @@ public class Depth {
     }
     return NULL_VALUE;
   }
-
-  private final static int NULL_VALUE = -1;
 
   private final int[][] depth = new int[2][3];
 
@@ -65,8 +64,7 @@ public class Depth {
     }
   }
 
-  public void add(final int geomIndex, final int posIndex,
-    final Location location) {
+  public void add(final int geomIndex, final int posIndex, final Location location) {
     if (location == Location.INTERIOR) {
       this.depth[geomIndex][posIndex]++;
     }
@@ -155,14 +153,13 @@ public class Depth {
     }
   }
 
-  public void setDepth(final int geomIndex, final int posIndex,
-    final int depthValue) {
+  public void setDepth(final int geomIndex, final int posIndex, final int depthValue) {
     this.depth[geomIndex][posIndex] = depthValue;
   }
 
   @Override
   public String toString() {
     return "A: " + this.depth[0][1] + "," + this.depth[0][2] + " B: " + this.depth[1][1] + ","
-        + this.depth[1][2];
+      + this.depth[1][2];
   }
 }

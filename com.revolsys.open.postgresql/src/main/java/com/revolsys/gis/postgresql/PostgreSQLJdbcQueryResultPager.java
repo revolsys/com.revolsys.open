@@ -46,19 +46,18 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
             final RecordFactory recordFactory = getRecordFactory();
             final JdbcRecordStore recordStore = getRecordStore();
             try (
-                JdbcConnection connection = recordStore.getJdbcConnection()) {
+              JdbcConnection connection = recordStore.getJdbcConnection()) {
               final List<FieldDefinition> attributes = recordDefinition.getFields();
 
               try (
-                  final PreparedStatement statement = connection.prepareStatement(sql);
-                  final ResultSet resultSet = JdbcQueryIterator.getResultSet(
-                    recordDefinition, statement, getQuery());) {
+                final PreparedStatement statement = connection.prepareStatement(sql);
+                final ResultSet resultSet = JdbcQueryIterator.getResultSet(recordDefinition,
+                  statement, getQuery());) {
                 if (resultSet.next()) {
                   int i = 0;
                   do {
-                    final Record object = JdbcQueryIterator.getNextRecord(
-                      recordStore, recordDefinition, attributes, recordFactory,
-                      resultSet);
+                    final Record object = JdbcQueryIterator.getNextRecord(recordStore,
+                      recordDefinition, attributes, recordFactory, resultSet);
                     results.add(object);
                     i++;
                   } while (resultSet.next() && i < pageSize);

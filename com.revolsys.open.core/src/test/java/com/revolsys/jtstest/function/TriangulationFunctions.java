@@ -41,14 +41,14 @@ import com.revolsys.jts.triangulate.VoronoiDiagramBuilder;
 import com.revolsys.jts.triangulate.quadedge.LocateFailureException;
 
 public class TriangulationFunctions {
-  public static Geometry conformingDelaunayEdges(final Geometry sites,
-    final Geometry constraints) {
-    return conformingDelaunayEdgesWithTolerance(sites, constraints,
-      TRIANGULATION_TOLERANCE);
+  private static final double TRIANGULATION_TOLERANCE = 0.0;
+
+  public static Geometry conformingDelaunayEdges(final Geometry sites, final Geometry constraints) {
+    return conformingDelaunayEdgesWithTolerance(sites, constraints, TRIANGULATION_TOLERANCE);
   }
 
-  public static Geometry conformingDelaunayEdgesWithTolerance(
-    final Geometry sites, final Geometry constraints, final double tol) {
+  public static Geometry conformingDelaunayEdgesWithTolerance(final Geometry sites,
+    final Geometry constraints, final double tol) {
     final ConformingDelaunayTriangulationBuilder builder = new ConformingDelaunayTriangulationBuilder();
     builder.setSites(sites);
     builder.setConstraints(constraints);
@@ -62,12 +62,11 @@ public class TriangulationFunctions {
 
   public static Geometry conformingDelaunayTriangles(final Geometry sites,
     final Geometry constraints) {
-    return conformingDelaunayTrianglesWithTolerance(sites, constraints,
-      TRIANGULATION_TOLERANCE);
+    return conformingDelaunayTrianglesWithTolerance(sites, constraints, TRIANGULATION_TOLERANCE);
   }
 
-  public static Geometry conformingDelaunayTrianglesWithTolerance(
-    final Geometry sites, final Geometry constraints, final double tol) {
+  public static Geometry conformingDelaunayTrianglesWithTolerance(final Geometry sites,
+    final Geometry constraints, final double tol) {
     final ConformingDelaunayTriangulationBuilder builder = new ConformingDelaunayTriangulationBuilder();
     builder.setSites(sites);
     builder.setConstraints(constraints);
@@ -87,8 +86,7 @@ public class TriangulationFunctions {
     return edges;
   }
 
-  public static Geometry delaunayEdgesWithTolerance(final Geometry geom,
-    final double tolerance) {
+  public static Geometry delaunayEdgesWithTolerance(final Geometry geom, final double tolerance) {
     final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
     builder.setSites(geom);
     builder.setTolerance(tolerance);
@@ -104,8 +102,7 @@ public class TriangulationFunctions {
     return tris;
   }
 
-  public static Geometry delaunayTrianglesWithTolerance(final Geometry geom,
-    final double tolerance) {
+  public static Geometry delaunayTrianglesWithTolerance(final Geometry geom, final double tolerance) {
     final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
     builder.setSites(geom);
     builder.setTolerance(tolerance);
@@ -113,8 +110,8 @@ public class TriangulationFunctions {
     return tris;
   }
 
-  public static Geometry delaunayTrianglesWithToleranceNoError(
-    final Geometry geom, final double tolerance) {
+  public static Geometry delaunayTrianglesWithToleranceNoError(final Geometry geom,
+    final double tolerance) {
     final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
     builder.setSites(geom);
     builder.setTolerance(tolerance);
@@ -128,13 +125,11 @@ public class TriangulationFunctions {
     /**
      * Get the triangles created up until the error
      */
-    final Geometry tris = builder.getSubdivision().getTriangles(
-      geom.getGeometryFactory());
+    final Geometry tris = builder.getSubdivision().getTriangles(geom.getGeometryFactory());
     return tris;
   }
 
-  public static Geometry voronoiDiagram(final Geometry sitesGeom,
-    final Geometry clipGeom) {
+  public static Geometry voronoiDiagram(final Geometry sitesGeom, final Geometry clipGeom) {
     final VoronoiDiagramBuilder builder = new VoronoiDiagramBuilder();
     builder.setSites(sitesGeom);
     if (clipGeom != null) {
@@ -145,8 +140,7 @@ public class TriangulationFunctions {
     return diagram;
   }
 
-  public static Geometry voronoiDiagramWithData(final Geometry sitesGeom,
-    final Geometry clipGeom) {
+  public static Geometry voronoiDiagramWithData(final Geometry sitesGeom, final Geometry clipGeom) {
 
     final VertexTaggedGeometryDataMapper mapper = new VertexTaggedGeometryDataMapper();
     mapper.loadSourceGeometries(sitesGeom);
@@ -161,7 +155,5 @@ public class TriangulationFunctions {
     mapper.transferData(diagram);
     return diagram;
   }
-
-  private static final double TRIANGULATION_TOLERANCE = 0.0;
 
 }

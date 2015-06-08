@@ -61,8 +61,8 @@ public class LoggingGeometryOperation implements GeometryOperation {
   }
 
   @Override
-  public Result invoke(final String opName, final Geometry geometry,
-    final Object[] args) throws Exception {
+  public Result invoke(final String opName, final Geometry geometry, final Object[] args)
+    throws Exception {
     System.out.println("Operation <" + opName + ">");
     System.out.println("Geometry: " + geometry);
     for (int i = 0; i < args.length; i++) {

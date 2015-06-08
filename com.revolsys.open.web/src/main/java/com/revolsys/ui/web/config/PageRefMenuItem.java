@@ -29,19 +29,17 @@ public class PageRefMenuItem extends MenuItem {
 
   private final String pageRef;
 
-  public PageRefMenuItem(final String title, final String pageRef)
-      throws Exception {
+  public PageRefMenuItem(final String title, final String pageRef) throws Exception {
     this(title, title, pageRef);
   }
 
-  public PageRefMenuItem(final String name, final String title,
-    final String pageRef) throws Exception {
+  public PageRefMenuItem(final String name, final String title, final String pageRef)
+    throws Exception {
     this(name, title, pageRef, null, null);
   }
 
-  public PageRefMenuItem(final String name, final String title,
-    final String pageRef, final String anchor, final String condition)
-        throws Exception {
+  public PageRefMenuItem(final String name, final String title, final String pageRef,
+    final String anchor, final String condition) throws Exception {
     super(name, title, null, anchor, condition);
     this.pageRef = pageRef;
   }

@@ -64,16 +64,14 @@ import com.revolsys.jts.geom.Polygon;
  */
 public class Polygonizer {
 
-  private static void assignHolesToShells(final List holeList,
-    final List shellList) {
+  private static void assignHolesToShells(final List holeList, final List shellList) {
     for (final Iterator i = holeList.iterator(); i.hasNext();) {
       final EdgeRing holeER = (EdgeRing)i.next();
       assignHoleToShell(holeER, shellList);
     }
   }
 
-  private static void assignHoleToShell(final EdgeRing holeER,
-    final List shellList) {
+  private static void assignHoleToShell(final EdgeRing holeER, final List shellList) {
     final EdgeRing shell = EdgeRing.findEdgeRingContaining(holeER, shellList);
     if (shell != null) {
       shell.addHole(holeER.getRing());
@@ -160,8 +158,8 @@ public class Polygonizer {
     }
   }
 
-  private void findValidRings(final List edgeRingList,
-    final List validEdgeRingList, final List invalidRingList) {
+  private void findValidRings(final List edgeRingList, final List validEdgeRingList,
+    final List invalidRingList) {
     for (final Iterator i = edgeRingList.iterator(); i.hasNext();) {
       final EdgeRing er = (EdgeRing)i.next();
       if (er.isValid()) {

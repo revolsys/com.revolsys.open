@@ -32,7 +32,6 @@
  */
 package com.revolsys.jts.noding;
 
-
 /**
  * Processes possible intersections detected by a {@link Noder}.
  * The {@link SegmentIntersector} is passed to a {@link Noder}.
@@ -46,8 +45,7 @@ package com.revolsys.jts.noding;
  *
  * @version 1.7
  */
-public interface SegmentIntersector
-{
+public interface SegmentIntersector {
   /**
    * Reports whether the client of this class
    * needs to continue testing all intersections in an arrangement.
@@ -61,8 +59,5 @@ public interface SegmentIntersector
    * of the {@link SegmentIntersector} interface to process
    * intersections for two segments of the {@link SegmentString}s being intersected.
    */
-  void processIntersections(
-    SegmentString e0,  int segIndex0,
-    SegmentString e1,  int segIndex1
-      );
+  void processIntersections(SegmentString e0, int segIndex0, SegmentString e1, int segIndex1);
 }

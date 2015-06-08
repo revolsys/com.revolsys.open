@@ -58,15 +58,14 @@ public class PolygonizeTest extends TestCase {
     super(name);
   }
 
-  private void compare(final Collection expectedGeometries,
-    final Collection actualGeometries) {
-    assertEquals("Geometry count - expected " + expectedGeometries.size()
-      + " but actual was " + actualGeometries.size() + " in "
-      + actualGeometries, expectedGeometries.size(), actualGeometries.size());
+  private void compare(final Collection expectedGeometries, final Collection actualGeometries) {
+    assertEquals("Geometry count - expected " + expectedGeometries.size() + " but actual was "
+      + actualGeometries.size() + " in " + actualGeometries, expectedGeometries.size(),
+      actualGeometries.size());
     for (final Iterator i = expectedGeometries.iterator(); i.hasNext();) {
       final Geometry expectedGeometry = (Geometry)i.next();
-      assertTrue("Expected to find: " + expectedGeometry + " in Actual result:"
-          + actualGeometries, contains(actualGeometries, expectedGeometry));
+      assertTrue("Expected to find: " + expectedGeometry + " in Actual result:" + actualGeometries,
+        contains(actualGeometries, expectedGeometry));
     }
   }
 
@@ -104,23 +103,20 @@ public class PolygonizeTest extends TestCase {
   }
 
   public void test2() {
-    doTest(
-      new String[]{
-        "LINESTRING (100 180, 20 20, 160 20, 100 180)",
-        "LINESTRING (100 180, 80 60, 120 60, 100 180)",
-      },
-      new String[]{
-        "POLYGON ((100 180, 120 60, 80 60, 100 180))",
-        "POLYGON ((100 180, 160 20, 20 20, 100 180), (100 180, 80 60, 120 60, 100 180))"
-      });
+    doTest(new String[] {
+      "LINESTRING (100 180, 20 20, 160 20, 100 180)",
+      "LINESTRING (100 180, 80 60, 120 60, 100 180)",
+    }, new String[] {
+      "POLYGON ((100 180, 120 60, 80 60, 100 180))",
+      "POLYGON ((100 180, 160 20, 20 20, 100 180), (100 180, 80 60, 120 60, 100 180))"
+    });
   }
 
   public void test3() {
     doTest(new String[] {
-      "LINESTRING (0 0, 4 0)", "LINESTRING (4 0, 5 3)",
-      "LINESTRING (5 3, 4 6, 6 6, 5 3)", "LINESTRING (5 3, 6 0)",
-      "LINESTRING (6 0, 10 0, 5 10, 0 0)", "LINESTRING (4 0, 6 0)"
-    }, new String[]{
+      "LINESTRING (0 0, 4 0)", "LINESTRING (4 0, 5 3)", "LINESTRING (5 3, 4 6, 6 6, 5 3)",
+      "LINESTRING (5 3, 6 0)", "LINESTRING (6 0, 10 0, 5 10, 0 0)", "LINESTRING (4 0, 6 0)"
+    }, new String[] {
       "POLYGON ((5 3, 4 0, 0 0, 5 10, 10 0, 6 0, 5 3), (5 3, 6 6, 4 6, 5 3))",
       "POLYGON ((5 3, 4 6, 6 6, 5 3))", "POLYGON ((4 0, 5 3, 6 0, 4 0))"
     });

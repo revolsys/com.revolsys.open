@@ -14,14 +14,12 @@ import com.revolsys.jts.util.Assert;
  */
 public class LocationOfPoint {
 
-  public static LineStringLocation locate(final LineString line,
-    final Point inputPt) {
+  public static LineStringLocation locate(final LineString line, final Point inputPt) {
     final LocationOfPoint locater = new LocationOfPoint(line);
     return locater.locate(inputPt);
   }
 
-  public static double segmentFraction(final Point p0,
-    final Point p1, final Point inputPt) {
+  public static double segmentFraction(final Point p0, final Point p1, final Point inputPt) {
     double segFrac = LineSegmentUtil.projectionFactor(p0, p1, inputPt);
     if (segFrac < 0.0) {
       segFrac = 0.0;
@@ -31,8 +29,7 @@ public class LocationOfPoint {
     return segFrac;
   }
 
-  public static double segmentFraction(final Segment segment,
-    final Point inputPt) {
+  public static double segmentFraction(final Segment segment, final Point inputPt) {
     double segFrac = segment.projectionFactor(inputPt);
     if (segFrac < 0.0) {
       segFrac = 0.0;
@@ -57,10 +54,9 @@ public class LocationOfPoint {
    * @param loc a location
    * @return <code>true</code> if the first location is greater than the second
    */
-  private boolean isGreater(final int i, final double segFrac,
-    final LineStringLocation loc) {
-    return LineStringLocation.compareLocationValues(i, segFrac,
-      loc.getSegmentIndex(), loc.getSegmentFraction()) > 0;
+  private boolean isGreater(final int i, final double segFrac, final LineStringLocation loc) {
+    return LineStringLocation.compareLocationValues(i, segFrac, loc.getSegmentIndex(),
+      loc.getSegmentFraction()) > 0;
   }
 
   /**
@@ -101,8 +97,7 @@ public class LocationOfPoint {
    * @param minLocation the minimum location for the point location
    * @return the location of the nearest point
    */
-  public LineStringLocation locateAfter(final Point inputPt,
-    final LineStringLocation minLocation) {
+  public LineStringLocation locateAfter(final Point inputPt, final LineStringLocation minLocation) {
     if (minLocation == null) {
       return locate(inputPt);
     }
@@ -132,7 +127,7 @@ public class LocationOfPoint {
        * initialized to minLocation
        */
       Assert.isTrue(nextClosestLocation.compareTo(minLocation) >= 0,
-          "computed location is before specified minimum location");
+        "computed location is before specified minimum location");
       return nextClosestLocation;
     }
   }

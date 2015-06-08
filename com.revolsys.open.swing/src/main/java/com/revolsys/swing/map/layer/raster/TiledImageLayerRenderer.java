@@ -20,14 +20,13 @@ import com.revolsys.swing.map.layer.MapTile;
 import com.revolsys.swing.parallel.RunnableSwingWorkerManager;
 import com.revolsys.util.Property;
 
-public class TiledImageLayerRenderer extends
-AbstractLayerRenderer<AbstractTiledImageLayer> implements
-PropertyChangeListener {
-
-  private final Map<MapTile, MapTile> cachedTiles = new HashMap<MapTile, MapTile>();
+public class TiledImageLayerRenderer extends AbstractLayerRenderer<AbstractTiledImageLayer>
+  implements PropertyChangeListener {
 
   private static RunnableSwingWorkerManager tileLoaderManager = new RunnableSwingWorkerManager(
     "Load Map Tiles");
+
+  private final Map<MapTile, MapTile> cachedTiles = new HashMap<MapTile, MapTile>();
 
   private GeometryFactory geometryFactory;
 
@@ -46,14 +45,13 @@ PropertyChangeListener {
     if (newValue instanceof BoundingBoxDoubleGf) {
       final BoundingBox newBoundingBox = (BoundingBox)newValue;
       synchronized (this.cachedTiles) {
-        final List<MapTile> mapTiles = new ArrayList<MapTile>(
-            this.cachedTiles.keySet());
+        final List<MapTile> mapTiles = new ArrayList<MapTile>(this.cachedTiles.keySet());
         final GeometryFactory newGeometryFactory = newBoundingBox.getGeometryFactory();
         for (final MapTile mapTile : mapTiles) {
           final BoundingBox boundingBox = mapTile.getBoundingBox();
           final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
           if (!geometryFactory.equals(newGeometryFactory)
-              || !newBoundingBox.intersects(boundingBox)) {
+            || !newBoundingBox.intersects(boundingBox)) {
             this.cachedTiles.remove(boundingBox);
           }
         }
@@ -69,13 +67,11 @@ PropertyChangeListener {
   }
 
   @Override
-  public void render(final Viewport2D viewport,
-    final AbstractTiledImageLayer layer) {
+  public void render(final Viewport2D viewport, final AbstractTiledImageLayer layer) {
     final GeometryFactory geometryFactory = viewport.getGeometryFactory();
     final double resolution = layer.getResolution(viewport);
     synchronized (this.cachedTiles) {
-      if (resolution != this.resolution
-          || geometryFactory != this.geometryFactory) {
+      if (resolution != this.resolution || geometryFactory != this.geometryFactory) {
         this.resolution = resolution;
         this.geometryFactory = geometryFactory;
         this.cachedTiles.clear();
@@ -93,16 +89,14 @@ PropertyChangeListener {
           if (cachedTile == null) {
             cachedTile = mapTile;
             this.cachedTiles.put(cachedTile, cachedTile);
-            final Runnable task = new TileLoadTask(this, geometryFactory,
-              cachedTile);
+            final Runnable task = new TileLoadTask(this, geometryFactory, cachedTile);
             tasks.add(task);
           }
         }
         final GeoReferencedImage image = cachedTile.getImage(geometryFactory);
         final Graphics2D graphics = viewport.getGraphics();
         if (graphics != null) {
-          GeoReferencedImageLayerRenderer.render(viewport, graphics, image,
-            false);
+          GeoReferencedImageLayerRenderer.render(viewport, graphics, image, false);
         }
       }
     }

@@ -17,13 +17,17 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.geometry.GeometryCoordinatesTableModel;
 
-public class GeometryCoordinateErrorPredicate extends BorderHighlighter
-implements HighlightPredicate {
+public class GeometryCoordinateErrorPredicate extends BorderHighlighter implements
+  HighlightPredicate {
+
+  private static final Border ERROR_BORDER = BorderFactory.createLineBorder(WebColors.Red, 2);
+
+  private static final ColorHighlighter ERROR_HIGHLIGHTER = new ColorHighlighter(
+    WebColors.setAlpha(WebColors.Red, 127), Color.BLACK, Color.RED, Color.YELLOW);
 
   public static void add(final BaseJTable table) {
     final GeometryCoordinatesTableModel model = (GeometryCoordinatesTableModel)table.getModel();
-    final GeometryCoordinateErrorPredicate predicate = new GeometryCoordinateErrorPredicate(
-      model);
+    final GeometryCoordinateErrorPredicate predicate = new GeometryCoordinateErrorPredicate(model);
     table.addHighlighter(predicate);
   }
 
@@ -31,39 +35,28 @@ implements HighlightPredicate {
     return Arrays.toString(vertexIndex);
   }
 
-  private static final Border ERROR_BORDER = BorderFactory.createLineBorder(
-    WebColors.Red, 2);
-
-  private static final ColorHighlighter ERROR_HIGHLIGHTER = new ColorHighlighter(
-    WebColors.setAlpha(WebColors.Red, 127), Color.BLACK, Color.RED,
-    Color.YELLOW);
-
   private final GeometryCoordinatesTableModel model;
 
-  public GeometryCoordinateErrorPredicate(
-    final GeometryCoordinatesTableModel model) {
+  public GeometryCoordinateErrorPredicate(final GeometryCoordinatesTableModel model) {
     setHighlightPredicate(this);
     setBorder(ERROR_BORDER);
     this.model = model;
   }
 
   @Override
-  protected boolean canHighlight(final Component component,
-    final ComponentAdapter adapter) {
+  protected boolean canHighlight(final Component component, final ComponentAdapter adapter) {
     return component instanceof JComponent;
   }
 
   @Override
-  protected Component doHighlight(final Component renderer,
-    final ComponentAdapter adapter) {
+  protected Component doHighlight(final Component renderer, final ComponentAdapter adapter) {
     ERROR_HIGHLIGHTER.highlight(renderer, adapter);
     final Component doHighlight = super.doHighlight(renderer, adapter);
     return doHighlight;
   }
 
   @Override
-  public boolean isHighlighted(final Component renderer,
-    final ComponentAdapter adapter) {
+  public boolean isHighlighted(final Component renderer, final ComponentAdapter adapter) {
     final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
     final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
     final int axisIndex = columnIndex - this.model.getNumIndexItems();

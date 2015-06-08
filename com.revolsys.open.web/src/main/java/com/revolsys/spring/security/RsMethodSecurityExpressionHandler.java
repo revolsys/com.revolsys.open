@@ -22,8 +22,7 @@ import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.core.Authentication;
 
-public class RsMethodSecurityExpressionHandler implements
-MethodSecurityExpressionHandler {
+public class RsMethodSecurityExpressionHandler implements MethodSecurityExpressionHandler {
 
   protected final Log logger = LogFactory.getLog(getClass());
 
@@ -47,13 +46,11 @@ MethodSecurityExpressionHandler {
    * object.
    */
   @Override
-  public EvaluationContext createEvaluationContext(
-    final Authentication auth,
+  public EvaluationContext createEvaluationContext(final Authentication auth,
     final MethodInvocation mi) {
-    final MethodSecurityEvaluationContext ctx = new MethodSecurityEvaluationContext(
-      auth, mi, this.parameterNameDiscoverer);
-    final MethodSecurityExpressionRoot root = new MethodSecurityExpressionRoot(
-      auth);
+    final MethodSecurityEvaluationContext ctx = new MethodSecurityEvaluationContext(auth, mi,
+      this.parameterNameDiscoverer);
+    final MethodSecurityExpressionRoot root = new MethodSecurityExpressionRoot(auth);
     root.setTrustResolver(this.trustResolver);
     root.setPermissionEvaluator(this.permissionEvaluator);
     root.setRoleHierarchy(this.roleHierarchy);
@@ -64,17 +61,14 @@ MethodSecurityExpressionHandler {
 
   @Override
   @SuppressWarnings("unchecked")
-  public Object filter(
-    final Object filterTarget,
-    final Expression filterExpression,
+  public Object filter(final Object filterTarget, final Expression filterExpression,
     final EvaluationContext ctx) {
     final MethodSecurityExpressionRoot rootObject = (MethodSecurityExpressionRoot)ctx.getRootObject()
-        .getValue();
+      .getValue();
     List retainList;
 
     if (this.logger.isDebugEnabled()) {
-      this.logger.debug("Filtering with expression: "
-          + filterExpression.getExpressionString());
+      this.logger.debug("Filtering with expression: " + filterExpression.getExpressionString());
     }
 
     if (filterTarget instanceof Collection) {
@@ -82,8 +76,7 @@ MethodSecurityExpressionHandler {
       retainList = new ArrayList(collection.size());
 
       if (this.logger.isDebugEnabled()) {
-        this.logger.debug("Filtering collection with " + collection.size()
-          + " elements");
+        this.logger.debug("Filtering collection with " + collection.size() + " elements");
       }
       for (final Object filterObject : (Collection)filterTarget) {
         rootObject.setFilterObject(filterObject);
@@ -123,8 +116,8 @@ MethodSecurityExpressionHandler {
         this.logger.debug("Retaining elements: " + retainList);
       }
 
-      final Object[] filtered = (Object[])Array.newInstance(
-        filterTarget.getClass().getComponentType(), retainList.size());
+      final Object[] filtered = (Object[])Array.newInstance(filterTarget.getClass()
+        .getComponentType(), retainList.size());
       for (int i = 0; i < retainList.size(); i++) {
         filtered[i] = retainList.get(i);
       }
@@ -132,9 +125,8 @@ MethodSecurityExpressionHandler {
       return filtered;
     }
 
-    throw new IllegalArgumentException(
-      "Filter target must be a collection or array type, but was "
-          + filterTarget);
+    throw new IllegalArgumentException("Filter target must be a collection or array type, but was "
+      + filterTarget);
   }
 
   @Override
@@ -142,20 +134,16 @@ MethodSecurityExpressionHandler {
     return this.expressionParser;
   }
 
-  public void setParameterNameDiscoverer(
-    final ParameterNameDiscoverer parameterNameDiscoverer) {
+  public void setParameterNameDiscoverer(final ParameterNameDiscoverer parameterNameDiscoverer) {
     this.parameterNameDiscoverer = parameterNameDiscoverer;
   }
 
-  public void setPermissionEvaluator(
-    final PermissionEvaluator permissionEvaluator) {
+  public void setPermissionEvaluator(final PermissionEvaluator permissionEvaluator) {
     this.permissionEvaluator = permissionEvaluator;
   }
 
   @Override
-  public void setReturnObject(
-    final Object returnObject,
-    final EvaluationContext ctx) {
+  public void setReturnObject(final Object returnObject, final EvaluationContext ctx) {
     ((MethodSecurityExpressionRoot)ctx.getRootObject().getValue()).setReturnObject(returnObject);
   }
 

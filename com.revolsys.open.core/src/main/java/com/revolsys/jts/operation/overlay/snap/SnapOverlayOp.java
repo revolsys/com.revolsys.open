@@ -58,8 +58,7 @@ public class SnapOverlayOp {
     return overlayOp(g0, g1, OverlayOp.INTERSECTION);
   }
 
-  public static Geometry overlayOp(final Geometry g0, final Geometry g1,
-    final int opCode) {
+  public static Geometry overlayOp(final Geometry g0, final Geometry g1, final int opCode) {
     final SnapOverlayOp op = new SnapOverlayOp(g0, g1);
     return op.getResultGeometry(opCode);
   }
@@ -85,8 +84,7 @@ public class SnapOverlayOp {
   }
 
   private void computeSnapTolerance() {
-    this.snapTolerance = GeometrySnapper.computeOverlaySnapTolerance(this.geom[0],
-      this.geom[1]);
+    this.snapTolerance = GeometrySnapper.computeOverlaySnapTolerance(this.geom[0], this.geom[1]);
 
     // System.out.println("Snap tol = " + snapTolerance);
   }
@@ -95,8 +93,7 @@ public class SnapOverlayOp {
     // Geometry[] selfSnapGeom = new Geometry[] { selfSnap(geom[0]),
     // selfSnap(geom[1])};
     final Geometry[] prepGeom = snap(this.geom);
-    final Geometry result = OverlayOp.overlayOp(prepGeom[0], prepGeom[1],
-      opCode);
+    final Geometry result = OverlayOp.overlayOp(prepGeom[0], prepGeom[1], opCode);
     return prepareResult(result);
   }
 
@@ -117,8 +114,7 @@ public class SnapOverlayOp {
 
   private Geometry[] snap(final Geometry[] geom) {
     final Geometry[] remGeom = removeCommonBits(geom);
-    final Geometry[] snapGeom = GeometrySnapper.snap(remGeom[0], remGeom[1],
-      this.snapTolerance);
+    final Geometry[] snapGeom = GeometrySnapper.snap(remGeom[0], remGeom[1], this.snapTolerance);
     return snapGeom;
   }
 

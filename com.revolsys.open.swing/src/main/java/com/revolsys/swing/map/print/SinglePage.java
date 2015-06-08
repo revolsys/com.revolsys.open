@@ -37,8 +37,7 @@ public class SinglePage extends Viewport2D implements Pageable, Printable {
       format.setOrientation(PageFormat.PORTRAIT);
     }
 
-    final SinglePage pageable = new SinglePage(project, boundingBox, viewWidth,
-      viewHeight);
+    final SinglePage pageable = new SinglePage(project, boundingBox, viewWidth, viewHeight);
     job.setPageable(pageable);
     final boolean doPrint = job.printDialog();
     if (doPrint) {
@@ -48,8 +47,8 @@ public class SinglePage extends Viewport2D implements Pageable, Printable {
 
   private Graphics2D graphics;
 
-  public SinglePage(final Project project, final BoundingBox boundingBox,
-    final int viewWidth, final int viewHeight) {
+  public SinglePage(final Project project, final BoundingBox boundingBox, final int viewWidth,
+    final int viewHeight) {
     super(project, viewWidth, viewHeight, boundingBox);
   }
 
@@ -86,8 +85,7 @@ public class SinglePage extends Viewport2D implements Pageable, Printable {
   }
 
   @Override
-  protected double getPixelsPerYUnit(final double viewHeight,
-    final double mapHeight) {
+  protected double getPixelsPerYUnit(final double viewHeight, final double mapHeight) {
     return -viewHeight / mapHeight;
   }
 
@@ -106,14 +104,13 @@ public class SinglePage extends Viewport2D implements Pageable, Printable {
   }
 
   @Override
-  public boolean isHidden(final AbstractRecordLayer layer,
-    final LayerRecord record) {
+  public boolean isHidden(final AbstractRecordLayer layer, final LayerRecord record) {
     return false;
   }
 
   @Override
-  public int print(final Graphics graphics, final PageFormat pageFormat,
-    final int pageIndex) throws PrinterException {
+  public int print(final Graphics graphics, final PageFormat pageFormat, final int pageIndex)
+    throws PrinterException {
     if (pageIndex == 0) {
       this.graphics = (Graphics2D)graphics;
       final int translateX = (int)pageFormat.getImageableX();

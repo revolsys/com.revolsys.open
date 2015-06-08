@@ -332,8 +332,7 @@ public class Vector2D {
   }
 
   public Point translate(final Point coord) {
-    return new PointDouble(this.x + coord.getX(), this.y + coord.getY(),
-      Point.NULL_ORDINATE);
+    return new PointDouble(this.x + coord.getX(), this.y + coord.getY(), Point.NULL_ORDINATE);
   }
 
   /**

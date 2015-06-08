@@ -64,9 +64,8 @@ public class GeometryMethodOperation implements GeometryOperation {
          * Filter out only acceptable classes. (For instance, don't accept the
          * relate()=>IntersectionMatrix method)
          */
-        if (returnClass == boolean.class
-            || Geometry.class.isAssignableFrom(returnClass)
-            || returnClass == double.class || returnClass == int.class) {
+        if (returnClass == boolean.class || Geometry.class.isAssignableFrom(returnClass)
+          || returnClass == double.class || returnClass == int.class) {
           return returnClass;
         }
       }
@@ -107,8 +106,7 @@ public class GeometryMethodOperation implements GeometryOperation {
   public GeometryMethodOperation() {
   }
 
-  private boolean convertArg(final Class destClass, final Object srcValue,
-    final Object[] convArg) {
+  private boolean convertArg(final Class destClass, final Object srcValue, final Object[] convArg) {
     convArg[0] = null;
     if (srcValue instanceof String) {
       return convertArgFromString(destClass, (String)srcValue, convArg);
@@ -120,8 +118,8 @@ public class GeometryMethodOperation implements GeometryOperation {
     return false;
   }
 
-  private boolean convertArgFromString(final Class destClass,
-    final String srcStr, final Object[] convArg) {
+  private boolean convertArgFromString(final Class destClass, final String srcStr,
+    final Object[] convArg) {
     convArg[0] = null;
     if (destClass == Boolean.class || destClass == boolean.class) {
       if (srcStr.equals("true")) {
@@ -161,15 +159,14 @@ public class GeometryMethodOperation implements GeometryOperation {
     return false;
   }
 
-  private boolean convertArgs(final Class[] parameterTypes,
-    final Object[] args, final Object[] actualArgs) {
+  private boolean convertArgs(final Class[] parameterTypes, final Object[] args,
+    final Object[] actualArgs) {
     if (parameterTypes.length != nonNullItemCount(args)) {
       return false;
     }
 
     for (int i = 0; i < args.length; i++) {
-      final boolean isCompatible = convertArg(parameterTypes[i], args[i],
-        this.convArg);
+      final boolean isCompatible = convertArg(parameterTypes[i], args[i], this.convArg);
       if (!isCompatible) {
         return false;
       }
@@ -198,8 +195,8 @@ public class GeometryMethodOperation implements GeometryOperation {
   }
 
   @Override
-  public Result invoke(final String opName, final Geometry geometry,
-    final Object[] args) throws Exception {
+  public Result invoke(final String opName, final Geometry geometry, final Object[] args)
+    throws Exception {
     final Object[] actualArgs = new Object[args.length];
     final Method geomMethod = getGeometryMethod(opName, args, actualArgs);
     if (geomMethod == null) {
@@ -208,8 +205,8 @@ public class GeometryMethodOperation implements GeometryOperation {
     return invokeMethod(geomMethod, geometry, actualArgs);
   }
 
-  private Result invokeMethod(final Method method, final Geometry geometry,
-    final Object[] args) throws Exception {
+  private Result invokeMethod(final Method method, final Geometry geometry, final Object[] args)
+    throws Exception {
     try {
       if (method.getReturnType() == boolean.class) {
         return new BooleanResult((Boolean)method.invoke(geometry, args));
@@ -231,8 +228,7 @@ public class GeometryMethodOperation implements GeometryOperation {
       }
       throw (Error)t;
     }
-    throw new JTSTestReflectionException("Unsupported result type: "
-        + method.getReturnType());
+    throw new JTSTestReflectionException("Unsupported result type: " + method.getReturnType());
   }
 
 }

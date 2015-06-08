@@ -58,8 +58,7 @@ public class PointFacetSequence implements FacetSequence {
       final double y1 = facetSeq.getCoordinate(i, 1);
       final double x2 = facetSeq.getCoordinate(i + 1, 0);
       final double y2 = facetSeq.getCoordinate(i + 1, 1);
-      final double dist = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x,
-        y);
+      final double dist = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
       if (dist == 0.0) {
         return 0.0;
       } else if (dist < minDistance) {

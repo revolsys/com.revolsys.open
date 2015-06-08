@@ -11,8 +11,7 @@ public class WriterProcess extends BaseInProcess<Record> {
   public WriterProcess() {
   }
 
-  public WriterProcess(final Channel<Record> in,
-    final Writer<Record> writer) {
+  public WriterProcess(final Channel<Record> in, final Writer<Record> writer) {
     super(in);
     this.writer = writer;
   }

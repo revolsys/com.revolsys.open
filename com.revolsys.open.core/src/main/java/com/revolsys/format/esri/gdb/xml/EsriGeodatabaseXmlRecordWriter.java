@@ -34,8 +34,8 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.util.DateUtil;
 
-public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
-implements EsriGeodatabaseXmlConstants {
+public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter implements
+  EsriGeodatabaseXmlConstants {
   private static final Logger LOG = LoggerFactory.getLogger(EsriGeodatabaseXmlRecordWriter.class);
 
   private int datasetId = 1;
@@ -54,8 +54,7 @@ implements EsriGeodatabaseXmlConstants {
 
   private String geometryType;
 
-  public EsriGeodatabaseXmlRecordWriter(
-    final RecordDefinition recordDefinition, final Writer out) {
+  public EsriGeodatabaseXmlRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
     this.recordDefinition = recordDefinition;
     this.out = new XmlWriter(out);
   }
@@ -106,8 +105,7 @@ implements EsriGeodatabaseXmlConstants {
     this.out.endTag(RECORD);
   }
 
-  private void writeDataElement(final RecordDefinition recordDefinition,
-    final Geometry geometry) {
+  private void writeDataElement(final RecordDefinition recordDefinition, final Geometry geometry) {
     final String dataElementType;
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
     boolean hasGeometry = false;
@@ -368,11 +366,9 @@ implements EsriGeodatabaseXmlConstants {
         if (esriCoordinateSystem != null) {
           this.out.startTag(SPATIAL_REFERENCE);
           if (esriCoordinateSystem instanceof ProjectedCoordinateSystem) {
-            this.out.attribute(XsiConstants.TYPE,
-              PROJECTED_COORDINATE_SYSTEM_TYPE);
+            this.out.attribute(XsiConstants.TYPE, PROJECTED_COORDINATE_SYSTEM_TYPE);
           } else {
-            this.out.attribute(XsiConstants.TYPE,
-              GEOGRAPHIC_COORDINATE_SYSTEM_TYPE);
+            this.out.attribute(XsiConstants.TYPE, GEOGRAPHIC_COORDINATE_SYSTEM_TYPE);
           }
           this.out.element(WKT, EsriCsWktWriter.toWkt(esriCoordinateSystem));
           this.out.element(X_ORIGIN, 0);

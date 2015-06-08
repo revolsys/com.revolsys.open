@@ -16,7 +16,7 @@ public class SimpleCodeTable extends AbstractCodeTable {
   public static CodeTable create(final String name, final Resource resource) {
     final SimpleCodeTable codeTable = new SimpleCodeTable(name);
     try (
-        final RecordReader reader = RecordIo.recordReader(resource)) {
+      final RecordReader reader = RecordIo.recordReader(resource)) {
       for (final Record record : reader) {
         final Identifier id = SingleIdentifier.create(record.getValue(0));
         final List<Object> values = new ArrayList<>();

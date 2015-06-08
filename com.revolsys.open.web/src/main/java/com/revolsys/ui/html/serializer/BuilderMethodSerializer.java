@@ -14,8 +14,7 @@ import com.revolsys.ui.html.serializer.type.TypeSerializer;
  *
  * @author Paul Austin
  */
-public class BuilderMethodSerializer extends AbstractKeySerializer implements
-TypeSerializer {
+public class BuilderMethodSerializer extends AbstractKeySerializer implements TypeSerializer {
   /** The HTML UI Builder */
   private HtmlUiBuilder<?> builder;
 
@@ -31,8 +30,8 @@ TypeSerializer {
    * @param builder The HTML UI Builder the method is on.
    * @param method The serializer method.
    */
-  public BuilderMethodSerializer(final String name,
-    final HtmlUiBuilder<?> builder, final Method method) {
+  public BuilderMethodSerializer(final String name, final HtmlUiBuilder<?> builder,
+    final Method method) {
     super(name);
     this.builder = builder;
     this.method = method;

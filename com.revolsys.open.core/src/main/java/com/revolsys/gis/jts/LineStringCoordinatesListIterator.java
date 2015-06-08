@@ -6,15 +6,14 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 
 public class LineStringCoordinatesListIterator implements Iterator<LineString>,
-Iterable<LineString> {
+  Iterable<LineString> {
   private final GeometryFactory factory;
 
   private int index = 0;
 
   private final LineString points;
 
-  public LineStringCoordinatesListIterator(final GeometryFactory factory,
-    final LineString points) {
+  public LineStringCoordinatesListIterator(final GeometryFactory factory, final LineString points) {
     this.factory = factory;
     this.points = points;
   }

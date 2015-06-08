@@ -23,8 +23,7 @@ import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.util.Property;
 
-public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
-Kml22Constants {
+public class KmlGeometryIterator extends AbstractIterator<Geometry> implements Kml22Constants {
   private GeometryFactory geometryFactory = GeometryFactory.floating3(COORDINATE_SYSTEM_ID);
 
   private XMLStreamReader in;
@@ -52,8 +51,7 @@ Kml22Constants {
   @Override
   protected Geometry getNext() {
     try {
-      if (StaxUtils.skipToChildStartElements(this.in, MULTI_GEOMETRY, POINT,
-        LINE_STRING, POLYGON)) {
+      if (StaxUtils.skipToChildStartElements(this.in, MULTI_GEOMETRY, POINT, LINE_STRING, POLYGON)) {
         final Geometry geometry = parseGeometry();
         if (geometry == null) {
           throw new NoSuchElementException();
@@ -73,8 +71,7 @@ Kml22Constants {
     final String coordinatesListString = StaxUtils.getElementText(this.in);
     if (Property.hasValue(coordinatesListString)) {
       int axisCount = 2;
-      final String[] coordinatesListArray = coordinatesListString.trim().split(
-          "\\s+");
+      final String[] coordinatesListArray = coordinatesListString.trim().split("\\s+");
       final List<Point> points = new ArrayList<>();
       for (final String coordinatesString : coordinatesListArray) {
         final String[] coordinatesArray = coordinatesString.split(",");
@@ -130,7 +127,7 @@ Kml22Constants {
     StaxUtils.requireLocalName(this.in, LINE_STRING);
     LineString points = null;
     while (!StaxUtils.isEndElementLocalName(this.in, LINE_STRING)
-        && this.in.nextTag() == XMLStreamConstants.START_ELEMENT) {
+      && this.in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (StaxUtils.matchElementLocalName(this.in, COORDINATES)) {
         points = parseCoordinates();
       } else {
@@ -150,8 +147,7 @@ Kml22Constants {
   private Geometry parseMultiGeometry() throws XMLStreamException {
     int axisCount = 2;
     final List<Geometry> geometries = new ArrayList<Geometry>();
-    while (StaxUtils.skipToChildStartElements(this.in, POINT, LINE_STRING,
-      POLYGON)) {
+    while (StaxUtils.skipToChildStartElements(this.in, POINT, LINE_STRING, POLYGON)) {
       final Geometry geometry = parseGeometry();
       if (geometry != null) {
         axisCount = Math.max(axisCount, geometry.getAxisCount());
@@ -168,9 +164,8 @@ Kml22Constants {
     StaxUtils.requireLocalName(this.in, POINT);
     LineString points = null;
     while (!StaxUtils.isEndElementLocalName(this.in, POINT)
-        && this.in.nextTag() == XMLStreamConstants.START_ELEMENT) {
-      if (points == null
-          && StaxUtils.matchElementLocalName(this.in, COORDINATES)) {
+      && this.in.nextTag() == XMLStreamConstants.START_ELEMENT) {
+      if (points == null && StaxUtils.matchElementLocalName(this.in, COORDINATES)) {
         points = parseCoordinates();
       } else {
         StaxUtils.skipSubTree(this.in);

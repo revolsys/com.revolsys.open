@@ -2,7 +2,6 @@ package com.revolsys.format.usgsdem;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.format.tiff.TiffImage;
 import com.revolsys.raster.AbstractGeoReferencedImageFactory;
 import com.revolsys.raster.GeoReferencedImage;
 

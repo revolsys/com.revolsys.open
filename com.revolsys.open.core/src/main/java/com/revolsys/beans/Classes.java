@@ -5,8 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class Classes {
-  public static void addSuperClasses(
-    final Set<Class<? extends Object>> classes,
+  public static void addSuperClasses(final Set<Class<? extends Object>> classes,
     final Class<? extends Object> clazz) {
     if (clazz != null) {
       classes.add(clazz);
@@ -15,8 +14,7 @@ public class Classes {
     }
   }
 
-  public static void addSuperClassesAndInterfaces(
-    final Set<Class<? extends Object>> classes,
+  public static void addSuperClassesAndInterfaces(final Set<Class<? extends Object>> classes,
     final Class<? extends Object> clazz) {
     if (clazz != null) {
       classes.add(clazz);
@@ -39,8 +37,7 @@ public class Classes {
     }
   }
 
-  public static Set<Class<? extends Object>> getSuperClasses(
-    final Class<? extends Object> clazz) {
+  public static Set<Class<? extends Object>> getSuperClasses(final Class<? extends Object> clazz) {
     final Set<Class<? extends Object>> classes = new LinkedHashSet<Class<? extends Object>>();
     addSuperClasses(classes, clazz);
     return Collections.unmodifiableSet(classes);

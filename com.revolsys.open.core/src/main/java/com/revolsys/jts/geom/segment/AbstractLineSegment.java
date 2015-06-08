@@ -23,19 +23,16 @@ import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractLineSegment extends AbstractLineString implements
-  LineSegment {
+public abstract class AbstractLineSegment extends AbstractLineString implements LineSegment {
 
   private static final long serialVersionUID = 1L;
 
   private static int addEndPointIntersection(final double[] coordinates,
-    final int intersectionCount, final int axisCount,
-    final LineSegment segment1, final int vertexIndex1,
-    final LineSegment segment2, final int vertexIndex2) {
+    final int intersectionCount, final int axisCount, final LineSegment segment1,
+    final int vertexIndex1, final LineSegment segment2, final int vertexIndex2) {
     final double x = segment1.getX(vertexIndex1);
     final double y = segment1.getY(vertexIndex1);
-    if (!CoordinatesListUtil.containsXy(coordinates, intersectionCount,
-      axisCount, x, y)) {
+    if (!CoordinatesListUtil.containsXy(coordinates, intersectionCount, axisCount, x, y)) {
       coordinates[intersectionCount * axisCount] = x;
       coordinates[intersectionCount * axisCount + 1] = y;
       for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
@@ -50,14 +47,12 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
     return intersectionCount;
   }
 
-  private static int addEndPointIntersectionProjected(
-    final double[] coordinates, final int intersectionCount,
-    final int axisCount, final LineSegment segment1, final int vertexIndex1,
-    final LineSegment segment2, final double projectionFactor) {
+  private static int addEndPointIntersectionProjected(final double[] coordinates,
+    final int intersectionCount, final int axisCount, final LineSegment segment1,
+    final int vertexIndex1, final LineSegment segment2, final double projectionFactor) {
     final double x = segment1.getX(vertexIndex1);
     final double y = segment1.getY(vertexIndex1);
-    if (!CoordinatesListUtil.containsXy(coordinates, intersectionCount,
-      axisCount, x, y)) {
+    if (!CoordinatesListUtil.containsXy(coordinates, intersectionCount, axisCount, x, y)) {
       coordinates[intersectionCount * axisCount] = x;
       coordinates[intersectionCount * axisCount + 1] = y;
       for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
@@ -71,18 +66,17 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
     return intersectionCount + 1;
   }
 
-  private static int addPointIntersection(final double[] coordinates,
-    final int intersectionCount, final int axisCount,
-    final LineSegment segment1, final int vertexIndex,
+  private static int addPointIntersection(final double[] coordinates, final int intersectionCount,
+    final int axisCount, final LineSegment segment1, final int vertexIndex,
     final LineSegment segment2) {
     final double x = segment1.getCoordinate(vertexIndex, 0);
     final double y = segment1.getCoordinate(vertexIndex, 1);
     if (segment2.equalsVertex(0, x, y)) {
-      return addEndPointIntersection(coordinates, intersectionCount, axisCount,
-        segment1, vertexIndex, segment2, 0);
+      return addEndPointIntersection(coordinates, intersectionCount, axisCount, segment1,
+        vertexIndex, segment2, 0);
     } else if (segment2.equalsVertex(1, x, y)) {
-      return addEndPointIntersection(coordinates, intersectionCount, axisCount,
-        segment1, vertexIndex, segment2, 1);
+      return addEndPointIntersection(coordinates, intersectionCount, axisCount, segment1,
+        vertexIndex, segment2, 1);
     } else {
       final double distance = segment2.distance(x, y);
       final double maxDistance = segment1.getGeometryFactory().getResolution(0);
@@ -91,12 +85,10 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
         final double y1 = segment2.getY(0);
         final double x2 = segment2.getX(1);
         final double y2 = segment2.getY(1);
-        final double projectionFactor = LineSegmentUtil.projectionFactor(x1,
-          y1, x2, y2, x, y);
+        final double projectionFactor = LineSegmentUtil.projectionFactor(x1, y1, x2, y2, x, y);
         if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
-          return addEndPointIntersectionProjected(coordinates,
-            intersectionCount, axisCount, segment1, vertexIndex, segment2,
-            projectionFactor);
+          return addEndPointIntersectionProjected(coordinates, intersectionCount, axisCount,
+            segment1, vertexIndex, segment2, projectionFactor);
         }
       }
     }
@@ -238,22 +230,18 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
     if (geometryFactory == factory) {
       return (V)this;
     } else {
-      final Point point1 = ProjectionFactory.convert(getPoint(0), factory,
-        geometryFactory);
-      final Point point2 = ProjectionFactory.convert(getPoint(1), factory,
-        geometryFactory);
+      final Point point1 = ProjectionFactory.convert(getPoint(0), factory, geometryFactory);
+      final Point point2 = ProjectionFactory.convert(getPoint(1), factory, geometryFactory);
       return (V)new LineSegmentDoubleGF(geometryFactory, point1, point2);
     }
   }
 
-  protected LineSegment createLineSegment(
-    final GeometryFactory geometryFactory, final int axisCount,
-    final double... coordinates) {
+  protected LineSegment createLineSegment(final GeometryFactory geometryFactory,
+    final int axisCount, final double... coordinates) {
     return new LineSegmentDoubleGF(geometryFactory, axisCount, coordinates);
   }
 
-  protected Point createPoint(final GeometryFactory geometryFactory,
-    final double... coordinates) {
+  protected Point createPoint(final GeometryFactory geometryFactory, final double... coordinates) {
     return new PointDoubleGf(geometryFactory, coordinates);
   }
 
@@ -278,8 +266,8 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
     final double line2Y1 = line.getY(0);
     final double line2X2 = line.getX(1);
     final double line2Y2 = line.getY(1);
-    return LineSegmentUtil.distanceLineLine(line1X1, line1Y1, line1X2, line1Y2,
-      line2X1, line2Y1, line2X2, line2Y2);
+    return LineSegmentUtil.distanceLineLine(line1X1, line1Y1, line1X2, line1Y2, line2X1, line2Y1,
+      line2X2, line2Y2);
   }
 
   /**
@@ -400,8 +388,8 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
     for (int i = 0; i < 4; i++) {
       final Point ringC1 = points.getPoint(i);
       final Point ringC2 = points.getPoint(i);
-      final LineString currentIntersections = LineSegmentUtil.getIntersection(
-        geometryFactory, coordinates1, coordinates2, ringC1, ringC2);
+      final LineString currentIntersections = LineSegmentUtil.getIntersection(geometryFactory,
+        coordinates1, coordinates2, ringC1, ringC2);
       if (currentIntersections.getVertexCount() == 1) {
         final Point currentIntersection = currentIntersections.getPoint(0);
         if (intersection == null) {
@@ -461,54 +449,53 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
     final double line2y1 = lineSegment2.getY(0);
     final double line2x2 = lineSegment2.getX(1);
     final double line2y2 = lineSegment2.getY(1);
-    if (BoundingBoxUtil.intersectsMinMax(line1x1, line1y1, line1x2, line1y2, line2x1,
-      line2y1, line2x2, line2y2)) {
+    if (BoundingBoxUtil.intersectsMinMax(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
+      line2x2, line2y2)) {
       int intersectionCount = 0;
       final int axisCount = geometryFactory.getAxisCount();
       final double[] coordinates = new double[2 * axisCount];
       for (int vertexIndex = 0; vertexIndex < 2; vertexIndex++) {
-        intersectionCount = addPointIntersection(coordinates,
-          intersectionCount, axisCount, this, vertexIndex, lineSegment2);
+        intersectionCount = addPointIntersection(coordinates, intersectionCount, axisCount, this,
+          vertexIndex, lineSegment2);
       }
       for (int vertexIndex = 0; vertexIndex < 2; vertexIndex++) {
-        intersectionCount = addPointIntersection(coordinates,
-          intersectionCount, axisCount, lineSegment2, vertexIndex, this);
+        intersectionCount = addPointIntersection(coordinates, intersectionCount, axisCount,
+          lineSegment2, vertexIndex, this);
       }
 
       if (intersectionCount == 0) {
-        final int Pq1 = CoordinatesListUtil.orientationIndex(line1x1, line1y1,
-          line1x2, line1y2, line2x1, line2y1);
-        final int Pq2 = CoordinatesListUtil.orientationIndex(line1x1, line1y1,
-          line1x2, line1y2, line2x2, line2y2);
+        final int Pq1 = CoordinatesListUtil.orientationIndex(line1x1, line1y1, line1x2, line1y2,
+          line2x1, line2y1);
+        final int Pq2 = CoordinatesListUtil.orientationIndex(line1x1, line1y1, line1x2, line1y2,
+          line2x2, line2y2);
 
         if (!(Pq1 > 0 && Pq2 > 0 || Pq1 < 0 && Pq2 < 0)) {
-          final int Qp1 = CoordinatesListUtil.orientationIndex(line2x1,
-            line2y1, line2x2, line2y2, line1x1, line1y1);
-          final int Qp2 = CoordinatesListUtil.orientationIndex(line2x1,
-            line2y1, line2x2, line2y2, line1x2, line1y2);
+          final int Qp1 = CoordinatesListUtil.orientationIndex(line2x1, line2y1, line2x2, line2y2,
+            line1x1, line1y1);
+          final int Qp2 = CoordinatesListUtil.orientationIndex(line2x1, line2y1, line2x2, line2y2,
+            line1x2, line1y2);
 
           if (!(Qp1 > 0 && Qp2 > 0 || Qp1 < 0 && Qp2 < 0)) {
-            final double detLine1StartLine1End = LineSegmentUtil.det(line1x1,
-              line1y1, line1x2, line1y2);
-            final double detLine2StartLine2End = LineSegmentUtil.det(line2x1,
-              line2y1, line2x2, line2y2);
-            double x = LineSegmentUtil.det(detLine1StartLine1End, line1x1
-              - line1x2, detLine2StartLine2End, line2x1 - line2x2)
-              / LineSegmentUtil.det(line1x1 - line1x2, line1y1 - line1y2,
-                line2x1 - line2x2, line2y1 - line2y2);
+            final double detLine1StartLine1End = LineSegmentUtil.det(line1x1, line1y1, line1x2,
+              line1y2);
+            final double detLine2StartLine2End = LineSegmentUtil.det(line2x1, line2y1, line2x2,
+              line2y2);
+            double x = LineSegmentUtil.det(detLine1StartLine1End, line1x1 - line1x2,
+              detLine2StartLine2End, line2x1 - line2x2)
+              / LineSegmentUtil.det(line1x1 - line1x2, line1y1 - line1y2, line2x1 - line2x2,
+                line2y1 - line2y2);
             x = geometryFactory.makePrecise(0, x);
-            double y = LineSegmentUtil.det(detLine1StartLine1End, line1y1
-              - line1y2, detLine2StartLine2End, line2y1 - line2y2)
-              / LineSegmentUtil.det(line1x1 - line1x2, line1y1 - line1y2,
-                line2x1 - line2x2, line2y1 - line2y2);
+            double y = LineSegmentUtil.det(detLine1StartLine1End, line1y1 - line1y2,
+              detLine2StartLine2End, line2y1 - line2y2)
+              / LineSegmentUtil.det(line1x1 - line1x2, line1y1 - line1y2, line2x1 - line2x2,
+                line2y1 - line2y2);
             y = geometryFactory.makePrecise(1, y);
             coordinates[0] = x;
             coordinates[1] = y;
             boolean hasNaN = false;
             double projectionFactor = projectionFactor(x, y);
             for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
-              final double value = projectCoordinate(axisIndex,
-                projectionFactor);
+              final double value = projectCoordinate(axisIndex, projectionFactor);
               coordinates[axisIndex] = value;
               hasNaN |= Double.isNaN(value);
             }
@@ -517,8 +504,7 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
               for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
                 double value = coordinates[axisIndex];
                 if (Double.isNaN(value)) {
-                  value = lineSegment2.projectCoordinate(axisIndex,
-                    projectionFactor);
+                  value = lineSegment2.projectCoordinate(axisIndex, projectionFactor);
                   coordinates[axisIndex] = value;
                   hasNaN |= Double.isNaN(value);
                 }
@@ -530,10 +516,9 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
       } else if (intersectionCount == 1) {
         return geometryFactory.point(coordinates);
       } else if (intersectionCount == 2) {
-        final double distance1 = MathUtil.distance(line1x1, line1y1,
-          coordinates[0], coordinates[1]);
-        final double distance2 = MathUtil.distance(line1x1, line1y1,
-          coordinates[axisCount], coordinates[axisCount + 1]);
+        final double distance1 = MathUtil.distance(line1x1, line1y1, coordinates[0], coordinates[1]);
+        final double distance2 = MathUtil.distance(line1x1, line1y1, coordinates[axisCount],
+          coordinates[axisCount + 1]);
         if (distance1 > distance2) {
           CoordinatesListUtil.switchCoordinates(coordinates, axisCount, 0, 1);
         }
@@ -597,8 +582,7 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
 
   @Override
   public boolean intersects(final Point point, final double maxDistance) {
-    return LineSegmentUtil.isPointOnLine(getPoint(0), getPoint(1), point,
-      maxDistance);
+    return LineSegmentUtil.isPointOnLine(getPoint(0), getPoint(1), point, maxDistance);
   }
 
   @Override
@@ -660,11 +644,9 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
       } else if (NumberEquals.equal(x, x2) && NumberEquals.equal(y, y2)) {
         return false;
       } else {
-        final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2,
-          y2, x, y);
+        final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
         if (distance < maxDistance) {
-          final double projectionFactor = LineSegmentUtil.projectionFactor(x1,
-            y1, x2, y2, x, y);
+          final double projectionFactor = LineSegmentUtil.projectionFactor(x1, y1, x2, y2, x, y);
           if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
             return true;
           }
@@ -713,8 +695,7 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
   @Override
   public Point lineIntersection(final LineSegment line) {
     try {
-      final Point intPt = HCoordinate.intersection(getP0(), getP1(),
-        line.getP0(), line.getP1());
+      final Point intPt = HCoordinate.intersection(getP0(), getP1(), line.getP0(), line.getP1());
       return intPt;
     } catch (final NotRepresentableException ex) {
       // eat this exception, and return null;
@@ -729,8 +710,7 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
    */
   @Override
   public Point midPoint() {
-    return LineSegmentUtil.midPoint(getGeometryFactory(), getPoint(0),
-      getPoint(1));
+    return LineSegmentUtil.midPoint(getGeometryFactory(), getPoint(0), getPoint(1));
   }
 
   /**
@@ -770,10 +750,8 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
    */
   @Override
   public int orientationIndex(final LineSegment seg) {
-    final int orient0 = CoordinatesUtil.orientationIndex(getPoint(0),
-      getPoint(1), seg.getPoint(0));
-    final int orient1 = CoordinatesUtil.orientationIndex(getPoint(0),
-      getPoint(1), seg.getPoint(1));
+    final int orient0 = CoordinatesUtil.orientationIndex(getPoint(0), getPoint(1), seg.getPoint(0));
+    final int orient1 = CoordinatesUtil.orientationIndex(getPoint(0), getPoint(1), seg.getPoint(1));
     // this handles the case where the points are L or collinear
     if (orient0 >= 0 && orient1 >= 0) {
       return Math.max(orient0, orient1);
@@ -873,8 +851,7 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
    * @throws IllegalStateException if the segment has zero length
    */
   @Override
-  public Point pointAlongOffset(final double segmentLengthFraction,
-    final double offsetDistance) {
+  public Point pointAlongOffset(final double segmentLengthFraction, final double offsetDistance) {
     final double x1 = getX(0);
     final double x2 = getX(1);
     final double dx = x2 - x1;
@@ -890,8 +867,7 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
     final double len = Math.sqrt(dx * dx + dy * dy);
     if (offsetDistance != 0.0) {
       if (len <= 0.0) {
-        throw new IllegalStateException(
-          "Cannot compute offset from zero-length line segment");
+        throw new IllegalStateException("Cannot compute offset from zero-length line segment");
       }
       double ux = 0.0;
       double uy = 0.0;
@@ -965,14 +941,12 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
   public Point project(final Point point) {
     final Point lineStart = getPoint(0);
     final Point lineEnd = getPoint(1);
-    final Point newPoint = LineSegmentUtil.project(getGeometryFactory(),
-      lineStart, lineEnd, point);
+    final Point newPoint = LineSegmentUtil.project(getGeometryFactory(), lineStart, lineEnd, point);
     return newPoint;
   }
 
   @Override
-  public double projectCoordinate(final int axisIndex,
-    final double projectionFactor) {
+  public double projectCoordinate(final int axisIndex, final double projectionFactor) {
     final double value1 = getCoordinate(0, axisIndex);
     final double value2 = getCoordinate(1, axisIndex);
     if (Double.isNaN(value1) || Double.isNaN(value2)) {
@@ -1020,8 +994,7 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
     final double[] coordinates = new double[axisCount * 2];
     for (int vertexIndex = 0; vertexIndex < 2; vertexIndex++) {
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-        coordinates[vertexIndex * axisCount + axisIndex] = getCoordinate(
-          1 - vertexIndex, axisIndex);
+        coordinates[vertexIndex * axisCount + axisIndex] = getCoordinate(1 - vertexIndex, axisIndex);
       }
     }
     final GeometryFactory geometryFactory = getGeometryFactory();

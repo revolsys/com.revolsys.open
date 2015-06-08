@@ -56,18 +56,17 @@ public class IndexedPointInAreaStressTest extends TestCase {
     final GeometryFactory geomFactory = GeometryFactory.fixed(0, 1.0);
     // GeometryFactoryI geomFactory = new GeometryFactoryI();
 
-    final PerturbedGridPolygonBuilder gridBuilder = new PerturbedGridPolygonBuilder(
-      geomFactory);
+    final PerturbedGridPolygonBuilder gridBuilder = new PerturbedGridPolygonBuilder(geomFactory);
     gridBuilder.setNumLines(20);
     gridBuilder.setLineWidth(10.0);
     gridBuilder.setSeed(1185072199562L);
     final Geometry area = gridBuilder.getGeometry();
 
-    // PointInAreaLocator pia = new GeometryFactoryIndexedPointInAreaLocator(area);
+    // PointInAreaLocator pia = new
+    // GeometryFactoryIndexedPointInAreaLocator(area);
     final PointOnGeometryLocator pia = new IndexedPointInAreaLocator(area);
 
-    final PointInAreaStressTester gridTester = new PointInAreaStressTester(
-      geomFactory, area);
+    final PointInAreaStressTester gridTester = new PointInAreaStressTester(geomFactory, area);
     gridTester.setNumPoints(100000);
     gridTester.setPIA(pia);
 

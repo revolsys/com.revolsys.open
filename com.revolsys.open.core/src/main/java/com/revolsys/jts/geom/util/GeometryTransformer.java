@@ -163,7 +163,7 @@ public abstract class GeometryTransformer {
     }
 
     throw new IllegalArgumentException("Unknown Geometry subtype: "
-        + inputGeom.getClass().getName());
+      + inputGeom.getClass().getName());
   }
 
   /**
@@ -178,8 +178,7 @@ public abstract class GeometryTransformer {
    * @param parent the parent geometry
    * @return the transformed coordinates
    */
-  protected LineString transformCoordinates(final LineString coords,
-    final Geometry parent) {
+  protected LineString transformCoordinates(final LineString coords, final Geometry parent) {
     return copy(coords);
   }
 
@@ -215,8 +214,7 @@ public abstract class GeometryTransformer {
    * @return a LinearRing if the transformation resulted in a structurally valid ring
    * @return a LineString if the transformation caused the LinearRing to collapse to 3 or fewer points
    */
-  protected Geometry transformLinearRing(final LinearRing geometry,
-    final Geometry parent) {
+  protected Geometry transformLinearRing(final LinearRing geometry, final Geometry parent) {
     if (geometry == null) {
       return this.factory.linearRing();
     } else {
@@ -242,18 +240,15 @@ public abstract class GeometryTransformer {
    * @param parent
    * @return
    */
-  protected Geometry transformLineString(final LineString geom,
-    final Geometry parent) {
+  protected Geometry transformLineString(final LineString geom, final Geometry parent) {
     // should check for 1-point sequences and downgrade them to points
     return this.factory.lineString(transformCoordinates(geom, geom));
   }
 
-  protected Geometry transformMultiLineString(final MultiLineString geom,
-    final Geometry parent) {
+  protected Geometry transformMultiLineString(final MultiLineString geom, final Geometry parent) {
     final List transGeomList = new ArrayList();
     for (int i = 0; i < geom.getGeometryCount(); i++) {
-      final Geometry transformGeom = transformLineString(
-        (LineString)geom.getGeometry(i), geom);
+      final Geometry transformGeom = transformLineString((LineString)geom.getGeometry(i), geom);
       if (transformGeom == null) {
         continue;
       }
@@ -265,12 +260,10 @@ public abstract class GeometryTransformer {
     return this.factory.buildGeometry(transGeomList);
   }
 
-  protected Geometry transformMultiPoint(final MultiPoint geom,
-    final Geometry parent) {
+  protected Geometry transformMultiPoint(final MultiPoint geom, final Geometry parent) {
     final List transGeomList = new ArrayList();
     for (int i = 0; i < geom.getGeometryCount(); i++) {
-      final Geometry transformGeom = transformPoint((Point)geom.getGeometry(i),
-        geom);
+      final Geometry transformGeom = transformPoint((Point)geom.getGeometry(i), geom);
       if (transformGeom == null) {
         continue;
       }
@@ -282,12 +275,10 @@ public abstract class GeometryTransformer {
     return this.factory.buildGeometry(transGeomList);
   }
 
-  protected Geometry transformMultiPolygon(final MultiPolygon geom,
-    final Geometry parent) {
+  protected Geometry transformMultiPolygon(final MultiPolygon geom, final Geometry parent) {
     final List transGeomList = new ArrayList();
     for (int i = 0; i < geom.getGeometryCount(); i++) {
-      final Geometry transformGeom = transformPolygon(
-        (Polygon)geom.getGeometry(i), geom);
+      final Geometry transformGeom = transformPolygon((Polygon)geom.getGeometry(i), geom);
       if (transformGeom == null) {
         continue;
       }
@@ -299,8 +290,7 @@ public abstract class GeometryTransformer {
     return this.factory.buildGeometry(transGeomList);
   }
 
-  protected abstract Geometry transformPoint(final Point point,
-    final Geometry parent);
+  protected abstract Geometry transformPoint(final Point point, final Geometry parent);
 
   protected Geometry transformPolygon(final Polygon geom, final Geometry parent) {
     boolean isAllValidLinearRings = true;

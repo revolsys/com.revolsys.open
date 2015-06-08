@@ -8,9 +8,8 @@ import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.Path;
 import com.revolsys.util.Property;
 
-public abstract class AbstractRecordStoreSchemaElement extends
-AbstractObjectWithProperties implements RecordStoreSchemaElement,
-Comparable<RecordStoreSchemaElement> {
+public abstract class AbstractRecordStoreSchemaElement extends AbstractObjectWithProperties
+  implements RecordStoreSchemaElement, Comparable<RecordStoreSchemaElement> {
 
   private final String path;
 
@@ -23,8 +22,7 @@ Comparable<RecordStoreSchemaElement> {
     this.name = "";
   }
 
-  public AbstractRecordStoreSchemaElement(final RecordStoreSchema schema,
-    final String path) {
+  public AbstractRecordStoreSchemaElement(final RecordStoreSchema schema, final String path) {
     if (!Property.hasValue(path)) {
       throw new IllegalArgumentException("Path is required");
     }

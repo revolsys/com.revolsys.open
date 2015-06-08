@@ -18,12 +18,13 @@ import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.record.model.RecordListTableModel;
 import com.revolsys.swing.table.record.row.RecordRowTable;
 
-public class MergedRecordsTableModel extends RecordListTableModel implements
-SortableTableModel, ListSelectionListener {
-  public static TablePanel createPanel(final AbstractRecordLayer layer,
-    final Record mergedObject, final Collection<LayerRecord> objects) {
-    final MergedRecordsTableModel model = new MergedRecordsTableModel(layer,
-      mergedObject, objects);
+public class MergedRecordsTableModel extends RecordListTableModel implements SortableTableModel,
+  ListSelectionListener {
+  private static final long serialVersionUID = 1L;
+
+  public static TablePanel createPanel(final AbstractRecordLayer layer, final Record mergedObject,
+    final Collection<LayerRecord> objects) {
+    final MergedRecordsTableModel model = new MergedRecordsTableModel(layer, mergedObject, objects);
     final RecordRowTable table = new RecordRowTable(model);
     table.setVisibleRowCount(objects.size() + 2);
     MergedValuePredicate.add(table);
@@ -34,8 +35,6 @@ SortableTableModel, ListSelectionListener {
     return new TablePanel(table);
   }
 
-  private static final long serialVersionUID = 1L;
-
   private final Record mergedRecord;
 
   private final AbstractRecordLayer layer;
@@ -44,8 +43,8 @@ SortableTableModel, ListSelectionListener {
     this(layer, null, null);
   }
 
-  public MergedRecordsTableModel(final AbstractRecordLayer layer,
-    final Record mergedRecord, final Collection<LayerRecord> records) {
+  public MergedRecordsTableModel(final AbstractRecordLayer layer, final Record mergedRecord,
+    final Collection<LayerRecord> records) {
     super(layer.getRecordDefinition(), records, layer.getFieldNames());
     this.layer = layer;
     setFieldsOffset(1);
@@ -107,8 +106,7 @@ SortableTableModel, ListSelectionListener {
   }
 
   @Override
-  public void setValueAt(final Object value, final int rowIndex,
-    final int columnIndex) {
+  public void setValueAt(final Object value, final int rowIndex, final int columnIndex) {
     final Map<String, Object> record = getRecord(rowIndex);
     if (record != null) {
       final String name = getFieldName(columnIndex);

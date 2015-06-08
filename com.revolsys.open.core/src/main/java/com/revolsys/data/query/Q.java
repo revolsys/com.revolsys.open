@@ -26,15 +26,15 @@ public class Q {
     return new And(conditions);
   }
 
-  public static QueryValue arithmatic(final FieldDefinition field,
-    final String operator, final Object value) {
+  public static QueryValue arithmatic(final FieldDefinition field, final String operator,
+    final Object value) {
     final Column column = new Column(field);
     final Value queryValue = new Value(field, value);
     return arithmatic(column, operator, queryValue);
   }
 
-  public static QueryValue arithmatic(final QueryValue left,
-    final String operator, final QueryValue right) {
+  public static QueryValue arithmatic(final QueryValue left, final String operator,
+    final QueryValue right) {
     if ("+".equals(operator)) {
       return Q.add(left, right);
     } else if ("-".equals(operator)) {
@@ -46,29 +46,27 @@ public class Q {
     } else if ("%".equals(operator) || "mod".equals(operator)) {
       return Q.mod(left, right);
     } else {
-      throw new IllegalArgumentException("Operator " + operator
-        + " not supported");
+      throw new IllegalArgumentException("Operator " + operator + " not supported");
     }
   }
 
-  public static QueryValue arithmatic(final String fieldName,
-    final String operator, final Object value) {
+  public static QueryValue arithmatic(final String fieldName, final String operator,
+    final Object value) {
     final Column column = new Column(fieldName);
     final Value queryValue = new Value(value);
     return arithmatic(column, operator, queryValue);
 
   }
 
-  public static Between between(final FieldDefinition attribute,
-    final Object min, final Object max) {
+  public static Between between(final FieldDefinition attribute, final Object min, final Object max) {
     final Column column = new Column(attribute);
     final Value minCondition = new Value(attribute, min);
     final Value maxCondition = new Value(attribute, max);
     return new Between(column, minCondition, maxCondition);
   }
 
-  public static Condition binary(final FieldDefinition field,
-    final String operator, final Object value) {
+  public static Condition binary(final FieldDefinition field, final String operator,
+    final Object value) {
     final Column column = new Column(field);
     final Value queryValue = new Value(field, value);
     return binary(column, operator, queryValue);
@@ -89,13 +87,11 @@ public class Q {
     } else if (">=".equals(operator)) {
       return Q.greaterThanEqual(left, right);
     } else {
-      throw new IllegalArgumentException("Operator " + operator
-        + " not supported");
+      throw new IllegalArgumentException("Operator " + operator + " not supported");
     }
   }
 
-  public static Condition binary(final String fieldName, final String operator,
-    final Object value) {
+  public static Condition binary(final String fieldName, final String operator, final Object value) {
     final Column column = new Column(fieldName);
     final Value queryValue = new Value(value);
     return binary(column, operator, queryValue);
@@ -131,8 +127,7 @@ public class Q {
     return new Equal(leftCondition, right);
   }
 
-  public static Condition equalId(final List<?> attributes,
-    final Identifier identifier) {
+  public static Condition equalId(final List<?> attributes, final Identifier identifier) {
     final And and = new And();
     List<Object> values;
     if (identifier == null) {
@@ -164,21 +159,19 @@ public class Q {
         and.add(condition);
       }
     } else {
-      throw new IllegalArgumentException("Field count for " + attributes
-        + " != count for values " + values);
+      throw new IllegalArgumentException("Field count for " + attributes + " != count for values "
+        + values);
     }
     return and;
   }
 
-  public static GreaterThan greaterThan(final FieldDefinition attribute,
-    final Object value) {
+  public static GreaterThan greaterThan(final FieldDefinition attribute, final Object value) {
     final String name = attribute.getName();
     final Value valueCondition = new Value(attribute, value);
     return greaterThan(name, valueCondition);
   }
 
-  public static GreaterThan greaterThan(final QueryValue left,
-    final QueryValue right) {
+  public static GreaterThan greaterThan(final QueryValue left, final QueryValue right) {
     return new GreaterThan(left, right);
   }
 
@@ -187,32 +180,28 @@ public class Q {
     return greaterThan(name, valueCondition);
   }
 
-  public static GreaterThan greaterThan(final String name,
-    final QueryValue right) {
+  public static GreaterThan greaterThan(final String name, final QueryValue right) {
     final Column column = new Column(name);
     return new GreaterThan(column, right);
   }
 
-  public static GreaterThanEqual greaterThanEqual(
-    final FieldDefinition attribute, final Object value) {
+  public static GreaterThanEqual greaterThanEqual(final FieldDefinition attribute,
+    final Object value) {
     final String name = attribute.getName();
     final Value valueCondition = new Value(attribute, value);
     return greaterThanEqual(name, valueCondition);
   }
 
-  public static GreaterThanEqual greaterThanEqual(final QueryValue left,
-    final QueryValue right) {
+  public static GreaterThanEqual greaterThanEqual(final QueryValue left, final QueryValue right) {
     return new GreaterThanEqual(left, right);
   }
 
-  public static GreaterThanEqual greaterThanEqual(final String name,
-    final Object value) {
+  public static GreaterThanEqual greaterThanEqual(final String name, final Object value) {
     final Value valueCondition = new Value(value);
     return greaterThanEqual(name, valueCondition);
   }
 
-  public static GreaterThanEqual greaterThanEqual(final String name,
-    final QueryValue right) {
+  public static GreaterThanEqual greaterThanEqual(final String name, final QueryValue right) {
     final Column column = new Column(name);
     return greaterThanEqual(column, right);
   }
@@ -239,12 +228,10 @@ public class Q {
   }
 
   public static Condition iLike(final String left, final String right) {
-    return Q.like(F.upper(new Cast(left, "varchar(4000)")),
-      ("%" + right + "%").toUpperCase());
+    return Q.like(F.upper(new Cast(left, "varchar(4000)")), ("%" + right + "%").toUpperCase());
   }
 
-  public static In in(final FieldDefinition attribute,
-    final Collection<? extends Object> values) {
+  public static In in(final FieldDefinition attribute, final Collection<? extends Object> values) {
     return new In(attribute, values);
   }
 
@@ -253,8 +240,7 @@ public class Q {
     return new In(attribute, list);
   }
 
-  public static In in(final String name,
-    final Collection<? extends Object> values) {
+  public static In in(final String name, final Collection<? extends Object> values) {
     final Column left = new Column(name);
     final CollectionValue collectionValue = new CollectionValue(values);
     return new In(left, collectionValue);
@@ -280,8 +266,7 @@ public class Q {
     return new IsNull(condition);
   }
 
-  public static LessThan lessThan(final FieldDefinition attribute,
-    final Object value) {
+  public static LessThan lessThan(final FieldDefinition attribute, final Object value) {
     final String name = attribute.getName();
     final Value valueCondition = new Value(attribute, value);
     return lessThan(name, valueCondition);
@@ -301,26 +286,22 @@ public class Q {
     return lessThan(column, right);
   }
 
-  public static LessThanEqual lessThanEqual(final FieldDefinition attribute,
-    final Object value) {
+  public static LessThanEqual lessThanEqual(final FieldDefinition attribute, final Object value) {
     final String name = attribute.getName();
     final Value valueCondition = new Value(attribute, value);
     return lessThanEqual(name, valueCondition);
   }
 
-  public static LessThanEqual lessThanEqual(final QueryValue left,
-    final QueryValue right) {
+  public static LessThanEqual lessThanEqual(final QueryValue left, final QueryValue right) {
     return new LessThanEqual(left, right);
   }
 
-  public static LessThanEqual lessThanEqual(final String name,
-    final Object value) {
+  public static LessThanEqual lessThanEqual(final String name, final Object value) {
     final Value valueCondition = new Value(value);
     return lessThanEqual(name, valueCondition);
   }
 
-  public static LessThanEqual lessThanEqual(final String name,
-    final QueryValue right) {
+  public static LessThanEqual lessThanEqual(final String name, final QueryValue right) {
     final Column column = new Column(name);
     return new LessThanEqual(column, right);
   }
@@ -346,8 +327,8 @@ public class Q {
     return new Like(leftCondition, right);
   }
 
-  public static Condition likeRegEx(final RecordStore recordStore,
-    final String fieldName, final Object value) {
+  public static Condition likeRegEx(final RecordStore recordStore, final String fieldName,
+    final Object value) {
     QueryValue left;
     if (recordStore.getClass().getName().contains("Oracle")) {
       left = F.regexpReplace(F.upper(fieldName), "[^A-Z0-9]", "");
@@ -355,9 +336,7 @@ public class Q {
       left = F.regexpReplace(F.upper(fieldName), "[^A-Z0-9]", "", "g");
     }
     final String right = "%"
-        + StringConverterRegistry.toString(value)
-        .toUpperCase()
-        .replaceAll("[^A-Z0-9]", "") + "%";
+      + StringConverterRegistry.toString(value).toUpperCase().replaceAll("[^A-Z0-9]", "") + "%";
     return Q.like(left, right);
   }
 
@@ -373,8 +352,7 @@ public class Q {
     return new Not(condition);
   }
 
-  public static NotEqual notEqual(final FieldDefinition attribute,
-    final Object value) {
+  public static NotEqual notEqual(final FieldDefinition attribute, final Object value) {
     final String name = attribute.getName();
     final Value valueCondition = new Value(attribute, value);
     return notEqual(name, valueCondition);
@@ -402,14 +380,13 @@ public class Q {
     return new Or(conditions);
   }
 
-  public static void setValue(final int index, final Condition condition,
-    final Object value) {
+  public static void setValue(final int index, final Condition condition, final Object value) {
     setValueInternal(-1, index, condition, value);
 
   }
 
-  public static int setValueInternal(int i, final int index,
-    final QueryValue condition, final Object value) {
+  public static int setValueInternal(int i, final int index, final QueryValue condition,
+    final Object value) {
     for (final QueryValue subCondition : condition.getQueryValues()) {
       if (subCondition instanceof Value) {
         final Value valueCondition = (Value)subCondition;

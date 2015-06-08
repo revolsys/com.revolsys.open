@@ -39,12 +39,9 @@ public class CascadedPolygonUnionTester {
     // System.out.println("Testing similarity with min measure = "
     // + minimumMeasure);
 
-    final double areaMeasure = new AreaSimilarityMeasure().measure(union1,
-      union2);
-    final double hausMeasure = new HausdorffSimilarityMeasure().measure(union1,
-      union2);
-    final double overallMeasure = SimilarityMeasureCombiner.combine(
-      areaMeasure, hausMeasure);
+    final double areaMeasure = new AreaSimilarityMeasure().measure(union1, union2);
+    final double hausMeasure = new HausdorffSimilarityMeasure().measure(union1, union2);
+    final double overallMeasure = SimilarityMeasureCombiner.combine(areaMeasure, hausMeasure);
 
     // System.out.println("Area measure = " + areaMeasure
     // + "   Hausdorff measure = " + hausMeasure + "    Overall = "

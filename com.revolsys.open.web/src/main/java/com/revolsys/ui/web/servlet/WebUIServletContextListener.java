@@ -35,8 +35,7 @@ public class WebUIServletContextListener implements ServletContextListener {
    */
   @Override
   public final void contextDestroyed(final ServletContextEvent event) {
-    final ClassLoader contextClassLoader = Thread.currentThread()
-        .getContextClassLoader();
+    final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     LogFactory.releaseAll();
     Introspector.flushCaches();
   }

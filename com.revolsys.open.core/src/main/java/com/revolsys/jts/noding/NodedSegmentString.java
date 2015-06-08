@@ -120,8 +120,7 @@ public class NodedSegmentString implements NodableSegmentString {
    * @param segmentIndex the index of the segment containing the intersection
    * @return the intersection node for the point
    */
-  public SegmentNode addIntersectionNode(final Point point,
-    final int segmentIndex) {
+  public SegmentNode addIntersectionNode(final Point point, final int segmentIndex) {
     int normalizedSegmentIndex = segmentIndex;
     // normalize the intersection point location
     final int nextSegIndex = normalizedSegmentIndex + 1;
@@ -130,7 +129,7 @@ public class NodedSegmentString implements NodableSegmentString {
 
       // Normalize segment index if point falls on vertex
       // The check for point equality is 2D only - Z values are ignored
-      if (point.equals(2,nextPt)) {
+      if (point.equals(2, nextPt)) {
         normalizedSegmentIndex = nextSegIndex;
       }
     }
@@ -145,8 +144,7 @@ public class NodedSegmentString implements NodableSegmentString {
    * Adds EdgeIntersections for one or both
    * intersections found for a segment of an edge to the edge intersection list.
    */
-  public void addIntersections(final LineIntersector li,
-    final int segmentIndex, final int geomIndex) {
+  public void addIntersections(final LineIntersector li, final int segmentIndex, final int geomIndex) {
     for (int i = 0; i < li.getIntersectionNum(); i++) {
       addIntersection(li, segmentIndex, geomIndex, i);
     }
@@ -197,7 +195,7 @@ public class NodedSegmentString implements NodableSegmentString {
   }
 
   private int safeOctant(final Point p0, final Point p1) {
-    if (p0.equals(2,p1)) {
+    if (p0.equals(2, p1)) {
       return 0;
     }
     return Octant.octant(p0, p1);

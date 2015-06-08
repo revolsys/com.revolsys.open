@@ -37,8 +37,7 @@ import com.revolsys.io.Path;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.AbstractInOutProcess;
 
-public class AddDefaultValuesProcess extends
-AbstractInOutProcess<Record, Record> {
+public class AddDefaultValuesProcess extends AbstractInOutProcess<Record, Record> {
   private static final Logger log = Logger.getLogger(AddDefaultValuesProcess.class);
 
   private Set<String> excludedFieldNames = new HashSet<String>();
@@ -49,8 +48,7 @@ AbstractInOutProcess<Record, Record> {
 
   private final Map<RecordDefinition, Map<String, Object>> typeDefaultValues = new HashMap<RecordDefinition, Map<String, Object>>();
 
-  private void addDefaultValues(final Map<String, Object> defaultValues,
-    final RecordDefinition type) {
+  private void addDefaultValues(final Map<String, Object> defaultValues, final RecordDefinition type) {
     if (Path.getPath(type.getPath()).equals(this.schemaName)) {
       defaultValues.putAll(type.getDefaultValues());
     }
@@ -114,9 +112,8 @@ AbstractInOutProcess<Record, Record> {
     }
   }
 
-  private void processDefaultValues(final Record record,
-    final Map<String, Object> defaultValues) {
-    for (Entry<String, Object> defaultValue : defaultValues.entrySet()) {
+  private void processDefaultValues(final Record record, final Map<String, Object> defaultValues) {
+    for (final Entry<String, Object> defaultValue : defaultValues.entrySet()) {
       final String key = defaultValue.getKey();
       final Object value = defaultValue.getValue();
       setDefaultValue(record, key, value);
@@ -131,12 +128,10 @@ AbstractInOutProcess<Record, Record> {
     }
   }
 
-  private void setDefaultValue(final Record record, final String key,
-    final Object value) {
+  private void setDefaultValue(final Record record, final String key, final Object value) {
     final int dotIndex = key.indexOf('.');
     if (dotIndex == -1) {
-      if (record.getValue(key) == null
-          && !this.excludedFieldNames.contains(key)) {
+      if (record.getValue(key) == null && !this.excludedFieldNames.contains(key)) {
         log.info("Adding attribute " + key + "=" + value);
         record.setValue(key, value);
       }
@@ -162,8 +157,7 @@ AbstractInOutProcess<Record, Record> {
         } else if (attributeValue instanceof Record) {
           final Record subObject = (Record)attributeValue;
           setDefaultValue(subObject, subKey, value);
-        } else if (!fieldName.equals(record.getRecordDefinition()
-          .getGeometryFieldName())) {
+        } else if (!fieldName.equals(record.getRecordDefinition().getGeometryFieldName())) {
           log.error("Attribute '" + fieldName + "' must be a Record");
         }
       } finally {
@@ -182,8 +176,7 @@ AbstractInOutProcess<Record, Record> {
     this.excludedFieldNames = excludedFieldNames;
   }
 
-  public void setRecordDefinitionFactory(
-    final RecordDefinitionFactory recordDefinitionFactory) {
+  public void setRecordDefinitionFactory(final RecordDefinitionFactory recordDefinitionFactory) {
     this.recordDefinitionFactory = recordDefinitionFactory;
   }
 

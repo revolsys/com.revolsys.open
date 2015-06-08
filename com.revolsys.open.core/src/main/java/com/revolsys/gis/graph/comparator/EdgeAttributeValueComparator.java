@@ -45,8 +45,7 @@ public class EdgeAttributeValueComparator<T> implements Comparator<Edge<T>> {
             compare = comparable1.compareTo(object2);
           } else if (object1 instanceof Collection) {
             final Collection collection1 = (Collection)object1;
-            compare = new CollectionComparator().compare(collection1,
-              (Collection)object2);
+            compare = new CollectionComparator().compare(collection1, (Collection)object2);
 
           }
           if (compare != 0) {

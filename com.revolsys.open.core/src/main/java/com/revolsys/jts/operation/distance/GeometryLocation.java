@@ -70,8 +70,7 @@ public class GeometryLocation {
    * @param segIndex the segment index of the location, or INSIDE_AREA
    * @param pt the coordinate of the location
    */
-  public GeometryLocation(final Geometry component, final int segIndex,
-    final Point pt) {
+  public GeometryLocation(final Geometry component, final int segIndex, final Point pt) {
     this.component = component;
     this.segIndex = segIndex;
     this.pt = pt;
@@ -88,17 +87,17 @@ public class GeometryLocation {
   }
 
   /**
-   * Returns the {@link Coordinates} of this location.
-   */
-  public Point getPoint() {
-    return this.pt;
-  }
-
-  /**
    * Returns the geometry component on (or in) which this location occurs.
    */
   public Geometry getGeometryComponent() {
     return this.component;
+  }
+
+  /**
+   * Returns the {@link Coordinates} of this location.
+   */
+  public Point getPoint() {
+    return this.pt;
   }
 
   /**

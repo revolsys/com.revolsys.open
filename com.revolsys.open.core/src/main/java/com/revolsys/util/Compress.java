@@ -18,8 +18,7 @@ public class Compress {
     final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
     try {
       final Deflater delator = new Deflater(Deflater.BEST_COMPRESSION, true);
-      final OutputStream compressOut = new DeflaterOutputStream(byteOut,
-        delator);
+      final OutputStream compressOut = new DeflaterOutputStream(byteOut, delator);
       compressOut.write(bytes);
       compressOut.close();
     } catch (final IOException e) {

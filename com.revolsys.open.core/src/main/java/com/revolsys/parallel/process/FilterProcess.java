@@ -23,8 +23,7 @@ public class FilterProcess<T> extends BaseInOutProcess<T, T> {
   }
 
   @Override
-  protected void process(final Channel<T> in, final Channel<T> out,
-    final T object) {
+  protected void process(final Channel<T> in, final Channel<T> out, final T object) {
     boolean accept = this.filter.accept(object);
     if (this.invert) {
       accept = !accept;

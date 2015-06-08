@@ -6,8 +6,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
-public class GeometryBufferProcess extends
-BaseInOutProcess<Record, Record> {
+public class GeometryBufferProcess extends BaseInOutProcess<Record, Record> {
 
   private int buffer;
 
@@ -16,8 +15,7 @@ BaseInOutProcess<Record, Record> {
   }
 
   @Override
-  protected void process(final Channel<Record> in,
-    final Channel<Record> out, final Record object) {
+  protected void process(final Channel<Record> in, final Channel<Record> out, final Record object) {
     final Geometry geometry = object.getGeometryValue();
     if (geometry == null) {
       out.write(object);

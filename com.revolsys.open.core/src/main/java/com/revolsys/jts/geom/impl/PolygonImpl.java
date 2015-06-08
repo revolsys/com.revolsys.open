@@ -107,8 +107,7 @@ public class PolygonImpl extends AbstractPolygon implements Polygon {
         for (int i = 1; i < rings.length; i++) {
           final LinearRing ring = rings[i];
           if (!ring.isEmpty()) {
-            throw new IllegalArgumentException("shell is empty but hole "
-                + (i - 1) + " is not");
+            throw new IllegalArgumentException("shell is empty but hole " + (i - 1) + " is not");
           }
         }
       } else {

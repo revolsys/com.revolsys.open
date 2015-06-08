@@ -41,8 +41,7 @@ public class Print extends I18nAction {
     final PageFormat format = job.defaultPage();
     format.setOrientation(PageFormat.PORTRAIT);
     final Paper paper = format.getPaper();
-    paper.setImageableArea(29, 29, format.getWidth() - 58,
-      format.getHeight() - 58);
+    paper.setImageableArea(29, 29, format.getWidth() - 58, format.getHeight() - 58);
     format.setPaper(paper);
     if (this.printService != null) {
       try {
@@ -54,8 +53,7 @@ public class Print extends I18nAction {
     }
 
     final BoundingBox boundingBox = viewport.getBoundingBox();
-    final MapPageable pageable = new MapPageable(project, boundingBox, format,
-      20000, 300, 200);
+    final MapPageable pageable = new MapPageable(project, boundingBox, format, 20000, 300, 200);
     job.setPageable(pageable);
     final boolean doPrint = job.printDialog();
     if (doPrint) {

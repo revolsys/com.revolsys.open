@@ -43,6 +43,7 @@ public class PreparedPoint extends AbstractPoint {
    *
    */
   private static final long serialVersionUID = 1L;
+
   private final Point point;
 
   public PreparedPoint(final Point point) {

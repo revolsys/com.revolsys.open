@@ -18,14 +18,14 @@ import org.springframework.web.servlet.view.AbstractView;
 import com.revolsys.ui.web.controller.PathViewController;
 
 public class HttpMessageConverterView extends AbstractView {
+  private static final String NAME = HttpMessageConverterView.class.getName();
+
   public static HttpMessageConverterView getMessageConverterView() {
     final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
     final HttpMessageConverterView view = (HttpMessageConverterView)requestAttributes.getAttribute(
       NAME, RequestAttributes.SCOPE_REQUEST);
     return view;
   }
-
-  private static final String NAME = HttpMessageConverterView.class.getName();
 
   private final HttpMessageConverter<Object> messageConverter;
 
@@ -53,21 +53,20 @@ public class HttpMessageConverterView extends AbstractView {
   }
 
   public void render(final HttpServletResponse response) throws IOException {
-    this.messageConverter.write(this.returnValue, this.mediaType,
-      new ServletServerHttpResponse(response));
+    this.messageConverter.write(this.returnValue, this.mediaType, new ServletServerHttpResponse(
+      response));
   }
 
   @Override
   protected void renderMergedOutputModel(final Map<String, Object> model,
-    final HttpServletRequest request, final HttpServletResponse response)
-        throws Exception {
+    final HttpServletRequest request, final HttpServletResponse response) throws Exception {
     final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
 
-    final String path = (String)requestAttributes.getAttribute(
-      "httpMessageConverterTemplatePath", RequestAttributes.SCOPE_REQUEST);
+    final String path = (String)requestAttributes.getAttribute("httpMessageConverterTemplatePath",
+      RequestAttributes.SCOPE_REQUEST);
     if (path == null
-        || !Arrays.asList(MediaType.TEXT_HTML, MediaType.APPLICATION_XHTML_XML)
-        .contains(this.mediaType)) {
+      || !Arrays.asList(MediaType.TEXT_HTML, MediaType.APPLICATION_XHTML_XML).contains(
+        this.mediaType)) {
       render(response);
     } else {
       final Charset charSet = this.mediaType.getCharSet();
@@ -77,13 +76,11 @@ public class HttpMessageConverterView extends AbstractView {
         response.setContentType(this.mediaType.toString());
       }
       final HttpMessageConverterView savedView = getMessageConverterView();
-      requestAttributes.setAttribute(NAME, this,
-        RequestAttributes.SCOPE_REQUEST);
+      requestAttributes.setAttribute(NAME, this, RequestAttributes.SCOPE_REQUEST);
       if (!PathViewController.include(request, response, path)) {
         render(response);
       }
-      requestAttributes.setAttribute(NAME, savedView,
-        RequestAttributes.SCOPE_REQUEST);
+      requestAttributes.setAttribute(NAME, savedView, RequestAttributes.SCOPE_REQUEST);
     }
   }
 }

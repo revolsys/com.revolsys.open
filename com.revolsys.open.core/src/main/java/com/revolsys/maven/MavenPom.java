@@ -35,8 +35,7 @@ public class MavenPom extends LinkedHashMap<String, Object> {
 
   private Map<String, Object> properties;
 
-  public MavenPom(final MavenRepository mavenRepository,
-    final Map<String, Object> pom) {
+  public MavenPom(final MavenRepository mavenRepository, final Map<String, Object> pom) {
     super(pom);
     this.mavenRepository = mavenRepository;
   }
@@ -44,10 +43,9 @@ public class MavenPom extends LinkedHashMap<String, Object> {
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
-  public boolean addDependenciesFromTree(
-    final Map<String, String> dependencies, final String dependencyPath,
-    final Map<String, Map<String, Map>> dependencyTree, final int depth,
-    final int searchDepth) {
+  public boolean addDependenciesFromTree(final Map<String, String> dependencies,
+    final String dependencyPath, final Map<String, Map<String, Map>> dependencyTree,
+    final int depth, final int searchDepth) {
     boolean hasChildren = false;
     final Set<Entry<String, Map<String, Map>>> entries = dependencyTree.entrySet();
     for (final Entry<String, Map<String, Map>> dependencyEntry : entries) {
@@ -57,8 +55,7 @@ public class MavenPom extends LinkedHashMap<String, Object> {
       final String existingDependencyPath = dependencies.get(childDependencyId);
       if (childPath.equals(existingDependencyPath)) {
         if (depth < searchDepth) {
-          if (addDependenciesFromTree(dependencies, childPath, childTree,
-            depth + 1, searchDepth)) {
+          if (addDependenciesFromTree(dependencies, childPath, childTree, depth + 1, searchDepth)) {
             hasChildren = true;
           }
         }
@@ -68,8 +65,8 @@ public class MavenPom extends LinkedHashMap<String, Object> {
           if (!childTree.isEmpty()) {
             hasChildren = true;
           }
-        } else if (addDependenciesFromTree(dependencies, childPath, childTree,
-          depth + 1, searchDepth)) {
+        } else if (addDependenciesFromTree(dependencies, childPath, childTree, depth + 1,
+          searchDepth)) {
           hasChildren = true;
         }
       }
@@ -93,31 +90,27 @@ public class MavenPom extends LinkedHashMap<String, Object> {
 
   public Set<String> getDependencies(final Collection<String> exclusionIds) {
     final Map<String, String> versions = getDependencyVersions();
-    final Map<String, Map<String, Map>> dependencyTree = getDependencyTree(
-      versions, exclusionIds, true);
+    final Map<String, Map<String, Map>> dependencyTree = getDependencyTree(versions, exclusionIds,
+      true);
 
     return getDependenciesFromTree(dependencyTree);
   }
 
-  private Set<String> getDependenciesFromTree(
-    final Map<String, Map<String, Map>> dependencyTree) {
+  private Set<String> getDependenciesFromTree(final Map<String, Map<String, Map>> dependencyTree) {
     final Map<String, String> dependencyPaths = new LinkedHashMap<String, String>();
     int searchDepth = 0;
-    while (addDependenciesFromTree(dependencyPaths, "", dependencyTree, 0,
-      searchDepth)) {
+    while (addDependenciesFromTree(dependencyPaths, "", dependencyTree, 0, searchDepth)) {
       searchDepth++;
     }
     return dependencyPaths.keySet();
   }
 
-  protected Map<String, Map<String, Map>> getDependencyTree(
-    final Map<String, String> versions, final Collection<String> exclusionIds,
-    final boolean includeOptional) {
+  protected Map<String, Map<String, Map>> getDependencyTree(final Map<String, String> versions,
+    final Collection<String> exclusionIds, final boolean includeOptional) {
     final Map<String, Map<String, Map>> dependencies = new LinkedHashMap<String, Map<String, Map>>();
     final Map<String, Object> dependencyMap = (Map<String, Object>)get("dependencies");
     if (dependencyMap != null) {
-      final List<Map<String, Object>> dependencyList = getList(dependencyMap,
-          "dependency");
+      final List<Map<String, Object>> dependencyList = getList(dependencyMap, "dependency");
       if (dependencyList != null) {
         for (final Map<String, Object> dependency : dependencyList) {
           final String groupId = getMapValue(dependency, "groupId", null);
@@ -129,21 +122,17 @@ public class MavenPom extends LinkedHashMap<String, Object> {
           }
           final String scope = getMapValue(dependency, "scope", "compile");
           final String optional = getMapValue(dependency, "optional", "false");
-          if (scope.equals("compile")
-              && (includeOptional || "false".equals(optional))) {
+          if (scope.equals("compile") && (includeOptional || "false".equals(optional))) {
             if (!Property.hasValue(version)) {
               if (groupId.equals(getGroupId())) {
                 version = getVersion();
               }
             }
-            if (!exclusionIds.contains(dependencyKey)
-                && !exclusionIds.contains(groupId + ":*")) {
+            if (!exclusionIds.contains(dependencyKey) && !exclusionIds.contains(groupId + ":*")) {
               try {
-                final MavenPom pom = this.mavenRepository.getPom(groupId,
-                  artifactId, version);
+                final MavenPom pom = this.mavenRepository.getPom(groupId, artifactId, version);
                 final String dependencyId = pom.getMavenId();
-                final Set<String> mergedExclusionIds = new HashSet<String>(
-                    exclusionIds);
+                final Set<String> mergedExclusionIds = new HashSet<String>(exclusionIds);
                 mergedExclusionIds.addAll(getExclusionIds(dependency));
 
                 // Add child dependencies first so they don't override parent
@@ -151,13 +140,12 @@ public class MavenPom extends LinkedHashMap<String, Object> {
                 mergedVersions.putAll(pom.getDependencyVersions());
                 mergedVersions.putAll(versions);
 
-                final Map childDependencyTree = pom.getDependencyTree(
-                  mergedVersions, mergedExclusionIds, false);
+                final Map childDependencyTree = pom.getDependencyTree(mergedVersions,
+                  mergedExclusionIds, false);
                 dependencies.put(dependencyId, childDependencyTree);
               } catch (final Exception e) {
-                throw new IllegalArgumentException(
-                  "Unable to download pom for " + dependencyKey + ":" + version
-                  + " in pom " + getMavenId(), e);
+                throw new IllegalArgumentException("Unable to download pom for " + dependencyKey
+                  + ":" + version + " in pom " + getMavenId(), e);
               }
             }
           }
@@ -177,13 +165,11 @@ public class MavenPom extends LinkedHashMap<String, Object> {
     if (dependencyManagement != null) {
       final Map<String, Object> dependencyMap = (Map<String, Object>)dependencyManagement.get("dependencies");
       if (dependencyMap != null) {
-        final List<Map<String, Object>> dependencyList = getList(dependencyMap,
-            "dependency");
+        final List<Map<String, Object>> dependencyList = getList(dependencyMap, "dependency");
         if (dependencyList != null) {
           for (final Map<String, Object> dependency : dependencyList) {
             final String groupId = getMapValue(dependency, "groupId", null);
-            final String artifactId = getMapValue(dependency, "artifactId",
-              null);
+            final String artifactId = getMapValue(dependency, "artifactId", null);
             final String version = getMapValue(dependency, "version", null);
             versions.put(groupId + ":" + artifactId, version);
           }
@@ -212,8 +198,7 @@ public class MavenPom extends LinkedHashMap<String, Object> {
     final Set<String> exclusionIds = new LinkedHashSet<String>();
     final Map<String, Object> exclusionsMap = (Map<String, Object>)dependency.get("exclusions");
     if (exclusionsMap != null) {
-      final List<Map<String, Object>> exclusionsList = getList(exclusionsMap,
-          "exclusion");
+      final List<Map<String, Object>> exclusionsList = getList(exclusionsMap, "exclusion");
       if (exclusionsList != null) {
         for (final Map<String, Object> exclusion : exclusionsList) {
           final String groupId = getMapValue(exclusion, "groupId", null);
@@ -265,8 +250,7 @@ public class MavenPom extends LinkedHashMap<String, Object> {
     final String classifier = getMapValue(this, "classifier", null);
     final String version = getVersion();
     final String scope = getMapValue(this, "scope", "compile");
-    return MavenRepository.getMavenId(groupId, artifactId, type, classifier,
-      version, scope);
+    return MavenRepository.getMavenId(groupId, artifactId, type, classifier, version, scope);
   }
 
   public String getMavenId(final Map<String, Object> dependency) {
@@ -276,8 +260,7 @@ public class MavenPom extends LinkedHashMap<String, Object> {
     final String classifier = getMapValue(dependency, "classifier", null);
     final String version = getMapValue(dependency, "version", null);
     final String scope = getMapValue(dependency, "scope", "compile");
-    return MavenRepository.getMavenId(groupId, artifactId, type, classifier,
-      version, scope);
+    return MavenRepository.getMavenId(groupId, artifactId, type, classifier, version, scope);
   }
 
   public MavenPom getParentPom() {
@@ -326,8 +309,7 @@ public class MavenPom extends LinkedHashMap<String, Object> {
     }
   }
 
-  public boolean isDependencyIgnored(final Set<String> dependencies,
-    final String dependencyId) {
+  public boolean isDependencyIgnored(final Set<String> dependencies, final String dependencyId) {
     for (final String matchedDependencyId : dependencies) {
       boolean match = true;
       final String[] parts = dependencyId.split(":");

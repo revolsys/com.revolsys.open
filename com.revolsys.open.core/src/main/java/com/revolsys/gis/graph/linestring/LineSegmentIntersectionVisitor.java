@@ -8,8 +8,7 @@ import com.revolsys.gis.graph.visitor.AbstractEdgeListenerVisitor;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.segment.LineSegment;
 
-public class LineSegmentIntersectionVisitor extends
-AbstractEdgeListenerVisitor<LineSegment> {
+public class LineSegmentIntersectionVisitor extends AbstractEdgeListenerVisitor<LineSegment> {
 
   private final Set<Geometry> intersections = new LinkedHashSet<>();
 

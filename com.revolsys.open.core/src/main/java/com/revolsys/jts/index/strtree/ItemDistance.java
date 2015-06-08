@@ -33,7 +33,6 @@
 
 package com.revolsys.jts.index.strtree;
 
-
 /**
  * A function method which computes the distance
  * between two {@link ItemBoundable}s in an {@link STRtree}.
@@ -42,8 +41,7 @@ package com.revolsys.jts.index.strtree;
  * @author Martin Davis
  *
  */
-public interface ItemDistance
-{
+public interface ItemDistance {
   /**
    * Computes the distance between two items.
    *

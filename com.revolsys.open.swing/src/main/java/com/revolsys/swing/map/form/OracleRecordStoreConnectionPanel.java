@@ -24,8 +24,7 @@ import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
 
-public class OracleRecordStoreConnectionPanel extends ValueField implements
-PropertyChangeListener {
+public class OracleRecordStoreConnectionPanel extends ValueField implements PropertyChangeListener {
   private static final long serialVersionUID = 2750736040832727823L;
 
   private String name;
@@ -33,8 +32,7 @@ PropertyChangeListener {
   private final Map<String, Field> fieldsByName = new HashMap<>();
 
   @SuppressWarnings("unchecked")
-  public OracleRecordStoreConnectionPanel(
-    final ConnectionRegistry<RecordStoreConnection> registry,
+  public OracleRecordStoreConnectionPanel(final ConnectionRegistry<RecordStoreConnection> registry,
     final RecordStoreConnection connection) {
     addField(new TextField("name", 50));
 

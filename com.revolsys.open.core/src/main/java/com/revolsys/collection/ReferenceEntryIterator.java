@@ -12,8 +12,7 @@ import com.revolsys.collection.iterator.AbstractIterator;
 public class ReferenceEntryIterator<K, V> extends AbstractIterator<Entry<K, V>> {
   private Iterator<Entry<K, Reference<V>>> iterator;
 
-  public ReferenceEntryIterator(
-    final Collection<Entry<K, Reference<V>>> collection) {
+  public ReferenceEntryIterator(final Collection<Entry<K, Reference<V>>> collection) {
     this.iterator = collection.iterator();
   }
 

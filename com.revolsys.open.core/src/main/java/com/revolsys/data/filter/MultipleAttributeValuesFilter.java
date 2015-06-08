@@ -18,8 +18,7 @@ public class MultipleAttributeValuesFilter implements Filter<Record> {
   /** The values to match. */
   private Map<String, ? extends Object> values = Collections.emptyMap();
 
-  public MultipleAttributeValuesFilter(
-    final Map<String, ? extends Object> values) {
+  public MultipleAttributeValuesFilter(final Map<String, ? extends Object> values) {
     this.values = values;
   }
 

@@ -1,6 +1,4 @@
 
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -38,20 +36,23 @@ package com.revolsys.jts.index.sweepline;
 /**
  * @version 1.7
  */
-public class SweepLineEvent
-implements Comparable
-{
+public class SweepLineEvent implements Comparable {
   public static final int INSERT = 1;
+
   public static final int DELETE = 2;
 
   private final double xValue;
+
   private int eventType;
+
   private final SweepLineEvent insertEvent; // null if this is an INSERT event
+
   private int deleteEventIndex;
 
   SweepLineInterval sweepInt;
-  public SweepLineEvent(final double x, final SweepLineEvent insertEvent, final SweepLineInterval sweepInt)
-  {
+
+  public SweepLineEvent(final double x, final SweepLineEvent insertEvent,
+    final SweepLineInterval sweepInt) {
     this.xValue = x;
     this.insertEvent = insertEvent;
     this.eventType = INSERT;
@@ -69,29 +70,44 @@ implements Comparable
    */
   @Override
   public int compareTo(final Object o) {
-    final SweepLineEvent pe = (SweepLineEvent) o;
+    final SweepLineEvent pe = (SweepLineEvent)o;
     if (this.xValue < pe.xValue) {
-      return  -1;
+      return -1;
     }
     if (this.xValue > pe.xValue) {
-      return   1;
+      return 1;
     }
     if (this.eventType < pe.eventType) {
-      return  -1;
+      return -1;
     }
     if (this.eventType > pe.eventType) {
-      return   1;
+      return 1;
     }
     return 0;
   }
-  public int getDeleteEventIndex() { return this.deleteEventIndex; }
-  public SweepLineEvent getInsertEvent() { return this.insertEvent; }
-  SweepLineInterval getInterval() { return this.sweepInt; }
-  public boolean isDelete() { return this.insertEvent != null; }
 
-  public boolean isInsert() { return this.insertEvent == null; }
+  public int getDeleteEventIndex() {
+    return this.deleteEventIndex;
+  }
 
-  public void setDeleteEventIndex(final int deleteEventIndex) { this.deleteEventIndex = deleteEventIndex; }
+  public SweepLineEvent getInsertEvent() {
+    return this.insertEvent;
+  }
 
+  SweepLineInterval getInterval() {
+    return this.sweepInt;
+  }
+
+  public boolean isDelete() {
+    return this.insertEvent != null;
+  }
+
+  public boolean isInsert() {
+    return this.insertEvent == null;
+  }
+
+  public void setDeleteEventIndex(final int deleteEventIndex) {
+    this.deleteEventIndex = deleteEventIndex;
+  }
 
 }

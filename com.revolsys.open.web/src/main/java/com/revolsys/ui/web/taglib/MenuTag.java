@@ -37,8 +37,7 @@ public class MenuTag extends AbstractMapElementTag {
   }
 
   @Override
-  protected void serializeObject(final Writer out, final Object object)
-      throws IOException {
+  protected void serializeObject(final Writer out, final Object object) throws IOException {
     final Menu menu = (Menu)object;
     Logger.getLogger(MenuTag.class).debug(menu);
     this.element.setMenu(menu);

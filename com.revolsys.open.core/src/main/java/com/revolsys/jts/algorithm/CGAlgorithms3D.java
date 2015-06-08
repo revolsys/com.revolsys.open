@@ -57,8 +57,7 @@ public class CGAlgorithms3D {
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
   }
 
-  public static double distancePointSegment(final Point p, final Point A,
-    final Point B) {
+  public static double distancePointSegment(final Point p, final Point A, final Point B) {
     // if start = end, then just compute distance to one of the endpoints
     if (A.equals(3, B)) {
       return distance(p, A);
@@ -71,16 +70,14 @@ public class CGAlgorithms3D {
      * forward extension of AB 0<r<1 P is interior to AB
      */
 
-    final double len2 = (B.getX() - A.getX()) * (B.getX() - A.getX())
-        + (B.getY() - A.getY()) * (B.getY() - A.getY()) + (B.getZ() - A.getZ())
-        * (B.getZ() - A.getZ());
+    final double len2 = (B.getX() - A.getX()) * (B.getX() - A.getX()) + (B.getY() - A.getY())
+      * (B.getY() - A.getY()) + (B.getZ() - A.getZ()) * (B.getZ() - A.getZ());
     if (Double.isNaN(len2)) {
       throw new IllegalArgumentException("Ordinates must not be NaN");
     }
-    final double r = ((p.getX() - A.getX()) * (B.getX() - A.getX())
-        + (p.getY() - A.getY()) * (B.getY() - A.getY()) + (p.getZ() - A.getZ())
-        * (B.getZ() - A.getZ()))
-        / len2;
+    final double r = ((p.getX() - A.getX()) * (B.getX() - A.getX()) + (p.getY() - A.getY())
+      * (B.getY() - A.getY()) + (p.getZ() - A.getZ()) * (B.getZ() - A.getZ()))
+      / len2;
 
     if (r <= 0.0) {
       return distance(p, A);
@@ -109,8 +106,8 @@ public class CGAlgorithms3D {
    * @param D the end point of the second segment
    * @return the distance between the segments
    */
-  public static double distanceSegmentSegment(final Point A, final Point B,
-    final Point C, final Point D) {
+  public static double distanceSegmentSegment(final Point A, final Point B, final Point C,
+    final Point D) {
     /**
      * This calculation is susceptible to roundoff errors when
      * passed large ordinate values.

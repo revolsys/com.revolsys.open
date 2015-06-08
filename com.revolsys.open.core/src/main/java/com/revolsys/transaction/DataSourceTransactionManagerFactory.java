@@ -6,7 +6,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 public class DataSourceTransactionManagerFactory implements
-FactoryBean<DataSourceTransactionManager> {
+  FactoryBean<DataSourceTransactionManager> {
 
   private DataSource dataSource;
 

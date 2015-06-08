@@ -22,17 +22,16 @@ import com.revolsys.jts.util.Stopwatch;
  */
 public class PolygonBufferStressTest {
 
+  static final int MAX_ITER = 50;
+
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+
+  static WKTReader wktRdr = new WKTReader(geometryFactory);
+
   public static void main(final String[] args) {
     final PolygonBufferStressTest test = new PolygonBufferStressTest();
     test.test();
   }
-
-  static final int MAX_ITER = 50;
-
-  private static final GeometryFactory geometryFactory = GeometryFactory.floating(
-    0, 2);
-
-  static WKTReader wktRdr = new WKTReader(geometryFactory);
 
   Stopwatch sw = new Stopwatch();
 
@@ -41,8 +40,7 @@ public class PolygonBufferStressTest {
   public PolygonBufferStressTest() {
   }
 
-  public void doAlternatingIteratedBuffer(Geometry g, double dist,
-    final int maxCount) {
+  public void doAlternatingIteratedBuffer(Geometry g, double dist, final int maxCount) {
     int i = 0;
     while (i < maxCount) {
       i++;
@@ -57,8 +55,8 @@ public class PolygonBufferStressTest {
     }
   }
 
-  public void doIteratedBuffer(Geometry g, final double initDist,
-    final double distanceInc, final int maxCount) {
+  public void doIteratedBuffer(Geometry g, final double initDist, final double distanceInc,
+    final int maxCount) {
     int i = 0;
     double dist = initDist;
     while (i < maxCount) {
@@ -112,22 +110,25 @@ public class PolygonBufferStressTest {
 
   public void test() {
     final String geomStr;
-    final GeometricShapeFactory shapeFact = new GeometricShapeFactory(
-      geometryFactory);
+    final GeometricShapeFactory shapeFact = new GeometricShapeFactory(geometryFactory);
 
     final Geometry g = getSampleGeometry();
 
-    // Geometry g = GeometricShapeFactory.createArc(geometryFactory, 0, 0, 200.0, 0.0, 6.0,
+    // Geometry g = GeometricShapeFactory.createArc(geometryFactory, 0, 0,
+    // 200.0, 0.0, 6.0,
     // 100);
 
-    // Geometry circle = GeometricShapeFactory.createCircle(geometryFactory, 0, 0, 200,
+    // Geometry circle = GeometricShapeFactory.createCircle(geometryFactory, 0,
+    // 0, 200,
     // 100);
     // Geometry g = circle;
 
-    // Geometry sq = GeometricShapeFactory.createBox(geometryFactory, 0, 0, 1, 120);
+    // Geometry sq = GeometricShapeFactory.createBox(geometryFactory, 0, 0, 1,
+    // 120);
     // Geometry g = sq.difference(circle);
 
-    // Geometry handle = GeometricShapeFactory.createRectangle(geometryFactory, 0, 0, 400,
+    // Geometry handle = GeometricShapeFactory.createRectangle(geometryFactory,
+    // 0, 0, 400,
     // 20, 1);
     // Geometry g = circle.union(handle);
 

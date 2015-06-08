@@ -165,11 +165,10 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  *
  *@version 1.7
  */
-public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
-  DataTypeProxy {
-  List<String> sortedGeometryTypes = Collections.unmodifiableList(Arrays.asList(
-    "Point", "MultiPoint", "LineString", "LinearRing", "MultiLineString",
-    "Polygon", "MultiPolygon", "GeometryCollection"));
+public interface Geometry extends Cloneable, Comparable<Object>, Serializable, DataTypeProxy {
+  List<String> sortedGeometryTypes = Collections.unmodifiableList(Arrays.asList("Point",
+    "MultiPoint", "LineString", "LinearRing", "MultiLineString", "Polygon", "MultiPolygon",
+    "GeometryCollection"));
 
   /**
    * Standard ordinate index values
@@ -277,8 +276,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * @see #buffer(double, int)
    * @see Buffer
    */
-  Geometry buffer(final double distance, final int quadrantSegments,
-    final int endCapStyle);
+  Geometry buffer(final double distance, final int quadrantSegments, final int endCapStyle);
 
   /**
    * Creates and returns a full copy of this {@link Geometry} object
@@ -363,8 +361,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    */
   <V extends Geometry> V convert(GeometryFactory geometryFactory);
 
-  <V extends Geometry> V convert(GeometryFactory geometryFactory,
-    final int axisCount);
+  <V extends Geometry> V convert(GeometryFactory geometryFactory, final int axisCount);
 
   /**
    *  Computes the smallest convex <code>Polygon</code> that contains all the
@@ -828,8 +825,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * @return
    */
 
-  <V extends Geometry> List<V> getGeometryComponents(
-    final Class<V> geometryClass);
+  <V extends Geometry> List<V> getGeometryComponents(final Class<V> geometryClass);
 
   /**
    * Returns the number of {@link Geometry}s in a {@link GeometryCollection}

@@ -36,22 +36,19 @@ public class AreaPrecisionPerfTest {
       for (int i = 0; i <= nrVertices; i++) {
         vertex = new PointDouble(originX
           + (1 + Math.sin((float)i / (float)nrVertices * 2 * Math.PI)), originY
-          + (1 + Math.cos((float)i / (float)nrVertices * 2 * Math.PI)),
-          Point.NULL_ORDINATE);
+          + (1 + Math.cos((float)i / (float)nrVertices * 2 * Math.PI)), Point.NULL_ORDINATE);
         coordinates[i] = vertex;
       }
       // close ring
       coordinates[nrVertices] = coordinates[0];
 
-      final LinearRing g1 = GeometryFactory.floating3()
-          .linearRing(coordinates);
+      final LinearRing g1 = GeometryFactory.floating3().linearRing(coordinates);
       final Polygon polygon = GeometryFactory.floating3().polygon(g1);
       // System.out.println(polygon);
 
       final double area = originalSignedArea(coordinates);
       final double area2 = accurateSignedArea(coordinates);
-      final double exactArea = 0.5 * nrVertices
-          * Math.sin(2 * Math.PI / nrVertices);
+      final double exactArea = 0.5 * nrVertices * Math.sin(2 * Math.PI / nrVertices);
 
       final double eps = exactArea - area;
       final double eps2 = exactArea - area2;

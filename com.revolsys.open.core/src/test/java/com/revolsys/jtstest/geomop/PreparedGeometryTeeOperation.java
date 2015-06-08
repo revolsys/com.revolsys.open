@@ -47,62 +47,53 @@ public class PreparedGeometryTeeOperation extends TeeGeometryOperation {
     checkCovers(g1, prepGeom, g2);
   }
 
-  private void checkContains(final Geometry g1, final Geometry pg,
-    final Geometry g2) {
+  private void checkContains(final Geometry g1, final Geometry pg, final Geometry g2) {
     final boolean pgResult = pg.contains(g2);
     final boolean expected = g1.contains(g2);
 
     if (pgResult != expected) {
-      throw new IllegalStateException(
-          "Geometry.contains result does not match expected");
+      throw new IllegalStateException("Geometry.contains result does not match expected");
     }
 
     // System.out.println("Results match!");
   }
 
-  private void checkContainsProperly(final Geometry g1, final Geometry pg,
-    final Geometry g2) {
+  private void checkContainsProperly(final Geometry g1, final Geometry pg, final Geometry g2) {
     final boolean pgResult = pg.containsProperly(g2);
     final boolean expected = containsProperly(g1, g2);
 
     if (pgResult != expected) {
-      throw new IllegalStateException(
-          "Geometry.containsProperly result does not match expected");
+      throw new IllegalStateException("Geometry.containsProperly result does not match expected");
     }
 
     // System.out.println("Results match!");
   }
 
-  private void checkCovers(final Geometry g1, final Geometry pg,
-    final Geometry g2) {
+  private void checkCovers(final Geometry g1, final Geometry pg, final Geometry g2) {
     final boolean pgResult = pg.covers(g2);
     final boolean expected = g1.covers(g2);
 
     if (pgResult != expected) {
-      throw new IllegalStateException(
-          "Geometry.covers result does not match expected");
+      throw new IllegalStateException("Geometry.covers result does not match expected");
     }
 
     // System.out.println("Results match!");
   }
 
-  private void checkIntersects(final Geometry g1, final Geometry pg,
-    final Geometry g2) {
+  private void checkIntersects(final Geometry g1, final Geometry pg, final Geometry g2) {
     final boolean pgResult = pg.intersects(g2);
     final boolean expected = g1.intersects(g2);
 
     if (pgResult != expected) {
       // pg.intersects(g2);
-      throw new IllegalStateException(
-          "Geometry.intersects result does not match expected");
+      throw new IllegalStateException("Geometry.intersects result does not match expected");
     }
 
     // System.out.println("Results match!");
   }
 
   @Override
-  protected void runTeeOp(final String opName, final Geometry geometry,
-    final Object[] args) {
+  protected void runTeeOp(final String opName, final Geometry geometry, final Object[] args) {
     if (args.length < 1) {
       return;
     }

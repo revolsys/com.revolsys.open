@@ -52,8 +52,7 @@ public class Edge extends GraphComponent {
    * Handles edges from both L and A geometries.
    */
   public static void updateIM(final Label label, final IntersectionMatrix im) {
-    im.setAtLeastIfValid(label.getLocation(0, Position.ON),
-      label.getLocation(1, Position.ON), 1);
+    im.setAtLeastIfValid(label.getLocation(0, Position.ON), label.getLocation(1, Position.ON), 1);
     if (label.isArea()) {
       im.setAtLeastIfValid(label.getLocation(0, Position.LEFT),
         label.getLocation(1, Position.LEFT), 2);
@@ -77,6 +76,7 @@ public class Edge extends GraphComponent {
   private final Depth depth = new Depth();
 
   private int depthDelta = 0; // the change in area depth from the R to L side
+
   // of this edge
 
   public Edge(final LineString points) {
@@ -104,7 +104,7 @@ public class Edge extends GraphComponent {
       final Point nextPt = getCoordinate(nextSegIndex);
       // Normalize segment index if intPt falls on vertex
       // The check for point equality is 2D only - Z values are ignored
-      if (intPt.equals(2,nextPt)) {
+      if (intPt.equals(2, nextPt)) {
         normalizedSegmentIndex = nextSegIndex;
         dist = 0.0;
       }
@@ -119,8 +119,7 @@ public class Edge extends GraphComponent {
    * Adds EdgeIntersections for one or both
    * intersections found for a segment of an edge to the edge intersection list.
    */
-  public void addIntersections(final LineIntersector li,
-    final int segmentIndex, final int geomIndex) {
+  public void addIntersections(final LineIntersector li, final int segmentIndex, final int geomIndex) {
     for (int i = 0; i < li.getIntersectionNum(); i++) {
       addIntersection(li, segmentIndex, geomIndex, i);
     }
@@ -157,10 +156,10 @@ public class Edge extends GraphComponent {
     boolean isEqualReverse = true;
     int iRev = getNumPoints();
     for (int i = 0; i < getNumPoints(); i++) {
-      if (!getCoordinate(i).equals(2,e.getCoordinate(i))) {
+      if (!getCoordinate(i).equals(2, e.getCoordinate(i))) {
         isEqualForward = false;
       }
-      if (!getCoordinate(i).equals(2,e.getCoordinate(--iRev))) {
+      if (!getCoordinate(i).equals(2, e.getCoordinate(--iRev))) {
         isEqualReverse = false;
       }
       if (!isEqualForward && !isEqualReverse) {
@@ -171,8 +170,7 @@ public class Edge extends GraphComponent {
   }
 
   public Edge getCollapsedEdge() {
-    final LineString points = new LineStringDouble(getCoordinate(0),
-      getCoordinate(1));
+    final LineString points = new LineStringDouble(getCoordinate(0), getCoordinate(1));
     final Edge edge = new Edge(points, Label.toLineLabel(this.label));
     return edge;
   }
@@ -266,7 +264,7 @@ public class Edge extends GraphComponent {
     }
 
     for (int i = 0; i < getNumPoints(); i++) {
-      if (!getCoordinate(i).equals(2,e.getCoordinate(i))) {
+      if (!getCoordinate(i).equals(2, e.getCoordinate(i))) {
         return false;
       }
     }

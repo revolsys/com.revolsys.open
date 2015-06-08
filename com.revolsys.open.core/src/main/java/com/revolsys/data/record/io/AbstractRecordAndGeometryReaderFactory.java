@@ -20,9 +20,8 @@ import com.revolsys.io.MapReaderFactory;
 import com.revolsys.io.Reader;
 import com.revolsys.spring.SpringUtil;
 
-public abstract class AbstractRecordAndGeometryReaderFactory extends
-AbstractGeometryReaderFactory implements RecordReaderFactory,
-MapReaderFactory, RecordStoreFactory {
+public abstract class AbstractRecordAndGeometryReaderFactory extends AbstractGeometryReaderFactory
+  implements RecordReaderFactory, MapReaderFactory, RecordStoreFactory {
 
   private final ArrayRecordFactory recordFactory = new ArrayRecordFactory();
 
@@ -32,14 +31,12 @@ MapReaderFactory, RecordStoreFactory {
 
   private final List<String> urlPatterns = new ArrayList<>();
 
-  public AbstractRecordAndGeometryReaderFactory(final String name,
-    final boolean binary) {
+  public AbstractRecordAndGeometryReaderFactory(final String name, final boolean binary) {
     super(name, binary);
   }
 
   @Override
-  protected void addMediaTypeAndFileExtension(final String mediaType,
-    final String fileExtension) {
+  protected void addMediaTypeAndFileExtension(final String mediaType, final String fileExtension) {
     super.addMediaTypeAndFileExtension(mediaType, fileExtension);
     this.urlPatterns.add("(.+)[\\?|&]format=" + fileExtension + "(&.+)?");
   }
@@ -89,8 +86,7 @@ MapReaderFactory, RecordStoreFactory {
   public GeometryReader createGeometryReader(final Resource resource) {
     final Reader<Record> recordReader = createRecordReader(resource);
     final Iterator<Record> recordIterator = recordReader.iterator();
-    final RecordGeometryIterator iterator = new RecordGeometryIterator(
-      recordIterator);
+    final RecordGeometryIterator iterator = new RecordGeometryIterator(recordIterator);
     final GeometryReader geometryReader = new GeometryReader(iterator);
     return geometryReader;
   }
@@ -118,8 +114,7 @@ MapReaderFactory, RecordStoreFactory {
   }
 
   @Override
-  public RecordStore createRecordStore(
-    final Map<String, ? extends Object> connectionProperties) {
+  public RecordStore createRecordStore(final Map<String, ? extends Object> connectionProperties) {
     final String url = (String)connectionProperties.get("url");
     final Resource resource = SpringUtil.getResource(url);
     final File directory = SpringUtil.getFile(resource);
@@ -159,8 +154,7 @@ MapReaderFactory, RecordStoreFactory {
     return this.singleFile;
   }
 
-  protected void setCustomAttributionSupported(
-    final boolean customAttributionSupported) {
+  protected void setCustomAttributionSupported(final boolean customAttributionSupported) {
     this.customAttributionSupported = customAttributionSupported;
   }
 

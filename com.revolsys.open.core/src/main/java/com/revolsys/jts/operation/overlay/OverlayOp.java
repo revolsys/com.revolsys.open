@@ -70,6 +70,26 @@ public class OverlayOp extends GeometryGraphOperation {
    */
 
   /**
+   * The code for the Intersection overlay operation.
+   */
+  public static final int INTERSECTION = 1;
+
+  /**
+   * The code for the Union overlay operation.
+   */
+  public static final int UNION = 2;
+
+  /**
+   *  The code for the Difference overlay operation.
+   */
+  public static final int DIFFERENCE = 3;
+
+  /**
+   *  The code for the Symmetric Difference overlay operation.
+   */
+  public static final int SYMDIFFERENCE = 4;
+
+  /**
    * Creates an empty result geometry of the appropriate dimension,
    * based on the given overlay operation and the dimensions of the inputs.
    * The created geometry is always an atomic geometry,
@@ -90,22 +110,22 @@ public class OverlayOp extends GeometryGraphOperation {
    * @param geomFact the geometry factory being used for the operation
    * @return an empty atomic geometry of the appropriate dimension
    */
-  public static Geometry createEmptyResult(final int overlayOpCode,
-    final Geometry a, final Geometry b, final GeometryFactory geomFact) {
+  public static Geometry createEmptyResult(final int overlayOpCode, final Geometry a,
+    final Geometry b, final GeometryFactory geomFact) {
     Geometry result = null;
     switch (resultDimension(overlayOpCode, a, b)) {
       case -1:
         result = geomFact.geometryCollection();
-        break;
+      break;
       case 0:
         result = geomFact.point();
-        break;
+      break;
       case 1:
         result = geomFact.lineString();
-        break;
+      break;
       case 2:
         result = geomFact.polygon();
-        break;
+      break;
     }
     return result;
   }
@@ -141,8 +161,7 @@ public class OverlayOp extends GeometryGraphOperation {
    * @param overlayOpCode the code for the overlay operation to test
    * @return true if the locations correspond to the overlayOpCode
    */
-  public static boolean isResultOfOp(Location loc0, Location loc1,
-    final int overlayOpCode) {
+  public static boolean isResultOfOp(Location loc0, Location loc1, final int overlayOpCode) {
     if (loc0 == Location.BOUNDARY) {
       loc0 = Location.INTERIOR;
     }
@@ -157,8 +176,8 @@ public class OverlayOp extends GeometryGraphOperation {
       case DIFFERENCE:
         return loc0 == Location.INTERIOR && loc1 != Location.INTERIOR;
       case SYMDIFFERENCE:
-        return loc0 == Location.INTERIOR && loc1 != Location.INTERIOR
-        || loc0 != Location.INTERIOR && loc1 == Location.INTERIOR;
+        return loc0 == Location.INTERIOR && loc1 != Location.INTERIOR || loc0 != Location.INTERIOR
+          && loc1 == Location.INTERIOR;
     }
     return false;
   }
@@ -173,15 +192,13 @@ public class OverlayOp extends GeometryGraphOperation {
    * @return the result of the overlay operation
    * @throws TopologyException if a robustness problem is encountered
    */
-  public static Geometry overlayOp(final Geometry geom0, final Geometry geom1,
-    final int opCode) {
+  public static Geometry overlayOp(final Geometry geom0, final Geometry geom1, final int opCode) {
     final OverlayOp gov = new OverlayOp(geom0, geom1);
     final Geometry geomOv = gov.getResultGeometry(opCode);
     return geomOv;
   }
 
-  private static int resultDimension(final int opCode, final Geometry g0,
-    final Geometry g1) {
+  private static int resultDimension(final int opCode, final Geometry g0, final Geometry g1) {
     final int dim0 = g0.getDimension();
     final int dim1 = g1.getDimension();
 
@@ -189,13 +206,13 @@ public class OverlayOp extends GeometryGraphOperation {
     switch (opCode) {
       case INTERSECTION:
         resultDimension = Math.min(dim0, dim1);
-        break;
+      break;
       case UNION:
         resultDimension = Math.max(dim0, dim1);
-        break;
+      break;
       case DIFFERENCE:
         resultDimension = dim0;
-        break;
+      break;
       case SYMDIFFERENCE:
         /**
          * This result is chosen because
@@ -205,30 +222,10 @@ public class OverlayOp extends GeometryGraphOperation {
          * and Union has the dimension of the highest-dimension argument.
          */
         resultDimension = Math.max(dim0, dim1);
-        break;
+      break;
     }
     return resultDimension;
   }
-
-  /**
-   * The code for the Intersection overlay operation.
-   */
-  public static final int INTERSECTION = 1;
-
-  /**
-   * The code for the Union overlay operation.
-   */
-  public static final int UNION = 2;
-
-  /**
-   *  The code for the Difference overlay operation.
-   */
-  public static final int DIFFERENCE = 3;
-
-  /**
-   *  The code for the Symmetric Difference overlay operation.
-   */
-  public static final int SYMDIFFERENCE = 4;
 
   private final PointLocator ptLocator = new PointLocator();
 
@@ -281,8 +278,7 @@ public class OverlayOp extends GeometryGraphOperation {
   }
 
   private Geometry computeGeometry(final List<Point> resultLineString,
-    final List<LineString> resultLineList, final List<Polygon> resultPolyList,
-    final int opcode) {
+    final List<LineString> resultLineList, final List<Polygon> resultPolyList, final int opcode) {
     final List<Geometry> geometries = new ArrayList<>();
     // element geometries of the result are always in the order P,L,A
     geometries.addAll(resultLineString);
@@ -290,8 +286,8 @@ public class OverlayOp extends GeometryGraphOperation {
     geometries.addAll(resultPolyList);
 
     if (geometries.isEmpty()) {
-      return createEmptyResult(opcode, this.arg[0].getGeometry(),
-        this.arg[1].getGeometry(), this.geomFact);
+      return createEmptyResult(opcode, this.arg[0].getGeometry(), this.arg[1].getGeometry(),
+        this.geomFact);
       // */
     } else {
       return this.geomFact.geometry(geometries);
@@ -367,13 +363,11 @@ public class OverlayOp extends GeometryGraphOperation {
                * side locations indicated by the depth values.
                */
               Assert.isTrue(!depth.isNull(i, Position.LEFT),
-                  "depth of LEFT side has not been initialized");
-              lbl.setLocation(i, Position.LEFT,
-                depth.getLocation(i, Position.LEFT));
+                "depth of LEFT side has not been initialized");
+              lbl.setLocation(i, Position.LEFT, depth.getLocation(i, Position.LEFT));
               Assert.isTrue(!depth.isNull(i, Position.RIGHT),
-                  "depth of RIGHT side has not been initialized");
-              lbl.setLocation(i, Position.RIGHT,
-                depth.getLocation(i, Position.RIGHT));
+                "depth of RIGHT side has not been initialized");
+              lbl.setLocation(i, Position.RIGHT, depth.getLocation(i, Position.RIGHT));
             }
           }
         }
@@ -436,8 +430,7 @@ public class OverlayOp extends GeometryGraphOperation {
     final LineBuilder lineBuilder = new LineBuilder(this, this.geomFact, this.ptLocator);
     this.resultLineList = lineBuilder.build(opCode);
 
-    final PointBuilder pointBuilder = new PointBuilder(this, this.geomFact,
-      this.ptLocator);
+    final PointBuilder pointBuilder = new PointBuilder(this, this.geomFact, this.ptLocator);
     this.resultLineString = pointBuilder.build(opCode);
 
     // gather the results from all calculations into a single Geometry for the
@@ -476,9 +469,9 @@ public class OverlayOp extends GeometryGraphOperation {
       // mark all dirEdges with the appropriate label
       final Label label = de.getLabel();
       if (label.isArea()
-          && !de.isInteriorAreaEdge()
-          && isResultOfOp(label.getLocation(0, Position.RIGHT),
-            label.getLocation(1, Position.RIGHT), opCode)) {
+        && !de.isInteriorAreaEdge()
+        && isResultOfOp(label.getLocation(0, Position.RIGHT), label.getLocation(1, Position.RIGHT),
+          opCode)) {
         de.setInResult(true);
         // Debug.print("in result "); Debug.println(de);
       }
@@ -562,8 +555,7 @@ public class OverlayOp extends GeometryGraphOperation {
    * @return true if the coord is located in the interior or boundary of
    * a geometry in the list.
    */
-  private boolean isCovered(final Point coord,
-    final List<? extends Geometry> geometries) {
+  private boolean isCovered(final Point coord, final List<? extends Geometry> geometries) {
     for (final Geometry geometry : geometries) {
       final Location loc = this.ptLocator.locate(coord, geometry);
       if (loc != Location.EXTERIOR) {

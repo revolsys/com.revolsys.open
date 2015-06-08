@@ -43,8 +43,8 @@ public class BPlusTreePageValueManager<T> implements PageValueManager<T> {
       this.pageManager.removePage(dataPage);
       this.pageManager.releasePage(dataPage);
     } else {
-      throw new IllegalArgumentException("Expecting a data page "
-          + BPlusTreeMap.DATA + " not " + pageType);
+      throw new IllegalArgumentException("Expecting a data page " + BPlusTreeMap.DATA + " not "
+        + pageType);
     }
   }
 
@@ -110,8 +110,8 @@ public class BPlusTreePageValueManager<T> implements PageValueManager<T> {
         size += bytes.length;
 
       } else {
-        throw new IllegalArgumentException("Expecting a data page "
-            + BPlusTreeMap.DATA + " not " + pageType);
+        throw new IllegalArgumentException("Expecting a data page " + BPlusTreeMap.DATA + " not "
+          + pageType);
       }
       final byte[] valueBytes = new byte[size];
       int offset = 0;

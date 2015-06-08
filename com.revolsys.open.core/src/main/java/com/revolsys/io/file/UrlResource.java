@@ -28,8 +28,7 @@ public class UrlResource extends org.springframework.core.io.UrlResource {
   }
 
   @Override
-  public Resource createRelative(String relativePath)
-      throws MalformedURLException {
+  public Resource createRelative(String relativePath) throws MalformedURLException {
     try {
       if (relativePath.startsWith("/")) {
         relativePath = relativePath.substring(1);
@@ -38,8 +37,8 @@ public class UrlResource extends org.springframework.core.io.UrlResource {
       final URL relativeUrl = UrlUtil.getUrl(url, relativePath);
       return new UrlResource(relativeUrl);
     } catch (final IOException e) {
-      throw new IllegalArgumentException("Unable to create relative URL "
-          + this + " " + relativePath, e);
+      throw new IllegalArgumentException("Unable to create relative URL " + this + " "
+        + relativePath, e);
     }
   }
 

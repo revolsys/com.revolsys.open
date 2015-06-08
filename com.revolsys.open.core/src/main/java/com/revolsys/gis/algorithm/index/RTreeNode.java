@@ -25,8 +25,7 @@ public abstract class RTreeNode<T> {
     return this.boundingBox;
   }
 
-  public abstract boolean remove(LinkedList<RTreeNode<T>> path,
-    BoundingBox envelope, T object);
+  public abstract boolean remove(LinkedList<RTreeNode<T>> path, BoundingBox envelope, T object);
 
   protected void setBoundingBox(final BoundingBox boundingBox) {
     this.boundingBox = boundingBox;
@@ -39,8 +38,7 @@ public abstract class RTreeNode<T> {
 
   protected abstract void updateEnvelope();
 
-  public abstract boolean visit(BoundingBox envelope, Filter<T> filter,
-    Visitor<T> visitor);
+  public abstract boolean visit(BoundingBox envelope, Filter<T> filter, Visitor<T> visitor);
 
   public abstract boolean visit(BoundingBox envelope, Visitor<T> visitor);
 

@@ -35,8 +35,8 @@ public class RecordStoreConnection implements MapSerializer {
     }
   }
 
-  public RecordStoreConnection(final RecordStoreConnectionRegistry registry,
-    final String name, final RecordStore recordStore) {
+  public RecordStoreConnection(final RecordStoreConnectionRegistry registry, final String name,
+    final RecordStore recordStore) {
     this.registry = registry;
     this.name = name;
     this.recordStore = recordStore;
@@ -65,12 +65,11 @@ public class RecordStoreConnection implements MapSerializer {
     synchronized (this) {
       if (this.recordStore == null) {
         try {
-          final Map<String, Object> connectionProperties = Maps.get(
-            this.config, "connection", Collections.<String, Object> emptyMap());
+          final Map<String, Object> connectionProperties = Maps.get(this.config, "connection",
+            Collections.<String, Object> emptyMap());
           if (connectionProperties.isEmpty()) {
             LoggerFactory.getLogger(getClass()).error(
-              "Record store must include a 'connection' map property: "
-                  + this.name);
+              "Record store must include a 'connection' map property: " + this.name);
           } else {
             this.recordStore = RecordStoreFactoryRegistry.createRecordStore(connectionProperties);
             this.recordStore.initialize();

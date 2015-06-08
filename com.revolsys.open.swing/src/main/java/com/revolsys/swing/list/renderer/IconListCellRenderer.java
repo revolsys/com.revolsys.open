@@ -14,6 +14,7 @@ public class IconListCellRenderer extends DefaultListCellRenderer {
    *
    */
   private static final long serialVersionUID = 1L;
+
   private Map<Object, Icon> icons = new HashMap<>();
 
   public IconListCellRenderer(final Map<Object, Icon> icons) {
@@ -22,11 +23,10 @@ public class IconListCellRenderer extends DefaultListCellRenderer {
   }
 
   @Override
-  public Component getListCellRendererComponent(
-    final JList<? extends Object> list, final Object value, final int index,
-    final boolean isSelected, final boolean cellHasFocus) {
-    final Component component = super.getListCellRendererComponent(list, value,
-      index, isSelected, cellHasFocus);
+  public Component getListCellRendererComponent(final JList<? extends Object> list,
+    final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
+    final Component component = super.getListCellRendererComponent(list, value, index, isSelected,
+      cellHasFocus);
     final Icon icon = this.icons.get(value);
     setIcon(icon);
     return component;

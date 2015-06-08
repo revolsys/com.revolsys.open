@@ -51,8 +51,7 @@ public class DirectoryRecordWriter extends AbstractRecordWriter {
         try {
           writer.close();
         } catch (final RuntimeException e) {
-          LoggerFactory.getLogger(getClass()).error("Error closing " + writer,
-            e);
+          LoggerFactory.getLogger(getClass()).error("Error closing " + writer, e);
         }
       }
 
@@ -88,8 +87,7 @@ public class DirectoryRecordWriter extends AbstractRecordWriter {
         final File childDirectory = new File(this.directory, schemaName);
         if (!childDirectory.mkdirs()) {
           if (!childDirectory.isDirectory()) {
-            throw new IllegalArgumentException("Unable to create directory "
-                + childDirectory);
+            throw new IllegalArgumentException("Unable to create directory " + childDirectory);
           }
         }
         return childDirectory;
@@ -126,13 +124,11 @@ public class DirectoryRecordWriter extends AbstractRecordWriter {
       final File directory = getDirectory(recordDefinition);
       directory.mkdirs();
       final String fileName = getFileName(recordDefinition);
-      final File file = new File(directory, fileName + this.nameSuffix + "."
-          + this.fileExtension);
+      final File file = new File(directory, fileName + this.nameSuffix + "." + this.fileExtension);
       final FileSystemResource resource = new FileSystemResource(file);
       writer = RecordIo.recordWriter(recordDefinition, resource);
       if (writer == null) {
-        throw new IllegalArgumentException("Unable to create writer for "
-            + resource);
+        throw new IllegalArgumentException("Unable to create writer for " + resource);
       } else {
         final Map<String, Object> properties = getProperties();
         Property.set(writer, properties);
@@ -186,8 +182,7 @@ public class DirectoryRecordWriter extends AbstractRecordWriter {
     }
   }
 
-  public void setUseNamespaceAsSubDirectory(
-    final boolean useNamespaceAsSubDirectory) {
+  public void setUseNamespaceAsSubDirectory(final boolean useNamespaceAsSubDirectory) {
     this.useNamespaceAsSubDirectory = useNamespaceAsSubDirectory;
   }
 

@@ -18,17 +18,14 @@ import com.revolsys.spring.OutputStreamResource;
 public class ShapefileIoFactory extends AbstractRecordAndGeometryIoFactory {
   public ShapefileIoFactory() {
     super(ShapefileConstants.DESCRIPTION, true, true);
-    addMediaTypeAndFileExtension(ShapefileConstants.MIME_TYPE,
-      ShapefileConstants.FILE_EXTENSION);
+    addMediaTypeAndFileExtension(ShapefileConstants.MIME_TYPE, ShapefileConstants.FILE_EXTENSION);
     setSingleFile(false);
   }
 
   @Override
-  public RecordReader createRecordReader(final Resource resource,
-    final RecordFactory recordFactory) {
+  public RecordReader createRecordReader(final Resource resource, final RecordFactory recordFactory) {
     try {
-      final ShapefileIterator iterator = new ShapefileIterator(resource,
-        recordFactory);
+      final ShapefileIterator iterator = new ShapefileIterator(resource, recordFactory);
       return new RecordIteratorReader(iterator);
     } catch (final IOException e) {
       throw new RuntimeException("Unable to create reader for " + resource, e);
@@ -36,17 +33,15 @@ public class ShapefileIoFactory extends AbstractRecordAndGeometryIoFactory {
   }
 
   @Override
-  public Writer<Record> createRecordWriter(
-    final RecordDefinition recordDefinition, final Resource resource) {
+  public Writer<Record> createRecordWriter(final RecordDefinition recordDefinition,
+    final Resource resource) {
     return new ShapefileRecordWriter(recordDefinition, resource);
   }
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream,
-    final Charset charset) {
-    return createRecordWriter(recordDefinition, new OutputStreamResource(
-      baseName, outputStream));
+    final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
+    return createRecordWriter(recordDefinition, new OutputStreamResource(baseName, outputStream));
   }
 
 }

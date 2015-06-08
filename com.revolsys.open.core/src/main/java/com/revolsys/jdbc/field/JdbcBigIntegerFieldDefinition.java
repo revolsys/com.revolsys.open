@@ -11,22 +11,21 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.types.DataTypes;
 
 public class JdbcBigIntegerFieldDefinition extends JdbcFieldDefinition {
-  public JdbcBigIntegerFieldDefinition(final String dbName, final String name,
-    final int sqlType, final int length, final boolean required,
-    final String description, final Map<String, Object> properties) {
-    super(dbName, name, DataTypes.INTEGER, sqlType, length, 0, required,
-      description, properties);
+  public JdbcBigIntegerFieldDefinition(final String dbName, final String name, final int sqlType,
+    final int length, final boolean required, final String description,
+    final Map<String, Object> properties) {
+    super(dbName, name, DataTypes.INTEGER, sqlType, length, 0, required, description, properties);
   }
 
   @Override
   public JdbcBigIntegerFieldDefinition clone() {
-    return new JdbcBigIntegerFieldDefinition(getDbName(), getName(), getSqlType(),
-      getLength(), isRequired(), getDescription(), getProperties());
+    return new JdbcBigIntegerFieldDefinition(getDbName(), getName(), getSqlType(), getLength(),
+      isRequired(), getDescription(), getProperties());
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet,
-    final int columnIndex, final Record object) throws SQLException {
+  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final Record object) throws SQLException {
     Object value;
     final int length = getLength();
     if (length <= 2) {
@@ -52,8 +51,8 @@ public class JdbcBigIntegerFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setPreparedStatementValue(final PreparedStatement statement,
-    final int parameterIndex, final Object value) throws SQLException {
+  public int setPreparedStatementValue(final PreparedStatement statement, final int parameterIndex,
+    final Object value) throws SQLException {
     if (value == null) {
       statement.setNull(parameterIndex, getSqlType());
     } else {

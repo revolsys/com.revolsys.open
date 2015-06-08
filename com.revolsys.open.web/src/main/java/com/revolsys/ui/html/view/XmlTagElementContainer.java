@@ -37,8 +37,7 @@ public class XmlTagElementContainer extends ElementContainer {
     this(tagName, cssClass, null);
   }
 
-  public XmlTagElementContainer(final QName tagName, final String cssClass,
-    final Element element) {
+  public XmlTagElementContainer(final QName tagName, final String cssClass, final Element element) {
     this.tagName = tagName;
     this.cssClass = cssClass;
     this.add(element);

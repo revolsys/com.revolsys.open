@@ -55,8 +55,8 @@ import com.revolsys.jts.planargraph.DirectedEdge;
  */
 class EdgeRing {
 
-  private static void addEdge(final LineString coords,
-    final boolean isForward, final CoordinateList coordList) {
+  private static void addEdge(final LineString coords, final boolean isForward,
+    final CoordinateList coordList) {
     if (isForward) {
       for (int i = 0; i < coords.getVertexCount(); i++) {
         coordList.add(coords.getPoint(i), false);
@@ -103,8 +103,7 @@ class EdgeRing {
         continue;
       }
 
-      testPt = CoordinatesUtil.pointNotInList(testRing.vertices(),
-        tryShellRing.vertices());
+      testPt = CoordinatesUtil.pointNotInList(testRing.vertices(), tryShellRing.vertices());
       boolean isContained = false;
       if (CGAlgorithms.isPointInRing(testPt, tryShellRing)) {
         isContained = true;
@@ -152,8 +151,7 @@ class EdgeRing {
    * @deprecated Use CoordinateArrays.ptNotInList instead
    */
   @Deprecated
-  public static Point ptNotInList(final Point[] testPts,
-    final Point[] pts) {
+  public static Point ptNotInList(final Point[] testPts, final Point[] pts) {
     for (final Point testPt2 : testPts) {
       final Point testPt = testPt2;
       if (!isInList(testPt, pts)) {
@@ -208,8 +206,7 @@ class EdgeRing {
       final CoordinateList coordList = new CoordinateList();
       for (final DirectedEdge de : this.deList) {
         final PolygonizeEdge edge = (PolygonizeEdge)de.getEdge();
-        addEdge(edge.getLine(), de.getEdgeDirection(),
-          coordList);
+        addEdge(edge.getLine(), de.getEdgeDirection(), coordList);
       }
       this.ringPts = coordList.toCoordinateArray();
     }

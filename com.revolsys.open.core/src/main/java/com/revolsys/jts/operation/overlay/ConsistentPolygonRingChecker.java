@@ -54,8 +54,7 @@ import com.revolsys.jts.geomgraph.Position;
  * @author Martin Davis
  * @version 1.7
  */
-public class ConsistentPolygonRingChecker
-{
+public class ConsistentPolygonRingChecker {
   private final PlanarGraph graph;
 
   private final int SCANNING_FOR_INCOMING = 1;
@@ -71,53 +70,46 @@ public class ConsistentPolygonRingChecker
    *
    * @throws TopologyException if inconsistent topology is found
    */
-  public void check(final int opCode)
-  {
-    for (final Iterator nodeit = this.graph.getNodeIterator(); nodeit.hasNext(); ) {
-      final Node node = (Node) nodeit.next();
-      testLinkResultDirectedEdges((DirectedEdgeStar) node.getEdges(), opCode);
+  public void check(final int opCode) {
+    for (final Iterator nodeit = this.graph.getNodeIterator(); nodeit.hasNext();) {
+      final Node node = (Node)nodeit.next();
+      testLinkResultDirectedEdges((DirectedEdgeStar)node.getEdges(), opCode);
     }
   }
 
-  public void checkAll()
-  {
+  public void checkAll() {
     check(OverlayOp.INTERSECTION);
     check(OverlayOp.DIFFERENCE);
     check(OverlayOp.UNION);
     check(OverlayOp.SYMDIFFERENCE);
   }
 
-  private List getPotentialResultAreaEdges(final DirectedEdgeStar deStar, final int opCode)
-  {
-    //print(System.out);
+  private List getPotentialResultAreaEdges(final DirectedEdgeStar deStar, final int opCode) {
+    // print(System.out);
     final List resultAreaEdgeList = new ArrayList();
-    for (final Iterator it = deStar.iterator(); it.hasNext(); ) {
-      final DirectedEdge de = (DirectedEdge) it.next();
-      if (isPotentialResultAreaEdge(de, opCode) || isPotentialResultAreaEdge(de.getSym(), opCode) ) {
+    for (final Iterator it = deStar.iterator(); it.hasNext();) {
+      final DirectedEdge de = (DirectedEdge)it.next();
+      if (isPotentialResultAreaEdge(de, opCode) || isPotentialResultAreaEdge(de.getSym(), opCode)) {
         resultAreaEdgeList.add(de);
       }
     }
     return resultAreaEdgeList;
   }
-  private boolean isPotentialResultAreaEdge(final DirectedEdge de, final int opCode)
-  {
+
+  private boolean isPotentialResultAreaEdge(final DirectedEdge de, final int opCode) {
     // mark all dirEdges with the appropriate label
     final Label label = de.getLabel();
     if (label.isArea()
-        && ! de.isInteriorAreaEdge()
-        && OverlayOp.isResultOfOp(
-          label.getLocation(0, Position.RIGHT),
-          label.getLocation(1, Position.RIGHT),
-          opCode)
-        ) {
+      && !de.isInteriorAreaEdge()
+      && OverlayOp.isResultOfOp(label.getLocation(0, Position.RIGHT),
+        label.getLocation(1, Position.RIGHT), opCode)) {
       return true;
-      //Debug.print("in result "); Debug.println(de);
+      // Debug.print("in result "); Debug.println(de);
     }
     return false;
   }
 
-  private void testLinkResultDirectedEdges(final DirectedEdgeStar deStar, final int opCode)
-  {
+  private void testLinkResultDirectedEdges(final DirectedEdgeStar deStar, final int opCode) {
     // make sure edges are copied to resultAreaEdges list
     final List ringEdges = getPotentialResultAreaEdges(deStar, opCode);
     // find first area edge (if any) to start linking at
@@ -126,50 +118,46 @@ public class ConsistentPolygonRingChecker
     int state = this.SCANNING_FOR_INCOMING;
     // link edges in CCW order
     for (int i = 0; i < ringEdges.size(); i++) {
-      final DirectedEdge nextOut = (DirectedEdge) ringEdges.get(i);
+      final DirectedEdge nextOut = (DirectedEdge)ringEdges.get(i);
       final DirectedEdge nextIn = nextOut.getSym();
 
       // skip de's that we're not interested in
-      if (! nextOut.getLabel().isArea()) {
+      if (!nextOut.getLabel().isArea()) {
         continue;
       }
 
       // record first outgoing edge, in order to link the last incoming edge
-      if (firstOut == null
-          && isPotentialResultAreaEdge(nextOut, opCode))
-      {
+      if (firstOut == null && isPotentialResultAreaEdge(nextOut, opCode)) {
         firstOut = nextOut;
-        // assert: sym.isInResult() == false, since pairs of dirEdges should have been removed already
+        // assert: sym.isInResult() == false, since pairs of dirEdges should
+        // have been removed already
       }
 
       switch (state) {
         case SCANNING_FOR_INCOMING:
-          if (! isPotentialResultAreaEdge(nextIn, opCode)) {
+          if (!isPotentialResultAreaEdge(nextIn, opCode)) {
             continue;
           }
           incoming = nextIn;
           state = this.LINKING_TO_OUTGOING;
-          break;
+        break;
         case LINKING_TO_OUTGOING:
-          if (! isPotentialResultAreaEdge(nextOut, opCode)) {
+          if (!isPotentialResultAreaEdge(nextOut, opCode)) {
             continue;
           }
-          //incoming.setNext(nextOut);
+          // incoming.setNext(nextOut);
           state = this.SCANNING_FOR_INCOMING;
-          break;
+        break;
       }
     }
-    //Debug.print(this);
+    // Debug.print(this);
     if (state == this.LINKING_TO_OUTGOING) {
-      //Debug.print(firstOut == null, this);
+      // Debug.print(firstOut == null, this);
       if (firstOut == null) {
         throw new TopologyException("no outgoing dirEdge found", deStar.getCoordinate());
       }
     }
 
   }
-
-
-
 
 }

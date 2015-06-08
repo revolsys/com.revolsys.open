@@ -77,10 +77,9 @@ public class GeometryFunctionOperation implements GeometryOperation {
     return func.getReturnType();
   }
 
-  private Result invoke(final GeometryFunction func, final Geometry geometry,
-    final Object[] args) throws Exception {
-    final Object[] actualArgs = this.argConverter.convert(func.getParameterTypes(),
-      args);
+  private Result invoke(final GeometryFunction func, final Geometry geometry, final Object[] args)
+    throws Exception {
+    final Object[] actualArgs = this.argConverter.convert(func.getParameterTypes(), args);
 
     if (func.getReturnType() == boolean.class) {
       return new BooleanResult((Boolean)func.invoke(geometry, actualArgs));
@@ -94,13 +93,12 @@ public class GeometryFunctionOperation implements GeometryOperation {
     if (func.getReturnType() == int.class) {
       return new IntegerResult((Integer)func.invoke(geometry, actualArgs));
     }
-    throw new JTSTestReflectionException("Unsupported result type: "
-        + func.getReturnType());
+    throw new JTSTestReflectionException("Unsupported result type: " + func.getReturnType());
   }
 
   @Override
-  public Result invoke(final String opName, final Geometry geometry,
-    final Object[] args) throws Exception {
+  public Result invoke(final String opName, final Geometry geometry, final Object[] args)
+    throws Exception {
     final GeometryFunction func = this.registry.find(opName, args.length);
     if (func == null) {
       return this.defaultOp.invoke(opName, geometry, args);

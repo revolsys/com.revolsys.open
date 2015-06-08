@@ -97,8 +97,7 @@ public class GridGenerator extends GeometryGenerator {
    */
   public BoundingBox createEnv() {
     if (!canCreate()) {
-      throw new NoSuchElementException(
-          "There are not any grids left to create.");
+      throw new NoSuchElementException("There are not any grids left to create.");
     }
     if (this.geometryFactory == null) {
       throw new NullPointerException("GeometryFactoryI is not declared");
@@ -114,8 +113,7 @@ public class GridGenerator extends GeometryGenerator {
     final double dy = this.boundingBox.getMaxY() - y;
 
     final int row = this.numberRows == 1 ? 0 : this.index / this.numberRows;
-    final int col = this.numberColumns == 1 ? 0 : this.index
-      % this.numberColumns;
+    final int col = this.numberColumns == 1 ? 0 : this.index % this.numberColumns;
 
     double sx, sy; // size of a step
     sx = dx / this.numberColumns;
@@ -125,9 +123,8 @@ public class GridGenerator extends GeometryGenerator {
     minx = x + col * sx;
     miny = y + row * sy;
 
-    final BoundingBox box = new BoundingBoxDoubleGf(2, this.geometryFactory.makePrecise(0,
-      minx), this.geometryFactory.makePrecise(1, miny),
-      this.geometryFactory.makePrecise(0, minx + sx),
+    final BoundingBox box = new BoundingBoxDoubleGf(2, this.geometryFactory.makePrecise(0, minx),
+      this.geometryFactory.makePrecise(1, miny), this.geometryFactory.makePrecise(0, minx + sx),
       this.geometryFactory.makePrecise(1, miny + sy));
 
     this.index++;
@@ -161,8 +158,7 @@ public class GridGenerator extends GeometryGenerator {
   @Override
   public void setDimensions(final int dimensions) {
     if (dimensions != 2) {
-      throw new IllegalStateException(
-          "MAY NOT CHANGE GridGenerator's Dimensions");
+      throw new IllegalStateException("MAY NOT CHANGE GridGenerator's Dimensions");
     }
   }
 
@@ -171,8 +167,7 @@ public class GridGenerator extends GeometryGenerator {
    */
   public void setNumberColumns(final int numberColumns) {
     if (numberColumns <= 0) {
-      throw new IndexOutOfBoundsException(
-          "Index sizes must be positive, non zero");
+      throw new IndexOutOfBoundsException("Index sizes must be positive, non zero");
     }
     this.numberColumns = numberColumns;
   }
@@ -182,8 +177,7 @@ public class GridGenerator extends GeometryGenerator {
    */
   public void setNumberRows(final int numberRows) {
     if (numberRows <= 0) {
-      throw new IndexOutOfBoundsException(
-          "Index sizes must be positive, non zero");
+      throw new IndexOutOfBoundsException("Index sizes must be positive, non zero");
     }
     this.numberRows = numberRows;
   }

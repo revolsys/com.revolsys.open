@@ -21,8 +21,7 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 
-public class GeoJsonRecordWriter extends AbstractRecordWriter implements
-GeoJsonConstants {
+public class GeoJsonRecordWriter extends AbstractRecordWriter implements GeoJsonConstants {
 
   boolean initialized = false;
 

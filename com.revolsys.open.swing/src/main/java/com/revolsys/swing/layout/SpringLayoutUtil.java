@@ -16,8 +16,8 @@ import javax.swing.SwingUtilities;
 
 public class SpringLayoutUtil {
   /* Used by makeCompactGrid. */
-  private static SpringLayout.Constraints getConstraintsForCell(final int row,
-    final int col, final Container parent, final int cols) {
+  private static SpringLayout.Constraints getConstraintsForCell(final int row, final int col,
+    final Container parent, final int cols) {
     final SpringLayout layout = (SpringLayout)parent.getLayout();
     final Component c = parent.getComponent(row * cols + col);
     return layout.getConstraints(c);
@@ -47,9 +47,8 @@ public class SpringLayoutUtil {
     return null;
   }
 
-  public static void makeColumns(final Container container,
-    final int numColumns, final int initialX, final int initialY,
-    final int xPad, final int yPad) {
+  public static void makeColumns(final Container container, final int numColumns,
+    final int initialX, final int initialY, final int xPad, final int yPad) {
     final Spring xPadSpring = Spring.constant(xPad);
     final Spring yPadSpring = Spring.constant(yPad);
 
@@ -84,15 +83,13 @@ public class SpringLayoutUtil {
       final Spring initialXSpring = Spring.constant(initialX);
       columnX[0] = initialXSpring;
       for (int i = 1; i < columnX.length; i++) {
-        columnX[i] = Spring.sum(columnX[i - 1],
-          Spring.sum(xPadSpring, columnWidths[i - 1]));
+        columnX[i] = Spring.sum(columnX[i - 1], Spring.sum(xPadSpring, columnWidths[i - 1]));
       }
       final Spring[] rowY = new Spring[numRows];
       final Spring initialYSpring = Spring.constant(initialY);
       rowY[0] = initialYSpring;
       for (int i = 1; i < rowY.length; i++) {
-        rowY[i] = Spring.sum(rowY[i - 1],
-          Spring.sum(yPadSpring, rowHeights[i - 1]));
+        rowY[i] = Spring.sum(rowY[i - 1], Spring.sum(yPadSpring, rowHeights[i - 1]));
       }
       final Constraints containerConstraints = springLayout.getConstraints(container);
       containerConstraints.setWidth(Spring.sum(columnX[numColumns - 1],
@@ -127,9 +124,8 @@ public class SpringLayoutUtil {
    * @param xPad x padding between cells
    * @param yPad y padding between cells
    */
-  public static void makeCompactGrid(final Container parent, final int rows,
-    final int cols, final int initialX, final int initialY, final int xPad,
-    final int yPad) {
+  public static void makeCompactGrid(final Container parent, final int rows, final int cols,
+    final int initialX, final int initialY, final int xPad, final int yPad) {
     SpringLayout layout;
     try {
       layout = (SpringLayout)parent.getLayout();
@@ -143,12 +139,10 @@ public class SpringLayoutUtil {
     for (int c = 0; c < cols; c++) {
       Spring width = Spring.constant(0);
       for (int r = 0; r < rows; r++) {
-        width = Spring.max(width,
-          getConstraintsForCell(r, c, parent, cols).getWidth());
+        width = Spring.max(width, getConstraintsForCell(r, c, parent, cols).getWidth());
       }
       for (int r = 0; r < rows; r++) {
-        final SpringLayout.Constraints constraints = getConstraintsForCell(r,
-          c, parent, cols);
+        final SpringLayout.Constraints constraints = getConstraintsForCell(r, c, parent, cols);
         constraints.setX(x);
         constraints.setWidth(width);
       }
@@ -160,12 +154,10 @@ public class SpringLayoutUtil {
     for (int r = 0; r < rows; r++) {
       Spring height = Spring.constant(0);
       for (int c = 0; c < cols; c++) {
-        height = Spring.max(height,
-          getConstraintsForCell(r, c, parent, cols).getHeight());
+        height = Spring.max(height, getConstraintsForCell(r, c, parent, cols).getHeight());
       }
       for (int c = 0; c < cols; c++) {
-        final SpringLayout.Constraints constraints = getConstraintsForCell(r,
-          c, parent, cols);
+        final SpringLayout.Constraints constraints = getConstraintsForCell(r, c, parent, cols);
         constraints.setY(y);
         constraints.setHeight(height);
       }
@@ -191,9 +183,8 @@ public class SpringLayoutUtil {
    * @param xPad x padding between cells
    * @param yPad y padding between cells
    */
-  public static void makeGrid(final Container parent, final int rows,
-    final int cols, final int initialX, final int initialY, final int xPad,
-    final int yPad) {
+  public static void makeGrid(final Container parent, final int rows, final int cols,
+    final int initialX, final int initialY, final int xPad, final int yPad) {
     LayoutManager layout = parent.getLayout();
     if (!(layout instanceof SpringLayout)) {
       layout = new SpringLayout();
@@ -209,10 +200,8 @@ public class SpringLayoutUtil {
 
     // Calculate Springs that are the max of the width/height so that all
     // cells have the same size.
-    Spring maxWidthSpring = springLayout.getConstraints(parent.getComponent(0))
-        .getWidth();
-    Spring maxHeightSpring = springLayout.getConstraints(parent.getComponent(0))
-        .getWidth();
+    Spring maxWidthSpring = springLayout.getConstraints(parent.getComponent(0)).getWidth();
+    Spring maxHeightSpring = springLayout.getConstraints(parent.getComponent(0)).getWidth();
     for (int i = 1; i < max; i++) {
       final SpringLayout.Constraints cons = springLayout.getConstraints(parent.getComponent(i));
 
@@ -239,34 +228,27 @@ public class SpringLayoutUtil {
         lastRowCons = lastCons;
         cons.setX(initialXSpring);
       } else { // x position depends on previous component
-        cons.setX(Spring.sum(lastCons.getConstraint(SpringLayout.EAST),
-          xPadSpring));
+        cons.setX(Spring.sum(lastCons.getConstraint(SpringLayout.EAST), xPadSpring));
       }
 
       if (i / cols == 0) { // first row
         cons.setY(initialYSpring);
       } else { // y position depends on previous row
-        cons.setY(Spring.sum(lastRowCons.getConstraint(SpringLayout.SOUTH),
-          yPadSpring));
+        cons.setY(Spring.sum(lastRowCons.getConstraint(SpringLayout.SOUTH), yPadSpring));
       }
       lastCons = cons;
     }
 
     // Set the parent's size.
     final SpringLayout.Constraints pCons = springLayout.getConstraints(parent);
-    pCons.setConstraint(
-      SpringLayout.SOUTH,
-      Spring.sum(Spring.constant(yPad),
-        lastCons.getConstraint(SpringLayout.SOUTH)));
-    pCons.setConstraint(
-      SpringLayout.EAST,
-      Spring.sum(Spring.constant(xPad),
-        lastCons.getConstraint(SpringLayout.EAST)));
+    pCons.setConstraint(SpringLayout.SOUTH,
+      Spring.sum(Spring.constant(yPad), lastCons.getConstraint(SpringLayout.SOUTH)));
+    pCons.setConstraint(SpringLayout.EAST,
+      Spring.sum(Spring.constant(xPad), lastCons.getConstraint(SpringLayout.EAST)));
   }
 
-  public static void makeRows(final Container container, final int initialX,
-    final int initialY, final int xPad, final int yPad,
-    final int... componentsPerRow) {
+  public static void makeRows(final Container container, final int initialX, final int initialY,
+    final int xPad, final int yPad, final int... componentsPerRow) {
     final SpringLayout layout = (SpringLayout)container.getLayout();
     final Spring xPadSpring = Spring.constant(xPad);
     final Spring yPadSpring = Spring.constant(yPad);
@@ -311,10 +293,8 @@ public class SpringLayoutUtil {
     containerConstraints.setHeight(Spring.sum(initialYSpring, y));
   }
 
-  public static void singleColumn(final Container container,
-    final int initialY, final int yPad) {
-    Spring height = Spring.constant(initialY + yPad
-      * container.getComponentCount());
+  public static void singleColumn(final Container container, final int initialY, final int yPad) {
+    Spring height = Spring.constant(initialY + yPad * container.getComponentCount());
     Spring width = Spring.constant(0);
 
     final SpringLayout layout = (SpringLayout)container.getLayout();
@@ -324,11 +304,9 @@ public class SpringLayoutUtil {
       width = Spring.max(width, constraints.getWidth());
       height = Spring.sum(height, constraints.getHeight());
       if (previous == container) {
-        layout.putConstraint(SpringLayout.NORTH, previous, initialY,
-          SpringLayout.NORTH, component);
+        layout.putConstraint(SpringLayout.NORTH, previous, initialY, SpringLayout.NORTH, component);
       } else {
-        layout.putConstraint(SpringLayout.SOUTH, previous, yPad,
-          SpringLayout.NORTH, component);
+        layout.putConstraint(SpringLayout.SOUTH, previous, yPad, SpringLayout.NORTH, component);
       }
 
       previous = component;

@@ -170,6 +170,70 @@ import com.revolsys.jts.geom.Point;
 
 public class ShewchuksDeterminant {
 
+  private static final double splitter;
+
+  private static final double resulterrbound;
+
+  private static final double ccwerrboundA;
+
+  private static final double ccwerrboundB;
+
+  private static final double ccwerrboundC;
+
+  /*****************************************************************************/
+  /*                                                                           */
+  /* exactinit() Initialize the variables used for exact arithmetic. */
+  /*                                                                           */
+  /* `epsilon' is the largest power of two such that 1.0 + epsilon = 1.0 in */
+  /* floating-point arithmetic. `epsilon' bounds the relative roundoff */
+  /* error. It is used for floating-point error analysis. */
+  /*                                                                           */
+  /* `splitter' is used to split floating-point numbers into two half- */
+  /* length significands for exact multiplication. */
+  /*                                                                           */
+  /* I imagine that a highly optimizing compiler might be too smart for its */
+  /* own good, and somehow cause this routine to fail, if it pretends that */
+  /* floating-point arithmetic is too much like real arithmetic. */
+  /*                                                                           */
+  /* Don't change this routine unless you fully understand it. */
+  /*                                                                           */
+  /*****************************************************************************/
+
+  static {
+    double epsilon_temp;
+    double splitter_temp;
+    double half;
+    double check, lastcheck;
+    int every_other;
+
+    every_other = 1;
+    half = 0.5;
+    epsilon_temp = 1.0;
+    splitter_temp = 1.0;
+    check = 1.0;
+    /* Repeatedly divide `epsilon' by two until it is too small to add to */
+    /* one without causing roundoff. (Also check if the sum is equal to */
+    /* the previous sum, for machines that round up instead of using exact */
+    /* rounding. Not that this library will work on such machines anyway. */
+    do {
+      lastcheck = check;
+      epsilon_temp *= half;
+      if (every_other != 0) {
+        splitter_temp *= 2.0;
+      }
+      every_other = every_other == 0 ? 1 : 0;
+      check = 1.0 + epsilon_temp;
+    } while (check != 1.0 && check != lastcheck);
+    splitter_temp += 1.0;
+
+    /* Error bounds for orientation and incircle tests. */
+    resulterrbound = (3.0 + 8.0 * epsilon_temp) * epsilon_temp;
+    ccwerrboundA = (3.0 + 16.0 * epsilon_temp) * epsilon_temp;
+    ccwerrboundB = (2.0 + 12.0 * epsilon_temp) * epsilon_temp;
+    ccwerrboundC = (9.0 + 64.0 * epsilon_temp) * epsilon_temp * epsilon_temp;
+    splitter = splitter_temp;
+  }
+
   private static double Absolute(final double a) {
     return a >= 0.0 ? a : -a;
   }
@@ -188,15 +252,10 @@ public class ShewchuksDeterminant {
   /*                                                                           */
   /*****************************************************************************/
 
-  private static int fast_expansion_sum_zeroelim(final int elen,
-    final double[] e, final int flen, final double[] f, final double[] h) /*
-     * h
-     * cannot
-     * be
-     * e
-     * or
-     * f.
-     */
+  private static int fast_expansion_sum_zeroelim(final int elen, final double[] e, final int flen,
+    final double[] f, final double[] h) /*
+                                         * h cannot be e or f.
+                                         */
   {
     double Q;
     double Qnew;
@@ -276,16 +335,14 @@ public class ShewchuksDeterminant {
     return x;
   }
 
-  private static double Fast_Two_Sum_Tail(final double a, final double b,
-    final double x) {
+  private static double Fast_Two_Sum_Tail(final double a, final double b, final double x) {
     final double bvirt = x - a;
     final double y = b - bvirt;
 
     return y;
   }
 
-  private static double orient2d(final Point pa, final Point pb,
-    final Point pc) {
+  private static double orient2d(final Point pa, final Point pb, final Point pc) {
     double detsum;
 
     final double detleft = (pa.getX() - pc.getX()) * (pb.getY() - pc.getY());
@@ -336,8 +393,8 @@ public class ShewchuksDeterminant {
   /*                                                                           */
   /*****************************************************************************/
 
-  private static double orient2dadapt(final Point pa, final Point pb,
-    final Point pc, final double detsum) {
+  private static double orient2dadapt(final Point pa, final Point pb, final Point pc,
+    final double detsum) {
 
     final double acx = pa.getX() - pc.getX();
     final double bcx = pb.getX() - pc.getX();
@@ -442,8 +499,7 @@ public class ShewchuksDeterminant {
    * -1 if q is clockwise (right) from p1-p2;
    * 0 if q is collinear with p1-p2
    */
-  public static int orientationIndex(final Point p1, final Point p2,
-    final Point q) {
+  public static int orientationIndex(final Point p1, final Point p2, final Point q) {
     final double orientation = orient2d(p1, p2, q);
     if (orientation > 0.0) {
       return 1;
@@ -469,8 +525,7 @@ public class ShewchuksDeterminant {
    * @return the orientation index if it can be computed safely, or
    * i > 1 if the orientation index cannot be computed safely
    */
-  public static int orientationIndexFilter(final Point pa,
-    final Point pb, final Point pc) {
+  public static int orientationIndexFilter(final Point pa, final Point pb, final Point pc) {
     double detsum;
 
     final double detleft = (pa.getX() - pc.getX()) * (pb.getY() - pc.getY());
@@ -536,8 +591,7 @@ public class ShewchuksDeterminant {
     return x;
   }
 
-  private static double Two_Diff_Tail(final double a, final double b,
-    final double x) {
+  private static double Two_Diff_Tail(final double a, final double b, final double x) {
     final double bvirt = a - x; // porting issue: why this cast?
     final double avirt = x + bvirt;
     final double bround = bvirt - b;
@@ -548,8 +602,7 @@ public class ShewchuksDeterminant {
   }
 
   // #define Two_One_Diff(a1, a0, b, x2, x1, x0)
-  private static double Two_One_Diff__x0(final double a1, final double a0,
-    final double b) {
+  private static double Two_One_Diff__x0(final double a1, final double a0, final double b) {
     final double _i = Two_Diff_Head(a0, b);
     final double x0 = Two_Diff_Tail(a0, b, _i);
 
@@ -557,8 +610,7 @@ public class ShewchuksDeterminant {
   }
 
   // #define Two_One_Diff(a1, a0, b, x2, x1, x0)
-  private static double Two_One_Diff__x1(final double a1, final double a0,
-    final double b) {
+  private static double Two_One_Diff__x1(final double a1, final double a0, final double b) {
     final double _i = Two_Diff_Head(a0, b);
     final double x2 = Two_Sum_Head(a1, _i);
     final double x1 = Two_Sum_Tail(a1, _i, x2);
@@ -567,8 +619,7 @@ public class ShewchuksDeterminant {
   }
 
   // #define Two_One_Diff(a1, a0, b, x2, x1, x0)
-  private static double Two_One_Diff__x2(final double a1, final double a0,
-    final double b) {
+  private static double Two_One_Diff__x2(final double a1, final double a0, final double b) {
     final double _i = Two_Diff_Head(a0, b);
     final double x2 = Two_Sum_Head(a1, _i);
 
@@ -581,8 +632,7 @@ public class ShewchuksDeterminant {
     return x;
   }
 
-  private static double Two_Product_Tail(final double a, final double b,
-    final double x) {
+  private static double Two_Product_Tail(final double a, final double b, final double x) {
     final double ahi = SplitHi(a);
     final double alo = SplitLo(a);
     final double bhi = SplitHi(b);
@@ -602,8 +652,7 @@ public class ShewchuksDeterminant {
     return x;
   }
 
-  private static double Two_Sum_Tail(final double a, final double b,
-    final double x) {
+  private static double Two_Sum_Tail(final double a, final double b, final double x) {
     final double bvirt = x - a;
     final double avirt = x - bvirt;
     final double bround = b - bvirt;
@@ -615,16 +664,16 @@ public class ShewchuksDeterminant {
   }
 
   // #define Two_Two_Diff(a1, a0, b1, b0, x3, x2, x1, x0)
-  private static double Two_Two_Diff__x0(final double a1, final double a0,
-    final double b1, final double b0) {
+  private static double Two_Two_Diff__x0(final double a1, final double a0, final double b1,
+    final double b0) {
     final double x0 = Two_One_Diff__x0(a1, a0, b0);
 
     return x0;
   }
 
   // #define Two_Two_Diff(a1, a0, b1, b0, x3, x2, x1, x0)
-  private static double Two_Two_Diff__x1(final double a1, final double a0,
-    final double b1, final double b0) {
+  private static double Two_Two_Diff__x1(final double a1, final double a0, final double b1,
+    final double b0) {
     final double _j = Two_One_Diff__x2(a1, a0, b0);
     final double _0 = Two_One_Diff__x1(a1, a0, b0);
 
@@ -634,8 +683,8 @@ public class ShewchuksDeterminant {
   }
 
   // #define Two_Two_Diff(a1, a0, b1, b0, x3, x2, x1, x0)
-  private static double Two_Two_Diff__x2(final double a1, final double a0,
-    final double b1, final double b0) {
+  private static double Two_Two_Diff__x2(final double a1, final double a0, final double b1,
+    final double b0) {
     final double _j = Two_One_Diff__x2(a1, a0, b0);
     final double _0 = Two_One_Diff__x1(a1, a0, b0);
 
@@ -645,78 +694,14 @@ public class ShewchuksDeterminant {
   }
 
   // #define Two_Two_Diff(a1, a0, b1, b0, x3, x2, x1, x0)
-  private static double Two_Two_Diff__x3(final double a1, final double a0,
-    final double b1, final double b0) {
+  private static double Two_Two_Diff__x3(final double a1, final double a0, final double b1,
+    final double b0) {
     final double _j = Two_One_Diff__x2(a1, a0, b0);
     final double _0 = Two_One_Diff__x1(a1, a0, b0);
 
     final double x3 = Two_One_Diff__x2(_j, _0, b1);
 
     return x3;
-  }
-
-  private static final double splitter;
-
-  private static final double resulterrbound;
-
-  private static final double ccwerrboundA;
-
-  private static final double ccwerrboundB;
-
-  private static final double ccwerrboundC;
-
-  /*****************************************************************************/
-  /*                                                                           */
-  /* exactinit() Initialize the variables used for exact arithmetic. */
-  /*                                                                           */
-  /* `epsilon' is the largest power of two such that 1.0 + epsilon = 1.0 in */
-  /* floating-point arithmetic. `epsilon' bounds the relative roundoff */
-  /* error. It is used for floating-point error analysis. */
-  /*                                                                           */
-  /* `splitter' is used to split floating-point numbers into two half- */
-  /* length significands for exact multiplication. */
-  /*                                                                           */
-  /* I imagine that a highly optimizing compiler might be too smart for its */
-  /* own good, and somehow cause this routine to fail, if it pretends that */
-  /* floating-point arithmetic is too much like real arithmetic. */
-  /*                                                                           */
-  /* Don't change this routine unless you fully understand it. */
-  /*                                                                           */
-  /*****************************************************************************/
-
-  static {
-    double epsilon_temp;
-    double splitter_temp;
-    double half;
-    double check, lastcheck;
-    int every_other;
-
-    every_other = 1;
-    half = 0.5;
-    epsilon_temp = 1.0;
-    splitter_temp = 1.0;
-    check = 1.0;
-    /* Repeatedly divide `epsilon' by two until it is too small to add to */
-    /* one without causing roundoff. (Also check if the sum is equal to */
-    /* the previous sum, for machines that round up instead of using exact */
-    /* rounding. Not that this library will work on such machines anyway. */
-    do {
-      lastcheck = check;
-      epsilon_temp *= half;
-      if (every_other != 0) {
-        splitter_temp *= 2.0;
-      }
-      every_other = every_other == 0 ? 1 : 0;
-      check = 1.0 + epsilon_temp;
-    } while (check != 1.0 && check != lastcheck);
-    splitter_temp += 1.0;
-
-    /* Error bounds for orientation and incircle tests. */
-    resulterrbound = (3.0 + 8.0 * epsilon_temp) * epsilon_temp;
-    ccwerrboundA = (3.0 + 16.0 * epsilon_temp) * epsilon_temp;
-    ccwerrboundB = (2.0 + 12.0 * epsilon_temp) * epsilon_temp;
-    ccwerrboundC = (9.0 + 64.0 * epsilon_temp) * epsilon_temp * epsilon_temp;
-    splitter = splitter_temp;
   }
 
 }

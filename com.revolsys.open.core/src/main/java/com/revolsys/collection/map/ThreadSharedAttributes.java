@@ -6,6 +6,12 @@ import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
 public class ThreadSharedAttributes {
+  private static ThreadLocal<Map<Object, Object>> threadAttributes = new ThreadLocal<Map<Object, Object>>();
+
+  private static Map<ThreadGroup, Map<Object, Object>> threadGroupAttributes = new WeakHashMap<ThreadGroup, Map<Object, Object>>();
+
+  private static Map<Object, Object> defaultAttributes = new WeakHashMap<Object, Object>();
+
   public static void clearAttributes() {
     final Map<Object, Object> attributes = getLocalAttributes();
     synchronized (attributes) {
@@ -114,16 +120,9 @@ public class ThreadSharedAttributes {
     }
   }
 
-  public static void setDefaultAttributes(
-    final Map<? extends Object, Object> values) {
+  public static void setDefaultAttributes(final Map<? extends Object, Object> values) {
     synchronized (defaultAttributes) {
       defaultAttributes.putAll(values);
     }
   }
-
-  private static ThreadLocal<Map<Object, Object>> threadAttributes = new ThreadLocal<Map<Object, Object>>();
-
-  private static Map<ThreadGroup, Map<Object, Object>> threadGroupAttributes = new WeakHashMap<ThreadGroup, Map<Object, Object>>();
-
-  private static Map<Object, Object> defaultAttributes = new WeakHashMap<Object, Object>();
 }

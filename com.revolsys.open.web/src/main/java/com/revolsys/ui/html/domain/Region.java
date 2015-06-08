@@ -28,6 +28,12 @@ import java.util.StringTokenizer;
 import com.revolsys.io.FileUtil;
 
 public final class Region {
+  private static Map<Country, List<Region>> countryRegions = new HashMap<>();
+
+  private static Map<Country, Map<String, Region>> countryRegionCodeMap = new HashMap<>();
+
+  private static Map<Country, Map<String, Region>> countryRegionNameMap = new HashMap<>();
+
   public static Region getRegion(final String countryRegioncode) {
     final StringTokenizer st = new StringTokenizer(countryRegioncode, "-");
     final String countryCode = st.nextToken();
@@ -43,8 +49,7 @@ public final class Region {
     return getRegionCodeMap(country).get(code.toUpperCase());
   }
 
-  public static Region getRegionByCode(final String countryCode,
-    final String code) {
+  public static Region getRegionByCode(final String countryCode, final String code) {
     return getRegionByCode(Country.getCountry(countryCode), code);
   }
 
@@ -52,8 +57,7 @@ public final class Region {
     return getRegionNameMap(country).get(name.toUpperCase());
   }
 
-  public static Region getRegionByName(final String countryCode,
-    final String name) {
+  public static Region getRegionByName(final String countryCode, final String name) {
     return getRegionByName(Country.getCountry(countryCode), name);
   }
 
@@ -93,7 +97,7 @@ public final class Region {
     InputStream in = null;
     if (country != null) {
       in = Region.class.getResourceAsStream("/com/revolsys/ui/html/domain/region/"
-          + country.getCodeAplha2() + ".txt");
+        + country.getCodeAplha2() + ".txt");
     }
     List<Region> regions;
     Map<String, Region> regionMap;
@@ -106,8 +110,7 @@ public final class Region {
       regions = new ArrayList<>();
       regionMap = new HashMap<>();
       regionNameMap = new HashMap<>();
-      final BufferedReader lineReader = new BufferedReader(
-        FileUtil.createUtf8Reader(in));
+      final BufferedReader lineReader = new BufferedReader(FileUtil.createUtf8Reader(in));
       try {
         for (String line = lineReader.readLine(); line != null; line = lineReader.readLine()) {
           final StringTokenizer columns = new StringTokenizer(line, "\t");
@@ -126,12 +129,6 @@ public final class Region {
     countryRegionCodeMap.put(country, regionMap);
     countryRegionNameMap.put(country, regionNameMap);
   }
-
-  private static Map<Country, List<Region>> countryRegions = new HashMap<>();
-
-  private static Map<Country, Map<String, Region>> countryRegionCodeMap = new HashMap<>();
-
-  private static Map<Country, Map<String, Region>> countryRegionNameMap = new HashMap<>();
 
   private final Country country;
 

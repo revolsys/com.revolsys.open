@@ -39,6 +39,12 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.index.strtree.STRtree;
 
 public class FacetSequenceTreeBuilder {
+  // 6 seems to be a good facet sequence size
+  private static final int FACET_SEQUENCE_SIZE = 6;
+
+  // Seems to be better to use a minimum node capacity
+  private static final int STR_TREE_NODE_CAPACITY = 4;
+
   public static STRtree build(final Geometry g) {
     final STRtree tree = new STRtree(STR_TREE_NODE_CAPACITY);
     for (final LineString line : g.getGeometryComponents(LineString.class)) {
@@ -63,10 +69,4 @@ public class FacetSequenceTreeBuilder {
     tree.build();
     return tree;
   }
-
-  // 6 seems to be a good facet sequence size
-  private static final int FACET_SEQUENCE_SIZE = 6;
-
-  // Seems to be better to use a minimum node capacity
-  private static final int STR_TREE_NODE_CAPACITY = 4;
 }

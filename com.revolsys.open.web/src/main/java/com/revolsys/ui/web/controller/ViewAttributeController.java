@@ -52,8 +52,7 @@ public class ViewAttributeController implements Controller {
     return null;
   }
 
-  private void render(final HttpServletResponse response, final Object object)
-      throws IOException {
+  private void render(final HttpServletResponse response, final Object object) throws IOException {
     if (object != null) {
       final PrintWriter out = response.getWriter();
       if (object instanceof Element) {

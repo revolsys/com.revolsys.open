@@ -27,8 +27,8 @@ public class ZipUtil {
    * @throws IOException
    * @throws IOException If an I/O error occurs.
    */
-  public static void addDirectoryToZipFile(final ZipOutputStream zipOut,
-    final File directory) throws IOException {
+  public static void addDirectoryToZipFile(final ZipOutputStream zipOut, final File directory)
+    throws IOException {
     addDirectoryToZipFile(zipOut, directory, directory);
   }
 
@@ -42,16 +42,15 @@ public class ZipUtil {
    * @param directory The directory containing the files.
    * @throws IOException If an I/O error occurs.
    */
-  public static void addDirectoryToZipFile(final ZipOutputStream zipOut,
-    final File baseDirectory, final File directory) throws IOException {
+  public static void addDirectoryToZipFile(final ZipOutputStream zipOut, final File baseDirectory,
+    final File directory) throws IOException {
     final File[] files = directory.listFiles();
     if (files != null) {
       for (final File file : files) {
         if (file.isDirectory()) {
           addDirectoryToZipFile(zipOut, baseDirectory, file);
         } else {
-          final String zipEntryName = FileUtil.getRelativePath(baseDirectory,
-            file);
+          final String zipEntryName = FileUtil.getRelativePath(baseDirectory, file);
           zipOut.putNextEntry(new ZipEntry(zipEntryName));
           final InputStream in = new FileInputStream(file);
           FileUtil.copy(in, zipOut);
@@ -70,8 +69,8 @@ public class ZipUtil {
    * @param fileNames The list of file names to add.
    * @throws IOException If an I/O error occurs.
    */
-  public static void addFilesToZipFile(final ZipOutputStream zipOut,
-    final File baseDirectory, final String[] fileNames) throws IOException {
+  public static void addFilesToZipFile(final ZipOutputStream zipOut, final File baseDirectory,
+    final String[] fileNames) throws IOException {
     for (final String fileName : fileNames) {
       final File file = new File(baseDirectory, fileName);
       if (file.isDirectory()) {
@@ -85,8 +84,8 @@ public class ZipUtil {
     }
   }
 
-  public static List<String> unzipFile(final File file,
-    final File outputDirectory) throws IOException {
+  public static List<String> unzipFile(final File file, final File outputDirectory)
+    throws IOException {
     final List<String> entryNames = new ArrayList<String>();
     final ZipFile zipFile = new ZipFile(file);
     for (final Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements();) {
@@ -141,8 +140,8 @@ public class ZipUtil {
     }
   }
 
-  public static void zipDirectory(final File directory,
-    final OutputStream outputStream) throws IOException {
+  public static void zipDirectory(final File directory, final OutputStream outputStream)
+    throws IOException {
     final ZipOutputStream zipOut = new ZipOutputStream(outputStream);
     addDirectoryToZipFile(zipOut, directory, directory);
     zipOut.close();

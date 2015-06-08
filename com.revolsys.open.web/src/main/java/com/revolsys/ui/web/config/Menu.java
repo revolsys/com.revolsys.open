@@ -30,8 +30,8 @@ public class Menu extends MenuItem {
   public Menu() {
   }
 
-  public Menu(final String name, final String title, final String uri,
-    final String anchor, final String condition) throws Exception {
+  public Menu(final String name, final String title, final String uri, final String anchor,
+    final String condition) throws Exception {
     super(name, title, uri, anchor, condition);
   }
 

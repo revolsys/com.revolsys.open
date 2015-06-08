@@ -19,8 +19,7 @@ import com.revolsys.util.Reorderable;
 public class ListReorderableTransferHandler extends TransferHandler {
   private static final long serialVersionUID = 1L;
 
-  private final DataFlavor localObjectFlavor = new DataFlavor(int[].class,
-      "Integer[]");
+  private final DataFlavor localObjectFlavor = new DataFlavor(int[].class, "Integer[]");
 
   private final String mimeType = this.localObjectFlavor.getMimeType();
 
@@ -56,8 +55,7 @@ public class ListReorderableTransferHandler extends TransferHandler {
   }
 
   @Override
-  protected void exportDone(final JComponent c, final Transferable t,
-    final int action) {
+  protected void exportDone(final JComponent c, final Transferable t, final int action) {
     if (action == TransferHandler.MOVE) {
       this.list.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }
@@ -104,8 +102,7 @@ public class ListReorderableTransferHandler extends TransferHandler {
         }
         final ListSelectionModel selectionModel = target.getSelectionModel();
         selectionModel.clearSelection();
-        selectionModel.addSelectionInterval(currentIndex - indices.length,
-          currentIndex - 1);
+        selectionModel.addSelectionInterval(currentIndex - indices.length, currentIndex - 1);
         return true;
       }
     } catch (final Throwable e) {

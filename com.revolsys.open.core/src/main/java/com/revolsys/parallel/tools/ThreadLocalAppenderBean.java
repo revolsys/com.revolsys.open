@@ -32,8 +32,8 @@ public class ThreadLocalAppenderBean implements BeanFactoryPostProcessor {
   }
 
   @Override
-  public void postProcessBeanFactory(
-    final ConfigurableListableBeanFactory beanFactory) throws BeansException {
+  public void postProcessBeanFactory(final ConfigurableListableBeanFactory beanFactory)
+    throws BeansException {
     final ThreadLocalFileAppender localAppender = ThreadLocalFileAppender.getAppender();
     final String logFilePath = this.logFile.getAbsolutePath();
     if (localAppender != null && this.logFile != null) {
@@ -47,8 +47,7 @@ public class ThreadLocalAppenderBean implements BeanFactoryPostProcessor {
       final org.apache.log4j.Logger rootLogger = org.apache.log4j.Logger.getRootLogger();
       try {
         final Layout layout = new PatternLayout("%d\t%p\t%m%n");
-        final Appender appender = new ThreadLocalFileAppender(layout,
-          logFilePath, false);
+        final Appender appender = new ThreadLocalFileAppender(layout, logFilePath, false);
         appender.setName("ThreadLocalLog");
         rootLogger.addAppender(appender);
       } catch (final IOException e) {

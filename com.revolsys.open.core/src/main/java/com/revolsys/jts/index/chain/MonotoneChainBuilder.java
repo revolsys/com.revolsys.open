@@ -61,7 +61,7 @@ public class MonotoneChainBuilder {
     // (since they cannot be used to establish a quadrant)
     final int size = points.getVertexCount();
     while (safeStart < size - 1
-        && points.getPoint(safeStart).equals(2,points.getPoint(safeStart + 1))) {
+      && points.getPoint(safeStart).equals(2, points.getPoint(safeStart + 1))) {
       safeStart++;
     }
     // check if there are NO non-zero-length segments
@@ -74,10 +74,9 @@ public class MonotoneChainBuilder {
     int last = start + 1;
     while (last < size) {
       // skip zero-length segments, but include them in the chain
-      if (!points.getPoint(last - 1).equals(2,points.getPoint(last))) {
+      if (!points.getPoint(last - 1).equals(2, points.getPoint(last))) {
         // compute quadrant for next possible segment in chain
-        final int quad = Quadrant.quadrant(points.getPoint(last - 1),
-          points.getPoint(last));
+        final int quad = Quadrant.quadrant(points.getPoint(last - 1), points.getPoint(last));
         if (quad != chainQuad) {
           break;
         }
@@ -95,15 +94,13 @@ public class MonotoneChainBuilder {
    * Return a list of the {@link MonotoneChain}s
    * for the given list of coordinates.
    */
-  public static List<MonotoneChain> getChains(final LineString points,
-    final Object context) {
+  public static List<MonotoneChain> getChains(final LineString points, final Object context) {
     final List<MonotoneChain> mcList = new ArrayList<>();
     final List<Integer> indices = getChainStartIndices(points);
     int startIndex = indices.get(0);
     for (int i = 1; i < indices.size(); i++) {
       final int endIndex = indices.get(i);
-      final MonotoneChain chain = new MonotoneChain(points, startIndex,
-        endIndex, context);
+      final MonotoneChain chain = new MonotoneChain(points, startIndex, endIndex, context);
       mcList.add(chain);
       startIndex = endIndex;
     }

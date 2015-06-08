@@ -9,6 +9,8 @@ import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 import com.revolsys.jts.util.Stopwatch;
 
 public class TestPerfFastDistanceFile {
+  static final int MAX_ITER = 10;
+
   static List loadWKT(final String filename) throws Exception {
     final WKTReader rdr = new WKTReader();
     final WKTFileReader fileRdr = new WKTFileReader(filename, rdr);
@@ -23,8 +25,6 @@ public class TestPerfFastDistanceFile {
       ex.printStackTrace();
     }
   }
-
-  static final int MAX_ITER = 10;
 
   boolean testFailed = false;
 

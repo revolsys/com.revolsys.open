@@ -106,8 +106,7 @@ public class AffineTransformation implements Cloneable
    * @param y the y-ordinate of a point on the reflection line
    * @return a transformation for the reflection
    */
-  public static AffineTransformation reflectionInstance(final double x,
-    final double y) {
+  public static AffineTransformation reflectionInstance(final double x, final double y) {
     final AffineTransformation trans = new AffineTransformation();
     trans.setToReflection(x, y);
     return trans;
@@ -123,8 +122,8 @@ public class AffineTransformation implements Cloneable
    * @param y1 the y-ordinate of a another point on the reflection line
    * @return a transformation for the reflection
    */
-  public static AffineTransformation reflectionInstance(final double x0,
-    final double y0, final double x1, final double y1) {
+  public static AffineTransformation reflectionInstance(final double x0, final double y0,
+    final double x1, final double y1) {
     final AffineTransformation trans = new AffineTransformation();
     trans.setToReflection(x0, y0, x1, y1);
     return trans;
@@ -155,8 +154,7 @@ public class AffineTransformation implements Cloneable
    * @param cosTheta the cosine of the rotation angle
    * @return a transformation for the rotation
    */
-  public static AffineTransformation rotationInstance(final double sinTheta,
-    final double cosTheta) {
+  public static AffineTransformation rotationInstance(final double sinTheta, final double cosTheta) {
     final AffineTransformation trans = new AffineTransformation();
     trans.setToRotation(sinTheta, cosTheta);
     return trans;
@@ -173,8 +171,8 @@ public class AffineTransformation implements Cloneable
    * @param y the y-ordinate of the rotation point
    * @return a transformation for the rotation
    */
-  public static AffineTransformation rotationInstance(final double theta,
-    final double x, final double y) {
+  public static AffineTransformation rotationInstance(final double theta, final double x,
+    final double y) {
     return rotationInstance(Math.sin(theta), Math.cos(theta), x, y);
   }
 
@@ -191,8 +189,8 @@ public class AffineTransformation implements Cloneable
    * @param y the y-ordinate of the rotation point
    * @return a transformation for the rotation
    */
-  public static AffineTransformation rotationInstance(final double sinTheta,
-    final double cosTheta, final double x, final double y) {
+  public static AffineTransformation rotationInstance(final double sinTheta, final double cosTheta,
+    final double x, final double y) {
     final AffineTransformation trans = new AffineTransformation();
     trans.setToRotation(sinTheta, cosTheta, x, y);
     return trans;
@@ -205,8 +203,7 @@ public class AffineTransformation implements Cloneable
    * @param yScale the value to scale by in the y direction
    * @return a transformation for the scaling
    */
-  public static AffineTransformation scaleInstance(final double xScale,
-    final double yScale) {
+  public static AffineTransformation scaleInstance(final double xScale, final double yScale) {
     final AffineTransformation trans = new AffineTransformation();
     trans.setToScale(xScale, yScale);
     return trans;
@@ -221,8 +218,8 @@ public class AffineTransformation implements Cloneable
    * @param y the y-ordinate of the point to scale around
    * @return a transformation for the scaling
    */
-  public static AffineTransformation scaleInstance(final double xScale,
-    final double yScale, final double x, final double y) {
+  public static AffineTransformation scaleInstance(final double xScale, final double yScale,
+    final double x, final double y) {
     final AffineTransformation trans = new AffineTransformation();
     trans.translate(-x, -y);
     trans.scale(xScale, yScale);
@@ -237,8 +234,7 @@ public class AffineTransformation implements Cloneable
    * @param yShear the value to shear by in the y direction
    * @return a tranformation for the shear
    */
-  public static AffineTransformation shearInstance(final double xShear,
-    final double yShear) {
+  public static AffineTransformation shearInstance(final double xShear, final double yShear) {
     final AffineTransformation trans = new AffineTransformation();
     trans.setToShear(xShear, yShear);
     return trans;
@@ -251,8 +247,7 @@ public class AffineTransformation implements Cloneable
    * @param y the value to translate by in the y direction
    * @return a tranformation for the translation
    */
-  public static AffineTransformation translationInstance(final double x,
-    final double y) {
+  public static AffineTransformation translationInstance(final double x, final double y) {
     final AffineTransformation trans = new AffineTransformation();
     trans.setToTranslation(x, y);
     return trans;
@@ -300,8 +295,8 @@ public class AffineTransformation implements Cloneable
    * @param m11 the entry for the [1, 1] element in the transformation matrix
    * @param m12 the entry for the [1, 2] element in the transformation matrix
    */
-  public AffineTransformation(final double m00, final double m01,
-    final double m02, final double m10, final double m11, final double m12) {
+  public AffineTransformation(final double m00, final double m01, final double m02,
+    final double m10, final double m11, final double m12) {
     setTransformation(m00, m01, m02, m10, m11, m12);
   }
 
@@ -335,9 +330,8 @@ public class AffineTransformation implements Cloneable
    * @param dest2 the mapped point for source point 2
    *
    */
-  public AffineTransformation(final Point src0, final Point src1,
-    final Point src2, final Point dest0, final Point dest1,
-    final Point dest2) {
+  public AffineTransformation(final Point src0, final Point src1, final Point src2,
+    final Point dest0, final Point dest1, final Point dest2) {
   }
 
   /**
@@ -435,7 +429,7 @@ public class AffineTransformation implements Cloneable
 
     final AffineTransformation trans = (AffineTransformation)obj;
     return this.m00 == trans.m00 && this.m01 == trans.m01 && this.m02 == trans.m02
-        && this.m10 == trans.m10 && this.m11 == trans.m11 && this.m12 == trans.m12;
+      && this.m10 == trans.m10 && this.m11 == trans.m11 && this.m12 == trans.m12;
   }
 
   /**
@@ -508,12 +502,10 @@ public class AffineTransformation implements Cloneable
    * @throws NoninvertibleTransformationException
    * @see #getDeterminant()
    */
-  public AffineTransformation getInverse()
-      throws NoninvertibleTransformationException {
+  public AffineTransformation getInverse() throws NoninvertibleTransformationException {
     final double det = getDeterminant();
     if (det == 0) {
-      throw new NoninvertibleTransformationException(
-          "Transformation is non-invertible");
+      throw new NoninvertibleTransformationException("Transformation is non-invertible");
     }
 
     final double im00 = this.m11 / det;
@@ -565,7 +557,8 @@ public class AffineTransformation implements Cloneable
    * @return true if this is the identity transformation
    */
   public boolean isIdentity() {
-    return this.m00 == 1 && this.m01 == 0 && this.m02 == 0 && this.m10 == 0 && this.m11 == 1 && this.m12 == 0;
+    return this.m00 == 1 && this.m01 == 0 && this.m02 == 0 && this.m10 == 0 && this.m11 == 1
+      && this.m12 == 0;
   }
 
   /**
@@ -593,8 +586,8 @@ public class AffineTransformation implements Cloneable
    * @param y1 the y-ordinate of a point on the line to reflect around
    * @return this transformation, with an updated matrix
    */
-  public AffineTransformation reflect(final double x0, final double y0,
-    final double x1, final double y1) {
+  public AffineTransformation reflect(final double x0, final double y0, final double x1,
+    final double y1) {
     compose(reflectionInstance(x0, y0, x1, y1));
     return this;
   }
@@ -624,8 +617,7 @@ public class AffineTransformation implements Cloneable
    * @param cosTheta the cosine of the angle to rotate by
    * @return this transformation, with an updated matrix
    */
-  public AffineTransformation rotate(final double sinTheta,
-    final double cosTheta) {
+  public AffineTransformation rotate(final double sinTheta, final double cosTheta) {
     compose(rotationInstance(sinTheta, cosTheta));
     return this;
   }
@@ -642,8 +634,7 @@ public class AffineTransformation implements Cloneable
    * @param y the y-ordinate of the rotation point
    * @return this transformation, with an updated matrix
    */
-  public AffineTransformation rotate(final double theta, final double x,
-    final double y) {
+  public AffineTransformation rotate(final double theta, final double x, final double y) {
     compose(rotationInstance(theta, x, y));
     return this;
   }
@@ -660,8 +651,8 @@ public class AffineTransformation implements Cloneable
    * @param y the y-ordinate of the rotation point
    * @return this transformation, with an updated matrix
    */
-  public AffineTransformation rotate(final double sinTheta,
-    final double cosTheta, final double x, final double y) {
+  public AffineTransformation rotate(final double sinTheta, final double cosTheta, final double x,
+    final double y) {
     compose(rotationInstance(sinTheta, cosTheta));
     return this;
   }
@@ -758,11 +749,10 @@ public class AffineTransformation implements Cloneable
    * @param y1 the Y ordinate of another point on the reflection line
    * @return this transformation, with an updated matrix
    */
-  public AffineTransformation setToReflection(final double x0, final double y0,
-    final double x1, final double y1) {
+  public AffineTransformation setToReflection(final double x0, final double y0, final double x1,
+    final double y1) {
     if (x0 == x1 && y0 == y1) {
-      throw new IllegalArgumentException(
-          "Reflection line points must be distinct");
+      throw new IllegalArgumentException("Reflection line points must be distinct");
     }
     // translate line vector to origin
     setToTranslation(-x0, -y0);
@@ -791,11 +781,10 @@ public class AffineTransformation implements Cloneable
    * @param y1 the Y ordinate of another point on the reflection line
    * @return this transformation, with an updated matrix
    */
-  public AffineTransformation setToReflectionBasic(final double x0,
-    final double y0, final double x1, final double y1) {
+  public AffineTransformation setToReflectionBasic(final double x0, final double y0,
+    final double x1, final double y1) {
     if (x0 == x1 && y0 == y1) {
-      throw new IllegalArgumentException(
-          "Reflection line points must be distinct");
+      throw new IllegalArgumentException("Reflection line points must be distinct");
     }
     final double dx = x1 - x0;
     final double dy = y1 - y0;
@@ -849,8 +838,7 @@ public class AffineTransformation implements Cloneable
    * @param cosTheta the cosine of the rotation angle
    * @return this transformation, with an updated matrix
    */
-  public AffineTransformation setToRotation(final double sinTheta,
-    final double cosTheta) {
+  public AffineTransformation setToRotation(final double sinTheta, final double cosTheta) {
     this.m00 = cosTheta;
     this.m01 = -sinTheta;
     this.m02 = 0.0;
@@ -879,8 +867,7 @@ public class AffineTransformation implements Cloneable
    * @param y the y-ordinate of the rotation point
    * @return this transformation, with an updated matrix
    */
-  public AffineTransformation setToRotation(final double theta, final double x,
-    final double y) {
+  public AffineTransformation setToRotation(final double theta, final double x, final double y) {
     setToRotation(Math.sin(theta), Math.cos(theta), x, y);
     return this;
   }
@@ -903,8 +890,8 @@ public class AffineTransformation implements Cloneable
    * @param y the y-ordinate of the rotation point
    * @return this transformation, with an updated matrix
    */
-  public AffineTransformation setToRotation(final double sinTheta,
-    final double cosTheta, final double x, final double y) {
+  public AffineTransformation setToRotation(final double sinTheta, final double cosTheta,
+    final double x, final double y) {
     this.m00 = cosTheta;
     this.m01 = -sinTheta;
     this.m02 = x - x * cosTheta + y * sinTheta;
@@ -928,8 +915,7 @@ public class AffineTransformation implements Cloneable
    * @param yScale the amount to scale y-ordinates by
    * @return this transformation, with an updated matrix
    */
-  public AffineTransformation setToScale(final double xScale,
-    final double yScale) {
+  public AffineTransformation setToScale(final double xScale, final double yScale) {
     this.m00 = xScale;
     this.m01 = 0.0;
     this.m02 = 0.0;
@@ -957,8 +943,7 @@ public class AffineTransformation implements Cloneable
    * @param yShear the y component to shear by
    * @return this transformation, with an updated matrix
    */
-  public AffineTransformation setToShear(final double xShear,
-    final double yShear) {
+  public AffineTransformation setToShear(final double xShear, final double yShear) {
     this.m00 = 1.0;
     this.m01 = xShear;
     this.m02 = 0.0;
@@ -1018,9 +1003,8 @@ public class AffineTransformation implements Cloneable
    * @param m12 the entry for the [1, 2] element in the transformation matrix
    * @return this transformation, with an updated matrix
    */
-  public AffineTransformation setTransformation(final double m00,
-    final double m01, final double m02, final double m10, final double m11,
-    final double m12) {
+  public AffineTransformation setTransformation(final double m00, final double m01,
+    final double m02, final double m10, final double m11, final double m12) {
     this.m00 = m00;
     this.m01 = m01;
     this.m02 = m02;
@@ -1057,7 +1041,7 @@ public class AffineTransformation implements Cloneable
   @Override
   public String toString() {
     return "AffineTransformation[[" + this.m00 + ", " + this.m01 + ", " + this.m02 + "], ["
-        + this.m10 + ", " + this.m11 + ", " + this.m12 + "]]";
+      + this.m10 + ", " + this.m11 + ", " + this.m12 + "]]";
   }
 
   /**

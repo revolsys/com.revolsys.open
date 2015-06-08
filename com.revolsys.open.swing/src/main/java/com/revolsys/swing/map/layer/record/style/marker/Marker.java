@@ -10,6 +10,6 @@ import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 public interface Marker {
   Icon getIcon(MarkerStyle style);
 
-  void render(Viewport2D viewport, Graphics2D graphics, MarkerStyle style,
-    double modelX, double modelY, double orientation);
+  void render(Viewport2D viewport, Graphics2D graphics, MarkerStyle style, double modelX,
+    double modelY, double orientation);
 }

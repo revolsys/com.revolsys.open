@@ -22,8 +22,7 @@ public class FieldValue {
 
   private String label = "";
 
-  public FieldValue(final Object value, final String stringValue,
-    final String label) {
+  public FieldValue(final Object value, final String stringValue, final String label) {
     this.value = value;
     if (stringValue != null) {
       this.stringValue = stringValue;

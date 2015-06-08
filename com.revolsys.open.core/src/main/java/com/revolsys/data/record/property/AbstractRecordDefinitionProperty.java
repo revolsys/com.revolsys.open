@@ -2,8 +2,7 @@ package com.revolsys.data.record.property;
 
 import com.revolsys.data.record.schema.RecordDefinition;
 
-public abstract class AbstractRecordDefinitionProperty implements
-RecordDefinitionProperty {
+public abstract class AbstractRecordDefinitionProperty implements RecordDefinitionProperty {
   private RecordDefinition recordDefinition;
 
   @Override

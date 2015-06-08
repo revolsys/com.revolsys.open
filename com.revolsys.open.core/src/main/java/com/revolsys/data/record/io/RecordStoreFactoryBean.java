@@ -8,8 +8,7 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
-public class RecordStoreFactoryBean extends
-AbstractFactoryBean<RecordStore> {
+public class RecordStoreFactoryBean extends AbstractFactoryBean<RecordStore> {
 
   private Map<String, Object> config = new LinkedHashMap<String, Object>();
 
@@ -24,8 +23,7 @@ AbstractFactoryBean<RecordStore> {
   }
 
   @Override
-  protected void destroyInstance(final RecordStore recordStore)
-      throws Exception {
+  protected void destroyInstance(final RecordStore recordStore) throws Exception {
     recordStore.close();
     this.properties = null;
     this.config = null;

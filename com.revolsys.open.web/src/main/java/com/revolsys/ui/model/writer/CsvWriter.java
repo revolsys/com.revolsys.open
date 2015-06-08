@@ -73,8 +73,7 @@ public class CsvWriter {
     this.firstCol = true;
   }
 
-  private void printRow(final TableModel model, final int row)
-      throws IOException {
+  private void printRow(final TableModel model, final int row) throws IOException {
     final int colCount = model.getColumnCount();
     for (int col = 0; col < colCount; col++) {
       final String value = model.getBodyCell(row, col);

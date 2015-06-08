@@ -66,6 +66,12 @@ package com.revolsys.jts.geom;
  *@version 1.7
  */
 public class IntersectionMatrix implements Cloneable {
+  public static final int EXTERIOR = Location.EXTERIOR.getIndex();
+
+  public static final int BOUNDARY = Location.BOUNDARY.getIndex();
+
+  public static final int INTERIOR = Location.INTERIOR.getIndex();
+
   /**
    *  Tests if the dimension value matches <tt>TRUE</tt>
    *  (i.e.  has value 0, 1, 2 or TRUE).
@@ -92,29 +98,24 @@ public class IntersectionMatrix implements Cloneable {
    *@return                          true if the dimension symbol matches
    *      the dimension value
    */
-  public static boolean matches(final int actualDimensionValue,
-    final char requiredDimensionSymbol) {
+  public static boolean matches(final int actualDimensionValue, final char requiredDimensionSymbol) {
     if (requiredDimensionSymbol == Dimension.SYM_DONTCARE) {
       return true;
     }
     if (requiredDimensionSymbol == Dimension.SYM_TRUE
-        && (actualDimensionValue >= 0 || actualDimensionValue == Dimension.TRUE)) {
+      && (actualDimensionValue >= 0 || actualDimensionValue == Dimension.TRUE)) {
       return true;
     }
-    if (requiredDimensionSymbol == Dimension.SYM_FALSE
-        && actualDimensionValue == Dimension.FALSE) {
+    if (requiredDimensionSymbol == Dimension.SYM_FALSE && actualDimensionValue == Dimension.FALSE) {
       return true;
     }
-    if (requiredDimensionSymbol == Dimension.SYM_P
-        && actualDimensionValue == Dimension.P) {
+    if (requiredDimensionSymbol == Dimension.SYM_P && actualDimensionValue == Dimension.P) {
       return true;
     }
-    if (requiredDimensionSymbol == Dimension.SYM_L
-        && actualDimensionValue == Dimension.L) {
+    if (requiredDimensionSymbol == Dimension.SYM_L && actualDimensionValue == Dimension.L) {
       return true;
     }
-    if (requiredDimensionSymbol == Dimension.SYM_A
-        && actualDimensionValue == Dimension.A) {
+    if (requiredDimensionSymbol == Dimension.SYM_A && actualDimensionValue == Dimension.A) {
       return true;
     }
     return false;
@@ -136,12 +137,6 @@ public class IntersectionMatrix implements Cloneable {
     final IntersectionMatrix m = new IntersectionMatrix(actualDimensionSymbols);
     return m.matches(requiredDimensionSymbols);
   }
-
-  public static final int EXTERIOR = Location.EXTERIOR.getIndex();
-
-  public static final int BOUNDARY = Location.BOUNDARY.getIndex();
-
-  public static final int INTERIOR = Location.INTERIOR.getIndex();
 
   /**
    *  Internal representation of this <code>IntersectionMatrix</code>.
@@ -229,8 +224,8 @@ public class IntersectionMatrix implements Cloneable {
    */
   public boolean isContains() {
     return isTrue(this.matrix[INTERIOR][INTERIOR])
-        && this.matrix[EXTERIOR][INTERIOR] == Dimension.FALSE
-        && this.matrix[EXTERIOR][BOUNDARY] == Dimension.FALSE;
+      && this.matrix[EXTERIOR][INTERIOR] == Dimension.FALSE
+      && this.matrix[EXTERIOR][BOUNDARY] == Dimension.FALSE;
   }
 
   /**
@@ -245,12 +240,11 @@ public class IntersectionMatrix implements Cloneable {
    */
   public boolean isCoveredBy() {
     final boolean hasPointInCommon = isTrue(this.matrix[INTERIOR][INTERIOR])
-        || isTrue(this.matrix[INTERIOR][BOUNDARY])
-        || isTrue(this.matrix[BOUNDARY][INTERIOR])
-        || isTrue(this.matrix[BOUNDARY][BOUNDARY]);
+      || isTrue(this.matrix[INTERIOR][BOUNDARY]) || isTrue(this.matrix[BOUNDARY][INTERIOR])
+      || isTrue(this.matrix[BOUNDARY][BOUNDARY]);
 
     return hasPointInCommon && this.matrix[INTERIOR][EXTERIOR] == Dimension.FALSE
-        && this.matrix[BOUNDARY][EXTERIOR] == Dimension.FALSE;
+      && this.matrix[BOUNDARY][EXTERIOR] == Dimension.FALSE;
   }
 
   /**
@@ -265,12 +259,11 @@ public class IntersectionMatrix implements Cloneable {
    */
   public boolean isCovers() {
     final boolean hasPointInCommon = isTrue(this.matrix[INTERIOR][INTERIOR])
-        || isTrue(this.matrix[INTERIOR][BOUNDARY])
-        || isTrue(this.matrix[BOUNDARY][INTERIOR])
-        || isTrue(this.matrix[BOUNDARY][BOUNDARY]);
+      || isTrue(this.matrix[INTERIOR][BOUNDARY]) || isTrue(this.matrix[BOUNDARY][INTERIOR])
+      || isTrue(this.matrix[BOUNDARY][BOUNDARY]);
 
     return hasPointInCommon && this.matrix[EXTERIOR][INTERIOR] == Dimension.FALSE
-        && this.matrix[EXTERIOR][BOUNDARY] == Dimension.FALSE;
+      && this.matrix[EXTERIOR][BOUNDARY] == Dimension.FALSE;
   }
 
   /**
@@ -298,22 +291,18 @@ public class IntersectionMatrix implements Cloneable {
    *@return                       <code>true</code> if the two <code>Geometry</code>s
    *      related by this <code>IntersectionMatrix</code> cross.
    */
-  public boolean isCrosses(final int dimensionOfGeometryA,
-    final int dimensionOfGeometryB) {
+  public boolean isCrosses(final int dimensionOfGeometryA, final int dimensionOfGeometryB) {
     if (dimensionOfGeometryA == Dimension.P && dimensionOfGeometryB == Dimension.L
-        || dimensionOfGeometryA == Dimension.P && dimensionOfGeometryB == Dimension.A
-        || dimensionOfGeometryA == Dimension.L && dimensionOfGeometryB == Dimension.A) {
-      return isTrue(this.matrix[INTERIOR][INTERIOR])
-          && isTrue(this.matrix[INTERIOR][EXTERIOR]);
+      || dimensionOfGeometryA == Dimension.P && dimensionOfGeometryB == Dimension.A
+      || dimensionOfGeometryA == Dimension.L && dimensionOfGeometryB == Dimension.A) {
+      return isTrue(this.matrix[INTERIOR][INTERIOR]) && isTrue(this.matrix[INTERIOR][EXTERIOR]);
     }
     if (dimensionOfGeometryA == Dimension.L && dimensionOfGeometryB == Dimension.P
-        || dimensionOfGeometryA == Dimension.A && dimensionOfGeometryB == Dimension.P
-        || dimensionOfGeometryA == Dimension.A && dimensionOfGeometryB == Dimension.L) {
-      return isTrue(this.matrix[INTERIOR][INTERIOR])
-          && isTrue(this.matrix[EXTERIOR][INTERIOR]);
+      || dimensionOfGeometryA == Dimension.A && dimensionOfGeometryB == Dimension.P
+      || dimensionOfGeometryA == Dimension.A && dimensionOfGeometryB == Dimension.L) {
+      return isTrue(this.matrix[INTERIOR][INTERIOR]) && isTrue(this.matrix[EXTERIOR][INTERIOR]);
     }
-    if (dimensionOfGeometryA == Dimension.L
-        && dimensionOfGeometryB == Dimension.L) {
+    if (dimensionOfGeometryA == Dimension.L && dimensionOfGeometryB == Dimension.L) {
       return this.matrix[INTERIOR][INTERIOR] == 0;
     }
     return false;
@@ -328,9 +317,9 @@ public class IntersectionMatrix implements Cloneable {
    */
   public boolean isDisjoint() {
     return this.matrix[INTERIOR][INTERIOR] == Dimension.FALSE
-        && this.matrix[INTERIOR][BOUNDARY] == Dimension.FALSE
-        && this.matrix[BOUNDARY][INTERIOR] == Dimension.FALSE
-        && this.matrix[BOUNDARY][BOUNDARY] == Dimension.FALSE;
+      && this.matrix[INTERIOR][BOUNDARY] == Dimension.FALSE
+      && this.matrix[BOUNDARY][INTERIOR] == Dimension.FALSE
+      && this.matrix[BOUNDARY][BOUNDARY] == Dimension.FALSE;
   }
 
   /**
@@ -351,16 +340,15 @@ public class IntersectionMatrix implements Cloneable {
    *      related by this <code>IntersectionMatrix</code> are equal; the
    *      <code>Geometry</code>s must have the same dimension to be equal
    */
-  public boolean isEquals(final int dimensionOfGeometryA,
-    final int dimensionOfGeometryB) {
+  public boolean isEquals(final int dimensionOfGeometryA, final int dimensionOfGeometryB) {
     if (dimensionOfGeometryA != dimensionOfGeometryB) {
       return false;
     }
     return isTrue(this.matrix[INTERIOR][INTERIOR])
-        && this.matrix[INTERIOR][EXTERIOR] == Dimension.FALSE
-        && this.matrix[BOUNDARY][EXTERIOR] == Dimension.FALSE
-        && this.matrix[EXTERIOR][INTERIOR] == Dimension.FALSE
-        && this.matrix[EXTERIOR][BOUNDARY] == Dimension.FALSE;
+      && this.matrix[INTERIOR][EXTERIOR] == Dimension.FALSE
+      && this.matrix[BOUNDARY][EXTERIOR] == Dimension.FALSE
+      && this.matrix[EXTERIOR][INTERIOR] == Dimension.FALSE
+      && this.matrix[EXTERIOR][BOUNDARY] == Dimension.FALSE;
   }
 
   /**
@@ -387,19 +375,15 @@ public class IntersectionMatrix implements Cloneable {
    *      function to return <code>true</code>, the <code>Geometry</code>s must
    *      be two points, two curves or two surfaces.
    */
-  public boolean isOverlaps(final int dimensionOfGeometryA,
-    final int dimensionOfGeometryB) {
+  public boolean isOverlaps(final int dimensionOfGeometryA, final int dimensionOfGeometryB) {
     if (dimensionOfGeometryA == Dimension.P && dimensionOfGeometryB == Dimension.P
-        || dimensionOfGeometryA == Dimension.A && dimensionOfGeometryB == Dimension.A) {
-      return isTrue(this.matrix[INTERIOR][INTERIOR])
-          && isTrue(this.matrix[INTERIOR][EXTERIOR])
-          && isTrue(this.matrix[EXTERIOR][INTERIOR]);
+      || dimensionOfGeometryA == Dimension.A && dimensionOfGeometryB == Dimension.A) {
+      return isTrue(this.matrix[INTERIOR][INTERIOR]) && isTrue(this.matrix[INTERIOR][EXTERIOR])
+        && isTrue(this.matrix[EXTERIOR][INTERIOR]);
     }
-    if (dimensionOfGeometryA == Dimension.L
-        && dimensionOfGeometryB == Dimension.L) {
-      return this.matrix[INTERIOR][INTERIOR] == 1
-          && isTrue(this.matrix[INTERIOR][EXTERIOR])
-          && isTrue(this.matrix[EXTERIOR][INTERIOR]);
+    if (dimensionOfGeometryA == Dimension.L && dimensionOfGeometryB == Dimension.L) {
+      return this.matrix[INTERIOR][INTERIOR] == 1 && isTrue(this.matrix[INTERIOR][EXTERIOR])
+        && isTrue(this.matrix[EXTERIOR][INTERIOR]);
     }
     return false;
   }
@@ -414,20 +398,18 @@ public class IntersectionMatrix implements Cloneable {
    *      s related by this <code>IntersectionMatrix</code> touch; Returns false
    *      if both <code>Geometry</code>s are points.
    */
-  public boolean isTouches(final int dimensionOfGeometryA,
-    final int dimensionOfGeometryB) {
+  public boolean isTouches(final int dimensionOfGeometryA, final int dimensionOfGeometryB) {
     if (dimensionOfGeometryA > dimensionOfGeometryB) {
       // no need to get transpose because pattern matrix is symmetrical
       return isTouches(dimensionOfGeometryB, dimensionOfGeometryA);
     }
     if (dimensionOfGeometryA == Dimension.A && dimensionOfGeometryB == Dimension.A
-        || dimensionOfGeometryA == Dimension.L && dimensionOfGeometryB == Dimension.L
-        || dimensionOfGeometryA == Dimension.L && dimensionOfGeometryB == Dimension.A
-        || dimensionOfGeometryA == Dimension.P && dimensionOfGeometryB == Dimension.A
-        || dimensionOfGeometryA == Dimension.P && dimensionOfGeometryB == Dimension.L) {
+      || dimensionOfGeometryA == Dimension.L && dimensionOfGeometryB == Dimension.L
+      || dimensionOfGeometryA == Dimension.L && dimensionOfGeometryB == Dimension.A
+      || dimensionOfGeometryA == Dimension.P && dimensionOfGeometryB == Dimension.A
+      || dimensionOfGeometryA == Dimension.P && dimensionOfGeometryB == Dimension.L) {
       return this.matrix[INTERIOR][INTERIOR] == Dimension.FALSE
-          && (isTrue(this.matrix[INTERIOR][BOUNDARY])
-              || isTrue(this.matrix[BOUNDARY][INTERIOR]) || isTrue(this.matrix[BOUNDARY][BOUNDARY]));
+        && (isTrue(this.matrix[INTERIOR][BOUNDARY]) || isTrue(this.matrix[BOUNDARY][INTERIOR]) || isTrue(this.matrix[BOUNDARY][BOUNDARY]));
     }
     return false;
   }
@@ -441,8 +423,8 @@ public class IntersectionMatrix implements Cloneable {
    */
   public boolean isWithin() {
     return isTrue(this.matrix[INTERIOR][INTERIOR])
-        && this.matrix[INTERIOR][EXTERIOR] == Dimension.FALSE
-        && this.matrix[BOUNDARY][EXTERIOR] == Dimension.FALSE;
+      && this.matrix[INTERIOR][EXTERIOR] == Dimension.FALSE
+      && this.matrix[BOUNDARY][EXTERIOR] == Dimension.FALSE;
   }
 
   /**
@@ -457,13 +439,11 @@ public class IntersectionMatrix implements Cloneable {
    */
   public boolean matches(final String requiredDimensionSymbols) {
     if (requiredDimensionSymbols.length() != 9) {
-      throw new IllegalArgumentException("Should be length 9: "
-          + requiredDimensionSymbols);
+      throw new IllegalArgumentException("Should be length 9: " + requiredDimensionSymbols);
     }
     for (int ai = 0; ai < 3; ai++) {
       for (int bi = 0; bi < 3; bi++) {
-        if (!matches(this.matrix[ai][bi],
-          requiredDimensionSymbols.charAt(3 * ai + bi))) {
+        if (!matches(this.matrix[ai][bi], requiredDimensionSymbols.charAt(3 * ai + bi))) {
           return false;
         }
       }
@@ -485,8 +465,7 @@ public class IntersectionMatrix implements Cloneable {
     this.matrix[row][column] = dimensionValue;
   }
 
-  public void set(final Location row, final Location column,
-    final int dimensionValue) {
+  public void set(final Location row, final Location column, final int dimensionValue) {
     set(row.getIndex(), column.getIndex(), dimensionValue);
   }
 
@@ -533,8 +512,7 @@ public class IntersectionMatrix implements Cloneable {
    *      element. The order of dimension values from least to greatest is
    *      <code>{DONTCARE, TRUE, FALSE, 0, 1, 2}</code>.
    */
-  public void setAtLeast(final int row, final int column,
-    final int minimumDimensionValue) {
+  public void setAtLeast(final int row, final int column, final int minimumDimensionValue) {
     if (this.matrix[row][column] < minimumDimensionValue) {
       this.matrix[row][column] = minimumDimensionValue;
     }
@@ -554,8 +532,7 @@ public class IntersectionMatrix implements Cloneable {
     for (int i = 0; i < minimumDimensionSymbols.length(); i++) {
       final int row = i / 3;
       final int col = i % 3;
-      setAtLeast(row, col,
-        Dimension.toDimensionValue(minimumDimensionSymbols.charAt(i)));
+      setAtLeast(row, col, Dimension.toDimensionValue(minimumDimensionSymbols.charAt(i)));
     }
   }
 
@@ -571,8 +548,7 @@ public class IntersectionMatrix implements Cloneable {
    *      element. The order of dimension values from least to greatest is
    *      <code>{DONTCARE, TRUE, FALSE, 0, 1, 2}</code>.
    */
-  public void setAtLeastIfValid(final int row, final int column,
-    final int minimumDimensionValue) {
+  public void setAtLeastIfValid(final int row, final int column, final int minimumDimensionValue) {
     if (row >= 0 && column >= 0) {
       setAtLeast(row, column, minimumDimensionValue);
     }

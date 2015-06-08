@@ -204,8 +204,7 @@ public class Numbers {
     return result;
   }
 
-  public static double[] toDoubleArray(final Number[] numbers, int offset,
-    int length) {
+  public static double[] toDoubleArray(final Number[] numbers, int offset, int length) {
     if (length > 0) {
       if (offset + length > numbers.length) {
         length = numbers.length - offset;

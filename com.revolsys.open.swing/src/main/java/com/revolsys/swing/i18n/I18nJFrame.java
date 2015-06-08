@@ -17,13 +17,11 @@ public class I18nJFrame extends JFrame {
   public I18nJFrame() throws HeadlessException {
   }
 
-  public I18nJFrame(final Class<?> clazz, final String title)
-      throws HeadlessException {
+  public I18nJFrame(final Class<?> clazz, final String title) throws HeadlessException {
     setTitle(title);
   }
 
-  public I18nJFrame(final Class<?> clazz, final String title,
-    final GraphicsConfiguration gc) {
+  public I18nJFrame(final Class<?> clazz, final String title, final GraphicsConfiguration gc) {
     super(gc);
     setTitle(title);
   }

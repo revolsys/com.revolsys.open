@@ -18,6 +18,8 @@ import com.revolsys.util.CollectionUtil;
 
 public class StringConverterRegistry {
 
+  public static StringConverterRegistry instance = new StringConverterRegistry();
+
   public static void clearInstance() {
     instance = null;
   }
@@ -36,8 +38,8 @@ public class StringConverterRegistry {
     if (value == null) {
       return null;
     } else {
-      final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-          .getConverter(valueClass);
+      final StringConverter<Object> converter = StringConverterRegistry.getInstance().getConverter(
+        valueClass);
       if (converter == null) {
         return (V)value;
       } else {
@@ -97,8 +99,6 @@ public class StringConverterRegistry {
     }
   }
 
-  public static StringConverterRegistry instance = new StringConverterRegistry();
-
   private final Map<Class<?>, StringConverter<?>> classConverterMap = new HashMap<Class<?>, StringConverter<?>>();
 
   public StringConverterRegistry() {
@@ -130,8 +130,7 @@ public class StringConverterRegistry {
     addConverter(new BoundingBoxStringConverter());
   }
 
-  public void addConverter(final Class<?> clazz,
-    final StringConverter<?> converter) {
+  public void addConverter(final Class<?> clazz, final StringConverter<?> converter) {
     this.classConverterMap.put(clazz, converter);
   }
 
@@ -156,8 +155,7 @@ public class StringConverterRegistry {
   }
 
   @SuppressWarnings("rawtypes")
-  private StringConverter get(final Set<Class<?>> interfaces,
-    final Class<?> clazz) {
+  private StringConverter get(final Set<Class<?>> interfaces, final Class<?> clazz) {
     StringConverter converter = null;
     if (clazz != null) {
       converter = this.classConverterMap.get(clazz);

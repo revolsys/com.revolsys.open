@@ -62,9 +62,8 @@ public class LambertConicConformal extends AbstractCoordinatesProjection {
   }
 
   @Override
-  public void inverse(final double x, final double y,
-    final double[] targetCoordinates, final int targetOffset,
-    final int targetAxisCount) {
+  public void inverse(final double x, final double y, final double[] targetCoordinates,
+    final int targetOffset, final int targetAxisCount) {
 
     double dX = x - this.x0;
     double dY = y - this.y0;
@@ -88,7 +87,7 @@ public class LambertConicConformal extends AbstractCoordinatesProjection {
       final double sinPhi = Math.sin(phi);
       final double eSinPhi = this.e * sinPhi;
       final double phi1 = Angle.PI_OVER_2 - 2
-          * Math.atan(t * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.e / 2));
+        * Math.atan(t * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.e / 2));
       delta = Math.abs(phi1 - phi);
       phi = phi1;
     } while (!Double.isNaN(phi) && delta > 1.0e-011);
@@ -104,9 +103,8 @@ public class LambertConicConformal extends AbstractCoordinatesProjection {
   }
 
   @Override
-  public void project(final double lambda, final double phi,
-    final double[] targetCoordinates, final int targetOffset,
-    final int targetAxisCount) {
+  public void project(final double lambda, final double phi, final double[] targetCoordinates,
+    final int targetOffset, final int targetAxisCount) {
 
     final double t = t(phi);
     final double rho = this.a * this.f * Math.pow(t, this.n);
@@ -124,7 +122,7 @@ public class LambertConicConformal extends AbstractCoordinatesProjection {
     final double eSinPhi = this.e * sinPhi;
 
     final double t = Math.tan(Angle.PI_OVER_4 - phi / 2)
-        / Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.e / 2);
+      / Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.e / 2);
     return t;
   }
 }

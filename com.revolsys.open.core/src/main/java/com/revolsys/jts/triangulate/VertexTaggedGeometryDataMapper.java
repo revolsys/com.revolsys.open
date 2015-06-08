@@ -80,8 +80,7 @@ public class VertexTaggedGeometryDataMapper {
     }
   }
 
-  private void loadVertices(final Iterable<? extends Point> points,
-    final Object data) {
+  private void loadVertices(final Iterable<? extends Point> points, final Object data) {
     for (final Point point : points) {
       this.coordDataMap.put(point.clonePoint(), data);
     }

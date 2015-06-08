@@ -58,8 +58,7 @@ public class CascadingUndoManager extends UndoManager {
 
   @Override
   public boolean isEventsEnabled() {
-    return super.isEventsEnabled()
-        && (this.parent == null || this.parent.isEventsEnabled());
+    return super.isEventsEnabled() && (this.parent == null || this.parent.isEventsEnabled());
   }
 
   @Override

@@ -21,8 +21,7 @@ import com.revolsys.jts.geom.LineString;
 public class NodeAttributes {
   protected static class Methods {
     public static Set<Double> edgeAngles(final Node<?> node) {
-      final Set<Double> angles = new TreeSet<Double>(
-          new NumericComparator<Double>());
+      final Set<Double> angles = new TreeSet<Double>(new NumericComparator<Double>());
       for (final Edge<?> edge : node.getInEdges()) {
         final double toAngle = edge.getToAngle();
         angles.add(toAngle);
@@ -70,8 +69,7 @@ public class NodeAttributes {
       final Map<LineString, Map<String, Set<Edge<T>>>> lineEdgeMap = new HashMap<LineString, Map<String, Set<Edge<T>>>>();
       for (final Edge<T> edge : new HashSet<Edge<T>>(edges)) {
         LineString line = edge.getLine();
-        Map<String, Set<Edge<T>>> edgesByType = edgesByTypeForLine(lineEdgeMap,
-          line);
+        Map<String, Set<Edge<T>>> edgesByType = edgesByTypeForLine(lineEdgeMap, line);
         if (edgesByType == null) {
           edgesByType = new HashMap<String, Set<Edge<T>>>();
           if (!edge.isForwards(node)) {
@@ -105,8 +103,7 @@ public class NodeAttributes {
     }
 
     private static <T> Map<String, Set<Edge<T>>> edgesByTypeForLine(
-      final Map<LineString, Map<String, Set<Edge<T>>>> lineEdgeMap,
-      final LineString line) {
+      final Map<LineString, Map<String, Set<Edge<T>>>> lineEdgeMap, final LineString line) {
       for (final Entry<LineString, Map<String, Set<Edge<T>>>> entry : lineEdgeMap.entrySet()) {
         final LineString keyLine = entry.getKey();
         if (LineStringUtil.equalsIgnoreDirection2d(line, keyLine)) {
@@ -142,8 +139,8 @@ public class NodeAttributes {
       return typePaths;
     }
 
-    public static Set<Double> getAnglesForType(
-      final Map<String, Set<Double>> anglesByType, final String typePath) {
+    public static Set<Double> getAnglesForType(final Map<String, Set<Double>> anglesByType,
+      final String typePath) {
       Set<Double> angles = anglesByType.get(typePath);
       if (angles == null) {
         angles = new TreeSet<Double>(new NumericComparator<Double>());
@@ -153,6 +150,20 @@ public class NodeAttributes {
     }
   }
 
+  private static String EDGE_ANGLES = "edgeAngles";
+
+  private static String EDGE_ANGLES_BY_TYPE = "edgeAnglesByType";
+
+  private static String EDGE_TYPE_NAMES = "edgeTypeNames";
+
+  private static String EDGE_RECORD_DEFINITIONS = "edgeRecordDefinitions";
+
+  private static String EDGES_BY_LINE_AND_TYPE_NAME = "edgesByLineAndTypeName";
+
+  private static String EDGES_BY_TYPE = "edgesByType";
+
+  private static String EDGES_BY_TYPE_NAME_AND_LINE = "edgesByTypeNameAndLine";
+
   public static Set<Double> getEdgeAngles(final Node<?> node) {
     return getField(node, EDGE_ANGLES);
   }
@@ -161,15 +172,13 @@ public class NodeAttributes {
     return getField(node, EDGE_ANGLES_BY_TYPE);
   }
 
-  public static <T> Set<Double> getEdgeAnglesByType(final Node<T> node,
-    final String typePath) {
+  public static <T> Set<Double> getEdgeAnglesByType(final Node<T> node, final String typePath) {
     final Map<String, Set<Double>> anglesByType = getEdgeAnglesByType(node);
     final Set<Double> angles = anglesByType.get(typePath);
     return angles;
   }
 
-  public static Set<RecordDefinition> getEdgeRecordDefinitions(
-    final Node<? extends Object> node) {
+  public static Set<RecordDefinition> getEdgeRecordDefinitions(final Node<? extends Object> node) {
     return getField(node, EDGE_RECORD_DEFINITIONS);
   }
 
@@ -190,8 +199,7 @@ public class NodeAttributes {
     return getField(node, EDGES_BY_TYPE);
   }
 
-  public static <T> List<Edge<T>> getEdgesByType(final Node<T> node,
-    final String typePath) {
+  public static <T> List<Edge<T>> getEdgesByType(final Node<T> node, final String typePath) {
     final Map<String, List<Edge<T>>> edgesByType = getEdgesByType(node);
     final List<Edge<T>> edges = edgesByType.get(typePath);
     if (edges != null) {
@@ -214,25 +222,11 @@ public class NodeAttributes {
     final String fieldName = NodeAttributes.class.getName() + "." + name;
     if (!node.hasAttribute(fieldName)) {
       final ObjectAttributeProxy<T, V> proxy = new InvokeMethodObjectAttributeProxy<T, V>(
-          Methods.class, name, Node.class);
+        Methods.class, name, Node.class);
       node.setAttribute(fieldName, proxy);
     }
     final V value = (V)node.getField(fieldName);
     return value;
   }
-
-  private static String EDGE_ANGLES = "edgeAngles";
-
-  private static String EDGE_ANGLES_BY_TYPE = "edgeAnglesByType";
-
-  private static String EDGE_TYPE_NAMES = "edgeTypeNames";
-
-  private static String EDGE_RECORD_DEFINITIONS = "edgeRecordDefinitions";
-
-  private static String EDGES_BY_LINE_AND_TYPE_NAME = "edgesByLineAndTypeName";
-
-  private static String EDGES_BY_TYPE = "edgesByType";
-
-  private static String EDGES_BY_TYPE_NAME_AND_LINE = "edgesByTypeNameAndLine";
 
 }

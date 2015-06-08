@@ -212,11 +212,9 @@ public class IsSimpleOp {
           final Segment segment2 = (Segment)lineSegment;
           final int partIndex2 = segment2.getPartIndex();
           final int segmentIndex2 = segment2.getSegmentIndex();
-          if (partIndex2 > partIndex || partIndex == partIndex2
-              && segmentIndex2 > segmentIndex) {
+          if (partIndex2 > partIndex || partIndex == partIndex2 && segmentIndex2 > segmentIndex) {
             if (segment.equals(lineSegment)) {
-              final SelfOverlapSegmentError error = new SelfOverlapSegmentError(
-                segment);
+              final SelfOverlapSegmentError error = new SelfOverlapSegmentError(segment);
               this.errors.add(error);
               if (this.shortCircuit) {
                 return false;
@@ -246,10 +244,10 @@ public class IsSimpleOp {
                   }
                 } else {
                   if (!segment.isLineClosed() && !segment2.isLineClosed()) {
-                    final boolean segment1EndIntersection = isEndIntersection(
-                      segment, pointIntersection);
-                    final boolean segment2EndIntersection = isEndIntersection(
-                      segment2, pointIntersection);
+                    final boolean segment1EndIntersection = isEndIntersection(segment,
+                      pointIntersection);
+                    final boolean segment2EndIntersection = isEndIntersection(segment2,
+                      pointIntersection);
 
                     if (segment1EndIntersection && segment2EndIntersection) {
                       isIntersection = false;
@@ -281,8 +279,7 @@ public class IsSimpleOp {
                 } else if (lineSegment.equals(lineIntersection)) {
                   error = new SelfOverlapSegmentError(segment2);
                 } else {
-                  error = new SelfOverlapLineSegmentError(this.geometry,
-                    lineIntersection);
+                  error = new SelfOverlapLineSegmentError(this.geometry, lineIntersection);
                 }
                 this.errors.add(error);
                 if (this.shortCircuit) {

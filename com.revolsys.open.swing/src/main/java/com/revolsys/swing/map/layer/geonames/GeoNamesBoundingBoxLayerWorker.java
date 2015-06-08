@@ -19,14 +19,12 @@ import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.marker.ImageMarker;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 
-public class GeoNamesBoundingBoxLayerWorker extends
-AbstractSwingWorker<List<LayerRecord>, Void> {
+public class GeoNamesBoundingBoxLayerWorker extends AbstractSwingWorker<List<LayerRecord>, Void> {
 
-  public static BoundingBoxRecordLayer create(
-    final Map<String, Object> properties) {
+  public static BoundingBoxRecordLayer create(final Map<String, Object> properties) {
     final GeometryFactory wgs84 = GeometryFactory.floating3(4326);
-    final BoundingBoxRecordLayer layer = new BoundingBoxRecordLayer("geoname",
-      "Geo Names", GeoNamesBoundingBoxLayerWorker.class, wgs84);
+    final BoundingBoxRecordLayer layer = new BoundingBoxRecordLayer("geoname", "Geo Names",
+      GeoNamesBoundingBoxLayerWorker.class, wgs84);
 
     final BufferedImage image = Icons.getImage("world");
     final ImageMarker marker = new ImageMarker(image);

@@ -48,8 +48,7 @@ public class RectanglePredicateSyntheticTest extends TestCase {
     super(name);
   }
 
-  public Geometry createAngle(final Point base, final double size,
-    final int quadrant) {
+  public Geometry createAngle(final Point base, final double size, final int quadrant) {
     final int[][] factor = {
       {
         1, 0
@@ -65,18 +64,18 @@ public class RectanglePredicateSyntheticTest extends TestCase {
     final int xFac = factor[quadrant][0];
     final int yFac = factor[quadrant][1];
 
-    final Point p0 = new PointDouble(base.getX() + xFac * size,
-      base.getY() + yFac * size, Point.NULL_ORDINATE);
-    final Point p2 = new PointDouble(base.getX() + yFac * size,
-      base.getY() + -xFac * size, Point.NULL_ORDINATE);
+    final Point p0 = new PointDouble(base.getX() + xFac * size, base.getY() + yFac * size,
+      Point.NULL_ORDINATE);
+    final Point p2 = new PointDouble(base.getX() + yFac * size, base.getY() + -xFac * size,
+      Point.NULL_ORDINATE);
 
     return this.fact.lineString(new Point[] {
       p0, base, p2
     });
   }
 
-  public List<Geometry> createTestGeometries(final BoundingBox env,
-    final double inc, final double size) {
+  public List<Geometry> createTestGeometries(final BoundingBox env, final double inc,
+    final double size) {
     final List<Geometry> testGeoms = new ArrayList<Geometry>();
 
     for (double y = env.getMinY(); y <= env.getMaxY(); y += inc) {
@@ -92,17 +91,14 @@ public class RectanglePredicateSyntheticTest extends TestCase {
   }
 
   private List<Geometry> getTestGeometries() {
-    final BoundingBox testEnv = new BoundingBoxDoubleGf(2, this.rectEnv.getMinX()
-      - this.bufSize, this.rectEnv.getMinY() - this.bufSize,
-      this.rectEnv.getMaxX() + this.bufSize, this.rectEnv.getMaxY()
-      + this.bufSize);
-    final List<Geometry> testGeoms = createTestGeometries(testEnv, 5,
-      this.testGeomSize);
+    final BoundingBox testEnv = new BoundingBoxDoubleGf(2, this.rectEnv.getMinX() - this.bufSize,
+      this.rectEnv.getMinY() - this.bufSize, this.rectEnv.getMaxX() + this.bufSize,
+      this.rectEnv.getMaxY() + this.bufSize);
+    final List<Geometry> testGeoms = createTestGeometries(testEnv, 5, this.testGeomSize);
     return testGeoms;
   }
 
-  private void runRectanglePredicates(final Geometry rect,
-    final Geometry testGeom) {
+  private void runRectanglePredicates(final Geometry rect, final Geometry testGeom) {
     final boolean intersectsValue = rect.intersects(testGeom);
     final boolean relateIntersectsValue = rect.relate(testGeom).isIntersects();
     final boolean intersectsOK = intersectsValue == relateIntersectsValue;
@@ -126,8 +122,7 @@ public class RectanglePredicateSyntheticTest extends TestCase {
     for (final Object element : testGeoms) {
       final Geometry testGeom = (Geometry)element;
 
-      final SegmentDensifier densifier = new SegmentDensifier(
-        (LineString)testGeom);
+      final SegmentDensifier densifier = new SegmentDensifier((LineString)testGeom);
       final LineString denseLine = (LineString)densifier.densify(this.testGeomSize / 400);
 
       runRectanglePredicates(this.rect, denseLine);

@@ -6,8 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
-public class BeanReferenceListFactoryBean<T> extends
-AbstractFactoryBean<List<T>> {
+public class BeanReferenceListFactoryBean<T> extends AbstractFactoryBean<List<T>> {
 
   private List<String> beanNames = new ArrayList<String>();
 

@@ -11,8 +11,7 @@ import com.revolsys.jtstest.testrunner.TopologyTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-  GeometrySuite.class, OperationTests.class, MasterTester.class,
-  TopologyTest.class
+  GeometrySuite.class, OperationTests.class, MasterTester.class, TopologyTest.class
 })
 public class JtsTestSuite {
 

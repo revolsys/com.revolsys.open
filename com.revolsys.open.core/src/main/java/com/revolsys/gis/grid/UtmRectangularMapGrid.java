@@ -108,10 +108,8 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
    * @param north The number of sheets north.
    * @return The new map sheet.
    */
-  public String getMapTileName(final String sheet, final int east,
-    final int north) {
-    final double lon = MathUtil.makePrecise(1.0, getLongitude(sheet)
-      + east * getTileHeight());
+  public String getMapTileName(final String sheet, final int east, final int north) {
+    final double lon = MathUtil.makePrecise(1.0, getLongitude(sheet) + east * getTileHeight());
     final double lat = getLatitude(sheet) + north * getTileHeight();
     return getMapTileName(lon, lat);
   }
@@ -130,8 +128,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     if (horizontalZone < 24 && verticalZone >= 'n') {
       return 26700 + horizontalZone;
     } else {
-      throw new IllegalArgumentException("UTM Zone " + sheet
-        + " is not in North America");
+      throw new IllegalArgumentException("UTM Zone " + sheet + " is not in North America");
     }
   }
 
@@ -149,8 +146,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     if (horizontalZone < 24 && verticalZone >= 'n') {
       return 26900 + horizontalZone;
     } else {
-      throw new IllegalArgumentException("UTM Zone " + sheet
-        + " is not in North America");
+      throw new IllegalArgumentException("UTM Zone " + sheet + " is not in North America");
     }
   }
 
@@ -159,8 +155,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     final String mapTileName = getMapTileName(x, y);
     final BoundingBox boundingBox = getBoundingBox(mapTileName);
     final String formattedMapTileName = getFormattedMapTileName(mapTileName);
-    return new SimpleRectangularMapTile(this, formattedMapTileName,
-      mapTileName, boundingBox);
+    return new SimpleRectangularMapTile(this, formattedMapTileName, mapTileName, boundingBox);
   }
 
   @Override
@@ -170,8 +165,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     final double lat = boundingBox.getMinY();
     final String tileName = getMapTileName(lon, lat);
     final String formattedMapTileName = getFormattedMapTileName(mapTileName);
-    return new SimpleRectangularMapTile(this, formattedMapTileName, tileName,
-      boundingBox);
+    return new SimpleRectangularMapTile(this, formattedMapTileName, tileName, boundingBox);
   }
 
   @Override

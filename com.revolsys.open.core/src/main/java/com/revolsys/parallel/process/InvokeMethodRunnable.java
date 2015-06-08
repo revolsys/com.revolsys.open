@@ -18,8 +18,7 @@ import com.revolsys.util.Property;
  */
 public class InvokeMethodRunnable extends AbstractRunnable implements Process {
 
-  public static void run(final Object object, final String methodName,
-    final List<Object> parameters) {
+  public static void run(final Object object, final String methodName, final List<Object> parameters) {
     final Object[] parameterArray = parameters.toArray();
     Property.invoke(object, methodName, parameterArray);
   }
@@ -58,8 +57,7 @@ public class InvokeMethodRunnable extends AbstractRunnable implements Process {
    * @param methodName The name of the method to invoke.
    * @param parameters The parameters to pass to the method.
    */
-  protected InvokeMethodRunnable(final String methodName,
-    final Object... parameters) {
+  protected InvokeMethodRunnable(final String methodName, final Object... parameters) {
     this.methodName = methodName;
     this.parameters = parameters;
   }
@@ -71,8 +69,7 @@ public class InvokeMethodRunnable extends AbstractRunnable implements Process {
   public void doRun() {
     final Object object = getObject();
     if (object == null) {
-      LoggerFactory.getLogger(getClass())
-      .debug("Object cannot be null " + this);
+      LoggerFactory.getLogger(getClass()).debug("Object cannot be null " + this);
     } else {
       Property.invoke(object, this.methodName, this.parameters);
     }

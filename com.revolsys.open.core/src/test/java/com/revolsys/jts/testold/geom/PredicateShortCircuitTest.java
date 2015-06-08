@@ -83,16 +83,12 @@ public class PredicateShortCircuitTest extends TestCase {
 
   public void doPredicates(final Geometry a, final Geometry b) throws Exception {
     assertTrue(a.contains(b) == a.relate(b).isContains());
-    assertTrue(a.crosses(b) == a.relate(b).isCrosses(a.getDimension(),
-      b.getDimension()));
+    assertTrue(a.crosses(b) == a.relate(b).isCrosses(a.getDimension(), b.getDimension()));
     assertTrue(a.disjoint(b) == a.relate(b).isDisjoint());
-    assertTrue(a.equals(b) == a.relate(b).isEquals(a.getDimension(),
-      b.getDimension()));
+    assertTrue(a.equals(b) == a.relate(b).isEquals(a.getDimension(), b.getDimension()));
     assertTrue(a.intersects(b) == a.relate(b).isIntersects());
-    assertTrue(a.overlaps(b) == a.relate(b).isOverlaps(a.getDimension(),
-      b.getDimension()));
-    assertTrue(a.touches(b) == a.relate(b).isTouches(a.getDimension(),
-      b.getDimension()));
+    assertTrue(a.overlaps(b) == a.relate(b).isOverlaps(a.getDimension(), b.getDimension()));
+    assertTrue(a.touches(b) == a.relate(b).isTouches(a.getDimension(), b.getDimension()));
     assertTrue(a.within(b) == a.relate(b).isWithin());
   }
 

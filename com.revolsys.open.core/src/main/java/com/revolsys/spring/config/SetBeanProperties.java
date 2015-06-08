@@ -13,8 +13,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.TypedStringValue;
 
-public class SetBeanProperties implements BeanFactoryPostProcessor,
-InitializingBean {
+public class SetBeanProperties implements BeanFactoryPostProcessor, InitializingBean {
   private Map<String, String> beanPropertyNames = new LinkedHashMap<String, String>();
 
   private String targetTypeName;
@@ -25,8 +24,7 @@ InitializingBean {
 
   private Object propertyValue;
 
-  public void addBeanPropertyName(final String beanName,
-    final String propertyName) {
+  public void addBeanPropertyName(final String beanName, final String propertyName) {
     this.beanPropertyNames.put(beanName, propertyName);
   }
 
@@ -69,8 +67,8 @@ InitializingBean {
   }
 
   @Override
-  public void postProcessBeanFactory(
-    final ConfigurableListableBeanFactory beanFactory) throws BeansException {
+  public void postProcessBeanFactory(final ConfigurableListableBeanFactory beanFactory)
+    throws BeansException {
     for (final Entry<String, String> beanPropertyName : this.beanPropertyNames.entrySet()) {
       String beanName = beanPropertyName.getKey();
       final String[] aliases = beanFactory.getAliases(beanName);

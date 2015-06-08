@@ -8,13 +8,13 @@ import com.revolsys.data.record.schema.RecordDefinition;
 
 public class RecordMapTableModel extends AbstractSingleRecordTableModel {
 
+  private static final long serialVersionUID = 1L;
+
   public static JComponent create(final RecordDefinition recordDefinition,
     final Map<String, Object> values, final boolean editable) {
     final RecordMapTableModel model = new RecordMapTableModel(recordDefinition, values, editable);
     return createTable(model);
   }
-
-  private static final long serialVersionUID = 1L;
 
   private Map<String, Object> values;
 

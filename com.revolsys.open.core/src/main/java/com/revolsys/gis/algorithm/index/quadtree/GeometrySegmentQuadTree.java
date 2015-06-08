@@ -14,6 +14,14 @@ import com.revolsys.jts.geom.segment.Segment;
 
 public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
 
+  private static final String GEOMETRY_SEGMENT_INDEX = "GeometrySegmentQuadTree";
+
+  private static final long serialVersionUID = 1L;
+
+  static {
+    GeometryEqualsExact3d.addExclude(GEOMETRY_SEGMENT_INDEX);
+  }
+
   public static GeometrySegmentQuadTree get(final Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
       final Reference<GeometrySegmentQuadTree> reference = GeometryProperties.getGeometryProperty(
@@ -32,14 +40,6 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
       return index;
     }
     return new GeometrySegmentQuadTree(null);
-  }
-
-  private static final String GEOMETRY_SEGMENT_INDEX = "GeometrySegmentQuadTree";
-
-  private static final long serialVersionUID = 1L;
-
-  static {
-    GeometryEqualsExact3d.addExclude(GEOMETRY_SEGMENT_INDEX);
   }
 
   private final Geometry geometry;

@@ -83,8 +83,7 @@ public class LocationIndexedLine {
    * @param endIndex the index of the end of the interval
    * @return the linear interval between the indices
    */
-  public Geometry extractLine(final LinearLocation startIndex,
-    final LinearLocation endIndex) {
+  public Geometry extractLine(final LinearLocation startIndex, final LinearLocation endIndex) {
     return ExtractLineByLocation.extract(this.linearGeom, startIndex, endIndex);
   }
 
@@ -119,11 +118,10 @@ public class LocationIndexedLine {
    *    (positive is to the left, negative is to the right)
    * @return the Point at the given index
    */
-  public Point extractPoint(final LinearLocation index,
-    final double offsetDistance) {
+  public Point extractPoint(final LinearLocation index, final double offsetDistance) {
     final LinearLocation indexLow = index.toLowest(this.linearGeom);
-    return indexLow.getSegment(this.linearGeom).pointAlongOffset(
-      indexLow.getSegmentFraction(), offsetDistance);
+    return indexLow.getSegment(this.linearGeom).pointAlongOffset(indexLow.getSegmentFraction(),
+      offsetDistance);
   }
 
   /**
@@ -181,8 +179,7 @@ public class LocationIndexedLine {
    *
    * @see #project(Point)
    */
-  public LinearLocation indexOfAfter(final Point pt,
-    final LinearLocation minIndex) {
+  public LinearLocation indexOfAfter(final Point pt, final LinearLocation minIndex) {
     return LocationIndexOfPoint.indexOfAfter(this.linearGeom, pt, minIndex);
   }
 

@@ -73,8 +73,7 @@ public class WeakCache<K, V> implements Map<K, V> {
         oldValue = oldReference.get();
       }
     } else {
-      final Reference<V> oldReference = this.cache.put(key,
-        new WeakReference<V>(value));
+      final Reference<V> oldReference = this.cache.put(key, new WeakReference<V>(value));
       if (oldReference != null) {
         oldValue = oldReference.get();
       }

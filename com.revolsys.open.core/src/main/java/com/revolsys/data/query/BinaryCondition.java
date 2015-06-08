@@ -16,21 +16,19 @@ public class BinaryCondition extends Condition {
 
   private QueryValue right;
 
-  public BinaryCondition(final QueryValue left, final String operator,
-    final QueryValue right) {
+  public BinaryCondition(final QueryValue left, final String operator, final QueryValue right) {
     this.left = left;
     this.operator = operator;
     this.right = right;
   }
 
-  public BinaryCondition(final String name, final String operator,
-    final Object value) {
+  public BinaryCondition(final String name, final String operator, final Object value) {
     this(new Column(name), operator, new Value(value));
   }
 
   @Override
-  public void appendDefaultSql(final Query query,
-    final RecordStore recordStore, final StringBuilder buffer) {
+  public void appendDefaultSql(final Query query, final RecordStore recordStore,
+    final StringBuilder buffer) {
     if (this.left == null) {
       buffer.append("NULL");
     } else {
@@ -102,6 +100,6 @@ public class BinaryCondition extends Condition {
   @Override
   public String toString() {
     return StringConverterRegistry.toString(this.left) + " " + this.operator + " "
-        + StringConverterRegistry.toString(this.right);
+      + StringConverterRegistry.toString(this.right);
   }
 }

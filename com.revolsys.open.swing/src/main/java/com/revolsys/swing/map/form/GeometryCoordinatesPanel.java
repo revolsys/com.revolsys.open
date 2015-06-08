@@ -22,12 +22,10 @@ import com.revolsys.swing.table.geometry.GeometryCoordinatesTableModel;
 import com.revolsys.swing.table.renderer.BaseTableCellRenderer;
 import com.revolsys.util.Property;
 
-public class GeometryCoordinatesPanel extends ValueField implements
-TableModelListener {
+public class GeometryCoordinatesPanel extends ValueField implements TableModelListener {
   private static final long serialVersionUID = 1L;
 
-  private final GeometryCoordinatesTableModel model = new GeometryCoordinatesTableModel(
-    this);
+  private final GeometryCoordinatesTableModel model = new GeometryCoordinatesTableModel(this);
 
   private final BaseJTable table;
 
@@ -39,8 +37,7 @@ TableModelListener {
 
   final BaseTableCellEditor cellEditor;
 
-  public GeometryCoordinatesPanel(final RecordLayerForm form,
-    final String fieldName) {
+  public GeometryCoordinatesPanel(final RecordLayerForm form, final String fieldName) {
     super(fieldName, null);
     setLayout(new BorderLayout());
 
@@ -70,8 +67,8 @@ TableModelListener {
   }
 
   @Override
-  public void setFieldInvalid(final String message,
-    final Color foregroundColor, final Color backgroundColor) {
+  public void setFieldInvalid(final String message, final Color foregroundColor,
+    final Color backgroundColor) {
     super.setFieldInvalid(message, foregroundColor, backgroundColor);
     setForeground(null);
     setBackground(null);

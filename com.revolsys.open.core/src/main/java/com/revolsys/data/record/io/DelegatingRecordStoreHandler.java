@@ -11,16 +11,15 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.data.record.schema.RecordStore;
 
 public class DelegatingRecordStoreHandler implements InvocationHandler {
-  public static <T extends RecordStore> T create(final String label,
-    final Class<T> interfaceClass, final T recordStore) {
+  public static <T extends RecordStore> T create(final String label, final Class<T> interfaceClass,
+    final T recordStore) {
     final ClassLoader classLoader = recordStore.getClass().getClassLoader();
     final Class<?>[] interfaces = new Class<?>[] {
       interfaceClass
     };
-    final DelegatingRecordStoreHandler handler = new DelegatingRecordStoreHandler(
-      label, recordStore);
-    final T proxyStore = (T)Proxy.newProxyInstance(classLoader, interfaces,
-      handler);
+    final DelegatingRecordStoreHandler handler = new DelegatingRecordStoreHandler(label,
+      recordStore);
+    final T proxyStore = (T)Proxy.newProxyInstance(classLoader, interfaces, handler);
     return proxyStore;
 
   }
@@ -28,15 +27,12 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
   @SuppressWarnings("unchecked")
   public static <T extends RecordStore> T create(final String label,
     final Map<String, ? extends Object> config) {
-    final ClassLoader classLoader = Thread.currentThread()
-        .getContextClassLoader();
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     final Class<?>[] interfaces = new Class<?>[] {
       RecordStoreFactoryRegistry.getRecordStoreInterfaceClass(config)
     };
-    final DelegatingRecordStoreHandler handler = new DelegatingRecordStoreHandler(
-      label, config);
-    final T proxyStore = (T)Proxy.newProxyInstance(classLoader, interfaces,
-      handler);
+    final DelegatingRecordStoreHandler handler = new DelegatingRecordStoreHandler(label, config);
+    final T proxyStore = (T)Proxy.newProxyInstance(classLoader, interfaces, handler);
     try {
       proxyStore.initialize();
     } catch (final Throwable t) {
@@ -55,14 +51,12 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
   public DelegatingRecordStoreHandler() {
   }
 
-  public DelegatingRecordStoreHandler(final String label,
-    final Map<String, ? extends Object> config) {
+  public DelegatingRecordStoreHandler(final String label, final Map<String, ? extends Object> config) {
     this.label = label;
     this.config = new HashMap<String, Object>(config);
   }
 
-  public DelegatingRecordStoreHandler(final String label,
-    final RecordStore recordStore) {
+  public DelegatingRecordStoreHandler(final String label, final RecordStore recordStore) {
     this.label = label;
     this.recordStore = recordStore;
   }
@@ -72,8 +66,7 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
       final RecordStore recordStore = RecordStoreFactoryRegistry.createRecordStore(this.config);
       return recordStore;
     } else {
-      throw new UnsupportedOperationException(
-          "Record store must be set manually");
+      throw new UnsupportedOperationException("Record store must be set manually");
     }
   }
 
@@ -86,8 +79,8 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
   }
 
   @Override
-  public Object invoke(final Object proxy, final Method method,
-    final Object[] args) throws Throwable {
+  public Object invoke(final Object proxy, final Method method, final Object[] args)
+    throws Throwable {
     int numArgs;
     if (args == null) {
       numArgs = 0;

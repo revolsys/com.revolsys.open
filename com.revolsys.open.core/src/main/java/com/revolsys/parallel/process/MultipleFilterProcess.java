@@ -28,7 +28,7 @@ public class MultipleFilterProcess<T> extends BaseInOutProcess<T, T> {
 
   @Override
   protected void destroy() {
-    for (Channel<T> channel : this.filters.values()) {
+    for (final Channel<T> channel : this.filters.values()) {
       if (channel != null) {
         channel.writeDisconnect();
       }
@@ -47,8 +47,7 @@ public class MultipleFilterProcess<T> extends BaseInOutProcess<T, T> {
   }
 
   @Override
-  protected void process(final Channel<T> in, final Channel<T> out,
-    final T object) {
+  protected void process(final Channel<T> in, final Channel<T> out, final T object) {
     for (final Entry<Filter<T>, Channel<T>> entry : this.filters.entrySet()) {
       final Filter<T> filter = entry.getKey();
       final Channel<T> filterOut = entry.getValue();
@@ -61,8 +60,7 @@ public class MultipleFilterProcess<T> extends BaseInOutProcess<T, T> {
     }
   }
 
-  protected boolean processFilter(final T object, final Filter<T> filter,
-    final Channel<T> filterOut) {
+  protected boolean processFilter(final T object, final Filter<T> filter, final Channel<T> filterOut) {
     if (filter.accept(object)) {
       if (filterOut != null) {
         try {

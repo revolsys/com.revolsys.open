@@ -94,17 +94,15 @@ public class MonotoneChain {
 
   private int id;// useful for optimizing chain comparisons
 
-  public MonotoneChain(final LineString pts, final int start,
-    final int end, final Object context) {
+  public MonotoneChain(final LineString pts, final int start, final int end, final Object context) {
     this.points = pts;
     this.start = start;
     this.end = end;
     this.context = context;
   }
 
-  private void computeOverlaps(final int start0, final int end0,
-    final MonotoneChain mc, final int start1, final int end1,
-    final MonotoneChainOverlapAction mco) {
+  private void computeOverlaps(final int start0, final int end0, final MonotoneChain mc,
+    final int start1, final int end1, final MonotoneChainOverlapAction mco) {
     final Point p00 = this.points.getPoint(start0);
     final Point p01 = this.points.getPoint(end0);
     final Point p10 = mc.points.getPoint(start1);
@@ -156,13 +154,12 @@ public class MonotoneChain {
    * @param searchEnv the search envelope
    * @param mco the overlap action to execute on selected segments
    */
-  public void computeOverlaps(final MonotoneChain mc,
-    final MonotoneChainOverlapAction mco) {
+  public void computeOverlaps(final MonotoneChain mc, final MonotoneChainOverlapAction mco) {
     computeOverlaps(this.start, this.end, mc, mc.start, mc.end, mco);
   }
 
-  private void computeSelect(final BoundingBox searchEnv, final int start0,
-    final int end0, final MonotoneChainSelectAction mcs) {
+  private void computeSelect(final BoundingBox searchEnv, final int start0, final int end0,
+    final MonotoneChainSelectAction mcs) {
     final Point p0 = this.points.getPoint(start0);
     final Point p1 = this.points.getPoint(end0);
     mcs.tempEnv1 = new BoundingBoxDoubleGf(p0, p1);
@@ -255,8 +252,7 @@ public class MonotoneChain {
    * @param searchEnv the search envelope
    * @param mcs the select action to execute on selected segments
    */
-  public void select(final BoundingBox searchEnv,
-    final MonotoneChainSelectAction mcs) {
+  public void select(final BoundingBox searchEnv, final MonotoneChainSelectAction mcs) {
     computeSelect(searchEnv, this.start, this.end, mcs);
   }
 

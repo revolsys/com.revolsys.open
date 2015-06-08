@@ -19,42 +19,32 @@ import com.revolsys.data.types.DataTypes;
 public class JdbcFieldDefinition extends FieldDefinition {
   public static JdbcFieldDefinition createField(final Object value) {
     if (value == null) {
-      return new JdbcFieldDefinition(null, null, DataTypes.OBJECT, Types.OTHER,
-        0, 0, false, null, null);
+      return new JdbcFieldDefinition(null, null, DataTypes.OBJECT, Types.OTHER, 0, 0, false, null,
+        null);
     } else if (value instanceof CharSequence) {
-      return new JdbcStringFieldDefinition(null, null, Types.CHAR, -1, false, null,
-        null);
+      return new JdbcStringFieldDefinition(null, null, Types.CHAR, -1, false, null, null);
     } else if (value instanceof BigInteger) {
-      return new JdbcLongFieldDefinition(null, null, Types.BIGINT, -1, false, null,
-        null);
+      return new JdbcLongFieldDefinition(null, null, Types.BIGINT, -1, false, null, null);
     } else if (value instanceof Long) {
-      return new JdbcLongFieldDefinition(null, null, Types.BIGINT, -1, false, null,
-        null);
+      return new JdbcLongFieldDefinition(null, null, Types.BIGINT, -1, false, null, null);
     } else if (value instanceof Integer) {
-      return new JdbcIntegerFieldDefinition(null, null, Types.INTEGER, -1, false,
-        null, null);
+      return new JdbcIntegerFieldDefinition(null, null, Types.INTEGER, -1, false, null, null);
     } else if (value instanceof Short) {
-      return new JdbcShortFieldDefinition(null, null, Types.SMALLINT, -1, false,
-        null, null);
+      return new JdbcShortFieldDefinition(null, null, Types.SMALLINT, -1, false, null, null);
     } else if (value instanceof Byte) {
-      return new JdbcByteFieldDefinition(null, null, Types.TINYINT, -1, false,
-        null, null);
+      return new JdbcByteFieldDefinition(null, null, Types.TINYINT, -1, false, null, null);
     } else if (value instanceof Double) {
-      return new JdbcDoubleFieldDefinition(null, null, Type.DOUBLE, -1, false,
-        null, null);
+      return new JdbcDoubleFieldDefinition(null, null, Type.DOUBLE, -1, false, null, null);
     } else if (value instanceof Float) {
-      return new JdbcFloatFieldDefinition(null, null, Types.FLOAT, -1, false, null,
-        null);
+      return new JdbcFloatFieldDefinition(null, null, Types.FLOAT, -1, false, null, null);
     } else if (value instanceof BigDecimal) {
-      return new JdbcBigDecimalFieldDefinition(null, null, Types.NUMERIC, -1,
-        -1, false, null, null);
+      return new JdbcBigDecimalFieldDefinition(null, null, Types.NUMERIC, -1, -1, false, null, null);
     } else if (value instanceof Date) {
       return new JdbcDateFieldDefinition(null, null, -1, false, null, null);
     } else if (value instanceof java.util.Date) {
       return new JdbcTimestampFieldDefinition(null, null, -1, false, null, null);
     } else if (value instanceof Boolean) {
-      return new JdbcBooleanFieldDefinition(null, null, Types.BIT, -1, false,
-        null, null);
+      return new JdbcBooleanFieldDefinition(null, null, Types.BIT, -1, false, null, null);
     } else {
       return new JdbcFieldDefinition();
     }
@@ -69,10 +59,9 @@ public class JdbcFieldDefinition extends FieldDefinition {
   private JdbcFieldDefinition() {
   }
 
-  public JdbcFieldDefinition(final String dbName, final String name,
-    final DataType type, final int sqlType, final int length, final int scale,
-    final boolean required, final String description,
-    final Map<String, Object> properties) {
+  public JdbcFieldDefinition(final String dbName, final String name, final DataType type,
+    final int sqlType, final int length, final int scale, final boolean required,
+    final String description, final Map<String, Object> properties) {
     super(name, type, length, scale, required, description, properties);
     this.dbName = dbName;
     this.sqlType = sqlType;
@@ -93,8 +82,7 @@ public class JdbcFieldDefinition extends FieldDefinition {
     }
   }
 
-  public void addInsertStatementPlaceHolder(final StringBuilder sql,
-    final boolean generateKeys) {
+  public void addInsertStatementPlaceHolder(final StringBuilder sql, final boolean generateKeys) {
     addStatementPlaceHolder(sql);
   }
 
@@ -108,9 +96,8 @@ public class JdbcFieldDefinition extends FieldDefinition {
 
   @Override
   public JdbcFieldDefinition clone() {
-    return new JdbcFieldDefinition(this.dbName, getName(), getType(),
-      getSqlType(), getLength(), getScale(), isRequired(), getDescription(),
-      getProperties());
+    return new JdbcFieldDefinition(this.dbName, getName(), getType(), getSqlType(), getLength(),
+      getScale(), isRequired(), getDescription(), getProperties());
   }
 
   public String getDbName() {
@@ -125,8 +112,8 @@ public class JdbcFieldDefinition extends FieldDefinition {
     return this.quoteName;
   }
 
-  public int setFieldValueFromResultSet(final ResultSet resultSet,
-    final int columnIndex, final Record record) throws SQLException {
+  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final Record record) throws SQLException {
     final Object value = resultSet.getObject(columnIndex);
     setValue(record, value);
     return columnIndex + 1;
@@ -139,8 +126,8 @@ public class JdbcFieldDefinition extends FieldDefinition {
     return setPreparedStatementValue(statement, parameterIndex, value);
   }
 
-  public int setPreparedStatementValue(final PreparedStatement statement,
-    final int parameterIndex, final Object value) throws SQLException {
+  public int setPreparedStatementValue(final PreparedStatement statement, final int parameterIndex,
+    final Object value) throws SQLException {
     statement.setObject(parameterIndex, value);
     return parameterIndex + 1;
   }

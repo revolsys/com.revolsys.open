@@ -10,6 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 public interface Action {
   void init(ServletContext context) throws ServletException;
 
-  void process(HttpServletRequest request, HttpServletResponse response)
-      throws IOException, ServletException;
+  void process(HttpServletRequest request, HttpServletResponse response) throws IOException,
+    ServletException;
 }

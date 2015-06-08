@@ -22,8 +22,11 @@ import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 
 public class Triangle extends AbstractLineString {
-  public static Triangle createClockwiseTriangle(final Point c0,
-    final Point c1, final Point c2) {
+  private static final long serialVersionUID = -4513931832875328029L;
+
+  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(0, 1.0);
+
+  public static Triangle createClockwiseTriangle(final Point c0, final Point c1, final Point c2) {
     try {
       if (CoordinatesUtil.orientationIndex(c0, c1, c2) == CGAlgorithms.CLOCKWISE) {
         return new Triangle(c0, c1, c2);
@@ -36,20 +39,15 @@ public class Triangle extends AbstractLineString {
 
   }
 
-  private static final long serialVersionUID = -4513931832875328029L;
-
   private final double[] coordinates = new double[9];
-
-  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(
-    0, 1.0);
 
   public Triangle() {
   }
 
   public Triangle(final Point... points) {
     if (points.length > 3) {
-      throw new IllegalArgumentException(
-        "A traingle must have exeactly 3 points not " + getVertexCount());
+      throw new IllegalArgumentException("A traingle must have exeactly 3 points not "
+        + getVertexCount());
     }
     for (int i = 0; i < 3; i++) {
       final Point point = points[i];
@@ -59,11 +57,10 @@ public class Triangle extends AbstractLineString {
     }
   }
 
-  private void addIntersection(final GeometryFactory geometryFactory,
-    final Set<Point> coordinates, final Point line1Start, final Point line1End,
-    final Point line2Start, final Point line2End) {
-    final LineString intersections = LineSegmentUtil.getIntersection(
-      geometryFactory, line1Start, line1End, line2Start, line2End);
+  private void addIntersection(final GeometryFactory geometryFactory, final Set<Point> coordinates,
+    final Point line1Start, final Point line1End, final Point line2Start, final Point line2End) {
+    final LineString intersections = LineSegmentUtil.getIntersection(geometryFactory, line1Start,
+      line1End, line2Start, line2End);
     for (int i = 0; i < intersections.getVertexCount(); i++) {
       final Point point = intersections.getPoint(i);
       coordinates.add(point);
@@ -102,8 +99,7 @@ public class Triangle extends AbstractLineString {
 
     final Point centre = CoordinatesUtil.circumcentre(x1, y1, x2, y2, x3, y3);
     final double angleB = Angle.angle(x1, y1, x2, y2, x3, y3);
-    final double radius = MathUtil.distance(x1, y1, x3, y3) / Math.sin(angleB)
-        * 0.5;
+    final double radius = MathUtil.distance(x1, y1, x3, y3) / Math.sin(angleB) * 0.5;
 
     return new Circle(centre, radius);
   }
@@ -159,12 +155,8 @@ public class Triangle extends AbstractLineString {
     final double len2 = a.distance(b);
     final double circum = len0 + len1 + len2;
 
-    final double inCentreX = (len0 * a.getX() + len1 * b.getX() + len2
-        * c.getX())
-        / circum;
-    final double inCentreY = (len0 * a.getY() + len1 * b.getY() + len2
-        * c.getY())
-        / circum;
+    final double inCentreX = (len0 * a.getX() + len1 * b.getX() + len2 * c.getX()) / circum;
+    final double inCentreY = (len0 * a.getY() + len1 * b.getY() + len2 * c.getY()) / circum;
     return new PointDouble(inCentreX, inCentreY);
   }
 
@@ -180,10 +172,8 @@ public class Triangle extends AbstractLineString {
     return getPoint(2);
   }
 
-  public Polygon getPolygon(
-    final GeometryFactory geometryFactory) {
-    final LinearRing shell = geometryFactory.linearRing(getP0(), getP1(),
-      getP2(), getP0());
+  public Polygon getPolygon(final GeometryFactory geometryFactory) {
+    final LinearRing shell = geometryFactory.linearRing(getP0(), getP1(), getP2(), getP0());
     return geometryFactory.polygon(shell);
   }
 
@@ -200,31 +190,23 @@ public class Triangle extends AbstractLineString {
    */
   @Override
   public boolean hasVertex(final Point coordinate) {
-    final int triangleOrientation = CoordinatesUtil.orientationIndex(getP0(),
-      getP1(), getP2());
-    final int p0p1Orientation = CoordinatesUtil.orientationIndex(getP0(),
-      getP1(), coordinate);
-    if (p0p1Orientation != triangleOrientation
-        && p0p1Orientation != CGAlgorithms.COLLINEAR) {
+    final int triangleOrientation = CoordinatesUtil.orientationIndex(getP0(), getP1(), getP2());
+    final int p0p1Orientation = CoordinatesUtil.orientationIndex(getP0(), getP1(), coordinate);
+    if (p0p1Orientation != triangleOrientation && p0p1Orientation != CGAlgorithms.COLLINEAR) {
       return false;
     }
-    final int p1p2Orientation = CoordinatesUtil.orientationIndex(getP1(),
-      getP2(), coordinate);
-    if (p1p2Orientation != triangleOrientation
-        && p1p2Orientation != CGAlgorithms.COLLINEAR) {
+    final int p1p2Orientation = CoordinatesUtil.orientationIndex(getP1(), getP2(), coordinate);
+    if (p1p2Orientation != triangleOrientation && p1p2Orientation != CGAlgorithms.COLLINEAR) {
       return false;
     }
-    final int p2p0Orientation = CoordinatesUtil.orientationIndex(getP2(),
-      getP0(), coordinate);
-    if (p2p0Orientation != triangleOrientation
-        && p2p0Orientation != CGAlgorithms.COLLINEAR) {
+    final int p2p0Orientation = CoordinatesUtil.orientationIndex(getP2(), getP0(), coordinate);
+    if (p2p0Orientation != triangleOrientation && p2p0Orientation != CGAlgorithms.COLLINEAR) {
       return false;
     }
     return true;
   }
 
-  public LineSegment intersection(final GeometryFactory geometryFactory,
-    final LineSegment line) {
+  public LineSegment intersection(final GeometryFactory geometryFactory, final LineSegment line) {
     final Point lc0 = line.getPoint(0);
     final Point lc1 = line.getPoint(1);
     final boolean lc0Contains = hasVertex(lc0);

@@ -32,8 +32,7 @@ import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.ExceptionUtil;
 
-public class XbaseIterator extends AbstractIterator<Record> implements
-RecordIterator {
+public class XbaseIterator extends AbstractIterator<Record> implements RecordIterator {
   public static final char CHARACTER_TYPE = 'C';
 
   private static final Map<Character, DataType> DATA_TYPES = new HashMap<>();
@@ -50,8 +49,6 @@ RecordIterator {
 
   public static final char OBJECT_TYPE = 'o';
 
-  private boolean closeFile = true;
-
   static {
     DATA_TYPES.put(CHARACTER_TYPE, DataTypes.STRING);
     DATA_TYPES.put(NUMBER_TYPE, DataTypes.DECIMAL);
@@ -62,6 +59,8 @@ RecordIterator {
     DATA_TYPES.put(OBJECT_TYPE, DataTypes.OBJECT);
 
   }
+
+  private boolean closeFile = true;
 
   private int currentDeletedCount = 0;
 
@@ -93,16 +92,14 @@ RecordIterator {
 
   private String typeName;
 
-  public XbaseIterator(final Resource resource,
-    final RecordFactory recordFactory) throws IOException {
+  public XbaseIterator(final Resource resource, final RecordFactory recordFactory)
+    throws IOException {
     this.typeName = "/" + this.typeName;
     this.resource = resource;
 
     this.recordFactory = recordFactory;
-    final Resource codePageResource = SpringUtil.getResourceWithExtension(
-      resource, "cpg");
-    if (!(codePageResource instanceof NonExistingResource)
-        && codePageResource.exists()) {
+    final Resource codePageResource = SpringUtil.getResourceWithExtension(resource, "cpg");
+    if (!(codePageResource instanceof NonExistingResource) && codePageResource.exists()) {
       final String charsetName = SpringUtil.getContents(codePageResource);
       try {
         this.charset = Charset.forName(charsetName);
@@ -190,8 +187,7 @@ RecordIterator {
     if (dateString.trim().length() == 0 || dateString.equals("0")) {
       return null;
     } else {
-      return new java.sql.Date(DateUtil.getDate("yyyyMMdd", dateString)
-        .getTime());
+      return new java.sql.Date(DateUtil.getDate("yyyyMMdd", dateString).getTime());
     }
   }
 
@@ -199,8 +195,7 @@ RecordIterator {
     return this.deletedCount;
   }
 
-  private Object getMemo(final int startIndex, final int len)
-      throws IOException {
+  private Object getMemo(final int startIndex, final int len) throws IOException {
     return null;
     /*
      * String memoIndexString = new String(record, startIndex, len).trim(); if
@@ -254,8 +249,7 @@ RecordIterator {
       try {
         number = new BigDecimal(numberString.trim());
       } catch (final Throwable e) {
-        ExceptionUtil.log(getClass(), "'" + numberString
-          + " 'is not a valid number", e);
+        ExceptionUtil.log(getClass(), "'" + numberString + " 'is not a valid number", e);
       }
     }
     return number;
@@ -275,8 +269,7 @@ RecordIterator {
   }
 
   private String getString(final int startIndex, final int len) {
-    final String text = new String(this.recordBuffer, startIndex, len,
-      this.charset);
+    final String text = new String(this.recordBuffer, startIndex, len, this.charset);
     return text.trim();
   }
 
@@ -365,8 +358,7 @@ RecordIterator {
       if (fieldType == MEMO_TYPE) {
         length = Integer.MAX_VALUE;
       }
-      this.recordDefinition.addField(fieldName.toString(), dataType, length,
-        decimalCount, false);
+      this.recordDefinition.addField(fieldName.toString(), dataType, length, decimalCount, false);
     }
     if (this.mappedFile) {
       final EndianMappedByteBuffer file = (EndianMappedByteBuffer)this.in;
@@ -388,8 +380,7 @@ RecordIterator {
       final EndianMappedByteBuffer file = (EndianMappedByteBuffer)this.in;
       this.position = position;
       try {
-        final long offset = this.firstIndex + (long)(this.recordSize + 1)
-            * position;
+        final long offset = this.firstIndex + (long)(this.recordSize + 1) * position;
         file.seek(offset);
         setLoadNext(true);
       } catch (final IOException e) {
@@ -397,8 +388,7 @@ RecordIterator {
       }
 
     } else {
-      throw new UnsupportedOperationException(
-          "The position can only be set on files");
+      throw new UnsupportedOperationException("The position can only be set on files");
     }
   }
 

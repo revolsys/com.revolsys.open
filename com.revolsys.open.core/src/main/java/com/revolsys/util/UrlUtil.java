@@ -40,6 +40,25 @@ import com.revolsys.io.FileUtil;
  */
 public final class UrlUtil {
 
+  private static final String DOMAIN_PART = "\\p{Alpha}[\\p{Alpha}0-9\\-]*\\.";
+
+  private static final String TLD = "\\p{Alpha}+";
+
+  private static final String DOMAIN_NAME = "(?:" + DOMAIN_PART + ")+" + TLD;
+
+  private static final String IP4_ADDRESS = "\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}";
+
+  private static final String DOMAIN = "(?:" + IP4_ADDRESS + "|" + DOMAIN_NAME + ")";
+
+  private static final String WORD_CHARACTERS = "a-zA-Z0-9\\+!#$%&'*+-/=?^_`{}|~";
+
+  private static final String LOCAL_PART = "[" + WORD_CHARACTERS + "][" + WORD_CHARACTERS
+    + "\\.]*[" + WORD_CHARACTERS + "]?";
+
+  private static final String EMAIL_RE = "^(" + LOCAL_PART + ")@(" + DOMAIN + ")$";
+
+  private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_RE);
+
   public static void appendQuery(final StringBuilder query,
     final Map<String, ? extends Object> parameters) throws Error {
     if (parameters != null) {
@@ -57,9 +76,7 @@ public final class UrlUtil {
             if (value instanceof String[]) {
               final String[] values = (String[])value;
               for (int i = 0; i < values.length; i++) {
-                query.append(name)
-                .append('=')
-                .append(URLEncoder.encode(values[i], "US-ASCII"));
+                query.append(name).append('=').append(URLEncoder.encode(values[i], "US-ASCII"));
                 if (i < values.length - 1) {
                   query.append('&');
                 }
@@ -75,16 +92,15 @@ public final class UrlUtil {
                     query.append('&');
                   }
                   query.append(name)
-                  .append('=')
-                  .append(
-                    URLEncoder.encode(childValue.toString(), "US-ASCII"));
+                    .append('=')
+                    .append(URLEncoder.encode(childValue.toString(), "US-ASCII"));
                 }
               }
 
             } else {
               query.append(name)
-              .append('=')
-              .append(URLEncoder.encode(value.toString(), "US-ASCII"));
+                .append('=')
+                .append(URLEncoder.encode(value.toString(), "US-ASCII"));
             }
           } catch (final UnsupportedEncodingException e) {
             throw new Error(e);
@@ -95,8 +111,7 @@ public final class UrlUtil {
     }
   }
 
-  public static void appendQuery(final StringBuilder query, final String name,
-    final Object value) {
+  public static void appendQuery(final StringBuilder query, final String name, final Object value) {
     final boolean firstParameter = query.length() == 0;
     if (name != null && value != null) {
       if (!firstParameter) {
@@ -106,9 +121,7 @@ public final class UrlUtil {
         if (value instanceof String[]) {
           final String[] values = (String[])value;
           for (int i = 0; i < values.length; i++) {
-            query.append(name)
-            .append('=')
-            .append(URLEncoder.encode(values[i], "US-ASCII"));
+            query.append(name).append('=').append(URLEncoder.encode(values[i], "US-ASCII"));
             if (i < values.length - 1) {
               query.append('&');
             }
@@ -124,15 +137,13 @@ public final class UrlUtil {
                 query.append('&');
               }
               query.append(name)
-              .append('=')
-              .append(URLEncoder.encode(childValue.toString(), "US-ASCII"));
+                .append('=')
+                .append(URLEncoder.encode(childValue.toString(), "US-ASCII"));
             }
           }
 
         } else {
-          query.append(name)
-          .append('=')
-          .append(URLEncoder.encode(value.toString(), "US-ASCII"));
+          query.append(name).append('=').append(URLEncoder.encode(value.toString(), "US-ASCII"));
         }
       } catch (final UnsupportedEncodingException e) {
         throw new Error(e);
@@ -149,8 +160,8 @@ public final class UrlUtil {
    */
   public static String cleanPath(final String url) {
     return url.replaceAll("/+", "/")
-        .replaceAll("^((\\w)+:)/", "$1//")
-        .replaceAll("^file://", "file:///");
+      .replaceAll("^((\\w)+:)/", "$1//")
+      .replaceAll("^file://", "file:///");
   }
 
   public static String getContent(final String urlString) {
@@ -234,8 +245,7 @@ public final class UrlUtil {
    * @param parameters The additional parameters to add to the query string.
    * @return The new URL.
    */
-  public static String getQueryString(
-    final Map<String, ? extends Object> parameters) {
+  public static String getQueryString(final Map<String, ? extends Object> parameters) {
     final StringBuilder query = new StringBuilder();
     appendQuery(query, parameters);
     return query.toString();
@@ -248,8 +258,7 @@ public final class UrlUtil {
       final int equalsIndex = part.indexOf("=");
       if (equalsIndex > -1) {
         final String name = part.substring(0, equalsIndex);
-        final String value = percentDecode(part.substring(equalsIndex + 1)
-          .replaceAll("\\+", " "));
+        final String value = percentDecode(part.substring(equalsIndex + 1).replaceAll("\\+", " "));
         if (map.containsKey(name)) {
           final Object existingValue = map.get(name);
           if (existingValue instanceof List) {
@@ -292,8 +301,7 @@ public final class UrlUtil {
    * @param parameters The additional parameters to add to the query string.
    * @return The new URL.
    */
-  public static String getUrl(final Object baseUrl,
-    final Map<String, ? extends Object> parameters) {
+  public static String getUrl(final Object baseUrl, final Map<String, ? extends Object> parameters) {
     return getUrl(baseUrl.toString(), parameters);
   }
 
@@ -313,8 +321,7 @@ public final class UrlUtil {
    * @param parameters The additional parameters to add to the query string.
    * @return The new URL.
    */
-  public static String getUrl(String baseUrl,
-    final Map<String, ? extends Object> parameters) {
+  public static String getUrl(String baseUrl, final Map<String, ? extends Object> parameters) {
     final int fragmentIndex = baseUrl.indexOf('#');
     String fragment = null;
     if (fragmentIndex > -1 && fragmentIndex < baseUrl.length() - 1) {
@@ -351,8 +358,7 @@ public final class UrlUtil {
         final String encodedChild = percentEncode(child);
         return new URL(parent, encodedChild);
       } catch (final MalformedURLException e) {
-        throw new IllegalArgumentException("Cannot create child URL for "
-            + parent + " + " + child);
+        throw new IllegalArgumentException("Cannot create child URL for " + parent + " + " + child);
       }
     }
   }
@@ -376,8 +382,7 @@ public final class UrlUtil {
     return params;
   }
 
-  public static void parseMatrixParams(final String matrixParams,
-    final Map<String, String> params) {
+  public static void parseMatrixParams(final String matrixParams, final Map<String, String> params) {
     for (final String param : matrixParams.split(";")) {
       final String[] paramParts = param.split("=");
       final String key = paramParts[0];
@@ -411,9 +416,8 @@ public final class UrlUtil {
     final StringBuilder encoded = new StringBuilder(len);
     for (int i = 0; i < len; i++) {
       final char ch = text.charAt(i);
-      if (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0'
-          && ch <= '9' || ch == '-' || ch == ',' || ch == '.' || ch == '_'
-          || ch == '~' || ch == '/') {
+      if (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' || ch == '-'
+        || ch == ',' || ch == '.' || ch == '_' || ch == '~' || ch == '/') {
         encoded.append(ch);
       } else {
         encoded.append('%');
@@ -425,27 +429,6 @@ public final class UrlUtil {
     }
     return encoded.toString();
   }
-
-  private static final String DOMAIN_PART = "\\p{Alpha}[\\p{Alpha}0-9\\-]*\\.";
-
-  private static final String TLD = "\\p{Alpha}+";
-
-  private static final String DOMAIN_NAME = "(?:" + DOMAIN_PART + ")+" + TLD;
-
-  private static final String IP4_ADDRESS = "\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}";
-
-  private static final String DOMAIN = "(?:" + IP4_ADDRESS + "|" + DOMAIN_NAME
-      + ")";
-
-  private static final String WORD_CHARACTERS = "a-zA-Z0-9\\+!#$%&'*+-/=?^_`{}|~";
-
-  private static final String LOCAL_PART = "[" + WORD_CHARACTERS + "]["
-      + WORD_CHARACTERS + "\\.]*[" + WORD_CHARACTERS + "]?";
-
-  private static final String EMAIL_RE = "^(" + LOCAL_PART + ")@(" + DOMAIN
-      + ")$";
-
-  private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_RE);
 
   /**
    * Construct a new UrlUtil.

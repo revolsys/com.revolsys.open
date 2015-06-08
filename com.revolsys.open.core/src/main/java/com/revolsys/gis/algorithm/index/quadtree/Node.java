@@ -22,14 +22,12 @@ public class Node<T> extends AbstractNode<T> {
   }
 
   @Override
-  protected AbstractNode<T> createNode(final int level,
-    final double... newBounds) {
+  protected AbstractNode<T> createNode(final int level, final double... newBounds) {
     return new Node<T>(level, newBounds);
   }
 
   @Override
-  protected void doAdd(final QuadTree<T> tree, final double[] bounds,
-    final T item) {
+  protected void doAdd(final QuadTree<T> tree, final double[] bounds, final T item) {
     this.boundingBoxes.add(bounds);
     this.items.add(item);
   }

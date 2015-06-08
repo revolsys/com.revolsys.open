@@ -8,15 +8,14 @@ import org.apache.commons.beanutils.MethodUtils;
 
 import com.revolsys.util.ExceptionUtil;
 
-public class InvokeMethodMapObjectFactory extends AbstractMapObjectFactory
-implements MapSerializer {
+public class InvokeMethodMapObjectFactory extends AbstractMapObjectFactory implements MapSerializer {
 
   private final Class<?> typeClass;
 
   private final String methodName;
 
-  public InvokeMethodMapObjectFactory(final String typeName,
-    final String description, final Class<?> typeClass, final String methodName) {
+  public InvokeMethodMapObjectFactory(final String typeName, final String description,
+    final Class<?> typeClass, final String methodName) {
     super(typeName, description);
     this.typeClass = typeClass;
     this.methodName = methodName;
@@ -37,8 +36,7 @@ implements MapSerializer {
   public <V> V toObject(final Map<String, ? extends Object> properties) {
     try {
       final Class<?> clazz = this.typeClass;
-      return (V)MethodUtils.invokeStaticMethod(clazz, this.methodName,
-        properties);
+      return (V)MethodUtils.invokeStaticMethod(clazz, this.methodName, properties);
     } catch (final NoSuchMethodException e) {
       return ExceptionUtil.throwUncheckedException(e);
     } catch (final IllegalAccessException e) {

@@ -4,8 +4,7 @@ import org.springframework.core.convert.converter.Converter;
 
 import com.revolsys.data.record.Record;
 
-public class SourceValueConverter extends
-AbstractSourceToTargetProcess<Record, Record> {
+public class SourceValueConverter extends AbstractSourceToTargetProcess<Record, Record> {
   private Converter<Record, ? extends Object> sourceValueConverter;
 
   private String targetFieldName;

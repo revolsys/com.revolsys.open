@@ -11,8 +11,7 @@ public class Service extends ArcGisResponse {
   public Service() {
   }
 
-  protected Service(final Catalog catalog, final String serviceName,
-    final String serviceType) {
+  protected Service(final Catalog catalog, final String serviceName, final String serviceType) {
     super(catalog, serviceName + "/" + serviceType);
     this.serviceName = serviceName;
     this.serviceType = serviceType;

@@ -19,39 +19,33 @@ import com.revolsys.swing.table.highlighter.OutsideBorderHighlighter;
 
 public class InvokeHighlighter implements HighlightPredicate {
 
-  public static Highlighter border(final Object object,
-    final String methodName, final Border border) {
-    final HighlightPredicate predicate = new InvokeHighlighter(object,
-      methodName);
+  public static Highlighter border(final Object object, final String methodName, final Border border) {
+    final HighlightPredicate predicate = new InvokeHighlighter(object, methodName);
     return new BorderHighlighter(predicate, border);
   }
 
-  public static Highlighter border(final Object object,
-    final String methodName, final Color color) {
+  public static Highlighter border(final Object object, final String methodName, final Color color) {
     return border(object, methodName, color, 1);
   }
 
-  public static Highlighter border(final Object object,
-    final String methodName, final Color color, final int thickness) {
+  public static Highlighter border(final Object object, final String methodName, final Color color,
+    final int thickness) {
     final Border border = BorderFactory.createLineBorder(color, thickness);
     return border(object, methodName, border);
   }
 
   public static Highlighter color(final Object object, final String methodName,
-    final Color cellBackground, final Color cellForeground,
-    final Color selectedBackground, final Color selectedForeground) {
-    final HighlightPredicate predicate = new InvokeHighlighter(object,
-      methodName);
-    return new ColorHighlighter(predicate, cellBackground, cellForeground,
-      selectedBackground, selectedForeground);
+    final Color cellBackground, final Color cellForeground, final Color selectedBackground,
+    final Color selectedForeground) {
+    final HighlightPredicate predicate = new InvokeHighlighter(object, methodName);
+    return new ColorHighlighter(predicate, cellBackground, cellForeground, selectedBackground,
+      selectedForeground);
   }
 
-  public static Highlighter outsideBorder(final Object object,
-    final String methodName, final Color color, final int thickness) {
-    final HighlightPredicate predicate = new InvokeHighlighter(object,
-      methodName);
-    return new OutsideBorderHighlighter(predicate, color, thickness, true,
-      false);
+  public static Highlighter outsideBorder(final Object object, final String methodName,
+    final Color color, final int thickness) {
+    final HighlightPredicate predicate = new InvokeHighlighter(object, methodName);
+    return new OutsideBorderHighlighter(predicate, color, thickness, true, false);
   }
 
   private final Object object;
@@ -67,8 +61,7 @@ public class InvokeHighlighter implements HighlightPredicate {
       clazz = object.getClass();
     }
     try {
-      this.method = clazz.getMethod(methodName, Component.class,
-        ComponentAdapter.class);
+      this.method = clazz.getMethod(methodName, Component.class, ComponentAdapter.class);
     } catch (final NoSuchMethodException e) {
       throw new IllegalArgumentException("Method does not exist", e);
     } catch (final SecurityException e) {
@@ -77,16 +70,14 @@ public class InvokeHighlighter implements HighlightPredicate {
   }
 
   @Override
-  public boolean isHighlighted(final Component renderer,
-    final ComponentAdapter adapter) {
+  public boolean isHighlighted(final Component renderer, final ComponentAdapter adapter) {
     try {
       return (Boolean)this.method.invoke(this.object, renderer, adapter);
     } catch (final InvocationTargetException e) {
-      LoggerFactory.getLogger(getClass()).debug(
-        "Error invoking method " + this.method, e.getTargetException());
+      LoggerFactory.getLogger(getClass()).debug("Error invoking method " + this.method,
+        e.getTargetException());
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).debug(
-        "Error invoking method " + this.method, e);
+      LoggerFactory.getLogger(getClass()).debug("Error invoking method " + this.method, e);
     }
     return false;
   }

@@ -5,8 +5,7 @@ import java.util.Map;
 
 import com.revolsys.data.record.Record;
 
-public class SourceToTargetFieldMapping extends
-AbstractSourceToTargetProcess<Record, Record> {
+public class SourceToTargetFieldMapping extends AbstractSourceToTargetProcess<Record, Record> {
   private Map<String, SourceToTargetProcess<Record, Record>> targetFieldMappings = new HashMap<String, SourceToTargetProcess<Record, Record>>();
 
   public SourceToTargetFieldMapping() {

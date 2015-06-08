@@ -22,8 +22,7 @@ public class MapSerializerUtil {
    * @param name
    * @param value
    */
-  public static void add(final Map<String, Object> map, final String name,
-    final Object value) {
+  public static void add(final Map<String, Object> map, final String name, final Object value) {
     final Object mapValue = getValue(value);
     if (mapValue == null) {
       map.remove(mapValue);
@@ -32,8 +31,8 @@ public class MapSerializerUtil {
     }
   }
 
-  public static void add(final Map<String, Object> map, final String name,
-    final Object value, final Object defaultValue) {
+  public static void add(final Map<String, Object> map, final String name, final Object value,
+    final Object defaultValue) {
     if (EqualsRegistry.equal(value, defaultValue)) {
       map.remove(name);
     } else {
@@ -46,8 +45,7 @@ public class MapSerializerUtil {
     }
   }
 
-  public static void addAll(final Map<String, Object> map,
-    final Map<String, Object> values) {
+  public static void addAll(final Map<String, Object> map, final Map<String, Object> values) {
     if (map != null && values != null) {
       for (final Entry<String, Object> entry : values.entrySet()) {
         final String name = entry.getKey();

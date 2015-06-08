@@ -692,7 +692,8 @@ public abstract class AbstractRecordStore extends AbstractObjectWithProperties i
     }
   }
 
-  protected RecordDefinition refreshRecordDefinition(RecordStoreSchema schema, final String typePath) {
+  protected RecordDefinition refreshRecordDefinition(final RecordStoreSchema schema,
+    final String typePath) {
     return null;
   }
 

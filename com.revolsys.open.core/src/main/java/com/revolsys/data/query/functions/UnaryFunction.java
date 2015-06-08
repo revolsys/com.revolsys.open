@@ -21,8 +21,8 @@ public abstract class UnaryFunction extends QueryValue {
   }
 
   @Override
-  public void appendDefaultSql(final Query query,
-    final RecordStore recordStore, final StringBuilder buffer) {
+  public void appendDefaultSql(final Query query, final RecordStore recordStore,
+    final StringBuilder buffer) {
     buffer.append(getName());
     buffer.append("(");
     final QueryValue parameter = getParameter();

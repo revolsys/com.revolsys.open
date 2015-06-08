@@ -28,15 +28,14 @@ public class CoordinateEvent extends EventObject {
     super(coordinate);
   }
 
-  public CoordinateEvent(final Point coordinate, final String ruleName,
-    final String action) {
+  public CoordinateEvent(final Point coordinate, final String ruleName, final String action) {
     super(coordinate);
     this.ruleName = ruleName;
     this.action = action;
   }
 
-  public CoordinateEvent(final Point coordinate, final String path,
-    final String ruleName, final String action, final String notes) {
+  public CoordinateEvent(final Point coordinate, final String path, final String ruleName,
+    final String action, final String notes) {
     super(coordinate);
     this.typePath = path;
     this.ruleName = ruleName;

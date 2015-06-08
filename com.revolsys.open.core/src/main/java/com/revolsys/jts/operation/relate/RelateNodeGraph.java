@@ -102,8 +102,7 @@ public class RelateNodeGraph {
    * <p>
    * Precondition: edge intersections have been computed.
    */
-  public void computeIntersectionNodes(final GeometryGraph geomGraph,
-    final int argIndex) {
+  public void computeIntersectionNodes(final GeometryGraph geomGraph, final int argIndex) {
     for (final Iterator edgeIt = geomGraph.getEdgeIterator(); edgeIt.hasNext();) {
       final Edge e = (Edge)edgeIt.next();
       final Location eLoc = e.getLabel().getLocation(argIndex);
@@ -131,8 +130,7 @@ public class RelateNodeGraph {
    * but in the original arg Geometry it is actually
    * in the interior due to the Boundary Determination Rule)
    */
-  public void copyNodesAndLabels(final GeometryGraph geomGraph,
-    final int argIndex) {
+  public void copyNodesAndLabels(final GeometryGraph geomGraph, final int argIndex) {
     for (final Iterator nodeIt = geomGraph.getNodeIterator(); nodeIt.hasNext();) {
       final Node graphNode = (Node)nodeIt.next();
       final Node newNode = this.nodes.addNode(graphNode.getCoordinate());

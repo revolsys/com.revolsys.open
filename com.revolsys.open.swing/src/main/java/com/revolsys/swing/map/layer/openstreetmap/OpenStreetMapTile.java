@@ -16,8 +16,7 @@ public class OpenStreetMapTile extends MapTile {
 
   public OpenStreetMapTile(final OpenStreetMapLayer layer, final int zoomLevel,
     final double resolution, final int tileX, final int tileY) {
-    super(layer.getClient().getBoundingBox(zoomLevel, tileX, tileY), 256, 256,
-      resolution);
+    super(layer.getClient().getBoundingBox(zoomLevel, tileX, tileY), 256, 256, resolution);
     this.layer = layer;
     this.zoomLevel = zoomLevel;
     this.tileX = tileX;
@@ -62,8 +61,7 @@ public class OpenStreetMapTile extends MapTile {
   public BufferedImage loadBuffferedImage() {
     try {
       final OpenStreetMapClient client = this.layer.getClient();
-      final BufferedImage image = client.getMapImage(this.zoomLevel,
-        this.tileX, this.tileY);
+      final BufferedImage image = client.getMapImage(this.zoomLevel, this.tileX, this.tileY);
       return image;
     } catch (final Throwable e) {
       return null;
@@ -72,7 +70,6 @@ public class OpenStreetMapTile extends MapTile {
 
   @Override
   public String toString() {
-    return this.layer + " " + this.zoomLevel + "/" + this.tileX + "/"
-        + this.tileY;
+    return this.layer + " " + this.zoomLevel + "/" + this.tileX + "/" + this.tileY;
   }
 }

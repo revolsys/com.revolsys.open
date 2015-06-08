@@ -18,9 +18,8 @@ public class LabelListCellRenderer extends DefaultListCellRenderer {
   private static final long serialVersionUID = 1L;
 
   @Override
-  public Component getListCellRendererComponent(final JList list,
-    final Object value, final int index, final boolean isSelected,
-    final boolean cellHasFocus) {
+  public Component getListCellRendererComponent(final JList list, final Object value,
+    final int index, final boolean isSelected, final boolean cellHasFocus) {
     if (value instanceof JLabel) {
       final JLabel label = (JLabel)value;
       label.setOpaque(true);
@@ -56,8 +55,7 @@ public class LabelListCellRenderer extends DefaultListCellRenderer {
 
       return label;
     } else {
-      return super.getListCellRendererComponent(list, value, index, isSelected,
-        cellHasFocus);
+      return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
     }
   }
 

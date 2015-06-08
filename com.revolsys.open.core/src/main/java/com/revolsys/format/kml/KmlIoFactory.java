@@ -22,15 +22,14 @@ import com.revolsys.io.MapWriterFactory;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.SpringUtil;
 
-public class KmlIoFactory extends AbstractRecordAndGeometryWriterFactory
-implements MapWriterFactory, GeometryReaderFactory {
+public class KmlIoFactory extends AbstractRecordAndGeometryWriterFactory implements
+  MapWriterFactory, GeometryReaderFactory {
 
   public static final Set<CoordinateSystem> COORDINATE_SYSTEMS = Collections.singleton(EpsgCoordinateSystems.wgs84());
 
   public KmlIoFactory() {
     super(Kml22Constants.KML_FORMAT_DESCRIPTION, true, true);
-    addMediaTypeAndFileExtension(Kml22Constants.KML_MEDIA_TYPE,
-      Kml22Constants.KML_FILE_EXTENSION);
+    addMediaTypeAndFileExtension(Kml22Constants.KML_MEDIA_TYPE, Kml22Constants.KML_FILE_EXTENSION);
   }
 
   @Override
@@ -41,8 +40,7 @@ implements MapWriterFactory, GeometryReaderFactory {
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream,
-    final Charset charset) {
+    final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
     return new KmlRecordWriter(writer);
   }
@@ -81,8 +79,7 @@ implements MapWriterFactory, GeometryReaderFactory {
   }
 
   @Override
-  public boolean isCoordinateSystemSupported(
-    final CoordinateSystem coordinateSystem) {
+  public boolean isCoordinateSystemSupported(final CoordinateSystem coordinateSystem) {
     return COORDINATE_SYSTEMS.contains(coordinateSystem);
   }
 

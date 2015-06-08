@@ -9,11 +9,10 @@ import com.revolsys.ui.html.view.ElementContainer;
 import com.revolsys.util.HtmlUtil;
 
 public class FieldNoLabelDecorator implements Decorator {
-  public static void add(final ElementContainer container,
-    final Element element, final String instructions) {
+  public static void add(final ElementContainer container, final Element element,
+    final String instructions) {
 
-    final FieldNoLabelDecorator decorator = new FieldNoLabelDecorator(
-      instructions);
+    final FieldNoLabelDecorator decorator = new FieldNoLabelDecorator(instructions);
     element.setDecorator(decorator);
     container.add(element);
   }
@@ -54,8 +53,7 @@ public class FieldNoLabelDecorator implements Decorator {
       if (field.hasValidationErrors()) {
         out.startTag(HtmlUtil.DIV);
         out.attribute(HtmlUtil.ATTR_CLASS, "errors");
-        for (final Iterator<String> validationErrors = field.getValidationErrors()
-            .iterator(); validationErrors.hasNext();) {
+        for (final Iterator<String> validationErrors = field.getValidationErrors().iterator(); validationErrors.hasNext();) {
           final String error = validationErrors.next();
           out.text(error);
           if (validationErrors.hasNext()) {

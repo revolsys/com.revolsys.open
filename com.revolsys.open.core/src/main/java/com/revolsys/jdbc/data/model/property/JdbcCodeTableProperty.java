@@ -31,12 +31,12 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
   @Override
   protected synchronized Identifier createId(final List<Object> values) {
     try (
-        JdbcConnection connection = this.recordStore.getJdbcConnection()) {
+      JdbcConnection connection = this.recordStore.getJdbcConnection()) {
       Identifier id = loadId(values, false);
       boolean retry = true;
       while (id == null) {
         try (
-            final PreparedStatement statement = connection.prepareStatement(this.insertSql)) {
+          final PreparedStatement statement = connection.prepareStatement(this.insertSql)) {
           id = SingleIdentifier.create(this.recordStore.getNextPrimaryKey(getRecordDefinition()));
           int index = 1;
           index = JdbcUtils.setValue(statement, index, id);
@@ -91,8 +91,8 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
       }
       if (this.useAuditColumns) {
         if (this.recordStore.getClass()
-            .getName()
-            .equals("com.revolsys.gis.oracle.io.OracleRecordStore")) {
+          .getName()
+          .equals("com.revolsys.gis.oracle.io.OracleRecordStore")) {
           this.insertSql += ", USER, SYSDATE, USER, SYSDATE";
         } else {
           this.insertSql += ", current_user, current_timestamp, current_user, current_timestamp";

@@ -20,6 +20,12 @@ import com.revolsys.jts.geom.vertex.Vertex;
 
 public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
 
+  private static final String POINT_QUAD_TREE = "PointQuadTree";
+
+  static {
+    GeometryEqualsExact3d.addExclude(POINT_QUAD_TREE);
+  }
+
   public static PointQuadTree<int[]> get(final Geometry geometry) {
     if (geometry == null || geometry.isEmpty()) {
       return new PointQuadTree<int[]>();
@@ -47,12 +53,6 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
       }
       return index;
     }
-  }
-
-  private static final String POINT_QUAD_TREE = "PointQuadTree";
-
-  static {
-    GeometryEqualsExact3d.addExclude(POINT_QUAD_TREE);
   }
 
   private GeometryFactory geometryFactory;

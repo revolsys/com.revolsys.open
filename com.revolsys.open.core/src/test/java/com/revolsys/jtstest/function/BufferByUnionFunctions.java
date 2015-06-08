@@ -42,11 +42,11 @@ import com.revolsys.jts.geom.GeometryCollectionIterator;
 
 public class BufferByUnionFunctions {
 
-  public static Geometry bufferByChains(final Geometry g,
-    final double distance, final int maxChainSize) {
+  public static Geometry bufferByChains(final Geometry g, final double distance,
+    final int maxChainSize) {
     if (maxChainSize <= 0) {
       throw new IllegalArgumentException(
-          "Maximum Chain Size must be specified as an input parameter");
+        "Maximum Chain Size must be specified as an input parameter");
     }
     final Geometry segs = LineHandlingFunctions.extractChains(g, maxChainSize);
     final double posDist = Math.abs(distance);
@@ -57,8 +57,7 @@ public class BufferByUnionFunctions {
     return g.union(segBuf);
   }
 
-  public static Geometry bufferByComponents(final Geometry g,
-    final double distance) {
+  public static Geometry bufferByComponents(final Geometry g, final double distance) {
     return componentBuffers(g, distance).union();
   }
 
@@ -70,8 +69,7 @@ public class BufferByUnionFunctions {
    * @param distance
    * @return the buffer geometry
    */
-  public static Geometry bufferBySegments(final Geometry g,
-    final double distance) {
+  public static Geometry bufferBySegments(final Geometry g, final double distance) {
     final Geometry segs = LineHandlingFunctions.extractSegments(g);
     final double posDist = Math.abs(distance);
     final Geometry segBuf = bufferByComponents(segs, posDist);
@@ -81,8 +79,7 @@ public class BufferByUnionFunctions {
     return g.union(segBuf);
   }
 
-  public static Geometry componentBuffers(final Geometry g,
-    final double distance) {
+  public static Geometry componentBuffers(final Geometry g, final double distance) {
     final List bufs = new ArrayList();
     for (final Iterator it = new GeometryCollectionIterator(g); it.hasNext();) {
       final Geometry comp = (Geometry)it.next();

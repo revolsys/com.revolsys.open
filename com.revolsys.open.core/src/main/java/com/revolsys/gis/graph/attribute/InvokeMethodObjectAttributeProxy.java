@@ -6,8 +6,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.lang.reflect.Method;
 
-public class InvokeMethodObjectAttributeProxy<T, O> extends
-AbstractObjectAttributeProxy<T, O> implements Externalizable {
+public class InvokeMethodObjectAttributeProxy<T, O> extends AbstractObjectAttributeProxy<T, O>
+  implements Externalizable {
 
   private static final long serialVersionUID = 1L;
 
@@ -27,9 +27,8 @@ AbstractObjectAttributeProxy<T, O> implements Externalizable {
   public InvokeMethodObjectAttributeProxy() {
   }
 
-  public InvokeMethodObjectAttributeProxy(final Object object,
-    final String methodName, final Class<?> parameterClass,
-    final Object... parameters) {
+  public InvokeMethodObjectAttributeProxy(final Object object, final String methodName,
+    final Class<?> parameterClass, final Object... parameters) {
     if (object instanceof Class) {
       this.clazz = (Class<?>)object;
     } else {
@@ -95,14 +94,13 @@ AbstractObjectAttributeProxy<T, O> implements Externalizable {
       throw new RuntimeException(e);
     }
     if (this.method == null) {
-      throw new IllegalArgumentException("Method could not be found " + this.clazz
-        + "." + this.methodName);
+      throw new IllegalArgumentException("Method could not be found " + this.clazz + "."
+        + this.methodName);
     }
   }
 
   @Override
-  public void readExternal(final ObjectInput in) throws IOException,
-  ClassNotFoundException {
+  public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
     final String className = (String)in.readObject();
     this.clazz = Class.forName(className);
 

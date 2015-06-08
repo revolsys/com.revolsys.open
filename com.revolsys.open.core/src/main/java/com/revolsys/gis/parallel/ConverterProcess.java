@@ -22,8 +22,7 @@ public class ConverterProcess extends BaseInOutProcess<Record, Record> {
   }
 
   @Override
-  protected void process(final Channel<Record> in,
-    final Channel<Record> out, final Record object) {
+  protected void process(final Channel<Record> in, final Channel<Record> out, final Record object) {
     if (this.converter != null) {
       final Record target = this.converter.convert(object);
       out.write(target);

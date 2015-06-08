@@ -20,8 +20,8 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractConnectionRegistry<T extends MapSerializer>
-implements ConnectionRegistry<T>, PropertyChangeListener {
+public abstract class AbstractConnectionRegistry<T extends MapSerializer> implements
+  ConnectionRegistry<T>, PropertyChangeListener {
 
   private Map<String, T> connections;
 
@@ -29,8 +29,7 @@ implements ConnectionRegistry<T>, PropertyChangeListener {
 
   private final Map<String, String> connectionNames = new TreeMap<String, String>();
 
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-    this);
+  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   private File directory;
 
@@ -44,13 +43,12 @@ implements ConnectionRegistry<T>, PropertyChangeListener {
 
   public AbstractConnectionRegistry(
     final ConnectionRegistryManager<? extends ConnectionRegistry<T>> connectionManager,
-      final String name) {
+    final String name) {
     this.name = name;
     setConnectionManager(connectionManager);
   }
 
-  protected synchronized void addConnection(final String name,
-    final T connection) {
+  protected synchronized void addConnection(final String name, final T connection) {
     if (connection != null && name != null) {
       final String lowerName = name.toLowerCase();
       final T existingConnection = this.connections.get(lowerName);
@@ -65,14 +63,12 @@ implements ConnectionRegistry<T>, PropertyChangeListener {
         }
       }
       final int index = getConnectionIndex(name);
-      this.propertyChangeSupport.fireIndexedPropertyChange("connections",
-        index, null, connection);
+      this.propertyChangeSupport.fireIndexedPropertyChange("connections", index, null, connection);
     }
   }
 
   @Override
-  public void createConnection(
-    final Map<String, ? extends Object> connectionParameters) {
+  public void createConnection(final Map<String, ? extends Object> connectionParameters) {
     final String name = Maps.getString(connectionParameters, "name");
     final File file = getConnectionFile(name);
     if (file != null && (!file.exists() || file.canRead())) {
@@ -84,8 +80,8 @@ implements ConnectionRegistry<T>, PropertyChangeListener {
 
   protected void doInit() {
     if (this.directory != null && this.directory.isDirectory()) {
-      for (final File connectionFile : FileUtil.getFilesByExtension(
-        this.directory, this.fileExtension)) {
+      for (final File connectionFile : FileUtil.getFilesByExtension(this.directory,
+        this.fileExtension)) {
         loadConnection(connectionFile);
       }
     }
@@ -113,8 +109,7 @@ implements ConnectionRegistry<T>, PropertyChangeListener {
         return null;
       }
     }
-    final String fileName = FileUtil.toSafeName(name) + "."
-        + this.fileExtension;
+    final String fileName = FileUtil.toSafeName(name) + "." + this.fileExtension;
     final File file = new File(this.directory, fileName);
     return file;
   }
@@ -132,8 +127,7 @@ implements ConnectionRegistry<T>, PropertyChangeListener {
 
   @Override
   public List<String> getConnectionNames() {
-    final List<String> names = new ArrayList<String>(
-        this.connectionNames.values());
+    final List<String> names = new ArrayList<String>(this.connectionNames.values());
     return names;
   }
 
@@ -181,8 +175,7 @@ implements ConnectionRegistry<T>, PropertyChangeListener {
     return removeConnection(connection);
   }
 
-  protected synchronized boolean removeConnection(final String name,
-    final T connection) {
+  protected synchronized boolean removeConnection(final String name, final T connection) {
     if (connection != null && name != null) {
       final String lowerName = name.toLowerCase();
       final T existingConnection = this.connections.get(lowerName);
@@ -197,8 +190,7 @@ implements ConnectionRegistry<T>, PropertyChangeListener {
             propertyChangeSupport.removePropertyChangeListener(this);
           }
         }
-        this.propertyChangeSupport.fireIndexedPropertyChange("connections",
-          index, connection, null);
+        this.propertyChangeSupport.fireIndexedPropertyChange("connections", index, connection, null);
         if (this.directory != null && !this.readOnly) {
           final Map<String, Object> connectionParameters = existingConnection.toMap();
           final String connectionName = (String)connectionParameters.get("name");
@@ -231,8 +223,7 @@ implements ConnectionRegistry<T>, PropertyChangeListener {
   }
 
   public void saveAs(final Resource parentDirectory, final String directoryName) {
-    final Resource connectionsDirectory = SpringUtil.getResource(
-      parentDirectory, directoryName);
+    final Resource connectionsDirectory = SpringUtil.getResource(parentDirectory, directoryName);
     saveAs(connectionsDirectory);
   }
 
@@ -274,8 +265,7 @@ implements ConnectionRegistry<T>, PropertyChangeListener {
 
   public void setReadOnly(final boolean readOnly) {
     if (this.isReadOnly() && !readOnly) {
-      throw new IllegalArgumentException(
-          "Cannot make a read only registry not read only");
+      throw new IllegalArgumentException("Cannot make a read only registry not read only");
     }
     this.readOnly = readOnly;
   }

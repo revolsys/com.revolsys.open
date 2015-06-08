@@ -48,11 +48,13 @@ import java.util.Set;
  * No new objects are created when edges are added -
  * all associated components must already exist in the parent graph.
  */
-public class Subgraph
-{
+public class Subgraph {
   protected PlanarGraph parentGraph;
+
   protected Set edges = new HashSet();
+
   protected List dirEdges = new ArrayList();
+
   protected NodeMap nodeMap = new NodeMap();
 
   /**
@@ -71,8 +73,7 @@ public class Subgraph
    *
    * @param e the edge to add
    */
-  public void add(final Edge e)
-  {
+  public void add(final Edge e) {
     if (this.edges.contains(e)) {
       return;
     }
@@ -83,12 +84,15 @@ public class Subgraph
     this.nodeMap.add(e.getDirEdge(0).getFromNode());
     this.nodeMap.add(e.getDirEdge(1).getFromNode());
   }
+
   /**
    * Tests whether an {@link Edge} is contained in this subgraph
    * @param e the edge to test
    * @return <code>true</code> if the edge is contained in this subgraph
    */
-  public boolean contains(final Edge e) { return this.edges.contains(e); }
+  public boolean contains(final Edge e) {
+    return this.edges.contains(e);
+  }
 
   /**
    * Returns an {@link Iterator} over the {@link DirectedEdge}s in this graph,
@@ -98,7 +102,9 @@ public class Subgraph
    *
    * @see #add(Edge)
    */
-  public Iterator dirEdgeIterator()  {    return this.dirEdges.iterator();  }
+  public Iterator dirEdgeIterator() {
+    return this.dirEdges.iterator();
+  }
 
   /**
    * Returns an {@link Iterator} over the {@link Edge}s in this graph,
@@ -108,7 +114,9 @@ public class Subgraph
    *
    * @see #add(Edge)
    */
-  public Iterator edgeIterator()  {    return this.edges.iterator();  }
+  public Iterator edgeIterator() {
+    return this.edges.iterator();
+  }
 
   /**
    * Gets the {@link PlanarGraph} which this subgraph
@@ -116,8 +124,7 @@ public class Subgraph
    *
    * @return the parent PlanarGraph
    */
-  public PlanarGraph getParent()
-  {
+  public PlanarGraph getParent() {
     return this.parentGraph;
   }
 
@@ -125,6 +132,8 @@ public class Subgraph
    * Returns an {@link Iterator} over the {@link Node}s in this graph.
    * @return an iterator over the nodes
    */
-  public Iterator nodeIterator()  {    return this.nodeMap.iterator();  }
+  public Iterator nodeIterator() {
+    return this.nodeMap.iterator();
+  }
 
 }

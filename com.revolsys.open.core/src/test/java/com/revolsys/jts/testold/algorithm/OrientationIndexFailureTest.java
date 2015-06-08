@@ -44,17 +44,15 @@ import com.revolsys.jts.geom.impl.PointDouble;
  * @version 1.7
  */
 public class OrientationIndexFailureTest extends TestCase {
-  public static boolean isAllOrientationsEqual(final double p0x,
-    final double p0y, final double p1x, final double p1y, final double p2x,
-    final double p2y) {
+  public static boolean isAllOrientationsEqual(final double p0x, final double p0y,
+    final double p1x, final double p1y, final double p2x, final double p2y) {
     final Point[] pts = {
       new PointDouble(p0x, p0y, Point.NULL_ORDINATE),
       new PointDouble(p1x, p1y, Point.NULL_ORDINATE),
       new PointDouble(p2x, p2y, Point.NULL_ORDINATE)
     };
     if (!isAllOrientationsEqualDD(pts)) {
-      throw new IllegalStateException(
-          "High-precision orientation computation FAILED");
+      throw new IllegalStateException("High-precision orientation computation FAILED");
     }
     return OrientationIndexTest.isAllOrientationsEqual(pts);
   }
@@ -67,12 +65,9 @@ public class OrientationIndexFailureTest extends TestCase {
   }
 
   public static boolean isAllOrientationsEqualSD(final Point[] pts) {
-    final int orient0 = ShewchuksDeterminant.orientationIndex(pts[0], pts[1],
-      pts[2]);
-    final int orient1 = ShewchuksDeterminant.orientationIndex(pts[1], pts[2],
-      pts[0]);
-    final int orient2 = ShewchuksDeterminant.orientationIndex(pts[2], pts[0],
-      pts[1]);
+    final int orient0 = ShewchuksDeterminant.orientationIndex(pts[0], pts[1], pts[2]);
+    final int orient1 = ShewchuksDeterminant.orientationIndex(pts[1], pts[2], pts[0]);
+    final int orient2 = ShewchuksDeterminant.orientationIndex(pts[2], pts[0], pts[1]);
     return orient0 == orient1 && orient0 == orient2;
   }
 
@@ -103,8 +98,7 @@ public class OrientationIndexFailureTest extends TestCase {
   }
 
   private void checkOriginalJTS(final Point[] pts, final boolean expected) {
-    assertTrue("JTS Robust FAIL",
-      expected == OrientationIndexTest.isAllOrientationsEqual(pts));
+    assertTrue("JTS Robust FAIL", expected == OrientationIndexTest.isAllOrientationsEqual(pts));
   }
 
   private void checkShewchuk(final Point[] pts, final boolean expected) {
@@ -114,12 +108,9 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW() throws Exception {
     // this case fails because subtraction of small from large loses precision
     final Point[] pts = {
-      new PointDouble(1.4540766091864998, -7.989685402102996,
-        Point.NULL_ORDINATE),
-        new PointDouble(23.131039116367354, -7.004368924503866,
-          Point.NULL_ORDINATE),
-          new PointDouble(1.4540766091865, -7.989685402102996,
-            Point.NULL_ORDINATE),
+      new PointDouble(1.4540766091864998, -7.989685402102996, Point.NULL_ORDINATE),
+      new PointDouble(23.131039116367354, -7.004368924503866, Point.NULL_ORDINATE),
+      new PointDouble(1.4540766091865, -7.989685402102996, Point.NULL_ORDINATE),
     };
     checkOrientation(pts);
   }
@@ -127,12 +118,9 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW2() throws Exception {
     // this case fails because subtraction of small from large loses precision
     final Point[] pts = {
-      new PointDouble(219.3649559090992, 140.84159161824724,
-        Point.NULL_ORDINATE),
-        new PointDouble(168.9018919682399, -5.713787599646864,
-          Point.NULL_ORDINATE),
-          new PointDouble(186.80814046338352, 46.28973405831556,
-            Point.NULL_ORDINATE),
+      new PointDouble(219.3649559090992, 140.84159161824724, Point.NULL_ORDINATE),
+      new PointDouble(168.9018919682399, -5.713787599646864, Point.NULL_ORDINATE),
+      new PointDouble(186.80814046338352, 46.28973405831556, Point.NULL_ORDINATE),
     };
     checkOrientation(pts);
   }
@@ -140,11 +128,9 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW3() throws Exception {
     // this case fails because subtraction of small from large loses precision
     final Point[] pts = {
-      new PointDouble(279.56857838488514, -186.3790522565901,
-        Point.NULL_ORDINATE),
-        new PointDouble(-20.43142161511487, 13.620947743409914,
-          Point.NULL_ORDINATE),
-          new PointDouble((double)0, 0, Point.NULL_ORDINATE)
+      new PointDouble(279.56857838488514, -186.3790522565901, Point.NULL_ORDINATE),
+      new PointDouble(-20.43142161511487, 13.620947743409914, Point.NULL_ORDINATE),
+      new PointDouble((double)0, 0, Point.NULL_ORDINATE)
     };
     checkOrientation(pts);
   }
@@ -165,7 +151,7 @@ public class OrientationIndexFailureTest extends TestCase {
       new PointDouble(-5.9, 163.1, Point.NULL_ORDINATE),
       new PointDouble(76.1, 250.7, Point.NULL_ORDINATE),
       new PointDouble(14.6, 185, Point.NULL_ORDINATE)
-      // new PointDouble((double)96.6, 272.6)
+    // new PointDouble((double)96.6, 272.6)
     };
     checkOrientation(pts);
   }
@@ -173,12 +159,9 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW6() throws Exception {
     // from JTS Convex Hull "Almost collinear" unit test
     final Point[] pts = {
-      new PointDouble(-140.8859438214298, 140.88594382142983,
-        Point.NULL_ORDINATE),
-        new PointDouble(-57.309236848216706, 57.30923684821671,
-          Point.NULL_ORDINATE),
-          new PointDouble(-190.9188309203678, 190.91883092036784,
-            Point.NULL_ORDINATE)
+      new PointDouble(-140.8859438214298, 140.88594382142983, Point.NULL_ORDINATE),
+      new PointDouble(-57.309236848216706, 57.30923684821671, Point.NULL_ORDINATE),
+      new PointDouble(-190.9188309203678, 190.91883092036784, Point.NULL_ORDINATE)
     };
     checkOrientation(pts);
   }

@@ -59,8 +59,8 @@ public class TaggedLineStringSimplifier {
    * @param seg
    * @return
    */
-  private static boolean isInLineSection(final TaggedLineString line,
-    final int[] sectionIndex, final TaggedLineSegment seg) {
+  private static boolean isInLineSection(final TaggedLineString line, final int[] sectionIndex,
+    final TaggedLineSegment seg) {
     // not in this taggedLine
     if (seg.getParent() != line.getParent()) {
       return false;
@@ -90,8 +90,7 @@ public class TaggedLineStringSimplifier {
     this.outputIndex = outputIndex;
   }
 
-  private int findFurthestPoint(final int i, final int j,
-    final double[] maxDistance) {
+  private int findFurthestPoint(final int i, final int j, final double[] maxDistance) {
     final Point p0 = this.line.getVertex(i);
     final Point p1 = this.line.getVertex(j);
     double maxDist = -1.0;
@@ -144,8 +143,8 @@ public class TaggedLineStringSimplifier {
     return false;
   }
 
-  private boolean hasBadIntersection(final TaggedLineString parentLine,
-    final int[] sectionIndex, final LineSegment candidateSeg) {
+  private boolean hasBadIntersection(final TaggedLineString parentLine, final int[] sectionIndex,
+    final LineSegment candidateSeg) {
     if (hasBadOutputIntersection(candidateSeg)) {
       return true;
     }
@@ -165,10 +164,8 @@ public class TaggedLineStringSimplifier {
     return false;
   }
 
-  private boolean hasInteriorIntersection(final LineSegment seg0,
-    final LineSegment seg1) {
-    this.li.computeIntersection(seg0.getP0(), seg0.getP1(), seg1.getP0(),
-      seg1.getP1());
+  private boolean hasInteriorIntersection(final LineSegment seg0, final LineSegment seg1) {
+    this.li.computeIntersection(seg0.getP0(), seg0.getP1(), seg1.getP0(), seg1.getP1());
     return this.li.isInteriorIntersection();
   }
 
@@ -179,8 +176,7 @@ public class TaggedLineStringSimplifier {
    * @param sectionStartIndex
    * @param sectionEndIndex
    */
-  private void remove(final TaggedLineString line, final int start,
-    final int end) {
+  private void remove(final TaggedLineString line, final int start, final int end) {
     for (int i = start; i < end; i++) {
       final TaggedLineSegment seg = line.getSegment(i);
       this.inputIndex.remove(seg);

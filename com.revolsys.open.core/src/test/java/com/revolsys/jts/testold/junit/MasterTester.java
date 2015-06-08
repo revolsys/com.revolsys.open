@@ -87,21 +87,18 @@ import com.revolsys.jts.testold.triangulate.DelaunayTest;
 @RunWith(Suite.class)
 @SuiteClasses({
   AngleTest.class, AreaLengthTest.class, CascadedPolygonUnionTest.class,
-  OrientationIndexTest.class, ConformingDelaunayTest.class,
-  ConvexHullTest.class, CoordinateArraysTest.class, DelaunayTest.class,
-  DistanceTest.class, GeometryCollectionImplTest.class, GeometryImplTest.class,
-  IntersectionMatrixTest.class, IntervalTest.class,
-  IsCounterClockWiseTest.class, IsRectangleTest.class, IsValidTest.class,
+  OrientationIndexTest.class, ConformingDelaunayTest.class, ConvexHullTest.class,
+  CoordinateArraysTest.class, DelaunayTest.class, DistanceTest.class,
+  GeometryCollectionImplTest.class, GeometryImplTest.class, IntersectionMatrixTest.class,
+  IntervalTest.class, IsCounterClockWiseTest.class, IsRectangleTest.class, IsValidTest.class,
   LengthIndexedLineTest.class, LineMergerTest.class, LineStringImplTest.class,
-  LocationIndexedLineTest.class, MiscellaneousTest.class,
-  MiscellaneousTest2.class, MultiPointImplTest.class,
-  NonRobustLineIntersectorTest.class, NormalizeTest.class, PointImplTest.class,
-  PolygonizeTest.class, PredicateShortCircuitTest.class, QuadtreeTest.class,
+  LocationIndexedLineTest.class, MiscellaneousTest.class, MiscellaneousTest2.class,
+  MultiPointImplTest.class, NonRobustLineIntersectorTest.class, NormalizeTest.class,
+  PointImplTest.class, PolygonizeTest.class, PredicateShortCircuitTest.class, QuadtreeTest.class,
   RectanglePredicateSyntheticTest.class, RectanglePredicateTest.class,
-  RelateBoundaryNodeRuleTest.class, RobustLineIntersectionTest.class,
-  SimpleTest.class, SIRtreeTest.class, STRtreeTest.class, WKTReaderTest.class,
-  WKBTest.class, UnaryUnionTest.class, ValidClosedRingTest.class,
-  ValidSelfTouchingRingFormingHoleTest.class, InteriorPointTest.class
+  RelateBoundaryNodeRuleTest.class, RobustLineIntersectionTest.class, SimpleTest.class,
+  SIRtreeTest.class, STRtreeTest.class, WKTReaderTest.class, WKBTest.class, UnaryUnionTest.class,
+  ValidClosedRingTest.class, ValidSelfTouchingRingFormingHoleTest.class, InteriorPointTest.class
 })
 public class MasterTester extends TestCase {
 }

@@ -61,18 +61,21 @@ import com.revolsys.jts.math.Matrix;
  *
  * @author Martin Davis
  */
-public class AffineTransformationBuilder
-{
+public class AffineTransformationBuilder {
   private final Point src0;
+
   private final Point src1;
+
   private final Point src2;
+
   private final Point dest0;
+
   private final Point dest1;
+
   private final Point dest2;
 
   // the matrix entries for the transformation
   private double m00, m01, m02, m10, m11, m12;
-
 
   /**
    * Constructs a new builder for
@@ -86,13 +89,8 @@ public class AffineTransformationBuilder
    * @param dest1 the image of control point 1 under the required transformation
    * @param dest2 the image of control point 2 under the required transformation
    */
-  public AffineTransformationBuilder(final Point src0,
-    final Point src1,
-    final Point src2,
-    final Point dest0,
-    final Point dest1,
-    final Point dest2)
-  {
+  public AffineTransformationBuilder(final Point src0, final Point src1, final Point src2,
+    final Point dest0, final Point dest1, final Point dest2) {
     this.src0 = src0;
     this.src1 = src1;
     this.src2 = src2;
@@ -109,9 +107,10 @@ public class AffineTransformationBuilder
    *
    * @return true if the transformation matrix is solvable
    */
-  private boolean compute()
-  {
-    final double[] bx = new double[] { this.dest0.getX(), this.dest1.getX(), this.dest2.getX() };
+  private boolean compute() {
+    final double[] bx = new double[] {
+      this.dest0.getX(), this.dest1.getX(), this.dest2.getX()
+    };
     final double[] row0 = solve(bx);
     if (row0 == null) {
       return false;
@@ -120,7 +119,9 @@ public class AffineTransformationBuilder
     this.m01 = row0[1];
     this.m02 = row0[2];
 
-    final double[] by = new double[] { this.dest0.getY(), this.dest1.getY(), this.dest2.getY() };
+    final double[] by = new double[] {
+      this.dest0.getY(), this.dest1.getY(), this.dest2.getY()
+    };
     final double[] row1 = solve(by);
     if (row1 == null) {
       return false;
@@ -139,8 +140,7 @@ public class AffineTransformationBuilder
    * @return an affine transformation
    * @return null if the control vectors do not determine a well-defined transformation
    */
-  public AffineTransformation getTransformation()
-  {
+  public AffineTransformation getTransformation() {
     // compute full 3-point transformation
     final boolean isSolvable = compute();
     if (isSolvable) {
@@ -157,12 +157,15 @@ public class AffineTransformationBuilder
    * @return the solution vector
    * @return null if no solution could be determined
    */
-  private double[] solve(final double[] b)
-  {
+  private double[] solve(final double[] b) {
     final double[][] a = new double[][] {
-      { this.src0.getX(), this.src0.getY(), 1 },
-      { this.src1.getX(), this.src1.getY(), 1},
-      { this.src2.getX(), this.src2.getY(), 1}
+      {
+        this.src0.getX(), this.src0.getY(), 1
+      }, {
+        this.src1.getX(), this.src1.getY(), 1
+      }, {
+        this.src2.getX(), this.src2.getY(), 1
+      }
     };
     return Matrix.solve(a, b);
   }

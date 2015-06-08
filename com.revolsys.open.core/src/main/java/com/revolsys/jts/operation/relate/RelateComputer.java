@@ -111,8 +111,8 @@ public class RelateComputer {
 
     // if the Geometries don't overlap there is nothing to do
     if (!this.arg[0].getGeometry()
-        .getBoundingBox()
-        .intersects(this.arg[1].getGeometry().getBoundingBox())) {
+      .getBoundingBox()
+      .intersects(this.arg[1].getGeometry().getBoundingBox())) {
       computeDisjointIM(im);
       return im;
     }
@@ -120,8 +120,8 @@ public class RelateComputer {
     this.arg[1].computeSelfNodes(this.li, false);
 
     // compute intersections between edges of the two input geometries
-    final SegmentIntersector intersector = this.arg[0].computeEdgeIntersections(
-      this.arg[1], this.li, false);
+    final SegmentIntersector intersector = this.arg[0].computeEdgeIntersections(this.arg[1],
+      this.li, false);
     // System.out.println("computeIM: # segment intersection tests: " +
     // intersector.numTests);
     computeIntersectionNodes(0);
@@ -206,8 +206,8 @@ public class RelateComputer {
     }
   }
 
-  private void computeProperIntersectionIM(
-    final SegmentIntersector intersector, final IntersectionMatrix im) {
+  private void computeProperIntersectionIM(final SegmentIntersector intersector,
+    final IntersectionMatrix im) {
     // If a proper intersection is found, we can set a lower bound on the IM.
     final int dimA = this.arg[0].getGeometry().getDimension();
     final int dimB = this.arg[1].getGeometry().getDimension();
@@ -294,8 +294,7 @@ public class RelateComputer {
    * If the target has dim 2 or 1, the edge can either be in the interior or the exterior.
    * If the target has dim 0, the edge must be in the exterior
    */
-  private void labelIsolatedEdge(final Edge e, final int targetIndex,
-    final Geometry target) {
+  private void labelIsolatedEdge(final Edge e, final int targetIndex, final Geometry target) {
     // this won't work for GeometryCollections with both dim 2 and 1 geoms
     if (target.getDimension() > 0) {
       // since edge is not in boundary, may not need the full generality of

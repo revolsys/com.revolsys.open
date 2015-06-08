@@ -97,8 +97,7 @@ public class VWSimplifier {
     }
 
     @Override
-    protected LineString transformCoordinates(final LineString coords,
-      final Geometry parent) {
+    protected LineString transformCoordinates(final LineString coords, final Geometry parent) {
       if (coords.getVertexCount() == 0) {
         return coords;
       } else {
@@ -115,8 +114,7 @@ public class VWSimplifier {
      * @return null if the simplification results in a degenerate ring
      */
     @Override
-    protected Geometry transformLinearRing(final LinearRing geom,
-      final Geometry parent) {
+    protected Geometry transformLinearRing(final LinearRing geom, final Geometry parent) {
       final boolean removeDegenerateRings = parent instanceof Polygon;
       final Geometry simpResult = super.transformLinearRing(geom, parent);
       if (removeDegenerateRings && !(simpResult instanceof LinearRing)) {
@@ -130,8 +128,7 @@ public class VWSimplifier {
      * Simplifies a MultiPolygon, fixing it if required.
      */
     @Override
-    protected Geometry transformMultiPolygon(final MultiPolygon geom,
-      final Geometry parent) {
+    protected Geometry transformMultiPolygon(final MultiPolygon geom, final Geometry parent) {
       final Geometry rawGeom = super.transformMultiPolygon(geom, parent);
       return createValidArea(rawGeom);
     }
@@ -145,8 +142,7 @@ public class VWSimplifier {
      * Simplifies a polygon, fixing it if required.
      */
     @Override
-    protected Geometry transformPolygon(final Polygon geom,
-      final Geometry parent) {
+    protected Geometry transformPolygon(final Polygon geom, final Geometry parent) {
       // empty geometries are simply removed
       if (geom.isEmpty()) {
         return null;
@@ -167,8 +163,7 @@ public class VWSimplifier {
    * @param distanceTolerance the tolerance to use
    * @return a simplified version of the geometry
    */
-  public static Geometry simplify(final Geometry geom,
-    final double distanceTolerance) {
+  public static Geometry simplify(final Geometry geom, final double distanceTolerance) {
     final VWSimplifier simp = new VWSimplifier(geom);
     simp.setDistanceTolerance(distanceTolerance);
     return simp.getResultGeometry();

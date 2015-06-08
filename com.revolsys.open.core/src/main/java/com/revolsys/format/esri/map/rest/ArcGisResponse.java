@@ -51,8 +51,8 @@ public class ArcGisResponse extends AbstractMapWrapper {
   public synchronized Map<String, Object> getValues() {
     Map<String, Object> values = super.getValues();
     if (values == null) {
-      final Resource resource = SpringUtil.getResource(UrlUtil.getUrl(
-        this.serviceUrl + this.path, FORMAT_PARAMETER));
+      final Resource resource = SpringUtil.getResource(UrlUtil.getUrl(this.serviceUrl + this.path,
+        FORMAT_PARAMETER));
       values = JsonMapIoFactory.toMap(resource);
       setValues(values);
     }

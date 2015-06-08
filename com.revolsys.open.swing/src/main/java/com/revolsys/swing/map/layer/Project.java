@@ -51,6 +51,13 @@ import com.revolsys.util.PreferencesUtil;
 
 public class Project extends LayerGroup {
 
+  static {
+    final MenuFactory menu = MenuFactory.getMenu(Project.class);
+    menu.deleteMenuItem("layer", "Delete Layer");
+  }
+
+  private static WeakReference<Project> project = new WeakReference<Project>(null);
+
   public static Project get() {
     return Project.project.get();
   }
@@ -59,21 +66,11 @@ public class Project extends LayerGroup {
     Project.project = new WeakReference<Project>(project);
   }
 
-  static {
-    final MenuFactory menu = MenuFactory.getMenu(Project.class);
-    menu.deleteMenuItem("layer", "Delete Layer");
-  }
-
-  private static WeakReference<Project> project = new WeakReference<Project>(
-      null);
-
   private BaseMapLayerGroup baseMapLayers = new BaseMapLayerGroup();
 
-  private RecordStoreConnectionRegistry recordStores = new RecordStoreConnectionRegistry(
-      "Project");
+  private RecordStoreConnectionRegistry recordStores = new RecordStoreConnectionRegistry("Project");
 
-  private FolderConnectionRegistry folderConnections = new FolderConnectionRegistry(
-      "Project");
+  private FolderConnectionRegistry folderConnections = new FolderConnectionRegistry("Project");
 
   private BoundingBox initialBoundingBox;
 
@@ -94,8 +91,7 @@ public class Project extends LayerGroup {
     setGeometryFactory(GeometryFactory.worldMercator());
   }
 
-  private void addChangedLayers(final LayerGroup group,
-    final List<Layer> layersWithChanges) {
+  private void addChangedLayers(final LayerGroup group, final List<Layer> layersWithChanges) {
     for (final Layer layer : group) {
       if (layer instanceof LayerGroup) {
         final LayerGroup subGroup = (LayerGroup)layer;
@@ -114,13 +110,11 @@ public class Project extends LayerGroup {
   }
 
   @Override
-  protected ValueField createPropertiesTabGeneralPanelSource(
-    final BasePanel parent) {
+  protected ValueField createPropertiesTabGeneralPanelSource(final BasePanel parent) {
     final ValueField panel = super.createPropertiesTabGeneralPanelSource(parent);
     if (this.resource != null) {
       try {
-        SwingUtil.addLabelledReadOnlyTextField(panel, "URL",
-          this.resource.getURL());
+        SwingUtil.addLabelledReadOnlyTextField(panel, "URL", this.resource.getURL());
         GroupLayoutUtil.makeColumns(panel, 2, true);
       } catch (final IOException e) {
       }
@@ -225,8 +219,8 @@ public class Project extends LayerGroup {
 
   public File getSaveAsDirectory() {
     File directory = null;
-    final JFileChooser fileChooser = SwingUtil.createFileChooser(
-      "Save Project", "com.revolsys.swing.map.project", "directory");
+    final JFileChooser fileChooser = SwingUtil.createFileChooser("Save Project",
+      "com.revolsys.swing.map.project", "directory");
     fileChooser.setFileFilter(new FileNameExtensionFilter("Project", "rgmap"));
     fileChooser.setMultiSelectionEnabled(false);
     final int returnVal = fileChooser.showSaveDialog(SwingUtil.getActiveWindow());
@@ -234,11 +228,10 @@ public class Project extends LayerGroup {
       directory = fileChooser.getSelectedFile();
       final String fileExtension = FileUtil.getFileNameExtension(directory);
       if (!"rgmap".equals(fileExtension)) {
-        directory = new File(directory.getParentFile(), directory.getName()
-          + ".rgmap");
+        directory = new File(directory.getParentFile(), directory.getName() + ".rgmap");
       }
-      PreferencesUtil.setUserString("com.revolsys.swing.map.project",
-        "directory", directory.getParent());
+      PreferencesUtil.setUserString("com.revolsys.swing.map.project", "directory",
+        directory.getParent());
 
       if (directory.exists()) {
         FileUtil.deleteDirectory(directory);
@@ -267,10 +260,9 @@ public class Project extends LayerGroup {
   }
 
   protected void readBaseMapsLayers(final Resource resource) {
-    final Resource baseMapsResource = SpringUtil.getResource(resource,
-        "Base Maps");
-    final Resource layerGroupResource = SpringUtil.getResource(
-      baseMapsResource, "rgLayerGroup.rgobject");
+    final Resource baseMapsResource = SpringUtil.getResource(resource, "Base Maps");
+    final Resource layerGroupResource = SpringUtil.getResource(baseMapsResource,
+      "rgLayerGroup.rgobject");
     if (layerGroupResource.exists()) {
       final Resource oldResource = SpringUtil.setBaseResource(baseMapsResource);
       try {
@@ -293,19 +285,16 @@ public class Project extends LayerGroup {
   }
 
   protected void readLayers(final Resource resource) {
-    final Resource layerGroupResource = SpringUtil.getResource(resource,
-        "rgLayerGroup.rgobject");
+    final Resource layerGroupResource = SpringUtil.getResource(resource, "rgLayerGroup.rgobject");
     if (!layerGroupResource.exists()) {
-      LoggerFactory.getLogger(getClass()).error(
-        "File not found: " + layerGroupResource);
+      LoggerFactory.getLogger(getClass()).error("File not found: " + layerGroupResource);
     } else {
       final Resource oldResource = SpringUtil.setBaseResource(resource);
       try {
         final Map<String, Object> properties = JsonMapIoFactory.toMap(layerGroupResource);
         loadLayers(properties);
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error(
-          "Unable to read: " + layerGroupResource, e);
+        LoggerFactory.getLogger(getClass()).error("Unable to read: " + layerGroupResource, e);
       } finally {
         SpringUtil.setBaseResource(oldResource);
       }
@@ -323,11 +312,9 @@ public class Project extends LayerGroup {
 
         final RecordStoreConnectionRegistry oldRecordStoreConnections = RecordStoreConnectionRegistry.getForThread();
         try {
-          final Resource recordStoresDirectory = SpringUtil.getResource(
-            resource, "Record Stores");
+          final Resource recordStoresDirectory = SpringUtil.getResource(resource, "Record Stores");
           if (!recordStoresDirectory.exists()) {
-            final Resource dataStoresDirectory = SpringUtil.getResource(
-              resource, "Data Stores");
+            final Resource dataStoresDirectory = SpringUtil.getResource(resource, "Data Stores");
             if (dataStoresDirectory.exists()) {
               try {
                 final File file = dataStoresDirectory.getFile();
@@ -343,8 +330,8 @@ public class Project extends LayerGroup {
           setRecordStores(recordStores);
           RecordStoreConnectionRegistry.setForThread(recordStores);
 
-          final Resource folderConnectionsDirectory = SpringUtil.getResource(
-            resource, "Folder Connections");
+          final Resource folderConnectionsDirectory = SpringUtil.getResource(resource,
+            "Folder Connections");
           this.folderConnections = new FolderConnectionRegistry("Project",
             folderConnectionsDirectory, readOnly);
 
@@ -364,19 +351,16 @@ public class Project extends LayerGroup {
   }
 
   protected void readProperties(final Resource resource) {
-    final Resource layerGroupResource = SpringUtil.getResource(resource,
-        "rgLayerGroup.rgobject");
+    final Resource layerGroupResource = SpringUtil.getResource(resource, "rgLayerGroup.rgobject");
     if (!layerGroupResource.exists()) {
-      LoggerFactory.getLogger(getClass()).error(
-        "File not found: " + layerGroupResource);
+      LoggerFactory.getLogger(getClass()).error("File not found: " + layerGroupResource);
     } else {
       final Resource oldResource = SpringUtil.setBaseResource(resource);
       try {
         final Map<String, Object> properties = JsonMapIoFactory.toMap(layerGroupResource);
         setProperties(properties);
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error(
-          "Unable to read: " + layerGroupResource, e);
+        LoggerFactory.getLogger(getClass()).error("Unable to read: " + layerGroupResource, e);
       } finally {
         SpringUtil.setBaseResource(oldResource);
       }
@@ -457,12 +441,12 @@ public class Project extends LayerGroup {
         final MapPanel mapPanel = MapPanel.get(this);
         final JLabel message = new JLabel(
           "<html><body><p><b>The following layers have un-saved changes.</b></p>"
-              + "<p><b>Do you want to save the changes before continuing?</b></p><ul><li>"
-              + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
-              + "</li></ul></body></html>");
+            + "<p><b>Do you want to save the changes before continuing?</b></p><ul><li>"
+            + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
+            + "</li></ul></body></html>");
 
-        final int option = JOptionPane.showConfirmDialog(mapPanel, message,
-          "Save Changes", optionType, JOptionPane.WARNING_MESSAGE);
+        final int option = JOptionPane.showConfirmDialog(mapPanel, message, "Save Changes",
+          optionType, JOptionPane.WARNING_MESSAGE);
         if (option == JOptionPane.CANCEL_OPTION) {
           return false;
         } else if (option == JOptionPane.NO_OPTION) {
@@ -479,13 +463,12 @@ public class Project extends LayerGroup {
           } else {
             final JLabel message2 = new JLabel(
               "<html><body><p><b>The following layers could not be saved.</b></p>"
-                  + "<p><b>Do you want to ignore these changes and continue?</b></p><ul><li>"
-                  + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
-                  + "</li></ul></body></html>");
+                + "<p><b>Do you want to ignore these changes and continue?</b></p><ul><li>"
+                + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
+                + "</li></ul></body></html>");
 
-            final int option2 = JOptionPane.showConfirmDialog(mapPanel,
-              message2, "Ignore Changes", JOptionPane.OK_CANCEL_OPTION,
-              JOptionPane.WARNING_MESSAGE);
+            final int option2 = JOptionPane.showConfirmDialog(mapPanel, message2, "Ignore Changes",
+              JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
             if (option2 == JOptionPane.CANCEL_OPTION) {
               return false;
             } else {
@@ -503,11 +486,10 @@ public class Project extends LayerGroup {
     } else {
       final MapPanel mapPanel = MapPanel.get(this);
       final JLabel message = new JLabel(
-          "<html><body><p><b>Save changes to project?</b></p></body></html>");
+        "<html><body><p><b>Save changes to project?</b></p></body></html>");
 
-      final int option = JOptionPane.showConfirmDialog(mapPanel, message,
-        "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION,
-        JOptionPane.WARNING_MESSAGE);
+      final int option = JOptionPane.showConfirmDialog(mapPanel, message, "Save Changes",
+        JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
       if (option == JOptionPane.CANCEL_OPTION) {
         return false;
       } else if (option == JOptionPane.NO_OPTION) {
@@ -516,13 +498,11 @@ public class Project extends LayerGroup {
         if (saveAllSettings()) {
           return true;
         } else {
-          final JLabel message2 = new JLabel(
-            "<html><body><p>Saving project failed.</b></p>"
-                + "<p><b>Do you want to ignore any changes and continue?</b></p></body></html>");
+          final JLabel message2 = new JLabel("<html><body><p>Saving project failed.</b></p>"
+            + "<p><b>Do you want to ignore any changes and continue?</b></p></body></html>");
 
-          final int option2 = JOptionPane.showConfirmDialog(mapPanel, message2,
-            "Ignore Changes", JOptionPane.OK_CANCEL_OPTION,
-            JOptionPane.WARNING_MESSAGE);
+          final int option2 = JOptionPane.showConfirmDialog(mapPanel, message2, "Ignore Changes",
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
           if (option2 == JOptionPane.CANCEL_OPTION) {
             return false;
           } else {
@@ -541,8 +521,7 @@ public class Project extends LayerGroup {
     return result;
   }
 
-  public void setFolderConnections(
-    final FolderConnectionRegistry folderConnections) {
+  public void setFolderConnections(final FolderConnectionRegistry folderConnections) {
     this.folderConnections = folderConnections;
   }
 
@@ -558,8 +537,7 @@ public class Project extends LayerGroup {
   public void setProperty(final String name, final Object value) {
     if ("srid".equals(name)) {
       try {
-        final Integer srid = StringConverterRegistry.toObject(Integer.class,
-          value);
+        final Integer srid = StringConverterRegistry.toObject(Integer.class, value);
         setGeometryFactory(GeometryFactory.floating3(srid));
       } catch (final Throwable t) {
       }
@@ -632,8 +610,7 @@ public class Project extends LayerGroup {
               bookmarks.put(name, boundingBox);
             }
           } catch (final Throwable e) {
-            ExceptionUtil.log(getClass(), "Not a valid bounding box " + name
-              + "=" + object, e);
+            ExceptionUtil.log(getClass(), "Not a valid bounding box " + name + "=" + object, e);
           }
         }
       }
@@ -656,15 +633,14 @@ public class Project extends LayerGroup {
         }
         boundingBox = boundingBox.convert(geometryFactory);
       }
-      MapSerializerUtil.add(map, "viewBoundingBox", boundingBox,
-        defaultBoundingBox);
+      MapSerializerUtil.add(map, "viewBoundingBox", boundingBox, defaultBoundingBox);
       final Map<String, BoundingBox> zoomBookmarks = getZoomBookmarks();
       MapSerializerUtil.add(map, "zoomBookmarks", zoomBookmarks);
     }
     final Rectangle frameBounds = ProjectFrame.get(this).getBounds();
     if (frameBounds != null) {
-      map.put("frameBounds", Arrays.asList(frameBounds.x, frameBounds.y,
-        frameBounds.width, frameBounds.height));
+      map.put("frameBounds",
+        Arrays.asList(frameBounds.x, frameBounds.y, frameBounds.width, frameBounds.height));
     }
 
     return map;

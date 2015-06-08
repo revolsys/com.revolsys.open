@@ -11,6 +11,11 @@ import com.revolsys.data.equals.EqualsRegistry;
 
 public class AngularUnit implements Serializable {
   /**
+   *
+   */
+  private static final long serialVersionUID = -3508138430785747634L;
+
+  /**
    * Get the angular unit representing the conversion factor from
    * {@link SI#RADIAN}.
    *
@@ -32,8 +37,7 @@ public class AngularUnit implements Serializable {
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
-  public static Unit<Angle> getUnit(final Unit<Angle> baseUnit,
-    final double conversionFactor) {
+  public static Unit<Angle> getUnit(final Unit<Angle> baseUnit, final double conversionFactor) {
     Unit<Angle> unit;
     if (baseUnit == null) {
       unit = SI.RADIAN;
@@ -58,11 +62,6 @@ public class AngularUnit implements Serializable {
 
   }
 
-  /**
-   *
-   */
-  private static final long serialVersionUID = -3508138430785747634L;
-
   private final Authority authority;
 
   private final AngularUnit baseUnit;
@@ -75,14 +74,13 @@ public class AngularUnit implements Serializable {
 
   private Unit<Angle> unit;
 
-  public AngularUnit(final String name, final AngularUnit baseUnit,
-    final double conversionFactor, final Authority authority) {
+  public AngularUnit(final String name, final AngularUnit baseUnit, final double conversionFactor,
+    final Authority authority) {
     this(name, baseUnit, conversionFactor, authority, false);
   }
 
-  public AngularUnit(final String name, final AngularUnit baseUnit,
-    final double conversionFactor, final Authority authority,
-    final boolean deprecated) {
+  public AngularUnit(final String name, final AngularUnit baseUnit, final double conversionFactor,
+    final Authority authority, final boolean deprecated) {
     this.name = name;
     if (name.equals("degree (supplier to define representation)")) {
       this.name = "degree";
@@ -100,8 +98,7 @@ public class AngularUnit implements Serializable {
     }
   }
 
-  public AngularUnit(final String name, final double conversionFactor,
-    final Authority authority) {
+  public AngularUnit(final String name, final double conversionFactor, final Authority authority) {
     this(name, null, conversionFactor, authority, false);
   }
 

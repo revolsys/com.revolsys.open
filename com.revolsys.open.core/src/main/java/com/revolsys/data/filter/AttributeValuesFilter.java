@@ -35,8 +35,8 @@ public class AttributeValuesFilter implements Filter<Record> {
    * @param fieldName The attribute name.
    * @param values The list of values.
    */
-  public AttributeValuesFilter(final String fieldName,
-    final boolean allowNulls, final List<Object> values) {
+  public AttributeValuesFilter(final String fieldName, final boolean allowNulls,
+    final List<Object> values) {
     this.fieldName = fieldName;
     this.values = values;
     this.allowNulls = allowNulls;
@@ -48,8 +48,8 @@ public class AttributeValuesFilter implements Filter<Record> {
    * @param fieldName The attribute name.
    * @param values The array of values.
    */
-  public AttributeValuesFilter(final String fieldName,
-    final boolean allowNulls, final Object... values) {
+  public AttributeValuesFilter(final String fieldName, final boolean allowNulls,
+    final Object... values) {
     this(fieldName, allowNulls, Arrays.asList(values));
   }
 
@@ -72,8 +72,7 @@ public class AttributeValuesFilter implements Filter<Record> {
    */
   @Override
   public boolean accept(final Record object) {
-    final Object propertyValue = Records.getFieldByPath(object,
-      this.fieldName);
+    final Object propertyValue = Records.getFieldByPath(object, this.fieldName);
     if (propertyValue == null) {
       if (this.allowNulls) {
         return true;

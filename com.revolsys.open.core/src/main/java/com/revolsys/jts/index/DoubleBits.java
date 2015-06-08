@@ -14,6 +14,8 @@ package com.revolsys.jts.index;
  */
 public class DoubleBits {
 
+  public static final int EXPONENT_BIAS = 1023;
+
   public static int exponent(final double d) {
     final DoubleBits db = new DoubleBits(d);
     return db.getExponent();
@@ -55,8 +57,6 @@ public class DoubleBits {
     db.zeroLowerBits(52);
     return db.getDouble();
   }
-
-  public static final int EXPONENT_BIAS = 1023;
 
   private final double x;
 
@@ -120,8 +120,8 @@ public class DoubleBits {
     final String zero64 = "0000000000000000000000000000000000000000000000000000000000000000";
     final String padStr = zero64 + numStr;
     final String bitStr = padStr.substring(padStr.length() - 64);
-    final String str = bitStr.substring(0, 1) + "  " + bitStr.substring(1, 12)
-        + "(" + getExponent() + ") " + bitStr.substring(12) + " [ " + this.x + " ]";
+    final String str = bitStr.substring(0, 1) + "  " + bitStr.substring(1, 12) + "("
+      + getExponent() + ") " + bitStr.substring(12) + " [ " + this.x + " ]";
     return str;
   }
 

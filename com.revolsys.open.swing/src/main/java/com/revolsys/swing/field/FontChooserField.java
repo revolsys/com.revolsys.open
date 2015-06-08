@@ -18,6 +18,31 @@ import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
 
 public class FontChooserField extends ComboBox {
+  private static final long serialVersionUID = 1L;
+
+  private static final String[] FONT_NAMES = getFontNames();
+
+  private static final Map<String, Reference<Font>> fontCache = new HashMap<>();
+
+  private static final ListCellRenderer RENDERER = new DefaultListCellRenderer() {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Component getListCellRendererComponent(final JList list, final Object value,
+      final int index, final boolean isSelected, final boolean cellHasFocus) {
+      final String fontName = StringConverterRegistry.toString(value);
+      final Font font = FontChooserField.getFont(fontName);
+
+      final Component renderer = super.getListCellRendererComponent(list, value, index, isSelected,
+        cellHasFocus);
+      renderer.setFont(font);
+      return renderer;
+    }
+  };
+
   private static Font getFont(final String name) {
     Reference<Font> reference = fontCache.get(name);
     if (reference != null) {
@@ -33,35 +58,8 @@ public class FontChooserField extends ComboBox {
   }
 
   public static String[] getFontNames() {
-    return GraphicsEnvironment.getLocalGraphicsEnvironment()
-        .getAvailableFontFamilyNames();
+    return GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
   }
-
-  private static final long serialVersionUID = 1L;
-
-  private static final String[] FONT_NAMES = getFontNames();
-
-  private static final Map<String, Reference<Font>> fontCache = new HashMap<>();
-
-  private static final ListCellRenderer RENDERER = new DefaultListCellRenderer() {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public Component getListCellRendererComponent(final JList list,
-      final Object value, final int index, final boolean isSelected,
-      final boolean cellHasFocus) {
-      final String fontName = StringConverterRegistry.toString(value);
-      final Font font = FontChooserField.getFont(fontName);
-
-      final Component renderer = super.getListCellRendererComponent(list,
-        value, index, isSelected, cellHasFocus);
-      renderer.setFont(font);
-      return renderer;
-    }
-  };
 
   public FontChooserField(final String fieldName, final String fontName) {
     super(fieldName, new DefaultComboBoxModel(FONT_NAMES),

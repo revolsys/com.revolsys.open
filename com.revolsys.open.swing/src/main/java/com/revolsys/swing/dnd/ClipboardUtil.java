@@ -33,8 +33,7 @@ public class ClipboardUtil {
           return null;
         } catch (final IOException e) {
           LoggerFactory.getLogger(ClipboardUtil.class).warn(
-            "Unable to be clipboard data for flavor="
-                + dataFlavor.getHumanPresentableName(), e);
+            "Unable to be clipboard data for flavor=" + dataFlavor.getHumanPresentableName(), e);
         }
       }
     }

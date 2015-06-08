@@ -57,8 +57,7 @@ import com.revolsys.jts.math.Vector3D;
  */
 public class PlanarPolygon3D {
 
-  private static LineString project(final LineString seq,
-    final int facingPlane) {
+  private static LineString project(final LineString seq, final int facingPlane) {
     switch (facingPlane) {
       case Plane3D.XY_PLANE:
         return AxisPlaneCoordinateSequence.projectToXY(seq);
@@ -120,8 +119,7 @@ public class PlanarPolygon3D {
     sum[0] /= n;
     sum[1] /= n;
     sum[2] /= n;
-    final Vector3D norm = Vector3D.create(new PointDouble(sum))
-        .normalize();
+    final Vector3D norm = Vector3D.create(new PointDouble(sum)).normalize();
     return norm;
   }
 
@@ -192,8 +190,7 @@ public class PlanarPolygon3D {
     final LineString seq = ring;
     final LineString seqProj = project(seq, this.facingPlane);
     final Point ptProj = project(pt, this.facingPlane);
-    return Location.EXTERIOR != RayCrossingCounter.locatePointInRing(ptProj,
-      seqProj);
+    return Location.EXTERIOR != RayCrossingCounter.locatePointInRing(ptProj, seqProj);
   }
 
   private Location locate(final Point pt, final LineString ring) {

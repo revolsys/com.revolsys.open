@@ -12,11 +12,10 @@ public class ImageViewport extends Viewport2D implements AutoCloseable {
 
   private final Graphics2D graphics;
 
-  public ImageViewport(final Project project, final int width,
-    final int height, final BoundingBox boundingBox) {
+  public ImageViewport(final Project project, final int width, final int height,
+    final BoundingBox boundingBox) {
     super(project, width, height, boundingBox);
-    this.image = new BufferedImage(width, height,
-      BufferedImage.TYPE_INT_ARGB_PRE);
+    this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
     this.graphics = (Graphics2D)this.image.getGraphics();
   }
 

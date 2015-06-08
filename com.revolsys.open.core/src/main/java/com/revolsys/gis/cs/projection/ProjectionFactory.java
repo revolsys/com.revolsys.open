@@ -21,8 +21,27 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 
 public final class ProjectionFactory {
-  public static Point convert(final Point point,
-    final GeometryFactory sourceGeometryFactory,
+  /** The map from projection names to projection classes. */
+  private static final Map<String, Class<? extends CoordinatesProjection>> projectionClasses = new HashMap<String, Class<? extends CoordinatesProjection>>();
+
+  static {
+    registerCoordinatesProjection(Projection.ALBERS_EQUAL_AREA, AlbersConicEqualArea.class);
+    registerCoordinatesProjection(Projection.TRANSVERSE_MERCATOR, TransverseMercator.class);
+    registerCoordinatesProjection(Projection.MERCATOR, Mercator1SP.class);
+    registerCoordinatesProjection(Projection.POPULAR_VISUALISATION_PSEUDO_MERCATOR,
+      WebMercator.class);
+    registerCoordinatesProjection(Projection.MERCATOR_1SP, Mercator1SP.class);
+    registerCoordinatesProjection(Projection.MERCATOR_2SP, Mercator2SP.class);
+    registerCoordinatesProjection(Projection.MERCATOR_1SP_SPHERICAL, Mercator1SPSpherical.class);
+    registerCoordinatesProjection(Projection.LAMBERT_CONIC_CONFORMAL_1SP,
+      LambertConicConformal1SP.class);
+    registerCoordinatesProjection(Projection.LAMBERT_CONIC_CONFORMAL_2SP,
+      LambertConicConformal.class);
+    registerCoordinatesProjection(Projection.LAMBERT_CONIC_CONFORMAL_2SP_BELGIUM,
+      LambertConicConformal.class);
+  }
+
+  public static Point convert(final Point point, final GeometryFactory sourceGeometryFactory,
     final GeometryFactory targetGeometryFactory) {
     if (point == null) {
       return null;
@@ -51,15 +70,12 @@ public final class ProjectionFactory {
           final CoordinatesProjection coordinateProjection = constructor.newInstance(coordinateSystem);
           return coordinateProjection;
         } catch (final NoSuchMethodException e) {
-          throw new IllegalArgumentException("Constructor " + projectionClass
-            + "(" + ProjectedCoordinateSystem.class.getName()
-            + ") does not exist");
+          throw new IllegalArgumentException("Constructor " + projectionClass + "("
+            + ProjectedCoordinateSystem.class.getName() + ") does not exist");
         } catch (final InstantiationException e) {
-          throw new IllegalArgumentException(projectionClass
-            + " cannot be instantiated", e);
+          throw new IllegalArgumentException(projectionClass + " cannot be instantiated", e);
         } catch (final IllegalAccessException e) {
-          throw new IllegalArgumentException(projectionClass
-            + " cannot be instantiated", e);
+          throw new IllegalArgumentException(projectionClass + " cannot be instantiated", e);
         } catch (final InvocationTargetException e) {
           final Throwable cause = e.getCause();
           if (cause instanceof RuntimeException) {
@@ -67,16 +83,15 @@ public final class ProjectionFactory {
           } else if (cause instanceof Error) {
             throw (Error)cause;
           } else {
-            throw new IllegalArgumentException(projectionClass
-              + " cannot be instantiated", cause);
+            throw new IllegalArgumentException(projectionClass + " cannot be instantiated", cause);
           }
         }
       }
     }
   }
 
-  public static CoordinatesOperation getCoordinatesOperation(
-    final CoordinateSystem cs1, final CoordinateSystem cs2) {
+  public static CoordinatesOperation getCoordinatesOperation(final CoordinateSystem cs1,
+    final CoordinateSystem cs2) {
     if (cs1 == null || cs2 == null || cs1 == cs2) {
       return null;
     } else {
@@ -110,8 +125,7 @@ public final class ProjectionFactory {
             if (angularUnit1.equals(NonSI.DEGREE_ANGLE)) {
               converstionOperation = DegreesToRadiansOperation.INSTANCE;
             } else {
-              converstionOperation = new UnitConverstionOperation(angularUnit1,
-                SI.RADIAN, 2);
+              converstionOperation = new UnitConverstionOperation(angularUnit1, SI.RADIAN, 2);
             }
 
             operations.add(converstionOperation);
@@ -134,8 +148,7 @@ public final class ProjectionFactory {
         final GeographicCoordinateSystem gcs2 = (GeographicCoordinateSystem)cs2;
         final Unit<Angle> angularUnit2 = gcs2.getUnit();
         if (!angularUnit2.equals(SI.RADIAN)) {
-          operations.add(new UnitConverstionOperation(SI.RADIAN, angularUnit2,
-            2));
+          operations.add(new UnitConverstionOperation(SI.RADIAN, angularUnit2, 2));
         }
       }
       switch (operations.size()) {
@@ -150,12 +163,10 @@ public final class ProjectionFactory {
   }
 
   public static CoordinatesOperation getCoordinatesOperation(
-    final GeometryFactory sourceGeometryFactory,
-    final GeometryFactory targetGeometryFactory) {
+    final GeometryFactory sourceGeometryFactory, final GeometryFactory targetGeometryFactory) {
     final CoordinateSystem sourceCoordinateSystem = sourceGeometryFactory.getCoordinateSystem();
     final CoordinateSystem targetCoordinateSystem = targetGeometryFactory.getCoordinateSystem();
-    return getCoordinatesOperation(sourceCoordinateSystem,
-      targetCoordinateSystem);
+    return getCoordinatesOperation(sourceCoordinateSystem, targetCoordinateSystem);
   }
 
   public static CoordinatesProjection getCoordinatesProjection(
@@ -205,30 +216,6 @@ public final class ProjectionFactory {
   public static void registerCoordinatesProjection(final String name,
     final Class<? extends CoordinatesProjection> projectionClass) {
     projectionClasses.put(name, projectionClass);
-  }
-
-  /** The map from projection names to projection classes. */
-  private static final Map<String, Class<? extends CoordinatesProjection>> projectionClasses = new HashMap<String, Class<? extends CoordinatesProjection>>();
-
-  static {
-    registerCoordinatesProjection(Projection.ALBERS_EQUAL_AREA,
-      AlbersConicEqualArea.class);
-    registerCoordinatesProjection(Projection.TRANSVERSE_MERCATOR,
-      TransverseMercator.class);
-    registerCoordinatesProjection(Projection.MERCATOR, Mercator1SP.class);
-    registerCoordinatesProjection(
-      Projection.POPULAR_VISUALISATION_PSEUDO_MERCATOR, WebMercator.class);
-    registerCoordinatesProjection(Projection.MERCATOR_1SP, Mercator1SP.class);
-    registerCoordinatesProjection(Projection.MERCATOR_2SP, Mercator2SP.class);
-    registerCoordinatesProjection(Projection.MERCATOR_1SP_SPHERICAL,
-      Mercator1SPSpherical.class);
-    registerCoordinatesProjection(Projection.LAMBERT_CONIC_CONFORMAL_1SP,
-      LambertConicConformal1SP.class);
-    registerCoordinatesProjection(Projection.LAMBERT_CONIC_CONFORMAL_2SP,
-      LambertConicConformal.class);
-    registerCoordinatesProjection(
-      Projection.LAMBERT_CONIC_CONFORMAL_2SP_BELGIUM,
-      LambertConicConformal.class);
   }
 
   private ProjectionFactory() {

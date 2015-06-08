@@ -8,21 +8,18 @@ import javax.swing.DefaultListSelectionModel;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 
-public class RecordLayerHighlightedListSelectionModel extends
-DefaultListSelectionModel {
+public class RecordLayerHighlightedListSelectionModel extends DefaultListSelectionModel {
   private static final long serialVersionUID = 1L;
 
   private final RecordLayerTableModel model;
 
-  public RecordLayerHighlightedListSelectionModel(
-    final RecordLayerTableModel model) {
+  public RecordLayerHighlightedListSelectionModel(final RecordLayerTableModel model) {
     this.model = model;
   }
 
   @Override
   public void addSelectionInterval(final int index0, final int index1) {
-    super.addSelectionInterval(convertRowIndexToModel(index0),
-      convertRowIndexToModel(index1));
+    super.addSelectionInterval(convertRowIndexToModel(index0), convertRowIndexToModel(index1));
     final List<LayerRecord> records = getObjects(index0, index1);
     final AbstractRecordLayer layer = this.model.getLayer();
     layer.addHighlightedRecords(records);
@@ -62,8 +59,7 @@ DefaultListSelectionModel {
 
   @Override
   public void removeSelectionInterval(final int index0, final int index1) {
-    super.removeSelectionInterval(convertRowIndexToModel(index0),
-      convertRowIndexToModel(index1));
+    super.removeSelectionInterval(convertRowIndexToModel(index0), convertRowIndexToModel(index1));
     final List<LayerRecord> records = getObjects(index0, index1);
     final AbstractRecordLayer layer = this.model.getLayer();
     layer.unHighlightRecords(records);
@@ -74,7 +70,6 @@ DefaultListSelectionModel {
     final List<LayerRecord> records = getObjects(index0, index1);
     final AbstractRecordLayer layer = this.model.getLayer();
     layer.setHighlightedRecords(records);
-    super.setSelectionInterval(convertRowIndexToModel(index0),
-      convertRowIndexToModel(index1));
+    super.setSelectionInterval(convertRowIndexToModel(index0), convertRowIndexToModel(index1));
   }
 }

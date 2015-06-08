@@ -81,8 +81,7 @@ public class ListFactoryBean<T> extends AbstractFactoryBean<List> {
       throw new IllegalArgumentException("'targetListClass' must not be null");
     }
     if (!List.class.isAssignableFrom(targetListClass)) {
-      throw new IllegalArgumentException(
-          "'targetListClass' must implement [java.util.List]");
+      throw new IllegalArgumentException("'targetListClass' must implement [java.util.List]");
     }
     this.targetListClass = targetListClass;
   }

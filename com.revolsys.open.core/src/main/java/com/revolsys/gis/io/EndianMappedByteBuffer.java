@@ -33,8 +33,7 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
 
   private final RandomAccessFile randomAccessFile;
 
-  public EndianMappedByteBuffer(final File file, final MapMode mapMode)
-      throws IOException {
+  public EndianMappedByteBuffer(final File file, final MapMode mapMode) throws IOException {
     String mode = "r";
     if (mapMode.equals(MapMode.READ_WRITE)) {
       mode = "rw";
@@ -45,8 +44,7 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
     this.buffer.order(ByteOrder.BIG_ENDIAN);
   }
 
-  public EndianMappedByteBuffer(final String name, final MapMode mapMode)
-      throws IOException {
+  public EndianMappedByteBuffer(final String name, final MapMode mapMode) throws IOException {
     this(new File(name), mapMode);
   }
 
@@ -168,8 +166,7 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
   }
 
   @Override
-  public void write(final byte[] bytes, final int offset, final int length)
-      throws IOException {
+  public void write(final byte[] bytes, final int offset, final int length) throws IOException {
     this.buffer.put(bytes, offset, length);
   }
 

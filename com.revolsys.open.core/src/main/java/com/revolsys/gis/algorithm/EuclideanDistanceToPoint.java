@@ -45,8 +45,7 @@ import com.revolsys.jts.geom.segment.Segment;
  * computes two points which are separated by the distance.
  */
 public class EuclideanDistanceToPoint {
-  public void computeDistance(final Geometry geom, final Point pt,
-    final PointPairDistance ptDist) {
+  public void computeDistance(final Geometry geom, final Point pt, final PointPairDistance ptDist) {
     if (geom instanceof LineString) {
       computeDistance(geom, pt, ptDist);
     } else if (geom instanceof Polygon) {
@@ -68,8 +67,7 @@ public class EuclideanDistanceToPoint {
     ptDist.setMinimum(closestPt, pt);
   }
 
-  public void computeDistance(final LineString line, final Point pt,
-    final PointPairDistance ptDist) {
+  public void computeDistance(final LineString line, final Point pt, final PointPairDistance ptDist) {
     for (final Segment segment : line.segments()) {
       // this is somewhat inefficient - could do better
       final Point closestPt = segment.closestPoint(pt);
@@ -77,8 +75,7 @@ public class EuclideanDistanceToPoint {
     }
   }
 
-  public void computeDistance(final Polygon poly, final Point pt,
-    final PointPairDistance ptDist) {
+  public void computeDistance(final Polygon poly, final Point pt, final PointPairDistance ptDist) {
     computeDistance(poly.getShell(), pt, ptDist);
     for (int i = 0; i < poly.getHoleCount(); i++) {
       computeDistance(poly.getHole(i), pt, ptDist);

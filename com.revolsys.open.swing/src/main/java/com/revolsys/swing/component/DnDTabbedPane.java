@@ -36,6 +36,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import com.revolsys.io.FileUtil;
@@ -65,8 +66,7 @@ public class DnDTabbedPane extends JTabbedPane {
         final int tabPlacement = getTabPlacement();
         final Point location = e.getLocation();
         final int targetTabIndex = getTargetTabIndex(location);
-        if (tabPlacement == JTabbedPane.TOP
-          || tabPlacement == JTabbedPane.BOTTOM) {
+        if (tabPlacement == SwingConstants.TOP || tabPlacement == SwingConstants.BOTTOM) {
           initTargetLeftRightLine(targetTabIndex, data);
         } else {
           initTargetTopBottomLine(targetTabIndex, data);
@@ -118,8 +118,7 @@ public class DnDTabbedPane extends JTabbedPane {
 
         if (DnDTabbedPane.this != sourceTabs) {
           if (DnDTabbedPane.this.acceptor != null) {
-            return DnDTabbedPane.this.acceptor.isDropAcceptable(sourceTabs,
-              data.getTabIndex());
+            return DnDTabbedPane.this.acceptor.isDropAcceptable(sourceTabs, data.getTabIndex());
           }
         }
       }
@@ -146,8 +145,7 @@ public class DnDTabbedPane extends JTabbedPane {
 
       if (DnDTabbedPane.this != sourceTabs) {
         if (DnDTabbedPane.this.acceptor != null) {
-          return DnDTabbedPane.this.acceptor.isDropAcceptable(sourceTabs,
-            data.getTabIndex());
+          return DnDTabbedPane.this.acceptor.isDropAcceptable(sourceTabs, data.getTabIndex());
         }
       }
 
@@ -223,8 +221,7 @@ public class DnDTabbedPane extends JTabbedPane {
 
   private static GhostGlassPane glassPane = new GhostGlassPane();
 
-  private final DataFlavor FLAVOR = new DataFlavor(
-    DataFlavor.javaJVMLocalObjectMimeType, NAME);
+  private final DataFlavor FLAVOR = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType, NAME);
 
   private boolean isDrawRect = false;
 
@@ -312,8 +309,8 @@ public class DnDTabbedPane extends JTabbedPane {
 
         initGlassPane(e.getComponent(), e.getDragOrigin(), dragTabIndex);
         try {
-          e.startDrag(DragSource.DefaultMoveDrop, new TabTransferable(
-            DnDTabbedPane.this, dragTabIndex), dsl);
+          e.startDrag(DragSource.DefaultMoveDrop, new TabTransferable(DnDTabbedPane.this,
+            dragTabIndex), dsl);
         } catch (final InvalidDnDOperationException idoe) {
           idoe.printStackTrace();
         }
@@ -321,14 +318,11 @@ public class DnDTabbedPane extends JTabbedPane {
     };
 
     // dropTarget =
-    new DropTarget(this, DnDConstants.ACTION_COPY_OR_MOVE,
-      new CDropTargetListener(), true);
-    new DragSource().createDefaultDragGestureRecognizer(this,
-      DnDConstants.ACTION_COPY_OR_MOVE, dgl);
+    new DropTarget(this, DnDConstants.ACTION_COPY_OR_MOVE, new CDropTargetListener(), true);
+    new DragSource().createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY_OR_MOVE, dgl);
     this.acceptor = new TabAcceptor() {
       @Override
-      public boolean isDropAcceptable(final DnDTabbedPane component,
-        final int index) {
+      public boolean isDropAcceptable(final DnDTabbedPane component, final int index) {
         return true;
       }
     };
@@ -338,25 +332,25 @@ public class DnDTabbedPane extends JTabbedPane {
     Point retval = new Point(location);
 
     switch (getTabPlacement()) {
-      case JTabbedPane.TOP: {
+      case SwingConstants.TOP: {
         retval.y = 1;
         retval.x -= glassPane.getGhostWidth() / 2;
       }
       break;
 
-      case JTabbedPane.BOTTOM: {
+      case SwingConstants.BOTTOM: {
         retval.y = getHeight() - 1 - glassPane.getGhostHeight();
         retval.x -= glassPane.getGhostWidth() / 2;
       }
       break;
 
-      case JTabbedPane.LEFT: {
+      case SwingConstants.LEFT: {
         retval.x = 1;
         retval.y -= glassPane.getGhostHeight() / 2;
       }
       break;
 
-      case JTabbedPane.RIGHT: {
+      case SwingConstants.RIGHT: {
         retval.x = getWidth() - 1 - glassPane.getGhostWidth();
         retval.y -= glassPane.getGhostHeight() / 2;
       }
@@ -400,8 +394,8 @@ public class DnDTabbedPane extends JTabbedPane {
 
   private TabTransferData getTabTransferData(final DropTargetDropEvent event) {
     try {
-      final TabTransferData data = (TabTransferData)event.getTransferable()
-        .getTransferData(this.FLAVOR);
+      final TabTransferData data = (TabTransferData)event.getTransferable().getTransferData(
+        this.FLAVOR);
       return data;
     } catch (final Exception e) {
       e.printStackTrace();
@@ -417,8 +411,8 @@ public class DnDTabbedPane extends JTabbedPane {
    */
   private int getTargetTabIndex(final Point point) {
     final int tabPlacement = getTabPlacement();
-    final boolean isTopOrBottom = tabPlacement == JTabbedPane.TOP
-      || tabPlacement == JTabbedPane.BOTTOM;
+    final boolean isTopOrBottom = tabPlacement == SwingConstants.TOP
+      || tabPlacement == SwingConstants.BOTTOM;
 
     // if the pane is empty, the target index is always zero.
     if (getTabCount() == 0) {
@@ -454,8 +448,7 @@ public class DnDTabbedPane extends JTabbedPane {
     return this.hasGhost;
   }
 
-  private void initGlassPane(final Component c, final Point tabPt,
-    final int tabIndex) {
+  private void initGlassPane(final Component c, final Point tabPt, final int tabIndex) {
     // Point p = (Point) pt.clone();
     getRootPane().setGlassPane(glassPane);
     if (hasGhost()) {
@@ -472,8 +465,7 @@ public class DnDTabbedPane extends JTabbedPane {
     glassPane.setVisible(true);
   }
 
-  private void initTargetLeftRightLine(final int next,
-    final TabTransferData data) {
+  private void initTargetLeftRightLine(final int next, final TabTransferData data) {
     if (next < 0) {
       this.lineRect.setRect(0, 0, 0, 0);
       this.isDrawRect = false;
@@ -496,19 +488,16 @@ public class DnDTabbedPane extends JTabbedPane {
       this.isDrawRect = true;
     } else if (next == tabCount) {
       final Rectangle rect = getBoundsAt(tabCount - 1);
-      this.lineRect.setRect(rect.x + rect.width - LINEWIDTH / 2, rect.y,
-        LINEWIDTH, rect.height);
+      this.lineRect.setRect(rect.x + rect.width - LINEWIDTH / 2, rect.y, LINEWIDTH, rect.height);
       this.isDrawRect = true;
     } else {
       final Rectangle rect = getBoundsAt(next - 1);
-      this.lineRect.setRect(rect.x + rect.width - LINEWIDTH / 2, rect.y,
-        LINEWIDTH, rect.height);
+      this.lineRect.setRect(rect.x + rect.width - LINEWIDTH / 2, rect.y, LINEWIDTH, rect.height);
       this.isDrawRect = true;
     }
   }
 
-  private void initTargetTopBottomLine(final int next,
-    final TabTransferData data) {
+  private void initTargetTopBottomLine(final int next, final TabTransferData data) {
     if (next < 0) {
       this.lineRect.setRect(0, 0, 0, 0);
       this.isDrawRect = false;
@@ -525,8 +514,7 @@ public class DnDTabbedPane extends JTabbedPane {
       return;
     } else if (next == getTabCount()) {
       final Rectangle rect = getBoundsAt(getTabCount() - 1);
-      this.lineRect.setRect(rect.x, rect.y + rect.height - LINEWIDTH / 2,
-        rect.width, LINEWIDTH);
+      this.lineRect.setRect(rect.x, rect.y + rect.height - LINEWIDTH / 2, rect.width, LINEWIDTH);
       this.isDrawRect = true;
     } else if (next == 0) {
       final Rectangle rect = getBoundsAt(0);
@@ -534,8 +522,7 @@ public class DnDTabbedPane extends JTabbedPane {
       this.isDrawRect = true;
     } else {
       final Rectangle rect = getBoundsAt(next - 1);
-      this.lineRect.setRect(rect.x, rect.y + rect.height - LINEWIDTH / 2,
-        rect.width, LINEWIDTH);
+      this.lineRect.setRect(rect.x, rect.y + rect.height - LINEWIDTH / 2, rect.width, LINEWIDTH);
       this.isDrawRect = true;
     }
   }

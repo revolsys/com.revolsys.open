@@ -61,8 +61,7 @@ public class LineStringExtracter {
    * @param geom the geometry from which to extract
    * @param lines the list to add the extracted LineStrings to
    */
-  public static List<LineString> getLines(final Geometry geometry,
-    final List<LineString> list) {
+  public static List<LineString> getLines(final Geometry geometry, final List<LineString> list) {
     for (final Geometry part : geometry.geometries()) {
       if (part instanceof LineString) {
         list.add((LineString)part);

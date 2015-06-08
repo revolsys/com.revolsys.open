@@ -22,11 +22,10 @@ public class UiBuilderObjectForm extends Form {
 
   private final Object object;
 
-  private final ElementContainer fieldContainer = new ElementContainer(
-    new TableBody());
+  private final ElementContainer fieldContainer = new ElementContainer(new TableBody());
 
-  public UiBuilderObjectForm(final Object object,
-    final HtmlUiBuilder<?> uiBuilder, final List<String> fieldKeys) {
+  public UiBuilderObjectForm(final Object object, final HtmlUiBuilder<?> uiBuilder,
+    final List<String> fieldKeys) {
     super(uiBuilder.getTypeName());
     this.object = object;
     this.builder = uiBuilder;
@@ -34,9 +33,8 @@ public class UiBuilderObjectForm extends Form {
     add(this.fieldContainer);
   }
 
-  public UiBuilderObjectForm(final Object object,
-    final HtmlUiBuilder<?> uiBuilder, final String formName,
-    final List<String> fieldKeys) {
+  public UiBuilderObjectForm(final Object object, final HtmlUiBuilder<?> uiBuilder,
+    final String formName, final List<String> fieldKeys) {
     super(formName);
     this.object = object;
     this.builder = uiBuilder;
@@ -47,8 +45,7 @@ public class UiBuilderObjectForm extends Form {
   }
 
   @Override
-  public Object getInitialValue(final Field field,
-    final HttpServletRequest request) {
+  public Object getInitialValue(final Field field, final HttpServletRequest request) {
     if (this.object != null) {
       final String propertyName = field.getName();
       if (propertyName != Form.FORM_TASK_PARAM) {
@@ -80,8 +77,7 @@ public class UiBuilderObjectForm extends Form {
               final HiddenField hiddenField = (HiddenField)field;
               add(hiddenField);
             } else {
-              final Decorator label = this.builder.getAttributeTableLabel(key,
-                field);
+              final Decorator label = this.builder.getAttributeTableLabel(key, field);
               final TableRow row = new TableRow();
               row.add(field, label);
               this.fieldContainer.add(row);
@@ -105,8 +101,7 @@ public class UiBuilderObjectForm extends Form {
       for (final Field field : getFields().values()) {
         if (!field.hasValidationErrors() && !field.isReadOnly()) {
           final String propertyName = field.getName();
-          if (propertyName != Form.FORM_TASK_PARAM
-              && this.fieldKeys.contains(propertyName)) {
+          if (propertyName != Form.FORM_TASK_PARAM && this.fieldKeys.contains(propertyName)) {
             final Object value = field.getValue();
             try {
               this.builder.setValue(this.object, propertyName, value);

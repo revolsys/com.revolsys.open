@@ -54,6 +54,12 @@ import org.slf4j.LoggerFactory;
  * @author Paul Austin
  */
 public final class JavaBeanUtil {
+  private static PropertyUtilsBean propertiesUtilBean;
+
+  private static ConvertUtilsBean convertUtilsBean;
+
+  static final Logger LOG = LoggerFactory.getLogger(JavaBeanUtil.class);
+
   public static void clearCache() {
     propertiesUtilBean = null;
     convertUtilsBean = null;
@@ -68,8 +74,7 @@ public final class JavaBeanUtil {
   @SuppressWarnings("unchecked")
   public static <V> V clone(final V value) {
     if (value instanceof Map) {
-      final Map<Object, Object> map = new LinkedHashMap<Object, Object>(
-          (Map<Object, Object>)value);
+      final Map<Object, Object> map = new LinkedHashMap<Object, Object>((Map<Object, Object>)value);
       for (final Entry<Object, Object> entry : map.entrySet()) {
         final Object mapValue = entry.getValue();
         final Object clonedMapValue = clone(mapValue);
@@ -137,8 +142,7 @@ public final class JavaBeanUtil {
     }
   }
 
-  public static boolean getBooleanValue(final Object object,
-    final String fieldName) {
+  public static boolean getBooleanValue(final Object object, final String fieldName) {
     if (object == null) {
       return false;
     } else {
@@ -220,12 +224,8 @@ public final class JavaBeanUtil {
     Arrays.sort(methods, new Comparator<Method>() {
       @Override
       public int compare(final Method method1, final Method method2) {
-        final String name1 = method1.getName()
-            .replaceAll("^(set|get|is)", "")
-            .toLowerCase();
-        final String name2 = method2.getName()
-            .replaceAll("^(set|get|is)", "")
-            .toLowerCase();
+        final String name1 = method1.getName().replaceAll("^(set|get|is)", "").toLowerCase();
+        final String name2 = method2.getName().replaceAll("^(set|get|is)", "").toLowerCase();
         final int nameCompare = name1.compareTo(name2);
         return nameCompare;
       }
@@ -257,19 +257,16 @@ public final class JavaBeanUtil {
         throw new RuntimeException("Unable to get property " + propertyName, t);
       }
     } catch (final NoSuchMethodException e) {
-      throw new IllegalArgumentException("Property " + propertyName
-        + " does not exist");
+      throw new IllegalArgumentException("Property " + propertyName + " does not exist");
     }
   }
 
   public static String getPropertyName(final String methodName) {
     String propertyName;
     if (methodName.startsWith("is")) {
-      propertyName = methodName.substring(2, 3).toLowerCase()
-          + methodName.substring(3);
+      propertyName = methodName.substring(2, 3).toLowerCase() + methodName.substring(3);
     } else {
-      propertyName = methodName.substring(3, 4).toLowerCase()
-          + methodName.substring(4);
+      propertyName = methodName.substring(3, 4).toLowerCase() + methodName.substring(4);
     }
     return propertyName;
   }
@@ -290,8 +287,7 @@ public final class JavaBeanUtil {
    * @return The property value.
    */
   @SuppressWarnings("unchecked")
-  public static <T> T getSimpleProperty(final Object object,
-    final String propertyName) {
+  public static <T> T getSimpleProperty(final Object object, final String propertyName) {
     if (object == null) {
       return null;
     } else {
@@ -306,12 +302,10 @@ public final class JavaBeanUtil {
         } else if (t instanceof Error) {
           throw (Error)t;
         } else {
-          throw new RuntimeException("Unable to get property " + propertyName,
-            t);
+          throw new RuntimeException("Unable to get property " + propertyName, t);
         }
       } catch (final NoSuchMethodException e) {
-        throw new IllegalArgumentException("Property " + propertyName
-          + " does not exist");
+        throw new IllegalArgumentException("Property " + propertyName + " does not exist");
       }
     }
   }
@@ -328,8 +322,7 @@ public final class JavaBeanUtil {
     return name;
   }
 
-  public static Class<?> getTypeParameterClass(final Method method,
-    final Class<?> expectedRawClass) {
+  public static Class<?> getTypeParameterClass(final Method method, final Class<?> expectedRawClass) {
     final Type resultListReturnType = method.getGenericReturnType();
     if (resultListReturnType instanceof ParameterizedType) {
       final ParameterizedType parameterizedType = (ParameterizedType)resultListReturnType;
@@ -342,19 +335,17 @@ public final class JavaBeanUtil {
             final Class<?> resultClass = (Class<?>)resultType;
             return resultClass;
           } else {
-            throw new IllegalArgumentException(method.getName()
-              + " must return " + expectedRawClass.getName()
-              + " with 1 generic type parameter that is a class");
+            throw new IllegalArgumentException(method.getName() + " must return "
+              + expectedRawClass.getName() + " with 1 generic type parameter that is a class");
           }
         }
       }
     }
     throw new IllegalArgumentException(method.getName() + " must return "
-        + expectedRawClass.getName() + " with 1 generic class parameter");
+      + expectedRawClass.getName() + " with 1 generic class parameter");
   }
 
-  public static Method getWriteMethod(final Class<?> beanClass,
-    final String name) {
+  public static Method getWriteMethod(final Class<?> beanClass, final String name) {
     final PropertyDescriptor descriptor = Property.descriptor(beanClass, name);
     if (descriptor != null) {
       return descriptor.getWriteMethod();
@@ -377,8 +368,8 @@ public final class JavaBeanUtil {
     }
   }
 
-  public static <T> T invokeConstructor(
-    final Constructor<? extends T> constructor, final Object... args) {
+  public static <T> T invokeConstructor(final Constructor<? extends T> constructor,
+    final Object... args) {
     try {
       final T object = constructor.newInstance(args);
       return object;
@@ -412,8 +403,7 @@ public final class JavaBeanUtil {
     return false;
   }
 
-  public static boolean isAssignableFrom(final Collection<Class<?>> classes,
-    final Object object) {
+  public static boolean isAssignableFrom(final Collection<Class<?>> classes, final Object object) {
     Class<?> objectClass;
     if (object == null) {
       return false;
@@ -425,8 +415,7 @@ public final class JavaBeanUtil {
     return isAssignableFrom(classes, objectClass);
   }
 
-  public static boolean isDefinedInClassLoader(final ClassLoader classLoader,
-    final URL resourceUrl) {
+  public static boolean isDefinedInClassLoader(final ClassLoader classLoader, final URL resourceUrl) {
     if (classLoader instanceof URLClassLoader) {
       final String resourceUrlString = resourceUrl.toString();
       final URLClassLoader urlClassLoader = (URLClassLoader)classLoader;
@@ -441,8 +430,7 @@ public final class JavaBeanUtil {
     }
   }
 
-  public static <T> T method(final Method method, final Object object,
-    final Object... args) {
+  public static <T> T method(final Method method, final Object object, final Object... args) {
     try {
       @SuppressWarnings("unchecked")
       final T result = (T)method.invoke(object, args);
@@ -466,8 +454,7 @@ public final class JavaBeanUtil {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T method(final Object object, final String methodName,
-    final Object... args) {
+  public static <T> T method(final Object object, final String methodName, final Object... args) {
     try {
       return (T)MethodUtils.invokeMethod(object, methodName, args);
     } catch (final RuntimeException e) {
@@ -496,8 +483,7 @@ public final class JavaBeanUtil {
    * @param propertyName The name of the property.
    * @param value The property value.
    */
-  public static boolean setProperty(final Object object, String propertyName,
-    final Object value) {
+  public static boolean setProperty(final Object object, String propertyName, final Object value) {
     if (object == null || !Property.hasValue(propertyName)) {
       return false;
     } else {
@@ -506,8 +492,7 @@ public final class JavaBeanUtil {
         final Resolver resolver = getPropertyUtilsBean().getResolver();
         while (resolver.hasNested(propertyName)) {
           try {
-            target = getPropertyUtilsBean().getProperty(target,
-              resolver.next(propertyName));
+            target = getPropertyUtilsBean().getProperty(target, resolver.next(propertyName));
             propertyName = resolver.remove(propertyName);
           } catch (final NoSuchMethodException e) {
             return false;
@@ -534,8 +519,7 @@ public final class JavaBeanUtil {
         } else {
           PropertyDescriptor descriptor = null;
           try {
-            descriptor = getPropertyUtilsBean().getPropertyDescriptor(target,
-              propertyName);
+            descriptor = getPropertyUtilsBean().getPropertyDescriptor(target, propertyName);
 
             if (descriptor == null) {
               return false;
@@ -548,8 +532,7 @@ public final class JavaBeanUtil {
               return false;
             }
             type = ((MappedPropertyDescriptor)descriptor).getMappedPropertyType();
-          } else if (index >= 0
-              && descriptor instanceof IndexedPropertyDescriptor) {
+          } else if (index >= 0 && descriptor instanceof IndexedPropertyDescriptor) {
             if (((IndexedPropertyDescriptor)descriptor).getIndexedWriteMethod() == null) {
               return false;
             }
@@ -561,13 +544,12 @@ public final class JavaBeanUtil {
             type = value == null ? Object.class : value.getClass();
           } else {
             if (descriptor.getWriteMethod() == null) {
-              final String setMethodName = "set"
-                  + CaseConverter.toUpperFirstChar(propertyName);
-              Method setMethod = MethodUtils.getAccessibleMethod(
-                target.getClass(), setMethodName, value.getClass());
+              final String setMethodName = "set" + CaseConverter.toUpperFirstChar(propertyName);
+              Method setMethod = MethodUtils.getAccessibleMethod(target.getClass(), setMethodName,
+                value.getClass());
               if (setMethod == null) {
-                setMethod = MethodUtils.getAccessibleMethod(target.getClass(),
-                  setMethodName, Double.TYPE);
+                setMethod = MethodUtils.getAccessibleMethod(target.getClass(), setMethodName,
+                  Double.TYPE);
               }
               if (setMethod != null) {
                 method(setMethod, target, value);
@@ -596,11 +578,9 @@ public final class JavaBeanUtil {
           }
         } else if (type.isArray()) {
           if (value instanceof String || value == null) {
-            newValue = getConvertutilsbean().convert((String)value,
-              type.getComponentType());
+            newValue = getConvertutilsbean().convert((String)value, type.getComponentType());
           } else if (value instanceof String[]) {
-            newValue = getConvertutilsbean().convert(((String[])value)[0],
-              type.getComponentType());
+            newValue = getConvertutilsbean().convert(((String[])value)[0], type.getComponentType());
           } else {
             newValue = convert(value, type.getComponentType());
           }
@@ -620,8 +600,7 @@ public final class JavaBeanUtil {
           return false;
         }
       } catch (final IllegalAccessException e) {
-        throw new RuntimeException(
-          "Unable to access property: " + propertyName, e);
+        throw new RuntimeException("Unable to access property: " + propertyName, e);
       } catch (final InvocationTargetException e) {
         final Throwable t = e.getCause();
         if (t instanceof RuntimeException) {
@@ -629,18 +608,11 @@ public final class JavaBeanUtil {
         } else if (t instanceof Error) {
           throw (Error)t;
         } else {
-          throw new RuntimeException("Unable to set property: " + propertyName,
-            e);
+          throw new RuntimeException("Unable to set property: " + propertyName, e);
         }
       }
     }
   }
-
-  private static PropertyUtilsBean propertiesUtilBean;
-
-  private static ConvertUtilsBean convertUtilsBean;
-
-  static final Logger LOG = LoggerFactory.getLogger(JavaBeanUtil.class);
 
   /**
    * Construct a new JavaBeanUtil.

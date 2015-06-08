@@ -29,38 +29,34 @@ public class AffineTransformationBuilderTest extends TestCase {
     assertEquals(p.getY(), q.getY(), 0.00005);
   }
 
-  void run(final double p0x, final double p0y, final double pp0x,
-    final double pp0y) {
+  void run(final double p0x, final double p0y, final double pp0x, final double pp0y) {
     final Point p0 = new PointDouble(p0x, p0y);
 
     final Point pp0 = new PointDouble(pp0x, pp0y);
 
-    final AffineTransformation trans = AffineTransformationFactory.createFromControlVectors(
-      p0, pp0);
+    final AffineTransformation trans = AffineTransformationFactory.createFromControlVectors(p0, pp0);
 
     assertEqualPoint(pp0, trans.transform(p0));
   }
 
-  void run(final double p0x, final double p0y, final double p1x,
-    final double p1y, final double pp0x, final double pp0y, final double pp1x,
-    final double pp1y) {
+  void run(final double p0x, final double p0y, final double p1x, final double p1y,
+    final double pp0x, final double pp0y, final double pp1x, final double pp1y) {
     final Point p0 = new PointDouble(p0x, p0y);
     final Point p1 = new PointDouble(p1x, p1y);
 
     final Point pp0 = new PointDouble(pp0x, pp0y);
     final Point pp1 = new PointDouble(pp1x, pp1y);
 
-    final AffineTransformation trans = AffineTransformationFactory.createFromControlVectors(
-      p0, p1, pp0, pp1);
+    final AffineTransformation trans = AffineTransformationFactory.createFromControlVectors(p0, p1,
+      pp0, pp1);
 
     assertEqualPoint(pp0, trans.transform(p0));
     assertEqualPoint(pp1, trans.transform(p1));
   }
 
-  void run(final double p0x, final double p0y, final double p1x,
-    final double p1y, final double p2x, final double p2y, final double pp0x,
-    final double pp0y, final double pp1x, final double pp1y, final double pp2x,
-    final double pp2y) {
+  void run(final double p0x, final double p0y, final double p1x, final double p1y,
+    final double p2x, final double p2y, final double pp0x, final double pp0y, final double pp1x,
+    final double pp1y, final double pp2x, final double pp2y) {
     final Point p0 = new PointDouble(p0x, p0y);
     final Point p1 = new PointDouble(p1x, p1y);
     final Point p2 = new PointDouble(p2x, p2y);
@@ -69,8 +65,8 @@ public class AffineTransformationBuilderTest extends TestCase {
     final Point pp1 = new PointDouble(pp1x, pp1y);
     final Point pp2 = new PointDouble(pp2x, pp2y);
 
-    final AffineTransformationBuilder atb = new AffineTransformationBuilder(p0,
-      p1, p2, pp0, pp1, pp2);
+    final AffineTransformationBuilder atb = new AffineTransformationBuilder(p0, p1, p2, pp0, pp1,
+      pp2);
     final AffineTransformation trans = atb.getTransformation();
 
     assertEqualPoint(pp0, trans.transform(p0));
@@ -78,10 +74,9 @@ public class AffineTransformationBuilderTest extends TestCase {
     assertEqualPoint(pp2, trans.transform(p2));
   }
 
-  void runSingular(final double p0x, final double p0y, final double p1x,
-    final double p1y, final double p2x, final double p2y, final double pp0x,
-    final double pp0y, final double pp1x, final double pp1y, final double pp2x,
-    final double pp2y) {
+  void runSingular(final double p0x, final double p0y, final double p1x, final double p1y,
+    final double p2x, final double p2y, final double pp0x, final double pp0y, final double pp1x,
+    final double pp1y, final double pp2x, final double pp2y) {
     final Point p0 = new PointDouble(p0x, p0y);
     final Point p1 = new PointDouble(p1x, p1y);
     final Point p2 = new PointDouble(p2x, p2y);
@@ -90,20 +85,20 @@ public class AffineTransformationBuilderTest extends TestCase {
     final Point pp1 = new PointDouble(pp1x, pp1y);
     final Point pp2 = new PointDouble(pp2x, pp2y);
 
-    final AffineTransformationBuilder atb = new AffineTransformationBuilder(p0,
-      p1, p2, pp0, pp1, pp2);
+    final AffineTransformationBuilder atb = new AffineTransformationBuilder(p0, p1, p2, pp0, pp1,
+      pp2);
     final AffineTransformation trans = atb.getTransformation();
     assertEquals(trans, null);
   }
 
-  private void runTransform(final AffineTransformation trans, final Point p0,
-    final Point p1, final Point p2) {
+  private void runTransform(final AffineTransformation trans, final Point p0, final Point p1,
+    final Point p2) {
     final Point pp0 = trans.transform(p0);
     final Point pp1 = trans.transform(p1);
     final Point pp2 = trans.transform(p2);
 
-    final AffineTransformationBuilder atb = new AffineTransformationBuilder(p0,
-      p1, p2, pp0, pp1, pp2);
+    final AffineTransformationBuilder atb = new AffineTransformationBuilder(p0, p1, p2, pp0, pp1,
+      pp2);
     final AffineTransformation atbTrans = atb.getTransformation();
 
     assertEqualPoint(pp0, atbTrans.transform(p0));

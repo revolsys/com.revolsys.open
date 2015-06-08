@@ -17,9 +17,8 @@ public class PrintViewport2D extends Viewport2D {
 
   private final int dpi;
 
-  public PrintViewport2D(final Project map, final Graphics2D graphics,
-    final PageFormat pageFormat, final BoundingBox boundingBox,
-    final Rectangle2D contentRect, final int dpi) {
+  public PrintViewport2D(final Project map, final Graphics2D graphics, final PageFormat pageFormat,
+    final BoundingBox boundingBox, final Rectangle2D contentRect, final int dpi) {
     super(map);
     this.contentRect = contentRect;
     this.dpi = dpi;

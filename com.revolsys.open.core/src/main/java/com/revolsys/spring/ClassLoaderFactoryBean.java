@@ -15,6 +15,8 @@ import com.revolsys.io.filter.ExtensionFilenameFilter;
 
 public class ClassLoaderFactoryBean extends AbstractFactoryBean<ClassLoader> {
 
+  private static final FilenameFilter JAR_FILTER = new ExtensionFilenameFilter("jar", "zip");
+
   public static void addJars(final Collection<URL> urls, final File directory) {
     if (directory.exists() && directory.isDirectory()) {
       final File[] libFiles = directory.listFiles(JAR_FILTER);
@@ -28,27 +30,23 @@ public class ClassLoaderFactoryBean extends AbstractFactoryBean<ClassLoader> {
     }
   }
 
-  public static URLClassLoader createClassLoader(
-    final ClassLoader parentClassLoader, final Collection<URL> urls) {
+  public static URLClassLoader createClassLoader(final ClassLoader parentClassLoader,
+    final Collection<URL> urls) {
     URL[] urlArray = new URL[urls.size()];
     urlArray = urls.toArray(urlArray);
     return new URLClassLoader(urlArray, parentClassLoader);
   }
 
-  public static URLClassLoader createClassLoader(
-    final ClassLoader parentClassLoader, final File file) {
+  public static URLClassLoader createClassLoader(final ClassLoader parentClassLoader,
+    final File file) {
     final Collection<URL> urls = new LinkedHashSet<URL>();
     if (file.isDirectory()) {
       addJars(urls, file);
-    } else if (JAR_FILTER.accept(file.getParentFile(),
-      FileUtil.getFileName(file))) {
+    } else if (JAR_FILTER.accept(file.getParentFile(), FileUtil.getFileName(file))) {
       urls.add(FileUtil.toUrl(file));
     }
     return createClassLoader(parentClassLoader, urls);
   }
-
-  private static final FilenameFilter JAR_FILTER = new ExtensionFilenameFilter(
-    "jar", "zip");
 
   private Collection<URL> urls = new LinkedHashSet<URL>();
 
@@ -60,8 +58,7 @@ public class ClassLoaderFactoryBean extends AbstractFactoryBean<ClassLoader> {
   protected ClassLoader createInstance() throws Exception {
     final Class<? extends ClassLoaderFactoryBean> clazz = getClass();
     final ClassLoader parentClassLoader = clazz.getClassLoader();
-    final URLClassLoader classLoader = createClassLoader(parentClassLoader,
-      this.mergedUrls);
+    final URLClassLoader classLoader = createClassLoader(parentClassLoader, this.mergedUrls);
     return classLoader;
   }
 

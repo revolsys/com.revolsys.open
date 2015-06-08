@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -37,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-
 /**
  * The base class for nodes in a {@link Bintree}.
  *
@@ -49,8 +47,7 @@ public abstract class NodeBase {
    * Returns the index of the subnode that wholely contains the given interval.
    * If none does, returns -1.
    */
-  public static int getSubnodeIndex(final Interval interval, final double centre)
-  {
+  public static int getSubnodeIndex(final Interval interval, final double centre) {
     int subnodeIndex = -1;
     if (interval.min >= centre) {
       subnodeIndex = 1;
@@ -73,13 +70,11 @@ public abstract class NodeBase {
   public NodeBase() {
   }
 
-  public void add(final Object item)
-  {
+  public void add(final Object item) {
     this.items.add(item);
   }
 
-  public List addAllItems(final List items)
-  {
+  public List addAllItems(final List items) {
     items.addAll(this.items);
     for (int i = 0; i < 2; i++) {
       if (this.subnode[i] != null) {
@@ -88,6 +83,7 @@ public abstract class NodeBase {
     }
     return items;
   }
+
   /**
    * Adds items in the tree which potentially overlap the query interval
    * to the given collection.
@@ -96,13 +92,13 @@ public abstract class NodeBase {
    * @param interval a query nterval, or null
    * @param resultItems the candidate items found
    */
-  public void addAllItemsFromOverlapping(final Interval interval, final Collection resultItems)
-  {
-    if (interval != null && ! isSearchMatch(interval)) {
+  public void addAllItemsFromOverlapping(final Interval interval, final Collection resultItems) {
+    if (interval != null && !isSearchMatch(interval)) {
       return;
     }
 
-    // some of these may not actually overlap - this is allowed by the bintree contract
+    // some of these may not actually overlap - this is allowed by the bintree
+    // contract
     resultItems.addAll(this.items);
 
     if (this.subnode[0] != null) {
@@ -112,8 +108,8 @@ public abstract class NodeBase {
       this.subnode[1].addAllItemsFromOverlapping(interval, resultItems);
     }
   }
-  int depth()
-  {
+
+  int depth() {
     int maxSubDepth = 0;
     for (int i = 0; i < 2; i++) {
       if (this.subnode[i] != null) {
@@ -126,10 +122,11 @@ public abstract class NodeBase {
     return maxSubDepth + 1;
   }
 
-  public List getItems() { return this.items; }
+  public List getItems() {
+    return this.items;
+  }
 
-  public boolean hasChildren()
-  {
+  public boolean hasChildren() {
     for (int i = 0; i < 2; i++) {
       if (this.subnode[i] != null) {
         return true;
@@ -138,17 +135,17 @@ public abstract class NodeBase {
     return false;
   }
 
-  public boolean hasItems() { return ! this.items.isEmpty(); }
+  public boolean hasItems() {
+    return !this.items.isEmpty();
+  }
 
-  public boolean isPrunable()
-  {
-    return ! (hasChildren() || hasItems());
+  public boolean isPrunable() {
+    return !(hasChildren() || hasItems());
   }
 
   protected abstract boolean isSearchMatch(Interval interval);
 
-  int nodeSize()
-  {
+  int nodeSize() {
     int subSize = 0;
     for (int i = 0; i < 2; i++) {
       if (this.subnode[i] != null) {
@@ -165,10 +162,9 @@ public abstract class NodeBase {
    * @param item the item to remove
    * @return <code>true</code> if the item was found and removed
    */
-  public boolean remove(final Interval itemInterval, final Object item)
-  {
+  public boolean remove(final Interval itemInterval, final Object item) {
     // use interval to restrict nodes scanned
-    if (! isSearchMatch(itemInterval)) {
+    if (!isSearchMatch(itemInterval)) {
       return false;
     }
 
@@ -194,8 +190,7 @@ public abstract class NodeBase {
     return found;
   }
 
-  int size()
-  {
+  int size() {
     int subSize = 0;
     for (int i = 0; i < 2; i++) {
       if (this.subnode[i] != null) {

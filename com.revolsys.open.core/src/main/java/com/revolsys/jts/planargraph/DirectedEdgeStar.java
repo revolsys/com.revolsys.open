@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -32,7 +31,6 @@
  *     www.vividsolutions.com
  */
 
-
 package com.revolsys.jts.planargraph;
 
 import java.util.ArrayList;
@@ -48,13 +46,13 @@ import com.revolsys.jts.geom.Point;
  *
  * @version 1.7
  */
-public class DirectedEdgeStar
-{
+public class DirectedEdgeStar {
 
   /**
    * The underlying list of outgoing DirectedEdges
    */
   protected List outEdges = new ArrayList();
+
   private boolean sorted = false;
 
   /**
@@ -62,36 +60,38 @@ public class DirectedEdgeStar
    */
   public DirectedEdgeStar() {
   }
+
   /**
    * Adds a new member to this DirectedEdgeStar.
    */
-  public void add(final DirectedEdge de)
-  {
+  public void add(final DirectedEdge de) {
     this.outEdges.add(de);
     this.sorted = false;
   }
+
   /**
    * Returns the coordinate for the node at wich this star is based
    */
-  public Point getCoordinate()
-  {
+  public Point getCoordinate() {
     final Iterator it = iterator();
-    if (! it.hasNext()) {
+    if (!it.hasNext()) {
       return null;
     }
-    final DirectedEdge e = (DirectedEdge) it.next();
+    final DirectedEdge e = (DirectedEdge)it.next();
     return e.getCoordinate();
   }
+
   /**
    * Returns the number of edges around the Node associated with this DirectedEdgeStar.
    */
-  public int getDegree() { return this.outEdges.size(); }
+  public int getDegree() {
+    return this.outEdges.size();
+  }
 
   /**
    * Returns the DirectedEdges, in ascending order by angle with the positive x-axis.
    */
-  public List getEdges()
-  {
+  public List getEdges() {
     sortEdges();
     return this.outEdges;
   }
@@ -100,11 +100,10 @@ public class DirectedEdgeStar
    * Returns the zero-based index of the given DirectedEdge, after sorting in ascending order
    * by angle with the positive x-axis.
    */
-  public int getIndex(final DirectedEdge dirEdge)
-  {
+  public int getIndex(final DirectedEdge dirEdge) {
     sortEdges();
     for (int i = 0; i < this.outEdges.size(); i++) {
-      final DirectedEdge de = (DirectedEdge) this.outEdges.get(i);
+      final DirectedEdge de = (DirectedEdge)this.outEdges.get(i);
       if (de == dirEdge) {
         return i;
       }
@@ -116,11 +115,10 @@ public class DirectedEdgeStar
    * Returns the zero-based index of the given Edge, after sorting in ascending order
    * by angle with the positive x-axis.
    */
-  public int getIndex(final Edge edge)
-  {
+  public int getIndex(final Edge edge) {
     sortEdges();
     for (int i = 0; i < this.outEdges.size(); i++) {
-      final DirectedEdge de = (DirectedEdge) this.outEdges.get(i);
+      final DirectedEdge de = (DirectedEdge)this.outEdges.get(i);
       if (de.getEdge() == edge) {
         return i;
       }
@@ -134,40 +132,40 @@ public class DirectedEdgeStar
    *
    * @param i an integer (positive, negative or zero)
    */
-  public int getIndex(final int i)
-  {
+  public int getIndex(final int i) {
     int modi = i % this.outEdges.size();
-    //I don't think modi can be 0 (assuming i is positive) [Jon Aquino 10/28/2003]
+    // I don't think modi can be 0 (assuming i is positive) [Jon Aquino
+    // 10/28/2003]
     if (modi < 0) {
       modi += this.outEdges.size();
     }
     return modi;
   }
+
   /**
    * Returns the {@link DirectedEdge} on the right-hand (CW)
    * side of the given {@link DirectedEdge}
    * (which must be a member of this DirectedEdgeStar).
    */
-  public DirectedEdge getNextCWEdge(final DirectedEdge dirEdge)
-  {
+  public DirectedEdge getNextCWEdge(final DirectedEdge dirEdge) {
     final int i = getIndex(dirEdge);
-    return (DirectedEdge) this.outEdges.get(getIndex(i - 1));
+    return (DirectedEdge)this.outEdges.get(getIndex(i - 1));
   }
+
   /**
    * Returns the {@link DirectedEdge} on the left-hand (CCW)
    * side of the given {@link DirectedEdge}
    * (which must be a member of this DirectedEdgeStar).
    */
-  public DirectedEdge getNextEdge(final DirectedEdge dirEdge)
-  {
+  public DirectedEdge getNextEdge(final DirectedEdge dirEdge) {
     final int i = getIndex(dirEdge);
-    return (DirectedEdge) this.outEdges.get(getIndex(i + 1));
+    return (DirectedEdge)this.outEdges.get(getIndex(i + 1));
   }
+
   /**
    * Returns an Iterator over the DirectedEdges, in ascending order by angle with the positive x-axis.
    */
-  public Iterator iterator()
-  {
+  public Iterator iterator() {
     sortEdges();
     return this.outEdges.iterator();
   }
@@ -175,14 +173,12 @@ public class DirectedEdgeStar
   /**
    * Drops a member of this DirectedEdgeStar.
    */
-  public void remove(final DirectedEdge de)
-  {
+  public void remove(final DirectedEdge de) {
     this.outEdges.remove(de);
   }
 
-  private void sortEdges()
-  {
-    if (! this.sorted) {
+  private void sortEdges() {
+    if (!this.sorted) {
       Collections.sort(this.outEdges);
       this.sorted = true;
     }

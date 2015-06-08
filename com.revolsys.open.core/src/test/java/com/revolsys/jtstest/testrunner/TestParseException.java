@@ -32,7 +32,6 @@
  */
 package com.revolsys.jtstest.testrunner;
 
-
 /**
  * @version 1.7
  */

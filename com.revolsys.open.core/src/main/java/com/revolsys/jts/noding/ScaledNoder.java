@@ -71,8 +71,8 @@ public class ScaledNoder implements Noder {
     this(noder, scaleFactor, 0, 0);
   }
 
-  public ScaledNoder(final Noder noder, final double scaleFactor,
-    final double offsetX, final double offsetY) {
+  public ScaledNoder(final Noder noder, final double scaleFactor, final double offsetX,
+    final double offsetY) {
     this.noder = noder;
     this.scaleFactor = scaleFactor;
     // no need to scale if input precision is already integral
@@ -101,8 +101,7 @@ public class ScaledNoder implements Noder {
     return this.scaleFactor == 1.0;
   }
 
-  private Collection<NodedSegmentString> rescale(
-    final Collection<NodedSegmentString> segments) {
+  private Collection<NodedSegmentString> rescale(final Collection<NodedSegmentString> segments) {
     final List<NodedSegmentString> newSegments = new ArrayList<NodedSegmentString>();
     for (final NodedSegmentString segment : segments) {
       final NodedSegmentString newSegment = rescale(segment);
@@ -125,20 +124,17 @@ public class ScaledNoder implements Noder {
         coordinates[i * axisCount + axisIndex] = value;
       }
     }
-    final LineStringDouble newPoints = new LineStringDouble(
-      axisCount, coordinates);
+    final LineStringDouble newPoints = new LineStringDouble(axisCount, coordinates);
     final Object data = segment.getData();
     return new NodedSegmentString(newPoints, data);
   }
 
-  private Collection<NodedSegmentString> scale(
-    final Collection<NodedSegmentString> segments) {
+  private Collection<NodedSegmentString> scale(final Collection<NodedSegmentString> segments) {
     final List<NodedSegmentString> result = new ArrayList<>();
     for (final NodedSegmentString segment : segments) {
       final Object data = segment.getData();
       final LineString scale = scale(segment);
-      final NodedSegmentString nodedSegmentString = new NodedSegmentString(
-        scale, data);
+      final NodedSegmentString nodedSegmentString = new NodedSegmentString(scale, data);
       result.add(nodedSegmentString);
     }
     return result;
@@ -162,8 +158,7 @@ public class ScaledNoder implements Noder {
       previousX = x;
       previousY = y;
     }
-    final LineString points = new LineStringDouble(axisCount, j,
-      coordinates);
+    final LineString points = new LineStringDouble(axisCount, j, coordinates);
     return points;
   }
 }

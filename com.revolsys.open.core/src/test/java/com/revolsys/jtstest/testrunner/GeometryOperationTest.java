@@ -53,8 +53,7 @@ import com.revolsys.util.Property;
  *
  * @version 1.7
  */
-public class GeometryOperationTest extends junit.framework.TestCase implements
-MapSerializer {
+public class GeometryOperationTest extends junit.framework.TestCase implements MapSerializer {
   private String testDescription;
 
   private final String operation;
@@ -89,9 +88,8 @@ MapSerializer {
    *  "equals") will be performed, the expected result of which is <tt>expectedResult</tt>.
    */
   public GeometryOperationTest(final TestCase testCase, final int testIndex,
-    final String description, final String operation,
-    final String geometryIndex, final List<String> arguments,
-    final Result expectedResult, final double tolerance) {
+    final String description, final String operation, final String geometryIndex,
+    final List<String> arguments, final Result expectedResult, final double tolerance) {
     this.tolerance = tolerance;
     this.testDescription = StringUtils.trimWhitespace(description);
     if (!Property.hasValue(description)) {
@@ -125,8 +123,8 @@ MapSerializer {
     // MD - disable except for testing
     // if (! isExpectedResultGeometryValid()) return false;
 
-    return matcher.isMatch(this.targetGeometry, this.operation,
-      this.operationArgs, actualResult, this.expectedResult, this.tolerance);
+    return matcher.isMatch(this.targetGeometry, this.operation, this.operationArgs, actualResult,
+      this.expectedResult, this.tolerance);
     // return expectedResult.equals(actualResult, tolerance);
   }
 
@@ -168,8 +166,7 @@ MapSerializer {
 
     this.operationArgs = convertArgs(this.arguments);
     final GeometryOperation op = getGeometryOperation();
-    this.actualResult = op.invoke(this.operation, this.targetGeometry,
-      this.operationArgs);
+    this.actualResult = op.invoke(this.operation, this.targetGeometry, this.operationArgs);
     return this.actualResult;
   }
 
@@ -233,8 +230,7 @@ MapSerializer {
     try {
       this.passed = computePassed();
     } catch (final Throwable e) {
-      System.err.println(this.testCase.getTestRun() + "\t" + this.testCase
-        + "\t" + getName());
+      System.err.println(this.testCase.getTestRun() + "\t" + this.testCase + "\t" + getName());
       e.printStackTrace();
       throw e;
     }
@@ -287,8 +283,8 @@ MapSerializer {
     String xml = "";
     xml += "<test>" + StringUtil.newLine;
     if (this.testDescription != null && this.testDescription.length() > 0) {
-      xml += "  <desc>" + StringUtil.escapeHTML(this.testDescription)
-          + "</desc>" + StringUtil.newLine;
+      xml += "  <desc>" + StringUtil.escapeHTML(this.testDescription) + "</desc>"
+        + StringUtil.newLine;
     }
     xml += "  <op name=\"" + this.operation + "\"";
     xml += " arg1=\"" + this.geometryIndex + "\"";
@@ -301,8 +297,7 @@ MapSerializer {
     }
 
     xml += ">" + StringUtil.newLine;
-    xml += StringUtil.indent(this.expectedResult.toFormattedString(), 4)
-        + StringUtil.newLine;
+    xml += StringUtil.indent(this.expectedResult.toFormattedString(), 4) + StringUtil.newLine;
     xml += "  </op>" + StringUtil.newLine;
     xml += "</test>" + StringUtil.newLine;
     return xml;

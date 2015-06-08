@@ -26,8 +26,7 @@ public class CreateListVisitor<T> extends BaseVisitor<T> {
     super(filter);
   }
 
-  public CreateListVisitor(final Filter<T> filter,
-    final Comparator<T> comparator) {
+  public CreateListVisitor(final Filter<T> filter, final Comparator<T> comparator) {
     super(filter, comparator);
   }
 

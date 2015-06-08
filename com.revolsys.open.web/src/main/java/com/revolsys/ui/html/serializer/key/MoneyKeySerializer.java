@@ -30,8 +30,7 @@ public class MoneyKeySerializer extends AbstractKeySerializer {
    */
   @Override
   public void serialize(final XmlWriter out, final Object object) {
-    final BigDecimal value = (BigDecimal)JavaBeanUtil.getProperty(object,
-      getName());
+    final BigDecimal value = (BigDecimal)JavaBeanUtil.getProperty(object, getName());
     if (value != null) {
       out.text(MathUtil.currencyToString(value));
     } else {

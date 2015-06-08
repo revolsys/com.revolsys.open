@@ -69,36 +69,30 @@ public class SelectedRecordsRenderer {
   {
   }
 
-  public SelectedRecordsRenderer(final Color outlineColor,
-    final Color selectColor) {
+  public SelectedRecordsRenderer(final Color outlineColor, final Color selectColor) {
 
     final Color selectColorTransparent = WebColors.setAlpha(selectColor, 127);
     final Color outlineColorTransparent = WebColors.setAlpha(outlineColor, 127);
 
-    this.erroStyle = MarkerStyle.marker("ellipse", 7, WebColors.Yellow, 1,
-      WebColors.Red);
+    this.erroStyle = MarkerStyle.marker("ellipse", 7, WebColors.Yellow, 1, WebColors.Red);
 
-    this.highlightStyle = GeometryStyle.polygon(selectColor, 3,
+    this.highlightStyle = GeometryStyle.polygon(selectColor, 3, selectColorTransparent);
+    MarkerStyle.setMarker(this.highlightStyle, "ellipse", 6, outlineColorTransparent, 1,
       selectColorTransparent);
-    MarkerStyle.setMarker(this.highlightStyle, "ellipse", 6,
-      outlineColorTransparent, 1, selectColorTransparent);
 
     this.outlineStyle = GeometryStyle.line(outlineColor);
-    MarkerStyle.setMarker(this.outlineStyle, "ellipse", 6,
-      outlineColorTransparent, 1, selectColorTransparent);
+    MarkerStyle.setMarker(this.outlineStyle, "ellipse", 6, outlineColorTransparent, 1,
+      selectColorTransparent);
 
-    this.vertexStyle = MarkerStyle.marker(vertexShape(), 9, outlineColor, 1,
-      selectColor);
+    this.vertexStyle = MarkerStyle.marker(vertexShape(), 9, outlineColor, 1, selectColor);
     this.vertexStyle.setMarkerOrientationType("auto");
 
-    this.firstVertexStyle = MarkerStyle.marker(firstVertexShape(), 9,
-      outlineColor, 1, selectColor);
+    this.firstVertexStyle = MarkerStyle.marker(firstVertexShape(), 9, outlineColor, 1, selectColor);
     this.firstVertexStyle.setMarkerOrientationType("auto");
     this.firstVertexStyle.setMarkerPlacementType("point(0)");
     this.firstVertexStyle.setMarkerHorizontalAlignment("center");
 
-    this.lastVertexStyle = MarkerStyle.marker(lastVertexShape(), 9,
-      outlineColor, 1, selectColor);
+    this.lastVertexStyle = MarkerStyle.marker(lastVertexShape(), 9, outlineColor, 1, selectColor);
     this.lastVertexStyle.setMarkerOrientationType("auto");
     this.lastVertexStyle.setMarkerPlacementType("point(n)");
     this.lastVertexStyle.setMarkerHorizontalAlignment("right");
@@ -113,21 +107,18 @@ public class SelectedRecordsRenderer {
     }
   }
 
-  public void paintSelected(final Viewport2D viewport,
-    final Graphics2D graphics, final GeometryFactory viewportGeometryFactory,
-    Geometry geometry) {
+  public void paintSelected(final Viewport2D viewport, final Graphics2D graphics,
+    final GeometryFactory viewportGeometryFactory, Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
       geometry = viewport.getGeometry(geometry);
-      GeometryStyleRenderer.renderGeometry(viewport, graphics, geometry,
-        this.highlightStyle);
-      GeometryStyleRenderer.renderOutline(viewport, graphics, geometry,
-        this.outlineStyle);
+      GeometryStyleRenderer.renderGeometry(viewport, graphics, geometry, this.highlightStyle);
+      GeometryStyleRenderer.renderOutline(viewport, graphics, geometry, this.outlineStyle);
 
       if (!geometry.isEmpty()) {
         final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
         for (final LineString line : lines) {
-          MarkerStyleRenderer.renderMarkers(viewport, graphics, line,
-            this.firstVertexStyle, this.lastVertexStyle, this.vertexStyle);
+          MarkerStyleRenderer.renderMarkers(viewport, graphics, line, this.firstVertexStyle,
+            this.lastVertexStyle, this.vertexStyle);
         }
       }
 

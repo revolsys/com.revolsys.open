@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -79,10 +78,8 @@ public class InteriorPointArea {
    * @author mdavis
    *
    */
-  private static class SafeBisectorFinder
-  {
-    public static double getBisectorY(final Polygon poly)
-    {
+  private static class SafeBisectorFinder {
+    public static double getBisectorY(final Polygon poly) {
       final SafeBisectorFinder finder = new SafeBisectorFinder(poly);
       return finder.getBisectorY();
     }
@@ -90,7 +87,9 @@ public class InteriorPointArea {
     private final Polygon poly;
 
     private final double centreY;
+
     private double hiY = Double.MAX_VALUE;
+
     private double loY = -Double.MAX_VALUE;
 
     public SafeBisectorFinder(final Polygon poly) {
@@ -102,8 +101,7 @@ public class InteriorPointArea {
       this.centreY = avg(this.loY, this.hiY);
     }
 
-    public double getBisectorY()
-    {
+    public double getBisectorY() {
       process(this.poly.getShell());
       for (int i = 0; i < this.poly.getHoleCount(); i++) {
         process(this.poly.getHole(i));
@@ -125,8 +123,7 @@ public class InteriorPointArea {
         if (y > this.loY) {
           this.loY = y;
         }
-      }
-      else if (y > this.centreY) {
+      } else if (y > this.centreY) {
         if (y < this.hiY) {
           this.hiY = y;
         }
@@ -134,20 +131,20 @@ public class InteriorPointArea {
     }
   }
 
-  private static double avg(final double a, final double b)
-  {
+  private static double avg(final double a, final double b) {
     return (a + b) / 2.0;
   }
+
   /**
    * Returns the centre point of the envelope.
    * @param envelope the envelope to analyze
    * @return the centre of the envelope
    */
   public static Point centre(final BoundingBox envelope) {
-    return new PointDouble(avg(envelope.getMinX(),
-      envelope.getMaxX()),
-      avg(envelope.getMinY(), envelope.getMaxY()), Point.NULL_ORDINATE);
+    return new PointDouble(avg(envelope.getMinX(), envelope.getMaxX()), avg(envelope.getMinY(),
+      envelope.getMaxY()), Point.NULL_ORDINATE);
   }
+
   private final GeometryFactory factory;
 
   private Point interiorPoint = null;
@@ -160,8 +157,7 @@ public class InteriorPointArea {
    *
    * @param g an areal geometry
    */
-  public InteriorPointArea(final Geometry g)
-  {
+  public InteriorPointArea(final Geometry g) {
     this.factory = g.getGeometryFactory();
     add(g);
   }
@@ -173,13 +169,11 @@ public class InteriorPointArea {
    *
    * @param geom the geometry to add
    */
-  private void add(final Geometry geom)
-  {
+  private void add(final Geometry geom) {
     if (geom instanceof Polygon) {
       addPolygon(geom);
-    }
-    else if (geom instanceof GeometryCollection) {
-      final GeometryCollection gc = (GeometryCollection) geom;
+    } else if (geom instanceof GeometryCollection) {
+      final GeometryCollection gc = (GeometryCollection)geom;
       for (int i = 0; i < gc.getGeometryCount(); i++) {
         add(gc.getGeometry(i));
       }
@@ -202,8 +196,7 @@ public class InteriorPointArea {
     if (bisector.getLength() == 0.0) {
       width = 0;
       intPt = bisector.getPoint();
-    }
-    else {
+    } else {
       final Geometry intersections = bisector.intersection(geometry);
       final Geometry widestIntersection = widestGeometry(intersections);
       width = widestIntersection.getBoundingBox().getWidth();
@@ -220,8 +213,7 @@ public class InteriorPointArea {
    *
    * @return the coordinate of an interior point
    */
-  public Point getInteriorPoint()
-  {
+  public Point getInteriorPoint() {
     return this.interiorPoint;
   }
 
@@ -233,22 +225,22 @@ public class InteriorPointArea {
      * segment at the Y midpoint.
      */
     // Assert: for areas, minx <> maxx
-    //double avgY = avg(envelope.getMinY(), envelope.getMaxY());
+    // double avgY = avg(envelope.getMinY(), envelope.getMaxY());
 
-    final double bisectY = SafeBisectorFinder.getBisectorY((Polygon) geometry);
+    final double bisectY = SafeBisectorFinder.getBisectorY((Polygon)geometry);
     return this.factory.lineString(new Point[] {
       new PointDouble(envelope.getMinX(), bisectY, Point.NULL_ORDINATE),
       new PointDouble(envelope.getMaxX(), bisectY, Point.NULL_ORDINATE)
     });
   }
 
-  //@return if geometry is a collection, the widest sub-geometry; otherwise,
-  //the geometry itself
+  // @return if geometry is a collection, the widest sub-geometry; otherwise,
+  // the geometry itself
   private Geometry widestGeometry(final Geometry geometry) {
     if (!(geometry instanceof GeometryCollection)) {
       return geometry;
     }
-    return widestGeometry((GeometryCollection) geometry);
+    return widestGeometry((GeometryCollection)geometry);
   }
 
   private Geometry widestGeometry(final GeometryCollection gc) {
@@ -259,8 +251,8 @@ public class InteriorPointArea {
     Geometry widestGeometry = gc.getGeometry(0);
     // scan remaining geom components to see if any are wider
     for (int i = 1; i < gc.getGeometryCount(); i++) {
-      if (gc.getGeometry(i).getBoundingBox().getWidth() >
-      widestGeometry.getBoundingBox().getWidth()) {
+      if (gc.getGeometry(i).getBoundingBox().getWidth() > widestGeometry.getBoundingBox()
+        .getWidth()) {
         widestGeometry = gc.getGeometry(i);
       }
     }

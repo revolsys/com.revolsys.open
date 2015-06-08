@@ -29,8 +29,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 import org.springframework.web.util.WebUtils;
 
-public class ServletForwardingController extends AbstractController implements
-BeanNameAware {
+public class ServletForwardingController extends AbstractController implements BeanNameAware {
 
   private String servletName;
 
@@ -108,8 +107,7 @@ BeanNameAware {
    * @see javax.servlet.ServletResponse#isCommitted
    * @see org.springframework.web.util.WebUtils#isIncludeRequest
    */
-  protected boolean useInclude(final HttpServletRequest request,
-    final HttpServletResponse response) {
+  protected boolean useInclude(final HttpServletRequest request, final HttpServletResponse response) {
     return WebUtils.isIncludeRequest(request) || response.isCommitted();
   }
 

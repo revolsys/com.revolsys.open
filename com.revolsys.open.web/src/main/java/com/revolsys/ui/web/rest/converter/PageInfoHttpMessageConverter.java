@@ -40,20 +40,18 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
-public class PageInfoHttpMessageConverter extends
-AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
+public class PageInfoHttpMessageConverter extends AbstractHttpMessageConverter<PageInfo> implements
+  WadlConstants {
   private static final MediaType APPLICATION_VND_SUN_WADL_XML = MediaType.parseMediaType("application/vnd.sun.wadl+xml");
-
-  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
   private static final MediaType TEXT_URI_LIST = MediaType.parseMediaType("text/uri-list");
 
   private static final Collection<MediaType> WRITE_MEDIA_TYPES = Arrays.asList(
-    MediaType.APPLICATION_XHTML_XML, MediaType.TEXT_HTML,
-    APPLICATION_VND_SUN_WADL_XML, TEXT_URI_LIST, MediaType.APPLICATION_JSON,
-    MediaType.TEXT_XML);
+    MediaType.APPLICATION_XHTML_XML, MediaType.TEXT_HTML, APPLICATION_VND_SUN_WADL_XML,
+    TEXT_URI_LIST, MediaType.APPLICATION_JSON, MediaType.TEXT_XML);
 
   private static Map<MediaType, String> MEDIA_TYPE_TO_EXTENSION_MAP = new HashMap<MediaType, String>();
+
   static {
     MEDIA_TYPE_TO_EXTENSION_MAP.put(MediaType.APPLICATION_XHTML_XML, ".html");
     MEDIA_TYPE_TO_EXTENSION_MAP.put(MediaType.TEXT_HTML, ".html");
@@ -63,28 +61,27 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
     MEDIA_TYPE_TO_EXTENSION_MAP.put(MediaType.TEXT_XML, ".xml");
   }
 
+  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
+
   public PageInfoHttpMessageConverter() {
     super(PageInfo.class, Collections.emptySet(), WRITE_MEDIA_TYPES);
   }
 
   private Map<String, Object> getMap(final String url, final PageInfo pageInfo) {
-    final Map<String, Object> pageMap = new NamedLinkedHashMap<String, Object>(
-        "resource");
+    final Map<String, Object> pageMap = new NamedLinkedHashMap<String, Object>("resource");
     pageMap.put("resourceUri", url);
     pageMap.put("title", pageInfo.getTitle());
     final String description = pageInfo.getDescription();
     if (Property.hasValue(description)) {
       pageMap.put("description", description);
     }
-    for (final Entry<String, Object> attribute : pageInfo.getFields()
-        .entrySet()) {
+    for (final Entry<String, Object> attribute : pageInfo.getFields().entrySet()) {
       final String key = attribute.getKey();
       final Object value = attribute.getValue();
       pageMap.put(key, value);
     }
     final List<Map<String, Object>> childPages = new ArrayList<Map<String, Object>>();
-    for (final Entry<String, PageInfo> childPage : pageInfo.getPages()
-        .entrySet()) {
+    for (final Entry<String, PageInfo> childPage : pageInfo.getPages().entrySet()) {
       final String childPath = childPage.getKey();
       final PageInfo childPageInfo = childPage.getValue();
       final String childUri = getUrl(url, childPath);
@@ -113,12 +110,10 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
 
   @Override
   public void write(final PageInfo pageInfo, final MediaType mediaType,
-    final HttpOutputMessage outputMessage) throws IOException,
-    HttpMessageNotWritableException {
+    final HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
     if (!HttpServletUtils.getResponse().isCommitted()) {
       if (pageInfo != null) {
-        final Charset charset = HttpServletUtils.setContentTypeWithCharset(
-          outputMessage, mediaType);
+        final Charset charset = HttpServletUtils.setContentTypeWithCharset(outputMessage, mediaType);
 
         final HttpServletRequest request = HttpServletUtils.getRequest();
 
@@ -139,7 +134,7 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
         if (APPLICATION_VND_SUN_WADL_XML.equals(mediaType)) {
           writeWadl(out, url, pageInfo);
         } else if (MediaType.TEXT_HTML.equals(mediaType)
-            || MediaType.APPLICATION_XHTML_XML.equals(mediaType)) {
+          || MediaType.APPLICATION_XHTML_XML.equals(mediaType)) {
           writeHtml(out, url, pageInfo, showTitle);
         } else if (TEXT_URI_LIST.equals(mediaType)) {
           writeUriList(out, url, pageInfo);
@@ -151,8 +146,8 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
   }
 
   @SuppressWarnings("unchecked")
-  private void writeHtml(final OutputStream out, final String url,
-    final PageInfo pageInfo, final boolean showTitle) {
+  private void writeHtml(final OutputStream out, final String url, final PageInfo pageInfo,
+    final boolean showTitle) {
     final XmlWriter writer = new XmlWriter(out);
     writer.startTag(HtmlUtil.DIV);
     if (showTitle) {
@@ -216,8 +211,7 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
             writer.attribute(HtmlUtil.ATTR_METHOD, "get");
             for (final String pathElement : childPath.split("/")) {
               if (pathElement.matches("\\{[^\\}]+\\}")) {
-                final String name = pathElement.substring(1,
-                  pathElement.length() - 1);
+                final String name = pathElement.substring(1, pathElement.length() - 1);
                 HtmlUtil.serializeTextInput(writer, name, name, 20, 255);
               }
             }
@@ -235,8 +229,8 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
     writer.close();
   }
 
-  private void writeHtmlField(final XmlWriter writer,
-    final ParameterInfo parameter, final Map<String, ?> formValues) {
+  private void writeHtmlField(final XmlWriter writer, final ParameterInfo parameter,
+    final Map<String, ?> formValues) {
     final String parameterName = parameter.getName();
     final Object defaultValue = parameter.getDefaultValue();
 
@@ -261,8 +255,8 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
     writer.endTag(HtmlUtil.TR);
   }
 
-  private void writeHtmlFileField(final XmlWriter writer,
-    final ParameterInfo parameter, final Map<String, ?> formValues) {
+  private void writeHtmlFileField(final XmlWriter writer, final ParameterInfo parameter,
+    final Map<String, ?> formValues) {
     final String name = parameter.getName();
     final Object value = formValues.get(name);
     writer.startTag(HtmlUtil.TR);
@@ -281,9 +275,8 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
     writer.endTag(HtmlUtil.TR);
   }
 
-  private void writeHtmlSelect(final XmlWriter writer,
-    final ParameterInfo parameter, final Map<String, ?> formValues,
-    final List<? extends Object> values) {
+  private void writeHtmlSelect(final XmlWriter writer, final ParameterInfo parameter,
+    final Map<String, ?> formValues, final List<? extends Object> values) {
     final String name = parameter.getName();
     final boolean optional = !parameter.isRequired();
     Object value = formValues.get(name);
@@ -306,9 +299,8 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
     writer.endTag(HtmlUtil.TR);
   }
 
-  private void writeHtmlSelect(final XmlWriter writer,
-    final ParameterInfo parameter, final Map<String, ?> formValues,
-    final Map<? extends Object, ? extends Object> values) {
+  private void writeHtmlSelect(final XmlWriter writer, final ParameterInfo parameter,
+    final Map<String, ?> formValues, final Map<? extends Object, ? extends Object> values) {
     final String name = parameter.getName();
     final boolean optional = !parameter.isRequired();
     Object value = formValues.get(name);
@@ -331,8 +323,7 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
     writer.endTag(HtmlUtil.TR);
   }
 
-  private void writeInstructions(final XmlWriter writer,
-    final ParameterInfo parameter) {
+  private void writeInstructions(final XmlWriter writer, final ParameterInfo parameter) {
     final String description = parameter.getDescription();
     if (Property.hasValue(description)) {
       writer.startTag(HtmlUtil.DIV);
@@ -342,9 +333,8 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
     }
   }
 
-  private void writeMethod(final XmlWriter writer, final String url,
-    final PageInfo pageInfo, final String method,
-    final Map<String, Object> values) {
+  private void writeMethod(final XmlWriter writer, final String url, final PageInfo pageInfo,
+    final String method, final Map<String, Object> values) {
     final Collection<ParameterInfo> parameters = pageInfo.getParameters();
     final boolean hasParameters = !parameters.isEmpty();
     if (hasParameters) {
@@ -365,8 +355,7 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
             }
           }
           if (isFormData) {
-            writer.attribute(HtmlUtil.ATTR_ENCTYPE,
-              MediaType.MULTIPART_FORM_DATA.toString());
+            writer.attribute(HtmlUtil.ATTR_ENCTYPE, MediaType.MULTIPART_FORM_DATA.toString());
           }
         }
         writer.attribute(HtmlUtil.ATTR_METHOD, method);
@@ -391,8 +380,7 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
       }
       final List<MediaType> mediaTypes = pageInfo.getMediaTypes();
       if (!mediaTypes.isEmpty()) {
-        final ParameterInfo parameter = new ParameterInfo("format", true,
-          DataTypes.STRING,
+        final ParameterInfo parameter = new ParameterInfo("format", true, DataTypes.STRING,
           "Select the file format to return the result data in.", mediaTypes);
         writeHtmlSelect(writer, parameter, values, mediaTypes);
       }
@@ -408,13 +396,12 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
     }
   }
 
-  public void writeResourceList(final MediaType mediaType, Charset charset,
-    final OutputStream out, final String url, final PageInfo pageInfo) {
+  public void writeResourceList(final MediaType mediaType, Charset charset, final OutputStream out,
+    final String url, final PageInfo pageInfo) {
     if (charset == null) {
       charset = StandardCharsets.UTF_8;
     }
-    final String mediaTypeString = mediaType.getType() + "/"
-        + mediaType.getSubtype();
+    final String mediaTypeString = mediaType.getType() + "/" + mediaType.getSubtype();
     final MapWriterFactory writerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
       MapWriterFactory.class, mediaTypeString);
     if (writerFactory != null) {
@@ -435,8 +422,8 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
     }
   }
 
-  private void writeUriList(final OutputStream out, final String url,
-    final PageInfo pageInfo) throws IOException {
+  private void writeUriList(final OutputStream out, final String url, final PageInfo pageInfo)
+    throws IOException {
     final Writer writer = FileUtil.createUtf8Writer(out);
 
     try {
@@ -455,8 +442,7 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
     }
   }
 
-  private void writeWadl(final OutputStream out, final String url,
-    final PageInfo pageInfo) {
+  private void writeWadl(final OutputStream out, final String url, final PageInfo pageInfo) {
     final XmlWriter writer = new XmlWriter(out);
     writer.startDocument("UTF-8", "1.0");
     writer.startTag(APPLICATION);
@@ -487,14 +473,13 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
     }
   }
 
-  private void writeWadlResource(final XmlWriter writer, final String url,
-    final PageInfo pageInfo, final boolean writeChildren) {
+  private void writeWadlResource(final XmlWriter writer, final String url, final PageInfo pageInfo,
+    final boolean writeChildren) {
     writer.startTag(RESOURCE);
     writer.attribute(PATH, url);
     writeWadlDoc(writer, pageInfo);
     if (writeChildren) {
-      for (final Entry<String, PageInfo> childPage : pageInfo.getPages()
-          .entrySet()) {
+      for (final Entry<String, PageInfo> childPage : pageInfo.getPages().entrySet()) {
         final String childPath = childPage.getKey();
         final PageInfo childPageInfo = childPage.getValue();
         writeWadlResource(writer, childPath, childPageInfo, false);

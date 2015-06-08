@@ -10,8 +10,7 @@ import com.revolsys.parallel.channel.ChannelInput;
 import com.revolsys.parallel.channel.ChannelOutput;
 import com.revolsys.parallel.tools.ScriptExecutorRunnable;
 
-public class ScriptExecutorBoundingBoxTaskSplitter extends
-BoundingBoxTaskSplitter {
+public class ScriptExecutorBoundingBoxTaskSplitter extends BoundingBoxTaskSplitter {
 
   private String scriptName;
 
@@ -29,8 +28,8 @@ BoundingBoxTaskSplitter {
   public void execute(final BoundingBox boundingBox) {
     this.outsideBoundaryObjects.expandBoundary(boundingBox.toGeometry());
 
-    final ScriptExecutorRunnable executor = new ScriptExecutorRunnable(
-      this.scriptName, this.attributes);
+    final ScriptExecutorRunnable executor = new ScriptExecutorRunnable(this.scriptName,
+      this.attributes);
     executor.setLogScriptInfo(isLogScriptInfo());
     executor.addBean("boundingBox", boundingBox);
     final Set<Record> objects = this.outsideBoundaryObjects.getAndClearObjects();
@@ -104,8 +103,7 @@ BoundingBoxTaskSplitter {
     this.outChannels = outChannels;
   }
 
-  public void setOutsideBoundaryObjects(
-    final OutsideBoundaryObjects outsideBoundaryObjects) {
+  public void setOutsideBoundaryObjects(final OutsideBoundaryObjects outsideBoundaryObjects) {
     this.outsideBoundaryObjects = outsideBoundaryObjects;
   }
 

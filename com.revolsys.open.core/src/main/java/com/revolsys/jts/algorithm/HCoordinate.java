@@ -55,9 +55,8 @@ public class HCoordinate {
    * to increase the precision of the calculation input points should be normalized
    * before passing them to this routine.
    */
-  public static Point intersection(final Point p1,
-    final Point p2, final Point q1, final Point q2)
-        throws NotRepresentableException {
+  public static Point intersection(final Point p1, final Point p2, final Point q1, final Point q2)
+    throws NotRepresentableException {
     // unrolled computation
     final double px = p1.getY() - p2.getY();
     final double py = p2.getX() - p1.getX();
@@ -75,7 +74,7 @@ public class HCoordinate {
     final double yInt = y / w;
 
     if (Double.isNaN(xInt) || Double.isInfinite(xInt) || Double.isNaN(yInt)
-        || Double.isInfinite(yInt)) {
+      || Double.isInfinite(yInt)) {
       throw new NotRepresentableException();
     }
 
@@ -83,11 +82,11 @@ public class HCoordinate {
   }
 
   /*
-   * public static Point OLDintersection( Point p1, Point p2,
-   * Point q1, Point q2) throws NotRepresentableException {
-   * HCoordinate l1 = new HCoordinate(p1, p2); HCoordinate l2 = new
-   * HCoordinate(q1, q2); HCoordinate intHCoord = new HCoordinate(l1, l2);
-   * Point intPt = intHCoord.getCoordinate(); return intPt; }
+   * public static Point OLDintersection( Point p1, Point p2, Point q1, Point
+   * q2) throws NotRepresentableException { HCoordinate l1 = new HCoordinate(p1,
+   * p2); HCoordinate l2 = new HCoordinate(q1, q2); HCoordinate intHCoord = new
+   * HCoordinate(l1, l2); Point intPt = intHCoord.getCoordinate(); return intPt;
+   * }
    */
 
   public double x, y, w;
@@ -137,8 +136,7 @@ public class HCoordinate {
     this.w = p1.getX() * p2.getY() - p2.getX() * p1.getY();
   }
 
-  public HCoordinate(final Point p1, final Point p2,
-    final Point q1, final Point q2) {
+  public HCoordinate(final Point p1, final Point p2, final Point q1, final Point q2) {
     // unrolled computation
     final double px = p1.getY() - p2.getY();
     final double py = p2.getX() - p1.getX();

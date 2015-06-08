@@ -12,6 +12,8 @@ import org.springframework.beans.factory.BeanFactoryAware;
 
 public class HtmlUiBuilderFactory implements BeanFactoryAware {
 
+  private static Map<BeanFactory, Map<Class<?>, HtmlUiBuilder<?>>> buildersByFactoryAndClass = new WeakHashMap<BeanFactory, Map<Class<?>, HtmlUiBuilder<?>>>();
+
   @SuppressWarnings("unchecked")
   public static <T extends HtmlUiBuilder> T get(final BeanFactory factory,
     final Class<?> objectClass) {
@@ -35,8 +37,7 @@ public class HtmlUiBuilderFactory implements BeanFactoryAware {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T extends HtmlUiBuilder> T get(final BeanFactory factory,
-    final String typePath) {
+  public static <T extends HtmlUiBuilder> T get(final BeanFactory factory, final String typePath) {
     final String beanName = typePath + "-htmlbuilder";
     if (factory.containsBean(beanName)) {
       return (T)factory.getBean(beanName);
@@ -45,10 +46,8 @@ public class HtmlUiBuilderFactory implements BeanFactoryAware {
     }
   }
 
-  private static HtmlUiBuilder<?> get(
-    final Map<Class<?>, HtmlUiBuilder<?>> buildersByClass,
-    final BeanFactory factory, final Class<?> objectClass,
-    final Set<Class<?>> interfaces) {
+  private static HtmlUiBuilder<?> get(final Map<Class<?>, HtmlUiBuilder<?>> buildersByClass,
+    final BeanFactory factory, final Class<?> objectClass, final Set<Class<?>> interfaces) {
     HtmlUiBuilder<?> builder = null;
     for (final Class<?> interfaceClass : interfaces) {
       builder = get(buildersByClass, interfaces, factory, interfaceClass);
@@ -60,10 +59,8 @@ public class HtmlUiBuilderFactory implements BeanFactoryAware {
     return builder;
   }
 
-  private static HtmlUiBuilder<?> get(
-    final Map<Class<?>, HtmlUiBuilder<?>> buildersByClass,
-    final Set<Class<?>> interfaces, final BeanFactory factory,
-    final Class<?> objectClass) {
+  private static HtmlUiBuilder<?> get(final Map<Class<?>, HtmlUiBuilder<?>> buildersByClass,
+    final Set<Class<?>> interfaces, final BeanFactory factory, final Class<?> objectClass) {
     HtmlUiBuilder<?> builder = null;
     if (objectClass != null) {
       builder = buildersByClass.get(objectClass);
@@ -86,8 +83,6 @@ public class HtmlUiBuilderFactory implements BeanFactoryAware {
   }
 
   private BeanFactory beanFactory;
-
-  private static Map<BeanFactory, Map<Class<?>, HtmlUiBuilder<?>>> buildersByFactoryAndClass = new WeakHashMap<BeanFactory, Map<Class<?>, HtmlUiBuilder<?>>>();
 
   @PreDestroy
   public void destory() {

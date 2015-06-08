@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -42,34 +41,32 @@ public class Interval {
 
   public double min, max;
 
-  public Interval()
-  {
+  public Interval() {
     this.min = 0.0;
     this.max = 0.0;
   }
 
-  public Interval(final double min, final double max)
-  {
+  public Interval(final double min, final double max) {
     init(min, max);
   }
-  public Interval(final Interval interval)
-  {
+
+  public Interval(final Interval interval) {
     init(interval.min, interval.max);
   }
-  public boolean contains(final double p)
-  {
+
+  public boolean contains(final double p) {
     return p >= this.min && p <= this.max;
   }
-  public boolean contains(final double min, final double max)
-  {
+
+  public boolean contains(final double min, final double max) {
     return min >= this.min && max <= this.max;
   }
-  public boolean contains(final Interval interval)
-  {
+
+  public boolean contains(final Interval interval) {
     return contains(interval.min, interval.max);
   }
-  public void expandToInclude(final Interval interval)
-  {
+
+  public void expandToInclude(final Interval interval) {
     if (interval.max > this.max) {
       this.max = interval.max;
     }
@@ -78,13 +75,19 @@ public class Interval {
     }
   }
 
-  public double getMax() { return this.max; }
-  public double getMin() { return this.min; }
+  public double getMax() {
+    return this.max;
+  }
 
-  public double getWidth() { return this.max - this.min; }
+  public double getMin() {
+    return this.min;
+  }
 
-  public void init(final double min, final double max)
-  {
+  public double getWidth() {
+    return this.max - this.min;
+  }
+
+  public void init(final double min, final double max) {
     this.min = min;
     this.max = max;
     if (min > max) {
@@ -92,21 +95,20 @@ public class Interval {
       this.max = min;
     }
   }
-  public boolean overlaps(final double min, final double max)
-  {
+
+  public boolean overlaps(final double min, final double max) {
     if (this.min > max || this.max < min) {
       return false;
     }
     return true;
   }
-  public boolean overlaps(final Interval interval)
-  {
+
+  public boolean overlaps(final Interval interval) {
     return overlaps(interval.min, interval.max);
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     return "[" + this.min + ", " + this.max + "]";
   }
 }

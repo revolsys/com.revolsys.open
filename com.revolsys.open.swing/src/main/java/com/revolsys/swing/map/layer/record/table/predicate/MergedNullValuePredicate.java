@@ -15,10 +15,9 @@ public class MergedNullValuePredicate implements HighlightPredicate {
 
   public static void add(final RecordRowTable table) {
     final MergedRecordsTableModel model = table.getTableModel();
-    final MergedNullValuePredicate predicate = new MergedNullValuePredicate(
-      model);
-    table.addHighlighter(new ColorHighlighter(predicate, WebColors.Yellow,
-      WebColors.Black, WebColors.Orange, WebColors.Black));
+    final MergedNullValuePredicate predicate = new MergedNullValuePredicate(model);
+    table.addHighlighter(new ColorHighlighter(predicate, WebColors.Yellow, WebColors.Black,
+      WebColors.Orange, WebColors.Black));
   }
 
   private final MergedRecordsTableModel model;
@@ -28,8 +27,7 @@ public class MergedNullValuePredicate implements HighlightPredicate {
   }
 
   @Override
-  public boolean isHighlighted(final Component renderer,
-    final ComponentAdapter adapter) {
+  public boolean isHighlighted(final Component renderer, final ComponentAdapter adapter) {
     try {
       final int rowIndex = adapter.convertRowIndexToView(adapter.row);
       final int columnIndex = adapter.convertColumnIndexToView(adapter.column);

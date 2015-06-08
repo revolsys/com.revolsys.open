@@ -16,13 +16,12 @@ public class RecordEqualsFilter implements Filter<Record> {
 
   private final Record searchObject;
 
-  public RecordEqualsFilter(final EqualsRegistry equalsRegistry,
-    final Record searchObject) {
+  public RecordEqualsFilter(final EqualsRegistry equalsRegistry, final Record searchObject) {
     this(null, searchObject, null);
   }
 
-  public RecordEqualsFilter(final EqualsRegistry equalsRegistry,
-    final Record searchObject, final Collection<String> equalExclude) {
+  public RecordEqualsFilter(final EqualsRegistry equalsRegistry, final Record searchObject,
+    final Collection<String> equalExclude) {
     if (equalsRegistry != null) {
       this.equalsRegistry = equalsRegistry;
     }
@@ -36,8 +35,7 @@ public class RecordEqualsFilter implements Filter<Record> {
     this(null, searchObject, null);
   }
 
-  public RecordEqualsFilter(final Record searchObject,
-    final Collection<String> equalExclude) {
+  public RecordEqualsFilter(final Record searchObject, final Collection<String> equalExclude) {
     this(null, searchObject, equalExclude);
   }
 

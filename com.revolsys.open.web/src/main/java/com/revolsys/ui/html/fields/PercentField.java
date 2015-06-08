@@ -63,8 +63,7 @@ public class PercentField extends BigDecimalField {
     } else if (percent.compareTo(new BigDecimal("100")) > 0) {
       throw new IllegalArgumentException("Must be <= 100 %");
     } else {
-      setValue(percent.divide(new BigDecimal("100"), 3,
-        BigDecimal.ROUND_HALF_UP));
+      setValue(percent.divide(new BigDecimal("100"), 3, BigDecimal.ROUND_HALF_UP));
     }
   }
 }

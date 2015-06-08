@@ -14,8 +14,7 @@ public class Sets {
     return set;
   }
 
-  public static <V> Set<V> hash(
-    @SuppressWarnings("unchecked") final V... values) {
+  public static <V> Set<V> hash(@SuppressWarnings("unchecked") final V... values) {
     final Set<V> set = new HashSet<>();
     for (final V value : values) {
       set.add(value);

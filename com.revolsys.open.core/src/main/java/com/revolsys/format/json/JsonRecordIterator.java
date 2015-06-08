@@ -17,25 +17,22 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.io.FileUtil;
 
-public class JsonRecordIterator extends AbstractIterator<Record>
-implements RecordIterator {
+public class JsonRecordIterator extends AbstractIterator<Record> implements RecordIterator {
 
   private RecordDefinition recordDefinition;
 
   private JsonMapIterator iterator;
 
-  public JsonRecordIterator(final RecordDefinition recordDefinition,
-    final InputStream in) {
+  public JsonRecordIterator(final RecordDefinition recordDefinition, final InputStream in) {
     this(recordDefinition, FileUtil.createUtf8Reader(in));
   }
 
-  public JsonRecordIterator(final RecordDefinition recordDefinition,
-    final Reader in) {
+  public JsonRecordIterator(final RecordDefinition recordDefinition, final Reader in) {
     this(recordDefinition, in, false);
   }
 
-  public JsonRecordIterator(final RecordDefinition recordDefinition,
-    final Reader in, final boolean single) {
+  public JsonRecordIterator(final RecordDefinition recordDefinition, final Reader in,
+    final boolean single) {
     this.recordDefinition = recordDefinition;
     try {
       this.iterator = new JsonMapIterator(in, single);
@@ -67,7 +64,7 @@ implements RecordIterator {
             object.setValue(name, value);
           } else {
             final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-                .getConverter(dataTypeClass);
+              .getConverter(dataTypeClass);
             if (converter == null) {
               object.setValue(name, value);
             } else {

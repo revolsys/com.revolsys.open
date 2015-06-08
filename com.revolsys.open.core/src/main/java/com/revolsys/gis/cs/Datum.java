@@ -22,16 +22,14 @@ public class Datum implements Serializable {
 
   private PrimeMeridian primeMeridian;
 
-  public Datum(final String name, final Spheroid spheroid,
-    final Authority authority) {
+  public Datum(final String name, final Spheroid spheroid, final Authority authority) {
     this.name = name;
     this.spheroid = spheroid;
     this.authority = authority;
   }
 
-  public Datum(final String name, final Spheroid spheroid,
-    final PrimeMeridian primeMeridian, final Authority authority,
-    final boolean deprecated) {
+  public Datum(final String name, final Spheroid spheroid, final PrimeMeridian primeMeridian,
+    final Authority authority, final boolean deprecated) {
     this.name = name;
     this.spheroid = spheroid;
     this.primeMeridian = primeMeridian;
@@ -39,8 +37,8 @@ public class Datum implements Serializable {
     this.deprecated = deprecated;
   }
 
-  public Datum(final String name, final Spheroid spheroid,
-    final ToWgs84 toWgs84, final Authority authority) {
+  public Datum(final String name, final Spheroid spheroid, final ToWgs84 toWgs84,
+    final Authority authority) {
     this.name = name;
     this.spheroid = spheroid;
     this.toWgs84 = toWgs84;

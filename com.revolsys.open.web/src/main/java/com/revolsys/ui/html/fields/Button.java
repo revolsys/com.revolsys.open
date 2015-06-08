@@ -33,8 +33,8 @@ public class Button extends Field {
     this(name, false, "submit", name, name, null);
   }
 
-  public Button(final String name, final boolean required, final String type,
-    final Object value, final String text, final String cssClass) {
+  public Button(final String name, final boolean required, final String type, final Object value,
+    final String text, final String cssClass) {
     super(name, required);
     setValue(value);
     this.type = type;

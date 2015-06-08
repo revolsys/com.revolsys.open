@@ -83,10 +83,9 @@ public class JspTagException extends JspException {
     if (this.rootCause == null) {
       return super.getMessage();
     } else {
-      return new StringBuilder(super.getMessage()).append(
-          "; nested exception is: \n\t")
-          .append(this.rootCause)
-          .toString();
+      return new StringBuilder(super.getMessage()).append("; nested exception is: \n\t")
+        .append(this.rootCause)
+        .toString();
     }
   }
 

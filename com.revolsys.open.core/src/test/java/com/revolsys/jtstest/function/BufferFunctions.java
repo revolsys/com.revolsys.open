@@ -52,6 +52,8 @@ import com.revolsys.jts.operation.buffer.validate.BufferResultValidator;
 
 public class BufferFunctions {
 
+  public static String bufferDescription = "Buffers a geometry by a distance";
+
   public static Geometry buffer(final Geometry g, final double distance) {
     return g.buffer(distance);
   }
@@ -60,9 +62,9 @@ public class BufferFunctions {
     return buildCurveSet(g, distance, new BufferParameters());
   }
 
-  public static Geometry bufferCurveWithParams(final Geometry g,
-    final Double distance, final Integer quadrantSegments,
-    final Integer capStyle, final Integer joinStyle, final Double mitreLimit) {
+  public static Geometry bufferCurveWithParams(final Geometry g, final Double distance,
+    final Integer quadrantSegments, final Integer capStyle, final Integer joinStyle,
+    final Double mitreLimit) {
     double dist = 0;
     if (distance != null) {
       dist = distance.doubleValue();
@@ -96,8 +98,7 @@ public class BufferFunctions {
     });
   }
 
-  public static Geometry bufferLineSimplifier(final Geometry g,
-    final double distance) {
+  public static Geometry bufferLineSimplifier(final Geometry g, final double distance) {
     return buildBufferLineSimplifiedSet(g, distance);
   }
 
@@ -110,18 +111,16 @@ public class BufferFunctions {
     return buf;
   }
 
-  public static Geometry bufferValidatedGeom(final Geometry g,
-    final double distance) {
+  public static Geometry bufferValidatedGeom(final Geometry g, final double distance) {
     final Geometry buf = g.buffer(distance);
-    final BufferResultValidator validator = new BufferResultValidator(g,
-      distance, buf);
+    final BufferResultValidator validator = new BufferResultValidator(g, distance, buf);
     final boolean isValid = validator.isValid();
     return validator.getErrorIndicator();
   }
 
-  public static Geometry bufferWithParams(final Geometry g,
-    final Double distance, final Integer quadrantSegments,
-    final Integer capStyle, final Integer joinStyle, final Double mitreLimit) {
+  public static Geometry bufferWithParams(final Geometry g, final Double distance,
+    final Integer quadrantSegments, final Integer capStyle, final Integer joinStyle,
+    final Double mitreLimit) {
     double dist = 0;
     if (distance != null) {
       dist = distance.doubleValue();
@@ -151,22 +150,19 @@ public class BufferFunctions {
     final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
     for (final LineString line : lines) {
       final Point[] pts = CoordinatesListUtil.getCoordinateArray(line);
-      simpLines.add(geometry.getGeometryFactory()
-        .lineString(
-          BufferInputLineSimplifier.simplify(line,
-            distance)));
+      simpLines.add(geometry.getGeometryFactory().lineString(
+        BufferInputLineSimplifier.simplify(line, distance)));
     }
-    final Geometry simpGeom = geometry.getGeometryFactory().buildGeometry(
-      simpLines);
+    final Geometry simpGeom = geometry.getGeometryFactory().buildGeometry(simpLines);
     return simpGeom;
   }
 
-  private static Geometry buildCurveSet(final Geometry geometry,
-    final double dist, final BufferParameters bufParams) {
+  private static Geometry buildCurveSet(final Geometry geometry, final double dist,
+    final BufferParameters bufParams) {
     // --- now construct curve
     final GeometryFactory precisionModel = geometry.getGeometryFactory();
-    final OffsetCurveSetBuilder curveBuilder = new OffsetCurveSetBuilder(
-      geometry, dist, precisionModel, bufParams);
+    final OffsetCurveSetBuilder curveBuilder = new OffsetCurveSetBuilder(geometry, dist,
+      precisionModel, bufParams);
     final List curves = curveBuilder.getCurves();
 
     final List<LineString> lines = new ArrayList<LineString>();
@@ -179,13 +175,10 @@ public class BufferFunctions {
     return curve;
   }
 
-  public static Geometry singleSidedBuffer(final Geometry geom,
-    final double distance) {
+  public static Geometry singleSidedBuffer(final Geometry geom, final double distance) {
     final BufferParameters bufParams = new BufferParameters();
     bufParams.setSingleSided(true);
     return Buffer.buffer(geom, distance, bufParams);
   }
-
-  public static String bufferDescription = "Buffers a geometry by a distance";
 
 }

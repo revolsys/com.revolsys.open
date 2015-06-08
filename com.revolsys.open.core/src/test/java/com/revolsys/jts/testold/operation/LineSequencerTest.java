@@ -16,11 +16,11 @@ import com.revolsys.jts.operation.linemerge.LineSequencer;
  * @version 1.7
  */
 public class LineSequencerTest extends TestCase {
+  private static WKTReader rdr = new WKTReader();
+
   public static void main(final String[] args) {
     junit.textui.TestRunner.run(LineSequencerTest.class);
   }
-
-  private static WKTReader rdr = new WKTReader();
 
   public LineSequencerTest(final String name) {
     super(name);
@@ -38,15 +38,14 @@ public class LineSequencerTest extends TestCase {
     return geomList;
   }
 
-  private void runIsSequenced(final String inputWKT, final boolean expected)
-      throws ParseException {
+  private void runIsSequenced(final String inputWKT, final boolean expected) throws ParseException {
     final Geometry g = rdr.read(inputWKT);
     final boolean isSequenced = LineSequencer.isSequenced(g);
     assertTrue(isSequenced == expected);
   }
 
-  private void runLineSequencer(final String[] inputWKT,
-    final String expectedWKT) throws ParseException {
+  private void runLineSequencer(final String[] inputWKT, final String expectedWKT)
+    throws ParseException {
     final List inputGeoms = fromWKT(inputWKT);
     final LineSequencer sequencer = new LineSequencer();
     sequencer.add(inputGeoms);
@@ -59,8 +58,8 @@ public class LineSequencerTest extends TestCase {
       final Geometry result = sequencer.getSequencedLineStrings();
       final boolean isOK = expected.equalsNorm(result);
       if (!isOK) {
-        //  System.out.println("ERROR - Expected: " + expected);
-        //  System.out.println("          Actual: " + result);
+        // System.out.println("ERROR - Expected: " + expected);
+        // System.out.println("          Actual: " + result);
       }
       assertTrue(isOK);
 
@@ -71,8 +70,8 @@ public class LineSequencerTest extends TestCase {
 
   public void test2SimpleLoops() throws Exception {
     final String[] wkt = {
-      "LINESTRING ( 0 0, 0 10 )", "LINESTRING ( 0 10, 0 0 )",
-      "LINESTRING ( 0 0, 0 20 )", "LINESTRING ( 0 20, 0 0 )",
+      "LINESTRING ( 0 0, 0 10 )", "LINESTRING ( 0 10, 0 0 )", "LINESTRING ( 0 0, 0 20 )",
+      "LINESTRING ( 0 20, 0 0 )",
     };
     final String result = "MULTILINESTRING ((0 10, 0 0), (0 0, 0 20), (0 20, 0 0), (0 0, 0 10))";
     runLineSequencer(wkt, result);
@@ -101,8 +100,7 @@ public class LineSequencerTest extends TestCase {
     final String[] wkt = {
       "LINESTRING ( 0 0, 0 10 )", "LINESTRING ( 0 10, 10 10, 10 20, 0 10 )",
       "LINESTRING ( 0 10, 40 40, 40 20, 0 10 )", "LINESTRING ( 0 30, 0 20 )",
-      "LINESTRING ( 0 20, 0 10 )", "LINESTRING ( 0 60, 0 50 )",
-      "LINESTRING ( 0 40, 0 50 )",
+      "LINESTRING ( 0 20, 0 10 )", "LINESTRING ( 0 60, 0 50 )", "LINESTRING ( 0 40, 0 50 )",
     };
     final String result = "MULTILINESTRING ((0 0, 0 10), (0 10, 40 40, 40 20, 0 10), (0 10, 10 10, 10 20, 0 10), (0 10, 0 20), (0 20, 0 30), (0 40, 0 50), (0 50, 0 60))";
     runLineSequencer(wkt, result);
@@ -111,8 +109,8 @@ public class LineSequencerTest extends TestCase {
   public void testMultipleGraphsWithRing() throws Exception {
     final String[] wkt = {
       "LINESTRING ( 0 0, 0 10 )", "LINESTRING ( 0 10, 10 10, 10 20, 0 10 )",
-      "LINESTRING ( 0 30, 0 20 )", "LINESTRING ( 0 20, 0 10 )",
-      "LINESTRING ( 0 60, 0 50 )", "LINESTRING ( 0 40, 0 50 )",
+      "LINESTRING ( 0 30, 0 20 )", "LINESTRING ( 0 20, 0 10 )", "LINESTRING ( 0 60, 0 50 )",
+      "LINESTRING ( 0 40, 0 50 )",
     };
     final String result = "MULTILINESTRING ((0 0, 0 10), (0 10, 10 10, 10 20, 0 10), (0 10, 0 20), (0 20, 0 30), (0 40, 0 50), (0 50, 0 60))";
     runLineSequencer(wkt, result);
@@ -123,8 +121,7 @@ public class LineSequencerTest extends TestCase {
 
   public void testSimple() throws Exception {
     final String[] wkt = {
-      "LINESTRING ( 0 0, 0 10 )", "LINESTRING ( 0 20, 0 30 )",
-      "LINESTRING ( 0 10, 0 20 )"
+      "LINESTRING ( 0 0, 0 10 )", "LINESTRING ( 0 20, 0 30 )", "LINESTRING ( 0 10, 0 20 )"
     };
     final String result = "MULTILINESTRING ((0 0, 0 10), (0 10, 0 20), (0 20, 0 30))";
     runLineSequencer(wkt, result);
@@ -132,8 +129,8 @@ public class LineSequencerTest extends TestCase {
 
   public void testSimpleBigLoop() throws Exception {
     final String[] wkt = {
-      "LINESTRING ( 0 0, 0 10 )", "LINESTRING ( 0 20, 0 30 )",
-      "LINESTRING ( 0 30, 0 00 )", "LINESTRING ( 0 10, 0 20 )",
+      "LINESTRING ( 0 0, 0 10 )", "LINESTRING ( 0 20, 0 30 )", "LINESTRING ( 0 30, 0 00 )",
+      "LINESTRING ( 0 10, 0 20 )",
     };
     final String result = "MULTILINESTRING ((0 0, 0 10), (0 10, 0 20), (0 20, 0 30), (0 30, 0 0))";
     runLineSequencer(wkt, result);
@@ -165,9 +162,8 @@ public class LineSequencerTest extends TestCase {
 
   public void testWide8WithTail() throws Exception {
     final String[] wkt = {
-      "LINESTRING ( 0 0, 0 10 )", "LINESTRING ( 10 0, 10 10 )",
-      "LINESTRING ( 0 0, 10 0 )", "LINESTRING ( 0 10, 10 10 )",
-      "LINESTRING ( 0 10, 0 20 )", "LINESTRING ( 10 10, 10 20 )",
+      "LINESTRING ( 0 0, 0 10 )", "LINESTRING ( 10 0, 10 10 )", "LINESTRING ( 0 0, 10 0 )",
+      "LINESTRING ( 0 10, 10 10 )", "LINESTRING ( 0 10, 0 20 )", "LINESTRING ( 10 10, 10 20 )",
       "LINESTRING ( 0 20, 10 20 )",
 
       "LINESTRING ( 10 20, 30 30 )",

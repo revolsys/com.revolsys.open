@@ -12,11 +12,15 @@ import com.revolsys.util.JavaBeanUtil;
 
 public class GeometryProperties {
 
+  public static final String FEATURE_PROPERTY = "feature";
+
+  static {
+    GeometryEqualsExact3d.addExclude(FEATURE_PROPERTY);
+  }
+
   @SuppressWarnings("unchecked")
-  public static void copyUserData(final Geometry oldGeometry,
-    final Geometry newGeometry) {
-    if (oldGeometry != null && newGeometry != null
-        && oldGeometry != newGeometry) {
+  public static void copyUserData(final Geometry oldGeometry, final Geometry newGeometry) {
+    if (oldGeometry != null && newGeometry != null && oldGeometry != newGeometry) {
       Object userData = oldGeometry.getUserData();
       if (userData instanceof Map) {
         final Map<String, Object> oldValues = (Map<String, Object>)userData;
@@ -48,8 +52,7 @@ public class GeometryProperties {
   }
 
   @SuppressWarnings("unchecked")
-  public static Map<String, Object> getGeometryProperties(
-    final Geometry geometry) {
+  public static Map<String, Object> getGeometryProperties(final Geometry geometry) {
     final Object userData = geometry.getUserData();
     if (userData instanceof Map) {
       final Map<String, Object> map = (Map<String, Object>)userData;
@@ -59,20 +62,18 @@ public class GeometryProperties {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T extends Object> T getGeometryProperty(
-    final Geometry geometry, final String name) {
+  public static <T extends Object> T getGeometryProperty(final Geometry geometry, final String name) {
     final Map<String, Object> map = getGeometryProperties(geometry);
     return (T)map.get(name);
   }
 
-  public static void setGeometryFeature(final Geometry geometry,
-    final Record feature) {
+  public static void setGeometryFeature(final Geometry geometry, final Record feature) {
     setGeometryProperty(geometry, FEATURE_PROPERTY, feature);
   }
 
   @SuppressWarnings("unchecked")
-  public static void setGeometryProperty(final Geometry geometry,
-    final CharSequence name, final Object value) {
+  public static void setGeometryProperty(final Geometry geometry, final CharSequence name,
+    final Object value) {
     Object userData = geometry.getUserData();
     if (!(userData instanceof Map)) {
       userData = new TreeMap<Object, Object>();
@@ -81,12 +82,6 @@ public class GeometryProperties {
     final Map<Object, Object> map = (Map<Object, Object>)userData;
     map.put(name.toString(), value);
 
-  }
-
-  public static final String FEATURE_PROPERTY = "feature";
-
-  static {
-    GeometryEqualsExact3d.addExclude(FEATURE_PROPERTY);
   }
 
 }

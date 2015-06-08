@@ -153,181 +153,6 @@ import com.revolsys.util.Base64InputStream;
 @SuppressWarnings("unchecked")
 public class ImageInfo {
   /**
-   * Run over String list, return false iff at least one of the arguments
-   * equals <code>-c</code>.
-   * @param args string list to check
-   */
-  private static boolean determineVerbosity(final String[] args) {
-    if (args != null && args.length > 0) {
-      for (final String arg : args) {
-        if ("-c".equals(arg)) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
-  private static boolean equals(final byte[] a1, int offs1, final byte[] a2,
-    int offs2, int num) {
-    while (num-- > 0) {
-      if (a1[offs1++] != a2[offs2++]) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private static int getIntBigEndian(final byte[] a, final int offs) {
-    return (a[offs] & 0xff) << 24 | (a[offs + 1] & 0xff) << 16
-        | (a[offs + 2] & 0xff) << 8 | a[offs + 3] & 0xff;
-  }
-
-  private static int getIntLittleEndian(final byte[] a, final int offs) {
-    return (a[offs + 3] & 0xff) << 24 | (a[offs + 2] & 0xff) << 16
-        | (a[offs + 1] & 0xff) << 8 | a[offs] & 0xff;
-  }
-
-  private static int getShortBigEndian(final byte[] a, final int offs) {
-    return (a[offs] & 0xff) << 8 | a[offs + 1] & 0xff;
-  }
-
-  private static int getShortLittleEndian(final byte[] a, final int offs) {
-    return a[offs] & 0xff | (a[offs + 1] & 0xff) << 8;
-  }
-
-  /**
-   * To use this class as a command line application, give it either
-   * some file names as parameters (information on them will be
-   * printed to standard output, one line per file) or call
-   * it with no parameters. It will then check data given to it
-   * via standard input.
-   * @param args the program arguments which must be file names
-   */
-  public static void main(final String[] args) {
-    final ImageInfo imageInfo = new ImageInfo();
-    imageInfo.setDetermineImageNumber(true);
-    final boolean verbose = determineVerbosity(args);
-    if (args.length == 0) {
-      run(null, System.in, imageInfo, verbose);
-    } else {
-      int index = 0;
-      while (index < args.length) {
-        InputStream in = null;
-        try {
-          final String name = args[index++];
-          System.out.print(name + ";");
-          if (name.startsWith("http://")) {
-            in = new URL(name).openConnection().getInputStream();
-          } else {
-            in = new FileInputStream(name);
-          }
-          run(name, in, imageInfo, verbose);
-          in.close();
-        } catch (final IOException e) {
-          System.out.println(e);
-          try {
-            if (in != null) {
-              in.close();
-            }
-          } catch (final IOException ee) {
-          }
-        }
-      }
-    }
-  }
-
-  private static void print(final String sourceName, final ImageInfo ii,
-    final boolean verbose) {
-    if (verbose) {
-      printVerbose(sourceName, ii);
-    } else {
-      printCompact(sourceName, ii);
-    }
-  }
-
-  private static void printCompact(final String sourceName,
-    final ImageInfo imageInfo) {
-    final String SEP = "\t";
-    System.out.println(sourceName + SEP + imageInfo.getFormatName() + SEP
-      + imageInfo.getMimeType() + SEP + imageInfo.getWidth() + SEP
-      + imageInfo.getHeight() + SEP + imageInfo.getBitsPerPixel() + SEP
-      + imageInfo.getNumberOfImages() + SEP + imageInfo.getPhysicalWidthDpi()
-      + SEP + imageInfo.getPhysicalHeightDpi() + SEP
-      + imageInfo.getPhysicalWidthInch() + SEP
-      + imageInfo.getPhysicalHeightInch() + SEP + imageInfo.isProgressive());
-  }
-
-  private static void printLine(final int indentLevels, final String text,
-    final float value, final float minValidValue) {
-    if (value < minValidValue) {
-      return;
-    }
-    printLine(indentLevels, text, Float.toString(value));
-  }
-
-  private static void printLine(final int indentLevels, final String text,
-    final int value, final int minValidValue) {
-    if (value >= minValidValue) {
-      printLine(indentLevels, text, Integer.toString(value));
-    }
-  }
-
-  /*
-   * public static final int COLOR_TYPE_UNKNOWN = -1; public static final int
-   * COLOR_TYPE_TRUECOLOR_RGB = 0; public static final int COLOR_TYPE_PALETTED =
-   * 1; public static final int COLOR_TYPE_GRAYSCALE= 2; public static final int
-   * COLOR_TYPE_BLACK_AND_WHITE = 3;
-   */
-
-  private static void printLine(int indentLevels, final String text,
-    final String value) {
-    if (value == null || value.length() == 0) {
-      return;
-    }
-    while (indentLevels-- > 0) {
-      System.out.print("\t");
-    }
-    if (text != null && text.length() > 0) {
-      System.out.print(text);
-      System.out.print(" ");
-    }
-    System.out.println(value);
-  }
-
-  private static void printVerbose(final String sourceName, final ImageInfo ii) {
-    printLine(0, null, sourceName);
-    printLine(1, "File format: ", ii.getFormatName());
-    printLine(1, "MIME type: ", ii.getMimeType());
-    printLine(1, "Width (pixels): ", ii.getWidth(), 1);
-    printLine(1, "Height (pixels): ", ii.getHeight(), 1);
-    printLine(1, "Bits per pixel: ", ii.getBitsPerPixel(), 1);
-    printLine(1, "Progressive: ", ii.isProgressive() ? "yes" : "no");
-    printLine(1, "Number of images: ", ii.getNumberOfImages(), 1);
-    printLine(1, "Physical width (dpi): ", ii.getPhysicalWidthDpi(), 1);
-    printLine(1, "Physical height (dpi): ", ii.getPhysicalHeightDpi(), 1);
-    printLine(1, "Physical width (inches): ", ii.getPhysicalWidthInch(), 1.0f);
-    printLine(1, "Physical height (inches): ", ii.getPhysicalHeightInch(), 1.0f);
-    final int numComments = ii.getNumberOfComments();
-    printLine(1, "Number of textual comments: ", numComments, 1);
-    if (numComments > 0) {
-      for (int i = 0; i < numComments; i++) {
-        printLine(2, null, ii.getComment(i));
-      }
-    }
-  }
-
-  private static void run(final String sourceName, final InputStream in,
-    final ImageInfo imageInfo, final boolean verbose) {
-    imageInfo.setInput(in);
-    imageInfo.setDetermineImageNumber(true);
-    imageInfo.setCollectComments(verbose);
-    if (imageInfo.check()) {
-      print(sourceName, imageInfo, verbose);
-    }
-  }
-
-  /**
    * Return value of {@link #getFormat()} for JPEG streams.
    * ImageInfo can extract physical resolution and comments
    * from JPEGs (only from APP0 headers).
@@ -393,14 +218,20 @@ public class ImageInfo {
   /** Return value of {@link #getFormat()} for PSD streams. */
   public static final int FORMAT_PSD = 10;
 
+  /*
+   * public static final int COLOR_TYPE_UNKNOWN = -1; public static final int
+   * COLOR_TYPE_TRUECOLOR_RGB = 0; public static final int COLOR_TYPE_PALETTED =
+   * 1; public static final int COLOR_TYPE_GRAYSCALE= 2; public static final int
+   * COLOR_TYPE_BLACK_AND_WHITE = 3;
+   */
+
   /**
    * The names of all supported file formats.
    * The FORMAT_xyz int constants can be used as index values for
    * this array.
    */
   private static final String[] FORMAT_NAMES = {
-    "JPEG", "GIF", "PNG", "BMP", "PCX", "IFF", "RAS", "PBM", "PGM", "PPM",
-    "PSD"
+    "JPEG", "GIF", "PNG", "BMP", "PCX", "IFF", "RAS", "PBM", "PGM", "PPM", "PSD"
   };
 
   /**
@@ -409,10 +240,172 @@ public class ImageInfo {
    * this array.
    */
   private static final String[] MIME_TYPE_STRINGS = {
-    "image/jpeg", "image/gif", "image/png", "image/bmp", "image/pcx",
-    "image/iff", "image/ras", "image/x-portable-bitmap",
-    "image/x-portable-graymap", "image/x-portable-pixmap", "image/psd"
+    "image/jpeg", "image/gif", "image/png", "image/bmp", "image/pcx", "image/iff", "image/ras",
+    "image/x-portable-bitmap", "image/x-portable-graymap", "image/x-portable-pixmap", "image/psd"
   };
+
+  /**
+   * Run over String list, return false iff at least one of the arguments
+   * equals <code>-c</code>.
+   * @param args string list to check
+   */
+  private static boolean determineVerbosity(final String[] args) {
+    if (args != null && args.length > 0) {
+      for (final String arg : args) {
+        if ("-c".equals(arg)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  private static boolean equals(final byte[] a1, int offs1, final byte[] a2, int offs2, int num) {
+    while (num-- > 0) {
+      if (a1[offs1++] != a2[offs2++]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private static int getIntBigEndian(final byte[] a, final int offs) {
+    return (a[offs] & 0xff) << 24 | (a[offs + 1] & 0xff) << 16 | (a[offs + 2] & 0xff) << 8
+      | a[offs + 3] & 0xff;
+  }
+
+  private static int getIntLittleEndian(final byte[] a, final int offs) {
+    return (a[offs + 3] & 0xff) << 24 | (a[offs + 2] & 0xff) << 16 | (a[offs + 1] & 0xff) << 8
+      | a[offs] & 0xff;
+  }
+
+  private static int getShortBigEndian(final byte[] a, final int offs) {
+    return (a[offs] & 0xff) << 8 | a[offs + 1] & 0xff;
+  }
+
+  private static int getShortLittleEndian(final byte[] a, final int offs) {
+    return a[offs] & 0xff | (a[offs + 1] & 0xff) << 8;
+  }
+
+  /**
+   * To use this class as a command line application, give it either
+   * some file names as parameters (information on them will be
+   * printed to standard output, one line per file) or call
+   * it with no parameters. It will then check data given to it
+   * via standard input.
+   * @param args the program arguments which must be file names
+   */
+  public static void main(final String[] args) {
+    final ImageInfo imageInfo = new ImageInfo();
+    imageInfo.setDetermineImageNumber(true);
+    final boolean verbose = determineVerbosity(args);
+    if (args.length == 0) {
+      run(null, System.in, imageInfo, verbose);
+    } else {
+      int index = 0;
+      while (index < args.length) {
+        InputStream in = null;
+        try {
+          final String name = args[index++];
+          System.out.print(name + ";");
+          if (name.startsWith("http://")) {
+            in = new URL(name).openConnection().getInputStream();
+          } else {
+            in = new FileInputStream(name);
+          }
+          run(name, in, imageInfo, verbose);
+          in.close();
+        } catch (final IOException e) {
+          System.out.println(e);
+          try {
+            if (in != null) {
+              in.close();
+            }
+          } catch (final IOException ee) {
+          }
+        }
+      }
+    }
+  }
+
+  private static void print(final String sourceName, final ImageInfo ii, final boolean verbose) {
+    if (verbose) {
+      printVerbose(sourceName, ii);
+    } else {
+      printCompact(sourceName, ii);
+    }
+  }
+
+  private static void printCompact(final String sourceName, final ImageInfo imageInfo) {
+    final String SEP = "\t";
+    System.out.println(sourceName + SEP + imageInfo.getFormatName() + SEP + imageInfo.getMimeType()
+      + SEP + imageInfo.getWidth() + SEP + imageInfo.getHeight() + SEP
+      + imageInfo.getBitsPerPixel() + SEP + imageInfo.getNumberOfImages() + SEP
+      + imageInfo.getPhysicalWidthDpi() + SEP + imageInfo.getPhysicalHeightDpi() + SEP
+      + imageInfo.getPhysicalWidthInch() + SEP + imageInfo.getPhysicalHeightInch() + SEP
+      + imageInfo.isProgressive());
+  }
+
+  private static void printLine(final int indentLevels, final String text, final float value,
+    final float minValidValue) {
+    if (value < minValidValue) {
+      return;
+    }
+    printLine(indentLevels, text, Float.toString(value));
+  }
+
+  private static void printLine(final int indentLevels, final String text, final int value,
+    final int minValidValue) {
+    if (value >= minValidValue) {
+      printLine(indentLevels, text, Integer.toString(value));
+    }
+  }
+
+  private static void printLine(int indentLevels, final String text, final String value) {
+    if (value == null || value.length() == 0) {
+      return;
+    }
+    while (indentLevels-- > 0) {
+      System.out.print("\t");
+    }
+    if (text != null && text.length() > 0) {
+      System.out.print(text);
+      System.out.print(" ");
+    }
+    System.out.println(value);
+  }
+
+  private static void printVerbose(final String sourceName, final ImageInfo ii) {
+    printLine(0, null, sourceName);
+    printLine(1, "File format: ", ii.getFormatName());
+    printLine(1, "MIME type: ", ii.getMimeType());
+    printLine(1, "Width (pixels): ", ii.getWidth(), 1);
+    printLine(1, "Height (pixels): ", ii.getHeight(), 1);
+    printLine(1, "Bits per pixel: ", ii.getBitsPerPixel(), 1);
+    printLine(1, "Progressive: ", ii.isProgressive() ? "yes" : "no");
+    printLine(1, "Number of images: ", ii.getNumberOfImages(), 1);
+    printLine(1, "Physical width (dpi): ", ii.getPhysicalWidthDpi(), 1);
+    printLine(1, "Physical height (dpi): ", ii.getPhysicalHeightDpi(), 1);
+    printLine(1, "Physical width (inches): ", ii.getPhysicalWidthInch(), 1.0f);
+    printLine(1, "Physical height (inches): ", ii.getPhysicalHeightInch(), 1.0f);
+    final int numComments = ii.getNumberOfComments();
+    printLine(1, "Number of textual comments: ", numComments, 1);
+    if (numComments > 0) {
+      for (int i = 0; i < numComments; i++) {
+        printLine(2, null, ii.getComment(i));
+      }
+    }
+  }
+
+  private static void run(final String sourceName, final InputStream in, final ImageInfo imageInfo,
+    final boolean verbose) {
+    imageInfo.setInput(in);
+    imageInfo.setDetermineImageNumber(true);
+    imageInfo.setCollectComments(verbose);
+    if (imageInfo.check()) {
+      print(sourceName, imageInfo, verbose);
+    }
+  }
 
   private int width;
 
@@ -513,7 +506,7 @@ public class ImageInfo {
     }
     this.bitsPerPixel = getShortLittleEndian(a, 26);
     if (this.bitsPerPixel != 1 && this.bitsPerPixel != 4 && this.bitsPerPixel != 8
-        && this.bitsPerPixel != 16 && this.bitsPerPixel != 24 && this.bitsPerPixel != 32) {
+      && this.bitsPerPixel != 16 && this.bitsPerPixel != 24 && this.bitsPerPixel != 32) {
       return false;
     }
     final int x = (int)(getIntLittleEndian(a, 36) * 0.0254);
@@ -540,8 +533,7 @@ public class ImageInfo {
     if (read(a) != 11) {
       return false;
     }
-    if (!equals(a, 0, GIF_MAGIC_89A, 0, 4)
-        && !equals(a, 0, GIF_MAGIC_87A, 0, 4)) {
+    if (!equals(a, 0, GIF_MAGIC_89A, 0, 4) && !equals(a, 0, GIF_MAGIC_87A, 0, 4)) {
       return false;
     }
     this.format = FORMAT_GIF;
@@ -656,7 +648,7 @@ public class ImageInfo {
     }
     final int type = getIntBigEndian(a, 6);
     if (type != 0x494c424d && // type must be ILBM...
-        type != 0x50424d20) { // ...or PBM
+      type != 0x50424d20) { // ...or PBM
       return false;
     }
     // loop chunks to find BMHD chunk
@@ -729,15 +721,14 @@ public class ImageInfo {
         String comment = new String(chars, "iso-8859-1");
         comment = comment.trim();
         addComment(comment);
-      } else if (marker >= 0xffc0 && marker <= 0xffcf && marker != 0xffc4
-          && marker != 0xffc8) {
+      } else if (marker >= 0xffc0 && marker <= 0xffcf && marker != 0xffc4 && marker != 0xffc8) {
         if (read(data, 0, 6) != 6) {
           return false;
         }
         this.format = FORMAT_JPEG;
         this.bitsPerPixel = (data[0] & 0xff) * (data[5] & 0xff);
         this.progressive = marker == 0xffc2 || marker == 0xffc6 || marker == 0xffca
-            || marker == 0xffce;
+          || marker == 0xffce;
         this.width = getShortBigEndian(data, 3);
         this.height = getShortBigEndian(data, 1);
         return true;
@@ -1109,8 +1100,7 @@ public class ImageInfo {
     }
   }
 
-  private int read(final byte[] a, final int offset, final int num)
-      throws IOException {
+  private int read(final byte[] a, final int offset, final int num) throws IOException {
     if (this.in != null) {
       return this.in.read(a, offset, num);
     } else {

@@ -8,7 +8,6 @@
 
 package org.gdal.ogr;
 
-
 public class Feature implements Cloneable {
   protected static long getCPtr(final Feature obj) {
     return obj == null ? 0 : obj.swigCPtr;

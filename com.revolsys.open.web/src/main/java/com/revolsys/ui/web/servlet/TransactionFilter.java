@@ -31,15 +31,13 @@ public class TransactionFilter extends GenericFilterBean {
   }
 
   @Override
-  public void doFilter(final ServletRequest servletRequest,
-    final ServletResponse servletResponse, final FilterChain filterChain)
-        throws IOException, ServletException {
+  public void doFilter(final ServletRequest servletRequest, final ServletResponse servletResponse,
+    final FilterChain filterChain) throws IOException, ServletException {
     final AbstractPlatformTransactionManager transactionManager = (AbstractPlatformTransactionManager)this.applicationContext.getBean("transactionManager");
     try (
-        HttpSavedRequestAndResponse saved = new HttpSavedRequestAndResponse(
-          servletRequest, servletResponse);
-        Transaction transaction = new Transaction(transactionManager,
-          Propagation.REQUIRED);) {
+      HttpSavedRequestAndResponse saved = new HttpSavedRequestAndResponse(servletRequest,
+        servletResponse);
+      Transaction transaction = new Transaction(transactionManager, Propagation.REQUIRED);) {
       try {
         filterChain.doFilter(servletRequest, servletResponse);
       } catch (final Throwable e) {

@@ -66,25 +66,21 @@ public class STRtreeTest extends TestCase {
     super(Name_);
   }
 
-  private void doTestCreateParentsFromVerticalSlice(final int childCount,
-    final int nodeCapacity, final int expectedChildrenPerParentBoundable,
-    final int expectedChildrenOfLastParent) {
+  private void doTestCreateParentsFromVerticalSlice(final int childCount, final int nodeCapacity,
+    final int expectedChildrenPerParentBoundable, final int expectedChildrenOfLastParent) {
     final STRtreeDemo.TestTree t = new STRtreeDemo.TestTree(nodeCapacity);
     final List parentBoundables = t.createParentBoundablesFromVerticalSlice(
       itemWrappers(childCount), 0);
     for (int i = 0; i < parentBoundables.size() - 1; i++) {// -1
       final AbstractNode parentBoundable = (AbstractNode)parentBoundables.get(i);
-      assertEquals(expectedChildrenPerParentBoundable,
-        parentBoundable.getChildBoundables().size());
+      assertEquals(expectedChildrenPerParentBoundable, parentBoundable.getChildBoundables().size());
     }
     final AbstractNode lastParent = (AbstractNode)parentBoundables.get(parentBoundables.size() - 1);
-    assertEquals(expectedChildrenOfLastParent, lastParent.getChildBoundables()
-      .size());
+    assertEquals(expectedChildrenOfLastParent, lastParent.getChildBoundables().size());
   }
 
   private void doTestVerticalSlices(final int itemCount, final int sliceCount,
-    final int expectedBoundablesPerSlice,
-    final int expectedBoundablesOnLastSlice) {
+    final int expectedBoundablesPerSlice, final int expectedBoundablesOnLastSlice) {
     final STRtreeDemo.TestTree t = new STRtreeDemo.TestTree(2);
     final List[] slices = t.verticalSlices(itemWrappers(itemCount), sliceCount);
     assertEquals(sliceCount, slices.length);
@@ -97,8 +93,7 @@ public class STRtreeTest extends TestCase {
   private List itemWrappers(final int size) {
     final ArrayList itemWrappers = new ArrayList();
     for (int i = 0; i < size; i++) {
-      itemWrappers.add(new ItemBoundable(new BoundingBoxDoubleGf(2, 0, 0, 0, 0),
-        new Object()));
+      itemWrappers.add(new ItemBoundable(new BoundingBoxDoubleGf(2, 0, 0, 0, 0), new Object()));
     }
     return itemWrappers;
   }

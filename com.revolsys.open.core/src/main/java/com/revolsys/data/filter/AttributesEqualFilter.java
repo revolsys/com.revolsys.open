@@ -37,8 +37,7 @@ public class AttributesEqualFilter implements Filter<Record> {
 
   public static boolean accept(final Record object1, final Record object2,
     final boolean nullEqualsEmptyString, final String... fieldNames) {
-    return accept(object1, object2, nullEqualsEmptyString,
-      Arrays.asList(fieldNames));
+    return accept(object1, object2, nullEqualsEmptyString, Arrays.asList(fieldNames));
   }
 
   public static boolean accept(final Record object1, final Record object2,
@@ -52,8 +51,7 @@ public class AttributesEqualFilter implements Filter<Record> {
 
   private boolean nullEqualsEmptyString;
 
-  public AttributesEqualFilter(final Record object,
-    final Collection<String> fieldNames) {
+  public AttributesEqualFilter(final Record object, final Collection<String> fieldNames) {
     this.fieldNames = fieldNames;
     this.object = object;
   }
@@ -64,8 +62,7 @@ public class AttributesEqualFilter implements Filter<Record> {
 
   @Override
   public boolean accept(final Record object) {
-    return accept(this.object, object, this.nullEqualsEmptyString,
-      this.fieldNames);
+    return accept(this.object, object, this.nullEqualsEmptyString, this.fieldNames);
   }
 
   public boolean isNullEqualsEmptyString() {

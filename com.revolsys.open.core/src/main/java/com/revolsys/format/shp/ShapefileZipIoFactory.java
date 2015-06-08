@@ -17,8 +17,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.io.ZipWriter;
 
-public class ShapefileZipIoFactory extends
-AbstractRecordAndGeometryIoFactory {
+public class ShapefileZipIoFactory extends AbstractRecordAndGeometryIoFactory {
 
   public ShapefileZipIoFactory() {
     super("ESRI Shapefile inside a ZIP archive", true, true);
@@ -26,26 +25,21 @@ AbstractRecordAndGeometryIoFactory {
   }
 
   @Override
-  public RecordReader createRecordReader(final Resource resource,
-    final RecordFactory factory) {
-    return new ZipRecordReader(resource, ShapefileConstants.FILE_EXTENSION,
-      factory);
+  public RecordReader createRecordReader(final Resource resource, final RecordFactory factory) {
+    return new ZipRecordReader(resource, ShapefileConstants.FILE_EXTENSION, factory);
   }
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream,
-    final Charset charset) {
+    final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
     File directory;
     try {
       directory = FileUtil.createTempDirectory(baseName, "zipDir");
     } catch (final Throwable e) {
       throw new RuntimeException("Unable to create temporary directory", e);
     }
-    final Resource tempResource = new FileSystemResource(new File(directory,
-      baseName + ".shp"));
-    final Writer<Record> shapeWriter = new ShapefileRecordWriter(recordDefinition,
-      tempResource);
+    final Resource tempResource = new FileSystemResource(new File(directory, baseName + ".shp"));
+    final Writer<Record> shapeWriter = new ShapefileRecordWriter(recordDefinition, tempResource);
     return new ZipWriter<Record>(directory, shapeWriter, outputStream);
   }
 

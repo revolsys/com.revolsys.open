@@ -50,8 +50,7 @@ import com.revolsys.jts.planargraph.Subgraph;
  * <p>
  * <b>Note:</b> uses the <code>isVisited</code> flag on the nodes.
  */
-public class ConnectedSubgraphFinder
-{
+public class ConnectedSubgraphFinder {
 
   private final PlanarGraph graph;
 
@@ -64,14 +63,13 @@ public class ConnectedSubgraphFinder
    * @param node the node to add
    * @param nodeStack the current set of nodes being traversed
    */
-  private void addEdges(final Node node, final Stack nodeStack, final Subgraph subgraph)
-  {
+  private void addEdges(final Node node, final Stack nodeStack, final Subgraph subgraph) {
     node.setVisited(true);
-    for (final Iterator i = node.getOutEdges().iterator(); i.hasNext(); ) {
-      final DirectedEdge de = (DirectedEdge) i.next();
+    for (final Iterator i = node.getOutEdges().iterator(); i.hasNext();) {
+      final DirectedEdge de = (DirectedEdge)i.next();
       subgraph.add(de.getEdge());
       final Node toNode = de.getToNode();
-      if (! toNode.isVisited()) {
+      if (!toNode.isVisited()) {
         nodeStack.push(toNode);
       }
     }
@@ -83,32 +81,29 @@ public class ConnectedSubgraphFinder
    *
    * @param node a node known to be in the subgraph
    */
-  private void addReachable(final Node startNode, final Subgraph subgraph)
-  {
+  private void addReachable(final Node startNode, final Subgraph subgraph) {
     final Stack nodeStack = new Stack();
     nodeStack.add(startNode);
-    while (! nodeStack.empty()) {
-      final Node node = (Node) nodeStack.pop();
+    while (!nodeStack.empty()) {
+      final Node node = (Node)nodeStack.pop();
       addEdges(node, nodeStack, subgraph);
     }
   }
 
-  private Subgraph findSubgraph(final Node node)
-  {
+  private Subgraph findSubgraph(final Node node) {
     final Subgraph subgraph = new Subgraph(this.graph);
     addReachable(node, subgraph);
     return subgraph;
   }
 
-  public List getConnectedSubgraphs()
-  {
+  public List getConnectedSubgraphs() {
     final List subgraphs = new ArrayList();
 
     GraphComponent.setVisited(this.graph.nodeIterator(), false);
-    for (final Iterator i = this.graph.edgeIterator(); i.hasNext(); ) {
-      final Edge e = (Edge) i.next();
+    for (final Iterator i = this.graph.edgeIterator(); i.hasNext();) {
+      final Edge e = (Edge)i.next();
       final Node node = e.getDirEdge(0).getFromNode();
-      if (! node.isVisited()) {
+      if (!node.isVisited()) {
         subgraphs.add(findSubgraph(node));
       }
     }

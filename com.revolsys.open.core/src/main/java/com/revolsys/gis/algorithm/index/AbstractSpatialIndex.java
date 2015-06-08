@@ -6,8 +6,7 @@ import com.revolsys.filter.Filter;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.visitor.CreateListVisitor;
 
-public abstract class AbstractSpatialIndex<T> implements
-EnvelopeSpatialIndex<T> {
+public abstract class AbstractSpatialIndex<T> implements EnvelopeSpatialIndex<T> {
 
   @Override
   public List<T> find(final BoundingBox envelope) {

@@ -9,8 +9,7 @@ import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.vertex.Vertex;
 
-public class MultiPolygonSegment extends AbstractSegment implements
-Iterator<Segment> {
+public class MultiPolygonSegment extends AbstractSegment implements Iterator<Segment> {
   /**
    *
    */
@@ -22,8 +21,7 @@ Iterator<Segment> {
 
   private int partIndex;
 
-  public MultiPolygonSegment(final MultiPolygon multiPolygon,
-    final int... segmentId) {
+  public MultiPolygonSegment(final MultiPolygon multiPolygon, final int... segmentId) {
     super(multiPolygon);
     setSegmentId(segmentId);
   }

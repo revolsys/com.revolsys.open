@@ -4,11 +4,11 @@
 package com.revolsys.format.openstreetmap.pbf;
 
 public final class Osmformat {
-  public static final class ChangeSet extends
-  com.google.protobuf.GeneratedMessageLite implements ChangeSetOrBuilder {
+  public static final class ChangeSet extends com.google.protobuf.GeneratedMessageLite implements
+    ChangeSetOrBuilder {
     public static final class Builder extends
-    com.google.protobuf.GeneratedMessageLite.Builder<ChangeSet, Builder>
-    implements ChangeSetOrBuilder {
+      com.google.protobuf.GeneratedMessageLite.Builder<ChangeSet, Builder> implements
+      ChangeSetOrBuilder {
       private static Builder create() {
         return new Builder();
       }
@@ -32,8 +32,7 @@ public final class Osmformat {
         return result;
       }
 
-      private ChangeSet buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      private ChangeSet buildParsed() throws com.google.protobuf.InvalidProtocolBufferException {
         final ChangeSet result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result).asInvalidProtocolBufferException();
@@ -113,10 +112,9 @@ public final class Osmformat {
       }
 
       @Override
-      public Builder mergeFrom(
-        final com.google.protobuf.CodedInputStream input,
+      public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -149,6 +147,18 @@ public final class Osmformat {
       // @@protoc_insertion_point(builder_scope:OSMPBF.ChangeSet)
     }
 
+    private static final ChangeSet defaultInstance;
+
+    // required int64 id = 1;
+    public static final int ID_FIELD_NUMBER = 1;
+
+    private static final long serialVersionUID = 0L;
+
+    static {
+      defaultInstance = new ChangeSet(true);
+      defaultInstance.initFields();
+    }
+
     public static ChangeSet getDefaultInstance() {
       return defaultInstance;
     }
@@ -162,7 +172,7 @@ public final class Osmformat {
     }
 
     public static ChangeSet parseDelimitedFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
         return builder.buildParsed();
@@ -172,8 +182,7 @@ public final class Osmformat {
     }
 
     public static ChangeSet parseDelimitedFrom(final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -183,70 +192,53 @@ public final class Osmformat {
     }
 
     public static ChangeSet parseFrom(final byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
     public static ChangeSet parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
     public static ChangeSet parseFrom(final com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
-    public static ChangeSet parseFrom(
-      final com.google.protobuf.ByteString data,
+    public static ChangeSet parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
-    public static ChangeSet parseFrom(
-      final com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+    public static ChangeSet parseFrom(final com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
-    public static ChangeSet parseFrom(
-      final com.google.protobuf.CodedInputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+    public static ChangeSet parseFrom(final com.google.protobuf.CodedInputStream input,
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    public static ChangeSet parseFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+    public static ChangeSet parseFrom(final java.io.InputStream input) throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
     public static ChangeSet parseFrom(final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    private static final ChangeSet defaultInstance;
-
     private int bitField0_;
-
-    // required int64 id = 1;
-    public static final int ID_FIELD_NUMBER = 1;
 
     private long id_;
 
     private byte memoizedIsInitialized = -1;
 
     private int memoizedSerializedSize = -1;
-
-    private static final long serialVersionUID = 0L;
-    static {
-      defaultInstance = new ChangeSet(true);
-      defaultInstance.initFields();
-    }
 
     private ChangeSet(final boolean noInit) {
     }
@@ -275,8 +267,7 @@ public final class Osmformat {
 
       size = 0;
       if ((this.bitField0_ & 0x00000001) == 0x00000001) {
-        size += com.google.protobuf.CodedOutputStream.computeInt64Size(1,
-          this.id_);
+        size += com.google.protobuf.CodedOutputStream.computeInt64Size(1, this.id_);
       }
       this.memoizedSerializedSize = size;
       return size;
@@ -317,14 +308,13 @@ public final class Osmformat {
     }
 
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+    protected java.lang.Object writeReplace() throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
     @Override
     public void writeTo(final com.google.protobuf.CodedOutputStream output)
-        throws java.io.IOException {
+      throws java.io.IOException {
       getSerializedSize();
       if ((this.bitField0_ & 0x00000001) == 0x00000001) {
         output.writeInt64(1, this.id_);
@@ -334,8 +324,7 @@ public final class Osmformat {
     // @@protoc_insertion_point(class_scope:OSMPBF.ChangeSet)
   }
 
-  public interface ChangeSetOrBuilder extends
-  com.google.protobuf.MessageLiteOrBuilder {
+  public interface ChangeSetOrBuilder extends com.google.protobuf.MessageLiteOrBuilder {
 
     long getId();
 
@@ -343,11 +332,11 @@ public final class Osmformat {
     boolean hasId();
   }
 
-  public static final class DenseInfo extends
-  com.google.protobuf.GeneratedMessageLite implements DenseInfoOrBuilder {
+  public static final class DenseInfo extends com.google.protobuf.GeneratedMessageLite implements
+    DenseInfoOrBuilder {
     public static final class Builder extends
-    com.google.protobuf.GeneratedMessageLite.Builder<DenseInfo, Builder>
-    implements DenseInfoOrBuilder {
+      com.google.protobuf.GeneratedMessageLite.Builder<DenseInfo, Builder> implements
+      DenseInfoOrBuilder {
       private static Builder create() {
         return new Builder();
       }
@@ -377,48 +366,42 @@ public final class Osmformat {
         maybeForceBuilderInitialization();
       }
 
-      public Builder addAllChangeset(
-        final java.lang.Iterable<? extends java.lang.Long> values) {
+      public Builder addAllChangeset(final java.lang.Iterable<? extends java.lang.Long> values) {
         ensureChangesetIsMutable();
         super.addAll(values, this.changeset_);
 
         return this;
       }
 
-      public Builder addAllTimestamp(
-        final java.lang.Iterable<? extends java.lang.Long> values) {
+      public Builder addAllTimestamp(final java.lang.Iterable<? extends java.lang.Long> values) {
         ensureTimestampIsMutable();
         super.addAll(values, this.timestamp_);
 
         return this;
       }
 
-      public Builder addAllUid(
-        final java.lang.Iterable<? extends java.lang.Integer> values) {
+      public Builder addAllUid(final java.lang.Iterable<? extends java.lang.Integer> values) {
         ensureUidIsMutable();
         super.addAll(values, this.uid_);
 
         return this;
       }
 
-      public Builder addAllUserSid(
-        final java.lang.Iterable<? extends java.lang.Integer> values) {
+      public Builder addAllUserSid(final java.lang.Iterable<? extends java.lang.Integer> values) {
         ensureUserSidIsMutable();
         super.addAll(values, this.userSid_);
 
         return this;
       }
 
-      public Builder addAllVersion(
-        final java.lang.Iterable<? extends java.lang.Integer> values) {
+      public Builder addAllVersion(final java.lang.Iterable<? extends java.lang.Integer> values) {
         ensureVersionIsMutable();
         super.addAll(values, this.version_);
 
         return this;
       };
 
-      public Builder addAllVisible(
-        final java.lang.Iterable<? extends java.lang.Boolean> values) {
+      public Builder addAllVisible(final java.lang.Iterable<? extends java.lang.Boolean> values) {
         ensureVisibleIsMutable();
         super.addAll(values, this.visible_);
 
@@ -476,8 +459,7 @@ public final class Osmformat {
         return result;
       }
 
-      private DenseInfo buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      private DenseInfo buildParsed() throws com.google.protobuf.InvalidProtocolBufferException {
         final DenseInfo result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result).asInvalidProtocolBufferException();
@@ -601,16 +583,14 @@ public final class Osmformat {
 
       private void ensureChangesetIsMutable() {
         if (!((this.bitField0_ & 0x00000004) == 0x00000004)) {
-          this.changeset_ = new java.util.ArrayList<java.lang.Long>(
-              this.changeset_);
+          this.changeset_ = new java.util.ArrayList<java.lang.Long>(this.changeset_);
           this.bitField0_ |= 0x00000004;
         }
       }
 
       private void ensureTimestampIsMutable() {
         if (!((this.bitField0_ & 0x00000002) == 0x00000002)) {
-          this.timestamp_ = new java.util.ArrayList<java.lang.Long>(
-              this.timestamp_);
+          this.timestamp_ = new java.util.ArrayList<java.lang.Long>(this.timestamp_);
           this.bitField0_ |= 0x00000002;
         }
       }
@@ -624,24 +604,21 @@ public final class Osmformat {
 
       private void ensureUserSidIsMutable() {
         if (!((this.bitField0_ & 0x00000010) == 0x00000010)) {
-          this.userSid_ = new java.util.ArrayList<java.lang.Integer>(
-              this.userSid_);
+          this.userSid_ = new java.util.ArrayList<java.lang.Integer>(this.userSid_);
           this.bitField0_ |= 0x00000010;
         }
       }
 
       private void ensureVersionIsMutable() {
         if (!((this.bitField0_ & 0x00000001) == 0x00000001)) {
-          this.version_ = new java.util.ArrayList<java.lang.Integer>(
-              this.version_);
+          this.version_ = new java.util.ArrayList<java.lang.Integer>(this.version_);
           this.bitField0_ |= 0x00000001;
         }
       }
 
       private void ensureVisibleIsMutable() {
         if (!((this.bitField0_ & 0x00000020) == 0x00000020)) {
-          this.visible_ = new java.util.ArrayList<java.lang.Boolean>(
-              this.visible_);
+          this.visible_ = new java.util.ArrayList<java.lang.Boolean>(this.visible_);
           this.bitField0_ |= 0x00000020;
         }
       }
@@ -750,10 +727,9 @@ public final class Osmformat {
       };
 
       @Override
-      public Builder mergeFrom(
-        final com.google.protobuf.CodedInputStream input,
+      public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -968,6 +944,33 @@ public final class Osmformat {
       // @@protoc_insertion_point(builder_scope:OSMPBF.DenseInfo)
     }
 
+    private static final DenseInfo defaultInstance;
+
+    // repeated int32 version = 1 [packed = true];
+    public static final int VERSION_FIELD_NUMBER = 1;
+
+    // repeated sint64 timestamp = 2 [packed = true];
+    public static final int TIMESTAMP_FIELD_NUMBER = 2;
+
+    // repeated sint64 changeset = 3 [packed = true];
+    public static final int CHANGESET_FIELD_NUMBER = 3;
+
+    // repeated sint32 uid = 4 [packed = true];
+    public static final int UID_FIELD_NUMBER = 4;
+
+    // repeated sint32 user_sid = 5 [packed = true];
+    public static final int USER_SID_FIELD_NUMBER = 5;
+
+    // repeated bool visible = 6 [packed = true];
+    public static final int VISIBLE_FIELD_NUMBER = 6;
+
+    private static final long serialVersionUID = 0L;
+
+    static {
+      defaultInstance = new DenseInfo(true);
+      defaultInstance.initFields();
+    }
+
     public static DenseInfo getDefaultInstance() {
       return defaultInstance;
     }
@@ -981,7 +984,7 @@ public final class Osmformat {
     }
 
     public static DenseInfo parseDelimitedFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
         return builder.buildParsed();
@@ -991,8 +994,7 @@ public final class Osmformat {
     }
 
     public static DenseInfo parseDelimitedFrom(final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -1002,91 +1004,65 @@ public final class Osmformat {
     }
 
     public static DenseInfo parseFrom(final byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
     public static DenseInfo parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
     public static DenseInfo parseFrom(final com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
-    public static DenseInfo parseFrom(
-      final com.google.protobuf.ByteString data,
+    public static DenseInfo parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
-    public static DenseInfo parseFrom(
-      final com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+    public static DenseInfo parseFrom(final com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
-    public static DenseInfo parseFrom(
-      final com.google.protobuf.CodedInputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+    public static DenseInfo parseFrom(final com.google.protobuf.CodedInputStream input,
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    public static DenseInfo parseFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+    public static DenseInfo parseFrom(final java.io.InputStream input) throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
     public static DenseInfo parseFrom(final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
-
-    private static final DenseInfo defaultInstance;
-
-    // repeated int32 version = 1 [packed = true];
-    public static final int VERSION_FIELD_NUMBER = 1;
 
     private java.util.List<java.lang.Integer> version_;
 
     private int versionMemoizedSerializedSize = -1;
 
-    // repeated sint64 timestamp = 2 [packed = true];
-    public static final int TIMESTAMP_FIELD_NUMBER = 2;
-
     private java.util.List<java.lang.Long> timestamp_;
 
     private int timestampMemoizedSerializedSize = -1;
-
-    // repeated sint64 changeset = 3 [packed = true];
-    public static final int CHANGESET_FIELD_NUMBER = 3;
 
     private java.util.List<java.lang.Long> changeset_;
 
     private int changesetMemoizedSerializedSize = -1;
 
-    // repeated sint32 uid = 4 [packed = true];
-    public static final int UID_FIELD_NUMBER = 4;
-
     private java.util.List<java.lang.Integer> uid_;
 
     private int uidMemoizedSerializedSize = -1;
 
-    // repeated sint32 user_sid = 5 [packed = true];
-    public static final int USER_SID_FIELD_NUMBER = 5;
-
     private java.util.List<java.lang.Integer> userSid_;
 
     private int userSidMemoizedSerializedSize = -1;
-
-    // repeated bool visible = 6 [packed = true];
-    public static final int VISIBLE_FIELD_NUMBER = 6;
 
     private java.util.List<java.lang.Boolean> visible_;
 
@@ -1095,12 +1071,6 @@ public final class Osmformat {
     private byte memoizedIsInitialized = -1;
 
     private int memoizedSerializedSize = -1;
-
-    private static final long serialVersionUID = 0L;
-    static {
-      defaultInstance = new DenseInfo(true);
-      defaultInstance.initFields();
-    }
 
     private DenseInfo(final boolean noInit) {
     }
@@ -1324,14 +1294,13 @@ public final class Osmformat {
     }
 
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+    protected java.lang.Object writeReplace() throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
     @Override
     public void writeTo(final com.google.protobuf.CodedOutputStream output)
-        throws java.io.IOException {
+      throws java.io.IOException {
       getSerializedSize();
       if (getVersionList().size() > 0) {
         output.writeRawVarint32(10);
@@ -1380,8 +1349,7 @@ public final class Osmformat {
     // @@protoc_insertion_point(class_scope:OSMPBF.DenseInfo)
   }
 
-  public interface DenseInfoOrBuilder extends
-  com.google.protobuf.MessageLiteOrBuilder {
+  public interface DenseInfoOrBuilder extends com.google.protobuf.MessageLiteOrBuilder {
 
     long getChangeset(int index);
 
@@ -1426,11 +1394,11 @@ public final class Osmformat {
     java.util.List<java.lang.Boolean> getVisibleList();
   }
 
-  public static final class DenseNodes extends
-  com.google.protobuf.GeneratedMessageLite implements DenseNodesOrBuilder {
+  public static final class DenseNodes extends com.google.protobuf.GeneratedMessageLite implements
+    DenseNodesOrBuilder {
     public static final class Builder extends
-    com.google.protobuf.GeneratedMessageLite.Builder<DenseNodes, Builder>
-    implements DenseNodesOrBuilder {
+      com.google.protobuf.GeneratedMessageLite.Builder<DenseNodes, Builder> implements
+      DenseNodesOrBuilder {
       private static Builder create() {
         return new Builder();
       }
@@ -1457,32 +1425,28 @@ public final class Osmformat {
         maybeForceBuilderInitialization();
       }
 
-      public Builder addAllId(
-        final java.lang.Iterable<? extends java.lang.Long> values) {
+      public Builder addAllId(final java.lang.Iterable<? extends java.lang.Long> values) {
         ensureIdIsMutable();
         super.addAll(values, this.id_);
 
         return this;
       }
 
-      public Builder addAllKeysVals(
-        final java.lang.Iterable<? extends java.lang.Integer> values) {
+      public Builder addAllKeysVals(final java.lang.Iterable<? extends java.lang.Integer> values) {
         ensureKeysValsIsMutable();
         super.addAll(values, this.keysVals_);
 
         return this;
       }
 
-      public Builder addAllLat(
-        final java.lang.Iterable<? extends java.lang.Long> values) {
+      public Builder addAllLat(final java.lang.Iterable<? extends java.lang.Long> values) {
         ensureLatIsMutable();
         super.addAll(values, this.lat_);
 
         return this;
       }
 
-      public Builder addAllLon(
-        final java.lang.Iterable<? extends java.lang.Long> values) {
+      public Builder addAllLon(final java.lang.Iterable<? extends java.lang.Long> values) {
         ensureLonIsMutable();
         super.addAll(values, this.lon_);
 
@@ -1526,8 +1490,7 @@ public final class Osmformat {
         return result;
       }
 
-      private DenseNodes buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      private DenseNodes buildParsed() throws com.google.protobuf.InvalidProtocolBufferException {
         final DenseNodes result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result).asInvalidProtocolBufferException();
@@ -1641,8 +1604,7 @@ public final class Osmformat {
 
       private void ensureKeysValsIsMutable() {
         if (!((this.bitField0_ & 0x00000010) == 0x00000010)) {
-          this.keysVals_ = new java.util.ArrayList<java.lang.Integer>(
-              this.keysVals_);
+          this.keysVals_ = new java.util.ArrayList<java.lang.Integer>(this.keysVals_);
           this.bitField0_ |= 0x00000010;
         }
       }
@@ -1746,10 +1708,8 @@ public final class Osmformat {
 
       public Builder mergeDenseinfo(final DenseInfo value) {
         if ((this.bitField0_ & 0x00000002) == 0x00000002
-            && this.denseinfo_ != DenseInfo.getDefaultInstance()) {
-          this.denseinfo_ = DenseInfo.newBuilder(this.denseinfo_)
-              .mergeFrom(value)
-              .buildPartial();
+          && this.denseinfo_ != DenseInfo.getDefaultInstance()) {
+          this.denseinfo_ = DenseInfo.newBuilder(this.denseinfo_).mergeFrom(value).buildPartial();
         } else {
           this.denseinfo_ = value;
         }
@@ -1759,10 +1719,9 @@ public final class Osmformat {
       };
 
       @Override
-      public Builder mergeFrom(
-        final com.google.protobuf.CodedInputStream input,
+      public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -1944,6 +1903,30 @@ public final class Osmformat {
       // @@protoc_insertion_point(builder_scope:OSMPBF.DenseNodes)
     }
 
+    private static final DenseNodes defaultInstance;
+
+    // repeated sint64 id = 1 [packed = true];
+    public static final int ID_FIELD_NUMBER = 1;
+
+    // optional .OSMPBF.DenseInfo denseinfo = 5;
+    public static final int DENSEINFO_FIELD_NUMBER = 5;
+
+    // repeated sint64 lat = 8 [packed = true];
+    public static final int LAT_FIELD_NUMBER = 8;
+
+    // repeated sint64 lon = 9 [packed = true];
+    public static final int LON_FIELD_NUMBER = 9;
+
+    // repeated int32 keys_vals = 10 [packed = true];
+    public static final int KEYS_VALS_FIELD_NUMBER = 10;
+
+    private static final long serialVersionUID = 0L;
+
+    static {
+      defaultInstance = new DenseNodes(true);
+      defaultInstance.initFields();
+    }
+
     public static DenseNodes getDefaultInstance() {
       return defaultInstance;
     }
@@ -1957,7 +1940,7 @@ public final class Osmformat {
     }
 
     public static DenseNodes parseDelimitedFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
         return builder.buildParsed();
@@ -1966,10 +1949,8 @@ public final class Osmformat {
       }
     }
 
-    public static DenseNodes parseDelimitedFrom(
-      final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+    public static DenseNodes parseDelimitedFrom(final java.io.InputStream input,
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -1979,84 +1960,61 @@ public final class Osmformat {
     }
 
     public static DenseNodes parseFrom(final byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
     public static DenseNodes parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
     public static DenseNodes parseFrom(final com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
-    public static DenseNodes parseFrom(
-      final com.google.protobuf.ByteString data,
+    public static DenseNodes parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
-    public static DenseNodes parseFrom(
-      final com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+    public static DenseNodes parseFrom(final com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
-    public static DenseNodes parseFrom(
-      final com.google.protobuf.CodedInputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+    public static DenseNodes parseFrom(final com.google.protobuf.CodedInputStream input,
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    public static DenseNodes parseFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+    public static DenseNodes parseFrom(final java.io.InputStream input) throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
     public static DenseNodes parseFrom(final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    private static final DenseNodes defaultInstance;
-
     private int bitField0_;
-
-    // repeated sint64 id = 1 [packed = true];
-    public static final int ID_FIELD_NUMBER = 1;
 
     private java.util.List<java.lang.Long> id_;
 
     private int idMemoizedSerializedSize = -1;
 
-    // optional .OSMPBF.DenseInfo denseinfo = 5;
-    public static final int DENSEINFO_FIELD_NUMBER = 5;
-
     private DenseInfo denseinfo_;
-
-    // repeated sint64 lat = 8 [packed = true];
-    public static final int LAT_FIELD_NUMBER = 8;
 
     private java.util.List<java.lang.Long> lat_;
 
     private int latMemoizedSerializedSize = -1;
 
-    // repeated sint64 lon = 9 [packed = true];
-    public static final int LON_FIELD_NUMBER = 9;
-
     private java.util.List<java.lang.Long> lon_;
 
     private int lonMemoizedSerializedSize = -1;
-
-    // repeated int32 keys_vals = 10 [packed = true];
-    public static final int KEYS_VALS_FIELD_NUMBER = 10;
 
     private java.util.List<java.lang.Integer> keysVals_;
 
@@ -2065,12 +2023,6 @@ public final class Osmformat {
     private byte memoizedIsInitialized = -1;
 
     private int memoizedSerializedSize = -1;
-
-    private static final long serialVersionUID = 0L;
-    static {
-      defaultInstance = new DenseNodes(true);
-      defaultInstance.initFields();
-    }
 
     private DenseNodes(final boolean noInit) {
     }
@@ -2171,8 +2123,7 @@ public final class Osmformat {
         this.idMemoizedSerializedSize = dataSize;
       }
       if ((this.bitField0_ & 0x00000001) == 0x00000001) {
-        size += com.google.protobuf.CodedOutputStream.computeMessageSize(5,
-          this.denseinfo_);
+        size += com.google.protobuf.CodedOutputStream.computeMessageSize(5, this.denseinfo_);
       }
       {
         int dataSize = 0;
@@ -2253,14 +2204,13 @@ public final class Osmformat {
     }
 
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+    protected java.lang.Object writeReplace() throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
     @Override
     public void writeTo(final com.google.protobuf.CodedOutputStream output)
-        throws java.io.IOException {
+      throws java.io.IOException {
       getSerializedSize();
       if (getIdList().size() > 0) {
         output.writeRawVarint32(10);
@@ -2298,8 +2248,7 @@ public final class Osmformat {
     // @@protoc_insertion_point(class_scope:OSMPBF.DenseNodes)
   }
 
-  public interface DenseNodesOrBuilder extends
-  com.google.protobuf.MessageLiteOrBuilder {
+  public interface DenseNodesOrBuilder extends com.google.protobuf.MessageLiteOrBuilder {
 
     DenseInfo getDenseinfo();
 
@@ -2335,11 +2284,11 @@ public final class Osmformat {
     boolean hasDenseinfo();
   }
 
-  public static final class HeaderBBox extends
-  com.google.protobuf.GeneratedMessageLite implements HeaderBBoxOrBuilder {
+  public static final class HeaderBBox extends com.google.protobuf.GeneratedMessageLite implements
+    HeaderBBoxOrBuilder {
     public static final class Builder extends
-    com.google.protobuf.GeneratedMessageLite.Builder<HeaderBBox, Builder>
-    implements HeaderBBoxOrBuilder {
+      com.google.protobuf.GeneratedMessageLite.Builder<HeaderBBox, Builder> implements
+      HeaderBBoxOrBuilder {
       private static Builder create() {
         return new Builder();
       }
@@ -2372,8 +2321,7 @@ public final class Osmformat {
         return result;
       }
 
-      private HeaderBBox buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      private HeaderBBox buildParsed() throws com.google.protobuf.InvalidProtocolBufferException {
         final HeaderBBox result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result).asInvalidProtocolBufferException();
@@ -2523,10 +2471,9 @@ public final class Osmformat {
       }
 
       @Override
-      public Builder mergeFrom(
-        final com.google.protobuf.CodedInputStream input,
+      public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -2615,6 +2562,27 @@ public final class Osmformat {
       // @@protoc_insertion_point(builder_scope:OSMPBF.HeaderBBox)
     }
 
+    private static final HeaderBBox defaultInstance;
+
+    // required sint64 left = 1;
+    public static final int LEFT_FIELD_NUMBER = 1;
+
+    // required sint64 right = 2;
+    public static final int RIGHT_FIELD_NUMBER = 2;
+
+    // required sint64 top = 3;
+    public static final int TOP_FIELD_NUMBER = 3;
+
+    // required sint64 bottom = 4;
+    public static final int BOTTOM_FIELD_NUMBER = 4;
+
+    private static final long serialVersionUID = 0L;
+
+    static {
+      defaultInstance = new HeaderBBox(true);
+      defaultInstance.initFields();
+    }
+
     public static HeaderBBox getDefaultInstance() {
       return defaultInstance;
     }
@@ -2628,7 +2596,7 @@ public final class Osmformat {
     }
 
     public static HeaderBBox parseDelimitedFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
         return builder.buildParsed();
@@ -2637,10 +2605,8 @@ public final class Osmformat {
       }
     }
 
-    public static HeaderBBox parseDelimitedFrom(
-      final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+    public static HeaderBBox parseDelimitedFrom(final java.io.InputStream input,
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -2650,85 +2616,59 @@ public final class Osmformat {
     }
 
     public static HeaderBBox parseFrom(final byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
     public static HeaderBBox parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
     public static HeaderBBox parseFrom(final com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
-    public static HeaderBBox parseFrom(
-      final com.google.protobuf.ByteString data,
+    public static HeaderBBox parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
-    public static HeaderBBox parseFrom(
-      final com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+    public static HeaderBBox parseFrom(final com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
-    public static HeaderBBox parseFrom(
-      final com.google.protobuf.CodedInputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+    public static HeaderBBox parseFrom(final com.google.protobuf.CodedInputStream input,
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    public static HeaderBBox parseFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+    public static HeaderBBox parseFrom(final java.io.InputStream input) throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
     public static HeaderBBox parseFrom(final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    private static final HeaderBBox defaultInstance;
-
     private int bitField0_;
-
-    // required sint64 left = 1;
-    public static final int LEFT_FIELD_NUMBER = 1;
 
     private long left_;
 
-    // required sint64 right = 2;
-    public static final int RIGHT_FIELD_NUMBER = 2;
-
     private long right_;
 
-    // required sint64 top = 3;
-    public static final int TOP_FIELD_NUMBER = 3;
-
     private long top_;
-
-    // required sint64 bottom = 4;
-    public static final int BOTTOM_FIELD_NUMBER = 4;
 
     private long bottom_;
 
     private byte memoizedIsInitialized = -1;
 
     private int memoizedSerializedSize = -1;
-
-    private static final long serialVersionUID = 0L;
-    static {
-      defaultInstance = new HeaderBBox(true);
-      defaultInstance.initFields();
-    }
 
     private HeaderBBox(final boolean noInit) {
     }
@@ -2767,20 +2707,16 @@ public final class Osmformat {
 
       size = 0;
       if ((this.bitField0_ & 0x00000001) == 0x00000001) {
-        size += com.google.protobuf.CodedOutputStream.computeSInt64Size(1,
-          this.left_);
+        size += com.google.protobuf.CodedOutputStream.computeSInt64Size(1, this.left_);
       }
       if ((this.bitField0_ & 0x00000002) == 0x00000002) {
-        size += com.google.protobuf.CodedOutputStream.computeSInt64Size(2,
-          this.right_);
+        size += com.google.protobuf.CodedOutputStream.computeSInt64Size(2, this.right_);
       }
       if ((this.bitField0_ & 0x00000004) == 0x00000004) {
-        size += com.google.protobuf.CodedOutputStream.computeSInt64Size(3,
-          this.top_);
+        size += com.google.protobuf.CodedOutputStream.computeSInt64Size(3, this.top_);
       }
       if ((this.bitField0_ & 0x00000008) == 0x00000008) {
-        size += com.google.protobuf.CodedOutputStream.computeSInt64Size(4,
-          this.bottom_);
+        size += com.google.protobuf.CodedOutputStream.computeSInt64Size(4, this.bottom_);
       }
       this.memoizedSerializedSize = size;
       return size;
@@ -2856,14 +2792,13 @@ public final class Osmformat {
     }
 
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+    protected java.lang.Object writeReplace() throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
     @Override
     public void writeTo(final com.google.protobuf.CodedOutputStream output)
-        throws java.io.IOException {
+      throws java.io.IOException {
       getSerializedSize();
       if ((this.bitField0_ & 0x00000001) == 0x00000001) {
         output.writeSInt64(1, this.left_);
@@ -2882,8 +2817,7 @@ public final class Osmformat {
     // @@protoc_insertion_point(class_scope:OSMPBF.HeaderBBox)
   }
 
-  public interface HeaderBBoxOrBuilder extends
-  com.google.protobuf.MessageLiteOrBuilder {
+  public interface HeaderBBoxOrBuilder extends com.google.protobuf.MessageLiteOrBuilder {
 
     long getBottom();
 
@@ -2906,11 +2840,11 @@ public final class Osmformat {
     boolean hasTop();
   }
 
-  public static final class HeaderBlock extends
-  com.google.protobuf.GeneratedMessageLite implements HeaderBlockOrBuilder {
+  public static final class HeaderBlock extends com.google.protobuf.GeneratedMessageLite implements
+    HeaderBlockOrBuilder {
     public static final class Builder extends
-    com.google.protobuf.GeneratedMessageLite.Builder<HeaderBlock, Builder>
-    implements HeaderBlockOrBuilder {
+      com.google.protobuf.GeneratedMessageLite.Builder<HeaderBlock, Builder> implements
+      HeaderBlockOrBuilder {
       private static Builder create() {
         return new Builder();
       }
@@ -2946,16 +2880,14 @@ public final class Osmformat {
         maybeForceBuilderInitialization();
       }
 
-      public Builder addAllOptionalFeatures(
-        final java.lang.Iterable<String> values) {
+      public Builder addAllOptionalFeatures(final java.lang.Iterable<String> values) {
         ensureOptionalFeaturesIsMutable();
         super.addAll(values, this.optionalFeatures_);
 
         return this;
       }
 
-      public Builder addAllRequiredFeatures(
-        final java.lang.Iterable<String> values) {
+      public Builder addAllRequiredFeatures(final java.lang.Iterable<String> values) {
         ensureRequiredFeaturesIsMutable();
         super.addAll(values, this.requiredFeatures_);
 
@@ -3003,8 +2935,7 @@ public final class Osmformat {
         return result;
       }
 
-      private HeaderBlock buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      private HeaderBlock buildParsed() throws com.google.protobuf.InvalidProtocolBufferException {
         final HeaderBlock result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result).asInvalidProtocolBufferException();
@@ -3288,10 +3219,8 @@ public final class Osmformat {
 
       public Builder mergeBbox(final HeaderBBox value) {
         if ((this.bitField0_ & 0x00000001) == 0x00000001
-            && this.bbox_ != HeaderBBox.getDefaultInstance()) {
-          this.bbox_ = HeaderBBox.newBuilder(this.bbox_)
-              .mergeFrom(value)
-              .buildPartial();
+          && this.bbox_ != HeaderBBox.getDefaultInstance()) {
+          this.bbox_ = HeaderBBox.newBuilder(this.bbox_).mergeFrom(value).buildPartial();
         } else {
           this.bbox_ = value;
         }
@@ -3301,10 +3230,9 @@ public final class Osmformat {
       }
 
       @Override
-      public Builder mergeFrom(
-        final com.google.protobuf.CodedInputStream input,
+      public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -3439,8 +3367,7 @@ public final class Osmformat {
         return this;
       }
 
-      void setOsmosisReplicationBaseUrl(
-        final com.google.protobuf.ByteString value) {
+      void setOsmosisReplicationBaseUrl(final com.google.protobuf.ByteString value) {
         this.bitField0_ |= 0x00000080;
         this.osmosisReplicationBaseUrl_ = value;
 
@@ -3515,6 +3442,39 @@ public final class Osmformat {
       // @@protoc_insertion_point(builder_scope:OSMPBF.HeaderBlock)
     }
 
+    private static final HeaderBlock defaultInstance;
+
+    // optional .OSMPBF.HeaderBBox bbox = 1;
+    public static final int BBOX_FIELD_NUMBER = 1;
+
+    // repeated string required_features = 4;
+    public static final int REQUIRED_FEATURES_FIELD_NUMBER = 4;
+
+    // repeated string optional_features = 5;
+    public static final int OPTIONAL_FEATURES_FIELD_NUMBER = 5;
+
+    // optional string writingprogram = 16;
+    public static final int WRITINGPROGRAM_FIELD_NUMBER = 16;
+
+    // optional string source = 17;
+    public static final int SOURCE_FIELD_NUMBER = 17;
+
+    // optional int64 osmosis_replication_timestamp = 32;
+    public static final int OSMOSIS_REPLICATION_TIMESTAMP_FIELD_NUMBER = 32;
+
+    // optional int64 osmosis_replication_sequence_number = 33;
+    public static final int OSMOSIS_REPLICATION_SEQUENCE_NUMBER_FIELD_NUMBER = 33;
+
+    // optional string osmosis_replication_base_url = 34;
+    public static final int OSMOSIS_REPLICATION_BASE_URL_FIELD_NUMBER = 34;
+
+    private static final long serialVersionUID = 0L;
+
+    static {
+      defaultInstance = new HeaderBlock(true);
+      defaultInstance.initFields();
+    }
+
     public static HeaderBlock getDefaultInstance() {
       return defaultInstance;
     }
@@ -3528,7 +3488,7 @@ public final class Osmformat {
     }
 
     public static HeaderBlock parseDelimitedFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
         return builder.buildParsed();
@@ -3537,10 +3497,8 @@ public final class Osmformat {
       }
     }
 
-    public static HeaderBlock parseDelimitedFrom(
-      final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+    public static HeaderBlock parseDelimitedFrom(final java.io.InputStream input,
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -3550,106 +3508,67 @@ public final class Osmformat {
     }
 
     public static HeaderBlock parseFrom(final byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
     public static HeaderBlock parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
-    public static HeaderBlock parseFrom(
-      final com.google.protobuf.ByteString data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+    public static HeaderBlock parseFrom(final com.google.protobuf.ByteString data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
-    public static HeaderBlock parseFrom(
-      final com.google.protobuf.ByteString data,
+    public static HeaderBlock parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
-    public static HeaderBlock parseFrom(
-      final com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+    public static HeaderBlock parseFrom(final com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
-    public static HeaderBlock parseFrom(
-      final com.google.protobuf.CodedInputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+    public static HeaderBlock parseFrom(final com.google.protobuf.CodedInputStream input,
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    public static HeaderBlock parseFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+    public static HeaderBlock parseFrom(final java.io.InputStream input) throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
     public static HeaderBlock parseFrom(final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    private static final HeaderBlock defaultInstance;
-
     private int bitField0_;
-
-    // optional .OSMPBF.HeaderBBox bbox = 1;
-    public static final int BBOX_FIELD_NUMBER = 1;
 
     private HeaderBBox bbox_;
 
-    // repeated string required_features = 4;
-    public static final int REQUIRED_FEATURES_FIELD_NUMBER = 4;
-
     private com.google.protobuf.LazyStringList requiredFeatures_;
-
-    // repeated string optional_features = 5;
-    public static final int OPTIONAL_FEATURES_FIELD_NUMBER = 5;
 
     private com.google.protobuf.LazyStringList optionalFeatures_;
 
-    // optional string writingprogram = 16;
-    public static final int WRITINGPROGRAM_FIELD_NUMBER = 16;
-
     private java.lang.Object writingprogram_;
-
-    // optional string source = 17;
-    public static final int SOURCE_FIELD_NUMBER = 17;
 
     private java.lang.Object source_;
 
-    // optional int64 osmosis_replication_timestamp = 32;
-    public static final int OSMOSIS_REPLICATION_TIMESTAMP_FIELD_NUMBER = 32;
-
     private long osmosisReplicationTimestamp_;
 
-    // optional int64 osmosis_replication_sequence_number = 33;
-    public static final int OSMOSIS_REPLICATION_SEQUENCE_NUMBER_FIELD_NUMBER = 33;
-
     private long osmosisReplicationSequenceNumber_;
-
-    // optional string osmosis_replication_base_url = 34;
-    public static final int OSMOSIS_REPLICATION_BASE_URL_FIELD_NUMBER = 34;
 
     private java.lang.Object osmosisReplicationBaseUrl_;
 
     private byte memoizedIsInitialized = -1;
 
     private int memoizedSerializedSize = -1;
-
-    private static final long serialVersionUID = 0L;
-    static {
-      defaultInstance = new HeaderBlock(true);
-      defaultInstance.initFields();
-    }
 
     private HeaderBlock(final boolean noInit) {
     }
@@ -3744,8 +3663,7 @@ public final class Osmformat {
 
       size = 0;
       if ((this.bitField0_ & 0x00000001) == 0x00000001) {
-        size += com.google.protobuf.CodedOutputStream.computeMessageSize(1,
-          this.bbox_);
+        size += com.google.protobuf.CodedOutputStream.computeMessageSize(1, this.bbox_);
       }
       {
         int dataSize = 0;
@@ -3764,12 +3682,10 @@ public final class Osmformat {
         size += 1 * getOptionalFeaturesList().size();
       }
       if ((this.bitField0_ & 0x00000002) == 0x00000002) {
-        size += com.google.protobuf.CodedOutputStream.computeBytesSize(16,
-          getWritingprogramBytes());
+        size += com.google.protobuf.CodedOutputStream.computeBytesSize(16, getWritingprogramBytes());
       }
       if ((this.bitField0_ & 0x00000004) == 0x00000004) {
-        size += com.google.protobuf.CodedOutputStream.computeBytesSize(17,
-          getSourceBytes());
+        size += com.google.protobuf.CodedOutputStream.computeBytesSize(17, getSourceBytes());
       }
       if ((this.bitField0_ & 0x00000008) == 0x00000008) {
         size += com.google.protobuf.CodedOutputStream.computeInt64Size(32,
@@ -3908,14 +3824,13 @@ public final class Osmformat {
     }
 
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+    protected java.lang.Object writeReplace() throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
     @Override
     public void writeTo(final com.google.protobuf.CodedOutputStream output)
-        throws java.io.IOException {
+      throws java.io.IOException {
       getSerializedSize();
       if ((this.bitField0_ & 0x00000001) == 0x00000001) {
         output.writeMessage(1, this.bbox_);
@@ -3946,8 +3861,7 @@ public final class Osmformat {
     // @@protoc_insertion_point(class_scope:OSMPBF.HeaderBlock)
   }
 
-  public interface HeaderBlockOrBuilder extends
-  com.google.protobuf.MessageLiteOrBuilder {
+  public interface HeaderBlockOrBuilder extends com.google.protobuf.MessageLiteOrBuilder {
 
     HeaderBBox getBbox();
 
@@ -3994,11 +3908,10 @@ public final class Osmformat {
     boolean hasWritingprogram();
   }
 
-  public static final class Info extends
-  com.google.protobuf.GeneratedMessageLite implements InfoOrBuilder {
-    public static final class Builder extends
-    com.google.protobuf.GeneratedMessageLite.Builder<Info, Builder> implements
+  public static final class Info extends com.google.protobuf.GeneratedMessageLite implements
     InfoOrBuilder {
+    public static final class Builder extends
+      com.google.protobuf.GeneratedMessageLite.Builder<Info, Builder> implements InfoOrBuilder {
       private static Builder create() {
         return new Builder();
       }
@@ -4037,8 +3950,7 @@ public final class Osmformat {
         return result;
       }
 
-      private Info buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      private Info buildParsed() throws com.google.protobuf.InvalidProtocolBufferException {
         final Info result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result).asInvalidProtocolBufferException();
@@ -4218,10 +4130,9 @@ public final class Osmformat {
       }
 
       @Override
-      public Builder mergeFrom(
-        final com.google.protobuf.CodedInputStream input,
+      public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -4340,6 +4251,33 @@ public final class Osmformat {
       // @@protoc_insertion_point(builder_scope:OSMPBF.Info)
     }
 
+    private static final Info defaultInstance;
+
+    // optional int32 version = 1 [default = -1];
+    public static final int VERSION_FIELD_NUMBER = 1;
+
+    // optional int64 timestamp = 2;
+    public static final int TIMESTAMP_FIELD_NUMBER = 2;
+
+    // optional int64 changeset = 3;
+    public static final int CHANGESET_FIELD_NUMBER = 3;
+
+    // optional int32 uid = 4;
+    public static final int UID_FIELD_NUMBER = 4;
+
+    // optional uint32 user_sid = 5;
+    public static final int USER_SID_FIELD_NUMBER = 5;
+
+    // optional bool visible = 6;
+    public static final int VISIBLE_FIELD_NUMBER = 6;
+
+    private static final long serialVersionUID = 0L;
+
+    static {
+      defaultInstance = new Info(true);
+      defaultInstance.initFields();
+    }
+
     public static Info getDefaultInstance() {
       return defaultInstance;
     }
@@ -4353,7 +4291,7 @@ public final class Osmformat {
     }
 
     public static Info parseDelimitedFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
         return builder.buildParsed();
@@ -4363,8 +4301,7 @@ public final class Osmformat {
     }
 
     public static Info parseDelimitedFrom(final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -4374,94 +4311,63 @@ public final class Osmformat {
     }
 
     public static Info parseFrom(final byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
     public static Info parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
     public static Info parseFrom(final com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
     public static Info parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
-    public static Info parseFrom(
-      final com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+    public static Info parseFrom(final com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
-    public static Info parseFrom(
-      final com.google.protobuf.CodedInputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+    public static Info parseFrom(final com.google.protobuf.CodedInputStream input,
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    public static Info parseFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+    public static Info parseFrom(final java.io.InputStream input) throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
     public static Info parseFrom(final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    private static final Info defaultInstance;
-
     private int bitField0_;
-
-    // optional int32 version = 1 [default = -1];
-    public static final int VERSION_FIELD_NUMBER = 1;
 
     private int version_;
 
-    // optional int64 timestamp = 2;
-    public static final int TIMESTAMP_FIELD_NUMBER = 2;
-
     private long timestamp_;
-
-    // optional int64 changeset = 3;
-    public static final int CHANGESET_FIELD_NUMBER = 3;
 
     private long changeset_;
 
-    // optional int32 uid = 4;
-    public static final int UID_FIELD_NUMBER = 4;
-
     private int uid_;
 
-    // optional uint32 user_sid = 5;
-    public static final int USER_SID_FIELD_NUMBER = 5;
-
     private int userSid_;
-
-    // optional bool visible = 6;
-    public static final int VISIBLE_FIELD_NUMBER = 6;
 
     private boolean visible_;
 
     private byte memoizedIsInitialized = -1;
 
     private int memoizedSerializedSize = -1;
-
-    private static final long serialVersionUID = 0L;
-    static {
-      defaultInstance = new Info(true);
-      defaultInstance.initFields();
-    }
 
     private Info(final boolean noInit) {
     }
@@ -4490,28 +4396,22 @@ public final class Osmformat {
 
       size = 0;
       if ((this.bitField0_ & 0x00000001) == 0x00000001) {
-        size += com.google.protobuf.CodedOutputStream.computeInt32Size(1,
-          this.version_);
+        size += com.google.protobuf.CodedOutputStream.computeInt32Size(1, this.version_);
       }
       if ((this.bitField0_ & 0x00000002) == 0x00000002) {
-        size += com.google.protobuf.CodedOutputStream.computeInt64Size(2,
-          this.timestamp_);
+        size += com.google.protobuf.CodedOutputStream.computeInt64Size(2, this.timestamp_);
       }
       if ((this.bitField0_ & 0x00000004) == 0x00000004) {
-        size += com.google.protobuf.CodedOutputStream.computeInt64Size(3,
-          this.changeset_);
+        size += com.google.protobuf.CodedOutputStream.computeInt64Size(3, this.changeset_);
       }
       if ((this.bitField0_ & 0x00000008) == 0x00000008) {
-        size += com.google.protobuf.CodedOutputStream.computeInt32Size(4,
-          this.uid_);
+        size += com.google.protobuf.CodedOutputStream.computeInt32Size(4, this.uid_);
       }
       if ((this.bitField0_ & 0x00000010) == 0x00000010) {
-        size += com.google.protobuf.CodedOutputStream.computeUInt32Size(5,
-          this.userSid_);
+        size += com.google.protobuf.CodedOutputStream.computeUInt32Size(5, this.userSid_);
       }
       if ((this.bitField0_ & 0x00000020) == 0x00000020) {
-        size += com.google.protobuf.CodedOutputStream.computeBoolSize(6,
-          this.visible_);
+        size += com.google.protobuf.CodedOutputStream.computeBoolSize(6, this.visible_);
       }
       this.memoizedSerializedSize = size;
       return size;
@@ -4603,14 +4503,13 @@ public final class Osmformat {
     }
 
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+    protected java.lang.Object writeReplace() throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
     @Override
     public void writeTo(final com.google.protobuf.CodedOutputStream output)
-        throws java.io.IOException {
+      throws java.io.IOException {
       getSerializedSize();
       if ((this.bitField0_ & 0x00000001) == 0x00000001) {
         output.writeInt32(1, this.version_);
@@ -4635,8 +4534,7 @@ public final class Osmformat {
     // @@protoc_insertion_point(class_scope:OSMPBF.Info)
   }
 
-  public interface InfoOrBuilder extends
-  com.google.protobuf.MessageLiteOrBuilder {
+  public interface InfoOrBuilder extends com.google.protobuf.MessageLiteOrBuilder {
 
     long getChangeset();
 
@@ -4669,11 +4567,10 @@ public final class Osmformat {
     boolean hasVisible();
   }
 
-  public static final class Node extends
-  com.google.protobuf.GeneratedMessageLite implements NodeOrBuilder {
-    public static final class Builder extends
-    com.google.protobuf.GeneratedMessageLite.Builder<Node, Builder> implements
+  public static final class Node extends com.google.protobuf.GeneratedMessageLite implements
     NodeOrBuilder {
+    public static final class Builder extends
+      com.google.protobuf.GeneratedMessageLite.Builder<Node, Builder> implements NodeOrBuilder {
       private static Builder create() {
         return new Builder();
       }
@@ -4703,16 +4600,14 @@ public final class Osmformat {
         maybeForceBuilderInitialization();
       }
 
-      public Builder addAllKeys(
-        final java.lang.Iterable<? extends java.lang.Integer> values) {
+      public Builder addAllKeys(final java.lang.Iterable<? extends java.lang.Integer> values) {
         ensureKeysIsMutable();
         super.addAll(values, this.keys_);
 
         return this;
       }
 
-      public Builder addAllVals(
-        final java.lang.Iterable<? extends java.lang.Integer> values) {
+      public Builder addAllVals(final java.lang.Iterable<? extends java.lang.Integer> values) {
         ensureValsIsMutable();
         super.addAll(values, this.vals_);
 
@@ -4742,8 +4637,7 @@ public final class Osmformat {
         return result;
       }
 
-      private Node buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      private Node buildParsed() throws com.google.protobuf.InvalidProtocolBufferException {
         final Node result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result).asInvalidProtocolBufferException();
@@ -4965,10 +4859,9 @@ public final class Osmformat {
       }
 
       @Override
-      public Builder mergeFrom(
-        final com.google.protobuf.CodedInputStream input,
+      public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -5079,11 +4972,8 @@ public final class Osmformat {
       }
 
       public Builder mergeInfo(final Info value) {
-        if ((this.bitField0_ & 0x00000008) == 0x00000008
-            && this.info_ != Info.getDefaultInstance()) {
-          this.info_ = Info.newBuilder(this.info_)
-              .mergeFrom(value)
-              .buildPartial();
+        if ((this.bitField0_ & 0x00000008) == 0x00000008 && this.info_ != Info.getDefaultInstance()) {
+          this.info_ = Info.newBuilder(this.info_).mergeFrom(value).buildPartial();
         } else {
           this.info_ = value;
         }
@@ -5147,6 +5037,33 @@ public final class Osmformat {
       // @@protoc_insertion_point(builder_scope:OSMPBF.Node)
     }
 
+    private static final Node defaultInstance;
+
+    // required sint64 id = 1;
+    public static final int ID_FIELD_NUMBER = 1;
+
+    // repeated uint32 keys = 2 [packed = true];
+    public static final int KEYS_FIELD_NUMBER = 2;
+
+    // repeated uint32 vals = 3 [packed = true];
+    public static final int VALS_FIELD_NUMBER = 3;
+
+    // optional .OSMPBF.Info info = 4;
+    public static final int INFO_FIELD_NUMBER = 4;
+
+    // required sint64 lat = 8;
+    public static final int LAT_FIELD_NUMBER = 8;
+
+    // required sint64 lon = 9;
+    public static final int LON_FIELD_NUMBER = 9;
+
+    private static final long serialVersionUID = 0L;
+
+    static {
+      defaultInstance = new Node(true);
+      defaultInstance.initFields();
+    }
+
     public static Node getDefaultInstance() {
       return defaultInstance;
     }
@@ -5160,7 +5077,7 @@ public final class Osmformat {
     }
 
     public static Node parseDelimitedFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
         return builder.buildParsed();
@@ -5170,8 +5087,7 @@ public final class Osmformat {
     }
 
     public static Node parseDelimitedFrom(final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -5181,98 +5097,67 @@ public final class Osmformat {
     }
 
     public static Node parseFrom(final byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
     public static Node parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
     public static Node parseFrom(final com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
     public static Node parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
-    public static Node parseFrom(
-      final com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+    public static Node parseFrom(final com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
-    public static Node parseFrom(
-      final com.google.protobuf.CodedInputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+    public static Node parseFrom(final com.google.protobuf.CodedInputStream input,
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    public static Node parseFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+    public static Node parseFrom(final java.io.InputStream input) throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
     public static Node parseFrom(final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    private static final Node defaultInstance;
-
     private int bitField0_;
 
-    // required sint64 id = 1;
-    public static final int ID_FIELD_NUMBER = 1;
-
     private long id_;
-
-    // repeated uint32 keys = 2 [packed = true];
-    public static final int KEYS_FIELD_NUMBER = 2;
 
     private java.util.List<java.lang.Integer> keys_;
 
     private int keysMemoizedSerializedSize = -1;
 
-    // repeated uint32 vals = 3 [packed = true];
-    public static final int VALS_FIELD_NUMBER = 3;
-
     private java.util.List<java.lang.Integer> vals_;
 
     private int valsMemoizedSerializedSize = -1;
 
-    // optional .OSMPBF.Info info = 4;
-    public static final int INFO_FIELD_NUMBER = 4;
-
     private Info info_;
 
-    // required sint64 lat = 8;
-    public static final int LAT_FIELD_NUMBER = 8;
-
     private long lat_;
-
-    // required sint64 lon = 9;
-    public static final int LON_FIELD_NUMBER = 9;
 
     private long lon_;
 
     private byte memoizedIsInitialized = -1;
 
     private int memoizedSerializedSize = -1;
-
-    private static final long serialVersionUID = 0L;
-    static {
-      defaultInstance = new Node(true);
-      defaultInstance.initFields();
-    }
 
     private Node(final boolean noInit) {
     }
@@ -5331,8 +5216,7 @@ public final class Osmformat {
 
       size = 0;
       if ((this.bitField0_ & 0x00000001) == 0x00000001) {
-        size += com.google.protobuf.CodedOutputStream.computeSInt64Size(1,
-          this.id_);
+        size += com.google.protobuf.CodedOutputStream.computeSInt64Size(1, this.id_);
       }
       {
         int dataSize = 0;
@@ -5359,16 +5243,13 @@ public final class Osmformat {
         this.valsMemoizedSerializedSize = dataSize;
       }
       if ((this.bitField0_ & 0x00000002) == 0x00000002) {
-        size += com.google.protobuf.CodedOutputStream.computeMessageSize(4,
-          this.info_);
+        size += com.google.protobuf.CodedOutputStream.computeMessageSize(4, this.info_);
       }
       if ((this.bitField0_ & 0x00000004) == 0x00000004) {
-        size += com.google.protobuf.CodedOutputStream.computeSInt64Size(8,
-          this.lat_);
+        size += com.google.protobuf.CodedOutputStream.computeSInt64Size(8, this.lat_);
       }
       if ((this.bitField0_ & 0x00000008) == 0x00000008) {
-        size += com.google.protobuf.CodedOutputStream.computeSInt64Size(9,
-          this.lon_);
+        size += com.google.protobuf.CodedOutputStream.computeSInt64Size(9, this.lon_);
       }
       this.memoizedSerializedSize = size;
       return size;
@@ -5454,14 +5335,13 @@ public final class Osmformat {
     }
 
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+    protected java.lang.Object writeReplace() throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
     @Override
     public void writeTo(final com.google.protobuf.CodedOutputStream output)
-        throws java.io.IOException {
+      throws java.io.IOException {
       getSerializedSize();
       if ((this.bitField0_ & 0x00000001) == 0x00000001) {
         output.writeSInt64(1, this.id_);
@@ -5494,8 +5374,7 @@ public final class Osmformat {
     // @@protoc_insertion_point(class_scope:OSMPBF.Node)
   }
 
-  public interface NodeOrBuilder extends
-  com.google.protobuf.MessageLiteOrBuilder {
+  public interface NodeOrBuilder extends com.google.protobuf.MessageLiteOrBuilder {
 
     long getId();
 
@@ -5532,11 +5411,11 @@ public final class Osmformat {
     boolean hasLon();
   }
 
-  public static final class PrimitiveBlock extends
-  com.google.protobuf.GeneratedMessageLite implements PrimitiveBlockOrBuilder {
-    public static final class Builder extends
-    com.google.protobuf.GeneratedMessageLite.Builder<PrimitiveBlock, Builder>
+  public static final class PrimitiveBlock extends com.google.protobuf.GeneratedMessageLite
     implements PrimitiveBlockOrBuilder {
+    public static final class Builder extends
+      com.google.protobuf.GeneratedMessageLite.Builder<PrimitiveBlock, Builder> implements
+      PrimitiveBlockOrBuilder {
       private static Builder create() {
         return new Builder();
       }
@@ -5566,16 +5445,14 @@ public final class Osmformat {
         maybeForceBuilderInitialization();
       }
 
-      public Builder addAllPrimitivegroup(
-        final java.lang.Iterable<? extends PrimitiveGroup> values) {
+      public Builder addAllPrimitivegroup(final java.lang.Iterable<? extends PrimitiveGroup> values) {
         ensurePrimitivegroupIsMutable();
         super.addAll(values, this.primitivegroup_);
 
         return this;
       }
 
-      public Builder addPrimitivegroup(final int index,
-        final PrimitiveGroup value) {
+      public Builder addPrimitivegroup(final int index, final PrimitiveGroup value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -5585,8 +5462,7 @@ public final class Osmformat {
         return this;
       }
 
-      public Builder addPrimitivegroup(final int index,
-        final PrimitiveGroup.Builder builderForValue) {
+      public Builder addPrimitivegroup(final int index, final PrimitiveGroup.Builder builderForValue) {
         ensurePrimitivegroupIsMutable();
         this.primitivegroup_.add(index, builderForValue.build());
 
@@ -5603,8 +5479,7 @@ public final class Osmformat {
         return this;
       }
 
-      public Builder addPrimitivegroup(
-        final PrimitiveGroup.Builder builderForValue) {
+      public Builder addPrimitivegroup(final PrimitiveGroup.Builder builderForValue) {
         ensurePrimitivegroupIsMutable();
         this.primitivegroup_.add(builderForValue.build());
 
@@ -5621,7 +5496,7 @@ public final class Osmformat {
       }
 
       private PrimitiveBlock buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
+        throws com.google.protobuf.InvalidProtocolBufferException {
         final PrimitiveBlock result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result).asInvalidProtocolBufferException();
@@ -5730,8 +5605,7 @@ public final class Osmformat {
 
       private void ensurePrimitivegroupIsMutable() {
         if (!((this.bitField0_ & 0x00000002) == 0x00000002)) {
-          this.primitivegroup_ = new java.util.ArrayList<PrimitiveGroup>(
-              this.primitivegroup_);
+          this.primitivegroup_ = new java.util.ArrayList<PrimitiveGroup>(this.primitivegroup_);
           this.bitField0_ |= 0x00000002;
         }
       }
@@ -5825,10 +5699,9 @@ public final class Osmformat {
       }
 
       @Override
-      public Builder mergeFrom(
-        final com.google.protobuf.CodedInputStream input,
+      public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -5916,10 +5789,10 @@ public final class Osmformat {
 
       public Builder mergeStringtable(final StringTable value) {
         if ((this.bitField0_ & 0x00000001) == 0x00000001
-            && this.stringtable_ != StringTable.getDefaultInstance()) {
+          && this.stringtable_ != StringTable.getDefaultInstance()) {
           this.stringtable_ = StringTable.newBuilder(this.stringtable_)
-              .mergeFrom(value)
-              .buildPartial();
+            .mergeFrom(value)
+            .buildPartial();
         } else {
           this.stringtable_ = value;
         }
@@ -5963,8 +5836,7 @@ public final class Osmformat {
         return this;
       }
 
-      public Builder setPrimitivegroup(final int index,
-        final PrimitiveGroup value) {
+      public Builder setPrimitivegroup(final int index, final PrimitiveGroup value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -5974,8 +5846,7 @@ public final class Osmformat {
         return this;
       }
 
-      public Builder setPrimitivegroup(final int index,
-        final PrimitiveGroup.Builder builderForValue) {
+      public Builder setPrimitivegroup(final int index, final PrimitiveGroup.Builder builderForValue) {
         ensurePrimitivegroupIsMutable();
         this.primitivegroup_.set(index, builderForValue.build());
 
@@ -6002,6 +5873,33 @@ public final class Osmformat {
       // @@protoc_insertion_point(builder_scope:OSMPBF.PrimitiveBlock)
     }
 
+    private static final PrimitiveBlock defaultInstance;
+
+    // required .OSMPBF.StringTable stringtable = 1;
+    public static final int STRINGTABLE_FIELD_NUMBER = 1;
+
+    // repeated .OSMPBF.PrimitiveGroup primitivegroup = 2;
+    public static final int PRIMITIVEGROUP_FIELD_NUMBER = 2;
+
+    // optional int32 granularity = 17 [default = 100];
+    public static final int GRANULARITY_FIELD_NUMBER = 17;
+
+    // optional int64 lat_offset = 19 [default = 0];
+    public static final int LAT_OFFSET_FIELD_NUMBER = 19;
+
+    // optional int64 lon_offset = 20 [default = 0];
+    public static final int LON_OFFSET_FIELD_NUMBER = 20;
+
+    // optional int32 date_granularity = 18 [default = 1000];
+    public static final int DATE_GRANULARITY_FIELD_NUMBER = 18;
+
+    private static final long serialVersionUID = 0L;
+
+    static {
+      defaultInstance = new PrimitiveBlock(true);
+      defaultInstance.initFields();
+    }
+
     public static PrimitiveBlock getDefaultInstance() {
       return defaultInstance;
     }
@@ -6014,8 +5912,8 @@ public final class Osmformat {
       return newBuilder().mergeFrom(prototype);
     }
 
-    public static PrimitiveBlock parseDelimitedFrom(
-      final java.io.InputStream input) throws java.io.IOException {
+    public static PrimitiveBlock parseDelimitedFrom(final java.io.InputStream input)
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
         return builder.buildParsed();
@@ -6024,10 +5922,8 @@ public final class Osmformat {
       }
     }
 
-    public static PrimitiveBlock parseDelimitedFrom(
-      final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+    public static PrimitiveBlock parseDelimitedFrom(final java.io.InputStream input,
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -6037,96 +5933,64 @@ public final class Osmformat {
     }
 
     public static PrimitiveBlock parseFrom(final byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
     public static PrimitiveBlock parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
-    public static PrimitiveBlock parseFrom(
-      final com.google.protobuf.ByteString data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+    public static PrimitiveBlock parseFrom(final com.google.protobuf.ByteString data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
-    public static PrimitiveBlock parseFrom(
-      final com.google.protobuf.ByteString data,
+    public static PrimitiveBlock parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
-    public static PrimitiveBlock parseFrom(
-      final com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+    public static PrimitiveBlock parseFrom(final com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
-    public static PrimitiveBlock parseFrom(
-      final com.google.protobuf.CodedInputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+    public static PrimitiveBlock parseFrom(final com.google.protobuf.CodedInputStream input,
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
     public static PrimitiveBlock parseFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
     public static PrimitiveBlock parseFrom(final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    private static final PrimitiveBlock defaultInstance;
-
     private int bitField0_;
-
-    // required .OSMPBF.StringTable stringtable = 1;
-    public static final int STRINGTABLE_FIELD_NUMBER = 1;
 
     private StringTable stringtable_;
 
-    // repeated .OSMPBF.PrimitiveGroup primitivegroup = 2;
-    public static final int PRIMITIVEGROUP_FIELD_NUMBER = 2;
-
     private java.util.List<PrimitiveGroup> primitivegroup_;
-
-    // optional int32 granularity = 17 [default = 100];
-    public static final int GRANULARITY_FIELD_NUMBER = 17;
 
     private int granularity_;
 
-    // optional int64 lat_offset = 19 [default = 0];
-    public static final int LAT_OFFSET_FIELD_NUMBER = 19;
-
     private long latOffset_;
 
-    // optional int64 lon_offset = 20 [default = 0];
-    public static final int LON_OFFSET_FIELD_NUMBER = 20;
-
     private long lonOffset_;
-
-    // optional int32 date_granularity = 18 [default = 1000];
-    public static final int DATE_GRANULARITY_FIELD_NUMBER = 18;
 
     private int dateGranularity_;
 
     private byte memoizedIsInitialized = -1;
 
     private int memoizedSerializedSize = -1;
-
-    private static final long serialVersionUID = 0L;
-    static {
-      defaultInstance = new PrimitiveBlock(true);
-      defaultInstance.initFields();
-    }
 
     private PrimitiveBlock(final boolean noInit) {
     }
@@ -6193,28 +6057,23 @@ public final class Osmformat {
 
       size = 0;
       if ((this.bitField0_ & 0x00000001) == 0x00000001) {
-        size += com.google.protobuf.CodedOutputStream.computeMessageSize(1,
-          this.stringtable_);
+        size += com.google.protobuf.CodedOutputStream.computeMessageSize(1, this.stringtable_);
       }
       for (int i = 0; i < this.primitivegroup_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream.computeMessageSize(2,
           this.primitivegroup_.get(i));
       }
       if ((this.bitField0_ & 0x00000002) == 0x00000002) {
-        size += com.google.protobuf.CodedOutputStream.computeInt32Size(17,
-          this.granularity_);
+        size += com.google.protobuf.CodedOutputStream.computeInt32Size(17, this.granularity_);
       }
       if ((this.bitField0_ & 0x00000010) == 0x00000010) {
-        size += com.google.protobuf.CodedOutputStream.computeInt32Size(18,
-          this.dateGranularity_);
+        size += com.google.protobuf.CodedOutputStream.computeInt32Size(18, this.dateGranularity_);
       }
       if ((this.bitField0_ & 0x00000004) == 0x00000004) {
-        size += com.google.protobuf.CodedOutputStream.computeInt64Size(19,
-          this.latOffset_);
+        size += com.google.protobuf.CodedOutputStream.computeInt64Size(19, this.latOffset_);
       }
       if ((this.bitField0_ & 0x00000008) == 0x00000008) {
-        size += com.google.protobuf.CodedOutputStream.computeInt64Size(20,
-          this.lonOffset_);
+        size += com.google.protobuf.CodedOutputStream.computeInt64Size(20, this.lonOffset_);
       }
       this.memoizedSerializedSize = size;
       return size;
@@ -6291,14 +6150,13 @@ public final class Osmformat {
     }
 
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+    protected java.lang.Object writeReplace() throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
     @Override
     public void writeTo(final com.google.protobuf.CodedOutputStream output)
-        throws java.io.IOException {
+      throws java.io.IOException {
       getSerializedSize();
       if ((this.bitField0_ & 0x00000001) == 0x00000001) {
         output.writeMessage(1, this.stringtable_);
@@ -6323,8 +6181,7 @@ public final class Osmformat {
     // @@protoc_insertion_point(class_scope:OSMPBF.PrimitiveBlock)
   }
 
-  public interface PrimitiveBlockOrBuilder extends
-  com.google.protobuf.MessageLiteOrBuilder {
+  public interface PrimitiveBlockOrBuilder extends com.google.protobuf.MessageLiteOrBuilder {
 
     int getDateGranularity();
 
@@ -6359,11 +6216,11 @@ public final class Osmformat {
     boolean hasStringtable();
   }
 
-  public static final class PrimitiveGroup extends
-  com.google.protobuf.GeneratedMessageLite implements PrimitiveGroupOrBuilder {
-    public static final class Builder extends
-    com.google.protobuf.GeneratedMessageLite.Builder<PrimitiveGroup, Builder>
+  public static final class PrimitiveGroup extends com.google.protobuf.GeneratedMessageLite
     implements PrimitiveGroupOrBuilder {
+    public static final class Builder extends
+      com.google.protobuf.GeneratedMessageLite.Builder<PrimitiveGroup, Builder> implements
+      PrimitiveGroupOrBuilder {
       private static Builder create() {
         return new Builder();
       }
@@ -6390,8 +6247,7 @@ public final class Osmformat {
         maybeForceBuilderInitialization();
       }
 
-      public Builder addAllChangesets(
-        final java.lang.Iterable<? extends ChangeSet> values) {
+      public Builder addAllChangesets(final java.lang.Iterable<? extends ChangeSet> values) {
         ensureChangesetsIsMutable();
         super.addAll(values, this.changesets_);
 
@@ -6405,8 +6261,7 @@ public final class Osmformat {
         return this;
       }
 
-      public Builder addAllRelations(
-        final java.lang.Iterable<? extends Relation> values) {
+      public Builder addAllRelations(final java.lang.Iterable<? extends Relation> values) {
         ensureRelationsIsMutable();
         super.addAll(values, this.relations_);
 
@@ -6447,8 +6302,7 @@ public final class Osmformat {
         return this;
       }
 
-      public Builder addChangesets(final int index,
-        final ChangeSet.Builder builderForValue) {
+      public Builder addChangesets(final int index, final ChangeSet.Builder builderForValue) {
         ensureChangesetsIsMutable();
         this.changesets_.add(index, builderForValue.build());
 
@@ -6465,8 +6319,7 @@ public final class Osmformat {
         return this;
       }
 
-      public Builder addNodes(final int index,
-        final Node.Builder builderForValue) {
+      public Builder addNodes(final int index, final Node.Builder builderForValue) {
         ensureNodesIsMutable();
         this.nodes_.add(index, builderForValue.build());
 
@@ -6500,8 +6353,7 @@ public final class Osmformat {
         return this;
       }
 
-      public Builder addRelations(final int index,
-        final Relation.Builder builderForValue) {
+      public Builder addRelations(final int index, final Relation.Builder builderForValue) {
         ensureRelationsIsMutable();
         this.relations_.add(index, builderForValue.build());
 
@@ -6569,7 +6421,7 @@ public final class Osmformat {
       }
 
       private PrimitiveGroup buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
+        throws com.google.protobuf.InvalidProtocolBufferException {
         final PrimitiveGroup result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result).asInvalidProtocolBufferException();
@@ -6668,8 +6520,7 @@ public final class Osmformat {
 
       private void ensureChangesetsIsMutable() {
         if (!((this.bitField0_ & 0x00000010) == 0x00000010)) {
-          this.changesets_ = new java.util.ArrayList<ChangeSet>(
-              this.changesets_);
+          this.changesets_ = new java.util.ArrayList<ChangeSet>(this.changesets_);
           this.bitField0_ |= 0x00000010;
         }
       }
@@ -6804,10 +6655,8 @@ public final class Osmformat {
 
       public Builder mergeDense(final DenseNodes value) {
         if ((this.bitField0_ & 0x00000002) == 0x00000002
-            && this.dense_ != DenseNodes.getDefaultInstance()) {
-          this.dense_ = DenseNodes.newBuilder(this.dense_)
-              .mergeFrom(value)
-              .buildPartial();
+          && this.dense_ != DenseNodes.getDefaultInstance()) {
+          this.dense_ = DenseNodes.newBuilder(this.dense_).mergeFrom(value).buildPartial();
         } else {
           this.dense_ = value;
         }
@@ -6817,10 +6666,9 @@ public final class Osmformat {
       }
 
       @Override
-      public Builder mergeFrom(
-        final com.google.protobuf.CodedInputStream input,
+      public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -6960,8 +6808,7 @@ public final class Osmformat {
         return this;
       }
 
-      public Builder setChangesets(final int index,
-        final ChangeSet.Builder builderForValue) {
+      public Builder setChangesets(final int index, final ChangeSet.Builder builderForValue) {
         ensureChangesetsIsMutable();
         this.changesets_.set(index, builderForValue.build());
 
@@ -6995,8 +6842,7 @@ public final class Osmformat {
         return this;
       }
 
-      public Builder setNodes(final int index,
-        final Node.Builder builderForValue) {
+      public Builder setNodes(final int index, final Node.Builder builderForValue) {
         ensureNodesIsMutable();
         this.nodes_.set(index, builderForValue.build());
 
@@ -7013,8 +6859,7 @@ public final class Osmformat {
         return this;
       }
 
-      public Builder setRelations(final int index,
-        final Relation.Builder builderForValue) {
+      public Builder setRelations(final int index, final Relation.Builder builderForValue) {
         ensureRelationsIsMutable();
         this.relations_.set(index, builderForValue.build());
 
@@ -7041,6 +6886,30 @@ public final class Osmformat {
       // @@protoc_insertion_point(builder_scope:OSMPBF.PrimitiveGroup)
     }
 
+    private static final PrimitiveGroup defaultInstance;
+
+    // repeated .OSMPBF.Node nodes = 1;
+    public static final int NODES_FIELD_NUMBER = 1;
+
+    // optional .OSMPBF.DenseNodes dense = 2;
+    public static final int DENSE_FIELD_NUMBER = 2;
+
+    // repeated .OSMPBF.Way ways = 3;
+    public static final int WAYS_FIELD_NUMBER = 3;
+
+    // repeated .OSMPBF.Relation relations = 4;
+    public static final int RELATIONS_FIELD_NUMBER = 4;
+
+    // repeated .OSMPBF.ChangeSet changesets = 5;
+    public static final int CHANGESETS_FIELD_NUMBER = 5;
+
+    private static final long serialVersionUID = 0L;
+
+    static {
+      defaultInstance = new PrimitiveGroup(true);
+      defaultInstance.initFields();
+    }
+
     public static PrimitiveGroup getDefaultInstance() {
       return defaultInstance;
     }
@@ -7053,8 +6922,8 @@ public final class Osmformat {
       return newBuilder().mergeFrom(prototype);
     }
 
-    public static PrimitiveGroup parseDelimitedFrom(
-      final java.io.InputStream input) throws java.io.IOException {
+    public static PrimitiveGroup parseDelimitedFrom(final java.io.InputStream input)
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
         return builder.buildParsed();
@@ -7063,10 +6932,8 @@ public final class Osmformat {
       }
     }
 
-    public static PrimitiveGroup parseDelimitedFrom(
-      final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+    public static PrimitiveGroup parseDelimitedFrom(final java.io.InputStream input,
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -7076,91 +6943,62 @@ public final class Osmformat {
     }
 
     public static PrimitiveGroup parseFrom(final byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
     public static PrimitiveGroup parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
-    public static PrimitiveGroup parseFrom(
-      final com.google.protobuf.ByteString data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+    public static PrimitiveGroup parseFrom(final com.google.protobuf.ByteString data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
-    public static PrimitiveGroup parseFrom(
-      final com.google.protobuf.ByteString data,
+    public static PrimitiveGroup parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
-    public static PrimitiveGroup parseFrom(
-      final com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+    public static PrimitiveGroup parseFrom(final com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
-    public static PrimitiveGroup parseFrom(
-      final com.google.protobuf.CodedInputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+    public static PrimitiveGroup parseFrom(final com.google.protobuf.CodedInputStream input,
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
     public static PrimitiveGroup parseFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
     public static PrimitiveGroup parseFrom(final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    private static final PrimitiveGroup defaultInstance;
-
     private int bitField0_;
-
-    // repeated .OSMPBF.Node nodes = 1;
-    public static final int NODES_FIELD_NUMBER = 1;
 
     private java.util.List<Node> nodes_;
 
-    // optional .OSMPBF.DenseNodes dense = 2;
-    public static final int DENSE_FIELD_NUMBER = 2;
-
     private DenseNodes dense_;
-
-    // repeated .OSMPBF.Way ways = 3;
-    public static final int WAYS_FIELD_NUMBER = 3;
 
     private java.util.List<Way> ways_;
 
-    // repeated .OSMPBF.Relation relations = 4;
-    public static final int RELATIONS_FIELD_NUMBER = 4;
-
     private java.util.List<Relation> relations_;
-
-    // repeated .OSMPBF.ChangeSet changesets = 5;
-    public static final int CHANGESETS_FIELD_NUMBER = 5;
 
     private java.util.List<ChangeSet> changesets_;
 
     private byte memoizedIsInitialized = -1;
 
     private int memoizedSerializedSize = -1;
-
-    private static final long serialVersionUID = 0L;
-    static {
-      defaultInstance = new PrimitiveGroup(true);
-      defaultInstance.initFields();
-    }
 
     private PrimitiveGroup(final boolean noInit) {
     }
@@ -7258,24 +7096,19 @@ public final class Osmformat {
 
       size = 0;
       for (int i = 0; i < this.nodes_.size(); i++) {
-        size += com.google.protobuf.CodedOutputStream.computeMessageSize(1,
-          this.nodes_.get(i));
+        size += com.google.protobuf.CodedOutputStream.computeMessageSize(1, this.nodes_.get(i));
       }
       if ((this.bitField0_ & 0x00000001) == 0x00000001) {
-        size += com.google.protobuf.CodedOutputStream.computeMessageSize(2,
-          this.dense_);
+        size += com.google.protobuf.CodedOutputStream.computeMessageSize(2, this.dense_);
       }
       for (int i = 0; i < this.ways_.size(); i++) {
-        size += com.google.protobuf.CodedOutputStream.computeMessageSize(3,
-          this.ways_.get(i));
+        size += com.google.protobuf.CodedOutputStream.computeMessageSize(3, this.ways_.get(i));
       }
       for (int i = 0; i < this.relations_.size(); i++) {
-        size += com.google.protobuf.CodedOutputStream.computeMessageSize(4,
-          this.relations_.get(i));
+        size += com.google.protobuf.CodedOutputStream.computeMessageSize(4, this.relations_.get(i));
       }
       for (int i = 0; i < this.changesets_.size(); i++) {
-        size += com.google.protobuf.CodedOutputStream.computeMessageSize(5,
-          this.changesets_.get(i));
+        size += com.google.protobuf.CodedOutputStream.computeMessageSize(5, this.changesets_.get(i));
       }
       this.memoizedSerializedSize = size;
       return size;
@@ -7363,14 +7196,13 @@ public final class Osmformat {
     }
 
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+    protected java.lang.Object writeReplace() throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
     @Override
     public void writeTo(final com.google.protobuf.CodedOutputStream output)
-        throws java.io.IOException {
+      throws java.io.IOException {
       getSerializedSize();
       for (int i = 0; i < this.nodes_.size(); i++) {
         output.writeMessage(1, this.nodes_.get(i));
@@ -7392,8 +7224,7 @@ public final class Osmformat {
     // @@protoc_insertion_point(class_scope:OSMPBF.PrimitiveGroup)
   }
 
-  public interface PrimitiveGroupOrBuilder extends
-  com.google.protobuf.MessageLiteOrBuilder {
+  public interface PrimitiveGroupOrBuilder extends com.google.protobuf.MessageLiteOrBuilder {
 
     ChangeSet getChangesets(int index);
 
@@ -7429,11 +7260,11 @@ public final class Osmformat {
     boolean hasDense();
   }
 
-  public static final class Relation extends
-  com.google.protobuf.GeneratedMessageLite implements RelationOrBuilder {
+  public static final class Relation extends com.google.protobuf.GeneratedMessageLite implements
+    RelationOrBuilder {
     public static final class Builder extends
-    com.google.protobuf.GeneratedMessageLite.Builder<Relation, Builder>
-    implements RelationOrBuilder {
+      com.google.protobuf.GeneratedMessageLite.Builder<Relation, Builder> implements
+      RelationOrBuilder {
       private static Builder create() {
         return new Builder();
       }
@@ -7466,40 +7297,35 @@ public final class Osmformat {
         maybeForceBuilderInitialization();
       }
 
-      public Builder addAllKeys(
-        final java.lang.Iterable<? extends java.lang.Integer> values) {
+      public Builder addAllKeys(final java.lang.Iterable<? extends java.lang.Integer> values) {
         ensureKeysIsMutable();
         super.addAll(values, this.keys_);
 
         return this;
       }
 
-      public Builder addAllMemids(
-        final java.lang.Iterable<? extends java.lang.Long> values) {
+      public Builder addAllMemids(final java.lang.Iterable<? extends java.lang.Long> values) {
         ensureMemidsIsMutable();
         super.addAll(values, this.memids_);
 
         return this;
       }
 
-      public Builder addAllRolesSid(
-        final java.lang.Iterable<? extends java.lang.Integer> values) {
+      public Builder addAllRolesSid(final java.lang.Iterable<? extends java.lang.Integer> values) {
         ensureRolesSidIsMutable();
         super.addAll(values, this.rolesSid_);
 
         return this;
       }
 
-      public Builder addAllTypes(
-        final java.lang.Iterable<? extends Relation.MemberType> values) {
+      public Builder addAllTypes(final java.lang.Iterable<? extends Relation.MemberType> values) {
         ensureTypesIsMutable();
         super.addAll(values, this.types_);
 
         return this;
       }
 
-      public Builder addAllVals(
-        final java.lang.Iterable<? extends java.lang.Integer> values) {
+      public Builder addAllVals(final java.lang.Iterable<? extends java.lang.Integer> values) {
         ensureValsIsMutable();
         super.addAll(values, this.vals_);
 
@@ -7553,8 +7379,7 @@ public final class Osmformat {
         return result;
       }
 
-      private Relation buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      private Relation buildParsed() throws com.google.protobuf.InvalidProtocolBufferException {
         final Relation result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result).asInvalidProtocolBufferException();
@@ -7702,16 +7527,14 @@ public final class Osmformat {
 
       private void ensureRolesSidIsMutable() {
         if (!((this.bitField0_ & 0x00000010) == 0x00000010)) {
-          this.rolesSid_ = new java.util.ArrayList<java.lang.Integer>(
-              this.rolesSid_);
+          this.rolesSid_ = new java.util.ArrayList<java.lang.Integer>(this.rolesSid_);
           this.bitField0_ |= 0x00000010;
         }
       }
 
       private void ensureTypesIsMutable() {
         if (!((this.bitField0_ & 0x00000040) == 0x00000040)) {
-          this.types_ = new java.util.ArrayList<Relation.MemberType>(
-              this.types_);
+          this.types_ = new java.util.ArrayList<Relation.MemberType>(this.types_);
           this.bitField0_ |= 0x00000040;
         }
       }
@@ -7836,10 +7659,9 @@ public final class Osmformat {
       }
 
       @Override
-      public Builder mergeFrom(
-        final com.google.protobuf.CodedInputStream input,
+      public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -8013,11 +7835,8 @@ public final class Osmformat {
       }
 
       public Builder mergeInfo(final Info value) {
-        if ((this.bitField0_ & 0x00000008) == 0x00000008
-            && this.info_ != Info.getDefaultInstance()) {
-          this.info_ = Info.newBuilder(this.info_)
-              .mergeFrom(value)
-              .buildPartial();
+        if ((this.bitField0_ & 0x00000008) == 0x00000008 && this.info_ != Info.getDefaultInstance()) {
+          this.info_ = Info.newBuilder(this.info_).mergeFrom(value).buildPartial();
         } else {
           this.info_ = value;
         }
@@ -8094,6 +7913,19 @@ public final class Osmformat {
     public enum MemberType implements com.google.protobuf.Internal.EnumLite {
       NODE(0, 0), WAY(1, 1), RELATION(2, 2), ;
 
+      public static final int NODE_VALUE = 0;
+
+      public static final int WAY_VALUE = 1;
+
+      public static final int RELATION_VALUE = 2;
+
+      private static com.google.protobuf.Internal.EnumLiteMap<MemberType> internalValueMap = new com.google.protobuf.Internal.EnumLiteMap<MemberType>() {
+        @Override
+        public MemberType findValueByNumber(final int number) {
+          return MemberType.valueOf(number);
+        }
+      };
+
       public static com.google.protobuf.Internal.EnumLiteMap<MemberType> internalGetValueMap() {
         return internalValueMap;
       }
@@ -8111,19 +7943,6 @@ public final class Osmformat {
         }
       }
 
-      public static final int NODE_VALUE = 0;
-
-      public static final int WAY_VALUE = 1;
-
-      public static final int RELATION_VALUE = 2;
-
-      private static com.google.protobuf.Internal.EnumLiteMap<MemberType> internalValueMap = new com.google.protobuf.Internal.EnumLiteMap<MemberType>() {
-        @Override
-        public MemberType findValueByNumber(final int number) {
-          return MemberType.valueOf(number);
-        }
-      };
-
       private final int value;
 
       private MemberType(final int index, final int value) {
@@ -8136,6 +7955,36 @@ public final class Osmformat {
       }
 
       // @@protoc_insertion_point(enum_scope:OSMPBF.Relation.MemberType)
+    }
+
+    private static final Relation defaultInstance;
+
+    // required int64 id = 1;
+    public static final int ID_FIELD_NUMBER = 1;
+
+    // repeated uint32 keys = 2 [packed = true];
+    public static final int KEYS_FIELD_NUMBER = 2;
+
+    // repeated uint32 vals = 3 [packed = true];
+    public static final int VALS_FIELD_NUMBER = 3;
+
+    // optional .OSMPBF.Info info = 4;
+    public static final int INFO_FIELD_NUMBER = 4;
+
+    // repeated int32 roles_sid = 8 [packed = true];
+    public static final int ROLES_SID_FIELD_NUMBER = 8;
+
+    // repeated sint64 memids = 9 [packed = true];
+    public static final int MEMIDS_FIELD_NUMBER = 9;
+
+    // repeated .OSMPBF.Relation.MemberType types = 10 [packed = true];
+    public static final int TYPES_FIELD_NUMBER = 10;
+
+    private static final long serialVersionUID = 0L;
+
+    static {
+      defaultInstance = new Relation(true);
+      defaultInstance.initFields();
     }
 
     public static Relation getDefaultInstance() {
@@ -8151,7 +8000,7 @@ public final class Osmformat {
     }
 
     public static Relation parseDelimitedFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
         return builder.buildParsed();
@@ -8161,8 +8010,7 @@ public final class Osmformat {
     }
 
     public static Relation parseDelimitedFrom(final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -8172,95 +8020,67 @@ public final class Osmformat {
     }
 
     public static Relation parseFrom(final byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
     public static Relation parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
     public static Relation parseFrom(final com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
     public static Relation parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
-    public static Relation parseFrom(
-      final com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+    public static Relation parseFrom(final com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
-    public static Relation parseFrom(
-      final com.google.protobuf.CodedInputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+    public static Relation parseFrom(final com.google.protobuf.CodedInputStream input,
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    public static Relation parseFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+    public static Relation parseFrom(final java.io.InputStream input) throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
     public static Relation parseFrom(final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    private static final Relation defaultInstance;
-
     private int bitField0_;
 
-    // required int64 id = 1;
-    public static final int ID_FIELD_NUMBER = 1;
-
     private long id_;
-
-    // repeated uint32 keys = 2 [packed = true];
-    public static final int KEYS_FIELD_NUMBER = 2;
 
     private java.util.List<java.lang.Integer> keys_;
 
     private int keysMemoizedSerializedSize = -1;
 
-    // repeated uint32 vals = 3 [packed = true];
-    public static final int VALS_FIELD_NUMBER = 3;
-
     private java.util.List<java.lang.Integer> vals_;
 
     private int valsMemoizedSerializedSize = -1;
 
-    // optional .OSMPBF.Info info = 4;
-    public static final int INFO_FIELD_NUMBER = 4;
-
     private Info info_;
-
-    // repeated int32 roles_sid = 8 [packed = true];
-    public static final int ROLES_SID_FIELD_NUMBER = 8;
 
     private java.util.List<java.lang.Integer> rolesSid_;
 
     private int rolesSidMemoizedSerializedSize = -1;
 
-    // repeated sint64 memids = 9 [packed = true];
-    public static final int MEMIDS_FIELD_NUMBER = 9;
-
     private java.util.List<java.lang.Long> memids_;
 
     private int memidsMemoizedSerializedSize = -1;
-
-    // repeated .OSMPBF.Relation.MemberType types = 10 [packed = true];
-    public static final int TYPES_FIELD_NUMBER = 10;
 
     private java.util.List<Relation.MemberType> types_;
 
@@ -8269,13 +8089,6 @@ public final class Osmformat {
     private byte memoizedIsInitialized = -1;
 
     private int memoizedSerializedSize = -1;
-
-    private static final long serialVersionUID = 0L;
-
-    static {
-      defaultInstance = new Relation(true);
-      defaultInstance.initFields();
-    }
 
     private Relation(final boolean noInit) {
     }
@@ -8354,8 +8167,7 @@ public final class Osmformat {
 
       size = 0;
       if ((this.bitField0_ & 0x00000001) == 0x00000001) {
-        size += com.google.protobuf.CodedOutputStream.computeInt64Size(1,
-          this.id_);
+        size += com.google.protobuf.CodedOutputStream.computeInt64Size(1, this.id_);
       }
       {
         int dataSize = 0;
@@ -8382,8 +8194,7 @@ public final class Osmformat {
         this.valsMemoizedSerializedSize = dataSize;
       }
       if ((this.bitField0_ & 0x00000002) == 0x00000002) {
-        size += com.google.protobuf.CodedOutputStream.computeMessageSize(4,
-          this.info_);
+        size += com.google.protobuf.CodedOutputStream.computeMessageSize(4, this.info_);
       }
       {
         int dataSize = 0;
@@ -8412,8 +8223,7 @@ public final class Osmformat {
       {
         int dataSize = 0;
         for (int i = 0; i < this.types_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream.computeEnumSizeNoTag(this.types_.get(
-            i)
+          dataSize += com.google.protobuf.CodedOutputStream.computeEnumSizeNoTag(this.types_.get(i)
             .getNumber());
         }
         size += dataSize;
@@ -8507,14 +8317,13 @@ public final class Osmformat {
     }
 
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+    protected java.lang.Object writeReplace() throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
     @Override
     public void writeTo(final com.google.protobuf.CodedOutputStream output)
-        throws java.io.IOException {
+      throws java.io.IOException {
       getSerializedSize();
       if ((this.bitField0_ & 0x00000001) == 0x00000001) {
         output.writeInt64(1, this.id_);
@@ -8562,8 +8371,7 @@ public final class Osmformat {
     // @@protoc_insertion_point(class_scope:OSMPBF.Relation)
   }
 
-  public interface RelationOrBuilder extends
-  com.google.protobuf.MessageLiteOrBuilder {
+  public interface RelationOrBuilder extends com.google.protobuf.MessageLiteOrBuilder {
 
     long getId();
 
@@ -8611,11 +8419,11 @@ public final class Osmformat {
     boolean hasInfo();
   }
 
-  public static final class StringTable extends
-  com.google.protobuf.GeneratedMessageLite implements StringTableOrBuilder {
+  public static final class StringTable extends com.google.protobuf.GeneratedMessageLite implements
+    StringTableOrBuilder {
     public static final class Builder extends
-    com.google.protobuf.GeneratedMessageLite.Builder<StringTable, Builder>
-    implements StringTableOrBuilder {
+      com.google.protobuf.GeneratedMessageLite.Builder<StringTable, Builder> implements
+      StringTableOrBuilder {
       private static Builder create() {
         return new Builder();
       }
@@ -8657,8 +8465,7 @@ public final class Osmformat {
         return result;
       }
 
-      private StringTable buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      private StringTable buildParsed() throws com.google.protobuf.InvalidProtocolBufferException {
         final StringTable result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result).asInvalidProtocolBufferException();
@@ -8702,8 +8509,7 @@ public final class Osmformat {
 
       private void ensureSIsMutable() {
         if (!((this.bitField0_ & 0x00000001) == 0x00000001)) {
-          this.s_ = new java.util.ArrayList<com.google.protobuf.ByteString>(
-              this.s_);
+          this.s_ = new java.util.ArrayList<com.google.protobuf.ByteString>(this.s_);
           this.bitField0_ |= 0x00000001;
         }
       }
@@ -8737,10 +8543,9 @@ public final class Osmformat {
       }
 
       @Override
-      public Builder mergeFrom(
-        final com.google.protobuf.CodedInputStream input,
+      public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -8781,8 +8586,7 @@ public final class Osmformat {
         return this;
       }
 
-      public Builder setS(final int index,
-        final com.google.protobuf.ByteString value) {
+      public Builder setS(final int index, final com.google.protobuf.ByteString value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -8793,6 +8597,18 @@ public final class Osmformat {
       }
 
       // @@protoc_insertion_point(builder_scope:OSMPBF.StringTable)
+    }
+
+    private static final StringTable defaultInstance;
+
+    // repeated bytes s = 1;
+    public static final int S_FIELD_NUMBER = 1;
+
+    private static final long serialVersionUID = 0L;
+
+    static {
+      defaultInstance = new StringTable(true);
+      defaultInstance.initFields();
     }
 
     public static StringTable getDefaultInstance() {
@@ -8808,7 +8624,7 @@ public final class Osmformat {
     }
 
     public static StringTable parseDelimitedFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
         return builder.buildParsed();
@@ -8817,10 +8633,8 @@ public final class Osmformat {
       }
     }
 
-    public static StringTable parseDelimitedFrom(
-      final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+    public static StringTable parseDelimitedFrom(final java.io.InputStream input,
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -8830,69 +8644,51 @@ public final class Osmformat {
     }
 
     public static StringTable parseFrom(final byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
     public static StringTable parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
-    public static StringTable parseFrom(
-      final com.google.protobuf.ByteString data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+    public static StringTable parseFrom(final com.google.protobuf.ByteString data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
-    public static StringTable parseFrom(
-      final com.google.protobuf.ByteString data,
+    public static StringTable parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
-    public static StringTable parseFrom(
-      final com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+    public static StringTable parseFrom(final com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
-    public static StringTable parseFrom(
-      final com.google.protobuf.CodedInputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+    public static StringTable parseFrom(final com.google.protobuf.CodedInputStream input,
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    public static StringTable parseFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+    public static StringTable parseFrom(final java.io.InputStream input) throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
     public static StringTable parseFrom(final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
-
-    private static final StringTable defaultInstance;
-
-    // repeated bytes s = 1;
-    public static final int S_FIELD_NUMBER = 1;
 
     private java.util.List<com.google.protobuf.ByteString> s_;
 
     private byte memoizedIsInitialized = -1;
 
     private int memoizedSerializedSize = -1;
-
-    private static final long serialVersionUID = 0L;
-    static {
-      defaultInstance = new StringTable(true);
-      defaultInstance.initFields();
-    }
 
     private StringTable(final boolean noInit) {
     }
@@ -8969,14 +8765,13 @@ public final class Osmformat {
     }
 
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+    protected java.lang.Object writeReplace() throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
     @Override
     public void writeTo(final com.google.protobuf.CodedOutputStream output)
-        throws java.io.IOException {
+      throws java.io.IOException {
       getSerializedSize();
       for (int i = 0; i < this.s_.size(); i++) {
         output.writeBytes(1, this.s_.get(i));
@@ -8986,8 +8781,7 @@ public final class Osmformat {
     // @@protoc_insertion_point(class_scope:OSMPBF.StringTable)
   }
 
-  public interface StringTableOrBuilder extends
-  com.google.protobuf.MessageLiteOrBuilder {
+  public interface StringTableOrBuilder extends com.google.protobuf.MessageLiteOrBuilder {
 
     com.google.protobuf.ByteString getS(int index);
 
@@ -8997,11 +8791,10 @@ public final class Osmformat {
     java.util.List<com.google.protobuf.ByteString> getSList();
   }
 
-  public static final class Way extends
-  com.google.protobuf.GeneratedMessageLite implements WayOrBuilder {
-    public static final class Builder extends
-    com.google.protobuf.GeneratedMessageLite.Builder<Way, Builder> implements
+  public static final class Way extends com.google.protobuf.GeneratedMessageLite implements
     WayOrBuilder {
+    public static final class Builder extends
+      com.google.protobuf.GeneratedMessageLite.Builder<Way, Builder> implements WayOrBuilder {
       private static Builder create() {
         return new Builder();
       }
@@ -9028,24 +8821,21 @@ public final class Osmformat {
         maybeForceBuilderInitialization();
       }
 
-      public Builder addAllKeys(
-        final java.lang.Iterable<? extends java.lang.Integer> values) {
+      public Builder addAllKeys(final java.lang.Iterable<? extends java.lang.Integer> values) {
         ensureKeysIsMutable();
         super.addAll(values, this.keys_);
 
         return this;
       }
 
-      public Builder addAllRefs(
-        final java.lang.Iterable<? extends java.lang.Long> values) {
+      public Builder addAllRefs(final java.lang.Iterable<? extends java.lang.Long> values) {
         ensureRefsIsMutable();
         super.addAll(values, this.refs_);
 
         return this;
       }
 
-      public Builder addAllVals(
-        final java.lang.Iterable<? extends java.lang.Integer> values) {
+      public Builder addAllVals(final java.lang.Iterable<? extends java.lang.Integer> values) {
         ensureValsIsMutable();
         super.addAll(values, this.vals_);
 
@@ -9082,8 +8872,7 @@ public final class Osmformat {
         return result;
       }
 
-      private Way buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      private Way buildParsed() throws com.google.protobuf.InvalidProtocolBufferException {
         final Way result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result).asInvalidProtocolBufferException();
@@ -9289,10 +9078,9 @@ public final class Osmformat {
       }
 
       @Override
-      public Builder mergeFrom(
-        final com.google.protobuf.CodedInputStream input,
+      public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -9411,11 +9199,8 @@ public final class Osmformat {
       }
 
       public Builder mergeInfo(final Info value) {
-        if ((this.bitField0_ & 0x00000008) == 0x00000008
-            && this.info_ != Info.getDefaultInstance()) {
-          this.info_ = Info.newBuilder(this.info_)
-              .mergeFrom(value)
-              .buildPartial();
+        if ((this.bitField0_ & 0x00000008) == 0x00000008 && this.info_ != Info.getDefaultInstance()) {
+          this.info_ = Info.newBuilder(this.info_).mergeFrom(value).buildPartial();
         } else {
           this.info_ = value;
         }
@@ -9472,6 +9257,30 @@ public final class Osmformat {
       // @@protoc_insertion_point(builder_scope:OSMPBF.Way)
     }
 
+    private static final Way defaultInstance;
+
+    // required int64 id = 1;
+    public static final int ID_FIELD_NUMBER = 1;
+
+    // repeated uint32 keys = 2 [packed = true];
+    public static final int KEYS_FIELD_NUMBER = 2;
+
+    // repeated uint32 vals = 3 [packed = true];
+    public static final int VALS_FIELD_NUMBER = 3;
+
+    // optional .OSMPBF.Info info = 4;
+    public static final int INFO_FIELD_NUMBER = 4;
+
+    // repeated sint64 refs = 8 [packed = true];
+    public static final int REFS_FIELD_NUMBER = 8;
+
+    private static final long serialVersionUID = 0L;
+
+    static {
+      defaultInstance = new Way(true);
+      defaultInstance.initFields();
+    }
+
     public static Way getDefaultInstance() {
       return defaultInstance;
     }
@@ -9485,7 +9294,7 @@ public final class Osmformat {
     }
 
     public static Way parseDelimitedFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
         return builder.buildParsed();
@@ -9495,8 +9304,7 @@ public final class Osmformat {
     }
 
     public static Way parseDelimitedFrom(final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -9506,80 +9314,59 @@ public final class Osmformat {
     }
 
     public static Way parseFrom(final byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
     public static Way parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
     public static Way parseFrom(final com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
 
     public static Way parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
     public static Way parseFrom(final com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
-    public static Way parseFrom(
-      final com.google.protobuf.CodedInputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+    public static Way parseFrom(final com.google.protobuf.CodedInputStream input,
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    public static Way parseFrom(final java.io.InputStream input)
-        throws java.io.IOException {
+    public static Way parseFrom(final java.io.InputStream input) throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
 
     public static Way parseFrom(final java.io.InputStream input,
-      final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      final com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    private static final Way defaultInstance;
-
     private int bitField0_;
 
-    // required int64 id = 1;
-    public static final int ID_FIELD_NUMBER = 1;
-
     private long id_;
-
-    // repeated uint32 keys = 2 [packed = true];
-    public static final int KEYS_FIELD_NUMBER = 2;
 
     private java.util.List<java.lang.Integer> keys_;
 
     private int keysMemoizedSerializedSize = -1;
 
-    // repeated uint32 vals = 3 [packed = true];
-    public static final int VALS_FIELD_NUMBER = 3;
-
     private java.util.List<java.lang.Integer> vals_;
 
     private int valsMemoizedSerializedSize = -1;
 
-    // optional .OSMPBF.Info info = 4;
-    public static final int INFO_FIELD_NUMBER = 4;
-
     private Info info_;
-
-    // repeated sint64 refs = 8 [packed = true];
-    public static final int REFS_FIELD_NUMBER = 8;
 
     private java.util.List<java.lang.Long> refs_;
 
@@ -9588,13 +9375,6 @@ public final class Osmformat {
     private byte memoizedIsInitialized = -1;
 
     private int memoizedSerializedSize = -1;
-
-    private static final long serialVersionUID = 0L;
-
-    static {
-      defaultInstance = new Way(true);
-      defaultInstance.initFields();
-    }
 
     private Way(final boolean noInit) {
     }
@@ -9658,8 +9438,7 @@ public final class Osmformat {
 
       size = 0;
       if ((this.bitField0_ & 0x00000001) == 0x00000001) {
-        size += com.google.protobuf.CodedOutputStream.computeInt64Size(1,
-          this.id_);
+        size += com.google.protobuf.CodedOutputStream.computeInt64Size(1, this.id_);
       }
       {
         int dataSize = 0;
@@ -9686,8 +9465,7 @@ public final class Osmformat {
         this.valsMemoizedSerializedSize = dataSize;
       }
       if ((this.bitField0_ & 0x00000002) == 0x00000002) {
-        size += com.google.protobuf.CodedOutputStream.computeMessageSize(4,
-          this.info_);
+        size += com.google.protobuf.CodedOutputStream.computeMessageSize(4, this.info_);
       }
       {
         int dataSize = 0;
@@ -9767,14 +9545,13 @@ public final class Osmformat {
     }
 
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+    protected java.lang.Object writeReplace() throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
     @Override
     public void writeTo(final com.google.protobuf.CodedOutputStream output)
-        throws java.io.IOException {
+      throws java.io.IOException {
       getSerializedSize();
       if ((this.bitField0_ & 0x00000001) == 0x00000001) {
         output.writeInt64(1, this.id_);
@@ -9808,8 +9585,7 @@ public final class Osmformat {
     // @@protoc_insertion_point(class_scope:OSMPBF.Way)
   }
 
-  public interface WayOrBuilder extends
-  com.google.protobuf.MessageLiteOrBuilder {
+  public interface WayOrBuilder extends com.google.protobuf.MessageLiteOrBuilder {
 
     long getId();
 
@@ -9843,11 +9619,10 @@ public final class Osmformat {
     boolean hasInfo();
   }
 
-  public static void registerAllExtensions(
-    final com.google.protobuf.ExtensionRegistryLite registry) {
+  static {
   }
 
-  static {
+  public static void registerAllExtensions(final com.google.protobuf.ExtensionRegistryLite registry) {
   }
 
   private Osmformat() {

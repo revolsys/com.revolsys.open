@@ -27,11 +27,12 @@ import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.parallel.Invoke;
 
 public class ProgressMonitor extends JDialog implements WindowListener {
-  public static void background(final Component component, final String title,
-    final String note, final boolean canCancel, final Object object,
-    final String methodName, final Object... parameters) {
-    final ProgressMonitor progressMonitor = new ProgressMonitor(component,
-      title, note, canCancel);
+  private static final long serialVersionUID = -5843323756390303783L;
+
+  public static void background(final Component component, final String title, final String note,
+    final boolean canCancel, final Object object, final String methodName,
+    final Object... parameters) {
+    final ProgressMonitor progressMonitor = new ProgressMonitor(component, title, note, canCancel);
     final List<Object> params = new ArrayList<Object>();
     params.add(progressMonitor);
     params.addAll(Arrays.asList(parameters));
@@ -39,11 +40,10 @@ public class ProgressMonitor extends JDialog implements WindowListener {
     progressMonitor.setVisible(true);
   }
 
-  public static void ui(final Component component, final String title,
-    final String note, final boolean canCancel, final Object object,
-    final String methodName, final Object... parameters) {
-    final ProgressMonitor progressMonitor = new ProgressMonitor(component,
-      title, note, canCancel);
+  public static void ui(final Component component, final String title, final String note,
+    final boolean canCancel, final Object object, final String methodName,
+    final Object... parameters) {
+    final ProgressMonitor progressMonitor = new ProgressMonitor(component, title, note, canCancel);
     final List<Object> params = new ArrayList<Object>();
     params.add(progressMonitor);
     params.addAll(Arrays.asList(parameters));
@@ -51,28 +51,24 @@ public class ProgressMonitor extends JDialog implements WindowListener {
     progressMonitor.setVisible(true);
   }
 
-  private static final long serialVersionUID = -5843323756390303783L;
-
   private final JProgressBar progressBar = new JProgressBar();
 
   private final JLabel noteLabel;
 
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-    this);
+  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   private final JButton cancelButton;
 
   private boolean cancelled = false;
 
-  private ProgressMonitor(final Component component, final String title,
-    final String note, final boolean canCancel) {
+  private ProgressMonitor(final Component component, final String title, final String note,
+    final boolean canCancel) {
     this(component, title, note, canCancel, 0, 0);
   }
 
-  private ProgressMonitor(final Component component, final String title,
-    final String note, final boolean canCancel, final int min, final int max) {
-    super(SwingUtil.getWindowAncestor(component), title,
-      ModalityType.APPLICATION_MODAL);
+  private ProgressMonitor(final Component component, final String title, final String note,
+    final boolean canCancel, final int min, final int max) {
+    super(SwingUtil.getWindowAncestor(component), title, ModalityType.APPLICATION_MODAL);
     setMinimumSize(new Dimension(title.length() * 20, 100));
     setLayout(new VerticalLayout(5));
     getRootPane().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));

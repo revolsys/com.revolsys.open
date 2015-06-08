@@ -25,8 +25,8 @@ public class CodeTableValueComaprator implements Comparator<Identifier> {
     } else if (identifier1.equals(identifier2)) {
       return 0;
     } else {
-      final Object value1 = codeTable.getValue(identifier1);
-      final Object value2 = codeTable.getValue(identifier2);
+      final Object value1 = this.codeTable.getValue(identifier1);
+      final Object value2 = this.codeTable.getValue(identifier2);
       int compare = CompareUtil.compare(value1, value2);
       if (compare == 0) {
         compare = identifier1.compareTo(identifier2);

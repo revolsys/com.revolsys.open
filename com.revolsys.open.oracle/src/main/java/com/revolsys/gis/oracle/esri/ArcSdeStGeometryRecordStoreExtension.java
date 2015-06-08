@@ -19,8 +19,7 @@ import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.Property;
 
-public class ArcSdeStGeometryRecordStoreExtension implements
-RecordStoreExtension {
+public class ArcSdeStGeometryRecordStoreExtension implements RecordStoreExtension {
 
   public ArcSdeStGeometryRecordStoreExtension() {
   }
@@ -32,8 +31,7 @@ RecordStoreExtension {
     final JdbcFieldAdder stGeometryAttributeAdder = new ArcSdeStGeometryFieldAdder(
       oracleRecordStore);
     oracleRecordStore.addFieldAdder("ST_GEOMETRY", stGeometryAttributeAdder);
-    oracleRecordStore.addFieldAdder("SDE.ST_GEOMETRY",
-      stGeometryAttributeAdder);
+    oracleRecordStore.addFieldAdder("SDE.ST_GEOMETRY", stGeometryAttributeAdder);
   }
 
   @Override
@@ -41,8 +39,8 @@ RecordStoreExtension {
     return ArcSdeConstants.isSdeAvailable(recordStore);
   }
 
-  private void loadColumnProperties(final RecordStoreSchema schema,
-    final String schemaName, final Connection connection) throws SQLException {
+  private void loadColumnProperties(final RecordStoreSchema schema, final String schemaName,
+    final Connection connection) throws SQLException {
     final String sql = "SELECT GC.F_TABLE_NAME, GC.F_GEOMETRY_COLUMN, GC.SRID, GC.GEOMETRY_TYPE, GC.COORD_DIMENSION, SG.GEOMETRY_TYPE GEOMETRY_DATA_TYPE FROM SDE.GEOMETRY_COLUMNS GC LEFT OUTER JOIN SDE.ST_GEOMETRY_COLUMNS SG ON GC.F_TABLE_SCHEMA = SG.OWNER AND GC.F_TABLE_NAME = SG.TABLE_NAME WHERE GC.F_TABLE_SCHEMA = ?";
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
@@ -61,16 +59,16 @@ RecordStoreExtension {
 
           int axisCount = resultSet.getInt(5);
           axisCount = Math.max(axisCount, 2);
-          JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
-            JdbcFieldAdder.NUM_AXIS, axisCount);
+          JdbcFieldAdder.setColumnProperty(schema, typePath, columnName, JdbcFieldAdder.NUM_AXIS,
+            axisCount);
 
           final ArcSdeSpatialReference spatialReference = ArcSdeSpatialReferenceCache.getSpatialReference(
             schema, esriSrid);
           JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
             ArcSdeConstants.SPATIAL_REFERENCE, spatialReference);
 
-          GeometryFactory geometryFactory = JdbcFieldAdder.getColumnProperty(
-            schema, typePath, columnName, JdbcFieldAdder.GEOMETRY_FACTORY);
+          GeometryFactory geometryFactory = JdbcFieldAdder.getColumnProperty(schema, typePath,
+            columnName, JdbcFieldAdder.GEOMETRY_FACTORY);
           int srid = spatialReference.getSrid();
           final double scaleXy = spatialReference.getXyScale();
           final double scaleZ = spatialReference.getZScale();
@@ -78,16 +76,14 @@ RecordStoreExtension {
             srid = geometryFactory.getSrid();
           }
           axisCount = Math.min(axisCount, 3);
-          geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXy,
-            scaleZ);
+          geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXy, scaleZ);
 
           JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
             JdbcFieldAdder.GEOMETRY_FACTORY, geometryFactory);
 
           final int geometryType = resultSet.getInt(4);
           JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
-            JdbcFieldAdder.GEOMETRY_TYPE,
-            ArcSdeConstants.getGeometryDataType(geometryType));
+            JdbcFieldAdder.GEOMETRY_TYPE, ArcSdeConstants.getGeometryDataType(geometryType));
 
           String geometryColumnType = resultSet.getString(6);
           if (!Property.hasValue(geometryColumnType)) {
@@ -104,8 +100,8 @@ RecordStoreExtension {
     }
   }
 
-  private void loadTableProperties(final Connection connection,
-    final RecordStoreSchema schema, final String schemaName) {
+  private void loadTableProperties(final Connection connection, final RecordStoreSchema schema,
+    final String schemaName) {
     final String sql = "SELECT registration_id, table_name, rowid_column FROM sde.table_registry WHERE owner = ?";
     PreparedStatement statement = null;
     ResultSet resultSet = null;
@@ -115,20 +111,18 @@ RecordStoreExtension {
       resultSet = statement.executeQuery();
       while (resultSet.next()) {
         final String tableName = resultSet.getString(2);
-        final String typePath = Path.toPath(schemaName, tableName)
-            .toUpperCase();
+        final String typePath = Path.toPath(schemaName, tableName).toUpperCase();
 
         final int registrationId = resultSet.getInt(1);
-        JdbcFieldAdder.setTableProperty(schema, typePath,
-          ArcSdeConstants.REGISTRATION_ID, registrationId);
+        JdbcFieldAdder.setTableProperty(schema, typePath, ArcSdeConstants.REGISTRATION_ID,
+          registrationId);
 
         final String rowidColumn = resultSet.getString(3);
-        JdbcFieldAdder.setTableProperty(schema, typePath,
-          ArcSdeConstants.ROWID_COLUMN, rowidColumn);
+        JdbcFieldAdder.setTableProperty(schema, typePath, ArcSdeConstants.ROWID_COLUMN, rowidColumn);
       }
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).error(
-        "Unable to load rowid columns for " + schemaName, e);
+      LoggerFactory.getLogger(getClass())
+        .error("Unable to load rowid columns for " + schemaName, e);
     } finally {
       JdbcUtils.close(statement, resultSet);
     }
@@ -139,13 +133,13 @@ RecordStoreExtension {
     final String schemaName = schema.getName();
     for (final RecordDefinition recordDefinition : schema.getRecordDefinitions()) {
       final String typePath = recordDefinition.getPath();
-      final Integer registrationId = JdbcFieldAdder.getTableProperty(
-        schema, typePath, ArcSdeConstants.REGISTRATION_ID);
-      final String rowIdColumn = JdbcFieldAdder.getTableProperty(schema,
-        typePath, ArcSdeConstants.ROWID_COLUMN);
+      final Integer registrationId = JdbcFieldAdder.getTableProperty(schema, typePath,
+        ArcSdeConstants.REGISTRATION_ID);
+      final String rowIdColumn = JdbcFieldAdder.getTableProperty(schema, typePath,
+        ArcSdeConstants.ROWID_COLUMN);
       if (registrationId != null && rowIdColumn != null) {
-        ArcSdeObjectIdJdbcFieldDefinition.replaceAttribute(schemaName,
-          recordDefinition, registrationId, rowIdColumn);
+        ArcSdeObjectIdJdbcFieldDefinition.replaceAttribute(schemaName, recordDefinition,
+          registrationId, rowIdColumn);
       }
     }
   }
@@ -156,7 +150,7 @@ RecordStoreExtension {
     final OracleRecordStore oracleRecordStore = (OracleRecordStore)recordStore;
     try {
       try (
-          final Connection connection = oracleRecordStore.getJdbcConnection()) {
+        final Connection connection = oracleRecordStore.getJdbcConnection()) {
         final String schemaName = oracleRecordStore.getDatabaseSchemaName(schema);
         loadTableProperties(connection, schema, schemaName);
         loadColumnProperties(schema, schemaName, connection);

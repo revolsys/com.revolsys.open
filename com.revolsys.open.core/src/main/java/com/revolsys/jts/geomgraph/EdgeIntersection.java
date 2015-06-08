@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -53,13 +52,14 @@ public class EdgeIntersection implements Comparable {
   public Point coord; // the point of intersection
 
   public int segmentIndex; // the index of the containing line segment in the
+
   // parent edge
 
   public double dist; // the edge distance of this point along the containing
+
   // line segment
 
-  public EdgeIntersection(final Point coord, final int segmentIndex,
-    final double dist) {
+  public EdgeIntersection(final Point coord, final int segmentIndex, final double dist) {
     this.coord = new PointDouble(coord);
     this.segmentIndex = segmentIndex;
     this.dist = dist;

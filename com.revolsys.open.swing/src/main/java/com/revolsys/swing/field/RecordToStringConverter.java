@@ -32,8 +32,7 @@ public class RecordToStringConverter extends ObjectToStringConverter {
       final Record object = (Record)value;
       final List<String> values = new ArrayList<String>();
       for (final String fieldName : this.fieldNames) {
-        final String text = StringConverterRegistry.toString(Property.get(
-          object, fieldName));
+        final String text = StringConverterRegistry.toString(Property.get(object, fieldName));
         values.add(text);
       }
       return CollectionUtil.toString(values);

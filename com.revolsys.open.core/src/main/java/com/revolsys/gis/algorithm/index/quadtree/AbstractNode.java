@@ -22,8 +22,8 @@ public abstract class AbstractNode<T> implements Serializable {
     return level;
   }
 
-  private static int getSubnodeIndex(final double centreX,
-    final double centreY, final double... bounds) {
+  private static int getSubnodeIndex(final double centreX, final double centreY,
+    final double... bounds) {
     final double minX = bounds[0];
     final double minY = bounds[1];
     final double maxX = bounds[2];
@@ -49,8 +49,8 @@ public abstract class AbstractNode<T> implements Serializable {
     return subnodeIndex;
   }
 
-  private static void setBounds(final double minX, final double minY,
-    final double[] newBounds, final int level) {
+  private static void setBounds(final double minX, final double minY, final double[] newBounds,
+    final int level) {
     final double quadSize = DoubleBits.powerOf2(level);
     final double x1 = Math.floor(minX / quadSize) * quadSize;
     final double y1 = Math.floor(minY / quadSize) * quadSize;
@@ -100,8 +100,7 @@ public abstract class AbstractNode<T> implements Serializable {
     this.nodes = null;
   }
 
-  public AbstractNode<T> createExpanded(final AbstractNode<T> node,
-    double[] bounds) {
+  public AbstractNode<T> createExpanded(final AbstractNode<T> node, double[] bounds) {
     bounds = bounds.clone();
     if (node != null) {
       BoundingBoxUtil.expand(bounds, 2, 0, node.minX);
@@ -125,8 +124,8 @@ public abstract class AbstractNode<T> implements Serializable {
     final double maxY = bounds[3];
     int level = computeQuadLevel(bounds);
     setBounds(minX, minY, newBounds, level);
-    while (!BoundingBoxUtil.covers(newBounds[0], newBounds[1], newBounds[2],
-      newBounds[3], minX, minY, maxX, maxY)) {
+    while (!BoundingBoxUtil.covers(newBounds[0], newBounds[1], newBounds[2], newBounds[3], minX,
+      minY, maxX, maxY)) {
       level++;
       setBounds(minX, minY, newBounds, level);
     }
@@ -172,8 +171,7 @@ public abstract class AbstractNode<T> implements Serializable {
         maxY = this.maxY;
       break;
     }
-    final AbstractNode<T> node = createNode(this.level - 1, minX, minY, maxX,
-      maxY);
+    final AbstractNode<T> node = createNode(this.level - 1, minX, minY, maxX, maxY);
     return node;
   }
 
@@ -278,8 +276,8 @@ public abstract class AbstractNode<T> implements Serializable {
     return getItemCount() > 0;
   }
 
-  private void insertContained(final QuadTree<T> tree,
-    final AbstractNode<T> root, final double[] bounds, final T item) {
+  private void insertContained(final QuadTree<T> tree, final AbstractNode<T> root,
+    final double[] bounds, final T item) {
     final boolean isZeroX = IntervalSize.isZeroWidth(bounds[2], bounds[0]);
     final boolean isZeroY = IntervalSize.isZeroWidth(bounds[3], bounds[1]);
     AbstractNode<T> node;
@@ -294,8 +292,7 @@ public abstract class AbstractNode<T> implements Serializable {
   void insertNode(final AbstractNode<T> node) {
     final double centreX = getCentreX();
     final double centreY = getCentreY();
-    final int index = getSubnodeIndex(centreX, centreY, node.minX, node.minY,
-      node.maxX, node.maxY);
+    final int index = getSubnodeIndex(centreX, centreY, node.minX, node.minY, node.maxX, node.maxY);
     if (node.level == this.level - 1) {
       setNode(index, node);
     } else {
@@ -305,8 +302,7 @@ public abstract class AbstractNode<T> implements Serializable {
     }
   }
 
-  protected void insertRoot(final QuadTree<T> tree, final double[] bounds,
-    final T item) {
+  protected void insertRoot(final QuadTree<T> tree, final double[] bounds, final T item) {
     final int index = getSubnodeIndex(0, 0, bounds);
     if (index == -1) {
       add(tree, bounds, item);
@@ -317,8 +313,8 @@ public abstract class AbstractNode<T> implements Serializable {
       final double maxY2 = bounds[3];
       AbstractNode<T> node = getNode(index);
       if (node == null
-        || !BoundingBoxUtil.covers(node.minX, node.minY, node.maxX, node.maxY,
-          minX2, minY2, maxX2, maxY2)) {
+        || !BoundingBoxUtil.covers(node.minX, node.minY, node.maxX, node.maxY, minX2, minY2, maxX2,
+          maxY2)) {
         final AbstractNode<T> largerNode = createExpanded(node, bounds);
         setNode(index, largerNode);
         node = largerNode;
@@ -358,12 +354,11 @@ public abstract class AbstractNode<T> implements Serializable {
       final double minY2 = bounds[1];
       final double maxX2 = bounds[2];
       final double maxY2 = bounds[3];
-      return !(minX2 > maxX || maxX2 < minX || minY2 > maxY || maxY2 < minY);
+      return !(minX2 > this.maxX || maxX2 < this.minX || minY2 > this.maxY || maxY2 < this.minY);
     }
   }
 
-  public boolean remove(final QuadTree<T> tree, final double[] bounds,
-    final T item) {
+  public boolean remove(final QuadTree<T> tree, final double[] bounds, final T item) {
     boolean removed = false;
     if (isSearchMatch(bounds)) {
       for (int i = 0; i < 4; i++) {
@@ -420,8 +415,7 @@ public abstract class AbstractNode<T> implements Serializable {
     }
   }
 
-  public boolean visit(final QuadTree<T> tree, final double[] bounds,
-    final Visitor<T> visitor) {
+  public boolean visit(final QuadTree<T> tree, final double[] bounds, final Visitor<T> visitor) {
     if (isSearchMatch(bounds)) {
       final int itemCount = getItemCount();
       for (int i = 0; i < itemCount; i++) {

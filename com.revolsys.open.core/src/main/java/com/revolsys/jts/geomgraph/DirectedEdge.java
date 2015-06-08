@@ -46,12 +46,10 @@ public class DirectedEdge extends EdgeEnd {
    * Computes the factor for the change in depth when moving from one location to another.
    * E.g. if crossing from the INTERIOR to the EXTERIOR the depth decreases, so the factor is -1
    */
-  public static int depthFactor(final Location currLocation,
-    final Location nextLocation) {
+  public static int depthFactor(final Location currLocation, final Location nextLocation) {
     if (currLocation == Location.EXTERIOR && nextLocation == Location.INTERIOR) {
       return 1;
-    } else if (currLocation == Location.INTERIOR
-        && nextLocation == Location.EXTERIOR) {
+    } else if (currLocation == Location.INTERIOR && nextLocation == Location.EXTERIOR) {
       return -1;
     }
     return 0;
@@ -66,9 +64,11 @@ public class DirectedEdge extends EdgeEnd {
   private DirectedEdge sym; // the symmetric edge
 
   private DirectedEdge next; // the next edge in the edge ring for the polygon
+
   // containing this edge
 
   private DirectedEdge nextMin; // the next edge in the MinimalEdgeRing that
+
   // contains this edge
 
   private EdgeRing edgeRing; // the EdgeRing that this edge is part of
@@ -167,9 +167,8 @@ public class DirectedEdge extends EdgeEnd {
   public boolean isInteriorAreaEdge() {
     boolean isInteriorAreaEdge = true;
     for (int i = 0; i < 2; i++) {
-      if (!(getLabel().isArea(i)
-          && getLabel().getLocation(i, Position.LEFT) == Location.INTERIOR && getLabel().getLocation(
-            i, Position.RIGHT) == Location.INTERIOR)) {
+      if (!(getLabel().isArea(i) && getLabel().getLocation(i, Position.LEFT) == Location.INTERIOR && getLabel().getLocation(
+        i, Position.RIGHT) == Location.INTERIOR)) {
         isInteriorAreaEdge = false;
       }
     }
@@ -186,9 +185,9 @@ public class DirectedEdge extends EdgeEnd {
   public boolean isLineEdge() {
     final boolean isLine = getLabel().isLine(0) || getLabel().isLine(1);
     final boolean isExteriorIfArea0 = !getLabel().isArea(0)
-        || getLabel().allPositionsEqual(0, Location.EXTERIOR);
+      || getLabel().allPositionsEqual(0, Location.EXTERIOR);
     final boolean isExteriorIfArea1 = !getLabel().isArea(1)
-        || getLabel().allPositionsEqual(1, Location.EXTERIOR);
+      || getLabel().allPositionsEqual(1, Location.EXTERIOR);
 
     return isLine && isExteriorIfArea0 && isExteriorIfArea1;
   }
@@ -212,8 +211,7 @@ public class DirectedEdge extends EdgeEnd {
   public void setDepth(final int position, final int depthVal) {
     if (this.depth[position] != -999) {
       if (this.depth[position] != depthVal) {
-        throw new TopologyException("assigned depths do not match",
-          getCoordinate());
+        throw new TopologyException("assigned depths do not match", getCoordinate());
       }
     }
     this.depth[position] = depthVal;

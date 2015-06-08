@@ -10,8 +10,8 @@ public final class IdObjectIndexEnvelopeVisitor<T> implements Visitor<Integer> {
 
   private final Visitor<T> visitor;
 
-  public IdObjectIndexEnvelopeVisitor(final IdObjectIndex<T> index,
-    final BoundingBox envelope, final Visitor<T> visitor) {
+  public IdObjectIndexEnvelopeVisitor(final IdObjectIndex<T> index, final BoundingBox envelope,
+    final Visitor<T> visitor) {
     this.index = index;
     this.envelope = envelope;
     this.visitor = visitor;

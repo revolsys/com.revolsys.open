@@ -44,17 +44,17 @@ import com.revolsys.jts.util.Stopwatch;
  */
 public class BinTreeCorrectTest {
 
-  public static void main(final String[] args) throws Exception {
-    // testBinaryPower();
-    final BinTreeCorrectTest test = new BinTreeCorrectTest();
-    test.run();
-  }
-
   static final int NUM_ITEMS = 20000;
 
   static final double MIN_EXTENT = -1000.0;
 
   static final double MAX_EXTENT = 1000.0;
+
+  public static void main(final String[] args) throws Exception {
+    // testBinaryPower();
+    final BinTreeCorrectTest test = new BinTreeCorrectTest();
+    test.run();
+  }
 
   IntervalList intervalList = new IntervalList();
 

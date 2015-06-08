@@ -32,8 +32,7 @@ public class ViewWrapper implements Controller {
   }
 
   @Override
-  public ModelAndView handleRequest(
-    final HttpServletRequest request,
+  public ModelAndView handleRequest(final HttpServletRequest request,
     final HttpServletResponse response) throws Exception {
     String path = request.getPathInfo();
     if ("/".equals(path)) {

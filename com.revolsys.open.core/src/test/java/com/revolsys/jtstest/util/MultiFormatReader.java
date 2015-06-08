@@ -48,6 +48,16 @@ import com.revolsys.jts.io.WKTReader;
  * @version 1.7
  */
 public class MultiFormatReader {
+  public static final int FORMAT_UNKNOWN = 0;
+
+  public static final int FORMAT_WKT = 1;
+
+  public static final int FORMAT_WKB = 2;
+
+  public static final int FORMAT_GML = 3;
+
+  private static final int MAX_CHARS_TO_CHECK = 6;
+
   public static int format(final String s) {
     if (isWKB(s)) {
       return FORMAT_WKB;
@@ -93,16 +103,6 @@ public class MultiFormatReader {
   public static boolean isWKT(final String s) {
     return !isWKB(s) && !isGML(s);
   }
-
-  public static final int FORMAT_UNKNOWN = 0;
-
-  public static final int FORMAT_WKT = 1;
-
-  public static final int FORMAT_WKB = 2;
-
-  public static final int FORMAT_GML = 3;
-
-  private static final int MAX_CHARS_TO_CHECK = 6;
 
   private final GeometryFactory geomFactory;
 

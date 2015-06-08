@@ -25,6 +25,12 @@ import com.revolsys.ui.web.controller.PathAliasController;
 import com.revolsys.util.Property;
 
 public final class HttpServletUtils {
+  private static ThreadLocal<HttpServletRequest> REQUEST_LOCAL = new ThreadLocal<HttpServletRequest>();
+
+  private static ThreadLocal<HttpServletResponse> RESPONSE_LOCAL = new ThreadLocal<HttpServletResponse>();
+
+  private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
+
   public static void clearRequestAndResponse() {
     REQUEST_LOCAL.remove();
     RESPONSE_LOCAL.remove();
@@ -51,8 +57,7 @@ public final class HttpServletUtils {
     }
   }
 
-  public static boolean getBooleanParameter(final HttpServletRequest request,
-    final String paramName) {
+  public static boolean getBooleanParameter(final HttpServletRequest request, final String paramName) {
     final String value = request.getParameter(paramName);
     if (Property.hasValue(value)) {
       return Boolean.parseBoolean(value);
@@ -76,8 +81,7 @@ public final class HttpServletUtils {
     return getAbsoluteUrl(aliasUrl);
   }
 
-  public static int getIntegerParameter(final HttpServletRequest request,
-    final String paramName) {
+  public static int getIntegerParameter(final HttpServletRequest request, final String paramName) {
     final String value = request.getParameter(paramName);
     if (Property.hasValue(value)) {
       try {
@@ -105,8 +109,7 @@ public final class HttpServletUtils {
   }
 
   @SuppressWarnings("unchecked")
-  public static Map<String, Object> getParameterMap(
-    final HttpServletRequest request) {
+  public static Map<String, Object> getParameterMap(final HttpServletRequest request) {
     final Map<String, Object> parameters = new LinkedHashMap<>();
     final Enumeration<String> parameterNames = request.getParameterNames();
     while (parameterNames.hasMoreElements()) {
@@ -139,8 +142,7 @@ public final class HttpServletUtils {
       Map<String, String> pathVariables = (Map<String, String>)request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
       if (pathVariables == null) {
         pathVariables = new HashMap<String, String>();
-        request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE,
-          pathVariables);
+        request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, pathVariables);
       }
       return pathVariables;
     }
@@ -257,21 +259,19 @@ public final class HttpServletUtils {
     request.setAttribute(name, value);
   }
 
-  public static Charset setContentTypeWithCharset(final HttpHeaders headers,
-    MediaType mediaType) {
+  public static Charset setContentTypeWithCharset(final HttpHeaders headers, MediaType mediaType) {
     Charset charset = mediaType.getCharSet();
     if (charset == null) {
       charset = StandardCharsets.UTF_8;
-      final Map<String, String> params = Collections.singletonMap("charset",
-          "utf-8");
+      final Map<String, String> params = Collections.singletonMap("charset", "utf-8");
       mediaType = new MediaType(mediaType, params);
     }
     headers.setContentType(mediaType);
     return charset;
   }
 
-  public static Charset setContentTypeWithCharset(
-    final HttpOutputMessage outputMessage, final MediaType mediaType) {
+  public static Charset setContentTypeWithCharset(final HttpOutputMessage outputMessage,
+    final MediaType mediaType) {
     final HttpHeaders headers = outputMessage.getHeaders();
     return setContentTypeWithCharset(headers, mediaType);
   }
@@ -293,12 +293,6 @@ public final class HttpServletUtils {
     REQUEST_LOCAL.set(request);
     RESPONSE_LOCAL.set(response);
   }
-
-  private static ThreadLocal<HttpServletRequest> REQUEST_LOCAL = new ThreadLocal<HttpServletRequest>();
-
-  private static ThreadLocal<HttpServletResponse> RESPONSE_LOCAL = new ThreadLocal<HttpServletResponse>();
-
-  private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
 
   private HttpServletUtils() {
 

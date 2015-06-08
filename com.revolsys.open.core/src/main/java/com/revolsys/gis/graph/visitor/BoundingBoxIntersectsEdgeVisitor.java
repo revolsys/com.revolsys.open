@@ -11,17 +11,16 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
 
-public class BoundingBoxIntersectsEdgeVisitor<T> extends
-DelegatingVisitor<Edge<T>> {
-  public static <T> List<Edge<T>> getEdges(final Graph<T> graph,
-    final Edge<T> edge, final double maxDistance) {
+public class BoundingBoxIntersectsEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
+  public static <T> List<Edge<T>> getEdges(final Graph<T> graph, final Edge<T> edge,
+    final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
 
     final LineString line = edge.getLine();
     BoundingBox boundingBox = line.getBoundingBox();
     boundingBox = boundingBox.expand(maxDistance);
     final BoundingBoxIntersectsEdgeVisitor<T> visitor = new BoundingBoxIntersectsEdgeVisitor<T>(
-        boundingBox, results);
+      boundingBox, results);
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
     index.visit(boundingBox, visitor);
     final List<Edge<T>> list = results.getList();

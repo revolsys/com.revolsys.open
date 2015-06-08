@@ -40,36 +40,31 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.operation.distance.DistanceWithPoints;
 
 public class DistanceFunctions {
-  public static Geometry densifiedDiscreteHausdorffDistanceLine(
-    final Geometry a, final Geometry b, final double frac) {
-    final DiscreteHausdorffDistance hausDist = new DiscreteHausdorffDistance(a,
-      b);
+  public static Geometry densifiedDiscreteHausdorffDistanceLine(final Geometry a, final Geometry b,
+    final double frac) {
+    final DiscreteHausdorffDistance hausDist = new DiscreteHausdorffDistance(a, b);
     hausDist.setDensifyFraction(frac);
     hausDist.distance();
     return a.getGeometryFactory().lineString(hausDist.getCoordinates());
   }
 
-  public static double discreteHausdorffDistance(final Geometry a,
-    final Geometry b) {
+  public static double discreteHausdorffDistance(final Geometry a, final Geometry b) {
     final DiscreteHausdorffDistance dist = new DiscreteHausdorffDistance(a, b);
     return dist.distance();
   }
 
-  public static Geometry discreteHausdorffDistanceLine(final Geometry a,
-    final Geometry b) {
+  public static Geometry discreteHausdorffDistanceLine(final Geometry a, final Geometry b) {
     final DiscreteHausdorffDistance dist = new DiscreteHausdorffDistance(a, b);
     dist.distance();
     return a.getGeometryFactory().lineString(dist.getCoordinates());
   }
 
-  public static double discreteOrientedHausdorffDistance(final Geometry a,
-    final Geometry b) {
+  public static double discreteOrientedHausdorffDistance(final Geometry a, final Geometry b) {
     final DiscreteHausdorffDistance dist = new DiscreteHausdorffDistance(a, b);
     return dist.orientedDistance();
   }
 
-  public static Geometry discreteOrientedHausdorffDistanceLine(
-    final Geometry a, final Geometry b) {
+  public static Geometry discreteOrientedHausdorffDistanceLine(final Geometry a, final Geometry b) {
     final DiscreteHausdorffDistance dist = new DiscreteHausdorffDistance(a, b);
     dist.orientedDistance();
     return a.getGeometryFactory().lineString(dist.getCoordinates());
@@ -79,8 +74,7 @@ public class DistanceFunctions {
     return a.distance(b);
   }
 
-  public static boolean isWithinDistance(final Geometry a, final Geometry b,
-    final double dist) {
+  public static boolean isWithinDistance(final Geometry a, final Geometry b, final double dist) {
     return a.isWithinDistance(b, dist);
   }
 

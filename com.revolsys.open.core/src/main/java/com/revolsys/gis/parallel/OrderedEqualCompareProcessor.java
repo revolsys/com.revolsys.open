@@ -85,15 +85,13 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
     return this.fieldName;
   }
 
-  protected Set<String> getNotEqualFieldNames(final Record object1,
-    final Record object2) {
+  protected Set<String> getNotEqualFieldNames(final Record object1, final Record object2) {
     final Set<String> notEqualFieldNames = new LinkedHashSet<String>();
     final String geometryFieldName1 = this.recordDefinition1.getGeometryFieldName();
     final String geometryFieldName2 = this.recordDefinition2.getGeometryFieldName();
     for (final String fieldName : this.fieldNames) {
-      if (!this.equalExclude.contains(fieldName)
-          && !fieldName.equals(geometryFieldName1)
-          && !fieldName.equals(geometryFieldName2)) {
+      if (!this.equalExclude.contains(fieldName) && !fieldName.equals(geometryFieldName1)
+        && !fieldName.equals(geometryFieldName2)) {
         final Object value1 = object1.getValue(fieldName);
         final Object value2 = object2.getValue(fieldName);
         if (!valueEquals(value1, value2)) {
@@ -132,38 +130,31 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
   }
 
   private void initAttributes() {
-    final List<String> fieldNames1 = new ArrayList<>(
-        this.recordDefinition1.getFieldNames());
-    final List<String> fieldNames2 = new ArrayList<>(
-        this.recordDefinition2.getFieldNames());
+    final List<String> fieldNames1 = new ArrayList<>(this.recordDefinition1.getFieldNames());
+    final List<String> fieldNames2 = new ArrayList<>(this.recordDefinition2.getFieldNames());
     this.fieldNames.addAll(fieldNames1);
     this.fieldNames.retainAll(fieldNames2);
     fieldNames1.removeAll(this.fieldNames);
     fieldNames1.remove(this.recordDefinition1.getGeometryFieldName());
     if (!fieldNames1.isEmpty()) {
-      LoggerFactory.getLogger(getClass()).error(
-        "Extra columns in file 1: " + fieldNames1);
+      LoggerFactory.getLogger(getClass()).error("Extra columns in file 1: " + fieldNames1);
     }
     fieldNames2.removeAll(this.fieldNames);
     fieldNames2.remove(this.recordDefinition2.getGeometryFieldName());
     if (!fieldNames2.isEmpty()) {
-      LoggerFactory.getLogger(getClass()).error(
-        "Extra columns in file 2: " + fieldNames2);
+      LoggerFactory.getLogger(getClass()).error("Extra columns in file 2: " + fieldNames2);
     }
   }
 
   protected void logNoMatch(final Record object, final boolean other) {
     if (other) {
-      RecordLog.warn(getClass(), this.otherName + " has no match in "
-          + this.sourceName, object);
+      RecordLog.warn(getClass(), this.otherName + " has no match in " + this.sourceName, object);
     } else {
-      RecordLog.warn(getClass(), this.sourceName + " has no match in "
-          + this.otherName, object);
+      RecordLog.warn(getClass(), this.sourceName + " has no match in " + this.otherName, object);
     }
   }
 
-  private void logNoMatch(final Record[] objects,
-    final Channel<Record> channel, final boolean other) {
+  private void logNoMatch(final Record[] objects, final Channel<Record> channel, final boolean other) {
     if (objects[0] != null) {
       logNoMatch(objects[0], false);
     }
@@ -176,12 +167,10 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
     }
   }
 
-  protected void logNotEqual(final Record sourceObject,
-    final Record otherObject, final Set<String> notEqualFieldNames,
-    final boolean geometryEquals) {
+  protected void logNotEqual(final Record sourceObject, final Record otherObject,
+    final Set<String> notEqualFieldNames, final boolean geometryEquals) {
     final String fieldNames = CollectionUtil.toString(",", notEqualFieldNames);
-    RecordLog.error(getClass(), this.sourceName + " " + fieldNames,
-      sourceObject);
+    RecordLog.error(getClass(), this.sourceName + " " + fieldNames, sourceObject);
     RecordLog.error(getClass(), this.otherName + " " + fieldNames, otherObject);
   }
 
@@ -227,13 +216,11 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
 
         if (readObject != null) {
           if (previousEqualObject != null
-              && EqualsInstance.INSTANCE.equals(previousEqualObject, readObject)) {
+            && EqualsInstance.INSTANCE.equals(previousEqualObject, readObject)) {
             if (index == 0) {
-              RecordLog.error(getClass(), "Duplicate in " + this.sourceName,
-                readObject);
+              RecordLog.error(getClass(), "Duplicate in " + this.sourceName, readObject);
             } else {
-              RecordLog.error(getClass(), "Duplicate in " + this.otherName,
-                readObject);
+              RecordLog.error(getClass(), "Duplicate in " + this.otherName, readObject);
             }
           } else {
             Record sourceObject;
@@ -248,8 +235,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
             }
             final Object value = readObject.getValue(this.fieldName);
             if (value == null) {
-              RecordLog.error(getClass(), "Missing key value for "
-                  + this.fieldName, readObject);
+              RecordLog.error(getClass(), "Missing key value for " + this.fieldName, readObject);
             } else if (objects[oppositeIndex] == null) {
               objects[index] = readObject;
               guard[index] = false;
@@ -272,19 +258,17 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
               // TODO duplicates
               final int compare = sourceComparator.compareTo(otherValue);
               if (compare == 0) {
-                final Set<String> notEqualFieldNames = getNotEqualFieldNames(
-                  sourceObject, otherObject);
-
-                final boolean geometryEquals = geometryEquals(sourceObject,
+                final Set<String> notEqualFieldNames = getNotEqualFieldNames(sourceObject,
                   otherObject);
+
+                final boolean geometryEquals = geometryEquals(sourceObject, otherObject);
                 if (!geometryEquals) {
                   final String geometryFieldName = sourceObject.getRecordDefinition()
-                      .getGeometryFieldName();
+                    .getGeometryFieldName();
                   notEqualFieldNames.add(geometryFieldName);
                 }
                 if (!notEqualFieldNames.isEmpty()) {
-                  logNotEqual(sourceObject, otherObject, notEqualFieldNames,
-                    geometryEquals);
+                  logNotEqual(sourceObject, otherObject, notEqualFieldNames, geometryEquals);
                 }
                 objects[0] = null;
                 objects[1] = null;
@@ -371,8 +355,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
         return false;
       }
     } else if (value1 instanceof String && value2 instanceof String) {
-      if (!Property.hasValue((String)value1)
-          && !Property.hasValue((String)value2)) {
+      if (!Property.hasValue((String)value1) && !Property.hasValue((String)value2)) {
         return true;
       }
     }

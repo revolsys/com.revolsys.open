@@ -34,8 +34,7 @@ public class PostgreSQLDatabaseFactory extends AbstractJdbcDatabaseFactory {
   }
 
   @Override
-  public JdbcRecordStore createRecordStore(
-    final Map<String, ? extends Object> connectionProperties) {
+  public JdbcRecordStore createRecordStore(final Map<String, ? extends Object> connectionProperties) {
     return new PostgreSQLRecordStore(this, connectionProperties);
   }
 

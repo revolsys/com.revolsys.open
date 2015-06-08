@@ -12,8 +12,8 @@ public interface MtoConstants {
   String REGEX_TWELTH_LETTER = "([a-lA-L])";
 
   String REGEX_MTO = "([0-9]{2,3})" + NtsConstants.REGEX_SIXTEENTH_LETTER
-      + NtsConstants.REGEX_SIXTEENTH_NUMBER + REGEX_TWELTH_LETTER
-      + BcgsConstants.REGEX_HUNDRETH_NUMBER + REGEX_QUARTER_LETTER;
+    + NtsConstants.REGEX_SIXTEENTH_NUMBER + REGEX_TWELTH_LETTER
+    + BcgsConstants.REGEX_HUNDRETH_NUMBER + REGEX_QUARTER_LETTER;
 
   double WIDTH_HUNDRETH = 0.0125;
 

@@ -48,7 +48,7 @@ public class BootstrapUtil {
   }
 
   public static void navbarStart(final XmlWriter writer, final String id, final String navbarClass,
-    final String navMenuClass, final String title, String uri) {
+    final String navMenuClass, final String title, final String uri) {
     writer.startTag(HtmlUtil.NAV);
     writer.attribute(HtmlUtil.ATTR_ID, id);
     writer.attribute(HtmlUtil.ATTR_CLASS, "navbar navbar-default " + navbarClass);

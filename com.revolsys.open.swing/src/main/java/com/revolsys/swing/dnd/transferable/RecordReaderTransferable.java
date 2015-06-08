@@ -15,26 +15,26 @@ import com.revolsys.format.csv.Csv;
 
 public class RecordReaderTransferable implements Transferable {
 
-  public static final DataFlavor DATA_OBJECT_READER_FLAVOR = new DataFlavor(
-    RecordReader.class, "Data Object List");
-
-  private final RecordReader reader;
+  public static final DataFlavor DATA_OBJECT_READER_FLAVOR = new DataFlavor(RecordReader.class,
+    "Data Object List");
 
   private static final DataFlavor[] DATA_FLAVORS = {
     DATA_OBJECT_READER_FLAVOR, DataFlavor.stringFlavor
   };
+
+  private final RecordReader reader;
 
   public RecordReaderTransferable(final RecordReader reader) {
     this.reader = reader;
   }
 
   @Override
-  public Object getTransferData(final DataFlavor flavor)
-      throws UnsupportedFlavorException, IOException {
+  public Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException,
+    IOException {
     if (this.reader == null) {
       return null;
     } else if (DATA_OBJECT_READER_FLAVOR.equals(flavor)
-        || MapTransferable.MAP_FLAVOR.equals(flavor)) {
+      || MapTransferable.MAP_FLAVOR.equals(flavor)) {
       return this.reader;
     } else if (DataFlavor.stringFlavor.equals(flavor)) {
       final StringWriter out = new StringWriter();

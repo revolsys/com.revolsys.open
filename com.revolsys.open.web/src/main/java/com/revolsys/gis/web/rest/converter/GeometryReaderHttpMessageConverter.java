@@ -21,7 +21,7 @@ import com.revolsys.spring.InputStreamResource;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 
 public class GeometryReaderHttpMessageConverter extends
-AbstractHttpMessageConverter<GeometryReader> {
+  AbstractHttpMessageConverter<GeometryReader> {
 
   private GeometryFactory geometryFactory;
 
@@ -38,8 +38,7 @@ AbstractHttpMessageConverter<GeometryReader> {
 
   @Override
   public GeometryReader read(final Class<? extends GeometryReader> clazz,
-    final HttpInputMessage inputMessage) throws IOException,
-    HttpMessageNotReadableException {
+    final HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
     try {
       final HttpHeaders headers = inputMessage.getHeaders();
       final MediaType mediaType = headers.getContentType();
@@ -48,16 +47,13 @@ AbstractHttpMessageConverter<GeometryReader> {
         charset = StandardCharsets.UTF_8;
       }
       final InputStream body = inputMessage.getBody();
-      final String mediaTypeString = mediaType.getType() + "/"
-          + mediaType.getSubtype();
+      final String mediaTypeString = mediaType.getType() + "/" + mediaType.getSubtype();
       final GeometryReaderFactory readerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
         GeometryReaderFactory.class, mediaTypeString);
       if (readerFactory == null) {
-        throw new HttpMessageNotReadableException("Cannot read data in format"
-            + mediaType);
+        throw new HttpMessageNotReadableException("Cannot read data in format" + mediaType);
       } else {
-        final InputStreamResource resource = new InputStreamResource(
-          "geometryInput", body);
+        final InputStreamResource resource = new InputStreamResource("geometryInput", body);
         final GeometryReader reader = readerFactory.createGeometryReader(resource);
         GeometryFactory factory = this.geometryFactory;
         final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder.getRequestAttributes();

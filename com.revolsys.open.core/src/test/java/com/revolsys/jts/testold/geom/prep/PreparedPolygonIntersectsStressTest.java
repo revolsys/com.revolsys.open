@@ -54,15 +54,15 @@ import com.revolsys.jts.util.GeometricShapeFactory;
  *
  */
 public class PreparedPolygonIntersectsStressTest extends TestCase {
-  public static void main(final String args[]) {
-    TestRunner.run(PreparedPolygonIntersectsStressTest.class);
-  }
-
   static final int MAX_ITER = 10000;
 
   private static final GeometryFactory fact = GeometryFactory.floating(0, 2);
 
   private static WKTReader wktRdr = new WKTReader(fact);
+
+  public static void main(final String args[]) {
+    TestRunner.run(PreparedPolygonIntersectsStressTest.class);
+  }
 
   boolean testFailed = false;
 
@@ -92,13 +92,12 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
     return poly;
   }
 
-  LineString createTestLine(final BoundingBox env, final double size,
-    final int nPts) {
+  LineString createTestLine(final BoundingBox env, final double size, final int nPts) {
     final double width = env.getWidth();
     final double xOffset = width * Math.random();
     final double yOffset = env.getHeight() * Math.random();
-    final Point basePt = new PointDouble(env.getMinX() + xOffset, env.getMinY()
-      + yOffset, Point.NULL_ORDINATE);
+    final Point basePt = new PointDouble(env.getMinX() + xOffset, env.getMinY() + yOffset,
+      Point.NULL_ORDINATE);
     final LineString line = createTestLine(basePt, size, nPts);
     return line;
   }
@@ -115,8 +114,8 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
 
   public void run(final int nPts) {
     // Geometry poly = createCircle(new PointDouble((double)0, 0), 100, nPts);
-    final Geometry poly = createSineStar(new PointDouble((double)0, 0,
-      Point.NULL_ORDINATE), 100, nPts);
+    final Geometry poly = createSineStar(new PointDouble((double)0, 0, Point.NULL_ORDINATE), 100,
+      nPts);
     // System.out.println(poly);
     //
     // System.out.println();

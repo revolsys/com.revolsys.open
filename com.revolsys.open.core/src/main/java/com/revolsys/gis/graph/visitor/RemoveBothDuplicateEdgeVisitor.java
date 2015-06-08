@@ -14,8 +14,8 @@ import com.revolsys.visitor.AbstractVisitor;
  * Find all edges that share the same line geometry and remove the current edge
  * and matching edges. Can be used to dissolve lines between polygons.
  */
-public class RemoveBothDuplicateEdgeVisitor<T> extends AbstractVisitor<Edge<T>>
-implements ObjectProcessor<Graph<T>> {
+public class RemoveBothDuplicateEdgeVisitor<T> extends AbstractVisitor<Edge<T>> implements
+  ObjectProcessor<Graph<T>> {
   @Override
   public void process(final Graph<T> graph) {
     graph.visitEdges(this);

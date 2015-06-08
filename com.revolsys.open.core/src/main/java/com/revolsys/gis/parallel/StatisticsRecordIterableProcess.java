@@ -4,8 +4,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.parallel.channel.Channel;
 
-public class StatisticsRecordIterableProcess extends
-IterableProcess<Record> {
+public class StatisticsRecordIterableProcess extends IterableProcess<Record> {
 
   private Statistics statistics;
 

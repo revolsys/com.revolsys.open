@@ -41,8 +41,8 @@ public class SaveAsPdf {
       final PDRectangle pageSize = new PDRectangle(width, height);
       final PDPage page = new PDPage(pageSize);
       try (
-          PdfViewport pdfViewport = new PdfViewport(document, page, project,
-            width, height, boundingBox)) {
+        PdfViewport pdfViewport = new PdfViewport(document, page, project, width, height,
+          boundingBox)) {
         final LayerRenderer<? extends Layer> renderer = project.getRenderer();
         renderer.render(pdfViewport);
       }
@@ -61,8 +61,7 @@ public class SaveAsPdf {
 
       document.save(file);
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(SaveAsPdf.class).error(
-        "Unable to create PDF " + file, e);
+      LoggerFactory.getLogger(SaveAsPdf.class).error("Unable to create PDF " + file, e);
     }
   }
 }

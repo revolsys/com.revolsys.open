@@ -9,8 +9,7 @@ import javax.swing.JCheckBoxMenuItem;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.util.Property;
 
-public class CheckBoxMenuItem extends JCheckBoxMenuItem implements
-PropertyChangeListener {
+public class CheckBoxMenuItem extends JCheckBoxMenuItem implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   private EnableCheck selectedCheck;

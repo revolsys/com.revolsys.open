@@ -28,8 +28,7 @@ import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.ListTreeNode;
 import com.revolsys.util.Property;
 
-public class LayerRendererTreeNode extends ListTreeNode implements
-MouseListener {
+public class LayerRendererTreeNode extends ListTreeNode implements MouseListener {
   public static final Icon ICON = Icons.getIcon("folder");
 
   public LayerRendererTreeNode(final LayerRenderer<?> renderer) {
@@ -79,8 +78,7 @@ MouseListener {
       final AbstractMultipleRenderer multiRenderer = (AbstractMultipleRenderer)renderer;
       final List<BaseTreeNode> nodes = new ArrayList<>();
       for (final LayerRenderer<?> childRenderer : multiRenderer.getRenderers()) {
-        final LayerRendererTreeNode node = new LayerRendererTreeNode(
-          childRenderer);
+        final LayerRendererTreeNode node = new LayerRendererTreeNode(childRenderer);
         nodes.add(node);
       }
       return nodes;
@@ -127,19 +125,18 @@ MouseListener {
   }
 
   @Override
-  public Component getTreeCellRendererComponent(Component renderer,
-    final JTree tree, final Object value, final boolean selected,
-    final boolean expanded, final boolean leaf, final int row,
-    final boolean hasFocus) {
-    renderer = super.getTreeCellRendererComponent(renderer, tree, value,
-      selected, expanded, leaf, row, hasFocus);
+  public Component getTreeCellRendererComponent(Component renderer, final JTree tree,
+    final Object value, final boolean selected, final boolean expanded, final boolean leaf,
+    final int row, final boolean hasFocus) {
+    renderer = super.getTreeCellRendererComponent(renderer, tree, value, selected, expanded, leaf,
+      row, hasFocus);
     renderer.setEnabled(getRenderer().isVisible());
     return renderer;
   }
 
   @Override
-  protected boolean isDndDropSupported(final TransferSupport support,
-    final TreePath dropPath, final TreePath childPath, final Object child) {
+  protected boolean isDndDropSupported(final TransferSupport support, final TreePath dropPath,
+    final TreePath childPath, final Object child) {
     final LayerRenderer<?> renderer = getRenderer();
 
     if (renderer instanceof AbstractMultipleRenderer) {

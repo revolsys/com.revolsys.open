@@ -7,8 +7,7 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.vertex.Vertex;
 
-public class MultiLineStringSegment extends AbstractSegment implements
-Iterator<Segment> {
+public class MultiLineStringSegment extends AbstractSegment implements Iterator<Segment> {
   /**
    *
    */
@@ -18,8 +17,7 @@ Iterator<Segment> {
 
   private int partIndex;
 
-  public MultiLineStringSegment(final MultiLineString line,
-    final int... segmentId) {
+  public MultiLineStringSegment(final MultiLineString line, final int... segmentId) {
     super(line);
     setSegmentId(segmentId);
   }

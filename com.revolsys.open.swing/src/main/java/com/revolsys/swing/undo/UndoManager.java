@@ -18,16 +18,14 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.util.OS;
 
-public class UndoManager extends javax.swing.undo.UndoManager implements
-PropertyChangeSupportProxy {
+public class UndoManager extends javax.swing.undo.UndoManager implements PropertyChangeSupportProxy {
 
   /**
    *
    */
   private static final long serialVersionUID = 1L;
 
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-    this);
+  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   private boolean eventsEnabled = true;
 
@@ -82,14 +80,12 @@ PropertyChangeSupportProxy {
         modifiers = Event.CTRL_MASK;
       }
       final KeyStroke undoKey = KeyStroke.getKeyStroke(KeyEvent.VK_Z, modifiers);
-      final InvokeMethodAction undoAction = new InvokeMethodAction("Undo",
-        this, "undo");
+      final InvokeMethodAction undoAction = new InvokeMethodAction("Undo", this, "undo");
       actionMap.put("undo", undoAction);
       inputMap.put(undoKey, "undo");
 
       final KeyStroke redoKey = KeyStroke.getKeyStroke(KeyEvent.VK_Y, modifiers);
-      final InvokeMethodAction redoAction = new InvokeMethodAction("Redo",
-        this, "redo");
+      final InvokeMethodAction redoAction = new InvokeMethodAction("Redo", this, "redo");
       actionMap.put("redo", redoAction);
       inputMap.put(redoKey, "redo");
 

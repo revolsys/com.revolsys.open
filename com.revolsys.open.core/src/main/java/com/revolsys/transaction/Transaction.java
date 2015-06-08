@@ -9,6 +9,8 @@ import com.revolsys.util.ExceptionUtil;
 
 public class Transaction implements AutoCloseable {
 
+  private static ThreadLocal<Transaction> currentTransaction = new ThreadLocal<>();
+
   public static Transaction getCurrentTransaction() {
     return currentTransaction.get();
   }
@@ -18,14 +20,12 @@ public class Transaction implements AutoCloseable {
   }
 
   public static Runnable runnable(final Runnable runnable,
-    final PlatformTransactionManager transactionManager,
-    final Propagation propagation) {
+    final PlatformTransactionManager transactionManager, final Propagation propagation) {
     if (transactionManager == null || propagation == null) {
       return runnable;
     } else {
       final DefaultTransactionDefinition transactionDefinition = Transaction.transactionDefinition(propagation);
-      return new TransactionRunnable(transactionManager, transactionDefinition,
-        runnable);
+      return new TransactionRunnable(transactionManager, transactionDefinition, runnable);
     }
   }
 
@@ -36,8 +36,7 @@ public class Transaction implements AutoCloseable {
     }
   }
 
-  public static DefaultTransactionDefinition transactionDefinition(
-    final Propagation propagation) {
+  public static DefaultTransactionDefinition transactionDefinition(final Propagation propagation) {
     if (propagation == null) {
       return null;
     } else {
@@ -49,8 +48,7 @@ public class Transaction implements AutoCloseable {
   }
 
   public static DefaultTransactionStatus transactionStatus(
-    final PlatformTransactionManager transactionManager,
-    final Propagation propagation) {
+    final PlatformTransactionManager transactionManager, final Propagation propagation) {
     if (propagation == null || transactionManager == null) {
       return null;
     } else {
@@ -68,8 +66,6 @@ public class Transaction implements AutoCloseable {
       return (DefaultTransactionStatus)transactionManager.getTransaction(transactionDefinition);
     }
   }
-
-  private static ThreadLocal<Transaction> currentTransaction = new ThreadLocal<>();
 
   private Transaction previousTransaction;
 
@@ -95,14 +91,12 @@ public class Transaction implements AutoCloseable {
 
   public Transaction(final PlatformTransactionManager transactionManager,
     final Propagation propagation) {
-    this(transactionManager, Transaction.transactionStatus(transactionManager,
-      propagation));
+    this(transactionManager, Transaction.transactionStatus(transactionManager, propagation));
   }
 
   public Transaction(final PlatformTransactionManager transactionManager,
     final TransactionDefinition transactionDefinition) {
-    this(transactionManager, transactionStatus(transactionManager,
-      transactionDefinition));
+    this(transactionManager, transactionStatus(transactionManager, transactionDefinition));
   }
 
   @Override

@@ -16,8 +16,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.util.DateUtil;
 
-public class MoepDirectoryReader extends RecordDirectoryReader implements
-RecordDefinitionFactory {
+public class MoepDirectoryReader extends RecordDirectoryReader implements RecordDefinitionFactory {
 
   private Date integrationDate;
 
@@ -78,8 +77,7 @@ RecordDefinitionFactory {
     super.setDirectory(directory);
     final String name = FileUtil.getFileName(directory);
     final File file = new File(directory, name + "s.bin");
-    final Reader<Record> supDataReader = createReader(new FileSystemResource(
-      file));
+    final Reader<Record> supDataReader = createReader(new FileSystemResource(file));
     for (final Record supData : supDataReader) {
       final String featureCode = supData.getValue(MoepConstants.FEATURE_CODE);
       if (featureCode.equals("KN00020000")) {
@@ -87,11 +85,9 @@ RecordDefinitionFactory {
         final String[] versionFields = text.split(" ");
 
         final String dateString = versionFields[2];
-        this.submissionDate = new Date(DateUtil.getDate("yyyyMMdd", dateString)
-          .getTime());
+        this.submissionDate = new Date(DateUtil.getDate("yyyyMMdd", dateString).getTime());
         this.revisionKey = versionFields[3];
-        this.integrationDate = new Date(DateUtil.getDate("yyyyMMdd", versionFields[4])
-          .getTime());
+        this.integrationDate = new Date(DateUtil.getDate("yyyyMMdd", versionFields[4]).getTime());
         this.specificationsRelease = versionFields[5];
       }
     }

@@ -15,13 +15,17 @@ import com.revolsys.gis.graph.attribute.ObjectAttributeProxy;
 import com.revolsys.gis.graph.attribute.PseudoNodeAttribute;
 
 public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {
+  protected static final List<String> DEFAULT_EXCLUDE = Arrays.asList(RecordEquals.EXCLUDE_ID,
+    RecordEquals.EXCLUDE_GEOMETRY);
+
+  public static final String PROPERTY_NAME = PseudoNodeProperty.class.getName() + ".propertyName";
+
   public static AbstractRecordDefinitionProperty getProperty(final Record object) {
     final RecordDefinition recordDefinition = object.getRecordDefinition();
     return getProperty(recordDefinition);
   }
 
-  public static PseudoNodeProperty getProperty(
-    final RecordDefinition recordDefinition) {
+  public static PseudoNodeProperty getProperty(final RecordDefinition recordDefinition) {
     PseudoNodeProperty property = recordDefinition.getProperty(PROPERTY_NAME);
     if (property == null) {
       property = new PseudoNodeProperty();
@@ -30,21 +34,13 @@ public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {
     return property;
   }
 
-  protected static final List<String> DEFAULT_EXCLUDE = Arrays.asList(
-    RecordEquals.EXCLUDE_ID, RecordEquals.EXCLUDE_GEOMETRY);
-
-  public static final String PROPERTY_NAME = PseudoNodeProperty.class.getName()
-      + ".propertyName";
-
-  private Set<String> equalExcludeAttributes = new HashSet<String>(
-      DEFAULT_EXCLUDE);
+  private Set<String> equalExcludeAttributes = new HashSet<String>(DEFAULT_EXCLUDE);
 
   public PseudoNodeProperty() {
   }
 
   public PseudoNodeAttribute createAttribute(final Node<Record> node) {
-    return new PseudoNodeAttribute(node, getTypePath(),
-      this.equalExcludeAttributes);
+    return new PseudoNodeAttribute(node, getTypePath(), this.equalExcludeAttributes);
   }
 
   public Collection<String> getEqualExcludeAttributes() {
@@ -55,7 +51,7 @@ public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {
     final String fieldName = PseudoNodeProperty.PROPERTY_NAME;
     if (!node.hasAttribute(fieldName)) {
       final ObjectAttributeProxy<PseudoNodeAttribute, Node<Record>> proxy = new InvokeMethodObjectAttributeProxy<PseudoNodeAttribute, Node<Record>>(
-          this, "createAttribute", Node.class);
+        this, "createAttribute", Node.class);
       node.setAttribute(fieldName, proxy);
     }
     final PseudoNodeAttribute value = node.getField(fieldName);
@@ -67,8 +63,7 @@ public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {
     return PROPERTY_NAME;
   }
 
-  public void setEqualExcludeAttributes(
-    final Collection<String> equalExcludeAttributes) {
+  public void setEqualExcludeAttributes(final Collection<String> equalExcludeAttributes) {
     if (equalExcludeAttributes == null) {
       this.equalExcludeAttributes.clear();
     } else {

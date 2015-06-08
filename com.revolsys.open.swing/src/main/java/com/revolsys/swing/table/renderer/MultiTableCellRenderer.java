@@ -30,16 +30,15 @@ public class MultiTableCellRenderer implements TableCellRenderer, MouseListener 
   }
 
   @Override
-  public Component getTableCellRendererComponent(final JTable table,
-    final Object value, final boolean isSelected, final boolean hasFocus,
-    final int row, final int column) {
+  public Component getTableCellRendererComponent(final JTable table, final Object value,
+    final boolean isSelected, final boolean hasFocus, final int row, final int column) {
     this.panel.removeAll();
     for (final Object object : this.renderers) {
       Component component = null;
       if (object instanceof TableCellRenderer) {
         final TableCellRenderer renderer = (TableCellRenderer)object;
-        component = renderer.getTableCellRendererComponent(table, value,
-          isSelected, hasFocus, row, column);
+        component = renderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
+          column);
       } else if (object instanceof Component) {
         component = (Component)object;
       }

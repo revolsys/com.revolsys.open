@@ -1,5 +1,4 @@
 
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -40,22 +39,29 @@ package com.revolsys.jts.index.sweepline;
 public class SweepLineInterval {
 
   private final double min, max;
+
   private final Object item;
 
-  public SweepLineInterval(final double min, final double max)
-  {
+  public SweepLineInterval(final double min, final double max) {
     this(min, max, null);
   }
 
-  public SweepLineInterval(final double min, final double max, final Object item)
-  {
+  public SweepLineInterval(final double min, final double max, final Object item) {
     this.min = min < max ? min : max;
     this.max = max > min ? max : min;
     this.item = item;
   }
 
-  public Object getItem() { return this.item; }
-  public double getMax() { return this.max;  }
-  public double getMin() { return this.min;  }
+  public Object getItem() {
+    return this.item;
+  }
+
+  public double getMax() {
+    return this.max;
+  }
+
+  public double getMin() {
+    return this.min;
+  }
 
 }

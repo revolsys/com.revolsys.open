@@ -9,8 +9,7 @@ import javax.swing.table.TableCellEditor;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 
-public class ObjectListTableCellEditor extends AbstractCellEditor implements
-TableCellEditor {
+public class ObjectListTableCellEditor extends AbstractCellEditor implements TableCellEditor {
 
   /**
    *
@@ -25,9 +24,8 @@ TableCellEditor {
   }
 
   @Override
-  public Component getTableCellEditorComponent(final JTable table,
-    final Object value, final boolean isSelected, final int row,
-    final int column) {
+  public Component getTableCellEditorComponent(final JTable table, final Object value,
+    final boolean isSelected, final int row, final int column) {
     if (value == null) {
       this.editorComponent.setText(null);
     } else {

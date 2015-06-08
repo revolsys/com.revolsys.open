@@ -27,18 +27,17 @@ public class TogglePanel extends ValueField implements ItemListener {
     this(value, null, actions);
   }
 
-  public TogglePanel(final String value, final Dimension dimension,
-    final Action... actions) {
+  public TogglePanel(final String value, final Dimension dimension, final Action... actions) {
     this(null, value, dimension, actions);
   }
 
-  public TogglePanel(final String fieldName, final String value,
-    final Dimension dimension, final Action... actions) {
+  public TogglePanel(final String fieldName, final String value, final Dimension dimension,
+    final Action... actions) {
     this(fieldName, value, dimension, Arrays.asList(actions));
   }
 
-  public TogglePanel(final String fieldName, final String value,
-    final Dimension dimension, final List<Action> actions) {
+  public TogglePanel(final String fieldName, final String value, final Dimension dimension,
+    final List<Action> actions) {
     super(fieldName, value);
     setOpaque(false);
     setLayout(new SpringLayout());
@@ -54,7 +53,7 @@ public class TogglePanel extends ValueField implements ItemListener {
       final Object actionCommand = action.getValue(Action.ACTION_COMMAND_KEY);
 
       if (value != null && actionCommand != null
-          && value.equalsIgnoreCase(actionCommand.toString())) {
+        && value.equalsIgnoreCase(actionCommand.toString())) {
         button.setSelected(true);
       }
       button.addItemListener(this);

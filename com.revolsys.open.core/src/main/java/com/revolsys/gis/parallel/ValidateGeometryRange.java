@@ -11,8 +11,7 @@ import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
-public class ValidateGeometryRange extends
-BaseInOutProcess<Record, Record> {
+public class ValidateGeometryRange extends BaseInOutProcess<Record, Record> {
   private static final Logger LOG = Logger.getLogger(ValidateGeometryRange.class);
 
   private double maxX = Double.MAX_VALUE;
@@ -116,8 +115,8 @@ BaseInOutProcess<Record, Record> {
 
   private boolean isValid(final String type, final Point coordinate) {
     if (!isValid(this.minX, this.maxY, coordinate.getX())
-        || !isValid(this.minY, this.maxY, coordinate.getY())
-        || !isValid(this.minZ, this.maxZ, coordinate.getZ())) {
+      || !isValid(this.minY, this.maxY, coordinate.getY())
+      || !isValid(this.minZ, this.maxZ, coordinate.getZ())) {
       LOG.warn(type + " has invalid coordinate at " + coordinate);
       return false;
     } else {
@@ -127,8 +126,7 @@ BaseInOutProcess<Record, Record> {
   }
 
   @Override
-  protected void process(final Channel<Record> in,
-    final Channel<Record> out, final Record object) {
+  protected void process(final Channel<Record> in, final Channel<Record> out, final Record object) {
     // TODO Auto-generated method stub
     final Geometry geometry = object.getGeometryValue();
     isValid(object.getRecordDefinition().getPath().toString(), geometry);

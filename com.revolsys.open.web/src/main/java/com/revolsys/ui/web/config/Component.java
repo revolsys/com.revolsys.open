@@ -95,8 +95,7 @@ public class Component {
   public void addField(final String name, final String value) {
     final String lastValue = (String)this.fields.get(name);
     if (lastValue != EMPTY_STRING) {
-      throw new IllegalArgumentException("Value already exists for the field "
-          + name);
+      throw new IllegalArgumentException("Value already exists for the field " + name);
     }
     this.fields.put(name, value);
   }
@@ -147,8 +146,8 @@ public class Component {
     if (o instanceof Component) {
       final Component c = (Component)o;
       if (equalsWithNull(c.name, this.name) && equalsWithNull(c.file, this.file)
-          && c.styles.equals(this.styles) && c.scripts.equals(this.scripts)
-          && c.onLoads.equals(this.onLoads)) {
+        && c.styles.equals(this.styles) && c.scripts.equals(this.scripts)
+        && c.onLoads.equals(this.onLoads)) {
         return true;
       }
     }
@@ -211,15 +210,12 @@ public class Component {
     }
   }
 
-  public void includeComponent(final PageContext context)
-      throws ServletException, IOException {
+  public void includeComponent(final PageContext context) throws ServletException, IOException {
     context.getOut().flush();
     context.include(getFile());
   }
 
-  public void invokeActions(
-    final ServletContext context,
-    final HttpServletRequest request,
+  public void invokeActions(final ServletContext context, final HttpServletRequest request,
     final HttpServletResponse response) throws ServletException, IOException {
     final Iterator i = this.actions.iterator();
     while (i.hasNext()) {

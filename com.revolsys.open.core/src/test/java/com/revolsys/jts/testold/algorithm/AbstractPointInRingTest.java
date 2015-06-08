@@ -53,12 +53,11 @@ public abstract class AbstractPointInRingTest extends TestCase {
     super(name);
   }
 
-  abstract protected void runPtInRing(Location expectedLoc, Point pt, String wkt)
-      throws Exception;
+  abstract protected void runPtInRing(Location expectedLoc, Point pt, String wkt) throws Exception;
 
   public void testBox() throws Exception {
     runPtInRing(Location.INTERIOR, new PointDouble(10.0, 10.0),
-        "POLYGON ((0 0, 0 20, 20 20, 20 0, 0 0))");
+      "POLYGON ((0 0, 0 20, 20 20, 20 0, 0 0))");
   }
 
   public void testComb() throws Exception {
@@ -88,7 +87,7 @@ public abstract class AbstractPointInRingTest extends TestCase {
     runPtInRing(
       Location.INTERIOR,
       new PointDouble(0.0, 0, Point.NULL_ORDINATE),
-        "POLYGON ((-40 80, -40 -80, 20 0, 20 -100, 40 40, 80 -80, 100 80, 140 -20, 120 140, 40 180,     60 40, 0 120, -20 -20, -40 80))");
+      "POLYGON ((-40 80, -40 -80, 20 0, 20 -100, 40 40, 80 -80, 100 80, 140 -20, 120 140, 40 180,     60 40, 0 120, -20 -20, -40 80))");
   }
 
   /**

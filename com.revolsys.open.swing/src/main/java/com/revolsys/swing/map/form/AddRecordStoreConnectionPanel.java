@@ -28,14 +28,13 @@ public class AddRecordStoreConnectionPanel extends ValueField {
 
   private final String name;
 
-  public AddRecordStoreConnectionPanel(
-    final ConnectionRegistry<RecordStoreConnection> registry) {
+  public AddRecordStoreConnectionPanel(final ConnectionRegistry<RecordStoreConnection> registry) {
     this(registry, null);
 
   }
 
-  public AddRecordStoreConnectionPanel(
-    final ConnectionRegistry<RecordStoreConnection> registry, final String name) {
+  public AddRecordStoreConnectionPanel(final ConnectionRegistry<RecordStoreConnection> registry,
+    final String name) {
     this.registry = registry;
     this.name = name;
     add(new JLabel("Name:"));

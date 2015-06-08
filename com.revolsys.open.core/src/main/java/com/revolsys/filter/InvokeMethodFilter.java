@@ -39,8 +39,7 @@ public class InvokeMethodFilter<T> implements Filter<T> {
         object = item;
       } else {
         parameters = new Object[parameters.length + 1];
-        System.arraycopy(parameters, 0, this.parameters, 0,
-          this.parameters.length);
+        System.arraycopy(parameters, 0, this.parameters, 0, this.parameters.length);
         parameters[parameters.length - 1] = item;
       }
       if (object instanceof Class<?>) {

@@ -231,8 +231,8 @@ public class QuadEdge {
    * @return true if the quadedges are based on the same line segment
    */
   public boolean equalsOriented(final QuadEdge qe) {
-    if (orig().getCoordinate().equals(2,qe.orig().getCoordinate())
-        && dest().getCoordinate().equals(2,qe.dest().getCoordinate())) {
+    if (orig().getCoordinate().equals(2, qe.orig().getCoordinate())
+      && dest().getCoordinate().equals(2, qe.dest().getCoordinate())) {
       return true;
     }
     return false;

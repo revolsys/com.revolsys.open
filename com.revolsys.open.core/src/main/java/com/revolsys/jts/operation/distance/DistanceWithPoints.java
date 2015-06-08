@@ -71,10 +71,8 @@ public class DistanceWithPoints {
    * @param geometry2 another {@link Geometry}
    * @return the distance between the geometries
    */
-  public static double distance(final Geometry geometry1,
-    final Geometry geometry2) {
-    final DistanceWithPoints distOp = new DistanceWithPoints(geometry1,
-      geometry2);
+  public static double distance(final Geometry geometry1, final Geometry geometry2) {
+    final DistanceWithPoints distOp = new DistanceWithPoints(geometry1, geometry2);
     return distOp.distance();
   }
 
@@ -85,10 +83,9 @@ public class DistanceWithPoints {
    * @param distance the distance to test
    * @return true if geometry1.distance(geometry2) <= distance
    */
-  public static boolean isWithinDistance(final Geometry geometry1,
-    final Geometry geometry2, final double distance) {
-    final DistanceWithPoints distOp = new DistanceWithPoints(geometry1,
-      geometry2, distance);
+  public static boolean isWithinDistance(final Geometry geometry1, final Geometry geometry2,
+    final double distance) {
+    final DistanceWithPoints distOp = new DistanceWithPoints(geometry1, geometry2, distance);
     return distOp.distance() <= distance;
   }
 
@@ -100,10 +97,8 @@ public class DistanceWithPoints {
    * @param geometry2 another {@link Geometry}
    * @return the nearest points in the geometries
    */
-  public static List<Point> nearestPoints(final Geometry geometry1,
-    final Geometry geometry2) {
-    final DistanceWithPoints distOp = new DistanceWithPoints(geometry1,
-      geometry2);
+  public static List<Point> nearestPoints(final Geometry geometry1, final Geometry geometry2) {
+    final DistanceWithPoints distOp = new DistanceWithPoints(geometry1, geometry2);
     return distOp.nearestPoints();
   }
 
@@ -152,17 +147,16 @@ public class DistanceWithPoints {
   }
 
   private boolean computeContainmentDistance() {
-    if (computeContainmentDistance(geometry1, geometry2)) {
+    if (computeContainmentDistance(this.geometry1, this.geometry2)) {
       return true;
-    } else if (computeContainmentDistance(geometry2, geometry1)) {
+    } else if (computeContainmentDistance(this.geometry2, this.geometry1)) {
       return true;
     } else {
       return false;
     }
   }
 
-  private boolean computeContainmentDistance(final Geometry geometry1,
-    final Geometry geometry2) {
+  private boolean computeContainmentDistance(final Geometry geometry1, final Geometry geometry2) {
     final List<Polygon> polygons = geometry1.getGeometries(Polygon.class);
     if (polygons.size() > 0) {
       final List<Point> insidePoints = ConnectedElementLocationFilter.getPoints(geometry2);
@@ -185,13 +179,12 @@ public class DistanceWithPoints {
     return false;
   }
 
-  private boolean computeContainmentDistance(final Point point,
-    final Polygon poly) {
+  private boolean computeContainmentDistance(final Point point, final Polygon poly) {
     // if point is not in exterior, distance to geom is 0
     if (Location.EXTERIOR != poly.locate(point)) {
-      minDistance = 0.0;
-      minDistancePoint1 = point;
-      minDistancePoint2 = point;
+      this.minDistance = 0.0;
+      this.minDistancePoint1 = point;
+      this.minDistancePoint2 = point;
       return true;
     } else {
       return false;
@@ -208,13 +201,13 @@ public class DistanceWithPoints {
      * Geometries are not wholly inside, so compute distance from lines and points
      * of one to lines and points of the other
      */
-    final List<LineString> lines0 = geometry1.getGeometryComponents(LineString.class);
-    final List<LineString> lines1 = geometry2.getGeometryComponents(LineString.class);
+    final List<LineString> lines0 = this.geometry1.getGeometryComponents(LineString.class);
+    final List<LineString> lines1 = this.geometry2.getGeometryComponents(LineString.class);
 
     if (!computeLinesLines(lines0, lines1)) {
-      final List<Point> points1 = geometry2.getGeometries(Point.class);
+      final List<Point> points1 = this.geometry2.getGeometries(Point.class);
       if (!computeLinesPoints(lines0, points1)) {
-        final List<Point> points0 = geometry1.getGeometries(Point.class);
+        final List<Point> points0 = this.geometry1.getGeometries(Point.class);
         if (!computePointsLines(points0, lines1)) {
           computePointsPoints(points0, points1);
         }
@@ -223,17 +216,17 @@ public class DistanceWithPoints {
   }
 
   private boolean computeLineLine(final LineString line1, final LineString line2) {
-    if (minDistance == Double.MAX_VALUE
-      || line1.getBoundingBox().distance(line2.getBoundingBox()) <= minDistance) {
+    if (this.minDistance == Double.MAX_VALUE
+      || line1.getBoundingBox().distance(line2.getBoundingBox()) <= this.minDistance) {
       for (final Segment segment1 : line1.segments()) {
         for (final Segment segment2 : line2.segments()) {
           final double dist = segment1.distance(segment2);
-          if (dist < minDistance) {
-            minDistance = dist;
+          if (dist < this.minDistance) {
+            this.minDistance = dist;
             final Point[] closestPt = segment1.closestPoints(segment2);
-            minDistancePoint1 = closestPt[0];
-            minDistancePoint2 = closestPt[1];
-            if (minDistance <= terminateDistance) {
+            this.minDistancePoint1 = closestPt[0];
+            this.minDistancePoint2 = closestPt[1];
+            if (this.minDistance <= this.terminateDistance) {
               return true;
             }
           }
@@ -244,16 +237,16 @@ public class DistanceWithPoints {
   }
 
   private boolean computeLinePoint(final LineString line, final Point point) {
-    if (minDistance == Double.MAX_VALUE
-      || line.getBoundingBox().distance(point) <= minDistance) {
+    if (this.minDistance == Double.MAX_VALUE
+      || line.getBoundingBox().distance(point) <= this.minDistance) {
       for (final Segment segment : line.segments()) {
         final double distance = segment.distance(point);
-        if (distance < minDistance) {
-          minDistance = distance;
+        if (distance < this.minDistance) {
+          this.minDistance = distance;
           final Point closestPoint = segment.closestPoint(point);
-          minDistancePoint1 = closestPoint;
-          minDistancePoint2 = point;
-          if (minDistance <= terminateDistance) {
+          this.minDistancePoint1 = closestPoint;
+          this.minDistancePoint2 = point;
+          if (this.minDistance <= this.terminateDistance) {
             return true;
           }
         }
@@ -262,8 +255,7 @@ public class DistanceWithPoints {
     return false;
   }
 
-  private boolean computeLinesLines(final List<LineString> lines1,
-    final List<LineString> lines2) {
+  private boolean computeLinesLines(final List<LineString> lines1, final List<LineString> lines2) {
     for (final LineString line1 : lines1) {
       for (final LineString line2 : lines2) {
         if (computeLineLine(line1, line2)) {
@@ -274,8 +266,7 @@ public class DistanceWithPoints {
     return false;
   }
 
-  private boolean computeLinesPoints(final List<LineString> lines,
-    final List<Point> points) {
+  private boolean computeLinesPoints(final List<LineString> lines, final List<Point> points) {
     for (final LineString line : lines) {
       for (final Point point : points) {
         if (computeLinePoint(line, point)) {
@@ -288,16 +279,15 @@ public class DistanceWithPoints {
 
   private boolean computePointLine(final Point point, final LineString line) {
     final BoundingBox boundingBox = line.getBoundingBox();
-    if (minDistance == Double.MAX_VALUE
-      || boundingBox.distance(point) <= minDistance) {
+    if (this.minDistance == Double.MAX_VALUE || boundingBox.distance(point) <= this.minDistance) {
       for (final Segment segment : line.segments()) {
         final double distance = segment.distance(point);
-        if (distance < minDistance) {
-          minDistance = distance;
+        if (distance < this.minDistance) {
+          this.minDistance = distance;
           final Point closestPoint = segment.closestPoint(point);
-          minDistancePoint1 = point;
-          minDistancePoint2 = closestPoint;
-          if (minDistance <= terminateDistance) {
+          this.minDistancePoint1 = point;
+          this.minDistancePoint2 = closestPoint;
+          if (this.minDistance <= this.terminateDistance) {
             return true;
           }
         }
@@ -306,8 +296,7 @@ public class DistanceWithPoints {
     return false;
   }
 
-  private boolean computePointsLines(final List<Point> points,
-    final List<LineString> lines) {
+  private boolean computePointsLines(final List<Point> points, final List<LineString> lines) {
     for (final Point point : points) {
       for (final LineString line : lines) {
         if (computePointLine(point, line)) {
@@ -318,16 +307,15 @@ public class DistanceWithPoints {
     return false;
   }
 
-  private boolean computePointsPoints(final List<Point> points1,
-    final List<Point> points2) {
+  private boolean computePointsPoints(final List<Point> points1, final List<Point> points2) {
     for (final Point point1 : points1) {
       for (final Point point2 : points2) {
         final double dist = point1.distance(point2);
-        if (dist < minDistance) {
-          minDistance = dist;
-          minDistancePoint1 = point1;
-          minDistancePoint2 = point2;
-          if (minDistance <= terminateDistance) {
+        if (dist < this.minDistance) {
+          this.minDistance = dist;
+          this.minDistancePoint1 = point1;
+          this.minDistancePoint2 = point2;
+          if (this.minDistance <= this.terminateDistance) {
             return true;
           }
         }
@@ -344,17 +332,17 @@ public class DistanceWithPoints {
    * @throws IllegalArgumentException if either input geometry is null
    */
   public double distance() {
-    if (!computed) {
-      computed = true;
-      if (geometry1.isEmpty() || geometry2.isEmpty()) {
-        minDistance = 0;
+    if (!this.computed) {
+      this.computed = true;
+      if (this.geometry1.isEmpty() || this.geometry2.isEmpty()) {
+        this.minDistance = 0;
       } else {
         if (!computeContainmentDistance()) {
           computeFacetDistance();
         }
       }
     }
-    return minDistance;
+    return this.minDistance;
   }
 
   /**
@@ -365,10 +353,10 @@ public class DistanceWithPoints {
    */
   public List<Point> nearestPoints() {
     distance();
-    if (minDistancePoint1 == null) {
+    if (this.minDistancePoint1 == null) {
       return Collections.emptyList();
     } else {
-      return Arrays.asList(minDistancePoint1, minDistancePoint2);
+      return Arrays.asList(this.minDistancePoint1, this.minDistancePoint2);
     }
   }
 }

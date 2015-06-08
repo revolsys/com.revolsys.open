@@ -35,8 +35,7 @@ import org.springframework.util.ObjectUtils;
 
 import com.revolsys.jdbc.JdbcUtils;
 
-public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor,
-Ordered {
+public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor, Ordered {
   /** The LOG for the instance. */
   private static final Logger LOG = Logger.getLogger(DatabaseConfigurer.class);
 
@@ -163,14 +162,13 @@ Ordered {
    * @param beanFactory The bean factory the bean is loaded from.
    */
   @Override
-  public void postProcessBeanFactory(
-    final ConfigurableListableBeanFactory beanFactory) {
+  public void postProcessBeanFactory(final ConfigurableListableBeanFactory beanFactory) {
     final Map<String, String> properties = new HashMap<String, String>();
     Connection connection = null;
     try {
       connection = JdbcUtils.getConnection(this.dataSource);
-      final String sql = "SELECT " + this.keyColumnName + ", " + this.valueColumnName
-          + " FROM " + this.tableName;
+      final String sql = "SELECT " + this.keyColumnName + ", " + this.valueColumnName + " FROM "
+        + this.tableName;
       final Statement statement = connection.createStatement();
       final ResultSet results = statement.executeQuery(sql);
       while (results.next()) {
@@ -194,8 +192,8 @@ Ordered {
    * @param beanFactory the bean factory used by the application context
    * @param properties the Properties to apply
    */
-  protected abstract void processProperties(
-    ConfigurableListableBeanFactory beanFactory, Map properties);
+  protected abstract void processProperties(ConfigurableListableBeanFactory beanFactory,
+    Map properties);
 
   /**
    * Set the data source used to load properties from.

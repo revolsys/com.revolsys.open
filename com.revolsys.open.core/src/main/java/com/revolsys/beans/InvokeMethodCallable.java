@@ -16,10 +16,10 @@ import com.revolsys.util.Property;
  */
 public class InvokeMethodCallable<T> implements Callable<T> {
 
-  public static <V> V invokeAndWait(final Object object,
-    final String methodName, final Object... parameters) {
-    final InvokeMethodCallable<V> callable = new InvokeMethodCallable<V>(
-        object, methodName, parameters);
+  public static <V> V invokeAndWait(final Object object, final String methodName,
+    final Object... parameters) {
+    final InvokeMethodCallable<V> callable = new InvokeMethodCallable<V>(object, methodName,
+      parameters);
     return RunnableCallable.invokeAndWait(callable);
   }
 
@@ -66,7 +66,6 @@ public class InvokeMethodCallable<T> implements Callable<T> {
 
   @Override
   public String toString() {
-    return Property.toString(this.object, this.methodName,
-      Arrays.asList(this.parameters));
+    return Property.toString(this.object, this.methodName, Arrays.asList(this.parameters));
   }
 }

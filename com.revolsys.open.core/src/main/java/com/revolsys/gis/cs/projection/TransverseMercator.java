@@ -116,21 +116,19 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
    * @param to The ordinates to write the converted ordinates to.
    */
   @Override
-  public void inverse(final double x, final double y,
-    final double[] targetCoordinates, final int targetOffset,
-    final int targetAxisCount) {
+  public void inverse(final double x, final double y, final double[] targetCoordinates,
+    final int targetOffset, final int targetAxisCount) {
     final double m = this.m0 + (y - this.y0) / this.k0;
     final double sqrt1MinusESq = Math.sqrt(1 - this.eSq);
     final double e1 = (1 - sqrt1MinusESq) / (1 + sqrt1MinusESq);
     final double mu = m
-        / (this.a * (1 - this.eSq / 4 - 3 * this.ePow4 / 64 - 5 * this.ePow6 / 256));
+      / (this.a * (1 - this.eSq / 4 - 3 * this.ePow4 / 64 - 5 * this.ePow6 / 256));
     final double e1Pow2 = e1 * e1;
     final double e1Pow3 = e1Pow2 * e1;
     final double e1Pow4 = e1Pow2 * e1Pow2;
-    final double phi11 = mu + (3 * e1 / 2 - 27 * e1Pow3 / 32)
-        * Math.sin(2 * mu) + (21 * e1Pow2 / 16 - 55 * e1Pow4 / 32)
-        * Math.sin(4 * mu) + 151 * e1Pow3 / 96 * Math.sin(6 * mu)
-        + 1097 * e1Pow4 / 512 * Math.sin(8 * mu);
+    final double phi11 = mu + (3 * e1 / 2 - 27 * e1Pow3 / 32) * Math.sin(2 * mu)
+      + (21 * e1Pow2 / 16 - 55 * e1Pow4 / 32) * Math.sin(4 * mu) + 151 * e1Pow3 / 96
+      * Math.sin(6 * mu) + 1097 * e1Pow4 / 512 * Math.sin(8 * mu);
 
     final double phi1 = phi11;
     final double cosPhi1 = Math.cos(phi1);
@@ -140,7 +138,7 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
     final double oneMinusESqSinPhi1Sq = 1 - this.eSq * sinPhi * sinPhi;
     final double nu1 = this.a / Math.sqrt(oneMinusESqSinPhi1Sq);
     final double rho1 = this.a * (1 - this.eSq)
-        / (oneMinusESqSinPhi1Sq * Math.sqrt(oneMinusESqSinPhi1Sq));
+      / (oneMinusESqSinPhi1Sq * Math.sqrt(oneMinusESqSinPhi1Sq));
     final double c1 = this.ePrimeSq * cosPhi1 * cosPhi1;
     final double d = (x - this.x0) / (nu1 * this.k0);
     final double d2 = d * d;
@@ -153,15 +151,16 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
     final double c1Sq = c1 * c1;
     final double t1Sq = t1 * t1;
     final double phi = phi1
-        - nu1 * tanPhi1 / rho1
-        * (d2 / 2 - (5 + 3 * t1 + 10 * c1 - 4 * c1Sq - 9 * this.ePrimeSq) * d4 / 24 + (61
-            + 90 * t1 + 298 * c1 + 45 * t1Sq - 252 * this.ePrimeSq - 3 * c1Sq)
-            * d6 / 720);
+      - nu1
+      * tanPhi1
+      / rho1
+      * (d2 / 2 - (5 + 3 * t1 + 10 * c1 - 4 * c1Sq - 9 * this.ePrimeSq) * d4 / 24 + (61 + 90 * t1
+        + 298 * c1 + 45 * t1Sq - 252 * this.ePrimeSq - 3 * c1Sq)
+        * d6 / 720);
 
     final double lambda = this.lambda0
-        + (d - (1 + 2 * t1 + c1) * d3 / 6 + (5 - 2 * c1 + 28 * t1 - 3 * c1Sq + 8
-            * this.ePrimeSq + 24 * t1Sq)
-            * d5 / 120) / cosPhi1;
+      + (d - (1 + 2 * t1 + c1) * d3 / 6 + (5 - 2 * c1 + 28 * t1 - 3 * c1Sq + 8 * this.ePrimeSq + 24 * t1Sq)
+        * d5 / 120) / cosPhi1;
 
     targetCoordinates[targetOffset * targetAxisCount] = lambda;
     targetCoordinates[targetOffset * targetAxisCount + 1] = phi;
@@ -185,10 +184,10 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
    */
   private double m(final double phi) {
     return this.a
-        * ((1 - this.eSq / 4 - 3 * this.ePow4 / 64 - 5 * this.ePow6 / 256) * phi
-            - (3 * this.eSq / 8 + 3 * this.ePow4 / 32 + 45 * this.ePow6 / 1024)
-            * Math.sin(2 * phi) + (15 * this.ePow4 / 256 + 45 * this.ePow6 / 1024)
-            * Math.sin(4 * phi) - 35 * this.ePow6 / 3072 * Math.sin(6 * phi));
+      * ((1 - this.eSq / 4 - 3 * this.ePow4 / 64 - 5 * this.ePow6 / 256) * phi
+        - (3 * this.eSq / 8 + 3 * this.ePow4 / 32 + 45 * this.ePow6 / 1024) * Math.sin(2 * phi)
+        + (15 * this.ePow4 / 256 + 45 * this.ePow6 / 1024) * Math.sin(4 * phi) - 35 * this.ePow6
+        / 3072 * Math.sin(6 * phi));
   }
 
   /**
@@ -216,9 +215,8 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
    * @param to The ordinates to write the converted ordinates to.
    */
   @Override
-  public void project(final double lambda, final double phi,
-    final double[] targetCoordinates, final int targetOffset,
-    final int targetAxisCount) {
+  public void project(final double lambda, final double phi, final double[] targetCoordinates,
+    final int targetOffset, final int targetAxisCount) {
     final double cosPhi = Math.cos(phi);
     final double sinPhi = Math.sin(phi);
     final double tanPhi = Math.tan(phi);
@@ -235,19 +233,18 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
     final double a1Pow5 = a1Pow4 * a1;
     final double a1Pow6 = a1Pow4 * a1Pow2;
     final double x = this.x0
-        + this.k0
-        * nu
-        * (a1 + (1 - t + c) * a1Pow3 / 6 + (5 - 18 * t + tSq + 72 * c - 58 * this.ePrimeSq)
-            * a1Pow5 / 120);
+      + this.k0
+      * nu
+      * (a1 + (1 - t + c) * a1Pow3 / 6 + (5 - 18 * t + tSq + 72 * c - 58 * this.ePrimeSq) * a1Pow5
+        / 120);
 
     final double m = m(phi);
     final double y = this.y0
-        + this.k0
-        * (m - this.m0 + nu
-            * tanPhi
-            * (a1Pow2 / 2 + (5 - t + 9 * c + 4 * cSq) * a1Pow4 / 24 + (61 - 58 * t
-                + tSq + 600 * c - 330 * this.ePrimeSq)
-                * a1Pow6 / 720));
+      + this.k0
+      * (m - this.m0 + nu
+        * tanPhi
+        * (a1Pow2 / 2 + (5 - t + 9 * c + 4 * cSq) * a1Pow4 / 24 + (61 - 58 * t + tSq + 600 * c - 330 * this.ePrimeSq)
+          * a1Pow6 / 720));
     targetCoordinates[targetOffset * targetAxisCount] = x;
     targetCoordinates[targetOffset * targetAxisCount + 1] = y;
   }

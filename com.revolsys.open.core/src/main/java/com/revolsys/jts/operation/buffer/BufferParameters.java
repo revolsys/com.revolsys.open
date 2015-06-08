@@ -48,24 +48,12 @@ package com.revolsys.jts.operation.buffer;
  * @author Martin Davis
  *
  */
-public class BufferParameters
-{
-  /**
-   * Computes the maximum distance error due to a given level
-   * of approximation to a true arc.
-   *
-   * @param quadSegs the number of segments used to approximate a quarter-circle
-   * @return the error of approximation
-   */
-  public static double bufferDistanceError(final int quadSegs)
-  {
-    final double alpha = Math.PI / 2.0 / quadSegs;
-    return 1 - Math.cos(alpha / 2.0);
-  }
+public class BufferParameters {
   /**
    * Specifies a round line buffer end cap style.
    */
   public static final int CAP_ROUND = 1;
+
   /**
    * Specifies a flat line buffer end cap style.
    */
@@ -75,10 +63,12 @@ public class BufferParameters
    * Specifies a square line buffer end cap style.
    */
   public static final int CAP_SQUARE = 3;
+
   /**
    * Specifies a round join style.
    */
   public static final int JOIN_ROUND = 1;
+
   /**
    * Specifies a mitre join style.
    */
@@ -97,15 +87,30 @@ public class BufferParameters
    */
   public static final int DEFAULT_QUADRANT_SEGMENTS = 8;
 
-
   /**
    * The default mitre limit
    * Allows fairly pointy mitres.
    */
   public static final double DEFAULT_MITRE_LIMIT = 5.0;
+
+  /**
+   * Computes the maximum distance error due to a given level
+   * of approximation to a true arc.
+   *
+   * @param quadSegs the number of segments used to approximate a quarter-circle
+   * @return the error of approximation
+   */
+  public static double bufferDistanceError(final int quadSegs) {
+    final double alpha = Math.PI / 2.0 / quadSegs;
+    return 1 - Math.cos(alpha / 2.0);
+  }
+
   private int quadrantSegments = DEFAULT_QUADRANT_SEGMENTS;
+
   private int endCapStyle = CAP_ROUND;
+
   private int joinStyle = JOIN_ROUND;
+
   private double mitreLimit = DEFAULT_MITRE_LIMIT;
 
   private boolean isSingleSided = false;
@@ -123,8 +128,7 @@ public class BufferParameters
    *
    * @param quadrantSegments the number of quadrant segments to use
    */
-  public BufferParameters(final int quadrantSegments)
-  {
+  public BufferParameters(final int quadrantSegments) {
     setQuadrantSegments(quadrantSegments);
   }
 
@@ -135,9 +139,7 @@ public class BufferParameters
    * @param quadrantSegments the number of quadrant segments to use
    * @param endCapStyle the end cap style to use
    */
-  public BufferParameters(final int quadrantSegments,
-    final int endCapStyle)
-  {
+  public BufferParameters(final int quadrantSegments, final int endCapStyle) {
     setQuadrantSegments(quadrantSegments);
     setEndCapStyle(endCapStyle);
   }
@@ -151,11 +153,8 @@ public class BufferParameters
    * @param joinStyle the join style to use
    * @param mitreLimit the mitre limit to use
    */
-  public BufferParameters(final int quadrantSegments,
-    final int endCapStyle,
-    final int joinStyle,
-    final double mitreLimit)
-  {
+  public BufferParameters(final int quadrantSegments, final int endCapStyle, final int joinStyle,
+    final double mitreLimit) {
     setQuadrantSegments(quadrantSegments);
     setEndCapStyle(endCapStyle);
     setJoinStyle(joinStyle);
@@ -167,8 +166,7 @@ public class BufferParameters
    *
    * @return the end cap style
    */
-  public int getEndCapStyle()
-  {
+  public int getEndCapStyle() {
     return this.endCapStyle;
   }
 
@@ -177,8 +175,7 @@ public class BufferParameters
    *
    * @return the join style code
    */
-  public int getJoinStyle()
-  {
+  public int getJoinStyle() {
     return this.joinStyle;
   }
 
@@ -187,8 +184,7 @@ public class BufferParameters
    *
    * @return the limit value
    */
-  public double getMitreLimit()
-  {
+  public double getMitreLimit() {
     return this.mitreLimit;
   }
 
@@ -197,8 +193,7 @@ public class BufferParameters
    *
    * @return the number of quadrant segments
    */
-  public int getQuadrantSegments()
-  {
+  public int getQuadrantSegments() {
     return this.quadrantSegments;
   }
 
@@ -218,8 +213,7 @@ public class BufferParameters
    *
    * @param endCapStyle the end cap style to specify
    */
-  public void setEndCapStyle(final int endCapStyle)
-  {
+  public void setEndCapStyle(final int endCapStyle) {
     this.endCapStyle = endCapStyle;
   }
 
@@ -230,8 +224,7 @@ public class BufferParameters
    *
    * @param joinStyle the code for the join style
    */
-  public void setJoinStyle(final int joinStyle)
-  {
+  public void setJoinStyle(final int joinStyle) {
     this.joinStyle = joinStyle;
   }
 
@@ -248,8 +241,7 @@ public class BufferParameters
    *
    * @param mitreLimit the mitre ratio limit
    */
-  public void setMitreLimit(final double mitreLimit)
-  {
+  public void setMitreLimit(final double mitreLimit) {
     this.mitreLimit = mitreLimit;
   }
 
@@ -276,8 +268,7 @@ public class BufferParameters
    *
    * @param quadSegs the number of segments in a fillet for a quadrant
    */
-  public void setQuadrantSegments(final int quadSegs)
-  {
+  public void setQuadrantSegments(final int quadSegs) {
     this.quadrantSegments = quadSegs;
 
     /**
@@ -329,8 +320,7 @@ public class BufferParameters
    *
    * @param isSingleSided true if a single-sided buffer should be constructed
    */
-  public void setSingleSided(final boolean isSingleSided)
-  {
+  public void setSingleSided(final boolean isSingleSided) {
     this.isSingleSided = isSingleSided;
   }
 }

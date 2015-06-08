@@ -62,8 +62,7 @@ import com.revolsys.jts.util.PriorityQueue;
  *
  * @version 1.7
  */
-public class STRtree extends AbstractSTRtree implements SpatialIndex,
-Serializable {
+public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializable {
 
   private static final class STRtreeNode extends AbstractNode {
     /**
@@ -88,18 +87,6 @@ Serializable {
       }
       return bounds;
     }
-  }
-
-  private static double avg(final double a, final double b) {
-    return (a + b) / 2d;
-  }
-
-  private static double centreX(final BoundingBox e) {
-    return avg(e.getMinX(), e.getMaxX());
-  }
-
-  private static double centreY(final BoundingBox e) {
-    return avg(e.getMinY(), e.getMaxY());
   }
 
   /**
@@ -132,6 +119,18 @@ Serializable {
 
   private static final int DEFAULT_NODE_CAPACITY = 10;
 
+  private static double avg(final double a, final double b) {
+    return (a + b) / 2d;
+  }
+
+  private static double centreX(final BoundingBox e) {
+    return avg(e.getMinX(), e.getMaxX());
+  }
+
+  private static double centreY(final BoundingBox e) {
+    return avg(e.getMinY(), e.getMaxY());
+  }
+
   /**
    * Constructs an STRtree with the default node capacity.
    */
@@ -163,8 +162,7 @@ Serializable {
    * a new (parent) node.
    */
   @Override
-  protected List createParentBoundables(final List childBoundables,
-    final int newLevel) {
+  protected List createParentBoundables(final List childBoundables, final int newLevel) {
     Assert.isTrue(!childBoundables.isEmpty());
     final int minLeafCount = (int)Math.ceil(childBoundables.size() / (double)getNodeCapacity());
     final ArrayList sortedChildBoundables = new ArrayList(childBoundables);
@@ -174,18 +172,17 @@ Serializable {
     return createParentBoundablesFromVerticalSlices(verticalSlices, newLevel);
   }
 
-  protected List createParentBoundablesFromVerticalSlice(
-    final List childBoundables, final int newLevel) {
+  protected List createParentBoundablesFromVerticalSlice(final List childBoundables,
+    final int newLevel) {
     return super.createParentBoundables(childBoundables, newLevel);
   }
 
-  private List createParentBoundablesFromVerticalSlices(
-    final List[] verticalSlices, final int newLevel) {
+  private List createParentBoundablesFromVerticalSlices(final List[] verticalSlices,
+    final int newLevel) {
     Assert.isTrue(verticalSlices.length > 0);
     final List parentBoundables = new ArrayList();
     for (final List verticalSlice : verticalSlices) {
-      parentBoundables.addAll(createParentBoundablesFromVerticalSlice(
-        verticalSlice, newLevel));
+      parentBoundables.addAll(createParentBoundablesFromVerticalSlice(verticalSlice, newLevel));
     }
     return parentBoundables;
   }
@@ -225,8 +222,7 @@ Serializable {
     return nearestNeighbour(initBndPair, Double.POSITIVE_INFINITY);
   }
 
-  private Object[] nearestNeighbour(final BoundablePair initBndPair,
-    final double maxDistance) {
+  private Object[] nearestNeighbour(final BoundablePair initBndPair, final double maxDistance) {
     double distanceLowerBound = maxDistance;
     BoundablePair minPair = null;
 
@@ -319,8 +315,7 @@ Serializable {
    * @return the pair of the nearest items
    */
   public Object[] nearestNeighbour(final ItemDistance itemDist) {
-    final BoundablePair bp = new BoundablePair(this.getRoot(), this.getRoot(),
-      itemDist);
+    final BoundablePair bp = new BoundablePair(this.getRoot(), this.getRoot(), itemDist);
     return nearestNeighbour(bp);
   }
 
@@ -338,10 +333,8 @@ Serializable {
    * @param itemDist a distance metric applicable to the items in the trees
    * @return the pair of the nearest items, one from each tree
    */
-  public Object[] nearestNeighbour(final STRtree tree,
-    final ItemDistance itemDist) {
-    final BoundablePair bp = new BoundablePair(this.getRoot(), tree.getRoot(),
-      itemDist);
+  public Object[] nearestNeighbour(final STRtree tree, final ItemDistance itemDist) {
+    final BoundablePair bp = new BoundablePair(this.getRoot(), tree.getRoot(), itemDist);
     return nearestNeighbour(bp);
   }
 
@@ -351,7 +344,8 @@ Serializable {
   @Override
   public List query(final BoundingBox searchEnv) {
     // Yes this method does something. It specifies that the bounds is an
-    // BoundingBoxDoubleGf. super.query takes an Object, not an BoundingBoxDoubleGf. [Jon Aquino
+    // BoundingBoxDoubleGf. super.query takes an Object, not an
+    // BoundingBoxDoubleGf. [Jon Aquino
     // 10/24/2003]
     return super.query(searchEnv);
   }
@@ -361,7 +355,8 @@ Serializable {
    */
   public void query(final BoundingBox searchEnv, final ItemVisitor visitor) {
     // Yes this method does something. It specifies that the bounds is an
-    // BoundingBoxDoubleGf. super.query takes an Object, not an BoundingBoxDoubleGf. [Jon Aquino
+    // BoundingBoxDoubleGf. super.query takes an Object, not an
+    // BoundingBoxDoubleGf. [Jon Aquino
     // 10/24/2003]
     super.query(searchEnv, visitor);
   }
@@ -391,10 +386,8 @@ Serializable {
   /**
    * @param childBoundables Must be sorted by the x-value of the envelope midpoints
    */
-  protected List[] verticalSlices(final List childBoundables,
-    final int sliceCount) {
-    final int sliceCapacity = (int)Math.ceil(childBoundables.size()
-      / (double)sliceCount);
+  protected List[] verticalSlices(final List childBoundables, final int sliceCount) {
+    final int sliceCapacity = (int)Math.ceil(childBoundables.size() / (double)sliceCount);
     final List[] slices = new List[sliceCount];
     final Iterator i = childBoundables.iterator();
     for (int j = 0; j < sliceCount; j++) {

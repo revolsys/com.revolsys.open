@@ -9,8 +9,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.revolsys.parallel.process.ProcessNetwork;
 
-public class ProcessNetworkServletContextListener implements
-ServletContextListener {
+public class ProcessNetworkServletContextListener implements ServletContextListener {
 
   private ProcessNetwork processNetwork;
 

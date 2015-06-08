@@ -108,8 +108,7 @@ public class MCPointInRing implements PointInRing {
 
     // test all segments intersected by ray from pt in positive x direction
     final double y = pt.getY();
-    final BoundingBox rayEnv = new BoundingBoxDoubleGf(2, -Double.MAX_VALUE, y,
-      Double.MAX_VALUE, y);
+    final BoundingBox rayEnv = new BoundingBoxDoubleGf(2, -Double.MAX_VALUE, y, Double.MAX_VALUE, y);
 
     this.interval.min = y;
     this.interval.max = y;
@@ -163,8 +162,8 @@ public class MCPointInRing implements PointInRing {
     }
   }
 
-  private void testMonotoneChain(final BoundingBox rayEnv,
-    final MCSelecter mcSelecter, final MonotoneChain mc) {
+  private void testMonotoneChain(final BoundingBox rayEnv, final MCSelecter mcSelecter,
+    final MonotoneChain mc) {
     mc.select(rayEnv, mcSelecter);
   }
 

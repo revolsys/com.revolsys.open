@@ -45,10 +45,9 @@ import com.revolsys.jts.geom.Point;
 
 public class InteriorPointTest extends TestCase {
   public static List<Geometry> getTestGeometries(final String file) {
-    final ClassPathResource resource = new ClassPathResource(
-      "/com/revolsys/jts/test/data/" + file);
+    final ClassPathResource resource = new ClassPathResource("/com/revolsys/jts/test/data/" + file);
     try (
-        Reader<Geometry> reader = AbstractGeometryReaderFactory.geometryReader(resource)) {
+      Reader<Geometry> reader = AbstractGeometryReaderFactory.geometryReader(resource)) {
       return reader.read();
     }
   }

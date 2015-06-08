@@ -23,42 +23,39 @@ public class Listeners {
     }
   }
 
-  public static void addMouseMotion(final Object object,
-    final MouseMotionListener listener) {
+  public static void addMouseMotion(final Object object, final MouseMotionListener listener) {
     if (object instanceof Component) {
       final Component component = (Component)object;
       component.addMouseMotionListener(listener);
     }
   }
 
-  public static void addMouseWheel(final Object object,
-    final MouseWheelListener listener) {
+  public static void addMouseWheel(final Object object, final MouseWheelListener listener) {
     if (object instanceof Component) {
       final Component component = (Component)object;
       component.addMouseWheelListener(listener);
     }
   }
 
-  public static void mouseEvent(final MouseListener listener,
-    final MouseEvent e) {
+  public static void mouseEvent(final MouseListener listener, final MouseEvent e) {
     if (listener != null) {
       final int id = e.getID();
       switch (id) {
         case MouseEvent.MOUSE_PRESSED:
           listener.mousePressed(e);
-          break;
+        break;
         case MouseEvent.MOUSE_RELEASED:
           listener.mouseReleased(e);
-          break;
+        break;
         case MouseEvent.MOUSE_CLICKED:
           listener.mouseClicked(e);
-          break;
+        break;
         case MouseEvent.MOUSE_EXITED:
           listener.mouseExited(e);
-          break;
+        break;
         case MouseEvent.MOUSE_ENTERED:
           listener.mouseEntered(e);
-          break;
+        break;
       }
     }
   }
@@ -70,24 +67,21 @@ public class Listeners {
     }
   }
 
-  public static void removeMouse(final Object object,
-    final MouseListener listener) {
+  public static void removeMouse(final Object object, final MouseListener listener) {
     if (object instanceof Component) {
       final Component component = (Component)object;
       component.removeMouseListener(listener);
     }
   }
 
-  public static void removeMouseMotion(final Object object,
-    final MouseMotionListener listener) {
+  public static void removeMouseMotion(final Object object, final MouseMotionListener listener) {
     if (object instanceof Component) {
       final Component component = (Component)object;
       component.removeMouseMotionListener(listener);
     }
   }
 
-  public static void removeMouseWheel(final Object object,
-    final MouseWheelListener listener) {
+  public static void removeMouseWheel(final Object object, final MouseWheelListener listener) {
     if (object instanceof Component) {
       final Component component = (Component)object;
       component.removeMouseWheelListener(listener);

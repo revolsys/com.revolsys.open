@@ -48,66 +48,6 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  * @author David Zwiers, Vivid Solutions.
  */
 public class LineStringGenerator extends GeometryGenerator {
-  private static void fillArc(final double x, final double dx, final double y,
-    final double dy, final Point[] coords, final GeometryFactory gf) {
-    if (coords.length == 2) {
-      throw new IllegalStateException("Too few points for Arc");
-    }
-
-    final double theta = 360 / coords.length;
-    final double start = theta / 2;
-
-    final double radius = dx < dy ? dx / 3 : dy / 3;
-
-    final double cx = x + dx / 2; // center
-    final double cy = y + dy / 2; // center
-
-    for (int i = 0; i < coords.length; i++) {
-      final double angle = Math.toRadians(start + theta * i);
-
-      final double fx = Math.sin(angle) * radius; // may be neg.
-      final double fy = Math.cos(angle) * radius; // may be neg.
-
-      coords[i] = new PointDouble(gf.makePrecise(0, cx + fx),
-        gf.makePrecise(1, cy + fy));
-    }
-  }
-
-  private static void fillHorz(final double x, final double dx, final double y,
-    final double dy, final Point[] coords, final GeometryFactory gf) {
-    final double fy = y + Math.random() * dy;
-    double rx = dx; // remainder of x distance
-    coords[0] = new PointDouble(gf.makePrecise(0, x), gf.makePrecise(1,
-      fy));
-    for (int i = 1; i < coords.length - 1; i++) {
-      rx -= Math.random() * rx;
-      coords[i] = new PointDouble(gf.makePrecise(0, x + dx - rx),
-        gf.makePrecise(1, fy));
-    }
-    coords[coords.length - 1] = new PointDouble(
-      gf.makePrecise(0, x + dx), gf.makePrecise(1, fy));
-  }
-
-  private static void fillVert(final double x, final double dx, final double y,
-    final double dy, final Point[] coords, final GeometryFactory gf) {
-    final double fx = x + Math.random() * dx;
-    double ry = dy; // remainder of y distance
-
-    coords[0] = new PointDouble(gf.makePrecise(0, fx), gf.makePrecise(1,
-      y));
-    for (int i = 1; i < coords.length - 1; i++) {
-      ry -= Math.random() * ry;
-      coords[i] = new PointDouble(gf.makePrecise(0, fx), gf.makePrecise(
-        1, y + dy - ry));
-    }
-    coords[coords.length - 1] = new PointDouble(gf.makePrecise(0, fx),
-      gf.makePrecise(1, y + dy));
-  }
-
-  protected int numberPoints = 2;
-
-  protected int generationAlgorithm = 0;
-
   /**
    * Create the points in a vertical line
    */
@@ -132,6 +72,59 @@ public class LineStringGenerator extends GeometryGenerator {
    * Number of interations attempting to create a valid line string
    */
   private static final int RUNS = 5;
+
+  private static void fillArc(final double x, final double dx, final double y, final double dy,
+    final Point[] coords, final GeometryFactory gf) {
+    if (coords.length == 2) {
+      throw new IllegalStateException("Too few points for Arc");
+    }
+
+    final double theta = 360 / coords.length;
+    final double start = theta / 2;
+
+    final double radius = dx < dy ? dx / 3 : dy / 3;
+
+    final double cx = x + dx / 2; // center
+    final double cy = y + dy / 2; // center
+
+    for (int i = 0; i < coords.length; i++) {
+      final double angle = Math.toRadians(start + theta * i);
+
+      final double fx = Math.sin(angle) * radius; // may be neg.
+      final double fy = Math.cos(angle) * radius; // may be neg.
+
+      coords[i] = new PointDouble(gf.makePrecise(0, cx + fx), gf.makePrecise(1, cy + fy));
+    }
+  }
+
+  private static void fillHorz(final double x, final double dx, final double y, final double dy,
+    final Point[] coords, final GeometryFactory gf) {
+    final double fy = y + Math.random() * dy;
+    double rx = dx; // remainder of x distance
+    coords[0] = new PointDouble(gf.makePrecise(0, x), gf.makePrecise(1, fy));
+    for (int i = 1; i < coords.length - 1; i++) {
+      rx -= Math.random() * rx;
+      coords[i] = new PointDouble(gf.makePrecise(0, x + dx - rx), gf.makePrecise(1, fy));
+    }
+    coords[coords.length - 1] = new PointDouble(gf.makePrecise(0, x + dx), gf.makePrecise(1, fy));
+  }
+
+  private static void fillVert(final double x, final double dx, final double y, final double dy,
+    final Point[] coords, final GeometryFactory gf) {
+    final double fx = x + Math.random() * dx;
+    double ry = dy; // remainder of y distance
+
+    coords[0] = new PointDouble(gf.makePrecise(0, fx), gf.makePrecise(1, y));
+    for (int i = 1; i < coords.length - 1; i++) {
+      ry -= Math.random() * ry;
+      coords[i] = new PointDouble(gf.makePrecise(0, fx), gf.makePrecise(1, y + dy - ry));
+    }
+    coords[coords.length - 1] = new PointDouble(gf.makePrecise(0, fx), gf.makePrecise(1, y + dy));
+  }
+
+  protected int numberPoints = 2;
+
+  protected int generationAlgorithm = 0;
 
   /**
    * As the user increases the number of points, the probability of creating a random valid linestring decreases.
@@ -178,13 +171,13 @@ public class LineStringGenerator extends GeometryGenerator {
       switch (getGenerationAlgorithm()) {
         case VERT:
           fillVert(x, dx, y, dy, coords, this.geometryFactory);
-          break;
+        break;
         case HORZ:
           fillHorz(x, dx, y, dy, coords, this.geometryFactory);
-          break;
+        break;
         case ARC:
           fillArc(x, dx, y, dy, coords, this.geometryFactory);
-          break;
+        break;
         default:
           throw new IllegalStateException("Invalid Alg. Specified");
       }

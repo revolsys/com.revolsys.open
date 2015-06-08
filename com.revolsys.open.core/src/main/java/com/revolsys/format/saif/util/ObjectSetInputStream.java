@@ -45,27 +45,23 @@ public class ObjectSetInputStream extends InputStream {
 
   private ZipFile zipFile;
 
-  public ObjectSetInputStream(final File directory, final String fileName)
-      throws IOException {
+  public ObjectSetInputStream(final File directory, final String fileName) throws IOException {
     this.directory = directory;
     this.fileName = fileName;
     this.prefix = ObjectSetUtil.getObjectSubsetPrefix(fileName);
     this.in = openFile(fileName);
     if (this.in == null) {
-      throw new IllegalArgumentException("File " + fileName
-        + " does not exist ");
+      throw new IllegalArgumentException("File " + fileName + " does not exist ");
     }
   }
 
-  public ObjectSetInputStream(final ZipFile zipFile, final String fileName)
-      throws IOException {
+  public ObjectSetInputStream(final ZipFile zipFile, final String fileName) throws IOException {
     this.zipFile = zipFile;
     this.fileName = fileName;
     this.in = openFile(fileName);
     this.prefix = ObjectSetUtil.getObjectSubsetPrefix(fileName);
     if (this.in == null) {
-      throw new IllegalArgumentException("File " + fileName
-        + " does not exist ");
+      throw new IllegalArgumentException("File " + fileName + " does not exist ");
     }
   }
 
@@ -129,8 +125,7 @@ public class ObjectSetInputStream extends InputStream {
   }
 
   @Override
-  public int read(final byte[] b, final int off, final int len)
-      throws IOException {
+  public int read(final byte[] b, final int off, final int len) throws IOException {
     if (this.in == null) {
       return -1;
     } else {

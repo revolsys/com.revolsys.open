@@ -33,13 +33,11 @@ public class MethodSecurityEvaluationContext extends StandardEvaluationContext {
    * resolver for each instance. Use the constructor which takes the resolver,
    * as an argument thus allowing for caching.
    */
-  public MethodSecurityEvaluationContext(final Authentication user,
-    final MethodInvocation mi) {
+  public MethodSecurityEvaluationContext(final Authentication user, final MethodInvocation mi) {
     this(user, mi, new LocalVariableTableParameterNameDiscoverer());
   }
 
-  public MethodSecurityEvaluationContext(final Authentication user,
-    final MethodInvocation mi,
+  public MethodSecurityEvaluationContext(final Authentication user, final MethodInvocation mi,
     final ParameterNameDiscoverer parameterNameDiscoverer) {
     this.mi = mi;
     this.parameterNameDiscoverer = parameterNameDiscoverer;
@@ -58,9 +56,8 @@ public class MethodSecurityEvaluationContext extends StandardEvaluationContext {
     final String[] paramNames = this.parameterNameDiscoverer.getParameterNames(method);
 
     if (paramNames == null) {
-      logger.warn("Unable to resolve method parameter names for method: "
-          + method
-          + ". Debug symbol information is required if you are using parameter names in expressions.");
+      logger.warn("Unable to resolve method parameter names for method: " + method
+        + ". Debug symbol information is required if you are using parameter names in expressions.");
       return;
     }
 
@@ -84,8 +81,7 @@ public class MethodSecurityEvaluationContext extends StandardEvaluationContext {
     return super.lookupVariable(name);
   }
 
-  public void setParameterNameDiscoverer(
-    final ParameterNameDiscoverer parameterNameDiscoverer) {
+  public void setParameterNameDiscoverer(final ParameterNameDiscoverer parameterNameDiscoverer) {
     this.parameterNameDiscoverer = parameterNameDiscoverer;
   }
 

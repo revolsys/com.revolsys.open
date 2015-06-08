@@ -60,12 +60,13 @@ public class CoordinateArrays {
     }
   }
 
+  private final static Point[] coordArrayType = new Point[0];
+
   /**
    * Returns either the given coordinate array if its length is greater than the
    * given amount, or an empty coordinate array.
    */
-  public static Point[] atLeastNCoordinatesOrNothing(final int n,
-    final Point[] c) {
+  public static Point[] atLeastNCoordinatesOrNothing(final int n, final Point[] c) {
     return c.length >= n ? c : new Point[] {};
   }
 
@@ -124,8 +125,8 @@ public class CoordinateArrays {
    * @param destStart the destination index to start copying to
    * @param length the number of items to copy
    */
-  public static void copyDeep(final Point[] src, final int srcStart,
-    final Point[] dest, final int destStart, final int length) {
+  public static void copyDeep(final Point[] src, final int srcStart, final Point[] dest,
+    final int destStart, final int length) {
     for (int i = 0; i < length; i++) {
       dest[destStart + i] = new PointDouble(src[srcStart + i]);
     }
@@ -347,7 +348,5 @@ public class CoordinateArrays {
   public static Point[] toCoordinateArray(final Collection coordList) {
     return (Point[])coordList.toArray(coordArrayType);
   }
-
-  private final static Point[] coordArrayType = new Point[0];
 
 }

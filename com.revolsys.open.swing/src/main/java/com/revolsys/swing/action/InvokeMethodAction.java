@@ -18,54 +18,49 @@ import com.revolsys.swing.parallel.Invoke;
 
 public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
 
-  public static JButton createButton(final CharSequence name,
-    final String toolTip, final Icon icon, final Object object,
-    final String methodName, final Object... parameters) {
-    final InvokeMethodAction action = new InvokeMethodAction(name, toolTip,
-      icon, true, object, methodName, parameters);
+  private static final long serialVersionUID = -5339626097125548212L;
+
+  public static JButton createButton(final CharSequence name, final String toolTip,
+    final Icon icon, final Object object, final String methodName, final Object... parameters) {
+    final InvokeMethodAction action = new InvokeMethodAction(name, toolTip, icon, true, object,
+      methodName, parameters);
     return action.createButton();
   }
 
   public static JButton createButton(final String name, final Object object,
     final String methodName, final Object... parameters) {
-    final InvokeMethodAction action = new InvokeMethodAction(name, object,
-      methodName, parameters);
+    final InvokeMethodAction action = new InvokeMethodAction(name, object, methodName, parameters);
     return action.createButton();
   }
 
-  public static JCheckBoxMenuItem createCheckBoxMenuItem(final String name,
-    final Object object, final String methodName, final Object... parameters) {
-    final InvokeMethodAction action = new InvokeMethodAction(name, object,
-      methodName, parameters);
+  public static JCheckBoxMenuItem createCheckBoxMenuItem(final String name, final Object object,
+    final String methodName, final Object... parameters) {
+    final InvokeMethodAction action = new InvokeMethodAction(name, object, methodName, parameters);
     action.setCheckBox(true);
     return (JCheckBoxMenuItem)action.createComponent();
   }
 
-  public static JMenuItem createMenuItem(final String name, final Icon icon,
-    final Object object, final String methodName, final Object... parameters) {
-    final InvokeMethodAction action = new InvokeMethodAction(name, icon,
-      object, methodName, parameters);
+  public static JMenuItem createMenuItem(final String name, final Icon icon, final Object object,
+    final String methodName, final Object... parameters) {
+    final InvokeMethodAction action = new InvokeMethodAction(name, icon, object, methodName,
+      parameters);
     return action.createComponent();
   }
 
-  public static JMenuItem createMenuItem(final String name,
-    final Object object, final String methodName, final Object... parameters) {
-    final InvokeMethodAction action = new InvokeMethodAction(name, object,
-      methodName, parameters);
+  public static JMenuItem createMenuItem(final String name, final Object object,
+    final String methodName, final Object... parameters) {
+    final InvokeMethodAction action = new InvokeMethodAction(name, object, methodName, parameters);
     return action.createComponent();
   }
 
-  public static JMenuItem createMenuItem(final String name,
-    final String iconName, final Object object, final String methodName,
-    final Object... parameters) {
+  public static JMenuItem createMenuItem(final String name, final String iconName,
+    final Object object, final String methodName, final Object... parameters) {
     final Icon icon = Icons.getIcon(iconName);
-    final InvokeMethodAction action = new InvokeMethodAction(name, icon,
-      object, methodName, parameters);
+    final InvokeMethodAction action = new InvokeMethodAction(name, icon, object, methodName,
+      parameters);
     action.setIconName(iconName);
     return action.createComponent();
   }
-
-  private static final long serialVersionUID = -5339626097125548212L;
 
   private boolean invokeLater;
 
@@ -81,9 +76,8 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
     this(name, null, invokeLater, object, methodName, parameters);
   }
 
-  public InvokeMethodAction(final CharSequence name, final Icon icon,
-    final boolean invokeLater, final Object object, final String methodName,
-    final Object... parameters) {
+  public InvokeMethodAction(final CharSequence name, final Icon icon, final boolean invokeLater,
+    final Object object, final String methodName, final Object... parameters) {
     this.runnable = new InvokeMethodRunnable(object, methodName, parameters);
     this.invokeLater = invokeLater;
     if (name != null) {
@@ -104,25 +98,24 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
     }
   };
 
-  public InvokeMethodAction(final CharSequence name, final Icon icon,
-    final Object object, final String methodName, final Object... parameters) {
+  public InvokeMethodAction(final CharSequence name, final Icon icon, final Object object,
+    final String methodName, final Object... parameters) {
     this(name, icon, false, object, methodName, parameters);
   }
 
-  public InvokeMethodAction(final CharSequence name, final Object object,
-    final String methodName, final Object... parameters) {
+  public InvokeMethodAction(final CharSequence name, final Object object, final String methodName,
+    final Object... parameters) {
     this(name, null, false, object, methodName, parameters);
   }
 
-  public InvokeMethodAction(final CharSequence name, final String toolTip,
-    final Icon icon, final boolean invokeLater, final Object object,
-    final String methodName, final Object... parameters) {
-    this(name, toolTip, icon, invokeLater, new InvokeMethodRunnable(object,
-      methodName, parameters));
+  public InvokeMethodAction(final CharSequence name, final String toolTip, final Icon icon,
+    final boolean invokeLater, final Object object, final String methodName,
+    final Object... parameters) {
+    this(name, toolTip, icon, invokeLater, new InvokeMethodRunnable(object, methodName, parameters));
   }
 
-  public InvokeMethodAction(final CharSequence name, final String toolTip,
-    final Icon icon, final boolean invokeLater, final Runnable runnable) {
+  public InvokeMethodAction(final CharSequence name, final String toolTip, final Icon icon,
+    final boolean invokeLater, final Runnable runnable) {
     this.runnable = runnable;
     this.invokeLater = invokeLater;
     if (name != null) {
@@ -146,26 +139,25 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
     }
   }
 
-  public InvokeMethodAction(final CharSequence name, final String toolTip,
-    final Icon icon, final EnableCheck enableCheck, final Object object,
-    final String methodName, final Object... parameters) {
+  public InvokeMethodAction(final CharSequence name, final String toolTip, final Icon icon,
+    final EnableCheck enableCheck, final Object object, final String methodName,
+    final Object... parameters) {
     this(name, toolTip, icon, true, object, methodName, parameters);
     setEnableCheck(enableCheck);
   }
 
-  public InvokeMethodAction(final CharSequence name, final String toolTip,
-    final Icon icon, final Object object, final String methodName,
-    final Object... parameters) {
+  public InvokeMethodAction(final CharSequence name, final String toolTip, final Icon icon,
+    final Object object, final String methodName, final Object... parameters) {
     this(name, toolTip, icon, true, object, methodName, parameters);
   }
 
-  public InvokeMethodAction(final Icon icon, final boolean invokeLater,
-    final Object object, final String methodName, final Object... parameters) {
+  public InvokeMethodAction(final Icon icon, final boolean invokeLater, final Object object,
+    final String methodName, final Object... parameters) {
     this(null, icon, invokeLater, object, methodName, parameters);
   }
 
-  public InvokeMethodAction(final Icon icon, final Object object,
-    final String methodName, final Object... parameters) {
+  public InvokeMethodAction(final Icon icon, final Object object, final String methodName,
+    final Object... parameters) {
     this(null, icon, false, object, methodName, parameters);
   }
 

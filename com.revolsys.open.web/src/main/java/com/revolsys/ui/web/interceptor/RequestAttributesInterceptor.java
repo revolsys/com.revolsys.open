@@ -28,9 +28,8 @@ public class RequestAttributesInterceptor implements HandlerInterceptor {
   }
 
   @Override
-  public void afterCompletion(final HttpServletRequest request,
-    final HttpServletResponse response, final Object handler, final Exception ex)
-        throws Exception {
+  public void afterCompletion(final HttpServletRequest request, final HttpServletResponse response,
+    final Object handler, final Exception ex) throws Exception {
   }
 
   public Map<String, Map<String, Object>> getAttributeMappings() {
@@ -38,16 +37,14 @@ public class RequestAttributesInterceptor implements HandlerInterceptor {
   }
 
   @Override
-  public void postHandle(final HttpServletRequest request,
-    final HttpServletResponse response, final Object handler,
-    final ModelAndView modelAndView) throws Exception {
+  public void postHandle(final HttpServletRequest request, final HttpServletResponse response,
+    final Object handler, final ModelAndView modelAndView) throws Exception {
 
   }
 
   @Override
-  public boolean preHandle(final HttpServletRequest request,
-    final HttpServletResponse response, final Object handler)
-        throws ServletException {
+  public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response,
+    final Object handler) throws ServletException {
     final String path = this.urlPathHelper.getLookupPathForRequest(request);
     for (final Entry<String, Map<String, Object>> mapping : this.attributeMappings.entrySet()) {
       final String pattern = mapping.getKey();
@@ -80,8 +77,7 @@ public class RequestAttributesInterceptor implements HandlerInterceptor {
     this.urlPathHelper.setAlwaysUseFullPath(alwaysUseFullPath);
   }
 
-  public void setAttributeMappings(
-    final Map<String, Map<String, Object>> attributeMappings) {
+  public void setAttributeMappings(final Map<String, Map<String, Object>> attributeMappings) {
     this.attributeMappings = attributeMappings;
   }
 

@@ -39,51 +39,45 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-public class DoubleKeyMap
-{
+public class DoubleKeyMap {
   private final Map topMap = new TreeMap();
 
-  private Map createKeyMap(final Object key1)
-  {
+  private Map createKeyMap(final Object key1) {
     final Map map = new TreeMap();
     this.topMap.put(key1, map);
     return map;
   }
 
-  public Object get(final Object key1, final Object key2)
-  {
-    final Map keyMap = (Map) this.topMap.get(key1);
+  public Object get(final Object key1, final Object key2) {
+    final Map keyMap = (Map)this.topMap.get(key1);
     if (keyMap == null) {
       return null;
     }
     return keyMap.get(key2);
   }
 
-  public Set keySet()
-  {
+  public Set keySet() {
     return this.topMap.keySet();
   }
 
-  public Set keySet(final Object key)
-  {
-    final Map keyMap = (Map) this.topMap.get(key);
+  public Set keySet(final Object key) {
+    final Map keyMap = (Map)this.topMap.get(key);
     if (keyMap == null) {
       return new TreeSet();
     }
     return keyMap.keySet();
   }
-  public void put(final Object key1, final Object key2, final Object value)
-  {
-    Map keyMap = (Map) this.topMap.get(key1);
+
+  public void put(final Object key1, final Object key2, final Object value) {
+    Map keyMap = (Map)this.topMap.get(key1);
     if (keyMap == null) {
       keyMap = createKeyMap(key1);
     }
     keyMap.put(key2, value);
   }
 
-  public Collection values(final Object key1)
-  {
-    final Map keyMap = (Map) this.topMap.get(key1);
+  public Collection values(final Object key1) {
+    final Map keyMap = (Map)this.topMap.get(key1);
     if (keyMap == null) {
       return new ArrayList();
     }

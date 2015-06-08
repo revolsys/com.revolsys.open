@@ -18,8 +18,8 @@ import com.revolsys.gis.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 
-public class CogoJsonIoFactory extends
-AbstractRecordAndGeometryWriterFactory implements GeometryReaderFactory {
+public class CogoJsonIoFactory extends AbstractRecordAndGeometryWriterFactory implements
+  GeometryReaderFactory {
 
   public CogoJsonIoFactory() {
     super(GeoJsonConstants.COGO_DESCRIPTION, true, true);
@@ -30,8 +30,7 @@ AbstractRecordAndGeometryWriterFactory implements GeometryReaderFactory {
   @Override
   public GeometryReader createGeometryReader(final Resource resource) {
     try {
-      final GeoJsonGeometryIterator iterator = new GeoJsonGeometryIterator(
-        resource);
+      final GeoJsonGeometryIterator iterator = new GeoJsonGeometryIterator(resource);
       return new GeometryReader(iterator);
     } catch (final IOException e) {
       throw new RuntimeException("Unable to create reader for " + resource, e);
@@ -40,8 +39,7 @@ AbstractRecordAndGeometryWriterFactory implements GeometryReaderFactory {
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream,
-    final Charset charset) {
+    final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
     return new GeoJsonRecordWriter(writer, true);
   }

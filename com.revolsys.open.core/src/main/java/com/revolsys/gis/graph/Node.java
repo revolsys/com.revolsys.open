@@ -24,8 +24,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.AbstractPoint;
 import com.revolsys.jts.geom.impl.PointDouble;
 
-public class Node<T> extends AbstractPoint implements AttributedObject,
-Externalizable {
+public class Node<T> extends AbstractPoint implements AttributedObject, Externalizable {
   public static List<Point> getCoordinates(final Collection<Node<Record>> nodes) {
     final List<Point> points = new ArrayList<Point>(nodes.size());
     for (final Node<Record> node : nodes) {
@@ -35,13 +34,11 @@ Externalizable {
     return points;
   }
 
-  public static <V> int getEdgeIndex(final List<Edge<V>> edges,
-    final Edge<V> edge) {
+  public static <V> int getEdgeIndex(final List<Edge<V>> edges, final Edge<V> edge) {
     return edges.indexOf(edge);
   }
 
-  public static <T> Set<Edge<T>> getEdgesBetween(final Node<T> node0,
-    final Node<T> node1) {
+  public static <T> Set<Edge<T>> getEdgesBetween(final Node<T> node0, final Node<T> node1) {
     final Set<Edge<T>> commonEdges = new HashSet<Edge<T>>();
     if (node1 == null) {
       return commonEdges;
@@ -60,8 +57,8 @@ Externalizable {
     return commonEdges;
   }
 
-  public static <T> Collection<Edge<T>> getEdgesBetween(final String typePath,
-    final Node<T> node0, final Node<T> node1) {
+  public static <T> Collection<Edge<T>> getEdgesBetween(final String typePath, final Node<T> node0,
+    final Node<T> node1) {
     final Collection<Edge<T>> edges = getEdgesBetween(node0, node1);
     for (final Iterator<Edge<T>> edgeIter = edges.iterator(); edgeIter.hasNext();) {
       final Edge<T> edge = edgeIter.next();
@@ -72,15 +69,14 @@ Externalizable {
     return edges;
   }
 
-  public static <V> Edge<V> getNextEdge(final List<Edge<V>> edges,
-    final Edge<V> edge) {
+  public static <V> Edge<V> getNextEdge(final List<Edge<V>> edges, final Edge<V> edge) {
     final int index = getEdgeIndex(edges, edge);
     final int nextIndex = (index + 1) % edges.size();
     return edges.get(nextIndex);
   }
 
-  public static <T> boolean hasEdgesBetween(final String typePath,
-    final Node<T> node0, final Node<T> node1) {
+  public static <T> boolean hasEdgesBetween(final String typePath, final Node<T> node0,
+    final Node<T> node1) {
     if (node1 == null) {
       return false;
     }
@@ -457,11 +453,9 @@ Externalizable {
             final LineString line = edge.getLine();
             LineString newLine;
             if (edge.isForwards(this)) {
-              newLine = line.subLine(newNode, 1, line.getVertexCount() - 1,
-                null);
+              newLine = line.subLine(newNode, 1, line.getVertexCount() - 1, null);
             } else {
-              newLine = line.subLine(null, 0, line.getVertexCount() - 1,
-                newNode);
+              newLine = line.subLine(null, 0, line.getVertexCount() - 1, newNode);
             }
             this.graph.replaceEdge(edge, newLine);
             if (!edge.isRemoved()) {
@@ -481,8 +475,7 @@ Externalizable {
   }
 
   @Override
-  public void readExternal(final ObjectInput in) throws IOException,
-  ClassNotFoundException {
+  public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
     final int graphId = in.readInt();
     this.graph = Graph.getGraph(graphId);
     this.id = in.readInt();

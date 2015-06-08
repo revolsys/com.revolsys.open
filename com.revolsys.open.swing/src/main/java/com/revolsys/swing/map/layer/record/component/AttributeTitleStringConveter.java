@@ -12,8 +12,8 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 
-public class AttributeTitleStringConveter extends ObjectToStringConverter
-implements ListCellRenderer {
+public class AttributeTitleStringConveter extends ObjectToStringConverter implements
+  ListCellRenderer {
   private final AbstractRecordLayer layer;
 
   private final DefaultListCellRenderer renderer = new DefaultListCellRenderer();
@@ -23,12 +23,10 @@ implements ListCellRenderer {
   }
 
   @Override
-  public Component getListCellRendererComponent(final JList list,
-    final Object value, final int index, final boolean isSelected,
-    final boolean cellHasFocus) {
+  public Component getListCellRendererComponent(final JList list, final Object value,
+    final int index, final boolean isSelected, final boolean cellHasFocus) {
     final String title = getPreferredStringForItem(value);
-    return this.renderer.getListCellRendererComponent(list, title, index,
-      isSelected, cellHasFocus);
+    return this.renderer.getListCellRendererComponent(list, title, index, isSelected, cellHasFocus);
   }
 
   @Override

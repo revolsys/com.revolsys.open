@@ -11,8 +11,8 @@ import com.revolsys.data.record.RecordFactory;
 import com.revolsys.io.AbstractMapReaderFactory;
 import com.revolsys.io.Reader;
 
-public abstract class AbstractRecordReaderFactory extends
-AbstractMapReaderFactory implements RecordReaderFactory {
+public abstract class AbstractRecordReaderFactory extends AbstractMapReaderFactory implements
+  RecordReaderFactory {
   private final RecordFactory recordFactory = new ArrayRecordFactory();
 
   private final boolean binary;

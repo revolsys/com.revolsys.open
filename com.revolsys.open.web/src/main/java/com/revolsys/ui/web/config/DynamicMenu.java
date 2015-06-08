@@ -21,9 +21,8 @@ public class DynamicMenu extends Menu {
 
   private final MenuItemLoader loader;
 
-  public DynamicMenu(final String name, final String title, final String uri,
-    final String anchor, final String condition, final MenuItemLoader loader)
-        throws Exception {
+  public DynamicMenu(final String name, final String title, final String uri, final String anchor,
+    final String condition, final MenuItemLoader loader) throws Exception {
     super(name, title, uri, anchor, condition);
     this.loader = loader;
   }

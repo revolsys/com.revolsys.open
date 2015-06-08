@@ -62,9 +62,8 @@ public class LinearLocation implements Comparable {
    *      as the first set of location values
    *      is less than, equal to, or greater than the second set of locationValues
    */
-  public static int compareLocationValues(final int componentIndex0,
-    final int segmentIndex0, final double segmentFraction0,
-    final int componentIndex1, final int segmentIndex1,
+  public static int compareLocationValues(final int componentIndex0, final int segmentIndex0,
+    final double segmentFraction0, final int componentIndex1, final int segmentIndex1,
     final double segmentFraction1) {
     // compare component indices
     if (componentIndex0 < componentIndex1) {
@@ -118,8 +117,7 @@ public class LinearLocation implements Comparable {
    * @param frac the length to the desired point
    * @return the <tt>Coordinate</tt> of the desired point
    */
-  public static Point pointAlongSegmentByFraction(final Point p0,
-    final Point p1, final double frac) {
+  public static Point pointAlongSegmentByFraction(final Point p0, final Point p1, final double frac) {
     if (frac <= 0.0) {
       return p0;
     }
@@ -216,8 +214,8 @@ public class LinearLocation implements Comparable {
    * @return    a negative integer, zero, or a positive integer as this <code>LineStringLocation</code>
    *      is less than, equal to, or greater than the specified locationValues
    */
-  public int compareLocationValues(final int componentIndex1,
-    final int segmentIndex1, final double segmentFraction1) {
+  public int compareLocationValues(final int componentIndex1, final int segmentIndex1,
+    final double segmentFraction1) {
     // compare component indices
     if (this.componentIndex < componentIndex1) {
       return -1;
@@ -375,8 +373,7 @@ public class LinearLocation implements Comparable {
     final LineString lineComp = (LineString)linearGeom.getGeometry(this.componentIndex);
     // check for endpoint
     final int nseg = lineComp.getVertexCount() - 1;
-    return this.segmentIndex >= nseg
-        || this.segmentIndex == nseg && this.segmentFraction >= 1.0;
+    return this.segmentIndex >= nseg || this.segmentIndex == nseg && this.segmentFraction >= 1.0;
   }
 
   /**
@@ -530,6 +527,6 @@ public class LinearLocation implements Comparable {
   @Override
   public String toString() {
     return "LinearLoc[" + this.componentIndex + ", " + this.segmentIndex + ", "
-        + this.segmentFraction + "]";
+      + this.segmentFraction + "]";
   }
 }

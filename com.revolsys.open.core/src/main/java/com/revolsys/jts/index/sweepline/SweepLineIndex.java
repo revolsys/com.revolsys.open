@@ -1,5 +1,4 @@
 
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -47,12 +46,13 @@ import java.util.List;
 public class SweepLineIndex {
 
   List events = new ArrayList();
+
   private boolean indexBuilt;
+
   public SweepLineIndex() {
   }
 
-  public void add(final SweepLineInterval sweepInt)
-  {
+  public void add(final SweepLineInterval sweepInt) {
     final SweepLineEvent insertEvent = new SweepLineEvent(sweepInt.getMin(), null, sweepInt);
     this.events.add(insertEvent);
     this.events.add(new SweepLineEvent(sweepInt.getMax(), insertEvent, sweepInt));
@@ -63,15 +63,13 @@ public class SweepLineIndex {
    * it is possible to compute exactly the range of events which must be
    * compared to a given Insert event object.
    */
-  private void buildIndex()
-  {
+  private void buildIndex() {
     if (this.indexBuilt) {
       return;
     }
     Collections.sort(this.events);
-    for (int i = 0; i < this.events.size(); i++ )
-    {
-      final SweepLineEvent ev = (SweepLineEvent) this.events.get(i);
+    for (int i = 0; i < this.events.size(); i++) {
+      final SweepLineEvent ev = (SweepLineEvent)this.events.get(i);
       if (ev.isDelete()) {
         ev.getInsertEvent().setDeleteEventIndex(i);
       }
@@ -79,28 +77,26 @@ public class SweepLineIndex {
     this.indexBuilt = true;
   }
 
-  public void computeOverlaps(final SweepLineOverlapAction action)
-  {
+  public void computeOverlaps(final SweepLineOverlapAction action) {
     buildIndex();
 
-    for (int i = 0; i < this.events.size(); i++ )
-    {
-      final SweepLineEvent ev = (SweepLineEvent) this.events.get(i);
+    for (int i = 0; i < this.events.size(); i++) {
+      final SweepLineEvent ev = (SweepLineEvent)this.events.get(i);
       if (ev.isInsert()) {
         processOverlaps(i, ev.getDeleteEventIndex(), ev.getInterval(), action);
       }
     }
   }
 
-  private void processOverlaps(final int start, final int end, final SweepLineInterval s0, final SweepLineOverlapAction action)
-  {
+  private void processOverlaps(final int start, final int end, final SweepLineInterval s0,
+    final SweepLineOverlapAction action) {
     /**
      * Since we might need to test for self-intersections,
      * include current insert event object in list of event objects to test.
      * Last index can be skipped, because it must be a Delete event.
      */
-    for (int i = start; i < end; i++ ) {
-      final SweepLineEvent ev = (SweepLineEvent) this.events.get(i);
+    for (int i = start; i < end; i++) {
+      final SweepLineEvent ev = (SweepLineEvent)this.events.get(i);
       if (ev.isInsert()) {
         final SweepLineInterval s1 = ev.getInterval();
         action.overlap(s0, s1);
@@ -108,6 +104,5 @@ public class SweepLineIndex {
     }
 
   }
-
 
 }

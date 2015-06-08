@@ -47,21 +47,20 @@ import com.revolsys.jts.triangulate.ConformingDelaunayTriangulationBuilder;
  */
 public class ConformingDelaunayTest extends TestCase {
 
+  static final double COMPARISON_TOLERANCE = 1.0e-7;
+
   public static void main(final String args[]) {
     TestRunner.run(ConformingDelaunayTest.class);
   }
 
   private final WKTReader reader = new WKTReader();
 
-  static final double COMPARISON_TOLERANCE = 1.0e-7;
-
   public ConformingDelaunayTest(final String name) {
     super(name);
   }
 
   void runDelaunay(final String sitesWKT, final String constraintsWKT,
-    final boolean computeTriangles, final String expectedWKT)
-        throws ParseException {
+    final boolean computeTriangles, final String expectedWKT) throws ParseException {
     final Geometry sites = this.reader.read(sitesWKT);
     final Geometry constraints = this.reader.read(constraintsWKT);
 

@@ -10,6 +10,12 @@ import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 import com.revolsys.jts.util.Stopwatch;
 
 public class FileBufferPerfTest {
+  static final int MAX_ITER = 1;
+
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+
+  static WKTReader wktRdr = new WKTReader(geometryFactory);
+
   public static void main(final String[] args) {
     final FileBufferPerfTest test = new FileBufferPerfTest();
     try {
@@ -18,13 +24,6 @@ public class FileBufferPerfTest {
       ex.printStackTrace();
     }
   }
-
-  static final int MAX_ITER = 1;
-
-  private static final GeometryFactory geometryFactory = GeometryFactory.floating(
-    0, 2);
-
-  static WKTReader wktRdr = new WKTReader(geometryFactory);
 
   GeometryFactory factory = GeometryFactory.floating3();
 

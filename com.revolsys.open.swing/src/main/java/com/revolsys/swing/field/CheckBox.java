@@ -17,15 +17,15 @@ public class CheckBox extends JCheckBox implements Field, ActionListener {
 
   private static final long serialVersionUID = 1L;
 
-  private final String fieldName;
-
-  private boolean fieldValue;
-
   public static final Color DEFAULT_SELECTED_FOREGROUND = new JTextField().getSelectedTextColor();
 
   public static final Color DEFAULT_BACKGROUND = new JTextField().getBackground();
 
   public static final Color DEFAULT_FOREGROUND = new JTextField().getForeground();
+
+  private final String fieldName;
+
+  private boolean fieldValue;
 
   private String errorMessage;
 

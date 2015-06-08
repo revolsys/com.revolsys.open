@@ -5,8 +5,8 @@ import java.util.Map;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.util.Property;
 
-public abstract class AbstractMapWriter extends
-AbstractWriter<Map<String, ? extends Object>> implements MapWriter {
+public abstract class AbstractMapWriter extends AbstractWriter<Map<String, ? extends Object>>
+  implements MapWriter {
 
   @Override
   public void close() {

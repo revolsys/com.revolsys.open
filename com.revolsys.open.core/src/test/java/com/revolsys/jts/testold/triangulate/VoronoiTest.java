@@ -48,20 +48,20 @@ import com.revolsys.jts.triangulate.quadedge.QuadEdgeSubdivision;
  */
 public class VoronoiTest extends TestCase {
 
+  static final double COMPARISON_TOLERANCE = 1.0e-7;
+
   public static void main(final String args[]) {
     TestRunner.run(VoronoiTest.class);
   }
 
   private final WKTReader reader = new WKTReader();
 
-  static final double COMPARISON_TOLERANCE = 1.0e-7;
-
   public VoronoiTest(final String name) {
     super(name);
   }
 
-  void runVoronoi(final String sitesWKT, final boolean computeTriangles,
-    final String expectedWKT) throws ParseException {
+  void runVoronoi(final String sitesWKT, final boolean computeTriangles, final String expectedWKT)
+    throws ParseException {
     final Geometry sites = this.reader.read(sitesWKT);
     final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
     builder.setSites(sites);
@@ -75,7 +75,7 @@ public class VoronoiTest extends TestCase {
     } else {
       // result = builder.getEdges(geomFact);
     }
-    //  System.out.println(result);
+    // System.out.println(result);
 
     Geometry expectedEdges = this.reader.read(expectedWKT);
     result = result.normalize();

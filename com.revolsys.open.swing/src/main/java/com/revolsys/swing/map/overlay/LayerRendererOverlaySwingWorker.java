@@ -12,15 +12,13 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 
-public class LayerRendererOverlaySwingWorker extends
-AbstractSwingWorker<Void, Void> {
+public class LayerRendererOverlaySwingWorker extends AbstractSwingWorker<Void, Void> {
 
   private final LayerRendererOverlay overlay;
 
   private final GeoReferencedImage referencedImage;
 
-  public LayerRendererOverlaySwingWorker(
-    final LayerRendererOverlay layerRendererOverlay,
+  public LayerRendererOverlaySwingWorker(final LayerRendererOverlay layerRendererOverlay,
     final GeoReferencedImage image) {
     this.overlay = layerRendererOverlay;
     this.referencedImage = image;
@@ -37,8 +35,8 @@ AbstractSwingWorker<Void, Void> {
         if (imageWidth > 0 && imageHeight > 0 && project != null) {
           final BoundingBox boundingBox = this.referencedImage.getBoundingBox();
           try (
-              final ImageViewport viewport = new ImageViewport(project,
-                imageWidth, imageHeight, boundingBox)) {
+            final ImageViewport viewport = new ImageViewport(project, imageWidth, imageHeight,
+              boundingBox)) {
 
             if (layer != null && layer.isExists() && layer.isVisible()) {
               final LayerRenderer<Layer> renderer = layer.getRenderer();

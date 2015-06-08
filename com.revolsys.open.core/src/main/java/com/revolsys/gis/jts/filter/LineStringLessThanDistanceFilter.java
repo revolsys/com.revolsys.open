@@ -29,11 +29,10 @@ import com.revolsys.jts.geom.LineString;
 
 public class LineStringLessThanDistanceFilter implements Filter<LineString> {
 
-  public static Filter<Record> getFilter(final Record object,
-    final double maxDistance) {
+  public static Filter<Record> getFilter(final Record object, final double maxDistance) {
     final LineString line = object.getGeometryValue();
-    final LineStringLessThanDistanceFilter lineFilter = new LineStringLessThanDistanceFilter(
-      line, maxDistance);
+    final LineStringLessThanDistanceFilter lineFilter = new LineStringLessThanDistanceFilter(line,
+      maxDistance);
     return new RecordGeometryFilter<LineString>(lineFilter);
   }
 
@@ -54,8 +53,7 @@ public class LineStringLessThanDistanceFilter implements Filter<LineString> {
    * @param geometry The geometry to compare the data objects to to.
    * @param distance
    */
-  public LineStringLessThanDistanceFilter(final LineString geometry,
-    final double distance) {
+  public LineStringLessThanDistanceFilter(final LineString geometry, final double distance) {
     this.distance = distance;
     setGeometry(geometry);
   }
@@ -63,8 +61,7 @@ public class LineStringLessThanDistanceFilter implements Filter<LineString> {
   @Override
   public boolean accept(final LineString line) {
     if (line.getBoundingBox().intersects(this.envelope)) {
-      final double distance = LineStringUtil.distance(line, this.geometry,
-        this.distance);
+      final double distance = LineStringUtil.distance(line, this.geometry, this.distance);
       if (distance < this.distance) {
         return true;
       } else {

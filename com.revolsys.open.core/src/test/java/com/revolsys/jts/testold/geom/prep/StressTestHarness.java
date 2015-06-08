@@ -56,8 +56,7 @@ public abstract class StressTestHarness {
 
   public abstract boolean checkResult(Geometry target, Geometry test);
 
-  Geometry createCircle(final Point origin, final double size,
-    final int nPts) {
+  Geometry createCircle(final Point origin, final double size, final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(origin);
     gsf.setSize(size);
@@ -68,13 +67,12 @@ public abstract class StressTestHarness {
     return circle;
   }
 
-  Geometry createRandomTestGeometry(final BoundingBox env, final double size,
-    final int nPts) {
+  Geometry createRandomTestGeometry(final BoundingBox env, final double size, final int nPts) {
     final double width = env.getWidth();
     final double xOffset = width * Math.random();
     final double yOffset = env.getHeight() * Math.random();
-    final Point basePt = new PointDouble(env.getMinX() + xOffset,
-      env.getMinY() + yOffset, Point.NULL_ORDINATE);
+    final Point basePt = new PointDouble(env.getMinX() + xOffset, env.getMinY() + yOffset,
+      Point.NULL_ORDINATE);
     Geometry test = createTestCircle(basePt, size, nPts);
     if (test instanceof Polygon && Math.random() > 0.5) {
       test = test.getBoundary();
@@ -82,8 +80,7 @@ public abstract class StressTestHarness {
     return test;
   }
 
-  Geometry createSineStar(final Point origin, final double size,
-    final int nPts) {
+  Geometry createSineStar(final Point origin, final double size, final int nPts) {
     final SineStarFactory gsf = new SineStarFactory();
     gsf.setCentre(origin);
     gsf.setSize(size);
@@ -94,8 +91,7 @@ public abstract class StressTestHarness {
     return poly;
   }
 
-  Geometry createTestCircle(final Point base, final double size,
-    final int nPts) {
+  Geometry createTestCircle(final Point base, final double size, final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(base);
     gsf.setSize(size);
@@ -108,8 +104,8 @@ public abstract class StressTestHarness {
   public void run(final int nIter) {
     // System.out.println("Running " + nIter + " tests");
     // Geometry poly = createCircle(new PointDouble((double)0, 0), 100, nPts);
-    final Geometry poly = createSineStar(new PointDouble((double)0, 0,
-      Point.NULL_ORDINATE), 100, this.numTargetPts);
+    final Geometry poly = createSineStar(new PointDouble((double)0, 0, Point.NULL_ORDINATE), 100,
+      this.numTargetPts);
     // System.out.println(poly);
 
     // System.out.println();
@@ -121,8 +117,7 @@ public abstract class StressTestHarness {
     int count = 0;
     while (count < nIter) {
       count++;
-      final Geometry test = createRandomTestGeometry(target.getBoundingBox(),
-        10, 20);
+      final Geometry test = createRandomTestGeometry(target.getBoundingBox(), 10, 20);
 
       // System.out.println("Test # " + count);
       // System.out.println(line);

@@ -38,8 +38,7 @@ public class ThreadUtil {
     }
   }
 
-  public static void pause(final Object object, final long milliSeconds,
-    final int nanoSeconds) {
+  public static void pause(final Object object, final long milliSeconds, final int nanoSeconds) {
     synchronized (object) {
       try {
         object.wait(milliSeconds, nanoSeconds);

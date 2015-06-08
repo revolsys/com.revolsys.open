@@ -26,8 +26,7 @@ public class StringContainsRowFilter extends RowFilter<ListModel, Integer> {
   }
 
   @Override
-  public boolean include(
-    final Entry<? extends ListModel, ? extends Integer> entry) {
+  public boolean include(final Entry<? extends ListModel, ? extends Integer> entry) {
     final Integer identifier = entry.getIdentifier();
     final Object value = entry.getValue(identifier);
     final String string = StringConverterRegistry.toString(value);

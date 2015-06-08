@@ -14,24 +14,23 @@ import com.revolsys.util.ExceptionUtil;
 
 public abstract class LazyLoadTreeNode extends BaseTreeNode {
 
-  private final AtomicInteger updateIndicies = new AtomicInteger();
-
-  private List<BaseTreeNode> children = Collections.emptyList();
-
-  private final Object sync = new Object();
-
   private static Method setChildrenMethod;
 
   static {
     try {
       final Class<LazyLoadTreeNode> clazz = LazyLoadTreeNode.class;
-      setChildrenMethod = clazz.getDeclaredMethod("setChildren", Integer.TYPE,
-        List.class);
+      setChildrenMethod = clazz.getDeclaredMethod("setChildren", Integer.TYPE, List.class);
       setChildrenMethod.setAccessible(true);
     } catch (final Throwable e) {
       ExceptionUtil.log(LazyLoadTreeNode.class, e);
     }
   }
+
+  private final AtomicInteger updateIndicies = new AtomicInteger();
+
+  private List<BaseTreeNode> children = Collections.emptyList();
+
+  private final Object sync = new Object();
 
   public LazyLoadTreeNode(final Object userObject) {
     super(userObject, true);
@@ -90,8 +89,7 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
   public void loadChildren() {
     if (SwingUtilities.isEventDispatchThread()) {
       if (!isLoaded()) {
-        Invoke.background("Load tree node " + this.getName(), this,
-            "loadChildren");
+        Invoke.background("Load tree node " + this.getName(), this, "loadChildren");
       }
     } else {
       synchronized (this.sync) {
@@ -149,8 +147,7 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
     }
   }
 
-  protected void setChildren(final int updateIndex,
-    final List<BaseTreeNode> newNodes) {
+  protected void setChildren(final int updateIndex, final List<BaseTreeNode> newNodes) {
     synchronized (this.updateIndicies) {
       if (updateIndex == this.updateIndicies.get()) {
         final List<BaseTreeNode> oldNodes = this.children;

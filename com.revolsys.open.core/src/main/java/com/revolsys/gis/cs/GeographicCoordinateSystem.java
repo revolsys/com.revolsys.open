@@ -15,8 +15,15 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class GeographicCoordinateSystem implements CoordinateSystem {
-  public static double distanceMetres(final double lon1, final double lat1,
-    final double lon2, final double lat2) {
+  public static final double EARTH_RADIUS = 6378137;
+
+  /**
+   *
+   */
+  private static final long serialVersionUID = 8655274386401351222L;
+
+  public static double distanceMetres(final double lon1, final double lat1, final double lon2,
+    final double lat2) {
     final double lon1Radians = Math.toRadians(lon1);
     final double lon2Radians = Math.toRadians(lon2);
     final double width = lon2Radians - lon1Radians;
@@ -29,19 +36,11 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     final double sinHeightOver2 = Math.sin(height / 2);
     final double sinWidthOver2 = Math.sin(width / 2);
     final double distance = 2
-        * EARTH_RADIUS
-        * Math.asin(Math.sqrt(sinHeightOver2 * sinHeightOver2
-          + Math.cos(lat1Radians) * Math.cos(lat2Radians) * sinWidthOver2
-          * sinWidthOver2));
+      * EARTH_RADIUS
+      * Math.asin(Math.sqrt(sinHeightOver2 * sinHeightOver2 + Math.cos(lat1Radians)
+        * Math.cos(lat2Radians) * sinWidthOver2 * sinWidthOver2));
     return distance;
   }
-
-  public static final double EARTH_RADIUS = 6378137;
-
-  /**
-   *
-   */
-  private static final long serialVersionUID = 8655274386401351222L;
 
   private final AngularUnit angularUnit;
 
@@ -61,9 +60,9 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
 
   private final PrimeMeridian primeMeridian;
 
-  public GeographicCoordinateSystem(final int id, final String name,
-    final Datum datum, final AngularUnit angularUnit, final List<Axis> axis,
-    final Area area, final Authority authority, final boolean deprecated) {
+  public GeographicCoordinateSystem(final int id, final String name, final Datum datum,
+    final AngularUnit angularUnit, final List<Axis> axis, final Area area,
+    final Authority authority, final boolean deprecated) {
     this.id = id;
     this.name = name;
     this.datum = datum;
@@ -76,10 +75,9 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     this.authority = authority;
   }
 
-  public GeographicCoordinateSystem(final int id, final String name,
-    final Datum datum, final PrimeMeridian primeMeridian,
-    final AngularUnit angularUnit, final List<Axis> axis, final Area area,
-    final Authority authority, final boolean deprecated) {
+  public GeographicCoordinateSystem(final int id, final String name, final Datum datum,
+    final PrimeMeridian primeMeridian, final AngularUnit angularUnit, final List<Axis> axis,
+    final Area area, final Authority authority, final boolean deprecated) {
     this.id = id;
     this.name = name;
     this.datum = datum;
@@ -93,9 +91,8 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     this.deprecated = deprecated;
   }
 
-  public GeographicCoordinateSystem(final int id, final String name,
-    final Datum datum, final PrimeMeridian primeMeridian,
-    final AngularUnit angularUnit, final List<Axis> axis,
+  public GeographicCoordinateSystem(final int id, final String name, final Datum datum,
+    final PrimeMeridian primeMeridian, final AngularUnit angularUnit, final List<Axis> axis,
     final Authority authority) {
     this.id = id;
     this.name = name;

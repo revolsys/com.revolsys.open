@@ -43,9 +43,7 @@ import com.revolsys.jts.geom.Geometry;
  * @author Martin Davis
  *
  */
-public class GeometryItemDistance
-implements ItemDistance
-{
+public class GeometryItemDistance implements ItemDistance {
   /**
    * Computes the distance between two {@link Geometry} items,
    * using the {@link Geometry#distance(Geometry)} method.
@@ -57,9 +55,8 @@ implements ItemDistance
    */
   @Override
   public double distance(final ItemBoundable item1, final ItemBoundable item2) {
-    final Geometry g1 = (Geometry) item1.getItem();
-    final Geometry g2 = (Geometry) item2.getItem();
+    final Geometry g1 = (Geometry)item1.getItem();
+    final Geometry g2 = (Geometry)item2.getItem();
     return g1.distance(g2);
   }
 }
-

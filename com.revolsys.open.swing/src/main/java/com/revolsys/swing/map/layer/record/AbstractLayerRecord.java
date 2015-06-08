@@ -192,6 +192,7 @@ public abstract class AbstractLayerRecord extends AbstractRecord implements Laye
     return this.layer.setEventsEnabled(eventsEnabled);
   }
 
+  @Override
   public void validate() {
   }
 

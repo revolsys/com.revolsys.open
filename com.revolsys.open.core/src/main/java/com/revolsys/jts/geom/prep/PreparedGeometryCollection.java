@@ -59,6 +59,7 @@ public class PreparedGeometryCollection extends AbstractGeometryCollection {
    *
    */
   private static final long serialVersionUID = 1L;
+
   private final GeometryCollection geometryCollection;
 
   public PreparedGeometryCollection(final GeometryCollection geometryCollection) {
@@ -109,14 +110,12 @@ public class PreparedGeometryCollection extends AbstractGeometryCollection {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V moveVertex(final Point newPoint,
-    final int... vertexId) {
+  public <V extends Geometry> V moveVertex(final Point newPoint, final int... vertexId) {
     if (newPoint == null || newPoint.isEmpty()) {
       return (V)this;
     } else if (vertexId.length > 1) {
       if (isEmpty()) {
-        throw new IllegalArgumentException(
-            "Cannot move vertex for empty MultiPoint");
+        throw new IllegalArgumentException("Cannot move vertex for empty MultiPoint");
       } else {
         final int partIndex = vertexId[0];
         final int partCount = getGeometryCount();
@@ -132,15 +131,13 @@ public class PreparedGeometryCollection extends AbstractGeometryCollection {
           geometries.set(partIndex, newGeometry);
           return (V)geometryFactory.geometryCollection(geometries);
         } else {
-          throw new IllegalArgumentException(
-            "Part index must be between 0 and " + partCount + " not "
-                + partIndex);
+          throw new IllegalArgumentException("Part index must be between 0 and " + partCount
+            + " not " + partIndex);
         }
       }
     } else {
       throw new IllegalArgumentException(
-        "Vertex id's for GeometryCollection must have length > 1. "
-            + Arrays.toString(vertexId));
+        "Vertex id's for GeometryCollection must have length > 1. " + Arrays.toString(vertexId));
     }
   }
 

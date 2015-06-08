@@ -101,11 +101,11 @@ public class PointLocator {
       return ((Polygon)geometry).locate(point);
     }
 
-    isIn = false;
+    this.isIn = false;
     final int boundaryCount = computeLocation(point, geometry);
     if (boundaryCount % 2 == 1) {
       return Location.BOUNDARY;
-    } else if (boundaryCount > 0 || isIn) {
+    } else if (boundaryCount > 0 || this.isIn) {
       return Location.INTERIOR;
     } else {
       return Location.EXTERIOR;
@@ -114,7 +114,7 @@ public class PointLocator {
 
   private int updateLocationInfo(final Location loc) {
     if (loc == Location.INTERIOR) {
-      isIn = true;
+      this.isIn = true;
     } else if (loc == Location.BOUNDARY) {
       return 1;
     }

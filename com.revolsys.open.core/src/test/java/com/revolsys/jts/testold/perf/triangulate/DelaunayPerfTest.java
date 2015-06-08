@@ -10,14 +10,14 @@ import com.revolsys.jts.triangulate.DelaunayTriangulationBuilder;
 import com.revolsys.jts.util.Stopwatch;
 
 public class DelaunayPerfTest {
+  final static GeometryFactory geomFact = GeometryFactory.floating3();
+
+  final static double SIDE_LEN = 10.0;
+
   public static void main(final String args[]) {
     final DelaunayPerfTest test = new DelaunayPerfTest();
     test.run();
   }
-
-  final static GeometryFactory geomFact = GeometryFactory.floating3();
-
-  final static double SIDE_LEN = 10.0;
 
   List randomPoints(final int nPts) {
     final List pts = new ArrayList();

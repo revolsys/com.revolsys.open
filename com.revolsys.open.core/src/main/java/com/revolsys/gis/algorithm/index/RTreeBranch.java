@@ -12,8 +12,7 @@ import com.revolsys.filter.Filter;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
-public class RTreeBranch<T> extends RTreeNode<T> implements
-Iterable<RTreeNode<T>> {
+public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T>> {
 
   private RTreeNode<T>[] nodes;
 
@@ -59,8 +58,8 @@ Iterable<RTreeNode<T>> {
   }
 
   @Override
-  public boolean remove(final LinkedList<RTreeNode<T>> path,
-    final BoundingBox envelope, final T object) {
+  public boolean remove(final LinkedList<RTreeNode<T>> path, final BoundingBox envelope,
+    final T object) {
     for (int i = 0; i < this.size; i++) {
       final RTreeNode<T> node = this.nodes[i];
       if (node.contains(envelope)) {
@@ -89,8 +88,7 @@ Iterable<RTreeNode<T>> {
   }
 
   @SuppressWarnings("unchecked")
-  public List<RTreeNode<T>> split(final RTreeNode<T> node,
-    final List<RTreeNode<T>> newNodes) {
+  public List<RTreeNode<T>> split(final RTreeNode<T> node, final List<RTreeNode<T>> newNodes) {
     final RTreeBranch<T> branch1 = new RTreeBranch<T>(this.nodes.length);
     final RTreeBranch<T> branch2 = new RTreeBranch<T>(this.nodes.length);
 
@@ -129,8 +127,7 @@ Iterable<RTreeNode<T>> {
   }
 
   @Override
-  public boolean visit(final BoundingBox envelope, final Filter<T> filter,
-    final Visitor<T> visitor) {
+  public boolean visit(final BoundingBox envelope, final Filter<T> filter, final Visitor<T> visitor) {
     for (int i = 0; i < this.size; i++) {
       final RTreeNode<T> node = this.nodes[i];
       if (envelope.intersects(node.getBoundingBox())) {

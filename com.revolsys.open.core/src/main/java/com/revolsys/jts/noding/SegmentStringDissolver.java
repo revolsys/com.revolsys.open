@@ -73,8 +73,7 @@ public class SegmentStringDissolver {
      * @param isSameOrientation <code>true</code> if the strings are in the same direction,
      * <code>false</code> if they are opposite
      */
-    void merge(SegmentString mergeTarget, SegmentString ssToMerge,
-      boolean isSameOrientation);
+    void merge(SegmentString mergeTarget, SegmentString ssToMerge, boolean isSameOrientation);
   }
 
   private final SegmentStringMerger merger;
@@ -100,8 +99,7 @@ public class SegmentStringDissolver {
     this.merger = merger;
   }
 
-  private void add(final OrientedCoordinateArray oca,
-    final SegmentString segString) {
+  private void add(final OrientedCoordinateArray oca, final SegmentString segString) {
     this.ocaMap.put(oca, segString);
     // testAddedSS.add(oca);
   }
@@ -122,22 +120,19 @@ public class SegmentStringDissolver {
    * @param segString the string to dissolve
    */
   public void dissolve(final SegmentString segString) {
-    final OrientedCoordinateArray oca = new OrientedCoordinateArray(
-      segString.getPoints());
+    final OrientedCoordinateArray oca = new OrientedCoordinateArray(segString.getPoints());
     final SegmentString existing = findMatching(oca, segString);
     if (existing == null) {
       add(oca, segString);
     } else {
       if (this.merger != null) {
-        final boolean isSameOrientation = equals(existing.getPoints(), 2,
-          segString.getPoints());
+        final boolean isSameOrientation = equals(existing.getPoints(), 2, segString.getPoints());
         this.merger.merge(existing, segString, isSameOrientation);
       }
     }
   }
 
-  private boolean equals(final LineString points1, final int axisCount,
-    final LineString points2) {
+  private boolean equals(final LineString points1, final int axisCount, final LineString points2) {
     double maxAxis = Math.max(points1.getAxisCount(), points2.getAxisCount());
     if (maxAxis > axisCount) {
       maxAxis = axisCount;

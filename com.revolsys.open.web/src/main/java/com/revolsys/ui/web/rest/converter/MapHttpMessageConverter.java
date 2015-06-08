@@ -33,9 +33,8 @@ public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
   }
 
   @Override
-  public Map read(final Class<? extends Map> clazz,
-    final HttpInputMessage inputMessage) throws IOException,
-    HttpMessageNotReadableException {
+  public Map read(final Class<? extends Map> clazz, final HttpInputMessage inputMessage)
+    throws IOException, HttpMessageNotReadableException {
     try {
       final Map<String, Object> map = new HashMap<String, Object>();
       final InputStream in = inputMessage.getBody();
@@ -51,15 +50,12 @@ public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
 
   @SuppressWarnings("unchecked")
   @Override
-  public void write(final Map map, final MediaType mediaType,
-    final HttpOutputMessage outputMessage) throws IOException,
-    HttpMessageNotWritableException {
+  public void write(final Map map, final MediaType mediaType, final HttpOutputMessage outputMessage)
+    throws IOException, HttpMessageNotWritableException {
     if (!HttpServletUtils.getResponse().isCommitted()) {
-      final Charset charset = HttpServletUtils.setContentTypeWithCharset(
-        outputMessage, mediaType);
+      final Charset charset = HttpServletUtils.setContentTypeWithCharset(outputMessage, mediaType);
       final OutputStream body = outputMessage.getBody();
-      final String mediaTypeString = mediaType.getType() + "/"
-          + mediaType.getSubtype();
+      final String mediaTypeString = mediaType.getType() + "/" + mediaType.getSubtype();
       final MapWriterFactory writerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
         MapWriterFactory.class, mediaTypeString);
       final MapWriter writer = writerFactory.getMapWriter(body, charset);

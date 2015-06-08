@@ -16,13 +16,11 @@ public class BigDecimalField extends NumberField {
     super(name, 20, 50, null, required);
   }
 
-  public BigDecimalField(final String name, final boolean required,
-    final Object defaultValue) {
+  public BigDecimalField(final String name, final boolean required, final Object defaultValue) {
     super(name, 20, 50, defaultValue, required);
   }
 
-  public BigDecimalField(final String name, final int scale,
-    final boolean required) {
+  public BigDecimalField(final String name, final int scale, final boolean required) {
     super(name, 20, 50, null, required);
     this.scale = scale;
   }

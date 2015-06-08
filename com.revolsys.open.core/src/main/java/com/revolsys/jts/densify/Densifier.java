@@ -63,27 +63,25 @@ import com.revolsys.jts.geom.segment.Segment;
  */
 public class Densifier {
 
-  private static GeometryCollection densify(
-    final GeometryCollection geometryCollection, final double distanceTolerance) {
+  private static GeometryCollection densify(final GeometryCollection geometryCollection,
+    final double distanceTolerance) {
     final List<Geometry> geometries = new ArrayList<>();
     for (final Geometry part : geometryCollection.geometries()) {
       final Geometry newGeometry = densify(part, distanceTolerance);
       geometries.add(newGeometry);
     }
     final GeometryCollection newGeometry = geometryCollection.getGeometryFactory()
-        .geometryCollection(geometries);
+      .geometryCollection(geometries);
     return newGeometry;
   }
 
-  private static LinearRing densify(final LinearRing line,
-    final double distanceTolerance) {
+  private static LinearRing densify(final LinearRing line, final double distanceTolerance) {
     final List<Point> points = densifyPoints(line, distanceTolerance);
     final GeometryFactory geometryFactory = line.getGeometryFactory();
     return geometryFactory.linearRing(points);
   }
 
-  private static LineString densify(final LineString line,
-    final double distanceTolerance) {
+  private static LineString densify(final LineString line, final double distanceTolerance) {
     final List<Point> points = densifyPoints(line, distanceTolerance);
     final GeometryFactory geometryFactory = line.getGeometryFactory();
     return geometryFactory.lineString(points);
@@ -112,8 +110,7 @@ public class Densifier {
     return (MultiPolygon)newMultiPolygon.buffer(0);
   }
 
-  private static Polygon densify(final Polygon polygon,
-    final double distanceTolerance) {
+  private static Polygon densify(final Polygon polygon, final double distanceTolerance) {
     // Attempt to fix invalid geometries
     final GeometryFactory geometryFactory = polygon.getGeometryFactory();
     final List<LinearRing> rings = new ArrayList<>();
@@ -134,8 +131,7 @@ public class Densifier {
    * @return the densified geometry
    */
   @SuppressWarnings("unchecked")
-  public static <V extends Geometry> V densify(final V geometry,
-    final double distanceTolerance) {
+  public static <V extends Geometry> V densify(final V geometry, final double distanceTolerance) {
     if (distanceTolerance <= 0.0) {
       throw new IllegalArgumentException("Tolerance must be positive");
     } else if (geometry == null || geometry.isEmpty()) {
@@ -158,8 +154,7 @@ public class Densifier {
       } else if (geometry instanceof GeometryCollection) {
         return (V)densify((GeometryCollection)geometry, distanceTolerance);
       } else {
-        throw new UnsupportedOperationException("Unknown geometry type "
-            + geometry.getClass());
+        throw new UnsupportedOperationException("Unknown geometry type " + geometry.getClass());
       }
     }
   }
@@ -171,8 +166,7 @@ public class Densifier {
    * @param distanceTolerance
    * @return the densified coordinate sequence
    */
-  private static List<Point> densifyPoints(final LineString line,
-    final double distanceTolerance) {
+  private static List<Point> densifyPoints(final LineString line, final double distanceTolerance) {
     final List<Point> points = new ArrayList<Point>();
 
     for (final Segment segment : line.segments()) {

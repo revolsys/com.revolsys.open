@@ -51,8 +51,7 @@ public class ObjectSetOutputStream extends OutputStream {
     openFile();
   }
 
-  public ObjectSetOutputStream(final File file, final int maxSize)
-      throws IOException {
+  public ObjectSetOutputStream(final File file, final int maxSize) throws IOException {
     this(file);
     this.maxSize = maxSize;
   }
@@ -60,8 +59,7 @@ public class ObjectSetOutputStream extends OutputStream {
   @Override
   public void close() throws IOException {
     if (log.isDebugEnabled()) {
-      log.debug("Closing object subset '" + FileUtil.getFileName(this.file)
-        + "' from writing");
+      log.debug("Closing object subset '" + FileUtil.getFileName(this.file) + "' from writing");
     }
     this.out.close();
   }
@@ -95,8 +93,7 @@ public class ObjectSetOutputStream extends OutputStream {
   }
 
   @Override
-  public void write(final byte[] b, final int off, final int len)
-      throws IOException {
+  public void write(final byte[] b, final int off, final int len) throws IOException {
     if (this.size >= this.maxSize) {
       openNextFile();
       this.size = 0;

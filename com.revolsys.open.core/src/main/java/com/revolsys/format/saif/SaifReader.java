@@ -66,8 +66,8 @@ import com.revolsys.spring.SpringUtil;
  * @author Paul Austin
  * @see SaifWriter
  */
-public class SaifReader extends AbstractReader<Record> implements
-RecordIterator, RecordDefinitionFactory, com.revolsys.data.record.io.RecordReader {
+public class SaifReader extends AbstractReader<Record> implements RecordIterator,
+  RecordDefinitionFactory, com.revolsys.data.record.io.RecordReader {
   /** The logging instance. */
   private static final Logger log = Logger.getLogger(SaifReader.class);
 
@@ -233,8 +233,7 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.record.io.RecordReade
       try {
         loadGlobalMetadata();
       } catch (final IOException e) {
-        throw new RuntimeException("Unable to load globmeta.osn: "
-            + e.getMessage());
+        throw new RuntimeException("Unable to load globmeta.osn: " + e.getMessage());
       }
     }
     return this.globalMetadata;
@@ -250,8 +249,7 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.record.io.RecordReade
       try {
         loadImportedObjects();
       } catch (final IOException e) {
-        throw new RuntimeException("Unable to load imports.dir: "
-            + e.getMessage());
+        throw new RuntimeException("Unable to load imports.dir: " + e.getMessage());
       }
     }
     return this.importedObjects;
@@ -276,27 +274,25 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.record.io.RecordReade
       try {
         loadInternallyReferencedObjects();
       } catch (final IOException e) {
-        throw new RuntimeException("Unable to load internal.dir: "
-            + e.getMessage());
+        throw new RuntimeException("Unable to load internal.dir: " + e.getMessage());
       }
     }
     return this.internallyReferencedObjects;
   }
 
   private <D extends Record> OsnReader getOsnReader(
-    final RecordDefinitionFactory recordDefinitionFactory,
-    final RecordFactory factory, final String className) throws IOException {
+    final RecordDefinitionFactory recordDefinitionFactory, final RecordFactory factory,
+    final String className) throws IOException {
     String fileName = this.typePathFileNameMap.get(className);
     if (fileName == null) {
       fileName = Path.getName(className);
     }
     OsnReader reader;
     if (this.zipFile != null) {
-      reader = new OsnReader(recordDefinitionFactory, this.zipFile, fileName,
-        this.srid);
+      reader = new OsnReader(recordDefinitionFactory, this.zipFile, fileName, this.srid);
     } else {
-      reader = new OsnReader(recordDefinitionFactory,
-        this.saifArchiveDirectory, fileName, this.srid);
+      reader = new OsnReader(recordDefinitionFactory, this.saifArchiveDirectory, fileName,
+        this.srid);
     }
     reader.setFactory(factory);
     return reader;
@@ -390,8 +386,7 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.record.io.RecordReade
   @SuppressWarnings("unchecked")
   private void loadExportedObjects() throws IOException {
     final boolean setNames = this.includeTypeNames.isEmpty();
-    final ClassPathResource resource = new ClassPathResource(
-        "com/revolsys/io/saif/saifzip.csn");
+    final ClassPathResource resource = new ClassPathResource("com/revolsys/io/saif/saifzip.csn");
     final RecordDefinitionFactory schema = new SaifSchemaReader().loadSchema(resource);
     final OsnReader reader = getOsnReader(schema, this.factory, "/exports.dir");
     try {
@@ -412,8 +407,7 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.record.io.RecordReade
               }
             }
 
-            if (setNames && !fileName.equals("metdat00.osn")
-                && !fileName.equals("refsys00.osn")) {
+            if (setNames && !fileName.equals("metdat00.osn") && !fileName.equals("refsys00.osn")) {
               names.put(typePath.toString(), typePath);
             }
           }
@@ -523,8 +517,7 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.record.io.RecordReade
 
     final InputStream in = getInputStream("clasdefs.csn");
     try {
-      this.declaredRecordDefinitionFactory = parser.loadSchema("clasdefs.csn",
-        in);
+      this.declaredRecordDefinitionFactory = parser.loadSchema("clasdefs.csn", in);
     } finally {
       FileUtil.closeSilent(in);
     }
@@ -575,14 +568,12 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.record.io.RecordReade
       this.opened = true;
       try {
         if (log.isDebugEnabled()) {
-          log.debug("Opening SAIF archive '" + this.file.getCanonicalPath()
-            + "'");
+          log.debug("Opening SAIF archive '" + this.file.getCanonicalPath() + "'");
         }
         if (this.file.isDirectory()) {
           this.saifArchiveDirectory = this.file;
         } else if (!this.file.exists()) {
-          throw new IllegalArgumentException("SAIF file " + this.file
-            + " does not exist");
+          throw new IllegalArgumentException("SAIF file " + this.file + " does not exist");
         } else {
           this.zipFile = new ZipFile(this.file);
         }
@@ -592,14 +583,12 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.record.io.RecordReade
         loadSchema();
         loadExportedObjects();
         loadSrid();
-        final GeometryFactory geometryFactory = GeometryFactory.fixed(
-          this.srid, 1.0, 1.0);
+        final GeometryFactory geometryFactory = GeometryFactory.fixed(this.srid, 1.0, 1.0);
 
         for (final RecordDefinition recordDefinition : ((RecordDefinitionFactoryImpl)this.recordDefinitionFactory).getRecordDefinitions()) {
           final FieldDefinition geometryField = recordDefinition.getGeometryField();
           if (geometryField != null) {
-            geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY,
-              geometryFactory);
+            geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
           }
         }
       } catch (final IOException e) {
@@ -638,8 +627,8 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.record.io.RecordReade
     return false;
   }
 
-  protected Record readObject(final String className,
-    final RecordFactory factory) throws IOException {
+  protected Record readObject(final String className, final RecordFactory factory)
+    throws IOException {
     final OsnReader reader = getOsnReader(className, factory);
     try {
       final Record object = reader.next();
@@ -656,8 +645,7 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.record.io.RecordReade
    */
   @Override
   public void remove() {
-    throw new UnsupportedOperationException(
-        "Removing SAIF objects is not supported");
+    throw new UnsupportedOperationException("Removing SAIF objects is not supported");
   }
 
   /**
@@ -706,8 +694,7 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.record.io.RecordReade
    *
    * @param schema The schema definition.
    */
-  public void setRecordDefinitionFactory(
-    final RecordDefinitionFactory recordDefinitionFactory) {
+  public void setRecordDefinitionFactory(final RecordDefinitionFactory recordDefinitionFactory) {
     if (recordDefinitionFactory != null) {
       this.recordDefinitionFactory = recordDefinitionFactory;
     } else {
@@ -723,8 +710,7 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.record.io.RecordReade
   /**
    * @param typePathObjectSetMap the typePathObjectSetMap to set
    */
-  public void setTypeNameFileNameMap(
-    final Map<String, String> typePathObjectSetMap) {
+  public void setTypeNameFileNameMap(final Map<String, String> typePathObjectSetMap) {
     this.typePathFileNameMap.clear();
     this.fileNameTypeNameMap.clear();
     for (final Entry<String, String> entry : typePathObjectSetMap.entrySet()) {

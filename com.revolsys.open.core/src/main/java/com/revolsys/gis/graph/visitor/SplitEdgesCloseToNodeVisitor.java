@@ -7,8 +7,7 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 
-public class SplitEdgesCloseToNodeVisitor<T> extends
-AbstractNodeListenerVisitor<T> {
+public class SplitEdgesCloseToNodeVisitor<T> extends AbstractNodeListenerVisitor<T> {
   public static final String EDGE_CLOSE_TO_NODE = "Edge close to node";
 
   private final Graph<T> graph;
@@ -21,14 +20,13 @@ AbstractNodeListenerVisitor<T> {
 
   private Collection<T> splitObjects = null;
 
-  public SplitEdgesCloseToNodeVisitor(final Graph<T> graph,
-    final double maxDistance) {
+  public SplitEdgesCloseToNodeVisitor(final Graph<T> graph, final double maxDistance) {
     this.graph = graph;
     this.maxDistance = maxDistance;
   }
 
-  public SplitEdgesCloseToNodeVisitor(final Graph<T> graph,
-    final String ruleName, final double maxDistance) {
+  public SplitEdgesCloseToNodeVisitor(final Graph<T> graph, final String ruleName,
+    final double maxDistance) {
     this.graph = graph;
     this.ruleName = ruleName;
     this.maxDistance = maxDistance;

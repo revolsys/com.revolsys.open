@@ -16,8 +16,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
 
-public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>> implements
-Filter<Edge<T>> {
+public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>> implements Filter<Edge<T>> {
   public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
     final Geometry geometry, final double maxDistance) {
     if (geometry == null) {
@@ -26,14 +25,13 @@ Filter<Edge<T>> {
       final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
       BoundingBox env = geometry.getBoundingBox();
       env = env.expand(maxDistance);
-      graph.getEdgeIndex().visit(env,
-        new EdgeWithinDistance<T>(geometry, maxDistance, results));
+      graph.getEdgeIndex().visit(env, new EdgeWithinDistance<T>(geometry, maxDistance, results));
       return results.getList();
     }
   }
 
-  public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
-    final Node<T> node, final double maxDistance) {
+  public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph, final Node<T> node,
+    final double maxDistance) {
     final GeometryFactory geometryFactory = GeometryFactory.floating3();
     final Point coordinate = node;
     final Geometry geometry = geometryFactory.point(coordinate);
@@ -41,8 +39,8 @@ Filter<Edge<T>> {
 
   }
 
-  public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
-    final Point point, final double maxDistance) {
+  public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph, final Point point,
+    final double maxDistance) {
     final GeometryFactory geometryFactory = GeometryFactory.floating3();
     final Geometry geometry = geometryFactory.point(point);
     return edgesWithinDistance(graph, geometry, maxDistance);

@@ -29,13 +29,12 @@ public class BaseTableCellRenderer extends DefaultTableRenderer {
     super(converter);
   }
 
-  public BaseTableCellRenderer(final StringValue stringValue,
-    final IconValue iconValue) {
+  public BaseTableCellRenderer(final StringValue stringValue, final IconValue iconValue) {
     super(stringValue, iconValue);
   }
 
-  public BaseTableCellRenderer(final StringValue stringValue,
-    final IconValue iconValue, final int alignment) {
+  public BaseTableCellRenderer(final StringValue stringValue, final IconValue iconValue,
+    final int alignment) {
     super(stringValue, iconValue, alignment);
   }
 
@@ -44,14 +43,12 @@ public class BaseTableCellRenderer extends DefaultTableRenderer {
   }
 
   @Override
-  public Component getTableCellRendererComponent(final JTable table,
-    final Object value, final boolean isSelected, final boolean hasFocus,
-    final int row, final int columnIndex) {
+  public Component getTableCellRendererComponent(final JTable table, final Object value,
+    final boolean isSelected, final boolean hasFocus, final int row, final int columnIndex) {
     final String text = StringConverterRegistry.toString(value);
-    final Component component = super.getTableCellRendererComponent(table,
-      text, isSelected, hasFocus, row, columnIndex);
-    if (Number.class.isAssignableFrom(table.getModel().getColumnClass(
-      columnIndex))) {
+    final Component component = super.getTableCellRendererComponent(table, text, isSelected,
+      hasFocus, row, columnIndex);
+    if (Number.class.isAssignableFrom(table.getModel().getColumnClass(columnIndex))) {
       if (component instanceof JLabel) {
         final JLabel label = (JLabel)component;
         label.setAlignmentX(Component.RIGHT_ALIGNMENT);

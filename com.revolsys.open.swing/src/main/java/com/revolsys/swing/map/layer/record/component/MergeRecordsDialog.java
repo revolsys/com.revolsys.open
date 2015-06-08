@@ -55,13 +55,13 @@ import com.revolsys.util.Property;
 
 public class MergeRecordsDialog extends JDialog implements WindowListener {
 
+  private static final long serialVersionUID = 1L;
+
   public static void showDialog(final AbstractRecordLayer layer) {
     final UndoManager undoManager = MapPanel.get(layer).getUndoManager();
     final MergeRecordsDialog dialog = new MergeRecordsDialog(undoManager, layer);
     dialog.showDialog();
   }
-
-  private static final long serialVersionUID = 1L;
 
   private JButton okButton;
 
@@ -77,10 +77,8 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
   private final UndoManager undoManager;
 
-  public MergeRecordsDialog(final UndoManager undoManager,
-    final AbstractRecordLayer layer) {
-    super(SwingUtil.getActiveWindow(), "Merge " + layer.getName(),
-      ModalityType.APPLICATION_MODAL);
+  public MergeRecordsDialog(final UndoManager undoManager, final AbstractRecordLayer layer) {
+    super(SwingUtil.getActiveWindow(), "Merge " + layer.getName(), ModalityType.APPLICATION_MODAL);
     this.undoManager = undoManager;
     this.layer = layer;
     initDialog();
@@ -96,13 +94,11 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
   public void finish() {
     final MultipleUndo multipleUndo = new MultipleUndo();
     for (final Record mergedRecord : this.mergedRecords.keySet()) {
-      final CreateRecordUndo createRecordUndo = new CreateRecordUndo(
-        this.layer, mergedRecord);
+      final CreateRecordUndo createRecordUndo = new CreateRecordUndo(this.layer, mergedRecord);
       multipleUndo.addEdit(createRecordUndo);
     }
     for (final LayerRecord record : this.replacedOriginalRecords) {
-      final DeleteLayerRecordUndo deleteRecordUndo = new DeleteLayerRecordUndo(
-        record);
+      final DeleteLayerRecordUndo deleteRecordUndo = new DeleteLayerRecordUndo(record);
       multipleUndo.addEdit(deleteRecordUndo);
     }
     if (this.undoManager == null) {
@@ -133,8 +129,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
     final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     add(buttonsPanel, BorderLayout.SOUTH);
 
-    final JButton cancelButton = InvokeMethodAction.createButton("Cancel",
-      this, "cancel");
+    final JButton cancelButton = InvokeMethodAction.createButton("Cancel", this, "cancel");
     buttonsPanel.add(cancelButton);
 
     this.okButton = InvokeMethodAction.createButton("OK", this, "finish");
@@ -164,20 +159,18 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
       if (originalRecords.size() < 2) {
         errorMessage = " at least two records must be selected to merge.";
       } else if (!DataTypes.LINE_STRING.equals(geometryType)
-          && !DataTypes.MULTI_LINE_STRING.equals(geometryType)) {
+        && !DataTypes.MULTI_LINE_STRING.equals(geometryType)) {
         errorMessage = "Merging " + geometryType + " not currently supported";
       } else {
         final RecordGraph graph = new RecordGraph();
         for (final LayerRecord originalRecord : originalRecords) {
           Geometry geometry = originalRecord.getGeometryValue();
           if (geometry != null && !geometry.isEmpty()) {
-            geometry = this.layer.getGeometryFactory().geometry(
-              LineString.class, geometry);
+            geometry = this.layer.getGeometryFactory().geometry(LineString.class, geometry);
             if (geometry instanceof LineString) {
               final Record mergeableRecord = new ArrayRecord(originalRecord);
               mergeableRecord.setGeometryValue(geometry);
-              this.mergeableToOiginalRecordMap.put(mergeableRecord,
-                originalRecord);
+              this.mergeableToOiginalRecordMap.put(mergeableRecord, originalRecord);
               graph.addEdge(mergeableRecord);
             }
           }
@@ -191,8 +184,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
               final Edge<Record> edge2 = edges.get(1);
               final Record record2 = edge2.getObject();
               if (record1 != record2) {
-                final Record mergedRecord = this.layer.getMergedRecord(node,
-                  record1, record2);
+                final Record mergedRecord = this.layer.getMergedRecord(node, record1, record2);
 
                 graph.addEdge(mergedRecord);
                 edge1.remove();
@@ -204,12 +196,10 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
                 // and see if they are reversed
                 CollectionUtil.addIfNotNull(sourceRecords,
                   this.mergeableToOiginalRecordMap.get(record1));
-                CollectionUtil.addAllIfNotNull(sourceRecords,
-                  this.mergedRecords.remove(record1));
+                CollectionUtil.addAllIfNotNull(sourceRecords, this.mergedRecords.remove(record1));
                 CollectionUtil.addIfNotNull(sourceRecords,
                   this.mergeableToOiginalRecordMap.get(record2));
-                CollectionUtil.addAllIfNotNull(sourceRecords,
-                  this.mergedRecords.remove(record2));
+                CollectionUtil.addAllIfNotNull(sourceRecords, this.mergedRecords.remove(record2));
                 this.mergedRecords.put(mergedRecord, sourceRecords);
                 replaceRecord(mergedRecord, record1);
                 replaceRecord(mergedRecord, record2);
@@ -230,8 +220,8 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
     this.okButton.setEnabled(true);
 
-    final TablePanel tablePanel = MergedRecordsTableModel.createPanel(
-      this.layer, mergedObject, objects);
+    final TablePanel tablePanel = MergedRecordsTableModel.createPanel(this.layer, mergedObject,
+      objects);
 
     final JPanel panel = new JPanel(new VerticalLayout());
     panel.add(tablePanel);
@@ -243,7 +233,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
   public void setMergedRecords(String errorMessage,
     final Map<Record, Set<LayerRecord>> mergedRecords) {
     final Set<Record> unMergeableRecords = new HashSet<Record>(
-        this.mergeableToOiginalRecordMap.keySet());
+      this.mergeableToOiginalRecordMap.keySet());
     unMergeableRecords.removeAll(mergedRecords.keySet());
     if (!mergedRecords.isEmpty()) {
       int i = 0;
@@ -263,23 +253,20 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
           records.add(originalRecord);
         }
       }
-      final TablePanel tablePanel = RecordListTableModel.createPanel(
-        this.layer, records);
+      final TablePanel tablePanel = RecordListTableModel.createPanel(this.layer, records);
       final RecordListTableModel tableModel = tablePanel.getTableModel();
       tableModel.setEditable(false);
-      tablePanel.setPreferredSize(new Dimension(100,
-        50 + unMergeableRecords.size() * 22));
+      tablePanel.setPreferredSize(new Dimension(100, 50 + unMergeableRecords.size() * 22));
 
       final JPanel panel = new JPanel(new BorderLayout());
       if (!Property.hasValue(errorMessage)) {
         errorMessage = "The following records could not be merged and will not be modified.";
       }
-      final JLabel unMergeLabel = new JLabel("<html><p style=\"color:red\">"
-          + errorMessage + "</p></html>");
+      final JLabel unMergeLabel = new JLabel("<html><p style=\"color:red\">" + errorMessage
+        + "</p></html>");
       panel.add(unMergeLabel, BorderLayout.NORTH);
       panel.add(tablePanel, BorderLayout.SOUTH);
-      SwingUtil.setTitledBorder(panel, unMergeableRecords.size()
-        + " Un-Mergeable Records");
+      SwingUtil.setTitledBorder(panel, unMergeableRecords.size() + " Un-Mergeable Records");
 
       this.mergedObjectsPanel.add(panel);
     }

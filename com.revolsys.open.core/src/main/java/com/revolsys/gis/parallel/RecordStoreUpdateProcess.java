@@ -64,17 +64,17 @@ public class RecordStoreUpdateProcess extends BaseInProcess<Record> {
     switch (state) {
       case New:
         this.recordStore.insert(object);
-        break;
+      break;
       case Persisted:
-        break;
+      break;
       case Modified:
         this.recordStore.update(object);
-        break;
+      break;
       case Deleted:
         this.recordStore.delete(object);
-        break;
+      break;
       default:
-        break;
+      break;
     }
   }
 

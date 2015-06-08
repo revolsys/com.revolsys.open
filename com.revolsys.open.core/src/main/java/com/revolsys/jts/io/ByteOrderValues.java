@@ -38,78 +38,56 @@ package com.revolsys.jts.io;
  * <p>
  * Similar to the standard Java <code>ByteBuffer</code> class.
  */
-public class ByteOrderValues
-{
-  public static double getDouble(final byte[] buf, final int byteOrder)
-  {
+public class ByteOrderValues {
+  public static final int BIG_ENDIAN = 1;
+
+  public static final int LITTLE_ENDIAN = 2;
+
+  public static double getDouble(final byte[] buf, final int byteOrder) {
     final long longVal = getLong(buf, byteOrder);
     return Double.longBitsToDouble(longVal);
   }
-  public static int getInt(final byte[] buf, final int byteOrder)
-  {
+
+  public static int getInt(final byte[] buf, final int byteOrder) {
     if (byteOrder == BIG_ENDIAN) {
-      return  (buf[0] & 0xff) << 24
-          | (buf[1] & 0xff) << 16
-          | (buf[2] & 0xff) << 8
-          | buf[3] & 0xff;
-    }
-    else {// LITTLE_ENDIAN
-      return  (buf[3] & 0xff) << 24
-          | (buf[2] & 0xff) << 16
-          | (buf[1] & 0xff) << 8
-          | buf[0] & 0xff;
+      return (buf[0] & 0xff) << 24 | (buf[1] & 0xff) << 16 | (buf[2] & 0xff) << 8 | buf[3] & 0xff;
+    } else {// LITTLE_ENDIAN
+      return (buf[3] & 0xff) << 24 | (buf[2] & 0xff) << 16 | (buf[1] & 0xff) << 8 | buf[0] & 0xff;
     }
   }
 
-  public static long getLong(final byte[] buf, final int byteOrder)
-  {
+  public static long getLong(final byte[] buf, final int byteOrder) {
     if (byteOrder == BIG_ENDIAN) {
-      return
-          (long) (buf[0] & 0xff) << 56
-          | (long) (buf[1] & 0xff) << 48
-          | (long) (buf[2] & 0xff) << 40
-          | (long) (buf[3] & 0xff) << 32
-          | (long) (buf[4] & 0xff) << 24
-          | (long) (buf[5] & 0xff) << 16
-          | (long) (buf[6] & 0xff) <<  8
-          | buf[7] & 0xff;
-    }
-    else {// LITTLE_ENDIAN
-      return
-          (long) (buf[7] & 0xff) << 56
-          | (long) (buf[6] & 0xff) << 48
-          | (long) (buf[5] & 0xff) << 40
-          | (long) (buf[4] & 0xff) << 32
-          | (long) (buf[3] & 0xff) << 24
-          | (long) (buf[2] & 0xff) << 16
-          | (long) (buf[1] & 0xff) <<  8
-          | buf[0] & 0xff;
+      return (long)(buf[0] & 0xff) << 56 | (long)(buf[1] & 0xff) << 48
+        | (long)(buf[2] & 0xff) << 40 | (long)(buf[3] & 0xff) << 32 | (long)(buf[4] & 0xff) << 24
+        | (long)(buf[5] & 0xff) << 16 | (long)(buf[6] & 0xff) << 8 | buf[7] & 0xff;
+    } else {// LITTLE_ENDIAN
+      return (long)(buf[7] & 0xff) << 56 | (long)(buf[6] & 0xff) << 48
+        | (long)(buf[5] & 0xff) << 40 | (long)(buf[4] & 0xff) << 32 | (long)(buf[3] & 0xff) << 24
+        | (long)(buf[2] & 0xff) << 16 | (long)(buf[1] & 0xff) << 8 | buf[0] & 0xff;
     }
   }
 
-  public static void putDouble(final double doubleValue, final byte[] buf, final int byteOrder)
-  {
+  public static void putDouble(final double doubleValue, final byte[] buf, final int byteOrder) {
     final long longVal = Double.doubleToLongBits(doubleValue);
     putLong(longVal, buf, byteOrder);
   }
-  public static void putInt(final int intValue, final byte[] buf, final int byteOrder)
-  {
+
+  public static void putInt(final int intValue, final byte[] buf, final int byteOrder) {
     if (byteOrder == BIG_ENDIAN) {
       buf[0] = (byte)(intValue >> 24);
       buf[1] = (byte)(intValue >> 16);
       buf[2] = (byte)(intValue >> 8);
-      buf[3] = (byte) intValue;
-    }
-    else {// LITTLE_ENDIAN
-      buf[0] = (byte) intValue;
+      buf[3] = (byte)intValue;
+    } else {// LITTLE_ENDIAN
+      buf[0] = (byte)intValue;
       buf[1] = (byte)(intValue >> 8);
       buf[2] = (byte)(intValue >> 16);
       buf[3] = (byte)(intValue >> 24);
     }
   }
 
-  public static void putLong(final long longValue, final byte[] buf, final int byteOrder)
-  {
+  public static void putLong(final long longValue, final byte[] buf, final int byteOrder) {
     if (byteOrder == BIG_ENDIAN) {
       buf[0] = (byte)(longValue >> 56);
       buf[1] = (byte)(longValue >> 48);
@@ -118,10 +96,9 @@ public class ByteOrderValues
       buf[4] = (byte)(longValue >> 24);
       buf[5] = (byte)(longValue >> 16);
       buf[6] = (byte)(longValue >> 8);
-      buf[7] = (byte) longValue;
-    }
-    else {  // LITTLE_ENDIAN
-      buf[0] = (byte) longValue;
+      buf[7] = (byte)longValue;
+    } else { // LITTLE_ENDIAN
+      buf[0] = (byte)longValue;
       buf[1] = (byte)(longValue >> 8);
       buf[2] = (byte)(longValue >> 16);
       buf[3] = (byte)(longValue >> 24);
@@ -131,9 +108,5 @@ public class ByteOrderValues
       buf[7] = (byte)(longValue >> 56);
     }
   }
-
-  public static final int BIG_ENDIAN = 1;
-
-  public static final int LITTLE_ENDIAN = 2;
 
 }

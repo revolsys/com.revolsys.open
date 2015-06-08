@@ -7,19 +7,14 @@ import org.springframework.security.core.Authentication;
 
 public class DenyAllPermissionEvaluator implements PermissionEvaluator {
   @Override
-  public boolean hasPermission(
-    final Authentication authentication,
-    final Object target,
+  public boolean hasPermission(final Authentication authentication, final Object target,
     final Object permission) {
     return false;
   }
 
   @Override
-  public boolean hasPermission(
-    final Authentication authentication,
-    final Serializable targetId,
-    final String targetType,
-    final Object permission) {
+  public boolean hasPermission(final Authentication authentication, final Serializable targetId,
+    final String targetType, final Object permission) {
     return false;
   }
 

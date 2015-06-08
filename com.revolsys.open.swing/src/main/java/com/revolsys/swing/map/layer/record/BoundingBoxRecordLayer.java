@@ -27,8 +27,8 @@ public class BoundingBoxRecordLayer extends AbstractRecordLayer {
 
   private SwingWorker worker;
 
-  public BoundingBoxRecordLayer(final String type, final String name,
-    final Class<?> workerClass, final GeometryFactory geometryFactory) {
+  public BoundingBoxRecordLayer(final String type, final String name, final Class<?> workerClass,
+    final GeometryFactory geometryFactory) {
     super(name, geometryFactory);
     setType(type);
     this.workerClass = workerClass;
@@ -58,22 +58,19 @@ public class BoundingBoxRecordLayer extends AbstractRecordLayer {
             this.loading = false;
           }
         }
-        if (this.boundingBox == null || !boundingBox.equals(this.boundingBox)
-            && !this.loading) {
+        if (this.boundingBox == null || !boundingBox.equals(this.boundingBox) && !this.loading) {
           this.loading = true;
           this.boundingBox = boundingBox;
           firePropertyChange("visible", super.isVisible(), false);
           try {
             final Constructor<?> constructor = this.workerClass.getConstructor(
               BoundingBoxRecordLayer.class, BoundingBox.class);
-            this.worker = (SwingWorker)constructor.newInstance(this,
-              boundingBox);
+            this.worker = (SwingWorker)constructor.newInstance(this, boundingBox);
             Invoke.worker(this.worker);
           } catch (final NoSuchMethodException e) {
             LOG.error("Worker Constructor not found", e);
           } catch (final InvocationTargetException e) {
-            LOG.error("Unable to construct loader class",
-              e.getTargetException());
+            LOG.error("Unable to construct loader class", e.getTargetException());
           } catch (final Throwable e) {
             LOG.error("Unable to construct loader class", e);
           }
@@ -98,8 +95,7 @@ public class BoundingBoxRecordLayer extends AbstractRecordLayer {
     return !this.loading && super.isVisible();
   }
 
-  public void setIndexRecords(final BoundingBox boundingBox,
-    final List<LayerRecord> records) {
+  public void setIndexRecords(final BoundingBox boundingBox, final List<LayerRecord> records) {
     synchronized (getSync()) {
       if (EqualsRegistry.equal(this.boundingBox, boundingBox)) {
         setIndexRecords(records);

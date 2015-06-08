@@ -21,10 +21,10 @@ public class SegmentPointComparatorTest extends TestCase {
     super(name);
   }
 
-  private void checkNodePosition(final int octant, final double x0,
-    final double y0, final double x1, final double y1,
-    final int expectedPositionValue) {
-    final int posValue = SegmentPointComparator.compare(octant, new PointDouble(x0, y0, Point.NULL_ORDINATE), new PointDouble(x1, y1, Point.NULL_ORDINATE));
+  private void checkNodePosition(final int octant, final double x0, final double y0,
+    final double x1, final double y1, final int expectedPositionValue) {
+    final int posValue = SegmentPointComparator.compare(octant, new PointDouble(x0, y0,
+      Point.NULL_ORDINATE), new PointDouble(x1, y1, Point.NULL_ORDINATE));
     assertTrue(posValue == expectedPositionValue);
   }
 

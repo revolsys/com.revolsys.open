@@ -32,7 +32,6 @@
  */
 package com.revolsys.jts.triangulate;
 
-
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.triangulate.quadedge.Vertex;
 
@@ -45,7 +44,8 @@ import com.revolsys.jts.triangulate.quadedge.Vertex;
  */
 public class ConstraintVertex extends Vertex {
   private boolean isOnConstraint;
-  private Object  constraint = null;
+
+  private Object constraint = null;
 
   /**
    * Creates a new constraint vertex

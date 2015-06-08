@@ -19,8 +19,7 @@ public class RecordLayerListSelectionModel extends DefaultListSelectionModel {
 
   @Override
   public void addSelectionInterval(final int index0, final int index1) {
-    super.addSelectionInterval(convertRowIndexToModel(index0),
-      convertRowIndexToModel(index1));
+    super.addSelectionInterval(convertRowIndexToModel(index0), convertRowIndexToModel(index1));
     final List<LayerRecord> objects = getObjects(index0, index1);
     final AbstractRecordLayer layer = this.model.getLayer();
     layer.addSelectedRecords(objects);
@@ -61,8 +60,7 @@ public class RecordLayerListSelectionModel extends DefaultListSelectionModel {
 
   @Override
   public void removeSelectionInterval(final int index0, final int index1) {
-    super.removeSelectionInterval(convertRowIndexToModel(index0),
-      convertRowIndexToModel(index1));
+    super.removeSelectionInterval(convertRowIndexToModel(index0), convertRowIndexToModel(index1));
     final List<LayerRecord> records = getObjects(index0, index1);
     final AbstractRecordLayer layer = this.model.getLayer();
     layer.unSelectRecords(records);
@@ -73,7 +71,6 @@ public class RecordLayerListSelectionModel extends DefaultListSelectionModel {
     final List<LayerRecord> records = getObjects(index0, index1);
     final AbstractRecordLayer layer = this.model.getLayer();
     layer.setSelectedRecords(records);
-    super.setSelectionInterval(convertRowIndexToModel(index0),
-      convertRowIndexToModel(index1));
+    super.setSelectionInterval(convertRowIndexToModel(index0), convertRowIndexToModel(index1));
   }
 }

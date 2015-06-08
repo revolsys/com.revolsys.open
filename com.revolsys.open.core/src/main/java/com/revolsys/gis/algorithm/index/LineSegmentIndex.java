@@ -64,11 +64,9 @@ public class LineSegmentIndex extends QuadTree<LineSegment> {
 
   public List<Geometry> queryIntersections(final LineSegment querySeg) {
     final BoundingBox env = querySeg.getBoundingBox();
-    final LineSegmentIntersectionVisitor visitor = new LineSegmentIntersectionVisitor(
-      querySeg);
+    final LineSegmentIntersectionVisitor visitor = new LineSegmentIntersectionVisitor(querySeg);
     visit(env, visitor);
-    final List<Geometry> intersections = new ArrayList<>(
-        visitor.getIntersections());
+    final List<Geometry> intersections = new ArrayList<>(visitor.getIntersections());
     return intersections;
   }
 

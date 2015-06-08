@@ -39,16 +39,15 @@ public class LineContainsWithinToleranceFilter implements Filter<LineString> {
     this.envelope = line.getBoundingBox();
   }
 
-  public LineContainsWithinToleranceFilter(final LineString line,
-    final double tolerance) {
+  public LineContainsWithinToleranceFilter(final LineString line, final double tolerance) {
     this.points = line;
     this.tolerance = tolerance;
     this.envelope = line.getBoundingBox();
     this.envelope = this.envelope.expand(tolerance);
   }
 
-  public LineContainsWithinToleranceFilter(final LineString line,
-    final double tolerance, final boolean flip) {
+  public LineContainsWithinToleranceFilter(final LineString line, final double tolerance,
+    final boolean flip) {
     this(line, tolerance);
     this.flip = flip;
   }
@@ -60,11 +59,9 @@ public class LineContainsWithinToleranceFilter implements Filter<LineString> {
 
       final boolean contains;
       if (this.flip) {
-        contains = CoordinatesListUtil.containsWithinTolerance(points,
-          this.points, this.tolerance);
+        contains = CoordinatesListUtil.containsWithinTolerance(points, this.points, this.tolerance);
       } else {
-        contains = CoordinatesListUtil.containsWithinTolerance(this.points,
-          points, this.tolerance);
+        contains = CoordinatesListUtil.containsWithinTolerance(this.points, points, this.tolerance);
       }
       if (contains) {
         return true;

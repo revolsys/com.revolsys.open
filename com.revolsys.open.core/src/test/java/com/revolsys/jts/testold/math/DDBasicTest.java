@@ -104,8 +104,7 @@ public class DDBasicTest extends TestCase {
     checkErrorBound("DivideMultiply", a, a2, errBound);
   }
 
-  private void checkErrorBound(final String tag, final DD x, final DD y,
-    final double errBound) {
+  private void checkErrorBound(final String tag, final DD x, final DD y, final double errBound) {
     final DD err = x.subtract(y).abs();
     // System.out.println(tag + " err=" + err);
     final boolean isWithinEps = err.doubleValue() <= errBound;
@@ -263,8 +262,7 @@ public class DDBasicTest extends TestCase {
   }
 
   public void testTrunc() {
-    checkTrunc(DD.valueOf(1e16).subtract(DD.valueOf(1)), DD.valueOf(1e16)
-      .subtract(DD.valueOf(1)));
+    checkTrunc(DD.valueOf(1e16).subtract(DD.valueOf(1)), DD.valueOf(1e16).subtract(DD.valueOf(1)));
     // the appropriate error bound is determined empirically
     checkTrunc(DD.PI, DD.valueOf(3));
     checkTrunc(DD.valueOf(999.999), DD.valueOf(999));

@@ -21,13 +21,12 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.spring.SpringUtil;
 
 public abstract class AbstractRecordAndGeometryIoFactory extends
-AbstractRecordAndGeometryReaderFactory implements RecordWriterFactory,
-GeometryWriterFactory {
+  AbstractRecordAndGeometryReaderFactory implements RecordWriterFactory, GeometryWriterFactory {
 
   private Set<CoordinateSystem> coordinateSystems = EpsgCoordinateSystems.getCoordinateSystems();
 
-  public AbstractRecordAndGeometryIoFactory(final String name,
-    final boolean binary, final boolean customAttributionSupported) {
+  public AbstractRecordAndGeometryIoFactory(final String name, final boolean binary,
+    final boolean customAttributionSupported) {
     super(name, binary);
     setCustomAttributionSupported(customAttributionSupported);
   }
@@ -35,32 +34,27 @@ GeometryWriterFactory {
   @Override
   public Writer<Geometry> createGeometryWriter(final Resource resource) {
     final RecordDefinition recordDefinition = Records.createGeometryRecordDefinition();
-    final Writer<Record> recordWriter = createRecordWriter(recordDefinition,
-      resource);
+    final Writer<Record> recordWriter = createRecordWriter(recordDefinition, resource);
     return createGeometryWriter(recordWriter);
   }
 
   @Override
-  public Writer<Geometry> createGeometryWriter(final String baseName,
-    final OutputStream out) {
+  public Writer<Geometry> createGeometryWriter(final String baseName, final OutputStream out) {
     final RecordDefinition recordDefinition = Records.createGeometryRecordDefinition();
-    final Writer<Record> recordWriter = createRecordWriter(baseName,
-      recordDefinition, out);
+    final Writer<Record> recordWriter = createRecordWriter(baseName, recordDefinition, out);
     return createGeometryWriter(recordWriter);
   }
 
   @Override
-  public Writer<Geometry> createGeometryWriter(final String baseName,
-    final OutputStream out, final Charset charset) {
+  public Writer<Geometry> createGeometryWriter(final String baseName, final OutputStream out,
+    final Charset charset) {
     final RecordDefinition recordDefinition = Records.createGeometryRecordDefinition();
-    final Writer<Record> recordWriter = createRecordWriter(baseName,
-      recordDefinition, out, charset);
+    final Writer<Record> recordWriter = createRecordWriter(baseName, recordDefinition, out, charset);
     return createGeometryWriter(recordWriter);
   }
 
   public Writer<Geometry> createGeometryWriter(final Writer<Record> recordWriter) {
-    final Writer<Geometry> geometryWriter = new RecordWriterGeometryWriter(
-      recordWriter);
+    final Writer<Geometry> geometryWriter = new RecordWriterGeometryWriter(recordWriter);
     return geometryWriter;
   }
 
@@ -72,8 +66,8 @@ GeometryWriterFactory {
    * @return The writer.
    */
   @Override
-  public Writer<Record> createRecordWriter(
-    final RecordDefinition recordDefinition, final Resource resource) {
+  public Writer<Record> createRecordWriter(final RecordDefinition recordDefinition,
+    final Resource resource) {
     final OutputStream out = SpringUtil.getOutputStream(resource);
     final String fileName = resource.getFilename();
     final String baseName = FileUtil.getBaseName(fileName);
@@ -83,8 +77,7 @@ GeometryWriterFactory {
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream) {
-    return createRecordWriter(baseName, recordDefinition, outputStream,
-      StandardCharsets.UTF_8);
+    return createRecordWriter(baseName, recordDefinition, outputStream, StandardCharsets.UTF_8);
   }
 
   @Override
@@ -93,8 +86,7 @@ GeometryWriterFactory {
   }
 
   @Override
-  public boolean isCoordinateSystemSupported(
-    final CoordinateSystem coordinateSystem) {
+  public boolean isCoordinateSystemSupported(final CoordinateSystem coordinateSystem) {
     return this.coordinateSystems.contains(coordinateSystem);
   }
 
@@ -104,15 +96,12 @@ GeometryWriterFactory {
   }
 
   @Override
-  protected void setCoordinateSystems(
-    final CoordinateSystem... coordinateSystems) {
-    setCoordinateSystems(new LinkedHashSet<CoordinateSystem>(
-        Arrays.asList(coordinateSystems)));
+  protected void setCoordinateSystems(final CoordinateSystem... coordinateSystems) {
+    setCoordinateSystems(new LinkedHashSet<CoordinateSystem>(Arrays.asList(coordinateSystems)));
   }
 
   @Override
-  protected void setCoordinateSystems(
-    final Set<CoordinateSystem> coordinateSystems) {
+  protected void setCoordinateSystems(final Set<CoordinateSystem> coordinateSystems) {
     this.coordinateSystems = coordinateSystems;
   }
 }

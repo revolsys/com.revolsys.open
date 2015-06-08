@@ -31,8 +31,7 @@ public class ListTreeNode extends BaseTreeNode {
     this(userData, null);
   }
 
-  public ListTreeNode(final Object userObject,
-    List<? extends BaseTreeNode> children) {
+  public ListTreeNode(final Object userObject, List<? extends BaseTreeNode> children) {
     super(userObject, true);
     if (children == null) {
       children = doLoadChildren();

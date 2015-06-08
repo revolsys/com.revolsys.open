@@ -32,8 +32,8 @@ import com.revolsys.util.Property;
 
 public final class Records {
 
-  public static int compareNullFirst(final Record record1,
-    final Record record2, final String fieldName) {
+  public static int compareNullFirst(final Record record1, final Record record2,
+    final String fieldName) {
     final Object value1 = getValue(record1, fieldName);
     final Object value2 = getValue(record2, fieldName);
     if (value1 == value2) {
@@ -49,8 +49,8 @@ public final class Records {
     }
   }
 
-  public static int compareNullFirst(final Record record1,
-    final Record record2, final String... fieldNames) {
+  public static int compareNullFirst(final Record record1, final Record record2,
+    final String... fieldNames) {
     for (final String fieldName : fieldNames) {
       final Object value1 = getValue(record1, fieldName);
       final Object value2 = getValue(record2, fieldName);
@@ -108,8 +108,7 @@ public final class Records {
     return 0;
   }
 
-  public static Record copy(final RecordDefinition recordDefinition,
-    final Record record) {
+  public static Record copy(final RecordDefinition recordDefinition, final Record record) {
     final Record copy = new ArrayRecord(recordDefinition);
     copy.setValues(record);
     return copy;
@@ -125,8 +124,7 @@ public final class Records {
    * @return The copied record.
    */
   @SuppressWarnings("unchecked")
-  public static <T extends Record> T copy(final T record,
-    final Geometry geometry) {
+  public static <T extends Record> T copy(final T record, final Geometry geometry) {
     final Geometry oldGeometry = record.getGeometryValue();
     final T newObject = (T)record.clone();
     newObject.setGeometryValue(geometry);
@@ -135,8 +133,7 @@ public final class Records {
   }
 
   public static RecordDefinition createGeometryRecordDefinition() {
-    final FieldDefinition geometryField = new FieldDefinition("geometry",
-      DataTypes.GEOMETRY, true);
+    final FieldDefinition geometryField = new FieldDefinition("geometry", DataTypes.GEOMETRY, true);
     return new RecordDefinitionImpl("Feature", geometryField);
   }
 
@@ -168,8 +165,7 @@ public final class Records {
         return number.intValue() == 1;
       } else {
         final String stringValue = value.toString();
-        if (stringValue.equals("Y") || stringValue.equals("1")
-          || Boolean.parseBoolean(stringValue)) {
+        if (stringValue.equals("Y") || stringValue.equals("1") || Boolean.parseBoolean(stringValue)) {
           return true;
         } else {
           return false;
@@ -226,8 +222,7 @@ public final class Records {
         }
       } else if (propertyValue instanceof Geometry) {
         final Geometry geometry = (Geometry)propertyValue;
-        propertyValue = GeometryProperties.getGeometryProperty(geometry,
-          propertyName);
+        propertyValue = GeometryProperties.getGeometryProperty(geometry, propertyName);
       } else if (propertyValue instanceof Map) {
         final Map<String, Object> map = (Map<String, Object>)propertyValue;
         propertyValue = map.get(propertyName);
@@ -266,14 +261,12 @@ public final class Records {
     if (geometries.isEmpty()) {
       return GeometryFactory.floating3().geometry();
     } else {
-      final GeometryFactory geometryFactory = geometries.get(0)
-        .getGeometryFactory();
+      final GeometryFactory geometryFactory = geometries.get(0).getGeometryFactory();
       return geometryFactory.geometry(geometries);
     }
   }
 
-  public static Set<Identifier> getIdentifiers(
-    final Collection<? extends Record> records) {
+  public static Set<Identifier> getIdentifiers(final Collection<? extends Record> records) {
     final Set<Identifier> identifiers = new TreeSet<>();
     for (final Record record : records) {
       final Identifier identifier = record.getIdentifier();
@@ -296,8 +289,7 @@ public final class Records {
     return identifiers;
   }
 
-  public static List<Identifier> getIdentifiers(final Record record,
-    final String... fieldNames) {
+  public static List<Identifier> getIdentifiers(final Record record, final String... fieldNames) {
     return getIdentifiers(record, Arrays.asList(fieldNames));
   }
 
@@ -373,8 +365,7 @@ public final class Records {
     return record;
   }
 
-  public static List<Record> getObjects(
-    final RecordDefinition recordDefinition,
+  public static List<Record> getObjects(final RecordDefinition recordDefinition,
     final Collection<? extends Map<String, Object>> list) {
     final List<Record> records = new ArrayList<Record>();
     for (final Map<String, Object> map : list) {
@@ -392,9 +383,8 @@ public final class Records {
     }
   }
 
-  public static void mergeStringListValue(final Map<String, Object> record,
-    final Record record1, final Record record2, final String fieldName,
-    final String separator) {
+  public static void mergeStringListValue(final Map<String, Object> record, final Record record1,
+    final Record record2, final String fieldName, final String separator) {
     final String value1 = record1.getString(fieldName);
     final String value2 = record2.getString(fieldName);
     Object value;
@@ -413,9 +403,8 @@ public final class Records {
     record.put(fieldName, value);
   }
 
-  public static void mergeValue(final Map<String, Object> record,
-    final Record record1, final Record record2, final String fieldName,
-    final String separator) {
+  public static void mergeValue(final Map<String, Object> record, final Record record1,
+    final Record record2, final String fieldName, final String separator) {
     final String value1 = record1.getString(fieldName);
     final String value2 = record2.getString(fieldName);
     Object value;
@@ -432,8 +421,7 @@ public final class Records {
   }
 
   public static void setValues(final Record target, final Record source,
-    final Collection<String> fieldNames,
-    final Collection<String> ignoreFieldNames) {
+    final Collection<String> fieldNames, final Collection<String> ignoreFieldNames) {
     for (final String fieldName : fieldNames) {
       if (!ignoreFieldNames.contains(fieldName)) {
         final Object oldValue = getValue(target, fieldName);

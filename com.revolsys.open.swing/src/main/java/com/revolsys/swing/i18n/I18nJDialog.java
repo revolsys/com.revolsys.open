@@ -30,14 +30,13 @@ public class I18nJDialog extends JDialog {
     setTitle(title);
   }
 
-  public I18nJDialog(final Window owner, final String title,
-    final ModalityType modalityType) {
+  public I18nJDialog(final Window owner, final String title, final ModalityType modalityType) {
     super(owner, title, modalityType);
     setTitle(title);
   }
 
-  public I18nJDialog(final Window owner, final String title,
-    final ModalityType modalityType, final GraphicsConfiguration gc) {
+  public I18nJDialog(final Window owner, final String title, final ModalityType modalityType,
+    final GraphicsConfiguration gc) {
     super(owner, title, modalityType, gc);
     setTitle(title);
   }

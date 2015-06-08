@@ -11,12 +11,12 @@ import com.revolsys.math.Angle;
  * @param <T> The type of object stored on the edges in the graph.
  */
 public class EdgeToAngleComparator<T> implements Comparator<Edge<T>> {
+  private static final EdgeToAngleComparator<?> INSTANCE = new EdgeToAngleComparator<Object>();
+
   @SuppressWarnings("unchecked")
   public static <T> EdgeToAngleComparator<T> get() {
     return (EdgeToAngleComparator<T>)INSTANCE;
   }
-
-  private static final EdgeToAngleComparator<?> INSTANCE = new EdgeToAngleComparator<Object>();
 
   /**
    * Construct a new EdgeToAngleComparator.

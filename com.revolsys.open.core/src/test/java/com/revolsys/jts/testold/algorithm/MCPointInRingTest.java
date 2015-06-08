@@ -60,8 +60,8 @@ public class MCPointInRingTest extends AbstractPointInRingTest {
   }
 
   @Override
-  protected void runPtInRing(final Location expectedLoc, final Point pt,
-    final String wkt) throws Exception {
+  protected void runPtInRing(final Location expectedLoc, final Point pt, final String wkt)
+    throws Exception {
     // isPointInRing is not defined for pts on boundary
     if (expectedLoc == Location.BOUNDARY) {
       return;

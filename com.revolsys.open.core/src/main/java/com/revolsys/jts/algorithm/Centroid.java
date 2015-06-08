@@ -75,8 +75,8 @@ public class Centroid {
    * The area is positive if the triangle is oriented CCW, and negative if CW.
    */
   private static double area2(final Point p1, final Point p2, final Point p3) {
-    return (p2.getX() - p1.getX()) * (p3.getY() - p1.getY())
-        - (p3.getX() - p1.getX()) * (p2.getY() - p1.getY());
+    return (p2.getX() - p1.getX()) * (p3.getY() - p1.getY()) - (p3.getX() - p1.getX())
+      * (p2.getY() - p1.getY());
   }
 
   /**

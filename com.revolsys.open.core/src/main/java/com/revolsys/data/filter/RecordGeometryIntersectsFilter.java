@@ -49,7 +49,7 @@ public class RecordGeometryIntersectsFilter implements Filter<Record> {
       final Geometry convertedGeometry = matchGeometry.convert(this.geometryFactory);
       try {
         if (convertedGeometry != null && this.geometry != null
-            && convertedGeometry.intersects(this.geometry)) {
+          && convertedGeometry.intersects(this.geometry)) {
           return true;
         } else {
           return false;

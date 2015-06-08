@@ -20,8 +20,7 @@ public class PointConverter implements OsnConverter {
     this.geometryFactory = geometryFactory;
   }
 
-  public PointConverter(final GeometryFactory geometryFactory,
-    final String geometryClass) {
+  public PointConverter(final GeometryFactory geometryFactory, final String geometryClass) {
     this.geometryFactory = geometryFactory;
     this.geometryClass = geometryClass;
   }
@@ -65,15 +64,14 @@ public class PointConverter implements OsnConverter {
     return geometry;
   }
 
-  protected void readAttribute(final OsnIterator iterator,
-    final String fieldName, final Map<String, Object> values) {
+  protected void readAttribute(final OsnIterator iterator, final String fieldName,
+    final Map<String, Object> values) {
     iterator.next();
     values.put(fieldName, iterator.getValue());
   }
 
   @Override
-  public void write(final OsnSerializer serializer, final Object object)
-      throws IOException {
+  public void write(final OsnSerializer serializer, final Object object) throws IOException {
     if (object instanceof Point) {
       final Point point = (Point)object;
       final int axisCount = point.getAxisCount();
@@ -105,8 +103,8 @@ public class PointConverter implements OsnConverter {
     }
   }
 
-  protected void writeAttribute(final OsnSerializer serializer,
-    final Map<String, Object> values, final String name) throws IOException {
+  protected void writeAttribute(final OsnSerializer serializer, final Map<String, Object> values,
+    final String name) throws IOException {
     final Object value = values.get(name);
     if (value != null) {
       serializer.endLine();
@@ -115,8 +113,8 @@ public class PointConverter implements OsnConverter {
 
   }
 
-  protected void writeAttributes(final OsnSerializer serializer,
-    final Map<String, Object> values) throws IOException {
+  protected void writeAttributes(final OsnSerializer serializer, final Map<String, Object> values)
+    throws IOException {
     writeEnumAttribute(serializer, values, "qualifier");
   }
 

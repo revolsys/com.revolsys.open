@@ -21,10 +21,10 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 
-public class LinearIntersectionNotEqualEdgeLogVisitor extends
-AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
+public class LinearIntersectionNotEqualEdgeLogVisitor extends AbstractVisitor<Edge<Record>>
+  implements ObjectProcessor<RecordGraph> {
   private static final String PROCESSED = LinearIntersectionNotEqualLineEdgeCleanupVisitor.class.getName()
-      + ".PROCESSED";
+    + ".PROCESSED";
   static {
     GeometryEqualsExact3d.addExclude(PROCESSED);
   }
@@ -46,8 +46,7 @@ AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
 
       final AndFilter<Edge<Record>> attributeAndGeometryFilter = new AndFilter<Edge<Record>>();
 
-      attributeAndGeometryFilter.addFilter(new EdgeTypeNameFilter<Record>(
-          typePath));
+      attributeAndGeometryFilter.addFilter(new EdgeTypeNameFilter<Record>(typePath));
 
       final Filter<Edge<Record>> filter = getFilter();
       if (filter != null) {
@@ -55,17 +54,15 @@ AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
       }
 
       final Filter<Record> notEqualLineFilter = new NotFilter<Record>(
-          new RecordGeometryFilter<LineString>(new EqualFilter<LineString>(
-              line)));
+        new RecordGeometryFilter<LineString>(new EqualFilter<LineString>(line)));
 
       final RecordGeometryFilter<LineString> linearIntersectionFilter = new RecordGeometryFilter<LineString>(
-          new LinearIntersectionFilter(line));
+        new LinearIntersectionFilter(line));
 
-      attributeAndGeometryFilter.addFilter(new EdgeObjectFilter<Record>(
-          new AndFilter<Record>(notEqualLineFilter, linearIntersectionFilter)));
+      attributeAndGeometryFilter.addFilter(new EdgeObjectFilter<Record>(new AndFilter<Record>(
+        notEqualLineFilter, linearIntersectionFilter)));
 
-      final List<Edge<Record>> intersectingEdges = graph.getEdges(
-        attributeAndGeometryFilter, line);
+      final List<Edge<Record>> intersectingEdges = graph.getEdges(attributeAndGeometryFilter, line);
 
       if (!intersectingEdges.isEmpty()) {
         RecordLog.error(getClass(), "Overlapping edge", object);
@@ -74,8 +71,7 @@ AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
           final Record intersectingObject = intersectingEdge.getObject();
           final LineString intersectingLine = intersectingObject.getGeometryValue();
           if (GeometryProperties.getGeometryProperty(intersectingLine, PROCESSED) != Boolean.TRUE) {
-            GeometryProperties.setGeometryProperty(intersectingLine, PROCESSED,
-              Boolean.TRUE);
+            GeometryProperties.setGeometryProperty(intersectingLine, PROCESSED, Boolean.TRUE);
           }
         }
       }

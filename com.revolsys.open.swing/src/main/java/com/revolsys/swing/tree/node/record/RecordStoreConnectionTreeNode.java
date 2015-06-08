@@ -29,10 +29,28 @@ import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.util.OS;
 
-public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode implements
-RecordStoreProxy, RecordStoreConnectionMapProxy {
-  public static List<BaseTreeNode> getChildren(
-    final Map<String, Object> connectionMap, final RecordStore recordStore) {
+public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode implements RecordStoreProxy,
+  RecordStoreConnectionMapProxy {
+  public static final Icon ICON = Icons.getIcon("database_link");
+
+  private static final MenuFactory MENU = new MenuFactory("Record Store Connection");
+
+  static {
+    final EnableCheck notReadOnly = new TreeNodePropertyEnableCheck("readOnly", false);
+
+    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh", "arrow_refresh",
+      "refresh");
+    MENU.addMenuItem("default", refresh);
+    if (OS.isMac()) {
+      MENU.addMenuItem("default", TreeNodeRunnable.createAction("Edit Connection", "database_edit",
+        notReadOnly, "editConnection"));
+    }
+    MENU.addMenuItem("default", TreeNodeRunnable.createAction("Delete Record Store Connection",
+      "database_delete", notReadOnly, "deleteConnection"));
+  }
+
+  public static List<BaseTreeNode> getChildren(final Map<String, Object> connectionMap,
+    final RecordStore recordStore) {
     if (recordStore == null) {
       return Collections.emptyList();
     } else {
@@ -41,8 +59,8 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
     }
   }
 
-  public static List<BaseTreeNode> getChildren(
-    final Map<String, Object> connectionMap, final RecordStoreSchema schema) {
+  public static List<BaseTreeNode> getChildren(final Map<String, Object> connectionMap,
+    final RecordStoreSchema schema) {
     final List<BaseTreeNode> children = new ArrayList<>();
     if (schema != null) {
       schema.refresh();
@@ -50,8 +68,8 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
         final String path = element.getPath();
 
         if (element instanceof RecordStoreSchema) {
-          final RecordStoreSchemaTreeNode childNode = new RecordStoreSchemaTreeNode(
-            connectionMap, path);
+          final RecordStoreSchemaTreeNode childNode = new RecordStoreSchemaTreeNode(connectionMap,
+            path);
           children.add(childNode);
         } else if (element instanceof RecordDefinition) {
           final RecordDefinition recordDefinition = (RecordDefinition)element;
@@ -60,34 +78,13 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
           if (geometryField != null) {
             geometryType = geometryField.getType().toString();
           }
-          final RecordStoreTableTreeNode childNode = new RecordStoreTableTreeNode(
-            connectionMap, path, geometryType);
+          final RecordStoreTableTreeNode childNode = new RecordStoreTableTreeNode(connectionMap,
+            path, geometryType);
           children.add(childNode);
         }
       }
     }
     return children;
-  }
-
-  public static final Icon ICON = Icons.getIcon("database_link");
-
-  private static final MenuFactory MENU = new MenuFactory(
-      "Record Store Connection");
-
-  static {
-    final EnableCheck notReadOnly = new TreeNodePropertyEnableCheck("readOnly",
-      false);
-
-    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh",
-      "arrow_refresh", "refresh");
-    MENU.addMenuItem("default", refresh);
-    if (OS.isMac()) {
-      MENU.addMenuItem("default", TreeNodeRunnable.createAction(
-        "Edit Connection", "database_edit", notReadOnly, "editConnection"));
-    }
-    MENU.addMenuItem("default", TreeNodeRunnable.createAction(
-      "Delete Record Store Connection", "database_delete", notReadOnly,
-        "deleteConnection"));
   }
 
   public RecordStoreConnectionTreeNode(final RecordStoreConnection connection) {
@@ -99,11 +96,10 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
 
   public void deleteConnection() {
     final RecordStoreConnection connection = getConnection();
-    final int confirm = JOptionPane.showConfirmDialog(
-      SwingUtil.getActiveWindow(), "Delete record store connection '"
-          + connection.getName() + "'? This action cannot be undone.",
-          "Delete Record Store Connection", JOptionPane.OK_CANCEL_OPTION,
-          JOptionPane.ERROR_MESSAGE);
+    final int confirm = JOptionPane.showConfirmDialog(SwingUtil.getActiveWindow(),
+      "Delete record store connection '" + connection.getName()
+        + "'? This action cannot be undone.", "Delete Record Store Connection",
+      JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
     if (confirm == JOptionPane.OK_OPTION) {
       connection.delete();
     }
@@ -118,8 +114,7 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
   public void editConnection() {
     final RecordStoreConnectionRegistry registry = ((RecordStoreConnectionRegistryTreeNode)getParent()).getRegistry();
     final RecordStoreConnection connection = getConnection();
-    final RecordStoreConnectionDialog dialog = new RecordStoreConnectionDialog(
-      registry, connection);
+    final RecordStoreConnectionDialog dialog = new RecordStoreConnectionDialog(registry, connection);
     dialog.setVisible(true);
   }
 

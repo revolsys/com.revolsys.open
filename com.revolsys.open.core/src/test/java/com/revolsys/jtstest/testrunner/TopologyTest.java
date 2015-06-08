@@ -8,6 +8,10 @@ import com.revolsys.jts.geom.GeometryFactory;
 
 public class TopologyTest {
 
+  private static GeometryFactory geometryFactory = GeometryFactory.floating3();
+
+  private static final TestReader testReader = new TestReader();
+
   public static GeometryFactory getGeometryFactory() {
     return TopologyTest.geometryFactory;
   }
@@ -28,13 +32,8 @@ public class TopologyTest {
   public static junit.framework.Test suite() throws Throwable {
     // return testReader.createTestRun(new File("src/test/testxml/Quick.xml"),
     // 1);
-    return new TestDirectory(null, 0, new File("src/test/testxml/"),
-        "Topology Tests");
+    return new TestDirectory(null, 0, new File("src/test/testxml/"), "Topology Tests");
   }
-
-  private static GeometryFactory geometryFactory = GeometryFactory.floating3();
-
-  private static final TestReader testReader = new TestReader();
 
   public TopologyTest() {
   }

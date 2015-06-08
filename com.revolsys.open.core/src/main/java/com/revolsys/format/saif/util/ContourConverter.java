@@ -53,8 +53,7 @@ public class ContourConverter extends ArcConverter {
   }
 
   @Override
-  public void write(final OsnSerializer serializer, final Object object)
-      throws IOException {
+  public void write(final OsnSerializer serializer, final Object object) throws IOException {
     if (object instanceof LineString) {
       final LineString lineString = (LineString)object;
       serializer.startObject(GEOMETRY_CLASS);

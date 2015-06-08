@@ -16,8 +16,8 @@ public class StaticMethodFilter<T> implements Filter<T> {
   public StaticMethodFilter() {
   }
 
-  public StaticMethodFilter(final Class<?> methodClass,
-    final String methodName, final Object... args) {
+  public StaticMethodFilter(final Class<?> methodClass, final String methodName,
+    final Object... args) {
     this.methodClass = methodClass;
     this.methodName = methodName;
     this.args = args;
@@ -57,17 +57,17 @@ public class StaticMethodFilter<T> implements Filter<T> {
     final Method[] methods = this.methodClass.getMethods();
     for (final Method method : methods) {
       if (method.getName().equals(this.methodName)
-          && method.getParameterTypes().length == 1 + this.args.length) {
+        && method.getParameterTypes().length == 1 + this.args.length) {
         if (this.method != null) {
-          throw new IllegalArgumentException("Multiple method match for "
-              + this.methodClass + "." + this.methodName);
+          throw new IllegalArgumentException("Multiple method match for " + this.methodClass + "."
+            + this.methodName);
         }
         this.method = method;
       }
     }
     if (this.method == null) {
-      throw new IllegalArgumentException("Method could not be found "
-          + this.methodClass + "." + this.methodName);
+      throw new IllegalArgumentException("Method could not be found " + this.methodClass + "."
+        + this.methodName);
     }
   }
 

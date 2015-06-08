@@ -25,8 +25,7 @@ import com.sun.javadoc.Tag;
 import com.sun.javadoc.Type;
 
 public class JavaDoclet {
-  public static void documentationClass(final XmlWriter writer,
-    final ClassDoc classDoc) {
+  public static void documentationClass(final XmlWriter writer, final ClassDoc classDoc) {
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass");
     final String name = classDoc.name();
@@ -56,8 +55,7 @@ public class JavaDoclet {
     writer.endTagLn(HtmlUtil.DIV);
   }
 
-  public static void documentationMethod(final XmlWriter writer,
-    final ExecutableMemberDoc member) {
+  public static void documentationMethod(final XmlWriter writer, final ExecutableMemberDoc member) {
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "javaMethod");
 
@@ -81,8 +79,7 @@ public class JavaDoclet {
     writer.endTagLn(HtmlUtil.DIV);
   }
 
-  public static void documentationPackage(final XmlWriter writer,
-    final PackageDoc packageDoc) {
+  public static void documentationPackage(final XmlWriter writer, final PackageDoc packageDoc) {
     final String name = packageDoc.name();
     writer.startTag(HtmlUtil.A);
     writer.attribute(HtmlUtil.ATTR_NAME, name);
@@ -139,8 +136,7 @@ public class JavaDoclet {
     return LanguageVersion.JAVA_1_5;
   }
 
-  public static void methodSignature(final XmlWriter writer,
-    final ExecutableMemberDoc member) {
+  public static void methodSignature(final XmlWriter writer, final ExecutableMemberDoc member) {
     writer.startTag(HtmlUtil.A);
     final String anchor = getAnchor(member);
     writer.attribute(HtmlUtil.ATTR_NAME, anchor);
@@ -181,16 +177,14 @@ public class JavaDoclet {
 
   public static int optionLength(String optionName) {
     optionName = optionName.toLowerCase();
-    if (optionName.equals("-d") || optionName.equals("-doctitle")
-        || optionName.equals("-docid") || optionName.equals("-htmlfooter")
-        || optionName.equals("-htmlheader")) {
+    if (optionName.equals("-d") || optionName.equals("-doctitle") || optionName.equals("-docid")
+      || optionName.equals("-htmlfooter") || optionName.equals("-htmlheader")) {
       return 2;
     }
     return -1;
   }
 
-  public static void parameters(final XmlWriter writer,
-    final ExecutableMemberDoc method) {
+  public static void parameters(final XmlWriter writer, final ExecutableMemberDoc method) {
     final List<Parameter> parameters = new ArrayList<Parameter>();
     for (final Parameter parameter : method.parameters()) {
       parameters.add(parameter);
@@ -259,12 +253,10 @@ public class JavaDoclet {
           file.mkdirs();
         }
         if (!file.isDirectory()) {
-          docerrorreporter.printError("Destination not a directory"
-              + file.getPath());
+          docerrorreporter.printError("Destination not a directory" + file.getPath());
           return false;
         } else if (!file.canWrite()) {
-          docerrorreporter.printError("Destination directory not writable "
-              + file.getPath());
+          docerrorreporter.printError("Destination directory not writable " + file.getPath());
           return false;
         }
       } else if (argName.equals("-htmlheader")) {
@@ -339,12 +331,10 @@ public class JavaDoclet {
       this.writer = new XmlWriter(out, false);
       this.writer.setIndent(false);
       this.writer.setWriteNewLine(false);
-      FileUtil.copy(
-        getClass().getResourceAsStream("/com/revolsys/doclet/javadoc.css"),
-        new File(this.destDir, "javadoc.css"));
-      FileUtil.copy(
-        getClass().getResourceAsStream("/com/revolsys/doclet/javadoc.js"),
-        new File(this.destDir, "javadoc.js"));
+      FileUtil.copy(getClass().getResourceAsStream("/com/revolsys/doclet/javadoc.css"), new File(
+        this.destDir, "javadoc.css"));
+      FileUtil.copy(getClass().getResourceAsStream("/com/revolsys/doclet/javadoc.js"), new File(
+        this.destDir, "javadoc.js"));
     } catch (final IOException e) {
       throw new IllegalArgumentException(e.fillInStackTrace().getMessage(), e);
     }

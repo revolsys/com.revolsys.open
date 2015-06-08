@@ -11,8 +11,8 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 public class OsmProxyLayerRecord extends IdentifierProxyLayerRecord {
   private final OsmDocument document;
 
-  public OsmProxyLayerRecord(final OpenStreetMapApiLayer layer,
-    final OsmDocument document, final Identifier identifier) {
+  public OsmProxyLayerRecord(final OpenStreetMapApiLayer layer, final OsmDocument document,
+    final Identifier identifier) {
     super(layer, identifier);
     this.document = document;
   }

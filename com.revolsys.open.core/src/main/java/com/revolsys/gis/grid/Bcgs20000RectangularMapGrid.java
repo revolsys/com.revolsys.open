@@ -4,6 +4,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Bcgs20000RectangularMapGrid extends Nts250000RectangularMapGrid {
+  private static final Pattern NAME_PATTERN = Pattern.compile("^" + BcgsConstants.REGEX_20000
+    + ".*");
+
+  private static final Pattern FIND_NAME_PATTERN = Pattern.compile(".*("
+    + BcgsConstants.REGEX_20000 + ").*");
+
+  public static final Bcgs20000RectangularMapGrid INSTANCE = new Bcgs20000RectangularMapGrid();
+
   public static String getTileName(final String mapTileName) {
     final Matcher matcher = FIND_NAME_PATTERN.matcher(mapTileName);
     if (matcher.find()) {
@@ -12,14 +20,6 @@ public class Bcgs20000RectangularMapGrid extends Nts250000RectangularMapGrid {
       return mapTileName;
     }
   }
-
-  private static final Pattern NAME_PATTERN = Pattern.compile("^"
-      + BcgsConstants.REGEX_20000 + ".*");
-
-  private static final Pattern FIND_NAME_PATTERN = Pattern.compile(".*("
-      + BcgsConstants.REGEX_20000 + ").*");
-
-  public static final Bcgs20000RectangularMapGrid INSTANCE = new Bcgs20000RectangularMapGrid();
 
   public Bcgs20000RectangularMapGrid() {
     this(BcgsConstants.WIDTH_20000, BcgsConstants.HEIGHT_20000);
@@ -36,7 +36,7 @@ public class Bcgs20000RectangularMapGrid extends Nts250000RectangularMapGrid {
     String tileName = getTileName(name);
     final int length = tileName.length();
     tileName = tileName.substring(0, length - 3).toUpperCase() + "."
-        + tileName.substring(length - 3);
+      + tileName.substring(length - 3);
     return tileName;
   }
 

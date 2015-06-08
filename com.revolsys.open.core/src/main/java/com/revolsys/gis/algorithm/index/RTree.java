@@ -24,8 +24,8 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
     this.root = new RTreeLeaf<T>(maxEntries);
   }
 
-  private RTreeLeaf<T> chooseLeaf(final List<RTreeBranch<T>> path,
-    final RTreeNode<T> node, final BoundingBox envelope) {
+  private RTreeLeaf<T> chooseLeaf(final List<RTreeBranch<T>> path, final RTreeNode<T> node,
+    final BoundingBox envelope) {
     if (node instanceof RTreeLeaf) {
       return (RTreeLeaf<T>)node;
     } else {
@@ -51,8 +51,7 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
     }
   }
 
-  private double getRequiredExpansion(final RTreeNode<T> node,
-    final BoundingBox envelope) {
+  private double getRequiredExpansion(final RTreeNode<T> node, final BoundingBox envelope) {
     double areaExpansion = 0;
 
     final BoundingBox boundingBox = node.getBoundingBox();
@@ -113,15 +112,14 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
     }
   }
 
-  private void replace(final LinkedList<RTreeBranch<T>> path,
-    final RTreeNode<T> oldNode, final List<RTreeNode<T>> newNodes) {
+  private void replace(final LinkedList<RTreeBranch<T>> path, final RTreeNode<T> oldNode,
+    final List<RTreeNode<T>> newNodes) {
     if (path.isEmpty()) {
       this.root = new RTreeBranch<T>(this.maxEntries, newNodes);
     } else {
       final RTreeBranch<T> parentNode = path.removeLast();
       if (parentNode.getSize() + newNodes.size() - 1 >= this.maxEntries) {
-        final List<RTreeNode<T>> newParentNodes = parentNode.split(oldNode,
-          newNodes);
+        final List<RTreeNode<T>> newParentNodes = parentNode.split(oldNode, newNodes);
         replace(path, parentNode, newParentNodes);
       } else {
         parentNode.replace(oldNode, newNodes);
@@ -131,8 +129,7 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
   }
 
   @Override
-  public void visit(final BoundingBox envelope, final Filter<T> filter,
-    final Visitor<T> visitor) {
+  public void visit(final BoundingBox envelope, final Filter<T> filter, final Visitor<T> visitor) {
     this.root.visit(envelope, filter, visitor);
   }
 

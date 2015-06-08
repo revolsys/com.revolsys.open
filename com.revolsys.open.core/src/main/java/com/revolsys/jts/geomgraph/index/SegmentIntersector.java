@@ -79,8 +79,8 @@ public class SegmentIntersector {
   /*
    * public SegmentIntersector() { }
    */
-  public SegmentIntersector(final LineIntersector li,
-    final boolean includeProper, final boolean recordIsolated) {
+  public SegmentIntersector(final LineIntersector li, final boolean includeProper,
+    final boolean recordIsolated) {
     this.li = li;
     this.includeProper = includeProper;
     this.recordIsolated = recordIsolated;
@@ -92,8 +92,8 @@ public class SegmentIntersector {
    * Note that clients (such as MonotoneChainEdges) may choose not to intersect
    * certain pairs of segments for efficiency reasons.
    */
-  public void addIntersections(final Edge e0, final int segIndex0,
-    final Edge e1, final int segIndex1) {
+  public void addIntersections(final Edge e0, final int segIndex0, final Edge e1,
+    final int segIndex1) {
     if (e0 == e1 && segIndex0 == segIndex1) {
       return;
     }
@@ -168,8 +168,7 @@ public class SegmentIntersector {
     return this.hasProper;
   }
 
-  private boolean isBoundaryPoint(final LineIntersector li,
-    final Collection bdyNodes) {
+  private boolean isBoundaryPoint(final LineIntersector li, final Collection bdyNodes) {
     for (final Iterator i = bdyNodes.iterator(); i.hasNext();) {
       final Node node = (Node)i.next();
       final Point pt = node.getCoordinate();
@@ -180,8 +179,7 @@ public class SegmentIntersector {
     return false;
   }
 
-  private boolean isBoundaryPoint(final LineIntersector li,
-    final Collection[] bdyNodes) {
+  private boolean isBoundaryPoint(final LineIntersector li, final Collection[] bdyNodes) {
     if (bdyNodes == null) {
       return false;
     }
@@ -200,8 +198,8 @@ public class SegmentIntersector {
    * Note that closed edges require a special check for the point shared by the beginning
    * and end segments.
    */
-  private boolean isTrivialIntersection(final Edge e0, final int segIndex0,
-    final Edge e1, final int segIndex1) {
+  private boolean isTrivialIntersection(final Edge e0, final int segIndex0, final Edge e1,
+    final int segIndex1) {
     if (e0 == e1) {
       if (this.li.getIntersectionNum() == 1) {
         if (isAdjacentSegments(segIndex0, segIndex1)) {
@@ -209,8 +207,8 @@ public class SegmentIntersector {
         }
         if (e0.isClosed()) {
           final int maxSegIndex = e0.getNumPoints() - 1;
-          if (segIndex0 == 0 && segIndex1 == maxSegIndex
-              || segIndex1 == 0 && segIndex0 == maxSegIndex) {
+          if (segIndex0 == 0 && segIndex1 == maxSegIndex || segIndex1 == 0
+            && segIndex0 == maxSegIndex) {
             return true;
           }
         }
@@ -219,8 +217,7 @@ public class SegmentIntersector {
     return false;
   }
 
-  public void setBoundaryNodes(final Collection bdyNodes0,
-    final Collection bdyNodes1) {
+  public void setBoundaryNodes(final Collection bdyNodes0, final Collection bdyNodes1) {
     this.bdyNodes = new Collection[2];
     this.bdyNodes[0] = bdyNodes0;
     this.bdyNodes[1] = bdyNodes1;

@@ -38,8 +38,9 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>,
-PropertyChangeListener {
+public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyChangeListener {
+
+  public static final EnableCheck NODE_EXISTS = new TreeNodePropertyEnableCheck("exists");
 
   @SuppressWarnings("unchecked")
   public static <V> V getUserData(final TreePath path) {
@@ -52,9 +53,6 @@ PropertyChangeListener {
   }
 
   private boolean visible = true;
-
-  public static final EnableCheck NODE_EXISTS = new TreeNodePropertyEnableCheck(
-      "exists");
 
   private boolean allowsChildren;
 
@@ -143,8 +141,8 @@ PropertyChangeListener {
     }
   }
 
-  public boolean dndImportData(final TransferSupport support, int index)
-      throws IOException, UnsupportedFlavorException {
+  public boolean dndImportData(final TransferSupport support, int index) throws IOException,
+    UnsupportedFlavorException {
     if (!TreeTransferHandler.isDndNoneAction(support)) {
       final Transferable transferable = support.getTransferable();
       if (support.isDataFlavorSupported(TreePathListTransferable.FLAVOR)) {
@@ -282,8 +280,7 @@ PropertyChangeListener {
     return children.indexOf(node);
   }
 
-  protected int getIndexOfChild(final BaseTreeNode abstractTreeNode,
-    final Object child) {
+  protected int getIndexOfChild(final BaseTreeNode abstractTreeNode, final Object child) {
     if (child != null) {
       final List<BaseTreeNode> children = getChildren();
       for (int i = 0; i < children.size(); i++) {
@@ -345,10 +342,9 @@ PropertyChangeListener {
     }
   }
 
-  public Component getTreeCellRendererComponent(final Component renderer,
-    final JTree tree, final Object value, final boolean selected,
-    final boolean expanded, final boolean leaf, final int row,
-    final boolean hasFocus) {
+  public Component getTreeCellRendererComponent(final Component renderer, final JTree tree,
+    final Object value, final boolean selected, final boolean expanded, final boolean leaf,
+    final int row, final boolean hasFocus) {
     final Icon icon;
     if (expanded) {
       icon = getOpenIcon();
@@ -436,8 +432,7 @@ PropertyChangeListener {
   }
 
   protected int importData(final TransferSupport support,
-    final TreePathListTransferable pathTransferable, int index,
-    final TreePath sourcePath) {
+    final TreePathListTransferable pathTransferable, int index, final TreePath sourcePath) {
     Object child = getUserData(sourcePath);
     if (TreeTransferHandler.isDndCopyAction(support)) {
       if (isCopySupported(child)) {
@@ -485,8 +480,7 @@ PropertyChangeListener {
     return child instanceof Cloneable;
   }
 
-  public boolean isDndCanImport(final TreePath dropPath,
-    final TransferSupport support) {
+  public boolean isDndCanImport(final TreePath dropPath, final TransferSupport support) {
     if (support.isDataFlavorSupported(TreePathListTransferable.FLAVOR)) {
       try {
         final Object node = dropPath.getLastPathComponent();
@@ -512,8 +506,8 @@ PropertyChangeListener {
     return false;
   }
 
-  public boolean isDndDropSupported(final TransferSupport support,
-    final TreePath dropPath, final TreePath sourcePath) {
+  public boolean isDndDropSupported(final TransferSupport support, final TreePath dropPath,
+    final TreePath sourcePath) {
     final boolean descendant = sourcePath.isDescendant(dropPath);
     if (!descendant) {
       final Object value = getUserData(sourcePath);
@@ -524,8 +518,8 @@ PropertyChangeListener {
     return false;
   }
 
-  protected boolean isDndDropSupported(final TransferSupport support,
-    final TreePath dropPath, final TreePath childPath, final Object child) {
+  protected boolean isDndDropSupported(final TransferSupport support, final TreePath dropPath,
+    final TreePath childPath, final Object child) {
     final Class<?> valueClass = child.getClass();
     final List<Class<?>> childClasses = getChildClasses();
     for (final Class<?> supportedClass : childClasses) {

@@ -7,6 +7,10 @@ import com.revolsys.collection.map.ThreadSharedAttributes;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 
 public class ExecutorServiceFactory {
+  private static final Object SYNC = new Object();
+
+  private static final String KEY = ExecutorServiceFactory.class.getName() + ".key";
+
   public static ExecutorService getExecutorService() {
     synchronized (SYNC) {
       ExecutorService executorService = ThreadSharedAttributes.getField(KEY);
@@ -19,26 +23,18 @@ public class ExecutorServiceFactory {
     }
   }
 
-  public static final void invokeMethod(final Object object,
-    final String methodName, final Object... args) {
+  public static final void invokeMethod(final Object object, final String methodName,
+    final Object... args) {
     final ExecutorService executorService = getExecutorService();
-    final InvokeMethodRunnable task = new InvokeMethodRunnable(object,
-      methodName, args);
+    final InvokeMethodRunnable task = new InvokeMethodRunnable(object, methodName, args);
     executorService.execute(task);
   }
 
-  public static void setDefaultExecutorService(
-    final ExecutorService executorService) {
+  public static void setDefaultExecutorService(final ExecutorService executorService) {
     ThreadSharedAttributes.setDefaultAttribute(KEY, executorService);
   }
 
-  public static void setThreadExecutorService(
-    final ExecutorService executorService) {
+  public static void setThreadExecutorService(final ExecutorService executorService) {
     ThreadSharedAttributes.setAttribute(KEY, executorService);
   }
-
-  private static final Object SYNC = new Object();
-
-  private static final String KEY = ExecutorServiceFactory.class.getName()
-      + ".key";
 }

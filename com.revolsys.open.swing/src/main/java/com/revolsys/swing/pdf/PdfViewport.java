@@ -71,9 +71,8 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
 
   private final Map<String, PDFont> fonts = new HashMap<>();
 
-  public PdfViewport(final PDDocument document, final PDPage page,
-    final Project project, final int width, final int height,
-    final BoundingBox boundingBox) throws IOException {
+  public PdfViewport(final PDDocument document, final PDPage page, final Project project,
+    final int width, final int height, final BoundingBox boundingBox) throws IOException {
     super(project, width, height, boundingBox);
     this.document = document;
     this.page = page;
@@ -130,8 +129,8 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
     gcs.setString("WKT", wkt);
   }
 
-  private void addPoint(final COSArray geoPoints,
-    final GeometryFactory geometryFactory, final double x, final double y) {
+  private void addPoint(final COSArray geoPoints, final GeometryFactory geometryFactory,
+    final double x, final double y) {
     final Point point = geometryFactory.point(x, y);
     final GeometryFactory geographicGeometryFactory = geometryFactory.getGeographicGeometryFactory();
     final Point geoPoint = point.convert(geographicGeometryFactory);
@@ -232,13 +231,11 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
   }
 
   @Override
-  public void drawText(final LayerRecord object, final Geometry geometry,
-    final TextStyle style) {
+  public void drawText(final LayerRecord object, final Geometry geometry, final TextStyle style) {
     try {
       final String label = TextStyleRenderer.getLabel(object, style);
       if (Property.hasValue(label) && geometry != null) {
-        final PointWithOrientation point = TextStyleRenderer.getTextLocation(
-          this, geometry, style);
+        final PointWithOrientation point = TextStyleRenderer.getTextLocation(this, geometry, style);
         if (point != null) {
           final double orientation = point.getOrientation();
 
@@ -271,8 +268,8 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
             final int descent = fontMetrics.getDescent();
             final int ascent = fontMetrics.getAscent();
             final int leading = fontMetrics.getLeading();
-            final double maxHeight = lines.length * (ascent + descent)
-                + (lines.length - 1) * leading;
+            final double maxHeight = lines.length * (ascent + descent) + (lines.length - 1)
+              * leading;
             final String verticalAlignment = style.getTextVerticalAlignment();
             if ("top".equals(verticalAlignment)) {
             } else if ("middle".equals(verticalAlignment)) {
@@ -316,8 +313,7 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
 
             for (final String line : lines) {
               transform.translate(0, ascent);
-              final AffineTransform lineTransform = new AffineTransform(
-                transform);
+              final AffineTransform lineTransform = new AffineTransform(transform);
               final Rectangle2D bounds = fontMetrics.getStringBounds(line,
                 this.canvas.getGraphics());
               final double width = bounds.getWidth();
@@ -359,8 +355,8 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
                 // RoundRectangle2D.Double(
                 // bounds.getX() - 3, bounds.getY() - 1, width + 6, height + 2,
                 // cornerSize, cornerSize);
-                this.contentStream.fillRect((float)bounds.getX() - 3,
-                  (float)bounds.getY() - 1, (float)width + 6, (float)height + 2);
+                this.contentStream.fillRect((float)bounds.getX() - 3, (float)bounds.getY() - 1,
+                  (float)width + 6, (float)height + 2);
               }
               this.contentStream.setNonStrokingColor(style.getTextFill());
 
@@ -397,8 +393,7 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
   }
 
   @Override
-  public boolean isHidden(final AbstractRecordLayer layer,
-    final LayerRecord record) {
+  public boolean isHidden(final AbstractRecordLayer layer, final LayerRecord record) {
     return false;
   }
 
@@ -429,44 +424,41 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
         for (int i = 0; i < dashArray.length; i++) {
           if (i < lineDashArray.size()) {
             final Double dashDouble = lineDashArray.get(i);
-            final Measure<Length> dashMeasure = Measure.valueOf(dashDouble,
-              unit);
+            final Measure<Length> dashMeasure = Measure.valueOf(dashDouble, unit);
             final float dashFloat = (float)toDisplayValue(dashMeasure);
             dashArray[i] = dashFloat;
           } else {
             dashArray[i] = dashArray[i - 1];
           }
         }
-        final int offset = (int)toDisplayValue(Measure.valueOf(
-          style.getLineDashOffset(), unit));
+        final int offset = (int)toDisplayValue(Measure.valueOf(style.getLineDashOffset(), unit));
         final COSArray dashCosArray = new COSArray();
         dashCosArray.setFloatArray(dashArray);
-        final PDLineDashPattern pattern = new PDLineDashPattern(dashCosArray,
-          offset);
+        final PDLineDashPattern pattern = new PDLineDashPattern(dashCosArray, offset);
         graphicsState.setLineDashPattern(pattern);
       }
       switch (style.getLineCap()) {
         case BUTT:
           graphicsState.setLineCapStyle(0);
-          break;
+        break;
         case ROUND:
           graphicsState.setLineCapStyle(1);
-          break;
+        break;
         case SQUARE:
           graphicsState.setLineCapStyle(2);
-          break;
+        break;
       }
 
       switch (style.getLineJoin()) {
         case MITER:
           graphicsState.setLineJoinStyle(0);
-          break;
+        break;
         case ROUND:
           graphicsState.setLineJoinStyle(1);
-          break;
+        break;
         case BEVEL:
           graphicsState.setLineJoinStyle(2);
-          break;
+        break;
       }
 
       final int polygonFillOpacity = style.getPolygonFillOpacity();

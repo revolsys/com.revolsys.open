@@ -19,13 +19,12 @@ public class CompareFilterFactory implements Factory<Filter<Record>, Record> {
   public Filter<Record> create(final Record object) {
     final AndFilter<Record> filters = new AndFilter<Record>();
     if (!this.equalFieldNames.isEmpty()) {
-      final Filter<Record> valuesFilter = new AttributesEqualFilter(object,
-        this.equalFieldNames);
+      final Filter<Record> valuesFilter = new AttributesEqualFilter(object, this.equalFieldNames);
       filters.addFilter(valuesFilter);
     }
     if (!this.equalOrNullFieldNames.isEmpty()) {
-      final Filter<Record> valuesFilter = new AttributesEqualOrNullFilter(
-        object, this.equalOrNullFieldNames);
+      final Filter<Record> valuesFilter = new AttributesEqualOrNullFilter(object,
+        this.equalOrNullFieldNames);
       filters.addFilter(valuesFilter);
     }
 

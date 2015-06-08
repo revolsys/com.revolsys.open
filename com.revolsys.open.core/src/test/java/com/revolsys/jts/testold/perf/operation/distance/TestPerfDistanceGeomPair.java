@@ -10,13 +10,13 @@ import com.revolsys.jts.util.Stopwatch;
 
 public class TestPerfDistanceGeomPair {
 
+  static final int MAX_ITER = 100;
+
   public static void main(final String[] args) {
     final TestPerfDistanceGeomPair test = new TestPerfDistanceGeomPair();
     // test.test();
     test.test2();
   }
-
-  static final int MAX_ITER = 100;
 
   boolean testFailed = false;
 
@@ -50,8 +50,7 @@ public class TestPerfDistanceGeomPair {
 
     final Polygon gRect = gsf.createCircle();
 
-    gsf.setCentre(new PointDouble((double)0, this.separationDist,
-      Point.NULL_ORDINATE));
+    gsf.setCentre(new PointDouble((double)0, this.separationDist, Point.NULL_ORDINATE));
 
     final Polygon gRect2 = gsf.createCircle();
 
@@ -69,8 +68,7 @@ public class TestPerfDistanceGeomPair {
 
     final Geometry g = gsf.createSineStar().getBoundary();
 
-    gsf.setCentre(new PointDouble((double)0, this.separationDist,
-      Point.NULL_ORDINATE));
+    gsf.setCentre(new PointDouble((double)0, this.separationDist, Point.NULL_ORDINATE));
 
     final Geometry g2 = gsf.createSineStar().getBoundary();
 

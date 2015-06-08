@@ -10,15 +10,15 @@ import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.distance3d.Distance3DOp;
 
 public class Distance3DOpTest extends TestCase {
-  public static void main(final String args[]) {
-    TestRunner.run(Distance3DOpTest.class);
-  }
-
   static GeometryFactory geomFact = GeometryFactory.floating3();
 
   static WKTReader rdr = new WKTReader();
 
-  String polyHoleFlat = "POLYGON ((100 200 0, 200 200 0, 200 100 0, 100 100 0, 100 200 0), (120 180 0, 180 180 0, 180 120 0, 120 120 0, 120 180 0))";
+  private static final double DIST_TOLERANCE = 0.00001;
+
+  public static void main(final String args[]) {
+    TestRunner.run(Distance3DOpTest.class);
+  }
 
   /*
    * public void testTest() { checkDistance(
@@ -27,28 +27,27 @@ public class Distance3DOpTest extends TestCase {
    * 70.71067811865476); testLinePolygonFlat(); }
    */
 
-  String poly2HoleFlat = "POLYGON ((100 200 0, 200 200 0, 200 100 0, 100 100 0, 100 200 0), (110 110 0, 110 130 0, 130 130 0, 130 110 0, 110 110 0), (190 110 0, 170 110 0, 170 130 0, 190 130 0, 190 110 0))";
+  String polyHoleFlat = "POLYGON ((100 200 0, 200 200 0, 200 100 0, 100 100 0, 100 200 0), (120 180 0, 180 180 0, 180 120 0, 120 120 0, 120 180 0))";
 
-  private static final double DIST_TOLERANCE = 0.00001;
+  String poly2HoleFlat = "POLYGON ((100 200 0, 200 200 0, 200 100 0, 100 100 0, 100 200 0), (110 110 0, 110 130 0, 130 130 0, 130 110 0, 110 110 0), (190 110 0, 170 110 0, 170 130 0, 190 130 0, 190 110 0))";
 
   public Distance3DOpTest(final String name) {
     super(name);
   }
 
-  private void checkDistance(final Geometry g1, final Geometry g2,
-    final double expectedDistance, final double tolerance) {
+  private void checkDistance(final Geometry g1, final Geometry g2, final double expectedDistance,
+    final double tolerance) {
     final Distance3DOp distOp = new Distance3DOp(g1, g2);
     final double dist = distOp.distance();
     assertEquals(expectedDistance, dist, tolerance);
   }
 
-  private void checkDistance(final String wkt1, final String wkt2,
-    final double expectedDistance) {
+  private void checkDistance(final String wkt1, final String wkt2, final double expectedDistance) {
     checkDistance(wkt1, wkt2, expectedDistance, DIST_TOLERANCE);
   }
 
-  private void checkDistance(final String wkt1, final String wkt2,
-    final double expectedDistance, final double tolerance) {
+  private void checkDistance(final String wkt1, final String wkt2, final double expectedDistance,
+    final double tolerance) {
     Geometry g1;
     Geometry g2;
     try {
@@ -67,19 +66,14 @@ public class Distance3DOpTest extends TestCase {
   }
 
   public void testCrossSegments() {
-    checkDistance("LINESTRING (0 0 0, 10 10 0 )",
-      "LINESTRING (10 0 1, 0 10 1 )", 1);
-    checkDistance("LINESTRING (0 0 0, 20 20 0 )",
-      "LINESTRING (10 0 1, 0 10 1 )", 1);
-    checkDistance("LINESTRING (20 10 20, 10 20 10 )",
-      "LINESTRING (10 10 20, 20 20 10 )", 0);
+    checkDistance("LINESTRING (0 0 0, 10 10 0 )", "LINESTRING (10 0 1, 0 10 1 )", 1);
+    checkDistance("LINESTRING (0 0 0, 20 20 0 )", "LINESTRING (10 0 1, 0 10 1 )", 1);
+    checkDistance("LINESTRING (20 10 20, 10 20 10 )", "LINESTRING (10 10 20, 20 20 10 )", 0);
   }
 
   public void testCrossSegmentsFlat() {
-    checkDistance("LINESTRING (0 0 0, 10 10 0 )",
-      "LINESTRING (10 0 0, 0 10 0 )", 0);
-    checkDistance("LINESTRING (0 0 10, 30 10 10 )",
-      "LINESTRING (10 0 10, 0 10 10 )", 0);
+    checkDistance("LINESTRING (0 0 0, 10 10 0 )", "LINESTRING (10 0 0, 0 10 0 )", 0);
+    checkDistance("LINESTRING (0 0 10, 30 10 10 )", "LINESTRING (10 0 10, 0 10 10 )", 0);
   }
 
   /**
@@ -144,8 +138,7 @@ public class Distance3DOpTest extends TestCase {
     // line crossing interior
     checkDistance("LINESTRING (110 110 10, 110 110 -10)", this.polyHoleFlat, 0);
     // vertical line above hole
-    checkDistance("LINESTRING (130 130 10, 150 150 100)", this.polyHoleFlat,
-      14.14213562373095);
+    checkDistance("LINESTRING (130 130 10, 150 150 100)", this.polyHoleFlat, 14.14213562373095);
     // vertical line touching hole
     checkDistance("LINESTRING (120 180 0, 120 180 100)", this.polyHoleFlat, 0);
   }
@@ -191,25 +184,23 @@ public class Distance3DOpTest extends TestCase {
 
   public void testParallelSegments() {
     checkDistance("LINESTRING (0 0 0, 1 0 0 )", "LINESTRING (0 0 1, 1 0 1 )", 1);
-    checkDistance("LINESTRING (10 10 0, 20 10 0 )",
-      "LINESTRING (10 20 10, 20 20 10 )", 14.142135623730951);
-    checkDistance("LINESTRING (10 10 0, 20 20 0 )",
-      "LINESTRING (10 20 10, 20 30 10 )", 12.24744871391589);
+    checkDistance("LINESTRING (10 10 0, 20 10 0 )", "LINESTRING (10 20 10, 20 20 10 )",
+      14.142135623730951);
+    checkDistance("LINESTRING (10 10 0, 20 20 0 )", "LINESTRING (10 20 10, 20 30 10 )",
+      12.24744871391589);
     // = distance from LINESTRING (10 10 0, 20 20 0 ) to POINT(10 20 10)
     // = hypotenuse(7.0710678118654755, 10)
   }
 
   public void testParallelSegmentsFlat() {
-    checkDistance("LINESTRING (10 10 0, 20 20 0 )",
-      "LINESTRING (10 20 0, 20 30 0 )", 7.0710678118654755);
+    checkDistance("LINESTRING (10 10 0, 20 20 0 )", "LINESTRING (10 20 0, 20 30 0 )",
+      7.0710678118654755);
   }
 
   public void testPartiallyEmpty() {
-    checkDistance("GEOMETRYCOLLECTION( MULTIPOINT (0 0 0), POLYGON EMPTY)",
-      "POINT (0 1 0)", 1);
+    checkDistance("GEOMETRYCOLLECTION( MULTIPOINT (0 0 0), POLYGON EMPTY)", "POINT (0 1 0)", 1);
     checkDistance("GEOMETRYCOLLECTION( MULTIPOINT (11 11 0), POLYGON EMPTY)",
-      "GEOMETRYCOLLECTION( MULTIPOINT EMPTY, LINESTRING (10 10 0, 10 20 0 ))",
-      1);
+      "GEOMETRYCOLLECTION( MULTIPOINT EMPTY, LINESTRING (10 10 0, 10 20 0 ))", 1);
   }
 
   public void testPointPoint() {
@@ -241,8 +232,7 @@ public class Distance3DOpTest extends TestCase {
       "POLYGON ((100 200 0, 200 200 0, 200 100 0, 100 100 0, 100 200 0))", 0);
     // outside
     checkDistance("POINT (250 250 0)",
-      "POLYGON ((100 200 0, 200 200 0, 200 100 0, 100 100 0, 100 200 0))",
-      70.71067811865476);
+      "POLYGON ((100 200 0, 200 200 0, 200 100 0, 100 100 0, 100 200 0))", 70.71067811865476);
     // on
     checkDistance("POINT (200 200 0)",
       "POLYGON ((100 200 0, 200 200 0, 200 100 0, 100 100 0, 100 200 0))", 0);
@@ -259,8 +249,7 @@ public class Distance3DOpTest extends TestCase {
 
   public void testPointSeg() {
     checkDistance("LINESTRING (0 0 0, 10 10 10 )", "POINT (5 5 5 )", 0);
-    checkDistance("LINESTRING (10 10 10, 20 20 20 )", "POINT (11 11 10 )",
-      0.816496580927726);
+    checkDistance("LINESTRING (10 10 10, 20 20 20 )", "POINT (11 11 10 )", 0.816496580927726);
   }
 
   // ==========================================================
@@ -272,10 +261,9 @@ public class Distance3DOpTest extends TestCase {
   }
 
   public void testPointSegRobust() {
-    checkDistance("LINESTRING (0 0 0, 10000000 10000000 1 )",
-      "POINT (9999999 9999999 .9999999 )", 0);
-    checkDistance("LINESTRING (0 0 0, 10000000 10000000 1 )",
-      "POINT (5000000 5000000 .5 )", 0);
+    checkDistance("LINESTRING (0 0 0, 10000000 10000000 1 )", "POINT (9999999 9999999 .9999999 )",
+      0);
+    checkDistance("LINESTRING (0 0 0, 10000000 10000000 1 )", "POINT (5000000 5000000 .5 )", 0);
   }
 
   /**
@@ -284,27 +272,22 @@ public class Distance3DOpTest extends TestCase {
    */
   public void testPolygonPolygonLinkedThruHoles() {
     // note distance is zero!
-    checkDistance(
-      this.// polygon with two holes
+    checkDistance(this.// polygon with two holes
       poly2HoleFlat,
       // polygon parallel to XZ plane with shell passing through holes in other
       // polygon
-      "POLYGON ((120 120 -10, 120 120 100, 180 120 100, 180 120 -10, 120 120 -10))",
-      0);
+      "POLYGON ((120 120 -10, 120 120 100, 180 120 100, 180 120 -10, 120 120 -10))", 0);
 
     // confirm that distance of simple poly boundary is non-zero
-    checkDistance(
-      this.// polygon with two holes
+    checkDistance(this.// polygon with two holes
       poly2HoleFlat,
       // boundary of polygon parallel to XZ plane with shell passing through
       // holes
-      "LINESTRING (120 120 -10, 120 120 100, 180 120 100, 180 120 -10, 120 120 -10)",
-      10);
+      "LINESTRING (120 120 -10, 120 120 100, 180 120 100, 180 120 -10, 120 120 -10)", 10);
   }
 
   public void testTSegmentsFlat() {
-    checkDistance("LINESTRING (10 10 0, 10 20 0 )",
-      "LINESTRING (20 15 0, 25 15 0 )", 10);
+    checkDistance("LINESTRING (10 10 0, 10 20 0 )", "LINESTRING (20 15 0, 25 15 0 )", 10);
   }
 
 }

@@ -77,20 +77,21 @@ public class GeometricShapeFactory {
 
     public Point getCentre() {
       if (this.centre == null) {
-        this.centre = new PointDouble(this.base.getX() + this.width / 2, this.base.getY() + this.height
-          / 2, Point.NULL_ORDINATE);
+        this.centre = new PointDouble(this.base.getX() + this.width / 2, this.base.getY()
+          + this.height / 2, Point.NULL_ORDINATE);
       }
       return this.centre;
     }
 
     public BoundingBox getEnvelope() {
       if (this.base != null) {
-        return new BoundingBoxDoubleGf(2, this.base.getX(), this.base.getY(), this.base.getX() + this.width,
-          this.base.getY() + this.height);
+        return new BoundingBoxDoubleGf(2, this.base.getX(), this.base.getY(), this.base.getX()
+          + this.width, this.base.getY() + this.height);
       }
       if (this.centre != null) {
         return new BoundingBoxDoubleGf(2, this.centre.getX() - this.width / 2, this.centre.getY()
-          - this.height / 2, this.centre.getX() + this.width / 2, this.centre.getY() + this.height / 2);
+          - this.height / 2, this.centre.getX() + this.width / 2, this.centre.getY() + this.height
+          / 2);
       }
       return new BoundingBoxDoubleGf(2, 0, 0, this.width, this.height);
     }
@@ -167,13 +168,12 @@ public class GeometricShapeFactory {
   }
 
   protected Point coord(final double x, final double y) {
-    final Point point = new PointDouble(this.geomFact.makePrecise(0, x),
-      this.geomFact.makePrecise(1, y));
+    final Point point = new PointDouble(this.geomFact.makePrecise(0, x), this.geomFact.makePrecise(
+      1, y));
     return point;
   }
 
-  protected Point coordTrans(final double x, final double y,
-    final Point trans) {
+  protected Point coordTrans(final double x, final double y, final Point trans) {
     return coord(x + trans.getX(), y + trans.getY());
   }
 
@@ -411,8 +411,8 @@ public class GeometricShapeFactory {
 
   protected Geometry rotate(final Geometry geom) {
     if (this.rotationAngle != 0.0) {
-      final AffineTransformation trans = AffineTransformation.rotationInstance(
-        this.rotationAngle, this.dim.getCentre().getX(), this.dim.getCentre().getY());
+      final AffineTransformation trans = AffineTransformation.rotationInstance(this.rotationAngle,
+        this.dim.getCentre().getX(), this.dim.getCentre().getY());
       trans.transform(geom);
     }
     return geom;

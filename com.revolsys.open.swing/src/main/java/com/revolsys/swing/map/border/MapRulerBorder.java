@@ -35,10 +35,33 @@ import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.Property;
 
-public class MapRulerBorder extends AbstractBorder implements
-PropertyChangeListener {
-  public static <U extends Quantity> List<Unit<U>> createSteps(
-    final Unit<U>... steps) {
+public class MapRulerBorder extends AbstractBorder implements PropertyChangeListener {
+  /**
+   *
+   */
+  private static final long serialVersionUID = -3070841484052913548L;
+
+  private static final List<Unit<Angle>> METRIC_GEOGRAPHICS_STEPS = createSteps(NonSI.DEGREE_ANGLE,
+    30, 10, 1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10, 1e-11, 1e-12, 1e-13,
+    1e-14, 1e-15);
+
+  private static final List<Unit<Length>> METRIC_PROJECTED_STEPS = createSteps(SI.METRE, 1e8, 1e7,
+    1e6, 1e5, 1e4, 1e3, 1e2, 1e1, 1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10,
+    1e-11, 1e-12, 1e-13, 1e-14, 1e-15);
+
+  private static final List<Unit<Length>> IMPERIAL_PROJECTED_STEPS = createSteps(
+    NonSI.MILE.times(1000), NonSI.MILE.times(100), NonSI.MILE.times(10), NonSI.MILE,
+    NonSI.MILE.divide(16), NonSI.MILE.divide(32), NonSI.FOOT, NonSI.INCH);
+
+  private static final List<Unit<Length>> IMPERIAL_MILE_STEPS = createSteps(NonSI.MILE.times(1000),
+    NonSI.MILE.times(100), NonSI.MILE.times(10), NonSI.MILE, NonSI.MILE.divide(10),
+    NonSI.MILE.divide(100));
+
+  private static final List<Unit<Length>> IMPERIAL_FOOT_STEPS = createSteps(
+    NonSI.FOOT.times(1000000), NonSI.FOOT.times(100000), NonSI.FOOT.times(10000),
+    NonSI.FOOT.times(1000), NonSI.FOOT.times(100), NonSI.FOOT.times(10), NonSI.FOOT);
+
+  public static <U extends Quantity> List<Unit<U>> createSteps(final Unit<U>... steps) {
     final List<Unit<U>> stepList = new ArrayList<Unit<U>>();
     for (final Unit<U> step : steps) {
       stepList.add(step);
@@ -54,8 +77,8 @@ PropertyChangeListener {
    * @param steps The list of steps.
    * @return The list of step measures.
    */
-  public static <U extends Quantity> List<Unit<U>> createSteps(
-    final Unit<U> unit, final double... steps) {
+  public static <U extends Quantity> List<Unit<U>> createSteps(final Unit<U> unit,
+    final double... steps) {
     final List<Unit<U>> stepList = new ArrayList<Unit<U>>();
     for (final double step : steps) {
       if (step == 1) {
@@ -68,34 +91,6 @@ PropertyChangeListener {
   }
 
   private final int rulerSize = 25;
-
-  /**
-   *
-   */
-  private static final long serialVersionUID = -3070841484052913548L;
-
-  private static final List<Unit<Angle>> METRIC_GEOGRAPHICS_STEPS = createSteps(
-    NonSI.DEGREE_ANGLE, 30, 10, 1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7,
-    1e-8, 1e-9, 1e-10, 1e-11, 1e-12, 1e-13, 1e-14, 1e-15);
-
-  private static final List<Unit<Length>> METRIC_PROJECTED_STEPS = createSteps(
-    SI.METRE, 1e8, 1e7, 1e6, 1e5, 1e4, 1e3, 1e2, 1e1, 1, 1e-1, 1e-2, 1e-3,
-    1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10, 1e-11, 1e-12, 1e-13, 1e-14,
-    1e-15);
-
-  private static final List<Unit<Length>> IMPERIAL_PROJECTED_STEPS = createSteps(
-    NonSI.MILE.times(1000), NonSI.MILE.times(100), NonSI.MILE.times(10),
-    NonSI.MILE, NonSI.MILE.divide(16), NonSI.MILE.divide(32), NonSI.FOOT,
-    NonSI.INCH);
-
-  private static final List<Unit<Length>> IMPERIAL_MILE_STEPS = createSteps(
-    NonSI.MILE.times(1000), NonSI.MILE.times(100), NonSI.MILE.times(10),
-    NonSI.MILE, NonSI.MILE.divide(10), NonSI.MILE.divide(100));
-
-  private static final List<Unit<Length>> IMPERIAL_FOOT_STEPS = createSteps(
-    NonSI.FOOT.times(1000000), NonSI.FOOT.times(100000),
-    NonSI.FOOT.times(10000), NonSI.FOOT.times(1000), NonSI.FOOT.times(100),
-    NonSI.FOOT.times(10), NonSI.FOOT);
 
   private final Viewport2D viewport;
 
@@ -123,24 +118,21 @@ PropertyChangeListener {
     Property.addListener(viewport, "geometryFactory", this);
   }
 
-  private <Q extends Quantity> void drawLabel(final Graphics2D graphics,
-    final int textX, final int textY, final Unit<Q> displayUnit,
-    final double displayValue, final Unit<Q> scaleUnit) {
+  private <Q extends Quantity> void drawLabel(final Graphics2D graphics, final int textX,
+    final int textY, final Unit<Q> displayUnit, final double displayValue, final Unit<Q> scaleUnit) {
     DecimalFormat format;
     if (displayValue - Math.floor(displayValue) == 0) {
       format = new DecimalFormat("#,###,###,###");
     } else {
       final StringBuilder formatString = new StringBuilder("#,###,###,###.");
-      final double stepSize = Measure.valueOf(1, scaleUnit).doubleValue(
-        displayUnit);
+      final double stepSize = Measure.valueOf(1, scaleUnit).doubleValue(displayUnit);
       final int numZeros = (int)Math.abs(Math.round(Math.log10(stepSize % 1.0)));
       for (int j = 0; j < numZeros; j++) {
         formatString.append("0");
       }
       format = new DecimalFormat(formatString.toString());
     }
-    final String label = String.valueOf(format.format(displayValue)
-      + displayUnit);
+    final String label = String.valueOf(format.format(displayValue) + displayUnit);
     graphics.setColor(Color.BLACK);
     graphics.drawString(label, textX, textY);
   }
@@ -151,8 +143,7 @@ PropertyChangeListener {
    */
   @Override
   public Insets getBorderInsets(final Component c) {
-    return new Insets(this.rulerSize, this.rulerSize, this.rulerSize,
-      this.rulerSize);
+    return new Insets(this.rulerSize, this.rulerSize, this.rulerSize, this.rulerSize);
   }
 
   /**
@@ -190,21 +181,19 @@ PropertyChangeListener {
     return steps.size() - 1;
   }
 
-  private void paintBackground(final Graphics2D g, final int x, final int y,
-    final int width, final int height) {
+  private void paintBackground(final Graphics2D g, final int x, final int y, final int width,
+    final int height) {
     g.setColor(Color.WHITE);
     g.fillRect(x, y, this.rulerSize - 1, height); // left
-    g.fillRect(x + width - this.rulerSize + 1, y, this.rulerSize - 1,
-      height - 1); // right
-    g.fillRect(x + this.rulerSize - 1, y, width - 2 * this.rulerSize + 2,
-      this.rulerSize - 1); // top
-    g.fillRect(x + this.rulerSize - 1, y + height - this.rulerSize + 1, width
-      - 2 * this.rulerSize + 2, this.rulerSize - 1); // bottom
+    g.fillRect(x + width - this.rulerSize + 1, y, this.rulerSize - 1, height - 1); // right
+    g.fillRect(x + this.rulerSize - 1, y, width - 2 * this.rulerSize + 2, this.rulerSize - 1); // top
+    g.fillRect(x + this.rulerSize - 1, y + height - this.rulerSize + 1, width - 2 * this.rulerSize
+      + 2, this.rulerSize - 1); // bottom
   }
 
   @Override
-  public void paintBorder(final Component c, final Graphics g, final int x,
-    final int y, final int width, final int height) {
+  public void paintBorder(final Component c, final Graphics g, final int x, final int y,
+    final int width, final int height) {
     final Graphics2D graphics = (Graphics2D)g;
 
     graphics.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
@@ -216,29 +205,28 @@ PropertyChangeListener {
     final BoundingBox boundingBox = this.viewport.getBoundingBox();
     if (this.rulerCoordinateSystem instanceof GeographicCoordinateSystem) {
       final Unit<Angle> displayUnit = NonSI.DEGREE_ANGLE;
-      paintRuler(graphics, boundingBox, displayUnit, METRIC_GEOGRAPHICS_STEPS,
-        true, x, y, width, height);
+      paintRuler(graphics, boundingBox, displayUnit, METRIC_GEOGRAPHICS_STEPS, true, x, y, width,
+        height);
     } else if (this.rulerCoordinateSystem instanceof ProjectedCoordinateSystem) {
       if (this.baseUnit.equals(NonSI.FOOT)) {
         final Unit<Length> displayUnit = NonSI.FOOT;
-        paintRuler(graphics, boundingBox, displayUnit, IMPERIAL_FOOT_STEPS,
-          true, x, y, width, height);
+        paintRuler(graphics, boundingBox, displayUnit, IMPERIAL_FOOT_STEPS, true, x, y, width,
+          height);
       } else {
         final BaseUnit<Length> displayUnit = SI.METRE;
-        paintRuler(graphics, boundingBox, displayUnit, METRIC_PROJECTED_STEPS,
-          true, x, y, width, height);
+        paintRuler(graphics, boundingBox, displayUnit, METRIC_PROJECTED_STEPS, true, x, y, width,
+          height);
       }
     }
     graphics.setColor(Color.BLACK);
-    graphics.drawRect(this.rulerSize - 1, this.rulerSize - 1, width - 2
-      * this.rulerSize + 1, height - 2 * this.rulerSize + 1);
+    graphics.drawRect(this.rulerSize - 1, this.rulerSize - 1, width - 2 * this.rulerSize + 1,
+      height - 2 * this.rulerSize + 1);
 
   }
 
   private <Q extends Quantity> void paintHorizontalRuler(final Graphics2D g,
-    final BoundingBox boundingBox, final Unit<Q> displayUnit,
-    final List<Unit<Q>> steps, final int x, final int y, final int width,
-    final int height, final boolean top) {
+    final BoundingBox boundingBox, final Unit<Q> displayUnit, final List<Unit<Q>> steps,
+    final int x, final int y, final int width, final int height, final boolean top) {
 
     final AffineTransform transform = g.getTransform();
     final Shape clip = g.getClip();
@@ -258,8 +246,7 @@ PropertyChangeListener {
         textY = this.rulerSize - 3;
         y0 = boundingBox.getMinY();
       }
-      line = new LineSegmentDoubleGF(boundingBox.getGeometryFactory(), 2, x1,
-        y0, x2, y0);
+      line = new LineSegmentDoubleGF(boundingBox.getGeometryFactory(), 2, x1, y0, x2, y0);
 
       line = line.convert(this.rulerGeometryFactory);
 
@@ -275,8 +262,7 @@ PropertyChangeListener {
 
       if (mapSize > 0) {
         final Unit<Q> screenToModelUnit = this.viewport.getViewToModelUnit(this.baseUnit);
-        final Measure<Q> modelUnitsPer6ViewUnits = Measure.valueOf(6,
-          screenToModelUnit);
+        final Measure<Q> modelUnitsPer6ViewUnits = Measure.valueOf(6, screenToModelUnit);
         final int stepLevel = getStepLevel(steps, modelUnitsPer6ViewUnits);
         final Unit<Q> stepUnit = steps.get(stepLevel);
         final double step = toBaseUnit(Measure.valueOf(1, stepUnit));
@@ -305,15 +291,13 @@ PropertyChangeListener {
             if (Math.abs(stepValue - Math.round(stepValue)) < 0.000001) {
               barSize = 4 + (int)((this.rulerSize - 4) * (((double)stepLevel - i) / stepLevel));
               found = true;
-              drawLabel(g, pixel + 3, textY, displayUnit, displayValue,
-                scaleUnit);
+              drawLabel(g, pixel + 3, textY, displayUnit, displayValue, scaleUnit);
             }
 
           }
 
           if (top) {
-            g.drawLine(pixel, this.rulerSize - 1 - barSize, pixel,
-              this.rulerSize - 1);
+            g.drawLine(pixel, this.rulerSize - 1 - barSize, pixel, this.rulerSize - 1);
           } else {
             g.drawLine(pixel, 0, pixel, barSize);
           }
@@ -327,26 +311,20 @@ PropertyChangeListener {
     }
   }
 
-  private <Q extends Quantity> void paintRuler(final Graphics2D g,
-    final BoundingBox boundingBox, final Unit<Q> displayUnit,
-    final List<Unit<Q>> steps, final boolean horizontal, final int x,
+  private <Q extends Quantity> void paintRuler(final Graphics2D g, final BoundingBox boundingBox,
+    final Unit<Q> displayUnit, final List<Unit<Q>> steps, final boolean horizontal, final int x,
     final int y, final int width, final int height) {
-    paintHorizontalRuler(g, boundingBox, displayUnit, steps, x, y, width,
-      height, true);
-    paintHorizontalRuler(g, boundingBox, displayUnit, steps, x, y, width,
-      height, false);
+    paintHorizontalRuler(g, boundingBox, displayUnit, steps, x, y, width, height, true);
+    paintHorizontalRuler(g, boundingBox, displayUnit, steps, x, y, width, height, false);
 
-    paintVerticalRuler(g, boundingBox, displayUnit, steps, x, y, width, height,
-      true);
-    paintVerticalRuler(g, boundingBox, displayUnit, steps, x, y, width, height,
-      false);
+    paintVerticalRuler(g, boundingBox, displayUnit, steps, x, y, width, height, true);
+    paintVerticalRuler(g, boundingBox, displayUnit, steps, x, y, width, height, false);
 
   }
 
   private <Q extends Quantity> void paintVerticalRuler(final Graphics2D g,
-    final BoundingBox boundingBox, final Unit<Q> displayUnit,
-    final List<Unit<Q>> steps, final int x, final int y, final int width,
-    final int height, final boolean left) {
+    final BoundingBox boundingBox, final Unit<Q> displayUnit, final List<Unit<Q>> steps,
+    final int x, final int y, final int width, final int height, final boolean left) {
 
     final AffineTransform transform = g.getTransform();
     final Shape clip = g.getClip();
@@ -365,13 +343,11 @@ PropertyChangeListener {
         textX = this.rulerSize - 3;
         x0 = boundingBox.getMaxX();
       }
-      line = new LineSegmentDoubleGF(boundingBox.getGeometryFactory(), 2, x0,
-        y1, x0, y2);
+      line = new LineSegmentDoubleGF(boundingBox.getGeometryFactory(), 2, x0, y1, x0, y2);
 
       line = line.convert(this.rulerGeometryFactory);
 
-      g.setClip(0, this.rulerSize * 2, this.rulerSize, height - 2
-        * this.rulerSize);
+      g.setClip(0, this.rulerSize * 2, this.rulerSize, height - 2 * this.rulerSize);
 
       final double mapSize = boundingBox.getHeight();
       final double viewSize = this.viewport.getViewHeightPixels();
@@ -383,8 +359,7 @@ PropertyChangeListener {
 
       if (mapSize > 0) {
         final Unit<Q> screenToModelUnit = this.viewport.getViewToModelUnit(this.baseUnit);
-        final Measure<Q> modelUnitsPer6ViewUnits = Measure.valueOf(6,
-          screenToModelUnit);
+        final Measure<Q> modelUnitsPer6ViewUnits = Measure.valueOf(6, screenToModelUnit);
         final int stepLevel = getStepLevel(steps, modelUnitsPer6ViewUnits);
         final Unit<Q> stepUnit = steps.get(stepLevel);
         final double step = toBaseUnit(Measure.valueOf(1, stepUnit));
@@ -426,8 +401,8 @@ PropertyChangeListener {
           }
 
           if (left) {
-            g.drawLine(this.rulerSize - 1 - barSize, height - pixel,
-              this.rulerSize - 1, height - pixel);
+            g.drawLine(this.rulerSize - 1 - barSize, height - pixel, this.rulerSize - 1, height
+              - pixel);
           } else {
             g.drawLine(0, height - pixel, barSize, height - pixel);
           }

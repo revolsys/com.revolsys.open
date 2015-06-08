@@ -14,10 +14,12 @@ import com.revolsys.jts.io.WKTReader;
 public class GeometryUtils {
   // TODO: allow specifying GeometryFactoryI
 
+  public static WKTReader reader = new WKTReader();
+
   public static boolean isEqual(final Geometry a, final Geometry b) {
     final Geometry a2 = normalize(a);
     final Geometry b2 = normalize(b);
-    return a2.equals(2,b2);
+    return a2.equals(2, b2);
   }
 
   public static Geometry normalize(final Geometry g) {
@@ -37,19 +39,15 @@ public class GeometryUtils {
     return geometries;
   }
 
-  public static Collection readWKTFile(final Reader rdr) throws IOException,
-  ParseException {
+  public static Collection readWKTFile(final Reader rdr) throws IOException, ParseException {
     final WKTFileReader fileRdr = new WKTFileReader(rdr, reader);
     final List geoms = fileRdr.read();
     return geoms;
   }
 
-  public static Collection readWKTFile(final String filename)
-      throws IOException, ParseException {
+  public static Collection readWKTFile(final String filename) throws IOException, ParseException {
     final WKTFileReader fileRdr = new WKTFileReader(filename, reader);
     final List geoms = fileRdr.read();
     return geoms;
   }
-
-  public static WKTReader reader = new WKTReader();
 }

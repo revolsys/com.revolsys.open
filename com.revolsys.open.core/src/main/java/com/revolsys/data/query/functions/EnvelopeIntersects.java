@@ -19,18 +19,15 @@ public class EnvelopeIntersects extends Condition {
 
   private QueryValue boundingBox2Value;
 
-  public EnvelopeIntersects(final QueryValue boundingBox1Value,
-    final QueryValue boundingBox2Value) {
+  public EnvelopeIntersects(final QueryValue boundingBox1Value, final QueryValue boundingBox2Value) {
     this.boundingBox1Value = boundingBox1Value;
     this.boundingBox2Value = boundingBox2Value;
   }
 
   @Override
   public boolean accept(final Map<String, Object> record) {
-    final BoundingBox boundingBox1 = getBoundingBox(this.boundingBox1Value,
-      record);
-    final BoundingBox boundingBox2 = getBoundingBox(this.boundingBox2Value,
-      record);
+    final BoundingBox boundingBox1 = getBoundingBox(this.boundingBox1Value, record);
+    final BoundingBox boundingBox2 = getBoundingBox(this.boundingBox2Value, record);
     if (boundingBox1 == null || boundingBox2 == null) {
       return false;
     } else {
@@ -39,8 +36,8 @@ public class EnvelopeIntersects extends Condition {
   }
 
   @Override
-  public void appendDefaultSql(final Query query,
-    final RecordStore recordStore, final StringBuilder buffer) {
+  public void appendDefaultSql(final Query query, final RecordStore recordStore,
+    final StringBuilder buffer) {
     buffer.append("ST_INTERSECTS(");
     if (this.boundingBox1Value == null) {
       buffer.append("NULL");
@@ -83,10 +80,8 @@ public class EnvelopeIntersects extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof EnvelopeIntersects) {
       final EnvelopeIntersects condition = (EnvelopeIntersects)obj;
-      if (EqualsRegistry.equal(condition.boundingBox1Value,
-        this.boundingBox1Value)) {
-        if (EqualsRegistry.equal(condition.boundingBox2Value,
-          this.boundingBox1Value)) {
+      if (EqualsRegistry.equal(condition.boundingBox1Value, this.boundingBox1Value)) {
+        if (EqualsRegistry.equal(condition.boundingBox2Value, this.boundingBox1Value)) {
           return true;
         }
       }
@@ -94,8 +89,7 @@ public class EnvelopeIntersects extends Condition {
     return false;
   }
 
-  private BoundingBox getBoundingBox(final QueryValue queryValue,
-    final Map<String, Object> record) {
+  private BoundingBox getBoundingBox(final QueryValue queryValue, final Map<String, Object> record) {
     if (queryValue == null) {
       return null;
     } else {
@@ -126,9 +120,8 @@ public class EnvelopeIntersects extends Condition {
 
   @Override
   public String toString() {
-    return "ST_INTERSECTS("
-        + StringConverterRegistry.toString(this.boundingBox1Value) + ","
-        + StringConverterRegistry.toString(this.boundingBox2Value) + ")";
+    return "ST_INTERSECTS(" + StringConverterRegistry.toString(this.boundingBox1Value) + ","
+      + StringConverterRegistry.toString(this.boundingBox2Value) + ")";
   }
 
 }

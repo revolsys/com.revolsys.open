@@ -8,6 +8,8 @@ import com.revolsys.jts.geom.Location;
 
 public class GeometryFactoryIndexedPointInAreaLocator extends IndexedPointInAreaLocator {
 
+  private static final String KEY = GeometryFactoryIndexedPointInAreaLocator.class.getName();
+
   public static GeometryFactoryIndexedPointInAreaLocator get(final Geometry geometry) {
     GeometryFactoryIndexedPointInAreaLocator locator = GeometryProperties.getGeometryProperty(
       geometry, KEY);
@@ -17,8 +19,6 @@ public class GeometryFactoryIndexedPointInAreaLocator extends IndexedPointInArea
     }
     return locator;
   }
-
-  private static final String KEY = GeometryFactoryIndexedPointInAreaLocator.class.getName();
 
   public GeometryFactoryIndexedPointInAreaLocator(final Geometry geometry) {
     super(geometry);

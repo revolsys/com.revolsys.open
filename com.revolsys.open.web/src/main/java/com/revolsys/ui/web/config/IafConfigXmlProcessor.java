@@ -41,15 +41,7 @@ import com.revolsys.ui.web.exception.PageNotFoundException;
 public class IafConfigXmlProcessor extends XmlProcessor {
   private static final Logger log = Logger.getLogger(IafConfigXmlProcessor.class);
 
-  private final ServletContext servletContext;
-
   private static final Map standardTypes = new HashMap();
-
-  private boolean child = false;
-
-  private Config config;
-
-  private final LinkedList pageStack = new LinkedList();
 
   static {
     standardTypes.put("int", Integer.class);
@@ -57,6 +49,14 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     standardTypes.put("boolean", Boolean.class);
     standardTypes.put("string", String.class);
   }
+
+  private final ServletContext servletContext;
+
+  private boolean child = false;
+
+  private Config config;
+
+  private final LinkedList pageStack = new LinkedList();
 
   public IafConfigXmlProcessor(final IafConfigXmlProcessor parent) {
     super("urn:x-revolsys-com:iaf:core:config");
@@ -73,8 +73,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     this.servletContext = (ServletContext)processorContext.getAttribute("javax.servlet.ServletContext");
   }
 
-  private boolean getBooleanAttribute(final XMLStreamReader parser,
-    final String name) {
+  private boolean getBooleanAttribute(final XMLStreamReader parser, final String name) {
     final String value = parser.getAttributeValue(null, name);
     if (value != null && (value.equals("yes") || value.equals("true"))) {
       return true;
@@ -114,8 +113,8 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return page;
   }
 
-  public ActionConfig processAction(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+  public ActionConfig processAction(final XMLStreamReader parser) throws XMLStreamException,
+    IOException {
     final String type = parser.getAttributeValue(null, "type");
     final String file = parser.getAttributeValue(null, "file");
     final ActionConfig action = new ActionConfig(this.config, type);
@@ -128,8 +127,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return action;
   }
 
-  public Area processArea(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+  public Area processArea(final XMLStreamReader parser) throws XMLStreamException, IOException {
     final String name = parser.getAttributeValue(null, "name");
     final String component = parser.getAttributeValue(null, "component");
     final Area area = new Area(name, component);
@@ -137,8 +135,8 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return area;
   }
 
-  public Argument processArgument(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+  public Argument processArgument(final XMLStreamReader parser) throws XMLStreamException,
+    IOException {
     final String name = parser.getAttributeValue(null, "name");
     final String typePath = parser.getAttributeValue(null, "type");
     final String defaultValue = parser.getAttributeValue(null, "default");
@@ -150,21 +148,19 @@ public class IafConfigXmlProcessor extends XmlProcessor {
           type = Class.forName(typePath);
         } catch (final ClassNotFoundException e) {
           log.error(e);
-          throw new RuntimeException("Type " + typePath + "could not be found",
-            e);
+          throw new RuntimeException("Type " + typePath + "could not be found", e);
         }
       }
     }
     final boolean required = getBooleanAttribute(parser, "required");
     final boolean inheritable = getBooleanAttribute(parser, "inheritable");
-    final Argument argument = new Argument(name, type, defaultValue, required,
-      inheritable);
+    final Argument argument = new Argument(name, type, defaultValue, required, inheritable);
     StaxUtils.skipSubTree(parser);
     return argument;
   }
 
-  public Attribute processAttribute(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+  public Attribute processAttribute(final XMLStreamReader parser) throws XMLStreamException,
+    IOException {
     final String name = parser.getAttributeValue(null, "name");
     final String typePath = parser.getAttributeValue(null, "type");
     final String value = parser.getAttributeValue(null, "value");
@@ -176,8 +172,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
           type = Class.forName(typePath);
         } catch (final ClassNotFoundException e) {
           log.error(e);
-          throw new RuntimeException("Type " + typePath + "could not be found",
-            e);
+          throw new RuntimeException("Type " + typePath + "could not be found", e);
         }
       }
     }
@@ -187,18 +182,16 @@ public class IafConfigXmlProcessor extends XmlProcessor {
       try {
         loader = Class.forName(loaderName);
       } catch (final ClassNotFoundException e) {
-        throw new RuntimeException("Loader " + loaderName
-          + "could not be found", e);
+        throw new RuntimeException("Loader " + loaderName + "could not be found", e);
       }
     }
     final String inheritableAttr = parser.getAttributeValue(null, "inheritable");
     boolean inheritable = false;
     if (inheritableAttr != null
-        && (inheritableAttr.equals("yes") || inheritableAttr.equals("true"))) {
+      && (inheritableAttr.equals("yes") || inheritableAttr.equals("true"))) {
       inheritable = true;
     }
-    final Attribute attribute = new Attribute(this.config, name, type, value,
-      inheritable, loader);
+    final Attribute attribute = new Attribute(this.config, name, type, value, inheritable, loader);
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
       final Object object = process(parser);
       if (object instanceof Parameter) {
@@ -209,8 +202,8 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return attribute;
   }
 
-  public Component processComponent(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+  public Component processComponent(final XMLStreamReader parser) throws XMLStreamException,
+    IOException {
     final String area = parser.getAttributeValue(null, "area");
     final String name = parser.getAttributeValue(null, "name");
     final String file = parser.getAttributeValue(null, "file");
@@ -233,19 +226,17 @@ public class IafConfigXmlProcessor extends XmlProcessor {
   }
 
   public ComponentInclude processComponentInclude(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+    throws XMLStreamException, IOException {
     final String name = parser.getAttributeValue(null, "name");
     final String area = parser.getAttributeValue(null, "area");
-    final Component component = (Component)this.config.getComponent(name)
-        .clone();
-    final ComponentInclude componentInclude = new ComponentInclude(area,
-      component);
+    final Component component = (Component)this.config.getComponent(name).clone();
+    final ComponentInclude componentInclude = new ComponentInclude(area, component);
     StaxUtils.skipSubTree(parser);
     return componentInclude;
   }
 
-  public Menu processDynamicMenu(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+  public Menu processDynamicMenu(final XMLStreamReader parser) throws XMLStreamException,
+    IOException {
     final String name = parser.getAttributeValue(null, "name");
     String pageRef = parser.getAttributeValue(null, "pageRef");
     String title = parser.getAttributeValue(null, "title");
@@ -276,8 +267,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
       final MenuItemLoader loader = (MenuItemLoader)loaderCons.newInstance(new Object[] {
         this.config
       });
-      final DynamicMenu menu = new DynamicMenu(name, title, url, anchor,
-        condition, loader);
+      final DynamicMenu menu = new DynamicMenu(name, title, url, anchor, condition, loader);
       while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
         final Object object = process(parser);
         if (object instanceof Property) {
@@ -298,12 +288,11 @@ public class IafConfigXmlProcessor extends XmlProcessor {
   }
 
   public ElementComponent processElementComponent(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+    throws XMLStreamException, IOException {
     final String area = parser.getAttributeValue(null, "area");
     final String name = parser.getAttributeValue(null, "name");
     final String attribute = parser.getAttributeValue(null, "attribute");
-    final ElementComponent component = new ElementComponent(area, name,
-      attribute);
+    final ElementComponent component = new ElementComponent(area, name, attribute);
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
       final Object object = process(parser);
       if (object instanceof ActionConfig) {
@@ -321,16 +310,15 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return component;
   }
 
-  public Field processField(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+  public Field processField(final XMLStreamReader parser) throws XMLStreamException, IOException {
     final String script = parser.getAttributeValue(null, "script");
     final Field field = new Field(script);
     StaxUtils.skipSubTree(parser);
     return field;
   }
 
-  public Config processIafConfig(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+  public Config processIafConfig(final XMLStreamReader parser) throws XMLStreamException,
+    IOException {
     final String basePath = parser.getAttributeValue(null, "basePath");
     if (!this.child) {
       this.config = new Config(this.servletContext, basePath);
@@ -352,8 +340,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return this.config;
   }
 
-  public Config processImport(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+  public Config processImport(final XMLStreamReader parser) throws XMLStreamException, IOException {
     final String resource = parser.getAttributeValue(null, "resource");
     if (resource != null) {
       final URL resourceUrl = getClass().getResource(resource);
@@ -372,7 +359,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
   }
 
   public JavaComponent processJavaComponent(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+    throws XMLStreamException, IOException {
     final String area = parser.getAttributeValue(null, "area");
     final String name = parser.getAttributeValue(null, "name");
     final String className = parser.getAttributeValue(null, "class");
@@ -397,8 +384,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return component;
   }
 
-  public Layout processLayout(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+  public Layout processLayout(final XMLStreamReader parser) throws XMLStreamException, IOException {
     final String areaName = parser.getAttributeValue(null, "area");
     final String name = parser.getAttributeValue(null, "name");
     final String file = parser.getAttributeValue(null, "file");
@@ -434,7 +420,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
   }
 
   public LayoutInclude processLayoutInclude(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+    throws XMLStreamException, IOException {
     final String name = parser.getAttributeValue(null, "name");
     final String area = parser.getAttributeValue(null, "area");
     final Layout layout = (Layout)this.config.getLayout(name).clone();
@@ -446,8 +432,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
         layout.setComponent(childInclude.getArea(), childInclude.getLayout());
       } else if (object instanceof ComponentInclude) {
         final ComponentInclude componentInclude = (ComponentInclude)object;
-        layout.setComponent(componentInclude.getArea(),
-          componentInclude.getComponent());
+        layout.setComponent(componentInclude.getArea(), componentInclude.getComponent());
       } else if (object instanceof Component) {
         final Component component = (Component)object;
         layout.setComponent(component.getArea(), component);
@@ -456,8 +441,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return layoutInclude;
   }
 
-  public Menu processMenu(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+  public Menu processMenu(final XMLStreamReader parser) throws XMLStreamException, IOException {
     final String name = parser.getAttributeValue(null, "name");
     String pageRef = parser.getAttributeValue(null, "pageRef");
     String title = parser.getAttributeValue(null, "title");
@@ -478,8 +462,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     try {
       menu = new Menu(name, title, url, anchor, condition);
     } catch (final Exception e) {
-      getContext().addError("Error creating menu item: " + e.getMessage(), e,
-        parser.getLocation());
+      getContext().addError("Error creating menu item: " + e.getMessage(), e, parser.getLocation());
     }
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
       final Object object = process(parser);
@@ -489,8 +472,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
         try {
           menu.addParameter((Parameter)object);
         } catch (final Exception e) {
-          getContext().addError(
-            "Error adding menu parameter: " + e.getMessage(), e,
+          getContext().addError("Error adding menu parameter: " + e.getMessage(), e,
             parser.getLocation());
         }
       } else if (object instanceof Property) {
@@ -500,8 +482,8 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return menu;
   }
 
-  public Menu processMenuInclude(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+  public Menu processMenuInclude(final XMLStreamReader parser) throws XMLStreamException,
+    IOException {
     final String refname = parser.getAttributeValue(null, "refname");
     final String name = parser.getAttributeValue(null, "name");
     Menu menu = this.config.getMenu(refname);
@@ -514,8 +496,8 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return menu;
   }
 
-  public MenuItem processMenuItem(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+  public MenuItem processMenuItem(final XMLStreamReader parser) throws XMLStreamException,
+    IOException {
     final String name = parser.getAttributeValue(null, "name");
     final String pageRef = parser.getAttributeValue(null, "pageRef");
     final String title = parser.getAttributeValue(null, "title");
@@ -525,14 +507,12 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     MenuItem menuItem = null;
     try {
       if (pageRef != null) {
-        menuItem = new PageRefMenuItem(name, title, pageRef.trim(), anchor,
-          condition);
+        menuItem = new PageRefMenuItem(name, title, pageRef.trim(), anchor, condition);
       } else {
         menuItem = new MenuItem(name, title, url, anchor, condition);
       }
     } catch (final Exception e) {
-      getContext().addError("Error creating menu item: " + e.getMessage(), e,
-        parser.getLocation());
+      getContext().addError("Error creating menu item: " + e.getMessage(), e, parser.getLocation());
       return null;
     }
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
@@ -541,8 +521,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
         try {
           menuItem.addParameter((Parameter)object);
         } catch (final Exception e) {
-          getContext().addError(
-            "Error creating menu item parameter: " + e.getMessage(), e,
+          getContext().addError("Error creating menu item parameter: " + e.getMessage(), e,
             parser.getLocation());
         }
       } else if (object instanceof Property) {
@@ -552,16 +531,14 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return menuItem;
   }
 
-  public OnLoad processOnLoad(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+  public OnLoad processOnLoad(final XMLStreamReader parser) throws XMLStreamException, IOException {
     final String script = parser.getAttributeValue(null, "script");
     final OnLoad onLoad = new OnLoad(script);
     StaxUtils.skipSubTree(parser);
     return onLoad;
   }
 
-  public Page processPage(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+  public Page processPage(final XMLStreamReader parser) throws XMLStreamException, IOException {
     final String name = parser.getAttributeValue(null, "name");
     final String title = parser.getAttributeValue(null, "title");
     final String path = parser.getAttributeValue(null, "path");
@@ -601,8 +578,8 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return page;
   }
 
-  public Parameter processParameter(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+  public Parameter processParameter(final XMLStreamReader parser) throws XMLStreamException,
+    IOException {
     final String name = parser.getAttributeValue(null, "name");
     final String value = parser.getAttributeValue(null, "value");
     final Parameter parameter = new Parameter(name, value);
@@ -610,8 +587,8 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return parameter;
   }
 
-  public Property processProperty(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+  public Property processProperty(final XMLStreamReader parser) throws XMLStreamException,
+    IOException {
     final String name = parser.getAttributeValue(null, "name");
     final String value = parser.getAttributeValue(null, "value");
     final Property property = new Property(name, value);
@@ -619,16 +596,14 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return property;
   }
 
-  public Script processScript(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+  public Script processScript(final XMLStreamReader parser) throws XMLStreamException, IOException {
     final String file = parser.getAttributeValue(null, "file");
     final Script script = new Script(file);
     StaxUtils.skipSubTree(parser);
     return script;
   }
 
-  public Style processStyle(final XMLStreamReader parser)
-      throws XMLStreamException, IOException {
+  public Style processStyle(final XMLStreamReader parser) throws XMLStreamException, IOException {
     final String file = parser.getAttributeValue(null, "file");
     final Style style = new Style(file);
     StaxUtils.skipSubTree(parser);

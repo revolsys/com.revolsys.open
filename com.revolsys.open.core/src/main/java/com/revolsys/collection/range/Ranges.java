@@ -62,9 +62,8 @@ public class Ranges {
           return create(fromLong, toLong);
         }
       } else {
-        throw new RangeInvalidException("Cannot create range from " + fromValue
-          + " (Long) and " + toValue + " ("
-          + Classes.className(toValue.getClass()) + ")");
+        throw new RangeInvalidException("Cannot create range from " + fromValue + " (Long) and "
+          + toValue + " (" + Classes.className(toValue.getClass()) + ")");
       }
     } else if (fromValue instanceof Character) {
       final char fromChar = (Character)fromValue;
@@ -73,13 +72,11 @@ public class Ranges {
         return create(fromChar, toChar);
       } else {
         throw new RangeInvalidException("Cannot create range from " + fromValue
-          + " (Character) and " + toValue + " ("
-          + Classes.className(toValue.getClass()) + ")");
+          + " (Character) and " + toValue + " (" + Classes.className(toValue.getClass()) + ")");
       }
     } else {
-      throw new RangeInvalidException("Cannot create range from " + fromValue
-        + " (String) and " + toValue + " ("
-        + Classes.className(toValue.getClass()) + ")");
+      throw new RangeInvalidException("Cannot create range from " + fromValue + " (String) and "
+        + toValue + " (" + Classes.className(toValue.getClass()) + ")");
     }
   }
 

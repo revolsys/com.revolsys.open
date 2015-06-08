@@ -6,12 +6,12 @@ import java.util.NoSuchElementException;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.vertex.Vertex;
 
-public class LineStringSegment extends AbstractSegment implements
-Iterator<Segment> {
+public class LineStringSegment extends AbstractSegment implements Iterator<Segment> {
   /**
    *
    */
   private static final long serialVersionUID = 1L;
+
   private int segmentIndex;
 
   public LineStringSegment(final LineString line, final int... segmentId) {

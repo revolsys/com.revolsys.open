@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -49,6 +48,7 @@ public class CommandLine {
   Vector optVec = new Vector(); // used to store options in order of entry
 
   char optionChar; // the char that indicates an option. Default is '/', which
+
   // is
   // NT Standard, but this causes problems on Unix systems, so
   // '-' should
@@ -138,8 +138,7 @@ public class CommandLine {
 
   }
 
-  void parseParams(final String[] args, final Vector params, int i,
-    final int expectedArgCount) {
+  void parseParams(final String[] args, final Vector params, int i, final int expectedArgCount) {
     params.clear();
     int count = 0;
     int expected = expectedArgCount;
@@ -152,8 +151,7 @@ public class CommandLine {
     if (expectedArgCount == OptionSpec.NARGS_ONE_OR_MORE) {
       expected = 999999999;
     }
-    while (i < args.length && count < expected
-        && args[i].charAt(0) != this.optionChar) {
+    while (i < args.length && count < expected && args[i].charAt(0) != this.optionChar) {
       params.addElement(args[i++]);
       count++;
     }

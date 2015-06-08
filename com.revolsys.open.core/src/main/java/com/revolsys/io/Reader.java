@@ -46,8 +46,7 @@ import com.revolsys.collection.Visitor;
  * @author Paul Austin
  * @param <T> The type of the item to read.
  */
-public interface Reader<T> extends Iterable<T>, ObjectWithProperties,
-AutoCloseable {
+public interface Reader<T> extends Iterable<T>, ObjectWithProperties, AutoCloseable {
   /**
    * Close the reader and all resources associated with it.
    */

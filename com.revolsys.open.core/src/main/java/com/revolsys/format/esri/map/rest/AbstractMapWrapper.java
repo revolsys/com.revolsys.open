@@ -59,8 +59,7 @@ public class AbstractMapWrapper {
     }
   }
 
-  public <T extends AbstractMapWrapper> List<T> getList(final Class<T> clazz,
-    final String name) {
+  public <T extends AbstractMapWrapper> List<T> getList(final Class<T> clazz, final String name) {
     final List<T> objects = new ArrayList<T>();
 
     final List<Map<String, Object>> maps = getValue(name);
@@ -77,8 +76,7 @@ public class AbstractMapWrapper {
     return objects;
   }
 
-  public <T extends AbstractMapWrapper> T getObject(final Class<T> clazz,
-    final String name) {
+  public <T extends AbstractMapWrapper> T getObject(final Class<T> clazz, final String name) {
     final Map<String, Object> values = getValue(name);
     if (values == null) {
       return null;

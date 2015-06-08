@@ -15,7 +15,9 @@ import com.revolsys.io.connection.AbstractConnectionRegistry;
 import com.revolsys.util.Property;
 
 public class RecordStoreConnectionRegistry extends
-AbstractConnectionRegistry<RecordStoreConnection> {
+  AbstractConnectionRegistry<RecordStoreConnection> {
+
+  private static final ThreadLocal<RecordStoreConnectionRegistry> threadRegistry = new ThreadLocal<RecordStoreConnectionRegistry>();
 
   public static RecordStoreConnectionRegistry getForThread() {
     return RecordStoreConnectionRegistry.threadRegistry.get();
@@ -28,19 +30,15 @@ AbstractConnectionRegistry<RecordStoreConnection> {
     return oldValue;
   }
 
-  private static final ThreadLocal<RecordStoreConnectionRegistry> threadRegistry = new ThreadLocal<RecordStoreConnectionRegistry>();
-
-  protected RecordStoreConnectionRegistry(
-    final RecordStoreConnectionManager connectionManager, final String name,
-    final boolean visible) {
+  protected RecordStoreConnectionRegistry(final RecordStoreConnectionManager connectionManager,
+    final String name, final boolean visible) {
     super(connectionManager, name);
     setVisible(visible);
     init();
   }
 
-  protected RecordStoreConnectionRegistry(
-    final RecordStoreConnectionManager connectionManager, final String name,
-    final Resource resource) {
+  protected RecordStoreConnectionRegistry(final RecordStoreConnectionManager connectionManager,
+    final String name, final Resource resource) {
     super(connectionManager, name);
     setDirectory(resource);
     init();
@@ -50,8 +48,8 @@ AbstractConnectionRegistry<RecordStoreConnection> {
     this(null, name, true);
   }
 
-  public RecordStoreConnectionRegistry(final String name,
-    final Resource resource, final boolean readOnly) {
+  public RecordStoreConnectionRegistry(final String name, final Resource resource,
+    final boolean readOnly) {
     super(null, name);
     setReadOnly(readOnly);
     setDirectory(resource);
@@ -59,8 +57,7 @@ AbstractConnectionRegistry<RecordStoreConnection> {
   }
 
   public void addConnection(final Map<String, Object> config) {
-    final RecordStoreConnection connection = new RecordStoreConnection(this,
-      null, config);
+    final RecordStoreConnection connection = new RecordStoreConnection(this, null, config);
     addConnection(connection);
   }
 
@@ -69,8 +66,7 @@ AbstractConnectionRegistry<RecordStoreConnection> {
   }
 
   public void addConnection(final String name, final RecordStore recordStore) {
-    final RecordStoreConnection connection = new RecordStoreConnection(this,
-      name, recordStore);
+    final RecordStoreConnection connection = new RecordStoreConnection(this, name, recordStore);
     addConnection(connection);
   }
 
@@ -82,16 +78,15 @@ AbstractConnectionRegistry<RecordStoreConnection> {
       name = FileUtil.getBaseName(recordStoreFile);
     }
     try {
-      final Map<String, Object> connectionProperties = Maps.get(
-        config, "connection", Collections.<String, Object> emptyMap());
+      final Map<String, Object> connectionProperties = Maps.get(config, "connection",
+        Collections.<String, Object> emptyMap());
       if (connectionProperties.isEmpty()) {
         LoggerFactory.getLogger(getClass()).error(
-          "Record store must include a 'connection' map property: "
-              + recordStoreFile);
+          "Record store must include a 'connection' map property: " + recordStoreFile);
         return null;
       } else {
-        final RecordStoreConnection recordStoreConnection = new RecordStoreConnection(
-          this, recordStoreFile.toString(), config);
+        final RecordStoreConnection recordStoreConnection = new RecordStoreConnection(this,
+          recordStoreFile.toString(), config);
         addConnection(name, recordStoreConnection);
         return recordStoreConnection;
       }

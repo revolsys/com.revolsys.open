@@ -49,8 +49,9 @@ import com.revolsys.jts.io.WKTReader;
  */
 public class LineSegmentTest extends TestCase {
 
-  public static boolean equalsTolerance(final Point p0,
-    final Point p1, final double tolerance) {
+  private static double ROOT2 = Math.sqrt(2);
+
+  public static boolean equalsTolerance(final Point p0, final Point p1, final double tolerance) {
     if (Math.abs(p0.getX() - p1.getX()) > tolerance) {
       return false;
     }
@@ -66,38 +67,34 @@ public class LineSegmentTest extends TestCase {
 
   WKTReader rdr = new WKTReader();
 
-  private static double ROOT2 = Math.sqrt(2);
-
   public LineSegmentTest(final String name) {
     super(name);
   }
 
-  void checkOffset(final double x0, final double y0, final double x1,
-    final double y1, final double segFrac, final double offset,
-    final double expectedX, final double expectedY) {
+  void checkOffset(final double x0, final double y0, final double x1, final double y1,
+    final double segFrac, final double offset, final double expectedX, final double expectedY) {
     final LineSegment seg = new LineSegmentDouble(2, x0, y0, x1, y1);
     final Point p = seg.pointAlongOffset(segFrac, offset);
 
-    assertTrue(equalsTolerance(new PointDouble(expectedX, expectedY,
-      Point.NULL_ORDINATE), p, 0.000001));
+    assertTrue(equalsTolerance(new PointDouble(expectedX, expectedY, Point.NULL_ORDINATE), p,
+      0.000001));
   }
 
-  void checkOrientationIndex(final double x0, final double y0, final double x1,
-    final double y1, final double px, final double py, final int expectedOrient) {
+  void checkOrientationIndex(final double x0, final double y0, final double x1, final double y1,
+    final double px, final double py, final int expectedOrient) {
     final LineSegment seg = new LineSegmentDouble(2, x0, y0, x1, y1);
     checkOrientationIndex(seg, px, py, expectedOrient);
   }
 
-  void checkOrientationIndex(final LineSegment seg, final double s0x,
-    final double s0y, final double s1x, final double s1y,
-    final int expectedOrient) {
+  void checkOrientationIndex(final LineSegment seg, final double s0x, final double s0y,
+    final double s1x, final double s1y, final int expectedOrient) {
     final LineSegment seg2 = new LineSegmentDouble(2, s0x, s0y, s1x, s1y);
     final int orient = seg.orientationIndex(seg2);
     assertTrue(orient == expectedOrient);
   }
 
-  void checkOrientationIndex(final LineSegment seg, final double px,
-    final double py, final int expectedOrient) {
+  void checkOrientationIndex(final LineSegment seg, final double px, final double py,
+    final int expectedOrient) {
     final Point p = new PointDouble(px, py, Point.NULL_ORDINATE);
     final int orient = seg.orientationIndex(p);
     assertTrue(orient == expectedOrient);
@@ -148,12 +145,10 @@ public class LineSegmentTest extends TestCase {
   public void testProjectionFactor() {
     // zero-length line
     final LineSegment seg = new LineSegmentDouble(2, 10, 0, 10, 0);
-    assertTrue(Double.isNaN(seg.projectionFactor(new PointDouble(11.0, 0,
-      Point.NULL_ORDINATE))));
+    assertTrue(Double.isNaN(seg.projectionFactor(new PointDouble(11.0, 0, Point.NULL_ORDINATE))));
 
     final LineSegment seg2 = new LineSegmentDouble(2, 10, 0, 20, 0);
-    assertTrue(seg2.projectionFactor(new PointDouble(11.0, 0,
-      Point.NULL_ORDINATE)) == 0.1);
+    assertTrue(seg2.projectionFactor(new PointDouble(11.0, 0, Point.NULL_ORDINATE)) == 0.1);
 
   }
 

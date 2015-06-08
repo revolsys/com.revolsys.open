@@ -30,45 +30,13 @@ public class NodeRemovalVisitor implements Visitor<Node<Record>> {
 
   private final RecordGraph graph;
 
-  public NodeRemovalVisitor(final RecordDefinition recordDefinition,
-    final RecordGraph graph, final Collection<String> excludedAttributes) {
+  public NodeRemovalVisitor(final RecordDefinition recordDefinition, final RecordGraph graph,
+    final Collection<String> excludedAttributes) {
     super();
     this.graph = graph;
     if (excludedAttributes != null) {
       this.excludedAttributes.addAll(excludedAttributes);
     }
-  }
-
-  /**
-   * Check the direction of the edge by checking following the edge to the TO
-   * node until the degree of the node != 2 of the next edge is reversed.
-   *
-   * @param node
-   * @param edge The edge.
-   * @return The type of edge.
-   */
-  private EdgeType checkDirection(final Node<Record> node,
-    final Edge<Record> edge) {
-    final Node<Record> toNode = edge.getToNode();
-    final int degree = toNode.getDegree();
-    if (degree == 1) {
-      return EdgeType.END_DEGREE_1;
-    } else if (degree == 2) {
-      final Edge<Record> nextEdge = toNode.getNextEdge(edge);
-      if (nextEdge.isForwards(toNode) == edge.isForwards(toNode)) {
-        return EdgeType.BACKWARDS;
-      } else {
-        final EdgeType nextDirection = checkDirection(toNode, nextEdge);
-        if (nextDirection == EdgeType.BACKWARDS) {
-          return EdgeType.BACKWARDS;
-        } else {
-          return EdgeType.FORWARDS;
-        }
-      }
-    } else {
-      return EdgeType.END_DEGREE_N;
-    }
-
   }
 
   @Override
@@ -81,8 +49,7 @@ public class NodeRemovalVisitor implements Visitor<Node<Record>> {
         if (edge1 != edge2) {
           final Record object1 = edge1.getObject();
           final Record object2 = edge2.getObject();
-          if (EqualsInstance.INSTANCE.equals(object1, object2,
-            this.excludedAttributes)) {
+          if (EqualsInstance.INSTANCE.equals(object1, object2, this.excludedAttributes)) {
             if (edge1.isForwards(node) == edge2.isForwards(node)) {
               // if (!fixReversedEdges(node, reversedEdges, edge1, edge2)) {
               return true;

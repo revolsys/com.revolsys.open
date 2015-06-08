@@ -21,8 +21,7 @@ public class BooleanEquals implements Equals<Object> {
   }
 
   @Override
-  public boolean equals(final Object object1, final Object object2,
-    final Collection<String> exclude) {
+  public boolean equals(final Object object1, final Object object2, final Collection<String> exclude) {
     final boolean boolean1 = getBoolean(object1);
     final boolean boolean2 = getBoolean(object2);
     return boolean1 == boolean2;

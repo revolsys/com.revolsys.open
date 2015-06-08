@@ -17,14 +17,13 @@ public class OutputStreamResource extends AbstractResource {
 
   private boolean read;
 
-  public OutputStreamResource(final String filename,
-    final OutputStream outputStream) {
+  public OutputStreamResource(final String filename, final OutputStream outputStream) {
     this.outputStream = outputStream;
     this.filename = filename;
   }
 
-  public OutputStreamResource(final String filename,
-    final OutputStream outputStream, final String description) {
+  public OutputStreamResource(final String filename, final OutputStream outputStream,
+    final String description) {
     this.filename = filename;
     this.outputStream = outputStream;
     this.description = description;
@@ -62,9 +61,8 @@ public class OutputStreamResource extends AbstractResource {
 
   public OutputStream getOutputStream() {
     if (this.read) {
-      throw new IllegalStateException(
-        "OutputStream has already been read - "
-            + "do not use OutputStreamResource if a stream needs to be read multiple times");
+      throw new IllegalStateException("OutputStream has already been read - "
+        + "do not use OutputStreamResource if a stream needs to be read multiple times");
     }
     this.read = true;
     return this.outputStream;

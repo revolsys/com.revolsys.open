@@ -33,6 +33,8 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public class GeometryCoordinatesTableModel extends AbstractTableModel {
+  private static final long serialVersionUID = 1L;
+
   public static int[] getEventRowObject(final TablePanel panel) {
     final GeometryCoordinatesTableModel model = panel.getTableModel();
     final int row = TablePanel.getEventRow();
@@ -52,8 +54,6 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     }
     return pointIndexes;
   }
-
-  private static final long serialVersionUID = 1L;
 
   private List<String> axisNames = Arrays.asList("#", "X", "Y", "Z", "M");
 
@@ -83,8 +83,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     this(null);
   }
 
-  public GeometryCoordinatesTableModel(
-    final GeometryCoordinatesPanel geometryCoordinatesPanel) {
+  public GeometryCoordinatesTableModel(final GeometryCoordinatesPanel geometryCoordinatesPanel) {
     this.geometryCoordinatesPanel = geometryCoordinatesPanel;
 
   }
@@ -127,8 +126,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
   }
 
   @Override
-  public JComponent getEditorField(final int rowIndex, final int columnIndex,
-    final Object value) {
+  public JComponent getEditorField(final int rowIndex, final int columnIndex, final Object value) {
     if (columnIndex < this.numIndexItems) {
       return null;
     } else {
@@ -139,8 +137,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
       } else {
         scale = (int)Math.ceil(Math.log10(this.geometryFactory.getScale(axisIndex)));
       }
-      final NumberTextField field = new NumberTextField(DataTypes.DOUBLE, 20,
-        scale);
+      final NumberTextField field = new NumberTextField(DataTypes.DOUBLE, 20, scale);
       field.setFieldValue(value);
       field.setUndoManager(getForm().getUndoManager());
       return field;
@@ -243,8 +240,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
 
     if (oldGeometry != geometry) {
       final SetObjectProperty setObjectProperty = new SetObjectProperty(record,
-        record.getRecordDefinition().getGeometryFieldName(), oldGeometry,
-        geometry);
+        record.getRecordDefinition().getGeometryFieldName(), oldGeometry, geometry);
       final UndoManager undoManager = form.getUndoManager();
       undoManager.addEdit(setObjectProperty);
     }
@@ -294,8 +290,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
   }
 
   @Override
-  public void setValueAt(final Object value, final int rowIndex,
-    final int columnIndex) {
+  public void setValueAt(final Object value, final int rowIndex, final int columnIndex) {
     if (Property.hasValue(value)) {
       if (rowIndex < getRowCount()) {
         if (columnIndex >= this.numIndexItems) {
@@ -307,8 +302,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
             final Point newPoint = this.geometryFactory.point(coordinates);
             if (!newPoint.equalsExact(vertex)) {
               final int[] vertexId = vertex.getVertexId();
-              final Geometry newGeometry = this.geometry.moveVertex(newPoint,
-                vertexId);
+              final Geometry newGeometry = this.geometry.moveVertex(newPoint, vertexId);
               setGeometry(newGeometry);
             }
           }

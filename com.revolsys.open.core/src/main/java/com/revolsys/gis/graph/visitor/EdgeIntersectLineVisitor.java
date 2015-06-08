@@ -14,8 +14,7 @@ import com.revolsys.visitor.CreateListVisitor;
 
 public class EdgeIntersectLineVisitor<T> implements Visitor<Edge<T>> {
 
-  public static <T> List<Edge<T>> getEdges(final Graph<T> graph,
-    final LineString line) {
+  public static <T> List<Edge<T>> getEdges(final Graph<T> graph, final LineString line) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
     final BoundingBox env = line.getBoundingBox();
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
@@ -28,8 +27,7 @@ public class EdgeIntersectLineVisitor<T> implements Visitor<Edge<T>> {
 
   private final Visitor<Edge<T>> matchVisitor;
 
-  public EdgeIntersectLineVisitor(final LineString line,
-    final Visitor<Edge<T>> matchVisitor) {
+  public EdgeIntersectLineVisitor(final LineString line, final Visitor<Edge<T>> matchVisitor) {
     this.line = line;
     this.matchVisitor = matchVisitor;
   }

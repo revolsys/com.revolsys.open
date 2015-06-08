@@ -172,6 +172,8 @@ public class QuadEdgeSubdivision {
     }
   }
 
+  private final static double EDGE_COINCIDENCE_TOL_FACTOR = 1000;
+
   /**
    * Gets the edges for the triangle to the left of the given {@link QuadEdge}.
    *
@@ -181,8 +183,7 @@ public class QuadEdgeSubdivision {
    * @throws IllegalArgumentException
    *           if the edges do not form a triangle
    */
-  public static void getTriangleEdges(final QuadEdge startQE,
-    final QuadEdge[] triEdge) {
+  public static void getTriangleEdges(final QuadEdge startQE, final QuadEdge[] triEdge) {
     triEdge[0] = startQE;
     triEdge[1] = triEdge[0].lNext();
     triEdge[2] = triEdge[1].lNext();
@@ -190,8 +191,6 @@ public class QuadEdgeSubdivision {
       throw new IllegalArgumentException("Edges do not form a triangle");
     }
   }
-
-  private final static double EDGE_COINCIDENCE_TOL_FACTOR = 1000;
 
   // private Set quadEdges = new HashSet();
   private final List quadEdges = new ArrayList();
@@ -261,8 +260,7 @@ public class QuadEdgeSubdivision {
       offset = deltaY * 10.0;
     }
 
-    this.frameVertex[0] = new Vertex((env.getMaxX() + env.getMinX()) / 2.0,
-      env.getMaxY() + offset);
+    this.frameVertex[0] = new Vertex((env.getMaxX() + env.getMinX()) / 2.0, env.getMaxY() + offset);
     this.frameVertex[1] = new Vertex(env.getMinX() - offset, env.getMinY() - offset);
     this.frameVertex[2] = new Vertex(env.getMaxX() + offset, env.getMinY() - offset);
 
@@ -309,8 +307,8 @@ public class QuadEdgeSubdivision {
    * or null if the triangle should not be visited (for instance, if it is
    *         outer)
    */
-  private QuadEdge[] fetchTriangleToVisit(final QuadEdge edge,
-    final Stack edgeStack, final boolean includeFrame, final Set visitedEdges) {
+  private QuadEdge[] fetchTriangleToVisit(final QuadEdge edge, final Stack edgeStack,
+    final boolean includeFrame, final Set visitedEdges) {
     QuadEdge curr = edge;
     int edgeCount = 0;
     boolean isFrame = false;
@@ -579,8 +577,7 @@ public class QuadEdgeSubdivision {
    * @param geomFact a factory for building the polygon
    * @return a polygon indicating the cell extent
    */
-  public Polygon getVoronoiCellPolygon(QuadEdge qe,
-    final GeometryFactory geomFact) {
+  public Polygon getVoronoiCellPolygon(QuadEdge qe, final GeometryFactory geomFact) {
     final List<Point> cellPts = new ArrayList<>();
     final QuadEdge startQE = qe;
     do {
@@ -831,13 +828,13 @@ public class QuadEdgeSubdivision {
 
     // normalize so that p0 is origin of base edge
     QuadEdge base = e;
-    if (e.dest().getCoordinate().equals(2,p0)) {
+    if (e.dest().getCoordinate().equals(2, p0)) {
       base = e.sym();
     }
     // check all edges around origin of base edge
     QuadEdge locEdge = base;
     do {
-      if (locEdge.dest().getCoordinate().equals(2,p1)) {
+      if (locEdge.dest().getCoordinate().equals(2, p1)) {
         return locEdge;
       }
       locEdge = locEdge.oNext();
@@ -946,8 +943,7 @@ public class QuadEdgeSubdivision {
    * Visitors
    ****************************************************************************/
 
-  public void visitTriangles(final TriangleVisitor triVisitor,
-    final boolean includeFrame) {
+  public void visitTriangles(final TriangleVisitor triVisitor, final boolean includeFrame) {
     // visited flag is used to record visited edges of triangles
     // setVisitedAll(false);
     final Stack edgeStack = new Stack();
@@ -958,8 +954,8 @@ public class QuadEdgeSubdivision {
     while (!edgeStack.empty()) {
       final QuadEdge edge = (QuadEdge)edgeStack.pop();
       if (!visitedEdges.contains(edge)) {
-        final QuadEdge[] triEdges = fetchTriangleToVisit(edge, edgeStack,
-          includeFrame, visitedEdges);
+        final QuadEdge[] triEdges = fetchTriangleToVisit(edge, edgeStack, includeFrame,
+          visitedEdges);
         if (triEdges != null) {
           triVisitor.visit(triEdges);
         }

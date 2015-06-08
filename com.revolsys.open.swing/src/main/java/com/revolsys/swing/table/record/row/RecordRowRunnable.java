@@ -13,21 +13,17 @@ import com.revolsys.swing.table.record.model.RecordRowTableModel;
 
 public class RecordRowRunnable extends InvokeMethodRunnable {
 
-  public static InvokeMethodAction createAction(final CharSequence name,
-    final Icon icon, final EnableCheck enableCheck, final String methodName,
-    final Object... parameters) {
-    final RecordRowRunnable runnable = new RecordRowRunnable(methodName,
-      parameters);
-    final InvokeMethodAction action = new InvokeMethodAction(name, null, icon,
-      true, runnable);
+  public static InvokeMethodAction createAction(final CharSequence name, final Icon icon,
+    final EnableCheck enableCheck, final String methodName, final Object... parameters) {
+    final RecordRowRunnable runnable = new RecordRowRunnable(methodName, parameters);
+    final InvokeMethodAction action = new InvokeMethodAction(name, null, icon, true, runnable);
     action.setEnableCheck(enableCheck);
 
     return action;
   }
 
-  public static InvokeMethodAction createAction(final CharSequence name,
-    final String iconName, final EnableCheck enableCheck,
-    final String methodName, final Object... parameters) {
+  public static InvokeMethodAction createAction(final CharSequence name, final String iconName,
+    final EnableCheck enableCheck, final String methodName, final Object... parameters) {
     final ImageIcon icon = Icons.getIcon(iconName);
     return createAction(name, icon, enableCheck, methodName, parameters);
   }

@@ -75,7 +75,7 @@ public class IteratedNoder implements Noder {
    */
   @Override
   public void computeNodes(final Collection<NodedSegmentString> segStrings)
-      throws TopologyException {
+    throws TopologyException {
     final int[] numInteriorIntersections = new int[1];
     this.nodedSegStrings = segStrings;
     int nodingIterationCount = 0;
@@ -91,9 +91,9 @@ public class IteratedNoder implements Noder {
        */
       // System.out.println("# nodes created: " + nodesCreated);
       if (lastNodesCreated > 0 && nodesCreated >= lastNodesCreated
-          && nodingIterationCount > this.maxIter) {
+        && nodingIterationCount > this.maxIter) {
         throw new TopologyException("Iterated noding failed to converge after "
-            + nodingIterationCount + " iterations");
+          + nodingIterationCount + " iterations");
       }
       lastNodesCreated = nodesCreated;
 
@@ -110,8 +110,7 @@ public class IteratedNoder implements Noder {
    * Node the input segment strings once
    * and create the split edges between the nodes
    */
-  private void node(final Collection segStrings,
-    final int[] numInteriorIntersections) {
+  private void node(final Collection segStrings, final int[] numInteriorIntersections) {
     final IntersectionAdder si = new IntersectionAdder(this.li);
     final MCIndexNoder noder = new MCIndexNoder();
     noder.setSegmentIntersector(si);

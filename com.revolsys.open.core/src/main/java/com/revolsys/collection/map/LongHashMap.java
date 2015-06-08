@@ -363,21 +363,6 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
   }
 
   /**
-   * Returns index for hash code h.
-   *
-   * @param h
-   * @param length
-   * @return The index for the hash long for the given length
-   */
-  static int indexFor(final int h, final int length) {
-    return h & length - 1;
-  }
-
-  transient volatile Set<Long> keySet = null;
-
-  transient volatile Collection<T> values = null;
-
-  /**
    * The default initial capacity - MUST be a power of two.
    */
   static final int DEFAULT_INITIAL_CAPACITY = 16;
@@ -388,12 +373,29 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
    */
   static final int MAXIMUM_CAPACITY = 1 << 30;
 
-  // internal utilities
-
   /**
    * The load factor used when none specified in constructor.
    */
   static final float DEFAULT_LOAD_FACTOR = 0.75f;
+
+  private static final long serialVersionUID = 362498820763181265L;
+
+  /**
+   * Returns index for hash code h.
+   *
+   * @param h
+   * @param length
+   * @return The index for the hash long for the given length
+   */
+  static int indexFor(final int h, final int length) {
+    return h & length - 1;
+  }
+
+  // internal utilities
+
+  transient volatile Set<Long> keySet = null;
+
+  transient volatile Collection<T> values = null;
 
   /**
    * The table, resized as necessary. Length MUST Always be a power of two.
@@ -429,8 +431,6 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
   transient volatile int modCount;
 
   private transient Set<Entry<T>> entrySet = null;
-
-  private static final long serialVersionUID = 362498820763181265L;
 
   /**
    * Constructs an empty <tt>HashMap</tt> with the default initial capacity (16)
@@ -468,14 +468,14 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
   public LongHashMap(int initialCapacity, final float loadFactor) {
     if (initialCapacity < 0) {
       throw new IllegalArgumentException("Illegal initial capacity: " + //$NON-NLS-1$
-          initialCapacity);
+        initialCapacity);
     }
     if (initialCapacity > MAXIMUM_CAPACITY) {
       initialCapacity = MAXIMUM_CAPACITY;
     }
     if (loadFactor <= 0 || Float.isNaN(loadFactor)) {
       throw new IllegalArgumentException("Illegal load factor: " + //$NON-NLS-1$
-          loadFactor);
+        loadFactor);
     }
 
     // Find a power of 2 >= initialCapacity
@@ -846,7 +846,7 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
   }
 
   void putAllForCreate(final LongHashMap<T> m) {
-    for (Entry<T> e : m.entryIntSet()) {
+    for (final Entry<T> e : m.entryIntSet()) {
       putForCreate(e.getLongKey(), e.getValue());
     }
   }
@@ -913,8 +913,8 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
    * @throws ClassNotFoundException
    */
   @SuppressWarnings("unchecked")
-  private void readObject(final java.io.ObjectInputStream s)
-      throws IOException, ClassNotFoundException {
+  private void readObject(final java.io.ObjectInputStream s) throws IOException,
+    ClassNotFoundException {
     // Read in the threshold, loadfactor, and any hidden stuff
     s.defaultReadObject();
 
@@ -1121,8 +1121,7 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
    *             in the order that they are returned by
    *             <tt>entrySet().iterator()</tt>.
    */
-  private void writeObject(final java.io.ObjectOutputStream s)
-      throws IOException {
+  private void writeObject(final java.io.ObjectOutputStream s) throws IOException {
     // Write out the threshold, loadfactor, and any hidden stuff
     s.defaultWriteObject();
 

@@ -70,6 +70,30 @@ import com.revolsys.jts.util.Assert;
  */
 public abstract class LineIntersector {
   /**
+   * These are deprecated, due to ambiguous naming
+   */
+  public final static int DONT_INTERSECT = 0;
+
+  public final static int DO_INTERSECT = 1;
+
+  public final static int COLLINEAR = 2;
+
+  /**
+   * Indicates that line segments do not intersect
+   */
+  public final static int NO_INTERSECTION = 0;
+
+  /**
+   * Indicates that line segments intersect in a single point
+   */
+  public final static int POINT_INTERSECTION = 1;
+
+  /**
+   * Indicates that line segments intersect in a line segment
+   */
+  public final static int COLLINEAR_INTERSECTION = 2;
+
+  /**
    * Computes the "edge distance" of an intersection point p along a segment.
    * The edge distance is a metric of the point along the edge.
    * The metric used is a robust and easy to compute metric function.
@@ -86,8 +110,7 @@ public abstract class LineIntersector {
    * result of <b>rounding</b> points which lie on the line,
    * but not safe to use for <b>truncated</b> points.
    */
-  public static double computeEdgeDistance(final Point p,
-    final Point p0, final Point p1) {
+  public static double computeEdgeDistance(final Point p, final Point p0, final Point p1) {
     final double dx = Math.abs(p1.getX() - p0.getX());
     final double dy = Math.abs(p1.getY() - p0.getY());
 
@@ -122,39 +145,13 @@ public abstract class LineIntersector {
    * This function is non-robust, since it may compute the square of large numbers.
    * Currently not sure how to improve this.
    */
-  public static double nonRobustComputeEdgeDistance(final Point p,
-    final Point p1, final Point p2) {
+  public static double nonRobustComputeEdgeDistance(final Point p, final Point p1, final Point p2) {
     final double dx = p.getX() - p1.getX();
     final double dy = p.getY() - p1.getY();
     final double dist = Math.sqrt(dx * dx + dy * dy); // dummy value
-    Assert.isTrue(!(dist == 0.0 && !p.equals(p1)),
-        "Invalid distance calculation");
+    Assert.isTrue(!(dist == 0.0 && !p.equals(p1)), "Invalid distance calculation");
     return dist;
   }
-
-  /**
-   * These are deprecated, due to ambiguous naming
-   */
-  public final static int DONT_INTERSECT = 0;
-
-  public final static int DO_INTERSECT = 1;
-
-  public final static int COLLINEAR = 2;
-
-  /**
-   * Indicates that line segments do not intersect
-   */
-  public final static int NO_INTERSECTION = 0;
-
-  /**
-   * Indicates that line segments intersect in a single point
-   */
-  public final static int POINT_INTERSECTION = 1;
-
-  /**
-   * Indicates that line segments intersect in a line segment
-   */
-  public final static int COLLINEAR_INTERSECTION = 2;
 
   protected int result;
 
@@ -191,8 +188,7 @@ public abstract class LineIntersector {
     this.scale = scale;
   }
 
-  protected abstract int computeIntersect(Point p1, Point p2,
-    Point q1, Point q2);
+  protected abstract int computeIntersect(Point p1, Point p2, Point q1, Point q2);
 
   /**
    * Compute the intersection of a point p and the line p1-p2.
@@ -200,16 +196,14 @@ public abstract class LineIntersector {
    * The actual value of the intersection (if there is one)
    * is equal to the value of <code>p</code>.
    */
-  public abstract void computeIntersection(Point p, Point p1,
-    Point p2);
+  public abstract void computeIntersection(Point p, Point p1, Point p2);
 
   /**
    * Computes the intersection of the lines p1-p2 and p3-p4.
    * This function computes both the boolean value of the hasIntersection test
    * and the (approximate) value of the intersection point itself (if there is one).
    */
-  public void computeIntersection(final Point p1, final Point p2,
-    final Point p3, final Point p4) {
+  public void computeIntersection(final Point p1, final Point p2, final Point p3, final Point p4) {
     this.inputLines[0][0] = p1;
     this.inputLines[0][1] = p2;
     this.inputLines[1][0] = p3;
@@ -247,8 +241,8 @@ public abstract class LineIntersector {
    * @return the edge distance of the intersection point
    */
   public double getEdgeDistance(final int segmentIndex, final int intIndex) {
-    final double dist = computeEdgeDistance(this.intPt[intIndex],
-      this.inputLines[segmentIndex][0], this.inputLines[segmentIndex][1]);
+    final double dist = computeEdgeDistance(this.intPt[intIndex], this.inputLines[segmentIndex][0],
+      this.inputLines[segmentIndex][1]);
     return dist;
   }
 
@@ -303,8 +297,7 @@ public abstract class LineIntersector {
    *
    * @return the intIndex'th intersection point in the direction of the specified input line segment
    */
-  public Point getIntersectionAlongSegment(final int segmentIndex,
-    final int intIndex) {
+  public Point getIntersectionAlongSegment(final int segmentIndex, final int intIndex) {
     // lazily compute int line array
     computeIntLineIndex();
     return this.intPt[this.intLineIndex[segmentIndex][intIndex]];
@@ -376,7 +369,8 @@ public abstract class LineIntersector {
    */
   public boolean isInteriorIntersection(final int inputLineIndex) {
     for (int i = 0; i < this.result; i++) {
-      if (!(this.intPt[i].equals(2,this.inputLines[inputLineIndex][0]) || this.intPt[i].equals(2,this.inputLines[inputLineIndex][1]))) {
+      if (!(this.intPt[i].equals(2, this.inputLines[inputLineIndex][0]) || this.intPt[i].equals(2,
+        this.inputLines[inputLineIndex][1]))) {
         return true;
       }
     }
@@ -394,7 +388,7 @@ public abstract class LineIntersector {
    */
   public boolean isIntersection(final Point pt) {
     for (int i = 0; i < this.result; i++) {
-      if (this.intPt[i].equals(2,pt)) {
+      if (this.intPt[i].equals(2, pt)) {
         return true;
       }
     }
@@ -426,7 +420,6 @@ public abstract class LineIntersector {
   @Override
   public String toString() {
     return EWktWriter.lineString(this.inputLines[0][0], this.inputLines[0][1]) + " - "
-        + EWktWriter.lineString(this.inputLines[1][0], this.inputLines[1][1])
-        + getTopologySummary();
+      + EWktWriter.lineString(this.inputLines[1][0], this.inputLines[1][1]) + getTopologySummary();
   }
 }

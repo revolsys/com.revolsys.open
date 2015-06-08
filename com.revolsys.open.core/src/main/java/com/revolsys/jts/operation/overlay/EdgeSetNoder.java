@@ -1,5 +1,4 @@
 
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -54,27 +53,26 @@ import com.revolsys.jts.geomgraph.index.SimpleMCSweepLineIntersector;
 public class EdgeSetNoder {
 
   private final LineIntersector li;
+
   private final List inputEdges = new ArrayList();
 
   public EdgeSetNoder(final LineIntersector li) {
     this.li = li;
   }
 
-  public void addEdges(final List edges)
-  {
+  public void addEdges(final List edges) {
     this.inputEdges.addAll(edges);
   }
 
-  public List getNodedEdges()
-  {
+  public List getNodedEdges() {
     final EdgeSetIntersector esi = new SimpleMCSweepLineIntersector();
     final SegmentIntersector si = new SegmentIntersector(this.li, true, false);
     esi.computeIntersections(this.inputEdges, si, true);
-    //Debug.println("has proper int = " + si.hasProperIntersection());
+    // Debug.println("has proper int = " + si.hasProperIntersection());
 
     final List splitEdges = new ArrayList();
-    for (final Iterator i = this.inputEdges.iterator(); i.hasNext(); ) {
-      final Edge e = (Edge) i.next();
+    for (final Iterator i = this.inputEdges.iterator(); i.hasNext();) {
+      final Edge e = (Edge)i.next();
       e.getEdgeIntersectionList().addSplitEdges(splitEdges);
     }
     return splitEdges;

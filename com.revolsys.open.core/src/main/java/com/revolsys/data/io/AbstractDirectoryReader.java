@@ -44,8 +44,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 
-public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
-implements Iterator<T> {
+public abstract class AbstractDirectoryReader<T> extends AbstractReader<T> implements Iterator<T> {
   /** The list of base file names to read. */
   private final List<String> baseFileNames = new ArrayList<String>();
 
@@ -265,8 +264,7 @@ implements Iterator<T> {
    */
   public void setDirectory(final File directory) {
     if (!directory.isDirectory()) {
-      throw new IllegalArgumentException("File must exist and be a directory "
-          + directory);
+      throw new IllegalArgumentException("File must exist and be a directory " + directory);
     } else {
       this.directory = directory;
       this.files = getFiles();

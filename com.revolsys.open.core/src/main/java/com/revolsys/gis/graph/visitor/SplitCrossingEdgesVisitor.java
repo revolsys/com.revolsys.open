@@ -15,8 +15,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 
-public class SplitCrossingEdgesVisitor<T> extends
-AbstractEdgeListenerVisitor<T> {
+public class SplitCrossingEdgesVisitor<T> extends AbstractEdgeListenerVisitor<T> {
 
   public static final String CROSSING_EDGES = "Crossing edges";
 
@@ -26,8 +25,8 @@ AbstractEdgeListenerVisitor<T> {
 
   public SplitCrossingEdgesVisitor(final Graph<T> graph) {
     this.graph = graph;
-    this.splitEdgesCloseToNodeVisitor = new SplitEdgesCloseToNodeVisitor<T>(graph,
-        CROSSING_EDGES, 1);
+    this.splitEdgesCloseToNodeVisitor = new SplitEdgesCloseToNodeVisitor<T>(graph, CROSSING_EDGES,
+      1);
   }
 
   @Override
@@ -43,8 +42,7 @@ AbstractEdgeListenerVisitor<T> {
     return this.splitEdgesCloseToNodeVisitor.getSplitObjects();
   }
 
-  public List<Edge<T>> queryCrosses(final IdObjectIndex<Edge<T>> edgeIndex,
-    final LineString line) {
+  public List<Edge<T>> queryCrosses(final IdObjectIndex<Edge<T>> edgeIndex, final LineString line) {
     final Geometry preparedLine = line.prepare();
     final BoundingBox envelope = line.getBoundingBox();
     final List<Edge<T>> edges = edgeIndex.query(envelope);
@@ -77,11 +75,9 @@ AbstractEdgeListenerVisitor<T> {
     for (final Edge<T> crossEdge : crossings) {
       if (!crossEdge.isRemoved()) {
         final LineString crossLine = crossEdge.getLine();
-        final Point intersection = LineStringUtil.getCrossingIntersection(line,
-          crossLine);
+        final Point intersection = LineStringUtil.getCrossingIntersection(line, crossLine);
         if (intersection != null) {
-          final Point point = this.graph.getPrecisionModel().getPreciseCoordinates(
-            intersection);
+          final Point point = this.graph.getPrecisionModel().getPreciseCoordinates(intersection);
           final Node<T> node = this.graph.getNode(point);
           this.splitEdgesCloseToNodeVisitor.visit(node);
         }

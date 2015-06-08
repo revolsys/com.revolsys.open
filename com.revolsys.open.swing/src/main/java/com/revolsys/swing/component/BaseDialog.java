@@ -37,8 +37,8 @@ public class BaseDialog extends JDialog {
     super(owner, title, modal);
   }
 
-  public BaseDialog(final Dialog owner, final String title,
-    final boolean modal, final GraphicsConfiguration gc) {
+  public BaseDialog(final Dialog owner, final String title, final boolean modal,
+    final GraphicsConfiguration gc) {
     super(owner, title, modal, gc);
   }
 
@@ -75,13 +75,12 @@ public class BaseDialog extends JDialog {
     super(owner, title);
   }
 
-  public BaseDialog(final Window owner, final String title,
-    final ModalityType modalityType) {
+  public BaseDialog(final Window owner, final String title, final ModalityType modalityType) {
     super(owner, title, modalityType);
   }
 
-  public BaseDialog(final Window owner, final String title,
-    final ModalityType modalityType, final GraphicsConfiguration gc) {
+  public BaseDialog(final Window owner, final String title, final ModalityType modalityType,
+    final GraphicsConfiguration gc) {
     super(owner, title, modalityType, gc);
   }
 

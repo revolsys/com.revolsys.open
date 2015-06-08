@@ -12,8 +12,7 @@ import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.swing.map.layer.Project;
 
-public class HotspotViewport2D extends
-com.revolsys.swing.map.ComponentViewport2D {
+public class HotspotViewport2D extends com.revolsys.swing.map.ComponentViewport2D {
 
   private ZoomMode zoomMode = FixedScaleZoomMode.METRIC;
 
@@ -23,8 +22,8 @@ com.revolsys.swing.map.ComponentViewport2D {
     super(project, component);
   }
 
-  public void addHotSpot(final GeometryFactory geometryFactory,
-    final Point point, final String text, final String url) {
+  public void addHotSpot(final GeometryFactory geometryFactory, final Point point,
+    final String text, final String url) {
     Point coordinate;
 
     if (!geometryFactory.equals(getGeometryFactory())) {
@@ -33,8 +32,8 @@ com.revolsys.swing.map.ComponentViewport2D {
     } else {
       coordinate = point.getPoint();
     }
-    this.toolTipIndex.insert(new BoundingBoxDoubleGf(coordinate), new ViewportHotspot(
-      coordinate, text, url));
+    this.toolTipIndex.insert(new BoundingBoxDoubleGf(coordinate), new ViewportHotspot(coordinate,
+      text, url));
   }
 
   public ViewportHotspot getHotspot(final int x, final int y) {
@@ -42,8 +41,7 @@ com.revolsys.swing.map.ComponentViewport2D {
     final double[] location = toModelCoordinates(x, y);
     final double[] location1 = toModelCoordinates(x - 8, y - 8);
     final double[] location2 = toModelCoordinates(x + 8, y + 8);
-    final Point coordinate = new PointDouble(location[0],
-      location[1]);
+    final Point coordinate = new PointDouble(location[0], location[1]);
     double closestDistance = Double.MAX_VALUE;
 
     final BoundingBox envelope = new BoundingBoxDoubleGf(2, location1[0], location2[0],
@@ -77,8 +75,7 @@ com.revolsys.swing.map.ComponentViewport2D {
 
   @Override
   public BoundingBox setBoundingBox(final BoundingBox boundingBox) {
-    final BoundingBox newBoundingBox = this.zoomMode.getBoundingBox(this,
-      boundingBox);
+    final BoundingBox newBoundingBox = this.zoomMode.getBoundingBox(this, boundingBox);
     if (newBoundingBox.equals(this.getBoundingBox())) {
       return this.getBoundingBox();
     } else {

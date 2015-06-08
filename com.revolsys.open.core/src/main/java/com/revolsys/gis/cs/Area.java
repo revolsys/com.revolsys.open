@@ -19,8 +19,8 @@ public class Area implements Serializable {
 
   private final String name;
 
-  public Area(final String name, final BoundingBoxDoubleGf latLonBounds,
-    final Authority authority, final boolean deprecated) {
+  public Area(final String name, final BoundingBoxDoubleGf latLonBounds, final Authority authority,
+    final boolean deprecated) {
     this.name = name;
     this.latLonBounds = latLonBounds;
     this.authority = authority;

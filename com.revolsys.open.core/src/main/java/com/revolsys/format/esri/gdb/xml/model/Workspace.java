@@ -38,8 +38,7 @@ public class Workspace implements Cloneable {
     this.workspaceData = workspaceData;
   }
 
-  public void setWorkspaceDefinition(
-    final WorkspaceDefinition workspaceDefinition) {
+  public void setWorkspaceDefinition(final WorkspaceDefinition workspaceDefinition) {
     this.workspaceDefinition = workspaceDefinition;
   }
 

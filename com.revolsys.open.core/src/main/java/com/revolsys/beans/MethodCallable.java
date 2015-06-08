@@ -17,8 +17,7 @@ public class MethodCallable<T> extends MethodInvoker implements Callable<T> {
    * @param method The method to invoke.
    * @param parameters The parameters to pass to the method.
    */
-  public MethodCallable(final Method method, final Object object,
-    final Object... parameters) {
+  public MethodCallable(final Method method, final Object object, final Object... parameters) {
     super(method, object, parameters);
   }
 

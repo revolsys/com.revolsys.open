@@ -18,8 +18,7 @@ public class GeometryEqual2d extends Condition {
 
   private QueryValue geometry2Value;
 
-  public GeometryEqual2d(final QueryValue geometry1Value,
-    final QueryValue geometry2Value) {
+  public GeometryEqual2d(final QueryValue geometry1Value, final QueryValue geometry2Value) {
     this.geometry1Value = geometry1Value;
     this.geometry2Value = geometry2Value;
   }
@@ -36,8 +35,8 @@ public class GeometryEqual2d extends Condition {
   }
 
   @Override
-  public void appendDefaultSql(final Query query,
-    final RecordStore recordStore, final StringBuilder buffer) {
+  public void appendDefaultSql(final Query query, final RecordStore recordStore,
+    final StringBuilder buffer) {
     buffer.append("ST_EQUALS(");
     if (this.geometry1Value == null) {
       buffer.append("NULL");
@@ -104,8 +103,8 @@ public class GeometryEqual2d extends Condition {
 
   @Override
   public String toString() {
-    return "ST_EQUALS(" + StringConverterRegistry.toString(this.geometry1Value)
-        + "," + StringConverterRegistry.toString(this.geometry2Value) + ")";
+    return "ST_EQUALS(" + StringConverterRegistry.toString(this.geometry1Value) + ","
+      + StringConverterRegistry.toString(this.geometry2Value) + ")";
   }
 
 }

@@ -14,14 +14,12 @@ import com.revolsys.jts.geom.impl.PointDouble;
 
 public class PointTest implements TestConstants {
 
-  public static void assertCoordinatesEquals(final Point point,
-    final double... coordinates) {
+  public static void assertCoordinatesEquals(final Point point, final double... coordinates) {
     Assert.assertEquals("Is Empty", false, point.isEmpty());
     Assert.assertEquals("Geometry Count", 1, point.getGeometryCount());
     Assert.assertNotNull("Not Null First Vertex", point.getVertex(0));
     Assert.assertEquals("Axis Count", coordinates.length, point.getAxisCount());
-    Assert.assertEquals("Vertex Count", coordinates.length,
-      point.getAxisCount());
+    Assert.assertEquals("Vertex Count", coordinates.length, point.getAxisCount());
     for (int axisIndex = -1; axisIndex < point.getAxisCount() + 1; axisIndex++) {
       final double value = point.getCoordinate(axisIndex);
       if (axisIndex < 0 || axisIndex >= coordinates.length) {
@@ -29,8 +27,7 @@ public class PointTest implements TestConstants {
           TestUtil.failNotEquals("Value NaN", Double.NaN, value);
         }
       } else {
-        Assert.assertEquals("Coordinate Value", coordinates[axisIndex], value,
-          0);
+        Assert.assertEquals("Coordinate Value", coordinates[axisIndex], value, 0);
       }
     }
   }
@@ -49,8 +46,7 @@ public class PointTest implements TestConstants {
     }
   }
 
-  public static void assertEquals(final Point point,
-    final double... coordinates) {
+  public static void assertEquals(final Point point, final double... coordinates) {
     final GeometryFactory geometryFactory = point.getGeometryFactory();
 
     final GeometryFactory geometryFactory2;
@@ -58,8 +54,7 @@ public class PointTest implements TestConstants {
     if (geometryFactory.getCoordinateSystem() instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)geometryFactory.getCoordinateSystem();
       final GeographicCoordinateSystem geographicCoordinateSystem = projectedCs.getGeographicCoordinateSystem();
-      geometryFactory2 = GeometryFactory.floating(
-        geographicCoordinateSystem.getId(), axisCount);
+      geometryFactory2 = GeometryFactory.floating(geographicCoordinateSystem.getId(), axisCount);
     } else {
       geometryFactory2 = GeometryFactory.floating(26910, axisCount);
     }
@@ -108,9 +103,8 @@ public class PointTest implements TestConstants {
     Assert.assertEquals("Vertex Count", vertexCount, point.getVertexCount());
   }
 
-  private void assertEquals(final double[] coordinates,
-    final double[] coordinatesLessNaN, final Point pointCoordinatesListAllAxis,
-    final Point pointCoordinatesListExtraAxis,
+  private void assertEquals(final double[] coordinates, final double[] coordinatesLessNaN,
+    final Point pointCoordinatesListAllAxis, final Point pointCoordinatesListExtraAxis,
     final Point pointCoordinatesListLessAxis) {
     assertEquals(pointCoordinatesListAllAxis, coordinates);
     assertEquals(pointCoordinatesListExtraAxis, coordinates);
@@ -118,21 +112,20 @@ public class PointTest implements TestConstants {
   }
 
   private void assertObjectContsructor(final GeometryFactory geometryFactory,
-    final double[] coordinates, final double[] coordinatesLessNaN,
-    final Point pointAll, final Point pointExtra, final Point pointLess) {
+    final double[] coordinates, final double[] coordinatesLessNaN, final Point pointAll,
+    final Point pointExtra, final Point pointLess) {
     final Point pointAllAxis = geometryFactory.point((Object)pointAll);
     final Point pointExtraAxis = geometryFactory.point((Object)pointExtra);
     final Point pointLessAxis = geometryFactory.point((Object)pointLess);
 
-    assertEquals(coordinates, coordinatesLessNaN, pointAllAxis, pointExtraAxis,
-      pointLessAxis);
+    assertEquals(coordinates, coordinatesLessNaN, pointAllAxis, pointExtraAxis, pointLessAxis);
   }
 
   @Test
   public void constructEmpty() {
     for (int axisCount = 2; axisCount < 4; axisCount++) {
-      final GeometryFactory geometryFactory = GeometryFactory.fixed(26910,
-        axisCount, 1000.0, 1000.0);
+      final GeometryFactory geometryFactory = GeometryFactory.fixed(26910, axisCount, 1000.0,
+        1000.0);
 
       final Point pointEmpty = geometryFactory.point();
       assertEmpty(pointEmpty);
@@ -140,19 +133,17 @@ public class PointTest implements TestConstants {
       final Point pointCoordinatesNull = geometryFactory.point((Point)null);
       assertEmpty(pointCoordinatesNull);
 
-      final Point pointCoordinatesSize0 = geometryFactory.point(new PointDouble(
-        0));
+      final Point pointCoordinatesSize0 = geometryFactory.point(new PointDouble(0));
       assertEmpty(pointCoordinatesSize0);
 
-      final Point pointCoordinatesSize1 = geometryFactory.point(new PointDouble(
-        1));
+      final Point pointCoordinatesSize1 = geometryFactory.point(new PointDouble(1));
       assertEmpty(pointCoordinatesSize1);
 
       final Point pointCoordinatesListNull = geometryFactory.point((LineString)null);
       assertEmpty(pointCoordinatesListNull);
 
-      final Point pointCoordinatesListSize0 = geometryFactory.point(new LineStringDouble(
-        0, axisCount));
+      final Point pointCoordinatesListSize0 = geometryFactory.point(new LineStringDouble(0,
+        axisCount));
       assertEmpty(pointCoordinatesListSize0);
 
       final Point pointObjectNull = geometryFactory.point((Object)null);
@@ -176,12 +167,10 @@ public class PointTest implements TestConstants {
       if (axisCountLess > 2) {
         axisCountLess--;
       }
-      final GeometryFactory geometryFactory = GeometryFactory.fixed(26910,
-        axisCount, 1000.0, 1000.0);
-      final GeometryFactory geometryFactoryExtra = GeometryFactory.floating(
-        26910, axisCount + 1);
-      final GeometryFactory geometryFactoryLess = GeometryFactory.floating(
-        26910, axisCountLess);
+      final GeometryFactory geometryFactory = GeometryFactory.fixed(26910, axisCount, 1000.0,
+        1000.0);
+      final GeometryFactory geometryFactoryExtra = GeometryFactory.floating(26910, axisCount + 1);
+      final GeometryFactory geometryFactoryLess = GeometryFactory.floating(26910, axisCountLess);
       final double[] coordinatesExtra = new double[axisCount + 1];
       final double[] coordinates = new double[axisCount];
       final double[] coordinatesLess = new double[axisCountLess];
@@ -191,10 +180,10 @@ public class PointTest implements TestConstants {
         switch (i) {
           case 0:
             value = UTM10_X_START;
-            break;
+          break;
           case 1:
             value = UTM10_Y_START;
-            break;
+          break;
           default:
             value = i * 10 + i;
         }
@@ -213,23 +202,20 @@ public class PointTest implements TestConstants {
       final Point pointDoubleAllAxis = geometryFactory.point(coordinates);
       final Point pointDoubleExtraAxis = geometryFactory.point(coordinatesExtra);
       final Point pointDoubleLessAxis = geometryFactory.point(coordinatesLess);
-      assertEquals(coordinates, coordinatesLessNaN, pointDoubleAllAxis,
+      assertEquals(coordinates, coordinatesLessNaN, pointDoubleAllAxis, pointDoubleExtraAxis,
+        pointDoubleLessAxis);
+      assertObjectContsructor(geometryFactory, coordinates, coordinatesLessNaN, pointDoubleAllAxis,
         pointDoubleExtraAxis, pointDoubleLessAxis);
-      assertObjectContsructor(geometryFactory, coordinates, coordinatesLessNaN,
-        pointDoubleAllAxis, pointDoubleExtraAxis, pointDoubleLessAxis);
 
       // Coordinates
-      final Point pointCoordinatesAllAxis = geometryFactory.point(new PointDouble(
-        coordinates));
+      final Point pointCoordinatesAllAxis = geometryFactory.point(new PointDouble(coordinates));
       final Point pointCoordinatesExtraAxis = geometryFactory.point(new PointDouble(
         coordinatesExtra));
-      final Point pointCoordinatesLessAxis = geometryFactory.point(new PointDouble(
-        coordinatesLess));
+      final Point pointCoordinatesLessAxis = geometryFactory.point(new PointDouble(coordinatesLess));
       assertEquals(coordinates, coordinatesLessNaN, pointCoordinatesAllAxis,
         pointCoordinatesExtraAxis, pointCoordinatesLessAxis);
       assertObjectContsructor(geometryFactory, coordinates, coordinatesLessNaN,
-        pointCoordinatesAllAxis, pointCoordinatesExtraAxis,
-        pointCoordinatesLessAxis);
+        pointCoordinatesAllAxis, pointCoordinatesExtraAxis, pointCoordinatesLessAxis);
 
       // LineString
       final Point pointCoordinatesListAllAxis = geometryFactory.point(new LineStringDouble(
@@ -238,19 +224,17 @@ public class PointTest implements TestConstants {
         axisCount, coordinatesExtra));
       final Point pointCoordinatesListLessAxis = geometryFactory.point(new LineStringDouble(
         axisCountLess, coordinatesLess));
-      assertEquals(coordinates, coordinatesLessNaN,
-        pointCoordinatesListAllAxis, pointCoordinatesListExtraAxis,
-        pointCoordinatesListLessAxis);
+      assertEquals(coordinates, coordinatesLessNaN, pointCoordinatesListAllAxis,
+        pointCoordinatesListExtraAxis, pointCoordinatesListLessAxis);
       assertObjectContsructor(geometryFactory, coordinates, coordinatesLessNaN,
-        pointCoordinatesListAllAxis, pointCoordinatesListExtraAxis,
-        pointCoordinatesListLessAxis);
+        pointCoordinatesListAllAxis, pointCoordinatesListExtraAxis, pointCoordinatesListLessAxis);
 
       // Object Point
       final Point pointAll = pointDoubleAllAxis;
       final Point pointExtra = geometryFactoryExtra.point(coordinatesExtra);
       final Point pointLess = geometryFactoryLess.point(coordinatesLess);
-      assertObjectContsructor(geometryFactory, coordinates, coordinatesLessNaN,
-        pointAll, pointExtra, pointLess);
+      assertObjectContsructor(geometryFactory, coordinates, coordinatesLessNaN, pointAll,
+        pointExtra, pointLess);
     }
   }
 

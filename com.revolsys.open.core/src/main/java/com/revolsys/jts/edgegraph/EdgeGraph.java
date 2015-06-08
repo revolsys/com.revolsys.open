@@ -107,8 +107,7 @@ public class EdgeGraph {
    * @param eAdj an existing edge with same orig (if any)
    * @return the created edge
    */
-  private HalfEdge insert(final Point orig, final Point dest,
-    final HalfEdge eAdj) {
+  private HalfEdge insert(final Point orig, final Point dest, final HalfEdge eAdj) {
     // edge does not exist, so create it and insert in graph
     final HalfEdge e = create(orig, dest);
     if (eAdj != null) {

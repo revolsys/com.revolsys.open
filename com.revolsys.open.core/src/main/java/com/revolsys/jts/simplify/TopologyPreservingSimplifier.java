@@ -96,8 +96,7 @@ public class TopologyPreservingSimplifier {
 
   class LineStringTransformer extends GeometryTransformer {
     @Override
-    protected LineString transformCoordinates(final LineString coords,
-      final Geometry parent) {
+    protected LineString transformCoordinates(final LineString coords, final Geometry parent) {
       if (coords.getVertexCount() == 0) {
         return null;
       }
@@ -116,10 +115,8 @@ public class TopologyPreservingSimplifier {
     }
   }
 
-  public static Geometry simplify(final Geometry geom,
-    final double distanceTolerance) {
-    final TopologyPreservingSimplifier tss = new TopologyPreservingSimplifier(
-      geom);
+  public static Geometry simplify(final Geometry geom, final double distanceTolerance) {
+    final TopologyPreservingSimplifier tss = new TopologyPreservingSimplifier(geom);
     tss.setDistanceTolerance(distanceTolerance);
     return tss.getResultGeometry();
   }
@@ -146,8 +143,7 @@ public class TopologyPreservingSimplifier {
         // skip empty geometries
         if (!line.isEmpty()) {
           final int minSize = line.isClosed() ? 4 : 2;
-          final TaggedLineString taggedLine = new TaggedLineString(line,
-            minSize);
+          final TaggedLineString taggedLine = new TaggedLineString(line, minSize);
           this.linestringMap.put(line, taggedLine);
         }
       }

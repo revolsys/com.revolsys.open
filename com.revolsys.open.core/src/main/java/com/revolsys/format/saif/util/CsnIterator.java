@@ -77,12 +77,10 @@ public class CsnIterator {
 
   public static final int OPTIONAL_ATTRIBUTE = 6;
 
-  private static final Set<String> RESERVED_WORDS = new HashSet<String>(
-      Arrays.asList(new String[] {
-        "subclass", "values", "comments", "attributes", "subclassing",
-        "classAttributes", "defaults", "constraints", "restricted",
-        "classAttributeValues", "classAttributeDefaults"// "primitiveType",
-      }));
+  private static final Set<String> RESERVED_WORDS = new HashSet<String>(Arrays.asList(new String[] {
+    "subclass", "values", "comments", "attributes", "subclassing", "classAttributes", "defaults",
+    "constraints", "restricted", "classAttributeValues", "classAttributeDefaults"// "primitiveType",
+  }));
 
   public static final int START_DEFINITION = 2;
 
@@ -130,13 +128,11 @@ public class CsnIterator {
     this(FileUtil.getFileName(file), new FileReader(file));
   }
 
-  public CsnIterator(final String fileName, final InputStream in)
-      throws IOException {
+  public CsnIterator(final String fileName, final InputStream in) throws IOException {
     this(fileName, FileUtil.createUtf8Reader(in));
   }
 
-  public CsnIterator(final String fileName, final Reader reader)
-      throws IOException {
+  public CsnIterator(final String fileName, final Reader reader) throws IOException {
     this.reader = new BufferedReader(reader);
     this.scopeStack.push(IN_DOCUMENT);
     processNext();
@@ -225,8 +221,7 @@ public class CsnIterator {
     return name;
   }
 
-  private int findStartDefinition(final StringBuilder buffer)
-      throws IOException {
+  private int findStartDefinition(final StringBuilder buffer) throws IOException {
     if (buffer.charAt(0) != '<') {
       return UNKNOWN;
     } else {
@@ -253,8 +248,7 @@ public class CsnIterator {
     if (this.buffer == null || this.buffer.length() == 0) {
       this.line = this.reader.readLine();
       this.lineNumber++;
-      while (this.line != null
-          && (this.line.startsWith("//") || this.line.length() == 0)) {
+      while (this.line != null && (this.line.startsWith("//") || this.line.length() == 0)) {
         this.line = this.reader.readLine();
         this.lineNumber++;
       }
@@ -352,8 +346,7 @@ public class CsnIterator {
           setNextToken(fieldName);
           // scopeStack.pop();
         } else {
-          throw new IllegalStateException(
-              "Expecting end of optional attribute name ']'");
+          throw new IllegalStateException("Expecting end of optional attribute name ']'");
         }
       } else {
         throw new IllegalStateException("Expecting an attribute name");
@@ -391,8 +384,7 @@ public class CsnIterator {
     } else {
       final String className = findClassName(localBuffer);
       if (className != null) {
-        if (className.equals("Set") || className.equals("List")
-            || className.equals("Relation")) {
+        if (className.equals("Set") || className.equals("List") || className.equals("Relation")) {
           final StringBuilder newBuffer = getStrippedBuffer();
           if (newBuffer.charAt(0) == '(') {
             this.nextEventType = COLLECTION_ATTRIBUTE;
@@ -481,8 +473,7 @@ public class CsnIterator {
     } else {
       this.nextEventType = processFieldName(buffer);
       if (this.nextEventType == UNKNOWN) {
-        throw new IllegalStateException(
-            "Expecting an attribute name or component name");
+        throw new IllegalStateException("Expecting an attribute name or component name");
       }
     }
   }
@@ -502,8 +493,7 @@ public class CsnIterator {
     } else {
       this.nextEventType = processFieldName(buffer);
       if (this.nextEventType == UNKNOWN) {
-        throw new IllegalStateException(
-            "Expecting an attribute name or component name");
+        throw new IllegalStateException("Expecting an attribute name or component name");
       }
     }
   }
@@ -517,21 +507,20 @@ public class CsnIterator {
   }
 
   public void processComponent(final String componentName) throws IOException {
-    final String methodName = "process"
-        + Character.toUpperCase(componentName.charAt(0))
-        + componentName.substring(1);
+    final String methodName = "process" + Character.toUpperCase(componentName.charAt(0))
+      + componentName.substring(1);
     try {
       final Method method = getClass().getMethod(methodName, new Class[0]);
       method.invoke(this, new Object[0]);
     } catch (final SecurityException e) {
-      throw new RuntimeException("Unable to access method '" + methodName
-        + "': " + e.getMessage(), e);
+      throw new RuntimeException("Unable to access method '" + methodName + "': " + e.getMessage(),
+        e);
     } catch (final NoSuchMethodException e) {
-      throw new RuntimeException("No process method available for component '"
-          + componentName + "': " + e.getMessage(), e);
-    } catch (final IllegalAccessException e) {
-      throw new RuntimeException("Unable to access method '" + methodName
+      throw new RuntimeException("No process method available for component '" + componentName
         + "': " + e.getMessage(), e);
+    } catch (final IllegalAccessException e) {
+      throw new RuntimeException("Unable to access method '" + methodName + "': " + e.getMessage(),
+        e);
     } catch (final InvocationTargetException e) {
       final Throwable cause = e.getCause();
       if (cause instanceof RuntimeException) {
@@ -561,8 +550,7 @@ public class CsnIterator {
     }
   }
 
-  private void processDefinitions(final StringBuilder buffer)
-      throws IOException {
+  private void processDefinitions(final StringBuilder buffer) throws IOException {
     final char c = buffer.charAt(0);
     // End of Definition
     if (c == '>') {
@@ -587,13 +575,12 @@ public class CsnIterator {
         setNextToken(componentName);
         this.scopeStack.push(componentName);
       } else {
-        throw new IllegalStateException(
-            "Expecting component definition ending in a ':'");
+        throw new IllegalStateException("Expecting component definition ending in a ':'");
 
       }
     } else {
       throw new IllegalStateException(
-          "Expecting end of definition, class name or definition component");
+        "Expecting end of definition, class name or definition component");
     }
   }
 
@@ -634,7 +621,7 @@ public class CsnIterator {
     this.nextEventType = findStartDefinition(buffer);
     if (this.nextEventType == UNKNOWN) {
       throw new IllegalStateException(this.lineNumber + ":"
-          + "Expecting start of an object definition");
+        + "Expecting start of an object definition");
     }
   }
 
@@ -692,8 +679,7 @@ public class CsnIterator {
         endIndex++;
       } else if (c == '.') {
         if (hasSecondPeriod) {
-          throw new IllegalStateException(
-              "A .. has already been defined for the range");
+          throw new IllegalStateException("A .. has already been defined for the range");
         } else if (periodIndex == -1) {
           periodIndex = endIndex;
           endIndex++;
@@ -847,10 +833,9 @@ public class CsnIterator {
         this.scopeStack.pop();
       } else {
         throw new IllegalStateException(
-            "Expecting a tag value, component name or end of definition");
+          "Expecting a tag value, component name or end of definition");
       }
-    } else if (tagName.equals("comments")
-        && getStrippedBuffer().charAt(0) == ':') {
+    } else if (tagName.equals("comments") && getStrippedBuffer().charAt(0) == ':') {
       removeToken(0, 1);
       this.scopeStack.pop();
       this.nextEventType = COMPONENT_NAME;
@@ -893,7 +878,6 @@ public class CsnIterator {
 
   @Override
   public String toString() {
-    return this.fileName + "[" + this.lineNumber + "," + this.columnNumber
-        + "]";
+    return this.fileName + "[" + this.lineNumber + "," + this.columnNumber + "]";
   }
 }

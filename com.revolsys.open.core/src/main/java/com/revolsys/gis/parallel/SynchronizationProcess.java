@@ -4,8 +4,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.AbstractInOutProcess;
 
-public class SynchronizationProcess extends
-AbstractInOutProcess<Record, Record> {
+public class SynchronizationProcess extends AbstractInOutProcess<Record, Record> {
   private int count = 0;
 
   @Override

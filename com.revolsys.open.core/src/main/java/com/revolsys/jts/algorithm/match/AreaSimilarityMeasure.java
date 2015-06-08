@@ -46,28 +46,21 @@ import com.revolsys.jts.geom.Geometry;
  * @author mbdavis
  *
  */
-public class AreaSimilarityMeasure
-implements SimilarityMeasure
-{
+public class AreaSimilarityMeasure implements SimilarityMeasure {
   /*
-	public static double measure(Geometry a, Geometry b)
-	{
-		AreaSimilarityMeasure gv = new AreaSimilarityMeasure(a, b);
-		return gv.measure();
-	}
+   * public static double measure(Geometry a, Geometry b) {
+   * AreaSimilarityMeasure gv = new AreaSimilarityMeasure(a, b); return
+   * gv.measure(); }
    */
 
-  public AreaSimilarityMeasure()
-  {
+  public AreaSimilarityMeasure() {
   }
 
   @Override
-  public double measure(final Geometry g1, final Geometry g2)
-  {
+  public double measure(final Geometry g1, final Geometry g2) {
     final double areaInt = g1.intersection(g2).getArea();
     final double areaUnion = g1.union(g2).getArea();
     return areaInt / areaUnion;
   }
-
 
 }

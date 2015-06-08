@@ -72,8 +72,8 @@ public class RobustLineIntersector extends LineIntersector {
    * @param q2 an endpoint of segment Q
    * @return the nearest endpoint to the other segment
    */
-  private static Point nearestEndpoint(final Point p1, final Point p2,
-    final Point q1, final Point q2) {
+  private static Point nearestEndpoint(final Point p1, final Point p2, final Point q1,
+    final Point q2) {
     Point nearestPt = p1;
     double minDist = LineSegmentUtil.distanceLinePoint(q1, q2, p1);
 
@@ -102,8 +102,8 @@ public class RobustLineIntersector extends LineIntersector {
     super(scale);
   }
 
-  private int computeCollinearIntersection(final Point p1, final Point p2,
-    final Point q1, final Point q2) {
+  private int computeCollinearIntersection(final Point p1, final Point p2, final Point q1,
+    final Point q2) {
     final boolean p1q1p2 = BoundingBoxUtil.intersects(p1, p2, q1);
     final boolean p1q2p2 = BoundingBoxUtil.intersects(p1, p2, q2);
     final boolean q1p1q2 = BoundingBoxUtil.intersects(q1, q2, p1);
@@ -122,33 +122,28 @@ public class RobustLineIntersector extends LineIntersector {
     if (p1q1p2 && q1p1q2) {
       this.intPt[0] = q1;
       this.intPt[1] = p1;
-      return q1.equals(p1) && !p1q2p2 && !q1p2q2 ? POINT_INTERSECTION
-        : COLLINEAR_INTERSECTION;
+      return q1.equals(p1) && !p1q2p2 && !q1p2q2 ? POINT_INTERSECTION : COLLINEAR_INTERSECTION;
     }
     if (p1q1p2 && q1p2q2) {
       this.intPt[0] = q1;
       this.intPt[1] = p2;
-      return q1.equals(p2) && !p1q2p2 && !q1p1q2 ? POINT_INTERSECTION
-        : COLLINEAR_INTERSECTION;
+      return q1.equals(p2) && !p1q2p2 && !q1p1q2 ? POINT_INTERSECTION : COLLINEAR_INTERSECTION;
     }
     if (p1q2p2 && q1p1q2) {
       this.intPt[0] = q2;
       this.intPt[1] = p1;
-      return q2.equals(p1) && !p1q1p2 && !q1p2q2 ? POINT_INTERSECTION
-        : COLLINEAR_INTERSECTION;
+      return q2.equals(p1) && !p1q1p2 && !q1p2q2 ? POINT_INTERSECTION : COLLINEAR_INTERSECTION;
     }
     if (p1q2p2 && q1p2q2) {
       this.intPt[0] = q2;
       this.intPt[1] = p2;
-      return q2.equals(p2) && !p1q1p2 && !q1p1q2 ? POINT_INTERSECTION
-        : COLLINEAR_INTERSECTION;
+      return q2.equals(p2) && !p1q1p2 && !q1p1q2 ? POINT_INTERSECTION : COLLINEAR_INTERSECTION;
     }
     return NO_INTERSECTION;
   }
 
   @Override
-  protected int computeIntersect(final Point p1, final Point p2,
-    final Point q1, final Point q2) {
+  protected int computeIntersect(final Point p1, final Point p2, final Point q1, final Point q2) {
     this.isProper = false;
 
     // first try a fast test to see if the envelopes of the lines intersect
@@ -241,7 +236,7 @@ public class RobustLineIntersector extends LineIntersector {
     // do between check first, since it is faster than the orientation test
     if (BoundingBoxUtil.intersects(p1, p2, p)) {
       if (CGAlgorithmsDD.orientationIndex(p1, p2, p) == 0
-          && CGAlgorithmsDD.orientationIndex(p2, p1, p) == 0) {
+        && CGAlgorithmsDD.orientationIndex(p2, p1, p) == 0) {
         this.isProper = true;
         if (p.equals(p1) || p.equals(p2)) {
           this.isProper = false;
@@ -261,8 +256,7 @@ public class RobustLineIntersector extends LineIntersector {
    * removing common significant digits from the calculation to
    * maintain more bits of precision.
    */
-  private Point intersection(final Point p1, final Point p2, final Point q1,
-    final Point q2) {
+  private Point intersection(final Point p1, final Point p2, final Point q1, final Point q2) {
     Point intPt = intersectionWithNormalization(p1, p2, q1, q2);
 
     /*
@@ -300,8 +294,8 @@ public class RobustLineIntersector extends LineIntersector {
     return CoordinatesUtil.getPrecise(getScale(), intPt);
   }
 
-  private Point intersectionWithNormalization(final Point p1, final Point p2,
-    final Point q1, final Point q2) {
+  private Point intersectionWithNormalization(final Point p1, final Point p2, final Point q1,
+    final Point q2) {
 
     final double minX0 = p1.getX() < p2.getX() ? p1.getX() : p2.getX();
     final double minY0 = p1.getY() < p2.getY() ? p1.getY() : p2.getY();
@@ -323,10 +317,10 @@ public class RobustLineIntersector extends LineIntersector {
 
     /*
      * // equilavalent code using more modular but slower method BoundingBox
-     * env0 = new BoundingBoxDoubleGf(n00, n01); BoundingBox env1 = new BoundingBoxDoubleGf(n10, n11);
-     * BoundingBox intEnv = env0.intersection(env1); Point intMidPt =
-     * intEnv.centre(); normPt.getX() = intMidPt.getX(); normPt.getY() =
-     * intMidPt.getY();
+     * env0 = new BoundingBoxDoubleGf(n00, n01); BoundingBox env1 = new
+     * BoundingBoxDoubleGf(n10, n11); BoundingBox intEnv =
+     * env0.intersection(env1); Point intMidPt = intEnv.centre(); normPt.getX()
+     * = intMidPt.getX(); normPt.getY() = intMidPt.getY();
      */
 
     final Point n1 = new PointDouble(p1.getX() - normX, p1.getY() - normY);
@@ -369,8 +363,8 @@ public class RobustLineIntersector extends LineIntersector {
    * @param q2 a segment endpoint
    * @return the computed intersection point
    */
-  private Point safeHCoordinatesIntersection(final Point p1, final Point p2,
-    final Point q1, final Point q2) {
+  private Point safeHCoordinatesIntersection(final Point p1, final Point p2, final Point q1,
+    final Point q2) {
     Point intPt = null;
     try {
       intPt = HCoordinate.intersection(p1, p2, q1, q2);

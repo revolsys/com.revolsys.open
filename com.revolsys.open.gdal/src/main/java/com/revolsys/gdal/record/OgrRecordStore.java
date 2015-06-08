@@ -21,6 +21,7 @@ import org.gdal.ogr.FieldDefn;
 import org.gdal.ogr.GeomFieldDefn;
 import org.gdal.ogr.Layer;
 import org.gdal.ogr.ogr;
+import org.gdal.ogr.ogrConstants;
 import org.gdal.osr.SpatialReference;
 import org.slf4j.LoggerFactory;
 
@@ -332,7 +333,7 @@ public class OgrRecordStore extends AbstractRecordStore {
     } else {
       layer = dataSource.CreateLayer(name);
     }
-    if (dataSource.TestCapability(ogr.ODsCCreateLayer) == false) {
+    if (dataSource.TestCapability(ogrConstants.ODsCCreateLayer) == false) {
       System.err.println("CreateLayer not supported by driver.");
     }
     return createRecordDefinition(schema, layer);

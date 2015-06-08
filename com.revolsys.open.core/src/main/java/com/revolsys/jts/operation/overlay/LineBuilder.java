@@ -38,7 +38,6 @@ import java.util.List;
 import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geomgraph.DirectedEdge;
 import com.revolsys.jts.geomgraph.DirectedEdgeStar;
 import com.revolsys.jts.geomgraph.Edge;
@@ -99,8 +98,8 @@ public class LineBuilder {
    * <li> OR as a result of a dimensional collapse.
    * </ul>
    */
-  private void collectBoundaryTouchEdge(final DirectedEdge de,
-    final int opCode, final List<Edge> edges) {
+  private void collectBoundaryTouchEdge(final DirectedEdge de, final int opCode,
+    final List<Edge> edges) {
     final Label label = de.getLabel();
     if (de.isLineEdge()) {
       return; // only interested in area edges
@@ -117,12 +116,10 @@ public class LineBuilder {
     }
 
     // sanity check for labelling of result edgerings
-    Assert.isTrue(!(de.isInResult() || de.getSym().isInResult())
-      || !de.getEdge().isInResult());
+    Assert.isTrue(!(de.isInResult() || de.getSym().isInResult()) || !de.getEdge().isInResult());
 
     // include the linework if it's in the result of the operation
-    if (OverlayOp.isResultOfOp(label, opCode)
-        && opCode == OverlayOp.INTERSECTION) {
+    if (OverlayOp.isResultOfOp(label, opCode) && opCode == OverlayOp.INTERSECTION) {
       edges.add(de.getEdge());
       de.setVisitedEdge(true);
     }
@@ -138,14 +135,12 @@ public class LineBuilder {
    * @param opCode the overlap operation
    * @param edges the list of included line edges
    */
-  private void collectLineEdge(final DirectedEdge de, final int opCode,
-    final List<Edge> edges) {
+  private void collectLineEdge(final DirectedEdge de, final int opCode, final List<Edge> edges) {
     final Label label = de.getLabel();
     final Edge e = de.getEdge();
     // include L edges which are in the result
     if (de.isLineEdge()) {
-      if (!de.isVisited() && OverlayOp.isResultOfOp(label, opCode)
-          && !e.isCovered()) {
+      if (!de.isVisited() && OverlayOp.isResultOfOp(label, opCode) && !e.isCovered()) {
         // Debug.println("de: " + de.getLabel());
         // Debug.println("edge: " + e.getLabel());
 
@@ -190,15 +185,6 @@ public class LineBuilder {
         e.setCovered(isCovered);
       }
     }
-  }
-
-  /**
-   * Label an isolated node with its relationship to the target geometry.
-   */
-  private void labelIsolatedLine(final Edge e, final int targetIndex) {
-    final Location loc = this.ptLocator.locate(e.getCoordinate(),
-      this.op.getArgGeometry(targetIndex));
-    e.getLabel().setLocation(targetIndex, loc);
   }
 
 }

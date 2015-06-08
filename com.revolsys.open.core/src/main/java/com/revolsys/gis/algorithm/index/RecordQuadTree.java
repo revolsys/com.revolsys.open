@@ -88,15 +88,14 @@ public class RecordQuadTree extends QuadTree<Record> {
     visit(boundingBox, visitor);
   }
 
-  public List<Record> queryDistance(final Geometry geometry,
-    final double distance) {
+  public List<Record> queryDistance(final Geometry geometry, final double distance) {
     if (geometry == null) {
       return Collections.emptyList();
     } else {
       BoundingBox boundingBox = geometry.getBoundingBox();
       boundingBox = boundingBox.expand(distance);
-      final RecordGeometryDistanceFilter filter = new RecordGeometryDistanceFilter(
-        geometry, distance);
+      final RecordGeometryDistanceFilter filter = new RecordGeometryDistanceFilter(geometry,
+        distance);
       return queryList(boundingBox, filter, filter);
     }
   }
@@ -119,13 +118,11 @@ public class RecordQuadTree extends QuadTree<Record> {
     }
   }
 
-  public Record queryFirstEquals(final Record object,
-    final Collection<String> excludedAttributes) {
+  public Record queryFirstEquals(final Record object, final Collection<String> excludedAttributes) {
     if (object == null) {
       return null;
     } else {
-      final RecordEqualsFilter filter = new RecordEqualsFilter(object,
-        excludedAttributes);
+      final RecordEqualsFilter filter = new RecordEqualsFilter(object, excludedAttributes);
       return queryFirst(object, filter);
     }
   }
@@ -136,8 +133,7 @@ public class RecordQuadTree extends QuadTree<Record> {
     if (convertedBoundingBox.isEmpty()) {
       return Arrays.asList();
     } else {
-      final Filter<Record> filter = new RecordGeometryBoundingBoxIntersectsFilter(
-        boundingBox);
+      final Filter<Record> filter = new RecordGeometryBoundingBoxIntersectsFilter(boundingBox);
       return queryList(convertedBoundingBox, filter);
     }
   }
@@ -147,20 +143,17 @@ public class RecordQuadTree extends QuadTree<Record> {
     if (geometryFactory != null) {
       geometry = geometry.convert(geometryFactory);
     }
-    final RecordGeometryIntersectsFilter filter = new RecordGeometryIntersectsFilter(
-      geometry);
+    final RecordGeometryIntersectsFilter filter = new RecordGeometryIntersectsFilter(geometry);
     return queryList(geometry, filter);
   }
 
-  public List<Record> queryList(final BoundingBox boundingBox,
-    final Filter<Record> filter) {
+  public List<Record> queryList(final BoundingBox boundingBox, final Filter<Record> filter) {
     return queryList(boundingBox, filter, null);
   }
 
-  public List<Record> queryList(final BoundingBox boundingBox,
-    final Filter<Record> filter, final Comparator<Record> comparator) {
-    final CreateListVisitor<Record> listVisitor = new CreateListVisitor<Record>(
-      filter);
+  public List<Record> queryList(final BoundingBox boundingBox, final Filter<Record> filter,
+    final Comparator<Record> comparator) {
+    final CreateListVisitor<Record> listVisitor = new CreateListVisitor<Record>(filter);
     visit(boundingBox, listVisitor);
     final List<Record> list = listVisitor.getList();
     if (comparator != null) {
@@ -169,14 +162,13 @@ public class RecordQuadTree extends QuadTree<Record> {
     return list;
   }
 
-  public List<Record> queryList(final Geometry geometry,
-    final Filter<Record> filter) {
+  public List<Record> queryList(final Geometry geometry, final Filter<Record> filter) {
     final BoundingBox boundingBox = geometry.getBoundingBox();
     return queryList(boundingBox, filter);
   }
 
-  public List<Record> queryList(final Geometry geometry,
-    final Filter<Record> filter, final Comparator<Record> comparator) {
+  public List<Record> queryList(final Geometry geometry, final Filter<Record> filter,
+    final Comparator<Record> comparator) {
     final BoundingBox boundingBox = geometry.getBoundingBox();
     return queryList(boundingBox, filter, comparator);
   }

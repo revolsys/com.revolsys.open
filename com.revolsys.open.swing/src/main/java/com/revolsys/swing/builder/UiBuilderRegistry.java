@@ -5,13 +5,13 @@ import java.util.Map;
 
 public class UiBuilderRegistry {
 
-  public static UiBuilderRegistry getInstance() {
-    return INSTANCE;
-  }
-
   private static final StringUiBuilder DEFAULT_RENDERER = new StringUiBuilder();
 
   private static UiBuilderRegistry INSTANCE = new UiBuilderRegistry();
+
+  public static UiBuilderRegistry getInstance() {
+    return INSTANCE;
+  }
 
   private final Map<Class<?>, UiBuilder> builders = new LinkedHashMap<Class<?>, UiBuilder>();
 

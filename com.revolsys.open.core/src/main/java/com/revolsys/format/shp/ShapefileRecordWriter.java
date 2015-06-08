@@ -72,10 +72,8 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
 
   private DataType geometryDataType;
 
-  public ShapefileRecordWriter(final RecordDefinition recordDefinition,
-    final Resource resource) {
-    super(recordDefinition,
-      SpringUtil.getResourceWithExtension(resource, "dbf"));
+  public ShapefileRecordWriter(final RecordDefinition recordDefinition, final Resource resource) {
+    super(recordDefinition, SpringUtil.getResourceWithExtension(resource, "dbf"));
     this.resource = resource;
   }
 
@@ -111,8 +109,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
     }
   }
 
-  private void doubleNotNaN(final ResourceEndianOutput out, final double value)
-      throws IOException {
+  private void doubleNotNaN(final ResourceEndianOutput out, final double value) throws IOException {
     if (MathUtil.isNanOrInfinite(value)) {
       out.writeLEDouble(0);
     } else {
@@ -132,12 +129,10 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
         writeHeader(this.out);
 
         if (!hasField(this.geometryPropertyName)) {
-          addFieldDefinition(this.geometryPropertyName,
-            XBaseFieldDefinition.OBJECT_TYPE, 0, 0);
+          addFieldDefinition(this.geometryPropertyName, XBaseFieldDefinition.OBJECT_TYPE, 0, 0);
         }
 
-        final Resource indexResource = SpringUtil.getResourceWithExtension(
-          this.resource, "shx");
+        final Resource indexResource = SpringUtil.getResourceWithExtension(this.resource, "shx");
         if (!(indexResource instanceof NonExistingResource)) {
           this.indexOut = new ResourceEndianOutput(indexResource);
           writeHeader(this.indexOut);
@@ -160,18 +155,16 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
           this.geometryFactory = geometry.getGeometryFactory();
         }
         if (this.geometryDataType == null) {
-          this.geometryDataType = object.getRecordDefinition()
-              .getGeometryField()
-              .getType();
+          this.geometryDataType = object.getRecordDefinition().getGeometryField().getType();
           if (DataTypes.GEOMETRY.equals(this.geometryDataType)) {
             final String geometryType = geometry.getGeometryType();
             this.geometryDataType = DataTypes.getType(geometryType);
           }
         }
-        this.shapeType = ShapefileGeometryUtil.SHP_INSTANCE.getShapeType(
-          this.geometryFactory, this.geometryDataType);
-        this.geometryWriteMethod = ShapefileGeometryUtil.getWriteMethod(
-          this.geometryFactory, this.geometryDataType);
+        this.shapeType = ShapefileGeometryUtil.SHP_INSTANCE.getShapeType(this.geometryFactory,
+          this.geometryDataType);
+        this.geometryWriteMethod = ShapefileGeometryUtil.getWriteMethod(this.geometryFactory,
+          this.geometryDataType);
       }
       EsriCoordinateSystems.createPrjFile(this.resource, this.geometryFactory);
     }
@@ -203,8 +196,8 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
   }
 
   @Override
-  protected boolean writeField(final Record object,
-    final XBaseFieldDefinition field) throws IOException {
+  protected boolean writeField(final Record object, final XBaseFieldDefinition field)
+    throws IOException {
     if (field.getFullName().equals(this.geometryPropertyName)) {
       final long recordIndex = this.out.getFilePointer();
       Geometry geometry = object.getGeometryValue();

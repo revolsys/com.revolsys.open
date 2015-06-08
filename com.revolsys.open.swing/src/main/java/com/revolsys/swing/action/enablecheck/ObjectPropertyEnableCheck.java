@@ -15,18 +15,17 @@ public class ObjectPropertyEnableCheck extends AbstractEnableCheck {
 
   private boolean inverse = false;
 
-  public ObjectPropertyEnableCheck(final Object object,
-    final String propertyName) {
+  public ObjectPropertyEnableCheck(final Object object, final String propertyName) {
     this(object, propertyName, true);
   }
 
-  public ObjectPropertyEnableCheck(final Object object,
-    final String propertyName, final Object value) {
+  public ObjectPropertyEnableCheck(final Object object, final String propertyName,
+    final Object value) {
     this(object, propertyName, value, false);
   }
 
-  public ObjectPropertyEnableCheck(final Object object,
-    final String propertyName, final Object value, final boolean inverse) {
+  public ObjectPropertyEnableCheck(final Object object, final String propertyName,
+    final Object value, final boolean inverse) {
     this.object = new WeakReference<>(object);
     this.propertyName = propertyName;
     this.value = value;

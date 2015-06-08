@@ -31,8 +31,8 @@ public class CoordinatesUtil {
     return new PointDouble(coordinates);
   }
 
-  public static Point circumcentre(final double x1, final double y1,
-    final double x2, final double y2, final double x3, final double y3) {
+  public static Point circumcentre(final double x1, final double y1, final double x2,
+    final double y2, final double x3, final double y3) {
     // compute the perpendicular bisector of chord ab
     final HCoordinate cab = perpendicularBisector(x1, y1, x2, y2);
     // compute the perpendicular bisector of chord bc
@@ -45,15 +45,13 @@ public class CoordinatesUtil {
     } catch (final NotRepresentableException ex) {
       // MD - not sure what we can do to prevent this (robustness problem)
       // Idea - can we condition which edges we choose?
-      throw new IllegalStateException(ex.getMessage() + " POLYGON((" + x1 + " "
-          + y1 + "," + x2 + " " + y2 + "," + x3 + " " + y3 + "," + x1 + " " + y1
-          + "))");
+      throw new IllegalStateException(ex.getMessage() + " POLYGON((" + x1 + " " + y1 + "," + x2
+        + " " + y2 + "," + x3 + " " + y3 + "," + x1 + " " + y1 + "))");
     }
     return cc;
   }
 
-  public static int compare(final double x1, final double y1, final double x2,
-    final double y2) {
+  public static int compare(final double x1, final double y1, final double x2, final double y2) {
     if (x1 < x2) {
       return -1;
     } else if (x1 > x2) {
@@ -95,8 +93,7 @@ public class CoordinatesUtil {
     }
   }
 
-  public static boolean contains(final Iterable<? extends Point> points,
-    final Point point) {
+  public static boolean contains(final Iterable<? extends Point> points, final Point point) {
     for (final Point point1 : points) {
       if (point1.equals(point)) {
         return true;
@@ -118,8 +115,7 @@ public class CoordinatesUtil {
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
   }
 
-  public static boolean equals(final double x1, final double y1,
-    final double x2, final double y2) {
+  public static boolean equals(final double x1, final double y1, final double x2, final double y2) {
     return x1 == x2 && y1 == y2;
   }
 
@@ -140,25 +136,21 @@ public class CoordinatesUtil {
     return axisCount;
   }
 
-  public static double getElevation(final LineString line,
-    final Point coordinate) {
+  public static double getElevation(final LineString line, final Point coordinate) {
     final LineString coordinates = line;
     Point previousCoordinate = coordinates.getPoint(0);
     for (int i = 1; i < coordinates.getVertexCount(); i++) {
       final Point currentCoordinate = coordinates.getPoint(i);
 
-      if (LineSegmentUtil.distanceLinePoint(previousCoordinate, currentCoordinate,
-        coordinate) < 1) {
-        return LineSegmentUtil.getElevation(previousCoordinate,
-          currentCoordinate, coordinate);
+      if (LineSegmentUtil.distanceLinePoint(previousCoordinate, currentCoordinate, coordinate) < 1) {
+        return LineSegmentUtil.getElevation(previousCoordinate, currentCoordinate, coordinate);
       }
       previousCoordinate = currentCoordinate;
     }
     return Double.NaN;
   }
 
-  public static double getElevation(final Point coordinate, final Point c0,
-    final Point c1) {
+  public static double getElevation(final Point coordinate, final Point c0, final Point c1) {
     final double fraction = coordinate.distance(c0) / c0.distance(c1);
     final double z = c0.getZ() + (c1.getZ() - c0.getZ()) * fraction;
     return z;
@@ -175,8 +167,7 @@ public class CoordinatesUtil {
     }
   }
 
-  public static boolean isAcute(final Point point1, final Point point2,
-    final Point point3) {
+  public static boolean isAcute(final Point point1, final Point point2, final Point point3) {
     final double x1 = point1.getX();
     final double y1 = point1.getY();
     final double x2 = point2.getX();
@@ -207,8 +198,8 @@ public class CoordinatesUtil {
    */
   public static int octant(final double dx, final double dy) {
     if (dx == 0.0 && dy == 0.0) {
-      throw new IllegalArgumentException(
-        "Cannot compute the octant for point ( " + dx + ", " + dy + " )");
+      throw new IllegalArgumentException("Cannot compute the octant for point ( " + dx + ", " + dy
+        + " )");
     }
 
     final double adx = Math.abs(dx);
@@ -252,14 +243,12 @@ public class CoordinatesUtil {
     final double dx = p1.getX() - p0.getX();
     final double dy = p1.getY() - p0.getY();
     if (dx == 0.0 && dy == 0.0) {
-      throw new IllegalArgumentException(
-        "Cannot compute the octant for two identical points " + p0);
+      throw new IllegalArgumentException("Cannot compute the octant for two identical points " + p0);
     }
     return octant(dx, dy);
   }
 
-  public static Point offset(final Point coordinate, final double angle,
-    final double distance) {
+  public static Point offset(final Point coordinate, final double angle, final double distance) {
     final double newX = coordinate.getX() + distance * Math.cos(angle);
     final double newY = coordinate.getY() + distance * Math.sin(angle);
     final Point newCoordinate = new PointDouble(newX, newY);
@@ -267,8 +256,7 @@ public class CoordinatesUtil {
 
   }
 
-  public static int orientationIndex(final Point p1, final Point p2,
-    final Point q) {
+  public static int orientationIndex(final Point p1, final Point p2, final Point q) {
     // travelling along p1->p2, turn counter clockwise to get to q return 1,
     // travelling along p1->p2, turn clockwise to get to q return -1,
     // p1, p2 and q are colinear return 0.
@@ -285,13 +273,12 @@ public class CoordinatesUtil {
     return RobustDeterminant.signOfDet2x2(dx1, dy1, dx2, dy2);
   }
 
-  public static HCoordinate perpendicularBisector(final double x1,
-    final double y1, final double x2, final double y2) {
+  public static HCoordinate perpendicularBisector(final double x1, final double y1,
+    final double x2, final double y2) {
     final double dx = x2 - x1;
     final double dy = y2 - y1;
     final HCoordinate l1 = new HCoordinate(x1 + dx / 2.0, y1 + dy / 2.0, 1.0);
-    final HCoordinate l2 = new HCoordinate(x1 - dy + dx / 2.0, y1 + dx + dy
-      / 2.0, 1.0);
+    final HCoordinate l2 = new HCoordinate(x1 - dy + dx / 2.0, y1 + dx + dy / 2.0, 1.0);
     return new HCoordinate(l1, l2);
   }
 
@@ -312,8 +299,7 @@ public class CoordinatesUtil {
     return null;
   }
 
-  public static Point setElevation(final Point newLocation,
-    final Point originalLocation) {
+  public static Point setElevation(final Point newLocation, final Point originalLocation) {
     if (originalLocation.getAxisCount() > 2) {
       final double z = originalLocation.getZ();
       if (Double.isNaN(z)) {
@@ -339,8 +325,7 @@ public class CoordinatesUtil {
     return coordinates;
   }
 
-  public static Point translate(final Point point, final Double angle,
-    final double length) {
+  public static Point translate(final Point point, final Double angle, final double length) {
     final double x = point.getX();
     final double y = point.getY();
 

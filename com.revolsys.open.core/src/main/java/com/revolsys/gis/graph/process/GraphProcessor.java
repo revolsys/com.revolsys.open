@@ -43,8 +43,7 @@ public class GraphProcessor extends BaseInOutProcess<Record, Record> {
   }
 
   @Override
-  protected void postRun(final Channel<Record> in,
-    final Channel<Record> out) {
+  protected void postRun(final Channel<Record> in, final Channel<Record> out) {
     if (out != null) {
       processGraph();
       for (final Edge<Record> edge : this.graph.getEdges()) {
@@ -55,8 +54,7 @@ public class GraphProcessor extends BaseInOutProcess<Record, Record> {
   }
 
   @Override
-  protected void process(final Channel<Record> in,
-    final Channel<Record> out, final Record object) {
+  protected void process(final Channel<Record> in, final Channel<Record> out, final Record object) {
     final Geometry geometry = object.getGeometryValue();
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
@@ -81,8 +79,7 @@ public class GraphProcessor extends BaseInOutProcess<Record, Record> {
     this.precisionModel = precisionModel;
   }
 
-  public void setProcessors(
-    final List<ObjectProcessor<RecordGraph>> processors) {
+  public void setProcessors(final List<ObjectProcessor<RecordGraph>> processors) {
     this.processors = processors;
   }
 }

@@ -51,8 +51,7 @@ public class CachedLayerRecordArrayList extends ArrayList<LayerRecord> {
   }
 
   @Override
-  public boolean addAll(final int index,
-    final Collection<? extends LayerRecord> c) {
+  public boolean addAll(final int index, final Collection<? extends LayerRecord> c) {
     final boolean addAll = super.addAll(index, c);
     updateCache();
     return addAll;

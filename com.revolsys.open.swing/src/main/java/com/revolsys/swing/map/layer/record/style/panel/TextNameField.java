@@ -35,28 +35,26 @@ public class TextNameField extends ValueField {
 
   private final ComboBox fieldNamesField;
 
-  public TextNameField(final AbstractRecordLayer layer,
-    final String fieldName, final Object fieldValue) {
+  public TextNameField(final AbstractRecordLayer layer, final String fieldName,
+    final Object fieldValue) {
     super(new BorderLayout());
     this.textNameField = new TextArea(fieldName, fieldValue, 3, 30);
     add(new JScrollPane(this.textNameField), BorderLayout.NORTH);
 
-    final ArrayList<String> fieldNames = new ArrayList<String>(
-        layer.getFieldNames());
+    final ArrayList<String> fieldNames = new ArrayList<String>(layer.getFieldNames());
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
     fieldNames.remove(recordDefinition.getGeometryFieldName());
-    final AttributeTitleStringConveter converter = new AttributeTitleStringConveter(
-      layer);
+    final AttributeTitleStringConveter converter = new AttributeTitleStringConveter(layer);
     this.fieldNamesField = new ComboBox(converter, false, fieldNames.toArray());
     this.fieldNamesField.setRenderer(converter);
 
-    final JButton addButton = InvokeMethodAction.createButton(null,
-      "Add field name", Icons.getIcon("add"), this, "addFieldName");
+    final JButton addButton = InvokeMethodAction.createButton(null, "Add field name",
+      Icons.getIcon("add"), this, "addFieldName");
     addButton.setIcon(Icons.getIcon("add"));
     addButton.setToolTipText("Add field Name");
 
-    final BasePanel fieldNamesPanel = new BasePanel(new FlowLayout(
-      FlowLayout.LEFT), this.fieldNamesField, addButton);
+    final BasePanel fieldNamesPanel = new BasePanel(new FlowLayout(FlowLayout.LEFT),
+      this.fieldNamesField, addButton);
     GroupLayoutUtil.makeColumns(fieldNamesPanel, 2, false);
     add(fieldNamesPanel, BorderLayout.SOUTH);
 
@@ -108,8 +106,8 @@ public class TextNameField extends ValueField {
   }
 
   @Override
-  public void setFieldInvalid(final String message,
-    final Color foregroundColor, final Color backgroundColor) {
+  public void setFieldInvalid(final String message, final Color foregroundColor,
+    final Color backgroundColor) {
     this.textNameField.setFieldInvalid(message, foregroundColor, backgroundColor);
   }
 

@@ -46,14 +46,13 @@ import com.revolsys.jts.util.Assert;
  * the start of the geometry.
  */
 class LengthIndexOfPoint {
-  public static double indexOf(final Geometry linearGeom,
-    final Point inputPt) {
+  public static double indexOf(final Geometry linearGeom, final Point inputPt) {
     final LengthIndexOfPoint locater = new LengthIndexOfPoint(linearGeom);
     return locater.indexOf(inputPt);
   }
 
-  public static double indexOfAfter(final Geometry linearGeom,
-    final Point inputPt, final double minIndex) {
+  public static double indexOfAfter(final Geometry linearGeom, final Point inputPt,
+    final double minIndex) {
     final LengthIndexOfPoint locater = new LengthIndexOfPoint(linearGeom);
     return locater.indexOfAfter(inputPt, minIndex);
   }
@@ -104,13 +103,11 @@ class LengthIndexOfPoint {
     /**
      * Return the minDistanceLocation found.
      */
-    Assert.isTrue(closestAfter >= minIndex,
-        "computed index is before specified minimum index");
+    Assert.isTrue(closestAfter >= minIndex, "computed index is before specified minimum index");
     return closestAfter;
   }
 
-  private double indexOfFromStart(final Point inputPt,
-    final double minIndex) {
+  private double indexOfFromStart(final Point inputPt, final double minIndex) {
     double minDistance = Double.MAX_VALUE;
 
     double ptMeasure = minIndex;
@@ -123,8 +120,8 @@ class LengthIndexOfPoint {
         final double length = p0.distance(p1);
 
         final double segDistance = LineSegmentUtil.distanceLinePoint(p0, p1, inputPt);
-        final double segMeasureToPt = segmentNearestMeasure(p0, p1, inputPt,
-          segmentStartMeasure, length);
+        final double segMeasureToPt = segmentNearestMeasure(p0, p1, inputPt, segmentStartMeasure,
+          length);
         if (segDistance < minDistance && segMeasureToPt > minIndex) {
           ptMeasure = segMeasureToPt;
           minDistance = segDistance;
@@ -136,8 +133,7 @@ class LengthIndexOfPoint {
     return ptMeasure;
   }
 
-  private double segmentNearestMeasure(final Point p0,
-    final Point p1, final Point inputPt,
+  private double segmentNearestMeasure(final Point p0, final Point p1, final Point inputPt,
     final double segmentStartMeasure, final double length) {
     // found new minimum, so compute location distance of point
     final double projFactor = LineSegmentUtil.projectionFactor(p0, p1, inputPt);

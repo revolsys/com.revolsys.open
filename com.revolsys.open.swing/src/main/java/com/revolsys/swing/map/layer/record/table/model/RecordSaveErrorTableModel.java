@@ -26,8 +26,10 @@ import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.record.model.RecordListTableModel;
 import com.revolsys.swing.table.record.row.RecordRowTable;
 
-public class RecordSaveErrorTableModel extends RecordListTableModel implements
-SortableTableModel, ListSelectionListener {
+public class RecordSaveErrorTableModel extends RecordListTableModel implements SortableTableModel,
+  ListSelectionListener {
+  private static final long serialVersionUID = 1L;
+
   public static TablePanel createPanel(final RecordSaveErrorTableModel model) {
     final RecordRowTable table = new RecordRowTable(model);
     table.setVisibleRowCount(model.getRowCount() + 1);
@@ -37,8 +39,6 @@ SortableTableModel, ListSelectionListener {
     return new TablePanel(table);
   }
 
-  private static final long serialVersionUID = 1L;
-
   private final AbstractRecordLayer layer;
 
   private final List<String> messages = new ArrayList<>();
@@ -46,8 +46,7 @@ SortableTableModel, ListSelectionListener {
   private final List<Throwable> exceptions = new ArrayList<>();
 
   public RecordSaveErrorTableModel(final AbstractRecordLayer layer) {
-    super(layer.getRecordDefinition(), Collections.<LayerRecord> emptyList(),
-      layer.getFieldNames());
+    super(layer.getRecordDefinition(), Collections.<LayerRecord> emptyList(), layer.getFieldNames());
     this.layer = layer;
     setFieldsOffset(1);
     setEditable(true);
@@ -66,7 +65,7 @@ SortableTableModel, ListSelectionListener {
     if (exception instanceof ObjectPropertyException) {
       final ObjectPropertyException objectPropertyException = (ObjectPropertyException)exception;
       message = objectPropertyException.getPropertyName() + ": "
-          + objectPropertyException.getMessage();
+        + objectPropertyException.getMessage();
     } else {
       message = exception.getMessage();
     }
@@ -121,19 +120,18 @@ SortableTableModel, ListSelectionListener {
     } else {
       final String layerPath = this.layer.getPath();
       final BasePanel panel = new BasePanel(new VerticalLayout(), new JLabel(
-        "<html><p><b style=\"color:red\">Error saving changes for layer:</b></p><p>"
-            + layerPath + "</p>"), RecordSaveErrorTableModel.createPanel(this));
-      panel.setPreferredSize(new Dimension(
-        SwingUtil.getScreenBounds().width - 300, getRowCount() * 22 + 75));
+        "<html><p><b style=\"color:red\">Error saving changes for layer:</b></p><p>" + layerPath
+          + "</p>"), RecordSaveErrorTableModel.createPanel(this));
+      panel.setPreferredSize(new Dimension(SwingUtil.getScreenBounds().width - 300,
+        getRowCount() * 22 + 75));
 
       final Window window = SwingUtil.getActiveWindow();
-      final JOptionPane pane = new JOptionPane(panel,
-        JOptionPane.ERROR_MESSAGE, JOptionPane.DEFAULT_OPTION, null, null, null);
+      final JOptionPane pane = new JOptionPane(panel, JOptionPane.ERROR_MESSAGE,
+        JOptionPane.DEFAULT_OPTION, null, null, null);
 
       pane.setComponentOrientation(window.getComponentOrientation());
 
-      final JDialog dialog = pane.createDialog(window, "Error Saving Changes: "
-          + layerPath);
+      final JDialog dialog = pane.createDialog(window, "Error Saving Changes: " + layerPath);
 
       dialog.pack();
       SwingUtil.setLocationCentre(dialog);

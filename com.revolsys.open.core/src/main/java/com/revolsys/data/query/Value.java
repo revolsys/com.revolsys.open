@@ -61,8 +61,8 @@ public class Value extends QueryValue {
   }
 
   @Override
-  public void appendDefaultSql(final Query query,
-    final RecordStore recordStore, final StringBuilder buffer) {
+  public void appendDefaultSql(final Query query, final RecordStore recordStore,
+    final StringBuilder buffer) {
     if (this.jdbcAttribute == null) {
       buffer.append('?');
     } else {
@@ -73,8 +73,7 @@ public class Value extends QueryValue {
   @Override
   public int appendParameters(final int index, final PreparedStatement statement) {
     try {
-      return this.jdbcAttribute.setPreparedStatementValue(statement, index,
-        this.queryValue);
+      return this.jdbcAttribute.setPreparedStatementValue(statement, index, this.queryValue);
     } catch (final SQLException e) {
       throw new RuntimeException("Unable to set value: " + this.queryValue, e);
     }
@@ -87,12 +86,11 @@ public class Value extends QueryValue {
 
   public void convert(final DataType dataType) {
     if (this.queryValue != null) {
-      final Object newValue = StringConverterRegistry.toObject(dataType,
-        this.queryValue);
+      final Object newValue = StringConverterRegistry.toObject(dataType, this.queryValue);
       final Class<?> typeClass = dataType.getJavaClass();
       if (newValue == null || !typeClass.isAssignableFrom(newValue.getClass())) {
-        throw new IllegalArgumentException("'" + this.queryValue
-          + "' is not a valid " + dataType.getValidationName());
+        throw new IllegalArgumentException("'" + this.queryValue + "' is not a valid "
+          + dataType.getValidationName());
       } else {
         setQueryValue(newValue);
       }

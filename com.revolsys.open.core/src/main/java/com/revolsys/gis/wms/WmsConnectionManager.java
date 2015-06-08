@@ -16,13 +16,13 @@ import com.revolsys.collection.map.Maps;
 
 public class WmsConnectionManager {
 
-  public static WmsConnectionManager get() {
-    return INSTANCE;
-  }
-
   private static final Logger LOG = LoggerFactory.getLogger(WmsConnectionManager.class);
 
   private static WmsConnectionManager INSTANCE = new WmsConnectionManager();
+
+  public static WmsConnectionManager get() {
+    return INSTANCE;
+  }
 
   private final Map<String, WmsClient> wmsConnections = new HashMap<String, WmsClient>();
 
@@ -34,8 +34,7 @@ public class WmsConnectionManager {
     node.put("connectionUrl", "http://openmaps.gov.bc.ca/mapserver/base2");
   }
 
-  public WmsConnectionManager(final Preferences root,
-    final String preferencesPath) {
+  public WmsConnectionManager(final Preferences root, final String preferencesPath) {
     this.wmsConnectionsPrefereneces = root.node(preferencesPath);
   }
 

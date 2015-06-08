@@ -45,8 +45,7 @@ import com.revolsys.jts.geom.Geometry;
  * @author Martin Davis
  *
  */
-public abstract class BaseGeometryFunction implements GeometryFunction,
-Comparable {
+public abstract class BaseGeometryFunction implements GeometryFunction, Comparable {
   private static int compareTo(final Class c1, final Class c2) {
     return c1.getName().compareTo(c2.getName());
   }
@@ -72,8 +71,7 @@ Comparable {
   }
 
   public static boolean isBinaryGeomFunction(final GeometryFunction func) {
-    return func.getParameterTypes().length >= 1
-        && func.getParameterTypes()[0] == Geometry.class;
+    return func.getParameterTypes().length >= 1 && func.getParameterTypes()[0] == Geometry.class;
   }
 
   protected String category = null;
@@ -88,9 +86,8 @@ Comparable {
 
   protected Class returnType;
 
-  public BaseGeometryFunction(final String category, final String name,
-    final String description, final String[] parameterNames,
-    final Class[] parameterTypes, final Class returnType) {
+  public BaseGeometryFunction(final String category, final String name, final String description,
+    final String[] parameterNames, final Class[] parameterTypes, final Class returnType) {
     this.category = category;
     this.name = name;
     this.description = description;
@@ -100,8 +97,7 @@ Comparable {
   }
 
   public BaseGeometryFunction(final String category, final String name,
-    final String[] parameterNames, final Class[] parameterTypes,
-    final Class returnType) {
+    final String[] parameterNames, final Class[] parameterTypes, final Class returnType) {
     this.category = category;
     this.name = name;
     this.parameterNames = parameterNames;

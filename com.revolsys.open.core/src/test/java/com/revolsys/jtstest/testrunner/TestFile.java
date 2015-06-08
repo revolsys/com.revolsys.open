@@ -79,10 +79,9 @@ public class TestFile extends TestSuite implements MapSerializer {
    * @param geometryOperation a GeometryOperation to use for all tests in this run (may be null)
    * @param testFile
    */
-  public TestFile(final TestDirectory parent, final String description,
-    final int runIndex, final GeometryFactory geometryFactory,
-    final GeometryOperation geomOp, final ResultMatcher resultMatcher,
-    final File testFile) {
+  public TestFile(final TestDirectory parent, final String description, final int runIndex,
+    final GeometryFactory geometryFactory, final GeometryOperation geomOp,
+    final ResultMatcher resultMatcher, final File testFile) {
     this.parent = parent;
     this.runIndex = runIndex;
     if (Property.hasValue(description)) {

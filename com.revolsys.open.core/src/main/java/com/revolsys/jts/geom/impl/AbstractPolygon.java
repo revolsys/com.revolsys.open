@@ -84,8 +84,7 @@ import com.revolsys.jts.operation.distance.DistanceOp;
  *
  *@version 1.7
  */
-public abstract class AbstractPolygon extends AbstractGeometry implements
-  Polygon {
+public abstract class AbstractPolygon extends AbstractGeometry implements Polygon {
   private static final long serialVersionUID = -3494792200821764533L;
 
   /**
@@ -121,15 +120,14 @@ public abstract class AbstractPolygon extends AbstractGeometry implements
     final double[] coordinates = new double[vertexCount * axisCount];
     int newVertexIndex = 0;
     for (int vertexIndex = index; vertexIndex < vertexCount - 1; vertexIndex++) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount,
-        newVertexIndex++, points, vertexIndex);
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, newVertexIndex++, points,
+        vertexIndex);
     }
     for (int vertexIndex = 0; vertexIndex < index; vertexIndex++) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount,
-        newVertexIndex++, points, vertexIndex);
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, newVertexIndex++, points,
+        vertexIndex);
     }
-    CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexCount - 1,
-      points, index);
+    CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexCount - 1, points, index);
     final GeometryFactory geometryFactory = ring.getGeometryFactory();
     return geometryFactory.linearRing(axisCount, coordinates);
   }
@@ -139,14 +137,12 @@ public abstract class AbstractPolygon extends AbstractGeometry implements
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V appendVertex(final Point newPoint,
-    final int... geometryId) {
+  public <V extends Geometry> V appendVertex(final Point newPoint, final int... geometryId) {
     if (newPoint == null || newPoint.isEmpty()) {
       return (V)this;
     } else if (geometryId.length == 1) {
       if (isEmpty()) {
-        throw new IllegalArgumentException(
-          "Cannot move vertex for empty Polygon");
+        throw new IllegalArgumentException("Cannot move vertex for empty Polygon");
       } else {
         final int ringIndex = geometryId[0];
         final int ringCount = getRingCount();
@@ -159,15 +155,13 @@ public abstract class AbstractPolygon extends AbstractGeometry implements
           rings.set(ringIndex, newRing);
           return (V)geometryFactory.polygon(rings);
         } else {
-          throw new IllegalArgumentException(
-            "Ring index must be between 0 and " + ringCount + " not "
-              + ringIndex);
+          throw new IllegalArgumentException("Ring index must be between 0 and " + ringCount
+            + " not " + ringIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException(
-        "Geometry id's for Polygons must have length 1. "
-          + Arrays.toString(geometryId));
+      throw new IllegalArgumentException("Geometry id's for Polygons must have length 1. "
+        + Arrays.toString(geometryId));
     }
   }
 
@@ -222,8 +216,7 @@ public abstract class AbstractPolygon extends AbstractGeometry implements
   public <V extends Geometry> V deleteVertex(final int... vertexId) {
     if (vertexId.length == 2) {
       if (isEmpty()) {
-        throw new IllegalArgumentException(
-          "Cannot move vertex for empty Polygon");
+        throw new IllegalArgumentException("Cannot move vertex for empty Polygon");
       } else {
         final int ringIndex = vertexId[0];
         final int vertexIndex = vertexId[1];
@@ -237,21 +230,18 @@ public abstract class AbstractPolygon extends AbstractGeometry implements
           rings.set(ringIndex, newRing);
           return (V)geometryFactory.polygon(rings);
         } else {
-          throw new IllegalArgumentException(
-            "Ring index must be between 0 and " + ringCount + " not "
-              + ringIndex);
+          throw new IllegalArgumentException("Ring index must be between 0 and " + ringCount
+            + " not " + ringIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException(
-        "Vertex id's for Polygons must have length 2. "
-          + Arrays.toString(vertexId));
+      throw new IllegalArgumentException("Vertex id's for Polygons must have length 2. "
+        + Arrays.toString(vertexId));
     }
   }
 
   @Override
-  protected double doDistance(final Geometry geometry,
-    final double terminateDistance) {
+  protected double doDistance(final Geometry geometry, final double terminateDistance) {
     if (geometry instanceof Point) {
       final Point point = (Point)geometry;
       return doDistance(point, terminateDistance);
@@ -266,8 +256,7 @@ public abstract class AbstractPolygon extends AbstractGeometry implements
     }
   }
 
-  protected double doDistance(final LineString line,
-    final double terminateDistance) {
+  protected double doDistance(final LineString line, final double terminateDistance) {
     // TODO Auto-generated method stub
     final DistanceOp distOp = new DistanceOp(this, line, terminateDistance);
     final double distance = distOp.distance();
@@ -292,8 +281,7 @@ public abstract class AbstractPolygon extends AbstractGeometry implements
     }
   }
 
-  protected double doDistance(final Polygon polygon,
-    final double terminateDistance) {
+  protected double doDistance(final Polygon polygon, final double terminateDistance) {
     // TODO Auto-generated method stub
     final DistanceOp distOp = new DistanceOp(this, polygon, terminateDistance);
     final double distance = distOp.distance();
@@ -422,8 +410,7 @@ public abstract class AbstractPolygon extends AbstractGeometry implements
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> List<V> getGeometryComponents(
-    final Class<V> geometryClass) {
+  public <V extends Geometry> List<V> getGeometryComponents(final Class<V> geometryClass) {
     final List<V> geometries = new ArrayList<V>();
     if (geometryClass.isAssignableFrom(getClass())) {
       geometries.add((V)this);
@@ -592,14 +579,12 @@ public abstract class AbstractPolygon extends AbstractGeometry implements
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V insertVertex(final Point newPoint,
-    final int... vertexId) {
+  public <V extends Geometry> V insertVertex(final Point newPoint, final int... vertexId) {
     if (newPoint == null || newPoint.isEmpty()) {
       return (V)this;
     } else if (vertexId.length == 2) {
       if (isEmpty()) {
-        throw new IllegalArgumentException(
-          "Cannot move vertex for empty Polygon");
+        throw new IllegalArgumentException("Cannot move vertex for empty Polygon");
       } else {
         final int ringIndex = vertexId[0];
         final int vertexIndex = vertexId[1];
@@ -613,15 +598,13 @@ public abstract class AbstractPolygon extends AbstractGeometry implements
           rings.set(ringIndex, newRing);
           return (V)geometryFactory.polygon(rings);
         } else {
-          throw new IllegalArgumentException(
-            "Ring index must be between 0 and " + ringCount + " not "
-              + ringIndex);
+          throw new IllegalArgumentException("Ring index must be between 0 and " + ringCount
+            + " not " + ringIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException(
-        "Vertex id's for Polygons must have length 2. "
-          + Arrays.toString(vertexId));
+      throw new IllegalArgumentException("Vertex id's for Polygons must have length 2. "
+        + Arrays.toString(vertexId));
     }
   }
 
@@ -705,8 +688,7 @@ public abstract class AbstractPolygon extends AbstractGeometry implements
       point = point.convert(geometryFactory);
       final LinearRing shell = getShell();
       final Point point1 = point;
-      final Location shellLocation = RayCrossingCounter.locatePointInRing(
-        point1, shell);
+      final Location shellLocation = RayCrossingCounter.locatePointInRing(point1, shell);
       if (shellLocation == Location.EXTERIOR) {
         return Location.EXTERIOR;
       } else if (shellLocation == Location.BOUNDARY) {
@@ -714,8 +696,7 @@ public abstract class AbstractPolygon extends AbstractGeometry implements
       } else {
         for (final LinearRing hole : holes()) {
           final Point point2 = point;
-          final Location holeLocation = RayCrossingCounter.locatePointInRing(
-            point2, hole);
+          final Location holeLocation = RayCrossingCounter.locatePointInRing(point2, hole);
           if (holeLocation == Location.INTERIOR) {
             return Location.EXTERIOR;
           } else if (holeLocation == Location.BOUNDARY) {
@@ -744,14 +725,12 @@ public abstract class AbstractPolygon extends AbstractGeometry implements
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V moveVertex(final Point newPoint,
-    final int... vertexId) {
+  public <V extends Geometry> V moveVertex(final Point newPoint, final int... vertexId) {
     if (newPoint == null || newPoint.isEmpty()) {
       return (V)this;
     } else if (vertexId.length == 2) {
       if (isEmpty()) {
-        throw new IllegalArgumentException(
-          "Cannot move vertex for empty Polygon");
+        throw new IllegalArgumentException("Cannot move vertex for empty Polygon");
       } else {
         final int ringIndex = vertexId[0];
         final int vertexIndex = vertexId[1];
@@ -765,15 +744,13 @@ public abstract class AbstractPolygon extends AbstractGeometry implements
           rings.set(ringIndex, newRing);
           return (V)geometryFactory.polygon(rings);
         } else {
-          throw new IllegalArgumentException(
-            "Ring index must be between 0 and " + ringCount + " not "
-              + ringIndex);
+          throw new IllegalArgumentException("Ring index must be between 0 and " + ringCount
+            + " not " + ringIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException(
-        "Vertex id's for Polygons must have length 2. "
-          + Arrays.toString(vertexId));
+      throw new IllegalArgumentException("Vertex id's for Polygons must have length 2. "
+        + Arrays.toString(vertexId));
     }
   }
 

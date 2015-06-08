@@ -52,8 +52,8 @@ public class PointBuilder {
 
   private final List<Point> resultLineString = new ArrayList<Point>();
 
-  public PointBuilder(final OverlayOp op,
-    final GeometryFactory geometryFactory, final PointLocator ptLocator) {
+  public PointBuilder(final OverlayOp op, final GeometryFactory geometryFactory,
+    final PointLocator ptLocator) {
     this.op = op;
     this.geometryFactory = geometryFactory;
     // ptLocator is never used in this class

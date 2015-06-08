@@ -52,8 +52,7 @@ class LocationIndexOfLine {
    * because it is intended to validate that the subline truly is a subline,
    * and also to use the internal vertex information to unambiguously locate the subline.
    */
-  public static LinearLocation[] indicesOf(final Geometry linearGeom,
-    final Geometry subLine) {
+  public static LinearLocation[] indicesOf(final Geometry linearGeom, final Geometry subLine) {
     final LocationIndexOfLine locater = new LocationIndexOfLine(linearGeom);
     return locater.indicesOf(subLine);
   }

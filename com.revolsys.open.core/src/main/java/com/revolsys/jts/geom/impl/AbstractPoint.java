@@ -80,8 +80,7 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V appendVertex(final Point newPoint,
-    final int... geometryId) {
+  public <V extends Geometry> V appendVertex(final Point newPoint, final int... geometryId) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (newPoint == null || newPoint.isEmpty()) {
       return (V)this;
@@ -172,8 +171,8 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
         final int sourceAxisCount = getAxisCount();
         final int targetAxisCount = geometryFactory.getAxisCount();
         targetCoordinates = new double[targetAxisCount];
-        coordinatesOperation.perform(sourceAxisCount, coordinates,
-          targetAxisCount, targetCoordinates);
+        coordinatesOperation.perform(sourceAxisCount, coordinates, targetAxisCount,
+          targetCoordinates);
       }
 
       return (V)geometryFactory.point(targetCoordinates);
@@ -187,8 +186,7 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
    * @param coordinates
    */
   @Override
-  public void copyCoordinates(GeometryFactory geometryFactory,
-    final double[] coordinates) {
+  public void copyCoordinates(GeometryFactory geometryFactory, final double[] coordinates) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
       for (int i = 0; i < coordinates.length; i++) {
@@ -210,8 +208,8 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
       } else {
         final int sourceAxisCount = getAxisCount();
         final int targetAxisCount = geometryFactory.getAxisCount();
-        coordinatesOperation.perform(sourceAxisCount, getCoordinates(),
-          targetAxisCount, coordinates);
+        coordinatesOperation.perform(sourceAxisCount, getCoordinates(), targetAxisCount,
+          coordinates);
       }
 
     }
@@ -261,8 +259,7 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
   }
 
   @Override
-  protected double doDistance(final Geometry geometry,
-    final double terminateDistance) {
+  protected double doDistance(final Geometry geometry, final double terminateDistance) {
     if (geometry instanceof Point) {
       final Point point = (Point)geometry;
       final double x = point.getX();
@@ -487,8 +484,7 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V insertVertex(final Point newPoint,
-    final int... vertexId) {
+  public <V extends Geometry> V insertVertex(final Point newPoint, final int... vertexId) {
     if (vertexId.length == 1) {
       final int vertexIndex = vertexId[0];
       final GeometryFactory geometryFactory = getGeometryFactory();
@@ -576,8 +572,7 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V moveVertex(final Point newPoint,
-    final int... vertexId) {
+  public <V extends Geometry> V moveVertex(final Point newPoint, final int... vertexId) {
     if (newPoint == null || newPoint.isEmpty()) {
       return (V)this;
     } else {

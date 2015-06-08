@@ -43,9 +43,8 @@ public class Mercator2SP extends AbstractCoordinatesProjection {
   }
 
   @Override
-  public void inverse(final double x, final double y,
-    final double[] targetCoordinates, final int targetOffset,
-    final int targetAxisCount) {
+  public void inverse(final double x, final double y, final double[] targetCoordinates,
+    final int targetOffset, final int targetAxisCount) {
     final double dX = (x - this.x0) / this.multiple;
     final double dY = (y - this.y0) / this.multiple;
 
@@ -57,7 +56,7 @@ public class Mercator2SP extends AbstractCoordinatesProjection {
     do {
       final double eSinPhi = this.e * Math.sin(phi);
       final double phi1 = Angle.PI_OVER_2 - 2
-          * Math.atan(t * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.eOver2));
+        * Math.atan(t * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.eOver2));
       delta = Math.abs(phi1 - phi);
       phi = phi1;
     } while (delta > 1.0e-011);
@@ -67,16 +66,15 @@ public class Mercator2SP extends AbstractCoordinatesProjection {
   }
 
   @Override
-  public void project(final double lambda, final double phi,
-    final double[] targetCoordinates, final int targetOffset,
-    final int targetAxisCount) {
+  public void project(final double lambda, final double phi, final double[] targetCoordinates,
+    final int targetOffset, final int targetAxisCount) {
 
     final double x = this.a * (lambda - this.lambda0) * this.multiple;
 
     final double eSinPhi = this.e * Math.sin(phi);
-    final double y = this.a * Math.log(Math.tan(Angle.PI_OVER_4 + phi / 2)
-      * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.eOver2))
-      * this.multiple;
+    final double y = this.a
+      * Math.log(Math.tan(Angle.PI_OVER_4 + phi / 2)
+        * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.eOver2)) * this.multiple;
 
     targetCoordinates[targetOffset * targetAxisCount] = this.x0 + x;
     targetCoordinates[targetOffset * targetAxisCount + 1] = this.y0 + y;

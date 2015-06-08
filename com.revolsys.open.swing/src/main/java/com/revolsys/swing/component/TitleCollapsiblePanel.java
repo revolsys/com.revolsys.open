@@ -30,13 +30,12 @@ public class TitleCollapsiblePanel extends BasePanel implements MouseListener {
     this(title, null, component);
   }
 
-  public TitleCollapsiblePanel(final String title,
-    final ComponentFactory<?> componentFactory) {
+  public TitleCollapsiblePanel(final String title, final ComponentFactory<?> componentFactory) {
     this(title, componentFactory, null);
   }
 
-  private TitleCollapsiblePanel(final String title,
-    final ComponentFactory<?> componentFactory, final Component component) {
+  private TitleCollapsiblePanel(final String title, final ComponentFactory<?> componentFactory,
+    final Component component) {
     super(new VerticalLayout());
     this.componentFactory = componentFactory;
 

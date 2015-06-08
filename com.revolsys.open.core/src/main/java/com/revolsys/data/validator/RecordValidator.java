@@ -36,34 +36,30 @@ import com.revolsys.data.types.EnumerationDataType;
 public class RecordValidator {
   private static final Logger log = Logger.getLogger(RecordValidator.class);
 
-  private final FieldValueValidator recordAttributeValidator = new RecordAttributeValidator(
-    this);
+  private final FieldValueValidator recordAttributeValidator = new RecordAttributeValidator(this);
 
   private final Map<DataType, FieldValueValidator> objectValidators = new HashMap<DataType, FieldValueValidator>();
 
   public RecordValidator() {
     setObjectValidator(DataTypes.BOOLEAN, new BooleanAttributeValidator());
-    setObjectValidator(DataTypes.DECIMAL,
-      new BigDecimalAttributeValidator(true));
-    setObjectValidator(DataTypes.INTEGER, new BigDecimalAttributeValidator(
-      Long.MIN_VALUE, Long.MAX_VALUE));
-    setObjectValidator(DataTypes.BYTE, new BigDecimalAttributeValidator(
-      Byte.MIN_VALUE, Byte.MAX_VALUE));
-    setObjectValidator(DataTypes.SHORT, new BigDecimalAttributeValidator(
-      Short.MIN_VALUE, Short.MAX_VALUE));
-    setObjectValidator(DataTypes.INT, new BigDecimalAttributeValidator(
-      Integer.MIN_VALUE, Integer.MAX_VALUE));
-    setObjectValidator(DataTypes.LONG, new BigDecimalAttributeValidator(
-      Long.MIN_VALUE, Long.MAX_VALUE));
-    setObjectValidator(DataTypes.DECIMAL,
-      new BigDecimalAttributeValidator(true));
+    setObjectValidator(DataTypes.DECIMAL, new BigDecimalAttributeValidator(true));
+    setObjectValidator(DataTypes.INTEGER, new BigDecimalAttributeValidator(Long.MIN_VALUE,
+      Long.MAX_VALUE));
+    setObjectValidator(DataTypes.BYTE, new BigDecimalAttributeValidator(Byte.MIN_VALUE,
+      Byte.MAX_VALUE));
+    setObjectValidator(DataTypes.SHORT, new BigDecimalAttributeValidator(Short.MIN_VALUE,
+      Short.MAX_VALUE));
+    setObjectValidator(DataTypes.INT, new BigDecimalAttributeValidator(Integer.MIN_VALUE,
+      Integer.MAX_VALUE));
+    setObjectValidator(DataTypes.LONG, new BigDecimalAttributeValidator(Long.MIN_VALUE,
+      Long.MAX_VALUE));
+    setObjectValidator(DataTypes.DECIMAL, new BigDecimalAttributeValidator(true));
     setObjectValidator(DataTypes.FLOAT, new BigDecimalAttributeValidator(true));
     setObjectValidator(DataTypes.DOUBLE, new BigDecimalAttributeValidator(true));
     setObjectValidator(DataTypes.DATE, new DateAttributeValidator());
     setObjectValidator(DataTypes.GEOMETRY, new GeometryFieldValidator());
     setObjectValidator(DataTypes.POINT, new GeometryFieldValidator());
-    setObjectValidator(DataTypes.MULTI_LINE_STRING,
-      new GeometryFieldValidator());
+    setObjectValidator(DataTypes.MULTI_LINE_STRING, new GeometryFieldValidator());
     setObjectValidator(DataTypes.POLYGON, new GeometryFieldValidator());
     setObjectValidator(DataTypes.MULTI_POINT, new GeometryFieldValidator());
     setObjectValidator(DataTypes.MULTI_POLYGON, new GeometryFieldValidator());
@@ -86,8 +82,7 @@ public class RecordValidator {
         validator = new EnumerationAttributeValidator(enumerationDataType);
       } else {
         final String packageName = getClass().getPackage().getName();
-        final String className = packageName + "." + dataType
-            + "AttributeValidator";
+        final String className = packageName + "." + dataType + "AttributeValidator";
         try {
           final Class<?> validatorClass = Class.forName(className);
           validator = (FieldValueValidator)validatorClass.newInstance();
@@ -127,7 +122,7 @@ public class RecordValidator {
             if (!validator.isValid(attribDef, value)) {
               if (!(validator instanceof RecordAttributeValidator)) {
                 log.error(fieldName + "='" + value + "' is not a valid "
-                    + dataType.getValidationName());
+                  + dataType.getValidationName());
               }
               valid = i == record.getRecordDefinition().getGeometryFieldIndex();
             }
@@ -141,8 +136,7 @@ public class RecordValidator {
     }
   }
 
-  public void setObjectValidator(final DataType dataType,
-    final FieldValueValidator validator) {
+  public void setObjectValidator(final DataType dataType, final FieldValueValidator validator) {
     this.objectValidators.put(dataType, validator);
   }
 }

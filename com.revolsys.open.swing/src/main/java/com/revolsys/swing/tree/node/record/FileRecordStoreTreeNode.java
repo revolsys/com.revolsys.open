@@ -29,18 +29,17 @@ import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.file.FileTreeNode;
 import com.revolsys.util.Property;
 
-public class FileRecordStoreTreeNode extends FileTreeNode implements
-RecordStoreProxy, RecordStoreConnectionMapProxy {
+public class FileRecordStoreTreeNode extends FileTreeNode implements RecordStoreProxy,
+  RecordStoreConnectionMapProxy {
   private static final MenuFactory MENU = new MenuFactory("File Record Store");
 
   static {
-    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh",
-      "arrow_refresh", NODE_EXISTS, "refresh");
+    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh", "arrow_refresh",
+      NODE_EXISTS, "refresh");
     MENU.addMenuItem("default", refresh);
 
-    MENU.addMenuItem("default", TreeNodeRunnable.createAction(
-      "Add Record Store Connection", "link_add", NODE_EXISTS,
-        "addRecordStoreConnection"));
+    MENU.addMenuItem("default", TreeNodeRunnable.createAction("Add Record Store Connection",
+      "link_add", NODE_EXISTS, "addRecordStoreConnection"));
   }
 
   public FileRecordStoreTreeNode(final File file) {
@@ -74,13 +73,13 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
 
     final List<RecordStoreConnectionRegistry> registries = new ArrayList<>();
     for (final RecordStoreConnectionRegistry registry : RecordStoreConnectionManager.get()
-        .getVisibleConnectionRegistries()) {
+      .getVisibleConnectionRegistries()) {
       if (!registry.isReadOnly()) {
         registries.add(registry);
       }
     }
-    final JComboBox registryField = new JComboBox(
-      new Vector<RecordStoreConnectionRegistry>(registries));
+    final JComboBox registryField = new JComboBox(new Vector<RecordStoreConnectionRegistry>(
+      registries));
 
     panel.add(registryField);
 
@@ -109,8 +108,7 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
   @Override
   protected List<BaseTreeNode> doLoadChildren() {
     final RecordStore recordStore = getRecordStore();
-    return RecordStoreConnectionTreeNode.getChildren(
-      getRecordStoreConnectionMap(), recordStore);
+    return RecordStoreConnectionTreeNode.getChildren(getRecordStoreConnectionMap(), recordStore);
   }
 
   @Override

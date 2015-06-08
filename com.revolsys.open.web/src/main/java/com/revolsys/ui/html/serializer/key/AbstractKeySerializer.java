@@ -7,8 +7,8 @@ import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
-public abstract class AbstractKeySerializer extends
-AbstractObjectWithProperties implements KeySerializer {
+public abstract class AbstractKeySerializer extends AbstractObjectWithProperties implements
+  KeySerializer {
   private String name;
 
   private String label;

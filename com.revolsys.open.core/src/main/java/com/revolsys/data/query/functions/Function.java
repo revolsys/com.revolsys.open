@@ -33,8 +33,8 @@ public class Function extends QueryValue {
   }
 
   @Override
-  public void appendDefaultSql(final Query query,
-    final RecordStore recordStore, final StringBuilder buffer) {
+  public void appendDefaultSql(final Query query, final RecordStore recordStore,
+    final StringBuilder buffer) {
     buffer.append(this.name);
     buffer.append("(");
     boolean first = true;
@@ -107,8 +107,7 @@ public class Function extends QueryValue {
     return Collections.unmodifiableList(this.parameters);
   }
 
-  public String getParameterStringValue(final int index,
-    final Map<String, Object> record) {
+  public String getParameterStringValue(final int index, final Map<String, Object> record) {
     final QueryValue parameter = getParameter(index);
     if (parameter == null) {
       return null;
@@ -117,8 +116,7 @@ public class Function extends QueryValue {
     }
   }
 
-  public <V> V getParameterValue(final int index,
-    final Map<String, Object> record) {
+  public <V> V getParameterValue(final int index, final Map<String, Object> record) {
     final QueryValue parameter = getParameter(index);
     if (parameter == null) {
       return null;
@@ -136,8 +134,7 @@ public class Function extends QueryValue {
 
   @Override
   public <V> V getValue(final Map<String, Object> record) {
-    throw new UnsupportedOperationException("Function is not supported"
-        + getName());
+    throw new UnsupportedOperationException("Function is not supported" + getName());
   }
 
   @Override

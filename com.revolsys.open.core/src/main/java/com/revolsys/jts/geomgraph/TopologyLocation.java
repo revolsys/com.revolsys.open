@@ -71,8 +71,7 @@ public class TopologyLocation {
    * and Location.INTERIOR.
    * @see Location
    */
-  public TopologyLocation(final Location on, final Location left,
-    final Location right) {
+  public TopologyLocation(final Location on, final Location left, final Location right) {
     init(3);
     this.location[Position.ON] = on;
     this.location[Position.LEFT] = left;
@@ -205,8 +204,7 @@ public class TopologyLocation {
     setLocation(Position.ON, locValue);
   }
 
-  public void setLocations(final Location on, final Location left,
-    final Location right) {
+  public void setLocations(final Location on, final Location left, final Location right) {
     this.location[Position.ON] = on;
     this.location[Position.LEFT] = left;
     this.location[Position.RIGHT] = right;

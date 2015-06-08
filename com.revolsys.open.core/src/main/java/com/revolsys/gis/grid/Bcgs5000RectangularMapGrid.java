@@ -4,8 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Bcgs5000RectangularMapGrid extends Bcgs10000RectangularMapGrid {
-  private static final Pattern NAME_PATTERN = Pattern.compile("^"
-      + BcgsConstants.REGEX_5000 + ".*");
+  private static final Pattern NAME_PATTERN = Pattern.compile("^" + BcgsConstants.REGEX_5000 + ".*");
 
   public Bcgs5000RectangularMapGrid() {
     this(BcgsConstants.WIDTH_5000, BcgsConstants.HEIGHT_5000);
@@ -25,8 +24,7 @@ public class Bcgs5000RectangularMapGrid extends Bcgs10000RectangularMapGrid {
       final String number20k = matcher.group(3);
       final String number10k = matcher.group(4);
       final String number5k = matcher.group(5);
-      final double latitude = getLatitude(blockName, letter, number20k,
-        number10k, number5k);
+      final double latitude = getLatitude(blockName, letter, number20k, number10k, number5k);
       return latitude;
     } else {
       throw new IllegalArgumentException(mapTileName
@@ -34,8 +32,8 @@ public class Bcgs5000RectangularMapGrid extends Bcgs10000RectangularMapGrid {
     }
   }
 
-  protected double getLatitude(final String blockName, final String letter,
-    final String number20k, final String number10k, final String number5k) {
+  protected double getLatitude(final String blockName, final String letter, final String number20k,
+    final String number10k, final String number5k) {
     double latitude = getLatitude(blockName, letter, number20k, number10k);
     final int numberRow = GridUtil.getNumberRow4(number5k);
     latitude += numberRow * BcgsConstants.HEIGHT_5000;
@@ -51,8 +49,7 @@ public class Bcgs5000RectangularMapGrid extends Bcgs10000RectangularMapGrid {
       final String number20k = matcher.group(3);
       final String number10k = matcher.group(4);
       final String number5k = matcher.group(5);
-      final double longitude = getLongitude(blockName, letter, number20k,
-        number10k, number5k);
+      final double longitude = getLongitude(blockName, letter, number20k, number10k, number5k);
       return longitude;
     } else {
       throw new IllegalArgumentException(mapTileName

@@ -98,22 +98,68 @@ import java.io.Serializable;
  * @author Martin Davis
  *
  */
-public strictfp final class DD
-implements Serializable, Comparable, Cloneable
-{
+public strictfp final class DD implements Serializable, Comparable, Cloneable {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * The value nearest to the constant Pi.
+   */
+  public static final DD PI = new DD(3.141592653589793116e+00, 1.224646799147353207e-16);
+
+  /**
+   * The value nearest to the constant 2 * Pi.
+   */
+  public static final DD TWO_PI = new DD(6.283185307179586232e+00, 2.449293598294706414e-16);
+
+  /**
+   * The value nearest to the constant Pi / 2.
+   */
+  public static final DD PI_2 = new DD(1.570796326794896558e+00, 6.123233995736766036e-17);
+
+  /**
+   * The value nearest to the constant e (the natural logarithm base).
+   */
+  public static final DD E = new DD(2.718281828459045091e+00, 1.445646891729250158e-16);
+
+  /**
+   * A value representing the result of an operation which does not return a valid number.
+   */
+  public static final DD NaN = new DD(Double.NaN, Double.NaN);
+
+  /**
+   * The smallest representable relative difference between two {link @ DoubleDouble} values
+   */
+  public static final double EPS = 1.23259516440783e-32; /* = 2^-106 */
+
+  /**
+   * The value to split a double-precision value on during multiplication
+   */
+  private static final double SPLIT = 134217729.0D; // 2^27+1, for IEEE double
+
+  private static final int MAX_PRINT_DIGITS = 32;
+
+  private static final DD TEN = DD.valueOf(10.0);
+
+  private static final DD ONE = DD.valueOf(1.0);
+
+  private static final String SCI_NOT_EXPONENT_CHAR = "E";
+
+  private static final String SCI_NOT_ZERO = "0.0E0";
+
   /**
    * Creates a new DoubleDouble with the value of the argument.
    *
    * @param dd the DoubleDouble value to copy
    * @return a copy of the input value
    */
-  public static DD copy(final DD dd)
-  {
+  public static DD copy(final DD dd) {
     return new DD(dd);
   }
 
-  private static DD createNaN()
-  {
+  private static DD createNaN() {
     return new DD(Double.NaN, Double.NaN);
   }
 
@@ -125,11 +171,10 @@ implements Serializable, Comparable, Cloneable
    * @param x the number to find the magnitude of
    * @return the decimal magnitude of x
    */
-  private static int magnitude(final double x)
-  {
+  private static int magnitude(final double x) {
     final double xAbs = Math.abs(x);
     final double xLog10 = Math.log(xAbs) / Math.log(10);
-    int xMag = (int) Math.floor(xLog10);
+    int xMag = (int)Math.floor(xLog10);
     /**
      * Since log computation is inexact, there may be an off-by-one error
      * in the computed magnitude.
@@ -155,9 +200,7 @@ implements Serializable, Comparable, Cloneable
    * @return the value of the parsed number
    * @throws NumberFormatException if <tt>str</tt> is not a valid representation of a number
    */
-  public static DD parse(final String str)
-      throws NumberFormatException
-  {
+  public static DD parse(final String str) throws NumberFormatException {
     int i = 0;
     final int strlen = str.length();
 
@@ -179,7 +222,8 @@ implements Serializable, Comparable, Cloneable
     }
 
     // scan all digits and accumulate into an integral value
-    // Keep track of the location of the decimal point (if any) to allow scaling later
+    // Keep track of the location of the decimal point (if any) to allow scaling
+    // later
     final DD val = new DD();
 
     int numDigits = 0;
@@ -208,14 +252,12 @@ implements Serializable, Comparable, Cloneable
         // this should catch any format problems with the exponent
         try {
           exp = Integer.parseInt(expStr);
-        }
-        catch (final NumberFormatException ex) {
+        } catch (final NumberFormatException ex) {
           throw new NumberFormatException("Invalid exponent " + expStr + " in string " + str);
         }
         break;
       }
-      throw new NumberFormatException("Unexpected character '" + ch
-        + "' at position " + i
+      throw new NumberFormatException("Unexpected character '" + ch + "' at position " + i
         + " in string " + str);
     }
     DD val2 = val;
@@ -224,12 +266,10 @@ implements Serializable, Comparable, Cloneable
     final int numDecPlaces = numDigits - numBeforeDec - exp;
     if (numDecPlaces == 0) {
       val2 = val;
-    }
-    else if (numDecPlaces > 0) {
+    } else if (numDecPlaces > 0) {
       final DD scale = TEN.pow(numDecPlaces);
       val2 = val.divide(scale);
-    }
-    else if (numDecPlaces < 0) {
+    } else if (numDecPlaces < 0) {
       final DD scale = TEN.pow(-numDecPlaces);
       val2 = val.multiply(scale);
     }
@@ -246,13 +286,11 @@ implements Serializable, Comparable, Cloneable
    *
    * @return the square of this value.
    */
-  public static DD sqr(final double x)
-  {
+  public static DD sqr(final double x) {
     return valueOf(x).selfMultiply(x);
   }
 
-  public static DD sqrt(final double x)
-  {
+  public static DD sqrt(final double x) {
     return valueOf(x).sqrt();
   }
 
@@ -263,8 +301,7 @@ implements Serializable, Comparable, Cloneable
    * @param len the len of the desired string
    * @return the string
    */
-  private static String stringOfChar(final char ch, final int len)
-  {
+  private static String stringOfChar(final char ch, final int len) {
     final StringBuilder buf = new StringBuilder();
     for (int i = 0; i < len; i++) {
       buf.append(ch);
@@ -278,7 +315,9 @@ implements Serializable, Comparable, Cloneable
    * @param x a numeric value
    * @return the extended precision version of the value
    */
-  public static DD valueOf(final double x) { return new DD(x); }
+  public static DD valueOf(final double x) {
+    return new DD(x);
+  }
 
   /**
    * Converts the string argument to a DoubleDouble number.
@@ -287,102 +326,35 @@ implements Serializable, Comparable, Cloneable
    * @return the extended precision version of the value
    * @throws NumberFormatException if <tt>s</tt> is not a valid representation of a number
    */
-  public static DD valueOf(final String str)
-      throws NumberFormatException
-  {
+  public static DD valueOf(final String str) throws NumberFormatException {
     return parse(str);
   }
-
-  /**
-   *
-   */
-  private static final long serialVersionUID = 1L;
-
-  /**
-   * The value nearest to the constant Pi.
-   */
-  public static final DD PI = new DD(
-    3.141592653589793116e+00,
-    1.224646799147353207e-16);
-
-  /**
-   * The value nearest to the constant 2 * Pi.
-   */
-  public static final DD TWO_PI = new DD(
-    6.283185307179586232e+00,
-    2.449293598294706414e-16);
-
-  /**
-   * The value nearest to the constant Pi / 2.
-   */
-  public static final DD PI_2 = new DD(
-    1.570796326794896558e+00,
-    6.123233995736766036e-17);
-
-  /**
-   * The value nearest to the constant e (the natural logarithm base).
-   */
-  public static final DD E = new DD(
-    2.718281828459045091e+00,
-    1.445646891729250158e-16);
-
-  /**
-   * A value representing the result of an operation which does not return a valid number.
-   */
-  public static final DD NaN = new DD(Double.NaN, Double.NaN);
-
-  /**
-   * The smallest representable relative difference between two {link @ DoubleDouble} values
-   */
-  public static final double EPS = 1.23259516440783e-32;  /* = 2^-106 */
-
-  /**
-   * The value to split a double-precision value on during multiplication
-   */
-  private static final double SPLIT = 134217729.0D; // 2^27+1, for IEEE double
 
   /**
    * The high-order component of the double-double precision value.
    */
   private double hi = 0.0;
 
+  /*
+   * double getHighComponent() { return hi; } double getLowComponent() { return
+   * lo; }
+   */
+
+  // Testing only - should not be public
+  /*
+   * public void RENORM() { double s = hi + lo; double err = lo - (s - hi); hi =
+   * s; lo = err; }
+   */
+
   /**
    * The low-order component of the double-double precision value.
    */
   private double lo = 0.0;
 
-  private static final int MAX_PRINT_DIGITS = 32;
-
-  private static final DD TEN = DD.valueOf(10.0);
-
-  private static final DD ONE = DD.valueOf(1.0);
-
-  private static final String SCI_NOT_EXPONENT_CHAR = "E";
-
-  /*
-  double getHighComponent() { return hi; }
-
-  double getLowComponent() { return lo; }
-   */
-
-  // Testing only - should not be public
-  /*
-  public void RENORM()
-  {
-    double s = hi + lo;
-    double err = lo - (s - hi);
-    hi = s;
-    lo = err;
-  }
-   */
-
-  private static final String SCI_NOT_ZERO = "0.0E0";
-
   /**
    * Creates a new DoubleDouble with value 0.0.
    */
-  public DD()
-  {
+  public DD() {
     init(0.0);
   }
 
@@ -391,8 +363,7 @@ implements Serializable, Comparable, Cloneable
    *
    * @param dd the value to initialize
    */
-  public DD(final DD dd)
-  {
+  public DD(final DD dd) {
     init(dd);
   }
 
@@ -401,8 +372,7 @@ implements Serializable, Comparable, Cloneable
    *
    * @param x the value to initialize
    */
-  public DD(final double x)
-  {
+  public DD(final double x) {
     init(x);
   }
 
@@ -412,8 +382,7 @@ implements Serializable, Comparable, Cloneable
    * @param hi the high-order component
    * @param lo the high-order component
    */
-  public DD(final double hi, final double lo)
-  {
+  public DD(final double hi, final double lo) {
     init(hi, lo);
   }
 
@@ -423,9 +392,7 @@ implements Serializable, Comparable, Cloneable
    * @param str the value to initialize by
    * @throws NumberFormatException if <tt>str</tt> is not a valid representation of a number
    */
-  public DD(final String str)
-      throws NumberFormatException
-  {
+  public DD(final String str) throws NumberFormatException {
     this(parse(str));
   }
 
@@ -438,8 +405,7 @@ implements Serializable, Comparable, Cloneable
    *
    * @return the absolute value of this value
    */
-  public DD abs()
-  {
+  public DD abs() {
     if (isNaN()) {
       return NaN;
     }
@@ -449,15 +415,13 @@ implements Serializable, Comparable, Cloneable
     return new DD(this);
   }
 
-
   /**
    * Returns a DoubleDouble whose value is <tt>(this + y)</tt>.
    *
    * @param y the addend
    * @return <tt>(this + y)</tt>
    */
-  public final DD add(final DD y)
-  {
+  public final DD add(final DD y) {
     return copy(this).selfAdd(y);
   }
 
@@ -467,8 +431,7 @@ implements Serializable, Comparable, Cloneable
    * @param y the addend
    * @return <tt>(this + y)</tt>
    */
-  public final DD add(final double y)
-  {
+  public final DD add(final double y) {
     return copy(this).selfAdd(y);
   }
 
@@ -483,14 +446,13 @@ implements Serializable, Comparable, Cloneable
    * @return the smallest (closest to negative infinity) value
    * that is not less than the argument and is equal to a mathematical integer.
    */
-  public DD ceil()
-  {
+  public DD ceil() {
     if (isNaN()) {
       return NaN;
     }
-    final double fhi=Math.ceil(this.hi);
+    final double fhi = Math.ceil(this.hi);
     double flo = 0.0;
-    // Hi is already integral.  Ceil the low word
+    // Hi is already integral. Ceil the low word
     if (fhi == this.hi) {
       flo = Math.ceil(this.lo);
       // do we need to renormalize here?
@@ -504,12 +466,10 @@ implements Serializable, Comparable, Cloneable
    * @return a copy of this value
    */
   @Override
-  public Object clone()
-  {
+  public Object clone() {
     try {
       return super.clone();
-    }
-    catch (final CloneNotSupportedException ex) {
+    } catch (final CloneNotSupportedException ex) {
       // should never reach here
       return null;
     }
@@ -522,9 +482,8 @@ implements Serializable, Comparable, Cloneable
    * or greater than the value of <tt>o</tt>
    */
   @Override
-  public int compareTo(final Object o)
-  {
-    final DD other = (DD) o;
+  public int compareTo(final Object o) {
+    final DD other = (DD)o;
 
     if (this.hi < other.hi) {
       return -1;
@@ -547,17 +506,24 @@ implements Serializable, Comparable, Cloneable
    * @param y the divisor
    * @return a new object with the value <tt>(this / y)</tt>
    */
-  public final DD divide(final DD y)
-  {
+  public final DD divide(final DD y) {
     double hc, tc, hy, ty, C, c, U, u;
-    C = this.hi/y.hi; c = SPLIT*C; hc =c-C;  u = SPLIT*y.hi; hc = c-hc;
-    tc = C-hc; hy = u-y.hi; U = C * y.hi; hy = u-hy; ty = y.hi-hy;
-    u = hc*hy-U+hc*ty+tc*hy+tc*ty;
-    c = (this.hi-U-u+this.lo-C*y.lo)/y.hi;
-    u = C+c;
+    C = this.hi / y.hi;
+    c = SPLIT * C;
+    hc = c - C;
+    u = SPLIT * y.hi;
+    hc = c - hc;
+    tc = C - hc;
+    hy = u - y.hi;
+    U = C * y.hi;
+    hy = u - hy;
+    ty = y.hi - hy;
+    u = hc * hy - U + hc * ty + tc * hy + tc * ty;
+    c = (this.hi - U - u + this.lo - C * y.lo) / y.hi;
+    u = C + c;
 
     final double zhi = u;
-    final double zlo = C-u+c;
+    final double zlo = C - u + c;
     return new DD(zhi, zlo);
   }
 
@@ -567,8 +533,7 @@ implements Serializable, Comparable, Cloneable
    * @param y the divisor
    * @return a new object with the value <tt>(this / y)</tt>
    */
-  public final DD divide(final double y)
-  {
+  public final DD divide(final double y) {
     if (Double.isNaN(y)) {
       return createNaN();
     }
@@ -580,8 +545,7 @@ implements Serializable, Comparable, Cloneable
    *
    * @return the nearest double-precision number to this value
    */
-  public double doubleValue()
-  {
+  public double doubleValue() {
     return this.hi + this.lo;
   }
 
@@ -590,8 +554,7 @@ implements Serializable, Comparable, Cloneable
    *
    * @return a string showing the components of the number
    */
-  public String dump()
-  {
+  public String dump() {
     return "DD<" + this.hi + ", " + this.lo + ">";
   }
 
@@ -601,8 +564,7 @@ implements Serializable, Comparable, Cloneable
    * @param y a DoubleDouble value
    * @return true if this value = y
    */
-  public boolean equals(final DD y)
-  {
+  public boolean equals(final DD y) {
     return this.hi == y.hi && this.lo == y.lo;
   }
 
@@ -616,8 +578,7 @@ implements Serializable, Comparable, Cloneable
    * @param decimalPointPos the position in which to insert a decimal point
    * @return the string containing the significant digits and possibly a decimal point
    */
-  private String extractSignificantDigits(final boolean insertDecimalPoint, final int[] magnitude)
-  {
+  private String extractSignificantDigits(final boolean insertDecimalPoint, final int[] magnitude) {
     DD y = this.abs();
     // compute *correct* magnitude of y
     int mag = magnitude(y.hi);
@@ -628,8 +589,7 @@ implements Serializable, Comparable, Cloneable
     if (y.gt(TEN)) {
       y = y.divide(TEN);
       mag += 1;
-    }
-    else if (y.lt(ONE)) {
+    } else if (y.lt(ONE)) {
       y = y.multiply(TEN);
       mag -= 1;
     }
@@ -641,15 +601,17 @@ implements Serializable, Comparable, Cloneable
       if (insertDecimalPoint && i == decimalPointPos) {
         buf.append('.');
       }
-      final int digit = (int) y.hi;
-      //      System.out.println("printDump: [" + i + "] digit: " + digit + "  y: " + y.dump() + "  buf: " + buf);
+      final int digit = (int)y.hi;
+      // System.out.println("printDump: [" + i + "] digit: " + digit + "  y: " +
+      // y.dump() + "  buf: " + buf);
 
       /**
        * This should never happen, due to heuristic checks on remainder below
        */
       if (digit < 0 || digit > 9) {
-        //        System.out.println("digit > 10 : " + digit);
-        //        throw new IllegalStateException("Internal errror: found digit = " + digit);
+        // System.out.println("digit > 10 : " + digit);
+        // throw new IllegalStateException("Internal errror: found digit = " +
+        // digit);
       }
       /**
        * If a negative remainder is encountered, simply terminate the extraction.
@@ -659,7 +621,8 @@ implements Serializable, Comparable, Cloneable
        */
       if (digit < 0) {
         break;
-        // throw new IllegalStateException("Internal errror: found digit = " + digit);
+        // throw new IllegalStateException("Internal errror: found digit = " +
+        // digit);
       }
       boolean rebiasBy10 = false;
       char digitChar = 0;
@@ -668,13 +631,11 @@ implements Serializable, Comparable, Cloneable
         rebiasBy10 = true;
         // output digit will end up being '9'
         digitChar = '9';
-      }
-      else {
-        digitChar = (char) ('0' + digit);
+      } else {
+        digitChar = (char)('0' + digit);
       }
       buf.append(digitChar);
-      y = y.subtract(DD.valueOf(digit))
-          .multiply(TEN);
+      y = y.subtract(DD.valueOf(digit)).multiply(TEN);
       if (rebiasBy10) {
         y.selfAdd(TEN);
       }
@@ -684,9 +645,9 @@ implements Serializable, Comparable, Cloneable
        * Heuristic check: if the remaining portion of
        * y is non-positive, assume that output is complete
        */
-      //      if (y.hi <= 0.0)
-      //        if (y.hi < 0.0)
-      //        continueExtractingDigits = false;
+      // if (y.hi <= 0.0)
+      // if (y.hi < 0.0)
+      // continueExtractingDigits = false;
       /**
        * Check if remaining digits will be 0, and if so don't output them.
        * Do this by comparing the magnitude of the remainder with the expected precision.
@@ -695,7 +656,7 @@ implements Serializable, Comparable, Cloneable
       if (remMag < 0 && Math.abs(remMag) >= numDigits - i) {
         continueExtractingDigits = false;
       }
-      if (! continueExtractingDigits) {
+      if (!continueExtractingDigits) {
         break;
       }
     }
@@ -716,14 +677,13 @@ implements Serializable, Comparable, Cloneable
    * value that is not greater than the argument
    * and is equal to a mathematical integer.
    */
-  public DD floor()
-  {
+  public DD floor() {
     if (isNaN()) {
       return NaN;
     }
-    final double fhi=Math.floor(this.hi);
+    final double fhi = Math.floor(this.hi);
     double flo = 0.0;
-    // Hi is already integral.  Floor the low word
+    // Hi is already integral. Floor the low word
     if (fhi == this.hi) {
       flo = Math.floor(this.lo);
     }
@@ -736,8 +696,7 @@ implements Serializable, Comparable, Cloneable
    * @param y a DoubleDouble value
    * @return true if this value >= y
    */
-  public boolean ge(final DD y)
-  {
+  public boolean ge(final DD y) {
     return this.hi > y.hi || this.hi == y.hi && this.lo >= y.lo;
   }
 
@@ -748,8 +707,7 @@ implements Serializable, Comparable, Cloneable
    * @return the string for this special number
    * or null if the number is not a special number
    */
-  private String getSpecialNumberString()
-  {
+  private String getSpecialNumberString() {
     if (isZero()) {
       return "0.0";
     }
@@ -764,25 +722,21 @@ implements Serializable, Comparable, Cloneable
    * @param y a DoubleDouble value
    * @return true if this value > y
    */
-  public boolean gt(final DD y)
-  {
+  public boolean gt(final DD y) {
     return this.hi > y.hi || this.hi == y.hi && this.lo > y.lo;
   }
 
-  private final void init(final DD dd)
-  {
+  private final void init(final DD dd) {
     this.hi = dd.hi;
     this.lo = dd.lo;
   }
 
-  private final void init(final double x)
-  {
+  private final void init(final double x) {
     this.hi = x;
     this.lo = 0.0;
   }
 
-  private final void init(final double hi, final double lo)
-  {
+  private final void init(final double hi, final double lo) {
     this.hi = hi;
     this.lo = lo;
   }
@@ -792,9 +746,8 @@ implements Serializable, Comparable, Cloneable
    *
    * @return the nearest integer to this value
    */
-  public int intValue()
-  {
-    return (int) this.hi;
+  public int intValue() {
+    return (int)this.hi;
   }
 
   /**
@@ -802,15 +755,16 @@ implements Serializable, Comparable, Cloneable
    *
    * @return true if this value is NaN
    */
-  public boolean isNaN() { return Double.isNaN(this.hi); }
+  public boolean isNaN() {
+    return Double.isNaN(this.hi);
+  }
 
   /**
    * Tests whether this value is less than 0.
    *
    * @return true if this value is less than 0
    */
-  public boolean isNegative()
-  {
+  public boolean isNegative() {
     return this.hi < 0.0 || this.hi == 0.0 && this.lo < 0.0;
   }
 
@@ -819,8 +773,7 @@ implements Serializable, Comparable, Cloneable
    *
    * @return true if this value is greater than 0
    */
-  public boolean isPositive()
-  {
+  public boolean isPositive() {
     return this.hi > 0.0 || this.hi == 0.0 && this.lo > 0.0;
   }
 
@@ -829,8 +782,7 @@ implements Serializable, Comparable, Cloneable
    *
    * @return true if this value is equal to 0
    */
-  public boolean isZero()
-  {
+  public boolean isZero() {
     return this.hi == 0.0 && this.lo == 0.0;
   }
 
@@ -839,8 +791,7 @@ implements Serializable, Comparable, Cloneable
    * @param y a DoubleDouble value
    * @return true if this value <= y
    */
-  public boolean le(final DD y)
-  {
+  public boolean le(final DD y) {
     return this.hi < y.hi || this.hi == y.hi && this.lo <= y.lo;
   }
 
@@ -849,11 +800,9 @@ implements Serializable, Comparable, Cloneable
    * @param y a DoubleDouble value
    * @return true if this value < y
    */
-  public boolean lt(final DD y)
-  {
+  public boolean lt(final DD y) {
     return this.hi < y.hi || this.hi == y.hi && this.lo < y.lo;
   }
-
 
   /*------------------------------------------------------------
    *   Ordering Functions
@@ -869,8 +818,7 @@ implements Serializable, Comparable, Cloneable
   public DD max(final DD x) {
     if (this.ge(x)) {
       return this;
-    }
-    else {
+    } else {
       return x;
     }
   }
@@ -884,8 +832,7 @@ implements Serializable, Comparable, Cloneable
   public DD min(final DD x) {
     if (this.le(x)) {
       return this;
-    }
-    else {
+    } else {
       return x;
     }
   }
@@ -901,8 +848,7 @@ implements Serializable, Comparable, Cloneable
    * @param y the multiplicand
    * @return <tt>(this * y)</tt>
    */
-  public final DD multiply(final DD y)
-  {
+  public final DD multiply(final DD y) {
     if (y.isNaN()) {
       return createNaN();
     }
@@ -915,8 +861,7 @@ implements Serializable, Comparable, Cloneable
    * @param y the multiplicand
    * @return <tt>(this * y)</tt>
    */
-  public final DD multiply(final double y)
-  {
+  public final DD multiply(final double y) {
     if (Double.isNaN(y)) {
       return createNaN();
     }
@@ -933,8 +878,7 @@ implements Serializable, Comparable, Cloneable
    *
    * @return <tt>-this</tt>
    */
-  public final DD negate()
-  {
+  public final DD negate() {
     if (isNaN()) {
       return this;
     }
@@ -948,8 +892,7 @@ implements Serializable, Comparable, Cloneable
    * @param exp the integer exponent
    * @return x raised to the integral power exp
    */
-  public DD pow(final int exp)
-  {
+  public DD pow(final int exp) {
     if (exp == 0.0) {
       return valueOf(1.0);
     }
@@ -985,19 +928,23 @@ implements Serializable, Comparable, Cloneable
    *
    * @return the reciprocal of this value
    */
-  public final DD reciprocal()
-  {
-    double  hc, tc, hy, ty, C, c, U, u;
-    C = 1.0/this.hi;
-    c = SPLIT*C;
-    hc =c-C;
-    u = SPLIT*this.hi;
-    hc = c-hc; tc = C-hc; hy = u-this.hi; U = C*this.hi; hy = u-hy; ty = this.hi-hy;
-    u = hc*hy-U+hc*ty+tc*hy+tc*ty;
-    c = (1.0-U-u-C*this.lo)/this.hi;
+  public final DD reciprocal() {
+    double hc, tc, hy, ty, C, c, U, u;
+    C = 1.0 / this.hi;
+    c = SPLIT * C;
+    hc = c - C;
+    u = SPLIT * this.hi;
+    hc = c - hc;
+    tc = C - hc;
+    hy = u - this.hi;
+    U = C * this.hi;
+    hy = u - hy;
+    ty = this.hi - hy;
+    u = hc * hy - U + hc * ty + tc * hy + tc * ty;
+    c = (1.0 - U - u - C * this.lo) / this.hi;
 
-    final double  zhi = C+c;
-    final double  zlo = C-zhi+c;
+    final double zhi = C + c;
+    final double zlo = C - zhi + c;
     return new DD(zhi, zlo);
   }
 
@@ -1011,8 +958,7 @@ implements Serializable, Comparable, Cloneable
    *
    * @return this value rounded to the nearest integer
    */
-  public DD rint()
-  {
+  public DD rint() {
     if (isNaN()) {
       return this;
     }
@@ -1030,8 +976,7 @@ implements Serializable, Comparable, Cloneable
    * @param y the addend
    * @return this object, increased by y
    */
-  public final DD selfAdd(final DD y)
-  {
+  public final DD selfAdd(final DD y) {
     return selfAdd(y.hi, y.lo);
   }
 
@@ -1044,8 +989,7 @@ implements Serializable, Comparable, Cloneable
    * @param y the addend
    * @return this object, increased by y
    */
-  public final DD selfAdd(final double y)
-  {
+  public final DD selfAdd(final double y) {
     double H, h, S, s, e, f;
     S = this.hi + y;
     e = S - this.hi;
@@ -1059,18 +1003,21 @@ implements Serializable, Comparable, Cloneable
     return this;
     // return selfAdd(y, 0.0);
   }
-  private final DD selfAdd(final double yhi, final double ylo)
-  {
+
+  private final DD selfAdd(final double yhi, final double ylo) {
     double H, h, T, t, S, s, e, f;
     S = this.hi + yhi;
     T = this.lo + ylo;
     e = S - this.hi;
     f = T - this.lo;
-    s = S-e;
-    t = T-f;
-    s = yhi-e+(this.hi-s);
-    t = ylo-f+(this.lo-t);
-    e = s+T; H = S+e; h = e+(S-H); e = t+h;
+    s = S - e;
+    t = T - f;
+    s = yhi - e + (this.hi - s);
+    t = ylo - f + (this.lo - t);
+    e = s + T;
+    H = S + e;
+    h = e + (S - H);
+    e = t + h;
 
     final double zhi = H + e;
     final double zlo = e + (H - zhi);
@@ -1078,6 +1025,7 @@ implements Serializable, Comparable, Cloneable
     this.lo = zlo;
     return this;
   }
+
   /**
    * Divides this object by the argument, returning <tt>this</tt>.
    * To prevent altering constants,
@@ -1087,10 +1035,10 @@ implements Serializable, Comparable, Cloneable
    * @param y the value to divide by
    * @return this object, divided by y
    */
-  public final DD selfDivide(final DD y)
-  {
+  public final DD selfDivide(final DD y) {
     return selfDivide(y.hi, y.lo);
   }
+
   /**
    * Divides this object by the argument, returning <tt>this</tt>.
    * To prevent altering constants,
@@ -1100,25 +1048,30 @@ implements Serializable, Comparable, Cloneable
    * @param y the value to divide by
    * @return this object, divided by y
    */
-  public final DD selfDivide(final double y)
-  {
+  public final DD selfDivide(final double y) {
     return selfDivide(y, 0.0);
   }
 
-  private final DD selfDivide(final double yhi, final double ylo)
-  {
+  private final DD selfDivide(final double yhi, final double ylo) {
     double hc, tc, hy, ty, C, c, U, u;
-    C = this.hi/yhi; c = SPLIT*C; hc =c-C;  u = SPLIT*yhi; hc = c-hc;
-    tc = C-hc; hy = u-yhi; U = C * yhi; hy = u-hy; ty = yhi-hy;
-    u = hc*hy-U+hc*ty+tc*hy+tc*ty;
-    c = (this.hi-U-u+this.lo-C*ylo)/yhi;
-    u = C+c;
+    C = this.hi / yhi;
+    c = SPLIT * C;
+    hc = c - C;
+    u = SPLIT * yhi;
+    hc = c - hc;
+    tc = C - hc;
+    hy = u - yhi;
+    U = C * yhi;
+    hy = u - hy;
+    ty = yhi - hy;
+    u = hc * hy - U + hc * ty + tc * hy + tc * ty;
+    c = (this.hi - U - u + this.lo - C * ylo) / yhi;
+    u = C + c;
 
     this.hi = u;
-    this.lo = C-u+c;
+    this.lo = C - u + c;
     return this;
   }
-
 
   /*------------------------------------------------------------
    *   Output
@@ -1134,10 +1087,10 @@ implements Serializable, Comparable, Cloneable
    * @param y the value to multiply by
    * @return this object, multiplied by y
    */
-  public final DD selfMultiply(final DD y)
-  {
+  public final DD selfMultiply(final DD y) {
     return selfMultiply(y.hi, y.lo);
   }
+
   /**
    * Multiplies this object by the argument, returning <tt>this</tt>.
    * To prevent altering constants,
@@ -1147,23 +1100,30 @@ implements Serializable, Comparable, Cloneable
    * @param y the value to multiply by
    * @return this object, multiplied by y
    */
-  public final DD selfMultiply(final double y)
-  {
+  public final DD selfMultiply(final double y) {
     return selfMultiply(y, 0.0);
   }
-  private final DD selfMultiply(final double yhi, final double ylo)
-  {
+
+  private final DD selfMultiply(final double yhi, final double ylo) {
     double hx, tx, hy, ty, C, c;
-    C = SPLIT * this.hi; hx = C-this.hi; c = SPLIT * yhi;
-    hx = C-hx; tx = this.hi-hx; hy = c-yhi;
-    C = this.hi*yhi; hy = c-hy; ty = yhi-hy;
-    c = hx*hy-C+hx*ty+tx*hy+tx*ty+(this.hi*ylo+this.lo*yhi);
-    final double zhi = C+c; hx = C-zhi;
-    final double zlo = c+hx;
+    C = SPLIT * this.hi;
+    hx = C - this.hi;
+    c = SPLIT * yhi;
+    hx = C - hx;
+    tx = this.hi - hx;
+    hy = c - yhi;
+    C = this.hi * yhi;
+    hy = c - hy;
+    ty = yhi - hy;
+    c = hx * hy - C + hx * ty + tx * hy + tx * ty + (this.hi * ylo + this.lo * yhi);
+    final double zhi = C + c;
+    hx = C - zhi;
+    final double zlo = c + hx;
     this.hi = zhi;
     this.lo = zlo;
     return this;
   }
+
   /**
    * Subtracts the argument from the value of <tt>this</tt>.
    * To prevent altering constants,
@@ -1173,13 +1133,13 @@ implements Serializable, Comparable, Cloneable
    * @param y the addend
    * @return this object, decreased by y
    */
-  public final DD selfSubtract(final DD y)
-  {
+  public final DD selfSubtract(final DD y) {
     if (isNaN()) {
       return this;
     }
     return selfAdd(-y.hi, -y.lo);
   }
+
   /**
    * Subtracts the argument from the value of <tt>this</tt>.
    * To prevent altering constants,
@@ -1189,8 +1149,7 @@ implements Serializable, Comparable, Cloneable
    * @param y the addend
    * @return this object, decreased by y
    */
-  public final DD selfSubtract(final double y)
-  {
+  public final DD selfSubtract(final double y) {
     if (isNaN()) {
       return this;
     }
@@ -1208,8 +1167,7 @@ implements Serializable, Comparable, Cloneable
    *
    * @return an integer indicating the sign of this value
    */
-  public int signum()
-  {
+  public int signum() {
     if (this.hi > 0) {
       return 1;
     }
@@ -1230,8 +1188,7 @@ implements Serializable, Comparable, Cloneable
    *
    * @return the square of this value.
    */
-  public DD sqr()
-  {
+  public DD sqr() {
     return this.multiply(this);
   }
 
@@ -1242,16 +1199,12 @@ implements Serializable, Comparable, Cloneable
    * @return the positive square root of this number.
    * If the argument is NaN or less than zero, the result is NaN.
    */
-  public DD sqrt()
-  {
-    /* Strategy:  Use Karp's trick:  if x is an approximation
-    to sqrt(a), then
-
-       sqrt(a) = a*x + [a - (a*x)^2] * x / 2   (approx)
-
-    The approximation is accurate to twice the accuracy of x.
-    Also, the multiplication (a*x) and [-]*x can be done with
-    only half the precision.
+  public DD sqrt() {
+    /*
+     * Strategy: Use Karp's trick: if x is an approximation to sqrt(a), then
+     * sqrt(a) = a*x + [a - (a*x)^2] * x / 2 (approx) The approximation is
+     * accurate to twice the accuracy of x. Also, the multiplication (a*x) and
+     * [-]*x can be done with only half the precision.
      */
 
     if (isZero()) {
@@ -1278,11 +1231,9 @@ implements Serializable, Comparable, Cloneable
    * @param y the subtrahend
    * @return <tt>(this - y)</tt>
    */
-  public final DD subtract(final DD y)
-  {
+  public final DD subtract(final DD y) {
     return add(y.negate());
   }
-
 
   /**
    * Computes a new DoubleDouble object whose value is <tt>(this - y)</tt>.
@@ -1290,19 +1241,16 @@ implements Serializable, Comparable, Cloneable
    * @param y the subtrahend
    * @return <tt>(this - y)</tt>
    */
-  public final DD subtract(final double y)
-  {
+  public final DD subtract(final double y) {
     return add(-y);
   }
-
 
   /**
    * Returns the string representation of this value in scientific notation.
    *
    * @return the string representation in scientific notation
    */
-  public String toSciNotation()
-  {
+  public String toSciNotation() {
     // special case zero, to allow as
     if (isZero()) {
       return SCI_NOT_ZERO;
@@ -1318,7 +1266,7 @@ implements Serializable, Comparable, Cloneable
     final String expStr = SCI_NOT_EXPONENT_CHAR + magnitude[0];
 
     // should never have leading zeroes
-    // MD - is this correct?  Or should we simply strip them if they are present?
+    // MD - is this correct? Or should we simply strip them if they are present?
     if (digits.charAt(0) == '0') {
       throw new IllegalStateException("Found leading zero: " + digits);
     }
@@ -1341,8 +1289,7 @@ implements Serializable, Comparable, Cloneable
    *
    * @return the string representation in standard notation
    */
-  public String toStandardNotation()
-  {
+  public String toStandardNotation() {
     final String specialStr = getSpecialNumberString();
     if (specialStr != null) {
       return specialStr;
@@ -1356,11 +1303,9 @@ implements Serializable, Comparable, Cloneable
     // add a leading 0 if the decimal point is the first char
     if (sigDigits.charAt(0) == '.') {
       num = "0" + sigDigits;
-    }
-    else if (decimalPointPos < 0) {
+    } else if (decimalPointPos < 0) {
       num = "0." + stringOfChar('0', -decimalPointPos) + sigDigits;
-    }
-    else if (sigDigits.indexOf('.') == -1) {
+    } else if (sigDigits.indexOf('.') == -1) {
       // no point inserted - sig digits must be smaller than magnitude of number
       // add zeroes to end to make number the correct size
       final int numZeroes = decimalPointPos - sigDigits.length();
@@ -1374,8 +1319,6 @@ implements Serializable, Comparable, Cloneable
     return num;
   }
 
-
-
   /**
    * Returns a string representation of this number, in either standard or scientific notation.
    * If the magnitude of the number is in the range [ 10<sup>-3</sup>, 10<sup>8</sup> ]
@@ -1384,15 +1327,13 @@ implements Serializable, Comparable, Cloneable
    * @return a string representation of this number
    */
   @Override
-  public String toString()
-  {
+  public String toString() {
     final int mag = magnitude(this.hi);
     if (mag >= -3 && mag <= 20) {
       return toStandardNotation();
     }
     return toSciNotation();
   }
-
 
   /*------------------------------------------------------------
    *   Input
@@ -1409,8 +1350,7 @@ implements Serializable, Comparable, Cloneable
    *
    * @return the integer which is largest in absolute value and not further from zero than this value
    */
-  public DD trunc()
-  {
+  public DD trunc() {
     if (isNaN()) {
       return NaN;
     }

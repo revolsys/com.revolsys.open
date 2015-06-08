@@ -17,8 +17,7 @@ import javax.swing.event.ChangeListener;
 import com.revolsys.awt.WebColors;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 
-public class ColorAlphaPanel extends AbstractColorChooserPanel implements
-ChangeListener {
+public class ColorAlphaPanel extends AbstractColorChooserPanel implements ChangeListener {
   private static final long serialVersionUID = 3533569797414988165L;
 
   private final JSlider alphaSlider;
@@ -68,8 +67,7 @@ ChangeListener {
   @Override
   public void stateChanged(final ChangeEvent e) {
     final Color color = getColorFromModel();
-    final Color newColor = WebColors.setAlpha(color,
-      this.alphaSlider.getValue());
+    final Color newColor = WebColors.setAlpha(color, this.alphaSlider.getValue());
     final ColorSelectionModel colorSelectionModel = getColorSelectionModel();
     colorSelectionModel.setSelectedColor(newColor);
   }

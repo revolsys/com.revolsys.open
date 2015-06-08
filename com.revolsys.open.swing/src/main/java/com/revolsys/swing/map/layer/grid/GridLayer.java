@@ -22,16 +22,15 @@ import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 
 public class GridLayer extends AbstractLayer {
-  public static GridLayer create(final Map<String, Object> properties) {
-    return new GridLayer(properties);
-  }
-
   static {
-    final MenuFactory menu = MenuFactory.createMenu(GridLayer.class,
-        "ZoomToSheet");
+    final MenuFactory menu = MenuFactory.createMenu(GridLayer.class, "ZoomToSheet");
 
     menu.deleteMenuItem("zoom", "Zoom to Layer");
     menu.deleteMenuItem("refresh", "Refresh");
+  }
+
+  public static GridLayer create(final Map<String, Object> properties) {
+    return new GridLayer(properties);
   }
 
   private RectangularMapGrid grid;
@@ -51,14 +50,13 @@ public class GridLayer extends AbstractLayer {
     if (Property.hasValue(gridName)) {
       this.grid = RectangularMapGridFactory.getGrid(gridName);
       if (this.grid == null) {
-        LoggerFactory.getLogger(getClass()).error(
-          "Cannot find gridName=" + gridName);
+        LoggerFactory.getLogger(getClass()).error("Cannot find gridName=" + gridName);
       } else {
         return true;
       }
     } else {
       LoggerFactory.getLogger(getClass()).error(
-          "Layer definition does not contain a 'gridName' property");
+        "Layer definition does not contain a 'gridName' property");
     }
     return false;
   }
@@ -86,11 +84,10 @@ public class GridLayer extends AbstractLayer {
       final MapPanel map = MapPanel.get(this);
       final RectangularMapGrid grid = getGrid();
       final String gridName = grid.getName();
-      final String preferenceName = CaseConverter.toCapitalizedWords(gridName)
-          + "Mapsheet";
+      final String preferenceName = CaseConverter.toCapitalizedWords(gridName) + "Mapsheet";
       String mapsheet = PreferencesUtil.getString(getClass(), preferenceName);
-      mapsheet = JOptionPane.showInputDialog(map, "Enter name of the"
-          + gridName + " mapsheet to zoom to", mapsheet);
+      mapsheet = JOptionPane.showInputDialog(map, "Enter name of the" + gridName
+        + " mapsheet to zoom to", mapsheet);
       zoomToSheet(mapsheet);
     }
   }
@@ -107,12 +104,10 @@ public class GridLayer extends AbstractLayer {
           final BoundingBox boundingBox = mapTile.getBoundingBox();
           project.setViewBoundingBox(boundingBox);
         } catch (final Throwable e) {
-          final String message = "Invalid mapsheet " + mapsheet + " for "
-              + gridName;
+          final String message = "Invalid mapsheet " + mapsheet + " for " + gridName;
           JOptionPane.showMessageDialog(map, message);
         } finally {
-          final String preferenceName = CaseConverter.toCapitalizedWords(gridName)
-              + "Mapsheet";
+          final String preferenceName = CaseConverter.toCapitalizedWords(gridName) + "Mapsheet";
           PreferencesUtil.setString(getClass(), preferenceName, mapsheet);
         }
       }

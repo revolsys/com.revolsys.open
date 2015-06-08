@@ -61,8 +61,8 @@ public class MCIndexPointSnapper {
 
     private boolean isNodeAdded = false;
 
-    public HotPixelSnapAction(final HotPixel hotPixel,
-      final SegmentString parentEdge, final int hotPixelVertexIndex) {
+    public HotPixelSnapAction(final HotPixel hotPixel, final SegmentString parentEdge,
+      final int hotPixelVertexIndex) {
       this.hotPixel = hotPixel;
       this.parentEdge = parentEdge;
       this.hotPixelVertexIndex = hotPixelVertexIndex;
@@ -119,8 +119,8 @@ public class MCIndexPointSnapper {
   public boolean snap(final HotPixel hotPixel, final SegmentString parentEdge,
     final int hotPixelVertexIndex) {
     final BoundingBox pixelEnv = hotPixel.getSafeEnvelope();
-    final HotPixelSnapAction hotPixelSnapAction = new HotPixelSnapAction(
-      hotPixel, parentEdge, hotPixelVertexIndex);
+    final HotPixelSnapAction hotPixelSnapAction = new HotPixelSnapAction(hotPixel, parentEdge,
+      hotPixelVertexIndex);
 
     this.index.query(pixelEnv, new ItemVisitor() {
       @Override

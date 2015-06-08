@@ -61,9 +61,8 @@ public abstract class AbstractElementTag extends SimpleTagSupport {
       final JspContext jspContext = getJspContext();
       final JspWriter out = jspContext.getOut();
       final ExpressionEvaluator expressionEvaluator = jspContext.getExpressionEvaluator();
-      final Collection elements = (Collection)expressionEvaluator.evaluate(
-        this.elementExpression, Collection.class, jspContext.getVariableResolver(),
-        null);
+      final Collection elements = (Collection)expressionEvaluator.evaluate(this.elementExpression,
+        Collection.class, jspContext.getVariableResolver(), null);
       if (elements != null) {
         serializeElements(out, elements);
       }
@@ -81,8 +80,7 @@ public abstract class AbstractElementTag extends SimpleTagSupport {
    * @param elements The elements to write.
    * @throws IOException If there was an error writing the elements.
    */
-  private void serializeElements(final Writer out, final Collection elements)
-      throws IOException {
+  private void serializeElements(final Writer out, final Collection elements) throws IOException {
     final Iterator elementIter = elements.iterator();
     while (elementIter.hasNext()) {
       final Element element = (Element)elementIter.next();

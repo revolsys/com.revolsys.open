@@ -58,6 +58,11 @@ public class HausdorffSimilarityMeasure implements SimilarityMeasure {
    * return gv.measure(); }
    */
 
+  /*
+   * Densify a small amount to increase accuracy of Hausdorff distance
+   */
+  private static final double DENSIFY_FRACTION = 0.25;
+
   public static double diagonalSize(final BoundingBox env) {
     if (env.isEmpty()) {
       return 0.0;
@@ -68,18 +73,12 @@ public class HausdorffSimilarityMeasure implements SimilarityMeasure {
     return Math.sqrt(width * width + hgt * hgt);
   }
 
-  /*
-   * Densify a small amount to increase accuracy of Hausdorff distance
-   */
-  private static final double DENSIFY_FRACTION = 0.25;
-
   public HausdorffSimilarityMeasure() {
   }
 
   @Override
   public double measure(final Geometry g1, final Geometry g2) {
-    final double distance = DiscreteHausdorffDistance.distance(g1, g2,
-      DENSIFY_FRACTION);
+    final double distance = DiscreteHausdorffDistance.distance(g1, g2, DENSIFY_FRACTION);
 
     BoundingBox env = g1.getBoundingBox();
     env = env.expandToInclude(g2.getBoundingBox());

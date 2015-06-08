@@ -24,22 +24,18 @@ import com.revolsys.swing.table.record.row.RecordRowTable;
 public class ModifiedAttributePredicate implements HighlightPredicate {
   public static void add(final RecordRowTable table) {
     final RecordRowTableModel model = (RecordRowTableModel)table.getModel();
-    final ModifiedAttributePredicate predicate = new ModifiedAttributePredicate(
-      model);
+    final ModifiedAttributePredicate predicate = new ModifiedAttributePredicate(model);
     addModifiedHighlighters(table, predicate);
   }
 
-  public static void addModifiedHighlighters(final JXTable table,
-    final HighlightPredicate predicate) {
+  public static void addModifiedHighlighters(final JXTable table, final HighlightPredicate predicate) {
 
-    table.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(
-      predicate, HighlightPredicate.EVEN), WebColors.setAlpha(
-        WebColors.YellowGreen, 127), WebColors.Black, WebColors.LimeGreen,
-        Color.WHITE));
+    table.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(predicate,
+      HighlightPredicate.EVEN), WebColors.setAlpha(WebColors.YellowGreen, 127), WebColors.Black,
+      WebColors.LimeGreen, Color.WHITE));
 
-    table.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(
-      predicate, HighlightPredicate.ODD), WebColors.YellowGreen,
-      WebColors.Black, WebColors.Green, Color.WHITE));
+    table.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(predicate,
+      HighlightPredicate.ODD), WebColors.YellowGreen, WebColors.Black, WebColors.Green, Color.WHITE));
   }
 
   private final RecordRowTableModel model;
@@ -49,8 +45,7 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
   }
 
   @Override
-  public boolean isHighlighted(final Component renderer,
-    final ComponentAdapter adapter) {
+  public boolean isHighlighted(final Component renderer, final ComponentAdapter adapter) {
     String toolTip = null;
     boolean highlighted = false;
     try {

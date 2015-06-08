@@ -31,10 +31,10 @@ import com.revolsys.swing.preferences.PreferencesDialog;
 import com.revolsys.util.OS;
 
 public class ZoomOverlay extends AbstractOverlay {
-  public static final BasicStroke ZOOM_BOX_STROKE = new BasicStroke(2,
-    BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 2, new float[] {
-    6, 6
-  }, 0f);
+  public static final BasicStroke ZOOM_BOX_STROKE = new BasicStroke(2, BasicStroke.CAP_SQUARE,
+    BasicStroke.JOIN_MITER, 2, new float[] {
+      6, 6
+    }, 0f);
 
   public static final String ACTION_PAN = "pan";
 
@@ -44,16 +44,15 @@ public class ZoomOverlay extends AbstractOverlay {
 
   private static final Cursor CURSOR_PAN = new Cursor(Cursor.HAND_CURSOR);
 
-  private static final Cursor CURSOR_ZOOM_BOX = Icons.getCursor(
-    "cursor_zoom_box", 9, 9);
+  private static final Cursor CURSOR_ZOOM_BOX = Icons.getCursor("cursor_zoom_box", 9, 9);
 
   private static final long serialVersionUID = 1L;
 
   private static final Color TRANS_BG = new Color(0, 0, 0, 30);
 
   static {
-    PreferencesDialog.get().addPreference("Zoom", "com.revolsys.gis",
-      "/com/revolsys/gis/zoom", "wheelForwardsZoomIn", Boolean.class, true);
+    PreferencesDialog.get().addPreference("Zoom", "com.revolsys.gis", "/com/revolsys/gis/zoom",
+      "wheelForwardsZoomIn", Boolean.class, true);
   }
 
   private BufferedImage panImage;
@@ -132,8 +131,7 @@ public class ZoomOverlay extends AbstractOverlay {
         final int y = event.getY();
         int numSteps = 0;
 
-        if (button == MouseEvent.BUTTON1 && !hasOverlayAction()
-            || button == MouseEvent.BUTTON2) {
+        if (button == MouseEvent.BUTTON1 && !hasOverlayAction() || button == MouseEvent.BUTTON2) {
           // Left or middle button, zoom in
           numSteps = -1;
         } else if (button == MouseEvent.BUTTON3) {
@@ -238,8 +236,7 @@ public class ZoomOverlay extends AbstractOverlay {
       g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
         RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-      final AffineTransform transform = AffineTransform.getTranslateInstance(
-        dx, dy);
+      final AffineTransform transform = AffineTransform.getTranslateInstance(dx, dy);
       g.drawRenderedImage(this.panImage, transform);
     }
   }
@@ -309,8 +306,7 @@ public class ZoomOverlay extends AbstractOverlay {
           final int height = viewport.getViewHeightPixels();
           if (width > 0 && height > 0) {
             final JComponent parent = (JComponent)getParent();
-            this.panImage = new BufferedImage(width, height,
-              BufferedImage.TYPE_INT_RGB);
+            this.panImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             final Graphics2D graphics = (Graphics2D)this.panImage.getGraphics();
             try {
               final Insets insets = parent.getInsets();
@@ -355,8 +351,7 @@ public class ZoomOverlay extends AbstractOverlay {
   }
 
   protected boolean zoomBoxFinish(final MouseEvent event) {
-    if (event.getButton() == MouseEvent.BUTTON1
-        && clearOverlayAction(ACTION_ZOOM_BOX)) {
+    if (event.getButton() == MouseEvent.BUTTON1 && clearOverlayAction(ACTION_ZOOM_BOX)) {
       final Viewport2D viewport = getViewport();
 
       // Convert first point to envelope top left in map coords.
@@ -371,9 +366,8 @@ public class ZoomOverlay extends AbstractOverlay {
 
       final MapPanel map = getMap();
       final GeometryFactory geometryFactory = map.getGeometryFactory();
-      final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory,
-        2, topLeft.getX(), topLeft.getY(), bottomRight.getX(),
-        bottomRight.getY());
+      final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, topLeft.getX(),
+        topLeft.getY(), bottomRight.getX(), bottomRight.getY());
 
       if (boundingBox.isEmpty()) {
         Toolkit.getDefaultToolkit().beep();
@@ -397,8 +391,7 @@ public class ZoomOverlay extends AbstractOverlay {
   }
 
   protected boolean zoomBoxStart(final MouseEvent event) {
-    if (isOverlayAction(ACTION_ZOOM_BOX)
-        && event.getButton() == MouseEvent.BUTTON1) {
+    if (isOverlayAction(ACTION_ZOOM_BOX) && event.getButton() == MouseEvent.BUTTON1) {
       this.zoomBoxX1 = this.zoomBoxX2 = event.getX();
       this.zoomBoxY1 = this.zoomBoxY2 = event.getY();
       return true;

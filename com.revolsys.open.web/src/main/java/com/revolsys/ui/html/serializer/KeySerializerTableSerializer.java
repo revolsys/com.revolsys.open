@@ -84,8 +84,7 @@ public class KeySerializerTableSerializer implements RowsTableSerializer {
   }
 
   @Override
-  public void serializeBodyCell(final XmlWriter out, final int row,
-    final int col) {
+  public void serializeBodyCell(final XmlWriter out, final int row, final int col) {
     if (col < this.colCount) {
       final Object object = this.rows.get(row);
       final KeySerializer serializer = getSerializer(col);
@@ -96,8 +95,7 @@ public class KeySerializerTableSerializer implements RowsTableSerializer {
   }
 
   @Override
-  public void serializeFooterCell(final XmlWriter out, final int row,
-    final int col) {
+  public void serializeFooterCell(final XmlWriter out, final int row, final int col) {
   }
 
   @Override

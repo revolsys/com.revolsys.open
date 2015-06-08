@@ -17,8 +17,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.util.Property;
 
-public class KmlRecordWriter extends AbstractRecordWriter implements
-Kml22Constants {
+public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Constants {
   private static final Map<Class<?>, String> TYPE_MAP = new HashMap<Class<?>, String>();
 
   static {
@@ -63,7 +62,7 @@ Kml22Constants {
   @Override
   public boolean isWriteNulls() {
     return super.isWriteNulls()
-        || BooleanStringConverter.isTrue(getProperty(Kml22Constants.WRITE_NULLS_PROPERTY));
+      || BooleanStringConverter.isTrue(getProperty(Kml22Constants.WRITE_NULLS_PROPERTY));
   }
 
   @Override
@@ -235,8 +234,7 @@ Kml22Constants {
       final GeometryFactory geometryFactory = GeometryFactory.wgs84();
       final Geometry projectedGeometry = geometry.convert(geometryFactory);
       final BoundingBox boundingBox = projectedGeometry.getBoundingBox();
-      final Point centre = geometryFactory.point(boundingBox.getCentreX(),
-        boundingBox.getCentreY());
+      final Point centre = geometryFactory.point(boundingBox.getCentreX(), boundingBox.getCentreY());
 
       final Number configRange = getProperty(LOOK_AT_RANGE_PROPERTY);
       final long range;

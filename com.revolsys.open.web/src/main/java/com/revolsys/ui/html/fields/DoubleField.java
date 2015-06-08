@@ -9,10 +9,8 @@ public class DoubleField extends NumberField {
     this(name, required, null);
   }
 
-  public DoubleField(final String name, final boolean required,
-    final Object defaultValue) {
-    super(name, 23, 20, defaultValue, required, -Double.MAX_VALUE,
-      Double.MAX_VALUE);
+  public DoubleField(final String name, final boolean required, final Object defaultValue) {
+    super(name, 23, 20, defaultValue, required, -Double.MAX_VALUE, Double.MAX_VALUE);
   }
 
   @Override

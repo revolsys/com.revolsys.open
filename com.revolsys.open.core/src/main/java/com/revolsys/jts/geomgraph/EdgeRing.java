@@ -51,11 +51,13 @@ import com.revolsys.jts.util.Assert;
 public abstract class EdgeRing {
 
   protected DirectedEdge startDe; // the directed edge which starts the list of
+
   // edges for this EdgeRing
 
   private int maxNodeDegree = -1;
 
   private final List<DirectedEdge> edges = new ArrayList<>(); // the
+
   // DirectedEdges
   // making up
 
@@ -64,6 +66,7 @@ public abstract class EdgeRing {
   private final List<Point> pts = new ArrayList<>();
 
   private final Label label = new Label(Location.NONE); // label stores the
+
   // locations of each
   // geometry on the face
   // surrounded by this
@@ -74,9 +77,11 @@ public abstract class EdgeRing {
   private boolean isHole;
 
   private EdgeRing shell; // if non-null, the ring is a hole and this EdgeRing
+
   // is its containing shell
 
   private final List<EdgeRing> holes = new ArrayList<EdgeRing>(); // a list of
+
   // EdgeRings
   // which
 
@@ -84,8 +89,7 @@ public abstract class EdgeRing {
 
   protected GeometryFactory geometryFactory;
 
-  public EdgeRing(final DirectedEdge start,
-    final GeometryFactory geometryFactory) {
+  public EdgeRing(final DirectedEdge start, final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
     computePoints(start);
     computeRing();
@@ -95,8 +99,7 @@ public abstract class EdgeRing {
     this.holes.add(ring);
   }
 
-  protected void addPoints(final Edge edge, final boolean isForward,
-    final boolean isFirstEdge) {
+  protected void addPoints(final Edge edge, final boolean isForward, final boolean isFirstEdge) {
     final int numPoints = edge.getNumPoints();
     if (isForward) {
       int startIndex = 1;
@@ -144,9 +147,8 @@ public abstract class EdgeRing {
         throw new TopologyException("Found null DirectedEdge");
       }
       if (de.getEdgeRing() == this) {
-        throw new TopologyException(
-          "Directed Edge visited twice during ring-building at "
-              + de.getCoordinate());
+        throw new TopologyException("Directed Edge visited twice during ring-building at "
+          + de.getCoordinate());
       }
 
       this.edges.add(de);

@@ -87,8 +87,7 @@ public class Root extends NodeBase {
    * the given Node.  Lower levels of the tree will be created
    * if necessary to hold the item.
    */
-  private void insertContained(final Node tree, final Interval itemInterval,
-    final Object item) {
+  private void insertContained(final Node tree, final Interval itemInterval, final Object item) {
     Assert.isTrue(tree.getInterval().contains(itemInterval));
     /**
      * Do NOT create a new node for zero-area intervals - this would lead

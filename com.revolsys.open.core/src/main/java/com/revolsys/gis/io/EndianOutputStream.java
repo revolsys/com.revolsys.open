@@ -68,8 +68,7 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
   }
 
   @Override
-  public void write(final byte[] b, final int off, final int len)
-      throws IOException {
+  public void write(final byte[] b, final int off, final int len) throws IOException {
     this.out.write(b, off, len);
     this.written += len;
   }

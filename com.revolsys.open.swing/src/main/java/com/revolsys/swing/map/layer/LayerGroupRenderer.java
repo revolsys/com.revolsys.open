@@ -28,8 +28,7 @@ public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {
               renderer.render(viewport);
             }
           } catch (final Throwable e) {
-            LoggerFactory.getLogger(getClass()).error(
-              "Error rendering layer: " + childLayer, e);
+            LoggerFactory.getLogger(getClass()).error("Error rendering layer: " + childLayer, e);
           }
         }
       }

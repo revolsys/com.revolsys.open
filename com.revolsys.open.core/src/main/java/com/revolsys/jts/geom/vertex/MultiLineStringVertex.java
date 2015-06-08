@@ -15,8 +15,7 @@ public class MultiLineStringVertex extends AbstractVertex {
 
   private int partIndex;
 
-  public MultiLineStringVertex(final MultiLineString multiLineString,
-    final int... vertexId) {
+  public MultiLineStringVertex(final MultiLineString multiLineString, final int... vertexId) {
     super(multiLineString);
     setVertexId(vertexId);
   }
@@ -37,8 +36,7 @@ public class MultiLineStringVertex extends AbstractVertex {
     if (line != null) {
       final int newVertexIndex = this.vertexIndex + 1;
       if (newVertexIndex < line.getVertexCount() - 1) {
-        return new MultiLineStringVertex(getMultiLineString(), this.partIndex,
-          newVertexIndex);
+        return new MultiLineStringVertex(getMultiLineString(), this.partIndex, newVertexIndex);
       }
     }
     return null;
@@ -50,8 +48,7 @@ public class MultiLineStringVertex extends AbstractVertex {
     if (line != null) {
       final int newVertexIndex = this.vertexIndex - 1;
       if (newVertexIndex >= 0) {
-        return new MultiLineStringVertex(getMultiLineString(), this.partIndex,
-          newVertexIndex);
+        return new MultiLineStringVertex(getMultiLineString(), this.partIndex, newVertexIndex);
       }
     }
     return null;

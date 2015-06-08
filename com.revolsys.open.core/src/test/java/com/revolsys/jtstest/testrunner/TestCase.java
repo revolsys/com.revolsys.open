@@ -57,8 +57,7 @@ import com.revolsys.util.Property;
  *
  * @version 1.7
  */
-public class TestCase extends junit.framework.TestSuite implements
-MapSerializer {
+public class TestCase extends junit.framework.TestSuite implements MapSerializer {
   private String testDescription;
 
   private Geometry a;
@@ -78,13 +77,13 @@ MapSerializer {
    *  to a and b.
    */
   public TestCase(final String description, final Geometry a, final Geometry b,
-    final File aWktFile, final File bWktFile, final TestFile testFile,
-    final int caseIndex, final int lineNumber) {
+    final File aWktFile, final File bWktFile, final TestFile testFile, final int caseIndex,
+    final int lineNumber) {
     this.testFile = testFile;
     this.caseIndex = caseIndex;
     if (Property.hasValue(description)) {
-      this.testDescription = description.replaceAll("\\s+", " ").replaceAll(
-        "[^A-Za-z0-9\\-_ ]", " ");
+      this.testDescription = description.replaceAll("\\s+", " ").replaceAll("[^A-Za-z0-9\\-_ ]",
+        " ");
       setName(getId() + "." + this.testDescription);
     } else {
       setName(getId() + ".");
@@ -200,8 +199,8 @@ MapSerializer {
     String xml = "";
     xml += "<case>" + StringUtil.newLine;
     if (this.testDescription != null && this.testDescription.length() > 0) {
-      xml += "  <desc>" + StringUtil.escapeHTML(this.testDescription)
-          + "</desc>" + StringUtil.newLine;
+      xml += "  <desc>" + StringUtil.escapeHTML(this.testDescription) + "</desc>"
+        + StringUtil.newLine;
     }
     xml += xml("a", this.a) + StringUtil.newLine;
     xml += xml("b", this.b);

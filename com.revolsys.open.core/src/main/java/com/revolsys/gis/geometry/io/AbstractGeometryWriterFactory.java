@@ -12,8 +12,8 @@ import com.revolsys.io.Writer;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.spring.SpringUtil;
 
-public abstract class AbstractGeometryWriterFactory extends AbstractIoFactory
-implements GeometryWriterFactory {
+public abstract class AbstractGeometryWriterFactory extends AbstractIoFactory implements
+  GeometryWriterFactory {
 
   public static Writer<Geometry> createWriter(final Resource resource) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
@@ -53,8 +53,7 @@ implements GeometryWriterFactory {
    * @return The writer.
    */
   @Override
-  public Writer<Geometry> createGeometryWriter(final String baseName,
-    final OutputStream out) {
+  public Writer<Geometry> createGeometryWriter(final String baseName, final OutputStream out) {
     return createGeometryWriter(baseName, out, StandardCharsets.UTF_8);
 
   }

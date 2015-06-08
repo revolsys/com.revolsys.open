@@ -36,8 +36,7 @@ public class LessThanOrEqualDistanceFilter implements Filter<Geometry> {
    * @param geometry The geometry to compare the data objects to to.
    * @param maxDistance
    */
-  public LessThanOrEqualDistanceFilter(final Geometry geometry,
-    final double maxDistance) {
+  public LessThanOrEqualDistanceFilter(final Geometry geometry, final double maxDistance) {
     this.geometry = geometry;
     this.maxDistance = maxDistance;
   }

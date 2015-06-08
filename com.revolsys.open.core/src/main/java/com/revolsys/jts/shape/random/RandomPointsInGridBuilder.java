@@ -48,8 +48,8 @@ import com.revolsys.jts.shape.GeometricShapeBuilder;
  *
  */
 public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
-  private static Point randomPointInCircle(final double orgX,
-    final double orgY, final double width, final double height) {
+  private static Point randomPointInCircle(final double orgX, final double orgY,
+    final double width, final double height) {
     final double centreX = orgX + width / 2;
     final double centreY = orgY + height / 2;
 
@@ -103,8 +103,7 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
     final double gridDX = getExtent().getWidth() / nCells;
     final double gridDY = getExtent().getHeight() / nCells;
 
-    final double gutterFrac = com.revolsys.util.MathUtil.clamp(
-      this.gutterFraction, 0.0, 1.0);
+    final double gutterFrac = com.revolsys.util.MathUtil.clamp(this.gutterFraction, 0.0, 1.0);
     final double gutterOffsetX = gridDX * gutterFrac / 2;
     final double gutterOffsetY = gridDY * gutterFrac / 2;
     final double cellFrac = 1.0 - gutterFrac;
@@ -123,16 +122,16 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
     return this.geometryFactory.multiPoint(pts);
   }
 
-  private Point randomPointInCell(final double orgX, final double orgY,
-    final double xLen, final double yLen) {
+  private Point randomPointInCell(final double orgX, final double orgY, final double xLen,
+    final double yLen) {
     if (this.isConstrainedToCircle) {
       return randomPointInCircle(orgX, orgY, xLen, yLen);
     }
     return randomPointInGridCell(orgX, orgY, xLen, yLen);
   }
 
-  private Point randomPointInGridCell(final double orgX, final double orgY,
-    final double xLen, final double yLen) {
+  private Point randomPointInGridCell(final double orgX, final double orgY, final double xLen,
+    final double yLen) {
     final double x = orgX + xLen * Math.random();
     final double y = orgY + yLen * Math.random();
     return createCoord(x, y);

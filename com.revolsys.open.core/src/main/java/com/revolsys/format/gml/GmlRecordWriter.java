@@ -19,10 +19,8 @@ import com.revolsys.io.Path;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public class GmlRecordWriter extends AbstractRecordWriter implements
-GmlConstants {
-  public static final void srsName(final XmlWriter out,
-    final GeometryFactory geometryFactory) {
+public class GmlRecordWriter extends AbstractRecordWriter implements GmlConstants {
+  public static final void srsName(final XmlWriter out, final GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
     final int csId = coordinateSystem.getId();
     out.attribute(SRS_NAME, "EPSG:" + csId);
@@ -40,8 +38,7 @@ GmlConstants {
 
   private final String namespaceUri;
 
-  public GmlRecordWriter(final RecordDefinition recordDefinition,
-    final Writer out) {
+  public GmlRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
     this.out = new XmlWriter(out);
     this.qualifiedName = recordDefinition.getProperty(RecordProperties.QUALIFIED_NAME);
     if (this.qualifiedName == null) {
@@ -51,8 +48,7 @@ GmlConstants {
     this.out.setPrefix(this.qualifiedName);
   }
 
-  private void box(final GeometryFactory geometryFactory,
-    final BoundingBox areaBoundingBox) {
+  private void box(final GeometryFactory geometryFactory, final BoundingBox areaBoundingBox) {
     this.out.startTag(BOX);
     srsName(this.out, geometryFactory);
     this.out.startTag(COORDINATES);
@@ -103,8 +99,7 @@ GmlConstants {
       final String path = Path.getPath(typeName);
       final String name = Path.getName(typeName);
       qualifiedName = new QName(path, name);
-      recordDefinition.setProperty(RecordProperties.QUALIFIED_NAME,
-        qualifiedName);
+      recordDefinition.setProperty(RecordProperties.QUALIFIED_NAME, qualifiedName);
     }
     this.out.startTag(qualifiedName);
 
@@ -139,8 +134,7 @@ GmlConstants {
     this.out.startTag(FEATURE_COLLECTION);
     if (this.geometryFactory != null) {
       this.out.startTag(BOUNDED_BY);
-      box(this.geometryFactory, this.geometryFactory.getCoordinateSystem()
-        .getAreaBoundingBox());
+      box(this.geometryFactory, this.geometryFactory.getCoordinateSystem().getAreaBoundingBox());
       this.out.endTag(BOUNDED_BY);
     }
   }

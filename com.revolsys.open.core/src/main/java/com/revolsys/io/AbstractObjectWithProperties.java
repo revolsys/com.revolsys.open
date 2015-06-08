@@ -15,8 +15,7 @@ public class AbstractObjectWithProperties implements ObjectWithProperties {
   public AbstractObjectWithProperties() {
   }
 
-  public AbstractObjectWithProperties(
-    final Map<String, ? extends Object> properties) {
+  public AbstractObjectWithProperties(final Map<String, ? extends Object> properties) {
     setProperties(properties);
   }
 

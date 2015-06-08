@@ -67,8 +67,7 @@ public class TreePathListTransferHandler extends TransferHandler {
   }
 
   @Override
-  protected void exportDone(final JComponent c,
-    final Transferable transferable, final int action) {
+  protected void exportDone(final JComponent c, final Transferable transferable, final int action) {
     try {
       final Object data = transferable.getTransferData(ObjectTransferable.FLAVOR);
       if (data instanceof ObjectTransferable) {

@@ -17,15 +17,14 @@ public class InvokeMethodChangeListener implements ChangeListener {
 
   private boolean invokeLater;
 
-  public InvokeMethodChangeListener(final Class<?> clazz,
-    final String methodName, final boolean invokeLater,
-    final Object... parameters) {
+  public InvokeMethodChangeListener(final Class<?> clazz, final String methodName,
+    final boolean invokeLater, final Object... parameters) {
     this.runnable = new InvokeMethodRunnable(clazz, methodName, parameters);
     this.invokeLater = invokeLater;
   }
 
-  public InvokeMethodChangeListener(final Class<?> clazz,
-    final String methodName, final Object... parameters) {
+  public InvokeMethodChangeListener(final Class<?> clazz, final String methodName,
+    final Object... parameters) {
     this.runnable = new InvokeMethodRunnable(clazz, methodName, parameters);
   }
 
@@ -33,20 +32,19 @@ public class InvokeMethodChangeListener implements ChangeListener {
     this(object, methodName, new Object[0]);
   }
 
-  public InvokeMethodChangeListener(final Object object,
-    final String methodName, final boolean invokeLater) {
+  public InvokeMethodChangeListener(final Object object, final String methodName,
+    final boolean invokeLater) {
     this(object, methodName, invokeLater, new Object[0]);
   }
 
-  public InvokeMethodChangeListener(final Object object,
-    final String methodName, final boolean invokeLater,
-    final Object... parameters) {
+  public InvokeMethodChangeListener(final Object object, final String methodName,
+    final boolean invokeLater, final Object... parameters) {
     this.runnable = new InvokeMethodRunnable(object, methodName, parameters);
     this.invokeLater = invokeLater;
   }
 
-  public InvokeMethodChangeListener(final Object object,
-    final String methodName, final Object... parameters) {
+  public InvokeMethodChangeListener(final Object object, final String methodName,
+    final Object... parameters) {
     this(object, methodName, false, parameters);
   }
 

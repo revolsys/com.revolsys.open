@@ -82,14 +82,13 @@ public abstract class TeeGeometryOperation implements GeometryOperation {
    * @see GeometryOperation#invoke
    */
   @Override
-  public Result invoke(final String opName, final Geometry geometry,
-    final Object[] args) throws Exception {
+  public Result invoke(final String opName, final Geometry geometry, final Object[] args)
+    throws Exception {
     runTeeOp(opName, geometry, args);
 
     return this.chainOp.invoke(opName, geometry, args);
   }
 
-  protected abstract void runTeeOp(String opName, Geometry geometry,
-    Object[] args);
+  protected abstract void runTeeOp(String opName, Geometry geometry, Object[] args);
 
 }

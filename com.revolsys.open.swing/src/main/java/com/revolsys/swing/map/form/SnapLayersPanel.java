@@ -36,8 +36,7 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.toolbar.ToolBar;
 
-public class SnapLayersPanel extends ValueField implements ActionListener,
-ListSelectionListener {
+public class SnapLayersPanel extends ValueField implements ActionListener, ListSelectionListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -75,8 +74,7 @@ ListSelectionListener {
     add(snapAllPanel);
 
     SwingUtil.addLabel(snapAllPanel, "Snap To All Visible Layers");
-    this.snapToAllLayers = new CheckBox("snapToAllLayers",
-      layer.isSnapToAllLayers());
+    this.snapToAllLayers = new CheckBox("snapToAllLayers", layer.isSnapToAllLayers());
     this.snapToAllLayers.addActionListener(this);
     snapAllPanel.add(this.snapToAllLayers);
     GroupLayoutUtil.makeColumns(snapAllPanel, 2, false);
@@ -85,14 +83,12 @@ ListSelectionListener {
     this.filterPanel.setOpaque(false);
     add(this.filterPanel);
 
-    final SearchField layerPathsFilterField = new SearchField(
-        "layerPathsFilter");
+    final SearchField layerPathsFilterField = new SearchField("layerPathsFilter");
     layerPathsFilterField.setPreferredSize(new Dimension(350, 25));
     layerPathsFilterField.addActionListener(this);
     this.filterPanel.add(layerPathsFilterField);
 
-    final SearchField snapLayerPathsFilterField = new SearchField(
-        "snapLayerPathsFilter");
+    final SearchField snapLayerPathsFilterField = new SearchField("snapLayerPathsFilter");
     snapLayerPathsFilterField.setPreferredSize(new Dimension(350, 25));
     snapLayerPathsFilterField.addActionListener(this);
     this.filterPanel.add(snapLayerPathsFilterField);
@@ -100,8 +96,8 @@ ListSelectionListener {
     this.fieldsPanel = new JPanel(new HorizontalLayout(5));
     this.fieldsPanel.setOpaque(false);
 
-    final List<AbstractRecordLayer> recordLayers = layer.getProject()
-        .getDescenants(AbstractRecordLayer.class);
+    final List<AbstractRecordLayer> recordLayers = layer.getProject().getDescenants(
+      AbstractRecordLayer.class);
 
     this.layerPathsModel = new ArrayListModel<String>();
     for (final AbstractLayer recordLayer : recordLayers) {
@@ -115,8 +111,7 @@ ListSelectionListener {
     this.layerPathsField.setSortable(true);
     this.layerPathsField.setSortOrder(SortOrder.ASCENDING);
     this.layerPathsField.addListSelectionListener(this);
-    final JScrollPane layerPathsScrollPane = new JScrollPane(
-      this.layerPathsField);
+    final JScrollPane layerPathsScrollPane = new JScrollPane(this.layerPathsField);
     layerPathsScrollPane.setPreferredSize(new Dimension(350, 400));
     this.fieldsPanel.add(layerPathsScrollPane);
 
@@ -125,10 +120,9 @@ ListSelectionListener {
     toolBar.setMinimumSize(new Dimension(25, 25));
     this.fieldsPanel.add(toolBar);
 
-    this.addButton = toolBar.addButtonTitleIcon("default", "Add", "add", this,
-        "addSelected");
-    this.removeButton = toolBar.addButtonTitleIcon("default", "Remove",
-      "delete", this, "removeSelected");
+    this.addButton = toolBar.addButtonTitleIcon("default", "Add", "add", this, "addSelected");
+    this.removeButton = toolBar.addButtonTitleIcon("default", "Remove", "delete", this,
+      "removeSelected");
 
     final Collection<String> snapLayerPaths = layer.getSnapLayerPaths();
     this.snapLayerPathsModel = new ArrayListModel<String>(snapLayerPaths);
@@ -148,8 +142,7 @@ ListSelectionListener {
 
     this.layerPathsTextFilter = new StringContainsRowFilter();
     final RowFilter<ListModel, Integer> layerPathsFilter = RowFilter.andFilter(Arrays.asList(
-      new CollectionRowFilter(this.snapLayerPathsModel, false),
-      this.layerPathsTextFilter));
+      new CollectionRowFilter(this.snapLayerPathsModel, false), this.layerPathsTextFilter));
     this.layerPathsField.setRowFilter(layerPathsFilter);
     updateEnabledState();
   }

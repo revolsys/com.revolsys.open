@@ -20,19 +20,17 @@ public class DDIOTest extends TestCase {
     super(name);
   }
 
-  private void checkParse(final String str, final DD expectedVal,
-    final double relErrBound) {
+  private void checkParse(final String str, final DD expectedVal, final double relErrBound) {
     final DD xdd = DD.parse(str);
     final double err = xdd.subtract(expectedVal).doubleValue();
     final double relErr = err / xdd.doubleValue();
 
-    //  System.out.println("Parsed= " + xdd + " rel err= " + relErr);
+    // System.out.println("Parsed= " + xdd + " rel err= " + relErr);
 
     assertTrue(err <= relErrBound);
   }
 
-  private void checkParse(final String str, final double expectedVal,
-    final double errBound) {
+  private void checkParse(final String str, final double expectedVal, final double errBound) {
     checkParse(str, new DD(expectedVal), errBound);
   }
 
@@ -48,7 +46,7 @@ public class DDIOTest extends TestCase {
 
   private void checkSciNotation(final DD x, final String expectedStr) {
     final String xStr = x.toSciNotation();
-    //  System.out.println("Sci Notation: " + xStr);
+    // System.out.println("Sci Notation: " + xStr);
     assertEquals(xStr, expectedStr);
   }
 
@@ -58,7 +56,7 @@ public class DDIOTest extends TestCase {
 
   private void checkStandardNotation(final DD x, final String expectedStr) {
     final String xStr = x.toStandardNotation();
-    //  System.out.println("Standard Notation: " + xStr);
+    // System.out.println("Standard Notation: " + xStr);
     assertEquals(expectedStr, xStr);
   }
 
@@ -75,11 +73,9 @@ public class DDIOTest extends TestCase {
   public void testParse() {
     checkParse("1.05e10", 1.05E10, 1e-32);
     checkParse("-1.05e10", -1.05E10, 1e-32);
-    checkParse("1.05e-10",
-      DD.valueOf(105.).divide(DD.valueOf(100.)).divide(DD.valueOf(1.0E10)),
+    checkParse("1.05e-10", DD.valueOf(105.).divide(DD.valueOf(100.)).divide(DD.valueOf(1.0E10)),
       1e-32);
-    checkParse("-1.05e-10",
-      DD.valueOf(105.)
+    checkParse("-1.05e-10", DD.valueOf(105.)
       .divide(DD.valueOf(100.))
       .divide(DD.valueOf(1.0E10))
       .negate(), 1e-32);
@@ -129,18 +125,15 @@ public class DDIOTest extends TestCase {
     checkStandardNotation(0.0, "0.0");
 
     // cases where hi is a power of 10 and lo is negative
-    checkStandardNotation(DD.valueOf(1e12).subtract(DD.valueOf(1)),
-        "999999999999.0");
-    checkStandardNotation(DD.valueOf(1e14).subtract(DD.valueOf(1)),
-        "99999999999999.0");
-    checkStandardNotation(DD.valueOf(1e16).subtract(DD.valueOf(1)),
-        "9999999999999999.0");
+    checkStandardNotation(DD.valueOf(1e12).subtract(DD.valueOf(1)), "999999999999.0");
+    checkStandardNotation(DD.valueOf(1e14).subtract(DD.valueOf(1)), "99999999999999.0");
+    checkStandardNotation(DD.valueOf(1e16).subtract(DD.valueOf(1)), "9999999999999999.0");
 
     final DD num8Dec = DD.valueOf(-379363639).divide(DD.valueOf(100000000));
     checkStandardNotation(num8Dec, "-3.79363639");
 
     checkStandardNotation(new DD(-3.79363639, 8.039137357367426E-17),
-        "-3.7936363900000000000000000");
+      "-3.7936363900000000000000000");
 
     checkStandardNotation(DD.valueOf(34).divide(DD.valueOf(1000)), "0.034");
     checkStandardNotation(1.05e3, "1050.0");
@@ -190,7 +183,7 @@ public class DDIOTest extends TestCase {
       final double x = xdd.doubleValue();
       final DD xSqr = xdd.sqr();
       final String s = xSqr.toString();
-      //  System.out.println(count + ": " + s);
+      // System.out.println(count + ": " + s);
 
       final DD xSqr2 = DD.parse(s);
 

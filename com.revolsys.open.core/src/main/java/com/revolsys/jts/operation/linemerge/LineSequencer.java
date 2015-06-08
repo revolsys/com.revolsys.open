@@ -320,9 +320,7 @@ public class LineSequencer {
     GraphComponent.setVisited(graph.edgeIterator(), false);
 
     final Node startNode = findLowestDegreeNode(graph);
-    final DirectedEdge startDE = (DirectedEdge)startNode.getOutEdges()
-        .iterator()
-        .next();
+    final DirectedEdge startDE = (DirectedEdge)startNode.getOutEdges().iterator().next();
     final DirectedEdge startDESym = startDE.getSym();
 
     final List seq = new LinkedList();
@@ -428,21 +426,18 @@ public class LineSequencer {
     final Node endNode = endEdge.getToNode();
 
     boolean flipSeq = false;
-    final boolean hasDegree1Node = startNode.getDegree() == 1
-        || endNode.getDegree() == 1;
+    final boolean hasDegree1Node = startNode.getDegree() == 1 || endNode.getDegree() == 1;
 
     if (hasDegree1Node) {
       boolean hasObviousStartNode = false;
 
       // test end edge before start edge, to make result stable
       // (ie. if both are good starts, pick the actual start
-      if (endEdge.getToNode().getDegree() == 1
-          && endEdge.getEdgeDirection() == false) {
+      if (endEdge.getToNode().getDegree() == 1 && endEdge.getEdgeDirection() == false) {
         hasObviousStartNode = true;
         flipSeq = true;
       }
-      if (startEdge.getFromNode().getDegree() == 1
-          && startEdge.getEdgeDirection() == true) {
+      if (startEdge.getFromNode().getDegree() == 1 && startEdge.getEdgeDirection() == true) {
         hasObviousStartNode = true;
         flipSeq = false;
       }

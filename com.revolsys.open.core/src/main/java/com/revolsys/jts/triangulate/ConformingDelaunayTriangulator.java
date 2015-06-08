@@ -87,6 +87,8 @@ import com.revolsys.jts.triangulate.quadedge.Vertex;
  * @author Martin Davis
  */
 public class ConformingDelaunayTriangulator {
+  private final static int MAX_SPLIT_ITER = 99;
+
   private static BoundingBox computeVertexEnvelope(final Collection vertices) {
     BoundingBox env = new BoundingBoxDoubleGf();
     for (final Iterator i = vertices.iterator(); i.hasNext();) {
@@ -95,8 +97,6 @@ public class ConformingDelaunayTriangulator {
     }
     return env;
   }
-
-  private final static int MAX_SPLIT_ITER = 99;
 
   private final List initialVertices; // List<Vertex>
 
@@ -136,8 +136,7 @@ public class ConformingDelaunayTriangulator {
    * @param tolerance
    *          the distance tolerance below which points are considered identical
    */
-  public ConformingDelaunayTriangulator(final Collection initialVertices,
-    final double tolerance) {
+  public ConformingDelaunayTriangulator(final Collection initialVertices, final double tolerance) {
     this.initialVertices = new ArrayList(initialVertices);
     this.tolerance = tolerance;
     this.kdt = new KdTree(tolerance);
@@ -266,7 +265,7 @@ public class ConformingDelaunayTriangulator {
        * </ul>
        */
       final ConstraintVertex insertedVertex = insertSite(splitVertex);
-      if (!insertedVertex.getCoordinate().equals(2,this.splitPt)) {
+      if (!insertedVertex.getCoordinate().equals(2, this.splitPt)) {
         // throw new ConstraintEnforcementException("Split point snapped to
         // existing point
         // (tolerance too large or constraint interior narrow angle?)",
@@ -274,12 +273,10 @@ public class ConformingDelaunayTriangulator {
       }
 
       // split segment and record the new halves
-      final Segment s1 = new Segment(seg.getStartX(), seg.getStartY(),
-        seg.getStartZ(), splitVertex.getX(), splitVertex.getY(),
-        splitVertex.getZ(), seg.getData());
-      final Segment s2 = new Segment(splitVertex.getX(), splitVertex.getY(),
-        splitVertex.getZ(), seg.getEndX(), seg.getEndY(), seg.getEndZ(),
-        seg.getData());
+      final Segment s1 = new Segment(seg.getStartX(), seg.getStartY(), seg.getStartZ(),
+        splitVertex.getX(), splitVertex.getY(), splitVertex.getZ(), seg.getData());
+      final Segment s2 = new Segment(splitVertex.getX(), splitVertex.getY(), splitVertex.getZ(),
+        seg.getEndX(), seg.getEndY(), seg.getEndZ(), seg.getData());
       newSegments.add(s1);
       newSegments.add(s2);
       segsToRemove.add(seg);
@@ -311,8 +308,8 @@ public class ConformingDelaunayTriangulator {
     final Point p = seg.getStart();
     final Point q = seg.getEnd();
     // Find the mid point on the line and compute the radius of enclosing circle
-    final Point midPt = new PointDouble((p.getX() + q.getX()) / 2.0,
-      (p.getY() + q.getY()) / 2.0, Point.NULL_ORDINATE);
+    final Point midPt = new PointDouble((p.getX() + q.getX()) / 2.0, (p.getY() + q.getY()) / 2.0,
+      Point.NULL_ORDINATE);
     final double segRadius = p.distance(midPt);
 
     // compute envelope of circumcircle
@@ -328,7 +325,7 @@ public class ConformingDelaunayTriangulator {
       final KdNode nextNode = (KdNode)i.next();
       final Point testPt = nextNode.getCoordinate();
       // ignore segment endpoints
-      if (testPt.equals(2,p) || testPt.equals(2,q)) {
+      if (testPt.equals(2, p) || testPt.equals(2, q)) {
         continue;
       }
 
@@ -431,8 +428,7 @@ public class ConformingDelaunayTriangulator {
   }
 
   private Point[] getPointArray() {
-    final Point[] pts = new Point[this.initialVertices.size()
-                                  + this.segVertices.size()];
+    final Point[] pts = new Point[this.initialVertices.size() + this.segVertices.size()];
     int index = 0;
     for (final Iterator i = this.initialVertices.iterator(); i.hasNext();) {
       final Vertex v = (Vertex)i.next();

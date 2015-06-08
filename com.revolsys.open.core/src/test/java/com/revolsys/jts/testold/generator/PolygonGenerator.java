@@ -52,9 +52,20 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  * @author David Zwiers, Vivid Solutions.
  */
 public class PolygonGenerator extends GeometryGenerator {
-  private static Polygon createArc(final double x, final double dx,
-    final double y, final double dy, final int nholes, final int npoints,
-    final GeometryFactory gf) {
+  /**
+   * Creates rectangular polygons
+   */
+  public static final int BOX = 0;
+
+  /**
+   * Creates polygons whose points will not be rectangular when there are more than 4 points
+   */
+  public static final int ARC = 1;
+
+  private static final int RUNS = 5;
+
+  private static Polygon createArc(final double x, final double dx, final double y,
+    final double dy, final int nholes, final int npoints, final GeometryFactory gf) {
     // make outer ring first
     double radius = dx < dy ? dx / 3 : dy / 3;
 
@@ -89,8 +100,8 @@ public class PolygonGenerator extends GeometryGenerator {
     return gf.polygon(rings);
   }
 
-  private static LinearRing createArc(final double cx, final double cy,
-    final double radius, final int npoints, final GeometryFactory gf) {
+  private static LinearRing createArc(final double cx, final double cy, final double radius,
+    final int npoints, final GeometryFactory gf) {
 
     final Point[] coords = new Point[npoints + 1];
 
@@ -102,8 +113,7 @@ public class PolygonGenerator extends GeometryGenerator {
       final double fx = Math.sin(angle) * radius; // may be neg.
       final double fy = Math.cos(angle) * radius; // may be neg.
 
-      coords[i] = new PointDouble(gf.makePrecise(0, cx + fx),
-        gf.makePrecise(1, cy + fy));
+      coords[i] = new PointDouble(gf.makePrecise(0, cx + fx), gf.makePrecise(1, cy + fy));
     }
 
     coords[npoints] = coords[0].clonePoint();
@@ -111,15 +121,14 @@ public class PolygonGenerator extends GeometryGenerator {
     return gf.linearRing(coords);
   }
 
-  private static LinearRing createBox(final double x, final double dx,
-    final double y, final double dy, final int npoints, final GeometryFactory gf) {
+  private static LinearRing createBox(final double x, final double dx, final double y,
+    final double dy, final int npoints, final GeometryFactory gf) {
 
     // figure out the number of points per side
     final int ptsPerSide = npoints / 4;
     int rPtsPerSide = npoints % 4;
     final Point[] coords = new Point[npoints + 1];
-    coords[0] = new PointDouble(gf.makePrecise(0, x),
-      gf.makePrecise(1, y)); // start
+    coords[0] = new PointDouble(gf.makePrecise(0, x), gf.makePrecise(1, y)); // start
 
     final int cindex = 1;
     for (int i = 0; i < 4; i++) { // sides
@@ -135,8 +144,8 @@ public class PolygonGenerator extends GeometryGenerator {
         final double sy = coords[cindex - 1].getY();
 
         for (int j = 0; j < npts; j++) {
-          coords[cindex] = new PointDouble(gf.makePrecise(0, tx),
-            gf.makePrecise(1, sy + (j + 1) * cy));
+          coords[cindex] = new PointDouble(gf.makePrecise(0, tx), gf.makePrecise(1, sy + (j + 1)
+            * cy));
         }
       } else { // even horz
         double cx = dx / npts;
@@ -147,20 +156,18 @@ public class PolygonGenerator extends GeometryGenerator {
         final double sx = coords[cindex - 1].getX();
 
         for (int j = 0; j < npts; j++) {
-          coords[cindex] = new PointDouble(gf.makePrecise(0, sx + (j + 1) * cx),
-            gf.makePrecise(1, ty));
+          coords[cindex] = new PointDouble(gf.makePrecise(0, sx + (j + 1) * cx), gf.makePrecise(1,
+            ty));
         }
       }
     }
-    coords[npoints] = new PointDouble(gf.makePrecise(0, x),
-      gf.makePrecise(1, y)); // end
+    coords[npoints] = new PointDouble(gf.makePrecise(0, x), gf.makePrecise(1, y)); // end
 
     return gf.linearRing(coords);
   }
 
-  private static Polygon createBox(final double x, final double dx,
-    final double y, final double dy, final int nholes, final int npoints,
-    final GeometryFactory gf) {
+  private static Polygon createBox(final double x, final double dx, final double y,
+    final double dy, final int nholes, final int npoints, final GeometryFactory gf) {
     // make outer ring first
     final LinearRing outer = createBox(x, dx, y, dy, npoints, gf);
 
@@ -189,8 +196,8 @@ public class PolygonGenerator extends GeometryGenerator {
           int pts = npoints / 2;
           pts = pts < 4 ? 4 : pts;
           cindex++;
-          rings.add(createBox(spx + x + j * (ddx + spx), ddx, spy + y + i
-            * (ddy + spy), ddy, pts, gf));
+          rings.add(createBox(spx + x + j * (ddx + spx), ddx, spy + y + i * (ddy + spy), ddy, pts,
+            gf));
         }
       }
     }
@@ -198,9 +205,8 @@ public class PolygonGenerator extends GeometryGenerator {
     return gf.polygon(rings);
   }
 
-  private static LinearRing createTri(final double cx, final double cy,
-    final int startAngle, final int endAngle, final double radius,
-    final GeometryFactory gf) {
+  private static LinearRing createTri(final double cx, final double cy, final int startAngle,
+    final int endAngle, final double radius, final GeometryFactory gf) {
 
     final Point[] coords = new Point[4];
 
@@ -216,8 +222,7 @@ public class PolygonGenerator extends GeometryGenerator {
 
     final double cxp = gf.makePrecise(0, cx);
     final double cyp = gf.makePrecise(1, cy);
-    return gf.linearRing(2, cxp, cyp, cx + fx1, cy + fy1, cx + fx2, cy + fy2,
-      cxp, cyp);
+    return gf.linearRing(2, cxp, cyp, cx + fx1, cy + fy1, cx + fx2, cy + fy2, cxp, cyp);
   }
 
   protected int numberPoints = 4;
@@ -225,18 +230,6 @@ public class PolygonGenerator extends GeometryGenerator {
   protected int numberHoles = 0;
 
   protected int generationAlgorithm = 0;
-
-  /**
-   * Creates rectangular polygons
-   */
-  public static final int BOX = 0;
-
-  /**
-   * Creates polygons whose points will not be rectangular when there are more than 4 points
-   */
-  public static final int ARC = 1;
-
-  private static final int RUNS = 5;
 
   /**
    * As the user increases the number of points, the probability of creating a random valid polygon decreases.
@@ -281,13 +274,11 @@ public class PolygonGenerator extends GeometryGenerator {
     for (int i = 0; i < RUNS; i++) {
       switch (getGenerationAlgorithm()) {
         case BOX:
-          p = createBox(x, dx, y, dy, this.numberHoles, this.numberPoints,
-            this.geometryFactory);
-          break;
+          p = createBox(x, dx, y, dy, this.numberHoles, this.numberPoints, this.geometryFactory);
+        break;
         case ARC:
-          p = createArc(x, dx, y, dy, this.numberHoles, this.numberPoints,
-            this.geometryFactory);
-          break;
+          p = createArc(x, dx, y, dy, this.numberHoles, this.numberPoints, this.geometryFactory);
+        break;
         default:
           throw new IllegalStateException("Invalid Alg. Specified");
       }

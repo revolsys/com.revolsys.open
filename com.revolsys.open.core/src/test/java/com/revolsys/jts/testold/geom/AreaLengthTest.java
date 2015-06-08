@@ -44,29 +44,26 @@ import com.revolsys.jts.io.WKTReader;
  */
 public class AreaLengthTest extends TestCase {
 
+  private static final double TOLERANCE = 1E-5;
+
   public static void main(final String args[]) {
     TestRunner.run(AreaLengthTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.floating(0,
-    2);
+  private final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
-
-  private static final double TOLERANCE = 1E-5;
 
   public AreaLengthTest(final String name) {
     super(name);
   }
 
-  public void checkArea(final String wkt, final double expectedValue)
-      throws Exception {
+  public void checkArea(final String wkt, final double expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
     assertEquals(expectedValue, g.getArea(), TOLERANCE);
   }
 
-  public void checkLength(final String wkt, final double expectedValue)
-      throws Exception {
+  public void checkLength(final String wkt, final double expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
     final double len = g.getLength();
     // System.out.println(len);
@@ -77,8 +74,7 @@ public class AreaLengthTest extends TestCase {
     checkArea("MULTIPOINT (220 140, 180 280)", 0.0);
     checkArea("LINESTRING (220 140, 180 280)", 0.0);
     checkArea("POLYGON ((20 20, 40 20, 40 40, 20 40, 20 20))", 400.0);
-    checkArea(
-      "POLYGON ((20 20, 40 20, 40 40, 20 40, 20 20), (25 35, 35 35, 35 25, 25 25, 25 35))",
+    checkArea("POLYGON ((20 20, 40 20, 40 40, 20 40, 20 20), (25 35, 35 35, 35 25, 25 25, 25 35))",
       300.0);
   }
 
@@ -88,8 +84,7 @@ public class AreaLengthTest extends TestCase {
     checkLength("LINESTRING (0 0, 100 100)", 141.4213562373095);
     checkLength("POLYGON ((20 20, 40 20, 40 40, 20 40, 20 20))", 80.0);
     checkLength(
-      "POLYGON ((20 20, 40 20, 40 40, 20 40, 20 20), (25 35, 35 35, 35 25, 25 25, 25 35))",
-      120.0);
+      "POLYGON ((20 20, 40 20, 40 40, 20 40, 20 20), (25 35, 35 35, 35 25, 25 25, 25 35))", 120.0);
   }
 
 }

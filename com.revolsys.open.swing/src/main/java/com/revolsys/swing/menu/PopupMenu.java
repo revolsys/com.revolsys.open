@@ -92,12 +92,10 @@ public class PopupMenu implements MouseListener {
         if (this.autoCreateDnd) {
           if (!menu.getProperty("hasDndMenu", Boolean.FALSE)) {
             menu.setProperty("hasDndMenu", Boolean.TRUE);
-            menu.addMenuItemTitleIcon("dataTransfer", "Cut", "cut",
-              textComponent, "cut");
-            menu.addMenuItemTitleIcon("dataTransfer", "Copy", "page_copy",
-              textComponent, "copy");
-            menu.addMenuItemTitleIcon("dataTransfer", "Paste", "paste_plain",
-              textComponent, "paste");
+            menu.addMenuItemTitleIcon("dataTransfer", "Cut", "cut", textComponent, "cut");
+            menu.addMenuItemTitleIcon("dataTransfer", "Copy", "page_copy", textComponent, "copy");
+            menu.addMenuItemTitleIcon("dataTransfer", "Paste", "paste_plain", textComponent,
+              "paste");
           }
         }
         textComponent.setDragEnabled(true);

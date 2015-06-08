@@ -1,6 +1,5 @@
 package com.revolsys.io.map;
 
-
 public abstract class AbstractMapObjectFactory implements MapObjectFactory {
   private String description;
 

@@ -47,8 +47,7 @@ public class EpsgCsWktWriter {
     }
   }
 
-  public static void write(final PrintWriter out,
-    final CoordinateSystem coordinateSystem) {
+  public static void write(final PrintWriter out, final CoordinateSystem coordinateSystem) {
     if (coordinateSystem instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem projCs = (ProjectedCoordinateSystem)coordinateSystem;
       write(out, projCs);
@@ -72,8 +71,7 @@ public class EpsgCsWktWriter {
     }
   }
 
-  public static void write(final PrintWriter out,
-    final GeographicCoordinateSystem coordinateSystem) {
+  public static void write(final PrintWriter out, final GeographicCoordinateSystem coordinateSystem) {
     if (coordinateSystem != null) {
       out.print("GEOGCS[");
       write(out, coordinateSystem.getName());
@@ -106,8 +104,7 @@ public class EpsgCsWktWriter {
 
   }
 
-  public static void write(final PrintWriter out,
-    final PrimeMeridian primeMeridian) {
+  public static void write(final PrintWriter out, final PrimeMeridian primeMeridian) {
     if (primeMeridian != null) {
       out.print(",PRIMEM[");
       write(out, primeMeridian.getName());
@@ -120,8 +117,7 @@ public class EpsgCsWktWriter {
     }
   }
 
-  public static void write(final PrintWriter out,
-    final ProjectedCoordinateSystem coordinateSystem) {
+  public static void write(final PrintWriter out, final ProjectedCoordinateSystem coordinateSystem) {
     if (coordinateSystem != null) {
       out.print("PROJCS[");
       write(out, coordinateSystem.getName());
@@ -130,8 +126,7 @@ public class EpsgCsWktWriter {
       write(out, geoCs);
       final Projection projection = coordinateSystem.getProjection();
       write(out, projection);
-      for (final Entry<String, Object> parameter : coordinateSystem.getParameters()
-          .entrySet()) {
+      for (final Entry<String, Object> parameter : coordinateSystem.getParameters().entrySet()) {
         final String name = parameter.getKey();
         final Object value = parameter.getValue();
         write(out, name, value);
@@ -178,8 +173,7 @@ public class EpsgCsWktWriter {
     out.write('"');
   }
 
-  public static void write(final PrintWriter out, final String name,
-    final Object value) {
+  public static void write(final PrintWriter out, final String name, final Object value) {
     out.print(",PARAMETER[");
     write(out, name);
     out.write(',');

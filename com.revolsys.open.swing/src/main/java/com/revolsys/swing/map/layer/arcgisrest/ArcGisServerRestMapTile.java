@@ -17,13 +17,11 @@ public class ArcGisServerRestMapTile extends MapTile {
 
   private final ArcGisServerRestLayer layer;
 
-  public ArcGisServerRestMapTile(final ArcGisServerRestLayer layer,
-    final MapServer mapServer, final int zoomLevel, final double resolution,
-    final int tileX, final int tileY) {
+  public ArcGisServerRestMapTile(final ArcGisServerRestLayer layer, final MapServer mapServer,
+    final int zoomLevel, final double resolution, final int tileX, final int tileY) {
 
-    super(mapServer.getBoundingBox(zoomLevel, tileX, tileY),
-      mapServer.getTileInfo().getWidth(), mapServer.getTileInfo().getHeight(),
-      resolution);
+    super(mapServer.getBoundingBox(zoomLevel, tileX, tileY), mapServer.getTileInfo().getWidth(),
+      mapServer.getTileInfo().getHeight(), resolution);
     this.layer = layer;
     this.mapServer = mapServer;
     this.zoomLevel = zoomLevel;
@@ -81,7 +79,6 @@ public class ArcGisServerRestMapTile extends MapTile {
 
   @Override
   public String toString() {
-    return this.mapServer.getMapName() + " " + this.zoomLevel + "/"
-        + this.tileX + "/" + this.tileY;
+    return this.mapServer.getMapName() + " " + this.zoomLevel + "/" + this.tileX + "/" + this.tileY;
   }
 }

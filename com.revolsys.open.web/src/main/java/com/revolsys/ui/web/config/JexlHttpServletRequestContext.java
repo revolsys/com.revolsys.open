@@ -49,15 +49,12 @@ public class JexlHttpServletRequestContext implements JexlContext {
         map.putAll(JexlHttpServletRequestContext.this.request.getParameterMap());
         for (final Enumeration names = JexlHttpServletRequestContext.this.request.getAttributeNames(); names.hasMoreElements();) {
           final String name = (String)names.nextElement();
-          map.put(name,
-            JexlHttpServletRequestContext.this.request.getAttribute(name));
+          map.put(name, JexlHttpServletRequestContext.this.request.getAttribute(name));
         }
         if (JexlHttpServletRequestContext.this.servletContext != null) {
           for (final Enumeration names = JexlHttpServletRequestContext.this.servletContext.getAttributeNames(); names.hasMoreElements();) {
             final String name = (String)names.nextElement();
-            map.put(
-              name,
-              JexlHttpServletRequestContext.this.servletContext.getAttribute(name));
+            map.put(name, JexlHttpServletRequestContext.this.servletContext.getAttribute(name));
           }
         }
         return map.entrySet();

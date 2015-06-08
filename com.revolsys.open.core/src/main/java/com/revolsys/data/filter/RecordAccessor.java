@@ -16,6 +16,7 @@ public class RecordAccessor implements PropertyAccessor {
      *
      */
     private static final long serialVersionUID = 1L;
+
     private final String key;
 
     public RecordAccessException(final String key) {
@@ -30,15 +31,15 @@ public class RecordAccessor implements PropertyAccessor {
   }
 
   @Override
-  public boolean canRead(final EvaluationContext context, final Object target,
-    final String name) throws AccessException {
+  public boolean canRead(final EvaluationContext context, final Object target, final String name)
+    throws AccessException {
     final Record object = (Record)target;
     return object.hasField(name);
   }
 
   @Override
-  public boolean canWrite(final EvaluationContext context, final Object target,
-    final String name) throws AccessException {
+  public boolean canWrite(final EvaluationContext context, final Object target, final String name)
+    throws AccessException {
     return true;
   }
 
@@ -51,8 +52,8 @@ public class RecordAccessor implements PropertyAccessor {
   }
 
   @Override
-  public TypedValue read(final EvaluationContext context, final Object target,
-    final String name) throws AccessException {
+  public TypedValue read(final EvaluationContext context, final Object target, final String name)
+    throws AccessException {
     final Record object = (Record)target;
     final Object value = object.getValue(name);
     if (value == null && !object.hasField(name)) {
@@ -62,8 +63,8 @@ public class RecordAccessor implements PropertyAccessor {
   }
 
   @Override
-  public void write(final EvaluationContext context, final Object target,
-    final String name, final Object newValue) throws AccessException {
+  public void write(final EvaluationContext context, final Object target, final String name,
+    final Object newValue) throws AccessException {
     final Record object = (Record)target;
     object.setValue(name, newValue);
   }

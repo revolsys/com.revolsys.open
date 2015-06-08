@@ -46,14 +46,13 @@ import com.revolsys.jts.util.Assert;
  * the start of the geometry.
  */
 class LocationIndexOfPoint {
-  public static LinearLocation indexOf(final Geometry linearGeom,
-    final Point inputPt) {
+  public static LinearLocation indexOf(final Geometry linearGeom, final Point inputPt) {
     final LocationIndexOfPoint locater = new LocationIndexOfPoint(linearGeom);
     return locater.indexOf(inputPt);
   }
 
-  public static LinearLocation indexOfAfter(final Geometry linearGeom,
-    final Point inputPt, final LinearLocation minIndex) {
+  public static LinearLocation indexOfAfter(final Geometry linearGeom, final Point inputPt,
+    final LinearLocation minIndex) {
     final LocationIndexOfPoint locater = new LocationIndexOfPoint(linearGeom);
     return locater.indexOfAfter(inputPt, minIndex);
   }
@@ -89,8 +88,7 @@ class LocationIndexOfPoint {
    * @param minIndex the minimum location for the point location
    * @return the location of the nearest point
    */
-  public LinearLocation indexOfAfter(final Point inputPt,
-    final LinearLocation minIndex) {
+  public LinearLocation indexOfAfter(final Point inputPt, final LinearLocation minIndex) {
     if (minIndex == null) {
       return indexOf(inputPt);
     }
@@ -107,12 +105,11 @@ class LocationIndexOfPoint {
      * This will not be null, since it was initialized to minLocation
      */
     Assert.isTrue(closestAfter.compareTo(minIndex) >= 0,
-        "computed location is before specified minimum location");
+      "computed location is before specified minimum location");
     return closestAfter;
   }
 
-  private LinearLocation indexOfFromStart(final Point inputPt,
-    final LinearLocation minIndex) {
+  private LinearLocation indexOfFromStart(final Point inputPt, final LinearLocation minIndex) {
     double minDistance = Double.MAX_VALUE;
     int minComponentIndex = 0;
     int minSegmentIndex = 0;
@@ -130,8 +127,8 @@ class LocationIndexOfPoint {
         if (segDistance < minDistance) {
           // ensure after minLocation, if any
           if (minIndex == null
-              || minIndex.compareLocationValues(candidateComponentIndex,
-                candidateSegmentIndex, segFrac) < 0) {
+            || minIndex.compareLocationValues(candidateComponentIndex, candidateSegmentIndex,
+              segFrac) < 0) {
             // otherwise, save this as new minimum
             minComponentIndex = candidateComponentIndex;
             minSegmentIndex = candidateSegmentIndex;
@@ -146,8 +143,7 @@ class LocationIndexOfPoint {
       return new LinearLocation(minIndex);
     }
     // otherwise, return computed location
-    final LinearLocation loc = new LinearLocation(minComponentIndex,
-      minSegmentIndex, minFrac);
+    final LinearLocation loc = new LinearLocation(minComponentIndex, minSegmentIndex, minFrac);
     return loc;
   }
 
@@ -162,9 +158,9 @@ class LocationIndexOfPoint {
    * @return the fraction along the line segment the point occurs
    */
   /*
-   * // MD - no longer needed private static double segmentFraction(
-   * LineSegment seg, Point inputPt) { double segFrac =
-   * seg.projectionFactor(inputPt); if (segFrac < 0.0) segFrac = 0.0; else if
-   * (segFrac > 1.0) segFrac = 1.0; return segFrac; }
+   * // MD - no longer needed private static double segmentFraction( LineSegment
+   * seg, Point inputPt) { double segFrac = seg.projectionFactor(inputPt); if
+   * (segFrac < 0.0) segFrac = 0.0; else if (segFrac > 1.0) segFrac = 1.0;
+   * return segFrac; }
    */
 }

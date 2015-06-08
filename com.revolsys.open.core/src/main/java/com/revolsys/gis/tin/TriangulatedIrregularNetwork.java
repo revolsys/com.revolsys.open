@@ -42,8 +42,7 @@ public class TriangulatedIrregularNetwork {
     this(boundingBox.getGeometryFactory(), boundingBox);
   }
 
-  protected TriangulatedIrregularNetwork(final BoundingBox boundingBox,
-    final boolean loadMode) {
+  protected TriangulatedIrregularNetwork(final BoundingBox boundingBox, final boolean loadMode) {
     this(boundingBox.getGeometryFactory(), boundingBox, loadMode);
   }
 
@@ -79,8 +78,7 @@ public class TriangulatedIrregularNetwork {
     }
   }
 
-  private void addBreaklineIntersect(final Triangle triangle,
-    final LineSegment intersectLine) {
+  private void addBreaklineIntersect(final Triangle triangle, final LineSegment intersectLine) {
     final Point lc0 = intersectLine.getPoint(0);
     final Point lc1 = intersectLine.getPoint(1);
     if (intersectLine.getLength() > 0) {
@@ -127,25 +125,23 @@ public class TriangulatedIrregularNetwork {
         // Touching Start corner
         if (endCornerDistance < 0.01) {
           // Touching two corners
-          final Triangle newTriangle = Triangle.createClockwiseTriangle(lc0,
-            lc1,
+          final Triangle newTriangle = Triangle.createClockwiseTriangle(lc0, lc1,
             getOtherCoordinates(triangle, startClosestCorner, endClosestCorner));
           replaceTriangle(triangle, newTriangle);
         } else {
           // Touching start corner
           final double edgeDistance = endEdgeDistance;
-          addTriangleTouchingOneCorner(triangle, lc0, lc1, startClosestCorner,
-            endClosestEdge, edgeDistance);
+          addTriangleTouchingOneCorner(triangle, lc0, lc1, startClosestCorner, endClosestEdge,
+            edgeDistance);
         }
       } else if (endCornerDistance < 0.01) {
         // Touching end corner
         final double edgeDistance = startEdgeDistance;
-        addTriangleTouchingOneCorner(triangle, lc1, lc0, endClosestCorner,
-          startClosestEdge, edgeDistance);
+        addTriangleTouchingOneCorner(triangle, lc1, lc0, endClosestCorner, startClosestEdge,
+          edgeDistance);
       } else if (startEdgeDistance < 0.01) {
         if (endEdgeDistance < 0.01) {
-          addTriangleTouchingTwoEdges(triangle, lc0, lc1, startClosestEdge,
-            endClosestEdge);
+          addTriangleTouchingTwoEdges(triangle, lc0, lc1, startClosestEdge, endClosestEdge);
         } else {
           addTriangleTouchingOneEdge(triangle, lc0, lc1, startClosestEdge);
         }
@@ -162,29 +158,25 @@ public class TriangulatedIrregularNetwork {
     }
   }
 
-  private void addBreaklineIntersect(final Triangle triangle,
-    final Point intersectCoord) {
+  private void addBreaklineIntersect(final Triangle triangle, final Point intersectCoord) {
     Point previousCoord = triangle.getPoint(0);
     for (int i = 1; i < 3; i++) {
       final Point triCorner = triangle.getPoint(i);
-      if (!triCorner.equals(2, intersectCoord)
-          && !previousCoord.equals(2, intersectCoord)) {
-        final double distance = new LineSegmentDoubleGF(previousCoord,
-          triCorner).distance(intersectCoord);
+      if (!triCorner.equals(2, intersectCoord) && !previousCoord.equals(2, intersectCoord)) {
+        final double distance = new LineSegmentDoubleGF(previousCoord, triCorner).distance(intersectCoord);
         if (distance == 0) {
           final Point nextCoordinates = triangle.getPoint((i + 1) % 3);
-          replaceTriangle(triangle, Triangle.createClockwiseTriangle(
-            intersectCoord, triCorner, nextCoordinates),
-            Triangle.createClockwiseTriangle(intersectCoord, nextCoordinates,
-              previousCoord));
+          replaceTriangle(triangle,
+            Triangle.createClockwiseTriangle(intersectCoord, triCorner, nextCoordinates),
+            Triangle.createClockwiseTriangle(intersectCoord, nextCoordinates, previousCoord));
         }
       }
       previousCoord = triCorner;
     }
   }
 
-  private void addBreaklineItersect(final Triangle triangle,
-    final LineSegment breakline, final LineSegment intersectLine) {
+  private void addBreaklineItersect(final Triangle triangle, final LineSegment breakline,
+    final LineSegment intersectLine) {
     final Point lc0 = intersectLine.getPoint(0);
     final Point lc1 = intersectLine.getPoint(0);
     final double x1 = lc0.getX();
@@ -193,8 +185,8 @@ public class TriangulatedIrregularNetwork {
     final double y2 = lc1.getY();
     final double z1 = breakline.getElevation(lc0);
     final double z2 = breakline.getElevation(lc1);
-    final LineSegment lineSegment = new LineSegmentDoubleGF(this.geometryFactory, 3,
-      x1, y1, z1, x2, y2, z2);
+    final LineSegment lineSegment = new LineSegmentDoubleGF(this.geometryFactory, 3, x1, y1, z1,
+      x2, y2, z2);
     addBreaklineIntersect(triangle, lineSegment);
   }
 
@@ -208,8 +200,8 @@ public class TriangulatedIrregularNetwork {
    * @param l0 The start coordinate of the line.
    * @param l1 The end coordinate of the line.
    */
-  private void addContainedLine(final Triangle triangle, final int index,
-    final Point l0, final Point l1) {
+  private void addContainedLine(final Triangle triangle, final int index, final Point l0,
+    final Point l1) {
     final Point t0 = triangle.getPoint(index);
     final Point t1 = triangle.getPoint((index + 1) % 3);
     final Point t2 = triangle.getPoint((index + 2) % 3);
@@ -242,11 +234,9 @@ public class TriangulatedIrregularNetwork {
     }
   }
 
-  private void addTrangleCornerAndEdgeTouch(final Triangle triangle,
-    final Point cPrevious, final Point c, final Point cNext,
-    final Point cOpposite) {
-    replaceTriangle(triangle,
-      Triangle.createClockwiseTriangle(cPrevious, c, cOpposite),
+  private void addTrangleCornerAndEdgeTouch(final Triangle triangle, final Point cPrevious,
+    final Point c, final Point cNext, final Point cOpposite) {
+    replaceTriangle(triangle, Triangle.createClockwiseTriangle(cPrevious, c, cOpposite),
       Triangle.createClockwiseTriangle(c, cNext, cOpposite));
   }
 
@@ -268,8 +258,8 @@ public class TriangulatedIrregularNetwork {
     }
   }
 
-  private void addTriangleCorderEdge(final Triangle triangle, final Point lc0,
-    final Point lc1, final int startCorner, final int startEdge) {
+  private void addTriangleCorderEdge(final Triangle triangle, final Point lc0, final Point lc1,
+    final int startCorner, final int startEdge) {
     final Point cNext = triangle.getPoint((startCorner + 1) % 3);
     final Point cPrevious = triangle.getPoint((startCorner + 2) % 3);
     if (startEdge == startCorner) {
@@ -294,28 +284,24 @@ public class TriangulatedIrregularNetwork {
    * @param l0 The first line coordinate.
    * @param l1 The second line coordinate.
    */
-  private void addTrianglesContained(final Triangle triangle, final Point t0,
-    final Point t1, final Point t2, final Point l0, final Point l1) {
+  private void addTrianglesContained(final Triangle triangle, final Point t0, final Point t1,
+    final Point t2, final Point l0, final Point l1) {
     replaceTriangle(triangle, Triangle.createClockwiseTriangle(t0, t1, l0),
-      Triangle.createClockwiseTriangle(l0, t1, l1),
-      Triangle.createClockwiseTriangle(l1, t1, t2),
-      Triangle.createClockwiseTriangle(l0, l1, t2),
-      Triangle.createClockwiseTriangle(t0, l0, t2));
+      Triangle.createClockwiseTriangle(l0, t1, l1), Triangle.createClockwiseTriangle(l1, t1, t2),
+      Triangle.createClockwiseTriangle(l0, l1, t2), Triangle.createClockwiseTriangle(t0, l0, t2));
   }
 
-  private void addTriangleStartCornerEndInside(final Triangle triangle,
-    final int cornerIndex, final Point cCorner, final Point cInside) {
+  private void addTriangleStartCornerEndInside(final Triangle triangle, final int cornerIndex,
+    final Point cCorner, final Point cInside) {
     final Point cNext = triangle.getPoint((cornerIndex + 1) % 3);
     final Point cPrevious = triangle.getPoint((cornerIndex + 2) % 3);
-    replaceTriangle(triangle,
-      Triangle.createClockwiseTriangle(cCorner, cNext, cInside),
+    replaceTriangle(triangle, Triangle.createClockwiseTriangle(cCorner, cNext, cInside),
       Triangle.createClockwiseTriangle(cInside, cNext, cPrevious),
       Triangle.createClockwiseTriangle(cInside, cPrevious, cCorner));
   }
 
-  private void addTriangleTouchingOneCorner(final Triangle triangle,
-    final Point lc0, final Point lc1, final int startCorner, final int endEdge,
-    final double endEdgeDistance) {
+  private void addTriangleTouchingOneCorner(final Triangle triangle, final Point lc0,
+    final Point lc1, final int startCorner, final int endEdge, final double endEdgeDistance) {
     if (endEdgeDistance < 1) {
       addTriangleCorderEdge(triangle, lc0, lc1, startCorner, endEdge);
     } else {
@@ -323,51 +309,45 @@ public class TriangulatedIrregularNetwork {
     }
   }
 
-  private void addTriangleTouchingOneEdge(final Triangle triangle,
-    final Point lc0, final Point lc1, final int edgeIndex) {
+  private void addTriangleTouchingOneEdge(final Triangle triangle, final Point lc0,
+    final Point lc1, final int edgeIndex) {
     final Point cPrevious = triangle.getPoint(edgeIndex % 3);
     final Point cNext = triangle.getPoint((edgeIndex + 1) % 3);
     final Point cOpposite = triangle.getPoint((edgeIndex + 2) % 3);
     if (CoordinatesUtil.orientationIndex(cPrevious, lc0, lc1) == CGAlgorithms.COLLINEAR) {
-      replaceTriangle(triangle,
-        Triangle.createClockwiseTriangle(cPrevious, lc0, cOpposite),
+      replaceTriangle(triangle, Triangle.createClockwiseTriangle(cPrevious, lc0, cOpposite),
         Triangle.createClockwiseTriangle(cOpposite, lc0, lc1),
         Triangle.createClockwiseTriangle(cOpposite, lc1, cNext),
         Triangle.createClockwiseTriangle(lc0, lc1, cNext));
     } else {
-      replaceTriangle(triangle,
-        Triangle.createClockwiseTriangle(cPrevious, lc0, lc1),
+      replaceTriangle(triangle, Triangle.createClockwiseTriangle(cPrevious, lc0, lc1),
         Triangle.createClockwiseTriangle(cNext, lc0, lc1),
         Triangle.createClockwiseTriangle(cNext, lc1, cOpposite),
         Triangle.createClockwiseTriangle(cPrevious, lc1, cOpposite));
     }
   }
 
-  private void addTriangleTouchingTwoEdges(final Triangle triangle,
-    final Point lc0, final Point lc1, final int startEdge, final int endEdge) {
+  private void addTriangleTouchingTwoEdges(final Triangle triangle, final Point lc0,
+    final Point lc1, final int startEdge, final int endEdge) {
     final Point cPrevious = triangle.getPoint(startEdge);
     final Point cNext = triangle.getPoint((startEdge + 1) % 3);
     final Point cOpposite = triangle.getPoint((startEdge + 2) % 3);
     if (startEdge == endEdge) {
       if (cPrevious.distance(lc0) < cPrevious.distance(lc1)) {
-        replaceTriangle(triangle,
-          Triangle.createClockwiseTriangle(cPrevious, lc0, cOpposite),
+        replaceTriangle(triangle, Triangle.createClockwiseTriangle(cPrevious, lc0, cOpposite),
           Triangle.createClockwiseTriangle(lc0, lc1, cOpposite),
           Triangle.createClockwiseTriangle(lc1, cNext, cOpposite));
       } else {
-        replaceTriangle(triangle,
-          Triangle.createClockwiseTriangle(cPrevious, lc1, cOpposite),
+        replaceTriangle(triangle, Triangle.createClockwiseTriangle(cPrevious, lc1, cOpposite),
           Triangle.createClockwiseTriangle(lc0, lc1, cOpposite),
           Triangle.createClockwiseTriangle(lc0, cNext, cOpposite));
       }
     } else if (endEdge == (startEdge + 1) % 3) {
-      replaceTriangle(triangle,
-        Triangle.createClockwiseTriangle(cPrevious, lc0, cOpposite),
+      replaceTriangle(triangle, Triangle.createClockwiseTriangle(cPrevious, lc0, cOpposite),
         Triangle.createClockwiseTriangle(lc0, lc1, cOpposite),
         Triangle.createClockwiseTriangle(lc0, cNext, lc1));
     } else {
-      replaceTriangle(triangle,
-        Triangle.createClockwiseTriangle(cPrevious, lc0, lc1),
+      replaceTriangle(triangle, Triangle.createClockwiseTriangle(cPrevious, lc0, lc1),
         Triangle.createClockwiseTriangle(lc0, cNext, lc1),
         Triangle.createClockwiseTriangle(lc1, cNext, cOpposite));
     }
@@ -469,8 +449,8 @@ public class TriangulatedIrregularNetwork {
         closestCorner = t2;
         oppositeEdge = new LineSegmentDoubleGF(t0, t1);
       }
-      LineSegment segment = new LineSegmentDoubleGF(closestCorner, coordinate).extend(
-        0, t0.distance(t1) + t1.distance(t2) + t0.distance(t2));
+      LineSegment segment = new LineSegmentDoubleGF(closestCorner, coordinate).extend(0,
+        t0.distance(t1) + t1.distance(t2) + t0.distance(t2));
       final Geometry intersectCoordinates = oppositeEdge.getIntersection(segment);
       if (intersectCoordinates.getVertexCount() > 0) {
         final Point intersectPoint = intersectCoordinates.getVertex(0);
@@ -491,8 +471,7 @@ public class TriangulatedIrregularNetwork {
     return Collections.unmodifiableSet(this.nodes);
   }
 
-  private Point getOtherCoordinates(final LineString coords, final int i1,
-    final int i2) {
+  private Point getOtherCoordinates(final LineString coords, final int i1, final int i2) {
     final int index = getOtherIndex(i1, i2);
     return coords.getPoint(index);
   }
@@ -550,8 +529,7 @@ public class TriangulatedIrregularNetwork {
 
   public List<Triangle> getTriangles(final Point coordinate) {
     final BoundingBox envelope = new BoundingBoxDoubleGf(coordinate);
-    final TriangleContainsPointFilter filter = new TriangleContainsPointFilter(
-      coordinate);
+    final TriangleContainsPointFilter filter = new TriangleContainsPointFilter(coordinate);
     return getTriangleIndex().find(envelope, filter);
   }
 
@@ -572,8 +550,7 @@ public class TriangulatedIrregularNetwork {
     if (!breakline.isEmpty()) {
       final List<Triangle> triangles = getTriangles(breakline);
       for (final Triangle triangle : triangles) {
-        final LineSegment intersection = triangle.intersection(this.geometryFactory,
-          breakline);
+        final LineSegment intersection = triangle.intersection(this.geometryFactory, breakline);
         if (intersection != null) {
           final double length = intersection.getLength();
           if (length < 0.01) {
@@ -599,13 +576,11 @@ public class TriangulatedIrregularNetwork {
 
   public void insertNode(final Point coordinate) {
     if (this.boundingBox.covers(coordinate)) {
-      final Point point = new PointDouble(
-        this.geometryFactory.createCoordinates(coordinate), 3);
+      final Point point = new PointDouble(this.geometryFactory.createCoordinates(coordinate), 3);
       if (!this.nodes.contains(point)) {
         final List<Triangle> triangles = getTrianglesCircumcircleIntersections(point);
         if (!triangles.isEmpty()) {
-          final AngleFromPointComparator comparator = new AngleFromPointComparator(
-            point);
+          final AngleFromPointComparator comparator = new AngleFromPointComparator(point);
           final TreeSet<Point> exterior = new TreeSet<Point>(comparator);
           for (final Triangle triangle : triangles) {
             final Circle circle = triangle.getCircumcircle();
@@ -664,14 +639,12 @@ public class TriangulatedIrregularNetwork {
     }
   }
 
-  private void replaceTriangle(final Triangle triangle,
-    final Triangle newTriangle) {
+  private void replaceTriangle(final Triangle triangle, final Triangle newTriangle) {
     removeTriangle(triangle);
     addTriangle(newTriangle);
   }
 
-  private void replaceTriangle(final Triangle triangle,
-    final Triangle... newTriangles) {
+  private void replaceTriangle(final Triangle triangle, final Triangle... newTriangles) {
     removeTriangle(triangle);
     for (final Triangle newTriangle : newTriangles) {
       addTriangle(newTriangle);

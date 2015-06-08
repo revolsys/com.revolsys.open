@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -40,11 +39,8 @@ import com.revolsys.jts.util.Assert;
  *
  * @version 1.7
  */
-public class Node
-extends NodeBase
-{
-  public static Node createExpanded(final Node node, final Interval addInterval)
-  {
+public class Node extends NodeBase {
+  public static Node createExpanded(final Node node, final Interval addInterval) {
     final Interval expandInt = new Interval(addInterval);
     if (node != null) {
       expandInt.expandToInclude(node.interval);
@@ -57,28 +53,28 @@ extends NodeBase
     return largerNode;
   }
 
-  public static Node createNode(final Interval itemInterval)
-  {
+  public static Node createNode(final Interval itemInterval) {
     final Key key = new Key(itemInterval);
 
-    //System.out.println("input: " + env + "  binaryEnv: " + key.getEnvelope());
+    // System.out.println("input: " + env + "  binaryEnv: " +
+    // key.getEnvelope());
     final Node node = new Node(key.getInterval(), key.getLevel());
     return node;
   }
 
   private final Interval interval;
+
   private final double centre;
+
   private final int level;
 
-  public Node(final Interval interval, final int level)
-  {
+  public Node(final Interval interval, final int level) {
     this.interval = interval;
     this.level = level;
     this.centre = (interval.getMin() + interval.getMax()) / 2;
   }
 
-  private Node createSubnode(final int index)
-  {
+  private Node createSubnode(final int index) {
     // create a new subnode in the appropriate interval
 
     double min = 0.0;
@@ -88,11 +84,11 @@ extends NodeBase
       case 0:
         min = this.interval.getMin();
         max = this.centre;
-        break;
+      break;
       case 1:
         min = this.centre;
         max = this.interval.getMax();
-        break;
+      break;
     }
     final Interval subInt = new Interval(min, max);
     final Node node = new Node(subInt, this.level - 1);
@@ -103,8 +99,7 @@ extends NodeBase
    * Returns the smallest <i>existing</i>
    * node containing the envelope.
    */
-  public NodeBase find(final Interval searchInterval)
-  {
+  public NodeBase find(final Interval searchInterval) {
     final int subnodeIndex = getSubnodeIndex(searchInterval, this.centre);
     if (subnodeIndex == -1) {
       return this;
@@ -118,15 +113,16 @@ extends NodeBase
     return this;
   }
 
-  public Interval getInterval() { return this.interval; }
+  public Interval getInterval() {
+    return this.interval;
+  }
 
   /**
    * Returns the subnode containing the envelope.
    * Creates the node if
    * it does not already exist.
    */
-  public Node getNode(final Interval searchInterval)
-  {
+  public Node getNode(final Interval searchInterval) {
     final int subnodeIndex = getSubnodeIndex(searchInterval, this.centre);
     // if index is -1 searchEnv is not contained in a subnode
     if (subnodeIndex != -1) {
@@ -134,8 +130,7 @@ extends NodeBase
       final Node node = getSubnode(subnodeIndex);
       // recursively search the found/created node
       return node.getNode(searchInterval);
-    }
-    else {
+    } else {
       return this;
     }
   }
@@ -144,22 +139,19 @@ extends NodeBase
    * get the subnode for the index.
    * If it doesn't exist, create it
    */
-  private Node getSubnode(final int index)
-  {
+  private Node getSubnode(final int index) {
     if (this.subnode[index] == null) {
       this.subnode[index] = createSubnode(index);
     }
     return this.subnode[index];
   }
 
-  void insert(final Node node)
-  {
+  void insert(final Node node) {
     Assert.isTrue(this.interval == null || this.interval.contains(node.interval));
     final int index = getSubnodeIndex(node.interval, this.centre);
     if (node.level == this.level - 1) {
       this.subnode[index] = node;
-    }
-    else {
+    } else {
       // the node is not a direct child, so make a new child node to contain it
       // and recursively insert the node
       final Node childNode = createSubnode(index);
@@ -169,10 +161,9 @@ extends NodeBase
   }
 
   @Override
-  protected boolean isSearchMatch(final Interval itemInterval)
-  {
-    //    System.out.println(itemInterval + " overlaps " + interval + " : "
-    //                       + itemInterval.overlaps(interval));
+  protected boolean isSearchMatch(final Interval itemInterval) {
+    // System.out.println(itemInterval + " overlaps " + interval + " : "
+    // + itemInterval.overlaps(interval));
     return itemInterval.overlaps(this.interval);
   }
 

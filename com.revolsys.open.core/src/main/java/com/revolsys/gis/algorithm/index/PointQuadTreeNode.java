@@ -61,8 +61,7 @@ public class PointQuadTreeNode<T> {
     return false;
   }
 
-  public void findEntriesWithin(final List<Entry<Point, T>> results,
-    final BoundingBox envelope) {
+  public void findEntriesWithin(final List<Entry<Point, T>> results, final BoundingBox envelope) {
     final double minX = envelope.getMinX();
     final double maxX = envelope.getMaxX();
     final double minY = envelope.getMinY();
@@ -151,8 +150,7 @@ public class PointQuadTreeNode<T> {
     return y < this.y;
   }
 
-  public void put(final double x, final double y,
-    final PointQuadTreeNode<T> node) {
+  public void put(final double x, final double y, final PointQuadTreeNode<T> node) {
     final boolean xLess = isLessThanX(x);
     final boolean yLess = isLessThanY(y);
     if (xLess && yLess) {
@@ -182,8 +180,7 @@ public class PointQuadTreeNode<T> {
     }
   }
 
-  public PointQuadTreeNode<T> remove(final double x, final double y,
-    final T value) {
+  public PointQuadTreeNode<T> remove(final double x, final double y, final T value) {
     final boolean xLess = isLessThanX(x);
     final boolean yLess = isLessThanY(y);
     if (this.x == x && this.y == y && this.value == value) {
@@ -230,8 +227,7 @@ public class PointQuadTreeNode<T> {
   }
 
   public void setValue(final int index, final double value) {
-    throw new UnsupportedOperationException(
-        "Cannot change the coordinates on a quad tree");
+    throw new UnsupportedOperationException("Cannot change the coordinates on a quad tree");
   }
 
   public boolean visit(final BoundingBox envelope, final Visitor<T> visitor) {

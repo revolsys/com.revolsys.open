@@ -12,6 +12,12 @@ import com.revolsys.jts.util.GeometricShapeFactory;
 
 public class PolygonUnionPerfTest {
 
+  static final int MAX_ITER = 1;
+
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+
+  static WKTReader wktRdr = new WKTReader(geometryFactory);
+
   public static void main(final String[] args) {
     final PolygonUnionPerfTest test = new PolygonUnionPerfTest();
 
@@ -19,13 +25,6 @@ public class PolygonUnionPerfTest {
     test.testRampItems();
 
   }
-
-  static final int MAX_ITER = 1;
-
-  private static final GeometryFactory geometryFactory = GeometryFactory.floating(
-    0, 2);
-
-  static WKTReader wktRdr = new WKTReader(geometryFactory);
 
   GeometryFactory factory = GeometryFactory.floating3();
 
@@ -83,8 +82,7 @@ public class PolygonUnionPerfTest {
     final double yInc = height / nCells;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
-        final Point base = new PointDouble(i * xInc, j * yInc,
-          Point.NULL_ORDINATE);
+        final Point base = new PointDouble(i * xInc, j * yInc, Point.NULL_ORDINATE);
         final Geometry poly = createPoly(base, size, nPts);
         geoms.add(poly);
         // System.out.println(poly);
@@ -99,8 +97,8 @@ public class PolygonUnionPerfTest {
   }
 
   public void test(final int nItems, final int nPts, final double size) {
-    //  System.out.println("---------------------------------------------------------");
-    //  System.out.println("# pts/item: " + nPts);
+    // System.out.println("---------------------------------------------------------");
+    // System.out.println("# pts/item: " + nPts);
 
     final List polys = createPolys(nItems, size, nPts);
 

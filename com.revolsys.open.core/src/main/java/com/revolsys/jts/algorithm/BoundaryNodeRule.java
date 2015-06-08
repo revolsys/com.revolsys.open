@@ -76,8 +76,7 @@ import com.revolsys.jts.operation.relate.RelateOp;
  * @see IsSimpleOp
  * @see PointLocator
  */
-public interface BoundaryNodeRule
-{
+public interface BoundaryNodeRule {
 
   /**
    * A {@link BoundaryNodeRule} which specifies that any points which are endpoints
@@ -101,12 +100,9 @@ public interface BoundaryNodeRule
    * @author Martin Davis
    * @version 1.7
    */
-  public static class EndPointBoundaryNodeRule
-  implements BoundaryNodeRule
-  {
+  public static class EndPointBoundaryNodeRule implements BoundaryNodeRule {
     @Override
-    public boolean isInBoundary(final int boundaryCount)
-    {
+    public boolean isInBoundary(final int boundaryCount) {
       return boundaryCount > 0;
     }
   }
@@ -125,12 +121,9 @@ public interface BoundaryNodeRule
    * @author Martin Davis
    * @version 1.7
    */
-  public static class Mod2BoundaryNodeRule
-  implements BoundaryNodeRule
-  {
+  public static class Mod2BoundaryNodeRule implements BoundaryNodeRule {
     @Override
-    public boolean isInBoundary(final int boundaryCount)
-    {
+    public boolean isInBoundary(final int boundaryCount) {
       // the "Mod-2 Rule"
       return boundaryCount % 2 == 1;
     }
@@ -145,12 +138,9 @@ public interface BoundaryNodeRule
    * @author Martin Davis
    * @version 1.7
    */
-  public static class MonoValentEndPointBoundaryNodeRule
-  implements BoundaryNodeRule
-  {
+  public static class MonoValentEndPointBoundaryNodeRule implements BoundaryNodeRule {
     @Override
-    public boolean isInBoundary(final int boundaryCount)
-    {
+    public boolean isInBoundary(final int boundaryCount) {
       return boundaryCount == 1;
     }
   }
@@ -165,12 +155,9 @@ public interface BoundaryNodeRule
    * @author Martin Davis
    * @version 1.7
    */
-  public static class MultiValentEndPointBoundaryNodeRule
-  implements BoundaryNodeRule
-  {
+  public static class MultiValentEndPointBoundaryNodeRule implements BoundaryNodeRule {
     @Override
-    public boolean isInBoundary(final int boundaryCount)
-    {
+    public boolean isInBoundary(final int boundaryCount) {
       return boundaryCount > 1;
     }
   }
@@ -215,6 +202,5 @@ public interface BoundaryNodeRule
    * @return true if points in this number of boundaries lie in the parent boundary
    */
   boolean isInBoundary(int boundaryCount);
-
 
 }

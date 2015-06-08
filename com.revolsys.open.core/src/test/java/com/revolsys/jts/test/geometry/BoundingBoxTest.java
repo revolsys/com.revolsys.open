@@ -73,11 +73,9 @@ public class BoundingBoxTest implements TestConstants {
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
-  private void assertEnvelope(final BoundingBox boundingBox,
-    final GeometryFactory geometryFactory, final boolean empty,
-    final int axisCount, final double... bounds) {
-    Assert.assertEquals("Geometry Factory", geometryFactory,
-      boundingBox.getGeometryFactory());
+  private void assertEnvelope(final BoundingBox boundingBox, final GeometryFactory geometryFactory,
+    final boolean empty, final int axisCount, final double... bounds) {
+    Assert.assertEquals("Geometry Factory", geometryFactory, boundingBox.getGeometryFactory());
     Assert.assertEquals("Empty", empty, boundingBox.isEmpty());
     Assert.assertEquals("Axis Count", axisCount, boundingBox.getAxisCount());
     Assert.assertEquals("Bounds", CollectionUtil.toList(bounds),
@@ -88,8 +86,7 @@ public class BoundingBoxTest implements TestConstants {
     final StringBuilder wkt = new StringBuilder();
     final int srid = boundingBox.getSrid();
     if (geometryFactory == null) {
-      Assert.assertEquals("coordinateSystem", null,
-        boundingBox.getCoordinateSystem());
+      Assert.assertEquals("coordinateSystem", null, boundingBox.getCoordinateSystem());
       Assert.assertEquals("srid", 0, srid);
     } else {
       if (srid > 0) {
@@ -99,8 +96,7 @@ public class BoundingBoxTest implements TestConstants {
       }
       Assert.assertEquals("srid", geometryFactory.getSrid(), srid);
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      Assert.assertEquals("coordinateSystem", coordinateSystem,
-        boundingBox.getCoordinateSystem());
+      Assert.assertEquals("coordinateSystem", coordinateSystem, boundingBox.getCoordinateSystem());
       if (coordinateSystem != null) {
         unit = coordinateSystem.getUnit();
         lengthUnit = coordinateSystem.getLengthUnit();
@@ -160,23 +156,19 @@ public class BoundingBoxTest implements TestConstants {
 
         Assert.assertEquals("Minimum " + i, Measure.valueOf(bounds[i], unit),
           boundingBox.getMinimum(i));
-        Assert.assertEquals("Maximum" + i,
-          Measure.valueOf(bounds[axisCount + i], unit),
+        Assert.assertEquals("Maximum" + i, Measure.valueOf(bounds[axisCount + i], unit),
           boundingBox.getMaximum(i));
 
-        Assert.assertEquals("Minimum " + i, bounds[i],
-          boundingBox.getMinimum(i, unit), 0);
-        Assert.assertEquals("Maximum " + i, bounds[axisCount + i],
-          boundingBox.getMaximum(i, unit), 0);
+        Assert.assertEquals("Minimum " + i, bounds[i], boundingBox.getMinimum(i, unit), 0);
+        Assert.assertEquals("Maximum " + i, bounds[axisCount + i], boundingBox.getMaximum(i, unit),
+          0);
       }
     }
     Assert.assertEquals("MinX", minX, boundingBox.getMinX(), 0);
     Assert.assertEquals("MaxX", maxX, boundingBox.getMaxX(), 0);
 
-    Assert.assertEquals("MinimumX", Measure.valueOf(minX, unit),
-      boundingBox.getMinimum(0));
-    Assert.assertEquals("MaximumX", Measure.valueOf(maxX, unit),
-      boundingBox.getMaximum(0));
+    Assert.assertEquals("MinimumX", Measure.valueOf(minX, unit), boundingBox.getMinimum(0));
+    Assert.assertEquals("MaximumX", Measure.valueOf(maxX, unit), boundingBox.getMaximum(0));
 
     Assert.assertEquals("MinimumX", minX, boundingBox.getMinimum(0, unit), 0);
     Assert.assertEquals("MaximumX", maxX, boundingBox.getMaximum(0, unit), 0);
@@ -184,10 +176,8 @@ public class BoundingBoxTest implements TestConstants {
     Assert.assertEquals("MinY", minY, boundingBox.getMinY(), 0);
     Assert.assertEquals("MaxY", maxY, boundingBox.getMaxY(), 0);
 
-    Assert.assertEquals("MinimumY", Measure.valueOf(minY, unit),
-      boundingBox.getMinimum(1));
-    Assert.assertEquals("MaximumY", Measure.valueOf(maxY, unit),
-      boundingBox.getMaximum(1));
+    Assert.assertEquals("MinimumY", Measure.valueOf(minY, unit), boundingBox.getMinimum(1));
+    Assert.assertEquals("MaximumY", Measure.valueOf(maxY, unit), boundingBox.getMaximum(1));
 
     Assert.assertEquals("MinimumY", minY, boundingBox.getMinimum(1, unit), 0);
     Assert.assertEquals("MaximumY", maxY, boundingBox.getMaximum(1, unit), 0);
@@ -195,18 +185,14 @@ public class BoundingBoxTest implements TestConstants {
     Assert.assertEquals("WKT", wkt.toString(), boundingBox.toString());
     Assert.assertEquals("Area", area, boundingBox.getArea(), 0);
     Assert.assertEquals("Width", width, boundingBox.getWidth(), 0);
-    Assert.assertEquals("Width", width, boundingBox.getWidthLength()
-      .doubleValue(lengthUnit), 0);
-    Assert.assertEquals("Width", Measure.valueOf(width, lengthUnit),
-      boundingBox.getWidthLength());
+    Assert.assertEquals("Width", width, boundingBox.getWidthLength().doubleValue(lengthUnit), 0);
+    Assert.assertEquals("Width", Measure.valueOf(width, lengthUnit), boundingBox.getWidthLength());
     Assert.assertEquals("Height", height, boundingBox.getHeight(), 0);
-    Assert.assertEquals("Height", height, boundingBox.getHeightLength()
-      .doubleValue(lengthUnit), 0);
+    Assert.assertEquals("Height", height, boundingBox.getHeightLength().doubleValue(lengthUnit), 0);
     Assert.assertEquals("Height", Measure.valueOf(height, lengthUnit),
       boundingBox.getHeightLength());
 
-    Assert.assertEquals("Aspect Ratio", width / height,
-      boundingBox.getAspectRatio(), 0);
+    Assert.assertEquals("Aspect Ratio", width / height, boundingBox.getAspectRatio(), 0);
 
   }
 
@@ -253,18 +239,16 @@ public class BoundingBoxTest implements TestConstants {
         final BoundingBoxDoubleGf noGeometryFactory = new BoundingBoxDoubleGf(points);
         assertEnvelope(noGeometryFactory, null, false, axisCount, bounds);
 
-        final GeometryFactory gfFloating = GeometryFactory.floating(4326,
-          axisCount);
-        assertEnvelope(new BoundingBoxDoubleGf(gfFloating, points), gfFloating, false,
-          axisCount, bounds);
+        final GeometryFactory gfFloating = GeometryFactory.floating(4326, axisCount);
+        assertEnvelope(new BoundingBoxDoubleGf(gfFloating, points), gfFloating, false, axisCount,
+          bounds);
 
-        final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount,
-          10.0, 10.0);
+        final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount, 10.0, 10.0);
 
         points = gfFixed.getPrecise(points);
         final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
-        assertEnvelope(new BoundingBoxDoubleGf(gfFixed, points), gfFixed, false,
-          axisCount, boundsPrecise);
+        assertEnvelope(new BoundingBoxDoubleGf(gfFixed, points), gfFixed, false, axisCount,
+          boundsPrecise);
       }
     }
   }
@@ -300,17 +284,15 @@ public class BoundingBoxTest implements TestConstants {
         assertEnvelope(noGeometryFactory, null, false, axisCount, bounds);
 
         if (axisCount > 1) {
-          final GeometryFactory gfFloating = GeometryFactory.floating(4326,
-            axisCount);
-          assertEnvelope(new BoundingBoxDoubleGf(gfFloating, axisCount, values),
-            gfFloating, false, axisCount, bounds);
+          final GeometryFactory gfFloating = GeometryFactory.floating(4326, axisCount);
+          assertEnvelope(new BoundingBoxDoubleGf(gfFloating, axisCount, values), gfFloating, false,
+            axisCount, bounds);
 
-          final GeometryFactory gfFixed = GeometryFactory.fixed(4326,
-            axisCount, 10.0, 10.0);
+          final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount, 10.0, 10.0);
           final double[] valuesPrecise = gfFixed.copyPrecise(values);
           final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
-          assertEnvelope(new BoundingBoxDoubleGf(gfFixed, axisCount, valuesPrecise),
-            gfFixed, false, axisCount, boundsPrecise);
+          assertEnvelope(new BoundingBoxDoubleGf(gfFixed, axisCount, valuesPrecise), gfFixed,
+            false, axisCount, boundsPrecise);
         }
       }
     }
@@ -321,14 +303,11 @@ public class BoundingBoxTest implements TestConstants {
     final BoundingBox empty = new BoundingBoxDoubleGf();
     assertEnvelope(empty, null, true, 0, NULL_BOUNDS);
 
-    final BoundingBox emptyNullGeometryFactory = new BoundingBoxDoubleGf(
-      (GeometryFactory)null);
+    final BoundingBox emptyNullGeometryFactory = new BoundingBoxDoubleGf((GeometryFactory)null);
     assertEnvelope(emptyNullGeometryFactory, null, true, 0, NULL_BOUNDS);
 
-    final BoundingBox emptyWithGeometryFactory = new BoundingBoxDoubleGf(
-      UTM10_GF_2_FLOATING);
-    assertEnvelope(emptyWithGeometryFactory, UTM10_GF_2_FLOATING, true, 0,
-      NULL_BOUNDS);
+    final BoundingBox emptyWithGeometryFactory = new BoundingBoxDoubleGf(UTM10_GF_2_FLOATING);
+    assertEnvelope(emptyWithGeometryFactory, UTM10_GF_2_FLOATING, true, 0, NULL_BOUNDS);
   }
 
   @Test
@@ -343,12 +322,10 @@ public class BoundingBoxTest implements TestConstants {
       Collections.<Point> singleton(null));
     assertEnvelope(emptyListWithNulls, null, true, 0, NULL_BOUNDS);
 
-    final BoundingBox emptyNullCoordinatesList = new BoundingBoxDoubleGf(
-      (Iterable<Point>)null);
+    final BoundingBox emptyNullCoordinatesList = new BoundingBoxDoubleGf((Iterable<Point>)null);
     assertEnvelope(emptyNullCoordinatesList, null, true, 0, NULL_BOUNDS);
 
-    final BoundingBox emptyCoordinatesList = new BoundingBoxDoubleGf(
-      new ArrayList<Point>());
+    final BoundingBox emptyCoordinatesList = new BoundingBoxDoubleGf(new ArrayList<Point>());
     assertEnvelope(emptyCoordinatesList, null, true, 0, NULL_BOUNDS);
 
     // Different number of axis and values
@@ -375,17 +352,15 @@ public class BoundingBoxTest implements TestConstants {
         final BoundingBoxDoubleGf noGeometryFactory = new BoundingBoxDoubleGf(points);
         assertEnvelope(noGeometryFactory, null, false, axisCount, bounds);
 
-        final GeometryFactory gfFloating = GeometryFactory.floating(4326,
-          axisCount);
-        assertEnvelope(new BoundingBoxDoubleGf(gfFloating, points), gfFloating, false,
-          axisCount, bounds);
+        final GeometryFactory gfFloating = GeometryFactory.floating(4326, axisCount);
+        assertEnvelope(new BoundingBoxDoubleGf(gfFloating, points), gfFloating, false, axisCount,
+          bounds);
 
-        final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount,
-          10.0, 10.0);
+        final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount, 10.0, 10.0);
 
         final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
-        assertEnvelope(new BoundingBoxDoubleGf(gfFixed, points), gfFixed, false,
-          axisCount, boundsPrecise);
+        assertEnvelope(new BoundingBoxDoubleGf(gfFixed, points), gfFixed, false, axisCount,
+          boundsPrecise);
       }
     }
   }

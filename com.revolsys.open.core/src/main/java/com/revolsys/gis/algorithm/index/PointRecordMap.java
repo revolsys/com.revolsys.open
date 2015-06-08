@@ -101,8 +101,7 @@ public class PointRecordMap {
     return Collections.<Point> unmodifiableSet(this.objectMap.keySet());
   }
 
-  public List<Record> getMatches(final Record record,
-    final Filter<Record> filter) {
+  public List<Record> getMatches(final Record record, final Filter<Record> filter) {
     final List<Record> records = getRecords(record);
     final List<Record> filteredRecords = FilterUtil.filter(records, filter);
     return filteredRecords;

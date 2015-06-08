@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -42,49 +41,44 @@ package com.revolsys.jts.util;
 public class Stopwatch {
 
   public static String getTimeString(final long timeMillis) {
-    final String totalTimeStr = timeMillis < 10000
-        ? timeMillis + " ms"
-          : timeMillis / 1000.0 + " s";
+    final String totalTimeStr = timeMillis < 10000 ? timeMillis + " ms" : timeMillis / 1000.0
+      + " s";
     return totalTimeStr;
   }
+
   private long startTimestamp;
+
   private long totalTime = 0;
 
   private boolean isRunning = false;
 
-  public Stopwatch()
-  {
+  public Stopwatch() {
     start();
   }
 
-  public long getTime()
-  {
+  public long getTime() {
     updateTotalTime();
     return this.totalTime;
   }
 
-  public String getTimeString()
-  {
+  public String getTimeString() {
     final long totalTime = getTime();
     return getTimeString(totalTime);
   }
 
-  public void reset()
-  {
+  public void reset() {
     this.totalTime = 0;
     this.startTimestamp = System.currentTimeMillis();
   }
 
-  public long split()
-  {
+  public long split() {
     if (this.isRunning) {
       updateTotalTime();
     }
     return this.totalTime;
   }
 
-  public void start()
-  {
+  public void start() {
     if (this.isRunning) {
       return;
     }
@@ -92,8 +86,7 @@ public class Stopwatch {
     this.isRunning = true;
   }
 
-  public long stop()
-  {
+  public long stop() {
     if (this.isRunning) {
       updateTotalTime();
       this.isRunning = false;
@@ -101,8 +94,7 @@ public class Stopwatch {
     return this.totalTime;
   }
 
-  private void updateTotalTime()
-  {
+  private void updateTotalTime() {
     final long endTimestamp = System.currentTimeMillis();
     final long elapsedTime = endTimestamp - this.startTimestamp;
     this.startTimestamp = endTimestamp;

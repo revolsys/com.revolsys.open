@@ -19,8 +19,7 @@ public class PointDouble extends AbstractPoint implements Serializable {
     this(coordinates.length, coordinates);
   }
 
-  protected PointDouble(final GeometryFactory geometryFactory,
-    final double... coordinates) {
+  protected PointDouble(final GeometryFactory geometryFactory, final double... coordinates) {
     if (coordinates != null && coordinates.length > 0) {
       final int axisCount = geometryFactory.getAxisCount();
       this.coordinates = new double[axisCount];

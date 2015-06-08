@@ -26,8 +26,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.filter.Filter;
 import com.revolsys.jts.geom.Geometry;
 
-public class RecordGeometryDistanceFilter implements Filter<Record>,
-  Comparator<Record> {
+public class RecordGeometryDistanceFilter implements Filter<Record>, Comparator<Record> {
   /** The geometry to compare the data objects to to. */
   private Geometry geometry;
 
@@ -40,8 +39,7 @@ public class RecordGeometryDistanceFilter implements Filter<Record>,
    * @param geometry The geometry to compare the data objects to to.
    * @param maxDistance
    */
-  public RecordGeometryDistanceFilter(final Geometry geometry,
-    final double maxDistance) {
+  public RecordGeometryDistanceFilter(final Geometry geometry, final double maxDistance) {
     this.geometry = geometry;
     this.maxDistance = maxDistance;
   }
@@ -49,8 +47,8 @@ public class RecordGeometryDistanceFilter implements Filter<Record>,
   @Override
   public boolean accept(final Record record) {
     final Geometry recordGeometry = record.getGeometryValue();
-    final double distance = recordGeometry.distance(geometry, maxDistance);
-    if (distance <= maxDistance) {
+    final double distance = recordGeometry.distance(this.geometry, this.maxDistance);
+    if (distance <= this.maxDistance) {
       return true;
     } else {
       return false;
@@ -74,12 +72,12 @@ public class RecordGeometryDistanceFilter implements Filter<Record>,
 
   @Override
   protected void finalize() throws Throwable {
-    geometry = null;
+    this.geometry = null;
   }
 
   public double getDistance(final Record record) {
     final Geometry recordGeometry = record.getGeometryValue();
-    final double distance = recordGeometry.distance(geometry);
+    final double distance = recordGeometry.distance(this.geometry);
     return distance;
   }
 
@@ -89,7 +87,7 @@ public class RecordGeometryDistanceFilter implements Filter<Record>,
    * @return The geometry to compare the data objects to to.
    */
   public Geometry getGeometry() {
-    return geometry;
+    return this.geometry;
   }
 
   /**
@@ -98,7 +96,7 @@ public class RecordGeometryDistanceFilter implements Filter<Record>,
    * @return The maximum maxDistance the object can be from the source geometry.
    */
   public double getMaxDistance() {
-    return maxDistance;
+    return this.maxDistance;
   }
 
 }

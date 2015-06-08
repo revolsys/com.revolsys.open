@@ -4,8 +4,7 @@ import java.math.BigInteger;
 
 import com.revolsys.util.Property;
 
-public class BigIntegerStringConverter extends
-AbstractNumberStringConverter<BigInteger> {
+public class BigIntegerStringConverter extends AbstractNumberStringConverter<BigInteger> {
   public BigIntegerStringConverter() {
     super();
   }

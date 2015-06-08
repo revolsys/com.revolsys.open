@@ -42,8 +42,13 @@ import com.revolsys.jts.math.DD;
  * @author Martin Davis
  *
  */
-public class CGAlgorithmsDD
-{
+public class CGAlgorithmsDD {
+  /**
+   * A value which is safely greater than the
+   * relative round-off error in double-precision numbers
+   */
+  private static final double DP_SAFE_EPSILON = 1e-15;
+
   /**
    * Computes an intersection point between two lines
    * using DD arithmetic.
@@ -55,14 +60,13 @@ public class CGAlgorithmsDD
    * @param q2
    * @return
    */
-  public static Point intersection(
-    final Point p1, final Point p2,
-    final Point q1, final Point q2)
-  {
-    final DD denom1 = DD.valueOf(q2.getY()).selfSubtract(q1.getY())
-        .selfMultiply(DD.valueOf(p2.getX()).selfSubtract(p1.getX()));
-    final DD denom2 = DD.valueOf(q2.getX()).selfSubtract(q1.getX())
-        .selfMultiply(DD.valueOf(p2.getY()).selfSubtract(p1.getY()));
+  public static Point intersection(final Point p1, final Point p2, final Point q1, final Point q2) {
+    final DD denom1 = DD.valueOf(q2.getY())
+      .selfSubtract(q1.getY())
+      .selfMultiply(DD.valueOf(p2.getX()).selfSubtract(p1.getX()));
+    final DD denom2 = DD.valueOf(q2.getX())
+      .selfSubtract(q1.getX())
+      .selfMultiply(DD.valueOf(p2.getY()).selfSubtract(p1.getY()));
     final DD denom = denom1.subtract(denom2);
 
     /**
@@ -72,25 +76,33 @@ public class CGAlgorithmsDD
      * - intersection point lies within line segment q if fracQ is between 0 and 1
      */
 
-    final DD numx1 = DD.valueOf(q2.getX()).selfSubtract(q1.getX())
-        .selfMultiply(DD.valueOf(p1.getY()).selfSubtract(q1.getY()));
-    final DD numx2 = DD.valueOf(q2.getY()).selfSubtract(q1.getY())
-        .selfMultiply(DD.valueOf(p1.getX()).selfSubtract(q1.getX()));
+    final DD numx1 = DD.valueOf(q2.getX())
+      .selfSubtract(q1.getX())
+      .selfMultiply(DD.valueOf(p1.getY()).selfSubtract(q1.getY()));
+    final DD numx2 = DD.valueOf(q2.getY())
+      .selfSubtract(q1.getY())
+      .selfMultiply(DD.valueOf(p1.getX()).selfSubtract(q1.getX()));
     final DD numx = numx1.subtract(numx2);
     final double fracP = numx.selfDivide(denom).doubleValue();
 
-    final double x = DD.valueOf(p1.getX()).selfAdd(DD.valueOf(p2.getX()).selfSubtract(p1.getX()).selfMultiply(fracP)).doubleValue();
+    final double x = DD.valueOf(p1.getX())
+      .selfAdd(DD.valueOf(p2.getX()).selfSubtract(p1.getX()).selfMultiply(fracP))
+      .doubleValue();
 
-    final DD numy1 = DD.valueOf(p2.getX()).selfSubtract(p1.getX())
-        .selfMultiply(DD.valueOf(p1.getY()).selfSubtract(q1.getY()));
-    final DD numy2 = DD.valueOf(p2.getY()).selfSubtract(p1.getY())
-        .selfMultiply(DD.valueOf(p1.getX()).selfSubtract(q1.getX()));
+    final DD numy1 = DD.valueOf(p2.getX())
+      .selfSubtract(p1.getX())
+      .selfMultiply(DD.valueOf(p1.getY()).selfSubtract(q1.getY()));
+    final DD numy2 = DD.valueOf(p2.getY())
+      .selfSubtract(p1.getY())
+      .selfMultiply(DD.valueOf(p1.getX()).selfSubtract(q1.getX()));
     final DD numy = numy1.subtract(numy2);
     final double fracQ = numy.selfDivide(denom).doubleValue();
 
-    final double y = DD.valueOf(q1.getY()).selfAdd(DD.valueOf(q2.getY()).selfSubtract(q1.getY()).selfMultiply(fracQ)).doubleValue();
+    final double y = DD.valueOf(q1.getY())
+      .selfAdd(DD.valueOf(q2.getY()).selfSubtract(q1.getY()).selfMultiply(fracQ))
+      .doubleValue();
 
-    return new PointDouble(x,y, Point.NULL_ORDINATE);
+    return new PointDouble(x, y, Point.NULL_ORDINATE);
   }
 
   /**
@@ -105,8 +117,7 @@ public class CGAlgorithmsDD
    * @return -1 if q is clockwise (right) from p1-p2
    * @return 0 if q is collinear with p1-p2
    */
-  public static int orientationIndex(final Point p1, final Point p2, final Point q)
-  {
+  public static int orientationIndex(final Point p1, final Point p2, final Point q) {
     // fast filter for orientation index
     // avoids use of slow extended-precision arithmetic in many cases
     final int index = orientationIndexFilter(p1, p2, q);
@@ -144,8 +155,7 @@ public class CGAlgorithmsDD
    * @return the orientation index if it can be computed safely
    * @return i > 1 if the orientation index cannot be computed safely
    */
-  private static int orientationIndexFilter(final Point pa, final Point pb, final Point pc)
-  {
+  private static int orientationIndexFilter(final Point pa, final Point pb, final Point pc) {
     double detsum;
 
     final double detleft = (pa.getX() - pc.getX()) * (pb.getY() - pc.getY());
@@ -155,20 +165,16 @@ public class CGAlgorithmsDD
     if (detleft > 0.0) {
       if (detright <= 0.0) {
         return signum(det);
-      }
-      else {
+      } else {
         detsum = detleft + detright;
       }
-    }
-    else if (detleft < 0.0) {
+    } else if (detleft < 0.0) {
       if (detright >= 0.0) {
         return signum(det);
-      }
-      else {
+      } else {
         detsum = -detleft - detright;
       }
-    }
-    else {
+    } else {
       return signum(det);
     }
 
@@ -188,14 +194,12 @@ public class CGAlgorithmsDD
    * @return  1 if the determinant is positive,
    * @return  0 if the determinant is 0.
    */
-  public static int signOfDet2x2(final DD x1, final DD y1, final DD x2, final DD y2)
-  {
+  public static int signOfDet2x2(final DD x1, final DD y1, final DD x2, final DD y2) {
     final DD det = x1.multiply(y2).selfSubtract(y1.multiply(x2));
     return det.signum();
   }
 
-  private static int signum(final double x)
-  {
+  private static int signum(final double x) {
     if (x > 0) {
       return 1;
     }
@@ -204,10 +208,4 @@ public class CGAlgorithmsDD
     }
     return 0;
   }
-
-  /**
-   * A value which is safely greater than the
-   * relative round-off error in double-precision numbers
-   */
-  private static final double DP_SAFE_EPSILON = 1e-15;
 }

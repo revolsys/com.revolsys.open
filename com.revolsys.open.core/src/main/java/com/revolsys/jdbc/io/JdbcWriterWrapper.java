@@ -3,8 +3,7 @@ package com.revolsys.jdbc.io;
 import com.revolsys.data.record.Record;
 import com.revolsys.io.DelegatingObjectWithProperties;
 
-public class JdbcWriterWrapper extends DelegatingObjectWithProperties implements
-JdbcWriter {
+public class JdbcWriterWrapper extends DelegatingObjectWithProperties implements JdbcWriter {
   private JdbcWriter writer;
 
   public JdbcWriterWrapper(final JdbcWriter writer) {

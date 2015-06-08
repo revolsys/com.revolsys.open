@@ -34,8 +34,8 @@ public class CreateRandomShapeFunctions {
     return haltonPointsWithBases(g, nPts, 5, 7);
   }
 
-  public static Geometry haltonPointsWithBases(final Geometry g,
-    final int nPts, final int basei, final int basej) {
+  public static Geometry haltonPointsWithBases(final Geometry g, final int nPts, final int basei,
+    final int basej) {
     final BoundingBox env = FunctionsUtil.getEnvelopeOrDefault(g);
     final Point[] pts = new Point[nPts];
     final double baseX = env.getMinX();
@@ -70,8 +70,7 @@ public class CreateRandomShapeFunctions {
     return geomFact.lineString(pts);
   }
 
-  private static Point randomPointInTriangle(final Point p0,
-    final Point p1, final Point p2) {
+  private static Point randomPointInTriangle(final Point p0, final Point p1, final Point p2) {
     double s = Math.random();
     double t = Math.random();
     if (s + t > 1) {
@@ -104,8 +103,7 @@ public class CreateRandomShapeFunctions {
     return shapeBuilder.getGeometry();
   }
 
-  public static Geometry randomPointsInGridCircles(final Geometry g,
-    final int nPts) {
+  public static Geometry randomPointsInGridCircles(final Geometry g, final int nPts) {
     final RandomPointsInGridBuilder shapeBuilder = new RandomPointsInGridBuilder(
       FunctionsUtil.getFactoryOrDefault(g));
     shapeBuilder.setExtent(FunctionsUtil.getEnvelopeOrDefault(g));
@@ -114,8 +112,8 @@ public class CreateRandomShapeFunctions {
     return shapeBuilder.getGeometry();
   }
 
-  public static Geometry randomPointsInGridWithGutter(final Geometry g,
-    final int nPts, final double gutterFraction) {
+  public static Geometry randomPointsInGridWithGutter(final Geometry g, final int nPts,
+    final double gutterFraction) {
     final RandomPointsInGridBuilder shapeBuilder = new RandomPointsInGridBuilder(
       FunctionsUtil.getFactoryOrDefault(g));
     shapeBuilder.setExtent(FunctionsUtil.getEnvelopeOrDefault(g));
@@ -147,8 +145,8 @@ public class CreateRandomShapeFunctions {
     return geomFact.buildGeometry(pts);
   }
 
-  private static Point randomPtInRectangleAround(
-    final Point centre, final double width, final double height) {
+  private static Point randomPtInRectangleAround(final Point centre, final double width,
+    final double height) {
     final double x0 = centre.getX() + width * (Math.random() - 0.5);
     final double y0 = centre.getY() + height * (Math.random() - 0.5);
     return new PointDouble(x0, y0);

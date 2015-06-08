@@ -18,8 +18,7 @@ public class SameStructureTester {
       return false;
     }
     if (g1 instanceof GeometryCollection) {
-      return isSameStructureCollection((GeometryCollection)g1,
-        (GeometryCollection)g2);
+      return isSameStructureCollection((GeometryCollection)g1, (GeometryCollection)g2);
     } else if (g1 instanceof Polygon) {
       return isSameStructurePolygon((Polygon)g1, (Polygon)g2);
     } else if (g1 instanceof LineString) {
@@ -28,8 +27,7 @@ public class SameStructureTester {
       return isSameStructurePoint((Point)g1, (Point)g2);
     }
 
-    Assert.shouldNeverReachHere("Unsupported Geometry class: "
-        + g1.getClass().getName());
+    Assert.shouldNeverReachHere("Unsupported Geometry class: " + g1.getClass().getName());
     return false;
   }
 
@@ -46,8 +44,7 @@ public class SameStructureTester {
     return true;
   }
 
-  private static boolean isSameStructureLineString(final LineString g1,
-    final LineString g2) {
+  private static boolean isSameStructureLineString(final LineString g1, final LineString g2) {
     // could check for both empty or nonempty here
     return true;
   }
@@ -57,8 +54,7 @@ public class SameStructureTester {
     return true;
   }
 
-  private static boolean isSameStructurePolygon(final Polygon g1,
-    final Polygon g2) {
+  private static boolean isSameStructurePolygon(final Polygon g1, final Polygon g2) {
     if (g1.getHoleCount() != g2.getHoleCount()) {
       return false;
     }

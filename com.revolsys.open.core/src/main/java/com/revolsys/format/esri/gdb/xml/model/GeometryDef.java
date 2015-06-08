@@ -23,8 +23,7 @@ public class GeometryDef {
   public GeometryDef() {
   }
 
-  public GeometryDef(final GeometryType geometryType,
-    final SpatialReference spatialReference) {
+  public GeometryDef(final GeometryType geometryType, final SpatialReference spatialReference) {
     this.geometryType = geometryType;
     this.spatialReference = spatialReference;
     final GeometryFactory geometryFactory = spatialReference.getGeometryFactory();

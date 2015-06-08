@@ -15,13 +15,13 @@ import com.revolsys.gis.cs.Projection;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 
 public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
+  private static final Object ROOT = new Object();
+
   private final List<GeographicCoordinateSystem> geographicCoordinateSystems;
 
   private final Map<Projection, List<ProjectedCoordinateSystem>> projectedCoordinateSystemsByProjection = new TreeMap<Projection, List<ProjectedCoordinateSystem>>();
 
   private final List<Projection> projections = new ArrayList<Projection>();
-
-  private static final Object ROOT = new Object();
 
   public CoordinateSystemTreeTableModel() {
     super(ROOT);
@@ -29,8 +29,8 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
 
     for (final ProjectedCoordinateSystem projectedCoordinateSystem : EpsgCoordinateSystems.getProjectedCoordinateSystems()) {
       final Projection projection = projectedCoordinateSystem.getProjection();
-      Maps.addToList(this.projectedCoordinateSystemsByProjection,
-        projection, projectedCoordinateSystem);
+      Maps.addToList(this.projectedCoordinateSystemsByProjection, projection,
+        projectedCoordinateSystem);
     }
     this.projections.addAll(this.projectedCoordinateSystemsByProjection.keySet());
   }

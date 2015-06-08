@@ -34,8 +34,8 @@ public class LabelValueListModelSerializer implements LabelValueListSerializer {
     this.model = model;
   }
 
-  public LabelValueListModelSerializer(final LabelValueListModel model,
-    final String labelCss, final String valueCss) {
+  public LabelValueListModelSerializer(final LabelValueListModel model, final String labelCss,
+    final String valueCss) {
     this(model);
     this.labelCss = labelCss;
     this.valueCss = valueCss;

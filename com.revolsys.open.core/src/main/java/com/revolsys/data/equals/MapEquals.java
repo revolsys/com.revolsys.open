@@ -7,8 +7,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class MapEquals implements Equals<Map<Object, Object>> {
-  public static boolean equalMap1Keys(final Map<String, Object> map1,
-    final Map<String, Object> map2) {
+  public static boolean equalMap1Keys(final Map<String, Object> map1, final Map<String, Object> map2) {
     if (map1 == null) {
       return false;
     } else if (map2 == null) {
@@ -24,8 +23,8 @@ public class MapEquals implements Equals<Map<Object, Object>> {
     }
   }
 
-  public static boolean equals(final Map<String, Object> map1,
-    final Map<String, Object> map2, final String fieldName) {
+  public static boolean equals(final Map<String, Object> map1, final Map<String, Object> map2,
+    final String fieldName) {
     final Object value1 = map1.get(fieldName);
     final Object value2 = map2.get(fieldName);
     return EqualsInstance.INSTANCE.equals(value1, value2);

@@ -86,13 +86,11 @@ class TaggedLineString {
   }
 
   public LinearRing asLinearRing() {
-    return this.parentLine.getGeometryFactory().linearRing(
-      extractCoordinates(this.resultSegs));
+    return this.parentLine.getGeometryFactory().linearRing(extractCoordinates(this.resultSegs));
   }
 
   public LineString asLineString() {
-    return this.parentLine.getGeometryFactory().lineString(
-      extractCoordinates(this.resultSegs));
+    return this.parentLine.getGeometryFactory().lineString(extractCoordinates(this.resultSegs));
   }
 
   public int getMinimumSize() {
@@ -124,9 +122,8 @@ class TaggedLineString {
     this.segs = new TaggedLineSegment[this.parentLine.getVertexCount() - 1];
     int i = 0;
     for (final Segment segment : this.parentLine.segments()) {
-      final TaggedLineSegment seg = new TaggedLineSegment(segment.getPoint(0)
-        .clonePoint(), segment.getPoint(1).clonePoint(),
-        this.parentLine, i);
+      final TaggedLineSegment seg = new TaggedLineSegment(segment.getPoint(0).clonePoint(),
+        segment.getPoint(1).clonePoint(), this.parentLine, i);
       this.segs[i] = seg;
       i++;
     }

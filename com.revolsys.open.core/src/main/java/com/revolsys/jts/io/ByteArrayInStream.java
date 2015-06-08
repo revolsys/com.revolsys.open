@@ -37,14 +37,13 @@ package com.revolsys.jts.io;
  * To optimize memory usage, instances can be reused
  * with different byte arrays.
  */
-public class ByteArrayInStream
-implements InStream
-{
+public class ByteArrayInStream implements InStream {
   /*
    * Implementation improvement suggested by Andrea Aime - Dec 15 2007
    */
 
   private byte[] buffer;
+
   private int position;
 
   /**
@@ -73,8 +72,7 @@ implements InStream
       for (int i = numToRead; i < buf.length; i++) {
         buf[i] = 0;
       }
-    }
-    else {
+    } else {
       System.arraycopy(this.buffer, this.position, buf, 0, numToRead);
     }
     this.position += numToRead;

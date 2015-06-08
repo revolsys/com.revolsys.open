@@ -44,8 +44,7 @@ public class FileResponseCache extends ResponseCache {
   }
 
   @Override
-  public CacheRequest put(final URI uri, final URLConnection connection)
-      throws IOException {
+  public CacheRequest put(final URI uri, final URLConnection connection) throws IOException {
     final File file = toFile(uri);
     if (file != null) {
 

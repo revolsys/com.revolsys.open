@@ -56,6 +56,8 @@ public class HotPixel {
   // testing only
   // public static int nTests = 0;
 
+  private static final double SAFE_ENV_EXPANSION_FACTOR = 0.75;
+
   private final LineIntersector li;
 
   private Point pt;
@@ -81,8 +83,6 @@ public class HotPixel {
 
   private BoundingBox safeEnv = null;
 
-  private static final double SAFE_ENV_EXPANSION_FACTOR = 0.75;
-
   /**
    * Creates a new hot pixel, using a given scale factor.
    * The scale factor must be strictly positive (non-zero).
@@ -92,8 +92,7 @@ public class HotPixel {
    * @param li the intersector to use for testing intersection with line segments
    *
    */
-  public HotPixel(final Point pt, final double scaleFactor,
-    final LineIntersector li) {
+  public HotPixel(final Point pt, final double scaleFactor, final LineIntersector li) {
     this.originalPt = pt;
     this.pt = pt;
     this.scaleFactor = scaleFactor;
@@ -103,8 +102,7 @@ public class HotPixel {
       throw new IllegalArgumentException("Scale factor must be non-zero");
     }
     if (scaleFactor != 1.0) {
-      this.pt = new PointDouble(scale(pt.getX()), scale(pt.getY()),
-        Point.NULL_ORDINATE);
+      this.pt = new PointDouble(scale(pt.getX()), scale(pt.getY()), Point.NULL_ORDINATE);
     }
     initCorners(this.pt);
   }
@@ -117,8 +115,7 @@ public class HotPixel {
    * @param segIndex
    * @return true if a node was added to the segment
    */
-  public boolean addSnappedNode(final NodedSegmentString segStr,
-    final int segIndex) {
+  public boolean addSnappedNode(final NodedSegmentString segStr, final int segIndex) {
     final Point p0 = segStr.getCoordinate(segIndex);
     final Point p1 = segStr.getCoordinate(segIndex + 1);
 
@@ -198,15 +195,15 @@ public class HotPixel {
     final double segMaxy = Math.max(p0.getY(), p1.getY());
 
     final boolean isOutsidePixelEnv = this.maxx < segMinx || this.minx > segMaxx
-        || this.maxy < segMiny || this.miny > segMaxy;
-        if (isOutsidePixelEnv) {
-          return false;
-        }
-        final boolean intersects = intersectsToleranceSquare(p0, p1);
+      || this.maxy < segMiny || this.miny > segMaxy;
+    if (isOutsidePixelEnv) {
+      return false;
+    }
+    final boolean intersects = intersectsToleranceSquare(p0, p1);
 
-        Assert.isTrue(!(isOutsidePixelEnv && intersects), "Found bad envelope test");
+    Assert.isTrue(!(isOutsidePixelEnv && intersects), "Found bad envelope test");
 
-        return intersects;
+    return intersects;
   }
 
   /**
@@ -228,8 +225,7 @@ public class HotPixel {
    * @param p1
    * @return
    */
-  private boolean intersectsToleranceSquare(final Point p0,
-    final Point p1) {
+  private boolean intersectsToleranceSquare(final Point p0, final Point p1) {
     boolean intersectsLeft = false;
     boolean intersectsBottom = false;
 

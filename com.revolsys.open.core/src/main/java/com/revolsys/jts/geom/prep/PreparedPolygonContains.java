@@ -48,8 +48,7 @@ import com.revolsys.jts.geom.Geometry;
  */
 class PreparedPolygonContains extends AbstractPreparedPolygonContains {
 
-  public PreparedPolygonContains(final Geometry preparedPolygon,
-    final Geometry originalGeometry) {
+  public PreparedPolygonContains(final Geometry preparedPolygon, final Geometry originalGeometry) {
     super(preparedPolygon, originalGeometry);
   }
 

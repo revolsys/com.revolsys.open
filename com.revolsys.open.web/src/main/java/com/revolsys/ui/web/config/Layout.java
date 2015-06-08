@@ -48,8 +48,7 @@ public class Layout extends Component {
     }
   }
 
-  public Layout(final String area, final String name, final String file,
-    final boolean page) {
+  public Layout(final String area, final String name, final String file, final boolean page) {
     super(area, name, file);
     this.page = page;
   }
@@ -72,7 +71,7 @@ public class Layout extends Component {
     if (o instanceof Layout) {
       final Layout l = (Layout)o;
       if (super.equals(o) && l.page == this.page && l.areas.equals(this.areas)
-          && l.components.equals(this.components)) {
+        && l.components.equals(this.components)) {
         return true;
       }
     }
@@ -98,8 +97,7 @@ public class Layout extends Component {
   }
 
   @Override
-  public void includeComponent(final PageContext context) throws IOException,
-  ServletException {
+  public void includeComponent(final PageContext context) throws IOException, ServletException {
     final WebUiContext niceContext = WebUiContext.get();
     niceContext.pushLayout(this);
     context.getOut().flush();
@@ -113,8 +111,8 @@ public class Layout extends Component {
 
   public void setComponent(final String name, final Component component) {
     if (!this.areas.contains(name)) {
-      throw new IllegalArgumentException(new StringBuilder(
-        "Area does not exist with name ").append(name).toString());
+      throw new IllegalArgumentException(
+        new StringBuilder("Area does not exist with name ").append(name).toString());
     }
     this.components.put(name, component);
   }

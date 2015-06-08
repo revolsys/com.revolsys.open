@@ -66,8 +66,8 @@ public final class IafServlet extends HttpServlet {
    *              request
    */
   @Override
-  public void doGet(final HttpServletRequest request,
-    final HttpServletResponse response) throws ServletException, IOException {
+  public void doGet(final HttpServletRequest request, final HttpServletResponse response)
+    throws ServletException, IOException {
     processRequest(request, response);
   }
 
@@ -81,8 +81,8 @@ public final class IafServlet extends HttpServlet {
    *              request
    */
   @Override
-  public void doPost(final HttpServletRequest request,
-    final HttpServletResponse response) throws ServletException, IOException {
+  public void doPost(final HttpServletRequest request, final HttpServletResponse response)
+    throws ServletException, IOException {
     processRequest(request, response);
   }
 
@@ -99,9 +99,7 @@ public final class IafServlet extends HttpServlet {
   public void forward(final String path, final HttpServletRequest request,
     final HttpServletResponse response) throws ServletException, IOException {
     if (!response.isCommitted()) {
-      getServletConfig().getServletContext()
-      .getRequestDispatcher(path)
-      .forward(request, response);
+      getServletConfig().getServletContext().getRequestDispatcher(path).forward(request, response);
     }
   }
 
@@ -119,8 +117,7 @@ public final class IafServlet extends HttpServlet {
       this.servletContext = config.getServletContext();
       final URL configResource = this.servletContext.getResource("/WEB-INF/iaf-config.xml");
       WebUiContext.setServletContext(this.servletContext);
-      final XmlConfigLoader configLoader = new XmlConfigLoader(configResource,
-        this.servletContext);
+      final XmlConfigLoader configLoader = new XmlConfigLoader(configResource, this.servletContext);
       this.applicationConfig = configLoader.loadConfig();
       this.servletContext.setAttribute("rsWebUiConfig", this.applicationConfig);
     } catch (final InvalidConfigException ice) {
@@ -142,8 +139,8 @@ public final class IafServlet extends HttpServlet {
    * @param request
    * @throws PageNotFoundException
    */
-  private void processArguments(final Page page,
-    final HttpServletRequest request) throws ActionException {
+  private void processArguments(final Page page, final HttpServletRequest request)
+    throws ActionException {
     for (final Object element : page.getArguments()) {
       final Argument argument = (Argument)element;
       final String name = argument.getName();
@@ -157,8 +154,7 @@ public final class IafServlet extends HttpServlet {
         try {
           value = argument.valueOf(stringValue);
         } catch (final NumberFormatException e) {
-          throw new PageNotFoundException(
-            "Page argument is not a valid number: " + name);
+          throw new PageNotFoundException("Page argument is not a valid number: " + name);
         }
       }
       if (value != null) {
@@ -174,8 +170,8 @@ public final class IafServlet extends HttpServlet {
    * @param request
    * @throws PageNotFoundException
    */
-  private void processAttributes(final Page page,
-    final HttpServletRequest request) throws ActionException {
+  private void processAttributes(final Page page, final HttpServletRequest request)
+    throws ActionException {
     for (final Object element : page.getFields()) {
       final Attribute attribute = (Attribute)element;
       final String name = attribute.getName();
@@ -209,8 +205,8 @@ public final class IafServlet extends HttpServlet {
    * @see PageNotFoundException
    * @see RedirectException
    */
-  public void processRequest(final HttpServletRequest request,
-    final HttpServletResponse response) throws ServletException, IOException {
+  public void processRequest(final HttpServletRequest request, final HttpServletResponse response)
+    throws ServletException, IOException {
     try {
       String path = request.getServletPath();
       final String pathInfo = request.getPathInfo();
@@ -227,8 +223,8 @@ public final class IafServlet extends HttpServlet {
         path = path.substring(0, path.length() - 4);
       }
       final Page page = this.applicationConfig.getPage(contextPath + path);
-      WebUiContext.set(new WebUiContext(this.applicationConfig, contextPath,
-        page, request, response));
+      WebUiContext.set(new WebUiContext(this.applicationConfig, contextPath, page, request,
+        response));
       if (page.isSecure() && !secure) {
         response.sendRedirect(page.getFullUrl());
         return;

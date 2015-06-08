@@ -18,8 +18,7 @@ public class FormAllFieldsModifiedPredicate implements HighlightPredicate {
 
   public static void add(final RecordLayerForm form, final BaseJTable table) {
     final LayerRecordTableModel model = table.getTableModel();
-    final FormAllFieldsModifiedPredicate predicate = new FormAllFieldsModifiedPredicate(
-      form, model);
+    final FormAllFieldsModifiedPredicate predicate = new FormAllFieldsModifiedPredicate(form, model);
     ModifiedAttributePredicate.addModifiedHighlighters(table, predicate);
   }
 
@@ -34,8 +33,7 @@ public class FormAllFieldsModifiedPredicate implements HighlightPredicate {
   }
 
   @Override
-  public boolean isHighlighted(final Component renderer,
-    final ComponentAdapter adapter) {
+  public boolean isHighlighted(final Component renderer, final ComponentAdapter adapter) {
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
       final String fieldName = this.model.getFieldName(rowIndex);

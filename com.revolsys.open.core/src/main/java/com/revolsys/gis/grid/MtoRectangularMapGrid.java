@@ -4,8 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MtoRectangularMapGrid extends Nts50000RectangularMapGrid {
-  private static final Pattern NAME_PATTERN = Pattern.compile("^"
-      + MtoConstants.REGEX_MTO + ".*");
+  private static final Pattern NAME_PATTERN = Pattern.compile("^" + MtoConstants.REGEX_MTO + ".*");
 
   public MtoRectangularMapGrid() {
     this(MtoConstants.WIDTH_QUARTER, MtoConstants.HEIGHT_QUARTER);
@@ -28,22 +27,17 @@ public class MtoRectangularMapGrid extends Nts50000RectangularMapGrid {
       final String letter4 = matcher.group(6);
 
       double latitude = getLatitude(blockName, letter, number50k);
-      latitude += GridUtil.getLetter16Row(letter12.charAt(0))
-          * MtoConstants.HEIGHT_TWELTH;
-      latitude += GridUtil.getNumberRow100(number100)
-          * MtoConstants.HEIGHT_HUNDRETH;
-      latitude += GridUtil.getLetter4Row(letter4.charAt(0))
-          * MtoConstants.HEIGHT_QUARTER;
+      latitude += GridUtil.getLetter16Row(letter12.charAt(0)) * MtoConstants.HEIGHT_TWELTH;
+      latitude += GridUtil.getNumberRow100(number100) * MtoConstants.HEIGHT_HUNDRETH;
+      latitude += GridUtil.getLetter4Row(letter4.charAt(0)) * MtoConstants.HEIGHT_QUARTER;
 
       return latitude;
     } else {
-      throw new IllegalArgumentException(mapTileName
-        + " does not start with a valid MTO tile name");
+      throw new IllegalArgumentException(mapTileName + " does not start with a valid MTO tile name");
     }
   }
 
-  private double getLatitude(final String blockName, final String letter,
-    final String number50k) {
+  private double getLatitude(final String blockName, final String letter, final String number50k) {
     double latitude = getLatitude(blockName, letter);
 
     final int number = Integer.parseInt(number50k);
@@ -65,22 +59,17 @@ public class MtoRectangularMapGrid extends Nts50000RectangularMapGrid {
       final String letter4 = matcher.group(6);
 
       double longitude = getLongitude(blockName, letter, number50k);
-      longitude -= GridUtil.getLetter16Col(letter12.charAt(0))
-          * MtoConstants.WIDTH_TWELTH;
-      longitude -= GridUtil.getNumberCol100(number100)
-          * MtoConstants.WIDTH_HUNDRETH;
-      longitude -= GridUtil.getLetter4Col(letter4.charAt(0))
-          * MtoConstants.WIDTH_QUARTER;
+      longitude -= GridUtil.getLetter16Col(letter12.charAt(0)) * MtoConstants.WIDTH_TWELTH;
+      longitude -= GridUtil.getNumberCol100(number100) * MtoConstants.WIDTH_HUNDRETH;
+      longitude -= GridUtil.getLetter4Col(letter4.charAt(0)) * MtoConstants.WIDTH_QUARTER;
 
       return longitude;
     } else {
-      throw new IllegalArgumentException(mapTileName
-        + " does not start with a valid MTO tile name");
+      throw new IllegalArgumentException(mapTileName + " does not start with a valid MTO tile name");
     }
   }
 
-  private double getLongitude(final String blockName, final String letter,
-    final String number50k) {
+  private double getLongitude(final String blockName, final String letter, final String number50k) {
     double longitude = getLongitude(blockName, letter);
 
     final int number = Integer.parseInt(number50k);

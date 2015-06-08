@@ -56,8 +56,7 @@ public class TreeItemScaleMenu implements ComponentFactory<JMenu> {
       label = MapScale.formatScale(scale);
     }
 
-    final InvokeMethodAction action = new InvokeMethodAction(label, object,
-      methodName, scale);
+    final InvokeMethodAction action = new InvokeMethodAction(label, object, methodName, scale);
     final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(action);
     final boolean selected = scale == layerScale;
     menuItem.setSelected(selected);

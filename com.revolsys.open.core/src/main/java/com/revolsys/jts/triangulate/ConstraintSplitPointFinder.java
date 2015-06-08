@@ -33,7 +33,6 @@
 
 package com.revolsys.jts.triangulate;
 
-
 import com.revolsys.jts.geom.Point;
 
 /**

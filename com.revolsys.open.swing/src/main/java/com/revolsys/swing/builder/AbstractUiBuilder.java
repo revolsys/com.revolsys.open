@@ -1,8 +1,8 @@
 package com.revolsys.swing.builder;
 
 public abstract class AbstractUiBuilder implements UiBuilder {
-  public final static String escapeHTML(final String value,
-    final boolean escapeSpaces, final boolean escapeNewlines) {
+  public final static String escapeHTML(final String value, final boolean escapeSpaces,
+    final boolean escapeNewlines) {
     if (value == null) {
       return null;
     }
@@ -17,173 +17,173 @@ public abstract class AbstractUiBuilder implements UiBuilder {
         case ' ':
           result.append(escapeSpaces ? "&#32;" : " ");
 
-          break;
+        break;
 
-          // Added \n [Jon Aquino]
+        // Added \n [Jon Aquino]
         case '\n':
           result.append(escapeNewlines ? "<BR>" : "\n");
 
-          break;
+        break;
 
         case '!':
           result.append("&#33;");
 
-          break;
+        break;
 
         case '"':
           result.append("&#34;");
 
-          break;
+        break;
 
         case '#':
           result.append("&#35;");
 
-          break;
+        break;
 
         case '$':
           result.append("&#36;");
 
-          break;
+        break;
 
         case '%':
           result.append("&#37;");
 
-          break;
+        break;
 
         case '&':
           result.append("&#38;");
 
-          break;
+        break;
 
         case '\'':
           result.append("&#39;");
 
-          break;
+        break;
 
         case '(':
           result.append("&#40;");
 
-          break;
+        break;
 
         case ')':
           result.append("&#41;");
 
-          break;
+        break;
 
         case '*':
           result.append("&#42;");
 
-          break;
+        break;
 
         case '+':
           result.append("&#43;");
 
-          break;
+        break;
 
         case ',':
           result.append("&#44;");
 
-          break;
+        break;
 
         case '-':
           result.append("&#45;");
 
-          break;
+        break;
 
         case '.':
           result.append("&#46;");
 
-          break;
+        break;
 
         case '/':
           result.append("&#47;");
 
-          break;
+        break;
 
         case ':':
           result.append("&#58;");
 
-          break;
+        break;
 
         case ';':
           result.append("&#59;");
 
-          break;
+        break;
 
         case '<':
           result.append("&#60;");
 
-          break;
+        break;
 
         case '=':
           result.append("&#61;");
 
-          break;
+        break;
 
         case '>':
           result.append("&#62;");
 
-          break;
+        break;
 
         case '?':
           result.append("&#63;");
 
-          break;
+        break;
 
         case '@':
           result.append("&#64;");
 
-          break;
+        break;
 
         case '[':
           result.append("&#91;");
 
-          break;
+        break;
 
         case '\\':
           result.append("&#92;");
 
-          break;
+        break;
 
         case ']':
           result.append("&#93;");
 
-          break;
+        break;
 
         case '^':
           result.append("&#94;");
 
-          break;
+        break;
 
         case '_':
           result.append("&#95;");
 
-          break;
+        break;
 
         case '`':
           result.append("&#96;");
 
-          break;
+        break;
 
         case '{':
           result.append("&#123;");
 
-          break;
+        break;
 
         case '|':
           result.append("&#124;");
 
-          break;
+        break;
 
         case '}':
           result.append("&#125;");
 
-          break;
+        break;
 
         case '~':
           result.append("&#126;");
 
-          break;
+        break;
 
         default:
           result.append(element);

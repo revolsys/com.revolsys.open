@@ -20,10 +20,8 @@ public class RecordGraph extends Graph<Record> {
 
   public static <T extends Geometry> Filter<Edge<Record>> getEdgeFilter(
     final Filter<T> geometryFilter) {
-    final Filter<Record> objectFilter = new RecordGeometryFilter<T>(
-        geometryFilter);
-    final EdgeObjectFilter<Record> edgeFilter = new EdgeObjectFilter<Record>(
-        objectFilter);
+    final Filter<Record> objectFilter = new RecordGeometryFilter<T>(geometryFilter);
+    final EdgeObjectFilter<Record> edgeFilter = new EdgeObjectFilter<Record>(objectFilter);
     return edgeFilter;
   }
 
@@ -130,8 +128,7 @@ public class RecordGraph extends Graph<Record> {
     final Node<Record> fromNode = findNode(fromPoint);
     final Node<Record> toNode = findNode(toPoint);
     if (fromNode != null && toNode != null) {
-      final Collection<Edge<Record>> edges = Node.getEdgesBetween(fromNode,
-        toNode);
+      final Collection<Edge<Record>> edges = Node.getEdgesBetween(fromNode, toNode);
       for (final Edge<Record> edge : edges) {
         final LineString updateLine = edge.getLine();
         if (updateLine.equals(line)) {
@@ -147,8 +144,7 @@ public class RecordGraph extends Graph<Record> {
     final Edge<Record> edge2) {
     final Record object1 = edge1.getObject();
     final Record object2 = edge2.getObject();
-    final Record mergedObject = DirectionalAttributes.merge(node, object1,
-      object2);
+    final Record mergedObject = DirectionalAttributes.merge(node, object1, object2);
     final Edge<Record> mergedEdge = addEdge(mergedObject);
     remove(edge1);
     remove(edge2);

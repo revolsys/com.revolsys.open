@@ -49,8 +49,11 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
 public abstract class QueryValue implements Cloneable {
-  public static <V extends QueryValue> List<V> cloneQueryValues(
-    final List<V> values) {
+  /** Must be in upper case */
+  public static final List<String> SUPPORTED_BINARY_OPERATORS = Arrays.asList("AND", "OR", "+",
+    "-", "/", "*", "=", "<>", "<", "<=", ">", ">=", "LIKE", "+", "-", "/", "*", "%", "MOD");
+
+  public static <V extends QueryValue> List<V> cloneQueryValues(final List<V> values) {
     final List<V> clonedValues = new ArrayList<V>();
     for (final V value : values) {
       @SuppressWarnings("unchecked")
@@ -60,8 +63,7 @@ public abstract class QueryValue implements Cloneable {
     return clonedValues;
   }
 
-  public static BoundingBox expand(final BoundingBox boundingBox,
-    final BoundingBox newBoundingBox) {
+  public static BoundingBox expand(final BoundingBox boundingBox, final BoundingBox newBoundingBox) {
     if (boundingBox == null) {
       return newBoundingBox;
     } else if (newBoundingBox == null) {
@@ -82,10 +84,8 @@ public abstract class QueryValue implements Cloneable {
       for (final QueryValue childValue : queryValue.getQueryValues()) {
         if (childValue instanceof EnvelopeIntersects) {
           final EnvelopeIntersects intersects = (EnvelopeIntersects)childValue;
-          boundingBox = expand(boundingBox,
-            getBoundingBox(intersects.getBoundingBox1Value()));
-          boundingBox = expand(boundingBox,
-            getBoundingBox(intersects.getBoundingBox2Value()));
+          boundingBox = expand(boundingBox, getBoundingBox(intersects.getBoundingBox1Value()));
+          boundingBox = expand(boundingBox, getBoundingBox(intersects.getBoundingBox2Value()));
         } else if (childValue instanceof WithinDistance) {
           final WithinDistance withinDistance = (WithinDistance)childValue;
           BoundingBox withinBoundingBox = getBoundingBox(withinDistance.getGeometry1Value());
@@ -117,7 +117,7 @@ public abstract class QueryValue implements Cloneable {
       try {
         final SQLParser sqlParser = new SQLParser();
         final StatementNode statement = sqlParser.parseStatement("SELECT * FROM "
-            + recordDefinition.getName() + " WHERE " + whereClause);
+          + recordDefinition.getName() + " WHERE " + whereClause);
         if (statement instanceof CursorNode) {
           final CursorNode selectStatement = (CursorNode)statement;
           final ResultSetNode resultSetNode = selectStatement.getResultSetNode();
@@ -130,8 +130,7 @@ public abstract class QueryValue implements Cloneable {
         }
         return null;
       } catch (final Throwable e) {
-        throw new IllegalArgumentException("Invalid where clause: "
-            + whereClause, e);
+        throw new IllegalArgumentException("Invalid where clause: " + whereClause, e);
       }
     } else {
       return null;
@@ -139,8 +138,8 @@ public abstract class QueryValue implements Cloneable {
   }
 
   @SuppressWarnings("unchecked")
-  public static <V extends QueryValue> V toQueryValue(
-    final RecordDefinition recordDefinition, final ValueNode expression) {
+  public static <V extends QueryValue> V toQueryValue(final RecordDefinition recordDefinition,
+    final ValueNode expression) {
     if (expression instanceof BetweenOperatorNode) {
       final BetweenOperatorNode betweenExpression = (BetweenOperatorNode)expression;
       final ValueNode leftValueNode = betweenExpression.getLeftOperand();
@@ -148,17 +147,17 @@ public abstract class QueryValue implements Cloneable {
       final ValueNode betweenExpressionStart = rightOperandList.get(0);
       final ValueNode betweenExpressionEnd = rightOperandList.get(1);
       if (!(leftValueNode instanceof ColumnReference)) {
-        throw new IllegalArgumentException(
-          "Between operator must use a column name not: " + leftValueNode);
+        throw new IllegalArgumentException("Between operator must use a column name not: "
+          + leftValueNode);
       }
 
       if (!(betweenExpressionStart instanceof NumericConstantNode)) {
-        throw new IllegalArgumentException(
-          "Between min value must be a number not: " + betweenExpressionStart);
+        throw new IllegalArgumentException("Between min value must be a number not: "
+          + betweenExpressionStart);
       }
       if (!(betweenExpressionEnd instanceof NumericConstantNode)) {
-        throw new IllegalArgumentException(
-          "Between max value must be a number not: " + betweenExpressionEnd);
+        throw new IllegalArgumentException("Between max value must be a number not: "
+          + betweenExpressionEnd);
       }
       final Column column = toQueryValue(recordDefinition, leftValueNode);
       final Value min = toQueryValue(recordDefinition, betweenExpressionStart);
@@ -172,17 +171,15 @@ public abstract class QueryValue implements Cloneable {
       final String operator = binaryOperatorNode.getOperator().toUpperCase();
       final ValueNode leftValueNode = binaryOperatorNode.getLeftOperand();
       final ValueNode rightValueNode = binaryOperatorNode.getRightOperand();
-      final Condition leftCondition = toQueryValue(recordDefinition,
-        leftValueNode);
-      final Condition rightCondition = toQueryValue(recordDefinition,
-        rightValueNode);
+      final Condition leftCondition = toQueryValue(recordDefinition, leftValueNode);
+      final Condition rightCondition = toQueryValue(recordDefinition, rightValueNode);
       if ("AND".equals(operator)) {
         return (V)new And(leftCondition, rightCondition);
       } else if ("OR".equals(operator)) {
         return (V)new Or(leftCondition, rightCondition);
       } else {
-        throw new IllegalArgumentException("Binary logical operator "
-            + operator + " not supported.");
+        throw new IllegalArgumentException("Binary logical operator " + operator
+          + " not supported.");
       }
     } else if (expression instanceof BinaryOperatorNode) {
       final BinaryOperatorNode binaryOperatorNode = (BinaryOperatorNode)expression;
@@ -190,10 +187,8 @@ public abstract class QueryValue implements Cloneable {
       final ValueNode leftValueNode = binaryOperatorNode.getLeftOperand();
       final ValueNode rightValueNode = binaryOperatorNode.getRightOperand();
       if (SUPPORTED_BINARY_OPERATORS.contains(operator.toUpperCase())) {
-        final QueryValue leftCondition = toQueryValue(recordDefinition,
-          leftValueNode);
-        QueryValue rightCondition = toQueryValue(recordDefinition,
-          rightValueNode);
+        final QueryValue leftCondition = toQueryValue(recordDefinition, leftValueNode);
+        QueryValue rightCondition = toQueryValue(recordDefinition, rightValueNode);
 
         if (leftCondition instanceof Column) {
           if (rightCondition instanceof Value) {
@@ -203,27 +198,22 @@ public abstract class QueryValue implements Cloneable {
             final FieldDefinition attribute = recordDefinition.getField(name);
             final Object value = ((Value)rightCondition).getValue();
             if (value == null) {
-              throw new IllegalArgumentException("Values can't be null for "
-                  + operator + " use IS NULL or IS NOT NULL instead.");
+              throw new IllegalArgumentException("Values can't be null for " + operator
+                + " use IS NULL or IS NOT NULL instead.");
             } else {
               final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(name);
-              if (codeTable == null
-                  || attribute == recordDefinition.getIdField()) {
+              if (codeTable == null || attribute == recordDefinition.getIdField()) {
                 final Class<?> typeClass = attribute.getTypeClass();
                 try {
-                  final Object convertedValue = StringConverterRegistry.toObject(
-                    typeClass, value);
-                  if (convertedValue == null
-                      || !typeClass.isAssignableFrom(typeClass)) {
-                    throw new IllegalArgumentException(name + "='" + value
-                      + "' is not a valid "
+                  final Object convertedValue = StringConverterRegistry.toObject(typeClass, value);
+                  if (convertedValue == null || !typeClass.isAssignableFrom(typeClass)) {
+                    throw new IllegalArgumentException(name + "='" + value + "' is not a valid "
                       + attribute.getType().getValidationName());
                   } else {
                     rightCondition = new Value(attribute, convertedValue);
                   }
                 } catch (final Throwable t) {
-                  throw new IllegalArgumentException(name + "='" + value
-                    + "' is not a valid "
+                  throw new IllegalArgumentException(name + "='" + value + "' is not a valid "
                     + attribute.getType().getValidationName(), t);
                 }
               } else {
@@ -237,8 +227,7 @@ public abstract class QueryValue implements Cloneable {
                 }
                 if (id == null) {
                   throw new IllegalArgumentException(name + "='" + value
-                    + "' could not be found in the code table "
-                    + codeTable.getName());
+                    + "' could not be found in the code table " + codeTable.getName());
                 } else {
                   rightCondition = new Value(attribute, id);
                 }
@@ -247,17 +236,15 @@ public abstract class QueryValue implements Cloneable {
           }
         }
         if (expression instanceof BinaryArithmeticOperatorNode) {
-          final QueryValue arithmaticCondition = Q.arithmatic(leftCondition,
-            operator, rightCondition);
+          final QueryValue arithmaticCondition = Q.arithmatic(leftCondition, operator,
+            rightCondition);
           return (V)arithmaticCondition;
         } else {
-          final Condition binaryCondition = Q.binary(leftCondition, operator,
-            rightCondition);
+          final Condition binaryCondition = Q.binary(leftCondition, operator, rightCondition);
           return (V)binaryCondition;
         }
       } else {
-        throw new IllegalArgumentException("Unsupported binary operator "
-            + operator);
+        throw new IllegalArgumentException("Unsupported binary operator " + operator);
       }
     } else if (expression instanceof ColumnReference) {
       final ColumnReference column = (ColumnReference)expression;
@@ -273,10 +260,8 @@ public abstract class QueryValue implements Cloneable {
       final LikeEscapeOperatorNode likeEscapeOperatorNode = (LikeEscapeOperatorNode)expression;
       final ValueNode leftValueNode = likeEscapeOperatorNode.getReceiver();
       final ValueNode rightValueNode = likeEscapeOperatorNode.getLeftOperand();
-      final QueryValue leftCondition = toQueryValue(recordDefinition,
-        leftValueNode);
-      final QueryValue rightCondition = toQueryValue(recordDefinition,
-        rightValueNode);
+      final QueryValue leftCondition = toQueryValue(recordDefinition, leftValueNode);
+      final QueryValue rightCondition = toQueryValue(recordDefinition, rightValueNode);
       return (V)new ILike(leftCondition, rightCondition);
     } else if (expression instanceof NotNode) {
       final NotNode notNode = (NotNode)expression;
@@ -286,14 +271,12 @@ public abstract class QueryValue implements Cloneable {
     } else if (expression instanceof InListOperatorNode) {
       final InListOperatorNode inListOperatorNode = (InListOperatorNode)expression;
       final ValueNode leftOperand = inListOperatorNode.getLeftOperand();
-      final QueryValue leftCondition = toQueryValue(recordDefinition,
-        leftOperand);
+      final QueryValue leftCondition = toQueryValue(recordDefinition, leftOperand);
 
       final List<QueryValue> conditions = new ArrayList<QueryValue>();
       final RowConstructorNode itemsList = inListOperatorNode.getRightOperandList();
       for (final ValueNode itemValueNode : itemsList.getNodeList()) {
-        final QueryValue itemCondition = toQueryValue(recordDefinition,
-          itemValueNode);
+        final QueryValue itemCondition = toQueryValue(recordDefinition, itemValueNode);
         conditions.add(itemCondition);
       }
       return (V)new In(leftCondition, new CollectionValue(conditions));
@@ -354,8 +337,7 @@ public abstract class QueryValue implements Cloneable {
         for (final JavaValueNode parameter : methodNode.getMethodParameters()) {
           if (parameter instanceof SQLToJavaValueNode) {
             final SQLToJavaValueNode sqlNode = (SQLToJavaValueNode)parameter;
-            final QueryValue param = toQueryValue(recordDefinition,
-              sqlNode.getSQLValueNode());
+            final QueryValue param = toQueryValue(recordDefinition, sqlNode.getSQLValueNode());
             parameters.add(param);
           }
         }
@@ -368,24 +350,17 @@ public abstract class QueryValue implements Cloneable {
     } else if (expression == null) {
       return null;
     } else {
-      throw new IllegalArgumentException("Unsupported expression"
-          + expression.getClass() + " " + expression);
+      throw new IllegalArgumentException("Unsupported expression" + expression.getClass() + " "
+        + expression);
     }
   }
 
-  /** Must be in upper case */
-  public static final List<String> SUPPORTED_BINARY_OPERATORS = Arrays.asList(
-    "AND", "OR", "+", "-", "/", "*", "=", "<>", "<", "<=", ">", ">=", "LIKE",
-    "+", "-", "/", "*", "%", "MOD");
-
-  public abstract void appendDefaultSql(Query query, RecordStore recordStore,
-    StringBuilder sql);
+  public abstract void appendDefaultSql(Query query, RecordStore recordStore, StringBuilder sql);
 
   // TODO wrap in a more generic structure
   public abstract int appendParameters(int index, PreparedStatement statement);
 
-  public void appendSql(final Query query, final RecordStore recordStore,
-    final StringBuilder sql) {
+  public void appendSql(final Query query, final RecordStore recordStore, final StringBuilder sql) {
     if (recordStore == null) {
       appendDefaultSql(query, null, sql);
     } else {

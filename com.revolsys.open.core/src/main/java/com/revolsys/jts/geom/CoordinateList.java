@@ -50,6 +50,7 @@ public class CoordinateList extends ArrayList<Point> {
    *
    */
   private static final long serialVersionUID = 1L;
+
   // With contributions from Markus Schaber [schabios@logi-track.com]
   // [Jon Aquino 2004-03-25]
   private final static Point[] coordArrayType = new Point[0];
@@ -119,8 +120,7 @@ public class CoordinateList extends ArrayList<Point> {
     super.add(i, coord);
   }
 
-  public boolean add(final LineString coord, final boolean allowRepeated,
-    final boolean direction) {
+  public boolean add(final LineString coord, final boolean allowRepeated, final boolean direction) {
     if (direction) {
       for (int i = 0; i < coord.getVertexCount(); i++) {
         add(coord.getPoint(i), allowRepeated);
@@ -140,8 +140,7 @@ public class CoordinateList extends ArrayList<Point> {
    * @param direction if false, the array is added in reverse order
    * @return true (as by general collection contract)
    */
-  public boolean add(final List<Point> coord, final boolean allowRepeated,
-    final boolean direction) {
+  public boolean add(final List<Point> coord, final boolean allowRepeated, final boolean direction) {
     if (direction) {
       for (int i = 0; i < coord.size(); i++) {
         add(coord.get(i), allowRepeated);
@@ -202,8 +201,7 @@ public class CoordinateList extends ArrayList<Point> {
    * @param direction if false, the array is added in reverse order
    * @return true (as by general collection contract)
    */
-  public boolean add(final Point[] coord, final boolean allowRepeated,
-    final boolean direction) {
+  public boolean add(final Point[] coord, final boolean allowRepeated, final boolean direction) {
     if (direction) {
       for (final Point element : coord) {
         add(element, allowRepeated);
@@ -224,8 +222,8 @@ public class CoordinateList extends ArrayList<Point> {
    * @param end the index to add up to but not including
    * @return true (as by general collection contract)
    */
-  public boolean add(final Point[] coord, final boolean allowRepeated,
-    final int start, final int end) {
+  public boolean add(final Point[] coord, final boolean allowRepeated, final int start,
+    final int end) {
     int inc = 1;
     if (start > end) {
       inc = -1;
@@ -242,8 +240,7 @@ public class CoordinateList extends ArrayList<Point> {
    * @param allowRepeated if set to false, repeated coordinates are collapsed
    * @return true (as by general collection contract)
    */
-  public boolean addAll(final Collection<? extends Point> points,
-    final boolean allowRepeated) {
+  public boolean addAll(final Collection<? extends Point> points, final boolean allowRepeated) {
     boolean isChanged = false;
     for (final Point point : points) {
       add(point, allowRepeated);

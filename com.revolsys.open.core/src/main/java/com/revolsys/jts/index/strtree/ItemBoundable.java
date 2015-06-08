@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -46,7 +45,9 @@ public class ItemBoundable implements Boundable, Serializable {
    *
    */
   private static final long serialVersionUID = 1L;
+
   private final Object bounds;
+
   private final Object item;
 
   public ItemBoundable(final Object bounds, final Object item) {
@@ -59,5 +60,7 @@ public class ItemBoundable implements Boundable, Serializable {
     return this.bounds;
   }
 
-  public Object getItem() { return this.item; }
+  public Object getItem() {
+    return this.item;
+  }
 }

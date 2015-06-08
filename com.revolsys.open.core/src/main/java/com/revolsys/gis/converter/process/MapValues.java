@@ -48,8 +48,7 @@ public class MapValues extends AbstractSourceToTargetProcess<Record, Record> {
 
   @Override
   public void process(final Record source, final Record target) {
-    final Object sourceValue = Records.getFieldByPath(source,
-      this.sourceFieldName);
+    final Object sourceValue = Records.getFieldByPath(source, this.sourceFieldName);
     if (sourceValue != null) {
       final Object targetValue = this.valueMap.get(sourceValue);
       if (targetValue != null) {

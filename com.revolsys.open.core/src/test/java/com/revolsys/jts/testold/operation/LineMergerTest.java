@@ -48,10 +48,12 @@ import com.revolsys.jts.util.Assert;
  * @version 1.7
  */
 public class LineMergerTest extends TestCase {
+  private static WKTReader reader = new WKTReader();
+
   public static void compare(final Collection expectedGeometries,
     final Collection actualGeometries, final boolean compareDirections) {
-    assertEquals("Geometry count, " + actualGeometries,
-      expectedGeometries.size(), actualGeometries.size());
+    assertEquals("Geometry count, " + actualGeometries, expectedGeometries.size(),
+      actualGeometries.size());
     for (final Iterator i = expectedGeometries.iterator(); i.hasNext();) {
       final Geometry expectedGeometry = (Geometry)i.next();
       assertTrue("Not found: " + expectedGeometry + ", " + actualGeometries,
@@ -59,11 +61,10 @@ public class LineMergerTest extends TestCase {
     }
   }
 
-  private static boolean contains(final Collection geometries,
-    final Geometry g, final boolean exact) {
+  private static boolean contains(final Collection geometries, final Geometry g, final boolean exact) {
     for (final Iterator i = geometries.iterator(); i.hasNext();) {
       final Geometry element = (Geometry)i.next();
-      if (exact && element.equals(2,g)) {
+      if (exact && element.equals(2, g)) {
         return true;
       }
       if (!exact && element.equalsTopo(g)) {
@@ -74,12 +75,11 @@ public class LineMergerTest extends TestCase {
     return false;
   }
 
-  public static void doTest(final String[] inputWKT,
-    final String[] expectedOutputWKT, final boolean compareDirections) {
+  public static void doTest(final String[] inputWKT, final String[] expectedOutputWKT,
+    final boolean compareDirections) {
     final LineMerger lineMerger = new LineMerger();
     lineMerger.add(toGeometries(inputWKT));
-    compare(toGeometries(expectedOutputWKT), lineMerger.getMergedLineStrings(),
-      compareDirections);
+    compare(toGeometries(expectedOutputWKT), lineMerger.getMergedLineStrings(), compareDirections);
   }
 
   public static void main(final String[] args) {
@@ -98,8 +98,6 @@ public class LineMergerTest extends TestCase {
 
     return geometries;
   }
-
-  private static WKTReader reader = new WKTReader();
 
   public LineMergerTest(final String name) {
     super(name);
@@ -121,10 +119,8 @@ public class LineMergerTest extends TestCase {
   public void test2() {
     doTest(new String[] {
       "LINESTRING (120 300, 80 340)", "LINESTRING (120 300, 140 320, 160 320)",
-      "LINESTRING (40 320, 20 340, 0 320)",
-      "LINESTRING (0 320, 20 300, 40 320)",
-      "LINESTRING (40 320, 60 320, 80 340)",
-      "LINESTRING (160 320, 180 340, 200 320)",
+      "LINESTRING (40 320, 20 340, 0 320)", "LINESTRING (0 320, 20 300, 40 320)",
+      "LINESTRING (40 320, 60 320, 80 340)", "LINESTRING (160 320, 180 340, 200 320)",
       "LINESTRING (200 320, 180 300, 160 320)"
     }, new String[] {
       "LINESTRING (160 320, 180 340, 200 320, 180 300, 160 320)",

@@ -43,12 +43,6 @@ import com.revolsys.jts.math.Vector2D;
 import com.revolsys.jts.shape.GeometricShapeBuilder;
 
 public class KochSnowflakeBuilder extends GeometricShapeBuilder {
-  public static int recursionLevelForSize(final int numPts) {
-    final double pow4 = numPts / 3;
-    final double exp = Math.log(pow4) / Math.log(4);
-    return (int)exp;
-  }
-
   private static final double ONE_THIRD = 1.0 / 3.0;
 
   /**
@@ -59,6 +53,12 @@ public class KochSnowflakeBuilder extends GeometricShapeBuilder {
   private static final double THIRD_HEIGHT = HEIGHT_FACTOR / 3.0;
 
   private static final double TWO_THIRDS = 2.0 / 3.0;
+
+  public static int recursionLevelForSize(final int numPts) {
+    final double pow4 = numPts / 3;
+    final double exp = Math.log(pow4) / Math.log(4);
+    return (int)exp;
+  }
 
   private final CoordinateList coordList = new CoordinateList();
 
@@ -93,8 +93,7 @@ public class KochSnowflakeBuilder extends GeometricShapeBuilder {
     }
   }
 
-  private Point[] getBoundary(final int level, final Point origin,
-    final double width) {
+  private Point[] getBoundary(final int level, final Point origin, final double width) {
     double y = origin.getY();
     // for all levels beyond 0 need to vertically shift shape by height of one
     // "arm" to centre it
@@ -102,12 +101,10 @@ public class KochSnowflakeBuilder extends GeometricShapeBuilder {
       y += THIRD_HEIGHT * width;
     }
 
-    final Point p0 = new PointDouble(origin.getX(), y,
+    final Point p0 = new PointDouble(origin.getX(), y, Point.NULL_ORDINATE);
+    final Point p1 = new PointDouble(origin.getX() + width / 2, y + width * HEIGHT_FACTOR,
       Point.NULL_ORDINATE);
-    final Point p1 = new PointDouble(origin.getX() + width / 2, y + width
-      * HEIGHT_FACTOR, Point.NULL_ORDINATE);
-    final Point p2 = new PointDouble(origin.getX() + width, y,
-      Point.NULL_ORDINATE);
+    final Point p2 = new PointDouble(origin.getX() + width, y, Point.NULL_ORDINATE);
     addSide(level, p0, p1);
     addSide(level, p1, p2);
     addSide(level, p2, p0);
@@ -119,8 +116,7 @@ public class KochSnowflakeBuilder extends GeometricShapeBuilder {
   public Geometry getGeometry() {
     final int level = recursionLevelForSize(this.numPts);
     final LineSegment baseLine = getSquareBaseLine();
-    final Point[] pts = getBoundary(level, baseLine.getPoint(0),
-      baseLine.getLength());
+    final Point[] pts = getBoundary(level, baseLine.getPoint(0), baseLine.getLength());
     return this.geometryFactory.polygon(this.geometryFactory.linearRing(pts));
   }
 

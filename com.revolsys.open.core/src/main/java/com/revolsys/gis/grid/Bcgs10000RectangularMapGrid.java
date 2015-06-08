@@ -4,8 +4,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Bcgs10000RectangularMapGrid extends Bcgs20000RectangularMapGrid {
-  private static final Pattern NAME_PATTERN = Pattern.compile("^"
-      + BcgsConstants.REGEX_10000 + ".*");
+  private static final Pattern NAME_PATTERN = Pattern.compile("^" + BcgsConstants.REGEX_10000
+    + ".*");
 
   public Bcgs10000RectangularMapGrid() {
     this(BcgsConstants.WIDTH_10000, BcgsConstants.HEIGHT_10000);
@@ -24,8 +24,7 @@ public class Bcgs10000RectangularMapGrid extends Bcgs20000RectangularMapGrid {
       final String letter = matcher.group(2);
       final String number20k = matcher.group(3);
       final String number10k = matcher.group(4);
-      final double latitude = getLatitude(blockName, letter, number20k,
-        number10k);
+      final double latitude = getLatitude(blockName, letter, number20k, number10k);
       return latitude;
     } else {
       throw new IllegalArgumentException(mapTileName
@@ -33,8 +32,8 @@ public class Bcgs10000RectangularMapGrid extends Bcgs20000RectangularMapGrid {
     }
   }
 
-  protected double getLatitude(final String blockName, final String letter,
-    final String number20k, final String number10k) {
+  protected double getLatitude(final String blockName, final String letter, final String number20k,
+    final String number10k) {
     double latitude = getLatitude(blockName, letter, number20k);
     final int numberRow = GridUtil.getNumberRow4(number10k);
     latitude += numberRow * BcgsConstants.HEIGHT_10000;
@@ -49,8 +48,7 @@ public class Bcgs10000RectangularMapGrid extends Bcgs20000RectangularMapGrid {
       final String letter = matcher.group(2);
       final String number20k = matcher.group(3);
       final String number10k = matcher.group(4);
-      final double longitude = getLongitude(blockName, letter, number20k,
-        number10k);
+      final double longitude = getLongitude(blockName, letter, number20k, number10k);
       return longitude;
     } else {
       throw new IllegalArgumentException(mapTileName

@@ -53,8 +53,7 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public void addStatistic(final String statisticName, final String typePath,
-    final int count) {
+  public void addStatistic(final String statisticName, final String typePath, final int count) {
     this.recordStore.addStatistic(statisticName, typePath, count);
   }
 
@@ -167,8 +166,7 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public RecordDefinition getRecordDefinition(
-    final RecordDefinition recordDefinition) {
+  public RecordDefinition getRecordDefinition(final RecordDefinition recordDefinition) {
     return this.recordStore.getRecordDefinition(recordDefinition);
   }
 
@@ -308,8 +306,7 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public void setCodeTableColumNames(
-    final Map<String, List<String>> domainColumNames) {
+  public void setCodeTableColumNames(final Map<String, List<String>> domainColumNames) {
     this.recordStore.setCodeTableColumNames(domainColumNames);
   }
 

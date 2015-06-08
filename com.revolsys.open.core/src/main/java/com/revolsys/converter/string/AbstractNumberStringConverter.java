@@ -2,8 +2,7 @@ package com.revolsys.converter.string;
 
 import com.revolsys.util.MathUtil;
 
-public abstract class AbstractNumberStringConverter<T> implements
-StringConverter<T> {
+public abstract class AbstractNumberStringConverter<T> implements StringConverter<T> {
   @Override
   public String toString(final Object value) {
     if (value == null) {

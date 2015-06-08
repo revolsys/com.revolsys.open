@@ -8,24 +8,21 @@ import org.springframework.beans.factory.support.GenericBeanDefinition;
 
 public class Parameter implements FactoryBean<Object> {
 
-  public static void registerBeanDefinition(
-    final BeanDefinitionRegistry registry, final BeanFactory beanFactory,
-    final String beanName) {
+  public static void registerBeanDefinition(final BeanDefinitionRegistry registry,
+    final BeanFactory beanFactory, final String beanName) {
     registerBeanDefinition(registry, beanFactory, beanName, beanName);
   }
 
-  public static void registerBeanDefinition(
-    final BeanDefinitionRegistry registry, final BeanFactory beanFactory,
-    final String beanName, final String alias) {
+  public static void registerBeanDefinition(final BeanDefinitionRegistry registry,
+    final BeanFactory beanFactory, final String beanName, final String alias) {
     if (beanFactory.containsBean(beanName)) {
       final Object value = beanFactory.getBean(beanName);
       registerBeanDefinition(registry, alias, value);
     }
   }
 
-  public static void registerBeanDefinition(
-    final BeanDefinitionRegistry registry, final String beanName,
-    final Object value) {
+  public static void registerBeanDefinition(final BeanDefinitionRegistry registry,
+    final String beanName, final Object value) {
     final GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
     beanDefinition.setBeanClass(Parameter.class);
     final MutablePropertyValues values = beanDefinition.getPropertyValues();

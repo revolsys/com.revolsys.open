@@ -156,8 +156,7 @@ public class LineMerger {
     }
   }
 
-  private EdgeString buildEdgeStringStartingWith(
-    final LineMergeDirectedEdge start) {
+  private EdgeString buildEdgeStringStartingWith(final LineMergeDirectedEdge start) {
     final EdgeString edgeString = new EdgeString(this.factory);
     LineMergeDirectedEdge current = start;
     do {

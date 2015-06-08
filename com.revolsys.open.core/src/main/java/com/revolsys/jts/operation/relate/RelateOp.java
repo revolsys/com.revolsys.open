@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -110,8 +109,7 @@ public class RelateOp extends GeometryGraphOperation {
    * @param g1 another Geometry to relate
    * @param boundaryNodeRule the Boundary Node Rule to use
    */
-  public RelateOp(final Geometry g0, final Geometry g1,
-    final BoundaryNodeRule boundaryNodeRule) {
+  public RelateOp(final Geometry g0, final Geometry g1, final BoundaryNodeRule boundaryNodeRule) {
     super(g0, g1, boundaryNodeRule);
     this.relate = new RelateComputer(this.arg);
   }

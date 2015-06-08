@@ -25,8 +25,7 @@ public class ObjectLabelField extends TextField {
     this.codeTable = codeTable;
   }
 
-  public ObjectLabelField(final String fieldName, final int columns,
-    final CodeTable codeTable) {
+  public ObjectLabelField(final String fieldName, final int columns, final CodeTable codeTable) {
     super(fieldName, columns);
     this.codeTable = codeTable;
   }

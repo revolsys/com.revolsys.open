@@ -50,17 +50,15 @@ import com.revolsys.jts.test.geometry.CoordinateTest;
  */
 public class NormalizeTest extends TestCase {
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0,
-    1.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0);
 
   public NormalizeTest(final String name) {
     super(name);
   }
 
-  private void assertEqualsExact(final Geometry expectedValue,
-    final Geometry actualValue) {
+  private void assertEqualsExact(final Geometry expectedValue, final Geometry actualValue) {
     assertTrue("Expected " + expectedValue + " but encountered " + actualValue,
-      actualValue.equals(2,expectedValue));
+      actualValue.equals(2, expectedValue));
   }
 
   public void testCompareEmptyPoint() throws Exception {
@@ -152,7 +150,7 @@ public class NormalizeTest extends TestCase {
     final MultiPoint expectedValue = (MultiPoint)this.geometryFactory.geometry("MULTIPOINT((10 10),(20 10),(20 20),(30 20),(30 30))");
     assertEqualsExact(expectedValue, m);
     final MultiPoint unexpectedValue = (MultiPoint)this.geometryFactory.geometry("MULTIPOINT((20 10),(20 20),(30 20),(30 30),(10 10))");
-    assertTrue(!m.equals(2,unexpectedValue));
+    assertTrue(!m.equals(2, unexpectedValue));
   }
 
   public void testNormalizeMultiPolygon() throws Exception {

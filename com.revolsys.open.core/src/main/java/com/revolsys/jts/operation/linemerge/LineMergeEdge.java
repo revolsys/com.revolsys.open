@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -44,12 +43,14 @@ import com.revolsys.jts.planargraph.Edge;
  */
 public class LineMergeEdge extends Edge {
   private final LineString line;
+
   /**
    * Constructs a LineMergeEdge with vertices given by the specified LineString.
    */
   public LineMergeEdge(final LineString line) {
     this.line = line;
   }
+
   /**
    * Returns the LineString specifying the vertices of this edge.
    */

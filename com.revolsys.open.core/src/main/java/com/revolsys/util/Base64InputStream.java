@@ -195,8 +195,7 @@ public class Base64InputStream extends java.io.FilterInputStream {
    * @since 1.3
    */
   @Override
-  public int read(final byte[] dest, final int off, final int len)
-      throws java.io.IOException {
+  public int read(final byte[] dest, final int off, final int len) throws java.io.IOException {
     int i;
     int b;
     for (i = 0; i < len; i++) {

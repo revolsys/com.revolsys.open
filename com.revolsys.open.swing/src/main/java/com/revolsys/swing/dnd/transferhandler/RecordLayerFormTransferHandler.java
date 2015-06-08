@@ -26,8 +26,7 @@ public class RecordLayerFormTransferHandler extends TransferHandler {
   }
 
   @Override
-  public boolean canImport(final JComponent comp,
-    final DataFlavor[] transferFlavors) {
+  public boolean canImport(final JComponent comp, final DataFlavor[] transferFlavors) {
     for (final DataFlavor dataFlavor : transferFlavors) {
       if (MapTransferable.MAP_FLAVOR.equals(dataFlavor)) {
         return true;
@@ -55,10 +54,9 @@ public class RecordLayerFormTransferHandler extends TransferHandler {
   }
 
   @Override
-  public boolean importData(final JComponent comp,
-    final Transferable transferable) {
-    for (final DataFlavor dataFlavor : Arrays.asList(
-      RecordTransferable.DATA_OBJECT_FLAVOR, MapTransferable.MAP_FLAVOR)) {
+  public boolean importData(final JComponent comp, final Transferable transferable) {
+    for (final DataFlavor dataFlavor : Arrays.asList(RecordTransferable.DATA_OBJECT_FLAVOR,
+      MapTransferable.MAP_FLAVOR)) {
       if (pasteValues(transferable, dataFlavor)) {
         return true;
       }
@@ -67,16 +65,14 @@ public class RecordLayerFormTransferHandler extends TransferHandler {
   }
 
   @SuppressWarnings("unchecked")
-  public boolean pasteValues(final Transferable transferable,
-    final DataFlavor dataFlavor) {
+  public boolean pasteValues(final Transferable transferable, final DataFlavor dataFlavor) {
     if (transferable.isDataFlavorSupported(dataFlavor)) {
       try {
         final Map<String, Object> map = (Map<String, Object>)transferable.getTransferData(dataFlavor);
         getForm().pasteValues(map);
         return true;
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error("Unable to paste data",
-          transferable);
+        LoggerFactory.getLogger(getClass()).error("Unable to paste data", transferable);
         return false;
       }
     } else {

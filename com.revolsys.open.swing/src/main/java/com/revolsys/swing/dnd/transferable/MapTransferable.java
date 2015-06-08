@@ -13,14 +13,13 @@ import com.revolsys.format.csv.Csv;
 
 public class MapTransferable implements Transferable {
 
-  public static final DataFlavor MAP_FLAVOR = new DataFlavor(Map.class,
-      "Java Map");
-
-  private final Map<String, Object> map;
+  public static final DataFlavor MAP_FLAVOR = new DataFlavor(Map.class, "Java Map");
 
   private static final DataFlavor[] DATA_FLAVORS = {
     MAP_FLAVOR, DataFlavor.stringFlavor
   };
+
+  private final Map<String, Object> map;
 
   public MapTransferable(final Map<String, Object> map) {
     this.map = map;
@@ -31,8 +30,8 @@ public class MapTransferable implements Transferable {
   }
 
   @Override
-  public Object getTransferData(final DataFlavor flavor)
-      throws UnsupportedFlavorException, IOException {
+  public Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException,
+    IOException {
     if (MAP_FLAVOR.equals(flavor)) {
       return this.map;
     } else if (DataFlavor.stringFlavor.equals(flavor)) {

@@ -76,8 +76,8 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
 
     @Override
     public int hashCode() {
-      return (this.key == null ? 0 : this.key.hashCode()) ^ (this.value == null ? 0
-        : this.value.hashCode());
+      return (this.key == null ? 0 : this.key.hashCode())
+        ^ (this.value == null ? 0 : this.value.hashCode());
     }
 
     @Override
@@ -114,7 +114,7 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
           final ObjectKey objectKey = new ObjectKey(key);
           final V value = entry.getValue();
           final Map.Entry<ObjectKey, V> objectKeyEntry = new AbstractMap.SimpleEntry<ObjectKey, V>(
-              objectKey, value);
+            objectKey, value);
           return this.map.map.entrySet().contains(objectKeyEntry);
         }
       }
@@ -135,8 +135,7 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
   private class EntrySetIterator implements Iterator<java.util.Map.Entry<K, V>> {
     private final Iterator<java.util.Map.Entry<ObjectKey, V>> iterator;
 
-    public EntrySetIterator(
-      final Iterator<java.util.Map.Entry<ObjectKey, V>> iterator) {
+    public EntrySetIterator(final Iterator<java.util.Map.Entry<ObjectKey, V>> iterator) {
       this.iterator = iterator;
     }
 
@@ -344,11 +343,9 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
       final Map.Entry<K, V> localEntry = localIterator.next();
       final Object localObject1 = localEntry.getKey();
       final Object localObject2 = localEntry.getValue();
-      localStringBuilder.append(localObject1 == this ? "(this Map)"
-        : localObject1);
+      localStringBuilder.append(localObject1 == this ? "(this Map)" : localObject1);
       localStringBuilder.append('=');
-      localStringBuilder.append(localObject2 == this ? "(this Map)"
-        : localObject2);
+      localStringBuilder.append(localObject2 == this ? "(this Map)" : localObject2);
       if (!localIterator.hasNext()) {
         return "}";
       }

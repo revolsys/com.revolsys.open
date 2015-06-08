@@ -37,15 +37,14 @@ public class ShapeIcon implements Icon {
   }
 
   @Override
-  public void paintIcon(final Component c, final Graphics g, final int x,
-    final int y) {
+  public void paintIcon(final Component c, final Graphics g, final int x, final int y) {
     final Graphics2D graphics = (Graphics2D)g;
     final AffineTransform savedTransform = graphics.getTransform();
     try {
       graphics.translate(x, y);
       final Rectangle bounds = this.shape.getBounds();
-      final AffineTransform shapeTransform = AffineTransform.getScaleInstance(
-        this.iconWidth / bounds.width, this.iconHeight / bounds.height);
+      final AffineTransform shapeTransform = AffineTransform.getScaleInstance(this.iconWidth
+        / bounds.width, this.iconHeight / bounds.height);
       final Shape newShape = new GeneralPath(this.shape).createTransformedShape(shapeTransform);
       graphics.setPaint(WebColors.Gray);
       graphics.fill(newShape);

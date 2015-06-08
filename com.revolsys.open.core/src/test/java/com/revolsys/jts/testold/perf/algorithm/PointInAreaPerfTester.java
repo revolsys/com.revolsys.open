@@ -27,8 +27,7 @@ public class PointInAreaPerfTester {
 
   private final int[] locationCount = new int[3];
 
-  public PointInAreaPerfTester(final GeometryFactory geomFactory,
-    final Geometry area) {
+  public PointInAreaPerfTester(final GeometryFactory geomFactory, final Geometry area) {
     this.geomFactory = geomFactory;
     this.area = area;
   }
@@ -57,10 +56,8 @@ public class PointInAreaPerfTester {
       for (int j = 0; j < ptGridWidth; j++) {
 
         // compute test point
-        final double x = this.geomFactory.makePrecise(0, areaEnv.getMinX() + i
-          * xStep);
-        final double y = this.geomFactory.makePrecise(1, areaEnv.getMinY() + j
-          * yStep);
+        final double x = this.geomFactory.makePrecise(0, areaEnv.getMinX() + i * xStep);
+        final double y = this.geomFactory.makePrecise(1, areaEnv.getMinY() + j * yStep);
         final Point pt = new PointDouble(x, y);
 
         final Location loc = this.pia1.locate(pt);

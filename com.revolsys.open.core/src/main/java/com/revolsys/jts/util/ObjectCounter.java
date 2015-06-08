@@ -41,25 +41,20 @@ import java.util.Map;
  * @author Martin Davis
  *
  */
-public class ObjectCounter
-{
+public class ObjectCounter {
 
-  private static class Counter
-  {
+  private static class Counter {
     int count = 0;
 
-    public Counter(final int count)
-    {
+    public Counter(final int count) {
       this.count = count;
     }
 
-    public int count()
-    {
+    public int count() {
       return this.count;
     }
 
-    public void increment()
-    {
+    public void increment() {
       this.count++;
     }
   }
@@ -71,18 +66,17 @@ public class ObjectCounter
 
   // TODO: add remove(Object o)
 
-  public void add(final Object o)
-  {
-    final Counter counter = (Counter) this.counts.get(o);
+  public void add(final Object o) {
+    final Counter counter = (Counter)this.counts.get(o);
     if (counter == null) {
       this.counts.put(o, new Counter(1));
     } else {
       counter.increment();
     }
   }
-  public int count(final Object o)
-  {
-    final Counter counter = (Counter) this.counts.get(o);
+
+  public int count(final Object o) {
+    final Counter counter = (Counter)this.counts.get(o);
     if (counter == null) {
       return 0;
     } else {

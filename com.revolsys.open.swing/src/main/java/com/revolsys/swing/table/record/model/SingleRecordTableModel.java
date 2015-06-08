@@ -9,6 +9,8 @@ import com.revolsys.data.record.Record;
 import com.revolsys.swing.table.BaseJTable;
 
 public class SingleRecordTableModel extends AbstractSingleRecordTableModel {
+  private static final long serialVersionUID = 1L;
+
   public static JComponent create(final Record object, final boolean editable) {
     final SingleRecordTableModel model = new SingleRecordTableModel(object, editable);
     final BaseJTable table = createTable(model);
@@ -16,8 +18,6 @@ public class SingleRecordTableModel extends AbstractSingleRecordTableModel {
     tableHeader.setReorderingAllowed(false);
     return table;
   }
-
-  private static final long serialVersionUID = 1L;
 
   private Record record;
 

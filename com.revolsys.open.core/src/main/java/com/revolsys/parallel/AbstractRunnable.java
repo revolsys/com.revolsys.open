@@ -11,6 +11,8 @@ import javax.swing.SwingUtilities;
 import com.revolsys.util.ExceptionUtil;
 
 public abstract class AbstractRunnable implements Runnable {
+  private static final Cursor WAIT_CURSOR = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
+
   public static Window getActiveWindow() {
     final KeyboardFocusManager keyboardFocusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
     final Window activeWindow = keyboardFocusManager.getActiveWindow();
@@ -32,8 +34,6 @@ public abstract class AbstractRunnable implements Runnable {
       return false;
     }
   }
-
-  private static final Cursor WAIT_CURSOR = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 
   private boolean showWaitCursor = false;
 

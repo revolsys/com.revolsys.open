@@ -74,8 +74,7 @@ public class PointDoubleGf extends PointDouble {
    *@param  coordinates      contains the single coordinate on which to base this <code>Point</code>
    *      , or <code>null</code> to create the empty geometry.
    */
-  public PointDoubleGf(final GeometryFactory geometryFactory,
-    final double... coordinates) {
+  public PointDoubleGf(final GeometryFactory geometryFactory, final double... coordinates) {
     super(geometryFactory, coordinates);
     this.geometryFactory = geometryFactory;
   }

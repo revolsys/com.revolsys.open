@@ -61,8 +61,8 @@ public class MenuItem implements Cloneable, Comparable {
     setUri(uri);
   }
 
-  public MenuItem(final String name, final String title, final String uri,
-    final String anchor, final String condition) {
+  public MenuItem(final String name, final String title, final String uri, final String anchor,
+    final String condition) {
     this(name, title, uri);
     this.anchor = anchor;
     setCondition(condition);
@@ -72,8 +72,7 @@ public class MenuItem implements Cloneable, Comparable {
     addParameter(parameter.getName(), parameter.getValue());
   }
 
-  public void addParameter(final String name, final Object value)
-      throws Exception {
+  public void addParameter(final String name, final Object value) throws Exception {
     if (value instanceof String) {
       final String stringValue = (String)value;
       final Expression expression = JexlUtil.createExpression(stringValue);

@@ -13,31 +13,27 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.connection.AbstractConnectionRegistry;
 import com.revolsys.util.Property;
 
-public class FolderConnectionRegistry extends
-AbstractConnectionRegistry<FolderConnection> {
+public class FolderConnectionRegistry extends AbstractConnectionRegistry<FolderConnection> {
+
+  private static final ThreadLocal<FolderConnectionRegistry> threadRegistry = new ThreadLocal<FolderConnectionRegistry>();
 
   public static FolderConnectionRegistry getForThread() {
     return FolderConnectionRegistry.threadRegistry.get();
   }
 
-  public static FolderConnectionRegistry setForThread(
-    final FolderConnectionRegistry registry) {
+  public static FolderConnectionRegistry setForThread(final FolderConnectionRegistry registry) {
     final FolderConnectionRegistry oldValue = getForThread();
     FolderConnectionRegistry.threadRegistry.set(registry);
     return oldValue;
   }
 
-  private static final ThreadLocal<FolderConnectionRegistry> threadRegistry = new ThreadLocal<FolderConnectionRegistry>();
-
-  public FolderConnectionRegistry(
-    final FolderConnectionManager connectionManager, final String name) {
+  public FolderConnectionRegistry(final FolderConnectionManager connectionManager, final String name) {
     super(connectionManager, name);
     init();
   }
 
-  public FolderConnectionRegistry(
-    final FolderConnectionManager connectionManager, final String name,
-    final boolean visible, final FolderConnection... connections) {
+  public FolderConnectionRegistry(final FolderConnectionManager connectionManager,
+    final String name, final boolean visible, final FolderConnection... connections) {
     super(connectionManager, name);
     setReadOnly(!visible);
     setVisible(visible);
@@ -47,9 +43,8 @@ AbstractConnectionRegistry<FolderConnection> {
     }
   }
 
-  public FolderConnectionRegistry(
-    final FolderConnectionManager connectionManager, final String name,
-    final Resource resource, final boolean readOnly) {
+  public FolderConnectionRegistry(final FolderConnectionManager connectionManager,
+    final String name, final Resource resource, final boolean readOnly) {
     super(connectionManager, name);
     setReadOnly(readOnly);
     setDirectory(resource);
@@ -60,8 +55,7 @@ AbstractConnectionRegistry<FolderConnection> {
     this(null, name, true);
   }
 
-  public FolderConnectionRegistry(final String name, final Resource resource,
-    final boolean readOnly) {
+  public FolderConnectionRegistry(final String name, final Resource resource, final boolean readOnly) {
     this(null, name, resource, readOnly);
   }
 

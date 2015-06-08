@@ -45,12 +45,6 @@ import com.revolsys.jts.index.SpatialIndex;
 public class SpatialIndexTester {
   private static boolean VERBOSE = false;
 
-  private SpatialIndex index;
-
-  private ArrayList sourceData;
-
-  private boolean isSuccess = true;
-
   private static final double CELL_EXTENT = 20.31;
 
   private static final int CELLS_PER_GRID_SIDE = 10;
@@ -62,6 +56,12 @@ public class SpatialIndexTester {
   private static final double QUERY_ENVELOPE_EXTENT_1 = 1.009;
 
   private static final double QUERY_ENVELOPE_EXTENT_2 = 11.7;
+
+  private SpatialIndex index;
+
+  private ArrayList sourceData;
+
+  private boolean isSuccess = true;
 
   public SpatialIndexTester() {
   }
@@ -98,8 +98,8 @@ public class SpatialIndexTester {
     }
   }
 
-  private void doTest(final SpatialIndex index,
-    final double queryEnvelopeExtent, final List sourceData) {
+  private void doTest(final SpatialIndex index, final double queryEnvelopeExtent,
+    final List sourceData) {
     int extraMatchCount = 0;
     int expectedMatchCount = 0;
     int actualMatchCount = 0;
@@ -108,8 +108,7 @@ public class SpatialIndexTester {
       for (int y = 0; y < CELL_EXTENT * CELLS_PER_GRID_SIDE; y += queryEnvelopeExtent) {
         final BoundingBoxDoubleGf queryEnvelope = new BoundingBoxDoubleGf(2, x, y, x
           + queryEnvelopeExtent, y + queryEnvelopeExtent);
-        final List expectedMatches = intersectingEnvelopes(queryEnvelope,
-          sourceData);
+        final List expectedMatches = intersectingEnvelopes(queryEnvelope, sourceData);
         final List actualMatches = index.query(queryEnvelope);
         // since index returns candidates only, it may return more than the
         // expected value
@@ -125,7 +124,8 @@ public class SpatialIndexTester {
     }
     if (VERBOSE) {
       // System.out.println("---------------");
-      // System.out.println("BoundingBoxDoubleGf Extent: " + queryEnvelopeExtent);
+      // System.out.println("BoundingBoxDoubleGf Extent: " +
+      // queryEnvelopeExtent);
       // System.out.println("Expected Matches: " + expectedMatchCount);
       // System.out.println("Actual Matches: " + actualMatchCount);
       // System.out.println("Extra Matches: " + extraMatchCount);
@@ -167,8 +167,7 @@ public class SpatialIndexTester {
     }
   }
 
-  private List intersectingEnvelopes(final BoundingBoxDoubleGf queryEnvelope,
-    final List envelopes) {
+  private List intersectingEnvelopes(final BoundingBoxDoubleGf queryEnvelope, final List envelopes) {
     final ArrayList intersectingEnvelopes = new ArrayList();
     for (final Iterator i = envelopes.iterator(); i.hasNext();) {
       final BoundingBoxDoubleGf candidate = (BoundingBoxDoubleGf)i.next();

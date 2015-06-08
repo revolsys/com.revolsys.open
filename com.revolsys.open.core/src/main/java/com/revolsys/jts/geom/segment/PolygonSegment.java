@@ -8,8 +8,7 @@ import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.vertex.Vertex;
 
-public class PolygonSegment extends AbstractSegment implements
-Iterator<Segment> {
+public class PolygonSegment extends AbstractSegment implements Iterator<Segment> {
   /**
    *
    */

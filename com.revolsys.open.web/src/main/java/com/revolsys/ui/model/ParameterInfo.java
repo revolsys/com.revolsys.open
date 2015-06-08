@@ -21,13 +21,13 @@ public class ParameterInfo {
 
   private Object defaultValue;
 
-  public ParameterInfo(final String name, final boolean required,
-    final DataType type, final String description) {
+  public ParameterInfo(final String name, final boolean required, final DataType type,
+    final String description) {
     this(name, required, type, description, Collections.emptyList());
   }
 
-  public ParameterInfo(final String name, final boolean required,
-    final DataType type, final String description, final List<?> allowedValues) {
+  public ParameterInfo(final String name, final boolean required, final DataType type,
+    final String description, final List<?> allowedValues) {
     this.name = name;
     this.required = required;
     this.type = type;
@@ -37,8 +37,8 @@ public class ParameterInfo {
     }
   }
 
-  public ParameterInfo(final String name, final boolean required,
-    final DataType type, final String description, final Map<?, ?> allowedValues) {
+  public ParameterInfo(final String name, final boolean required, final DataType type,
+    final String description, final Map<?, ?> allowedValues) {
     this.name = name;
     this.required = required;
     this.type = type;
@@ -50,9 +50,8 @@ public class ParameterInfo {
     }
   }
 
-  public ParameterInfo(final String name, final boolean required,
-    final DataType type, final String description, final Object defaultValue,
-    final Map<?, ?> allowedValues) {
+  public ParameterInfo(final String name, final boolean required, final DataType type,
+    final String description, final Object defaultValue, final Map<?, ?> allowedValues) {
     this.name = name;
     this.required = required;
     this.type = type;

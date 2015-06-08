@@ -17,8 +17,7 @@ public class HttpSavedRequestAndResponse implements AutoCloseable {
 
   public HttpSavedRequestAndResponse(final ServletRequest servletRequest,
     final ServletResponse servletResponse) {
-    this((HttpServletRequest)servletRequest,
-      (HttpServletResponse)servletResponse);
+    this((HttpServletRequest)servletRequest, (HttpServletResponse)servletResponse);
 
   }
 
@@ -27,8 +26,7 @@ public class HttpSavedRequestAndResponse implements AutoCloseable {
     if (this.savedRequest == null) {
       HttpServletUtils.clearRequestAndResponse();
     } else {
-      HttpServletUtils.setRequestAndResponse(this.savedRequest,
-        this.savedResponse);
+      HttpServletUtils.setRequestAndResponse(this.savedRequest, this.savedResponse);
     }
   }
 }

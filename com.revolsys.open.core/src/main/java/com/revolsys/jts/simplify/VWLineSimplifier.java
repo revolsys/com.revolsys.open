@@ -16,6 +16,8 @@ import com.revolsys.jts.geom.impl.PointDouble;
  */
 class VWLineSimplifier {
   static class VWVertex {
+    public static double MAX_AREA = Double.MAX_VALUE;
+
     public static VWLineSimplifier.VWVertex buildLine(final LineString pts) {
       VWLineSimplifier.VWVertex first = null;
       VWLineSimplifier.VWVertex prev = null;
@@ -33,8 +35,6 @@ class VWLineSimplifier {
       }
       return first;
     }
-
-    public static double MAX_AREA = Double.MAX_VALUE;
 
     private final Point pt;
 
@@ -105,10 +105,8 @@ class VWLineSimplifier {
     }
   }
 
-  public static Point[] simplify(final LineString coords,
-    final double distanceTolerance) {
-    final VWLineSimplifier simp = new VWLineSimplifier(coords,
-      distanceTolerance);
+  public static Point[] simplify(final LineString coords, final double distanceTolerance) {
+    final VWLineSimplifier simp = new VWLineSimplifier(coords, distanceTolerance);
     return simp.simplify();
   }
 

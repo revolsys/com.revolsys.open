@@ -17,21 +17,19 @@ import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.file.FileTreeNode;
 import com.revolsys.util.OS;
 
-public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
-implements PropertyChangeListener {
+public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode implements
+  PropertyChangeListener {
 
-  private static final MenuFactory MENU = new MenuFactory(
-    "Record Store Connections");
+  private static final MenuFactory MENU = new MenuFactory("Record Store Connections");
 
   static {
     if (OS.isMac()) {
-      MENU.addMenuItem("default", TreeNodeRunnable.createAction(
-        "Add Connection", "database_add", "addConnection"));
+      MENU.addMenuItem("default",
+        TreeNodeRunnable.createAction("Add Connection", "database_add", "addConnection"));
     }
   }
 
-  public RecordStoreConnectionRegistryTreeNode(
-    final RecordStoreConnectionRegistry registry) {
+  public RecordStoreConnectionRegistryTreeNode(final RecordStoreConnectionRegistry registry) {
     super(registry);
     setType("Record Store Connections");
     setName(registry.getName());
@@ -40,8 +38,7 @@ implements PropertyChangeListener {
 
   public void addConnection() {
     final RecordStoreConnectionRegistry registry = getRegistry();
-    final RecordStoreConnectionDialog dialog = new RecordStoreConnectionDialog(
-      registry);
+    final RecordStoreConnectionDialog dialog = new RecordStoreConnectionDialog(registry);
     dialog.setVisible(true);
   }
 
@@ -51,8 +48,7 @@ implements PropertyChangeListener {
     final RecordStoreConnectionRegistry registry = getRegistry();
     final List<RecordStoreConnection> conections = registry.getConections();
     for (final RecordStoreConnection connection : conections) {
-      final RecordStoreConnectionTreeNode child = new RecordStoreConnectionTreeNode(
-        connection);
+      final RecordStoreConnectionTreeNode child = new RecordStoreConnectionTreeNode(connection);
       children.add(child);
     }
     return children;

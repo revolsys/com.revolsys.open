@@ -32,9 +32,9 @@ public class BingClient {
   public static final int TILE_SIZE = 256;
 
   private static final double[] METRES_PER_PIXEL = {
-    78271.517, 39135.7585, 19567.8792, 9783.9396, 4891.9698, 2445.9849,
-    1222.9925, 611.4962, 305.7481, 152.8741, 76.437, 38.2185, 19.1093, 9.5546,
-    4.7773, 2.3887, 1.1943, 0.5972, 0.2986, 0.1493, 0.0746
+    78271.517, 39135.7585, 19567.8792, 9783.9396, 4891.9698, 2445.9849, 1222.9925, 611.4962,
+    305.7481, 152.8741, 76.437, 38.2185, 19.1093, 9.5546, 4.7773, 2.3887, 1.1943, 0.5972, 0.2986,
+    0.1493, 0.0746
   };
 
   private final String bingMapsKey;
@@ -59,8 +59,7 @@ public class BingClient {
     return parameters;
   }
 
-  public BoundingBox getBoundingBox(final int zoomLevel, final int tileX,
-    final int tileY) {
+  public BoundingBox getBoundingBox(final int zoomLevel, final int tileX, final int tileY) {
     final double y1 = getLatitude(zoomLevel, tileY);
     final double y2 = getLatitude(zoomLevel, tileY + 1);
     final double x1 = getLongitude(zoomLevel, tileX);
@@ -88,8 +87,7 @@ public class BingClient {
     }
     final Map<String, Object> parameters = createParameterMap();
     parameters.put("output", "json");
-    return UrlUtil.getUrl(
-      "http://dev.virtualearth.net/REST/V1/Imagery/Metadata/" + imagerySet,
+    return UrlUtil.getUrl("http://dev.virtualearth.net/REST/V1/Imagery/Metadata/" + imagerySet,
       parameters);
   }
 
@@ -106,8 +104,8 @@ public class BingClient {
     return 360 * x;
   }
 
-  public BufferedImage getMapImage(final ImagerySet imagerySet,
-    final MapLayer mapLayer, final String quadKey) {
+  public BufferedImage getMapImage(final ImagerySet imagerySet, final MapLayer mapLayer,
+    final String quadKey) {
     final String url = getMapUrl(imagerySet, mapLayer, quadKey);
     if (url == null) {
       return null;
@@ -122,12 +120,11 @@ public class BingClient {
     }
   }
 
-  public Image getMapImage(final ImagerySet imagerySet,
-    final MapLayer mapLayer, final String format, final double minX,
-    final double minY, final double maxX, final double maxY,
-    final Integer width, final Integer height, final double scale) {
-    final String url = getMapUrl(imagerySet, mapLayer, format, minX, minY,
-      maxX, maxY, width, height);
+  public Image getMapImage(final ImagerySet imagerySet, final MapLayer mapLayer,
+    final String format, final double minX, final double minY, final double maxX,
+    final double maxY, final Integer width, final Integer height, final double scale) {
+    final String url = getMapUrl(imagerySet, mapLayer, format, minX, minY, maxX, maxY, width,
+      height);
     try {
       final URLConnection connection = new URL(url).openConnection();
       final InputStream in = connection.getInputStream();
@@ -142,8 +139,7 @@ public class BingClient {
   }
 
   @SuppressWarnings("unchecked")
-  public String getMapUrl(ImagerySet imagerySet, final MapLayer mapLayer,
-    final String quadKey) {
+  public String getMapUrl(ImagerySet imagerySet, final MapLayer mapLayer, final String quadKey) {
     if (imagerySet == null) {
       imagerySet = ImagerySet.Aerial;
     }
@@ -177,39 +173,35 @@ public class BingClient {
 
   }
 
-  public String getMapUrl(ImagerySet imagerySet, final MapLayer mapLayer,
-    final String format, final double minX, final double minY,
-    final double maxX, final double maxY, Integer width, Integer height) {
+  public String getMapUrl(ImagerySet imagerySet, final MapLayer mapLayer, final String format,
+    final double minX, final double minY, final double maxX, final double maxY, Integer width,
+    Integer height) {
     if (imagerySet == null) {
       imagerySet = ImagerySet.Aerial;
     }
     if (width == null) {
       width = 350;
     } else if (width < 80 || width > 900) {
-      throw new IllegalArgumentException("Width must be between 80-900 not "
-          + width);
+      throw new IllegalArgumentException("Width must be between 80-900 not " + width);
     }
     if (height == null) {
       height = 350;
     } else if (height < 80 || height > 834) {
-      throw new IllegalArgumentException("Height must be between 80-834 not "
-          + height);
+      throw new IllegalArgumentException("Height must be between 80-834 not " + height);
     }
     final double centreX = minX + (maxX - minX) / 2;
     final double centreY = minY + (maxY - minY) / 2;
     final Map<String, Object> parameters = createParameterMap();
-    parameters.put(
-      "mapArea",
-      StringConverterRegistry.toString(minY) + ","
-          + StringConverterRegistry.toString(minX) + ","
-          + StringConverterRegistry.toString(maxY) + ","
-          + StringConverterRegistry.toString(maxX));
+    parameters.put("mapArea", StringConverterRegistry.toString(minY) + ","
+      + StringConverterRegistry.toString(minX) + "," + StringConverterRegistry.toString(maxY) + ","
+      + StringConverterRegistry.toString(maxX));
     parameters.put("mapSize", width + "," + height);
     parameters.put("mapLayer", mapLayer);
     parameters.put("format", format);
 
-    return UrlUtil.getUrl("http://dev.virtualearth.net/REST/v1/Imagery/Map/"
-        + imagerySet + "/" + StringConverterRegistry.toString(centreY) + ","
+    return UrlUtil.getUrl(
+      "http://dev.virtualearth.net/REST/v1/Imagery/Map/" + imagerySet + "/"
+        + StringConverterRegistry.toString(centreY) + ","
         + StringConverterRegistry.toString(centreX), parameters);
   }
 
@@ -246,8 +238,7 @@ public class BingClient {
 
   public int getTileY(final int zoomLevel, final double latitude) {
     final double sinLatitude = Math.sin(latitude * Math.PI / 180);
-    final int tileY = (int)Math.floor((0.5 - Math.log((1 + sinLatitude)
-      / (1 - sinLatitude))
+    final int tileY = (int)Math.floor((0.5 - Math.log((1 + sinLatitude) / (1 - sinLatitude))
       / (4 * Math.PI))
       * Math.pow(2, zoomLevel));
     return tileY;

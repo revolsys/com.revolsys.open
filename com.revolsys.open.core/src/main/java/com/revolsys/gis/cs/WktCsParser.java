@@ -65,8 +65,7 @@ public class WktCsParser {
     final int startIndex = this.index;
 
     char currentChar = this.value.charAt(this.index);
-    while (Character.isDigit(currentChar) || currentChar == '.'
-        || currentChar == '-') {
+    while (Character.isDigit(currentChar) || currentChar == '.' || currentChar == '-') {
       this.index++;
       currentChar = this.value.charAt(this.index);
     }
@@ -187,8 +186,7 @@ public class WktCsParser {
     return new Datum(name, spheroid, toWgs84, authority);
   }
 
-  private GeographicCoordinateSystem processGeographicCoordinateSystem(
-    final List<Object> values) {
+  private GeographicCoordinateSystem processGeographicCoordinateSystem(final List<Object> values) {
     final String name = (String)values.get(0);
     final Datum datum = (Datum)values.get(1);
     final PrimeMeridian primeMeridian = (PrimeMeridian)values.get(2);
@@ -214,8 +212,8 @@ public class WktCsParser {
         authorityId = Integer.parseInt(authorityCode);
       }
     }
-    return new GeographicCoordinateSystem(authorityId, name, datum,
-      primeMeridian, angularUnit, axis, authority);
+    return new GeographicCoordinateSystem(authorityId, name, datum, primeMeridian, angularUnit,
+      axis, authority);
   }
 
   private LinearUnit processLinearUnit(final List<Object> values) {
@@ -239,8 +237,7 @@ public class WktCsParser {
   }
 
   @SuppressWarnings("unchecked")
-  private ProjectedCoordinateSystem processProjectedCoordinateSystem(
-    final List<Object> values) {
+  private ProjectedCoordinateSystem processProjectedCoordinateSystem(final List<Object> values) {
     int index = 0;
     final String name = (String)values.get(index++);
     final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)values.get(index++);
@@ -279,9 +276,8 @@ public class WktCsParser {
         srid = Integer.parseInt(code);
       }
     }
-    return new ProjectedCoordinateSystem(srid, name,
-      geographicCoordinateSystem, projection, parameters, linearUnit, axis,
-      authority);
+    return new ProjectedCoordinateSystem(srid, name, geographicCoordinateSystem, projection,
+      parameters, linearUnit, axis, authority);
   }
 
   private Projection processProjection(final List<Object> values) {
@@ -297,8 +293,8 @@ public class WktCsParser {
     if (values.size() > 3) {
       authority = (Authority)values.get(3);
     }
-    return new Spheroid(name, semiMajorAxis.doubleValue(),
-      inverseFlattening.doubleValue(), authority);
+    return new Spheroid(name, semiMajorAxis.doubleValue(), inverseFlattening.doubleValue(),
+      authority);
   }
 
   private ToWgs84 processToWgs84(final List<Object> values) {

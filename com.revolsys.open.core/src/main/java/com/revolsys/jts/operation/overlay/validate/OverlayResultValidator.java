@@ -59,14 +59,14 @@ import com.revolsys.jts.operation.overlay.snap.GeometrySnapper;
  * @see OverlayOp
  */
 public class OverlayResultValidator {
-  private static double computeBoundaryDistanceTolerance(final Geometry g0,
-    final Geometry g1) {
+  private static final double TOLERANCE = 0.000001;
+
+  private static double computeBoundaryDistanceTolerance(final Geometry g0, final Geometry g1) {
     return Math.min(GeometrySnapper.computeSizeBasedSnapTolerance(g0),
       GeometrySnapper.computeSizeBasedSnapTolerance(g1));
   }
 
-  private static boolean hasLocation(final Location[] location,
-    final Location loc) {
+  private static boolean hasLocation(final Location[] location, final Location loc) {
     for (int i = 0; i < 3; i++) {
       if (location[i] == loc) {
         return true;
@@ -75,14 +75,11 @@ public class OverlayResultValidator {
     return false;
   }
 
-  public static boolean isValid(final Geometry a, final Geometry b,
-    final int overlayOp, final Geometry result) {
-    final OverlayResultValidator validator = new OverlayResultValidator(a, b,
-      result);
+  public static boolean isValid(final Geometry a, final Geometry b, final int overlayOp,
+    final Geometry result) {
+    final OverlayResultValidator validator = new OverlayResultValidator(a, b, result);
     return validator.isValid(overlayOp);
   }
-
-  private static final double TOLERANCE = 0.000001;
 
   private final Geometry[] geom;
 
@@ -96,8 +93,7 @@ public class OverlayResultValidator {
 
   private final List<Point> testCoords = new ArrayList<>();
 
-  public OverlayResultValidator(final Geometry a, final Geometry b,
-    final Geometry result) {
+  public OverlayResultValidator(final Geometry a, final Geometry b, final Geometry result) {
     /**
      * The tolerance to use needs to depend on the size of the geometries.
      * It should not be more precise than double-precision can support.
@@ -164,8 +160,7 @@ public class OverlayResultValidator {
   }
 
   private boolean isValidResult(final int overlayOp, final Location[] location) {
-    final boolean expectedInterior = OverlayOp.isResultOfOp(location[0],
-      location[1], overlayOp);
+    final boolean expectedInterior = OverlayOp.isResultOfOp(location[0], location[1], overlayOp);
 
     final boolean resultInInterior = location[2] == Location.INTERIOR;
     // MD use simpler: boolean isValid = (expectedInterior == resultInInterior);
@@ -180,10 +175,8 @@ public class OverlayResultValidator {
 
   private void reportResult(final int overlayOp, final Location[] location,
     final boolean expectedInterior) {
-    System.out.println("Overlay result invalid - A:"
-        + Location.toLocationSymbol(location[0]) + " B:"
-        + Location.toLocationSymbol(location[1]) + " expected:"
-        + (expectedInterior ? 'i' : 'e') + " actual:"
-        + Location.toLocationSymbol(location[2]));
+    System.out.println("Overlay result invalid - A:" + Location.toLocationSymbol(location[0])
+      + " B:" + Location.toLocationSymbol(location[1]) + " expected:"
+      + (expectedInterior ? 'i' : 'e') + " actual:" + Location.toLocationSymbol(location[2]));
   }
 }

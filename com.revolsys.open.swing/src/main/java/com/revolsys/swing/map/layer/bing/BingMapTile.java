@@ -10,10 +10,9 @@ public class BingMapTile extends MapTile {
 
   private final BingLayer layer;
 
-  public BingMapTile(final BingLayer layer, final int zoomLevel,
-    final double resolution, final int tileX, final int tileY) {
-    super(layer.getClient().getBoundingBox(zoomLevel, tileX, tileY), 256, 256,
-      resolution);
+  public BingMapTile(final BingLayer layer, final int zoomLevel, final double resolution,
+    final int tileX, final int tileY) {
+    super(layer.getClient().getBoundingBox(zoomLevel, tileX, tileY), 256, 256, resolution);
     this.layer = layer;
     this.quadKey = layer.getClient().getQuadKey(zoomLevel, tileX, tileY);
   }
@@ -46,8 +45,7 @@ public class BingMapTile extends MapTile {
       final BingClient client = this.layer.getClient();
       final ImagerySet imagerySet = this.layer.getImagerySetEnum();
       final MapLayer mapLayer = this.layer.getMapLayerEnum();
-      final BufferedImage image = client.getMapImage(imagerySet, mapLayer,
-        this.quadKey);
+      final BufferedImage image = client.getMapImage(imagerySet, mapLayer, this.quadKey);
       return image;
     } catch (final Throwable t) {
       this.layer.setError(t);

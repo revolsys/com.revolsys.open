@@ -23,8 +23,19 @@ import com.revolsys.collection.map.WeakCache;
 import com.revolsys.util.OS;
 
 public class Icons {
-  public static void addIcon(final List<Icon> icons, Icon icon,
-    final boolean enabled) {
+  public static final String RESOURCE_FOLDER = "/com/revolsys/famfamfam/silk/icons/";
+
+  private static final Map<String, Reference<BufferedImage>> IMAGE_CACHE = new HashMap<>();
+
+  private static final Map<String, Reference<BufferedImage>> DISABLED_IMAGE_CACHE = new HashMap<>();
+
+  private static final Map<String, Reference<ImageIcon>> ICON_CACHE = new HashMap<>();
+
+  private static final Map<String, Reference<ImageIcon>> DISABLED_ICON_CACHE = new HashMap<>();
+
+  private static final Map<Icon, Reference<ImageIcon>> DISABLED_ICON_BY_ICON = new WeakCache<>();
+
+  public static void addIcon(final List<Icon> icons, Icon icon, final boolean enabled) {
     if (icon != null) {
       if (!enabled) {
         icon = Icons.getDisabledIcon(icon);
@@ -33,8 +44,7 @@ public class Icons {
     }
   }
 
-  public static BufferedImage alpha(final BufferedImage original,
-    final float percent) {
+  public static BufferedImage alpha(final BufferedImage original, final float percent) {
     final int width = original.getWidth();
     final int height = original.getHeight();
     final int type = original.getType();
@@ -49,13 +59,13 @@ public class Icons {
       for (int j = 0; j < height; j++) {
         final int rgb = original.getRGB(i, j);
         final int alpha = rgb >> 24 & 0xff;
-      final int red = rgb >> 16 & 0xff;
-    final int green = rgb >> 8 & 0xff;
-    final int blue = rgb & 0xff;
-    final int newAlpha = (int)Math.ceil(alpha * percent);
-    final int newRgb = WebColors.colorToRGB(newAlpha, red, green, blue);
+        final int red = rgb >> 16 & 0xff;
+        final int green = rgb >> 8 & 0xff;
+        final int blue = rgb & 0xff;
+        final int newAlpha = (int)Math.ceil(alpha * percent);
+        final int newRgb = WebColors.colorToRGB(newAlpha, red, green, blue);
 
-    newImage.setRGB(i, j, newRgb);
+        newImage.setRGB(i, j, newRgb);
       }
     }
     return newImage;
@@ -70,16 +80,14 @@ public class Icons {
     return getCursor(imageName, delta, delta);
   }
 
-  public static Cursor getCursor(final String imageName, final int dx,
-    final int dy) {
+  public static Cursor getCursor(final String imageName, final int dx, final int dy) {
     Image image = getImage(imageName);
     if (image == null) {
       return null;
     } else {
       final Toolkit toolkit = Toolkit.getDefaultToolkit();
       if (OS.isWindows()) {
-        final BufferedImage newImage = new BufferedImage(32, 32,
-          BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage newImage = new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB);
         final Graphics graphics = newImage.getGraphics();
         graphics.drawImage(image, 0, 0, null);
         graphics.dispose();
@@ -101,8 +109,7 @@ public class Icons {
       if (disabledIcon == null) {
         if (icon instanceof ImageIcon) {
           final ImageIcon imageIcon = (ImageIcon)icon;
-          disabledIcon = new ImageIcon(
-            getDisabledImage((BufferedImage)imageIcon.getImage()));
+          disabledIcon = new ImageIcon(getDisabledImage((BufferedImage)imageIcon.getImage()));
         } else {
           return icon;
         }
@@ -173,8 +180,8 @@ public class Icons {
     if (in != null) {
       try {
         final BufferedImage image = ImageIO.read(in);
-        final BufferedImage convertedImg = new BufferedImage(image.getWidth(),
-          image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage convertedImg = new BufferedImage(image.getWidth(), image.getHeight(),
+          BufferedImage.TYPE_INT_ARGB);
         final Graphics graphics = convertedImg.getGraphics();
         graphics.drawImage(image, 0, 0, null);
         graphics.dispose();
@@ -200,21 +207,19 @@ public class Icons {
     return image;
   }
 
-  public static BufferedImage getImage(final String imageName,
-    final String fileExtension) {
+  public static BufferedImage getImage(final String imageName, final String fileExtension) {
     BufferedImage image;
     final Class<?> clazz = Icons.class;
-    final String resourceName = RESOURCE_FOLDER + imageName + "."
-        + fileExtension;
+    final String resourceName = RESOURCE_FOLDER + imageName + "." + fileExtension;
     InputStream in = clazz.getResourceAsStream(resourceName);
     if (in == null) {
       in = Thread.currentThread()
-          .getContextClassLoader()
-          .getResourceAsStream("images/" + imageName + "." + fileExtension);
+        .getContextClassLoader()
+        .getResourceAsStream("images/" + imageName + "." + fileExtension);
       if (in == null) {
         in = Thread.currentThread()
-            .getContextClassLoader()
-            .getResourceAsStream("icons/" + imageName + "." + fileExtension);
+          .getContextClassLoader()
+          .getResourceAsStream("icons/" + imageName + "." + fileExtension);
       }
     }
     image = getImage(in);
@@ -236,15 +241,15 @@ public class Icons {
       for (int j = 0; j < height; j++) {
         final int rgb = original.getRGB(i, j);
         final int alpha = rgb >> 24 & 0xff;
-      final int red = rgb >> 16 & 0xff;
-    final int green = rgb >> 8 & 0xff;
-    final int blue = rgb & 0xff;
+        final int red = rgb >> 16 & 0xff;
+        final int green = rgb >> 8 & 0xff;
+        final int blue = rgb & 0xff;
 
-    int newRgb = red + green + blue;
-    newRgb = avgLUT[newRgb];
-    newRgb = WebColors.colorToRGB(alpha, newRgb, newRgb, newRgb);
+        int newRgb = red + green + blue;
+        newRgb = avgLUT[newRgb];
+        newRgb = WebColors.colorToRGB(alpha, newRgb, newRgb, newRgb);
 
-    newImage.setRGB(i, j, newRgb);
+        newImage.setRGB(i, j, newRgb);
       }
     }
     return newImage;
@@ -288,17 +293,5 @@ public class Icons {
 
     return new ImageIcon(newImage);
   }
-
-  public static final String RESOURCE_FOLDER = "/com/revolsys/famfamfam/silk/icons/";
-
-  private static final Map<String, Reference<BufferedImage>> IMAGE_CACHE = new HashMap<>();
-
-  private static final Map<String, Reference<BufferedImage>> DISABLED_IMAGE_CACHE = new HashMap<>();
-
-  private static final Map<String, Reference<ImageIcon>> ICON_CACHE = new HashMap<>();
-
-  private static final Map<String, Reference<ImageIcon>> DISABLED_ICON_CACHE = new HashMap<>();
-
-  private static final Map<Icon, Reference<ImageIcon>> DISABLED_ICON_BY_ICON = new WeakCache<>();
 
 }

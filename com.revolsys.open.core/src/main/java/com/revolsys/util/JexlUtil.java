@@ -30,17 +30,19 @@ import org.apache.log4j.Logger;
  * @author Paul Austin
  */
 public final class JexlUtil {
+  /** The default expression pattern matching expressions in the form ${el}. */
+  public static final String DEFAULT_EXPRESSION_PATTERN = "\\$\\{([^\\}]+)\\}";
+
+  private static final Logger LOG = Logger.getLogger(JexlUtil.class);
+
   /**
    * Add the text to the Jexl expression, wrapping the text in a '' string.
    *
    * @param jexlExpression The expression to add the test to.
    * @param text The text to add.
    */
-  private static void addText(final StringBuilder jexlExpression,
-    final String text) {
-    jexlExpression.append("'")
-    .append(text.replaceAll("'", "' + \"'\" + '"))
-    .append("'");
+  private static void addText(final StringBuilder jexlExpression, final String text) {
+    jexlExpression.append("'").append(text.replaceAll("'", "' + \"'\" + '")).append("'");
   }
 
   /**
@@ -52,8 +54,7 @@ public final class JexlUtil {
    * @return The expression object for the string expression.
    * @throws Exception If there was an error creating the expression.
    */
-  public static Expression createExpression(final String expression)
-      throws Exception {
+  public static Expression createExpression(final String expression) throws Exception {
     return createExpression(expression, DEFAULT_EXPRESSION_PATTERN);
   }
 
@@ -79,8 +80,8 @@ public final class JexlUtil {
    * @return The expression object for the string expression.
    * @throws Exception If there was an error creating the expression.
    */
-  public static Expression createExpression(final String expression,
-    final String expressionPattern) throws Exception {
+  public static Expression createExpression(final String expression, final String expressionPattern)
+    throws Exception {
     final String newExpression = expression.replaceAll("\n", "");
     // Wrap the entires expression in '' and replace the expressions in the
     // form "${expr)" to ' + expr + '
@@ -114,21 +115,15 @@ public final class JexlUtil {
     }
   }
 
-  public static Object evaluateExpression(final JexlContext context,
-    final Expression expression) {
+  public static Object evaluateExpression(final JexlContext context, final Expression expression) {
     try {
       return expression.evaluate(context);
     } catch (final Exception e) {
-      LOG.error("Unable to evaluate expression '" + expression.getExpression()
-        + "': " + e.getMessage(), e);
+      LOG.error(
+        "Unable to evaluate expression '" + expression.getExpression() + "': " + e.getMessage(), e);
       return null;
     }
   }
-
-  /** The default expression pattern matching expressions in the form ${el}. */
-  public static final String DEFAULT_EXPRESSION_PATTERN = "\\$\\{([^\\}]+)\\}";
-
-  private static final Logger LOG = Logger.getLogger(JexlUtil.class);
 
   /**
    * Construct a new JexlUtil.

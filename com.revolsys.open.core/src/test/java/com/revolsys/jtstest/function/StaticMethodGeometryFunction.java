@@ -51,6 +51,12 @@ import com.revolsys.jtstest.testrunner.StringUtil;
  *
  */
 public class StaticMethodGeometryFunction extends BaseGeometryFunction {
+  private static final String FUNCTIONS_SUFFIX = "Functions";
+
+  private static final String PARAMETERS_SUFFIX = "Parameters";
+
+  private static final String DESCRIPTION_SUFFIX = "Description";
+
   /**
    * Creates an arg array which includes the target geometry as the first argument
    *
@@ -83,15 +89,14 @@ public class StaticMethodGeometryFunction extends BaseGeometryFunction {
     final Class[] paramTypes = extractParamTypes(method);
     final Class returnType = method.getReturnType();
 
-    return new StaticMethodGeometryFunction(category, funcName, description,
-      paramNames, paramTypes, returnType, method);
+    return new StaticMethodGeometryFunction(category, funcName, description, paramNames,
+      paramTypes, returnType, method);
   }
 
-  public static Object dynamicCall(final String clzName,
-    final String methodName, final Class[] methodParamTypes,
-    final Object[] methodArgs) throws ClassNotFoundException,
-    SecurityException, NoSuchMethodException, IllegalArgumentException,
-    InstantiationException, IllegalAccessException, InvocationTargetException {
+  public static Object dynamicCall(final String clzName, final String methodName,
+    final Class[] methodParamTypes, final Object[] methodArgs) throws ClassNotFoundException,
+    SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
+    IllegalAccessException, InvocationTargetException {
     final Class clz = Class.forName(clzName);
 
     final Class[] constParTypes = new Class[] {
@@ -155,8 +160,7 @@ public class StaticMethodGeometryFunction extends BaseGeometryFunction {
     return jClassName.substring(lastDotPos + 1, jClassName.length());
   }
 
-  public static String[] getStringArrayClassField(final Class clz,
-    final String name) {
+  public static String[] getStringArrayClassField(final Class clz, final String name) {
     try {
       final Field field = clz.getField(name);
       final String[] str = (String[])field.get(null);
@@ -180,13 +184,11 @@ public class StaticMethodGeometryFunction extends BaseGeometryFunction {
 
   private static String invocationErrMsg(final InvocationTargetException ex) {
     final Throwable targetEx = ex.getTargetException();
-    final String msg = getClassname(targetEx.getClass()) + ": "
-        + targetEx.getMessage();
+    final String msg = getClassname(targetEx.getClass()) + ": " + targetEx.getMessage();
     return msg;
   }
 
-  public static Object invoke(final Method method, final Object target,
-    final Object[] args) {
+  public static Object invoke(final Method method, final Object target, final Object[] args) {
     Object result;
     try {
       result = method.invoke(target, args);
@@ -203,19 +205,12 @@ public class StaticMethodGeometryFunction extends BaseGeometryFunction {
     return result;
   }
 
-  private static final String FUNCTIONS_SUFFIX = "Functions";
-
-  private static final String PARAMETERS_SUFFIX = "Parameters";
-
-  private static final String DESCRIPTION_SUFFIX = "Description";
-
   private final Method method;
 
   public StaticMethodGeometryFunction(final String category, final String name,
-    final String description, final String[] parameterNames,
-    final Class[] parameterTypes, final Class returnType, final Method method) {
-    super(category, name, description, parameterNames, parameterTypes,
-      returnType);
+    final String description, final String[] parameterNames, final Class[] parameterTypes,
+    final Class returnType, final Method method) {
+    super(category, name, description, parameterNames, parameterTypes, returnType);
     this.method = method;
   }
 

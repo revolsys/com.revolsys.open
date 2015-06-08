@@ -28,20 +28,19 @@ public class InvokeMethodSwingWorker<T, V> extends AbstractSwingWorker<T, V> {
 
   public InvokeMethodSwingWorker(final String description, final Object object,
     final String backgroundMethodName) {
-    this(description, object, backgroundMethodName, Collections.emptyList(),
-      null, Collections.emptyList());
+    this(description, object, backgroundMethodName, Collections.emptyList(), null,
+      Collections.emptyList());
   }
 
   public InvokeMethodSwingWorker(final String description, final Object object,
     final String backgroundMethodName,
-    final Collection<? extends Object> backgroundMethodParameters,
-    final String doneMethodName,
+    final Collection<? extends Object> backgroundMethodParameters, final String doneMethodName,
     final Collection<? extends Object> doneMethodParameters) {
     this.description = description;
     this.doneObject = object;
     if (Property.hasValue(backgroundMethodName)) {
-      this.backgroundTask = new InvokeMethodCallable<T>(object,
-          backgroundMethodName, backgroundMethodParameters.toArray());
+      this.backgroundTask = new InvokeMethodCallable<T>(object, backgroundMethodName,
+        backgroundMethodParameters.toArray());
     }
     if (Property.hasValue(doneMethodName)) {
       this.doneMethodName = doneMethodName;
@@ -54,14 +53,13 @@ public class InvokeMethodSwingWorker<T, V> extends AbstractSwingWorker<T, V> {
 
   public InvokeMethodSwingWorker(final String description, final Object object,
     final String backgroundMethodName, final Collection<Object> parameters) {
-    this(description, object, backgroundMethodName, parameters, null,
-      Collections.emptyList());
+    this(description, object, backgroundMethodName, parameters, null, Collections.emptyList());
   }
 
   public InvokeMethodSwingWorker(final String description, final Object object,
     final String backgroundMethodName, final String doneMethodName) {
-    this(description, object, backgroundMethodName, Collections.emptyList(),
-      doneMethodName, Collections.emptyList());
+    this(description, object, backgroundMethodName, Collections.emptyList(), doneMethodName,
+      Collections.emptyList());
   }
 
   @Override
@@ -93,26 +91,21 @@ public class InvokeMethodSwingWorker<T, V> extends AbstractSwingWorker<T, V> {
       throw new ThreadInterruptedException(e);
     } catch (final ExecutionException e) {
       final Throwable cause = e.getCause();
-      ExceptionUtil.log(getClass(), "Error running " + this.description
-        + " using " + this.backgroundTask, cause);
+      ExceptionUtil.log(getClass(), "Error running " + this.description + " using "
+        + this.backgroundTask, cause);
       return;
     }
     if (this.doneMethodName != null) {
-      final List<Object> parameters = new ArrayList<Object>(
-          this.doneMethodParameters);
+      final List<Object> parameters = new ArrayList<Object>(this.doneMethodParameters);
       if (result != null) {
         parameters.add(result);
       }
       try {
-        InvokeMethodRunnable.run(this.doneObject, this.doneMethodName,
-          parameters);
+        InvokeMethodRunnable.run(this.doneObject, this.doneMethodName, parameters);
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error(
-          "Error running "
-              + this.description
-              + " using "
-              + Property.toString(this.doneObject, this.doneMethodName,
-                parameters), e);
+          "Error running " + this.description + " using "
+            + Property.toString(this.doneObject, this.doneMethodName, parameters), e);
       }
     }
   }

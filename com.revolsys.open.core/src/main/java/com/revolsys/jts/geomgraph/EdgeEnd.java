@@ -59,6 +59,7 @@ public class EdgeEnd implements Comparable {
   private Point p0, p1; // points of initial line segment
 
   private double dx, dy; // the direction vector for this edge from its starting
+
   // point
 
   private int quadrant;
@@ -71,8 +72,7 @@ public class EdgeEnd implements Comparable {
     this(edge, p0, p1, null);
   }
 
-  public EdgeEnd(final Edge edge, final Point p0, final Point p1,
-    final Label label) {
+  public EdgeEnd(final Edge edge, final Point p0, final Point p1, final Label label) {
     this(edge);
     init(p0, p1);
     this.setLabel(label);
@@ -185,8 +185,7 @@ public class EdgeEnd implements Comparable {
     this.dx = p1.getX() - p0.getX();
     this.dy = p1.getY() - p0.getY();
     this.quadrant = Quadrant.quadrant(this.dx, this.dy);
-    Assert.isTrue(!(this.dx == 0 && this.dy == 0),
-        "EdgeEnd with identical endpoints found");
+    Assert.isTrue(!(this.dx == 0 && this.dy == 0), "EdgeEnd with identical endpoints found");
   }
 
   public void print(final PrintStream out) {
@@ -194,8 +193,8 @@ public class EdgeEnd implements Comparable {
     final String className = getClass().getName();
     final int lastDotPos = className.lastIndexOf('.');
     final String name = className.substring(lastDotPos + 1);
-    out.print("  " + name + ": " + this.p0 + " - " + this.p1 + " " + this.quadrant + ":"
-        + angle + "   " + getLabel());
+    out.print("  " + name + ": " + this.p0 + " - " + this.p1 + " " + this.quadrant + ":" + angle
+      + "   " + getLabel());
   }
 
   protected void setLabel(final Label label) {
@@ -213,6 +212,6 @@ public class EdgeEnd implements Comparable {
     final int lastDotPos = className.lastIndexOf('.');
     final String name = className.substring(lastDotPos + 1);
     return "  " + name + ": " + this.p0 + " - " + this.p1 + " " + this.quadrant + ":" + angle
-        + "   " + getLabel();
+      + "   " + getLabel();
   }
 }

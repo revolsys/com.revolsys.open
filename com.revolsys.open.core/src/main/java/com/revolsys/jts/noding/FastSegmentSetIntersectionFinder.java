@@ -45,9 +45,9 @@ import java.util.Collection;
  *
  * @version 1.7
  */
-public class FastSegmentSetIntersectionFinder
-{
+public class FastSegmentSetIntersectionFinder {
   private final SegmentSetMutualIntersector segSetMutInt;
+
   // for testing purposes
   // private SimpleSegmentSetMutualIntersector mci;
 
@@ -56,8 +56,7 @@ public class FastSegmentSetIntersectionFinder
    *
    * @param baseSegStrings the segment strings to search for intersections
    */
-  public FastSegmentSetIntersectionFinder(final Collection baseSegStrings)
-  {
+  public FastSegmentSetIntersectionFinder(final Collection baseSegStrings) {
     this.segSetMutInt = new MCIndexSegmentSetMutualIntersector(baseSegStrings);
   }
 
@@ -67,8 +66,7 @@ public class FastSegmentSetIntersectionFinder
    *
    * @return the segment set intersector used
    */
-  public SegmentSetMutualIntersector getSegmentSetIntersector()
-  {
+  public SegmentSetMutualIntersector getSegmentSetIntersector() {
     return this.segSetMutInt;
   }
 
@@ -78,8 +76,7 @@ public class FastSegmentSetIntersectionFinder
    * @param segStrings the SegmentStrings to test
    * @return true if an intersection is found
    */
-  public boolean intersects(final Collection segStrings)
-  {
+  public boolean intersects(final Collection segStrings) {
     final SegmentIntersectionDetector intFinder = new SegmentIntersectionDetector();
     return intersects(segStrings, intFinder);
   }
@@ -92,8 +89,8 @@ public class FastSegmentSetIntersectionFinder
    * @param intDetector the intersection detector to use
    * @return true if the detector reports intersections
    */
-  public boolean intersects(final Collection segStrings, final SegmentIntersectionDetector intDetector)
-  {
+  public boolean intersects(final Collection segStrings,
+    final SegmentIntersectionDetector intDetector) {
     this.segSetMutInt.process(segStrings, intDetector);
     return intDetector.hasIntersection();
   }

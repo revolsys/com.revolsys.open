@@ -194,9 +194,8 @@ import com.revolsys.jts.operation.valid.IsValidOp;
 public abstract class AbstractGeometry implements Geometry {
   private static final long serialVersionUID = 8763622679187376702L;
 
-  private static final List<String> sortedGeometryTypes = Arrays.asList(
-    "Point", "MultiPoint", "LineString", "LinearRing", "MultiLineString",
-    "Polygon", "MultiPolygon", "GeometryCollection");
+  private static final List<String> sortedGeometryTypes = Arrays.asList("Point", "MultiPoint",
+    "LineString", "LinearRing", "MultiLineString", "Polygon", "MultiPolygon", "GeometryCollection");
 
   public static int[] createVertexId(final int[] partId, final int vertexIndex) {
     final int[] vertexId = new int[partId.length + 1];
@@ -353,8 +352,7 @@ public abstract class AbstractGeometry implements Geometry {
    * @see Buffer
    */
   @Override
-  public Geometry buffer(final double distance, final int quadrantSegments,
-    final int endCapStyle) {
+  public Geometry buffer(final double distance, final int quadrantSegments, final int endCapStyle) {
     return Buffer.buffer(this, distance, quadrantSegments, endCapStyle);
   }
 
@@ -564,8 +562,7 @@ public abstract class AbstractGeometry implements Geometry {
 
   @Override
   @SuppressWarnings("unchecked")
-  public <V extends Geometry> V convert(GeometryFactory geometryFactory,
-    final int axisCount) {
+  public <V extends Geometry> V convert(GeometryFactory geometryFactory, final int axisCount) {
     if (geometryFactory != null) {
       geometryFactory = geometryFactory.convertAxisCount(axisCount);
     }
@@ -770,8 +767,7 @@ public abstract class AbstractGeometry implements Geometry {
   public Geometry difference(final Geometry other) {
     // special case: if A.isEmpty ==> empty; if B.isEmpty ==> A
     if (this.isEmpty()) {
-      return OverlayOp.createEmptyResult(OverlayOp.DIFFERENCE, this, other,
-        getGeometryFactory());
+      return OverlayOp.createEmptyResult(OverlayOp.DIFFERENCE, this, other, getGeometryFactory());
     }
     if (other.isEmpty()) {
       return clone();
@@ -839,8 +835,7 @@ public abstract class AbstractGeometry implements Geometry {
     }
   }
 
-  protected abstract double doDistance(final Geometry geometry,
-    final double terminateDistance);
+  protected abstract double doDistance(final Geometry geometry, final double terminateDistance);
 
   protected abstract boolean doEquals(int axisCount, Geometry geometry);
 
@@ -1225,8 +1220,7 @@ public abstract class AbstractGeometry implements Geometry {
   }
 
   @Override
-  public <V extends Geometry> V getGeometry(
-    final Class<? extends Geometry> geometryClass) {
+  public <V extends Geometry> V getGeometry(final Class<? extends Geometry> geometryClass) {
     final List<? extends Geometry> geometries = getGeometries(geometryClass);
     final GeometryFactory geometryFactory = getGeometryFactory();
     return geometryFactory.geometry(geometries);
@@ -1247,8 +1241,7 @@ public abstract class AbstractGeometry implements Geometry {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> List<V> getGeometryComponents(
-    final Class<V> geometryClass) {
+  public <V extends Geometry> List<V> getGeometryComponents(final Class<V> geometryClass) {
     if (geometryClass.isAssignableFrom(getClass())) {
       return Collections.singletonList((V)this);
     } else {
@@ -1335,8 +1328,7 @@ public abstract class AbstractGeometry implements Geometry {
     return 0.0;
   }
 
-  protected GeometryFactory getNonZeroGeometryFactory(
-    GeometryFactory geometryFactory) {
+  protected GeometryFactory getNonZeroGeometryFactory(GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
       return GeometryFactory.floating3();
     } else {
@@ -1444,20 +1436,18 @@ public abstract class AbstractGeometry implements Geometry {
      */
     // special case: if one input is empty ==> empty
     if (this.isEmpty() || other.isEmpty()) {
-      return OverlayOp.createEmptyResult(OverlayOp.INTERSECTION, this, other,
-        getGeometryFactory());
+      return OverlayOp.createEmptyResult(OverlayOp.INTERSECTION, this, other, getGeometryFactory());
     }
 
     // compute for GCs
     if (this.isGeometryCollection()) {
       final Geometry g2 = other;
-      return GeometryCollectionMapper.map((GeometryCollection)this,
-        new GeometryMapper.MapOp() {
-          @Override
-          public Geometry map(final Geometry g) {
-            return g.intersection(g2);
-          }
-        });
+      return GeometryCollectionMapper.map((GeometryCollection)this, new GeometryMapper.MapOp() {
+        @Override
+        public Geometry map(final Geometry g) {
+          return g.intersection(g2);
+        }
+      });
     }
     // if (isGeometryCollection(other))
     // return other.intersection(this);
@@ -1796,8 +1786,8 @@ public abstract class AbstractGeometry implements Geometry {
     if (this.isEmpty() || other.isEmpty()) {
       // both empty - check dimensions
       if (this.isEmpty() && other.isEmpty()) {
-        return OverlayOp.createEmptyResult(OverlayOp.SYMDIFFERENCE, this,
-          other, getGeometryFactory());
+        return OverlayOp.createEmptyResult(OverlayOp.SYMDIFFERENCE, this, other,
+          getGeometryFactory());
       }
 
       // special case: if either input is empty ==> result = other arg
@@ -1945,8 +1935,7 @@ public abstract class AbstractGeometry implements Geometry {
       return this;
     } else if (isEmpty()) {
       if (other.isEmpty()) {
-        return OverlayOp.createEmptyResult(OverlayOp.UNION, this, other,
-          getGeometryFactory());
+        return OverlayOp.createEmptyResult(OverlayOp.UNION, this, other, getGeometryFactory());
       } else {
         return other;
       }
