@@ -13,7 +13,7 @@ import com.revolsys.data.types.DataType;
 public class JdbcFieldAdder {
   public static String GEOMETRY_FACTORY = "geometryFactory";
 
-  public static String NUM_AXIS = "axisCount";
+  public static String AXIS_COUNT = "axisCount";
 
   public static String GEOMETRY_TYPE = "geometryType";
 
