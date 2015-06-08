@@ -148,9 +148,9 @@ public class JdbcFieldAdder {
   public FieldDefinition addField(final RecordDefinitionImpl recordDefinition, final String dbName,
     final String name, final String dataType, final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
-    JdbcFieldDefinition attribute;
+    JdbcFieldDefinition field;
     if (dataType.equals("oid")) {
-      attribute = new JdbcBlobFieldDefinition(dbName, name, sqlType, length, required, description,
+      field = new JdbcBlobFieldDefinition(dbName, name, sqlType, length, required, description,
         null);
     } else {
       switch (sqlType) {
@@ -158,85 +158,84 @@ public class JdbcFieldAdder {
         case Types.CLOB:
         case Types.LONGVARCHAR:
         case Types.VARCHAR:
-          attribute = new JdbcStringFieldDefinition(dbName, name, sqlType, length, required,
+          field = new JdbcStringFieldDefinition(dbName, name, sqlType, length, required,
             description, null);
         break;
         case Types.BIGINT:
-          attribute = new JdbcLongFieldDefinition(dbName, name, sqlType, length, required,
-            description, null);
+          field = new JdbcLongFieldDefinition(dbName, name, sqlType, length, required, description,
+            null);
         break;
         case Types.INTEGER:
-          attribute = new JdbcIntegerFieldDefinition(dbName, name, sqlType, length, required,
+          field = new JdbcIntegerFieldDefinition(dbName, name, sqlType, length, required,
             description, null);
         break;
         case Types.SMALLINT:
-          attribute = new JdbcShortFieldDefinition(dbName, name, sqlType, length, required,
+          field = new JdbcShortFieldDefinition(dbName, name, sqlType, length, required,
             description, null);
         break;
         case Types.TINYINT:
-          attribute = new JdbcByteFieldDefinition(dbName, name, sqlType, length, required,
-            description, null);
+          field = new JdbcByteFieldDefinition(dbName, name, sqlType, length, required, description,
+            null);
         break;
         case Types.DOUBLE:
-          attribute = new JdbcDoubleFieldDefinition(dbName, name, sqlType, length, required,
+          field = new JdbcDoubleFieldDefinition(dbName, name, sqlType, length, required,
             description, null);
         break;
         case Types.REAL:
-          attribute = new JdbcFloatFieldDefinition(dbName, name, sqlType, length, required,
+          field = new JdbcFloatFieldDefinition(dbName, name, sqlType, length, required,
             description, null);
         break;
         case Types.DECIMAL:
         case Types.NUMERIC:
         case Types.FLOAT:
           if (scale > 0) {
-            attribute = new JdbcBigDecimalFieldDefinition(dbName, name, sqlType, length, scale,
+            field = new JdbcBigDecimalFieldDefinition(dbName, name, sqlType, length, scale,
               required, description, null);
           } else if (length == 131089 || length == 0) {
-            attribute = new JdbcBigDecimalFieldDefinition(dbName, name, sqlType, -1, -1, required,
+            field = new JdbcBigDecimalFieldDefinition(dbName, name, sqlType, -1, -1, required,
               description, null);
           } else {
             if (length <= 2) {
-              attribute = new JdbcByteFieldDefinition(dbName, name, sqlType, length, required,
+              field = new JdbcByteFieldDefinition(dbName, name, sqlType, length, required,
                 description, null);
             } else if (length <= 4) {
-              attribute = new JdbcShortFieldDefinition(dbName, name, sqlType, length, required,
+              field = new JdbcShortFieldDefinition(dbName, name, sqlType, length, required,
                 description, null);
             } else if (length <= 9) {
-              attribute = new JdbcIntegerFieldDefinition(dbName, name, sqlType, length, required,
+              field = new JdbcIntegerFieldDefinition(dbName, name, sqlType, length, required,
                 description, null);
             } else if (length <= 18) {
-              attribute = new JdbcLongFieldDefinition(dbName, name, sqlType, length, required,
+              field = new JdbcLongFieldDefinition(dbName, name, sqlType, length, required,
                 description, null);
             } else {
-              attribute = new JdbcBigIntegerFieldDefinition(dbName, name, sqlType, length,
-                required, description, null);
+              field = new JdbcBigIntegerFieldDefinition(dbName, name, sqlType, length, required,
+                description, null);
             }
           }
         break;
         case Types.DATE:
-          attribute = new JdbcDateFieldDefinition(dbName, name, sqlType, required, description,
-            null);
+          field = new JdbcDateFieldDefinition(dbName, name, sqlType, required, description, null);
         break;
         case Types.TIMESTAMP:
-          attribute = new JdbcTimestampFieldDefinition(dbName, name, sqlType, required,
-            description, null);
+          field = new JdbcTimestampFieldDefinition(dbName, name, sqlType, required, description,
+            null);
         break;
         case Types.BIT:
-          attribute = new JdbcBooleanFieldDefinition(dbName, name, sqlType, length, required,
+          field = new JdbcBooleanFieldDefinition(dbName, name, sqlType, length, required,
             description, null);
         break;
         case Types.BLOB:
-          attribute = new JdbcBlobFieldDefinition(dbName, name, sqlType, length, required,
-            description, null);
+          field = new JdbcBlobFieldDefinition(dbName, name, sqlType, length, required, description,
+            null);
         break;
         default:
-          attribute = new JdbcFieldDefinition(dbName, name, this.dataType, sqlType, length, scale,
+          field = new JdbcFieldDefinition(dbName, name, this.dataType, sqlType, length, scale,
             required, description, null);
         break;
       }
     }
-    recordDefinition.addField(attribute);
-    return attribute;
+    recordDefinition.addField(field);
+    return field;
   }
 
   public void initialize(final RecordStoreSchema schema) {
