@@ -712,7 +712,7 @@ public final class JdbcUtils {
     final PreparedStatement statement, final Query query) {
     int index = 1;
     for (final Object parameter : query.getParameters()) {
-      final JdbcFieldDefinition attribute = JdbcFieldDefinition.createAttribute(parameter);
+      final JdbcFieldDefinition attribute = JdbcFieldDefinition.createField(parameter);
       try {
         index = attribute.setPreparedStatementValue(statement, index, parameter);
       } catch (final SQLException e) {
@@ -727,7 +727,7 @@ public final class JdbcUtils {
 
   public static int setValue(final PreparedStatement statement,
     final int index, final Object value) throws SQLException {
-    final JdbcFieldDefinition attribute = JdbcFieldDefinition.createAttribute(value);
+    final JdbcFieldDefinition attribute = JdbcFieldDefinition.createField(value);
     return attribute.setPreparedStatementValue(statement, index, value);
   }
 

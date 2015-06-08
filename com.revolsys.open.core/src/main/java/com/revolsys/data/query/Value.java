@@ -57,7 +57,7 @@ public class Value extends QueryValue {
   }
 
   public Value(final Object value) {
-    this(JdbcFieldDefinition.createAttribute(value), value);
+    this(JdbcFieldDefinition.createField(value), value);
   }
 
   @Override
@@ -155,7 +155,7 @@ public class Value extends QueryValue {
       if (attribute instanceof JdbcFieldDefinition) {
         this.jdbcAttribute = (JdbcFieldDefinition)attribute;
       } else {
-        this.jdbcAttribute = JdbcFieldDefinition.createAttribute(this.queryValue);
+        this.jdbcAttribute = JdbcFieldDefinition.createField(this.queryValue);
       }
 
       CodeTable codeTable = null;

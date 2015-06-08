@@ -80,7 +80,7 @@ public class SqlCondition extends Condition {
       }
 
       if (jdbcAttribute == null) {
-        jdbcAttribute = JdbcFieldDefinition.createAttribute(value);
+        jdbcAttribute = JdbcFieldDefinition.createField(value);
       }
       try {
         index = jdbcAttribute.setPreparedStatementValue(statement, index, value);

@@ -17,7 +17,7 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 
 public class JdbcFieldDefinition extends FieldDefinition {
-  public static JdbcFieldDefinition createAttribute(final Object value) {
+  public static JdbcFieldDefinition createField(final Object value) {
     if (value == null) {
       return new JdbcFieldDefinition(null, null, DataTypes.OBJECT, Types.OTHER,
         0, 0, false, null, null);
