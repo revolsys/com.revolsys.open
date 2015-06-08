@@ -152,7 +152,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore implem
     if (attributeAdder == null) {
       attributeAdder = new JdbcFieldAdder(DataTypes.OBJECT);
     }
-    return (JdbcFieldDefinition)attributeAdder.addField(recordDefinition, dbColumnName, name,
+    return (JdbcFieldDefinition)attributeAdder.addField(this, recordDefinition, dbColumnName, name,
       dataType, sqlType, length, scale, required, description);
   }
 

@@ -19,6 +19,7 @@ import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.Path;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
+import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
@@ -109,9 +110,10 @@ public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
   }
 
   @Override
-  public FieldDefinition addField(final RecordDefinitionImpl recordDefinition, final String dbName,
-    final String name, final String dataTypeName, final int sqlType, final int length,
-    final int scale, final boolean required, final String description) {
+  public FieldDefinition addField(final AbstractJdbcRecordStore recordStore,
+    final RecordDefinitionImpl recordDefinition, final String dbName, final String name,
+    final String dataTypeName, final int sqlType, final int length, final int scale,
+    final boolean required, final String description) {
     final String typePath = recordDefinition.getPath();
     final String columnName = name.toUpperCase();
     final RecordStoreSchema schema = recordDefinition.getSchema();
@@ -127,7 +129,7 @@ public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
       dataType = DataTypes.GEOMETRY;
     }
 
-    int axisCount = getIntegerColumnProperty(schema, typePath, columnName, NUM_AXIS);
+    int axisCount = getIntegerColumnProperty(schema, typePath, columnName, AXIS_COUNT);
     if (axisCount == -1) {
       axisCount = geometryFactory.getAxisCount();
     }
@@ -183,7 +185,7 @@ public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
             }
             final Object[] dimInfo = (Object[])resultSet.getArray("DIMINFO").getArray();
             int axisCount = dimInfo.length;
-            setColumnProperty(schema, typePath, columnName, NUM_AXIS, axisCount);
+            setColumnProperty(schema, typePath, columnName, AXIS_COUNT, axisCount);
             if (axisCount < 2) {
               axisCount = 2;
             } else if (axisCount > 4) {

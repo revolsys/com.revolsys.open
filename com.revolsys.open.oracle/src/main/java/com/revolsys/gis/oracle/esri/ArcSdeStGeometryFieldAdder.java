@@ -23,9 +23,10 @@ public class ArcSdeStGeometryFieldAdder extends JdbcFieldAdder {
   }
 
   @Override
-  public FieldDefinition addField(final RecordDefinitionImpl recordDefinition, final String dbName,
-    final String name, final String dataTypeName, final int sqlType, final int length,
-    final int scale, final boolean required, final String description) {
+  public FieldDefinition addField(final AbstractJdbcRecordStore recordStore,
+    final RecordDefinitionImpl recordDefinition, final String dbName, final String name,
+    final String dataTypeName, final int sqlType, final int length, final int scale,
+    final boolean required, final String description) {
     final RecordStoreSchema schema = recordDefinition.getSchema();
     final String typePath = recordDefinition.getPath();
     final String owner = this.recordStore.getDatabaseSchemaName(schema);
@@ -38,7 +39,7 @@ public class ArcSdeStGeometryFieldAdder extends JdbcFieldAdder {
         + name);
     }
     final int axisCount = JdbcFieldAdder.getIntegerColumnProperty(schema, typePath, columnName,
-      JdbcFieldAdder.NUM_AXIS);
+      JdbcFieldAdder.AXIS_COUNT);
     if (axisCount == -1) {
       LOG.error("Column not found in SDE.GEOMETRY_COLUMNS table " + owner + "." + tableName + "."
         + name);

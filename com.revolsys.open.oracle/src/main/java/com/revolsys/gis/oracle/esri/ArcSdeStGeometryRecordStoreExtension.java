@@ -59,7 +59,7 @@ public class ArcSdeStGeometryRecordStoreExtension implements RecordStoreExtensio
 
           int axisCount = resultSet.getInt(5);
           axisCount = Math.max(axisCount, 2);
-          JdbcFieldAdder.setColumnProperty(schema, typePath, columnName, JdbcFieldAdder.NUM_AXIS,
+          JdbcFieldAdder.setColumnProperty(schema, typePath, columnName, JdbcFieldAdder.AXIS_COUNT,
             axisCount);
 
           final ArcSdeSpatialReference spatialReference = ArcSdeSpatialReferenceCache.getSpatialReference(

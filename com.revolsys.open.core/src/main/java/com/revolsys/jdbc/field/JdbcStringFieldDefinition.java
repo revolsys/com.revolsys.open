@@ -7,12 +7,16 @@ import java.util.Map;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.types.DataTypes;
+import com.revolsys.util.Property;
 
 public class JdbcStringFieldDefinition extends JdbcFieldDefinition {
+  private final boolean intern;
+
   public JdbcStringFieldDefinition(final String dbName, final String name, final int sqlType,
     final int length, final boolean required, final String description,
     final Map<String, Object> properties) {
     super(dbName, name, DataTypes.STRING, sqlType, length, 0, required, description, properties);
+    this.intern = Property.getBoolean(properties, "stringIntern");
   }
 
   @Override
@@ -24,7 +28,10 @@ public class JdbcStringFieldDefinition extends JdbcFieldDefinition {
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
     final Record record) throws SQLException {
-    final String value = resultSet.getString(columnIndex);
+    String value = resultSet.getString(columnIndex);
+    if (this.intern) {
+      value = value.intern();
+    }
     setValue(record, value);
     return columnIndex + 1;
   }
@@ -36,7 +43,8 @@ public class JdbcStringFieldDefinition extends JdbcFieldDefinition {
       final int sqlType = getSqlType();
       statement.setNull(parameterIndex, sqlType);
     } else {
-      statement.setString(parameterIndex, value.toString());
+      final String string = value.toString();
+      statement.setString(parameterIndex, string);
     }
     return parameterIndex + 1;
   }

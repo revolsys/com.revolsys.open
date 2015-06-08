@@ -14,6 +14,7 @@ import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.Path;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
+import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.Property;
 
@@ -40,9 +41,10 @@ public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
   }
 
   @Override
-  public FieldDefinition addField(final RecordDefinitionImpl recordDefinition, final String dbName,
-    final String name, final String dataTypeName, final int sqlType, final int length,
-    final int scale, final boolean required, final String description) {
+  public FieldDefinition addField(final AbstractJdbcRecordStore recordStore,
+    final RecordDefinitionImpl recordDefinition, final String dbName, final String name,
+    final String dataTypeName, final int sqlType, final int length, final int scale,
+    final boolean required, final String description) {
     final String typePath = recordDefinition.getPath();
     String owner = this.recordStore.getDatabaseSchemaName(Path.getPath(typePath));
     if (!Property.hasValue(owner)) {
