@@ -23,9 +23,9 @@ public class JdbcBlobFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record object) throws SQLException {
+    final Record record) throws SQLException {
     final Blob value = resultSet.getBlob(columnIndex);
-    object.setValue(getIndex(), value);
+    setValue(record, value);
     return columnIndex + 1;
   }
 

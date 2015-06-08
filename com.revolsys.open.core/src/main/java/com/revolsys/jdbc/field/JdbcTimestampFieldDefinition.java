@@ -23,9 +23,9 @@ public class JdbcTimestampFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record object) throws SQLException {
+    final Record record) throws SQLException {
     final Timestamp value = resultSet.getTimestamp(columnIndex);
-    setValue(object, value);
+    setValue(record, value);
     return columnIndex + 1;
   }
 

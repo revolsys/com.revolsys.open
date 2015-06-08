@@ -25,7 +25,7 @@ public class JdbcBigIntegerFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record object) throws SQLException {
+    final Record record) throws SQLException {
     Object value;
     final int length = getLength();
     if (length <= 2) {
@@ -45,7 +45,7 @@ public class JdbcBigIntegerFieldDefinition extends JdbcFieldDefinition {
       }
     }
     if (!resultSet.wasNull()) {
-      setValue(object, value);
+      setValue(record, value);
     }
     return columnIndex + 1;
   }

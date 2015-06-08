@@ -23,10 +23,10 @@ public class JdbcIntegerFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record object) throws SQLException {
+    final Record record) throws SQLException {
     final int value = resultSet.getInt(columnIndex);
     if (!resultSet.wasNull()) {
-      setValue(object, Integer.valueOf(value));
+      setValue(record, Integer.valueOf(value));
     }
     return columnIndex + 1;
   }

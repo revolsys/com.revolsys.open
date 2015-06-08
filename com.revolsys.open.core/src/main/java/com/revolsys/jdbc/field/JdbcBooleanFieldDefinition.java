@@ -23,10 +23,10 @@ public class JdbcBooleanFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record object) throws SQLException {
+    final Record record) throws SQLException {
     final boolean booleanValue = resultSet.getBoolean(columnIndex);
     if (!resultSet.wasNull()) {
-      setValue(object, booleanValue);
+      setValue(record, booleanValue);
     }
     return columnIndex + 1;
   }

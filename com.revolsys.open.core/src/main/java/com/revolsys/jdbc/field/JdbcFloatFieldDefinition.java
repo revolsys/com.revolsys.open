@@ -23,10 +23,10 @@ public class JdbcFloatFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record object) throws SQLException {
+    final Record record) throws SQLException {
     final float longValue = resultSet.getFloat(columnIndex);
     if (!resultSet.wasNull()) {
-      setValue(object, Float.valueOf(longValue));
+      setValue(record, Float.valueOf(longValue));
     }
     return columnIndex + 1;
   }

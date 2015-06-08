@@ -23,10 +23,10 @@ public class JdbcShortFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record object) throws SQLException {
+    final Record record) throws SQLException {
     final short value = resultSet.getShort(columnIndex);
     if (!resultSet.wasNull()) {
-      setValue(object, Short.valueOf(value));
+      setValue(record, Short.valueOf(value));
     }
     return columnIndex + 1;
   }
