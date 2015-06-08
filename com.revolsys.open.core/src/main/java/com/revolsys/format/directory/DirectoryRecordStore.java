@@ -27,6 +27,7 @@ import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.record.schema.RecordStoreSchemaElement;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.ObjectWithProperties;
 import com.revolsys.io.Path;
 import com.revolsys.io.Writer;
@@ -51,14 +52,12 @@ public class DirectoryRecordStore extends AbstractRecordStore {
 
   private final Map<Resource, String> typePathByResource = new HashMap<>();
 
-  public DirectoryRecordStore(final File directory,
-    final Collection<String> fileExtensions) {
+  public DirectoryRecordStore(final File directory, final Collection<String> fileExtensions) {
     this.directory = directory;
     this.fileExtensions = new ArrayList<>(fileExtensions);
   }
 
-  public DirectoryRecordStore(final File directory,
-    final String... fileExtensions) {
+  public DirectoryRecordStore(final File directory, final String... fileExtensions) {
     this(directory, Arrays.asList(fileExtensions));
   }
 
@@ -67,7 +66,9 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     this.directory = null;
     if (this.writers != null) {
       for (final Writer<Record> writer : this.writers.values()) {
-        writer.close();
+        if (writer != null) {
+          writer.close();
+        }
       }
       this.writers.clear();
     }
@@ -114,8 +115,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public RecordDefinition getRecordDefinition(
-    final RecordDefinition recordDefinition) {
+  public RecordDefinition getRecordDefinition(final RecordDefinition recordDefinition) {
     final RecordDefinition storeRecordDefinition = super.getRecordDefinition(recordDefinition);
     if (storeRecordDefinition == null && this.createMissingTables) {
       final String typePath = recordDefinition.getPath();
@@ -129,8 +129,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
       if (!schemaDirectory.exists()) {
         schemaDirectory.mkdirs();
       }
-      final RecordDefinitionImpl newRecordDefinition = new RecordDefinitionImpl(
-        schema, typePath);
+      final RecordDefinitionImpl newRecordDefinition = new RecordDefinitionImpl(schema, typePath);
       for (final FieldDefinition field : recordDefinition.getFields()) {
         final FieldDefinition newField = new FieldDefinition(field);
         newRecordDefinition.addField(newField);
@@ -146,8 +145,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     return getResource(path, recordDefinition);
   }
 
-  protected Resource getResource(final String path,
-    final RecordDefinition recordDefinition) {
+  protected Resource getResource(final String path, final RecordDefinition recordDefinition) {
     if (recordDefinition == null) {
       throw new IllegalArgumentException("Table does not exist " + path);
     }
@@ -187,13 +185,14 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     Writer<Record> writer = this.writers.get(typePath);
     if (writer == null) {
       final String schemaName = Path.getPath(typePath);
-      final File subDirectory = new File(getDirectory(), schemaName);
+      final File subDirectory = FileUtil.getDirectory(getDirectory(), schemaName);
       final String fileExtension = getFileExtension();
-      final File file = new File(subDirectory, recordDefinition.getName() + "."
-        + fileExtension);
+      final File file = new File(subDirectory, recordDefinition.getName() + "." + fileExtension);
       final Resource resource = new FileSystemResource(file);
       writer = RecordIo.recordWriter(recordDefinition, resource);
-      if (writer instanceof ObjectWithProperties) {
+      if (writer == null) {
+        throw new RuntimeException("Cannot create writer for: " + typePath);
+      } else if (writer instanceof ObjectWithProperties) {
         final ObjectWithProperties properties = writer;
         properties.setProperties(getProperties());
       }
@@ -211,13 +210,11 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     return this.createMissingTables;
   }
 
-  protected RecordDefinition loadRecordDefinition(
-    final RecordStoreSchema schema, final String schemaName,
-    final Resource resource) {
+  protected RecordDefinition loadRecordDefinition(final RecordStoreSchema schema,
+    final String schemaName, final Resource resource) {
     try (
       RecordReader recordReader = RecordIo.recordReader(resource)) {
-      final String typePath = Path.toPath(schemaName,
-        SpringUtil.getBaseName(resource));
+      final String typePath = Path.toPath(schemaName, SpringUtil.getBaseName(resource));
       recordReader.setProperty("schema", schema);
       recordReader.setProperty("typePath", typePath);
       final RecordDefinition recordDefinition = recordReader.getRecordDefinition();
@@ -261,8 +258,8 @@ public class DirectoryRecordStore extends AbstractRecordStore {
       for (final File file : files) {
         if (filter.accept(file)) {
           final FileSystemResource resource = new FileSystemResource(file);
-          final RecordDefinition recordDefinition = loadRecordDefinition(
-            schema, schemaPath, resource);
+          final RecordDefinition recordDefinition = loadRecordDefinition(schema, schemaPath,
+            resource);
           if (recordDefinition != null) {
             final String path = recordDefinition.getPath();
             final String pathUpper = path.toUpperCase();
