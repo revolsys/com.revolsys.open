@@ -9,10 +9,6 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.types.DataTypes;
 
 public class JdbcLongFieldDefinition extends JdbcFieldDefinition {
-  public JdbcLongFieldDefinition(final String name) {
-    super(name, name, DataTypes.LONG, 0, 0, 0, false, null, null);
-  }
-
   public JdbcLongFieldDefinition(final String dbName, final String name, final int sqlType,
     final int length, final boolean required, final String description,
     final Map<String, Object> properties) {
