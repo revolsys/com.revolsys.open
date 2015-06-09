@@ -16,9 +16,9 @@ import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.raster.AbstractGeoReferencedImage;
+import com.revolsys.raster.AbstractGeoreferencedImage;
 
-public class GdalImage extends AbstractGeoReferencedImage {
+public class GdalImage extends AbstractGeoreferencedImage {
 
   private Dataset dataset;
 

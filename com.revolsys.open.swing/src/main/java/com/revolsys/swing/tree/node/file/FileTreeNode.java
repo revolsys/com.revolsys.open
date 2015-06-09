@@ -25,8 +25,8 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Paths;
 import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
-import com.revolsys.raster.AbstractGeoReferencedImageFactory;
-import com.revolsys.raster.GeoReferencedImageFactory;
+import com.revolsys.raster.AbstractGeoreferencedImageFactory;
+import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
@@ -192,7 +192,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
   public static boolean isImage(final File file) {
     final String fileNameExtension = FileUtil.getFileNameExtension(file);
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-    return ioFactoryRegistry.isFileExtensionSupported(GeoReferencedImageFactory.class,
+    return ioFactoryRegistry.isFileExtensionSupported(GeoreferencedImageFactory.class,
       fileNameExtension);
   }
 
@@ -376,7 +376,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
   public boolean isFileLayer() {
     final File file = getFile();
     final String fileName = FileUtil.getFileName(file);
-    if (AbstractGeoReferencedImageFactory.hasGeoReferencedImageFactory(fileName)) {
+    if (AbstractGeoreferencedImageFactory.hasGeoreferencedImageFactory(fileName)) {
       return true;
     } else if (RecordIo.hasRecordReaderFactory(fileName)) {
       return true;

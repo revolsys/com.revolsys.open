@@ -15,10 +15,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.raster.JaiGeoReferencedImage;
+import com.revolsys.raster.JaiGeoreferencedImage;
 import com.revolsys.spring.SpringUtil;
 
-public class PdfImage extends JaiGeoReferencedImage {
+public class PdfImage extends JaiGeoreferencedImage {
 
   public PdfImage(final Resource imageResource) {
     setImageResource(imageResource);

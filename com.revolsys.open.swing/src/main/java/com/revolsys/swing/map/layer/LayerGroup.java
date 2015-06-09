@@ -25,11 +25,11 @@ import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
-import com.revolsys.raster.AbstractGeoReferencedImageFactory;
+import com.revolsys.raster.AbstractGeoreferencedImageFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.action.AddFileLayerAction;
-import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
+import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer;
 import com.revolsys.swing.map.layer.record.FileRecordLayer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
@@ -579,8 +579,8 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     name = FileUtil.fromSafeName(name);
     properties.put("name", name);
     Layer layer;
-    if (AbstractGeoReferencedImageFactory.hasGeoReferencedImageFactory(urlString)) {
-      layer = new GeoReferencedImageLayer(properties);
+    if (AbstractGeoreferencedImageFactory.hasGeoreferencedImageFactory(urlString)) {
+      layer = new GeoreferencedImageLayer(properties);
     } else if (RecordIo.hasRecordReaderFactory(urlString)) {
       final FileRecordLayer recordLayer = new FileRecordLayer(properties);
       final GeometryStyleRenderer renderer = recordLayer.getRenderer();

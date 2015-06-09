@@ -2,10 +2,10 @@ package com.revolsys.format.usgsdem;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.raster.AbstractGeoReferencedImageFactory;
-import com.revolsys.raster.GeoReferencedImage;
+import com.revolsys.raster.AbstractGeoreferencedImageFactory;
+import com.revolsys.raster.GeoreferencedImage;
 
-public class UsgsDemImageFactory extends AbstractGeoReferencedImageFactory {
+public class UsgsDemImageFactory extends AbstractGeoreferencedImageFactory {
 
   public UsgsDemImageFactory() {
     super("USGS DEM");
@@ -13,8 +13,8 @@ public class UsgsDemImageFactory extends AbstractGeoReferencedImageFactory {
   }
 
   @Override
-  public GeoReferencedImage loadImage(final Resource resource) {
-    return new UsgsDemGeoReferencedImage(resource);
+  public GeoreferencedImage loadImage(final Resource resource) {
+    return new UsgsDemGeoreferencedImage(resource);
   }
 
 }

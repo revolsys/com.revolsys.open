@@ -2,10 +2,10 @@ package com.revolsys.format.jpg;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.raster.AbstractGeoReferencedImageFactory;
-import com.revolsys.raster.GeoReferencedImage;
+import com.revolsys.raster.AbstractGeoreferencedImageFactory;
+import com.revolsys.raster.GeoreferencedImage;
 
-public class JpegImageFactory extends AbstractGeoReferencedImageFactory {
+public class JpegImageFactory extends AbstractGeoreferencedImageFactory {
 
   public JpegImageFactory() {
     super("JPEG");
@@ -14,7 +14,7 @@ public class JpegImageFactory extends AbstractGeoReferencedImageFactory {
   }
 
   @Override
-  public GeoReferencedImage loadImage(final Resource resource) {
+  public GeoreferencedImage loadImage(final Resource resource) {
     return new JpegImage(resource);
   }
 

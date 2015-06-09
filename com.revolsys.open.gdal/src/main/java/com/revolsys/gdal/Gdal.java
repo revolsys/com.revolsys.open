@@ -72,14 +72,14 @@ public class Gdal {
       ogr.RegisterAll();
 
       available = true;
-      addGeoReferencedImageFactory("ECW", "ECW", "ecw", "image/ecw");
-      addGeoReferencedImageFactory("JP2ECW", "JPEG 2000", "jp2", "image/jp2");
+      addGeoreferencedImageFactory("ECW", "ECW", "ecw", "image/ecw");
+      addGeoreferencedImageFactory("JP2ECW", "JPEG 2000", "jp2", "image/jp2");
     } catch (final Throwable e) {
       e.printStackTrace();
     }
   }
 
-  private static void addGeoReferencedImageFactory(final GdalImageFactory georeferencedImageFactory) {
+  private static void addGeoreferencedImageFactory(final GdalImageFactory georeferencedImageFactory) {
     if (georeferencedImageFactory.isAvailable()) {
 
       final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
@@ -87,11 +87,11 @@ public class Gdal {
     }
   }
 
-  private static void addGeoReferencedImageFactory(final String driverName,
+  private static void addGeoreferencedImageFactory(final String driverName,
     final String formatName, final String fileExtension, final String mimeType) {
     final GdalImageFactory readerSpi = new GdalImageFactory(driverName, formatName, fileExtension,
       mimeType);
-    addGeoReferencedImageFactory(readerSpi);
+    addGeoreferencedImageFactory(readerSpi);
   }
 
   public static Dataset closeDataSet(final Dataset dataSet) {

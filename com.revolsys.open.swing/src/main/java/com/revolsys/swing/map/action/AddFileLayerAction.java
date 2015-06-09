@@ -21,7 +21,7 @@ import com.revolsys.data.record.io.RecordReaderFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
-import com.revolsys.raster.GeoReferencedImageFactory;
+import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.AbstractAction;
@@ -96,7 +96,7 @@ public class AddFileLayerAction extends AbstractAction {
 
     final Set<String> allImageExtensions = new TreeSet<String>();
     final List<FileNameExtensionFilter> imageFileFilters = getFileFilters(allImageExtensions,
-      GeoReferencedImageFactory.class);
+      GeoreferencedImageFactory.class);
 
     final Set<String> allRecordExtensions = new TreeSet<String>();
     final List<FileNameExtensionFilter> recordFileFilters = getFileFilters(allRecordExtensions,

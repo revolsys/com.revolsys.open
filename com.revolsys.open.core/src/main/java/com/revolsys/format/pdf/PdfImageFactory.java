@@ -2,10 +2,10 @@ package com.revolsys.format.pdf;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.raster.AbstractGeoReferencedImageFactory;
-import com.revolsys.raster.GeoReferencedImage;
+import com.revolsys.raster.AbstractGeoreferencedImageFactory;
+import com.revolsys.raster.GeoreferencedImage;
 
-public class PdfImageFactory extends AbstractGeoReferencedImageFactory {
+public class PdfImageFactory extends AbstractGeoreferencedImageFactory {
 
   public PdfImageFactory() {
     super("PDF");
@@ -13,7 +13,7 @@ public class PdfImageFactory extends AbstractGeoReferencedImageFactory {
   }
 
   @Override
-  public GeoReferencedImage loadImage(final Resource resource) {
+  public GeoreferencedImage loadImage(final Resource resource) {
     return new PdfImage(resource);
   }
 

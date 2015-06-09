@@ -4,7 +4,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.io.IoFactory;
 
-public interface GeoReferencedImageFactory extends IoFactory {
+public interface GeoreferencedImageFactory extends IoFactory {
 
-  GeoReferencedImage loadImage(Resource resource);
+  GeoreferencedImage loadImage(Resource resource);
 }

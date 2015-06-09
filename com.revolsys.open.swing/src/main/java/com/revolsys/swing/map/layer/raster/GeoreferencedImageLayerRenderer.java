@@ -8,19 +8,19 @@ import java.util.Map;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.raster.GeoReferencedImage;
+import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 
-public class GeoReferencedImageLayerRenderer extends AbstractLayerRenderer<GeoReferencedImageLayer> {
+public class GeoreferencedImageLayerRenderer extends AbstractLayerRenderer<GeoreferencedImageLayer> {
 
   private static final GeometryStyle STYLE_DIFFERENT_COORDINATE_SYSTEM = GeometryStyle.line(
     WebColors.Red, 4);
 
   public static void render(final Viewport2D viewport, final Graphics2D graphics,
-    final GeoReferencedImage image, final boolean useTransform) {
+    final GeoreferencedImage image, final boolean useTransform) {
     if (image != null) {
       final BoundingBox viewBoundingBox = viewport.getBoundingBox();
       final int viewWidth = viewport.getViewWidthPixels();
@@ -30,7 +30,7 @@ public class GeoReferencedImageLayerRenderer extends AbstractLayerRenderer<GeoRe
   }
 
   public static void renderAlpha(final Graphics2D graphics, final Viewport2D viewport,
-    final GeoReferencedImage image, final double alpha, final boolean useTransform) {
+    final GeoreferencedImage image, final double alpha, final boolean useTransform) {
     final Composite composite = graphics.getComposite();
     try {
       AlphaComposite alphaComposite = AlphaComposite.SrcOver;
@@ -52,16 +52,16 @@ public class GeoReferencedImageLayerRenderer extends AbstractLayerRenderer<GeoRe
     }
   }
 
-  public GeoReferencedImageLayerRenderer(final GeoReferencedImageLayer layer) {
+  public GeoreferencedImageLayerRenderer(final GeoreferencedImageLayer layer) {
     super("raster", layer);
   }
 
   @Override
-  public void render(final Viewport2D viewport, final GeoReferencedImageLayer layer) {
+  public void render(final Viewport2D viewport, final GeoreferencedImageLayer layer) {
     final double scale = viewport.getScale();
     if (layer.isVisible(scale)) {
       if (!layer.isEditable()) {
-        final GeoReferencedImage image = layer.getImage();
+        final GeoreferencedImage image = layer.getImage();
         if (image != null) {
           BoundingBox boundingBox = layer.getBoundingBox();
           if (boundingBox == null || boundingBox.isEmpty()) {

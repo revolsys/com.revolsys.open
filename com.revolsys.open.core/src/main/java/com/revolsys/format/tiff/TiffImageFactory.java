@@ -2,10 +2,10 @@ package com.revolsys.format.tiff;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.raster.AbstractGeoReferencedImageFactory;
-import com.revolsys.raster.GeoReferencedImage;
+import com.revolsys.raster.AbstractGeoreferencedImageFactory;
+import com.revolsys.raster.GeoreferencedImage;
 
-public class TiffImageFactory extends AbstractGeoReferencedImageFactory {
+public class TiffImageFactory extends AbstractGeoreferencedImageFactory {
 
   public TiffImageFactory() {
     super("TIFF/GeoTIFF");
@@ -14,7 +14,7 @@ public class TiffImageFactory extends AbstractGeoReferencedImageFactory {
   }
 
   @Override
-  public GeoReferencedImage loadImage(final Resource resource) {
+  public GeoreferencedImage loadImage(final Resource resource) {
     return new TiffImage(resource);
   }
 

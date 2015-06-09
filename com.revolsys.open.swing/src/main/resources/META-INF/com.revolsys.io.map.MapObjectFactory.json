@@ -113,13 +113,13 @@
     {
       "typeName": "geoReferencedImage",
       "description": "Geo-referenced Image Layer",
-      "typeClass": "com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer",
+      "typeClass": "com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer",
       "methodName": "create"
     },
     {
       "typeName": "geoReferencedImageLayer",
       "description": "Geo-referenced Image Layer",
-      "typeClass": "com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer",
+      "typeClass": "com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer",
       "methodName": "create"
     }
   ]

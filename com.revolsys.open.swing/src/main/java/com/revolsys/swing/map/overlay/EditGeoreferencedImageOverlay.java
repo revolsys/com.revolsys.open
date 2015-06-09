@@ -23,16 +23,16 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
-import com.revolsys.raster.BufferedGeoReferencedImage;
-import com.revolsys.raster.GeoReferencedImage;
+import com.revolsys.raster.BufferedGeoreferencedImage;
+import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.MappedLocation;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
-import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayerRenderer;
+import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer;
+import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
@@ -40,7 +40,7 @@ import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.undo.ListAddUndo;
 import com.revolsys.swing.undo.SetObjectProperty;
 
-public class EditGeoReferencedImageOverlay extends AbstractOverlay {
+public class EditGeoreferencedImageOverlay extends AbstractOverlay {
   private static final String ACTION_TIE_POINT_ADD = "Add Tie Point";
 
   private static final Cursor CURSOR_MOVE_IMAGE = Icons.getCursor("cursor_move", 8, 7);
@@ -84,9 +84,9 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
 
   private Point addTiePointFirstPoint;
 
-  private GeoReferencedImage image;
+  private GeoreferencedImage image;
 
-  private GeoReferencedImageLayer layer;
+  private GeoreferencedImageLayer layer;
 
   private Point moveCornerOppositePoint;
 
@@ -98,7 +98,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
 
   private Point addTiePointMove;
 
-  private GeoReferencedImage cachedImage;
+  private GeoreferencedImage cachedImage;
 
   private int moveTiePointIndex = -1;
 
@@ -114,7 +114,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
 
   private Point moveTiePointLocation;
 
-  public EditGeoReferencedImageOverlay(final MapPanel map) {
+  public EditGeoreferencedImageOverlay(final MapPanel map) {
     super(map);
     setOverlayActionCursor(ACTION_MOVE_IMAGE, CURSOR_MOVE_IMAGE);
     setOverlayActionCursor(ACTION_TIE_POINT_ADD, CURSOR_SOURCE_PIXEL_ADD);
@@ -316,7 +316,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
     }
   }
 
-  private GeoReferencedImage getCachedImage(BoundingBox boundingBox) {
+  private GeoreferencedImage getCachedImage(BoundingBox boundingBox) {
     boundingBox = boundingBox.convert(getViewportGeometryFactory());
     final Viewport2D viewport = getViewport();
     final BoundingBox viewBoundingBox = viewport.getBoundingBox();
@@ -329,9 +329,9 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
 
         this.image.drawImage(graphics, viewBoundingBox, viewport.getViewWidthPixels(),
           viewport.getViewHeightPixels(), !this.layer.isShowOriginalImage());
-        GeoReferencedImageLayerRenderer.render(imageViewport, graphics, this.image,
+        GeoreferencedImageLayerRenderer.render(imageViewport, graphics, this.image,
           !this.layer.isShowOriginalImage());
-        this.cachedImage = new BufferedGeoReferencedImage(imageViewport.getBoundingBox(), image);
+        this.cachedImage = new BufferedGeoreferencedImage(imageViewport.getBoundingBox(), image);
       }
     }
     return this.cachedImage;
@@ -353,7 +353,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
     }
   }
 
-  public GeoReferencedImageLayer getLayer() {
+  public GeoreferencedImageLayer getLayer() {
     return this.layer;
   }
 
@@ -906,8 +906,8 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
 
   @Override
   protected void paintComponent(final Graphics2D graphics) {
-    final GeoReferencedImageLayer layer = this.layer;
-    final GeoReferencedImage image = this.image;
+    final GeoreferencedImageLayer layer = this.layer;
+    final GeoreferencedImage image = this.image;
     final boolean moveTiePointStarted = this.moveTiePointStarted;
     final Point moveTiePointLocation = this.moveTiePointLocation;
     final BoundingBox moveImageBoundingBox = this.moveImageBoundingBox;
@@ -926,10 +926,10 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       }
       super.paintComponent(graphics);
 
-      final GeoReferencedImage cachedImage = getCachedImage(boundingBox);
-      GeoReferencedImageLayerRenderer.renderAlpha(graphics, viewport, cachedImage,
+      final GeoreferencedImage cachedImage = getCachedImage(boundingBox);
+      GeoreferencedImageLayerRenderer.renderAlpha(graphics, viewport, cachedImage,
         layer.getOpacity() / 255.0, false);
-      GeoReferencedImageLayerRenderer.renderDifferentCoordinateSystem(viewport, imageBoundingBox,
+      GeoreferencedImageLayerRenderer.renderDifferentCoordinateSystem(viewport, imageBoundingBox,
         graphics);
 
       if (outlineBoundingBox != null && !outlineBoundingBox.isEmpty()) {
@@ -998,8 +998,8 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
     super.propertyChange(event);
     final Object source = event.getSource();
     final String propertyName = event.getPropertyName();
-    if (source instanceof GeoReferencedImageLayer) {
-      final GeoReferencedImageLayer layer = (GeoReferencedImageLayer)source;
+    if (source instanceof GeoreferencedImageLayer) {
+      final GeoreferencedImageLayer layer = (GeoreferencedImageLayer)source;
       if ("editable".equals(propertyName)) {
         if (!BooleanStringConverter.getBoolean(event.getNewValue())) {
           if (this.layer == layer) {
@@ -1048,8 +1048,8 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
     clearCachedImage();
   }
 
-  public void setLayer(final GeoReferencedImageLayer layer) {
-    final GeoReferencedImageLayer oldLayer = this.layer;
+  public void setLayer(final GeoreferencedImageLayer layer) {
+    final GeoreferencedImageLayer oldLayer = this.layer;
     if (oldLayer != layer) {
       clear();
       this.layer = layer;

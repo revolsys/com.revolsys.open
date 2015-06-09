@@ -3,10 +3,10 @@ package com.revolsys.gdal.raster;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gdal.Gdal;
-import com.revolsys.raster.AbstractGeoReferencedImageFactory;
-import com.revolsys.raster.GeoReferencedImage;
+import com.revolsys.raster.AbstractGeoreferencedImageFactory;
+import com.revolsys.raster.GeoreferencedImage;
 
-public class GdalImageFactory extends AbstractGeoReferencedImageFactory {
+public class GdalImageFactory extends AbstractGeoreferencedImageFactory {
 
   private final String driverName;
 
@@ -23,7 +23,7 @@ public class GdalImageFactory extends AbstractGeoReferencedImageFactory {
   }
 
   @Override
-  public GeoReferencedImage loadImage(final Resource resource) {
+  public GeoreferencedImage loadImage(final Resource resource) {
     return new GdalImage(this, resource);
   }
 

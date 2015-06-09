@@ -15,11 +15,11 @@ import org.springframework.core.io.Resource;
 import com.revolsys.format.raster.RasterWriter;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.raster.BufferedGeoReferencedImage;
+import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.WrappedException;
 
-public class UsgsDemGeoReferencedImage extends BufferedGeoReferencedImage {
+public class UsgsDemGeoreferencedImage extends BufferedGeoreferencedImage {
 
   private static Byte getByte(final byte[] buffer, final int offset) {
     final String string = getString(buffer, offset, 1);
@@ -199,7 +199,7 @@ public class UsgsDemGeoReferencedImage extends BufferedGeoReferencedImage {
 
   }
 
-  public UsgsDemGeoReferencedImage(final Resource resource) {
+  public UsgsDemGeoreferencedImage(final Resource resource) {
     final byte[] buffer = new byte[1024];
     try (
       InputStream in = SpringUtil.getInputStream(resource)) {

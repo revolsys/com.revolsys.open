@@ -28,12 +28,12 @@ import com.revolsys.gis.cs.ProjectionParameterNames;
 import com.revolsys.gis.cs.epsg.EpsgAuthority;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.raster.JaiGeoReferencedImage;
+import com.revolsys.raster.JaiGeoreferencedImage;
 import com.revolsys.util.ExceptionUtil;
 import com.sun.media.jai.codec.ImageCodec;
 
 @SuppressWarnings("deprecation")
-public class TiffImage extends JaiGeoReferencedImage {
+public class TiffImage extends JaiGeoreferencedImage {
   private static final int TAG_X_RESOLUTION = 282;
 
   private static final int TAG_Y_RESOLUTION = 283;

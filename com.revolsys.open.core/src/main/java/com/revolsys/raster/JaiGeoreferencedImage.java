@@ -5,11 +5,11 @@ import javax.media.jai.PlanarImage;
 
 import org.springframework.core.io.Resource;
 
-public class JaiGeoReferencedImage extends AbstractGeoReferencedImage {
-  protected JaiGeoReferencedImage() {
+public class JaiGeoreferencedImage extends AbstractGeoreferencedImage {
+  protected JaiGeoreferencedImage() {
   }
 
-  public JaiGeoReferencedImage(final Resource imageResource) {
+  public JaiGeoreferencedImage(final Resource imageResource) {
     setImageResource(imageResource);
 
     final PlanarImage jaiImage = JAI.create("fileload", getFile().getAbsolutePath());

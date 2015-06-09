@@ -14,7 +14,7 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public interface GeoReferencedImage extends MapSerializer, PropertyChangeListener {
+public interface GeoreferencedImage extends MapSerializer, PropertyChangeListener {
 
   void cancelChanges();
 
@@ -33,11 +33,11 @@ public interface GeoReferencedImage extends MapSerializer, PropertyChangeListene
 
   GeometryFactory getGeometryFactory();
 
-  GeoReferencedImage getImage(final CoordinateSystem coordinateSystem);
+  GeoreferencedImage getImage(final CoordinateSystem coordinateSystem);
 
-  GeoReferencedImage getImage(final CoordinateSystem coordinateSystem, final double resolution);
+  GeoreferencedImage getImage(final CoordinateSystem coordinateSystem, final double resolution);
 
-  GeoReferencedImage getImage(final GeometryFactory geometryFactory);
+  GeoreferencedImage getImage(final GeometryFactory geometryFactory);
 
   double getImageAspectRatio();
 

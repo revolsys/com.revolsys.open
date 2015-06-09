@@ -52,8 +52,8 @@ import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractGeoReferencedImage extends AbstractPropertyChangeObject implements
-  GeoReferencedImage {
+public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeObject implements
+  GeoreferencedImage {
 
   private static double[] calculateLSM(final BoundingBox boundingBox, final int imageWidth,
     final int imageHeight, final List<MappedLocation> mappings) {
@@ -172,7 +172,7 @@ public abstract class AbstractGeoReferencedImage extends AbstractPropertyChangeO
 
   private double resolution;
 
-  private final Map<CoordinateSystem, AbstractGeoReferencedImage> projectedImages = new HashMap<CoordinateSystem, AbstractGeoReferencedImage>();
+  private final Map<CoordinateSystem, AbstractGeoreferencedImage> projectedImages = new HashMap<CoordinateSystem, AbstractGeoreferencedImage>();
 
   private final PropertyChangeArrayList<MappedLocation> tiePoints = new PropertyChangeArrayList<MappedLocation>();
 
@@ -182,7 +182,7 @@ public abstract class AbstractGeoReferencedImage extends AbstractPropertyChangeO
 
   private File file;
 
-  public AbstractGeoReferencedImage() {
+  public AbstractGeoreferencedImage() {
   }
 
   protected void addOverviewSize(final int width, final int height) {
@@ -384,12 +384,12 @@ public abstract class AbstractGeoReferencedImage extends AbstractPropertyChangeO
   }
 
   @Override
-  public AbstractGeoReferencedImage getImage(final CoordinateSystem coordinateSystem) {
+  public AbstractGeoreferencedImage getImage(final CoordinateSystem coordinateSystem) {
     synchronized (this.projectedImages) {
       if (coordinateSystem.equals(getCoordinateSystem())) {
         return this;
       } else {
-        AbstractGeoReferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
+        AbstractGeoreferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
         if (projectedImage == null) {
           projectedImage = getImage(coordinateSystem, this.resolution);
           this.projectedImages.put(coordinateSystem, projectedImage);
@@ -400,7 +400,7 @@ public abstract class AbstractGeoReferencedImage extends AbstractPropertyChangeO
   }
 
   @Override
-  public AbstractGeoReferencedImage getImage(final CoordinateSystem coordinateSystem,
+  public AbstractGeoreferencedImage getImage(final CoordinateSystem coordinateSystem,
     final double resolution) {
     final int imageSrid = getGeometryFactory().getSrid();
     if (imageSrid > 0 && imageSrid != coordinateSystem.getId()) {
@@ -411,13 +411,13 @@ public abstract class AbstractGeoReferencedImage extends AbstractPropertyChangeO
       final BufferedImage newImage = filter.filter(getBufferedImage());
 
       final BoundingBox destBoundingBox = filter.getDestBoundingBox();
-      return new BufferedGeoReferencedImage(destBoundingBox, newImage);
+      return new BufferedGeoreferencedImage(destBoundingBox, newImage);
     }
     return this;
   }
 
   @Override
-  public AbstractGeoReferencedImage getImage(final GeometryFactory geometryFactory) {
+  public AbstractGeoreferencedImage getImage(final GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
     return getImage(coordinateSystem);
   }

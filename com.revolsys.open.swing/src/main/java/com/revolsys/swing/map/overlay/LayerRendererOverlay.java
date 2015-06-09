@@ -11,15 +11,15 @@ import java.util.HashSet;
 import javax.swing.JComponent;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.raster.BufferedGeoReferencedImage;
-import com.revolsys.raster.GeoReferencedImage;
+import com.revolsys.raster.BufferedGeoreferencedImage;
+import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.NullLayer;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayerRenderer;
+import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayerRenderer;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
@@ -36,7 +36,7 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
 
   private Viewport2D viewport;
 
-  private GeoReferencedImage image;
+  private GeoreferencedImage image;
 
   private final Object loadSync = new Object();
 
@@ -81,7 +81,7 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
   @Override
   public void paintComponent(final Graphics g) {
     if (!(this.layer instanceof NullLayer)) {
-      GeoReferencedImage image;
+      GeoreferencedImage image;
       synchronized (this.loadSync) {
         image = this.image;
 
@@ -89,7 +89,7 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
           final BoundingBox boundingBox = this.viewport.getBoundingBox();
           final int viewWidthPixels = this.viewport.getViewWidthPixels();
           final int viewHeightPixels = this.viewport.getViewHeightPixels();
-          final GeoReferencedImage loadImage = new BufferedGeoReferencedImage(boundingBox,
+          final GeoreferencedImage loadImage = new BufferedGeoreferencedImage(boundingBox,
             viewWidthPixels, viewHeightPixels);
           this.imageWorker = new LayerRendererOverlaySwingWorker(this, loadImage);
           Invoke.worker(this.imageWorker);
@@ -132,7 +132,7 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
   }
 
   private void render(final Graphics2D graphics) {
-    GeoReferencedImageLayerRenderer.render(this.viewport, graphics, this.image, false);
+    GeoreferencedImageLayerRenderer.render(this.viewport, graphics, this.image, false);
   }
 
   public void setImage(final LayerRendererOverlaySwingWorker imageWorker) {
