@@ -339,9 +339,19 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     if (this.loadAll && !this.loaded) {
       loadAll();
     } else {
-      final Record code = this.recordStore.load(this.typePath, id);
-      if (code != null) {
-        addValue(code);
+      try {
+        final Record code;
+        if (id instanceof Identifier) {
+          final Identifier identifier = (Identifier)id;
+          code = this.recordStore.load(this.typePath, identifier);
+        } else {
+          code = this.recordStore.load(this.typePath, id);
+        }
+        if (code != null) {
+          addValue(code);
+        }
+      } catch (final Throwable e) {
+        return null;
       }
     }
     return getValueById(id);

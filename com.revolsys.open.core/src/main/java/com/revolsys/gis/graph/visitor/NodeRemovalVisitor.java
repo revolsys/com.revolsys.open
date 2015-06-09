@@ -14,18 +14,6 @@ import com.revolsys.gis.graph.RecordGraph;
 
 public class NodeRemovalVisitor implements Visitor<Node<Record>> {
 
-  /** The relationship between an Edge and it's next edge. */
-  private enum EdgeType {
-    /** The edge is backwards in relation to the next edge. */
-    BACKWARDS,
-    /** The edge has degree 1 at the TO node. */
-    END_DEGREE_1,
-    /** The edge has degree > 2 at the TO node. */
-    END_DEGREE_N,
-    /** The edge is forwards in relation to the next edge. */
-    FORWARDS
-  };
-
   private final Collection<String> excludedAttributes = new HashSet<String>();
 
   private final RecordGraph graph;

@@ -6,25 +6,25 @@ import java.util.List;
 import com.revolsys.util.Property;
 
 public class Lists {
-
-  static <V> void addAll(final List<V> list, final Iterable<V> values) {
+  public static <V> void addAll(final List<V> list, final Iterable<V> values) {
     for (final V value : values) {
       list.add(value);
     }
   }
 
-  static <V> void addAll(final List<V> list, @SuppressWarnings("unchecked") final V... values) {
+  public static <V> void addAll(final List<V> list,
+    @SuppressWarnings("unchecked") final V... values) {
     for (final V value : values) {
       list.add(value);
     }
   }
 
   /**
-   * Add the value to the list if it is not empty and not already in the list.
-   * @param list
-   * @param value
-   * @return
-   */
+  * Add the value to the list if it is not empty and not already in the list.
+  * @param list
+  * @param value
+  * @return
+  */
   public static <V> boolean addNotContains(final List<V> list, final int index, final V value) {
     if (Property.hasValue(value)) {
       if (!list.contains(value)) {
@@ -105,5 +105,15 @@ public class Lists {
     final List<V> list = new ArrayList<>();
     addAll(list, values);
     return list;
+  }
+
+  public static <V> List<V> unmodifiable(final Iterable<? extends V> values) {
+    return new UnmodifiableArrayList<V>(values);
+
+  }
+
+  public static <V> List<V> unmodifiable(@SuppressWarnings("unchecked") final V... values) {
+    return new UnmodifiableArrayList<V>(values);
+
   }
 }

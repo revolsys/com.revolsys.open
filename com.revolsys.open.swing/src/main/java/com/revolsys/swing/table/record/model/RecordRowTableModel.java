@@ -35,14 +35,14 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel imple
 
   private List<String> fieldNames = new ArrayList<>();
 
+  /** The columnIndex that the fields start. Allows for extra columns in subclasses.*/
+  private int fieldsOffset;
+
   private final List<String> fieldTitles = new ArrayList<>();
 
   private Map<Integer, SortOrder> sortedColumns = new LinkedHashMap<>();
 
   private RecordRowTable table;
-
-  /** The columnIndex that the attribute start. Allows for extra columns in subclasses.*/
-  private int fieldsOffset;
 
   public RecordRowTableModel(final RecordDefinition recordDefinition) {
     this(recordDefinition, Collections.<String> emptyList());

@@ -8,10 +8,12 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.comparator.NumericComparator;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.codes.CodeTableProperty;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.query.Value;
 import com.revolsys.data.record.Record;
@@ -650,6 +652,103 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
             throw new IllegalArgumentException(fieldName + "=" + value + " not in ("
               + CollectionUtil.toString(",", this.allowedValues) + ")");
           }
+        }
+      }
+    }
+    return value;
+  }
+
+  public Object validate(final Record record, Object value) {
+    final String fieldName = getName();
+    if (isRequired()) {
+      if (value == null || value instanceof String && !Property.hasValue((String)value)) {
+        throw new ObjectPropertyException(record, fieldName, "Required");
+      }
+    }
+    final DataType fieldType = getType();
+    if (value != null) {
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
+      if (codeTable == null) {
+        final Class<?> fieldClass = fieldType.getJavaClass();
+        final Class<? extends Object> valueClass = value.getClass();
+        if (!fieldClass.isAssignableFrom(valueClass)) {
+          try {
+            value = StringConverterRegistry.toObject(fieldType, value);
+          } catch (final Throwable t) {
+            throw new ObjectPropertyException(record, fieldName, "'" + value + "' is not a valid "
+              + fieldType.getValidationName(), t);
+          }
+          if (value == null) {
+            throw new ObjectPropertyException(record, fieldName, "'" + value + "' is not a valid "
+              + fieldType.getValidationName());
+          }
+        }
+        if (value != null) {
+          final int maxLength = getLength();
+          if (value instanceof Number) {
+            final Number number = (Number)value;
+            final BigDecimal bigNumber = new BigDecimal(number.toString());
+            final int length = bigNumber.precision();
+            if (maxLength > 0) {
+              if (length > maxLength) {
+                throw new ObjectPropertyException(record, fieldName, "'" + value + "' length "
+                  + length + " > " + maxLength);
+              }
+            }
+
+            final int scale = bigNumber.scale();
+            final int maxScale = getScale();
+            if (maxScale > 0) {
+              if (scale > maxScale) {
+                throw new ObjectPropertyException(record, fieldName, "'" + value + "' scale "
+                  + scale + " > " + maxScale);
+              }
+            }
+            final Number minValue = getMinValue();
+            if (minValue != null) {
+              if (NumericComparator.numericCompare(number, minValue) < 0) {
+                throw new ObjectPropertyException(record, fieldName, "'" + value + "' > "
+                  + minValue);
+              }
+            }
+            final Number maxValue = getMaxValue();
+            if (maxValue != null) {
+              if (NumericComparator.numericCompare(number, maxValue) > 0) {
+                throw new ObjectPropertyException(record, fieldName, "'" + value + "' < "
+                  + maxValue);
+              }
+            }
+          } else if (value instanceof String) {
+            final String string = (String)value;
+            final int length = string.length();
+            if (maxLength > 0) {
+              if (length > maxLength) {
+                throw new ObjectPropertyException(record, fieldName, "'" + value + "' length "
+                  + length + " > " + maxLength);
+              }
+            }
+          }
+          if (!this.allowedValues.isEmpty()) {
+            if (!this.allowedValues.containsKey(value)) {
+              throw new ObjectPropertyException(record, fieldName, "'" + value + " not in ("
+                + CollectionUtil.toString(",", this.allowedValues) + ")");
+            }
+          }
+        }
+      } else {
+        final Identifier id = codeTable.getId(value);
+        if (id == null) {
+          String codeTableName;
+          if (codeTable instanceof CodeTableProperty) {
+            @SuppressWarnings("resource")
+            final CodeTableProperty property = (CodeTableProperty)codeTable;
+            codeTableName = property.getTypeName();
+          } else {
+            codeTableName = codeTable.toString();
+          }
+          throw new ObjectPropertyException(record, fieldName, "Unable to find code for '" + value
+            + "' in " + codeTableName);
         }
       }
     }

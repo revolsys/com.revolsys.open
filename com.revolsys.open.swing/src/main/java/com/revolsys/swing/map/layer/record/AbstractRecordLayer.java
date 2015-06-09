@@ -871,17 +871,18 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
     throw new UnsupportedOperationException();
   }
 
-  protected boolean doSaveChanges(final LayerRecord record) {
-    return false;
-  }
-
   protected boolean doSaveChanges(final RecordSaveErrorTableModel errors) {
     if (isExists()) {
       boolean saved = true;
       try {
-        saved &= doSaveChanges(errors, getDeletedRecords());
-        saved &= doSaveChanges(errors, getModifiedRecords());
-        saved &= doSaveChanges(errors, getNewRecords());
+        final Collection<LayerRecord> deletedRecords = getDeletedRecords();
+        saved &= doSaveChanges(errors, deletedRecords);
+
+        final Collection<LayerRecord> modifiedRecords = getModifiedRecords();
+        saved &= doSaveChanges(errors, modifiedRecords);
+
+        final List<LayerRecord> newRecords = getNewRecords();
+        saved &= doSaveChanges(errors, newRecords);
       } finally {
         fireRecordsChanged();
       }
@@ -905,6 +906,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
       }
     }
     return saved;
+  }
+
+  protected boolean doSaveChanges(final RecordSaveErrorTableModel errors, final LayerRecord record) {
+    return false;
   }
 
   public void exportRecords() {
@@ -1573,7 +1578,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
   protected boolean internalSaveChanges(final RecordSaveErrorTableModel errors,
     final LayerRecord record) {
     final RecordState originalState = record.getState();
-    final boolean saved = doSaveChanges(record);
+    final boolean saved = doSaveChanges(errors, record);
     if (saved) {
       postSaveChanges(originalState, record);
     }
@@ -1887,7 +1892,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
       saveChanges(newRecords);
       if (!newRecords.isEmpty()) {
         zoomToRecords(newRecords);
-        showRecordsTable(RecordLayerTableModel.MODE_EDITS);
+        showRecordsTable(RecordLayerTableModel.MODE_SELECTED);
       }
     }
     firePropertyChange("recordsInserted", null, newRecords);

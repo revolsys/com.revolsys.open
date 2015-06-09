@@ -17,6 +17,7 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.map.WeakCache;
 import com.revolsys.data.codes.CodeTable;
@@ -60,9 +61,11 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
 
   private final Map<String, FieldDefinition> fieldMap = new HashMap<String, FieldDefinition>();
 
-  private final List<String> fieldNames = new ArrayList<String>();
+  private final List<String> internalFieldNames = new ArrayList<>();
 
-  private final List<FieldDefinition> fields = new ArrayList<FieldDefinition>();
+  private List<String> fieldNames = Collections.emptyList();
+
+  private List<FieldDefinition> fields = Collections.emptyList();
 
   private Map<String, CodeTable> codeTableByColumnMap = new HashMap<String, CodeTable>();
 
@@ -95,6 +98,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
   private final List<RecordDefinition> superClasses = new ArrayList<RecordDefinition>();
 
   private String description;
+
+  private final List<FieldDefinition> internalFields = new ArrayList<>();
 
   public RecordDefinitionImpl() {
   }
@@ -190,7 +195,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
     this.defaultValues.put(fieldName, defaultValue);
   }
 
-  public void addField(final FieldDefinition field) {
+  public synchronized void addField(final FieldDefinition field) {
     final int index = this.fieldNames.size();
     final String name = field.getName();
     String lowerName;
@@ -200,8 +205,10 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
       lowerName = name.toLowerCase();
 
     }
-    this.fieldNames.add(name);
-    this.fields.add(field);
+    this.internalFieldNames.add(name);
+    this.fieldNames = Lists.unmodifiable(this.internalFieldNames);
+    this.internalFields.add(field);
+    this.fields = Lists.unmodifiable(this.internalFields);
     this.fieldMap.put(lowerName, field);
     this.fieldIdMap.put(lowerName, this.fieldIdMap.size());
     final DataType dataType = field.getType();
@@ -309,8 +316,10 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
     RECORD_DEFINITION_CACHE.remove(this.instanceId);
     this.fieldIdMap.clear();
     this.fieldMap.clear();
-    this.fieldNames.clear();
-    this.fields.clear();
+    this.internalFieldNames.clear();
+    this.fields = Collections.emptyList();
+    this.internalFields.clear();
+    this.fieldNames = Collections.emptyList();
     this.codeTableByColumnMap.clear();
     this.recordFactory = null;
     this.recordDefinitionFactory = new RecordDefinitionFactoryImpl();
@@ -433,12 +442,12 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
 
   @Override
   public List<String> getFieldNames() {
-    return new ArrayList<String>(this.fieldNames);
+    return this.fieldNames;
   }
 
   @Override
   public List<FieldDefinition> getFields() {
-    return new ArrayList<FieldDefinition>(this.fields);
+    return this.fields;
   }
 
   @Override
@@ -646,6 +655,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
     if (this.fields.contains(field) && name.equals(newName)) {
       final int index = field.getIndex();
       this.fields.set(index, newFieldDefinition);
+      this.fields = Lists.unmodifiable(this.fields);
       this.fieldMap.put(lowerName, newFieldDefinition);
       newFieldDefinition.setIndex(index);
     } else {

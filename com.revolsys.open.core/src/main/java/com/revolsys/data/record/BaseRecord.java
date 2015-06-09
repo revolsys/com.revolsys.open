@@ -27,7 +27,7 @@ public abstract class BaseRecord extends AbstractRecord implements Serializable 
   }
 
   /**
-   * Get the metd data describing the Record and it's attributes.
+   * Get the recordDefinition describing the Record and it's attributes.
    *
    * @return The meta data.
    */

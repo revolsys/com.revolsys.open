@@ -17,6 +17,7 @@ import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
 import com.revolsys.swing.map.layer.record.table.model.RecordListLayerTableModel;
+import com.revolsys.swing.map.layer.record.table.model.RecordSaveErrorTableModel;
 
 public class ListRecordLayer extends AbstractRecordLayer {
 
@@ -122,11 +123,11 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected boolean doSaveChanges(final LayerRecord record) {
+  protected boolean doSaveChanges(final RecordSaveErrorTableModel errors, final LayerRecord record) {
     if (record.isDeleted()) {
       return true;
     } else {
-      return super.doSaveChanges(record);
+      return super.doSaveChanges(errors, record);
     }
   }
 

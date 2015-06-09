@@ -27,6 +27,7 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.field.AbstractRecordQueryField;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.listener.Listeners;
 import com.revolsys.swing.menu.MenuFactory;
@@ -132,6 +133,11 @@ public class RecordTableCellEditor extends AbstractCellEditor implements TableCe
     if (this.editorComponent instanceof JTextField) {
       final JTextField textField = (JTextField)this.editorComponent;
       textField.setBorder(BorderFactory.createCompoundBorder(
+        BorderFactory.createLineBorder(WebColors.LightSteelBlue),
+        BorderFactory.createEmptyBorder(1, 2, 1, 2)));
+    } else if (this.editorComponent instanceof AbstractRecordQueryField) {
+      final AbstractRecordQueryField queryField = (AbstractRecordQueryField)this.editorComponent;
+      queryField.setSearchFieldBorder(BorderFactory.createCompoundBorder(
         BorderFactory.createLineBorder(WebColors.LightSteelBlue),
         BorderFactory.createEmptyBorder(1, 2, 1, 2)));
     }

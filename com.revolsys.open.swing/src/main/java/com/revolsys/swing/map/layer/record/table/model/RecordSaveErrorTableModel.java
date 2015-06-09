@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.Window;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -122,8 +123,8 @@ public class RecordSaveErrorTableModel extends RecordListTableModel implements S
       final BasePanel panel = new BasePanel(new VerticalLayout(), new JLabel(
         "<html><p><b style=\"color:red\">Error saving changes for layer:</b></p><p>" + layerPath
           + "</p>"), RecordSaveErrorTableModel.createPanel(this));
-      panel.setPreferredSize(new Dimension(SwingUtil.getScreenBounds().width - 300,
-        getRowCount() * 22 + 75));
+      final Rectangle screenBounds = SwingUtil.getScreenBounds();
+      panel.setPreferredSize(new Dimension(screenBounds.width - 300, getRowCount() * 22 + 75));
 
       final Window window = SwingUtil.getActiveWindow();
       final JOptionPane pane = new JOptionPane(panel, JOptionPane.ERROR_MESSAGE,
@@ -134,7 +135,7 @@ public class RecordSaveErrorTableModel extends RecordListTableModel implements S
       final JDialog dialog = pane.createDialog(window, "Error Saving Changes: " + layerPath);
 
       dialog.pack();
-      SwingUtil.setLocationCentre(dialog);
+      SwingUtil.setLocationCentre(screenBounds, dialog);
       dialog.setVisible(true);
       dialog.dispose();
       return false;

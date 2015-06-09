@@ -28,6 +28,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataEvent;
@@ -150,7 +151,7 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
 
     this.searchField.setEditable(true);
     PopupMenu.getPopupMenuFactory(this.searchField);
-    this.searchField.setPreferredSize(new Dimension(100, 22));
+    this.searchField.setPreferredSize(new Dimension(100, 20));
     add(this.searchField);
     this.busyLabel.setVisible(false);
     add(this.busyLabel);
@@ -494,6 +495,10 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
 
   public void setMinSearchCharacters(final int minSearchCharacters) {
     this.minSearchCharacters = minSearchCharacters;
+  }
+
+  public void setSearchFieldBorder(final Border border) {
+    this.searchField.setBorder(border);
   }
 
   protected void setSearchResults(final int searchIndex, final Collection<Record> records,

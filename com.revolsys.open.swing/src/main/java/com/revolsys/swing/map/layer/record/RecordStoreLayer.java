@@ -53,6 +53,7 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
+import com.revolsys.swing.map.layer.record.table.model.RecordSaveErrorTableModel;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
@@ -470,49 +471,55 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected boolean doSaveChanges(final LayerRecord record) {
+  protected boolean doSaveChanges(final RecordSaveErrorTableModel errors, final LayerRecord record) {
     final boolean deleted = super.isDeleted(record);
-    final RecordStore recordStore = getRecordStore();
-    final PlatformTransactionManager transactionManager = recordStore.getTransactionManager();
-    try (
-      Transaction transaction = new Transaction(transactionManager, Propagation.REQUIRES_NEW)) {
-      try {
 
-        if (isExists()) {
-          if (recordStore != null) {
+    if (isExists()) {
+      if (this.recordStore != null) {
+        final RecordStore recordStore = getRecordStore();
+        final PlatformTransactionManager transactionManager = recordStore.getTransactionManager();
+        try (
+          Transaction transaction = new Transaction(transactionManager, Propagation.REQUIRES_NEW)) {
+          try {
             try (
               final Writer<Record> writer = recordStore.createWriter()) {
               if (isCached(this.getCacheIdDeleted(), record) || super.isDeleted(record)) {
                 preDeleteRecord(record);
                 record.setState(RecordState.Deleted);
                 writeDelete(writer, record);
-              } else if (super.isModified(record)) {
-                writeUpdate(writer, record);
-              } else if (super.isNew(record)) {
-                Identifier identifier = record.getIdentifier();
+              } else {
                 final RecordDefinition recordDefinition = getRecordDefinition();
-                final List<String> idFieldNames = recordDefinition.getIdFieldNames();
-                if (identifier == null && !idFieldNames.isEmpty()) {
-                  final Object idValue = recordStore.createPrimaryIdValue(this.typePath);
-                  if (idValue != null) {
-                    identifier = SingleIdentifier.create(idValue);
-                    identifier.setIdentifier(record, idFieldNames);
-                  }
+                final int fieldCount = recordDefinition.getFieldCount();
+                for (int fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++) {
+                  record.validateField(fieldIndex);
                 }
-                writer.write(record);
+                if (super.isModified(record)) {
+                  writeUpdate(writer, record);
+                } else if (super.isNew(record)) {
+                  Identifier identifier = record.getIdentifier();
+                  final List<String> idFieldNames = recordDefinition.getIdFieldNames();
+                  if (identifier == null && !idFieldNames.isEmpty()) {
+                    final Object idValue = recordStore.createPrimaryIdValue(this.typePath);
+                    if (idValue != null) {
+                      identifier = SingleIdentifier.create(idValue);
+                      identifier.setIdentifier(record, idFieldNames);
+                    }
+                  }
+                  writer.write(record);
+                }
               }
             }
             if (!deleted) {
               record.setState(RecordState.Persisted);
             }
             return true;
+          } catch (final Throwable e) {
+            throw transaction.setRollbackOnly(e);
           }
         }
-        return false;
-      } catch (final Throwable e) {
-        throw transaction.setRollbackOnly(e);
       }
     }
+    return false;
   }
 
   @Override

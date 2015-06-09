@@ -66,8 +66,8 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
     return (Icon)getValue(SMALL_ICON);
   }
 
-  public Object getLargeIcon() {
-    return getValue(LARGE_ICON_KEY);
+  public Icon getLargeIcon() {
+    return (Icon)getValue(LARGE_ICON_KEY);
   }
 
   public Integer getMnemonic() {

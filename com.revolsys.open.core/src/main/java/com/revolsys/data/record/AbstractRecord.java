@@ -25,6 +25,7 @@ import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.ListIdentifier;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.query.Value;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionFactory;
 import com.revolsys.data.types.DataType;
@@ -156,6 +157,11 @@ public abstract class AbstractRecord extends AbstractMap<String, Object> impleme
     } else {
       return recordDefinition.getRecordFactory();
     }
+  }
+
+  public FieldDefinition getFieldDefinition(final int fieldIndex) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return recordDefinition.getField(fieldIndex);
   }
 
   @Override
@@ -708,6 +714,15 @@ public abstract class AbstractRecord extends AbstractMap<String, Object> impleme
       break;
       case Deleted:
         throw new IllegalStateException("Cannot modify an object which has been deleted");
+    }
+  }
+
+  @Override
+  public void validateField(final int fieldIndex) {
+    final FieldDefinition field = getFieldDefinition(fieldIndex);
+    if (field != null) {
+      final Object value = getValue(fieldIndex);
+      field.validate(this, value);
     }
   }
 

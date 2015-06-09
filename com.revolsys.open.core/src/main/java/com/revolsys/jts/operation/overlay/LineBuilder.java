@@ -56,8 +56,6 @@ public class LineBuilder {
 
   private final GeometryFactory geometryFactory;
 
-  private final PointLocator ptLocator;
-
   private final List<Edge> lineEdgesList = new ArrayList<>();
 
   private final List<LineString> resultLineList = new ArrayList<>();
@@ -66,7 +64,6 @@ public class LineBuilder {
     final PointLocator ptLocator) {
     this.op = op;
     this.geometryFactory = geometryFactory;
-    this.ptLocator = ptLocator;
   }
 
   /**

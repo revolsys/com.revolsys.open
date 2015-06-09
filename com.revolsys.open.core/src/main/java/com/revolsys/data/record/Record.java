@@ -170,4 +170,6 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
    */
   void setValuesByPath(Map<String, ? extends Object> values);
 
+  void validateField(int fieldIndex);
+
 }
