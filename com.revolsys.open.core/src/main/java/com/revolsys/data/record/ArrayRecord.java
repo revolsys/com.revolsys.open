@@ -20,17 +20,17 @@ public class ArrayRecord extends BaseRecord {
   private static final long serialVersionUID = 1L;
 
   /** The object's attribute values. */
-  private Object[] attributes;
+  private Object[] values;
 
   /**
    * Construct a new ArrayRecord as a deep clone of the attribute values.
    * Objects can only be cloned if they have a publicly accessible
    * {@link #clone()} method.
    *
-   * @param object The object to clone.
+   * @param record The object to clone.
    */
-  public ArrayRecord(final Record object) {
-    this(object.getRecordDefinition(), object);
+  public ArrayRecord(final Record record) {
+    this(record.getRecordDefinition(), record);
   }
 
   /**
@@ -46,10 +46,10 @@ public class ArrayRecord extends BaseRecord {
     final Map<String, ? extends Object> values) {
     super(recordDefinition);
     if (recordDefinition == null) {
-      this.attributes = new Object[0];
+      this.values = new Object[0];
     } else {
-      final int attributeCount = recordDefinition.getFieldCount();
-      this.attributes = new Object[attributeCount];
+      final int fieldCount = recordDefinition.getFieldCount();
+      this.values = new Object[fieldCount];
       final Map<String, Object> defaultValues = recordDefinition.getDefaultValues();
       setValuesByPath(defaultValues);
       setValues(values);
@@ -65,7 +65,7 @@ public class ArrayRecord extends BaseRecord {
   @Override
   public ArrayRecord clone() {
     final ArrayRecord clone = (ArrayRecord)super.clone();
-    clone.attributes = this.attributes.clone();
+    clone.values = this.values.clone();
     return clone;
   }
 
@@ -81,23 +81,23 @@ public class ArrayRecord extends BaseRecord {
     if (index < 0) {
       return null;
     } else {
-      return (T)this.attributes[index];
+      return (T)this.values[index];
     }
   }
 
   /**
-   * Get the values of all attributes.
+   * Get the values of all values.
    *
    * @return The attribute value.
    */
   @Override
   public List<Object> getValues() {
-    return Arrays.asList(this.attributes);
+    return Arrays.asList(this.values);
   }
 
   @Override
   public int hashCode() {
-    return this.attributes.hashCode();
+    return this.values.hashCode();
   }
 
   /**
@@ -120,12 +120,12 @@ public class ArrayRecord extends BaseRecord {
         final SingleIdentifier identifier = (SingleIdentifier)value;
         value = identifier.getValue(0);
       }
-      final Object oldValue = this.attributes[index];
+      final Object oldValue = this.values[index];
       if (!EqualsInstance.INSTANCE.equals(oldValue, value)) {
         updated = true;
         updateState();
       }
-      this.attributes[index] = value;
+      this.values[index] = value;
     }
     return updated;
   }

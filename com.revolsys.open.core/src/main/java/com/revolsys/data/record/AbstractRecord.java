@@ -635,9 +635,9 @@ public abstract class AbstractRecord extends AbstractMap<String, Object> impleme
   @Override
   public void setValues(final Map<String, ? extends Object> values) {
     if (values != null) {
-      for (final Entry<String, Object> defaultValue : new LinkedHashMap<String, Object>(values).entrySet()) {
-        final String name = defaultValue.getKey();
-        final Object value = defaultValue.getValue();
+      for (final Entry<String, Object> entry : new LinkedHashMap<String, Object>(values).entrySet()) {
+        final String name = entry.getKey();
+        final Object value = entry.getValue();
         setValue(name, value);
       }
     }
