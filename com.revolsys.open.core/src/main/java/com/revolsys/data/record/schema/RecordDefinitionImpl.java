@@ -57,15 +57,15 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
     return RECORD_DEFINITION_CACHE.get(instanceId);
   }
 
-  private Map<String, CodeTable> codeTableByColumnMap = new HashMap<String, CodeTable>();
+  private Map<String, CodeTable> codeTableByColumnMap = new HashMap<>();
 
-  private Map<String, Object> defaultValues = new HashMap<String, Object>();
+  private Map<String, Object> defaultValues = new HashMap<>();
 
   private String description;
 
-  private final Map<String, Integer> fieldIdMap = new HashMap<String, Integer>();
+  private final Map<String, Integer> fieldIdMap = new HashMap<>();
 
-  private final Map<String, FieldDefinition> fieldMap = new HashMap<String, FieldDefinition>();
+  private final Map<String, FieldDefinition> fieldMap = new HashMap<>();
 
   private List<String> fieldNames = Collections.emptyList();
 
@@ -97,9 +97,9 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
 
   private RecordFactory recordFactory = new ArrayRecordFactory();
 
-  private final Map<String, Collection<Object>> restrictions = new HashMap<String, Collection<Object>>();
+  private final Map<String, Collection<Object>> restrictions = new HashMap<>();
 
-  private final List<RecordDefinition> superClasses = new ArrayList<RecordDefinition>();
+  private final List<RecordDefinition> superClasses = new ArrayList<>();
 
   public RecordDefinitionImpl() {
   }
