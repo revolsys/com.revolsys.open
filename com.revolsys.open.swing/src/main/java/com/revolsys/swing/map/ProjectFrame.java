@@ -431,6 +431,7 @@ public class ProjectFrame extends BaseFrame {
       this.leftTabs = null;
       this.leftRightSplit = null;
       this.bottomTabs = null;
+      this.topBottomSplit = null;
 
       if (this.mapPanel != null) {
         this.mapPanel.destroy();
@@ -610,7 +611,7 @@ public class ProjectFrame extends BaseFrame {
 
     addTasksPanel();
     addLogPanel();
-    setBounds((Object)null);
+    setBounds((Object)null, false);
 
     super.init();
   }
@@ -621,7 +622,7 @@ public class ProjectFrame extends BaseFrame {
     Invoke.later(this, "setTitle", this.project.getName() + " - " + this.frameTitle);
 
     final Object frameBoundsObject = this.project.getProperty("frameBounds");
-    setBounds(frameBoundsObject);
+    setBounds(frameBoundsObject, true);
     setVisible(true);
 
     final RecordStoreConnectionManager recordStoreConnectionManager = RecordStoreConnectionManager.get();
@@ -672,8 +673,8 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
-  public void setBounds(final Object frameBoundsObject) {
-    if (SwingUtilities.isEventDispatchThread()) {
+  public void setBounds(final Object frameBoundsObject, final boolean visible) {
+    Invoke.later(() -> {
       boolean sizeSet = false;
       if (frameBoundsObject instanceof List) {
         try {
@@ -717,13 +718,10 @@ public class ProjectFrame extends BaseFrame {
 
       final int topBottomDividerLocation = (int)(getHeight() * 0.75);
       this.topBottomSplit.setDividerLocation(topBottomDividerLocation);
-    } else {
-      if (frameBoundsObject == null) {
-        Invoke.later(this, "setBounds", new Object());
-      } else {
-        Invoke.later(this, "setBounds", frameBoundsObject);
+      if (visible) {
+        setVisible(true);
       }
-    }
+    });
   }
 
   public void setExitOnClose(final boolean exitOnClose) {

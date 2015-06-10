@@ -8,6 +8,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 
 import com.revolsys.swing.WindowManager;
+import com.revolsys.swing.parallel.Invoke;
 
 @SuppressWarnings("serial")
 public class BaseFrame extends JFrame implements WindowListener {
@@ -60,12 +61,14 @@ public class BaseFrame extends JFrame implements WindowListener {
 
   @Override
   public void setVisible(final boolean visible) {
-    if (visible) {
-      WindowManager.addWindow(this);
-    } else {
-      WindowManager.removeWindow(this);
-    }
-    super.setVisible(visible);
+    Invoke.later(() -> {
+      if (visible) {
+        WindowManager.addWindow(this);
+      } else {
+        WindowManager.removeWindow(this);
+      }
+      super.setVisible(visible);
+    });
   }
 
   @Override
