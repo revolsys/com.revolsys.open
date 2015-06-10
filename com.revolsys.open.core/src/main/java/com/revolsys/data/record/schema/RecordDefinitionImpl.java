@@ -654,8 +654,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
     final String newName = newFieldDefinition.getName();
     if (this.fields.contains(field) && name.equals(newName)) {
       final int index = field.getIndex();
-      this.fields.set(index, newFieldDefinition);
-      this.fields = Lists.unmodifiable(this.fields);
+      this.internalFields.set(index, newFieldDefinition);
+      this.fields = Lists.unmodifiable(this.internalFields);
       this.fieldMap.put(lowerName, newFieldDefinition);
       newFieldDefinition.setIndex(index);
     } else {
