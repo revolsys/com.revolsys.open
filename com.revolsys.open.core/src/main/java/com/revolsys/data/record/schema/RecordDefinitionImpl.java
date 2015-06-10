@@ -57,23 +57,19 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
     return RECORD_DEFINITION_CACHE.get(instanceId);
   }
 
+  private Map<String, CodeTable> codeTableByColumnMap = new HashMap<String, CodeTable>();
+
+  private Map<String, Object> defaultValues = new HashMap<String, Object>();
+
+  private String description;
+
   private final Map<String, Integer> fieldIdMap = new HashMap<String, Integer>();
 
   private final Map<String, FieldDefinition> fieldMap = new HashMap<String, FieldDefinition>();
 
-  private final List<String> internalFieldNames = new ArrayList<>();
-
   private List<String> fieldNames = Collections.emptyList();
 
   private List<FieldDefinition> fields = Collections.emptyList();
-
-  private Map<String, CodeTable> codeTableByColumnMap = new HashMap<String, CodeTable>();
-
-  private RecordFactory recordFactory = new ArrayRecordFactory();
-
-  private RecordDefinitionFactory recordDefinitionFactory;
-
-  private Map<String, Object> defaultValues = new HashMap<String, Object>();
 
   /** The index of the primary geometry field. */
   private int geometryFieldDefinitionIndex = -1;
@@ -82,24 +78,28 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
 
   private final List<String> geometryFieldDefinitionNames = new ArrayList<>();
 
+  /** The index of the ID field. */
+  private int idFieldDefinitionIndex = -1;
+
   private final List<Integer> idFieldDefinitionIndexes = new ArrayList<>();
 
   private final List<String> idFieldDefinitionNames = new ArrayList<>();
 
   private final List<FieldDefinition> idFieldDefinitions = new ArrayList<>();
 
-  /** The index of the ID field. */
-  private int idFieldDefinitionIndex = -1;
-
   private final Integer instanceId = INSTANCE_IDS.getAndIncrement();
+
+  private final List<String> internalFieldNames = new ArrayList<>();
+
+  private final List<FieldDefinition> internalFields = new ArrayList<>();
+
+  private RecordDefinitionFactory recordDefinitionFactory;
+
+  private RecordFactory recordFactory = new ArrayRecordFactory();
 
   private final Map<String, Collection<Object>> restrictions = new HashMap<String, Collection<Object>>();
 
   private final List<RecordDefinition> superClasses = new ArrayList<RecordDefinition>();
-
-  private String description;
-
-  private final List<FieldDefinition> internalFields = new ArrayList<>();
 
   public RecordDefinitionImpl() {
   }
