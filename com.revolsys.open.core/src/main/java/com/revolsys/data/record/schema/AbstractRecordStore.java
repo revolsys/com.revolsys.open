@@ -108,10 +108,10 @@ public abstract class AbstractRecordStore extends AbstractObjectWithProperties i
         if (schema.isInitialized()) {
           for (final RecordDefinition recordDefinition : schema.getRecordDefinitions()) {
             final String idFieldName = recordDefinition.getIdFieldName();
-            for (final FieldDefinition attribute : recordDefinition.getFields()) {
-              final String fieldName = attribute.getName();
+            for (final FieldDefinition field : recordDefinition.getFields()) {
+              final String fieldName = field.getName();
               if (fieldName.equals(columnName) && !fieldName.equals(idFieldName)) {
-                attribute.setCodeTable(codeTable);
+                field.setCodeTable(codeTable);
               }
             }
           }
@@ -129,12 +129,12 @@ public abstract class AbstractRecordStore extends AbstractObjectWithProperties i
 
   protected void addRecordDefinition(final RecordDefinition recordDefinition) {
     final String idFieldName = recordDefinition.getIdFieldName();
-    for (final FieldDefinition attribute : recordDefinition.getFields()) {
-      final String fieldName = attribute.getName();
+    for (final FieldDefinition field : recordDefinition.getFields()) {
+      final String fieldName = field.getName();
       if (!fieldName.equals(idFieldName)) {
         final CodeTable codeTable = this.columnToTableMap.get(fieldName);
         if (codeTable != null) {
-          attribute.setCodeTable(codeTable);
+          field.setCodeTable(codeTable);
         }
       }
     }
@@ -462,7 +462,7 @@ public abstract class AbstractRecordStore extends AbstractObjectWithProperties i
   }
 
   protected Map<String, Object> getSharedAttributes() {
-    Map<String, Object> sharedAttributes = ThreadSharedAttributes.getField(this);
+    Map<String, Object> sharedAttributes = ThreadSharedAttributes.getAttribute(this);
     if (sharedAttributes == null) {
       sharedAttributes = new HashMap<String, Object>();
       ThreadSharedAttributes.setAttribute(this, sharedAttributes);
@@ -578,8 +578,8 @@ public abstract class AbstractRecordStore extends AbstractObjectWithProperties i
         for (int i = 0; i < idFieldNames.size(); i++) {
           final String name = idFieldNames.get(i);
           final Object value = values.get(i);
-          final FieldDefinition attribute = recordDefinition.getField(name);
-          query.and(Q.equal(attribute, value));
+          final FieldDefinition field = recordDefinition.getField(name);
+          query.and(Q.equal(field, value));
         }
         return queryFirst(query);
       }
@@ -603,8 +603,8 @@ public abstract class AbstractRecordStore extends AbstractObjectWithProperties i
         for (int i = 0; i < idFieldNames.size(); i++) {
           final String name = idFieldNames.get(i);
           final Object value = id[i];
-          final FieldDefinition attribute = recordDefinition.getField(name);
-          query.and(Q.equal(attribute, value));
+          final FieldDefinition field = recordDefinition.getField(name);
+          query.and(Q.equal(field, value));
         }
         return queryFirst(query);
       }

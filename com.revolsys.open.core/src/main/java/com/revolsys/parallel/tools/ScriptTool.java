@@ -250,7 +250,7 @@ public class ScriptTool {
             while (logFileName.contains("${")) {
               final Expression expression = JexlUtil.createExpression(logFileName);
               final HashMapContext context = new HashMapContext();
-              context.setVars(ThreadSharedAttributes.getFields());
+              context.setVars(ThreadSharedAttributes.getAttributes());
               logFileName = (String)JexlUtil.evaluateExpression(context, expression);
             }
           } catch (final Exception e) {
