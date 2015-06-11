@@ -57,7 +57,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
     return RECORD_DEFINITION_CACHE.get(instanceId);
   }
 
-  private Map<String, CodeTable> codeTableByColumnMap = new HashMap<>();
+  private Map<String, CodeTable> codeTableByFieldNameMap = new HashMap<>();
 
   private Map<String, Object> defaultValues = new HashMap<>();
 
@@ -186,10 +186,6 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
     RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
 
-  public void addColumnCodeTable(final String column, final CodeTable codeTable) {
-    this.codeTableByColumnMap.put(column, codeTable);
-  }
-
   @Override
   public void addDefaultValue(final String fieldName, final Object defaultValue) {
     this.defaultValues.put(fieldName, defaultValue);
@@ -263,6 +259,10 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
     return field;
   }
 
+  public void addFieldCodeTable(final String fieldName, final CodeTable codeTable) {
+    this.codeTableByFieldNameMap.put(fieldName, codeTable);
+  }
+
   public void addRestriction(final String fieldPath, final Collection<Object> values) {
     this.restrictions.put(fieldPath, values);
   }
@@ -320,7 +320,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
     this.fields = Collections.emptyList();
     this.internalFields.clear();
     this.fieldNames = Collections.emptyList();
-    this.codeTableByColumnMap.clear();
+    this.codeTableByFieldNameMap.clear();
     this.recordFactory = null;
     this.recordDefinitionFactory = new RecordDefinitionFactoryImpl();
     this.defaultValues.clear();
@@ -333,14 +333,14 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
   }
 
   @Override
-  public CodeTable getCodeTableByFieldName(final String column) {
+  public CodeTable getCodeTableByFieldName(final String fieldName) {
     final RecordStore recordStore = getRecordStore();
     if (recordStore == null) {
       return null;
     } else {
-      CodeTable codeTable = this.codeTableByColumnMap.get(column);
+      CodeTable codeTable = this.codeTableByFieldNameMap.get(fieldName);
       if (codeTable == null && recordStore != null) {
-        codeTable = recordStore.getCodeTableByFieldName(column);
+        codeTable = recordStore.getCodeTableByFieldName(fieldName);
       }
       if (codeTable instanceof CodeTableProperty) {
         final CodeTableProperty property = (CodeTableProperty)codeTable;
@@ -663,8 +663,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
     }
   }
 
-  public void setCodeTableByColumnMap(final Map<String, CodeTable> codeTableByColumnMap) {
-    this.codeTableByColumnMap = codeTableByColumnMap;
+  public void setCodeTableByFieldNameMap(final Map<String, CodeTable> codeTableByFieldNameMap) {
+    this.codeTableByFieldNameMap = codeTableByFieldNameMap;
   }
 
   @Override

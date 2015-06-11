@@ -15,8 +15,8 @@ import javax.swing.SwingConstants;
 
 import org.jdesktop.swingx.JXList;
 
-import com.revolsys.io.datastore.RecordStoreConnection;
-import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
+import com.revolsys.data.record.io.RecordStoreConnection;
+import com.revolsys.data.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;

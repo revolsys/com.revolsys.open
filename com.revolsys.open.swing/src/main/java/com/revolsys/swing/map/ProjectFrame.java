@@ -41,9 +41,9 @@ import javax.swing.tree.TreePath;
 
 import org.springframework.core.io.FileSystemResource;
 
+import com.revolsys.data.record.io.RecordStoreConnectionManager;
+import com.revolsys.data.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.datastore.RecordStoreConnectionManager;
-import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
 import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
