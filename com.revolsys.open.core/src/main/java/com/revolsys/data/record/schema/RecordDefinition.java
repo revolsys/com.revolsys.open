@@ -56,7 +56,7 @@ public interface RecordDefinition extends RecordStoreSchemaElement, MapSerialize
   /**
    * Get the number of fields supported by the type.
    *
-   * @return The number of fieldibutes.
+   * @return The number of fields.
    */
   int getFieldCount();
 
