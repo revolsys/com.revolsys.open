@@ -176,37 +176,37 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   @PostConstruct
   public void initialize() {
     super.initialize();
-    final JdbcFieldAdder numberAttributeAdder = new JdbcFieldAdder(DataTypes.DECIMAL);
-    addFieldAdder("numeric", numberAttributeAdder);
+    final JdbcFieldAdder numberFieldAdder = new JdbcFieldAdder(DataTypes.DECIMAL);
+    addFieldAdder("numeric", numberFieldAdder);
 
-    final JdbcFieldAdder stringAttributeAdder = new JdbcFieldAdder(DataTypes.STRING);
-    addFieldAdder("varchar", stringAttributeAdder);
-    addFieldAdder("text", stringAttributeAdder);
-    addFieldAdder("name", stringAttributeAdder);
-    addFieldAdder("bpchar", stringAttributeAdder);
+    final JdbcFieldAdder stringFieldAdder = new JdbcFieldAdder(DataTypes.STRING);
+    addFieldAdder("varchar", stringFieldAdder);
+    addFieldAdder("text", stringFieldAdder);
+    addFieldAdder("name", stringFieldAdder);
+    addFieldAdder("bpchar", stringFieldAdder);
 
-    final JdbcFieldAdder longAttributeAdder = new JdbcFieldAdder(DataTypes.LONG);
-    addFieldAdder("int8", longAttributeAdder);
-    addFieldAdder("bigint", longAttributeAdder);
-    addFieldAdder("bigserial", longAttributeAdder);
-    addFieldAdder("serial8", longAttributeAdder);
+    final JdbcFieldAdder longFieldAdder = new JdbcFieldAdder(DataTypes.LONG);
+    addFieldAdder("int8", longFieldAdder);
+    addFieldAdder("bigint", longFieldAdder);
+    addFieldAdder("bigserial", longFieldAdder);
+    addFieldAdder("serial8", longFieldAdder);
 
-    final JdbcFieldAdder intAttributeAdder = new JdbcFieldAdder(DataTypes.INT);
-    addFieldAdder("int4", intAttributeAdder);
-    addFieldAdder("integer", intAttributeAdder);
-    addFieldAdder("serial", intAttributeAdder);
-    addFieldAdder("serial4", intAttributeAdder);
+    final JdbcFieldAdder intFieldAdder = new JdbcFieldAdder(DataTypes.INT);
+    addFieldAdder("int4", intFieldAdder);
+    addFieldAdder("integer", intFieldAdder);
+    addFieldAdder("serial", intFieldAdder);
+    addFieldAdder("serial4", intFieldAdder);
 
-    final JdbcFieldAdder shortAttributeAdder = new JdbcFieldAdder(DataTypes.SHORT);
-    addFieldAdder("int2", shortAttributeAdder);
-    addFieldAdder("smallint", shortAttributeAdder);
+    final JdbcFieldAdder shortFieldAdder = new JdbcFieldAdder(DataTypes.SHORT);
+    addFieldAdder("int2", shortFieldAdder);
+    addFieldAdder("smallint", shortFieldAdder);
 
-    final JdbcFieldAdder floatAttributeAdder = new JdbcFieldAdder(DataTypes.FLOAT);
-    addFieldAdder("float4", floatAttributeAdder);
+    final JdbcFieldAdder floatFieldAdder = new JdbcFieldAdder(DataTypes.FLOAT);
+    addFieldAdder("float4", floatFieldAdder);
 
-    final JdbcFieldAdder doubleAttributeAdder = new JdbcFieldAdder(DataTypes.DOUBLE);
-    addFieldAdder("float8", doubleAttributeAdder);
-    addFieldAdder("double precision", doubleAttributeAdder);
+    final JdbcFieldAdder doubleFieldAdder = new JdbcFieldAdder(DataTypes.DOUBLE);
+    addFieldAdder("float8", doubleFieldAdder);
+    addFieldAdder("double precision", doubleFieldAdder);
 
     addFieldAdder("date", new JdbcFieldAdder(DataTypes.DATE_TIME));
 
