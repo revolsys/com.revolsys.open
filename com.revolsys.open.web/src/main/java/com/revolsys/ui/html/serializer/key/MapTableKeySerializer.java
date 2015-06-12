@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.revolsys.format.json.JsonMapIoFactory;
+import com.revolsys.format.json.Json;
 import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.JavaBeanUtil;
@@ -36,7 +36,7 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
       if (value instanceof String) {
         final String string = (String)value;
         if (Property.hasValue(string)) {
-          value = JsonMapIoFactory.toMap(string);
+          value = Json.toMap(string);
         } else {
           out.text("-");
           return;

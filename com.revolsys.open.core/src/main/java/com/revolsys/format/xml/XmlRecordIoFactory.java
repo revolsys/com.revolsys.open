@@ -11,7 +11,7 @@ import com.revolsys.io.Writer;
 
 public class XmlRecordIoFactory extends AbstractRecordAndGeometryWriterFactory {
   public XmlRecordIoFactory() {
-    super("XML", true, true);
+    super("XML");
     addMediaTypeAndFileExtension("text/xml", "xml");
   }
 

@@ -19,7 +19,7 @@ public class RecordStoreRecordAndGeometryWriterFactory extends
   public RecordStoreRecordAndGeometryWriterFactory(final String name, final String mediaType,
     final boolean geometrySupported, final boolean customAttributionSupported,
     final Iterable<String> fileExtensions) {
-    super(name, geometrySupported, customAttributionSupported);
+    super(name);
     for (final String fileExtension : fileExtensions) {
       addMediaTypeAndFileExtension(mediaType, fileExtension);
     }

@@ -17,7 +17,7 @@ import com.revolsys.spring.OutputStreamResource;
 
 public class XBaseRecordIoFactory extends AbstractRecordIoFactory {
   public XBaseRecordIoFactory() {
-    super("D-Base", true, false, true);
+    super("D-Base", true);
     addMediaTypeAndFileExtension("application/dbase", "dbf");
     addMediaTypeAndFileExtension("application/dbf", "dbf");
   }
@@ -45,4 +45,13 @@ public class XBaseRecordIoFactory extends AbstractRecordIoFactory {
     return createRecordWriter(recordDefinition, new OutputStreamResource(baseName, outputStream));
   }
 
+  @Override
+  public boolean isBinary() {
+    return true;
+  }
+
+  @Override
+  public boolean isGeometrySupported() {
+    return false;
+  }
 }

@@ -20,7 +20,7 @@ import com.revolsys.io.ZipWriter;
 public class ShapefileZipIoFactory extends AbstractRecordAndGeometryIoFactory {
 
   public ShapefileZipIoFactory() {
-    super("ESRI Shapefile inside a ZIP archive", true, true);
+    super("ESRI Shapefile inside a ZIP archive");
     addMediaTypeAndFileExtension("application/x-shp+zip", "shpz");
   }
 
@@ -43,4 +43,8 @@ public class ShapefileZipIoFactory extends AbstractRecordAndGeometryIoFactory {
     return new ZipWriter<Record>(directory, shapeWriter, outputStream);
   }
 
+  @Override
+  public boolean isBinary() {
+    return true;
+  }
 }

@@ -236,6 +236,10 @@ public interface BoundingBox {
 
   boolean isEmpty();
 
+  boolean isWithinDistance(BoundingBox boundingBox, double maxDistance);
+
+  boolean isWithinDistance(Geometry geometry, double maxDistance);
+
   BoundingBox move(double deltaX, double deltaY);
 
   /**

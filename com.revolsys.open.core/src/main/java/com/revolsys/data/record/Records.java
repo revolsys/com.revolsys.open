@@ -31,7 +31,6 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public final class Records {
-
   public static int compareNullFirst(final Record record1, final Record record2,
     final String fieldName) {
     final Object value1 = getValue(record1, fieldName);
@@ -135,6 +134,16 @@ public final class Records {
   public static RecordDefinition createGeometryRecordDefinition() {
     final FieldDefinition geometryField = new FieldDefinition("geometry", DataTypes.GEOMETRY, true);
     return new RecordDefinitionImpl("Feature", geometryField);
+  }
+
+  public static double distance(final Record record1, final Record record2) {
+    final Geometry geometry1 = record1.getGeometryValue();
+    final Geometry geometry2 = record2.getGeometryValue();
+    if (geometry1 == null || geometry2 == null) {
+      return Double.MIN_VALUE;
+    } else {
+      return geometry1.distance(geometry2);
+    }
   }
 
   public static <D extends Record> List<D> filter(final Collection<D> records,
@@ -263,6 +272,14 @@ public final class Records {
     } else {
       final GeometryFactory geometryFactory = geometries.get(0).getGeometryFactory();
       return geometryFactory.geometry(geometries);
+    }
+  }
+
+  public static <G extends Geometry> G getGeometry(final Record record) {
+    if (record == null) {
+      return null;
+    } else {
+      return record.getGeometryValue();
     }
   }
 
@@ -476,5 +493,4 @@ public final class Records {
 
   private Records() {
   }
-
 }

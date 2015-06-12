@@ -26,23 +26,15 @@ public abstract class AbstractGeometryReaderFactory extends AbstractIoFactory im
     }
   }
 
-  private final boolean binary;
-
   private Set<CoordinateSystem> coordinateSystems = EpsgCoordinateSystems.getCoordinateSystems();
 
-  public AbstractGeometryReaderFactory(final String name, final boolean binary) {
+  public AbstractGeometryReaderFactory(final String name) {
     super(name);
-    this.binary = binary;
   }
 
   @Override
   public Set<CoordinateSystem> getCoordinateSystems() {
     return this.coordinateSystems;
-  }
-
-  @Override
-  public boolean isBinary() {
-    return this.binary;
   }
 
   @Override

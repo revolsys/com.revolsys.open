@@ -21,7 +21,7 @@ public class KmzIoFactory extends AbstractRecordAndGeometryWriterFactory impleme
   MapWriterFactory, GeometryReaderFactory {
 
   public KmzIoFactory() {
-    super(Kml22Constants.KMZ_FORMAT_DESCRIPTION, true, true);
+    super(Kml22Constants.KMZ_FORMAT_DESCRIPTION);
     addMediaTypeAndFileExtension(Kml22Constants.KMZ_MEDIA_TYPE, Kml22Constants.KMZ_FILE_EXTENSION);
   }
 
@@ -71,15 +71,5 @@ public class KmzIoFactory extends AbstractRecordAndGeometryWriterFactory impleme
   @Override
   public boolean isCoordinateSystemSupported(final CoordinateSystem coordinateSystem) {
     return KmlIoFactory.COORDINATE_SYSTEMS.contains(coordinateSystem);
-  }
-
-  @Override
-  public boolean isCustomAttributionSupported() {
-    return true;
-  }
-
-  @Override
-  public boolean isGeometrySupported() {
-    return true;
   }
 }

@@ -15,7 +15,7 @@ import java.util.TreeMap;
 
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.format.csv.CsvIterator;
-import com.revolsys.format.json.JsonMapIoFactory;
+import com.revolsys.format.json.Json;
 import com.revolsys.gis.cs.AngularUnit;
 import com.revolsys.gis.cs.Area;
 import com.revolsys.gis.cs.Authority;
@@ -255,7 +255,7 @@ public final class EpsgCoordinateSystems {
 
   private static Map<String, Object> getParameters(final String parametersString) {
     final Map<String, Object> parameters = new TreeMap<String, Object>();
-    final Map<String, Object> jsonParams = JsonMapIoFactory.toObjectMap(parametersString);
+    final Map<String, Object> jsonParams = Json.toObjectMap(parametersString);
     for (final Entry<String, Object> parameter : jsonParams.entrySet()) {
       final String key = parameter.getKey();
       final Object value = parameter.getValue();

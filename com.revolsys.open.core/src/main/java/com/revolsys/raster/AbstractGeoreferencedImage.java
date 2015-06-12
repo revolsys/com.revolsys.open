@@ -35,7 +35,7 @@ import org.w3c.dom.NodeList;
 import com.revolsys.beans.AbstractPropertyChangeObject;
 import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.format.json.JsonMapIoFactory;
+import com.revolsys.format.json.Json;
 import com.revolsys.format.xml.DomUtil;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
@@ -609,7 +609,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
     final Resource settingsFile = SpringUtil.addExtension(resource, "rgobject");
     if (settingsFile.exists()) {
       try {
-        final Map<String, Object> settings = JsonMapIoFactory.toMap(settingsFile);
+        final Map<String, Object> settings = Json.toMap(settingsFile);
         final String boundingBoxWkt = (String)settings.get("boundingBox");
         if (Property.hasValue(boundingBoxWkt)) {
           final BoundingBox boundingBox = BoundingBoxDoubleGf.create(boundingBoxWkt);

@@ -12,7 +12,7 @@ import com.revolsys.io.Writer;
 
 public class EsriGeodatabaseXmlRecordWriterFactory extends AbstractRecordAndGeometryWriterFactory {
   public EsriGeodatabaseXmlRecordWriterFactory() {
-    super(EsriGeodatabaseXmlConstants.FORMAT_DESCRIPTION, true, true);
+    super(EsriGeodatabaseXmlConstants.FORMAT_DESCRIPTION);
     addMediaTypeAndFileExtension(EsriGeodatabaseXmlConstants.MEDIA_TYPE,
       EsriGeodatabaseXmlConstants.FILE_EXTENSION);
     setCoordinateSystems(EpsgCoordinateSystems.getCoordinateSystem(4326));

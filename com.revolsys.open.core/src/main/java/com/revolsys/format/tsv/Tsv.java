@@ -47,7 +47,7 @@ public class Tsv extends AbstractRecordAndGeometryIoFactory implements MapWriter
   }
 
   public Tsv() {
-    super(Tsv.DESCRIPTION, false, true);
+    super(Tsv.DESCRIPTION);
     addMediaTypeAndFileExtension(Tsv.MEDIA_TYPE, Tsv.FILE_EXTENSION);
   }
 
@@ -87,15 +87,5 @@ public class Tsv extends AbstractRecordAndGeometryIoFactory implements MapWriter
   @Override
   public MapWriter getMapWriter(final Writer out) {
     return new CsvMapWriter(out, Tsv.FIELD_SEPARATOR, true);
-  }
-
-  @Override
-  public boolean isCustomAttributionSupported() {
-    return true;
-  }
-
-  @Override
-  public boolean isGeometrySupported() {
-    return true;
   }
 }

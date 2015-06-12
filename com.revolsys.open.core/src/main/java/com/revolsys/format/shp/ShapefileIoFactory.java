@@ -17,9 +17,8 @@ import com.revolsys.spring.OutputStreamResource;
 
 public class ShapefileIoFactory extends AbstractRecordAndGeometryIoFactory {
   public ShapefileIoFactory() {
-    super(ShapefileConstants.DESCRIPTION, true, true);
+    super(ShapefileConstants.DESCRIPTION);
     addMediaTypeAndFileExtension(ShapefileConstants.MIME_TYPE, ShapefileConstants.FILE_EXTENSION);
-    setSingleFile(false);
   }
 
   @Override
@@ -44,4 +43,13 @@ public class ShapefileIoFactory extends AbstractRecordAndGeometryIoFactory {
     return createRecordWriter(recordDefinition, new OutputStreamResource(baseName, outputStream));
   }
 
+  @Override
+  public boolean isBinary() {
+    return true;
+  }
+
+  @Override
+  public boolean isSingleFile() {
+    return false;
+  }
 }

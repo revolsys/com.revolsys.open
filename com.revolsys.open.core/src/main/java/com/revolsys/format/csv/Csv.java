@@ -147,7 +147,7 @@ public class Csv extends AbstractRecordAndGeometryIoFactory implements MapWriter
   }
 
   public Csv() {
-    super(CsvConstants.DESCRIPTION, false, true);
+    super(CsvConstants.DESCRIPTION);
     addMediaTypeAndFileExtension(CsvConstants.MEDIA_TYPE, CsvConstants.FILE_EXTENSION);
   }
 
@@ -196,15 +196,5 @@ public class Csv extends AbstractRecordAndGeometryIoFactory implements MapWriter
   public MapWriter getMapWriter(final Resource resource) {
     final java.io.Writer writer = SpringUtil.getWriter(resource);
     return getMapWriter(writer);
-  }
-
-  @Override
-  public boolean isCustomAttributionSupported() {
-    return true;
-  }
-
-  @Override
-  public boolean isGeometrySupported() {
-    return true;
   }
 }

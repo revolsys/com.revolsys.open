@@ -21,7 +21,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.io.RecordStoreFactoryRegistry;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.format.csv.CsvWriter;
-import com.revolsys.format.json.JsonMapIoFactory;
+import com.revolsys.format.json.Json;
 import com.revolsys.gis.cs.epsg.EpsgUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Reader;
@@ -374,7 +374,7 @@ public final class EpsgCoordinateSystemsLoader {
 
             final Integer unitId = this.coordinateSystemUnitMap.get(coordSysCode);
             final Integer axisId = coordSysCode;
-            final String parametersString = JsonMapIoFactory.toString(parameters);
+            final String parametersString = Json.toString(parameters);
             writer.write(code, name, sourceGeogcrsCode, unitId, methodCode, methodName,
               parametersString, axisId, areaCode, deprecated);
           }

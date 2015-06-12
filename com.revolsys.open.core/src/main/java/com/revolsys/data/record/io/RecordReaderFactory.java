@@ -8,10 +8,10 @@ import org.springframework.core.io.Resource;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.io.IoFactory;
+import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.Reader;
 
-public interface RecordReaderFactory extends IoFactory {
+public interface RecordReaderFactory extends FileIoFactory {
 
   Reader<Record> createDirectoryRecordReader();
 
@@ -24,8 +24,6 @@ public interface RecordReaderFactory extends IoFactory {
   RecordReader createRecordReader(Resource resource, RecordFactory factory);
 
   Set<CoordinateSystem> getCoordinateSystems();
-
-  boolean isBinary();
 
   boolean isCoordinateSystemSupported(CoordinateSystem coordinateSystem);
 }

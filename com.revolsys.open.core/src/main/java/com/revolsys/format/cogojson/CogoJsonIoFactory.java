@@ -22,7 +22,7 @@ public class CogoJsonIoFactory extends AbstractRecordAndGeometryWriterFactory im
   GeometryReaderFactory {
 
   public CogoJsonIoFactory() {
-    super(GeoJsonConstants.COGO_DESCRIPTION, true, true);
+    super(GeoJsonConstants.COGO_DESCRIPTION);
     addMediaTypeAndFileExtension(GeoJsonConstants.COGO_MEDIA_TYPE,
       GeoJsonConstants.COGO_FILE_EXTENSION);
   }
@@ -42,10 +42,5 @@ public class CogoJsonIoFactory extends AbstractRecordAndGeometryWriterFactory im
     final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
     return new GeoJsonRecordWriter(writer, true);
-  }
-
-  @Override
-  public boolean isBinary() {
-    return false;
   }
 }

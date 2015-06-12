@@ -15,9 +15,8 @@ import com.revolsys.jts.geom.Geometry;
 public abstract class AbstractRecordAndGeometryWriterFactory extends AbstractRecordWriterFactory
   implements GeometryWriterFactory {
 
-  public AbstractRecordAndGeometryWriterFactory(final String name, final boolean geometrySupported,
-    final boolean customAttributionSupported) {
-    super(name, geometrySupported, customAttributionSupported);
+  public AbstractRecordAndGeometryWriterFactory(final String name) {
+    super(name);
   }
 
   @Override

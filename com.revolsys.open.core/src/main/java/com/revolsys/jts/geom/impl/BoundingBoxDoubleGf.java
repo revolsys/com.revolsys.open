@@ -1258,6 +1258,22 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     }
   }
 
+  @Override
+  public boolean isWithinDistance(final BoundingBox boundingBox, final double maxDistance) {
+    final double distance = boundingBox.distance(boundingBox);
+    if (distance < maxDistance) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public boolean isWithinDistance(final Geometry geometry, final double maxDistance) {
+    final BoundingBox boundingBox = geometry.getBoundingBox();
+    return isWithinDistance(boundingBox, maxDistance);
+  }
+
   /**
    * <p>Create a new BoundingBox by moving the min/max x coordinates by xDisplacement and
    * the min/max y coordinates by yDisplacement. If the bounding box is null or the xDisplacement

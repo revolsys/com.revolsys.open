@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.revolsys.format.json.JsonMapIoFactory;
+import com.revolsys.format.json.Json;
 import com.revolsys.io.FileUtil;
 
 public class OS {
@@ -88,7 +88,7 @@ public class OS {
   public static Map<String, Object> getPreferences(final String applicationName, final String path) {
     final File file = getPreferenceFile(applicationName, path);
     if (file.exists()) {
-      return JsonMapIoFactory.toMap(file);
+      return Json.toMap(file);
     } else {
       return new LinkedHashMap<String, Object>();
     }
@@ -135,7 +135,7 @@ public class OS {
     final Map<String, Object> preferences = getPreferences(applicationName, path);
     Property.set(preferences, propertyName, value);
     final File file = getPreferenceFile(applicationName, path);
-    JsonMapIoFactory.write(preferences, file, true);
+    Json.write(preferences, file, true);
   }
 
 }

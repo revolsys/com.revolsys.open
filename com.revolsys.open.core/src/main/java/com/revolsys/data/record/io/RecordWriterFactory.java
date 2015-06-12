@@ -9,10 +9,10 @@ import org.springframework.core.io.Resource;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.io.IoFactory;
+import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.Writer;
 
-public interface RecordWriterFactory extends IoFactory {
+public interface RecordWriterFactory extends FileIoFactory {
 
   Writer<Record> createRecordWriter(RecordDefinition recordDefinition, Resource resource);
 
@@ -25,10 +25,4 @@ public interface RecordWriterFactory extends IoFactory {
   Set<CoordinateSystem> getCoordinateSystems();
 
   boolean isCoordinateSystemSupported(CoordinateSystem coordinateSystem);
-
-  boolean isCustomAttributionSupported();
-
-  boolean isGeometrySupported();
-
-  boolean isSingleFile();
 }

@@ -64,14 +64,4 @@ public class XmlMapIoFactory extends AbstractMapReaderFactory implements MapWrit
   public MapWriter getMapWriter(final Writer out) {
     return new XmlMapWriter(out);
   }
-
-  @Override
-  public boolean isCustomAttributionSupported() {
-    return true;
-  }
-
-  @Override
-  public boolean isGeometrySupported() {
-    return true;
-  }
 }

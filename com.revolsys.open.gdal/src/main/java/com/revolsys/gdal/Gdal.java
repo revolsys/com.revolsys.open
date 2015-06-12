@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.format.json.JsonMapIoFactory;
+import com.revolsys.format.json.Json;
 import com.revolsys.gdal.raster.GdalImageFactory;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
@@ -491,7 +491,7 @@ public class Gdal {
     if (settingsFile.exists()) {
       try {
 
-        final Map<String, Object> settings = JsonMapIoFactory.toMap(settingsFile);
+        final Map<String, Object> settings = Json.toMap(settingsFile);
         final String boundingBoxWkt = (String)settings.get("boundingBox");
         if (Property.hasValue(boundingBoxWkt)) {
           final BoundingBox boundingBox = BoundingBoxDoubleGf.create(boundingBoxWkt);

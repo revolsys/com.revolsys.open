@@ -17,7 +17,7 @@ import com.revolsys.io.Writer;
 public class GmlIoFactory extends AbstractRecordAndGeometryWriterFactory implements
   GeometryReaderFactory {
   public GmlIoFactory() {
-    super(GmlConstants.FORMAT_DESCRIPTION, true, true);
+    super(GmlConstants.FORMAT_DESCRIPTION);
     addMediaTypeAndFileExtension(GmlConstants.MEDIA_TYPE, GmlConstants.FILE_EXTENSION);
   }
 
@@ -32,10 +32,5 @@ public class GmlIoFactory extends AbstractRecordAndGeometryWriterFactory impleme
     final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
     return new GmlRecordWriter(recordDefinition, writer);
-  }
-
-  @Override
-  public boolean isBinary() {
-    return false;
   }
 }

@@ -19,7 +19,7 @@ public class GeoJsonIoFactory extends AbstractRecordAndGeometryWriterFactory imp
   GeometryReaderFactory {
 
   public GeoJsonIoFactory() {
-    super(GeoJsonConstants.DESCRIPTION, true, true);
+    super(GeoJsonConstants.DESCRIPTION);
     addMediaTypeAndFileExtension(GeoJsonConstants.MEDIA_TYPE, GeoJsonConstants.FILE_EXTENSION);
     addMediaType(GeoJsonConstants.MEDIA_TYPE);
   }
@@ -39,10 +39,5 @@ public class GeoJsonIoFactory extends AbstractRecordAndGeometryWriterFactory imp
     final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
     return new GeoJsonRecordWriter(writer);
-  }
-
-  @Override
-  public boolean isBinary() {
-    return false;
   }
 }

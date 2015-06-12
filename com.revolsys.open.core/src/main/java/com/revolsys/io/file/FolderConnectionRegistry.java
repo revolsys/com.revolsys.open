@@ -8,7 +8,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.format.json.JsonMapIoFactory;
+import com.revolsys.format.json.Json;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.connection.AbstractConnectionRegistry;
 import com.revolsys.util.Property;
@@ -66,7 +66,7 @@ public class FolderConnectionRegistry extends AbstractConnectionRegistry<FolderC
       final File file = getConnectionFile(name);
       if (file != null && (!file.exists() || file.canWrite())) {
         final FileSystemResource resource = new FileSystemResource(file);
-        JsonMapIoFactory.write(connection.toMap(), resource);
+        Json.write(connection.toMap(), resource);
       }
     }
   }
@@ -79,7 +79,7 @@ public class FolderConnectionRegistry extends AbstractConnectionRegistry<FolderC
 
   @Override
   protected FolderConnection loadConnection(final File connectionFile) {
-    final Map<String, ? extends Object> config = JsonMapIoFactory.toMap(connectionFile);
+    final Map<String, ? extends Object> config = Json.toMap(connectionFile);
     String name = Maps.getString(config, "name");
     if (!Property.hasValue(name)) {
       name = FileUtil.getBaseName(connectionFile);

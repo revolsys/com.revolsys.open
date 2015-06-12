@@ -9,7 +9,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.data.record.schema.RecordStore;
-import com.revolsys.format.json.JsonMapIoFactory;
+import com.revolsys.format.json.Json;
 import com.revolsys.parallel.process.AbstractMultipleProcess;
 import com.revolsys.parallel.process.Parallel;
 import com.revolsys.parallel.process.Process;
@@ -129,7 +129,7 @@ public class MultiCopyRecords implements Process {
   }
 
   public void setProcessDefinitionResource(final Resource resource) {
-    final Map<String, Object> processDefinition = JsonMapIoFactory.toMap(resource);
+    final Map<String, Object> processDefinition = Json.toMap(resource);
     setProcessDefinition(processDefinition);
   }
 

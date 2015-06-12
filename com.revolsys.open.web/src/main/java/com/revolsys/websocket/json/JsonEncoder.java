@@ -6,7 +6,7 @@ import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
 
-import com.revolsys.format.json.JsonMapIoFactory;
+import com.revolsys.format.json.Json;
 
 public class JsonEncoder implements Encoder.Text<Map<String, Object>> {
 
@@ -16,7 +16,7 @@ public class JsonEncoder implements Encoder.Text<Map<String, Object>> {
 
   @Override
   public String encode(final Map<String, Object> map) throws EncodeException {
-    return JsonMapIoFactory.toString(map);
+    return Json.toString(map);
   }
 
   @Override

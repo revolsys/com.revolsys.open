@@ -25,14 +25,10 @@ public abstract class AbstractRecordAndGeometryReaderFactory extends AbstractGeo
 
   private final ArrayRecordFactory recordFactory = new ArrayRecordFactory();
 
-  private boolean singleFile = true;
-
-  private boolean customAttributionSupported = true;
-
   private final List<String> urlPatterns = new ArrayList<>();
 
-  public AbstractRecordAndGeometryReaderFactory(final String name, final boolean binary) {
-    super(name, binary);
+  public AbstractRecordAndGeometryReaderFactory(final String name) {
+    super(name);
   }
 
   @Override
@@ -142,23 +138,5 @@ public abstract class AbstractRecordAndGeometryReaderFactory extends AbstractGeo
   public void init() {
     super.init();
     RecordStoreFactoryRegistry.register(this);
-  }
-
-  @Override
-  public boolean isCustomAttributionSupported() {
-    return this.customAttributionSupported;
-  }
-
-  @Override
-  public boolean isSingleFile() {
-    return this.singleFile;
-  }
-
-  protected void setCustomAttributionSupported(final boolean customAttributionSupported) {
-    this.customAttributionSupported = customAttributionSupported;
-  }
-
-  protected void setSingleFile(final boolean singleFile) {
-    this.singleFile = singleFile;
   }
 }

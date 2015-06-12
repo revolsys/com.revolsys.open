@@ -15,11 +15,8 @@ public abstract class AbstractRecordReaderFactory extends AbstractMapReaderFacto
   RecordReaderFactory {
   private final RecordFactory recordFactory = new ArrayRecordFactory();
 
-  private final boolean binary;
-
   public AbstractRecordReaderFactory(final String name, final boolean binary) {
     super(name);
-    this.binary = binary;
   }
 
   /**
@@ -84,10 +81,5 @@ public abstract class AbstractRecordReaderFactory extends AbstractMapReaderFacto
   public RecordReader createRecordReader(final Resource resource) {
     return createRecordReader(resource, this.recordFactory);
 
-  }
-
-  @Override
-  public boolean isBinary() {
-    return this.binary;
   }
 }

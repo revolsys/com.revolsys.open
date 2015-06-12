@@ -28,7 +28,7 @@ public class KmlIoFactory extends AbstractRecordAndGeometryWriterFactory impleme
   public static final Set<CoordinateSystem> COORDINATE_SYSTEMS = Collections.singleton(EpsgCoordinateSystems.wgs84());
 
   public KmlIoFactory() {
-    super(Kml22Constants.KML_FORMAT_DESCRIPTION, true, true);
+    super(Kml22Constants.KML_FORMAT_DESCRIPTION);
     addMediaTypeAndFileExtension(Kml22Constants.KML_MEDIA_TYPE, Kml22Constants.KML_FILE_EXTENSION);
   }
 
@@ -74,22 +74,7 @@ public class KmlIoFactory extends AbstractRecordAndGeometryWriterFactory impleme
   }
 
   @Override
-  public boolean isBinary() {
-    return false;
-  }
-
-  @Override
   public boolean isCoordinateSystemSupported(final CoordinateSystem coordinateSystem) {
     return COORDINATE_SYSTEMS.contains(coordinateSystem);
-  }
-
-  @Override
-  public boolean isCustomAttributionSupported() {
-    return true;
-  }
-
-  @Override
-  public boolean isGeometrySupported() {
-    return true;
   }
 }

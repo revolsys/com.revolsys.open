@@ -18,7 +18,7 @@ import com.revolsys.io.Writer;
 
 public class WktIoFactory extends AbstractRecordAndGeometryIoFactory implements WktConstants {
   public WktIoFactory() {
-    super(WktConstants.DESCRIPTION, false, false);
+    super(WktConstants.DESCRIPTION);
     addMediaTypeAndFileExtension(MEDIA_TYPE, FILE_EXTENSION);
   }
 
@@ -38,5 +38,10 @@ public class WktIoFactory extends AbstractRecordAndGeometryIoFactory implements 
     final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
     return new WktRecordWriter(recordDefinition, writer);
+  }
+
+  @Override
+  public boolean isCustomFieldsSupported() {
+    return false;
   }
 }

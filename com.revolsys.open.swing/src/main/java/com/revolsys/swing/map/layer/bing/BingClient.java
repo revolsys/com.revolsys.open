@@ -19,7 +19,7 @@ import javax.imageio.ImageIO;
 import org.springframework.core.io.UrlResource;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.format.json.JsonMapIoFactory;
+import com.revolsys.format.json.Json;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
@@ -72,7 +72,7 @@ public class BingClient {
     if (cachedRecordDefinition == null) {
       final String url = getImageryMetadataUrl(imagerySet);
       try {
-        cachedRecordDefinition = JsonMapIoFactory.toMap(new UrlResource(url));
+        cachedRecordDefinition = Json.toMap(new UrlResource(url));
         this.recordDefinitionCache.put(imagerySet, cachedRecordDefinition);
       } catch (final MalformedURLException e) {
         return Collections.emptyMap();

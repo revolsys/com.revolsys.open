@@ -14,7 +14,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.format.json.JsonMapIoFactory;
+import com.revolsys.format.json.Json;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.spring.SpringUtil;
@@ -73,7 +73,7 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer> implem
     final File file = getConnectionFile(name);
     if (file != null && (!file.exists() || file.canRead())) {
       final FileSystemResource resource = new FileSystemResource(file);
-      JsonMapIoFactory.write(connectionParameters, resource, true);
+      Json.write(connectionParameters, resource, true);
       loadConnection(file);
     }
   }
@@ -212,7 +212,7 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer> implem
       final File file = getConnectionFile(name);
       if (file != null) {
         final FileSystemResource resource = new FileSystemResource(file);
-        JsonMapIoFactory.write(connectionParameters, resource, true);
+        Json.write(connectionParameters, resource, true);
       }
     }
   }

@@ -43,15 +43,4 @@ public class XhtmlMapIoFactory extends AbstractIoFactory implements MapWriterFac
   public MapWriter getMapWriter(final Writer out) {
     return new XhtmlMapWriter(out);
   }
-
-  @Override
-  public boolean isCustomAttributionSupported() {
-    return true;
-  }
-
-  @Override
-  public boolean isGeometrySupported() {
-    return true;
-  }
-
 }

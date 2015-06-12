@@ -23,29 +23,7 @@ public abstract class AbstractMapReaderFactory extends AbstractIoFactory impleme
     }
   }
 
-  private boolean singleFile = true;
-
-  protected boolean customAttributionSupported = true;
-
   public AbstractMapReaderFactory(final String name) {
     super(name);
-  }
-
-  @Override
-  public boolean isCustomAttributionSupported() {
-    return this.customAttributionSupported;
-  }
-
-  @Override
-  public boolean isSingleFile() {
-    return this.singleFile;
-  }
-
-  protected void setCustomAttributionSupported(final boolean customAttributionSupported) {
-    this.customAttributionSupported = customAttributionSupported;
-  }
-
-  protected void setSingleFile(final boolean singleFile) {
-    this.singleFile = singleFile;
   }
 }

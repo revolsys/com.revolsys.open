@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -18,7 +19,6 @@ import java.util.prefs.Preferences;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.factory.Factory;
 import com.revolsys.factory.TreeMapFactory;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -62,7 +62,7 @@ public class Maps {
   }
 
   public static <K1, V> boolean addToSet(final Map<K1, Set<V>> map, final K1 key1, final V value) {
-    final Set<V> values = CollectionUtil.getSet(map, key1);
+    final Set<V> values = getSet(map, key1);
     return values.add(value);
   }
 
@@ -143,6 +143,13 @@ public class Maps {
       }
       return count;
     }
+  }
+
+  public static <V> V first(final Map<?, V> map) {
+    if (Property.hasValue(map)) {
+      return map.values().iterator().next();
+    }
+    return null;
   }
 
   @SuppressWarnings({
@@ -394,6 +401,15 @@ public class Maps {
       }
     }
     return values;
+  }
+
+  public static <K, V> Set<V> getSet(final Map<K, Set<V>> map, final K key) {
+    Set<V> value = map.get(key);
+    if (value == null) {
+      value = new LinkedHashSet<V>();
+      map.put(key, value);
+    }
+    return value;
   }
 
   public static String getString(final Map<String, ? extends Object> map, final String name) {

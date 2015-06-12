@@ -44,7 +44,7 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordStore;
-import com.revolsys.format.json.JsonMapIoFactory;
+import com.revolsys.format.json.Json;
 import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.io.Reader;
 import com.revolsys.spring.InvokeMethodAfterCommit;
@@ -436,7 +436,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       }
     }
     final Script script = new Script();
-    String jsonMap = JsonMapIoFactory.toString(tableParams);
+    String jsonMap = Json.toString(tableParams);
     jsonMap = jsonMap.substring(0, jsonMap.length() - 1)
       + ",\"createdRow\": function( row, data, dataIndex ) {refreshButtons(row);}"
       + ",\"initComplete\": function() {$(this).DataTable().columns.adjust();}";

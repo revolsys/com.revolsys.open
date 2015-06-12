@@ -18,7 +18,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.data.record.io.RecordIo;
-import com.revolsys.format.json.JsonMapIoFactory;
+import com.revolsys.format.json.Json;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Path;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
@@ -509,7 +509,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       file.getParentFile()));
 
     try {
-      final Map<String, Object> properties = JsonMapIoFactory.toMap(file);
+      final Map<String, Object> properties = Json.toMap(file);
       final Layer layer = MapObjectFactoryRegistry.toObject(properties);
       if (layer != null) {
         addLayer(layer);

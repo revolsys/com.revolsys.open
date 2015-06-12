@@ -9,9 +9,8 @@ import com.revolsys.data.record.schema.RecordDefinition;
 
 public class MoepBinaryReaderFactory extends AbstractRecordAndGeometryReaderFactory {
   public MoepBinaryReaderFactory() {
-    super("MOEP (BC Ministry of Environment and Parks)", true);
+    super("MOEP (BC Ministry of Environment and Parks)");
     addMediaTypeAndFileExtension("application/x-bcgov-moep-bin", "bin");
-    setCustomAttributionSupported(false);
   }
 
   public RecordReader createRecordReader(final RecordDefinition recordDefinition,
@@ -22,5 +21,15 @@ public class MoepBinaryReaderFactory extends AbstractRecordAndGeometryReaderFact
   @Override
   public RecordReader createRecordReader(final Resource resource, final RecordFactory recordFactory) {
     return new MoepBinaryReader(null, resource, recordFactory);
+  }
+
+  @Override
+  public boolean isBinary() {
+    return true;
+  }
+
+  @Override
+  public boolean isCustomFieldsSupported() {
+    return false;
   }
 }

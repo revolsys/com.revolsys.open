@@ -19,9 +19,8 @@ import com.revolsys.io.Writer;
 
 public class GpxReaderFactory extends AbstractRecordAndGeometryIoFactory {
   public GpxReaderFactory() {
-    super("GPS Exchange Format", false, false);
+    super("GPS Exchange Format");
     addMediaTypeAndFileExtension(GpxConstants.MEDIA_TYPE, GpxConstants.FILE_EXTENSION);
-    setCustomAttributionSupported(false);
   }
 
   public RecordReader createRecordReader(final RecordDefinition recordDefinition,
@@ -51,5 +50,10 @@ public class GpxReaderFactory extends AbstractRecordAndGeometryIoFactory {
     final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
     return new GpxWriter(writer);
+  }
+
+  @Override
+  public boolean isCustomFieldsSupported() {
+    return false;
   }
 }

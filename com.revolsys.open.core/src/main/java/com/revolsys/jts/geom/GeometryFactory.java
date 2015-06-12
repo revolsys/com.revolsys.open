@@ -92,6 +92,14 @@ public class GeometryFactory implements Serializable, MapSerializer {
 
   private static IntHashMap<IntHashMap<List<GeometryFactory>>> factoriesBySrid = new IntHashMap<>();
 
+  public static final BoundingBox boundingBox(final Geometry geometry) {
+    if (geometry == null) {
+      return floating3().boundingBox();
+    } else {
+      return geometry.getBoundingBox();
+    }
+  }
+
   public static void clear() {
     factoriesBySrid.clear();
   }

@@ -202,7 +202,7 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
         final List<FileNameExtensionFilter> recordFileFilters = new ArrayList<>();
         for (final RecordWriterFactory factory : IoFactoryRegistry.getInstance().getFactories(
           RecordWriterFactory.class)) {
-          if (recordDefinition.hasGeometryField() || factory.isCustomAttributionSupported()) {
+          if (recordDefinition.hasGeometryField() || factory.isCustomFieldsSupported()) {
             recordFileFilters.add(AddFileLayerAction.createFilter(factory));
           }
         }

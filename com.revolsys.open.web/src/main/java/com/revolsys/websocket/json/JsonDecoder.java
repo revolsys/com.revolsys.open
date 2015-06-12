@@ -5,13 +5,13 @@ import java.util.Map;
 import javax.websocket.Decoder;
 import javax.websocket.EndpointConfig;
 
-import com.revolsys.format.json.JsonMapIoFactory;
+import com.revolsys.format.json.Json;
 
 public class JsonDecoder implements Decoder.Text<Map<String, Object>> {
 
   @Override
   public Map<String, Object> decode(final String string) {
-    return JsonMapIoFactory.toObjectMap(string);
+    return Json.toObjectMap(string);
   }
 
   @Override

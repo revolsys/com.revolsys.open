@@ -225,15 +225,6 @@ public final class CollectionUtil {
     return values;
   }
 
-  public static <K, V> Set<V> getSet(final Map<K, Set<V>> map, final K key) {
-    Set<V> value = map.get(key);
-    if (value == null) {
-      value = new LinkedHashSet<V>();
-      map.put(key, value);
-    }
-    return value;
-  }
-
   public static <V> List<V> list(final Iterable<? extends V> values) {
     final ArrayList<V> list = new ArrayList<V>();
     if (values != null) {

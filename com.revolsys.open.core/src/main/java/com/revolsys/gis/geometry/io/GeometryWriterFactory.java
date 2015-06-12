@@ -7,11 +7,11 @@ import java.util.Set;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.io.IoFactory;
+import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.Writer;
 import com.revolsys.jts.geom.Geometry;
 
-public interface GeometryWriterFactory extends IoFactory {
+public interface GeometryWriterFactory extends FileIoFactory {
   Writer<Geometry> createGeometryWriter(Resource resource);
 
   Writer<Geometry> createGeometryWriter(String baseName, OutputStream out);

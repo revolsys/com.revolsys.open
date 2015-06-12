@@ -13,7 +13,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.format.json.JsonMapIoFactory;
+import com.revolsys.format.json.Json;
 import com.revolsys.format.json.JsonParser;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.JavaBeanUtil;
@@ -96,7 +96,7 @@ public class MapObjectFactoryRegistry {
     final Resource oldResource = SpringUtil.setBaseResource(SpringUtil.getParentResource(resource));
 
     try {
-      final Map<String, Object> properties = JsonMapIoFactory.toMap(resource);
+      final Map<String, Object> properties = Json.toMap(resource);
       return (V)MapObjectFactoryRegistry.toObject(properties);
     } catch (final Throwable t) {
       LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error(
@@ -109,16 +109,16 @@ public class MapObjectFactoryRegistry {
 
   public static String toString(final MapSerializer serializer) {
     final Map<String, Object> properties = serializer.toMap();
-    return JsonMapIoFactory.toString(properties);
+    return Json.toString(properties);
   }
 
   public static void write(final File file, final MapSerializer serializer) {
     final Map<String, Object> properties = serializer.toMap();
-    JsonMapIoFactory.write(properties, file, true);
+    Json.write(properties, file, true);
   }
 
   public static void write(final Resource resource, final MapSerializer serializer) {
     final Map<String, Object> properties = serializer.toMap();
-    JsonMapIoFactory.write(properties, resource, true);
+    Json.write(properties, resource, true);
   }
 }

@@ -23,7 +23,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.format.json.JsonMapIoFactory;
+import com.revolsys.format.json.Json;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.io.FileUtil;
@@ -266,7 +266,7 @@ public class Project extends LayerGroup {
     if (layerGroupResource.exists()) {
       final Resource oldResource = SpringUtil.setBaseResource(baseMapsResource);
       try {
-        final Map<String, Object> properties = JsonMapIoFactory.toMap(layerGroupResource);
+        final Map<String, Object> properties = Json.toMap(layerGroupResource);
         this.baseMapLayers.loadLayers(properties);
         boolean hasVisible = false;
         if (this.baseMapLayers != null) {
@@ -291,7 +291,7 @@ public class Project extends LayerGroup {
     } else {
       final Resource oldResource = SpringUtil.setBaseResource(resource);
       try {
-        final Map<String, Object> properties = JsonMapIoFactory.toMap(layerGroupResource);
+        final Map<String, Object> properties = Json.toMap(layerGroupResource);
         loadLayers(properties);
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error("Unable to read: " + layerGroupResource, e);
@@ -357,7 +357,7 @@ public class Project extends LayerGroup {
     } else {
       final Resource oldResource = SpringUtil.setBaseResource(resource);
       try {
-        final Map<String, Object> properties = JsonMapIoFactory.toMap(layerGroupResource);
+        final Map<String, Object> properties = Json.toMap(layerGroupResource);
         setProperties(properties);
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error("Unable to read: " + layerGroupResource, e);

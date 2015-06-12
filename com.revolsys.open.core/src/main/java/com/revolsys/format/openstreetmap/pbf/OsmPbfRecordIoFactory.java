@@ -15,7 +15,7 @@ import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 
 public class OsmPbfRecordIoFactory extends AbstractRecordAndGeometryReaderFactory {
   public OsmPbfRecordIoFactory() {
-    super("Open Street Map PBF", true);
+    super("Open Street Map PBF");
     addMediaTypeAndFileExtension("application/x-pbf+osm", "osm.pbf");
   }
 
@@ -31,8 +31,12 @@ public class OsmPbfRecordIoFactory extends AbstractRecordAndGeometryReaderFactor
   }
 
   @Override
+  public boolean isBinary() {
+    return true;
+  }
+
+  @Override
   public boolean isCoordinateSystemSupported(final CoordinateSystem coordinateSystem) {
     return coordinateSystem instanceof GeographicCoordinateSystem;
   }
-
 }

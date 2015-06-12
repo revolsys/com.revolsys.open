@@ -79,7 +79,7 @@ public class JsonRecordIoFactory extends AbstractRecordAndGeometryWriterFactory 
   }
 
   public JsonRecordIoFactory() {
-    super("JavaScript Object Notation", true, true);
+    super("JavaScript Object Notation");
     addMediaTypeAndFileExtension("application/json", "json");
   }
 

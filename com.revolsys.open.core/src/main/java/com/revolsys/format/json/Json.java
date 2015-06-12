@@ -8,7 +8,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.Property;
 
-public class JsonMapIoFactory extends AbstractMapReaderFactory implements MapWriterFactory {
+public class Json extends AbstractMapReaderFactory implements MapWriterFactory {
   public static Map<String, Object> toMap(final File file) {
     if (file == null) {
       return new LinkedHashMap<String, Object>();
@@ -114,12 +113,14 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements MapWri
   public static Map<String, Object> toObjectMap(final String string) {
     if (Property.hasValue(string)) {
       final StringReader reader = new StringReader(string);
-      final Reader<Map<String, Object>> mapReader = new JsonMapReader(reader, true);
-      for (final Map<String, Object> map : mapReader) {
-        return map;
+      try (
+        final Reader<Map<String, Object>> mapReader = new JsonMapReader(reader, true)) {
+        for (final Map<String, Object> map : mapReader) {
+          return map;
+        }
       }
     }
-    return Collections.emptyMap();
+    return new LinkedHashMap<>();
   }
 
   public static String toString(final List<? extends Map<String, Object>> list) {
@@ -182,7 +183,7 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements MapWri
     }
   }
 
-  public JsonMapIoFactory() {
+  public Json() {
     super("JSON");
     addMediaTypeAndFileExtension("application/json", "json");
   }
@@ -217,15 +218,4 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements MapWri
   public MapWriter getMapWriter(final Writer out) {
     return new JsonMapWriter(out);
   }
-
-  @Override
-  public boolean isCustomAttributionSupported() {
-    return true;
-  }
-
-  @Override
-  public boolean isGeometrySupported() {
-    return true;
-  }
-
 }

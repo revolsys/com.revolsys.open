@@ -19,15 +19,10 @@ import com.revolsys.spring.SpringUtil;
 public abstract class AbstractRecordIoFactory extends AbstractRecordReaderFactory implements
   RecordWriterFactory {
 
-  private final boolean geometrySupported;
-
   private Set<CoordinateSystem> coordinateSystems = EpsgCoordinateSystems.getCoordinateSystems();
 
-  public AbstractRecordIoFactory(final String name, final boolean binary,
-    final boolean geometrySupported, final boolean customAttributionSupported) {
+  public AbstractRecordIoFactory(final String name, final boolean binary) {
     super(name, binary);
-    this.geometrySupported = geometrySupported;
-    setCustomAttributionSupported(customAttributionSupported);
   }
 
   /**
@@ -60,11 +55,6 @@ public abstract class AbstractRecordIoFactory extends AbstractRecordReaderFactor
   @Override
   public boolean isCoordinateSystemSupported(final CoordinateSystem coordinateSystem) {
     return this.coordinateSystems.contains(coordinateSystem);
-  }
-
-  @Override
-  public boolean isGeometrySupported() {
-    return this.geometrySupported;
   }
 
   protected void setCoordinateSystems(final CoordinateSystem... coordinateSystems) {

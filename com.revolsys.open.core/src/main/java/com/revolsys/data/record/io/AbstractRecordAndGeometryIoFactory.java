@@ -25,10 +25,8 @@ public abstract class AbstractRecordAndGeometryIoFactory extends
 
   private Set<CoordinateSystem> coordinateSystems = EpsgCoordinateSystems.getCoordinateSystems();
 
-  public AbstractRecordAndGeometryIoFactory(final String name, final boolean binary,
-    final boolean customAttributionSupported) {
-    super(name, binary);
-    setCustomAttributionSupported(customAttributionSupported);
+  public AbstractRecordAndGeometryIoFactory(final String name) {
+    super(name);
   }
 
   @Override
@@ -88,11 +86,6 @@ public abstract class AbstractRecordAndGeometryIoFactory extends
   @Override
   public boolean isCoordinateSystemSupported(final CoordinateSystem coordinateSystem) {
     return this.coordinateSystems.contains(coordinateSystem);
-  }
-
-  @Override
-  public boolean isGeometrySupported() {
-    return true;
   }
 
   @Override
