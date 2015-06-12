@@ -1,4 +1,4 @@
-package com.revolsys.io.datastore;
+package com.revolsys.data.record.io;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -11,7 +11,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.record.io.RecordStoreFactoryRegistry;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.connection.AbstractConnectionRegistryManager;
@@ -36,9 +35,9 @@ public class RecordStoreConnectionManager extends
   }
 
   // TODO make this garbage collectable with reference counting.
-  private static Map<Map<String, Object>, RecordStore> recordStoreByConfig = new HashMap<Map<String, Object>, RecordStore>();
+  private static Map<Map<String, Object>, RecordStore> recordStoreByConfig = new HashMap<>();
 
-  private static Map<Map<String, Object>, AtomicInteger> recordStoreCounts = new HashMap<Map<String, Object>, AtomicInteger>();
+  private static Map<Map<String, Object>, AtomicInteger> recordStoreCounts = new HashMap<>();
 
   public static RecordStoreConnectionManager get() {
     return INSTANCE;
@@ -89,7 +88,7 @@ public class RecordStoreConnectionManager extends
 
   public static RecordStore getRecordStore(final String name) {
     final RecordStoreConnectionManager connectionManager = get();
-    final List<RecordStoreConnectionRegistry> registries = new ArrayList<RecordStoreConnectionRegistry>();
+    final List<RecordStoreConnectionRegistry> registries = new ArrayList<>();
     registries.addAll(connectionManager.getConnectionRegistries());
     final RecordStoreConnectionRegistry threadRegistry = RecordStoreConnectionRegistry.getForThread();
     if (threadRegistry != null) {

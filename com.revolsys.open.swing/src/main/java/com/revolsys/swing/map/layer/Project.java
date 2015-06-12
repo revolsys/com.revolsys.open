@@ -23,12 +23,12 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.data.record.io.RecordStoreConnectionManager;
+import com.revolsys.data.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.format.json.Json;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.datastore.RecordStoreConnectionManager;
-import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
 import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.map.MapSerializerUtil;

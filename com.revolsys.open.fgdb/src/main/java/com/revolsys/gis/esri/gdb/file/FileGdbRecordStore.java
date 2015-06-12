@@ -631,8 +631,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           AtomicLong idGenerator = this.idGenerators.get(typePath);
           if (idGenerator == null) {
             long maxId = 0;
-            for (final Record object : query(typePath)) {
-              final Identifier id = object.getIdentifier();
+            for (final Record record : query(typePath)) {
+              final Identifier id = record.getIdentifier();
               final Object firstId = id.getValue(0);
               if (firstId instanceof Number) {
                 final Number number = (Number)firstId;
@@ -792,13 +792,13 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public void delete(final Record object) {
+  public void delete(final Record record) {
     // Don't synchronize to avoid deadlock as that is done lower down in the
     // methods
-    if (object.getState() == RecordState.Persisted || object.getState() == RecordState.Modified) {
-      object.setState(RecordState.Deleted);
+    if (record.getState() == RecordState.Persisted || record.getState() == RecordState.Modified) {
+      record.setState(RecordState.Deleted);
       final Writer<Record> writer = getWriter();
-      writer.write(object);
+      writer.write(record);
     }
   }
 
@@ -1244,10 +1244,10 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public void insert(final Record object) {
+  public void insert(final Record record) {
     // Don't synchronize to avoid deadlock as that is done lower down in the
     // methods
-    getWriter().write(object);
+    getWriter().write(record);
   }
 
   protected void insertRow(final Table table, final Row row) {
@@ -1656,10 +1656,10 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public void update(final Record object) {
+  public void update(final Record record) {
     // Don't synchronize to avoid deadlock as that is done lower down in the
     // methods
-    getWriter().write(object);
+    getWriter().write(record);
   }
 
   protected void updateRow(final String typePath, final Table table, final Row row) {

@@ -142,7 +142,7 @@ public class ScriptExecutorProcess extends BaseInProcess<Record> implements Bean
 
   @Override
   public void setBeanFactory(final BeanFactory beanFactory) throws BeansException {
-    this.attributes.putAll(ThreadSharedAttributes.getFields());
+    this.attributes.putAll(ThreadSharedAttributes.getAttributes());
   }
 
   public void setExecutor(final ExecutorService executor) {

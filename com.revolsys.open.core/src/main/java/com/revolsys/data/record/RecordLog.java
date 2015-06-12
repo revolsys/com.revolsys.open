@@ -33,7 +33,7 @@ public class RecordLog {
   }
 
   public static RecordLog getForThread() {
-    final RecordLog recordLog = ThreadSharedAttributes.getField(KEY);
+    final RecordLog recordLog = ThreadSharedAttributes.getAttribute(KEY);
     return recordLog;
   }
 

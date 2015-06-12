@@ -1,4 +1,4 @@
-package com.revolsys.io.datastore;
+package com.revolsys.data.record.io;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -8,7 +8,6 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.data.record.io.RecordStoreFactoryRegistry;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.io.FileUtil;

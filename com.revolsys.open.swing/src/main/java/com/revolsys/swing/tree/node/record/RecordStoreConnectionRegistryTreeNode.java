@@ -7,8 +7,8 @@ import java.util.List;
 
 import javax.swing.Icon;
 
-import com.revolsys.io.datastore.RecordStoreConnection;
-import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
+import com.revolsys.data.record.io.RecordStoreConnection;
+import com.revolsys.data.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.swing.map.form.RecordStoreConnectionDialog;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeNodeRunnable;

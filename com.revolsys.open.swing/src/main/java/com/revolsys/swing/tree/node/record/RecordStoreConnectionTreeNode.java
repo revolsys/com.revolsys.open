@@ -8,15 +8,15 @@ import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
 
+import com.revolsys.data.record.io.RecordStoreConnection;
 import com.revolsys.data.record.io.RecordStoreConnectionMapProxy;
+import com.revolsys.data.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.data.record.io.RecordStoreProxy;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.record.schema.RecordStoreSchemaElement;
-import com.revolsys.io.datastore.RecordStoreConnection;
-import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
