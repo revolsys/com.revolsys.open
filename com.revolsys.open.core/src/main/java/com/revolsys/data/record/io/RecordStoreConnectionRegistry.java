@@ -9,7 +9,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.data.record.schema.RecordStore;
-import com.revolsys.format.json.JsonMapIoFactory;
+import com.revolsys.format.json.Json;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.connection.AbstractConnectionRegistry;
 import com.revolsys.util.Property;
@@ -72,7 +72,7 @@ public class RecordStoreConnectionRegistry extends
 
   @Override
   protected RecordStoreConnection loadConnection(final File recordStoreFile) {
-    final Map<String, ? extends Object> config = JsonMapIoFactory.toMap(recordStoreFile);
+    final Map<String, ? extends Object> config = Json.toMap(recordStoreFile);
     String name = Maps.getString(config, "name");
     if (!Property.hasValue(name)) {
       name = FileUtil.getBaseName(recordStoreFile);
