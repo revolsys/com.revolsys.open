@@ -547,10 +547,6 @@ public class ProjectFrame extends BaseFrame {
     return recentProjects;
   }
 
-  public BaseTree getTocTree() {
-    return this.tocTree;
-  }
-
   public BaseTreeNode getTreeNode(final Layer layer) {
     final List<Layer> layerPath = layer.getPathList();
     final TreePath treePath = this.tocTree.getTreePath(layerPath);
