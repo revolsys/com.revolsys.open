@@ -18,6 +18,59 @@ public class Strings {
     }
   }
 
+  public static boolean equalExceptOneCharacter(final String string1, final String string2) {
+    final int length1 = string1.length();
+    if (length1 != string2.length()) {
+      return false;
+    } else {
+      boolean equal = true;
+      for (int i = 0; i < length1; ++i) {
+        if (string1.charAt(i) != string2.charAt(i)) {
+          if (equal) {
+            equal = false;
+          } else {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+  }
+
+  public static boolean equalExceptOneExtraCharacter(final String string1, final String string2) {
+    final int length1 = string1.length();
+    final int length2 = string2.length();
+    if (length1 == length2) {
+      return string1.equals(string2);
+    } else {
+      if (length1 == length2 + 1) {
+        return equalExceptOneExtraCharacter(string2, string1);
+      }
+      if (length2 == length1 + 1) {
+        int matchCount = 0;
+        for (int i = 0; i < length1; i++) {
+          if (string1.charAt(i) == string2.charAt(i)) {
+            matchCount++;
+          } else {
+            break;
+          }
+        }
+        for (int i = 1; i <= length1; i++) {
+          final char c1 = string1.charAt(length1 - i);
+          final char c2 = string2.charAt(length2 - i);
+          if (c1 == c2) {
+            matchCount++;
+          } else {
+            break;
+          }
+        }
+        return matchCount == length1;
+      } else {
+        return false;
+      }
+    }
+  }
+
   public static String firstPart(final String text, final char character) {
     final int index = text.indexOf(character);
     if (index == -1) {
