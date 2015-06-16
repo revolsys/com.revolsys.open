@@ -294,12 +294,12 @@ public class SwingUtil {
   public static <T extends Field> T createField(final RecordDefinition recordDefinition,
     final String fieldName, final boolean editable) {
     Field field;
-    final FieldDefinition attribute = recordDefinition.getField(fieldName);
-    if (attribute == null) {
+    final FieldDefinition fieldDefinition = recordDefinition.getField(fieldName);
+    if (fieldDefinition == null) {
       throw new IllegalArgumentException("Cannot find field " + fieldName);
     } else {
-      final boolean required = attribute.isRequired();
-      final int length = attribute.getLength();
+      final boolean required = fieldDefinition.isRequired();
+      final int length = fieldDefinition.getLength();
       CodeTable codeTable;
       if (recordDefinition.getIdFieldNames().contains(fieldName)) {
         codeTable = null;
@@ -307,7 +307,7 @@ public class SwingUtil {
         codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
       }
 
-      final DataType type = attribute.getType();
+      final DataType type = fieldDefinition.getType();
       int columns = length;
       if (columns <= 0) {
         columns = 10;
@@ -331,9 +331,9 @@ public class SwingUtil {
         textField.setEditable(false);
         field = textField;
       } else if (Number.class.isAssignableFrom(javaClass)) {
-        final int scale = attribute.getScale();
-        final Number minValue = attribute.getMinValue();
-        final Number maxValue = attribute.getMaxValue();
+        final int scale = fieldDefinition.getScale();
+        final Number minValue = fieldDefinition.getMinValue();
+        final Number maxValue = fieldDefinition.getMaxValue();
         final NumberTextField numberTextField = new NumberTextField(fieldName, type, length, scale,
           minValue, maxValue);
         field = numberTextField;

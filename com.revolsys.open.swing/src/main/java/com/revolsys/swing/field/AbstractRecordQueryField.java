@@ -74,7 +74,7 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordQueryField extends ValueField implements DocumentListener,
-  KeyListener, MouseListener, FocusListener, ListDataListener, Field, ListSelectionListener,
+  KeyListener, MouseListener, FocusListener, ListDataListener, ListSelectionListener,
   HighlightPredicate, EventsEnabler, ActionListenable {
   private static final Icon ICON_DELETE = Icons.getIcon("delete");
 
