@@ -35,6 +35,8 @@ public class Icons {
 
   public static final String RESOURCE_FOLDER = "/com/revolsys/famfamfam/silk/icons/";
 
+  public static final String BADGE_FOLDER = "/com/revolsys/famfamfam/silk/badges/";
+
   public static void addIcon(final List<Icon> icons, Icon icon, final boolean enabled) {
     if (icon != null) {
       if (!enabled) {
@@ -69,6 +71,12 @@ public class Icons {
       }
     }
     return newImage;
+  }
+
+  public static BufferedImage getBadgeImage(final String imageName) {
+    final String resourceName = BADGE_FOLDER + imageName + ".png";
+    final InputStream in = Icons.class.getResourceAsStream(resourceName);
+    return getImage(in);
   }
 
   public static Cursor getCursor(final String imageName) {
@@ -174,6 +182,17 @@ public class Icons {
       }
     }
     return icon;
+  }
+
+  public static Icon getIconWithBadge(final Icon baseIcon, final String badgeName) {
+    final BufferedImage image = new BufferedImage(baseIcon.getIconWidth(),
+      baseIcon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+    final Graphics graphics = image.createGraphics();
+    baseIcon.paintIcon(null, graphics, 0, 0);
+    final Image badgeImage = getBadgeImage(badgeName);
+    graphics.drawImage(badgeImage, 0, 0, null);
+    graphics.dispose();
+    return new ImageIcon(image);
   }
 
   protected static BufferedImage getImage(final InputStream in) {

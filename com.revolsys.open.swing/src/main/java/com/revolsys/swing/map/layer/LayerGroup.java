@@ -84,6 +84,8 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
   private List<Layer> layers = new ArrayList<Layer>();
 
+  private boolean deleted = false;
+
   public LayerGroup() {
     this(null);
   }
@@ -230,6 +232,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
   @Override
   public void delete() {
+    this.deleted = true;
     synchronized (this.layers) {
       for (final Iterator<Layer> iterator = this.layers.iterator(); iterator.hasNext();) {
         final Layer layer = iterator.next();
@@ -465,6 +468,11 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
         }
       }
     }
+  }
+
+  @Override
+  public boolean isDeleted() {
+    return this.deleted;
   }
 
   public boolean isEmpty() {

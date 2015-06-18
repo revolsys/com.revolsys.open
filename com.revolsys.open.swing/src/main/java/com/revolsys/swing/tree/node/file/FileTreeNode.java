@@ -11,9 +11,11 @@ import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileSystemView;
 
 import com.revolsys.data.equals.EqualsRegistry;
@@ -48,6 +50,10 @@ import com.revolsys.util.UrlUtil;
 
 public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
+  private static final JFileChooser CHOOSER = new JFileChooser();
+
+  private static final UIDefaults DEFAULTS = UIManager.getDefaults();
+
   public static final Icon ICON_FILE = Icons.getIcon("file");
 
   public static final Icon ICON_FILE_DATABASE = Icons.getIcon("file_database");
@@ -58,17 +64,17 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   public static final Icon ICON_FILE_VECTOR = Icons.getIcon("file_table");
 
-  public static final Icon ICON_FOLDER = Icons.getIcon("folder");
+  public static final Icon ICON_FOLDER = DEFAULTS.getIcon("Tree.closedIcon");
 
-  public static final Icon ICON_FOLDER_OPEN = Icons.getIcon("folder_open");
+  public static final Icon ICON_FOLDER_OPEN = DEFAULTS.getIcon("Tree.openIcon");
 
   public static final Icon ICON_DRIVE = Icons.getIcon("drive");
 
   public static final Icon ICON_DRIVE_MISSING = Icons.getIcon("drive_error");
 
-  public static final ImageIcon ICON_FOLDER_LINK = Icons.getIcon("folder_link");
+  public static final Icon ICON_FOLDER_DRIVE = Icons.getIconWithBadge(ICON_FOLDER, "drive");
 
-  public static final ImageIcon ICON_FOLDER_LINK_OPEN = Icons.getIcon("folder_link_open");
+  public static final Icon ICON_FOLDER_LINK = Icons.getIconWithBadge(ICON_FOLDER, "link");
 
   public static final Icon ICON_FOLDER_MISSING = Icons.getIcon("folder_error");
 
@@ -212,6 +218,9 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     super(file);
     final String fileName = FileUtil.getFileName(file);
     setName(fileName);
+    if (file.exists()) {
+      setIcon(CHOOSER.getIcon(file));
+    }
   }
 
   public void addFolderConnection() {
@@ -296,23 +305,20 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   @Override
   public Icon getIcon() {
-    final File file = getUserData();
-    return FileTreeNode.getIcon(file);
+    Icon icon = super.getIcon();
+    if (icon == null) {
+      if (isExists()) {
+        final File file = getUserData();
+        icon = CHOOSER.getIcon(file);
+        setIcon(icon);
+      }
+    }
+    return icon;
   }
 
   @Override
   public MenuFactory getMenu() {
     return MENU;
-  }
-
-  @Override
-  public Icon getOpenIcon() {
-    final File file = getUserData();
-    if (file.isDirectory()) {
-      return ICON_FOLDER_OPEN;
-    } else {
-      return super.getOpenIcon();
-    }
   }
 
   @Override
@@ -383,5 +389,11 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     } else {
       return false;
     }
+  }
+
+  @Override
+  public void refresh() {
+    setIcon(null);
+    super.refresh();
   }
 }

@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.SwingUtilities;
-
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.BaseTreeNodeLoadingIcon;
 
@@ -16,11 +14,7 @@ public class ListTreeNode extends BaseTreeNode {
   private final List<BaseTreeNode> publicChildren = Collections.unmodifiableList(this.children);
 
   public ListTreeNode() {
-    this(null, null);
-  }
-
-  public ListTreeNode(final BaseTreeNode... nodes) {
-    this(null, Arrays.asList(nodes));
+    this(null, (List<? extends BaseTreeNode>)null);
   }
 
   public ListTreeNode(final BaseTreeNode node) {
@@ -39,16 +33,19 @@ public class ListTreeNode extends BaseTreeNode {
     setChildren(children);
   }
 
+  public ListTreeNode(final String name, final BaseTreeNode... nodes) {
+    this(null, Arrays.asList(nodes));
+    setName(name);
+  }
+
   public void addNode(final BaseTreeNode child) {
     if (child != null) {
-      if (SwingUtilities.isEventDispatchThread()) {
+      Invoke.andWait(() -> {
         final int index = this.children.size();
         this.children.add(child);
         child.setParent(this);
         nodesInserted(index);
-      } else {
-        Invoke.andWait(this, "addNode", child);
-      }
+      });
     }
   }
 
@@ -67,24 +64,20 @@ public class ListTreeNode extends BaseTreeNode {
   }
 
   public void refresh() {
-    if (SwingUtilities.isEventDispatchThread()) {
+    Invoke.andWait(() -> {
       final List<BaseTreeNode> newChildren = doLoadChildren();
       setChildren(newChildren);
-    } else {
-      Invoke.andWait(this, "refresh");
-    }
+    });
   }
 
   public void removeNode(final int index) {
-    if (SwingUtilities.isEventDispatchThread()) {
+    Invoke.andWait(() -> {
       if (index >= 0 && index < this.children.size()) {
         final BaseTreeNode node = this.children.remove(index);
         node.setParent(null);
         nodeRemoved(index, node);
       }
-    } else {
-      Invoke.andWait(this, "removeNode", index);
-    }
+    });
   }
 
   public void setChildren(final List<? extends BaseTreeNode> children) {

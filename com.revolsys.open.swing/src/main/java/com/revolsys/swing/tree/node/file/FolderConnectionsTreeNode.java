@@ -3,15 +3,13 @@ package com.revolsys.swing.tree.node.file;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.Icon;
-
 import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.tree.node.BaseTreeNode;
-import com.revolsys.swing.tree.node.ListTreeNode;
+import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 
-public class FolderConnectionsTreeNode extends ListTreeNode {
+public class FolderConnectionsTreeNode extends LazyLoadTreeNode {
 
   public FolderConnectionsTreeNode() {
     setName("Folder Connections");
@@ -32,10 +30,5 @@ public class FolderConnectionsTreeNode extends ListTreeNode {
       children.add(child);
     }
     return children;
-  }
-
-  @Override
-  public Icon getOpenIcon() {
-    return FileTreeNode.ICON_FOLDER_LINK_OPEN;
   }
 }

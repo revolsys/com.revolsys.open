@@ -51,7 +51,9 @@ public class LayerRendererOverlaySwingWorker extends AbstractSwingWorker<Void, V
       }
       return null;
     } catch (final Throwable t) {
-      LoggerFactory.getLogger(getClass()).error("Unable to paint", t);
+      if (!isCancelled()) {
+        LoggerFactory.getLogger(getClass()).error("Unable to paint", t);
+      }
       return null;
     }
   }

@@ -8,8 +8,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.Icon;
-
 import com.revolsys.io.file.FolderConnection;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.swing.SwingUtil;
@@ -90,11 +88,6 @@ public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode implement
   @Override
   public MenuFactory getMenu() {
     return MENU;
-  }
-
-  @Override
-  public Icon getOpenIcon() {
-    return FileTreeNode.ICON_FOLDER_LINK_OPEN;
   }
 
   public FolderConnectionRegistry getRegistry() {

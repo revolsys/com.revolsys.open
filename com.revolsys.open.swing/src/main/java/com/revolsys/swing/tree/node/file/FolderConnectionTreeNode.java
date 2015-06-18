@@ -4,7 +4,6 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 
-import javax.swing.Icon;
 import javax.swing.JOptionPane;
 
 import com.revolsys.io.file.FolderConnection;
@@ -64,11 +63,6 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements UrlPro
   @Override
   public MenuFactory getMenu() {
     return MENU;
-  }
-
-  @Override
-  public Icon getOpenIcon() {
-    return FileTreeNode.ICON_FOLDER_LINK_OPEN;
   }
 
   @Override

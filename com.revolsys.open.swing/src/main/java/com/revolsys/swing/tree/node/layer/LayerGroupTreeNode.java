@@ -26,12 +26,9 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.tree.node.BaseTreeNode;
+import com.revolsys.swing.tree.node.file.FileTreeNode;
 
 public class LayerGroupTreeNode extends AbstractLayerTreeNode implements MouseListener {
-
-  public static final Icon ICON = Icons.getIcon("folder");
-
-  public static final Icon ICON_OPEN = Icons.getIcon("folder_open");
 
   public LayerGroupTreeNode(final LayerGroup layerGroup) {
     super(layerGroup);
@@ -117,19 +114,9 @@ public class LayerGroupTreeNode extends AbstractLayerTreeNode implements MouseLi
   public Icon getIcon() {
     final Layer layer = getLayer();
     if (layer.isVisible()) {
-      return ICON;
+      return FileTreeNode.ICON_FOLDER;
     } else {
-      return Icons.getDisabledIcon(ICON);
-    }
-  }
-
-  @Override
-  public Icon getOpenIcon() {
-    final Layer layer = getLayer();
-    if (layer.isVisible()) {
-      return ICON_OPEN;
-    } else {
-      return Icons.getDisabledIcon(ICON_OPEN);
+      return Icons.getDisabledIcon(FileTreeNode.ICON_FOLDER);
     }
   }
 

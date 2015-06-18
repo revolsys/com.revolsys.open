@@ -64,6 +64,8 @@ public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties,
 
   boolean isClonable();
 
+  boolean isDeleted();
+
   boolean isEditable();
 
   boolean isEditable(double scale);

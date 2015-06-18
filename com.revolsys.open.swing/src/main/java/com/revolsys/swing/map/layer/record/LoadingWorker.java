@@ -27,17 +27,25 @@ public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> 
 
   @Override
   protected List<LayerRecord> doInBackground() throws Exception {
-    final GeometryFactory geometryFactory = this.layer.getGeometryFactory();
-    final BoundingBox queryBoundingBox = this.viewportBoundingBox.convert(geometryFactory);
-    Query query = this.layer.getQuery();
-    final FieldDefinition geometryField = this.layer.getGeometryField();
-    if (query != null && geometryField != null && !queryBoundingBox.isEmpty()) {
-      query = query.clone();
-      query.and(F.envelopeIntersects(geometryField, queryBoundingBox));
-      final List<LayerRecord> records = this.layer.query(query);
-      return records;
+    try {
+      final GeometryFactory geometryFactory = this.layer.getGeometryFactory();
+      final BoundingBox queryBoundingBox = this.viewportBoundingBox.convert(geometryFactory);
+      Query query = this.layer.getQuery();
+      final FieldDefinition geometryField = this.layer.getGeometryField();
+      if (query != null && geometryField != null && !queryBoundingBox.isEmpty()) {
+        query = query.clone();
+        query.and(F.envelopeIntersects(geometryField, queryBoundingBox));
+        final List<LayerRecord> records = this.layer.query(query);
+        return records;
+      }
+      return Collections.emptyList();
+    } catch (final Exception e) {
+      if (this.layer.isDeleted()) {
+        return null;
+      } else {
+        throw e;
+      }
     }
-    return Collections.emptyList();
   }
 
   public AbstractLayer getLayer() {

@@ -156,7 +156,7 @@ public class ProjectFrame extends BaseFrame {
   public ProjectFrame(final String title, final File projectDirectory) {
     this(title);
     if (projectDirectory != null) {
-      Invoke.background("Load project", this, "loadProject", projectDirectory);
+      Invoke.background("Load project: " + projectDirectory, () -> loadProject(projectDirectory));
     }
   }
 
@@ -266,7 +266,7 @@ public class ProjectFrame extends BaseFrame {
 
     final FolderConnectionsTreeNode folderConnections = new FolderConnectionsTreeNode();
 
-    final ListTreeNode root = new ListTreeNode(recordStores, fileSystems, folderConnections);
+    final ListTreeNode root = new ListTreeNode("/", recordStores, fileSystems, folderConnections);
 
     final BaseTree tree = new BaseTree(root);
     tree.setRootVisible(false);
@@ -415,10 +415,13 @@ public class ProjectFrame extends BaseFrame {
 
   @Override
   public void dispose() {
-    if (SwingUtilities.isEventDispatchThread()) {
+    Invoke.later(() -> {
+      Property.removeAllListeners(this);
       setVisible(false);
       super.dispose();
-      Property.removeAllListeners(this);
+      setRootPane(new JRootPane());
+      removeAll();
+      setMenuBar(null);
       if (this.project != null) {
         final RecordStoreConnectionRegistry recordStores = this.project.getRecordStores();
         RecordStoreConnectionManager.get().removeConnectionRegistry(recordStores);
@@ -437,16 +440,11 @@ public class ProjectFrame extends BaseFrame {
         this.mapPanel.destroy();
         this.mapPanel = null;
       }
-      setMenuBar(null);
       final ActionMap actionMap = getRootPane().getActionMap();
       actionMap.put(SAVE_PROJECT_KEY, null);
       actionMap.put(SAVE_CHANGES_KEY, null);
 
-      setRootPane(new JRootPane());
-      removeAll();
-    } else {
-      Invoke.later(this, "dispose");
-    }
+    });
   }
 
   public void exit() {

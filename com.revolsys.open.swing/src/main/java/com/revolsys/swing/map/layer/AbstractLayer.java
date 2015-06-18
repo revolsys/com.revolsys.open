@@ -595,6 +595,16 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties impleme
   }
 
   @Override
+  public boolean isDeleted() {
+    final Project project = getProject();
+    if (project == null) {
+      return false;
+    } else {
+      return project.isDeleted();
+    }
+  }
+
+  @Override
   public boolean isEditable() {
     return this.editable;
   }

@@ -200,33 +200,37 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
   }
 
   public void expand() {
-    final TreePath treePath = getTreePath();
-    expand(treePath);
+    Invoke.andWait(() -> {
+      final TreePath treePath = getTreePath();
+      expand(treePath);
+    });
   }
 
   public void expand(final List<?> path) {
     if (path != null) {
-      if (SwingUtilities.isEventDispatchThread()) {
+      Invoke.andWait(() -> {
         final TreePath treePath = getTreePath(path);
         expand(treePath);
-      } else {
-        Invoke.andWait(this, "expand", path);
-      }
+      });
     }
   }
 
   public void expand(final TreePath treePath) {
-    final JTree tree = getTree();
-    if (tree != null) {
-      tree.expandPath(treePath);
-    }
+    Invoke.andWait(() -> {
+      final JTree tree = getTree();
+      if (tree != null) {
+        tree.expandPath(treePath);
+      }
+    });
   }
 
   public void expandChildren() {
-    expand();
-    for (final BaseTreeNode child : getChildren()) {
-      child.expand();
-    }
+    Invoke.andWait(() -> {
+      expand();
+      for (final BaseTreeNode child : getChildren()) {
+        child.expand();
+      }
+    });
   }
 
   @Override

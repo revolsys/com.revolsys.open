@@ -5,20 +5,13 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.List;
 
-import javax.swing.Icon;
-
-import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeNodeRunnable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
-import com.revolsys.swing.tree.node.ListTreeNode;
+import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 
-public class FileSystemsTreeNode extends ListTreeNode {
-
-  public static final Icon ICON_FOLDER_DRIVE = Icons.getIcon("folder_drive");
-
-  public static final Icon ICON_FOLDER_DRIVE_OPEN = Icons.getIcon("folder_drive_open");
+public class FileSystemsTreeNode extends LazyLoadTreeNode {
 
   private static final MenuFactory MENU = new MenuFactory("File Systems");
 
@@ -31,7 +24,7 @@ public class FileSystemsTreeNode extends ListTreeNode {
   public FileSystemsTreeNode() {
     setType("File Systems");
     setName("File Systems");
-    setIcon(FileSystemsTreeNode.ICON_FOLDER_DRIVE);
+    setIcon(FileTreeNode.ICON_FOLDER_DRIVE);
   }
 
   @Override
@@ -45,10 +38,5 @@ public class FileSystemsTreeNode extends ListTreeNode {
   @Override
   public MenuFactory getMenu() {
     return MENU;
-  }
-
-  @Override
-  public Icon getOpenIcon() {
-    return ICON_FOLDER_DRIVE_OPEN;
   }
 }

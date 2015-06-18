@@ -67,7 +67,13 @@ public class Invoke {
 
   private static final List<WeakReference<SwingWorker<?, ?>>> RUNNING_WORKERS = new ArrayList<WeakReference<SwingWorker<?, ?>>>();
 
-  public static void andWait(final InvokeMethodRunnable runnable) {
+  public static void andWait(final Object object, final String methodName,
+    final Object... parameters) {
+    final InvokeMethodRunnable runnable = new InvokeMethodRunnable(object, methodName, parameters);
+    andWait(runnable);
+  }
+
+  public static void andWait(final Runnable runnable) {
     if (SwingUtilities.isEventDispatchThread()) {
       runnable.run();
     } else {
@@ -79,12 +85,6 @@ public class Invoke {
         ExceptionUtil.throwCauseException(e);
       }
     }
-  }
-
-  public static void andWait(final Object object, final String methodName,
-    final Object... parameters) {
-    final InvokeMethodRunnable runnable = new InvokeMethodRunnable(object, methodName, parameters);
-    andWait(runnable);
   }
 
   public static void background(final Runnable backgroundTask) {
