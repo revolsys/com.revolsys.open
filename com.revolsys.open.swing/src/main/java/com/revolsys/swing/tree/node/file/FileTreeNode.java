@@ -52,7 +52,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   private static final UIDefaults DEFAULTS = UIManager.getDefaults();
 
-  public static final Icon ICON_FILE = DEFAULTS.getIcon("Tree.leafIcon");
+  public static final Icon ICON_FILE = CHOOSER.getIcon(FileUtil.createTempFile("xxxx", "6z4gsdj"));
 
   public static final Icon ICON_FILE_DATABASE = Icons.getIconWithBadge(ICON_FILE, "database");
 
