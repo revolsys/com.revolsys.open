@@ -16,7 +16,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
-import javax.swing.filechooser.FileSystemView;
 
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.record.io.RecordIo;
@@ -43,7 +42,6 @@ import com.revolsys.swing.tree.TreeNodeRunnable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.record.FileRecordStoreTreeNode;
-import com.revolsys.util.OS;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlProxy;
 import com.revolsys.util.UrlUtil;
@@ -54,23 +52,17 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   private static final UIDefaults DEFAULTS = UIManager.getDefaults();
 
-  public static final Icon ICON_FILE = Icons.getIcon("file");
+  public static final Icon ICON_FILE = DEFAULTS.getIcon("Tree.leafIcon");
 
-  public static final Icon ICON_FILE_DATABASE = Icons.getIcon("file_database");
+  public static final Icon ICON_FILE_DATABASE = Icons.getIconWithBadge(ICON_FILE, "database");
 
-  public static final Icon ICON_FILE_IMAGE = Icons.getIcon("file_image");
+  public static final Icon ICON_FILE_IMAGE = Icons.getIconWithBadge(ICON_FILE, "picture");
 
-  public static final Icon ICON_FILE_TABLE = Icons.getIcon("file_table");
+  public static final Icon ICON_FILE_TABLE = Icons.getIconWithBadge(ICON_FILE, "table");
 
-  public static final Icon ICON_FILE_VECTOR = Icons.getIcon("file_table");
+  public static final Icon ICON_FILE_VECTOR = Icons.getIconWithBadge(ICON_FILE, "table");
 
   public static final Icon ICON_FOLDER = DEFAULTS.getIcon("Tree.closedIcon");
-
-  public static final Icon ICON_FOLDER_OPEN = DEFAULTS.getIcon("Tree.openIcon");
-
-  public static final Icon ICON_DRIVE = Icons.getIcon("drive");
-
-  public static final Icon ICON_DRIVE_MISSING = Icons.getIcon("drive_error");
 
   public static final Icon ICON_FOLDER_DRIVE = Icons.getIconWithBadge(ICON_FOLDER, "drive");
 
@@ -108,7 +100,6 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     final List<BaseTreeNode> children = new ArrayList<>();
     if (files != null) {
       for (final File childFile : files) {
-        final boolean hidden = false;
         if (!childFile.isHidden()) {
           if (FileTreeNode.isRecordStore(childFile)) {
             final FileRecordStoreTreeNode recordStoreNode = new FileRecordStoreTreeNode(childFile);
@@ -127,25 +118,13 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     if (file == null) {
       return ICON_FOLDER_MISSING;
     } else {
-      if (FileUtil.isRoot(file)) {
-        if (OS.isMac()) {
-          return ICON_DRIVE;
-        } else {
-          final FileSystemView view = FileSystemView.getFileSystemView();
-          return view.getSystemIcon(file);
-        }
-      } else if (isRecordStore(file)) {
-        return ICON_FILE_DATABASE;
-      } else if (isImage(file)) {
+      final Icon icon = CHOOSER.getIcon(file);
+      if (isImage(file)) {
         return ICON_FILE_IMAGE;
       } else if (RecordIo.canReadRecords(file)) {
         return ICON_FILE_TABLE;
-      } else if (file.isDirectory()) {
-        return ICON_FOLDER;
-      } else {
-        // return FileSystemView.getFileSystemView().getSystemIcon(file);
-        return ICON_FILE;
       }
+      return icon;
     }
   }
 
@@ -218,9 +197,8 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     super(file);
     final String fileName = FileUtil.getFileName(file);
     setName(fileName);
-    if (file.exists()) {
-      setIcon(CHOOSER.getIcon(file));
-    }
+    final Icon icon = getIcon(file);
+    setIcon(icon);
   }
 
   public void addFolderConnection() {
@@ -309,7 +287,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     if (icon == null) {
       if (isExists()) {
         final File file = getUserData();
-        icon = CHOOSER.getIcon(file);
+        icon = getIcon(file);
         setIcon(icon);
       }
     }

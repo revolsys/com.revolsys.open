@@ -55,7 +55,13 @@ public class BaseTreeCellRenderer extends DefaultTreeCellRenderer implements Ima
             return node.getTreeCellRendererComponent(renderer, tree, value, selected, expanded,
               leaf, row, hasFocus);
           } else {
-            setIcon(ICON_MISSING);
+            Icon icon = node.getIcon();
+            if (icon == null) {
+              icon = ICON_MISSING;
+            } else {
+              icon = Icons.getDisabledIcon(icon);
+            }
+            setIcon(icon);
             setForeground(WebColors.Red);
           }
         } else {
