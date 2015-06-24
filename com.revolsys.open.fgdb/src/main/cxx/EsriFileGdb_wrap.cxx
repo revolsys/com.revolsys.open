@@ -217,6 +217,8 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include <iostream>
 #include <stdio.h>
 #include "time.h"
+#include "libxml/parser.h"
+
 #include "FileGDBAPI.h"
 
 std::string wstring2string(std::wstring wstr) {
@@ -341,6 +343,10 @@ template<class T> class ArrayOut {
 
 
  
+  void init() {
+    xmlInitParser();
+  }
+
   void setMaxOpenFiles(int maxOpenFiles) {
 
 
@@ -1033,6 +1039,21 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       delete arg1;;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
+    } catch (const std::exception& e) {
+      handleException(jenv, e);
+    }
+  }
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_init(JNIEnv *jenv, jclass jcls) {
+  (void)jenv;
+  (void)jcls;
+  {
+    try {
+      init();;
     } catch (const std::runtime_error& e) {
       handleException(jenv, e);
     } catch (const std::exception& e) {

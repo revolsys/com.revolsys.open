@@ -7,7 +7,7 @@
 #include <iostream>
 #include <stdio.h>
 #include "time.h"
-#include "libxml/threads.h"
+#include "libxml/parser.h"
 
 #include "FileGDBAPI.h"
 
@@ -65,9 +65,6 @@ import com.revolsys.util.OS;
       ClasspathNativeLibraryUtil.loadLibrary("EsriFileGdbJni");
       EsriFileGdb.setMaxOpenFiles(2048);
     }
-  }
-
-  public static void init() {
   }
 %}
 %define EXT_FILEGDB_API
