@@ -12,15 +12,42 @@ import com.revolsys.util.MathUtil;
 
 public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
 
+  private static final int DEFAULT_TILE_SIZE = 1000;
+
   private GeometryFactory geometryFactory;
 
-  private double tileHeight;
+  private double tileHeight = DEFAULT_TILE_SIZE;
 
-  private double tileWidth;
+  private double tileWidth = DEFAULT_TILE_SIZE;
 
   private double originX;
 
   private double originY;
+
+  public CustomRectangularMapGrid() {
+  }
+
+  public CustomRectangularMapGrid(final GeometryFactory geometryFactory) {
+    this(geometryFactory, 0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE);
+  }
+
+  public CustomRectangularMapGrid(final GeometryFactory geometryFactory, final double tileSize) {
+    this(geometryFactory, 0, 0, tileSize, tileSize);
+  }
+
+  public CustomRectangularMapGrid(final GeometryFactory geometryFactory, final double tileWidth,
+    final double tileHeight) {
+    this(geometryFactory, 0, 0, tileWidth, tileHeight);
+  }
+
+  public CustomRectangularMapGrid(final GeometryFactory geometryFactory, final double originX,
+    final double originY, final double tileWidth, final double tileHeight) {
+    this.geometryFactory = geometryFactory;
+    this.tileHeight = tileHeight;
+    this.tileWidth = tileWidth;
+    this.originX = originX;
+    this.originY = originY;
+  }
 
   public BoundingBox getBoundingBox(final String name) {
     final double[] coordinates = MathUtil.toDoubleArraySplit(name, "_");
@@ -152,6 +179,26 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
 
   public void setTileWidth(final double tileWidth) {
     this.tileWidth = tileWidth;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder string = new StringBuilder();
+    if (this.geometryFactory != null) {
+      string.append(this.geometryFactory.getCoordinateSystem().getName());
+      string.append(" ");
+    }
+    if (this.originX != 0 && this.originY != 0) {
+      string.append(this.originX);
+      string.append(',');
+      string.append(this.originY);
+    }
+
+    string.append(this.tileWidth);
+    string.append('x');
+    string.append(this.tileHeight);
+
+    return string.toString();
   }
 
 }

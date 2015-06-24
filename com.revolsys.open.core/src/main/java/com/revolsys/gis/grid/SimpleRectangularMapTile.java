@@ -1,5 +1,6 @@
 package com.revolsys.gis.grid;
 
+import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
@@ -20,6 +21,25 @@ public class SimpleRectangularMapTile implements RectangularMapTile {
     this.name = name;
     this.formattedName = formattedName;
     this.boundingBox = boundingBox;
+  }
+
+  @Override
+  public boolean equals(final Object object) {
+    if (this == object) {
+      return true;
+    } else if (object == null) {
+      return false;
+    } else if (object instanceof SimpleRectangularMapTile) {
+      final SimpleRectangularMapTile tile = (SimpleRectangularMapTile)object;
+      if (EqualsRegistry.equal(this.boundingBox, tile.boundingBox)) {
+        if (EqualsRegistry.equal(this.grid, tile.grid)) {
+          if (EqualsRegistry.equal(this.name, tile.name)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 
   @Override
@@ -63,6 +83,11 @@ public class SimpleRectangularMapTile implements RectangularMapTile {
   public Polygon getPolygon(final int numXPoints, final int numYPoints) {
     final GeometryFactory factory = GeometryFactory.floating3(4326);
     return getPolygon(factory, numXPoints, numYPoints);
+  }
+
+  @Override
+  public int hashCode() {
+    return this.name.hashCode();
   }
 
   @Override

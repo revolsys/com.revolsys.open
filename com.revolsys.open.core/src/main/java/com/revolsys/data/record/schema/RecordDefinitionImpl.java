@@ -22,6 +22,7 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.map.WeakCache;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.codes.CodeTableProperty;
+import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
@@ -293,7 +294,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
   public Record createRecord() {
     final RecordFactory recordFactory = this.recordFactory;
     if (recordFactory == null) {
-      return null;
+      return new ArrayRecord(this);
     } else {
       return recordFactory.createRecord(this);
     }
