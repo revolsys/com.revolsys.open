@@ -28,6 +28,16 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
     "folderconnection:/(//)?.*.gdb/?");
 
   static {
+    final File tmpFile = FileUtil.createTempFile("filegdb", ".gdb");
+    tmpFile.delete();
+    try {
+      try (
+        FileGdbRecordStore recordStore = create(tmpFile)) {
+        recordStore.initialize();
+      }
+    } finally {
+      FileUtil.deleteDirectory(tmpFile, true);
+    }
     final RecordStoreRecordAndGeometryWriterFactory writerFactory = new RecordStoreRecordAndGeometryWriterFactory(
       "ESRI File Geodatabase", "application/x-esri-gdb", true, true, "gdb");
     IoFactoryRegistry.getInstance().addFactory(writerFactory);

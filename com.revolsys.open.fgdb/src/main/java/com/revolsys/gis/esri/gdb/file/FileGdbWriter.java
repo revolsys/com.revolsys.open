@@ -124,15 +124,17 @@ public class FileGdbWriter extends AbstractRecordWriter {
           }
         }
         this.recordStore.insertRow(table, row);
-        for (final FieldDefinition field : recordDefinition.getFields()) {
-          final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
-          try {
-            esriField.setPostInsertValue(record, row);
-          } catch (final Throwable e) {
-            throw new ObjectPropertyException(record, field.getName(), e);
+        if (sourceRecordDefinition == recordDefinition) {
+          for (final FieldDefinition field : recordDefinition.getFields()) {
+            final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
+            try {
+              esriField.setPostInsertValue(record, row);
+            } catch (final Throwable e) {
+              throw new ObjectPropertyException(record, field.getName(), e);
+            }
           }
+          record.setState(RecordState.Persisted);
         }
-        record.setState(RecordState.Persisted);
       } finally {
         this.recordStore.closeRow(row);
         this.recordStore.addStatistic("Insert", record);
