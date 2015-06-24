@@ -171,6 +171,8 @@ public class EsriFileGdbJNI {
 
   public final static native String Guid_toString(long jarg1, Guid jarg1_);
 
+  public final static native void init();
+
   public final static native long new_EnumRows();
 
   public final static native long new_Envelope__SWIG_0();

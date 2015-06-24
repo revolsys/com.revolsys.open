@@ -10,7 +10,6 @@ import java.util.ListIterator;
 import com.revolsys.collection.MultiIterator;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.util.CollectionUtil;
-import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
 public class RangeSet extends AbstractSet<Object> implements Iterable<Object>, Cloneable {
@@ -90,13 +89,17 @@ public class RangeSet extends AbstractSet<Object> implements Iterable<Object>, C
 
   private int size;
 
-  private List<AbstractRange<?>> ranges = new LinkedList<>();
+  private final List<AbstractRange<?>> ranges = new LinkedList<>();
 
   public RangeSet() {
   }
 
   public RangeSet(final Iterable<Integer> values) {
     addAll(values);
+  }
+
+  public RangeSet(final RangeSet rangeSet) {
+    addRanges(rangeSet);
   }
 
   @Override
@@ -211,21 +214,17 @@ public class RangeSet extends AbstractSet<Object> implements Iterable<Object>, C
 
   public boolean addRanges(final RangeSet ranges) {
     boolean added = false;
-    for (final AbstractRange<?> range : ranges.getRanges()) {
-      added |= addRange(range);
+    if (ranges != null) {
+      for (final AbstractRange<?> range : ranges.getRanges()) {
+        added |= addRange(range);
+      }
     }
     return added;
   }
 
   @Override
   public RangeSet clone() {
-    try {
-      final RangeSet clone = (RangeSet)super.clone();
-      clone.ranges = new ArrayList<>(this.ranges);
-      return clone;
-    } catch (final CloneNotSupportedException e) {
-      return ExceptionUtil.throwUncheckedException(e);
-    }
+    return new RangeSet(this);
   }
 
   @Override

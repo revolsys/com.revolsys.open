@@ -370,6 +370,14 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>, Externali
     return currentNode;
   }
 
+  public Node<T> getNode(final boolean from) {
+    if (from) {
+      return getFromNode();
+    } else {
+      return getToNode();
+    }
+  }
+
   public Collection<Node<T>> getNodes() {
     final LinkedHashSet<Node<T>> nodes = new LinkedHashSet<Node<T>>();
     nodes.add(getFromNode());

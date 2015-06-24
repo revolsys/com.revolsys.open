@@ -47,24 +47,27 @@ public class Strings {
         return equalExceptOneExtraCharacter(string2, string1);
       }
       if (length2 == length1 + 1) {
-        int matchCount = 0;
+        int startMatchCount = 0;
         for (int i = 0; i < length1; i++) {
-          if (string1.charAt(i) == string2.charAt(i)) {
-            matchCount++;
+          final char c1 = string1.charAt(i);
+          final char c2 = string2.charAt(i);
+          if (c1 == c2) {
+            startMatchCount++;
           } else {
             break;
           }
         }
-        for (int i = 1; i <= length1; i++) {
+        int endMatchCount = 0;
+        for (int i = 1; i <= length1 - startMatchCount; i++) {
           final char c1 = string1.charAt(length1 - i);
           final char c2 = string2.charAt(length2 - i);
           if (c1 == c2) {
-            matchCount++;
+            endMatchCount++;
           } else {
             break;
           }
         }
-        return matchCount == length1;
+        return startMatchCount + endMatchCount == length1;
       } else {
         return false;
       }

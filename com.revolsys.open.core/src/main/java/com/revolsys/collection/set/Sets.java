@@ -26,16 +26,24 @@ public class Sets {
     return set;
   }
 
-  public static <V> Set<V> hash(final Iterable<V> values) {
-    final Set<V> set = new HashSet<>();
+  public static <V> HashSet<V> hash(final Iterable<V> values) {
+    final HashSet<V> set = new HashSet<>();
     for (final V value : values) {
       set.add(value);
     }
     return set;
   }
 
-  public static <V> Set<V> hash(@SuppressWarnings("unchecked") final V... values) {
-    final Set<V> set = new HashSet<>();
+  public static <V> HashSet<V> hash(@SuppressWarnings("unchecked") final V... values) {
+    final HashSet<V> set = new HashSet<>();
+    for (final V value : values) {
+      set.add(value);
+    }
+    return set;
+  }
+
+  public static <V> LinkedHashSet<V> linkedHash(@SuppressWarnings("unchecked") final V... values) {
+    final LinkedHashSet<V> set = new LinkedHashSet<>();
     for (final V value : values) {
       set.add(value);
     }
@@ -59,8 +67,8 @@ public class Sets {
   }
 
   @SafeVarargs
-  public static <V> Set<V> treeAll(final Collection<? extends V>... collections) {
-    final Set<V> set = new TreeSet<>();
+  public static <V> TreeSet<V> treeAll(final Collection<? extends V>... collections) {
+    final TreeSet<V> set = new TreeSet<>();
     addAll(set, collections);
     return set;
   }

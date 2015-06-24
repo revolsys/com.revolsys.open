@@ -137,12 +137,16 @@ public final class Records {
   }
 
   public static double distance(final Record record1, final Record record2) {
-    final Geometry geometry1 = record1.getGeometryValue();
-    final Geometry geometry2 = record2.getGeometryValue();
-    if (geometry1 == null || geometry2 == null) {
-      return Double.MIN_VALUE;
+    if (record1 == null || record2 == null) {
+      return Double.MAX_VALUE;
     } else {
-      return geometry1.distance(geometry2);
+      final Geometry geometry1 = record1.getGeometryValue();
+      final Geometry geometry2 = record2.getGeometryValue();
+      if (geometry1 == null || geometry2 == null) {
+        return Double.MAX_VALUE;
+      } else {
+        return geometry1.distance(geometry2);
+      }
     }
   }
 

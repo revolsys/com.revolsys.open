@@ -157,6 +157,25 @@ public class Node<T> extends AbstractPoint implements AttributedObject, External
     return compareTo((Point)node);
   }
 
+  public boolean containsEdge(final Edge<T> edge) {
+    final Graph graph = getGraph();
+    if (graph == edge.getGraph()) {
+      for (final int edgeId : this.inEdgeIds) {
+        if (graph.getEdge(edgeId) == edge) {
+          return true;
+        }
+      }
+      for (final int edgeId : this.outEdgeIds) {
+        if (graph.getEdge(edgeId) == edge) {
+          return true;
+        }
+      }
+      return false;
+    } else {
+      return false;
+    }
+  }
+
   public boolean equalsCoordinate(final double x, final double y) {
     return this.x == x && this.y == y;
   }

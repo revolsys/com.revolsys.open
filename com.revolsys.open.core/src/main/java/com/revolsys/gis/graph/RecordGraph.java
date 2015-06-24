@@ -64,13 +64,15 @@ public class RecordGraph extends Graph<Record> {
   }
 
   public Edge<Record> getEdge(final Record record) {
-    final LineString line = record.getGeometryValue();
-    final Point fromPoint = line.getPoint(0);
-    final Node<Record> fromNode = findNode(fromPoint);
-    if (fromNode != null) {
-      for (final Edge<Record> edge : fromNode.getEdges()) {
-        if (edge.getObject() == record) {
-          return edge;
+    if (record != null) {
+      final LineString line = record.getGeometryValue();
+      final Point fromPoint = line.getPoint(0);
+      final Node<Record> fromNode = findNode(fromPoint);
+      if (fromNode != null) {
+        for (final Edge<Record> edge : fromNode.getEdges()) {
+          if (edge.getObject() == record) {
+            return edge;
+          }
         }
       }
     }

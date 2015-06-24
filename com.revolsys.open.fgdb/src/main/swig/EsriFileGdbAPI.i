@@ -7,6 +7,8 @@
 #include <iostream>
 #include <stdio.h>
 #include "time.h"
+#include "libxml/threads.h"
+
 #include "FileGDBAPI.h"
 
 std::string wstring2string(std::wstring wstr) {
@@ -63,6 +65,9 @@ import com.revolsys.util.OS;
       ClasspathNativeLibraryUtil.loadLibrary("EsriFileGdbJni");
       EsriFileGdb.setMaxOpenFiles(2048);
     }
+  }
+
+  public static void init() {
   }
 %}
 %define EXT_FILEGDB_API
@@ -133,6 +138,10 @@ import com.revolsys.util.OS;
 %newobject openGeodatabase;
 %inline {
  
+  void init() {
+    xmlInitParser();
+  }
+
   void setMaxOpenFiles(int maxOpenFiles) {
 #ifdef _WIN32
     _setmaxstdio(maxOpenFiles);

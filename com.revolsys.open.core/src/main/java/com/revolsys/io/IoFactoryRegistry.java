@@ -53,6 +53,10 @@ public class IoFactoryRegistry {
     }
   }
 
+  public static void init() {
+    getInstance();
+  }
+
   private final Map<Class<? extends IoFactory>, Set<String>> classFileExtensions = new HashMap<>();
 
   private final Map<Class<? extends IoFactory>, Set<IoFactory>> classFactories = new HashMap<>();

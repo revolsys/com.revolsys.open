@@ -2,6 +2,16 @@ package com.revolsys.util;
 
 public class Numbers {
 
+  public static boolean between(final int min, final int value, final int max) {
+    if (value < min) {
+      return false;
+    } else if (value > max) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   public static byte digitCount(long value) {
     if (value == 0) {
       return 1;
@@ -65,8 +75,16 @@ public class Numbers {
     }
   }
 
+  public static boolean isEven(final int number) {
+    return number % 2 == 0;
+  }
+
   public static boolean isLong(final String part) {
     return toLong(part) != null;
+  }
+
+  public static boolean isOdd(final int number) {
+    return number % 2 == 1;
   }
 
   public static boolean isPrimitive(final Object object) {

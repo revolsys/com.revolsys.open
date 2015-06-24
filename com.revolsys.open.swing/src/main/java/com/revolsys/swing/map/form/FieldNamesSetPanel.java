@@ -352,7 +352,7 @@ public class FieldNamesSetPanel extends ValueField implements ActionListener,
   }
 
   public void setFieldNamesSetName(final String fieldNamesSetName) {
-    final List<String> allFieldNames = this.layer.getFieldNames();
+    final List<String> allFieldNames = new ArrayList<>(this.layer.getFieldNames());
     List<String> selectedFieldNames = this.fieldNamesSets.get(fieldNamesSetName);
     if (selectedFieldNames == null) {
       selectedFieldNames = new ArrayList<>();
