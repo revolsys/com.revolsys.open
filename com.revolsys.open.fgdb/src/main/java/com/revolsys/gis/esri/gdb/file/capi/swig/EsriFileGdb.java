@@ -42,10 +42,6 @@ public class EsriFileGdb {
     return EsriFileGdbJNI.getSpatialReferenceWkt(srid);
   }
 
-  public static void init() {
-    EsriFileGdbJNI.init();
-  }
-
   public static Geodatabase openGeodatabase(final String path) {
     final long cPtr = EsriFileGdbJNI.openGeodatabase(path);
     return cPtr == 0 ? null : new Geodatabase(cPtr, true);

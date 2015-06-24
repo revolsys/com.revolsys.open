@@ -7,7 +7,6 @@
 #include <iostream>
 #include <stdio.h>
 #include "time.h"
-#include "libxml/parser.h"
 
 #include "FileGDBAPI.h"
 
@@ -134,11 +133,6 @@ import com.revolsys.util.OS;
 %newobject createGeodatabase;
 %newobject openGeodatabase;
 %inline {
- 
-  void init() {
-    xmlInitParser();
-  }
-
   void setMaxOpenFiles(int maxOpenFiles) {
 #ifdef _WIN32
     _setmaxstdio(maxOpenFiles);

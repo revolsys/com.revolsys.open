@@ -13,7 +13,6 @@ import com.revolsys.data.record.io.RecordStoreFactory;
 import com.revolsys.data.record.io.RecordStoreFactoryRegistry;
 import com.revolsys.data.record.io.RecordStoreRecordAndGeometryWriterFactory;
 import com.revolsys.data.record.schema.RecordStore;
-import com.revolsys.gis.esri.gdb.file.capi.swig.EsriFileGdb;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
 
@@ -29,7 +28,6 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
     "folderconnection:/(//)?.*.gdb/?");
 
   static {
-    EsriFileGdb.init();
     final RecordStoreRecordAndGeometryWriterFactory writerFactory = new RecordStoreRecordAndGeometryWriterFactory(
       "ESRI File Geodatabase", "application/x-esri-gdb", true, true, "gdb");
     IoFactoryRegistry.getInstance().addFactory(writerFactory);
