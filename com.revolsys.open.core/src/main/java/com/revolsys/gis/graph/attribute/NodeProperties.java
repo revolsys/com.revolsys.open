@@ -17,8 +17,9 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.properties.ObjectPropertyProxy;
 
-public class NodeAttributes {
+public class NodeProperties {
   protected static class Methods {
     public static Set<Double> edgeAngles(final Node<?> node) {
       final Set<Double> angles = new TreeSet<Double>(new NumericComparator<Double>());
@@ -219,13 +220,13 @@ public class NodeAttributes {
 
   @SuppressWarnings("unchecked")
   private static <T, V> V getField(final Node<T> node, final String name) {
-    final String fieldName = NodeAttributes.class.getName() + "." + name;
-    if (!node.hasAttribute(fieldName)) {
-      final ObjectAttributeProxy<T, V> proxy = new InvokeMethodObjectAttributeProxy<T, V>(
+    final String fieldName = NodeProperties.class.getName() + "." + name;
+    if (!node.hasProperty(fieldName)) {
+      final ObjectPropertyProxy<T, V> proxy = new InvokeMethodObjectPropertyProxy<T, V>(
         Methods.class, name, Node.class);
-      node.setAttribute(fieldName, proxy);
+      node.setProperty(fieldName, proxy);
     }
-    final V value = (V)node.getField(fieldName);
+    final V value = (V)node.getProperty(fieldName);
     return value;
   }
 

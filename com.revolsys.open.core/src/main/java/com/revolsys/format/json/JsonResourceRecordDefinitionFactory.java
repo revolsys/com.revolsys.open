@@ -13,10 +13,10 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionFactory;
-import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.properties.BaseObjectWithProperties;
 
-public class JsonResourceRecordDefinitionFactory extends AbstractObjectWithProperties implements
+public class JsonResourceRecordDefinitionFactory extends BaseObjectWithProperties implements
   ApplicationContextAware, RecordDefinitionFactory {
 
   private final Map<String, RecordDefinition> recordDefinitionMap = new HashMap<String, RecordDefinition>();

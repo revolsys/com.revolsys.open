@@ -186,8 +186,8 @@ public class MiscellaneousTest extends TestCase {
     assertEquals(1, l.getDimension());
     assertEquals(new BoundingBoxDoubleGf(), l.getBoundingBox());
     assertTrue(l.isSimple());
-    assertEquals(null, l.getStartPoint());
-    assertEquals(null, l.getEndPoint());
+    assertEquals(null, l.getFromPoint());
+    assertEquals(null, l.getToPoint());
     assertTrue(l.isClosed());
     assertTrue(l.isRing());
   }
@@ -200,8 +200,8 @@ public class MiscellaneousTest extends TestCase {
      * @todo Enable when #isSimple implemented
      */
     // assertTrue(l.isSimple());
-    assertEquals(null, l.getStartPoint());
-    assertEquals(null, l.getEndPoint());
+    assertEquals(null, l.getFromPoint());
+    assertEquals(null, l.getToPoint());
     assertTrue(!l.isClosed());
     assertTrue(!l.isRing());
   }
@@ -282,8 +282,8 @@ public class MiscellaneousTest extends TestCase {
     final LineString g = (LineString)this.reader.read("LINESTRING(10 10, 20 10, 15 20)");
     assertTrue(g.getBoundary() instanceof MultiPoint);
     final MultiPoint boundary = (MultiPoint)g.getBoundary();
-    assertTrue(boundary.getGeometry(0).equals(g.getStartPoint()));
-    assertTrue(boundary.getGeometry(1).equals(g.getEndPoint()));
+    assertTrue(boundary.getGeometry(0).equals(g.getFromPoint()));
+    assertTrue(boundary.getGeometry(1).equals(g.getToPoint()));
   }
 
   public void testLineStringGetBoundary2() throws Exception {

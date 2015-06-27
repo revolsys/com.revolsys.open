@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
+import com.revolsys.properties.ObjectWithProperties;
 
 /**
  * <p>

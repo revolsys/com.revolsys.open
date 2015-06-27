@@ -31,7 +31,7 @@ public class PseudoNodeAttribute {
     if (equalExcludeAttributes != null) {
       this.equalExcludeAttributes.addAll(equalExcludeAttributes);
     }
-    final Map<String, Map<LineString, Set<Edge<Record>>>> edgesByTypeNameAndLine = NodeAttributes.getEdgesByTypeNameAndLine(node);
+    final Map<String, Map<LineString, Set<Edge<Record>>>> edgesByTypeNameAndLine = NodeProperties.getEdgesByTypeNameAndLine(node);
     final Map<LineString, Set<Edge<Record>>> edgesByLine = edgesByTypeNameAndLine.get(typePath);
     init(node, edgesByLine);
   }

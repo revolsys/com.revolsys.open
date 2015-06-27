@@ -530,7 +530,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements Lin
   }
 
   @Override
-  public Point getEndPoint() {
+  public Point getToPoint() {
     if (isEmpty()) {
       return null;
     }
@@ -638,7 +638,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements Lin
   }
 
   @Override
-  public Point getStartPoint() {
+  public Point getFromPoint() {
     if (isEmpty()) {
       return null;
     } else {

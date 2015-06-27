@@ -20,7 +20,7 @@ public class SegmentError extends AbstractGeometryValidationError {
 
   @Override
   public Point getErrorPoint() {
-    return getSegment().getStartPoint();
+    return getSegment().getFromPoint();
   }
 
   public Segment getSegment() {

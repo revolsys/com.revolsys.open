@@ -4,11 +4,11 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
 import com.revolsys.collection.EmptyReference;
-import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.Path;
+import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.util.Property;
 
-public abstract class AbstractRecordStoreSchemaElement extends AbstractObjectWithProperties
+public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithProperties
   implements RecordStoreSchemaElement, Comparable<RecordStoreSchemaElement> {
 
   private final String path;

@@ -10,9 +10,9 @@ import com.revolsys.data.equals.RecordEquals;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.gis.graph.attribute.InvokeMethodObjectAttributeProxy;
-import com.revolsys.gis.graph.attribute.ObjectAttributeProxy;
+import com.revolsys.gis.graph.attribute.InvokeMethodObjectPropertyProxy;
 import com.revolsys.gis.graph.attribute.PseudoNodeAttribute;
+import com.revolsys.properties.ObjectPropertyProxy;
 
 public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {
   protected static final List<String> DEFAULT_EXCLUDE = Arrays.asList(RecordEquals.EXCLUDE_ID,
@@ -39,7 +39,7 @@ public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {
   public PseudoNodeProperty() {
   }
 
-  public PseudoNodeAttribute createAttribute(final Node<Record> node) {
+  public PseudoNodeAttribute createProperty(final Node<Record> node) {
     return new PseudoNodeAttribute(node, getTypePath(), this.equalExcludeAttributes);
   }
 
@@ -47,14 +47,14 @@ public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {
     return this.equalExcludeAttributes;
   }
 
-  public PseudoNodeAttribute getField(final Node<Record> node) {
+  public PseudoNodeAttribute getProperty(final Node<Record> node) {
     final String fieldName = PseudoNodeProperty.PROPERTY_NAME;
-    if (!node.hasAttribute(fieldName)) {
-      final ObjectAttributeProxy<PseudoNodeAttribute, Node<Record>> proxy = new InvokeMethodObjectAttributeProxy<PseudoNodeAttribute, Node<Record>>(
-        this, "createAttribute", Node.class);
-      node.setAttribute(fieldName, proxy);
+    if (!node.hasProperty(fieldName)) {
+      final ObjectPropertyProxy<PseudoNodeAttribute, Node<Record>> proxy = new InvokeMethodObjectPropertyProxy<>(
+        this, "createProperty", Node.class);
+      node.setProperty(fieldName, proxy);
     }
-    final PseudoNodeAttribute value = node.getField(fieldName);
+    final PseudoNodeAttribute value = node.getProperty(fieldName);
     return value;
   }
 

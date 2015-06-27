@@ -29,8 +29,8 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 
-public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Record>> implements
-  ObjectProcessor<RecordGraph> {
+public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Record>>
+  implements ObjectProcessor<RecordGraph> {
 
   /** Flag indicating that the edge has been processed. */
   private static final String EDGE_PROCESSED = EqualTypeAndLineEdgeCleanupVisitor.class.getName()
@@ -38,8 +38,8 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
 
   private Statistics duplicateStatistics;
 
-  private Set<String> equalExcludeAttributes = new HashSet<String>(Arrays.asList(
-    RecordEquals.EXCLUDE_ID, RecordEquals.EXCLUDE_GEOMETRY));
+  private Set<String> equalExcludeAttributes = new HashSet<String>(
+    Arrays.asList(RecordEquals.EXCLUDE_ID, RecordEquals.EXCLUDE_GEOMETRY));
 
   @PreDestroy
   public void destroy() {
@@ -177,12 +177,12 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
   private void processEqualEdges(final List<Edge<Record>> equalEdges) {
     final Iterator<Edge<Record>> edgeIter = equalEdges.iterator();
     final Edge<Record> edge1 = edgeIter.next();
-    edge1.setAttribute(EDGE_PROCESSED, Boolean.TRUE);
+    edge1.setProperty(EDGE_PROCESSED, Boolean.TRUE);
 
     while (edgeIter.hasNext()) {
       final Edge<Record> edge2 = edgeIter.next();
 
-      edge2.setAttribute(EDGE_PROCESSED, Boolean.TRUE);
+      edge2.setProperty(EDGE_PROCESSED, Boolean.TRUE);
       processEqualEdge(edge1, edge2);
       if (edge1.isRemoved()) {
         return;
@@ -209,7 +209,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
 
   @Override
   public boolean visit(final Edge<Record> edge) {
-    if (edge.getField(EDGE_PROCESSED) == null) {
+    if (edge.getProperty(EDGE_PROCESSED) == null) {
       final String typePath = edge.getTypeName();
       final Graph<Record> graph = edge.getGraph();
       final LineString line = edge.getLine();

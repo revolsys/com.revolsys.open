@@ -178,7 +178,8 @@ public final class Records {
         return number.intValue() == 1;
       } else {
         final String stringValue = value.toString();
-        if (stringValue.equals("Y") || stringValue.equals("1") || Boolean.parseBoolean(stringValue)) {
+        if (stringValue.equals("Y") || stringValue.equals("1")
+          || Boolean.parseBoolean(stringValue)) {
           return true;
         } else {
           return false;
@@ -354,6 +355,30 @@ public final class Records {
     } else {
       return value.longValue();
     }
+  }
+
+  public static int getMax(final int max, final Record record, final String fieldName) {
+    if (record != null) {
+      final Integer value = record.getInteger(fieldName);
+      if (value != null) {
+        if (value > max) {
+          return value;
+        }
+      }
+    }
+    return max;
+  }
+
+  public static int getMin(final int min, final Record record, final String fieldName) {
+    if (record != null) {
+      final Integer value = record.getInteger(fieldName);
+      if (value != null) {
+        if (value < min) {
+          return value;
+        }
+      }
+    }
+    return min;
   }
 
   public static Record getObject(final RecordDefinition recordDefinition,

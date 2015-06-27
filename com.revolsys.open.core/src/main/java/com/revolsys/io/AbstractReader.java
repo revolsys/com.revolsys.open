@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
+import com.revolsys.properties.BaseObjectWithProperties;
 
 /**
  * The AbstracteReader is an implementation of the {@link Reader} interface,
@@ -34,7 +35,7 @@ import com.revolsys.collection.Visitor;
  * @author Paul Austin
  * @param <T> The type of object being read.
  */
-public abstract class AbstractReader<T> extends AbstractObjectWithProperties implements Reader<T> {
+public abstract class AbstractReader<T> extends BaseObjectWithProperties implements Reader<T> {
 
   /**
    * Read all items and return a List containing the items.

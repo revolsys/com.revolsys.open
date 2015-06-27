@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.io.AbstractReader;
-import com.revolsys.io.ObjectWithProperties;
+import com.revolsys.properties.ObjectWithProperties;
 
 public class IteratorReader<T> extends AbstractReader<T> {
 

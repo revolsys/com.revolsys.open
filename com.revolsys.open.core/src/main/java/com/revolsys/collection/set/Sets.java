@@ -18,6 +18,14 @@ public class Sets {
     }
   }
 
+  public static <V> void addAll(final Set<V> set, final Iterable<? extends V> values) {
+    if (set != null && values != null) {
+      for (final V value : values) {
+        set.add(value);
+      }
+    }
+  }
+
   @SafeVarargs
   public static <V> Set<V> all(final Factory<Set<V>> factory,
     final Collection<? extends V>... collections) {
@@ -39,6 +47,12 @@ public class Sets {
     for (final V value : values) {
       set.add(value);
     }
+    return set;
+  }
+
+  public static <V> LinkedHashSet<V> linkedHash(final Iterable<V> values) {
+    final LinkedHashSet<V> set = new LinkedHashSet<>();
+    addAll(set, values);
     return set;
   }
 

@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +24,9 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.properties.ObjectWithProperties;
 
-public class Edge<T> implements AttributedObject, Comparable<Edge<T>>, Externalizable {
+public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Externalizable {
 
   public static <T> void addEdgeToEdgesByLine(final Map<LineString, Set<Edge<T>>> lineEdgeMap,
     final Edge<T> edge) {
@@ -71,7 +73,8 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>, Externali
     return newEdges;
   }
 
-  public static <T> List<Edge<T>> getEdges(final List<Edge<T>> edges, final Filter<Edge<T>> filter) {
+  public static <T> List<Edge<T>> getEdges(final List<Edge<T>> edges,
+    final Filter<Edge<T>> filter) {
     final List<Edge<T>> filteredEdges = new ArrayList<Edge<T>>();
     for (final Edge<T> edge : edges) {
       if (filter.accept(edge)) {
@@ -181,7 +184,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>, Externali
   public static <T> void setEdgesAttribute(final List<Edge<T>> edges, final String fieldName,
     final Object value) {
     for (final Edge<T> edge : edges) {
-      edge.setAttribute(fieldName, value);
+      edge.setProperty(fieldName, value);
     }
   }
 
@@ -204,6 +207,14 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>, Externali
     this.toNodeId = toNode.getId();
     fromNode.addOutEdge(this);
     toNode.addInEdge(this);
+  }
+
+  @Override
+  public void clearProperties() {
+    if (this.graph != null) {
+      final Map<Integer, Map<String, Object>> propertiesById = this.graph.getEdgePropertiesById();
+      propertiesById.remove(this.id);
+    }
   }
 
   @Override
@@ -313,21 +324,6 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>, Externali
     return getLine().getBoundingBox();
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public <V> V getField(final String name) {
-    if (this.graph == null) {
-      return null;
-    } else {
-      return (V)this.graph.getEdgeAttribute(this.id, name);
-    }
-  }
-
-  @Override
-  public Map<String, Object> getFields() {
-    return this.graph.getEdgeAttributes(this.id);
-  }
-
   public double getFromAngle() {
     final LineString line = getLine();
     final LineString points = line;
@@ -401,6 +397,31 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>, Externali
     return null;
   }
 
+  @Override
+  public Map<String, Object> getProperties() {
+    if (this.graph == null) {
+      return Collections.emptyMap();
+    } else {
+      final Map<Integer, Map<String, Object>> propertiesById = this.graph.getEdgePropertiesById();
+      Map<String, Object> properties = propertiesById.get(this.id);
+      if (properties == null) {
+        properties = new LinkedHashMap<>();
+        propertiesById.put(this.id, properties);
+      }
+      return properties;
+    }
+  }
+
+  @Override
+  public <V> V getProperty(final String name) {
+    if (this.graph != null) {
+      final Map<Integer, Map<String, Object>> propertiesById = this.graph.getEdgePropertiesById();
+      final Map<String, Object> properties = propertiesById.get(this.id);
+      return ObjectWithProperties.getProperty(this, properties, name);
+    }
+    return null;
+  }
+
   public double getToAngle() {
     final LineString line = getLine();
     if (line == null) {
@@ -425,7 +446,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>, Externali
   }
 
   public boolean hasNode(final Node<T> node) {
-    if (node.getGraph() == this.graph) {
+    if (node != null && node.getGraph() == this.graph) {
       final int nodeId = node.getId();
       if (this.fromNodeId == nodeId) {
         return true;
@@ -519,20 +540,12 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>, Externali
     }
   }
 
-  @Override
-  public void setAttribute(final String name, final Object value) {
-    this.graph.setEdgeAttribute(this.id, name, value);
-  }
-
-  public void setAttributes(final Map<String, Object> attributes) {
-    this.graph.setEdgeAttributes(this.id, attributes);
-  }
-
   public <V extends Point> List<Edge<T>> split(final Collection<V> splitPoints) {
     return this.graph.splitEdge(this, splitPoints);
   }
 
-  public <V extends Point> List<Edge<T>> split(final Collection<V> points, final double maxDistance) {
+  public <V extends Point> List<Edge<T>> split(final Collection<V> points,
+    final double maxDistance) {
     return this.graph.splitEdge(this, points, maxDistance);
   }
 

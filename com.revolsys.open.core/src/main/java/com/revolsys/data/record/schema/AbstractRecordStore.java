@@ -37,19 +37,19 @@ import com.revolsys.data.record.io.RecordStoreQueryReader;
 import com.revolsys.data.record.property.RecordDefinitionProperty;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
-import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.Path;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractRecordStore extends AbstractObjectWithProperties implements
+public abstract class AbstractRecordStore extends BaseObjectWithProperties implements
   RecordStore {
 
   private Map<String, Object> connectionProperties = new HashMap<String, Object>();

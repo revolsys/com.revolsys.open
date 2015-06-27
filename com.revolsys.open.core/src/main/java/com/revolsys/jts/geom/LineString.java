@@ -96,15 +96,23 @@ public interface LineString extends Lineal {
 
   LineString getCoordinatesList();
 
-  Point getEndPoint();
+  Point getFromPoint();
 
   double getM(int vertexIndex);
 
   Point getPoint(final int vertexIndex);
 
+  default Point getPoint(final LineEnd lineEnd) {
+    if (LineEnd.isFrom(lineEnd)) {
+      return getFromPoint();
+    } else {
+      return getToPoint();
+    }
+  }
+
   int getSegmentCount();
 
-  Point getStartPoint();
+  Point getToPoint();
 
   double getX(int vertexIndex);
 

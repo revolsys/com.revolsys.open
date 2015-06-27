@@ -5,7 +5,7 @@ import java.util.Map;
 
 import javax.swing.Icon;
 
-import com.revolsys.io.ObjectWithProperties;
+import com.revolsys.properties.ObjectWithProperties;
 
 public interface ProjectFramePanel extends ObjectWithProperties {
   void activatePanelComponent(Component component, Map<String, Object> config);

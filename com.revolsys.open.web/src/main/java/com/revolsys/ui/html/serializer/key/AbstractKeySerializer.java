@@ -3,11 +3,11 @@ package com.revolsys.ui.html.serializer.key;
 import java.io.StringWriter;
 
 import com.revolsys.format.xml.XmlWriter;
-import com.revolsys.io.AbstractObjectWithProperties;
+import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
-public abstract class AbstractKeySerializer extends AbstractObjectWithProperties implements
+public abstract class AbstractKeySerializer extends BaseObjectWithProperties implements
   KeySerializer {
   private String name;
 

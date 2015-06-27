@@ -29,8 +29,8 @@ import com.revolsys.beans.WeakPropertyChangeListener;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.record.Record;
-import com.revolsys.io.ObjectWithProperties;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.properties.ObjectWithProperties;
 
 public final class Property {
   public static void addListener(final Object source, final Object listener) {
@@ -85,7 +85,8 @@ public final class Property {
     return null;
   }
 
-  public static boolean equals(final Object object1, final Object object2, final String propertyName) {
+  public static boolean equals(final Object object1, final Object object2,
+    final String propertyName) {
     if (object1 == object2) {
       return true;
     } else if (object1 != null && object2 != null) {
@@ -161,7 +162,8 @@ public final class Property {
         return number.intValue() == 1;
       } else {
         final String stringValue = value.toString();
-        if (stringValue.equals("Y") || stringValue.equals("1") || Boolean.parseBoolean(stringValue)) {
+        if (stringValue.equals("Y") || stringValue.equals("1")
+          || Boolean.parseBoolean(stringValue)) {
           return true;
         } else {
           return false;
@@ -185,7 +187,8 @@ public final class Property {
         return number.intValue() == 1;
       } else {
         final String stringValue = value.toString();
-        if (stringValue.equals("Y") || stringValue.equals("1") || Boolean.parseBoolean(stringValue)) {
+        if (stringValue.equals("Y") || stringValue.equals("1")
+          || Boolean.parseBoolean(stringValue)) {
           return true;
         } else {
           return false;
@@ -365,6 +368,14 @@ public final class Property {
     }
   }
 
+  public static boolean hasValue(final Object[] array) {
+    if (array == null || array.length > 1) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   public static boolean hasValuesAll(final Object... values) {
     if (values == null || values.length == 0) {
       return false;
@@ -404,8 +415,8 @@ public final class Property {
     } catch (final InvocationTargetException e) {
       return (V)ExceptionUtil.throwCauseException(e);
     } catch (final Throwable e) {
-      throw new RuntimeException(
-        "Unable to invoke " + toString(object, methodName, parameterArray), e);
+      throw new RuntimeException("Unable to invoke " + toString(object, methodName, parameterArray),
+        e);
     }
   }
 
@@ -508,7 +519,8 @@ public final class Property {
       final PropertyChangeSupportProxy proxy = (PropertyChangeSupportProxy)object;
 
       final PropertyChangeSupport propertyChangeSupport = proxy.getPropertyChangeSupport();
-      for (final PropertyChangeListener listener : propertyChangeSupport.getPropertyChangeListeners()) {
+      for (final PropertyChangeListener listener : propertyChangeSupport
+        .getPropertyChangeListeners()) {
         if (listener instanceof PropertyChangeListenerProxy) {
           final PropertyChangeListenerProxy listenerProxy = (PropertyChangeListenerProxy)listener;
           final String propertyName = listenerProxy.getPropertyName();
@@ -521,7 +533,8 @@ public final class Property {
   }
 
   public static void removeAllListeners(final PropertyChangeSupport propertyChangeSupport) {
-    for (final PropertyChangeListener listener : propertyChangeSupport.getPropertyChangeListeners()) {
+    for (final PropertyChangeListener listener : propertyChangeSupport
+      .getPropertyChangeListeners()) {
       if (listener instanceof PropertyChangeListenerProxy) {
         final PropertyChangeListenerProxy proxy = (PropertyChangeListenerProxy)listener;
         final String propertyName = proxy.getPropertyName();
@@ -536,7 +549,8 @@ public final class Property {
       final PropertyChangeListener propertyChangeListener = (PropertyChangeListener)listener;
       final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
       if (propertyChangeSupport != null) {
-        for (final PropertyChangeListener otherListener : propertyChangeSupport.getPropertyChangeListeners()) {
+        for (final PropertyChangeListener otherListener : propertyChangeSupport
+          .getPropertyChangeListeners()) {
           if (otherListener == propertyChangeListener) {
             propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
           } else if (otherListener instanceof WeakPropertyChangeListener) {
@@ -571,7 +585,8 @@ public final class Property {
       final PropertyChangeListener propertyChangeListener = (PropertyChangeListener)listener;
       final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
       if (propertyChangeSupport != null) {
-        for (final PropertyChangeListener otherListener : propertyChangeSupport.getPropertyChangeListeners()) {
+        for (final PropertyChangeListener otherListener : propertyChangeSupport
+          .getPropertyChangeListeners()) {
           if (otherListener instanceof PropertyChangeListenerProxy) {
             final PropertyChangeListenerProxy proxy = (PropertyChangeListenerProxy)otherListener;
             final PropertyChangeListener proxyListener = proxy.getListener();

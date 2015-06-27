@@ -14,11 +14,11 @@ import com.revolsys.data.query.functions.F;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.io.Statistics;
-import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.properties.BaseObjectWithProperties;
 
-public class Query extends AbstractObjectWithProperties implements Cloneable {
+public class Query extends BaseObjectWithProperties implements Cloneable {
   private static void addFilter(final Query query, final RecordDefinition recordDefinition,
     final Map<String, ?> filter, final AbstractMultiCondition multipleCondition) {
     if (filter != null && !filter.isEmpty()) {

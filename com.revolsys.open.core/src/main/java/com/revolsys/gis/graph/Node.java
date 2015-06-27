@@ -10,21 +10,23 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.gis.graph.attribute.NodeAttributes;
-import com.revolsys.gis.graph.attribute.ObjectAttributeProxy;
+import com.revolsys.gis.graph.attribute.NodeProperties;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.AbstractPoint;
 import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.properties.ObjectPropertyProxy;
+import com.revolsys.properties.ObjectWithProperties;
 
-public class Node<T> extends AbstractPoint implements AttributedObject, Externalizable {
+public class Node<T> extends AbstractPoint implements ObjectWithProperties, Externalizable {
   public static List<Point> getCoordinates(final Collection<Node<Record>> nodes) {
     final List<Point> points = new ArrayList<Point>(nodes.size());
     for (final Node<Record> node : nodes) {
@@ -149,6 +151,14 @@ public class Node<T> extends AbstractPoint implements AttributedObject, External
   }
 
   @Override
+  public void clearProperties() {
+    if (this.graph != null) {
+      final Map<Integer, Map<String, Object>> propertiesById = this.graph.getNodePropertiesById();
+      propertiesById.remove(this.id);
+    }
+  }
+
+  @Override
   public PointDouble clonePoint() {
     return new PointDouble(this.x, this.y);
   }
@@ -158,22 +168,22 @@ public class Node<T> extends AbstractPoint implements AttributedObject, External
   }
 
   public boolean containsEdge(final Edge<T> edge) {
-    final Graph graph = getGraph();
-    if (graph == edge.getGraph()) {
-      for (final int edgeId : this.inEdgeIds) {
-        if (graph.getEdge(edgeId) == edge) {
-          return true;
+    if (edge != null) {
+      final Graph<T> graph = getGraph();
+      if (graph == edge.getGraph()) {
+        for (final int edgeId : this.inEdgeIds) {
+          if (graph.getEdge(edgeId) == edge) {
+            return true;
+          }
+        }
+        for (final int edgeId : this.outEdgeIds) {
+          if (graph.getEdge(edgeId) == edge) {
+            return true;
+          }
         }
       }
-      for (final int edgeId : this.outEdgeIds) {
-        if (graph.getEdge(edgeId) == edge) {
-          return true;
-        }
-      }
-      return false;
-    } else {
-      return false;
     }
+    return false;
   }
 
   public boolean equalsCoordinate(final double x, final double y) {
@@ -191,7 +201,7 @@ public class Node<T> extends AbstractPoint implements AttributedObject, External
   public Point get3dCoordinates(final String typePath) {
     if (!isRemoved()) {
 
-      final List<Edge<T>> edges = NodeAttributes.getEdgesByType(this, typePath);
+      final List<Edge<T>> edges = NodeProperties.getEdgesByType(this, typePath);
       if (!edges.isEmpty()) {
         Point coordinates = null;
         for (final Edge<T> edge : edges) {
@@ -246,6 +256,11 @@ public class Node<T> extends AbstractPoint implements AttributedObject, External
     final GeometryFactory factory = geometry.getGeometryFactory();
     final Point point = factory.point(this);
     return point.distance(geometry);
+  }
+
+  public Edge<T> getEdge(final int i) {
+    final List<Edge<T>> edges = getEdges();
+    return edges.get(i);
   }
 
   public int getEdgeCount() {
@@ -324,22 +339,11 @@ public class Node<T> extends AbstractPoint implements AttributedObject, External
   public List<Edge<T>> getEdgesWithoutAttribute(final String fieldName) {
     final List<Edge<T>> edges = new ArrayList<Edge<T>>();
     for (final Edge<T> edge : getEdges()) {
-      if (edge.getField(fieldName) == null) {
+      if (edge.getProperty(fieldName) == null) {
         edges.add(edge);
       }
     }
     return edges;
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public <V> V getField(final String name) {
-    return (V)this.graph.getNodeAttribute(this.id, name);
-  }
-
-  @Override
-  public Map<String, Object> getFields() {
-    return this.graph.getNodeAttributes(this.id);
   }
 
   public Graph<T> getGraph() {
@@ -404,8 +408,33 @@ public class Node<T> extends AbstractPoint implements AttributedObject, External
     return geometryFactory.point(this);
   }
 
-  public boolean hasAttribute(final String name) {
-    return getFields().containsKey(name);
+  @Override
+  public Map<String, Object> getProperties() {
+    if (this.graph == null) {
+      return Collections.emptyMap();
+    } else {
+      final Map<Integer, Map<String, Object>> propertiesById = this.graph.getNodePropertiesById();
+      Map<String, Object> properties = propertiesById.get(this.id);
+      if (properties == null) {
+        properties = new LinkedHashMap<>();
+        propertiesById.put(this.id, properties);
+      }
+      return properties;
+    }
+  }
+
+  @Override
+  public <V> V getProperty(final String name) {
+    if (this.graph != null) {
+      final Map<Integer, Map<String, Object>> propertiesById = this.graph.getNodePropertiesById();
+      final Map<String, Object> properties = propertiesById.get(this.id);
+      return ObjectWithProperties.getProperty(this, properties, name);
+    }
+    return null;
+  }
+
+  public boolean ha(final String name) {
+    return getProperties().containsKey(name);
   }
 
   public boolean hasEdge(final Edge<T> edge) {
@@ -530,15 +559,6 @@ public class Node<T> extends AbstractPoint implements AttributedObject, External
   }
 
   @Override
-  public void setAttribute(final String name, final Object value) {
-    this.graph.setNodeAttribute(this.id, name, value);
-  }
-
-  public void setAttributes(final Map<String, Object> attributes) {
-    this.graph.setNodeAttributes(this.id, attributes);
-  }
-
-  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("Node: ");
     sb.append(' ');
@@ -561,10 +581,10 @@ public class Node<T> extends AbstractPoint implements AttributedObject, External
   }
 
   private void updateAttributes() {
-    for (final Object attribute : getFields().values()) {
-      if (attribute instanceof ObjectAttributeProxy) {
+    for (final Object attribute : getProperties().values()) {
+      if (attribute instanceof ObjectPropertyProxy) {
         @SuppressWarnings("unchecked")
-        final ObjectAttributeProxy<Object, Node<T>> proxy = (ObjectAttributeProxy<Object, Node<T>>)attribute;
+        final ObjectPropertyProxy<Object, Node<T>> proxy = (ObjectPropertyProxy<Object, Node<T>>)attribute;
         proxy.clearValue();
       }
     }

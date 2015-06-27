@@ -18,7 +18,7 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.RecordGraph;
-import com.revolsys.gis.graph.attribute.NodeAttributes;
+import com.revolsys.gis.graph.attribute.NodeProperties;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
@@ -55,8 +55,8 @@ public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record
     final Node<Record> node2) {
     boolean matched = false;
     if (!node2.hasEdgeTo(node1)) {
-      final Set<Double> angles1 = NodeAttributes.getEdgeAnglesByType(node2, typePath);
-      final Set<Double> angles2 = NodeAttributes.getEdgeAnglesByType(node1, typePath);
+      final Set<Double> angles1 = NodeProperties.getEdgeAnglesByType(node2, typePath);
+      final Set<Double> angles2 = NodeProperties.getEdgeAnglesByType(node1, typePath);
       if (angles1.size() == 1 && angles2.size() == 1) {
 
         matched = node1.getGraph().moveNodesToMidpoint(typePath, node2, node1);
@@ -80,7 +80,7 @@ public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record
     final List<Node<Record>> nodes = graph.findNodes(edge, 2);
     for (final Iterator<Node<Record>> nodeIter = nodes.iterator(); nodeIter.hasNext();) {
       final Node<Record> node = nodeIter.next();
-      final List<Edge<Record>> edges = NodeAttributes.getEdgesByType(node, typePath);
+      final List<Edge<Record>> edges = NodeProperties.getEdgesByType(node, typePath);
       if (edges.isEmpty()) {
         nodeIter.remove();
       }

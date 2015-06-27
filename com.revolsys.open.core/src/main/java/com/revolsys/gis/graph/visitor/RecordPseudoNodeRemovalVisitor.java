@@ -15,7 +15,7 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.EdgePair;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.RecordGraph;
-import com.revolsys.gis.graph.attribute.NodeAttributes;
+import com.revolsys.gis.graph.attribute.NodeProperties;
 import com.revolsys.gis.graph.attribute.PseudoNodeAttribute;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.util.ObjectProcessor;
@@ -26,8 +26,8 @@ import com.revolsys.util.ObjectProcessor;
  *
  * @author Paul Austin
  */
-public class RecordPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<Record> implements
-  FilterProxy<Node<Record>>, ObjectProcessor<RecordGraph> {
+public class RecordPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<Record>
+  implements FilterProxy<Node<Record>>, ObjectProcessor<RecordGraph> {
 
   private Filter<Node<Record>> filter;
 
@@ -84,7 +84,8 @@ public class RecordPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<
     return newEdge;
   }
 
-  protected Record mergeObjects(final Node<Record> node, final Record object1, final Record object2) {
+  protected Record mergeObjects(final Node<Record> node, final Record object1,
+    final Record object2) {
     return DirectionalAttributes.merge(node, object1, object2);
   }
 
@@ -94,10 +95,10 @@ public class RecordPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<
   }
 
   private void processPseudoNodes(final Node<Record> node) {
-    for (final RecordDefinition recordDefinition : NodeAttributes.getEdgeRecordDefinitions(node)) {
+    for (final RecordDefinition recordDefinition : NodeProperties.getEdgeRecordDefinitions(node)) {
       final PseudoNodeProperty property = PseudoNodeProperty.getProperty(recordDefinition);
 
-      final PseudoNodeAttribute pseudoNodeAttribute = property.getField(node);
+      final PseudoNodeAttribute pseudoNodeAttribute = property.getProperty(node);
       processPseudoNodesForType(node, pseudoNodeAttribute);
     }
   }

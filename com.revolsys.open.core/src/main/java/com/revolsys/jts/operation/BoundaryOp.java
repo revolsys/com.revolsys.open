@@ -97,13 +97,13 @@ public class BoundaryOp {
       // check whether endpoints of valence 2 are on the boundary or not
       final boolean closedEndpointOnBoundary = this.bnRule.isInBoundary(2);
       if (closedEndpointOnBoundary) {
-        return line.getStartPoint();
+        return line.getFromPoint();
       } else {
         return this.geomFact.multiPoint((Point[])null);
       }
     }
     return this.geomFact.multiPoint(new Point[] {
-      line.getStartPoint(), line.getEndPoint()
+      line.getFromPoint(), line.getToPoint()
     });
   }
 

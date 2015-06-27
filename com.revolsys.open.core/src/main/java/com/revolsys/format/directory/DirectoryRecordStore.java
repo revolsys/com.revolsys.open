@@ -28,10 +28,10 @@ import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.record.schema.RecordStoreSchemaElement;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.ObjectWithProperties;
 import com.revolsys.io.Path;
 import com.revolsys.io.Writer;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
+import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.spring.SpringUtil;
 
 public class DirectoryRecordStore extends AbstractRecordStore {

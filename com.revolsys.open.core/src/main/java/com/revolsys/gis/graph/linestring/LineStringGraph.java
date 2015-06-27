@@ -48,10 +48,10 @@ public class LineStringGraph extends Graph<LineSegment> {
     final Iterator<Edge<LineSegment>> iterator = edges.iterator();
     if (iterator.hasNext()) {
       Edge<LineSegment> edge = iterator.next();
-      List<Integer> index = edge.getField(INDEX);
+      List<Integer> index = edge.getProperty(INDEX);
       while (iterator.hasNext()) {
         final Edge<LineSegment> edge2 = iterator.next();
-        final List<Integer> index2 = edge2.getField(INDEX);
+        final List<Integer> index2 = edge2.getProperty(INDEX);
         if (INDEX_COMPARATOR.compare(index, index2) > 0) {
           edge = edge2;
           index = index2;
@@ -212,7 +212,8 @@ public class LineStringGraph extends Graph<LineSegment> {
       for (final Edge<LineSegment> edge2 : edges) {
         if (edge1 != edge2) {
           final LineSegment lineSegment2 = edge2.getObject();
-          final Geometry intersections = ((LineSegment)lineSegment1.convert(getGeometryFactory())).getIntersection(lineSegment2);
+          final Geometry intersections = ((LineSegment)lineSegment1.convert(getGeometryFactory()))
+            .getIntersection(lineSegment2);
           for (final Point intersection : intersections.vertices()) {
             if (!lineSegment1.isEndPoint(intersection) && !lineSegment2.isEndPoint(intersection)) {
               intersectionPoints.add(intersection);
@@ -308,8 +309,8 @@ public class LineStringGraph extends Graph<LineSegment> {
 
               if (point.equals(fromPoint) || point.equals(toPoint)) {
                 // Point intersection, make sure it's not at the start
-                for (final Node<LineSegment> node : NodeLessThanDistanceOfCoordinatesVisitor.getNodes(
-                  this, point, maxDistance)) {
+                for (final Node<LineSegment> node : NodeLessThanDistanceOfCoordinatesVisitor
+                  .getNodes(this, point, maxDistance)) {
                   final int degree = node.getDegree();
                   if (node.equals(2, this.fromPoint)) {
                     if (degree > 2) {
@@ -419,7 +420,7 @@ public class LineStringGraph extends Graph<LineSegment> {
       final Point to = lineSegment.getPoint(1);
       final Edge<LineSegment> edge = addEdge((LineSegment)lineSegment.clone(), from, to);
 
-      edge.setAttribute(INDEX, Arrays.asList(index++));
+      edge.setProperty(INDEX, Arrays.asList(index++));
     }
     this.fromPoint = new PointDouble(points.getPoint(0));
     this.envelope = CoordinatesListUtil.getBoundingBox(this.geometryFactory, points);
@@ -471,7 +472,7 @@ public class LineStringGraph extends Graph<LineSegment> {
       }
       newPoints.add(toNode);
 
-      final List<Integer> index = edge.getField(INDEX);
+      final List<Integer> index = edge.getProperty(INDEX);
       int i = 0;
       Point previousPoint = fromNode;
       for (final Point point : newPoints) {
@@ -479,7 +480,7 @@ public class LineStringGraph extends Graph<LineSegment> {
         final Edge<LineSegment> newEdge = addEdge(lineSegment, previousPoint, point);
         final List<Integer> newIndecies = new ArrayList<Integer>(index);
         newIndecies.add(i++);
-        newEdge.setAttribute(INDEX, newIndecies);
+        newEdge.setProperty(INDEX, newIndecies);
         newEdges.add(newEdge);
         previousPoint = point;
       }

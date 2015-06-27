@@ -43,7 +43,6 @@ import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
-import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapSerializer;
@@ -51,6 +50,7 @@ import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.border.TitledBorder;
@@ -71,7 +71,7 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractLayer extends AbstractObjectWithProperties implements Layer,
+public abstract class AbstractLayer extends BaseObjectWithProperties implements Layer,
   PropertyChangeListener, PropertyChangeSupportProxy, EventsEnabler, ProjectFramePanel {
   public static final ImageIcon ICON_LAYER = Icons.getIcon("map");
 

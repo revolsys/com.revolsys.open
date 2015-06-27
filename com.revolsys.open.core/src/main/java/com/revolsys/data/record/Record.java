@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.identifier.Identifiable;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -18,6 +19,11 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
   Record clone();
 
   void delete();
+
+  default boolean equalValue(final String fieldName, final Object value) {
+    final Object fieldValue = getValue(fieldName);
+    return EqualsRegistry.equal(fieldValue, value);
+  }
 
   Byte getByte(final CharSequence name);
 

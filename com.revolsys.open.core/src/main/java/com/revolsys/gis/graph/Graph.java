@@ -29,8 +29,7 @@ import com.revolsys.filter.Filter;
 import com.revolsys.filter.FilterProxy;
 import com.revolsys.filter.FilterUtil;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
-import com.revolsys.gis.graph.attribute.NodeAttributes;
-import com.revolsys.gis.graph.attribute.ObjectAttributeProxy;
+import com.revolsys.gis.graph.attribute.NodeProperties;
 import com.revolsys.gis.graph.comparator.NodeDistanceComparator;
 import com.revolsys.gis.graph.event.EdgeEvent;
 import com.revolsys.gis.graph.event.EdgeEventListener;
@@ -66,7 +65,7 @@ public class Graph<T> {
 
   private static final AtomicInteger GRAPH_IDS = new AtomicInteger();
 
-  private static Map<Integer, WeakReference<Graph<?>>> graphs = new HashMap<Integer, WeakReference<Graph<?>>>();
+  private static Map<Integer, WeakReference<Graph<?>>> graphs = new HashMap<>();
 
   @SuppressWarnings("unchecked")
   public static <V> Graph<V> getGraph(final int id) {
@@ -84,29 +83,27 @@ public class Graph<T> {
     }
   }
 
-  private final int id = GRAPH_IDS.incrementAndGet();
-
-  private int maxEdgesInMemory = Integer.MAX_VALUE;
-
-  private boolean inMemory = true;
+  private final Map<Edge<T>, Integer> edgeIds = new TreeMap<>();
 
   private IdObjectIndex<Edge<T>> edgeIndex;
 
-  private Map<Integer, LineString> edgeLinesById = new IntHashMap<LineString>();
+  private Map<Integer, LineString> edgeLinesById = new IntHashMap<>();
 
-  private final EdgeEventListenerList<T> edgeListeners = new EdgeEventListenerList<T>();
+  private final EdgeEventListenerList<T> edgeListeners = new EdgeEventListenerList<>();
 
-  private Map<Integer, T> edgeObjectsById = new IntHashMap<T>();
+  private Map<Integer, T> edgeObjectsById = new IntHashMap<>();
 
-  private Map<Integer, Map<String, Object>> edgeAttributesById = new IntHashMap<Map<String, Object>>();
-
-  private Map<Integer, Map<String, Object>> nodeAttributesById = new IntHashMap<Map<String, Object>>();
+  private Map<Integer, Map<String, Object>> edgePropertiesById = new IntHashMap<>();
 
   private Map<Integer, Edge<T>> edgesById = new IntHashMap<Edge<T>>();
 
-  private final Map<Edge<T>, Integer> edgeIds = new TreeMap<Edge<T>, Integer>();
-
   private GeometryFactory geometryFactory = GeometryFactory.floating3();
+
+  private final int id = GRAPH_IDS.incrementAndGet();
+
+  private boolean inMemory = true;
+
+  private int maxEdgesInMemory = Integer.MAX_VALUE;
 
   private int nextEdgeId;
 
@@ -114,11 +111,13 @@ public class Graph<T> {
 
   private IdObjectIndex<Node<T>> nodeIndex;
 
-  private final NodeEventListenerList<T> nodeListeners = new NodeEventListenerList<T>();
+  private final NodeEventListenerList<T> nodeListeners = new NodeEventListenerList<>();
 
-  private Map<Point, Integer> nodesIdsByCoordinates = new TreeMap<Point, Integer>();
+  private Map<Integer, Map<String, Object>> nodePropertiesById = new IntHashMap<>();
 
-  private Map<Integer, Node<T>> nodesById = new IntHashMap<Node<T>>();
+  private Map<Integer, Node<T>> nodesById = new IntHashMap<>();
+
+  private Map<Point, Integer> nodesIdsByCoordinates = new TreeMap<>();
 
   private GeometryFactory precisionModel = GeometryFactory.floating3();
 
@@ -153,9 +152,10 @@ public class Graph<T> {
    * @param to
    * @return
    */
-  protected Edge<T> addEdge(final T object, final LineString line, final Point from, final Point to) {
+  protected Edge<T> addEdge(final T object, final LineString line, final Point from,
+    final Point to) {
     if (this.inMemory && getEdgeCount() >= this.maxEdgesInMemory) {
-      this.edgeAttributesById = BPlusTreeMap.createIntSeralizableTempDisk(this.edgeAttributesById);
+      this.edgePropertiesById = BPlusTreeMap.createIntSeralizableTempDisk(this.edgePropertiesById);
       // TODO edgIds
       // TODO edgeIndex
       this.edgeLinesById = BPlusTreeMap.createIntSeralizableTempDisk(this.edgeLinesById);
@@ -163,7 +163,7 @@ public class Graph<T> {
       this.edgesById = BPlusTreeMap.createIntSeralizableTempDisk(this.edgesById);
 
       // TODO nodeIndex
-      this.nodeAttributesById = BPlusTreeMap.createIntSeralizableTempDisk(this.nodeAttributesById);
+      this.nodePropertiesById = BPlusTreeMap.createIntSeralizableTempDisk(this.nodePropertiesById);
       this.nodesById = BPlusTreeMap.createIntSeralizableTempDisk(this.nodesById);
       this.nodesIdsByCoordinates = BPlusTreeMap.createTempDisk(this.nodesIdsByCoordinates,
         new SerializablePageValueManager<Point>(), PageValueManager.INT);
@@ -218,7 +218,7 @@ public class Graph<T> {
 
   @PreDestroy
   public void close() {
-    this.edgeAttributesById.clear();
+    this.edgePropertiesById.clear();
     this.edgeIds.clear();
     // TODO edgeIndex
     this.edgeLinesById.clear();
@@ -226,7 +226,7 @@ public class Graph<T> {
     this.edgesById.clear();
 
     // TODO nodeIndex.clear();
-    this.nodeAttributesById.clear();
+    this.nodePropertiesById.clear();
     this.nodesIdsByCoordinates.clear();
   }
 
@@ -249,6 +249,10 @@ public class Graph<T> {
   public void deleteEdges(final Filter<Edge<T>> filter) {
     final DeleteEdgeVisitor<T> visitor = new DeleteEdgeVisitor<T>();
     visitEdges(filter, visitor);
+  }
+
+  public Iterable<Edge<T>> edges() {
+    return getEdges();
   }
 
   protected void evict(final Edge<T> edge) {
@@ -394,31 +398,6 @@ public class Graph<T> {
     return this.edgesById.get(edgeId);
   }
 
-  @SuppressWarnings("unchecked")
-  protected <V> V getEdgeAttribute(final int edgeId, final String name) {
-    final Map<String, Object> edgeAttributes = this.edgeAttributesById.get(edgeId);
-    if (edgeAttributes == null) {
-      return null;
-    } else {
-      Object value = edgeAttributes.get(name);
-      if (value instanceof ObjectAttributeProxy) {
-        final ObjectAttributeProxy<V, Edge<T>> proxy = (ObjectAttributeProxy<V, Edge<T>>)value;
-        final Edge<T> edge = getEdge(edgeId);
-        value = proxy.getValue(edge);
-      }
-      return (V)value;
-    }
-  }
-
-  protected Map<String, Object> getEdgeAttributes(final int edgeId) {
-    final Map<String, Object> edgeAttributes = this.edgeAttributesById.get(edgeId);
-    if (edgeAttributes == null) {
-      return Collections.emptyMap();
-    } else {
-      return Collections.unmodifiableMap(edgeAttributes);
-    }
-  }
-
   public int getEdgeCount() {
     return this.edgesById.size();
   }
@@ -455,6 +434,10 @@ public class Graph<T> {
 
   public T getEdgeObject(final int edgeId) {
     return this.edgeObjectsById.get(edgeId);
+  }
+
+  protected Map<Integer, Map<String, Object>> getEdgePropertiesById() {
+    return this.edgePropertiesById;
   }
 
   public List<Edge<T>> getEdges() {
@@ -498,7 +481,8 @@ public class Graph<T> {
 
   }
 
-  public List<Edge<T>> getEdges(final Filter<Edge<T>> filter, final Comparator<Edge<T>> comparator) {
+  public List<Edge<T>> getEdges(final Filter<Edge<T>> filter,
+    final Comparator<Edge<T>> comparator) {
     final List<Edge<T>> targetEdges = getEdges(filter);
     if (comparator != null) {
       Collections.sort(targetEdges, comparator);
@@ -591,31 +575,6 @@ public class Graph<T> {
     return node;
   }
 
-  @SuppressWarnings("unchecked")
-  protected <V> V getNodeAttribute(final int nodeId, final String name) {
-    final Map<String, Object> nodeAttributes = this.nodeAttributesById.get(nodeId);
-    if (nodeAttributes == null) {
-      return null;
-    } else {
-      Object value = nodeAttributes.get(name);
-      if (value instanceof ObjectAttributeProxy) {
-        final ObjectAttributeProxy<V, Node<T>> proxy = (ObjectAttributeProxy<V, Node<T>>)value;
-        final Node<T> node = getNode(nodeId);
-        value = proxy.getValue(node);
-      }
-      return (V)value;
-    }
-  }
-
-  protected Map<String, Object> getNodeAttributes(final int nodeId) {
-    final Map<String, Object> nodeAttributes = this.nodeAttributesById.get(nodeId);
-    if (nodeAttributes == null) {
-      return Collections.emptyMap();
-    } else {
-      return Collections.unmodifiableMap(nodeAttributes);
-    }
-  }
-
   public Collection<Integer> getNodeIds() {
     return this.nodesById.keySet();
   }
@@ -625,6 +584,10 @@ public class Graph<T> {
       this.nodeIndex = new NodeQuadTree<T>(this);
     }
     return this.nodeIndex;
+  }
+
+  protected Map<Integer, Map<String, Object>> getNodePropertiesById() {
+    return this.nodePropertiesById;
   }
 
   public List<Node<T>> getNodes() {
@@ -655,7 +618,8 @@ public class Graph<T> {
 
   }
 
-  public List<Node<T>> getNodes(final Filter<Node<T>> filter, final Comparator<Node<T>> comparator) {
+  public List<Node<T>> getNodes(final Filter<Node<T>> filter,
+    final Comparator<Node<T>> comparator) {
     final List<Node<T>> targetNodes = getNodes(filter);
     if (comparator != null) {
       Collections.sort(targetNodes, comparator);
@@ -750,8 +714,8 @@ public class Graph<T> {
    */
   public Edge<T> merge(final Node<T> node, final Edge<T> edge1, final Edge<T> edge2) {
     if (edge1 != edge2 && edge1.hasNode(node) && edge2.hasNode(node)) {
-      final Map<String, Object> attributes1 = edge1.getFields();
-      final Map<String, Object> attributes2 = edge2.getFields();
+      final Map<String, Object> attributes1 = edge1.getProperties();
+      final Map<String, Object> attributes2 = edge2.getProperties();
       final T object1 = edge1.getObject();
       final LineString line1 = edge1.getLine();
       final LineString line2 = edge2.getLine();
@@ -760,8 +724,8 @@ public class Graph<T> {
 
       final T mergedObject = clone(object1, newLine);
       final Edge<T> newEdge = addEdge(mergedObject, newLine);
-      newEdge.setAttributes(attributes2);
-      newEdge.setAttributes(attributes1);
+      newEdge.setProperties(attributes2);
+      newEdge.setProperties(attributes1);
       remove(edge1);
       remove(edge2);
       return newEdge;
@@ -795,7 +759,7 @@ public class Graph<T> {
     final Node<Record> toNode, final Point newPoint) {
     if (!fromNode.isRemoved() && !toNode.isRemoved()) {
       if (!fromNode.equals(toNode)) {
-        final List<Edge<Record>> edges = NodeAttributes.getEdgesByType(fromNode, typePath);
+        final List<Edge<Record>> edges = NodeProperties.getEdgesByType(fromNode, typePath);
 
         for (final Edge<Record> edge : edges) {
           if (!edge.isRemoved()) {
@@ -928,7 +892,7 @@ public class Graph<T> {
       final int edgeId = edge.getId();
       this.edgeIds.remove(edge);
       this.edgesById.remove(edgeId);
-      this.edgeAttributesById.remove(edgeId);
+      this.edgePropertiesById.remove(edgeId);
       if (this.edgeLinesById != null) {
         this.edgeLinesById.remove(edgeId);
       }
@@ -953,7 +917,7 @@ public class Graph<T> {
       this.nodeListeners.nodeEvent(node, null, null, NodeEvent.NODE_REMOVED, null);
       final int nodeId = node.getId();
       this.nodesById.remove(nodeId);
-      this.nodeAttributesById.remove(nodeId);
+      this.nodePropertiesById.remove(nodeId);
       this.nodesIdsByCoordinates.remove(node);
       if (this.nodeIndex != null) {
         this.nodeIndex.remove(node);
@@ -1012,24 +976,6 @@ public class Graph<T> {
     }
   }
 
-  protected void setEdgeAttribute(final int edgeId, final String name, final Object value) {
-    Map<String, Object> attributes = this.edgeAttributesById.get(edgeId);
-    if (attributes == null) {
-      attributes = new HashMap<String, Object>();
-      this.edgeAttributesById.put(edgeId, attributes);
-    }
-    attributes.put(name, value);
-  }
-
-  protected void setEdgeAttributes(final int edgeId, final Map<String, Object> attributes) {
-    Map<String, Object> edgeAttributes = this.edgeAttributesById.get(edgeId);
-    if (edgeAttributes == null) {
-      edgeAttributes = new HashMap<String, Object>();
-      this.edgeAttributesById.put(edgeId, edgeAttributes);
-    }
-    edgeAttributes.putAll(attributes);
-  }
-
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
     setPrecisionModel(geometryFactory);
@@ -1037,24 +983,6 @@ public class Graph<T> {
 
   public void setMaxEdgesInMemory(final int maxEdgesInMemory) {
     this.maxEdgesInMemory = maxEdgesInMemory;
-  }
-
-  protected void setNodeAttribute(final int edgeId, final String name, final Object value) {
-    Map<String, Object> nodeAttributes = this.nodeAttributesById.get(edgeId);
-    if (nodeAttributes == null) {
-      nodeAttributes = new HashMap<String, Object>();
-      this.nodeAttributesById.put(edgeId, nodeAttributes);
-    }
-    nodeAttributes.put(name, value);
-  }
-
-  protected void setNodeAttributes(final int edgeId, final Map<String, Object> attributes) {
-    Map<String, Object> nodeAttributes = this.nodeAttributesById.get(edgeId);
-    if (nodeAttributes == null) {
-      nodeAttributes = new HashMap<String, Object>();
-      this.nodeAttributesById.put(edgeId, nodeAttributes);
-    }
-    nodeAttributes.putAll(attributes);
   }
 
   public void setPrecisionModel(final GeometryFactory precisionModel) {
@@ -1112,7 +1040,8 @@ public class Graph<T> {
               nodeSegment.put(node, segmentIndex);
               nodeIter.remove();
             } else {
-              final double projectionFactor = LineSegmentUtil.projectionFactor(x1, y1, x2, y2, x, y);
+              final double projectionFactor = LineSegmentUtil.projectionFactor(x1, y1, x2, y2, x,
+                y);
               if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
                 final Double closestDistance = nodeDistanceMap.get(node);
                 if (closestDistance == null) {
@@ -1149,8 +1078,8 @@ public class Graph<T> {
         Point startPoint = null;
         for (final Integer index : splitIndexes) {
           if (splitVertices.contains(index)) {
-            final LineString newPoints = points.subLine(startPoint, startIndex, index - startIndex
-              + 1, null);
+            final LineString newPoints = points.subLine(startPoint, startIndex,
+              index - startIndex + 1, null);
             newLines.add(newPoints);
             startPoint = null;
             startIndex = index;
@@ -1191,8 +1120,8 @@ public class Graph<T> {
             }
           }
         }
-        final LineString newPoints = points.subLine(startPoint, startIndex,
-          points.getVertexCount(), null);
+        final LineString newPoints = points.subLine(startPoint, startIndex, points.getVertexCount(),
+          null);
         newLines.add(newPoints);
 
         if (newLines.size() > 1) {
@@ -1218,8 +1147,8 @@ public class Graph<T> {
       final LineString line = edge.getLine();
       final LineString points = line;
 
-      final Map<String, Number> result = CoordinatesListUtil.findClosestSegmentAndCoordinate(
-        points, point);
+      final Map<String, Number> result = CoordinatesListUtil.findClosestSegmentAndCoordinate(points,
+        point);
       final int segmentIndex = result.get("segmentIndex").intValue();
       if (segmentIndex != -1) {
         List<LineString> lines;

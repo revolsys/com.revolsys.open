@@ -29,9 +29,9 @@ public class EdgeAttributeValueComparator<T> implements Comparator<Edge<T>> {
       return -11;
     } else {
       for (final String fieldName : this.fieldNames) {
-        final Object object1 = edge1.getField(fieldName);
+        final Object object1 = edge1.getProperty(fieldName);
 
-        final Object object2 = edge2.getField(fieldName);
+        final Object object2 = edge2.getProperty(fieldName);
         if (object1 == null) {
           if (object2 != null) {
             return 1;

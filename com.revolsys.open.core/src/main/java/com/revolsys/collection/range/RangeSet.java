@@ -12,7 +12,7 @@ import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
-public class RangeSet extends AbstractSet<Object> implements Iterable<Object>, Cloneable {
+public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Cloneable {
 
   private static void addPart(final RangeSet set, final List<AbstractRange<?>> crossProductRanges,
     final String fromValue, final String rangeSpec, final int partStart, final int partEnd) {
@@ -95,7 +95,7 @@ public class RangeSet extends AbstractSet<Object> implements Iterable<Object>, C
   }
 
   public RangeSet(final Iterable<Integer> values) {
-    addAll(values);
+    addValues(values);
   }
 
   public RangeSet(final RangeSet rangeSet) {
@@ -113,7 +113,8 @@ public class RangeSet extends AbstractSet<Object> implements Iterable<Object>, C
       final RangeSet ranges = (RangeSet)value;
       return addRanges(ranges);
     } else {
-      for (final ListIterator<AbstractRange<?>> iterator = this.ranges.listIterator(); iterator.hasNext();) {
+      for (final ListIterator<AbstractRange<?>> iterator = this.ranges.listIterator(); iterator
+        .hasNext();) {
         final AbstractRange<?> range = iterator.next();
         AbstractRange<?> newRange = range.expand(value);
         if (range == newRange) {
@@ -146,9 +147,9 @@ public class RangeSet extends AbstractSet<Object> implements Iterable<Object>, C
     }
   }
 
-  public boolean addAll(final Iterable<Integer> values) {
+  public boolean addValues(final Iterable<? extends Number> values) {
     boolean added = false;
-    for (final Integer value : values) {
+    for (final Number value : values) {
       added |= add(value);
     }
     return added;
@@ -157,7 +158,8 @@ public class RangeSet extends AbstractSet<Object> implements Iterable<Object>, C
   public boolean addRange(final AbstractRange<?> addRange) {
     boolean added = false;
     if (addRange != null) {
-      for (final ListIterator<AbstractRange<?>> iterator = this.ranges.listIterator(); iterator.hasNext();) {
+      for (final ListIterator<AbstractRange<?>> iterator = this.ranges.listIterator(); iterator
+        .hasNext();) {
         final AbstractRange<?> range = iterator.next();
         AbstractRange<?> newRange = range.expand(addRange);
         if (range == newRange) {
@@ -230,7 +232,8 @@ public class RangeSet extends AbstractSet<Object> implements Iterable<Object>, C
   @Override
   public boolean contains(final Object object) {
     if (object != null) {
-      for (final ListIterator<AbstractRange<?>> iterator = this.ranges.listIterator(); iterator.hasNext();) {
+      for (final ListIterator<AbstractRange<?>> iterator = this.ranges.listIterator(); iterator
+        .hasNext();) {
         final AbstractRange<?> range = iterator.next();
         if (range.contains(object)) {
           return true;
@@ -256,7 +259,8 @@ public class RangeSet extends AbstractSet<Object> implements Iterable<Object>, C
 
   @Override
   public boolean remove(final Object value) {
-    for (final ListIterator<AbstractRange<?>> iterator = this.ranges.listIterator(); iterator.hasNext();) {
+    for (final ListIterator<AbstractRange<?>> iterator = this.ranges.listIterator(); iterator
+      .hasNext();) {
       final AbstractRange<?> range = iterator.next();
       if (range.contains(value)) {
         final Object from = range.getFrom();
@@ -316,7 +320,8 @@ public class RangeSet extends AbstractSet<Object> implements Iterable<Object>, C
 
   public boolean removeRange(final Object from, final Object to) {
     boolean removed = false;
-    for (final ListIterator<AbstractRange<?>> iterator = this.ranges.listIterator(); iterator.hasNext();) {
+    for (final ListIterator<AbstractRange<?>> iterator = this.ranges.listIterator(); iterator
+      .hasNext();) {
       final AbstractRange<?> range = iterator.next();
 
       final Object rangeFrom = range.getFrom();

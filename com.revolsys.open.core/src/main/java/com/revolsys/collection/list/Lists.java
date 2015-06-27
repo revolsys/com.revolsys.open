@@ -6,16 +6,20 @@ import java.util.List;
 import com.revolsys.util.Property;
 
 public class Lists {
-  public static <V> void addAll(final List<V> list, final Iterable<V> values) {
-    for (final V value : values) {
-      list.add(value);
+  public static <V> void addAll(final List<V> list, final Iterable<? extends V> values) {
+    if (values != null) {
+      for (final V value : values) {
+        list.add(value);
+      }
     }
   }
 
   public static <V> void addAll(final List<V> list,
     @SuppressWarnings("unchecked") final V... values) {
-    for (final V value : values) {
-      list.add(value);
+    if (values != null) {
+      for (final V value : values) {
+        list.add(value);
+      }
     }
   }
 
@@ -95,7 +99,7 @@ public class Lists {
     }
   }
 
-  public static <V> List<V> array(final Iterable<V> values) {
+  public static <V> List<V> array(final Iterable<? extends V> values) {
     final List<V> list = new ArrayList<>();
     addAll(list, values);
     return list;

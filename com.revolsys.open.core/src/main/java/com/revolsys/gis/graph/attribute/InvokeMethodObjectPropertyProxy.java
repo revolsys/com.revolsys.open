@@ -6,7 +6,9 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.lang.reflect.Method;
 
-public class InvokeMethodObjectAttributeProxy<T, O> extends AbstractObjectAttributeProxy<T, O>
+import com.revolsys.properties.AbstractObjectPropertyProxy;
+
+public class InvokeMethodObjectPropertyProxy<T, O> extends AbstractObjectPropertyProxy<T, O>
   implements Externalizable {
 
   private static final long serialVersionUID = 1L;
@@ -24,10 +26,10 @@ public class InvokeMethodObjectAttributeProxy<T, O> extends AbstractObjectAttrib
 
   private Object object;
 
-  public InvokeMethodObjectAttributeProxy() {
+  public InvokeMethodObjectPropertyProxy() {
   }
 
-  public InvokeMethodObjectAttributeProxy(final Object object, final String methodName,
+  public InvokeMethodObjectPropertyProxy(final Object object, final String methodName,
     final Class<?> parameterClass, final Object... parameters) {
     if (object instanceof Class) {
       this.clazz = (Class<?>)object;
