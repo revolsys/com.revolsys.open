@@ -88,6 +88,7 @@ import com.revolsys.gis.esri.gdb.file.capi.type.StringFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.XmlFieldDefinition;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Path;
+import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jts.geom.BoundingBox;
@@ -182,7 +183,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   private boolean initialized;
 
-  private final Map<String, Table> tableByTypePath = new HashMap<>();
+  private final Map<String, Table> tableByPath = new HashMap<>();
 
   private final Map<String, Integer> tableReferenceCountsByTypePath = new HashMap<>();
 
@@ -439,8 +440,28 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       count--;
       if (count <= 0) {
         this.tableReferenceCountsByTypePath.remove(typePath);
-        final Table table = this.tableByTypePath.remove(typePath);
-        closeTable(typePath, table);
+        final Table table = this.tableByPath.remove(typePath);
+        synchronized (API_SYNC) {
+          if (table != null) {
+            try {
+              final Geodatabase geodatabase = getGeodatabase();
+              if (geodatabase != null) {
+                try {
+                  geodatabase.closeTable(table);
+                } finally {
+                  releaseGeodatabase();
+                }
+              }
+            } catch (final Throwable e) {
+              LoggerFactory.getLogger(getClass()).error("Cannot close Table " + typePath, e);
+            } finally {
+              try {
+                table.delete();
+              } catch (final Throwable t) {
+              }
+            }
+          }
+        }
         return true;
       } else {
         this.tableReferenceCountsByTypePath.put(typePath, count);
@@ -449,41 +470,13 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
-  private void closeTable(final String typePath, final Table table) {
-    synchronized (API_SYNC) {
-      if (table != null) {
-        try {
-          if (!isClosed()) {
-            getGeodatabase().closeTable(table);
-          }
-        } catch (final Throwable e) {
-          LoggerFactory.getLogger(getClass()).error("Cannot close Table " + typePath, e);
-        } finally {
-          this.tableByTypePath.remove(typePath);
-          this.tableReferenceCountsByTypePath.remove(typePath);
-          try {
-            table.delete();
-          } catch (final Throwable t) {
-          }
-        }
-      }
-      if (this.tableByTypePath.isEmpty() && this.geodatabase != null) {
-        try {
-          EsriFileGdb.CloseGeodatabase(this.geodatabase);
-        } finally {
-          this.geodatabase = null;
-        }
-      }
-    }
-  }
-
   private void closeTables() {
     synchronized (this.apiSync) {
-      if (!this.tableByTypePath.isEmpty()) {
+      if (!this.tableByPath.isEmpty()) {
         final Geodatabase geodatabase = getGeodatabase();
         if (geodatabase != null) {
           try {
-            for (final Entry<String, Table> entry : this.tableByTypePath.entrySet()) {
+            for (final Entry<String, Table> entry : this.tableByPath.entrySet()) {
               final Table table = entry.getValue();
               try {
                 table.setLoadOnlyMode(false);
@@ -497,7 +490,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                 }
               }
             }
-            this.tableByTypePath.clear();
+            this.tableByPath.clear();
             this.tableReferenceCountsByTypePath.clear();
             this.tableWriteLockCountsByTypePath.clear();
           } finally {
@@ -794,14 +787,34 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     return new FileGdbWriter(this);
   }
 
-  @Override
-  public void delete(final Record record) {
+  private void delete(final FileGdbWriter writer, final Record record) {
     // Don't synchronize to avoid deadlock as that is done lower down in the
     // methods
     if (record.getState() == RecordState.Persisted || record.getState() == RecordState.Modified) {
       record.setState(RecordState.Deleted);
-      final Writer<Record> writer = getWriter();
       writer.write(record);
+    }
+  }
+
+  @Override
+  public int delete(final Query query) {
+    int i = 0;
+    try (
+      final Reader<Record> reader = query(query);
+      FileGdbWriter writer = createWriter();) {
+      for (final Record record : reader) {
+        delete(writer, record);
+        i++;
+      }
+    }
+    return i;
+  }
+
+  @Override
+  public void delete(final Record record) {
+    try (
+      FileGdbWriter writer = createWriter()) {
+      delete(writer, record);
     }
   }
 
@@ -823,7 +836,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   protected void deleteRow(final String typePath, final Table table, final Row row) {
     synchronized (this.apiSync) {
       if (isOpen(table)) {
-        final boolean loadOnly = this.tableWriteLockCountsByTypePath.containsKey(typePath);
+        final boolean loadOnly = isTableLocked(typePath);
         if (loadOnly) {
           table.setLoadOnlyMode(false);
         }
@@ -1108,15 +1121,18 @@ public class FileGdbRecordStore extends AbstractRecordStore {
               return null;
             } else {
               try {
-                Table table = this.tableByTypePath.get(typePath);
+                Table table = this.tableByPath.get(typePath);
                 if (table == null) {
                   table = this.geodatabase.openTable(path);
                   if (table != null) {
-                    if (this.tableByTypePath.isEmpty()) {
+                    if (this.tableByPath.isEmpty()) {
                       this.geodatabaseReferenceCount++;
                     }
-                    this.tableByTypePath.put(typePath, table);
+                    Maps.addCount(this.tableReferenceCountsByTypePath, typePath);
+                    this.tableByPath.put(typePath, table);
                   }
+                } else {
+                  Maps.addCount(this.tableReferenceCountsByTypePath, typePath);
                 }
                 return table;
               } catch (final RuntimeException e) {
@@ -1135,7 +1151,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     synchronized (this.apiSync) {
       final Table table = getTable(typePath);
       if (table != null) {
-        if (Maps.addCount(this.tableWriteLockCountsByTypePath, typePath) == 1) {
+        final Integer count = Maps.addCount(this.tableWriteLockCountsByTypePath, typePath);
+        if (count == 1) {
           table.setWriteLock();
           table.setLoadOnlyMode(true);
         }
@@ -1242,7 +1259,10 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   public void insert(final Record record) {
     // Don't synchronize to avoid deadlock as that is done lower down in the
     // methods
-    getWriter().write(record);
+    try (
+      FileGdbWriter writer = createWriter()) {
+      writer.write(record);
+    }
   }
 
   protected void insertRow(final Table table, final Row row) {
@@ -1290,7 +1310,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       if (table == null) {
         return false;
       } else {
-        return this.tableByTypePath.containsValue(table);
+        final boolean open = this.tableByPath.containsValue(table);
+        return open;
       }
     }
   }
@@ -1331,6 +1352,10 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       }
       return pathExists;
     }
+  }
+
+  private boolean isTableLocked(final String typePath) {
+    return Maps.getCount(this.tableWriteLockCountsByTypePath, typePath) > 0;
   }
 
   @Override
@@ -1379,8 +1404,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   protected Row nextRow(final EnumRows rows) {
     synchronized (this.apiSync) {
       if (isOpen(rows)) {
-        final Row row = rows.next();
-        return row;
+        return rows.next();
       } else {
         return null;
       }
@@ -1527,17 +1551,19 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       final Geodatabase geodatabase = getGeodatabase();
       if (geodatabase != null) {
         try {
-          final Table table = this.tableByTypePath.get(typePath);
+          final Table table = this.tableByPath.get(typePath);
           if (table != null) {
-            if (Maps.decrementCount(this.tableReferenceCountsByTypePath, typePath) == 0) {
+            final Integer count = Maps.decrementCount(this.tableReferenceCountsByTypePath,
+              typePath);
+            if (count == 0) {
               try {
-                this.tableByTypePath.remove(typePath);
+                this.tableByPath.remove(typePath);
                 this.tableWriteLockCountsByTypePath.remove(typePath);
                 geodatabase.closeTable(table);
               } catch (final Exception e) {
                 LoggerFactory.getLogger(getClass()).error("Unable to close table: " + typePath, e);
               } finally {
-                if (this.tableByTypePath.isEmpty()) {
+                if (this.tableByPath.isEmpty()) {
                   this.geodatabaseReferenceCount--;
                 }
                 table.delete();
@@ -1556,9 +1582,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       final Geodatabase geodatabase = getGeodatabase();
       if (geodatabase != null) {
         try {
-          final Table table = this.tableByTypePath.get(typePath);
+          final Table table = this.tableByPath.get(typePath);
           if (table != null) {
-            if (Maps.decrementCount(this.tableWriteLockCountsByTypePath, typePath) == 0) {
+            final Integer count = Maps.decrementCount(this.tableWriteLockCountsByTypePath,
+              typePath);
+            if (count == 0) {
               try {
                 table.setLoadOnlyMode(false);
                 table.freeWriteLock();
@@ -1656,13 +1684,16 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   public void update(final Record record) {
     // Don't synchronize to avoid deadlock as that is done lower down in the
     // methods
-    getWriter().write(record);
+    try (
+      FileGdbWriter writer = createWriter()) {
+      writer.write(record);
+    }
   }
 
   protected void updateRow(final String typePath, final Table table, final Row row) {
     synchronized (this.apiSync) {
       if (isOpen(table)) {
-        final boolean loadOnly = this.tableWriteLockCountsByTypePath.containsKey(typePath);
+        final boolean loadOnly = isTableLocked(typePath);
         if (loadOnly) {
           table.setLoadOnlyMode(false);
         }

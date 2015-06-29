@@ -232,6 +232,15 @@ public class Maps {
     }
   }
 
+  public static <T> Integer getCount(final Map<T, Integer> counts, final T key) {
+    final Integer count = counts.get(key);
+    if (count == null) {
+      return 0;
+    } else {
+      return count;
+    }
+  }
+
   public static Double getDouble(final Map<String, ? extends Object> map, final String name) {
     final Object value = get(map, name);
     if (value == null) {
