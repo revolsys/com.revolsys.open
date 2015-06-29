@@ -38,7 +38,8 @@ public class Maps {
     return count;
   }
 
-  public static <K1, V> boolean addToList(final Map<K1, List<V>> map, final K1 key1, final V value) {
+  public static <K1, V> boolean addToList(final Map<K1, List<V>> map, final K1 key1,
+    final V value) {
     final List<V> values = getList(map, key1);
     return values.add(value);
   }
@@ -72,7 +73,8 @@ public class Maps {
     return values.add(value);
   }
 
-  public static <K1, V> boolean addToTreeSet(final Map<K1, Set<V>> map, final K1 key1, final V value) {
+  public static <K1, V> boolean addToTreeSet(final Map<K1, Set<V>> map, final K1 key1,
+    final V value) {
     final Set<V> values = getTreeSet(map, key1);
     if (values == null) {
       return false;
@@ -469,6 +471,15 @@ public class Maps {
     return map;
   }
 
+  public static <K> boolean hasValue(final Map<K, ?> map, final K key) {
+    if (map == null || key == null) {
+      return false;
+    } else {
+      final Object value = map.get(key);
+      return Property.hasValue(value);
+    }
+  }
+
   public static boolean isNotNullAndNotZero(final Map<String, Object> object, final String name) {
     final Integer value = getInteger(object, name);
     if (value == null || value == 0) {
@@ -503,8 +514,8 @@ public class Maps {
     return values.put(key2, value);
   }
 
-  public static <K, V extends Comparable<V>> void putIfGreaterThan(final Map<K, V> map,
-    final K key, final V value) {
+  public static <K, V extends Comparable<V>> void putIfGreaterThan(final Map<K, V> map, final K key,
+    final V value) {
     synchronized (map) {
       final V lastValue = map.get(key);
       if (lastValue == null || value.compareTo(lastValue) > 1) {

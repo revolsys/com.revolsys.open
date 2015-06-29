@@ -128,8 +128,8 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Label;
 import com.revolsys.util.Property;
 
-public abstract class AbstractRecordLayer extends AbstractLayer implements RecordFactory,
-  AddGeometryCompleteAction {
+public abstract class AbstractRecordLayer extends AbstractLayer
+  implements RecordFactory, AddGeometryCompleteAction {
 
   public static final String ALL = "All";
 
@@ -149,9 +149,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
 
     final EnableCheck hasSelectedRecords = new MenuSourcePropertyEnableCheck("hasSelectedRecords");
     final EnableCheck hasGeometry = new MenuSourcePropertyEnableCheck("hasGeometry");
-    menu.addMenuItem("zoom", MenuSourceRunnable.createAction("Zoom to Selected",
-      "magnifier_zoom_selected", new AndEnableCheck(exists, hasGeometry, hasSelectedRecords),
-      "zoomToSelected"));
+    menu.addMenuItem("zoom",
+      MenuSourceRunnable.createAction("Zoom to Selected", "magnifier_zoom_selected",
+        new AndEnableCheck(exists, hasGeometry, hasSelectedRecords), "zoomToSelected"));
 
     final EnableCheck editable = new MenuSourcePropertyEnableCheck("editable");
     final EnableCheck readonly = new MenuSourcePropertyEnableCheck("readOnly", false);
@@ -167,16 +167,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
     menu.addMenuItem("edit",
       MenuSourceRunnable.createAction("Save Changes", "table_save", hasChanges, "saveChanges"));
 
-    menu.addMenuItem(
-      "edit",
-      MenuSourceRunnable.createAction("Cancel Changes", "table_cancel", hasChanges, "cancelChanges"));
+    menu.addMenuItem("edit", MenuSourceRunnable.createAction("Cancel Changes", "table_cancel",
+      hasChanges, "cancelChanges"));
+
+    menu.addMenuItem("edit", MenuSourceRunnable.createAction("Add New Record", "table_row_insert",
+      canAdd, "addNewRecord"));
 
     menu.addMenuItem("edit",
-      MenuSourceRunnable.createAction("Add New Record", "table_row_insert", canAdd, "addNewRecord"));
-
-    menu.addMenuItem("edit", MenuSourceRunnable.createAction("Delete Selected Records",
-      "table_row_delete", new AndEnableCheck(hasSelectedRecords, canDelete),
-      "deleteSelectedRecords"));
+      MenuSourceRunnable.createAction("Delete Selected Records", "table_row_delete",
+        new AndEnableCheck(hasSelectedRecords, canDelete), "deleteSelectedRecords"));
 
     menu.addMenuItem("edit", MenuSourceRunnable.createAction("Merge Selected Records",
       "shape_group", canMergeRecords, "mergeSelectedRecords"));
@@ -195,7 +194,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
     // "exportRecords"));
   }
 
-  public static void addVisibleLayers(final List<AbstractRecordLayer> layers, final LayerGroup group) {
+  public static void addVisibleLayers(final List<AbstractRecordLayer> layers,
+    final LayerGroup group) {
     if (group.isExists() && group.isVisible()) {
       for (final Layer layer : group) {
         if (layer instanceof LayerGroup) {
@@ -263,7 +263,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
 
   private RecordQuadTree index = new RecordQuadTree();
 
-  private Set<AbstractProxyLayerRecord> proxyRecords = MapBackedSet.mapBackedSet(new WeakHashMap<AbstractProxyLayerRecord, Object>());
+  private Set<AbstractProxyLayerRecord> proxyRecords = MapBackedSet
+    .mapBackedSet(new WeakHashMap<AbstractProxyLayerRecord, Object>());
 
   private Query query = new Query();
 
@@ -572,7 +573,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
     clone.formWindows = new LinkedList<>();
     clone.index = new RecordQuadTree();
     clone.selectedRecordsIndex = null;
-    clone.proxyRecords = MapBackedSet.mapBackedSet(new WeakHashMap<AbstractProxyLayerRecord, Object>());
+    clone.proxyRecords = MapBackedSet
+      .mapBackedSet(new WeakHashMap<AbstractProxyLayerRecord, Object>());
     clone.query = this.query.clone();
     clone.sync = new Object();
     clone.editSync = new Object();
@@ -908,7 +910,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
     return saved;
   }
 
-  protected boolean doSaveChanges(final RecordSaveErrorTableModel errors, final LayerRecord record) {
+  protected boolean doSaveChanges(final RecordSaveErrorTableModel errors,
+    final LayerRecord record) {
     return false;
   }
 
@@ -917,7 +920,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
     if (!records.isEmpty()) {
       try {
         try (
-          GpxWriter writer = new GpxWriter(new File("/Users/paustin/Desktop/" + getName() + ".gpx"))) {
+          GpxWriter writer = new GpxWriter(
+            new File("/Users/paustin/Desktop/" + getName() + ".gpx"))) {
           for (final LayerRecord record : records) {
             writer.write(record);
           }
@@ -1211,7 +1215,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
       return new ArrayList<>();
     } else {
       final List<LayerRecord> selectedRecords = getSelectedRecords();
-      for (final ListIterator<LayerRecord> iterator = selectedRecords.listIterator(); iterator.hasNext();) {
+      for (final ListIterator<LayerRecord> iterator = selectedRecords.listIterator(); iterator
+        .hasNext();) {
         final LayerRecord record = iterator.next();
         if (record == null || record.isDeleted()) {
           iterator.remove();
@@ -1273,7 +1278,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
       if (compare > 0) {
         return getMergedRecord(point, record2, record1);
       } else {
-        final DirectionalAttributes property = DirectionalAttributes.getProperty(getRecordDefinition());
+        final DirectionalAttributes property = DirectionalAttributes
+          .getProperty(getRecordDefinition());
         final Map<String, Object> newValues = property.getMergedMap(point, record1, record2);
         newValues.remove(getIdFieldName());
         return new ArrayRecord(getRecordDefinition(), newValues);
@@ -1312,7 +1318,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
           final GeometryFactory geometryFactory = getGeometryFactory();
           geometryDataType = geometryField.getType();
           layerGeometryClass = geometryDataType.getJavaClass();
-          RecordReader reader = ClipboardUtil.getContents(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR);
+          RecordReader reader = ClipboardUtil
+            .getContents(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR);
           if (reader == null) {
             final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
             if (Property.hasValue(string)) {
@@ -1349,8 +1356,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
                     if (alert) {
                       JOptionPane.showMessageDialog(parentComponent,
                         "Clipboard should contain a record with a " + geometryDataType + " not a "
-                          + sourceGeometry.getGeometryType() + ".", "Paste Geometry",
-                        JOptionPane.ERROR_MESSAGE);
+                          + sourceGeometry.getGeometryType() + ".",
+                        "Paste Geometry", JOptionPane.ERROR_MESSAGE);
                     }
                     return null;
                   }
@@ -1526,7 +1533,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
    *
    * @param records
    */
-  private boolean internalCancelChanges(final Label cacheId, final Collection<LayerRecord> records) {
+  private boolean internalCancelChanges(final Label cacheId,
+    final Collection<LayerRecord> records) {
     boolean cancelled = true;
     for (final LayerRecord record : records) {
       removeFromIndex(record);
@@ -1822,7 +1830,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
     final List<LayerRecord> newRecords = new ArrayList<>();
     try (
       EventsEnabledState eventsEnabled = EventsEnabledState.disabled(this)) {
-      RecordReader reader = ClipboardUtil.getContents(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR);
+      RecordReader reader = ClipboardUtil
+        .getContents(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR);
       if (reader == null) {
         final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
         if (Property.hasValue(string)) {
@@ -1851,7 +1860,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
           final Map<String, Object> newValues = new LinkedHashMap<>(sourceRecord);
 
           Geometry sourceGeometry = sourceRecord.getGeometryValue();
-          for (final Iterator<String> iterator = newValues.keySet().iterator(); iterator.hasNext();) {
+          for (final Iterator<String> iterator = newValues.keySet().iterator(); iterator
+            .hasNext();) {
             final String fieldName = iterator.next();
             final FieldDefinition field = recordDefinition.getField(fieldName);
             if (field == null) {
@@ -1921,27 +1931,33 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
   }
 
   protected boolean postSaveModifiedRecord(final LayerRecord record) {
+    boolean removed;
     synchronized (getSync()) {
-      if (removeRecordFromCache(this.cacheIdModified, record)) {
-        record.postSaveModified();
-        return true;
-      } else {
-        return false;
-      }
+      removed = removeRecordFromCache(this.cacheIdModified, record);
+    }
+    if (removed) {
+      record.postSaveModified();
+      return true;
+    } else {
+      return false;
     }
   }
 
   protected boolean postSaveNewRecord(final LayerRecord record) {
+    boolean removed;
+    final boolean selected;
+    final boolean highlighted;
     synchronized (getSync()) {
-      final boolean selected = isSelected(record);
-      final boolean highlighted = isHighlighted(record);
-      if (removeRecordFromCache(this.cacheIdNew, record)) {
-        removeRecordFromCache(record);
-        record.postSaveNew();
-        addToIndex(record);
-        setSelectedHighlighted(record, selected, highlighted);
-        return true;
-      }
+      selected = isSelected(record);
+      highlighted = isHighlighted(record);
+      removed = removeRecordFromCache(this.cacheIdNew, record);
+    }
+    if (removed) {
+      removeRecordFromCache(record);
+      record.postSaveNew();
+      addToIndex(record);
+      setSelectedHighlighted(record, selected, highlighted);
+      return true;
     }
     return false;
   }
@@ -2255,10 +2271,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
         if (editable == false) {
           firePropertyChange("preEditable", false, true);
           if (isHasChanges()) {
-            final Integer result = InvokeMethodCallable.invokeAndWait(
-              JOptionPane.class,
-              "showConfirmDialog",
-              JOptionPane.getRootFrame(),
+            final Integer result = InvokeMethodCallable.invokeAndWait(JOptionPane.class,
+              "showConfirmDialog", JOptionPane.getRootFrame(),
               "The layer has unsaved changes. Click Yes to save changes. Click No to discard changes. Click Cancel to continue editing.",
               "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION);
 
@@ -2380,8 +2394,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
       if (value instanceof Map) {
         @SuppressWarnings("unchecked")
         final Map<String, Object> style = (Map<String, Object>)value;
-        final LayerRenderer<AbstractRecordLayer> renderer = AbstractRecordLayerRenderer.getRenderer(
-          this, style);
+        final LayerRenderer<AbstractRecordLayer> renderer = AbstractRecordLayerRenderer
+          .getRenderer(this, style);
         if (renderer != null) {
           setRenderer(renderer);
         }
@@ -2550,9 +2564,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
       }
     } else {
       final Window window = SwingUtil.getActiveWindow();
-      JOptionPane.showMessageDialog(window, "Adding records is not enabled for the " + getPath()
-        + " layer. If possible make the layer editable", "Cannot Add Record",
-        JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(window,
+        "Adding records is not enabled for the " + getPath()
+          + " layer. If possible make the layer editable",
+        "Cannot Add Record", JOptionPane.ERROR_MESSAGE);
       return null;
     }
 
@@ -2659,7 +2674,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
     });
   }
 
-  public List<LayerRecord> splitRecord(final LayerRecord record, final CloseLocation mouseLocation) {
+  public List<LayerRecord> splitRecord(final LayerRecord record,
+    final CloseLocation mouseLocation) {
 
     final Geometry geometry = mouseLocation.getGeometry();
     if (geometry instanceof LineString) {

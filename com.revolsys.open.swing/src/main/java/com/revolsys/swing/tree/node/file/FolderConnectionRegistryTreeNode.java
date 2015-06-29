@@ -8,19 +8,21 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JFileChooser;
+
 import com.revolsys.io.file.FolderConnection;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.field.DirectoryNameField;
+import com.revolsys.swing.field.FileField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.util.Property;
 
-public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode implements
-  PropertyChangeListener {
+public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
+  implements PropertyChangeListener {
 
   private static final MenuFactory MENU = new MenuFactory("Folder Connection Registry");
 
@@ -42,7 +44,7 @@ public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode implement
     panel.add(nameField);
 
     SwingUtil.addLabel(panel, "Folder");
-    final DirectoryNameField folderField = new DirectoryNameField();
+    final FileField folderField = new FileField(JFileChooser.DIRECTORIES_ONLY);
     panel.add(folderField);
 
     GroupLayoutUtil.makeColumns(panel, 2, true);

@@ -116,10 +116,12 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     addFieldTypeAttributeConstructor(FieldType.esriFieldTypeSingle, FloatFieldDefinition.class);
     addFieldTypeAttributeConstructor(FieldType.esriFieldTypeString, StringFieldDefinition.class);
     addFieldTypeAttributeConstructor(FieldType.esriFieldTypeDate, DateFieldDefinition.class);
-    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeGeometry, GeometryFieldDefinition.class);
+    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeGeometry,
+      GeometryFieldDefinition.class);
     addFieldTypeAttributeConstructor(FieldType.esriFieldTypeOID, OidFieldDefinition.class);
     addFieldTypeAttributeConstructor(FieldType.esriFieldTypeBlob, BinaryFieldDefinition.class);
-    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeGlobalID, GlobalIdFieldDefinition.class);
+    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeGlobalID,
+      GlobalIdFieldDefinition.class);
     addFieldTypeAttributeConstructor(FieldType.esriFieldTypeGUID, GuidFieldDefinition.class);
     addFieldTypeAttributeConstructor(FieldType.esriFieldTypeXML, XmlFieldDefinition.class);
 
@@ -128,7 +130,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   private static void addFieldTypeAttributeConstructor(final FieldType fieldType,
     final Class<? extends AbstractFileGdbFieldDefinition> fieldClass) {
     try {
-      final Constructor<? extends AbstractFileGdbFieldDefinition> constructor = fieldClass.getConstructor(Field.class);
+      final Constructor<? extends AbstractFileGdbFieldDefinition> constructor = fieldClass
+        .getConstructor(Field.class);
       ESRI_FIELD_TYPE_ATTRIBUTE_MAP.put(fieldType, constructor);
     } catch (final SecurityException e) {
       LOG.error("No public constructor for ESRI type " + fieldType, e);
@@ -179,11 +182,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   private boolean initialized;
 
+  private final Map<String, Table> tableByTypePath = new HashMap<>();
+
   private final Map<String, Integer> tableReferenceCountsByTypePath = new HashMap<>();
 
-  private final Map<String, Table> tablesToClose = new HashMap<>();
-
-  private final Map<String, Integer> writeLockCountsByTypePath = new HashMap<>();
+  private final Map<String, Integer> tableWriteLockCountsByTypePath = new HashMap<>();
 
   protected FileGdbRecordStore(final File file) {
     this.fileName = file.getAbsolutePath();
@@ -382,7 +385,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   protected void closeEnumRows() {
     synchronized (this.apiSync) {
-      for (final Iterator<EnumRows> iterator = this.enumRowsToClose.iterator(); iterator.hasNext();) {
+      for (final Iterator<EnumRows> iterator = this.enumRowsToClose.iterator(); iterator
+        .hasNext();) {
         final EnumRows rows = iterator.next();
         try {
           rows.Close();
@@ -435,7 +439,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       count--;
       if (count <= 0) {
         this.tableReferenceCountsByTypePath.remove(typePath);
-        final Table table = this.tablesToClose.remove(typePath);
+        final Table table = this.tableByTypePath.remove(typePath);
         closeTable(typePath, table);
         return true;
       } else {
@@ -455,7 +459,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         } catch (final Throwable e) {
           LoggerFactory.getLogger(getClass()).error("Cannot close Table " + typePath, e);
         } finally {
-          this.tablesToClose.remove(typePath);
+          this.tableByTypePath.remove(typePath);
           this.tableReferenceCountsByTypePath.remove(typePath);
           try {
             table.delete();
@@ -463,7 +467,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           }
         }
       }
-      if (this.tablesToClose.isEmpty() && this.geodatabase != null) {
+      if (this.tableByTypePath.isEmpty() && this.geodatabase != null) {
         try {
           EsriFileGdb.CloseGeodatabase(this.geodatabase);
         } finally {
@@ -475,11 +479,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   private void closeTables() {
     synchronized (this.apiSync) {
-      if (!this.tablesToClose.isEmpty()) {
+      if (!this.tableByTypePath.isEmpty()) {
         final Geodatabase geodatabase = getGeodatabase();
         if (geodatabase != null) {
           try {
-            for (final Entry<String, Table> entry : this.tablesToClose.entrySet()) {
+            for (final Entry<String, Table> entry : this.tableByTypePath.entrySet()) {
               final Table table = entry.getValue();
               try {
                 table.setLoadOnlyMode(false);
@@ -493,9 +497,9 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                 }
               }
             }
-            this.tablesToClose.clear();
+            this.tableByTypePath.clear();
             this.tableReferenceCountsByTypePath.clear();
-            this.writeLockCountsByTypePath.clear();
+            this.tableWriteLockCountsByTypePath.clear();
           } finally {
             releaseGeodatabase();
           }
@@ -565,9 +569,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     StringBuilder sql = new StringBuilder();
     if (orderBy.isEmpty() || boundingBox != null) {
       if (!orderBy.isEmpty()) {
-        LoggerFactory.getLogger(getClass()).error(
-          "Unable to sort on " + recordDefinition.getPath() + " " + orderBy.keySet()
-            + " as the ESRI library can't sort with a bounding box query");
+        LoggerFactory.getLogger(getClass()).error("Unable to sort on " + recordDefinition.getPath()
+          + " " + orderBy.keySet() + " as the ESRI library can't sort with a bounding box query");
       }
       sql = whereClause;
     } else {
@@ -603,8 +606,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           }
 
         } else {
-          LoggerFactory.getLogger(getClass()).error(
-            "Unable to sort on " + recordDefinition.getPath() + "." + column
+          LoggerFactory.getLogger(getClass())
+            .error("Unable to sort on " + recordDefinition.getPath() + "." + column
               + " as the ESRI library can't sort on " + dataType + " columns");
         }
       }
@@ -681,8 +684,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                 if (!hasChildDataset(getGeodatabase(), parentCatalogPath, "Feature Dataset",
                   childCatalogPath)) {
                   if (spatialReference != null) {
-                    final DEFeatureDataset dataset = EsriXmlRecordDefinitionUtil.createDEFeatureDataset(
-                      childCatalogPath, spatialReference);
+                    final DEFeatureDataset dataset = EsriXmlRecordDefinitionUtil
+                      .createDEFeatureDataset(childCatalogPath, spatialReference);
                     final String datasetDefinition = EsriGdbXmlSerializer.toString(dataset);
                     try {
                       geodatabase.createFeatureDataset(datasetDefinition);
@@ -690,8 +693,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                       if (LOG.isDebugEnabled()) {
                         LOG.debug(datasetDefinition);
                       }
-                      throw new RuntimeException("Unable to create feature dataset "
-                        + childCatalogPath, t);
+                      throw new RuntimeException(
+                        "Unable to create feature dataset " + childCatalogPath, t);
                     }
                   }
                 }
@@ -820,7 +823,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   protected void deleteRow(final String typePath, final Table table, final Row row) {
     synchronized (this.apiSync) {
       if (isOpen(table)) {
-        final boolean loadOnly = this.writeLockCountsByTypePath.containsKey(typePath);
+        final boolean loadOnly = this.tableWriteLockCountsByTypePath.containsKey(typePath);
         if (loadOnly) {
           table.setLoadOnlyMode(false);
         }
@@ -866,17 +869,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   @Override
   protected void finalize() throws Throwable {
     super.finalize();
-  }
-
-  protected void freeWriteLock(final String typePath, final Table table) {
-    synchronized (this.apiSync) {
-      if (isOpen(table)) {
-        if (Maps.decrementCount(this.writeLockCountsByTypePath, typePath) == 0) {
-          table.setLoadOnlyMode(false);
-          table.freeWriteLock();
-        }
-      }
-    }
   }
 
   public Object getApiSync() {
@@ -961,11 +953,12 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           for (final Field field : deTable.getFields()) {
             final String fieldName = field.getName();
             final FieldType type = field.getType();
-            final Constructor<? extends AbstractFileGdbFieldDefinition> attributeConstructor = ESRI_FIELD_TYPE_ATTRIBUTE_MAP.get(type);
+            final Constructor<? extends AbstractFileGdbFieldDefinition> attributeConstructor = ESRI_FIELD_TYPE_ATTRIBUTE_MAP
+              .get(type);
             if (attributeConstructor != null) {
               try {
-                final AbstractFileGdbFieldDefinition attribute = JavaBeanUtil.invokeConstructor(
-                  attributeConstructor, field);
+                final AbstractFileGdbFieldDefinition attribute = JavaBeanUtil
+                  .invokeConstructor(attributeConstructor, field);
                 attribute.setRecordStore(this);
                 recordDefinition.addField(attribute);
                 if (attribute instanceof GlobalIdFieldDefinition) {
@@ -1062,7 +1055,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                 }
               }
             } else {
-              final GeometryFieldDefinition geometryField = (GeometryFieldDefinition)recordDefinition.getGeometryField();
+              final GeometryFieldDefinition geometryField = (GeometryFieldDefinition)recordDefinition
+                .getGeometryField();
               if (geometryField == null || boundingBox.isEmpty()) {
                 return 0;
               } else {
@@ -1114,14 +1108,14 @@ public class FileGdbRecordStore extends AbstractRecordStore {
               return null;
             } else {
               try {
-                Table table = this.tablesToClose.get(typePath);
+                Table table = this.tableByTypePath.get(typePath);
                 if (table == null) {
                   table = this.geodatabase.openTable(path);
                   if (table != null) {
-                    if (this.tablesToClose.isEmpty()) {
+                    if (this.tableByTypePath.isEmpty()) {
                       this.geodatabaseReferenceCount++;
                     }
-                    this.tablesToClose.put(typePath, table);
+                    this.tableByTypePath.put(typePath, table);
                   }
                 }
                 return table;
@@ -1141,7 +1135,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     synchronized (this.apiSync) {
       final Table table = getTable(typePath);
       if (table != null) {
-        if (Maps.addCount(this.writeLockCountsByTypePath, typePath) == 1) {
+        if (Maps.addCount(this.tableWriteLockCountsByTypePath, typePath) == 1) {
           table.setWriteLock();
           table.setLoadOnlyMode(true);
         }
@@ -1211,18 +1205,19 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             if (file.exists()) {
               if (file.isDirectory()) {
                 if (!new File(this.fileName, "gdb").exists()) {
-                  throw new IllegalArgumentException(FileUtil.getCanonicalPath(file)
-                    + " is not a valid ESRI File Geodatabase");
+                  throw new IllegalArgumentException(
+                    FileUtil.getCanonicalPath(file) + " is not a valid ESRI File Geodatabase");
                 }
                 geodatabase = openGeodatabase();
               } else {
-                throw new IllegalArgumentException(FileUtil.getCanonicalPath(file)
-                  + " ESRI File Geodatabase must be a directory");
+                throw new IllegalArgumentException(
+                  FileUtil.getCanonicalPath(file) + " ESRI File Geodatabase must be a directory");
               }
             } else if (this.createMissingRecordStore) {
               geodatabase = createGeodatabase();
             } else {
-              throw new IllegalArgumentException("ESRI file geodatabase not found " + this.fileName);
+              throw new IllegalArgumentException(
+                "ESRI file geodatabase not found " + this.fileName);
             }
             final VectorOfWString domainNames = geodatabase.getDomains();
             for (int i = 0; i < domainNames.size(); i++) {
@@ -1295,7 +1290,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       if (table == null) {
         return false;
       } else {
-        return this.tablesToClose.containsValue(table);
+        return this.tableByTypePath.containsValue(table);
       }
     }
   }
@@ -1321,7 +1316,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           currentPath = path.substring(0, nextIndex);
         }
         boolean found = false;
-        final VectorOfWString children = geodatabase.getChildDatasets(parentPath, "Feature Dataset");
+        final VectorOfWString children = geodatabase.getChildDatasets(parentPath,
+          "Feature Dataset");
         for (int i = 0; i < children.size(); i++) {
           final String childPath = children.get(i);
           if (childPath.equals(currentPath)) {
@@ -1383,7 +1379,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   protected Row nextRow(final EnumRows rows) {
     synchronized (this.apiSync) {
       if (isOpen(rows)) {
-        return rows.next();
+        final Row row = rows.next();
+        return row;
       } else {
         return null;
       }
@@ -1482,8 +1479,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           try {
             final boolean pathExists = isPathExists(geodatabase, catalogPath);
             if (pathExists) {
-              final VectorOfWString childFeatureClasses = getChildDatasets(geodatabase,
-                catalogPath, datasetType);
+              final VectorOfWString childFeatureClasses = getChildDatasets(geodatabase, catalogPath,
+                datasetType);
               if (childFeatureClasses != null) {
                 for (int i = 0; i < childFeatureClasses.size(); i++) {
                   final String childCatalogPath = childFeatureClasses.get(i);
@@ -1530,17 +1527,17 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       final Geodatabase geodatabase = getGeodatabase();
       if (geodatabase != null) {
         try {
-          final Table table = this.tablesToClose.get(typePath);
+          final Table table = this.tableByTypePath.get(typePath);
           if (table != null) {
             if (Maps.decrementCount(this.tableReferenceCountsByTypePath, typePath) == 0) {
               try {
-                this.tablesToClose.remove(typePath);
-                this.writeLockCountsByTypePath.remove(typePath);
+                this.tableByTypePath.remove(typePath);
+                this.tableWriteLockCountsByTypePath.remove(typePath);
                 geodatabase.closeTable(table);
               } catch (final Exception e) {
                 LoggerFactory.getLogger(getClass()).error("Unable to close table: " + typePath, e);
               } finally {
-                if (this.tablesToClose.isEmpty()) {
+                if (this.tableByTypePath.isEmpty()) {
                   this.geodatabaseReferenceCount--;
                 }
                 table.delete();
@@ -1559,15 +1556,15 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       final Geodatabase geodatabase = getGeodatabase();
       if (geodatabase != null) {
         try {
-          final Table table = this.tablesToClose.get(typePath);
+          final Table table = this.tableByTypePath.get(typePath);
           if (table != null) {
-            if (Maps.decrementCount(this.writeLockCountsByTypePath, typePath) == 0) {
+            if (Maps.decrementCount(this.tableWriteLockCountsByTypePath, typePath) == 0) {
               try {
                 table.setLoadOnlyMode(false);
                 table.freeWriteLock();
               } catch (final Exception e) {
-                LoggerFactory.getLogger(getClass()).error(
-                  "Unable to free write lock for table: " + typePath, e);
+                LoggerFactory.getLogger(getClass())
+                  .error("Unable to free write lock for table: " + typePath, e);
               }
             }
           }
@@ -1665,7 +1662,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   protected void updateRow(final String typePath, final Table table, final Row row) {
     synchronized (this.apiSync) {
       if (isOpen(table)) {
-        final boolean loadOnly = this.writeLockCountsByTypePath.containsKey(typePath);
+        final boolean loadOnly = this.tableWriteLockCountsByTypePath.containsKey(typePath);
         if (loadOnly) {
           table.setLoadOnlyMode(false);
         }
