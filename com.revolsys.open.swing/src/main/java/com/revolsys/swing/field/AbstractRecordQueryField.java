@@ -45,8 +45,6 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.beans.EventsEnabledState;
-import com.revolsys.beans.EventsEnabler;
 import com.revolsys.collection.map.LruMap;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.equals.EqualsRegistry;
@@ -72,15 +70,17 @@ import com.revolsys.swing.map.list.RecordListCellRenderer;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
+import com.revolsys.util.enableable.Enabled;
+import com.revolsys.util.enableable.ThreadEnableable;
 
-public abstract class AbstractRecordQueryField extends ValueField implements DocumentListener,
-  KeyListener, MouseListener, FocusListener, ListDataListener, ListSelectionListener,
-  HighlightPredicate, EventsEnabler, ActionListenable {
+public abstract class AbstractRecordQueryField extends ValueField
+  implements DocumentListener, KeyListener, MouseListener, FocusListener, ListDataListener,
+  ListSelectionListener, HighlightPredicate, ActionListenable {
   private static final Icon ICON_DELETE = Icons.getIcon("delete");
 
   private static final long serialVersionUID = 1L;
 
-  private final ThreadLocal<Boolean> eventsEnabled = new ThreadLocal<>();
+  private final ThreadEnableable eventsEnabled = new ThreadEnableable();
 
   private final String displayFieldName;
 
@@ -117,8 +117,9 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
     super(fieldName, null);
     this.typePath = typePath;
     this.displayFieldName = displayFieldName;
-    this.queries = Arrays.asList(new Query(typePath, new Equal(F.upper(displayFieldName),
-      new Value(null))), new Query(typePath, Q.iLike(displayFieldName, "")));
+    this.queries = Arrays.asList(
+      new Query(typePath, new Equal(F.upper(displayFieldName), new Value(null))),
+      new Query(typePath, Q.iLike(displayFieldName, "")));
 
     final Document document = this.searchField.getDocument();
     document.addDocumentListener(this);
@@ -146,8 +147,9 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
     this.menu.add(new JScrollPane(this.list), BorderLayout.CENTER);
     this.menu.setFocusable(false);
     this.menu.setBorderPainted(true);
-    this.menu.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createLineBorder(Color.DARK_GRAY), BorderFactory.createEmptyBorder(1, 2, 1, 2)));
+    this.menu
+      .setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.DARK_GRAY),
+        BorderFactory.createEmptyBorder(1, 2, 1, 2)));
 
     this.searchField.setEditable(true);
     PopupMenu.getPopupMenuFactory(this.searchField);
@@ -209,6 +211,10 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
       }
       setSearchResults(searchIndex, allRecords.values(), selectedRecord);
     }
+  }
+
+  public Enabled eventsDisabled() {
+    return this.eventsEnabled.disabled();
   }
 
   @Override
@@ -305,11 +311,6 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
   @Override
   public void intervalRemoved(final ListDataEvent e) {
     intervalAdded(e);
-  }
-
-  @Override
-  public boolean isEventsEnabled() {
-    return this.eventsEnabled.get() != Boolean.FALSE;
   }
 
   @Override
@@ -425,7 +426,7 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
   }
 
   protected void search() {
-    if (isEventsEnabled()) {
+    if (this.eventsEnabled.isEnabled()) {
       final String queryText = this.searchField.getText();
       if (Property.hasValue(queryText)) {
         if (queryText.length() >= this.minSearchCharacters) {
@@ -438,8 +439,9 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
           setSelectedRecord(null);
           this.listModel.clear();
           this.menu.setVisible(false);
-          this.searchField.setFieldInvalid("Minimum " + this.minSearchCharacters
-            + " characters required for search", WebColors.Red, WebColors.Pink);
+          this.searchField.setFieldInvalid(
+            "Minimum " + this.minSearchCharacters + " characters required for search",
+            WebColors.Red, WebColors.Pink);
         }
       } else {
         this.listModel.clear();
@@ -447,17 +449,6 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
         setSelectedRecord(null);
       }
     }
-  }
-
-  @Override
-  public boolean setEventsEnabled(final boolean eventsEnabled) {
-    final boolean oldValue = this.eventsEnabled.get() != Boolean.FALSE;
-    if (eventsEnabled) {
-      this.eventsEnabled.set(null);
-    } else {
-      this.eventsEnabled.set(Boolean.FALSE);
-    }
-    return oldValue;
   }
 
   @Override
@@ -533,8 +524,8 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
       int x;
       int y;
       x = 0;
-      final Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(
-        getGraphicsConfiguration());
+      final Insets screenInsets = Toolkit.getDefaultToolkit()
+        .getScreenInsets(getGraphicsConfiguration());
 
       final Rectangle bounds = getGraphicsConfiguration().getBounds();
       final int menuHeight = this.menu.getBounds().height;
@@ -562,9 +553,9 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
 
   @Override
   public void valueChanged(final ListSelectionEvent e) {
-    if (!e.getValueIsAdjusting() && isEventsEnabled()) {
+    if (!e.getValueIsAdjusting() && this.eventsEnabled.isEnabled()) {
       try (
-        EventsEnabledState eventsEnabled = EventsEnabledState.disabled(this)) {
+        Enabled eventsEnabled = eventsDisabled()) {
         final Record record = (Record)this.list.getSelectedValue();
         if (record != null) {
           setSelectedRecord(record);

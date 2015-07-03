@@ -1,9 +1,8 @@
 package com.revolsys.swing.map.layer.record;
 
-import com.revolsys.beans.EventsEnabler;
 import com.revolsys.data.record.Record;
 
-public interface LayerRecord extends Record, EventsEnabler {
+public interface LayerRecord extends Record {
   void cancelChanges();
 
   void clearChanges();

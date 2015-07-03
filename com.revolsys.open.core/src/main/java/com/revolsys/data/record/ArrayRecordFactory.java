@@ -10,6 +10,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
  * @see ArrayRecord
  */
 public class ArrayRecordFactory implements RecordFactory {
+  public static final ArrayRecordFactory INSTANCE = new ArrayRecordFactory();
 
   /**
    * Create an instance of ArrayRecord using the record definition

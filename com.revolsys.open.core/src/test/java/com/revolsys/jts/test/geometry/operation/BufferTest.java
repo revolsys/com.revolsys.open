@@ -10,7 +10,7 @@ import org.junit.Assert;
 import org.springframework.core.io.ClassPathResource;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.io.AbstractMapReaderFactory;
+import com.revolsys.io.MapReaderFactory;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -42,7 +42,7 @@ public class BufferTest extends TestCase {
     final TestSuite suite = new TestSuite("Buffer");
     int i = 0;
     try (
-      Reader<Map<String, Object>> reader = AbstractMapReaderFactory.mapReader(new ClassPathResource(
+      Reader<Map<String, Object>> reader = MapReaderFactory.mapReader(new ClassPathResource(
         "/com/revolsys/jts/test/geometry/operation/buffer.csv"))) {
       for (final Map<String, Object> map : reader) {
         i++;

@@ -7,7 +7,7 @@ import java.util.List;
 import org.springframework.core.io.FileSystemResource;
 
 import com.revolsys.data.io.GeometryReader;
-import com.revolsys.gis.geometry.io.AbstractGeometryReaderFactory;
+import com.revolsys.gis.geometry.io.GeometryReaderFactory;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.io.ParseException;
@@ -22,7 +22,7 @@ public class IOUtil {
     final String ext = FileUtil.extension(filename);
     if (ext.equalsIgnoreCase(".shp")) {
       try (
-        GeometryReader reader = AbstractGeometryReaderFactory.geometryReader(new FileSystemResource(
+        GeometryReader reader = GeometryReaderFactory.geometryReader(new FileSystemResource(
           filename))) {
         final List<Geometry> geometries = reader.read();
         if (geometries.isEmpty()) {

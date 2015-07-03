@@ -28,7 +28,8 @@ import com.revolsys.util.Property;
 public class NumberTextField extends JXTextField implements Field, DocumentListener, FocusListener {
   private static final long serialVersionUID = 1L;
 
-  public static Number createMaximumValue(final DataType dataType, final int length, final int scale) {
+  public static Number createMaximumValue(final DataType dataType, final int length,
+    final int scale) {
     final Class<?> javaClass = dataType.getJavaClass();
     final StringBuilder text = new StringBuilder(length);
     for (int i = length - scale + 1; i > 1; i--) {
@@ -272,22 +273,6 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
   @Override
   public void removeUpdate(final DocumentEvent e) {
     validateField();
-  }
-
-  @Override
-  public void setFieldBackgroundColor(Color color) {
-    if (color == null) {
-      color = this.support.getOriginalBackgroundColor();
-    }
-    setBackground(color);
-  }
-
-  @Override
-  public void setFieldForegroundColor(Color color) {
-    if (color == null) {
-      color = this.support.getOriginalForegroundColor();
-    }
-    setForeground(color);
   }
 
   @Override

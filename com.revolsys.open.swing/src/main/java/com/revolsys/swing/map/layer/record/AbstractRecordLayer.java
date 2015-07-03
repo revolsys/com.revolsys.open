@@ -42,7 +42,6 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
-import com.revolsys.beans.EventsEnabledState;
 import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -127,6 +126,7 @@ import com.revolsys.util.CompareUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Label;
 import com.revolsys.util.Property;
+import com.revolsys.util.enableable.Enabled;
 
 public abstract class AbstractRecordLayer extends AbstractLayer
   implements RecordFactory, AddGeometryCompleteAction {
@@ -513,7 +513,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     synchronized (this.getEditSync()) {
       boolean cancelled = true;
       try (
-        EventsEnabledState eventsEnabled = EventsEnabledState.disabled(this)) {
+        Enabled eventsEnabled = eventsDisabled()) {
         cancelled &= internalCancelChanges(this.cacheIdNew, getNewRecords());
         cancelled &= internalCancelChanges(this.cacheIdDeleted, getDeletedRecords());
         cancelled &= internalCancelChanges(this.cacheIdModified, getModifiedRecords());
@@ -787,7 +787,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void deleteRecords(final Collection<? extends LayerRecord> records) {
     try (
-      EventsEnabledState eventsEnabled = EventsEnabledState.disabled(this)) {
+      Enabled eventsEnabled = eventsDisabled()) {
       if (isCanDeleteRecords()) {
         synchronized (this.getEditSync()) {
           unSelectRecords(records);
@@ -1829,7 +1829,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public List<LayerRecord> pasteRecords() {
     final List<LayerRecord> newRecords = new ArrayList<>();
     try (
-      EventsEnabledState eventsEnabled = EventsEnabledState.disabled(this)) {
+      Enabled eventsEnabled = eventsDisabled()) {
       RecordReader reader = ClipboardUtil
         .getContents(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR);
       if (reader == null) {
@@ -2177,7 +2177,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       if (isHasChanges()) {
         final RecordSaveErrorTableModel errors = new RecordSaveErrorTableModel(this);
         try (
-          EventsEnabledState eventsEnabled = EventsEnabledState.disabled(this)) {
+          Enabled eventsEnabled = eventsDisabled()) {
           doSaveChanges(errors);
         } finally {
           cleanCachedRecords();
@@ -2194,7 +2194,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       boolean allSaved;
       final RecordSaveErrorTableModel errors = new RecordSaveErrorTableModel(this);
       try (
-        EventsEnabledState eventsEnabled = EventsEnabledState.disabled(this)) {
+        Enabled eventsEnabled = eventsDisabled()) {
         for (final LayerRecord record : records) {
           try {
             if (isLayerRecord(record)) {
@@ -2225,7 +2225,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       boolean allSaved;
       final RecordSaveErrorTableModel errors = new RecordSaveErrorTableModel(this);
       try (
-        EventsEnabledState eventsEnabled = EventsEnabledState.disabled(this)) {
+        Enabled eventsEnabled = eventsDisabled()) {
         try {
           final boolean saved = internalSaveChanges(errors, record);
           if (!saved) {

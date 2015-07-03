@@ -9,17 +9,18 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.io.GeometryReader;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.io.AbstractRecordAndGeometryWriterFactory;
+import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.geojson.GeoJsonConstants;
 import com.revolsys.format.geojson.GeoJsonGeometryIterator;
 import com.revolsys.format.geojson.GeoJsonRecordWriter;
 import com.revolsys.gis.geometry.io.GeometryReaderFactory;
+import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 
-public class CogoJsonIoFactory extends AbstractRecordAndGeometryWriterFactory implements
-  GeometryReaderFactory {
+public class CogoJsonIoFactory extends AbstractIoFactoryWithCoordinateSystem
+  implements RecordWriterFactory, GeometryReaderFactory {
 
   public CogoJsonIoFactory() {
     super(GeoJsonConstants.COGO_DESCRIPTION);
@@ -39,7 +40,8 @@ public class CogoJsonIoFactory extends AbstractRecordAndGeometryWriterFactory im
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
+    final RecordDefinition recordDefinition, final OutputStream outputStream,
+    final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
     return new GeoJsonRecordWriter(writer, true);
   }

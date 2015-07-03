@@ -17,13 +17,13 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeNodeRunnable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
-import com.revolsys.swing.tree.node.file.FileTreeNode;
+import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.Property;
 
 public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode implements
   RecordStoreConnectionMapProxy {
 
-  public static final Icon ICON_SCHEMA = Icons.getIconWithBadge(FileTreeNode.ICON_FOLDER, "table");
+  public static final Icon ICON_SCHEMA = Icons.getIconWithBadge(PathTreeNode.ICON_FOLDER, "table");
 
   private static final MenuFactory MENU = new MenuFactory("Record Store Schema");
 

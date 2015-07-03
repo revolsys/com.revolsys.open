@@ -60,6 +60,7 @@ import com.revolsys.transaction.Transaction;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Label;
 import com.revolsys.util.Property;
+import com.revolsys.util.enableable.Enabled;
 
 public class RecordStoreLayer extends AbstractRecordLayer {
 
@@ -94,7 +95,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     setType("recordStoreLayer");
   }
 
-  public RecordStoreLayer(final RecordStore recordStore, final String typePath, final boolean exists) {
+  public RecordStoreLayer(final RecordStore recordStore, final String typePath,
+    final boolean exists) {
     this.recordStore = recordStore;
     setExists(exists);
     setType("recordStoreLayer");
@@ -307,10 +309,9 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     if (recordStore == null) {
       final Map<String, String> connectionProperties = getProperty("connection");
       if (connectionProperties == null) {
-        LoggerFactory.getLogger(getClass())
-          .error(
-            "A record store layer requires a connectionProperties entry with a name or url, username, and password: "
-              + getPath());
+        LoggerFactory.getLogger(getClass()).error(
+          "A record store layer requires a connectionProperties entry with a name or url, username, and password: "
+            + getPath());
         return false;
       } else {
         final Map<String, Object> config = new HashMap<String, Object>();
@@ -318,8 +319,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         recordStore = RecordStoreConnectionManager.getRecordStore(config);
 
         if (recordStore == null) {
-          LoggerFactory.getLogger(getClass()).error(
-            "Unable to create record store for layer: " + getPath());
+          LoggerFactory.getLogger(getClass())
+            .error("Unable to create record store for layer: " + getPath());
           return false;
         } else {
           try {
@@ -338,8 +339,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     if (recordDefinition == null) {
       recordDefinition = recordStore.getRecordDefinition(typePath);
       if (recordDefinition == null) {
-        LoggerFactory.getLogger(getClass()).error(
-          "Cannot find table " + typePath + " for layer " + getPath());
+        LoggerFactory.getLogger(getClass())
+          .error("Cannot find table " + typePath + " for layer " + getPath());
         return false;
       } else {
         setRecordDefinition(recordDefinition);
@@ -355,8 +356,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   })
   @Override
   protected List<LayerRecord> doQuery(final BoundingBox boundingBox) {
-    final boolean enabled = setEventsEnabled(false);
-    try {
+    try (
+      final Enabled enabled = eventsDisabled()) {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final BoundingBox queryBoundingBox = boundingBox.convert(geometryFactory);
       if (this.loadedBoundingBox.covers(queryBoundingBox)) {
@@ -365,8 +366,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         final List<LayerRecord> records = getRecordsFromRecordStore(queryBoundingBox);
         return records;
       }
-    } finally {
-      setEventsEnabled(enabled);
     }
   }
 
@@ -391,8 +390,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     if (isExists()) {
       final RecordStore recordStore = getRecordStore();
       if (recordStore != null) {
-        final boolean enabled = setEventsEnabled(false);
-        try {
+        try (
+          final Enabled enabled = eventsDisabled()) {
           final Statistics statistics = query.getProperty("statistics");
           query.setProperty("recordFactory", this);
           try (
@@ -407,8 +406,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
             return records;
 
           }
-        } finally {
-          setEventsEnabled(enabled);
         }
       }
     }
@@ -471,7 +468,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected boolean doSaveChanges(final RecordSaveErrorTableModel errors, final LayerRecord record) {
+  protected boolean doSaveChanges(final RecordSaveErrorTableModel errors,
+    final LayerRecord record) {
     final boolean deleted = super.isDeleted(record);
 
     if (isExists()) {
@@ -585,7 +583,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     }
   }
 
-  protected <V extends LayerRecord> List<V> getCachedRecords(final Collection<? extends V> records) {
+  protected <V extends LayerRecord> List<V> getCachedRecords(
+    final Collection<? extends V> records) {
     final List<V> cachedRecords = new ArrayList<V>();
     for (final V record : records) {
       addProxyRecordToList(cachedRecords, record);

@@ -3,6 +3,7 @@ package com.revolsys.swing.tree.node.record;
 import java.awt.TextField;
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,7 +19,7 @@ import com.revolsys.data.record.io.RecordStoreConnectionMapProxy;
 import com.revolsys.data.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.data.record.io.RecordStoreProxy;
 import com.revolsys.data.record.schema.RecordStore;
-import com.revolsys.io.FileUtil;
+import com.revolsys.io.Paths;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.ValueField;
@@ -26,11 +27,11 @@ import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeNodeRunnable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
-import com.revolsys.swing.tree.node.file.FileTreeNode;
+import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.Property;
 
-public class FileRecordStoreTreeNode extends FileTreeNode implements RecordStoreProxy,
-  RecordStoreConnectionMapProxy {
+public class FileRecordStoreTreeNode extends PathTreeNode
+  implements RecordStoreProxy, RecordStoreConnectionMapProxy {
   private static final MenuFactory MENU = new MenuFactory("File Record Store");
 
   static {
@@ -42,26 +43,26 @@ public class FileRecordStoreTreeNode extends FileTreeNode implements RecordStore
       "link_add", NODE_EXISTS, "addRecordStoreConnection"));
   }
 
-  public FileRecordStoreTreeNode(final File file) {
-    super(file);
+  public FileRecordStoreTreeNode(final java.nio.file.Path Path) {
+    super(Path);
     setType("Record Store");
-    setName(FileUtil.getFileName(file));
-    setIcon(FileTreeNode.ICON_FILE_DATABASE);
+    setName(Paths.getFileName(Path));
+    setIcon(PathTreeNode.ICON_FILE_DATABASE);
   }
 
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
   public void addRecordStoreConnection() {
-    final File file = getUserData();
-    final String fileName = FileUtil.getBaseName(file);
+    final Path path = getPath();
+    final String fileName = Paths.getBaseName(path);
 
     final ValueField panel = new ValueField();
     panel.setTitle("Add Record Store Connection");
     SwingUtil.setTitledBorder(panel, "Record Store Connection");
 
     SwingUtil.addLabel(panel, "File");
-    final JLabel fileLabel = new JLabel(file.getAbsolutePath());
+    final JLabel fileLabel = new JLabel(path.toString());
     panel.add(fileLabel);
 
     SwingUtil.addLabel(panel, "Name");
@@ -78,15 +79,16 @@ public class FileRecordStoreTreeNode extends FileTreeNode implements RecordStore
         registries.add(registry);
       }
     }
-    final JComboBox registryField = new JComboBox(new Vector<RecordStoreConnectionRegistry>(
-      registries));
+    final JComboBox registryField = new JComboBox(
+      new Vector<RecordStoreConnectionRegistry>(registries));
 
     panel.add(registryField);
 
     GroupLayoutUtil.makeColumns(panel, 2, true);
     panel.showDialog();
     if (panel.isSaved()) {
-      final RecordStoreConnectionRegistry registry = (RecordStoreConnectionRegistry)registryField.getSelectedItem();
+      final RecordStoreConnectionRegistry registry = (RecordStoreConnectionRegistry)registryField
+        .getSelectedItem();
       String connectionName = nameField.getText();
       if (!Property.hasValue(connectionName)) {
         connectionName = fileName;
@@ -119,15 +121,15 @@ public class FileRecordStoreTreeNode extends FileTreeNode implements RecordStore
   @Override
   @SuppressWarnings("unchecked")
   public <V extends RecordStore> V getRecordStore() {
-    final File file = getUserData();
+    final File file = getPath().toFile();
     return (V)RecordStoreConnectionManager.getRecordStore(file);
   }
 
   @Override
   public Map<String, Object> getRecordStoreConnectionMap() {
     final BaseTreeNode parent = getParent();
-    final File file = getUserData();
-    final URL url = FileTreeNode.getUrl(parent, file);
+    final Path path = getPath();
+    final URL url = PathTreeNode.getUrl(parent, path);
 
     return Collections.<String, Object> singletonMap("url", url.toString());
   }

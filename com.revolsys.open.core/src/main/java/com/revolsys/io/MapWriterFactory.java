@@ -1,17 +1,36 @@
 package com.revolsys.io;
 
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 
+import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 
+import com.revolsys.spring.SpringUtil;
+
 public interface MapWriterFactory extends FileIoFactory {
-  MapWriter getMapWriter(final OutputStream out);
+  default MapWriter createMapWriter(final OutputStream out) {
+    final java.io.Writer writer = FileUtil.createUtf8Writer(out);
+    return createMapWriter(writer);
+  }
 
-  MapWriter getMapWriter(OutputStream out, Charset charset);
+  default MapWriter createMapWriter(final OutputStream out, final Charset charset) {
+    final OutputStreamWriter writer = new OutputStreamWriter(out, charset);
+    return createMapWriter(writer);
+  }
 
-  MapWriter getMapWriter(final Resource resource);
+  default MapWriter createMapWriter(final Resource resource) {
+    final java.io.Writer writer = SpringUtil.getWriter(resource);
+    return createMapWriter(writer);
+  }
 
-  MapWriter getMapWriter(final Writer out);
+  MapWriter createMapWriter(final Writer out);
+
+  default MapWriter createMapWriter(final Path path) {
+    final PathResource resource = new PathResource(path);
+    return createMapWriter(resource);
+  }
 }

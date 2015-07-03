@@ -89,6 +89,9 @@ public class ValueField extends JPanel implements Field {
     }
   }
 
+  protected void doSave() {
+  }
+
   @Override
   public void firePropertyChange(final String propertyName, final Object oldValue,
     final Object newValue) {
@@ -126,6 +129,7 @@ public class ValueField extends JPanel implements Field {
 
   public void save() {
     save(this);
+    doSave();
   }
 
   private void save(final Container container) {
@@ -151,32 +155,20 @@ public class ValueField extends JPanel implements Field {
     dialog.setVisible(false);
   }
 
+  protected void setColor(final Color foregroundColor, final Color backgroundColor) {
+    setForeground(foregroundColor);
+    setBackground(backgroundColor);
+  }
+
   @Override
   public void setEditable(final boolean editable) {
     setEnabled(editable);
   }
 
   @Override
-  public void setFieldBackgroundColor(Color color) {
-    if (color == null) {
-      color = this.defaultBackground;
-    }
-    setBackground(color);
-  }
-
-  @Override
-  public void setFieldForegroundColor(Color color) {
-    if (color == null) {
-      color = this.defaultForeground;
-    }
-    setForeground(color);
-  }
-
-  @Override
   public void setFieldInvalid(final String message, final Color foregroundColor,
     final Color backgroundColor) {
-    setForeground(foregroundColor);
-    setBackground(backgroundColor);
+    setColor(foregroundColor, backgroundColor);
     this.errorMessage = message;
     super.setToolTipText(this.errorMessage);
   }
@@ -192,9 +184,9 @@ public class ValueField extends JPanel implements Field {
 
   @Override
   public void setFieldValid() {
-    setForeground(this.defaultForeground);
-    setBackground(this.defaultBackground);
+    setColor(this.defaultForeground, this.defaultBackground);
     super.setToolTipText(this.originalToolTip);
+    this.errorMessage = null;
   }
 
   @Override

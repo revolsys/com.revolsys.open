@@ -16,15 +16,16 @@ import java.util.Map.Entry;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.io.AbstractMapReaderFactory;
+import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.MapReaderFactory;
 import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
 import com.revolsys.io.Reader;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.Property;
 
-public class Json extends AbstractMapReaderFactory implements MapWriterFactory {
+public class Json extends AbstractIoFactory implements MapReaderFactory, MapWriterFactory {
   public static Map<String, Object> toMap(final File file) {
     if (file == null) {
       return new LinkedHashMap<String, Object>();
@@ -198,24 +199,12 @@ public class Json extends AbstractMapReaderFactory implements MapWriterFactory {
   }
 
   @Override
-  public MapWriter getMapWriter(final OutputStream out) {
-    final Writer writer = FileUtil.createUtf8Writer(out);
-    return getMapWriter(writer);
+  public MapWriter createMapWriter(final OutputStream out, final Charset charset) {
+    return createMapWriter(out);
   }
 
   @Override
-  public MapWriter getMapWriter(final OutputStream out, final Charset charset) {
-    return getMapWriter(out);
-  }
-
-  @Override
-  public MapWriter getMapWriter(final Resource resource) {
-    final Writer writer = SpringUtil.getWriter(resource);
-    return getMapWriter(writer);
-  }
-
-  @Override
-  public MapWriter getMapWriter(final Writer out) {
+  public MapWriter createMapWriter(final Writer out) {
     return new JsonMapWriter(out);
   }
 }

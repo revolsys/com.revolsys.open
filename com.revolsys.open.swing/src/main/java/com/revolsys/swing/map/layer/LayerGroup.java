@@ -17,15 +17,16 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.Parent;
-import com.revolsys.data.record.io.RecordIo;
+import com.revolsys.data.record.io.RecordReaderFactory;
 import com.revolsys.format.json.Json;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoFactory;
 import com.revolsys.io.Path;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
-import com.revolsys.raster.AbstractGeoreferencedImageFactory;
+import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.action.AddFileLayerAction;
@@ -207,8 +208,8 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   @SuppressWarnings("unchecked")
-  protected <V extends Layer> void addVisibleLayers(final List<V> layers,
-    final Class<V> layerClass, final double scale) {
+  protected <V extends Layer> void addVisibleLayers(final List<V> layers, final Class<V> layerClass,
+    final double scale) {
     for (final Layer layer : this.layers) {
       if (layer.isVisible(scale)) {
         if (layerClass.isAssignableFrom(layer.getClass())) {
@@ -513,8 +514,8 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   protected Layer loadLayer(final File file) {
-    final Resource oldResource = SpringUtil.setBaseResource(new FileSystemResource(
-      file.getParentFile()));
+    final Resource oldResource = SpringUtil
+      .setBaseResource(new FileSystemResource(file.getParentFile()));
 
     try {
       final Map<String, Object> properties = Json.toMap(file);
@@ -547,8 +548,8 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
             final Layer layer = (Layer)object;
             addLayer(layer);
           } else if (object != null) {
-            LoggerFactory.getLogger(LayerGroup.class).error(
-              "Unexpected object type " + object.getClass() + " in " + childResource);
+            LoggerFactory.getLogger(LayerGroup.class)
+              .error("Unexpected object type " + object.getClass() + " in " + childResource);
           }
         } else {
           LoggerFactory.getLogger(LayerGroup.class).error("Cannot find " + childResource);
@@ -587,9 +588,9 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     name = FileUtil.fromSafeName(name);
     properties.put("name", name);
     Layer layer;
-    if (AbstractGeoreferencedImageFactory.hasGeoreferencedImageFactory(urlString)) {
+    if (IoFactory.hasFactory(GeoreferencedImageFactory.class, url)) {
       layer = new GeoreferencedImageLayer(properties);
-    } else if (RecordIo.hasRecordReaderFactory(urlString)) {
+    } else if (IoFactory.hasFactory(RecordReaderFactory.class, url)) {
       final FileRecordLayer recordLayer = new FileRecordLayer(properties);
       final GeometryStyleRenderer renderer = recordLayer.getRenderer();
       renderer.setStyle(GeometryStyle.createStyle());

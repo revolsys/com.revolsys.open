@@ -48,6 +48,7 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.PreferencesUtil;
+import com.revolsys.util.enableable.Enabled;
 
 public class Project extends LayerGroup {
 
@@ -304,13 +305,14 @@ public class Project extends LayerGroup {
   public void readProject(final Resource resource) {
     this.resource = resource;
     if (resource.exists()) {
-      setEventsEnabled(false);
       String name;
-      try {
+      try (
+        final Enabled enabled = eventsDisabled()) {
         final Resource layersDir = SpringUtil.getResource(resource, "Layers");
         readProperties(layersDir);
 
-        final RecordStoreConnectionRegistry oldRecordStoreConnections = RecordStoreConnectionRegistry.getForThread();
+        final RecordStoreConnectionRegistry oldRecordStoreConnections = RecordStoreConnectionRegistry
+          .getForThread();
         try {
           final Resource recordStoresDirectory = SpringUtil.getResource(resource, "Record Stores");
           if (!recordStoresDirectory.exists()) {
@@ -343,8 +345,6 @@ public class Project extends LayerGroup {
         }
         name = getName();
         setName(null);
-      } finally {
-        setEventsEnabled(true);
       }
       setName(name);
     }
@@ -395,12 +395,15 @@ public class Project extends LayerGroup {
       final File directory = getDirectory();
       final boolean saveAllSettings = super.saveAllSettings(directory);
       if (saveAllSettings) {
-        final RecordStoreConnectionManager recordStoreConnectionManager = RecordStoreConnectionManager.get();
-        final RecordStoreConnectionRegistry recordStoreConnections = recordStoreConnectionManager.getConnectionRegistry("Project");
+        final RecordStoreConnectionManager recordStoreConnectionManager = RecordStoreConnectionManager
+          .get();
+        final RecordStoreConnectionRegistry recordStoreConnections = recordStoreConnectionManager
+          .getConnectionRegistry("Project");
         recordStoreConnections.saveAs(this.resource, "Record Stores");
 
         final FolderConnectionManager folderConnectionManager = FolderConnectionManager.get();
-        final FolderConnectionRegistry folderConnections = folderConnectionManager.getConnectionRegistry("Project");
+        final FolderConnectionRegistry folderConnections = folderConnectionManager
+          .getConnectionRegistry("Project");
         folderConnections.saveAs(this.resource, "Folder Connections");
       }
       return saveAllSettings;

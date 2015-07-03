@@ -1,67 +1,61 @@
 package com.revolsys.data.record.io;
 
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.io.FileUtil;
-import com.revolsys.io.Writer;
+import com.revolsys.data.record.schema.RecordStore;
+import com.revolsys.format.directory.DirectoryRecordStore;
+import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.spring.SpringUtil;
 
-public abstract class AbstractRecordIoFactory extends AbstractRecordReaderFactory implements
-  RecordWriterFactory {
+public abstract class AbstractRecordIoFactory extends AbstractIoFactoryWithCoordinateSystem
+  implements RecordReaderFactory, RecordStoreFactory {
 
-  private Set<CoordinateSystem> coordinateSystems = EpsgCoordinateSystems.getCoordinateSystems();
+  private final List<String> urlPatterns = new ArrayList<>();
 
-  public AbstractRecordIoFactory(final String name, final boolean binary) {
-    super(name, binary);
-  }
-
-  /**
-   * Create a writer to write to the specified resource.
-   *
-   * @param recordDefinition The recordDefinition for the type of data to write.
-   * @param resource The resource to write to.
-   * @return The writer.
-   */
-  @Override
-  public Writer<Record> createRecordWriter(final RecordDefinition recordDefinition,
-    final Resource resource) {
-    final OutputStream out = SpringUtil.getOutputStream(resource);
-    final String fileName = resource.getFilename();
-    final String baseName = FileUtil.getBaseName(fileName);
-    return createRecordWriter(baseName, recordDefinition, out);
+  public AbstractRecordIoFactory(final String name) {
+    super(name);
   }
 
   @Override
-  public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream) {
-    return createRecordWriter(baseName, recordDefinition, outputStream, StandardCharsets.UTF_8);
+  protected void addMediaTypeAndFileExtension(final String mediaType, final String fileExtension) {
+    super.addMediaTypeAndFileExtension(mediaType, fileExtension);
+    this.urlPatterns.add("(.+)[\\?|&]format=" + fileExtension + "(&.+)?");
   }
 
   @Override
-  public Set<CoordinateSystem> getCoordinateSystems() {
-    return this.coordinateSystems;
+  public RecordStore createRecordStore(final Map<String, ? extends Object> connectionProperties) {
+    final String url = (String)connectionProperties.get("url");
+    final Resource resource = SpringUtil.getResource(url);
+    final File directory = SpringUtil.getFile(resource);
+    final List<String> fileExtensions = getFileExtensions();
+    return new DirectoryRecordStore(directory, fileExtensions);
   }
 
   @Override
-  public boolean isCoordinateSystemSupported(final CoordinateSystem coordinateSystem) {
-    return this.coordinateSystems.contains(coordinateSystem);
+  public List<String> getRecordStoreFileExtensions() {
+    return Collections.emptyList();
   }
 
-  protected void setCoordinateSystems(final CoordinateSystem... coordinateSystems) {
-    setCoordinateSystems(new LinkedHashSet<CoordinateSystem>(Arrays.asList(coordinateSystems)));
+  @Override
+  public Class<? extends RecordStore> getRecordStoreInterfaceClass(
+    final Map<String, ? extends Object> connectionProperties) {
+    return RecordStore.class;
   }
 
-  protected void setCoordinateSystems(final Set<CoordinateSystem> coordinateSystems) {
-    this.coordinateSystems = coordinateSystems;
+  @Override
+  public List<String> getUrlPatterns() {
+    return this.urlPatterns;
+  }
+
+  @Override
+  public void init() {
+    super.init();
+    RecordStoreFactoryRegistry.register(this);
   }
 }

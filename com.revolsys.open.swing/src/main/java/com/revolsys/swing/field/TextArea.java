@@ -48,7 +48,8 @@ public class TextArea extends JTextArea implements Field, FocusListener {
     this(fieldName, fieldValue, 0, 0);
   }
 
-  public TextArea(final String fieldName, final Object fieldValue, final int rows, final int columns) {
+  public TextArea(final String fieldName, final Object fieldValue, final int rows,
+    final int columns) {
     setRows(rows);
     setColumns(columns);
     this.fieldName = fieldName;
@@ -106,22 +107,6 @@ public class TextArea extends JTextArea implements Field, FocusListener {
   @Override
   public boolean isFieldValid() {
     return true;
-  }
-
-  @Override
-  public void setFieldBackgroundColor(Color color) {
-    if (color == null) {
-      color = TextField.DEFAULT_BACKGROUND;
-    }
-    setBackground(color);
-  }
-
-  @Override
-  public void setFieldForegroundColor(Color color) {
-    if (color == null) {
-      color = TextField.DEFAULT_BACKGROUND;
-    }
-    setForeground(color);
   }
 
   @Override

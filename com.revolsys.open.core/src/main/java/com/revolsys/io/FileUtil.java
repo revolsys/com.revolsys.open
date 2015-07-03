@@ -40,6 +40,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -86,12 +87,12 @@ public final class FileUtil {
   public static final FilenameFilter IMAGE_FILENAME_FILTER = new ExtensionFilenameFilter(
     Arrays.asList(new String[] {
       "gif", "jpg", "png", "tif", "tiff", "bmp"
-    }));
+  }));
 
   public static final FilenameFilter VIDEO_FILENAME_FILTER = new ExtensionFilenameFilter(
     Arrays.asList(new String[] {
       "avi", "wmv", "flv", "mpg"
-    }));
+  }));
 
   /**
    * Close the writer without throwing an I/O exception if the close failed. The
@@ -136,8 +137,8 @@ public final class FileUtil {
     } else if (separator == UNIX_FILE_SEPARATOR) {
       return path.replace(WINDOWS_FILE_SEPARATOR, separator);
     } else {
-      return path.replace(UNIX_FILE_SEPARATOR, separator)
-        .replace(WINDOWS_FILE_SEPARATOR, separator);
+      return path.replace(UNIX_FILE_SEPARATOR, separator).replace(WINDOWS_FILE_SEPARATOR,
+        separator);
     }
   }
 
@@ -233,7 +234,8 @@ public final class FileUtil {
    * @param sz file size
    * @throws IOException if an i/o error
    */
-  public static void copy(final InputStream zin, final File file, final long sz) throws IOException {
+  public static void copy(final InputStream zin, final File file, final long sz)
+    throws IOException {
 
     ReadableByteChannel rc = null;
     FileOutputStream out = null;
@@ -739,6 +741,11 @@ public final class FileUtil {
     }
   }
 
+  public static String getFileName(final Path path) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
   public static String getFileName(final String fileName) {
     int slashIndex = fileName.lastIndexOf('/');
     if (slashIndex != -1) {
@@ -778,8 +785,8 @@ public final class FileUtil {
     if (startIndex == -1) {
       startIndex = 0;
     }
-    for (int dotIndex = fileName.indexOf('.', startIndex); dotIndex > 0; dotIndex = fileName.indexOf(
-      '.', startIndex)) {
+    for (int dotIndex = fileName.indexOf('.', startIndex); dotIndex > 0; dotIndex = fileName
+      .indexOf('.', startIndex)) {
       dotIndex++;
       final String extension = fileName.substring(dotIndex);
       extensions.add(extension);

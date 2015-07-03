@@ -36,7 +36,8 @@ public abstract class AbstractLayerRecord extends AbstractRecord implements Laye
     final Object newValue) {
     final AbstractLayer layer = getLayer();
     if (layer.isEventsEnabled()) {
-      final PropertyChangeEvent event = new PropertyChangeEvent(this, fieldName, oldValue, newValue);
+      final PropertyChangeEvent event = new PropertyChangeEvent(this, fieldName, oldValue,
+        newValue);
       layer.propertyChange(event);
     }
   }
@@ -73,11 +74,6 @@ public abstract class AbstractLayerRecord extends AbstractRecord implements Laye
   @Override
   public boolean isDeleted() {
     return getState() == RecordState.Deleted;
-  }
-
-  @Override
-  public boolean isEventsEnabled() {
-    return this.layer.isEventsEnabled();
   }
 
   @Override
@@ -185,11 +181,6 @@ public abstract class AbstractLayerRecord extends AbstractRecord implements Laye
         }
       }
     }
-  }
-
-  @Override
-  public boolean setEventsEnabled(final boolean eventsEnabled) {
-    return this.layer.setEventsEnabled(eventsEnabled);
   }
 
   @Override

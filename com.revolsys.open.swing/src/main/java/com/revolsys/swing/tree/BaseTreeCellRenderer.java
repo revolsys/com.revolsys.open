@@ -14,7 +14,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import com.revolsys.awt.WebColors;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.tree.node.BaseTreeNode;
-import com.revolsys.swing.tree.node.file.FileTreeNode;
+import com.revolsys.swing.tree.node.file.PathTreeNode;
 
 public class BaseTreeCellRenderer extends DefaultTreeCellRenderer implements ImageObserver {
   private static final ImageIcon ICON_MISSING = Icons.getIcon("error");
@@ -28,8 +28,8 @@ public class BaseTreeCellRenderer extends DefaultTreeCellRenderer implements Ima
   private final Icon loadingIcon = this.loading.getIcon();
 
   public BaseTreeCellRenderer() {
-    setOpenIcon(FileTreeNode.ICON_FOLDER);
-    setClosedIcon(FileTreeNode.ICON_FOLDER);
+    setOpenIcon(PathTreeNode.ICON_FOLDER);
+    setClosedIcon(PathTreeNode.ICON_FOLDER);
     setBorder(BorderFactory.createEmptyBorder(1, 0, 0, 0));
     final Dimension zeroSize = new Dimension(0, 0);
     this.hiddenRenderer.setMinimumSize(zeroSize);

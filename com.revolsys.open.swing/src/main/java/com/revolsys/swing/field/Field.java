@@ -3,6 +3,8 @@ package com.revolsys.swing.field;
 import java.awt.Color;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JTextField;
 
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.undo.UndoManager;
@@ -10,6 +12,12 @@ import com.revolsys.swing.undo.UndoManager;
 public interface Field extends Cloneable {
 
   ImageIcon ERROR_ICON = Icons.getIcon("exclamation");
+
+  Color DEFAULT_BACKGROUND = new JTextField().getBackground();
+
+  Color DEFAULT_FOREGROUND = new JTextField().getForeground();
+
+  Color DEFAULT_SELECTED_FOREGROUND = new JTextField().getSelectedTextColor();
 
   Field clone();
 
@@ -25,9 +33,25 @@ public interface Field extends Cloneable {
 
   void setEditable(boolean editable);
 
-  void setFieldBackgroundColor(Color color);
+  default void setFieldBackgroundColor(Color color) {
+    if (color == null) {
+      color = TextField.DEFAULT_BACKGROUND;
+    }
+    if (this instanceof JComponent) {
+      final JComponent component = (JComponent)this;
+      component.setBackground(color);
+    }
+  }
 
-  void setFieldForegroundColor(Color color);
+  default void setFieldForegroundColor(Color color) {
+    if (color == null) {
+      color = TextField.DEFAULT_BACKGROUND;
+    }
+    if (this instanceof JComponent) {
+      final JComponent component = (JComponent)this;
+      component.setForeground(color);
+    }
+  }
 
   void setFieldInvalid(String message, Color foregroundColor, Color backgroundColor);
 
@@ -40,4 +64,5 @@ public interface Field extends Cloneable {
   void setUndoManager(UndoManager undoManager);
 
   void updateFieldValue();
+
 }

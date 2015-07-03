@@ -35,7 +35,7 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements UrlPro
     super(connection);
     setType("Folder Connection");
     setName(connection.getName());
-    setIcon(FileTreeNode.ICON_FOLDER_LINK);
+    setIcon(PathTreeNode.ICON_FOLDER_LINK);
   }
 
   public void deleteConnection() {
@@ -51,7 +51,7 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements UrlPro
   @Override
   protected List<BaseTreeNode> doLoadChildren() {
     final FolderConnection connection = getUserData();
-    return FileTreeNode.getFileNodes(this, connection.getFile());
+    return PathTreeNode.getPathNodes(this, connection.getFile().toPath());
   }
 
   protected File getFile() {

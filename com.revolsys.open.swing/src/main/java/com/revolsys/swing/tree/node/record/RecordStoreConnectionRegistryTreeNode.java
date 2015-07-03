@@ -12,7 +12,7 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeNodeRunnable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
-import com.revolsys.swing.tree.node.file.FileTreeNode;
+import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.OS;
 
 public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode implements
@@ -31,7 +31,7 @@ public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode impl
     super(registry);
     setType("Record Store Connections");
     setName(registry.getName());
-    setIcon(FileTreeNode.ICON_FOLDER_LINK);
+    setIcon(PathTreeNode.ICON_FOLDER_LINK);
   }
 
   public void addConnection() {

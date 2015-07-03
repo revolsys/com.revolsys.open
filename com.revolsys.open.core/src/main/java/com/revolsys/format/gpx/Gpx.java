@@ -9,16 +9,18 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.io.AbstractRecordAndGeometryIoFactory;
+import com.revolsys.data.record.io.AbstractRecordIoFactory;
 import com.revolsys.data.record.io.RecordIterator;
 import com.revolsys.data.record.io.RecordIteratorReader;
 import com.revolsys.data.record.io.RecordReader;
+import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 
-public class GpxReaderFactory extends AbstractRecordAndGeometryIoFactory {
-  public GpxReaderFactory() {
+public class Gpx extends AbstractRecordIoFactory
+  implements RecordWriterFactory {
+  public Gpx() {
     super("GPS Exchange Format");
     addMediaTypeAndFileExtension(GpxConstants.MEDIA_TYPE, GpxConstants.FILE_EXTENSION);
   }
@@ -36,7 +38,8 @@ public class GpxReaderFactory extends AbstractRecordAndGeometryIoFactory {
    * @return The reader for the file.
    */
   @Override
-  public RecordReader createRecordReader(final Resource resource, final RecordFactory recordFactory) {
+  public RecordReader createRecordReader(final Resource resource,
+    final RecordFactory recordFactory) {
     try {
       final RecordIterator iterator = new GpxIterator(resource, recordFactory, null);
       return new RecordIteratorReader(iterator);
@@ -47,7 +50,8 @@ public class GpxReaderFactory extends AbstractRecordAndGeometryIoFactory {
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
+    final RecordDefinition recordDefinition, final OutputStream outputStream,
+    final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
     return new GpxWriter(writer);
   }

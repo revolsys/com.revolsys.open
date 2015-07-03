@@ -1,22 +1,19 @@
 package com.revolsys.format.xml;
 
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.Charset;
 import java.util.Map;
 
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.io.IteratorReader;
-import com.revolsys.io.AbstractMapReaderFactory;
-import com.revolsys.io.FileUtil;
+import com.revolsys.io.AbstractIoFactory;
+import com.revolsys.io.MapReaderFactory;
 import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
 import com.revolsys.io.Reader;
-import com.revolsys.spring.SpringUtil;
 
-public class XmlMapIoFactory extends AbstractMapReaderFactory implements MapWriterFactory {
+public class XmlMapIoFactory extends AbstractIoFactory
+  implements MapReaderFactory, MapWriterFactory {
   public static Map<String, Object> toMap(final Resource resource) {
     final XmlMapIterator iterator = new XmlMapIterator(resource, true);
     try {
@@ -43,25 +40,7 @@ public class XmlMapIoFactory extends AbstractMapReaderFactory implements MapWrit
   }
 
   @Override
-  public MapWriter getMapWriter(final OutputStream out) {
-    final Writer writer = FileUtil.createUtf8Writer(out);
-    return getMapWriter(writer);
-  }
-
-  @Override
-  public MapWriter getMapWriter(final OutputStream out, final Charset charset) {
-    final OutputStreamWriter writer = new OutputStreamWriter(out, charset);
-    return getMapWriter(writer);
-  }
-
-  @Override
-  public MapWriter getMapWriter(final Resource resource) {
-    final Writer writer = SpringUtil.getWriter(resource);
-    return getMapWriter(writer);
-  }
-
-  @Override
-  public MapWriter getMapWriter(final Writer out) {
+  public MapWriter createMapWriter(final Writer out) {
     return new XmlMapWriter(out);
   }
 }

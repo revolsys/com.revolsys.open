@@ -3,12 +3,12 @@ package com.revolsys.format.moep;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.io.AbstractRecordAndGeometryReaderFactory;
+import com.revolsys.data.record.io.AbstractRecordIoFactory;
 import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.schema.RecordDefinition;
 
-public class MoepBinaryReaderFactory extends AbstractRecordAndGeometryReaderFactory {
-  public MoepBinaryReaderFactory() {
+public class MoepBinary extends AbstractRecordIoFactory {
+  public MoepBinary() {
     super("MOEP (BC Ministry of Environment and Parks)");
     addMediaTypeAndFileExtension("application/x-bcgov-moep-bin", "bin");
   }

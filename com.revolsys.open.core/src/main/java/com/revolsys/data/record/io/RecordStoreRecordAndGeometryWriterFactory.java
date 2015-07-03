@@ -11,10 +11,11 @@ import org.springframework.core.io.Resource;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
+import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.Writer;
 
-public class RecordStoreRecordAndGeometryWriterFactory extends
-  AbstractRecordAndGeometryWriterFactory {
+public class RecordStoreRecordAndGeometryWriterFactory extends AbstractIoFactoryWithCoordinateSystem
+  implements RecordWriterFactory {
 
   public RecordStoreRecordAndGeometryWriterFactory(final String name, final String mediaType,
     final boolean geometrySupported, final boolean customAttributionSupported,
@@ -46,13 +47,14 @@ public class RecordStoreRecordAndGeometryWriterFactory extends
         return new RecordStoreRecordWriter(recordStore);
       }
     } else {
-      return super.createRecordWriter(recordDefinition, resource);
+      throw new UnsupportedOperationException("Writing to a stream not currently supported");
     }
   }
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
+    final RecordDefinition recordDefinition, final OutputStream outputStream,
+    final Charset charset) {
     throw new UnsupportedOperationException("Writing to a stream not currently supported");
   }
 }

@@ -2,7 +2,11 @@ package com.revolsys.swing.tree.node.file;
 
 import java.awt.TextField;
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,8 +21,11 @@ import javax.swing.JLabel;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 
+import org.slf4j.LoggerFactory;
+
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.record.io.RecordIo;
+import com.revolsys.data.record.io.RecordReaderFactory;
 import com.revolsys.data.record.io.RecordStoreFactoryRegistry;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
@@ -26,7 +33,6 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Paths;
 import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
-import com.revolsys.raster.AbstractGeoreferencedImageFactory;
 import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
@@ -45,8 +51,9 @@ import com.revolsys.swing.tree.node.record.FileRecordStoreTreeNode;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlProxy;
 import com.revolsys.util.UrlUtil;
+import com.revolsys.util.WrappedException;
 
-public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
+public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   private static final JFileChooser CHOOSER = new JFileChooser();
 
@@ -87,104 +94,137 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       new AndEnableCheck(isDirectory, NODE_EXISTS), "addFolderConnection"));
   }
 
-  public static List<BaseTreeNode> getFileNodes(final BaseTreeNode parent, final File file) {
-    if (file.isDirectory()) {
-      final File[] files = file.listFiles();
-      return getFileNodes(parent, files);
-    } else {
-      return Collections.emptyList();
+  public static void addPathNode(final List<BaseTreeNode> children, final Path path) {
+    if (!Paths.isHidden(path)) {
+      if (PathTreeNode.isRecordStore(path)) {
+        final FileRecordStoreTreeNode recordStoreNode = new FileRecordStoreTreeNode(path);
+        children.add(recordStoreNode);
+      } else {
+        BaseTreeNode child;
+        final List<String> fileNameExtensions = Paths.getFileNameExtensions(path);
+        if (fileNameExtensions.contains("zip") || fileNameExtensions.contains("jar")) {
+          try {
+            child = new SingleFileSystemTreeNode(path);
+          } catch (final Throwable e) {
+            child = new PathTreeNode(path);
+          }
+        } else {
+          child = new PathTreeNode(path);
+        }
+        children.add(child);
+      }
     }
   }
 
-  public static List<BaseTreeNode> getFileNodes(final BaseTreeNode parent, final File[] files) {
-    final List<BaseTreeNode> children = new ArrayList<>();
-    if (files != null) {
-      for (final File childFile : files) {
-        if (!childFile.isHidden()) {
-          if (FileTreeNode.isRecordStore(childFile)) {
-            final FileRecordStoreTreeNode recordStoreNode = new FileRecordStoreTreeNode(childFile);
-            children.add(recordStoreNode);
-          } else {
-            final FileTreeNode child = new FileTreeNode(childFile);
-            children.add(child);
-          }
+  public static Icon getIcon(final Path path) {
+    if (path == null) {
+      return ICON_FOLDER_MISSING;
+    } else {
+      if (isImage(path)) {
+        return ICON_FILE_IMAGE;
+      } else if (RecordIo.canReadRecords(path)) {
+        return ICON_FILE_TABLE;
+      }
+      File file;
+      try {
+        file = path.toFile();
+        final Icon icon = CHOOSER.getIcon(file);
+        return icon;
+      } catch (final UnsupportedOperationException e) {
+        if (Files.isDirectory(path)) {
+          return ICON_FOLDER;
         }
+        final String fileNameExtension = Paths.getFileNameExtension(path);
+        file = FileUtil.createTempFile("1234567890", fileNameExtension);
+        final Icon icon = CHOOSER.getIcon(file);
+        file.delete();
+        return icon;
+      }
+    }
+  }
+
+  private static File getIconFile(final Path path) {
+    try {
+      return path.toFile();
+    } catch (final UnsupportedOperationException e) {
+      final String fileNameExtension = Paths.getFileNameExtension(path);
+      final File file = FileUtil.createTempFile("1234567890", fileNameExtension);
+      file.delete();
+      return file;
+    }
+  }
+
+  public static List<BaseTreeNode> getPathNodes(final BaseTreeNode parent,
+    final DirectoryStream<Path> paths) {
+    final List<BaseTreeNode> children = new ArrayList<>();
+    if (paths != null) {
+      for (final Path path : paths) {
+        addPathNode(children, path);
       }
     }
     return children;
-  }
-
-  public static Icon getIcon(final File file) {
-    if (file == null) {
-      return ICON_FOLDER_MISSING;
-    } else {
-      final Icon icon = CHOOSER.getIcon(file);
-      if (isImage(file)) {
-        return ICON_FILE_IMAGE;
-      } else if (RecordIo.canReadRecords(file)) {
-        return ICON_FILE_TABLE;
-      }
-      return icon;
-    }
   }
 
   public static List<BaseTreeNode> getPathNodes(final BaseTreeNode parent,
     final Iterable<Path> paths) {
     final List<BaseTreeNode> children = new ArrayList<>();
     if (paths != null) {
-      for (final Path childPath : paths) {
-        if (!Paths.isHidden(childPath)) {
-          final File file = childPath.toFile();
-          if (FileTreeNode.isRecordStore(childPath)) {
-            final FileRecordStoreTreeNode recordStoreNode = new FileRecordStoreTreeNode(file);
-            children.add(recordStoreNode);
-          } else {
-            final FileTreeNode child = new FileTreeNode(file);
-            children.add(child);
-          }
-        }
+      for (final Path path : paths) {
+        addPathNode(children, path);
       }
     }
     return children;
   }
 
-  public static URL getUrl(final BaseTreeNode parent, final File file) {
+  public static List<BaseTreeNode> getPathNodes(final BaseTreeNode parent, final Path path) {
+    if (Files.isDirectory(path)) {
+      try (
+        final DirectoryStream<Path> children = Files.newDirectoryStream(path)) {
+        return getPathNodes(parent, children);
+      } catch (final IOException e) {
+        LoggerFactory.getLogger(PathTreeNode.class).debug("Unable to get children " + path);
+        return Collections.emptyList();
+      }
+    } else {
+      return Collections.emptyList();
+    }
+  }
+
+  public static URL getUrl(final BaseTreeNode parent, final Path path) {
     if (parent instanceof UrlProxy) {
       final UrlProxy parentProxy = (UrlProxy)parent;
-      String childPath = FileUtil.getFileName(file);
+      String childPath = Paths.getFileName(path);
 
-      if (file.isDirectory()) {
+      if (Files.isDirectory(path)) {
         childPath += "/";
       }
       return UrlUtil.getUrl(parentProxy, childPath);
     } else {
-      return FileUtil.toUrl(file);
+      try {
+        return path.toUri().toURL();
+      } catch (final MalformedURLException e) {
+        throw new WrappedException(e);
+      }
     }
   }
 
-  public static boolean isAllowsChildren(final File file) {
-    if (file == null) {
+  public static boolean isAllowsChildren(final Path path) {
+    if (path == null) {
       return true;
-    } else if (!file.exists()) {
+    } else if (!Files.exists(path)) {
       return false;
-    } else if (file.isDirectory()) {
+    } else if (Files.isDirectory(path)) {
       return true;
     } else {
       return false;
     }
   }
 
-  public static boolean isImage(final File file) {
-    final String fileNameExtension = FileUtil.getFileNameExtension(file);
+  public static boolean isImage(final Path path) {
+    final String fileNameExtension = Paths.getFileNameExtension(path);
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
     return ioFactoryRegistry.isFileExtensionSupported(GeoreferencedImageFactory.class,
       fileNameExtension);
-  }
-
-  public static boolean isRecordStore(final File file) {
-    final Set<String> fileExtensions = RecordStoreFactoryRegistry.getFileExtensions();
-    final String extension = FileUtil.getFileNameExtension(file).toLowerCase();
-    return fileExtensions.contains(extension);
   }
 
   public static boolean isRecordStore(final Path path) {
@@ -193,17 +233,24 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     return fileExtensions.contains(extension);
   }
 
-  public FileTreeNode(final File file) {
-    super(file);
-    final String fileName = FileUtil.getFileName(file);
+  private boolean hasFile = false;
+
+  public PathTreeNode(final Path path) {
+    super(path);
+    final String fileName = Paths.getFileName(path);
     setName(fileName);
-    final Icon icon = getIcon(file);
+    final Icon icon = getIcon(path);
     setIcon(icon);
+    try {
+      path.toFile();
+      this.hasFile = true;
+    } catch (final UnsupportedOperationException e) {
+    }
   }
 
   public void addFolderConnection() {
     if (isDirectory()) {
-      final File directory = getUserData();
+      final Path path = getPath();
       final String fileName = getName();
 
       final ValueField panel = new ValueField();
@@ -211,7 +258,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       SwingUtil.setTitledBorder(panel, "Folder Connection");
 
       SwingUtil.addLabel(panel, "Folder");
-      final JLabel fileLabel = new JLabel(directory.getAbsolutePath());
+      final JLabel fileLabel = new JLabel(getIconFile(path).getAbsolutePath());
       panel.add(fileLabel);
 
       SwingUtil.addLabel(panel, "Name");
@@ -235,7 +282,8 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       GroupLayoutUtil.makeColumns(panel, 2, true);
       panel.showDialog();
       if (panel.isSaved()) {
-        final FolderConnectionRegistry registry = (FolderConnectionRegistry)registryField.getSelectedItem();
+        final FolderConnectionRegistry registry = (FolderConnectionRegistry)registryField
+          .getSelectedItem();
         String connectionName = nameField.getText();
         if (!Property.hasValue(connectionName)) {
           connectionName = fileName;
@@ -246,7 +294,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
           connectionName = baseConnectionName + i;
           i++;
         }
-        registry.addConnection(connectionName, directory);
+        registry.addConnection(connectionName, getIconFile(path));
       }
     }
   }
@@ -259,26 +307,22 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   @Override
   protected List<BaseTreeNode> doLoadChildren() {
-    final File file = getFile();
-    return getFileNodes(this, file);
+    final Path path = getPath();
+    return getPathNodes(this, path);
   }
 
   @Override
   public boolean equals(final Object other) {
     if (other == this) {
       return true;
-    } else if (other instanceof FileTreeNode) {
-      final FileTreeNode fileNode = (FileTreeNode)other;
-      final File file = getFile();
-      final File otherFile = fileNode.getFile();
-      final boolean equal = EqualsRegistry.equal(file, otherFile);
+    } else if (other instanceof PathTreeNode) {
+      final PathTreeNode fileNode = (PathTreeNode)other;
+      final Path path = getPath();
+      final Path otherPath = fileNode.getPath();
+      final boolean equal = EqualsRegistry.equal(path, otherPath);
       return equal;
     }
     return false;
-  }
-
-  public File getFile() {
-    return getUserData();
   }
 
   @Override
@@ -286,8 +330,8 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     Icon icon = super.getIcon();
     if (icon == null) {
       if (isExists()) {
-        final File file = getUserData();
-        icon = getIcon(file);
+        final Path path = getPath();
+        icon = getIcon(path);
         setIcon(icon);
       }
     }
@@ -299,16 +343,20 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     return MENU;
   }
 
+  public Path getPath() {
+    return getUserData();
+  }
+
   @Override
   public String getType() {
-    final File file = getUserData();
-    if (file.isDirectory()) {
+    final Path path = getPath();
+    if (Files.isDirectory(path)) {
       return "Folder";
-    } else if (file.exists()) {
-      final String extension = FileUtil.getFileNameExtension(file);
+    } else if (Files.exists(path)) {
+      final String extension = Paths.getFileNameExtension(path);
       if (Property.hasValue(extension)) {
-        final IoFactory factory = IoFactoryRegistry.getInstance().getFactoryByFileExtension(
-          IoFactory.class, extension);
+        final IoFactory factory = IoFactoryRegistry.getInstance()
+          .getFactoryByFileExtension(IoFactory.class, extension);
         if (factory != null) {
           return factory.getName();
         }
@@ -321,52 +369,57 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   @Override
   public URL getUrl() {
-    final File file = getFile();
+    final Path path = getPath();
     final BaseTreeNode parent = getParent();
-    return getUrl(parent, file);
+    return getUrl(parent, path);
   }
 
   @Override
   public int hashCode() {
-    final File file = getUserData();
-    if (file == null) {
+    final Path path = getPath();
+    if (path == null) {
       return 0;
     } else {
-      return file.hashCode();
+      return path.hashCode();
     }
   }
 
   @Override
   public boolean isAllowsChildren() {
-    final File file = getUserData();
-    return isAllowsChildren(file);
+    final Path path = getPath();
+    return isAllowsChildren(path);
   }
 
   public boolean isDirectory() {
-    final File file = getFile();
-    return file.isDirectory();
+    final Path path = getPath();
+    return Files.isDirectory(path);
   }
 
   @Override
   public boolean isExists() {
-    final File file = getFile();
-    if (file == null) {
+    final Path path = getPath();
+    if (path == null) {
       return false;
     } else {
-      return file.exists() && super.isExists();
+      return Files.exists(path) && super.isExists();
     }
   }
 
   public boolean isFileLayer() {
-    final File file = getFile();
-    final String fileName = FileUtil.getFileName(file);
-    if (AbstractGeoreferencedImageFactory.hasGeoreferencedImageFactory(fileName)) {
+    final Path path = getPath();
+    if (!this.hasFile) {
+      return false;
+    } else if (IoFactory.hasFactory(GeoreferencedImageFactory.class, path)) {
       return true;
-    } else if (RecordIo.hasRecordReaderFactory(fileName)) {
+    } else if (IoFactory.hasFactory(RecordReaderFactory.class, path)) {
       return true;
     } else {
       return false;
     }
+  }
+
+  public boolean isHasFile() {
+    return this.hasFile;
   }
 
   @Override

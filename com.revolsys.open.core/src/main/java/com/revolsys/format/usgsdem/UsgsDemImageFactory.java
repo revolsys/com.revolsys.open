@@ -2,10 +2,11 @@ package com.revolsys.format.usgsdem;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.raster.AbstractGeoreferencedImageFactory;
+import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.raster.GeoreferencedImage;
+import com.revolsys.raster.GeoreferencedImageFactory;
 
-public class UsgsDemImageFactory extends AbstractGeoreferencedImageFactory {
+public class UsgsDemImageFactory extends AbstractIoFactory implements GeoreferencedImageFactory {
 
   public UsgsDemImageFactory() {
     super("USGS DEM");

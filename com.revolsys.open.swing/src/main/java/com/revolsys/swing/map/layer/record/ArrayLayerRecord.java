@@ -73,7 +73,8 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
     final Object newValue) {
     final AbstractLayer layer = getLayer();
     if (layer.isEventsEnabled()) {
-      final PropertyChangeEvent event = new PropertyChangeEvent(this, fieldName, oldValue, newValue);
+      final PropertyChangeEvent event = new PropertyChangeEvent(this, fieldName, oldValue,
+        newValue);
       layer.propertyChange(event);
     }
   }
@@ -121,11 +122,6 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   @Override
   public boolean isDeleted() {
     return getState() == RecordState.Deleted;
-  }
-
-  @Override
-  public boolean isEventsEnabled() {
-    return this.layer.isEventsEnabled();
   }
 
   @Override
@@ -247,11 +243,6 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
         }
       }
     }
-  }
-
-  @Override
-  public boolean setEventsEnabled(final boolean eventsEnabled) {
-    return this.layer.setEventsEnabled(eventsEnabled);
   }
 
   @Override

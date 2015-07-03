@@ -8,8 +8,6 @@ import java.awt.event.FocusListener;
 import javax.swing.JEditorPane;
 import javax.swing.text.Element;
 
-import jsyntaxpane.DefaultSyntaxKit;
-
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.swing.listener.WeakFocusListener;
@@ -18,6 +16,8 @@ import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
+
+import jsyntaxpane.DefaultSyntaxKit;
 
 public class TextPane extends JEditorPane implements Field, FocusListener {
   private static final long serialVersionUID = 1L;
@@ -122,22 +122,6 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
   @Override
   public boolean isFieldValid() {
     return true;
-  }
-
-  @Override
-  public void setFieldBackgroundColor(Color color) {
-    if (color == null) {
-      color = TextField.DEFAULT_BACKGROUND;
-    }
-    setBackground(color);
-  }
-
-  @Override
-  public void setFieldForegroundColor(Color color) {
-    if (color == null) {
-      color = TextField.DEFAULT_BACKGROUND;
-    }
-    setForeground(color);
   }
 
   @Override

@@ -30,7 +30,7 @@ public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
     super(registry);
     setType("Folder Connections");
     setName(registry.getName());
-    setIcon(FileTreeNode.ICON_FOLDER_LINK);
+    setIcon(PathTreeNode.ICON_FOLDER_LINK);
     Property.addListener(registry, this);
   }
 
@@ -50,7 +50,7 @@ public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
     GroupLayoutUtil.makeColumns(panel, 2, true);
     panel.showDialog();
     if (panel.isSaved()) {
-      final File file = folderField.getDirectoryFile();
+      final File file = folderField.getFile();
       if (file != null && file.exists()) {
         registry.addConnection(nameField.getText(), file);
       }

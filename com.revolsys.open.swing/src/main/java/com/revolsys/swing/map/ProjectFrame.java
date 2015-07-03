@@ -1,8 +1,5 @@
 package com.revolsys.swing.map;
 
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -66,6 +63,7 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.overlay.MeasureOverlay;
 import com.revolsys.swing.map.print.SinglePage;
+import com.revolsys.swing.map.tools.ConvertFileTool;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.SwingWorkerProgressBar;
@@ -76,7 +74,7 @@ import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.ListTreeNode;
 import com.revolsys.swing.tree.node.file.FileSystemsTreeNode;
-import com.revolsys.swing.tree.node.file.FileTreeNode;
+import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.swing.tree.node.file.FolderConnectionsTreeNode;
 import com.revolsys.swing.tree.node.layer.ProjectTreeNode;
 import com.revolsys.swing.tree.node.record.RecordStoreConnectionsTreeNode;
@@ -84,6 +82,9 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.OS;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
+
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
 
 public class ProjectFrame extends BaseFrame {
   public static final String PROJECT_FRAME = "projectFrame";
@@ -100,8 +101,10 @@ public class ProjectFrame extends BaseFrame {
 
   public static void addSaveActions(final JComponent component, final Project project) {
     final InputMap inputMap = component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-    inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK), SAVE_PROJECT_KEY);
-    inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.META_DOWN_MASK), SAVE_PROJECT_KEY);
+    inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK),
+      SAVE_PROJECT_KEY);
+    inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.META_DOWN_MASK),
+      SAVE_PROJECT_KEY);
 
     inputMap.put(
       KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK),
@@ -111,8 +114,8 @@ public class ProjectFrame extends BaseFrame {
       SAVE_CHANGES_KEY);
 
     final ActionMap actionMap = component.getActionMap();
-    actionMap.put(SAVE_PROJECT_KEY, new InvokeMethodAction(SAVE_PROJECT_KEY, project,
-      "saveAllSettings"));
+    actionMap.put(SAVE_PROJECT_KEY,
+      new InvokeMethodAction(SAVE_PROJECT_KEY, project, "saveAllSettings"));
     actionMap.put(SAVE_CHANGES_KEY,
       new InvokeMethodAction(SAVE_CHANGES_KEY, project, "saveChanges"));
   }
@@ -280,7 +283,7 @@ public class ProjectFrame extends BaseFrame {
 
     this.catalogTree = tree;
 
-    final Icon icon = Icons.getIconWithBadge(FileTreeNode.ICON_FOLDER, "tree");
+    final Icon icon = Icons.getIconWithBadge(PathTreeNode.ICON_FOLDER, "tree");
     addTab(this.leftTabs, icon, "Catalog", this.catalogTree, true);
   }
 
@@ -381,32 +384,32 @@ public class ProjectFrame extends BaseFrame {
   protected MenuFactory createMenuFile() {
     final MenuFactory file = new MenuFactory("File");
 
-    file.addMenuItemTitleIcon("projectOpen", "New Project", "layout_add", this, "actionNewProject")
+    file.addMenuItemTitleIcon("projectOpen", "New Project", "layout_add", () -> actionNewProject())
       .setAcceleratorControlKey(KeyEvent.VK_N);
 
-    file.addMenuItemTitleIcon("projectOpen", "Open Project...", "layout_add", this,
-      "actionOpenProject").setAcceleratorControlKey(KeyEvent.VK_O);
+    file.addMenuItemTitleIcon("projectOpen", "Open Project...", "layout_add",
+      () -> actionOpenProject()).setAcceleratorControlKey(KeyEvent.VK_O);
 
     file.addComponent("projectOpen", this.openRecentMenu);
     updateRecentMenu();
 
-    file.addMenuItemTitleIcon("projectSave", "Save Project", "layout_save", this.project,
-      "saveAllSettings").setAcceleratorControlKey(KeyEvent.VK_S);
+    file.addMenuItemTitleIcon("projectSave", "Save Project", "layout_save",
+      () -> this.project.saveAllSettings()).setAcceleratorControlKey(KeyEvent.VK_S);
 
-    file.addMenuItemTitleIcon("projectSave", "Save Project As...", "layout_save", this,
-      "actionSaveProjectAs").setAcceleratorShiftControlKey(KeyEvent.VK_S);
+    file.addMenuItemTitleIcon("projectSave", "Save Project As...", "layout_save",
+      () -> actionSaveProjectAs()).setAcceleratorShiftControlKey(KeyEvent.VK_S);
 
-    file.addMenuItemTitleIcon("save", "Save as PDF", "save_pdf", SaveAsPdf.class, "save");
+    file.addMenuItemTitleIcon("save", "Save as PDF", "save_pdf", () -> SaveAsPdf.save());
 
-    file.addMenuItemTitleIcon("print", "Print", "printer", SinglePage.class, "print")
+    file.addMenuItemTitleIcon("print", "Print", "printer", () -> SinglePage.print())
       .setAcceleratorControlKey(KeyEvent.VK_P);
 
     if (OS.isWindows()) {
-      file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit").setAcceleratorKey(
-        KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
+      file.addMenuItemTitleIcon("exit", "Exit", null, () -> exit())
+        .setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
     } else if (OS.isUnix()) {
-      file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit").setAcceleratorKey(
-        KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_MASK));
+      file.addMenuItemTitleIcon("exit", "Exit", null, () -> exit())
+        .setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_MASK));
     }
 
     return file;
@@ -415,11 +418,13 @@ public class ProjectFrame extends BaseFrame {
   protected MenuFactory createMenuTools() {
     final MenuFactory tools = new MenuFactory("Tools");
     final MapPanel map = getMapPanel();
-    tools.addCheckboxMenuItem("map", new InvokeMethodAction("Measure", Icons.getIcon("ruler"), map,
-      "toggleMode", MeasureOverlay.MEASURE), new ObjectPropertyEnableCheck(map, "overlayAction",
-      MeasureOverlay.MEASURE));
+    tools.addCheckboxMenuItem("map",
+      new InvokeMethodAction("Measure", Icons.getIcon("ruler"), map, "toggleMode",
+        MeasureOverlay.MEASURE),
+      new ObjectPropertyEnableCheck(map, "overlayAction", MeasureOverlay.MEASURE));
 
-    tools.addMenuItemTitleIcon("script", "Run Script...", "script_go", this, "actionRunScript");
+    tools.addMenuItemTitleIcon("script", "Run Script...", "script_go", () -> actionRunScript());
+    ConvertFileTool.addMenuItem(tools);
     return tools;
   }
 
@@ -629,7 +634,8 @@ public class ProjectFrame extends BaseFrame {
     setBounds(frameBoundsObject, true);
     setVisible(true);
 
-    final RecordStoreConnectionManager recordStoreConnectionManager = RecordStoreConnectionManager.get();
+    final RecordStoreConnectionManager recordStoreConnectionManager = RecordStoreConnectionManager
+      .get();
     recordStoreConnectionManager.removeConnectionRegistry("Project");
     recordStoreConnectionManager.addConnectionRegistry(this.project.getRecordStores());
 

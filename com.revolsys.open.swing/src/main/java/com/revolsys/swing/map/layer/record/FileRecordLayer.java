@@ -11,6 +11,7 @@ import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.io.RecordReaderFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
@@ -53,7 +54,7 @@ public class FileRecordLayer extends ListRecordLayer {
     final String fileNameExtension = FileUtil.getFileNameExtension(url);
     if (Property.hasValue(fileNameExtension)) {
       SwingUtil.addLabelledReadOnlyTextField(panel, "File Extension", fileNameExtension);
-      final RecordReaderFactory factory = RecordIo.recordReaderFactory(fileNameExtension);
+      final RecordReaderFactory factory = IoFactory.factory(RecordReaderFactory.class, fileNameExtension);
       if (factory != null) {
         SwingUtil.addLabelledReadOnlyTextField(panel, "File Type", factory.getName());
       }

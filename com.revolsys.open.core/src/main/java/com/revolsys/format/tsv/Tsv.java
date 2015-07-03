@@ -10,9 +10,10 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.io.AbstractRecordAndGeometryIoFactory;
+import com.revolsys.data.record.io.AbstractRecordIoFactory;
 import com.revolsys.data.record.io.RecordIteratorReader;
 import com.revolsys.data.record.io.RecordReader;
+import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.csv.CsvMapWriter;
 import com.revolsys.format.csv.CsvRecordIterator;
@@ -20,9 +21,8 @@ import com.revolsys.format.csv.CsvRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
-import com.revolsys.spring.SpringUtil;
 
-public class Tsv extends AbstractRecordAndGeometryIoFactory implements MapWriterFactory {
+public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory, MapWriterFactory {
   public static final String DESCRIPTION = "Tab-Separated Values";
 
   public static final char FIELD_SEPARATOR = '\t';
@@ -52,7 +52,13 @@ public class Tsv extends AbstractRecordAndGeometryIoFactory implements MapWriter
   }
 
   @Override
-  public RecordReader createRecordReader(final Resource resource, final RecordFactory recordFactory) {
+  public MapWriter createMapWriter(final Writer out) {
+    return new CsvMapWriter(out, Tsv.FIELD_SEPARATOR, true);
+  }
+
+  @Override
+  public RecordReader createRecordReader(final Resource resource,
+    final RecordFactory recordFactory) {
     final CsvRecordIterator iterator = new CsvRecordIterator(resource, recordFactory,
       Tsv.FIELD_SEPARATOR);
     return new RecordIteratorReader(iterator);
@@ -60,32 +66,10 @@ public class Tsv extends AbstractRecordAndGeometryIoFactory implements MapWriter
 
   @Override
   public com.revolsys.io.Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
+    final RecordDefinition recordDefinition, final OutputStream outputStream,
+    final Charset charset) {
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream, charset);
 
     return new CsvRecordWriter(recordDefinition, writer, Tsv.FIELD_SEPARATOR, true, true);
-  }
-
-  @Override
-  public MapWriter getMapWriter(final OutputStream out) {
-    final Writer writer = FileUtil.createUtf8Writer(out);
-    return getMapWriter(writer);
-  }
-
-  @Override
-  public MapWriter getMapWriter(final OutputStream out, final Charset charset) {
-    final OutputStreamWriter writer = new OutputStreamWriter(out, charset);
-    return getMapWriter(writer);
-  }
-
-  @Override
-  public MapWriter getMapWriter(final Resource resource) {
-    final Writer writer = SpringUtil.getWriter(resource);
-    return getMapWriter(writer);
-  }
-
-  @Override
-  public MapWriter getMapWriter(final Writer out) {
-    return new CsvMapWriter(out, Tsv.FIELD_SEPARATOR, true);
   }
 }

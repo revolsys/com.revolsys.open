@@ -24,7 +24,7 @@ public class FileSystemsTreeNode extends LazyLoadTreeNode {
   public FileSystemsTreeNode() {
     setType("File Systems");
     setName("File Systems");
-    setIcon(FileTreeNode.ICON_FOLDER_DRIVE);
+    setIcon(PathTreeNode.ICON_FOLDER_DRIVE);
   }
 
   @Override
@@ -32,7 +32,7 @@ public class FileSystemsTreeNode extends LazyLoadTreeNode {
     final FileSystem fileSystem = FileSystems.getDefault();
 
     final Iterable<Path> roots = fileSystem.getRootDirectories();
-    return FileTreeNode.getPathNodes(this, roots);
+    return PathTreeNode.getPathNodes(this, roots);
   }
 
   @Override

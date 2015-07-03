@@ -2,6 +2,7 @@ package com.revolsys.io;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -33,14 +34,14 @@ public class IoFactoryRegistry {
     instance = null;
   }
 
-  public static String getFileExtension(final String resultFormat) {
+  public static String getFileExtension(final String mediaType) {
     final IoFactoryRegistry ioFactory = getInstance();
-    final RecordWriterFactory writerFactory = ioFactory.getFactoryByMediaType(
-      RecordWriterFactory.class, resultFormat);
+    final RecordWriterFactory writerFactory = ioFactory
+      .getFactoryByMediaType(RecordWriterFactory.class, mediaType);
     if (writerFactory == null) {
       return null;
     } else {
-      return writerFactory.getFileExtension(resultFormat);
+      return writerFactory.getFileExtension(mediaType);
     }
   }
 
@@ -77,13 +78,15 @@ public class IoFactoryRegistry {
     }
     final ClassLoader classLoader = IoFactoryRegistry.class.getClassLoader();
     try {
-      final Enumeration<URL> urls = classLoader.getResources("META-INF/com.revolsys.io.IoFactory.properties");
+      final Enumeration<URL> urls = classLoader
+        .getResources("META-INF/com.revolsys.io.IoFactory.properties");
       while (urls.hasMoreElements()) {
         final URL resourceUrl = urls.nextElement();
         try {
           final Properties properties = new Properties();
           properties.load(resourceUrl.openStream());
-          final String factoryClassNames = properties.getProperty("com.revolsys.io.IoFactory.factoryClassNames");
+          final String factoryClassNames = properties
+            .getProperty("com.revolsys.io.IoFactory.factoryClassNames");
           for (final String factoryClassName : factoryClassNames.split(",")) {
             if (Property.hasValue(factoryClassName)) {
               try {
@@ -127,7 +130,8 @@ public class IoFactoryRegistry {
         if (factories.add(factory)) {
           for (final String fileExtension : factory.getFileExtensions()) {
             Maps.addToTreeSet(this.classFileExtensions, ioInterface, fileExtension);
-            final Map<String, IoFactory> factoriesByFileExtension = getFactoriesByFileExtensionMap(ioInterface);
+            final Map<String, IoFactory> factoriesByFileExtension = getFactoriesByFileExtensionMap(
+              ioInterface);
             factoriesByFileExtension.put(fileExtension, factory);
             for (final String mediaType : factory.getMediaTypes()) {
               this.extensionMimeTypeMap.put(fileExtension.toLowerCase(), mediaType);
@@ -195,7 +199,8 @@ public class IoFactoryRegistry {
     if (factoryClass == null) {
       return Collections.emptyMap();
     } else {
-      Map<String, IoFactory> factoriesByFileExtension = this.classFactoriesByFileExtension.get(factoryClass);
+      Map<String, IoFactory> factoriesByFileExtension = this.classFactoriesByFileExtension
+        .get(factoryClass);
       if (factoriesByFileExtension == null) {
         factoriesByFileExtension = new TreeMap<String, IoFactory>();
         this.classFactoriesByFileExtension.put(factoryClass, factoriesByFileExtension);
@@ -210,13 +215,36 @@ public class IoFactoryRegistry {
     if (factoryClass == null) {
       return Collections.emptyMap();
     } else {
-      Map<String, IoFactory> factoriesByMediaType = this.classFactoriesByMediaType.get(factoryClass);
+      Map<String, IoFactory> factoriesByMediaType = this.classFactoriesByMediaType
+        .get(factoryClass);
       if (factoriesByMediaType == null) {
         factoriesByMediaType = new TreeMap<String, IoFactory>();
         this.classFactoriesByMediaType.put(factoryClass, factoriesByMediaType);
       }
       return (Map<String, F>)factoriesByMediaType;
     }
+  }
+
+  public <F extends IoFactory> F getFactory(final Class<F> factoryClass, final Path path) {
+    final String fileName = Paths.getFileName(path);
+    return getFactoryByFileName(factoryClass, fileName);
+  }
+
+  public <F extends IoFactory> F getFactory(final Class<F> factoryClass, final Resource resource) {
+    String fileName;
+    if (resource == null) {
+      return null;
+    } else if (resource instanceof UrlResource) {
+      final UrlResource urlResoure = (UrlResource)resource;
+      try {
+        fileName = urlResoure.getURL().getPath();
+      } catch (final IOException e) {
+        fileName = resource.getFilename();
+      }
+    } else {
+      fileName = resource.getFilename();
+    }
+    return getFactoryByFileName(factoryClass, fileName);
   }
 
   public <F extends IoFactory> F getFactoryByFileExtension(final Class<F> factoryClass,
@@ -254,24 +282,6 @@ public class IoFactoryRegistry {
     } else {
       return getFactoryByFileExtension(factoryClass, mediaType);
     }
-  }
-
-  public <F extends IoFactory> F getFactoryByResource(final Class<F> factoryClass,
-    final Resource resource) {
-    String fileName;
-    if (resource == null) {
-      return null;
-    } else if (resource instanceof UrlResource) {
-      final UrlResource urlResoure = (UrlResource)resource;
-      try {
-        fileName = urlResoure.getURL().getPath();
-      } catch (final IOException e) {
-        fileName = resource.getFilename();
-      }
-    } else {
-      fileName = resource.getFilename();
-    }
-    return getFactoryByFileName(factoryClass, fileName);
   }
 
   public Set<String> getFileExtensions(final Class<? extends IoFactory> factoryClass) {

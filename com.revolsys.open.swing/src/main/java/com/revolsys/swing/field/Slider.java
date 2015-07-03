@@ -24,10 +24,6 @@ public class Slider extends JSlider implements Field, FocusListener, ChangeListe
    */
   private static final long serialVersionUID = 1L;
 
-  public static final Color DEFAULT_BACKGROUND = new JTextField().getBackground();
-
-  public static final Color DEFAULT_FOREGROUND = new JTextField().getForeground();
-
   public static final Color DEFAULT_SELECTED_FOREGROUND = new JTextField().getSelectedTextColor();
 
   private String errorMessage;
@@ -133,22 +129,6 @@ public class Slider extends JSlider implements Field, FocusListener, ChangeListe
   @Override
   public void setEditable(final boolean editable) {
     setEnabled(editable);
-  }
-
-  @Override
-  public void setFieldBackgroundColor(Color color) {
-    if (color == null) {
-      color = DEFAULT_BACKGROUND;
-    }
-    setBackground(color);
-  }
-
-  @Override
-  public void setFieldForegroundColor(Color color) {
-    if (color == null) {
-      color = DEFAULT_FOREGROUND;
-    }
-    setForeground(color);
   }
 
   @Override

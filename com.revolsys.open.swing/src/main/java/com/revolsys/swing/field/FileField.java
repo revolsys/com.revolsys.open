@@ -6,32 +6,33 @@ import java.io.File;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 
 import com.revolsys.swing.EventQueue;
+import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.SpringLayoutUtil;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Property;
 
-public class FileField extends JPanel implements Field {
+public class FileField extends ValueField implements Field {
   private static final long serialVersionUID = -8433151755294925911L;
 
   private final TextField fileName = new TextField(70);
 
   private final JButton browseButton = new JButton();
 
-  private final String fieldName = "fieldValue";
+  private final JFileChooser fileChooser = new JFileChooser();
 
-  private String errorMessage;
+  public FileField(final int fileSelectionMode) {
+    this("file", fileSelectionMode);
+  }
 
-  private String originalToolTip;
+  public FileField(final String fieldName) {
+    this(fieldName, JFileChooser.FILES_ONLY);
+  }
 
-  final JFileChooser fileChooser = new JFileChooser();
-
-  public FileField(int fileSelectionMode) {
-    super(new SpringLayout());
+  public FileField(final String fieldName, final int fileSelectionMode) {
+    super(fieldName, null);
 
     add(this.fileName);
     this.browseButton.setText("Browse...");
@@ -41,7 +42,7 @@ public class FileField extends JPanel implements Field {
 
     this.fileChooser.setFileSelectionMode(fileSelectionMode);
 
-    final String directoryPath = getDirectoryPath();
+    final String directoryPath = getFilePath();
     final File initialFile = new File(directoryPath);
 
     if (initialFile.getParentFile() != null && initialFile.getParentFile().exists()) {
@@ -73,32 +74,8 @@ public class FileField extends JPanel implements Field {
   }
 
   @Override
-  public void firePropertyChange(final String propertyName, final Object oldValue,
-    final Object newValue) {
-    super.firePropertyChange(propertyName, oldValue, newValue);
-  }
-
-  public File getDirectoryFile() {
-    final String directoryPath = getDirectoryPath();
-    if (Property.hasValue(directoryPath)) {
-      return new File(directoryPath);
-    } else {
-      return null;
-    }
-  }
-
-  public String getDirectoryPath() {
-    return this.fileName.getText();
-  }
-
-  @Override
-  public String getFieldName() {
-    return this.fieldName;
-  }
-
-  @Override
   public String getFieldValidationMessage() {
-    final File directory = getDirectoryFile();
+    final File directory = getFile();
     if (directory == null) {
       return "No directory specified";
     } else if (directory.exists()) {
@@ -114,9 +91,22 @@ public class FileField extends JPanel implements Field {
     return (T)this.fileName.getText();
   }
 
+  public File getFile() {
+    final String path = getFilePath();
+    if (Property.hasValue(path)) {
+      return new File(path);
+    } else {
+      return null;
+    }
+  }
+
+  public String getFilePath() {
+    return this.fileName.getText();
+  }
+
   @Override
   public boolean isFieldValid() {
-    final File directory = getDirectoryFile();
+    final File directory = getFile();
     if (directory == null || !directory.exists()) {
       this.fileName.setForeground(Color.RED);
       this.fileName.setSelectedTextColor(Color.RED);
@@ -130,8 +120,10 @@ public class FileField extends JPanel implements Field {
     }
   }
 
-  public void setDirectoryPath(final String directoryPath) {
-    this.fileName.setText(directoryPath);
+  @Override
+  protected void setColor(final Color foregroundColor, final Color backgroundColor) {
+    this.fileName.setForeground(foregroundColor);
+    this.fileName.setBackground(backgroundColor);
   }
 
   @Override
@@ -140,55 +132,30 @@ public class FileField extends JPanel implements Field {
   }
 
   @Override
-  public void setFieldBackgroundColor(Color color) {
-    if (color == null) {
-      color = TextField.DEFAULT_BACKGROUND;
-    }
-    setBackground(color);
-  }
-
-  @Override
-  public void setFieldForegroundColor(Color color) {
-    if (color == null) {
-      color = TextField.DEFAULT_FOREGROUND;
-    }
-    setForeground(color);
-  }
-
-  @Override
   public void setFieldInvalid(final String message, final Color foregroundColor,
     final Color backgroundColor) {
-    this.fileName.setForeground(foregroundColor);
+    super.setFieldInvalid(message, foregroundColor, backgroundColor);
     this.fileName.setSelectedTextColor(foregroundColor);
-    this.fileName.setBackground(backgroundColor);
-    this.errorMessage = message;
-    super.setToolTipText(this.errorMessage);
-  }
-
-  @Override
-  public void setFieldToolTip(final String toolTip) {
-    setToolTipText(toolTip);
   }
 
   @Override
   public void setFieldValid() {
-    this.fileName.setForeground(TextField.DEFAULT_FOREGROUND);
+    super.setFieldValid();
     this.fileName.setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
-    this.fileName.setBackground(TextField.DEFAULT_BACKGROUND);
-    this.errorMessage = null;
-    super.setToolTipText(this.originalToolTip);
   }
 
   @Override
   public void setFieldValue(final Object fieldValue) {
-    setDirectoryPath(fieldValue.toString());
+    if (fieldValue == null) {
+      setPath("");
+    } else {
+      setPath(fieldValue.toString());
+    }
   }
 
-  @Override
-  public void setToolTipText(final String text) {
-    this.originalToolTip = text;
-    if (!Property.hasValue(this.errorMessage)) {
-      super.setToolTipText(text);
+  public void setPath(final String directoryPath) {
+    if (this.fileName != null) {
+      this.fileName.setText(directoryPath);
     }
   }
 

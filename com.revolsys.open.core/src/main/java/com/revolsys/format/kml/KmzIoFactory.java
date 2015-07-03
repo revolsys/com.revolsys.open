@@ -8,17 +8,17 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.io.GeometryReader;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.io.AbstractRecordAndGeometryWriterFactory;
+import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.geometry.io.GeometryReaderFactory;
+import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
 import com.revolsys.io.Writer;
-import com.revolsys.spring.SpringUtil;
 
-public class KmzIoFactory extends AbstractRecordAndGeometryWriterFactory implements
-  MapWriterFactory, GeometryReaderFactory {
+public class KmzIoFactory extends AbstractIoFactoryWithCoordinateSystem
+  implements RecordWriterFactory, MapWriterFactory, GeometryReaderFactory {
 
   public KmzIoFactory() {
     super(Kml22Constants.KMZ_FORMAT_DESCRIPTION);
@@ -32,8 +32,24 @@ public class KmzIoFactory extends AbstractRecordAndGeometryWriterFactory impleme
   }
 
   @Override
+  public MapWriter createMapWriter(final java.io.Writer out) {
+    throw new IllegalArgumentException("Cannot use a writer");
+  }
+
+  @Override
+  public MapWriter createMapWriter(final OutputStream out) {
+    return new KmzMapWriter(out);
+  }
+
+  @Override
+  public MapWriter createMapWriter(final OutputStream out, final Charset charset) {
+    return createMapWriter(out);
+  }
+
+  @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
+    final RecordDefinition recordDefinition, final OutputStream outputStream,
+    final Charset charset) {
     return new KmzRecordWriter(outputStream, charset);
   }
 
@@ -43,33 +59,7 @@ public class KmzIoFactory extends AbstractRecordAndGeometryWriterFactory impleme
   }
 
   @Override
-  public MapWriter getMapWriter(final java.io.Writer out) {
-    throw new IllegalArgumentException("Cannot use a writer");
-  }
-
-  @Override
-  public MapWriter getMapWriter(final OutputStream out) {
-    return new KmzMapWriter(out);
-  }
-
-  @Override
-  public MapWriter getMapWriter(final OutputStream out, final Charset charset) {
-    return getMapWriter(out);
-  }
-
-  @Override
-  public MapWriter getMapWriter(final Resource resource) {
-    final OutputStream out = SpringUtil.getOutputStream(resource);
-    return getMapWriter(out);
-  }
-
-  @Override
   public boolean isBinary() {
     return true;
-  }
-
-  @Override
-  public boolean isCoordinateSystemSupported(final CoordinateSystem coordinateSystem) {
-    return KmlIoFactory.COORDINATE_SYSTEMS.contains(coordinateSystem);
   }
 }

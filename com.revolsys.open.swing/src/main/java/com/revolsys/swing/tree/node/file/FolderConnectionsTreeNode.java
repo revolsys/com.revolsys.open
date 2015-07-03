@@ -14,7 +14,7 @@ public class FolderConnectionsTreeNode extends LazyLoadTreeNode {
   public FolderConnectionsTreeNode() {
     setName("Folder Connections");
     setType("Folder Connections");
-    setIcon(FileTreeNode.ICON_FOLDER_LINK);
+    setIcon(PathTreeNode.ICON_FOLDER_LINK);
     final FolderConnectionManager connectionManager = FolderConnectionManager.get();
     EventQueue.addPropertyChange(connectionManager, () -> refresh());
   }

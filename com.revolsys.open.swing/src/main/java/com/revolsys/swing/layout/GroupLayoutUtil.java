@@ -73,6 +73,15 @@ public class GroupLayoutUtil {
     makeColumns(container, groupLayout, numColumns);
   }
 
+  public static void makeColumns(final Container container, final int numColumns,
+    final boolean containerGaps, final boolean gaps) {
+    final GroupLayout groupLayout = getLayout(container, true);
+    groupLayout.setAutoCreateContainerGaps(containerGaps);
+    groupLayout.setAutoCreateGaps(gaps);
+    groupLayout.setLayoutStyle(LayoutStyle.getInstance());
+    makeColumns(container, groupLayout, numColumns);
+  }
+
   public static void makeColumns(final LayoutStyle layoutStyle, final Container container,
     final int numColumns) {
     final GroupLayout groupLayout = getLayout(container, true);

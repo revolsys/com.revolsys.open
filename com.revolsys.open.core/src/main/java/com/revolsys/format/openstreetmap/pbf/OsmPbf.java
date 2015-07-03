@@ -6,15 +6,15 @@ import java.util.Set;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.io.AbstractRecordAndGeometryReaderFactory;
+import com.revolsys.data.record.io.AbstractRecordIoFactory;
 import com.revolsys.data.record.io.RecordIteratorReader;
 import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 
-public class OsmPbfRecordIoFactory extends AbstractRecordAndGeometryReaderFactory {
-  public OsmPbfRecordIoFactory() {
+public class OsmPbf extends AbstractRecordIoFactory {
+  public OsmPbf() {
     super("Open Street Map PBF");
     addMediaTypeAndFileExtension("application/x-pbf+osm", "osm.pbf");
   }

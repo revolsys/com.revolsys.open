@@ -2,10 +2,11 @@ package com.revolsys.format.pdf;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.raster.AbstractGeoreferencedImageFactory;
+import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.raster.GeoreferencedImage;
+import com.revolsys.raster.GeoreferencedImageFactory;
 
-public class PdfImageFactory extends AbstractGeoreferencedImageFactory {
+public class PdfImageFactory extends AbstractIoFactory implements GeoreferencedImageFactory {
 
   public PdfImageFactory() {
     super("PDF");

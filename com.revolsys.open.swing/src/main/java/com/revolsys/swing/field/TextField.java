@@ -22,16 +22,11 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
 public class TextField extends JXTextField implements Field, FocusListener {
-  public static final CompoundBorder READ_ONLY_BORDER = BorderFactory.createCompoundBorder(
-    BorderFactory.createEmptyBorder(0, 3, 0, 3), BorderFactory.createCompoundBorder(
-      BorderFactory.createLineBorder(new Color(224, 224, 224), 1),
-      BorderFactory.createEmptyBorder(1, 2, 1, 2)));
-
-  public static final Color DEFAULT_BACKGROUND = new JTextField().getBackground();
-
-  public static final Color DEFAULT_FOREGROUND = new JTextField().getForeground();
-
-  public static final Color DEFAULT_SELECTED_FOREGROUND = new JTextField().getSelectedTextColor();
+  public static final CompoundBorder READ_ONLY_BORDER = BorderFactory
+    .createCompoundBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3),
+      BorderFactory.createCompoundBorder(
+        BorderFactory.createLineBorder(new Color(224, 224, 224), 1),
+        BorderFactory.createEmptyBorder(1, 2, 1, 2)));
 
   private static final long serialVersionUID = 1L;
 
@@ -137,22 +132,6 @@ public class TextField extends JXTextField implements Field, FocusListener {
       super.setEditable(editable);
       setForeground(getForeground());
     }
-  }
-
-  @Override
-  public void setFieldBackgroundColor(Color color) {
-    if (color == null) {
-      color = DEFAULT_BACKGROUND;
-    }
-    setBackground(color);
-  }
-
-  @Override
-  public void setFieldForegroundColor(Color color) {
-    if (color == null) {
-      color = DEFAULT_FOREGROUND;
-    }
-    setForeground(color);
   }
 
   @Override

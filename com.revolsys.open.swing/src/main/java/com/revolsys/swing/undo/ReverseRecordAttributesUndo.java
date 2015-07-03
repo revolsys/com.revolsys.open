@@ -3,7 +3,6 @@ package com.revolsys.swing.undo;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.record.property.DirectionalAttributes;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.swing.map.layer.record.BatchUpdate;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 
 public class ReverseRecordAttributesUndo extends AbstractUndoableEdit {
@@ -46,20 +45,14 @@ public class ReverseRecordAttributesUndo extends AbstractUndoableEdit {
 
   @Override
   protected void doRedo() {
-    try (
-      BatchUpdate batchUpdate = new BatchUpdate(this.record)) {
-      final DirectionalAttributes property = DirectionalAttributes.getProperty(this.record);
-      property.reverseAttributes(this.record);
-    }
+    final DirectionalAttributes property = DirectionalAttributes.getProperty(this.record);
+    property.reverseAttributes(this.record);
   }
 
   @Override
   protected void doUndo() {
-    try (
-      BatchUpdate batchUpdate = new BatchUpdate(this.record)) {
-      final DirectionalAttributes property = DirectionalAttributes.getProperty(this.record);
-      property.reverseAttributes(this.record);
-    }
+    final DirectionalAttributes property = DirectionalAttributes.getProperty(this.record);
+    property.reverseAttributes(this.record);
   }
 
   @Override

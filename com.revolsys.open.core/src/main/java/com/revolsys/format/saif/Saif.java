@@ -3,12 +3,12 @@ package com.revolsys.format.saif;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.io.AbstractRecordAndGeometryReaderFactory;
+import com.revolsys.data.record.io.AbstractRecordIoFactory;
 import com.revolsys.data.record.io.RecordReader;
 
-public class SaifIoFactory extends AbstractRecordAndGeometryReaderFactory {
+public class Saif extends AbstractRecordIoFactory {
 
-  public SaifIoFactory() {
+  public Saif() {
     super("SAIF");
     addMediaTypeAndFileExtension("zip/x-saif", "saf");
   }

@@ -25,12 +25,12 @@ import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.util.Property;
 
-public class MenuFactory extends BaseObjectWithProperties implements
-  ComponentFactory<JMenuItem> {
+public class MenuFactory extends BaseObjectWithProperties implements ComponentFactory<JMenuItem> {
 
   private static Object menuSource;
 
@@ -233,10 +233,11 @@ public class MenuFactory extends BaseObjectWithProperties implements
   }
 
   public void addMenuItem(final String groupName, final int index, final String title,
-    final String iconName, final Object object, final String methodName, final Object... parameters) {
+    final String iconName, final Object object, final String methodName,
+    final Object... parameters) {
     final ImageIcon icon = Icons.getIcon(iconName);
-    final InvokeMethodAction menuItem = createMenuItem(title, title, icon, null, object,
-      methodName, parameters);
+    final InvokeMethodAction menuItem = createMenuItem(title, title, icon, null, object, methodName,
+      parameters);
     addComponentFactory(groupName, index, menuItem);
   }
 
@@ -262,18 +263,27 @@ public class MenuFactory extends BaseObjectWithProperties implements
     }
   }
 
-  public void addMenuItemTitleIcon(final String groupName, final String name,
-    final String iconName, final EnableCheck enableCheck, final Object object,
-    final String methodName, final Object... parameters) {
+  public void addMenuItemTitleIcon(final String groupName, final String name, final String iconName,
+    final EnableCheck enableCheck, final Object object, final String methodName,
+    final Object... parameters) {
     final ImageIcon icon = Icons.getIcon(iconName);
     addMenuItem(groupName, name, null, icon, enableCheck, object, methodName, parameters);
   }
 
   public InvokeMethodAction addMenuItemTitleIcon(final String groupName, final String title,
-    final String iconName, final Object object, final String methodName, final Object... parameters) {
+    final String iconName, final Object object, final String methodName,
+    final Object... parameters) {
     final ImageIcon icon = Icons.getIcon(iconName);
     final InvokeMethodAction action = createMenuItem(title, null, icon, null, object, methodName,
       parameters);
+    addComponentFactory(groupName, action);
+    return action;
+  }
+
+  public RunnableAction addMenuItemTitleIcon(final String groupName, final String title,
+    final String iconName, final Runnable runnable) {
+    final ImageIcon icon = Icons.getIcon(iconName);
+    final RunnableAction action = createMenuItem(title, null, icon, null, runnable);
     addComponentFactory(groupName, action);
     return action;
   }
@@ -382,6 +392,13 @@ public class MenuFactory extends BaseObjectWithProperties implements
     final Object... parameters) {
     final InvokeMethodAction action = new InvokeMethodAction(name, title, icon, object, methodName,
       parameters);
+    action.setEnableCheck(enableCheck);
+    return action;
+  }
+
+  public RunnableAction createMenuItem(final String name, final String title, final Icon icon,
+    final EnableCheck enableCheck, final Runnable runnable) {
+    final RunnableAction action = new RunnableAction(name, title, icon, runnable);
     action.setEnableCheck(enableCheck);
     return action;
   }

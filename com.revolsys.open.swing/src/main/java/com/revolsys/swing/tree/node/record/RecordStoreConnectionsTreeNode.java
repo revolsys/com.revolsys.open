@@ -11,10 +11,10 @@ import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
-import com.revolsys.swing.tree.node.file.FileTreeNode;
+import com.revolsys.swing.tree.node.file.PathTreeNode;
 
 public class RecordStoreConnectionsTreeNode extends LazyLoadTreeNode {
-  public static final Icon ICON = Icons.getIconWithBadge(FileTreeNode.ICON_FOLDER, "database");
+  public static final Icon ICON = Icons.getIconWithBadge(PathTreeNode.ICON_FOLDER, "database");
 
   public RecordStoreConnectionsTreeNode() {
     setName("Record Stores");

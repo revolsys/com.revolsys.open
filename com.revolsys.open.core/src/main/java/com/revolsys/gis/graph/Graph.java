@@ -398,6 +398,21 @@ public class Graph<T> {
     return this.edgesById.get(edgeId);
   }
 
+  public Edge<T> getEdge(final T object, final LineString line) {
+    if (object != null) {
+      final Point fromPoint = line.getPoint(0);
+      final Node<T> fromNode = findNode(fromPoint);
+      if (fromNode != null) {
+        for (final Edge<T> edge : fromNode.getEdges()) {
+          if (edge.getObject() == object) {
+            return edge;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
   public int getEdgeCount() {
     return this.edgesById.size();
   }

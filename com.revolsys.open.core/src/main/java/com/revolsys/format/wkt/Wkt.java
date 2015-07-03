@@ -9,15 +9,17 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.io.AbstractRecordAndGeometryIoFactory;
+import com.revolsys.data.record.io.AbstractRecordIoFactory;
 import com.revolsys.data.record.io.RecordIteratorReader;
 import com.revolsys.data.record.io.RecordReader;
+import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 
-public class WktIoFactory extends AbstractRecordAndGeometryIoFactory implements WktConstants {
-  public WktIoFactory() {
+public class Wkt extends AbstractRecordIoFactory
+  implements RecordWriterFactory, WktConstants {
+  public Wkt() {
     super(WktConstants.DESCRIPTION);
     addMediaTypeAndFileExtension(MEDIA_TYPE, FILE_EXTENSION);
   }
@@ -35,7 +37,8 @@ public class WktIoFactory extends AbstractRecordAndGeometryIoFactory implements 
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
+    final RecordDefinition recordDefinition, final OutputStream outputStream,
+    final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
     return new WktRecordWriter(recordDefinition, writer);
   }

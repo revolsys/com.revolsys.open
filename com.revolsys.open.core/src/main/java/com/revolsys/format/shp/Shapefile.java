@@ -8,21 +8,24 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.io.AbstractRecordAndGeometryIoFactory;
+import com.revolsys.data.record.io.AbstractRecordIoFactory;
 import com.revolsys.data.record.io.RecordIteratorReader;
 import com.revolsys.data.record.io.RecordReader;
+import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.OutputStreamResource;
 
-public class ShapefileIoFactory extends AbstractRecordAndGeometryIoFactory {
-  public ShapefileIoFactory() {
+public class Shapefile extends AbstractRecordIoFactory
+  implements RecordWriterFactory {
+  public Shapefile() {
     super(ShapefileConstants.DESCRIPTION);
     addMediaTypeAndFileExtension(ShapefileConstants.MIME_TYPE, ShapefileConstants.FILE_EXTENSION);
   }
 
   @Override
-  public RecordReader createRecordReader(final Resource resource, final RecordFactory recordFactory) {
+  public RecordReader createRecordReader(final Resource resource,
+    final RecordFactory recordFactory) {
     try {
       final ShapefileIterator iterator = new ShapefileIterator(resource, recordFactory);
       return new RecordIteratorReader(iterator);
@@ -39,7 +42,8 @@ public class ShapefileIoFactory extends AbstractRecordAndGeometryIoFactory {
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream, final Charset charset) {
+    final RecordDefinition recordDefinition, final OutputStream outputStream,
+    final Charset charset) {
     return createRecordWriter(recordDefinition, new OutputStreamResource(baseName, outputStream));
   }
 

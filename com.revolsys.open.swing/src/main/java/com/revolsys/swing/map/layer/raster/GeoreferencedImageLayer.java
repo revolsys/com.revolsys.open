@@ -22,7 +22,6 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble2D;
-import com.revolsys.raster.AbstractGeoreferencedImageFactory;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.raster.MappedLocation;
@@ -103,7 +102,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
       final Resource imageResource = SpringUtil.getResource(this.url);
       if (imageResource.exists()) {
         try {
-          image = AbstractGeoreferencedImageFactory.loadGeoreferencedImage(imageResource);
+          image = GeoreferencedImageFactory.loadGeoreferencedImage(imageResource);
           if (image == null) {
             LoggerFactory.getLogger(GeoreferencedImageLayer.class).error(
               "Cannot load image: " + this.url);
