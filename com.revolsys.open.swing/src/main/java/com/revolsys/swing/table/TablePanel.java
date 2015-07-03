@@ -1,7 +1,6 @@
 package com.revolsys.swing.table;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -13,6 +12,7 @@ import java.lang.ref.WeakReference;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 
 import com.revolsys.collection.EmptyReference;
@@ -162,14 +162,18 @@ public class TablePanel extends JPanel implements MouseListener, AutoCloseable {
     setEventRow(this.table, e);
     if (eventRow > -1 && e.isPopupTrigger()) {
       e.consume();
-      final MenuFactory menu = getTableModel().getMenu(eventRow, eventColumn);
+      final AbstractTableModel tableModel = getTableModel();
+      final MenuFactory menu = tableModel.getMenu(eventRow, eventColumn);
       if (menu != null) {
-        popupMouseEvent = new WeakReference<MouseEvent>(e);
-        final int x = e.getX();
-        final int y = e.getY();
+        final TableCellEditor cellEditor = this.table.getCellEditor();
+        if (cellEditor == null || cellEditor.stopCellEditing()) {
+          popupMouseEvent = new WeakReference<MouseEvent>(e);
+          final int x = e.getXOnScreen() - getX();
+          final int y = e.getYOnScreen() - getY();
 
-        final Component component = e.getComponent();
-        menu.show(getMenuSource(), component, x + 5, y);
+          final Object menuSource = getMenuSource();
+          menu.show(menuSource, this, x + 5, y);
+        }
       }
     }
   }
