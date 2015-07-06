@@ -166,11 +166,17 @@ public class TablePanel extends JPanel implements MouseListener, AutoCloseable {
       final MenuFactory menu = tableModel.getMenu(eventRow, eventColumn);
       if (menu != null) {
         final TableCellEditor cellEditor = this.table.getCellEditor();
+        final int x;
+        final int y;
+        if (cellEditor == null) {
+          x = e.getX();
+          y = e.getY();
+        } else {
+          x = e.getXOnScreen() - getX();
+          y = e.getYOnScreen() - getY();
+        }
         if (cellEditor == null || cellEditor.stopCellEditing()) {
           popupMouseEvent = new WeakReference<MouseEvent>(e);
-          final int x = e.getXOnScreen() - getX();
-          final int y = e.getYOnScreen() - getY();
-
           final Object menuSource = getMenuSource();
           menu.show(menuSource, this, x + 5, y);
         }
