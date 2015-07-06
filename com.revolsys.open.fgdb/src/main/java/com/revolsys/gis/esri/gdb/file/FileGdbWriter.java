@@ -45,12 +45,10 @@ public class FileGdbWriter extends AbstractRecordWriter {
     }
   }
 
-  public void closeTable(final String typePath) {
+  public synchronized void closeTable(final String typePath) {
     if (this.tables != null) {
-      synchronized (this.tables) {
-        if (this.tables.remove(typePath) != null) {
-          this.recordStore.releaseTableAndWriteLock(typePath);
-        }
+      if (this.tables.remove(typePath) != null) {
+        this.recordStore.releaseTableAndWriteLock(typePath);
       }
     }
   }
@@ -62,7 +60,8 @@ public class FileGdbWriter extends AbstractRecordWriter {
       final String typePath = recordDefinition.getPath();
       final Table table = getTable(typePath);
       final String whereClause = "OBJECTID=" + objectId;
-      final EnumRows rows = this.recordStore.search(typePath, table, "OBJECTID", whereClause, false);
+      final EnumRows rows = this.recordStore.search(typePath, table, "OBJECTID", whereClause,
+        false);
       if (rows != null) {
         try {
           final Row row = this.recordStore.nextRow(rows);
@@ -87,22 +86,21 @@ public class FileGdbWriter extends AbstractRecordWriter {
     close();
   }
 
-  private Table getTable(final String typePath) {
-    synchronized (this) {
-      Table table = this.tables.get(typePath);
-      if (table == null) {
-        table = this.recordStore.getTableWithWriteLock(typePath);
-        if (table != null) {
-          this.tables.put(typePath, table);
-        }
+  private synchronized Table getTable(final String typePath) {
+    Table table = this.tables.get(typePath);
+    if (table == null) {
+      table = this.recordStore.getTableWithWriteLock(typePath);
+      if (table != null) {
+        this.tables.put(typePath, table);
       }
-      return table;
     }
+    return table;
   }
 
   private void insert(final Record record) {
     final RecordDefinition sourceRecordDefinition = record.getRecordDefinition();
-    final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(sourceRecordDefinition);
+    final RecordDefinition recordDefinition = this.recordStore
+      .getRecordDefinition(sourceRecordDefinition);
 
     validateRequired(record, recordDefinition);
 
@@ -160,7 +158,8 @@ public class FileGdbWriter extends AbstractRecordWriter {
       insert(record);
     } else {
       final RecordDefinition sourceRecordDefinition = record.getRecordDefinition();
-      final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(sourceRecordDefinition);
+      final RecordDefinition recordDefinition = this.recordStore
+        .getRecordDefinition(sourceRecordDefinition);
 
       validateRequired(record, recordDefinition);
 
