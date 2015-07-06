@@ -60,8 +60,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
       final String typePath = recordDefinition.getPath();
       final Table table = getTable(typePath);
       final String whereClause = "OBJECTID=" + objectId;
-      final EnumRows rows = this.recordStore.search(typePath, table, "OBJECTID", whereClause,
-        false);
+      final EnumRows rows = this.recordStore.search(typePath, table, "OBJECTID", whereClause, false);
       if (rows != null) {
         try {
           final Row row = this.recordStore.nextRow(rows);
@@ -99,8 +98,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
 
   private void insert(final Record record) {
     final RecordDefinition sourceRecordDefinition = record.getRecordDefinition();
-    final RecordDefinition recordDefinition = this.recordStore
-      .getRecordDefinition(sourceRecordDefinition);
+    final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(sourceRecordDefinition);
 
     validateRequired(record, recordDefinition);
 
@@ -158,8 +156,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
       insert(record);
     } else {
       final RecordDefinition sourceRecordDefinition = record.getRecordDefinition();
-      final RecordDefinition recordDefinition = this.recordStore
-        .getRecordDefinition(sourceRecordDefinition);
+      final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(sourceRecordDefinition);
 
       validateRequired(record, recordDefinition);
 

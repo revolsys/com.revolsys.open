@@ -81,9 +81,8 @@ public class Geodatabase {
   }
 
   public VectorOfWString getChildDatasets(final String parentPath, final String datasetType) {
-    return new VectorOfWString(
-      EsriFileGdbJNI.Geodatabase_getChildDatasets(this.swigCPtr, this, parentPath, datasetType),
-      true);
+    return new VectorOfWString(EsriFileGdbJNI.Geodatabase_getChildDatasets(this.swigCPtr, this,
+      parentPath, datasetType), true);
   }
 
   public String getDatasetDefinition(final String path, final String datasetType) {

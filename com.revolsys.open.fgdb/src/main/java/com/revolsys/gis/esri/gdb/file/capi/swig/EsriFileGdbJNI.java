@@ -14,6 +14,7 @@ import com.revolsys.util.OS;
 public class EsriFileGdbJNI {
 
   static {
+    System.out.println(Thread.currentThread());
     if (OS.isUnix() || OS.isMac()) {
       ClasspathNativeLibraryUtil.loadLibrary("fgdbunixrtl");
       ClasspathNativeLibraryUtil.loadLibrary("FileGDBAPI");
@@ -89,8 +90,8 @@ public class EsriFileGdbJNI {
   public final static native void Geodatabase_alterDomain(long jarg1, Geodatabase jarg1_,
     String jarg2);
 
-  public final static native void Geodatabase_closeTable(long jarg1, Geodatabase jarg1_, long jarg2,
-    Table jarg2_);
+  public final static native void Geodatabase_closeTable(long jarg1, Geodatabase jarg1_,
+    long jarg2, Table jarg2_);
 
   public final static native int Geodatabase_CompactDatabase(long jarg1, Geodatabase jarg1_);
 
@@ -115,8 +116,8 @@ public class EsriFileGdbJNI {
   public final static native long Geodatabase_getChildDatasets(long jarg1, Geodatabase jarg1_,
     String jarg2, String jarg3);
 
-  public final static native String Geodatabase_getDatasetDefinition(long jarg1, Geodatabase jarg1_,
-    String jarg2, String jarg3);
+  public final static native String Geodatabase_getDatasetDefinition(long jarg1,
+    Geodatabase jarg1_, String jarg2, String jarg3);
 
   public final static native String Geodatabase_getDatasetDocumentation(long jarg1,
     Geodatabase jarg1_, String jarg2, String jarg3);
@@ -136,8 +137,7 @@ public class EsriFileGdbJNI {
     String jarg2);
 
   public final static native int Geodatabase_GetRelatedDatasetDefinitions(long jarg1,
-    Geodatabase jarg1_, String jarg2, String jarg3, String jarg4, long jarg5,
-    VectorOfString jarg5_);
+    Geodatabase jarg1_, String jarg2, String jarg3, String jarg4, long jarg5, VectorOfString jarg5_);
 
   public final static native int Geodatabase_GetRelatedDatasets(long jarg1, Geodatabase jarg1_,
     String jarg2, String jarg3, String jarg4, long jarg5, VectorOfWString jarg5_);
@@ -148,8 +148,7 @@ public class EsriFileGdbJNI {
   public final static native int Geodatabase_Move(long jarg1, Geodatabase jarg1_, String jarg2,
     String jarg3);
 
-  public final static native long Geodatabase_openTable(long jarg1, Geodatabase jarg1_,
-    String jarg2);
+  public final static native long Geodatabase_openTable(long jarg1, Geodatabase jarg1_, String jarg2);
 
   public final static native long Geodatabase_query(long jarg1, Geodatabase jarg1_, String jarg2,
     boolean jarg3);
@@ -167,8 +166,7 @@ public class EsriFileGdbJNI {
 
   public final static native int Guid_FromString(long jarg1, Guid jarg1_, String jarg2);
 
-  public final static native boolean Guid_notEqual(long jarg1, Guid jarg1_, long jarg2,
-    Guid jarg2_);
+  public final static native boolean Guid_notEqual(long jarg1, Guid jarg1_, long jarg2, Guid jarg2_);
 
   public final static native void Guid_SetNull(long jarg1, Guid jarg1_);
 
@@ -304,15 +302,13 @@ public class EsriFileGdbJNI {
 
   public final static native void Table_updateRow(long jarg1, Table jarg1_, long jarg2, Row jarg2_);
 
-  public final static native void VectorOfString_add(long jarg1, VectorOfString jarg1_,
-    String jarg2);
+  public final static native void VectorOfString_add(long jarg1, VectorOfString jarg1_, String jarg2);
 
   public final static native long VectorOfString_capacity(long jarg1, VectorOfString jarg1_);
 
   public final static native void VectorOfString_clear(long jarg1, VectorOfString jarg1_);
 
-  public final static native String VectorOfString_get(long jarg1, VectorOfString jarg1_,
-    int jarg2);
+  public final static native String VectorOfString_get(long jarg1, VectorOfString jarg1_, int jarg2);
 
   public final static native boolean VectorOfString_isEmpty(long jarg1, VectorOfString jarg1_);
 
@@ -339,8 +335,8 @@ public class EsriFileGdbJNI {
   public final static native void VectorOfWString_reserve(long jarg1, VectorOfWString jarg1_,
     long jarg2);
 
-  public final static native void VectorOfWString_set(long jarg1, VectorOfWString jarg1_, int jarg2,
-    String jarg3);
+  public final static native void VectorOfWString_set(long jarg1, VectorOfWString jarg1_,
+    int jarg2, String jarg3);
 
   public final static native long VectorOfWString_size(long jarg1, VectorOfWString jarg1_);
 }

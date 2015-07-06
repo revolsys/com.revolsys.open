@@ -13,6 +13,8 @@ import com.revolsys.data.record.io.RecordStoreFactory;
 import com.revolsys.data.record.io.RecordStoreFactoryRegistry;
 import com.revolsys.data.record.io.RecordStoreRecordAndGeometryWriterFactory;
 import com.revolsys.data.record.schema.RecordStore;
+import com.revolsys.gis.esri.gdb.file.capi.swig.EsriFileGdb;
+import com.revolsys.gis.esri.gdb.file.capi.swig.Geodatabase;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
 
@@ -28,13 +30,14 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
     "folderconnection:/(//)?.*.gdb/?");
 
   static {
+    System.out.println("F\t" + Thread.currentThread());
     final File tmpFile = FileUtil.createTempFile("filegdb", ".gdb");
     tmpFile.delete();
     try {
-      try (
-        FileGdbRecordStore recordStore = create(tmpFile)) {
-        recordStore.initialize();
-      }
+      final String path = FileUtil.getCanonicalPath(tmpFile);
+      final Geodatabase geodatabase = EsriFileGdb.createGeodatabase(path);
+      EsriFileGdb.CloseGeodatabase(geodatabase);
+      EsriFileGdb.DeleteGeodatabase(path);
     } finally {
       FileUtil.deleteDirectory(tmpFile, true);
     }
