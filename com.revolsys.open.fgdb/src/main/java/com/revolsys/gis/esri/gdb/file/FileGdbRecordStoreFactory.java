@@ -30,7 +30,6 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
     "folderconnection:/(//)?.*.gdb/?");
 
   static {
-    System.out.println("F\t" + Thread.currentThread());
     final File tmpFile = FileUtil.createTempFile("filegdb", ".gdb");
     tmpFile.delete();
     try {

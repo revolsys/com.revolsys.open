@@ -14,7 +14,6 @@ import com.revolsys.util.OS;
 public class EsriFileGdbJNI {
 
   static {
-    System.out.println(Thread.currentThread());
     if (OS.isUnix() || OS.isMac()) {
       ClasspathNativeLibraryUtil.loadLibrary("fgdbunixrtl");
       ClasspathNativeLibraryUtil.loadLibrary("FileGDBAPI");
