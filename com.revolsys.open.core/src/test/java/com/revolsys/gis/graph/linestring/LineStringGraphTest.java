@@ -7,6 +7,8 @@ import com.revolsys.jts.geom.LineString;
 
 import junit.framework.Assert;
 
+import junit.framework.Assert;
+
 public class LineStringGraphTest {
   GeometryFactory geometryFactory = GeometryFactory.fixed(3005, 1000.0);
 

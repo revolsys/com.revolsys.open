@@ -13,6 +13,8 @@ import com.revolsys.jts.testold.junit.GeometryUtils;
 
 import junit.framework.TestCase;
 
+import junit.framework.TestCase;
+
 /**
  * Large-scale tests of {@link CascadedPolygonUnion}
  * using synthetic datasets.

@@ -41,6 +41,9 @@ import com.revolsys.jts.io.WKTReader;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
+
 /**
  * Test named predicate short-circuits
  */

@@ -43,6 +43,8 @@ import com.revolsys.jts.util.Stopwatch;
 
 import junit.framework.TestCase;
 
+import junit.framework.TestCase;
+
 /**
  * @version 1.7
  */

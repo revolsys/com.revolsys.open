@@ -37,6 +37,8 @@ import com.revolsys.jts.geom.Geometry;
 
 import junit.framework.Assert;
 
+import junit.framework.Assert;
+
 /**
  * A {@link ResultMatcher} which compares the results of
  * buffer operations for equality, up to the given tolerance.

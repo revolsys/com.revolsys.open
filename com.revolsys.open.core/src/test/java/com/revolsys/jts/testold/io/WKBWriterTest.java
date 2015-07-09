@@ -8,6 +8,8 @@ import com.revolsys.jts.io.WKBWriter;
 
 import junit.framework.TestCase;
 
+import junit.framework.TestCase;
+
 public class WKBWriterTest extends TestCase {
 
   public WKBWriterTest(final String name) {

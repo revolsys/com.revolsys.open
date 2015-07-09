@@ -9,6 +9,9 @@ import com.revolsys.jts.operation.distance3d.Distance3DOp;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
+
 public class Distance3DOpTest extends TestCase {
   static GeometryFactory geomFact = GeometryFactory.floating3();
 

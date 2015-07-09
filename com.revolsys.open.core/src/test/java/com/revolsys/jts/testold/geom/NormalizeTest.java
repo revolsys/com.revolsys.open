@@ -45,6 +45,8 @@ import com.revolsys.jts.test.geometry.CoordinateTest;
 
 import junit.framework.TestCase;
 
+import junit.framework.TestCase;
+
 /**
  * @version 1.7
  */

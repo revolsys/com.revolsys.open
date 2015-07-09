@@ -11,6 +11,8 @@ import com.revolsys.jts.operation.overlay.snap.SnapIfNeededOverlayOp;
 
 import junit.framework.TestCase;
 
+import junit.framework.TestCase;
+
 /**
  * Tests Noding checking during overlay.
  * Intended to show that noding check failures due to robustness

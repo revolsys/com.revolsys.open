@@ -133,6 +133,8 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
 
   boolean isEditable(String typePath);
 
+  boolean isLoadFullSchema();
+
   Record load(String typePath, Identifier id);
 
   Record load(String typePath, Object... id);
@@ -150,6 +152,8 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
   Record queryFirst(Query query);
 
   void setLabel(String label);
+
+  void setLoadFullSchema(boolean loadFullSchema);
 
   void setLogCounts(boolean logCounts);
 

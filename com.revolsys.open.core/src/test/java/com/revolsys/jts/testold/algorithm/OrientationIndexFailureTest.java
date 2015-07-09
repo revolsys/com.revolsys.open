@@ -39,6 +39,9 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
+
 /**
  * Tests failure cases of CGAlgorithms.computeOrientation
  * @version 1.7

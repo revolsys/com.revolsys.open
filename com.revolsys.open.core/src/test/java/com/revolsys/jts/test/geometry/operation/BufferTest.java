@@ -20,6 +20,10 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 public class BufferTest extends TestCase {
 
   private static boolean hasHoles(final Geometry geometry) {

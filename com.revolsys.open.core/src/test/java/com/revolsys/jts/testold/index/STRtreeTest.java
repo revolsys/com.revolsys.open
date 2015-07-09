@@ -49,6 +49,8 @@ import com.revolsys.jts.testold.util.SerializationUtil;
 
 import junit.framework.TestCase;
 
+import junit.framework.TestCase;
+
 /**
  * @version 1.7
  */

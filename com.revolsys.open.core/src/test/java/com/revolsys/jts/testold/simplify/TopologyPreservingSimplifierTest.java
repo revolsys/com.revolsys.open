@@ -7,6 +7,8 @@ import com.revolsys.jts.simplify.TopologyPreservingSimplifier;
 
 import junit.framework.TestCase;
 
+import junit.framework.TestCase;
+
 /**
  * @version 1.7
  */

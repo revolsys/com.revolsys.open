@@ -6,6 +6,8 @@ import com.revolsys.jts.noding.SegmentPointComparator;
 
 import junit.framework.TestCase;
 
+import junit.framework.TestCase;
+
 /**
  * Test IntersectionSegment#compareNodePosition
  *

@@ -12,6 +12,9 @@ import com.revolsys.jts.linearref.LocationIndexedLine;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
+
 /**
  * Tests methods involving only {@link LinearLocation}s
  *

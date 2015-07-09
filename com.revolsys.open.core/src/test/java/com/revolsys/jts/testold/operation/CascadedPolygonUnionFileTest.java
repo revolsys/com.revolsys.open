@@ -10,6 +10,8 @@ import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 
 import junit.framework.TestCase;
 
+import junit.framework.TestCase;
+
 /**
  * Large-scale tests of {@link CascadedPolygonUnion}
  * using data from files.

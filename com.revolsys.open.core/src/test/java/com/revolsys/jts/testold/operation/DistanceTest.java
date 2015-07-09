@@ -46,6 +46,9 @@ import com.revolsys.jts.operation.distance.DistanceWithPoints;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
+
 /**
  * @version 1.7
  */

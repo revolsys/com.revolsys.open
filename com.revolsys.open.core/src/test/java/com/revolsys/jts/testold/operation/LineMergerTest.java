@@ -44,6 +44,8 @@ import com.revolsys.jts.util.Assert;
 
 import junit.framework.TestCase;
 
+import junit.framework.TestCase;
+
 /**
  * @version 1.7
  */

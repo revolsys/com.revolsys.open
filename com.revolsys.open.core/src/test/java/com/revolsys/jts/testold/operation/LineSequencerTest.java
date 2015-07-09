@@ -10,6 +10,8 @@ import com.revolsys.jts.operation.linemerge.LineSequencer;
 
 import junit.framework.TestCase;
 
+import junit.framework.TestCase;
+
 /**
  * Test LineSequencer
  *

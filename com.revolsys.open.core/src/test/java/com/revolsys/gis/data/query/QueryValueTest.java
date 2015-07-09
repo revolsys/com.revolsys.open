@@ -12,6 +12,8 @@ import com.revolsys.data.types.DataTypes;
 
 import junit.framework.Assert;
 
+import junit.framework.Assert;
+
 public class QueryValueTest {
   public static void main(final String[] args) {
     new QueryValueTest().run();

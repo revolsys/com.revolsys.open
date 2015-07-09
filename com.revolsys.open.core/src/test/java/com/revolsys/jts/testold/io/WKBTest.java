@@ -17,6 +17,9 @@ import com.revolsys.jts.util.GeometricShapeFactory;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
+
 /**
  * Tests the {@link WKBReader} and {@link WKBWriter}.
  * Tests all geometries with both 2 and 3 dimensions and both byte orderings.

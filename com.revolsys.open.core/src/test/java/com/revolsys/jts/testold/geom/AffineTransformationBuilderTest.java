@@ -8,6 +8,8 @@ import com.revolsys.jts.geom.util.AffineTransformationFactory;
 
 import junit.framework.TestCase;
 
+import junit.framework.TestCase;
+
 /**
  * Tests {@link AffineTransformationBuilder}.
  *

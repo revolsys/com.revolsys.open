@@ -10,6 +10,8 @@ import com.revolsys.util.MathUtil;
 
 import junit.framework.TestCase;
 
+import junit.framework.TestCase;
+
 /**
  * Test IntersectionSegment#compareNodePosition using an exhaustive set
  * of test cases

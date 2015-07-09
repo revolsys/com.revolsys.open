@@ -14,6 +14,9 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
+
 /**
  * Test spatial predicate optimizations for rectangles by
  * synthesizing an exhaustive set of test cases.

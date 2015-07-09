@@ -23,6 +23,8 @@ package com.revolsys.gis.io;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import com.revolsys.util.WrappedException;
+
 public class EndianOutputStream extends OutputStream implements EndianOutput {
 
   private final OutputStream out;
@@ -36,10 +38,13 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
   }
 
   @Override
-  public void close() throws IOException {
+  public void close() {
     flush();
-    this.out.close();
-    super.close();
+    try {
+      this.out.close();
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 
   @Override
@@ -47,40 +52,52 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
     try {
       this.out.flush();
     } catch (final IOException e) {
-      throw new RuntimeException(e);
+      throw new WrappedException(e);
     }
   }
 
   @Override
-  public long getFilePointer() throws IOException {
+  public long getFilePointer() {
     return this.written;
   }
 
   @Override
-  public long length() throws IOException {
+  public long length() {
     return this.written;
   }
 
   @Override
-  public void write(final byte[] b) throws IOException {
-    this.out.write(b);
-    this.written += b.length;
+  public void write(final byte[] b) {
+    try {
+      this.out.write(b);
+      this.written += b.length;
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 
   @Override
-  public void write(final byte[] b, final int off, final int len) throws IOException {
-    this.out.write(b, off, len);
-    this.written += len;
+  public void write(final byte[] b, final int off, final int len) {
+    try {
+      this.out.write(b, off, len);
+      this.written += len;
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 
   @Override
-  public void write(final int b) throws IOException {
-    this.out.write(b);
-    this.written++;
+  public void write(final int b) {
+    try {
+      this.out.write(b);
+      this.written++;
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 
   @Override
-  public final void writeBytes(final String s) throws IOException {
+  public final void writeBytes(final String s) {
     final int len = s.length();
     final byte[] buffer = new byte[len];
     int count = 0;
@@ -98,19 +115,19 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
   }
 
   @Override
-  public void writeDouble(final double d) throws IOException {
+  public void writeDouble(final double d) {
     final long l = Double.doubleToLongBits(d);
     writeLong(l);
   }
 
   @Override
-  public void writeFloat(final float f) throws IOException {
+  public void writeFloat(final float f) {
     final int i = Float.floatToIntBits(f);
     writeInt(i);
   }
 
   @Override
-  public void writeInt(final int i) throws IOException {
+  public void writeInt(final int i) {
     this.writeBuffer[0] = (byte)(i >>> 24);
     this.writeBuffer[1] = (byte)(i >>> 16);
     this.writeBuffer[2] = (byte)(i >>> 8);
@@ -119,19 +136,19 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
   }
 
   @Override
-  public void writeLEDouble(final double d) throws IOException {
+  public void writeLEDouble(final double d) {
     final long l = Double.doubleToLongBits(d);
     writeLELong(l);
   }
 
   @Override
-  public void writeLEFloat(final float f) throws IOException {
+  public void writeLEFloat(final float f) {
     final int i = Float.floatToIntBits(f);
     writeLEInt(i);
   }
 
   @Override
-  public void writeLEInt(final int i) throws IOException {
+  public void writeLEInt(final int i) {
     this.writeBuffer[0] = (byte)(i >>> 0);
     this.writeBuffer[1] = (byte)(i >>> 8);
     this.writeBuffer[2] = (byte)(i >>> 16);
@@ -140,7 +157,7 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
   }
 
   @Override
-  public void writeLELong(final long l) throws IOException {
+  public void writeLELong(final long l) {
     this.writeBuffer[0] = (byte)(l >>> 0);
     this.writeBuffer[1] = (byte)(l >>> 8);
     this.writeBuffer[2] = (byte)(l >>> 16);
@@ -153,14 +170,14 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
   }
 
   @Override
-  public void writeLEShort(final short s) throws IOException {
+  public void writeLEShort(final short s) {
     this.writeBuffer[0] = (byte)(s >>> 0);
     this.writeBuffer[1] = (byte)(s >>> 8);
     write(this.writeBuffer, 0, 2);
   }
 
   @Override
-  public void writeLong(final long l) throws IOException {
+  public void writeLong(final long l) {
     this.writeBuffer[0] = (byte)(l >>> 56);
     this.writeBuffer[1] = (byte)(l >>> 48);
     this.writeBuffer[2] = (byte)(l >>> 40);
@@ -173,7 +190,7 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
   }
 
   @Override
-  public void writeShort(final short s) throws IOException {
+  public void writeShort(final short s) {
     this.writeBuffer[0] = (byte)(s >>> 8);
     this.writeBuffer[1] = (byte)(s >>> 0);
     write(this.writeBuffer, 0, 2);

@@ -40,6 +40,9 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
+
 /**
  * Unit tests for {@link BoundingBoxDoubleGf}
  *

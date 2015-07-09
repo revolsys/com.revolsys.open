@@ -300,7 +300,8 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
   }
 
   protected void refreshIfNeeded() {
-    if (!this.initialized) {
+    final RecordStore recordStore = getRecordStore();
+    if (!this.initialized && recordStore.isLoadFullSchema()) {
       refresh();
     }
   }

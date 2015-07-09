@@ -13,6 +13,9 @@ import com.revolsys.jts.testold.junit.GeometryUtils;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
+
 public class EdgeGraphTest extends TestCase {
   public static void main(final String args[]) {
     TestRunner.run(EdgeGraphTest.class);

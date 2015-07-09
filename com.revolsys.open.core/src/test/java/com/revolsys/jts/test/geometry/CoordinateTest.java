@@ -9,6 +9,9 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
+
 public class CoordinateTest extends TestCase {
   public static void assertEquals(final Point point, final double... coordinates) {
     for (int i = 0; i < coordinates.length; i++) {

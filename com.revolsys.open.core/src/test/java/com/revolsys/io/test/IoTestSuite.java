@@ -30,6 +30,9 @@ import com.revolsys.junit.InvokeMethodTestCase;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 @RunWith(Suite.class)
 @SuiteClasses({
   ShapefileIoTest.class, GeoJsonIoTest.class, GmlIoTest.class, KmlIoTest.class, WktlIoTest.class

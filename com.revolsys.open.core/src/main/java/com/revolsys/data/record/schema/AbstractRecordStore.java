@@ -75,6 +75,8 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   private final Set<RecordStoreExtension> recordStoreExtensions = new LinkedHashSet<RecordStoreExtension>();
 
+  private boolean loadFullSchema = true;
+
   public AbstractRecordStore() {
     this(new ArrayRecordFactory());
   }
@@ -562,6 +564,11 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
+  public boolean isLoadFullSchema() {
+    return this.loadFullSchema;
+  }
+
+  @Override
   public Record load(final String typePath, final Identifier id) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     if (recordDefinition == null || id == null) {
@@ -742,6 +749,11 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   public void setLabel(final String label) {
     this.label = label;
     this.statistics.setPrefix(label);
+  }
+
+  @Override
+  public void setLoadFullSchema(final boolean loadFullSchema) {
+    this.loadFullSchema = loadFullSchema;
   }
 
   @Override

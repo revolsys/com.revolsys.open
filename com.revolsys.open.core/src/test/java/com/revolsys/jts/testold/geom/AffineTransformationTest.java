@@ -12,6 +12,8 @@ import com.revolsys.jts.io.WKTReader;
 
 import junit.framework.TestCase;
 
+import junit.framework.TestCase;
+
 /**
  * @author Martin Davis
  *

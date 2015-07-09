@@ -28,6 +28,8 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 
+import com.revolsys.util.WrappedException;
+
 public class EndianMappedByteBuffer implements EndianInputOutput {
   private final MappedByteBuffer buffer;
 
@@ -49,8 +51,12 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
   }
 
   @Override
-  public void close() throws IOException {
-    this.randomAccessFile.close();
+  public void close() {
+    try {
+      this.randomAccessFile.close();
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 
   @Override
@@ -58,7 +64,7 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
   }
 
   @Override
-  public long getFilePointer() throws IOException {
+  public long getFilePointer() {
     return this.buffer.position();
   }
 
@@ -161,22 +167,22 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
   }
 
   @Override
-  public void write(final byte[] bytes) throws IOException {
+  public void write(final byte[] bytes) {
     this.buffer.put(bytes);
   }
 
   @Override
-  public void write(final byte[] bytes, final int offset, final int length) throws IOException {
+  public void write(final byte[] bytes, final int offset, final int length) {
     this.buffer.put(bytes, offset, length);
   }
 
   @Override
-  public void write(final int i) throws IOException {
+  public void write(final int i) {
     this.buffer.put((byte)i);
   }
 
   @Override
-  public void writeBytes(final String s) throws IOException {
+  public void writeBytes(final String s) {
     final int len = s.length();
     final byte[] bytes = new byte[len];
     s.getBytes(0, len, bytes, 0);
@@ -184,22 +190,22 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
   }
 
   @Override
-  public void writeDouble(final double value) throws IOException {
+  public void writeDouble(final double value) {
     this.buffer.putDouble(value);
   }
 
   @Override
-  public void writeFloat(final float value) throws IOException {
+  public void writeFloat(final float value) {
     this.buffer.putFloat(value);
   }
 
   @Override
-  public void writeInt(final int value) throws IOException {
+  public void writeInt(final int value) {
     this.buffer.putInt(value);
   }
 
   @Override
-  public void writeLEDouble(final double value) throws IOException {
+  public void writeLEDouble(final double value) {
     this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     try {
       this.buffer.putDouble(value);
@@ -209,7 +215,7 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
   }
 
   @Override
-  public void writeLEFloat(final float value) throws IOException {
+  public void writeLEFloat(final float value) {
     this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     try {
       this.buffer.putFloat(value);
@@ -219,7 +225,7 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
   }
 
   @Override
-  public void writeLEInt(final int value) throws IOException {
+  public void writeLEInt(final int value) {
     this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     try {
       this.buffer.putInt(value);
@@ -229,7 +235,7 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
   }
 
   @Override
-  public void writeLELong(final long value) throws IOException {
+  public void writeLELong(final long value) {
     this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     try {
       this.buffer.putLong(value);
@@ -239,7 +245,7 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
   }
 
   @Override
-  public void writeLEShort(final short value) throws IOException {
+  public void writeLEShort(final short value) {
     this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     try {
       this.buffer.putShort(value);
@@ -249,12 +255,12 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
   }
 
   @Override
-  public void writeLong(final long value) throws IOException {
+  public void writeLong(final long value) {
     this.buffer.putLong(value);
   }
 
   @Override
-  public void writeShort(final short value) throws IOException {
+  public void writeShort(final short value) {
     this.buffer.putShort(value);
   }
 }

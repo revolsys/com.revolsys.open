@@ -49,6 +49,8 @@ import com.revolsys.util.Property;
 
 import junit.framework.Test;
 
+import junit.framework.Test;
+
 /**
  *  A set of tests for two Geometry's.
  *

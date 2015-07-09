@@ -43,6 +43,8 @@ import com.revolsys.jtstest.testrunner.StringUtil;
 
 import junit.framework.Assert;
 
+import junit.framework.Assert;
+
 /**
  * A {@link GeometryFunction} which calls a static
  * {@link Method}.

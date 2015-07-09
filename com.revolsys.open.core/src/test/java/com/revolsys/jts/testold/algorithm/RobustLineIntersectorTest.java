@@ -44,6 +44,8 @@ import com.revolsys.jts.geom.impl.PointDouble;
 
 import junit.framework.TestCase;
 
+import junit.framework.TestCase;
+
 /**
  * Basic functionality tests for RobustLineIntersector.
  *

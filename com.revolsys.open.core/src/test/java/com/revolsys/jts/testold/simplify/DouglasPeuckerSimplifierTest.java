@@ -7,6 +7,8 @@ import com.revolsys.jts.simplify.DouglasPeuckerSimplifier;
 
 import junit.framework.TestCase;
 
+import junit.framework.TestCase;
+
 /**
  * @version 1.7
  */

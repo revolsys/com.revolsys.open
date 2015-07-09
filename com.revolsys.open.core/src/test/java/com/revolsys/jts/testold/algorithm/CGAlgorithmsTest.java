@@ -8,6 +8,9 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
+
 public class CGAlgorithmsTest extends TestCase {
   public static void main(final String args[]) {
     TestRunner.run(CGAlgorithmsTest.class);
