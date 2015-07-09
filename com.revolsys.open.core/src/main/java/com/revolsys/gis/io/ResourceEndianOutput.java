@@ -11,6 +11,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.SpringUtil;
+import com.revolsys.util.WrappedException;
 
 public class ResourceEndianOutput implements EndianOutput {
   private final Resource resource;
@@ -33,14 +34,18 @@ public class ResourceEndianOutput implements EndianOutput {
   }
 
   @Override
-  public void close() throws IOException {
+  public void close() {
     try {
       this.out.close();
+    } catch (final Throwable e) {
+      throw new WrappedException(e);
     } finally {
       if (!(this.resource instanceof FileSystemResource)) {
         try {
           FileUtil.copy(this.file, this.resourceOut);
           this.resourceOut.flush();
+        } catch (final Throwable e) {
+          throw new WrappedException(e);
         } finally {
           FileUtil.closeSilent(this.resourceOut);
           if (!(this.resource instanceof FileSystemResource)) {
@@ -81,7 +86,7 @@ public class ResourceEndianOutput implements EndianOutput {
   }
 
   @Override
-  public void write(final byte[] bytes) throws IOException {
+  public void write(final byte[] bytes) {
     this.out.write(bytes);
   }
 
@@ -91,63 +96,63 @@ public class ResourceEndianOutput implements EndianOutput {
   }
 
   @Override
-  public void write(final int i) throws IOException {
+  public void write(final int i) {
     this.out.write(i);
   }
 
   @Override
-  public void writeBytes(final String s) throws IOException {
+  public void writeBytes(final String s) {
     this.out.writeBytes(s);
   }
 
   @Override
-  public void writeDouble(final double d) throws IOException {
+  public void writeDouble(final double d) {
     this.out.writeDouble(d);
   }
 
   @Override
-  public void writeFloat(final float f) throws IOException {
+  public void writeFloat(final float f) {
     this.out.writeFloat(f);
   }
 
   @Override
-  public void writeInt(final int i) throws IOException {
+  public void writeInt(final int i) {
     this.out.writeInt(i);
   }
 
   @Override
-  public void writeLEDouble(final double d) throws IOException {
+  public void writeLEDouble(final double d) {
     this.out.writeLEDouble(d);
   }
 
   @Override
-  public void writeLEFloat(final float f) throws IOException {
+  public void writeLEFloat(final float f) {
     this.out.writeLEFloat(f);
   }
 
   @Override
-  public void writeLEInt(final int i) throws IOException {
+  public void writeLEInt(final int i) {
     this.out.writeLEInt(i);
   }
 
   @Override
-  public void writeLELong(final long l) throws IOException {
+  public void writeLELong(final long l) {
     this.out.writeLELong(l);
 
   }
 
   @Override
-  public void writeLEShort(final short s) throws IOException {
+  public void writeLEShort(final short s) {
     this.out.writeLEShort(s);
   }
 
   @Override
-  public void writeLong(final long l) throws IOException {
+  public void writeLong(final long l) {
     this.out.writeLong(l);
   }
 
   @Override
-  public void writeShort(final short s) throws IOException {
+  public void writeShort(final short s) {
     this.out.writeShort(s);
   }
 

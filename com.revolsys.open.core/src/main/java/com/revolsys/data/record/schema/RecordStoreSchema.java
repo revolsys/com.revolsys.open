@@ -92,7 +92,8 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
       final RecordStoreSchema schema = (RecordStoreSchema)element;
       return schema;
     } else {
-      throw new IllegalArgumentException("Non schema element with path " + path + " already exists");
+      throw new IllegalArgumentException(
+        "Non schema element with path " + path + " already exists");
     }
   }
 
@@ -232,7 +233,8 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
         if (Property.equals(newRecordDefinition, oldRecordDefinition, "idFieldNames")) {
           if (Property.equals(newRecordDefinition, oldRecordDefinition, "idFieldIndexes")) {
             if (Property.equals(newRecordDefinition, oldRecordDefinition, "geometryFieldNames")) {
-              if (Property.equals(newRecordDefinition, oldRecordDefinition, "geometryFieldIndexes")) {
+              if (Property.equals(newRecordDefinition, oldRecordDefinition,
+                "geometryFieldIndexes")) {
                 if (Property.equals(newRecordDefinition, oldRecordDefinition, "fields")) {
                   return true;
                 }
@@ -264,10 +266,12 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
         }
       }
 
-      final Map<String, ? extends RecordStoreSchemaElement> elementsByPath = recordStore.refreshSchemaElements(this);
+      final Map<String, ? extends RecordStoreSchemaElement> elementsByPath = recordStore
+        .refreshSchemaElements(this);
 
       final Set<String> removedPaths = new HashSet<>(this.elementsByPath.keySet());
-      for (final Entry<String, ? extends RecordStoreSchemaElement> entry : elementsByPath.entrySet()) {
+      for (final Entry<String, ? extends RecordStoreSchemaElement> entry : elementsByPath
+        .entrySet()) {
         final String path = entry.getKey();
         final String upperPath = path.toUpperCase();
         removedPaths.remove(upperPath);
@@ -296,7 +300,8 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
   }
 
   protected void refreshIfNeeded() {
-    if (!this.initialized) {
+    final RecordStore recordStore = getRecordStore();
+    if (!this.initialized && recordStore.isLoadFullSchema()) {
       refresh();
     }
   }

@@ -1,12 +1,10 @@
 package com.revolsys.format.raster;
 
 import java.io.BufferedOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 
 import com.revolsys.gis.io.EndianOutputStream;
 import com.revolsys.util.Property;
-import com.revolsys.util.WrappedException;
 
 public class RasterWriter implements AutoCloseable {
 
@@ -38,11 +36,8 @@ public class RasterWriter implements AutoCloseable {
 
   @Override
   public void close() {
-    try {
-      this.out.flush();
-      this.out.close();
-    } catch (final IOException e) {
-    }
+    this.out.flush();
+    this.out.close();
   }
 
   public void property(final String name, final boolean value) {
@@ -60,39 +55,23 @@ public class RasterWriter implements AutoCloseable {
   }
 
   public void property(final String name, final double value) {
-    try {
-      writeByte(PROPERTY_DOUBLE);
-      this.out.writeDouble(value);
-    } catch (final IOException e) {
-      throw new WrappedException(e);
-    }
+    writeByte(PROPERTY_DOUBLE);
+    this.out.writeDouble(value);
   }
 
   public void property(final String name, final float value) {
-    try {
-      writeByte(PROPERTY_FLOAT);
-      this.out.writeFloat(value);
-    } catch (final IOException e) {
-      throw new WrappedException(e);
-    }
+    writeByte(PROPERTY_FLOAT);
+    this.out.writeFloat(value);
   }
 
   public void property(final String name, final int value) {
-    try {
-      writeByte(PROPERTY_INT);
-      this.out.writeInt(value);
-    } catch (final IOException e) {
-      throw new WrappedException(e);
-    }
+    writeByte(PROPERTY_INT);
+    this.out.writeInt(value);
   }
 
   public void property(final String name, final long value) {
-    try {
-      writeByte(PROPERTY_LONG);
-      this.out.writeLong(value);
-    } catch (final IOException e) {
-      throw new WrappedException(e);
-    }
+    writeByte(PROPERTY_LONG);
+    this.out.writeLong(value);
   }
 
   public void property(final String name, final Object value) {
@@ -121,21 +100,13 @@ public class RasterWriter implements AutoCloseable {
   }
 
   public void property(final String name, final short value) {
-    try {
-      writeByte(PROPERTY_SHORT);
-      this.out.writeShort(value);
-    } catch (final IOException e) {
-      throw new WrappedException(e);
-    }
+    writeByte(PROPERTY_SHORT);
+    this.out.writeShort(value);
   }
 
   public void property(final String name, final String value) {
-    try {
-      writeByte(PROPERTY_STRING);
-      this.out.writeBytes(value);
-    } catch (final IOException e) {
-      throw new WrappedException(e);
-    }
+    writeByte(PROPERTY_STRING);
+    this.out.writeBytes(value);
   }
 
   public void values(final double offset, final double scale, final double... values) {
@@ -186,10 +157,6 @@ public class RasterWriter implements AutoCloseable {
   }
 
   private void writeByte(final int value) {
-    try {
-      this.out.write(value);
-    } catch (final IOException e) {
-      throw new WrappedException(e);
-    }
+    this.out.write(value);
   }
 }

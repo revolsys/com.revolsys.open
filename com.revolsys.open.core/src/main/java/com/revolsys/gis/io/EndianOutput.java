@@ -2,8 +2,9 @@ package com.revolsys.gis.io;
 
 import java.io.IOException;
 
-public interface EndianOutput {
-  void close() throws IOException;
+public interface EndianOutput extends AutoCloseable {
+  @Override
+  void close();
 
   void flush();
 
@@ -11,7 +12,7 @@ public interface EndianOutput {
 
   long length() throws IOException;
 
-  void write(byte[] bytes) throws IOException;
+  void write(byte[] bytes);
 
   void write(byte[] bytes, int offset, int length) throws IOException;
 
@@ -21,9 +22,9 @@ public interface EndianOutput {
    * @param i The int.
    * @throws IOException If an I/O error occurs.
    */
-  void write(int i) throws IOException;
+  void write(int i);
 
-  void writeBytes(String s) throws IOException;
+  void writeBytes(String s);
 
   /**
    * Write a big endian double.
@@ -31,7 +32,7 @@ public interface EndianOutput {
    * @param d The double.
    * @throws IOException If an I/O error occurs.
    */
-  void writeDouble(double d) throws IOException;
+  void writeDouble(double d);
 
   /**
    * Write a big endian float.
@@ -39,7 +40,7 @@ public interface EndianOutput {
    * @param f The float.
    * @throws IOException If an I/O error occurs.
    */
-  void writeFloat(float f) throws IOException;
+  void writeFloat(float f);
 
   /**
    * Write a big endian int.
@@ -47,7 +48,7 @@ public interface EndianOutput {
    * @param i The int.
    * @throws IOException If an I/O error occurs.
    */
-  void writeInt(int i) throws IOException;
+  void writeInt(int i);
 
   /**
    * Write a little endian double.
@@ -55,7 +56,7 @@ public interface EndianOutput {
    * @param d The double.
    * @throws IOException If an I/O error occurs.
    */
-  void writeLEDouble(double d) throws IOException;
+  void writeLEDouble(double d);
 
   /**
    * Write a little endian float.
@@ -63,7 +64,7 @@ public interface EndianOutput {
    * @param f The float.
    * @throws IOException If an I/O error occurs.
    */
-  void writeLEFloat(float f) throws IOException;
+  void writeLEFloat(float f);
 
   /**
    * Write a little endian int.
@@ -71,7 +72,7 @@ public interface EndianOutput {
    * @param i The int.
    * @throws IOException If an I/O error occurs.
    */
-  void writeLEInt(int i) throws IOException;
+  void writeLEInt(int i);
 
   /**
    * Write a little endian int.
@@ -79,7 +80,7 @@ public interface EndianOutput {
    * @param l The long.
    * @throws IOException If an I/O error occurs.
    */
-  void writeLELong(long l) throws IOException;
+  void writeLELong(long l);
 
   /**
    * Write a little endian short.
@@ -87,7 +88,7 @@ public interface EndianOutput {
    * @param s The short.
    * @throws IOException If an I/O error occurs.
    */
-  void writeLEShort(short s) throws IOException;
+  void writeLEShort(short s);
 
   /**
    * Write a big endian int.
@@ -95,7 +96,7 @@ public interface EndianOutput {
    * @param l The long.
    * @throws IOException If an I/O error occurs.
    */
-  void writeLong(long l) throws IOException;
+  void writeLong(long l);
 
   /**
    * Write a big endian short.
@@ -103,5 +104,5 @@ public interface EndianOutput {
    * @param s The short.
    * @throws IOException If an I/O error occurs.
    */
-  void writeShort(short s) throws IOException;
+  void writeShort(short s);
 }

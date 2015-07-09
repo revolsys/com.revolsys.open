@@ -84,8 +84,8 @@ public class FgdbReader {
 
   public FgdbReader() {
     try {
-      this.in = new EndianInputStream(new FileInputStream(
-        "/Users/paustin/Downloads/KSRD_20140306.gdb/a0000000d.gdbtable"));
+      this.in = new EndianInputStream(
+        new FileInputStream("/Users/paustin/Downloads/KSRD_20140306.gdb/a0000000d.gdbtable"));
     } catch (final FileNotFoundException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -370,9 +370,9 @@ public class FgdbReader {
   }
 
   private String readUtf16String() throws IOException {
-    final int numWords = this.in.read();
-    final char[] characters = new char[numWords];
-    for (int i = 0; i < numWords; i++) {
+    final int numCharacters = this.in.read();
+    final char[] characters = new char[numCharacters];
+    for (int i = 0; i < numCharacters; i++) {
       final short c = this.in.readLEShort();
       characters[i] = (char)c;
     }

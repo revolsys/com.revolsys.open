@@ -61,6 +61,7 @@ import com.revolsys.io.filter.PatternFilenameFilter;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
+import com.revolsys.util.WrappedException;
 
 /**
  * The FileUtil class is a utility class for performing common tasks with
@@ -345,6 +346,14 @@ public final class FileUtil {
 
   public static void copy(final String text, final File file) {
     copy(new StringReader(text), file);
+  }
+
+  public static OutputStream createOutputStream(final File file) {
+    try {
+      return new FileOutputStream(file);
+    } catch (final FileNotFoundException e) {
+      throw new WrappedException(e);
+    }
   }
 
   /**

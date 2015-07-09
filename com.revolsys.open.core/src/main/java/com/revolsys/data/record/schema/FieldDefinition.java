@@ -79,17 +79,17 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
   public FieldDefinition() {
   }
 
-  public FieldDefinition(final FieldDefinition attribute) {
-    this.name = attribute.getName();
-    this.title = attribute.getTitle();
-    this.description = attribute.getDescription();
-    this.type = attribute.getType();
-    this.required = attribute.isRequired();
-    this.length = attribute.getLength();
-    this.scale = attribute.getScale();
-    this.minValue = attribute.getMinValue();
-    this.maxValue = attribute.getMaxValue();
-    final Map<String, Object> properties = attribute.getProperties();
+  public FieldDefinition(final FieldDefinition field) {
+    this.name = field.getName();
+    this.title = field.getTitle();
+    this.description = field.getDescription();
+    this.type = field.getType();
+    this.required = field.isRequired();
+    this.length = field.getLength();
+    this.scale = field.getScale();
+    this.minValue = field.getMinValue();
+    this.maxValue = field.getMaxValue();
+    final Map<String, Object> properties = field.getProperties();
     setProperties(properties);
   }
 
