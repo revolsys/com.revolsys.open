@@ -1,10 +1,10 @@
 package com.revolsys.jts.testold.noding;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.noding.SegmentPointComparator;
+
+import junit.framework.TestCase;
 
 /**
  * Test IntersectionSegment#compareNodePosition

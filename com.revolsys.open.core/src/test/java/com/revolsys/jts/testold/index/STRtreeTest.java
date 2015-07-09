@@ -36,8 +36,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -48,6 +46,8 @@ import com.revolsys.jts.index.strtree.AbstractNode;
 import com.revolsys.jts.index.strtree.ItemBoundable;
 import com.revolsys.jts.index.strtree.STRtree;
 import com.revolsys.jts.testold.util.SerializationUtil;
+
+import junit.framework.TestCase;
 
 /**
  * @version 1.7

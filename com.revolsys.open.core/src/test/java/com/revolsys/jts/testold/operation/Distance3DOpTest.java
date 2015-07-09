@@ -1,13 +1,13 @@
 package com.revolsys.jts.testold.operation;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.distance3d.Distance3DOp;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 public class Distance3DOpTest extends TestCase {
   static GeometryFactory geomFact = GeometryFactory.floating3();

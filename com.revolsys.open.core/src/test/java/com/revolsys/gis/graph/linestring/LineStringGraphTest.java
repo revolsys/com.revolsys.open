@@ -2,10 +2,10 @@ package com.revolsys.gis.graph.linestring;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+
+import junit.framework.Assert;
 
 public class LineStringGraphTest {
   GeometryFactory geometryFactory = GeometryFactory.fixed(3005, 1000.0);

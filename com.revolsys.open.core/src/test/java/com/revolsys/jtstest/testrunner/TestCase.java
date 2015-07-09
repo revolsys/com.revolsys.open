@@ -39,8 +39,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Test;
-
 import org.springframework.util.StringUtils;
 
 import com.revolsys.io.map.MapSerializer;
@@ -48,6 +46,8 @@ import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.Property;
+
+import junit.framework.Test;
 
 /**
  *  A set of tests for two Geometry's.

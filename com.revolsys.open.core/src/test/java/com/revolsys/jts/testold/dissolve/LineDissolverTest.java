@@ -2,13 +2,13 @@ package com.revolsys.jts.testold.dissolve;
 
 import java.util.List;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.dissolve.LineDissolver;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.testold.junit.GeometryUtils;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 public class LineDissolverTest extends TestCase {
   public static void main(final String args[]) {

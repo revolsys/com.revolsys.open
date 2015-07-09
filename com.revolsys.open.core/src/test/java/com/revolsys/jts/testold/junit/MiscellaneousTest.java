@@ -33,9 +33,6 @@
 
 package com.revolsys.jts.testold.junit;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -53,6 +50,9 @@ import com.revolsys.jts.geom.impl.MultiPointImpl;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.util.Assert;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 /**
  * @version 1.7

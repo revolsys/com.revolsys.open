@@ -18,26 +18,16 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 
 public class FileGdbTable {
-  private final File file;
-
   private final LittleEndianRandomAccessFile out;
-
-  private RecordDefinition recordDefinition;
 
   private final long fieldHeaderOffset = 40;
 
-  private long recordsOffset;
-
   public FileGdbTable(final File file) {
-    this.file = file;
     this.out = new LittleEndianRandomAccessFile(file, "rw");
   }
 
   public FileGdbTable(final File file, final RecordDefinition recordDefinition) {
-    this.file = file;
     this.out = new LittleEndianRandomAccessFile(file, "rw");
-    this.recordDefinition = recordDefinition;
-
     writeFieldHeader(recordDefinition);
   }
 
@@ -119,32 +109,6 @@ public class FileGdbTable {
     this.out.write(0xAD);
     this.out.write(0xBE);
     this.out.write(0xEF);
-  }
-
-  private void writeHeader() {
-    // Magic
-    this.out.write(0x03);
-    this.out.write(0);
-    this.out.write(0);
-    this.out.write(0);
-
-    this.out.writeLEInt(0); // Number of valid rows
-
-    // 4 bytes: varying values - unknown role (TBC : this value does have
-    // something to do with row size. A value larger than the size of the
-    // largest row seems to be ok)
-
-    this.out.write(0x03);
-    this.out.write(0);
-    this.out.write(0);
-    this.out.write(0);
-
-    this.out.writeLEInt(0); // Unknown
-    this.out.writeLEInt(0); // Unknown
-    this.out.writeLEInt(40); // file size in bytes
-    this.out.writeLEInt(0); // Unknown
-    this.out.writeLEInt(40); // field description header offset
-    this.out.writeLEInt(0); // Unknown
   }
 
   private void writeUtf16String255(final String string) {

@@ -1,10 +1,10 @@
 package com.revolsys.jts.testold.operation;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.io.ParseException;
+
+import junit.framework.TestCase;
 
 public class FixedPrecisionSnappingTest extends TestCase {
   private final GeometryFactory factory = GeometryFactory.fixed(0, 1.0);

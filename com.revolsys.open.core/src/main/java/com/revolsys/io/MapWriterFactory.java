@@ -22,15 +22,15 @@ public interface MapWriterFactory extends FileIoFactory {
     return createMapWriter(writer);
   }
 
+  default MapWriter createMapWriter(final Path path) {
+    final PathResource resource = new PathResource(path);
+    return createMapWriter(resource);
+  }
+
   default MapWriter createMapWriter(final Resource resource) {
     final java.io.Writer writer = SpringUtil.getWriter(resource);
     return createMapWriter(writer);
   }
 
   MapWriter createMapWriter(final Writer out);
-
-  default MapWriter createMapWriter(final Path path) {
-    final PathResource resource = new PathResource(path);
-    return createMapWriter(resource);
-  }
 }

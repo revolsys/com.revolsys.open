@@ -2,10 +2,6 @@ package com.revolsys.jts.test.geometry.operation;
 
 import java.util.Map;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.junit.Assert;
 import org.springframework.core.io.ClassPathResource;
 
@@ -19,6 +15,10 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.operation.buffer.Buffer;
 import com.revolsys.jts.operation.buffer.BufferParameters;
 import com.revolsys.jts.test.geometry.TestUtil;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 public class BufferTest extends TestCase {
 

@@ -141,7 +141,7 @@ public class FileField extends ValueField implements Field {
   @Override
   public void setFieldValid() {
     super.setFieldValid();
-    this.fileName.setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
+    this.fileName.setSelectedTextColor(Field.DEFAULT_SELECTED_FOREGROUND);
   }
 
   @Override

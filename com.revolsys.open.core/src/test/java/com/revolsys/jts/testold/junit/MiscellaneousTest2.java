@@ -35,8 +35,6 @@ package com.revolsys.jts.testold.junit;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.geom.Geometry;
@@ -50,6 +48,8 @@ import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.planargraph.DirectedEdge;
 import com.revolsys.jts.planargraph.Node;
 import com.revolsys.jts.util.UniqueCoordinateArrayFilter;
+
+import junit.framework.TestCase;
 
 /**
  * @version 1.7

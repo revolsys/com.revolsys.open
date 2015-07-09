@@ -1,8 +1,8 @@
 package com.revolsys.jts.testold.util;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.util.PriorityQueue;
+
+import junit.framework.TestCase;
 
 /**
  * @version 1.7

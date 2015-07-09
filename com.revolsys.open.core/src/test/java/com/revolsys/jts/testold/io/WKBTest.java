@@ -2,9 +2,6 @@ package com.revolsys.jts.testold.io;
 
 import java.io.IOException;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -16,6 +13,9 @@ import com.revolsys.jts.io.WKBReader;
 import com.revolsys.jts.io.WKBWriter;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.util.GeometricShapeFactory;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 /**
  * Tests the {@link WKBReader} and {@link WKBWriter}.

@@ -37,11 +37,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import junit.framework.Assert;
-
 import com.revolsys.beans.Classes;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jtstest.testrunner.StringUtil;
+
+import junit.framework.Assert;
 
 /**
  * A {@link GeometryFunction} which calls a static

@@ -34,14 +34,14 @@ package com.revolsys.jts.testold.algorithm;
 
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.springframework.core.io.ClassPathResource;
 
 import com.revolsys.gis.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
+
+import junit.framework.TestCase;
 
 public class InteriorPointTest extends TestCase {
   public static List<Geometry> getTestGeometries(final String file) {

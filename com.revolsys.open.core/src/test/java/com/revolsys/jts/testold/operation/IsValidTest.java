@@ -32,9 +32,6 @@
  */
 package com.revolsys.jts.testold.operation;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -43,6 +40,9 @@ import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.valid.CoordinateNaNError;
 import com.revolsys.jts.operation.valid.GeometryValidationError;
 import com.revolsys.jts.operation.valid.IsValidOp;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 /**
  * @version 1.7

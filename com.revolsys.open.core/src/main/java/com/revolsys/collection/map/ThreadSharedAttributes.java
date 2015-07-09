@@ -26,14 +26,6 @@ public class ThreadSharedAttributes {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T getDefaultAttribute(final Object name) {
-    synchronized (defaultAttributes) {
-      final T value = (T)defaultAttributes.get(name);
-      return value;
-    }
-  }
-
-  @SuppressWarnings("unchecked")
   public static <T> T getAttribute(final Object name) {
     final Map<Object, Object> attributes = getLocalAttributes();
     synchronized (attributes) {
@@ -54,6 +46,14 @@ public class ThreadSharedAttributes {
         }
       }
       return map;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> T getDefaultAttribute(final Object name) {
+    synchronized (defaultAttributes) {
+      final T value = (T)defaultAttributes.get(name);
+      return value;
     }
   }
 

@@ -154,8 +154,8 @@ public class Slider extends JSlider implements Field, FocusListener, ChangeListe
 
   @Override
   public void setFieldValid() {
-    setForeground(TextField.DEFAULT_FOREGROUND);
-    setBackground(TextField.DEFAULT_BACKGROUND);
+    setForeground(Field.DEFAULT_FOREGROUND);
+    setBackground(Field.DEFAULT_BACKGROUND);
     this.errorMessage = null;
     super.setToolTipText(this.originalToolTip);
   }

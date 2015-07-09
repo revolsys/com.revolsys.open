@@ -32,15 +32,15 @@
  */
 package com.revolsys.jts.testold.operation;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.BoundaryOp;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 /**
  * Tests {@link BoundaryOp} with different {@link BoundaryNodeRule}s.

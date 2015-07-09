@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.operation.union.CascadedPolygonUnion;
 import com.revolsys.jts.testold.junit.GeometryUtils;
+
+import junit.framework.TestCase;
 
 /**
  * Large-scale tests of {@link CascadedPolygonUnion}

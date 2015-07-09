@@ -35,7 +35,7 @@ public interface Field extends Cloneable {
 
   default void setFieldBackgroundColor(Color color) {
     if (color == null) {
-      color = TextField.DEFAULT_BACKGROUND;
+      color = Field.DEFAULT_BACKGROUND;
     }
     if (this instanceof JComponent) {
       final JComponent component = (JComponent)this;
@@ -45,7 +45,7 @@ public interface Field extends Cloneable {
 
   default void setFieldForegroundColor(Color color) {
     if (color == null) {
-      color = TextField.DEFAULT_BACKGROUND;
+      color = Field.DEFAULT_BACKGROUND;
     }
     if (this instanceof JComponent) {
       final JComponent component = (JComponent)this;

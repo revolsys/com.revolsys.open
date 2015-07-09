@@ -601,7 +601,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
           } else {
             final LineMerger merger = new LineMerger();
             merger.add(geometry);
-            final List<LineString> mergedLineStrings = (List<LineString>)merger.getMergedLineStrings();
+            final List<LineString> mergedLineStrings = merger.getMergedLineStrings();
             if (mergedLineStrings.size() == 1) {
               return (V)mergedLineStrings.get(0);
             }

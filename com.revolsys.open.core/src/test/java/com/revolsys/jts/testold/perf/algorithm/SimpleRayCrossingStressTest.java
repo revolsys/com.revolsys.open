@@ -32,9 +32,6 @@
  */
 package com.revolsys.jts.testold.perf.algorithm;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.geom.Geometry;
@@ -43,6 +40,9 @@ import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.testold.algorithm.PerturbedGridPolygonBuilder;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 public class SimpleRayCrossingStressTest extends TestCase {
 

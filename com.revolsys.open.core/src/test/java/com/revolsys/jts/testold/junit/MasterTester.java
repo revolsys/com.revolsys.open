@@ -33,8 +33,6 @@
 
 package com.revolsys.jts.testold.junit;
 
-import junit.framework.TestCase;
-
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -78,6 +76,8 @@ import com.revolsys.jts.testold.operation.ValidClosedRingTest;
 import com.revolsys.jts.testold.operation.ValidSelfTouchingRingFormingHoleTest;
 import com.revolsys.jts.testold.triangulate.ConformingDelaunayTest;
 import com.revolsys.jts.testold.triangulate.DelaunayTest;
+
+import junit.framework.TestCase;
 
 /**
  * A collection of all the tests.

@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -29,6 +26,9 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.test.geometry.GeometryTestUtil;
 import com.revolsys.jts.test.geometry.TestUtil;
 import com.revolsys.junit.InvokeMethodTestCase;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 @RunWith(Suite.class)
 @SuiteClasses({

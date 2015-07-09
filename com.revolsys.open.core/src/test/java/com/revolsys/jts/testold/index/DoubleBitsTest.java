@@ -32,10 +32,10 @@
  */
 package com.revolsys.jts.testold.index;
 
+import com.revolsys.jts.index.DoubleBits;
+
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
-
-import com.revolsys.jts.index.DoubleBits;
 
 /**
  * Tests DoubleBits

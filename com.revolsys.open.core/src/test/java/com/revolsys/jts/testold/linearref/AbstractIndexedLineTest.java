@@ -1,11 +1,11 @@
 package com.revolsys.jts.testold.linearref;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
+
+import junit.framework.TestCase;
 
 /**
  * Base class for linear referencing class unit tests.

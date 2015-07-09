@@ -2,9 +2,9 @@ package com.revolsys.junit;
 
 import java.util.Collection;
 
-import junit.framework.TestCase;
-
 import com.revolsys.util.Property;
+
+import junit.framework.TestCase;
 
 public class InvokeMethodTestCase extends TestCase {
 

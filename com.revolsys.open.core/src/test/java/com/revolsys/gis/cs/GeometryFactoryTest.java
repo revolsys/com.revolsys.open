@@ -1,7 +1,5 @@
 package com.revolsys.gis.cs;
 
-import junit.framework.Assert;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -13,6 +11,8 @@ import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.LineStringDouble;
+
+import junit.framework.Assert;
 
 public class GeometryFactoryTest {
   private static GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(3857, 1.0);

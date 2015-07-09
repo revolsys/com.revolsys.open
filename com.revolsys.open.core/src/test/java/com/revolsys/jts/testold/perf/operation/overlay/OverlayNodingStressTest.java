@@ -2,14 +2,14 @@ package com.revolsys.jts.testold.perf.operation.overlay;
 
 import java.util.Random;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.operation.overlay.snap.SnapIfNeededOverlayOp;
+
+import junit.framework.TestCase;
 
 /**
  * Tests Noding checking during overlay.

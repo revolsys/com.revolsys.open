@@ -1,9 +1,9 @@
 package com.revolsys.jts.testold.math;
 
+import com.revolsys.jts.math.DD;
+
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
-
-import com.revolsys.jts.math.DD;
 
 /**
  * Tests I/O for {@link DD}s.

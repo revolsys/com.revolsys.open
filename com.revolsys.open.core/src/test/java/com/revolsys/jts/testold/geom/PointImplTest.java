@@ -33,13 +33,13 @@
 
 package com.revolsys.jts.testold.geom;
 
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
-
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
 
 /**
  * Test for com.revolsys.jts.testold.geom.impl.PointImpl.

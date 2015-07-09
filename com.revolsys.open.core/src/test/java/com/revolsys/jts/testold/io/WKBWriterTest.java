@@ -1,12 +1,12 @@
 package com.revolsys.jts.testold.io;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKBReader;
 import com.revolsys.jts.io.WKBWriter;
+
+import junit.framework.TestCase;
 
 public class WKBWriterTest extends TestCase {
 

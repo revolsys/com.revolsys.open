@@ -1,13 +1,13 @@
 package com.revolsys.jts.testold.precision;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.precision.MinimumClearance;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 public class MinimumClearanceTest extends TestCase {
   public static void main(final String args[]) {

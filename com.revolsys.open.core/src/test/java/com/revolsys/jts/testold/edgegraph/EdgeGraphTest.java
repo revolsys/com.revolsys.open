@@ -2,9 +2,6 @@ package com.revolsys.jts.testold.edgegraph;
 
 import java.util.List;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.edgegraph.EdgeGraph;
 import com.revolsys.jts.edgegraph.EdgeGraphBuilder;
 import com.revolsys.jts.edgegraph.HalfEdge;
@@ -12,6 +9,9 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.testold.junit.GeometryUtils;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 public class EdgeGraphTest extends TestCase {
   public static void main(final String args[]) {

@@ -32,11 +32,11 @@
  */
 package com.revolsys.jts.testold.index;
 
-import junit.framework.TestCase;
-
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.testold.util.SerializationUtil;
+
+import junit.framework.TestCase;
 
 /**
  * @version 1.7

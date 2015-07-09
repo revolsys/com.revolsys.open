@@ -32,15 +32,15 @@
  */
 package com.revolsys.jts.testold.triangulate;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.triangulate.DelaunayTriangulationBuilder;
 import com.revolsys.jts.triangulate.quadedge.QuadEdgeSubdivision;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 /**
  * Tests Voronoi diagram generation

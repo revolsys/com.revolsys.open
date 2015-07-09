@@ -2,12 +2,12 @@ package com.revolsys.jtstest.testrunner;
 
 import java.io.File;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.util.Property;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 public class TestDirectory extends TestSuite {
 

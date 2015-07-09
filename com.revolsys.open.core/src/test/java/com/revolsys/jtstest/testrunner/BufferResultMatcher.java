@@ -32,10 +32,10 @@
  */
 package com.revolsys.jtstest.testrunner;
 
-import junit.framework.Assert;
-
 import com.revolsys.jts.algorithm.distance.DiscreteHausdorffDistance;
 import com.revolsys.jts.geom.Geometry;
+
+import junit.framework.Assert;
 
 /**
  * A {@link ResultMatcher} which compares the results of

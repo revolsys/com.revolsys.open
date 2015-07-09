@@ -530,11 +530,12 @@ public abstract class AbstractLineString extends AbstractGeometry implements Lin
   }
 
   @Override
-  public Point getToPoint() {
+  public Point getFromPoint() {
     if (isEmpty()) {
       return null;
+    } else {
+      return getPoint(0);
     }
-    return getPoint(getVertexCount() - 1);
   }
 
   /**
@@ -638,12 +639,11 @@ public abstract class AbstractLineString extends AbstractGeometry implements Lin
   }
 
   @Override
-  public Point getFromPoint() {
+  public Point getToPoint() {
     if (isEmpty()) {
       return null;
-    } else {
-      return getPoint(0);
     }
+    return getPoint(getVertexCount() - 1);
   }
 
   @Override

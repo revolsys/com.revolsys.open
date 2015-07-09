@@ -32,11 +32,11 @@
  */
 package com.revolsys.jts.testold.geom.prep;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.prep.PreparedPolygon;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 /**
  * Stress tests {@link PreparedPolygon} for
