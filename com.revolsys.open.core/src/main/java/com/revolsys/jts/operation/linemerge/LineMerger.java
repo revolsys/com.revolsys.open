@@ -34,14 +34,18 @@ package com.revolsys.jts.operation.linemerge;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.planargraph.GraphComponent;
 import com.revolsys.jts.planargraph.Node;
 import com.revolsys.jts.util.Assert;
+import com.revolsys.util.Property;
 
 /**
  * Merges a collection of linear components to form maximal-length linestrings.
@@ -66,13 +70,26 @@ import com.revolsys.jts.util.Assert;
  * @version 1.7
  */
 public class LineMerger {
+
+  public static List<LineString> merge(final Collection<? extends LineString> lines) {
+    if (Property.hasValue(lines)) {
+      if (lines.size() == 1) {
+        return Lists.array(lines);
+      } else {
+        final LineMerger lineMerger = new LineMerger(lines);
+        return lineMerger.getMergedLineStrings();
+      }
+    }
+    return Collections.emptyList();
+  }
+
   private final LineMergeGraph graph = new LineMergeGraph();
 
-  private Collection mergedLineStrings = null;
+  private List<LineString> mergedLineStrings = null;
 
   private GeometryFactory factory = null;
 
-  private Collection edgeStrings = null;
+  private List<EdgeString> edgeStrings = null;
 
   /**
    * Creates a new line merger.
@@ -82,6 +99,10 @@ public class LineMerger {
 
   }
 
+  public LineMerger(final Collection<? extends LineString> lines) {
+    add(lines);
+  }
+
   /**
    * Adds a collection of Geometries to be processed. May be called multiple times.
    * Any dimension of Geometry may be added; the constituent linework will be
@@ -89,10 +110,9 @@ public class LineMerger {
    *
    * @param geometries the geometries to be line-merged
    */
-  public void add(final Collection geometries) {
+  public void add(final Collection<? extends Geometry> geometries) {
     this.mergedLineStrings = null;
-    for (final Iterator i = geometries.iterator(); i.hasNext();) {
-      final Geometry geometry = (Geometry)i.next();
+    for (final Geometry geometry : geometries) {
       add(geometry);
     }
   }
@@ -172,7 +192,7 @@ public class LineMerger {
    *
    * @return the collection of merged LineStrings
    */
-  public Collection getMergedLineStrings() {
+  public List<LineString> getMergedLineStrings() {
     merge();
     return this.mergedLineStrings;
   }
@@ -186,13 +206,13 @@ public class LineMerger {
     GraphComponent.setMarked(this.graph.nodeIterator(), false);
     GraphComponent.setMarked(this.graph.edgeIterator(), false);
 
-    this.edgeStrings = new ArrayList();
+    this.edgeStrings = new ArrayList<EdgeString>();
     buildEdgeStringsForObviousStartNodes();
     buildEdgeStringsForIsolatedLoops();
-    this.mergedLineStrings = new ArrayList();
-    for (final Iterator i = this.edgeStrings.iterator(); i.hasNext();) {
-      final EdgeString edgeString = (EdgeString)i.next();
-      this.mergedLineStrings.add(edgeString.toLineString());
+    this.mergedLineStrings = new ArrayList<LineString>();
+    for (final EdgeString edgeString : this.edgeStrings) {
+      final LineString line = edgeString.toLineString();
+      this.mergedLineStrings.add(line);
     }
   }
 }

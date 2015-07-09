@@ -2,9 +2,16 @@ package com.revolsys.jts.geom.impl;
 
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.util.MathUtil;
 
 public class PointDouble2D extends AbstractPoint {
   private static final long serialVersionUID = 1L;
+
+  public static PointDouble2D create(final Point point, final double scaleFactor) {
+    final double x = MathUtil.makePrecise(scaleFactor, point.getX());
+    final double y = MathUtil.makePrecise(scaleFactor, point.getY());
+    return new PointDouble2D(x, y);
+  }
 
   private final double x;
 

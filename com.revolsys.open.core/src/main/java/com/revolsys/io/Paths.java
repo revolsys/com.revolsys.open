@@ -13,6 +13,10 @@ import java.util.List;
 import com.revolsys.util.WrappedException;
 
 public class Paths {
+  public static boolean exists(final Path path) {
+    return Files.exists(path);
+  }
+
   public static Path get(final String first, final String... more) {
     return java.nio.file.Paths.get(first, more);
   }
@@ -53,6 +57,20 @@ public class Paths {
   public static List<String> getFileNameExtensions(final Path path) {
     final String fileName = getFileName(path);
     return FileUtil.getFileNameExtensions(fileName);
+  }
+
+  public static Path getPath(final Path path) {
+    return path.toAbsolutePath();
+  }
+
+  public static Path getPath(final Path parent, final String path) {
+    final Path childPath = parent.resolve(path);
+    return getPath(childPath);
+  }
+
+  public static Path getPath(final String name) {
+    final Path path = Paths.get(name);
+    return getPath(path);
   }
 
   public static boolean isHidden(final Path path) {

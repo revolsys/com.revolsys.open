@@ -38,8 +38,13 @@ public class Maps {
     return count;
   }
 
-  public static <K1, V> boolean addToList(final Map<K1, List<V>> map, final K1 key1,
-    final V value) {
+  public static <K1, K2, V> boolean addToList(final Factory<Map<K2, List<V>>> factory,
+    final Map<K1, Map<K2, List<V>>> map, final K1 key1, final K2 key2, final V value) {
+    final List<V> values = getList(factory, map, key1, key2);
+    return values.add(value);
+  }
+
+  public static <K1, V> boolean addToList(final Map<K1, List<V>> map, final K1 key1, final V value) {
     final List<V> values = getList(map, key1);
     return values.add(value);
   }
@@ -73,8 +78,7 @@ public class Maps {
     return values.add(value);
   }
 
-  public static <K1, V> boolean addToTreeSet(final Map<K1, Set<V>> map, final K1 key1,
-    final V value) {
+  public static <K1, V> boolean addToTreeSet(final Map<K1, Set<V>> map, final K1 key1, final V value) {
     final Set<V> values = getTreeSet(map, key1);
     if (values == null) {
       return false;
@@ -312,6 +316,13 @@ public class Maps {
     }
   }
 
+  public static <K1, K2, V> List<V> getList(final Factory<Map<K2, List<V>>> factory,
+    final Map<K1, Map<K2, List<V>>> map, final K1 key1, final K2 key2) {
+    final Map<K2, List<V>> map2 = getMap(factory, map, key1);
+    final List<V> list = getList(map2, key2);
+    return list;
+  }
+
   public static <K, V> List<V> getList(final Map<K, List<V>> map, final K key) {
     List<V> list = map.get(key);
     if (list == null) {
@@ -523,8 +534,8 @@ public class Maps {
     return values.put(key2, value);
   }
 
-  public static <K, V extends Comparable<V>> void putIfGreaterThan(final Map<K, V> map, final K key,
-    final V value) {
+  public static <K, V extends Comparable<V>> void putIfGreaterThan(final Map<K, V> map,
+    final K key, final V value) {
     synchronized (map) {
       final V lastValue = map.get(key);
       if (lastValue == null || value.compareTo(lastValue) > 1) {

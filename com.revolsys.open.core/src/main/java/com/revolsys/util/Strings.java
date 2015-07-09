@@ -11,7 +11,7 @@ public class Strings {
   }
 
   public static boolean endsWith(final String text, final String suffix) {
-    if (text != null && Property.hasValue(suffix)) {
+    if (text != null && suffix != null) {
       return text.endsWith(suffix);
     } else {
       return false;
@@ -105,6 +105,14 @@ public class Strings {
       return false;
     } else {
       return text.matches(regex);
+    }
+  }
+
+  public static boolean startsWith(final String text, final String prefix) {
+    if (text != null && prefix != null) {
+      return text.startsWith(prefix);
+    } else {
+      return false;
     }
   }
 

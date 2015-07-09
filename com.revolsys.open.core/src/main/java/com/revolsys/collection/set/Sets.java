@@ -1,6 +1,7 @@
 package com.revolsys.collection.set;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -69,6 +70,12 @@ public class Sets {
     if (value != null) {
       set.add(value);
     }
+    return set;
+  }
+
+  public static <V> TreeSet<V> tree(final Comparator<V> comparator, final Iterable<V> values) {
+    final TreeSet<V> set = new TreeSet<>(comparator);
+    addAll(set, values);
     return set;
   }
 

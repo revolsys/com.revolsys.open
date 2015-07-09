@@ -117,9 +117,6 @@ public class BaseMain implements UncaughtExceptionHandler {
           logError(e);
         }
       });
-      synchronized (this) {
-        wait();
-      }
     } catch (final Throwable e) {
       logError(e);
     }

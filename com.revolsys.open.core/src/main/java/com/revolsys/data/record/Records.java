@@ -3,6 +3,7 @@ package com.revolsys.data.record;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -178,8 +179,7 @@ public final class Records {
         return number.intValue() == 1;
       } else {
         final String stringValue = value.toString();
-        if (stringValue.equals("Y") || stringValue.equals("1")
-          || Boolean.parseBoolean(stringValue)) {
+        if (stringValue.equals("Y") || stringValue.equals("1") || Boolean.parseBoolean(stringValue)) {
           return true;
         } else {
           return false;
@@ -464,6 +464,15 @@ public final class Records {
       value = value1 + separator + value2;
     }
     record.put(fieldName, value);
+  }
+
+  public static void removeDeleted(final Collection<? extends Record> records) {
+    for (final Iterator<? extends Record> iterator = records.iterator(); iterator.hasNext();) {
+      final Record record = iterator.next();
+      if (record == null || record.getState() == RecordState.Deleted) {
+        iterator.remove();
+      }
+    }
   }
 
   public static void setValues(final Record target, final Record source,

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +17,7 @@ import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryComponent;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineEnd;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
@@ -747,20 +747,6 @@ public final class LineStringUtil {
     }
   }
 
-  public static LineString merge(final List<LineString> lines) {
-    final Iterator<LineString> iterator = lines.iterator();
-    if (!iterator.hasNext()) {
-      return null;
-    } else {
-      LineString line = iterator.next();
-      while (iterator.hasNext()) {
-        final LineString nextLine = iterator.next();
-        line = line.merge(nextLine);
-      }
-      return line;
-    }
-  }
-
   public static Point midPoint(final LineString line) {
     if (line.isEmpty()) {
       return null;
@@ -788,6 +774,33 @@ public final class LineStringUtil {
       } else {
         return line.getPoint(0);
       }
+    }
+  }
+
+  public static Point pointOffset(final LineString line, final LineEnd lineEnd,
+    final double xOffset, double yOffset) {
+    if (line.getLength() == 0) {
+      return line.getFromPoint();
+    } else {
+      Point point1;
+      Point point2;
+      if (LineEnd.isFrom(lineEnd)) {
+        point1 = line.getPoint(0);
+        int i = 1;
+        do {
+          point2 = line.getPoint(i);
+          i++;
+        } while (point1.equals(point2));
+      } else {
+        point1 = line.getPoint(-1);
+        int i = -2;
+        do {
+          point2 = line.getPoint(i);
+          i--;
+        } while (point1.equals(point2));
+        yOffset = -yOffset;
+      }
+      return Points.pointOffset(point1, point2, xOffset, yOffset);
     }
   }
 
