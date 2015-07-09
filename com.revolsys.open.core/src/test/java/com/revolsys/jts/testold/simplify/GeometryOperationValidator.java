@@ -1,9 +1,9 @@
 package com.revolsys.jts.testold.simplify;
 
-import junit.framework.Assert;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.io.WKTReader;
+
+import junit.framework.Assert;
 
 /**
  * Runs various validation tests on a the results of a geometry operation

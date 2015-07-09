@@ -344,7 +344,8 @@ public final class EpsgCoordinateSystemsLoader {
   private void loadProjectedCoordinateSystems() throws IOException {
     final Map<Integer, String> coordinateOperationMethodNames = loadCoordinateOperationMethodNames();
     final Map<Integer, String> coordinateOperationParamNames = loadCoordinateOperationParamNames();
-    final Map<Integer, Map<String, Object>> coordinateOperationParamValues = loadCoordinateOperationParamValues(coordinateOperationParamNames);
+    final Map<Integer, Map<String, Object>> coordinateOperationParamValues = loadCoordinateOperationParamValues(
+      coordinateOperationParamNames);
     final Map<Integer, Integer> coordinateOperationMethods = loadCoordinateOperations();
     final Reader<Record> reader = this.recordStore.query("/public/epsg_coordinatereferencesystem");
     final File file = new File(
@@ -365,7 +366,8 @@ public final class EpsgCoordinateSystemsLoader {
           final Integer projectionConvCode = object.getInteger("projection_conv_code");
           final boolean deprecated = isDeprecated(object);
 
-          final Map<String, Object> parameters = coordinateOperationParamValues.get(projectionConvCode);
+          final Map<String, Object> parameters = coordinateOperationParamValues
+            .get(projectionConvCode);
           final Integer methodCode = coordinateOperationMethods.get(projectionConvCode);
           final String methodName = coordinateOperationMethodNames.get(methodCode);
           if (methodCode == null) {
@@ -423,12 +425,12 @@ public final class EpsgCoordinateSystemsLoader {
     final Reader<Record> reader = this.recordStore.query(query);
     final File linearFile = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/linearunit.csv");
-    final CsvWriter linearWriter = new CsvWriter(FileUtil.createUtf8Writer(new FileOutputStream(
-      linearFile)));
+    final CsvWriter linearWriter = new CsvWriter(
+      FileUtil.createUtf8Writer(new FileOutputStream(linearFile)));
     final File angularFile = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/angularunit.csv");
-    final CsvWriter angularWriter = new CsvWriter(FileUtil.createUtf8Writer(new FileOutputStream(
-      angularFile)));
+    final CsvWriter angularWriter = new CsvWriter(
+      FileUtil.createUtf8Writer(new FileOutputStream(angularFile)));
     try {
       linearWriter.write("ID", "NAME", "BASE_ID", "CONVERSION_FACTOR", "DEPRECATED");
       angularWriter.write("ID", "NAME", "BASE_ID", "CONVERSION_FACTOR", "DEPRECATED");

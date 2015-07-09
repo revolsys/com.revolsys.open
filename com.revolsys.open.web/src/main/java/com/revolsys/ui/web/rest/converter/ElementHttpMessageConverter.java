@@ -15,8 +15,8 @@ import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class ElementHttpMessageConverter extends AbstractHttpMessageConverter<Element> {
 
-  private static final Collection<MediaType> WRITE_MEDIA_TYPES = Arrays.asList(
-    MediaType.APPLICATION_XHTML_XML, MediaType.TEXT_HTML);
+  private static final Collection<MediaType> WRITE_MEDIA_TYPES = Arrays
+    .asList(MediaType.APPLICATION_XHTML_XML, MediaType.TEXT_HTML);
 
   public ElementHttpMessageConverter() {
     super(Element.class, Collections.emptySet(), WRITE_MEDIA_TYPES);

@@ -63,7 +63,8 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     final double y1 = y - height / 2;
     final double x2 = x1 + width;
     final double y2 = y1 + height;
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(getGeometryFactory(), 2, x1, y1, x2, y2);
+    final BoundingBox boundingBox = new BoundingBoxDoubleGf(getGeometryFactory(), 2, x1, y1, x2,
+      y2);
     return boundingBox;
   }
 
@@ -261,8 +262,8 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
       final double logMinY = Math.log10(Math.abs(minY));
       final double logMaxX = Math.log10(Math.abs(maxX));
       final double logMaxY = Math.log10(Math.abs(maxY));
-      final double maxLog = Math.abs(Math.max(Math.max(logMinX, logMinY),
-        Math.max(logMaxX, logMaxY)));
+      final double maxLog = Math
+        .abs(Math.max(Math.max(logMinX, logMinY), Math.max(logMaxX, logMaxY)));
       this.maxIntegerDigits = (int)Math.floor(maxLog + 1);
       this.maxDecimalDigits = 15 - this.maxIntegerDigits;
       getPropertyChangeSupport().firePropertyChange("geometryFactory", oldGeometryFactory,

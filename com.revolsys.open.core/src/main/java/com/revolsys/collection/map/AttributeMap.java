@@ -25,7 +25,8 @@ public class AttributeMap extends LinkedHashMap<String, Object> {
     super(initialCapacity, loadFactor);
   }
 
-  public AttributeMap(final int initialCapacity, final float loadFactor, final boolean accessOrder) {
+  public AttributeMap(final int initialCapacity, final float loadFactor,
+    final boolean accessOrder) {
     super(initialCapacity, loadFactor, accessOrder);
   }
 

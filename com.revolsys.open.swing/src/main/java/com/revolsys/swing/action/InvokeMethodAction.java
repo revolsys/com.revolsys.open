@@ -20,8 +20,8 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
 
   private static final long serialVersionUID = -5339626097125548212L;
 
-  public static JButton createButton(final CharSequence name, final String toolTip,
-    final Icon icon, final Object object, final String methodName, final Object... parameters) {
+  public static JButton createButton(final CharSequence name, final String toolTip, final Icon icon,
+    final Object object, final String methodName, final Object... parameters) {
     final InvokeMethodAction action = new InvokeMethodAction(name, toolTip, icon, true, object,
       methodName, parameters);
     return action.createButton();
@@ -71,8 +71,8 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
   public InvokeMethodAction() {
   }
 
-  public InvokeMethodAction(final CharSequence name, final boolean invokeLater,
-    final Object object, final String methodName, final Object... parameters) {
+  public InvokeMethodAction(final CharSequence name, final boolean invokeLater, final Object object,
+    final String methodName, final Object... parameters) {
     this(name, null, invokeLater, object, methodName, parameters);
   }
 
@@ -111,7 +111,8 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
   public InvokeMethodAction(final CharSequence name, final String toolTip, final Icon icon,
     final boolean invokeLater, final Object object, final String methodName,
     final Object... parameters) {
-    this(name, toolTip, icon, invokeLater, new InvokeMethodRunnable(object, methodName, parameters));
+    this(name, toolTip, icon, invokeLater,
+      new InvokeMethodRunnable(object, methodName, parameters));
   }
 
   public InvokeMethodAction(final CharSequence name, final String toolTip, final Icon icon,

@@ -108,17 +108,16 @@ public class Parameters {
         value = "";
       }
       if (!allowedKeys.contains(key)) {
-        throw new IllegalArgumentException("Unrecognized command-line argument: "
-          + arg.substring(1) + ". Valid arguments are: "
-          + StringUtil.toCommaDelimitedString(allowedKeys));
+        throw new IllegalArgumentException("Unrecognized command-line argument: " + arg.substring(1)
+          + ". Valid arguments are: " + StringUtil.toCommaDelimitedString(allowedKeys));
       }
       this.hashtable.put(key, value);
     }
     for (final Iterator i = requiredKeys.iterator(); i.hasNext();) {
       final String requiredKey = (String)i.next();
       if (!this.hashtable.containsKey(requiredKey)) {
-        throw new IllegalArgumentException("Required command-line argument is missing: "
-          + requiredKey);
+        throw new IllegalArgumentException(
+          "Required command-line argument is missing: " + requiredKey);
       }
     }
   }

@@ -88,7 +88,8 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   public void testComputeZ() {
     final Geometry linearGeom = read("LINESTRING (0 0 0, 10 10 10)");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
-    final double projIndex = indexedLine.project(new PointDouble((double)5, 5, Point.NULL_ORDINATE));
+    final double projIndex = indexedLine
+      .project(new PointDouble((double)5, 5, Point.NULL_ORDINATE));
     final Point projPt = indexedLine.extractPoint(projIndex);
     // System.out.println(projPt);
     assertTrue(projPt.equals(3, new PointDouble(5.0, 5, 5)));
@@ -101,7 +102,8 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   public void testComputeZNaN() {
     final Geometry linearGeom = read("LINESTRING (0 0, 10 10 10)");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
-    final double projIndex = indexedLine.project(new PointDouble((double)5, 5, Point.NULL_ORDINATE));
+    final double projIndex = indexedLine
+      .project(new PointDouble((double)5, 5, Point.NULL_ORDINATE));
     final Point projPt = indexedLine.extractPoint(projIndex);
     assertTrue(Double.isNaN(projPt.getZ()));
   }
@@ -204,7 +206,8 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   public void testProjectPointWithDuplicateCoords() {
     final Geometry linearGeom = read("LINESTRING (0 0, 10 0, 10 0, 20 0)");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
-    final double projIndex = indexedLine.project(new PointDouble((double)10, 1, Point.NULL_ORDINATE));
+    final double projIndex = indexedLine
+      .project(new PointDouble((double)10, 1, Point.NULL_ORDINATE));
     assertTrue(projIndex == 10.0);
   }
 

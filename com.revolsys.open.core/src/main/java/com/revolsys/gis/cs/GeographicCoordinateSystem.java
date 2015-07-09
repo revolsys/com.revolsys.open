@@ -35,10 +35,8 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
 
     final double sinHeightOver2 = Math.sin(height / 2);
     final double sinWidthOver2 = Math.sin(width / 2);
-    final double distance = 2
-      * EARTH_RADIUS
-      * Math.asin(Math.sqrt(sinHeightOver2 * sinHeightOver2 + Math.cos(lat1Radians)
-        * Math.cos(lat2Radians) * sinWidthOver2 * sinWidthOver2));
+    final double distance = 2 * EARTH_RADIUS * Math.asin(Math.sqrt(sinHeightOver2 * sinHeightOver2
+      + Math.cos(lat1Radians) * Math.cos(lat2Radians) * sinWidthOver2 * sinWidthOver2));
     return distance;
   }
 

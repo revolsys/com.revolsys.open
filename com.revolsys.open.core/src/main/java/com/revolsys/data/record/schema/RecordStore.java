@@ -46,7 +46,8 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
 
   <T> T createPrimaryIdValue(String typePath);
 
-  Query createQuery(final String typePath, String whereClause, final BoundingBoxDoubleGf boundingBox);
+  Query createQuery(final String typePath, String whereClause,
+    final BoundingBoxDoubleGf boundingBox);
 
   Transaction createTransaction(Propagation propagation);
 

@@ -129,7 +129,8 @@ public class PreparedGeometryOperation implements GeometryOperation {
     return invokePreparedOp(opName, geometry, args);
   }
 
-  private Result invokePreparedOp(final String opName, final Geometry geometry, final Object[] args) {
+  private Result invokePreparedOp(final String opName, final Geometry geometry,
+    final Object[] args) {
     final Geometry g2 = (Geometry)args[0];
     if (opName.equals("intersects")) {
       return new BooleanResult(PreparedGeometryOp.intersects(geometry, g2));

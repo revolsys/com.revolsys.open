@@ -35,11 +35,6 @@ package com.revolsys.jts.testold.algorithm;
 
 import java.util.Stack;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.algorithm.ConvexHull;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -47,6 +42,11 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKTReader;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import junit.textui.TestRunner;
 
 /**
  * Test for {@link ConvexHull}.
@@ -91,7 +91,8 @@ public class ConvexHullTest extends TestCase {
 
   public void test2() throws Exception {
     final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1.0));
-    final Geometry geometry = reader.read("MULTIPOINT (130 240, 130 240, 130 240, 570 240, 570 240, 570 240, 650 240)");
+    final Geometry geometry = reader
+      .read("MULTIPOINT (130 240, 130 240, 130 240, 570 240, 570 240, 570 240, 650 240)");
     final LineString convexHull = (LineString)reader.read("LINESTRING (130 240, 650 240)");
     assertTrue(convexHull.equals(2, geometry.convexHull()));
   }

@@ -66,7 +66,8 @@ public class ExpressionMeasurable<Q extends Quantity> extends Measure<Q> {
       return Double.NaN;
     } else {
       try {
-        return Double.valueOf(JexlUtil.evaluateExpression(this.context, this.expression).toString());
+        return Double
+          .valueOf(JexlUtil.evaluateExpression(this.context, this.expression).toString());
       } catch (final NullPointerException e) {
         return 0.0;
       }

@@ -61,8 +61,8 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
   public static final List<Action> HORIZONTAL_ALIGNMENT_ACTIONS = getTextAlignActions("left",
     "center", "right");
 
-  public static final List<Action> VERTICAL_ALIGNMENT_ACTIONS = getTextAlignActions("top",
-    "middle", "bottom");
+  public static final List<Action> VERTICAL_ALIGNMENT_ACTIONS = getTextAlignActions("top", "middle",
+    "bottom");
 
   public static final List<Action> LINE_JOIN_ACTIONS = getLineActions("join", "MITER", "ROUND",
     "BEVEL");
@@ -86,8 +86,8 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
     final List<Action> actions = new ArrayList<Action>();
     for (final String alignmentType : alignmentTypes) {
       final I18nAction action = new I18nAction(alignmentType, null,
-        CaseConverter.toCapitalizedWords(alignmentType), Icons.getIcon("text_align_"
-          + alignmentType));
+        CaseConverter.toCapitalizedWords(alignmentType),
+        Icons.getIcon("text_align_" + alignmentType));
       actions.add(action);
     }
     return actions;
@@ -122,7 +122,8 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
     container.add(field);
   }
 
-  protected void addColorField(final JPanel container, final Object object, final String fieldName) {
+  protected void addColorField(final JPanel container, final Object object,
+    final String fieldName) {
     SwingUtil.addLabel(container, fieldName);
     final Color value = Property.get(object, fieldName);
     final ColorChooserField field = new ColorChooserField(fieldName, value);
@@ -156,7 +157,8 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
     }
   }
 
-  protected void addFields(final JPanel container, final Object object, final String... fieldNames) {
+  protected void addFields(final JPanel container, final Object object,
+    final String... fieldNames) {
     for (final String fieldName : fieldNames) {
       addField(container, object, fieldName);
     }
@@ -230,7 +232,8 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
   }
 
   @SuppressWarnings("unchecked")
-  protected Field createField(final String fieldName, final Class<?> fieldClass, final Object value) {
+  protected Field createField(final String fieldName, final Class<?> fieldClass,
+    final Object value) {
     Field field;
     if (fieldName.equals("visible")) {
       this.visibleField = new CheckBox(fieldName, value);
@@ -255,16 +258,16 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
     } else if (fieldName.equals("marker")) {
       field = new MarkerField(fieldName, value);
     } else if (fieldName.endsWith("OrientationType")) {
-      final ComboBox orientationTypeField = new ComboBox(fieldName, new DefaultComboBoxModel<>(
-        new String[] {
+      final ComboBox orientationTypeField = new ComboBox(fieldName,
+        new DefaultComboBoxModel<>(new String[] {
           "auto", "none"
-        }));
+      }));
       field = orientationTypeField;
     } else if (fieldName.endsWith("PlacementType")) {
-      final ComboBox placementField = new ComboBox(fieldName, new DefaultComboBoxModel<>(
-        new String[] {
+      final ComboBox placementField = new ComboBox(fieldName,
+        new DefaultComboBoxModel<>(new String[] {
           "auto", "center", "point(0)", "point(n)", "vertices"
-        }));
+      }));
       placementField.setFieldValue(value);
       field = placementField;
     } else if (fieldName.endsWith("Scale")) {
@@ -285,7 +288,8 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
     if (!"left".equalsIgnoreCase(aligment) && !"right".equalsIgnoreCase(aligment)) {
       aligment = "center";
     }
-    return new TogglePanel(fieldName, aligment, new Dimension(28, 28), HORIZONTAL_ALIGNMENT_ACTIONS);
+    return new TogglePanel(fieldName, aligment, new Dimension(28, 28),
+      HORIZONTAL_ALIGNMENT_ACTIONS);
   }
 
   protected TogglePanel createLineCapField(final LineCap lineCap) {
@@ -307,7 +311,8 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
     converter.setHorizontalAlignment(SwingConstants.RIGHT);
     final ComboBox field = new ComboBox(fieldName, new DefaultComboBoxModel(scales), converter,
       converter);
-    ((JTextField)field.getEditor().getEditorComponent()).setHorizontalAlignment(SwingConstants.RIGHT);
+    ((JTextField)field.getEditor().getEditorComponent())
+      .setHorizontalAlignment(SwingConstants.RIGHT);
     field.setSelectedItem(value);
     field.setPreferredSize(new Dimension(150, 22));
     return field;

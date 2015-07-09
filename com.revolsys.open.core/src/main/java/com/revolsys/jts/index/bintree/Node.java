@@ -56,7 +56,7 @@ public class Node extends NodeBase {
   public static Node createNode(final Interval itemInterval) {
     final Key key = new Key(itemInterval);
 
-    // System.out.println("input: " + env + "  binaryEnv: " +
+    // System.out.println("input: " + env + " binaryEnv: " +
     // key.getEnvelope());
     final Node node = new Node(key.getInterval(), key.getLevel());
     return node;

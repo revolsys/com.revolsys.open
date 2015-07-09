@@ -53,11 +53,12 @@ public class SplitSegment {
    * @param segmentLengthFraction the fraction of the segment length along the line
    * @return the point at that distance
    */
-  private static Point pointAlongReverse(final LineSegment seg, final double segmentLengthFraction) {
-    final double x = seg.getP1().getX() - segmentLengthFraction
-      * (seg.getP1().getX() - seg.getP0().getX());
-    final double y = seg.getP1().getY() - segmentLengthFraction
-      * (seg.getP1().getY() - seg.getP0().getY());
+  private static Point pointAlongReverse(final LineSegment seg,
+    final double segmentLengthFraction) {
+    final double x = seg.getP1().getX()
+      - segmentLengthFraction * (seg.getP1().getX() - seg.getP0().getX());
+    final double y = seg.getP1().getY()
+      - segmentLengthFraction * (seg.getP1().getY() - seg.getP0().getY());
     final Point coord = new PointDouble(x, y, Point.NULL_ORDINATE);
     return coord;
   }

@@ -67,7 +67,8 @@ public class DisplayConfigAction implements Action {
         pageView.add("Menus");
         final ElementContainer menusView = new ElementContainer(new UnorderedListLayout());
         pageView.add(menusView);
-        for (final Iterator menus = pageController.getMenus().entrySet().iterator(); menus.hasNext();) {
+        for (final Iterator menus = pageController.getMenus().entrySet().iterator(); menus
+          .hasNext();) {
           final Map.Entry entry = (Entry)menus.next();
           final String name = (String)entry.getKey();
           final Menu menu = (Menu)entry.getValue();

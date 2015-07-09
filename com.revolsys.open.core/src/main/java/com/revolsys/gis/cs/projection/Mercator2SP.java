@@ -28,7 +28,8 @@ public class Mercator2SP extends AbstractCoordinatesProjection {
   public Mercator2SP(final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
     final Datum datum = geographicCS.getDatum();
-    final double centralMeridian = cs.getDoubleParameter(ProjectionParameterNames.LONGITUDE_OF_CENTER);
+    final double centralMeridian = cs
+      .getDoubleParameter(ProjectionParameterNames.LONGITUDE_OF_CENTER);
 
     final Spheroid spheroid = datum.getSpheroid();
     this.x0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_EASTING);
@@ -55,8 +56,8 @@ public class Mercator2SP extends AbstractCoordinatesProjection {
     double delta = 10e010;
     do {
       final double eSinPhi = this.e * Math.sin(phi);
-      final double phi1 = Angle.PI_OVER_2 - 2
-        * Math.atan(t * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.eOver2));
+      final double phi1 = Angle.PI_OVER_2
+        - 2 * Math.atan(t * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.eOver2));
       delta = Math.abs(phi1 - phi);
       phi = phi1;
     } while (delta > 1.0e-011);
@@ -73,8 +74,9 @@ public class Mercator2SP extends AbstractCoordinatesProjection {
 
     final double eSinPhi = this.e * Math.sin(phi);
     final double y = this.a
-      * Math.log(Math.tan(Angle.PI_OVER_4 + phi / 2)
-        * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.eOver2)) * this.multiple;
+      * Math.log(
+        Math.tan(Angle.PI_OVER_4 + phi / 2) * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.eOver2))
+      * this.multiple;
 
     targetCoordinates[targetOffset * targetAxisCount] = this.x0 + x;
     targetCoordinates[targetOffset * targetAxisCount + 1] = this.y0 + y;

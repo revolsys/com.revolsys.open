@@ -47,7 +47,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   protected static final BasicStroke BOX_STROKE = new BasicStroke(2, BasicStroke.CAP_SQUARE,
     BasicStroke.JOIN_MITER, 2, new float[] {
       6, 6
-    }, 0f);
+  }, 0f);
 
   private static final Color COLOR_BOX = WebColors.Green;
 
@@ -55,20 +55,21 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   private static final Cursor CURSOR_SELECT_BOX = Icons.getCursor("cursor_select_box", 8, 7);
 
-  private static final Cursor CURSOR_SELECT_BOX_ADD = Icons.getCursor("cursor_select_box_add", 8, 7);
+  private static final Cursor CURSOR_SELECT_BOX_ADD = Icons.getCursor("cursor_select_box_add", 8,
+    7);
 
-  private static final Cursor CURSOR_SELECT_BOX_DELETE = Icons.getCursor(
-    "cursor_select_box_delete", 8, 7);
+  private static final Cursor CURSOR_SELECT_BOX_DELETE = Icons.getCursor("cursor_select_box_delete",
+    8, 7);
 
   public static final SelectedRecordsRenderer HIGHLIGHT_RENDERER = new SelectedRecordsRenderer(
     WebColors.Black, WebColors.Yellow);
 
-  private static final Set<String> REDRAW_PROPERTY_NAMES = new HashSet<>(Arrays.asList("refresh",
-    "viewBoundingBox", "unitsPerPixel", "scale"));
+  private static final Set<String> REDRAW_PROPERTY_NAMES = new HashSet<>(
+    Arrays.asList("refresh", "viewBoundingBox", "unitsPerPixel", "scale"));
 
-  private static final Set<String> REDRAW_REPAINT_PROPERTY_NAMES = new HashSet<>(Arrays.asList(
-    "layers", "selectable", "visible", "editable", "recordsChanged", "updateRecord",
-    "hasSelectedRecords", "hasHighlightedRecords", "minimumScale", "maximumScale"));
+  private static final Set<String> REDRAW_REPAINT_PROPERTY_NAMES = new HashSet<>(
+    Arrays.asList("layers", "selectable", "visible", "editable", "recordsChanged", "updateRecord",
+      "hasSelectedRecords", "hasHighlightedRecords", "minimumScale", "maximumScale"));
 
   public static final SelectedRecordsRenderer SELECT_RENDERER = new SelectedRecordsRenderer(
     WebColors.Black, WebColors.Lime);
@@ -94,7 +95,8 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   public SelectRecordsOverlay(final MapPanel map) {
     super(map);
     setOverlayActionCursor(ACTION_SELECT_RECORDS, CURSOR_SELECT_BOX);
-    addOverlayActionOverride(ACTION_SELECT_RECORDS, ZoomOverlay.ACTION_PAN, ZoomOverlay.ACTION_ZOOM);
+    addOverlayActionOverride(ACTION_SELECT_RECORDS, ZoomOverlay.ACTION_PAN,
+      ZoomOverlay.ACTION_ZOOM);
     Property.addListener(map.getProject(), this);
   }
 

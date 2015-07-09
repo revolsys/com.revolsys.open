@@ -58,7 +58,8 @@ public class Q {
 
   }
 
-  public static Between between(final FieldDefinition attribute, final Object min, final Object max) {
+  public static Between between(final FieldDefinition attribute, final Object min,
+    final Object max) {
     final Column column = new Column(attribute);
     final Value minCondition = new Value(attribute, min);
     final Value maxCondition = new Value(attribute, max);
@@ -91,7 +92,8 @@ public class Q {
     }
   }
 
-  public static Condition binary(final String fieldName, final String operator, final Object value) {
+  public static Condition binary(final String fieldName, final String operator,
+    final Object value) {
     final Column column = new Column(fieldName);
     final Value queryValue = new Value(value);
     return binary(column, operator, queryValue);
@@ -159,8 +161,8 @@ public class Q {
         and.add(condition);
       }
     } else {
-      throw new IllegalArgumentException("Field count for " + attributes + " != count for values "
-        + values);
+      throw new IllegalArgumentException(
+        "Field count for " + attributes + " != count for values " + values);
     }
     return and;
   }

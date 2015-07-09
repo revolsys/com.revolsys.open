@@ -36,8 +36,8 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractRecordLayerRenderer extends
-  AbstractLayerRenderer<AbstractRecordLayer> {
+public abstract class AbstractRecordLayerRenderer
+  extends AbstractLayerRenderer<AbstractRecordLayer> {
 
   private static final AcceptAllFilter<Record> DEFAULT_FILTER = new AcceptAllFilter<Record>();
 
@@ -63,8 +63,8 @@ public abstract class AbstractRecordLayerRenderer extends
     for (final String type : Arrays.asList("Multiple", "Filter", "Scale")) {
       final String iconName = ("style_" + type + "_wrap").toLowerCase();
       final ImageIcon icon = Icons.getIcon(iconName);
-      final InvokeMethodAction action = MenuSourceRunnable.createAction("Wrap With " + type
-        + " Style", icon, null, "wrapWith" + type + "Style");
+      final InvokeMethodAction action = MenuSourceRunnable
+        .createAction("Wrap With " + type + " Style", icon, null, "wrapWith" + type + "Style");
       menu.addMenuItem("wrap", action);
     }
 
@@ -73,8 +73,8 @@ public abstract class AbstractRecordLayerRenderer extends
   public static void addRendererClass(final String name,
     final Class<? extends AbstractRecordLayerRenderer> clazz) {
     try {
-      final Constructor<? extends AbstractRecordLayerRenderer> constructor = clazz.getConstructor(
-        AbstractRecordLayer.class, LayerRenderer.class, Map.class);
+      final Constructor<? extends AbstractRecordLayerRenderer> constructor = clazz
+        .getConstructor(AbstractRecordLayer.class, LayerRenderer.class, Map.class);
       RENDERER_CONSTRUCTORS.put(name, constructor);
     } catch (final NoSuchMethodException e) {
       throw new IllegalArgumentException("Invalid constructor", e);
@@ -111,8 +111,8 @@ public abstract class AbstractRecordLayerRenderer extends
           return new SqlLayerFilter(layer, query);
         }
       } else {
-        LoggerFactory.getLogger(AbstractRecordLayerRenderer.class).error(
-          "Unknown filter type " + type);
+        LoggerFactory.getLogger(AbstractRecordLayerRenderer.class)
+          .error("Unknown filter type " + type);
       }
     }
     return DEFAULT_FILTER;
@@ -121,10 +121,11 @@ public abstract class AbstractRecordLayerRenderer extends
   public static AbstractRecordLayerRenderer getRenderer(final AbstractLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> style) {
     final String type = (String)style.remove("type");
-    final Constructor<? extends AbstractRecordLayerRenderer> constructor = RENDERER_CONSTRUCTORS.get(type);
+    final Constructor<? extends AbstractRecordLayerRenderer> constructor = RENDERER_CONSTRUCTORS
+      .get(type);
     if (constructor == null) {
-      LoggerFactory.getLogger(AbstractRecordLayerRenderer.class).error(
-        "Unknown style type: " + style);
+      LoggerFactory.getLogger(AbstractRecordLayerRenderer.class)
+        .error("Unknown style type: " + style);
       return null;
     } else {
       try {
@@ -149,7 +150,8 @@ public abstract class AbstractRecordLayerRenderer extends
   }
 
   public AbstractRecordLayerRenderer(final String type, final String name,
-    final AbstractRecordLayer layer, final LayerRenderer<?> parent, final Map<String, Object> style) {
+    final AbstractRecordLayer layer, final LayerRenderer<?> parent,
+    final Map<String, Object> style) {
     super(type, name, layer, parent, style);
     this.filter = getFilter(layer, style);
   }

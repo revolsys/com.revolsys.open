@@ -60,8 +60,8 @@ public class IafServletFilter implements Filter {
       final HttpServletRequest httpRequest = (HttpServletRequest)request;
       final HttpServletResponse httpResponse = (HttpServletResponse)response;
       final String contextPath = httpRequest.getContextPath();
-      WebUiContext.set(new WebUiContext(this.rsWebUiConfig, contextPath, null, httpRequest,
-        httpResponse));
+      WebUiContext
+        .set(new WebUiContext(this.rsWebUiConfig, contextPath, null, httpRequest, httpResponse));
       request.setAttribute("niceConfig", this.rsWebUiConfig);
       chain.doFilter(request, response);
     } finally {
@@ -77,7 +77,8 @@ public class IafServletFilter implements Filter {
     }
     final ServletContext servletContext = filterConfig.getServletContext();
     WebUiContext.setServletContext(servletContext);
-    final WebApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+    final WebApplicationContext applicationContext = WebApplicationContextUtils
+      .getRequiredWebApplicationContext(servletContext);
 
     try {
       final URL configResource = servletContext.getResource(config);
@@ -86,12 +87,12 @@ public class IafServletFilter implements Filter {
       servletContext.setAttribute("rsWebUiConfig", this.rsWebUiConfig);
     } catch (final InvalidConfigException e) {
       log.error(e.getErrors(), e);
-      throw new UnavailableException("Cannot load a rsWebUiConfig resource from '" + config
-        + "' due to " + e.getErrors());
+      throw new UnavailableException(
+        "Cannot load a rsWebUiConfig resource from '" + config + "' due to " + e.getErrors());
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
-      throw new UnavailableException("Cannot load a rsWebUiConfig resource from '" + config
-        + "' due to " + e.getMessage());
+      throw new UnavailableException(
+        "Cannot load a rsWebUiConfig resource from '" + config + "' due to " + e.getMessage());
     }
   }
 }

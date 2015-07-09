@@ -18,8 +18,8 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;
 
-public class RecordStoreConnectionManager extends
-  AbstractConnectionRegistryManager<RecordStoreConnectionRegistry, RecordStoreConnection> {
+public class RecordStoreConnectionManager
+  extends AbstractConnectionRegistryManager<RecordStoreConnectionRegistry, RecordStoreConnection> {
 
   private static final RecordStoreConnectionManager INSTANCE;
 
@@ -30,7 +30,8 @@ public class RecordStoreConnectionManager extends
     if (oldDirectory.exists()) {
       oldDirectory.renameTo(new File(appsDirectory, "com.revolsys.gis/Record Stores"));
     }
-    final File recordStoresDirectory = OS.getApplicationDataDirectory("com.revolsys.gis/Record Stores");
+    final File recordStoresDirectory = OS
+      .getApplicationDataDirectory("com.revolsys.gis/Record Stores");
     INSTANCE.addConnectionRegistry("User", new FileSystemResource(recordStoresDirectory));
   }
 
@@ -57,13 +58,15 @@ public class RecordStoreConnectionManager extends
    * @return
    */
   @SuppressWarnings("unchecked")
-  public static <T extends RecordStore> T getRecordStore(final Map<String, ? extends Object> config) {
+  public static <T extends RecordStore> T getRecordStore(
+    final Map<String, ? extends Object> config) {
     @SuppressWarnings("rawtypes")
     final Map<String, Object> configClone = (Map)JavaBeanUtil.clone(config);
     synchronized (recordStoreByConfig) {
       RecordStore recordStore = recordStoreByConfig.get(configClone);
       if (recordStore == null) {
-        final Map<String, ? extends Object> connectionProperties = (Map<String, ? extends Object>)configClone.get("connection");
+        final Map<String, ? extends Object> connectionProperties = (Map<String, ? extends Object>)configClone
+          .get("connection");
         final String name = (String)connectionProperties.get("name");
         if (Property.hasValue(name)) {
           recordStore = getRecordStore(name);
@@ -90,7 +93,8 @@ public class RecordStoreConnectionManager extends
     final RecordStoreConnectionManager connectionManager = get();
     final List<RecordStoreConnectionRegistry> registries = new ArrayList<>();
     registries.addAll(connectionManager.getConnectionRegistries());
-    final RecordStoreConnectionRegistry threadRegistry = RecordStoreConnectionRegistry.getForThread();
+    final RecordStoreConnectionRegistry threadRegistry = RecordStoreConnectionRegistry
+      .getForThread();
     if (threadRegistry != null) {
       registries.add(threadRegistry);
     }
@@ -113,7 +117,8 @@ public class RecordStoreConnectionManager extends
       if (recordStore != null) {
         final AtomicInteger count = recordStoreCounts.get(configClone);
         if (count.decrementAndGet() == 0) {
-          final Map<String, ? extends Object> connectionProperties = (Map<String, ? extends Object>)configClone.get("connection");
+          final Map<String, ? extends Object> connectionProperties = (Map<String, ? extends Object>)configClone
+            .get("connection");
           final String name = (String)connectionProperties.get("name");
           if (!Property.hasValue(name)) {
             // TODO release for connections from connection registries

@@ -50,9 +50,9 @@ public class RecordReaderHttpMessageConverter extends AbstractHttpMessageConvert
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
   public RecordReaderHttpMessageConverter() {
-    super(RecordReader.class, IoFactoryRegistry.getInstance().getMediaTypes(
-      RecordReaderFactory.class), IoFactoryRegistry.getInstance().getMediaTypes(
-      RecordWriterFactory.class));
+    super(RecordReader.class,
+      IoFactoryRegistry.getInstance().getMediaTypes(RecordReaderFactory.class),
+      IoFactoryRegistry.getInstance().getMediaTypes(RecordWriterFactory.class));
   }
 
   public GeometryFactory getGeometryFactory() {
@@ -75,16 +75,17 @@ public class RecordReaderHttpMessageConverter extends AbstractHttpMessageConvert
       }
       final InputStream body = inputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/" + mediaType.getSubtype();
-      final RecordReaderFactory readerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
-        RecordReaderFactory.class, mediaTypeString);
+      final RecordReaderFactory readerFactory = this.ioFactoryRegistry
+        .getFactoryByMediaType(RecordReaderFactory.class, mediaTypeString);
       if (readerFactory == null) {
         throw new HttpMessageNotReadableException("Cannot read data in format" + mediaType);
       } else {
-        final Reader<Record> reader = readerFactory.createRecordReader(new InputStreamResource(
-          "recordInput", body));
+        final Reader<Record> reader = readerFactory
+          .createRecordReader(new InputStreamResource("recordInput", body));
 
         GeometryFactory factory = this.geometryFactory;
-        final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder.getRequestAttributes();
+        final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder
+          .getRequestAttributes();
         final String srid = requestAttributes.getParameter("srid");
         if (srid != null && srid.trim().length() > 0) {
           factory = GeometryFactory.floating3(Integer.parseInt(srid));
@@ -120,8 +121,8 @@ public class RecordReaderHttpMessageConverter extends AbstractHttpMessageConvert
           actualMediaType);
         final String mediaTypeString = actualMediaType.getType() + "/"
           + actualMediaType.getSubtype();
-        final RecordWriterFactory writerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
-          RecordWriterFactory.class, mediaTypeString);
+        final RecordWriterFactory writerFactory = this.ioFactoryRegistry
+          .getFactoryByMediaType(RecordWriterFactory.class, mediaTypeString);
         if (writerFactory == null) {
           throw new IllegalArgumentException("Media type " + actualMediaType + " not supported");
         } else {
@@ -142,10 +143,10 @@ public class RecordReaderHttpMessageConverter extends AbstractHttpMessageConvert
           headers.set("Content-Disposition", contentDisposition + "; filename=" + fileName);
 
           final OutputStream body = outputMessage.getBody();
-          final Writer<Record> writer = writerFactory.createRecordWriter(baseName,
-            recordDefinition, body, charset);
-          if (Boolean.FALSE.equals(requestAttributes.getAttribute("wrapHtml",
-            RequestAttributes.SCOPE_REQUEST))) {
+          final Writer<Record> writer = writerFactory.createRecordWriter(baseName, recordDefinition,
+            body, charset);
+          if (Boolean.FALSE
+            .equals(requestAttributes.getAttribute("wrapHtml", RequestAttributes.SCOPE_REQUEST))) {
             writer.setProperty(IoConstants.WRAP_PROPERTY, false);
           }
           final HttpServletRequest request = HttpServletUtils.getRequest();
@@ -156,7 +157,8 @@ public class RecordReaderHttpMessageConverter extends AbstractHttpMessageConvert
           if (callback != null) {
             writer.setProperty(IoConstants.JSONP_PROPERTY, callback);
           }
-          for (final String attributeName : requestAttributes.getAttributeNames(RequestAttributes.SCOPE_REQUEST)) {
+          for (final String attributeName : requestAttributes
+            .getAttributeNames(RequestAttributes.SCOPE_REQUEST)) {
             final Object value = requestAttributes.getAttribute(attributeName,
               RequestAttributes.SCOPE_REQUEST);
             if (value != null && attributeName.startsWith("java:")

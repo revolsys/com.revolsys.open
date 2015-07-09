@@ -20,8 +20,8 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
-public class MapPointerLocation extends JLabel implements MouseMotionListener,
-  PropertyChangeListener {
+public class MapPointerLocation extends JLabel
+  implements MouseMotionListener, PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -43,9 +43,9 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener,
 
     Property.addListener(map, "geometryFactory", this);
     map.getMouseOverlay().addMouseMotionListener(this);
-    setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createBevelBorder(BevelBorder.LOWERED),
-      BorderFactory.createEmptyBorder(2, 3, 2, 3)));
+    setBorder(
+      BorderFactory.createCompoundBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED),
+        BorderFactory.createEmptyBorder(2, 3, 2, 3)));
     setText(" ");
 
     final int height2 = getPreferredSize().height;

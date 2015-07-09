@@ -23,15 +23,15 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 
-public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record>> implements
-  ObjectProcessor<RecordGraph> {
+public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record>>
+  implements ObjectProcessor<RecordGraph> {
 
   private static final Logger LOG = LoggerFactory.getLogger(ItersectsNodeEdgeCleanupVisitor.class);
 
   private Statistics splitStatistics;
 
-  private final Set<String> equalExcludeAttributes = new HashSet<String>(Arrays.asList(
-    RecordEquals.EXCLUDE_ID, RecordEquals.EXCLUDE_GEOMETRY));
+  private final Set<String> equalExcludeAttributes = new HashSet<String>(
+    Arrays.asList(RecordEquals.EXCLUDE_ID, RecordEquals.EXCLUDE_GEOMETRY));
 
   @PreDestroy
   public void destroy() {

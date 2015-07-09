@@ -225,9 +225,10 @@ abstract class AbstractPreparedPolygonContains {
      * is some portion of the interior of the test geometry lying outside
      * the target, which means that the test is not contained.
      */
-    final boolean properIntersectionImpliesNotContained = isProperIntersectionImpliesNotContainedSituation(geometry);
-    // MD - testing only
-    // properIntersectionImpliesNotContained = true;
+    final boolean properIntersectionImpliesNotContained = isProperIntersectionImpliesNotContainedSituation(
+      geometry);
+      // MD - testing only
+      // properIntersectionImpliesNotContained = true;
 
     // find all intersection types which exist
     findAndClassifyIntersections(geometry);

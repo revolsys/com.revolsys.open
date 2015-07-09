@@ -54,8 +54,8 @@ public class SplitEdgesCloseToNodeVisitor<T> extends AbstractNodeListenerVisitor
 
   @Override
   public boolean visit(final Node<T> node) {
-    final List<Edge<T>> closeEdges = EdgeLessThanDistanceToNodeVisitor.edgesWithinDistance(
-      this.graph, node, this.maxDistance);
+    final List<Edge<T>> closeEdges = EdgeLessThanDistanceToNodeVisitor
+      .edgesWithinDistance(this.graph, node, this.maxDistance);
     for (final Edge<T> edge : closeEdges) {
       final T object = edge.getObject();
       final String typePath = this.graph.getTypeName(edge);

@@ -20,7 +20,8 @@ public class OsmPbf extends AbstractRecordIoFactory {
   }
 
   @Override
-  public RecordReader createRecordReader(final Resource resource, final RecordFactory recordFactory) {
+  public RecordReader createRecordReader(final Resource resource,
+    final RecordFactory recordFactory) {
     final OsmPbfRecordIterator iterator = new OsmPbfRecordIterator(resource);
     return new RecordIteratorReader(iterator);
   }

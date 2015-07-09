@@ -1,10 +1,10 @@
 package com.revolsys.jts.testold.operation;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.valid.IsValidOp;
+
+import junit.framework.TestCase;
 
 /**
  * Tests allowing IsValidOp to validate polygons with

@@ -99,8 +99,8 @@ public class Geometry implements Cloneable {
   }
 
   public void AssignSpatialReference(final SpatialReference reference) {
-    ogrJNI.Geometry_AssignSpatialReference(this.swigCPtr, this,
-      SpatialReference.getCPtr(reference), reference);
+    ogrJNI.Geometry_AssignSpatialReference(this.swigCPtr, this, SpatialReference.getCPtr(reference),
+      reference);
   }
 
   public Geometry Boundary() {

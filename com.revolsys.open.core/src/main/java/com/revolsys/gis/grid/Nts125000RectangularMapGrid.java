@@ -4,8 +4,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Nts125000RectangularMapGrid extends Nts250000RectangularMapGrid {
-  private static final Pattern NAME_PATTERN = Pattern.compile("^" + NtsConstants.REGEX_125000
-    + ".*");
+  private static final Pattern NAME_PATTERN = Pattern
+    .compile("^" + NtsConstants.REGEX_125000 + ".*");
 
   public Nts125000RectangularMapGrid() {
     super(NtsConstants.WIDTH_125000, NtsConstants.HEIGHT_125000);
@@ -37,8 +37,8 @@ public class Nts125000RectangularMapGrid extends Nts250000RectangularMapGrid {
 
       return latitude;
     } else {
-      throw new IllegalArgumentException(mapTileName
-        + " does not start with a valid NTS 1:125,000 tile name");
+      throw new IllegalArgumentException(
+        mapTileName + " does not start with a valid NTS 1:125,000 tile name");
     }
   }
 
@@ -61,8 +61,8 @@ public class Nts125000RectangularMapGrid extends Nts250000RectangularMapGrid {
 
       return longitude;
     } else {
-      throw new IllegalArgumentException(mapTileName
-        + " does not start with a valid NTS 1:125,000 tile name");
+      throw new IllegalArgumentException(
+        mapTileName + " does not start with a valid NTS 1:125,000 tile name");
     }
   }
 

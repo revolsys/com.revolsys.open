@@ -35,13 +35,13 @@ package com.revolsys.jts.testold.perf.operation.buffer;
 import java.util.Iterator;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.buffer.validate.BufferResultValidator;
 import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 import com.revolsys.jts.util.Stopwatch;
+
+import junit.framework.TestCase;
 
 /**
  * @version 1.7
@@ -60,7 +60,7 @@ public class FileBufferResultValidatorTest extends TestCase {
 
   void runAll(final List geoms, final double dist) {
     final Stopwatch sw = new Stopwatch();
-    // System.out.println("Geom count = " + geoms.size() + "   distance = " +
+    // System.out.println("Geom count = " + geoms.size() + " distance = " +
     // dist);
     for (final Iterator i = geoms.iterator(); i.hasNext();) {
       final Geometry g = (Geometry)i.next();
@@ -68,7 +68,7 @@ public class FileBufferResultValidatorTest extends TestCase {
       runBuffer(g.reverse(), dist);
       System.out.print(".");
     }
-    // System.out.println("  " + sw.getTimeString());
+    // System.out.println(" " + sw.getTimeString());
 
   }
 

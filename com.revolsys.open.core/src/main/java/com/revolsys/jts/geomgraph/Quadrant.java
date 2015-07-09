@@ -125,8 +125,8 @@ public class Quadrant {
    */
   public static int quadrant(final double dx, final double dy) {
     if (dx == 0.0 && dy == 0.0) {
-      throw new IllegalArgumentException("Cannot compute the quadrant for point ( " + dx + ", "
-        + dy + " )");
+      throw new IllegalArgumentException(
+        "Cannot compute the quadrant for point ( " + dx + ", " + dy + " )");
     }
     if (dx >= 0.0) {
       if (dy >= 0.0) {
@@ -150,8 +150,8 @@ public class Quadrant {
    */
   public static int quadrant(final Point p0, final Point p1) {
     if (p1.getX() == p0.getX() && p1.getY() == p0.getY()) {
-      throw new IllegalArgumentException("Cannot compute the quadrant for two identical points "
-        + p0);
+      throw new IllegalArgumentException(
+        "Cannot compute the quadrant for two identical points " + p0);
     }
 
     if (p1.getX() >= p0.getX()) {

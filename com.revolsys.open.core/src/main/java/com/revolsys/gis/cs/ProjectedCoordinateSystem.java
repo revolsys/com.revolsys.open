@@ -157,7 +157,8 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   @Override
   public BoundingBox getAreaBoundingBox() {
     BoundingBox boundingBox;
-    final GeometryFactory geographicGeometryFactory = this.geographicCoordinateSystem.getGeometryFactory();
+    final GeometryFactory geographicGeometryFactory = this.geographicCoordinateSystem
+      .getGeometryFactory();
     if (this.area == null) {
       boundingBox = new BoundingBoxDoubleGf(geographicGeometryFactory, 2, -180, -90, 180, 90);
     } else {

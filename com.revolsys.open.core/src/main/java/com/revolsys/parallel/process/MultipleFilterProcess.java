@@ -60,7 +60,8 @@ public class MultipleFilterProcess<T> extends BaseInOutProcess<T, T> {
     }
   }
 
-  protected boolean processFilter(final T object, final Filter<T> filter, final Channel<T> filterOut) {
+  protected boolean processFilter(final T object, final Filter<T> filter,
+    final Channel<T> filterOut) {
     if (filter.accept(object)) {
       if (filterOut != null) {
         try {

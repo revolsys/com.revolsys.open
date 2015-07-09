@@ -30,8 +30,8 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     if (geometry == null || geometry.isEmpty()) {
       return new PointQuadTree<int[]>();
     } else {
-      final Reference<PointQuadTree<int[]>> reference = GeometryProperties.getGeometryProperty(
-        geometry, PointQuadTree.POINT_QUAD_TREE);
+      final Reference<PointQuadTree<int[]>> reference = GeometryProperties
+        .getGeometryProperty(geometry, PointQuadTree.POINT_QUAD_TREE);
       PointQuadTree<int[]> index;
       if (reference == null) {
         index = null;

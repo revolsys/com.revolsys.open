@@ -106,8 +106,8 @@ public class TestReader {
     try {
       scale = scaleAttribute.getDoubleValue();
     } catch (final DataConversionException e) {
-      throw new TestParseException("Could not convert scale attribute to double: "
-        + scaleAttribute.getValue());
+      throw new TestParseException(
+        "Could not convert scale attribute to double: " + scaleAttribute.getValue());
     }
     return scale;
   }
@@ -119,8 +119,8 @@ public class TestReader {
       final Document document = builder.build(new FileInputStream(testFile));
       final Element runElement = document.getRootElement();
       if (!runElement.getName().equalsIgnoreCase("run")) {
-        throw new TestParseException("Expected <run> but encountered <" + runElement.getName()
-          + ">");
+        throw new TestParseException(
+          "Expected <run> but encountered <" + runElement.getName() + ">");
       }
       return parseTestRun(parent, runElement, testFile, runIndex);
     } catch (final IllegalArgumentException e) {
@@ -194,8 +194,8 @@ public class TestReader {
     final GeometryOperation geomOp = (GeometryOperation)getInstance(goClass,
       GeometryOperation.class);
     if (geomOp == null) {
-      throw new TestParseException("Could not create instance of GeometryOperation from class "
-        + goClass);
+      throw new TestParseException(
+        "Could not create instance of GeometryOperation from class " + goClass);
     }
     return geomOp;
   }
@@ -218,8 +218,8 @@ public class TestReader {
     if (typeAttribute == null && scaleAttribute == null) {
       throw new TestParseException("Missing type attribute in <precisionModel>");
     }
-    if (scaleAttribute != null || typeAttribute != null
-      && typeAttribute.getValue().trim().equalsIgnoreCase("FIXED")) {
+    if (scaleAttribute != null
+      || typeAttribute != null && typeAttribute.getValue().trim().equalsIgnoreCase("FIXED")) {
       if (typeAttribute != null && typeAttribute.getValue().trim().equalsIgnoreCase("FLOATING")) {
         throw new TestParseException("scale attribute not allowed in floating <precisionModel>");
       }
@@ -245,8 +245,8 @@ public class TestReader {
     final String goClass = goElement.getTextTrim();
     final ResultMatcher resultMatcher = (ResultMatcher)getInstance(goClass, ResultMatcher.class);
     if (resultMatcher == null) {
-      throw new TestParseException("Could not create instance of ResultMatcher from class "
-        + goClass);
+      throw new TestParseException(
+        "Could not create instance of ResultMatcher from class " + goClass);
     }
     return resultMatcher;
   }
@@ -272,9 +272,9 @@ public class TestReader {
         final File bWktFile = wktFile(bElement, testRun);
         final Geometry a = readGeometry(aElement, absoluteWktFile(aWktFile, testRun));
         final Geometry b = readGeometry(bElement, absoluteWktFile(bWktFile, testRun));
-        final TestCase testCase = new TestCase(
-          descElement != null ? descElement.getTextTrim() : "", a, b, aWktFile, bWktFile, testRun,
-          caseIndex, ((LineNumberElement)caseElement).getStartLine());
+        final TestCase testCase = new TestCase(descElement != null ? descElement.getTextTrim() : "",
+          a, b, aWktFile, bWktFile, testRun, caseIndex,
+          ((LineNumberElement)caseElement).getStartLine());
         final List testElements = caseElement.getChildren("test");
         // if (testElements.size() == 0) {
         // throw new TestParseException("Missing <test> in <case>");
@@ -286,8 +286,8 @@ public class TestReader {
         }
         testCases.add(testCase);
       } catch (final Exception e) {
-        throw new IllegalArgumentException("An exception occurred while parsing <case> "
-          + caseIndex + " in " + testFile, e);
+        throw new IllegalArgumentException(
+          "An exception occurred while parsing <case> " + caseIndex + " in " + testFile, e);
       }
     }
     return testCases;
@@ -339,7 +339,8 @@ public class TestReader {
     if (caseElements.size() == 0) {
       throw new TestParseException("Missing <case> in <run>");
     }
-    for (final TestCase testCase : parseTestCases(caseElements, testFile, testRun, this.tolerance)) {
+    for (final TestCase testCase : parseTestCases(caseElements, testFile, testRun,
+      this.tolerance)) {
       testRun.addTest(testCase);
     }
     return testRun;
@@ -368,21 +369,15 @@ public class TestReader {
         if (nameAttribute == null) {
           throw new TestParseException("Missing name attribute in <op>");
         }
-        final String arg1 = opElement.getAttribute("arg1") == null ? "A" : opElement.getAttribute(
-          "arg1")
-          .getValue()
-          .trim();
-        final String arg2 = opElement.getAttribute("arg2") == null ? null : opElement.getAttribute(
-          "arg2")
-          .getValue()
-          .trim();
+        final String arg1 = opElement.getAttribute("arg1") == null ? "A"
+          : opElement.getAttribute("arg1").getValue().trim();
+        final String arg2 = opElement.getAttribute("arg2") == null ? null
+          : opElement.getAttribute("arg2").getValue().trim();
         String arg3 = opElement.getAttribute("arg3") == null ? null
           : opElement.getAttribute("arg3").getValue().trim();
         if (arg3 == null && nameAttribute.getValue().trim().equalsIgnoreCase("relate")) {
-          arg3 = opElement.getAttribute("pattern") == null ? null : opElement.getAttribute(
-            "pattern")
-            .getValue()
-            .trim();
+          arg3 = opElement.getAttribute("pattern") == null ? null
+            : opElement.getAttribute("pattern").getValue().trim();
         }
         final ArrayList arguments = new ArrayList();
         if (arg2 != null) {
@@ -399,8 +394,8 @@ public class TestReader {
 
         tests.add(test);
       } catch (final Exception e) {
-        throw new IllegalArgumentException("An exception occurred while parsing <test> "
-          + testIndex + " in <case> " + caseIndex + " in " + testFile, e);
+        throw new IllegalArgumentException("An exception occurred while parsing <test> " + testIndex
+          + " in <case> " + caseIndex + " in " + testFile, e);
       }
     }
     return tests;
@@ -416,8 +411,8 @@ public class TestReader {
       try {
         tolerance = Double.parseDouble(toleranceElement.getTextTrim());
       } catch (final NumberFormatException e) {
-        throw new TestParseException("Could not parse tolerance from string: "
-          + toleranceElement.getTextTrim());
+        throw new TestParseException(
+          "Could not parse tolerance from string: " + toleranceElement.getTextTrim());
       }
     }
     return tolerance;

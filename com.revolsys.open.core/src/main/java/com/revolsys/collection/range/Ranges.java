@@ -55,8 +55,8 @@ public class Ranges {
       final long fromLong = (Long)fromValue;
       if (toValue instanceof Long) {
         final long toLong = (Long)toValue;
-        if (fromLong != 0 && from.toString().charAt(0) == '0' || toLong != 0
-          && to.toString().charAt(0) == '0') {
+        if (fromLong != 0 && from.toString().charAt(0) == '0'
+          || toLong != 0 && to.toString().charAt(0) == '0') {
           return new LongPaddedRange(fromLong, toLong);
         } else {
           return create(fromLong, toLong);

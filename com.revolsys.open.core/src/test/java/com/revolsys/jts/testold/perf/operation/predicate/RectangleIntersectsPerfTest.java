@@ -104,7 +104,8 @@ public class RectangleIntersectsPerfTest {
       for (int j = 0; j < nSide; j++) {
         final double baseX = env.getMinX() + i * dx;
         final double baseY = env.getMinY() + j * dy;
-        final BoundingBox envRect = new BoundingBoxDoubleGf(2, baseX, baseY, baseX + dx, baseY + dy);
+        final BoundingBox envRect = new BoundingBoxDoubleGf(2, baseX, baseY, baseX + dx,
+          baseY + dy);
         final Geometry rect = envRect.toGeometry();
         rectList.add(rect);
       }
@@ -137,7 +138,7 @@ public class RectangleIntersectsPerfTest {
 
   void test(final Collection<Geometry> rect, final Geometry g) {
     // System.out.println("Target # pts: " + g.getVertexCount()
-    // + "  -- # Rectangles: " + rect.size());
+    // + " -- # Rectangles: " + rect.size());
 
     final int maxCount = MAX_ITER;
     final Stopwatch sw = new Stopwatch();

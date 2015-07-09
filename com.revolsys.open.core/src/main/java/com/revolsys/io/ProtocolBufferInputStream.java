@@ -97,7 +97,8 @@ public final class ProtocolBufferInputStream {
   /**
    * Create a new CodedInputStream wrapping the given byte array slice.
    */
-  public static ProtocolBufferInputStream newInstance(final byte[] buf, final int off, final int len) {
+  public static ProtocolBufferInputStream newInstance(final byte[] buf, final int off,
+    final int len) {
     final ProtocolBufferInputStream result = new ProtocolBufferInputStream(buf, off, len);
     try {
       // Some uses of CodedInputStream can be more efficient if they know
@@ -941,8 +942,8 @@ public final class ProtocolBufferInputStream {
         return true;
       case WireFormat.WIRETYPE_START_GROUP:
         skipMessage();
-        checkLastTagWas(WireFormat.makeTag(WireFormat.getTagFieldNumber(tag),
-          WireFormat.WIRETYPE_END_GROUP));
+        checkLastTagWas(
+          WireFormat.makeTag(WireFormat.getTagFieldNumber(tag), WireFormat.WIRETYPE_END_GROUP));
         return true;
       case WireFormat.WIRETYPE_END_GROUP:
         return false;

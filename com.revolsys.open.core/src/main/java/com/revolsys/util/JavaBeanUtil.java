@@ -322,7 +322,8 @@ public final class JavaBeanUtil {
     return name;
   }
 
-  public static Class<?> getTypeParameterClass(final Method method, final Class<?> expectedRawClass) {
+  public static Class<?> getTypeParameterClass(final Method method,
+    final Class<?> expectedRawClass) {
     final Type resultListReturnType = method.getGenericReturnType();
     if (resultListReturnType instanceof ParameterizedType) {
       final ParameterizedType parameterizedType = (ParameterizedType)resultListReturnType;
@@ -415,7 +416,8 @@ public final class JavaBeanUtil {
     return isAssignableFrom(classes, objectClass);
   }
 
-  public static boolean isDefinedInClassLoader(final ClassLoader classLoader, final URL resourceUrl) {
+  public static boolean isDefinedInClassLoader(final ClassLoader classLoader,
+    final URL resourceUrl) {
     if (classLoader instanceof URLClassLoader) {
       final String resourceUrlString = resourceUrl.toString();
       final URLClassLoader urlClassLoader = (URLClassLoader)classLoader;

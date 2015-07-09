@@ -14,7 +14,8 @@ public class RecordStoreCache {
     return new RecordStoreCache(recordStore);
   }
 
-  private final Map<BoundingBox, List> cachedObejcts = Collections.synchronizedMap(new HashMap<BoundingBox, List>());
+  private final Map<BoundingBox, List> cachedObejcts = Collections
+    .synchronizedMap(new HashMap<BoundingBox, List>());
 
   private final RecordStore recordStore;
 
@@ -29,8 +30,8 @@ public class RecordStoreCache {
   private void addBoundingBox(final BoundingBox boundingBox) {
     synchronized (this.loadTasks) {
       if (!this.loadTasks.containsKey(boundingBox)) {
-        this.loadTasks.put(boundingBox, new RecordStoreQueryTask(this.recordStore, this.typePath,
-          boundingBox));
+        this.loadTasks.put(boundingBox,
+          new RecordStoreQueryTask(this.recordStore, this.typePath, boundingBox));
       }
     }
   }

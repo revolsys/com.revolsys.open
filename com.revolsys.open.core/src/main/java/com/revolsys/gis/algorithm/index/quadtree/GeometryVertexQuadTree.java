@@ -23,8 +23,8 @@ public class GeometryVertexQuadTree extends IdObjectQuadTree<Vertex> {
 
   public static GeometryVertexQuadTree getGeometryVertexIndex(final Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
-      final Reference<GeometryVertexQuadTree> reference = GeometryProperties.getGeometryProperty(
-        geometry, GEOMETRY_VERTEX_INDEX);
+      final Reference<GeometryVertexQuadTree> reference = GeometryProperties
+        .getGeometryProperty(geometry, GEOMETRY_VERTEX_INDEX);
       GeometryVertexQuadTree index;
       if (reference == null) {
         index = null;

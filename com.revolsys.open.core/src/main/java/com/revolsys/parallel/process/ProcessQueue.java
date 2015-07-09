@@ -12,7 +12,8 @@ public class ProcessQueue {
 
   private final Channel<Process> processChannel = new Channel<Process>(this.processBuffer);
 
-  private final Set<ProcessQueueWorker> workers = Collections.synchronizedSet(new HashSet<ProcessQueueWorker>());
+  private final Set<ProcessQueueWorker> workers = Collections
+    .synchronizedSet(new HashSet<ProcessQueueWorker>());
 
   private final int maxWorkers;
 

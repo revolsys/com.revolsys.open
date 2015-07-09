@@ -85,7 +85,7 @@ public class CoordinateSequenceExperiment2 {
     endTime = System.currentTimeMillis();
     totalTime = endTime - startTime;
     totalTimeStr = totalTime < 10000 ? totalTime + " ms" : totalTime / 1000.0 + " s";
-    // System.out.println("n Pts: " + nPts + "   Executed in " + totalTimeStr);
+    // System.out.println("n Pts: " + nPts + " Executed in " + totalTimeStr);
   }
 
   public void run2(final int nPts) throws IOException {
@@ -113,8 +113,8 @@ public class CoordinateSequenceExperiment2 {
     totalTime = endTime - startTime;
     totalTimeStr = totalTime < 10000 ? totalTime + " ms" : totalTime / 1000.0 + " s";
 
-    // System.out.println("   signOfDet2x2 calls: " +
+    // System.out.println(" signOfDet2x2 calls: " +
     // RobustDeterminant.callCount);
-    // System.out.println("   Executed in " + totalTimeStr);
+    // System.out.println(" Executed in " + totalTimeStr);
   }
 }

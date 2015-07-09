@@ -9,8 +9,8 @@ import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Reader;
 
-public class JsonMapReader extends AbstractReader<Map<String, Object>> implements
-  Reader<Map<String, Object>> {
+public class JsonMapReader extends AbstractReader<Map<String, Object>>
+  implements Reader<Map<String, Object>> {
 
   private final java.io.Reader in;
 

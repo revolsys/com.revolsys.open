@@ -54,8 +54,8 @@ public class Edge extends GraphComponent {
   public static void updateIM(final Label label, final IntersectionMatrix im) {
     im.setAtLeastIfValid(label.getLocation(0, Position.ON), label.getLocation(1, Position.ON), 1);
     if (label.isArea()) {
-      im.setAtLeastIfValid(label.getLocation(0, Position.LEFT),
-        label.getLocation(1, Position.LEFT), 2);
+      im.setAtLeastIfValid(label.getLocation(0, Position.LEFT), label.getLocation(1, Position.LEFT),
+        2);
       im.setAtLeastIfValid(label.getLocation(0, Position.RIGHT),
         label.getLocation(1, Position.RIGHT), 2);
     }
@@ -93,8 +93,8 @@ public class Edge extends GraphComponent {
    * An intersection that falls exactly on a vertex of the edge is normalized
    * to use the higher of the two possible segmentIndexes
    */
-  public void addIntersection(final LineIntersector li, final int segmentIndex,
-    final int geomIndex, final int intIndex) {
+  public void addIntersection(final LineIntersector li, final int segmentIndex, final int geomIndex,
+    final int intIndex) {
     final Point intPt = new PointDouble(li.getIntersection(intIndex));
     int normalizedSegmentIndex = segmentIndex;
     double dist = li.getEdgeDistance(geomIndex, intIndex);
@@ -119,7 +119,8 @@ public class Edge extends GraphComponent {
    * Adds EdgeIntersections for one or both
    * intersections found for a segment of an edge to the edge intersection list.
    */
-  public void addIntersections(final LineIntersector li, final int segmentIndex, final int geomIndex) {
+  public void addIntersections(final LineIntersector li, final int segmentIndex,
+    final int geomIndex) {
     for (int i = 0; i < li.getIntersectionNum(); i++) {
       addIntersection(li, segmentIndex, geomIndex, i);
     }

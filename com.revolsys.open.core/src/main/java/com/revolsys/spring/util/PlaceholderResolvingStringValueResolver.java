@@ -16,7 +16,8 @@ import org.springframework.util.StringValueResolver;
  * to the <code>parseStringValue</code> method of the containing class.
  */
 public class PlaceholderResolvingStringValueResolver implements StringValueResolver {
-  private static final Logger LOG = LoggerFactory.getLogger(PlaceholderResolvingStringValueResolver.class);
+  private static final Logger LOG = LoggerFactory
+    .getLogger(PlaceholderResolvingStringValueResolver.class);
 
   private final Map<String, Object> attributes;
 
@@ -85,8 +86,8 @@ public class PlaceholderResolvingStringValueResolver implements StringValueResol
       if (endIndex != -1) {
         String placeholder = buf.substring(startIndex + this.placeholderPrefix.length(), endIndex);
         if (!visitedPlaceholders.add(placeholder)) {
-          throw new BeanDefinitionStoreException("Circular placeholder reference '" + placeholder
-            + "' in property definitions");
+          throw new BeanDefinitionStoreException(
+            "Circular placeholder reference '" + placeholder + "' in property definitions");
         }
         // Recursive invocation, parsing placeholders contained in the
         // placeholder key.
@@ -108,8 +109,8 @@ public class PlaceholderResolvingStringValueResolver implements StringValueResol
           startIndex = buf.indexOf(this.placeholderPrefix,
             endIndex + this.placeholderSuffix.length());
         } else {
-          throw new BeanDefinitionStoreException("Could not resolve placeholder '" + placeholder
-            + "'");
+          throw new BeanDefinitionStoreException(
+            "Could not resolve placeholder '" + placeholder + "'");
         }
         visitedPlaceholders.remove(placeholder);
       } else {

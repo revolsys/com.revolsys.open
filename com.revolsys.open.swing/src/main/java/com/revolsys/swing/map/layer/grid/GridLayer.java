@@ -55,8 +55,8 @@ public class GridLayer extends AbstractLayer {
         return true;
       }
     } else {
-      LoggerFactory.getLogger(getClass()).error(
-        "Layer definition does not contain a 'gridName' property");
+      LoggerFactory.getLogger(getClass())
+        .error("Layer definition does not contain a 'gridName' property");
     }
     return false;
   }
@@ -86,8 +86,8 @@ public class GridLayer extends AbstractLayer {
       final String gridName = grid.getName();
       final String preferenceName = CaseConverter.toCapitalizedWords(gridName) + "Mapsheet";
       String mapsheet = PreferencesUtil.getString(getClass(), preferenceName);
-      mapsheet = JOptionPane.showInputDialog(map, "Enter name of the" + gridName
-        + " mapsheet to zoom to", mapsheet);
+      mapsheet = JOptionPane.showInputDialog(map,
+        "Enter name of the" + gridName + " mapsheet to zoom to", mapsheet);
       zoomToSheet(mapsheet);
     }
   }

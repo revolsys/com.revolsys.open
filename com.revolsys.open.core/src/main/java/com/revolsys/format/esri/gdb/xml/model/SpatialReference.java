@@ -64,7 +64,8 @@ public class SpatialReference {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem != null) {
-        final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem.getId());
+        final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
+          .getCoordinateSystem(coordinateSystem.getId());
         if (esriCoordinateSystem != null) {
           final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
           this.wkt = wkt;

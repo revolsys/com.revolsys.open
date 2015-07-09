@@ -59,8 +59,8 @@ public class SierpinskiCarpetBuilder extends GeometricShapeBuilder {
     super(geomFactory);
   }
 
-  private void addHoles(final int n, final double originX, final double originY,
-    final double width, final List<LinearRing> holeList) {
+  private void addHoles(final int n, final double originX, final double originY, final double width,
+    final List<LinearRing> holeList) {
     if (n < 0) {
       return;
     }
@@ -86,8 +86,7 @@ public class SierpinskiCarpetBuilder extends GeometricShapeBuilder {
       new PointDouble(x, y, Point.NULL_ORDINATE),
       new PointDouble(x + width, y, Point.NULL_ORDINATE),
       new PointDouble(x + width, y + width, Point.NULL_ORDINATE),
-      new PointDouble(x, y + width, Point.NULL_ORDINATE),
-      new PointDouble(x, y, Point.NULL_ORDINATE)
+      new PointDouble(x, y + width, Point.NULL_ORDINATE), new PointDouble(x, y, Point.NULL_ORDINATE)
     };
     return this.geometryFactory.linearRing(pts);
   }

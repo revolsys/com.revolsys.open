@@ -62,8 +62,8 @@ import com.revolsys.jts.operation.BoundaryOp;
  *
  *@version 1.7
  */
-public abstract class AbstractMultiLineString extends AbstractGeometryCollection implements
-  MultiLineString {
+public abstract class AbstractMultiLineString extends AbstractGeometryCollection
+  implements MultiLineString {
 
   private static final long serialVersionUID = 8166665132445433741L;
 
@@ -285,13 +285,13 @@ public abstract class AbstractMultiLineString extends AbstractGeometryCollection
           lines.set(partIndex, newLine);
           return (V)geometryFactory.multiLineString(lines);
         } else {
-          throw new IllegalArgumentException("Part index must be between 0 and " + partCount
-            + " not " + partIndex);
+          throw new IllegalArgumentException(
+            "Part index must be between 0 and " + partCount + " not " + partIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException("Vertex id's for MultiLineStrings must have length 2. "
-        + Arrays.toString(vertexId));
+      throw new IllegalArgumentException(
+        "Vertex id's for MultiLineStrings must have length 2. " + Arrays.toString(vertexId));
     }
   }
 

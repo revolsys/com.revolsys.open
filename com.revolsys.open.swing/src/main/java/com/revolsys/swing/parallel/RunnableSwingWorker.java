@@ -28,8 +28,8 @@ public class RunnableSwingWorker extends AbstractSwingWorker<Void, Void> {
         this.backgroundTask.run();
       } catch (final Throwable e) {
         if (!isCancelled()) {
-          LoggerFactory.getLogger(this.backgroundTask.getClass()).error(
-            "Error running task:" + this.backgroundTask, e);
+          LoggerFactory.getLogger(this.backgroundTask.getClass())
+            .error("Error running task:" + this.backgroundTask, e);
         }
         throw e;
       }

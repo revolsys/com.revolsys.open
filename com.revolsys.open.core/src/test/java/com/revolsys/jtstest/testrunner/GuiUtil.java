@@ -60,10 +60,10 @@ public class GuiUtil {
    */
   public static void center(final Component componentToMove, final Component componentToCenterOn) {
     final Dimension componentToCenterOnSize = componentToCenterOn.getSize();
-    componentToMove.setLocation(componentToCenterOn.getX()
-      + (componentToCenterOnSize.width - componentToMove.getWidth()) / 2,
-      componentToCenterOn.getY() + (componentToCenterOnSize.height - componentToMove.getHeight())
-        / 2);
+    componentToMove.setLocation(
+      componentToCenterOn.getX() + (componentToCenterOnSize.width - componentToMove.getWidth()) / 2,
+      componentToCenterOn.getY()
+        + (componentToCenterOnSize.height - componentToMove.getHeight()) / 2);
   }
 
   /**
@@ -158,8 +158,8 @@ public class GuiUtil {
    * Runs r in the event dispatch thread, which may be the current thread.
    * Waits for r to finish before returning.
    */
-  public static void invokeAndWait(final Runnable r) throws InterruptedException,
-    java.lang.reflect.InvocationTargetException {
+  public static void invokeAndWait(final Runnable r)
+    throws InterruptedException, java.lang.reflect.InvocationTargetException {
     if (SwingUtilities.isEventDispatchThread()) {
       r.run();
     } else {

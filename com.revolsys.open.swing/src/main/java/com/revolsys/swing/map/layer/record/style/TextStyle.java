@@ -142,8 +142,8 @@ public class TextStyle implements MapSerializer, Cloneable {
         try {
           JavaBeanUtil.setProperty(this, propertyName, propertyValue);
         } catch (final Throwable e) {
-          ExceptionUtil.log(getClass(),
-            "Unable to set style " + propertyName + "=" + propertyValue, e);
+          ExceptionUtil.log(getClass(), "Unable to set style " + propertyName + "=" + propertyValue,
+            e);
         }
       }
     }

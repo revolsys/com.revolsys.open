@@ -96,7 +96,8 @@ public class LinearIterator {
    * @param vertexIndex the vertex to start at
    * @throws IllegalArgumentException if linearGeom is not lineal
    */
-  public LinearIterator(final Geometry linearGeom, final int componentIndex, final int vertexIndex) {
+  public LinearIterator(final Geometry linearGeom, final int componentIndex,
+    final int vertexIndex) {
     if (!(linearGeom instanceof Lineal)) {
       throw new IllegalArgumentException("Lineal geometry is required");
     }

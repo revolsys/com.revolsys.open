@@ -73,7 +73,8 @@ public class IndexTester {
       for (int j = 0; j < gridSize; j++) {
         final double x = EXTENT_MIN + gridInc * i;
         final double y = EXTENT_MIN + gridInc * j;
-        final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(2, x, y, x + cellSize, y + cellSize);
+        final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(2, x, y, x + cellSize,
+          y + cellSize);
         items.add(env);
       }
     }
@@ -105,7 +106,8 @@ public class IndexTester {
       for (int j = 0; j < gridSize; j++) {
         final double x = EXTENT_MIN + gridInc * i;
         final double y = EXTENT_MIN + gridInc * j;
-        final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(2, x, y, x + cellSize, y + cellSize);
+        final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(2, x, y, x + cellSize,
+          y + cellSize);
         this.index.query(env);
       }
     }
@@ -146,7 +148,7 @@ public class IndexTester {
     runSelfQuery(items);
     final String queryTime = sw.getTimeString();
     result.queryMilliseconds = sw.getTime();
-    // System.out.println("  Load Time = " + loadTime + "  Query Time = "
+    // System.out.println(" Load Time = " + loadTime + " Query Time = "
     // + queryTime);
     return result;
   }

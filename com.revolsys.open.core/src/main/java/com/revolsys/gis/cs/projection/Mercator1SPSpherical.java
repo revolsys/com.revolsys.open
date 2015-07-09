@@ -20,7 +20,8 @@ public class Mercator1SPSpherical extends AbstractCoordinatesProjection {
   public Mercator1SPSpherical(final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
     final Datum datum = geographicCS.getDatum();
-    final double centralMeridian = cs.getDoubleParameter(ProjectionParameterNames.LONGITUDE_OF_CENTER);
+    final double centralMeridian = cs
+      .getDoubleParameter(ProjectionParameterNames.LONGITUDE_OF_CENTER);
 
     final Spheroid spheroid = datum.getSpheroid();
     this.x0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_EASTING);

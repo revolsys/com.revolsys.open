@@ -51,7 +51,7 @@ public class VoronoiPerfTest {
     builder.setSites(pts);
 
     final Geometry g = builder.getEdges(geomFact);
-    // System.out.println("# pts: " + pts.size() + "  --  " +
+    // System.out.println("# pts: " + pts.size() + " -- " +
     // sw.getTimeString());
     // System.out.println(g);
   }

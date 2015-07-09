@@ -62,8 +62,8 @@ public class ArcSdeStGeometryRecordStoreExtension implements RecordStoreExtensio
           JdbcFieldAdder.setColumnProperty(schema, typePath, columnName, JdbcFieldAdder.AXIS_COUNT,
             axisCount);
 
-          final ArcSdeSpatialReference spatialReference = ArcSdeSpatialReferenceCache.getSpatialReference(
-            schema, esriSrid);
+          final ArcSdeSpatialReference spatialReference = ArcSdeSpatialReferenceCache
+            .getSpatialReference(schema, esriSrid);
           JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
             ArcSdeConstants.SPATIAL_REFERENCE, spatialReference);
 
@@ -118,11 +118,12 @@ public class ArcSdeStGeometryRecordStoreExtension implements RecordStoreExtensio
           registrationId);
 
         final String rowidColumn = resultSet.getString(3);
-        JdbcFieldAdder.setTableProperty(schema, typePath, ArcSdeConstants.ROWID_COLUMN, rowidColumn);
+        JdbcFieldAdder.setTableProperty(schema, typePath, ArcSdeConstants.ROWID_COLUMN,
+          rowidColumn);
       }
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass())
-        .error("Unable to load rowid columns for " + schemaName, e);
+      LoggerFactory.getLogger(getClass()).error("Unable to load rowid columns for " + schemaName,
+        e);
     } finally {
       JdbcUtils.close(statement, resultSet);
     }
@@ -156,8 +157,8 @@ public class ArcSdeStGeometryRecordStoreExtension implements RecordStoreExtensio
         loadColumnProperties(schema, schemaName, connection);
       }
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).error(
-        "Unable to get ArcSDE metadata for schema " + schema.getName(), e);
+      LoggerFactory.getLogger(getClass())
+        .error("Unable to get ArcSDE metadata for schema " + schema.getName(), e);
     }
   }
 }

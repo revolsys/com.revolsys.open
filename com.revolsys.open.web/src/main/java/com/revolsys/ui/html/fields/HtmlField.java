@@ -42,8 +42,8 @@ public class HtmlField extends Field {
     final String defaultValue, final boolean required) {
     this(name, maxLength, defaultValue, required);
     if (minLength <= maxLength) {
-      throw new IllegalArgumentException("minLength (" + minLength + ") must be <= maxLength ("
-        + minLength + ")");
+      throw new IllegalArgumentException(
+        "minLength (" + minLength + ") must be <= maxLength (" + minLength + ")");
     }
     this.minLength = minLength;
   }
@@ -116,7 +116,8 @@ public class HtmlField extends Field {
     return valid;
   }
 
-  private void serializeBlockFormatOption(final XmlWriter out, final String tag, final String title) {
+  private void serializeBlockFormatOption(final XmlWriter out, final String tag,
+    final String title) {
     out.startTag(HtmlUtil.OPTION);
     out.attribute(HtmlUtil.ATTR_VALUE, tag);
     out.text(title);
@@ -128,8 +129,8 @@ public class HtmlField extends Field {
     out.attribute(HtmlUtil.ATTR_CLASS, "blockFormat");
 
     out.startTag(HtmlUtil.SELECT);
-    out.attribute(HtmlUtil.ATTR_ON_CHANGE, getName()
-      + "IafHtml.formatBlock(this.value);this.value=''");
+    out.attribute(HtmlUtil.ATTR_ON_CHANGE,
+      getName() + "IafHtml.formatBlock(this.value);this.value=''");
     serializeBlockFormatOption(out, "", ".. Select Paragraph Format");
     serializeBlockFormatOption(out, "<p>", "Normal");
     serializeBlockFormatOption(out, "<h1>", "Heading 1");
@@ -219,9 +220,10 @@ public class HtmlField extends Field {
     // Paragraph style group
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "group ");
-    serializeToolbarButton(out, "orderedList", "Numbered List", getName() + "IafHtml.orderedList()");
-    serializeToolbarButton(out, "unorderedList", "Bulleted List", getName()
-      + "IafHtml.unorderedList()");
+    serializeToolbarButton(out, "orderedList", "Numbered List",
+      getName() + "IafHtml.orderedList()");
+    serializeToolbarButton(out, "unorderedList", "Bulleted List",
+      getName() + "IafHtml.unorderedList()");
     serializeBlockFormatToolbarList(out);
     out.endTag(HtmlUtil.DIV);
 

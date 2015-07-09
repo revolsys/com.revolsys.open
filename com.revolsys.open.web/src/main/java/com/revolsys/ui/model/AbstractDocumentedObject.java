@@ -54,7 +54,8 @@ public class AbstractDocumentedObject {
   }
 
   public Map<String, DocInfo> getDocumentationByLanguage(final String language) {
-    Map<String, DocInfo> documentationByCountry = this.documentationByLanguageAndCountry.get(language);
+    Map<String, DocInfo> documentationByCountry = this.documentationByLanguageAndCountry
+      .get(language);
     if (documentationByCountry == null) {
       documentationByCountry = new LinkedHashMap<String, DocInfo>();
       this.documentationByLanguageAndCountry.put(language, documentationByCountry);

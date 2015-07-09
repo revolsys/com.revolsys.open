@@ -165,7 +165,8 @@ public abstract class AbstractLineString extends AbstractGeometry implements Lin
     } else {
       geometryFactory = getNonZeroGeometryFactory(geometryFactory);
       double[] targetCoordinates;
-      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory.getCoordinatesOperation(geometryFactory);
+      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
+        .getCoordinatesOperation(geometryFactory);
       if (coordinatesOperation == null) {
         return coordinates;
       } else {
@@ -530,11 +531,12 @@ public abstract class AbstractLineString extends AbstractGeometry implements Lin
   }
 
   @Override
-  public Point getToPoint() {
+  public Point getFromPoint() {
     if (isEmpty()) {
       return null;
+    } else {
+      return getPoint(0);
     }
-    return getPoint(getVertexCount() - 1);
   }
 
   /**
@@ -638,12 +640,11 @@ public abstract class AbstractLineString extends AbstractGeometry implements Lin
   }
 
   @Override
-  public Point getFromPoint() {
+  public Point getToPoint() {
     if (isEmpty()) {
       return null;
-    } else {
-      return getPoint(0);
     }
+    return getPoint(getVertexCount() - 1);
   }
 
   @Override
@@ -894,7 +895,8 @@ public abstract class AbstractLineString extends AbstractGeometry implements Lin
     final Point line2From = line2.getVertex(0);
     final Point line2To = line2.getVertex(-1);
     if (line1From.equals(2, line2To)) {
-      newVertexCount = CoordinatesListUtil.append(axisCount, line2, 0, coordinates, 0, vertexCount2);
+      newVertexCount = CoordinatesListUtil.append(axisCount, line2, 0, coordinates, 0,
+        vertexCount2);
       newVertexCount = CoordinatesListUtil.append(axisCount, this, 1, coordinates, newVertexCount,
         vertexCount1 - 1);
     } else if (line2From.equals(2, line1To)) {
@@ -935,7 +937,8 @@ public abstract class AbstractLineString extends AbstractGeometry implements Lin
     final Point line2From = line2.getVertex(0);
     final Point line2To = line2.getVertex(-1);
     if (line1From.equals(2, line2To) && line1From.equals(2, point)) {
-      newVertexCount = CoordinatesListUtil.append(axisCount, line2, 0, coordinates, 0, vertexCount2);
+      newVertexCount = CoordinatesListUtil.append(axisCount, line2, 0, coordinates, 0,
+        vertexCount2);
       newVertexCount = CoordinatesListUtil.append(axisCount, this, 1, coordinates, newVertexCount,
         vertexCount1 - 1);
     } else if (line2From.equals(2, line1To) && line2From.equals(2, point)) {
@@ -1179,8 +1182,8 @@ public abstract class AbstractLineString extends AbstractGeometry implements Lin
       if (hasFromPoint) {
         CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex++, fromPoint);
       }
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex, this,
-        fromVertexIndex, vertexCount);
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex, this, fromVertexIndex,
+        vertexCount);
       vertexIndex += vertexCount;
       if (hasToPoint) {
         CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex++, toPoint);

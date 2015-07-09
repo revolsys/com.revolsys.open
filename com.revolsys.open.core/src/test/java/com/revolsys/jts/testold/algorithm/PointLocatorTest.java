@@ -32,15 +32,15 @@
  */
 package com.revolsys.jts.testold.algorithm;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKTReader;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 /**
  * Tests PointInRing algorithms
@@ -73,9 +73,7 @@ public class PointLocatorTest extends TestCase {
   }
 
   public void testComplexRing() throws Exception {
-    runPtLocator(
-      Location.INTERIOR,
-      new PointDouble((double)0, 0, Point.NULL_ORDINATE),
+    runPtLocator(Location.INTERIOR, new PointDouble((double)0, 0, Point.NULL_ORDINATE),
       "POLYGON ((-40 80, -40 -80, 20 0, 20 -100, 40 40, 80 -80, 100 80, 140 -20, 120 140, 40 180,     60 40, 0 120, -20 -20, -40 80))");
   }
 

@@ -369,8 +369,8 @@ public abstract class LineIntersector {
    */
   public boolean isInteriorIntersection(final int inputLineIndex) {
     for (int i = 0; i < this.result; i++) {
-      if (!(this.intPt[i].equals(2, this.inputLines[inputLineIndex][0]) || this.intPt[i].equals(2,
-        this.inputLines[inputLineIndex][1]))) {
+      if (!(this.intPt[i].equals(2, this.inputLines[inputLineIndex][0])
+        || this.intPt[i].equals(2, this.inputLines[inputLineIndex][1]))) {
         return true;
       }
     }

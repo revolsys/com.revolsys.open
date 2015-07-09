@@ -153,8 +153,8 @@ import com.revolsys.util.Property;
  * @see #setSessionAttributeStore
  * @since 2.5
  */
-public class AnnotationMethodHandlerAdapter extends WebContentGenerator implements HandlerAdapter,
-  Ordered, BeanFactoryAware {
+public class AnnotationMethodHandlerAdapter extends WebContentGenerator
+  implements HandlerAdapter, Ordered, BeanFactoryAware {
 
   /**
    * Holder for request mapping metadata. Allows for finding a best matching
@@ -277,8 +277,8 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
     protected WebDataBinder createBinder(final NativeWebRequest webRequest, final Object target,
       final String objectName) throws Exception {
 
-      return AnnotationMethodHandlerAdapter.this.createBinder(
-        (HttpServletRequest)webRequest.getNativeRequest(), target, objectName);
+      return AnnotationMethodHandlerAdapter.this
+        .createBinder((HttpServletRequest)webRequest.getNativeRequest(), target, objectName);
     }
 
     @Override
@@ -347,8 +347,8 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
         mav.getModelMap().mergeAttributes(implicitModel);
         return mav;
       } else if (returnValue instanceof Model) {
-        return new ModelAndView().addAllObjects(implicitModel).addAllObjects(
-          ((Model)returnValue).asMap());
+        return new ModelAndView().addAllObjects(implicitModel)
+          .addAllObjects(((Model)returnValue).asMap());
       } else if (returnValue instanceof View) {
         return new ModelAndView((View)returnValue).addAllObjects(implicitModel);
       } else if (AnnotationUtils.findAnnotation(handlerMethod, ModelAttribute.class) != null) {
@@ -443,8 +443,10 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
       if (AnnotationMethodHandlerAdapter.this.beanFactory == null) {
         return value;
       }
-      final String placeholdersResolved = AnnotationMethodHandlerAdapter.this.beanFactory.resolveEmbeddedValue(value);
-      final BeanExpressionResolver exprResolver = AnnotationMethodHandlerAdapter.this.beanFactory.getBeanExpressionResolver();
+      final String placeholdersResolved = AnnotationMethodHandlerAdapter.this.beanFactory
+        .resolveEmbeddedValue(value);
+      final BeanExpressionResolver exprResolver = AnnotationMethodHandlerAdapter.this.beanFactory
+        .getBeanExpressionResolver();
       if (exprResolver == null) {
         return value;
       }
@@ -460,10 +462,11 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
       final NativeWebRequest webRequest) throws Exception {
 
       final HttpServletRequest servletRequest = (HttpServletRequest)webRequest.getNativeRequest();
-      final Map<String, String> uriTemplateVariables = (Map<String, String>)servletRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+      final Map<String, String> uriTemplateVariables = (Map<String, String>)servletRequest
+        .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
       if (uriTemplateVariables == null || !uriTemplateVariables.containsKey(pathVarName)) {
-        throw new IllegalStateException("Could not find @PathVariable [" + pathVarName
-          + "] in @RequestMapping");
+        throw new IllegalStateException(
+          "Could not find @PathVariable [" + pathVarName + "] in @RequestMapping");
       }
       return uriTemplateVariables.get(pathVarName);
     }
@@ -522,8 +525,8 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
           if (charset == null) {
             charset = StandardCharsets.UTF_8;
           }
-          final String urlBody = FileCopyUtils.copyToString(new InputStreamReader(
-            inputMessage.getBody(), charset));
+          final String urlBody = FileCopyUtils
+            .copyToString(new InputStreamReader(inputMessage.getBody(), charset));
 
           final String[] pairs = StringUtils.tokenizeToStringArray(urlBody, "&");
 
@@ -657,25 +660,26 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
         && AnnotationMethodHandlerAdapter.this.pathMatcher.match(mappedPath + ".*", lookupPath)) {
         final String realPath = mappedPath + ".*";
         if (AnnotationMethodHandlerAdapter.this.pathMatcher.match(realPath, lookupPath)) {
-          variables = AnnotationMethodHandlerAdapter.this.pathMatcher.extractUriTemplateVariables(
-            realPath, lookupPath);
+          variables = AnnotationMethodHandlerAdapter.this.pathMatcher
+            .extractUriTemplateVariables(realPath, lookupPath);
         }
       }
       if (variables == null && !mappedPath.startsWith("/")) {
         String realPath = "/**/" + mappedPath;
         if (AnnotationMethodHandlerAdapter.this.pathMatcher.match(realPath, lookupPath)) {
-          variables = AnnotationMethodHandlerAdapter.this.pathMatcher.extractUriTemplateVariables(
-            realPath, lookupPath);
+          variables = AnnotationMethodHandlerAdapter.this.pathMatcher
+            .extractUriTemplateVariables(realPath, lookupPath);
         } else {
           realPath = realPath + ".*";
           if (AnnotationMethodHandlerAdapter.this.pathMatcher.match(realPath, lookupPath)) {
-            variables = AnnotationMethodHandlerAdapter.this.pathMatcher.extractUriTemplateVariables(
-              realPath, lookupPath);
+            variables = AnnotationMethodHandlerAdapter.this.pathMatcher
+              .extractUriTemplateVariables(realPath, lookupPath);
           }
         }
       }
       if (!CollectionUtils.isEmpty(variables)) {
-        final Map<String, String> typeVariables = (Map<String, String>)request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        final Map<String, String> typeVariables = (Map<String, String>)request
+          .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         if (typeVariables != null) {
           variables.putAll(typeVariables);
         }
@@ -704,18 +708,19 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
           if (!typeLevelPattern.startsWith("/")) {
             typeLevelPattern = "/" + typeLevelPattern;
           }
-          final String combinedPattern = AnnotationMethodHandlerAdapter.this.pathMatcher.combine(
-            typeLevelPattern, methodLevelPattern);
+          final String combinedPattern = AnnotationMethodHandlerAdapter.this.pathMatcher
+            .combine(typeLevelPattern, methodLevelPattern);
           if (isPathMatchInternal(combinedPattern, lookupPath)) {
             return combinedPattern;
           }
         }
         return null;
       }
-      final String bestMatchingPattern = (String)request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+      final String bestMatchingPattern = (String)request
+        .getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
       if (Property.hasValue(bestMatchingPattern)) {
-        final String combinedPattern = AnnotationMethodHandlerAdapter.this.pathMatcher.combine(
-          bestMatchingPattern, methodLevelPattern);
+        final String combinedPattern = AnnotationMethodHandlerAdapter.this.pathMatcher
+          .combine(bestMatchingPattern, methodLevelPattern);
         if (!combinedPattern.equals(bestMatchingPattern)
           && isPathMatchInternal(combinedPattern, lookupPath)) {
           return combinedPattern;
@@ -746,8 +751,10 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
     }
 
     public Method resolveHandlerMethod(final HttpServletRequest request) throws ServletException {
-      final String lookupPath = AnnotationMethodHandlerAdapter.this.urlPathHelper.getLookupPathForRequest(request);
-      final Comparator<String> pathComparator = AnnotationMethodHandlerAdapter.this.pathMatcher.getPatternComparator(lookupPath);
+      final String lookupPath = AnnotationMethodHandlerAdapter.this.urlPathHelper
+        .getLookupPathForRequest(request);
+      final Comparator<String> pathComparator = AnnotationMethodHandlerAdapter.this.pathMatcher
+        .getPatternComparator(lookupPath);
       final Map<RequestMappingInfo, Method> targetHandlerMethods = new LinkedHashMap<RequestMappingInfo, Method>();
       final Set<String> allowedMethods = new LinkedHashSet<String>(7);
       String resolvedMethodName = null;
@@ -772,7 +779,8 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
         if (mappingInfo.paths.length > 0) {
           final List<String> matchedPaths = new ArrayList<String>(mappingInfo.paths.length);
           for (final String methodLevelPattern : mappingInfo.paths) {
-            final String matchedPattern = getMatchedPattern(methodLevelPattern, lookupPath, request);
+            final String matchedPattern = getMatchedPattern(methodLevelPattern, lookupPath,
+              request);
             if (matchedPattern != null) {
               if (mappingInfo.matches(request)) {
                 match = true;
@@ -806,7 +814,8 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
               && mappingInfo.paths.length == 0) {
               if (!oldMappedMethod.getName().equals(handlerMethod.getName())) {
                 if (resolvedMethodName == null) {
-                  resolvedMethodName = AnnotationMethodHandlerAdapter.this.methodNameResolver.getHandlerMethodName(request);
+                  resolvedMethodName = AnnotationMethodHandlerAdapter.this.methodNameResolver
+                    .getHandlerMethodName(request);
                 }
                 if (!resolvedMethodName.equals(oldMappedMethod.getName())) {
                   oldMappedMethod = null;
@@ -822,15 +831,10 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
               }
             }
             if (oldMappedMethod != null) {
-              throw new IllegalStateException(
-                "Ambiguous handler methods mapped for HTTP path '"
-                  + lookupPath
-                  + "': {"
-                  + oldMappedMethod
-                  + ", "
-                  + handlerMethod
-                  + "}. If you intend to handle the same path in multiple methods, then factor "
-                  + "them out into a dedicated handler class with that path mapped at the type level!");
+              throw new IllegalStateException("Ambiguous handler methods mapped for HTTP path '"
+                + lookupPath + "': {" + oldMappedMethod + ", " + handlerMethod
+                + "}. If you intend to handle the same path in multiple methods, then factor "
+                + "them out into a dedicated handler class with that path mapped at the type level!");
             }
           }
         }

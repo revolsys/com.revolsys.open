@@ -1,12 +1,12 @@
 package com.revolsys.jts.testold.io;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKBReader;
 import com.revolsys.jts.io.WKBWriter;
+
+import junit.framework.TestCase;
 
 public class WKBWriterTest extends TestCase {
 
@@ -42,8 +42,8 @@ public class WKBWriterTest extends TestCase {
     b = (byte)(wkb[1] & 0x20);
     assertEquals(0x20, b);
 
-    final int srid = (wkb[5] & 0xff) << 24 | (wkb[6] & 0xff) << 16 | (wkb[7] & 0xff) << 8 | wkb[8]
-      & 0xff;
+    final int srid = (wkb[5] & 0xff) << 24 | (wkb[6] & 0xff) << 16 | (wkb[7] & 0xff) << 8
+      | wkb[8] & 0xff;
 
     assertEquals(1234, srid);
 

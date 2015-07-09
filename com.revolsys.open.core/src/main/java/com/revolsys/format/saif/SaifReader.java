@@ -66,8 +66,8 @@ import com.revolsys.spring.SpringUtil;
  * @author Paul Austin
  * @see SaifWriter
  */
-public class SaifReader extends AbstractReader<Record> implements RecordIterator,
-  RecordDefinitionFactory, com.revolsys.data.record.io.RecordReader {
+public class SaifReader extends AbstractReader<Record>
+  implements RecordIterator, RecordDefinitionFactory, com.revolsys.data.record.io.RecordReader {
   /** The logging instance. */
   private static final Logger log = Logger.getLogger(SaifReader.class);
 
@@ -585,7 +585,8 @@ public class SaifReader extends AbstractReader<Record> implements RecordIterator
         loadSrid();
         final GeometryFactory geometryFactory = GeometryFactory.fixed(this.srid, 1.0, 1.0);
 
-        for (final RecordDefinition recordDefinition : ((RecordDefinitionFactoryImpl)this.recordDefinitionFactory).getRecordDefinitions()) {
+        for (final RecordDefinition recordDefinition : ((RecordDefinitionFactoryImpl)this.recordDefinitionFactory)
+          .getRecordDefinitions()) {
           final FieldDefinition geometryField = recordDefinition.getGeometryField();
           if (geometryField != null) {
             geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);

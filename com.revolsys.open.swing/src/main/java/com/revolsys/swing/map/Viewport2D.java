@@ -163,10 +163,10 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     this.originX = boundingBox.getMinX();
     this.originY = boundingBox.getMaxY();
 
-    modelToScreenTransform.concatenate(AffineTransform.getScaleInstance(this.pixelsPerXUnit,
-      this.pixelsPerYUnit));
-    modelToScreenTransform.concatenate(AffineTransform.getTranslateInstance(-this.originX,
-      -this.originY));
+    modelToScreenTransform
+      .concatenate(AffineTransform.getScaleInstance(this.pixelsPerXUnit, this.pixelsPerYUnit));
+    modelToScreenTransform
+      .concatenate(AffineTransform.getTranslateInstance(-this.originX, -this.originY));
     return modelToScreenTransform;
   }
 
@@ -194,8 +194,8 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     return getBoundingBox(geometryFactory, x, y, pixels);
   }
 
-  public BoundingBox getBoundingBox(final GeometryFactory geometryFactory, final int x,
-    final int y, final int pixels) {
+  public BoundingBox getBoundingBox(final GeometryFactory geometryFactory, final int x, final int y,
+    final int pixels) {
     final Point p1 = toModelPoint(geometryFactory, x - pixels, y - pixels);
     final Point p2 = toModelPoint(geometryFactory, x + pixels, y + pixels);
     final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, p1, p2);
@@ -640,7 +640,8 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     }
   }
 
-  public Point toModelPoint(final GeometryFactory geometryFactory, final double... viewCoordinates) {
+  public Point toModelPoint(final GeometryFactory geometryFactory,
+    final double... viewCoordinates) {
     final double[] coordinates = toModelCoordinates(viewCoordinates);
     if (Double.isInfinite(coordinates[0]) || Double.isInfinite(coordinates[1])
       || Double.isNaN(coordinates[0]) || Double.isNaN(coordinates[1])) {

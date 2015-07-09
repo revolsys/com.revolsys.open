@@ -142,7 +142,8 @@ public class CoordinatesUtil {
     for (int i = 1; i < coordinates.getVertexCount(); i++) {
       final Point currentCoordinate = coordinates.getPoint(i);
 
-      if (LineSegmentUtil.distanceLinePoint(previousCoordinate, currentCoordinate, coordinate) < 1) {
+      if (LineSegmentUtil.distanceLinePoint(previousCoordinate, currentCoordinate,
+        coordinate) < 1) {
         return LineSegmentUtil.getElevation(previousCoordinate, currentCoordinate, coordinate);
       }
       previousCoordinate = currentCoordinate;
@@ -198,8 +199,8 @@ public class CoordinatesUtil {
    */
   public static int octant(final double dx, final double dy) {
     if (dx == 0.0 && dy == 0.0) {
-      throw new IllegalArgumentException("Cannot compute the octant for point ( " + dx + ", " + dy
-        + " )");
+      throw new IllegalArgumentException(
+        "Cannot compute the octant for point ( " + dx + ", " + dy + " )");
     }
 
     final double adx = Math.abs(dx);
@@ -243,7 +244,8 @@ public class CoordinatesUtil {
     final double dx = p1.getX() - p0.getX();
     final double dy = p1.getY() - p0.getY();
     if (dx == 0.0 && dy == 0.0) {
-      throw new IllegalArgumentException("Cannot compute the octant for two identical points " + p0);
+      throw new IllegalArgumentException(
+        "Cannot compute the octant for two identical points " + p0);
     }
     return octant(dx, dy);
   }
@@ -273,8 +275,8 @@ public class CoordinatesUtil {
     return RobustDeterminant.signOfDet2x2(dx1, dy1, dx2, dy2);
   }
 
-  public static HCoordinate perpendicularBisector(final double x1, final double y1,
-    final double x2, final double y2) {
+  public static HCoordinate perpendicularBisector(final double x1, final double y1, final double x2,
+    final double y2) {
     final double dx = x2 - x1;
     final double dy = y2 - y1;
     final HCoordinate l1 = new HCoordinate(x1 + dx / 2.0, y1 + dy / 2.0, 1.0);

@@ -43,8 +43,8 @@ public class ShapeIcon implements Icon {
     try {
       graphics.translate(x, y);
       final Rectangle bounds = this.shape.getBounds();
-      final AffineTransform shapeTransform = AffineTransform.getScaleInstance(this.iconWidth
-        / bounds.width, this.iconHeight / bounds.height);
+      final AffineTransform shapeTransform = AffineTransform
+        .getScaleInstance(this.iconWidth / bounds.width, this.iconHeight / bounds.height);
       final Shape newShape = new GeneralPath(this.shape).createTransformedShape(shapeTransform);
       graphics.setPaint(WebColors.Gray);
       graphics.fill(newShape);

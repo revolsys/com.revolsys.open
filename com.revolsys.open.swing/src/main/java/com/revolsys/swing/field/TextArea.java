@@ -126,9 +126,9 @@ public class TextArea extends JTextArea implements Field, FocusListener {
 
   @Override
   public void setFieldValid() {
-    setForeground(TextField.DEFAULT_FOREGROUND);
-    setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
-    setBackground(TextField.DEFAULT_BACKGROUND);
+    setForeground(Field.DEFAULT_FOREGROUND);
+    setSelectedTextColor(Field.DEFAULT_SELECTED_FOREGROUND);
+    setBackground(Field.DEFAULT_BACKGROUND);
     this.errorMessage = null;
     super.setToolTipText(this.originalToolTip);
   }

@@ -87,8 +87,8 @@ public class Triangle {
    * @see #signedArea(Coordinate, Coordinate, Coordinate)
    */
   public static double area(final Point a, final Point b, final Point c) {
-    return Math.abs(((c.getX() - a.getX()) * (b.getY() - a.getY()) - (b.getX() - a.getX())
-      * (c.getY() - a.getY())) / 2);
+    return Math.abs(((c.getX() - a.getX()) * (b.getY() - a.getY())
+      - (b.getX() - a.getX()) * (c.getY() - a.getY())) / 2);
   }
 
   /**
@@ -116,9 +116,9 @@ public class Triangle {
    * null; try { cc = new Coordinate(hcc.getX(), hcc.getY()); } catch
    * (NotRepresentableException ex) { // MD - not sure what we can do to prevent
    * this (robustness problem) // Idea - can we condition which edges we choose?
-   * throw new IllegalStateException(ex.getMessage()); }
-   * //System.out.println("Acc = " + a.distance(cc) + ", Bcc = " +
-   * b.distance(cc) + ", Ccc = " + c.distance(cc) ); return cc; }
+   * throw new IllegalStateException(ex.getMessage()); } //System.out.println(
+   * "Acc = " + a.distance(cc) + ", Bcc = " + b.distance(cc) + ", Ccc = " +
+   * c.distance(cc) ); return cc; }
    */
 
   /**
@@ -236,7 +236,8 @@ public class Triangle {
    *          the [1,1] entry of the matrix
    * @return the determinant
    */
-  private static double det(final double m00, final double m01, final double m10, final double m11) {
+  private static double det(final double m00, final double m01, final double m10,
+    final double m11) {
     return m00 * m11 - m01 * m10;
   }
 
@@ -402,8 +403,8 @@ public class Triangle {
      * triangle x is the vector cross-product For 2D vectors, this formual
      * simplifies to the expression below
      */
-    return ((c.getX() - a.getX()) * (b.getY() - a.getY()) - (b.getX() - a.getX())
-      * (c.getY() - a.getY())) / 2;
+    return ((c.getX() - a.getX()) * (b.getY() - a.getY())
+      - (b.getX() - a.getX()) * (c.getY() - a.getY())) / 2;
   }
 
   /**

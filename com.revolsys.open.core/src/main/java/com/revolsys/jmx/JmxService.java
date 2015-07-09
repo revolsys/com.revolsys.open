@@ -63,7 +63,8 @@ public class JmxService {
    * @param attributeId The name of the attribute.
    * @return The attribute value.
    */
-  public Object getAttribute(final String serverId, final String objectId, final String attributeId) {
+  public Object getAttribute(final String serverId, final String objectId,
+    final String attributeId) {
     if (hasAttribute(serverId, objectId, attributeId)) {
       final MBeanServerConnection connection = getConnection(serverId);
       try {
@@ -75,14 +76,14 @@ public class JmxService {
       } catch (final MalformedObjectNameException e) {
         throw new IllegalArgumentException("MBean name not valid " + serverId + " " + objectId);
       } catch (final AttributeNotFoundException e) {
-        throw new IllegalArgumentException("MBean attribute not found " + serverId + " " + objectId
-          + "." + attributeId);
+        throw new IllegalArgumentException(
+          "MBean attribute not found " + serverId + " " + objectId + "." + attributeId);
       } catch (final Throwable e) {
         return ExceptionUtil.throwUncheckedException(e);
       }
     } else {
-      throw new IllegalArgumentException("Attribute not configured " + serverId + " " + objectId
-        + "." + attributeId);
+      throw new IllegalArgumentException(
+        "Attribute not configured " + serverId + " " + objectId + "." + attributeId);
     }
   }
 
@@ -96,7 +97,8 @@ public class JmxService {
   @SuppressWarnings("unchecked")
   public List<String> getAttributeNames(final String serverId, final String objectId) {
     final Map<String, Object> object = getObjectParams(serverId, objectId);
-    final List<Map<String, Object>> attributes = (List<Map<String, Object>>)object.get("attributes");
+    final List<Map<String, Object>> attributes = (List<Map<String, Object>>)object
+      .get("attributes");
 
     final List<String> fieldNames = new ArrayList<String>();
     for (final Map<String, Object> field : attributes) {
@@ -181,8 +183,8 @@ public class JmxService {
     final Map<String, Object> server = getServerParams(serverId);
     final List<Map<String, Object>> objects = (List<Map<String, Object>>)server.get("objects");
     if (objects == null) {
-      throw new IllegalArgumentException("Server " + serverId
-        + " does not have an objects attribute");
+      throw new IllegalArgumentException(
+        "Server " + serverId + " does not have an objects attribute");
     }
     return objects;
   }
@@ -204,8 +206,8 @@ public class JmxService {
       }
     }
 
-    throw new IllegalArgumentException("Object for server " + serverId + " " + objectId
-      + " not found");
+    throw new IllegalArgumentException(
+      "Object for server " + serverId + " " + objectId + " not found");
   }
 
   /**
@@ -230,8 +232,8 @@ public class JmxService {
             return operation;
           }
         }
-        throw new IllegalArgumentException("MBean Operation not found " + serverId + " " + objectId
-          + "." + operationId);
+        throw new IllegalArgumentException(
+          "MBean Operation not found " + serverId + " " + objectId + "." + operationId);
       } catch (final InstanceNotFoundException e) {
         throw new IllegalArgumentException("MBean not found " + serverId + " " + objectId);
       } catch (final MalformedObjectNameException e) {
@@ -240,8 +242,8 @@ public class JmxService {
         return ExceptionUtil.throwUncheckedException(e);
       }
     } else {
-      throw new IllegalArgumentException("Operation not configured " + serverId + " " + objectId
-        + "." + operationId);
+      throw new IllegalArgumentException(
+        "Operation not configured " + serverId + " " + objectId + "." + operationId);
     }
   }
 
@@ -255,10 +257,11 @@ public class JmxService {
   @SuppressWarnings("unchecked")
   public List<String> getOperationNames(final String serverId, final String objectId) {
     final Map<String, Object> object = getObjectParams(serverId, objectId);
-    final List<Map<String, Object>> operations = (List<Map<String, Object>>)object.get("operations");
+    final List<Map<String, Object>> operations = (List<Map<String, Object>>)object
+      .get("operations");
     if (operations == null) {
-      throw new IllegalArgumentException("MBean " + serverId + " " + objectId
-        + " does not have any operations");
+      throw new IllegalArgumentException(
+        "MBean " + serverId + " " + objectId + " does not have any operations");
     } else {
       final List<String> operationNames = new ArrayList<String>();
       for (final Map<String, Object> attribute : operations) {
@@ -326,7 +329,8 @@ public class JmxService {
    * @param attributeId The name of the attribute.
    * @return True if the attribute exists.
    */
-  public boolean hasAttribute(final String serverId, final String objectId, final String attributeId) {
+  public boolean hasAttribute(final String serverId, final String objectId,
+    final String attributeId) {
     return getAttributeNames(serverId, objectId).contains(attributeId);
   }
 
@@ -339,7 +343,8 @@ public class JmxService {
    * @param operationId The name of the operation.
    * @return True if the operation exists.
    */
-  public boolean hasOperation(final String serverId, final String objectId, final String operationId) {
+  public boolean hasOperation(final String serverId, final String objectId,
+    final String operationId) {
     return getOperationNames(serverId, objectId).contains(operationId);
   }
 

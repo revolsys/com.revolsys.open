@@ -33,8 +33,6 @@
 
 package com.revolsys.jts.testold.algorithm;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.CGAlgorithmsDD;
 import com.revolsys.jts.algorithm.LineIntersector;
@@ -43,6 +41,8 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
+
+import junit.framework.TestCase;
 
 /**
  * Basic functionality tests for RobustLineIntersector.
@@ -142,37 +142,42 @@ public class RobustLineIntersectorTest extends TestCase {
 
   public void testEndpointIntersection() {
     this.i.computeIntersection(new PointDouble((double)100, 100, Point.NULL_ORDINATE),
-      new PointDouble((double)10, 100, Point.NULL_ORDINATE), new PointDouble((double)100, 10,
-        Point.NULL_ORDINATE), new PointDouble((double)100, 100, Point.NULL_ORDINATE));
+      new PointDouble((double)10, 100, Point.NULL_ORDINATE),
+      new PointDouble((double)100, 10, Point.NULL_ORDINATE),
+      new PointDouble((double)100, 100, Point.NULL_ORDINATE));
     assertTrue(this.i.hasIntersection());
     assertEquals(1, this.i.getIntersectionNum());
   }
 
   public void testEndpointIntersection2() {
     this.i.computeIntersection(new PointDouble((double)190, 50, Point.NULL_ORDINATE),
-      new PointDouble((double)120, 100, Point.NULL_ORDINATE), new PointDouble((double)120, 100,
-        Point.NULL_ORDINATE), new PointDouble((double)50, 150, Point.NULL_ORDINATE));
+      new PointDouble((double)120, 100, Point.NULL_ORDINATE),
+      new PointDouble((double)120, 100, Point.NULL_ORDINATE),
+      new PointDouble((double)50, 150, Point.NULL_ORDINATE));
     assertTrue(this.i.hasIntersection());
     assertEquals(1, this.i.getIntersectionNum());
     assertEquals(new PointDouble((double)120, 100, Point.NULL_ORDINATE), this.i.getIntersection(1));
   }
 
   public void testIsCCW() {
-    assertEquals(1, CGAlgorithmsDD.orientationIndex(new PointDouble((double)-123456789, -40,
-      Point.NULL_ORDINATE), new PointDouble((double)0, 0, Point.NULL_ORDINATE), new PointDouble(
-      381039468754763d, 123456789, Point.NULL_ORDINATE)));
+    assertEquals(1,
+      CGAlgorithmsDD.orientationIndex(new PointDouble((double)-123456789, -40, Point.NULL_ORDINATE),
+        new PointDouble((double)0, 0, Point.NULL_ORDINATE),
+        new PointDouble(381039468754763d, 123456789, Point.NULL_ORDINATE)));
   }
 
   public void testIsCCW2() {
-    assertEquals(0, CGAlgorithmsDD.orientationIndex(new PointDouble((double)10, 10,
-      Point.NULL_ORDINATE), new PointDouble((double)20, 20, Point.NULL_ORDINATE), new PointDouble(
-      (double)0, 0, Point.NULL_ORDINATE)));
+    assertEquals(0,
+      CGAlgorithmsDD.orientationIndex(new PointDouble((double)10, 10, Point.NULL_ORDINATE),
+        new PointDouble((double)20, 20, Point.NULL_ORDINATE),
+        new PointDouble((double)0, 0, Point.NULL_ORDINATE)));
   }
 
   public void testIsProper1() {
     this.i.computeIntersection(new PointDouble((double)30, 10, Point.NULL_ORDINATE),
-      new PointDouble((double)30, 30, Point.NULL_ORDINATE), new PointDouble((double)10, 10,
-        Point.NULL_ORDINATE), new PointDouble((double)90, 11, Point.NULL_ORDINATE));
+      new PointDouble((double)30, 30, Point.NULL_ORDINATE),
+      new PointDouble((double)10, 10, Point.NULL_ORDINATE),
+      new PointDouble((double)90, 11, Point.NULL_ORDINATE));
     assertTrue(this.i.hasIntersection());
     assertEquals(1, this.i.getIntersectionNum());
     assertTrue(this.i.isProper());
@@ -180,8 +185,9 @@ public class RobustLineIntersectorTest extends TestCase {
 
   public void testIsProper2() {
     this.i.computeIntersection(new PointDouble((double)10, 30, Point.NULL_ORDINATE),
-      new PointDouble((double)10, 0, Point.NULL_ORDINATE), new PointDouble((double)11, 90,
-        Point.NULL_ORDINATE), new PointDouble((double)10, 10, Point.NULL_ORDINATE));
+      new PointDouble((double)10, 0, Point.NULL_ORDINATE),
+      new PointDouble((double)11, 90, Point.NULL_ORDINATE),
+      new PointDouble((double)10, 10, Point.NULL_ORDINATE));
     assertTrue(this.i.hasIntersection());
     assertEquals(1, this.i.getIntersectionNum());
     assertTrue(!this.i.isProper());
@@ -189,8 +195,9 @@ public class RobustLineIntersectorTest extends TestCase {
 
   public void testOverlap() {
     this.i.computeIntersection(new PointDouble((double)180, 200, Point.NULL_ORDINATE),
-      new PointDouble((double)160, 180, Point.NULL_ORDINATE), new PointDouble((double)220, 240,
-        Point.NULL_ORDINATE), new PointDouble((double)140, 160, Point.NULL_ORDINATE));
+      new PointDouble((double)160, 180, Point.NULL_ORDINATE),
+      new PointDouble((double)220, 240, Point.NULL_ORDINATE),
+      new PointDouble((double)140, 160, Point.NULL_ORDINATE));
     assertTrue(this.i.hasIntersection());
     assertEquals(2, this.i.getIntersectionNum());
   }

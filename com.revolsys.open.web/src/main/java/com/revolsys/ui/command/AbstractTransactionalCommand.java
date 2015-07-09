@@ -18,7 +18,8 @@ public abstract class AbstractTransactionalCommand implements Runnable {
   }
 
   public void runInTransaction() {
-    final PlatformTransactionManager transactionManager = (PlatformTransactionManager)this.beanFactory.getBean("transactionManager");
+    final PlatformTransactionManager transactionManager = (PlatformTransactionManager)this.beanFactory
+      .getBean("transactionManager");
     try (
       Transaction transaction = new Transaction(transactionManager, Propagation.REQUIRES_NEW)) {
       try {

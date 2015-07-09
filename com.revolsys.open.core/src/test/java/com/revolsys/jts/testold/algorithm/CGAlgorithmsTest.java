@@ -1,12 +1,12 @@
 package com.revolsys.jts.testold.algorithm;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 public class CGAlgorithmsTest extends TestCase {
   public static void main(final String args[]) {
@@ -24,10 +24,10 @@ public class CGAlgorithmsTest extends TestCase {
   }
 
   public void testDistancePointLine() {
-    assertEquals(0.5, LineSegmentUtil.distanceLinePoint(new PointDouble(0.0, 0), new PointDouble(
-      1.0, 0), new PointDouble(0.5, 0.5)), 0.000001);
-    assertEquals(1.0, LineSegmentUtil.distanceLinePoint(new PointDouble(0.0, 0), new PointDouble(
-      1.0, 0), new PointDouble(2.0, 0)), 0.000001);
+    assertEquals(0.5, LineSegmentUtil.distanceLinePoint(new PointDouble(0.0, 0),
+      new PointDouble(1.0, 0), new PointDouble(0.5, 0.5)), 0.000001);
+    assertEquals(1.0, LineSegmentUtil.distanceLinePoint(new PointDouble(0.0, 0),
+      new PointDouble(1.0, 0), new PointDouble(2.0, 0)), 0.000001);
   }
 
   public void testDistancePointLinePerpendicular() {
@@ -35,8 +35,9 @@ public class CGAlgorithmsTest extends TestCase {
       new PointDouble(0.0, 0), new PointDouble(1.0, 0, Point.NULL_ORDINATE)), 0.000001);
     assertEquals(0.5, CGAlgorithms.distancePointLinePerpendicular(new PointDouble(3.5, 0.5),
       new PointDouble(0.0, 0), new PointDouble(1.0, 0, Point.NULL_ORDINATE)), 0.000001);
-    assertEquals(0.707106, CGAlgorithms.distancePointLinePerpendicular(new PointDouble(1.0, 0),
-      new PointDouble(0.0, 0, Point.NULL_ORDINATE), new PointDouble(1.0, 1, Point.NULL_ORDINATE)),
+    assertEquals(0.707106,
+      CGAlgorithms.distancePointLinePerpendicular(new PointDouble(1.0, 0),
+        new PointDouble(0.0, 0, Point.NULL_ORDINATE), new PointDouble(1.0, 1, Point.NULL_ORDINATE)),
       0.000001);
   }
 

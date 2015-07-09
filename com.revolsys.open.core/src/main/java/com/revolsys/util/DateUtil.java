@@ -130,7 +130,8 @@ public class DateUtil {
     return getDate(format, dateString);
   }
 
-  public static int getInteger(final Matcher matcher, final int groupIndex, final int defaultValue) {
+  public static int getInteger(final Matcher matcher, final int groupIndex,
+    final int defaultValue) {
     final String group = matcher.group(groupIndex);
     if (Property.hasValue(group)) {
       return Integer.parseInt(group);

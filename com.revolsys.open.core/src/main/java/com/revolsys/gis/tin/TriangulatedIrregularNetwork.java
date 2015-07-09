@@ -163,7 +163,8 @@ public class TriangulatedIrregularNetwork {
     for (int i = 1; i < 3; i++) {
       final Point triCorner = triangle.getPoint(i);
       if (!triCorner.equals(2, intersectCoord) && !previousCoord.equals(2, intersectCoord)) {
-        final double distance = new LineSegmentDoubleGF(previousCoord, triCorner).distance(intersectCoord);
+        final double distance = new LineSegmentDoubleGF(previousCoord, triCorner)
+          .distance(intersectCoord);
         if (distance == 0) {
           final Point nextCoordinates = triangle.getPoint((i + 1) % 3);
           replaceTriangle(triangle,
@@ -185,8 +186,8 @@ public class TriangulatedIrregularNetwork {
     final double y2 = lc1.getY();
     final double z1 = breakline.getElevation(lc0);
     final double z2 = breakline.getElevation(lc1);
-    final LineSegment lineSegment = new LineSegmentDoubleGF(this.geometryFactory, 3, x1, y1, z1,
-      x2, y2, z2);
+    final LineSegment lineSegment = new LineSegmentDoubleGF(this.geometryFactory, 3, x1, y1, z1, x2,
+      y2, z2);
     addBreaklineIntersect(triangle, lineSegment);
   }
 
@@ -309,8 +310,8 @@ public class TriangulatedIrregularNetwork {
     }
   }
 
-  private void addTriangleTouchingOneEdge(final Triangle triangle, final Point lc0,
-    final Point lc1, final int edgeIndex) {
+  private void addTriangleTouchingOneEdge(final Triangle triangle, final Point lc0, final Point lc1,
+    final int edgeIndex) {
     final Point cPrevious = triangle.getPoint(edgeIndex % 3);
     final Point cNext = triangle.getPoint((edgeIndex + 1) % 3);
     final Point cOpposite = triangle.getPoint((edgeIndex + 2) % 3);
@@ -567,8 +568,8 @@ public class TriangulatedIrregularNetwork {
     Point previousCoordinates = coordinates.getPoint(0);
     for (int i = 1; i < coordinates.getVertexCount(); i++) {
       final Point coordinate = coordinates.getPoint(i);
-      final LineSegment segment = new LineSegmentDoubleGF(this.geometryFactory,
-        previousCoordinates, coordinate);
+      final LineSegment segment = new LineSegmentDoubleGF(this.geometryFactory, previousCoordinates,
+        coordinate);
       insertEdge(segment);
       previousCoordinates = coordinate;
     }

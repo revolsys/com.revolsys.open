@@ -36,13 +36,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.jts.util.Assert;
+
+import junit.framework.TestCase;
 
 /**
  * @version 1.7
@@ -50,8 +50,8 @@ import com.revolsys.jts.util.Assert;
 public class LineMergerTest extends TestCase {
   private static WKTReader reader = new WKTReader();
 
-  public static void compare(final Collection expectedGeometries,
-    final Collection actualGeometries, final boolean compareDirections) {
+  public static void compare(final Collection expectedGeometries, final Collection actualGeometries,
+    final boolean compareDirections) {
     assertEquals("Geometry count, " + actualGeometries, expectedGeometries.size(),
       actualGeometries.size());
     for (final Iterator i = expectedGeometries.iterator(); i.hasNext();) {
@@ -61,7 +61,8 @@ public class LineMergerTest extends TestCase {
     }
   }
 
-  private static boolean contains(final Collection geometries, final Geometry g, final boolean exact) {
+  private static boolean contains(final Collection geometries, final Geometry g,
+    final boolean exact) {
     for (final Iterator i = geometries.iterator(); i.hasNext();) {
       final Geometry element = (Geometry)i.next();
       if (exact && element.equals(2, g)) {

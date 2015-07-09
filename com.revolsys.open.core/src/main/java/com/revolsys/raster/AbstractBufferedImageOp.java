@@ -43,8 +43,9 @@ public abstract class AbstractBufferedImageOp implements BufferedImageOp, Clonea
     if (dstCM == null) {
       dstCM = src.getColorModel();
     }
-    return new BufferedImage(dstCM, dstCM.createCompatibleWritableRaster(src.getWidth(),
-      src.getHeight()), dstCM.isAlphaPremultiplied(), null);
+    return new BufferedImage(dstCM,
+      dstCM.createCompatibleWritableRaster(src.getWidth(), src.getHeight()),
+      dstCM.isAlphaPremultiplied(), null);
   }
 
   @Override

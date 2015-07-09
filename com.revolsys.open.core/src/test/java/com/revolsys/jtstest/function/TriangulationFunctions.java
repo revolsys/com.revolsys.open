@@ -102,7 +102,8 @@ public class TriangulationFunctions {
     return tris;
   }
 
-  public static Geometry delaunayTrianglesWithTolerance(final Geometry geom, final double tolerance) {
+  public static Geometry delaunayTrianglesWithTolerance(final Geometry geom,
+    final double tolerance) {
     final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
     builder.setSites(geom);
     builder.setTolerance(tolerance);

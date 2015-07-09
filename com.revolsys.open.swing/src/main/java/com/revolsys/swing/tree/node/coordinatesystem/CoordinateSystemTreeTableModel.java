@@ -27,7 +27,8 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
     super(ROOT);
     this.geographicCoordinateSystems = EpsgCoordinateSystems.getGeographicCoordinateSystems();
 
-    for (final ProjectedCoordinateSystem projectedCoordinateSystem : EpsgCoordinateSystems.getProjectedCoordinateSystems()) {
+    for (final ProjectedCoordinateSystem projectedCoordinateSystem : EpsgCoordinateSystems
+      .getProjectedCoordinateSystems()) {
       final Projection projection = projectedCoordinateSystem.getProjection();
       Maps.addToList(this.projectedCoordinateSystemsByProjection, projection,
         projectedCoordinateSystem);
@@ -52,7 +53,8 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
       return this.projections.get(index);
     } else if (parent instanceof Projection) {
       final Projection projection = (Projection)parent;
-      final List<ProjectedCoordinateSystem> projectedCoordinateSystems = this.projectedCoordinateSystemsByProjection.get(projection);
+      final List<ProjectedCoordinateSystem> projectedCoordinateSystems = this.projectedCoordinateSystemsByProjection
+        .get(projection);
       if (projectedCoordinateSystems == null) {
         return null;
       } else {
@@ -73,7 +75,8 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
       return this.projections.size();
     } else if (parent instanceof Projection) {
       final Projection projection = (Projection)parent;
-      final List<ProjectedCoordinateSystem> projectedCoordinateSystems = this.projectedCoordinateSystemsByProjection.get(projection);
+      final List<ProjectedCoordinateSystem> projectedCoordinateSystems = this.projectedCoordinateSystemsByProjection
+        .get(projection);
       if (projectedCoordinateSystems == null) {
         return 0;
       } else {
@@ -129,7 +132,8 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
       return this.projections.indexOf(child);
     } else if (parent instanceof Projection) {
       final Projection projection = (Projection)parent;
-      final List<ProjectedCoordinateSystem> projectedCoordinateSystems = this.projectedCoordinateSystemsByProjection.get(projection);
+      final List<ProjectedCoordinateSystem> projectedCoordinateSystems = this.projectedCoordinateSystemsByProjection
+        .get(projection);
       if (projectedCoordinateSystems == null) {
         return -1;
       } else {

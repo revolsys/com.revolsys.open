@@ -47,12 +47,14 @@ public class JexlHttpServletRequestContext implements JexlContext {
       public Set entrySet() {
         final Map map = new HashMap();
         map.putAll(JexlHttpServletRequestContext.this.request.getParameterMap());
-        for (final Enumeration names = JexlHttpServletRequestContext.this.request.getAttributeNames(); names.hasMoreElements();) {
+        for (final Enumeration names = JexlHttpServletRequestContext.this.request
+          .getAttributeNames(); names.hasMoreElements();) {
           final String name = (String)names.nextElement();
           map.put(name, JexlHttpServletRequestContext.this.request.getAttribute(name));
         }
         if (JexlHttpServletRequestContext.this.servletContext != null) {
-          for (final Enumeration names = JexlHttpServletRequestContext.this.servletContext.getAttributeNames(); names.hasMoreElements();) {
+          for (final Enumeration names = JexlHttpServletRequestContext.this.servletContext
+            .getAttributeNames(); names.hasMoreElements();) {
             final String name = (String)names.nextElement();
             map.put(name, JexlHttpServletRequestContext.this.servletContext.getAttribute(name));
           }
@@ -65,7 +67,8 @@ public class JexlHttpServletRequestContext implements JexlContext {
         if (key.equals("request")) {
           return JexlHttpServletRequestContext.this.request;
         } else if (key.equals("requestURI")) {
-          return JexlHttpServletRequestContext.this.urlPathHelper.getOriginatingRequestUri(JexlHttpServletRequestContext.this.request);
+          return JexlHttpServletRequestContext.this.urlPathHelper
+            .getOriginatingRequestUri(JexlHttpServletRequestContext.this.request);
         }
         final String keyString = key.toString();
         Object value = null;

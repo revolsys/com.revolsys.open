@@ -165,8 +165,8 @@ public class TinProcess extends BaseInOutProcess<Record, Record> {
     out.write(object);
   }
 
-  private void readTinFeatures(final TriangulatedIrregularNetwork tin,
-    final List<LineString> lines, final Iterable<Record> iterable) {
+  private void readTinFeatures(final TriangulatedIrregularNetwork tin, final List<LineString> lines,
+    final Iterable<Record> iterable) {
     for (final Record object : iterable) {
       final Geometry geometry = object.getGeometryValue();
       if (geometry instanceof Point) {

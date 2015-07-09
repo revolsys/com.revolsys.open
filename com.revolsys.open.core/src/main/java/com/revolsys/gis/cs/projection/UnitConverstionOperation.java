@@ -18,7 +18,8 @@ public class UnitConverstionOperation implements CoordinatesOperation {
     this.converter = sourceUnit.getConverterTo(targetUnit);
   }
 
-  public UnitConverstionOperation(final Unit sourceUnit, final Unit targetUnit, final int axisCount) {
+  public UnitConverstionOperation(final Unit sourceUnit, final Unit targetUnit,
+    final int axisCount) {
     this.sourceUnit = sourceUnit;
     this.targetUnit = targetUnit;
     this.axisCount = axisCount;

@@ -268,7 +268,8 @@ public class Band extends MajorObject {
 
   public int GetStatistics(final int approx_ok, final int force, final double[] min,
     final double[] max, final double[] mean, final double[] stddev) {
-    return gdalJNI.Band_GetStatistics(this.swigCPtr, this, approx_ok, force, min, max, mean, stddev);
+    return gdalJNI.Band_GetStatistics(this.swigCPtr, this, approx_ok, force, min, max, mean,
+      stddev);
   }
 
   public String GetUnitType() {
@@ -309,12 +310,14 @@ public class Band extends MajorObject {
 
   public int ReadRaster(final int xoff, final int yoff, final int xsize, final int ysize,
     final double[] array) {
-    return ReadRaster(xoff, yoff, xsize, ysize, xsize, ysize, gdalconstConstants.GDT_Float64, array);
+    return ReadRaster(xoff, yoff, xsize, ysize, xsize, ysize, gdalconstConstants.GDT_Float64,
+      array);
   }
 
   public int ReadRaster(final int xoff, final int yoff, final int xsize, final int ysize,
     final float[] array) {
-    return ReadRaster(xoff, yoff, xsize, ysize, xsize, ysize, gdalconstConstants.GDT_Float32, array);
+    return ReadRaster(xoff, yoff, xsize, ysize, xsize, ysize, gdalconstConstants.GDT_Float32,
+      array);
   }
 
   public int ReadRaster(final int xoff, final int yoff, final int xsize, final int ysize,
@@ -334,22 +337,22 @@ public class Band extends MajorObject {
 
   public int ReadRaster(final int xoff, final int yoff, final int xsize, final int ysize,
     final int buf_xsize, final int buf_ysize, final int buf_type, final byte[] regularArrayOut) {
-    return gdalJNI.Band_ReadRaster__SWIG_2(this.swigCPtr, this, xoff, yoff, xsize, ysize,
-      buf_xsize, buf_ysize, buf_type, regularArrayOut);
+    return gdalJNI.Band_ReadRaster__SWIG_2(this.swigCPtr, this, xoff, yoff, xsize, ysize, buf_xsize,
+      buf_ysize, buf_type, regularArrayOut);
   }
 
   public int ReadRaster(final int xoff, final int yoff, final int xsize, final int ysize,
     final int buf_xsize, final int buf_ysize, final int buf_type, final byte[] regularArrayOut,
     final int nPixelSpace) {
-    return gdalJNI.Band_ReadRaster__SWIG_1(this.swigCPtr, this, xoff, yoff, xsize, ysize,
-      buf_xsize, buf_ysize, buf_type, regularArrayOut, nPixelSpace);
+    return gdalJNI.Band_ReadRaster__SWIG_1(this.swigCPtr, this, xoff, yoff, xsize, ysize, buf_xsize,
+      buf_ysize, buf_type, regularArrayOut, nPixelSpace);
   }
 
   public int ReadRaster(final int xoff, final int yoff, final int xsize, final int ysize,
     final int buf_xsize, final int buf_ysize, final int buf_type, final byte[] regularArrayOut,
     final int nPixelSpace, final int nLineSpace) {
-    return gdalJNI.Band_ReadRaster__SWIG_0(this.swigCPtr, this, xoff, yoff, xsize, ysize,
-      buf_xsize, buf_ysize, buf_type, regularArrayOut, nPixelSpace, nLineSpace);
+    return gdalJNI.Band_ReadRaster__SWIG_0(this.swigCPtr, this, xoff, yoff, xsize, ysize, buf_xsize,
+      buf_ysize, buf_type, regularArrayOut, nPixelSpace, nLineSpace);
   }
 
   public int ReadRaster(final int xoff, final int yoff, final int xsize, final int ysize,
@@ -388,48 +391,48 @@ public class Band extends MajorObject {
   public int ReadRaster(final int xoff, final int yoff, final int xsize, final int ysize,
     final int buf_xsize, final int buf_ysize, final int buf_type, final float[] regularArrayOut,
     final int nPixelSpace, final int nLineSpace) {
-    return gdalJNI.Band_ReadRaster__SWIG_9(this.swigCPtr, this, xoff, yoff, xsize, ysize,
-      buf_xsize, buf_ysize, buf_type, regularArrayOut, nPixelSpace, nLineSpace);
+    return gdalJNI.Band_ReadRaster__SWIG_9(this.swigCPtr, this, xoff, yoff, xsize, ysize, buf_xsize,
+      buf_ysize, buf_type, regularArrayOut, nPixelSpace, nLineSpace);
   }
 
   public int ReadRaster(final int xoff, final int yoff, final int xsize, final int ysize,
     final int buf_xsize, final int buf_ysize, final int buf_type, final int[] regularArrayOut) {
-    return gdalJNI.Band_ReadRaster__SWIG_8(this.swigCPtr, this, xoff, yoff, xsize, ysize,
-      buf_xsize, buf_ysize, buf_type, regularArrayOut);
+    return gdalJNI.Band_ReadRaster__SWIG_8(this.swigCPtr, this, xoff, yoff, xsize, ysize, buf_xsize,
+      buf_ysize, buf_type, regularArrayOut);
   }
 
   public int ReadRaster(final int xoff, final int yoff, final int xsize, final int ysize,
     final int buf_xsize, final int buf_ysize, final int buf_type, final int[] regularArrayOut,
     final int nPixelSpace) {
-    return gdalJNI.Band_ReadRaster__SWIG_7(this.swigCPtr, this, xoff, yoff, xsize, ysize,
-      buf_xsize, buf_ysize, buf_type, regularArrayOut, nPixelSpace);
+    return gdalJNI.Band_ReadRaster__SWIG_7(this.swigCPtr, this, xoff, yoff, xsize, ysize, buf_xsize,
+      buf_ysize, buf_type, regularArrayOut, nPixelSpace);
   }
 
   public int ReadRaster(final int xoff, final int yoff, final int xsize, final int ysize,
     final int buf_xsize, final int buf_ysize, final int buf_type, final int[] regularArrayOut,
     final int nPixelSpace, final int nLineSpace) {
-    return gdalJNI.Band_ReadRaster__SWIG_6(this.swigCPtr, this, xoff, yoff, xsize, ysize,
-      buf_xsize, buf_ysize, buf_type, regularArrayOut, nPixelSpace, nLineSpace);
+    return gdalJNI.Band_ReadRaster__SWIG_6(this.swigCPtr, this, xoff, yoff, xsize, ysize, buf_xsize,
+      buf_ysize, buf_type, regularArrayOut, nPixelSpace, nLineSpace);
   }
 
   public int ReadRaster(final int xoff, final int yoff, final int xsize, final int ysize,
     final int buf_xsize, final int buf_ysize, final int buf_type, final short[] regularArrayOut) {
-    return gdalJNI.Band_ReadRaster__SWIG_5(this.swigCPtr, this, xoff, yoff, xsize, ysize,
-      buf_xsize, buf_ysize, buf_type, regularArrayOut);
+    return gdalJNI.Band_ReadRaster__SWIG_5(this.swigCPtr, this, xoff, yoff, xsize, ysize, buf_xsize,
+      buf_ysize, buf_type, regularArrayOut);
   }
 
   public int ReadRaster(final int xoff, final int yoff, final int xsize, final int ysize,
     final int buf_xsize, final int buf_ysize, final int buf_type, final short[] regularArrayOut,
     final int nPixelSpace) {
-    return gdalJNI.Band_ReadRaster__SWIG_4(this.swigCPtr, this, xoff, yoff, xsize, ysize,
-      buf_xsize, buf_ysize, buf_type, regularArrayOut, nPixelSpace);
+    return gdalJNI.Band_ReadRaster__SWIG_4(this.swigCPtr, this, xoff, yoff, xsize, ysize, buf_xsize,
+      buf_ysize, buf_type, regularArrayOut, nPixelSpace);
   }
 
   public int ReadRaster(final int xoff, final int yoff, final int xsize, final int ysize,
     final int buf_xsize, final int buf_ysize, final int buf_type, final short[] regularArrayOut,
     final int nPixelSpace, final int nLineSpace) {
-    return gdalJNI.Band_ReadRaster__SWIG_3(this.swigCPtr, this, xoff, yoff, xsize, ysize,
-      buf_xsize, buf_ysize, buf_type, regularArrayOut, nPixelSpace, nLineSpace);
+    return gdalJNI.Band_ReadRaster__SWIG_3(this.swigCPtr, this, xoff, yoff, xsize, ysize, buf_xsize,
+      buf_ysize, buf_type, regularArrayOut, nPixelSpace, nLineSpace);
   }
 
   public int ReadRaster(final int xoff, final int yoff, final int xsize, final int ysize,

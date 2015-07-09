@@ -3,12 +3,12 @@ package com.revolsys.jts.testold.operation;
 import java.io.IOException;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.operation.union.CascadedPolygonUnion;
 import com.revolsys.jts.testold.algorithm.InteriorPointTest;
+
+import junit.framework.TestCase;
 
 /**
  * Large-scale tests of {@link CascadedPolygonUnion}
@@ -24,8 +24,8 @@ public class CascadedPolygonUnionFileTest extends TestCase {
     super(name);
   }
 
-  private void runTestResource(final String file, final double minimumMeasure) throws IOException,
-    ParseException {
+  private void runTestResource(final String file, final double minimumMeasure)
+    throws IOException, ParseException {
     final List<Geometry> geometries = InteriorPointTest.getTestGeometries(file);
     assertTrue(tester.test(geometries, minimumMeasure));
   }

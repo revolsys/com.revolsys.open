@@ -8,8 +8,8 @@ import javax.swing.JToggleButton;
 
 import com.revolsys.swing.action.InvokeMethodAction;
 
-public class InvokeMethodActionToolBarButtonFactory extends InvokeMethodAction implements
-  ToolBarButtonFactory {
+public class InvokeMethodActionToolBarButtonFactory extends InvokeMethodAction
+  implements ToolBarButtonFactory {
   private static final long serialVersionUID = -5626990626102421865L;
 
   private boolean checkBox;
@@ -61,16 +61,15 @@ public class InvokeMethodActionToolBarButtonFactory extends InvokeMethodAction i
     super(name, invokeLater, object, methodName, parameters);
   }
 
-  public InvokeMethodActionToolBarButtonFactory(final CharSequence name,
-    final CharSequence toolTip, final Icon icon, final boolean invokeLater, final Object object,
-    final String methodName, final Object... parameters) {
+  public InvokeMethodActionToolBarButtonFactory(final CharSequence name, final CharSequence toolTip,
+    final Icon icon, final boolean invokeLater, final Object object, final String methodName,
+    final Object... parameters) {
     super(name, icon, invokeLater, object, methodName, parameters);
     setToolTip(toolTip);
   }
 
-  public InvokeMethodActionToolBarButtonFactory(final CharSequence name,
-    final CharSequence toolTip, final Icon icon, final Object object, final String methodName,
-    final Object... parameters) {
+  public InvokeMethodActionToolBarButtonFactory(final CharSequence name, final CharSequence toolTip,
+    final Icon icon, final Object object, final String methodName, final Object... parameters) {
     super(name, icon, object, methodName, parameters);
     setToolTip(toolTip);
   }

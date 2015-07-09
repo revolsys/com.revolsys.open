@@ -1,9 +1,9 @@
 package com.revolsys.jts.testold.math;
 
+import com.revolsys.jts.math.DD;
+
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
-
-import com.revolsys.jts.math.DD;
 
 /**
  * Various tests involving computing known mathematical quantities
@@ -49,7 +49,7 @@ public class DDComputeTest extends TestCase {
       t = t.multiply(t2);
       sign = -sign;
     }
-    // System.out.println("Computed DD.atan(): " + at + "    Math.atan = "
+    // System.out.println("Computed DD.atan(): " + at + " Math.atan = "
     // + Math.atan(x.doubleValue()));
     return at;
   }

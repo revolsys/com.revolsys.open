@@ -32,14 +32,14 @@
  */
 package com.revolsys.jts.testold.geom;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDouble;
 import com.revolsys.jts.io.WKTReader;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 /**
  * Test named predicate short-circuits
@@ -76,8 +76,8 @@ public class LineSegmentTest extends TestCase {
     final LineSegment seg = new LineSegmentDouble(2, x0, y0, x1, y1);
     final Point p = seg.pointAlongOffset(segFrac, offset);
 
-    assertTrue(equalsTolerance(new PointDouble(expectedX, expectedY, Point.NULL_ORDINATE), p,
-      0.000001));
+    assertTrue(
+      equalsTolerance(new PointDouble(expectedX, expectedY, Point.NULL_ORDINATE), p, 0.000001));
   }
 
   void checkOrientationIndex(final double x0, final double y0, final double x1, final double y1,

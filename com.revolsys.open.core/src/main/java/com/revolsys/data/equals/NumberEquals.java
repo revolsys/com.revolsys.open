@@ -19,7 +19,8 @@ public class NumberEquals implements Equals<Object> {
   }
 
   @Override
-  public boolean equals(final Object object1, final Object object2, final Collection<String> exclude) {
+  public boolean equals(final Object object1, final Object object2,
+    final Collection<String> exclude) {
     try {
       if (object1 == null) {
         return object2 == null;

@@ -39,8 +39,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Test;
-
 import org.springframework.util.StringUtils;
 
 import com.revolsys.io.map.MapSerializer;
@@ -48,6 +46,8 @@ import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.Property;
+
+import junit.framework.Test;
 
 /**
  *  A set of tests for two Geometry's.
@@ -76,9 +76,8 @@ public class TestCase extends junit.framework.TestSuite implements MapSerializer
    *  Creates a TestCase with the given description. The tests will be applied
    *  to a and b.
    */
-  public TestCase(final String description, final Geometry a, final Geometry b,
-    final File aWktFile, final File bWktFile, final TestFile testFile, final int caseIndex,
-    final int lineNumber) {
+  public TestCase(final String description, final Geometry a, final Geometry b, final File aWktFile,
+    final File bWktFile, final TestFile testFile, final int caseIndex, final int lineNumber) {
     this.testFile = testFile;
     this.caseIndex = caseIndex;
     if (Property.hasValue(description)) {

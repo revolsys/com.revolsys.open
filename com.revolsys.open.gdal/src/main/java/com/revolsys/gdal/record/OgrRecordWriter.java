@@ -79,7 +79,8 @@ public class OgrRecordWriter extends AbstractRecordWriter {
 
   private void insert(final Record record) {
     final RecordDefinition sourceRecordDefinition = record.getRecordDefinition();
-    final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(sourceRecordDefinition);
+    final RecordDefinition recordDefinition = this.recordStore
+      .getRecordDefinition(sourceRecordDefinition);
     final String typePath = sourceRecordDefinition.getPath();
     final List<FieldDefinition> attributes = recordDefinition.getFields();
     final List<String> idFieldNames = recordDefinition.getIdFieldNames();
@@ -89,7 +90,8 @@ public class OgrRecordWriter extends AbstractRecordWriter {
         if (attribute.isRequired()) {
           final Object value = record.getValue(name);
           if (value == null) {
-            throw new IllegalArgumentException("Atribute " + typePath + "." + name + " is required");
+            throw new IllegalArgumentException(
+              "Atribute " + typePath + "." + name + " is required");
           }
         }
       }
@@ -113,12 +115,12 @@ public class OgrRecordWriter extends AbstractRecordWriter {
         this.recordStore.addStatistic("Insert", record);
       }
     } catch (final IllegalArgumentException e) {
-      throw new RuntimeException("Unable to insert row " + e.getMessage() + "\n"
-        + record.toString(), e);
+      throw new RuntimeException(
+        "Unable to insert row " + e.getMessage() + "\n" + record.toString(), e);
     } catch (final RuntimeException e) {
       if (LoggerFactory.getLogger(OgrRecordWriter.class).isDebugEnabled()) {
-        LoggerFactory.getLogger(OgrRecordWriter.class).debug(
-          "Unable to insert row \n:" + record.toString());
+        LoggerFactory.getLogger(OgrRecordWriter.class)
+          .debug("Unable to insert row \n:" + record.toString());
       }
       throw new RuntimeException("Unable to insert row", e);
     }
@@ -199,7 +201,8 @@ public class OgrRecordWriter extends AbstractRecordWriter {
       Geometry geometry = record.getValue(name);
       if (geometry != null) {
         final FieldDefinition attribute = recordDefinition.getField(name);
-        final GeometryFactory geometryFactory = attribute.getProperty(FieldProperties.GEOMETRY_FACTORY);
+        final GeometryFactory geometryFactory = attribute
+          .getProperty(FieldProperties.GEOMETRY_FACTORY);
         geometry = geometry.convert(geometryFactory);
         final int geometryType = fieldDefinition.GetFieldType();
         final int axisCount = geometryFactory.getAxisCount();

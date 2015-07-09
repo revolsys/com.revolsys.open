@@ -12,8 +12,8 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 
-public abstract class AbstractTableModel extends javax.swing.table.AbstractTableModel implements
-  PropertyChangeSupportProxy {
+public abstract class AbstractTableModel extends javax.swing.table.AbstractTableModel
+  implements PropertyChangeSupportProxy {
 
   /**
    *

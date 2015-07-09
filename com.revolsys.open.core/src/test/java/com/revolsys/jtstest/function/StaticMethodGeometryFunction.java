@@ -37,11 +37,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import junit.framework.Assert;
-
 import com.revolsys.beans.Classes;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jtstest.testrunner.StringUtil;
+
+import junit.framework.Assert;
 
 /**
  * A {@link GeometryFunction} which calls a static
@@ -89,14 +89,14 @@ public class StaticMethodGeometryFunction extends BaseGeometryFunction {
     final Class[] paramTypes = extractParamTypes(method);
     final Class returnType = method.getReturnType();
 
-    return new StaticMethodGeometryFunction(category, funcName, description, paramNames,
-      paramTypes, returnType, method);
+    return new StaticMethodGeometryFunction(category, funcName, description, paramNames, paramTypes,
+      returnType, method);
   }
 
   public static Object dynamicCall(final String clzName, final String methodName,
     final Class[] methodParamTypes, final Object[] methodArgs) throws ClassNotFoundException,
-    SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
-    IllegalAccessException, InvocationTargetException {
+      SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
+      IllegalAccessException, InvocationTargetException {
     final Class clz = Class.forName(clzName);
 
     final Class[] constParTypes = new Class[] {
@@ -130,8 +130,8 @@ public class StaticMethodGeometryFunction extends BaseGeometryFunction {
   private static String[] extractParamNames(final Method method) {
     // try to get names from predefined ones first
     final String paramsName = method.getName() + PARAMETERS_SUFFIX;
-    final String[] codeName = StaticMethodGeometryFunction.getStringArrayClassField(
-      method.getDeclaringClass(), paramsName);
+    final String[] codeName = StaticMethodGeometryFunction
+      .getStringArrayClassField(method.getDeclaringClass(), paramsName);
     if (codeName != null) {
       return codeName;
     }

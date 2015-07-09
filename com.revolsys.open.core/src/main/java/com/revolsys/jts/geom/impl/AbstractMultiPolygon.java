@@ -65,8 +65,8 @@ import com.revolsys.jts.geom.vertex.Vertex;
  *
  *@version 1.7
  */
-public abstract class AbstractMultiPolygon extends AbstractGeometryCollection implements
-  MultiPolygon {
+public abstract class AbstractMultiPolygon extends AbstractGeometryCollection
+  implements MultiPolygon {
 
   /**
    *
@@ -243,13 +243,13 @@ public abstract class AbstractMultiPolygon extends AbstractGeometryCollection im
           polygons.set(partIndex, newPolygon);
           return (V)geometryFactory.multiPolygon(polygons);
         } else {
-          throw new IllegalArgumentException("Part index must be between 0 and " + partCount
-            + " not " + partIndex);
+          throw new IllegalArgumentException(
+            "Part index must be between 0 and " + partCount + " not " + partIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException("Vertex id's for MultiPolygons must have length 3. "
-        + Arrays.toString(vertexId));
+      throw new IllegalArgumentException(
+        "Vertex id's for MultiPolygons must have length 3. " + Arrays.toString(vertexId));
     }
   }
 

@@ -44,8 +44,8 @@ public class TestUtil {
         GeometryFactory otherGeometryFactory;
         if (coordinateSystem instanceof ProjectedCoordinateSystem) {
           final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
-          otherGeometryFactory = GeometryFactory.fixed(projectedCoordinateSystem.getId(),
-            axisCount, scaleXy, scaleZ);
+          otherGeometryFactory = GeometryFactory.fixed(projectedCoordinateSystem.getId(), axisCount,
+            scaleXy, scaleZ);
         } else {
           otherGeometryFactory = GeometryFactory.fixed(3005, axisCount, scaleXy, scaleZ);
         }
@@ -93,7 +93,8 @@ public class TestUtil {
     return equalsExpectedGeometry(i, actualGeometry, expectedGeometry);
   }
 
-  public static void failNotEquals(final String message, final Object expected, final Object actual) {
+  public static void failNotEquals(final String message, final Object expected,
+    final Object actual) {
     Assert.fail(format(message, expected, actual));
   }
 
@@ -105,8 +106,8 @@ public class TestUtil {
     final String expectedString = String.valueOf(expected);
     final String actualString = String.valueOf(actual);
     if (expectedString.equals(actualString)) {
-      return formatted + "expected: " + formatClassAndValue(expected, expectedString)
-        + " but was: " + formatClassAndValue(actual, actualString);
+      return formatted + "expected: " + formatClassAndValue(expected, expectedString) + " but was: "
+        + formatClassAndValue(actual, actualString);
     } else {
       return formatted + "expected:<" + expectedString + "> but was:<" + actualString + ">";
     }

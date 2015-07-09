@@ -253,7 +253,8 @@ public class ShapeMarker extends AbstractMarker {
       translateMarker(viewport, graphics, style, modelX, modelY, mapWidth, mapHeight, orientation);
 
       final AffineTransform shapeTransform = AffineTransform.getScaleInstance(mapWidth, mapHeight);
-      final Shape newShape = new GeneralPath(this.getShape()).createTransformedShape(shapeTransform);
+      final Shape newShape = new GeneralPath(this.getShape())
+        .createTransformedShape(shapeTransform);
       if (style.setMarkerFillStyle(viewport, graphics)) {
         graphics.fill(newShape);
       }

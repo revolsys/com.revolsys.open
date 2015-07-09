@@ -141,8 +141,8 @@ public class InteriorPointArea {
    * @return the centre of the envelope
    */
   public static Point centre(final BoundingBox envelope) {
-    return new PointDouble(avg(envelope.getMinX(), envelope.getMaxX()), avg(envelope.getMinY(),
-      envelope.getMaxY()), Point.NULL_ORDINATE);
+    return new PointDouble(avg(envelope.getMinX(), envelope.getMaxX()),
+      avg(envelope.getMinY(), envelope.getMaxY()), Point.NULL_ORDINATE);
   }
 
   private final GeometryFactory factory;

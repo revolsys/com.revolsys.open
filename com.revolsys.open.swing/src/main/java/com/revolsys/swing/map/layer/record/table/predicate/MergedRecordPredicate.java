@@ -20,11 +20,11 @@ public class MergedRecordPredicate implements HighlightPredicate {
   public static void add(final RecordRowTable table) {
     final MergedRecordsTableModel model = table.getTableModel();
     final MergedRecordPredicate predicate = new MergedRecordPredicate(model);
-    final Highlighter colors = new ColorHighlighter(predicate, WebColors.setAlpha(WebColors.Green,
-      64), WebColors.Black, WebColors.Green, WebColors.White);
+    final Highlighter colors = new ColorHighlighter(predicate,
+      WebColors.setAlpha(WebColors.Green, 64), WebColors.Black, WebColors.Green, WebColors.White);
     table.addHighlighter(colors);
-    table.addHighlighter(new BorderHighlighter(predicate,
-      BorderFactory.createLineBorder(WebColors.Green)));
+    table.addHighlighter(
+      new BorderHighlighter(predicate, BorderFactory.createLineBorder(WebColors.Green)));
   }
 
   private final MergedRecordsTableModel model;

@@ -54,9 +54,11 @@ public interface EsriGeodatabaseXmlConstants {
 
   QName CODED_VALUES = new QName(_NAMESPACE_URI, "CodedValues", _NAMESPACE_PREFIX);
 
-  QName CONFIGURATION_KEYWORD = new QName(_NAMESPACE_URI, "ConfigurationKeyword", _NAMESPACE_PREFIX);
+  QName CONFIGURATION_KEYWORD = new QName(_NAMESPACE_URI, "ConfigurationKeyword",
+    _NAMESPACE_PREFIX);
 
-  QName CONTROLLER_MEMBERSHIP = new QName(_NAMESPACE_URI, "ControllerMembership", _NAMESPACE_PREFIX);
+  QName CONTROLLER_MEMBERSHIP = new QName(_NAMESPACE_URI, "ControllerMembership",
+    _NAMESPACE_PREFIX);
 
   QName CONTROLLER_MEMBERSHIPS = new QName(_NAMESPACE_URI, "ControllerMemberships",
     _NAMESPACE_PREFIX);
@@ -411,10 +413,9 @@ public interface EsriGeodatabaseXmlConstants {
   String XML_PROPERTY_SET_TYPE = "esri:XmlPropertySet";
 
   Collection<DataType> XML_SCHEMA_DATA_TYPES = Arrays.asList(DataTypes.ANY_URI,
-    DataTypes.BASE64_BINARY, DataTypes.BOOLEAN, DataTypes.BYTE, DataTypes.DATE,
-    DataTypes.DATE_TIME, DataTypes.DECIMAL, DataTypes.DOUBLE, DataTypes.DURATION, DataTypes.FLOAT,
-    DataTypes.INT, DataTypes.INTEGER, DataTypes.LONG, DataTypes.QNAME, DataTypes.SHORT,
-    DataTypes.STRING);
+    DataTypes.BASE64_BINARY, DataTypes.BOOLEAN, DataTypes.BYTE, DataTypes.DATE, DataTypes.DATE_TIME,
+    DataTypes.DECIMAL, DataTypes.DOUBLE, DataTypes.DURATION, DataTypes.FLOAT, DataTypes.INT,
+    DataTypes.INTEGER, DataTypes.LONG, DataTypes.QNAME, DataTypes.SHORT, DataTypes.STRING);
 
   QName XY_SCALE = new QName(_NAMESPACE_URI, "XYScale", _NAMESPACE_PREFIX);
 

@@ -382,8 +382,8 @@ public class EigenvalueDecomposition implements java.io.Serializable {
           if (m == l) {
             break;
           }
-          if (Math.abs(this.H[m][m - 1]) * (Math.abs(q) + Math.abs(r)) < eps
-            * (Math.abs(p) * (Math.abs(this.H[m - 1][m - 1]) + Math.abs(z) + Math.abs(this.H[m + 1][m + 1])))) {
+          if (Math.abs(this.H[m][m - 1]) * (Math.abs(q) + Math.abs(r)) < eps * (Math.abs(p)
+            * (Math.abs(this.H[m - 1][m - 1]) + Math.abs(z) + Math.abs(this.H[m + 1][m + 1])))) {
             break;
           }
           m--;

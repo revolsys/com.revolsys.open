@@ -180,7 +180,8 @@ public class DistanceWithLocation {
     final boolean flip = polyGeomIndex == 0;
     final List<Polygon> polys = geometry1.getGeometries(Polygon.class);
     if (polys.size() > 0) {
-      final List<GeometryLocation> insideLocs = ConnectedElementLocationFilter.getLocations(geometry2);
+      final List<GeometryLocation> insideLocs = ConnectedElementLocationFilter
+        .getLocations(geometry2);
       computeContainmentDistance(insideLocs, polys, locPtPoly);
       if (this.minDistance <= this.terminateDistance) {
         // this assignment is determined by the order of the args in the

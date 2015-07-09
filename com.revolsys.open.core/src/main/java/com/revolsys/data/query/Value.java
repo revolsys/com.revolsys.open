@@ -89,8 +89,8 @@ public class Value extends QueryValue {
       final Object newValue = StringConverterRegistry.toObject(dataType, this.queryValue);
       final Class<?> typeClass = dataType.getJavaClass();
       if (newValue == null || !typeClass.isAssignableFrom(newValue.getClass())) {
-        throw new IllegalArgumentException("'" + this.queryValue + "' is not a valid "
-          + dataType.getValidationName());
+        throw new IllegalArgumentException(
+          "'" + this.queryValue + "' is not a valid " + dataType.getValidationName());
       } else {
         setQueryValue(newValue);
       }

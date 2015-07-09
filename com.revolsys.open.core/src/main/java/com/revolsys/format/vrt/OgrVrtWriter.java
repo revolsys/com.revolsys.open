@@ -60,8 +60,8 @@ public class OgrVrtWriter {
           if (Arrays.asList(DataTypes.BYTE, DataTypes.SHORT, DataTypes.INT, DataTypes.LONG,
             DataTypes.INTEGER).contains(fieldType)) {
             type = "Integer";
-          } else if (Arrays.asList(DataTypes.FLOAT, DataTypes.DOUBLE, DataTypes.DECIMAL).contains(
-            fieldType)) {
+          } else if (Arrays.asList(DataTypes.FLOAT, DataTypes.DOUBLE, DataTypes.DECIMAL)
+            .contains(fieldType)) {
             type = "Real";
           } else if (DataTypes.DATE.equals(type)) {
             type = "Date";

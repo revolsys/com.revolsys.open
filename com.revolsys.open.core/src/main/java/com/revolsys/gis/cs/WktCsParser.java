@@ -240,7 +240,8 @@ public class WktCsParser {
   private ProjectedCoordinateSystem processProjectedCoordinateSystem(final List<Object> values) {
     int index = 0;
     final String name = (String)values.get(index++);
-    final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)values.get(index++);
+    final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)values
+      .get(index++);
     Projection projection = null;
     final Map<String, Object> parameters = new HashMap<String, Object>();
 

@@ -25,7 +25,8 @@ public class JdbcFieldAdder {
   public static Map<String, Map<String, Map<String, Object>>> getColumnProperties(
     final RecordStoreSchema schema) {
     synchronized (schema) {
-      Map<String, Map<String, Map<String, Object>>> columnProperties = schema.getProperty(COLUMN_PROPERTIES);
+      Map<String, Map<String, Map<String, Object>>> columnProperties = schema
+        .getProperty(COLUMN_PROPERTIES);
       if (columnProperties == null) {
         columnProperties = new HashMap<String, Map<String, Map<String, Object>>>();
         schema.setProperty(COLUMN_PROPERTIES, columnProperties);
@@ -69,7 +70,8 @@ public class JdbcFieldAdder {
     }
   }
 
-  public static Map<String, Map<String, Object>> getTableProperties(final RecordStoreSchema schema) {
+  public static Map<String, Map<String, Object>> getTableProperties(
+    final RecordStoreSchema schema) {
     synchronized (schema) {
       Map<String, Map<String, Object>> tableProperties = schema.getProperty(TABLE_PROPERTIES);
       if (tableProperties == null) {
@@ -103,8 +105,10 @@ public class JdbcFieldAdder {
 
   public static Map<String, Map<String, Object>> getTypeColumnProperties(
     final RecordStoreSchema schema, final String typePath) {
-    final Map<String, Map<String, Map<String, Object>>> esriColumnProperties = getColumnProperties(schema);
-    final Map<String, Map<String, Object>> typeColumnProperties = esriColumnProperties.get(typePath);
+    final Map<String, Map<String, Map<String, Object>>> esriColumnProperties = getColumnProperties(
+      schema);
+    final Map<String, Map<String, Object>> typeColumnProperties = esriColumnProperties
+      .get(typePath);
     if (typeColumnProperties == null) {
       return Collections.emptyMap();
     } else {
@@ -114,7 +118,8 @@ public class JdbcFieldAdder {
 
   public static void setColumnProperty(final RecordStoreSchema schema, final String typePath,
     final String columnName, final String propertyName, final Object propertyValue) {
-    final Map<String, Map<String, Map<String, Object>>> tableColumnProperties = getColumnProperties(schema);
+    final Map<String, Map<String, Map<String, Object>>> tableColumnProperties = getColumnProperties(
+      schema);
     synchronized (tableColumnProperties) {
 
       Map<String, Map<String, Object>> typeColumnMap = tableColumnProperties.get(typePath);
@@ -173,8 +178,8 @@ public class JdbcFieldAdder {
             description, null);
         break;
         case Types.SMALLINT:
-          field = new JdbcShortFieldDefinition(dbName, name, sqlType, length, required,
-            description, null);
+          field = new JdbcShortFieldDefinition(dbName, name, sqlType, length, required, description,
+            null);
         break;
         case Types.TINYINT:
           field = new JdbcByteFieldDefinition(dbName, name, sqlType, length, required, description,
@@ -185,8 +190,8 @@ public class JdbcFieldAdder {
             description, null);
         break;
         case Types.REAL:
-          field = new JdbcFloatFieldDefinition(dbName, name, sqlType, length, required,
-            description, null);
+          field = new JdbcFloatFieldDefinition(dbName, name, sqlType, length, required, description,
+            null);
         break;
         case Types.DECIMAL:
         case Types.NUMERIC:

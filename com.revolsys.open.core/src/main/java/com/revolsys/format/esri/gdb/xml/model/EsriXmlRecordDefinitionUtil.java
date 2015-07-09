@@ -33,8 +33,8 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
     final DataType dataType = attribute.getType();
     final EsriGeodatabaseXmlFieldType fieldType = FIELD_TYPES.getFieldType(dataType);
     if (fieldType == null) {
-      throw new RuntimeException("Data type not supported " + dataType + " for " + table.getName()
-        + "." + fieldName);
+      throw new RuntimeException(
+        "Data type not supported " + dataType + " for " + table.getName() + "." + fieldName);
     } else {
       final Field field = new Field();
       field.setName(fieldName);
@@ -83,12 +83,12 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
         break;
 
         default:
-          throw new RuntimeException("Unknown geometry type" + shapeType + " for " + tableName
-            + "." + fieldName);
+          throw new RuntimeException(
+            "Unknown geometry type" + shapeType + " for " + tableName + "." + fieldName);
       }
 
-    } else if (precision > 0
-      && (fieldType.equals(FieldType.esriFieldTypeSingle) || fieldType.equals(FieldType.esriFieldTypeDouble))) {
+    } else if (precision > 0 && (fieldType.equals(FieldType.esriFieldTypeSingle)
+      || fieldType.equals(FieldType.esriFieldTypeDouble))) {
       dataType = DataTypes.DECIMAL;
     } else {
       dataType = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE.getDataType(fieldType);
@@ -241,7 +241,8 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
       table = new DETable();
     }
 
-    String oidFieldName = recordDefinition.getProperty(EsriGeodatabaseXmlConstants.ESRI_OBJECT_ID_FIELD_NAME);
+    String oidFieldName = recordDefinition
+      .getProperty(EsriGeodatabaseXmlConstants.ESRI_OBJECT_ID_FIELD_NAME);
     if (!Property.hasValue(oidFieldName)) {
       oidFieldName = "OBJECTID";
     }
@@ -314,12 +315,13 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
    * @param deTable
    * @return
    */
-  public static RecordDefinition getRecordDefinition(final String schemaName, final DETable deTable) {
+  public static RecordDefinition getRecordDefinition(final String schemaName,
+    final DETable deTable) {
     return getRecordDefinition(schemaName, deTable, true);
   }
 
-  public static RecordDefinition getRecordDefinition(final String schemaName,
-    final DETable deTable, final boolean ignoreEsriFields) {
+  public static RecordDefinition getRecordDefinition(final String schemaName, final DETable deTable,
+    final boolean ignoreEsriFields) {
     final String tableName = deTable.getName();
     final String typePath = Path.toPath(schemaName, tableName);
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(typePath);

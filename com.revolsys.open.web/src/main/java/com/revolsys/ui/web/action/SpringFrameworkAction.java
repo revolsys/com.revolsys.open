@@ -35,6 +35,7 @@ public abstract class SpringFrameworkAction extends IafAction {
   public void init(final ActionConfig actionConfig) throws ActionInitException {
     super.init(actionConfig);
     final ServletContext servletContext = actionConfig.getConfig().getServletContext();
-    this.applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+    this.applicationContext = WebApplicationContextUtils
+      .getRequiredWebApplicationContext(servletContext);
   }
 }

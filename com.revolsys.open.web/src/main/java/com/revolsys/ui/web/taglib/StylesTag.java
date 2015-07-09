@@ -116,7 +116,8 @@ public class StylesTag extends TagSupport {
           }
         }
       }
-      final SiteNodeController controller = (SiteNodeController)this.pageContext.findAttribute("rsWebController");
+      final SiteNodeController controller = (SiteNodeController)this.pageContext
+        .findAttribute("rsWebController");
       if (controller instanceof PageController) {
         final PageController page = (PageController)controller;
         serializeElements(page.getStyles());

@@ -33,9 +33,9 @@
 
 package com.revolsys.jts.testold.algorithm;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.algorithm.NonRobustLineIntersector;
+
+import junit.framework.TestCase;
 
 /**
  * @version 1.7

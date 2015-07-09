@@ -84,8 +84,8 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
               }
 
               graphics.setColor(WebColors.LightGray);
-              graphics.fill(new Rectangle2D.Double(x - 2, y + bounds.getY() - 1, width + 4,
-                height + 2));
+              graphics
+                .fill(new Rectangle2D.Double(x - 2, y + bounds.getY() - 1, width + 4, height + 2));
 
               graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                 RenderingHints.VALUE_TEXT_ANTIALIAS_ON);

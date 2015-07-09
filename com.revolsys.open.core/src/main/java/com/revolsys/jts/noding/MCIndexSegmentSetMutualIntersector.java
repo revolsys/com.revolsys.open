@@ -153,7 +153,8 @@ public class MCIndexSegmentSetMutualIntersector implements SegmentSetMutualInter
     intersectChains(monoChains, segInt);
     // System.out.println("MCIndexBichromaticIntersector: # chain overlaps = " +
     // nOverlaps);
-    // System.out.println("MCIndexBichromaticIntersector: # oct chain overlaps = "
+    // System.out.println("MCIndexBichromaticIntersector: # oct chain overlaps =
+    // "
     // + nOctOverlaps);
   }
 }

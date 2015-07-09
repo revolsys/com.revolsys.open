@@ -38,8 +38,8 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.JavaBeanUtil;
 
-public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement implements
-  RecordDefinition {
+public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
+  implements RecordDefinition {
   private static final AtomicInteger INSTANCE_IDS = new AtomicInteger(0);
 
   private static final Map<Integer, RecordDefinitionImpl> RECORD_DEFINITION_CACHE = new WeakCache<Integer, RecordDefinitionImpl>();
@@ -119,7 +119,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
         addField(field);
       }
     }
-    final Map<String, Object> geometryFactoryDef = (Map<String, Object>)properties.get("geometryFactory");
+    final Map<String, Object> geometryFactoryDef = (Map<String, Object>)properties
+      .get("geometryFactory");
     if (geometryFactoryDef != null) {
       final GeometryFactory geometryFactory = MapObjectFactoryRegistry.toObject(geometryFactoryDef);
       setGeometryFactory(geometryFactory);
@@ -127,7 +128,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
   }
 
   public RecordDefinitionImpl(final RecordDefinition recordDefinition) {
-    this(recordDefinition.getPath(), recordDefinition.getProperties(), recordDefinition.getFields());
+    this(recordDefinition.getPath(), recordDefinition.getProperties(),
+      recordDefinition.getFields());
     setIdFieldIndex(recordDefinition.getIdFieldIndex());
     RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
@@ -498,7 +500,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
     if (geometryFieldDefinition == null) {
       return null;
     } else {
-      final GeometryFactory geometryFactory = geometryFieldDefinition.getProperty(FieldProperties.GEOMETRY_FACTORY);
+      final GeometryFactory geometryFactory = geometryFieldDefinition
+        .getProperty(FieldProperties.GEOMETRY_FACTORY);
       return geometryFactory;
     }
   }
@@ -728,8 +731,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
         for (final String name : names) {
           final int index = getFieldIndex(name);
           if (index == -1) {
-            LoggerFactory.getLogger(getClass()).error(
-              "Cannot set ID " + getPath() + "." + name + " does not exist");
+            LoggerFactory.getLogger(getClass())
+              .error("Cannot set ID " + getPath() + "." + name + " does not exist");
           } else {
             this.idFieldDefinitionIndexes.add(index);
             this.idFieldDefinitionNames.add(name);

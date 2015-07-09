@@ -241,8 +241,8 @@ public class ProcessorPipelineTool {
         processDirectory(file, new File(targetDirectory, fileName),
           new File(logDirectory, fileName), sourceFileExtension);
       } else if (fileName.endsWith(sourceFileExtension)) {
-        processFile(file, new File(targetDirectory, fileName), new File(logDirectory, fileName
-          + ".log"));
+        processFile(file, new File(targetDirectory, fileName),
+          new File(logDirectory, fileName + ".log"));
       }
     }
   }
@@ -272,8 +272,8 @@ public class ProcessorPipelineTool {
 
     System.setProperty("sourceFile", sourceFile.getAbsolutePath());
     System.setProperty("targetFile", targetFile.getAbsolutePath());
-    final BeanFactory beans = new FileSystemXmlApplicationContext("file:"
-      + this.scriptFile.getAbsolutePath());
+    final BeanFactory beans = new FileSystemXmlApplicationContext(
+      "file:" + this.scriptFile.getAbsolutePath());
     try {
       final File parentFile = targetFile.getParentFile();
       if (parentFile != null) {

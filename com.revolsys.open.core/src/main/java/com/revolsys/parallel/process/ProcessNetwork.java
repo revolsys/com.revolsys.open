@@ -24,8 +24,8 @@ import com.revolsys.parallel.ThreadUtil;
 import com.revolsys.spring.TargetBeanFactoryBean;
 import com.revolsys.spring.TargetBeanProcess;
 
-public class ProcessNetwork implements BeanPostProcessor,
-  ApplicationListener<ContextRefreshedEvent> {
+public class ProcessNetwork
+  implements BeanPostProcessor, ApplicationListener<ContextRefreshedEvent> {
 
   public static void startAndWait(final Process... processes) {
     final ProcessNetwork processNetwork = new ProcessNetwork(processes);

@@ -63,8 +63,8 @@ import com.revolsys.jts.operation.distance.DistanceOp;
  *
  *@version 1.7
  */
-public abstract class AbstractGeometryCollection extends AbstractGeometry implements
-  GeometryCollection {
+public abstract class AbstractGeometryCollection extends AbstractGeometry
+  implements GeometryCollection {
   private static final long serialVersionUID = -8159852648192400768L;
 
   @SuppressWarnings("unchecked")
@@ -89,8 +89,8 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry implem
           geometries.set(partIndex, newGeometry);
           return (V)geometryFactory.geometryCollection(geometries);
         } else {
-          throw new IllegalArgumentException("Part index must be between 0 and " + partCount
-            + " not " + partIndex);
+          throw new IllegalArgumentException(
+            "Part index must be between 0 and " + partCount + " not " + partIndex);
         }
       }
     } else {
@@ -158,8 +158,8 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry implem
           geometries.set(partIndex, newGeometry);
           return (V)geometryFactory.geometryCollection(geometries);
         } else {
-          throw new IllegalArgumentException("Part index must be between 0 and " + partCount
-            + " not " + partIndex);
+          throw new IllegalArgumentException(
+            "Part index must be between 0 and " + partCount + " not " + partIndex);
         }
       }
     } else {
@@ -365,8 +365,8 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry implem
           geometries.set(partIndex, newGeometry);
           return (V)geometryFactory.geometryCollection(geometries);
         } else {
-          throw new IllegalArgumentException("Part index must be between 0 and " + partCount
-            + " not " + partIndex);
+          throw new IllegalArgumentException(
+            "Part index must be between 0 and " + partCount + " not " + partIndex);
         }
       }
     } else {
@@ -451,8 +451,8 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry implem
           geometries.set(partIndex, newGeometry);
           return (V)geometryFactory.geometryCollection(geometries);
         } else {
-          throw new IllegalArgumentException("Part index must be between 0 and " + partCount
-            + " not " + partIndex);
+          throw new IllegalArgumentException(
+            "Part index must be between 0 and " + partCount + " not " + partIndex);
         }
       }
     } else {

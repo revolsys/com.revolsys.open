@@ -117,7 +117,8 @@ public class LinearLocation implements Comparable {
    * @param frac the length to the desired point
    * @return the <tt>Coordinate</tt> of the desired point
    */
-  public static Point pointAlongSegmentByFraction(final Point p0, final Point p1, final double frac) {
+  public static Point pointAlongSegmentByFraction(final Point p0, final Point p1,
+    final double frac) {
     if (frac <= 0.0) {
       return p0;
     }

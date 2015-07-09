@@ -73,8 +73,8 @@ public class ProjectionImageFilter extends WholeImageFilter {
     final GeometryFactory sourceGeometryFactory = this.sourceBoundingBox.getGeometryFactory();
     final GeometryFactory destGeometryFactory = this.destBoundingBox.getGeometryFactory();
 
-    final CoordinatesOperation operation = ProjectionFactory.getCoordinatesOperation(
-      destGeometryFactory, sourceGeometryFactory);
+    final CoordinatesOperation operation = ProjectionFactory
+      .getCoordinatesOperation(destGeometryFactory, sourceGeometryFactory);
     if (operation == null) {
       return inPixels;
     }

@@ -203,8 +203,8 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
       this.bounds = BoundingBoxUtil.createBounds(axisCount);
       BoundingBoxUtil.expand(geometryFactory, this.bounds, bounds);
     } else {
-      throw new IllegalArgumentException("Expecting a multiple of " + axisCount + " not "
-        + bounds.length);
+      throw new IllegalArgumentException(
+        "Expecting a multiple of " + axisCount + " not " + bounds.length);
     }
   }
 

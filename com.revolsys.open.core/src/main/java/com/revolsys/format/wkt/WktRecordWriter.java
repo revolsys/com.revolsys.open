@@ -28,7 +28,8 @@ public class WktRecordWriter extends AbstractRecordWriter {
     this.out = new BufferedWriter(out);
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
     if (geometryField != null) {
-      final GeometryFactory geometryFactory = geometryField.getProperty(FieldProperties.GEOMETRY_FACTORY);
+      final GeometryFactory geometryFactory = geometryField
+        .getProperty(FieldProperties.GEOMETRY_FACTORY);
       setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
     }
 

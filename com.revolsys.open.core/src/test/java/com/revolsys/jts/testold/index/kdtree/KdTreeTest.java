@@ -2,15 +2,15 @@ package com.revolsys.jts.testold.index.kdtree;
 
 import java.util.List;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.index.kdtree.KdNode;
 import com.revolsys.jts.index.kdtree.KdTree;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 public class KdTreeTest extends TestCase {
   public static void main(final String args[]) {

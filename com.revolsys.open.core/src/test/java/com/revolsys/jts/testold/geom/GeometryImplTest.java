@@ -34,10 +34,6 @@ package com.revolsys.jts.testold.geom;
 
 import java.util.Arrays;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -47,6 +43,10 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /**
  * @version 1.7
@@ -84,7 +84,7 @@ public class GeometryImplTest extends TestCase {
 
   private void doTestEqualsExact(final Geometry x, final Geometry somethingExactlyEqual,
     final Geometry somethingEqualButNotExactly, final Geometry somethingNotEqualButSameClass)
-    throws Exception {
+      throws Exception {
     Geometry differentClass;
 
     if (x instanceof Point) {
@@ -107,7 +107,7 @@ public class GeometryImplTest extends TestCase {
   private void doTestEqualsExact(final Geometry x, final Geometry somethingExactlyEqual,
     final Geometry somethingNotEqualButSameClass, final Geometry sameClassButEmpty,
     final Geometry anotherSameClassButEmpty, final CollectionFactory collectionFactory)
-    throws Exception {
+      throws Exception {
     Geometry emptyDifferentClass;
 
     if (x instanceof Point) {
@@ -116,7 +116,8 @@ public class GeometryImplTest extends TestCase {
       emptyDifferentClass = this.geometryFactory.point((Point)null);
     }
 
-    final Geometry somethingEqualButNotExactly = this.geometryFactory.geometryCollection(Arrays.asList(x));
+    final Geometry somethingEqualButNotExactly = this.geometryFactory
+      .geometryCollection(Arrays.asList(x));
 
     doTestEqualsExact(x, somethingExactlyEqual, collectionFactory.createCollection(new Geometry[] {
       x
@@ -139,19 +140,19 @@ public class GeometryImplTest extends TestCase {
   }
 
   private void doTestFromCommcast2003AtYahooDotCa(final WKTReader reader) throws ParseException {
-    this.readerFloat.read(
-      "POLYGON ((708653.498611049 2402311.54647056, 708708.895756966 2402203.47250014, 708280.326454234 2402089.6337791, 708247.896591321 2402252.48269854, 708367.379593851 2402324.00761653, 708248.882609455 2402253.07294874, 708249.523621829 2402244.3124463, 708261.854734465 2402182.39086576, 708262.818392579 2402183.35452387, 708653.498611049 2402311.54647056))")
-      .intersection(
-        reader.read("POLYGON ((708258.754920656 2402197.91172757, 708257.029447455 2402206.56901508, 708652.961095455 2402312.65463437, 708657.068786251 2402304.6356364, 708258.754920656 2402197.91172757))"));
+    this.readerFloat
+      .read(
+        "POLYGON ((708653.498611049 2402311.54647056, 708708.895756966 2402203.47250014, 708280.326454234 2402089.6337791, 708247.896591321 2402252.48269854, 708367.379593851 2402324.00761653, 708248.882609455 2402253.07294874, 708249.523621829 2402244.3124463, 708261.854734465 2402182.39086576, 708262.818392579 2402183.35452387, 708653.498611049 2402311.54647056))")
+      .intersection(reader.read(
+        "POLYGON ((708258.754920656 2402197.91172757, 708257.029447455 2402206.56901508, 708652.961095455 2402312.65463437, 708657.068786251 2402304.6356364, 708258.754920656 2402197.91172757))"));
   }
 
   public void testDepthMismatchAssertionFailedException() throws Exception {
     // register@robmeek.com reported an assertion failure
     // ("depth mismatch at (160.0, 300.0, Nan)") [Jon Aquino 10/28/2003]
-    this.reader.read(
-      "MULTIPOLYGON (((100 300, 100 400, 200 400, 200 300, 100 300)),"
-        + "((160 300, 160 400, 260 400, 260 300, 160 300)),"
-        + "((160 300, 160 200, 260 200, 260 300, 160 300)))").buffer(0);
+    this.reader.read("MULTIPOLYGON (((100 300, 100 400, 200 400, 200 300, 100 300)),"
+      + "((160 300, 160 400, 260 400, 260 300, 160 300)),"
+      + "((160 300, 160 200, 260 200, 260 300, 160 300)))").buffer(0);
   }
 
   public void testEmptyGeometryCentroid() throws Exception {
@@ -159,10 +160,10 @@ public class GeometryImplTest extends TestCase {
     assertTrue(this.reader.read("POLYGON EMPTY").getCentroid().isEmpty());
     assertTrue(this.reader.read("LINESTRING EMPTY").getCentroid().isEmpty());
     assertTrue(this.reader.read("GEOMETRYCOLLECTION EMPTY").getCentroid().isEmpty());
-    assertTrue(this.reader.read(
-      "GEOMETRYCOLLECTION(GEOMETRYCOLLECTION EMPTY, GEOMETRYCOLLECTION EMPTY)")
-      .getCentroid()
-      .isEmpty());
+    assertTrue(
+      this.reader.read("GEOMETRYCOLLECTION(GEOMETRYCOLLECTION EMPTY, GEOMETRYCOLLECTION EMPTY)")
+        .getCentroid()
+        .isEmpty());
     assertTrue(this.reader.read("MULTIPOLYGON EMPTY").getCentroid().isEmpty());
     assertTrue(this.reader.read("MULTILINESTRING EMPTY").getCentroid().isEmpty());
     assertTrue(this.reader.read("MULTIPOINT EMPTY").getCentroid().isEmpty());
@@ -190,9 +191,10 @@ public class GeometryImplTest extends TestCase {
     final Geometry polygon1 = this.reader.read("POLYGON ((0 0, 0 50, 50 50, 50 0, 0 0))");
     final Geometry polygon2 = this.reader.read("POLYGON ((50 50, 50 0, 0 0, 0 50, 50 50))");
     final GeometryCollection x = this.geometryFactory.geometryCollection(polygon1, polygon2);
-    final GeometryCollection somethingExactlyEqual = this.geometryFactory.geometryCollection(
-      polygon1, polygon2);
-    final GeometryCollection somethingNotEqualButSameClass = this.geometryFactory.geometryCollection(polygon2);
+    final GeometryCollection somethingExactlyEqual = this.geometryFactory
+      .geometryCollection(polygon1, polygon2);
+    final GeometryCollection somethingNotEqualButSameClass = this.geometryFactory
+      .geometryCollection(polygon2);
     final GeometryCollection sameClassButEmpty = this.geometryFactory.geometryCollection();
     final GeometryCollection anotherSameClassButEmpty = this.geometryFactory.geometryCollection();
     final CollectionFactory collectionFactory = new CollectionFactory() {
@@ -210,10 +212,10 @@ public class GeometryImplTest extends TestCase {
   // Geometry lineString =
   // reader.read("LINESTRING(0 0, 0 50, 50 50, 50 0, 0 0)");
   // Geometry geometryCollection =
-  // reader.read("GEOMETRYCOLLECTION ( LINESTRING(0 0  , 0  50), "
+  // reader.read("GEOMETRYCOLLECTION ( LINESTRING(0 0 , 0 50), "
   // + "LINESTRING(0 50 , 50 50), "
   // + "LINESTRING(50 50, 50 0 ), "
-  // + "LINESTRING(50 0 , 0  0 ) )");
+  // + "LINESTRING(50 0 , 0 0 ) )");
   // assertTrue(lineString.equals(geometryCollection));
   // }
   public void testEqualsExactForLinearRings() throws Exception {
@@ -292,8 +294,10 @@ public class GeometryImplTest extends TestCase {
 
   public void testEqualsExactForPolygons() throws Exception {
     final Polygon x = (Polygon)this.reader.read("POLYGON ((0 0, 0 50, 50 50, 50 0, 0 0))");
-    final Polygon somethingExactlyEqual = (Polygon)this.reader.read("POLYGON ((0 0, 0 50, 50 50, 50 0, 0 0))");
-    final Polygon somethingNotEqualButSameClass = (Polygon)this.reader.read("POLYGON ((50 50, 50 0, 0 0, 0 50, 50 50))");
+    final Polygon somethingExactlyEqual = (Polygon)this.reader
+      .read("POLYGON ((0 0, 0 50, 50 50, 50 0, 0 0))");
+    final Polygon somethingNotEqualButSameClass = (Polygon)this.reader
+      .read("POLYGON ((50 50, 50 0, 0 0, 0 50, 50 50))");
     final Polygon sameClassButEmpty = (Polygon)this.reader.read("POLYGON EMPTY");
     final Polygon anotherSameClassButEmpty = (Polygon)this.reader.read("POLYGON EMPTY");
     final CollectionFactory collectionFactory = new CollectionFactory() {

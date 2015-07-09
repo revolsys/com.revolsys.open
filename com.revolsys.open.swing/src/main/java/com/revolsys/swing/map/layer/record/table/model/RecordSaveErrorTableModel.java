@@ -27,8 +27,8 @@ import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.record.model.RecordListTableModel;
 import com.revolsys.swing.table.record.row.RecordRowTable;
 
-public class RecordSaveErrorTableModel extends RecordListTableModel implements SortableTableModel,
-  ListSelectionListener {
+public class RecordSaveErrorTableModel extends RecordListTableModel
+  implements SortableTableModel, ListSelectionListener {
   private static final long serialVersionUID = 1L;
 
   public static TablePanel createPanel(final RecordSaveErrorTableModel model) {
@@ -47,7 +47,8 @@ public class RecordSaveErrorTableModel extends RecordListTableModel implements S
   private final List<Throwable> exceptions = new ArrayList<>();
 
   public RecordSaveErrorTableModel(final AbstractRecordLayer layer) {
-    super(layer.getRecordDefinition(), Collections.<LayerRecord> emptyList(), layer.getFieldNames());
+    super(layer.getRecordDefinition(), Collections.<LayerRecord> emptyList(),
+      layer.getFieldNames());
     this.layer = layer;
     setFieldsOffset(1);
     setEditable(true);
@@ -120,9 +121,10 @@ public class RecordSaveErrorTableModel extends RecordListTableModel implements S
       return true;
     } else {
       final String layerPath = this.layer.getPath();
-      final BasePanel panel = new BasePanel(new VerticalLayout(), new JLabel(
-        "<html><p><b style=\"color:red\">Error saving changes for layer:</b></p><p>" + layerPath
-          + "</p>"), RecordSaveErrorTableModel.createPanel(this));
+      final BasePanel panel = new BasePanel(new VerticalLayout(),
+        new JLabel("<html><p><b style=\"color:red\">Error saving changes for layer:</b></p><p>"
+          + layerPath + "</p>"),
+        RecordSaveErrorTableModel.createPanel(this));
       final Rectangle screenBounds = SwingUtil.getScreenBounds();
       panel.setPreferredSize(new Dimension(screenBounds.width - 300, getRowCount() * 22 + 75));
 

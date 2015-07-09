@@ -31,7 +31,8 @@ public class PseudoNodeAttribute {
     if (equalExcludeAttributes != null) {
       this.equalExcludeAttributes.addAll(equalExcludeAttributes);
     }
-    final Map<String, Map<LineString, Set<Edge<Record>>>> edgesByTypeNameAndLine = NodeProperties.getEdgesByTypeNameAndLine(node);
+    final Map<String, Map<LineString, Set<Edge<Record>>>> edgesByTypeNameAndLine = NodeProperties
+      .getEdgesByTypeNameAndLine(node);
     final Map<LineString, Set<Edge<Record>>> edgesByLine = edgesByTypeNameAndLine.get(typePath);
     init(node, edgesByLine);
   }
@@ -40,7 +41,8 @@ public class PseudoNodeAttribute {
     final Edge<Record> edge2) {
     final Record object1 = edge1.getObject();
     final Record object2 = edge2.getObject();
-    if (DirectionalAttributes.canMergeObjects(node, object1, object2, this.equalExcludeAttributes)) {
+    if (DirectionalAttributes.canMergeObjects(node, object1, object2,
+      this.equalExcludeAttributes)) {
       return new EdgePair<Record>(edge1, edge2);
     } else {
       return null;

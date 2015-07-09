@@ -16,9 +16,9 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
 
-public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>> implements Filter<Edge<T>> {
-  public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
-    final Geometry geometry, final double maxDistance) {
+public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>>implements Filter<Edge<T>> {
+  public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph, final Geometry geometry,
+    final double maxDistance) {
     if (geometry == null) {
       return Collections.emptyList();
     } else {

@@ -197,7 +197,8 @@ public class BufferInputLineSimplifier {
     return isShallowSampled(p0, p1, i0, i2, distanceTol);
   }
 
-  private boolean isShallow(final Point p0, final Point p1, final Point p2, final double distanceTol) {
+  private boolean isShallow(final Point p0, final Point p1, final Point p2,
+    final double distanceTol) {
     final double dist = LineSegmentUtil.distanceLinePoint(p0, p2, p1);
     return dist < distanceTol;
   }

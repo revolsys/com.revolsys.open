@@ -96,8 +96,8 @@ public final class Region {
   private static void loadRegions(final Country country) {
     InputStream in = null;
     if (country != null) {
-      in = Region.class.getResourceAsStream("/com/revolsys/ui/html/domain/region/"
-        + country.getCodeAplha2() + ".txt");
+      in = Region.class.getResourceAsStream(
+        "/com/revolsys/ui/html/domain/region/" + country.getCodeAplha2() + ".txt");
     }
     List<Region> regions;
     Map<String, Region> regionMap;

@@ -2,14 +2,14 @@ package com.revolsys.jts.testold.perf.operation.overlay;
 
 import java.util.Random;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.operation.overlay.snap.SnapIfNeededOverlayOp;
+
+import junit.framework.TestCase;
 
 /**
  * Tests Noding checking during overlay.
@@ -121,7 +121,7 @@ public class OverlayNodingStressTest extends TestCase {
   public void testNoding() {
     final int iterLimit = ITER_LIMIT;
     for (int i = 0; i < iterLimit; i++) {
-      // System.out.println("Iter: " + i + "  Noding failure count = "
+      // System.out.println("Iter: " + i + " Noding failure count = "
       // + this.failureCount);
       final double ang1 = getRand() * Math.PI;
       final double ang2 = getRand() * Math.PI;
@@ -130,7 +130,7 @@ public class OverlayNodingStressTest extends TestCase {
       checkIntersection(geom[0], geom[1]);
     }
     // System.out.println("Test count = " + iterLimit
-    // + "  Noding failure count = " + this.failureCount);
+    // + " Noding failure count = " + this.failureCount);
   }
 }
 
@@ -144,7 +144,8 @@ class RotatedRectangleFactory {
   }
 
   public Polygon createRectangle(final double length, final double width, final double angle) {
-    return createRectangle(length, width, angle, new PointDouble((double)0, 0, Point.NULL_ORDINATE));
+    return createRectangle(length, width, angle,
+      new PointDouble((double)0, 0, Point.NULL_ORDINATE));
   }
 
   public Polygon createRectangle(final double length, final double width, final double angle,
@@ -164,7 +165,8 @@ class RotatedRectangleFactory {
       new PointDouble(base.getX() + negx - widthOffsetx, base.getY() + negy - widthOffsety,
         Point.NULL_ORDINATE),
       new PointDouble(base.getX() + negx + widthOffsetx, base.getY() + negy + widthOffsety,
-        Point.NULL_ORDINATE), new PointDouble(0.0, 0, Point.NULL_ORDINATE),
+        Point.NULL_ORDINATE),
+      new PointDouble(0.0, 0, Point.NULL_ORDINATE),
     };
     // close polygon
     pts[4] = new PointDouble(pts[0]);

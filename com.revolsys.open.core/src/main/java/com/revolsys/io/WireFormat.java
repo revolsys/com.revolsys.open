@@ -50,16 +50,16 @@ public final class WireFormat {
    * only here to support the lite runtime and should not be used by users.
    */
   public enum FieldType {
-    DOUBLE(JavaType.DOUBLE, WIRETYPE_FIXED64), FLOAT(JavaType.FLOAT, WIRETYPE_FIXED32), INT64(
-      JavaType.LONG, WIRETYPE_VARINT), UINT64(JavaType.LONG, WIRETYPE_VARINT), INT32(JavaType.INT,
-      WIRETYPE_VARINT), FIXED64(JavaType.LONG, WIRETYPE_FIXED64), FIXED32(JavaType.INT,
-      WIRETYPE_FIXED32), BOOL(JavaType.BOOLEAN, WIRETYPE_VARINT), STRING(JavaType.STRING,
-      WIRETYPE_LENGTH_DELIMITED) {
-      @Override
-      public boolean isPackable() {
-        return false;
-      }
-    },
+    DOUBLE(JavaType.DOUBLE, WIRETYPE_FIXED64), FLOAT(JavaType.FLOAT,
+      WIRETYPE_FIXED32), INT64(JavaType.LONG, WIRETYPE_VARINT), UINT64(JavaType.LONG,
+        WIRETYPE_VARINT), INT32(JavaType.INT, WIRETYPE_VARINT), FIXED64(JavaType.LONG,
+          WIRETYPE_FIXED64), FIXED32(JavaType.INT, WIRETYPE_FIXED32), BOOL(JavaType.BOOLEAN,
+            WIRETYPE_VARINT), STRING(JavaType.STRING, WIRETYPE_LENGTH_DELIMITED) {
+              @Override
+              public boolean isPackable() {
+                return false;
+              }
+            },
     GROUP(JavaType.MESSAGE, WIRETYPE_START_GROUP) {
       @Override
       public boolean isPackable() {
@@ -80,7 +80,7 @@ public final class WireFormat {
     },
     UINT32(JavaType.INT, WIRETYPE_VARINT), ENUM(JavaType.ENUM, WIRETYPE_VARINT), SFIXED32(
       JavaType.INT, WIRETYPE_FIXED32), SFIXED64(JavaType.LONG, WIRETYPE_FIXED64), SINT32(
-      JavaType.INT, WIRETYPE_VARINT), SINT64(JavaType.LONG, WIRETYPE_VARINT);
+        JavaType.INT, WIRETYPE_VARINT), SINT64(JavaType.LONG, WIRETYPE_VARINT);
 
     private final JavaType javaType;
 
@@ -157,7 +157,8 @@ public final class WireFormat {
 
   static final int MESSAGE_SET_TYPE_ID_TAG = makeTag(MESSAGE_SET_TYPE_ID, WIRETYPE_VARINT);
 
-  static final int MESSAGE_SET_MESSAGE_TAG = makeTag(MESSAGE_SET_MESSAGE, WIRETYPE_LENGTH_DELIMITED);
+  static final int MESSAGE_SET_MESSAGE_TAG = makeTag(MESSAGE_SET_MESSAGE,
+    WIRETYPE_LENGTH_DELIMITED);
 
   /** Given a tag value, determines the field number (the upper 29 bits). */
   public static int getTagFieldNumber(final int tag) {

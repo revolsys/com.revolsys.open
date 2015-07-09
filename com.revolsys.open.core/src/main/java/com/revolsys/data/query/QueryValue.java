@@ -50,8 +50,8 @@ import com.revolsys.util.Property;
 
 public abstract class QueryValue implements Cloneable {
   /** Must be in upper case */
-  public static final List<String> SUPPORTED_BINARY_OPERATORS = Arrays.asList("AND", "OR", "+",
-    "-", "/", "*", "=", "<>", "<", "<=", ">", ">=", "LIKE", "+", "-", "/", "*", "%", "MOD");
+  public static final List<String> SUPPORTED_BINARY_OPERATORS = Arrays.asList("AND", "OR", "+", "-",
+    "/", "*", "=", "<>", "<", "<=", ">", ">=", "LIKE", "+", "-", "/", "*", "%", "MOD");
 
   public static <V extends QueryValue> List<V> cloneQueryValues(final List<V> values) {
     final List<V> clonedValues = new ArrayList<V>();
@@ -63,7 +63,8 @@ public abstract class QueryValue implements Cloneable {
     return clonedValues;
   }
 
-  public static BoundingBox expand(final BoundingBox boundingBox, final BoundingBox newBoundingBox) {
+  public static BoundingBox expand(final BoundingBox boundingBox,
+    final BoundingBox newBoundingBox) {
     if (boundingBox == null) {
       return newBoundingBox;
     } else if (newBoundingBox == null) {
@@ -91,7 +92,8 @@ public abstract class QueryValue implements Cloneable {
           BoundingBox withinBoundingBox = getBoundingBox(withinDistance.getGeometry1Value());
           withinBoundingBox = expand(withinBoundingBox,
             getBoundingBox(withinDistance.getGeometry2Value()));
-          final double distance = ((Number)((Value)withinDistance.getDistanceValue()).getValue()).doubleValue();
+          final double distance = ((Number)((Value)withinDistance.getDistanceValue()).getValue())
+            .doubleValue();
 
           boundingBox = expand(boundingBox, withinBoundingBox.expand(distance));
         } else if (childValue instanceof Value) {
@@ -116,8 +118,8 @@ public abstract class QueryValue implements Cloneable {
     } else if (Property.hasValue(whereClause)) {
       try {
         final SQLParser sqlParser = new SQLParser();
-        final StatementNode statement = sqlParser.parseStatement("SELECT * FROM "
-          + recordDefinition.getName() + " WHERE " + whereClause);
+        final StatementNode statement = sqlParser
+          .parseStatement("SELECT * FROM " + recordDefinition.getName() + " WHERE " + whereClause);
         if (statement instanceof CursorNode) {
           final CursorNode selectStatement = (CursorNode)statement;
           final ResultSetNode resultSetNode = selectStatement.getResultSetNode();
@@ -147,17 +149,17 @@ public abstract class QueryValue implements Cloneable {
       final ValueNode betweenExpressionStart = rightOperandList.get(0);
       final ValueNode betweenExpressionEnd = rightOperandList.get(1);
       if (!(leftValueNode instanceof ColumnReference)) {
-        throw new IllegalArgumentException("Between operator must use a column name not: "
-          + leftValueNode);
+        throw new IllegalArgumentException(
+          "Between operator must use a column name not: " + leftValueNode);
       }
 
       if (!(betweenExpressionStart instanceof NumericConstantNode)) {
-        throw new IllegalArgumentException("Between min value must be a number not: "
-          + betweenExpressionStart);
+        throw new IllegalArgumentException(
+          "Between min value must be a number not: " + betweenExpressionStart);
       }
       if (!(betweenExpressionEnd instanceof NumericConstantNode)) {
-        throw new IllegalArgumentException("Between max value must be a number not: "
-          + betweenExpressionEnd);
+        throw new IllegalArgumentException(
+          "Between max value must be a number not: " + betweenExpressionEnd);
       }
       final Column column = toQueryValue(recordDefinition, leftValueNode);
       final Value min = toQueryValue(recordDefinition, betweenExpressionStart);
@@ -178,8 +180,8 @@ public abstract class QueryValue implements Cloneable {
       } else if ("OR".equals(operator)) {
         return (V)new Or(leftCondition, rightCondition);
       } else {
-        throw new IllegalArgumentException("Binary logical operator " + operator
-          + " not supported.");
+        throw new IllegalArgumentException(
+          "Binary logical operator " + operator + " not supported.");
       }
     } else if (expression instanceof BinaryOperatorNode) {
       final BinaryOperatorNode binaryOperatorNode = (BinaryOperatorNode)expression;
@@ -198,8 +200,8 @@ public abstract class QueryValue implements Cloneable {
             final FieldDefinition attribute = recordDefinition.getField(name);
             final Object value = ((Value)rightCondition).getValue();
             if (value == null) {
-              throw new IllegalArgumentException("Values can't be null for " + operator
-                + " use IS NULL or IS NOT NULL instead.");
+              throw new IllegalArgumentException(
+                "Values can't be null for " + operator + " use IS NULL or IS NOT NULL instead.");
             } else {
               final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(name);
               if (codeTable == null || attribute == recordDefinition.getIdField()) {
@@ -350,8 +352,8 @@ public abstract class QueryValue implements Cloneable {
     } else if (expression == null) {
       return null;
     } else {
-      throw new IllegalArgumentException("Unsupported expression" + expression.getClass() + " "
-        + expression);
+      throw new IllegalArgumentException(
+        "Unsupported expression" + expression.getClass() + " " + expression);
     }
   }
 

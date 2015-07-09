@@ -33,16 +33,16 @@
 
 package com.revolsys.jts.testold.geom;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryCollectionIterator;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.io.WKTReader;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import junit.textui.TestRunner;
 
 /**
  * Test for com.revolsys.jts.testold.geom.GeometryCollectionImpl.
@@ -68,7 +68,8 @@ public class GeometryCollectionImplTest extends TestCase {
   }
 
   public void testGeometryCollectionIterator() throws Exception {
-    final GeometryCollection g = (GeometryCollection)this.reader.read("GEOMETRYCOLLECTION (GEOMETRYCOLLECTION (POINT (10 10)))");
+    final GeometryCollection g = (GeometryCollection)this.reader
+      .read("GEOMETRYCOLLECTION (GEOMETRYCOLLECTION (POINT (10 10)))");
     final GeometryCollectionIterator i = new GeometryCollectionIterator(g);
     assertTrue(i.hasNext());
     assertTrue(i.next() instanceof GeometryCollection);
@@ -77,7 +78,8 @@ public class GeometryCollectionImplTest extends TestCase {
   }
 
   public void testGetDimension() throws Exception {
-    final GeometryCollection g = (GeometryCollection)this.reader.read("GEOMETRYCOLLECTION (POINT (10 10), POINT (30 30), LINESTRING (15 15, 20 20))");
+    final GeometryCollection g = (GeometryCollection)this.reader
+      .read("GEOMETRYCOLLECTION (POINT (10 10), POINT (30 30), LINESTRING (15 15, 20 20))");
     assertEquals(1, g.getDimension());
   }
 

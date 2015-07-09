@@ -132,13 +132,14 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
           if (boundingBox.getHeight() == 0) {
             boundingBox = boundingBox.expand(0, 1);
           }
-          final com.revolsys.gis.esri.gdb.file.capi.swig.Envelope envelope = GeometryConverter.toEsri(boundingBox);
+          final com.revolsys.gis.esri.gdb.file.capi.swig.Envelope envelope = GeometryConverter
+            .toEsri(boundingBox);
           String sql = this.sql;
           if ("1 = 1".equals(sql)) {
             sql = "";
           }
-          this.rows = this.recordStore.search(this.typePath, this.table, this.fields, sql,
-            envelope, true);
+          this.rows = this.recordStore.search(this.typePath, this.table, this.fields, sql, envelope,
+            true);
         }
       }
     }
@@ -212,7 +213,8 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
       if (boundingBox != null) {
         final FieldDefinition geometryField = recordDefinition.getGeometryField();
         if (geometryField != null) {
-          final GeometryFactory geometryFactory = geometryField.getProperty(FieldProperties.GEOMETRY_FACTORY);
+          final GeometryFactory geometryFactory = geometryField
+            .getProperty(FieldProperties.GEOMETRY_FACTORY);
           if (geometryFactory != null) {
             this.boundingBox = boundingBox.convert(geometryFactory);
           }

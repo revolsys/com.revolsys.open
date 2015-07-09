@@ -49,8 +49,7 @@ import com.revolsys.transaction.Transaction;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractRecordStore extends BaseObjectWithProperties implements
-  RecordStore {
+public abstract class AbstractRecordStore extends BaseObjectWithProperties implements RecordStore {
 
   private Map<String, Object> connectionProperties = new HashMap<String, Object>();
 
@@ -263,7 +262,8 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   }
 
-  public AbstractIterator<Record> createIterator(final Query query, Map<String, Object> properties) {
+  public AbstractIterator<Record> createIterator(final Query query,
+    Map<String, Object> properties) {
     if (properties == null) {
       properties = Collections.emptyMap();
     }
@@ -272,10 +272,11 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     } else {
       final RecordDefinition recordDefinition = query.getRecordDefinition();
       if (recordDefinition != null) {
-        final RecordStoreIteratorFactory recordDefinitionIteratorFactory = recordDefinition.getProperty("recordStoreIteratorFactory");
+        final RecordStoreIteratorFactory recordDefinitionIteratorFactory = recordDefinition
+          .getProperty("recordStoreIteratorFactory");
         if (recordDefinitionIteratorFactory != null) {
-          final AbstractIterator<Record> iterator = recordDefinitionIteratorFactory.createIterator(
-            this, query, properties);
+          final AbstractIterator<Record> iterator = recordDefinitionIteratorFactory
+            .createIterator(this, query, properties);
           if (iterator != null) {
             return iterator;
           }
@@ -571,8 +572,8 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
       if (idFieldNames.isEmpty()) {
         throw new IllegalArgumentException(typePath + " does not have a primary key");
       } else if (values.size() != idFieldNames.size()) {
-        throw new IllegalArgumentException(id + " not a valid id for " + typePath + " requires "
-          + idFieldNames);
+        throw new IllegalArgumentException(
+          id + " not a valid id for " + typePath + " requires " + idFieldNames);
       } else {
         final Query query = new Query(recordDefinition);
         for (int i = 0; i < idFieldNames.size(); i++) {
@@ -596,8 +597,8 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
       if (idFieldNames.isEmpty()) {
         throw new IllegalArgumentException(typePath + " does not have a primary key");
       } else if (id.length != idFieldNames.size()) {
-        throw new IllegalArgumentException(Arrays.toString(id) + " not a valid id for " + typePath
-          + " requires " + idFieldNames);
+        throw new IllegalArgumentException(
+          Arrays.toString(id) + " not a valid id for " + typePath + " requires " + idFieldNames);
       } else {
         final Query query = new Query(recordDefinition);
         for (int i = 0; i < idFieldNames.size(); i++) {
@@ -760,7 +761,8 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   public void setTypeRecordDefinitionProperties(
     final Map<String, List<RecordDefinitionProperty>> typeRecordDefinitionProperties) {
-    for (final Entry<String, List<RecordDefinitionProperty>> typeProperties : typeRecordDefinitionProperties.entrySet()) {
+    for (final Entry<String, List<RecordDefinitionProperty>> typeProperties : typeRecordDefinitionProperties
+      .entrySet()) {
       final String typePath = typeProperties.getKey();
       Map<String, Object> currentProperties = this.typeRecordDefinitionProperties.get(typePath);
       if (currentProperties == null) {

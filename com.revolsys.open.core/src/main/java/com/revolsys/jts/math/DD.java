@@ -257,8 +257,8 @@ public strictfp final class DD implements Serializable, Comparable, Cloneable {
         }
         break;
       }
-      throw new NumberFormatException("Unexpected character '" + ch + "' at position " + i
-        + " in string " + str);
+      throw new NumberFormatException(
+        "Unexpected character '" + ch + "' at position " + i + " in string " + str);
     }
     DD val2 = val;
 
@@ -602,8 +602,8 @@ public strictfp final class DD implements Serializable, Comparable, Cloneable {
         buf.append('.');
       }
       final int digit = (int)y.hi;
-      // System.out.println("printDump: [" + i + "] digit: " + digit + "  y: " +
-      // y.dump() + "  buf: " + buf);
+      // System.out.println("printDump: [" + i + "] digit: " + digit + " y: " +
+      // y.dump() + " buf: " + buf);
 
       /**
        * This should never happen, due to heuristic checks on remainder below

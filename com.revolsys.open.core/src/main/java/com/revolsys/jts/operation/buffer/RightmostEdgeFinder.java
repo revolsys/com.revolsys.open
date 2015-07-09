@@ -176,7 +176,8 @@ class RightmostEdgeFinder {
     }
     if (side < 0) {
       // reaching here can indicate that segment is horizontal
-      // Assert.shouldNeverReachHere("problem with finding rightmost side of segment at "
+      // Assert.shouldNeverReachHere("problem with finding rightmost side of
+      // segment at "
       // + de.getCoordinate());
       // testing only
       this.minCoord = null;

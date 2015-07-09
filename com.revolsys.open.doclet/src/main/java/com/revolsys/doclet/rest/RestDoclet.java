@@ -204,12 +204,10 @@ public class RestDoclet {
       final Map<String, Tag[]> descriptions = DocletUtil.getParameterDescriptions(method);
 
       this.writer.element(HtmlUtil.H4, "Parameters");
-      this.writer.element(
-        HtmlUtil.P,
-        "The resource supports the following parameters. "
-          + "For HTTP get requests these must be specified using query string parameters. "
-          + "For HTTP POST requests these can be specified using query string, application/x-www-form-urlencoded parameters or multipart/form-data unless otherwise specified. "
-          + "Array values [] can be specified by including the parameter multiple times in the request.");
+      this.writer.element(HtmlUtil.P, "The resource supports the following parameters. "
+        + "For HTTP get requests these must be specified using query string parameters. "
+        + "For HTTP POST requests these can be specified using query string, application/x-www-form-urlencoded parameters or multipart/form-data unless otherwise specified. "
+        + "Array values [] can be specified by including the parameter multiple times in the request.");
 
       this.writer.startTag(HtmlUtil.DIV);
       this.writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable");
@@ -317,9 +315,7 @@ public class RestDoclet {
         }
       }
     }
-    addResponseStatusDescription(
-      responseStatusDescriptions,
-      "500",
+    addResponseStatusDescription(responseStatusDescriptions, "500",
       "<p><b>Internal Server Error</b></p>"
         + "<p>This error indicates that there was an unexpected error on the server. "
         + "This is sometimes temporary so try again after a few minutes. "
@@ -327,8 +323,7 @@ public class RestDoclet {
         + "If the problem persists contact the support desk with exact details of the parameters you were using.</p>");
     if (!responseStatusDescriptions.isEmpty()) {
       this.writer.element(HtmlUtil.H4, "HTTP Status Codes");
-      this.writer.element(
-        HtmlUtil.P,
+      this.writer.element(HtmlUtil.P,
         "The resource will return one of the following status codes. The HTML error page may include an error message. The descriptions of the messages and the cause are described below.");
       this.writer.startTag(HtmlUtil.DIV);
       this.writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable");
@@ -438,8 +433,7 @@ public class RestDoclet {
     if (!parameters.isEmpty()) {
       final Map<String, Tag[]> descriptions = DocletUtil.getParameterDescriptions(method);
       this.writer.element(HtmlUtil.H4, "URI Template Parameters");
-      this.writer.element(
-        HtmlUtil.P,
+      this.writer.element(HtmlUtil.P,
         "The URI templates support the following parameters which must be replaced with values as described below.");
       this.writer.startTag(HtmlUtil.DIV);
       this.writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable");
@@ -476,8 +470,7 @@ public class RestDoclet {
     final AnnotationValue[] uriTemplates = getElementValue(requestMapping, "value");
     if (uriTemplates.length > 0) {
       this.writer.element(HtmlUtil.H4, "URI Templates");
-      this.writer.element(
-        HtmlUtil.P,
+      this.writer.element(HtmlUtil.P,
         "The URI templates define the paths that can be appended to the base URL of the service to access this resource.");
 
       for (final AnnotationValue uriTemplate : uriTemplates) {

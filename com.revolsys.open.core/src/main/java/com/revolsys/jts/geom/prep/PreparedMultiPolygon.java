@@ -108,8 +108,8 @@ public class PreparedMultiPolygon extends AbstractMultiPolygon {
        *
        * If a point of any test components does not lie in the target interior, result is false
        */
-      final boolean isAllInPrepGeomAreaInterior = AbstractPreparedPolygonContains.isAllTestComponentsInTargetInterior(
-        getPointLocator(), geometry);
+      final boolean isAllInPrepGeomAreaInterior = AbstractPreparedPolygonContains
+        .isAllTestComponentsInTargetInterior(getPointLocator(), geometry);
       if (!isAllInPrepGeomAreaInterior) {
         return false;
       }
@@ -130,8 +130,8 @@ public class PreparedMultiPolygon extends AbstractMultiPolygon {
        */
       if (geometry instanceof Polygonal) {
         // TODO: generalize this to handle GeometryCollections
-        final boolean isTargetGeomInTestArea = AbstractPreparedPolygonContains.isAnyTargetComponentInAreaTest(
-          geometry, this);
+        final boolean isTargetGeomInTestArea = AbstractPreparedPolygonContains
+          .isAnyTargetComponentInAreaTest(geometry, this);
         if (isTargetGeomInTestArea) {
           return false;
         }
@@ -239,8 +239,8 @@ public class PreparedMultiPolygon extends AbstractMultiPolygon {
          *
          * If a point of any test components lie in target, result is true
          */
-        final boolean isInPrepGeomArea = AbstractPreparedPolygonContains.isAnyTestComponentInTarget(
-          getPointLocator(), geometry);
+        final boolean isInPrepGeomArea = AbstractPreparedPolygonContains
+          .isAnyTestComponentInTarget(getPointLocator(), geometry);
         if (isInPrepGeomArea) {
           return true;
         }
@@ -271,8 +271,8 @@ public class PreparedMultiPolygon extends AbstractMultiPolygon {
            */
           if (geometry.getDimension() == 2) {
             // TODO: generalize this to handle GeometryCollections
-            final boolean isPrepGeomInArea = AbstractPreparedPolygonContains.isAnyTargetComponentInAreaTest(
-              geometry, this);
+            final boolean isPrepGeomInArea = AbstractPreparedPolygonContains
+              .isAnyTargetComponentInAreaTest(geometry, this);
             if (isPrepGeomInArea) {
               return true;
             }

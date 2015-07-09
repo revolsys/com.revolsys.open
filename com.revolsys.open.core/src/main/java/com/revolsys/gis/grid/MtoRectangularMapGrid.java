@@ -33,7 +33,8 @@ public class MtoRectangularMapGrid extends Nts50000RectangularMapGrid {
 
       return latitude;
     } else {
-      throw new IllegalArgumentException(mapTileName + " does not start with a valid MTO tile name");
+      throw new IllegalArgumentException(
+        mapTileName + " does not start with a valid MTO tile name");
     }
   }
 
@@ -65,7 +66,8 @@ public class MtoRectangularMapGrid extends Nts50000RectangularMapGrid {
 
       return longitude;
     } else {
-      throw new IllegalArgumentException(mapTileName + " does not start with a valid MTO tile name");
+      throw new IllegalArgumentException(
+        mapTileName + " does not start with a valid MTO tile name");
     }
   }
 
@@ -93,12 +95,12 @@ public class MtoRectangularMapGrid extends Nts50000RectangularMapGrid {
       tileName.insert(4, "0");
     }
 
-    tileName.append(GridUtil.getLetter12(x, y, MtoConstants.WIDTH_TWELTH,
-      MtoConstants.HEIGHT_TWELTH));
-    tileName.append(GridUtil.getNumber100(x, y, MtoConstants.WIDTH_HUNDRETH,
-      MtoConstants.HEIGHT_HUNDRETH));
-    tileName.append(GridUtil.getLetter4(x, y, MtoConstants.WIDTH_QUARTER,
-      MtoConstants.HEIGHT_QUARTER));
+    tileName
+      .append(GridUtil.getLetter12(x, y, MtoConstants.WIDTH_TWELTH, MtoConstants.HEIGHT_TWELTH));
+    tileName.append(
+      GridUtil.getNumber100(x, y, MtoConstants.WIDTH_HUNDRETH, MtoConstants.HEIGHT_HUNDRETH));
+    tileName
+      .append(GridUtil.getLetter4(x, y, MtoConstants.WIDTH_QUARTER, MtoConstants.HEIGHT_QUARTER));
 
     return tileName.toString();
 

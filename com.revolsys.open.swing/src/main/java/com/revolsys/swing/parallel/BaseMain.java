@@ -44,8 +44,8 @@ public class BaseMain implements UncaughtExceptionHandler {
         MethodUtils.invokeMethod(application, "setDockIconImage", image);
       }
       final Class<?> quitStrategyClass = Class.forName("com.apple.eawt.QuitStrategy");
-      final Object closeAllWindows = quitStrategyClass.getField("CLOSE_ALL_WINDOWS").get(
-        quitStrategyClass);
+      final Object closeAllWindows = quitStrategyClass.getField("CLOSE_ALL_WINDOWS")
+        .get(quitStrategyClass);
       MethodUtils.invokeExactMethod(application, "setQuitStrategy", closeAllWindows);
       MacApplicationListenerHandler.init(application);
     } catch (final ClassNotFoundException t) {

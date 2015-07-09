@@ -34,10 +34,11 @@ public class PackedGeometry {
       zOffset, zScale, hasM, mScale, mOffset, parts);
 
     final int geometryType = ArcSdeConstants.getStGeometryType(geometry);
-    final Geometry geometry2 = PackedCoordinateUtil.getGeometry(data, geometryFactory,
-      geometryType, numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset, mScale);
+    final Geometry geometry2 = PackedCoordinateUtil.getGeometry(data, geometryFactory, geometryType,
+      numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset, mScale);
     System.out.println(WktWriter.toString(geometry));
-    if (!new GeometryEqualsExact3d().equals(geometry, geometry2, Collections.<String> emptyList())) {
+    if (!new GeometryEqualsExact3d().equals(geometry, geometry2,
+      Collections.<String> emptyList())) {
       System.err.println(WktWriter.toString(geometry2));
       throw new RuntimeException("Geometry not equal");
     }
@@ -54,8 +55,11 @@ public class PackedGeometry {
     checkGeometry("LINESTRING Z(100 200 3,110 220 13)");
     checkGeometry("MULTILINESTRING Z((100 200 3,110 220 13),(400 500 6,410 520 16))");
     checkGeometry("POLYGON Z((100 100 1,100 200 2,200 200 3,200 100 4,100 100 5))");
-    checkGeometry("POLYGON Z((100 100 1,100 200 2,200 200 3,200 100 4,100 100 5),(50 50 1,50 70 2,70 70 3,70 50 4,50 50 5))");
-    checkGeometry("MULTIPOLYGON Z(((100 100 1,100 200 2,200 200 3,200 100 4,100 100 5),(50 50 1,50 70 2,70 70 3,70 50 4,50 50 5)),((300 300 1,300 400 2,400 400 3,400 300 4,300 300 5)))");
-    // checkGeometry("MULTILINESTRING Z((100 200 3,110 220 13),(400 500 6,410 520 16))");
+    checkGeometry(
+      "POLYGON Z((100 100 1,100 200 2,200 200 3,200 100 4,100 100 5),(50 50 1,50 70 2,70 70 3,70 50 4,50 50 5))");
+    checkGeometry(
+      "MULTIPOLYGON Z(((100 100 1,100 200 2,200 200 3,200 100 4,100 100 5),(50 50 1,50 70 2,70 70 3,70 50 4,50 50 5)),((300 300 1,300 400 2,400 400 3,400 300 4,300 300 5)))");
+    // checkGeometry("MULTILINESTRING Z((100 200 3,110 220 13),(400 500 6,410
+    // 520 16))");
   }
 }

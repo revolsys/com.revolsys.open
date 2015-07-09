@@ -77,12 +77,14 @@ public class OffsetCurveBuilder {
 
   private final BufferParameters bufParams;
 
-  public OffsetCurveBuilder(final GeometryFactory precisionModel, final BufferParameters bufParams) {
+  public OffsetCurveBuilder(final GeometryFactory precisionModel,
+    final BufferParameters bufParams) {
     this.precisionModel = precisionModel;
     this.bufParams = bufParams;
   }
 
-  private void computeLineBufferCurve(final LineString points, final OffsetSegmentGenerator segGen) {
+  private void computeLineBufferCurve(final LineString points,
+    final OffsetSegmentGenerator segGen) {
     final double distTol = simplifyTolerance(this.distance);
 
     // --------- compute points for left side of line
@@ -166,7 +168,7 @@ public class OffsetCurveBuilder {
       case BufferParameters.CAP_SQUARE:
         segGen.createSquare(point);
       break;
-    // otherwise curve is empty (e.g. for a butt cap);
+      // otherwise curve is empty (e.g. for a butt cap);
     }
   }
 

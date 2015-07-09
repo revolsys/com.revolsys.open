@@ -33,13 +33,13 @@
 
 package com.revolsys.jts.testold.geom;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 /**
  * Tests for {@link GeometryFactoryI}.
@@ -75,8 +75,10 @@ public class GeometryFactoryTest extends TestCase {
     checkCreateGeometryExact("LINESTRING(0 0,10 10)");
     checkCreateGeometryExact("MULTILINESTRING((50 100, 100 200),(100 100,150 200))");
     checkCreateGeometryExact("POLYGON((100 200,200 200,200 100,100 100,100 200))");
-    checkCreateGeometryExact("MULTIPOLYGON(((100 200,200 200,200 100,100 100,100 200)),((300 200,400 200,400 100,300 100,300 200)))");
-    // checkCreateGeometryExact("GEOMETRYCOLLECTION(POLYGON((100 200,200 200,200 100,100 100,100 200)),LINESTRING(250 100,350 200),POINT(350 150))");
+    checkCreateGeometryExact(
+      "MULTIPOLYGON(((100 200,200 200,200 100,100 100,100 200)),((300 200,400 200,400 100,300 100,300 200)))");
+    // checkCreateGeometryExact("GEOMETRYCOLLECTION(POLYGON((100 200,200 200,200
+    // 100,100 100,100 200)),LINESTRING(250 100,350 200),POINT(350 150))");
   }
 
   //

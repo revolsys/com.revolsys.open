@@ -63,8 +63,8 @@ public class RsMethodSecurityExpressionHandler implements MethodSecurityExpressi
   @SuppressWarnings("unchecked")
   public Object filter(final Object filterTarget, final Expression filterExpression,
     final EvaluationContext ctx) {
-    final MethodSecurityExpressionRoot rootObject = (MethodSecurityExpressionRoot)ctx.getRootObject()
-      .getValue();
+    final MethodSecurityExpressionRoot rootObject = (MethodSecurityExpressionRoot)ctx
+      .getRootObject().getValue();
     List retainList;
 
     if (this.logger.isDebugEnabled()) {
@@ -116,8 +116,8 @@ public class RsMethodSecurityExpressionHandler implements MethodSecurityExpressi
         this.logger.debug("Retaining elements: " + retainList);
       }
 
-      final Object[] filtered = (Object[])Array.newInstance(filterTarget.getClass()
-        .getComponentType(), retainList.size());
+      final Object[] filtered = (Object[])Array
+        .newInstance(filterTarget.getClass().getComponentType(), retainList.size());
       for (int i = 0; i < retainList.size(); i++) {
         filtered[i] = retainList.get(i);
       }
@@ -125,8 +125,8 @@ public class RsMethodSecurityExpressionHandler implements MethodSecurityExpressi
       return filtered;
     }
 
-    throw new IllegalArgumentException("Filter target must be a collection or array type, but was "
-      + filterTarget);
+    throw new IllegalArgumentException(
+      "Filter target must be a collection or array type, but was " + filterTarget);
   }
 
   @Override

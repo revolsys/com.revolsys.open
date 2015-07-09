@@ -32,13 +32,13 @@
  */
 package com.revolsys.jts.testold.algorithm;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 /**
  * Tests {@link LineString#isCounterClockwise()}
@@ -62,14 +62,16 @@ public class IsCounterClockWiseTest extends TestCase {
   }
 
   public void testCounterClockWise() throws Exception {
-    final LineString pts = getLineString("POLYGON ((60 180, 140 240, 140 240, 140 240, 200 180, 120 120, 60 180))");
+    final LineString pts = getLineString(
+      "POLYGON ((60 180, 140 240, 140 240, 140 240, 200 180, 120 120, 60 180))");
     assertEquals(pts.isCounterClockwise(), false);
 
     final LineString pts2 = getLineString("POLYGON ((60 180, 140 120, 100 180, 140 240, 60 180))");
     assertEquals(pts2.isCounterClockwise(), true);
     // same pts list with duplicate top point - check that isCounterClockise
     // still works
-    final LineString pts2x = getLineString("POLYGON ((60 180, 140 120, 100 180, 140 240, 140 240, 60 180))");
+    final LineString pts2x = getLineString(
+      "POLYGON ((60 180, 140 120, 100 180, 140 240, 140 240, 60 180))");
     assertEquals(pts2x.isCounterClockwise(), true);
   }
 }

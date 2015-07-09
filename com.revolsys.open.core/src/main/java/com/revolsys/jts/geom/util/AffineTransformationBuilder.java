@@ -161,11 +161,13 @@ public class AffineTransformationBuilder {
     final double[][] a = new double[][] {
       {
         this.src0.getX(), this.src0.getY(), 1
-      }, {
+        },
+      {
         this.src1.getX(), this.src1.getY(), 1
-      }, {
+        },
+      {
         this.src2.getX(), this.src2.getY(), 1
-      }
+        }
     };
     return Matrix.solve(a, b);
   }

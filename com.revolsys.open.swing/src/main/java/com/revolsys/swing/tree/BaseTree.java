@@ -26,8 +26,8 @@ import com.revolsys.swing.tree.dnd.TreeTransferHandler;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 
-public class BaseTree extends JTree implements MouseListener, TreeWillExpandListener,
-  TreeExpansionListener {
+public class BaseTree extends JTree
+  implements MouseListener, TreeWillExpandListener, TreeExpansionListener {
   private static final long serialVersionUID = 1L;
 
   private static Reference<BaseTreeNode> menuNode = new EmptyReference<>();

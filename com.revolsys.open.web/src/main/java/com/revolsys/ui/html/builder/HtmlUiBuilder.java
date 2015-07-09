@@ -99,7 +99,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   private static final Pattern SUB_KEY_PATTERN = Pattern.compile("^([\\w]+)(?:\\.(.+))?");
 
   public static HttpServletRequest getRequest() {
-    final ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
+    final ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder
+      .getRequestAttributes();
     final HttpServletRequest request = requestAttributes.getRequest();
     return request;
   }
@@ -112,7 +113,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   public static Map<String, String> getUriTemplateVariables() {
     final HttpServletRequest request = getRequest();
     @SuppressWarnings("unchecked")
-    final Map<String, String> uriTemplateVariables = (Map<String, String>)request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+    final Map<String, String> uriTemplateVariables = (Map<String, String>)request
+      .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
     if (uriTemplateVariables == null) {
       return Collections.emptyMap();
     } else {
@@ -452,7 +454,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     scriptBody.append("  tableShowEvents(table,");
     scriptBody.append(scrollYPercent);
     scriptBody.append(");\n");
-    scriptBody.append("$(window).bind('resize', function () {$(table).DataTable().columns.adjust();} );");
+    scriptBody
+      .append("$(window).bind('resize', function () {$(table).DataTable().columns.adjust();} );");
     scriptBody.append("});");
     script.setContent(scriptBody.toString());
     final ElementContainer container = new ElementContainer(tableView, script);
@@ -479,7 +482,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public Object createDataTableHandler(final HttpServletRequest request, final String pageName,
-    final Map<String, Object> parameters, final Callable<Collection<? extends Object>> rowsCallable) {
+    final Map<String, Object> parameters,
+    final Callable<Collection<? extends Object>> rowsCallable) {
     parameters.put("serverSide", false);
     if (isDataTableCallback(request)) {
       try {
@@ -531,7 +535,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public Object createDataTableHandlerOrRedirect(final HttpServletRequest request,
     final HttpServletResponse response, final String pageName,
-    final Collection<? extends Object> rows, final Object parentBuilder, final String parentPageName) {
+    final Collection<? extends Object> rows, final Object parentBuilder,
+    final String parentPageName) {
     if (isDataTableCallback(request)) {
       try {
         return createDataTableMap(request, rows, pageName);
@@ -710,8 +715,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return tabs;
   }
 
-  public Element createObjectEditPage(final T object, final String prefix) throws IOException,
-    ServletException {
+  public Element createObjectEditPage(final T object, final String prefix)
+    throws IOException, ServletException {
     if (object == null) {
       throw new PageNotFoundException();
     } else {
@@ -1243,7 +1248,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return serializers;
   }
 
-  protected List<KeySerializer> getSerializers(final String viewName, final String defaultViewName) {
+  protected List<KeySerializer> getSerializers(final String viewName,
+    final String defaultViewName) {
     List<KeySerializer> serializers = getSerializers(viewName);
     if (serializers == null) {
       serializers = getSerializers(defaultViewName);
@@ -1338,8 +1344,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         }
       }
     }
-    throw new RuntimeException("Unable to get page " + parentPageName + " from builder "
-      + parentBuilder);
+    throw new RuntimeException(
+      "Unable to get page " + parentPageName + " from builder " + parentBuilder);
   }
 
   public void referrerRedirect(final HttpServletRequest request) {
@@ -1385,8 +1391,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
             uiBuilder = getBuilder(currentObject);
           } catch (final IllegalArgumentException e) {
-            final String message = currentObject.getClass().getName()
-              + " does not have a property " + keyName;
+            final String message = currentObject.getClass().getName() + " does not have a property "
+              + keyName;
             this.log.error(e.getMessage(), e);
             out.element(HtmlUtil.B, message);
             return;

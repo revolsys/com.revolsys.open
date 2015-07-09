@@ -10,8 +10,8 @@ import com.revolsys.util.Property;
 
 public class IntegerFieldDefinition extends AbstractFileGdbFieldDefinition {
   public IntegerFieldDefinition(final Field field) {
-    super(field.getName(), DataTypes.INT, BooleanStringConverter.getBoolean(field.getRequired())
-      || !field.isIsNullable());
+    super(field.getName(), DataTypes.INT,
+      BooleanStringConverter.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 
   @Override

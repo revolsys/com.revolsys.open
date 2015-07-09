@@ -20,7 +20,8 @@ public abstract class AbstractMultiCondition extends Condition {
     this.values = new ArrayList<QueryValue>(values);
   }
 
-  public AbstractMultiCondition(final String operator, final Collection<? extends QueryValue> values) {
+  public AbstractMultiCondition(final String operator,
+    final Collection<? extends QueryValue> values) {
     this.operator = operator;
     this.values = new ArrayList<QueryValue>(values);
   }

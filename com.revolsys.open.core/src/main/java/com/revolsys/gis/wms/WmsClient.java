@@ -59,7 +59,7 @@ public class WmsClient {
 
   public Image getMapImage(final List<String> layers, final List<String> styles, final String srid,
     final BoundingBox envelope, final String format, final int width, final int height)
-    throws IOException {
+      throws IOException {
     final URL mapUrl = getMapUrl(layers, styles, srid, envelope, format, width, height);
     final URLConnection connection = mapUrl.openConnection();
     final String userInfo = mapUrl.getUserInfo();

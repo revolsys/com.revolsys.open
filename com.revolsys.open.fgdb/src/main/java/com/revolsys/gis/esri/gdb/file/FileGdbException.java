@@ -49,7 +49,7 @@ public class FileGdbException extends RuntimeException {
   // } else {
   // final StringBuilder string = new StringBuilder(superString);
   // for (final String error : this.errors) {
-  // string.append("\n  ");
+  // string.append("\n ");
   // string.append(error);
   // }
   // return string.toString();

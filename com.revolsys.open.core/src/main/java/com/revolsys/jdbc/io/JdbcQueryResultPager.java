@@ -234,8 +234,8 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
   private void initResultSet() {
     if (this.resultSet == null) {
       try {
-        this.statement = this.connection.prepareStatement(this.sql,
-          ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        this.statement = this.connection.prepareStatement(this.sql, ResultSet.TYPE_SCROLL_SENSITIVE,
+          ResultSet.CONCUR_READ_ONLY);
         this.statement.setFetchSize(this.pageSize);
 
         this.resultSet = JdbcQueryIterator.getResultSet(this.recordDefinition, this.statement,

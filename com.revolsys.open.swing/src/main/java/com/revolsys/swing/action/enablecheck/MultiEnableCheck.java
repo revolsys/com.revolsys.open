@@ -7,7 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public abstract class MultiEnableCheck extends AbstractEnableCheck implements Iterable<EnableCheck> {
+public abstract class MultiEnableCheck extends AbstractEnableCheck
+  implements Iterable<EnableCheck> {
 
   private List<EnableCheck> enableChecks = new ArrayList<>();
 

@@ -20,16 +20,16 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.spring.InputStreamResource;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 
-public class GeometryReaderHttpMessageConverter extends
-  AbstractHttpMessageConverter<GeometryReader> {
+public class GeometryReaderHttpMessageConverter
+  extends AbstractHttpMessageConverter<GeometryReader> {
 
   private GeometryFactory geometryFactory;
 
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
   public GeometryReaderHttpMessageConverter() {
-    super(GeometryReader.class, IoFactoryRegistry.getInstance().getMediaTypes(
-      GeometryReaderFactory.class), null);
+    super(GeometryReader.class,
+      IoFactoryRegistry.getInstance().getMediaTypes(GeometryReaderFactory.class), null);
   }
 
   public GeometryFactory getGeometryFactory() {
@@ -48,15 +48,16 @@ public class GeometryReaderHttpMessageConverter extends
       }
       final InputStream body = inputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/" + mediaType.getSubtype();
-      final GeometryReaderFactory readerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
-        GeometryReaderFactory.class, mediaTypeString);
+      final GeometryReaderFactory readerFactory = this.ioFactoryRegistry
+        .getFactoryByMediaType(GeometryReaderFactory.class, mediaTypeString);
       if (readerFactory == null) {
         throw new HttpMessageNotReadableException("Cannot read data in format" + mediaType);
       } else {
         final InputStreamResource resource = new InputStreamResource("geometryInput", body);
         final GeometryReader reader = readerFactory.createGeometryReader(resource);
         GeometryFactory factory = this.geometryFactory;
-        final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder.getRequestAttributes();
+        final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder
+          .getRequestAttributes();
         final String srid = requestAttributes.getParameter("srid");
         if (srid != null && srid.trim().length() > 0) {
           factory = GeometryFactory.floating3(Integer.parseInt(srid));

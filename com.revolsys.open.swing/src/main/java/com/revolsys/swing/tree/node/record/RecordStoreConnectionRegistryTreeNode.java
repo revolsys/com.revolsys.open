@@ -15,8 +15,8 @@ import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.OS;
 
-public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode implements
-  PropertyChangeListener {
+public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
+  implements PropertyChangeListener {
 
   private static final MenuFactory MENU = new MenuFactory("Record Store Connections");
 

@@ -39,7 +39,8 @@ public class IntervalRTreeBranchNode<V> extends IntervalRTreeNode<V> {
 
   private final IntervalRTreeNode<V> node2;
 
-  public IntervalRTreeBranchNode(final IntervalRTreeNode<V> node1, final IntervalRTreeNode<V> node2) {
+  public IntervalRTreeBranchNode(final IntervalRTreeNode<V> node1,
+    final IntervalRTreeNode<V> node2) {
     super(Math.min(node1.getMin(), node2.getMin()), Math.max(node1.getMax(), node2.getMax()));
     this.node1 = node1;
     this.node2 = node2;

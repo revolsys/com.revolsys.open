@@ -127,8 +127,8 @@ public class BufferResultValidator {
   }
 
   private void checkDistance() {
-    final BufferDistanceValidator distValid = new BufferDistanceValidator(this.input,
-      this.distance, this.result);
+    final BufferDistanceValidator distValid = new BufferDistanceValidator(this.input, this.distance,
+      this.result);
     if (!distValid.isValid()) {
       this.isValid = false;
       this.errorMsg = distValid.getErrorMessage();

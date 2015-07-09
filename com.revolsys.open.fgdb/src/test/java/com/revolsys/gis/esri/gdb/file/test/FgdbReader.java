@@ -84,8 +84,8 @@ public class FgdbReader {
 
   public FgdbReader() {
     try {
-      this.in = new EndianInputStream(new FileInputStream(
-        "/Users/paustin/Downloads/KSRD_20140306.gdb/a0000000d.gdbtable"));
+      this.in = new EndianInputStream(
+        new FileInputStream("/Users/paustin/Downloads/KSRD_20140306.gdb/a0000000d.gdbtable"));
     } catch (final FileNotFoundException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

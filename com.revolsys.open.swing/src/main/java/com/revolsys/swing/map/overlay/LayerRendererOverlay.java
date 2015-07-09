@@ -29,8 +29,8 @@ import com.revolsys.util.Property;
 public class LayerRendererOverlay extends JComponent implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
-  private static final Collection<String> IGNORE_PROPERTY_NAMES = new HashSet<>(Arrays.asList(
-    "selectionCount", "hasHighlightedRecords", "highlightedCount", "scale"));
+  private static final Collection<String> IGNORE_PROPERTY_NAMES = new HashSet<>(
+    Arrays.asList("selectionCount", "hasHighlightedRecords", "highlightedCount", "scale"));
 
   private Layer layer;
 

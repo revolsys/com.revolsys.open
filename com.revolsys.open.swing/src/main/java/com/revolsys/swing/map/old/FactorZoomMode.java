@@ -147,7 +147,8 @@ public class FactorZoomMode implements ZoomMode {
    * @param y The y coordinate.
    */
   @Override
-  public void zoomInAndRecentre(final ComponentViewport2D viewport, final double x, final double y) {
+  public void zoomInAndRecentre(final ComponentViewport2D viewport, final double x,
+    final double y) {
     zoomAndRecentre(viewport, x, y, 1 / this.factor);
   }
 
@@ -173,7 +174,8 @@ public class FactorZoomMode implements ZoomMode {
    * @param y The y coordinate.
    */
   @Override
-  public void zoomOutAndRecentre(final ComponentViewport2D viewport, final double x, final double y) {
+  public void zoomOutAndRecentre(final ComponentViewport2D viewport, final double x,
+    final double y) {
     zoomAndRecentre(viewport, x, y, this.factor);
   }
 

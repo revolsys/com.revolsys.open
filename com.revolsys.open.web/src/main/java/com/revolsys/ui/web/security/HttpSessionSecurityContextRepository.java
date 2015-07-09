@@ -62,8 +62,9 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
       try {
         return this.request.getSession(true);
       } catch (final IllegalStateException e) {
-        HttpSessionSecurityContextRepository.this.logger.warn("Failed to create a session, as response has been committed. Unable to store"
-          + " SecurityContext.");
+        HttpSessionSecurityContextRepository.this.logger
+          .warn("Failed to create a session, as response has been committed. Unable to store"
+            + " SecurityContext.");
       }
 
       return null;
@@ -115,10 +116,12 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
       HttpSession httpSession = this.request.getSession(false);
 
       if (authentication == null
-        || HttpSessionSecurityContextRepository.this.authenticationTrustResolver.isAnonymous(authentication)) {
+        || HttpSessionSecurityContextRepository.this.authenticationTrustResolver
+          .isAnonymous(authentication)) {
 
         if (httpSession != null) {
-          httpSession.removeAttribute(HttpSessionSecurityContextRepository.this.springSecurityContextKey);
+          httpSession
+            .removeAttribute(HttpSessionSecurityContextRepository.this.springSecurityContextKey);
         }
         return;
       }
@@ -128,9 +131,10 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
       }
 
       if (httpSession != null
-        && (context.hashCode() != this.contextHashBeforeChainExecution || httpSession.getAttribute(HttpSessionSecurityContextRepository.this.springSecurityContextKey) == null)) {
-        httpSession.setAttribute(
-          HttpSessionSecurityContextRepository.this.springSecurityContextKey, context);
+        && (context.hashCode() != this.contextHashBeforeChainExecution || httpSession.getAttribute(
+          HttpSessionSecurityContextRepository.this.springSecurityContextKey) == null)) {
+        httpSession.setAttribute(HttpSessionSecurityContextRepository.this.springSecurityContextKey,
+          context);
 
       }
     }
@@ -236,8 +240,8 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
 
     }
 
-    requestResponseHolder.setResponse(new SaveToSessionResponseWrapper(response, request,
-      httpSession != null, context.hashCode()));
+    requestResponseHolder.setResponse(
+      new SaveToSessionResponseWrapper(response, request, httpSession != null, context.hashCode()));
 
     return context;
   }
@@ -257,11 +261,11 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
 
     if (!(contextFromSession instanceof SecurityContext)) {
       if (this.logger.isWarnEnabled()) {
-        this.logger.warn("SPRING_SECURITY_CONTEXT did not contain a SecurityContext but contained: '"
-          + contextFromSession
-          + "'; are you improperly modifying the HttpSession directly "
-          + "(you should always use SecurityContextHolder) or using the HttpSession attribute "
-          + "reserved for this class?");
+        this.logger
+          .warn("SPRING_SECURITY_CONTEXT did not contain a SecurityContext but contained: '"
+            + contextFromSession + "'; are you improperly modifying the HttpSession directly "
+            + "(you should always use SecurityContextHolder) or using the HttpSession attribute "
+            + "reserved for this class?");
       }
 
       return null;

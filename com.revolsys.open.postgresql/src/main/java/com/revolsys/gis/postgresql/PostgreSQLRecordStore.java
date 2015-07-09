@@ -36,11 +36,12 @@ import com.revolsys.util.Property;
 
 public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
 
-  public static final List<String> POSTGRESQL_INTERNAL_SCHEMAS = Arrays.asList(
-    "information_schema", "pg_catalog", "pg_toast_temp_1");
+  public static final List<String> POSTGRESQL_INTERNAL_SCHEMAS = Arrays.asList("information_schema",
+    "pg_catalog", "pg_toast_temp_1");
 
   public static final AbstractIterator<Record> createPostgreSQLIterator(
-    final PostgreSQLRecordStore recordStore, final Query query, final Map<String, Object> properties) {
+    final PostgreSQLRecordStore recordStore, final Query query,
+    final Map<String, Object> properties) {
     return new PostgreSQLJdbcQueryIterator(recordStore, query, properties);
   }
 
@@ -226,16 +227,17 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
       + "where (t.grantee  in (current_user, 'PUBLIC') or "
       + "t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) and "
       + "privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') ");
-    setSchemaTablePermissionsSql("select distinct t.table_schema as \"SCHEMA_NAME\", t.table_name, t.privilege_type as \"PRIVILEGE\", d.description as \"REMARKS\" from information_schema.role_table_grants t join pg_namespace n on t.table_schema = n.nspname join pg_class c on (n.oid = c.relnamespace AND t.table_name = c.relname) left join pg_description d on d.objoid = c.oid "
-      + "where t.table_schema = ? and "
-      + "(t.grantee  in (current_user, 'PUBLIC') or t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) AND "
-      + "privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') "
-      + "order by t.table_schema, t.table_name, t.privilege_type");
+    setSchemaTablePermissionsSql(
+      "select distinct t.table_schema as \"SCHEMA_NAME\", t.table_name, t.privilege_type as \"PRIVILEGE\", d.description as \"REMARKS\" from information_schema.role_table_grants t join pg_namespace n on t.table_schema = n.nspname join pg_class c on (n.oid = c.relnamespace AND t.table_name = c.relname) left join pg_description d on d.objoid = c.oid "
+        + "where t.table_schema = ? and "
+        + "(t.grantee  in (current_user, 'PUBLIC') or t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) AND "
+        + "privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') "
+        + "order by t.table_schema, t.table_name, t.privilege_type");
   }
 
   protected void initSettings() {
-    setIteratorFactory(new RecordStoreIteratorFactory(PostgreSQLRecordStore.class,
-      "createPostgreSQLIterator"));
+    setIteratorFactory(
+      new RecordStoreIteratorFactory(PostgreSQLRecordStore.class, "createPostgreSQLIterator"));
   }
 
   @Override

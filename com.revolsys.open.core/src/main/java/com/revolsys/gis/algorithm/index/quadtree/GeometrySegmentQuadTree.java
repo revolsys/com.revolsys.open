@@ -24,8 +24,8 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
 
   public static GeometrySegmentQuadTree get(final Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
-      final Reference<GeometrySegmentQuadTree> reference = GeometryProperties.getGeometryProperty(
-        geometry, GEOMETRY_SEGMENT_INDEX);
+      final Reference<GeometrySegmentQuadTree> reference = GeometryProperties
+        .getGeometryProperty(geometry, GEOMETRY_SEGMENT_INDEX);
       GeometrySegmentQuadTree index;
       if (reference == null) {
         index = null;

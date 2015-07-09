@@ -18,8 +18,8 @@ import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.record.model.RecordListTableModel;
 import com.revolsys.swing.table.record.row.RecordRowTable;
 
-public class MergedRecordsTableModel extends RecordListTableModel implements SortableTableModel,
-  ListSelectionListener {
+public class MergedRecordsTableModel extends RecordListTableModel
+  implements SortableTableModel, ListSelectionListener {
   private static final long serialVersionUID = 1L;
 
   public static TablePanel createPanel(final AbstractRecordLayer layer, final Record mergedObject,

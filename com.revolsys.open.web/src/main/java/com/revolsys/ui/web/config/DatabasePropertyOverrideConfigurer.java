@@ -42,7 +42,8 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
    * The pattern for setting the value for a key in a Map property of a bean
    * (e.g. bean.property[key]).
    */
-  private static final Pattern MAP_PROPERTY_VALUE_PATTERN = Pattern.compile("(\\w+)\\.(\\w+)\\[([a-z]\\w*)\\]");
+  private static final Pattern MAP_PROPERTY_VALUE_PATTERN = Pattern
+    .compile("(\\w+)\\.(\\w+)\\[([a-z]\\w*)\\]");
 
   /**
    * The flag indictaing if invalid keys should be ignored or an exception
@@ -75,8 +76,8 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
         final Map map = (Map)objectValue;
         map.put(mapKey, value);
       } else {
-        throw new BeanInitializationException("Bean property [" + beanName + "." + propertyName
-          + "] is not a Map");
+        throw new BeanInitializationException(
+          "Bean property [" + beanName + "." + propertyName + "] is not a Map");
       }
     } else {
       final Map<String, Object> map = new HashMap<>();

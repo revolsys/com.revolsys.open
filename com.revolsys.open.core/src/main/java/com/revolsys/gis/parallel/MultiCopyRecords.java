@@ -47,24 +47,26 @@ public class MultiCopyRecords implements Process {
             this.targetRecordStore, hasSequence);
           return copy;
         } else {
-          LoggerFactory.getLogger(getClass()).error(
-            "Parameter 'typePath' required for type='copyRecords'");
+          LoggerFactory.getLogger(getClass())
+            .error("Parameter 'typePath' required for type='copyRecords'");
         }
       } else if ("sequential".equals(type)) {
-        final List<Map<String, Object>> processList = (List<Map<String, Object>>)processDefinition.get("processes");
+        final List<Map<String, Object>> processList = (List<Map<String, Object>>)processDefinition
+          .get("processes");
         if (processList == null) {
-          LoggerFactory.getLogger(getClass()).error(
-            "Parameter 'processes' required for type='sequential'");
+          LoggerFactory.getLogger(getClass())
+            .error("Parameter 'processes' required for type='sequential'");
         } else {
           final Sequential processes = new Sequential();
           createProcesses(processes, processList);
           return processes;
         }
       } else if ("parallel".equals(type)) {
-        final List<Map<String, Object>> processList = (List<Map<String, Object>>)processDefinition.get("processes");
+        final List<Map<String, Object>> processList = (List<Map<String, Object>>)processDefinition
+          .get("processes");
         if (processList == null) {
-          LoggerFactory.getLogger(getClass()).error(
-            "Parameter 'processes' required for type='parallel'");
+          LoggerFactory.getLogger(getClass())
+            .error("Parameter 'processes' required for type='parallel'");
         } else {
           final Parallel processes = new Parallel();
           createProcesses(processes, processList);
@@ -72,8 +74,8 @@ public class MultiCopyRecords implements Process {
         }
 
       } else {
-        LoggerFactory.getLogger(getClass()).error(
-          "Parameter type=" + type + " not in 'copyRecords', 'sequential', 'copyRecords'");
+        LoggerFactory.getLogger(getClass())
+          .error("Parameter type=" + type + " not in 'copyRecords', 'sequential', 'copyRecords'");
       }
       return null;
     }

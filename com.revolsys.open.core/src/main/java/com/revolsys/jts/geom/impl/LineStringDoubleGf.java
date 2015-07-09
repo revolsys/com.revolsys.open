@@ -64,7 +64,8 @@ public class LineStringDoubleGf extends AbstractLineString implements LineString
     double[] newCoordinates;
     if (axisCount < 0 || axisCount == 1) {
       throw new IllegalArgumentException("axisCount must 0 or > 1 not " + axisCount);
-    } else if (coordinates == null || axisCount == 0 || vertexCount == 0 || coordinates.length == 0) {
+    } else
+      if (coordinates == null || axisCount == 0 || vertexCount == 0 || coordinates.length == 0) {
       newCoordinates = null;
     } else {
       final int coordinateCount = vertexCount * axisCount;
@@ -135,8 +136,8 @@ public class LineStringDoubleGf extends AbstractLineString implements LineString
         throw new IllegalArgumentException("Coordinate array length " + coordinateCount
           + " is not a multiple of axisCount=" + axisCount);
       } else if (coordinateCount == axisCount) {
-        throw new IllegalArgumentException("Invalid number of points in LineString (found "
-          + vertexCount + " - must be 0 or >= 2)");
+        throw new IllegalArgumentException(
+          "Invalid number of points in LineString (found " + vertexCount + " - must be 0 or >= 2)");
       } else {
         final int axisCountThis = getAxisCount();
         this.coordinates = new double[axisCountThis * vertexCount];
@@ -178,8 +179,8 @@ public class LineStringDoubleGf extends AbstractLineString implements LineString
         throw new IllegalArgumentException("Coordinate array length " + coordinateCount
           + " is not a multiple of axisCount=" + axisCount);
       } else if (coordinateCount == axisCount) {
-        throw new IllegalArgumentException("Invalid number of points in LineString (found "
-          + vertexCount + " - must be 0 or >= 2)");
+        throw new IllegalArgumentException(
+          "Invalid number of points in LineString (found " + vertexCount + " - must be 0 or >= 2)");
       } else {
         final int axisCountThis = getAxisCount();
         this.coordinates = new double[axisCountThis * vertexCount];
@@ -208,8 +209,8 @@ public class LineStringDoubleGf extends AbstractLineString implements LineString
       if (vertexCount == 0) {
         this.coordinates = null;
       } else if (vertexCount == 1) {
-        throw new IllegalArgumentException("Invalid number of points in LineString (found "
-          + vertexCount + " - must be 0 or >= 2)");
+        throw new IllegalArgumentException(
+          "Invalid number of points in LineString (found " + vertexCount + " - must be 0 or >= 2)");
       } else {
         final int axisCount = getAxisCount();
         this.coordinates = new double[axisCount * vertexCount];
@@ -246,7 +247,8 @@ public class LineStringDoubleGf extends AbstractLineString implements LineString
       return this.coordinates;
     } else {
       geometryFactory = getNonZeroGeometryFactory(geometryFactory);
-      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory.getCoordinatesOperation(geometryFactory);
+      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
+        .getCoordinatesOperation(geometryFactory);
       if (coordinatesOperation == null) {
         return this.coordinates;
       } else {

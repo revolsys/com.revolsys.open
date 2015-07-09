@@ -250,11 +250,12 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     this.selectCoordinateSystem = new SelectMapCoordinateSystem(this);
     this.toolBar.addComponent("layers", this.selectCoordinateSystem);
 
-    final LayerGroupListModel baseMapLayersModel = new LayerGroupListModel(this.baseMapLayers, true);
+    final LayerGroupListModel baseMapLayersModel = new LayerGroupListModel(this.baseMapLayers,
+      true);
     this.baseMapLayerField = new ComboBox(baseMapLayersModel);
     this.baseMapLayerField.setMaximumSize(new Dimension(200, 22));
-    this.baseMapLayerField.addItemListener(new InvokeMethodSelectedItemListener(this,
-      "setBaseMapLayer"));
+    this.baseMapLayerField
+      .addItemListener(new InvokeMethodSelectedItemListener(this, "setBaseMapLayer"));
     if (this.baseMapLayers.getLayerCount() > 0) {
       this.baseMapLayerField.setSelectedIndex(1);
     }
@@ -315,9 +316,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     addPointerLocation(true);
 
     this.overlayActionLabel = new JLabel();
-    this.overlayActionLabel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createBevelBorder(BevelBorder.LOWERED),
-      BorderFactory.createEmptyBorder(2, 3, 2, 3)));
+    this.overlayActionLabel.setBorder(
+      BorderFactory.createCompoundBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED),
+        BorderFactory.createEmptyBorder(2, 3, 2, 3)));
     this.overlayActionLabel.setVisible(false);
     this.overlayActionLabel.setForeground(WebColors.Green);
     this.leftStatusBar.add(this.overlayActionLabel);
@@ -371,8 +372,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final JButton zoomPreviousButton = this.toolBar.addButtonTitleIcon("zoom", "Zoom Previous",
       "magnifier_zoom_left", this, "zoomPrevious");
     zoomPreviousButton.setEnabled(false);
-    Property.addListener(this, "zoomPreviousEnabled", new EnableComponentListener(
-      zoomPreviousButton));
+    Property.addListener(this, "zoomPreviousEnabled",
+      new EnableComponentListener(zoomPreviousButton));
 
     final JButton zoomNextButton = this.toolBar.addButtonTitleIcon("zoom", "Zoom Next",
       "magnifier_zoom_right", this, "zoomNext");
@@ -382,8 +383,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final JButton zoomSelectedButton = this.toolBar.addButtonTitleIcon("zoom", "Zoom To Selected",
       "magnifier_zoom_selected", this, "zoomToSelected");
     zoomSelectedButton.setEnabled(false);
-    Property.addListener(this.project, "hasSelectedRecords", new EnableComponentListener(
-      zoomSelectedButton));
+    Property.addListener(this.project, "hasSelectedRecords",
+      new EnableComponentListener(zoomSelectedButton));
 
     this.zoomBookmarkButton = this.toolBar.addButtonTitleIcon("zoom", "Zoom Bookmarks",
       "zoom_bookmark", this, "showZoomBookmarkMenu");
@@ -716,8 +717,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       }
     } else if (source == this.baseMapLayers) {
       if ("layers".equals(propertyName)) {
-        if (this.baseMapOverlay != null
-          && (this.baseMapOverlay.getLayer() == null || NullLayer.INSTANCE.equals(this.baseMapOverlay.getLayer()))) {
+        if (this.baseMapOverlay != null && (this.baseMapOverlay.getLayer() == null
+          || NullLayer.INSTANCE.equals(this.baseMapOverlay.getLayer()))) {
           final Layer layer = (Layer)event.getNewValue();
           if (layer != null && layer.isVisible()) {
             this.baseMapOverlay.setLayer(layer);

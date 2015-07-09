@@ -199,13 +199,13 @@ public abstract class AbstractMultiPoint extends AbstractGeometryCollection impl
           points.set(partIndex, newPoint);
           return (V)geometryFactory.multiPoint(points);
         } else {
-          throw new IllegalArgumentException("Part index must be between 0 and " + partCount
-            + " not " + partIndex);
+          throw new IllegalArgumentException(
+            "Part index must be between 0 and " + partCount + " not " + partIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException("Vertex id's for MultiPoint must have length 1. "
-        + Arrays.toString(vertexId));
+      throw new IllegalArgumentException(
+        "Vertex id's for MultiPoint must have length 1. " + Arrays.toString(vertexId));
     }
   }
 

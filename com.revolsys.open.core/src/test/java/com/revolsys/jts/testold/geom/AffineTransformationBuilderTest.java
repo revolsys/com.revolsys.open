@@ -1,12 +1,12 @@
 package com.revolsys.jts.testold.geom;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.util.AffineTransformation;
 import com.revolsys.jts.geom.util.AffineTransformationBuilder;
 import com.revolsys.jts.geom.util.AffineTransformationFactory;
+
+import junit.framework.TestCase;
 
 /**
  * Tests {@link AffineTransformationBuilder}.
@@ -34,7 +34,8 @@ public class AffineTransformationBuilderTest extends TestCase {
 
     final Point pp0 = new PointDouble(pp0x, pp0y);
 
-    final AffineTransformation trans = AffineTransformationFactory.createFromControlVectors(p0, pp0);
+    final AffineTransformation trans = AffineTransformationFactory.createFromControlVectors(p0,
+      pp0);
 
     assertEqualPoint(pp0, trans.transform(p0));
   }
@@ -54,9 +55,9 @@ public class AffineTransformationBuilderTest extends TestCase {
     assertEqualPoint(pp1, trans.transform(p1));
   }
 
-  void run(final double p0x, final double p0y, final double p1x, final double p1y,
-    final double p2x, final double p2y, final double pp0x, final double pp0y, final double pp1x,
-    final double pp1y, final double pp2x, final double pp2y) {
+  void run(final double p0x, final double p0y, final double p1x, final double p1y, final double p2x,
+    final double p2y, final double pp0x, final double pp0y, final double pp1x, final double pp1y,
+    final double pp2x, final double pp2y) {
     final Point p0 = new PointDouble(p0x, p0y);
     final Point p1 = new PointDouble(p1x, p1y);
     final Point p2 = new PointDouble(p2x, p2y);

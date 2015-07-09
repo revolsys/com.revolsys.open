@@ -93,8 +93,8 @@ public class ToolBar extends JToolBar {
       title = null;
     }
 
-    final InvokeMethodAction action = new InvokeMethodAction(name, title, icon, enableCheck,
-      object, methodName, parameters);
+    final InvokeMethodAction action = new InvokeMethodAction(name, title, icon, enableCheck, object,
+      methodName, parameters);
 
     return addButton(groupName, action);
   }
@@ -108,13 +108,15 @@ public class ToolBar extends JToolBar {
   }
 
   public JButton addButtonTitleIcon(final String groupName, final int index, final String title,
-    final String iconName, final Object object, final String methodName, final Object... parameters) {
+    final String iconName, final Object object, final String methodName,
+    final Object... parameters) {
     final ImageIcon icon = Icons.getIcon(iconName);
     return addButton(groupName, index, iconName, title, icon, object, methodName, parameters);
   }
 
   public JButton addButtonTitleIcon(final String groupName, final String title,
-    final String iconName, final Object object, final String methodName, final Object... parameters) {
+    final String iconName, final Object object, final String methodName,
+    final Object... parameters) {
     final ImageIcon icon = Icons.getIcon(iconName);
     return addButton(groupName, iconName, title, icon, object, methodName, parameters);
   }
@@ -141,8 +143,8 @@ public class ToolBar extends JToolBar {
     final String iconName, final EnableCheck enableCheck, final Object object,
     final String methodName, final Object... parameters) {
     final ImageIcon icon = Icons.getIcon(iconName);
-    return addToggleButton(groupName, index, iconName, title, icon, enableCheck, object,
-      methodName, parameters);
+    return addToggleButton(groupName, index, iconName, title, icon, enableCheck, object, methodName,
+      parameters);
   }
 
   public JToggleButton addToggleButton(final String groupName, final int index, final String name,

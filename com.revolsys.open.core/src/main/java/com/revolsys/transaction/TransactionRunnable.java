@@ -21,7 +21,8 @@ public class TransactionRunnable implements Runnable {
   @Override
   public void run() {
     try (
-      Transaction transaction = new Transaction(this.transactionManager, this.transactionDefinition)) {
+      Transaction transaction = new Transaction(this.transactionManager,
+        this.transactionDefinition)) {
       try {
         this.runnable.run();
       } catch (final Throwable e) {

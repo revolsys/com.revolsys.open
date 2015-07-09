@@ -29,8 +29,8 @@ public class GeoNamesService {
   public static final RecordDefinition WIKIPEDIA_RECORD_DEFINITION;
 
   static {
-    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(Path.toPath(
-      "/geoname.org", "name"));
+    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
+      Path.toPath("/geoname.org", "name"));
     recordDefinition.addField("geonameId", DataTypes.STRING, false);
     recordDefinition.addField("name", DataTypes.STRING, false);
     recordDefinition.addField("fcode", DataTypes.STRING, false);
@@ -49,8 +49,8 @@ public class GeoNamesService {
     recordDefinition.addField("geometry", DataTypes.POINT, false);
     NAME_RECORD_DEFINITION = recordDefinition;
 
-    final RecordDefinitionImpl wikipediaRecordDefinition = new RecordDefinitionImpl(Path.toPath(
-      "/geoname.org", "wikipedia"));
+    final RecordDefinitionImpl wikipediaRecordDefinition = new RecordDefinitionImpl(
+      Path.toPath("/geoname.org", "wikipedia"));
     wikipediaRecordDefinition.addField("summary", DataTypes.STRING, false);
     wikipediaRecordDefinition.addField("title", DataTypes.STRING, false);
     wikipediaRecordDefinition.addField("wikipediaUrl", DataTypes.STRING, false);
@@ -85,7 +85,8 @@ public class GeoNamesService {
 
   public List<Record> getNames(final BoundingBox boundingBox) {
     final GeometryFactory geometryFactory = GeometryFactory.floating3(4326);
-    final GeographicCoordinateSystem cs = (GeographicCoordinateSystem)geometryFactory.getCoordinateSystem();
+    final GeographicCoordinateSystem cs = (GeographicCoordinateSystem)geometryFactory
+      .getCoordinateSystem();
     final BoundingBox geographicBoundingBox = boundingBox.convert(geometryFactory);
     final Map<String, Object> params = new HashMap<String, Object>();
 

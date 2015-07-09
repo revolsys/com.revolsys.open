@@ -34,6 +34,7 @@ public abstract class SpringFrameworkAttributeLoader implements AttributeLoader 
   @Override
   public void init(final Attribute attribute) {
     final ServletContext servletContext = attribute.getConfig().getServletContext();
-    this.applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+    this.applicationContext = WebApplicationContextUtils
+      .getRequiredWebApplicationContext(servletContext);
   }
 }

@@ -12,7 +12,7 @@ import com.revolsys.filter.Filter;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
-public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T>> {
+public class RTreeBranch<T> extends RTreeNode<T>implements Iterable<RTreeNode<T>> {
 
   private RTreeNode<T>[] nodes;
 
@@ -127,7 +127,8 @@ public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T
   }
 
   @Override
-  public boolean visit(final BoundingBox envelope, final Filter<T> filter, final Visitor<T> visitor) {
+  public boolean visit(final BoundingBox envelope, final Filter<T> filter,
+    final Visitor<T> visitor) {
     for (int i = 0; i < this.size; i++) {
       final RTreeNode<T> node = this.nodes[i];
       if (envelope.intersects(node.getBoundingBox())) {

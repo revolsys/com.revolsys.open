@@ -223,7 +223,8 @@ public class SaifWriter extends AbstractRecordWriter {
       try {
         addExport(GLOBAL_METADATA, GLOBAL_METADATA, "globmeta.osn");
         final File metaFile = new File(this.tempDirectory, "globmeta.osn");
-        final OsnSerializer serializer = createSerializer(GLOBAL_METADATA, metaFile, Long.MAX_VALUE);
+        final OsnSerializer serializer = createSerializer(GLOBAL_METADATA, metaFile,
+          Long.MAX_VALUE);
         serializer.startObject("/GlobalMetadata");
         serializer.attribute("objectIdentifier", "GlobalMetadata", true);
 
@@ -285,7 +286,8 @@ public class SaifWriter extends AbstractRecordWriter {
     if (compositeTypeName == null) {
       compositeTypeName = typePath + "Composite";
     }
-    final RecordDefinition compisteType = this.recordDefinitionFactory.getRecordDefinition(String.valueOf(compositeTypeName));
+    final RecordDefinition compisteType = this.recordDefinitionFactory
+      .getRecordDefinition(String.valueOf(compositeTypeName));
     return compisteType;
   }
 
@@ -385,16 +387,16 @@ public class SaifWriter extends AbstractRecordWriter {
           addExport(typePath, compositeType.getPath(), objectSubsetName);
           this.serializers.put(typePath, serializer);
         } else if (typePath.equals("/ImportedObjects")) {
-          serializer = createSerializer("/ImportedObject", new File(this.tempDirectory,
-            "imports.dir"), Long.MAX_VALUE);
+          serializer = createSerializer("/ImportedObject",
+            new File(this.tempDirectory, "imports.dir"), Long.MAX_VALUE);
           this.serializers.put(typePath, serializer);
         } else if (Path.getName(typePath).endsWith("InternallyReferencedObjects")) {
-          serializer = createSerializer("/InternallyReferencedObject", new File(this.tempDirectory,
-            "internal.dir"), Long.MAX_VALUE);
+          serializer = createSerializer("/InternallyReferencedObject",
+            new File(this.tempDirectory, "internal.dir"), Long.MAX_VALUE);
           this.serializers.put(typePath, serializer);
         } else if (Path.getName(typePath).endsWith("GlobalMetadata")) {
-          serializer = createSerializer(GLOBAL_METADATA, new File(this.tempDirectory,
-            "globmeta.osn"), Long.MAX_VALUE);
+          serializer = createSerializer(GLOBAL_METADATA,
+            new File(this.tempDirectory, "globmeta.osn"), Long.MAX_VALUE);
           addExport(typePath, typePath, "globmeta.osn");
           this.serializers.put(typePath, serializer);
         }

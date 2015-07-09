@@ -84,8 +84,8 @@ public final class StaxUtils {
     return value;
   }
 
-  public static boolean getBooleanAttribute(final XMLStreamReader parser,
-    final String namespaceUri, final String name) {
+  public static boolean getBooleanAttribute(final XMLStreamReader parser, final String namespaceUri,
+    final String name) {
     final String value = parser.getAttributeValue(namespaceUri, name);
     if (value != null) {
       return Boolean.parseBoolean(value);

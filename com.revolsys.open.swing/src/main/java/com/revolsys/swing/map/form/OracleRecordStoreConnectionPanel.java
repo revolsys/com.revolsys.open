@@ -54,7 +54,8 @@ public class OracleRecordStoreConnectionPanel extends ValueField implements Prop
       this.name = connection.getName();
       setFieldValue("name", this.name);
       final Map<String, Object> config = connection.getConfig();
-      final Map<String, String> connectionParameters = (Map<String, String>)config.get("connection");
+      final Map<String, String> connectionParameters = (Map<String, String>)config
+        .get("connection");
       setFieldValues(connectionParameters);
     }
     setPreferredSize(new Dimension(400, 300));

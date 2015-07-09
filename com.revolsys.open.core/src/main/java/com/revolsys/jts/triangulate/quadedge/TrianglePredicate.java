@@ -78,7 +78,8 @@ public class TrianglePredicate {
     return pRadiusDiff <= 0;
   }
 
-  public static boolean isInCircleDDFast(final Point a, final Point b, final Point c, final Point p) {
+  public static boolean isInCircleDDFast(final Point a, final Point b, final Point c,
+    final Point p) {
     final DD aTerm = DD.sqr(a.getX())
       .selfAdd(DD.sqr(a.getY()))
       .selfMultiply(triAreaDDFast(b, c, p));
@@ -134,7 +135,8 @@ public class TrianglePredicate {
    * @param p the point to test
    * @return true if this point is inside the circle defined by the points a, b, c
    */
-  public static boolean isInCircleDDSlow(final Point a, final Point b, final Point c, final Point p) {
+  public static boolean isInCircleDDSlow(final Point a, final Point b, final Point c,
+    final Point p) {
     final DD px = DD.valueOf(p.getX());
     final DD py = DD.valueOf(p.getY());
     final DD ax = DD.valueOf(a.getX());
@@ -232,7 +234,8 @@ public class TrianglePredicate {
    * @param p the point to test
    * @return true if this point is inside the circle defined by the points a, b, c
    */
-  public static boolean isInCircleRobust(final Point a, final Point b, final Point c, final Point p) {
+  public static boolean isInCircleRobust(final Point a, final Point b, final Point c,
+    final Point p) {
     // checkRobustInCircle(a, b, c, p);
     // return isInCircleNonRobust(a, b, c, p);
     return isInCircleNormalized(a, b, c, p);
@@ -247,8 +250,8 @@ public class TrianglePredicate {
    * @param c a vertex of the triangle
    */
   private static double triArea(final Point a, final Point b, final Point c) {
-    return (b.getX() - a.getX()) * (c.getY() - a.getY()) - (b.getY() - a.getY())
-      * (c.getX() - a.getX());
+    return (b.getX() - a.getX()) * (c.getY() - a.getY())
+      - (b.getY() - a.getY()) * (c.getX() - a.getX());
   }
 
   public static DD triAreaDDFast(final Point a, final Point b, final Point c) {

@@ -210,7 +210,8 @@ public class UnaryUnionOp {
    * @param geometry a geometry
    * @return the union of the input geometry
    */
-  private static Geometry unionNoOpt(final GeometryFactory geometryFactory, final Geometry geometry) {
+  private static Geometry unionNoOpt(final GeometryFactory geometryFactory,
+    final Geometry geometry) {
     final Geometry empty = geometryFactory.point();
     return SnapIfNeededOverlayOp.overlayOp(geometry, empty, OverlayOp.UNION);
   }

@@ -53,7 +53,8 @@ public class JdbcFactoryRegistry {
         instance = new JdbcFactoryRegistry();
         try {
           final ClassLoader classLoader = JdbcFactoryRegistry.class.getClassLoader();
-          final Enumeration<URL> resources = classLoader.getResources("META-INF/com.revolsys.gis.jdbc.json");
+          final Enumeration<URL> resources = classLoader
+            .getResources("META-INF/com.revolsys.gis.jdbc.json");
           while (resources.hasMoreElements()) {
             final URL resourceUrl = resources.nextElement();
             final UrlResource resource = new UrlResource(resourceUrl);
@@ -70,7 +71,8 @@ public class JdbcFactoryRegistry {
 
   public static JdbcFactoryRegistry getFactory(final ApplicationContext applicationContext) {
     synchronized (factoriesByApplicationContext) {
-      final WeakReference<JdbcFactoryRegistry> reference = factoriesByApplicationContext.get(applicationContext);
+      final WeakReference<JdbcFactoryRegistry> reference = factoriesByApplicationContext
+        .get(applicationContext);
       JdbcFactoryRegistry jdbcFactoryRegistry;
       if (reference == null) {
         jdbcFactoryRegistry = null;
@@ -81,7 +83,8 @@ public class JdbcFactoryRegistry {
         jdbcFactoryRegistry = new JdbcFactoryRegistry();
         try {
           final ClassLoader classLoader = applicationContext.getClassLoader();
-          for (final Resource resource : applicationContext.getResources("classpath*:META-INF/com.revolsys.gis.jdbc.json")) {
+          for (final Resource resource : applicationContext
+            .getResources("classpath*:META-INF/com.revolsys.gis.jdbc.json")) {
             jdbcFactoryRegistry.loadFactories(classLoader, resource);
           }
         } catch (final IOException e) {
@@ -114,7 +117,8 @@ public class JdbcFactoryRegistry {
     if (url == null) {
       throw new IllegalArgumentException("The url parameter must be specified");
     } else {
-      for (final JdbcDatabaseFactory databaseFactory : this.databaseFactoriesByProductName.values()) {
+      for (final JdbcDatabaseFactory databaseFactory : this.databaseFactoriesByProductName
+        .values()) {
         if (databaseFactory.canHandleUrl(url)) {
           return databaseFactory;
         }
@@ -124,7 +128,8 @@ public class JdbcFactoryRegistry {
   }
 
   public JdbcDatabaseFactory getDatabaseFactory(final String productName) {
-    final JdbcDatabaseFactory databaseFactory = this.databaseFactoriesByProductName.get(productName);
+    final JdbcDatabaseFactory databaseFactory = this.databaseFactoriesByProductName
+      .get(productName);
     if (databaseFactory == null) {
       throw new IllegalArgumentException("Record Store not found for " + productName);
     } else {
@@ -138,8 +143,8 @@ public class JdbcFactoryRegistry {
         final String jdbcFactoryClassName = (String)factoryDefinition.get("jdbcFactoryClassName");
         if (Property.hasValue(jdbcFactoryClassName)) {
           @SuppressWarnings("unchecked")
-          final Class<JdbcDatabaseFactory> factoryClass = (Class<JdbcDatabaseFactory>)Class.forName(
-            jdbcFactoryClassName, true, classLoader);
+          final Class<JdbcDatabaseFactory> factoryClass = (Class<JdbcDatabaseFactory>)Class
+            .forName(jdbcFactoryClassName, true, classLoader);
           final JdbcDatabaseFactory factory = factoryClass.newInstance();
           for (final String productName : factory.getProductNames()) {
             this.databaseFactoriesByProductName.put(productName, factory);

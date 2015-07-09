@@ -32,15 +32,15 @@
  */
 package com.revolsys.jts.testold.operation;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.BoundaryOp;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 /**
  * Tests {@link BoundaryOp} with different {@link BoundaryNodeRule}s.
@@ -124,7 +124,8 @@ public class BoundaryTest extends TestCase {
     runBoundaryTest(a, BoundaryNodeRule.MOD2_BOUNDARY_RULE, "MULTIPOINT ((100 100), (100 200))");
     // under Endpoint, the ring has a boundary point, so the line does NOT
     // intersect the interior ==> simple
-    runBoundaryTest(a, BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE, "MULTIPOINT ((100 100), (100 200))");
+    runBoundaryTest(a, BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE,
+      "MULTIPOINT ((100 100), (100 200))");
   }
 
   public void testRing() throws Exception {

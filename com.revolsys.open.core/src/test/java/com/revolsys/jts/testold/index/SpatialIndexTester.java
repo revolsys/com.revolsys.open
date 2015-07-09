@@ -106,8 +106,8 @@ public class SpatialIndexTester {
     int queryCount = 0;
     for (int x = 0; x < CELL_EXTENT * CELLS_PER_GRID_SIDE; x += queryEnvelopeExtent) {
       for (int y = 0; y < CELL_EXTENT * CELLS_PER_GRID_SIDE; y += queryEnvelopeExtent) {
-        final BoundingBoxDoubleGf queryEnvelope = new BoundingBoxDoubleGf(2, x, y, x
-          + queryEnvelopeExtent, y + queryEnvelopeExtent);
+        final BoundingBoxDoubleGf queryEnvelope = new BoundingBoxDoubleGf(2, x, y,
+          x + queryEnvelopeExtent, y + queryEnvelopeExtent);
         final List expectedMatches = intersectingEnvelopes(queryEnvelope, sourceData);
         final List actualMatches = index.query(queryEnvelope);
         // since index returns candidates only, it may return more than the
@@ -167,7 +167,8 @@ public class SpatialIndexTester {
     }
   }
 
-  private List intersectingEnvelopes(final BoundingBoxDoubleGf queryEnvelope, final List envelopes) {
+  private List intersectingEnvelopes(final BoundingBoxDoubleGf queryEnvelope,
+    final List envelopes) {
     final ArrayList intersectingEnvelopes = new ArrayList();
     for (final Iterator i = envelopes.iterator(); i.hasNext();) {
       final BoundingBoxDoubleGf candidate = (BoundingBoxDoubleGf)i.next();

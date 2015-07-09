@@ -22,7 +22,8 @@ public class ClosestRecordFilter implements Filter<Record> {
 
   public static ClosestRecordFilter query(final RecordQuadTree index, final Geometry geometry,
     final double maxDistance, final Filter<Record> filter) {
-    final ClosestRecordFilter closestFilter = new ClosestRecordFilter(geometry, maxDistance, filter);
+    final ClosestRecordFilter closestFilter = new ClosestRecordFilter(geometry, maxDistance,
+      filter);
     final BoundingBox boundingBox = closestFilter.getFilterBoundingBox();
     index.queryList(boundingBox, closestFilter);
     return closestFilter;

@@ -82,8 +82,8 @@ public class EsriCsWktWriter {
     out.write(']');
   }
 
-  public static void write(final PrintWriter out,
-    final GeographicCoordinateSystem coordinateSystem, final int indentLevel) {
+  public static void write(final PrintWriter out, final GeographicCoordinateSystem coordinateSystem,
+    final int indentLevel) {
     out.print("GEOGCS[");
     write(out, coordinateSystem.getName(), incrementIndent(indentLevel));
     final Datum datum = coordinateSystem.getDatum();
@@ -162,7 +162,8 @@ public class EsriCsWktWriter {
     out.write(']');
   }
 
-  public static void write(final PrintWriter out, final Projection projection, final int indentLevel) {
+  public static void write(final PrintWriter out, final Projection projection,
+    final int indentLevel) {
     out.print("PROJECTION[");
     write(out, projection.getName(), incrementIndent(indentLevel));
     indent(out, indentLevel);

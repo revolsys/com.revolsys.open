@@ -9,8 +9,8 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 
 public class FloatFieldDefinition extends AbstractFileGdbFieldDefinition {
   public FloatFieldDefinition(final Field field) {
-    super(field.getName(), DataTypes.FLOAT, BooleanStringConverter.getBoolean(field.getRequired())
-      || !field.isIsNullable());
+    super(field.getName(), DataTypes.FLOAT,
+      BooleanStringConverter.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 
   @Override

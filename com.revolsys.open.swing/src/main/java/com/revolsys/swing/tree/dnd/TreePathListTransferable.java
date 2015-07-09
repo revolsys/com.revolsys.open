@@ -18,6 +18,7 @@ public class TreePathListTransferable implements Transferable {
   public static final DataFlavor FLAVOR;
 
   public static final DataFlavor[] FLAVORS;
+
   static {
     try {
       final String mimeType = DataFlavor.javaJVMLocalObjectMimeType + ";class=\""
@@ -68,8 +69,8 @@ public class TreePathListTransferable implements Transferable {
   }
 
   @Override
-  public Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException,
-    IOException {
+  public Object getTransferData(final DataFlavor flavor)
+    throws UnsupportedFlavorException, IOException {
     if (isDataFlavorSupported(flavor)) {
       return this;
     } else {

@@ -25,8 +25,8 @@ import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
-public class ActionFormKeySerializer extends AbstractKeySerializer implements
-  HtmlUiBuilderAware<HtmlUiBuilder<?>> {
+public class ActionFormKeySerializer extends AbstractKeySerializer
+  implements HtmlUiBuilderAware<HtmlUiBuilder<?>> {
   private String iconName;
 
   private String cssClass;

@@ -74,7 +74,8 @@ public class CreateObjectsWithinDistanceOfGeometry extends BaseInOutProcess<Reco
 
   private final Map<RecordDefinition, Geometry> getRecordDefinitionGeometries(
     final RecordDefinition recordDefinition) {
-    Map<RecordDefinition, Geometry> recordDefinitionGeometries = this.recordDefinitionGeometryMap.get(recordDefinition);
+    Map<RecordDefinition, Geometry> recordDefinitionGeometries = this.recordDefinitionGeometryMap
+      .get(recordDefinition);
     if (recordDefinitionGeometries == null) {
       recordDefinitionGeometries = new LinkedHashMap<RecordDefinition, Geometry>();
       RecordDefinition newRecordDefinition;
@@ -133,8 +134,10 @@ public class CreateObjectsWithinDistanceOfGeometry extends BaseInOutProcess<Reco
     }
     final RecordDefinition recordDefinition = object.getRecordDefinition();
     final Geometry geometryValue = object.getGeometryValue();
-    final Map<RecordDefinition, Geometry> recordDefinitionGeometries = getRecordDefinitionGeometries(recordDefinition);
-    for (final Entry<RecordDefinition, Geometry> recordDefinitionGeometry : recordDefinitionGeometries.entrySet()) {
+    final Map<RecordDefinition, Geometry> recordDefinitionGeometries = getRecordDefinitionGeometries(
+      recordDefinition);
+    for (final Entry<RecordDefinition, Geometry> recordDefinitionGeometry : recordDefinitionGeometries
+      .entrySet()) {
       final RecordDefinition newRecordDefinition = recordDefinitionGeometry.getKey();
       final Geometry intersectsGeometry = recordDefinitionGeometry.getValue();
       if (intersectsGeometry.intersects(geometryValue)) {

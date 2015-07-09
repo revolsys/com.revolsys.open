@@ -174,17 +174,17 @@ public class UriTemplate implements Serializable {
   public URI expand(final Object... uriVariableValues) {
     Assert.notNull(uriVariableValues, "'uriVariableValues' must not be null");
     if (uriVariableValues.length != this.variableNames.size()) {
-      throw new IllegalArgumentException("Invalid amount of variables values in ["
-        + this.uriTemplate + "]: expected " + this.variableNames.size() + "; got "
-        + uriVariableValues.length);
+      throw new IllegalArgumentException(
+        "Invalid amount of variables values in [" + this.uriTemplate + "]: expected "
+          + this.variableNames.size() + "; got " + uriVariableValues.length);
     }
     final Matcher matcher = NAMES_PATTERN.matcher(this.uriTemplate);
     final StringBuffer buffer = new StringBuffer();
     int i = 0;
     while (matcher.find()) {
       final Object uriVariable = uriVariableValues[i++];
-      final String replacement = Matcher.quoteReplacement(uriVariable != null ? uriVariable.toString()
-        : "");
+      final String replacement = Matcher
+        .quoteReplacement(uriVariable != null ? uriVariable.toString() : "");
       matcher.appendReplacement(buffer, replacement);
     }
     matcher.appendTail(buffer);
@@ -207,17 +207,17 @@ public class UriTemplate implements Serializable {
   public String expandString(final Object... uriVariableValues) {
     Assert.notNull(uriVariableValues, "'uriVariableValues' must not be null");
     if (uriVariableValues.length != this.variableNames.size()) {
-      throw new IllegalArgumentException("Invalid amount of variables values in ["
-        + this.uriTemplate + "]: expected " + this.variableNames.size() + "; got "
-        + uriVariableValues.length);
+      throw new IllegalArgumentException(
+        "Invalid amount of variables values in [" + this.uriTemplate + "]: expected "
+          + this.variableNames.size() + "; got " + uriVariableValues.length);
     }
     final Matcher matcher = NAMES_PATTERN.matcher(this.uriTemplate);
     final StringBuffer buffer = new StringBuffer();
     int i = 0;
     while (matcher.find()) {
       final Object uriVariable = uriVariableValues[i++];
-      final String replacement = Matcher.quoteReplacement(uriVariable != null ? uriVariable.toString()
-        : "");
+      final String replacement = Matcher
+        .quoteReplacement(uriVariable != null ? uriVariable.toString() : "");
       matcher.appendReplacement(buffer, replacement);
     }
     matcher.appendTail(buffer);

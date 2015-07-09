@@ -339,11 +339,10 @@ public class ImageInfo {
   private static void printCompact(final String sourceName, final ImageInfo imageInfo) {
     final String SEP = "\t";
     System.out.println(sourceName + SEP + imageInfo.getFormatName() + SEP + imageInfo.getMimeType()
-      + SEP + imageInfo.getWidth() + SEP + imageInfo.getHeight() + SEP
-      + imageInfo.getBitsPerPixel() + SEP + imageInfo.getNumberOfImages() + SEP
-      + imageInfo.getPhysicalWidthDpi() + SEP + imageInfo.getPhysicalHeightDpi() + SEP
-      + imageInfo.getPhysicalWidthInch() + SEP + imageInfo.getPhysicalHeightInch() + SEP
-      + imageInfo.isProgressive());
+      + SEP + imageInfo.getWidth() + SEP + imageInfo.getHeight() + SEP + imageInfo.getBitsPerPixel()
+      + SEP + imageInfo.getNumberOfImages() + SEP + imageInfo.getPhysicalWidthDpi() + SEP
+      + imageInfo.getPhysicalHeightDpi() + SEP + imageInfo.getPhysicalWidthInch() + SEP
+      + imageInfo.getPhysicalHeightInch() + SEP + imageInfo.isProgressive());
   }
 
   private static void printLine(final int indentLevels, final String text, final float value,

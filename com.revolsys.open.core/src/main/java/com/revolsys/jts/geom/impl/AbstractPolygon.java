@@ -155,13 +155,13 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
           rings.set(ringIndex, newRing);
           return (V)geometryFactory.polygon(rings);
         } else {
-          throw new IllegalArgumentException("Ring index must be between 0 and " + ringCount
-            + " not " + ringIndex);
+          throw new IllegalArgumentException(
+            "Ring index must be between 0 and " + ringCount + " not " + ringIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException("Geometry id's for Polygons must have length 1. "
-        + Arrays.toString(geometryId));
+      throw new IllegalArgumentException(
+        "Geometry id's for Polygons must have length 1. " + Arrays.toString(geometryId));
     }
   }
 
@@ -230,13 +230,13 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
           rings.set(ringIndex, newRing);
           return (V)geometryFactory.polygon(rings);
         } else {
-          throw new IllegalArgumentException("Ring index must be between 0 and " + ringCount
-            + " not " + ringIndex);
+          throw new IllegalArgumentException(
+            "Ring index must be between 0 and " + ringCount + " not " + ringIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException("Vertex id's for Polygons must have length 2. "
-        + Arrays.toString(vertexId));
+      throw new IllegalArgumentException(
+        "Vertex id's for Polygons must have length 2. " + Arrays.toString(vertexId));
     }
   }
 
@@ -598,13 +598,13 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
           rings.set(ringIndex, newRing);
           return (V)geometryFactory.polygon(rings);
         } else {
-          throw new IllegalArgumentException("Ring index must be between 0 and " + ringCount
-            + " not " + ringIndex);
+          throw new IllegalArgumentException(
+            "Ring index must be between 0 and " + ringCount + " not " + ringIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException("Vertex id's for Polygons must have length 2. "
-        + Arrays.toString(vertexId));
+      throw new IllegalArgumentException(
+        "Vertex id's for Polygons must have length 2. " + Arrays.toString(vertexId));
     }
   }
 
@@ -744,13 +744,13 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
           rings.set(ringIndex, newRing);
           return (V)geometryFactory.polygon(rings);
         } else {
-          throw new IllegalArgumentException("Ring index must be between 0 and " + ringCount
-            + " not " + ringIndex);
+          throw new IllegalArgumentException(
+            "Ring index must be between 0 and " + ringCount + " not " + ringIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException("Vertex id's for Polygons must have length 2. "
-        + Arrays.toString(vertexId));
+      throw new IllegalArgumentException(
+        "Vertex id's for Polygons must have length 2. " + Arrays.toString(vertexId));
     }
   }
 

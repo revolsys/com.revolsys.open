@@ -357,19 +357,19 @@ public class Base64 {
     51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, // Letters 'n' through
     // 'z'
     -9, -9, -9, -9
-  // Decimal 123 - 126
-  /*
-   * ,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 127 - 139
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 140 - 152
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 153 - 165
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 166 - 178
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 179 - 191
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 192 - 204
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 205 - 217
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 218 - 230
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 231 - 243
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9 // Decimal 244 - 255
-   */
+      // Decimal 123 - 126
+      /*
+       * ,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 127 - 139
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 140 - 152
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 153 - 165
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 166 - 178
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 179 - 191
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 192 - 204
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 205 - 217
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 218 - 230
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 231 - 243
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9 // Decimal 244 - 255
+       */
   };
 
   /** The 64 valid Base64 values. */
@@ -417,19 +417,19 @@ public class Base64 {
     39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, // Letters 'n' through
     // 'z'
     -9, -9, -9, -9
-  // Decimal 123 - 126
-  /*
-   * ,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 127 - 139
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 140 - 152
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 153 - 165
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 166 - 178
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 179 - 191
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 192 - 204
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 205 - 217
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 218 - 230
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 231 - 243
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9 // Decimal 244 - 255
-   */
+      // Decimal 123 - 126
+      /*
+       * ,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 127 - 139
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 140 - 152
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 153 - 165
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 166 - 178
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 179 - 191
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 192 - 204
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 205 - 217
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 218 - 230
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 231 - 243
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9 // Decimal 244 - 255
+       */
   };
 
   /**
@@ -483,19 +483,19 @@ public class Base64 {
     39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, // Letters 'n' through
     // 'z'
     -9, -9, -9, -9
-  // Decimal 123 - 126
-  /*
-   * ,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 127 - 139
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 140 - 152
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 153 - 165
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 166 - 178
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 179 - 191
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 192 - 204
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 205 - 217
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 218 - 230
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 231 - 243
-   * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9 // Decimal 244 - 255
-   */
+      // Decimal 123 - 126
+      /*
+       * ,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 127 - 139
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 140 - 152
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 153 - 165
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 166 - 178
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 179 - 191
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 192 - 204
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 205 - 217
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 218 - 230
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9, // Decimal 231 - 243
+       * -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9 // Decimal 244 - 255
+       */
   };
 
   /** Specify decoding. */
@@ -572,7 +572,8 @@ public class Base64 {
    * @return decoded data
    * @since 1.3
    */
-  public static byte[] decode(final byte[] source, final int off, final int len, final int options) {
+  public static byte[] decode(final byte[] source, final int off, final int len,
+    final int options) {
     final byte[] DECODABET = getDecodabet(options);
 
     final int len34 = len * 3 / 4;
@@ -725,8 +726,8 @@ public class Base64 {
       try {
         final int outBuff = (decodeabet[source[srcOffset]] & 0xFF) << 18
           | (decodeabet[source[srcOffset + 1]] & 0xFF) << 12
-          | (decodeabet[source[srcOffset + 2]] & 0xFF) << 6 | decodeabet[source[srcOffset + 3]]
-          & 0xFF;
+          | (decodeabet[source[srcOffset + 2]] & 0xFF) << 6
+          | decodeabet[source[srcOffset + 3]] & 0xFF;
 
         destination[destOffset] = (byte)(outBuff >> 16);
         destination[destOffset + 1] = (byte)(outBuff >> 8);
@@ -804,8 +805,8 @@ public class Base64 {
         // | ( ( DECODABET[ source[ srcOffset + 3 ] ] << 24 ) >>> 24 );
         final int outBuff = (DECODABET[source[srcOffset]] & 0xFF) << 18
           | (DECODABET[source[srcOffset + 1]] & 0xFF) << 12
-          | (DECODABET[source[srcOffset + 2]] & 0xFF) << 6 | DECODABET[source[srcOffset + 3]]
-          & 0xFF;
+          | (DECODABET[source[srcOffset + 2]] & 0xFF) << 6
+          | DECODABET[source[srcOffset + 3]] & 0xFF;
 
         destination[destOffset] = (byte)(outBuff >> 16);
         destination[destOffset + 1] = (byte)(outBuff >> 8);
@@ -885,8 +886,8 @@ public class Base64 {
     java.io.InputStream in = null;
     java.io.OutputStream out = null;
     try {
-      in = new Base64InputStream(new java.io.BufferedInputStream(
-        new java.io.FileInputStream(infile)), Base64.DECODE);
+      in = new Base64InputStream(
+        new java.io.BufferedInputStream(new java.io.FileInputStream(infile)), Base64.DECODE);
       out = new java.io.BufferedOutputStream(new java.io.FileOutputStream(outfile));
       final byte[] buffer = new byte[65536]; // 64K
       int read = -1;
@@ -929,8 +930,8 @@ public class Base64 {
 
       // Check for size of file
       if (file.length() > Integer.MAX_VALUE) {
-        System.err.println("File is too big for this convenience method (" + file.length()
-          + " bytes).");
+        System.err
+          .println("File is too big for this convenience method (" + file.length() + " bytes).");
         return null;
       } // end if: file too big for int index
       buffer = new byte[(int)file.length()];
@@ -1374,8 +1375,8 @@ public class Base64 {
     java.io.InputStream in = null;
     java.io.OutputStream out = null;
     try {
-      in = new Base64InputStream(new java.io.BufferedInputStream(
-        new java.io.FileInputStream(infile)), Base64.ENCODE);
+      in = new Base64InputStream(
+        new java.io.BufferedInputStream(new java.io.FileInputStream(infile)), Base64.ENCODE);
       out = new java.io.BufferedOutputStream(new java.io.FileOutputStream(outfile));
       final byte[] buffer = new byte[65536]; // 64K
       int read = -1;
@@ -1491,7 +1492,8 @@ public class Base64 {
    * @see Base64#DONT_BREAK_LINES
    * @since 2.0
    */
-  public static String encodeObject(final java.io.Serializable serializableObject, final int options) {
+  public static String encodeObject(final java.io.Serializable serializableObject,
+    final int options) {
     // Streams
     java.io.ByteArrayOutputStream baos = null;
     java.io.OutputStream b64os = null;

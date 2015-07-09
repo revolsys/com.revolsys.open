@@ -126,9 +126,8 @@ class LocationIndexOfPoint {
         final int candidateSegmentIndex = it.getVertexIndex();
         if (segDistance < minDistance) {
           // ensure after minLocation, if any
-          if (minIndex == null
-            || minIndex.compareLocationValues(candidateComponentIndex, candidateSegmentIndex,
-              segFrac) < 0) {
+          if (minIndex == null || minIndex.compareLocationValues(candidateComponentIndex,
+            candidateSegmentIndex, segFrac) < 0) {
             // otherwise, save this as new minimum
             minComponentIndex = candidateComponentIndex;
             minSegmentIndex = candidateSegmentIndex;

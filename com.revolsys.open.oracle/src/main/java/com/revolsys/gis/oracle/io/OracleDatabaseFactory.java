@@ -98,7 +98,8 @@ public class OracleDatabaseFactory extends AbstractJdbcDatabaseFactory {
   }
 
   @Override
-  public JdbcRecordStore createRecordStore(final Map<String, ? extends Object> connectionProperties) {
+  public JdbcRecordStore createRecordStore(
+    final Map<String, ? extends Object> connectionProperties) {
     return new OracleRecordStore(this, connectionProperties);
   }
 

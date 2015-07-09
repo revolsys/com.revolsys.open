@@ -36,8 +36,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -48,6 +46,8 @@ import com.revolsys.jts.index.strtree.AbstractNode;
 import com.revolsys.jts.index.strtree.ItemBoundable;
 import com.revolsys.jts.index.strtree.STRtree;
 import com.revolsys.jts.testold.util.SerializationUtil;
+
+import junit.framework.TestCase;
 
 /**
  * @version 1.7
@@ -69,8 +69,8 @@ public class STRtreeTest extends TestCase {
   private void doTestCreateParentsFromVerticalSlice(final int childCount, final int nodeCapacity,
     final int expectedChildrenPerParentBoundable, final int expectedChildrenOfLastParent) {
     final STRtreeDemo.TestTree t = new STRtreeDemo.TestTree(nodeCapacity);
-    final List parentBoundables = t.createParentBoundablesFromVerticalSlice(
-      itemWrappers(childCount), 0);
+    final List parentBoundables = t
+      .createParentBoundablesFromVerticalSlice(itemWrappers(childCount), 0);
     for (int i = 0; i < parentBoundables.size() - 1; i++) {// -1
       final AbstractNode parentBoundable = (AbstractNode)parentBoundables.get(i);
       assertEquals(expectedChildrenPerParentBoundable, parentBoundable.getChildBoundables().size());

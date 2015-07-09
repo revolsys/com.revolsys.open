@@ -19,7 +19,7 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public class WktRecordIterator extends AbstractIterator<Record> implements RecordIterator {
+public class WktRecordIterator extends AbstractIterator<Record>implements RecordIterator {
 
   private RecordFactory factory;
 
@@ -29,7 +29,8 @@ public class WktRecordIterator extends AbstractIterator<Record> implements Recor
 
   private RecordDefinition recordDefinition;
 
-  public WktRecordIterator(final RecordFactory factory, final Resource resource) throws IOException {
+  public WktRecordIterator(final RecordFactory factory, final Resource resource)
+    throws IOException {
     this.factory = factory;
     this.in = new BufferedReader(FileUtil.createUtf8Reader(resource.getInputStream()));
     this.recordDefinition = Records.createGeometryRecordDefinition();

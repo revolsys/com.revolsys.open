@@ -47,7 +47,8 @@ public class PathTest {
     Assert.assertEquals(expected, name);
   }
 
-  private void assertParent(final String parentPath, final String childPath, final boolean expected) {
+  private void assertParent(final String parentPath, final String childPath,
+    final boolean expected) {
     final boolean parent = Path.isParent(parentPath, childPath);
     Assert.assertEquals(expected, parent);
   }

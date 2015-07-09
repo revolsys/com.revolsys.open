@@ -92,8 +92,8 @@ public final class ShapefileGeometryUtil {
       EndianOutput.class, Geometry.class);
     addMethod("write", GEOMETRY_TYPE_WRITE_METHOD_MAP, geometryType, false, true,
       EndianOutput.class, Geometry.class);
-    addMethod("write", GEOMETRY_TYPE_WRITE_METHOD_MAP, geometryType, true, true,
-      EndianOutput.class, Geometry.class);
+    addMethod("write", GEOMETRY_TYPE_WRITE_METHOD_MAP, geometryType, true, true, EndianOutput.class,
+      Geometry.class);
   }
 
   public static Method getReadMethod(String geometryTypeKey) {
@@ -105,7 +105,8 @@ public final class ShapefileGeometryUtil {
     return method;
   }
 
-  public static Method getWriteMethod(final GeometryFactory geometryFactory, final DataType dataType) {
+  public static Method getWriteMethod(final GeometryFactory geometryFactory,
+    final DataType dataType) {
     final int axisCount = geometryFactory.getAxisCount();
     final boolean hasZ = axisCount > 2;
     final boolean hasM = axisCount > 3;
@@ -258,7 +259,7 @@ public final class ShapefileGeometryUtil {
 
   public void readCoordinates(final EndianInput in, final int[] partIndex,
     final List<double[]> coordinateLists, final int ordinate, final int axisCount)
-    throws IOException {
+      throws IOException {
     in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
     for (int i = 0; i < partIndex.length; i++) {
       final double[] coordinates = coordinateLists.get(i);
@@ -612,8 +613,8 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public double[] readXYCoordinates(final EndianInput in, final int vertexCount, final int axisCount)
-    throws IOException {
+  public double[] readXYCoordinates(final EndianInput in, final int vertexCount,
+    final int axisCount) throws IOException {
     final double[] coordinates = new double[vertexCount * axisCount];
     readXYCoordinates(in, axisCount, vertexCount, coordinates);
     return coordinates;
@@ -640,7 +641,8 @@ public final class ShapefileGeometryUtil {
     out.writeLEDouble(envelope.getMaxY());
   }
 
-  public void writeMCoordinates(final EndianOutput out, final Geometry geometry) throws IOException {
+  public void writeMCoordinates(final EndianOutput out, final Geometry geometry)
+    throws IOException {
     writeMCoordinatesRange(out, geometry);
     if (geometry.getAxisCount() >= 4) {
       for (final Vertex vertex : geometry.vertices()) {
@@ -725,8 +727,8 @@ public final class ShapefileGeometryUtil {
     writeMultipoint(out, geometry, ShapefileConstants.MULTI_POINT_SHAPE, 8);
   }
 
-  private void writeMultipoint(final EndianOutput out, final Geometry geometry,
-    final int shapeType, final int wordsPerPoint) throws IOException {
+  private void writeMultipoint(final EndianOutput out, final Geometry geometry, final int shapeType,
+    final int wordsPerPoint) throws IOException {
     if (geometry instanceof MultiPoint || geometry instanceof Point) {
       final int vertexCount = geometry.getVertexCount();
       if (this.writeLength) {
@@ -741,8 +743,8 @@ public final class ShapefileGeometryUtil {
       out.writeLEInt(vertexCount);
       writeXYCoordinates(out, geometry);
     } else {
-      throw new IllegalArgumentException("Expecting " + MultiPoint.class + " geometry got "
-        + geometry.getClass());
+      throw new IllegalArgumentException(
+        "Expecting " + MultiPoint.class + " geometry got " + geometry.getClass());
     }
   }
 
@@ -763,7 +765,8 @@ public final class ShapefileGeometryUtil {
     writeZCoordinates(out, geometry);
   }
 
-  public void writeMultipointZM(final EndianOutput out, final Geometry geometry) throws IOException {
+  public void writeMultipointZM(final EndianOutput out, final Geometry geometry)
+    throws IOException {
     writeMultipoint(out, geometry, ShapefileConstants.MULTI_POINT_ZM_SHAPE, 16);
     writeZCoordinates(out, geometry);
     writeMCoordinates(out, geometry);
@@ -780,8 +783,8 @@ public final class ShapefileGeometryUtil {
       out.writeLEInt(ShapefileConstants.POINT_SHAPE);
       writeXy(out, point);
     } else {
-      throw new IllegalArgumentException("Expecting " + Point.class + " geometry got "
-        + geometry.getClass());
+      throw new IllegalArgumentException(
+        "Expecting " + Point.class + " geometry got " + geometry.getClass());
     }
   }
 
@@ -803,8 +806,8 @@ public final class ShapefileGeometryUtil {
         out.writeLEDouble(m);
       }
     } else {
-      throw new IllegalArgumentException("Expecting " + Point.class + " geometry got "
-        + geometry.getClass());
+      throw new IllegalArgumentException(
+        "Expecting " + Point.class + " geometry got " + geometry.getClass());
     }
   }
 
@@ -829,8 +832,8 @@ public final class ShapefileGeometryUtil {
         out.writeLEDouble(z);
       }
     } else {
-      throw new IllegalArgumentException("Expecting " + Point.class + " geometry got "
-        + geometry.getClass());
+      throw new IllegalArgumentException(
+        "Expecting " + Point.class + " geometry got " + geometry.getClass());
     }
   }
 
@@ -857,8 +860,8 @@ public final class ShapefileGeometryUtil {
         out.writeLEDouble(m);
       }
     } else {
-      throw new IllegalArgumentException("Expecting " + Point.class + " geometry got "
-        + geometry.getClass());
+      throw new IllegalArgumentException(
+        "Expecting " + Point.class + " geometry got " + geometry.getClass());
     }
   }
 
@@ -896,8 +899,8 @@ public final class ShapefileGeometryUtil {
           vertexCount += interiorCoords.getVertexCount();
         }
       } else {
-        throw new IllegalArgumentException("Expecting " + Polygon.class + " geometry got "
-          + part.getClass());
+        throw new IllegalArgumentException(
+          "Expecting " + Polygon.class + " geometry got " + part.getClass());
       }
     }
     final int numParts = rings.size();
@@ -1049,7 +1052,8 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public void writeZCoordinates(final EndianOutput out, final Geometry geometry) throws IOException {
+  public void writeZCoordinates(final EndianOutput out, final Geometry geometry)
+    throws IOException {
     writeZCoordinatesRange(out, geometry);
     if (geometry.getAxisCount() >= 3) {
       for (final Vertex vertex : geometry.vertices()) {

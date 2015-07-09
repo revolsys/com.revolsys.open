@@ -97,8 +97,8 @@ public class GeometryTestUtil {
     final int geometryCount, final int vertexCount, final double delta) {
     final List<Geometry> geometries = new ArrayList<>();
     for (int i = 0; i < geometryCount; i++) {
-      final Geometry geometry = lineString(geometryFactory, vertexCount + i, delta
-        * (vertexCount + i * 3));
+      final Geometry geometry = lineString(geometryFactory, vertexCount + i,
+        delta * (vertexCount + i * 3));
       geometries.add(geometry);
     }
     return geometryFactory.multiLineString(geometries);

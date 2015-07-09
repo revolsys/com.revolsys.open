@@ -128,7 +128,8 @@ class BoundablePair implements Comparable {
         (ItemBoundable)this.boundable2);
     }
     // otherwise compute distance between bounds of boundables
-    return ((BoundingBox)this.boundable1.getBounds()).distance((BoundingBoxDoubleGf)this.boundable2.getBounds());
+    return ((BoundingBox)this.boundable1.getBounds())
+      .distance((BoundingBoxDoubleGf)this.boundable2.getBounds());
   }
 
   private void expand(final Boundable bndComposite, final Boundable bndOther,

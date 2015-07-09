@@ -37,9 +37,9 @@ public class GeometryHttpMessageConverter extends AbstractHttpMessageConverter<G
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
   public GeometryHttpMessageConverter() {
-    super(Geometry.class, IoFactoryRegistry.getInstance()
-      .getMediaTypes(GeometryReaderFactory.class), IoFactoryRegistry.getInstance().getMediaTypes(
-      GeometryWriterFactory.class));
+    super(Geometry.class,
+      IoFactoryRegistry.getInstance().getMediaTypes(GeometryReaderFactory.class),
+      IoFactoryRegistry.getInstance().getMediaTypes(GeometryWriterFactory.class));
   }
 
   public GeometryFactory getGeometryFactory() {
@@ -58,15 +58,16 @@ public class GeometryHttpMessageConverter extends AbstractHttpMessageConverter<G
       }
       final InputStream body = inputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/" + mediaType.getSubtype();
-      final GeometryReaderFactory readerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
-        GeometryReaderFactory.class, mediaTypeString);
+      final GeometryReaderFactory readerFactory = this.ioFactoryRegistry
+        .getFactoryByMediaType(GeometryReaderFactory.class, mediaTypeString);
       if (readerFactory == null) {
         throw new HttpMessageNotReadableException("Cannot read data in format" + mediaType);
       } else {
-        final Reader<Geometry> reader = readerFactory.createGeometryReader(new InputStreamResource(
-          "geometryUpload", body));
+        final Reader<Geometry> reader = readerFactory
+          .createGeometryReader(new InputStreamResource("geometryUpload", body));
         GeometryFactory factory = this.geometryFactory;
-        final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder.getRequestAttributes();
+        final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder
+          .getRequestAttributes();
         final String srid = requestAttributes.getParameter("srid");
         if (srid != null && srid.trim().length() > 0) {
           factory = GeometryFactory.floating3(Integer.parseInt(srid));
@@ -105,8 +106,8 @@ public class GeometryHttpMessageConverter extends AbstractHttpMessageConverter<G
         final OutputStream body = outputMessage.getBody();
         final String mediaTypeString = actualMediaType.getType() + "/"
           + actualMediaType.getSubtype();
-        final GeometryWriterFactory writerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
-          GeometryWriterFactory.class, mediaTypeString);
+        final GeometryWriterFactory writerFactory = this.ioFactoryRegistry
+          .getFactoryByMediaType(GeometryWriterFactory.class, mediaTypeString);
         if (writerFactory == null) {
           throw new IllegalArgumentException("Media type " + actualMediaType + " not supported");
         } else {

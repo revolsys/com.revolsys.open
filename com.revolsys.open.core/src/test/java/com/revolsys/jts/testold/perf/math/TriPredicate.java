@@ -147,7 +147,8 @@ public class TriPredicate {
    * @param p the point to test
    * @return true if this point is inside the circle defined by the points a, b, c
    */
-  public static boolean isInCircleRobust(final Point a, final Point b, final Point c, final Point p) {
+  public static boolean isInCircleRobust(final Point a, final Point b, final Point c,
+    final Point p) {
     // checkRobustInCircle(a, b, c, p);
     return isInCircleDD(a, b, c, p);
   }
@@ -161,8 +162,8 @@ public class TriPredicate {
    * @param c a vertex of the triangle
    */
   private static double triArea(final Point a, final Point b, final Point c) {
-    return (b.getX() - a.getX()) * (c.getY() - a.getY()) - (b.getY() - a.getY())
-      * (c.getX() - a.getX());
+    return (b.getX() - a.getX()) * (c.getY() - a.getY())
+      - (b.getY() - a.getY()) * (c.getX() - a.getX());
   }
 
   /**

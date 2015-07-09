@@ -253,7 +253,8 @@ public class TiffImage extends JaiGeoreferencedImage {
       final int geoSrid = getInteger(geoKeys, GEOGRAPHIC_TYPE_GEO_KEY, 0);
       if (geoSrid != 0) {
         if (geoSrid > 0 && geoSrid < 32767) {
-          final GeographicCoordinateSystem geographicCoordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(geoSrid);
+          final GeographicCoordinateSystem geographicCoordinateSystem = EpsgCoordinateSystems
+            .getCoordinateSystem(geoSrid);
           final String name = "unknown";
           final Projection projection = getProjection(geoKeys);
           final Area area = null;
@@ -278,7 +279,8 @@ public class TiffImage extends JaiGeoreferencedImage {
           final ProjectedCoordinateSystem coordinateSystem = new ProjectedCoordinateSystem(
             coordinateSystemId, name, geographicCoordinateSystem, area, projection, parameters,
             linearUnit, axis, authority, false);
-          final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystem);
+          final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems
+            .getCoordinateSystem(coordinateSystem);
           geometryFactory = GeometryFactory.floating(epsgCoordinateSystem.getId(), 2);
         }
       }

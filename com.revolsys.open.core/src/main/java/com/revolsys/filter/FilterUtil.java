@@ -12,7 +12,8 @@ public class FilterUtil {
     return list;
   }
 
-  public static <T> List<T> filterAndRemove(final Collection<T> collection, final Filter<T> filter) {
+  public static <T> List<T> filterAndRemove(final Collection<T> collection,
+    final Filter<T> filter) {
     final List<T> list = new ArrayList<T>();
     final Iterator<T> iterator = collection.iterator();
     while (iterator.hasNext()) {

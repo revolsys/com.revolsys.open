@@ -32,8 +32,8 @@ public class HotspotViewport2D extends com.revolsys.swing.map.ComponentViewport2
     } else {
       coordinate = point.getPoint();
     }
-    this.toolTipIndex.insert(new BoundingBoxDoubleGf(coordinate), new ViewportHotspot(coordinate,
-      text, url));
+    this.toolTipIndex.insert(new BoundingBoxDoubleGf(coordinate),
+      new ViewportHotspot(coordinate, text, url));
   }
 
   public ViewportHotspot getHotspot(final int x, final int y) {

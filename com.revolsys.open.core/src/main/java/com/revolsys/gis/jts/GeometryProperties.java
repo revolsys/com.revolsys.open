@@ -62,7 +62,8 @@ public class GeometryProperties {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T extends Object> T getGeometryProperty(final Geometry geometry, final String name) {
+  public static <T extends Object> T getGeometryProperty(final Geometry geometry,
+    final String name) {
     final Map<String, Object> map = getGeometryProperties(geometry);
     return (T)map.get(name);
   }

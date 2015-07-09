@@ -154,7 +154,8 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
     }
   }
 
-  private void logNoMatch(final Record[] objects, final Channel<Record> channel, final boolean other) {
+  private void logNoMatch(final Record[] objects, final Channel<Record> channel,
+    final boolean other) {
     if (objects[0] != null) {
       logNoMatch(objects[0], false);
     }

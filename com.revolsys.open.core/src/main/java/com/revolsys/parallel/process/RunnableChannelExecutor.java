@@ -136,7 +136,8 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements Proce
             throw (ThreadInterruptedException)cause;
           }
           synchronized (this.monitor) {
-            for (final Iterator<Channel<Runnable>> iterator = channels.iterator(); iterator.hasNext();) {
+            for (final Iterator<Channel<Runnable>> iterator = channels.iterator(); iterator
+              .hasNext();) {
               final Channel<Runnable> channel = iterator.next();
               if (channel.isClosed()) {
                 iterator.remove();

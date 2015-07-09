@@ -85,7 +85,8 @@ public class MCIndexNoder extends SinglePassNoder {
   }
 
   private void add(final SegmentString segStr) {
-    final List<MonotoneChain> segChains = MonotoneChainBuilder.getChains(segStr.getPoints(), segStr);
+    final List<MonotoneChain> segChains = MonotoneChainBuilder.getChains(segStr.getPoints(),
+      segStr);
     for (final MonotoneChain mc : segChains) {
       mc.setId(this.idCounter++);
       this.index.insert(mc.getEnvelope(), mc);

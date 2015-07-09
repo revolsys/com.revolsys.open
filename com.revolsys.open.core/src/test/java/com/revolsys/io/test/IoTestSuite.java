@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -29,6 +26,9 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.test.geometry.GeometryTestUtil;
 import com.revolsys.jts.test.geometry.TestUtil;
 import com.revolsys.junit.InvokeMethodTestCase;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 @RunWith(Suite.class)
 @SuiteClasses({
@@ -95,16 +95,16 @@ public class IoTestSuite {
     }
   }
 
-  public static void doWriteReadTest(final GeometryFactory geometryFactory,
-    final DataType dataType, final Geometry geometry, final String fileExtension) {
+  public static void doWriteReadTest(final GeometryFactory geometryFactory, final DataType dataType,
+    final Geometry geometry, final String fileExtension) {
     final String geometryTypeString = dataType.toString();
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(geometryTypeString);
     recordDefinition.addField("ID", DataTypes.INT, true);
     recordDefinition.addField("GEOMETRY", dataType, true);
     recordDefinition.setGeometryFactory(geometryFactory);
-    final File file = new File("/tmp/revolsystest/io/" + fileExtension + "/" + geometryTypeString
-      + "_" + geometryFactory.getAxisCount() + "_" + geometry.getVertexCount() + "."
-      + fileExtension);
+    final File file = new File(
+      "/tmp/revolsystest/io/" + fileExtension + "/" + geometryTypeString + "_"
+        + geometryFactory.getAxisCount() + "_" + geometry.getVertexCount() + "." + fileExtension);
     file.delete();
     file.getParentFile().mkdirs();
     final FileSystemResource resource = new FileSystemResource(file);

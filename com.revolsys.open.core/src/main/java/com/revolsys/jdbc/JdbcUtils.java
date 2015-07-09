@@ -82,7 +82,8 @@ public final class JdbcUtils {
   public static void addOrderBy(final StringBuilder sql, final Map<String, Boolean> orderBy) {
     if (!orderBy.isEmpty()) {
       sql.append(" ORDER BY ");
-      for (final Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet().iterator(); iterator.hasNext();) {
+      for (final Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet().iterator(); iterator
+        .hasNext();) {
         final Entry<String, Boolean> entry = iterator.next();
         final String column = entry.getKey();
         sql.append(column);
@@ -602,8 +603,8 @@ public final class JdbcUtils {
         if (resultSet.next()) {
           return readMap(resultSet);
         } else {
-          throw new IllegalArgumentException("Value not found for " + sql + " "
-            + Arrays.asList(parameters));
+          throw new IllegalArgumentException(
+            "Value not found for " + sql + " " + Arrays.asList(parameters));
         }
       } finally {
         close(resultSet);
@@ -636,8 +637,8 @@ public final class JdbcUtils {
           if (resultSet.next()) {
             return readMap(resultSet);
           } else {
-            throw new IllegalArgumentException("Value not found for " + sql + " "
-              + Arrays.asList(parameters));
+            throw new IllegalArgumentException(
+              "Value not found for " + sql + " " + Arrays.asList(parameters));
           }
         }
       } catch (final SQLException e) {

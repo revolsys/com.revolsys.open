@@ -23,6 +23,7 @@ class GeometryNative extends WeakReference {
   static private Set refList = Collections.synchronizedSet(new HashSet());
 
   static private Thread cleanupThread = null;
+
   /* We start a cleanup thread in daemon mode */
   /* If we can't, we'll cleanup garbaged features at creation time */
   static {

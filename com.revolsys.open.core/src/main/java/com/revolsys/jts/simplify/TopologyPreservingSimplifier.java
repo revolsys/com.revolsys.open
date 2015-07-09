@@ -102,7 +102,8 @@ public class TopologyPreservingSimplifier {
       }
       // for linear components (including rings), simplify the linestring
       if (parent instanceof LineString) {
-        final TaggedLineString taggedLine = TopologyPreservingSimplifier.this.linestringMap.get(parent);
+        final TaggedLineString taggedLine = TopologyPreservingSimplifier.this.linestringMap
+          .get(parent);
         return new LineStringDouble(taggedLine.getResultCoordinates());
       }
       // for anything else (e.g. points) just copy the coordinates

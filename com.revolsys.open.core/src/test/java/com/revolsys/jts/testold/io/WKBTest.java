@@ -2,9 +2,6 @@ package com.revolsys.jts.testold.io;
 
 import java.io.IOException;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -16,6 +13,9 @@ import com.revolsys.jts.io.WKBReader;
 import com.revolsys.jts.io.WKBWriter;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.util.GeometricShapeFactory;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 /**
  * Tests the {@link WKBReader} and {@link WKBWriter}.
@@ -127,7 +127,8 @@ public class WKBTest extends TestCase {
   }
 
   public void testGeometryCollection() throws IOException, ParseException {
-    runWKBTest("GEOMETRYCOLLECTION ( POINT ( 1 1), LINESTRING (0 0, 10 10), POLYGON ((0 0, 100 0, 100 100, 0 100, 0 0)) )");
+    runWKBTest(
+      "GEOMETRYCOLLECTION ( POINT ( 1 1), LINESTRING (0 0, 10 10), POLYGON ((0 0, 100 0, 100 100, 0 100, 0 0)) )");
   }
 
   public void testGeometryCollectionEmpty() throws IOException, ParseException {
@@ -159,7 +160,8 @@ public class WKBTest extends TestCase {
   }
 
   public void testMultiPolygon() throws IOException, ParseException {
-    runWKBTest("MULTIPOLYGON ( ((0 0, 100 0, 100 100, 0 100, 0 0), (1 1, 1 10, 10 10, 10 1, 1 1) ), ((200 200, 200 250, 250 250, 250 200, 200 200)) )");
+    runWKBTest(
+      "MULTIPOLYGON ( ((0 0, 100 0, 100 100, 0 100, 0 0), (1 1, 1 10, 10 10, 10 1, 1 1) ), ((200 200, 200 250, 250 250, 250 200, 200 200)) )");
   }
 
   public void testMultiPolygonEmpty() throws IOException, ParseException {
@@ -167,7 +169,8 @@ public class WKBTest extends TestCase {
   }
 
   public void testNestedGeometryCollection() throws IOException, ParseException {
-    runWKBTest("GEOMETRYCOLLECTION(POINT(20 20),GEOMETRYCOLLECTION(POINT( 1 1),LINESTRING(0 0,10 10),POLYGON((0 0,100 0,100 100,0 100,0 0))))");
+    runWKBTest(
+      "GEOMETRYCOLLECTION(POINT(20 20),GEOMETRYCOLLECTION(POINT( 1 1),LINESTRING(0 0,10 10),POLYGON((0 0,100 0,100 100,0 100,0 0))))");
   }
 
   public void testPoint() throws IOException, ParseException {

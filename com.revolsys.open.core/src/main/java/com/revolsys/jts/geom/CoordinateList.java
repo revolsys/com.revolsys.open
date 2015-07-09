@@ -140,7 +140,8 @@ public class CoordinateList extends ArrayList<Point> {
    * @param direction if false, the array is added in reverse order
    * @return true (as by general collection contract)
    */
-  public boolean add(final List<Point> coord, final boolean allowRepeated, final boolean direction) {
+  public boolean add(final List<Point> coord, final boolean allowRepeated,
+    final boolean direction) {
     if (direction) {
       for (int i = 0; i < coord.size(); i++) {
         add(coord.get(i), allowRepeated);

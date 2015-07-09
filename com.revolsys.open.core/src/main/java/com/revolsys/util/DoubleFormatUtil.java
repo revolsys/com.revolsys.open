@@ -293,8 +293,8 @@ public final class DoubleFormatUtil {
           final long decP = Long.parseLong(intS);
           format(target, scale, 0L, decP);
         } else if (decLength < digits) {
-          final long decP = Long.parseLong(intS) * tenPow(decLength + 1) + Long.parseLong(decS)
-            * 10;
+          final long decP = Long.parseLong(intS) * tenPow(decLength + 1)
+            + Long.parseLong(decS) * 10;
           format(target, exposant + decLength, 0L, decP);
         } else {
           final long subDecP = Long.parseLong(decS.substring(0, digits));

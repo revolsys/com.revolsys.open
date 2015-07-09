@@ -53,7 +53,8 @@ public class FieldNoLabelDecorator implements Decorator {
       if (field.hasValidationErrors()) {
         out.startTag(HtmlUtil.DIV);
         out.attribute(HtmlUtil.ATTR_CLASS, "errors");
-        for (final Iterator<String> validationErrors = field.getValidationErrors().iterator(); validationErrors.hasNext();) {
+        for (final Iterator<String> validationErrors = field.getValidationErrors()
+          .iterator(); validationErrors.hasNext();) {
           final String error = validationErrors.next();
           out.text(error);
           if (validationErrors.hasNext()) {

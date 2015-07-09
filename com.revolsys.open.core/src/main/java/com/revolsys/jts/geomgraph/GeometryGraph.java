@@ -226,7 +226,8 @@ public class GeometryGraph extends PlanarGraph {
    * If the ring is in the opposite orientation,
    * the left and right locations must be interchanged.
    */
-  private void addPolygonRing(final LinearRing ring, final Location cwLeft, final Location cwRight) {
+  private void addPolygonRing(final LinearRing ring, final Location cwLeft,
+    final Location cwRight) {
     // don't bother adding empty holes
     if (ring.isEmpty()) {
       return;
@@ -245,8 +246,8 @@ public class GeometryGraph extends PlanarGraph {
       left = cwRight;
       right = cwLeft;
     }
-    final Edge e = new Edge(coordinatesList, new Label(this.argIndex, Location.BOUNDARY, left,
-      right));
+    final Edge e = new Edge(coordinatesList,
+      new Label(this.argIndex, Location.BOUNDARY, left, right));
     this.lineEdgeMap.put(ring, e);
 
     insertEdge(e);
@@ -308,8 +309,8 @@ public class GeometryGraph extends PlanarGraph {
     final SegmentIntersector si = new SegmentIntersector(li, true, false);
     final EdgeSetIntersector esi = createEdgeSetIntersector();
     // optimized test for Polygons and Rings
-    if (!computeRingSelfNodes
-      && (this.geometry instanceof LinearRing || this.geometry instanceof Polygon || this.geometry instanceof MultiPolygon)) {
+    if (!computeRingSelfNodes && (this.geometry instanceof LinearRing
+      || this.geometry instanceof Polygon || this.geometry instanceof MultiPolygon)) {
       esi.computeIntersections(this.edges, si, false);
     } else {
       esi.computeIntersections(this.edges, si, true);

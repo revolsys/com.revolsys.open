@@ -54,8 +54,10 @@ public class LineStringTest {
     final GeometryFactory geometryFactory2;
     final int axisCount = geometryFactory.getAxisCount();
     if (geometryFactory.getCoordinateSystem() instanceof ProjectedCoordinateSystem) {
-      final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)geometryFactory.getCoordinateSystem();
-      final GeographicCoordinateSystem geographicCoordinateSystem = projectedCs.getGeographicCoordinateSystem();
+      final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)geometryFactory
+        .getCoordinateSystem();
+      final GeographicCoordinateSystem geographicCoordinateSystem = projectedCs
+        .getGeographicCoordinateSystem();
       geometryFactory2 = GeometryFactory.floating(geographicCoordinateSystem.getId(), axisCount);
     } else {
       geometryFactory2 = GeometryFactory.floating(26910, axisCount);
@@ -94,12 +96,12 @@ public class LineStringTest {
 
   }
 
-  public static void assertMerge(final boolean loop, final LineString line1,
-    final LineString line2, final double mergeX, final double mergeY,
-    final double... expectedCoordinates) {
+  public static void assertMerge(final boolean loop, final LineString line1, final LineString line2,
+    final double mergeX, final double mergeY, final double... expectedCoordinates) {
     final GeometryFactory geometryFactory = line1.getGeometryFactory();
     final int axisCount = geometryFactory.getAxisCount();
-    final LineString expectedMergedLine = geometryFactory.lineString(axisCount, expectedCoordinates);
+    final LineString expectedMergedLine = geometryFactory.lineString(axisCount,
+      expectedCoordinates);
 
     final Point mergePoint = geometryFactory.point(mergeX, mergeY);
 
@@ -174,8 +176,8 @@ public class LineStringTest {
       final LineString pointCoordinatesListNull = geometryFactory.lineString((LineString)null);
       assertEmpty(pointCoordinatesListNull);
 
-      final LineString pointCoordinatesListSize0 = geometryFactory.lineString(new LineStringDouble(
-        0, axisCount));
+      final LineString pointCoordinatesListSize0 = geometryFactory
+        .lineString(new LineStringDouble(0, axisCount));
       assertEmpty(pointCoordinatesListSize0);
 
       // double[] Constructor
@@ -246,21 +248,22 @@ public class LineStringTest {
 
       // Coordinates
       final Point pointCoordinatesAllAxis = geometryFactory.point(new PointDouble(coordinates));
-      final Point pointCoordinatesExtraAxis = geometryFactory.point(new PointDouble(
-        coordinatesExtra));
-      final Point pointCoordinatesLessAxis = geometryFactory.point(new PointDouble(coordinatesLess));
+      final Point pointCoordinatesExtraAxis = geometryFactory
+        .point(new PointDouble(coordinatesExtra));
+      final Point pointCoordinatesLessAxis = geometryFactory
+        .point(new PointDouble(coordinatesLess));
       assertEquals(coordinates, coordinatesLessNaN, pointCoordinatesAllAxis,
         pointCoordinatesExtraAxis, pointCoordinatesLessAxis);
       assertObjectContsructor(geometryFactory, coordinates, coordinatesLessNaN,
         pointCoordinatesAllAxis, pointCoordinatesExtraAxis, pointCoordinatesLessAxis);
 
       // LineString
-      final Point pointCoordinatesListAllAxis = geometryFactory.point(new LineStringDouble(
-        axisCount, coordinates));
-      final Point pointCoordinatesListExtraAxis = geometryFactory.point(new LineStringDouble(
-        axisCount, coordinatesExtra));
-      final Point pointCoordinatesListLessAxis = geometryFactory.point(new LineStringDouble(
-        axisCountLess, coordinatesLess));
+      final Point pointCoordinatesListAllAxis = geometryFactory
+        .point(new LineStringDouble(axisCount, coordinates));
+      final Point pointCoordinatesListExtraAxis = geometryFactory
+        .point(new LineStringDouble(axisCount, coordinatesExtra));
+      final Point pointCoordinatesListLessAxis = geometryFactory
+        .point(new LineStringDouble(axisCountLess, coordinatesLess));
       assertEquals(coordinates, coordinatesLessNaN, pointCoordinatesListAllAxis,
         pointCoordinatesListExtraAxis, pointCoordinatesListLessAxis);
       assertObjectContsructor(geometryFactory, coordinates, coordinatesLessNaN,
@@ -297,8 +300,8 @@ public class LineStringTest {
     final LineString line2Reverse = line2.reverse();
 
     // Line to make a loop
-    final LineString line3 = geometryFactory.lineString(3, START_X + 300, START_Y + 300, 3,
-      START_X, START_Y, 0);
+    final LineString line3 = geometryFactory.lineString(3, START_X + 300, START_Y + 300, 3, START_X,
+      START_Y, 0);
     final LineString line3Reverse = line3.reverse();
 
     // Forwards, Forwards
@@ -337,8 +340,8 @@ public class LineStringTest {
       START_Y + 100, 1, START_X, START_Y, 0);
 
     // Loop Reverse, Reverse
-    assertMerge(true, line1Reverse, line3Reverse, START_X + 300, START_Y + 300, START_X, START_Y,
-      0, START_X + 300, START_Y + 300, 3, START_X + 200, START_Y + 200, 2, START_X + 100,
+    assertMerge(true, line1Reverse, line3Reverse, START_X + 300, START_Y + 300, START_X, START_Y, 0,
+      START_X + 300, START_Y + 300, 3, START_X + 200, START_Y + 200, 2, START_X + 100,
       START_Y + 100, 1, START_X, START_Y, 0);
 
   }
@@ -360,8 +363,8 @@ public class LineStringTest {
     // Middle vertex
     final LineString lineVertexMiddle1 = geometryFactory.lineString(3, START_X, START_Y, 0,
       START_X + 100, START_Y + 100, 1);
-    final LineString lineVertexMiddle2 = geometryFactory.lineString(3, START_X + 100,
-      START_Y + 100, 1, START_X + 200, START_Y + 100, 2, START_X + 100, START_Y, 3);
+    final LineString lineVertexMiddle2 = geometryFactory.lineString(3, START_X + 100, START_Y + 100,
+      1, START_X + 200, START_Y + 100, 2, START_X + 100, START_Y, 3);
     assertSplit(line, geometryFactory.point(START_X + 100, START_Y + 100), lineVertexMiddle1,
       lineVertexMiddle2);
 
@@ -383,7 +386,8 @@ public class LineStringTest {
       final LineString lineSegmentFirst1 = geometryFactory.lineString(3, START_X, START_Y, 0, x, y,
         offset);
       final LineString lineSegmentFirst2 = geometryFactory.lineString(3, x, y, offset,
-        START_X + 100, START_Y + 100, 1, START_X + 200, START_Y + 100, 2, START_X + 100, START_Y, 3);
+        START_X + 100, START_Y + 100, 1, START_X + 200, START_Y + 100, 2, START_X + 100, START_Y,
+        3);
       assertSplit(line, geometryFactory.point(x, y, offset), lineSegmentFirst1, lineSegmentFirst2);
     }
   }

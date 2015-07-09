@@ -6,13 +6,14 @@ package com.revolsys.swing.map.layer.record.style;
  */
 public enum CompositionOperation {
   clear("clear"), src("src"), dst("dst"), src_over("src-over"), dst_over("dst-over"), src_in(
-    "src-in"), dst_in("dst-in"), src_out("src-out"), dst_out("dst-out"), src_atop("src-atop"), dst_atop(
-    "dst-atop"), xor("xor"), plus("plus"), minus("minus"), multiply("multiply"), screen("screen"), overlay(
-    "overlay"), darken("darken"), lighten("lighten"), color_dodge("color-dodge"), color_burn(
-    "color-burn"), hard_light("hard-light"), soft_light("soft-light"), difference("difference"), exclusion(
-    "exclusion"), contrast("contrast"), invert("invert"), invert_rgb("invert-rgb"), grain_merge(
-    "grain-merge"), grain_extract("grain-extract"), hue("hue"), saturation("saturation"), color(
-    "color"), value("value");
+    "src-in"), dst_in("dst-in"), src_out("src-out"), dst_out("dst-out"), src_atop(
+      "src-atop"), dst_atop("dst-atop"), xor("xor"), plus("plus"), minus("minus"), multiply(
+        "multiply"), screen("screen"), overlay("overlay"), darken("darken"), lighten(
+          "lighten"), color_dodge("color-dodge"), color_burn("color-burn"), hard_light(
+            "hard-light"), soft_light("soft-light"), difference("difference"), exclusion(
+              "exclusion"), contrast("contrast"), invert("invert"), invert_rgb(
+                "invert-rgb"), grain_merge("grain-merge"), grain_extract("grain-extract"), hue(
+                  "hue"), saturation("saturation"), color("color"), value("value");
 
   private String label;
 

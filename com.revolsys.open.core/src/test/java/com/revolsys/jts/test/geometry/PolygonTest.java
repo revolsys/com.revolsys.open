@@ -25,8 +25,8 @@ public class PolygonTest {
     new PointDouble(8.0, 2.0), new PointDouble(8.0, 8.0), new PointDouble(2.0, 8.0),
     new PointDouble(2.0, 2.0));
 
-  private static final Polygon WITH_HOLE = GEOMETRY_FACTORY.polygon(
-    GEOMETRY_FACTORY.linearRing(EXTERIOR_1), GEOMETRY_FACTORY.linearRing(INTERIOR_2));
+  private static final Polygon WITH_HOLE = GEOMETRY_FACTORY
+    .polygon(GEOMETRY_FACTORY.linearRing(EXTERIOR_1), GEOMETRY_FACTORY.linearRing(INTERIOR_2));
 
   @Test
   public void testFromFile() {

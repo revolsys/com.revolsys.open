@@ -17,7 +17,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.io.FileUtil;
 
-public class JsonRecordIterator extends AbstractIterator<Record> implements RecordIterator {
+public class JsonRecordIterator extends AbstractIterator<Record>implements RecordIterator {
 
   private RecordDefinition recordDefinition;
 

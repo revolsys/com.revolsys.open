@@ -492,32 +492,31 @@ public class Dataset extends MajorObject {
   public int WriteRaster_Direct(final int xoff, final int yoff, final int xsize, final int ysize,
     final int buf_xsize, final int buf_ysize, final int buf_type,
     final java.nio.ByteBuffer nioBuffer, final int[] band_list) {
-    return gdalJNI.Dataset_WriteRaster_Direct__SWIG_3(this.swigCPtr, this, xoff, yoff, xsize,
-      ysize, buf_xsize, buf_ysize, buf_type, nioBuffer, band_list);
+    return gdalJNI.Dataset_WriteRaster_Direct__SWIG_3(this.swigCPtr, this, xoff, yoff, xsize, ysize,
+      buf_xsize, buf_ysize, buf_type, nioBuffer, band_list);
   }
 
   public int WriteRaster_Direct(final int xoff, final int yoff, final int xsize, final int ysize,
     final int buf_xsize, final int buf_ysize, final int buf_type,
     final java.nio.ByteBuffer nioBuffer, final int[] band_list, final int nPixelSpace) {
-    return gdalJNI.Dataset_WriteRaster_Direct__SWIG_2(this.swigCPtr, this, xoff, yoff, xsize,
-      ysize, buf_xsize, buf_ysize, buf_type, nioBuffer, band_list, nPixelSpace);
+    return gdalJNI.Dataset_WriteRaster_Direct__SWIG_2(this.swigCPtr, this, xoff, yoff, xsize, ysize,
+      buf_xsize, buf_ysize, buf_type, nioBuffer, band_list, nPixelSpace);
   }
 
   public int WriteRaster_Direct(final int xoff, final int yoff, final int xsize, final int ysize,
     final int buf_xsize, final int buf_ysize, final int buf_type,
     final java.nio.ByteBuffer nioBuffer, final int[] band_list, final int nPixelSpace,
     final int nLineSpace) {
-    return gdalJNI.Dataset_WriteRaster_Direct__SWIG_1(this.swigCPtr, this, xoff, yoff, xsize,
-      ysize, buf_xsize, buf_ysize, buf_type, nioBuffer, band_list, nPixelSpace, nLineSpace);
+    return gdalJNI.Dataset_WriteRaster_Direct__SWIG_1(this.swigCPtr, this, xoff, yoff, xsize, ysize,
+      buf_xsize, buf_ysize, buf_type, nioBuffer, band_list, nPixelSpace, nLineSpace);
   }
 
   public int WriteRaster_Direct(final int xoff, final int yoff, final int xsize, final int ysize,
     final int buf_xsize, final int buf_ysize, final int buf_type,
     final java.nio.ByteBuffer nioBuffer, final int[] band_list, final int nPixelSpace,
     final int nLineSpace, final int nBandSpace) {
-    return gdalJNI.Dataset_WriteRaster_Direct__SWIG_0(this.swigCPtr, this, xoff, yoff, xsize,
-      ysize, buf_xsize, buf_ysize, buf_type, nioBuffer, band_list, nPixelSpace, nLineSpace,
-      nBandSpace);
+    return gdalJNI.Dataset_WriteRaster_Direct__SWIG_0(this.swigCPtr, this, xoff, yoff, xsize, ysize,
+      buf_xsize, buf_ysize, buf_type, nioBuffer, band_list, nPixelSpace, nLineSpace, nBandSpace);
   }
 
 }

@@ -28,8 +28,8 @@ public class JsonParser implements Iterator<JsonParser.EventType>, AutoCloseable
   }
 
   public static List<Object> getArray(final JsonParser parser) {
-    if (parser.getEvent() == EventType.startArray || parser.hasNext()
-      && parser.next() == EventType.startArray) {
+    if (parser.getEvent() == EventType.startArray
+      || parser.hasNext() && parser.next() == EventType.startArray) {
       EventType event = parser.getEvent();
       final List<Object> list = new ArrayList<Object>();
       do {
@@ -53,8 +53,8 @@ public class JsonParser implements Iterator<JsonParser.EventType>, AutoCloseable
   }
 
   public static double[] getDoubleArray(final JsonParser parser) {
-    if (parser.getEvent() == EventType.startArray || parser.hasNext()
-      && parser.next() == EventType.startArray) {
+    if (parser.getEvent() == EventType.startArray
+      || parser.hasNext() && parser.next() == EventType.startArray) {
       EventType event = parser.getEvent();
       final List<Number> list = new ArrayList<Number>();
       do {
@@ -96,8 +96,8 @@ public class JsonParser implements Iterator<JsonParser.EventType>, AutoCloseable
   }
 
   public static Map<String, Object> getMap(final JsonParser parser) {
-    if (parser.getEvent() == EventType.startObject || parser.hasNext()
-      && parser.next() == EventType.startObject) {
+    if (parser.getEvent() == EventType.startObject
+      || parser.hasNext() && parser.next() == EventType.startObject) {
       EventType event = parser.getEvent();
       final Map<String, Object> map = new LinkedHashMap<String, Object>();
       do {
@@ -143,8 +143,8 @@ public class JsonParser implements Iterator<JsonParser.EventType>, AutoCloseable
   }
 
   public static String getString(final JsonParser parser) {
-    if (parser.getEvent() == EventType.string || parser.hasNext()
-      && parser.next() == EventType.string) {
+    if (parser.getEvent() == EventType.string
+      || parser.hasNext() && parser.next() == EventType.string) {
       return parser.getValue();
     } else {
       throw new IllegalStateException("Expecting a string");

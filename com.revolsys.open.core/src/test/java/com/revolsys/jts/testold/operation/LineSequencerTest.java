@@ -3,12 +3,12 @@ package com.revolsys.jts.testold.operation;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.linemerge.LineSequencer;
+
+import junit.framework.TestCase;
 
 /**
  * Test LineSequencer
@@ -59,7 +59,7 @@ public class LineSequencerTest extends TestCase {
       final boolean isOK = expected.equalsNorm(result);
       if (!isOK) {
         // System.out.println("ERROR - Expected: " + expected);
-        // System.out.println("          Actual: " + result);
+        // System.out.println(" Actual: " + result);
       }
       assertTrue(isOK);
 
@@ -148,8 +148,7 @@ public class LineSequencerTest extends TestCase {
 
   public void testSimpleLoopWithTail() throws Exception {
     final String[] wkt = {
-      "LINESTRING ( 0 0, 0 10 )", "LINESTRING ( 0 10, 10 10 )",
-      "LINESTRING ( 10 10, 10 20, 0 10 )",
+      "LINESTRING ( 0 0, 0 10 )", "LINESTRING ( 0 10, 10 10 )", "LINESTRING ( 10 10, 10 20, 0 10 )",
     };
     final String result = "MULTILINESTRING ((0 0, 0 10), (0 10, 10 10), (10 10, 10 20, 0 10))";
     runLineSequencer(wkt, result);
@@ -166,7 +165,7 @@ public class LineSequencerTest extends TestCase {
       "LINESTRING ( 0 10, 10 10 )", "LINESTRING ( 0 10, 0 20 )", "LINESTRING ( 10 10, 10 20 )",
       "LINESTRING ( 0 20, 10 20 )",
 
-      "LINESTRING ( 10 20, 30 30 )",
+        "LINESTRING ( 10 20, 30 30 )",
     };
     final String result = null;
     runLineSequencer(wkt, result);

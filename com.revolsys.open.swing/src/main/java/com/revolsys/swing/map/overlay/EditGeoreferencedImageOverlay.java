@@ -58,11 +58,11 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
 
   private static final GeometryStyle STYLE_IMAGE_LINE = GeometryStyle.line(COLOR_SELECT, 1);
 
-  private static final MarkerStyle STYLE_VERTEX_FIRST_POINT = MarkerStyle.marker(
-    SelectedRecordsRenderer.firstVertexShape(), 9, COLOR_OUTLINE, 1, COLOR_SELECT);
+  private static final MarkerStyle STYLE_VERTEX_FIRST_POINT = MarkerStyle
+    .marker(SelectedRecordsRenderer.firstVertexShape(), 9, COLOR_OUTLINE, 1, COLOR_SELECT);
 
-  private static final MarkerStyle STYLE_VERTEX_LAST_POINT = MarkerStyle.marker(
-    SelectedRecordsRenderer.lastVertexShape(), 9, COLOR_OUTLINE, 1, COLOR_SELECT);
+  private static final MarkerStyle STYLE_VERTEX_LAST_POINT = MarkerStyle
+    .marker(SelectedRecordsRenderer.lastVertexShape(), 9, COLOR_OUTLINE, 1, COLOR_SELECT);
 
   static {
     STYLE_VERTEX_FIRST_POINT.setMarkerOrientationType("auto");
@@ -245,7 +245,8 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
     final boolean source) {
     if (!indices.isEmpty()) {
       int i = startNumber - 1;
-      toolTip.append("<div style=\"border-bottom: solid black 1px; font-weight:bold;padding: 1px 3px 1px 3px\">");
+      toolTip.append(
+        "<div style=\"border-bottom: solid black 1px; font-weight:bold;padding: 1px 3px 1px 3px\">");
       if (source) {
         toolTip.append("Move source pixel");
       } else {

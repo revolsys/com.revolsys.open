@@ -123,10 +123,10 @@ public class MapPageable implements Pageable {
 
   @Override
   public Printable getPrintable(final int pageIndex) {
-    final double pageXOffset = (this.modelPageWidth - this.coreCellsPerWidth
-      * this.modelGridSizeMetres) / 2;
-    final double pageYOffset = (this.modelPageHeight - this.coreCellsPerHeight
-      * this.modelGridSizeMetres) / 2;
+    final double pageXOffset = (this.modelPageWidth
+      - this.coreCellsPerWidth * this.modelGridSizeMetres) / 2;
+    final double pageYOffset = (this.modelPageHeight
+      - this.coreCellsPerHeight * this.modelGridSizeMetres) / 2;
     final double startX = Math.floor(this.mapBoundingBox.getMinX() / this.modelGridSizeMetres)
       * this.modelGridSizeMetres;
     final double startY = Math.floor(this.mapBoundingBox.getMinY() / this.modelGridSizeMetres)
@@ -137,8 +137,8 @@ public class MapPageable implements Pageable {
       - pageXOffset;
     final double y = startY + row * this.modelGridSizeMetres * this.coreCellsPerHeight
       - pageYOffset;
-    final BoundingBox pageBoundingBox = new BoundingBoxDoubleGf(this.map.getGeometryFactory(), 2,
-      x, y, x + this.modelPageWidth, y + this.modelPageHeight);
+    final BoundingBox pageBoundingBox = new BoundingBoxDoubleGf(this.map.getGeometryFactory(), 2, x,
+      y, x + this.modelPageWidth, y + this.modelPageHeight);
     return new MapPrintable(this.map, column, this.numYPages - row, pageBoundingBox,
       this.contentRect, this.dpi, this.rulerSizePixels, this.modelGridSizeMetres, this.scale);
   }

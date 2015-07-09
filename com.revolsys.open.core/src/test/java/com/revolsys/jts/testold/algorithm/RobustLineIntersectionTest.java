@@ -1,8 +1,5 @@
 package com.revolsys.jts.testold.algorithm;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.format.wkt.EWktWriter;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.algorithm.LineIntersector;
@@ -13,6 +10,9 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 /**
  * Tests robustness and correctness of RobustLineIntersector
@@ -91,12 +91,12 @@ public class RobustLineIntersectionTest extends TestCase {
         checkIntPoints(expectedIntPt[1], li.getIntersection(0), distanceTolerance);
         checkIntPoints(expectedIntPt[1], li.getIntersection(0), distanceTolerance);
 
-        if (!(equals(expectedIntPt[0], li.getIntersection(0), distanceTolerance) || equals(
-          expectedIntPt[0], li.getIntersection(1), distanceTolerance))) {
+        if (!(equals(expectedIntPt[0], li.getIntersection(0), distanceTolerance)
+          || equals(expectedIntPt[0], li.getIntersection(1), distanceTolerance))) {
           checkIntPoints(expectedIntPt[0], li.getIntersection(0), distanceTolerance);
           checkIntPoints(expectedIntPt[0], li.getIntersection(1), distanceTolerance);
-        } else if (!(equals(expectedIntPt[1], li.getIntersection(0), distanceTolerance) || equals(
-          expectedIntPt[1], li.getIntersection(1), distanceTolerance))) {
+        } else if (!(equals(expectedIntPt[1], li.getIntersection(0), distanceTolerance)
+          || equals(expectedIntPt[1], li.getIntersection(1), distanceTolerance))) {
           checkIntPoints(expectedIntPt[1], li.getIntersection(0), distanceTolerance);
           checkIntPoints(expectedIntPt[1], li.getIntersection(1), distanceTolerance);
         }
@@ -135,7 +135,8 @@ public class RobustLineIntersectionTest extends TestCase {
     checkIntersection(pt, 0, null, 0);
   }
 
-  void checkIntPoints(final Point expectedPt, final Point actualPt, final double distanceTolerance) {
+  void checkIntPoints(final Point expectedPt, final Point actualPt,
+    final double distanceTolerance) {
     final boolean isEqual = equals(expectedPt, actualPt, distanceTolerance);
     assertTrue("Int Pts not equal - " + "expected " + EWktWriter.point(expectedPt) + " VS "
       + "actual " + EWktWriter.point(actualPt), isEqual);
@@ -174,7 +175,7 @@ public class RobustLineIntersectionTest extends TestCase {
       new PointDouble(4348433.262114629, 5552595.478385733, Point.NULL_ORDINATE),
       new PointDouble(4348440.849387404, 5552599.272022122, Point.NULL_ORDINATE),
 
-      new PointDouble(4348433.26211463, 5552595.47838573, Point.NULL_ORDINATE),
+        new PointDouble(4348433.26211463, 5552595.47838573, Point.NULL_ORDINATE),
       new PointDouble(4348440.8493874, 5552599.27202212, Point.NULL_ORDINATE)
     }, 1, new Point[] {
       new PointDouble(4348440.8493874, 5552599.27202212, Point.NULL_ORDINATE),
@@ -192,7 +193,7 @@ public class RobustLineIntersectionTest extends TestCase {
       "LINESTRING (4348433.26211463  5552595.47838573,  4348440.8493874   5552599.27202212  )", 1,
       new Point[] {
         new PointDouble(4348440.8493874, 5552599.27202212, Point.NULL_ORDINATE),
-      }, 0);
+    }, 0);
   }
 
   /**
@@ -207,7 +208,7 @@ public class RobustLineIntersectionTest extends TestCase {
       "LINESTRING ( 1889281.8148903656 1997547.0560044837, 2259977.3672235999 483675.17050843034 )",
       1, new Point[] {
         new PointDouble(2087536.6062609926, 1187900.560566967, Point.NULL_ORDINATE),
-      }, 0);
+    }, 0);
   }
 
   /**

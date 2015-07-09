@@ -61,12 +61,13 @@ public class LayerGroupTreeNode extends AbstractLayerTreeNode implements MouseLi
 
   @SuppressWarnings("unchecked")
   @Override
-  public boolean dndImportData(final TransferSupport support, final int index) throws IOException,
-    UnsupportedFlavorException {
+  public boolean dndImportData(final TransferSupport support, final int index)
+    throws IOException, UnsupportedFlavorException {
     final LayerGroup group = getGroup();
     if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
       final Transferable transferable = support.getTransferable();
-      final List<File> files = (List<File>)transferable.getTransferData(DataFlavor.javaFileListFlavor);
+      final List<File> files = (List<File>)transferable
+        .getTransferData(DataFlavor.javaFileListFlavor);
       group.openFiles(index, files);
       return true;
     } else {

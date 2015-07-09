@@ -44,8 +44,8 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
-public class FieldNamesSetPanel extends ValueField implements ActionListener,
-  ListSelectionListener, PropertyChangeListener {
+public class FieldNamesSetPanel extends ValueField
+  implements ActionListener, ListSelectionListener, PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -157,8 +157,8 @@ public class FieldNamesSetPanel extends ValueField implements ActionListener,
     this.selectedFieldNames.addListSelectionListener(this);
     this.selectedFieldNames.setDragEnabled(true);
     this.selectedFieldNames.setDropMode(DropMode.INSERT);
-    this.selectedFieldNames.setTransferHandler(new ListReorderableTransferHandler(
-      this.selectedFieldNames));
+    this.selectedFieldNames
+      .setTransferHandler(new ListReorderableTransferHandler(this.selectedFieldNames));
 
     final JScrollPane snapScrollPane = new JScrollPane(this.selectedFieldNames);
     snapScrollPane.setPreferredSize(new Dimension(350, 400));
@@ -202,7 +202,8 @@ public class FieldNamesSetPanel extends ValueField implements ActionListener,
       final String fieldName = (String)selectedValue;
       if (!this.selectedFieldNamesModel.contains(fieldName)) {
         this.selectedFieldNamesModel.add(fieldName);
-        final int index = this.selectedFieldNames.convertIndexToView(this.selectedFieldNamesModel.indexOf(fieldName));
+        final int index = this.selectedFieldNames
+          .convertIndexToView(this.selectedFieldNamesModel.indexOf(fieldName));
         this.selectedFieldNames.addSelectionInterval(index, index);
       }
       this.allFieldNamesModel.remove(fieldName);
@@ -307,8 +308,8 @@ public class FieldNamesSetPanel extends ValueField implements ActionListener,
             this.fieldNamesSetNamesModel.insertElementAt(name, i);
             this.fieldNamesSetNamesModel.setSelectedItem(name);
           } else if (name2.equalsIgnoreCase(name)) {
-            JOptionPane.showMessageDialog(SwingUtil.getActiveWindow(), "New name already in use: "
-              + name2, "Rename Field Set", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(SwingUtil.getActiveWindow(),
+              "New name already in use: " + name2, "Rename Field Set", JOptionPane.ERROR_MESSAGE);
             return;
           }
         }
@@ -322,7 +323,8 @@ public class FieldNamesSetPanel extends ValueField implements ActionListener,
     if (propertyName.equals("fieldNamesSetName")) {
       final String oldFieldNamesSetName = (String)event.getOldValue();
       if (oldFieldNamesSetName != null) {
-        this.fieldNamesSets.put(oldFieldNamesSetName, new ArrayList<>(this.selectedFieldNamesModel));
+        this.fieldNamesSets.put(oldFieldNamesSetName,
+          new ArrayList<>(this.selectedFieldNamesModel));
       }
       final String newFieldNamesSetName = (String)event.getNewValue();
       setFieldNamesSetName(newFieldNamesSetName);

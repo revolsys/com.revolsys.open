@@ -96,8 +96,8 @@ public class LoggingEventPanel extends JPanel {
       if (!Property.hasValue(value)) {
         value = "";
       }
-      final TextArea textArea = SwingUtil.createTextArea(
-        Math.min(20, value.toString().split("\n").length), 80);
+      final TextArea textArea = SwingUtil
+        .createTextArea(Math.min(20, value.toString().split("\n").length), 80);
       textArea.setEditable(false);
       textArea.append(value.toString());
       add(textArea);

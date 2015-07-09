@@ -236,8 +236,10 @@ public class OsnReader implements RecordIterator {
   private boolean skipToFirstRecord() throws IOException {
     if (this.osnIterator.next() == OsnIterator.START_DEFINITION) {
       final String typePath = this.osnIterator.getPathValue();
-      final RecordDefinitionImpl type = (RecordDefinitionImpl)this.recordDefinitionFactory.getRecordDefinition(typePath);
-      final RecordDefinition spatialDataSetType = this.recordDefinitionFactory.getRecordDefinition("/SpatialDataSet");
+      final RecordDefinitionImpl type = (RecordDefinitionImpl)this.recordDefinitionFactory
+        .getRecordDefinition(typePath);
+      final RecordDefinition spatialDataSetType = this.recordDefinitionFactory
+        .getRecordDefinition("/SpatialDataSet");
       if (type != null && type.isInstanceOf(spatialDataSetType)) {
         final String oiName = this.osnIterator.nextFieldName();
 

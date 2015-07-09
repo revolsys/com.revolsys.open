@@ -61,13 +61,16 @@ public final class ProjectionFactory {
     final Projection projection = coordinateSystem.getProjection();
     final String projectionName = projection.getNormalizedName();
     synchronized (projectionClasses) {
-      final Class<? extends CoordinatesProjection> projectionClass = projectionClasses.get(projectionName);
+      final Class<? extends CoordinatesProjection> projectionClass = projectionClasses
+        .get(projectionName);
       if (projectionClass == null) {
         return null;
       } else {
         try {
-          final Constructor<? extends CoordinatesProjection> constructor = projectionClass.getConstructor(ProjectedCoordinateSystem.class);
-          final CoordinatesProjection coordinateProjection = constructor.newInstance(coordinateSystem);
+          final Constructor<? extends CoordinatesProjection> constructor = projectionClass
+            .getConstructor(ProjectedCoordinateSystem.class);
+          final CoordinatesProjection coordinateProjection = constructor
+            .newInstance(coordinateSystem);
           return coordinateProjection;
         } catch (final NoSuchMethodException e) {
           throw new IllegalArgumentException("Constructor " + projectionClass + "("

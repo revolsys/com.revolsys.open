@@ -65,8 +65,8 @@ public class MavenPom extends LinkedHashMap<String, Object> {
           if (!childTree.isEmpty()) {
             hasChildren = true;
           }
-        } else if (addDependenciesFromTree(dependencies, childPath, childTree, depth + 1,
-          searchDepth)) {
+        } else
+          if (addDependenciesFromTree(dependencies, childPath, childTree, depth + 1, searchDepth)) {
           hasChildren = true;
         }
       }
@@ -161,9 +161,11 @@ public class MavenPom extends LinkedHashMap<String, Object> {
     if (parent != null) {
       versions.putAll(parent.getDependencyVersions());
     }
-    final Map<String, Object> dependencyManagement = (Map<String, Object>)get("dependencyManagement");
+    final Map<String, Object> dependencyManagement = (Map<String, Object>)get(
+      "dependencyManagement");
     if (dependencyManagement != null) {
-      final Map<String, Object> dependencyMap = (Map<String, Object>)dependencyManagement.get("dependencies");
+      final Map<String, Object> dependencyMap = (Map<String, Object>)dependencyManagement
+        .get("dependencies");
       if (dependencyMap != null) {
         final List<Map<String, Object>> dependencyList = getList(dependencyMap, "dependency");
         if (dependencyList != null) {

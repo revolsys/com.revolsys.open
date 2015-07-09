@@ -45,8 +45,8 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
     final ImageIcon icon = Icons.getIcon(iconName);
 
     final EnableCheck enableCheck = new MenuSourcePropertyEnableCheck("class", rendererClass, true);
-    final InvokeMethodAction action = MenuSourceRunnable.createAction("Convert to " + type
-      + " Style", icon, enableCheck, "convertTo" + type + "Style");
+    final InvokeMethodAction action = MenuSourceRunnable.createAction(
+      "Convert to " + type + " Style", icon, enableCheck, "convertTo" + type + "Style");
     menu.addMenuItem("convert", action);
   }
 

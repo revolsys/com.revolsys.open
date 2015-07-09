@@ -103,7 +103,8 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
   }
 
   @Override
-  public OgrRecordStore createRecordStore(final Map<String, ? extends Object> connectionProperties) {
+  public OgrRecordStore createRecordStore(
+    final Map<String, ? extends Object> connectionProperties) {
     final Map<String, Object> properties = new LinkedHashMap<String, Object>(connectionProperties);
     final String url = (String)properties.remove("url");
     final File file = FileUtil.getUrlFile(url);

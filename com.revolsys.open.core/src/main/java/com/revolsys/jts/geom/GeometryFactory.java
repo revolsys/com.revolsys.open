@@ -328,13 +328,15 @@ public class GeometryFactory implements Serializable, MapSerializer {
     if (esriCoordinateSystem == null) {
       return floating3();
     } else {
-      final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(esriCoordinateSystem);
+      final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems
+        .getCoordinateSystem(esriCoordinateSystem);
       final int srid = epsgCoordinateSystem.getId();
       return fixed(srid, 0.0, 0.0);
     }
   }
 
-  private static Set<DataType> getGeometryDataTypes(final Collection<? extends Geometry> geometries) {
+  private static Set<DataType> getGeometryDataTypes(
+    final Collection<? extends Geometry> geometries) {
     final Set<DataType> dataTypes = new LinkedHashSet<DataType>();
     for (final Geometry geometry : geometries) {
       final DataType dataType = geometry.getDataType();
@@ -601,7 +603,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
           } else {
             final LineMerger merger = new LineMerger();
             merger.add(geometry);
-            final List<LineString> mergedLineStrings = (List<LineString>)merger.getMergedLineStrings();
+            final List<LineString> mergedLineStrings = merger.getMergedLineStrings();
             if (mergedLineStrings.size() == 1) {
               return (V)mergedLineStrings.get(0);
             }
@@ -1298,8 +1300,8 @@ public class GeometryFactory implements Serializable, MapSerializer {
     if (coordinates == null || coordinates.length == 0 || axisCount < 2) {
       return multiPoint();
     } else if (coordinates.length % axisCount != 0) {
-      throw new IllegalArgumentException("Coordinates length=" + coordinates.length
-        + " must be a multiple of " + axisCount);
+      throw new IllegalArgumentException(
+        "Coordinates length=" + coordinates.length + " must be a multiple of " + axisCount);
     } else {
       final Point[] points = new Point[coordinates.length / axisCount];
       for (int i = 0; i < points.length; i++) {

@@ -8,6 +8,7 @@ import java.io.IOException;
 public class ObjectTransferable<T> implements Transferable {
 
   public static final DataFlavor FLAVOR;
+
   static {
     try {
       FLAVOR = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType);
@@ -35,8 +36,8 @@ public class ObjectTransferable<T> implements Transferable {
   }
 
   @Override
-  public Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException,
-    IOException {
+  public Object getTransferData(final DataFlavor flavor)
+    throws UnsupportedFlavorException, IOException {
     if (isDataFlavorSupported(flavor)) {
       return this;
     } else {

@@ -16,8 +16,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.OutputStreamResource;
 
-public class Shapefile extends AbstractRecordIoFactory
-  implements RecordWriterFactory {
+public class Shapefile extends AbstractRecordIoFactory implements RecordWriterFactory {
   public Shapefile() {
     super(ShapefileConstants.DESCRIPTION);
     addMediaTypeAndFileExtension(ShapefileConstants.MIME_TYPE, ShapefileConstants.FILE_EXTENSION);

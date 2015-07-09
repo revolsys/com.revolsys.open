@@ -112,7 +112,7 @@ public class TestPerfDistanceGeomPair {
     }
     if (this.verbose) {
       // System.out.println("Finished in " + sw.getTimeString());
-      // System.out.println("       (Distance = " + dist + ")");
+      // System.out.println(" (Distance = " + dist + ")");
     }
   }
 

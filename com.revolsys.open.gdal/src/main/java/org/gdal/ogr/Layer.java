@@ -44,19 +44,20 @@ public class Layer {
   }
 
   public int Clip(final Layer method_layer, final Layer result_layer) {
-    return ogrJNI.Layer_Clip__SWIG_3(this.swigCPtr, this, Layer.getCPtr(method_layer),
-      method_layer, Layer.getCPtr(result_layer), result_layer);
+    return ogrJNI.Layer_Clip__SWIG_3(this.swigCPtr, this, Layer.getCPtr(method_layer), method_layer,
+      Layer.getCPtr(result_layer), result_layer);
   }
 
-  public int Clip(final Layer method_layer, final Layer result_layer, final java.util.Vector options) {
-    return ogrJNI.Layer_Clip__SWIG_2(this.swigCPtr, this, Layer.getCPtr(method_layer),
-      method_layer, Layer.getCPtr(result_layer), result_layer, options);
+  public int Clip(final Layer method_layer, final Layer result_layer,
+    final java.util.Vector options) {
+    return ogrJNI.Layer_Clip__SWIG_2(this.swigCPtr, this, Layer.getCPtr(method_layer), method_layer,
+      Layer.getCPtr(result_layer), result_layer, options);
   }
 
   public int Clip(final Layer method_layer, final Layer result_layer,
     final java.util.Vector options, final ProgressCallback callback) {
-    return ogrJNI.Layer_Clip__SWIG_0(this.swigCPtr, this, Layer.getCPtr(method_layer),
-      method_layer, Layer.getCPtr(result_layer), result_layer, options, callback);
+    return ogrJNI.Layer_Clip__SWIG_0(this.swigCPtr, this, Layer.getCPtr(method_layer), method_layer,
+      Layer.getCPtr(result_layer), result_layer, options, callback);
   }
 
   public int CommitTransaction() {
@@ -301,8 +302,8 @@ public class Layer {
   }
 
   public void SetSpatialFilter(final int iGeomField, final Geometry filter) {
-    ogrJNI.Layer_SetSpatialFilter__SWIG_1(this.swigCPtr, this, iGeomField,
-      Geometry.getCPtr(filter), filter);
+    ogrJNI.Layer_SetSpatialFilter__SWIG_1(this.swigCPtr, this, iGeomField, Geometry.getCPtr(filter),
+      filter);
   }
 
   public void SetSpatialFilterRect(final double minx, final double miny, final double maxx,

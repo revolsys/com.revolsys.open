@@ -21,7 +21,8 @@ public class TableHeadingDecorator implements Decorator {
   public static void addRow(final ElementContainer container, final Element element,
     final String labelUrl, final String label, final String instructions) {
 
-    final TableHeadingDecorator decorator = new TableHeadingDecorator(labelUrl, label, instructions);
+    final TableHeadingDecorator decorator = new TableHeadingDecorator(labelUrl, label,
+      instructions);
     final TableRow row = new TableRow();
     row.add(element, decorator);
     container.add(row);
@@ -44,7 +45,8 @@ public class TableHeadingDecorator implements Decorator {
     this.instructions = instructions;
   }
 
-  public TableHeadingDecorator(final String labelUrl, final String label, final String instructions) {
+  public TableHeadingDecorator(final String labelUrl, final String label,
+    final String instructions) {
     this.labelUrl = labelUrl;
     this.label = label;
     this.instructions = instructions;

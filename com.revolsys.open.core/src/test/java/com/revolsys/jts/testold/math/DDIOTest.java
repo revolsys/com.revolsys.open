@@ -1,9 +1,9 @@
 package com.revolsys.jts.testold.math;
 
+import com.revolsys.jts.math.DD;
+
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
-
-import com.revolsys.jts.math.DD;
 
 /**
  * Tests I/O for {@link DD}s.
@@ -75,10 +75,8 @@ public class DDIOTest extends TestCase {
     checkParse("-1.05e10", -1.05E10, 1e-32);
     checkParse("1.05e-10", DD.valueOf(105.).divide(DD.valueOf(100.)).divide(DD.valueOf(1.0E10)),
       1e-32);
-    checkParse("-1.05e-10", DD.valueOf(105.)
-      .divide(DD.valueOf(100.))
-      .divide(DD.valueOf(1.0E10))
-      .negate(), 1e-32);
+    checkParse("-1.05e-10",
+      DD.valueOf(105.).divide(DD.valueOf(100.)).divide(DD.valueOf(1.0E10)).negate(), 1e-32);
 
     /**
      * The Java double-precision constant 1.4 gives rise to a value which
@@ -157,7 +155,7 @@ public class DDIOTest extends TestCase {
     final DD xSqrt2 = DD.parse(s);
     final DD xx = xSqrt2.multiply(xSqrt2);
     final String xxStr = xx.toString();
-    // System.out.println("==>  " + xxStr);
+    // System.out.println("==> " + xxStr);
 
     final DD xx2 = DD.parse(xxStr);
     final double err = Math.abs(xx2.doubleValue() - x);

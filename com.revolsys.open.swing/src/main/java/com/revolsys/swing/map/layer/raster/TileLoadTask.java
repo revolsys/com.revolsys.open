@@ -12,8 +12,8 @@ public class TileLoadTask implements Runnable {
 
   private final TiledImageLayerRenderer renderer;
 
-  public TileLoadTask(final TiledImageLayerRenderer renderer,
-    final GeometryFactory geometryFactory, final MapTile mapTile) {
+  public TileLoadTask(final TiledImageLayerRenderer renderer, final GeometryFactory geometryFactory,
+    final MapTile mapTile) {
     this.renderer = renderer;
     this.geometryFactory = geometryFactory;
     this.mapTile = mapTile;

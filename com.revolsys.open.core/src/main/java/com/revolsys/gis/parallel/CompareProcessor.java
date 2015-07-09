@@ -212,7 +212,8 @@ public class CompareProcessor extends AbstractMergeProcess {
   }
 
   @Override
-  protected void processObjects(final RecordDefinition recordDefinition, final Channel<Record> out) {
+  protected void processObjects(final RecordDefinition recordDefinition,
+    final Channel<Record> out) {
     if (this.otherIndex.size() + this.otherPointMap.size() == 0) {
       if (this.logNotEqualSource) {
         for (final Record object : this.sourceObjects) {

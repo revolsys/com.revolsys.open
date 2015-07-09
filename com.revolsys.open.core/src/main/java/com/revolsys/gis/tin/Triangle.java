@@ -46,8 +46,8 @@ public class Triangle extends AbstractLineString {
 
   public Triangle(final Point... points) {
     if (points.length > 3) {
-      throw new IllegalArgumentException("A traingle must have exeactly 3 points not "
-        + getVertexCount());
+      throw new IllegalArgumentException(
+        "A traingle must have exeactly 3 points not " + getVertexCount());
     }
     for (int i = 0; i < 3; i++) {
       final Point point = points[i];

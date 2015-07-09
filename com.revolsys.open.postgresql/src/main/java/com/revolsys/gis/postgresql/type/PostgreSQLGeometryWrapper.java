@@ -75,8 +75,8 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     return geometryFactory.geometryCollection(geoms);
   }
 
-  private double[] parseCoordinates(final int axisCount, final ValueGetter data,
-    final boolean hasZ, final boolean hasM) {
+  private double[] parseCoordinates(final int axisCount, final ValueGetter data, final boolean hasZ,
+    final boolean hasM) {
     final int vertexCount = data.getInt();
     final double[] coordinates = new double[axisCount * vertexCount];
 
@@ -180,7 +180,8 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     return geometryFactory.multiLineString(lines);
   }
 
-  private MultiPoint parseMultiPoint(final GeometryFactory geometryFactory, final ValueGetter data) {
+  private MultiPoint parseMultiPoint(final GeometryFactory geometryFactory,
+    final ValueGetter data) {
     final Point[] points = new Point[data.getInt()];
     parseGeometryArray(data, points);
     return geometryFactory.multiPoint(points);

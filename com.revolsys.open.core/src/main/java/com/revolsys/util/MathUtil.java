@@ -168,7 +168,8 @@ public final class MathUtil {
    * @param y2 The second y coordinate.
    * @return The distance.
    */
-  public static double distance(final double x1, final double y1, final double x2, final double y2) {
+  public static double distance(final double x1, final double y1, final double x2,
+    final double y2) {
     final double dx = x2 - x1;
     final double dy = y2 - y1;
 
@@ -592,8 +593,8 @@ public final class MathUtil {
       final DecimalFormat format = new DecimalFormat();
       format.setMinimumFractionDigits(0);
       format.setMaximumFractionDigits(scale);
-      final String string = format.format(decimalPercent.multiply(new BigDecimal(100)).setScale(
-        scale, BigDecimal.ROUND_HALF_UP))
+      final String string = format.format(
+        decimalPercent.multiply(new BigDecimal(100)).setScale(scale, BigDecimal.ROUND_HALF_UP))
         + "%";
 
       return string;
@@ -637,7 +638,8 @@ public final class MathUtil {
     return Math.abs(s) * Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   }
 
-  public static boolean precisionEqual(final double value1, final double value2, final double scale) {
+  public static boolean precisionEqual(final double value1, final double value2,
+    final double scale) {
     if (Double.isNaN(value1) && Double.isNaN(value2)) {
       return true;
     } else if (Double.isInfinite(value1) || Double.isInfinite(value2)) {

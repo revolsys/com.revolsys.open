@@ -27,7 +27,7 @@ import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 
-public class JdbcQueryIterator extends AbstractIterator<Record> implements RecordIterator {
+public class JdbcQueryIterator extends AbstractIterator<Record>implements RecordIterator {
 
   public static Record getNextRecord(final JdbcRecordStore recordStore,
     final RecordDefinition recordDefinition, final List<FieldDefinition> fields,
@@ -41,8 +41,8 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
         try {
           columnIndex = jdbcField.setFieldValueFromResultSet(resultSet, columnIndex, record);
         } catch (final SQLException e) {
-          throw new RuntimeException("Unable to get value " + (columnIndex + 1)
-            + " from result set", e);
+          throw new RuntimeException(
+            "Unable to get value " + (columnIndex + 1) + " from result set", e);
         }
       }
       record.setState(RecordState.Persisted);
@@ -206,7 +206,8 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
 
       final String typePath = this.query.getTypeNameAlias();
       if (typePath != null) {
-        final RecordDefinitionImpl newRecordDefinition = ((RecordDefinitionImpl)this.recordDefinition).rename(typePath);
+        final RecordDefinitionImpl newRecordDefinition = ((RecordDefinitionImpl)this.recordDefinition)
+          .rename(typePath);
         this.recordDefinition = newRecordDefinition;
       }
     } catch (final SQLException e) {

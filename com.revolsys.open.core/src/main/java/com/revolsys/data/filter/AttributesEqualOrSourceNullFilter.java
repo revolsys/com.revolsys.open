@@ -31,7 +31,8 @@ public class AttributesEqualOrSourceNullFilter implements Filter<Record> {
 
   private final Record object;
 
-  public AttributesEqualOrSourceNullFilter(final Record object, final Collection<String> fieldNames) {
+  public AttributesEqualOrSourceNullFilter(final Record object,
+    final Collection<String> fieldNames) {
     this.fieldNames = fieldNames;
     this.object = object;
   }

@@ -103,17 +103,17 @@ public class OptionSpec {
       // args must be ok
     } else if (this.nAllowedArgs == NARGS_ONE_OR_MORE) {
       if (args.length <= 0) {
-        throw new ParseException("option " + this.name + ": expected one or more args, found "
-          + args.length);
+        throw new ParseException(
+          "option " + this.name + ": expected one or more args, found " + args.length);
       }
     } else if (this.nAllowedArgs == NARGS_ZERO_OR_ONE) {
       if (args.length > 1) {
-        throw new ParseException("option " + this.name + ": expected zero or one arg, found "
-          + args.length);
+        throw new ParseException(
+          "option " + this.name + ": expected zero or one arg, found " + args.length);
       }
     } else if (args.length != this.nAllowedArgs) {
-      throw new ParseException("option " + this.name + ": expected " + this.nAllowedArgs
-        + " args, found " + args.length);
+      throw new ParseException(
+        "option " + this.name + ": expected " + this.nAllowedArgs + " args, found " + args.length);
     }
   }
 

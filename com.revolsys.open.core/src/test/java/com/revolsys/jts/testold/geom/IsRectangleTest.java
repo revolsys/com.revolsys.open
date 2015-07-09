@@ -32,11 +32,11 @@
  */
 package com.revolsys.jts.testold.geom;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.io.WKTReader;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 /**
  * Test named predicate short-circuits
@@ -70,7 +70,8 @@ public class IsRectangleTest extends TestCase {
   }
 
   public void testRectangleWithHole() throws Exception {
-    assertTrue(!isRectangle("POLYGON ((0 0, 0 100, 100 100, 100 0, 0 0), (10 10, 10 90, 90 90, 90 10, 10 10) ))"));
+    assertTrue(!isRectangle(
+      "POLYGON ((0 0, 0 100, 100 100, 100 0, 0 0), (10 10, 10 90, 90 90, 90 10, 10 10) ))"));
   }
 
   public void testRectangularLinestring() throws Exception {

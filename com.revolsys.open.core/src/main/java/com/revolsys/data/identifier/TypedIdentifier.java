@@ -17,8 +17,8 @@ public class TypedIdentifier extends AbstractIdentifier {
       if (existingType.equals(type)) {
         return typedIdentifier;
       } else {
-        throw new IllegalArgumentException("Cannot convert id " + typedIdentifier + " to type="
-          + type);
+        throw new IllegalArgumentException(
+          "Cannot convert id " + typedIdentifier + " to type=" + type);
       }
     } else if (id instanceof String) {
       final String string = (String)id;

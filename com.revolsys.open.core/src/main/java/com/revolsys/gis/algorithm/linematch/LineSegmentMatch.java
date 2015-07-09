@@ -15,7 +15,8 @@ public class LineSegmentMatch {
 
   private final List<LineSegment> segments = new ArrayList<LineSegment>();
 
-  public LineSegmentMatch(final GeometryFactory geometryFactory, final Point start, final Point end) {
+  public LineSegmentMatch(final GeometryFactory geometryFactory, final Point start,
+    final Point end) {
     this(new LineSegmentDoubleGF(geometryFactory, start, end));
   }
 

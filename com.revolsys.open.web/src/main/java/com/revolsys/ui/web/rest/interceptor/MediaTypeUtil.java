@@ -91,7 +91,8 @@ public class MediaTypeUtil {
 
   public static List<MediaType> getAcceptedMediaTypes(final HttpServletRequest request,
     final Map<String, MediaType> extensionToMediaTypeMap, final List<String> mediaTypeOrder,
-    final UrlPathHelper urlPathHelper, final String parameterName, final MediaType defaultMediaType) {
+    final UrlPathHelper urlPathHelper, final String parameterName,
+    final MediaType defaultMediaType) {
 
     final List<MediaType> mediaTypes = new ArrayList<MediaType>();
     for (final String source : mediaTypeOrder) {
@@ -175,8 +176,8 @@ public class MediaTypeUtil {
 
   public static MediaType getRequestMediaType(final HttpServletRequest request,
     final Map<String, MediaType> extensionToMediaTypeMap, final List<String> mediaTypeOrder,
-    final UrlPathHelper urlPathHelper, final String parameterName,
-    final MediaType defaultMediaType, final String fileName) {
+    final UrlPathHelper urlPathHelper, final String parameterName, final MediaType defaultMediaType,
+    final String fileName) {
     for (final String source : mediaTypeOrder) {
       if (source.equals("fileName")) {
         final MediaType mediaType = getMediaTypeFromFilename(extensionToMediaTypeMap, fileName);

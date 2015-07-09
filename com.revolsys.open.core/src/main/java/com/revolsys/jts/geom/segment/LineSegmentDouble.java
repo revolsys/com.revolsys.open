@@ -81,8 +81,8 @@ public class LineSegmentDouble extends AbstractLineSegment {
         }
       }
     } else {
-      throw new IllegalArgumentException("(coordinates.length) " + coordinates.length + " != 2 * "
-        + axisCount + " (axisCount)");
+      throw new IllegalArgumentException(
+        "(coordinates.length) " + coordinates.length + " != 2 * " + axisCount + " (axisCount)");
     }
   }
 
@@ -104,8 +104,8 @@ public class LineSegmentDouble extends AbstractLineSegment {
     } else if (coordinates.length % axisCount == 0 && coordinates.length / 2 == axisCount) {
       this.coordinates = coordinates;
     } else {
-      throw new IllegalArgumentException("(coordinates.length) " + coordinates.length + " != 2 * "
-        + axisCount + " (axisCount)");
+      throw new IllegalArgumentException(
+        "(coordinates.length) " + coordinates.length + " != 2 * " + axisCount + " (axisCount)");
     }
   }
 

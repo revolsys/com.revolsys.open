@@ -133,7 +133,8 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware, Di
         this.applicationContext.setClassLoader(classLoader);
       }
       AnnotationConfigUtils.registerAnnotationConfigProcessors(this.applicationContext, null);
-      final DefaultListableBeanFactory beanFactory = this.applicationContext.getDefaultListableBeanFactory();
+      final DefaultListableBeanFactory beanFactory = this.applicationContext
+        .getDefaultListableBeanFactory();
 
       final BeanFactory parentBeanFactory = (BeanFactory)parentRegistry;
       for (final String beanName : parentRegistry.getBeanDefinitionNames()) {
@@ -163,7 +164,8 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware, Di
         this.applicationContext, this.parameters);
       this.applicationContext.addBeanFactoryPostProcessor(attributesConfig);
       for (final String beanName : this.importBeanNames) {
-        registerTargetBeanDefinition(this.applicationContext, parentBeanFactory, beanName, beanName);
+        registerTargetBeanDefinition(this.applicationContext, parentBeanFactory, beanName,
+          beanName);
         this.beanNamesNotToExport.add(beanName);
       }
       for (final Entry<String, String> entry : this.importBeanAliases.entrySet()) {

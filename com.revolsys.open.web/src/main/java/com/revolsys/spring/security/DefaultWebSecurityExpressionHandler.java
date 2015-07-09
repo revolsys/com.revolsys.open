@@ -14,9 +14,9 @@ import org.springframework.util.Assert;
  * @author Luke Taylor
  * @since 3.0
  */
-public class DefaultWebSecurityExpressionHandler extends
-  AbstractSecurityExpressionHandler<FilterInvocation> implements
-  SecurityExpressionHandler<FilterInvocation> {
+public class DefaultWebSecurityExpressionHandler
+  extends AbstractSecurityExpressionHandler<FilterInvocation>
+  implements SecurityExpressionHandler<FilterInvocation> {
 
   private AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
 

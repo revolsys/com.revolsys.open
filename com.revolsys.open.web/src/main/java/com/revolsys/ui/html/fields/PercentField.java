@@ -37,8 +37,8 @@ public class PercentField extends BigDecimalField {
       final BigDecimal decimal = (BigDecimal)getInitialValue(request);
       setValue(decimal);
       if (getValue() != null) {
-        setValue(decimal.multiply(new BigDecimal(100)).setScale(getScale(),
-          BigDecimal.ROUND_HALF_UP));
+        setValue(
+          decimal.multiply(new BigDecimal(100)).setScale(getScale(), BigDecimal.ROUND_HALF_UP));
         final DecimalFormat format = new DecimalFormat();
         format.setMinimumFractionDigits(0);
         format.setMaximumFractionDigits(getScale());

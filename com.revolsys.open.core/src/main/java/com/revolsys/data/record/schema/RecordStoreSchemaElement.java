@@ -2,8 +2,8 @@ package com.revolsys.data.record.schema;
 
 import com.revolsys.properties.ObjectWithProperties;
 
-public interface RecordStoreSchemaElement extends ObjectWithProperties,
-  Comparable<RecordStoreSchemaElement> {
+public interface RecordStoreSchemaElement
+  extends ObjectWithProperties, Comparable<RecordStoreSchemaElement> {
   boolean equalPath(String path);
 
   String getName();

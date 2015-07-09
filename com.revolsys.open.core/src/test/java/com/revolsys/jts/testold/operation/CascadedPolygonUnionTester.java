@@ -44,7 +44,7 @@ public class CascadedPolygonUnionTester {
     final double overallMeasure = SimilarityMeasureCombiner.combine(areaMeasure, hausMeasure);
 
     // System.out.println("Area measure = " + areaMeasure
-    // + "   Hausdorff measure = " + hausMeasure + "    Overall = "
+    // + " Hausdorff measure = " + hausMeasure + " Overall = "
     // + overallMeasure);
 
     return overallMeasure > minimumMeasure;
@@ -56,11 +56,10 @@ public class CascadedPolygonUnionTester {
    * WKTFileReader(filename, wktRdr); List geoms = fileRdr.read();
    * System.out.println("Computing Iterated union"); Geometry union1 =
    * unionIterated(geoms); System.out.println("Computing Cascaded union");
-   * Geometry union2 = unionCascaded(geoms);
-   * System.out.println("Testing similarity with tolerance = " +
-   * distanceTolerance); boolean isSameWithinTolerance =
-   * SimilarityValidator.isSimilar(union1, union2, distanceTolerance);
-   * assertTrue(isSameWithinTolerance); }
+   * Geometry union2 = unionCascaded(geoms); System.out.println(
+   * "Testing similarity with tolerance = " + distanceTolerance); boolean
+   * isSameWithinTolerance = SimilarityValidator.isSimilar(union1, union2,
+   * distanceTolerance); assertTrue(isSameWithinTolerance); }
    */
 
   public Geometry unionCascaded(final Collection geoms) {

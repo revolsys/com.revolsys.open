@@ -95,8 +95,8 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
-public class QueryWhereConditionField extends ValueField implements MouseListener, CaretListener,
-  ItemListener {
+public class QueryWhereConditionField extends ValueField
+  implements MouseListener, CaretListener, ItemListener {
 
   private static final ImageIcon ICON = Icons.getIcon("add");
 
@@ -304,12 +304,13 @@ public class QueryWhereConditionField extends ValueField implements MouseListene
             try {
               fieldValue = StringConverterRegistry.toObject(attributeClass, fieldValue);
             } catch (final Throwable e) {
-              setInvalidMessage("'" + fieldValue + "' is not a valid "
-                + attribute.getType().getValidationName());
+              setInvalidMessage(
+                "'" + fieldValue + "' is not a valid " + attribute.getType().getValidationName());
               return;
             }
           } else {
-            final List<Object> values = this.codeTable.getValues(SingleIdentifier.create(fieldValue));
+            final List<Object> values = this.codeTable
+              .getValues(SingleIdentifier.create(fieldValue));
             if (values.size() == 1) {
               fieldValue = values.get(0);
             } else {
@@ -355,8 +356,8 @@ public class QueryWhereConditionField extends ValueField implements MouseListene
             try {
               fieldValue = StringConverterRegistry.toObject(attributeClass, fieldValue);
             } catch (final Throwable e) {
-              setInvalidMessage("'" + fieldValue + "' is not a valid "
-                + attribute.getType().getValidationName());
+              setInvalidMessage(
+                "'" + fieldValue + "' is not a valid " + attribute.getType().getValidationName());
               return;
             }
           } else {
@@ -489,12 +490,12 @@ public class QueryWhereConditionField extends ValueField implements MouseListene
       } catch (final BadLocationException e) {
         previousText = "";
       }
-      if (!Property.hasValue(previousText)
-        || !previousText.matches(".*"
-          + operator.replaceAll("\\(", "\\\\(")
-            .replaceAll("\\)", "\\\\)")
-            .replaceAll("\\*", "\\\\*")
-            .replaceAll("\\+", "\\\\+") + "\\s*$")) {
+      if (!Property.hasValue(previousText) || !previousText.matches(".*"
+        + operator.replaceAll("\\(", "\\\\(")
+          .replaceAll("\\)", "\\\\)")
+          .replaceAll("\\*", "\\\\*")
+          .replaceAll("\\+", "\\\\+")
+        + "\\s*$")) {
         final Document document = this.whereTextField.getDocument();
         try {
           if (Property.hasValue(previousText)
@@ -516,7 +517,8 @@ public class QueryWhereConditionField extends ValueField implements MouseListene
         final FieldDefinition field = (FieldDefinition)event.getItem();
         final String fieldName = field.getName();
         this.codeTable = this.recordDefinition.getCodeTableByFieldName(fieldName);
-        final JComponent binaryConditionField = createSearchField(this.layer, field, this.codeTable);
+        final JComponent binaryConditionField = createSearchField(this.layer, field,
+          this.codeTable);
         final JComponent inConditionField = createSearchField(this.layer, field, this.codeTable);
 
         if (this.codeTable == null) {
@@ -591,8 +593,8 @@ public class QueryWhereConditionField extends ValueField implements MouseListene
   public void save() {
     super.save();
     final Condition condition = getFieldValue();
-    this.listener.propertyChange(new PropertyChangeEvent(this, "filter", this.originalFilter,
-      condition));
+    this.listener
+      .propertyChange(new PropertyChangeEvent(this, "filter", this.originalFilter, condition));
   }
 
   @Override
@@ -601,8 +603,7 @@ public class QueryWhereConditionField extends ValueField implements MouseListene
     if (this.valid) {
       super.save(dialog);
     } else {
-      JOptionPane.showMessageDialog(
-        this,
+      JOptionPane.showMessageDialog(this,
         "<html><p>Cannot save the advanced query as the SQL is valid.<p></p>Fix the SQL or use the cancel button on the Advanced Search window to cancel the changes.<p></html>",
         "SQL Invalid", JOptionPane.ERROR_MESSAGE);
     }
@@ -714,8 +715,8 @@ public class QueryWhereConditionField extends ValueField implements MouseListene
           if (rightCondition instanceof Value) {
             final Object value = ((Value)rightCondition).getValue();
             if (value == null) {
-              setInvalidMessage("Values can't be null for " + operator
-                + " use IS NULL or IS NOT NULL instead.");
+              setInvalidMessage(
+                "Values can't be null for " + operator + " use IS NULL or IS NOT NULL instead.");
             } else {
               final Column column = (Column)leftCondition;
 

@@ -4,7 +4,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Bcgs2500RectangularMapGrid extends Bcgs5000RectangularMapGrid {
-  private static final Pattern NAME_PATTERN = Pattern.compile("^" + BcgsConstants.REGEX_2500 + ".*");
+  private static final Pattern NAME_PATTERN = Pattern
+    .compile("^" + BcgsConstants.REGEX_2500 + ".*");
 
   public Bcgs2500RectangularMapGrid() {
     this(BcgsConstants.WIDTH_2500, BcgsConstants.HEIGHT_2500);
@@ -29,8 +30,8 @@ public class Bcgs2500RectangularMapGrid extends Bcgs5000RectangularMapGrid {
         number2500);
       return latitude;
     } else {
-      throw new IllegalArgumentException(mapTileName
-        + " does not start with a valid BCGS 1:2,500 tile name");
+      throw new IllegalArgumentException(
+        mapTileName + " does not start with a valid BCGS 1:2,500 tile name");
     }
   }
 
@@ -56,13 +57,13 @@ public class Bcgs2500RectangularMapGrid extends Bcgs5000RectangularMapGrid {
         number2500);
       return longitude;
     } else {
-      throw new IllegalArgumentException(mapTileName
-        + " does not start with a valid BCGS 1:2,500 tile name");
+      throw new IllegalArgumentException(
+        mapTileName + " does not start with a valid BCGS 1:2,500 tile name");
     }
   }
 
-  protected double getLongitude(final String blockName, final String letter,
-    final String number20k, final String number10k, final String number5k, final String number2500) {
+  protected double getLongitude(final String blockName, final String letter, final String number20k,
+    final String number10k, final String number5k, final String number2500) {
     double longitude = getLongitude(blockName, letter, number20k, number10k, number5k);
     final int numberCol = GridUtil.getNumberCol4(number2500);
     longitude -= numberCol * BcgsConstants.WIDTH_2500;

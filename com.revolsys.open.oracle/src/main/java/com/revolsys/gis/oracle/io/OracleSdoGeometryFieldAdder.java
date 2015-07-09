@@ -83,7 +83,8 @@ public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
 
   private static final Logger LOG = LoggerFactory.getLogger(OracleSdoGeometryFieldAdder.class);
 
-  private static void addGeometryType(final DataType dataType, final String name, final Integer id) {
+  private static void addGeometryType(final DataType dataType, final String name,
+    final Integer id) {
     ID_TO_GEOMETRY_TYPE.put(id, name);
     GEOMETRY_TYPE_TO_ID.put(name, id);
     ID_TO_DATA_TYPE.put(id, dataType);

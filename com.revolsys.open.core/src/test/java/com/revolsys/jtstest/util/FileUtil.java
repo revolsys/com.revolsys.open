@@ -107,8 +107,8 @@ public class FileUtil {
   /**
    * Returns a List of the String's in the text file, one per line.
    */
-  public static List getContents(final String textFileName) throws FileNotFoundException,
-    IOException {
+  public static List getContents(final String textFileName)
+    throws FileNotFoundException, IOException {
     final List contents = new Vector();
     final FileReader fileReader = new FileReader(textFileName);
     final BufferedReader bufferedReader = new BufferedReader(fileReader);

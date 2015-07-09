@@ -73,8 +73,8 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
     super(dbName, name, type, -1, 0, 0, required, description, properties);
     this.spatialReference = spatialReference;
     final GeometryFactory factory = spatialReference.getGeometryFactory();
-    this.geometryFactory = GeometryFactory.fixed(factory.getSrid(), dimension,
-      factory.getScaleXY(), factory.getScaleZ());
+    this.geometryFactory = GeometryFactory.fixed(factory.getSrid(), dimension, factory.getScaleXY(),
+      factory.getScaleZ());
     this.dimension = dimension;
     setProperty(FieldProperties.GEOMETRY_FACTORY, this.geometryFactory);
   }

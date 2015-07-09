@@ -58,8 +58,8 @@ public class Octant {
    */
   public static int octant(final double dx, final double dy) {
     if (dx == 0.0 && dy == 0.0) {
-      throw new IllegalArgumentException("Cannot compute the octant for point ( " + dx + ", " + dy
-        + " )");
+      throw new IllegalArgumentException(
+        "Cannot compute the octant for point ( " + dx + ", " + dy + " )");
     }
 
     final double adx = Math.abs(dx);
@@ -103,7 +103,8 @@ public class Octant {
     final double dx = p1.getX() - p0.getX();
     final double dy = p1.getY() - p0.getY();
     if (dx == 0.0 && dy == 0.0) {
-      throw new IllegalArgumentException("Cannot compute the octant for two identical points " + p0);
+      throw new IllegalArgumentException(
+        "Cannot compute the octant for two identical points " + p0);
     }
     return octant(dx, dy);
   }

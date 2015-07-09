@@ -2,9 +2,9 @@ package com.revolsys.jtstest.testrunner;
 
 import java.io.File;
 
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.GeometryFactory;
+
+import junit.textui.TestRunner;
 
 public class TopologyTest {
 

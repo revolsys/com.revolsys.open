@@ -94,8 +94,8 @@ public class SpringLayoutUtil {
       final Constraints containerConstraints = springLayout.getConstraints(container);
       containerConstraints.setWidth(Spring.sum(columnX[numColumns - 1],
         Spring.sum(columnWidths[numColumns - 1], initialXSpring)));
-      containerConstraints.setHeight(Spring.sum(rowY[numRows - 1],
-        Spring.sum(rowHeights[numRows - 1], initialYSpring)));
+      containerConstraints.setHeight(
+        Spring.sum(rowY[numRows - 1], Spring.sum(rowHeights[numRows - 1], initialYSpring)));
 
       for (int i = 0; i < components.length; i++) {
         final Component component = components[i];

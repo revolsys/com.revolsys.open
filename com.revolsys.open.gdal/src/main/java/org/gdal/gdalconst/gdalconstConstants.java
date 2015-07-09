@@ -147,9 +147,11 @@ public interface gdalconstConstants {
 
   public final static String GDAL_DMD_EXTENSION = gdalconstJNI.GDAL_DMD_EXTENSION_get();
 
-  public final static String GDAL_DMD_CREATIONOPTIONLIST = gdalconstJNI.GDAL_DMD_CREATIONOPTIONLIST_get();
+  public final static String GDAL_DMD_CREATIONOPTIONLIST = gdalconstJNI
+    .GDAL_DMD_CREATIONOPTIONLIST_get();
 
-  public final static String GDAL_DMD_CREATIONDATATYPES = gdalconstJNI.GDAL_DMD_CREATIONDATATYPES_get();
+  public final static String GDAL_DMD_CREATIONDATATYPES = gdalconstJNI
+    .GDAL_DMD_CREATIONDATATYPES_get();
 
   public final static String GDAL_DMD_SUBDATASETS = gdalconstJNI.GDAL_DMD_SUBDATASETS_get();
 

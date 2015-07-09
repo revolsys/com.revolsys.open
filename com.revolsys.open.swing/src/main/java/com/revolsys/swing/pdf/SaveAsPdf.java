@@ -35,8 +35,8 @@ public class SaveAsPdf {
 
       final int srid = boundingBox.getSrid();
       if (srid == 3857) {
-        boundingBox = boundingBox.convert(boundingBox.getGeometryFactory()
-          .getGeographicGeometryFactory());
+        boundingBox = boundingBox
+          .convert(boundingBox.getGeometryFactory().getGeographicGeometryFactory());
       }
       final PDRectangle pageSize = new PDRectangle(width, height);
       final PDPage page = new PDPage(pageSize);

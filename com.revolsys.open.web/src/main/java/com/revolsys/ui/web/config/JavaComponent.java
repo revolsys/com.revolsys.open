@@ -150,18 +150,14 @@ public class JavaComponent extends Component {
     try {
       this.setPropertyMethod = this.componentClass.getMethod("setProperty", SET_PROPERTY_ARGS);
     } catch (final NoSuchMethodException e) {
-      throw new IllegalArgumentException(
-        "Class "
-          + className
-          + " must have a method with the signature 'public void setProperty(String name, Object value)'");
+      throw new IllegalArgumentException("Class " + className
+        + " must have a method with the signature 'public void setProperty(String name, Object value)'");
     }
     try {
       this.serializeMethod = this.componentClass.getMethod("serialize", SERIALIZE_METHOD_ARGS);
     } catch (final NoSuchMethodException e) {
-      throw new IllegalArgumentException(
-        "Class "
-          + className
-          + " must have a method with the signature 'public void serialize(Writer out) throws IOException'");
+      throw new IllegalArgumentException("Class " + className
+        + " must have a method with the signature 'public void serialize(Writer out) throws IOException'");
     }
   }
 

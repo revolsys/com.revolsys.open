@@ -105,11 +105,12 @@ public class AddFileLayerAction extends AbstractAction {
     final Set<String> allExtensions = new TreeSet<String>();
     allExtensions.addAll(allRecordExtensions);
     allExtensions.addAll(allImageExtensions);
-    final FileNameExtensionFilter allFilter = createFileFilter("All Supported Files", allExtensions);
+    final FileNameExtensionFilter allFilter = createFileFilter("All Supported Files",
+      allExtensions);
     fileChooser.addChoosableFileFilter(allFilter);
 
-    fileChooser.addChoosableFileFilter(createFileFilter("All Vector/Record Files",
-      allRecordExtensions));
+    fileChooser
+      .addChoosableFileFilter(createFileFilter("All Vector/Record Files", allRecordExtensions));
 
     fileChooser.addChoosableFileFilter(createFileFilter("All Image Files", allImageExtensions));
 

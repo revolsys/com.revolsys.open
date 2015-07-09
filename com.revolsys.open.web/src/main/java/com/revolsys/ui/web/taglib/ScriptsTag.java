@@ -116,7 +116,8 @@ public class ScriptsTag extends TagSupport {
           }
         }
       }
-      final SiteNodeController controller = (SiteNodeController)this.pageContext.findAttribute("rsWebController");
+      final SiteNodeController controller = (SiteNodeController)this.pageContext
+        .findAttribute("rsWebController");
       if (controller instanceof PageController) {
         final PageController page = (PageController)controller;
         writeScripts(page.getScripts());

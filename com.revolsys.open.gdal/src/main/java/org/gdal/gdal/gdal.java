@@ -187,7 +187,8 @@ public class gdal {
     return gdalJNI.GCPsToGeoTransform__SWIG_1(nGCPs, argout);
   }
 
-  public static int GCPsToGeoTransform(final GCP[] nGCPs, final double[] argout, final int bApproxOK) {
+  public static int GCPsToGeoTransform(final GCP[] nGCPs, final double[] argout,
+    final int bApproxOK) {
     return gdalJNI.GCPsToGeoTransform__SWIG_0(nGCPs, argout, bApproxOK);
   }
 
@@ -437,7 +438,8 @@ public class gdal {
     return cPtr == 0 ? null : new Driver(cPtr, false);
   }
 
-  public static Driver IdentifyDriver(final String utf8_path, final java.util.Vector papszSiblings) {
+  public static Driver IdentifyDriver(final String utf8_path,
+    final java.util.Vector papszSiblings) {
     final long cPtr = gdalJNI.IdentifyDriver__SWIG_0(utf8_path, papszSiblings);
     return cPtr == 0 ? null : new Driver(cPtr, false);
   }
@@ -601,39 +603,40 @@ public class gdal {
       dst_ds);
   }
 
-  public static int ReprojectImage(final Dataset src_ds, final Dataset dst_ds, final String src_wkt) {
+  public static int ReprojectImage(final Dataset src_ds, final Dataset dst_ds,
+    final String src_wkt) {
     return gdalJNI.ReprojectImage__SWIG_6(Dataset.getCPtr(src_ds), src_ds, Dataset.getCPtr(dst_ds),
       dst_ds, src_wkt);
   }
 
-  public static int ReprojectImage(final Dataset src_ds, final Dataset dst_ds,
-    final String src_wkt, final String dst_wkt) {
+  public static int ReprojectImage(final Dataset src_ds, final Dataset dst_ds, final String src_wkt,
+    final String dst_wkt) {
     return gdalJNI.ReprojectImage__SWIG_5(Dataset.getCPtr(src_ds), src_ds, Dataset.getCPtr(dst_ds),
       dst_ds, src_wkt, dst_wkt);
   }
 
-  public static int ReprojectImage(final Dataset src_ds, final Dataset dst_ds,
-    final String src_wkt, final String dst_wkt, final int eResampleAlg) {
+  public static int ReprojectImage(final Dataset src_ds, final Dataset dst_ds, final String src_wkt,
+    final String dst_wkt, final int eResampleAlg) {
     return gdalJNI.ReprojectImage__SWIG_4(Dataset.getCPtr(src_ds), src_ds, Dataset.getCPtr(dst_ds),
       dst_ds, src_wkt, dst_wkt, eResampleAlg);
   }
 
-  public static int ReprojectImage(final Dataset src_ds, final Dataset dst_ds,
-    final String src_wkt, final String dst_wkt, final int eResampleAlg, final double WarpMemoryLimit) {
+  public static int ReprojectImage(final Dataset src_ds, final Dataset dst_ds, final String src_wkt,
+    final String dst_wkt, final int eResampleAlg, final double WarpMemoryLimit) {
     return gdalJNI.ReprojectImage__SWIG_3(Dataset.getCPtr(src_ds), src_ds, Dataset.getCPtr(dst_ds),
       dst_ds, src_wkt, dst_wkt, eResampleAlg, WarpMemoryLimit);
   }
 
-  public static int ReprojectImage(final Dataset src_ds, final Dataset dst_ds,
-    final String src_wkt, final String dst_wkt, final int eResampleAlg,
-    final double WarpMemoryLimit, final double maxerror) {
+  public static int ReprojectImage(final Dataset src_ds, final Dataset dst_ds, final String src_wkt,
+    final String dst_wkt, final int eResampleAlg, final double WarpMemoryLimit,
+    final double maxerror) {
     return gdalJNI.ReprojectImage__SWIG_2(Dataset.getCPtr(src_ds), src_ds, Dataset.getCPtr(dst_ds),
       dst_ds, src_wkt, dst_wkt, eResampleAlg, WarpMemoryLimit, maxerror);
   }
 
-  public static int ReprojectImage(final Dataset src_ds, final Dataset dst_ds,
-    final String src_wkt, final String dst_wkt, final int eResampleAlg,
-    final double WarpMemoryLimit, final double maxerror, final ProgressCallback callback) {
+  public static int ReprojectImage(final Dataset src_ds, final Dataset dst_ds, final String src_wkt,
+    final String dst_wkt, final int eResampleAlg, final double WarpMemoryLimit,
+    final double maxerror, final ProgressCallback callback) {
     return gdalJNI.ReprojectImage__SWIG_0(Dataset.getCPtr(src_ds), src_ds, Dataset.getCPtr(dst_ds),
       dst_ds, src_wkt, dst_wkt, eResampleAlg, WarpMemoryLimit, maxerror, callback);
   }

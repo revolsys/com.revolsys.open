@@ -40,10 +40,11 @@ public class SelectAllElement extends Element {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
     out.text("select ");
-    HtmlUtil.serializeA(out, this.cssClass, "javascript:setCheckboxState('" + this.formName + "','"
-      + this.fieldName + "',true)", "all");
-    HtmlUtil.serializeA(out, this.cssClass, "javascript:setCheckboxState('" + this.formName + "','"
-      + this.fieldName + "',false)", "none");
+    HtmlUtil.serializeA(out, this.cssClass,
+      "javascript:setCheckboxState('" + this.formName + "','" + this.fieldName + "',true)", "all");
+    HtmlUtil.serializeA(out, this.cssClass,
+      "javascript:setCheckboxState('" + this.formName + "','" + this.fieldName + "',false)",
+      "none");
     out.endTag(HtmlUtil.DIV);
   }
 }

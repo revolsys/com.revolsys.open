@@ -117,8 +117,8 @@ public class TinReader {
           final int index = (int)indexes[j];
           points[j] = nodeIdMap.get(index);
           if (points[j] == null) {
-            throw new IllegalArgumentException("Unable to get coordinates for triangle " + i
-              + " vert " + index);
+            throw new IllegalArgumentException(
+              "Unable to get coordinates for triangle " + i + " vert " + index);
           }
         }
         final Triangle triangle = new Triangle(points);

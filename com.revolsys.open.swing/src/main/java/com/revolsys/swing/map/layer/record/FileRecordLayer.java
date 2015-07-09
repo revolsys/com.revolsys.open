@@ -54,7 +54,8 @@ public class FileRecordLayer extends ListRecordLayer {
     final String fileNameExtension = FileUtil.getFileNameExtension(url);
     if (Property.hasValue(fileNameExtension)) {
       SwingUtil.addLabelledReadOnlyTextField(panel, "File Extension", fileNameExtension);
-      final RecordReaderFactory factory = IoFactory.factory(RecordReaderFactory.class, fileNameExtension);
+      final RecordReaderFactory factory = IoFactory.factory(RecordReaderFactory.class,
+        fileNameExtension);
       if (factory != null) {
         SwingUtil.addLabelledReadOnlyTextField(panel, "File Type", factory.getName());
       }
@@ -70,8 +71,8 @@ public class FileRecordLayer extends ListRecordLayer {
       this.resource = SpringUtil.getResource(this.url);
       return revert();
     } else {
-      LoggerFactory.getLogger(getClass()).error(
-        "Layer definition does not contain a 'url' property: " + getName());
+      LoggerFactory.getLogger(getClass())
+        .error("Layer definition does not contain a 'url' property: " + getName());
       return false;
     }
 

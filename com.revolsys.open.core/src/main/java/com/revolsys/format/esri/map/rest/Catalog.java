@@ -67,8 +67,8 @@ public class Catalog extends ArcGisResponse {
         if (serviceClass.isAssignableFrom(service.getClass())) {
           return (T)service;
         } else {
-          throw new IllegalArgumentException("ArcGIS REST service is not a "
-            + serviceClass.getName() + ": " + name);
+          throw new IllegalArgumentException(
+            "ArcGIS REST service is not a " + serviceClass.getName() + ": " + name);
         }
       }
     }
@@ -78,8 +78,8 @@ public class Catalog extends ArcGisResponse {
         if (serviceClass.isAssignableFrom(service.getClass())) {
           return (T)service;
         } else {
-          throw new IllegalArgumentException("ArcGIS REST service is not a "
-            + serviceClass.getName() + ": " + name);
+          throw new IllegalArgumentException(
+            "ArcGIS REST service is not a " + serviceClass.getName() + ": " + name);
         }
       }
     }
@@ -97,8 +97,8 @@ public class Catalog extends ArcGisResponse {
           Service service;
           try {
             getClass();
-            final Class<Service> serviceClass = (Class<Service>)Class.forName("com.revolsys.format.esri.map.rest."
-              + type);
+            final Class<Service> serviceClass = (Class<Service>)Class
+              .forName("com.revolsys.format.esri.map.rest." + type);
             service = serviceClass.newInstance();
             service.setCatalog(this);
             service.setServiceName(name);

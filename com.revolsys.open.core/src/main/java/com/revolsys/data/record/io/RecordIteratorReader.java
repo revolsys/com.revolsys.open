@@ -4,7 +4,7 @@ import com.revolsys.data.io.IteratorReader;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 
-public class RecordIteratorReader extends IteratorReader<Record> implements RecordReader {
+public class RecordIteratorReader extends IteratorReader<Record>implements RecordReader {
   public RecordIteratorReader(final RecordIterator iterator) {
     super(iterator);
   }

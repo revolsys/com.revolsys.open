@@ -10,8 +10,8 @@ import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.builder.HtmlUiBuilderAware;
 
-public class PageLinkKeySerializer extends AbstractKeySerializer implements
-  HtmlUiBuilderAware<HtmlUiBuilder<?>> {
+public class PageLinkKeySerializer extends AbstractKeySerializer
+  implements HtmlUiBuilderAware<HtmlUiBuilder<?>> {
   private String pageName;
 
   private Map<String, String> parameterKeys = new LinkedHashMap<String, String>();

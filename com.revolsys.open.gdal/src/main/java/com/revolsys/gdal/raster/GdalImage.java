@@ -36,9 +36,11 @@ public class GdalImage extends AbstractGeoreferencedImage {
     final String projection = dataset.GetProjection();
     final double[] geoTransform = dataset.GetGeoTransform();
     if (projection != null) {
-      final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(projection);
+      final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
+        .getCoordinateSystem(projection);
       if (esriCoordinateSystem != null) {
-        CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(esriCoordinateSystem);
+        CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems
+          .getCoordinateSystem(esriCoordinateSystem);
         if (epsgCoordinateSystem == null) {
           epsgCoordinateSystem = esriCoordinateSystem;
         }
@@ -90,10 +92,10 @@ public class GdalImage extends AbstractGeoreferencedImage {
       }
 
       final double scale = srcWidth / imageBoundingBox.getWidth();
-      final int clipXoff = (int)Math.floor((clipBoundingBox.getMinX() - imageBoundingBox.getMinX())
-        * scale);
-      final int clipYoff = (int)Math.floor((imageBoundingBox.getMaxY() - clipBoundingBox.getMaxY())
-        * scale);
+      final int clipXoff = (int)Math
+        .floor((clipBoundingBox.getMinX() - imageBoundingBox.getMinX()) * scale);
+      final int clipYoff = (int)Math
+        .floor((imageBoundingBox.getMaxY() - clipBoundingBox.getMaxY()) * scale);
       final int clipWidth = (int)Math.ceil(clipModelWidth * scale);
       final int clipHeight = (int)Math.ceil(clipModelHeight * scale);
       final BufferedImage bufferedImage = Gdal.getBufferedImage(dataset, bestOverviewIdx, clipXoff,

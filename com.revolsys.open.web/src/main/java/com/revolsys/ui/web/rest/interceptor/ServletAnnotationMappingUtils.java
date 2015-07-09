@@ -42,14 +42,15 @@ abstract class ServletAnnotationMappingUtils {
           final String key = header.substring(0, separator);
           final String value = header.substring(separator + 1);
           if (isMediaTypeHeader(key)) {
-            final List<MediaType> requestMediaTypes = MediaType.parseMediaTypes(request.getHeader(key));
+            final List<MediaType> requestMediaTypes = MediaType
+              .parseMediaTypes(request.getHeader(key));
             final List<MediaType> valueMediaTypes = MediaType.parseMediaTypes(value);
             boolean found = false;
             for (final Iterator<MediaType> valIter = valueMediaTypes.iterator(); valIter.hasNext()
               && !found;) {
               final MediaType valueMediaType = valIter.next();
-              for (final Iterator<MediaType> reqIter = requestMediaTypes.iterator(); reqIter.hasNext()
-                && !found;) {
+              for (final Iterator<MediaType> reqIter = requestMediaTypes.iterator(); reqIter
+                .hasNext() && !found;) {
                 final MediaType requestMediaType = reqIter.next();
                 if (valueMediaType.includes(requestMediaType)) {
                   found = true;

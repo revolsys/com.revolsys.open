@@ -42,7 +42,8 @@ public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
           previousMatchCoordinate, matchCoordinate);
         if (distance <= this.maxDistance) {
           final double angle1 = Angle.normalizePositive(previousCoordinate.angle2d(coordinate));
-          final double angle2 = Angle.normalizePositive(previousMatchCoordinate.angle2d(matchCoordinate));
+          final double angle2 = Angle
+            .normalizePositive(previousMatchCoordinate.angle2d(matchCoordinate));
           final double angleDiff = Math.abs(angle1 - angle2);
           if (angleDiff <= Math.PI / 6) {
             return true;

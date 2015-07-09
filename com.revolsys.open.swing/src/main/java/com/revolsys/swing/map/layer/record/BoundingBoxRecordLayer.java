@@ -63,8 +63,8 @@ public class BoundingBoxRecordLayer extends AbstractRecordLayer {
           this.boundingBox = boundingBox;
           firePropertyChange("visible", super.isVisible(), false);
           try {
-            final Constructor<?> constructor = this.workerClass.getConstructor(
-              BoundingBoxRecordLayer.class, BoundingBox.class);
+            final Constructor<?> constructor = this.workerClass
+              .getConstructor(BoundingBoxRecordLayer.class, BoundingBox.class);
             this.worker = (SwingWorker)constructor.newInstance(this, boundingBox);
             Invoke.worker(this.worker);
           } catch (final NoSuchMethodException e) {

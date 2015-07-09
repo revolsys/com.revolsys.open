@@ -39,14 +39,14 @@ public class RecordStoreFactoryRegistry {
         try {
           new ClassPathXmlApplicationContext(url.toString());
         } catch (final Throwable e) {
-          LoggerFactory.getLogger(RecordStoreFactoryRegistry.class).error(
-            "Unable to initialize plugin: " + url, e);
+          LoggerFactory.getLogger(RecordStoreFactoryRegistry.class)
+            .error("Unable to initialize plugin: " + url, e);
         }
 
       }
     } catch (final IOException e) {
-      LoggerFactory.getLogger(RecordStoreFactoryRegistry.class).error(
-        "Unable to initialize plugins", e);
+      LoggerFactory.getLogger(RecordStoreFactoryRegistry.class)
+        .error("Unable to initialize plugins", e);
     }
     IoFactoryRegistry.getInstance();
   }
@@ -97,8 +97,8 @@ public class RecordStoreFactoryRegistry {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T extends RecordStore> T createRecordStore(final String url,
-    final String username, final String password) {
+  public static <T extends RecordStore> T createRecordStore(final String url, final String username,
+    final String password) {
     final RecordStoreFactory factory = getRecordStoreFactory(url);
     if (factory == null) {
       throw new IllegalArgumentException("Record Store Factory not found for " + url);
@@ -123,7 +123,8 @@ public class RecordStoreFactoryRegistry {
     if (url == null) {
       throw new IllegalArgumentException("The url parameter must be specified");
     } else {
-      for (final Entry<Pattern, RecordStoreFactory> entry : recordStoreFactoryUrlPatterns.entrySet()) {
+      for (final Entry<Pattern, RecordStoreFactory> entry : recordStoreFactoryUrlPatterns
+        .entrySet()) {
         final Pattern pattern = entry.getKey();
         final RecordStoreFactory factory = entry.getValue();
         if (pattern.matcher(url).matches()) {

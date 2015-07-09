@@ -20,7 +20,8 @@ class gdalJNI {
       available = true;
 
       if (gdal.HasThreadSupport() == 0) {
-        System.err.println("WARNING : GDAL should be compiled with thread support for safe execution in Java.");
+        System.err.println(
+          "WARNING : GDAL should be compiled with thread support for safe execution in Java.");
       }
 
     } catch (final UnsatisfiedLinkError e) {
@@ -38,7 +39,8 @@ class gdalJNI {
   public final static native int AsyncReader_GetNextUpdatedRegion(long jarg1, AsyncReader jarg1_,
     double jarg2, int[] jarg3, int[] jarg4, int[] jarg5, int[] jarg6);
 
-  public final static native int AsyncReader_LockBuffer(long jarg1, AsyncReader jarg1_, double jarg2);
+  public final static native int AsyncReader_LockBuffer(long jarg1, AsyncReader jarg1_,
+    double jarg2);
 
   public final static native void AsyncReader_UnlockBuffer(long jarg1, AsyncReader jarg1_);
 
@@ -316,17 +318,16 @@ class gdalJNI {
     int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, float[] jarg9, int jarg11,
     int jarg12);
 
-  public final static native int Band_WriteRaster_Direct__SWIG_0(long jarg1, Band jarg1_,
-    int jarg2, int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8,
-    java.nio.ByteBuffer jarg9, int jarg11, int jarg12);
+  public final static native int Band_WriteRaster_Direct__SWIG_0(long jarg1, Band jarg1_, int jarg2,
+    int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, java.nio.ByteBuffer jarg9,
+    int jarg11, int jarg12);
 
-  public final static native int Band_WriteRaster_Direct__SWIG_1(long jarg1, Band jarg1_,
-    int jarg2, int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8,
-    java.nio.ByteBuffer jarg9, int jarg11);
+  public final static native int Band_WriteRaster_Direct__SWIG_1(long jarg1, Band jarg1_, int jarg2,
+    int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, java.nio.ByteBuffer jarg9,
+    int jarg11);
 
-  public final static native int Band_WriteRaster_Direct__SWIG_2(long jarg1, Band jarg1_,
-    int jarg2, int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8,
-    java.nio.ByteBuffer jarg9);
+  public final static native int Band_WriteRaster_Direct__SWIG_2(long jarg1, Band jarg1_, int jarg2,
+    int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, java.nio.ByteBuffer jarg9);
 
   public final static native int Band_XSize_get(long jarg1, Band jarg1_);
 
@@ -344,8 +345,8 @@ class gdalJNI {
 
   public final static native int ColorTable_GetPaletteInterpretation(long jarg1, ColorTable jarg1_);
 
-  public final static native void ColorTable_SetColorEntry(long jarg1, ColorTable jarg1_,
-    int jarg2, java.awt.Color jarg3);
+  public final static native void ColorTable_SetColorEntry(long jarg1, ColorTable jarg1_, int jarg2,
+    java.awt.Color jarg3);
 
   public final static native int ComputeMedianCutPCT__SWIG_0(long jarg1, Band jarg1_, long jarg2,
     Band jarg2_, long jarg3, Band jarg3_, int jarg4, long jarg5, ColorTable jarg5_,
@@ -410,9 +411,11 @@ class gdalJNI {
 
   public final static native String Dataset_GetGCPProjection(long jarg1, Dataset jarg1_);
 
-  public final static native void Dataset_GetGCPs(long jarg1, Dataset jarg1_, java.util.Vector jarg2);
+  public final static native void Dataset_GetGCPs(long jarg1, Dataset jarg1_,
+    java.util.Vector jarg2);
 
-  public final static native void Dataset_GetGeoTransform(long jarg1, Dataset jarg1_, double[] jarg2);
+  public final static native void Dataset_GetGeoTransform(long jarg1, Dataset jarg1_,
+    double[] jarg2);
 
   public final static native String Dataset_GetProjection(long jarg1, Dataset jarg1_);
 
@@ -520,7 +523,8 @@ class gdalJNI {
   public final static native int Dataset_SetGCPs(long jarg1, Dataset jarg1_, GCP[] jarg2,
     String jarg4);
 
-  public final static native int Dataset_SetGeoTransform(long jarg1, Dataset jarg1_, double[] jarg2);
+  public final static native int Dataset_SetGeoTransform(long jarg1, Dataset jarg1_,
+    double[] jarg2);
 
   public final static native int Dataset_SetProjection(long jarg1, Dataset jarg1_, String jarg2);
 
@@ -532,45 +536,42 @@ class gdalJNI {
     int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, byte[] jarg9, int[] jarg11,
     int jarg13, int jarg14);
 
-  public final static native int Dataset_WriteRaster__SWIG_10(long jarg1, Dataset jarg1_,
-    int jarg2, int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, int[] jarg9,
-    int[] jarg11, int jarg13);
+  public final static native int Dataset_WriteRaster__SWIG_10(long jarg1, Dataset jarg1_, int jarg2,
+    int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, int[] jarg9, int[] jarg11,
+    int jarg13);
 
-  public final static native int Dataset_WriteRaster__SWIG_11(long jarg1, Dataset jarg1_,
-    int jarg2, int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, int[] jarg9,
-    int[] jarg11);
+  public final static native int Dataset_WriteRaster__SWIG_11(long jarg1, Dataset jarg1_, int jarg2,
+    int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, int[] jarg9, int[] jarg11);
 
-  public final static native int Dataset_WriteRaster__SWIG_12(long jarg1, Dataset jarg1_,
-    int jarg2, int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, float[] jarg9,
-    int[] jarg11, int jarg13, int jarg14, int jarg15);
+  public final static native int Dataset_WriteRaster__SWIG_12(long jarg1, Dataset jarg1_, int jarg2,
+    int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, float[] jarg9, int[] jarg11,
+    int jarg13, int jarg14, int jarg15);
 
-  public final static native int Dataset_WriteRaster__SWIG_13(long jarg1, Dataset jarg1_,
-    int jarg2, int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, float[] jarg9,
-    int[] jarg11, int jarg13, int jarg14);
+  public final static native int Dataset_WriteRaster__SWIG_13(long jarg1, Dataset jarg1_, int jarg2,
+    int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, float[] jarg9, int[] jarg11,
+    int jarg13, int jarg14);
 
-  public final static native int Dataset_WriteRaster__SWIG_14(long jarg1, Dataset jarg1_,
-    int jarg2, int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, float[] jarg9,
-    int[] jarg11, int jarg13);
+  public final static native int Dataset_WriteRaster__SWIG_14(long jarg1, Dataset jarg1_, int jarg2,
+    int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, float[] jarg9, int[] jarg11,
+    int jarg13);
 
-  public final static native int Dataset_WriteRaster__SWIG_15(long jarg1, Dataset jarg1_,
-    int jarg2, int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, float[] jarg9,
-    int[] jarg11);
+  public final static native int Dataset_WriteRaster__SWIG_15(long jarg1, Dataset jarg1_, int jarg2,
+    int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, float[] jarg9, int[] jarg11);
 
-  public final static native int Dataset_WriteRaster__SWIG_16(long jarg1, Dataset jarg1_,
-    int jarg2, int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, double[] jarg9,
-    int[] jarg11, int jarg13, int jarg14, int jarg15);
+  public final static native int Dataset_WriteRaster__SWIG_16(long jarg1, Dataset jarg1_, int jarg2,
+    int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, double[] jarg9, int[] jarg11,
+    int jarg13, int jarg14, int jarg15);
 
-  public final static native int Dataset_WriteRaster__SWIG_17(long jarg1, Dataset jarg1_,
-    int jarg2, int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, double[] jarg9,
-    int[] jarg11, int jarg13, int jarg14);
+  public final static native int Dataset_WriteRaster__SWIG_17(long jarg1, Dataset jarg1_, int jarg2,
+    int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, double[] jarg9, int[] jarg11,
+    int jarg13, int jarg14);
 
-  public final static native int Dataset_WriteRaster__SWIG_18(long jarg1, Dataset jarg1_,
-    int jarg2, int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, double[] jarg9,
-    int[] jarg11, int jarg13);
+  public final static native int Dataset_WriteRaster__SWIG_18(long jarg1, Dataset jarg1_, int jarg2,
+    int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, double[] jarg9, int[] jarg11,
+    int jarg13);
 
-  public final static native int Dataset_WriteRaster__SWIG_19(long jarg1, Dataset jarg1_,
-    int jarg2, int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, double[] jarg9,
-    int[] jarg11);
+  public final static native int Dataset_WriteRaster__SWIG_19(long jarg1, Dataset jarg1_, int jarg2,
+    int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, double[] jarg9, int[] jarg11);
 
   public final static native int Dataset_WriteRaster__SWIG_2(long jarg1, Dataset jarg1_, int jarg2,
     int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, byte[] jarg9, int[] jarg11,
@@ -668,18 +669,17 @@ class gdalJNI {
   public final static native long Driver_Create__SWIG_3(long jarg1, Driver jarg1_, String jarg2,
     int jarg3, int jarg4);
 
-  public final static native long Driver_CreateCopy__SWIG_0(long jarg1, Driver jarg1_,
-    String jarg2, long jarg3, Dataset jarg3_, int jarg4, java.util.Vector jarg5,
-    ProgressCallback jarg6);
+  public final static native long Driver_CreateCopy__SWIG_0(long jarg1, Driver jarg1_, String jarg2,
+    long jarg3, Dataset jarg3_, int jarg4, java.util.Vector jarg5, ProgressCallback jarg6);
 
-  public final static native long Driver_CreateCopy__SWIG_2(long jarg1, Driver jarg1_,
-    String jarg2, long jarg3, Dataset jarg3_, int jarg4, java.util.Vector jarg5);
+  public final static native long Driver_CreateCopy__SWIG_2(long jarg1, Driver jarg1_, String jarg2,
+    long jarg3, Dataset jarg3_, int jarg4, java.util.Vector jarg5);
 
-  public final static native long Driver_CreateCopy__SWIG_3(long jarg1, Driver jarg1_,
-    String jarg2, long jarg3, Dataset jarg3_, int jarg4);
+  public final static native long Driver_CreateCopy__SWIG_3(long jarg1, Driver jarg1_, String jarg2,
+    long jarg3, Dataset jarg3_, int jarg4);
 
-  public final static native long Driver_CreateCopy__SWIG_4(long jarg1, Driver jarg1_,
-    String jarg2, long jarg3, Dataset jarg3_);
+  public final static native long Driver_CreateCopy__SWIG_4(long jarg1, Driver jarg1_, String jarg2,
+    long jarg3, Dataset jarg3_);
 
   public final static native int Driver_Delete(long jarg1, Driver jarg1_, String jarg2);
 
@@ -691,7 +691,8 @@ class gdalJNI {
 
   public final static native int Driver_Register(long jarg1, Driver jarg1_);
 
-  public final static native int Driver_Rename(long jarg1, Driver jarg1_, String jarg2, String jarg3);
+  public final static native int Driver_Rename(long jarg1, Driver jarg1_, String jarg2,
+    String jarg3);
 
   public final static native String Driver_ShortName_get(long jarg1, Driver jarg1_);
 
@@ -811,7 +812,8 @@ class gdalJNI {
   public final static native java.util.Vector GeneralCmdLineProcessor__SWIG_0(
     java.util.Vector jarg1, int jarg2);
 
-  public final static native java.util.Vector GeneralCmdLineProcessor__SWIG_1(java.util.Vector jarg1);
+  public final static native java.util.Vector GeneralCmdLineProcessor__SWIG_1(
+    java.util.Vector jarg1);
 
   public final static native int GetCacheMax();
 
@@ -907,11 +909,11 @@ class gdalJNI {
   public final static native int MajorObject_SetMetadata__SWIG_3(long jarg1, MajorObject jarg1_,
     String jarg2);
 
-  public final static native int MajorObject_SetMetadataItem__SWIG_0(long jarg1,
-    MajorObject jarg1_, String jarg2, String jarg3, String jarg4);
+  public final static native int MajorObject_SetMetadataItem__SWIG_0(long jarg1, MajorObject jarg1_,
+    String jarg2, String jarg3, String jarg4);
 
-  public final static native int MajorObject_SetMetadataItem__SWIG_1(long jarg1,
-    MajorObject jarg1_, String jarg2, String jarg3);
+  public final static native int MajorObject_SetMetadataItem__SWIG_1(long jarg1, MajorObject jarg1_,
+    String jarg2, String jarg3);
 
   public final static native int Mkdir(String jarg1, int jarg2);
 
@@ -948,7 +950,8 @@ class gdalJNI {
   public final static native long ParseXMLString(String jarg1);
 
   public final static native int Polygonize__SWIG_0(long jarg1, Band jarg1_, long jarg2,
-    Band jarg2_, org.gdal.ogr.Layer jarg3, int jarg4, java.util.Vector jarg5, ProgressCallback jarg6);
+    Band jarg2_, org.gdal.ogr.Layer jarg3, int jarg4, java.util.Vector jarg5,
+    ProgressCallback jarg6);
 
   public final static native int Polygonize__SWIG_2(long jarg1, Band jarg1_, long jarg2,
     Band jarg2_, org.gdal.ogr.Layer jarg3, int jarg4, java.util.Vector jarg5);
@@ -972,7 +975,8 @@ class gdalJNI {
   public final static native int RasterAttributeTable_ChangesAreWrittenToFile(long jarg1,
     RasterAttributeTable jarg1_);
 
-  public final static native long RasterAttributeTable_Clone(long jarg1, RasterAttributeTable jarg1_);
+  public final static native long RasterAttributeTable_Clone(long jarg1,
+    RasterAttributeTable jarg1_);
 
   public final static native int RasterAttributeTable_CreateColumn(long jarg1,
     RasterAttributeTable jarg1_, String jarg2, int jarg3, int jarg4);

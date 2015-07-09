@@ -27,8 +27,8 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 
-public class MouseOverlay extends JComponent implements MouseListener, MouseMotionListener,
-  MouseWheelListener, KeyListener, FocusListener {
+public class MouseOverlay extends JComponent
+  implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
 
   private static final long serialVersionUID = 1L;
 

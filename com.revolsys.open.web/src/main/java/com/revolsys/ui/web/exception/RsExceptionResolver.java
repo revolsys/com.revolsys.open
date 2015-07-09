@@ -35,8 +35,8 @@ public class RsExceptionResolver implements HandlerExceptionResolver {
         if (cause == null) {
           cause = exception;
         }
-        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid HTTP multi-part request: "
-          + cause.getMessage());
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+          "Invalid HTTP multi-part request: " + cause.getMessage());
         return new ModelAndView();
       }
     } catch (final IOException e) {

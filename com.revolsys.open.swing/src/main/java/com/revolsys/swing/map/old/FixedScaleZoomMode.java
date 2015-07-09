@@ -301,7 +301,8 @@ public class FixedScaleZoomMode implements ZoomMode {
    * @param y The y coordinate.
    */
   @Override
-  public void zoomInAndRecentre(final ComponentViewport2D viewport, final double x, final double y) {
+  public void zoomInAndRecentre(final ComponentViewport2D viewport, final double x,
+    final double y) {
     final double scale = getNextScale(viewport, true);
     final double[] coord = viewport.toModelCoordinates(x, y);
     zoomAndRecentre(viewport, coord[0], coord[1], scale);
@@ -330,7 +331,8 @@ public class FixedScaleZoomMode implements ZoomMode {
    * @param y The y coordinate.
    */
   @Override
-  public void zoomOutAndRecentre(final ComponentViewport2D viewport, final double x, final double y) {
+  public void zoomOutAndRecentre(final ComponentViewport2D viewport, final double x,
+    final double y) {
     final double scale = getNextScale(viewport, false);
     final double[] coord = viewport.toModelCoordinates(x, y);
     zoomAndRecentre(viewport, coord[0], coord[1], scale);

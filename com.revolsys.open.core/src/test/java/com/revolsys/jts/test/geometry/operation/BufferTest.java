@@ -2,10 +2,6 @@ package com.revolsys.jts.test.geometry.operation;
 
 import java.util.Map;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.junit.Assert;
 import org.springframework.core.io.ClassPathResource;
 
@@ -19,6 +15,10 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.operation.buffer.Buffer;
 import com.revolsys.jts.operation.buffer.BufferParameters;
 import com.revolsys.jts.test.geometry.TestUtil;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 public class BufferTest extends TestCase {
 
@@ -42,8 +42,8 @@ public class BufferTest extends TestCase {
     final TestSuite suite = new TestSuite("Buffer");
     int i = 0;
     try (
-      Reader<Map<String, Object>> reader = MapReaderFactory.mapReader(new ClassPathResource(
-        "/com/revolsys/jts/test/geometry/operation/buffer.csv"))) {
+      Reader<Map<String, Object>> reader = MapReaderFactory
+        .mapReader(new ClassPathResource("/com/revolsys/jts/test/geometry/operation/buffer.csv"))) {
       for (final Map<String, Object> map : reader) {
         i++;
         final int srid = Maps.getInteger(map, "srid", 0);

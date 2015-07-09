@@ -19,7 +19,8 @@ public class EnvelopeIntersects extends Condition {
 
   private QueryValue boundingBox2Value;
 
-  public EnvelopeIntersects(final QueryValue boundingBox1Value, final QueryValue boundingBox2Value) {
+  public EnvelopeIntersects(final QueryValue boundingBox1Value,
+    final QueryValue boundingBox2Value) {
     this.boundingBox1Value = boundingBox1Value;
     this.boundingBox2Value = boundingBox2Value;
   }
@@ -89,7 +90,8 @@ public class EnvelopeIntersects extends Condition {
     return false;
   }
 
-  private BoundingBox getBoundingBox(final QueryValue queryValue, final Map<String, Object> record) {
+  private BoundingBox getBoundingBox(final QueryValue queryValue,
+    final Map<String, Object> record) {
     if (queryValue == null) {
       return null;
     } else {

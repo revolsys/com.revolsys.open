@@ -33,17 +33,17 @@
 
 package com.revolsys.jts.testold.io;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import junit.textui.TestRunner;
 
 /**
  * Test for {@link WKTReader}
@@ -80,8 +80,7 @@ public class WKTReaderTest extends TestCase {
     assertEquals("GEOMETRYCOLLECTION(POINT(10 10),POINT(30 30),LINESTRING(15 15,20 20))",
       this.reader.read("GEOMETRYCOLLECTION (POINT(10 10), POINT(30 30), LINESTRING(15 15, 20 20))")
         .toWkt());
-    assertEquals(
-      "GEOMETRYCOLLECTION(POINT(10 10),LINEARRING EMPTY,LINESTRING(15 15,20 20))",
+    assertEquals("GEOMETRYCOLLECTION(POINT(10 10),LINEARRING EMPTY,LINESTRING(15 15,20 20))",
       this.reader.read("GEOMETRYCOLLECTION(POINT(10 10),LINEARRING EMPTY,LINESTRING(15 15, 20 20))")
         .toWkt());
     assertReaderEquals(
@@ -94,8 +93,8 @@ public class WKTReaderTest extends TestCase {
     final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1E9);
     final WKTReader reader = new WKTReader(geometryFactory);
     final Geometry point1 = reader.read("POINT(123456789.01234567890 10)");
-    final Point point2 = geometryFactory.point(new PointDouble(123456789.01234567890, 10,
-      Point.NULL_ORDINATE));
+    final Point point2 = geometryFactory
+      .point(new PointDouble(123456789.01234567890, 10, Point.NULL_ORDINATE));
     assertEquals(point1.getPoint().getX(), point2.getPoint().getX(), 1E-7);
     assertEquals(point1.getPoint().getY(), point2.getPoint().getY(), 1E-7);
   }
@@ -115,8 +114,8 @@ public class WKTReaderTest extends TestCase {
 
   public void testReadLineString() throws Exception {
 
-    assertEquals("LINESTRING(10 10,20 20,30 40)", this.reader.read("LINESTRING(10 10,20 20,30 40)")
-      .toWkt());
+    assertEquals("LINESTRING(10 10,20 20,30 40)",
+      this.reader.read("LINESTRING(10 10,20 20,30 40)").toWkt());
 
     assertEquals("LINESTRING EMPTY", this.reader.read("LINESTRING EMPTY").toWkt());
   }
@@ -131,18 +130,17 @@ public class WKTReaderTest extends TestCase {
 
   public void testReadMultiPoint() throws Exception {
 
-    assertEquals("MULTIPOINT((10 10),(20 20))", this.reader.read("MULTIPOINT((10 10),(20 20))")
-      .toWkt());
+    assertEquals("MULTIPOINT((10 10),(20 20))",
+      this.reader.read("MULTIPOINT((10 10),(20 20))").toWkt());
 
     assertEquals("MULTIPOINT EMPTY", this.reader.read("MULTIPOINT EMPTY").toWkt());
   }
 
   public void testReadMultiPolygon() throws Exception {
 
-    assertEquals(
-      "MULTIPOLYGON(((10 10,10 20,20 20,20 15,10 10)),((60 60,70 70,80 60,60 60)))",
-      this.reader.read(
-        "MULTIPOLYGON(((10 10, 10 20, 20 20, 20 15, 10 10)), ((60 60, 70 70, 80 60, 60 60)))")
+    assertEquals("MULTIPOLYGON(((10 10,10 20,20 20,20 15,10 10)),((60 60,70 70,80 60,60 60)))",
+      this.reader
+        .read("MULTIPOLYGON(((10 10, 10 20, 20 20, 20 15, 10 10)), ((60 60, 70 70, 80 60, 60 60)))")
         .toWkt());
 
     assertEquals("MULTIPOLYGON EMPTY", this.reader.read("MULTIPOLYGON EMPTY").toWkt());

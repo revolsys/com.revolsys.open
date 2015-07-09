@@ -76,8 +76,8 @@ public class OS {
 
   public static File getPreferenceFile(final String applicationName, final String path) {
     if (path.contains("..")) {
-      throw new IllegalArgumentException("Path cannot contain the '..' character sequernce: "
-        + path);
+      throw new IllegalArgumentException(
+        "Path cannot contain the '..' character sequernce: " + path);
     }
     final File preferencesDirectory = getPreferencesDirectory(applicationName);
     final File file = FileUtil.getFile(preferencesDirectory, path + ".rgobject");
@@ -85,7 +85,8 @@ public class OS {
     return file;
   }
 
-  public static Map<String, Object> getPreferences(final String applicationName, final String path) {
+  public static Map<String, Object> getPreferences(final String applicationName,
+    final String path) {
     final File file = getPreferenceFile(applicationName, path);
     if (file.exists()) {
       return Json.toMap(file);

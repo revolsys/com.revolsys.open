@@ -27,7 +27,8 @@ public class CollectionValue extends QueryValue {
     this(null, values);
   }
 
-  public CollectionValue(final FieldDefinition attribute, final Collection<? extends Object> values) {
+  public CollectionValue(final FieldDefinition attribute,
+    final Collection<? extends Object> values) {
     setAttribute(attribute);
     for (final Object value : values) {
       QueryValue queryValue;

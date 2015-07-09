@@ -294,8 +294,8 @@ public class IsValidOp {
         isFirst = false;
       } else if (nodeSet.contains(ei.coord)) {
         valid = false;
-        addError(new TopologyValidationError(TopologyValidationError.RING_SELF_INTERSECTION,
-          ei.coord));
+        addError(
+          new TopologyValidationError(TopologyValidationError.RING_SELF_INTERSECTION, ei.coord));
         if (isErrorReturn()) {
           return false;
         }
@@ -459,7 +459,8 @@ public class IsValidOp {
       }
     }
     if (edgeCount < minVertexCount - 1) {
-      addError(new TopologyValidationError(TopologyValidationError.TOO_FEW_POINTS, line.getPoint(0)));
+      addError(
+        new TopologyValidationError(TopologyValidationError.TOO_FEW_POINTS, line.getPoint(0)));
       return false;
     } else {
       return true;

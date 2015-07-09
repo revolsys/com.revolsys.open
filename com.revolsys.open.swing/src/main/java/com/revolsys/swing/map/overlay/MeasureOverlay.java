@@ -436,7 +436,8 @@ public class MeasureOverlay extends AbstractOverlay {
   @Override
   protected void paintComponent(final Graphics2D graphics) {
     final Viewport2D viewport = getViewport();
-    final GeometryFactory viewportGeometryFactory = viewport.getRoundedGeometryFactory(getViewportGeometryFactory());
+    final GeometryFactory viewportGeometryFactory = viewport
+      .getRoundedGeometryFactory(getViewportGeometryFactory());
     if (!this.measureGeometry.isEmpty()) {
       String unitString = "m";
       if (viewportGeometryFactory != null) {

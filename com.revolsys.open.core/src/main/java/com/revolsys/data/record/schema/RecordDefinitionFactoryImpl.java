@@ -6,8 +6,8 @@ import java.util.Map;
 
 import com.revolsys.properties.BaseObjectWithProperties;
 
-public class RecordDefinitionFactoryImpl extends BaseObjectWithProperties implements
-  RecordDefinitionFactory {
+public class RecordDefinitionFactoryImpl extends BaseObjectWithProperties
+  implements RecordDefinitionFactory {
 
   private final Map<String, RecordDefinition> recordDefinitions = new LinkedHashMap<>();
 

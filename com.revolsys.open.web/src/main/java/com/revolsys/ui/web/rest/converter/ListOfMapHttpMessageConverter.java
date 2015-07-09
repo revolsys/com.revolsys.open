@@ -23,8 +23,8 @@ public class ListOfMapHttpMessageConverter extends AbstractHttpMessageConverter<
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
   public ListOfMapHttpMessageConverter() {
-    super(ArrayListOfMap.class, null, IoFactoryRegistry.getInstance().getMediaTypes(
-      MapWriterFactory.class));
+    super(ArrayListOfMap.class, null,
+      IoFactoryRegistry.getInstance().getMediaTypes(MapWriterFactory.class));
   }
 
   @SuppressWarnings("unchecked")
@@ -35,8 +35,8 @@ public class ListOfMapHttpMessageConverter extends AbstractHttpMessageConverter<
       final Charset charset = HttpServletUtils.setContentTypeWithCharset(outputMessage, mediaType);
       final OutputStream body = outputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/" + mediaType.getSubtype();
-      final MapWriterFactory writerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
-        MapWriterFactory.class, mediaTypeString);
+      final MapWriterFactory writerFactory = this.ioFactoryRegistry
+        .getFactoryByMediaType(MapWriterFactory.class, mediaTypeString);
       final MapWriter writer = writerFactory.createMapWriter(body, charset);
       writer.setProperty(IoConstants.INDENT, true);
       writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, false);

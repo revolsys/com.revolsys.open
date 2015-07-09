@@ -18,8 +18,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 
-public class Gpx extends AbstractRecordIoFactory
-  implements RecordWriterFactory {
+public class Gpx extends AbstractRecordIoFactory implements RecordWriterFactory {
   public Gpx() {
     super("GPS Exchange Format");
     addMediaTypeAndFileExtension(GpxConstants.MEDIA_TYPE, GpxConstants.FILE_EXTENSION);

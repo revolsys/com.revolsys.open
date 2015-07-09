@@ -21,7 +21,8 @@ public class GCP {
     this(x, y, 0.0, pixel, line, "", "");
   }
 
-  public GCP(final double x, final double y, final double z, final double pixel, final double line) {
+  public GCP(final double x, final double y, final double z, final double pixel,
+    final double line) {
     this(x, y, z, pixel, line, "", "");
   }
 

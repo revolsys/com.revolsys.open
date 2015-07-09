@@ -586,7 +586,8 @@ public class XmlWriter extends Writer {
    */
   public void endDocument() {
     this.endingDocument = true;
-    for (final Iterator<TagConfiguration> elements = this.elementStack.iterator(); elements.hasNext();) {
+    for (final Iterator<TagConfiguration> elements = this.elementStack.iterator(); elements
+      .hasNext();) {
       final TagConfiguration tag = elements.next();
       final QName element = tag.getElement();
       endTag(element);
@@ -622,8 +623,8 @@ public class XmlWriter extends Writer {
       } else {
         final QName currentElement = currentTag.getElement();
         if (!element.equals(currentElement)) {
-          throw new IllegalArgumentException("Cannot end tag " + element + " expecting "
-            + currentElement);
+          throw new IllegalArgumentException(
+            "Cannot end tag " + element + " expecting " + currentElement);
         }
         if (this.writingStartTag) {
           writeNamespaces();
@@ -1242,8 +1243,8 @@ public class XmlWriter extends Writer {
           default:
             // Reject all other control characters
             if (ch < 32) {
-              throw new IllegalStateException("character " + Integer.toString(ch)
-                + " is not allowed in output");
+              throw new IllegalStateException(
+                "character " + Integer.toString(ch) + " is not allowed in output");
             }
           break;
         }
@@ -1310,8 +1311,8 @@ public class XmlWriter extends Writer {
           default:
             // Reject all other control characters
             if (ch < 32) {
-              throw new IllegalStateException("character " + Integer.toString(ch)
-                + " is not allowed in output");
+              throw new IllegalStateException(
+                "character " + Integer.toString(ch) + " is not allowed in output");
             }
           break;
         }

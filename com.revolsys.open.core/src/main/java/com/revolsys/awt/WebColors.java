@@ -303,8 +303,8 @@ public class WebColors {
             final Color color = (Color)field.get(null);
             COLOR_NAMES.put(color, field.getName());
           } catch (final Throwable e) {
-            LoggerFactory.getLogger(WebColors.class)
-              .error("Unable to get field value: " + field, e);
+            LoggerFactory.getLogger(WebColors.class).error("Unable to get field value: " + field,
+              e);
           }
         }
       }

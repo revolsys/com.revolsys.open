@@ -33,7 +33,8 @@ public class MapObjectFactoryRegistry {
         final URL resource = resources.nextElement();
         try {
           final Map<String, Object> config = JsonParser.getMap(resource.openStream());
-          final List<Map<String, Object>> factories = (List<Map<String, Object>>)config.get("factories");
+          final List<Map<String, Object>> factories = (List<Map<String, Object>>)config
+            .get("factories");
           for (final Map<String, Object> factoryConfig : factories) {
             try {
               final String name = (String)factoryConfig.get("typeName");
@@ -45,13 +46,13 @@ public class MapObjectFactoryRegistry {
                 description, factoryClass, methodName);
               addFactory(factory);
             } catch (final Throwable e) {
-              LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error(
-                "Unable to add factory: " + factoryConfig, e);
+              LoggerFactory.getLogger(MapObjectFactoryRegistry.class)
+                .error("Unable to add factory: " + factoryConfig, e);
             }
           }
         } catch (final Throwable e) {
-          LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error(
-            "Unable to read resource: " + resource, e);
+          LoggerFactory.getLogger(MapObjectFactoryRegistry.class)
+            .error("Unable to read resource: " + resource, e);
         }
       }
     } catch (final Throwable e) {
@@ -99,8 +100,8 @@ public class MapObjectFactoryRegistry {
       final Map<String, Object> properties = Json.toMap(resource);
       return (V)MapObjectFactoryRegistry.toObject(properties);
     } catch (final Throwable t) {
-      LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error(
-        "Cannot load object from " + resource, t);
+      LoggerFactory.getLogger(MapObjectFactoryRegistry.class)
+        .error("Cannot load object from " + resource, t);
       return null;
     } finally {
       SpringUtil.setBaseResource(oldResource);

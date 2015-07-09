@@ -291,8 +291,8 @@ public class BoundingBoxTest implements TestConstants {
           final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount, 10.0, 10.0);
           final double[] valuesPrecise = gfFixed.copyPrecise(values);
           final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
-          assertEnvelope(new BoundingBoxDoubleGf(gfFixed, axisCount, valuesPrecise), gfFixed,
-            false, axisCount, boundsPrecise);
+          assertEnvelope(new BoundingBoxDoubleGf(gfFixed, axisCount, valuesPrecise), gfFixed, false,
+            axisCount, boundsPrecise);
         }
       }
     }

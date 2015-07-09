@@ -17,8 +17,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 
-public class Wkt extends AbstractRecordIoFactory
-  implements RecordWriterFactory, WktConstants {
+public class Wkt extends AbstractRecordIoFactory implements RecordWriterFactory, WktConstants {
   public Wkt() {
     super(WktConstants.DESCRIPTION);
     addMediaTypeAndFileExtension(MEDIA_TYPE, FILE_EXTENSION);

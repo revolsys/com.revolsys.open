@@ -29,7 +29,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
-public class CsvRecordIterator extends AbstractIterator<Record> implements RecordIterator {
+public class CsvRecordIterator extends AbstractIterator<Record>implements RecordIterator {
 
   private final char fieldSeparator;
 

@@ -26,8 +26,8 @@ public class RecordTransferable implements Transferable {
   }
 
   @Override
-  public Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException,
-    IOException {
+  public Object getTransferData(final DataFlavor flavor)
+    throws UnsupportedFlavorException, IOException {
     if (this.object == null) {
       return null;
     } else if (DATA_OBJECT_FLAVOR.equals(flavor) || MapTransferable.MAP_FLAVOR.equals(flavor)) {

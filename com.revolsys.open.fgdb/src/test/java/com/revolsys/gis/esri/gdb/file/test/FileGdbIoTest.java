@@ -3,9 +3,6 @@ package com.revolsys.gis.esri.gdb.file.test;
 import java.io.File;
 import java.util.List;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import org.junit.Assert;
 
 import com.revolsys.data.record.Record;
@@ -25,6 +22,9 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygonal;
 import com.revolsys.jts.test.geometry.TestUtil;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 public class FileGdbIoTest {
 

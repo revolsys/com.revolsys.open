@@ -52,8 +52,10 @@ public class PointTest implements TestConstants {
     final GeometryFactory geometryFactory2;
     final int axisCount = geometryFactory.getAxisCount();
     if (geometryFactory.getCoordinateSystem() instanceof ProjectedCoordinateSystem) {
-      final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)geometryFactory.getCoordinateSystem();
-      final GeographicCoordinateSystem geographicCoordinateSystem = projectedCs.getGeographicCoordinateSystem();
+      final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)geometryFactory
+        .getCoordinateSystem();
+      final GeographicCoordinateSystem geographicCoordinateSystem = projectedCs
+        .getGeographicCoordinateSystem();
       geometryFactory2 = GeometryFactory.floating(geographicCoordinateSystem.getId(), axisCount);
     } else {
       geometryFactory2 = GeometryFactory.floating(26910, axisCount);
@@ -142,8 +144,8 @@ public class PointTest implements TestConstants {
       final Point pointCoordinatesListNull = geometryFactory.point((LineString)null);
       assertEmpty(pointCoordinatesListNull);
 
-      final Point pointCoordinatesListSize0 = geometryFactory.point(new LineStringDouble(0,
-        axisCount));
+      final Point pointCoordinatesListSize0 = geometryFactory
+        .point(new LineStringDouble(0, axisCount));
       assertEmpty(pointCoordinatesListSize0);
 
       final Point pointObjectNull = geometryFactory.point((Object)null);
@@ -209,21 +211,22 @@ public class PointTest implements TestConstants {
 
       // Coordinates
       final Point pointCoordinatesAllAxis = geometryFactory.point(new PointDouble(coordinates));
-      final Point pointCoordinatesExtraAxis = geometryFactory.point(new PointDouble(
-        coordinatesExtra));
-      final Point pointCoordinatesLessAxis = geometryFactory.point(new PointDouble(coordinatesLess));
+      final Point pointCoordinatesExtraAxis = geometryFactory
+        .point(new PointDouble(coordinatesExtra));
+      final Point pointCoordinatesLessAxis = geometryFactory
+        .point(new PointDouble(coordinatesLess));
       assertEquals(coordinates, coordinatesLessNaN, pointCoordinatesAllAxis,
         pointCoordinatesExtraAxis, pointCoordinatesLessAxis);
       assertObjectContsructor(geometryFactory, coordinates, coordinatesLessNaN,
         pointCoordinatesAllAxis, pointCoordinatesExtraAxis, pointCoordinatesLessAxis);
 
       // LineString
-      final Point pointCoordinatesListAllAxis = geometryFactory.point(new LineStringDouble(
-        axisCount, coordinates));
-      final Point pointCoordinatesListExtraAxis = geometryFactory.point(new LineStringDouble(
-        axisCount, coordinatesExtra));
-      final Point pointCoordinatesListLessAxis = geometryFactory.point(new LineStringDouble(
-        axisCountLess, coordinatesLess));
+      final Point pointCoordinatesListAllAxis = geometryFactory
+        .point(new LineStringDouble(axisCount, coordinates));
+      final Point pointCoordinatesListExtraAxis = geometryFactory
+        .point(new LineStringDouble(axisCount, coordinatesExtra));
+      final Point pointCoordinatesListLessAxis = geometryFactory
+        .point(new LineStringDouble(axisCountLess, coordinatesLess));
       assertEquals(coordinates, coordinatesLessNaN, pointCoordinatesListAllAxis,
         pointCoordinatesListExtraAxis, pointCoordinatesListLessAxis);
       assertObjectContsructor(geometryFactory, coordinates, coordinatesLessNaN,

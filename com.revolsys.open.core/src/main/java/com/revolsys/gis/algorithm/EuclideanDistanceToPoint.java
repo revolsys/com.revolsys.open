@@ -67,7 +67,8 @@ public class EuclideanDistanceToPoint {
     ptDist.setMinimum(closestPt, pt);
   }
 
-  public void computeDistance(final LineString line, final Point pt, final PointPairDistance ptDist) {
+  public void computeDistance(final LineString line, final Point pt,
+    final PointPairDistance ptDist) {
     for (final Segment segment : line.segments()) {
       // this is somewhat inefficient - could do better
       final Point closestPt = segment.closestPoint(pt);

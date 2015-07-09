@@ -187,7 +187,8 @@ class PolygonizeGraph extends PlanarGraph {
    * @return the list of intersection nodes found,
    * or <code>null</code> if no intersection nodes were found
    */
-  private static List findIntersectionNodes(final PolygonizeDirectedEdge startDE, final long label) {
+  private static List findIntersectionNodes(final PolygonizeDirectedEdge startDE,
+    final long label) {
     PolygonizeDirectedEdge de = startDE;
     List intNodes = null;
     do {
@@ -297,10 +298,10 @@ class PolygonizeGraph extends PlanarGraph {
     final Node nStart = getNode(startPt);
     final Node nEnd = getNode(endPt);
 
-    final DirectedEdge de0 = new PolygonizeDirectedEdge(nStart, nEnd, cleanLine.getVertex(1)
-      .clonePoint(), true);
-    final DirectedEdge de1 = new PolygonizeDirectedEdge(nEnd, nStart, cleanLine.getVertex(-2)
-      .clonePoint(), false);
+    final DirectedEdge de0 = new PolygonizeDirectedEdge(nStart, nEnd,
+      cleanLine.getVertex(1).clonePoint(), true);
+    final DirectedEdge de1 = new PolygonizeDirectedEdge(nEnd, nStart,
+      cleanLine.getVertex(-2).clonePoint(), false);
     final Edge edge = new PolygonizeEdge(line);
     edge.setDirectedEdges(de0, de1);
     add(edge);

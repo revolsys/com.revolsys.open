@@ -327,17 +327,19 @@ class OffsetSegmentGenerator {
          * Add "closing segment" of required length.
          */
         if (this.closingSegLengthFactor > 0) {
-          final Point mid0 = new PointDouble((this.closingSegLengthFactor
-            * this.offset0.getP1().getX() + this.s1.getX())
-            / (this.closingSegLengthFactor + 1), (this.closingSegLengthFactor
-            * this.offset0.getP1().getY() + this.s1.getY())
-            / (this.closingSegLengthFactor + 1), Point.NULL_ORDINATE);
+          final Point mid0 = new PointDouble(
+            (this.closingSegLengthFactor * this.offset0.getP1().getX() + this.s1.getX())
+              / (this.closingSegLengthFactor + 1),
+            (this.closingSegLengthFactor * this.offset0.getP1().getY() + this.s1.getY())
+              / (this.closingSegLengthFactor + 1),
+            Point.NULL_ORDINATE);
           this.segList.addPt(mid0);
-          final Point mid1 = new PointDouble((this.closingSegLengthFactor
-            * this.offset1.getP0().getX() + this.s1.getX())
-            / (this.closingSegLengthFactor + 1), (this.closingSegLengthFactor
-            * this.offset1.getP0().getY() + this.s1.getY())
-            / (this.closingSegLengthFactor + 1), Point.NULL_ORDINATE);
+          final Point mid1 = new PointDouble(
+            (this.closingSegLengthFactor * this.offset1.getP0().getX() + this.s1.getX())
+              / (this.closingSegLengthFactor + 1),
+            (this.closingSegLengthFactor * this.offset1.getP0().getY() + this.s1.getY())
+              / (this.closingSegLengthFactor + 1),
+            Point.NULL_ORDINATE);
           this.segList.addPt(mid1);
         } else {
           /**
@@ -450,8 +452,8 @@ class OffsetSegmentGenerator {
       break;
       case BufferParameters.CAP_SQUARE:
         // add a square defined by extensions of the offset segment endpoints
-        final Point squareCapSideOffset = new PointDouble(
-          Math.abs(this.distance) * Math.cos(angle), Math.abs(this.distance) * Math.sin(angle));
+        final Point squareCapSideOffset = new PointDouble(Math.abs(this.distance) * Math.cos(angle),
+          Math.abs(this.distance) * Math.sin(angle));
 
         final double lx = lp1.getX() + squareCapSideOffset.getX();
         final double ly = lp1.getY() + squareCapSideOffset.getY();

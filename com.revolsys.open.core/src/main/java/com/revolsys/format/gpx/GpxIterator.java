@@ -381,8 +381,8 @@ public class GpxIterator implements RecordIterator {
       axisCount = Math.max(axisCount, pointAxisCount);
     }
     if (coordinates.size() == axisCount) {
-      return this.geometryFactory.convertAxisCount(axisCount).point(
-        MathUtil.toDoubleArray(coordinates));
+      return this.geometryFactory.convertAxisCount(axisCount)
+        .point(MathUtil.toDoubleArray(coordinates));
     } else {
       return this.geometryFactory.convertAxisCount(axisCount).lineString(4,
         MathUtil.toDoubleArray(coordinates));

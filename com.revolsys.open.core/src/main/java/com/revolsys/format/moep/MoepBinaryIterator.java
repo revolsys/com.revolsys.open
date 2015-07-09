@@ -269,8 +269,8 @@ public class MoepBinaryIterator extends BaseObjectWithProperties implements Iter
             final String fontName = new String(attribute.substring(0, 3).trim());
             object.setValue(MoepConstants.FONT_NAME, fontName);
             if (attribute.length() > 3) {
-              final String other = new String(attribute.substring(3,
-                Math.min(attribute.length(), 5)).trim());
+              final String other = new String(
+                attribute.substring(3, Math.min(attribute.length(), 5)).trim());
               object.setValue(MoepConstants.FONT_WEIGHT, other);
             } else {
               object.setValue(MoepConstants.FONT_WEIGHT, "0");

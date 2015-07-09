@@ -26,7 +26,8 @@ public class ogr implements ogrConstants {
     return cPtr == 0 ? null : new Geometry(cPtr, true);
   }
 
-  public static Geometry BuildPolygonFromEdges(final Geometry hLineCollection, final int bBestEffort) {
+  public static Geometry BuildPolygonFromEdges(final Geometry hLineCollection,
+    final int bBestEffort) {
     final long cPtr = ogrJNI.BuildPolygonFromEdges__SWIG_2(Geometry.getCPtr(hLineCollection),
       hLineCollection, bBestEffort);
     return cPtr == 0 ? null : new Geometry(cPtr, true);
@@ -61,7 +62,8 @@ public class ogr implements ogrConstants {
     return cPtr == 0 ? null : new Geometry(cPtr, true);
   }
 
-  public static Geometry CreateGeometryFromWkb(final byte[] nLen, final SpatialReference reference) {
+  public static Geometry CreateGeometryFromWkb(final byte[] nLen,
+    final SpatialReference reference) {
     final long cPtr = ogrJNI.CreateGeometryFromWkb__SWIG_0(nLen,
       SpatialReference.getCPtr(reference), reference);
     return cPtr == 0 ? null : new Geometry(cPtr, true);
@@ -73,8 +75,8 @@ public class ogr implements ogrConstants {
   }
 
   public static Geometry CreateGeometryFromWkt(final String val, final SpatialReference reference) {
-    final long cPtr = ogrJNI.CreateGeometryFromWkt__SWIG_0(val,
-      SpatialReference.getCPtr(reference), reference);
+    final long cPtr = ogrJNI.CreateGeometryFromWkt__SWIG_0(val, SpatialReference.getCPtr(reference),
+      reference);
     return cPtr == 0 ? null : new Geometry(cPtr, true);
   }
 

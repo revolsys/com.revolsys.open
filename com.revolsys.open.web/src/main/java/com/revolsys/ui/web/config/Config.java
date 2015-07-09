@@ -72,8 +72,8 @@ public class Config implements Serializable {
   public void addComponent(final Component component) {
     final String name = component.getName();
     if (this.components.containsKey(name)) {
-      throw new IllegalArgumentException(new StringBuilder(
-        "Duplicate Component definition with name ").append(name).toString());
+      throw new IllegalArgumentException(
+        new StringBuilder("Duplicate Component definition with name ").append(name).toString());
     }
     this.components.put(name, component);
   }
@@ -168,10 +168,10 @@ public class Config implements Serializable {
   public Component getComponent(final String name) {
     final Component component = (Component)this.components.get(name);
     if (component == null) {
-      throw new IllegalArgumentException(new StringBuilder(
-        "There does not exist a Component definition with name '").append(name)
-        .append("'")
-        .toString());
+      throw new IllegalArgumentException(
+        new StringBuilder("There does not exist a Component definition with name '").append(name)
+          .append("'")
+          .toString());
     }
     return component;
   }
@@ -183,10 +183,10 @@ public class Config implements Serializable {
   public Layout getLayout(final String name) {
     final Layout layout = (Layout)this.layouts.get(name);
     if (layout == null) {
-      throw new IllegalArgumentException(new StringBuilder(
-        "There does not exist a Component definition with name '").append(name)
-        .append("'")
-        .toString());
+      throw new IllegalArgumentException(
+        new StringBuilder("There does not exist a Component definition with name '").append(name)
+          .append("'")
+          .toString());
     }
     return layout;
   }
@@ -207,7 +207,8 @@ public class Config implements Serializable {
     } else {
       // Check to see if there is a page match for any of the parent paths
       String parentPath = path;
-      for (int pathIndex = parentPath.lastIndexOf('/'); pathIndex != -1; pathIndex = parentPath.lastIndexOf('/')) {
+      for (int pathIndex = parentPath.lastIndexOf('/'); pathIndex != -1; pathIndex = parentPath
+        .lastIndexOf('/')) {
         parentPath = parentPath.substring(0, pathIndex);
         page = this.pages.get(parentPath);
         if (page != null) {

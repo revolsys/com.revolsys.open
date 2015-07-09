@@ -6,8 +6,8 @@ import com.revolsys.format.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.format.xml.XsiConstants;
 
-public abstract class AbstractEsriGeodatabaseXmlFieldType implements EsriGeodatabaseXmlFieldType,
-  EsriGeodatabaseXmlConstants {
+public abstract class AbstractEsriGeodatabaseXmlFieldType
+  implements EsriGeodatabaseXmlFieldType, EsriGeodatabaseXmlConstants {
 
   private final FieldType esriFieldType;
 

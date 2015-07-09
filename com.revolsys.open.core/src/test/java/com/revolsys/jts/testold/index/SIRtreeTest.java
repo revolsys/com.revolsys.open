@@ -34,10 +34,10 @@ package com.revolsys.jts.testold.index;
 
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.index.strtree.AbstractNode;
 import com.revolsys.jts.index.strtree.SIRtree;
+
+import junit.framework.TestCase;
 
 /**
  * @version 1.7

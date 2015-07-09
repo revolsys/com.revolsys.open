@@ -235,10 +235,10 @@ public class Feature implements Cloneable {
     ogrJNI.Feature_SetField__SWIG_2(this.swigCPtr, this, id, value);
   }
 
-  public void SetField(final int id, final int year, final int month, final int day,
-    final int hour, final int minute, final int second, final int tzflag) {
-    ogrJNI.Feature_SetField__SWIG_6(this.swigCPtr, this, id, year, month, day, hour, minute,
-      second, tzflag);
+  public void SetField(final int id, final int year, final int month, final int day, final int hour,
+    final int minute, final int second, final int tzflag) {
+    ogrJNI.Feature_SetField__SWIG_6(this.swigCPtr, this, id, year, month, day, hour, minute, second,
+      tzflag);
   }
 
   public void SetField(final int id, final String value) {

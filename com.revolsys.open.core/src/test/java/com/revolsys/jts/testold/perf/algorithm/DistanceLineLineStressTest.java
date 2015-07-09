@@ -34,12 +34,12 @@ package com.revolsys.jts.testold.perf.algorithm;
 
 import java.util.Random;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 public class DistanceLineLineStressTest extends TestCase {
 

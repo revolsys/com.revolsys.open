@@ -1,9 +1,9 @@
 package com.revolsys.jts.testold.math;
 
+import com.revolsys.jts.math.Vector2D;
+
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
-
-import com.revolsys.jts.math.Vector2D;
 
 public class Vector2DTest extends TestCase {
 

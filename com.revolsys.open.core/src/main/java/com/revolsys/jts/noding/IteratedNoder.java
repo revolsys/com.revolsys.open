@@ -92,8 +92,8 @@ public class IteratedNoder implements Noder {
       // System.out.println("# nodes created: " + nodesCreated);
       if (lastNodesCreated > 0 && nodesCreated >= lastNodesCreated
         && nodingIterationCount > this.maxIter) {
-        throw new TopologyException("Iterated noding failed to converge after "
-          + nodingIterationCount + " iterations");
+        throw new TopologyException(
+          "Iterated noding failed to converge after " + nodingIterationCount + " iterations");
       }
       lastNodesCreated = nodesCreated;
 

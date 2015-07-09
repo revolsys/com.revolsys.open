@@ -18,7 +18,8 @@ public class FormAllFieldsModifiedPredicate implements HighlightPredicate {
 
   public static void add(final RecordLayerForm form, final BaseJTable table) {
     final LayerRecordTableModel model = table.getTableModel();
-    final FormAllFieldsModifiedPredicate predicate = new FormAllFieldsModifiedPredicate(form, model);
+    final FormAllFieldsModifiedPredicate predicate = new FormAllFieldsModifiedPredicate(form,
+      model);
     ModifiedAttributePredicate.addModifiedHighlighters(table, predicate);
   }
 

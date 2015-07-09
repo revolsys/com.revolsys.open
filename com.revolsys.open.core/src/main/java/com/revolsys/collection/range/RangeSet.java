@@ -147,14 +147,6 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Cl
     }
   }
 
-  public boolean addValues(final Iterable<? extends Number> values) {
-    boolean added = false;
-    for (final Number value : values) {
-      added |= add(value);
-    }
-    return added;
-  }
-
   public boolean addRange(final AbstractRange<?> addRange) {
     boolean added = false;
     if (addRange != null) {
@@ -220,6 +212,14 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Cl
       for (final AbstractRange<?> range : ranges.getRanges()) {
         added |= addRange(range);
       }
+    }
+    return added;
+  }
+
+  public boolean addValues(final Iterable<? extends Number> values) {
+    boolean added = false;
+    for (final Number value : values) {
+      added |= add(value);
     }
     return added;
   }

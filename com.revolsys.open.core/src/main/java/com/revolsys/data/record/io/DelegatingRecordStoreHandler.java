@@ -36,8 +36,8 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
     try {
       proxyStore.initialize();
     } catch (final Throwable t) {
-      LoggerFactory.getLogger(DelegatingRecordStoreHandler.class).error(
-        "Unable to initialize record store " + label, t);
+      LoggerFactory.getLogger(DelegatingRecordStoreHandler.class)
+        .error("Unable to initialize record store " + label, t);
     }
     return proxyStore;
   }
@@ -51,7 +51,8 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
   public DelegatingRecordStoreHandler() {
   }
 
-  public DelegatingRecordStoreHandler(final String label, final Map<String, ? extends Object> config) {
+  public DelegatingRecordStoreHandler(final String label,
+    final Map<String, ? extends Object> config) {
     this.label = label;
     this.config = new HashMap<String, Object>(config);
   }

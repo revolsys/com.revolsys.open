@@ -18,8 +18,8 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Reorderable;
 
-public class ObjectListTableModel<T> extends AbstractTableModel implements Reorderable,
-  PropertyChangeListener {
+public class ObjectListTableModel<T> extends AbstractTableModel
+  implements Reorderable, PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -31,15 +31,16 @@ public class ObjectListTableModel<T> extends AbstractTableModel implements Reord
 
   private PropertyChangeArrayList<T> objects;
 
-  public ObjectListTableModel(final Collection<? extends T> objects, final List<String> columnNames) {
+  public ObjectListTableModel(final Collection<? extends T> objects,
+    final List<String> columnNames) {
     this(objects, columnNames, columnNames);
   }
 
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
-  public ObjectListTableModel(final Collection<? extends T> objects,
-    final List<String> columnNames, final List<String> columnTitles) {
+  public ObjectListTableModel(final Collection<? extends T> objects, final List<String> columnNames,
+    final List<String> columnTitles) {
     if (objects == null) {
       this.objects = new PropertyChangeArrayList<T>();
     } else if (objects instanceof PropertyChangeArrayList) {

@@ -60,8 +60,8 @@ public class TextAreaField extends Field {
     final int maxLength, final String defaultValue, final boolean required) {
     this(name, cols, rows, maxLength, defaultValue, required);
     if (minLength <= maxLength) {
-      throw new IllegalArgumentException("minLength (" + minLength + ") must be <= maxLength ("
-        + minLength + ")");
+      throw new IllegalArgumentException(
+        "minLength (" + minLength + ") must be <= maxLength (" + minLength + ")");
     }
     this.minLength = minLength;
   }
@@ -72,8 +72,8 @@ public class TextAreaField extends Field {
     this.maxLength = maxLength;
   }
 
-  public TextAreaField(final String name, final int cols, final int rows,
-    final String defaultValue, final boolean required) {
+  public TextAreaField(final String name, final int cols, final int rows, final String defaultValue,
+    final boolean required) {
     this(name, cols, rows, required);
     this.inputValue = defaultValue;
   }

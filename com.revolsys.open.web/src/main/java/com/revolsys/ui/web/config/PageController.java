@@ -132,11 +132,10 @@ public class PageController implements SiteNodeController {
   public boolean equals(final Object o) {
     if (o instanceof PageController) {
       final PageController p = (PageController)o;
-      if (super.equals(o)
-        && p.menuId == this.menuId
-        && p.getPath().equals(getPath())
-        && (p.title == this.title || p.title != null && this.title != null
-          && p.title.equals(this.title)) && p.properties.equals(this.properties)) {
+      if (super.equals(o) && p.menuId == this.menuId && p.getPath().equals(getPath())
+        && (p.title == this.title
+          || p.title != null && this.title != null && p.title.equals(this.title))
+        && p.properties.equals(this.properties)) {
         return true;
       }
     }

@@ -18,8 +18,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.io.ZipWriter;
 
-public class ShapefileZip extends AbstractRecordIoFactory
-  implements RecordWriterFactory {
+public class ShapefileZip extends AbstractRecordIoFactory implements RecordWriterFactory {
 
   public ShapefileZip() {
     super("ESRI Shapefile inside a ZIP archive");

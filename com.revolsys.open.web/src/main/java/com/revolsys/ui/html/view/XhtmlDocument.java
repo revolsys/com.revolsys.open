@@ -14,7 +14,8 @@ public class XhtmlDocument {
 
   public void serialize(final XmlWriter out) throws IOException {
     out.startDocument("UTF-8", "1.0");
-    out.docType("html", "-//W3C//DTD XHTML 1.1//EN", "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd");
+    out.docType("html", "-//W3C//DTD XHTML 1.1//EN",
+      "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd");
     out.startTag(HtmlUtil.HTML);
     out.attribute(HtmlUtil.ATTR_LANG, "en");
 

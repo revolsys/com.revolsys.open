@@ -131,7 +131,7 @@ public class BinTreeCorrectTest {
 
   public void run() {
     fill();
-    // System.out.println("depth = " + this.btree.depth() + "  size = "
+    // System.out.println("depth = " + this.btree.depth() + " size = "
     // + this.btree.size());
     runQueries();
   }

@@ -26,8 +26,8 @@ public class TwoListsPanel<T> extends JPanel {
   private final JButton moveLeftButton = new InvokeMethodAction(Icons.getIcon("arrow_left"), this,
     "moveSelectedLeft").createButton();
 
-  private final JButton moveRightButton = new InvokeMethodAction(Icons.getIcon("arrow_right"),
-    this, "moveSelectedLeft").createButton();
+  private final JButton moveRightButton = new InvokeMethodAction(Icons.getIcon("arrow_right"), this,
+    "moveSelectedLeft").createButton();
 
   private final JList rightList;
 
@@ -57,8 +57,8 @@ public class TwoListsPanel<T> extends JPanel {
     moveRightConstraints.setWidth(Spring.constant(30));
 
     final Constraints rightConstraints = layout.getConstraints(rightScroll);
-    rightConstraints.setX(Spring.sum(buttonLeft,
-      Spring.sum(moveRightConstraints.getWidth(), Spring.constant(5))));
+    rightConstraints.setX(
+      Spring.sum(buttonLeft, Spring.sum(moveRightConstraints.getWidth(), Spring.constant(5))));
     rightConstraints.setY(Spring.constant(5));
 
     final Spring maxHeight = Spring.max(leftConstraints.getHeight(), rightConstraints.getHeight());
@@ -66,9 +66,8 @@ public class TwoListsPanel<T> extends JPanel {
     leftConstraints.setHeight(maxHeight);
     rightConstraints.setHeight(maxHeight);
 
-    panelConstraints.setWidth(Spring.sum(
-      Spring.constant(25),
-      Spring.sum(moveRightConstraints.getWidth(),
+    panelConstraints
+      .setWidth(Spring.sum(Spring.constant(25), Spring.sum(moveRightConstraints.getWidth(),
         Spring.sum(leftConstraints.getWidth(), rightConstraints.getWidth()))));
     panelConstraints.setHeight(Spring.sum(Spring.constant(10), maxHeight));
     //

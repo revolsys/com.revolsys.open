@@ -34,8 +34,8 @@ public class ContextCleanupListener implements ServletContextListener {
           try {
             ((DisposableBean)attrValue).destroy();
           } catch (final Throwable e) {
-            System.err.println("Couldn't invoke destroy method of attribute with name '" + attrName
-              + "'");
+            System.err
+              .println("Couldn't invoke destroy method of attribute with name '" + attrName + "'");
           }
         } else {
           servletContext.removeAttribute(attrName);

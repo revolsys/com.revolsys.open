@@ -877,8 +877,8 @@ public class Matrix implements Cloneable, java.io.Serializable {
     // for floating-point nxn matrices.
     if (m1.rowCount != m1.columnCount) {
       // Matrix is either under or over determined
-      throw new IllegalArgumentException("Row " + m1.rowCount + "and" + m1.columnCount
-        + " column count must be the same");
+      throw new IllegalArgumentException(
+        "Row " + m1.rowCount + "and" + m1.columnCount + " column count must be the same");
     }
 
     // Copy source matrix to temp

@@ -16,7 +16,8 @@ public class InputStreamResource extends org.springframework.core.io.InputStream
     this.filename = filename;
   }
 
-  public InputStreamResource(final String filename, final InputStream inputStream, final long length) {
+  public InputStreamResource(final String filename, final InputStream inputStream,
+    final long length) {
     super(inputStream);
     this.filename = filename;
     this.length = length;

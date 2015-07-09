@@ -74,7 +74,7 @@ public class PlanarPolygon3D {
         return new PointDouble(p.getX(), p.getY(), Point.NULL_ORDINATE);
       case Plane3D.XZ_PLANE:
         return new PointDouble(p.getX(), p.getZ(), Point.NULL_ORDINATE);
-        // Plane3D.YZ
+      // Plane3D.YZ
       default:
         return new PointDouble(p.getY(), p.getZ(), Point.NULL_ORDINATE);
     }

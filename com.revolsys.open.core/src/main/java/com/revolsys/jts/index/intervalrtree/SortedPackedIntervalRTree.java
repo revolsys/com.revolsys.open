@@ -74,7 +74,8 @@ public class SortedPackedIntervalRTree<V> {
       if (n2 == null) {
         dest.add(n1);
       } else {
-        final IntervalRTreeNode<V> node = new IntervalRTreeBranchNode<V>(src.get(i), src.get(i + 1));
+        final IntervalRTreeNode<V> node = new IntervalRTreeBranchNode<V>(src.get(i),
+          src.get(i + 1));
         // printNode(node);
         // System.out.println(node);
         dest.add(node);

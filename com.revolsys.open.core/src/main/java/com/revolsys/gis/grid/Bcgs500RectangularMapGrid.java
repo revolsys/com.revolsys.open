@@ -29,8 +29,8 @@ public class Bcgs500RectangularMapGrid extends Bcgs1000RectangularMapGrid {
         number500);
       return latitude;
     } else {
-      throw new IllegalArgumentException(mapTileName
-        + " does not start with a valid BCGS 1:500 tile name");
+      throw new IllegalArgumentException(
+        mapTileName + " does not start with a valid BCGS 1:500 tile name");
     }
   }
 
@@ -56,13 +56,13 @@ public class Bcgs500RectangularMapGrid extends Bcgs1000RectangularMapGrid {
         number500);
       return longitude;
     } else {
-      throw new IllegalArgumentException(mapTileName
-        + " does not start with a valid BCGS 1:500 tile name");
+      throw new IllegalArgumentException(
+        mapTileName + " does not start with a valid BCGS 1:500 tile name");
     }
   }
 
-  protected double getLongitude(final String blockName, final String letter,
-    final String number20k, final String number2000, final String number1000, final String number500) {
+  protected double getLongitude(final String blockName, final String letter, final String number20k,
+    final String number2000, final String number1000, final String number500) {
     double longitude = getLongitude(blockName, letter, number20k, number2000, number1000);
     final int numberCol = GridUtil.getNumberCol4(number500);
     longitude -= numberCol * BcgsConstants.WIDTH_500;

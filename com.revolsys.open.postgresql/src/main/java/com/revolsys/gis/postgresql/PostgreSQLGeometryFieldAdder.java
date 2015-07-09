@@ -82,8 +82,9 @@ public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
       field.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
       return field;
     } catch (final Throwable e) {
-      LOG.error("Attribute not registered in GEOMETRY_COLUMN table " + owner + "." + tableName
-        + "." + name, e);
+      LOG.error(
+        "Attribute not registered in GEOMETRY_COLUMN table " + owner + "." + tableName + "." + name,
+        e);
       return null;
     }
   }

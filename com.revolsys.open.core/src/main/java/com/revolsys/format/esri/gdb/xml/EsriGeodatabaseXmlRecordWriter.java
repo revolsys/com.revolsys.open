@@ -34,8 +34,8 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.util.DateUtil;
 
-public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter implements
-  EsriGeodatabaseXmlConstants {
+public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
+  implements EsriGeodatabaseXmlConstants {
   private static final Logger LOG = LoggerFactory.getLogger(EsriGeodatabaseXmlRecordWriter.class);
 
   private int datasetId = 1;
@@ -213,7 +213,8 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter impleme
       this.out.element(FEATURE_TYPE, FEATURE_TYPE_SIMPLE);
       this.out.element(SHAPE_TYPE, this.geometryType);
       this.out.element(SHAPE_FIELD_NAME, geometryField.getName());
-      final GeometryFactory geometryFactory = geometryField.getProperty(FieldProperties.GEOMETRY_FACTORY);
+      final GeometryFactory geometryFactory = geometryField
+        .getProperty(FieldProperties.GEOMETRY_FACTORY);
       this.out.element(HAS_M, false);
       this.out.element(HAS_Z, geometryFactory.hasZ());
       this.out.element(HAS_SPATIAL_INDEX, false);
@@ -275,7 +276,8 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter impleme
         this.out.element(PRECISION, precision);
         this.out.element(SCALE, attribute.getScale());
 
-        final GeometryFactory geometryFactory = attribute.getProperty(FieldProperties.GEOMETRY_FACTORY);
+        final GeometryFactory geometryFactory = attribute
+          .getProperty(FieldProperties.GEOMETRY_FACTORY);
         if (geometryFactory != null) {
           this.out.startTag(GEOMETRY_DEF);
           this.out.attribute(XsiConstants.TYPE, GEOMETRY_DEF_TYPE);
@@ -362,7 +364,8 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter impleme
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem != null) {
-        final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
+        final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
+          .getCoordinateSystem(coordinateSystem);
         if (esriCoordinateSystem != null) {
           this.out.startTag(SPATIAL_REFERENCE);
           if (esriCoordinateSystem instanceof ProjectedCoordinateSystem) {

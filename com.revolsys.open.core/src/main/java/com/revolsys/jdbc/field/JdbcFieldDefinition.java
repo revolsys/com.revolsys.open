@@ -38,7 +38,8 @@ public class JdbcFieldDefinition extends FieldDefinition {
     } else if (value instanceof Float) {
       return new JdbcFloatFieldDefinition(null, null, Types.FLOAT, -1, false, null, null);
     } else if (value instanceof BigDecimal) {
-      return new JdbcBigDecimalFieldDefinition(null, null, Types.NUMERIC, -1, -1, false, null, null);
+      return new JdbcBigDecimalFieldDefinition(null, null, Types.NUMERIC, -1, -1, false, null,
+        null);
     } else if (value instanceof Date) {
       return new JdbcDateFieldDefinition(null, null, -1, false, null, null);
     } else if (value instanceof java.util.Date) {

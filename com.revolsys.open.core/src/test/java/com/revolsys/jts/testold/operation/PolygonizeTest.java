@@ -36,13 +36,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.polygonize.Polygonizer;
 import com.revolsys.jts.util.Assert;
+
+import junit.framework.TestCase;
 
 /**
  * @version 1.7
@@ -59,9 +59,10 @@ public class PolygonizeTest extends TestCase {
   }
 
   private void compare(final Collection expectedGeometries, final Collection actualGeometries) {
-    assertEquals("Geometry count - expected " + expectedGeometries.size() + " but actual was "
-      + actualGeometries.size() + " in " + actualGeometries, expectedGeometries.size(),
-      actualGeometries.size());
+    assertEquals(
+      "Geometry count - expected " + expectedGeometries.size() + " but actual was "
+        + actualGeometries.size() + " in " + actualGeometries,
+      expectedGeometries.size(), actualGeometries.size());
     for (final Iterator i = expectedGeometries.iterator(); i.hasNext();) {
       final Geometry expectedGeometry = (Geometry)i.next();
       assertTrue("Expected to find: " + expectedGeometry + " in Actual result:" + actualGeometries,

@@ -40,9 +40,10 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
-public class PageInfoHttpMessageConverter extends AbstractHttpMessageConverter<PageInfo> implements
-  WadlConstants {
-  private static final MediaType APPLICATION_VND_SUN_WADL_XML = MediaType.parseMediaType("application/vnd.sun.wadl+xml");
+public class PageInfoHttpMessageConverter extends AbstractHttpMessageConverter<PageInfo>
+  implements WadlConstants {
+  private static final MediaType APPLICATION_VND_SUN_WADL_XML = MediaType
+    .parseMediaType("application/vnd.sun.wadl+xml");
 
   private static final MediaType TEXT_URI_LIST = MediaType.parseMediaType("text/uri-list");
 
@@ -113,7 +114,8 @@ public class PageInfoHttpMessageConverter extends AbstractHttpMessageConverter<P
     final HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
     if (!HttpServletUtils.getResponse().isCommitted()) {
       if (pageInfo != null) {
-        final Charset charset = HttpServletUtils.setContentTypeWithCharset(outputMessage, mediaType);
+        final Charset charset = HttpServletUtils.setContentTypeWithCharset(outputMessage,
+          mediaType);
 
         final HttpServletRequest request = HttpServletUtils.getRequest();
 
@@ -402,8 +404,8 @@ public class PageInfoHttpMessageConverter extends AbstractHttpMessageConverter<P
       charset = StandardCharsets.UTF_8;
     }
     final String mediaTypeString = mediaType.getType() + "/" + mediaType.getSubtype();
-    final MapWriterFactory writerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
-      MapWriterFactory.class, mediaTypeString);
+    final MapWriterFactory writerFactory = this.ioFactoryRegistry
+      .getFactoryByMediaType(MapWriterFactory.class, mediaTypeString);
     if (writerFactory != null) {
       final MapWriter writer = writerFactory.createMapWriter(out, charset);
       writer.setProperty(IoConstants.INDENT, true);

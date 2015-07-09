@@ -99,23 +99,22 @@ public class MavenRepository implements URLStreamHandlerFactory {
 
   public Map<String, Object> getMavenMetadata(final String groupId, final String artifactId,
     final String version) {
-    final String recordDefinitionPath = "/"
-      + CollectionUtil.toString("/", groupId.replace('.', '/'), artifactId, version,
-        "maven-metadata.xml");
+    final String recordDefinitionPath = "/" + CollectionUtil.toString("/",
+      groupId.replace('.', '/'), artifactId, version, "maven-metadata.xml");
     final Resource recordDefinitionResource = SpringUtil.getResource(this.root,
       recordDefinitionPath);
     if (recordDefinitionResource.exists()) {
       try {
         return XmlMapIoFactory.toMap(recordDefinitionResource);
       } catch (final RuntimeException e) {
-        LoggerFactory.getLogger(getClass()).error(
-          "Error loading maven resource" + recordDefinitionResource, e);
+        LoggerFactory.getLogger(getClass())
+          .error("Error loading maven resource" + recordDefinitionResource, e);
         if (recordDefinitionResource instanceof FileSystemResource) {
           try {
             final File file = recordDefinitionResource.getFile();
             if (file.delete()) {
-              LoggerFactory.getLogger(getClass()).error(
-                "Deleting corrupt maven resource" + recordDefinitionResource, e);
+              LoggerFactory.getLogger(getClass())
+                .error("Deleting corrupt maven resource" + recordDefinitionResource, e);
             }
           } catch (final IOException ioe) {
           }
@@ -156,9 +155,8 @@ public class MavenRepository implements URLStreamHandlerFactory {
   public MavenPom getPom(final String id) {
     final String[] parts = id.split(":");
     if (parts.length < 3) {
-      throw new IllegalArgumentException(
-        id
-          + " is not a valid Maven identifier. Should be in the format: <groupId>:<artifactId>:<version>.");
+      throw new IllegalArgumentException(id
+        + " is not a valid Maven identifier. Should be in the format: <groupId>:<artifactId>:<version>.");
     }
     final String groupId = parts[0];
     final String artifactId = parts[1];
@@ -180,8 +178,8 @@ public class MavenRepository implements URLStreamHandlerFactory {
       final Map<String, Object> map = XmlMapIoFactory.toMap(resource);
       return new MavenPom(this, map);
     } else {
-      throw new IllegalArgumentException("Pom does not exist for " + groupId + ":" + artifactId
-        + ":" + version + " at " + resource);
+      throw new IllegalArgumentException(
+        "Pom does not exist for " + groupId + ":" + artifactId + ":" + version + " at " + resource);
     }
   }
 
@@ -217,8 +215,8 @@ public class MavenRepository implements URLStreamHandlerFactory {
     final String path = getPath(groupId, artifactId, version, type, classifier, version, algorithm);
     final Resource artifactResource = SpringUtil.getResource(this.root, path);
     if (!artifactResource.exists()) {
-      return handleMissingResource(artifactResource, groupId, artifactId, type, classifier,
-        version, algorithm);
+      return handleMissingResource(artifactResource, groupId, artifactId, type, classifier, version,
+        algorithm);
     }
     return artifactResource;
   }
@@ -241,8 +239,8 @@ public class MavenRepository implements URLStreamHandlerFactory {
           if (digestContents == null) {
             LoggerFactory.getLogger(getClass()).error("Error downloading: " + digestResource, e);
           } else {
-            LoggerFactory.getLogger(getClass()).error(
-              "Error in SHA-1 checksum " + digestContents + " for " + digestResource, e);
+            LoggerFactory.getLogger(getClass())
+              .error("Error in SHA-1 checksum " + digestContents + " for " + digestResource, e);
           }
         }
       }

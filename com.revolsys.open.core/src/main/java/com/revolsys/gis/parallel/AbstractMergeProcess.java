@@ -209,8 +209,8 @@ public abstract class AbstractMergeProcess extends AbstractInOutProcess<Record, 
       if (typePaths[SOURCE_INDEX] != null) {
         final Record sourceObject = objects[SOURCE_INDEX];
         if (typePaths[OTHER_INDEX] != null) {
-          final int nameCompare = typePaths[SOURCE_INDEX].toString().compareTo(
-            typePaths[OTHER_INDEX].toString());
+          final int nameCompare = typePaths[SOURCE_INDEX].toString()
+            .compareTo(typePaths[OTHER_INDEX].toString());
           if (nameCompare <= 0) {
             currentType = sourceObject.getRecordDefinition();
             currentTypeName = typePaths[SOURCE_INDEX];

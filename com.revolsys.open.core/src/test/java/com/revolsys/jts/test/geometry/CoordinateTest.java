@@ -2,12 +2,12 @@ package com.revolsys.jts.test.geometry;
 
 import java.util.Arrays;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.data.equals.NumberEquals;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 public class CoordinateTest extends TestCase {
   public static void assertEquals(final Point point, final double... coordinates) {
@@ -44,7 +44,7 @@ public class CoordinateTest extends TestCase {
 
   public void testClone() {
     for (final Point point : Arrays.asList(//
-      new PointDouble(),//
+      new PointDouble(), //
       new PointDouble(100.0, 200.0), //
       new PointDouble(100.0, 200.0, 50.0), //
       new PointDouble(100.0, 200.0, 50.0, 4.0))) {

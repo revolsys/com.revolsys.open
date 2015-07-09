@@ -223,8 +223,8 @@ public final class IafServlet extends HttpServlet {
         path = path.substring(0, path.length() - 4);
       }
       final Page page = this.applicationConfig.getPage(contextPath + path);
-      WebUiContext.set(new WebUiContext(this.applicationConfig, contextPath, page, request,
-        response));
+      WebUiContext
+        .set(new WebUiContext(this.applicationConfig, contextPath, page, request, response));
       if (page.isSecure() && !secure) {
         response.sendRedirect(page.getFullUrl());
         return;

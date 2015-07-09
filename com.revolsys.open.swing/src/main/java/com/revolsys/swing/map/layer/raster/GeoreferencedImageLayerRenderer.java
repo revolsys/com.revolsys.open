@@ -14,10 +14,11 @@ import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 
-public class GeoreferencedImageLayerRenderer extends AbstractLayerRenderer<GeoreferencedImageLayer> {
+public class GeoreferencedImageLayerRenderer
+  extends AbstractLayerRenderer<GeoreferencedImageLayer> {
 
-  private static final GeometryStyle STYLE_DIFFERENT_COORDINATE_SYSTEM = GeometryStyle.line(
-    WebColors.Red, 4);
+  private static final GeometryStyle STYLE_DIFFERENT_COORDINATE_SYSTEM = GeometryStyle
+    .line(WebColors.Red, 4);
 
   public static void render(final Viewport2D viewport, final Graphics2D graphics,
     final GeoreferencedImage image, final boolean useTransform) {

@@ -15,7 +15,8 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
 
   public static final UtmRectangularMapGrid INSTANCE = new UtmRectangularMapGrid();
 
-  private static final CoordinateSystem COORDINATE_SYSTEM = EpsgCoordinateSystems.getCoordinateSystem(4326);
+  private static final CoordinateSystem COORDINATE_SYSTEM = EpsgCoordinateSystems
+    .getCoordinateSystem(4326);
 
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3(4326);
 
@@ -30,8 +31,8 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
   public BoundingBox getBoundingBox(final String mapTileName) {
     final double lat = getLatitude(mapTileName);
     final double lon = getLongitude(mapTileName);
-    return new BoundingBoxDoubleGf(GEOMETRY_FACTORY, 2, lon, lat, lon - this.tileWidth, lat
-      + this.tileHeight);
+    return new BoundingBoxDoubleGf(GEOMETRY_FACTORY, 2, lon, lat, lon - this.tileWidth,
+      lat + this.tileHeight);
   }
 
   @Override

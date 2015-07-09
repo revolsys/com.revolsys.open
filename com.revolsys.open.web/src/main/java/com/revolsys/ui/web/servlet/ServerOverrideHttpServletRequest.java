@@ -17,7 +17,8 @@ public class ServerOverrideHttpServletRequest extends HttpServletRequestWrapper 
 
   private int serverPort;
 
-  public ServerOverrideHttpServletRequest(final String serverUrl, final HttpServletRequest request) {
+  public ServerOverrideHttpServletRequest(final String serverUrl,
+    final HttpServletRequest request) {
     super(request);
 
     try {

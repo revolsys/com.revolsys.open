@@ -33,12 +33,12 @@
 
 package com.revolsys.jts.testold.geom;
 
+import com.revolsys.jts.geom.Dimension;
+import com.revolsys.jts.geom.IntersectionMatrix;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import com.revolsys.jts.geom.Dimension;
-import com.revolsys.jts.geom.IntersectionMatrix;
 
 /**
  * @version 1.7

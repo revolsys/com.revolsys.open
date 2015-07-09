@@ -17,8 +17,8 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.geometry.GeometryCoordinatesTableModel;
 
-public class GeometryCoordinateErrorPredicate extends BorderHighlighter implements
-  HighlightPredicate {
+public class GeometryCoordinateErrorPredicate extends BorderHighlighter
+  implements HighlightPredicate {
 
   private static final Border ERROR_BORDER = BorderFactory.createLineBorder(WebColors.Red, 2);
 

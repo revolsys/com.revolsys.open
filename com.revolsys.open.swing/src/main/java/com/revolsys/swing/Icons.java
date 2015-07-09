@@ -185,8 +185,8 @@ public class Icons {
   }
 
   public static Icon getIconWithBadge(final Icon baseIcon, final String badgeName) {
-    final BufferedImage image = new BufferedImage(baseIcon.getIconWidth(),
-      baseIcon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+    final BufferedImage image = new BufferedImage(baseIcon.getIconWidth(), baseIcon.getIconHeight(),
+      BufferedImage.TYPE_INT_ARGB);
     final Graphics graphics = image.createGraphics();
     baseIcon.paintIcon(null, graphics, 0, 0);
     final Image badgeImage = getBadgeImage(badgeName);

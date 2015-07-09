@@ -99,10 +99,8 @@ public class ConsistentPolygonRingChecker {
   private boolean isPotentialResultAreaEdge(final DirectedEdge de, final int opCode) {
     // mark all dirEdges with the appropriate label
     final Label label = de.getLabel();
-    if (label.isArea()
-      && !de.isInteriorAreaEdge()
-      && OverlayOp.isResultOfOp(label.getLocation(0, Position.RIGHT),
-        label.getLocation(1, Position.RIGHT), opCode)) {
+    if (label.isArea() && !de.isInteriorAreaEdge() && OverlayOp.isResultOfOp(
+      label.getLocation(0, Position.RIGHT), label.getLocation(1, Position.RIGHT), opCode)) {
       return true;
       // Debug.print("in result "); Debug.println(de);
     }

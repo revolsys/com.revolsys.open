@@ -123,7 +123,8 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected boolean doSaveChanges(final RecordSaveErrorTableModel errors, final LayerRecord record) {
+  protected boolean doSaveChanges(final RecordSaveErrorTableModel errors,
+    final LayerRecord record) {
     if (record.isDeleted()) {
       return true;
     } else {

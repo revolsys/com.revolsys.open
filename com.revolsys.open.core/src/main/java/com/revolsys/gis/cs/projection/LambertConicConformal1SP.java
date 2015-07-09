@@ -39,10 +39,12 @@ public class LambertConicConformal1SP extends AbstractCoordinatesProjection {
     this.x0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_EASTING);
     this.y0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_NORTHING);
 
-    final double longitudeOfNaturalOrigin = cs.getDoubleParameter(ProjectionParameterNames.LONGITUDE_OF_CENTER);
+    final double longitudeOfNaturalOrigin = cs
+      .getDoubleParameter(ProjectionParameterNames.LONGITUDE_OF_CENTER);
     this.lambda0 = Math.toRadians(longitudeOfNaturalOrigin);
 
-    final double latitudeOfNaturalOrigin = cs.getDoubleParameter(ProjectionParameterNames.LATITUDE_OF_CENTER);
+    final double latitudeOfNaturalOrigin = cs
+      .getDoubleParameter(ProjectionParameterNames.LATITUDE_OF_CENTER);
     final double phi0 = Math.toRadians(latitudeOfNaturalOrigin);
 
     this.a = spheroid.getSemiMajorAxis();
@@ -80,8 +82,8 @@ public class LambertConicConformal1SP extends AbstractCoordinatesProjection {
 
       final double sinPhi = Math.sin(phi);
       final double eSinPhi = this.e * sinPhi;
-      final double phi1 = Angle.PI_OVER_2 - 2
-        * Math.atan(t * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.e / 2));
+      final double phi1 = Angle.PI_OVER_2
+        - 2 * Math.atan(t * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.e / 2));
       delta = Math.abs(phi1 - phi);
       phi = phi1;
     } while (!Double.isNaN(phi) && delta > 1.0e-011);

@@ -23,7 +23,8 @@ public class ProcessNetworkServletContextListener implements ServletContextListe
   @Override
   public void contextInitialized(final ServletContextEvent servletContextEvent) {
     final ServletContext servletContext = servletContextEvent.getServletContext();
-    final WebApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+    final WebApplicationContext applicationContext = WebApplicationContextUtils
+      .getRequiredWebApplicationContext(servletContext);
     this.processNetwork = (ProcessNetwork)applicationContext.getBean("processNetwork");
     this.processNetwork.start();
   }

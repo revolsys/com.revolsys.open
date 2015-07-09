@@ -118,8 +118,8 @@ public class WktParser {
     if (hasText(text, "EMPTY")) {
       skipWhitespace(text);
       if (text.length() > 0) {
-        throw new IllegalArgumentException("Unexpected text at the end of an empty geometry: "
-          + text);
+        throw new IllegalArgumentException(
+          "Unexpected text at the end of an empty geometry: " + text);
       }
       return true;
     } else {
@@ -157,8 +157,8 @@ public class WktParser {
             }
             axisNum = 0;
           } else {
-            throw new IllegalArgumentException("Too many coordinates, vertex must have "
-              + axisCount + " coordinates not " + (axisNum + 1));
+            throw new IllegalArgumentException("Too many coordinates, vertex must have " + axisCount
+              + " coordinates not " + (axisNum + 1));
           }
           if (c == ')') {
             finished = true;
@@ -172,8 +172,8 @@ public class WktParser {
             }
             axisNum++;
           } else {
-            throw new IllegalArgumentException("Too many coordinates, vertex must have "
-              + axisCount + " coordinates not " + (axisNum + 1));
+            throw new IllegalArgumentException("Too many coordinates, vertex must have " + axisCount
+              + " coordinates not " + (axisNum + 1));
 
           }
         }

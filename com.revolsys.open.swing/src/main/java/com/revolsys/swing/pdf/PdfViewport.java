@@ -132,7 +132,8 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
   private void addPoint(final COSArray geoPoints, final GeometryFactory geometryFactory,
     final double x, final double y) {
     final Point point = geometryFactory.point(x, y);
-    final GeometryFactory geographicGeometryFactory = geometryFactory.getGeographicGeometryFactory();
+    final GeometryFactory geographicGeometryFactory = geometryFactory
+      .getGeographicGeometryFactory();
     final Point geoPoint = point.convert(geographicGeometryFactory);
     final double lon = geoPoint.getX();
     final double lat = geoPoint.getY();
@@ -268,8 +269,8 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
             final int descent = fontMetrics.getDescent();
             final int ascent = fontMetrics.getAscent();
             final int leading = fontMetrics.getLeading();
-            final double maxHeight = lines.length * (ascent + descent) + (lines.length - 1)
-              * leading;
+            final double maxHeight = lines.length * (ascent + descent)
+              + (lines.length - 1) * leading;
             final String verticalAlignment = style.getTextVerticalAlignment();
             if ("top".equals(verticalAlignment)) {
             } else if ("middle".equals(verticalAlignment)) {
@@ -385,7 +386,8 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
   private PDFont getFont(final String path) throws IOException {
     PDFont font = this.fonts.get(path);
     if (font == null) {
-      final InputStream fontStream = PDDocument.class.getResourceAsStream("/org/apache/pdfbox/resources/ttf/ArialMT.ttf");
+      final InputStream fontStream = PDDocument.class
+        .getResourceAsStream("/org/apache/pdfbox/resources/ttf/ArialMT.ttf");
       font = PDTrueTypeFont.loadTTF(this.document, fontStream);
       this.fonts.put("/org/apache/pdfbox/resources/ttf/ArialMT.ttf", font);
     }

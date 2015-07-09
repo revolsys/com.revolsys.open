@@ -32,7 +32,7 @@ import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.Property;
 
-public class ShapefileIterator extends AbstractIterator<Record> implements RecordIterator {
+public class ShapefileIterator extends AbstractIterator<Record>implements RecordIterator {
 
   private boolean closeFile = true;
 
@@ -62,7 +62,8 @@ public class ShapefileIterator extends AbstractIterator<Record> implements Recor
 
   private RecordDefinition returnRecordDefinition;
 
-  public ShapefileIterator(final Resource resource, final RecordFactory factory) throws IOException {
+  public ShapefileIterator(final Resource resource, final RecordFactory factory)
+    throws IOException {
     this.recordDefinitionFactory = factory;
     final String baseName = FileUtil.getBaseName(resource.getFilename());
     this.name = baseName;

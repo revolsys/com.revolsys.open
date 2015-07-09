@@ -2,8 +2,6 @@ package com.revolsys.jts.testold.operation;
 
 import java.util.Collection;
 
-import junit.framework.TestCase;
-
 import org.junit.Assert;
 
 import com.revolsys.jts.geom.Geometry;
@@ -11,6 +9,8 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.operation.union.UnaryUnionOp;
 import com.revolsys.jts.testold.junit.GeometryUtils;
+
+import junit.framework.TestCase;
 
 public class UnaryUnionTest extends TestCase {
 

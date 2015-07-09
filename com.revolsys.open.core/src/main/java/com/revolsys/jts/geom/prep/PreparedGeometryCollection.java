@@ -131,8 +131,8 @@ public class PreparedGeometryCollection extends AbstractGeometryCollection {
           geometries.set(partIndex, newGeometry);
           return (V)geometryFactory.geometryCollection(geometries);
         } else {
-          throw new IllegalArgumentException("Part index must be between 0 and " + partCount
-            + " not " + partIndex);
+          throw new IllegalArgumentException(
+            "Part index must be between 0 and " + partCount + " not " + partIndex);
         }
       }
     } else {

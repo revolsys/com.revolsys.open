@@ -41,8 +41,8 @@ package com.revolsys.jts.util;
 public class Stopwatch {
 
   public static String getTimeString(final long timeMillis) {
-    final String totalTimeStr = timeMillis < 10000 ? timeMillis + " ms" : timeMillis / 1000.0
-      + " s";
+    final String totalTimeStr = timeMillis < 10000 ? timeMillis + " ms"
+      : timeMillis / 1000.0 + " s";
     return totalTimeStr;
   }
 

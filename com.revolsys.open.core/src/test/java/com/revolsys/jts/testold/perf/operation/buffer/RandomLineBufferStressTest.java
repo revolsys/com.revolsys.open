@@ -99,8 +99,8 @@ public class RandomLineBufferStressTest {
 
   void runCase(final Geometry line, final double dist, final double lineScale, final int numPts)
     throws Exception {
-    // System.out.println("Running case " + this.caseCount + "  (line scale = "
-    // + lineScale + "  buffer dist = " + dist + "  num pts = " + numPts +
+    // System.out.println("Running case " + this.caseCount + " (line scale = "
+    // + lineScale + " buffer dist = " + dist + " num pts = " + numPts +
     // " )");
     checkBuffer(line, dist);
   }

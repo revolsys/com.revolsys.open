@@ -13,9 +13,9 @@ import org.springframework.core.io.Resource;
 import com.revolsys.io.connection.AbstractConnectionRegistryManager;
 import com.revolsys.util.OS;
 
-public class FolderConnectionManager extends
-  AbstractConnectionRegistryManager<FolderConnectionRegistry, FolderConnection> implements
-  URLStreamHandlerFactory {
+public class FolderConnectionManager
+  extends AbstractConnectionRegistryManager<FolderConnectionRegistry, FolderConnection>
+  implements URLStreamHandlerFactory {
 
   private static final FolderConnectionManager INSTANCE;
 

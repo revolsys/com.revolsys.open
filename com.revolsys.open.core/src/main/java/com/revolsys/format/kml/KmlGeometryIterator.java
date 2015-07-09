@@ -23,7 +23,7 @@ import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.util.Property;
 
-public class KmlGeometryIterator extends AbstractIterator<Geometry> implements Kml22Constants {
+public class KmlGeometryIterator extends AbstractIterator<Geometry>implements Kml22Constants {
   private GeometryFactory geometryFactory = GeometryFactory.floating3(COORDINATE_SYSTEM_ID);
 
   private XMLStreamReader in;
@@ -51,7 +51,8 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements K
   @Override
   protected Geometry getNext() {
     try {
-      if (StaxUtils.skipToChildStartElements(this.in, MULTI_GEOMETRY, POINT, LINE_STRING, POLYGON)) {
+      if (StaxUtils.skipToChildStartElements(this.in, MULTI_GEOMETRY, POINT, LINE_STRING,
+        POLYGON)) {
         final Geometry geometry = parseGeometry();
         if (geometry == null) {
           throw new NoSuchElementException();

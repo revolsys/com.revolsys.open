@@ -150,8 +150,8 @@ public class BufferFunctions {
     final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
     for (final LineString line : lines) {
       final Point[] pts = CoordinatesListUtil.getCoordinateArray(line);
-      simpLines.add(geometry.getGeometryFactory().lineString(
-        BufferInputLineSimplifier.simplify(line, distance)));
+      simpLines.add(geometry.getGeometryFactory()
+        .lineString(BufferInputLineSimplifier.simplify(line, distance)));
     }
     final Geometry simpGeom = geometry.getGeometryFactory().buildGeometry(simpLines);
     return simpGeom;

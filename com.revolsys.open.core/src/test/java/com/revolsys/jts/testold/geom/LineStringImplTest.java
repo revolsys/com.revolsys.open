@@ -33,11 +33,6 @@
 
 package com.revolsys.jts.testold.geom;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -46,6 +41,11 @@ import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKTReader;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import junit.textui.TestRunner;
 
 /**
  * Test for com.revolsys.jts.testold.geom.impl.LineStringImpl.
@@ -78,8 +78,10 @@ public class LineStringImplTest extends TestCase {
 
   public void testEquals10() throws Exception {
     final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1.0));
-    Geometry l1 = reader.read("POLYGON((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
-    Geometry l2 = reader.read("POLYGON((1731627364 519674014, 1731929984 519276112, 1732328800 519578384, 1732026179 519976285, 1731627364 519674014))");
+    Geometry l1 = reader.read(
+      "POLYGON((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
+    Geometry l2 = reader.read(
+      "POLYGON((1731627364 519674014, 1731929984 519276112, 1732328800 519578384, 1732026179 519976285, 1731627364 519674014))");
     l1 = l1.normalize();
     l2 = l2.normalize();
     assertTrue(l1.equals(2, l2));
@@ -110,28 +112,36 @@ public class LineStringImplTest extends TestCase {
   }
 
   public void testEquals6() throws Exception {
-    final LineString l1 = (LineString)this.reader.read("LINESTRING(1.111 2.222, 3.333 4.444, 5.555 6.666)");
-    final LineString l2 = (LineString)this.reader.read("LINESTRING(1.111 2.222, 3.333 4.444, 5.555 6.666)");
+    final LineString l1 = (LineString)this.reader
+      .read("LINESTRING(1.111 2.222, 3.333 4.444, 5.555 6.666)");
+    final LineString l2 = (LineString)this.reader
+      .read("LINESTRING(1.111 2.222, 3.333 4.444, 5.555 6.666)");
     assertTrue(l1.equals(l2));
   }
 
   public void testEquals7() throws Exception {
-    final LineString l1 = (LineString)this.reader.read("LINESTRING(1.111 2.222, 5.555 6.666, 3.333 4.444)");
-    final LineString l2 = (LineString)this.reader.read("LINESTRING(1.111 2.222, 3.333 4.444, 5.555 6.666)");
+    final LineString l1 = (LineString)this.reader
+      .read("LINESTRING(1.111 2.222, 5.555 6.666, 3.333 4.444)");
+    final LineString l2 = (LineString)this.reader
+      .read("LINESTRING(1.111 2.222, 3.333 4.444, 5.555 6.666)");
     assertTrue(!l1.equals(l2));
   }
 
   public void testEquals8() throws Exception {
     final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1000.0));
-    final MultiLineString l1 = (MultiLineString)reader.read("MULTILINESTRING((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
-    final MultiLineString l2 = (MultiLineString)reader.read("MULTILINESTRING((1731627364 519674014, 1731929984 519276112, 1732328800 519578384, 1732026179 519976285, 1731627364 519674014))");
+    final MultiLineString l1 = (MultiLineString)reader.read(
+      "MULTILINESTRING((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
+    final MultiLineString l2 = (MultiLineString)reader.read(
+      "MULTILINESTRING((1731627364 519674014, 1731929984 519276112, 1732328800 519578384, 1732026179 519976285, 1731627364 519674014))");
     assertTrue(l1.equals(l2));
   }
 
   public void testEquals9() throws Exception {
     final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1.0));
-    final MultiLineString l1 = (MultiLineString)reader.read("MULTILINESTRING((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
-    final MultiLineString l2 = (MultiLineString)reader.read("MULTILINESTRING((1731627364 519674014, 1731929984 519276112, 1732328800 519578384, 1732026179 519976285, 1731627364 519674014))");
+    final MultiLineString l1 = (MultiLineString)reader.read(
+      "MULTILINESTRING((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
+    final MultiLineString l2 = (MultiLineString)reader.read(
+      "MULTILINESTRING((1731627364 519674014, 1731929984 519276112, 1732328800 519578384, 1732026179 519976285, 1731627364 519674014))");
     assertTrue(l1.equals(l2));
   }
 

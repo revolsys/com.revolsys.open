@@ -203,7 +203,8 @@ public class Angle {
     return delAngle;
   }
 
-  public static double angleDiff(final double angle1, final double angle2, final boolean clockwise) {
+  public static double angleDiff(final double angle1, final double angle2,
+    final boolean clockwise) {
     if (clockwise) {
       if (angle2 < angle1) {
         final double angle = angle2 + Math.PI * 2 - angle1;

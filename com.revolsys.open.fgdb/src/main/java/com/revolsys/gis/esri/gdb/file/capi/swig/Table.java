@@ -117,7 +117,8 @@ public class Table {
     return EsriFileGdbJNI.Table_isEditable(this.swigCPtr, this);
   }
 
-  public EnumRows search(final String subfields, final String whereClause, final boolean recycling) {
+  public EnumRows search(final String subfields, final String whereClause,
+    final boolean recycling) {
     final long cPtr = EsriFileGdbJNI.Table_search__SWIG_1(this.swigCPtr, this, subfields,
       whereClause, recycling);
     return cPtr == 0 ? null : new EnumRows(cPtr, true);

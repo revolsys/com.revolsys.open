@@ -22,8 +22,8 @@ import com.revolsys.util.CompareUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractCodeTable implements Closeable, PropertyChangeSupportProxy,
-  CodeTable, Cloneable {
+public abstract class AbstractCodeTable
+  implements Closeable, PropertyChangeSupportProxy, CodeTable, Cloneable {
 
   private boolean capitalizeWords = false;
 

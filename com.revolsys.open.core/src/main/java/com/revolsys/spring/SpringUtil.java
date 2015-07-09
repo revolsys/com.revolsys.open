@@ -30,7 +30,8 @@ import com.revolsys.spring.config.AttributesBeanConfigurer;
 
 public class SpringUtil {
 
-  public static final Pattern KEY_PATTERN = Pattern.compile("(\\w[\\w\\d]*)(?:(?:\\[([\\w\\d]+)\\])|(?:\\.([\\w\\d]+)))?");
+  public static final Pattern KEY_PATTERN = Pattern
+    .compile("(\\w[\\w\\d]*)(?:(?:\\[([\\w\\d]+)\\])|(?:\\.([\\w\\d]+)))?");
 
   private static final ThreadLocal<Resource> BASE_RESOURCE = new ThreadLocal<Resource>();
 
@@ -172,8 +173,8 @@ public class SpringUtil {
     }
   }
 
-  public static OutputStream getFileOutputStream(final Resource resource) throws IOException,
-    FileNotFoundException {
+  public static OutputStream getFileOutputStream(final Resource resource)
+    throws IOException, FileNotFoundException {
     final File file = resource.getFile();
     final FileOutputStream fileOut = new FileOutputStream(file);
     return new BufferedOutputStream(fileOut);

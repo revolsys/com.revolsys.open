@@ -56,8 +56,8 @@ public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
       final Charset charset = HttpServletUtils.setContentTypeWithCharset(outputMessage, mediaType);
       final OutputStream body = outputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/" + mediaType.getSubtype();
-      final MapWriterFactory writerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
-        MapWriterFactory.class, mediaTypeString);
+      final MapWriterFactory writerFactory = this.ioFactoryRegistry
+        .getFactoryByMediaType(MapWriterFactory.class, mediaTypeString);
       final MapWriter writer = writerFactory.createMapWriter(body, charset);
       writer.setProperty(IoConstants.INDENT, true);
       writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);

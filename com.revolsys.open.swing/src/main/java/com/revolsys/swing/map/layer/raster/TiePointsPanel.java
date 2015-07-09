@@ -58,21 +58,22 @@ public class TiePointsPanel extends TablePanel implements PropertyChangeListener
     menu.addMenuItemTitleIcon("zoom", "Zoom to Tie Point", "magnifier_zoom_selected", this,
       "zoomToTiePoint");
 
-    menu.addMenuItemTitleIcon("record", "Delete Tie Point", "table_row_delete",
-      editableEnableCheck, this, "deleteTiePoint");
+    menu.addMenuItemTitleIcon("record", "Delete Tie Point", "table_row_delete", editableEnableCheck,
+      this, "deleteTiePoint");
 
     final ToolBar toolBar = getToolBar();
 
     final MenuFactory menuFactory = MenuFactory.findMenu(layer);
     if (menuFactory != null) {
-      toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu", menuFactory, "show", layer, this,
-        10, 10);
+      toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu", menuFactory, "show", layer, this, 10,
+        10);
     }
 
     menu.addMenuItem("zoom",
       MenuSourceRunnable.createAction("Zoom to Layer", "magnifier", "zoomToLayer"));
 
-    toolBar.addButton("zoom", "Zoom to Layer", "magnifier", (EnableCheck)null, layer, "zoomToLayer");
+    toolBar.addButton("zoom", "Zoom to Layer", "magnifier", (EnableCheck)null, layer,
+      "zoomToLayer");
 
     toolBar.addButton("edit", "Fit to Screen", "arrow_out", editableEnableCheck, layer,
       "fitToViewport");

@@ -28,14 +28,17 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
     addModifiedHighlighters(table, predicate);
   }
 
-  public static void addModifiedHighlighters(final JXTable table, final HighlightPredicate predicate) {
+  public static void addModifiedHighlighters(final JXTable table,
+    final HighlightPredicate predicate) {
 
-    table.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(predicate,
-      HighlightPredicate.EVEN), WebColors.setAlpha(WebColors.YellowGreen, 127), WebColors.Black,
-      WebColors.LimeGreen, Color.WHITE));
+    table.addHighlighter(
+      new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.EVEN),
+        WebColors.setAlpha(WebColors.YellowGreen, 127), WebColors.Black, WebColors.LimeGreen,
+        Color.WHITE));
 
-    table.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(predicate,
-      HighlightPredicate.ODD), WebColors.YellowGreen, WebColors.Black, WebColors.Green, Color.WHITE));
+    table.addHighlighter(
+      new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.ODD),
+        WebColors.YellowGreen, WebColors.Black, WebColors.Green, Color.WHITE));
   }
 
   private final RecordRowTableModel model;

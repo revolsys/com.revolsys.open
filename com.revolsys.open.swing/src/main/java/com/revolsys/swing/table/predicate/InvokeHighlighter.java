@@ -19,12 +19,14 @@ import com.revolsys.swing.table.highlighter.OutsideBorderHighlighter;
 
 public class InvokeHighlighter implements HighlightPredicate {
 
-  public static Highlighter border(final Object object, final String methodName, final Border border) {
+  public static Highlighter border(final Object object, final String methodName,
+    final Border border) {
     final HighlightPredicate predicate = new InvokeHighlighter(object, methodName);
     return new BorderHighlighter(predicate, border);
   }
 
-  public static Highlighter border(final Object object, final String methodName, final Color color) {
+  public static Highlighter border(final Object object, final String methodName,
+    final Color color) {
     return border(object, methodName, color, 1);
   }
 

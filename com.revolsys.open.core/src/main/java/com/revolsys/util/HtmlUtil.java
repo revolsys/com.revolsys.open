@@ -283,7 +283,8 @@ public final class HtmlUtil {
     out.endTag(LINK);
   }
 
-  public static void serializeDiv(final XmlWriter out, final String cssClass, final Object content) {
+  public static void serializeDiv(final XmlWriter out, final String cssClass,
+    final Object content) {
     if (content != null) {
       final String text = content.toString().trim();
       if (text.length() > 0) {
@@ -306,7 +307,8 @@ public final class HtmlUtil {
     out.endTag(INPUT);
   }
 
-  public static void serializeFileInput(final XmlWriter out, final String name, final Object value) {
+  public static void serializeFileInput(final XmlWriter out, final String name,
+    final Object value) {
     out.startTag(INPUT);
     out.attribute(ATTR_NAME, name);
     out.attribute(ATTR_TYPE, "file");
@@ -320,7 +322,8 @@ public final class HtmlUtil {
 
   }
 
-  public static void serializeHiddenInput(final XmlWriter out, final String name, final Object value) {
+  public static void serializeHiddenInput(final XmlWriter out, final String name,
+    final Object value) {
 
     String stringValue = null;
     if (value != null) {
@@ -329,7 +332,8 @@ public final class HtmlUtil {
     serializeHiddenInput(out, name, stringValue);
   }
 
-  public static void serializeHiddenInput(final XmlWriter out, final String name, final String value) {
+  public static void serializeHiddenInput(final XmlWriter out, final String name,
+    final String value) {
     out.startTag(INPUT);
     out.attribute(ATTR_NAME, name);
     out.attribute(ATTR_TYPE, "hidden");
@@ -423,7 +427,8 @@ public final class HtmlUtil {
 
   }
 
-  public static void serializeSpan(final XmlWriter out, final String cssClass, final Object content) {
+  public static void serializeSpan(final XmlWriter out, final String cssClass,
+    final Object content) {
     if (content != null) {
       final String text = content.toString().trim();
       if (text.length() > 0) {
@@ -445,7 +450,8 @@ public final class HtmlUtil {
     out.endTag(LINK);
   }
 
-  public static void serializeSubmitInput(final XmlWriter out, final String name, final Object value) {
+  public static void serializeSubmitInput(final XmlWriter out, final String name,
+    final Object value) {
     out.startTag(INPUT);
     out.attribute(ATTR_NAME, name);
     out.attribute(ATTR_TYPE, "submit");

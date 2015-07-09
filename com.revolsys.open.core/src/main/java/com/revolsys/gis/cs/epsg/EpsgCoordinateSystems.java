@@ -88,7 +88,8 @@ public final class EpsgCoordinateSystems {
         if (matchedCoordinateSystem == null) {
           final int hashCode = coordinateSystem.hashCode();
           int matchCoordinateSystemId = 0;
-          final List<CoordinateSystem> coordinateSystems = coordinateSystemsByCoordinateSystem.get(hashCode);
+          final List<CoordinateSystem> coordinateSystems = coordinateSystemsByCoordinateSystem
+            .get(hashCode);
           if (coordinateSystems != null) {
             for (final CoordinateSystem coordinateSystem3 : coordinateSystems) {
               if (coordinateSystem3.equals(coordinateSystem)) {
@@ -132,7 +133,8 @@ public final class EpsgCoordinateSystems {
               final Map<String, Object> parameters = projectedCs.getParameters();
               final LinearUnit linearUnit = projectedCs.getLinearUnit();
               final ProjectedCoordinateSystem newCs = new ProjectedCoordinateSystem(srid, name,
-                geographicCs, area, projection, parameters, linearUnit, axis, authority, deprecated);
+                geographicCs, area, projection, parameters, linearUnit, axis, authority,
+                deprecated);
               addCoordinateSystem(newCs);
               return newCs;
             }
@@ -319,10 +321,11 @@ public final class EpsgCoordinateSystems {
         final Map<Integer, LinearUnit> linearUnits = loadLinearUnits();
         loadGeographicCoordinateSystems(angularUnits, axisMap, areas);
         loadProjectedCoordinateSystems(axisMap, areas, linearUnits);
-        final ProjectedCoordinateSystem worldMercator = (ProjectedCoordinateSystem)coordinateSystemsById.get(3857);
+        final ProjectedCoordinateSystem worldMercator = (ProjectedCoordinateSystem)coordinateSystemsById
+          .get(3857);
         coordinateSystemsById.put(900913, worldMercator);
-        coordinateSystems = Collections.unmodifiableSet(new LinkedHashSet<CoordinateSystem>(
-          coordinateSystemsById.values()));
+        coordinateSystems = Collections
+          .unmodifiableSet(new LinkedHashSet<CoordinateSystem>(coordinateSystemsById.values()));
         initialized = true;
       } catch (final Throwable t) {
         t.printStackTrace();
@@ -332,7 +335,8 @@ public final class EpsgCoordinateSystems {
 
   private static Map<Integer, AngularUnit> loadAngularUnits() {
     final Map<Integer, AngularUnit> angularUnits = new LinkedHashMap<Integer, AngularUnit>();
-    final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/angularunit.csv");
+    final InputStream resource = EpsgCoordinateSystems.class
+      .getResourceAsStream("/com/revolsys/gis/cs/epsg/angularunit.csv");
     if (resource != null) {
       try {
 
@@ -363,7 +367,8 @@ public final class EpsgCoordinateSystems {
 
   private static Map<Integer, Area> loadAreas() {
     final Map<Integer, Area> areas = new LinkedHashMap<Integer, Area>();
-    final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/area.csv");
+    final InputStream resource = EpsgCoordinateSystems.class
+      .getResourceAsStream("/com/revolsys/gis/cs/epsg/area.csv");
     if (resource != null) {
       try {
 
@@ -397,7 +402,8 @@ public final class EpsgCoordinateSystems {
 
   private static Map<Integer, List<Axis>> loadAxis() {
     final Map<Integer, List<Axis>> axisMap = new LinkedHashMap<Integer, List<Axis>>();
-    final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/axis.csv");
+    final InputStream resource = EpsgCoordinateSystems.class
+      .getResourceAsStream("/com/revolsys/gis/cs/epsg/axis.csv");
     if (resource != null) {
       try {
 
@@ -432,7 +438,8 @@ public final class EpsgCoordinateSystems {
     final Map<Integer, Spheroid> spheroids = loadSpheroids();
     final Map<Integer, PrimeMeridian> primeMeridians = loadPrimeMeridians();
     final Map<Integer, Datum> datums = new LinkedHashMap<Integer, Datum>();
-    final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/datum.csv");
+    final InputStream resource = EpsgCoordinateSystems.class
+      .getResourceAsStream("/com/revolsys/gis/cs/epsg/datum.csv");
     if (resource != null) {
       try {
         final java.io.Reader reader = FileUtil.createUtf8Reader(resource);
@@ -463,7 +470,8 @@ public final class EpsgCoordinateSystems {
   private static void loadGeographicCoordinateSystems(final Map<Integer, AngularUnit> angularUnits,
     final Map<Integer, List<Axis>> axisMap, final Map<Integer, Area> areas) {
     final Map<Integer, Datum> datums = loadDatums();
-    final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/geographic.csv");
+    final InputStream resource = EpsgCoordinateSystems.class
+      .getResourceAsStream("/com/revolsys/gis/cs/epsg/geographic.csv");
     if (resource != null) {
       try {
         final java.io.Reader reader = FileUtil.createUtf8Reader(resource);
@@ -496,7 +504,8 @@ public final class EpsgCoordinateSystems {
   }
 
   private static Map<Integer, LinearUnit> loadLinearUnits() {
-    final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/linearunit.csv");
+    final InputStream resource = EpsgCoordinateSystems.class
+      .getResourceAsStream("/com/revolsys/gis/cs/epsg/linearunit.csv");
     if (resource != null) {
       try {
         final java.io.Reader reader = FileUtil.createUtf8Reader(resource);
@@ -527,7 +536,8 @@ public final class EpsgCoordinateSystems {
 
   private static Map<Integer, PrimeMeridian> loadPrimeMeridians() {
     final Map<Integer, PrimeMeridian> primeMeridians = new LinkedHashMap<Integer, PrimeMeridian>();
-    final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/primemeridian.csv");
+    final InputStream resource = EpsgCoordinateSystems.class
+      .getResourceAsStream("/com/revolsys/gis/cs/epsg/primemeridian.csv");
     if (resource != null) {
       try {
         final java.io.Reader reader = FileUtil.createUtf8Reader(resource);
@@ -555,7 +565,8 @@ public final class EpsgCoordinateSystems {
 
   private static void loadProjectedCoordinateSystems(final Map<Integer, List<Axis>> axisMap,
     final Map<Integer, Area> areas, final Map<Integer, LinearUnit> linearUnits) {
-    final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/projected.csv");
+    final InputStream resource = EpsgCoordinateSystems.class
+      .getResourceAsStream("/com/revolsys/gis/cs/epsg/projected.csv");
     if (resource != null) {
       try {
         final java.io.Reader reader = FileUtil.createUtf8Reader(resource);
@@ -607,7 +618,8 @@ public final class EpsgCoordinateSystems {
 
   private static Map<Integer, Spheroid> loadSpheroids() {
     final Map<Integer, Spheroid> spheroids = new LinkedHashMap<Integer, Spheroid>();
-    final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/spheroid.csv");
+    final InputStream resource = EpsgCoordinateSystems.class
+      .getResourceAsStream("/com/revolsys/gis/cs/epsg/spheroid.csv");
     if (resource != null) {
       try {
 

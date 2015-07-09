@@ -145,8 +145,8 @@ public abstract class AbstractIdentifier implements Identifier {
         record.put(fieldName, value);
       }
     } else {
-      throw new IllegalArgumentException("Attribute names count for " + fieldNames
-        + " != count for values " + values);
+      throw new IllegalArgumentException(
+        "Attribute names count for " + fieldNames + " != count for values " + values);
     }
   }
 

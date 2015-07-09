@@ -60,8 +60,8 @@ public class WebUiFilter implements Filter {
         } catch (final PageNotFoundException e) {
           page = new Page(null, null, "/", false);
         }
-        WebUiContext.set(new WebUiContext(this.rsWebUiConfig, contextPath, page, httpRequest,
-          httpResponse));
+        WebUiContext
+          .set(new WebUiContext(this.rsWebUiConfig, contextPath, page, httpRequest, httpResponse));
         request.setAttribute("rsWebUiConfig", this.rsWebUiConfig);
         chain.doFilter(request, response);
       } finally {
@@ -122,8 +122,8 @@ public class WebUiFilter implements Filter {
       try {
         LOG.debug("Loading config");
         this.servletContext = filterConfig.getServletContext();
-        this.applicationContext = new ResourceXmlApplicationContext(new ServletContextResource(
-          this.servletContext, "/WEB-INF/web-config.xml"));
+        this.applicationContext = new ResourceXmlApplicationContext(
+          new ServletContextResource(this.servletContext, "/WEB-INF/web-config.xml"));
         LOG.debug("Config loaded");
 
       } catch (final Throwable e) {
@@ -136,7 +136,8 @@ public class WebUiFilter implements Filter {
     throws UnavailableException {
     final ServletContext servletContext = filterConfig.getServletContext();
     WebUiContext.setServletContext(servletContext);
-    this.applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+    this.applicationContext = WebApplicationContextUtils
+      .getRequiredWebApplicationContext(servletContext);
 
     try {
       final URL configResource = servletContext.getResource(config);
@@ -145,12 +146,12 @@ public class WebUiFilter implements Filter {
       servletContext.setAttribute("rsWebUiConfig", this.rsWebUiConfig);
     } catch (final InvalidConfigException e) {
       LOG.error(e.getErrors(), e);
-      throw new UnavailableException("Cannot load a rsWebUiConfig resource from '" + config
-        + "' due to " + e.getErrors());
+      throw new UnavailableException(
+        "Cannot load a rsWebUiConfig resource from '" + config + "' due to " + e.getErrors());
     } catch (final Exception e) {
       LOG.error(e.getMessage(), e);
-      throw new UnavailableException("Cannot load a rsWebUiConfig resource from '" + config
-        + "' due to " + e.getMessage());
+      throw new UnavailableException(
+        "Cannot load a rsWebUiConfig resource from '" + config + "' due to " + e.getMessage());
     }
   }
 }

@@ -60,8 +60,8 @@ public class GeometryFunctions {
       return g;
     }
     // TODO: ensure ring is valid
-    final LinearRing ring = g.getGeometryFactory().linearRing(
-      CoordinatesListUtil.getCoordinateArray(g));
+    final LinearRing ring = g.getGeometryFactory()
+      .linearRing(CoordinatesListUtil.getCoordinateArray(g));
     return g.getGeometryFactory().polygon(ring);
   }
 

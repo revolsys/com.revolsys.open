@@ -123,7 +123,8 @@ public class Form extends ElementContainer {
   protected Map getActionParameters(final HttpServletRequest request) {
     final Set fieldNames = getFields().keySet();
     final Map parameters = new HashMap();
-    for (final Enumeration paramNames = request.getParameterNames(); paramNames.hasMoreElements();) {
+    for (final Enumeration paramNames = request.getParameterNames(); paramNames
+      .hasMoreElements();) {
       final String fieldName = (String)paramNames.nextElement();
       if (!fieldNames.contains(fieldName) && !FORM_TASK_PARAM.equals(fieldName)) {
         parameters.put(fieldName, request.getParameterValues(fieldName));

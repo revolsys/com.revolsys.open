@@ -1,13 +1,13 @@
 package com.revolsys.jts.testold.operation;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.distance3d.Distance3DOp;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 public class Distance3DOpTest extends TestCase {
   static GeometryFactory geomFact = GeometryFactory.floating3();
@@ -21,9 +21,8 @@ public class Distance3DOpTest extends TestCase {
   }
 
   /*
-   * public void testTest() { checkDistance(
-   * "LINESTRING (250 250 0, 260 260 0)",
-   * "POLYGON ((100 200 0, 200 200 0, 200 100 0, 100 100 0, 100 200 0))",
+   * public void testTest() { checkDistance( "LINESTRING (250 250 0, 260 260 0)"
+   * , "POLYGON ((100 200 0, 200 200 0, 200 100 0, 100 100 0, 100 200 0))",
    * 70.71067811865476); testLinePolygonFlat(); }
    */
 
@@ -273,14 +272,14 @@ public class Distance3DOpTest extends TestCase {
   public void testPolygonPolygonLinkedThruHoles() {
     // note distance is zero!
     checkDistance(this.// polygon with two holes
-      poly2HoleFlat,
+    poly2HoleFlat,
       // polygon parallel to XZ plane with shell passing through holes in other
       // polygon
       "POLYGON ((120 120 -10, 120 120 100, 180 120 100, 180 120 -10, 120 120 -10))", 0);
 
     // confirm that distance of simple poly boundary is non-zero
     checkDistance(this.// polygon with two holes
-      poly2HoleFlat,
+    poly2HoleFlat,
       // boundary of polygon parallel to XZ plane with shell passing through
       // holes
       "LINESTRING (120 120 -10, 120 120 100, 180 120 100, 180 120 -10, 120 120 -10)", 10);

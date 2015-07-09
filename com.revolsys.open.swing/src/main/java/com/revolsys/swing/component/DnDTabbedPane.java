@@ -309,8 +309,8 @@ public class DnDTabbedPane extends JTabbedPane {
 
         initGlassPane(e.getComponent(), e.getDragOrigin(), dragTabIndex);
         try {
-          e.startDrag(DragSource.DefaultMoveDrop, new TabTransferable(DnDTabbedPane.this,
-            dragTabIndex), dsl);
+          e.startDrag(DragSource.DefaultMoveDrop,
+            new TabTransferable(DnDTabbedPane.this, dragTabIndex), dsl);
         } catch (final InvalidDnDOperationException idoe) {
           idoe.printStackTrace();
         }
@@ -319,7 +319,8 @@ public class DnDTabbedPane extends JTabbedPane {
 
     // dropTarget =
     new DropTarget(this, DnDConstants.ACTION_COPY_OR_MOVE, new CDropTargetListener(), true);
-    new DragSource().createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY_OR_MOVE, dgl);
+    new DragSource().createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY_OR_MOVE,
+      dgl);
     this.acceptor = new TabAcceptor() {
       @Override
       public boolean isDropAcceptable(final DnDTabbedPane component, final int index) {
@@ -394,8 +395,8 @@ public class DnDTabbedPane extends JTabbedPane {
 
   private TabTransferData getTabTransferData(final DropTargetDropEvent event) {
     try {
-      final TabTransferData data = (TabTransferData)event.getTransferable().getTransferData(
-        this.FLAVOR);
+      final TabTransferData data = (TabTransferData)event.getTransferable()
+        .getTransferData(this.FLAVOR);
       return data;
     } catch (final Exception e) {
       e.printStackTrace();
@@ -618,8 +619,8 @@ public class DnDTabbedPane extends JTabbedPane {
 class GhostGlassPane extends JPanel {
   public static final long serialVersionUID = 1L;
 
-  private static final AlphaComposite COMPOSITE = AlphaComposite.getInstance(
-    AlphaComposite.SRC_OVER, 0.7f);
+  private static final AlphaComposite COMPOSITE = AlphaComposite
+    .getInstance(AlphaComposite.SRC_OVER, 0.7f);
 
   private int x;
 

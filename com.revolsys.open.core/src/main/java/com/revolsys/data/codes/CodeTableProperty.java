@@ -265,7 +265,8 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
         this.threadLoading.set(Boolean.TRUE);
         this.loading = true;
         try {
-          final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(this.typePath);
+          final RecordDefinition recordDefinition = this.recordStore
+            .getRecordDefinition(this.typePath);
           final Query query = new Query(this.typePath);
           query.setFieldNames(recordDefinition.getFieldNames());
           for (final String order : this.orderBy) {
@@ -274,9 +275,8 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
           try (
             Reader<Record> reader = this.recordStore.query(query)) {
             final List<Record> codes = reader.read();
-            this.recordStore.getStatistics()
-              .getStatistics("query")
-              .add(this.typePath, -codes.size());
+            this.recordStore.getStatistics().getStatistics("query").add(this.typePath,
+              -codes.size());
             Collections.sort(codes, new RecordAttributeComparator(this.orderBy));
             addValues(codes);
           }

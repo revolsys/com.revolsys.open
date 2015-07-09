@@ -168,7 +168,8 @@ public class JdbcConnection implements Connection {
     return this.dataSource;
   }
 
-  public DataAccessException getException(final String task, final String sql, final SQLException e) {
+  public DataAccessException getException(final String task, final String sql,
+    final SQLException e) {
     if (this.dataSource == null) {
       return new SQLStateSQLExceptionTranslator().translate(task, sql, e);
     } else {

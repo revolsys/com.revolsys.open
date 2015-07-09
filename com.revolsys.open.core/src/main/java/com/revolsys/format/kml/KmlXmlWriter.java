@@ -161,8 +161,8 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
         }
         endTag();
       } else {
-        final Geometry geoGraphicsGeom = geometry.convert(GeometryFactory.floating(
-          Kml22Constants.COORDINATE_SYSTEM_ID, axisCount));
+        final Geometry geoGraphicsGeom = geometry
+          .convert(GeometryFactory.floating(Kml22Constants.COORDINATE_SYSTEM_ID, axisCount));
         if (geoGraphicsGeom instanceof Point) {
           final Point point = (Point)geoGraphicsGeom;
           writePoint(point);
@@ -346,7 +346,8 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     endTag();
   }
 
-  public void writePlacemarkPolygon(final Polygon polygon, final String name, final String styleUrl) {
+  public void writePlacemarkPolygon(final Polygon polygon, final String name,
+    final String styleUrl) {
 
     startTag(PLACEMARK);
     if (name != null) {
@@ -414,8 +415,8 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     }
     writeLatLonBox(envelope);
     startTag(ICON);
-    final Map<String, String> parameters = Collections.singletonMap("BBOX", envelope.getMinX()
-      + "," + envelope.getMinY() + "," + envelope.getMaxX() + "," + envelope.getMaxY());
+    final Map<String, String> parameters = Collections.singletonMap("BBOX", envelope.getMinX() + ","
+      + envelope.getMinY() + "," + envelope.getMaxX() + "," + envelope.getMaxY());
     element(HREF, UrlUtil.getUrl(baseUrl, parameters));
 
     endTag();

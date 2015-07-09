@@ -259,7 +259,8 @@ public class PostgreSQLWktWriter {
     write(out, multiPoint, axisCount);
   }
 
-  private static void write(final PrintWriter out, final MultiPoint multiPoint, final int axisCount) {
+  private static void write(final PrintWriter out, final MultiPoint multiPoint,
+    final int axisCount) {
     writeGeometryType(out, "MULTIPOINT", axisCount);
     if (multiPoint.isEmpty()) {
       out.print(" EMPTY");
@@ -347,7 +348,8 @@ public class PostgreSQLWktWriter {
     out.print(')');
   }
 
-  private static void writeCoordinates(final PrintWriter out, final Point point, final int axisCount) {
+  private static void writeCoordinates(final PrintWriter out, final Point point,
+    final int axisCount) {
     writeOrdinate(out, point, 0);
     for (int j = 1; j < axisCount; j++) {
       out.print(' ');
@@ -389,7 +391,8 @@ public class PostgreSQLWktWriter {
     }
   }
 
-  private static void writePolygon(final PrintWriter out, final Polygon polygon, final int axisCount) {
+  private static void writePolygon(final PrintWriter out, final Polygon polygon,
+    final int axisCount) {
     out.print('(');
     final LineString shell = polygon.getShell();
     final LineString coordinates = shell;

@@ -409,8 +409,8 @@ public class ConvexHull {
     // the same minimum y coordinate choose the one with the minimu x.
     // This focal point is put in array location pts[0].
     for (int i = 1; i < pts.length; i++) {
-      if (pts[i].getY() < pts[0].getY() || pts[i].getY() == pts[0].getY()
-        && pts[i].getX() < pts[0].getX()) {
+      if (pts[i].getY() < pts[0].getY()
+        || pts[i].getY() == pts[0].getY() && pts[i].getX() < pts[0].getX()) {
         t = pts[0];
         pts[0] = pts[i];
         pts[i] = t;

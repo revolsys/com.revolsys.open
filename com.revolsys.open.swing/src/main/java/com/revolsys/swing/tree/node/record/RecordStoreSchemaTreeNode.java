@@ -20,8 +20,8 @@ import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.Property;
 
-public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode implements
-  RecordStoreConnectionMapProxy {
+public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode
+  implements RecordStoreConnectionMapProxy {
 
   public static final Icon ICON_SCHEMA = Icons.getIconWithBadge(PathTreeNode.ICON_FOLDER, "table");
 
@@ -37,7 +37,8 @@ public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode implements
 
   private final String schemaPath;
 
-  public RecordStoreSchemaTreeNode(final Map<String, Object> connectionMap, final String schemaPath) {
+  public RecordStoreSchemaTreeNode(final Map<String, Object> connectionMap,
+    final String schemaPath) {
     super(schemaPath);
     this.connectionMap = connectionMap;
     setType("Record Store Record Schema");

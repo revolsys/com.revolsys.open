@@ -98,7 +98,8 @@ public class IntersectionMatrix implements Cloneable {
    *@return                          true if the dimension symbol matches
    *      the dimension value
    */
-  public static boolean matches(final int actualDimensionValue, final char requiredDimensionSymbol) {
+  public static boolean matches(final int actualDimensionValue,
+    final char requiredDimensionSymbol) {
     if (requiredDimensionSymbol == Dimension.SYM_DONTCARE) {
       return true;
     }
@@ -409,7 +410,8 @@ public class IntersectionMatrix implements Cloneable {
       || dimensionOfGeometryA == Dimension.P && dimensionOfGeometryB == Dimension.A
       || dimensionOfGeometryA == Dimension.P && dimensionOfGeometryB == Dimension.L) {
       return this.matrix[INTERIOR][INTERIOR] == Dimension.FALSE
-        && (isTrue(this.matrix[INTERIOR][BOUNDARY]) || isTrue(this.matrix[BOUNDARY][INTERIOR]) || isTrue(this.matrix[BOUNDARY][BOUNDARY]));
+        && (isTrue(this.matrix[INTERIOR][BOUNDARY]) || isTrue(this.matrix[BOUNDARY][INTERIOR])
+          || isTrue(this.matrix[BOUNDARY][BOUNDARY]));
     }
     return false;
   }

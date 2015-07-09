@@ -32,7 +32,8 @@ public class MenuViewController {
         final OutputStream out = response.getOutputStream();
         XmlWriter writer = new XmlWriter(out)) {
         writer.setIndent(false);
-        final JexlHttpServletRequestContext jexlContext = new JexlHttpServletRequestContext(request);
+        final JexlHttpServletRequestContext jexlContext = new JexlHttpServletRequestContext(
+          request);
         final List<Menu> menus = new ArrayList<Menu>();
         for (final Menu menuItem : menu.getMenus()) {
           if (menuItem.isVisible()) {
@@ -77,7 +78,8 @@ public class MenuViewController {
     }
   }
 
-  private void bootStrapMenuLink(final XmlWriter out, final Menu menu, final JexlContext jexlContext) {
+  private void bootStrapMenuLink(final XmlWriter out, final Menu menu,
+    final JexlContext jexlContext) {
     String uri = menu.getLink(jexlContext);
     final String linkTitle = menu.getLinkTitle();
     final String onClick = menu.getOnClick();

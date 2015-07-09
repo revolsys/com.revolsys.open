@@ -1,10 +1,10 @@
 package com.revolsys.jts.testold.noding;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.noding.SegmentPointComparator;
+
+import junit.framework.TestCase;
 
 /**
  * Test IntersectionSegment#compareNodePosition
@@ -23,8 +23,8 @@ public class SegmentPointComparatorTest extends TestCase {
 
   private void checkNodePosition(final int octant, final double x0, final double y0,
     final double x1, final double y1, final int expectedPositionValue) {
-    final int posValue = SegmentPointComparator.compare(octant, new PointDouble(x0, y0,
-      Point.NULL_ORDINATE), new PointDouble(x1, y1, Point.NULL_ORDINATE));
+    final int posValue = SegmentPointComparator.compare(octant,
+      new PointDouble(x0, y0, Point.NULL_ORDINATE), new PointDouble(x1, y1, Point.NULL_ORDINATE));
     assertTrue(posValue == expectedPositionValue);
   }
 

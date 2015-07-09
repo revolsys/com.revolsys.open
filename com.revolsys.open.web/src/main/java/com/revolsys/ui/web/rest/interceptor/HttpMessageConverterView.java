@@ -22,8 +22,8 @@ public class HttpMessageConverterView extends AbstractView {
 
   public static HttpMessageConverterView getMessageConverterView() {
     final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-    final HttpMessageConverterView view = (HttpMessageConverterView)requestAttributes.getAttribute(
-      NAME, RequestAttributes.SCOPE_REQUEST);
+    final HttpMessageConverterView view = (HttpMessageConverterView)requestAttributes
+      .getAttribute(NAME, RequestAttributes.SCOPE_REQUEST);
     return view;
   }
 
@@ -53,8 +53,8 @@ public class HttpMessageConverterView extends AbstractView {
   }
 
   public void render(final HttpServletResponse response) throws IOException {
-    this.messageConverter.write(this.returnValue, this.mediaType, new ServletServerHttpResponse(
-      response));
+    this.messageConverter.write(this.returnValue, this.mediaType,
+      new ServletServerHttpResponse(response));
   }
 
   @Override
@@ -64,9 +64,8 @@ public class HttpMessageConverterView extends AbstractView {
 
     final String path = (String)requestAttributes.getAttribute("httpMessageConverterTemplatePath",
       RequestAttributes.SCOPE_REQUEST);
-    if (path == null
-      || !Arrays.asList(MediaType.TEXT_HTML, MediaType.APPLICATION_XHTML_XML).contains(
-        this.mediaType)) {
+    if (path == null || !Arrays.asList(MediaType.TEXT_HTML, MediaType.APPLICATION_XHTML_XML)
+      .contains(this.mediaType)) {
       render(response);
     } else {
       final Charset charSet = this.mediaType.getCharSet();

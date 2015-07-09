@@ -25,7 +25,8 @@ public class BoundingBoxUtil {
     return newBounds;
   }
 
-  public static double[] createBounds(final GeometryFactory geometryFactory, final double... bounds) {
+  public static double[] createBounds(final GeometryFactory geometryFactory,
+    final double... bounds) {
     final int axisCount = bounds.length;
     final double[] newBounds = createBounds(axisCount);
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
@@ -88,7 +89,8 @@ public class BoundingBoxUtil {
     return createBounds(axisCount, point);
   }
 
-  public static void expand(final double[] bounds, final int axisCount, final double... coordinates) {
+  public static void expand(final double[] bounds, final int axisCount,
+    final double... coordinates) {
     for (int axisIndex = 0; axisIndex < axisCount && axisIndex < coordinates.length; axisIndex++) {
       final double coordinate = coordinates[axisIndex];
       expand(bounds, axisCount, axisIndex, coordinate);

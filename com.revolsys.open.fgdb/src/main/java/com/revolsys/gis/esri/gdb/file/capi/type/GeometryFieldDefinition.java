@@ -93,7 +93,8 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
         }
         this.writeMethod = ShapefileGeometryUtil.getWriteMethod(geometryTypeKey);
         if (this.writeMethod == null) {
-          throw new IllegalArgumentException("No write method for geometry type " + geometryTypeKey);
+          throw new IllegalArgumentException(
+            "No write method for geometry type " + geometryTypeKey);
         }
       }
 
@@ -178,8 +179,8 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
       }
       return bytes;
     } else {
-      throw new IllegalArgumentException("Expecting a " + Geometry.class + " not a "
-        + value.getClass() + "=" + value);
+      throw new IllegalArgumentException(
+        "Expecting a " + Geometry.class + " not a " + value.getClass() + "=" + value);
     }
   }
 }

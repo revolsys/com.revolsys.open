@@ -49,8 +49,7 @@ public class BaseJTable extends JXTable {
       "selectPreviousColumnCell", this, "editRelativeCell", 0, -1);
     SwingUtil.addAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), "selectNextColumnCell",
       this, "editRelativeCell", 0, 1);
-    SwingUtil.addAction(this,
-      KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK),
+    SwingUtil.addAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK),
       "selectPreviousRowCell", this, "editRelativeCell", -1, 0);
     SwingUtil.addAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enterPressed", this,
       "editRelativeCell", 1, 0);
@@ -187,7 +186,8 @@ public class BaseJTable extends JXTable {
   }
 
   @Override
-  public Component prepareRenderer(final TableCellRenderer renderer, final int row, final int column) {
+  public Component prepareRenderer(final TableCellRenderer renderer, final int row,
+    final int column) {
     try {
       return super.prepareRenderer(renderer, row, column);
     } catch (final IndexOutOfBoundsException e) {

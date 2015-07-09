@@ -3,9 +3,6 @@ package com.revolsys.jts.testold.geom;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -13,6 +10,9 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 /**
  * Test spatial predicate optimizations for rectangles by
@@ -39,8 +39,8 @@ public class RectanglePredicateSyntheticTest extends TestCase {
 
   double bufferWidth = 1.0;
 
-  BoundingBox rectEnv = new BoundingBoxDoubleGf(2, this.baseX, this.baseY, this.baseX
-    + this.rectSize, this.baseY + this.rectSize);
+  BoundingBox rectEnv = new BoundingBoxDoubleGf(2, this.baseX, this.baseY,
+    this.baseX + this.rectSize, this.baseY + this.rectSize);
 
   Geometry rect = this.rectEnv.toGeometry();
 
@@ -52,13 +52,16 @@ public class RectanglePredicateSyntheticTest extends TestCase {
     final int[][] factor = {
       {
         1, 0
-      }, {
+        },
+      {
         0, 1
-      }, {
+        },
+      {
         -1, 0
-      }, {
+        },
+      {
         0, -1
-      }
+        }
     };
 
     final int xFac = factor[quadrant][0];

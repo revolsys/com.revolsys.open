@@ -48,8 +48,8 @@ import com.revolsys.jts.shape.GeometricShapeBuilder;
  *
  */
 public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
-  private static Point randomPointInCircle(final double orgX, final double orgY,
-    final double width, final double height) {
+  private static Point randomPointInCircle(final double orgX, final double orgY, final double width,
+    final double height) {
     final double centreX = orgX + width / 2;
     final double centreY = orgY + height / 2;
 

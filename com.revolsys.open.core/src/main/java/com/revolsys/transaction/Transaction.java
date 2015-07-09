@@ -24,7 +24,8 @@ public class Transaction implements AutoCloseable {
     if (transactionManager == null || propagation == null) {
       return runnable;
     } else {
-      final DefaultTransactionDefinition transactionDefinition = Transaction.transactionDefinition(propagation);
+      final DefaultTransactionDefinition transactionDefinition = Transaction
+        .transactionDefinition(propagation);
       return new TransactionRunnable(transactionManager, transactionDefinition, runnable);
     }
   }

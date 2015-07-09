@@ -13,8 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 
-public class SecurityExpressionRoot extends
-  org.springframework.security.access.expression.SecurityExpressionRoot {
+public class SecurityExpressionRoot
+  extends org.springframework.security.access.expression.SecurityExpressionRoot {
   private PermissionEvaluator permissionEvaluator;
 
   private RoleHierarchy roleHierarchy;

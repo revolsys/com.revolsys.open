@@ -84,7 +84,8 @@ public class Distance3DOp {
    *            the distance to test
    * @return true if g0.distance(g1) <= distance
    */
-  public static boolean isWithinDistance(final Geometry g0, final Geometry g1, final double distance) {
+  public static boolean isWithinDistance(final Geometry g0, final Geometry g1,
+    final double distance) {
     final Distance3DOp distOp = new Distance3DOp(g0, g1, distance);
     return distOp.distance() <= distance;
   }
@@ -128,7 +129,8 @@ public class Distance3DOp {
    *            proportional distance from computed point to end point
    * @return the computed point
    */
-  private static Point segmentPoint(final Point p0, final Point p1, final double d0, final double d1) {
+  private static Point segmentPoint(final Point p0, final Point p1, final double d0,
+    final double d1) {
     if (d0 <= 0) {
       return new PointDouble(p0);
     }
@@ -292,7 +294,8 @@ public class Distance3DOp {
     }
   }
 
-  private void computeMinDistanceMultiMulti(final Geometry g0, final Geometry g1, final boolean flip) {
+  private void computeMinDistanceMultiMulti(final Geometry g0, final Geometry g1,
+    final boolean flip) {
     if (g0 instanceof GeometryCollection) {
       final int n = g0.getGeometryCount();
       for (int i = 0; i < n; i++) {
@@ -317,7 +320,8 @@ public class Distance3DOp {
     }
   }
 
-  private void computeMinDistanceOneMulti(final Geometry g0, final Geometry g1, final boolean flip) {
+  private void computeMinDistanceOneMulti(final Geometry g0, final Geometry g1,
+    final boolean flip) {
     if (g1 instanceof GeometryCollection) {
       final int n = g1.getGeometryCount();
       for (int i = 0; i < n; i++) {
@@ -374,8 +378,8 @@ public class Distance3DOp {
     // first test if line intersects polygon
     final Point intPt = intersection(poly, line);
     if (intPt != null) {
-      updateDistance(0, new GeometryLocation(poly.getPolygon(), 0, intPt), new GeometryLocation(
-        line, 0, intPt), flip);
+      updateDistance(0, new GeometryLocation(poly.getPolygon(), 0, intPt),
+        new GeometryLocation(line, 0, intPt), flip);
       return;
     }
 

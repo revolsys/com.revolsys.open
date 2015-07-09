@@ -8,7 +8,8 @@ import org.apache.commons.beanutils.MethodUtils;
 
 import com.revolsys.util.ExceptionUtil;
 
-public class InvokeMethodMapObjectFactory extends AbstractMapObjectFactory implements MapSerializer {
+public class InvokeMethodMapObjectFactory extends AbstractMapObjectFactory
+  implements MapSerializer {
 
   private final Class<?> typeClass;
 

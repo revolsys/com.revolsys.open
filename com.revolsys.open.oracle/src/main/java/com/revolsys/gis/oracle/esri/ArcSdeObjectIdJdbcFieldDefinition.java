@@ -12,8 +12,10 @@ import com.revolsys.jdbc.field.JdbcFieldDefinition;
 
 public class ArcSdeObjectIdJdbcFieldDefinition extends JdbcFieldDefinition {
   public static void replaceAttribute(final String schemaName,
-    final RecordDefinition recordDefinition, final Integer registrationId, final String rowIdColumn) {
-    final JdbcFieldDefinition objectIdAttribute = (JdbcFieldDefinition)recordDefinition.getField(rowIdColumn);
+    final RecordDefinition recordDefinition, final Integer registrationId,
+    final String rowIdColumn) {
+    final JdbcFieldDefinition objectIdAttribute = (JdbcFieldDefinition)recordDefinition
+      .getField(rowIdColumn);
     if (objectIdAttribute != null
       && !(objectIdAttribute instanceof ArcSdeObjectIdJdbcFieldDefinition)) {
       final String name = objectIdAttribute.getName();
@@ -25,7 +27,8 @@ public class ArcSdeObjectIdJdbcFieldDefinition extends JdbcFieldDefinition {
       newObjectIdAttribute.setRecordDefinition(recordDefinition);
       final RecordDefinitionImpl recordDefinitionImpl = (RecordDefinitionImpl)recordDefinition;
       recordDefinitionImpl.replaceField(objectIdAttribute, newObjectIdAttribute);
-      if (recordDefinition.getIdFieldName() == null && recordDefinition.getIdFieldNames().isEmpty()) {
+      if (recordDefinition.getIdFieldName() == null
+        && recordDefinition.getIdFieldNames().isEmpty()) {
         recordDefinitionImpl.setIdFieldName(name);
       }
     }

@@ -1,11 +1,11 @@
 package com.revolsys.jts.testold.linearref;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
+
+import junit.framework.TestCase;
 
 /**
  * Base class for linear referencing class unit tests.
@@ -100,7 +100,7 @@ public abstract class AbstractIndexedLineTest extends TestCase {
 
     final boolean isOk = offsetPt.distance(expectedPt) < TOLERANCE_DIST;
     if (!isOk) {
-      // System.out.println("Expected = " + expectedPoint + "  Actual = "
+      // System.out.println("Expected = " + expectedPoint + " Actual = "
       // + offsetPt);
     }
     assertTrue(isOk);
@@ -161,7 +161,8 @@ public abstract class AbstractIndexedLineTest extends TestCase {
     // segment
     runOffsetTest("MULTILINESTRING ((0 0, 10 0), (10 0, 20 0))", "POINT(10 0)", -1.0,
       "POINT (10 -1)");
-    runOffsetTest("MULTILINESTRING ((0 0, 10 0), (10 0, 20 0))", "POINT(20 0)", 1.0, "POINT (20 1)");
+    runOffsetTest("MULTILINESTRING ((0 0, 10 0), (10 0, 20 0))", "POINT(20 0)", 1.0,
+      "POINT (20 1)");
   }
 
   /*
@@ -213,7 +214,8 @@ public abstract class AbstractIndexedLineTest extends TestCase {
 
   // test a zero-length subline equal to a mid point
   public void testZeroLenSubLineAtMidVertex() {
-    runIndicesOfThenExtract("LINESTRING (0 0, 0 10, 10 10, 10 0, 0 0)", "LINESTRING (10 10, 10 10)");
+    runIndicesOfThenExtract("LINESTRING (0 0, 0 10, 10 10, 10 0, 0 0)",
+      "LINESTRING (10 10, 10 10)");
   }
 
   // test a zero-length subline equal to the start point

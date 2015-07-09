@@ -312,9 +312,8 @@ public abstract class AbstractNode<T> implements Serializable {
       final double maxX2 = bounds[2];
       final double maxY2 = bounds[3];
       AbstractNode<T> node = getNode(index);
-      if (node == null
-        || !BoundingBoxUtil.covers(node.minX, node.minY, node.maxX, node.maxY, minX2, minY2, maxX2,
-          maxY2)) {
+      if (node == null || !BoundingBoxUtil.covers(node.minX, node.minY, node.maxX, node.maxY, minX2,
+        minY2, maxX2, maxY2)) {
         final AbstractNode<T> largerNode = createExpanded(node, bounds);
         setNode(index, largerNode);
         node = largerNode;

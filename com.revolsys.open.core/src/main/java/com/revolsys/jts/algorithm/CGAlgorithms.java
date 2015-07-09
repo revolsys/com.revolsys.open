@@ -94,11 +94,10 @@ public class CGAlgorithms {
      * (2) s = (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay) ----------------------------- L^2
      * Then the distance from C to P = |s|*L.
      */
-    final double len2 = (B.getX() - A.getX()) * (B.getX() - A.getX()) + (B.getY() - A.getY())
-      * (B.getY() - A.getY());
-    final double s = ((A.getY() - p.getY()) * (B.getX() - A.getX()) - (A.getX() - p.getX())
-      * (B.getY() - A.getY()))
-      / len2;
+    final double len2 = (B.getX() - A.getX()) * (B.getX() - A.getX())
+      + (B.getY() - A.getY()) * (B.getY() - A.getY());
+    final double s = ((A.getY() - p.getY()) * (B.getX() - A.getX())
+      - (A.getX() - p.getX()) * (B.getY() - A.getY())) / len2;
 
     return Math.abs(s) * Math.sqrt(len2);
   }

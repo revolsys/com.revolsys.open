@@ -4,8 +4,8 @@ import java.util.LinkedHashSet;
 
 import com.revolsys.gis.graph.Node;
 
-public class NodeEventListenerList<T> extends LinkedHashSet<NodeEventListener> implements
-  NodeEventListener<T> {
+public class NodeEventListenerList<T> extends LinkedHashSet<NodeEventListener>
+  implements NodeEventListener<T> {
 
   /**
    *

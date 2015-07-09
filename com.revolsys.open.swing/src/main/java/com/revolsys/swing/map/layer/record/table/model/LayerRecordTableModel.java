@@ -16,8 +16,8 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
 import com.revolsys.util.Property;
 
-public class LayerRecordTableModel extends AbstractSingleRecordTableModel implements
-  PropertyChangeListener {
+public class LayerRecordTableModel extends AbstractSingleRecordTableModel
+  implements PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 

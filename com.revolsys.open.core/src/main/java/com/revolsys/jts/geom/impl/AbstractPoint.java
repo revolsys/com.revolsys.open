@@ -163,7 +163,8 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
     } else {
       geometryFactory = getNonZeroGeometryFactory(geometryFactory);
       double[] targetCoordinates;
-      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory.getCoordinatesOperation(geometryFactory);
+      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
+        .getCoordinatesOperation(geometryFactory);
       final double[] coordinates = getCoordinates();
       if (coordinatesOperation == null) {
         targetCoordinates = coordinates;
@@ -199,7 +200,8 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
       }
     } else {
       geometryFactory = getNonZeroGeometryFactory(geometryFactory);
-      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory.getCoordinatesOperation(geometryFactory);
+      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
+        .getCoordinatesOperation(geometryFactory);
       if (coordinatesOperation == null) {
         for (int i = 0; i < coordinates.length; i++) {
           final double value = getCoordinate(i);

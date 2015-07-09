@@ -93,7 +93,8 @@ public class SimpleMCSweepLineIntersector extends EdgeSetIntersector {
   }
 
   @Override
-  public void computeIntersections(final List edges0, final List edges1, final SegmentIntersector si) {
+  public void computeIntersections(final List edges0, final List edges1,
+    final SegmentIntersector si) {
     add(edges0, edges0);
     add(edges1, edges1);
     computeIntersections(si);

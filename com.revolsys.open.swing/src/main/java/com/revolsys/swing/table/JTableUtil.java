@@ -21,8 +21,9 @@ public class JTableUtil {
         final TableColumn column = columnModel.getColumn(columnIndex);
         final String columnName = table.getColumnName(columnIndex);
         final TableCellRenderer headerRenderer = tableHeader.getDefaultRenderer();
-        final int headerWidth = headerRenderer.getTableCellRendererComponent(table, columnName,
-          false, false, 0, 0).getPreferredSize().width;
+        final int headerWidth = headerRenderer
+          .getTableCellRendererComponent(table, columnName, false, false, 0, 0)
+          .getPreferredSize().width;
         int maxwidth = headerWidth + 20;
         for (int rowIndex = 0; rowIndex < table.getRowCount(); rowIndex++) {
           final TableCellRenderer cellRenderer = table.getCellRenderer(rowIndex, columnIndex);

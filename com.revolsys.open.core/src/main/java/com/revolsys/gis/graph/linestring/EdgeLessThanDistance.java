@@ -14,8 +14,8 @@ import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
 
-public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>> implements
-  Filter<Edge<LineSegment>> {
+public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>>
+  implements Filter<Edge<LineSegment>> {
   public static List<Edge<LineSegment>> getEdges(final Graph<LineSegment> graph,
     final LineSegment lineSegment, final double maxDistance) {
     final CreateListVisitor<Edge<LineSegment>> results = new CreateListVisitor<Edge<LineSegment>>();
@@ -26,8 +26,8 @@ public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>> i
     return results.getList();
   }
 
-  public static List<Edge<LineSegment>> getEdges(final LineStringGraph graph,
-    final Point fromPoint, final Point toPoint, final double maxDistance) {
+  public static List<Edge<LineSegment>> getEdges(final LineStringGraph graph, final Point fromPoint,
+    final Point toPoint, final double maxDistance) {
     final LineSegment lineSegment = new LineSegmentDoubleGF(fromPoint, toPoint);
     return getEdges(graph, lineSegment, maxDistance);
 

@@ -178,10 +178,10 @@ public class CoordinatesListUtil {
     graph2.visitNodes(new InvokeMethodVisitor<Node<LineSegment>>(CoordinatesListUtil.class,
       "movePointsWithinTolerance", null, graph1, tolerance));
 
-    final Map<Edge<LineSegment>, List<Node<LineSegment>>> pointsOnEdge1 = graph1.getPointsOnEdges(
-      graph2, tolerance);
-    final Map<Edge<LineSegment>, List<Node<LineSegment>>> pointsOnEdge2 = graph2.getPointsOnEdges(
-      graph1, tolerance);
+    final Map<Edge<LineSegment>, List<Node<LineSegment>>> pointsOnEdge1 = graph1
+      .getPointsOnEdges(graph2, tolerance);
+    final Map<Edge<LineSegment>, List<Node<LineSegment>>> pointsOnEdge2 = graph2
+      .getPointsOnEdges(graph1, tolerance);
     graph1.splitEdges(pointsOnEdge1);
     graph2.splitEdges(pointsOnEdge2);
     for (final Edge<LineSegment> edge : graph2.getEdges()) {
@@ -298,10 +298,10 @@ public class CoordinatesListUtil {
     graph2.visitNodes(new InvokeMethodVisitor<Node<LineSegment>>(CoordinatesListUtil.class,
       "movePointsWithinTolerance", movedNodes, graph1, maxDistance));
 
-    final Map<Edge<LineSegment>, List<Node<LineSegment>>> pointsOnEdge1 = graph1.getPointsOnEdges(
-      graph2, maxDistance);
-    final Map<Edge<LineSegment>, List<Node<LineSegment>>> pointsOnEdge2 = graph2.getPointsOnEdges(
-      graph1, maxDistance);
+    final Map<Edge<LineSegment>, List<Node<LineSegment>>> pointsOnEdge1 = graph1
+      .getPointsOnEdges(graph2, maxDistance);
+    final Map<Edge<LineSegment>, List<Node<LineSegment>>> pointsOnEdge2 = graph2
+      .getPointsOnEdges(graph1, maxDistance);
     graph1.splitEdges(pointsOnEdge1);
     graph2.splitEdges(pointsOnEdge2);
     Point startPoint = points1.getPoint(0);

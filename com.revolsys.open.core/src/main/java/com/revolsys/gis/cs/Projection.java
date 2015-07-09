@@ -27,6 +27,7 @@ public class Projection implements Serializable, Comparable<Projection> {
   public static final String POPULAR_VISUALISATION_PSEUDO_MERCATOR = "Popular_Visualisation_Pseudo_Mercator";
 
   private static final Map<String, String> PROJECTION_ALIASES = new TreeMap<>();
+
   static {
     for (final String alias : Arrays.asList(ALBERS_EQUAL_AREA, "Albers", "Albers_Equal_Area_Conic",
       "Albers_Conic_Equal_Area")) {

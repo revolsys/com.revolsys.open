@@ -63,8 +63,8 @@ import com.revolsys.swing.table.TablePanel;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public class FieldFilterPanel extends JComponent implements ActionListener, ItemListener,
-  DocumentListener, PropertyChangeListener {
+public class FieldFilterPanel extends JComponent
+  implements ActionListener, ItemListener, DocumentListener, PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 

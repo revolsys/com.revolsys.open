@@ -467,41 +467,42 @@ public class SpatialReference implements Cloneable {
 
   public int SetGeogCS(final String pszGeogName, final String pszDatumName,
     final String pszEllipsoidName, final double dfSemiMajor, final double dfInvFlattening) {
-    return osrJNI.SpatialReference_SetGeogCS__SWIG_4(this.swigCPtr, this, pszGeogName,
-      pszDatumName, pszEllipsoidName, dfSemiMajor, dfInvFlattening);
+    return osrJNI.SpatialReference_SetGeogCS__SWIG_4(this.swigCPtr, this, pszGeogName, pszDatumName,
+      pszEllipsoidName, dfSemiMajor, dfInvFlattening);
   }
 
   public int SetGeogCS(final String pszGeogName, final String pszDatumName,
     final String pszEllipsoidName, final double dfSemiMajor, final double dfInvFlattening,
     final String pszPMName) {
-    return osrJNI.SpatialReference_SetGeogCS__SWIG_3(this.swigCPtr, this, pszGeogName,
-      pszDatumName, pszEllipsoidName, dfSemiMajor, dfInvFlattening, pszPMName);
+    return osrJNI.SpatialReference_SetGeogCS__SWIG_3(this.swigCPtr, this, pszGeogName, pszDatumName,
+      pszEllipsoidName, dfSemiMajor, dfInvFlattening, pszPMName);
   }
 
   public int SetGeogCS(final String pszGeogName, final String pszDatumName,
     final String pszEllipsoidName, final double dfSemiMajor, final double dfInvFlattening,
     final String pszPMName, final double dfPMOffset) {
-    return osrJNI.SpatialReference_SetGeogCS__SWIG_2(this.swigCPtr, this, pszGeogName,
-      pszDatumName, pszEllipsoidName, dfSemiMajor, dfInvFlattening, pszPMName, dfPMOffset);
+    return osrJNI.SpatialReference_SetGeogCS__SWIG_2(this.swigCPtr, this, pszGeogName, pszDatumName,
+      pszEllipsoidName, dfSemiMajor, dfInvFlattening, pszPMName, dfPMOffset);
   }
 
   public int SetGeogCS(final String pszGeogName, final String pszDatumName,
     final String pszEllipsoidName, final double dfSemiMajor, final double dfInvFlattening,
     final String pszPMName, final double dfPMOffset, final String pszUnits) {
-    return osrJNI.SpatialReference_SetGeogCS__SWIG_1(this.swigCPtr, this, pszGeogName,
-      pszDatumName, pszEllipsoidName, dfSemiMajor, dfInvFlattening, pszPMName, dfPMOffset, pszUnits);
+    return osrJNI.SpatialReference_SetGeogCS__SWIG_1(this.swigCPtr, this, pszGeogName, pszDatumName,
+      pszEllipsoidName, dfSemiMajor, dfInvFlattening, pszPMName, dfPMOffset, pszUnits);
   }
 
   public int SetGeogCS(final String pszGeogName, final String pszDatumName,
     final String pszEllipsoidName, final double dfSemiMajor, final double dfInvFlattening,
     final String pszPMName, final double dfPMOffset, final String pszUnits,
     final double dfConvertToRadians) {
-    return osrJNI.SpatialReference_SetGeogCS__SWIG_0(this.swigCPtr, this, pszGeogName,
-      pszDatumName, pszEllipsoidName, dfSemiMajor, dfInvFlattening, pszPMName, dfPMOffset,
-      pszUnits, dfConvertToRadians);
+    return osrJNI.SpatialReference_SetGeogCS__SWIG_0(this.swigCPtr, this, pszGeogName, pszDatumName,
+      pszEllipsoidName, dfSemiMajor, dfInvFlattening, pszPMName, dfPMOffset, pszUnits,
+      dfConvertToRadians);
   }
 
-  public int SetGEOS(final double cm, final double satelliteheight, final double fe, final double fn) {
+  public int SetGEOS(final double cm, final double satelliteheight, final double fe,
+    final double fn) {
     return osrJNI.SpatialReference_SetGEOS(this.swigCPtr, this, cm, satelliteheight, fe, fn);
   }
 
@@ -524,7 +525,8 @@ public class SpatialReference implements Cloneable {
   }
 
   public int SetHOM2PNO(final double clat, final double dfLat1, final double dfLong1,
-    final double dfLat2, final double dfLong2, final double scale, final double fe, final double fn) {
+    final double dfLat2, final double dfLong2, final double scale, final double fe,
+    final double fn) {
     return osrJNI.SpatialReference_SetHOM2PNO(this.swigCPtr, this, clat, dfLat1, dfLong1, dfLat2,
       dfLong2, scale, fe, fn);
   }
@@ -575,8 +577,8 @@ public class SpatialReference implements Cloneable {
     return osrJNI.SpatialReference_SetMC(this.swigCPtr, this, clat, clong, fe, fn);
   }
 
-  public int SetMercator(final double clat, final double clong, final double scale,
-    final double fe, final double fn) {
+  public int SetMercator(final double clat, final double clong, final double scale, final double fe,
+    final double fn) {
     return osrJNI.SpatialReference_SetMercator(this.swigCPtr, this, clat, clong, scale, fe, fn);
   }
 
@@ -592,7 +594,8 @@ public class SpatialReference implements Cloneable {
     return osrJNI.SpatialReference_SetNZMG(this.swigCPtr, this, clat, clong, fe, fn);
   }
 
-  public int SetOrthographic(final double clat, final double clong, final double fe, final double fn) {
+  public int SetOrthographic(final double clat, final double clong, final double fe,
+    final double fn) {
     return osrJNI.SpatialReference_SetOrthographic(this.swigCPtr, this, clat, clong, fe, fn);
   }
 
@@ -635,7 +638,8 @@ public class SpatialReference implements Cloneable {
     return osrJNI.SpatialReference_SetSinusoidal(this.swigCPtr, this, clong, fe, fn);
   }
 
-  public int SetSOC(final double latitudeoforigin, final double cm, final double fe, final double fn) {
+  public int SetSOC(final double latitudeoforigin, final double cm, final double fe,
+    final double fn) {
     return osrJNI.SpatialReference_SetSOC(this.swigCPtr, this, latitudeoforigin, cm, fe, fn);
   }
 
@@ -660,7 +664,8 @@ public class SpatialReference implements Cloneable {
 
   public int SetStereographic(final double clat, final double clong, final double scale,
     final double fe, final double fn) {
-    return osrJNI.SpatialReference_SetStereographic(this.swigCPtr, this, clat, clong, scale, fe, fn);
+    return osrJNI.SpatialReference_SetStereographic(this.swigCPtr, this, clat, clong, scale, fe,
+      fn);
   }
 
   public int SetTargetLinearUnits(final String target, final String name, final double to_meters) {
@@ -718,12 +723,14 @@ public class SpatialReference implements Cloneable {
   }
 
   public int SetVertCS(final String VertCSName, final String VertDatumName) {
-    return osrJNI.SpatialReference_SetVertCS__SWIG_1(this.swigCPtr, this, VertCSName, VertDatumName);
+    return osrJNI.SpatialReference_SetVertCS__SWIG_1(this.swigCPtr, this, VertCSName,
+      VertDatumName);
   }
 
-  public int SetVertCS(final String VertCSName, final String VertDatumName, final int VertDatumType) {
-    return osrJNI.SpatialReference_SetVertCS__SWIG_0(this.swigCPtr, this, VertCSName,
-      VertDatumName, VertDatumType);
+  public int SetVertCS(final String VertCSName, final String VertDatumName,
+    final int VertDatumType) {
+    return osrJNI.SpatialReference_SetVertCS__SWIG_0(this.swigCPtr, this, VertCSName, VertDatumName,
+      VertDatumType);
   }
 
   public int SetWellKnownGeogCS(final String name) {

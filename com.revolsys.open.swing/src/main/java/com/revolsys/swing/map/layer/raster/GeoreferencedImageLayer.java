@@ -61,8 +61,10 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     menu.addCheckboxMenuItem("edit",
       MenuSourceRunnable.createAction("Editable", "pencil", readonly, "toggleEditable"), editable);
 
-    menu.addCheckboxMenuItem("edit", MenuSourceRunnable.createAction("Show Original Image",
-      (String)null, new AndEnableCheck(editable, hasTransform), "toggleShowOriginalImage"),
+    menu
+      .addCheckboxMenuItem("edit",
+        MenuSourceRunnable.createAction("Show Original Image", (String)null,
+          new AndEnableCheck(editable, hasTransform), "toggleShowOriginalImage"),
       showOriginalImage);
 
     menu.addMenuItem("edit",
@@ -104,16 +106,16 @@ public class GeoreferencedImageLayer extends AbstractLayer {
         try {
           image = GeoreferencedImageFactory.loadGeoreferencedImage(imageResource);
           if (image == null) {
-            LoggerFactory.getLogger(GeoreferencedImageLayer.class).error(
-              "Cannot load image: " + this.url);
+            LoggerFactory.getLogger(GeoreferencedImageLayer.class)
+              .error("Cannot load image: " + this.url);
           }
         } catch (final RuntimeException e) {
-          LoggerFactory.getLogger(GeoreferencedImageLayer.class).error(
-            "Unable to load image: " + this.url, e);
+          LoggerFactory.getLogger(GeoreferencedImageLayer.class)
+            .error("Unable to load image: " + this.url, e);
         }
       } else {
-        LoggerFactory.getLogger(GeoreferencedImageLayer.class).error(
-          "Image does not exist: " + this.url);
+        LoggerFactory.getLogger(GeoreferencedImageLayer.class)
+          .error("Image does not exist: " + this.url);
       }
       setImage(image);
     } else {
@@ -164,8 +166,8 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     if (isEditable()) {
       this.image.deleteTiePoint(tiePoint);
     } else {
-      LoggerFactory.getLogger("Cannot delete tie-point. Layer " + getClass()).error(
-        getPath() + " is not editable");
+      LoggerFactory.getLogger("Cannot delete tie-point. Layer " + getClass())
+        .error(getPath() + " is not editable");
     }
   }
 
@@ -178,8 +180,8 @@ public class GeoreferencedImageLayer extends AbstractLayer {
       cancelChanges();
       return true;
     } else {
-      LoggerFactory.getLogger(getClass()).error(
-        "Layer definition does not contain a 'url' property");
+      LoggerFactory.getLogger(getClass())
+        .error("Layer definition does not contain a 'url' property");
       return false;
     }
   }
@@ -309,10 +311,8 @@ public class GeoreferencedImageLayer extends AbstractLayer {
         } else {
           firePropertyChange("preEditable", false, true);
           if (isHasChanges()) {
-            final Integer result = InvokeMethodCallable.invokeAndWait(
-              JOptionPane.class,
-              "showConfirmDialog",
-              JOptionPane.getRootFrame(),
+            final Integer result = InvokeMethodCallable.invokeAndWait(JOptionPane.class,
+              "showConfirmDialog", JOptionPane.getRootFrame(),
               "The layer has unsaved changes. Click Yes to save changes. Click No to discard changes. Click Cancel to continue editing.",
               "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION);
 
@@ -448,8 +448,8 @@ public class GeoreferencedImageLayer extends AbstractLayer {
       } catch (final NoninvertibleTransformException e) {
       }
     }
-    return new PointDouble2D(MathUtil.makePrecise(1, coordinates[0]), MathUtil.makePrecise(1,
-      coordinates[1]));
+    return new PointDouble2D(MathUtil.makePrecise(1, coordinates[0]),
+      MathUtil.makePrecise(1, coordinates[1]));
   }
 
   public void toggleShowOriginalImage() {
@@ -484,8 +484,8 @@ public class GeoreferencedImageLayer extends AbstractLayer {
       final double height = image.getImageHeight() - 1;
       final double[] targetCoordinates = MappedLocation.toModelCoordinates(image, layerBoundingBox,
         true, 0, height, width, height, width, 0, 0, 0, 0, height);
-      final LineString line = layerBoundingBox.getGeometryFactory()
-        .lineString(2, targetCoordinates);
+      final LineString line = layerBoundingBox.getGeometryFactory().lineString(2,
+        targetCoordinates);
       boundingBox = boundingBox.expandToInclude(line);
     }
     boundingBox = boundingBox.convert(geometryFactory).expandPercent(0.1).clipToCoordinateSystem();

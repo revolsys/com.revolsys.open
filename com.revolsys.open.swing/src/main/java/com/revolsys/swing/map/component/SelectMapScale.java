@@ -20,8 +20,8 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
-public class SelectMapScale extends JComboBox implements ItemListener, PropertyChangeListener,
-  ActionListener {
+public class SelectMapScale extends JComboBox
+  implements ItemListener, PropertyChangeListener, ActionListener {
   private static final long serialVersionUID = 1L;
 
   private final Reference<MapPanel> map;

@@ -117,7 +117,8 @@ public class ClasspathNativeLibraryUtil {
         System.load(file.getCanonicalPath());
         loaded = true;
       } catch (final Throwable e) {
-        LOG.debug("Unable to load shared library from classpath " + libraryName + " " + fileName, e);
+        LOG.debug("Unable to load shared library from classpath " + libraryName + " " + fileName,
+          e);
       }
     }
     LIBRARY_LOADED_MAP.put(name, loaded);

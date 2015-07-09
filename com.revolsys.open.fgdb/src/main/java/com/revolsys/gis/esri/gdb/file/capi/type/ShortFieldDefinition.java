@@ -9,8 +9,8 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 
 public class ShortFieldDefinition extends AbstractFileGdbFieldDefinition {
   public ShortFieldDefinition(final Field field) {
-    super(field.getName(), DataTypes.SHORT, BooleanStringConverter.getBoolean(field.getRequired())
-      || !field.isIsNullable());
+    super(field.getName(), DataTypes.SHORT,
+      BooleanStringConverter.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 
   @Override

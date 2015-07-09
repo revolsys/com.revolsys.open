@@ -109,8 +109,8 @@ public class FileMappedPageManager implements PageManager {
 
   private Page loadPage(final int index) {
     try {
-      final MappedByteBuffer buffer = this.fileChannel.map(MapMode.READ_WRITE, (long)index
-        * this.pageSize, this.pageSize);
+      final MappedByteBuffer buffer = this.fileChannel.map(MapMode.READ_WRITE,
+        (long)index * this.pageSize, this.pageSize);
       final Page page = new FileMappedPage(this, index, buffer);
       this.pages.put(index, page);
       return page;

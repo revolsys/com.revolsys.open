@@ -315,7 +315,7 @@ public class SingularValueDecomposition implements java.io.Serializable {
 
       switch (kase) {
 
-      // Deflate negligible s(p).
+        // Deflate negligible s(p).
 
         case 1: {
           double f = e[p - 2];
@@ -369,10 +369,9 @@ public class SingularValueDecomposition implements java.io.Serializable {
 
           // Calculate the shift.
 
-          final double scale = Math.max(
-            Math.max(
-              Math.max(Math.max(Math.abs(this.s[p - 1]), Math.abs(this.s[p - 2])),
-                Math.abs(e[p - 2])), Math.abs(this.s[k])), Math.abs(e[k]));
+          final double scale = Math
+            .max(Math.max(Math.max(Math.max(Math.abs(this.s[p - 1]), Math.abs(this.s[p - 2])),
+              Math.abs(e[p - 2])), Math.abs(this.s[k])), Math.abs(e[k]));
           final double sp = this.s[p - 1] / scale;
           final double spm1 = this.s[p - 2] / scale;
           final double epm1 = e[p - 2] / scale;

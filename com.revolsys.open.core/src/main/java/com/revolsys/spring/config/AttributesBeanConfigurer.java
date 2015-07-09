@@ -37,9 +37,11 @@ public class AttributesBeanConfigurer extends BeanConfigurrer {
     final ConfigurableListableBeanFactory beanFactory, final BeanDefinition beanDefinition,
     final String beanName, final String beanClassName) {
     if (beanClassName != null) {
-      if (beanClassName.equals(AttributeMap.class.getName()) || beanName.endsWith("-AttributeMap")) {
+      if (beanClassName.equals(AttributeMap.class.getName())
+        || beanName.endsWith("-AttributeMap")) {
         processPlaceholderAttributes(beanFactory, beanName, attributes);
-        final Map<String, Object> otherAttributes = (Map<String, Object>)beanFactory.getBean(beanName);
+        final Map<String, Object> otherAttributes = (Map<String, Object>)beanFactory
+          .getBean(beanName);
         processPlaceholderAttributes(beanFactory, otherAttributes);
         attributes.putAll(otherAttributes);
       } else if (beanClassName.equals(MapFactoryBean.class.getName())) {
@@ -49,7 +51,8 @@ public class AttributesBeanConfigurer extends BeanConfigurrer {
           final Object mapClass = targetMapClass.getValue();
           if (AttributeMap.class.getName().equals(mapClass)) {
             processPlaceholderAttributes(beanFactory, beanName, attributes);
-            final Map<String, Object> otherAttributes = (Map<String, Object>)beanFactory.getBean(beanName);
+            final Map<String, Object> otherAttributes = (Map<String, Object>)beanFactory
+              .getBean(beanName);
             processPlaceholderAttributes(beanFactory, otherAttributes);
             attributes.putAll(otherAttributes);
           }
@@ -88,9 +91,8 @@ public class AttributesBeanConfigurer extends BeanConfigurrer {
           addFields(allAttributes, beanFactory, bd, beanName, beanClassName);
           if (beanClassName.equals(TargetBeanFactoryBean.class.getName())) {
             final MutablePropertyValues propertyValues = bd.getPropertyValues();
-            final BeanDefinition targetBeanDefinition = (BeanDefinition)propertyValues.getPropertyValue(
-              "targetBeanDefinition")
-              .getValue();
+            final BeanDefinition targetBeanDefinition = (BeanDefinition)propertyValues
+              .getPropertyValue("targetBeanDefinition").getValue();
             final String targetBeanClassName = targetBeanDefinition.getBeanClassName();
             addFields(allAttributes, beanFactory, targetBeanDefinition, beanName,
               targetBeanClassName);

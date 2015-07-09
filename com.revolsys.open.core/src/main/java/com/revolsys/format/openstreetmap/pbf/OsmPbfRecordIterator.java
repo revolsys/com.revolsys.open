@@ -36,7 +36,7 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.Property;
 
-public class OsmPbfRecordIterator extends AbstractIterator<Record> implements RecordIterator {
+public class OsmPbfRecordIterator extends AbstractIterator<Record>implements RecordIterator {
 
   private static final int DATE_GRANULARITY = 1000;
 
@@ -105,7 +105,8 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements Re
     }
   }
 
-  private void addTags(final OsmElement element, final List<String> keys, final List<String> values) {
+  private void addTags(final OsmElement element, final List<String> keys,
+    final List<String> values) {
 
     if (keys.size() != values.size()) {
       throw new RuntimeException("Number of tag keys (" + keys.size() + ") and tag values ("

@@ -1,9 +1,9 @@
 package com.revolsys.jts.testold.math;
 
+import com.revolsys.jts.math.DD;
+
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
-
-import com.revolsys.jts.math.DD;
 
 /**
  * Tests basic arithmetic operations for {@link DD}s.
@@ -50,7 +50,7 @@ public class DDBasicTest extends TestCase {
     // System.out.println();
     // System.out.println("A = " + a + ", B = " + b);
     // System.out.println("[DD] (a+b)(a-b) = " + abProd
-    // + "   -((a^2 - b^2) - a^2) = " + diff + "   delta = " + delta);
+    // + " -((a^2 - b^2) - a^2) = " + diff + " delta = " + delta);
     // printBinomialSquareDouble(a,b);
 
     final boolean isSame = diff.equals(b2dd);
@@ -89,8 +89,8 @@ public class DDBasicTest extends TestCase {
 
     // System.out.println();
     // System.out.println("A = " + a + ", B = " + b);
-    // System.out.println("[DD]     2ab+b^2 = " + sum + "   (a+b)^2 - a^2 = "
-    // + diff + "   delta = " + delta);
+    // System.out.println("[DD] 2ab+b^2 = " + sum + " (a+b)^2 - a^2 = "
+    // + diff + " delta = " + delta);
     printBinomialSquareDouble(a, b);
 
     final boolean isSame = diff.equals(sum);
@@ -159,8 +159,8 @@ public class DDBasicTest extends TestCase {
   void printBinomialSquareDouble(final double a, final double b) {
     final double sum = 2 * a * b + b * b;
     final double diff = (a + b) * (a + b) - a * a;
-    // System.out.println("[double] 2ab+b^2= " + sum + "   (a+b)^2-a^2= " + diff
-    // + "   delta= " + (sum - diff));
+    // System.out.println("[double] 2ab+b^2= " + sum + " (a+b)^2-a^2= " + diff
+    // + " delta= " + (sum - diff));
   }
 
   private DD slowPow(final DD x, final int exp) {

@@ -27,7 +27,8 @@ public class SetCodeTableId extends AbstractSourceToTargetProcess<Record, Record
   public void process(final Record source, final Record target) {
     final Map<String, Object> codeTableValues = new HashMap<String, Object>();
 
-    for (final Entry<String, Converter<Record, Object>> entry : this.codeTableValueConverters.entrySet()) {
+    for (final Entry<String, Converter<Record, Object>> entry : this.codeTableValueConverters
+      .entrySet()) {
       String codeTableFieldName = entry.getKey();
       final Converter<Record, Object> sourceAttributeConverter = entry.getValue();
       Object sourceValue = sourceAttributeConverter.convert(source);
@@ -39,13 +40,14 @@ public class SetCodeTableId extends AbstractSourceToTargetProcess<Record, Record
           codeTableValueName = codeTableFieldName.substring(dotIndex + 1);
           codeTableFieldName = codeTableFieldName.substring(0, dotIndex);
         }
-        final CodeTable targetCodeTable = targetRecordDefinition.getCodeTableByFieldName(codeTableFieldName);
+        final CodeTable targetCodeTable = targetRecordDefinition
+          .getCodeTableByFieldName(codeTableFieldName);
         if (targetCodeTable != null) {
           if (codeTableValueName == null) {
             sourceValue = targetCodeTable.getId(sourceValue);
           } else {
-            sourceValue = targetCodeTable.getId(Collections.singletonMap(codeTableValueName,
-              sourceValue));
+            sourceValue = targetCodeTable
+              .getId(Collections.singletonMap(codeTableValueName, sourceValue));
           }
         }
       }

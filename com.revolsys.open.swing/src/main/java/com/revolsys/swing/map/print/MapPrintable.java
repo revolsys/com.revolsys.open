@@ -74,7 +74,8 @@ public class MapPrintable implements Printable {
     // final boolean savedUseModelCoordinates = viewport.setUseModelCoordinates(
     // true, graphics2d);
     try {
-      graphics2d.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
+      graphics2d
+        .setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
 
       final double rulerHeight = unit * this.rulerSizePixels;
 
@@ -155,10 +156,10 @@ public class MapPrintable implements Printable {
       }
 
       graphics2d.setColor(Color.BLACK);
-      graphics2d.draw(new Rectangle2D.Double(minX - rulerHeight, minY - rulerHeight, width + 2
-        * rulerHeight, height + 2 * rulerHeight));
-      graphics2d.draw(new Rectangle2D.Double(minX - lineWidth, minY - lineWidth, width + lineWidth
-        * 2, height + lineWidth * 2));
+      graphics2d.draw(new Rectangle2D.Double(minX - rulerHeight, minY - rulerHeight,
+        width + 2 * rulerHeight, height + 2 * rulerHeight));
+      graphics2d.draw(new Rectangle2D.Double(minX - lineWidth, minY - lineWidth,
+        width + lineWidth * 2, height + lineWidth * 2));
     } finally {
       // viewport.setUseModelCoordinates(savedUseModelCoordinates, graphics2d);
     }
@@ -179,14 +180,14 @@ public class MapPrintable implements Printable {
     final Graphics2D graphics2d = (Graphics2D)graphics;
     final PrintViewport2D viewport = new PrintViewport2D(this.map, graphics2d, pageFormat,
       this.boundingBox, this.contentRect, this.dpi);
-    graphics2d.translate(pageFormat.getImageableX() * this.dpi / 72.0, pageFormat.getImageableX()
-      * this.dpi / 72.0);
+    graphics2d.translate(pageFormat.getImageableX() * this.dpi / 72.0,
+      pageFormat.getImageableX() * this.dpi / 72.0);
     drawFooter(graphics2d);
 
     graphics2d.translate(this.contentRect.getMinX(), this.contentRect.getMinY());
     drawRuler(viewport, graphics2d);
-    graphics2d.clip(new Rectangle2D.Double(0, 0, this.contentRect.getWidth(),
-      this.contentRect.getHeight()));
+    graphics2d.clip(
+      new Rectangle2D.Double(0, 0, this.contentRect.getWidth(), this.contentRect.getHeight()));
 
     final LayerGroup map = viewport.getProject();
 
@@ -196,7 +197,8 @@ public class MapPrintable implements Printable {
     final float lineWidth = (float)(unit * this.millimetre / 5);
     // final boolean saved = viewport.setUseModelCoordinates(true, graphics2d);
     try {
-      graphics2d.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
+      graphics2d
+        .setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
 
       final double minX = this.boundingBox.getMinX();
       final double maxX = this.boundingBox.getMaxX();

@@ -30,10 +30,14 @@ public class LambertConicConformal extends AbstractCoordinatesProjection {
   public LambertConicConformal(final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
     final Datum datum = geographicCS.getDatum();
-    final double latitudeOfProjection = cs.getDoubleParameter(ProjectionParameterNames.LATITUDE_OF_CENTER);
-    final double centralMeridian = cs.getDoubleParameter(ProjectionParameterNames.LONGITUDE_OF_CENTER);
-    final double firstStandardParallel = cs.getDoubleParameter(ProjectionParameterNames.STANDARD_PARALLEL_1);
-    final double secondStandardParallel = cs.getDoubleParameter(ProjectionParameterNames.STANDARD_PARALLEL_2);
+    final double latitudeOfProjection = cs
+      .getDoubleParameter(ProjectionParameterNames.LATITUDE_OF_CENTER);
+    final double centralMeridian = cs
+      .getDoubleParameter(ProjectionParameterNames.LONGITUDE_OF_CENTER);
+    final double firstStandardParallel = cs
+      .getDoubleParameter(ProjectionParameterNames.STANDARD_PARALLEL_1);
+    final double secondStandardParallel = cs
+      .getDoubleParameter(ProjectionParameterNames.STANDARD_PARALLEL_2);
 
     final Spheroid spheroid = datum.getSpheroid();
     this.x0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_EASTING);
@@ -86,8 +90,8 @@ public class LambertConicConformal extends AbstractCoordinatesProjection {
 
       final double sinPhi = Math.sin(phi);
       final double eSinPhi = this.e * sinPhi;
-      final double phi1 = Angle.PI_OVER_2 - 2
-        * Math.atan(t * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.e / 2));
+      final double phi1 = Angle.PI_OVER_2
+        - 2 * Math.atan(t * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.e / 2));
       delta = Math.abs(phi1 - phi);
       phi = phi1;
     } while (!Double.isNaN(phi) && delta > 1.0e-011);

@@ -33,8 +33,8 @@ public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements Visitor<Node
 
   private final double maxDistance;
 
-  public NodeLessThanDistanceOfCoordinatesVisitor(final Point coordinates,
-    final double maxDistance, final Visitor<Node<T>> matchVisitor) {
+  public NodeLessThanDistanceOfCoordinatesVisitor(final Point coordinates, final double maxDistance,
+    final Visitor<Node<T>> matchVisitor) {
     this.coordinates = coordinates;
     this.maxDistance = maxDistance;
     this.matchVisitor = matchVisitor;

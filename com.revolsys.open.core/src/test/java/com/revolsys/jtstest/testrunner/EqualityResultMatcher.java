@@ -32,9 +32,9 @@
  */
 package com.revolsys.jtstest.testrunner;
 
-import junit.framework.Assert;
-
 import com.revolsys.jts.geom.Geometry;
+
+import junit.framework.Assert;
 
 /**
  * A {@link ResultMatcher} which compares result for equality,

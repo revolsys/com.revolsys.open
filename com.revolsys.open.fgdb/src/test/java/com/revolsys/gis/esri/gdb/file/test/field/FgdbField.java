@@ -13,7 +13,8 @@ public class FgdbField extends FieldDefinition {
     super(name, type, required);
   }
 
-  public FgdbField(final String name, final DataType type, final int length, final boolean required) {
+  public FgdbField(final String name, final DataType type, final int length,
+    final boolean required) {
     super(name, type, length, required);
   }
 

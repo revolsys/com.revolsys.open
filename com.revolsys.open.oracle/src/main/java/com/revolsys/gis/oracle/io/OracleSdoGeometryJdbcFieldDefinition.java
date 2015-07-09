@@ -78,9 +78,9 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public OracleSdoGeometryJdbcFieldDefinition clone() {
-    return new OracleSdoGeometryJdbcFieldDefinition(getDbName(), getName(), getType(),
-      getSqlType(), isRequired(), getDescription(), getProperties(), this.geometryFactory,
-      this.axisCount, this.oracleSrid);
+    return new OracleSdoGeometryJdbcFieldDefinition(getDbName(), getName(), getType(), getSqlType(),
+      isRequired(), getDescription(), getProperties(), this.geometryFactory, this.axisCount,
+      this.oracleSrid);
   }
 
   @Override
@@ -177,8 +177,8 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
         final LineString points = this.geometryFactory.lineString(axisCount, coordinates);
         lines.add(points);
       } else {
-        throw new IllegalArgumentException("Unsupported geometry type " + type + " interpretation "
-          + interpretation);
+        throw new IllegalArgumentException(
+          "Unsupported geometry type " + type + " interpretation " + interpretation);
       }
     }
 
@@ -238,8 +238,8 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
             throw new IllegalArgumentException("Unsupported geometry type " + type);
         }
       } else {
-        throw new IllegalArgumentException("Unsupported geometry type " + type + " interpretation "
-          + interpretation);
+        throw new IllegalArgumentException(
+          "Unsupported geometry type " + type + " interpretation " + interpretation);
       }
     }
     if (!rings.isEmpty()) {
@@ -306,8 +306,8 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
             throw new IllegalArgumentException("Unsupported geometry type " + type);
         }
       } else {
-        throw new IllegalArgumentException("Unsupported geometry type " + type + " interpretation "
-          + interpretation);
+        throw new IllegalArgumentException(
+          "Unsupported geometry type " + type + " interpretation " + interpretation);
       }
     }
     final Polygon polygon = this.geometryFactory.polygon(rings);
@@ -316,13 +316,13 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
 
   private Struct toSdoGeometry(final Connection connection, final int geometryType,
     final Struct pointStruct, final int[] elemInfo, final double... coordinates)
-    throws SQLException {
+      throws SQLException {
     return JdbcUtils.struct(connection, MDSYS_SDO_GEOMETRY, geometryType, this.oracleSrid,
       pointStruct, elemInfo, coordinates);
   }
 
-  private Struct toSdoGeometry(final Connection connection, final Object object, final int axisCount)
-    throws SQLException {
+  private Struct toSdoGeometry(final Connection connection, final Object object,
+    final int axisCount) throws SQLException {
     if (object instanceof Geometry) {
       Geometry geometry = (Geometry)object;
       geometry = geometry.copy(this.geometryFactory);

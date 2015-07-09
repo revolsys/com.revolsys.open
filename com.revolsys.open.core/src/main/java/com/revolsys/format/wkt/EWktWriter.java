@@ -443,8 +443,8 @@ public class EWktWriter {
     writeAxis(out, axisCount);
   }
 
-  private static void writeOrdinate(final Writer out, final LineString coordinates,
-    final int index, final int ordinateIndex) throws IOException {
+  private static void writeOrdinate(final Writer out, final LineString coordinates, final int index,
+    final int ordinateIndex) throws IOException {
     if (ordinateIndex > coordinates.getAxisCount()) {
       out.write('0');
     } else {

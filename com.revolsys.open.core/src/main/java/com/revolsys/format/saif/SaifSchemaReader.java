@@ -168,10 +168,10 @@ public class SaifSchemaReader {
                 if (contentDataType == null) {
                   contentDataType = DataTypes.DATA_OBJECT;
                 }
-                this.currentClass.addField(
-                  fieldName,
+                this.currentClass.addField(fieldName,
                   new CollectionDataType(collectionDataType.getName(),
-                    collectionDataType.getJavaClass(), contentDataType), required);
+                    collectionDataType.getJavaClass(), contentDataType),
+                  required);
               } else {
                 throw new IllegalStateException("Expecting attribute type");
               }
@@ -337,8 +337,8 @@ public class SaifSchemaReader {
           allowedValues.add(tagName);
         }
       } else if (!componentName.equals("comments")) {
-        throw new IllegalArgumentException("Unknown component " + componentName
-          + " for enumberation " + name);
+        throw new IllegalArgumentException(
+          "Unknown component " + componentName + " for enumberation " + name);
       }
 
     }
@@ -403,7 +403,8 @@ public class SaifSchemaReader {
         final FieldDefinition attribute = type.getField(key);
         if (attribute != null) {
           if (!typePaths.isEmpty()) {
-            Map<String, List<String>> allowedValues = attribute.getProperty(FieldProperties.ATTRIBUTE_ALLOWED_TYPE_NAMES);
+            Map<String, List<String>> allowedValues = attribute
+              .getProperty(FieldProperties.ATTRIBUTE_ALLOWED_TYPE_NAMES);
             if (allowedValues == null) {
               allowedValues = new HashMap<String, List<String>>();
               attribute.setProperty(FieldProperties.ATTRIBUTE_ALLOWED_TYPE_NAMES, allowedValues);
@@ -411,7 +412,8 @@ public class SaifSchemaReader {
             allowedValues.put(subKey, typePaths);
           }
           if (!values.isEmpty()) {
-            Map<String, List<Object>> allowedValues = attribute.getProperty(FieldProperties.ATTRIBUTE_ALLOWED_VALUES);
+            Map<String, List<Object>> allowedValues = attribute
+              .getProperty(FieldProperties.ATTRIBUTE_ALLOWED_VALUES);
             if (allowedValues == null) {
               allowedValues = new HashMap<String, List<Object>>();
               attribute.setProperty(FieldProperties.ATTRIBUTE_ALLOWED_VALUES, allowedValues);

@@ -125,7 +125,8 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
   protected void appendLocations(final StringBuilder text, final String title,
     final Map<String, Set<CloseLocation>> vertexLocations) {
     if (!vertexLocations.isEmpty()) {
-      text.append("<div style=\"border-bottom: solid black 1px; font-weight:bold;padding: 1px 3px 1px 3px\">");
+      text.append(
+        "<div style=\"border-bottom: solid black 1px; font-weight:bold;padding: 1px 3px 1px 3px\">");
       text.append(title);
       text.append("</div>");
       text.append("<div style=\"padding: 1px 3px 1px 3px\">");
@@ -137,16 +138,20 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
         text.append("<b><i>");
         text.append(typePath);
         text.append("</i></b>\n");
-        text.append("<table cellspacing=\"0\" cellpadding=\"1\" style=\"border: solid black 1px;margin: 3px 0px 3px 0px;padding: 0px;width: 100%\">");
-        text.append("<thead><tr style=\"border-bottom: solid black 3px\"><th style=\"border-right: solid black 1px\">");
+        text.append(
+          "<table cellspacing=\"0\" cellpadding=\"1\" style=\"border: solid black 1px;margin: 3px 0px 3px 0px;padding: 0px;width: 100%\">");
+        text.append(
+          "<thead><tr style=\"border-bottom: solid black 3px\"><th style=\"border-right: solid black 1px\">");
         final boolean hasId = Property.hasValue(idFieldName);
         if (hasId) {
           text.append(idFieldName);
           text.append("</th><th style=\"border-right: solid black 1px\">");
         }
-        text.append("INDEX</th><th style=\"border-right: solid black 1px\">SRID</th><th>POINT</th></tr></th><tbody>");
+        text.append(
+          "INDEX</th><th style=\"border-right: solid black 1px\">SRID</th><th>POINT</th></tr></th><tbody>");
         for (final CloseLocation location : locations) {
-          text.append("<tr style=\"border-bottom: solid black 1px\"><td style=\"border-right: solid black 1px\">");
+          text.append(
+            "<tr style=\"border-bottom: solid black 1px\"><td style=\"border-right: solid black 1px\">");
           final Object id = location.getId();
           if (hasId) {
             text.append(id);
@@ -284,7 +289,8 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     return closeLocation;
   }
 
-  protected CloseLocation findCloseLocation(final LayerRecord record, final BoundingBox boundingBox) {
+  protected CloseLocation findCloseLocation(final LayerRecord record,
+    final BoundingBox boundingBox) {
     if (record.isGeometryEditable()) {
       final AbstractRecordLayer layer = record.getLayer();
       final Geometry geometry = record.getGeometryValue();
@@ -765,8 +771,8 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
           if ("Point".equals(locationType) || "End-Vertex".equals(locationType)) {
             nodeSnap = true;
           }
-          Maps.addToSet(typeLocationsMap, typePath + " (<b style=\"color:red\">" + locationType
-            + "</b>)", snapLocation);
+          Maps.addToSet(typeLocationsMap,
+            typePath + " (<b style=\"color:red\">" + locationType + "</b>)", snapLocation);
         }
 
         for (final Entry<String, Set<CloseLocation>> typeLocations : typeLocationsMap.entrySet()) {

@@ -59,7 +59,8 @@ public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
     int matchCount = 0;
     final RecordDefinition sourceRecordDefinition = source.getRecordDefinition();
     final String sourceTypeName = sourceRecordDefinition.getPath();
-    final Collection<FilterRecordConverter> converters = this.typeFilterConverterMap.get(sourceTypeName);
+    final Collection<FilterRecordConverter> converters = this.typeFilterConverterMap
+      .get(sourceTypeName);
     Record target = null;
     if (converters != null && !converters.isEmpty()) {
       for (final FilterRecordConverter filterConverter : converters) {
@@ -158,7 +159,8 @@ public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
           targetTypeName = String.valueOf(targetName.toString());
         }
         @SuppressWarnings("unchecked")
-        final Map<String, String> attributeMapping = (Map<String, String>)map.get("attributeMapping");
+        final Map<String, String> attributeMapping = (Map<String, String>)map
+          .get("attributeMapping");
 
         final RecordDefinition targetRecordDefinition = getTargetRecordDefinition(targetTypeName);
         final SimpleRecordConveter converter = new SimpleRecordConveter(targetRecordDefinition);

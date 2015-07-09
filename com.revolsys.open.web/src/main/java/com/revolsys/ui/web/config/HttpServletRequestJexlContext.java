@@ -60,7 +60,8 @@ public class HttpServletRequestJexlContext implements JexlContext {
   }
 
   private HttpServletRequest getRequest() {
-    final ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
+    final ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder
+      .getRequestAttributes();
     final HttpServletRequest request = requestAttributes.getRequest();
     return request;
   }
@@ -74,17 +75,20 @@ public class HttpServletRequestJexlContext implements JexlContext {
         final HttpServletRequest request = getRequest();
         final Map<String, Object> map = new HashMap<String, Object>();
         map.putAll(request.getParameterMap());
-        for (final Enumeration<String> names = request.getAttributeNames(); names.hasMoreElements();) {
+        for (final Enumeration<String> names = request.getAttributeNames(); names
+          .hasMoreElements();) {
           final String name = names.nextElement();
           map.put(name, request.getAttribute(name));
         }
         if (HttpServletRequestJexlContext.this.servletContext != null) {
-          for (final Enumeration<String> names = HttpServletRequestJexlContext.this.servletContext.getAttributeNames(); names.hasMoreElements();) {
+          for (final Enumeration<String> names = HttpServletRequestJexlContext.this.servletContext
+            .getAttributeNames(); names.hasMoreElements();) {
             final String name = names.nextElement();
             map.put(name, HttpServletRequestJexlContext.this.servletContext.getAttribute(name));
           }
         }
-        final Map<String, Object> attributes = HttpServletRequestJexlContext.this.localAttributes.get();
+        final Map<String, Object> attributes = HttpServletRequestJexlContext.this.localAttributes
+          .get();
         if (attributes != null) {
           map.putAll(attributes);
         }

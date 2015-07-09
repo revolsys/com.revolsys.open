@@ -35,12 +35,12 @@ package com.revolsys.jts.testold.io;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.util.GeometricShapeFactory;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 public class SerializabilityTest extends TestCase {
 

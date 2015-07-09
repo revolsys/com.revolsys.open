@@ -33,11 +33,6 @@
 
 package com.revolsys.jts.testold.geom;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -45,6 +40,11 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKTReader;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import junit.textui.TestRunner;
 
 /**
  * Test for com.revolsys.jts.testold.geom.impl.MultiPointImpl.
@@ -85,7 +85,8 @@ public class MultiPointImplTest extends TestCase {
   }
 
   public void testGetEnvelope() throws Exception {
-    final MultiPoint m = (MultiPoint)this.reader.read("MULTIPOINT(1.111 2.222, 3.333 4.444, 3.333 4.444)");
+    final MultiPoint m = (MultiPoint)this.reader
+      .read("MULTIPOINT(1.111 2.222, 3.333 4.444, 3.333 4.444)");
     final BoundingBox e = m.getBoundingBox();
     assertEquals(1.111, e.getMinX(), 1E-10);
     assertEquals(3.333, e.getMaxX(), 1E-10);
@@ -103,7 +104,8 @@ public class MultiPointImplTest extends TestCase {
   // }
 
   public void testGetGeometryN() throws Exception {
-    final MultiPoint m = (MultiPoint)this.reader.read("MULTIPOINT(1.111 2.222, 3.333 4.444, 3.333 4.444)");
+    final MultiPoint m = (MultiPoint)this.reader
+      .read("MULTIPOINT(1.111 2.222, 3.333 4.444, 3.333 4.444)");
     final Geometry g = m.getGeometry(1);
     assertTrue(g instanceof Point);
     final Point p = (Point)g;

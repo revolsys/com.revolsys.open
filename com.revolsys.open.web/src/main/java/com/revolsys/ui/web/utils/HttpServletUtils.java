@@ -57,7 +57,8 @@ public final class HttpServletUtils {
     }
   }
 
-  public static boolean getBooleanParameter(final HttpServletRequest request, final String paramName) {
+  public static boolean getBooleanParameter(final HttpServletRequest request,
+    final String paramName) {
     final String value = request.getParameter(paramName);
     if (Property.hasValue(value)) {
       return Boolean.parseBoolean(value);
@@ -139,7 +140,8 @@ public final class HttpServletUtils {
     final HttpServletRequest request = getRequest();
     if (request != null) {
       @SuppressWarnings("unchecked")
-      Map<String, String> pathVariables = (Map<String, String>)request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+      Map<String, String> pathVariables = (Map<String, String>)request
+        .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
       if (pathVariables == null) {
         pathVariables = new HashMap<String, String>();
         request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, pathVariables);

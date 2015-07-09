@@ -192,9 +192,10 @@ public class Buffer {
   }
 
   public static Geometry buffer(final Geometry geometry, final double distance,
-    final int quadrantSegments, final int endCapStyle, final int joinStyle, final double mitreLimit) {
-    return buffer(geometry, distance, new BufferParameters(quadrantSegments, endCapStyle,
-      joinStyle, mitreLimit));
+    final int quadrantSegments, final int endCapStyle, final int joinStyle,
+    final double mitreLimit) {
+    return buffer(geometry, distance,
+      new BufferParameters(quadrantSegments, endCapStyle, joinStyle, mitreLimit));
   }
 
   private static Geometry buffer(final Noder noder, final GeometryFactory precisionModel,
@@ -243,8 +244,8 @@ public class Buffer {
     for (int precDigits = MAX_PRECISION_DIGITS; precDigits >= 0; precDigits--) {
       try {
         final double sizeBasedScaleFactor = precisionScaleFactor(geometry, distance, precDigits);
-        final GeometryFactory precisionModel = geometry.getGeometryFactory().convertScales(
-          sizeBasedScaleFactor);
+        final GeometryFactory precisionModel = geometry.getGeometryFactory()
+          .convertScales(sizeBasedScaleFactor);
         return bufferFixedPrecision(precisionModel, geometry, distance, parameters);
       } catch (final TopologyException e) {
 
@@ -285,8 +286,8 @@ public class Buffer {
     final Collection<NodedSegmentString> nodedSegments = noder.getNodedSubstrings();
     for (final SegmentString segment : nodedSegments) {
       final int vertexCount = segment.size();
-      if (vertexCount > 2 || vertexCount == 2
-        && !segment.getCoordinate(0).equals(2, segment.getCoordinate(1))) {
+      if (vertexCount > 2
+        || vertexCount == 2 && !segment.getCoordinate(0).equals(2, segment.getCoordinate(1))) {
         final Label oldLabel = (Label)segment.getData();
         final Label label = new Label(oldLabel);
         final LineString points = segment.getPoints();
@@ -396,7 +397,8 @@ public class Buffer {
       }
 
       // skip if stabbing ray is right of the segment
-      if (CGAlgorithmsDD.orientationIndex(seg.getP0(), seg.getP1(), stabbingRayLeftPt) == CGAlgorithms.RIGHT) {
+      if (CGAlgorithmsDD.orientationIndex(seg.getP0(), seg.getP1(),
+        stabbingRayLeftPt) == CGAlgorithms.RIGHT) {
         continue;
       }
 

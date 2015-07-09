@@ -22,8 +22,8 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
   public static final Date MIN_DATE = new Date(70, 0, 1);
 
   public DateFieldDefinition(final Field field) {
-    super(field.getName(), DataTypes.DATE, BooleanStringConverter.getBoolean(field.getRequired())
-      || !field.isIsNullable());
+    super(field.getName(), DataTypes.DATE,
+      BooleanStringConverter.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 
   @Override
@@ -95,8 +95,8 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
           return time;
         }
       } else {
-        throw new IllegalArgumentException("Expecting a java,util.Date not " + value.getClass()
-          + " " + value);
+        throw new IllegalArgumentException(
+          "Expecting a java,util.Date not " + value.getClass() + " " + value);
       }
     }
   }

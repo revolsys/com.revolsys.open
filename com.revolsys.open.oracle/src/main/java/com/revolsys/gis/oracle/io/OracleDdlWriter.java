@@ -55,7 +55,8 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     final String tableName = Path.getName(typePath);
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
     if (geometryField != null) {
-      final GeometryFactory geometryFactory = geometryField.getProperty(FieldProperties.GEOMETRY_FACTORY);
+      final GeometryFactory geometryFactory = geometryField
+        .getProperty(FieldProperties.GEOMETRY_FACTORY);
       final String name = geometryField.getName();
       String geometryType = "GEOMETRY";
       final DataType dataType = geometryField.getType();
@@ -90,7 +91,8 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     }
   }
 
-  public void writeAlterOwner(final String objectType, final String objectName, final String owner) {
+  public void writeAlterOwner(final String objectType, final String objectName,
+    final String owner) {
     final PrintWriter out = getOut();
     out.print("ALTER ");
     out.print(objectType);
@@ -174,19 +176,22 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     final String tableName = Path.getName(typePath);
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
     if (geometryField != null) {
-      final GeometryFactory geometryFactory = geometryField.getProperty(FieldProperties.GEOMETRY_FACTORY);
+      final GeometryFactory geometryFactory = geometryField
+        .getProperty(FieldProperties.GEOMETRY_FACTORY);
       final String name = geometryField.getName();
       final int axisCount = geometryFactory.getAxisCount();
       final DataType dataType = geometryField.getType();
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       final int srid = coordinateSystem.getId();
 
-      out.print("INSERT INTO USER_SDO_GEOM_METADATA(TABLE_NAME, COLUMN_NAME, DIMINFO, SRID) VALUES('");
+      out.print(
+        "INSERT INTO USER_SDO_GEOM_METADATA(TABLE_NAME, COLUMN_NAME, DIMINFO, SRID) VALUES('");
       out.print(tableName.toUpperCase());
       out.print("','");
       out.print(name.toUpperCase());
       // TODO get from geometry factory
-      out.print("',MDSYS.SDO_DIM_ARRAY(MDSYS.SDO_DIM_ELEMENT('X', 263000, 1876000, 0.001),MDSYS.SDO_DIM_ELEMENT('Y', 356000, 1738000, 0.001)");
+      out.print(
+        "',MDSYS.SDO_DIM_ARRAY(MDSYS.SDO_DIM_ELEMENT('X', 263000, 1876000, 0.001),MDSYS.SDO_DIM_ELEMENT('Y', 356000, 1738000, 0.001)");
       if (axisCount > 2) {
         out.print(",MDSYS.SDO_DIM_ELEMENT('Z',-2500, 5000, 0.001)");
       }
@@ -194,7 +199,8 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       out.println("3005);");
 
       final int geometryType = OracleSdoGeometryFieldAdder.getGeometryTypeId(dataType, axisCount);
-      out.print("INSERT INTO OGIS_GEOMETRY_COLUMNS(F_TABLE_SCHEMA,F_TABLE_NAME,F_GEOMETRY_COLUMN,G_TABLE_SCHEMA,G_TABLE_NAME,GEOMETRY_TYPE,COORD_DIMENSION,SRID) VALUES ('");
+      out.print(
+        "INSERT INTO OGIS_GEOMETRY_COLUMNS(F_TABLE_SCHEMA,F_TABLE_NAME,F_GEOMETRY_COLUMN,G_TABLE_SCHEMA,G_TABLE_NAME,GEOMETRY_TYPE,COORD_DIMENSION,SRID) VALUES ('");
       out.print(schemaName.toUpperCase());
       out.print("', '");
       out.print(tableName.toUpperCase());
@@ -216,7 +222,8 @@ public class OracleDdlWriter extends JdbcDdlWriter {
   }
 
   @Override
-  public void writeResetSequence(final RecordDefinition recordDefinition, final List<Record> values) {
+  public void writeResetSequence(final RecordDefinition recordDefinition,
+    final List<Record> values) {
     final PrintWriter out = getOut();
     Long nextValue = 0L;
     for (final Record object : values) {

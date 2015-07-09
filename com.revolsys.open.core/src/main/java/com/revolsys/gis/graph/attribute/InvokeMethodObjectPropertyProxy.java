@@ -96,8 +96,8 @@ public class InvokeMethodObjectPropertyProxy<T, O> extends AbstractObjectPropert
       throw new RuntimeException(e);
     }
     if (this.method == null) {
-      throw new IllegalArgumentException("Method could not be found " + this.clazz + "."
-        + this.methodName);
+      throw new IllegalArgumentException(
+        "Method could not be found " + this.clazz + "." + this.methodName);
     }
   }
 

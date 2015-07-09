@@ -16,7 +16,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.ZipUtil;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 
-public class ZipRecordReader extends DelegatingReader<Record> implements RecordReader {
+public class ZipRecordReader extends DelegatingReader<Record>implements RecordReader {
   private RecordReader reader;
 
   private File directory;
@@ -35,8 +35,8 @@ public class ZipRecordReader extends DelegatingReader<Record> implements RecordR
       }
       if (this.reader == null) {
         close();
-        throw new IllegalArgumentException("No *." + fileExtension + " exists in zip file "
-          + resource);
+        throw new IllegalArgumentException(
+          "No *." + fileExtension + " exists in zip file " + resource);
       } else {
         setReader(this.reader);
       }
@@ -63,8 +63,8 @@ public class ZipRecordReader extends DelegatingReader<Record> implements RecordR
       this.reader = RecordIo.recordReader(fileResource, factory);
       if (this.reader == null) {
         close();
-        throw new IllegalArgumentException("Cannot create reader for file " + zipEntryName
-          + " in zip file " + resource);
+        throw new IllegalArgumentException(
+          "Cannot create reader for file " + zipEntryName + " in zip file " + resource);
       } else {
         return true;
       }

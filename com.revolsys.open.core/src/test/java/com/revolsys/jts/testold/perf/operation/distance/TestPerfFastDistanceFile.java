@@ -93,7 +93,7 @@ public class TestPerfFastDistanceFile {
     // computePairDistance(geoms, 1, 3);
     // computePairDistance(geoms, 55, 77);
 
-    // System.out.println("Count = " + maxToScan + "   Finished in "
+    // System.out.println("Count = " + maxToScan + " Finished in "
     // + sw.getTimeString());
   }
 

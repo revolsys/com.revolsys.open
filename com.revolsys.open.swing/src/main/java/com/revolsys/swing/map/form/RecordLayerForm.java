@@ -317,8 +317,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   public <T> T addLabelledField(final Container container, final String fieldName) {
     final Field field = getField(fieldName);
     if (field == null) {
-      Logger.getLogger(getClass()).error(
-        "Cannot find field " + this.recordDefinition.getPath() + " " + fieldName);
+      Logger.getLogger(getClass())
+        .error("Cannot find field " + this.recordDefinition.getPath() + " " + fieldName);
     } else {
       addLabelledField(container, field);
     }
@@ -332,7 +332,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     addField(fieldName, field);
   }
 
-  protected void addPanel(final JPanel container, final String title, final List<String> fieldNames) {
+  protected void addPanel(final JPanel container, final String title,
+    final List<String> fieldNames) {
     final JPanel panel = createPanel(container, title);
 
     for (final String fieldName : fieldNames) {
@@ -425,7 +426,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     for (final String name : fieldNamesSetNames) {
       maxLength = Math.max(maxLength, name.length());
     }
-    this.fieldNameSetNamesField.setMaximumSize(new Dimension(Math.max(300, maxLength * 11 + 40), 22));
+    this.fieldNameSetNamesField
+      .setMaximumSize(new Dimension(Math.max(300, maxLength * 11 + 40), 22));
     Property.addListener(this.fieldNameSetNamesField, "fieldNamesSetName", this);
 
     final ToolBar toolBar = new ToolBar();
@@ -532,8 +534,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
         if (DirectionalAttributes.getProperty(recordDefinition).hasDirectionalAttributes()) {
           this.toolBar.addButton("geometry", FLIP_RECORD_NAME, FLIP_RECORD_ICON, editable, this,
             "flipRecordOrientation");
-          this.toolBar.addButton("geometry", FLIP_LINE_ORIENTATION_NAME,
-            FLIP_LINE_ORIENTATION_ICON, editable, this, "flipLineOrientation");
+          this.toolBar.addButton("geometry", FLIP_LINE_ORIENTATION_NAME, FLIP_LINE_ORIENTATION_ICON,
+            editable, this, "flipLineOrientation");
           this.toolBar.addButton("geometry", FLIP_FIELDS_NAME, FLIP_FIELDS_ICON, editable, this,
             "flipFields");
         } else {
@@ -1073,7 +1075,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
         } else if (propertyName.equals("fieldNamesSets")) {
           final Object selectedItem = this.fieldNameSetNamesField.getSelectedItem();
           final List<String> fieldNamesSetNames = this.layer.getFieldNamesSetNames();
-          final DefaultComboBoxModel<String> fieldNamesSetNamesModel = ComboBox.model(fieldNamesSetNames);
+          final DefaultComboBoxModel<String> fieldNamesSetNamesModel = ComboBox
+            .model(fieldNamesSetNames);
           this.fieldNameSetNamesField.setModel(fieldNamesSetNamesModel);
           this.fieldNameSetNamesField.setSelectedItem(selectedItem);
           final String fieldNamesSetName = (String)this.fieldNameSetNamesField.getSelectedItem();
@@ -1107,9 +1110,9 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
                 equal = true;
               }
             }
-            if (!equal
-              && layer.isEditable()
-              && (record.getState() == RecordState.New && layer.isCanAddRecords() || layer.isCanEditRecords())) {
+            if (!equal && layer.isEditable()
+              && (record.getState() == RecordState.New && layer.isCanAddRecords()
+                || layer.isCanEditRecords())) {
               record.setValueByPath(fieldName, fieldValue);
             }
           }
@@ -1128,8 +1131,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
             }
             final boolean modifiedOrDeleted = isModifiedOrDeleted();
             if (this.propertyChangeSupport != null) {
-              this.propertyChangeSupport.firePropertyChange("modifiedOrDeleted",
-                !modifiedOrDeleted, modifiedOrDeleted);
+              this.propertyChangeSupport.firePropertyChange("modifiedOrDeleted", !modifiedOrDeleted,
+                modifiedOrDeleted);
               final boolean deletable = isDeletable();
               this.propertyChangeSupport.firePropertyChange("deletable", !deletable, deletable);
             }

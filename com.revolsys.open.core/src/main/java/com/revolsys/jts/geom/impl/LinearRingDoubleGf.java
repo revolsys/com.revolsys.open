@@ -82,8 +82,8 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
     if (isClosed()) {
       final int vertexCount = getVertexCount();
       if (vertexCount >= 1 && vertexCount < MINIMUM_VALID_SIZE) {
-        throw new IllegalArgumentException("Invalid number of points in LinearRing (found "
-          + vertexCount + " - must be 0 or >= 4)");
+        throw new IllegalArgumentException(
+          "Invalid number of points in LinearRing (found " + vertexCount + " - must be 0 or >= 4)");
       }
     } else {
       throw new IllegalArgumentException("Points of LinearRing do not form a closed linestring");
@@ -92,8 +92,8 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
 
   public LinearRingDoubleGf(final GeometryFactory geometryFactory, final int axisCount,
     final int vertexCount, final double... coordinates) {
-    super(geometryFactory, axisCount, getNewCoordinates(geometryFactory, axisCount, vertexCount,
-      coordinates));
+    super(geometryFactory, axisCount,
+      getNewCoordinates(geometryFactory, axisCount, vertexCount, coordinates));
 
   }
 
@@ -112,8 +112,8 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
     if (isClosed()) {
       final int vertexCount = getVertexCount();
       if (vertexCount >= 1 && vertexCount < MINIMUM_VALID_SIZE) {
-        throw new IllegalArgumentException("Invalid number of points in LinearRing (found "
-          + vertexCount + " - must be 0 or >= 4)");
+        throw new IllegalArgumentException(
+          "Invalid number of points in LinearRing (found " + vertexCount + " - must be 0 or >= 4)");
       }
     } else {
       throw new IllegalArgumentException("Points of LinearRing do not form a closed linestring");
@@ -144,8 +144,8 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
         return (V)geometryFactory.linearRing(axisCount, newCoordinates);
       }
     } else {
-      throw new IllegalArgumentException("Geometry id's for LinearRings must have length 0. "
-        + Arrays.toString(geometryId));
+      throw new IllegalArgumentException(
+        "Geometry id's for LinearRings must have length 0. " + Arrays.toString(geometryId));
     }
   }
 
@@ -183,7 +183,8 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
         final int axisCount = getAxisCount();
         final double[] newCoordinates = new double[axisCount * (vertexCount - 1)];
         if (vertexIndex == 0 || vertexIndex == vertexCount - 1) {
-          System.arraycopy(coordinates, axisCount, newCoordinates, 0, (vertexCount - 2) * axisCount);
+          System.arraycopy(coordinates, axisCount, newCoordinates, 0,
+            (vertexCount - 2) * axisCount);
           System.arraycopy(coordinates, axisCount, newCoordinates, (vertexCount - 2) * axisCount,
             axisCount);
         } else {

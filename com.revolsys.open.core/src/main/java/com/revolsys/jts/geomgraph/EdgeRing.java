@@ -147,8 +147,8 @@ public abstract class EdgeRing {
         throw new TopologyException("Found null DirectedEdge");
       }
       if (de.getEdgeRing() == this) {
-        throw new TopologyException("Directed Edge visited twice during ring-building at "
-          + de.getCoordinate());
+        throw new TopologyException(
+          "Directed Edge visited twice during ring-building at " + de.getCoordinate());
       }
 
       this.edges.add(de);

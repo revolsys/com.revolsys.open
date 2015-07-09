@@ -20,8 +20,8 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractConnectionRegistry<T extends MapSerializer> implements
-  ConnectionRegistry<T>, PropertyChangeListener {
+public abstract class AbstractConnectionRegistry<T extends MapSerializer>
+  implements ConnectionRegistry<T>, PropertyChangeListener {
 
   private Map<String, T> connections;
 
@@ -190,7 +190,8 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer> implem
             propertyChangeSupport.removePropertyChangeListener(this);
           }
         }
-        this.propertyChangeSupport.fireIndexedPropertyChange("connections", index, connection, null);
+        this.propertyChangeSupport.fireIndexedPropertyChange("connections", index, connection,
+          null);
         if (this.directory != null && !this.readOnly) {
           final Map<String, Object> connectionParameters = existingConnection.toMap();
           final String connectionName = (String)connectionParameters.get("name");

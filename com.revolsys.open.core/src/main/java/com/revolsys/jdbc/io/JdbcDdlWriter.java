@@ -98,8 +98,8 @@ public abstract class JdbcDdlWriter implements Cloneable {
     final String typePath = recordDefinition.getPath();
     final String referencedTypeName = referencedRecordDefinition.getPath();
     final String referencedFieldName = referencedRecordDefinition.getIdFieldName();
-    final String constraintName = getTableAlias(recordDefinition) + "_" + referenceTablePrefix
-      + "_" + getTableAlias(referencedRecordDefinition) + "_FK";
+    final String constraintName = getTableAlias(recordDefinition) + "_" + referenceTablePrefix + "_"
+      + getTableAlias(referencedRecordDefinition) + "_FK";
     writeAddForeignKeyConstraint(typePath, constraintName, fieldName, referencedTypeName,
       referencedFieldName);
   }
@@ -276,7 +276,8 @@ public abstract class JdbcDdlWriter implements Cloneable {
 
   }
 
-  public void writeResetSequence(final RecordDefinition recordDefinition, final List<Record> values) {
+  public void writeResetSequence(final RecordDefinition recordDefinition,
+    final List<Record> values) {
     throw new UnsupportedOperationException();
   }
 

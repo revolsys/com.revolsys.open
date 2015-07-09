@@ -111,7 +111,8 @@ public class DistanceOp {
     return false;
   }
 
-  private boolean computeContainmentDistance(final List<Point> points, final List<Polygon> polygons) {
+  private boolean computeContainmentDistance(final List<Point> points,
+    final List<Polygon> polygons) {
     for (final Point point : points) {
       for (final Polygon polygon : polygons) {
         if (computeContainmentDistance(point, polygon)) {

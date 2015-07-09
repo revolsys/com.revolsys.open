@@ -61,8 +61,8 @@ import com.revolsys.swing.table.record.row.RecordRowTable;
 import com.revolsys.swing.table.selection.NullSelectionModel;
 import com.revolsys.util.Property;
 
-public class RecordLayerTableModel extends RecordRowTableModel implements SortableTableModel,
-  PropertyChangeListener, PropertyChangeSupportProxy {
+public class RecordLayerTableModel extends RecordRowTableModel
+  implements SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
 
   private static final long serialVersionUID = 1L;
 
@@ -341,8 +341,8 @@ public class RecordLayerTableModel extends RecordRowTableModel implements Sortab
 
         } else {
           if (this.rowCountWorker == null) {
-            this.rowCountWorker = Invoke.background("Query row count " + this.layer.getName(),
-              this, "loadRowCount", this.refreshIndex);
+            this.rowCountWorker = Invoke.background("Query row count " + this.layer.getName(), this,
+              "loadRowCount", this.refreshIndex);
           }
           return 0;
         }
@@ -515,7 +515,8 @@ public class RecordLayerTableModel extends RecordRowTableModel implements Sortab
   protected void replaceCachedObject(final LayerRecord oldObject, final LayerRecord newObject) {
     synchronized (this.pageCache) {
       for (final List<LayerRecord> objects : this.pageCache.values()) {
-        for (final ListIterator<LayerRecord> iterator = objects.listIterator(); iterator.hasNext();) {
+        for (final ListIterator<LayerRecord> iterator = objects.listIterator(); iterator
+          .hasNext();) {
           final LayerRecord object = iterator.next();
           if (object == oldObject) {
             iterator.set(newObject);

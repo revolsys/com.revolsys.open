@@ -120,8 +120,8 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       }
       sql.append(") = 1");
     } else {
-      throw new IllegalArgumentException("Unknown geometry attribute type "
-        + geometryField.getClass());
+      throw new IllegalArgumentException(
+        "Unknown geometry attribute type " + geometryField.getClass());
     }
   }
 
@@ -162,8 +162,8 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       }
       sql.append(") = 1");
     } else {
-      throw new IllegalArgumentException("Unknown geometry attribute type "
-        + geometryField.getClass());
+      throw new IllegalArgumentException(
+        "Unknown geometry attribute type " + geometryField.getClass());
     }
   }
 
@@ -245,8 +245,8 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       distanceValue.appendSql(query, this, sql);
       sql.append(")");
     } else {
-      throw new IllegalArgumentException("Unknown geometry attribute type "
-        + geometryField.getClass());
+      throw new IllegalArgumentException(
+        "Unknown geometry attribute type " + geometryField.getClass());
     }
   }
 
@@ -269,8 +269,8 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
           coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystem);
         }
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error(
-          "Unable to load coordinate system: " + oracleSrid, e);
+        LoggerFactory.getLogger(getClass()).error("Unable to load coordinate system: " + oracleSrid,
+          e);
         return null;
       }
       this.oracleCoordinateSystems.put(oracleSrid, coordinateSystem);
@@ -372,18 +372,20 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       final OracleClobFieldAdder clobAdder = new OracleClobFieldAdder();
       addFieldAdder("CLOB", clobAdder);
 
-      setPrimaryKeySql("SELECT distinct cols.table_name, cols.column_name FROM all_constraints cons, all_cons_columns cols WHERE cons.constraint_type = 'P' AND cons.constraint_name = cols.constraint_name AND cons.owner = cols.owner AND cons.owner =?");
+      setPrimaryKeySql(
+        "SELECT distinct cols.table_name, cols.column_name FROM all_constraints cons, all_cons_columns cols WHERE cons.constraint_type = 'P' AND cons.constraint_name = cols.constraint_name AND cons.owner = cols.owner AND cons.owner =?");
       setPrimaryKeyTableCondition(" AND cols.table_name = ?");
 
       setSchemaPermissionsSql("select distinct p.owner \"SCHEMA_NAME\" "
         + "from ALL_TAB_PRIVS_RECD P "
         + "where p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') union all select USER \"SCHEMA_NAME\" from DUAL");
-      setSchemaTablePermissionsSql("select distinct p.owner \"SCHEMA_NAME\", p.table_name, p.privilege, comments \"REMARKS\" "
-        + "from ALL_TAB_PRIVS_RECD P "
-        + "join all_tab_comments C on (p.owner = c.owner and p.table_name = c.table_name) "
-        + "where p.owner = ? and c.table_type in ('TABLE', 'VIEW') and p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') "
-        + " union all "
-        + "select user \"SCHEMA_NAME\", t.table_name, 'ALL', comments from user_tables t join user_tab_comments c on (t.table_name = c.table_name) and c.table_type in ('TABLE', 'VIEW')");
+      setSchemaTablePermissionsSql(
+        "select distinct p.owner \"SCHEMA_NAME\", p.table_name, p.privilege, comments \"REMARKS\" "
+          + "from ALL_TAB_PRIVS_RECD P "
+          + "join all_tab_comments C on (p.owner = c.owner and p.table_name = c.table_name) "
+          + "where p.owner = ? and c.table_type in ('TABLE', 'VIEW') and p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') "
+          + " union all "
+          + "select user \"SCHEMA_NAME\", t.table_name, 'ALL', comments from user_tables t join user_tab_comments c on (t.table_name = c.table_name) and c.table_type in ('TABLE', 'VIEW')");
 
       addRecordStoreExtension(new ArcSdeStGeometryRecordStoreExtension());
     }

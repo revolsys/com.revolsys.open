@@ -29,7 +29,8 @@ public class JndiObjectFactory extends AbstractFactoryBean<Object> {
     }
     Object savedObject;
     if (initialFactory == null && !NamingManager.hasInitialContextFactoryBuilder()) {
-      final SimpleNamingContextBuilder builder = SimpleNamingContextBuilder.emptyActivatedContextBuilder();
+      final SimpleNamingContextBuilder builder = SimpleNamingContextBuilder
+        .emptyActivatedContextBuilder();
       synchronized (this.beanName.intern()) {
         savedObject = beanFactory.getBean(this.beanName);
         builder.bind(this.jndiUrl, savedObject);

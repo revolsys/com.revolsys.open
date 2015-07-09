@@ -15,13 +15,15 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
 
 class ogrJNI {
   private static boolean available = false;
+
   static {
     try {
       ClasspathNativeLibraryUtil.loadLibrary("ogrjni");
       available = true;
 
       if (org.gdal.gdal.gdal.HasThreadSupport() == 0) {
-        System.err.println("WARNING : GDAL should be compiled with thread support for safe execution in Java.");
+        System.err.println(
+          "WARNING : GDAL should be compiled with thread support for safe execution in Java.");
       }
 
     } catch (final UnsatisfiedLinkError e) {
@@ -219,7 +221,8 @@ class ogrJNI {
 
   public final static native int Feature_GetFieldIndex(long jarg1, Feature jarg1_, String jarg2);
 
-  public final static native int Feature_GetFieldType__SWIG_0(long jarg1, Feature jarg1_, int jarg2);
+  public final static native int Feature_GetFieldType__SWIG_0(long jarg1, Feature jarg1_,
+    int jarg2);
 
   public final static native int Feature_GetFieldType__SWIG_1(long jarg1, Feature jarg1_,
     String jarg2);
@@ -234,7 +237,8 @@ class ogrJNI {
   public final static native long Feature_GetGeomFieldDefnRef__SWIG_1(long jarg1, Feature jarg1_,
     String jarg2);
 
-  public final static native int Feature_GetGeomFieldIndex(long jarg1, Feature jarg1_, String jarg2);
+  public final static native int Feature_GetGeomFieldIndex(long jarg1, Feature jarg1_,
+    String jarg2);
 
   public final static native long Feature_GetGeomFieldRef__SWIG_0(long jarg1, Feature jarg1_,
     int jarg2);
@@ -255,26 +259,26 @@ class ogrJNI {
   public final static native void Feature_SetField__SWIG_0(long jarg1, Feature jarg1_, int jarg2,
     String jarg3);
 
-  public final static native void Feature_SetField__SWIG_1(long jarg1, Feature jarg1_,
-    String jarg2, String jarg3);
+  public final static native void Feature_SetField__SWIG_1(long jarg1, Feature jarg1_, String jarg2,
+    String jarg3);
 
   public final static native void Feature_SetField__SWIG_2(long jarg1, Feature jarg1_, int jarg2,
     int jarg3);
 
-  public final static native void Feature_SetField__SWIG_3(long jarg1, Feature jarg1_,
-    String jarg2, int jarg3);
+  public final static native void Feature_SetField__SWIG_3(long jarg1, Feature jarg1_, String jarg2,
+    int jarg3);
 
   public final static native void Feature_SetField__SWIG_4(long jarg1, Feature jarg1_, int jarg2,
     double jarg3);
 
-  public final static native void Feature_SetField__SWIG_5(long jarg1, Feature jarg1_,
-    String jarg2, double jarg3);
+  public final static native void Feature_SetField__SWIG_5(long jarg1, Feature jarg1_, String jarg2,
+    double jarg3);
 
   public final static native void Feature_SetField__SWIG_6(long jarg1, Feature jarg1_, int jarg2,
     int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, int jarg9);
 
-  public final static native void Feature_SetField__SWIG_7(long jarg1, Feature jarg1_,
-    String jarg2, int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, int jarg9);
+  public final static native void Feature_SetField__SWIG_7(long jarg1, Feature jarg1_, String jarg2,
+    int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8, int jarg9);
 
   public final static native void Feature_SetFieldBinaryFromHexString__SWIG_0(long jarg1,
     Feature jarg1_, int jarg2, String jarg3);
@@ -285,8 +289,8 @@ class ogrJNI {
   public final static native void Feature_SetFieldDoubleList(long jarg1, Feature jarg1_, int jarg2,
     double[] jarg3);
 
-  public final static native void Feature_SetFieldIntegerList(long jarg1, Feature jarg1_,
-    int jarg2, int[] jarg3);
+  public final static native void Feature_SetFieldIntegerList(long jarg1, Feature jarg1_, int jarg2,
+    int[] jarg3);
 
   public final static native void Feature_SetFieldStringList(long jarg1, Feature jarg1_, int jarg2,
     java.util.Vector jarg3);
@@ -303,11 +307,11 @@ class ogrJNI {
   public final static native int Feature_SetGeometry(long jarg1, Feature jarg1_, long jarg2,
     Geometry jarg2_);
 
-  public final static native int Feature_SetGeometryDirectly(long jarg1, Feature jarg1_,
-    long jarg2, Geometry jarg2_);
+  public final static native int Feature_SetGeometryDirectly(long jarg1, Feature jarg1_, long jarg2,
+    Geometry jarg2_);
 
-  public final static native int Feature_SetGeomField__SWIG_0(long jarg1, Feature jarg1_,
-    int jarg2, long jarg3, Geometry jarg3_);
+  public final static native int Feature_SetGeomField__SWIG_0(long jarg1, Feature jarg1_, int jarg2,
+    long jarg3, Geometry jarg3_);
 
   public final static native int Feature_SetGeomField__SWIG_1(long jarg1, Feature jarg1_,
     String jarg2, long jarg3, Geometry jarg3_);
@@ -336,7 +340,8 @@ class ogrJNI {
 
   public final static native int FeatureDefn_GetFieldCount(long jarg1, FeatureDefn jarg1_);
 
-  public final static native long FeatureDefn_GetFieldDefn(long jarg1, FeatureDefn jarg1_, int jarg2);
+  public final static native long FeatureDefn_GetFieldDefn(long jarg1, FeatureDefn jarg1_,
+    int jarg2);
 
   public final static native int FeatureDefn_GetFieldIndex(long jarg1, FeatureDefn jarg1_,
     String jarg2);
@@ -365,7 +370,8 @@ class ogrJNI {
   public final static native void FeatureDefn_SetGeometryIgnored(long jarg1, FeatureDefn jarg1_,
     int jarg2);
 
-  public final static native void FeatureDefn_SetGeomType(long jarg1, FeatureDefn jarg1_, int jarg2);
+  public final static native void FeatureDefn_SetGeomType(long jarg1, FeatureDefn jarg1_,
+    int jarg2);
 
   public final static native void FeatureDefn_SetStyleIgnored(long jarg1, FeatureDefn jarg1_,
     int jarg2);
@@ -414,7 +420,8 @@ class ogrJNI {
   public final static native java.util.Vector GeneralCmdLineProcessor__SWIG_0(
     java.util.Vector jarg1, int jarg2);
 
-  public final static native java.util.Vector GeneralCmdLineProcessor__SWIG_1(java.util.Vector jarg1);
+  public final static native java.util.Vector GeneralCmdLineProcessor__SWIG_1(
+    java.util.Vector jarg1);
 
   public final static native int Geometry_AddGeometry(long jarg1, Geometry jarg1_, long jarg2,
     Geometry jarg2_);
@@ -438,10 +445,11 @@ class ogrJNI {
 
   public final static native long Geometry_Boundary(long jarg1, Geometry jarg1_);
 
-  public final static native long Geometry_Buffer__SWIG_0(long jarg1, Geometry jarg1_,
-    double jarg2, int jarg3);
+  public final static native long Geometry_Buffer__SWIG_0(long jarg1, Geometry jarg1_, double jarg2,
+    int jarg3);
 
-  public final static native long Geometry_Buffer__SWIG_1(long jarg1, Geometry jarg1_, double jarg2);
+  public final static native long Geometry_Buffer__SWIG_1(long jarg1, Geometry jarg1_,
+    double jarg2);
 
   public final static native long Geometry_Centroid(long jarg1, Geometry jarg1_);
 
@@ -511,7 +519,8 @@ class ogrJNI {
 
   public final static native void Geometry_GetEnvelope(long jarg1, Geometry jarg1_, double[] jarg2);
 
-  public final static native void Geometry_GetEnvelope3D(long jarg1, Geometry jarg1_, double[] jarg2);
+  public final static native void Geometry_GetEnvelope3D(long jarg1, Geometry jarg1_,
+    double[] jarg2);
 
   public final static native int Geometry_GetGeometryCount(long jarg1, Geometry jarg1_);
 
@@ -637,7 +646,8 @@ class ogrJNI {
   public final static native void GeomFieldDefn_SetSpatialRef(long jarg1, GeomFieldDefn jarg1_,
     long jarg2, SpatialReference jarg2_);
 
-  public final static native void GeomFieldDefn_SetType(long jarg1, GeomFieldDefn jarg1_, int jarg2);
+  public final static native void GeomFieldDefn_SetType(long jarg1, GeomFieldDefn jarg1_,
+    int jarg2);
 
   public final static native long GetDriver(int jarg1);
 
@@ -678,11 +688,11 @@ class ogrJNI {
   public final static native int Layer_CreateField__SWIG_1(long jarg1, Layer jarg1_, long jarg2,
     FieldDefn jarg2_);
 
-  public final static native int Layer_CreateGeomField__SWIG_0(long jarg1, Layer jarg1_,
-    long jarg2, GeomFieldDefn jarg2_, int jarg3);
+  public final static native int Layer_CreateGeomField__SWIG_0(long jarg1, Layer jarg1_, long jarg2,
+    GeomFieldDefn jarg2_, int jarg3);
 
-  public final static native int Layer_CreateGeomField__SWIG_1(long jarg1, Layer jarg1_,
-    long jarg2, GeomFieldDefn jarg2_);
+  public final static native int Layer_CreateGeomField__SWIG_1(long jarg1, Layer jarg1_, long jarg2,
+    GeomFieldDefn jarg2_);
 
   public final static native int Layer_DeleteFeature(long jarg1, Layer jarg1_, int jarg2);
 
@@ -700,7 +710,8 @@ class ogrJNI {
   public final static native int Layer_FindFieldIndex(long jarg1, Layer jarg1_, String jarg2,
     int jarg3);
 
-  public final static native int Layer_GetExtent(long jarg1, Layer jarg1_, double[] jarg2, int jarg3);
+  public final static native int Layer_GetExtent(long jarg1, Layer jarg1_, double[] jarg2,
+    int jarg3);
 
   public final static native long Layer_GetFeature(long jarg1, Layer jarg1_, int jarg2);
 

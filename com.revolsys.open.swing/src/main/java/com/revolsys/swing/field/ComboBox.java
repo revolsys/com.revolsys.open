@@ -150,7 +150,7 @@ public class ComboBox extends JComboBox implements Field {
   @Override
   public void setFieldBackgroundColor(Color color) {
     if (color == null) {
-      color = TextField.DEFAULT_BACKGROUND;
+      color = Field.DEFAULT_BACKGROUND;
     }
     final ComboBoxEditor editor = getEditor();
     final Component component = editor.getEditorComponent();
@@ -160,7 +160,7 @@ public class ComboBox extends JComboBox implements Field {
   @Override
   public void setFieldForegroundColor(Color color) {
     if (color == null) {
-      color = TextField.DEFAULT_FOREGROUND;
+      color = Field.DEFAULT_FOREGROUND;
     }
     final ComboBoxEditor editor = getEditor();
     final Component component = editor.getEditorComponent();

@@ -14,8 +14,8 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.ListRecordLayer;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 
-public class RecordListLayerTableModel extends RecordLayerTableModel implements
-  PropertyChangeListener {
+public class RecordListLayerTableModel extends RecordLayerTableModel
+  implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   public static RecordLayerTable createTable(final ListRecordLayer layer) {

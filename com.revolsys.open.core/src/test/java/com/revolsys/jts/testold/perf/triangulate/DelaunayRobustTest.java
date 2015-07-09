@@ -75,7 +75,7 @@ public class DelaunayRobustTest {
     // don't actually form output geometry, to save time and memory
     builder.getSubdivision();
 
-    // System.out.println("  --  Time: " + sw.getTimeString() + "  Mem: "
+    // System.out.println(" -- Time: " + sw.getTimeString() + " Mem: "
     // + Memory.usedTotalString());
     // System.out.println(g);
   }

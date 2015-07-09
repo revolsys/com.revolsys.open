@@ -7,8 +7,8 @@ import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Numbers;
 
-public abstract class AbstractRange<V> implements Iterable<V>,
-  Comparable<AbstractRange<? extends Object>> {
+public abstract class AbstractRange<V>
+  implements Iterable<V>, Comparable<AbstractRange<? extends Object>> {
 
   public static int compare(final Object value1, final Object value2) {
     if (value1 == null) {
@@ -127,8 +127,8 @@ public abstract class AbstractRange<V> implements Iterable<V>,
         return this;
       } else if (compareToValue(rangeFrom) > 0) {
         return createNew(from, rangeTo);
-      } else if (EqualsRegistry.equal(to, previous(rangeFrom))
-        || EqualsRegistry.equal(to, rangeFrom)) {
+      } else
+        if (EqualsRegistry.equal(to, previous(rangeFrom)) || EqualsRegistry.equal(to, rangeFrom)) {
         return createNew(from, rangeTo);
       }
     } else if (fromCompare > 0) {
@@ -136,8 +136,8 @@ public abstract class AbstractRange<V> implements Iterable<V>,
         return range;
       } else if (compareFromValue(rangeTo) < 0) {
         return createNew(rangeFrom, to);
-      } else if (EqualsRegistry.equal(previous(from), rangeTo)
-        || EqualsRegistry.equal(from, rangeTo)) {
+      } else
+        if (EqualsRegistry.equal(previous(from), rangeTo) || EqualsRegistry.equal(from, rangeTo)) {
         return createNew(rangeFrom, to);
       }
     }

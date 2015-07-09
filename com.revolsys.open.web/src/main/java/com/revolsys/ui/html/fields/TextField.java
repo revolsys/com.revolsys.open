@@ -52,8 +52,8 @@ public class TextField extends Field {
     final String defaultValue, final boolean required) {
     this(name, size, maxLength, defaultValue, required);
     if (minLength > maxLength) {
-      throw new IllegalArgumentException("minLength (" + minLength + ") must be <= maxLength ("
-        + minLength + ")");
+      throw new IllegalArgumentException(
+        "minLength (" + minLength + ") must be <= maxLength (" + minLength + ")");
     }
     this.minLength = minLength;
   }

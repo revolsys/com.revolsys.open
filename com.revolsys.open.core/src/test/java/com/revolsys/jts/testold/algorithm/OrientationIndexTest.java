@@ -32,13 +32,13 @@
  */
 package com.revolsys.jts.testold.algorithm;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKTReader;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 /**
  * Tests CGAlgorithms.computeOrientation
@@ -50,12 +50,11 @@ public class OrientationIndexTest extends TestCase {
 
   // private CGAlgorithms rcga = new CGAlgorithms();
 
-  public static boolean isAllOrientationsEqual(final double p0x, final double p0y,
-    final double p1x, final double p1y, final double p2x, final double p2y) {
+  public static boolean isAllOrientationsEqual(final double p0x, final double p0y, final double p1x,
+    final double p1y, final double p2x, final double p2y) {
     final Point[] pts = {
       new PointDouble(p0x, p0y, Point.NULL_ORDINATE),
-      new PointDouble(p1x, p1y, Point.NULL_ORDINATE),
-      new PointDouble(p2x, p2y, Point.NULL_ORDINATE)
+      new PointDouble(p1x, p1y, Point.NULL_ORDINATE), new PointDouble(p2x, p2y, Point.NULL_ORDINATE)
     };
     return isAllOrientationsEqual(pts);
   }

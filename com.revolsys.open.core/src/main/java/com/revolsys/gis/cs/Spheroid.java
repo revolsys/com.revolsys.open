@@ -62,10 +62,11 @@ public class Spheroid implements Serializable {
   public boolean equals(final Object object) {
     if (object instanceof Spheroid) {
       final Spheroid spheroid = (Spheroid)object;
-      if (Double.doubleToLongBits(MathUtil.makePrecise(1000000.0, this.inverseFlattening)) != Double.doubleToLongBits(MathUtil.makePrecise(
-        1000000.0, spheroid.inverseFlattening))) {
+      if (Double.doubleToLongBits(MathUtil.makePrecise(1000000.0, this.inverseFlattening)) != Double
+        .doubleToLongBits(MathUtil.makePrecise(1000000.0, spheroid.inverseFlattening))) {
         return false;
-      } else if (Double.doubleToLongBits(this.semiMajorAxis) != Double.doubleToLongBits(spheroid.semiMajorAxis)) {
+      } else if (Double.doubleToLongBits(this.semiMajorAxis) != Double
+        .doubleToLongBits(spheroid.semiMajorAxis)) {
         return false;
       }
       return true;

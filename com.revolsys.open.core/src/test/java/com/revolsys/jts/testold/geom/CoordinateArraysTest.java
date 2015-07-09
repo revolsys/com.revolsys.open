@@ -32,13 +32,13 @@
  */
 package com.revolsys.jts.testold.geom;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 /**
  * Unit tests for {@link BoundingBoxDoubleGf}
@@ -57,15 +57,13 @@ public class CoordinateArraysTest extends TestCase {
   }
 
   public void testPtNotInList1() {
-    assertTrue(CoordinateArrays.ptNotInList(
-      new Point[] {
-        new PointDouble(1.0, 1, Point.NULL_ORDINATE), new PointDouble(2.0, 2, Point.NULL_ORDINATE),
-        new PointDouble(3.0, 3, Point.NULL_ORDINATE)
-      },
-      new Point[] {
-        new PointDouble(1.0, 1, Point.NULL_ORDINATE), new PointDouble(1.0, 2, Point.NULL_ORDINATE),
-        new PointDouble(1.0, 3, Point.NULL_ORDINATE)
-      }).equals(2, new PointDouble((double)2, 2, Point.NULL_ORDINATE)));
+    assertTrue(CoordinateArrays.ptNotInList(new Point[] {
+      new PointDouble(1.0, 1, Point.NULL_ORDINATE), new PointDouble(2.0, 2, Point.NULL_ORDINATE),
+      new PointDouble(3.0, 3, Point.NULL_ORDINATE)
+    }, new Point[] {
+      new PointDouble(1.0, 1, Point.NULL_ORDINATE), new PointDouble(1.0, 2, Point.NULL_ORDINATE),
+      new PointDouble(1.0, 3, Point.NULL_ORDINATE)
+    }).equals(2, new PointDouble((double)2, 2, Point.NULL_ORDINATE)));
   }
 
   public void testPtNotInList2() {

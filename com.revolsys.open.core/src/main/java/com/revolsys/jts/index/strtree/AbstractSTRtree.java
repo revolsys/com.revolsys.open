@@ -155,8 +155,8 @@ public abstract class AbstractSTRtree implements Serializable {
     if (this.built) {
       return;
     }
-    this.root = this.itemBoundables.isEmpty() ? createNode(0) : createHigherLevels(
-      this.itemBoundables, -1);
+    this.root = this.itemBoundables.isEmpty() ? createNode(0)
+      : createHigherLevels(this.itemBoundables, -1);
     // the item list is no longer needed
     this.itemBoundables = null;
     this.built = true;
@@ -330,7 +330,8 @@ public abstract class AbstractSTRtree implements Serializable {
     return matches;
   }
 
-  private void query(final Object searchBounds, final AbstractNode node, final ItemVisitor visitor) {
+  private void query(final Object searchBounds, final AbstractNode node,
+    final ItemVisitor visitor) {
     final List childBoundables = node.getChildBoundables();
     for (int i = 0; i < childBoundables.size(); i++) {
       final Boundable childBoundable = (Boundable)childBoundables.get(i);

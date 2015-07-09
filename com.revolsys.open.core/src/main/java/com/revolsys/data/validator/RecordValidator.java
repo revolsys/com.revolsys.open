@@ -43,16 +43,16 @@ public class RecordValidator {
   public RecordValidator() {
     setObjectValidator(DataTypes.BOOLEAN, new BooleanAttributeValidator());
     setObjectValidator(DataTypes.DECIMAL, new BigDecimalAttributeValidator(true));
-    setObjectValidator(DataTypes.INTEGER, new BigDecimalAttributeValidator(Long.MIN_VALUE,
-      Long.MAX_VALUE));
-    setObjectValidator(DataTypes.BYTE, new BigDecimalAttributeValidator(Byte.MIN_VALUE,
-      Byte.MAX_VALUE));
-    setObjectValidator(DataTypes.SHORT, new BigDecimalAttributeValidator(Short.MIN_VALUE,
-      Short.MAX_VALUE));
-    setObjectValidator(DataTypes.INT, new BigDecimalAttributeValidator(Integer.MIN_VALUE,
-      Integer.MAX_VALUE));
-    setObjectValidator(DataTypes.LONG, new BigDecimalAttributeValidator(Long.MIN_VALUE,
-      Long.MAX_VALUE));
+    setObjectValidator(DataTypes.INTEGER,
+      new BigDecimalAttributeValidator(Long.MIN_VALUE, Long.MAX_VALUE));
+    setObjectValidator(DataTypes.BYTE,
+      new BigDecimalAttributeValidator(Byte.MIN_VALUE, Byte.MAX_VALUE));
+    setObjectValidator(DataTypes.SHORT,
+      new BigDecimalAttributeValidator(Short.MIN_VALUE, Short.MAX_VALUE));
+    setObjectValidator(DataTypes.INT,
+      new BigDecimalAttributeValidator(Integer.MIN_VALUE, Integer.MAX_VALUE));
+    setObjectValidator(DataTypes.LONG,
+      new BigDecimalAttributeValidator(Long.MIN_VALUE, Long.MAX_VALUE));
     setObjectValidator(DataTypes.DECIMAL, new BigDecimalAttributeValidator(true));
     setObjectValidator(DataTypes.FLOAT, new BigDecimalAttributeValidator(true));
     setObjectValidator(DataTypes.DOUBLE, new BigDecimalAttributeValidator(true));
@@ -121,8 +121,8 @@ public class RecordValidator {
           if (validator != null) {
             if (!validator.isValid(attribDef, value)) {
               if (!(validator instanceof RecordAttributeValidator)) {
-                log.error(fieldName + "='" + value + "' is not a valid "
-                  + dataType.getValidationName());
+                log.error(
+                  fieldName + "='" + value + "' is not a valid " + dataType.getValidationName());
               }
               valid = i == record.getRecordDefinition().getGeometryFieldIndex();
             }

@@ -38,7 +38,8 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
   }
 
   protected AbstractRecordLayerRenderer getRenderer(final AbstractRecordLayer layer,
-    final List<AbstractRecordLayerRenderer> renderers, final LayerRecord record, final double scale) {
+    final List<AbstractRecordLayerRenderer> renderers, final LayerRecord record,
+    final double scale) {
     for (final AbstractRecordLayerRenderer renderer : renderers) {
       if (renderer.isFilterAccept(record)) {
         if (renderer.isVisible(record) && !layer.isHidden(record)) {
@@ -76,7 +77,8 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
           }
         }
       }
-      for (final Entry<AbstractRecordLayerRenderer, List<LayerRecord>> entry : rendererToRecordMap.entrySet()) {
+      for (final Entry<AbstractRecordLayerRenderer, List<LayerRecord>> entry : rendererToRecordMap
+        .entrySet()) {
         final AbstractRecordLayerRenderer renderer = entry.getKey();
         final List<LayerRecord> rendererRecords = entry.getValue();
         for (final LayerRecord record : rendererRecords) {
@@ -105,8 +107,8 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
               try {
                 renderer.renderSelectedRecord(viewport, layer, record);
               } catch (final Throwable e) {
-                ExceptionUtil.log(getClass(), "Unabled to render " + layer.getName() + " #"
-                  + record.getIdentifier(), e);
+                ExceptionUtil.log(getClass(),
+                  "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
               }
             }
           }

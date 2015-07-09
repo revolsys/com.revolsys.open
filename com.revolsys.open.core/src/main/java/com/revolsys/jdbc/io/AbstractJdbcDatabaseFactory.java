@@ -69,8 +69,8 @@ public abstract class AbstractJdbcDatabaseFactory implements JdbcDatabaseFactory
         try {
           JavaBeanUtil.setProperty(dataSource, name, value);
         } catch (final Throwable t) {
-          LoggerFactory.getLogger(getClass()).debug(
-            "Unable to set data source property " + name + " = " + value + " for " + url, t);
+          LoggerFactory.getLogger(getClass())
+            .debug("Unable to set data source property " + name + " = " + value + " for " + url, t);
         }
       }
       return dataSource;

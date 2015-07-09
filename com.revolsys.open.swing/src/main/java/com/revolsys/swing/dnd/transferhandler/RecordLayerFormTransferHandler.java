@@ -68,7 +68,8 @@ public class RecordLayerFormTransferHandler extends TransferHandler {
   public boolean pasteValues(final Transferable transferable, final DataFlavor dataFlavor) {
     if (transferable.isDataFlavorSupported(dataFlavor)) {
       try {
-        final Map<String, Object> map = (Map<String, Object>)transferable.getTransferData(dataFlavor);
+        final Map<String, Object> map = (Map<String, Object>)transferable
+          .getTransferData(dataFlavor);
         getForm().pasteValues(map);
         return true;
       } catch (final Throwable e) {

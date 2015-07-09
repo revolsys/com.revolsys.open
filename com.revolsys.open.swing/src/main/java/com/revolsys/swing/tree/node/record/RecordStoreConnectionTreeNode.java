@@ -29,8 +29,8 @@ import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.util.OS;
 
-public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode implements RecordStoreProxy,
-  RecordStoreConnectionMapProxy {
+public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
+  implements RecordStoreProxy, RecordStoreConnectionMapProxy {
   public static final Icon ICON = Icons.getIcon("database_link");
 
   private static final MenuFactory MENU = new MenuFactory("Record Store Connection");
@@ -98,8 +98,8 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode implements R
     final RecordStoreConnection connection = getConnection();
     final int confirm = JOptionPane.showConfirmDialog(SwingUtil.getActiveWindow(),
       "Delete record store connection '" + connection.getName()
-        + "'? This action cannot be undone.", "Delete Record Store Connection",
-      JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
+        + "'? This action cannot be undone.",
+      "Delete Record Store Connection", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
     if (confirm == JOptionPane.OK_OPTION) {
       connection.delete();
     }
@@ -112,9 +112,11 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode implements R
   }
 
   public void editConnection() {
-    final RecordStoreConnectionRegistry registry = ((RecordStoreConnectionRegistryTreeNode)getParent()).getRegistry();
+    final RecordStoreConnectionRegistry registry = ((RecordStoreConnectionRegistryTreeNode)getParent())
+      .getRegistry();
     final RecordStoreConnection connection = getConnection();
-    final RecordStoreConnectionDialog dialog = new RecordStoreConnectionDialog(registry, connection);
+    final RecordStoreConnectionDialog dialog = new RecordStoreConnectionDialog(registry,
+      connection);
     dialog.setVisible(true);
   }
 

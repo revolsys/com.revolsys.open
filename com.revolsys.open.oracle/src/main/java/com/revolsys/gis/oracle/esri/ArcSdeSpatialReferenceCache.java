@@ -18,7 +18,8 @@ import com.revolsys.jts.geom.GeometryFactory;
 public class ArcSdeSpatialReferenceCache {
 
   public static ArcSdeSpatialReferenceCache get(final AbstractJdbcRecordStore recordStore) {
-    ArcSdeSpatialReferenceCache spatialReferences = recordStore.getProperty("esriSpatialReferences");
+    ArcSdeSpatialReferenceCache spatialReferences = recordStore
+      .getProperty("esriSpatialReferences");
     if (spatialReferences == null) {
       spatialReferences = new ArcSdeSpatialReferenceCache(recordStore);
       recordStore.setProperty("esriSpatialReferences", spatialReferences);
@@ -85,7 +86,8 @@ public class ArcSdeSpatialReferenceCache {
             final GeometryFactory geometryFactory;
             if (srid <= 0) {
               final CoordinateSystem coordinateSystem = new WktCsParser(wkt).parse();
-              final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
+              final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
+                .getCoordinateSystem(coordinateSystem);
               srid = esriCoordinateSystem.getId();
               if (srid <= 0) {
                 geometryFactory = GeometryFactory.fixed(coordinateSystem, 3, scale.doubleValue(),

@@ -71,7 +71,8 @@ public class EpsgCsWktWriter {
     }
   }
 
-  public static void write(final PrintWriter out, final GeographicCoordinateSystem coordinateSystem) {
+  public static void write(final PrintWriter out,
+    final GeographicCoordinateSystem coordinateSystem) {
     if (coordinateSystem != null) {
       out.print("GEOGCS[");
       write(out, coordinateSystem.getName());
@@ -117,7 +118,8 @@ public class EpsgCsWktWriter {
     }
   }
 
-  public static void write(final PrintWriter out, final ProjectedCoordinateSystem coordinateSystem) {
+  public static void write(final PrintWriter out,
+    final ProjectedCoordinateSystem coordinateSystem) {
     if (coordinateSystem != null) {
       out.print("PROJCS[");
       write(out, coordinateSystem.getName());

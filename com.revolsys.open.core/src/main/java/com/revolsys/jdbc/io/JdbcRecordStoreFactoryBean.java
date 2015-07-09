@@ -12,8 +12,8 @@ import org.springframework.context.ApplicationContextAware;
 
 import com.revolsys.util.Property;
 
-public class JdbcRecordStoreFactoryBean extends AbstractFactoryBean<JdbcRecordStore> implements
-  ApplicationContextAware {
+public class JdbcRecordStoreFactoryBean extends AbstractFactoryBean<JdbcRecordStore>
+  implements ApplicationContextAware {
 
   private Map<String, Object> config = new LinkedHashMap<String, Object>();
 
@@ -26,12 +26,15 @@ public class JdbcRecordStoreFactoryBean extends AbstractFactoryBean<JdbcRecordSt
   @Override
   protected JdbcRecordStore createInstance() throws Exception {
     JdbcRecordStore recordStore;
-    final JdbcFactoryRegistry jdbcFactoryRegistry = JdbcFactoryRegistry.getFactory(this.applicationContext);
+    final JdbcFactoryRegistry jdbcFactoryRegistry = JdbcFactoryRegistry
+      .getFactory(this.applicationContext);
     if (this.dataSource == null) {
-      final JdbcDatabaseFactory databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(this.config);
+      final JdbcDatabaseFactory databaseFactory = jdbcFactoryRegistry
+        .getDatabaseFactory(this.config);
       recordStore = databaseFactory.createRecordStore(this.config);
     } else {
-      final JdbcDatabaseFactory databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(this.dataSource);
+      final JdbcDatabaseFactory databaseFactory = jdbcFactoryRegistry
+        .getDatabaseFactory(this.dataSource);
       recordStore = databaseFactory.createRecordStore(this.dataSource);
     }
     Property.set(recordStore, this.properties);

@@ -97,7 +97,7 @@ public class UsgsDemGeoreferencedImage extends BufferedGeoreferencedImage {
     final byte[] buffer = new byte[1024];
     try (
       InputStream in = new FileInputStream(new File("/apps/gba/data/dem/"
-      // + "bc_093a096_utm10_2m_2013.dem"
+        // + "bc_093a096_utm10_2m_2013.dem"
         + "bc_093a096_grid10m_utm10_2013.dem"))) {
       if (in.read(buffer, 0, 1024) != -1) {
         final String fileName = getString(buffer, 1, 40);
@@ -188,8 +188,8 @@ public class UsgsDemGeoreferencedImage extends BufferedGeoreferencedImage {
         }
         System.out.println(maxRowCount + "x" + rasterColCount);
         try (
-          RasterWriter out = new RasterWriter(new FileOutputStream(new File(
-            "/Users/paustin/Downloads/dem.raster")))) {
+          RasterWriter out = new RasterWriter(
+            new FileOutputStream(new File("/Users/paustin/Downloads/dem.raster")))) {
           for (final double[] row : raster) {
             out.values(min, 1, row);
           }

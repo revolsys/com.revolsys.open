@@ -83,7 +83,8 @@ public class QuadtreeCorrectTest {
       for (int j = 0; j < gridSize; j++) {
         final double x = MIN_EXTENT + gridInc * i;
         final double y = MIN_EXTENT + gridInc * j;
-        final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(2, x, y, x + cellSize, y + cellSize);
+        final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(2, x, y, x + cellSize,
+          y + cellSize);
         this.index.insert(env, env);
         this.envList.add(env);
       }
@@ -118,7 +119,8 @@ public class QuadtreeCorrectTest {
       for (int j = 0; j < gridSize; j++) {
         final double x = MIN_EXTENT + gridInc * i;
         final double y = MIN_EXTENT + gridInc * j;
-        final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(2, x, y, x + cellSize, y + cellSize);
+        final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(2, x, y, x + cellSize,
+          y + cellSize);
         queryTest(env);
         // queryTime(env);
       }
@@ -146,7 +148,7 @@ public class QuadtreeCorrectTest {
 
   public void run() {
     fill();
-    // System.out.println("depth = " + this.q.depth() + "  size = "
+    // System.out.println("depth = " + this.q.depth() + " size = "
     // + this.q.size());
     runQueries();
   }

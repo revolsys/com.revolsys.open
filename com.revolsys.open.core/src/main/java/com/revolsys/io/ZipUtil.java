@@ -88,7 +88,8 @@ public class ZipUtil {
     throws IOException {
     final List<String> entryNames = new ArrayList<String>();
     final ZipFile zipFile = new ZipFile(file);
-    for (final Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements();) {
+    for (final Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries
+      .hasMoreElements();) {
       final ZipEntry entry = entries.nextElement();
       final String entryName = entry.getName();
       final File outputFile = new File(outputDirectory, entryName);

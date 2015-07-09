@@ -33,7 +33,8 @@ public class TransactionFilter extends GenericFilterBean {
   @Override
   public void doFilter(final ServletRequest servletRequest, final ServletResponse servletResponse,
     final FilterChain filterChain) throws IOException, ServletException {
-    final AbstractPlatformTransactionManager transactionManager = (AbstractPlatformTransactionManager)this.applicationContext.getBean("transactionManager");
+    final AbstractPlatformTransactionManager transactionManager = (AbstractPlatformTransactionManager)this.applicationContext
+      .getBean("transactionManager");
     try (
       HttpSavedRequestAndResponse saved = new HttpSavedRequestAndResponse(servletRequest,
         servletResponse);
@@ -56,6 +57,7 @@ public class TransactionFilter extends GenericFilterBean {
   @Override
   protected void initFilterBean() throws ServletException {
     final ServletContext servletContext = getServletContext();
-    this.applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+    this.applicationContext = WebApplicationContextUtils
+      .getRequiredWebApplicationContext(servletContext);
   }
 }

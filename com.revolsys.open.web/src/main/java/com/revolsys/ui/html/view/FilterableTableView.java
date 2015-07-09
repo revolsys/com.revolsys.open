@@ -60,8 +60,8 @@ public class FilterableTableView extends ElementContainer {
   @Override
   public void initialize(final HttpServletRequest request) {
     if (this.searchFields != null) {
-      final ElementContainer searchContainer = new ElementContainer(new TableBodyLayout("search",
-        this.model.getColumnCount()));
+      final ElementContainer searchContainer = new ElementContainer(
+        new TableBodyLayout("search", this.model.getColumnCount()));
       add(searchContainer);
       for (final KeySerializer serializer : this.model.getSerializers()) {
         final String name = serializer.getName();

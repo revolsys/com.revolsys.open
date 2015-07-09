@@ -18,7 +18,8 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.filter.Filter;
 
 public final class CollectionUtil {
-  public static <V> void addAllIfNotNull(final Collection<V> collection, final Collection<V> values) {
+  public static <V> void addAllIfNotNull(final Collection<V> collection,
+    final Collection<V> values) {
     if (collection != null && values != null) {
       collection.addAll(values);
     }
@@ -127,7 +128,8 @@ public final class CollectionUtil {
     }
   }
 
-  public static boolean containsAny(final Collection<?> collection1, final Collection<?> collection2) {
+  public static boolean containsAny(final Collection<?> collection1,
+    final Collection<?> collection2) {
     for (final Object value : collection1) {
       if (collection2.contains(value)) {
         return true;
@@ -202,7 +204,8 @@ public final class CollectionUtil {
     throw new ArrayIndexOutOfBoundsException(index);
   }
 
-  public static <K, V> int getCollectionSize(final Map<K, ? extends Collection<V>> map, final K key) {
+  public static <K, V> int getCollectionSize(final Map<K, ? extends Collection<V>> map,
+    final K key) {
     final Collection<V> values = map.get(key);
     if (values == null) {
       return 0;

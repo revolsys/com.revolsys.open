@@ -19,8 +19,8 @@ public class RunnableAction extends AbstractActionMainMenuItemFactory {
 
   private static final long serialVersionUID = -5339626097125548212L;
 
-  public static JButton createButton(final CharSequence name, final String toolTip,
-    final Icon icon, final Runnable runnable) {
+  public static JButton createButton(final CharSequence name, final String toolTip, final Icon icon,
+    final Runnable runnable) {
     final RunnableAction action = new RunnableAction(name, toolTip, icon, true, runnable);
     return action.createButton();
   }
@@ -30,13 +30,15 @@ public class RunnableAction extends AbstractActionMainMenuItemFactory {
     return action.createButton();
   }
 
-  public static JCheckBoxMenuItem createCheckBoxMenuItem(final String name, final Runnable runnable) {
+  public static JCheckBoxMenuItem createCheckBoxMenuItem(final String name,
+    final Runnable runnable) {
     final RunnableAction action = new RunnableAction(name, runnable);
     action.setCheckBox(true);
     return (JCheckBoxMenuItem)action.createComponent();
   }
 
-  public static JMenuItem createMenuItem(final String name, final Icon icon, final Runnable runnable) {
+  public static JMenuItem createMenuItem(final String name, final Icon icon,
+    final Runnable runnable) {
     final RunnableAction action = new RunnableAction(name, icon, runnable);
     return action.createComponent();
   }
@@ -63,7 +65,8 @@ public class RunnableAction extends AbstractActionMainMenuItemFactory {
   public RunnableAction() {
   }
 
-  public RunnableAction(final CharSequence name, final boolean invokeLater, final Runnable runnable) {
+  public RunnableAction(final CharSequence name, final boolean invokeLater,
+    final Runnable runnable) {
     this(name, null, invokeLater, runnable);
   }
 

@@ -138,7 +138,8 @@ public class DataSource {
     return ret;
   }
 
-  public Layer ExecuteSQL(final String statement, final Geometry spatialFilter, final String dialect) {
+  public Layer ExecuteSQL(final String statement, final Geometry spatialFilter,
+    final String dialect) {
     final long cPtr = ogrJNI.DataSource_ExecuteSQL__SWIG_0(this.swigCPtr, this, statement,
       Geometry.getCPtr(spatialFilter), spatialFilter, dialect);
     Layer ret = null;

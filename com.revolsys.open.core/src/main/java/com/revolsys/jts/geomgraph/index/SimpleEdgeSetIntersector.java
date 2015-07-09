@@ -52,7 +52,8 @@ public class SimpleEdgeSetIntersector extends EdgeSetIntersector {
   }
 
   @Override
-  public void computeIntersections(final List edges0, final List edges1, final SegmentIntersector si) {
+  public void computeIntersections(final List edges0, final List edges1,
+    final SegmentIntersector si) {
     this.nOverlaps = 0;
 
     for (final Iterator i0 = edges0.iterator(); i0.hasNext();) {

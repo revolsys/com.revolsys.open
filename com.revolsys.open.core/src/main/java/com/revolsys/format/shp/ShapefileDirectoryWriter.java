@@ -117,8 +117,8 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
     if (writer == null) {
       final File directory = getDirectory(recordDefinition);
       directory.mkdirs();
-      final File file = new File(directory, getFileName(recordDefinition) + this.nameSuffix
-        + ".shp");
+      final File file = new File(directory,
+        getFileName(recordDefinition) + this.nameSuffix + ".shp");
       writer = RecordIo.recordWriter(recordDefinition, new FileSystemResource(file));
 
       ((XbaseRecordWriter)writer).setUseZeroForNull(this.useZeroForNull);

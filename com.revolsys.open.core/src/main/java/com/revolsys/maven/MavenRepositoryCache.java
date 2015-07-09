@@ -61,8 +61,8 @@ public class MavenRepositoryCache extends MavenRepository {
           final byte[] digest = messageDigest.digest();
           final String fileDigest = Hex.toHex(digest);
           if (!sha1Digest.equals(fileDigest)) {
-            LoggerFactory.getLogger(getClass()).error(
-              ".sha1 digest is different for: " + repositoryResource);
+            LoggerFactory.getLogger(getClass())
+              .error(".sha1 digest is different for: " + repositoryResource);
             SpringUtil.delete(resource);
             return false;
           }

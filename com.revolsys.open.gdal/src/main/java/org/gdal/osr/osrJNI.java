@@ -12,6 +12,7 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
 
 class osrJNI {
   private static boolean available = false;
+
   static {
     try {
       ClasspathNativeLibraryUtil.loadLibrary("osrjni");
@@ -44,7 +45,8 @@ class osrJNI {
 
   public final static native void DontUseExceptions();
 
-  public final static native String[] GetProjectionMethodParameterList(String jarg1, String[] jarg2);
+  public final static native String[] GetProjectionMethodParameterList(String jarg1,
+    String[] jarg2);
 
   public final static native void GetProjectionMethodParamInfo(String jarg1, String jarg2,
     String[] jarg3, String[] jarg4, double[] jarg5);
@@ -100,8 +102,8 @@ class osrJNI {
   public final static native int SpatialReference_ExportToPrettyWkt__SWIG_1(long jarg1,
     SpatialReference jarg1_, String[] jarg2);
 
-  public final static native int SpatialReference_ExportToProj4(long jarg1,
-    SpatialReference jarg1_, String[] jarg2);
+  public final static native int SpatialReference_ExportToProj4(long jarg1, SpatialReference jarg1_,
+    String[] jarg2);
 
   public final static native int SpatialReference_ExportToUSGS(long jarg1, SpatialReference jarg1_,
     int[] jarg2, int[] jarg3, double[] jarg4, int[] jarg5);
@@ -117,7 +119,8 @@ class osrJNI {
 
   public final static native int SpatialReference_Fixup(long jarg1, SpatialReference jarg1_);
 
-  public final static native int SpatialReference_FixupOrdering(long jarg1, SpatialReference jarg1_);
+  public final static native int SpatialReference_FixupOrdering(long jarg1,
+    SpatialReference jarg1_);
 
   public final static native double SpatialReference_GetAngularUnits(long jarg1,
     SpatialReference jarg1_);
@@ -172,8 +175,8 @@ class osrJNI {
   public final static native int SpatialReference_ImportFromEPSGA(long jarg1,
     SpatialReference jarg1_, int jarg2);
 
-  public final static native int SpatialReference_ImportFromERM(long jarg1,
-    SpatialReference jarg1_, String jarg2, String jarg3, String jarg4);
+  public final static native int SpatialReference_ImportFromERM(long jarg1, SpatialReference jarg1_,
+    String jarg2, String jarg3, String jarg4);
 
   public final static native int SpatialReference_ImportFromESRI(long jarg1,
     SpatialReference jarg1_, java.util.Vector jarg2);
@@ -181,8 +184,8 @@ class osrJNI {
   public final static native int SpatialReference_ImportFromMICoordSys(long jarg1,
     SpatialReference jarg1_, String jarg2);
 
-  public final static native int SpatialReference_ImportFromOzi(long jarg1,
-    SpatialReference jarg1_, String jarg2, String jarg3, String jarg4);
+  public final static native int SpatialReference_ImportFromOzi(long jarg1, SpatialReference jarg1_,
+    String jarg2, String jarg3, String jarg4);
 
   public final static native int SpatialReference_ImportFromPCI__SWIG_0(long jarg1,
     SpatialReference jarg1_, String jarg2, String jarg3, double[] jarg4);
@@ -196,8 +199,8 @@ class osrJNI {
   public final static native int SpatialReference_ImportFromProj4(long jarg1,
     SpatialReference jarg1_, String jarg2);
 
-  public final static native int SpatialReference_ImportFromUrl(long jarg1,
-    SpatialReference jarg1_, String jarg2);
+  public final static native int SpatialReference_ImportFromUrl(long jarg1, SpatialReference jarg1_,
+    String jarg2);
 
   public final static native int SpatialReference_ImportFromUSGS__SWIG_0(long jarg1,
     SpatialReference jarg1_, int jarg2, int jarg3, double[] jarg4, int jarg5);
@@ -211,11 +214,11 @@ class osrJNI {
   public final static native int SpatialReference_ImportFromUSGS__SWIG_3(long jarg1,
     SpatialReference jarg1_, int jarg2);
 
-  public final static native int SpatialReference_ImportFromWkt(long jarg1,
-    SpatialReference jarg1_, String jarg2);
+  public final static native int SpatialReference_ImportFromWkt(long jarg1, SpatialReference jarg1_,
+    String jarg2);
 
-  public final static native int SpatialReference_ImportFromXML(long jarg1,
-    SpatialReference jarg1_, String jarg2);
+  public final static native int SpatialReference_ImportFromXML(long jarg1, SpatialReference jarg1_,
+    String jarg2);
 
   public final static native int SpatialReference_IsCompound(long jarg1, SpatialReference jarg1_);
 
@@ -238,7 +241,8 @@ class osrJNI {
 
   public final static native int SpatialReference_IsVertical(long jarg1, SpatialReference jarg1_);
 
-  public final static native int SpatialReference_MorphFromESRI(long jarg1, SpatialReference jarg1_);
+  public final static native int SpatialReference_MorphFromESRI(long jarg1,
+    SpatialReference jarg1_);
 
   public final static native int SpatialReference_MorphToESRI(long jarg1, SpatialReference jarg1_);
 
@@ -263,9 +267,8 @@ class osrJNI {
   public final static native int SpatialReference_SetCEA(long jarg1, SpatialReference jarg1_,
     double jarg2, double jarg3, double jarg4, double jarg5);
 
-  public final static native int SpatialReference_SetCompoundCS(long jarg1,
-    SpatialReference jarg1_, String jarg2, long jarg3, SpatialReference jarg3_, long jarg4,
-    SpatialReference jarg4_);
+  public final static native int SpatialReference_SetCompoundCS(long jarg1, SpatialReference jarg1_,
+    String jarg2, long jarg3, SpatialReference jarg3_, long jarg4, SpatialReference jarg4_);
 
   public final static native int SpatialReference_SetCS(long jarg1, SpatialReference jarg1_,
     double jarg2, double jarg3, double jarg4, double jarg5);
@@ -329,7 +332,8 @@ class osrJNI {
     double jarg2, double jarg3, double jarg4);
 
   public final static native int SpatialReference_SetHOM(long jarg1, SpatialReference jarg1_,
-    double jarg2, double jarg3, double jarg4, double jarg5, double jarg6, double jarg7, double jarg8);
+    double jarg2, double jarg3, double jarg4, double jarg5, double jarg6, double jarg7,
+    double jarg8);
 
   public final static native int SpatialReference_SetHOM2PNO(long jarg1, SpatialReference jarg1_,
     double jarg2, double jarg3, double jarg4, double jarg5, double jarg6, double jarg7,
@@ -338,7 +342,8 @@ class osrJNI {
   public final static native int SpatialReference_SetIGH(long jarg1, SpatialReference jarg1_);
 
   public final static native int SpatialReference_SetKrovak(long jarg1, SpatialReference jarg1_,
-    double jarg2, double jarg3, double jarg4, double jarg5, double jarg6, double jarg7, double jarg8);
+    double jarg2, double jarg3, double jarg4, double jarg5, double jarg6, double jarg7,
+    double jarg8);
 
   public final static native int SpatialReference_SetLAEA(long jarg1, SpatialReference jarg1_,
     double jarg2, double jarg3, double jarg4, double jarg5);
@@ -391,8 +396,8 @@ class osrJNI {
   public final static native int SpatialReference_SetProjCS__SWIG_1(long jarg1,
     SpatialReference jarg1_);
 
-  public final static native int SpatialReference_SetProjection(long jarg1,
-    SpatialReference jarg1_, String jarg2);
+  public final static native int SpatialReference_SetProjection(long jarg1, SpatialReference jarg1_,
+    String jarg2);
 
   public final static native int SpatialReference_SetProjParm(long jarg1, SpatialReference jarg1_,
     String jarg2, double jarg3);
@@ -403,8 +408,8 @@ class osrJNI {
   public final static native int SpatialReference_SetRobinson(long jarg1, SpatialReference jarg1_,
     double jarg2, double jarg3, double jarg4);
 
-  public final static native int SpatialReference_SetSinusoidal(long jarg1,
-    SpatialReference jarg1_, double jarg2, double jarg3, double jarg4);
+  public final static native int SpatialReference_SetSinusoidal(long jarg1, SpatialReference jarg1_,
+    double jarg2, double jarg3, double jarg4);
 
   public final static native int SpatialReference_SetSOC(long jarg1, SpatialReference jarg1_,
     double jarg2, double jarg3, double jarg4, double jarg5);
@@ -440,7 +445,8 @@ class osrJNI {
     String jarg2, double jarg3, double jarg4, double jarg5, double jarg6, double jarg7);
 
   public final static native int SpatialReference_SetTOWGS84(long jarg1, SpatialReference jarg1_,
-    double jarg2, double jarg3, double jarg4, double jarg5, double jarg6, double jarg7, double jarg8);
+    double jarg2, double jarg3, double jarg4, double jarg5, double jarg6, double jarg7,
+    double jarg8);
 
   public final static native int SpatialReference_SetUTM__SWIG_0(long jarg1,
     SpatialReference jarg1_, int jarg2, int jarg3);

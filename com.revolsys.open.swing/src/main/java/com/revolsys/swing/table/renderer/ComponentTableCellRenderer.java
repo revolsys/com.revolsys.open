@@ -17,7 +17,8 @@ public class ComponentTableCellRenderer implements TableCellRenderer, MouseListe
     final boolean isSelected, final boolean hasFocus, final int row, final int column) {
     if (this.component instanceof TableCellRenderer) {
       final TableCellRenderer renderer = (TableCellRenderer)this.component;
-      return renderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+      return renderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
+        column);
     } else {
       return this.component;
     }

@@ -7,13 +7,6 @@ import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 
 public interface MapReaderFactory extends FileIoFactory {
-  static MapReaderFactory mapReaderFactory(final Resource resource) {
-    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-    final MapReaderFactory readerFactory = ioFactoryRegistry
-      .getFactory(MapReaderFactory.class, resource);
-    return readerFactory;
-  }
-
   static Reader<Map<String, Object>> mapReader(final Resource resource) {
     final MapReaderFactory readerFactory = mapReaderFactory(resource);
     if (readerFactory == null) {
@@ -22,6 +15,13 @@ public interface MapReaderFactory extends FileIoFactory {
       final Reader<Map<String, Object>> reader = readerFactory.createMapReader(resource);
       return reader;
     }
+  }
+
+  static MapReaderFactory mapReaderFactory(final Resource resource) {
+    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
+    final MapReaderFactory readerFactory = ioFactoryRegistry.getFactory(MapReaderFactory.class,
+      resource);
+    return readerFactory;
   }
 
   default Reader<Map<String, Object>> createMapReader(final Path path) {

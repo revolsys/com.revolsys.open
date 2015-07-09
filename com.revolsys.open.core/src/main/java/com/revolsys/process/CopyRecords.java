@@ -74,7 +74,8 @@ public class CopyRecords extends AbstractProcess {
       try {
         final Writer<Record> targetWriter = this.targetRecordStore.createWriter();
         try {
-          final RecordDefinition targetRecordDefinition = this.targetRecordStore.getRecordDefinition(this.typePath);
+          final RecordDefinition targetRecordDefinition = this.targetRecordStore
+            .getRecordDefinition(this.typePath);
           if (targetRecordDefinition == null) {
             LoggerFactory.getLogger(getClass()).error("Cannot find target table: " + this.typePath);
           } else {

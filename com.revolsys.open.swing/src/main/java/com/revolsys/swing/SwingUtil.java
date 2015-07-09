@@ -433,7 +433,8 @@ public class SwingUtil {
   }
 
   public static Window getActiveWindow() {
-    final KeyboardFocusManager keyboardFocusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+    final KeyboardFocusManager keyboardFocusManager = KeyboardFocusManager
+      .getCurrentKeyboardFocusManager();
     final Window activeWindow = keyboardFocusManager.getActiveWindow();
     if (activeWindow == null) {
       final Window[] windows = Window.getOwnerlessWindows();
@@ -497,7 +498,8 @@ public class SwingUtil {
    */
   public static Rectangle getScreenBounds(final Point point) {
     Rectangle firstBounds = null;
-    final GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    final GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment
+      .getLocalGraphicsEnvironment();
     for (final GraphicsDevice device : graphicsEnvironment.getScreenDevices()) {
       for (final GraphicsConfiguration config : device.getConfigurations()) {
         final Rectangle bounds = config.getBounds();
@@ -673,9 +675,8 @@ public class SwingUtil {
 
   public static boolean isModifierKeyDown(final InputEvent event) {
     final int modifiersEx = event.getModifiersEx();
-    final int flag = modifiersEx
-      & (InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK | InputEvent.ALT_GRAPH_DOWN_MASK
-        | InputEvent.CTRL_DOWN_MASK | InputEvent.META_DOWN_MASK);
+    final int flag = modifiersEx & (InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK
+      | InputEvent.ALT_GRAPH_DOWN_MASK | InputEvent.CTRL_DOWN_MASK | InputEvent.META_DOWN_MASK);
     return flag != 0;
   }
 

@@ -10,8 +10,8 @@ import javax.swing.ListCellRenderer;
 import org.apache.commons.beanutils.MethodUtils;
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
-public class InvokeMethodStringConverter extends ObjectToStringConverter implements
-  ListCellRenderer {
+public class InvokeMethodStringConverter extends ObjectToStringConverter
+  implements ListCellRenderer {
 
   private final DefaultListCellRenderer renderer = new DefaultListCellRenderer();
 

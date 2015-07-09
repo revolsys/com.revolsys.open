@@ -234,7 +234,8 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
       final GeometryFactory geometryFactory = GeometryFactory.wgs84();
       final Geometry projectedGeometry = geometry.convert(geometryFactory);
       final BoundingBox boundingBox = projectedGeometry.getBoundingBox();
-      final Point centre = geometryFactory.point(boundingBox.getCentreX(), boundingBox.getCentreY());
+      final Point centre = geometryFactory.point(boundingBox.getCentreX(),
+        boundingBox.getCentreY());
 
       final Number configRange = getProperty(LOOK_AT_RANGE_PROPERTY);
       final long range;

@@ -35,7 +35,8 @@ public class JsonAsyncSender implements SendHandler {
 
   public void close() {
     synchronized (this.messageCallbackById) {
-      for (final AsyncResult<Map<String, Object>> messageProcessor : this.messageCallbackById.values()) {
+      for (final AsyncResult<Map<String, Object>> messageProcessor : this.messageCallbackById
+        .values()) {
         synchronized (messageProcessor) {
           messageProcessor.notify();
         }
@@ -107,7 +108,8 @@ public class JsonAsyncSender implements SendHandler {
       final String messageId = Maps.getString(message, "messageId");
       if (Property.hasValue(messageId)) {
         synchronized (this.messageCallbackById) {
-          final AsyncResult<Map<String, Object>> resultCallback = this.messageCallbackById.get(messageId);
+          final AsyncResult<Map<String, Object>> resultCallback = this.messageCallbackById
+            .get(messageId);
           if (resultCallback != null) {
             synchronized (resultCallback) {
               this.messageResultById.put(messageId, message);

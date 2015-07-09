@@ -12,8 +12,8 @@ import java.util.Iterator;
  *
  * @param <T>
  */
-public class CollectionComparator<T extends Comparable<T>> implements
-  Comparator<Collection<? extends T>> {
+public class CollectionComparator<T extends Comparable<T>>
+  implements Comparator<Collection<? extends T>> {
 
   @Override
   public int compare(final Collection<? extends T> collection1,

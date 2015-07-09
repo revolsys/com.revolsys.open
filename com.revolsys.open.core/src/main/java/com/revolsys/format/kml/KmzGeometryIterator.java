@@ -38,7 +38,8 @@ public class KmzGeometryIterator extends AbstractIterator<Geometry> {
   @Override
   protected void doInit() {
     try {
-      for (ZipEntry entry = this.zipIn.getNextEntry(); entry != null; entry = this.zipIn.getNextEntry()) {
+      for (ZipEntry entry = this.zipIn.getNextEntry(); entry != null; entry = this.zipIn
+        .getNextEntry()) {
         final String name = entry.getName();
         final String extension = FileUtil.getFileNameExtension(name);
         if ("kml".equals(extension)) {

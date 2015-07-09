@@ -151,7 +151,8 @@ public class Page extends Component {
       return true;
     } else {
       try {
-        final EvaluationContext securityEvaluationContext = SpringExpressionUtil.createSecurityEvaluationContext();
+        final EvaluationContext securityEvaluationContext = SpringExpressionUtil
+          .createSecurityEvaluationContext();
         for (final Entry<String, ? extends Object> entry : parameters.entrySet()) {
           final String name = entry.getKey();
           final Object value = entry.getValue();
@@ -175,11 +176,10 @@ public class Page extends Component {
   public boolean equals(final Object o) {
     if (o instanceof Page) {
       final Page p = (Page)o;
-      if (super.equals(o)
-        && p.menuId == this.menuId
-        && p.path.equals(this.path)
-        && (p.title == this.title || p.title != null && this.title != null
-          && p.title.equals(this.title)) && p.properties.equals(this.properties)) {
+      if (super.equals(o) && p.menuId == this.menuId && p.path.equals(this.path)
+        && (p.title == this.title
+          || p.title != null && this.title != null && p.title.equals(this.title))
+        && p.properties.equals(this.properties)) {
         return true;
       }
     }

@@ -243,8 +243,8 @@ public abstract class XmlProcessor {
         Object object = null;
         while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
           if (object != null) {
-            throw new IllegalArgumentException("Expecting a single child element "
-              + parser.getLocation());
+            throw new IllegalArgumentException(
+              "Expecting a single child element " + parser.getLocation());
           }
           object = process(parser);
         }

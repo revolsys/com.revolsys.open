@@ -64,8 +64,8 @@ public class PolygonGenerator extends GeometryGenerator {
 
   private static final int RUNS = 5;
 
-  private static Polygon createArc(final double x, final double dx, final double y,
-    final double dy, final int nholes, final int npoints, final GeometryFactory gf) {
+  private static Polygon createArc(final double x, final double dx, final double y, final double dy,
+    final int nholes, final int npoints, final GeometryFactory gf) {
     // make outer ring first
     double radius = dx < dy ? dx / 3 : dy / 3;
 
@@ -144,8 +144,8 @@ public class PolygonGenerator extends GeometryGenerator {
         final double sy = coords[cindex - 1].getY();
 
         for (int j = 0; j < npts; j++) {
-          coords[cindex] = new PointDouble(gf.makePrecise(0, tx), gf.makePrecise(1, sy + (j + 1)
-            * cy));
+          coords[cindex] = new PointDouble(gf.makePrecise(0, tx),
+            gf.makePrecise(1, sy + (j + 1) * cy));
         }
       } else { // even horz
         double cx = dx / npts;
@@ -156,8 +156,8 @@ public class PolygonGenerator extends GeometryGenerator {
         final double sx = coords[cindex - 1].getX();
 
         for (int j = 0; j < npts; j++) {
-          coords[cindex] = new PointDouble(gf.makePrecise(0, sx + (j + 1) * cx), gf.makePrecise(1,
-            ty));
+          coords[cindex] = new PointDouble(gf.makePrecise(0, sx + (j + 1) * cx),
+            gf.makePrecise(1, ty));
         }
       }
     }
@@ -166,8 +166,8 @@ public class PolygonGenerator extends GeometryGenerator {
     return gf.linearRing(coords);
   }
 
-  private static Polygon createBox(final double x, final double dx, final double y,
-    final double dy, final int nholes, final int npoints, final GeometryFactory gf) {
+  private static Polygon createBox(final double x, final double dx, final double y, final double dy,
+    final int nholes, final int npoints, final GeometryFactory gf) {
     // make outer ring first
     final LinearRing outer = createBox(x, dx, y, dy, npoints, gf);
 
@@ -196,8 +196,8 @@ public class PolygonGenerator extends GeometryGenerator {
           int pts = npoints / 2;
           pts = pts < 4 ? 4 : pts;
           cindex++;
-          rings.add(createBox(spx + x + j * (ddx + spx), ddx, spy + y + i * (ddy + spy), ddy, pts,
-            gf));
+          rings.add(
+            createBox(spx + x + j * (ddx + spx), ddx, spy + y + i * (ddy + spy), ddy, pts, gf));
         }
       }
     }

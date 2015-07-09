@@ -125,7 +125,8 @@ public class TreeTimeTest {
     final TreeTimeTest test = new TreeTimeTest();
     final List items = IndexTester.createGridItems(n);
     // System.out.println("----------------------------------------------");
-    // System.out.println("Dummy run to ensure classes are loaded before real run");
+    // System.out.println("Dummy run to ensure classes are loaded before real
+    // run");
     // System.out.println("----------------------------------------------");
     test.run(items);
     // System.out.println("----------------------------------------------");

@@ -78,16 +78,16 @@ public class LineSegmentUtil {
         line2X2, line2Y2)) {
         noIntersection = true;
       } else {
-        final double denom = (line1X2 - line1X1) * (line2Y2 - line2Y1) - (line1Y2 - line1Y1)
-          * (line2X2 - line2X1);
+        final double denom = (line1X2 - line1X1) * (line2Y2 - line2Y1)
+          - (line1Y2 - line1Y1) * (line2X2 - line2X1);
 
         if (denom == 0) {
           noIntersection = true;
         } else {
-          final double r_num = (line1Y1 - line2Y1) * (line2X2 - line2X1) - (line1X1 - line2X1)
-            * (line2Y2 - line2Y1);
-          final double s_num = (line1Y1 - line2Y1) * (line1X2 - line1X1) - (line1X1 - line2X1)
-            * (line1Y2 - line1Y1);
+          final double r_num = (line1Y1 - line2Y1) * (line2X2 - line2X1)
+            - (line1X1 - line2X1) * (line2Y2 - line2Y1);
+          final double s_num = (line1Y1 - line2Y1) * (line1X2 - line1X1)
+            - (line1X1 - line2X1) * (line1Y2 - line1Y1);
 
           final double s = s_num / denom;
           final double r = r_num / denom;
@@ -341,8 +341,8 @@ public class LineSegmentUtil {
     line2Start = geometryFactory.createCoordinates(line2Start);
     line2End = geometryFactory.createCoordinates(line2End);
     if (BoundingBoxUtil.intersects(line1Start, line1End, line2Start, line2End)) {
-      final Set<Point> intersections = new TreeSet<Point>(new CoordinatesDistanceComparator(
-        line1Start));
+      final Set<Point> intersections = new TreeSet<Point>(
+        new CoordinatesDistanceComparator(line1Start));
       if (LineSegmentUtil.isPointOnLine(geometryFactory, line2Start, line2End, line1Start)) {
         intersections.add(line1Start);
       }
@@ -464,8 +464,8 @@ public class LineSegmentUtil {
     }
   }
 
-  public static boolean isPointOnLine(final Point lineStart, final Point lineEnd,
-    final Point point, final double maxDistance) {
+  public static boolean isPointOnLine(final Point lineStart, final Point lineEnd, final Point point,
+    final double maxDistance) {
     if (lineStart.equals(2, point)) {
       return true;
     } else if (lineEnd.equals(2, point)) {
@@ -510,7 +510,8 @@ public class LineSegmentUtil {
     return midPoint(null, lineStart, lineEnd);
   }
 
-  public static int orientationIndex(final Point lineStart, final Point lineEnd, final Point point) {
+  public static int orientationIndex(final Point lineStart, final Point lineEnd,
+    final Point point) {
     final double lineDx = lineEnd.getX() - lineStart.getX();
     final double lineDy = lineEnd.getY() - lineStart.getY();
     final double dx2 = point.getX() - lineEnd.getX();
@@ -545,7 +546,8 @@ public class LineSegmentUtil {
     }
   }
 
-  public static Point pointAlong(final Point p0, final Point p1, final double segmentLengthFraction) {
+  public static Point pointAlong(final Point p0, final Point p1,
+    final double segmentLengthFraction) {
     final double x1 = p0.getX();
     final double x2 = p1.getX();
     final double y1 = p0.getY();
@@ -669,7 +671,8 @@ public class LineSegmentUtil {
     return projectionFactor(x1, y1, x2, y2, x, y);
   }
 
-  public static double segmentFraction(final Point lineStart, final Point lineEnd, final Point point) {
+  public static double segmentFraction(final Point lineStart, final Point lineEnd,
+    final Point point) {
     final double segFrac = projectionFactor(lineStart, lineEnd, point);
     if (segFrac < 0.0) {
       return 0.0;

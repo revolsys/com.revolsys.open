@@ -1,7 +1,5 @@
 package com.revolsys.gis.cs;
 
-import junit.framework.Assert;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -13,6 +11,8 @@ import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.LineStringDouble;
+
+import junit.framework.Assert;
 
 public class GeometryFactoryTest {
   private static GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(3857, 1.0);
@@ -81,9 +81,10 @@ public class GeometryFactoryTest {
     final LineString pointPoints = new LineStringDouble(2, 0.0, 0);
     final LineString point2Points = new LineStringDouble(2, 20.0, 20);
     final LineString ringPoints = new LineStringDouble(2, 0.0, 0, 0, 100, 100, 100, 100, 0, 0, 0);
-    final LineString ring2Points = new LineStringDouble(2, 20.0, 20, 20, 80, 80, 80, 80, 20, 20, 20);
-    final LineString ring3Points = new LineStringDouble(2, 120.0, 120, 120, 180, 180, 180, 180,
-      120, 120, 120);
+    final LineString ring2Points = new LineStringDouble(2, 20.0, 20, 20, 80, 80, 80, 80, 20, 20,
+      20);
+    final LineString ring3Points = new LineStringDouble(2, 120.0, 120, 120, 180, 180, 180, 180, 120,
+      120, 120);
 
     final Point point = GEOMETRY_FACTORY.point(pointPoints);
     assertCopyGeometry(point, pointPoints);

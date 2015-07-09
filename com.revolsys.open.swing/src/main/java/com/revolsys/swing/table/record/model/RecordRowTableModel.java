@@ -26,8 +26,8 @@ import com.revolsys.swing.table.record.row.RecordRowTable;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
-public abstract class RecordRowTableModel extends AbstractRecordTableModel implements
-  SortableTableModel, CellEditorListener {
+public abstract class RecordRowTableModel extends AbstractRecordTableModel
+  implements SortableTableModel, CellEditorListener {
 
   public static final String LOADING_VALUE = "\u2026";
 

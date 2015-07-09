@@ -22,8 +22,8 @@ import com.revolsys.transaction.Transaction;
 
 public class GeometryTest {
 
-  private final RecordStore recordStore = RecordStoreFactoryRegistry.createRecordStore(
-    "jdbc:oracle:thin:@//192.168.1.105:1521/TEST", "ORACLE_TEST", "test");
+  private final RecordStore recordStore = RecordStoreFactoryRegistry
+    .createRecordStore("jdbc:oracle:thin:@//192.168.1.105:1521/TEST", "ORACLE_TEST", "test");
 
   public GeometryTest() {
     this.recordStore.initialize();

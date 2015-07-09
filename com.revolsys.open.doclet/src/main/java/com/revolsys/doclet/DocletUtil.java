@@ -51,10 +51,10 @@ public class DocletUtil {
   }
 
   public static void copyFiles(final String destDir) {
-    for (final String name : Arrays.asList("javadoc.css", "javadoc.js", "javadoc.js",
-      "prettify.js", "prettify.css")) {
-      FileUtil.copy(DocletUtil.class.getResourceAsStream("/com/revolsys/doclet/" + name), new File(
-        destDir, name));
+    for (final String name : Arrays.asList("javadoc.css", "javadoc.js", "javadoc.js", "prettify.js",
+      "prettify.css")) {
+      FileUtil.copy(DocletUtil.class.getResourceAsStream("/com/revolsys/doclet/" + name),
+        new File(destDir, name));
     }
   }
 
@@ -132,7 +132,8 @@ public class DocletUtil {
     }
   }
 
-  public static AnnotationDesc getAnnotation(final AnnotationDesc[] annotations, final String name) {
+  public static AnnotationDesc getAnnotation(final AnnotationDesc[] annotations,
+    final String name) {
     for (final AnnotationDesc annotation : annotations) {
       final AnnotationTypeDoc annotationType = annotation.annotationType();
       final String annotationName = qualifiedName(annotationType);
@@ -193,7 +194,8 @@ public class DocletUtil {
     }
     for (final String url : Arrays.asList("https://code.jquery.com/jquery-1.11.1.min.js",
       "https://code.jquery.com/ui/1.11.2/jquery-ui.min.js",
-      "https://cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js", "prettify.js", "javadoc.js")) {
+      "https://cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js", "prettify.js",
+      "javadoc.js")) {
       HtmlUtil.serializeScriptLink(writer, url);
     }
     writer.endTagLn(HtmlUtil.HEAD);

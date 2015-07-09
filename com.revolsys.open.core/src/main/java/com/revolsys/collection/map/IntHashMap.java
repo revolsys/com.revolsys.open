@@ -913,8 +913,8 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
    * @throws ClassNotFoundException
    */
   @SuppressWarnings("unchecked")
-  private void readObject(final java.io.ObjectInputStream s) throws IOException,
-    ClassNotFoundException {
+  private void readObject(final java.io.ObjectInputStream s)
+    throws IOException, ClassNotFoundException {
     // Read in the threshold, loadfactor, and any hidden stuff
     s.defaultReadObject();
 

@@ -1,7 +1,5 @@
 package com.revolsys.jts.testold.noding;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.LineSegment;
@@ -9,6 +7,8 @@ import com.revolsys.jts.geom.segment.LineSegmentDouble;
 import com.revolsys.jts.noding.Octant;
 import com.revolsys.jts.noding.SegmentPointComparator;
 import com.revolsys.util.MathUtil;
+
+import junit.framework.TestCase;
 
 /**
  * Test IntersectionSegment#compareNodePosition using an exhaustive set
@@ -34,7 +34,8 @@ public class SegmentPointComparatorFullTest extends TestCase {
     assertTrue(posValue == expectedPositionValue);
   }
 
-  private void checkPointsAtDistance(final LineSegment seg, final double dist0, final double dist1) {
+  private void checkPointsAtDistance(final LineSegment seg, final double dist0,
+    final double dist1) {
     final Point p0 = computePoint(seg, dist0);
     final Point p1 = computePoint(seg, dist1);
     if (p0.equals(p1)) {

@@ -125,7 +125,8 @@ public class MultiInputSelector {
     return select(Long.MAX_VALUE, channels);
   }
 
-  public synchronized int select(final List<? extends SelectableInput> channels, final boolean skip) {
+  public synchronized int select(final List<? extends SelectableInput> channels,
+    final boolean skip) {
     if (skip) {
       enableChannels(channels);
       return disableChannels(channels);

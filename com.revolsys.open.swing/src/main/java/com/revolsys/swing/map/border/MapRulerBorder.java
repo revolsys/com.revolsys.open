@@ -119,7 +119,8 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
   }
 
   private <Q extends Quantity> void drawLabel(final Graphics2D graphics, final int textX,
-    final int textY, final Unit<Q> displayUnit, final double displayValue, final Unit<Q> scaleUnit) {
+    final int textY, final Unit<Q> displayUnit, final double displayValue,
+    final Unit<Q> scaleUnit) {
     DecimalFormat format;
     if (displayValue - Math.floor(displayValue) == 0) {
       format = new DecimalFormat("#,###,###,###");
@@ -187,8 +188,8 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
     g.fillRect(x, y, this.rulerSize - 1, height); // left
     g.fillRect(x + width - this.rulerSize + 1, y, this.rulerSize - 1, height - 1); // right
     g.fillRect(x + this.rulerSize - 1, y, width - 2 * this.rulerSize + 2, this.rulerSize - 1); // top
-    g.fillRect(x + this.rulerSize - 1, y + height - this.rulerSize + 1, width - 2 * this.rulerSize
-      + 2, this.rulerSize - 1); // bottom
+    g.fillRect(x + this.rulerSize - 1, y + height - this.rulerSize + 1,
+      width - 2 * this.rulerSize + 2, this.rulerSize - 1); // bottom
   }
 
   @Override
@@ -401,8 +402,8 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
           }
 
           if (left) {
-            g.drawLine(this.rulerSize - 1 - barSize, height - pixel, this.rulerSize - 1, height
-              - pixel);
+            g.drawLine(this.rulerSize - 1 - barSize, height - pixel, this.rulerSize - 1,
+              height - pixel);
           } else {
             g.drawLine(0, height - pixel, barSize, height - pixel);
           }

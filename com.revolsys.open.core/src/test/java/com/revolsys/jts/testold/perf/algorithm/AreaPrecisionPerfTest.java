@@ -34,9 +34,10 @@ public class AreaPrecisionPerfTest {
 
       Point vertex;
       for (int i = 0; i <= nrVertices; i++) {
-        vertex = new PointDouble(originX
-          + (1 + Math.sin((float)i / (float)nrVertices * 2 * Math.PI)), originY
-          + (1 + Math.cos((float)i / (float)nrVertices * 2 * Math.PI)), Point.NULL_ORDINATE);
+        vertex = new PointDouble(
+          originX + (1 + Math.sin((float)i / (float)nrVertices * 2 * Math.PI)),
+          originY + (1 + Math.cos((float)i / (float)nrVertices * 2 * Math.PI)),
+          Point.NULL_ORDINATE);
         coordinates[i] = vertex;
       }
       // close ring
@@ -53,7 +54,7 @@ public class AreaPrecisionPerfTest {
       final double eps = exactArea - area;
       final double eps2 = exactArea - area2;
 
-      // System.out.println(nrVertices + "   orig err: " + eps + "    acc err: "
+      // System.out.println(nrVertices + " orig err: " + eps + " acc err: "
       // + eps2);
     }
     // System.out.println("Time: " + (System.currentTimeMillis() - start) /

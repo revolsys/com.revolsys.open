@@ -97,7 +97,8 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
   }
 
   @Override
-  public boolean visit(final BoundingBox envelope, final Filter<T> filter, final Visitor<T> visitor) {
+  public boolean visit(final BoundingBox envelope, final Filter<T> filter,
+    final Visitor<T> visitor) {
     for (int i = 0; i < this.size; i++) {
       final BoundingBox objectEnvelope = this.envelopes[i];
       if (envelope.intersects(objectEnvelope)) {

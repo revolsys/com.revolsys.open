@@ -34,9 +34,6 @@ package com.revolsys.jts.testold.operation;
 
 import java.util.List;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -45,6 +42,9 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.distance.DistanceWithPoints;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 /**
  * @version 1.7
@@ -90,14 +90,14 @@ public class DistanceTest extends TestCase {
 
   public void testClosestPoints2() throws Exception {
     doNearestPointsTest("POLYGON ((200 180, 60 140, 60 260, 200 180))",
-      "MULTIPOINT ((140 280), (140 320))", 57.05597791103589, new PointDouble(111.6923076923077,
-        230.46153846153845, Point.NULL_ORDINATE), new PointDouble((double)140, 280,
-        Point.NULL_ORDINATE));
+      "MULTIPOINT ((140 280), (140 320))", 57.05597791103589,
+      new PointDouble(111.6923076923077, 230.46153846153845, Point.NULL_ORDINATE),
+      new PointDouble((double)140, 280, Point.NULL_ORDINATE));
   }
 
   public void testClosestPoints3() throws Exception {
-    doNearestPointsTest("LINESTRING (100 100, 200 100, 200 200, 100 200, 100 100)",
-      "POINT (10 10)", 127.27922061357856, new PointDouble((double)100, 100, Point.NULL_ORDINATE),
+    doNearestPointsTest("LINESTRING (100 100, 200 100, 200 200, 100 200, 100 100)", "POINT (10 10)",
+      127.27922061357856, new PointDouble((double)100, 100, Point.NULL_ORDINATE),
       new PointDouble((double)10, 10, Point.NULL_ORDINATE));
   }
 
@@ -108,8 +108,8 @@ public class DistanceTest extends TestCase {
 
   public void testClosestPoints5() throws Exception {
     doNearestPointsTest("LINESTRING (100 100, 200 200)", "LINESTRING (150 121, 200 0)",
-      20.506096654409877, new PointDouble(135.5, 135.5, Point.NULL_ORDINATE), new PointDouble(
-        (double)150, 121, Point.NULL_ORDINATE));
+      20.506096654409877, new PointDouble(135.5, 135.5, Point.NULL_ORDINATE),
+      new PointDouble((double)150, 121, Point.NULL_ORDINATE));
   }
 
   public void testClosestPoints6() throws Exception {
@@ -123,8 +123,9 @@ public class DistanceTest extends TestCase {
   public void testClosestPoints7() throws Exception {
     doNearestPointsTest(
       "POLYGON ((76 185, 125 283, 331 276, 324 122, 177 70, 184 155, 69 123, 76 185), (267 237, 148 248, 135 185, 223 189, 251 151, 286 183, 267 237))",
-      "LINESTRING (120 215, 185 224, 209 207, 238 222, 254 186)", 0.0, new PointDouble((double)120,
-        215, Point.NULL_ORDINATE), new PointDouble((double)120, 215, Point.NULL_ORDINATE));
+      "LINESTRING (120 215, 185 224, 209 207, 238 222, 254 186)", 0.0,
+      new PointDouble((double)120, 215, Point.NULL_ORDINATE),
+      new PointDouble((double)120, 215, Point.NULL_ORDINATE));
   }
 
   public void testDisjointCollinearSegments() throws Exception {
@@ -140,7 +141,8 @@ public class DistanceTest extends TestCase {
   }
 
   public void testEverything() throws Exception {
-    final Geometry g1 = this.reader.read("POLYGON ((40 320, 200 380, 320 80, 40 40, 40 320),  (180 280, 80 280, 100 100, 220 140, 180 280))");
+    final Geometry g1 = this.reader.read(
+      "POLYGON ((40 320, 200 380, 320 80, 40 40, 40 320),  (180 280, 80 280, 100 100, 220 140, 180 280))");
     Geometry g2 = this.reader.read("POLYGON ((160 240, 120 240, 120 160, 160 140, 160 240))");
     assertEquals(18.97366596, g1.distance(g2), 1E-5);
 

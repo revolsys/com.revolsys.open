@@ -34,7 +34,8 @@ public class OpenStreetMapClient {
     final double y1 = getLatitude(zoomLevel, tileY);
     final double x2 = getLongitude(zoomLevel, tileX + 1);
     final double y2 = getLatitude(zoomLevel, tileY + 1);
-    return new BoundingBoxDoubleGf(GeometryFactory.wgs84(), 2, x1, y1, x2, y2).convert(GeometryFactory.worldMercator());
+    return new BoundingBoxDoubleGf(GeometryFactory.wgs84(), 2, x1, y1, x2, y2)
+      .convert(GeometryFactory.worldMercator());
   }
 
   protected BufferedImage getImage(final String url) {
@@ -97,9 +98,8 @@ public class OpenStreetMapClient {
 
   public int getTileY(final int zoomLevel, final double latitude) {
     final double radians = Math.toRadians(latitude);
-    final int tileY = (int)Math.floor((1 - Math.log(Math.tan(radians) + 1 / Math.cos(radians))
-      / Math.PI)
-      / 2 * (1 << zoomLevel));
+    final int tileY = (int)Math.floor(
+      (1 - Math.log(Math.tan(radians) + 1 / Math.cos(radians)) / Math.PI) / 2 * (1 << zoomLevel));
     return tileY;
   }
 

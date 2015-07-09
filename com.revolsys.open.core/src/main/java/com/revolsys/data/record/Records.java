@@ -179,7 +179,8 @@ public final class Records {
         return number.intValue() == 1;
       } else {
         final String stringValue = value.toString();
-        if (stringValue.equals("Y") || stringValue.equals("1") || Boolean.parseBoolean(stringValue)) {
+        if (stringValue.equals("Y") || stringValue.equals("1")
+          || Boolean.parseBoolean(stringValue)) {
           return true;
         } else {
           return false;

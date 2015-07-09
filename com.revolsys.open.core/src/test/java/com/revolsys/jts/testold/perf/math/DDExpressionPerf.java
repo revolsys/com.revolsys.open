@@ -55,7 +55,7 @@ public class DDExpressionPerf {
       // System.out.println(det);
     }
     sw.stop();
-    // System.out.println("BigDecimal:      nIter = " + nIter + "   time = "
+    // System.out.println("BigDecimal: nIter = " + nIter + " time = "
     // + sw.getTimeString());
     return sw.getTime() / (double)nIter;
   }
@@ -73,7 +73,7 @@ public class DDExpressionPerf {
       // System.out.println(det);
     }
     sw.stop();
-    // System.out.println("double:          nIter = " + nIter + "   time = "
+    // System.out.println("double: nIter = " + nIter + " time = "
     // + sw.getTimeString());
     return sw.getTime() / (double)nIter;
   }
@@ -92,7 +92,7 @@ public class DDExpressionPerf {
       // System.out.println(det);
     }
     sw.stop();
-    // System.out.println("DD:              nIter = " + nIter + "   time = "
+    // System.out.println("DD: nIter = " + nIter + " time = "
     // + sw.getTimeString());
     return sw.getTime() / (double)nIter;
   }
@@ -119,7 +119,7 @@ public class DDExpressionPerf {
       // System.out.println(det);
     }
     sw.stop();
-    // System.out.println("DD-Self:         nIter = " + nIter + "   time = "
+    // System.out.println("DD-Self: nIter = " + nIter + " time = "
     // + sw.getTimeString());
     return sw.getTime() / (double)nIter;
   }
@@ -140,7 +140,7 @@ public class DDExpressionPerf {
       // System.out.println(det);
     }
     sw.stop();
-    // // System.out.println("DD:              nIter = " + nIter + "   time = "
+    // // System.out.println("DD: nIter = " + nIter + " time = "
     // + sw.getTimeString());
     return sw.getTime() / (double)nIter;
   }

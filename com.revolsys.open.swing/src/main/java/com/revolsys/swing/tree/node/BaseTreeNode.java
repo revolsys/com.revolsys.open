@@ -141,8 +141,8 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
     }
   }
 
-  public boolean dndImportData(final TransferSupport support, int index) throws IOException,
-    UnsupportedFlavorException {
+  public boolean dndImportData(final TransferSupport support, int index)
+    throws IOException, UnsupportedFlavorException {
     if (!TreeTransferHandler.isDndNoneAction(support)) {
       final Transferable transferable = support.getTransferable();
       if (support.isDataFlavorSupported(TreePathListTransferable.FLAVOR)) {

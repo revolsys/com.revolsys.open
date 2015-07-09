@@ -77,7 +77,7 @@ class LineSegmentIndex {
 
     // List listQueryItems = index.query(env);
     // System.out.println("visitor size = " + itemsFound.size()
-    // + "  query size = " + listQueryItems.size());
+    // + " query size = " + listQueryItems.size());
     // List itemsFound = index.query(env);
 
     return itemsFound;

@@ -11,11 +11,12 @@ import com.revolsys.jts.geom.Geometry;
 public class F {
   public static WithinDistance dWithin(final FieldDefinition attribute, final Geometry geometry,
     final double distance) {
-    return new WithinDistance(new Column(attribute), new Value(attribute, geometry), new Value(
-      distance));
+    return new WithinDistance(new Column(attribute), new Value(attribute, geometry),
+      new Value(distance));
   }
 
-  public static WithinDistance dWithin(final String name, final Geometry geometry, double distance) {
+  public static WithinDistance dWithin(final String name, final Geometry geometry,
+    double distance) {
     if (distance < 0) {
       distance = 0;
     }
@@ -35,8 +36,8 @@ public class F {
 
   public static EnvelopeIntersects envelopeIntersects(final FieldDefinition attribute,
     final Geometry geometry) {
-    return new EnvelopeIntersects(new Column(attribute), new Value(attribute,
-      geometry.getBoundingBox()));
+    return new EnvelopeIntersects(new Column(attribute),
+      new Value(attribute, geometry.getBoundingBox()));
   }
 
   public static EnvelopeIntersects envelopeIntersects(final RecordDefinition recordDefinition,

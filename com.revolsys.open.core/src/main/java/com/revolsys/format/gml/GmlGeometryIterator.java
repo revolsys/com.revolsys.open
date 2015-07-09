@@ -26,7 +26,7 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.util.MathUtil;
 
-public class GmlGeometryIterator extends AbstractIterator<Geometry> implements GmlConstants {
+public class GmlGeometryIterator extends AbstractIterator<Geometry>implements GmlConstants {
 
   public static final LineString parse(final String value, final String separator,
     final int axisCount) {

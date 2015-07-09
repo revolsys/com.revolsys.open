@@ -48,7 +48,8 @@ public class AddDefaultValuesProcess extends AbstractInOutProcess<Record, Record
 
   private final Map<RecordDefinition, Map<String, Object>> typeDefaultValues = new HashMap<RecordDefinition, Map<String, Object>>();
 
-  private void addDefaultValues(final Map<String, Object> defaultValues, final RecordDefinition type) {
+  private void addDefaultValues(final Map<String, Object> defaultValues,
+    final RecordDefinition type) {
     if (Path.getPath(type.getPath()).equals(this.schemaName)) {
       defaultValues.putAll(type.getDefaultValues());
     }
@@ -148,7 +149,8 @@ public class AddDefaultValuesProcess extends AbstractInOutProcess<Record, Record
           final Class<?> typeClass = dataType.getJavaClass();
           if (typeClass == Record.class) {
 
-            final RecordDefinition subClass = this.recordDefinitionFactory.getRecordDefinition(dataType.getName());
+            final RecordDefinition subClass = this.recordDefinitionFactory
+              .getRecordDefinition(dataType.getName());
             final Record subObject = subClass.createRecord();
             setDefaultValue(subObject, subKey, value);
             record.setValue(fieldName, subObject);

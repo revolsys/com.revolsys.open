@@ -17,8 +17,8 @@ public class ServerOverrideFilter extends SavedRequestFilter {
 
   @Override
   protected void doFilterInternal(final HttpServletRequest request,
-    final HttpServletResponse response, final FilterChain filterChain) throws ServletException,
-    IOException {
+    final HttpServletResponse response, final FilterChain filterChain)
+      throws ServletException, IOException {
     if (request.getCharacterEncoding() == null) {
       request.setCharacterEncoding("UTF-8");
     }

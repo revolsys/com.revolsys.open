@@ -14,7 +14,8 @@ public class Saif extends AbstractRecordIoFactory {
   }
 
   @Override
-  public RecordReader createRecordReader(final Resource resource, final RecordFactory recordFactory) {
+  public RecordReader createRecordReader(final Resource resource,
+    final RecordFactory recordFactory) {
     final SaifReader reader = new SaifReader(resource);
     return reader;
   }

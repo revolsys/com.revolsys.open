@@ -90,7 +90,8 @@ public class MinimumBoundingCircle {
     return min;
   }
 
-  private static Point pointWithMinAngleWithSegment(final Point[] pts, final Point P, final Point Q) {
+  private static Point pointWithMinAngleWithSegment(final Point[] pts, final Point P,
+    final Point Q) {
     double minAng = Double.MAX_VALUE;
     Point minAngPt = null;
     for (final Point p : pts) {

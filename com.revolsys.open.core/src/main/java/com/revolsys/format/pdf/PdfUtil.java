@@ -165,7 +165,8 @@ public class PdfUtil {
             } else {
               geometryFactory = GeometryFactory.floating3(srid);
             }
-            final GeometryFactory geoGeometryFactory = geometryFactory.getGeographicGeometryFactory();
+            final GeometryFactory geoGeometryFactory = geometryFactory
+              .getGeographicGeometryFactory();
 
             BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory);
             final COSArray geoPoints = PdfUtil.findArray(measure, "GPTS");

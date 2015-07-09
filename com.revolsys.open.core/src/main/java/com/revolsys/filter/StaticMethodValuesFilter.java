@@ -68,15 +68,15 @@ public class StaticMethodValuesFilter<T> implements Filter<T> {
       final String name = method.getName();
       if (name.equals(this.methodName) && method.getParameterTypes().length == 1) {
         if (this.method != null) {
-          throw new IllegalArgumentException("Multiple method match for " + this.methodClass + "."
-            + this.methodName);
+          throw new IllegalArgumentException(
+            "Multiple method match for " + this.methodClass + "." + this.methodName);
         }
         this.method = method;
       }
     }
     if (this.method == null) {
-      throw new IllegalArgumentException("No method match for " + this.methodClass + "."
-        + this.methodName);
+      throw new IllegalArgumentException(
+        "No method match for " + this.methodClass + "." + this.methodName);
     }
   }
 

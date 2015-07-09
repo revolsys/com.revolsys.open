@@ -77,8 +77,8 @@ public class PreparedLineIntersectsPerfTest {
   }
 
   public void test(final Geometry g, final List lines) {
-    // System.out.println("AOI # pts: " + g.getVertexCount() + "      # lines: "
-    // + lines.size() + "   # pts in line: " + NUM_LINE_PTS);
+    // System.out.println("AOI # pts: " + g.getVertexCount() + " # lines: "
+    // + lines.size() + " # pts in line: " + NUM_LINE_PTS);
 
     final Stopwatch sw = new Stopwatch();
     int count = 0;

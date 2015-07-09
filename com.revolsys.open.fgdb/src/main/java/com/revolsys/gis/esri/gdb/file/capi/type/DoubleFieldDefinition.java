@@ -10,8 +10,8 @@ import com.revolsys.util.Property;
 
 public class DoubleFieldDefinition extends AbstractFileGdbFieldDefinition {
   public DoubleFieldDefinition(final Field field) {
-    super(field.getName(), DataTypes.DOUBLE, BooleanStringConverter.getBoolean(field.getRequired())
-      || !field.isIsNullable());
+    super(field.getName(), DataTypes.DOUBLE,
+      BooleanStringConverter.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 
   @Override

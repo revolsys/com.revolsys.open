@@ -161,7 +161,8 @@ public class VoronoiDiagramBuilder {
    */
   public void setSites(final Collection coords) {
     // remove any duplicate points (they will cause the triangulation to fail)
-    this.siteCoords = DelaunayTriangulationBuilder.unique(CoordinateArrays.toCoordinateArray(coords));
+    this.siteCoords = DelaunayTriangulationBuilder
+      .unique(CoordinateArrays.toCoordinateArray(coords));
   }
 
   /**

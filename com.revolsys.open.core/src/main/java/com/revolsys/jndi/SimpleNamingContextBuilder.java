@@ -83,21 +83,20 @@ public class SimpleNamingContextBuilder implements InitialContextFactoryBuilder 
           icfClass = ClassUtils.resolveClassName((String)icf, getClass().getClassLoader());
         } else {
           throw new IllegalArgumentException(new StringBuilder(
-            "Invalid value type for environment key [java.naming.factory.initial]: ").append(
-            icf.getClass().getName()).toString());
+            "Invalid value type for environment key [java.naming.factory.initial]: ")
+              .append(icf.getClass().getName()).toString());
         }
         if (!InitialContextFactory.class.isAssignableFrom(icfClass)) {
-          throw new IllegalArgumentException(new StringBuilder(
-            "Specified class does not implement [").append(InitialContextFactory.class.getName())
-            .append("]: ")
-            .append(icf)
-            .toString());
+          throw new IllegalArgumentException(
+            new StringBuilder("Specified class does not implement [")
+              .append(InitialContextFactory.class.getName()).append("]: ").append(icf).toString());
         }
         try {
           return (InitialContextFactory)icfClass.newInstance();
         } catch (final Throwable ex) {
-          final IllegalStateException ise = new IllegalStateException(new StringBuilder(
-            "Cannot instantiate specified InitialContextFactory: ").append(icf).toString());
+          final IllegalStateException ise = new IllegalStateException(
+            new StringBuilder("Cannot instantiate specified InitialContextFactory: ").append(icf)
+              .toString());
           ise.initCause(ex);
           throw ise;
         }

@@ -8,8 +8,8 @@ import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.builder.HtmlUiBuilderAware;
 
-public class MultipleKeySerializer extends AbstractKeySerializer implements
-  HtmlUiBuilderAware<HtmlUiBuilder<?>> {
+public class MultipleKeySerializer extends AbstractKeySerializer
+  implements HtmlUiBuilderAware<HtmlUiBuilder<?>> {
   private List<KeySerializer> serializers = new ArrayList<KeySerializer>();
 
   private HtmlUiBuilder<?> uiBuilder;

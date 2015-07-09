@@ -146,7 +146,8 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
       i++;
     }
 
-    final XBaseFieldDefinition field = new XBaseFieldDefinition(name, fullName, type, length, scale);
+    final XBaseFieldDefinition field = new XBaseFieldDefinition(name, fullName, type, length,
+      scale);
     this.fieldNames.add(name);
     this.fields.add(field);
     return field;

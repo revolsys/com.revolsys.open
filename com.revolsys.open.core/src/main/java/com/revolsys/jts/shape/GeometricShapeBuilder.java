@@ -91,8 +91,8 @@ public abstract class GeometricShapeBuilder {
     final double radius = getRadius();
 
     final Point centre = getCentre();
-    return new BoundingBoxDoubleGf(2, centre.getX() - radius, centre.getY() - radius, centre.getX()
-      + radius, centre.getY() + radius);
+    return new BoundingBoxDoubleGf(2, centre.getX() - radius, centre.getY() - radius,
+      centre.getX() + radius, centre.getY() + radius);
   }
 
   public void setExtent(final BoundingBox extent) {

@@ -33,9 +33,6 @@
 
 package com.revolsys.jts.testold.junit;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -53,6 +50,9 @@ import com.revolsys.jts.geom.impl.MultiPointImpl;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.util.Assert;
+
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
 /**
  * @version 1.7
@@ -103,10 +103,10 @@ public class MiscellaneousTest extends TestCase {
     assertEquals(c1, c1);
     assertEquals(c2, c2);
     assertTrue(!c1.equals(c2));
-    assertEquals(new PointDouble((double)3, 5, Point.NULL_ORDINATE), new PointDouble((double)3, 5,
-      Point.NULL_ORDINATE));
-    assertEquals(new PointDouble((double)3, 5, Double.NaN), new PointDouble((double)3, 5,
-      Double.NaN));
+    assertEquals(new PointDouble((double)3, 5, Point.NULL_ORDINATE),
+      new PointDouble((double)3, 5, Point.NULL_ORDINATE));
+    assertEquals(new PointDouble((double)3, 5, Double.NaN),
+      new PointDouble((double)3, 5, Double.NaN));
     assertTrue(new PointDouble((double)3, 5, 0).equals(new PointDouble((double)3, 5, Double.NaN)));
   }
 
@@ -296,21 +296,21 @@ public class MiscellaneousTest extends TestCase {
    */
   // public void testMultiLineStringIsSimple2() throws Exception {
   // Geometry g = reader.read("MULTILINESTRING("
-  // + "(0 0,  100 0),"
+  // + "(0 0, 100 0),"
   // + "(50 0, 100 10))");
   // assertTrue(! g.isSimple());
   // }
 
   public void testMultiLineStringGetBoundary1() throws Exception {
-    final Geometry g = this.reader.read("MULTILINESTRING(" + "(0 0,  100 0, 50 50),"
-      + "(50 50, 50 -50))");
+    final Geometry g = this.reader
+      .read("MULTILINESTRING(" + "(0 0,  100 0, 50 50)," + "(50 50, 50 -50))");
     final Geometry m = this.reader.read("MULTIPOINT(0 0, 50 -50)");
     assertTrue(m.equals(2, g.getBoundary()));
   }
 
   public void testMultiLineStringGetBoundary2() throws Exception {
-    final Geometry g = this.reader.read("MULTILINESTRING(" + "(0 0,  100 0, 50 50),"
-      + "(50 50, 50 0))");
+    final Geometry g = this.reader
+      .read("MULTILINESTRING(" + "(0 0,  100 0, 50 50)," + "(50 50, 50 0))");
     final Geometry m = this.reader.read("MULTIPOINT(0 0, 50 0)");
     assertTrue(m.equals(2, g.getBoundary()));
   }
@@ -346,7 +346,8 @@ public class MiscellaneousTest extends TestCase {
   }
 
   public void testMultiPolygonIsSimple1() throws Exception {
-    final Geometry g = this.reader.read("MULTIPOLYGON (((10 10, 10 20, 20 20, 20 15, 10 10)), ((60 60, 70 70, 80 60, 60 60)))");
+    final Geometry g = this.reader
+      .read("MULTIPOLYGON (((10 10, 10 20, 20 20, 20 15, 10 10)), ((60 60, 70 70, 80 60, 60 60)))");
     assertTrue(g.isSimple());
   }
 
@@ -367,8 +368,8 @@ public class MiscellaneousTest extends TestCase {
   }
 
   public void testPolygonGetBoundary() throws Exception {
-    final Geometry g = this.reader.read("POLYGON(" + "(0 0, 40 0, 40 40, 0 40, 0 0),"
-      + "(10 10, 30 10, 30 30, 10 30, 10 10))");
+    final Geometry g = this.reader
+      .read("POLYGON(" + "(0 0, 40 0, 40 40, 0 40, 0 0)," + "(10 10, 30 10, 30 30, 10 30, 10 10))");
     final Geometry b = this.reader.read("MULTILINESTRING(" + "(0 0, 40 0, 40 40, 0 40, 0 0),"
       + "(10 10, 30 10, 30 30, 10 30, 10 10))");
     assertTrue(b.equals(2, g.getBoundary()));
@@ -376,14 +377,14 @@ public class MiscellaneousTest extends TestCase {
 
   // public void testGeometryCollectionIsSimple1() throws Exception {
   // Geometry g = reader.read("GEOMETRYCOLLECTION("
-  // + "LINESTRING(0 0,  100 0),"
+  // + "LINESTRING(0 0, 100 0),"
   // + "LINESTRING(0 10, 100 10))");
   // assertTrue(g.isSimple());
   // }
 
   // public void testGeometryCollectionIsSimple2() throws Exception {
   // Geometry g = reader.read("GEOMETRYCOLLECTION("
-  // + "LINESTRING(0 0,  100 0),"
+  // + "LINESTRING(0 0, 100 0),"
   // + "LINESTRING(50 0, 100 10))");
   // assertTrue(! g.isSimple());
   // }
@@ -393,7 +394,7 @@ public class MiscellaneousTest extends TestCase {
    */
   // public void testMultiLineStringIsSimple1() throws Exception {
   // Geometry g = reader.read("MULTILINESTRING("
-  // + "(0 0,  100 0),"
+  // + "(0 0, 100 0),"
   // + "(0 10, 100 10))");
   // assertTrue(g.isSimple());
   // }
@@ -441,8 +442,8 @@ public class MiscellaneousTest extends TestCase {
 
   public void testPredicatesReturnFalseForEmptyGeometries() {
     final Point p1 = GeometryFactory.floating3().point((Point)null);
-    final Point p2 = GeometryFactory.floating3().point(
-      new PointDouble((double)5, 5, Point.NULL_ORDINATE));
+    final Point p2 = GeometryFactory.floating3()
+      .point(new PointDouble((double)5, 5, Point.NULL_ORDINATE));
     assertEquals(false, p1.equals(p2));
     assertEquals(true, p1.disjoint(p2));
     assertEquals(false, p1.intersects(p2));

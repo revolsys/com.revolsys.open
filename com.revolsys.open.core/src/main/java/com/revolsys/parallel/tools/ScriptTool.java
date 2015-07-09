@@ -227,8 +227,8 @@ public class ScriptTool {
           }
 
         } catch (final IOException e) {
-          System.err.println("Properties file '" + this.propertiesName + "' could not be read:"
-            + e.getMessage());
+          System.err.println(
+            "Properties file '" + this.propertiesName + "' could not be read:" + e.getMessage());
           return false;
         }
       }
@@ -238,8 +238,8 @@ public class ScriptTool {
         final File logDirectory = this.logFile.getParentFile();
         if (!logDirectory.exists()) {
           if (!logDirectory.mkdirs()) {
-            System.err.println("Unable to create Log directory '" + logDirectory.getAbsolutePath()
-              + "'");
+            System.err
+              .println("Unable to create Log directory '" + logDirectory.getAbsolutePath() + "'");
             return false;
           }
         }
@@ -343,8 +343,8 @@ public class ScriptTool {
       beans.getBeanFactory().addPropertyEditorRegistrar(new ResourceEditorRegistrar());
 
       if (this.scriptFile != null) {
-        new XmlBeanDefinitionReader(beans).loadBeanDefinitions("file:"
-          + this.scriptFile.getAbsolutePath());
+        new XmlBeanDefinitionReader(beans)
+          .loadBeanDefinitions("file:" + this.scriptFile.getAbsolutePath());
       } else {
         new XmlBeanDefinitionReader(beans).loadBeanDefinitions("classpath:" + this.scriptFileName);
       }

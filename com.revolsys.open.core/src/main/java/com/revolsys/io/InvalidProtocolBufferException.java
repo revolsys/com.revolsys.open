@@ -73,9 +73,8 @@ public class InvalidProtocolBufferException extends IOException {
   }
 
   static InvalidProtocolBufferException sizeLimitExceeded() {
-    return new InvalidProtocolBufferException(
-      "Protocol message was too large.  May be malicious.  "
-        + "Use CodedInputStream.setSizeLimit() to increase the size limit.");
+    return new InvalidProtocolBufferException("Protocol message was too large.  May be malicious.  "
+      + "Use CodedInputStream.setSizeLimit() to increase the size limit.");
   }
 
   static InvalidProtocolBufferException truncatedMessage() {

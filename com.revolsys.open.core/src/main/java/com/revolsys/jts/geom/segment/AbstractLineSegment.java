@@ -394,7 +394,8 @@ public abstract class AbstractLineSegment extends AbstractLineString implements 
         final Point currentIntersection = currentIntersections.getPoint(0);
         if (intersection == null) {
           intersection = currentIntersection;
-        } else if (coordinates1.distance(currentIntersection) < coordinates1.distance(intersection)) {
+        } else
+          if (coordinates1.distance(currentIntersection) < coordinates1.distance(intersection)) {
           intersection = currentIntersection;
         }
       }
@@ -516,7 +517,8 @@ public abstract class AbstractLineSegment extends AbstractLineString implements 
       } else if (intersectionCount == 1) {
         return geometryFactory.point(coordinates);
       } else if (intersectionCount == 2) {
-        final double distance1 = MathUtil.distance(line1x1, line1y1, coordinates[0], coordinates[1]);
+        final double distance1 = MathUtil.distance(line1x1, line1y1, coordinates[0],
+          coordinates[1]);
         final double distance2 = MathUtil.distance(line1x1, line1y1, coordinates[axisCount],
           coordinates[axisCount + 1]);
         if (distance1 > distance2) {
@@ -994,7 +996,8 @@ public abstract class AbstractLineSegment extends AbstractLineString implements 
     final double[] coordinates = new double[axisCount * 2];
     for (int vertexIndex = 0; vertexIndex < 2; vertexIndex++) {
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-        coordinates[vertexIndex * axisCount + axisIndex] = getCoordinate(1 - vertexIndex, axisIndex);
+        coordinates[vertexIndex * axisCount + axisIndex] = getCoordinate(1 - vertexIndex,
+          axisIndex);
       }
     }
     final GeometryFactory geometryFactory = getGeometryFactory();

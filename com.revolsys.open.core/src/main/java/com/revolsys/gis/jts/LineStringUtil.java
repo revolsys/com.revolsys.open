@@ -98,10 +98,10 @@ public final class LineStringUtil {
       final double sBottom = (aX2 - aX1) * (bY2 - bY1) - (aY2 - aY1) * (bX2 - bX1);
 
       if (rBottom == 0 || sBottom == 0) {
-        return Math.min(LineSegmentUtil.distanceLinePoint(bX1, bY1, bX2, bY2, aX1, aY1), Math.min(
-          LineSegmentUtil.distanceLinePoint(bX1, bY1, bX2, bY2, aX2, aY2),
-          Math.min(LineSegmentUtil.distanceLinePoint(aX1, aY1, aX2, aY2, bX1, bY1),
-            LineSegmentUtil.distanceLinePoint(aX1, aY1, aX2, aY2, bX2, bY2))));
+        return Math.min(LineSegmentUtil.distanceLinePoint(bX1, bY1, bX2, bY2, aX1, aY1),
+          Math.min(LineSegmentUtil.distanceLinePoint(bX1, bY1, bX2, bY2, aX2, aY2),
+            Math.min(LineSegmentUtil.distanceLinePoint(aX1, aY1, aX2, aY2, bX1, bY1),
+              LineSegmentUtil.distanceLinePoint(aX1, aY1, aX2, aY2, bX2, bY2))));
 
       } else {
         final double s = sTop / sBottom;
@@ -110,9 +110,9 @@ public final class LineStringUtil {
         if (r < 0 || r > 1 || s < 0 || s > 1) {
           // no intersection
           return Math.min(LineSegmentUtil.distanceLinePoint(bX1, bY1, bX2, bY2, aX1, aY1),
-            Math.min(LineSegmentUtil.distanceLinePoint(bX1, bY1, bX2, bY2, aX2, aY2), Math.min(
-              LineSegmentUtil.distanceLinePoint(aX1, aY1, aX2, aY2, bX1, bY1),
-              LineSegmentUtil.distanceLinePoint(aX1, aY1, aX2, aY2, bX2, bY2))));
+            Math.min(LineSegmentUtil.distanceLinePoint(bX1, bY1, bX2, bY2, aX2, aY2),
+              Math.min(LineSegmentUtil.distanceLinePoint(aX1, aY1, aX2, aY2, bX1, bY1),
+                LineSegmentUtil.distanceLinePoint(aX1, aY1, aX2, aY2, bX2, bY2))));
         }
         return 0.0;
       }
@@ -196,7 +196,8 @@ public final class LineStringUtil {
     }
   }
 
-  public static double distance(final Point point, final Geometry geometry, final double tolerance) {
+  public static double distance(final Point point, final Geometry geometry,
+    final double tolerance) {
     final double x = point.getX();
     final double y = point.getY();
     return distance(x, y, geometry, tolerance);
@@ -399,7 +400,8 @@ public final class LineStringUtil {
           }
         }
       }
-      return Collections.<GeometryComponent, Double> singletonMap(closestComponent, closestDistance);
+      return Collections.<GeometryComponent, Double> singletonMap(closestComponent,
+        closestDistance);
     }
   }
 
@@ -521,8 +523,8 @@ public final class LineStringUtil {
           } else if (numIntersections == 1) {
             final Point intersection = intersector.getIntersection(0);
             if (i1 == 1 || i2 == 1 || i1 == numCoordinates1 - 1 || i2 == numCoordinates2 - 1) {
-              if (!((intersection.equals(2, firstCoord1) || intersection.equals(2, lastCoord1)) && (intersection.equals(
-                2, firstCoord2) || intersection.equals(2, lastCoord2)))) {
+              if (!((intersection.equals(2, firstCoord1) || intersection.equals(2, lastCoord1))
+                && (intersection.equals(2, firstCoord2) || intersection.equals(2, lastCoord2)))) {
                 return intersection;
               }
             } else {
@@ -804,8 +806,8 @@ public final class LineStringUtil {
     }
   }
 
-  public static List<LineString> split(final GeometryFactory geometryFactory,
-    final LineString line, final LineSegmentIndex index, final double tolerance) {
+  public static List<LineString> split(final GeometryFactory geometryFactory, final LineString line,
+    final LineSegmentIndex index, final double tolerance) {
     final LineString points = line;
     final Point firstCoordinate = points.getPoint(0);
     final int lastIndex = points.getVertexCount() - 1;
@@ -869,7 +871,8 @@ public final class LineStringUtil {
     if (newLines.isEmpty()) {
       newLines.add(line);
     } else {
-      addLineString(geometryFactory, points, startCoordinate, startIndex, lastIndex, null, newLines);
+      addLineString(geometryFactory, points, startCoordinate, startIndex, lastIndex, null,
+        newLines);
     }
     return newLines;
   }

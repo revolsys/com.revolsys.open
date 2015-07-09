@@ -18,7 +18,8 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.util.OS;
 
-public class UndoManager extends javax.swing.undo.UndoManager implements PropertyChangeSupportProxy {
+public class UndoManager extends javax.swing.undo.UndoManager
+  implements PropertyChangeSupportProxy {
 
   /**
    *
@@ -70,7 +71,8 @@ public class UndoManager extends javax.swing.undo.UndoManager implements Propert
         final JTextComponent textComponent = (JTextComponent)jcomponent;
         textComponent.getDocument().addUndoableEditListener(this);
       }
-      final InputMap inputMap = jcomponent.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+      final InputMap inputMap = jcomponent
+        .getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
       final ActionMap actionMap = jcomponent.getActionMap();
 
       int modifiers;

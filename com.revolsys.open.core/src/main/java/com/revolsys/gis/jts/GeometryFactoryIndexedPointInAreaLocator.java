@@ -11,8 +11,8 @@ public class GeometryFactoryIndexedPointInAreaLocator extends IndexedPointInArea
   private static final String KEY = GeometryFactoryIndexedPointInAreaLocator.class.getName();
 
   public static GeometryFactoryIndexedPointInAreaLocator get(final Geometry geometry) {
-    GeometryFactoryIndexedPointInAreaLocator locator = GeometryProperties.getGeometryProperty(
-      geometry, KEY);
+    GeometryFactoryIndexedPointInAreaLocator locator = GeometryProperties
+      .getGeometryProperty(geometry, KEY);
     if (locator == null) {
       locator = new GeometryFactoryIndexedPointInAreaLocator(geometry);
       GeometryProperties.setGeometryProperty(geometry, KEY, locator);

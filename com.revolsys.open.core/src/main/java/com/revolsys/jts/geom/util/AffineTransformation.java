@@ -154,7 +154,8 @@ public class AffineTransformation implements Cloneable
    * @param cosTheta the cosine of the rotation angle
    * @return a transformation for the rotation
    */
-  public static AffineTransformation rotationInstance(final double sinTheta, final double cosTheta) {
+  public static AffineTransformation rotationInstance(final double sinTheta,
+    final double cosTheta) {
     final AffineTransformation trans = new AffineTransformation();
     trans.setToRotation(sinTheta, cosTheta);
     return trans;
@@ -455,7 +456,7 @@ public class AffineTransformation implements Cloneable
    * the transform is singular (not invertible),
    * and operations which attempt to compute
    * an inverse will throw a <tt>NoninvertibleTransformException</tt>.
-
+  
    * @return the determinant of the transformation
    * @see #getInverse()
    */

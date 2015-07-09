@@ -328,7 +328,8 @@ public class PackedCoordinateUtil {
 
   public static byte[] getPackedBytes(final Double xOffset, final Double yOffset,
     final Double xyScale, final boolean hasZ, final Double zOffset, final Double zScale,
-    final boolean hasM, final Double mScale, final Double mOffset, final List<List<Geometry>> parts) {
+    final boolean hasM, final Double mScale, final Double mOffset,
+    final List<List<Geometry>> parts) {
 
     final int packedByteLength = 0;
     byte dimensionFlag = 0;
@@ -527,13 +528,14 @@ public class PackedCoordinateUtil {
     return value;
   }
 
-  private static void readCoordinates(final PackedIntegerInputStream in,
-    final double[] coordinates, final int vertexCount, final int axisCount, final int axisIndex,
-    final double offset, final double scale) throws IOException {
+  private static void readCoordinates(final PackedIntegerInputStream in, final double[] coordinates,
+    final int vertexCount, final int axisCount, final int axisIndex, final double offset,
+    final double scale) throws IOException {
 
     double previousValue = offset;
     for (int i = 0; i < vertexCount; i++) {
-      previousValue = readCoordinate(in, coordinates, i, axisCount, axisIndex, previousValue, scale);
+      previousValue = readCoordinate(in, coordinates, i, axisCount, axisIndex, previousValue,
+        scale);
     }
   }
 
@@ -557,8 +559,8 @@ public class PackedCoordinateUtil {
   }
 
   private static void readMultiPolygonCoordinates(final PackedIntegerInputStream in,
-    final List<List<double[]>> parts, final int axisCount, final int axisIndex,
-    final double offset, final double scale) throws IOException {
+    final List<List<double[]>> parts, final int axisCount, final int axisIndex, final double offset,
+    final double scale) throws IOException {
 
     double previousValue = offset;
     boolean first = true;
@@ -591,8 +593,8 @@ public class PackedCoordinateUtil {
     }
   }
 
-  private static long writeCoordinate(final PackedIntegerOutputStream out,
-    final long previousValue, final double scale, final double value) {
+  private static long writeCoordinate(final PackedIntegerOutputStream out, final long previousValue,
+    final double scale, final double value) {
     long longValue;
     if (Double.isNaN(value)) {
       longValue = 0;
@@ -624,8 +626,8 @@ public class PackedCoordinateUtil {
     return writeCoordinate(out, previousValue, scale, coordinate);
   }
 
-  private static long writeCoordinates(final PackedIntegerOutputStream out,
-    final Geometry geometry, long previousValue, final double scale, final int axisIndex) {
+  private static long writeCoordinates(final PackedIntegerOutputStream out, final Geometry geometry,
+    long previousValue, final double scale, final int axisIndex) {
     for (final Vertex vertex : geometry.vertices()) {
       previousValue = writeCoordinate(out, vertex, previousValue, scale, axisIndex);
     }

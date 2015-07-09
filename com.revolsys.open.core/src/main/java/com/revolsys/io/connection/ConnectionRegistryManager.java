@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 
-public interface ConnectionRegistryManager<T extends ConnectionRegistry<?>> extends
-  PropertyChangeSupportProxy, PropertyChangeListener {
+public interface ConnectionRegistryManager<T extends ConnectionRegistry<?>>
+  extends PropertyChangeSupportProxy, PropertyChangeListener {
 
   void addConnectionRegistry(T registry);
 

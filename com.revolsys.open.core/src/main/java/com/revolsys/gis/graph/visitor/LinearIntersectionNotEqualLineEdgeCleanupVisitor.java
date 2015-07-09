@@ -36,10 +36,11 @@ import com.revolsys.visitor.AbstractVisitor;
 public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Record>>
   implements ObjectProcessor<RecordGraph> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(LinearIntersectionNotEqualLineEdgeCleanupVisitor.class);
+  private static final Logger LOG = LoggerFactory
+    .getLogger(LinearIntersectionNotEqualLineEdgeCleanupVisitor.class);
 
-  private Set<String> equalExcludeAttributes = new HashSet<String>(Arrays.asList(
-    RecordEquals.EXCLUDE_ID, RecordEquals.EXCLUDE_GEOMETRY));
+  private Set<String> equalExcludeAttributes = new HashSet<String>(
+    Arrays.asList(RecordEquals.EXCLUDE_ID, RecordEquals.EXCLUDE_GEOMETRY));
 
   private Statistics duplicateStatistics;
 
@@ -132,8 +133,8 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVi
     final RecordGeometryFilter<LineString> linearIntersectionFilter = new RecordGeometryFilter<LineString>(
       new LinearIntersectionFilter(line));
 
-    attributeAndGeometryFilter.addFilter(new EdgeObjectFilter<Record>(new AndFilter<Record>(
-      notEqualLineFilter, linearIntersectionFilter)));
+    attributeAndGeometryFilter.addFilter(new EdgeObjectFilter<Record>(
+      new AndFilter<Record>(notEqualLineFilter, linearIntersectionFilter)));
 
     final List<Edge<Record>> intersectingEdges = graph.getEdges(attributeAndGeometryFilter, line);
 

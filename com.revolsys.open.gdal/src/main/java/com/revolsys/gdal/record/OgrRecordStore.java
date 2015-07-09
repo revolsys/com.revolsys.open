@@ -386,8 +386,8 @@ public class OgrRecordStore extends AbstractRecordStore {
         default:
           fieldDataType = DataTypes.STRING;
           final String fieldTypeName = fieldDefinition.GetFieldTypeName(fieldType);
-          LoggerFactory.getLogger(getClass()).error(
-            "Unsupported field type " + this.file + " " + fieldName + ": " + fieldTypeName);
+          LoggerFactory.getLogger(getClass())
+            .error("Unsupported field type " + this.file + " " + fieldName + ": " + fieldTypeName);
         break;
       }
       final FieldDefinition field = new FieldDefinition(fieldName, fieldDataType, fieldWidth,

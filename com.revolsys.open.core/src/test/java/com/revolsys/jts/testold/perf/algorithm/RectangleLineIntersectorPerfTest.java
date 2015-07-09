@@ -74,15 +74,15 @@ public class RectangleLineIntersectorPerfTest {
   }
 
   private BoundingBox createRectangle() {
-    final BoundingBox rectEnv = new BoundingBoxDoubleGf(new PointDouble(this.baseX, this.baseY,
-      Point.NULL_ORDINATE), new PointDouble(this.baseX + this.rectSize, this.baseY + this.rectSize,
-      Point.NULL_ORDINATE));
+    final BoundingBox rectEnv = new BoundingBoxDoubleGf(
+      new PointDouble(this.baseX, this.baseY, Point.NULL_ORDINATE),
+      new PointDouble(this.baseX + this.rectSize, this.baseY + this.rectSize, Point.NULL_ORDINATE));
     return rectEnv;
   }
 
   private Point[] createTestPoints(final int nPts) {
-    final Point pt = this.geomFact.point(new PointDouble(this.baseX, this.baseY,
-      Point.NULL_ORDINATE));
+    final Point pt = this.geomFact
+      .point(new PointDouble(this.baseX, this.baseY, Point.NULL_ORDINATE));
     final Geometry circle = pt.buffer(2 * this.rectSize, nPts / 4);
     return CoordinatesListUtil.getCoordinateArray(circle);
   }

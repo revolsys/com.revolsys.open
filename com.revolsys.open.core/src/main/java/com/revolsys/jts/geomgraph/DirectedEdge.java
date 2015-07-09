@@ -167,8 +167,8 @@ public class DirectedEdge extends EdgeEnd {
   public boolean isInteriorAreaEdge() {
     boolean isInteriorAreaEdge = true;
     for (int i = 0; i < 2; i++) {
-      if (!(getLabel().isArea(i) && getLabel().getLocation(i, Position.LEFT) == Location.INTERIOR && getLabel().getLocation(
-        i, Position.RIGHT) == Location.INTERIOR)) {
+      if (!(getLabel().isArea(i) && getLabel().getLocation(i, Position.LEFT) == Location.INTERIOR
+        && getLabel().getLocation(i, Position.RIGHT) == Location.INTERIOR)) {
         isInteriorAreaEdge = false;
       }
     }

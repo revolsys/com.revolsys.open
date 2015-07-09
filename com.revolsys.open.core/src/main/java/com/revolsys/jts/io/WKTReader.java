@@ -556,8 +556,8 @@ public class WKTReader {
    *@throws  IOException     if an I/O error occurs
    *@throws  ParseException  if an unexpected token was encountered
    */
-  private com.revolsys.jts.geom.MultiLineString readMultiLineStringText() throws IOException,
-    ParseException {
+  private com.revolsys.jts.geom.MultiLineString readMultiLineStringText()
+    throws IOException, ParseException {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
       return this.geometryFactory.multiLineString(new LineString[] {});

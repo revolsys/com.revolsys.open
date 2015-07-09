@@ -31,7 +31,8 @@ public class EdgeIntersectsLinearlyEdgeVisitor<T> implements Visitor<Edge<T>> {
 
   private final Visitor<Edge<T>> matchVisitor;
 
-  public EdgeIntersectsLinearlyEdgeVisitor(final Edge<T> edge, final Visitor<Edge<T>> matchVisitor) {
+  public EdgeIntersectsLinearlyEdgeVisitor(final Edge<T> edge,
+    final Visitor<Edge<T>> matchVisitor) {
     this.edge = edge;
     this.matchVisitor = matchVisitor;
   }

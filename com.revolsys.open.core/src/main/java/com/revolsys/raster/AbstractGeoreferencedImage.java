@@ -52,8 +52,8 @@ import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeObject implements
-  GeoreferencedImage {
+public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeObject
+  implements GeoreferencedImage {
 
   private static double[] calculateLSM(final BoundingBox boundingBox, final int imageWidth,
     final int imageHeight, final List<MappedLocation> mappings) {
@@ -249,10 +249,11 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
               if (renderedImage instanceof BufferedImage && !useTransform) {
                 final BufferedImage bufferedImage = (BufferedImage)renderedImage;
                 try {
-                  graphics.drawImage(bufferedImage, 0, 0, imageScreenWidth, imageScreenHeight, null);
+                  graphics.drawImage(bufferedImage, 0, 0, imageScreenWidth, imageScreenHeight,
+                    null);
                 } catch (final Throwable e) {
-                  LoggerFactory.getLogger(getClass()).error(
-                    imageScreenWidth + "x" + imageScreenHeight, e);
+                  LoggerFactory.getLogger(getClass())
+                    .error(imageScreenWidth + "x" + imageScreenHeight, e);
                 }
               } else {
                 final double scaleX = (double)imageScreenWidth / imageWidth;
@@ -546,7 +547,8 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
             for (int i = 0; i < srsList.getLength() && srid == 0; i++) {
               final Node srsNode = srsList.item(i);
               final String srsWkt = srsNode.getTextContent();
-              final CoordinateSystem coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(srsWkt);
+              final CoordinateSystem coordinateSystem = EsriCoordinateSystems
+                .getCoordinateSystem(srsWkt);
               if (coordinateSystem != null) {
                 srid = coordinateSystem.getId();
               }
@@ -559,7 +561,8 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
           final List<Double> targetControlPoints = DomUtil.getDoubleList(doc, "TargetGCPs");
           if (sourceControlPoints.size() > 0 && targetControlPoints.size() > 0) {
             final List<MappedLocation> tiePoints = new ArrayList<MappedLocation>();
-            for (int i = 0; i < sourceControlPoints.size() && i < targetControlPoints.size(); i += 2) {
+            for (int i = 0; i < sourceControlPoints.size()
+              && i < targetControlPoints.size(); i += 2) {
               final double imageX = sourceControlPoints.get(i) * dpi[0];
               final double imageY = sourceControlPoints.get(i + 1) * dpi[1];
               final Point sourcePixel = new PointDouble(imageX, imageY);

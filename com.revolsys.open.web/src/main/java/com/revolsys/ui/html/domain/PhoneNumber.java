@@ -140,8 +140,8 @@ public final class PhoneNumber {
         try {
           expression = JexlUtil.createExpression(format);
         } catch (final Exception e) {
-          throw new IllegalArgumentException(regex + " is not a valid regular expression: "
-            + e.getMessage());
+          throw new IllegalArgumentException(
+            regex + " is not a valid regular expression: " + e.getMessage());
         }
         final HashMapContext context = new HashMapContext();
         context.setVars(values);

@@ -63,11 +63,11 @@ public class ExportLayerRecordsPanel extends BasePanel {
     final JFileChooser fileChooser = SwingUtil.createFileChooser(getClass(), "currentDirectory");
 
     final Set<String> allRecordExtensions = new TreeSet<>();
-    final List<FileNameExtensionFilter> recordFileFilters = AddFileLayerAction.getFileFilters(
-      allRecordExtensions, RecordReaderFactory.class);
+    final List<FileNameExtensionFilter> recordFileFilters = AddFileLayerAction
+      .getFileFilters(allRecordExtensions, RecordReaderFactory.class);
 
-    final FileNameExtensionFilter allRecordFilter = AddFileLayerAction.createFileFilter(
-      "All Vector/Data files", allRecordExtensions);
+    final FileNameExtensionFilter allRecordFilter = AddFileLayerAction
+      .createFileFilter("All Vector/Data files", allRecordExtensions);
     fileChooser.addChoosableFileFilter(allRecordFilter);
 
     for (final FileFilter fileFilter : recordFileFilters) {

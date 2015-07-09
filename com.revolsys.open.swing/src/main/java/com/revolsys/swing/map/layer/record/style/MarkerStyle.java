@@ -520,8 +520,8 @@ public class MarkerStyle implements Cloneable, MapSerializer {
         try {
           JavaBeanUtil.setProperty(this, propertyName, propertyValue);
         } catch (final Throwable e) {
-          ExceptionUtil.log(getClass(),
-            "Unable to set style " + propertyName + "=" + propertyValue, e);
+          ExceptionUtil.log(getClass(), "Unable to set style " + propertyName + "=" + propertyValue,
+            e);
         }
       }
     }

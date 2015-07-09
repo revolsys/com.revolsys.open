@@ -21,8 +21,8 @@ public abstract class AbstractPreferencesPanel extends JPanel implements Prefere
     super(new BorderLayout());
     this.title = title;
     if (instructions != null) {
-      final JLabel instructionsLabel = new JLabel("<html><p style=\"color:#666666\">"
-        + instructions + "</p></html>");
+      final JLabel instructionsLabel = new JLabel(
+        "<html><p style=\"color:#666666\">" + instructions + "</p></html>");
       add(instructionsLabel, BorderLayout.NORTH);
     }
     add(this.fieldPanel, BorderLayout.CENTER);

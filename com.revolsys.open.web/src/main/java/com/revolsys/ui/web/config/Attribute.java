@@ -67,8 +67,8 @@ public class Attribute {
         }
 
       } catch (final NoSuchMethodException e) {
-        throw new IllegalArgumentException(type.getName()
-          + " must have a constructor that takes a java.lang.String as an argument");
+        throw new IllegalArgumentException(
+          type.getName() + " must have a constructor that takes a java.lang.String as an argument");
       }
     }
     this.loaderClass = loaderClass;

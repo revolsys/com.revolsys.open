@@ -28,7 +28,8 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   private JComponent swingEditor;
 
-  public FileGdbDomainCodeTable(final FileGdbRecordStore recordStore, final CodedValueDomain domain) {
+  public FileGdbDomainCodeTable(final FileGdbRecordStore recordStore,
+    final CodedValueDomain domain) {
     this.recordStore = recordStore;
     this.domain = domain;
     this.name = domain.getDomainName();

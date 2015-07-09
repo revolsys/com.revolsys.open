@@ -3,7 +3,6 @@ package com.revolsys.data.record.io;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.springframework.core.io.Resource;

@@ -246,7 +246,8 @@ public class RectangleIntersects {
     /**
      * Test if any rectangle vertex is contained in the target geometry
      */
-    final GeometryContainsPointVisitor ecpVisitor = new GeometryContainsPointVisitor(this.rectangle);
+    final GeometryContainsPointVisitor ecpVisitor = new GeometryContainsPointVisitor(
+      this.rectangle);
     ecpVisitor.applyTo(geom);
     if (ecpVisitor.containsPoint()) {
       return true;

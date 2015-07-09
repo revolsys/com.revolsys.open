@@ -5,8 +5,8 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
-public class DataSourceTransactionManagerFactory implements
-  FactoryBean<DataSourceTransactionManager> {
+public class DataSourceTransactionManagerFactory
+  implements FactoryBean<DataSourceTransactionManager> {
 
   private DataSource dataSource;
 

@@ -1,12 +1,12 @@
 package com.revolsys.jts.testold.operation;
 
-import junit.framework.TestCase;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.valid.IsValidOp;
+
+import junit.framework.TestCase;
 
 /**
  * Tests validating geometries with

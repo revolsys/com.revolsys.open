@@ -34,7 +34,7 @@ public class ZoomOverlay extends AbstractOverlay {
   public static final BasicStroke ZOOM_BOX_STROKE = new BasicStroke(2, BasicStroke.CAP_SQUARE,
     BasicStroke.JOIN_MITER, 2, new float[] {
       6, 6
-    }, 0f);
+  }, 0f);
 
   public static final String ACTION_PAN = "pan";
 

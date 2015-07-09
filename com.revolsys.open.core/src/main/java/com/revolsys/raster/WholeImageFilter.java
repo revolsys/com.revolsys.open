@@ -25,8 +25,8 @@ import java.awt.image.WritableRaster;
  * A filter which acts as a superclass for filters which need to have the whole image in memory
  * to do their stuff.
  */
-public abstract class WholeImageFilter extends AbstractBufferedImageOp implements
-  java.io.Serializable {
+public abstract class WholeImageFilter extends AbstractBufferedImageOp
+  implements java.io.Serializable {
 
   /**
    *
@@ -56,9 +56,9 @@ public abstract class WholeImageFilter extends AbstractBufferedImageOp implement
 
     if (dst == null) {
       final ColorModel dstCM = src.getColorModel();
-      dst = new BufferedImage(dstCM, dstCM.createCompatibleWritableRaster(
-        this.transformedSpace.width, this.transformedSpace.height), dstCM.isAlphaPremultiplied(),
-        null);
+      dst = new BufferedImage(dstCM, dstCM
+        .createCompatibleWritableRaster(this.transformedSpace.width, this.transformedSpace.height),
+        dstCM.isAlphaPremultiplied(), null);
     }
     final WritableRaster dstRaster = dst.getRaster();
 

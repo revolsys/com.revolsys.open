@@ -262,8 +262,8 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
       if (!Property.hasValue(errorMessage)) {
         errorMessage = "The following records could not be merged and will not be modified.";
       }
-      final JLabel unMergeLabel = new JLabel("<html><p style=\"color:red\">" + errorMessage
-        + "</p></html>");
+      final JLabel unMergeLabel = new JLabel(
+        "<html><p style=\"color:red\">" + errorMessage + "</p></html>");
       panel.add(unMergeLabel, BorderLayout.NORTH);
       panel.add(tablePanel, BorderLayout.SOUTH);
       SwingUtil.setTitledBorder(panel, unMergeableRecords.size() + " Un-Mergeable Records");

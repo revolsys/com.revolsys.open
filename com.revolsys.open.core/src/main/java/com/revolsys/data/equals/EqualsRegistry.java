@@ -62,7 +62,8 @@ public class EqualsRegistry implements Equals<Object> {
   }
 
   @Override
-  public boolean equals(final Object object1, final Object object2, final Collection<String> exclude) {
+  public boolean equals(final Object object1, final Object object2,
+    final Collection<String> exclude) {
     if (object1 == null) {
       if (object2 == null) {
         return true;

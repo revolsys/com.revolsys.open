@@ -18,7 +18,8 @@ import com.revolsys.util.Property;
  */
 public class InvokeMethodRunnable extends AbstractRunnable implements Process {
 
-  public static void run(final Object object, final String methodName, final List<Object> parameters) {
+  public static void run(final Object object, final String methodName,
+    final List<Object> parameters) {
     final Object[] parameterArray = parameters.toArray();
     Property.invoke(object, methodName, parameterArray);
   }

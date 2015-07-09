@@ -85,7 +85,7 @@ public class IteratedBufferStressTest {
       final Geometry b2 = doBuffer(b1, -dist);
       dist += 1;
       base = b2;
-      // System.out.println("----------------------  " +
+      // System.out.println("---------------------- " +
       // totalSW.getTimeString());
       // System.out.println();
     }

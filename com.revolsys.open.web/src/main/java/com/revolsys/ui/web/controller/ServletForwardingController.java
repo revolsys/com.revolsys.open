@@ -46,10 +46,11 @@ public class ServletForwardingController extends AbstractController implements B
     final ServletContext servletContext = getServletContext();
     final RequestDispatcher rd = servletContext.getNamedDispatcher(this.servletName);
     if (rd == null) {
-      throw new ServletException("No servlet with name '" + this.servletName
-        + "' defined in web.xml");
+      throw new ServletException(
+        "No servlet with name '" + this.servletName + "' defined in web.xml");
     }
-    final String dispatcherRequestPath = (String)request.getAttribute("org.apache.catalina.core.DISPATCHER_REQUEST_PATH");
+    final String dispatcherRequestPath = (String)request
+      .getAttribute("org.apache.catalina.core.DISPATCHER_REQUEST_PATH");
     if (dispatcherRequestPath != null) {
       final String servletPath = request.getServletPath();
       final String pathInfo = request.getPathInfo();
@@ -107,7 +108,8 @@ public class ServletForwardingController extends AbstractController implements B
    * @see javax.servlet.ServletResponse#isCommitted
    * @see org.springframework.web.util.WebUtils#isIncludeRequest
    */
-  protected boolean useInclude(final HttpServletRequest request, final HttpServletResponse response) {
+  protected boolean useInclude(final HttpServletRequest request,
+    final HttpServletResponse response) {
     return WebUtils.isIncludeRequest(request) || response.isCommitted();
   }
 

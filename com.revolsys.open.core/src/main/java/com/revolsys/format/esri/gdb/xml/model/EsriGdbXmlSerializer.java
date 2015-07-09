@@ -77,8 +77,8 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     addClassProperties(ProjectedCoordinateSystem.class, SPATIAL_REFERENCE,
       PROJECTED_COORDINATE_SYSTEM);
 
-    addClassProperties(GeometryDef.class, GEOMETRY_DEF, GEOMETRY_DEF, AVG_NUM_POINTS,
-      GEOMETRY_TYPE, HAS_M, HAS_Z, SPATIAL_REFERENCE, GRID_SIZE_0, GRID_SIZE_1, GRID_SIZE_2);
+    addClassProperties(GeometryDef.class, GEOMETRY_DEF, GEOMETRY_DEF, AVG_NUM_POINTS, GEOMETRY_TYPE,
+      HAS_M, HAS_Z, SPATIAL_REFERENCE, GRID_SIZE_0, GRID_SIZE_1, GRID_SIZE_2);
 
     addClassProperties(Domain.class, DOMAIN, null, DOMAIN_NAME, FIELD_TYPE, MERGE_POLICY,
       SPLIT_POLICY, DESCRIPTION, OWNER, CODED_VALUES);
@@ -88,8 +88,8 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
 
     addClassProperties(CodedValue.class, CODED_VALUE, CODED_VALUE, NAME, CODE);
 
-    addClassProperties(Field.class, FIELD, FIELD, NAME, TYPE, IS_NULLABLE, LENGTH, PRECISION,
-      SCALE, REQUIRED, EDIATBLE, DOMAIN_FIXED, GEOMETRY_DEF, ALIAS_NAME, MODEL_NAME, DEFAULT_VALUE,
+    addClassProperties(Field.class, FIELD, FIELD, NAME, TYPE, IS_NULLABLE, LENGTH, PRECISION, SCALE,
+      REQUIRED, EDIATBLE, DOMAIN_FIXED, GEOMETRY_DEF, ALIAS_NAME, MODEL_NAME, DEFAULT_VALUE,
       DOMAIN);
 
     addTagNameXsiTagName(FIELD_ARRAY, ARRAY_OF_FIELD);
@@ -136,10 +136,10 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     addClassProperties(DEFeatureDataset.class, DATA_ELEMENT, DE_FEATURE_DATASET, EXTENT,
       SPATIAL_REFERENCE);
 
-    addClassProperties(DETable.class, DATA_ELEMENT, DE_TABLE, HAS_OID, OBJECT_ID_FIELD_NAME,
-      FIELDS, INDEXES, CLSID, EXTCLSID, RELATIONSHIP_CLASS_NAMES, ALIAS_NAME, MODEL_NAME,
-      HAS_GLOBAL_ID, GLOBAL_ID_FIELD_NAME, RASTER_FIELD_NAME, EXTENSION_PROPERTIES,
-      SUBTYPE_FIELD_NAME, DEFAULT_SUBTYPE_CODE, SUBTYPES, CONTROLLER_MEMBERSHIPS);
+    addClassProperties(DETable.class, DATA_ELEMENT, DE_TABLE, HAS_OID, OBJECT_ID_FIELD_NAME, FIELDS,
+      INDEXES, CLSID, EXTCLSID, RELATIONSHIP_CLASS_NAMES, ALIAS_NAME, MODEL_NAME, HAS_GLOBAL_ID,
+      GLOBAL_ID_FIELD_NAME, RASTER_FIELD_NAME, EXTENSION_PROPERTIES, SUBTYPE_FIELD_NAME,
+      DEFAULT_SUBTYPE_CODE, SUBTYPES, CONTROLLER_MEMBERSHIPS);
 
     addClassProperties(DEFeatureClass.class, DATA_ELEMENT, DE_FEATURE_CLASS, FEATURE_TYPE,
       SHAPE_TYPE, SHAPE_FIELD_NAME, HAS_M, HAS_Z, HAS_SPATIAL_INDEX, AREA_FIELD_NAME,
@@ -355,7 +355,8 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     return hasXsi;
   }
 
-  private void writeXsiTypeAttribute(final QName tagName, final Class<? extends Object> objectClass) {
+  private void writeXsiTypeAttribute(final QName tagName,
+    final Class<? extends Object> objectClass) {
     QName xsiTagName = this.classXsiTagNameMap.get(objectClass);
     if (xsiTagName == null) {
       if (this.xsiTypeTypeNames.contains(tagName)) {

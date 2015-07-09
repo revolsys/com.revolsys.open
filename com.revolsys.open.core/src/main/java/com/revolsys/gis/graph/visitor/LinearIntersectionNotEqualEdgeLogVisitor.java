@@ -23,8 +23,9 @@ import com.revolsys.visitor.AbstractVisitor;
 
 public class LinearIntersectionNotEqualEdgeLogVisitor extends AbstractVisitor<Edge<Record>>
   implements ObjectProcessor<RecordGraph> {
-  private static final String PROCESSED = LinearIntersectionNotEqualLineEdgeCleanupVisitor.class.getName()
-    + ".PROCESSED";
+  private static final String PROCESSED = LinearIntersectionNotEqualLineEdgeCleanupVisitor.class
+    .getName() + ".PROCESSED";
+
   static {
     GeometryEqualsExact3d.addExclude(PROCESSED);
   }
@@ -59,8 +60,8 @@ public class LinearIntersectionNotEqualEdgeLogVisitor extends AbstractVisitor<Ed
       final RecordGeometryFilter<LineString> linearIntersectionFilter = new RecordGeometryFilter<LineString>(
         new LinearIntersectionFilter(line));
 
-      attributeAndGeometryFilter.addFilter(new EdgeObjectFilter<Record>(new AndFilter<Record>(
-        notEqualLineFilter, linearIntersectionFilter)));
+      attributeAndGeometryFilter.addFilter(new EdgeObjectFilter<Record>(
+        new AndFilter<Record>(notEqualLineFilter, linearIntersectionFilter)));
 
       final List<Edge<Record>> intersectingEdges = graph.getEdges(attributeAndGeometryFilter, line);
 

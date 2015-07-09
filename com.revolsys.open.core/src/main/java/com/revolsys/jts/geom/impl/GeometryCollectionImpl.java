@@ -85,7 +85,8 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection {
    *            geometry. Elements may be empty <code>Geometry</code>s,
    *            but not <code>null</code>s.
    */
-  public GeometryCollectionImpl(final GeometryFactory geometryFactory, final Geometry[] geometries) {
+  public GeometryCollectionImpl(final GeometryFactory geometryFactory,
+    final Geometry[] geometries) {
     this.geometryFactory = geometryFactory;
     if (geometries == null || geometries.length == 0) {
       this.geometries = null;

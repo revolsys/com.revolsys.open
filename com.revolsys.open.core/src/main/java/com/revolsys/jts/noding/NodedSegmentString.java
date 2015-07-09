@@ -94,8 +94,8 @@ public class NodedSegmentString implements NodableSegmentString {
    * of the SegmentString is normalized
    * to use the higher of the two possible segmentIndexes
    */
-  public void addIntersection(final LineIntersector li, final int segmentIndex,
-    final int geomIndex, final int intIndex) {
+  public void addIntersection(final LineIntersector li, final int segmentIndex, final int geomIndex,
+    final int intIndex) {
     final Point point = new PointDouble(li.getIntersection(intIndex));
     addIntersection(point, segmentIndex);
   }
@@ -144,7 +144,8 @@ public class NodedSegmentString implements NodableSegmentString {
    * Adds EdgeIntersections for one or both
    * intersections found for a segment of an edge to the edge intersection list.
    */
-  public void addIntersections(final LineIntersector li, final int segmentIndex, final int geomIndex) {
+  public void addIntersections(final LineIntersector li, final int segmentIndex,
+    final int geomIndex) {
     for (int i = 0; i < li.getIntersectionNum(); i++) {
       addIntersection(li, segmentIndex, geomIndex, i);
     }

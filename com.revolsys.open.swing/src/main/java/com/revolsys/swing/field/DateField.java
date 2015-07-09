@@ -92,7 +92,7 @@ public class DateField extends JXDatePicker implements Field, PropertyChangeList
   @Override
   public void setFieldBackgroundColor(Color color) {
     if (color == null) {
-      color = TextField.DEFAULT_BACKGROUND;
+      color = Field.DEFAULT_BACKGROUND;
     }
     final JFormattedTextField editor = getEditor();
     editor.setBackground(color);
@@ -101,7 +101,7 @@ public class DateField extends JXDatePicker implements Field, PropertyChangeList
   @Override
   public void setFieldForegroundColor(Color color) {
     if (color == null) {
-      color = TextField.DEFAULT_BACKGROUND;
+      color = Field.DEFAULT_BACKGROUND;
     }
     final JFormattedTextField editor = getEditor();
     editor.setForeground(color);
@@ -131,9 +131,9 @@ public class DateField extends JXDatePicker implements Field, PropertyChangeList
   @Override
   public void setFieldValid() {
     final JFormattedTextField editor = getEditor();
-    editor.setForeground(TextField.DEFAULT_FOREGROUND);
-    editor.setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
-    editor.setBackground(TextField.DEFAULT_BACKGROUND);
+    editor.setForeground(Field.DEFAULT_FOREGROUND);
+    editor.setSelectedTextColor(Field.DEFAULT_SELECTED_FOREGROUND);
+    editor.setBackground(Field.DEFAULT_BACKGROUND);
     this.errorMessage = null;
     setFieldToolTip(this.originalToolTip);
   }
