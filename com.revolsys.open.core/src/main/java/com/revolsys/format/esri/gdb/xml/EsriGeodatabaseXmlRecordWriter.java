@@ -77,7 +77,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
   @Override
   public void write(final Record object) {
     if (!this.opened) {
-      writeHeader(object.getGeometryValue());
+      writeHeader(object.getGeometry());
       writeWorkspaceDataHeader();
     }
     this.out.startTag(RECORD);

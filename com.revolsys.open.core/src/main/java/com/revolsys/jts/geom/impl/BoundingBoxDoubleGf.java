@@ -755,7 +755,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   @Override
   public BoundingBox expandToInclude(final Record object) {
     if (object != null) {
-      final Geometry geometry = object.getGeometryValue();
+      final Geometry geometry = object.getGeometry();
       return expandToInclude(geometry);
     }
     return this;

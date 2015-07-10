@@ -55,7 +55,7 @@ public class GraphProcessor extends BaseInOutProcess<Record, Record> {
 
   @Override
   protected void process(final Channel<Record> in, final Channel<Record> out, final Record object) {
-    final Geometry geometry = object.getGeometryValue();
+    final Geometry geometry = object.getGeometry();
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
       this.graph.addEdge(object, line);

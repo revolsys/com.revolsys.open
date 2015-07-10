@@ -59,8 +59,8 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
             return idCompare;
           }
         }
-        final Geometry geometry1 = getGeometryValue();
-        final Geometry geometry2 = other.getGeometryValue();
+        final Geometry geometry1 = getGeometry();
+        final Geometry geometry2 = other.getGeometry();
         if (geometry1 != null && geometry2 != null) {
           final int geometryComparison = geometry1.compareTo(geometry2);
           if (geometryComparison != 0) {
@@ -118,6 +118,15 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
     }
   }
 
+  default <E extends Enum<E>> E getEnum(final Class<E> enumType, final CharSequence fieldName) {
+    final String value = getString(fieldName);
+    if (Property.hasValue(value)) {
+      return Enum.valueOf(enumType, value);
+    } else {
+      return null;
+    }
+  }
+
   /**
    * Get the factory which created the instance.
    *
@@ -159,7 +168,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
    */
 
   @SuppressWarnings("unchecked")
-  default <T extends Geometry> T getGeometryValue() {
+  default <T extends Geometry> T getGeometry() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition == null) {
       return null;
@@ -658,7 +667,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
       final Object value = JavaBeanUtil.clone(object.getValue(name));
       setValue(name, value);
     }
-    setGeometryValue(JavaBeanUtil.clone(object.getGeometryValue()));
+    setGeometryValue(JavaBeanUtil.clone(object.getGeometry()));
   }
 
   default void setValuesByPath(final Map<? extends String, ? extends Object> values) {

@@ -56,7 +56,7 @@ public class ExcludeSavedObjectsInOutProcess extends BaseInOutProcess<Record, Re
       this.statistics.add("Excluded as already loaded from previous area", object);
     } else {
       final Set<String> ids = Collections.singleton(id);
-      final Geometry geometry = object.getGeometryValue();
+      final Geometry geometry = object.getGeometry();
       GeometryProperties.setGeometryProperty(geometry, "ORIGINAL_IDS", ids);
       out.write(object);
     }

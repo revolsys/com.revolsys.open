@@ -138,6 +138,9 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
         this.geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
         if (this.geometryFactory == null) {
           this.geometryFactory = EsriCoordinateSystems.getGeometryFactory(this.resource);
+          if (this.geometryFactory != null) {
+            this.geometryFactory = this.geometryFactory.convertAxisCount(axisCount);
+          }
         }
         if (this.geometryFactory == null) {
           this.geometryFactory = GeometryFactory.floating(0, axisCount);

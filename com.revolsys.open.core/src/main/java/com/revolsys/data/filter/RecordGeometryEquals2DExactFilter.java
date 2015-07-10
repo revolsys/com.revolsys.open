@@ -33,7 +33,7 @@ public class RecordGeometryEquals2DExactFilter implements Filter<Record> {
 
   @Override
   public boolean accept(final Record object) {
-    final Geometry matchGeometry = object.getGeometryValue();
+    final Geometry matchGeometry = object.getGeometry();
     if (this.geometry.equals(2, matchGeometry)) {
       return true;
     } else {

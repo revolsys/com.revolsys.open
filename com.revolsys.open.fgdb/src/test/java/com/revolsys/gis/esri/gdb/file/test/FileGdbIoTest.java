@@ -76,7 +76,7 @@ public class FileGdbIoTest {
         Reader<Record> reader = recordStore.query(typePath)) {
         final List<Record> objects = reader.read();
         Assert.assertEquals("Geometry Count", 1, objects.size());
-        final Geometry actual = objects.get(0).getGeometryValue();
+        final Geometry actual = objects.get(0).getGeometry();
         Assert.assertEquals("Empty", geometry.isEmpty(), actual.isEmpty());
         if (!geometry.isEmpty()) {
           final int axisCount = geometry.getAxisCount();

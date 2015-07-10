@@ -52,7 +52,7 @@ public class GeometryTest {
       final Identifier identifier = record.getIdentifier();
       final Record savedRecord = this.recordStore.load(typePath, identifier);
       Assert.assertNotNull("Saved record", savedRecord);
-      final Geometry savedGeometry = savedRecord.getGeometryValue();
+      final Geometry savedGeometry = savedRecord.getGeometry();
       final GeometryFactory tableGeometryFactory = recordDefinition.getGeometryFactory();
       final Geometry expectedGeometry = geometry.convert(tableGeometryFactory);
       com.revolsys.jts.util.Assert.equals("Saved geometry",

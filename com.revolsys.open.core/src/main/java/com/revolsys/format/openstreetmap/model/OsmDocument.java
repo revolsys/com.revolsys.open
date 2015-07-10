@@ -95,7 +95,7 @@ public class OsmDocument implements OsmConstants {
   public void addNode(final OsmNode node) {
     if (node != null) {
       final long id = node.getId();
-      final Point point = node.getGeometryValue();
+      final Point point = node.getGeometry();
       this.nodePointMap.put(id, point);
 
       if (node.isTagged()) {

@@ -66,7 +66,7 @@ public class WikipediaBoundingBoxLayerWorker extends AbstractSwingWorker<List<La
       final String title = record.getValue("title");
       final String wikipediaUrl = record.getValue("wikipediaUrl");
       final String thumbnailImage = record.getValue("thumbnailImg");
-      final Point point = record.getGeometryValue();
+      final Point point = record.getGeometry();
       String text;
       if (thumbnailImage != null) {
         text = "<html><b>" + title + "</b><br /><img src=\"" + thumbnailImage

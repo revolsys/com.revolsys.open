@@ -170,7 +170,7 @@ public class RecordReaderHttpMessageConverter extends AbstractHttpMessageConvert
           final Iterator<Record> iterator = reader.iterator();
           if (iterator.hasNext()) {
             Record record = iterator.next();
-            final Geometry geometry = record.getGeometryValue();
+            final Geometry geometry = record.getGeometry();
             if (geometry != null) {
               final GeometryFactory geometryFactory = geometry.getGeometryFactory();
               writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);

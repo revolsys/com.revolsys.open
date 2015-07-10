@@ -18,13 +18,13 @@ public class ReverseRecordAttributesUndo extends AbstractUndoableEdit {
 
   public ReverseRecordAttributesUndo(final LayerRecord record) {
     this.record = record;
-    this.oldValue = record.getGeometryValue();
+    this.oldValue = record.getGeometry();
   }
 
   @Override
   public boolean canRedo() {
     if (super.canRedo()) {
-      final Geometry value = this.record.getGeometryValue();
+      final Geometry value = this.record.getGeometry();
       if (EqualsRegistry.equal(value, this.oldValue)) {
         return true;
       }
@@ -35,7 +35,7 @@ public class ReverseRecordAttributesUndo extends AbstractUndoableEdit {
   @Override
   public boolean canUndo() {
     if (super.canUndo()) {
-      final Geometry value = this.record.getGeometryValue();
+      final Geometry value = this.record.getGeometry();
       if (EqualsRegistry.equal(value, this.oldValue)) {
         return true;
       }

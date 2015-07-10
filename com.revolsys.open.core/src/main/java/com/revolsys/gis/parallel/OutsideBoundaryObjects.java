@@ -27,7 +27,7 @@ public class OutsideBoundaryObjects {
   }
 
   public boolean boundaryContains(final Record object) {
-    final Geometry geometry = object.getGeometryValue();
+    final Geometry geometry = object.getGeometry();
     return boundaryContains(geometry);
   }
 

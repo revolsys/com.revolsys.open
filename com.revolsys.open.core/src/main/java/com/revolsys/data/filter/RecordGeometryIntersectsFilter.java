@@ -45,7 +45,7 @@ public class RecordGeometryIntersectsFilter implements Filter<Record> {
   @Override
   public boolean accept(final Record object) {
     try {
-      final Geometry matchGeometry = object.getGeometryValue();
+      final Geometry matchGeometry = object.getGeometry();
       final Geometry convertedGeometry = matchGeometry.convert(this.geometryFactory);
       try {
         if (convertedGeometry != null && this.geometry != null

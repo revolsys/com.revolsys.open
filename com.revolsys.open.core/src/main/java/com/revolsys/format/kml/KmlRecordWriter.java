@@ -135,7 +135,7 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
       this.writer.cdata(description);
       this.writer.endTag(DESCRIPTION);
     }
-    writeLookAt(object.getGeometryValue());
+    writeLookAt(object.getGeometry());
     if (Property.hasValue(this.styleUrl)) {
       this.writer.element(STYLE_URL, this.styleUrl);
     } else if (Property.hasValue(this.defaultStyleUrl)) {

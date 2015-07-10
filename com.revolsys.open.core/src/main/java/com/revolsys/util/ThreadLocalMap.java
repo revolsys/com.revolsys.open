@@ -83,6 +83,16 @@ public class ThreadLocalMap<K, V> implements Map<K, V> {
   }
 
   @Override
+  public String toString() {
+    final Map<K, V> localMap = this.map.get();
+    if (localMap == null) {
+      return "{}";
+    } else {
+      return localMap.toString();
+    }
+  }
+
+  @Override
   public Collection<V> values() {
     final Map<K, V> localMap = getMap();
     return localMap.values();

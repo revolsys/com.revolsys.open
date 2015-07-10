@@ -121,7 +121,7 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T extends Geometry> T getGeometryValue() {
+  public <T extends Geometry> T getGeometry() {
     return (T)this.geometry;
   }
 

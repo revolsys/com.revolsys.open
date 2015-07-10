@@ -26,7 +26,7 @@ public class IndexItemVisitor implements ItemVisitor {
   @Override
   public void visitItem(final Object item) {
     final Record object = (Record)item;
-    final BoundingBox envelope = object.getGeometryValue().getBoundingBox();
+    final BoundingBox envelope = object.getGeometry().getBoundingBox();
     if (envelope.intersects(this.envelope)) {
       this.visitor.visit(object);
     }

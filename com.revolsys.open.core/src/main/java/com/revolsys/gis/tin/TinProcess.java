@@ -142,7 +142,7 @@ public class TinProcess extends BaseInOutProcess<Record, Record> {
     if (this.tin == null) {
       loadTin();
     }
-    final LineString geometry = object.getGeometryValue();
+    final LineString geometry = object.getGeometry();
     if (geometry instanceof LineString) {
       final LineString line = geometry;
       final com.revolsys.jts.geom.BoundingBox envelope = line.getBoundingBox();
@@ -168,7 +168,7 @@ public class TinProcess extends BaseInOutProcess<Record, Record> {
   private void readTinFeatures(final TriangulatedIrregularNetwork tin, final List<LineString> lines,
     final Iterable<Record> iterable) {
     for (final Record object : iterable) {
-      final Geometry geometry = object.getGeometryValue();
+      final Geometry geometry = object.getGeometry();
       if (geometry instanceof Point) {
         final Point point = (Point)geometry;
         tin.insertNode(point);

@@ -48,7 +48,7 @@ public class RecordGeometryBoundingBoxIntersectsFilter implements Filter<Record>
   @Override
   public boolean accept(final Record object) {
     try {
-      final Geometry geometry = object.getGeometryValue();
+      final Geometry geometry = object.getGeometry();
       if (geometry != null && geometry.intersects(this.boundingBox)) {
         return true;
       } else {

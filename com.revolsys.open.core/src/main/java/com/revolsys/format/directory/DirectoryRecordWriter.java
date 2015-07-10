@@ -132,7 +132,7 @@ public class DirectoryRecordWriter extends AbstractRecordWriter {
       } else {
         final Map<String, Object> properties = getProperties();
         Property.set(writer, properties);
-        final Geometry geometry = record.getGeometryValue();
+        final Geometry geometry = record.getGeometry();
         if (geometry != null) {
           final GeometryFactory geometryFactory = geometry.getGeometryFactory();
           setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);

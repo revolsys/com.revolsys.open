@@ -236,7 +236,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
   public void setGeometry(final Geometry geometry) {
     final RecordLayerForm form = this.geometryCoordinatesPanel.getForm();
     final LayerRecord record = form.getRecord();
-    final Geometry oldGeometry = record.getGeometryValue();
+    final Geometry oldGeometry = record.getGeometry();
 
     if (oldGeometry != geometry) {
       final SetObjectProperty setObjectProperty = new SetObjectProperty(record,

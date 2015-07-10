@@ -25,8 +25,8 @@ public class RecordGeometryAreaComparitor implements Comparator<Record> {
       return 0;
     }
     int compare = -1;
-    final Polygon geometry1 = object1.getGeometryValue();
-    final Polygon geometry2 = object2.getGeometryValue();
+    final Polygon geometry1 = object1.getGeometry();
+    final Polygon geometry2 = object2.getGeometry();
     final double area1 = geometry1.getArea();
     final double area2 = geometry2.getArea();
     compare = Double.compare(area1, area2);

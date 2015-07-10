@@ -34,8 +34,8 @@ public class RecordEquals2DFilter implements Filter<Record> {
 
   @Override
   public boolean accept(final Record object) {
-    final Geometry serachGeometry = this.searchObject.getGeometryValue();
-    final Geometry geometry = object.getGeometryValue();
+    final Geometry serachGeometry = this.searchObject.getGeometry();
+    final Geometry geometry = object.getGeometry();
 
     if (Geometry2DEquals.INSTANCE.equals(serachGeometry, geometry, this.equalExclude)) {
       if (EqualsInstance.INSTANCE.equals(this.searchObject, object, this.equalExclude)) {

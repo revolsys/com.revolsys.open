@@ -128,7 +128,7 @@ public class ValidateGeometryRange extends BaseInOutProcess<Record, Record> {
   @Override
   protected void process(final Channel<Record> in, final Channel<Record> out, final Record object) {
     // TODO Auto-generated method stub
-    final Geometry geometry = object.getGeometryValue();
+    final Geometry geometry = object.getGeometry();
     isValid(object.getRecordDefinition().getPath().toString(), geometry);
     out.write(object);
   }

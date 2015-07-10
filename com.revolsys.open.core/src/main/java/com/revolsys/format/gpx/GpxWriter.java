@@ -90,7 +90,7 @@ public class GpxWriter extends AbstractRecordWriter {
   @Override
   public void write(final Record object) {
     try {
-      final Geometry geometry = object.getGeometryValue();
+      final Geometry geometry = object.getGeometry();
       if (geometry instanceof Point) {
         writeWaypoint(object);
       } else if (geometry instanceof LineString) {
@@ -126,7 +126,7 @@ public class GpxWriter extends AbstractRecordWriter {
 
   private void writeTrack(final Record object) throws IOException {
     this.out.startTag(GpxConstants.TRACK_ELEMENT);
-    LineString line = object.getGeometryValue();
+    LineString line = object.getGeometry();
     line = line.convert(GpxConstants.GEOMETRY_FACTORY);
     final LineString coordinatesList = line;
     writeAttributes(object);
@@ -150,7 +150,7 @@ public class GpxWriter extends AbstractRecordWriter {
 
   private void writeWaypoint(final Record wayPoint) throws IOException {
     this.out.startTag(GpxConstants.WAYPOINT_ELEMENT);
-    final Point point = wayPoint.getGeometryValue();
+    final Point point = wayPoint.getGeometry();
     final Point geoCoordinate = point.convert(GpxConstants.GEOMETRY_FACTORY);
     this.out.attribute(GpxConstants.LON_ATTRIBUTE, geoCoordinate.getX());
     this.out.attribute(GpxConstants.LAT_ATTRIBUTE, geoCoordinate.getY());

@@ -494,7 +494,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void addToIndex(final LayerRecord record) {
     if (record != null) {
-      final Geometry geometry = record.getGeometryValue();
+      final Geometry geometry = record.getGeometry();
       if (geometry != null && !geometry.isEmpty()) {
         final RecordQuadTree index = getIndex();
         addRecordToCache(this.cacheIdIndex, record);
@@ -590,7 +590,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void copyRecordGeometry(final LayerRecord record) {
-    final Geometry geometry = record.getGeometryValue();
+    final Geometry geometry = record.getGeometry();
     if (geometry != null) {
       final StringTransferable transferable = new StringTransferable(DataFlavor.stringFlavor,
         geometry.toString());
@@ -1179,7 +1179,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final GeometryFactory geometryFactory = getGeometryFactory();
     BoundingBox boundingBox = geometryFactory.boundingBox();
     for (final Record record : getHighlightedRecords()) {
-      final Geometry geometry = record.getGeometryValue();
+      final Geometry geometry = record.getGeometry();
       boundingBox = boundingBox.expandToInclude(geometry);
     }
     return boundingBox;
@@ -1221,7 +1221,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         if (record == null || record.isDeleted()) {
           iterator.remove();
         } else {
-          Geometry geometry = record.getGeometryValue();
+          Geometry geometry = record.getGeometry();
           if (geometry == null || geometry.isEmpty()) {
             iterator.remove();
           } else {
@@ -1265,8 +1265,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         compare = CompareUtil.compare(id1, id2);
       }
       if (compare == 0) {
-        final Geometry geometry1 = record1.getGeometryValue();
-        final Geometry geometry2 = record2.getGeometryValue();
+        final Geometry geometry1 = record1.getGeometry();
+        final Geometry geometry2 = record2.getGeometry();
         final double length1 = geometry1.getLength();
         final double length2 = geometry2.getLength();
         if (length1 > length2) {
@@ -1342,7 +1342,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
               for (final Record sourceRecord : reader) {
                 if (geometry == null) {
-                  final Geometry sourceGeometry = sourceRecord.getGeometryValue();
+                  final Geometry sourceGeometry = sourceRecord.getGeometry();
                   if (sourceGeometry == null) {
                     if (alert) {
                       JOptionPane.showMessageDialog(parentComponent,
@@ -1441,7 +1441,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public BoundingBox getSelectedBoundingBox() {
     BoundingBox boundingBox = super.getSelectedBoundingBox();
     for (final Record record : getSelectedRecords()) {
-      final Geometry geometry = record.getGeometryValue();
+      final Geometry geometry = record.getGeometry();
       boundingBox = boundingBox.expandToInclude(geometry);
     }
     return boundingBox;
@@ -1859,7 +1859,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         for (final Record sourceRecord : reader) {
           final Map<String, Object> newValues = new LinkedHashMap<>(sourceRecord);
 
-          Geometry sourceGeometry = sourceRecord.getGeometryValue();
+          Geometry sourceGeometry = sourceRecord.getGeometry();
           for (final Iterator<String> iterator = newValues.keySet().iterator(); iterator
             .hasNext();) {
             final String fieldName = iterator.next();
@@ -2093,7 +2093,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void removeFromIndex(final LayerRecord record) {
-    final Geometry geometry = record.getGeometryValue();
+    final Geometry geometry = record.getGeometry();
     if (geometry != null && !geometry.isEmpty()) {
       final BoundingBox boundingBox = geometry.getBoundingBox();
       removeFromIndex(boundingBox, record);
@@ -2733,7 +2733,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public List<LayerRecord> splitRecord(final LayerRecord record, final Point point) {
-    final LineString line = record.getGeometryValue();
+    final LineString line = record.getGeometry();
     final List<LineString> lines = line.split(point);
     if (lines.size() == 2) {
       final LineString line1 = lines.get(0);
@@ -2848,7 +2848,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void zoomToRecord(final Record record) {
-    final Geometry geometry = record.getGeometryValue();
+    final Geometry geometry = record.getGeometry();
     zoomToGeometry(geometry);
   }
 

@@ -1217,6 +1217,10 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return makePrecise(2, value);
   }
 
+  public MultiLineStringImpl multiLineString() {
+    return new MultiLineStringImpl(this);
+  }
+
   public MultiLineString multiLineString(final Collection<?> lines) {
     final LineString[] lineArray = getLineStringArray(lines);
     return multiLineString(lineArray);
@@ -1244,6 +1248,20 @@ public class GeometryFactory implements Serializable, MapSerializer {
     } else {
       throw new IllegalArgumentException("Cannot convert class " + geometry.getClass() + " to "
         + MultiLineString.class + "\n" + geometry);
+    }
+  }
+
+  public MultiLineString multiLineString(final int axisCount, final double[]... linesCoordinates) {
+    if (linesCoordinates == null) {
+      return multiLineString();
+    } else {
+      final int lineCount = linesCoordinates.length;
+      final LineString[] lines = new LineString[lineCount];
+      for (int i = 0; i < lineCount; i++) {
+        final double[] coordinates = linesCoordinates[i];
+        lines[i] = lineString(axisCount, coordinates);
+      }
+      return new MultiLineStringImpl(this, lines);
     }
   }
 

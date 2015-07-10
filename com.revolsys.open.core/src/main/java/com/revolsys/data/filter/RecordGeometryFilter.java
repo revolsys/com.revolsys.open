@@ -37,7 +37,7 @@ public class RecordGeometryFilter<G extends Geometry> implements Filter<Record> 
   @Override
   @SuppressWarnings("unchecked")
   public boolean accept(final Record object) {
-    final G geometry = (G)object.getGeometryValue();
+    final G geometry = (G)object.getGeometry();
     if (this.filter.accept(geometry)) {
       return true;
     } else {

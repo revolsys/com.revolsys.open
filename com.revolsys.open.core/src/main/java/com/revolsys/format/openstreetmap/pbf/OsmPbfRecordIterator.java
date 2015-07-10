@@ -98,7 +98,7 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record>implements Rec
 
   protected void addNode(final List<Record> currentRecords, final OsmNode node) {
     final long id = node.getId();
-    final Point point = (Point)node.getGeometryValue();
+    final Point point = (Point)node.getGeometry();
     this.nodePoints.put(id, point);
     if (node.hasTags()) {
       currentRecords.add(node);
@@ -703,7 +703,7 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record>implements Rec
       if (way.hasTags()) {
         this.currentRecords.add(way);
       }
-      geometry = way.getGeometryValue();
+      geometry = way.getGeometry();
       this.wayGeometries.put(wayId, geometry);
     } else {
       this.ways.add(way);

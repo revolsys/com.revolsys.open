@@ -513,7 +513,7 @@ public class RecordLayerTablePanel extends TablePanel
   public void zoomToRecord() {
     final Record object = getEventRowObject();
     final Project project = this.layer.getProject();
-    final Geometry geometry = object.getGeometryValue();
+    final Geometry geometry = object.getGeometry();
     if (geometry != null) {
       final GeometryFactory geometryFactory = project.getGeometryFactory();
       final BoundingBox boundingBox = geometry.getBoundingBox()

@@ -31,7 +31,7 @@ public class RecordGeometryIterator extends DelegatingObjectWithProperties
   public Geometry next() {
     if (this.iterator.hasNext()) {
       final Record record = this.iterator.next();
-      return record.getGeometryValue();
+      return record.getGeometry();
     } else {
       throw new NoSuchElementException();
     }

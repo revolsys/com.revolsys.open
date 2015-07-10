@@ -49,25 +49,25 @@ public class MoepBinaryIterator extends BaseObjectWithProperties implements Iter
   }
 
   public static void setGeometryProperties(final Record object) {
-    final Geometry geometry = object.getGeometryValue();
+    final Geometry geometry = object.getGeometry();
     final Number angle = object.getValue(MoepConstants.ANGLE);
     if (angle != null) {
       final double orientation = getAngle(angle.doubleValue());
       GeometryProperties.setGeometryProperty(geometry, "orientation", orientation);
     }
-    GeometryProperties.setGeometryProperty(object.getGeometryValue(), MoepConstants.TEXT_GROUP,
+    GeometryProperties.setGeometryProperty(object.getGeometry(), MoepConstants.TEXT_GROUP,
       object.getValue(MoepConstants.TEXT_GROUP));
-    GeometryProperties.setGeometryProperty(object.getGeometryValue(), MoepConstants.TEXT_INDEX,
+    GeometryProperties.setGeometryProperty(object.getGeometry(), MoepConstants.TEXT_INDEX,
       object.getValue(MoepConstants.TEXT_INDEX));
-    GeometryProperties.setGeometryProperty(object.getGeometryValue(), "text",
+    GeometryProperties.setGeometryProperty(object.getGeometry(), "text",
       object.getValue(MoepConstants.TEXT));
-    GeometryProperties.setGeometryProperty(object.getGeometryValue(), "textType",
+    GeometryProperties.setGeometryProperty(object.getGeometry(), "textType",
       SaifConstants.TEXT_LINE);
-    GeometryProperties.setGeometryProperty(object.getGeometryValue(), "fontName",
+    GeometryProperties.setGeometryProperty(object.getGeometry(), "fontName",
       object.getValue(MoepConstants.FONT_NAME));
-    GeometryProperties.setGeometryProperty(object.getGeometryValue(), "characterHeight",
+    GeometryProperties.setGeometryProperty(object.getGeometry(), "characterHeight",
       object.getValue(MoepConstants.FONT_SIZE));
-    GeometryProperties.setGeometryProperty(object.getGeometryValue(), "other",
+    GeometryProperties.setGeometryProperty(object.getGeometry(), "other",
       object.getValue(MoepConstants.FONT_WEIGHT));
   }
 

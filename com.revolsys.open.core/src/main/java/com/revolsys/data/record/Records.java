@@ -125,7 +125,7 @@ public final class Records {
    */
   @SuppressWarnings("unchecked")
   public static <T extends Record> T copy(final T record, final Geometry geometry) {
-    final Geometry oldGeometry = record.getGeometryValue();
+    final Geometry oldGeometry = record.getGeometry();
     final T newObject = (T)record.clone();
     newObject.setGeometryValue(geometry);
     GeometryProperties.copyUserData(oldGeometry, geometry);
@@ -141,8 +141,8 @@ public final class Records {
     if (record1 == null || record2 == null) {
       return Double.MAX_VALUE;
     } else {
-      final Geometry geometry1 = record1.getGeometryValue();
-      final Geometry geometry2 = record2.getGeometryValue();
+      final Geometry geometry1 = record1.getGeometry();
+      final Geometry geometry2 = record2.getGeometry();
       if (geometry1 == null || geometry2 == null) {
         return Double.MAX_VALUE;
       } else {
@@ -155,7 +155,7 @@ public final class Records {
     final Geometry geometry, final double maxDistance) {
     final List<D> results = new ArrayList<D>();
     for (final D record : records) {
-      final Geometry recordGeometry = record.getGeometryValue();
+      final Geometry recordGeometry = record.getGeometry();
       final double distance = recordGeometry.distance(geometry);
       if (distance < maxDistance) {
         results.add(record);
@@ -285,7 +285,7 @@ public final class Records {
     if (record == null) {
       return null;
     } else {
-      return record.getGeometryValue();
+      return record.getGeometry();
     }
   }
 
@@ -518,7 +518,7 @@ public final class Records {
       return geometry;
     } else if (object instanceof Record) {
       final Record record = (Record)object;
-      return record.getGeometryValue();
+      return record.getGeometry();
     } else if (object instanceof Collection) {
       final Collection<?> objects = (Collection<?>)object;
       return unionGeometry(objects);

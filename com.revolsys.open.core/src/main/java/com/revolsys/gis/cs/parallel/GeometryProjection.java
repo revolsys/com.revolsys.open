@@ -15,7 +15,7 @@ public class GeometryProjection extends BaseInOutProcess<Record, Record> {
 
   @Override
   protected void process(final Channel<Record> in, final Channel<Record> out, final Record object) {
-    final Geometry geometry = object.getGeometryValue();
+    final Geometry geometry = object.getGeometry();
 
     if (geometry != null) {
       final Geometry projectedGeometry = geometry.copy(this.geometryFactory);

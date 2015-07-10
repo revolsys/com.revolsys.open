@@ -586,7 +586,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       try {
         final boolean exists = doInitialize();
         setExists(exists);
-        if (Property.getBoolean(this, "showTableView")) {
+        if (exists && Property.getBoolean(this, "showTableView")) {
           Invoke.later(() -> showTableView());
         }
       } catch (final Throwable e) {

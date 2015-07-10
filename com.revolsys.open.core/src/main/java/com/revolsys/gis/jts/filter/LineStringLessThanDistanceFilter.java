@@ -30,7 +30,7 @@ import com.revolsys.jts.geom.LineString;
 public class LineStringLessThanDistanceFilter implements Filter<LineString> {
 
   public static Filter<Record> getFilter(final Record object, final double maxDistance) {
-    final LineString line = object.getGeometryValue();
+    final LineString line = object.getGeometry();
     final LineStringLessThanDistanceFilter lineFilter = new LineStringLessThanDistanceFilter(line,
       maxDistance);
     return new RecordGeometryFilter<LineString>(lineFilter);

@@ -93,7 +93,7 @@ public class PointRecordMap {
   }
 
   private PointDouble getKey(final Record object) {
-    final Point point = object.getGeometryValue();
+    final Point point = object.getGeometry();
     return getKey(point);
   }
 
@@ -127,7 +127,7 @@ public class PointRecordMap {
   }
 
   public List<Record> getRecords(final Record record) {
-    final Point point = record.getGeometryValue();
+    final Point point = record.getGeometry();
     final List<Record> objects = getRecords(point);
     return objects;
   }

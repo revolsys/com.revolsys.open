@@ -293,7 +293,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     final BoundingBox boundingBox) {
     if (record.isGeometryEditable()) {
       final AbstractRecordLayer layer = record.getLayer();
-      final Geometry geometry = record.getGeometryValue();
+      final Geometry geometry = record.getGeometry();
       return findCloseLocation(layer, record, geometry, boundingBox);
 
     }

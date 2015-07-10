@@ -64,7 +64,7 @@ public class GeoNamesBoundingBoxLayerWorker extends AbstractSwingWorker<List<Lay
     final List<LayerRecord> results = (List)this.geoNamesService.getNames(boundingBox);
     for (final Record record : results) {
       final String name = record.getValue("name");
-      final Point point = record.getGeometryValue();
+      final Point point = record.getGeometry();
       final String text = "<html><b>" + name + "</b><br /></html>";
 
       // if (viewport instanceof ComponentViewport2D) {

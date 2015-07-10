@@ -57,7 +57,7 @@ public class OpenStreetMapApiLayer extends AbstractRecordLayer {
     for (final BoundingBox tileBoundingBox : boundingBoxes) {
       final OsmDocument document = getTile(tileBoundingBox);
       for (final OsmElement record : document.getRecords()) {
-        final Geometry geometry = record.getGeometryValue();
+        final Geometry geometry = record.getGeometry();
         if (geometry != null && !geometry.isEmpty()) {
           if (boundingBox.intersects(geometry.getBoundingBox())) {
             final Identifier identifier = record.getIdentifier();

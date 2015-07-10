@@ -62,7 +62,7 @@ public class CompareProcessor extends AbstractMergeProcess {
 
   @Override
   protected void addOtherObject(final Record object) {
-    final Geometry geometry = object.getGeometryValue();
+    final Geometry geometry = object.getGeometry();
     if (geometry instanceof Point) {
       boolean add = true;
       if (this.cleanDuplicatePoints) {
@@ -84,7 +84,7 @@ public class CompareProcessor extends AbstractMergeProcess {
 
   @Override
   protected void addSourceObject(final Record object) {
-    final Geometry geometry = object.getGeometryValue();
+    final Geometry geometry = object.getGeometry();
     if (geometry instanceof Point) {
       boolean add = true;
       if (this.cleanDuplicatePoints) {
@@ -166,7 +166,7 @@ public class CompareProcessor extends AbstractMergeProcess {
   }
 
   private void processExactLineMatch(final Record sourceObject) {
-    final LineString sourceLine = sourceObject.getGeometryValue();
+    final LineString sourceLine = sourceObject.getGeometry();
     final LineEqualIgnoreDirectionFilter lineEqualFilter = new LineEqualIgnoreDirectionFilter(
       sourceLine, 3);
     final Filter<Record> geometryFilter = new RecordGeometryFilter<LineString>(lineEqualFilter);
@@ -191,10 +191,10 @@ public class CompareProcessor extends AbstractMergeProcess {
     final Filter<Record> equalFilter = this.equalFilterFactory.create(sourceObject);
     final Record otherObject = this.otherPointMap.getFirstMatch(sourceObject, equalFilter);
     if (otherObject != null) {
-      final Point sourcePoint = sourceObject.getGeometryValue();
+      final Point sourcePoint = sourceObject.getGeometry();
       final double sourceZ = sourcePoint.getZ();
 
-      final Point otherPoint = otherObject.getGeometryValue();
+      final Point otherPoint = otherObject.getGeometry();
       final double otherZ = otherPoint.getZ();
 
       if (sourceZ == otherZ || Double.isNaN(sourceZ) && Double.isNaN(otherZ)) {
@@ -242,7 +242,7 @@ public class CompareProcessor extends AbstractMergeProcess {
   }
 
   private void processPartialMatch(final Record sourceObject) {
-    final Geometry sourceGeometry = sourceObject.getGeometryValue();
+    final Geometry sourceGeometry = sourceObject.getGeometry();
     if (sourceGeometry instanceof LineString) {
       final LineString sourceLine = (LineString)sourceGeometry;
 
@@ -254,7 +254,7 @@ public class CompareProcessor extends AbstractMergeProcess {
       if (!otherObjects.isEmpty()) {
         final LineMatchGraph<Record> graph = new LineMatchGraph<Record>(sourceObject, sourceLine);
         for (final Record otherObject : otherObjects) {
-          final LineString otherLine = otherObject.getGeometryValue();
+          final LineString otherLine = otherObject.getGeometry();
           graph.add(otherLine);
         }
         final MultiLineString nonMatchedLines = graph.getNonMatchedLines(0);
@@ -298,7 +298,7 @@ public class CompareProcessor extends AbstractMergeProcess {
   }
 
   private void removeOtherObject(final Record object) {
-    final Geometry geometry = object.getGeometryValue();
+    final Geometry geometry = object.getGeometry();
     if (geometry instanceof Point) {
       this.otherPointMap.remove(object);
     } else {

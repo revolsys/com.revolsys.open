@@ -221,7 +221,7 @@ public class EditGeometryOverlay extends AbstractOverlay
         if (recordLayer.isSelectable(scale)) {
           final List<LayerRecord> selectedRecords = recordLayer.getSelectedRecords();
           for (final LayerRecord selectedRecord : selectedRecords) {
-            final Geometry geometry = selectedRecord.getGeometryValue();
+            final Geometry geometry = selectedRecord.getGeometry();
             if (boundingBox.intersects(geometry)) {
               results.add(selectedRecord);
             }

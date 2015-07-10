@@ -51,7 +51,7 @@ public class RecordQuadTree extends QuadTree<Record> {
 
   public void insert(final Record record) {
     if (record != null) {
-      final Geometry geometry = record.getGeometryValue();
+      final Geometry geometry = record.getGeometry();
       if (geometry != null && !geometry.isEmpty()) {
         final BoundingBox boundingBox = geometry.getBoundingBox();
         insert(boundingBox, record);
@@ -70,7 +70,7 @@ public class RecordQuadTree extends QuadTree<Record> {
     final List<Record> results = super.query(boundingBox);
     for (final Iterator<Record> iterator = results.iterator(); iterator.hasNext();) {
       final Record object = iterator.next();
-      final Geometry geometry = object.getGeometryValue();
+      final Geometry geometry = object.getGeometry();
       if (geometry == null) {
         iterator.remove();
       } else {
@@ -104,7 +104,7 @@ public class RecordQuadTree extends QuadTree<Record> {
     if (object == null) {
       return Collections.emptyList();
     } else {
-      final Geometry geometry = object.getGeometryValue();
+      final Geometry geometry = object.getGeometry();
       return queryBoundingBox(geometry);
     }
   }
@@ -113,7 +113,7 @@ public class RecordQuadTree extends QuadTree<Record> {
     if (object == null) {
       return null;
     } else {
-      final Geometry geometry = object.getGeometryValue();
+      final Geometry geometry = object.getGeometry();
       return getFirstBoundingBox(geometry, filter);
     }
   }
@@ -174,7 +174,7 @@ public class RecordQuadTree extends QuadTree<Record> {
   }
 
   public List<Record> queryList(final Record object, final Filter<Record> filter) {
-    final Geometry geometry = object.getGeometryValue();
+    final Geometry geometry = object.getGeometry();
     return queryList(geometry, filter);
   }
 
@@ -185,7 +185,7 @@ public class RecordQuadTree extends QuadTree<Record> {
   }
 
   public boolean remove(final Record object) {
-    final Geometry geometry = object.getGeometryValue();
+    final Geometry geometry = object.getGeometry();
     if (geometry == null) {
       return false;
     } else {

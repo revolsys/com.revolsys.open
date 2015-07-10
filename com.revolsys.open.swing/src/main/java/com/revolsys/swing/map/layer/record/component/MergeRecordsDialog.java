@@ -164,7 +164,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
       } else {
         final RecordGraph graph = new RecordGraph();
         for (final LayerRecord originalRecord : originalRecords) {
-          Geometry geometry = originalRecord.getGeometryValue();
+          Geometry geometry = originalRecord.getGeometry();
           if (geometry != null && !geometry.isEmpty()) {
             geometry = this.layer.getGeometryFactory().geometry(LineString.class, geometry);
             if (geometry instanceof LineString) {

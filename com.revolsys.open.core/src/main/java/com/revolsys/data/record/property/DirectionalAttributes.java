@@ -245,8 +245,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     final boolean[] forwardsIndicators) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (fieldName.equals(recordDefinition.getGeometryFieldName())) {
-      final LineString line1 = record1.getGeometryValue();
-      final LineString line2 = record2.getGeometryValue();
+      final LineString line1 = record1.getGeometry();
+      final LineString line2 = record2.getGeometry();
       return !line1.equals(line2);
     }
     if (forwardsIndicators == null) {
@@ -381,8 +381,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
 
   protected boolean equals(final String fieldName, final Record record1, final Record record2,
     final Collection<String> equalExcludeAttributes) {
-    final LineString line1 = record1.getGeometryValue();
-    final LineString line2 = record2.getGeometryValue();
+    final LineString line1 = record1.getGeometry();
+    final LineString line2 = record2.getGeometry();
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (fieldName.equals(recordDefinition.getGeometryFieldName())) {
       return line1.equals(line2);
@@ -485,8 +485,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
 
   protected boolean[] getForwardsIndicators(final Point point, final Record record1,
     final Record record2) {
-    final LineString line1 = record1.getGeometryValue();
-    final LineString line2 = record2.getGeometryValue();
+    final LineString line1 = record1.getGeometry();
+    final LineString line2 = record2.getGeometry();
 
     final boolean[] forwards = new boolean[2];
     final int vertexCount1 = line1.getVertexCount();
@@ -518,8 +518,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
   }
 
   public Map<String, Object> getMergedMap(final Point point, final Record record1, Record record2) {
-    final LineString line1 = record1.getGeometryValue();
-    LineString line2 = record2.getGeometryValue();
+    final LineString line1 = record1.getGeometry();
+    LineString line2 = record2.getGeometry();
 
     Record startObject;
     Record endObject;
@@ -530,7 +530,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     final Vertex line2From = line2.getVertex(0);
     if (line1From.equals(2, line2From) && line1From.equals(2, point)) {
       record2 = getReverse(record2);
-      line2 = record2.getGeometryValue();
+      line2 = record2.getGeometry();
       startObject = record2;
       endObject = record1;
       newLine = line1.merge(point, line2);
@@ -539,7 +539,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
       final Vertex line2To = line2.getVertex(-1);
       if (line1To.equals(2, line2To) && line1To.equals(2, point)) {
         record2 = getReverse(record2);
-        line2 = record2.getGeometryValue();
+        line2 = record2.getGeometry();
         startObject = record1;
         endObject = record2;
         newLine = line1.merge(point, line2);
@@ -575,8 +575,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
    * @return
    */
   public Record getMergedRecord(final Point point, final Record record1, Record record2) {
-    final LineString line1 = record1.getGeometryValue();
-    LineString line2 = record2.getGeometryValue();
+    final LineString line1 = record1.getGeometry();
+    LineString line2 = record2.getGeometry();
 
     Record startObject;
     Record endObject;
@@ -588,14 +588,14 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
 
     if (line1.equalsVertex(2, 0, line2, 0) && line1.equalsVertex(2, 0, point)) {
       record2 = getReverse(record2);
-      line2 = record2.getGeometryValue();
+      line2 = record2.getGeometry();
       startObject = record2;
       endObject = record1;
       newLine = line1.merge(point, line2);
     } else if (line1.equalsVertex(2, lastPoint1, line2, lastPoint2)
       && line1.equalsVertex(2, lastPoint1, point)) {
       record2 = getReverse(record2);
-      line2 = record2.getGeometryValue();
+      line2 = record2.getGeometry();
       startObject = record1;
       endObject = record2;
       newLine = line1.merge(point, line2);
@@ -634,9 +634,9 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
    * @return
    */
   public Record getMergedRecord(final Record record1, Record record2) {
-    final LineString line1 = record1.getGeometryValue();
+    final LineString line1 = record1.getGeometry();
     final int vertexCount1 = line1.getVertexCount();
-    LineString line2 = record2.getGeometryValue();
+    LineString line2 = record2.getGeometry();
     final int vertexCount2 = line2.getVertexCount();
 
     Record startObject;
@@ -647,13 +647,13 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
 
     if (line1.equalsVertex(2, 0, line2, 0)) {
       record2 = getReverse(record2);
-      line2 = record2.getGeometryValue();
+      line2 = record2.getGeometry();
       startObject = record2;
       endObject = record1;
       newLine = line1.merge(line2);
     } else if (line1.equalsVertex(2, vertexCount1 - 1, line2, vertexCount2 - 1)) {
       record2 = getReverse(record2);
-      line2 = record2.getGeometryValue();
+      line2 = record2.getGeometry();
       startObject = record1;
       endObject = record2;
       newLine = line1.merge(line2);
@@ -683,8 +683,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
 
   public Record getMergedRecordReverseLongest(final Point point, final Record record1,
     final Record record2) {
-    final LineString line1 = record1.getGeometryValue();
-    final LineString line2 = record2.getGeometryValue();
+    final LineString line1 = record1.getGeometry();
+    final LineString line2 = record2.getGeometry();
     if (line1.getLength() >= line2.getLength()) {
       return getMergedRecord(point, record1, record2);
     } else {
@@ -702,8 +702,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
    * @return
    */
   public Record getMergedRecordReverseLongest(final Record record1, final Record record2) {
-    final LineString line1 = record1.getGeometryValue();
-    final LineString line2 = record2.getGeometryValue();
+    final LineString line1 = record1.getGeometry();
+    final LineString line2 = record2.getGeometry();
     if (line1.getLength() >= line2.getLength()) {
       return getMergedRecord(record1, record2);
     } else {
@@ -893,7 +893,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
   }
 
   public void setSplitAttributes(final LineString line, final Point point, final Record record) {
-    final LineString newLine = record.getGeometryValue();
+    final LineString newLine = record.getGeometry();
     if (newLine != null) {
       final boolean firstPoint = newLine.equalsVertex(2, 0, point);
       final boolean toPoint = newLine.equalsVertex(2, -1, point);

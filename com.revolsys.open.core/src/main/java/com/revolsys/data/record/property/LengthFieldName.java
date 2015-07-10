@@ -51,7 +51,7 @@ public class LengthFieldName extends AbstractRecordDefinitionProperty {
 
   public void setLength(final Record object) {
     if (Property.hasValue(this.fieldName)) {
-      final LineString line = object.getGeometryValue();
+      final LineString line = object.getGeometry();
       final double length = line.getLength();
       object.setValue(this.fieldName, length);
     }

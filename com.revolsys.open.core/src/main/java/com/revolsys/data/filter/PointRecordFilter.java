@@ -13,7 +13,7 @@ public class PointRecordFilter implements Filter<Record> {
 
   @Override
   public boolean accept(final Record object) {
-    final Geometry geometry = object.getGeometryValue();
+    final Geometry geometry = object.getGeometry();
     return geometry instanceof Point;
   }
 

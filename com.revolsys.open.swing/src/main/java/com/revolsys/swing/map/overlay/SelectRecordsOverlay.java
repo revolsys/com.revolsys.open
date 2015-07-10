@@ -268,7 +268,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
         for (final LayerRecord record : recordLayer.getHighlightedRecords()) {
           if (record != null && recordLayer.isVisible(record)) {
-            final Geometry geometry = record.getGeometryValue();
+            final Geometry geometry = record.getGeometry();
             final AbstractRecordLayerRenderer layerRenderer = layer.getRenderer();
             layerRenderer.renderSelectedRecord(viewport, recordLayer, record);
             HIGHLIGHT_RENDERER.paintSelected(viewport, viewportGeometryFactory, geometry);
@@ -317,7 +317,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
             if (record != null && recordLayer.isVisible(record)) {
               if (!recordLayer.isHighlighted(record)) {
                 if (!recordLayer.isDeleted(record)) {
-                  final Geometry geometry = record.getGeometryValue();
+                  final Geometry geometry = record.getGeometry();
                   layerRenderer.renderSelectedRecord(viewport, recordLayer, record);
                   SELECT_RENDERER.paintSelected(viewport, viewportGeometryFactory, geometry);
                 }

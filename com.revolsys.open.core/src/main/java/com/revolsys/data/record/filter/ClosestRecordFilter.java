@@ -53,7 +53,7 @@ public class ClosestRecordFilter implements Filter<Record> {
   @Override
   public boolean accept(final Record record) {
     if (this.filter.accept(record)) {
-      final Geometry geometry = record.getGeometryValue();
+      final Geometry geometry = record.getGeometry();
       if (Property.hasValue(geometry)) {
         if (!(geometry instanceof Point)) {
           final BoundingBox boundingBox = geometry.getBoundingBox();

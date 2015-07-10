@@ -122,7 +122,7 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
       writer = RecordIo.recordWriter(recordDefinition, new FileSystemResource(file));
 
       ((XbaseRecordWriter)writer).setUseZeroForNull(this.useZeroForNull);
-      final Geometry geometry = object.getGeometryValue();
+      final Geometry geometry = object.getGeometry();
       if (geometry != null) {
         setProperty(IoConstants.GEOMETRY_FACTORY, geometry.getGeometryFactory());
       }
