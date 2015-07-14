@@ -851,7 +851,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
-  protected synchronized Map<String, ? extends RecordStoreSchemaElement> refreshSchemaElements(
+  protected Map<String, ? extends RecordStoreSchemaElement> refreshSchemaElements(
     final RecordStoreSchema schema) {
     final RecordStoreSchema rootSchema = getRootSchema();
     if (schema == rootSchema) {
