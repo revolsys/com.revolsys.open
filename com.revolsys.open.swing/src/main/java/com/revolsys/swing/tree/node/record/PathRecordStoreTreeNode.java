@@ -61,7 +61,7 @@ public class PathRecordStoreTreeNode extends PathTreeNode
     SwingUtil.setTitledBorder(panel, "Record Store Connection");
 
     SwingUtil.addLabel(panel, "File");
-    final JLabel fileLabel = new JLabel(path.toString());
+    final JLabel fileLabel = new JLabel(Paths.toPathString(path));
     panel.add(fileLabel);
 
     SwingUtil.addLabel(panel, "Name");
@@ -99,7 +99,7 @@ public class PathRecordStoreTreeNode extends PathTreeNode
         i++;
       }
       final Map<String, Object> connection = getRecordStoreConnectionMap();
-      final Map<String, Object> config = new HashMap<String, Object>();
+      final Map<String, Object> config = new HashMap<>();
       config.put("name", connectionName);
       config.put("connection", connection);
       registry.createConnection(config);
