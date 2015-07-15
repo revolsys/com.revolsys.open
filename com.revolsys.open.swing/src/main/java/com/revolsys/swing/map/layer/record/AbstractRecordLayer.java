@@ -75,7 +75,6 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.spring.ByteArrayResource;
 import com.revolsys.swing.SwingUtil;
@@ -496,7 +495,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       if (geometry != null && !geometry.isEmpty()) {
         final RecordQuadTree index = getIndex();
         addRecordToCache(this.cacheIdIndex, record);
-        index.insert(record);
+        index.add(record);
       }
     }
   }
@@ -2355,13 +2354,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         for (final Record record : records) {
           final LayerRecord cacheRecord = addRecordToCache(cacheIdIndex, (LayerRecord)record);
           if (!cacheRecord.isDeleted()) {
-            index.insert(cacheRecord);
+            index.add(cacheRecord);
           }
         }
       }
       cleanCachedRecords();
       final List<LayerRecord> newRecords = getNewRecords();
-      index.insert(newRecords);
+      index.addAll(newRecords);
       this.index = index;
     }
   }

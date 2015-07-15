@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ListReader<T> extends AbstractReader<T> {
-
   private List<T> values = Collections.emptyList();
 
   public ListReader() {

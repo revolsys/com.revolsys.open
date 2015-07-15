@@ -29,27 +29,21 @@ public class RecordQuadTree extends QuadTree<Record> {
   public RecordQuadTree() {
   }
 
-  public RecordQuadTree(final Collection<? extends Record> objects) {
-    insert(objects);
-  }
-
   public RecordQuadTree(final GeometryFactory geometryFactory) {
     super(geometryFactory);
   }
 
   public RecordQuadTree(final GeometryFactory geometryFactory,
-    final Collection<? extends Record> objects) {
+    final Iterable<? extends Record> records) {
     super(geometryFactory);
-    insert(objects);
+    addAll(records);
   }
 
-  public void insert(final Collection<? extends Record> objects) {
-    for (final Record object : objects) {
-      insert(object);
-    }
+  public RecordQuadTree(final Iterable<? extends Record> records) {
+    addAll(records);
   }
 
-  public void insert(final Record record) {
+  public void add(final Record record) {
     if (record != null) {
       final Geometry geometry = record.getGeometry();
       if (geometry != null && !geometry.isEmpty()) {
@@ -59,9 +53,9 @@ public class RecordQuadTree extends QuadTree<Record> {
     }
   }
 
-  public void insertAll(final Collection<? extends Record> records) {
+  public void addAll(final Iterable<? extends Record> records) {
     for (final Record record : records) {
-      insert(record);
+      add(record);
     }
   }
 

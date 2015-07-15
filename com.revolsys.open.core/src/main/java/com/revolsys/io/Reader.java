@@ -48,6 +48,13 @@ import com.revolsys.properties.ObjectWithProperties;
  * @param <T> The type of the item to read.
  */
 public interface Reader<T> extends Iterable<T>, ObjectWithProperties, AutoCloseable {
+  Reader<?> EMPTY = new ListReader<>();
+
+  @SuppressWarnings("unchecked")
+  static <V> Reader<V> empty() {
+    return (Reader<V>)EMPTY;
+  }
+
   /**
    * Close the reader and all resources associated with it.
    */

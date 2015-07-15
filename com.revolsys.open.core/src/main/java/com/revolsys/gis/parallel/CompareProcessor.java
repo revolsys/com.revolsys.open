@@ -61,24 +61,24 @@ public class CompareProcessor extends AbstractMergeProcess {
   private boolean logNotEqualSource = true;
 
   @Override
-  protected void addOtherObject(final Record object) {
-    final Geometry geometry = object.getGeometry();
+  protected void addOtherObject(final Record record) {
+    final Geometry geometry = record.getGeometry();
     if (geometry instanceof Point) {
       boolean add = true;
       if (this.cleanDuplicatePoints) {
-        final List<Record> objects = this.otherPointMap.getRecords(object);
+        final List<Record> objects = this.otherPointMap.getRecords(record);
         if (!objects.isEmpty()) {
-          final Filter<Record> filter = this.equalFilterFactory.create(object);
+          final Filter<Record> filter = this.equalFilterFactory.create(record);
           add = !FilterUtil.matches(objects, filter);
         }
         if (add) {
-          this.otherPointMap.add(object);
+          this.otherPointMap.add(record);
         } else {
-          this.duplicateOtherStatistics.add(object);
+          this.duplicateOtherStatistics.add(record);
         }
       }
     } else if (geometry instanceof LineString) {
-      this.otherIndex.insert(object);
+      this.otherIndex.add(record);
     }
   }
 

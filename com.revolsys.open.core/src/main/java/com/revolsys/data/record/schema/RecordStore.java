@@ -17,6 +17,7 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.transaction.Propagation;
@@ -148,6 +149,15 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
   Reader<Record> query(Query... queries);
 
   Reader<Record> query(String typePath);
+
+  default Reader<Record> query(final String typePath, final BoundingBox boundingBox) {
+    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+    if (recordDefinition != null && recordDefinition.hasGeometryField()) {
+      final Query query = Query.intersects(recordDefinition, boundingBox);
+      return query(query);
+    }
+    return Reader.empty();
+  }
 
   Record queryFirst(Query query);
 
