@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.Icon;
@@ -96,7 +95,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   public static void addPathNode(final List<BaseTreeNode> children, final Path path) {
     if (!Paths.isHidden(path)) {
-      if (PathTreeNode.isRecordStore(path)) {
+      if (RecordStoreFactoryRegistry.isRecordStore(path)) {
         final PathRecordStoreTreeNode recordStoreNode = new PathRecordStoreTreeNode(path);
         children.add(recordStoreNode);
       } else {
@@ -216,12 +215,6 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       fileNameExtension);
   }
 
-  public static boolean isRecordStore(final Path path) {
-    final Set<String> fileExtensions = RecordStoreFactoryRegistry.getFileExtensions();
-    final String extension = Paths.getFileNameExtension(path).toLowerCase();
-    return fileExtensions.contains(extension);
-  }
-
   private boolean hasFile = false;
 
   public PathTreeNode(final Path path) {
@@ -306,10 +299,12 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       return true;
     } else if (other instanceof PathTreeNode) {
       final PathTreeNode fileNode = (PathTreeNode)other;
-      final Path path = getPath();
-      final Path otherPath = fileNode.getPath();
-      final boolean equal = EqualsRegistry.equal(path, otherPath);
-      return equal;
+      if (getClass() == other.getClass()) {
+        final Path path = getPath();
+        final Path otherPath = fileNode.getPath();
+        final boolean equal = EqualsRegistry.equal(path, otherPath);
+        return equal;
+      }
     }
     return false;
   }

@@ -3,6 +3,7 @@ package com.revolsys.data.record.io;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -21,6 +22,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.io.Paths;
 
 public class RecordStoreFactoryRegistry {
 
@@ -144,6 +146,18 @@ public class RecordStoreFactoryRegistry {
     } else {
       return factory.getRecordStoreInterfaceClass(connectionProperties);
     }
+  }
+
+  public static boolean isRecordStore(final Path path) {
+    final String fileExtension = Paths.getFileNameExtension(path);
+    if (fileExtensions.contains(fileExtension)) {
+      for (final RecordStoreFactory recordStoreFactory : fileRecordStoreFactories) {
+        if (recordStoreFactory.canOpen(path)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   public static RecordStoreFactory register(final RecordStoreFactory factory) {
