@@ -1,7 +1,6 @@
 package com.revolsys.swing.tree.node.record;
 
 import java.awt.TextField;
-import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -30,7 +29,7 @@ import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.Property;
 
-public class FileRecordStoreTreeNode extends PathTreeNode
+public class PathRecordStoreTreeNode extends PathTreeNode
   implements RecordStoreProxy, RecordStoreConnectionMapProxy {
   private static final MenuFactory MENU = new MenuFactory("File Record Store");
 
@@ -43,7 +42,7 @@ public class FileRecordStoreTreeNode extends PathTreeNode
       "link_add", NODE_EXISTS, "addRecordStoreConnection"));
   }
 
-  public FileRecordStoreTreeNode(final java.nio.file.Path Path) {
+  public PathRecordStoreTreeNode(final Path Path) {
     super(Path);
     setType("Record Store");
     setName(Paths.getFileName(Path));
@@ -121,8 +120,8 @@ public class FileRecordStoreTreeNode extends PathTreeNode
   @Override
   @SuppressWarnings("unchecked")
   public <V extends RecordStore> V getRecordStore() {
-    final File file = getPath().toFile();
-    return (V)RecordStoreConnectionManager.getRecordStore(file);
+    final Path path = getPath();
+    return (V)RecordStoreConnectionManager.getRecordStore(path);
   }
 
   @Override

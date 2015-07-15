@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -123,6 +125,22 @@ public class Paths {
     } catch (final IOException e) {
       throw new WrappedException(e);
     }
+  }
+
+  public static String toPathString(final Path path) {
+    return getPath(path).toString();
+  }
+
+  public static URL toUrl(final Path path) {
+    try {
+      return path.toUri().toURL();
+    } catch (final MalformedURLException e) {
+      throw new WrappedException(e);
+    }
+  }
+
+  public static String toUrlString(final Path path) {
+    return toUrl(path).toString();
   }
 
   public static Path withExtension(final Path path, final String extension) {

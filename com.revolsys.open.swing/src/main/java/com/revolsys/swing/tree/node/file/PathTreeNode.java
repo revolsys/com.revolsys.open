@@ -47,7 +47,7 @@ import com.revolsys.swing.tree.TreeNodePropertyEnableCheck;
 import com.revolsys.swing.tree.TreeNodeRunnable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
-import com.revolsys.swing.tree.node.record.FileRecordStoreTreeNode;
+import com.revolsys.swing.tree.node.record.PathRecordStoreTreeNode;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlProxy;
 import com.revolsys.util.UrlUtil;
@@ -97,7 +97,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
   public static void addPathNode(final List<BaseTreeNode> children, final Path path) {
     if (!Paths.isHidden(path)) {
       if (PathTreeNode.isRecordStore(path)) {
-        final FileRecordStoreTreeNode recordStoreNode = new FileRecordStoreTreeNode(path);
+        final PathRecordStoreTreeNode recordStoreNode = new PathRecordStoreTreeNode(path);
         children.add(recordStoreNode);
       } else {
         BaseTreeNode child;

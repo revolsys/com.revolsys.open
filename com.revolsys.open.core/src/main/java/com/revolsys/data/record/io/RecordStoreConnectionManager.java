@@ -1,6 +1,7 @@
 package com.revolsys.data.record.io;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.Paths;
 import com.revolsys.io.connection.AbstractConnectionRegistryManager;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.OS;
@@ -87,6 +89,14 @@ public class RecordStoreConnectionManager
       }
       return (T)recordStore;
     }
+  }
+
+  public static <V extends RecordStore> V getRecordStore(final Path path) {
+    final Map<String, String> connectionProperties = Collections.singletonMap("url",
+      Paths.toUrlString(path));
+    final Map<String, Object> config = Collections.<String, Object> singletonMap("connection",
+      connectionProperties);
+    return getRecordStore(config);
   }
 
   public static RecordStore getRecordStore(final String name) {
