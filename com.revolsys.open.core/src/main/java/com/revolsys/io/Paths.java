@@ -33,7 +33,7 @@ public class Paths {
 
   public static String getBaseName(final java.nio.file.Path path) {
     final String fileName = getFileName(path);
-    return FileUtil.getBaseName(fileName);
+    return FileNames.getBaseName(fileName);
   }
 
   public static String getFileName(final Path path) {
@@ -57,12 +57,12 @@ public class Paths {
 
   public static String getFileNameExtension(final Path path) {
     final String fileName = getFileName(path);
-    return FileUtil.getFileNameExtension(fileName);
+    return FileNames.getFileNameExtension(fileName);
   }
 
   public static List<String> getFileNameExtensions(final Path path) {
     final String fileName = getFileName(path);
-    return FileUtil.getFileNameExtensions(fileName);
+    return FileNames.getFileNameExtensions(fileName);
   }
 
   public static Path getPath(final Path path) {
