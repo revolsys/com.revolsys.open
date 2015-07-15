@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.identifier.SingleIdentifier;
+import com.revolsys.data.identifier.Identifier;
 import com.revolsys.util.CollectionUtil;
 
 public class ObjectLabelField extends TextField {
@@ -37,7 +37,7 @@ public class ObjectLabelField extends TextField {
     } else if (this.codeTable == null) {
       return StringConverterRegistry.toString(fieldValue);
     } else {
-      final List<Object> values = this.codeTable.getValues(SingleIdentifier.create(fieldValue));
+      final List<Object> values = this.codeTable.getValues(Identifier.create(fieldValue));
       if (values == null || values.isEmpty()) {
         return StringConverterRegistry.toString(fieldValue);
       } else {

@@ -17,13 +17,13 @@ import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.jts.GeometryProperties;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.CollectionUtil;
@@ -32,6 +32,16 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public final class Records {
+  public static BoundingBox boundingBox(final Record record) {
+    if (record != null) {
+      final Geometry geometry = record.getGeometry();
+      if (geometry != null) {
+        return geometry.getBoundingBox();
+      }
+    }
+    return BoundingBox.EMPTY;
+  }
+
   public static int compareNullFirst(final Record record1, final Record record2,
     final String fieldName) {
     final Object value1 = getValue(record1, fieldName);
@@ -229,7 +239,7 @@ public final class Records {
           } else if (i + 1 < propertyPath.length) {
             final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(propertyName);
             if (codeTable != null) {
-              propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
+              propertyValue = codeTable.getMap(Identifier.create(propertyValue));
             }
           }
         } else {
@@ -246,7 +256,7 @@ public final class Records {
         } else if (i + 1 < propertyPath.length) {
           final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(propertyName);
           if (codeTable != null) {
-            propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
+            propertyValue = codeTable.getMap(Identifier.create(propertyValue));
           }
         }
       } else {

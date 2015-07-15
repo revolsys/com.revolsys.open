@@ -52,6 +52,8 @@ public class GridLayer extends AbstractLayer {
       if (this.grid == null) {
         LoggerFactory.getLogger(getClass()).error("Cannot find gridName=" + gridName);
       } else {
+        final GeometryFactory geometryFactory = this.grid.getGeometryFactory();
+        setGeometryFactory(geometryFactory);
         return true;
       }
     } else {
@@ -59,11 +61,6 @@ public class GridLayer extends AbstractLayer {
         .error("Layer definition does not contain a 'gridName' property");
     }
     return false;
-  }
-
-  @Override
-  public GeometryFactory getGeometryFactory() {
-    return this.grid.getGeometryFactory();
   }
 
   public RectangularMapGrid getGrid() {

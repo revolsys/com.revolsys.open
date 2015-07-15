@@ -49,7 +49,6 @@ import com.revolsys.collection.map.LruMap;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.query.BinaryCondition;
 import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.Equal;
@@ -458,7 +457,7 @@ public abstract class AbstractRecordQueryField extends ValueField
 
   @Override
   public void setFieldValue(final Object value) {
-    final Identifier identifier = SingleIdentifier.create(value);
+    final Identifier identifier = Identifier.create(value);
     super.setFieldValue(identifier);
     final String displayText = getDisplayText(identifier);
     if (this.searchField != null) {

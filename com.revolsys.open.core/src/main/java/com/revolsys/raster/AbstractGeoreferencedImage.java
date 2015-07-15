@@ -158,7 +158,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
 
   private List<Dimension> overviewSizes = new ArrayList<>();
 
-  private BoundingBox boundingBox = new BoundingBoxDoubleGf();
+  private BoundingBox boundingBox = BoundingBox.EMPTY;
 
   private int imageWidth = -1;
 

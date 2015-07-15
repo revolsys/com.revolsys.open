@@ -54,7 +54,7 @@ public class CsvRecordIterator extends AbstractIterator<Record>implements Record
   private boolean hasPointFields;
 
   public CsvRecordIterator(final Resource resource) {
-    this(resource, new ArrayRecordFactory(), CsvConstants.FIELD_SEPARATOR);
+    this(resource, new ArrayRecordFactory(), Csv.FIELD_SEPARATOR);
   }
 
   public CsvRecordIterator(final Resource resource, final char fieldSeparator) {
@@ -62,7 +62,7 @@ public class CsvRecordIterator extends AbstractIterator<Record>implements Record
   }
 
   public CsvRecordIterator(final Resource resource, final RecordFactory recordFactory) {
-    this(resource, recordFactory, CsvConstants.FIELD_SEPARATOR);
+    this(resource, recordFactory, Csv.FIELD_SEPARATOR);
   }
 
   public CsvRecordIterator(final Resource resource, final RecordFactory recordFactory,
@@ -262,10 +262,10 @@ public class CsvRecordIterator extends AbstractIterator<Record>implements Record
         }
         for (int i = 0; i < line.length(); i++) {
           final char c = line.charAt(i);
-          if (c == CsvConstants.QUOTE_CHARACTER) {
+          if (c == '"') {
             hadQuotes = true;
             if (inQuotes && line.length() > i + 1
-              && line.charAt(i + 1) == CsvConstants.QUOTE_CHARACTER) {
+              && line.charAt(i + 1) == '"') {
               sb.append(line.charAt(i + 1));
               i++;
             } else {

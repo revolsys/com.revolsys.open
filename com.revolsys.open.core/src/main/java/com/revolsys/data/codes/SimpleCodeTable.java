@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.io.RecordIo;
 import com.revolsys.data.record.io.RecordReader;
@@ -18,7 +17,7 @@ public class SimpleCodeTable extends AbstractCodeTable {
     try (
       final RecordReader reader = RecordIo.recordReader(resource)) {
       for (final Record record : reader) {
-        final Identifier id = SingleIdentifier.create(record.getValue(0));
+        final Identifier id = Identifier.create(record.getValue(0));
         final List<Object> values = new ArrayList<>();
         final int fieldCount = record.getRecordDefinition().getFieldCount();
         for (int i = 1; i < fieldCount; i++) {
@@ -41,7 +40,7 @@ public class SimpleCodeTable extends AbstractCodeTable {
   }
 
   public void addValue(final Object id, final Object... values) {
-    super.addValue(SingleIdentifier.create(id), values);
+    super.addValue(Identifier.create(id), values);
   }
 
   @Override

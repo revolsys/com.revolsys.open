@@ -300,7 +300,7 @@ public class BoundingBoxTest implements TestConstants {
 
   @Test
   public void testConstructorEmpty() {
-    final BoundingBox empty = new BoundingBoxDoubleGf();
+    final BoundingBox empty = BoundingBox.EMPTY;
     assertEnvelope(empty, null, true, 0, NULL_BOUNDS);
 
     final BoundingBox emptyNullGeometryFactory = new BoundingBoxDoubleGf((GeometryFactory)null);

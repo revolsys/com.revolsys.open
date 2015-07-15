@@ -224,7 +224,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
       final List list = (List)id;
       return getValue(new ListIdentifier(list));
     } else {
-      return getValue(SingleIdentifier.create(id));
+      return getValue(Identifier.create(id));
     }
   }
 

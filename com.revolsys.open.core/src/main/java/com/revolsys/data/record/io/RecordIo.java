@@ -161,7 +161,23 @@ public class RecordIo {
 
   public static Writer<Record> recordWriter(final RecordDefinition recordDefinition,
     final File file) {
-    return recordWriter(recordDefinition, new FileSystemResource(file));
+    if (file == null) {
+      return null;
+    } else {
+      final Path path = Paths.get(file);
+      return recordWriter(recordDefinition, path);
+    }
+  }
+
+  public static Writer<Record> recordWriter(final RecordDefinition recordDefinition,
+    final Path path) {
+    final RecordWriterFactory writerFactory = IoFactory.factory(RecordWriterFactory.class, path);
+    if (writerFactory == null) {
+      return null;
+    } else {
+      final Writer<Record> writer = writerFactory.createRecordWriter(recordDefinition, path);
+      return writer;
+    }
   }
 
   public static Writer<Record> recordWriter(final RecordDefinition recordDefinition,

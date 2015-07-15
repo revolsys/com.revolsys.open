@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -48,7 +49,6 @@ import com.revolsys.jts.index.strtree.STRtree;
 import com.revolsys.jts.testold.util.SerializationUtil;
 
 import junit.framework.TestCase;
-
 import junit.framework.TestCase;
 
 /**
@@ -110,7 +110,7 @@ public class STRtreeTest extends TestCase {
     final STRtree t = new STRtree(5);
     t.insert(new BoundingBoxDoubleGf(2, 0, 0, 0, 0), new Object());
     t.insert(new BoundingBoxDoubleGf(2, 0, 0, 0, 0), new Object());
-    t.query(new BoundingBoxDoubleGf());
+    t.query(BoundingBox.EMPTY);
     try {
       t.insert(new BoundingBoxDoubleGf(2, 0, 0, 0, 0), new Object());
       assertTrue(false);
@@ -174,7 +174,7 @@ public class STRtreeTest extends TestCase {
 
     STRtree tree = (STRtree)tester.getSpatialIndex();
     // create the index before serialization
-    tree.query(new BoundingBoxDoubleGf());
+    tree.query(BoundingBox.EMPTY);
 
     final byte[] data = SerializationUtil.serialize(tree);
     tree = (STRtree)SerializationUtil.deserialize(data);

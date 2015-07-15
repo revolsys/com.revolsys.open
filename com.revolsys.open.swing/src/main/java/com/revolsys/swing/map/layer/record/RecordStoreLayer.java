@@ -22,7 +22,6 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.filter.RecordGeometryBoundingBoxIntersectsFilter;
 import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.Q;
 import com.revolsys.data.query.Query;
@@ -68,7 +67,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     return new RecordStoreLayer(properties);
   }
 
-  private BoundingBox loadedBoundingBox = new BoundingBoxDoubleGf();
+  private BoundingBox loadedBoundingBox = BoundingBox.EMPTY;
 
   /**
    * Caches of sets of {@link Record#getIdentifier()} for different purposes (e.g. selected records, deleted records).
@@ -81,7 +80,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
   private final Label cacheIdForm = new Label("form");
 
-  private BoundingBox loadingBoundingBox = new BoundingBoxDoubleGf();
+  private BoundingBox loadingBoundingBox = BoundingBox.EMPTY;
 
   private SwingWorker<List<LayerRecord>, Void> loadingWorker;
 
@@ -204,7 +203,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       if (loadedBoundingBox == this.loadingBoundingBox) {
         firePropertyChange("loaded", false, true);
         this.loadedBoundingBox = this.loadingBoundingBox;
-        this.loadingBoundingBox = new BoundingBoxDoubleGf();
+        this.loadingBoundingBox = BoundingBox.EMPTY;
         this.loadingWorker = null;
       }
 
@@ -292,9 +291,9 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       this.recordStore = null;
     }
     final SwingWorker<List<LayerRecord>, Void> loadingWorker = this.loadingWorker;
-    this.loadedBoundingBox = new BoundingBoxDoubleGf();
+    this.loadedBoundingBox = BoundingBox.EMPTY;
     this.recordIdToRecordMap.clear();
-    this.loadingBoundingBox = new BoundingBoxDoubleGf();
+    this.loadingBoundingBox = BoundingBox.EMPTY;
     this.loadingWorker = null;
     this.typePath = null;
     super.delete();
@@ -453,7 +452,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       if (this.loadingWorker != null) {
         this.loadingWorker.cancel(true);
       }
-      this.loadedBoundingBox = new BoundingBoxDoubleGf();
+      this.loadedBoundingBox = BoundingBox.EMPTY;
       this.loadingBoundingBox = this.loadedBoundingBox;
       setIndexRecords(null);
       cleanCachedRecords();
@@ -499,7 +498,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
                   if (identifier == null && !idFieldNames.isEmpty()) {
                     final Object idValue = recordStore.createPrimaryIdValue(this.typePath);
                     if (idValue != null) {
-                      identifier = SingleIdentifier.create(idValue);
+                      identifier = Identifier.create(idValue);
                       identifier.setIdentifier(record, idFieldNames);
                     }
                   }
@@ -528,7 +527,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         return coordinateSystem.getAreaBoundingBox();
       }
     }
-    return new BoundingBoxDoubleGf();
+    return BoundingBox.EMPTY;
   }
 
   @SuppressWarnings("unchecked")

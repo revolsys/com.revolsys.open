@@ -13,7 +13,7 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.identifier.SingleIdentifier;
+import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -73,7 +73,7 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
             } else if (codeTable == null) {
               text = StringConverterRegistry.toString(originalValue);
             } else {
-              text = codeTable.getValue(SingleIdentifier.create(originalValue));
+              text = codeTable.getValue(Identifier.create(originalValue));
               if (text == null) {
                 text = "-";
               }

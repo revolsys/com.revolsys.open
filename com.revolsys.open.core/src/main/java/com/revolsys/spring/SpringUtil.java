@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
@@ -15,6 +16,7 @@ import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
@@ -317,6 +319,11 @@ public class SpringUtil {
   public static Writer getWriter(final Resource resource) {
     final OutputStream stream = getOutputStream(resource);
     return FileUtil.createUtf8Writer(stream);
+  }
+
+  public static Writer getWriter(final Resource resource, final Charset charset) {
+    final OutputStream stream = getOutputStream(resource);
+    return new OutputStreamWriter(stream, charset);
   }
 
   public static Resource setBaseResource(final Resource baseResource) {

@@ -1,8 +1,11 @@
 package com.revolsys.gis.cs.esri;
 
 import java.io.File;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,10 +23,11 @@ import com.revolsys.gis.cs.CoordinateSystems;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.WktCsParser;
-import com.revolsys.io.FileUtil;
+import com.revolsys.io.Paths;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.spring.NonExistingResource;
 import com.revolsys.spring.SpringUtil;
+import com.revolsys.util.WrappedException;
 
 public class EsriCoordinateSystems {
   private static Map<CoordinateSystem, CoordinateSystem> coordinateSystems = new HashMap<CoordinateSystem, CoordinateSystem>();
@@ -54,28 +58,43 @@ public class EsriCoordinateSystems {
   }
 
   public static void createPrjFile(final File file, final GeometryFactory geometryFactory) {
-    final FileSystemResource resource = new FileSystemResource(file);
-    createPrjFile(resource, geometryFactory);
+    final Path path = file.toPath();
+    createPrjFile(path, geometryFactory);
+  }
+
+  public static void createPrjFile(final Path path, final GeometryFactory geometryFactory) {
+    if (path != null) {
+      final Path prjPath = Paths.withExtension(path, "prj");
+      try (
+        final Writer writer = Files.newBufferedWriter(prjPath, StandardCharsets.ISO_8859_1)) {
+        createPrjFile(writer, geometryFactory);
+      } catch (final IOException e) {
+        throw new WrappedException(e);
+      }
+    }
   }
 
   public static void createPrjFile(final Resource resource, final GeometryFactory geometryFactory) {
+    final Resource prjResource = SpringUtil.getResourceWithExtension(resource, "prj");
+    if (!(prjResource instanceof NonExistingResource)) {
+      try (
+        final Writer writer = SpringUtil.getWriter(prjResource, StandardCharsets.ISO_8859_1)) {
+        createPrjFile(writer, geometryFactory);
+      } catch (final Throwable e) {
+        LoggerFactory.getLogger(EsriCoordinateSystems.class).error("Unable to create: " + resource,
+          e);
+      }
+    }
+  }
+
+  protected static void createPrjFile(final Writer writer, final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem != null) {
         final int srid = coordinateSystem.getId();
-        final Resource prjResource = SpringUtil.getResourceWithExtension(resource, "prj");
-        if (!(prjResource instanceof NonExistingResource)) {
-          try (
-            final OutputStream out = SpringUtil.getOutputStream(prjResource);
-            final PrintWriter writer = new PrintWriter(FileUtil.createUtf8Writer(out));) {
-            final CoordinateSystem esriCoordinateSystem = CoordinateSystems
-              .getCoordinateSystem(new QName("ESRI", String.valueOf(srid)));
-            EsriCsWktWriter.write(writer, esriCoordinateSystem, -1);
-          } catch (final Throwable e) {
-            LoggerFactory.getLogger(EsriCoordinateSystems.class)
-              .error("Unable to create: " + resource, e);
-          }
-        }
+        final CoordinateSystem esriCoordinateSystem = CoordinateSystems
+          .getCoordinateSystem(new QName("ESRI", String.valueOf(srid)));
+        EsriCsWktWriter.write(writer, esriCoordinateSystem, -1);
       }
     }
   }

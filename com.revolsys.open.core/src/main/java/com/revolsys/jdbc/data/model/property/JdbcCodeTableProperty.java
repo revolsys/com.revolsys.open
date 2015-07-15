@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.revolsys.data.codes.CodeTableProperty;
 import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
@@ -37,7 +36,7 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
       while (id == null) {
         try (
           final PreparedStatement statement = connection.prepareStatement(this.insertSql)) {
-          id = SingleIdentifier.create(this.recordStore.getNextPrimaryKey(getRecordDefinition()));
+          id = Identifier.create(this.recordStore.getNextPrimaryKey(getRecordDefinition()));
           int index = 1;
           index = JdbcUtils.setValue(statement, index, id);
           for (int i = 0; i < getValueFieldNames().size(); i++) {

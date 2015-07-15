@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.identifier.SingleIdentifier;
+import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.filter.Filter;
@@ -52,7 +52,7 @@ public class RecordCodeTableValueFilter implements Filter<Record> {
       final RecordDefinition recordDefinition = object.getRecordDefinition();
       final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(this.fieldName);
       if (codeTable != null) {
-        final Object codeValue = codeTable.getValue(SingleIdentifier.create(propertyValue));
+        final Object codeValue = codeTable.getValue(Identifier.create(propertyValue));
         if (this.values.contains(codeValue)) {
           this.values.add(propertyValue);
           return true;

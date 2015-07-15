@@ -1,32 +1,12 @@
 package com.revolsys.data.identifier;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.util.Numbers;
 
 public class SingleIdentifier extends AbstractIdentifier {
-
-  public static Identifier create(final Object value) {
-    if (value == null) {
-      return null;
-    } else if (value instanceof Long) {
-      return new LongIdentifier((Long)value);
-    } else if (Numbers.isPrimitiveIntegral(value)) {
-      final Number number = (Number)value;
-      return new IntegerIdentifier(number.intValue());
-    } else if (value instanceof Identifier) {
-      return (Identifier)value;
-    } else if (value instanceof Collection) {
-      final Collection<?> idValues = (Collection<?>)value;
-      return new ListIdentifier(idValues);
-    } else {
-      return new SingleIdentifier(value);
-    }
-  }
 
   private final Object value;
 

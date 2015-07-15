@@ -20,7 +20,6 @@ import com.revolsys.data.identifier.AbstractIdentifier;
 import com.revolsys.data.identifier.Identifiable;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.ListIdentifier;
-import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.query.Value;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -191,7 +190,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
       if (idValue == null) {
         return null;
       } else {
-        return SingleIdentifier.create(idValue);
+        return Identifier.create(idValue);
       }
     } else {
       boolean notNull = false;
@@ -222,7 +221,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
       if (idValue == null) {
         return null;
       } else {
-        return SingleIdentifier.create(idValue);
+        return Identifier.create(idValue);
       }
     } else {
       boolean notNull = false;
@@ -353,7 +352,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
             final CodeTable codeTable = this.getRecordDefinition()
               .getCodeTableByFieldName(propertyName);
             if (codeTable != null) {
-              propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
+              propertyValue = codeTable.getMap(Identifier.create(propertyValue));
             }
           }
         } else {
@@ -371,7 +370,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
           final CodeTable codeTable = this.getRecordDefinition()
             .getCodeTableByFieldName(propertyName);
           if (codeTable != null) {
-            propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
+            propertyValue = codeTable.getMap(Identifier.create(propertyValue));
           }
         }
       } else {

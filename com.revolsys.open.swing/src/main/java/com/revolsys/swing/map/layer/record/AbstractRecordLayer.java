@@ -229,8 +229,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return layers;
   }
 
-  private BoundingBox boundingBox = new BoundingBoxDoubleGf();
-
   private final Label cacheIdDeleted = new Label("deleted");
 
   private final Label cacheIdHighlighted = new Label("highlighted");
@@ -1000,11 +998,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final boolean selected = selectionCount > 0;
     firePropertyChange("hasSelectedRecords", !selected, selected);
     firePropertyChange("selectionCount", -1, selectionCount);
-  }
-
-  @Override
-  public BoundingBox getBoundingBox() {
-    return this.boundingBox;
   }
 
   @SuppressWarnings("unchecked")
@@ -2243,10 +2236,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public void setBoundingBox(final BoundingBox boundingBox) {
-    this.boundingBox = boundingBox;
-  }
-
   public void setCanAddRecords(final boolean canAddRecords) {
     this.canAddRecords = canAddRecords;
     firePropertyChange("canAddRecords", !isCanAddRecords(), isCanAddRecords());
@@ -2347,17 +2336,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
     getFieldNamesSet(ALL);
     firePropertyChange("fieldNamesSets", null, this.fieldNamesSets);
-  }
-
-  @Override
-  protected void setGeometryFactory(final GeometryFactory geometryFactory) {
-    super.setGeometryFactory(geometryFactory);
-    if (geometryFactory != null && this.boundingBox.isEmpty()) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      if (coordinateSystem != null) {
-        this.boundingBox = coordinateSystem.getAreaBoundingBox();
-      }
-    }
   }
 
   public void setHighlightedRecords(final Collection<LayerRecord> highlightedRecords) {
@@ -2853,7 +2831,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void zoomToRecords(final List<? extends LayerRecord> records) {
-    BoundingBox boundingBox = new BoundingBoxDoubleGf();
+    BoundingBox boundingBox = BoundingBox.EMPTY;
     for (final Record record : records) {
       boundingBox = boundingBox.expandToInclude(record);
     }

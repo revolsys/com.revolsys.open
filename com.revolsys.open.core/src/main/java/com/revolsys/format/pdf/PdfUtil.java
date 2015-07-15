@@ -182,7 +182,7 @@ public class PdfUtil {
         }
       }
     }
-    return new BoundingBoxDoubleGf();
+    return BoundingBox.EMPTY;
   }
 
   public static boolean hasNameValue(final COSDictionary dictionary, final String key,

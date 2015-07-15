@@ -8,6 +8,7 @@ import java.util.Map;
 import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.RecordState;
+import com.revolsys.data.record.Records;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
@@ -76,6 +77,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
     }
     synchronized (this.records) {
       this.records.add(record);
+      expandBoundingBox(record);
     }
     addToIndex(record);
   }
@@ -94,6 +96,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
         this.records.removeAll(records);
       }
       removeFromIndex(records);
+      refreshBoundingBox();
       fireRecordsChanged();
     }
   }
@@ -103,6 +106,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
     this.records.remove(record);
     super.doDeleteRecord(record);
     saveChanges(record);
+    refreshBoundingBox();
     fireEmpty();
   }
 
@@ -110,10 +114,10 @@ public class ListRecordLayer extends AbstractRecordLayer {
   protected List<LayerRecord> doQuery(final Query query) {
     final Condition whereCondition = query.getWhereCondition();
     if (whereCondition == null) {
-      return new ArrayList<LayerRecord>(this.records);
+      return new ArrayList<>(this.records);
     } else {
-      final List<LayerRecord> records = new ArrayList<LayerRecord>();
-      for (final LayerRecord record : new ArrayList<LayerRecord>(this.records)) {
+      final List<LayerRecord> records = new ArrayList<>();
+      for (final LayerRecord record : new ArrayList<>(this.records)) {
         if (whereCondition.accept(record)) {
           records.add(record);
         }
@@ -132,6 +136,18 @@ public class ListRecordLayer extends AbstractRecordLayer {
     }
   }
 
+  protected void expandBoundingBox(final LayerRecord record) {
+    if (record != null) {
+      BoundingBox boundingBox = getBoundingBox();
+      if (boundingBox.isEmpty()) {
+        boundingBox = Records.boundingBox(record);
+      } else {
+        boundingBox = boundingBox.expandToInclude(record);
+      }
+      setBoundingBox(boundingBox);
+    }
+  }
+
   public void fireEmpty() {
     final boolean empty = isEmpty();
     firePropertyChange("empty", !empty, empty);
@@ -141,15 +157,6 @@ public class ListRecordLayer extends AbstractRecordLayer {
   protected void fireRecordsChanged() {
     super.fireRecordsChanged();
     fireEmpty();
-  }
-
-  @Override
-  public BoundingBox getBoundingBox() {
-    BoundingBox boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
-    for (final LayerRecord record : getRecords()) {
-      boundingBox = boundingBox.expandToInclude(record);
-    }
-    return boundingBox;
   }
 
   @Override
@@ -193,6 +200,14 @@ public class ListRecordLayer extends AbstractRecordLayer {
   @Override
   public boolean isEmpty() {
     return getRowCount() + super.getNewRecordCount() <= 0;
+  }
+
+  protected void refreshBoundingBox() {
+    BoundingBox boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
+    for (final LayerRecord record : getRecords()) {
+      boundingBox = boundingBox.expandToInclude(record);
+    }
+    setBoundingBox(boundingBox);
   }
 
 }

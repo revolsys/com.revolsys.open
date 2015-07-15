@@ -13,10 +13,8 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapSerializerUtil;
-import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
@@ -87,32 +85,39 @@ public class FileRecordLayer extends ListRecordLayer {
       return false;
     } else {
       if (this.resource.exists()) {
-        final RecordReader reader = RecordIo.recordReader(this.resource);
-        if (reader == null) {
-          LoggerFactory.getLogger(getClass()).error("Cannot find reader for: " + this.resource);
-          return false;
-        } else {
-          try {
+        try (
+          final RecordReader reader = RecordIo.recordReader(this.resource)) {
+          if (reader == null) {
+            LoggerFactory.getLogger(getClass()).error("Cannot find reader for: " + this.resource);
+            return false;
+          } else {
             final Map<String, Object> properties = getProperties();
             reader.setProperties(properties);
             final RecordDefinition recordDefinition = reader.getRecordDefinition();
             setRecordDefinition(recordDefinition);
-            final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
-            BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory);
+            GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
             for (final Record record : reader) {
               final Geometry geometry = record.getGeometry();
-              boundingBox = boundingBox.expandToInclude(geometry);
+              if (geometry != null) {
+                if (geometryFactory == null || !geometryFactory.isHasCoordinateSystem()) {
+                  final GeometryFactory geometryFactory2 = geometry.getGeometryFactory();
+                  if (geometryFactory2.isHasCoordinateSystem()) {
+                    setGeometryFactory(geometryFactory2);
+                    geometryFactory = geometryFactory2;
+                    recordDefinition.setGeometryFactory(geometryFactory2);
+                  }
+                }
+              }
 
               createRecordInternal(record);
             }
-            setBoundingBox(boundingBox);
+            refreshBoundingBox();
             return true;
-          } catch (final Throwable e) {
-            ExceptionUtil.log(getClass(), "Error reading: " + this.resource, e);
-          } finally {
-            fireRecordsChanged();
-            reader.close();
           }
+        } catch (final Throwable e) {
+          ExceptionUtil.log(getClass(), "Error reading: " + this.resource, e);
+        } finally {
+          fireRecordsChanged();
         }
       } else {
         LoggerFactory.getLogger(getClass()).error("Cannot find: " + this.url);

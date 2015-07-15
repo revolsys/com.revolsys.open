@@ -12,7 +12,6 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.parallel.Invoke;
@@ -134,7 +133,7 @@ public abstract class AbstractRecordTableModel extends com.revolsys.swing.table.
         text = StringConverterRegistry.toString(objectValue);
       } else {
         if (codeTable.isLoaded()) {
-          final List<Object> values = codeTable.getValues(SingleIdentifier.create(objectValue));
+          final List<Object> values = codeTable.getValues(Identifier.create(objectValue));
           if (values == null || values.isEmpty()) {
             text = StringConverterRegistry.toString(objectValue);
           } else {

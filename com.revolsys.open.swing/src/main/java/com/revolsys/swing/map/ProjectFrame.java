@@ -528,7 +528,7 @@ public class ProjectFrame extends BaseFrame {
   // }
 
   protected BoundingBox getDefaultBoundingBox() {
-    return new BoundingBoxDoubleGf();
+    return BoundingBox.EMPTY;
   }
 
   public JTabbedPane getLeftTabs() {

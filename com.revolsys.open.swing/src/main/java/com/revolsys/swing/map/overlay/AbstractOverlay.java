@@ -414,7 +414,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
       final int hotspotPixels = getHotspotPixels();
       boundingBox = viewport.getBoundingBox(geometryFactory, hotspotPixels);
     } else {
-      boundingBox = new BoundingBoxDoubleGf();
+      boundingBox = BoundingBox.EMPTY;
     }
     return boundingBox;
   }
@@ -427,7 +427,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
       final int hotspotPixels = getHotspotPixels();
       boundingBox = viewport.getBoundingBox(geometryFactory, event, hotspotPixels);
     } else {
-      boundingBox = new BoundingBoxDoubleGf();
+      boundingBox = BoundingBox.EMPTY;
     }
     return boundingBox;
   }

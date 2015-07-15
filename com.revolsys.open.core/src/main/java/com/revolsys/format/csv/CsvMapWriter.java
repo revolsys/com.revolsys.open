@@ -33,7 +33,7 @@ public class CsvMapWriter extends AbstractMapWriter {
   }
 
   public CsvMapWriter(final Writer out) {
-    this(out, CsvConstants.FIELD_SEPARATOR, true);
+    this(out, Csv.FIELD_SEPARATOR, true);
   }
 
   public CsvMapWriter(final Writer out, final char fieldSeparator, final boolean useQuotes) {

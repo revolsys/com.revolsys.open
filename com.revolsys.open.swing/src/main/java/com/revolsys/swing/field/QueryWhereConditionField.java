@@ -63,7 +63,7 @@ import com.akiban.sql.parser.ValueNodeList;
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.identifier.SingleIdentifier;
+import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.query.And;
 import com.revolsys.data.query.Between;
 import com.revolsys.data.query.Cast;
@@ -310,7 +310,7 @@ public class QueryWhereConditionField extends ValueField
             }
           } else {
             final List<Object> values = this.codeTable
-              .getValues(SingleIdentifier.create(fieldValue));
+              .getValues(Identifier.create(fieldValue));
             if (values.size() == 1) {
               fieldValue = values.get(0);
             } else {
@@ -361,7 +361,7 @@ public class QueryWhereConditionField extends ValueField
               return;
             }
           } else {
-            fieldValue = this.codeTable.getValue(SingleIdentifier.create(fieldValue));
+            fieldValue = this.codeTable.getValue(Identifier.create(fieldValue));
             if (fieldValue != null) {
               attributeClass = fieldValue.getClass();
             }

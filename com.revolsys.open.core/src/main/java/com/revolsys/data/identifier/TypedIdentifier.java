@@ -8,6 +8,19 @@ import com.revolsys.util.Property;
 
 public class TypedIdentifier extends AbstractIdentifier {
 
+  public static Identifier create(final Object id) {
+    if (id instanceof String) {
+      final String string = (String)id;
+      final int colonIndex = string.indexOf(':');
+      if (colonIndex != -1) {
+        final String type = string.substring(0, colonIndex);
+        final Identifier identifier = Identifier.create(string.substring(colonIndex + 1));
+        return new TypedIdentifier(type, identifier);
+      }
+    }
+    return Identifier.create(id);
+  }
+
   public static TypedIdentifier create(final String type, Object id) {
     if (id == null) {
       return null;
@@ -32,7 +45,7 @@ public class TypedIdentifier extends AbstractIdentifier {
       }
     }
     if (Property.hasValue(id)) {
-      final Identifier identifier = SingleIdentifier.create(id);
+      final Identifier identifier = Identifier.create(id);
       return new TypedIdentifier(type, identifier);
     } else {
       return null;

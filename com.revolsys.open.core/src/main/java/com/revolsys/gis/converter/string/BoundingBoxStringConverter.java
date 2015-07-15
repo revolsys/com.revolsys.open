@@ -26,7 +26,7 @@ public class BoundingBoxStringConverter implements StringConverter<BoundingBox> 
       final Geometry geometry = (Geometry)value;
       return geometry.getBoundingBox();
     } else if (value == null) {
-      return new BoundingBoxDoubleGf();
+      return BoundingBox.EMPTY;
     } else {
       return toObject(value.toString());
     }

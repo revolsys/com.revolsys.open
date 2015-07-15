@@ -64,7 +64,7 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.identifier.SingleIdentifier;
+import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.property.DirectionalAttributes;
@@ -740,7 +740,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     } else if (codeTable == null) {
       string = StringConverterRegistry.toString(value);
     } else {
-      final List<Object> values = codeTable.getValues(SingleIdentifier.create(value));
+      final List<Object> values = codeTable.getValues(Identifier.create(value));
       if (values == null || values.isEmpty()) {
         string = "-";
       } else {

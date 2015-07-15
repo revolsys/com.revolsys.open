@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.format.esri.gdb.xml.model.CodedValueDomain;
 import com.revolsys.format.esri.gdb.xml.model.Domain;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
@@ -55,8 +54,8 @@ public class FileGdbDomainCodeTable implements CodeTable {
     } else if (value2 == null) {
       return -1;
     } else {
-      final Object codeValue1 = getValue(SingleIdentifier.create(value1));
-      final Object codeValue2 = getValue(SingleIdentifier.create(value2));
+      final Object codeValue1 = getValue(Identifier.create(value1));
+      final Object codeValue2 = getValue(Identifier.create(value2));
       return CompareUtil.compare(codeValue1, codeValue2);
     }
   }
@@ -140,7 +139,7 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   @Override
   public <V> V getValue(final Object id) {
-    return getValue(SingleIdentifier.create(id));
+    return getValue(Identifier.create(id));
   }
 
   @Override

@@ -2,7 +2,6 @@ package com.revolsys.swing.map.overlay;
 
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -93,7 +92,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
       id = this.record.getIdentifier();
     }
     if (id == null) {
-      id = SingleIdentifier.create("NEW");
+      id = Identifier.create("NEW");
     }
     return id;
   }

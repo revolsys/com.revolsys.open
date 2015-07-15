@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 
 import org.springframework.core.io.Resource;
 
@@ -65,11 +66,17 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   @Override
+  public com.revolsys.io.Writer<Record> createRecordWriter(final RecordDefinition recordDefinition,
+    final Path path) {
+    return new CsvRecordWriter(recordDefinition, path, Tsv.FIELD_SEPARATOR, false, true);
+  }
+
+  @Override
   public com.revolsys.io.Writer<Record> createRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream, charset);
 
-    return new CsvRecordWriter(recordDefinition, writer, Tsv.FIELD_SEPARATOR, true, true);
+    return new CsvRecordWriter(recordDefinition, writer, Tsv.FIELD_SEPARATOR, false, true);
   }
 }

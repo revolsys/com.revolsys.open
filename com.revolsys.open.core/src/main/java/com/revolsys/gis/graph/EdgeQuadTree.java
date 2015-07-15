@@ -20,11 +20,11 @@ public class EdgeQuadTree<T> extends AbstractIdObjectQuadTree<Edge<T>> {
   @Override
   public BoundingBox getEnvelope(final Edge<T> edge) {
     if (edge == null) {
-      return new BoundingBoxDoubleGf();
+      return BoundingBox.EMPTY;
     } else {
       final LineString line = edge.getLine();
       if (line == null) {
-        return new BoundingBoxDoubleGf();
+        return BoundingBox.EMPTY;
       } else {
         final BoundingBox envelope = line.getBoundingBox();
         return envelope;

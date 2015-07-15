@@ -1043,6 +1043,10 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return this.coordinateSystem instanceof GeographicCoordinateSystem;
   }
 
+  public boolean isHasCoordinateSystem() {
+    return this.coordinateSystem != null;
+  }
+
   public boolean isProjected() {
     return this.coordinateSystem instanceof ProjectedCoordinateSystem;
   }

@@ -189,7 +189,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   public synchronized BoundingBox fitToViewport() {
     final Project project = getProject();
     if (project == null || this.image == null || !isInitialized()) {
-      return new BoundingBoxDoubleGf();
+      return BoundingBox.EMPTY;
     } else {
       final BoundingBox oldValue = this.image.getBoundingBox();
       final BoundingBox viewBoundingBox = project.getViewBoundingBox();
@@ -217,7 +217,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   public BoundingBox getBoundingBox() {
     final GeoreferencedImage image = getImage();
     if (image == null) {
-      return new BoundingBoxDoubleGf();
+      return BoundingBox.EMPTY;
     } else {
       BoundingBox boundingBox = image.getBoundingBox();
       if (boundingBox.isEmpty()) {

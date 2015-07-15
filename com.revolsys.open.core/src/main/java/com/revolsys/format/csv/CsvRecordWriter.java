@@ -3,6 +3,7 @@ package com.revolsys.format.csv;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.Path;
 
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -10,9 +11,12 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.format.wkt.EWktWriter;
+import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.Paths;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.WrappedException;
 
 public class CsvRecordWriter extends AbstractRecordWriter {
@@ -27,10 +31,11 @@ public class CsvRecordWriter extends AbstractRecordWriter {
 
   private final boolean ewkt;
 
-  public CsvRecordWriter(final RecordDefinition recordDefinition, final Writer out,
-    final boolean ewkt) {
-    this(recordDefinition, out, CsvConstants.FIELD_SEPARATOR, true, ewkt);
-
+  public CsvRecordWriter(final RecordDefinition recordDefinition, final Path path,
+    final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {
+    this(recordDefinition, Paths.writer(path), fieldSeparator, useQuotes, ewkt);
+    final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
+    EsriCoordinateSystems.createPrjFile(path, geometryFactory);
   }
 
   public CsvRecordWriter(final RecordDefinition recordDefinition, final Writer out,

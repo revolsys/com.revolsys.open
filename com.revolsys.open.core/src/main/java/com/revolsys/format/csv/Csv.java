@@ -12,6 +12,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -39,6 +40,8 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.WrappedException;
 
 public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory, MapWriterFactory {
+
+  public static final char FIELD_SEPARATOR = ',';
 
   public static Reader<Map<String, Object>> mapReader(final File file) {
     try {
@@ -148,8 +151,8 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   public Csv() {
-    super(CsvConstants.DESCRIPTION);
-    addMediaTypeAndFileExtension(CsvConstants.MEDIA_TYPE, CsvConstants.FILE_EXTENSION);
+    super("Comma-Separated Values");
+    addMediaTypeAndFileExtension("text/csv", "csv");
   }
 
   @Override
@@ -175,11 +178,17 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   @Override
+  public com.revolsys.io.Writer<Record> createRecordWriter(final RecordDefinition recordDefinition,
+    final Path path) {
+    return new CsvRecordWriter(recordDefinition, path, Csv.FIELD_SEPARATOR, true, true);
+  }
+
+  @Override
   public Writer<Record> createRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream, charset);
 
-    return new CsvRecordWriter(recordDefinition, writer, true);
+    return new CsvRecordWriter(recordDefinition, writer, Csv.FIELD_SEPARATOR, true, true);
   }
 }

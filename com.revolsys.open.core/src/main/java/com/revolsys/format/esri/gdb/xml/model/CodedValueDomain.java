@@ -11,7 +11,6 @@ import javax.swing.JComponent;
 
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.util.CompareUtil;
 
 public class CodedValueDomain extends Domain implements CodeTable {
@@ -28,7 +27,7 @@ public class CodedValueDomain extends Domain implements CodeTable {
   private JComponent swingEditor;
 
   public synchronized void addCodedValue(final Object code, final String name) {
-    final Identifier identifier = SingleIdentifier.create(code);
+    final Identifier identifier = Identifier.create(code);
     final CodedValue value = new CodedValue(code, name);
     this.codedValues.add(value);
     final List<Object> values = Collections.<Object> singletonList(name);
@@ -57,7 +56,7 @@ public class CodedValueDomain extends Domain implements CodeTable {
         throw new RuntimeException("Cannot generate code for field type " + getFieldType());
     }
     addCodedValue(id, name);
-    return SingleIdentifier.create(id);
+    return Identifier.create(id);
   }
 
   @Override
@@ -84,8 +83,8 @@ public class CodedValueDomain extends Domain implements CodeTable {
     } else if (value2 == null) {
       return -1;
     } else {
-      final Object codeValue1 = getValue(SingleIdentifier.create(value1));
-      final Object codeValue2 = getValue(SingleIdentifier.create(value2));
+      final Object codeValue1 = getValue(Identifier.create(value1));
+      final Object codeValue2 = getValue(Identifier.create(value2));
       return CompareUtil.compare(codeValue1, codeValue2);
     }
   }
@@ -117,7 +116,7 @@ public class CodedValueDomain extends Domain implements CodeTable {
       if (value == null) {
         return null;
       } else if (this.idValueMap.containsKey(value)) {
-        return SingleIdentifier.create(value);
+        return Identifier.create(value);
       } else if (this.stringIdMap.containsKey(value.toString())) {
         return this.stringIdMap.get(value.toString());
       } else {
@@ -179,7 +178,7 @@ public class CodedValueDomain extends Domain implements CodeTable {
 
   @Override
   public <V> V getValue(final Object id) {
-    return getValue(SingleIdentifier.create(id));
+    return getValue(Identifier.create(id));
   }
 
   @Override

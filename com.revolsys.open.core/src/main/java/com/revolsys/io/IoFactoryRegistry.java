@@ -226,8 +226,12 @@ public class IoFactoryRegistry {
   }
 
   public <F extends IoFactory> F getFactory(final Class<F> factoryClass, final Path path) {
-    final String fileName = Paths.getFileName(path);
-    return getFactoryByFileName(factoryClass, fileName);
+    if (path == null) {
+      return null;
+    } else {
+      final String fileName = Paths.getFileName(path);
+      return getFactoryByFileName(factoryClass, fileName);
+    }
   }
 
   public <F extends IoFactory> F getFactory(final Class<F> factoryClass, final Resource resource) {

@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.index.chain;
 
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.segment.LineSegment;
 
 /**
@@ -43,7 +43,7 @@ import com.revolsys.jts.geom.segment.LineSegment;
  */
 public class MonotoneChainSelectAction {
   // these envelopes are used during the MonotoneChain search process
-  BoundingBoxDoubleGf tempEnv1 = new BoundingBoxDoubleGf();
+  BoundingBox tempEnv1 = BoundingBox.EMPTY;
 
   /**
    * This is a convenience method which can be overridden to obtain the actual

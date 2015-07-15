@@ -34,6 +34,7 @@
 package com.revolsys.jts.testold.junit;
 
 import com.revolsys.data.types.DataTypes;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -44,7 +45,6 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.MultiLineStringImpl;
 import com.revolsys.jts.geom.impl.MultiPointImpl;
 import com.revolsys.jts.geom.impl.PointDouble;
@@ -52,9 +52,8 @@ import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.util.Assert;
 
 import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import junit.framework.TestCase;
+import junit.textui.TestRunner;
 import junit.textui.TestRunner;
 
 /**
@@ -180,14 +179,14 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyGeometryCollection() throws Exception {
     final GeometryCollection g = this.geometryFactory.geometryCollection();
     assertEquals(-1, g.getDimension());
-    assertEquals(new BoundingBoxDoubleGf(), g.getBoundingBox());
+    assertEquals(BoundingBox.EMPTY, g.getBoundingBox());
     assertTrue(g.isSimple());
   }
 
   public void testEmptyLinearRing() throws Exception {
     final LineString l = this.geometryFactory.linearRing();
     assertEquals(1, l.getDimension());
-    assertEquals(new BoundingBoxDoubleGf(), l.getBoundingBox());
+    assertEquals(BoundingBox.EMPTY, l.getBoundingBox());
     assertTrue(l.isSimple());
     assertEquals(null, l.getFromPoint());
     assertEquals(null, l.getToPoint());
@@ -198,7 +197,7 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyLineString() throws Exception {
     final LineString l = this.geometryFactory.lineString();
     assertEquals(1, l.getDimension());
-    assertEquals(new BoundingBoxDoubleGf(), l.getBoundingBox());
+    assertEquals(BoundingBox.EMPTY, l.getBoundingBox());
     /**
      * @todo Enable when #isSimple implemented
      */
@@ -212,7 +211,7 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyMultiLineString() throws Exception {
     final MultiLineString g = this.geometryFactory.multiLineString();
     assertEquals(1, g.getDimension());
-    assertEquals(new BoundingBoxDoubleGf(), g.getBoundingBox());
+    assertEquals(BoundingBox.EMPTY, g.getBoundingBox());
     /**
      * @todo Enable when #isSimple implemented
      */
@@ -223,7 +222,7 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyMultiPoint() throws Exception {
     final MultiPoint g = this.geometryFactory.multiPoint();
     assertEquals(0, g.getDimension());
-    assertEquals(new BoundingBoxDoubleGf(), g.getBoundingBox());
+    assertEquals(BoundingBox.EMPTY, g.getBoundingBox());
     /**
      * @todo Enable when #isSimple implemented
      */
@@ -233,14 +232,14 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyMultiPolygon() throws Exception {
     final MultiPolygon g = this.geometryFactory.multiPolygon();
     assertEquals(2, g.getDimension());
-    assertEquals(new BoundingBoxDoubleGf(), g.getBoundingBox());
+    assertEquals(BoundingBox.EMPTY, g.getBoundingBox());
     assertTrue(g.isSimple());
   }
 
   public void testEmptyPoint() throws Exception {
     final Point p = this.geometryFactory.point((Point)null);
     assertEquals(0, p.getDimension());
-    assertEquals(new BoundingBoxDoubleGf(), p.getBoundingBox());
+    assertEquals(BoundingBox.EMPTY, p.getBoundingBox());
     assertTrue(p.isSimple());
 
     assertEquals("POINT EMPTY", p.toString());
@@ -250,7 +249,7 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyPolygon() throws Exception {
     final Polygon p = this.geometryFactory.polygon();
     assertEquals(2, p.getDimension());
-    assertEquals(new BoundingBoxDoubleGf(), p.getBoundingBox());
+    assertEquals(BoundingBox.EMPTY, p.getBoundingBox());
     assertTrue(p.isSimple());
   }
 

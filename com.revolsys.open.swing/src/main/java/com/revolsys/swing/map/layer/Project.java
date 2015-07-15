@@ -77,7 +77,7 @@ public class Project extends LayerGroup {
 
   private Resource resource;
 
-  private BoundingBox viewBoundingBox = new BoundingBoxDoubleGf();
+  private BoundingBox viewBoundingBox = BoundingBox.EMPTY;
 
   private Map<String, BoundingBox> zoomBookmarks = new LinkedHashMap<String, BoundingBox>();
 
@@ -380,7 +380,7 @@ public class Project extends LayerGroup {
     this.folderConnections = new FolderConnectionRegistry("Project");
     this.initialBoundingBox = null;
     this.resource = null;
-    this.viewBoundingBox = new BoundingBoxDoubleGf();
+    this.viewBoundingBox = BoundingBox.EMPTY;
     this.zoomBookmarks.clear();
     firePropertyChange("reset", false, true);
   }

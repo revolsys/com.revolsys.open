@@ -10,7 +10,7 @@ import org.jdesktop.swingx.table.TableColumnExt;
 import com.revolsys.comparator.NumericComparator;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.identifier.SingleIdentifier;
+import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.menu.MenuFactory;
@@ -231,7 +231,7 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
       if (codeTable == null) {
         text = StringConverterRegistry.toString(objectValue);
       } else {
-        final List<Object> values = codeTable.getValues(SingleIdentifier.create(objectValue));
+        final List<Object> values = codeTable.getValues(Identifier.create(objectValue));
         if (values == null || values.isEmpty()) {
           return null;
         } else {

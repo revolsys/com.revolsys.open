@@ -88,7 +88,7 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
 
   @Override
   protected void updateEnvelope() {
-    BoundingBox boundingBox = new BoundingBoxDoubleGf();
+    BoundingBox boundingBox = BoundingBox.EMPTY;
     for (int i = 0; i < this.size; i++) {
       final BoundingBox envelope = this.envelopes[i];
       boundingBox = boundingBox.expandToInclude(envelope);

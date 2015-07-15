@@ -8,8 +8,11 @@ import javax.measure.unit.Unit;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public interface BoundingBox {
+
+  BoundingBox EMPTY = new BoundingBoxDoubleGf();
 
   BoundingBox clipToCoordinateSystem();
 

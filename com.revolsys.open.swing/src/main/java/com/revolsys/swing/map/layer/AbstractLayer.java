@@ -85,6 +85,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   private PropertyChangeListener beanPropertyListener = new BeanPropertyListener(this);
 
+  private BoundingBox boundingBox = BoundingBox.EMPTY;
+
   private boolean editable = false;
 
   private ThreadEnableable eventsEnabled = new ThreadEnableable();
@@ -93,9 +95,9 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   private GeometryFactory geometryFactory;
 
-  private long id = ID_GEN.incrementAndGet();
-
   private Icon icon = ICON_LAYER;
+
+  private long id = ID_GEN.incrementAndGet();
 
   private boolean initialized;
 
@@ -107,6 +109,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   private String name;
 
+  private Map<String, Map<String, Object>> pluginConfigByName = new TreeMap<>();
+
   private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   private boolean queryable = true;
@@ -115,19 +119,17 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   private boolean readOnly = false;
 
-  private Map<String, Map<String, Object>> pluginConfigByName = new TreeMap<>();
-
   private LayerRenderer<AbstractLayer> renderer;
 
   private boolean selectable = true;
 
   private boolean selectSupported = true;
 
+  protected Object sync = new Object();
+
   private String type;
 
   private boolean visible = true;
-
-  protected Object sync = new Object();
 
   public AbstractLayer() {
   }
@@ -560,7 +562,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   public BoundingBox getSelectedBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
-      return new BoundingBoxDoubleGf();
+      return BoundingBox.EMPTY;
     } else {
       return geometryFactory.boundingBox();
     }
@@ -770,6 +772,10 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     return false;
   }
 
+  protected void setBoundingBox(final BoundingBox boundingBox) {
+    this.boundingBox = boundingBox;
+  }
+
   @Override
   public void setEditable(final boolean editable) {
     final boolean old = isEditable();
@@ -788,7 +794,17 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       final GeometryFactory old = this.geometryFactory;
       this.geometryFactory = geometryFactory;
       firePropertyChange("geometryFactory", old, this.geometryFactory);
+      if (this.boundingBox.isEmpty()) {
+        final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+        if (coordinateSystem != null) {
+          this.boundingBox = coordinateSystem.getAreaBoundingBox();
+        }
+      } else if (!this.boundingBox.getGeometryFactory().isHasCoordinateSystem()
+        && geometryFactory.isHasCoordinateSystem()) {
+        this.boundingBox = this.boundingBox.convert(geometryFactory);
+      }
     }
+
   }
 
   public void setIcon(final Icon icon) {

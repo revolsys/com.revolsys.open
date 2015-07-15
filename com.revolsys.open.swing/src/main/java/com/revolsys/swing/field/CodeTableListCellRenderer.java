@@ -7,7 +7,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 
 import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.identifier.SingleIdentifier;
+import com.revolsys.data.identifier.Identifier;
 import com.revolsys.util.CollectionUtil;
 
 @SuppressWarnings("serial")
@@ -29,7 +29,7 @@ public class CodeTableListCellRenderer extends DefaultListCellRenderer {
     if (value == null || value == CodeTableComboBoxModel.NULL) {
       value = "-";
     } else if (index >= 0) {
-      final List<Object> values = this.codeTable.getValues(SingleIdentifier.create(value));
+      final List<Object> values = this.codeTable.getValues(Identifier.create(value));
       if (values == null || values.isEmpty()) {
         value = "-";
       } else {

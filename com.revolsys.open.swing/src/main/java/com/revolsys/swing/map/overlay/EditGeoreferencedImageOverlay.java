@@ -340,7 +340,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
 
   public BoundingBox getImageBoundingBox() {
     if (this.image == null) {
-      return new BoundingBoxDoubleGf();
+      return BoundingBox.EMPTY;
     } else {
       return this.layer.getBoundingBox();
     }

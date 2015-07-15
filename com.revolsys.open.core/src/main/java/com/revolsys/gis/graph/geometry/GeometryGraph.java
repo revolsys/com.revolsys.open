@@ -223,7 +223,7 @@ public class GeometryGraph extends Graph<LineSegment> {
 
   public BoundingBox getBoundingBox(final Geometry geometry) {
     if (geometry == null) {
-      return new BoundingBoxDoubleGf();
+      return BoundingBox.EMPTY;
     } else {
       BoundingBox boundingBox = geometry.getBoundingBox();
       boundingBox = boundingBox.expand(this.maxDistance);

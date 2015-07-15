@@ -14,7 +14,7 @@ import javax.swing.event.ChangeEvent;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.identifier.SingleIdentifier;
+import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.schema.FieldDefinition;
@@ -383,7 +383,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
         if (codeTable == null) {
           text = StringConverterRegistry.toString(objectValue);
         } else {
-          final List<Object> values = codeTable.getValues(SingleIdentifier.create(objectValue));
+          final List<Object> values = codeTable.getValues(Identifier.create(objectValue));
           if (values == null || values.isEmpty()) {
             return null;
           } else {

@@ -15,7 +15,6 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.data.codes.AbstractCodeTable;
 import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 
@@ -120,13 +119,13 @@ public class JdbcCodeTable extends AbstractCodeTable {
               index = JdbcUtils.setValue(statement, index, value);
             }
             if (statement.executeUpdate() > 0) {
-              return SingleIdentifier.create(id);
+              return Identifier.create(id);
             } else {
               return null;
             }
           }
         } else {
-          return SingleIdentifier.create(id);
+          return Identifier.create(id);
         }
       }
     } catch (final SQLException e) {
@@ -208,7 +207,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
         final PreparedStatement statement = connection.prepareStatement(this.allSql);
         final ResultSet rs = statement.executeQuery()) {
         while (rs.next()) {
-          final Identifier id = SingleIdentifier.create(rs.getLong(1));
+          final Identifier id = Identifier.create(rs.getLong(1));
           final List<Object> values = new ArrayList<Object>();
           for (int i = 0; i < this.valueColumns.size(); i++) {
             values.add(rs.getObject(2 + i));
@@ -241,7 +240,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
           try (
             final ResultSet resultSet = statement.executeQuery()) {
             if (resultSet.next()) {
-              id = SingleIdentifier.create(resultSet.getLong(1));
+              id = Identifier.create(resultSet.getLong(1));
             }
           }
         }

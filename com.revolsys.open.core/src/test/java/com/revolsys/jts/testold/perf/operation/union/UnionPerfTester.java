@@ -3,9 +3,9 @@ package com.revolsys.jts.testold.perf.operation.union;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.union.CascadedPolygonUnion;
 import com.revolsys.jts.util.Stopwatch;
@@ -46,7 +46,7 @@ public class UnionPerfTester {
   }
 
   void printItemEnvelopes(final List tree) {
-    final BoundingBoxDoubleGf itemEnv = new BoundingBoxDoubleGf();
+    final BoundingBox itemEnv = BoundingBox.EMPTY;
     for (final Iterator i = tree.iterator(); i.hasNext();) {
       final Object o = i.next();
       if (o instanceof List) {

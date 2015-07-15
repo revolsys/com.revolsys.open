@@ -126,8 +126,8 @@ public abstract class AbstractCodeTable
     } else if (value2 == null) {
       return -1;
     } else {
-      final Object codeValue1 = getValue(SingleIdentifier.create(value1));
-      final Object codeValue2 = getValue(SingleIdentifier.create(value2));
+      final Object codeValue1 = getValue(Identifier.create(value1));
+      final Object codeValue2 = getValue(Identifier.create(value2));
       return CompareUtil.compare(codeValue1, codeValue2);
     }
   }
@@ -301,7 +301,7 @@ public abstract class AbstractCodeTable
 
   @Override
   public <V> V getValue(final Object id) {
-    return getValue(SingleIdentifier.create(id));
+    return getValue(Identifier.create(id));
   }
 
   protected List<Object> getValueById(Object id) {

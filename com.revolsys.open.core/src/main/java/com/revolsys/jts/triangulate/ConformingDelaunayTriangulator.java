@@ -90,7 +90,7 @@ public class ConformingDelaunayTriangulator {
   private final static int MAX_SPLIT_ITER = 99;
 
   private static BoundingBox computeVertexEnvelope(final Collection vertices) {
-    BoundingBox env = new BoundingBoxDoubleGf();
+    BoundingBox env = BoundingBox.EMPTY;
     for (final Iterator i = vertices.iterator(); i.hasNext();) {
       final Vertex v = (Vertex)i.next();
       env = env.expand(v.getCoordinate());

@@ -3,7 +3,8 @@ package com.revolsys.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -17,12 +18,17 @@ public class Paths {
     return Files.exists(path);
   }
 
-  public static Path get(final String first, final String... more) {
-    return java.nio.file.Paths.get(first, more);
+  public static Path get(final File file) {
+    if (file != null) {
+      final File parentFile = file.getParentFile();
+      parentFile.mkdirs();
+      return file.toPath();
+    }
+    return null;
   }
 
-  public static Path get(final URI uri) {
-    return java.nio.file.Paths.get(uri);
+  public static Path get(final String first, final String... more) {
+    return java.nio.file.Paths.get(first, more);
   }
 
   public static String getBaseName(final java.nio.file.Path path) {
@@ -98,6 +104,21 @@ public class Paths {
   public static OutputStream outputStream(final Path path) {
     try {
       return Files.newOutputStream(path);
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
+  }
+
+  public static Path withExtension(final Path path, final String extension) {
+    final String baseName = getBaseName(path);
+    final String newFileName = baseName + "." + extension;
+    final Path parent = path.getParent();
+    return parent.resolve(newFileName);
+  }
+
+  public static Writer writer(final Path path) {
+    try {
+      return Files.newBufferedWriter(path, StandardCharsets.UTF_8);
     } catch (final IOException e) {
       throw new WrappedException(e);
     }

@@ -67,7 +67,7 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
   public BoundingBox getBoundingBox() {
     final MapServer mapServer = getMapServer();
     if (mapServer == null) {
-      return new BoundingBoxDoubleGf();
+      return BoundingBox.EMPTY;
     } else {
       return mapServer.getFullExtent();
     }

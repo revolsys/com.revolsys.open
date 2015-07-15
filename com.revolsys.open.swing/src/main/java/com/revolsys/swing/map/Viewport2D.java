@@ -91,7 +91,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
   private double originY;
 
   /** The current bounding box of the project. */
-  private BoundingBox boundingBox = new BoundingBoxDoubleGf();
+  private BoundingBox boundingBox = BoundingBox.EMPTY;
 
   private GeometryFactory geometryFactory = GeometryFactory.floating3(3857);
 

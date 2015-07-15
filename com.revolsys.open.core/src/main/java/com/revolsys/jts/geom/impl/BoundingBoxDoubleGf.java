@@ -163,7 +163,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
       }
     }
 
-    return new BoundingBoxDoubleGf();
+    return BoundingBox.EMPTY;
   }
 
   public static boolean isEmpty(final double minX, final double maxX) {

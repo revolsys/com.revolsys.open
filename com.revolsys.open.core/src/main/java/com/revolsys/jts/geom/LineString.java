@@ -34,6 +34,9 @@ package com.revolsys.jts.geom;
 
 import java.util.List;
 
+import com.revolsys.jts.geom.segment.LineSegmentDouble;
+import com.revolsys.jts.geom.segment.Segment;
+
 /**
  *  Models an OGC-style <code>LineString</code>.
  *  A LineString consists of a sequence of two or more vertices,
@@ -127,6 +130,21 @@ public interface LineString extends Lineal {
   boolean isClosed();
 
   boolean isCounterClockwise();
+
+  default boolean isLeft(final Point point) {
+    for (final Segment segment : segments()) {
+      if (!new LineSegmentDouble(segment.getPoint(0), point).crosses(this)
+        && !new LineSegmentDouble(segment.getPoint(1), point).crosses(this)) {
+        final int orientation = segment.orientationIndex(point);
+        if (orientation == 1) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
 
   boolean isRing();
 
