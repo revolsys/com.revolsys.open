@@ -51,8 +51,12 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements UrlPro
 
   @Override
   protected List<BaseTreeNode> doLoadChildren() {
-    final FolderConnection connection = getConnection();
-    return PathTreeNode.getPathNodes(this, connection.getFile().toPath());
+    final Path path = getPath();
+    return PathTreeNode.getPathNodes(this, path);
+  }
+
+  public FolderConnection getConnection() {
+    return getUserData();
   }
 
   @Override
@@ -62,12 +66,7 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements UrlPro
 
   public Path getPath() {
     final FolderConnection connection = getConnection();
-    final Path path = connection.getPath();
-    return path;
-  }
-
-  public FolderConnection getConnection() {
-    return getUserData();
+    return connection.getPath();
   }
 
   @Override
@@ -84,7 +83,7 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements UrlPro
 
   @Override
   public boolean isExists() {
-    Path path = getPath();
+    final Path path = getPath();
     return Paths.exists(path) && super.isExists();
   }
 

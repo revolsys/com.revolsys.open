@@ -15,7 +15,11 @@ public class FileNames {
   }
 
   public static String getFileNameExtension(final String fileName) {
-    final int dotIndex = fileName.lastIndexOf('.');
+    int startIndex = fileName.indexOf("/");
+    if (startIndex == -1) {
+      startIndex = 0;
+    }
+    final int dotIndex = fileName.lastIndexOf(startIndex, '.');
     if (dotIndex != -1) {
       return fileName.substring(dotIndex + 1);
     } else {
