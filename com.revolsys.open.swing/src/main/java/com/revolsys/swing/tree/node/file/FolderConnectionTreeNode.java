@@ -1,11 +1,12 @@
 package com.revolsys.swing.tree.node.file;
 
-import java.io.File;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import com.revolsys.io.Paths;
 import com.revolsys.io.file.FolderConnection;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
@@ -39,7 +40,7 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements UrlPro
   }
 
   public void deleteConnection() {
-    final FolderConnection connection = getUserData();
+    final FolderConnection connection = getConnection();
     final int confirm = JOptionPane.showConfirmDialog(SwingUtil.getActiveWindow(),
       "Delete folder connection '" + connection.getName() + "'? This action cannot be undone.",
       "Delete Layer", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
@@ -50,19 +51,23 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements UrlPro
 
   @Override
   protected List<BaseTreeNode> doLoadChildren() {
-    final FolderConnection connection = getUserData();
+    final FolderConnection connection = getConnection();
     return PathTreeNode.getPathNodes(this, connection.getFile().toPath());
-  }
-
-  protected File getFile() {
-    final FolderConnection connection = getUserData();
-    final File file = connection.getFile();
-    return file;
   }
 
   @Override
   public MenuFactory getMenu() {
     return MENU;
+  }
+
+  public Path getPath() {
+    final FolderConnection connection = getConnection();
+    final Path path = connection.getPath();
+    return path;
+  }
+
+  public FolderConnection getConnection() {
+    return getUserData();
   }
 
   @Override
@@ -79,12 +84,12 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements UrlPro
 
   @Override
   public boolean isExists() {
-    final File file = getFile();
-    return file != null && file.exists() && super.isExists();
+    Path path = getPath();
+    return Paths.exists(path) && super.isExists();
   }
 
   public boolean isReadOnly() {
-    final FolderConnection connection = getUserData();
+    final FolderConnection connection = getConnection();
     return connection.isReadOnly();
   }
 

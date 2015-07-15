@@ -36,6 +36,22 @@ public class Paths {
     return FileNames.getBaseName(fileName);
   }
 
+  public static Path getDirectoryPath(final Path path) {
+    if (!Paths.exists(path)) {
+      try {
+        Files.createDirectories(path);
+      } catch (final IOException e) {
+        throw new WrappedException(e);
+      }
+    }
+    return getPath(path);
+  }
+
+  public static Path getDirectoryPath(final Path parent, final String path) {
+    final Path childPath = parent.resolve(path);
+    return getDirectoryPath(childPath);
+  }
+
   public static String getFileName(final Path path) {
     if (path.getNameCount() == 0) {
       final String fileName = path.toString();

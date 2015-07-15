@@ -155,17 +155,6 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
   }
 
   public static List<BaseTreeNode> getPathNodes(final BaseTreeNode parent,
-    final DirectoryStream<Path> paths) {
-    final List<BaseTreeNode> children = new ArrayList<>();
-    if (paths != null) {
-      for (final Path path : paths) {
-        addPathNode(children, path);
-      }
-    }
-    return children;
-  }
-
-  public static List<BaseTreeNode> getPathNodes(final BaseTreeNode parent,
     final Iterable<Path> paths) {
     final List<BaseTreeNode> children = new ArrayList<>();
     if (paths != null) {
