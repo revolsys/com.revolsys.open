@@ -13,6 +13,15 @@ public class Predicates {
     };
   }
 
+  public static <T> AndPredicate<T> and(final Iterable<Predicate<T>> predicates) {
+    return new AndPredicate<>(predicates);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> AndPredicate<T> and(final Predicate<T>... predicates) {
+    return new AndPredicate<>(predicates);
+  }
+
   public static <T> boolean matches(final List<T> objects, final Predicate<T> predicate) {
     for (final T object : objects) {
       if (predicate.test(object)) {
@@ -38,6 +47,11 @@ public class Predicates {
     return (t) -> {
       return false;
     };
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> OrPredicate<T> or(final Predicate<T>... predicates) {
+    return new OrPredicate<T>(predicates);
   }
 
   public static <T> List<T> predicate(final Collection<T> collection,

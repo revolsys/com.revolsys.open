@@ -2,9 +2,10 @@ package com.revolsys.predicate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
+
+import com.revolsys.collection.list.Lists;
 
 public class AndPredicate<T> implements Predicate<T> {
   private final List<Predicate<T>> predicates = new ArrayList<>();
@@ -12,10 +13,11 @@ public class AndPredicate<T> implements Predicate<T> {
   public AndPredicate() {
   }
 
-  public AndPredicate(final Collection<Predicate<T>> predicates) {
-    this.predicates.addAll(predicates);
+  public AndPredicate(final Iterable<Predicate<T>> predicates) {
+    Lists.addAll(this.predicates, predicates);
   }
 
+  @SuppressWarnings("unchecked")
   public AndPredicate(final Predicate<T>... predicates) {
     this(Arrays.asList(predicates));
   }

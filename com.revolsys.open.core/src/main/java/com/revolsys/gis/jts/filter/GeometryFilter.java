@@ -5,17 +5,17 @@ import java.util.function.Predicate;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.predicate.InvokeMethodPredicate;
 
 public class GeometryFilter {
-  public static boolean testEnvelopeIntersects(final BoundingBox envelope,
-    final Geometry geometry) {
-    final BoundingBox geometryEnvelope = geometry.getBoundingBox();
-    return envelope.intersects(geometryEnvelope);
-  }
-
-  public static <T extends Geometry> Predicate<T> intersects(final BoundingBox envelope) {
-    return new InvokeMethodPredicate<T>(GeometryFilter.class, "acceptEnvelopeIntersects", envelope);
+  public static <T extends Geometry> Predicate<T> intersects(final BoundingBox boundingBox) {
+    return (geometry) -> {
+      if (boundingBox == null || geometry == null) {
+        return false;
+      } else {
+        final BoundingBox geometryBoundingBox = geometry.getBoundingBox();
+        return boundingBox.intersects(geometryBoundingBox);
+      }
+    };
   }
 
   public static Predicate<LineString> lineContainedWithinTolerance(final LineString line,

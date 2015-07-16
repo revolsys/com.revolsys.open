@@ -5,7 +5,6 @@ import java.util.function.Predicate;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.comparator.ComparatorProxy;
-import com.revolsys.predicate.AndPredicate;
 import com.revolsys.predicate.PredicateProxy;
 
 public abstract class AbstractVisitor<T>
@@ -46,9 +45,5 @@ public abstract class AbstractVisitor<T>
 
   public void setFilter(final Predicate<T> predicate) {
     this.predicate = predicate;
-  }
-
-  public void setFilters(final Predicate<T>... predicates) {
-    this.predicate = new AndPredicate<T>(predicates);
   }
 }

@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 import com.revolsys.data.filter.AttributesEqualFilter;
 import com.revolsys.data.filter.AttributesEqualOrNullFilter;
 import com.revolsys.data.record.Record;
-import com.revolsys.predicate.AndPredicate;
+import com.revolsys.predicate.Predicates;
 
 public class CompareFilterFactory implements Function<Record, Predicate<Record>> {
   private List<String> equalFieldNames = new ArrayList<String>();
@@ -17,19 +17,19 @@ public class CompareFilterFactory implements Function<Record, Predicate<Record>>
 
   @Override
   public Predicate<Record> apply(final Record object) {
-    final AndPredicate<Record> filters = new AndPredicate<Record>();
+    Predicate<Record> predicate = Predicates.all();
     if (!this.equalFieldNames.isEmpty()) {
       final Predicate<Record> valuesFilter = new AttributesEqualFilter(object,
         this.equalFieldNames);
-      filters.addFilter(valuesFilter);
+      predicate = valuesFilter;
     }
     if (!this.equalOrNullFieldNames.isEmpty()) {
       final Predicate<Record> valuesFilter = new AttributesEqualOrNullFilter(object,
         this.equalOrNullFieldNames);
-      filters.addFilter(valuesFilter);
+      predicate = predicate.and(valuesFilter);
     }
 
-    return filters;
+    return predicate;
   }
 
   public List<String> getEqualFieldNames() {

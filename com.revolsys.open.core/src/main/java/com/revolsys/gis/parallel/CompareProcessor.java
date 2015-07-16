@@ -23,7 +23,6 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.parallel.channel.Channel;
-import com.revolsys.predicate.AndPredicate;
 import com.revolsys.predicate.Predicates;
 
 public class CompareProcessor extends AbstractMergeProcess {
@@ -171,7 +170,7 @@ public class CompareProcessor extends AbstractMergeProcess {
       sourceLine, 3);
     final Predicate<Record> geometryFilter = new RecordGeometryFilter<LineString>(lineEqualFilter);
     final Predicate<Record> equalFilter = this.equalFilterFactory.apply(sourceObject);
-    final Predicate<Record> filter = new AndPredicate<Record>(equalFilter, geometryFilter);
+    final Predicate<Record> filter = equalFilter.and(geometryFilter);
 
     final Record otherObject = this.otherIndex.queryFirst(sourceObject, filter);
     if (otherObject != null) {
@@ -250,7 +249,7 @@ public class CompareProcessor extends AbstractMergeProcess {
       final Predicate<Record> geometryFilter = new RecordGeometryFilter<LineString>(
         intersectsFilter);
       final Predicate<Record> equalFilter = this.equalFilterFactory.apply(sourceObject);
-      final Predicate<Record> filter = new AndPredicate<Record>(equalFilter, geometryFilter);
+      final Predicate<Record> filter = equalFilter.and(geometryFilter);
       final List<Record> otherObjects = this.otherIndex.queryList(sourceGeometry, filter);
       if (!otherObjects.isEmpty()) {
         final LineMatchGraph<Record> graph = new LineMatchGraph<Record>(sourceObject, sourceLine);

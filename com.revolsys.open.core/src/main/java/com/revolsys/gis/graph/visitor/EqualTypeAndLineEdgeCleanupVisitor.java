@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -16,8 +17,6 @@ import com.revolsys.data.equals.RecordEquals;
 import com.revolsys.data.filter.RecordGeometryFilter;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordLog;
-
-import java.util.function.Predicate;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.RecordGraph;
@@ -26,7 +25,6 @@ import com.revolsys.gis.graph.filter.EdgeTypeNameFilter;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jts.filter.LineEqualIgnoreDirectionFilter;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.predicate.AndPredicate;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 
@@ -215,19 +213,17 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
       final Graph<Record> graph = edge.getGraph();
       final LineString line = edge.getLine();
 
-      final AndPredicate<Edge<Record>> attributeAndGeometryFilter = new AndPredicate<Edge<Record>>();
-
-      attributeAndGeometryFilter.addFilter(new EdgeTypeNameFilter<Record>(typePath));
+      Predicate<Edge<Record>> attributeAndGeometryFilter = new EdgeTypeNameFilter<Record>(typePath);
 
       final Predicate<Edge<Record>> filter = getPredicate();
       if (filter != null) {
-        attributeAndGeometryFilter.addFilter(filter);
+        attributeAndGeometryFilter = attributeAndGeometryFilter.and(filter);
       }
 
       final Predicate<Record> equalLineFilter = new RecordGeometryFilter<LineString>(
         new LineEqualIgnoreDirectionFilter(line, 2));
       final EdgeObjectFilter<Record> edgeFilter = new EdgeObjectFilter<Record>(equalLineFilter);
-      attributeAndGeometryFilter.addFilter(edgeFilter);
+      attributeAndGeometryFilter = attributeAndGeometryFilter.and(edgeFilter);
 
       final List<Edge<Record>> equalEdges;
       if (getComparator() == null) {

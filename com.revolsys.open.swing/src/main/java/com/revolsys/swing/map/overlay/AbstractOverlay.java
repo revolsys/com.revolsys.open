@@ -43,7 +43,6 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.Vertex;
@@ -310,8 +309,9 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     final GeometrySegmentQuadTree lineSegments = GeometrySegmentQuadTree.get(convertedGeometry);
     final Point point = boundingBox.getCentre();
     double closestDistance = Double.MAX_VALUE;
-    final List<Segment> segments = lineSegments.query(boundingBox, "isWithinDistance", point,
-      maxDistance);
+    final List<Segment> segments = lineSegments.query(boundingBox, (segment) -> {
+      return segment.isWithinDistance(point, maxDistance);
+    });
     Segment closestSegment = null;
     for (final Segment segment : segments) {
       final double distance = segment.distance(point);

@@ -3,15 +3,13 @@ package com.revolsys.gis.algorithm.index.quadtree;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
-
-import com.revolsys.collection.Visitor;
 import java.util.function.Predicate;
 
+import com.revolsys.collection.Visitor;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.index.SpatialIndex;
-import com.revolsys.predicate.InvokeMethodPredicate;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.SingleObjectVisitor;
 
@@ -148,12 +146,6 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     final CreateListVisitor<T> visitor = new CreateListVisitor<T>(filter);
     visit(boundingBox, visitor);
     return visitor.getList();
-  }
-
-  public List<T> query(final BoundingBox boundingBox, final String methodName,
-    final Object... parameters) {
-    final InvokeMethodPredicate<T> filter = new InvokeMethodPredicate<T>(methodName, parameters);
-    return query(boundingBox, filter);
   }
 
   public List<T> queryBoundingBox(final Geometry geometry) {
