@@ -5,7 +5,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
-import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.io.FileIoFactory;
@@ -14,6 +13,7 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.io.Writer;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.spring.PathResource;
 import com.revolsys.spring.SpringUtil;
 
 public interface GeometryWriterFactory extends FileIoFactory, IoFactoryWithCoordinateSystem {

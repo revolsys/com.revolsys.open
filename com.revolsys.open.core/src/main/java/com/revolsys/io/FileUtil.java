@@ -40,7 +40,6 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -748,11 +747,6 @@ public final class FileUtil {
       }
       return fileName;
     }
-  }
-
-  public static String getFileName(final Path path) {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   public static String getFileName(final String fileName) {

@@ -17,6 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
@@ -296,10 +297,18 @@ public class SpringUtil {
   public static Resource getResourceWithExtension(final Resource resource, final String extension) {
     final String baseName = getBaseName(resource);
     final String newFileName = baseName + "." + extension;
-    try {
-      return resource.createRelative(newFileName);
-    } catch (final IOException e) {
-      throw new RuntimeException("Unable to get resource " + newFileName, e);
+    if (resource instanceof PathResource) {
+      final PathResource pathResource = (PathResource)resource;
+      final Path path = pathResource.getPath();
+      Path parent = path.getParent();
+      Path newPath = parent.resolve(newFileName);
+      return new PathResource(newPath);
+    } else {
+      try {
+        return resource.createRelative(newFileName);
+      } catch (final IOException e) {
+        throw new RuntimeException("Unable to get resource " + newFileName, e);
+      }
     }
   }
 

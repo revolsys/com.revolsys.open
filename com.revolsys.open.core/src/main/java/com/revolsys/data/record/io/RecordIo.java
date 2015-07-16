@@ -8,11 +8,11 @@ import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 
 public class RecordIo {
-  public static void copyRecords(final File sourceFile, final File targetFile) {
+  public static void copyRecords(final Object source, final File targetFile) {
     try (
-      RecordReader reader = RecordReader.create(sourceFile)) {
+      RecordReader reader = RecordReader.create(source)) {
       if (reader == null) {
-        throw new IllegalArgumentException("Unable to read " + sourceFile);
+        throw new IllegalArgumentException("Unable to read " + source);
       } else {
         copyRecords(reader, targetFile);
       }
@@ -20,11 +20,11 @@ public class RecordIo {
 
   }
 
-  public static void copyRecords(final File sourceFile, final Writer<Record> writer) {
+  public static void copyRecords(final Object source, final Writer<Record> writer) {
     try (
-      RecordReader reader = RecordReader.create(sourceFile)) {
+      RecordReader reader = RecordReader.create(source)) {
       if (reader == null) {
-        throw new IllegalArgumentException("Unable to read " + sourceFile);
+        throw new IllegalArgumentException("Unable to read " + source);
       } else {
         copyRecords(reader, writer);
       }

@@ -78,7 +78,11 @@ public interface RecordWriter extends Writer<Record> {
   }
 
   default void setIndent(final boolean indent) {
-    setProperty(IoConstants.INDENT, Boolean.valueOf(indent));
+
+    final Boolean indentObject = Boolean.valueOf(indent);
+    if (getProperty(IoConstants.INDENT) != indentObject) {
+      setProperty(IoConstants.INDENT, indentObject);
+    }
   }
 
   @Override

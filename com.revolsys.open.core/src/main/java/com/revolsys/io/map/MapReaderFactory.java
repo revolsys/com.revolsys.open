@@ -2,11 +2,11 @@ package com.revolsys.io.map;
 
 import java.nio.file.Path;
 
-import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.spring.PathResource;
 
 public interface MapReaderFactory extends FileIoFactory {
   static MapReaderFactory mapReaderFactory(final Resource resource) {

@@ -17,54 +17,44 @@ import com.revolsys.io.Paths;
 import com.revolsys.io.Reader;
 
 public interface RecordReader extends Reader<Record> {
-  static RecordReader create(final File file) {
-    final Resource resource = new FileSystemResource(file);
-    return create(resource);
+  /**
+   * Create a {@link RecordReader} for the given source. The source can be one of the following
+   * classes.
+   *
+   * <ul>
+   *   <li>{@link Path}</li>
+   *   <li>{@link File}</li>
+   *   <li>{@link Resource}</li>
+   * </ul>
+   * @param source The source to read the records from.
+   * @return The reader.
+   * @throws IllegalArgumentException If the source is not a supported class.
+   */
+  static RecordReader create(final Object source) {
+    final RecordFactory recordFactory = ArrayRecordFactory.INSTANCE;
+    return create(source, recordFactory);
   }
 
-  static RecordReader create(final FileSystemResource resource, final RecordFactory factory) {
-    final RecordReaderFactory readerFactory = IoFactory.factory(RecordReaderFactory.class,
-      resource);
+  /**
+   * Create a {@link RecordReader} for the given source. The source can be one of the following
+   * classes.
+   *
+   * <ul>
+   *   <li>{@link Path}</li>
+   *   <li>{@link File}</li>
+   *   <li>{@link Resource}</li>
+   * </ul>
+   * @param source The source to read the records from.
+   * @param recordFactory The factory used to create records.
+   * @return The reader.
+   * @throws IllegalArgumentException If the source is not a supported class.
+   */
+  static RecordReader create(final Object source, final RecordFactory recordFactory) {
+    final RecordReaderFactory readerFactory = IoFactory.factory(RecordReaderFactory.class, source);
     if (readerFactory == null) {
       return null;
     } else {
-      final RecordReader reader = readerFactory.createRecordReader(resource, factory);
-      return reader;
-    }
-  }
-
-  static RecordReader create(final Path path) {
-    return create(path, ArrayRecordFactory.INSTANCE);
-  }
-
-  static RecordReader create(final Path path, final RecordFactory factory) {
-    final RecordReaderFactory readerFactory = IoFactory.factory(RecordReaderFactory.class, path);
-    if (readerFactory == null) {
-      return null;
-    } else {
-      final RecordReader reader = readerFactory.createRecordReader(path, factory);
-      return reader;
-    }
-  }
-
-  static RecordReader create(final Resource resource) {
-    final RecordReaderFactory readerFactory = IoFactory.factory(RecordReaderFactory.class,
-      resource);
-    if (readerFactory == null) {
-      return null;
-    } else {
-      final RecordReader reader = readerFactory.createRecordReader(resource);
-      return reader;
-    }
-  }
-
-  static RecordReader create(final Resource resource, final RecordFactory factory) {
-    final RecordReaderFactory readerFactory = IoFactory.factory(RecordReaderFactory.class,
-      resource);
-    if (readerFactory == null) {
-      return null;
-    } else {
-      final RecordReader reader = readerFactory.createRecordReader(resource, factory);
+      final RecordReader reader = readerFactory.createRecordReader(source, recordFactory);
       return reader;
     }
   }

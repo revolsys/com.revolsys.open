@@ -4,7 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Iterator;
 
-import org.springframework.core.io.PathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.io.GeometryReader;
@@ -16,6 +16,7 @@ import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.io.Reader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapReaderFactory;
+import com.revolsys.spring.PathResource;
 
 public interface RecordReaderFactory
   extends GeometryReaderFactory, MapReaderFactory, IoFactoryWithCoordinateSystem {
@@ -75,31 +76,50 @@ public interface RecordReaderFactory
   }
 
   /**
-   * Create a reader for the path using the ({@link ArrayRecordFactory}
-   * ).
-   *
-   * @param file The file to read.
-   * @return The reader for the file.
-   */
-  default RecordReader createRecordReader(final Path path) {
-    return createRecordReader(path, ArrayRecordFactory.INSTANCE);
-  }
-
-  default RecordReader createRecordReader(final Path path, final RecordFactory factory) {
-    final PathResource resource = new PathResource(path);
-    return createRecordReader(resource, factory);
-  }
-
-  /**
    * Create a reader for the resource using the ({@link ArrayRecordFactory}
    * ).
    *
    * @param file The file to read.
    * @return The reader for the file.
    */
-  default RecordReader createRecordReader(final Resource resource) {
-    return createRecordReader(resource, ArrayRecordFactory.INSTANCE);
+  default RecordReader createRecordReader(final Object object) {
+    return createRecordReader(object, ArrayRecordFactory.INSTANCE);
 
+  }
+
+  /**
+   * Create a {@link RecordReader} for the given source. The source can be one of the following
+   * classes.
+   *
+   * <ul>
+   *   <li>{@link Path}</li>
+   *   <li>{@link File}</li>
+   *   <li>{@link Resource}</li>
+   * </ul>
+   * @param source The source to read the records from.
+   * @param recordFactory The factory used to create records.
+   * @return The reader.
+   * @throws IllegalArgumentException If the source is not a supported class.
+   */
+  default RecordReader createRecordReader(final Object source, final RecordFactory factory) {
+    if (source instanceof File) {
+      final File file = (File)source;
+      final FileSystemResource resource = new FileSystemResource(file);
+      return createRecordReader(resource, factory);
+    } else if (source instanceof Resource) {
+      final Resource resource = (Resource)source;
+      return createRecordReader(resource, factory);
+    } else if (source instanceof Path) {
+      final Path path = (Path)source;
+      return createRecordReader(path, factory);
+    } else {
+      throw new IllegalArgumentException(source.getClass() + " is not supported");
+    }
+  }
+
+  default RecordReader createRecordReader(final Path path, final RecordFactory factory) {
+    final PathResource resource = new PathResource(path);
+    return createRecordReader(resource, factory);
   }
 
   RecordReader createRecordReader(Resource resource, RecordFactory factory);

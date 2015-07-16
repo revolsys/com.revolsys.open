@@ -5,12 +5,12 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
+import com.revolsys.spring.SpringUtil;
 
 public class RecordStoreRecordAndGeometryWriterFactory extends AbstractIoFactoryWithCoordinateSystem
   implements RecordWriterFactory {
@@ -34,18 +34,13 @@ public class RecordStoreRecordAndGeometryWriterFactory extends AbstractIoFactory
   @Override
   public RecordWriter createRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
-    if (resource instanceof FileSystemResource) {
-      final FileSystemResource fileResource = (FileSystemResource)resource;
-      final File file = fileResource.getFile();
-      final RecordStore recordStore = RecordStoreFactoryRegistry.createRecordStore(file);
-      if (recordStore == null) {
-        return null;
-      } else {
-        recordStore.initialize();
-        return new RecordStoreRecordWriter(recordStore);
-      }
+    final File file = SpringUtil.getFile(resource);
+    final RecordStore recordStore = RecordStoreFactoryRegistry.createRecordStore(file);
+    if (recordStore == null) {
+      return null;
     } else {
-      throw new UnsupportedOperationException("Writing to a stream not currently supported");
+      recordStore.initialize();
+      return new RecordStoreRecordWriter(recordStore);
     }
   }
 

@@ -14,9 +14,9 @@ import com.revolsys.gis.geometry.io.GeometryWriterFactory;
 import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryWithCoordinateSystem;
-import com.revolsys.io.Paths;
 import com.revolsys.io.Writer;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.spring.PathResource;
 import com.revolsys.spring.SpringUtil;
 
 public interface RecordWriterFactory
@@ -33,9 +33,8 @@ public interface RecordWriterFactory
 
   default RecordWriter createRecordWriter(final RecordDefinition recordDefinition,
     final Path path) {
-    final OutputStream out = Paths.outputStream(path);
-    final String baseName = Paths.getBaseName(path);
-    return createRecordWriter(baseName, recordDefinition, out);
+    final PathResource resource = new PathResource(path);
+    return createRecordWriter(recordDefinition, resource);
   }
 
   /**

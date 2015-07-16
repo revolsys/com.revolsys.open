@@ -6,11 +6,11 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
-import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.FileUtil;
+import com.revolsys.spring.PathResource;
 import com.revolsys.spring.SpringUtil;
 
 public interface MapWriterFactory extends FileIoFactory {

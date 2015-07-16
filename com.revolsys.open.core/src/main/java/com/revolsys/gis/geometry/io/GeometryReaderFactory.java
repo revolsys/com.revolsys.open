@@ -2,7 +2,6 @@ package com.revolsys.gis.geometry.io;
 
 import java.nio.file.Path;
 
-import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.io.GeometryReader;
@@ -10,6 +9,7 @@ import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.IoFactoryWithCoordinateSystem;
+import com.revolsys.spring.PathResource;
 
 public interface GeometryReaderFactory extends FileIoFactory, IoFactoryWithCoordinateSystem {
   static GeometryReader geometryReader(final Resource resource) {

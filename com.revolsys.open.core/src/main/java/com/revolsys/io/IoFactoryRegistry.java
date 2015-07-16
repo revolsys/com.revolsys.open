@@ -1,5 +1,6 @@
 package com.revolsys.io;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -222,6 +223,42 @@ public class IoFactoryRegistry {
         this.classFactoriesByMediaType.put(factoryClass, factoriesByMediaType);
       }
       return (Map<String, F>)factoriesByMediaType;
+    }
+  }
+
+  /**
+   * Get the {@link IoFactory} for the given source. The source can be one of the following
+   * classes.
+   *
+   * <ul>
+   *   <li>{@link Path}</li>
+   *   <li>{@link File}</li>
+   *   <li>{@link Resource}</li>
+   * </ul>
+   * @param factoryClass The class or interface to get the factory for.
+   * @param source The source to create the factory for.
+   * @return The factory.
+   * @throws IllegalArgumentException If the source is not a supported class.
+   */
+  public <F extends IoFactory> F getFactory(final Class<F> factoryClass, final Object source) {
+    if (source == null) {
+      return null;
+    } else {
+      final String fileName;
+      if (source instanceof File) {
+        final File file = (File)source;
+        fileName = file.getName();
+      } else if (source instanceof Resource) {
+        final Resource resource = (Resource)source;
+        fileName = resource.getFilename();
+      } else if (source instanceof Path) {
+        final Path path = (Path)source;
+        fileName = Paths.getFileName(path);
+      } else {
+        throw new IllegalArgumentException(source.getClass() + " is not supported");
+      }
+
+      return getFactoryByFileName(factoryClass, fileName);
     }
   }
 
