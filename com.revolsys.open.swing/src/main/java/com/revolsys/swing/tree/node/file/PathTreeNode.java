@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -93,8 +94,9 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       new AndEnableCheck(isDirectory, NODE_EXISTS), "addFolderConnection"));
   }
 
-  public static void addPathNode(final List<BaseTreeNode> children, final Path path) {
-    if (!Paths.isHidden(path)) {
+  public static void addPathNode(final List<BaseTreeNode> children, final Path path,
+    final boolean showHidden) {
+    if (showHidden || !Paths.isHidden(path) && Files.exists(path)) {
       if (RecordStoreFactoryRegistry.isRecordStore(path)) {
         final PathRecordStoreTreeNode recordStoreNode = new PathRecordStoreTreeNode(path);
         children.add(recordStoreNode);
@@ -154,11 +156,11 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
   }
 
   public static List<BaseTreeNode> getPathNodes(final BaseTreeNode parent,
-    final Iterable<Path> paths) {
+    final Iterable<Path> paths, final boolean showHidden) {
     final List<BaseTreeNode> children = new ArrayList<>();
     if (paths != null) {
       for (final Path path : paths) {
-        addPathNode(children, path);
+        addPathNode(children, path, showHidden);
       }
     }
     return children;
@@ -168,14 +170,13 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
     if (Files.isDirectory(path)) {
       try (
         final DirectoryStream<Path> children = Files.newDirectoryStream(path)) {
-        return getPathNodes(parent, children);
+        return getPathNodes(parent, children, false);
+      } catch (final AccessDeniedException e) {
       } catch (final IOException e) {
         LoggerFactory.getLogger(PathTreeNode.class).debug("Unable to get children " + path);
-        return Collections.emptyList();
       }
-    } else {
-      return Collections.emptyList();
     }
+    return Collections.emptyList();
   }
 
   public static URL getUrl(final BaseTreeNode parent, final Path path) {
@@ -199,7 +200,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
   public static boolean isAllowsChildren(final Path path) {
     if (path == null) {
       return true;
-    } else if (!Files.exists(path)) {
+    } else if (!Paths.exists(path)) {
       return false;
     } else if (Files.isDirectory(path)) {
       return true;

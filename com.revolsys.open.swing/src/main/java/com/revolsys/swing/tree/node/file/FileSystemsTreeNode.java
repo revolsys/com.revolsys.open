@@ -32,7 +32,7 @@ public class FileSystemsTreeNode extends LazyLoadTreeNode {
     final FileSystem fileSystem = FileSystems.getDefault();
 
     final Iterable<Path> roots = fileSystem.getRootDirectories();
-    return PathTreeNode.getPathNodes(this, roots);
+    return PathTreeNode.getPathNodes(this, roots, true);
   }
 
   @Override
