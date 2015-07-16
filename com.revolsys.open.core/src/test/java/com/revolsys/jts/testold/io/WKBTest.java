@@ -15,9 +15,8 @@ import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.util.GeometricShapeFactory;
 
 import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import junit.framework.TestCase;
+import junit.textui.TestRunner;
 import junit.textui.TestRunner;
 
 /**

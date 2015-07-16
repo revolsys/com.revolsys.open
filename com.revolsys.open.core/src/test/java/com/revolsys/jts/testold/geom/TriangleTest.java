@@ -42,9 +42,8 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKTReader;
 
 import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import junit.framework.TestCase;
+import junit.textui.TestRunner;
 import junit.textui.TestRunner;
 
 /**

@@ -2,11 +2,11 @@ package com.revolsys.data.filter;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.function.Predicate;
 
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.Records;
-import java.util.function.Predicate;
 
 public class AttributesEqualFilter implements Predicate<Record> {
   public static boolean test(final Record object1, final Record object2,

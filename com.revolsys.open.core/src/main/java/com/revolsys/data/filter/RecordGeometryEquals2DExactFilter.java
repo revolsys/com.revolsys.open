@@ -20,8 +20,9 @@
  */
 package com.revolsys.data.filter;
 
-import com.revolsys.data.record.Record;
 import java.util.function.Predicate;
+
+import com.revolsys.data.record.Record;
 import com.revolsys.jts.geom.Geometry;
 
 public class RecordGeometryEquals2DExactFilter implements Predicate<Record> {
@@ -29,6 +30,15 @@ public class RecordGeometryEquals2DExactFilter implements Predicate<Record> {
 
   public RecordGeometryEquals2DExactFilter(final Geometry geometry) {
     this.geometry = geometry;
+  }
+
+  /**
+   * Get the geometry to compare the data objects to to.
+   *
+   * @return The geometry to compare the data objects to to.
+   */
+  public Geometry getGeometry() {
+    return this.geometry;
   }
 
   @Override
@@ -39,15 +49,6 @@ public class RecordGeometryEquals2DExactFilter implements Predicate<Record> {
     } else {
       return false;
     }
-  }
-
-  /**
-   * Get the geometry to compare the data objects to to.
-   *
-   * @return The geometry to compare the data objects to to.
-   */
-  public Geometry getGeometry() {
-    return this.geometry;
   }
 
 }

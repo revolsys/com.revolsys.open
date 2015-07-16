@@ -23,18 +23,19 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.io.IteratorReader;
-import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.io.AbstractRecordIoFactory;
 import com.revolsys.data.record.io.RecordIteratorReader;
 import com.revolsys.data.record.io.RecordReader;
+import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.MapWriter;
-import com.revolsys.io.MapWriterFactory;
 import com.revolsys.io.Reader;
-import com.revolsys.io.Writer;
+import com.revolsys.io.map.IteratorMapReader;
+import com.revolsys.io.map.MapReader;
+import com.revolsys.io.map.MapWriter;
+import com.revolsys.io.map.MapWriterFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.WrappedException;
@@ -156,10 +157,10 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   @Override
-  public Reader<Map<String, Object>> createMapReader(final Resource resource) {
+  public MapReader createMapReader(final Resource resource) {
     try {
       final CsvMapIterator iterator = new CsvMapIterator(SpringUtil.getReader(resource));
-      return new IteratorReader<>(iterator);
+      return new IteratorMapReader(iterator);
     } catch (final IOException e) {
       return ExceptionUtil.throwUncheckedException(e);
     }
@@ -178,13 +179,12 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   @Override
-  public com.revolsys.io.Writer<Record> createRecordWriter(final RecordDefinition recordDefinition,
-    final Path path) {
+  public RecordWriter createRecordWriter(final RecordDefinition recordDefinition, final Path path) {
     return new CsvRecordWriter(recordDefinition, path, Csv.FIELD_SEPARATOR, true, true);
   }
 
   @Override
-  public Writer<Record> createRecordWriter(final String baseName,
+  public RecordWriter createRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream, charset);

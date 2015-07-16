@@ -2,10 +2,10 @@ package com.revolsys.data.record.io;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordStore;
-import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.Writer;
 
-public class RecordStoreRecordWriter extends AbstractWriter<Record> {
+public class RecordStoreRecordWriter extends AbstractRecordWriter {
 
   private final RecordStore recordStore;
 

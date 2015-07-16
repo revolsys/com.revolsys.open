@@ -11,6 +11,11 @@ public class NotEqual extends BinaryCondition {
   }
 
   @Override
+  public NotEqual clone() {
+    return (NotEqual)super.clone();
+  }
+
+  @Override
   public boolean test(final Map<String, Object> record) {
     final QueryValue left = getLeft();
     final Object value1 = left.getValue(record);
@@ -19,11 +24,6 @@ public class NotEqual extends BinaryCondition {
     final Object value2 = right.getValue(record);
 
     return !EqualsRegistry.equal(value1, value2);
-  }
-
-  @Override
-  public NotEqual clone() {
-    return (NotEqual)super.clone();
   }
 
 }

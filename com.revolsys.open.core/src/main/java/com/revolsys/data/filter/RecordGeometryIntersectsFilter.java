@@ -20,8 +20,9 @@
  */
 package com.revolsys.data.filter;
 
-import com.revolsys.data.record.Record;
 import java.util.function.Predicate;
+
+import com.revolsys.data.record.Record;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.TopologyException;
@@ -40,6 +41,15 @@ public class RecordGeometryIntersectsFilter implements Predicate<Record> {
   public RecordGeometryIntersectsFilter(final Geometry geometry) {
     this.geometry = geometry;
     this.geometryFactory = geometry.getGeometryFactory();
+  }
+
+  /**
+   * Get the geometry to compare the data objects to to.
+   *
+   * @return The geometry to compare the data objects to to.
+   */
+  public Geometry getGeometry() {
+    return this.geometry;
   }
 
   @Override
@@ -62,14 +72,5 @@ public class RecordGeometryIntersectsFilter implements Predicate<Record> {
       t.printStackTrace();
       return false;
     }
-  }
-
-  /**
-   * Get the geometry to compare the data objects to to.
-   *
-   * @return The geometry to compare the data objects to to.
-   */
-  public Geometry getGeometry() {
-    return this.geometry;
   }
 }

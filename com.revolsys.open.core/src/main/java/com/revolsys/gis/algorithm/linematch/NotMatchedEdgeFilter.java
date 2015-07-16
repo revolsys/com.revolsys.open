@@ -1,6 +1,7 @@
 package com.revolsys.gis.algorithm.linematch;
 
 import java.util.function.Predicate;
+
 import com.revolsys.gis.graph.Edge;
 
 public class NotMatchedEdgeFilter implements Predicate<Edge<LineSegmentMatch>> {

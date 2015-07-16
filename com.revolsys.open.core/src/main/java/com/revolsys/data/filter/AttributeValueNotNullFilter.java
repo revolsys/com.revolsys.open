@@ -1,8 +1,9 @@
 package com.revolsys.data.filter;
 
+import java.util.function.Predicate;
+
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.Records;
-import java.util.function.Predicate;
 
 /**
  * Filter Records by the the attribute not having a null value.
@@ -21,6 +22,14 @@ public class AttributeValueNotNullFilter implements Predicate<Record> {
     this.fieldName = fieldName;
   }
 
+  public String getFieldName() {
+    return this.fieldName;
+  }
+
+  public void setFieldName(final String fieldName) {
+    this.fieldName = fieldName;
+  }
+
   /**
    * Match the property on the data object with the required value.
    *
@@ -31,14 +40,6 @@ public class AttributeValueNotNullFilter implements Predicate<Record> {
   public boolean test(final Record object) {
     final Object propertyValue = Records.getFieldByPath(object, this.fieldName);
     return propertyValue != null;
-  }
-
-  public String getFieldName() {
-    return this.fieldName;
-  }
-
-  public void setFieldName(final String fieldName) {
-    this.fieldName = fieldName;
   }
 
   /**

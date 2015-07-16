@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
-import java.util.function.Predicate;
 
 /**
  * Filter Records by the value of the fieldName.
@@ -35,35 +35,6 @@ public class RecordCodeTableValueFilter implements Predicate<Record> {
 
   public RecordCodeTableValueFilter(final String fieldName, final Object... values) {
     this(fieldName, Arrays.asList(values));
-  }
-
-  /**
-   * Match the fieldName on the data object with the required value.
-   *
-   * @param object The object.
-   * @return True if the object matched the filter, false otherwise.
-   */
-  @Override
-  public boolean test(final Record object) {
-    final Object propertyValue = object.getValue(this.fieldName);
-    if (this.values.contains(propertyValue)) {
-      return true;
-    } else {
-      final RecordDefinition recordDefinition = object.getRecordDefinition();
-      final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(this.fieldName);
-      if (codeTable != null) {
-        final Object codeValue = codeTable.getValue(Identifier.create(propertyValue));
-        if (this.values.contains(codeValue)) {
-          this.values.add(propertyValue);
-          return true;
-        } else {
-          return false;
-        }
-      } else {
-        return false;
-      }
-
-    }
   }
 
   /**
@@ -103,6 +74,35 @@ public class RecordCodeTableValueFilter implements Predicate<Record> {
   public void setValues(final List<Object> values) {
     this.values.clear();
     this.values.addAll(values);
+  }
+
+  /**
+   * Match the fieldName on the data object with the required value.
+   *
+   * @param object The object.
+   * @return True if the object matched the filter, false otherwise.
+   */
+  @Override
+  public boolean test(final Record object) {
+    final Object propertyValue = object.getValue(this.fieldName);
+    if (this.values.contains(propertyValue)) {
+      return true;
+    } else {
+      final RecordDefinition recordDefinition = object.getRecordDefinition();
+      final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(this.fieldName);
+      if (codeTable != null) {
+        final Object codeValue = codeTable.getValue(Identifier.create(propertyValue));
+        if (this.values.contains(codeValue)) {
+          this.values.add(propertyValue);
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+
+    }
   }
 
   /**

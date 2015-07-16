@@ -42,7 +42,6 @@ import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 import com.revolsys.jts.util.Stopwatch;
 
 import junit.framework.TestCase;
-
 import junit.framework.TestCase;
 
 /**

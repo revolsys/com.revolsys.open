@@ -14,8 +14,8 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import com.revolsys.collection.ArrayListOfMap;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
-import com.revolsys.io.MapWriter;
-import com.revolsys.io.MapWriterFactory;
+import com.revolsys.io.map.MapWriter;
+import com.revolsys.io.map.MapWriterFactory;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class ListOfMapHttpMessageConverter extends AbstractHttpMessageConverter<ArrayListOfMap> {

@@ -9,16 +9,6 @@ public class Not extends LeftUnaryCondition {
   }
 
   @Override
-  public boolean test(final Map<String, Object> object) {
-    final Condition condition = getQueryValue();
-    if (condition.test(object)) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
-  @Override
   public Not clone() {
     return (Not)super.clone();
   }
@@ -29,5 +19,15 @@ public class Not extends LeftUnaryCondition {
       return super.equals(obj);
     }
     return false;
+  }
+
+  @Override
+  public boolean test(final Map<String, Object> object) {
+    final Condition condition = getQueryValue();
+    if (condition.test(object)) {
+      return false;
+    } else {
+      return true;
+    }
   }
 }

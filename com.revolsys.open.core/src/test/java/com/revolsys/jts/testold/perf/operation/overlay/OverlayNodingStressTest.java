@@ -10,7 +10,6 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.operation.overlay.snap.SnapIfNeededOverlayOp;
 
 import junit.framework.TestCase;
-
 import junit.framework.TestCase;
 
 /**

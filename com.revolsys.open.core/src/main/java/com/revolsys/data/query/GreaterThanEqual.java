@@ -11,6 +11,11 @@ public class GreaterThanEqual extends BinaryCondition {
   }
 
   @Override
+  public GreaterThanEqual clone() {
+    return (GreaterThanEqual)super.clone();
+  }
+
+  @Override
   public boolean test(final Map<String, Object> record) {
     final QueryValue left = getLeft();
     final Object value1 = left.getValue(record);
@@ -19,11 +24,6 @@ public class GreaterThanEqual extends BinaryCondition {
     final Object value2 = right.getValue(record);
 
     return CompareUtil.compare(value1, value2) >= 0;
-  }
-
-  @Override
-  public GreaterThanEqual clone() {
-    return (GreaterThanEqual)super.clone();
   }
 
 }

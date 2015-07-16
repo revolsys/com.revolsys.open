@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.io.RecordIo;
+import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.AbstractRecordWriter;
@@ -126,7 +126,7 @@ public class DirectoryRecordWriter extends AbstractRecordWriter {
       final String fileName = getFileName(recordDefinition);
       final File file = new File(directory, fileName + this.nameSuffix + "." + this.fileExtension);
       final FileSystemResource resource = new FileSystemResource(file);
-      writer = RecordIo.recordWriter(recordDefinition, resource);
+      writer = RecordWriter.create(recordDefinition, resource);
       if (writer == null) {
         throw new IllegalArgumentException("Unable to create writer for " + resource);
       } else {

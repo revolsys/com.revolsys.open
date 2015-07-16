@@ -21,6 +21,7 @@
 package com.revolsys.gis.jts.filter;
 
 import java.util.function.Predicate;
+
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.LineString;

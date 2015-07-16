@@ -6,8 +6,8 @@ import org.junit.Assert;
 import org.springframework.core.io.ClassPathResource;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.io.MapReaderFactory;
 import com.revolsys.io.Reader;
+import com.revolsys.io.map.MapReader;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.MultiPolygon;
@@ -17,11 +17,10 @@ import com.revolsys.jts.operation.buffer.BufferParameters;
 import com.revolsys.jts.test.geometry.TestUtil;
 
 import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import junit.framework.TestSuite;
 
 public class BufferTest extends TestCase {
@@ -46,8 +45,8 @@ public class BufferTest extends TestCase {
     final TestSuite suite = new TestSuite("Buffer");
     int i = 0;
     try (
-      Reader<Map<String, Object>> reader = MapReaderFactory
-        .mapReader(new ClassPathResource("/com/revolsys/jts/test/geometry/operation/buffer.csv"))) {
+      Reader<Map<String, Object>> reader = MapReader
+        .create(new ClassPathResource("/com/revolsys/jts/test/geometry/operation/buffer.csv"))) {
       for (final Map<String, Object> map : reader) {
         i++;
         final int srid = Maps.getInteger(map, "srid", 0);

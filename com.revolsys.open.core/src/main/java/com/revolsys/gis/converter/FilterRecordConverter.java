@@ -1,9 +1,10 @@
 package com.revolsys.gis.converter;
 
+import java.util.function.Predicate;
+
 import org.springframework.core.convert.converter.Converter;
 
 import com.revolsys.data.record.Record;
-import java.util.function.Predicate;
 
 public class FilterRecordConverter {
   private Converter<Record, Record> converter;

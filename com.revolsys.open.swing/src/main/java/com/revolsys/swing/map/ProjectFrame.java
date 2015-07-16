@@ -46,7 +46,6 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.swing.Icons;

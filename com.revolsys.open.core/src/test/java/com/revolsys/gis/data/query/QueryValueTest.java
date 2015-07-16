@@ -11,7 +11,6 @@ import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataTypes;
 
 import junit.framework.Assert;
-
 import junit.framework.Assert;
 
 public class QueryValueTest {

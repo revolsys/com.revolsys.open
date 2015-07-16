@@ -6,7 +6,6 @@ import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.simplify.TopologyPreservingSimplifier;
 
 import junit.framework.TestCase;
-
 import junit.framework.TestCase;
 
 /**

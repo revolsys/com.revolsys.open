@@ -9,19 +9,19 @@ import java.nio.file.Path;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.io.AbstractRecordIoFactory;
 import com.revolsys.data.record.io.RecordIteratorReader;
 import com.revolsys.data.record.io.RecordReader;
+import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.csv.CsvMapWriter;
 import com.revolsys.format.csv.CsvRecordIterator;
 import com.revolsys.format.csv.CsvRecordWriter;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.MapWriter;
-import com.revolsys.io.MapWriterFactory;
+import com.revolsys.io.map.MapWriter;
+import com.revolsys.io.map.MapWriterFactory;
 
 public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory, MapWriterFactory {
   public static final String DESCRIPTION = "Tab-Separated Values";
@@ -66,13 +66,12 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   @Override
-  public com.revolsys.io.Writer<Record> createRecordWriter(final RecordDefinition recordDefinition,
-    final Path path) {
+  public RecordWriter createRecordWriter(final RecordDefinition recordDefinition, final Path path) {
     return new CsvRecordWriter(recordDefinition, path, Tsv.FIELD_SEPARATOR, false, true);
   }
 
   @Override
-  public com.revolsys.io.Writer<Record> createRecordWriter(final String baseName,
+  public RecordWriter createRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream, charset);

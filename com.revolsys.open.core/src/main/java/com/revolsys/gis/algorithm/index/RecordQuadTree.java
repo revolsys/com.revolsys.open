@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Predicate;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.data.filter.RecordEqualsFilter;
@@ -13,7 +14,6 @@ import com.revolsys.data.filter.RecordGeometryBoundingBoxIntersectsFilter;
 import com.revolsys.data.filter.RecordGeometryDistanceFilter;
 import com.revolsys.data.filter.RecordGeometryIntersectsFilter;
 import com.revolsys.data.record.Record;
-import java.util.function.Predicate;
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;

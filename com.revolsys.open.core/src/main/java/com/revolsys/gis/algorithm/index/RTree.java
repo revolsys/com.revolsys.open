@@ -2,9 +2,9 @@ package com.revolsys.gis.algorithm.index;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import com.revolsys.collection.Visitor;
-import java.util.function.Predicate;
 import com.revolsys.jts.geom.BoundingBox;
 
 public class RTree<T> extends AbstractSpatialIndex<T> {

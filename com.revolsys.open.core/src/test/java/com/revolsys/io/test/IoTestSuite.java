@@ -13,7 +13,7 @@ import org.springframework.core.io.FileSystemResource;
 
 import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.io.RecordIo;
+import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
@@ -28,9 +28,8 @@ import com.revolsys.jts.test.geometry.TestUtil;
 import com.revolsys.junit.InvokeMethodTestCase;
 
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import junit.framework.TestSuite;
 
 @RunWith(Suite.class)
@@ -112,7 +111,7 @@ public class IoTestSuite {
     file.getParentFile().mkdirs();
     final FileSystemResource resource = new FileSystemResource(file);
     try (
-      Writer<Record> writer = RecordIo.recordWriter(recordDefinition, resource)) {
+      Writer<Record> writer = RecordWriter.create(recordDefinition, resource)) {
       writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
       writer.setProperty(IoConstants.GEOMETRY_TYPE, dataType);
 

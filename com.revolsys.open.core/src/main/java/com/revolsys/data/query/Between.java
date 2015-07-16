@@ -25,29 +25,6 @@ public class Between extends Condition {
   }
 
   @Override
-  public boolean test(final Map<String, Object> record) {
-    final QueryValue colum = getColumn();
-    final Object columnValue = colum.getValue(record);
-    if (columnValue == null) {
-      return false;
-    } else {
-      final QueryValue min = getMin();
-      final Object minValue = min.getValue(record);
-      if (minValue == null || CompareUtil.compare(minValue, columnValue) > 0) {
-        return false;
-      } else {
-        final QueryValue max = getMax();
-        final Object maxValue = max.getValue(record);
-        if (maxValue == null || CompareUtil.compare(maxValue, columnValue) < 0) {
-          return false;
-        } else {
-          return true;
-        }
-      }
-    }
-  }
-
-  @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
     final StringBuilder buffer) {
     this.column.appendSql(query, recordStore, buffer);
@@ -104,6 +81,29 @@ public class Between extends Condition {
   @Override
   public List<QueryValue> getQueryValues() {
     return Arrays.<QueryValue> asList(this.column, this.min, this.max);
+  }
+
+  @Override
+  public boolean test(final Map<String, Object> record) {
+    final QueryValue colum = getColumn();
+    final Object columnValue = colum.getValue(record);
+    if (columnValue == null) {
+      return false;
+    } else {
+      final QueryValue min = getMin();
+      final Object minValue = min.getValue(record);
+      if (minValue == null || CompareUtil.compare(minValue, columnValue) > 0) {
+        return false;
+      } else {
+        final QueryValue max = getMax();
+        final Object maxValue = max.getValue(record);
+        if (maxValue == null || CompareUtil.compare(maxValue, columnValue) < 0) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+    }
   }
 
   @Override

@@ -1,9 +1,9 @@
 package com.revolsys.visitor;
 
 import java.util.Comparator;
+import java.util.function.Predicate;
 
 import com.revolsys.collection.Visitor;
-import java.util.function.Predicate;
 
 public class DelegatingVisitor<T> extends AbstractVisitor<T> {
   private Visitor<T> visitor;

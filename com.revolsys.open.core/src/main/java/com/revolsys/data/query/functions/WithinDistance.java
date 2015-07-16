@@ -28,24 +28,6 @@ public class WithinDistance extends Condition {
   }
 
   @Override
-  public boolean test(final Map<String, Object> record) {
-    if (this.geometry1Value == null || this.geometry2Value == null || this.distanceValue == null) {
-      return false;
-    } else {
-      final Geometry geometry1 = this.geometry1Value.getValue(record);
-      final Geometry geometry2 = this.geometry2Value.getValue(record);
-      ;
-      final Number acceptDistance = this.distanceValue.getValue(record);
-      if (acceptDistance == null || geometry1 == null || geometry2 == null) {
-        return false;
-      } else {
-        final double distance = geometry1.distance(geometry2);
-        return distance <= acceptDistance.doubleValue();
-      }
-    }
-  }
-
-  @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
     final StringBuilder sql) {
     if (this.geometry1Value == null || this.geometry2Value == null || this.distanceValue == null) {
@@ -120,6 +102,24 @@ public class WithinDistance extends Condition {
   @Override
   public List<QueryValue> getQueryValues() {
     return Arrays.asList(this.geometry1Value, this.geometry2Value, this.distanceValue);
+  }
+
+  @Override
+  public boolean test(final Map<String, Object> record) {
+    if (this.geometry1Value == null || this.geometry2Value == null || this.distanceValue == null) {
+      return false;
+    } else {
+      final Geometry geometry1 = this.geometry1Value.getValue(record);
+      final Geometry geometry2 = this.geometry2Value.getValue(record);
+      ;
+      final Number acceptDistance = this.distanceValue.getValue(record);
+      if (acceptDistance == null || geometry1 == null || geometry2 == null) {
+        return false;
+      } else {
+        final double distance = geometry1.distance(geometry2);
+        return distance <= acceptDistance.doubleValue();
+      }
+    }
   }
 
   @Override

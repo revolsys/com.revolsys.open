@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
@@ -44,7 +45,6 @@ import com.revolsys.data.query.Value;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
-import java.util.function.Predicate;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.AbstractRecordQueryField;
 import com.revolsys.swing.field.ComboBox;

@@ -7,7 +7,6 @@ import com.revolsys.jts.geom.util.AffineTransformationBuilder;
 import com.revolsys.jts.geom.util.AffineTransformationFactory;
 
 import junit.framework.TestCase;
-
 import junit.framework.TestCase;
 
 /**

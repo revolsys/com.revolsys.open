@@ -36,7 +36,6 @@ import com.revolsys.jts.algorithm.distance.DiscreteHausdorffDistance;
 import com.revolsys.jts.geom.Geometry;
 
 import junit.framework.Assert;
-
 import junit.framework.Assert;
 
 /**

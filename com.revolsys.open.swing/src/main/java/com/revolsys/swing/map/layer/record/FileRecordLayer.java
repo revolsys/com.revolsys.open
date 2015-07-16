@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.io.RecordIo;
 import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.io.RecordReaderFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -86,7 +85,7 @@ public class FileRecordLayer extends ListRecordLayer {
     } else {
       if (this.resource.exists()) {
         try (
-          final RecordReader reader = RecordIo.recordReader(this.resource)) {
+          final RecordReader reader = RecordReader.create(this.resource)) {
           if (reader == null) {
             LoggerFactory.getLogger(getClass()).error("Cannot find reader for: " + this.resource);
             return false;

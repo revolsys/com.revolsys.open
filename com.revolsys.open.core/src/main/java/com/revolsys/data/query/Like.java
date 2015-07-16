@@ -37,6 +37,11 @@ public class Like extends BinaryCondition {
   }
 
   @Override
+  public Like clone() {
+    return (Like)super.clone();
+  }
+
+  @Override
   public boolean test(final Map<String, Object> record) {
     final QueryValue left = getLeft();
     final String value1 = left.getStringValue(record);
@@ -62,11 +67,6 @@ public class Like extends BinaryCondition {
     } else {
       return !Property.hasValue(value2);
     }
-  }
-
-  @Override
-  public Like clone() {
-    return (Like)super.clone();
   }
 
 }

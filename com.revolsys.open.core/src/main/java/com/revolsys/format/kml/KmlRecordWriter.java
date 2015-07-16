@@ -146,7 +146,7 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
       if (i != geometryIndex) {
         final String fieldName = recordDefinition.getFieldName(i);
         final Object value = object.getValue(i);
-        if (isWritable(value)) {
+        if (isValueWritable(value)) {
           if (!hasValues) {
             hasValues = true;
             this.writer.startTag(EXTENDED_DATA);

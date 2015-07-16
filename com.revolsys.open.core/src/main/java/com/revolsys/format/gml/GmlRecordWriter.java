@@ -106,7 +106,7 @@ public class GmlRecordWriter extends AbstractRecordWriter implements GmlConstant
     for (final FieldDefinition attribute : recordDefinition.getFields()) {
       final String fieldName = attribute.getName();
       final Object value = object.getValue(fieldName);
-      if (isWritable(value)) {
+      if (isValueWritable(value)) {
         this.out.startTag(this.namespaceUri, fieldName);
         final DataType type = attribute.getType();
         final GmlFieldType fieldType = this.fieldTypes.getFieldType(type);

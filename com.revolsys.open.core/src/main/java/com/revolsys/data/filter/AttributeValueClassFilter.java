@@ -1,8 +1,9 @@
 package com.revolsys.data.filter;
 
+import java.util.function.Predicate;
+
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.Records;
-import java.util.function.Predicate;
 
 /**
  * Filter Records by the type (Java class) of the fieldName value.
@@ -15,18 +16,6 @@ public class AttributeValueClassFilter implements Predicate<Record> {
 
   /** The type to match. */
   private Class<?> type = Object.class;
-
-  /**
-   * Match the fieldName on the data object with the required value.
-   *
-   * @param object The object.
-   * @return True if the object matched the filter, false otherwise.
-   */
-  @Override
-  public boolean test(final Record object) {
-    final Object propertyValue = Records.getFieldByPath(object, this.fieldName);
-    return this.type.isInstance(propertyValue);
-  }
 
   /**
    * Get the fieldName name, or path to match.
@@ -66,6 +55,18 @@ public class AttributeValueClassFilter implements Predicate<Record> {
     } catch (final ClassNotFoundException e) {
       throw new IllegalArgumentException(e.getMessage());
     }
+  }
+
+  /**
+   * Match the fieldName on the data object with the required value.
+   *
+   * @param object The object.
+   * @return True if the object matched the filter, false otherwise.
+   */
+  @Override
+  public boolean test(final Record object) {
+    final Object propertyValue = Records.getFieldByPath(object, this.fieldName);
+    return this.type.isInstance(propertyValue);
   }
 
   /**

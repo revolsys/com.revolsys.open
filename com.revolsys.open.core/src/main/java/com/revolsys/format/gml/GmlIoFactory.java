@@ -7,13 +7,12 @@ import java.nio.charset.Charset;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.io.GeometryReader;
-import com.revolsys.data.record.Record;
+import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.Writer;
 
 public class GmlIoFactory extends AbstractIoFactoryWithCoordinateSystem
   implements RecordWriterFactory, GeometryReaderFactory {
@@ -29,7 +28,7 @@ public class GmlIoFactory extends AbstractIoFactoryWithCoordinateSystem
   }
 
   @Override
-  public Writer<Record> createRecordWriter(final String baseName,
+  public RecordWriter createRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);

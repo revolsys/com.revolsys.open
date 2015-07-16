@@ -1,6 +1,7 @@
 package com.revolsys.gis.graph.filter;
 
 import java.util.function.Predicate;
+
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.jts.LineStringUtil;
@@ -23,6 +24,10 @@ public class IsPointOnLineEdgeFilter<T> implements Predicate<Node<T>> {
     this.envelope = this.envelope.expand(maxDistance);
   }
 
+  public com.revolsys.jts.geom.BoundingBox getEnvelope() {
+    return this.envelope;
+  }
+
   @Override
   public boolean test(final Node<T> node) {
     final LineString line = this.edge.getLine();
@@ -34,10 +39,6 @@ public class IsPointOnLineEdgeFilter<T> implements Predicate<Node<T>> {
       }
     }
     return false;
-  }
-
-  public com.revolsys.jts.geom.BoundingBox getEnvelope() {
-    return this.envelope;
   }
 
 }

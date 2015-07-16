@@ -26,17 +26,6 @@ public class EnvelopeIntersects extends Condition {
   }
 
   @Override
-  public boolean test(final Map<String, Object> record) {
-    final BoundingBox boundingBox1 = getBoundingBox(this.boundingBox1Value, record);
-    final BoundingBox boundingBox2 = getBoundingBox(this.boundingBox2Value, record);
-    if (boundingBox1 == null || boundingBox2 == null) {
-      return false;
-    } else {
-      return boundingBox1.intersects(boundingBox2);
-    }
-  }
-
-  @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
     final StringBuilder buffer) {
     buffer.append("ST_INTERSECTS(");
@@ -118,6 +107,17 @@ public class EnvelopeIntersects extends Condition {
   @Override
   public List<QueryValue> getQueryValues() {
     return Arrays.asList(this.boundingBox1Value, this.boundingBox2Value);
+  }
+
+  @Override
+  public boolean test(final Map<String, Object> record) {
+    final BoundingBox boundingBox1 = getBoundingBox(this.boundingBox1Value, record);
+    final BoundingBox boundingBox2 = getBoundingBox(this.boundingBox2Value, record);
+    if (boundingBox1 == null || boundingBox2 == null) {
+      return false;
+    } else {
+      return boundingBox1.intersects(boundingBox2);
+    }
   }
 
   @Override

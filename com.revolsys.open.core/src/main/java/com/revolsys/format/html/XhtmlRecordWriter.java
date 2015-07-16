@@ -84,7 +84,7 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
     if (this.singleObject) {
       for (final String key : this.recordDefinition.getFieldNames()) {
         final Object value = object.getValue(key);
-        if (isWritable(value)) {
+        if (isValueWritable(value)) {
           this.out.startTag(HtmlUtil.TR);
           this.out.element(HtmlUtil.TH, CaseConverter.toCapitalizedWords(key.toString()));
           this.out.startTag(HtmlUtil.TD);

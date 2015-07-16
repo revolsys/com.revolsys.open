@@ -1,9 +1,9 @@
 package com.revolsys.gis.algorithm.index;
 
 import java.util.LinkedList;
+import java.util.function.Predicate;
 
 import com.revolsys.collection.Visitor;
-import java.util.function.Predicate;
 import com.revolsys.jts.geom.BoundingBox;
 
 public abstract class RTreeNode<T> {

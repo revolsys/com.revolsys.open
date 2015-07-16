@@ -7,16 +7,15 @@ import java.nio.charset.Charset;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.io.AbstractRecordIoFactory;
 import com.revolsys.data.record.io.RecordIterator;
 import com.revolsys.data.record.io.RecordIteratorReader;
 import com.revolsys.data.record.io.RecordReader;
+import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.Writer;
 
 public class Gpx extends AbstractRecordIoFactory implements RecordWriterFactory {
   public Gpx() {
@@ -48,7 +47,7 @@ public class Gpx extends AbstractRecordIoFactory implements RecordWriterFactory 
   }
 
   @Override
-  public Writer<Record> createRecordWriter(final String baseName,
+  public RecordWriter createRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);

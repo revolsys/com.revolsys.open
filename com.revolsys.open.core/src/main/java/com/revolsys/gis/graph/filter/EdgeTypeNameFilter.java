@@ -2,8 +2,8 @@ package com.revolsys.gis.graph.filter;
 
 import java.util.Arrays;
 import java.util.Collection;
-
 import java.util.function.Predicate;
+
 import com.revolsys.gis.graph.Edge;
 
 /**

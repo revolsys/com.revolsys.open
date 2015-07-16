@@ -9,7 +9,6 @@ import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.linemerge.LineSequencer;
 
 import junit.framework.TestCase;
-
 import junit.framework.TestCase;
 
 /**

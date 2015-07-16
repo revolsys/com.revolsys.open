@@ -42,7 +42,6 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jtstest.testrunner.StringUtil;
 
 import junit.framework.Assert;
-
 import junit.framework.Assert;
 
 /**

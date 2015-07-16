@@ -15,7 +15,7 @@ public class FileRecordReaderFactory extends AbstractFactoryBean<RecordReader> {
 
   @Override
   public RecordReader createInstance() throws Exception {
-    return RecordIo.recordReader(this.resource, this.factory);
+    return RecordReader.create(this.resource, this.factory);
   }
 
   @Override

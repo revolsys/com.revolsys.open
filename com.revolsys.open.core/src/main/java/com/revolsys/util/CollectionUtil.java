@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import java.util.function.Predicate;
 
 public final class CollectionUtil {
   public static <V> void addAllIfNotNull(final Collection<V> collection,

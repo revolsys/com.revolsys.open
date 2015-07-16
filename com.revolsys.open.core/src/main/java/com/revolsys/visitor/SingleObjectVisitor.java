@@ -1,7 +1,6 @@
 package com.revolsys.visitor;
 
 import java.util.Comparator;
-
 import java.util.function.Predicate;
 
 public class SingleObjectVisitor<T> extends BaseVisitor<T> {

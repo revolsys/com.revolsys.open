@@ -12,7 +12,6 @@ import com.revolsys.jts.operation.union.CascadedPolygonUnion;
 import com.revolsys.jts.testold.junit.GeometryUtils;
 
 import junit.framework.TestCase;
-
 import junit.framework.TestCase;
 
 /**

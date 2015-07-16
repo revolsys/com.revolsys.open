@@ -17,11 +17,6 @@ public class ParenthesisCondition extends Condition {
   }
 
   @Override
-  public boolean test(final Map<String, Object> record) {
-    return this.condition.test(record);
-  }
-
-  @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
     final StringBuilder buffer) {
     buffer.append("(");
@@ -64,6 +59,11 @@ public class ParenthesisCondition extends Condition {
   @Override
   public <V> V getValue(final Map<String, Object> record) {
     return this.condition.getValue(record);
+  }
+
+  @Override
+  public boolean test(final Map<String, Object> record) {
+    return this.condition.test(record);
   }
 
   @Override

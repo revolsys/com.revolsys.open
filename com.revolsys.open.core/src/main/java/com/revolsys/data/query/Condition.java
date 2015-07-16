@@ -1,7 +1,6 @@
 package com.revolsys.data.query;
 
 import java.util.Map;
-
 import java.util.function.Predicate;
 
 public abstract class Condition extends QueryValue implements Predicate<Map<String, Object>> {

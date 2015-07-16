@@ -57,7 +57,6 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.io.ListRecordReader;
-import com.revolsys.data.record.io.RecordIo;
 import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.property.DirectionalAttributes;
 import com.revolsys.data.record.schema.FieldDefinition;
@@ -1324,7 +1323,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
               } catch (final Throwable e) {
               }
               final Resource resource = new ByteArrayResource("t.csv", string);
-              reader = RecordIo.recordReader(resource);
+              reader = RecordReader.create(resource);
             } else {
               return null;
             }
@@ -1829,10 +1828,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         if (Property.hasValue(string)) {
           if (string.contains("\t")) {
             final Resource tsvResource = new ByteArrayResource("t.tsv", string);
-            reader = RecordIo.recordReader(tsvResource);
+            reader = RecordReader.create(tsvResource);
           } else {
             final Resource csvResource = new ByteArrayResource("t.csv", string);
-            reader = RecordIo.recordReader(csvResource);
+            reader = RecordReader.create(csvResource);
           }
         }
       }

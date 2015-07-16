@@ -7,7 +7,6 @@ import com.revolsys.jts.io.WKBReader;
 import com.revolsys.jts.io.WKBWriter;
 
 import junit.framework.TestCase;
-
 import junit.framework.TestCase;
 
 public class WKBWriterTest extends TestCase {

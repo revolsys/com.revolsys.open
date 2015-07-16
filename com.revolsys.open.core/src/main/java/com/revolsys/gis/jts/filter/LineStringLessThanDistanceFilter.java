@@ -20,9 +20,10 @@
  */
 package com.revolsys.gis.jts.filter;
 
+import java.util.function.Predicate;
+
 import com.revolsys.data.filter.RecordGeometryFilter;
 import com.revolsys.data.record.Record;
-import java.util.function.Predicate;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.LineString;
@@ -58,21 +59,6 @@ public class LineStringLessThanDistanceFilter implements Predicate<LineString> {
     setGeometry(geometry);
   }
 
-  @Override
-  public boolean test(final LineString line) {
-    if (line.getBoundingBox().intersects(this.envelope)) {
-      final double distance = LineStringUtil.distance(line, this.geometry, this.distance);
-      if (distance < this.distance) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-
-  }
-
   /**
    * Get the maximum distance the object can be from the source geometry.
    *
@@ -103,5 +89,20 @@ public class LineStringLessThanDistanceFilter implements Predicate<LineString> {
     this.geometry = geometry;
     this.envelope = geometry.getBoundingBox();
     this.envelope = this.envelope.expand(this.distance);
+  }
+
+  @Override
+  public boolean test(final LineString line) {
+    if (line.getBoundingBox().intersects(this.envelope)) {
+      final double distance = LineStringUtil.distance(line, this.geometry, this.distance);
+      if (distance < this.distance) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+
   }
 }

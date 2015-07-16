@@ -40,9 +40,8 @@ import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.BoundaryOp;
 
 import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import junit.framework.TestCase;
+import junit.textui.TestRunner;
 import junit.textui.TestRunner;
 
 /**

@@ -1,6 +1,7 @@
 package com.revolsys.gis.algorithm.linematch;
 
 import java.util.function.Predicate;
+
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.jts.geom.BoundingBox;
@@ -21,6 +22,10 @@ public class LineSegmentMatchWithinDistanceFilter implements Predicate<Edge<Line
     this.boundingBox = this.boundingBox.expand(maxDistance);
   }
 
+  public BoundingBox getBoundingBox() {
+    return this.boundingBox;
+  }
+
   @Override
   public boolean test(final Edge<LineSegmentMatch> edge) {
     if (!edge.hasNode(this.node) && edge.distance(this.node) < this.maxDistance) {
@@ -28,9 +33,5 @@ public class LineSegmentMatchWithinDistanceFilter implements Predicate<Edge<Line
     } else {
       return false;
     }
-  }
-
-  public BoundingBox getBoundingBox() {
-    return this.boundingBox;
   }
 }

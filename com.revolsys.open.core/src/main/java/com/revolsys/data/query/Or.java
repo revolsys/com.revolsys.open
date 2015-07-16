@@ -16,6 +16,19 @@ public class Or extends AbstractMultiCondition {
   }
 
   @Override
+  public Or clone() {
+    return (Or)super.clone();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof Or) {
+      return super.equals(obj);
+    }
+    return false;
+  }
+
+  @Override
   public boolean test(final Map<String, Object> object) {
     final List<Condition> conditions = (List)getQueryValues();
     if (conditions.isEmpty()) {
@@ -28,18 +41,5 @@ public class Or extends AbstractMultiCondition {
       }
       return false;
     }
-  }
-
-  @Override
-  public Or clone() {
-    return (Or)super.clone();
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    if (obj instanceof Or) {
-      return super.equals(obj);
-    }
-    return false;
   }
 }

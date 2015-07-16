@@ -9,7 +9,6 @@ import com.revolsys.jts.operation.union.CascadedPolygonUnion;
 import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 
 import junit.framework.TestCase;
-
 import junit.framework.TestCase;
 
 /**

@@ -8,11 +8,9 @@ import java.util.Arrays;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
-import com.revolsys.io.Writer;
 
 public class RecordStoreRecordAndGeometryWriterFactory extends AbstractIoFactoryWithCoordinateSystem
   implements RecordWriterFactory {
@@ -34,7 +32,7 @@ public class RecordStoreRecordAndGeometryWriterFactory extends AbstractIoFactory
   }
 
   @Override
-  public Writer<Record> createRecordWriter(final RecordDefinition recordDefinition,
+  public RecordWriter createRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
     if (resource instanceof FileSystemResource) {
       final FileSystemResource fileResource = (FileSystemResource)resource;
@@ -52,7 +50,7 @@ public class RecordStoreRecordAndGeometryWriterFactory extends AbstractIoFactory
   }
 
   @Override
-  public Writer<Record> createRecordWriter(final String baseName,
+  public RecordWriter createRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     throw new UnsupportedOperationException("Writing to a stream not currently supported");

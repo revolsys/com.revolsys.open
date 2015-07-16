@@ -50,7 +50,6 @@ import com.revolsys.jts.planargraph.Node;
 import com.revolsys.jts.util.UniqueCoordinateArrayFilter;
 
 import junit.framework.TestCase;
-
 import junit.framework.TestCase;
 
 /**

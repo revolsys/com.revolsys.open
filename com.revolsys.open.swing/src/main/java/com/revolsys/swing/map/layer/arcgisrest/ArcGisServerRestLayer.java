@@ -10,7 +10,6 @@ import com.revolsys.format.esri.map.rest.map.TileInfo;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
 import com.revolsys.swing.map.layer.MapTile;

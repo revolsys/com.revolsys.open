@@ -40,7 +40,6 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.spring.NonExistingResource;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.MathUtil;

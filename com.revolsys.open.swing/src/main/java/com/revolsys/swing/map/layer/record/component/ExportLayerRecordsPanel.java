@@ -20,8 +20,8 @@ import com.revolsys.data.query.Query;
 import com.revolsys.data.query.functions.EnvelopeIntersects;
 import com.revolsys.data.query.functions.F;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.io.RecordIo;
 import com.revolsys.data.record.io.RecordReaderFactory;
+import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.Writer;
 import com.revolsys.jts.geom.BoundingBox;
@@ -124,7 +124,7 @@ public class ExportLayerRecordsPanel extends BasePanel {
 
   private void writeRecords(final Iterable<LayerRecord> records) {
     try (
-      Writer<Record> writer = RecordIo.recordWriter(this.layer.getRecordDefinition(),
+      Writer<Record> writer = RecordWriter.create(this.layer.getRecordDefinition(),
         this.exportResource)) {
       for (final LayerRecord record : records) {
         writer.write(record);

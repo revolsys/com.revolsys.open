@@ -21,6 +21,7 @@
 package com.revolsys.gis.jts.filter;
 
 import java.util.function.Predicate;
+
 import com.revolsys.jts.geom.Geometry;
 
 public class LessThanOrEqualDistanceFilter implements Predicate<Geometry> {
@@ -41,16 +42,6 @@ public class LessThanOrEqualDistanceFilter implements Predicate<Geometry> {
     this.maxDistance = maxDistance;
   }
 
-  @Override
-  public boolean test(final Geometry geometry) {
-    final double distance = geometry.distance(this.geometry);
-    if (distance <= this.maxDistance) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   /**
    * Get the geometry to compare the data objects to to.
    *
@@ -67,6 +58,16 @@ public class LessThanOrEqualDistanceFilter implements Predicate<Geometry> {
    */
   public double getMaxDistance() {
     return this.maxDistance;
+  }
+
+  @Override
+  public boolean test(final Geometry geometry) {
+    final double distance = geometry.distance(this.geometry);
+    if (distance <= this.maxDistance) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
 }

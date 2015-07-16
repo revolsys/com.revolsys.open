@@ -2,7 +2,6 @@ package com.revolsys.data.equals;
 
 import java.util.Collection;
 import java.util.Collections;
-
 import java.util.function.Predicate;
 
 public class EqualsFilter<T> implements Predicate<T> {

@@ -3,7 +3,6 @@ package com.revolsys.data.record.io;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Iterator;
-import java.util.Map;
 
 import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
@@ -14,8 +13,9 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.gis.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.IoFactoryWithCoordinateSystem;
-import com.revolsys.io.MapReaderFactory;
 import com.revolsys.io.Reader;
+import com.revolsys.io.map.MapReader;
+import com.revolsys.io.map.MapReaderFactory;
 
 public interface RecordReaderFactory
   extends GeometryReaderFactory, MapReaderFactory, IoFactoryWithCoordinateSystem {
@@ -69,12 +69,9 @@ public interface RecordReaderFactory
   }
 
   @Override
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
-  default Reader<Map<String, Object>> createMapReader(final Resource resource) {
-    final Reader reader = createRecordReader(resource);
-    return reader;
+  default MapReader createMapReader(final Resource resource) {
+    final RecordReader reader = createRecordReader(resource);
+    return new RecordMapReader(reader);
   }
 
   /**

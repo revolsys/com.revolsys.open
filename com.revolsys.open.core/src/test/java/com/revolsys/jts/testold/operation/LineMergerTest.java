@@ -43,7 +43,6 @@ import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.jts.util.Assert;
 
 import junit.framework.TestCase;
-
 import junit.framework.TestCase;
 
 /**

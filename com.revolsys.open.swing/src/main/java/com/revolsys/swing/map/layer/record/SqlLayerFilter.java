@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.function.Predicate;
 
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +13,6 @@ import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.QueryValue;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
-import java.util.function.Predicate;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.util.UriTemplate;
 
@@ -28,20 +28,6 @@ public class SqlLayerFilter implements Predicate<Record>, MapSerializer {
   public SqlLayerFilter(final AbstractRecordLayer layer, final String query) {
     this.layer = layer;
     this.query = query;
-  }
-
-  @Override
-  public boolean test(final Record record) {
-    final Condition condition = getCondition();
-    if (condition == null) {
-      return false;
-    } else {
-      if (condition.test(record)) {
-        return true;
-      } else {
-        return false;
-      }
-    }
   }
 
   public synchronized Condition getCondition() {
@@ -74,6 +60,20 @@ public class SqlLayerFilter implements Predicate<Record>, MapSerializer {
 
   public String getQuery() {
     return this.query;
+  }
+
+  @Override
+  public boolean test(final Record record) {
+    final Condition condition = getCondition();
+    if (condition == null) {
+      return false;
+    } else {
+      if (condition.test(record)) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   }
 
   @Override

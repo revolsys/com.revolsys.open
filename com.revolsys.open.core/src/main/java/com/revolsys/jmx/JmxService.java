@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.io.MapWriter;
+import com.revolsys.io.map.MapWriter;
 import com.revolsys.util.ExceptionUtil;
 
 /**

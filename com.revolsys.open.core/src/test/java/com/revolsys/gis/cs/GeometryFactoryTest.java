@@ -13,7 +13,6 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.LineStringDouble;
 
 import junit.framework.Assert;
-
 import junit.framework.Assert;
 
 public class GeometryFactoryTest {

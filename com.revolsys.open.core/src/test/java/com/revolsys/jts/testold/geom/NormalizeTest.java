@@ -44,7 +44,6 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.test.geometry.CoordinateTest;
 
 import junit.framework.TestCase;
-
 import junit.framework.TestCase;
 
 /**

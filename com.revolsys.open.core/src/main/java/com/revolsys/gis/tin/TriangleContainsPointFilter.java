@@ -1,6 +1,7 @@
 package com.revolsys.gis.tin;
 
 import java.util.function.Predicate;
+
 import com.revolsys.jts.geom.Point;
 
 public class TriangleContainsPointFilter implements Predicate<Triangle> {

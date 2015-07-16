@@ -46,22 +46,6 @@ public class In extends Condition {
   }
 
   @Override
-  public boolean test(final Map<String, Object> record) {
-    final QueryValue left = getLeft();
-    final Object value = left.getValue(record);
-
-    final CollectionValue right = getValues();
-    final List<Object> allowedValues = right.getValues();
-
-    for (final Object allowedValue : allowedValues) {
-      if (EqualsRegistry.equal(value, allowedValue)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
     final StringBuilder buffer) {
     if (this.left == null) {
@@ -118,6 +102,22 @@ public class In extends Condition {
 
   public CollectionValue getValues() {
     return this.values;
+  }
+
+  @Override
+  public boolean test(final Map<String, Object> record) {
+    final QueryValue left = getLeft();
+    final Object value = left.getValue(record);
+
+    final CollectionValue right = getValues();
+    final List<Object> allowedValues = right.getValues();
+
+    for (final Object allowedValue : allowedValues) {
+      if (EqualsRegistry.equal(value, allowedValue)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

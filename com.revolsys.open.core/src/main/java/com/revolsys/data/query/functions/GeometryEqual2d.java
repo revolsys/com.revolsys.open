@@ -24,17 +24,6 @@ public class GeometryEqual2d extends Condition {
   }
 
   @Override
-  public boolean test(final Map<String, Object> record) {
-    final Geometry geometry1 = this.geometry1Value.getValue(record);
-    final Geometry geometry2 = this.geometry2Value.getValue(record);
-    if (geometry1 == null || geometry2 == null) {
-      return false;
-    } else {
-      return geometry1.equals(2, geometry2);
-    }
-  }
-
-  @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
     final StringBuilder buffer) {
     buffer.append("ST_EQUALS(");
@@ -99,6 +88,17 @@ public class GeometryEqual2d extends Condition {
   @Override
   public List<QueryValue> getQueryValues() {
     return Arrays.asList(this.geometry1Value, this.geometry2Value);
+  }
+
+  @Override
+  public boolean test(final Map<String, Object> record) {
+    final Geometry geometry1 = this.geometry1Value.getValue(record);
+    final Geometry geometry2 = this.geometry2Value.getValue(record);
+    if (geometry1 == null || geometry2 == null) {
+      return false;
+    } else {
+      return geometry1.equals(2, geometry2);
+    }
   }
 
   @Override

@@ -1,11 +1,11 @@
 package com.revolsys.io;
 
 import java.util.Iterator;
+import java.util.function.Predicate;
 
 import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.iterator.FilterIterator;
-import java.util.function.Predicate;
 
 public class FilterReader<T> extends AbstractReader<T> {
 

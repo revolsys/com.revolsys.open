@@ -6,7 +6,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 
 import junit.framework.Assert;
-
 import junit.framework.Assert;
 
 public class LineStringGraphTest {

@@ -15,6 +15,19 @@ public class And extends AbstractMultiCondition {
     this(Arrays.asList(conditions));
   }
 
+  @Override
+  public And clone() {
+    return (And)super.clone();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof And) {
+      return super.equals(obj);
+    }
+    return false;
+  }
+
   @SuppressWarnings({
     "unchecked", "rawtypes"
   })
@@ -27,18 +40,5 @@ public class And extends AbstractMultiCondition {
       }
     }
     return true;
-  }
-
-  @Override
-  public And clone() {
-    return (And)super.clone();
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    if (obj instanceof And) {
-      return super.equals(obj);
-    }
-    return false;
   }
 }

@@ -1,7 +1,8 @@
 package com.revolsys.data.filter;
 
-import com.revolsys.data.record.Record;
 import java.util.function.Predicate;
+
+import com.revolsys.data.record.Record;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
 

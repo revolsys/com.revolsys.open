@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.data.equals.GeometryEqualsExact3d;
 import com.revolsys.data.record.Record;
-import java.util.function.Predicate;
-
 import com.revolsys.gis.algorithm.linematch.LineMatchGraph;
 import com.revolsys.gis.algorithm.linematch.LineSegmentMatch;
 import com.revolsys.gis.graph.Edge;

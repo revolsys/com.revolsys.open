@@ -3,6 +3,7 @@ package com.revolsys.io;
 import java.util.Map;
 
 import com.revolsys.converter.string.BooleanStringConverter;
+import com.revolsys.io.map.MapWriter;
 import com.revolsys.util.Property;
 
 public abstract class AbstractMapWriter extends AbstractWriter<Map<String, ? extends Object>>

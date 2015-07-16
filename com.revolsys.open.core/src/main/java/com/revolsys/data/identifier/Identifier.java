@@ -8,22 +8,6 @@ import com.revolsys.data.record.Record;
 import com.revolsys.util.Numbers;
 
 public interface Identifier extends Comparable<Identifier> {
-  Integer getInteger(int index);
-
-  Long getLong(int index);
-
-  String getString(int index);
-
-  <V> V getValue(int index);
-
-  List<Object> getValues();
-
-  void setIdentifier(Map<String, Object> record, List<String> fieldNames);
-
-  void setIdentifier(Map<String, Object> record, String... fieldNames);
-
-  void setIdentifier(Record record);
-
   static Identifier create(final Object value) {
     if (value == null) {
       return null;
@@ -41,4 +25,20 @@ public interface Identifier extends Comparable<Identifier> {
       return new SingleIdentifier(value);
     }
   }
+
+  Integer getInteger(int index);
+
+  Long getLong(int index);
+
+  String getString(int index);
+
+  <V> V getValue(int index);
+
+  List<Object> getValues();
+
+  void setIdentifier(Map<String, Object> record, List<String> fieldNames);
+
+  void setIdentifier(Map<String, Object> record, String... fieldNames);
+
+  void setIdentifier(Record record);
 }

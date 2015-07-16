@@ -21,6 +21,7 @@
 package com.revolsys.gis.jts.filter;
 
 import java.util.function.Predicate;
+
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
@@ -47,29 +48,6 @@ public class LessThanDistanceFilter implements Predicate<Geometry> {
   public LessThanDistanceFilter(final LineString geometry, final double distance) {
     this.distance = distance;
     setGeometry(geometry);
-  }
-
-  @Override
-  public boolean test(final Geometry geometry) {
-    if (geometry.getBoundingBox().intersects(this.envelope)) {
-      double distance;
-      if (geometry instanceof LineString && this.geometry instanceof LineString) {
-        final LineString line1 = (LineString)geometry;
-        final LineString line2 = (LineString)this.geometry;
-
-        distance = LineStringUtil.distance(line1, line2, this.distance);
-      } else {
-        distance = geometry.distance(this.geometry);
-      }
-      if (distance < this.distance) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-
   }
 
   /**
@@ -102,5 +80,28 @@ public class LessThanDistanceFilter implements Predicate<Geometry> {
     this.geometry = geometry;
     this.envelope = geometry.getBoundingBox();
     this.envelope = this.envelope.expand(this.distance);
+  }
+
+  @Override
+  public boolean test(final Geometry geometry) {
+    if (geometry.getBoundingBox().intersects(this.envelope)) {
+      double distance;
+      if (geometry instanceof LineString && this.geometry instanceof LineString) {
+        final LineString line1 = (LineString)geometry;
+        final LineString line2 = (LineString)this.geometry;
+
+        distance = LineStringUtil.distance(line1, line2, this.distance);
+      } else {
+        distance = geometry.distance(this.geometry);
+      }
+      if (distance < this.distance) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+
   }
 }

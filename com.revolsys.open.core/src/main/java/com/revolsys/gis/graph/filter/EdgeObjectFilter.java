@@ -1,6 +1,7 @@
 package com.revolsys.gis.graph.filter;
 
 import java.util.function.Predicate;
+
 import com.revolsys.gis.graph.Edge;
 
 public class EdgeObjectFilter<T> implements Predicate<Edge<T>> {
@@ -13,17 +14,17 @@ public class EdgeObjectFilter<T> implements Predicate<Edge<T>> {
     this.filter = filter;
   }
 
-  @Override
-  public boolean test(final Edge<T> edge) {
-    final T object = edge.getObject();
-    return this.filter.test(object);
-  }
-
   public Predicate<T> getFilter() {
     return this.filter;
   }
 
   public void setFilter(final Predicate<T> filter) {
     this.filter = filter;
+  }
+
+  @Override
+  public boolean test(final Edge<T> edge) {
+    final T object = edge.getObject();
+    return this.filter.test(object);
   }
 }

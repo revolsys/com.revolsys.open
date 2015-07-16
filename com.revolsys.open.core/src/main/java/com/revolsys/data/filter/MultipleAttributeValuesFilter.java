@@ -3,11 +3,11 @@ package com.revolsys.data.filter;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
 
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.Records;
-import java.util.function.Predicate;
 
 /**
  * Filter Records by the value of the property.
@@ -19,6 +19,14 @@ public class MultipleAttributeValuesFilter implements Predicate<Record> {
   private Map<String, ? extends Object> values = Collections.emptyMap();
 
   public MultipleAttributeValuesFilter(final Map<String, ? extends Object> values) {
+    this.values = values;
+  }
+
+  public Map<String, ? extends Object> getValues() {
+    return this.values;
+  }
+
+  public void setValues(final Map<String, ? extends Object> values) {
     this.values = values;
   }
 
@@ -47,14 +55,6 @@ public class MultipleAttributeValuesFilter implements Predicate<Record> {
       }
     }
     return true;
-  }
-
-  public Map<String, ? extends Object> getValues() {
-    return this.values;
-  }
-
-  public void setValues(final Map<String, ? extends Object> values) {
-    this.values = values;
   }
 
   /**

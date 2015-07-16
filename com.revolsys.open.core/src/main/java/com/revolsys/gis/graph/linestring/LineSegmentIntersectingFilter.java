@@ -1,6 +1,7 @@
 package com.revolsys.gis.graph.linestring;
 
 import java.util.function.Predicate;
+
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.segment.LineSegment;
 

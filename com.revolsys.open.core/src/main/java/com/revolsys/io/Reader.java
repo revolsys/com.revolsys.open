@@ -20,6 +20,7 @@
  */
 package com.revolsys.io;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -59,7 +60,8 @@ public interface Reader<T> extends Iterable<T>, ObjectWithProperties, AutoClosea
    * Close the reader and all resources associated with it.
    */
   @Override
-  void close() throws RuntimeException;
+  default void close() {
+  }
 
   /**
    * Return a new iterator for type T at the first item to read. Subsequent
@@ -75,14 +77,23 @@ public interface Reader<T> extends Iterable<T>, ObjectWithProperties, AutoClosea
   /**
    * Open the reader so that it is ready to be read from.
    */
-  void open();
+  default void open() {
+  }
 
   /**
    * Read all items and return a List containing the items.
    *
    * @return The list of items.
    */
-  List<T> read();
+  default List<T> read() {
+    final List<T> items = new ArrayList<T>();
+    if (iterator() != null) {
+      for (final T item : this) {
+        items.add(item);
+      }
+    }
+    return items;
+  }
 
   /**
    * Visit each item returned from the reader until all items have been visited
@@ -90,5 +101,13 @@ public interface Reader<T> extends Iterable<T>, ObjectWithProperties, AutoClosea
    *
    * @param visitor The visitor.
    */
-  void visit(Visitor<T> visitor);
+  default void visit(final Visitor<T> visitor) {
+    if (iterator() != null) {
+      for (final T item : this) {
+        if (!visitor.visit(item)) {
+          return;
+        }
+      }
+    }
+  }
 }

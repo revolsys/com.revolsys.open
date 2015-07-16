@@ -18,10 +18,11 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.MapReaderFactory;
-import com.revolsys.io.MapWriter;
-import com.revolsys.io.MapWriterFactory;
 import com.revolsys.io.Reader;
+import com.revolsys.io.map.MapReader;
+import com.revolsys.io.map.MapReaderFactory;
+import com.revolsys.io.map.MapWriter;
+import com.revolsys.io.map.MapWriterFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.Property;
 
@@ -190,7 +191,7 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
   }
 
   @Override
-  public Reader<Map<String, Object>> createMapReader(final Resource resource) {
+  public MapReader createMapReader(final Resource resource) {
     try {
       return new JsonMapReader(resource.getInputStream());
     } catch (final IOException e) {

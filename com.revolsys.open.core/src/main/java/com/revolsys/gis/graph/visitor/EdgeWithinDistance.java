@@ -2,9 +2,9 @@ package com.revolsys.gis.graph.visitor;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
 import com.revolsys.collection.Visitor;
-import java.util.function.Predicate;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;

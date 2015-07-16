@@ -11,12 +11,12 @@ import java.util.Map;
 
 import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
-import com.revolsys.io.Writer;
 
 public class JsonRecordIoFactory extends AbstractIoFactoryWithCoordinateSystem
   implements RecordWriterFactory {
@@ -87,7 +87,7 @@ public class JsonRecordIoFactory extends AbstractIoFactoryWithCoordinateSystem
   }
 
   @Override
-  public Writer<Record> createRecordWriter(final String baseName,
+  public RecordWriter createRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);

@@ -31,7 +31,7 @@ public interface RecordWriterFactory
     return new RecordWriterGeometryWriter(recordWriter);
   }
 
-  default Writer<Record> createRecordWriter(final RecordDefinition recordDefinition,
+  default RecordWriter createRecordWriter(final RecordDefinition recordDefinition,
     final Path path) {
     final OutputStream out = Paths.outputStream(path);
     final String baseName = Paths.getBaseName(path);
@@ -45,7 +45,7 @@ public interface RecordWriterFactory
    * @param resource The resource to write to.
    * @return The writer.
    */
-  default Writer<Record> createRecordWriter(final RecordDefinition recordDefinition,
+  default RecordWriter createRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
     final OutputStream out = SpringUtil.getOutputStream(resource);
     final String fileName = resource.getFilename();
@@ -53,11 +53,11 @@ public interface RecordWriterFactory
     return createRecordWriter(baseName, recordDefinition, out);
   }
 
-  default Writer<Record> createRecordWriter(final String baseName,
+  default RecordWriter createRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream) {
     return createRecordWriter(baseName, recordDefinition, outputStream, StandardCharsets.UTF_8);
   }
 
-  Writer<Record> createRecordWriter(String baseName, RecordDefinition recordDefinition,
+  RecordWriter createRecordWriter(String baseName, RecordDefinition recordDefinition,
     OutputStream outputStream, Charset charset);
 }

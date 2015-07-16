@@ -1,6 +1,7 @@
 package com.revolsys.gis.jts.filter;
 
 import java.util.function.Predicate;
+
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.LineString;
 

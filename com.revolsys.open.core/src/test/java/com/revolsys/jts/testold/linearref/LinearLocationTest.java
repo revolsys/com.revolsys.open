@@ -10,9 +10,8 @@ import com.revolsys.jts.linearref.LinearLocation;
 import com.revolsys.jts.linearref.LocationIndexedLine;
 
 import junit.framework.TestCase;
-import junit.textui.TestRunner;
-
 import junit.framework.TestCase;
+import junit.textui.TestRunner;
 import junit.textui.TestRunner;
 
 /**

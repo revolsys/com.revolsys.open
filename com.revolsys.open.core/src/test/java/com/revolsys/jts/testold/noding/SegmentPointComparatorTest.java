@@ -5,7 +5,6 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.noding.SegmentPointComparator;
 
 import junit.framework.TestCase;
-
 import junit.framework.TestCase;
 
 /**

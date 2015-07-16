@@ -3,8 +3,8 @@ package com.revolsys.format.html;
 import java.io.Writer;
 
 import com.revolsys.io.AbstractIoFactory;
-import com.revolsys.io.MapWriter;
-import com.revolsys.io.MapWriterFactory;
+import com.revolsys.io.map.MapWriter;
+import com.revolsys.io.map.MapWriterFactory;
 
 public class XhtmlMapIoFactory extends AbstractIoFactory implements MapWriterFactory {
   public XhtmlMapIoFactory() {

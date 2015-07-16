@@ -5,12 +5,11 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import com.revolsys.collection.ArrayUtil;
 import com.revolsys.collection.Visitor;
-import java.util.function.Predicate;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class RTreeBranch<T> extends RTreeNode<T>implements Iterable<RTreeNode<T>> {
 

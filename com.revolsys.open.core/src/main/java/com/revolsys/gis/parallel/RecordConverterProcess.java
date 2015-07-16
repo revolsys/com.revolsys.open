@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,6 @@ import org.springframework.core.convert.converter.Converter;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionFactory;
-import java.util.function.Predicate;
 import com.revolsys.gis.converter.FilterRecordConverter;
 import com.revolsys.gis.converter.SimpleRecordConveter;
 import com.revolsys.gis.converter.process.CopyValues;

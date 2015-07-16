@@ -20,8 +20,9 @@
  */
 package com.revolsys.data.filter;
 
-import com.revolsys.data.record.Record;
 import java.util.function.Predicate;
+
+import com.revolsys.data.record.Record;
 import com.revolsys.jts.geom.Geometry;
 
 public class RecordGeometryFilter<G extends Geometry> implements Predicate<Record> {
@@ -34,6 +35,14 @@ public class RecordGeometryFilter<G extends Geometry> implements Predicate<Recor
     this.filter = filter;
   }
 
+  public Predicate<G> getFilter() {
+    return this.filter;
+  }
+
+  public void setFilter(final Predicate<G> filter) {
+    this.filter = filter;
+  }
+
   @Override
   @SuppressWarnings("unchecked")
   public boolean test(final Record object) {
@@ -43,14 +52,6 @@ public class RecordGeometryFilter<G extends Geometry> implements Predicate<Recor
     } else {
       return false;
     }
-  }
-
-  public Predicate<G> getFilter() {
-    return this.filter;
-  }
-
-  public void setFilter(final Predicate<G> filter) {
-    this.filter = filter;
   }
 
 }

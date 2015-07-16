@@ -3,11 +3,11 @@ package com.revolsys.data.filter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.Records;
-import java.util.function.Predicate;
 
 /**
  * Filter Records by the value of the fieldName.
@@ -65,31 +65,6 @@ public class AttributeValuesFilter implements Predicate<Record> {
   }
 
   /**
-   * Match the fieldName on the data object with the required value.
-   *
-   * @param object The object.
-   * @return True if the object matched the filter, false otherwise.
-   */
-  @Override
-  public boolean test(final Record object) {
-    final Object propertyValue = Records.getFieldByPath(object, this.fieldName);
-    if (propertyValue == null) {
-      if (this.allowNulls) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      for (final Object value : this.values) {
-        if (EqualsInstance.INSTANCE.equals(value, propertyValue)) {
-          return true;
-        }
-      }
-      return false;
-    }
-  }
-
-  /**
    * Get the fieldName name, or path to match.
    *
    * @return The fieldName name, or path to match.
@@ -127,6 +102,31 @@ public class AttributeValuesFilter implements Predicate<Record> {
    */
   public void setValues(final List<Object> values) {
     this.values = values;
+  }
+
+  /**
+   * Match the fieldName on the data object with the required value.
+   *
+   * @param object The object.
+   * @return True if the object matched the filter, false otherwise.
+   */
+  @Override
+  public boolean test(final Record object) {
+    final Object propertyValue = Records.getFieldByPath(object, this.fieldName);
+    if (propertyValue == null) {
+      if (this.allowNulls) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      for (final Object value : this.values) {
+        if (EqualsInstance.INSTANCE.equals(value, propertyValue)) {
+          return true;
+        }
+      }
+      return false;
+    }
   }
 
   /**

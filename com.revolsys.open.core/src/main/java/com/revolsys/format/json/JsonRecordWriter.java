@@ -254,7 +254,7 @@ public class JsonRecordWriter extends AbstractRecordWriter {
       final int attributeCount = this.recordDefinition.getFieldCount();
       for (int i = 0; i < attributeCount; i++) {
         final Object value = object.getValue(i);
-        if (isWritable(value)) {
+        if (isValueWritable(value)) {
           if (hasValue) {
             endAttribute();
           } else {

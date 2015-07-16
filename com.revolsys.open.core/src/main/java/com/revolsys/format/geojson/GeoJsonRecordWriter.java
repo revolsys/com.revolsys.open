@@ -347,7 +347,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter implements GeoJson
     for (int i = 0; i < numAttributes; i++) {
       if (i != geometryIndex) {
         final Object value = object.getValue(i);
-        if (isWritable(value)) {
+        if (isValueWritable(value)) {
           if (hasValue) {
             this.out.endAttribute();
           } else {

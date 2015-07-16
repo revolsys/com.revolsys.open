@@ -3,13 +3,13 @@ package com.revolsys.gis.graph;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 import com.revolsys.data.filter.RecordGeometryFilter;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.Records;
 import com.revolsys.data.record.property.DirectionalAttributes;
 import com.revolsys.data.record.schema.RecordDefinition;
-import java.util.function.Predicate;
 import com.revolsys.gis.graph.filter.EdgeObjectFilter;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;

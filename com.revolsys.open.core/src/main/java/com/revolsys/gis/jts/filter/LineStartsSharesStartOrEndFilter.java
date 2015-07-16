@@ -21,6 +21,7 @@
 package com.revolsys.gis.jts.filter;
 
 import java.util.function.Predicate;
+
 import com.revolsys.jts.geom.LineString;
 
 public class LineStartsSharesStartOrEndFilter implements Predicate<LineString> {
@@ -28,17 +29,6 @@ public class LineStartsSharesStartOrEndFilter implements Predicate<LineString> {
 
   public LineStartsSharesStartOrEndFilter(final LineString line) {
     this.line = line;
-  }
-
-  @Override
-  public boolean test(final LineString line) {
-    if (startsWith(line)) {
-      return true;
-    } else if (endsWith(line)) {
-      return true;
-    } else {
-      return false;
-    }
   }
 
   private boolean endsWith(final LineString line) {
@@ -70,5 +60,16 @@ public class LineStartsSharesStartOrEndFilter implements Predicate<LineString> {
       }
     }
     return true;
+  }
+
+  @Override
+  public boolean test(final LineString line) {
+    if (startsWith(line)) {
+      return true;
+    } else if (endsWith(line)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

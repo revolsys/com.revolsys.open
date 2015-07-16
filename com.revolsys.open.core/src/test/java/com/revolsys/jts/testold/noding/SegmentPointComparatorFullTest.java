@@ -9,7 +9,6 @@ import com.revolsys.jts.noding.SegmentPointComparator;
 import com.revolsys.util.MathUtil;
 
 import junit.framework.TestCase;
-
 import junit.framework.TestCase;
 
 /**

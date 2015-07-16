@@ -5,12 +5,12 @@ import java.util.Map;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.IteratorReader;
 import com.revolsys.io.AbstractIoFactory;
-import com.revolsys.io.MapReaderFactory;
-import com.revolsys.io.MapWriter;
-import com.revolsys.io.MapWriterFactory;
-import com.revolsys.io.Reader;
+import com.revolsys.io.map.IteratorMapReader;
+import com.revolsys.io.map.MapReader;
+import com.revolsys.io.map.MapReaderFactory;
+import com.revolsys.io.map.MapWriter;
+import com.revolsys.io.map.MapWriterFactory;
 
 public class XmlMapIoFactory extends AbstractIoFactory
   implements MapReaderFactory, MapWriterFactory {
@@ -33,10 +33,9 @@ public class XmlMapIoFactory extends AbstractIoFactory
   }
 
   @Override
-  public Reader<Map<String, Object>> createMapReader(final Resource resource) {
+  public MapReader createMapReader(final Resource resource) {
     final XmlMapIterator iterator = new XmlMapIterator(resource);
-    final Reader<Map<String, Object>> reader = new IteratorReader<Map<String, Object>>(iterator);
-    return reader;
+    return new IteratorMapReader(iterator);
   }
 
   @Override

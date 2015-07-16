@@ -1,4 +1,4 @@
-package com.revolsys.io;
+package com.revolsys.io.map;
 
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -9,11 +9,13 @@ import java.nio.file.Path;
 import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 
+import com.revolsys.io.FileIoFactory;
+import com.revolsys.io.FileUtil;
 import com.revolsys.spring.SpringUtil;
 
 public interface MapWriterFactory extends FileIoFactory {
   default MapWriter createMapWriter(final OutputStream out) {
-    final java.io.Writer writer = FileUtil.createUtf8Writer(out);
+    final Writer writer = FileUtil.createUtf8Writer(out);
     return createMapWriter(writer);
   }
 
@@ -28,7 +30,7 @@ public interface MapWriterFactory extends FileIoFactory {
   }
 
   default MapWriter createMapWriter(final Resource resource) {
-    final java.io.Writer writer = SpringUtil.getWriter(resource);
+    final Writer writer = SpringUtil.getWriter(resource);
     return createMapWriter(writer);
   }
 

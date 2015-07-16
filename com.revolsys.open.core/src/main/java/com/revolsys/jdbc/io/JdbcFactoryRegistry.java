@@ -16,7 +16,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 
-import com.revolsys.io.MapReaderFactory;
+import com.revolsys.io.map.MapReader;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.util.Property;
 
@@ -139,7 +139,7 @@ public class JdbcFactoryRegistry {
 
   private void loadFactories(final ClassLoader classLoader, final Resource resource) {
     try {
-      for (final Map<String, Object> factoryDefinition : MapReaderFactory.mapReader(resource)) {
+      for (final Map<String, Object> factoryDefinition : MapReader.create(resource)) {
         final String jdbcFactoryClassName = (String)factoryDefinition.get("jdbcFactoryClassName");
         if (Property.hasValue(jdbcFactoryClassName)) {
           @SuppressWarnings("unchecked")

@@ -18,8 +18,8 @@ import org.springframework.core.io.Resource;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.io.RecordIo;
 import com.revolsys.data.record.io.RecordReader;
+import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.schema.AbstractRecordStore;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -189,7 +189,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
       final String fileExtension = getFileExtension();
       final File file = new File(subDirectory, recordDefinition.getName() + "." + fileExtension);
       final Resource resource = new FileSystemResource(file);
-      writer = RecordIo.recordWriter(recordDefinition, resource);
+      writer = RecordWriter.create(recordDefinition, resource);
       if (writer == null) {
         throw new RuntimeException("Cannot create writer for: " + typePath);
       } else if (writer instanceof ObjectWithProperties) {
@@ -213,7 +213,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   protected RecordDefinition loadRecordDefinition(final RecordStoreSchema schema,
     final String schemaName, final Resource resource) {
     try (
-      RecordReader recordReader = RecordIo.recordReader(resource)) {
+      RecordReader recordReader = RecordReader.create(resource)) {
       final String typePath = Path.toPath(schemaName, SpringUtil.getBaseName(resource));
       recordReader.setProperty("schema", schema);
       recordReader.setProperty("typePath", typePath);
@@ -230,7 +230,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   public RecordReader query(final String path) {
     final RecordDefinition recordDefinition = getRecordDefinition(path);
     final Resource resource = getResource(path, recordDefinition);
-    final RecordReader reader = RecordIo.recordReader(resource);
+    final RecordReader reader = RecordReader.create(resource);
     if (reader == null) {
       throw new IllegalArgumentException("Cannot find reader for: " + path);
     } else {

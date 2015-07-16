@@ -48,7 +48,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.Property;
 
 import junit.framework.Test;
-
 import junit.framework.Test;
 
 /**

@@ -1,6 +1,7 @@
 package com.revolsys.gis.algorithm.linematch;
 
 import java.util.function.Predicate;
+
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.jts.geom.BoundingBox;
@@ -79,6 +80,24 @@ public class LineMatchEdgeFilter implements Predicate<Edge<LineSegmentMatch>> {
     this.toNode = edge.getToNode();
   }
 
+  private boolean checkTolerance(final double from1Distance, final double to1Distance,
+    final double from2Distance, final double to2Distance) {
+    if (from1Distance < this.tolerance) {
+      if (to1Distance < this.tolerance || from2Distance < this.tolerance
+        || to2Distance < this.tolerance) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  public com.revolsys.jts.geom.BoundingBox getEnvelope() {
+    return this.envelope;
+  }
+
   @Override
   public boolean test(final Edge<LineSegmentMatch> edge2) {
     if (edge2.getEnvelope().intersects(this.envelope)) {
@@ -116,23 +135,5 @@ public class LineMatchEdgeFilter implements Predicate<Edge<LineSegmentMatch>> {
       }
     }
     return false;
-  }
-
-  private boolean checkTolerance(final double from1Distance, final double to1Distance,
-    final double from2Distance, final double to2Distance) {
-    if (from1Distance < this.tolerance) {
-      if (to1Distance < this.tolerance || from2Distance < this.tolerance
-        || to2Distance < this.tolerance) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-
-  public com.revolsys.jts.geom.BoundingBox getEnvelope() {
-    return this.envelope;
   }
 }

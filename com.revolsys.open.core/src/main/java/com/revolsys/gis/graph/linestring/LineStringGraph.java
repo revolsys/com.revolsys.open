@@ -12,11 +12,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 
 import com.revolsys.collection.InvokeMethodVisitor;
 import com.revolsys.collection.Visitor;
 import com.revolsys.comparator.CollectionComparator;
-import java.util.function.Predicate;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;

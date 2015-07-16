@@ -127,7 +127,7 @@ public class XmlRecordWriter extends AbstractRecordWriter {
     final int attributeCount = this.recordDefinition.getFieldCount();
     for (int i = 0; i < attributeCount; i++) {
       final Object value = object.getValue(i);
-      if (isWritable(value)) {
+      if (isValueWritable(value)) {
         final String name = this.recordDefinition.getFieldName(i);
         final QName tagName = new QName(name);
         if (value instanceof Map) {

@@ -1,6 +1,7 @@
 package com.revolsys.gis.graph.filter;
 
 import java.util.function.Predicate;
+
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.jts.geom.LineString;
 
