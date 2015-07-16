@@ -215,19 +215,15 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       fileNameExtension);
   }
 
-  private boolean hasFile = false;
+  private boolean hasFile;
+
+  private boolean exists;
 
   public PathTreeNode(final Path path) {
     super(path);
     final String fileName = Paths.getFileName(path);
     setName(fileName);
-    final Icon icon = getIcon(path);
-    setIcon(icon);
-    try {
-      path.toFile();
-      this.hasFile = true;
-    } catch (final UnsupportedOperationException e) {
-    }
+    refreshFields();
   }
 
   public void addFolderConnection() {
@@ -256,8 +252,8 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
           registries.add(registry);
         }
       }
-      final JComboBox registryField = new JComboBox(
-        new Vector<FolderConnectionRegistry>(registries));
+      final JComboBox<FolderConnectionRegistry> registryField = new JComboBox<FolderConnectionRegistry>(
+        new Vector<>(registries));
 
       panel.add(registryField);
 
@@ -294,16 +290,25 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
   }
 
   @Override
+  protected void doRefresh() {
+    refreshFields();
+
+    super.doRefresh();
+  }
+
+  @Override
   public boolean equals(final Object other) {
     if (other == this) {
       return true;
     } else if (other instanceof PathTreeNode) {
-      final PathTreeNode fileNode = (PathTreeNode)other;
       if (getClass() == other.getClass()) {
-        final Path path = getPath();
-        final Path otherPath = fileNode.getPath();
-        final boolean equal = EqualsRegistry.equal(path, otherPath);
-        return equal;
+        final PathTreeNode fileNode = (PathTreeNode)other;
+        if (isExists() == fileNode.isExists()) {
+          final Path path = getPath();
+          final Path otherPath = fileNode.getPath();
+          final boolean equal = EqualsRegistry.equal(path, otherPath);
+          return equal;
+        }
       }
     }
     return false;
@@ -381,12 +386,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   @Override
   public boolean isExists() {
-    final Path path = getPath();
-    if (path == null) {
-      return false;
-    } else {
-      return Files.exists(path) && super.isExists();
-    }
+    return this.exists;
   }
 
   public boolean isFileLayer() {
@@ -406,9 +406,15 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
     return this.hasFile;
   }
 
-  @Override
-  public void refresh() {
-    setIcon(null);
-    super.refresh();
+  private void refreshFields() {
+    final Path path = getPath();
+    this.exists = Paths.exists(path);
+    final Icon icon = getIcon(path);
+    setIcon(icon);
+    try {
+      path.toFile();
+      this.hasFile = true;
+    } catch (final UnsupportedOperationException e) {
+    }
   }
 }

@@ -64,6 +64,8 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
 
   private Icon icon;
 
+  private Icon disabledIcon;
+
   private String type;
 
   private JTree tree;
@@ -274,6 +276,10 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
     return Collections.emptyList();
   }
 
+  public Icon getDisabledIcon() {
+    return this.disabledIcon;
+  }
+
   public Icon getIcon() {
     return this.icon;
   }
@@ -314,10 +320,6 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
     return this.name;
   }
 
-  public Icon getOpenIcon() {
-    return getIcon();
-  }
-
   @Override
   public BaseTreeNode getParent() {
     if (this.parent == null) {
@@ -349,17 +351,16 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
   public Component getTreeCellRendererComponent(final Component renderer, final JTree tree,
     final Object value, final boolean selected, final boolean expanded, final boolean leaf,
     final int row, final boolean hasFocus) {
-    final Icon icon;
-    if (expanded) {
-      icon = getOpenIcon();
-    } else {
-      icon = getIcon();
-    }
-    if (icon != null && renderer instanceof JLabel) {
+    final Icon icon = getIcon();
+    final Icon disabledIcon = getDisabledIcon();
+    if (renderer instanceof JLabel) {
       final JLabel label = (JLabel)renderer;
-      label.setIcon(icon);
-      final Icon disabledIcon = Icons.getDisabledIcon(icon);
-      label.setDisabledIcon(disabledIcon);
+      if (icon != null) {
+        label.setIcon(icon);
+      }
+      if (disabledIcon != null) {
+        label.setDisabledIcon(disabledIcon);
+      }
     }
     return renderer;
   }
@@ -646,8 +647,15 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
     this.allowsChildren = allowsChildren;
   }
 
+  protected void setDisabledIcon(final Icon disabledIcon) {
+    this.disabledIcon = disabledIcon;
+  }
+
   protected void setIcon(final Icon icon) {
     this.icon = icon;
+    if (this.disabledIcon == null) {
+      this.disabledIcon = Icons.getDisabledIcon(icon);
+    }
   }
 
   public void setName(final String name) {

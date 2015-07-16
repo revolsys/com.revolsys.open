@@ -50,18 +50,15 @@ public class BaseTreeCellRenderer extends DefaultTreeCellRenderer implements Ima
       BaseTreeNodeLoadingIcon.removeNode(node);
       if (node.isVisible()) {
         if (node.isUserObjectInitialized()) {
-
           if (node.isExists()) {
             return node.getTreeCellRendererComponent(renderer, tree, value, selected, expanded,
               leaf, row, hasFocus);
           } else {
-            Icon icon = node.getIcon();
-            if (icon == null) {
-              icon = ICON_MISSING;
-            } else {
-              icon = Icons.getDisabledIcon(icon);
+            Icon disabledIcon = node.getDisabledIcon();
+            if (disabledIcon == null) {
+              disabledIcon = ICON_MISSING;
             }
-            setIcon(icon);
+            setIcon(disabledIcon);
             setForeground(WebColors.Red);
           }
         } else {

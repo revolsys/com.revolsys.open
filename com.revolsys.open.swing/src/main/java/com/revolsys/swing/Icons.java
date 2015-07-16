@@ -2,6 +2,7 @@ package com.revolsys.swing;
 
 import java.awt.Cursor;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -27,11 +28,13 @@ public class Icons {
 
   private static final Map<String, Reference<ImageIcon>> DISABLED_ICON_CACHE = new HashMap<>();
 
-  private static final Map<String, Reference<BufferedImage>> DISABLED_IMAGE_CACHE = new HashMap<>();
+  private static final Map<String, Reference<BufferedImage>> NAMED_DISABLED_IMAGE_CACHE = new HashMap<>();
 
   private static final Map<String, Reference<ImageIcon>> ICON_CACHE = new HashMap<>();
 
-  private static final Map<String, Reference<BufferedImage>> IMAGE_CACHE = new HashMap<>();
+  private static final Map<String, Reference<BufferedImage>> NAMED_IMAGE_CACHE = new HashMap<>();
+
+  private static final Map<Image, BufferedImage> DISABLED_IMAGE_CACHE = new WeakCache<>();
 
   public static final String RESOURCE_FOLDER = "/com/revolsys/famfamfam/silk/icons/";
 
@@ -46,11 +49,19 @@ public class Icons {
     }
   }
 
-  public static BufferedImage alpha(final BufferedImage original, final float percent) {
-    final int width = original.getWidth();
-    final int height = original.getHeight();
-    final int type = original.getType();
-    final BufferedImage newImage = new BufferedImage(width, height, type);
+  public static BufferedImage alpha(final Image image, final float percent) {
+    BufferedImage bufferedImage;
+    final int width = image.getWidth(null);
+    final int height = image.getHeight(null);
+    if (image instanceof BufferedImage) {
+      bufferedImage = (BufferedImage)image;
+    } else {
+      bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+      final Graphics2D graphics = bufferedImage.createGraphics();
+      graphics.drawImage(image, 0, 0, null);
+      graphics.dispose();
+    }
+    final BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
     final int[] avgLUT = new int[766];
     for (int i = 0; i < avgLUT.length; i++) {
@@ -59,7 +70,7 @@ public class Icons {
 
     for (int i = 0; i < width; i++) {
       for (int j = 0; j < height; j++) {
-        final int rgb = original.getRGB(i, j);
+        final int rgb = bufferedImage.getRGB(i, j);
         final int alpha = rgb >> 24 & 0xff;
         final int red = rgb >> 16 & 0xff;
         final int green = rgb >> 8 & 0xff;
@@ -117,7 +128,9 @@ public class Icons {
       if (disabledIcon == null) {
         if (icon instanceof ImageIcon) {
           final ImageIcon imageIcon = (ImageIcon)icon;
-          disabledIcon = new ImageIcon(getDisabledImage((BufferedImage)imageIcon.getImage()));
+          final Image image = imageIcon.getImage();
+          final BufferedImage disabledImage = getDisabledImage(image);
+          disabledIcon = new ImageIcon(disabledImage);
         } else {
           return icon;
         }
@@ -148,20 +161,25 @@ public class Icons {
     return icon;
   }
 
-  public static BufferedImage getDisabledImage(final BufferedImage image) {
-    return alpha(image, 0.30f);
+  public static BufferedImage getDisabledImage(final Image image) {
+    BufferedImage disabledImage = DISABLED_IMAGE_CACHE.get(image);
+    if (disabledImage == null) {
+      disabledImage = alpha(image, 0.30f);
+      DISABLED_IMAGE_CACHE.put(image, disabledImage);
+    }
+    return disabledImage;
   }
 
   public static Image getDisabledImage(final String imageName) {
     BufferedImage image = null;
-    final Reference<BufferedImage> imageReference = DISABLED_IMAGE_CACHE.get(imageName);
+    final Reference<BufferedImage> imageReference = NAMED_DISABLED_IMAGE_CACHE.get(imageName);
     if (imageReference != null) {
       image = imageReference.get();
     }
     if (image == null) {
       image = getImage(imageName);
       image = getDisabledImage(image);
-      DISABLED_IMAGE_CACHE.put(imageName, new WeakReference<>(image));
+      NAMED_DISABLED_IMAGE_CACHE.put(imageName, new WeakReference<>(image));
     }
     return image;
   }
@@ -214,14 +232,14 @@ public class Icons {
 
   public static BufferedImage getImage(final String imageName) {
     BufferedImage image = null;
-    final Reference<BufferedImage> imageReference = IMAGE_CACHE.get(imageName);
+    final Reference<BufferedImage> imageReference = NAMED_IMAGE_CACHE.get(imageName);
     if (imageReference != null) {
       image = imageReference.get();
     }
     if (image == null) {
       final String fileExtension = "png";
       image = getImage(imageName, fileExtension);
-      IMAGE_CACHE.put(imageName, new WeakReference<>(image));
+      NAMED_IMAGE_CACHE.put(imageName, new WeakReference<>(image));
     }
     return image;
   }
