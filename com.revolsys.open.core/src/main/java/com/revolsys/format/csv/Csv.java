@@ -25,7 +25,6 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.io.IteratorReader;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.io.AbstractRecordIoFactory;
-import com.revolsys.data.record.io.RecordIteratorReader;
 import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.io.RecordWriterFactory;
@@ -174,8 +173,7 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
   @Override
   public RecordReader createRecordReader(final Resource resource,
     final RecordFactory recordFactory) {
-    final CsvRecordIterator iterator = new CsvRecordIterator(resource, recordFactory);
-    return new RecordIteratorReader(iterator);
+    return new CsvRecordReader(resource, recordFactory);
   }
 
   @Override

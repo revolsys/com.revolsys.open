@@ -18,6 +18,10 @@ public abstract class AbstractMultipleIterator<T> extends AbstractIterator<T> {
     }
   }
 
+  protected AbstractIterator<T> getIterator() {
+    return this.iterator;
+  }
+
   @Override
   protected T getNext() throws NoSuchElementException {
     try {

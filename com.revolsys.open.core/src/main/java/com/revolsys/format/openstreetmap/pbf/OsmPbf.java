@@ -7,7 +7,6 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.io.AbstractRecordIoFactory;
-import com.revolsys.data.record.io.RecordIteratorReader;
 import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
@@ -22,8 +21,7 @@ public class OsmPbf extends AbstractRecordIoFactory {
   @Override
   public RecordReader createRecordReader(final Resource resource,
     final RecordFactory recordFactory) {
-    final OsmPbfRecordIterator iterator = new OsmPbfRecordIterator(resource);
-    return new RecordIteratorReader(iterator);
+    return new OsmPbfRecordIterator(resource);
   }
 
   @Override

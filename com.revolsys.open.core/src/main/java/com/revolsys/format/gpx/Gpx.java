@@ -9,8 +9,6 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.io.AbstractRecordIoFactory;
-import com.revolsys.data.record.io.RecordIterator;
-import com.revolsys.data.record.io.RecordIteratorReader;
 import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.io.RecordWriterFactory;
@@ -39,8 +37,7 @@ public class Gpx extends AbstractRecordIoFactory implements RecordWriterFactory 
   public RecordReader createRecordReader(final Resource resource,
     final RecordFactory recordFactory) {
     try {
-      final RecordIterator iterator = new GpxIterator(resource, recordFactory, null);
-      return new RecordIteratorReader(iterator);
+      return new GpxIterator(resource, recordFactory, null);
     } catch (final IOException e) {
       throw new IllegalArgumentException("Unable to open resource " + resource, e);
     }

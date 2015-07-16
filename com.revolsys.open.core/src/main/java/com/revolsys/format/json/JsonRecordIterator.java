@@ -11,13 +11,13 @@ import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.io.RecordIterator;
+import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.io.FileUtil;
 
-public class JsonRecordIterator extends AbstractIterator<Record>implements RecordIterator {
+public class JsonRecordIterator extends AbstractIterator<Record>implements RecordReader {
 
   private RecordDefinition recordDefinition;
 

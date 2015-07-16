@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -18,9 +19,8 @@ import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.format.saif.util.OsnConverter;
 import com.revolsys.format.saif.util.OsnConverterRegistry;
 import com.revolsys.format.saif.util.OsnIterator;
-import com.revolsys.gis.io.RecordIterator;
 
-public class OsnReader implements RecordIterator {
+public class OsnReader implements Iterator<Record>, AutoCloseable {
   private final OsnConverterRegistry converters;
 
   private File directory;
@@ -185,7 +185,6 @@ public class OsnReader implements RecordIterator {
     }
   }
 
-  @Override
   public void open() {
     try {
       if (this.directory != null) {

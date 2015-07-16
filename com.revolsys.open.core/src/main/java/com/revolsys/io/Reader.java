@@ -64,17 +64,6 @@ public interface Reader<T> extends Iterable<T>, ObjectWithProperties, AutoClosea
   }
 
   /**
-   * Return a new iterator for type T at the first item to read. Subsequent
-   * calls to this method must return a new iterator. Implementors of this are
-   * responsible for cleaning up the iterator when the hasNext or next method on
-   * iterator reaches the end of the items to read.
-   *
-   * @return The iterator.
-   */
-  @Override
-  Iterator<T> iterator();
-
-  /**
    * Open the reader so that it is ready to be read from.
    */
   default void open() {

@@ -19,7 +19,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.LongHashMap;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.io.RecordIterator;
+import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.openstreetmap.model.OsmConstants;
 import com.revolsys.format.openstreetmap.model.OsmElement;
@@ -36,7 +36,7 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.Property;
 
-public class OsmPbfRecordIterator extends AbstractIterator<Record>implements RecordIterator {
+public class OsmPbfRecordIterator extends AbstractIterator<Record>implements RecordReader {
 
   private static final int DATE_GRANULARITY = 1000;
 

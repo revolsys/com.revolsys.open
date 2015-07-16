@@ -12,7 +12,6 @@ import com.revolsys.data.io.AbstractDirectoryReader;
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.io.RecordDirectoryReader;
-import com.revolsys.data.record.io.RecordIteratorReader;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.Reader;
 import com.revolsys.spring.SpringUtil;
@@ -58,7 +57,7 @@ public class ShapefileDirectoryReader extends RecordDirectoryReader {
       final String baseName = SpringUtil.getBaseName(resource).toUpperCase();
       iterator.setTypeName(this.fileNameTypeMap.get(baseName));
       iterator.setRecordDefinition(this.typeNameRecordDefinitionMap.get(iterator.getTypeName()));
-      return new RecordIteratorReader(iterator);
+      return iterator;
     } catch (final IOException e) {
       throw new RuntimeException("Unable to create reader for " + resource, e);
     }

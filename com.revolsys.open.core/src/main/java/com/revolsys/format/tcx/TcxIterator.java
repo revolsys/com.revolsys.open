@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Queue;
@@ -16,13 +17,15 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.io.RecordIterator;
+import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.gpx.GpxConstants;
 import com.revolsys.format.xml.StaxUtils;
 import com.revolsys.io.FileUtil;
+import com.revolsys.properties.BaseObjectWithProperties;
 
-public class TcxIterator implements RecordIterator {
+public class TcxIterator extends BaseObjectWithProperties
+  implements Iterator<Record>, RecordReader {
 
   private static final Logger LOG = Logger.getLogger(TcxIterator.class);
 
@@ -74,6 +77,7 @@ public class TcxIterator implements RecordIterator {
     // }
   }
 
+  @Override
   public void close() {
     try {
       this.in.close();
@@ -101,6 +105,11 @@ public class TcxIterator implements RecordIterator {
     } else {
       return true;
     }
+  }
+
+  @Override
+  public Iterator<Record> iterator() {
+    return this;
   }
 
   protected boolean loadNextRecord() {

@@ -8,7 +8,6 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.io.AbstractRecordIoFactory;
-import com.revolsys.data.record.io.RecordIteratorReader;
 import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.io.RecordWriterFactory;
@@ -25,8 +24,7 @@ public class Shapefile extends AbstractRecordIoFactory implements RecordWriterFa
   public RecordReader createRecordReader(final Resource resource,
     final RecordFactory recordFactory) {
     try {
-      final ShapefileIterator iterator = new ShapefileIterator(resource, recordFactory);
-      return new RecordIteratorReader(iterator);
+      return new ShapefileIterator(resource, recordFactory);
     } catch (final IOException e) {
       throw new RuntimeException("Unable to create reader for " + resource, e);
     }

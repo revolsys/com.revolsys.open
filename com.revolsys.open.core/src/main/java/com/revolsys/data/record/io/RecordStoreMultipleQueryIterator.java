@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.iterator.AbstractMultipleIterator;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 
 public class RecordStoreMultipleQueryIterator extends AbstractMultipleIterator<Record> {
 
@@ -31,6 +32,15 @@ public class RecordStoreMultipleQueryIterator extends AbstractMultipleIterator<R
       this.queryIndex++;
       return iterator;
     }
+  }
+
+  public RecordDefinition getRecordDefinition() {
+    final AbstractIterator<Record> iterator = getIterator();
+    if (iterator instanceof RecordReader) {
+      final RecordReader reader = (RecordReader)iterator;
+      return reader.getRecordDefinition();
+    }
+    return null;
   }
 
 }

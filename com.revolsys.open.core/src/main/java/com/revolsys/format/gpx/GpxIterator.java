@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -21,7 +22,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.io.RecordIterator;
+import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.xml.StaxUtils;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
@@ -31,10 +32,12 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.MathUtil;
 
-public class GpxIterator implements RecordIterator {
+public class GpxIterator extends BaseObjectWithProperties
+  implements Iterator<Record>, RecordReader {
 
   private static final Logger LOG = Logger.getLogger(GpxIterator.class);
 
@@ -94,6 +97,7 @@ public class GpxIterator implements RecordIterator {
     }
   }
 
+  @Override
   public void close() {
     try {
       this.in.close();
@@ -121,6 +125,11 @@ public class GpxIterator implements RecordIterator {
     } else {
       return true;
     }
+  }
+
+  @Override
+  public Iterator<Record> iterator() {
+    return this;
   }
 
   protected boolean loadNextRecord() {

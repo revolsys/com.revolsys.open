@@ -13,7 +13,8 @@ import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.Records;
-import com.revolsys.data.record.io.RecordIterator;
+import com.revolsys.data.record.io.RecordReader;
+import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
@@ -32,7 +33,7 @@ import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.Property;
 
-public class ShapefileIterator extends AbstractIterator<Record>implements RecordIterator {
+public class ShapefileIterator extends AbstractIterator<Record>implements RecordReader {
 
   private boolean closeFile = true;
 

@@ -14,7 +14,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.io.RecordIterator;
+import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.property.FieldProperties;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -29,7 +29,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
-public class CsvRecordIterator extends AbstractIterator<Record>implements RecordIterator {
+public class CsvRecordReader extends AbstractIterator<Record>implements RecordReader {
 
   private final char fieldSeparator;
 
@@ -53,19 +53,19 @@ public class CsvRecordIterator extends AbstractIterator<Record>implements Record
 
   private boolean hasPointFields;
 
-  public CsvRecordIterator(final Resource resource) {
+  public CsvRecordReader(final Resource resource) {
     this(resource, new ArrayRecordFactory(), Csv.FIELD_SEPARATOR);
   }
 
-  public CsvRecordIterator(final Resource resource, final char fieldSeparator) {
+  public CsvRecordReader(final Resource resource, final char fieldSeparator) {
     this(resource, new ArrayRecordFactory(), fieldSeparator);
   }
 
-  public CsvRecordIterator(final Resource resource, final RecordFactory recordFactory) {
+  public CsvRecordReader(final Resource resource, final RecordFactory recordFactory) {
     this(resource, recordFactory, Csv.FIELD_SEPARATOR);
   }
 
-  public CsvRecordIterator(final Resource resource, final RecordFactory recordFactory,
+  public CsvRecordReader(final Resource resource, final RecordFactory recordFactory,
     final char fieldSeparator) {
     this.resource = resource;
     this.recordFactory = recordFactory;
@@ -264,8 +264,7 @@ public class CsvRecordIterator extends AbstractIterator<Record>implements Record
           final char c = line.charAt(i);
           if (c == '"') {
             hadQuotes = true;
-            if (inQuotes && line.length() > i + 1
-              && line.charAt(i + 1) == '"') {
+            if (inQuotes && line.length() > i + 1 && line.charAt(i + 1) == '"') {
               sb.append(line.charAt(i + 1));
               i++;
             } else {

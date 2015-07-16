@@ -10,7 +10,7 @@ import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.Records;
-import com.revolsys.data.record.io.RecordIterator;
+import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.property.FieldProperties;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -19,7 +19,7 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public class WktRecordIterator extends AbstractIterator<Record>implements RecordIterator {
+public class WktRecordIterator extends AbstractIterator<Record>implements RecordReader {
 
   private RecordFactory factory;
 

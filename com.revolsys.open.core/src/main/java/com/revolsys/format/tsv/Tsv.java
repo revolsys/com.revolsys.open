@@ -11,13 +11,12 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.io.AbstractRecordIoFactory;
-import com.revolsys.data.record.io.RecordIteratorReader;
 import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.csv.CsvMapWriter;
-import com.revolsys.format.csv.CsvRecordIterator;
+import com.revolsys.format.csv.CsvRecordReader;
 import com.revolsys.format.csv.CsvRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapWriter;
@@ -60,9 +59,7 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
   @Override
   public RecordReader createRecordReader(final Resource resource,
     final RecordFactory recordFactory) {
-    final CsvRecordIterator iterator = new CsvRecordIterator(resource, recordFactory,
-      Tsv.FIELD_SEPARATOR);
-    return new RecordIteratorReader(iterator);
+    return new CsvRecordReader(resource, recordFactory, Tsv.FIELD_SEPARATOR);
   }
 
   @Override

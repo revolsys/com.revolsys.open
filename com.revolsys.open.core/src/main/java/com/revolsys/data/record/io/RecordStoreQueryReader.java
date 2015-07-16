@@ -84,7 +84,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record>implements Rec
 
   @Override
   public RecordDefinition getRecordDefinition() {
-    return ((RecordIterator)iterator()).getRecordDefinition();
+    return iterator().getRecordDefinition();
   }
 
   public AbstractRecordStore getRecordStore() {
@@ -93,6 +93,11 @@ public class RecordStoreQueryReader extends IteratorReader<Record>implements Rec
 
   public String getWhereClause() {
     return this.whereClause;
+  }
+
+  @Override
+  public RecordStoreMultipleQueryIterator iterator() {
+    return (RecordStoreMultipleQueryIterator)super.iterator();
   }
 
   @Override
@@ -108,7 +113,6 @@ public class RecordStoreQueryReader extends IteratorReader<Record>implements Rec
             query.setWhereCondition(new SqlCondition(this.whereClause));
           } else {
             query = Query.intersects(recordDefinition, this.boundingBox);
-            ;
           }
           addQuery(query);
         }

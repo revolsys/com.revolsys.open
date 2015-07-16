@@ -7,7 +7,6 @@ import java.nio.charset.Charset;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.io.RecordIteratorReader;
 import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.io.RecordReaderFactory;
 import com.revolsys.data.record.io.RecordWriter;
@@ -28,9 +27,7 @@ public class XBaseRecordIoFactory extends AbstractIoFactoryWithCoordinateSystem
   public RecordReader createRecordReader(final Resource resource,
     final RecordFactory recordFactory) {
     try {
-      final XbaseIterator iterator = new XbaseIterator(resource, recordFactory);
-
-      return new RecordIteratorReader(iterator);
+      return new XbaseIterator(resource, recordFactory);
     } catch (final IOException e) {
       throw new RuntimeException("Unable to create reader for " + resource, e);
     }

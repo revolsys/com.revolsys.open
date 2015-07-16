@@ -9,7 +9,6 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.io.AbstractRecordIoFactory;
-import com.revolsys.data.record.io.RecordIteratorReader;
 import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.io.RecordWriterFactory;
@@ -25,9 +24,7 @@ public class Wkt extends AbstractRecordIoFactory implements RecordWriterFactory,
   @Override
   public RecordReader createRecordReader(final Resource resource, final RecordFactory factory) {
     try {
-      final WktRecordIterator iterator = new WktRecordIterator(factory, resource);
-
-      return new RecordIteratorReader(iterator);
+      return new WktRecordIterator(factory, resource);
     } catch (final IOException e) {
       throw new RuntimeException("Unable to create reader for " + resource, e);
     }
