@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 
 public final class CollectionUtil {
   public static <V> void addAllIfNotNull(final Collection<V> collection,
@@ -183,10 +183,10 @@ public final class CollectionUtil {
    * @param filter
    */
   public static <V, C extends Collection<V>> void filter(final Collection<V> collection,
-    final Filter<V> filter) {
+    final Predicate<V> filter) {
     for (final Iterator<V> iterator = collection.iterator(); iterator.hasNext();) {
       final V record = iterator.next();
-      if (!filter.accept(record)) {
+      if (!filter.test(record)) {
         iterator.remove();
       }
     }

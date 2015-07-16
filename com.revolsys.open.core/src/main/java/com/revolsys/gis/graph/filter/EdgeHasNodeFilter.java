@@ -1,10 +1,10 @@
 package com.revolsys.gis.graph.filter;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 
-public class EdgeHasNodeFilter<T> implements Filter<Edge<T>> {
+public class EdgeHasNodeFilter<T> implements Predicate<Edge<T>> {
   private final Node<T> node;
 
   public EdgeHasNodeFilter(final Node<T> node) {
@@ -12,7 +12,7 @@ public class EdgeHasNodeFilter<T> implements Filter<Edge<T>> {
   }
 
   @Override
-  public boolean accept(final Edge<T> edge) {
+  public boolean test(final Edge<T> edge) {
     return edge.hasNode(this.node);
   }
 }

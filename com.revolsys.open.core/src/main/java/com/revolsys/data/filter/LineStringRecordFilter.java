@@ -1,11 +1,11 @@
 package com.revolsys.data.filter;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 
-public class LineStringRecordFilter implements Filter<Record> {
+public class LineStringRecordFilter implements Predicate<Record> {
 
   public static final LineStringRecordFilter FILTER = new LineStringRecordFilter();
 
@@ -13,7 +13,7 @@ public class LineStringRecordFilter implements Filter<Record> {
   }
 
   @Override
-  public boolean accept(final Record object) {
+  public boolean test(final Record object) {
     final Geometry geometry = object.getGeometry();
     return geometry instanceof LineString;
   }

@@ -12,11 +12,11 @@ import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.QueryValue;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.util.UriTemplate;
 
-public class SqlLayerFilter implements Filter<Record>, MapSerializer {
+public class SqlLayerFilter implements Predicate<Record>, MapSerializer {
   private final String query;
 
   private Condition condition;
@@ -31,12 +31,12 @@ public class SqlLayerFilter implements Filter<Record>, MapSerializer {
   }
 
   @Override
-  public boolean accept(final Record record) {
+  public boolean test(final Record record) {
     final Condition condition = getCondition();
     if (condition == null) {
       return false;
     } else {
-      if (condition.accept(record)) {
+      if (condition.test(record)) {
         return true;
       } else {
         return false;

@@ -9,7 +9,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.Records;
 import com.revolsys.data.record.property.DirectionalAttributes;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.gis.graph.filter.EdgeObjectFilter;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
@@ -18,9 +18,9 @@ import com.revolsys.jts.geom.impl.PointDouble;
 
 public class RecordGraph extends Graph<Record> {
 
-  public static <T extends Geometry> Filter<Edge<Record>> getEdgeFilter(
-    final Filter<T> geometryFilter) {
-    final Filter<Record> objectFilter = new RecordGeometryFilter<T>(geometryFilter);
+  public static <T extends Geometry> Predicate<Edge<Record>> getEdgeFilter(
+    final Predicate<T> geometryFilter) {
+    final Predicate<Record> objectFilter = new RecordGeometryFilter<T>(geometryFilter);
     final EdgeObjectFilter<Record> edgeFilter = new EdgeObjectFilter<Record>(objectFilter);
     return edgeFilter;
   }

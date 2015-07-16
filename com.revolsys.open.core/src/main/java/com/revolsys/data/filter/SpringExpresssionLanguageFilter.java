@@ -10,10 +10,10 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.io.map.MapSerializer;
 
-public class SpringExpresssionLanguageFilter implements Filter<Record>, MapSerializer {
+public class SpringExpresssionLanguageFilter implements Predicate<Record>, MapSerializer {
   private static SpelParserConfiguration EXPRESSION_CONFIGURATION = new SpelParserConfiguration(
     true, true);
 
@@ -41,7 +41,7 @@ public class SpringExpresssionLanguageFilter implements Filter<Record>, MapSeria
   }
 
   @Override
-  public boolean accept(final Record object) {
+  public boolean test(final Record object) {
     try {
       final Boolean value = this.expression.getValue(this.context, object, Boolean.class);
       return value;

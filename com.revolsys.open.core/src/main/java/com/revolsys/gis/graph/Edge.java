@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.gis.algorithm.linematch.LineSegmentMatch;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
@@ -74,10 +74,10 @@ public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Exter
   }
 
   public static <T> List<Edge<T>> getEdges(final List<Edge<T>> edges,
-    final Filter<Edge<T>> filter) {
+    final Predicate<Edge<T>> filter) {
     final List<Edge<T>> filteredEdges = new ArrayList<Edge<T>>();
     for (final Edge<T> edge : edges) {
-      if (filter.accept(edge)) {
+      if (filter.test(edge)) {
         filteredEdges.add(edge);
       }
     }
@@ -114,12 +114,12 @@ public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Exter
   }
 
   public static <T> List<Edge<T>> getEdgesMatchingObjectFilter(final List<Edge<T>> edges,
-    final Filter<T> filter) {
+    final Predicate<T> filter) {
     final List<Edge<T>> filteredEdges = new ArrayList<Edge<T>>();
     for (final Edge<T> edge : edges) {
       if (!edge.isRemoved()) {
         final T object = edge.getObject();
-        if (filter.accept(object)) {
+        if (filter.test(object)) {
           filteredEdges.add(edge);
         }
       }
@@ -165,10 +165,10 @@ public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Exter
   }
 
   public static <T> boolean hasEdgeMatchingObjectFilter(final List<Edge<T>> edges,
-    final Filter<T> filter) {
+    final Predicate<T> filter) {
     for (final Edge<T> edge : edges) {
       final T object = edge.getObject();
-      if (filter.accept(object)) {
+      if (filter.test(object)) {
         return true;
       }
     }

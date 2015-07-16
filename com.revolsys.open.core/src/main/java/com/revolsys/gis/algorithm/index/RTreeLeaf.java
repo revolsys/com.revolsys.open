@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
@@ -97,13 +97,13 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
   }
 
   @Override
-  public boolean visit(final BoundingBox envelope, final Filter<T> filter,
+  public boolean visit(final BoundingBox envelope, final Predicate<T> filter,
     final Visitor<T> visitor) {
     for (int i = 0; i < this.size; i++) {
       final BoundingBox objectEnvelope = this.envelopes[i];
       if (envelope.intersects(objectEnvelope)) {
         final T object = getObject(i);
-        if (filter.accept(object)) {
+        if (filter.test(object)) {
           if (!visitor.visit(object)) {
             return false;
           }

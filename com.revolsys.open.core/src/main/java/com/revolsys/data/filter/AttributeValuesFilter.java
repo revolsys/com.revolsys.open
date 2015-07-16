@@ -7,14 +7,14 @@ import java.util.List;
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.Records;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 
 /**
  * Filter Records by the value of the fieldName.
  *
  * @author Paul Austin
  */
-public class AttributeValuesFilter implements Filter<Record> {
+public class AttributeValuesFilter implements Predicate<Record> {
   private boolean allowNulls;
 
   /** The fieldName name, or path to match. */
@@ -71,7 +71,7 @@ public class AttributeValuesFilter implements Filter<Record> {
    * @return True if the object matched the filter, false otherwise.
    */
   @Override
-  public boolean accept(final Record object) {
+  public boolean test(final Record object) {
     final Object propertyValue = Records.getFieldByPath(object, this.fieldName);
     if (propertyValue == null) {
       if (this.allowNulls) {

@@ -1,12 +1,12 @@
 package com.revolsys.gis.algorithm.linematch;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
-public class LineSegmentMatchWithinDistanceFilter implements Filter<Edge<LineSegmentMatch>> {
+public class LineSegmentMatchWithinDistanceFilter implements Predicate<Edge<LineSegmentMatch>> {
   private BoundingBox boundingBox;
 
   private final double maxDistance;
@@ -22,7 +22,7 @@ public class LineSegmentMatchWithinDistanceFilter implements Filter<Edge<LineSeg
   }
 
   @Override
-  public boolean accept(final Edge<LineSegmentMatch> edge) {
+  public boolean test(final Edge<LineSegmentMatch> edge) {
     if (!edge.hasNode(this.node) && edge.distance(this.node) < this.maxDistance) {
       return true;
     } else {

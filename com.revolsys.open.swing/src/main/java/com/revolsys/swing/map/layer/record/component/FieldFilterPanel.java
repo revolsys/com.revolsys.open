@@ -44,7 +44,7 @@ import com.revolsys.data.query.Value;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.AbstractRecordQueryField;
 import com.revolsys.swing.field.ComboBox;
@@ -151,7 +151,7 @@ public class FieldFilterPanel extends JComponent
     this(tablePanel, tableModel);
 
     setSearchFieldName((String)config.get("searchField"));
-    final Filter<Record> filter = AbstractRecordLayerRenderer.getFilter(this.layer, config);
+    final Predicate<Record> filter = AbstractRecordLayerRenderer.getFilter(this.layer, config);
     if (filter instanceof SqlLayerFilter) {
       final SqlLayerFilter sqlFilter = (SqlLayerFilter)filter;
       final Condition condition = sqlFilter.getCondition();

@@ -6,7 +6,7 @@ import java.util.HashSet;
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.equals.Geometry2DEquals;
 import com.revolsys.data.record.Record;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.jts.geom.Geometry;
 
 /**
@@ -15,7 +15,7 @@ import com.revolsys.jts.geom.Geometry;
  *
  * @author Paul Austin
  */
-public class RecordEquals2DFilter implements Filter<Record> {
+public class RecordEquals2DFilter implements Predicate<Record> {
   private final Collection<String> equalExclude = new HashSet<String>();
 
   /** The update feature to find a match for. */
@@ -33,7 +33,7 @@ public class RecordEquals2DFilter implements Filter<Record> {
   }
 
   @Override
-  public boolean accept(final Record object) {
+  public boolean test(final Record object) {
     final Geometry serachGeometry = this.searchObject.getGeometry();
     final Geometry geometry = object.getGeometry();
 

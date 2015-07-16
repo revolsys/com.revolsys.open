@@ -9,14 +9,14 @@ import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 
 /**
  * Filter Records by the value of the fieldName.
  *
  * @author Paul Austin
  */
-public class RecordCodeTableValueFilter implements Filter<Record> {
+public class RecordCodeTableValueFilter implements Predicate<Record> {
   /** The fieldName name, or path to match. */
   private String fieldName;
 
@@ -44,7 +44,7 @@ public class RecordCodeTableValueFilter implements Filter<Record> {
    * @return True if the object matched the filter, false otherwise.
    */
   @Override
-  public boolean accept(final Record object) {
+  public boolean test(final Record object) {
     final Object propertyValue = object.getValue(this.fieldName);
     if (this.values.contains(propertyValue)) {
       return true;

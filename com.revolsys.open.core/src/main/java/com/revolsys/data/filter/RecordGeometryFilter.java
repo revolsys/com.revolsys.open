@@ -21,35 +21,35 @@
 package com.revolsys.data.filter;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.jts.geom.Geometry;
 
-public class RecordGeometryFilter<G extends Geometry> implements Filter<Record> {
-  private Filter<G> filter;
+public class RecordGeometryFilter<G extends Geometry> implements Predicate<Record> {
+  private Predicate<G> filter;
 
   public RecordGeometryFilter() {
   }
 
-  public RecordGeometryFilter(final Filter<G> filter) {
+  public RecordGeometryFilter(final Predicate<G> filter) {
     this.filter = filter;
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public boolean accept(final Record object) {
+  public boolean test(final Record object) {
     final G geometry = (G)object.getGeometry();
-    if (this.filter.accept(geometry)) {
+    if (this.filter.test(geometry)) {
       return true;
     } else {
       return false;
     }
   }
 
-  public Filter<G> getFilter() {
+  public Predicate<G> getFilter() {
     return this.filter;
   }
 
-  public void setFilter(final Filter<G> filter) {
+  public void setFilter(final Predicate<G> filter) {
     this.filter = filter;
   }
 

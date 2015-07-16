@@ -1,11 +1,11 @@
 package com.revolsys.gis.model.coordinates.filter;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.segment.LineSegment;
 
-public class PointOnLineSegment implements Filter<Point> {
+public class PointOnLineSegment implements Predicate<Point> {
 
   private final LineSegment lineSegment;
 
@@ -17,7 +17,7 @@ public class PointOnLineSegment implements Filter<Point> {
   }
 
   @Override
-  public boolean accept(final Point point) {
+  public boolean test(final Point point) {
     final Point start = this.lineSegment.getPoint(0);
     final Point end = this.lineSegment.getPoint(1);
     final boolean onLine = LineSegmentUtil.isPointOnLine(start, end, point, this.maxDistance);

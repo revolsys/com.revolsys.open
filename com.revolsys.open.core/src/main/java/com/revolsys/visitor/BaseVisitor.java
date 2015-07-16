@@ -2,7 +2,7 @@ package com.revolsys.visitor;
 
 import java.util.Comparator;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 
 public class BaseVisitor<T> extends AbstractVisitor<T> {
 
@@ -13,11 +13,11 @@ public class BaseVisitor<T> extends AbstractVisitor<T> {
     super(comparator);
   }
 
-  public BaseVisitor(final Filter<T> filter) {
+  public BaseVisitor(final Predicate<T> filter) {
     super(filter);
   }
 
-  public BaseVisitor(final Filter<T> filter, final Comparator<T> comparator) {
+  public BaseVisitor(final Predicate<T> filter, final Comparator<T> comparator) {
     super(filter, comparator);
   }
 
@@ -27,8 +27,8 @@ public class BaseVisitor<T> extends AbstractVisitor<T> {
 
   @Override
   public boolean visit(final T object) {
-    final Filter<T> filter = getFilter();
-    if (filter == null || filter.accept(object)) {
+    final Predicate<T> filter = getPredicate();
+    if (filter == null || filter.test(object)) {
       return doVisit(object);
     } else {
       return true;

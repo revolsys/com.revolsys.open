@@ -1,12 +1,12 @@
 package com.revolsys.gis.jts.filter;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.geom.LineString;
 
-public class LinearIntersectionFilter implements Filter<LineString> {
+public class LinearIntersectionFilter implements Predicate<LineString> {
 
   private final LineString line;
 
@@ -21,7 +21,7 @@ public class LinearIntersectionFilter implements Filter<LineString> {
   }
 
   @Override
-  public boolean accept(final LineString line) {
+  public boolean test(final LineString line) {
     final BoundingBox envelope = line.getBoundingBox();
     if (envelope.intersects(this.envelope)) {
       if (this.preparedLine.intersects(line)) {

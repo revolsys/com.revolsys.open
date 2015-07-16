@@ -22,21 +22,21 @@ package com.revolsys.data.filter;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.filter.Filter;
-import com.revolsys.filter.FilterUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.predicate.Predicates;
 
-public class RecordGeometryBoundingBoxIntersectsFilter implements Filter<Record> {
+public class RecordGeometryBoundingBoxIntersectsFilter implements Predicate<Record> {
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
-  public static <D extends Record> List<D> filter(final Collection<D> collection,
+  public static <D extends Record> List<D> predicate(final Collection<D> collection,
     final BoundingBox boundingBox) {
-    final Filter filter = new RecordGeometryBoundingBoxIntersectsFilter(boundingBox);
-    return FilterUtil.filter(collection, filter);
+    final Predicate predicate = new RecordGeometryBoundingBoxIntersectsFilter(boundingBox);
+    return Predicates.predicate(collection, predicate);
   }
 
   private final BoundingBox boundingBox;
@@ -46,7 +46,7 @@ public class RecordGeometryBoundingBoxIntersectsFilter implements Filter<Record>
   }
 
   @Override
-  public boolean accept(final Record object) {
+  public boolean test(final Record object) {
     try {
       final Geometry geometry = object.getGeometry();
       if (geometry != null && geometry.intersects(this.boundingBox)) {

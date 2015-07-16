@@ -1,9 +1,9 @@
 package com.revolsys.gis.tin;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.jts.geom.Point;
 
-public class TriangleContainsPointFilter implements Filter<Triangle> {
+public class TriangleContainsPointFilter implements Predicate<Triangle> {
   private final Point point;
 
   public TriangleContainsPointFilter(final Point point) {
@@ -11,7 +11,7 @@ public class TriangleContainsPointFilter implements Filter<Triangle> {
   }
 
   @Override
-  public boolean accept(final Triangle triangle) {
+  public boolean test(final Triangle triangle) {
     return triangle.hasVertex(this.point);
   }
 }

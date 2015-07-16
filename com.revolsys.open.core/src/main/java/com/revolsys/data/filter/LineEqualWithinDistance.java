@@ -1,13 +1,13 @@
 package com.revolsys.data.filter;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.gis.graph.linestring.LineStringRelate;
 import com.revolsys.jts.geom.LineString;
 
-public class LineEqualWithinDistance implements Filter<LineString> {
+public class LineEqualWithinDistance implements Predicate<LineString> {
 
-  public static Filter<Record> getFilter(final Record object, final double maxDistance) {
+  public static Predicate<Record> getFilter(final Record object, final double maxDistance) {
     final LineString line = object.getGeometry();
     final LineEqualWithinDistance lineFilter = new LineEqualWithinDistance(line, maxDistance);
     return new RecordGeometryFilter<LineString>(lineFilter);
@@ -23,7 +23,7 @@ public class LineEqualWithinDistance implements Filter<LineString> {
   }
 
   @Override
-  public boolean accept(final LineString line2) {
+  public boolean test(final LineString line2) {
     final LineStringRelate relate = new LineStringRelate(this.line, line2, this.maxDistance);
     return relate.isEqual();
   }

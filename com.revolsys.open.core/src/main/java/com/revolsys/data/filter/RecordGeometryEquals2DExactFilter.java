@@ -21,10 +21,10 @@
 package com.revolsys.data.filter;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.jts.geom.Geometry;
 
-public class RecordGeometryEquals2DExactFilter implements Filter<Record> {
+public class RecordGeometryEquals2DExactFilter implements Predicate<Record> {
   private final Geometry geometry;
 
   public RecordGeometryEquals2DExactFilter(final Geometry geometry) {
@@ -32,7 +32,7 @@ public class RecordGeometryEquals2DExactFilter implements Filter<Record> {
   }
 
   @Override
-  public boolean accept(final Record object) {
+  public boolean test(final Record object) {
     final Geometry matchGeometry = object.getGeometry();
     if (this.geometry.equals(2, matchGeometry)) {
       return true;

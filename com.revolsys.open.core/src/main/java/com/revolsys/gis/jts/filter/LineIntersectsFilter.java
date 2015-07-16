@@ -1,10 +1,10 @@
 package com.revolsys.gis.jts.filter;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.LineString;
 
-public class LineIntersectsFilter implements Filter<LineString> {
+public class LineIntersectsFilter implements Predicate<LineString> {
   private final LineString line;
 
   public LineIntersectsFilter(final LineString line) {
@@ -12,7 +12,7 @@ public class LineIntersectsFilter implements Filter<LineString> {
   }
 
   @Override
-  public boolean accept(final LineString line) {
+  public boolean test(final LineString line) {
     return LineStringUtil.intersects(this.line, line);
   }
 }

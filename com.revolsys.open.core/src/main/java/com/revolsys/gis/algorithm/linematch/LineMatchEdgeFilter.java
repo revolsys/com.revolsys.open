@@ -1,11 +1,11 @@
 package com.revolsys.gis.algorithm.linematch;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.jts.geom.BoundingBox;
 
-public class LineMatchEdgeFilter implements Filter<Edge<LineSegmentMatch>> {
+public class LineMatchEdgeFilter implements Predicate<Edge<LineSegmentMatch>> {
 
   public static double getDistance(final Edge<LineSegmentMatch> edge,
     final Node<LineSegmentMatch> node, final double tolerance) {
@@ -80,7 +80,7 @@ public class LineMatchEdgeFilter implements Filter<Edge<LineSegmentMatch>> {
   }
 
   @Override
-  public boolean accept(final Edge<LineSegmentMatch> edge2) {
+  public boolean test(final Edge<LineSegmentMatch> edge2) {
     if (edge2.getEnvelope().intersects(this.envelope)) {
       final LineSegmentMatch edgeMatch2 = edge2.getObject();
       if (!edgeMatch2.hasSegment(this.index)) {

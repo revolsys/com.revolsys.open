@@ -8,8 +8,8 @@ import java.util.Set;
 import com.revolsys.collection.Visitor;
 import com.revolsys.data.equals.GeometryEqualsExact3d;
 import com.revolsys.data.record.Record;
-import com.revolsys.filter.Filter;
-import com.revolsys.filter.FilterUtil;
+import java.util.function.Predicate;
+
 import com.revolsys.gis.algorithm.linematch.LineMatchGraph;
 import com.revolsys.gis.algorithm.linematch.LineSegmentMatch;
 import com.revolsys.gis.graph.Edge;
@@ -21,6 +21,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.predicate.Predicates;
 
 public class SplitIntersectingEdgeVisitor implements Visitor<Edge<Record>> {
 
@@ -145,9 +146,9 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<Record>> {
     final List<Edge<Record>> intersectEdges = EdgeIntersectsLinearlyEdgeVisitor
       .getEdges(edge.getGraph(), edge);
     if (!intersectEdges.isEmpty()) {
-      final Filter<Edge<Record>> edgeEqualFilter = new LineFilter<Record>(
+      final Predicate<Edge<Record>> edgeEqualFilter = new LineFilter<Record>(
         new EqualFilter<LineString>(line));
-      FilterUtil.remove(intersectEdges, edgeEqualFilter);
+      Predicates.remove(intersectEdges, edgeEqualFilter);
       for (final Edge<Record> edge2 : intersectEdges) {
         if (!edge2.isRemoved()) {
           final LineString line2 = edge2.getLine();

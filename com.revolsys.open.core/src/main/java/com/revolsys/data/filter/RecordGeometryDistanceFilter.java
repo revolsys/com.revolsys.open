@@ -23,10 +23,10 @@ package com.revolsys.data.filter;
 import java.util.Comparator;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.jts.geom.Geometry;
 
-public class RecordGeometryDistanceFilter implements Filter<Record>, Comparator<Record> {
+public class RecordGeometryDistanceFilter implements Predicate<Record>, Comparator<Record> {
   /** The geometry to compare the data objects to to. */
   private Geometry geometry;
 
@@ -45,7 +45,7 @@ public class RecordGeometryDistanceFilter implements Filter<Record>, Comparator<
   }
 
   @Override
-  public boolean accept(final Record record) {
+  public boolean test(final Record record) {
     final Geometry recordGeometry = record.getGeometry();
     final double distance = recordGeometry.distance(this.geometry, this.maxDistance);
     if (distance <= this.maxDistance) {

@@ -1,29 +1,29 @@
 package com.revolsys.gis.graph.filter;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.jts.geom.Point;
 
-public class NodeCoordinatesFilter<T> implements Filter<Node<T>> {
-  private Filter<Point> filter;
+public class NodeCoordinatesFilter<T> implements Predicate<Node<T>> {
+  private Predicate<Point> filter;
 
   public NodeCoordinatesFilter() {
   }
 
-  public NodeCoordinatesFilter(final Filter<Point> filter) {
+  public NodeCoordinatesFilter(final Predicate<Point> filter) {
     this.filter = filter;
   }
 
   @Override
-  public boolean accept(final Node<T> node) {
-    return this.filter.accept(node);
+  public boolean test(final Node<T> node) {
+    return this.filter.test(node);
   }
 
-  public Filter<Point> getFilter() {
+  public Predicate<Point> getFilter() {
     return this.filter;
   }
 
-  public void setFilter(final Filter<Point> filter) {
+  public void setFilter(final Predicate<Point> filter) {
     this.filter = filter;
   }
 }

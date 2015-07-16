@@ -5,12 +5,13 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.filter.Filter;
-import com.revolsys.filter.InvokeMethodFilter;
+import java.util.function.Predicate;
+
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.index.SpatialIndex;
+import com.revolsys.predicate.InvokeMethodPredicate;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.SingleObjectVisitor;
 
@@ -98,13 +99,13 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     return visitor.getList();
   }
 
-  public T getFirst(final BoundingBox boundingBox, final Filter<T> filter) {
+  public T getFirst(final BoundingBox boundingBox, final Predicate<T> filter) {
     final SingleObjectVisitor<T> visitor = new SingleObjectVisitor<T>(filter);
     visit(boundingBox, visitor);
     return visitor.getObject();
   }
 
-  public T getFirstBoundingBox(final Geometry geometry, final Filter<T> filter) {
+  public T getFirstBoundingBox(final Geometry geometry, final Predicate<T> filter) {
     if (geometry == null) {
       return null;
     } else {
@@ -143,7 +144,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     return visitor.getList();
   }
 
-  public List<T> query(final BoundingBox boundingBox, final Filter<T> filter) {
+  public List<T> query(final BoundingBox boundingBox, final Predicate<T> filter) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<T>(filter);
     visit(boundingBox, visitor);
     return visitor.getList();
@@ -151,7 +152,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   public List<T> query(final BoundingBox boundingBox, final String methodName,
     final Object... parameters) {
-    final InvokeMethodFilter<T> filter = new InvokeMethodFilter<T>(methodName, parameters);
+    final InvokeMethodPredicate<T> filter = new InvokeMethodPredicate<T>(methodName, parameters);
     return query(boundingBox, filter);
   }
 

@@ -20,12 +20,12 @@
  */
 package com.revolsys.gis.jts.filter;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.LineString;
 
-public class LineContainsWithinToleranceFilter implements Filter<LineString> {
+public class LineContainsWithinToleranceFilter implements Predicate<LineString> {
   private final LineString points;
 
   private BoundingBox envelope;
@@ -53,7 +53,7 @@ public class LineContainsWithinToleranceFilter implements Filter<LineString> {
   }
 
   @Override
-  public boolean accept(final LineString line) {
+  public boolean test(final LineString line) {
     if (this.envelope.intersects(line.getBoundingBox())) {
       final LineString points = line;
 

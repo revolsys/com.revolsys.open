@@ -1,6 +1,7 @@
 package com.revolsys.gis.graph.visitor;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -9,8 +10,6 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.property.DirectionalAttributes;
 import com.revolsys.data.record.property.PseudoNodeProperty;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.filter.Filter;
-import com.revolsys.filter.FilterProxy;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.EdgePair;
 import com.revolsys.gis.graph.Node;
@@ -18,6 +17,7 @@ import com.revolsys.gis.graph.RecordGraph;
 import com.revolsys.gis.graph.attribute.NodeProperties;
 import com.revolsys.gis.graph.attribute.PseudoNodeAttribute;
 import com.revolsys.gis.io.Statistics;
+import com.revolsys.predicate.PredicateProxy;
 import com.revolsys.util.ObjectProcessor;
 
 /**
@@ -27,9 +27,9 @@ import com.revolsys.util.ObjectProcessor;
  * @author Paul Austin
  */
 public class RecordPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<Record>
-  implements FilterProxy<Node<Record>>, ObjectProcessor<RecordGraph> {
+  implements PredicateProxy<Node<Record>>, ObjectProcessor<RecordGraph> {
 
-  private Filter<Node<Record>> filter;
+  private Predicate<Node<Record>> predicate;
 
   private Statistics mergedStatistics;
 
@@ -45,8 +45,8 @@ public class RecordPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<
   }
 
   @Override
-  public Filter<Node<Record>> getFilter() {
-    return this.filter;
+  public Predicate<Node<Record>> getPredicate() {
+    return this.predicate;
   }
 
   @PostConstruct
@@ -112,8 +112,8 @@ public class RecordPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<
     mergeEdgePairs(node, edgePairs);
   }
 
-  public void setFilter(final Filter<Node<Record>> filter) {
-    this.filter = filter;
+  public void setFilter(final Predicate<Node<Record>> filter) {
+    this.predicate = filter;
   }
 
   @Override

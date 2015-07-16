@@ -25,7 +25,7 @@ public class Between extends Condition {
   }
 
   @Override
-  public boolean accept(final Map<String, Object> record) {
+  public boolean test(final Map<String, Object> record) {
     final QueryValue colum = getColumn();
     final Object columnValue = colum.getValue(record);
     if (columnValue == null) {

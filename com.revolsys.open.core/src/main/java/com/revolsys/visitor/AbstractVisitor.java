@@ -1,15 +1,16 @@
 package com.revolsys.visitor;
 
 import java.util.Comparator;
+import java.util.function.Predicate;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.comparator.ComparatorProxy;
-import com.revolsys.filter.AndFilter;
-import com.revolsys.filter.Filter;
-import com.revolsys.filter.FilterProxy;
+import com.revolsys.predicate.AndPredicate;
+import com.revolsys.predicate.PredicateProxy;
 
-public abstract class AbstractVisitor<T> implements Visitor<T>, FilterProxy<T>, ComparatorProxy<T> {
-  private Filter<T> filter;
+public abstract class AbstractVisitor<T>
+  implements Visitor<T>, PredicateProxy<T>, ComparatorProxy<T> {
+  private Predicate<T> predicate;
 
   private Comparator<T> comparator;
 
@@ -20,12 +21,12 @@ public abstract class AbstractVisitor<T> implements Visitor<T>, FilterProxy<T>, 
     this.comparator = comparator;
   }
 
-  public AbstractVisitor(final Filter<T> filter) {
-    this.filter = filter;
+  public AbstractVisitor(final Predicate<T> predicate) {
+    this.predicate = predicate;
   }
 
-  public AbstractVisitor(final Filter<T> filter, final Comparator<T> comparator) {
-    this.filter = filter;
+  public AbstractVisitor(final Predicate<T> predicate, final Comparator<T> comparator) {
+    this.predicate = predicate;
     this.comparator = comparator;
   }
 
@@ -35,19 +36,19 @@ public abstract class AbstractVisitor<T> implements Visitor<T>, FilterProxy<T>, 
   }
 
   @Override
-  public Filter<T> getFilter() {
-    return this.filter;
+  public Predicate<T> getPredicate() {
+    return this.predicate;
   }
 
   public void setComparator(final Comparator<T> comparator) {
     this.comparator = comparator;
   }
 
-  public void setFilter(final Filter<T> filter) {
-    this.filter = filter;
+  public void setFilter(final Predicate<T> predicate) {
+    this.predicate = predicate;
   }
 
-  public void setFilters(final Filter<T>... filters) {
-    this.filter = new AndFilter<T>(filters);
+  public void setFilters(final Predicate<T>... predicates) {
+    this.predicate = new AndPredicate<T>(predicates);
   }
 }

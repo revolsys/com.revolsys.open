@@ -2,16 +2,16 @@ package com.revolsys.gis.parallel;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.filter.Filter;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.parallel.channel.Channel;
-import com.revolsys.parallel.process.MultipleFilterProcess;
+import com.revolsys.parallel.process.MultiplePredicateProcess;
 
-public class StatisticsMultipleFilterProcess extends MultipleFilterProcess<Record> {
+public class StatisticsMultipleFilterProcess extends MultiplePredicateProcess<Record> {
 
-  private final Map<Filter<Record>, Statistics> statisticsMap = new HashMap<Filter<Record>, Statistics>();
+  private final Map<Predicate<Record>, Statistics> statisticsMap = new HashMap<Predicate<Record>, Statistics>();
 
   private String statisticsName;
 
@@ -40,9 +40,9 @@ public class StatisticsMultipleFilterProcess extends MultipleFilterProcess<Recor
   }
 
   @Override
-  protected boolean processFilter(final Record object, final Filter<Record> filter,
+  protected boolean processPredicate(final Record object, final Predicate<Record> filter,
     final Channel<Record> filterOut) {
-    if (super.processFilter(object, filter, filterOut)) {
+    if (super.processPredicate(object, filter, filterOut)) {
       if (this.useStatistics) {
         Statistics stats = this.statisticsMap.get(filter);
         String name;

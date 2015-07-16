@@ -1,20 +1,20 @@
 package com.revolsys.gis.graph.filter;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.jts.geom.LineString;
 
-public class LineFilter<T> implements Filter<Edge<T>> {
-  private final Filter<LineString> filter;
+public class LineFilter<T> implements Predicate<Edge<T>> {
+  private final Predicate<LineString> filter;
 
-  public LineFilter(final Filter<LineString> filter) {
+  public LineFilter(final Predicate<LineString> filter) {
     this.filter = filter;
   }
 
   @Override
-  public boolean accept(final Edge<T> edge) {
+  public boolean test(final Edge<T> edge) {
     final LineString line = edge.getLine();
-    return this.filter.accept(line);
+    return this.filter.test(line);
   }
 
 }

@@ -11,6 +11,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.function.Predicate;
 
 import javax.swing.JComponent;
 import javax.swing.SwingWorker;
@@ -33,7 +34,6 @@ import com.revolsys.data.record.io.RecordStoreConnectionManager;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
-import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.index.RecordQuadTree;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.io.Statistics;
@@ -45,7 +45,6 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
@@ -435,10 +434,11 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
       final List<LayerRecord> records = (List)index.queryIntersects(boundingBox);
 
-      final Filter filter = new RecordGeometryBoundingBoxIntersectsFilter(boundingBox);
+      final Predicate<Record> predicate = new RecordGeometryBoundingBoxIntersectsFilter(
+        boundingBox);
       for (final ListIterator<LayerRecord> iterator = records.listIterator(); iterator.hasNext();) {
         final LayerRecord record = iterator.next();
-        if (!filter.accept(record)) {
+        if (!predicate.test(record)) {
           iterator.remove();
         }
       }

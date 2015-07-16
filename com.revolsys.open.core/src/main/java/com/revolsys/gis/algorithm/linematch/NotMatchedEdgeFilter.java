@@ -1,9 +1,9 @@
 package com.revolsys.gis.algorithm.linematch;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.gis.graph.Edge;
 
-public class NotMatchedEdgeFilter implements Filter<Edge<LineSegmentMatch>> {
+public class NotMatchedEdgeFilter implements Predicate<Edge<LineSegmentMatch>> {
   private final int index;
 
   public NotMatchedEdgeFilter(final int index) {
@@ -11,7 +11,7 @@ public class NotMatchedEdgeFilter implements Filter<Edge<LineSegmentMatch>> {
   }
 
   @Override
-  public boolean accept(final Edge<LineSegmentMatch> edge) {
+  public boolean test(final Edge<LineSegmentMatch> edge) {
     return edge.getObject().hasMatches(this.index);
   }
 

@@ -21,12 +21,12 @@
 package com.revolsys.data.filter;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.TopologyException;
 
-public class RecordGeometryIntersectsFilter implements Filter<Record> {
+public class RecordGeometryIntersectsFilter implements Predicate<Record> {
   /** The geometry to compare the data objects to to. */
   private final Geometry geometry;
 
@@ -43,7 +43,7 @@ public class RecordGeometryIntersectsFilter implements Filter<Record> {
   }
 
   @Override
-  public boolean accept(final Record object) {
+  public boolean test(final Record object) {
     try {
       final Geometry matchGeometry = object.getGeometry();
       final Geometry convertedGeometry = matchGeometry.convert(this.geometryFactory);

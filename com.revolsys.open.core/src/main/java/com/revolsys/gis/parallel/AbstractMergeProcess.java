@@ -19,10 +19,6 @@ public abstract class AbstractMergeProcess extends AbstractInOutProcess<Record, 
 
   private int otherInBufferSize = 0;
 
-  protected boolean acceptObject(final Record object) {
-    return true;
-  }
-
   private void addObjectFromOtherChannel(final Channel<Record>[] channels, final boolean[] guard,
     final Record[] objects, final int channelIndex) {
     int otherIndex;
@@ -39,7 +35,7 @@ public abstract class AbstractMergeProcess extends AbstractInOutProcess<Record, 
       while (objects[otherIndex] == null) {
         try {
           final Record object = otherChannel.read();
-          if (acceptObject(object)) {
+          if (testObject(object)) {
             objects[otherIndex] = object;
             return;
           }
@@ -190,12 +186,12 @@ public abstract class AbstractMergeProcess extends AbstractInOutProcess<Record, 
             guard[i] = false;
           } else {
             Record object = null;
-            boolean accept = false;
+            boolean test = false;
             do {
               object = channel.read();
-              accept = acceptObject(object);
-            } while (!accept);
-            if (accept) {
+              test = testObject(object);
+            } while (!test);
+            if (test) {
               objects[i] = object;
               typePaths[i] = objects[i].getRecordDefinition().getPath();
             }
@@ -251,7 +247,7 @@ public abstract class AbstractMergeProcess extends AbstractInOutProcess<Record, 
           final int channelIndex = alt.select(channels, guard, 1000);
           if (channelIndex >= 0) {
             final Record object = channels[channelIndex].read();
-            if (acceptObject(object)) {
+            if (testObject(object)) {
               final RecordDefinition type = object.getRecordDefinition();
               final String typePath = type.getPath();
               if (currentTypeName == null || typePath.equals(currentTypeName)) {
@@ -311,5 +307,9 @@ public abstract class AbstractMergeProcess extends AbstractInOutProcess<Record, 
   }
 
   protected void tearDown() {
+  }
+
+  protected boolean testObject(final Record object) {
+    return true;
   }
 }

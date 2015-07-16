@@ -3,7 +3,7 @@ package com.revolsys.gis.algorithm.index;
 import java.util.LinkedList;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.jts.geom.BoundingBox;
 
 public abstract class RTreeNode<T> {
@@ -38,7 +38,7 @@ public abstract class RTreeNode<T> {
 
   protected abstract void updateEnvelope();
 
-  public abstract boolean visit(BoundingBox envelope, Filter<T> filter, Visitor<T> visitor);
+  public abstract boolean visit(BoundingBox envelope, Predicate<T> filter, Visitor<T> visitor);
 
   public abstract boolean visit(BoundingBox envelope, Visitor<T> visitor);
 

@@ -14,7 +14,7 @@ import org.springframework.core.convert.converter.Converter;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionFactory;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.gis.converter.FilterRecordConverter;
 import com.revolsys.gis.converter.SimpleRecordConveter;
 import com.revolsys.gis.converter.process.CopyValues;
@@ -64,8 +64,8 @@ public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
     Record target = null;
     if (converters != null && !converters.isEmpty()) {
       for (final FilterRecordConverter filterConverter : converters) {
-        final Filter<Record> filter = filterConverter.getFilter();
-        if (filter.accept(source)) {
+        final Predicate<Record> filter = filterConverter.getFilter();
+        if (filter.test(source)) {
           final Converter<Record, Record> converter = filterConverter.getConverter();
           target = converter.convert(source);
           matchCount++;
@@ -89,8 +89,8 @@ public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
     } else {
       final StringBuilder sb = new StringBuilder("Multiple conveters found: \n  ");
       for (final FilterRecordConverter filterConverter : converters) {
-        final Filter<Record> filter = filterConverter.getFilter();
-        if (filter.accept(source)) {
+        final Predicate<Record> filter = filterConverter.getFilter();
+        if (filter.test(source)) {
           sb.append(filter.toString());
           sb.append("\n  ");
         }

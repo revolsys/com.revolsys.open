@@ -31,7 +31,7 @@ public class RecordReaderQueryIterator extends AbstractIterator<Record> {
   protected Record getNext() throws NoSuchElementException {
     while (true) {
       final Record record = this.iterator.next();
-      if (this.whereCondition == null || this.whereCondition.accept(record)) {
+      if (this.whereCondition == null || this.whereCondition.test(record)) {
         return record;
       }
     }

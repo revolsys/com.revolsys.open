@@ -2,7 +2,7 @@ package com.revolsys.visitor;
 
 import java.util.Comparator;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 
 public class SingleObjectVisitor<T> extends BaseVisitor<T> {
   private T object;
@@ -14,11 +14,11 @@ public class SingleObjectVisitor<T> extends BaseVisitor<T> {
     super(comparator);
   }
 
-  public SingleObjectVisitor(final Filter<T> filter) {
+  public SingleObjectVisitor(final Predicate<T> filter) {
     super(filter);
   }
 
-  public SingleObjectVisitor(final Filter<T> filter, final Comparator<T> comparator) {
+  public SingleObjectVisitor(final Predicate<T> filter, final Comparator<T> comparator) {
     super(filter, comparator);
   }
 

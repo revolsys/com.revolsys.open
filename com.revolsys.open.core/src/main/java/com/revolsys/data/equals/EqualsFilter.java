@@ -3,9 +3,9 @@ package com.revolsys.data.equals;
 import java.util.Collection;
 import java.util.Collections;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 
-public class EqualsFilter<T> implements Filter<T> {
+public class EqualsFilter<T> implements Predicate<T> {
   private Equals<Object> equals = EqualsInstance.INSTANCE;
 
   private Collection<String> excludeAttributes = Collections.emptyList();
@@ -34,7 +34,7 @@ public class EqualsFilter<T> implements Filter<T> {
   }
 
   @Override
-  public boolean accept(final T object) {
+  public boolean test(final T object) {
     if (this.equals.equals(this.object, object, this.excludeAttributes)) {
       return true;
     } else {

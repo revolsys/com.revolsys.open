@@ -1,10 +1,10 @@
 package com.revolsys.gis.graph.filter;
 
 import com.revolsys.data.equals.EqualsInstance;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.properties.ObjectWithProperties;
 
-public class AttributeFilter<T extends ObjectWithProperties> implements Filter<T> {
+public class AttributeFilter<T extends ObjectWithProperties> implements Predicate<T> {
   private final String fieldName;
 
   private final boolean inverse;
@@ -24,7 +24,7 @@ public class AttributeFilter<T extends ObjectWithProperties> implements Filter<T
   }
 
   @Override
-  public boolean accept(final T object) {
+  public boolean test(final T object) {
     final Object value = object.getProperty(this.fieldName);
     final boolean equal = EqualsInstance.INSTANCE.equals(this.value, value);
     if (this.inverse) {

@@ -2,28 +2,29 @@ package com.revolsys.gis.parallel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import com.revolsys.data.filter.AttributesEqualFilter;
 import com.revolsys.data.filter.AttributesEqualOrNullFilter;
 import com.revolsys.data.record.Record;
-import com.revolsys.filter.AndFilter;
-import com.revolsys.filter.Factory;
-import com.revolsys.filter.Filter;
+import com.revolsys.predicate.AndPredicate;
 
-public class CompareFilterFactory implements Factory<Filter<Record>, Record> {
+public class CompareFilterFactory implements Function<Record, Predicate<Record>> {
   private List<String> equalFieldNames = new ArrayList<String>();
 
   private List<String> equalOrNullFieldNames = new ArrayList<String>();
 
   @Override
-  public Filter<Record> create(final Record object) {
-    final AndFilter<Record> filters = new AndFilter<Record>();
+  public Predicate<Record> apply(final Record object) {
+    final AndPredicate<Record> filters = new AndPredicate<Record>();
     if (!this.equalFieldNames.isEmpty()) {
-      final Filter<Record> valuesFilter = new AttributesEqualFilter(object, this.equalFieldNames);
+      final Predicate<Record> valuesFilter = new AttributesEqualFilter(object,
+        this.equalFieldNames);
       filters.addFilter(valuesFilter);
     }
     if (!this.equalOrNullFieldNames.isEmpty()) {
-      final Filter<Record> valuesFilter = new AttributesEqualOrNullFilter(object,
+      final Predicate<Record> valuesFilter = new AttributesEqualOrNullFilter(object,
         this.equalOrNullFieldNames);
       filters.addFilter(valuesFilter);
     }

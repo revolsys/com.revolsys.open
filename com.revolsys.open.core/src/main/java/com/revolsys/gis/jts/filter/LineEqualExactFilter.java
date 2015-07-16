@@ -20,10 +20,10 @@
  */
 package com.revolsys.gis.jts.filter;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.jts.geom.LineString;
 
-public class LineEqualExactFilter implements Filter<LineString> {
+public class LineEqualExactFilter implements Predicate<LineString> {
   private final LineString line;
 
   int axisCount = -1;
@@ -38,7 +38,7 @@ public class LineEqualExactFilter implements Filter<LineString> {
   }
 
   @Override
-  public boolean accept(final LineString line) {
+  public boolean test(final LineString line) {
     int axisCount = this.axisCount;
     if (axisCount == -1) {
       axisCount = Math.max(this.line.getAxisCount(), line.getAxisCount());

@@ -20,10 +20,10 @@
  */
 package com.revolsys.gis.jts.filter;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.jts.geom.Geometry;
 
-public class IntersectsFilter<T extends Geometry> implements Filter<T> {
+public class IntersectsFilter<T extends Geometry> implements Predicate<T> {
   private Geometry geometry;
 
   private Geometry preparedGeometry;
@@ -36,7 +36,7 @@ public class IntersectsFilter<T extends Geometry> implements Filter<T> {
   }
 
   @Override
-  public boolean accept(final T geometry) {
+  public boolean test(final T geometry) {
     if (this.preparedGeometry.intersects(geometry)) {
       return true;
     } else {

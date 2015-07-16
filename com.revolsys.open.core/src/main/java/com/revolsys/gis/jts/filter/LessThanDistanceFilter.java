@@ -20,13 +20,13 @@
  */
 package com.revolsys.gis.jts.filter;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 
-public class LessThanDistanceFilter implements Filter<Geometry> {
+public class LessThanDistanceFilter implements Predicate<Geometry> {
   private BoundingBox envelope;
 
   /** The geometry to compare the data objects to to. */
@@ -50,7 +50,7 @@ public class LessThanDistanceFilter implements Filter<Geometry> {
   }
 
   @Override
-  public boolean accept(final Geometry geometry) {
+  public boolean test(final Geometry geometry) {
     if (geometry.getBoundingBox().intersects(this.envelope)) {
       double distance;
       if (geometry instanceof LineString && this.geometry instanceof LineString) {

@@ -1,16 +1,17 @@
 package com.revolsys.data.record.filter;
 
+import java.util.function.Predicate;
+
 import com.revolsys.data.record.Record;
-import com.revolsys.filter.AcceptAllFilter;
-import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.index.RecordQuadTree;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.predicate.Predicates;
 import com.revolsys.util.Property;
 
-public class ClosestRecordFilter implements Filter<Record> {
+public class ClosestRecordFilter implements Predicate<Record> {
 
   public static ClosestRecordFilter query(final RecordQuadTree index, final Geometry geometry,
     final double maxDistance) {
@@ -21,7 +22,7 @@ public class ClosestRecordFilter implements Filter<Record> {
   }
 
   public static ClosestRecordFilter query(final RecordQuadTree index, final Geometry geometry,
-    final double maxDistance, final Filter<Record> filter) {
+    final double maxDistance, final Predicate<Record> filter) {
     final ClosestRecordFilter closestFilter = new ClosestRecordFilter(geometry, maxDistance,
       filter);
     final BoundingBox boundingBox = closestFilter.getFilterBoundingBox();
@@ -29,7 +30,7 @@ public class ClosestRecordFilter implements Filter<Record> {
     return closestFilter;
   }
 
-  private final Filter<Record> filter;
+  private final Predicate<Record> filter;
 
   private final Geometry geometry;
 
@@ -40,19 +41,32 @@ public class ClosestRecordFilter implements Filter<Record> {
   private double closestDistance = Double.MAX_VALUE;
 
   public ClosestRecordFilter(final Geometry geometry, final double maxDistance) {
-    this(geometry, maxDistance, AcceptAllFilter.get());
+    this(geometry, maxDistance, Predicates.all());
   }
 
   public ClosestRecordFilter(final Geometry geometry, final double maxDistance,
-    final Filter<Record> filter) {
+    final Predicate<Record> filter) {
     this.geometry = geometry;
     this.maxDistance = maxDistance;
     this.filter = filter;
   }
 
+  public double getClosestDistance() {
+    return this.closestDistance;
+  }
+
+  public Record getClosestRecord() {
+    return this.closestRecord;
+  }
+
+  public BoundingBox getFilterBoundingBox() {
+    final BoundingBox boundingBox = GeometryFactory.boundingBox(this.geometry);
+    return boundingBox.expand(this.maxDistance);
+  }
+
   @Override
-  public boolean accept(final Record record) {
-    if (this.filter.accept(record)) {
+  public boolean test(final Record record) {
+    if (this.filter.test(record)) {
       final Geometry geometry = record.getGeometry();
       if (Property.hasValue(geometry)) {
         if (!(geometry instanceof Point)) {
@@ -70,18 +84,5 @@ public class ClosestRecordFilter implements Filter<Record> {
       }
     }
     return false;
-  }
-
-  public double getClosestDistance() {
-    return this.closestDistance;
-  }
-
-  public Record getClosestRecord() {
-    return this.closestRecord;
-  }
-
-  public BoundingBox getFilterBoundingBox() {
-    final BoundingBox boundingBox = GeometryFactory.boundingBox(this.geometry);
-    return boundingBox.expand(this.maxDistance);
   }
 }

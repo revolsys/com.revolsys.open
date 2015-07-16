@@ -20,11 +20,11 @@
  */
 package com.revolsys.gis.jts.filter;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.segment.Segment;
 
-public class SharesLineSegmentsFilter implements Filter<LineString> {
+public class SharesLineSegmentsFilter implements Predicate<LineString> {
   private final LineString line;
 
   public SharesLineSegmentsFilter(final LineString line) {
@@ -32,7 +32,7 @@ public class SharesLineSegmentsFilter implements Filter<LineString> {
   }
 
   @Override
-  public boolean accept(final LineString line) {
+  public boolean test(final LineString line) {
     for (final Segment segment1 : this.line.segments()) {
       for (final Segment segment2 : line.segments()) {
         if (segment1.equals(2, segment2)) {

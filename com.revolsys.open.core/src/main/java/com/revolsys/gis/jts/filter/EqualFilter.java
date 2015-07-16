@@ -20,10 +20,10 @@
  */
 package com.revolsys.gis.jts.filter;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.jts.geom.Geometry;
 
-public class EqualFilter<T extends Geometry> implements Filter<T> {
+public class EqualFilter<T extends Geometry> implements Predicate<T> {
   private final T geometry;
 
   public EqualFilter(final T geometry) {
@@ -31,7 +31,7 @@ public class EqualFilter<T extends Geometry> implements Filter<T> {
   }
 
   @Override
-  public boolean accept(final T geometry) {
+  public boolean test(final T geometry) {
     if (this.geometry.equals(geometry)) {
       return true;
     } else {

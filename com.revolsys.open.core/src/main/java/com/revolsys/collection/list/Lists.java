@@ -1,7 +1,9 @@
 package com.revolsys.collection.list;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import com.revolsys.util.Property;
 
@@ -109,6 +111,18 @@ public class Lists {
     final List<V> list = new ArrayList<>();
     addAll(list, values);
     return list;
+  }
+
+  public static <V> Supplier<ArrayList<V>> arrayFactory() {
+    return () -> {
+      return new ArrayList<V>();
+    };
+  }
+
+  public static <V> Supplier<LinkedList<V>> linkedFactory() {
+    return () -> {
+      return new LinkedList<V>();
+    };
   }
 
   public static <V> List<V> unmodifiable(final Iterable<? extends V> values) {

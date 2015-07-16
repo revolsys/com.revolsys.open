@@ -1,23 +1,23 @@
 package com.revolsys.util;
 
 import java.util.Set;
+import java.util.function.Supplier;
 
-import com.revolsys.factory.Factory;
-import com.revolsys.factory.HashSetFactory;
+import com.revolsys.collection.set.Sets;
 
 public class Locals {
 
-  public static <V> V get(final ThreadLocal<V> local, final Factory<V> factory) {
+  public static <V> V get(final ThreadLocal<V> local, final Supplier<V> supplier) {
     V value = local.get();
     if (value == null) {
-      value = factory.create();
+      value = supplier.get();
       local.set(value);
     }
     return value;
   }
 
   public static <V> boolean setAdd(final ThreadLocal<Set<V>> local, final V value) {
-    final Set<V> collection = get(local, HashSetFactory.<V> get());
+    final Set<V> collection = get(local, Sets.hashFactory());
     return collection.add(value);
   }
 
@@ -31,7 +31,7 @@ public class Locals {
   }
 
   public static <V> boolean setRemove(final ThreadLocal<Set<V>> local, final V value) {
-    final Set<V> collection = get(local, HashSetFactory.<V> get());
+    final Set<V> collection = get(local, Sets.hashFactory());
     final boolean removed = collection.remove(value);
     if (removed) {
       if (collection.isEmpty()) {

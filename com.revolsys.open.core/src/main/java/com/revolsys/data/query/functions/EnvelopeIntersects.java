@@ -26,7 +26,7 @@ public class EnvelopeIntersects extends Condition {
   }
 
   @Override
-  public boolean accept(final Map<String, Object> record) {
+  public boolean test(final Map<String, Object> record) {
     final BoundingBox boundingBox1 = getBoundingBox(this.boundingBox1Value, record);
     final BoundingBox boundingBox2 = getBoundingBox(this.boundingBox2Value, record);
     if (boundingBox1 == null || boundingBox2 == null) {

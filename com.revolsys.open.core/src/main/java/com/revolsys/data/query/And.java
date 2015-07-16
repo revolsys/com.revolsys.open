@@ -19,10 +19,10 @@ public class And extends AbstractMultiCondition {
     "unchecked", "rawtypes"
   })
   @Override
-  public boolean accept(final Map<String, Object> object) {
+  public boolean test(final Map<String, Object> object) {
     final List<Condition> conditions = (List)getQueryValues();
     for (final Condition condition : conditions) {
-      if (!condition.accept(object)) {
+      if (!condition.test(object)) {
         return false;
       }
     }

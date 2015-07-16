@@ -7,14 +7,14 @@ import java.util.Map.Entry;
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.Records;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 
 /**
  * Filter Records by the value of the property.
  *
  * @author Paul Austin
  */
-public class MultipleAttributeValuesFilter implements Filter<Record> {
+public class MultipleAttributeValuesFilter implements Predicate<Record> {
   /** The values to match. */
   private Map<String, ? extends Object> values = Collections.emptyMap();
 
@@ -29,7 +29,7 @@ public class MultipleAttributeValuesFilter implements Filter<Record> {
    * @return True if the object matched the filter, false otherwise.
    */
   @Override
-  public boolean accept(final Record object) {
+  public boolean test(final Record object) {
     for (final Entry<String, ? extends Object> entry : this.values.entrySet()) {
       final String fieldName = entry.getKey();
       final Object value = entry.getValue();

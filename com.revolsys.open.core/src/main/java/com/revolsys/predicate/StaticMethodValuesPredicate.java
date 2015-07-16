@@ -1,12 +1,13 @@
-package com.revolsys.filter;
+package com.revolsys.predicate;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.function.Predicate;
 
 import javax.annotation.PostConstruct;
 
-public class StaticMethodValuesFilter<T> implements Filter<T> {
+public class StaticMethodValuesPredicate<T> implements Predicate<T> {
   private Method method;
 
   private Class<?> methodClass;
@@ -15,10 +16,10 @@ public class StaticMethodValuesFilter<T> implements Filter<T> {
 
   private Collection<? extends Object> values;
 
-  public StaticMethodValuesFilter() {
+  public StaticMethodValuesPredicate() {
   }
 
-  public StaticMethodValuesFilter(final Class<?> methodClass, final String methodName,
+  public StaticMethodValuesPredicate(final Class<?> methodClass, final String methodName,
     final Collection<? extends Object> values) {
     this.methodClass = methodClass;
     this.methodName = methodName;
@@ -26,15 +27,9 @@ public class StaticMethodValuesFilter<T> implements Filter<T> {
     initialize();
   }
 
-  public StaticMethodValuesFilter(final Class<?> methodClass, final String methodName,
+  public StaticMethodValuesPredicate(final Class<?> methodClass, final String methodName,
     final Object... values) {
     this(methodClass, methodName, Arrays.asList(values));
-  }
-
-  @Override
-  public boolean accept(final T object) {
-    final Object value = getValue(object);
-    return this.values.contains(value);
   }
 
   public Class<?> getMethodClass() {
@@ -90,6 +85,12 @@ public class StaticMethodValuesFilter<T> implements Filter<T> {
 
   public void setValues(final Collection<? extends Object> values) {
     this.values = values;
+  }
+
+  @Override
+  public boolean test(final T object) {
+    final Object value = getValue(object);
+    return this.values.contains(value);
   }
 
   @Override

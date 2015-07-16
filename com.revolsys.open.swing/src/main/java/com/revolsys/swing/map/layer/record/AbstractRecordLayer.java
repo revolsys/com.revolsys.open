@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
+import java.util.function.Predicate;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -64,7 +65,6 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.filter.Filter;
 import com.revolsys.format.gpx.GpxWriter;
 import com.revolsys.gis.algorithm.index.RecordQuadTree;
 import com.revolsys.gis.cs.CoordinateSystem;
@@ -297,9 +297,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       renderer.setStyle(GeometryStyle.createStyle());
     }
     setProperties(properties);
-    final Filter<Record> filter = AbstractRecordLayerRenderer.getFilter(this, properties);
-    if (filter instanceof SqlLayerFilter) {
-      final SqlLayerFilter sqlFilter = (SqlLayerFilter)filter;
+    final Predicate<Record> predicate = AbstractRecordLayerRenderer.getFilter(this, properties);
+    if (predicate instanceof SqlLayerFilter) {
+      final SqlLayerFilter sqlFilter = (SqlLayerFilter)predicate;
       setWhere(sqlFilter.getQuery());
     }
     if (this.fieldNamesSets.isEmpty()) {
@@ -933,7 +933,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   @SuppressWarnings("unchecked")
   protected <V extends LayerRecord> List<V> filterQueryResults(final List<V> results,
-    final Filter<Map<String, Object>> filter) {
+    final Predicate<Map<String, Object>> filter) {
     final Collection<LayerRecord> modifiedRecords = getModifiedRecords();
     for (final ListIterator<V> iterator = results.listIterator(); iterator.hasNext();) {
       final LayerRecord record = iterator.next();
@@ -942,7 +942,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       } else {
         final V modifiedRecord = (V)getAndRemoveSame(modifiedRecords, record);
         if (modifiedRecord != null) {
-          if (Condition.accept(filter, modifiedRecord)) {
+          if (Condition.test(filter, modifiedRecord)) {
             iterator.set(modifiedRecord);
           } else {
             iterator.remove();
@@ -951,12 +951,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       }
     }
     for (final LayerRecord record : modifiedRecords) {
-      if (Condition.accept(filter, record)) {
+      if (Condition.test(filter, record)) {
         results.add((V)record);
       }
     }
     for (final LayerRecord record : getNewRecords()) {
-      if (Condition.accept(filter, record)) {
+      if (Condition.test(filter, record)) {
         results.add((V)record);
       }
     }
@@ -1983,7 +1983,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final GeometryFactory geometryFactory = getGeometryFactory();
       boundingBox = boundingBox.convert(geometryFactory);
       final List<LayerRecord> results = doQuery(boundingBox);
-      final Filter filter = new RecordGeometryBoundingBoxIntersectsFilter(boundingBox);
+      final Predicate filter = new RecordGeometryBoundingBoxIntersectsFilter(boundingBox);
       return filterQueryResults(results, filter);
     } else {
       return Collections.emptyList();
@@ -1996,8 +1996,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public List<LayerRecord> query(final Geometry geometry, final double maxDistance) {
     if (hasGeometryAttribute()) {
       final List<LayerRecord> results = doQuery(geometry, maxDistance);
-      final Filter filter = new RecordGeometryDistanceFilter(geometry, maxDistance);
-      return filterQueryResults(results, filter);
+      final Predicate predicate = new RecordGeometryDistanceFilter(geometry, maxDistance);
+      return filterQueryResults(results, predicate);
     } else {
       return Collections.emptyList();
     }

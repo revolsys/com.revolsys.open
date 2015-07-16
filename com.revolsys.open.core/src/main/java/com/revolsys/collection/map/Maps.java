@@ -13,20 +13,15 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Supplier;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.factory.Factory;
-import com.revolsys.factory.TreeMapFactory;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class Maps {
-
-  @SuppressWarnings("rawtypes")
-  private static final TreeMapFactory TREE_MAP_FACTORY = new TreeMapFactory<>();
-
   public static <T> Integer addCount(final Map<T, Integer> counts, final T key) {
     Integer count = counts.get(key);
     if (count == null) {
@@ -36,12 +31,6 @@ public class Maps {
     }
     counts.put(key, count);
     return count;
-  }
-
-  public static <K1, K2, V> boolean addToList(final Factory<Map<K2, List<V>>> factory,
-    final Map<K1, Map<K2, List<V>>> map, final K1 key1, final K2 key2, final V value) {
-    final List<V> values = getList(factory, map, key1, key2);
-    return values.add(value);
   }
 
   public static <K1, V> boolean addToList(final Map<K1, List<V>> map, final K1 key1,
@@ -56,15 +45,21 @@ public class Maps {
     return values.add(value);
   }
 
-  public static <K1, K2, V> V addToMap(final Factory<Map<K2, V>> factory,
-    final Map<K1, Map<K2, V>> map, final K1 key1, final K2 key2, final V value) {
-    final Map<K2, V> mapValue = getMap(factory, map, key1);
-    return mapValue.put(key2, value);
+  public static <K1, K2, V> boolean addToList(final Supplier<Map<K2, List<V>>> supplier,
+    final Map<K1, Map<K2, List<V>>> map, final K1 key1, final K2 key2, final V value) {
+    final List<V> values = getList(supplier, map, key1, key2);
+    return values.add(value);
   }
 
   public static <K1, K2, V> V addToMap(final Map<K1, Map<K2, V>> map, final K1 key1, final K2 key2,
     final V value) {
     final Map<K2, V> mapValue = getMap(map, key1);
+    return mapValue.put(key2, value);
+  }
+
+  public static <K1, K2, V> V addToMap(final Supplier<Map<K2, V>> supplier,
+    final Map<K1, Map<K2, V>> map, final K1 key1, final K2 key2, final V value) {
+    final Map<K2, V> mapValue = getMap(supplier, map, key1);
     return mapValue.put(key2, value);
   }
 
@@ -160,19 +155,6 @@ public class Maps {
     return null;
   }
 
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
-  public static <K, V> V get(final Factory<V> factory, final Map<K, ? extends Object> map,
-    final K key) {
-    V value = (V)map.get(key);
-    if (value == null) {
-      value = factory.create();
-      ((Map)map).put(key, value);
-    }
-    return value;
-  }
-
   /**
    * Get the value for the key from the map. If the value was null return
    * default Value instead.
@@ -202,6 +184,19 @@ public class Maps {
     } else {
       return map.get(name);
     }
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  public static <K, V> V get(final Supplier<V> supplier, final Map<K, ? extends Object> map,
+    final K key) {
+    V value = (V)map.get(key);
+    if (value == null) {
+      value = supplier.get();
+      ((Map)map).put(key, value);
+    }
+    return value;
   }
 
   public static boolean getBool(final Map<String, ? extends Object> map, final String name) {
@@ -318,13 +313,6 @@ public class Maps {
     }
   }
 
-  public static <K1, K2, V> List<V> getList(final Factory<Map<K2, List<V>>> factory,
-    final Map<K1, Map<K2, List<V>>> map, final K1 key1, final K2 key2) {
-    final Map<K2, List<V>> map2 = getMap(factory, map, key1);
-    final List<V> list = getList(map2, key2);
-    return list;
-  }
-
   public static <K, V> List<V> getList(final Map<K, List<V>> map, final K key) {
     List<V> list = map.get(key);
     if (list == null) {
@@ -337,6 +325,13 @@ public class Maps {
   public static <K1, K2, V> List<V> getList(final Map<K1, Map<K2, List<V>>> map, final K1 key1,
     final K2 key2) {
     final Map<K2, List<V>> map2 = getMap(map, key1);
+    final List<V> list = getList(map2, key2);
+    return list;
+  }
+
+  public static <K1, K2, V> List<V> getList(final Supplier<Map<K2, List<V>>> supplier,
+    final Map<K1, Map<K2, List<V>>> map, final K1 key1, final K2 key2) {
+    final Map<K2, List<V>> map2 = getMap(supplier, map, key1);
     final List<V> list = getList(map2, key2);
     return list;
   }
@@ -384,16 +379,6 @@ public class Maps {
     }
   }
 
-  public static <K1, K2, V> Map<K2, V> getMap(final Factory<Map<K2, V>> factory,
-    final Map<K1, Map<K2, V>> map, final K1 key) {
-    Map<K2, V> value = map.get(key);
-    if (value == null) {
-      value = factory.create();
-      map.put(key, value);
-    }
-    return value;
-  }
-
   public static <K1, K2, V> Map<K2, V> getMap(final Map<K1, Map<K2, V>> map, final K1 key) {
     Map<K2, V> value = map.get(key);
     if (value == null) {
@@ -409,9 +394,19 @@ public class Maps {
   }
 
   public static <K1, K2, V> V getMap(final Map<K1, Map<K2, V>> map, final K1 key1, final K2 key2,
-    final Factory<V> factory) {
+    final Supplier<V> supplier) {
     final Map<K2, V> values = getMap(map, key1);
-    return get(factory, values, key2);
+    return get(supplier, values, key2);
+  }
+
+  public static <K1, K2, V> Map<K2, V> getMap(final Supplier<Map<K2, V>> supplier,
+    final Map<K1, Map<K2, V>> map, final K1 key) {
+    Map<K2, V> value = map.get(key);
+    if (value == null) {
+      value = supplier.get();
+      map.put(key, value);
+    }
+    return value;
   }
 
   public static <K, V> List<V> getNotNull(final Map<K, V> map, final Collection<K> keys) {
@@ -487,6 +482,12 @@ public class Maps {
     }
   }
 
+  public static <K, V> Supplier<Map<K, V>> hashFactory() {
+    return () -> {
+      return new HashMap<K, V>();
+    };
+  }
+
   public static <K, V> Map<K, V> hashMap(final K key, final V value) {
     final Map<K, V> map = new HashMap<>();
     map.put(key, value);
@@ -509,6 +510,12 @@ public class Maps {
     } else {
       return true;
     }
+  }
+
+  public static <K, V> Supplier<Map<K, V>> linkedHashFactory() {
+    return () -> {
+      return new LinkedHashMap<K, V>();
+    };
   }
 
   public static <K, V> void mergeCollection(final Map<K, Collection<V>> map,
@@ -625,15 +632,16 @@ public class Maps {
     }
   }
 
+  public static <K, V> Supplier<Map<K, V>> treeFactory() {
+    return () -> {
+      return new TreeMap<K, V>();
+    };
+  }
+
   public static <K, V> Map<K, V> treeMap(final K key, final V value) {
     final Map<K, V> map = new TreeMap<>();
     map.put(key, value);
     return map;
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <K1, V1> TreeMapFactory<K1, V1> treeMapFactory() {
-    return TREE_MAP_FACTORY;
   }
 
 }

@@ -3,7 +3,7 @@ package com.revolsys.visitor;
 import java.util.Comparator;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 
 public class DelegatingVisitor<T> extends AbstractVisitor<T> {
   private Visitor<T> visitor;
@@ -20,21 +20,21 @@ public class DelegatingVisitor<T> extends AbstractVisitor<T> {
     this.visitor = visitor;
   }
 
-  public DelegatingVisitor(final Filter<T> filter) {
+  public DelegatingVisitor(final Predicate<T> filter) {
     super(filter);
   }
 
-  public DelegatingVisitor(final Filter<T> filter, final Comparator<T> comparator) {
+  public DelegatingVisitor(final Predicate<T> filter, final Comparator<T> comparator) {
     super(filter, comparator);
   }
 
-  public DelegatingVisitor(final Filter<T> filter, final Comparator<T> comparator,
+  public DelegatingVisitor(final Predicate<T> filter, final Comparator<T> comparator,
     final Visitor<T> visitor) {
     super(filter, comparator);
     this.visitor = visitor;
   }
 
-  public DelegatingVisitor(final Filter<T> filter, final Visitor<T> visitor) {
+  public DelegatingVisitor(final Predicate<T> filter, final Visitor<T> visitor) {
     super(filter);
     this.visitor = visitor;
   }
@@ -58,8 +58,8 @@ public class DelegatingVisitor<T> extends AbstractVisitor<T> {
 
   @Override
   public boolean visit(final T item) {
-    final Filter<T> filter = getFilter();
-    if (filter == null || filter.accept(item)) {
+    final Predicate<T> filter = getPredicate();
+    if (filter == null || filter.test(item)) {
       return this.visitor.visit(item);
     } else {
       return true;

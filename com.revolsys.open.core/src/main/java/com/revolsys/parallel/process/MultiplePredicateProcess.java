@@ -3,14 +3,14 @@ package com.revolsys.parallel.process;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
 
-import com.revolsys.filter.Filter;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 
-public class MultipleFilterProcess<T> extends BaseInOutProcess<T, T> {
+public class MultiplePredicateProcess<T> extends BaseInOutProcess<T, T> {
   /** The map of filters to channels. */
-  private final Map<Filter<T>, Channel<T>> filters = new LinkedHashMap<Filter<T>, Channel<T>>();
+  private final Map<Predicate<T>, Channel<T>> predicates = new LinkedHashMap<Predicate<T>, Channel<T>>();
 
   /**
    * Add the filter with the channel to write the data object to if the filter
@@ -19,8 +19,8 @@ public class MultipleFilterProcess<T> extends BaseInOutProcess<T, T> {
    * @param filter The filter.
    * @param channel The channel.
    */
-  private void addFiler(final Filter<T> filter, final Channel<T> channel) {
-    this.filters.put(filter, channel);
+  private void addFiler(final Predicate<T> filter, final Channel<T> channel) {
+    this.predicates.put(filter, channel);
     if (channel != null) {
       channel.writeConnect();
     }
@@ -28,7 +28,7 @@ public class MultipleFilterProcess<T> extends BaseInOutProcess<T, T> {
 
   @Override
   protected void destroy() {
-    for (final Channel<T> channel : this.filters.values()) {
+    for (final Channel<T> channel : this.predicates.values()) {
       if (channel != null) {
         channel.writeDisconnect();
       }
@@ -38,8 +38,8 @@ public class MultipleFilterProcess<T> extends BaseInOutProcess<T, T> {
   /**
    * @return the filters
    */
-  public Map<Filter<T>, Channel<T>> getFilters() {
-    return this.filters;
+  public Map<Predicate<T>, Channel<T>> getPredicates() {
+    return this.predicates;
   }
 
   @Override
@@ -48,10 +48,10 @@ public class MultipleFilterProcess<T> extends BaseInOutProcess<T, T> {
 
   @Override
   protected void process(final Channel<T> in, final Channel<T> out, final T object) {
-    for (final Entry<Filter<T>, Channel<T>> entry : this.filters.entrySet()) {
-      final Filter<T> filter = entry.getKey();
+    for (final Entry<Predicate<T>, Channel<T>> entry : this.predicates.entrySet()) {
+      final Predicate<T> filter = entry.getKey();
       final Channel<T> filterOut = entry.getValue();
-      if (processFilter(object, filter, filterOut)) {
+      if (processPredicate(object, filter, filterOut)) {
         return;
       }
     }
@@ -60,9 +60,9 @@ public class MultipleFilterProcess<T> extends BaseInOutProcess<T, T> {
     }
   }
 
-  protected boolean processFilter(final T object, final Filter<T> filter,
+  protected boolean processPredicate(final T object, final Predicate<T> filter,
     final Channel<T> filterOut) {
-    if (filter.accept(object)) {
+    if (filter.test(object)) {
       if (filterOut != null) {
         try {
           filterOut.write(object);
@@ -78,9 +78,9 @@ public class MultipleFilterProcess<T> extends BaseInOutProcess<T, T> {
   /**
    * @param filters the filters to set
    */
-  public void setFilters(final Map<Filter<T>, Channel<T>> filters) {
-    for (final Entry<Filter<T>, Channel<T>> filterEntry : filters.entrySet()) {
-      final Filter<T> filter = filterEntry.getKey();
+  public void setPredicates(final Map<Predicate<T>, Channel<T>> filters) {
+    for (final Entry<Predicate<T>, Channel<T>> filterEntry : filters.entrySet()) {
+      final Predicate<T> filter = filterEntry.getKey();
       final Channel<T> channel = filterEntry.getValue();
       addFiler(filter, channel);
     }

@@ -5,15 +5,15 @@ import java.util.Iterator;
 import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.iterator.FilterIterator;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 
 public class FilterReader<T> extends AbstractReader<T> {
 
-  private Filter<T> filter;
+  private Predicate<T> filter;
 
   private Reader<T> reader;
 
-  public FilterReader(final Filter<T> filter, final Reader<T> reader) {
+  public FilterReader(final Predicate<T> filter, final Reader<T> reader) {
     this.filter = filter;
     this.reader = reader;
   }
@@ -29,7 +29,7 @@ public class FilterReader<T> extends AbstractReader<T> {
     this.reader = null;
   }
 
-  protected Filter<T> getFilter() {
+  protected Predicate<T> getFilter() {
     return this.filter;
   }
 

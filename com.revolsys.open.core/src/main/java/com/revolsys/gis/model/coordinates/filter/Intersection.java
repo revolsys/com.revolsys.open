@@ -1,10 +1,10 @@
 package com.revolsys.gis.model.coordinates.filter;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.gis.graph.linestring.LineStringGraph;
 import com.revolsys.jts.geom.LineString;
 
-public class Intersection implements Filter<LineString> {
+public class Intersection implements Predicate<LineString> {
 
   private final LineString line;
 
@@ -16,7 +16,7 @@ public class Intersection implements Filter<LineString> {
   }
 
   @Override
-  public boolean accept(final LineString line) {
+  public boolean test(final LineString line) {
     return this.graph.intersects(line);
   }
 

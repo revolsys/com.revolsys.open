@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import javax.swing.ImageIcon;
 
@@ -14,11 +15,10 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.data.filter.MultipleAttributeValuesFilter;
 import com.revolsys.data.record.Record;
-import com.revolsys.filter.AcceptAllFilter;
-import com.revolsys.filter.Filter;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.TopologyException;
+import com.revolsys.predicate.Predicates;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.map.Viewport2D;
@@ -38,8 +38,6 @@ import com.revolsys.util.Property;
 
 public abstract class AbstractRecordLayerRenderer
   extends AbstractLayerRenderer<AbstractRecordLayer> {
-
-  private static final AcceptAllFilter<Record> DEFAULT_FILTER = new AcceptAllFilter<Record>();
 
   private static final Map<String, Constructor<? extends AbstractRecordLayerRenderer>> RENDERER_CONSTRUCTORS = new HashMap<>();
 
@@ -83,7 +81,7 @@ public abstract class AbstractRecordLayerRenderer
     }
   }
 
-  public static Filter<Record> getFilter(final AbstractRecordLayer layer,
+  public static Predicate<Record> getFilter(final AbstractRecordLayer layer,
     final Map<String, ? extends Object> style) {
     @SuppressWarnings("unchecked")
     Map<String, Object> filterDefinition = (Map<String, Object>)style.get("filter");
@@ -115,7 +113,7 @@ public abstract class AbstractRecordLayerRenderer
           .error("Unknown filter type " + type);
       }
     }
-    return DEFAULT_FILTER;
+    return Predicates.all();
   }
 
   public static AbstractRecordLayerRenderer getRenderer(final AbstractLayer layer,
@@ -142,7 +140,7 @@ public abstract class AbstractRecordLayerRenderer
     return getRenderer(layer, null, style);
   }
 
-  private Filter<Record> filter = DEFAULT_FILTER;
+  private Predicate<Record> filter = Predicates.all();
 
   public AbstractRecordLayerRenderer(final String type, final String name,
     final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
@@ -182,7 +180,7 @@ public abstract class AbstractRecordLayerRenderer
 
   protected boolean isFilterAccept(final LayerRecord record) {
     try {
-      return this.filter.accept(record);
+      return this.filter.test(record);
     } catch (final Throwable e) {
       return false;
     }
@@ -269,12 +267,12 @@ public abstract class AbstractRecordLayerRenderer
   }
 
   public void setQueryFilter(final String query) {
-    if (this.filter instanceof SqlLayerFilter || this.filter instanceof AcceptAllFilter) {
+    if (this.filter instanceof SqlLayerFilter || this.filter == Predicates.<Record> all()) {
       if (Property.hasValue(query)) {
         final AbstractRecordLayer layer = getLayer();
         this.filter = new SqlLayerFilter(layer, query);
       } else {
-        this.filter = new AcceptAllFilter<>();
+        this.filter = Predicates.all();
       }
     }
   }
@@ -282,7 +280,7 @@ public abstract class AbstractRecordLayerRenderer
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
-    if (!(this.filter instanceof AcceptAllFilter)) {
+    if (!(this.filter == Predicates.<Record> all())) {
       MapSerializerUtil.add(map, "filter", this.filter);
     }
     return map;

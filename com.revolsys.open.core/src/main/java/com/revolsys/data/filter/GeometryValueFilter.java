@@ -1,10 +1,10 @@
 package com.revolsys.data.filter;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.jts.geom.Geometry;
 
-public class GeometryValueFilter implements Filter<Record> {
+public class GeometryValueFilter implements Predicate<Record> {
   private final Geometry geometry;
 
   public GeometryValueFilter(final Geometry geometry) {
@@ -16,7 +16,7 @@ public class GeometryValueFilter implements Filter<Record> {
   }
 
   @Override
-  public boolean accept(final Record object) {
+  public boolean test(final Record object) {
     final Geometry value = object.getGeometry();
     if (value == this.geometry) {
       return true;

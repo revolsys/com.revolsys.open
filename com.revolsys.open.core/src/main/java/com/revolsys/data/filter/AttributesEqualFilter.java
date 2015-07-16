@@ -6,10 +6,10 @@ import java.util.Collection;
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.Records;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 
-public class AttributesEqualFilter implements Filter<Record> {
-  public static boolean accept(final Record object1, final Record object2,
+public class AttributesEqualFilter implements Predicate<Record> {
+  public static boolean test(final Record object1, final Record object2,
     final boolean nullEqualsEmptyString, final Collection<String> fieldNames) {
     for (final String fieldName : fieldNames) {
       final Object value1 = Records.getFieldByPath(object1, fieldName);
@@ -35,14 +35,14 @@ public class AttributesEqualFilter implements Filter<Record> {
     return true;
   }
 
-  public static boolean accept(final Record object1, final Record object2,
+  public static boolean test(final Record object1, final Record object2,
     final boolean nullEqualsEmptyString, final String... fieldNames) {
-    return accept(object1, object2, nullEqualsEmptyString, Arrays.asList(fieldNames));
+    return test(object1, object2, nullEqualsEmptyString, Arrays.asList(fieldNames));
   }
 
-  public static boolean accept(final Record object1, final Record object2,
+  public static boolean test(final Record object1, final Record object2,
     final String... fieldNames) {
-    return accept(object1, object2, false, Arrays.asList(fieldNames));
+    return test(object1, object2, false, Arrays.asList(fieldNames));
   }
 
   private final Collection<String> fieldNames;
@@ -60,17 +60,17 @@ public class AttributesEqualFilter implements Filter<Record> {
     this(object, Arrays.asList(fieldNames));
   }
 
-  @Override
-  public boolean accept(final Record object) {
-    return accept(this.object, object, this.nullEqualsEmptyString, this.fieldNames);
-  }
-
   public boolean isNullEqualsEmptyString() {
     return this.nullEqualsEmptyString;
   }
 
   public void setNullEqualsEmptyString(final boolean nullEqualsEmptyString) {
     this.nullEqualsEmptyString = nullEqualsEmptyString;
+  }
+
+  @Override
+  public boolean test(final Record object) {
+    return test(this.object, object, this.nullEqualsEmptyString, this.fieldNames);
   }
 
   @Override

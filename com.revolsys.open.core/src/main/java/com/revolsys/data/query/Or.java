@@ -16,13 +16,13 @@ public class Or extends AbstractMultiCondition {
   }
 
   @Override
-  public boolean accept(final Map<String, Object> object) {
+  public boolean test(final Map<String, Object> object) {
     final List<Condition> conditions = (List)getQueryValues();
     if (conditions.isEmpty()) {
       return true;
     } else {
       for (final Condition condition : conditions) {
-        if (condition.accept(object)) {
+        if (condition.test(object)) {
           return true;
         }
       }

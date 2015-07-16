@@ -28,7 +28,7 @@ public class WithinDistance extends Condition {
   }
 
   @Override
-  public boolean accept(final Map<String, Object> record) {
+  public boolean test(final Map<String, Object> record) {
     if (this.geometry1Value == null || this.geometry2Value == null || this.distanceValue == null) {
       return false;
     } else {

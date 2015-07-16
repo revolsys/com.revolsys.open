@@ -7,13 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.filter.Filter;
-import com.revolsys.filter.FilterUtil;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.parallel.channel.Channel;
+import com.revolsys.predicate.Predicates;
 
 public class PointRecordMap {
 
@@ -78,10 +78,10 @@ public class PointRecordMap {
 
   }
 
-  public Record getFirstMatch(final Record record, final Filter<Record> filter) {
+  public Record getFirstMatch(final Record record, final Predicate<Record> filter) {
     final List<Record> records = getRecords(record);
     for (final Record matchRecord : records) {
-      if (filter.accept(matchRecord)) {
+      if (filter.test(matchRecord)) {
         return matchRecord;
       }
     }
@@ -101,9 +101,9 @@ public class PointRecordMap {
     return Collections.<Point> unmodifiableSet(this.objectMap.keySet());
   }
 
-  public List<Record> getMatches(final Record record, final Filter<Record> filter) {
+  public List<Record> getMatches(final Record record, final Predicate<Record> predicate) {
     final List<Record> records = getRecords(record);
-    final List<Record> filteredRecords = FilterUtil.filter(records, filter);
+    final List<Record> filteredRecords = Predicates.predicate(records, predicate);
     return filteredRecords;
   }
 

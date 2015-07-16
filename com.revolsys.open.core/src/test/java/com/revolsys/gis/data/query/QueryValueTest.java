@@ -42,12 +42,12 @@ public class QueryValueTest {
   }
 
   public void assertConditionFalse(final Condition trueCondition1, final Record record) {
-    final boolean result1 = trueCondition1.accept(record);
+    final boolean result1 = trueCondition1.test(record);
     Assert.assertFalse(result1);
   }
 
   public void assertConditionTrue(final Condition trueCondition1, final Record record) {
-    final boolean result1 = trueCondition1.accept(record);
+    final boolean result1 = trueCondition1.test(record);
     Assert.assertTrue(result1);
   }
 

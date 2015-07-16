@@ -17,8 +17,8 @@ public class ParenthesisCondition extends Condition {
   }
 
   @Override
-  public boolean accept(final Map<String, Object> record) {
-    return this.condition.accept(record);
+  public boolean test(final Map<String, Object> record) {
+    return this.condition.test(record);
   }
 
   @Override

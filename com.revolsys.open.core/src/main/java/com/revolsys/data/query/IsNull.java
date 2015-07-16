@@ -9,7 +9,7 @@ public class IsNull extends RightUnaryCondition {
   }
 
   @Override
-  public boolean accept(final Map<String, Object> record) {
+  public boolean test(final Map<String, Object> record) {
     final QueryValue queryValue = getValue();
     final Object value = queryValue.getValue(record);
     return value == null;

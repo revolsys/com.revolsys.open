@@ -24,7 +24,7 @@ public class GeometryEqual2d extends Condition {
   }
 
   @Override
-  public boolean accept(final Map<String, Object> record) {
+  public boolean test(final Map<String, Object> record) {
     final Geometry geometry1 = this.geometry1Value.getValue(record);
     final Geometry geometry2 = this.geometry2Value.getValue(record);
     if (geometry1 == null || geometry2 == null) {

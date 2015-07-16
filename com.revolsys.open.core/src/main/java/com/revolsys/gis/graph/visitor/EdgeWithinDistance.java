@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -16,7 +16,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
 
-public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>>implements Filter<Edge<T>> {
+public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>>implements Predicate<Edge<T>> {
   public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph, final Geometry geometry,
     final double maxDistance) {
     if (geometry == null) {
@@ -64,7 +64,7 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>>implements 
   }
 
   @Override
-  public boolean accept(final Edge<T> edge) {
+  public boolean test(final Edge<T> edge) {
     final LineString line = edge.getLine();
     final double distance = line.distance(this.geometry);
     if (distance <= this.maxDistance) {
@@ -76,7 +76,7 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>>implements 
 
   @Override
   public boolean visit(final Edge<T> edge) {
-    if (accept(edge)) {
+    if (test(edge)) {
       super.visit(edge);
     }
     return true;

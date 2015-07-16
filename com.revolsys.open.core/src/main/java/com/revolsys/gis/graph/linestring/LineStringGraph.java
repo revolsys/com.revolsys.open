@@ -16,7 +16,7 @@ import java.util.TreeSet;
 import com.revolsys.collection.InvokeMethodVisitor;
 import com.revolsys.collection.Visitor;
 import com.revolsys.comparator.CollectionComparator;
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -436,8 +436,8 @@ public class LineStringGraph extends Graph<LineSegment> {
 
   public boolean splitCrossingEdges(final Edge<LineSegment> edge1) {
     final LineSegment line1 = edge1.getObject();
-    final Filter<LineSegment> lineFilter = new CrossingLineSegmentFilter(line1);
-    final Filter<Edge<LineSegment>> filter = new EdgeObjectFilter<LineSegment>(lineFilter);
+    final Predicate<LineSegment> lineFilter = new CrossingLineSegmentFilter(line1);
+    final Predicate<Edge<LineSegment>> filter = new EdgeObjectFilter<LineSegment>(lineFilter);
     final List<Edge<LineSegment>> edges = getEdges(filter, line1.getBoundingBox());
 
     if (!edges.isEmpty()) {

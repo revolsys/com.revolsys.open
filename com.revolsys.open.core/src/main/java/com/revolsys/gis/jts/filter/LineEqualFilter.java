@@ -20,10 +20,10 @@
  */
 package com.revolsys.gis.jts.filter;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.jts.geom.LineString;
 
-public class LineEqualFilter implements Filter<LineString> {
+public class LineEqualFilter implements Predicate<LineString> {
   private final LineString geometry;
 
   public LineEqualFilter(final LineString geometry) {
@@ -31,7 +31,7 @@ public class LineEqualFilter implements Filter<LineString> {
   }
 
   @Override
-  public boolean accept(final LineString geometry) {
+  public boolean test(final LineString geometry) {
     if (this.geometry.equals(geometry)) {
       return true;
     } else {

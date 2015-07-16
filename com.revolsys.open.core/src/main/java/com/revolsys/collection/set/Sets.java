@@ -6,8 +6,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
-
-import com.revolsys.factory.Factory;
+import java.util.function.Supplier;
 
 public class Sets {
   @SafeVarargs
@@ -28,9 +27,9 @@ public class Sets {
   }
 
   @SafeVarargs
-  public static <V> Set<V> all(final Factory<Set<V>> factory,
+  public static <V> Set<V> all(final Supplier<Set<V>> factory,
     final Collection<? extends V>... collections) {
-    final Set<V> set = factory.create();
+    final Set<V> set = factory.get();
     addAll(set, collections);
     return set;
   }
@@ -49,6 +48,12 @@ public class Sets {
       set.add(value);
     }
     return set;
+  }
+
+  public static <V> Supplier<Set<V>> hashFactory() {
+    return () -> {
+      return new HashSet<V>();
+    };
   }
 
   public static <V> LinkedHashSet<V> linkedHash(final Iterable<V> values) {
@@ -73,6 +78,12 @@ public class Sets {
     return set;
   }
 
+  public static <V> Supplier<Set<V>> linkedHashFactory() {
+    return () -> {
+      return new LinkedHashSet<V>();
+    };
+  }
+
   public static <V> TreeSet<V> tree(final Comparator<V> comparator, final Iterable<V> values) {
     final TreeSet<V> set = new TreeSet<>(comparator);
     addAll(set, values);
@@ -92,5 +103,11 @@ public class Sets {
     final TreeSet<V> set = new TreeSet<>();
     addAll(set, collections);
     return set;
+  }
+
+  public static <V> Supplier<Set<V>> treeFactory() {
+    return () -> {
+      return new TreeSet<V>();
+    };
   }
 }

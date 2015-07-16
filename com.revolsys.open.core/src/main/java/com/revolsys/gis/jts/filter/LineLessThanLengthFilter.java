@@ -1,9 +1,9 @@
 package com.revolsys.gis.jts.filter;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.jts.geom.Geometry;
 
-public class LineLessThanLengthFilter implements Filter<Geometry> {
+public class LineLessThanLengthFilter implements Predicate<Geometry> {
   private double length;
 
   public LineLessThanLengthFilter() {
@@ -14,7 +14,7 @@ public class LineLessThanLengthFilter implements Filter<Geometry> {
   }
 
   @Override
-  public boolean accept(final Geometry geometry) {
+  public boolean test(final Geometry geometry) {
     return geometry.getLength() < this.length;
   }
 

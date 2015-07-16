@@ -1,11 +1,11 @@
 package com.revolsys.gis.model.coordinates.filter;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.segment.LineSegment;
 
-public class CrossingLineSegmentFilter implements Filter<LineSegment> {
+public class CrossingLineSegmentFilter implements Predicate<LineSegment> {
   private final LineSegment line;
 
   public CrossingLineSegmentFilter(final LineSegment line) {
@@ -13,7 +13,7 @@ public class CrossingLineSegmentFilter implements Filter<LineSegment> {
   }
 
   @Override
-  public boolean accept(final LineSegment line) {
+  public boolean test(final LineSegment line) {
     if (this.line == line) {
       return false;
     } else {

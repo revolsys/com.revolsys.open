@@ -3,15 +3,15 @@ package com.revolsys.collection.iterator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import com.revolsys.filter.Filter;
+import java.util.function.Predicate;
 
 public class FilterIterator<T> extends AbstractIterator<T> {
 
-  private Filter<T> filter;
+  private Predicate<T> filter;
 
   private Iterator<T> iterator;
 
-  public FilterIterator(final Filter<T> filter, final Iterator<T> iterator) {
+  public FilterIterator(final Predicate<T> filter, final Iterator<T> iterator) {
     this.filter = filter;
     this.iterator = iterator;
   }
@@ -27,7 +27,7 @@ public class FilterIterator<T> extends AbstractIterator<T> {
     this.iterator = null;
   }
 
-  protected Filter<T> getFilter() {
+  protected Predicate<T> getFilter() {
     return this.filter;
   }
 
@@ -39,7 +39,7 @@ public class FilterIterator<T> extends AbstractIterator<T> {
   protected T getNext() throws NoSuchElementException {
     while (this.iterator != null && this.iterator.hasNext()) {
       final T value = this.iterator.next();
-      if (this.filter == null || this.filter.accept(value)) {
+      if (this.filter == null || this.filter.test(value)) {
         return value;
       }
     }
