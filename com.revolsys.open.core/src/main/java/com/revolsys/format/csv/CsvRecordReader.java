@@ -232,7 +232,13 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
 
   @Override
   public RecordDefinition getRecordDefinition() {
+    open();
     return this.recordDefinition;
+  }
+
+  @Override
+  public void open() {
+    hasNext();
   }
 
   /**
