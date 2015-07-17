@@ -245,6 +245,10 @@ public abstract class AbstractRecordQueryField extends ValueField
     }
   }
 
+  public String getDisplayFieldName() {
+    return this.displayFieldName;
+  }
+
   protected String getDisplayText(final Identifier identifier) {
     if (identifier == null || this.idToDisplayMap == null) {
       return "";

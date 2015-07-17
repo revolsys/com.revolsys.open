@@ -53,7 +53,7 @@ public final class LongIdentifier extends AbstractIdentifier {
 
   @Override
   public int hashCode() {
-    return (int)(this.value ^ this.value >>> 32);
+    return (int)this.value;
   }
 
   @Override

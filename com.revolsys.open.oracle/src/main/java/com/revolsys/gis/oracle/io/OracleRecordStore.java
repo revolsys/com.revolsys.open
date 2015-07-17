@@ -199,14 +199,14 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       } else {
         geometry2Value.appendSql(query, this, sql);
       }
-      sql.append(",'distance = ");
+      sql.append(",'distance = ' || ");
       final QueryValue distanceValue = withinDistance.getDistanceValue();
       if (distanceValue == null) {
         sql.append("0");
       } else {
         distanceValue.appendSql(query, this, sql);
       }
-      sql.append("') = 'TRUE'");
+      sql.append(") = 'TRUE'");
     } else if (geometryField instanceof ArcSdeStGeometryFieldDefinition) {
       final Column column = (Column)withinDistance.getGeometry1Value();
       final GeometryFactory geometryFactory = column.getField()

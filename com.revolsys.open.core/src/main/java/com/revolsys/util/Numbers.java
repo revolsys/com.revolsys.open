@@ -129,6 +129,30 @@ public class Numbers {
     }
   }
 
+  public static Integer max(final Integer number1, final Integer number2) {
+    if (number1 == null) {
+      return number2;
+    } else if (number2 == null) {
+      return number1;
+    } else if (number1 >= number2) {
+      return number1;
+    } else {
+      return number2;
+    }
+  }
+
+  public static Integer min(final Integer number1, final Integer number2) {
+    if (number1 == null) {
+      return number2;
+    } else if (number2 == null) {
+      return number1;
+    } else if (number1 <= number2) {
+      return number1;
+    } else {
+      return number2;
+    }
+  }
+
   /**
    * Convert the value to a Long. If the value cannot be converted to a number
    * null is returned instead of an exception.

@@ -32,6 +32,14 @@ public class RecordStoreQueryField extends AbstractRecordQueryField {
   }
 
   @Override
+  public Field clone() {
+    final String fieldName = getFieldName();
+    final String typePath = getTypePath();
+    final String displayFieldName = getDisplayFieldName();
+    return new RecordStoreQueryField(fieldName, this.recordStore, typePath, displayFieldName);
+  }
+
+  @Override
   protected Record getRecord(final Identifier identifier) {
     final String typePath = getTypePath();
     return this.recordStore.load(typePath, identifier);

@@ -6,10 +6,11 @@ import java.util.function.Predicate;
 import com.revolsys.collection.Visitor;
 import com.revolsys.comparator.ComparatorProxy;
 import com.revolsys.predicate.PredicateProxy;
+import com.revolsys.predicate.Predicates;
 
 public abstract class AbstractVisitor<T>
   implements Visitor<T>, PredicateProxy<T>, ComparatorProxy<T> {
-  private Predicate<T> predicate;
+  private Predicate<T> predicate = Predicates.all();
 
   private Comparator<T> comparator;
 
@@ -21,12 +22,12 @@ public abstract class AbstractVisitor<T>
   }
 
   public AbstractVisitor(final Predicate<T> predicate) {
-    this.predicate = predicate;
+    setPredicate(predicate);
   }
 
   public AbstractVisitor(final Predicate<T> predicate, final Comparator<T> comparator) {
-    this.predicate = predicate;
     this.comparator = comparator;
+    setPredicate(predicate);
   }
 
   @Override
@@ -43,7 +44,11 @@ public abstract class AbstractVisitor<T>
     this.comparator = comparator;
   }
 
-  public void setFilter(final Predicate<T> predicate) {
-    this.predicate = predicate;
+  public void setPredicate(final Predicate<T> predicate) {
+    if (predicate == null) {
+      this.predicate = Predicates.all();
+    } else {
+      this.predicate = predicate;
+    }
   }
 }

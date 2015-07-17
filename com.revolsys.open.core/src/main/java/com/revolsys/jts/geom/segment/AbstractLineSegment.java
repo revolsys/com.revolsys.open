@@ -6,7 +6,6 @@ import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.algorithm.CGAlgorithmsDD;
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
@@ -767,49 +766,6 @@ public abstract class AbstractLineSegment extends AbstractLineString implements 
   }
 
   /**
-   * Determines the orientation index of a {@link Coordinates} relative to this segment.
-   * The orientation index is as defined in {@link CGAlgorithms#computeOrientation}.
-   *
-   * @param p the coordinate to compare
-   *
-   * @return 1 (LEFT) if <code>p</code> is to the left of this segment
-   * @return -1 (RIGHT) if <code>p</code> is to the right of this segment
-   * @return 0 (COLLINEAR) if <code>p</code> is collinear with this segment
-   *
-   * @see CGAlgorithms#computeOrientation(Coordinate, Coordinate, Coordinate)
-   */
-  @Override
-  public int orientationIndex(final Point p) {
-    /**
-     * MD - 9 Aug 2010 It seems that the basic algorithm is slightly orientation
-     * dependent, when computing the orientation of a point very close to a
-     * line. This is possibly due to the arithmetic in the translation to the
-     * origin.
-     *
-     * For instance, the following situation produces identical results in spite
-     * of the inverse orientation of the line segment:
-     *
-     * Point p0 = new PointDouble((double)219.3649559090992, 140.84159161824724);
-     * Point p1 = new PointDouble((double)168.9018919682399, -5.713787599646864);
-     *
-     * Point p = new PointDouble((double)186.80814046338352, 46.28973405831556); int
-     * orient = orientationIndex(p0, p1, p); int orientInv =
-     * orientationIndex(p1, p0, p);
-     *
-     * A way to force consistent results is to normalize the orientation of the
-     * vector using the following code. However, this may make the results of
-     * orientationIndex inconsistent through the triangle of points, so it's not
-     * clear this is an appropriate patch.
-     *
-     */
-    return CGAlgorithmsDD.orientationIndex(getP0(), getP1(), p);
-    // testing only
-    // return ShewchuksDeterminant.orientationIndex(p1, p2, q);
-    // previous implementation - not quite fully robust
-    // return RobustDeterminant.orientationIndex(p1, p2, q);
-  }
-
-  /**
    * Computes the {@link Coordinates} that lies a given
    * fraction along the line defined by this segment.
    * A fraction of <code>0.0</code> returns the start point of the segment;
@@ -956,35 +912,6 @@ public abstract class AbstractLineSegment extends AbstractLineString implements 
     } else {
       return value1 + (value2 - value1) * projectionFactor;
     }
-  }
-
-  @Override
-  public double projectionFactor(final double x, final double y) {
-    final double x1 = getX(0);
-    final double y1 = getY(0);
-    final double x2 = getX(1);
-    final double y2 = getY(1);
-    return LineSegmentUtil.projectionFactor(x1, y1, x2, y2, x, y);
-  }
-
-  /**
-   * Computes the Projection Factor for the projection of the point p
-   * onto this LineSegmentDouble.  The Projection Factor is the constant r
-   * by which the vector for this segment must be multiplied to
-   * equal the vector for the projection of <tt>p<//t> on the line
-   * defined by this segment.
-   * <p>
-   * The projection factor will lie in the range <tt>(-inf, +inf)</tt>,
-   * or be <code>NaN</code> if the line segment has zero length..
-   *
-   * @param p the point to compute the factor for
-   * @return the projection factor for the point
-   */
-  @Override
-  public double projectionFactor(final Point point) {
-    final double x = point.getX();
-    final double y = point.getY();
-    return projectionFactor(x, y);
   }
 
   /**

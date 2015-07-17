@@ -26,8 +26,8 @@ public class BaseVisitor<T> extends AbstractVisitor<T> {
 
   @Override
   public boolean visit(final T object) {
-    final Predicate<T> filter = getPredicate();
-    if (filter == null || filter.test(object)) {
+    final Predicate<T> predicate = getPredicate();
+    if (predicate.test(object)) {
       return doVisit(object);
     } else {
       return true;

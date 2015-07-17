@@ -58,8 +58,8 @@ public class DelegatingVisitor<T> extends AbstractVisitor<T> {
 
   @Override
   public boolean visit(final T item) {
-    final Predicate<T> filter = getPredicate();
-    if (filter == null || filter.test(item)) {
+    final Predicate<T> predicate = getPredicate();
+    if (predicate.test(item)) {
       return this.visitor.visit(item);
     } else {
       return true;

@@ -90,6 +90,7 @@ public class FileRecordLayer extends ListRecordLayer {
             LoggerFactory.getLogger(getClass()).error("Cannot find reader for: " + this.resource);
             return false;
           } else {
+
             final Map<String, Object> properties = getProperties();
             reader.setProperties(properties);
             final RecordDefinition recordDefinition = reader.getRecordDefinition();

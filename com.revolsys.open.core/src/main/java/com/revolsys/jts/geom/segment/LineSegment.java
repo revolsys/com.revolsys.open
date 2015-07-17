@@ -1,12 +1,15 @@
 package com.revolsys.jts.geom.segment;
 
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.algorithm.CGAlgorithmsDD;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Side;
 
 public interface LineSegment extends LineString {
 
@@ -53,6 +56,7 @@ public interface LineSegment extends LineString {
 
   double distanceAlong(final double x, final double y);
 
+  @Override
   double distanceAlong(final Point point);
 
   /**
@@ -97,6 +101,19 @@ public interface LineSegment extends LineString {
   Point getP0();
 
   Point getP1();
+
+  default Side getSide(final Point point) {
+    final int orientationIndex = orientationIndex(point);
+    switch (orientationIndex) {
+      case 1:
+        return Side.LEFT;
+      case -1:
+        return Side.RIGHT;
+
+      default:
+        return null;
+    }
+  }
 
   /**
    * Computes an intersection point between two line segments, if there is one.
@@ -165,12 +182,12 @@ public interface LineSegment extends LineString {
   Point midPoint();
 
   /**
-   * Puts the line segment into a normalized form.
-   * This is useful for using line segments in maps and indexes when
-   * topological equality rather than exact equality is desired.
-   * A segment in normalized form has the first point smaller
-   * than the second (according to the standard ordering on {@link Coordinates}).
-   */
+  * Puts the line segment into a normalized form.
+  * This is useful for using line segments in maps and indexes when
+  * topological equality rather than exact equality is desired.
+  * A segment in normalized form has the first point smaller
+  * than the second (according to the standard ordering on {@link Coordinates}).
+  */
 
   @Override
   LineSegment normalize();
@@ -208,7 +225,31 @@ public interface LineSegment extends LineString {
    *
    * @see CGAlgorithms#computeOrientation(Coordinate, Coordinate, Coordinate)
    */
-  int orientationIndex(Point p);
+  default int orientationIndex(final Point p) {
+    /**
+     * MD - 9 Aug 2010 It seems that the basic algorithm is slightly orientation
+     * dependent, when computing the orientation of a point very close to a
+     * line. This is possibly due to the arithmetic in the translation to the
+     * origin.
+     *
+     * For instance, the following situation produces identical results in spite
+     * of the inverse orientation of the line segment:
+     *
+     * Point p0 = new PointDouble((double)219.3649559090992, 140.84159161824724);
+     * Point p1 = new PointDouble((double)168.9018919682399, -5.713787599646864);
+     *
+     * Point p = new PointDouble((double)186.80814046338352, 46.28973405831556); int
+     * orient = orientationIndex(p0, p1, p); int orientInv =
+     * orientationIndex(p1, p0, p);
+     *
+     * A way to force consistent results is to normalize the orientation of the
+     * vector using the following code. However, this may make the results of
+     * orientationIndex inconsistent through the triangle of points, so it's not
+     * clear this is an appropriate patch.
+     *
+     */
+    return CGAlgorithmsDD.orientationIndex(getP0(), getP1(), p);
+  }
 
   /**
    * Computes the {@link Coordinates} that lies a given
@@ -267,7 +308,27 @@ public interface LineSegment extends LineString {
 
   double projectCoordinate(int axisIndex, double projectionFactor);
 
-  double projectionFactor(double x, double y);
+  /**
+   * Computes the Projection Factor for the projection of the point p
+   * onto this LineSegmentDouble.  The Projection Factor is the constant r
+   * by which the vector for this segment must be multiplied to
+   * equal the vector for the projection of <tt>p<//t> on the line
+   * defined by this segment.
+   * <p>
+   * The projection factor will lie in the range <tt>(-inf, +inf)</tt>,
+   * or be <code>NaN</code> if the line segment has zero length..
+   *
+   * @param x the point x coordinate to compute the factor for
+   * @param y the point y coordinate to compute the factor for
+   * @return the projection factor for the point
+   */
+  default double projectionFactor(final double x, final double y) {
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    return LineSegmentUtil.projectionFactor(x1, y1, x2, y2, x, y);
+  }
 
   /**
    * Computes the Projection Factor for the projection of the point p
@@ -279,10 +340,14 @@ public interface LineSegment extends LineString {
    * The projection factor will lie in the range <tt>(-inf, +inf)</tt>,
    * or be <code>NaN</code> if the line segment has zero length..
    *
-   * @param p the point to compute the factor for
+   * @param point the point to compute the factor for
    * @return the projection factor for the point
    */
-  double projectionFactor(Point p);
+  default double projectionFactor(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    return projectionFactor(x, y);
+  }
 
   /**
    * Reverses the direction of the line segment.

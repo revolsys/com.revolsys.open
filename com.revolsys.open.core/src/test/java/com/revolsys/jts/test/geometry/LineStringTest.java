@@ -10,8 +10,10 @@ import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Side;
 import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.jts.geom.metrics.PointLineStringMetrics;
 
 public class LineStringTest {
 
@@ -34,6 +36,33 @@ public class LineStringTest {
         Assert.assertEquals("Coordinate Value", coordinates[axisIndex], value, 0);
       }
     }
+  }
+
+  private static void assertDistanceAlong(final double distanceAlong, final double distance,
+    final double x, final double y, final Side side, final double... coordinates) {
+    final GeometryFactory geometryFactory = GeometryFactory.worldMercator().convertAxisCount(2);
+    final Point point = geometryFactory.point(x, y);
+    final LineString line = geometryFactory.lineString(2, coordinates);
+    final double actual = line.distanceAlong(point);
+    Assert.assertEquals("Distance Along", distanceAlong, actual, 0.0000001);
+
+    final PointLineStringMetrics metrics = line.getMetrics(point);
+    Assert.assertEquals("Metrics Distance Along", distanceAlong, metrics.getDistanceAlong(),
+      0.0000001);
+    Assert.assertEquals("Metrics Distance", distance, metrics.getDistance(), 0.0000001);
+    Assert.assertEquals("Metrics Side", side, metrics.getSide());
+    Assert.assertEquals("Metrics Length", line.getLength(), metrics.getLineLength(), 0.0000001);
+    Assert.assertEquals("Distance Along -> Metrics", distanceAlong, metrics.getDistanceAlong(),
+      0.0000001);
+
+    if (side != null) {
+      final Side reverseSide = Side.opposite(side);
+      final LineString reverseLine = line.reverse();
+      final PointLineStringMetrics reverseMetrics = reverseLine.getMetrics(point);
+      Assert.assertEquals("Reverse Metrics Side", reverseSide, reverseMetrics.getSide());
+
+    }
+
   }
 
   public static void assertEmpty(final LineString line) {
@@ -276,6 +305,45 @@ public class LineStringTest {
       assertObjectContsructor(geometryFactory, coordinates, coordinatesLessNaN, pointAll,
         pointExtra, pointLess);
     }
+  }
+
+  @Test
+  public void testDistanceAlong() {
+    final double[] horizontal1 = new double[] {
+      0, 0, //
+      1, 0
+    };
+    // Diagonal
+    final double[] diagonal = new double[] {
+      1, 1, //
+      2, 2
+    };
+    assertDistanceAlong(0, 0, 0, 0, null, horizontal1);
+    assertDistanceAlong(1, 0, 1, 0, null, horizontal1);
+    assertDistanceAlong(0.5, 0, 0.5, 0, null, horizontal1);
+
+    // Before
+    assertDistanceAlong(-0.5, 0.5, -0.5, 0, null, horizontal1);
+    assertDistanceAlong(-0.5, 0.5099019513592785, -0.5, 0.1, Side.LEFT, horizontal1);
+    assertDistanceAlong(-1.4142135623730951, 1.4142135623730951, 0.0, 0.0, null, diagonal);
+
+    // Above
+    assertDistanceAlong(0.5, 1, 0.5, 1, Side.LEFT, horizontal1);
+
+    // After
+    assertDistanceAlong(1.5, 0.5, 1.5, 0, null, horizontal1);
+    assertDistanceAlong(2.8284271247461903, 1.4142135623730951, 3.0, 3.0, null, diagonal);
+
+    // Right angle
+    final double[] rightAngle1 = new double[] {
+      0, 1, //
+      1, 1, //
+      1, 0
+    };
+    assertDistanceAlong(1, 0.7071067811865476, 1.5, 1.5, Side.LEFT, rightAngle1);
+    assertDistanceAlong(1, 0.5, 1.0, 1.5, Side.LEFT, rightAngle1);
+    assertDistanceAlong(1, 0.5, 1.5, 1.0, Side.LEFT, rightAngle1);
+
   }
 
   @Test

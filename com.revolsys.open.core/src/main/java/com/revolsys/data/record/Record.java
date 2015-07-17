@@ -258,6 +258,15 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
     }
   }
 
+  default int getInteger(final CharSequence name, final int defaultValue) {
+    final Integer value = getInteger(name);
+    if (value == null) {
+      return defaultValue;
+    } else {
+      return value;
+    }
+  }
+
   default Long getLong(final CharSequence name) {
     final Number value = getValue(name);
     if (value == null) {
@@ -300,6 +309,15 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
       }
     } else {
       return StringConverterRegistry.toString(value);
+    }
+  }
+
+  default String getString(final CharSequence name, final String defaultValue) {
+    final String value = getString(name);
+    if (Property.hasValue(value)) {
+      return value;
+    } else {
+      return defaultValue;
     }
   }
 

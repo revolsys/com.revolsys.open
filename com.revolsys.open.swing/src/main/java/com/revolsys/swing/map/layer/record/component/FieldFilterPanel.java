@@ -338,11 +338,11 @@ public class FieldFilterPanel extends JComponent
       setSearchFilter(filter);
       boolean simple = false;
       if (filter == null) {
-        setSearchOperator("=");
         final Field searchField = (Field)this.searchField;
         if (searchField != null) {
           searchField.setFieldValue(null);
         }
+        setSearchOperator("=");
         simple = true;
       } else if (filter instanceof Not) {
         final Not not = (Not)filter;

@@ -294,38 +294,6 @@ public final class LineStringUtil {
     return point.distance(point2);
   }
 
-  public static double distanceFromStart(final LineString line, final Point point) {
-    double segmentDistance = 0;
-    double closestDistance = Double.MAX_VALUE;
-    double distanceAlong = 0;
-    for (final Segment segment : line.segments()) {
-      final double distance = segment.distance(point);
-      if (distance < line.getGeometryFactory().getResolutionXy()) {
-        return segmentDistance + segment.getPoint(0).distance(point);
-      } else if (distance < closestDistance) {
-        closestDistance = distance;
-        final double projectionFactor = segment.projectionFactor(point);
-        if (projectionFactor <= 0) {
-          if (segment.getSegmentIndex() == 0) {
-            distanceAlong = -distance;
-          } else {
-            distanceAlong = segmentDistance;
-          }
-        } else if (projectionFactor >= 1) {
-          if (segment.isLineEnd()) {
-            distanceAlong = segmentDistance + segment.getLength() + distance;
-          } else {
-            distanceAlong = segmentDistance + segment.getLength();
-          }
-        } else {
-          distanceAlong = segmentDistance + segment.distanceAlong(point);
-        }
-      }
-      segmentDistance += segment.getLength();
-    }
-    return distanceAlong;
-  }
-
   /**
    * Compare the coordinates of the two lines up to the given dimension to see
    * if they have the same ordinate values in either the forward or reverse
