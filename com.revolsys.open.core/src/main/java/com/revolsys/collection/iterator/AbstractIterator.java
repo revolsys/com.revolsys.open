@@ -41,11 +41,9 @@ public abstract class AbstractIterator<T> extends BaseObjectWithProperties
   protected abstract T getNext() throws NoSuchElementException;
 
   @Override
-  public final boolean hasNext() {
+  public synchronized final boolean hasNext() {
     if (this.hasNext) {
-      if (!this.initialized) {
-        init();
-      }
+      init();
       if (this.loadNext) {
         try {
           this.object = getNext();
@@ -72,7 +70,7 @@ public abstract class AbstractIterator<T> extends BaseObjectWithProperties
   }
 
   @Override
-  public final T next() {
+  public synchronized final T next() {
     if (hasNext()) {
       final T currentObject = this.object;
       this.loadNext = true;
@@ -80,6 +78,11 @@ public abstract class AbstractIterator<T> extends BaseObjectWithProperties
     } else {
       throw new NoSuchElementException();
     }
+  }
+
+  @Override
+  public void open() {
+    init();
   }
 
   @Override

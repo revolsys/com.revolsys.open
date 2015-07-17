@@ -264,6 +264,7 @@ public class XbaseIterator extends AbstractIterator<Record>implements RecordRead
 
   @Override
   public RecordDefinitionImpl getRecordDefinition() {
+    open();
     return this.recordDefinition;
   }
 

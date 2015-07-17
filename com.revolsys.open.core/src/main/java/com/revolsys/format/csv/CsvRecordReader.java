@@ -237,11 +237,6 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
     return this.recordDefinition;
   }
 
-  @Override
-  public void open() {
-    hasNext();
-  }
-
   /**
    * Parses an incoming String and returns an array of elements.
    *

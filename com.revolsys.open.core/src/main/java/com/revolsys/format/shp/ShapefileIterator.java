@@ -29,7 +29,6 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.Property;
 
@@ -103,7 +102,7 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
         final Resource xbaseResource = this.resource.createRelative(this.name + ".dbf");
         if (xbaseResource.exists()) {
           this.xbaseIterator = new XbaseIterator(xbaseResource, this.recordDefinitionFactory,
-            new InvokeMethodRunnable(this, "updateRecordDefinition"));
+            () -> updateRecordDefinition());
           this.xbaseIterator.setTypeName(this.typeName);
           this.xbaseIterator.setProperty("memoryMapped", memoryMapped);
           this.xbaseIterator.setCloseFile(this.closeFile);
@@ -215,6 +214,7 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
 
   @Override
   public RecordDefinition getRecordDefinition() {
+    open();
     return this.recordDefinition;
   }
 
@@ -369,7 +369,7 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
     return ShapefileConstants.DESCRIPTION + " " + this.resource;
   }
 
-  public void updateRecordDefinition() {
+  private void updateRecordDefinition() {
     assert this.recordDefinition == null : "Cannot override recordDefinition when set";
     if (this.xbaseIterator != null) {
       final RecordDefinitionImpl recordDefinition = this.xbaseIterator.getRecordDefinition();
