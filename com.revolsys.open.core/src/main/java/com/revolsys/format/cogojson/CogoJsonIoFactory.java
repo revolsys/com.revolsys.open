@@ -7,13 +7,13 @@ import java.nio.charset.Charset;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.GeometryReader;
 import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.geojson.GeoJsonConstants;
 import com.revolsys.format.geojson.GeoJsonGeometryIterator;
 import com.revolsys.format.geojson.GeoJsonRecordWriter;
+import com.revolsys.gis.geometry.io.GeometryReader;
 import com.revolsys.gis.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.FileUtil;

@@ -17,7 +17,7 @@ import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.gis.geometry.io.GeometryReaderFactory;
+import com.revolsys.gis.geometry.io.GeometryReader;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
@@ -121,7 +121,7 @@ public class IoTestSuite {
       writer.write(record);
     }
     try (
-      Reader<Geometry> reader = GeometryReaderFactory.geometryReader(resource)) {
+      Reader<Geometry> reader = GeometryReader.create(resource)) {
       reader.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
       final List<Geometry> geometries = reader.read();
       Assert.assertEquals("Geometry Count", 1, geometries.size());

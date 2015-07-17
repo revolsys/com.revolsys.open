@@ -2,6 +2,8 @@ package com.revolsys.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -18,12 +20,17 @@ import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.data.record.io.RecordWriterFactory;
+import com.revolsys.io.file.UrlResource;
+import com.revolsys.spring.PathResource;
+import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.UrlUtil;
+import com.revolsys.util.WrappedException;
 
 public class IoFactoryRegistry {
 
@@ -46,6 +53,28 @@ public class IoFactoryRegistry {
     }
   }
 
+  public static String getFileName(final Object source) {
+    String fileName = null;
+    if (Property.hasValue(source)) {
+      if (source instanceof Resource) {
+        fileName = SpringUtil.getFileName((Resource)source);
+      } else if (source instanceof Path) {
+        fileName = Paths.getFileName((Path)source);
+      } else if (source instanceof File) {
+        fileName = FileUtil.getFileName((File)source);
+      } else if (source instanceof URL) {
+        fileName = UrlUtil.getFileName((URL)source);
+      } else if (source instanceof URI) {
+        fileName = UrlUtil.getFileName((URI)source);
+      } else if (source instanceof String) {
+        fileName = FileUtil.getFileName((String)source);
+      } else {
+        throw new IllegalArgumentException(source.getClass() + " is not supported");
+      }
+    }
+    return fileName;
+  }
+
   public static IoFactoryRegistry getInstance() {
     synchronized (IoFactoryRegistry.class) {
       if (instance == null) {
@@ -55,8 +84,38 @@ public class IoFactoryRegistry {
     }
   }
 
+  public static Resource getResource(final Object source) {
+    Resource resource;
+    if (source instanceof Resource) {
+      resource = (Resource)source;
+    } else if (source instanceof Path) {
+      resource = new PathResource((Path)source);
+    } else if (source instanceof File) {
+      resource = new FileSystemResource((File)source);
+    } else if (source instanceof URL) {
+      resource = new UrlResource((URL)source);
+    } else if (source instanceof URI) {
+      try {
+        resource = new UrlResource((URI)source);
+      } catch (final MalformedURLException e) {
+        throw new WrappedException(e);
+      }
+    } else if (source instanceof String) {
+      return SpringUtil.getResource((String)source);
+    } else {
+      throw new IllegalArgumentException(source.getClass() + " is not supported");
+    }
+    return resource;
+  }
+
   public static void init() {
     getInstance();
+  }
+
+  public static <F extends IoFactory> boolean isAvailable(final Class<F> factoryClass,
+    final Object source) {
+    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
+    return ioFactoryRegistry.isFileExtensionSupported(factoryClass, source);
   }
 
   private final Map<Class<? extends IoFactory>, Set<String>> classFileExtensions = new HashMap<>();
@@ -244,48 +303,9 @@ public class IoFactoryRegistry {
     if (source == null) {
       return null;
     } else {
-      final String fileName;
-      if (source instanceof File) {
-        final File file = (File)source;
-        fileName = file.getName();
-      } else if (source instanceof Resource) {
-        final Resource resource = (Resource)source;
-        fileName = resource.getFilename();
-      } else if (source instanceof Path) {
-        final Path path = (Path)source;
-        fileName = Paths.getFileName(path);
-      } else {
-        throw new IllegalArgumentException(source.getClass() + " is not supported");
-      }
-
+      final String fileName = getFileName(source);
       return getFactoryByFileName(factoryClass, fileName);
     }
-  }
-
-  public <F extends IoFactory> F getFactory(final Class<F> factoryClass, final Path path) {
-    if (path == null) {
-      return null;
-    } else {
-      final String fileName = Paths.getFileName(path);
-      return getFactoryByFileName(factoryClass, fileName);
-    }
-  }
-
-  public <F extends IoFactory> F getFactory(final Class<F> factoryClass, final Resource resource) {
-    String fileName;
-    if (resource == null) {
-      return null;
-    } else if (resource instanceof UrlResource) {
-      final UrlResource urlResoure = (UrlResource)resource;
-      try {
-        fileName = urlResoure.getURL().getPath();
-      } catch (final IOException e) {
-        fileName = resource.getFilename();
-      }
-    } else {
-      fileName = resource.getFilename();
-    }
-    return getFactoryByFileName(factoryClass, fileName);
   }
 
   public <F extends IoFactory> F getFactoryByFileExtension(final Class<F> factoryClass,
@@ -341,6 +361,26 @@ public class IoFactoryRegistry {
       final Map<String, F> factoriesByMediaType = getFactoriesByMediaType(factoryClass);
       return factoriesByMediaType.keySet();
     }
+  }
+
+  public boolean isFileExtensionSupported(final Class<? extends IoFactory> factoryClass,
+    final Object source) {
+    if (factoryClass != null) {
+      final Set<String> fileExtensions = getFileExtensions(factoryClass);
+      if (Property.hasValue(fileExtensions)) {
+        try {
+          final String fileName = getFileName(source);
+          for (final String fileExtension : FileUtil.getFileNameExtensions(fileName)) {
+            if (Property.hasValue(fileExtension)
+              && fileExtensions.contains(fileExtension.toLowerCase())) {
+              return true;
+            }
+          }
+        } catch (final IllegalArgumentException e) {
+        }
+      }
+    }
+    return false;
   }
 
   public boolean isFileExtensionSupported(final Class<? extends IoFactory> factoryClass,

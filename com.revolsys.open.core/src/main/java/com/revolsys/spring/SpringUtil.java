@@ -30,6 +30,7 @@ import org.springframework.core.io.Resource;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.UrlResource;
 import com.revolsys.spring.config.AttributesBeanConfigurer;
+import com.revolsys.util.Property;
 
 public class SpringUtil {
 
@@ -39,7 +40,7 @@ public class SpringUtil {
   private static final ThreadLocal<Resource> BASE_RESOURCE = new ThreadLocal<Resource>();
 
   public static Resource addExtension(final Resource resource, final String extension) {
-    final String fileName = resource.getFilename();
+    final String fileName = getFileName(resource);
     final String newFileName = fileName + "." + extension;
     try {
       return resource.createRelative(newFileName);
@@ -111,7 +112,7 @@ public class SpringUtil {
   }
 
   public static String getBaseName(final Resource resource) {
-    return FileUtil.getBaseName(resource.getFilename());
+    return FileUtil.getBaseName(getFileName(resource));
   }
 
   public static Resource getBaseResource() {
@@ -157,8 +158,20 @@ public class SpringUtil {
     }
   }
 
+  public static String getFileName(final Resource resource) {
+    if (resource instanceof UrlResource) {
+      final UrlResource urlResoure = (UrlResource)resource;
+      try {
+        return urlResoure.getURL().getPath();
+      } catch (final IOException e) {
+      }
+    }
+    return resource.getFilename();
+  }
+
   public static String getFileNameExtension(final Resource resource) {
-    return FileUtil.getFileNameExtension(resource.getFilename());
+    String fileName = getFileName(resource);
+    return FileUtil.getFileNameExtension(fileName);
   }
 
   public static File getFileOrCreateTempFile(final Resource resource) {
@@ -166,7 +179,7 @@ public class SpringUtil {
       if (resource instanceof FileSystemResource) {
         return resource.getFile();
       } else {
-        final String filename = resource.getFilename();
+        final String filename = getFileName(resource);
         final String baseName = FileUtil.getBaseName(filename);
         final String fileExtension = FileUtil.getFileNameExtension(filename);
         return File.createTempFile(baseName, fileExtension);
@@ -286,12 +299,19 @@ public class SpringUtil {
     }
   }
 
-  public static Resource getResource(final String url) {
-    try {
-      return new UrlResource(url);
-    } catch (final MalformedURLException e) {
-      throw new RuntimeException("URL not valid " + url, e);
+  public static Resource getResource(final String location) {
+    if (Property.hasValue(location)) {
+      if (location.charAt(0) == '/' || location.length() > 1 && location.charAt(1) == ':') {
+        return new FileSystemResource(location);
+      } else {
+        try {
+          return new UrlResource(location);
+        } catch (final MalformedURLException e) {
+          throw new RuntimeException("URL not valid " + location, e);
+        }
+      }
     }
+    return null;
   }
 
   public static Resource getResourceWithExtension(final Resource resource, final String extension) {
@@ -300,8 +320,8 @@ public class SpringUtil {
     if (resource instanceof PathResource) {
       final PathResource pathResource = (PathResource)resource;
       final Path path = pathResource.getPath();
-      Path parent = path.getParent();
-      Path newPath = parent.resolve(newFileName);
+      final Path parent = path.getParent();
+      final Path newPath = parent.resolve(newFileName);
       return new PathResource(newPath);
     } else {
       try {

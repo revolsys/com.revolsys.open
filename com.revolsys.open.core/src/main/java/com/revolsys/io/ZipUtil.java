@@ -16,6 +16,8 @@ import java.util.zip.ZipOutputStream;
 
 import org.springframework.core.io.Resource;
 
+import com.revolsys.spring.SpringUtil;
+
 public class ZipUtil {
   /**
    * Add the all the sub directories and files below the directory to the zip
@@ -102,7 +104,7 @@ public class ZipUtil {
   }
 
   public static File unzipFile(final Resource resource) throws IOException {
-    String filename = resource.getFilename();
+    String filename = SpringUtil.getFileName(resource);
     while (filename.length() < 3) {
       filename += "x";
     }

@@ -6,11 +6,12 @@ import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.Records;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.gis.geometry.io.GeometryWriter;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.Writer;
 import com.revolsys.jts.geom.Geometry;
 
-public class RecordWriterGeometryWriter extends AbstractWriter<Geometry> {
+public class RecordWriterGeometryWriter extends AbstractWriter<Geometry>implements GeometryWriter {
   private final Writer<Record> writer;
 
   public RecordWriterGeometryWriter(final Writer<Record> writer) {
