@@ -3,17 +3,14 @@ package com.revolsys.data.record.io;
 import java.io.File;
 import java.nio.file.Path;
 
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
-import com.revolsys.io.Paths;
 import com.revolsys.io.Reader;
 
 public interface RecordReader extends Reader<Record> {
@@ -59,32 +56,8 @@ public interface RecordReader extends Reader<Record> {
     }
   }
 
-  static RecordReader create(final String fileName) {
-    final Resource resource = new FileSystemResource(fileName);
-    return create(resource);
-  }
-
-  static boolean isReadable(final File file) {
-    for (final String fileNameExtension : FileUtil.getFileNameExtensions(file)) {
-      if (isReadable(fileNameExtension)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  static boolean isReadable(final Path path) {
-    for (final String fileNameExtension : Paths.getFileNameExtensions(path)) {
-      if (isReadable(fileNameExtension)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  static boolean isReadable(final String fileNameExtension) {
-    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-    return ioFactoryRegistry.isFileExtensionSupported(RecordReaderFactory.class, fileNameExtension);
+  public static boolean isReadable(final Object source) {
+    return IoFactoryRegistry.isAvailable(RecordReaderFactory.class, source);
   }
 
   RecordDefinition getRecordDefinition();

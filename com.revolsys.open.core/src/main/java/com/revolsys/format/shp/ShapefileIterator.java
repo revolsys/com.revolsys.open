@@ -66,7 +66,7 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
   public ShapefileIterator(final Resource resource, final RecordFactory factory)
     throws IOException {
     this.recordDefinitionFactory = factory;
-    final String baseName = FileUtil.getBaseName(resource.getFilename());
+    final String baseName = FileUtil.getBaseName(SpringUtil.getFileName(resource));
     this.name = baseName;
     this.typeName = "/" + this.name;
     this.resource = resource;

@@ -50,6 +50,7 @@ import com.revolsys.data.types.DataTypes;
 import com.revolsys.data.types.EnumerationDataType;
 import com.revolsys.data.types.SimpleDataType;
 import com.revolsys.format.saif.util.CsnIterator;
+import com.revolsys.spring.SpringUtil;
 
 public class SaifSchemaReader {
 
@@ -300,7 +301,7 @@ public class SaifSchemaReader {
   }
 
   public RecordDefinitionFactory loadSchema(final Resource resource) throws IOException {
-    return loadSchema(new CsnIterator(resource.getFilename(), resource.getInputStream()));
+    return loadSchema(new CsnIterator(SpringUtil.getFileName(resource), resource.getInputStream()));
 
   }
 

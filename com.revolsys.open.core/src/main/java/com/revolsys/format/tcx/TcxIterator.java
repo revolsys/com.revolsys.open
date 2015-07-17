@@ -23,6 +23,7 @@ import com.revolsys.format.gpx.GpxConstants;
 import com.revolsys.format.xml.StaxUtils;
 import com.revolsys.io.FileUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.spring.SpringUtil;
 
 public class TcxIterator extends BaseObjectWithProperties
   implements Iterator<Record>, RecordReader {
@@ -64,7 +65,7 @@ public class TcxIterator extends BaseObjectWithProperties
     throws IOException {
     this(StaxUtils.createXmlReader(resource));
     this.typePath = path;
-    this.baseName = FileUtil.getBaseName(resource.getFilename());
+    this.baseName = FileUtil.getBaseName(SpringUtil.getFileName(resource));
   }
 
   public TcxIterator(final XMLStreamReader in) {

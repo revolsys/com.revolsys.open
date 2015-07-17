@@ -3,7 +3,6 @@ package com.revolsys.gis.geometry.io;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 
 import org.springframework.core.io.Resource;
 
@@ -11,26 +10,12 @@ import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.IoFactoryWithCoordinateSystem;
-import com.revolsys.io.Writer;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.spring.PathResource;
 import com.revolsys.spring.SpringUtil;
 
 public interface GeometryWriterFactory extends FileIoFactory, IoFactoryWithCoordinateSystem {
-  static Writer<Geometry> geometryWriter(final Resource resource) {
-    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-    final GeometryWriterFactory writerFactory = ioFactoryRegistry
-      .getFactory(GeometryWriterFactory.class, resource);
-    if (writerFactory == null) {
-      return null;
-    } else {
-      final Writer<Geometry> writer = writerFactory.createGeometryWriter(resource);
-      return writer;
-    }
-  }
 
-  default Writer<Geometry> createGeometryWriter(final Path path) {
-    final PathResource resource = new PathResource(path);
+  default GeometryWriter createGeometryWriter(final Object source) {
+    final Resource resource = IoFactoryRegistry.getResource(source);
     return createGeometryWriter(resource);
   }
 
@@ -40,9 +25,9 @@ public interface GeometryWriterFactory extends FileIoFactory, IoFactoryWithCoord
    * @param resource The resource to write to.
    * @return The writer.
    */
-  default Writer<Geometry> createGeometryWriter(final Resource resource) {
+  default GeometryWriter createGeometryWriter(final Resource resource) {
     final OutputStream out = SpringUtil.getOutputStream(resource);
-    final String fileName = resource.getFilename();
+    final String fileName = SpringUtil.getFileName(resource);
     final String baseName = FileUtil.getBaseName(fileName);
     return createGeometryWriter(baseName, out);
   }
@@ -54,10 +39,10 @@ public interface GeometryWriterFactory extends FileIoFactory, IoFactoryWithCoord
    * @param out The output stream to write to.
    * @return The writer.
    */
-  default Writer<Geometry> createGeometryWriter(final String baseName, final OutputStream out) {
+  default GeometryWriter createGeometryWriter(final String baseName, final OutputStream out) {
     return createGeometryWriter(baseName, out, StandardCharsets.UTF_8);
 
   }
 
-  Writer<Geometry> createGeometryWriter(String baseName, OutputStream out, Charset charset);
+  GeometryWriter createGeometryWriter(String baseName, OutputStream out, Charset charset);
 }

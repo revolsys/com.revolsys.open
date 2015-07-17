@@ -14,6 +14,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.ZipUtil;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
+import com.revolsys.spring.SpringUtil;
 
 public class ZipRecordReader extends DelegatingReader<Record>implements RecordReader {
   private RecordReader reader;
@@ -23,7 +24,7 @@ public class ZipRecordReader extends DelegatingReader<Record>implements RecordRe
   public ZipRecordReader(final Resource resource, final String fileExtension,
     final RecordFactory factory) {
     try {
-      final String baseName = FileUtil.getBaseName(resource.getFilename());
+      final String baseName = FileUtil.getBaseName(SpringUtil.getFileName(resource));
       final String zipEntryName = baseName + "." + fileExtension;
       this.directory = ZipUtil.unzipFile(resource);
       if (!openFile(resource, factory, zipEntryName)) {

@@ -36,7 +36,7 @@ import java.util.List;
 
 import org.springframework.core.io.ClassPathResource;
 
-import com.revolsys.gis.geometry.io.GeometryReaderFactory;
+import com.revolsys.gis.geometry.io.GeometryReader;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
@@ -47,7 +47,7 @@ public class InteriorPointTest extends TestCase {
   public static List<Geometry> getTestGeometries(final String file) {
     final ClassPathResource resource = new ClassPathResource("/com/revolsys/jts/test/data/" + file);
     try (
-      Reader<Geometry> reader = GeometryReaderFactory.geometryReader(resource)) {
+      Reader<Geometry> reader = GeometryReader.create(resource)) {
       return reader.read();
     }
   }

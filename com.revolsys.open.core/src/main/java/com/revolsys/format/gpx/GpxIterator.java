@@ -33,6 +33,7 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.MathUtil;
 
@@ -84,7 +85,7 @@ public class GpxIterator extends BaseObjectWithProperties
     this(StaxUtils.createXmlReader(resource));
     this.recordFactory = recordFactory;
     this.typePath = path;
-    this.baseName = FileUtil.getBaseName(resource.getFilename());
+    this.baseName = FileUtil.getBaseName(SpringUtil.getFileName(resource));
   }
 
   public GpxIterator(final XMLStreamReader in) {

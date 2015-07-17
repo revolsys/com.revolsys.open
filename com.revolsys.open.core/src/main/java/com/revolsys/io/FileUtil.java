@@ -57,6 +57,7 @@ import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 import com.revolsys.io.filter.PatternFilenameFilter;
+import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
@@ -655,7 +656,7 @@ public final class FileUtil {
       final FileSystemResource fileResource = (FileSystemResource)resource;
       return fileResource.getFile();
     } else {
-      final String fileName = resource.getFilename();
+      final String fileName = SpringUtil.getFileName(resource);
       final String ext = getFileNameExtension(fileName);
       final File file = File.createTempFile(fileName, "." + ext);
       copy(resource.getInputStream(), file);
@@ -749,17 +750,13 @@ public final class FileUtil {
     }
   }
 
-  public static String getFileName(final String fileName) {
-    int slashIndex = fileName.lastIndexOf('/');
+  public static String getFileName(String fileName) {
+    fileName = fileName.replaceAll("\\+", "/");
+    final int slashIndex = fileName.lastIndexOf('/');
     if (slashIndex != -1) {
       return fileName.substring(slashIndex + 1);
     } else {
-      slashIndex = fileName.lastIndexOf('\\');
-      if (slashIndex != -1) {
-        return fileName.substring(slashIndex + 1);
-      } else {
-        return fileName;
-      }
+      return fileName;
     }
   }
 

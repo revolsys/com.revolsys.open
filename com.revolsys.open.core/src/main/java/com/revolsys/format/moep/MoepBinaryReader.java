@@ -13,6 +13,7 @@ import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.AbstractReader;
+import com.revolsys.spring.SpringUtil;
 
 public class MoepBinaryReader extends AbstractReader<Record>implements RecordReader {
 
@@ -29,8 +30,8 @@ public class MoepBinaryReader extends AbstractReader<Record>implements RecordRea
     final RecordFactory factory) {
     try {
       final InputStream in = resource.getInputStream();
-      this.iterator = new MoepBinaryIterator(moepDirectoryReader, resource.getFilename(), in,
-        factory);
+      this.iterator = new MoepBinaryIterator(moepDirectoryReader, SpringUtil.getFileName(resource),
+        in, factory);
     } catch (final IOException e) {
     }
   }

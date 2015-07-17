@@ -10,12 +10,12 @@ import org.springframework.core.io.Resource;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.Records;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.gis.geometry.io.GeometryWriter;
 import com.revolsys.gis.geometry.io.GeometryWriterFactory;
 import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.io.Writer;
-import com.revolsys.jts.geom.Geometry;
 import com.revolsys.spring.PathResource;
 import com.revolsys.spring.SpringUtil;
 
@@ -23,7 +23,7 @@ public interface RecordWriterFactory
   extends FileIoFactory, GeometryWriterFactory, IoFactoryWithCoordinateSystem {
 
   @Override
-  default Writer<Geometry> createGeometryWriter(final String baseName, final OutputStream out,
+  default GeometryWriter createGeometryWriter(final String baseName, final OutputStream out,
     final Charset charset) {
     final RecordDefinition recordDefinition = Records.createGeometryRecordDefinition();
     final Writer<Record> recordWriter = createRecordWriter(baseName, recordDefinition, out,
@@ -47,7 +47,7 @@ public interface RecordWriterFactory
   default RecordWriter createRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
     final OutputStream out = SpringUtil.getOutputStream(resource);
-    final String fileName = resource.getFilename();
+    final String fileName = SpringUtil.getFileName(resource);
     final String baseName = FileUtil.getBaseName(fileName);
     return createRecordWriter(baseName, recordDefinition, out);
   }
