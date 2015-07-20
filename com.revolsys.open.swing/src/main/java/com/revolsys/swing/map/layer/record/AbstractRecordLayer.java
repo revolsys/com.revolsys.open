@@ -329,12 +329,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public void activatePanelComponent(final Component component, final Map<String, Object> config) {
     if (component instanceof RecordLayerTablePanel) {
       final RecordLayerTablePanel panel = (RecordLayerTablePanel)component;
-      final String fieldFilterMode = Maps.get(config, "fieldFilterMode",
-        RecordLayerTableModel.MODE_ALL);
+
+      final String fieldFilterMode = Maps.getString(config, "fieldFilterMode");
       panel.setFieldFilterMode(fieldFilterMode);
-      final String geometryFilterMode = Maps.get(config, "geometryFilterMode",
-        RecordLayerTableModel.MODE_ALL);
-      panel.setGeometryFilterMode(geometryFilterMode);
     }
   }
 
@@ -772,6 +769,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     this.index.clear();
     this.cacheIdToRecordMap.clear();
     this.selectedRecordsIndex = null;
+  }
+
+  @Override
+  public void deletePanelComponent(final Component component) {
+    clearPluginConfig(RecordLayerTablePanel.PLUGIN_NAME);
   }
 
   public void deleteRecord(final LayerRecord record) {
@@ -2634,18 +2636,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void showRecordsTable(final String fieldFilterMode) {
     Invoke.later(() -> {
-      final Map<String, Object> config = new LinkedHashMap<>();
-      if (!Property.hasValue(fieldFilterMode)) {
-        final String mode = Property.getString(this, "fieldFilterMode",
-          RecordLayerTableModel.MODE_ALL);
-        config.put("fieldFilterMode", mode);
-      } else {
-        config.put("fieldFilterMode", fieldFilterMode);
-      }
-      final String geometryFilterMode = Property.getString(this, "geometryFilterMode",
-        RecordLayerTableModel.MODE_ALL);
-      config.put("geometryFilterMode", geometryFilterMode);
-
+      final Map<String, Object> config = Maps.create("fieldFilterMode", fieldFilterMode);
       showTableView(config);
     });
   }

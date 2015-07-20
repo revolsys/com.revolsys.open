@@ -12,6 +12,9 @@ public interface ProjectFramePanel extends ObjectWithProperties {
 
   Component createPanelComponent(Map<String, Object> config);
 
+  default void deletePanelComponent(final Component component) {
+  }
+
   Icon getIcon();
 
   String getName();

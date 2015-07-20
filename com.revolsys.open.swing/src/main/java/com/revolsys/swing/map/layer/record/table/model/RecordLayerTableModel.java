@@ -203,6 +203,13 @@ public class RecordLayerTableModel extends RecordRowTableModel
     }
   }
 
+  public String getGeometryFilterMode() {
+    if (this.filterByBoundingBox) {
+      return "boundingBox";
+    }
+    return "all";
+  }
+
   public final ListSelectionModel getHighlightedModel() {
     return this.highlightedModel;
   }
@@ -576,6 +583,10 @@ public class RecordLayerTableModel extends RecordRowTableModel
       this.filterByBoundingBox = filterByBoundingBox;
       refresh();
     }
+  }
+
+  public void setGeometryFilterMode(final String mode) {
+    setFilterByBoundingBox("boundingBox".equals(mode));
   }
 
   protected void setModes(final String... modes) {

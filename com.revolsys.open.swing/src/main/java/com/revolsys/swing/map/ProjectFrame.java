@@ -53,8 +53,8 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BaseFrame;
-import com.revolsys.swing.component.ButtonTabComponent;
 import com.revolsys.swing.component.DnDTabbedPane;
+import com.revolsys.swing.component.TabCloseTitle;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.logging.Log4jTableModel;
 import com.revolsys.swing.map.layer.Layer;
@@ -248,13 +248,17 @@ public class ProjectFrame extends BaseFrame {
       component = panel.createPanelComponent(config);
 
       if (component != null) {
-        panel.activatePanelComponent(component, config);
+        final Component panelComponent = component;
+        panel.activatePanelComponent(panelComponent, config);
         final int tabIndex = tabs.getTabCount();
         final String name = panel.getName();
-        tabs.addTab(name, panel.getIcon(), component);
-        tabs.setTabComponentAt(tabIndex, new ButtonTabComponent(tabs));
-        final Component tabComponent = component;
-        panel.setPropertyWeak("bottomTab", tabComponent);
+        tabs.addTab(name, panel.getIcon(), panelComponent);
+
+        final TabCloseTitle tabTitle = new TabCloseTitle(tabs,
+          () -> panel.deletePanelComponent(panelComponent));
+        tabs.setTabComponentAt(tabIndex, tabTitle);
+
+        panel.setPropertyWeak("bottomTab", panelComponent);
         tabs.setSelectedIndex(tabIndex);
       }
     } else {

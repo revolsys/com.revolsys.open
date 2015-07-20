@@ -527,7 +527,10 @@ public class FieldFilterPanel extends JComponent
   }
 
   public boolean setSearchFilter(final Condition filter) {
-    return this.tableModel.setFilter(filter);
+    if (this.tableModel != null) {
+      return this.tableModel.setFilter(filter);
+    }
+    return true;
   }
 
   private boolean setSearchOperator(final String searchOperator) {

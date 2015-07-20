@@ -198,6 +198,10 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     return show;
   }
 
+  public void clearPluginConfig(final String pluginName) {
+    this.pluginConfigByName.remove(pluginName);
+  }
+
   @Override
   public AbstractLayer clone() {
     try {
