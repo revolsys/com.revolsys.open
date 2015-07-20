@@ -50,6 +50,7 @@ import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.action.enablecheck.OrEnableCheck;
 import com.revolsys.swing.map.action.AddFileLayerAction;
 import com.revolsys.swing.map.form.RecordLayerForm;
+import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
@@ -71,8 +72,6 @@ import com.revolsys.util.Property;
 
 public class RecordLayerTablePanel extends TablePanel
   implements PropertyChangeListener, MapSerializer {
-  public static final String PLUGIN_NAME = "tableView";
-
   private static final long serialVersionUID = 1L;
 
   public static final String FILTER_GEOMETRY = "filter_geometry";
@@ -94,7 +93,7 @@ public class RecordLayerTablePanel extends TablePanel
     super(table);
     this.layer = layer;
     this.tableModel = getTableModel();
-    final Map<String, Object> pluginConfig = layer.getPluginConfig(PLUGIN_NAME);
+    final Map<String, Object> pluginConfig = layer.getPluginConfig(AbstractLayer.PLUGIN_TABLE_VIEW);
 
     // Right click Menu
     final MenuFactory menu = this.tableModel.getMenu();
@@ -274,7 +273,7 @@ public class RecordLayerTablePanel extends TablePanel
         null);
     }
     setPluginConfig(pluginConfig);
-    layer.setPluginConfig(PLUGIN_NAME, this);
+    layer.setPluginConfig(AbstractLayer.PLUGIN_TABLE_VIEW, this);
     Property.addListener(layer, this);
   }
 
@@ -331,7 +330,7 @@ public class RecordLayerTablePanel extends TablePanel
     }
     if (this.layer != null) {
       Property.removeListener(this.layer, this);
-      this.layer.setPluginConfig(PLUGIN_NAME, toMap());
+      this.layer.setPluginConfig(AbstractLayer.PLUGIN_TABLE_VIEW, toMap());
     }
     this.tableModel = null;
     this.layer = null;

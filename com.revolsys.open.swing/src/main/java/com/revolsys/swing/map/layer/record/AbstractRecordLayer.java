@@ -771,11 +771,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     this.selectedRecordsIndex = null;
   }
 
-  @Override
-  public void deletePanelComponent(final Component component) {
-    clearPluginConfig(RecordLayerTablePanel.PLUGIN_NAME);
-  }
-
   public void deleteRecord(final LayerRecord record) {
     if (isCanDeleteRecords()) {
       doDeleteRecord(record);

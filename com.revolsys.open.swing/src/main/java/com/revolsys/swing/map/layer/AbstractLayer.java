@@ -83,6 +83,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       "DeleteLayer", "LayerProperties");
   }
 
+  public static final String PLUGIN_TABLE_VIEW = "tableView";
+
   private PropertyChangeListener beanPropertyListener = new BeanPropertyListener(this);
 
   private BoundingBox boundingBox = BoundingBox.EMPTY;
@@ -375,6 +377,11 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       Property.removeAllListeners(propertyChangeSupport);
       this.propertyChangeSupport = null;
     }
+  }
+
+  @Override
+  public void deletePanelComponent(final Component component) {
+    clearPluginConfig(AbstractLayer.PLUGIN_TABLE_VIEW);
   }
 
   public void deleteWithConfirm() {
