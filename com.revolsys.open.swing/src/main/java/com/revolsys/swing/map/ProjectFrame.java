@@ -54,7 +54,7 @@ import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BaseFrame;
 import com.revolsys.swing.component.DnDTabbedPane;
-import com.revolsys.swing.component.TabCloseTitle;
+import com.revolsys.swing.component.TabClosableTitle;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.logging.Log4jTableModel;
 import com.revolsys.swing.map.layer.Layer;
@@ -254,7 +254,7 @@ public class ProjectFrame extends BaseFrame {
         final String name = panel.getName();
         tabs.addTab(name, panel.getIcon(), panelComponent);
 
-        final TabCloseTitle tabTitle = new TabCloseTitle(tabs,
+        final TabClosableTitle tabTitle = new TabClosableTitle(tabs,
           () -> panel.deletePanelComponent(panelComponent));
         tabs.setTabComponentAt(tabIndex, tabTitle);
 

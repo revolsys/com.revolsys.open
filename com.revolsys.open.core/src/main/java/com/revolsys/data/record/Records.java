@@ -32,6 +32,14 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public final class Records {
+  public static BoundingBox boundingBox(final Iterable<Record> records) {
+    BoundingBox boundingBox = BoundingBox.EMPTY;
+    for (final Record record : records) {
+      boundingBox = boundingBox.expandToInclude(boundingBox(record));
+    }
+    return boundingBox;
+  }
+
   public static BoundingBox boundingBox(final Record record) {
     if (record != null) {
       final Geometry geometry = record.getGeometry();

@@ -22,14 +22,14 @@ import com.revolsys.swing.SwingUtil;
  * Contains a JLabel to show the text and
  * a JButton to close the tab it belongs to
  */
-public class TabCloseTitle extends JLabel implements MouseListener {
+public class TabClosableTitle extends JLabel implements MouseListener {
   private static final long serialVersionUID = 1L;
 
   private final JTabbedPane tabs;
 
   private final Runnable closeAction;
 
-  public TabCloseTitle(final JTabbedPane tabs, final Runnable closeAction) {
+  public TabClosableTitle(final JTabbedPane tabs, final Runnable closeAction) {
     this.tabs = tabs;
     setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 1));
     setOpaque(false);
@@ -111,6 +111,11 @@ public class TabCloseTitle extends JLabel implements MouseListener {
           } catch (final Throwable e) {
             LoggerFactory.getLogger(getClass()).error("Unable to close tab: " + title, e);
           }
+        }
+      } else {
+        final int i = this.tabs.indexOfTabComponent(this);
+        if (i != -1) {
+          this.tabs.setSelectedIndex(i);
         }
       }
     }

@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -176,6 +177,16 @@ public class Maps {
         return value;
       }
     }
+  }
+
+  public static <K, V> V get(final Map<K, V> map, final K key,
+    final Function<K, V> defaultFactory) {
+    V value = map.get(key);
+    if (value == null) {
+      value = defaultFactory.apply(key);
+      map.put(key, value);
+    }
+    return value;
   }
 
   public static Object get(final Map<String, ? extends Object> map, final String name) {

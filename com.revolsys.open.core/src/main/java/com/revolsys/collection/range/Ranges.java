@@ -7,7 +7,7 @@ import com.revolsys.util.Property;
 public class Ranges {
   public static AbstractRange<?> create(final char value) {
     if (Numbers.isDigit(value)) {
-      return new LongRange(value - '0');
+      return new IntRange(value - '0');
     } else if (CharRange.isLowerOrUpper(value)) {
       return new CharRange(value);
     } else {
@@ -17,10 +17,18 @@ public class Ranges {
 
   public static AbstractRange<?> create(final char from, final char to) {
     if (Numbers.isDigit(from) && Numbers.isDigit(to)) {
-      return new LongRange(from - '0', to - '0');
+      return new IntRange(from - '0', to - '0');
     } else {
       return new CharRange(from, to);
     }
+  }
+
+  public static AbstractRange<?> create(final int value) {
+    return new IntRange(value);
+  }
+
+  public static AbstractRange<?> create(final int from, final int to) {
+    return new IntRange(from, to);
   }
 
   public static AbstractRange<?> create(final long value) {
@@ -37,6 +45,8 @@ public class Ranges {
       return null;
     } else if (value instanceof Long) {
       return create(((Long)value).longValue());
+    } else if (Numbers.isPrimitiveIntegral(value)) {
+      return create(((Number)value).intValue());
     } else if (value instanceof Character) {
       final Character character = (Character)value;
       return create(character.charValue());
@@ -60,6 +70,36 @@ public class Ranges {
           return new LongPaddedRange(fromLong, toLong);
         } else {
           return create(fromLong, toLong);
+        }
+      } else if (toValue instanceof Integer) {
+        final long toLong = (Integer)toValue;
+        if (fromLong != 0 && from.toString().charAt(0) == '0'
+          || toLong != 0 && to.toString().charAt(0) == '0') {
+          return new LongPaddedRange(fromLong, toLong);
+        } else {
+          return create(fromLong, toLong);
+        }
+      } else {
+        throw new RangeInvalidException("Cannot create range from " + fromValue + " (Long) and "
+          + toValue + " (" + Classes.className(toValue.getClass()) + ")");
+      }
+    } else if (fromValue instanceof Integer) {
+      final long fromInt = (Integer)fromValue;
+      if (toValue instanceof Long) {
+        final long toLong = (Long)toValue;
+        if (fromInt != 0 && from.toString().charAt(0) == '0'
+          || toLong != 0 && to.toString().charAt(0) == '0') {
+          return new LongPaddedRange(fromInt, toLong);
+        } else {
+          return create(fromInt, toLong);
+        }
+      } else if (toValue instanceof Integer) {
+        final long toInt = (Integer)toValue;
+        if (fromInt != 0 && from.toString().charAt(0) == '0'
+          || toInt != 0 && to.toString().charAt(0) == '0') {
+          return new LongPaddedRange(fromInt, toInt);
+        } else {
+          return create(fromInt, toInt);
         }
       } else {
         throw new RangeInvalidException("Cannot create range from " + fromValue + " (Long) and "
@@ -86,11 +126,13 @@ public class Ranges {
     } else {
       for (final AbstractRange<?> range : rangeSet.getRanges()) {
         if (range instanceof LongRange) {
+        } else if (range instanceof IntRange) {
         } else if (range instanceof LongPaddedRange) {
         } else if (range instanceof CrossProductRange) {
           final CrossProductRange crossProduct = (CrossProductRange)range;
           for (final AbstractRange<?> subRange : crossProduct.getRanges()) {
             if (subRange instanceof LongRange) {
+            } else if (subRange instanceof IntRange) {
             } else if (subRange instanceof LongPaddedRange) {
             } else {
               return false;
@@ -118,7 +160,13 @@ public class Ranges {
       return null;
     } else if (Numbers.isPrimitiveIntegral(value)) {
       final Number number = (Number)value;
-      return number.longValue();
+      final long longValue = number.longValue();
+      final int intValue = (int)longValue;
+      if (intValue == longValue) {
+        return intValue;
+      } else {
+        return longValue;
+      }
     } else if (value instanceof Character) {
       final Character character = (Character)value;
       return character.charValue();

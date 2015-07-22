@@ -17,7 +17,7 @@ import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryComponent;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineEnd;
+import com.revolsys.jts.geom.End;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
@@ -747,14 +747,14 @@ public final class LineStringUtil {
     }
   }
 
-  public static Point pointOffset(final LineString line, final LineEnd lineEnd,
+  public static Point pointOffset(final LineString line, final End lineEnd,
     final double xOffset, double yOffset) {
     if (line.getLength() == 0) {
       return line.getFromPoint();
     } else {
       Point point1;
       Point point2;
-      if (LineEnd.isFrom(lineEnd)) {
+      if (End.isFrom(lineEnd)) {
         point1 = line.getPoint(0);
         int i = 1;
         do {

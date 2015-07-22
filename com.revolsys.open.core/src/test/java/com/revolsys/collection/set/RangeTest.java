@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.revolsys.collection.range.AbstractRange;
-import com.revolsys.collection.range.LongRange;
+import com.revolsys.collection.range.IntRange;
 import com.revolsys.collection.range.RangeInvalidException;
 import com.revolsys.collection.range.RangeSet;
 import com.revolsys.collection.range.Ranges;
@@ -41,7 +41,7 @@ public class RangeTest {
   }
 
   private static void assertRange(final int from, final int to, final long... numbers) {
-    final LongRange range = new LongRange(from, to);
+    final IntRange range = new IntRange(from, to);
     final List<Long> list = new ArrayList<>();
     for (final long i : numbers) {
       list.add(i);
@@ -211,45 +211,45 @@ public class RangeTest {
 
   @Test
   public void testExpand() {
-    final LongRange range1 = new LongRange(100, 110);
+    final IntRange range1 = new IntRange(100, 110);
     Assert.assertEquals("Same", range1, range1.expand(range1));
 
-    final LongRange range2 = new LongRange(100, 105);
-    final LongRange range3 = new LongRange(100, 115);
+    final IntRange range2 = new IntRange(100, 105);
+    final IntRange range3 = new IntRange(100, 115);
     Assert.assertEquals("From 2nd Subset", range1, range1.expand(range2));
     Assert.assertEquals("From 2nd Subset Switched", range1, range2.expand(range1));
     Assert.assertEquals("From 2nd Superset", range3, range1.expand(range3));
     Assert.assertEquals("From 2nd Superset Switched", range3, range3.expand(range1));
 
-    final LongRange range4 = new LongRange(105, 110);
-    final LongRange range5 = new LongRange(-5, 110);
+    final IntRange range4 = new IntRange(105, 110);
+    final IntRange range5 = new IntRange(-5, 110);
     Assert.assertEquals("To 2nd Subset", range1, range1.expand(range4));
     Assert.assertEquals("To 2nd Subset Switched", range1, range4.expand(range1));
     Assert.assertEquals("To 2nd Superset", range5, range1.expand(range5));
     Assert.assertEquals("To 2nd Superset Switched", range5, range5.expand(range1));
 
-    final LongRange range6 = new LongRange(101, 109);
+    final IntRange range6 = new IntRange(101, 109);
     Assert.assertEquals("Subset Middle", range1, range1.expand(range6));
     Assert.assertEquals("Subset Middle Switched", range1, range6.expand(range1));
 
-    final LongRange range7 = new LongRange(98, 101);
-    Assert.assertEquals("Overlap From", new LongRange(98, 110), range1.expand(range7));
-    Assert.assertEquals("Overlap To", new LongRange(98, 110), range7.expand(range1));
+    final IntRange range7 = new IntRange(98, 101);
+    Assert.assertEquals("Overlap From", new IntRange(98, 110), range1.expand(range7));
+    Assert.assertEquals("Overlap To", new IntRange(98, 110), range7.expand(range1));
 
-    final LongRange range8 = new LongRange(98, 99);
-    Assert.assertEquals("Touching From", new LongRange(98, 110), range1.expand(range8));
-    Assert.assertEquals("Touching To", new LongRange(98, 110), range8.expand(range1));
+    final IntRange range8 = new IntRange(98, 99);
+    Assert.assertEquals("Touching From", new IntRange(98, 110), range1.expand(range8));
+    Assert.assertEquals("Touching To", new IntRange(98, 110), range8.expand(range1));
 
-    final LongRange range9 = new LongRange(0, 98);
+    final IntRange range9 = new IntRange(0, 98);
     Assert.assertNull("Disjoint Before ", range1.expand(range9));
     Assert.assertNull("Disjoint After", range9.expand(range1));
   }
 
   @Test
   public void testIntRange() {
-    Assert.assertEquals("1", new LongRange(1).toString());
-    Assert.assertEquals("1~10", new LongRange(1, 10).toString());
-    Assert.assertEquals("-10~-1", new LongRange(-10, -1).toString());
+    Assert.assertEquals("1", new IntRange(1).toString());
+    Assert.assertEquals("1~10", new IntRange(1, 10).toString());
+    Assert.assertEquals("-10~-1", new IntRange(-10, -1).toString());
 
     assertRange(0, 0, 0);
     assertRange(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);

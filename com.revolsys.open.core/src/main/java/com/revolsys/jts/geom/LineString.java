@@ -215,8 +215,8 @@ public interface LineString extends Lineal {
 
   Point getPoint(final int vertexIndex);
 
-  default Point getPoint(final LineEnd lineEnd) {
-    if (LineEnd.isFrom(lineEnd)) {
+  default Point getPoint(final End lineEnd) {
+    if (End.isFrom(lineEnd)) {
       return getFromPoint();
     } else {
       return getToPoint();

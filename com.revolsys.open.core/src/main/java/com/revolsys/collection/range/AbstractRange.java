@@ -214,12 +214,16 @@ public abstract class AbstractRange<V>
 
   @Override
   public String toString() {
-    final V from = getFrom();
-    final V to = getTo();
-    if (from.equals(to)) {
-      return from.toString();
+    if (size() == 0) {
+      return "";
     } else {
-      return from + "~" + to;
+      final V from = getFrom();
+      final V to = getTo();
+      if (from.equals(to)) {
+        return from.toString();
+      } else {
+        return from + "~" + to;
+      }
     }
   }
 }

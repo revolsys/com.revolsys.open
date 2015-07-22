@@ -9,6 +9,7 @@ import java.util.ListIterator;
 
 import com.revolsys.collection.MultiIterator;
 import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.jts.geom.End;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
@@ -149,7 +150,7 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Cl
 
   public boolean addRange(final AbstractRange<?> addRange) {
     boolean added = false;
-    if (addRange != null) {
+    if (addRange != null && addRange.size() > 0) {
       for (final ListIterator<AbstractRange<?>> iterator = this.ranges.listIterator(); iterator
         .hasNext();) {
         final AbstractRange<?> range = iterator.next();
@@ -197,7 +198,7 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Cl
   }
 
   public boolean addRange(final int from, final int to) {
-    final LongRange addRange = new LongRange(from, to);
+    final IntRange addRange = new IntRange(from, to);
     return addRange(addRange);
   }
 
@@ -241,6 +242,25 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Cl
       }
     }
     return false;
+  }
+
+  public boolean equalEnd(final RangeSet ranges, final End end) {
+    final Object value1 = getEndValue(end);
+    final Object value2 = ranges.getEndValue(end);
+    return EqualsRegistry.equal(value1, value2);
+  }
+
+  public Object getEndValue(final End end) {
+    if (!isEmpty()) {
+      if (End.isFrom(end)) {
+        final AbstractRange<?> range = this.ranges.get(0);
+        return range.getFrom();
+      } else if (End.isTo(end)) {
+        final AbstractRange<?> range = this.ranges.get(this.ranges.size() - 1);
+        return range.getTo();
+      }
+    }
+    return null;
   }
 
   public List<AbstractRange<?>> getRanges() {
@@ -318,6 +338,14 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Cl
     }
   }
 
+  public boolean removeRange(final AbstractRange<?> range) {
+    boolean removed = false;
+    for (final Object object : range) {
+      removed |= remove(object);
+    }
+    return removed;
+  }
+
   public boolean removeRange(final Object from, final Object to) {
     boolean removed = false;
     for (final ListIterator<AbstractRange<?>> iterator = this.ranges.listIterator(); iterator
@@ -363,6 +391,14 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Cl
           removed = true;
         }
       }
+    }
+    return removed;
+  }
+
+  public boolean removeRange(final RangeSet ranges) {
+    boolean removed = false;
+    for (final AbstractRange<?> range : ranges.ranges) {
+      removed |= removeRange(range);
     }
     return removed;
   }
