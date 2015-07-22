@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.util.Property;
 
 public class MapSerializerUtil {
@@ -33,7 +33,7 @@ public class MapSerializerUtil {
 
   public static void add(final Map<String, Object> map, final String name, final Object value,
     final Object defaultValue) {
-    if (EqualsRegistry.equal(value, defaultValue)) {
+    if (Equals.equal(value, defaultValue)) {
       map.remove(name);
     } else {
       final Object mapValue = getValue(value);

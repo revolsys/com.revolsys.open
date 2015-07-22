@@ -3,7 +3,7 @@ package com.revolsys.data.query;
 import java.sql.PreparedStatement;
 import java.util.Map;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.record.schema.RecordStore;
 
 public class Cast extends QueryValue {
@@ -39,8 +39,8 @@ public class Cast extends QueryValue {
   public boolean equals(final Object obj) {
     if (obj instanceof Cast) {
       final Cast condition = (Cast)obj;
-      if (EqualsRegistry.equal(condition.getValue(), this.getValue())) {
-        if (EqualsRegistry.equal(condition.getDataType(), this.getDataType())) {
+      if (Equals.equal(condition.getValue(), this.getValue())) {
+        if (Equals.equal(condition.getDataType(), this.getDataType())) {
           return true;
         }
       }

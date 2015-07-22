@@ -7,7 +7,7 @@ import java.awt.event.FocusListener;
 import org.jdesktop.swingx.JXSearchField;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.ExceptionUtil;
@@ -110,10 +110,10 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
   public void setFieldValue(final Object value) {
     final String newValue = StringConverterRegistry.toString(value);
     final String oldValue = this.fieldValue;
-    if (!EqualsRegistry.equal(getText(), newValue)) {
+    if (!Equals.equal(getText(), newValue)) {
       setText(newValue);
     }
-    if (!EqualsRegistry.equal(oldValue, value)) {
+    if (!Equals.equal(oldValue, value)) {
       this.fieldValue = (String)value;
       firePropertyChange(this.fieldName, oldValue, value);
       SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this, oldValue, value);

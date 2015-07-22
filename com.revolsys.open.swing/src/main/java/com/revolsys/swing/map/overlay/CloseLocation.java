@@ -1,6 +1,6 @@
 package com.revolsys.swing.map.overlay;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.Geometry;
@@ -61,9 +61,9 @@ public class CloseLocation implements Comparable<CloseLocation> {
       } else if (!record2.isSame(record1)) {
         return false;
       }
-      if (!EqualsRegistry.equal(getVertex(), location.getVertex())) {
+      if (!Equals.equal(getVertex(), location.getVertex())) {
         return false;
-      } else if (!EqualsRegistry.equal(getSegment(), location.getSegment())) {
+      } else if (!Equals.equal(getSegment(), location.getSegment())) {
         return false;
       } else if (location.getPoint().equals(getPoint())) {
         return true;

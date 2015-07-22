@@ -6,7 +6,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -126,7 +126,7 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
     final String fieldName = getFieldName(rowIndex);
     final Object originalValue = this.record.getOriginalValue(fieldName);
     final Object value = this.record.getValue(fieldName);
-    return !EqualsRegistry.equal(originalValue, value);
+    return !Equals.equal(originalValue, value);
   }
 
   @Override

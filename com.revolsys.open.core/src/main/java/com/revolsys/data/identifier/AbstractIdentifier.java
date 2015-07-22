@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.record.Record;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.CompareUtil;
@@ -60,7 +60,7 @@ public abstract class AbstractIdentifier implements Identifier {
       final List<Object> values = getValues();
       final Identifier recordIdentifier = (Identifier)other;
       final List<Object> otherValues = recordIdentifier.getValues();
-      if (EqualsRegistry.equal(values, otherValues)) {
+      if (Equals.equal(values, otherValues)) {
         return true;
       } else {
         return false;

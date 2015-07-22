@@ -2,7 +2,7 @@ package com.revolsys.swing.tree;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.util.Property;
@@ -37,7 +37,7 @@ public class TreeNodePropertyEnableCheck extends AbstractEnableCheck {
     } else {
       try {
         final Object value = Property.get(node, this.propertyName);
-        if (this.inverse != EqualsRegistry.equal(value, this.value)) {
+        if (this.inverse != Equals.equal(value, this.value)) {
           return enabled();
         } else {
           return disabled();

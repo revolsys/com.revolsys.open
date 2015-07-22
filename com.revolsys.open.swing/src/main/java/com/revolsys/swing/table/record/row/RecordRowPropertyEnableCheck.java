@@ -2,7 +2,7 @@ package com.revolsys.swing.table.record.row;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.record.Record;
 import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
 import com.revolsys.swing.table.TablePanel;
@@ -53,7 +53,7 @@ public class RecordRowPropertyEnableCheck extends AbstractEnableCheck {
     try {
       final Record object = getObject();
       final Object value = JavaBeanUtil.getSimpleProperty(object, this.propertyName);
-      final boolean equal = EqualsRegistry.equal(value, this.value);
+      final boolean equal = Equals.equal(value, this.value);
       if (equal) {
         if (this.invert) {
           return disabled();

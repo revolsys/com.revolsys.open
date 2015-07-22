@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.JavaBeanUtil;
@@ -55,9 +55,9 @@ public class Between extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof Between) {
       final Between condition = (Between)obj;
-      if (EqualsRegistry.equal(condition.getColumn(), this.getColumn())) {
-        if (EqualsRegistry.equal(condition.getMin(), this.getMin())) {
-          if (EqualsRegistry.equal(condition.getMax(), this.getMax())) {
+      if (Equals.equal(condition.getColumn(), this.getColumn())) {
+        if (Equals.equal(condition.getMin(), this.getMin())) {
+          if (Equals.equal(condition.getMax(), this.getMax())) {
             return true;
           }
         }

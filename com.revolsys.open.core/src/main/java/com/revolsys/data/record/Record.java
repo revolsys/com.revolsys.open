@@ -14,8 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.equals.EqualsInstance;
-import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.identifier.AbstractIdentifier;
 import com.revolsys.data.identifier.Identifiable;
 import com.revolsys.data.identifier.Identifier;
@@ -86,7 +86,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
 
   default boolean equalValue(final String fieldName, final Object value) {
     final Object fieldValue = getValue(fieldName);
-    return EqualsRegistry.equal(fieldValue, value);
+    return Equals.equal(fieldValue, value);
   }
 
   @Override
@@ -518,7 +518,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
       setValue(index, id);
     } else {
       final Object oldId = getValue(index);
-      if (oldId != null && !EqualsRegistry.equal(id, oldId)) {
+      if (oldId != null && !Equals.equal(id, oldId)) {
         throw new IllegalStateException("Cannot change the ID on a persisted object");
       }
     }

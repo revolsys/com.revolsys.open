@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.query.BinaryCondition;
 import com.revolsys.data.query.Column;
 import com.revolsys.data.query.Condition;
@@ -221,7 +221,7 @@ public class FieldFilterPanel extends JComponent
 
   public void fireSearchChanged(final String propertyName, final Object oldValue,
     final Object newValue) {
-    if (!EqualsRegistry.equal(oldValue, newValue)) {
+    if (!Equals.equal(oldValue, newValue)) {
       if (SwingUtilities.isEventDispatchThread()) {
         final Method method = JavaBeanUtil.getMethod(getClass(), "fireSearchChanged", String.class,
           Object.class, Object.class);
@@ -372,7 +372,7 @@ public class FieldFilterPanel extends JComponent
               searchText = searchText.replaceAll("%", "");
               final String previousSearchText = this.searchTextField.getText();
 
-              if (!EqualsRegistry.equal(searchText, previousSearchText)) {
+              if (!Equals.equal(searchText, previousSearchText)) {
                 this.searchTextField.setFieldValue(searchText);
               }
               simple = true;
@@ -493,13 +493,13 @@ public class FieldFilterPanel extends JComponent
 
   private void setSearchFieldName(final String searchFieldName) {
     if (Property.hasValue(searchFieldName)
-      && !EqualsRegistry.equal(searchFieldName, this.previousSearchFieldName)) {
+      && !Equals.equal(searchFieldName, this.previousSearchFieldName)) {
       this.lastValue = null;
       this.previousSearchFieldName = searchFieldName;
       final RecordDefinition recordDefinition = this.tableModel.getRecordDefinition();
       this.field = recordDefinition.getField(searchFieldName);
       final Class<?> attributeClass = this.field.getTypeClass();
-      if (!EqualsRegistry.equal(searchFieldName, this.nameField.getSelectedItem())) {
+      if (!Equals.equal(searchFieldName, this.nameField.getSelectedItem())) {
         this.nameField.setFieldValue(searchFieldName);
       }
       if (searchFieldName.equals(recordDefinition.getIdFieldName())) {
@@ -538,7 +538,7 @@ public class FieldFilterPanel extends JComponent
       return false;
     } else {
       final Object currentSearchOperator = this.operatorField.getSelectedItem();
-      if (!EqualsRegistry.equal(searchOperator, currentSearchOperator)) {
+      if (!Equals.equal(searchOperator, currentSearchOperator)) {
         this.operatorField.setSelectedItem(searchOperator);
       }
       if (this.operatorField.getSelectedIndex() < 0) {

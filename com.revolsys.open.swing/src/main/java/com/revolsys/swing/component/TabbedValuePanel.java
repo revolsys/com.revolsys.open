@@ -5,7 +5,7 @@ import java.awt.Component;
 
 import javax.swing.JTabbedPane;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.util.Property;
 
 public class TabbedValuePanel extends ValueField {
@@ -41,7 +41,7 @@ public class TabbedValuePanel extends ValueField {
   public <V extends Component> V getTab(final String tabName) {
     for (int i = 0; i < this.tabs.getTabCount(); i++) {
       final String title = this.tabs.getTitleAt(i);
-      if (EqualsRegistry.equal(tabName, title)) {
+      if (Equals.equal(tabName, title)) {
         return (V)this.tabs.getComponentAt(i);
       }
     }

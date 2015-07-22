@@ -9,7 +9,7 @@ import javax.swing.JEditorPane;
 import javax.swing.text.Element;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.undo.CascadingUndoManager;
@@ -152,10 +152,10 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
   public void setFieldValue(final Object value) {
     final String newValue = StringConverterRegistry.toString(value);
     final String oldValue = this.fieldValue;
-    if (!EqualsRegistry.equal(getText(), newValue)) {
+    if (!Equals.equal(getText(), newValue)) {
       setText(newValue);
     }
-    if (!EqualsRegistry.equal(oldValue, value)) {
+    if (!Equals.equal(oldValue, value)) {
       this.fieldValue = (String)value;
       firePropertyChange(this.fieldName, oldValue, value);
       SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this, oldValue, value);

@@ -4,13 +4,13 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 
-public class FilterIterator<T> extends AbstractIterator<T> {
+public class PredicateIterator<T> extends AbstractIterator<T> {
 
   private Predicate<T> filter;
 
   private Iterator<T> iterator;
 
-  public FilterIterator(final Predicate<T> filter, final Iterator<T> iterator) {
+  public PredicateIterator(final Predicate<T> filter, final Iterator<T> iterator) {
     this.filter = filter;
     this.iterator = iterator;
   }

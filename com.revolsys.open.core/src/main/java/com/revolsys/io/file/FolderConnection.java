@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.util.Property;
@@ -45,8 +45,8 @@ public class FolderConnection implements MapSerializer {
     if (obj instanceof FolderConnection) {
       final FolderConnection folderConnection = (FolderConnection)obj;
       if (this.registry == folderConnection.registry) {
-        if (EqualsRegistry.equal(this.name, folderConnection.name)) {
-          if (EqualsRegistry.equal(getFile(), folderConnection.getFile())) {
+        if (Equals.equal(this.name, folderConnection.name)) {
+          if (Equals.equal(getFile(), folderConnection.getFile())) {
             return true;
           }
         }

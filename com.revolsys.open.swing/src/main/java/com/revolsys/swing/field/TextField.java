@@ -12,7 +12,7 @@ import org.jdesktop.swingx.JXTextField;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.listener.WeakFocusListener;
@@ -155,7 +155,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
     final String newText = getDisplayText(value);
     final String text = getText();
     this.support.discardAllEdits();
-    if (!EqualsRegistry.equal(text, newText)) {
+    if (!Equals.equal(text, newText)) {
       if (newText == null) {
         if (Property.hasValue(text)) {
           setText("");

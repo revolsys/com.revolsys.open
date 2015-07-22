@@ -33,7 +33,7 @@ import javax.swing.undo.UndoableEdit;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.record.Record;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.jts.geom.BoundingBox;
@@ -830,7 +830,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     if (overlayAction == null) {
       firePropertyChange("overlayAction", oldAction, null);
       return false;
-    } else if (EqualsRegistry.equal(oldAction, overlayAction)) {
+    } else if (Equals.equal(oldAction, overlayAction)) {
       return true;
     } else if (canOverrideOverlayAction(overlayAction, oldAction)) {
       final Cursor cursor = getOverlayActionCursor(overlayAction);

@@ -3,7 +3,7 @@ package com.revolsys.swing.map.form;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.util.JavaBeanUtil;
@@ -49,7 +49,7 @@ public class LayerFormRecordPropertyEnableCheck extends AbstractEnableCheck {
   public boolean isEnabled() {
     final LayerRecord record = getRecord();
     final Object value = JavaBeanUtil.getSimpleProperty(record, this.propertyName);
-    final boolean equal = EqualsRegistry.equal(value, this.value);
+    final boolean equal = Equals.equal(value, this.value);
     if (equal == !this.inverse) {
       return enabled();
     } else {

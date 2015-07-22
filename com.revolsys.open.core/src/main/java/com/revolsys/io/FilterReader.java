@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 
 import javax.annotation.PreDestroy;
 
-import com.revolsys.collection.iterator.FilterIterator;
+import com.revolsys.collection.iterator.PredicateIterator;
 
 public class FilterReader<T> extends AbstractReader<T> {
 
@@ -40,7 +40,7 @@ public class FilterReader<T> extends AbstractReader<T> {
   @Override
   public Iterator<T> iterator() {
     final Iterator<T> iterator = this.reader.iterator();
-    return new FilterIterator<T>(this.filter, iterator);
+    return new PredicateIterator<T>(this.filter, iterator);
   }
 
   @Override

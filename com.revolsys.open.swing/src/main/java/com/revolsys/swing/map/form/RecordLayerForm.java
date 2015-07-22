@@ -63,7 +63,7 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
@@ -1102,7 +1102,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
           final String fieldName = field.getFieldName();
           final Object fieldValue = field.getFieldValue();
           final Object recordValue = this.record.getValue(fieldName);
-          if (!EqualsRegistry.equal(recordValue, fieldValue)) {
+          if (!Equals.equal(recordValue, fieldValue)) {
             boolean equal = false;
             if (fieldValue instanceof String) {
               final String string = (String)fieldValue;
@@ -1199,7 +1199,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     }
     if (SwingUtilities.isEventDispatchThread()) {
       final String oldValue = this.fieldInValidMessage.get(fieldName);
-      if (!EqualsRegistry.equal(message, oldValue)) {
+      if (!Equals.equal(message, oldValue)) {
         this.fieldInValidMessage.put(fieldName, message);
         final Field field = getField(fieldName);
         field.setFieldInvalid(message, WebColors.Red, WebColors.Pink);

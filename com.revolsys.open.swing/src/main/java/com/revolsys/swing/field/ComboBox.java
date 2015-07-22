@@ -19,7 +19,7 @@ import javax.swing.ListCellRenderer;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.ExceptionUtil;
 
@@ -187,7 +187,7 @@ public class ComboBox extends JComboBox implements Field {
 
   @Override
   public synchronized void setFieldValue(final Object value) {
-    if (!EqualsRegistry.equal(getSelectedItem(), value)) {
+    if (!Equals.equal(getSelectedItem(), value)) {
       setSelectedItem(value);
     }
     this.support.setValue(value);

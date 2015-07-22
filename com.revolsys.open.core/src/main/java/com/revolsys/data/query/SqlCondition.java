@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
@@ -100,8 +100,8 @@ public class SqlCondition extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof SqlCondition) {
       final SqlCondition sqlCondition = (SqlCondition)obj;
-      if (EqualsRegistry.equal(sqlCondition.getSql(), this.getSql())) {
-        if (EqualsRegistry.equal(sqlCondition.getParameterValues(), this.getParameterValues())) {
+      if (Equals.equal(sqlCondition.getSql(), this.getSql())) {
+        if (Equals.equal(sqlCondition.getParameterValues(), this.getParameterValues())) {
           return true;
         }
       }

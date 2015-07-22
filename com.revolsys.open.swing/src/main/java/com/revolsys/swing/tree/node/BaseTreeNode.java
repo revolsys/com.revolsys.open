@@ -26,7 +26,7 @@ import javax.swing.tree.TreePath;
 
 import com.revolsys.collection.iterator.IteratorEnumeration;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.MenuFactory;
@@ -187,7 +187,7 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
     } else if (object.getClass().equals(getClass())) {
       final BaseTreeNode node = (BaseTreeNode)object;
       final Object otherUserObject1 = node.getUserObject();
-      if (EqualsRegistry.equal(userObject, otherUserObject1)) {
+      if (Equals.equal(userObject, otherUserObject1)) {
         return true;
       } else {
         return false;

@@ -1,6 +1,6 @@
 package com.revolsys.gis.grid;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
@@ -31,9 +31,9 @@ public class SimpleRectangularMapTile implements RectangularMapTile {
       return false;
     } else if (object instanceof SimpleRectangularMapTile) {
       final SimpleRectangularMapTile tile = (SimpleRectangularMapTile)object;
-      if (EqualsRegistry.equal(this.boundingBox, tile.boundingBox)) {
-        if (EqualsRegistry.equal(this.grid, tile.grid)) {
-          if (EqualsRegistry.equal(this.name, tile.name)) {
+      if (Equals.equal(this.boundingBox, tile.boundingBox)) {
+        if (Equals.equal(this.grid, tile.grid)) {
+          if (Equals.equal(this.name, tile.name)) {
             return true;
           }
         }

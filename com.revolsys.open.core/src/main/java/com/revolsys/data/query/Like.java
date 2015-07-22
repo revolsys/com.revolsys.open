@@ -2,7 +2,7 @@ package com.revolsys.data.query;
 
 import java.util.Map;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.util.Property;
 
 public class Like extends BinaryCondition {
@@ -59,7 +59,7 @@ public class Like extends BinaryCondition {
             return false;
           }
         } else {
-          return EqualsRegistry.equal(value1, value2);
+          return Equals.equal(value1, value2);
         }
       } else {
         return false;

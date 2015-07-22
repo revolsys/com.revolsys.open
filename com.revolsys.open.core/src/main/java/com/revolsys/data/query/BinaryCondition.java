@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.record.schema.RecordStore;
 
 public class BinaryCondition extends Condition {
@@ -67,9 +67,9 @@ public class BinaryCondition extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof BinaryCondition) {
       final BinaryCondition condition = (BinaryCondition)obj;
-      if (EqualsRegistry.equal(condition.getLeft(), this.getLeft())) {
-        if (EqualsRegistry.equal(condition.getRight(), this.getRight())) {
-          if (EqualsRegistry.equal(condition.getOperator(), this.getOperator())) {
+      if (Equals.equal(condition.getLeft(), this.getLeft())) {
+        if (Equals.equal(condition.getRight(), this.getRight())) {
+          if (Equals.equal(condition.getOperator(), this.getOperator())) {
             return true;
           }
         }

@@ -28,7 +28,7 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
 
   void addCodeTables(Collection<CodeTable> codeTables);
 
-  void addStatistic(String name, Record object);
+  void addStatistic(String name, Record record);
 
   void addStatistic(String name, String typePath, int count);
 
@@ -58,9 +58,9 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
 
   int delete(Query query);
 
-  void delete(Record object);
+  void delete(Record record);
 
-  void deleteAll(Collection<Record> objects);
+  void deleteAll(Collection<Record> records);
 
   <V extends CodeTable> V getCodeTable(String typePath);
 
@@ -128,9 +128,9 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
 
   void initialize();
 
-  void insert(Record object);
+  void insert(Record record);
 
-  void insertAll(Collection<Record> objects);
+  void insertAll(Collection<Record> records);
 
   boolean isEditable(String typePath);
 
@@ -169,7 +169,7 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
 
   void setRecordFactory(RecordFactory recordFactory);
 
-  void update(Record object);
+  void update(Record record);
 
-  void updateAll(Collection<Record> objects);
+  void updateAll(Collection<Record> records);
 }

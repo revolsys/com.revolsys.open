@@ -9,7 +9,7 @@ import java.util.Map;
 
 import com.ctc.wstx.util.ExceptionUtil;
 import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
@@ -99,7 +99,7 @@ public class CollectionValue extends QueryValue {
   public boolean equals(final Object obj) {
     if (obj instanceof CollectionValue) {
       final CollectionValue condition = (CollectionValue)obj;
-      return EqualsRegistry.equal(condition.getQueryValues(), this.getQueryValues());
+      return Equals.equal(condition.getQueryValues(), this.getQueryValues());
     } else {
       return false;
     }

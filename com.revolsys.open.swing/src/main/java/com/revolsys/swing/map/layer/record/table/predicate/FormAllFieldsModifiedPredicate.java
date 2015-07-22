@@ -7,7 +7,7 @@ import java.lang.ref.WeakReference;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.swing.map.form.RecordLayerForm;
 import com.revolsys.swing.map.layer.record.table.model.LayerRecordTableModel;
@@ -48,7 +48,7 @@ public class FormAllFieldsModifiedPredicate implements HighlightPredicate {
               fieldValue = singleIdentifier.getValue(0);
             }
             final Object originalValue = form.getOriginalValue(fieldName);
-            boolean equal = EqualsRegistry.equal(originalValue, fieldValue);
+            boolean equal = Equals.equal(originalValue, fieldValue);
             if (!equal) {
               if (originalValue == null) {
                 if (fieldValue instanceof String) {

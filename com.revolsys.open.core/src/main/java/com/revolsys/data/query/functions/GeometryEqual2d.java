@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.QueryValue;
@@ -68,8 +68,8 @@ public class GeometryEqual2d extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof GeometryEqual2d) {
       final GeometryEqual2d condition = (GeometryEqual2d)obj;
-      if (EqualsRegistry.equal(condition.geometry1Value, this.geometry1Value)) {
-        if (EqualsRegistry.equal(condition.geometry2Value, this.geometry1Value)) {
+      if (Equals.equal(condition.geometry1Value, this.geometry1Value)) {
+        if (Equals.equal(condition.geometry2Value, this.geometry1Value)) {
           return true;
         }
       }

@@ -2,7 +2,7 @@ package com.revolsys.swing.map.layer.record;
 
 import java.beans.PropertyChangeEvent;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.AbstractRecord;
 import com.revolsys.data.record.Record;
@@ -110,7 +110,7 @@ public abstract class AbstractLayerRecord extends AbstractRecord implements Laye
         final Identifier otherId = record.getIdentifier();
         if (id == null || otherId == null) {
           return false;
-        } else if (EqualsRegistry.equal(id, otherId)) {
+        } else if (Equals.equal(id, otherId)) {
           return true;
         } else {
           return false;

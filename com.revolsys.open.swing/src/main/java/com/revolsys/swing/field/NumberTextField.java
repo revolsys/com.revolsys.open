@@ -13,7 +13,7 @@ import org.jdesktop.swingx.JXTextField;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.swing.SwingUtil;
@@ -317,10 +317,10 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
       } else {
         newText = StringConverterRegistry.toString(newValue);
       }
-      if (!EqualsRegistry.equal(newText, getText())) {
+      if (!Equals.equal(newText, getText())) {
         setText(newText);
       }
-      if (!EqualsRegistry.equal(oldValue, newValue)) {
+      if (!Equals.equal(oldValue, newValue)) {
         validateField();
         this.support.setValue(newValue);
       }

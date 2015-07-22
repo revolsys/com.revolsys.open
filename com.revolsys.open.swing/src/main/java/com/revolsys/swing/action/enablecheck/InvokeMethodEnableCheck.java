@@ -3,7 +3,7 @@ package com.revolsys.swing.action.enablecheck;
 import java.util.concurrent.Callable;
 
 import com.revolsys.beans.InvokeMethodCallable;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.util.ExceptionUtil;
 
 public class InvokeMethodEnableCheck extends AbstractEnableCheck {
@@ -32,7 +32,7 @@ public class InvokeMethodEnableCheck extends AbstractEnableCheck {
   public boolean isEnabled() {
     try {
       final Object value = this.callable.call();
-      if (EqualsRegistry.equal(value, this.value) == !this.inverse) {
+      if (Equals.equal(value, this.value) == !this.inverse) {
         return enabled();
       } else {
         return disabled();

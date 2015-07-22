@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.util.CollectionUtil;
 
@@ -77,14 +77,14 @@ public abstract class AbstractMultiCondition extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof AbstractMultiCondition) {
       final AbstractMultiCondition value = (AbstractMultiCondition)obj;
-      if (EqualsRegistry.equal(getOperator(), value.getOperator())) {
+      if (Equals.equal(getOperator(), value.getOperator())) {
         final List<QueryValue> values1 = getQueryValues();
         final List<QueryValue> values2 = value.getQueryValues();
         if (values1.size() == values2.size()) {
           for (int i = 0; i < values1.size(); i++) {
             final QueryValue value1 = values1.get(i);
             final QueryValue value2 = values2.get(i);
-            if (!EqualsRegistry.equal(value1, value2)) {
+            if (!Equals.equal(value1, value2)) {
               return false;
             }
           }

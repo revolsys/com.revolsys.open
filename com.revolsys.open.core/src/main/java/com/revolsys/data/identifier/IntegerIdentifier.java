@@ -3,7 +3,7 @@ package com.revolsys.data.identifier;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 
 public final class IntegerIdentifier extends AbstractIdentifier {
 
@@ -23,12 +23,12 @@ public final class IntegerIdentifier extends AbstractIdentifier {
       final List<Object> values = identifier.getValues();
       if (values.size() == 1) {
         final Object otherValue = values.get(0);
-        return EqualsRegistry.equal(this.value, otherValue);
+        return Equals.equal(this.value, otherValue);
       } else {
         return false;
       }
     } else {
-      return EqualsRegistry.equal(this.value, other);
+      return Equals.equal(this.value, other);
     }
   }
 

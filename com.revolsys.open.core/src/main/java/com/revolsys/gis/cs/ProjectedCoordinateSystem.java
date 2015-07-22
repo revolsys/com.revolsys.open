@@ -10,7 +10,7 @@ import java.util.TreeMap;
 import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.gis.cs.projection.CoordinatesProjection;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.jts.geom.BoundingBox;
@@ -100,13 +100,13 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
       return true;
     } else if (object instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem cs = (ProjectedCoordinateSystem)object;
-      if (!EqualsRegistry.equal(this.geographicCoordinateSystem, cs.geographicCoordinateSystem)) {
+      if (!Equals.equal(this.geographicCoordinateSystem, cs.geographicCoordinateSystem)) {
         return false;
-      } else if (!EqualsRegistry.equal(this.projection, cs.projection)) {
+      } else if (!Equals.equal(this.projection, cs.projection)) {
         return false;
-      } else if (!EqualsRegistry.equal(this.normalizedParameters, cs.normalizedParameters)) {
+      } else if (!Equals.equal(this.normalizedParameters, cs.normalizedParameters)) {
         return false;
-      } else if (!EqualsRegistry.equal(this.linearUnit, cs.linearUnit)) {
+      } else if (!Equals.equal(this.linearUnit, cs.linearUnit)) {
         return false;
       } else {
         return true;
@@ -127,19 +127,19 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
         return false;
       } else if (!this.authority.equals(cs.authority)) {
         return false;
-      } else if (!EqualsRegistry.equal(this.axis, cs.axis)) {
+      } else if (!Equals.equal(this.axis, cs.axis)) {
         return false;
       } else if (!this.geographicCoordinateSystem.equals(cs.geographicCoordinateSystem)) {
         return false;
       } else if (this.id != cs.id) {
         return false;
-      } else if (!EqualsRegistry.equal(this.linearUnit, cs.linearUnit)) {
+      } else if (!Equals.equal(this.linearUnit, cs.linearUnit)) {
         return false;
-      } else if (!EqualsRegistry.equal(this.name, cs.name)) {
+      } else if (!Equals.equal(this.name, cs.name)) {
         return false;
-      } else if (!EqualsRegistry.equal(this.normalizedParameters, cs.normalizedParameters)) {
+      } else if (!Equals.equal(this.normalizedParameters, cs.normalizedParameters)) {
         return false;
-      } else if (!EqualsRegistry.equal(this.projection, cs.projection)) {
+      } else if (!Equals.equal(this.projection, cs.projection)) {
         return false;
       } else {
         return true;

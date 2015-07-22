@@ -2,7 +2,7 @@ package com.revolsys.swing.field;
 
 import javax.swing.JComponent;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.UndoManager;
 
@@ -39,7 +39,7 @@ public class SetFieldValueUndoableEdit extends AbstractUndoableEdit {
   public boolean canRedo() {
     if (super.canRedo()) {
       final Object value = this.field.getFieldValue();
-      if (EqualsRegistry.equal(value, this.oldValue)) {
+      if (Equals.equal(value, this.oldValue)) {
         return true;
       }
     }
@@ -50,7 +50,7 @@ public class SetFieldValueUndoableEdit extends AbstractUndoableEdit {
   public boolean canUndo() {
     if (super.canUndo()) {
       final Object value = this.field.getFieldValue();
-      if (EqualsRegistry.equal(value, this.newValue)) {
+      if (Equals.equal(value, this.newValue)) {
         return true;
       }
     }

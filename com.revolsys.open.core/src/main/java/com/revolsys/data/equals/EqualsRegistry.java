@@ -3,7 +3,6 @@ package com.revolsys.data.equals;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -16,19 +15,6 @@ import com.revolsys.data.record.Record;
 import com.revolsys.jts.geom.Geometry;
 
 public class EqualsRegistry implements Equals<Object> {
-
-  public static boolean equal(final Object object1, final Object object2) {
-    return EqualsInstance.INSTANCE.equals(object1, object2);
-  }
-
-  public static boolean equal(final Object object1, final Object object2,
-    final Collection<String> exclude) {
-    return EqualsInstance.INSTANCE.equals(object1, object2, exclude);
-  }
-
-  public static boolean equal(final Object object1, final Object object2, final String... exclude) {
-    return equal(object1, object2, Arrays.asList(exclude));
-  }
 
   private final Map<Class<?>, Equals<?>> classEqualsMap = new HashMap<Class<?>, Equals<?>>();
 

@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.QueryValue;
 import com.revolsys.data.record.schema.RecordStore;
@@ -72,14 +72,14 @@ public class Function extends QueryValue {
   public boolean equals(final Object obj) {
     if (obj instanceof Function) {
       final Function value = (Function)obj;
-      if (EqualsRegistry.equal(getName(), value.getName())) {
+      if (Equals.equal(getName(), value.getName())) {
         final List<QueryValue> parameters1 = getParameters();
         final List<QueryValue> parameters2 = value.getParameters();
         if (parameters1.size() == parameters2.size()) {
           for (int i = 0; i < parameters1.size(); i++) {
             final QueryValue value1 = parameters1.get(i);
             final QueryValue value2 = parameters2.get(i);
-            if (!EqualsRegistry.equal(value1, value2)) {
+            if (!Equals.equal(value1, value2)) {
               return false;
             }
           }

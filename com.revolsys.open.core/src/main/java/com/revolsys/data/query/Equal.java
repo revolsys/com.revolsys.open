@@ -2,7 +2,7 @@ package com.revolsys.data.query;
 
 import java.util.Map;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 
 public class Equal extends BinaryCondition {
 
@@ -23,7 +23,7 @@ public class Equal extends BinaryCondition {
     final QueryValue right = getRight();
     final Object value2 = right.getValue(record);
 
-    return EqualsRegistry.equal(value1, value2);
+    return Equals.equal(value1, value2);
   }
 
 }

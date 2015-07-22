@@ -10,7 +10,7 @@ import javax.swing.JFormattedTextField;
 import org.jdesktop.swingx.JXDatePicker;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Property;
@@ -142,10 +142,10 @@ public class DateField extends JXDatePicker implements Field, PropertyChangeList
   public void setFieldValue(final Object value) {
     final Date oldValue = this.fieldValue;
     final Date date = StringConverterRegistry.toObject(Date.class, value);
-    if (!EqualsRegistry.equal(getDate(), date)) {
+    if (!Equals.equal(getDate(), date)) {
       setDate(date);
     }
-    if (!EqualsRegistry.equal(oldValue, date)) {
+    if (!Equals.equal(oldValue, date)) {
       this.fieldValue = date;
       firePropertyChange(this.fieldName, oldValue, date);
       SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this, oldValue, date);

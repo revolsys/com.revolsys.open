@@ -6,8 +6,8 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.equals.EqualsInstance;
-import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;
@@ -166,7 +166,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
         final Identifier otherId = record.getIdentifier();
         if (id == null || otherId == null) {
           return false;
-        } else if (EqualsRegistry.equal(id, otherId)) {
+        } else if (Equals.equal(id, otherId)) {
           return true;
         } else {
           return false;
@@ -266,7 +266,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
       } else {
         if (layer.isCanEditRecords()) {
           final Object originalValue = getOriginalValue(fieldName);
-          if (EqualsRegistry.equal(value, originalValue)) {
+          if (Equals.equal(value, originalValue)) {
             if (this.originalValues != null) {
               this.originalValues.remove(fieldName);
               if (this.originalValues.isEmpty()) {

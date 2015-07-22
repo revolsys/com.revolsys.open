@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.QueryValue;
@@ -70,8 +70,8 @@ public class EnvelopeIntersects extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof EnvelopeIntersects) {
       final EnvelopeIntersects condition = (EnvelopeIntersects)obj;
-      if (EqualsRegistry.equal(condition.boundingBox1Value, this.boundingBox1Value)) {
-        if (EqualsRegistry.equal(condition.boundingBox2Value, this.boundingBox1Value)) {
+      if (Equals.equal(condition.boundingBox1Value, this.boundingBox1Value)) {
+        if (Equals.equal(condition.boundingBox2Value, this.boundingBox1Value)) {
           return true;
         }
       }

@@ -3,7 +3,7 @@ package com.revolsys.collection.range;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Numbers;
 
@@ -83,9 +83,9 @@ public abstract class AbstractRange<V>
       final AbstractRange<?> range = (AbstractRange<?>)other;
       final V from = getFrom();
       final Object rangeFrom = range.getFrom();
-      if (!EqualsRegistry.equal(from, rangeFrom)) {
+      if (!Equals.equal(from, rangeFrom)) {
         return false;
-      } else if (!EqualsRegistry.equal(getTo(), range.getTo())) {
+      } else if (!Equals.equal(getTo(), range.getTo())) {
         return false;
       } else {
         return true;
@@ -128,7 +128,7 @@ public abstract class AbstractRange<V>
       } else if (compareToValue(rangeFrom) > 0) {
         return createNew(from, rangeTo);
       } else
-        if (EqualsRegistry.equal(to, previous(rangeFrom)) || EqualsRegistry.equal(to, rangeFrom)) {
+        if (Equals.equal(to, previous(rangeFrom)) || Equals.equal(to, rangeFrom)) {
         return createNew(from, rangeTo);
       }
     } else if (fromCompare > 0) {
@@ -137,7 +137,7 @@ public abstract class AbstractRange<V>
       } else if (compareFromValue(rangeTo) < 0) {
         return createNew(rangeFrom, to);
       } else
-        if (EqualsRegistry.equal(previous(from), rangeTo) || EqualsRegistry.equal(from, rangeTo)) {
+        if (Equals.equal(previous(from), rangeTo) || Equals.equal(from, rangeTo)) {
         return createNew(rangeFrom, to);
       }
     }

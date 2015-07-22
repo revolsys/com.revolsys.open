@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.record.schema.RecordStore;
 
 public class ParenthesisCondition extends Condition {
@@ -40,7 +40,7 @@ public class ParenthesisCondition extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof ParenthesisCondition) {
       final ParenthesisCondition condition = (ParenthesisCondition)obj;
-      if (EqualsRegistry.equal(condition.getCondition(), this.getCondition())) {
+      if (Equals.equal(condition.getCondition(), this.getCondition())) {
         return true;
       }
     }

@@ -14,8 +14,8 @@ import com.revolsys.comparator.StringNumberComparator;
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.equals.EqualsInstance;
-import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -457,7 +457,7 @@ public final class Records {
       value = value2;
     } else if (!Property.hasValue(value2)) {
       value = value1;
-    } else if (EqualsRegistry.equal(value1, value2)) {
+    } else if (Equals.equal(value1, value2)) {
       value = value1;
     } else {
       final Set<String> values = new TreeSet<>(new StringNumberComparator());
@@ -477,7 +477,7 @@ public final class Records {
       value = value2;
     } else if (!Property.hasValue(value2)) {
       value = value1;
-    } else if (EqualsRegistry.equal(value1, value2)) {
+    } else if (Equals.equal(value1, value2)) {
       value = value1;
     } else {
       value = value1 + separator + value2;

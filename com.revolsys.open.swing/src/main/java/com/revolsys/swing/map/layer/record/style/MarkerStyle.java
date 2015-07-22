@@ -20,7 +20,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.SpringUtil;
@@ -539,7 +539,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
         if (DEFAULT_VALUES.containsKey(name)) {
           Object defaultValue = DEFAULT_VALUES.get(name);
           defaultValue = getValue(name, defaultValue);
-          defaultEqual = EqualsRegistry.equal(defaultValue, value);
+          defaultEqual = Equals.equal(defaultValue, value);
         }
         if (!defaultEqual) {
           MapSerializerUtil.add(map, name, value);

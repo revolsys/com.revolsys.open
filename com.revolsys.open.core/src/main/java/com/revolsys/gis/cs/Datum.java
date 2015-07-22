@@ -2,7 +2,7 @@ package com.revolsys.gis.cs;
 
 import java.io.Serializable;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 
 public class Datum implements Serializable {
   /**
@@ -49,7 +49,7 @@ public class Datum implements Serializable {
   public boolean equals(final Object object) {
     if (object instanceof Datum) {
       final Datum datum = (Datum)object;
-      if (EqualsRegistry.equal(this.authority, datum.getAuthority())) {
+      if (Equals.equal(this.authority, datum.getAuthority())) {
         return true;
       } else if (this.name == null) {
         if (datum.name != null) {
@@ -57,7 +57,7 @@ public class Datum implements Serializable {
         }
         // } else if (!name.equalsIgnoreCase(datum.name)) {
         // return false;
-      } else if (!EqualsRegistry.equal(this.spheroid, datum.spheroid)) {
+      } else if (!Equals.equal(this.spheroid, datum.spheroid)) {
         return false;
       } else {
         return true;
@@ -67,11 +67,11 @@ public class Datum implements Serializable {
   }
 
   public boolean equalsExact(final Datum datum) {
-    if (!EqualsRegistry.equal(this.authority, datum.authority)) {
+    if (!Equals.equal(this.authority, datum.authority)) {
       return false;
     } else if (this.deprecated != datum.deprecated) {
       return false;
-    } else if (!EqualsRegistry.equal(this.name, datum.name)) {
+    } else if (!Equals.equal(this.name, datum.name)) {
       return false;
     } else if (!this.primeMeridian.equalsExact(this.primeMeridian)) {
       return false;

@@ -7,7 +7,7 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.InvokeMethodAction;
@@ -204,7 +204,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
     for (int i = 0; i < pathSize; i++) {
       final String name = path.get(i);
       final String rendererName = renderer.getName();
-      if (EqualsRegistry.equal(name, rendererName)) {
+      if (Equals.equal(name, rendererName)) {
         if (i < pathSize - 1) {
           final String childName = path.get(i + 1);
           if (renderer instanceof AbstractMultipleRenderer) {
@@ -224,7 +224,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
     if (Property.hasValue(name)) {
       for (final LayerRenderer<?> renderer : this.renderers) {
         final String rendererName = renderer.getName();
-        if (EqualsRegistry.equal(name, rendererName)) {
+        if (Equals.equal(name, rendererName)) {
           return (V)renderer;
         }
       }

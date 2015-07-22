@@ -1,6 +1,6 @@
 package com.revolsys.swing.undo;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.util.Property;
 
 public class SetObjectProperty extends AbstractUndoableEdit {
@@ -26,7 +26,7 @@ public class SetObjectProperty extends AbstractUndoableEdit {
   public boolean canRedo() {
     if (super.canRedo()) {
       final Object value = Property.get(this.object, this.propertyName);
-      if (EqualsRegistry.equal(value, this.oldValue)) {
+      if (Equals.equal(value, this.oldValue)) {
         return true;
       }
     }
@@ -37,7 +37,7 @@ public class SetObjectProperty extends AbstractUndoableEdit {
   public boolean canUndo() {
     if (super.canUndo()) {
       final Object value = Property.get(this.object, this.propertyName);
-      if (EqualsRegistry.equal(value, this.newValue)) {
+      if (Equals.equal(value, this.newValue)) {
         return true;
       }
     }

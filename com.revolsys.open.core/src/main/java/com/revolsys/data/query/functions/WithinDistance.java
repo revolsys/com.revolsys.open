@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.QueryValue;
@@ -76,9 +76,9 @@ public class WithinDistance extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof WithinDistance) {
       final WithinDistance condition = (WithinDistance)obj;
-      if (EqualsRegistry.equal(condition.geometry1Value, this.geometry1Value)) {
-        if (EqualsRegistry.equal(condition.geometry2Value, this.geometry1Value)) {
-          if (EqualsRegistry.equal(condition.distanceValue, this.distanceValue)) {
+      if (Equals.equal(condition.geometry1Value, this.geometry1Value)) {
+        if (Equals.equal(condition.geometry2Value, this.geometry1Value)) {
+          if (Equals.equal(condition.distanceValue, this.distanceValue)) {
             return true;
           }
         }

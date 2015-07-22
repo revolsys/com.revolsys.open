@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import com.revolsys.collection.MultiIterator;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.jts.geom.End;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
@@ -247,7 +247,7 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Cl
   public boolean equalEnd(final RangeSet ranges, final End end) {
     final Object value1 = getEndValue(end);
     final Object value2 = ranges.getEndValue(end);
-    return EqualsRegistry.equal(value1, value2);
+    return Equals.equal(value1, value2);
   }
 
   public Object getEndValue(final End end) {
@@ -285,8 +285,8 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Cl
       if (range.contains(value)) {
         final Object from = range.getFrom();
         final Object to = range.getTo();
-        if (EqualsRegistry.equal(from, value)) {
-          if (EqualsRegistry.equal(to, value)) {
+        if (Equals.equal(from, value)) {
+          if (Equals.equal(to, value)) {
             iterator.remove();
           } else {
             final Object next = range.next(value);
@@ -295,7 +295,7 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Cl
           }
           this.size--;
           return true;
-        } else if (EqualsRegistry.equal(to, value)) {
+        } else if (Equals.equal(to, value)) {
           final Object previous = range.previous(value);
           final AbstractRange<?> newRange = range.createNew(from, previous);
           iterator.set(newRange);

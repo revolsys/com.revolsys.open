@@ -5,7 +5,7 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.Property;
@@ -51,7 +51,7 @@ public class MenuSourcePropertyEnableCheck extends AbstractEnableCheck {
     } else {
       try {
         final Object value = Property.get(object, this.propertyName);
-        if (this.inverse != EqualsRegistry.equal(value, this.value)) {
+        if (this.inverse != Equals.equal(value, this.value)) {
           return enabled();
         } else {
           return disabled();

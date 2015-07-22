@@ -3,7 +3,7 @@ package com.revolsys.swing.action.enablecheck;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.util.Property;
 
 public class ObjectPropertyEnableCheck extends AbstractEnableCheck {
@@ -36,7 +36,7 @@ public class ObjectPropertyEnableCheck extends AbstractEnableCheck {
   @Override
   public boolean isEnabled() {
     final Object value = Property.get(this.object.get(), this.propertyName);
-    final boolean equal = EqualsRegistry.equal(value, this.value);
+    final boolean equal = Equals.equal(value, this.value);
     if (equal == !this.inverse) {
       return enabled();
     } else {

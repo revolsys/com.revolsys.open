@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.record.schema.RecordStore;
 
 public class LeftUnaryCondition extends Condition {
@@ -42,8 +42,8 @@ public class LeftUnaryCondition extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof LeftUnaryCondition) {
       final LeftUnaryCondition value = (LeftUnaryCondition)obj;
-      if (EqualsRegistry.equal(value.getQueryValue(), this.getQueryValue())) {
-        if (EqualsRegistry.equal(value.getOperator(), this.getOperator())) {
+      if (Equals.equal(value.getQueryValue(), this.getQueryValue())) {
+        if (Equals.equal(value.getOperator(), this.getOperator())) {
           return true;
         }
       }

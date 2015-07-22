@@ -46,7 +46,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.filter.RecordGeometryBoundingBoxIntersectsFilter;
 import com.revolsys.data.filter.RecordGeometryDistanceFilter;
 import com.revolsys.data.identifier.Identifier;
@@ -1960,7 +1960,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         if (source instanceof LayerRecord) {
           final LayerRecord record = (LayerRecord)source;
           if (record.getLayer() == this) {
-            if (EqualsRegistry.equal(propertyName, getGeometryFieldName())) {
+            if (Equals.equal(propertyName, getGeometryFieldName())) {
               final Geometry oldGeometry = (Geometry)event.getOldValue();
               updateSpatialIndex(record, oldGeometry);
               clearSelectedRecordsIndex();

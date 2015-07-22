@@ -2,7 +2,7 @@ package com.revolsys.gis.cs;
 
 import java.io.Serializable;
 
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class Area implements Serializable {
@@ -31,7 +31,7 @@ public class Area implements Serializable {
   public boolean equals(final Object obj) {
     if (obj instanceof Area) {
       final Area area = (Area)obj;
-      if (!EqualsRegistry.equal(this.latLonBounds, area.latLonBounds)) {
+      if (!Equals.equal(this.latLonBounds, area.latLonBounds)) {
         return false;
       } else {
         return true;

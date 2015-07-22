@@ -11,7 +11,7 @@ import java.util.Map;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.codes.CodeTableProperty;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -108,7 +108,7 @@ public class Value extends QueryValue {
   public boolean equals(final Object obj) {
     if (obj instanceof Value) {
       final Value value = (Value)obj;
-      return EqualsRegistry.equal(value.getValue(), this.getValue());
+      return Equals.equal(value.getValue(), this.getValue());
     } else {
       return false;
     }

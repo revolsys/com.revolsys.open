@@ -22,7 +22,7 @@ import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
-import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.Equals;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.jts.geom.BoundingBox;
@@ -563,7 +563,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
    * @param coordinateSystem The coordinate system the project is displayed in.
    */
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    if (!EqualsRegistry.equal(this.geometryFactory, geometryFactory)) {
+    if (!Equals.equal(this.geometryFactory, geometryFactory)) {
       final GeometryFactory oldGeometryFactory = this.geometryFactory;
       this.geometryFactory = geometryFactory;
       if (geometryFactory == null) {
