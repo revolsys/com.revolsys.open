@@ -36,8 +36,12 @@ public class Maps {
 
   public static <K1, V> boolean addToList(final Map<K1, List<V>> map, final K1 key1,
     final V value) {
-    final List<V> values = getList(map, key1);
-    return values.add(value);
+    if (map != null && key1 != null) {
+      final List<V> values = getList(map, key1);
+      return values.add(value);
+    } else {
+      return false;
+    }
   }
 
   public static <K1, K2, V> boolean addToList(final Map<K1, Map<K2, List<V>>> map, final K1 key1,
@@ -179,6 +183,15 @@ public class Maps {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  public static <K, V> V get(final Map<K, ? extends Object> map, final K key) {
+    if (map == null) {
+      return null;
+    } else {
+      return (V)map.get(key);
+    }
+  }
+
   public static <K, V> V get(final Map<K, V> map, final K key,
     final Function<K, V> defaultFactory) {
     V value = map.get(key);
@@ -187,14 +200,6 @@ public class Maps {
       map.put(key, value);
     }
     return value;
-  }
-
-  public static Object get(final Map<String, ? extends Object> map, final String name) {
-    if (map == null) {
-      return null;
-    } else {
-      return map.get(name);
-    }
   }
 
   @SuppressWarnings({

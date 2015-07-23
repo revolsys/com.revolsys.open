@@ -3,12 +3,22 @@ package com.revolsys.util;
 public class Numbers {
 
   public static boolean between(final int min, final int value, final int max) {
-    if (value < min) {
-      return false;
-    } else if (value > max) {
-      return false;
+    if (min > max) {
+      if (value < max) {
+        return false;
+      } else if (value > min) {
+        return false;
+      } else {
+        return true;
+      }
     } else {
-      return true;
+      if (value < min) {
+        return false;
+      } else if (value > max) {
+        return false;
+      } else {
+        return true;
+      }
     }
   }
 
@@ -56,6 +66,14 @@ public class Numbers {
       return 18;
     } else {
       return 19;
+    }
+  }
+
+  public static boolean greaterThan(final Integer number, final int min) {
+    if (number == null) {
+      return false;
+    } else {
+      return number > min;
     }
   }
 
@@ -150,6 +168,48 @@ public class Numbers {
       return number1;
     } else {
       return number2;
+    }
+  }
+
+  public static double ratio(final Number number, final Number from, final Number to) {
+    if (number == null) {
+      return Double.MAX_VALUE;
+    } else {
+      final long numberLong = number.longValue();
+      if (from == null) {
+        if (to == null) {
+          return Double.MAX_VALUE;
+        } else {
+          final long toLong = to.longValue();
+          if (toLong < numberLong) {
+            return numberLong - toLong;
+          } else {
+            return 1.0 + (toLong - numberLong);
+          }
+        }
+      } else if (to == null) {
+        final long fromLong = from.longValue();
+        if (fromLong < numberLong) {
+          return numberLong - fromLong;
+        } else {
+          return 1.0 + (fromLong - numberLong);
+        }
+      } else {
+        final long fromLong = from.longValue();
+        final long toLong = to.longValue();
+        if (fromLong == numberLong) {
+          return 0;
+        } else if (to == number) {
+          return 1;
+        } else {
+          final double delta = Math.abs(toLong - fromLong);
+          if (fromLong <= toLong) {
+            return (numberLong - fromLong) / delta;
+          } else {
+            return 1 - (numberLong - toLong) / delta;
+          }
+        }
+      }
     }
   }
 

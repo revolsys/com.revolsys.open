@@ -1,25 +1,40 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <artifactId>com.revolsys.open.parent</artifactId>
-    <groupId>com.revolsys.open</groupId>
-    <version>TRUNK-SNAPSHOT</version>
-  </parent>
-  <artifactId>com.revolsys.open.doclet</artifactId>
-  <name>RS Doclet</name>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>com.revolsys.open.parent</artifactId>
+		<groupId>com.revolsys.open</groupId>
+		<version>TRUNK-SNAPSHOT</version>
+	</parent>
+	<artifactId>com.revolsys.open.doclet</artifactId>
+	<name>RS Doclet</name>
 
-  <dependencies>
-    <dependency>
-      <groupId>com.revolsys.open</groupId>
-      <artifactId>com.revolsys.open.core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>sun.jdk</groupId>
-      <artifactId>tools</artifactId>
-      <version>1.8.0</version>
-      <scope>system</scope>
-      <systemPath>${java.home}/../lib/tools.jar</systemPath>
-    </dependency>
-  </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>com.revolsys.open</groupId>
+			<artifactId>com.revolsys.open.core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>sun.jdk</groupId>
+			<artifactId>tools</artifactId>
+			<version>1.8.0</version>
+			<scope>system</scope>
+			<systemPath>${com.sun.tools.path}</systemPath>
+		</dependency>
+	</dependencies>
+	<profiles>
+		<profile>
+			<id>sun-tools</id>
+			<activation>
+			<file><exists>C:\Program Files\Java\jdk1.8.0\lib\tools.jar</exists></file>
+			</activation>
+			<properties>
+				<com.sun.tools.path>C:\Program Files\Java\jdk1.8.0\lib\tools.jar</com.sun.tools.path>
+			</properties>
+		</profile>
+	</profiles>
+	<properties>
+		<com.sun.tools.path>${java.home}/../lib/tools.jar</com.sun.tools.path>
+	</properties>
 </project>

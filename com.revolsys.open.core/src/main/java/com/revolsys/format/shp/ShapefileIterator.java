@@ -99,7 +99,7 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
           this.in = new EndianInputStream(this.resource.getInputStream());
         }
 
-        final Resource xbaseResource = this.resource.createRelative(this.name + ".dbf");
+        final Resource xbaseResource = SpringUtil.getResourceWithExtension(this.resource, "dbf");
         if (xbaseResource.exists()) {
           this.xbaseIterator = new XbaseIterator(xbaseResource, this.recordDefinitionFactory,
             () -> updateRecordDefinition());
