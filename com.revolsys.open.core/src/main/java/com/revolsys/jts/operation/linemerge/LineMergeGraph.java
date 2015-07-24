@@ -32,6 +32,7 @@
  */
 package com.revolsys.jts.operation.linemerge;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.util.CleanDuplicatePoints;
@@ -86,5 +87,18 @@ public class LineMergeGraph extends PlanarGraph {
     }
 
     return node;
+  }
+
+  public void removeEdge(final LineString line) {
+    final Point point = line.getFromPoint();
+    final Node node = findNode(point);
+    if (node != null) {
+      for (final DirectedEdge outEdge : Lists.array(node.getOutEdges())) {
+        final LineMergeEdge edge = (LineMergeEdge)outEdge.getEdge();
+        if (line.equals(edge.getLine())) {
+          remove(edge);
+        }
+      }
+    }
   }
 }

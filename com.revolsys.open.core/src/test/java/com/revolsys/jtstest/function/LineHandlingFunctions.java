@@ -37,11 +37,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.gis.graph.linemerge.LineMerger;
 import com.revolsys.jts.dissolve.LineDissolver;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.jts.operation.linemerge.LineSequencer;
 
 public class LineHandlingFunctions {
@@ -99,7 +99,7 @@ public class LineHandlingFunctions {
   public static Geometry mergeLines(final Geometry g) {
     final LineMerger merger = new LineMerger();
     merger.add(g);
-    final Collection lines = merger.getMergedLineStrings();
+    final Collection<LineString> lines = merger.getMergedLineStrings();
     return g.getGeometryFactory().buildGeometry(lines);
   }
 

@@ -46,12 +46,12 @@ import com.revolsys.jts.geom.Point;
  *
  * @version 1.7
  */
-public class DirectedEdgeStar {
+public class DirectedEdgeStar implements Iterable<DirectedEdge> {
 
   /**
    * The underlying list of outgoing DirectedEdges
    */
-  protected List outEdges = new ArrayList();
+  protected List<DirectedEdge> outEdges = new ArrayList<>();
 
   private boolean sorted = false;
 
@@ -73,11 +73,11 @@ public class DirectedEdgeStar {
    * Returns the coordinate for the node at wich this star is based
    */
   public Point getCoordinate() {
-    final Iterator it = iterator();
+    final Iterator<DirectedEdge> it = iterator();
     if (!it.hasNext()) {
       return null;
     }
-    final DirectedEdge e = (DirectedEdge)it.next();
+    final DirectedEdge e = it.next();
     return e.getCoordinate();
   }
 
@@ -91,7 +91,7 @@ public class DirectedEdgeStar {
   /**
    * Returns the DirectedEdges, in ascending order by angle with the positive x-axis.
    */
-  public List getEdges() {
+  public List<DirectedEdge> getEdges() {
     sortEdges();
     return this.outEdges;
   }
@@ -103,7 +103,7 @@ public class DirectedEdgeStar {
   public int getIndex(final DirectedEdge dirEdge) {
     sortEdges();
     for (int i = 0; i < this.outEdges.size(); i++) {
-      final DirectedEdge de = (DirectedEdge)this.outEdges.get(i);
+      final DirectedEdge de = this.outEdges.get(i);
       if (de == dirEdge) {
         return i;
       }
@@ -118,7 +118,7 @@ public class DirectedEdgeStar {
   public int getIndex(final Edge edge) {
     sortEdges();
     for (int i = 0; i < this.outEdges.size(); i++) {
-      final DirectedEdge de = (DirectedEdge)this.outEdges.get(i);
+      final DirectedEdge de = this.outEdges.get(i);
       if (de.getEdge() == edge) {
         return i;
       }
@@ -149,7 +149,7 @@ public class DirectedEdgeStar {
    */
   public DirectedEdge getNextCWEdge(final DirectedEdge dirEdge) {
     final int i = getIndex(dirEdge);
-    return (DirectedEdge)this.outEdges.get(getIndex(i - 1));
+    return this.outEdges.get(getIndex(i - 1));
   }
 
   /**
@@ -159,13 +159,14 @@ public class DirectedEdgeStar {
    */
   public DirectedEdge getNextEdge(final DirectedEdge dirEdge) {
     final int i = getIndex(dirEdge);
-    return (DirectedEdge)this.outEdges.get(getIndex(i + 1));
+    return this.outEdges.get(getIndex(i + 1));
   }
 
   /**
    * Returns an Iterator over the DirectedEdges, in ascending order by angle with the positive x-axis.
    */
-  public Iterator iterator() {
+  @Override
+  public Iterator<DirectedEdge> iterator() {
     sortEdges();
     return this.outEdges.iterator();
   }

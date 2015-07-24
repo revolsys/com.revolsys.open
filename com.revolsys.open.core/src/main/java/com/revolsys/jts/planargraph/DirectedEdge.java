@@ -52,15 +52,15 @@ import com.revolsys.jts.geomgraph.Quadrant;
  *
  * @version 1.7
  */
-public class DirectedEdge extends GraphComponent implements Comparable {
+public class DirectedEdge extends GraphComponent implements Comparable<DirectedEdge> {
   /**
    * Returns a List containing the parent Edge (possibly null) for each of the given
    * DirectedEdges.
    */
-  public static List toEdges(final Collection dirEdges) {
-    final List edges = new ArrayList();
-    for (final Iterator i = dirEdges.iterator(); i.hasNext();) {
-      edges.add(((DirectedEdge)i.next()).parentEdge);
+  public static List<Edge> toEdges(final Collection<DirectedEdge> dirEdges) {
+    final List<Edge> edges = new ArrayList<Edge>();
+    for (final Iterator<DirectedEdge> i = dirEdges.iterator(); i.hasNext();) {
+      edges.add(i.next().parentEdge);
     }
     return edges;
   }
@@ -180,8 +180,7 @@ public class DirectedEdge extends GraphComponent implements Comparable {
    * </ul>
    */
   @Override
-  public int compareTo(final Object obj) {
-    final DirectedEdge de = (DirectedEdge)obj;
+  public int compareTo(final DirectedEdge de) {
     return compareDirection(de);
   }
 

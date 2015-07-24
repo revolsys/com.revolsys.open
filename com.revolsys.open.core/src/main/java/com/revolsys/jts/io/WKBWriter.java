@@ -90,86 +90,86 @@ import com.revolsys.jts.util.Assert;
  * abstract Point { }
  *
  * Point2D extends Point {
- * 	<b>double</b> x;
- * 	<b>double</b> y;
+ *  <b>double</b> x;
+ *  <b>double</b> y;
  * }
  *
  * Point3D extends Point {
- * 	<b>double</b> x;
- * 	<b>double</b> y;
- * 	<b>double</b> z;
+ *  <b>double</b> x;
+ *  <b>double</b> y;
+ *  <b>double</b> z;
  * }
  *
  * LinearRing {
- * 	<b>uint32</b> numPoints;
- * 	Point points[numPoints];
+ *  <b>uint32</b> numPoints;
+ *  Point points[numPoints];
  * }
  *
  * enum wkbGeometryType {
- * 	wkbPoint = 1,
- * 	wkbLineString = 2,
- * 	wkbPolygon = 3,
- * 	wkbMultiPoint = 4,
- * 	wkbMultiLineString = 5,
- * 	wkbMultiPolygon = 6,
- * 	wkbGeometryCollection = 7
+ *  wkbPoint = 1,
+ *  wkbLineString = 2,
+ *  wkbPolygon = 3,
+ *  wkbMultiPoint = 4,
+ *  wkbMultiLineString = 5,
+ *  wkbMultiPolygon = 6,
+ *  wkbGeometryCollection = 7
  * }
  *
  * enum byteOrder {
- * 	wkbXDR = 0,	// Big Endian
- * 	wkbNDR = 1 	// Little Endian
+ *  wkbXDR = 0, // Big Endian
+ *  wkbNDR = 1  // Little Endian
  * }
  *
  * WKBType {
- * 	<b>uint32</b> wkbGeometryType : 8; // values from enum wkbGeometryType
+ *  <b>uint32</b> wkbGeometryType : 8; // values from enum wkbGeometryType
  * }
  *
  * EWKBType {
- * 	<b>uint32</b> is3D : 1; 	// 0 = 2D, 1 = 3D
- * 	<b>uint32</b> noData1 : 1;
- * 	<b>uint32</b> hasSRID : 1;  	// 0, no, 1 = yes
- * 	<b>uint32</b> noData2 : 21;
- * 	<b>uint32</b> wkbGeometryType : 8; // values from enum wkbGeometryType
+ *  <b>uint32</b> is3D : 1;  // 0 = 2D, 1 = 3D
+ *  <b>uint32</b> noData1 : 1;
+ *  <b>uint32</b> hasSRID : 1;   // 0, no, 1 = yes
+ *  <b>uint32</b> noData2 : 21;
+ *  <b>uint32</b> wkbGeometryType : 8; // values from enum wkbGeometryType
  * }
  *
  * abstract WKBGeometry {
- * 	<b>byte</b> byteOrder;		// values from enum byteOrder
- * 	EWKBType wkbType
- * 	[ <b>uint32</b> srid; ] 	// only if hasSRID = yes
+ *  <b>byte</b> byteOrder;  // values from enum byteOrder
+ *  EWKBType wkbType
+ *  [ <b>uint32</b> srid; ]  // only if hasSRID = yes
  * }
  *
  * WKBPoint extends WKBGeometry {
- * 	Point point;
+ *  Point point;
  * }
  *
  * WKBLineString extends WKBGeometry {
- * 	<b>uint32</b> numCoords;
- * 	Point points[numCoords];
+ *  <b>uint32</b> numCoords;
+ *  Point points[numCoords];
  * }
  *
  * WKBPolygon extends WKBGeometry {
- * 	<b>uint32</b> numRings;
- * 	LinearRing rings[numRings];
+ *  <b>uint32</b> numRings;
+ *  LinearRing rings[numRings];
  * }
  *
  * WKBMultiPoint extends WKBGeometry {
- * 	<b>uint32</b> numElems;
- * 	WKBPoint elems[numElems];
+ *  <b>uint32</b> numElems;
+ *  WKBPoint elems[numElems];
  * }
  *
  * WKBMultiLineString extends WKBGeometry {
- * 	<b>uint32</b> numElems;
- * 	WKBLineString elems[numElems];
+ *  <b>uint32</b> numElems;
+ *  WKBLineString elems[numElems];
  * }
  *
  * wkbMultiPolygon extends WKBGeometry {
- * 	<b>uint32</b> numElems;
- * 	WKBPolygon elems[numElems];
+ *  <b>uint32</b> numElems;
+ *  WKBPolygon elems[numElems];
  * }
  *
  * WKBGeometryCollection extends WKBGeometry {
- * 	<b>uint32</b> numElems;
- * 	WKBGeometry elems[numElems];
+ *  <b>uint32</b> numElems;
+ *  WKBGeometry elems[numElems];
  * }
  *
  * </pre></blockquote>

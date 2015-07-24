@@ -64,7 +64,7 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
 
   @Override
   public RecordWriter createRecordWriter(final RecordDefinition recordDefinition, final Path path) {
-    return new CsvRecordWriter(recordDefinition, path, Tsv.FIELD_SEPARATOR, false, true);
+    return new CsvRecordWriter(recordDefinition, path, Tsv.FIELD_SEPARATOR, true, true);
   }
 
   @Override
@@ -73,6 +73,6 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
     final Charset charset) {
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream, charset);
 
-    return new CsvRecordWriter(recordDefinition, writer, Tsv.FIELD_SEPARATOR, false, true);
+    return new CsvRecordWriter(recordDefinition, writer, Tsv.FIELD_SEPARATOR, true, true);
   }
 }

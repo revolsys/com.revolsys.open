@@ -84,6 +84,14 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
     getRecordDefinition().delete(this);
   }
 
+  default boolean equalValue(final Record otherRecord, final String fieldName) {
+    if (otherRecord != null) {
+      final Object value = getValue(fieldName);
+      return otherRecord.equalValue(fieldName, value);
+    }
+    return false;
+  }
+
   default boolean equalValue(final String fieldName, final Object value) {
     final Object fieldValue = getValue(fieldName);
     return Equals.equal(fieldValue, value);

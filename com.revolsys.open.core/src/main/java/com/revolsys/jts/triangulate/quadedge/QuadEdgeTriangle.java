@@ -118,7 +118,7 @@ public class QuadEdgeTriangle {
    * This allows tracing the neighbour triangles of any given triangle.
    *
    * @param subdiv
-   * 				the QuadEdgeSubdivision to create the triangles on.
+   * the QuadEdgeSubdivision to create the triangles on.
    * @return a List of the created QuadEdgeTriangles
    */
   public static List createOn(final QuadEdgeSubdivision subdiv) {

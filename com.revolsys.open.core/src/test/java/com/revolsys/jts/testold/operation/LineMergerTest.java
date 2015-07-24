@@ -36,13 +36,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import com.revolsys.gis.graph.linemerge.LineMerger;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.jts.util.Assert;
 
-import junit.framework.TestCase;
 import junit.framework.TestCase;
 
 /**

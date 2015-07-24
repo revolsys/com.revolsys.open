@@ -34,6 +34,12 @@ public class Maps {
     return count;
   }
 
+  public static <K, V, C extends Collection<V>> boolean addToCollection(final Supplier<C> supplier,
+    final Map<K, C> map, final K key, final V value) {
+    final C values = get(map, key, supplier);
+    return values.add(value);
+  }
+
   public static <K1, V> boolean addToList(final Map<K1, List<V>> map, final K1 key1,
     final V value) {
     if (map != null && key1 != null) {
@@ -197,6 +203,15 @@ public class Maps {
     V value = map.get(key);
     if (value == null) {
       value = defaultFactory.apply(key);
+      map.put(key, value);
+    }
+    return value;
+  }
+
+  public static <K, V> V get(final Map<K, V> map, final K key, final Supplier<V> defaultFactory) {
+    V value = map.get(key);
+    if (value == null) {
+      value = defaultFactory.get();
       map.put(key, value);
     }
     return value;

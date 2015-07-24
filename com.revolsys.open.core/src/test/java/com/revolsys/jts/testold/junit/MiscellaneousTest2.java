@@ -118,9 +118,7 @@ public class MiscellaneousTest2 extends TestCase {
       new Node(new PointDouble((double)20, 0, Point.NULL_ORDINATE)),
       new Node(new PointDouble((double)20, 10, Point.NULL_ORDINATE)),
       new PointDouble((double)20, 10, Point.NULL_ORDINATE), false);
-    final List edges = DirectedEdge.toEdges(Arrays.asList(new Object[] {
-      d1, d2
-    }));
+    final List edges = DirectedEdge.toEdges(Arrays.asList(d1, d2));
     assertEquals(2, edges.size());
     assertNull(edges.get(0));
     assertNull(edges.get(1));

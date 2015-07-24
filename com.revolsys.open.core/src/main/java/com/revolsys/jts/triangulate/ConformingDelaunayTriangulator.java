@@ -71,16 +71,16 @@ import com.revolsys.jts.triangulate.quadedge.Vertex;
  * <p>
  * A typical usage pattern for the triangulator is:
  * <pre>
- * 	 ConformingDelaunayTriangulator cdt = new ConformingDelaunayTriangulator(sites, tolerance);
+ *  ConformingDelaunayTriangulator cdt = new ConformingDelaunayTriangulator(sites, tolerance);
  *
  *   // optional
  *   cdt.setSplitPointFinder(splitPointFinder);
  *   cdt.setVertexFactory(vertexFactory);
  *
- *	 cdt.setConstraints(segments, new ArrayList(vertexMap.values()));
- *	 cdt.formInitialDelaunay();
- *	 cdt.enforceConstraints();
- *	 subdiv = cdt.getSubdivision();
+ * cdt.setConstraints(segments, new ArrayList(vertexMap.values()));
+ * cdt.formInitialDelaunay();
+ * cdt.enforceConstraints();
+ * subdiv = cdt.getSubdivision();
  * </pre>
  *
  * @author David Skea

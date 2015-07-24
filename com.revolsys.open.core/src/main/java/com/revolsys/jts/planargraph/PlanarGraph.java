@@ -56,9 +56,9 @@ import com.revolsys.jts.geom.Point;
  * @version 1.7
  */
 public abstract class PlanarGraph {
-  protected Set edges = new HashSet();
+  protected Set<Edge> edges = new HashSet<Edge>();
 
-  protected Set dirEdges = new HashSet();
+  protected Set<DirectedEdge> dirEdges = new HashSet<DirectedEdge>();
 
   protected NodeMap nodeMap = new NodeMap();
 
@@ -124,7 +124,7 @@ public abstract class PlanarGraph {
    * @see #add(Edge)
    * @see #add(DirectedEdge)
    */
-  public Iterator dirEdgeIterator() {
+  public Iterator<DirectedEdge> dirEdgeIterator() {
     return this.dirEdges.iterator();
   }
 
@@ -134,7 +134,7 @@ public abstract class PlanarGraph {
    *
    * @see #add(Edge)
    */
-  public Iterator edgeIterator() {
+  public Iterator<Edge> edgeIterator() {
     return this.edges.iterator();
   }
 
@@ -153,10 +153,9 @@ public abstract class PlanarGraph {
   /**
    * Returns all Nodes with the given number of Edges around it.
    */
-  public List findNodesOfDegree(final int degree) {
-    final List nodesFound = new ArrayList();
-    for (final Iterator i = nodeIterator(); i.hasNext();) {
-      final Node node = (Node)i.next();
+  public List<Node> findNodesOfDegree(final int degree) {
+    final List<Node> nodesFound = new ArrayList<Node>();
+    for (final Node node : this.nodeMap.nodes()) {
       if (node.getDegree() == degree) {
         nodesFound.add(node);
       }
@@ -168,18 +167,18 @@ public abstract class PlanarGraph {
    * Returns the Edges that have been added to this PlanarGraph
    * @see #add(Edge)
    */
-  public Collection getEdges() {
+  public Collection<Edge> getEdges() {
     return this.edges;
   }
 
-  public Collection getNodes() {
-    return this.nodeMap.values();
+  public Collection<Node> getNodes() {
+    return this.nodeMap.nodes();
   }
 
   /**
    * Returns an Iterator over the Nodes in this PlanarGraph.
    */
-  public Iterator nodeIterator() {
+  public Iterator<Node> nodeIterator() {
     return this.nodeMap.iterator();
   }
 
@@ -223,9 +222,8 @@ public abstract class PlanarGraph {
    */
   public void remove(final Node node) {
     // unhook all directed edges
-    final List outEdges = node.getOutEdges().getEdges();
-    for (final Iterator i = outEdges.iterator(); i.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)i.next();
+    final List<DirectedEdge> outEdges = node.getOutEdges().getEdges();
+    for (final DirectedEdge de : outEdges) {
       final DirectedEdge sym = de.getSym();
       // remove the diredge that points to this node
       if (sym != null) {

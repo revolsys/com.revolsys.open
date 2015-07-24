@@ -13,6 +13,7 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.comparator.EdgeAttributeValueComparator;
+import com.revolsys.gis.graph.linemerge.LineMerger;
 import com.revolsys.gis.graph.linestring.EdgeLessThanDistance;
 import com.revolsys.gis.graph.visitor.NodeLessThanDistanceOfCoordinatesVisitor;
 import com.revolsys.jts.geom.BoundingBox;
@@ -28,7 +29,6 @@ import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
-import com.revolsys.jts.operation.linemerge.LineMerger;
 
 public class GeometryGraph extends Graph<LineSegment> {
 

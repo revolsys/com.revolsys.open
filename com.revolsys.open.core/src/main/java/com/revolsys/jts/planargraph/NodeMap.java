@@ -49,7 +49,7 @@ public class NodeMap
 
 {
 
-  private final Map nodeMap = new TreeMap();
+  private final Map<Point, Node> nodeMap = new TreeMap<>();
 
   /**
    * Constructs a NodeMap without any Nodes.
@@ -70,29 +70,33 @@ public class NodeMap
    * Returns the Node at the given location, or null if no Node was there.
    */
   public Node find(final Point coord) {
-    return (Node)this.nodeMap.get(coord);
+    return this.nodeMap.get(coord);
   }
 
   /**
    * Returns an Iterator over the Nodes in this NodeMap, sorted in ascending order
    * by angle with the positive x-axis.
    */
-  public Iterator iterator() {
+  public Iterator<Node> iterator() {
     return this.nodeMap.values().iterator();
+  }
+
+  public Collection<Node> nodes() {
+    return this.nodeMap.values();
   }
 
   /**
    * Removes the Node at the given location, and returns it (or null if no Node was there).
    */
   public Node remove(final Point pt) {
-    return (Node)this.nodeMap.remove(pt);
+    return this.nodeMap.remove(pt);
   }
 
   /**
    * Returns the Nodes in this NodeMap, sorted in ascending order
    * by angle with the positive x-axis.
    */
-  public Collection values() {
+  public Collection<Node> values() {
     return this.nodeMap.values();
   }
 

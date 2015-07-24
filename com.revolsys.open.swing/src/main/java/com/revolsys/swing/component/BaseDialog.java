@@ -9,12 +9,7 @@ import javax.swing.JDialog;
 
 import com.revolsys.swing.WindowManager;
 
-@SuppressWarnings("serial")
 public class BaseDialog extends JDialog {
-
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   public BaseDialog() {

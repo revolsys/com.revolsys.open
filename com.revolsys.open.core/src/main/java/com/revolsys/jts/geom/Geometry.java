@@ -40,12 +40,12 @@ import java.util.List;
 
 import com.revolsys.data.types.DataTypeProxy;
 import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.gis.graph.linemerge.LineMerger;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.operation.buffer.Buffer;
-import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.jts.operation.union.UnaryUnionOp;
 import com.revolsys.jts.operation.valid.IsValidOp;
 

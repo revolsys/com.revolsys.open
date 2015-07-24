@@ -30,7 +30,7 @@
  *     (250)385-6040
  *     www.vividsolutions.com
  */
-package com.revolsys.jts.operation.linemerge;
+package com.revolsys.gis.graph.linemerge;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +38,8 @@ import java.util.List;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.operation.linemerge.LineMergeDirectedEdge;
+import com.revolsys.jts.operation.linemerge.LineMergeEdge;
 
 /**
  * A sequence of {@link LineMergeDirectedEdge}s forming one of the lines that will

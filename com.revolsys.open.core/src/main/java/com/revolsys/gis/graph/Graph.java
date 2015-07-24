@@ -137,9 +137,8 @@ public class Graph<T> {
   }
 
   public Edge<T> addEdge(final T object, final LineString line) {
-    final LineString points = line;
-    final Point from = points.getPoint(0);
-    final Point to = points.getPoint(points.getVertexCount() - 1);
+    final Point from = line.getFromPoint();
+    final Point to = line.getToPoint();
     return addEdge(object, line, from, to);
   }
 

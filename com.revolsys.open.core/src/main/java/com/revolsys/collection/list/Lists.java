@@ -113,13 +113,13 @@ public class Lists {
     return list;
   }
 
-  public static <V> Supplier<ArrayList<V>> arrayFactory() {
+  public static <V> Supplier<List<V>> arrayFactory() {
     return () -> {
       return new ArrayList<V>();
     };
   }
 
-  public static <V> Supplier<LinkedList<V>> linkedFactory() {
+  public static <V> Supplier<List<V>> linkedFactory() {
     return () -> {
       return new LinkedList<V>();
     };
