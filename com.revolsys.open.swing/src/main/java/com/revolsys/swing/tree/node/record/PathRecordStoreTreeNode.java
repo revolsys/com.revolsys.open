@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import javax.swing.Icon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
@@ -46,7 +47,7 @@ public class PathRecordStoreTreeNode extends PathTreeNode
     super(Path);
     setType("Record Store");
     setName(Paths.getFileName(Path));
-    setIcon(PathTreeNode.ICON_FILE_DATABASE);
+    super.setIcon(PathTreeNode.ICON_FILE_DATABASE);
   }
 
   @SuppressWarnings({
@@ -136,6 +137,11 @@ public class PathRecordStoreTreeNode extends PathTreeNode
   @Override
   public boolean isAllowsChildren() {
     return true;
+  }
+
+  @Override
+  protected void setIcon(final Icon icon) {
+    super.setIcon(PathTreeNode.ICON_FILE_DATABASE);
   }
 
 }

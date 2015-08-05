@@ -48,34 +48,34 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
   private Table table;
 
-  private final String typePath;
+  private final String catalogPath;
 
-  FileGdbQueryIterator(final FileGdbRecordStore recordStore, final String typePath) {
-    this(recordStore, typePath, "*", "", null, 0, -1);
+  FileGdbQueryIterator(final FileGdbRecordStore recordStore, final String catalogPath) {
+    this(recordStore, catalogPath, "*", "", null, 0, -1);
   }
 
-  FileGdbQueryIterator(final FileGdbRecordStore recordStore, final String typePath,
+  FileGdbQueryIterator(final FileGdbRecordStore recordStore, final String catalogPath,
     final String whereClause) {
-    this(recordStore, typePath, "*", whereClause, null, 0, -1);
+    this(recordStore, catalogPath, "*", whereClause, null, 0, -1);
   }
 
-  FileGdbQueryIterator(final FileGdbRecordStore recordStore, final String typePath,
+  FileGdbQueryIterator(final FileGdbRecordStore recordStore, final String catalogPath,
     final String whereClause, final BoundingBox boundingBox, final Query query, final int offset,
     final int limit) {
-    this(recordStore, typePath, "*", whereClause, boundingBox, offset, limit);
+    this(recordStore, catalogPath, "*", whereClause, boundingBox, offset, limit);
     final RecordFactory factory = query.getProperty("recordFactory");
     if (factory != null) {
       this.recordFactory = factory;
     }
   }
 
-  FileGdbQueryIterator(final FileGdbRecordStore recordStore, final String typePath,
+  FileGdbQueryIterator(final FileGdbRecordStore recordStore, final String catalogPath,
     final String fields, final String sql, final BoundingBox boundingBox, final int offset,
     final int limit) {
     this.recordStore = recordStore;
-    this.typePath = typePath;
-    this.recordDefinition = recordStore.getRecordDefinition(typePath);
-    this.table = recordStore.getTable(typePath);
+    this.catalogPath = catalogPath;
+    this.recordDefinition = recordStore.getRecordDefinition(catalogPath);
+    this.table = recordStore.getTable(catalogPath);
     if (this.recordDefinition != null && "*".equals(fields)) {
       this.fields = CollectionUtil.toString(this.recordDefinition.getFieldNames());
     } else {
@@ -97,10 +97,10 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
         try {
           this.recordStore.closeEnumRows(this.rows);
         } finally {
-          this.recordStore.releaseTable(this.typePath);
+          this.recordStore.releaseTable(this.catalogPath);
         }
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error("Error closing query: " + this.typePath);
+        LoggerFactory.getLogger(getClass()).error("Error closing query: " + this.catalogPath);
       } finally {
         this.boundingBox = null;
         this.recordStore = null;
@@ -121,7 +121,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
           if (this.sql.startsWith("SELECT")) {
             this.rows = this.recordStore.query(this.sql, true);
           } else {
-            this.rows = this.recordStore.search(this.typePath, this.table, this.fields, this.sql,
+            this.rows = this.recordStore.search(this.catalogPath, this.table, this.fields, this.sql,
               true);
           }
         } else {
@@ -138,8 +138,8 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
           if ("1 = 1".equals(sql)) {
             sql = "";
           }
-          this.rows = this.recordStore.search(this.typePath, this.table, this.fields, sql, envelope,
-            true);
+          this.rows = this.recordStore.search(this.catalogPath, this.table, this.fields, sql,
+            envelope, true);
         }
       }
     }
@@ -229,6 +229,6 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
   @Override
   public String toString() {
-    return this.typePath + " " + this.sql;
+    return this.catalogPath + " " + this.sql;
   }
 }

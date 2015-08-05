@@ -187,8 +187,8 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
     return createDETable(schemaPath, recordDefinition, spatialReference);
   }
 
-  public static DETable createDETable(final String schemaPath,
-    final RecordDefinition recordDefinition, final SpatialReference spatialReference) {
+  public static DETable createDETable(String schemaPath, final RecordDefinition recordDefinition,
+    final SpatialReference spatialReference) {
     DETable table;
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
     boolean hasGeometry = false;
@@ -239,6 +239,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
 
     } else {
       table = new DETable();
+      schemaPath = "\\";
     }
 
     String oidFieldName = recordDefinition

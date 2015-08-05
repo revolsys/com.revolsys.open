@@ -30,7 +30,8 @@ public class FileGdbReader extends AbstractMultipleIteratorReader<Record> {
   protected AbstractIterator<Record> getNextIterator() {
     if (this.index < this.typePaths.size()) {
       final String typePath = this.typePaths.get(this.index);
-      final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this.recordStore, typePath);
+      final String catalogPath = this.recordStore.getCatalogPath(typePath);
+      final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this.recordStore, catalogPath);
       if (this.boundingBox != null) {
         iterator.setBoundingBox(this.boundingBox);
       }

@@ -24,7 +24,7 @@ import com.revolsys.io.AbstractRecordWriter;
 public class FileGdbWriter extends AbstractRecordWriter {
   private FileGdbRecordStore recordStore;
 
-  private Map<String, Table> tables = new HashMap<>();
+  private Map<String, Table> tablesByCatalogPath = new HashMap<>();
 
   FileGdbWriter(final FileGdbRecordStore recordStore) {
     this.recordStore = recordStore;
@@ -34,21 +34,22 @@ public class FileGdbWriter extends AbstractRecordWriter {
   @PreDestroy
   public synchronized void close() {
     try {
-      if (this.tables != null) {
-        for (final String typePath : this.tables.keySet()) {
-          this.recordStore.releaseTableAndWriteLock(typePath);
+      if (this.tablesByCatalogPath != null) {
+        for (final String catalogPath : this.tablesByCatalogPath.keySet()) {
+          this.recordStore.releaseTableAndWriteLock(catalogPath);
         }
       }
     } finally {
-      this.tables = null;
+      this.tablesByCatalogPath = null;
       this.recordStore = null;
     }
   }
 
   public synchronized void closeTable(final String typePath) {
-    if (this.tables != null) {
-      if (this.tables.remove(typePath) != null) {
-        this.recordStore.releaseTableAndWriteLock(typePath);
+    if (this.tablesByCatalogPath != null) {
+      final String catalogPath = this.recordStore.getCatalogPath(typePath);
+      if (this.tablesByCatalogPath.remove(catalogPath) != null) {
+        this.recordStore.releaseTableAndWriteLock(catalogPath);
       }
     }
   }
@@ -87,11 +88,12 @@ public class FileGdbWriter extends AbstractRecordWriter {
   }
 
   private synchronized Table getTable(final String typePath) {
-    Table table = this.tables.get(typePath);
+    final String catalogPath = this.recordStore.getCatalogPath(typePath);
+    Table table = this.tablesByCatalogPath.get(catalogPath);
     if (table == null) {
-      table = this.recordStore.getTableWithWriteLock(typePath);
+      table = this.recordStore.getTableWithWriteLock(catalogPath);
       if (table != null) {
-        this.tables.put(typePath, table);
+        this.tablesByCatalogPath.put(catalogPath, table);
       }
     }
     return table;
@@ -104,47 +106,52 @@ public class FileGdbWriter extends AbstractRecordWriter {
 
     validateRequired(record, recordDefinition);
 
-    final String typePath = sourceRecordDefinition.getPath();
+    final String typePath = recordDefinition.getPath();
     final Table table = getTable(typePath);
-    try {
-      final Row row = this.recordStore.createRowObject(table);
+    if (table == null) {
+      throw new ObjectException(record, "Cannot find table: " + typePath);
+    } else {
       try {
-        final List<Object> values = new ArrayList<>();
-        for (final FieldDefinition field : recordDefinition.getFields()) {
-          final String name = field.getName();
-          try {
-            final Object value = record.getValue(name);
-            final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
-            final Object esriValue = esriField.setInsertValue(record, row, value);
-            values.add(esriValue);
-          } catch (final Throwable e) {
-            throw new ObjectPropertyException(record, name, e);
-          }
-        }
-        this.recordStore.insertRow(table, row);
-        if (sourceRecordDefinition == recordDefinition) {
+        final Row row = this.recordStore.createRowObject(table);
+
+        try {
+          final List<Object> values = new ArrayList<>();
           for (final FieldDefinition field : recordDefinition.getFields()) {
-            final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
+            final String name = field.getName();
             try {
-              esriField.setPostInsertValue(record, row);
+              final Object value = record.getValue(name);
+              final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
+              final Object esriValue = esriField.setInsertValue(record, row, value);
+              values.add(esriValue);
             } catch (final Throwable e) {
-              throw new ObjectPropertyException(record, field.getName(), e);
+              throw new ObjectPropertyException(record, name, e);
             }
           }
-          record.setState(RecordState.Persisted);
+          this.recordStore.insertRow(table, row);
+          if (sourceRecordDefinition == recordDefinition) {
+            for (final FieldDefinition field : recordDefinition.getFields()) {
+              final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
+              try {
+                esriField.setPostInsertValue(record, row);
+              } catch (final Throwable e) {
+                throw new ObjectPropertyException(record, field.getName(), e);
+              }
+            }
+            record.setState(RecordState.Persisted);
+          }
+        } finally {
+          this.recordStore.closeRow(row);
+          this.recordStore.addStatistic("Insert", record);
         }
-      } finally {
-        this.recordStore.closeRow(row);
-        this.recordStore.addStatistic("Insert", record);
-      }
-    } catch (final ObjectException e) {
-      if (e.getObject() == record) {
-        throw e;
-      } else {
+      } catch (final ObjectException e) {
+        if (e.getObject() == record) {
+          throw e;
+        } else {
+          throw new ObjectException(record, e);
+        }
+      } catch (final Throwable e) {
         throw new ObjectException(record, e);
       }
-    } catch (final Throwable e) {
-      throw new ObjectException(record, e);
     }
   }
 
