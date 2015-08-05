@@ -9,7 +9,6 @@ import java.util.Map;
 
 import com.revolsys.gis.algorithm.index.LineSegmentIndex;
 import com.revolsys.gis.algorithm.linematch.LineMatchGraph;
-import com.revolsys.gis.graph.linemerge.LineMerger;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
@@ -20,7 +19,6 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryComponent;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.Vertex;
@@ -536,23 +534,6 @@ public final class LineStringUtil {
       return line.getPoint(0);
     } else {
       return line.getPoint(-1);
-    }
-  }
-
-  public static Collection<LineString> getMergedLines(final MultiLineString multiLineString) {
-    final LineMerger merger = new LineMerger();
-    merger.add(multiLineString);
-    final Collection<LineString> lineStrings = merger.getMergedLineStrings();
-    return lineStrings;
-  }
-
-  public static LineString getMergeLine(final MultiLineString multiLineString) {
-    final Collection<LineString> lineStrings = getMergedLines(multiLineString);
-    final int numLines = lineStrings.size();
-    if (numLines == 1) {
-      return lineStrings.iterator().next();
-    } else {
-      return null;
     }
   }
 

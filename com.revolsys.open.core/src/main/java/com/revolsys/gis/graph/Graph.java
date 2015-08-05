@@ -638,10 +638,8 @@ public class Graph<T> {
     }
   }
 
-  public List<Node<T>> getNodes(final Predicate<Node<T>> filter,
-    final com.revolsys.jts.geom.BoundingBox envelope) {
+  public List<Node<T>> getNodes(final Predicate<Node<T>> filter, final BoundingBox envelope) {
     return getNodes(filter, null, envelope);
-
   }
 
   public List<Node<T>> getNodes(final Predicate<Node<T>> filter,
@@ -654,10 +652,10 @@ public class Graph<T> {
   }
 
   public List<Node<T>> getNodes(final Predicate<Node<T>> filter,
-    final Comparator<Node<T>> comparator, final com.revolsys.jts.geom.BoundingBox envelope) {
+    final Comparator<Node<T>> comparator, final BoundingBox boundingBox) {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>(filter);
     final IdObjectIndex<Node<T>> nodeIndex = getNodeIndex();
-    nodeIndex.visit(envelope, results);
+    nodeIndex.visit(boundingBox, results);
     final List<Node<T>> nodes = results.getList();
     if (comparator == null) {
       Collections.sort(nodes);
@@ -666,6 +664,15 @@ public class Graph<T> {
     }
     return nodes;
 
+  }
+
+  public List<Node<T>> getNodes(final Predicate<Node<T>> filter, final Geometry geometry,
+    final double maxDistance) {
+    final BoundingBox boundingBox = geometry.getBoundingBox().expand(maxDistance);
+    final Predicate<Node<T>> distanceFilter = (node) -> {
+      return filter.test(node) && node.distance(geometry) <= maxDistance;
+    };
+    return getNodes(distanceFilter, null, boundingBox);
   }
 
   public List<T> getObjects() {

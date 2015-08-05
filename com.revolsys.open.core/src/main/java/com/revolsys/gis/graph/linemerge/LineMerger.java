@@ -1,29 +1,37 @@
 package com.revolsys.gis.graph.linemerge;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.util.Property;
 
 public class LineMerger {
 
-  public static List<LineString> merge(final Collection<? extends LineString> lines) {
-    if (Property.hasValue(lines)) {
-      if (lines.size() == 1) {
-        return Lists.array(lines);
-      } else {
-        final LineMerger lineMerger = new LineMerger(lines);
-        return lineMerger.getMergedLineStrings();
-      }
+  public static List<LineString> merge(final Geometry... geometries) {
+    if (geometries == null) {
+      return Collections.emptyList();
+    } else {
+      final LineMerger lineMerger = new LineMerger(geometries);
+      return lineMerger.getLineStrings();
     }
-    return Collections.emptyList();
+  }
+
+  public static List<LineString> merge(final Iterable<? extends Geometry> geometries) {
+    if (Property.hasValue(geometries)) {
+      final LineMerger lineMerger = new LineMerger(geometries);
+      return lineMerger.getLineStrings();
+    } else {
+      return Collections.emptyList();
+    }
   }
 
   private final LineStringsGraph graph = new LineStringsGraph();
@@ -35,24 +43,18 @@ public class LineMerger {
    *
    */
   public LineMerger() {
-
   }
 
-  public LineMerger(final Collection<? extends LineString> lines) {
-    add(lines);
+  public LineMerger(final Geometry... geometries) {
+    addAll(geometries);
   }
 
-  /**
-   * Adds a collection of Geometries to be processed. May be called multiple times.
-   * Any dimension of Geometry may be added; the constituent linework will be
-   * extracted.
-   *
-   * @param geometries the geometries to be line-merged
-   */
-  public void add(final Collection<? extends Geometry> geometries) {
-    for (final Geometry geometry : geometries) {
-      add(geometry);
-    }
+  public LineMerger(final Iterable<? extends Geometry> lines) {
+    addAll(lines);
+  }
+
+  public LineMerger(final LineString line) {
+    add(line);
   }
 
   /**
@@ -63,14 +65,36 @@ public class LineMerger {
    * @param geometry geometry to be line-merged
    */
   public void add(final Geometry geometry) {
-    for (final LineString line : geometry.getGeometryComponents(LineString.class)) {
+    final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
+    for (final LineString line : lines) {
       add(line);
     }
   }
 
-  private void add(final LineString lineString) {
-    this.merged = false;
-    this.graph.addEdge(lineString);
+  public void add(final LineString lineString) {
+    if (lineString != null) {
+      this.merged = false;
+      this.graph.addEdge(lineString);
+    }
+  }
+
+  public void addAll(final Geometry... geometries) {
+    for (final Geometry geometry : geometries) {
+      add(geometry);
+    }
+  }
+
+  /**
+   * Adds a collection of Geometries to be processed. May be called multiple times.
+   * Any dimension of Geometry may be added; the constituent linework will be
+   * extracted.
+   *
+   * @param geometries the geometries to be line-merged
+   */
+  public void addAll(final Iterable<? extends Geometry> geometries) {
+    for (final Geometry geometry : geometries) {
+      add(geometry);
+    }
   }
 
   public LineStringsGraph getGraph() {
@@ -82,22 +106,34 @@ public class LineMerger {
    *
    * @return the collection of merged LineStrings
    */
-  public List<LineString> getMergedLineStrings() {
+  public List<LineString> getLineStrings() {
     merge();
-    return this.graph.getEdgeLines();
+    final List<LineString> edgeLines = this.graph.getEdgeLines();
+    return Lists.array(edgeLines);
+  }
+
+  public MultiLineString getMultiLineString() {
+    final GeometryFactory geometryFactory = this.graph.getGeometryFactory();
+    return getMultiLineString(geometryFactory);
+  }
+
+  public MultiLineString getMultiLineString(final GeometryFactory geometryFactory) {
+    final List<LineString> lines = getLineStrings();
+    return geometryFactory.multiLineString(lines);
   }
 
   private void merge() {
     if (!this.merged) {
-      mergeDegree2();
+      mergeDegree2FromEnds();
       this.merged = true;
     }
   }
 
-  private void mergeDegree2() {
-    for (final Node<LineString> node : this.graph.getNodes((node) -> {
+  private void mergeDegree2FromEnds() {
+    final Predicate<Node<LineString>> filter = (node) -> {
       return !node.isRemoved() && node.getDegree() != 2;
-    })) {
+    };
+    for (final Node<LineString> node : this.graph.getNodes(filter)) {
       if (!node.isRemoved()) {
         for (final Edge<LineString> edge : Lists.array(node.getEdges())) {
           if (!edge.isRemoved()) {
@@ -153,7 +189,7 @@ public class LineMerger {
     this.graph.removeEdge(lineString);
   }
 
-  public void remove(final List<LineString> lines) {
+  public void removeAll(final Iterable<LineString> lines) {
     this.merged = false;
     this.graph.removeEdges(lines);
   }

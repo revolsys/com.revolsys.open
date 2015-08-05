@@ -42,20 +42,19 @@ import java.util.List;
  *@version 1.7
  */
 public interface MultiLineString extends GeometryCollection, Lineal {
+  LineString getLineString(int partIndex);
 
-  public LineString getLineString(int partIndex);
+  <V extends LineString> List<V> getLineStrings();
 
-  public <V extends LineString> List<V> getLineStrings();
-
-  public boolean isClosed();
+  boolean isClosed();
 
   Iterable<LineString> lineStrings();
 
   @Override
-  public MultiLineString normalize();
+  MultiLineString normalize();
 
   @Override
-  public MultiLineString prepare();
+  MultiLineString prepare();
 
   /**
    * Creates a {@link MultiLineString} in the reverse
@@ -67,5 +66,5 @@ public interface MultiLineString extends GeometryCollection, Lineal {
    * @return a {@link MultiLineString} in the reverse order
    */
   @Override
-  public MultiLineString reverse();
+  MultiLineString reverse();
 }

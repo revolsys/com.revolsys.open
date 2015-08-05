@@ -97,9 +97,7 @@ public class LineHandlingFunctions {
   }
 
   public static Geometry mergeLines(final Geometry g) {
-    final LineMerger merger = new LineMerger();
-    merger.add(g);
-    final Collection<LineString> lines = merger.getMergedLineStrings();
+    final Collection<LineString> lines = LineMerger.merge(g);
     return g.getGeometryFactory().buildGeometry(lines);
   }
 

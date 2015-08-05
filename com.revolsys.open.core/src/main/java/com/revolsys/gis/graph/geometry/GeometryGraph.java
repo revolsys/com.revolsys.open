@@ -208,10 +208,8 @@ public class GeometryGraph extends Graph<LineSegment> {
     if (lineIntersections.isEmpty()) {
       return geometryFactory.multiPoint(pointIntersections);
     } else {
-      final LineMerger merger = new LineMerger();
-      merger.add(lineIntersections);
-      final Collection mergedLineStrings = merger.getMergedLineStrings();
-      final MultiLineString multiLine = geometryFactory.multiLineString(mergedLineStrings);
+      final List<LineString> mergedLines = LineMerger.merge(lineIntersections);
+      final MultiLineString multiLine = geometryFactory.multiLineString(mergedLines);
       if (pointIntersections.isEmpty()) {
         return multiLine;
       } else {

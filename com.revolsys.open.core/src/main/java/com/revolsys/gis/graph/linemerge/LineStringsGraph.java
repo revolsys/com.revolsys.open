@@ -1,7 +1,5 @@
 package com.revolsys.gis.graph.linemerge;
 
-import java.util.List;
-
 import com.revolsys.collection.list.Lists;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
@@ -35,7 +33,7 @@ public class LineStringsGraph extends Graph<LineString> {
     }
   }
 
-  public void removeEdges(final List<LineString> lines) {
+  public void removeEdges(final Iterable<LineString> lines) {
     for (final LineString line : lines) {
       removeEdge(line);
     }

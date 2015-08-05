@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.gis.graph.attribute.NodeProperties;
@@ -27,6 +28,12 @@ import com.revolsys.properties.ObjectPropertyProxy;
 import com.revolsys.properties.ObjectWithProperties;
 
 public class Node<T> extends AbstractPoint implements ObjectWithProperties, Externalizable {
+  public static <V> Predicate<Node<V>> filterDegree(final int degree) {
+    return (node) -> {
+      return node.getDegree() == degree;
+    };
+  }
+
   public static List<Point> getCoordinates(final Collection<Node<Record>> nodes) {
     final List<Point> points = new ArrayList<Point>(nodes.size());
     for (final Node<Record> node : nodes) {

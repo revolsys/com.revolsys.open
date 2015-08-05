@@ -35,9 +35,11 @@ package com.revolsys.jts.testold.operation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import com.revolsys.gis.graph.linemerge.LineMerger;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.util.Assert;
@@ -78,17 +80,17 @@ public class LineMergerTest extends TestCase {
 
   public static void doTest(final String[] inputWKT, final String[] expectedOutputWKT,
     final boolean compareDirections) {
-    final LineMerger lineMerger = new LineMerger();
-    lineMerger.add(toGeometries(inputWKT));
-    compare(toGeometries(expectedOutputWKT), lineMerger.getMergedLineStrings(), compareDirections);
+    final Collection<Geometry> inputGeometries = toGeometries(inputWKT);
+    final List<LineString> outputLines = LineMerger.merge(inputGeometries);
+    compare(toGeometries(expectedOutputWKT), outputLines, compareDirections);
   }
 
   public static void main(final String[] args) {
     junit.textui.TestRunner.run(LineMergerTest.class);
   }
 
-  public static Collection toGeometries(final String[] inputWKT) {
-    final ArrayList geometries = new ArrayList();
+  public static Collection<Geometry> toGeometries(final String[] inputWKT) {
+    final List<Geometry> geometries = new ArrayList<Geometry>();
     for (final String element : inputWKT) {
       try {
         geometries.add(reader.read(element));
