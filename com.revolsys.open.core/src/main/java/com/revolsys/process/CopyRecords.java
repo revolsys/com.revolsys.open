@@ -70,36 +70,31 @@ public class CopyRecords extends AbstractProcess {
     try {
       final Query query = new Query(this.typePath);
       query.setOrderBy(this.orderBy);
-      final Reader<Record> reader = this.sourceRecordStore.query(query);
-      try {
-        final Writer<Record> targetWriter = this.targetRecordStore.createWriter();
-        try {
-          final RecordDefinition targetRecordDefinition = this.targetRecordStore
-            .getRecordDefinition(this.typePath);
-          if (targetRecordDefinition == null) {
-            LoggerFactory.getLogger(getClass()).error("Cannot find target table: " + this.typePath);
+
+      try (
+        final Reader<Record> reader = this.sourceRecordStore.query(query);
+        final Writer<Record> targetWriter = this.targetRecordStore.createWriter();) {
+        final RecordDefinition targetRecordDefinition = this.targetRecordStore
+          .getRecordDefinition(this.typePath);
+        if (targetRecordDefinition == null) {
+          LoggerFactory.getLogger(getClass()).error("Cannot find target table: " + this.typePath);
+        } else {
+          if (this.hasSequence) {
+            final String idFieldName = targetRecordDefinition.getIdFieldName();
+            Object maxId = this.targetRecordStore.createPrimaryIdValue(this.typePath);
+            for (final Record sourceRecord : reader) {
+              final Object sourceId = sourceRecord.getValue(idFieldName);
+              while (CompareUtil.compare(maxId, sourceId) < 0) {
+                maxId = this.targetRecordStore.createPrimaryIdValue(this.typePath);
+              }
+              targetWriter.write(sourceRecord);
+            }
           } else {
-            if (this.hasSequence) {
-              final String idFieldName = targetRecordDefinition.getIdFieldName();
-              Object maxId = this.targetRecordStore.createPrimaryIdValue(this.typePath);
-              for (final Record sourceRecord : reader) {
-                final Object sourceId = sourceRecord.getValue(idFieldName);
-                while (CompareUtil.compare(maxId, sourceId) < 0) {
-                  maxId = this.targetRecordStore.createPrimaryIdValue(this.typePath);
-                }
-                targetWriter.write(sourceRecord);
-              }
-            } else {
-              for (final Record sourceRecord : reader) {
-                targetWriter.write(sourceRecord);
-              }
+            for (final Record sourceRecord : reader) {
+              targetWriter.write(sourceRecord);
             }
           }
-        } finally {
-          targetWriter.close();
         }
-      } finally {
-        reader.close();
       }
     } catch (final Throwable e) {
       throw new RuntimeException("Unable to copy records for " + this.typePath, e);
