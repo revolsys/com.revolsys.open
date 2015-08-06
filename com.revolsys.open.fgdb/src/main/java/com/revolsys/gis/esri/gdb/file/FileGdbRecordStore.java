@@ -969,20 +969,20 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           for (final Field field : deTable.getFields()) {
             final String fieldName = field.getName();
             final FieldType type = field.getType();
-            final Constructor<? extends AbstractFileGdbFieldDefinition> attributeConstructor = ESRI_FIELD_TYPE_ATTRIBUTE_MAP
+            final Constructor<? extends AbstractFileGdbFieldDefinition> fieldConstructor = ESRI_FIELD_TYPE_ATTRIBUTE_MAP
               .get(type);
-            if (attributeConstructor != null) {
+            if (fieldConstructor != null) {
               try {
-                final AbstractFileGdbFieldDefinition attribute = JavaBeanUtil
-                  .invokeConstructor(attributeConstructor, field);
-                attribute.setRecordStore(this);
-                recordDefinition.addField(attribute);
-                if (attribute instanceof GlobalIdFieldDefinition) {
+                final AbstractFileGdbFieldDefinition fieldDefinition = JavaBeanUtil
+                  .invokeConstructor(fieldConstructor, field);
+                fieldDefinition.setRecordStore(this);
+                recordDefinition.addField(fieldDefinition);
+                if (fieldDefinition instanceof GlobalIdFieldDefinition) {
                   recordDefinition.setIdFieldName(fieldName);
                 }
               } catch (final Throwable e) {
                 LOG.error(tableDefinition);
-                throw new RuntimeException("Error creating attribute for " + typePath + "."
+                throw new RuntimeException("Error creating field for " + typePath + "."
                   + field.getName() + " : " + field.getType(), e);
               }
             } else {

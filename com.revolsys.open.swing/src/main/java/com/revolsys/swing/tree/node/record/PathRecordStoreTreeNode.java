@@ -43,10 +43,10 @@ public class PathRecordStoreTreeNode extends PathTreeNode
       "link_add", NODE_EXISTS, "addRecordStoreConnection"));
   }
 
-  public PathRecordStoreTreeNode(final Path Path) {
-    super(Path);
+  public PathRecordStoreTreeNode(final Path path) {
+    super(path);
     setType("Record Store");
-    setName(Paths.getFileName(Path));
+    setName(Paths.getFileName(path));
     super.setIcon(PathTreeNode.ICON_FILE_DATABASE);
   }
 
@@ -129,7 +129,7 @@ public class PathRecordStoreTreeNode extends PathTreeNode
   public Map<String, Object> getRecordStoreConnectionMap() {
     final BaseTreeNode parent = getParent();
     final Path path = getPath();
-    final URL url = PathTreeNode.getUrl(parent, path);
+    final URL url = getUrl(parent, path);
 
     return Collections.<String, Object> singletonMap("url", url.toString());
   }
