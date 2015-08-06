@@ -16,8 +16,8 @@ import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.io.Writer;
-import com.revolsys.spring.PathResource;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.PathResource;
+import com.revolsys.spring.resource.SpringUtil;
 
 public interface RecordWriterFactory
   extends FileIoFactory, GeometryWriterFactory, IoFactoryWithCoordinateSystem {

@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.FileSystemResource;
+import com.revolsys.spring.resource.FileSystemResource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.io.Reader;

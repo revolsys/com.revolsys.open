@@ -3,7 +3,7 @@ package com.revolsys.ui.html.view;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.format.xml.XmlWriter;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 
 /**
  * @author paustin

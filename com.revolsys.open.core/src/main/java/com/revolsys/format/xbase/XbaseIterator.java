@@ -27,8 +27,7 @@ import com.revolsys.gis.io.EndianMappedByteBuffer;
 import com.revolsys.gis.io.LittleEndianRandomAccessFile;
 import com.revolsys.io.EndianInput;
 import com.revolsys.io.FileUtil;
-import com.revolsys.spring.NonExistingResource;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.ExceptionUtil;
 
@@ -99,7 +98,7 @@ public class XbaseIterator extends AbstractIterator<Record>implements RecordRead
 
     this.recordFactory = recordFactory;
     final Resource codePageResource = SpringUtil.getResourceWithExtension(resource, "cpg");
-    if (!(codePageResource instanceof NonExistingResource) && codePageResource.exists()) {
+    if (codePageResource != null && codePageResource.exists()) {
       final String charsetName = SpringUtil.getContents(codePageResource);
       try {
         this.charset = Charset.forName(charsetName);

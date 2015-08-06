@@ -4,7 +4,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Iterator;
 
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.ArrayRecordFactory;
@@ -16,7 +15,6 @@ import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.io.Reader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapReaderFactory;
-import com.revolsys.spring.PathResource;
 
 public interface RecordReaderFactory
   extends GeometryReaderFactory, MapReaderFactory, IoFactoryWithCoordinateSystem {
@@ -102,23 +100,8 @@ public interface RecordReaderFactory
    * @throws IllegalArgumentException If the source is not a supported class.
    */
   default RecordReader createRecordReader(final Object source, final RecordFactory factory) {
-    if (source instanceof File) {
-      final File file = (File)source;
-      final FileSystemResource resource = new FileSystemResource(file);
-      return createRecordReader(resource, factory);
-    } else if (source instanceof Resource) {
-      final Resource resource = (Resource)source;
-      return createRecordReader(resource, factory);
-    } else if (source instanceof Path) {
-      final Path path = (Path)source;
-      return createRecordReader(path, factory);
-    } else {
-      throw new IllegalArgumentException(source.getClass() + " is not supported");
-    }
-  }
-
-  default RecordReader createRecordReader(final Path path, final RecordFactory factory) {
-    final PathResource resource = new PathResource(path);
+    final com.revolsys.spring.resource.Resource resource = com.revolsys.spring.resource.Resource
+      .getResource(source);
     return createRecordReader(resource, factory);
   }
 

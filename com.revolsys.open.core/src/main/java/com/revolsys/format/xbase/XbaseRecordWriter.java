@@ -24,8 +24,7 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.io.ResourceEndianOutput;
 import com.revolsys.io.AbstractRecordWriter;
-import com.revolsys.spring.NonExistingResource;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
@@ -209,7 +208,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
   protected void init() throws IOException {
     if (!this.initialized) {
       this.initialized = true;
-      if (!(this.resource instanceof NonExistingResource)) {
+      if (this.resource != null) {
         final Map<String, String> shortNames = getProperty("shortNames");
         if (shortNames != null) {
           this.shortNames = shortNames;
@@ -218,8 +217,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
         writeHeader();
       }
       final Resource codePageResource = SpringUtil.getResourceWithExtension(this.resource, "cpg");
-      if (!(codePageResource instanceof NonExistingResource)) {
-
+      if (codePageResource != null) {
         try (
           final Writer writer = SpringUtil.getWriter(codePageResource)) {
           writer.write(this.charset.name());

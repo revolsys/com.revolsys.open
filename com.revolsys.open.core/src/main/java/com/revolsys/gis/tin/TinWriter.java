@@ -9,7 +9,7 @@ import java.util.Set;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.jts.geom.Point;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 
 public class TinWriter {
 

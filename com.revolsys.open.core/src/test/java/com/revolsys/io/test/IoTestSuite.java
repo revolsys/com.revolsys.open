@@ -9,7 +9,7 @@ import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.springframework.core.io.FileSystemResource;
+import com.revolsys.spring.resource.FileSystemResource;
 
 import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;

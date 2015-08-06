@@ -1,11 +1,8 @@
-package com.revolsys.spring;
+package com.revolsys.spring.resource;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import org.springframework.core.io.AbstractResource;
-import org.springframework.core.io.Resource;
 
 public class OutputStreamResource extends AbstractResource {
 
@@ -30,8 +27,8 @@ public class OutputStreamResource extends AbstractResource {
   }
 
   @Override
-  public Resource createRelative(final String relativePath) throws IOException {
-    return new NonExistingResource();
+  public Resource createRelative(final String relativePath) {
+    return null;
   }
 
   @Override

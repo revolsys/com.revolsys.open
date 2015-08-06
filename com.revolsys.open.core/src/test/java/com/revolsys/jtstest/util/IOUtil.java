@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
-import org.springframework.core.io.FileSystemResource;
+import com.revolsys.spring.resource.FileSystemResource;
 
 import com.revolsys.gis.geometry.io.GeometryReader;
 import com.revolsys.jts.geom.Geometry;

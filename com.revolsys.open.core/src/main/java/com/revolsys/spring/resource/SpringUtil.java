@@ -1,4 +1,4 @@
-package com.revolsys.spring;
+package com.revolsys.spring.resource;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -13,22 +13,19 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
-import java.nio.file.Path;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigUtils;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
+import com.revolsys.io.FileNames;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.file.UrlResource;
 import com.revolsys.spring.config.AttributesBeanConfigurer;
 import com.revolsys.util.Property;
 
@@ -161,16 +158,13 @@ public class SpringUtil {
   public static String getFileName(final Resource resource) {
     if (resource instanceof UrlResource) {
       final UrlResource urlResoure = (UrlResource)resource;
-      try {
-        return urlResoure.getURL().getPath();
-      } catch (final IOException e) {
-      }
+      return urlResoure.getURL().getPath();
     }
     return resource.getFilename();
   }
 
   public static String getFileNameExtension(final Resource resource) {
-    String fileName = getFileName(resource);
+    final String fileName = getFileName(resource);
     return FileUtil.getFileNameExtension(fileName);
   }
 
@@ -181,7 +175,7 @@ public class SpringUtil {
       } else {
         final String filename = getFileName(resource);
         final String baseName = FileUtil.getBaseName(filename);
-        final String fileExtension = FileUtil.getFileNameExtension(filename);
+        final String fileExtension = FileNames.getFileNameExtension(filename);
         return File.createTempFile(baseName, fileExtension);
       }
     } catch (final IOException e) {
@@ -299,31 +293,23 @@ public class SpringUtil {
     }
   }
 
-  public static Resource getResource(final String location) {
+  public static com.revolsys.spring.resource.Resource getResource(final String location) {
     if (Property.hasValue(location)) {
       if (location.charAt(0) == '/' || location.length() > 1 && location.charAt(1) == ':') {
         return new FileSystemResource(location);
       } else {
-        try {
-          return new UrlResource(location);
-        } catch (final MalformedURLException e) {
-          throw new RuntimeException("URL not valid " + location, e);
-        }
+        return new UrlResource(location);
       }
     }
     return null;
   }
 
   public static Resource getResourceWithExtension(final Resource resource, final String extension) {
-    final String baseName = getBaseName(resource);
-    final String newFileName = baseName + "." + extension;
-    if (resource instanceof PathResource) {
-      final PathResource pathResource = (PathResource)resource;
-      final Path path = pathResource.getPath();
-      final Path parent = path.getParent();
-      final Path newPath = parent.resolve(newFileName);
-      return new PathResource(newPath);
+    if (resource instanceof com.revolsys.spring.resource.Resource) {
+      return ((com.revolsys.spring.resource.Resource)resource).getResourceWithExtension(extension);
     } else {
+      final String baseName = getBaseName(resource);
+      final String newFileName = baseName + "." + extension;
       try {
         return resource.createRelative(newFileName);
       } catch (final IOException e) {

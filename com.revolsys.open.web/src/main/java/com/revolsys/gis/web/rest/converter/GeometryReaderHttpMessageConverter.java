@@ -17,7 +17,7 @@ import com.revolsys.gis.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.spring.InputStreamResource;
+import com.revolsys.spring.resource.InputStreamResource;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 
 public class GeometryReaderHttpMessageConverter

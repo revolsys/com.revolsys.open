@@ -13,7 +13,7 @@ import javax.measure.quantity.Length;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.io.FileUtil;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 

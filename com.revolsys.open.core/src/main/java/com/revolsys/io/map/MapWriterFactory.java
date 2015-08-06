@@ -9,12 +9,11 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.IoFactoryRegistry;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 
 public interface MapWriterFactory extends FileIoFactory {
   default MapWriter createMapWriter(final Object source) {
-    final Resource resource = IoFactoryRegistry.getResource(source);
+    final Resource resource = com.revolsys.spring.resource.Resource.getResource(source);
     final Writer writer = SpringUtil.getWriter(resource);
     return createMapWriter(writer);
   }

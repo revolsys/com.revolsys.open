@@ -38,7 +38,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.TreePath;
 
-import org.springframework.core.io.FileSystemResource;
+import com.revolsys.spring.resource.FileSystemResource;
 
 import com.revolsys.data.record.io.RecordStoreConnectionManager;
 import com.revolsys.data.record.io.RecordStoreConnectionRegistry;

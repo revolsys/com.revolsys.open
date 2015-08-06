@@ -1,7 +1,6 @@
 package com.revolsys.data.record.io;
 
 import java.io.File;
-import java.nio.file.Path;
 
 import org.springframework.core.io.Resource;
 
@@ -12,37 +11,18 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
-import com.revolsys.io.Paths;
 import com.revolsys.io.Writer;
 import com.revolsys.util.Property;
 
 public interface RecordWriter extends Writer<Record> {
-  static Writer<Record> create(final RecordDefinition recordDefinition, final File file) {
-    if (file == null) {
-      return null;
-    } else {
-      final Path path = Paths.get(file);
-      return create(recordDefinition, path);
-    }
-  }
-
-  static Writer<Record> create(final RecordDefinition recordDefinition, final Path path) {
-    final RecordWriterFactory writerFactory = IoFactory.factory(RecordWriterFactory.class, path);
-    if (writerFactory == null) {
-      return null;
-    } else {
-      final Writer<Record> writer = writerFactory.createRecordWriter(recordDefinition, path);
-      return writer;
-    }
-  }
-
-  static Writer<Record> create(final RecordDefinition recordDefinition, final Resource resource) {
+  static RecordWriter create(final RecordDefinition recordDefinition, final Object source) {
+    final Resource resource = com.revolsys.spring.resource.Resource.getResource(source);
     final RecordWriterFactory writerFactory = IoFactory.factory(RecordWriterFactory.class,
       resource);
     if (writerFactory == null) {
       return null;
     } else {
-      final Writer<Record> writer = writerFactory.createRecordWriter(recordDefinition, resource);
+      final RecordWriter writer = writerFactory.createRecordWriter(recordDefinition, resource);
       return writer;
     }
   }

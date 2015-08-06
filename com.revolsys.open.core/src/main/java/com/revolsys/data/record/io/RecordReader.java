@@ -56,7 +56,7 @@ public interface RecordReader extends Reader<Record> {
     }
   }
 
-  public static boolean isReadable(final Object source) {
+  static boolean isReadable(final Object source) {
     return IoFactoryRegistry.isAvailable(RecordReaderFactory.class, source);
   }
 

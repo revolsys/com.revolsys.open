@@ -11,7 +11,7 @@ import org.springframework.core.io.Resource;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.format.directory.DirectoryRecordStore;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 
 public abstract class AbstractRecordIoFactory extends AbstractIoFactoryWithCoordinateSystem
   implements RecordReaderFactory, RecordStoreFactory {
