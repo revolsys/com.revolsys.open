@@ -2,14 +2,12 @@ package com.revolsys.data.record.io;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.data.record.schema.RecordStore;
-import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.util.JavaBeanUtil;
@@ -80,15 +78,6 @@ public class RecordStoreConnection implements MapSerializer {
       }
     }
     return this.recordStore;
-  }
-
-  public List<RecordStoreSchema> getSchemas() {
-    final RecordStore recordStore = getRecordStore();
-    if (recordStore == null) {
-      return Collections.emptyList();
-    } else {
-      return recordStore.getSchemas();
-    }
   }
 
   public boolean isReadOnly() {
