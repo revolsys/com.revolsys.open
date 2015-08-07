@@ -17,7 +17,7 @@ import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.LineString;
 
 public class PseudoNodeAttribute {
-  private final Set<String> equalExcludeAttributes = new HashSet<String>();
+  private final Set<String> equalExcludeFieldNames = new HashSet<String>();
 
   private final List<EdgePair<Record>> edgePairs = new ArrayList<EdgePair<Record>>();
 
@@ -26,10 +26,10 @@ public class PseudoNodeAttribute {
   private final String typePath;
 
   public PseudoNodeAttribute(final Node<Record> node, final String typePath,
-    final Collection<String> equalExcludeAttributes) {
+    final Collection<String> equalExcludeFieldNames) {
     this.typePath = typePath;
-    if (equalExcludeAttributes != null) {
-      this.equalExcludeAttributes.addAll(equalExcludeAttributes);
+    if (equalExcludeFieldNames != null) {
+      this.equalExcludeFieldNames.addAll(equalExcludeFieldNames);
     }
     final Map<String, Map<LineString, Set<Edge<Record>>>> edgesByTypeNameAndLine = NodeProperties
       .getEdgesByTypeNameAndLine(node);
@@ -42,7 +42,7 @@ public class PseudoNodeAttribute {
     final Record object1 = edge1.getObject();
     final Record object2 = edge2.getObject();
     if (DirectionalAttributes.canMergeObjects(node, object1, object2,
-      this.equalExcludeAttributes)) {
+      this.equalExcludeFieldNames)) {
       return new EdgePair<Record>(edge1, edge2);
     } else {
       return null;

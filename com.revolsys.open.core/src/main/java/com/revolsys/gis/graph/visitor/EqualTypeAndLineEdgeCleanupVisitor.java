@@ -37,7 +37,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
 
   private Statistics duplicateStatistics;
 
-  private Set<String> equalExcludeAttributes = new HashSet<String>(
+  private Set<String> equalExcludeFieldNames = new HashSet<String>(
     Arrays.asList(RecordEquals.EXCLUDE_ID, RecordEquals.EXCLUDE_GEOMETRY));
 
   @PreDestroy
@@ -96,8 +96,8 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
     // }
   }
 
-  public Set<String> getEqualExcludeAttributes() {
-    return this.equalExcludeAttributes;
+  public Set<String> getEqualExcludeFieldNames() {
+    return this.equalExcludeFieldNames;
   }
 
   @PostConstruct
@@ -136,7 +136,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
     final Record object2 = edge2.getObject();
 
     final boolean equalAttributes = EqualsInstance.INSTANCE.equals(object1, object2,
-      this.equalExcludeAttributes);
+      this.equalExcludeFieldNames);
 
     final LineString line1 = edge1.getLine();
     int compare = 0;
@@ -147,7 +147,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
     if (compare == 0) {
       if (equalAttributes) {
         boolean equalExcludedAttributes = true;
-        for (final String name : this.equalExcludeAttributes) {
+        for (final String name : this.equalExcludeFieldNames) {
           if (!RecordEquals.equals(object1, object2, name)) {
             equalExcludedAttributes = false;
           }
@@ -196,14 +196,14 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
     }
   }
 
-  public void setEqualExcludeAttributes(final Collection<String> equalExcludeAttributes) {
-    setEqualExcludeAttributes(new HashSet<String>(equalExcludeAttributes));
+  public void setEqualExcludeFieldNames(final Collection<String> equalExcludeFieldNames) {
+    setEqualExcludeFieldNames(new HashSet<String>(equalExcludeFieldNames));
   }
 
-  public void setEqualExcludeAttributes(final Set<String> equalExcludeAttributes) {
-    this.equalExcludeAttributes = new HashSet<String>(equalExcludeAttributes);
-    this.equalExcludeAttributes.add(RecordEquals.EXCLUDE_ID);
-    this.equalExcludeAttributes.add(RecordEquals.EXCLUDE_GEOMETRY);
+  public void setEqualExcludeFieldNames(final Set<String> equalExcludeFieldNames) {
+    this.equalExcludeFieldNames = new HashSet<String>(equalExcludeFieldNames);
+    this.equalExcludeFieldNames.add(RecordEquals.EXCLUDE_ID);
+    this.equalExcludeFieldNames.add(RecordEquals.EXCLUDE_GEOMETRY);
   }
 
   @Override

@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.record.table;
 
+import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -41,7 +42,9 @@ import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.ConsumerAction;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -58,6 +61,7 @@ import com.revolsys.swing.map.layer.record.SqlLayerFilter;
 import com.revolsys.swing.map.layer.record.component.FieldFilterPanel;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.menu.WrappedMenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.TablePanel;
@@ -251,6 +255,25 @@ public class RecordLayerTablePanel extends TablePanel
 
     toolBar.addButton("search", "Clear Search", "filter_delete", hasFilter, this.fieldFilterPanel,
       "clear");
+
+    toolBar.addButton("search",
+      ConsumerAction.action(Icons.getIconWithBadge("book", "filter"), "Query History", (event) -> {
+        final Object source = event.getSource();
+        Component component = null;
+        if (source instanceof Component) {
+          component = (Component)source;
+        }
+        final PopupMenu queryMenu = new PopupMenu("Query History");
+        final MenuFactory factory = queryMenu.getMenu();
+        // factory.addMenuItemTitleIcon("default", "Add Bookmark", "add", this,
+        // "addZoomBookmark");
+
+        for (final Condition filter : this.tableModel.getFilterHistory()) {
+          factory.addMenuItemTitleIcon("bookmark", filter.toString(), null,
+            () -> this.fieldFilterPanel.setFilter(filter));
+        }
+        queryMenu.show(component, 0, 20);
+      }));
 
     // Filter buttons
 

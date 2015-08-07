@@ -37,7 +37,7 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVi
   private static final Logger LOG = LoggerFactory
     .getLogger(LinearIntersectionNotEqualLineEdgeCleanupVisitor.class);
 
-  private Set<String> equalExcludeAttributes = new HashSet<String>(
+  private Set<String> equalExcludeFieldNames = new HashSet<String>(
     Arrays.asList(RecordEquals.EXCLUDE_ID, RecordEquals.EXCLUDE_GEOMETRY));
 
   private Statistics duplicateStatistics;
@@ -56,8 +56,8 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVi
     this.duplicateStatistics = null;
   }
 
-  public Set<String> getEqualExcludeAttributes() {
-    return this.equalExcludeAttributes;
+  public Set<String> getEqualExcludeFieldNames() {
+    return this.equalExcludeFieldNames;
   }
 
   public Comparator<Record> getNewerComparator() {
@@ -94,14 +94,14 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVi
     throw new IllegalArgumentException("Cannot override comparator");
   }
 
-  public void setEqualExcludeAttributes(final Collection<String> equalExcludeAttributes) {
-    setEqualExcludeAttributes(new HashSet<String>(equalExcludeAttributes));
+  public void setEqualExcludeFieldNames(final Collection<String> equalExcludeFieldNames) {
+    setEqualExcludeFieldNames(new HashSet<String>(equalExcludeFieldNames));
   }
 
-  public void setEqualExcludeAttributes(final Set<String> equalExcludeAttributes) {
-    this.equalExcludeAttributes = new HashSet<String>(equalExcludeAttributes);
-    this.equalExcludeAttributes.add(RecordEquals.EXCLUDE_ID);
-    this.equalExcludeAttributes.add(RecordEquals.EXCLUDE_GEOMETRY);
+  public void setEqualExcludeFieldNames(final Set<String> equalExcludeFieldNames) {
+    this.equalExcludeFieldNames = new HashSet<String>(equalExcludeFieldNames);
+    this.equalExcludeFieldNames.add(RecordEquals.EXCLUDE_ID);
+    this.equalExcludeFieldNames.add(RecordEquals.EXCLUDE_GEOMETRY);
   }
 
   public void setNewerComparator(final Comparator<Record> newerComparator) {

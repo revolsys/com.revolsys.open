@@ -30,7 +30,7 @@ public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record
 
   private Statistics splitStatistics;
 
-  private final Set<String> equalExcludeAttributes = new HashSet<String>(
+  private final Set<String> equalExcludeFieldNames = new HashSet<String>(
     Arrays.asList(RecordEquals.EXCLUDE_ID, RecordEquals.EXCLUDE_GEOMETRY));
 
   @PreDestroy
@@ -41,8 +41,8 @@ public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record
     this.splitStatistics = null;
   }
 
-  public Set<String> getEqualExcludeAttributes() {
-    return this.equalExcludeAttributes;
+  public Set<String> getEqualExcludeFieldNames() {
+    return this.equalExcludeFieldNames;
   }
 
   @PostConstruct

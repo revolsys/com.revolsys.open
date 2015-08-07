@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import javax.annotation.PreDestroy;
@@ -377,6 +378,139 @@ public class Graph<T> {
       }
     }
     return nodesFound;
+  }
+
+  @SuppressWarnings("unchecked")
+  public void forEachEdge(final Consumer<Edge<T>> action) {
+    Predicate<Edge<T>> filter = null;
+    if (action instanceof PredicateProxy) {
+      filter = ((PredicateProxy<Edge<T>>)action).getPredicate();
+    }
+    Comparator<Edge<T>> comparator = null;
+    if (action instanceof ComparatorProxy) {
+      comparator = ((ComparatorProxy<Edge<T>>)action).getComparator();
+    }
+    forEachEdge(action, filter, comparator);
+  }
+
+  public void forEachEdge(final Consumer<Edge<T>> action, final Comparator<Edge<T>> comparator) {
+    forEachEdge(action, null, comparator);
+  }
+
+  public void forEachEdge(final Consumer<Edge<T>> action, final Predicate<Edge<T>> filter) {
+    forEachEdge(action, filter, null);
+  }
+
+  public void forEachEdge(final Consumer<Edge<T>> action, final Predicate<Edge<T>> filter,
+    final Comparator<Edge<T>> comparator) {
+    final LinkedList<Edge<T>> edges = new LinkedList<Edge<T>>(getEdges(filter));
+    if (comparator != null) {
+      Collections.sort(edges, comparator);
+    }
+    final EdgeEventListener<T> listener = new EdgeEventListener<T>() {
+      @Override
+      public void edgeEvent(final EdgeEvent<T> edgeEvent) {
+        final Edge<T> edge = edgeEvent.getEdge();
+        final String action = edgeEvent.getAction();
+        if (action.equals(EdgeEvent.EDGE_ADDED)) {
+          edges.addFirst(edge);
+          if (comparator == null) {
+            Collections.sort(edges);
+          } else {
+            Collections.sort(edges, comparator);
+          }
+        } else if (action.equals(EdgeEvent.EDGE_REMOVED)) {
+          if (comparator != null) {
+            edges.remove(edge);
+          }
+        }
+      }
+    };
+    this.edgeListeners.add(listener);
+    try {
+      while (!edges.isEmpty()) {
+        final Edge<T> edge = edges.remove(0);
+        if (!edge.isRemoved()) {
+          action.accept(edge);
+        }
+      }
+    } finally {
+      this.edgeListeners.remove(listener);
+    }
+  }
+
+  public void forEachEdge(final Visitor<Edge<T>> visitor,
+    final com.revolsys.jts.geom.BoundingBox envelope) {
+    final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
+    edgeIndex.visit(envelope, visitor);
+  }
+
+  @SuppressWarnings("unchecked")
+  public void forEachNode(final Consumer<Node<T>> action) {
+    Predicate<Node<T>> filter = null;
+    if (action instanceof PredicateProxy) {
+      filter = ((PredicateProxy<Node<T>>)action).getPredicate();
+    }
+    Comparator<Node<T>> comparator = null;
+    if (action instanceof ComparatorProxy) {
+      comparator = ((ComparatorProxy<Node<T>>)action).getComparator();
+    }
+    forEachNode(action, filter, comparator);
+  }
+
+  public void forEachNode(final Consumer<Node<T>> action, final Comparator<Node<T>> comparator) {
+    forEachNode(action, null, comparator);
+  }
+
+  public void forEachNode(final Consumer<Node<T>> action, final Predicate<Node<T>> filter) {
+    forEachNode(action, filter, null);
+  }
+
+  // TODO make this work with cached nodes
+  public void forEachNode(final Consumer<Node<T>> action, final Predicate<Node<T>> filter,
+    final Comparator<Node<T>> comparator) {
+    final List<Node<T>> nodes = new LinkedList<Node<T>>();
+    if (filter == null) {
+      nodes.addAll(getNodes());
+    } else {
+      for (final Node<T> node : getNodes()) {
+        if (filter.test(node)) {
+          nodes.add(node);
+        }
+      }
+    }
+    if (comparator != null) {
+      Collections.sort(nodes, comparator);
+    }
+
+    final NodeEventListener<T> listener = new NodeEventListener<T>() {
+      @Override
+      public void nodeEvent(final NodeEvent<T> nodeEvent) {
+        final Node<T> node = nodeEvent.getNode();
+        final String action = nodeEvent.getAction();
+        if (action.equals(NodeEvent.NODE_ADDED)) {
+          nodes.add(node);
+          if (comparator == null) {
+            Collections.sort(nodes);
+          } else {
+            Collections.sort(nodes, comparator);
+          }
+        } else if (action.equals(NodeEvent.NODE_REMOVED)) {
+          nodes.remove(node);
+        }
+      }
+    };
+    this.nodeListeners.add(listener);
+    try {
+      while (!nodes.isEmpty()) {
+        final Node<T> node = nodes.remove(0);
+        if (!node.isRemoved()) {
+          action.accept(node);
+        }
+      }
+    } finally {
+      this.nodeListeners.remove(listener);
+    }
   }
 
   public double getClosestDistance(final Node<T> node, final double maxDistance) {

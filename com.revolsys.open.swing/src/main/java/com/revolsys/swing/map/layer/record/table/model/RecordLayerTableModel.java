@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -108,6 +109,8 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   private Condition filter;
 
+  private final LinkedList<Condition> filterHistory = new LinkedList<>();
+
   private boolean filterByBoundingBox;
 
   private List<String> fieldFilterModes = Arrays.asList(MODE_ALL, MODE_SELECTED, MODE_EDITS);
@@ -180,6 +183,10 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   public Condition getFilter() {
     return this.filter;
+  }
+
+  public LinkedList<Condition> getFilterHistory() {
+    return this.filterHistory;
   }
 
   protected Query getFilterQuery() {
@@ -566,6 +573,13 @@ public class RecordLayerTableModel extends RecordRowTableModel
     } else {
       final Object oldValue = this.filter;
       this.filter = filter;
+      if (filter != null && !Equals.equal(oldValue, filter)) {
+        this.filterHistory.remove(filter);
+        this.filterHistory.addFirst(filter);
+        while (this.filterHistory.size() > 20) {
+          this.filterHistory.removeLast();
+        }
+      }
       if (MODE_SELECTED.equals(getFieldFilterMode())) {
         setRowSorter(filter);
       } else {

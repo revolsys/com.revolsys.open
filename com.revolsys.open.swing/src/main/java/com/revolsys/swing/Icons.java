@@ -213,6 +213,11 @@ public class Icons {
     return new ImageIcon(image);
   }
 
+  public static Icon getIconWithBadge(final String iconName, final String badgeName) {
+    final Icon icon = getIcon(iconName);
+    return getIconWithBadge(icon, badgeName);
+  }
+
   protected static BufferedImage getImage(final InputStream in) {
     if (in != null) {
       try {
