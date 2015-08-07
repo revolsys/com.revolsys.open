@@ -14,7 +14,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.io.RecordDirectoryReader;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.Reader;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 
 /**
  * <p>

@@ -23,7 +23,7 @@ import com.revolsys.format.gpx.GpxConstants;
 import com.revolsys.format.xml.StaxUtils;
 import com.revolsys.io.FileUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 
 public class TcxIterator extends BaseObjectWithProperties
   implements Iterator<Record>, RecordReader {

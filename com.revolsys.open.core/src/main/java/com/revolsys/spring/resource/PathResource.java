@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.revolsys.spring;
+package com.revolsys.spring.resource;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
@@ -28,11 +27,7 @@ import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.springframework.core.io.AbstractResource;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.WritableResource;
-import org.springframework.lang.UsesJava7;
+import com.revolsys.spring.resource.FileSystemResource;
 import org.springframework.util.Assert;
 
 /**
@@ -44,8 +39,7 @@ import org.springframework.util.Assert;
  * @since 4.0
  * @see java.nio.file.Path
  */
-@UsesJava7
-public class PathResource extends AbstractResource implements WritableResource {
+public class PathResource extends AbstractResource {
 
   private final Path path;
 
@@ -104,7 +98,7 @@ public class PathResource extends AbstractResource implements WritableResource {
    * @see java.nio.file.Path#resolve(String)
    */
   @Override
-  public Resource createRelative(final String relativePath) throws IOException {
+  public Resource createRelative(final String relativePath) {
     return new PathResource(this.path.resolve(relativePath));
   }
 
@@ -168,16 +162,14 @@ public class PathResource extends AbstractResource implements WritableResource {
     return Files.newInputStream(this.path);
   }
 
-  /**
-   * This implementation opens a OutputStream for the underlying file.
-   * @see java.nio.file.spi.FileSystemProvider#newOutputStream(Path, OpenOption...)
-   */
   @Override
-  public OutputStream getOutputStream() throws IOException {
-    if (Files.isDirectory(this.path)) {
-      throw new FileNotFoundException(getPath() + " (is a directory)");
+  public Resource getParent() {
+    final Path parentPath = this.path.getParent();
+    if (parentPath == null) {
+      return null;
+    } else {
+      return new PathResource(parentPath);
     }
-    return Files.newOutputStream(this.path);
   }
 
   /**
@@ -225,17 +217,6 @@ public class PathResource extends AbstractResource implements WritableResource {
   @Override
   public boolean isReadable() {
     return Files.isReadable(this.path) && !Files.isDirectory(this.path);
-  }
-
-  /**
-   * This implementation checks whether the underlying file is marked as writable
-   * (and corresponds to an actual file with content, not to a directory).
-   * @see java.nio.file.Files#isWritable(Path)
-   * @see java.nio.file.Files#isDirectory(Path, java.nio.file.LinkOption...)
-   */
-  @Override
-  public boolean isWritable() {
-    return Files.isWritable(this.path) && !Files.isDirectory(this.path);
   }
 
   /**

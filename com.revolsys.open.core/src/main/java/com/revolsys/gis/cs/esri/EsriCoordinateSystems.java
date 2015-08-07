@@ -13,7 +13,6 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.cs.Authority;
@@ -25,8 +24,8 @@ import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.WktCsParser;
 import com.revolsys.io.Paths;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.spring.NonExistingResource;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.WrappedException;
 
 public class EsriCoordinateSystems {
@@ -76,7 +75,7 @@ public class EsriCoordinateSystems {
 
   public static void createPrjFile(final Resource resource, final GeometryFactory geometryFactory) {
     final Resource prjResource = SpringUtil.getResourceWithExtension(resource, "prj");
-    if (!(prjResource instanceof NonExistingResource)) {
+    if (prjResource != null) {
       try (
         final Writer writer = SpringUtil.getWriter(prjResource, StandardCharsets.ISO_8859_1)) {
         createPrjFile(writer, geometryFactory);

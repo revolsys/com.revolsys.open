@@ -29,9 +29,9 @@ import org.springframework.core.PriorityOrdered;
 import org.springframework.util.StringValueResolver;
 
 import com.revolsys.spring.BeanReference;
-import com.revolsys.spring.SpringUtil;
 import com.revolsys.spring.TargetBeanFactoryBean;
 import com.revolsys.spring.factory.Parameter;
+import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.spring.util.PlaceholderResolvingStringValueResolver;
 
 public class BeanConfigurrer

@@ -4,11 +4,9 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,13 +14,12 @@ import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 
-import org.springframework.core.io.UrlResource;
-
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.format.json.Json;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
 import com.revolsys.util.UriTemplate;
 import com.revolsys.util.UrlUtil;
@@ -72,12 +69,8 @@ public class BingClient {
     Map<String, Object> cachedRecordDefinition = this.recordDefinitionCache.get(imagerySet);
     if (cachedRecordDefinition == null) {
       final String url = getImageryMetadataUrl(imagerySet);
-      try {
-        cachedRecordDefinition = Json.toMap(new UrlResource(url));
-        this.recordDefinitionCache.put(imagerySet, cachedRecordDefinition);
-      } catch (final MalformedURLException e) {
-        return Collections.emptyMap();
-      }
+      cachedRecordDefinition = Json.toMap(new UrlResource(url));
+      this.recordDefinitionCache.put(imagerySet, cachedRecordDefinition);
     }
     return cachedRecordDefinition;
   }

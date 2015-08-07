@@ -32,7 +32,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.io.input.XmlStreamReader;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 

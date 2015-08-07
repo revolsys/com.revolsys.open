@@ -16,7 +16,7 @@ import com.revolsys.format.raster.RasterWriter;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.raster.BufferedGeoreferencedImage;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.WrappedException;
 
 public class UsgsDemGeoreferencedImage extends BufferedGeoreferencedImage {

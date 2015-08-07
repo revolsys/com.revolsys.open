@@ -44,6 +44,14 @@ public enum Side {
     return this.name;
   }
 
+  public boolean isLeft() {
+    return this == LEFT;
+  }
+
+  public boolean isRight() {
+    return this == RIGHT;
+  }
+
   @Override
   public String toString() {
     return this.name;

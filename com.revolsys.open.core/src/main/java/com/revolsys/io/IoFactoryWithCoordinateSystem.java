@@ -4,7 +4,7 @@ import java.util.Set;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 
-public interface IoFactoryWithCoordinateSystem {
+public interface IoFactoryWithCoordinateSystem extends IoFactory {
   Set<CoordinateSystem> getCoordinateSystems();
 
   default boolean isCoordinateSystemSupported(final CoordinateSystem coordinateSystem) {

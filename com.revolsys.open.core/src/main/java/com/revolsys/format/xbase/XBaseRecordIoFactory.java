@@ -13,7 +13,7 @@ import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
-import com.revolsys.spring.OutputStreamResource;
+import com.revolsys.spring.resource.OutputStreamResource;
 
 public class XBaseRecordIoFactory extends AbstractIoFactoryWithCoordinateSystem
   implements RecordReaderFactory, RecordWriterFactory {

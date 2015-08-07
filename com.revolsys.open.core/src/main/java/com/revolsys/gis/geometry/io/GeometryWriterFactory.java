@@ -8,14 +8,13 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.IoFactoryWithCoordinateSystem;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 
 public interface GeometryWriterFactory extends FileIoFactory, IoFactoryWithCoordinateSystem {
 
   default GeometryWriter createGeometryWriter(final Object source) {
-    final Resource resource = IoFactoryRegistry.getResource(source);
+    final Resource resource = com.revolsys.spring.resource.Resource.getResource(source);
     return createGeometryWriter(resource);
   }
 

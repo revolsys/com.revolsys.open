@@ -35,7 +35,7 @@ import com.revolsys.io.map.IteratorMapReader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.WrappedException;
 

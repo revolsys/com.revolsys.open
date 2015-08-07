@@ -7,7 +7,7 @@ import java.util.Map;
 import javax.annotation.PreDestroy;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.FileSystemResource;
+import com.revolsys.spring.resource.FileSystemResource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.io.RecordWriter;

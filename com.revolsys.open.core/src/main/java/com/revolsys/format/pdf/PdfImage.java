@@ -16,7 +16,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.raster.JaiGeoreferencedImage;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 
 public class PdfImage extends JaiGeoreferencedImage {
 

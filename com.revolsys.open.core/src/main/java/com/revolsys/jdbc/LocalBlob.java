@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 
 public class LocalBlob implements Blob {
 

@@ -16,7 +16,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 
 public class ZipUtil {
   /**

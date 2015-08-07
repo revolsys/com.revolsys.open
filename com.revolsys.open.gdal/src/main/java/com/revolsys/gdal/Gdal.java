@@ -28,7 +28,7 @@ import org.gdal.ogr.ogr;
 import org.gdal.osr.SpatialReference;
 import org.gdal.osr.osr;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.FileSystemResource;
+import com.revolsys.spring.resource.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.format.json.Json;
@@ -42,7 +42,7 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;

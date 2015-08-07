@@ -13,7 +13,7 @@ import java.util.Stack;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.io.FileUtil;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 
 public class WktCsParser {
   public static CoordinateSystem read(final String wkt) {

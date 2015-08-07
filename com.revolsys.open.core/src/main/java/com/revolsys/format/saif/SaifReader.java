@@ -56,7 +56,7 @@ import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Path;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 
 /**
  * <p>

@@ -9,13 +9,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 
-import org.springframework.core.io.FileSystemResource;
+import com.revolsys.spring.resource.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 
 public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
   public OracleJdbcClobFieldDefinition(final String dbName, final String name, final int sqlType,

@@ -40,8 +40,7 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.spring.NonExistingResource;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.MathUtil;
 
 public class ShapefileRecordWriter extends XbaseRecordWriter {
@@ -132,7 +131,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
         }
 
         final Resource indexResource = SpringUtil.getResourceWithExtension(this.resource, "shx");
-        if (!(indexResource instanceof NonExistingResource)) {
+        if (indexResource != null) {
           this.indexOut = new ResourceEndianOutput(indexResource);
           writeHeader(this.indexOut);
         }

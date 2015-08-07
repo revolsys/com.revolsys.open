@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
-import org.springframework.core.io.FileSystemResource;
+import com.revolsys.spring.resource.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.RecordFactory;

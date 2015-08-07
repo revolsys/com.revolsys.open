@@ -75,7 +75,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.util.BoundingBoxUtil;
-import com.revolsys.spring.ByteArrayResource;
+import com.revolsys.spring.resource.ByteArrayResource;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;

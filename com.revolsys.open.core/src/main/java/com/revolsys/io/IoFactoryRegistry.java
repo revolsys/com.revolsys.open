@@ -2,7 +2,6 @@ package com.revolsys.io;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
@@ -20,17 +19,13 @@ import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.data.record.io.RecordWriterFactory;
-import com.revolsys.io.file.UrlResource;
-import com.revolsys.spring.PathResource;
-import com.revolsys.spring.SpringUtil;
+import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
-import com.revolsys.util.WrappedException;
 
 public class IoFactoryRegistry {
 
@@ -82,30 +77,6 @@ public class IoFactoryRegistry {
       }
       return instance;
     }
-  }
-
-  public static Resource getResource(final Object source) {
-    Resource resource;
-    if (source instanceof Resource) {
-      resource = (Resource)source;
-    } else if (source instanceof Path) {
-      resource = new PathResource((Path)source);
-    } else if (source instanceof File) {
-      resource = new FileSystemResource((File)source);
-    } else if (source instanceof URL) {
-      resource = new UrlResource((URL)source);
-    } else if (source instanceof URI) {
-      try {
-        resource = new UrlResource((URI)source);
-      } catch (final MalformedURLException e) {
-        throw new WrappedException(e);
-      }
-    } else if (source instanceof String) {
-      return SpringUtil.getResource((String)source);
-    } else {
-      throw new IllegalArgumentException(source.getClass() + " is not supported");
-    }
-    return resource;
   }
 
   public static void init() {

@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.FileSystemResource;
+import com.revolsys.spring.resource.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.map.Maps;

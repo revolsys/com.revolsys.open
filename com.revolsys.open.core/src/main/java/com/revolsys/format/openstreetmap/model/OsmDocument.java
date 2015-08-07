@@ -1,6 +1,5 @@
 package com.revolsys.format.openstreetmap.model;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,10 +12,10 @@ import org.springframework.core.io.Resource;
 import com.revolsys.collection.map.LongHashMap;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.format.xml.StaxUtils;
-import com.revolsys.io.file.UrlResource;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
 
 public class OsmDocument implements OsmConstants {
@@ -34,12 +33,8 @@ public class OsmDocument implements OsmConstants {
         url.append(boundingBox.getMaxX());
         url.append(",");
         url.append(boundingBox.getMaxY());
-        try {
-          final Resource resource = new UrlResource(url.toString());
-          return new OsmDocument(resource);
-        } catch (final IOException e) {
-          throw new RuntimeException("Unable to read " + url, e);
-        }
+        final Resource resource = new UrlResource(url.toString());
+        return new OsmDocument(resource);
       }
     }
     return new OsmDocument();
