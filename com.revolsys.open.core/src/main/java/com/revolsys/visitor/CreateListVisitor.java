@@ -21,9 +21,8 @@ public class CreateListVisitor<T> extends BaseVisitor<T> {
   }
 
   @Override
-  public boolean doVisit(final T item) {
+  public void doAccept(final T item) {
     this.list.add(item);
-    return true;
   }
 
   public List<T> getList() {

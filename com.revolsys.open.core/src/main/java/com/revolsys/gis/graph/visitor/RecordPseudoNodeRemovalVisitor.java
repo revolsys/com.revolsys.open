@@ -18,7 +18,6 @@ import com.revolsys.gis.graph.attribute.NodeProperties;
 import com.revolsys.gis.graph.attribute.PseudoNodeAttribute;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.predicate.PredicateProxy;
-import com.revolsys.util.ObjectProcessor;
 
 /**
  * Find and remove nodes that have exactly two edges for each feature type with
@@ -27,7 +26,7 @@ import com.revolsys.util.ObjectProcessor;
  * @author Paul Austin
  */
 public class RecordPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<Record>
-  implements PredicateProxy<Node<Record>>, ObjectProcessor<RecordGraph> {
+  implements PredicateProxy<Node<Record>> {
 
   private Predicate<Node<Record>> predicate;
 
@@ -94,11 +93,6 @@ public class RecordPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<
   protected Record mergeObjects(final Node<Record> node, final Record object1,
     final Record object2) {
     return DirectionalAttributes.merge(node, object1, object2);
-  }
-
-  @Override
-  public void process(final RecordGraph graph) {
-    graph.forEachNode(this);
   }
 
   private void processPseudoNodes(final Node<Record> node) {

@@ -1,12 +1,11 @@
 package com.revolsys.visitor;
 
 import java.util.Comparator;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.collection.Visitor;
-
 public class DelegatingVisitor<T> extends AbstractVisitor<T> {
-  private Visitor<T> visitor;
+  private Consumer<T> action;
 
   public DelegatingVisitor() {
   }
@@ -15,9 +14,13 @@ public class DelegatingVisitor<T> extends AbstractVisitor<T> {
     super(comparator);
   }
 
-  public DelegatingVisitor(final Comparator<T> comparator, final Visitor<T> visitor) {
+  public DelegatingVisitor(final Comparator<T> comparator, final Consumer<T> action) {
     super(comparator);
-    this.visitor = visitor;
+    this.action = action;
+  }
+
+  public DelegatingVisitor(final Consumer<T> action) {
+    this.action = action;
   }
 
   public DelegatingVisitor(final Predicate<T> filter) {
@@ -29,38 +32,34 @@ public class DelegatingVisitor<T> extends AbstractVisitor<T> {
   }
 
   public DelegatingVisitor(final Predicate<T> filter, final Comparator<T> comparator,
-    final Visitor<T> visitor) {
+    final Consumer<T> action) {
     super(filter, comparator);
-    this.visitor = visitor;
+    this.action = action;
   }
 
-  public DelegatingVisitor(final Predicate<T> filter, final Visitor<T> visitor) {
+  public DelegatingVisitor(final Predicate<T> filter, final Consumer<T> action) {
     super(filter);
-    this.visitor = visitor;
-  }
-
-  public DelegatingVisitor(final Visitor<T> visitor) {
-    this.visitor = visitor;
+    this.action = action;
   }
 
   @Override
   public void accept(final T item) {
     final Predicate<T> predicate = getPredicate();
     if (predicate.test(item)) {
-      this.visitor.accept(item);
+      this.action.accept(item);
     }
   }
 
-  public Visitor<T> getVisitor() {
-    return this.visitor;
+  public Consumer<T> getAction() {
+    return this.action;
   }
 
-  public void setVisitor(final Visitor<T> visitor) {
-    this.visitor = visitor;
+  public void setAction(final Consumer<T> action) {
+    this.action = action;
   }
 
   @Override
   public String toString() {
-    return this.visitor.toString();
+    return this.action.toString();
   }
 }

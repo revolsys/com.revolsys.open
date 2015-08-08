@@ -3,7 +3,6 @@ package com.revolsys.gis.graph.visitor;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -22,10 +21,10 @@ public class NodeWithinBoundingBoxVisitor<T> implements Consumer<Node<T>> {
 
   private final BoundingBox boundingBox;
 
-  private final Visitor<Node<T>> matchVisitor;
+  private final Consumer<Node<T>> matchVisitor;
 
   public NodeWithinBoundingBoxVisitor(final BoundingBox boundingBox,
-    final Visitor<Node<T>> matchVisitor) {
+    final Consumer<Node<T>> matchVisitor) {
     this.boundingBox = boundingBox;
     this.matchVisitor = matchVisitor;
   }

@@ -6,9 +6,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.data.filter.RecordEqualsFilter;
 import com.revolsys.data.filter.RecordGeometryBoundingBoxIntersectsFilter;
 import com.revolsys.data.filter.RecordGeometryDistanceFilter;
@@ -77,7 +77,7 @@ public class RecordQuadTree extends QuadTree<Record> {
     return results;
   }
 
-  public void query(final Geometry geometry, final Visitor<Record> visitor) {
+  public void query(final Geometry geometry, final Consumer<Record> visitor) {
     final BoundingBox boundingBox = geometry.getBoundingBox();
     forEach(visitor, boundingBox);
   }

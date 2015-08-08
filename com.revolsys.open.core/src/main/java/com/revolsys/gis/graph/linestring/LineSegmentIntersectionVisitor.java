@@ -18,12 +18,8 @@ public class LineSegmentIntersectionVisitor extends AbstractEdgeListenerVisitor<
     this.querySeg = querySeg;
   }
 
-  public Set<Geometry> getIntersections() {
-    return this.intersections;
-  }
-
   @Override
-  public boolean visit(final Edge<LineSegment> edge) {
+  public void accept(final Edge<LineSegment> edge) {
     final LineSegment lineSegment = edge.getObject();
     if (lineSegment.getBoundingBox().intersects(this.querySeg.getBoundingBox())) {
       final Geometry intersection = this.querySeg.getIntersection(lineSegment);
@@ -31,6 +27,9 @@ public class LineSegmentIntersectionVisitor extends AbstractEdgeListenerVisitor<
         this.intersections.add(intersection);
       }
     }
-    return true;
+  }
+
+  public Set<Geometry> getIntersections() {
+    return this.intersections;
   }
 }

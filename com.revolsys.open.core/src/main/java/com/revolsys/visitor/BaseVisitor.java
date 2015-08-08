@@ -20,17 +20,14 @@ public class BaseVisitor<T> extends AbstractVisitor<T> {
     super(filter, comparator);
   }
 
-  protected boolean doVisit(final T object) {
-    return true;
-  }
-
   @Override
-  public boolean visit(final T object) {
+  public void accept(final T object) {
     final Predicate<T> predicate = getPredicate();
     if (predicate.test(object)) {
-      return doVisit(object);
-    } else {
-      return true;
+      doAccept(object);
     }
+  }
+
+  protected void doAccept(final T object) {
   }
 }

@@ -1,14 +1,18 @@
 package com.revolsys.gis.graph.visitor;
 
-import com.revolsys.collection.Visitor;
+import java.util.function.Consumer;
+
 import com.revolsys.gis.graph.Edge;
+import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.event.EdgeEventListener;
 import com.revolsys.gis.graph.event.EdgeEventListenerList;
 import com.revolsys.gis.graph.event.NodeEventListener;
 import com.revolsys.gis.graph.event.NodeEventListenerList;
+import com.revolsys.util.ObjectProcessor;
 
-public abstract class AbstractNodeListenerVisitor<T> implements Visitor<Node<T>> {
+public abstract class AbstractNodeListenerVisitor<T>
+  implements Consumer<Node<T>>, ObjectProcessor<Graph<T>> {
 
   private final EdgeEventListenerList<T> edgeListeners = new EdgeEventListenerList<T>();
 
@@ -38,5 +42,10 @@ public abstract class AbstractNodeListenerVisitor<T> implements Visitor<Node<T>>
   public void nodeEvent(final Node<T> node, final String typePath, final String ruleName,
     final String action, final String notes) {
     this.nodeListeners.nodeEvent(node, typePath, ruleName, action, notes);
+  }
+
+  @Override
+  public void process(final Graph<T> graph) {
+    graph.forEachNode(this);
   }
 }

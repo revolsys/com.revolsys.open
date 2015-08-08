@@ -3,12 +3,15 @@ package com.revolsys.swing.action;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
+
+import org.apache.log4j.Logger;
 
 import com.revolsys.i18n.I18nCharSequence;
 import com.revolsys.swing.Icons;
@@ -132,10 +135,21 @@ public class ConsumerAction extends AbstractActionMainMenuItemFactory {
   public void actionPerformed(final ActionEvent event) {
     if (this.invokeLater) {
       Invoke.later(() -> {
-        this.handler.accept(event);
+        doAction(event);
       });
     } else {
-      this.handler.accept(event);
+      doAction(event);
+    }
+  }
+
+  public void doAction(final ActionEvent event) {
+    if (this.handler != null) {
+      try {
+        this.handler.accept(event);
+      } catch (final NoSuchElementException e) {
+      } catch (final Throwable e) {
+        Logger.getLogger(this.handler.getClass()).error("Error Performing action", e);
+      }
     }
   }
 

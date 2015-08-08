@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -32,9 +31,9 @@ public class OnLineNodeVisitor<T> implements Consumer<Node<T>> {
 
   private final LineString line;
 
-  private final Visitor<Node<T>> matchVisitor;
+  private final Consumer<Node<T>> matchVisitor;
 
-  public OnLineNodeVisitor(final LineString line, final Visitor<Node<T>> matchVisitor) {
+  public OnLineNodeVisitor(final LineString line, final Consumer<Node<T>> matchVisitor) {
     this.line = line;
     this.matchVisitor = matchVisitor;
   }

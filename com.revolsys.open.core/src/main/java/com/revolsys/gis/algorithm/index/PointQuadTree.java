@@ -17,6 +17,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.vertex.Vertex;
+import com.revolsys.util.ExitLoopException;
 
 public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
 
@@ -124,16 +125,19 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
   }
 
   @Override
-  public void forEach(final Consumer<? super T> action, final BoundingBox envelope) {
+  public void forEach(final Consumer<? super T> action) {
     if (this.root != null) {
-      this.root.forEach(action, envelope);
+      try {
+        this.root.forEach(action);
+      } catch (final ExitLoopException e) {
+      }
     }
   }
 
   @Override
-  public void forEach(final Consumer<? super T> action) {
+  public void forEach(final Consumer<? super T> action, final BoundingBox envelope) {
     if (this.root != null) {
-      this.root.forEach(action);
+      this.root.forEach(action, envelope);
     }
   }
 

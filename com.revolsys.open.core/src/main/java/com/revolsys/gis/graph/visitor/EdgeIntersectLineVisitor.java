@@ -3,7 +3,6 @@ package com.revolsys.gis.graph.visitor;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
@@ -26,9 +25,9 @@ public class EdgeIntersectLineVisitor<T> implements Consumer<Edge<T>> {
 
   private final LineString line;
 
-  private final Visitor<Edge<T>> matchVisitor;
+  private final Consumer<Edge<T>> matchVisitor;
 
-  public EdgeIntersectLineVisitor(final LineString line, final Visitor<Edge<T>> matchVisitor) {
+  public EdgeIntersectLineVisitor(final LineString line, final Consumer<Edge<T>> matchVisitor) {
     this.line = line;
     this.matchVisitor = matchVisitor;
   }

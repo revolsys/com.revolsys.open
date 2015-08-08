@@ -22,7 +22,6 @@ import java.util.function.Predicate;
 
 import javax.annotation.PreDestroy;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.collection.bplus.BPlusTreeMap;
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.comparator.ComparatorProxy;
@@ -58,6 +57,7 @@ import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.predicate.PredicateProxy;
 import com.revolsys.predicate.Predicates;
+import com.revolsys.util.ExitLoopException;
 import com.revolsys.util.MathUtil;
 import com.revolsys.visitor.CreateListVisitor;
 
@@ -391,6 +391,11 @@ public class Graph<T> {
     forEachEdge(action, filter, comparator);
   }
 
+  public void forEachEdge(final Consumer<Edge<T>> visitor, final BoundingBox envelope) {
+    final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
+    edgeIndex.forEach(visitor, envelope);
+  }
+
   public void forEachEdge(final Consumer<Edge<T>> action, final Comparator<Edge<T>> comparator) {
     forEachEdge(action, null, comparator);
   }
@@ -432,15 +437,10 @@ public class Graph<T> {
           action.accept(edge);
         }
       }
+    } catch (final ExitLoopException e) {
     } finally {
       this.edgeListeners.remove(listener);
     }
-  }
-
-  public void forEachEdge(final Visitor<Edge<T>> visitor,
-    final com.revolsys.jts.geom.BoundingBox envelope) {
-    final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
-    edgeIndex.forEach(visitor, envelope);
   }
 
   @SuppressWarnings("unchecked")
@@ -506,6 +506,7 @@ public class Graph<T> {
           action.accept(node);
         }
       }
+    } catch (final ExitLoopException e) {
     } finally {
       this.nodeListeners.remove(listener);
     }
@@ -1034,8 +1035,8 @@ public class Graph<T> {
     index.forEach(visitor, env);
   }
 
-  public void queryEdges(final EdgeVisitor<T> visitor, final Visitor<Edge<T>> matchVisitor) {
-    visitor.setVisitor(matchVisitor);
+  public void queryEdges(final EdgeVisitor<T> visitor, final Consumer<Edge<T>> matchVisitor) {
+    visitor.setAction(matchVisitor);
     queryEdges(visitor);
   }
 

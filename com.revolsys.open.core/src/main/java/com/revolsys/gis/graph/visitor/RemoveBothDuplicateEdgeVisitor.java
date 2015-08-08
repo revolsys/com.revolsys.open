@@ -1,6 +1,7 @@
 package com.revolsys.gis.graph.visitor;
 
 import java.util.Set;
+import java.util.function.Consumer;
 
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
@@ -8,14 +9,13 @@ import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.util.ObjectProcessor;
-import com.revolsys.visitor.AbstractVisitor;
 
 /**
  * Find all edges that share the same line geometry and remove the current edge
  * and matching edges. Can be used to dissolve lines between polygons.
  */
-public class RemoveBothDuplicateEdgeVisitor<T> extends AbstractVisitor<Edge<T>>
-  implements ObjectProcessor<Graph<T>> {
+public class RemoveBothDuplicateEdgeVisitor<T>
+  implements Consumer<Edge<T>>, ObjectProcessor<Graph<T>> {
   @Override
   public void accept(final Edge<T> edge) {
     final LineString line = edge.getLine();

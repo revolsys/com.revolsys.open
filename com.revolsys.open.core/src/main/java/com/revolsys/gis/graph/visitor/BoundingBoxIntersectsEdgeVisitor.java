@@ -1,8 +1,8 @@
 package com.revolsys.gis.graph.visitor;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
@@ -32,7 +32,7 @@ public class BoundingBoxIntersectsEdgeVisitor<T> extends DelegatingVisitor<Edge<
   private final BoundingBox boundingBox;
 
   public BoundingBoxIntersectsEdgeVisitor(final BoundingBox boundingBox,
-    final Visitor<Edge<T>> matchVisitor) {
+    final Consumer<Edge<T>> matchVisitor) {
     super(matchVisitor);
     this.boundingBox = boundingBox;
   }

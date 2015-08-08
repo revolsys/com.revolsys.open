@@ -2,9 +2,9 @@ package com.revolsys.gis.graph.visitor;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -57,7 +57,7 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>>implements 
   }
 
   public EdgeWithinDistance(final Geometry geometry, final double maxDistance,
-    final Visitor<Edge<T>> matchVisitor) {
+    final Consumer<Edge<T>> matchVisitor) {
     super(matchVisitor);
     this.geometry = geometry;
     this.maxDistance = maxDistance;
@@ -66,7 +66,7 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>>implements 
   @Override
   public void accept(final Edge<T> edge) {
     if (test(edge)) {
-      super.visit(edge);
+      super.accept(edge);
     }
   }
 

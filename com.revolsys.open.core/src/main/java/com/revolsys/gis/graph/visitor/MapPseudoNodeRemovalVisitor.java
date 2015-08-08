@@ -24,9 +24,4 @@ public class MapPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<Map
       graph.merge(node, edge1, edge2);
     }
   }
-
-  @Override
-  public void process(final Graph<Map<String, Object>> graph) {
-    graph.forEachNode(this);
-  }
 }

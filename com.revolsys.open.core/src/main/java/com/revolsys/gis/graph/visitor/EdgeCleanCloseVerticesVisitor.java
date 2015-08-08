@@ -3,7 +3,6 @@ package com.revolsys.gis.graph.visitor;
 import java.util.LinkedHashSet;
 import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.gis.event.CoordinateEventListenerList;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
@@ -32,7 +31,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Consumer<Edge<T>> {
   }
 
   public EdgeCleanCloseVerticesVisitor(final Graph<T> graph, final double minDistance,
-    final Visitor<Edge<T>> visitor) {
+    final Consumer<Edge<T>> visitor) {
     this.graph = graph;
     this.minDistance = minDistance;
   }

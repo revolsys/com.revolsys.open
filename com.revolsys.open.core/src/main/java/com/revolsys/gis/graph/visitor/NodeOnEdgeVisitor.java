@@ -2,8 +2,8 @@ package com.revolsys.gis.graph.visitor;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
@@ -42,7 +42,7 @@ public class NodeOnEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
   private final double maxDistance;
 
   public NodeOnEdgeVisitor(final Node<T> node, final BoundingBox boundingBox,
-    final double maxDistance, final Visitor<Edge<T>> matchVisitor) {
+    final double maxDistance, final Consumer<Edge<T>> matchVisitor) {
     super(matchVisitor);
     this.node = node;
     this.boundingBox = boundingBox;

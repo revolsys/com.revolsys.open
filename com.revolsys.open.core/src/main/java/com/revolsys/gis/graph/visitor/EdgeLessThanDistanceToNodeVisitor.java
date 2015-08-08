@@ -1,8 +1,8 @@
 package com.revolsys.gis.graph.visitor;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -32,7 +32,7 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends DelegatingVisitor<Edge
   private final Node<T> node;
 
   public EdgeLessThanDistanceToNodeVisitor(final Node<T> node, final double maxDistance,
-    final Visitor<Edge<T>> matchVisitor) {
+    final Consumer<Edge<T>> matchVisitor) {
     super(matchVisitor);
     this.node = node;
     this.maxDistance = maxDistance;
@@ -47,7 +47,7 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends DelegatingVisitor<Edge
     if (this.envelope.distance(envelope) < this.maxDistance) {
       if (!edge.hasNode(this.node)) {
         if (edge.isLessThanDistance(this.node, this.maxDistance)) {
-          super.visit(edge);
+          super.accept(edge);
         }
       }
     }

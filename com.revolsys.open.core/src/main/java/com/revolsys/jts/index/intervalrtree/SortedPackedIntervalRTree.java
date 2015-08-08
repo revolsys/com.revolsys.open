@@ -37,6 +37,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
+import com.revolsys.util.ExitLoopException;
+
 /**
  * A static index on a set of 1-dimensional intervals,
  * using an R-Tree packed based on the order of the interval midpoints.
@@ -135,8 +137,10 @@ public class SortedPackedIntervalRTree<V> {
    */
   public void query(final double min, final double max, final Consumer<V> visitor) {
     init();
-
-    this.root.query(min, max, visitor);
+    try {
+      this.root.query(min, max, visitor);
+    } catch (final ExitLoopException e) {
+    }
   }
 
 }

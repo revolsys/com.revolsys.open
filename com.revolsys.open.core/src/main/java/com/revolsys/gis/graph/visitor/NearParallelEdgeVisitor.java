@@ -20,6 +20,14 @@ public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
   }
 
   @Override
+  public void accept(final Edge<T> edge) {
+    final LineString matchLine = edge.getLine();
+    if (isAlmostParallel(matchLine)) {
+      super.accept(edge);
+    }
+  }
+
+  @Override
   public BoundingBox getEnvelope() {
     BoundingBox envelope = this.line.getBoundingBox();
     envelope = envelope.expand(this.maxDistance);
@@ -54,15 +62,5 @@ public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
       previousCoordinate = coordinate;
     }
     return false;
-  }
-
-  @Override
-  public boolean visit(final Edge<T> edge) {
-    final LineString matchLine = edge.getLine();
-    if (isAlmostParallel(matchLine)) {
-      return super.visit(edge);
-    } else {
-      return true;
-    }
   }
 }

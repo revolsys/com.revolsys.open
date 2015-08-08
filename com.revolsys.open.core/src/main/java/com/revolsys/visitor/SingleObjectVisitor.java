@@ -3,6 +3,8 @@ package com.revolsys.visitor;
 import java.util.Comparator;
 import java.util.function.Predicate;
 
+import com.revolsys.util.ExitLoopException;
+
 public class SingleObjectVisitor<T> extends BaseVisitor<T> {
   private T object;
 
@@ -22,11 +24,11 @@ public class SingleObjectVisitor<T> extends BaseVisitor<T> {
   }
 
   @Override
-  public boolean doVisit(final T object) {
+  public void accept(final T object) {
     if (this.object == null) {
       this.object = object;
     }
-    return false;
+    throw new ExitLoopException();
   }
 
   public T getObject() {

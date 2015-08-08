@@ -1,6 +1,7 @@
 package com.revolsys.gis.graph.visitor;
 
-import com.revolsys.collection.Visitor;
+import java.util.function.Consumer;
+
 import com.revolsys.data.record.Record;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.RecordGraph;
@@ -11,7 +12,7 @@ public class EdgeLessThanLengthVisitor extends AbstractEdgeListenerVisitor<Recor
 
   private double minLength;
 
-  private Visitor<Edge<Record>> visitor;
+  private Consumer<Edge<Record>> visitor;
 
   public EdgeLessThanLengthVisitor() {
   }
@@ -20,7 +21,7 @@ public class EdgeLessThanLengthVisitor extends AbstractEdgeListenerVisitor<Recor
     this.minLength = minLength;
   }
 
-  public EdgeLessThanLengthVisitor(final double minLength, final Visitor<Edge<Record>> visitor) {
+  public EdgeLessThanLengthVisitor(final double minLength, final Consumer<Edge<Record>> visitor) {
     this.minLength = minLength;
     this.visitor = visitor;
   }

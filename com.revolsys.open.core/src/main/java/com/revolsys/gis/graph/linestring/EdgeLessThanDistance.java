@@ -1,9 +1,9 @@
 package com.revolsys.gis.graph.linestring;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
@@ -43,7 +43,7 @@ public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>>
   }
 
   public EdgeLessThanDistance(final LineSegment lineSegment, final double maxDistance,
-    final Visitor<Edge<LineSegment>> matchVisitor) {
+    final Consumer<Edge<LineSegment>> matchVisitor) {
     super(matchVisitor);
     this.lineSegment = lineSegment;
     this.maxDistance = maxDistance;
@@ -52,7 +52,7 @@ public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>>
   @Override
   public void accept(final Edge<LineSegment> edge) {
     if (test(edge)) {
-      super.visit(edge);
+      super.accept(edge);
     }
   }
 

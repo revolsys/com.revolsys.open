@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -30,12 +29,12 @@ public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements Consumer<Nod
 
   private final Point coordinates;
 
-  private final Visitor<Node<T>> matchVisitor;
+  private final Consumer<Node<T>> matchVisitor;
 
   private final double maxDistance;
 
   public NodeLessThanDistanceOfCoordinatesVisitor(final Point coordinates, final double maxDistance,
-    final Visitor<Node<T>> matchVisitor) {
+    final Consumer<Node<T>> matchVisitor) {
     this.coordinates = coordinates;
     this.maxDistance = maxDistance;
     this.matchVisitor = matchVisitor;

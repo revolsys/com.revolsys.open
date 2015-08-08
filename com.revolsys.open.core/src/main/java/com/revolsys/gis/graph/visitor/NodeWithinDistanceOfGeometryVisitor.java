@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -35,12 +34,12 @@ public class NodeWithinDistanceOfGeometryVisitor<T> implements Consumer<Node<T>>
 
   private final GeometryFactory geometryFactory;
 
-  private final Visitor<Node<T>> matchVisitor;
+  private final Consumer<Node<T>> matchVisitor;
 
   private final double maxDistance;
 
   public NodeWithinDistanceOfGeometryVisitor(final Geometry geometry, final double maxDistance,
-    final Visitor<Node<T>> matchVisitor) {
+    final Consumer<Node<T>> matchVisitor) {
     this.geometry = geometry;
     this.maxDistance = maxDistance;
     this.matchVisitor = matchVisitor;

@@ -10,6 +10,7 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.index.SpatialIndex;
+import com.revolsys.util.ExitLoopException;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.SingleObjectVisitor;
 
@@ -92,7 +93,10 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   }
 
   public void forEach(final Consumer<T> action) {
-    this.root.forEach(this, action);
+    try {
+      this.root.forEach(this, action);
+    } catch (final ExitLoopException e) {
+    }
   }
 
   public void forEach(final Consumer<T> action, final BoundingBox boundingBox) {
@@ -102,7 +106,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   public List<T> getAll() {
     final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
-    this.root.forEach(this, visitor);
+    forEach(visitor);
     return visitor.getList();
   }
 

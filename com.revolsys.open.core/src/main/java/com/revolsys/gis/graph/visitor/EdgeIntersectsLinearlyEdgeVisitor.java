@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
@@ -30,10 +29,10 @@ public class EdgeIntersectsLinearlyEdgeVisitor<T> implements Consumer<Edge<T>> {
 
   private final Edge<T> edge;
 
-  private final Visitor<Edge<T>> matchVisitor;
+  private final Consumer<Edge<T>> matchVisitor;
 
   public EdgeIntersectsLinearlyEdgeVisitor(final Edge<T> edge,
-    final Visitor<Edge<T>> matchVisitor) {
+    final Consumer<Edge<T>> matchVisitor) {
     this.edge = edge;
     this.matchVisitor = matchVisitor;
   }

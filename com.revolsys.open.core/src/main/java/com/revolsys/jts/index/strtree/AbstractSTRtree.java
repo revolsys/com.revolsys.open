@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import com.revolsys.jts.util.Assert;
+import com.revolsys.util.ExitLoopException;
 
 /**
  * Base class for STRtree and SIRtree. STR-packed R-trees are described in:
@@ -331,7 +332,7 @@ public abstract class AbstractSTRtree implements Serializable {
   }
 
   private void query(final Object searchBounds, final AbstractNode node,
-    final Consumer<Object> visitor) {
+    final Consumer<Object> action) {
     final List childBoundables = node.getChildBoundables();
     for (int i = 0; i < childBoundables.size(); i++) {
       final Boundable childBoundable = (Boundable)childBoundables.get(i);
@@ -339,9 +340,9 @@ public abstract class AbstractSTRtree implements Serializable {
         continue;
       }
       if (childBoundable instanceof AbstractNode) {
-        query(searchBounds, (AbstractNode)childBoundable, visitor);
+        query(searchBounds, (AbstractNode)childBoundable, action);
       } else if (childBoundable instanceof ItemBoundable) {
-        visitor.accept(((ItemBoundable)childBoundable).getItem());
+        action.accept(((ItemBoundable)childBoundable).getItem());
       } else {
         Assert.shouldNeverReachHere();
       }
@@ -370,13 +371,11 @@ public abstract class AbstractSTRtree implements Serializable {
    */
   protected void query(final Object searchBounds, final Consumer<Object> visitor) {
     build();
-    if (isEmpty()) {
-      // nothing in tree, so return
-      // Assert.isTrue(root.getBounds() == null);
-      return;
-    }
-    if (getIntersectsOp().intersects(this.root.getBounds(), searchBounds)) {
-      query(searchBounds, this.root, visitor);
+    if (!isEmpty() && getIntersectsOp().intersects(this.root.getBounds(), searchBounds)) {
+      try {
+        query(searchBounds, this.root, visitor);
+      } catch (final ExitLoopException e) {
+      }
     }
   }
 

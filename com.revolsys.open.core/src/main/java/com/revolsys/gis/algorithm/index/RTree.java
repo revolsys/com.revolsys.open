@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.util.ExitLoopException;
 
 public class RTree<T> extends AbstractSpatialIndex<T> {
 
@@ -53,18 +54,27 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
 
   @Override
   public void forEach(final BoundingBox envelope, final Consumer<T> action) {
-    this.root.forEach(envelope, action);
+    try {
+      this.root.forEach(envelope, action);
+    } catch (final ExitLoopException e) {
+    }
   }
 
   @Override
   public void forEach(final BoundingBox envelope, final Predicate<T> filter,
     final Consumer<T> action) {
-    this.root.forEach(envelope, filter, action);
+    try {
+      this.root.forEach(envelope, filter, action);
+    } catch (final ExitLoopException e) {
+    }
   }
 
   @Override
   public void forEach(final Consumer<T> action) {
-    this.root.forEachValue(action);
+    try {
+      this.root.forEachValue(action);
+    } catch (final ExitLoopException e) {
+    }
   }
 
   private double getRequiredExpansion(final RTreeNode<T> node, final BoundingBox envelope) {
