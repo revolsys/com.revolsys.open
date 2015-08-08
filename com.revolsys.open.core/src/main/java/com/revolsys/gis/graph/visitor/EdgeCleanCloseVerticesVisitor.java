@@ -1,6 +1,7 @@
 package com.revolsys.gis.graph.visitor;
 
 import java.util.LinkedHashSet;
+import java.util.function.Consumer;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.event.CoordinateEventListenerList;
@@ -15,7 +16,7 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 
-public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
+public class EdgeCleanCloseVerticesVisitor<T> implements Consumer<Edge<T>> {
 
   private final CoordinateEventListenerList coordinateListeners = new CoordinateEventListenerList();
 
@@ -36,28 +37,6 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
     this.minDistance = minDistance;
   }
 
-  private double getAngle(final Edge<T> edge, final LineString line, final int index) {
-    if (index + index - 1 < 0 || index + index + 1 >= line.getVertexCount()) {
-      return Double.NaN;
-    } else {
-      final double x1 = line.getCoordinate(index - 1, 0);
-      final double y1 = line.getCoordinate(index - 1, 1);
-      final double x2 = line.getCoordinate(index, 0);
-      final double y2 = line.getCoordinate(index, 1);
-      final double x3 = line.getCoordinate(index + 1, 0);
-      final double y3 = line.getCoordinate(index + 1, 1);
-      return Angle.angle(x1, y1, x2, y2, x3, y3);
-    }
-  }
-
-  public CoordinateEventListenerList getCoordinateListeners() {
-    return this.coordinateListeners;
-  }
-
-  public EdgeEventListenerList<T> getEdgeListeners() {
-    return this.edgeListeners;
-  }
-
   // TODO look at the angles with the previous and next segments to decide
   // which coordinate to remove. If there is a right angle in a building then
   // it should probably not be removed. This would be confirmed by the angles
@@ -69,7 +48,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
    * @return true If further edges should be processed.
    */
   @Override
-  public boolean visit(final Edge<T> edge) {
+  public void accept(final Edge<T> edge) {
     final String typePath = edge.getTypeName();
     final LineString line = edge.getLine();
     final int vertexCount = line.getVertexCount();
@@ -126,7 +105,28 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
         this.edgeListeners.edgeEvent(newEdge, "Edge close indicies", EdgeEvent.EDGE_CHANGED, null);
       }
     }
-    return true;
+  }
+
+  private double getAngle(final Edge<T> edge, final LineString line, final int index) {
+    if (index + index - 1 < 0 || index + index + 1 >= line.getVertexCount()) {
+      return Double.NaN;
+    } else {
+      final double x1 = line.getCoordinate(index - 1, 0);
+      final double y1 = line.getCoordinate(index - 1, 1);
+      final double x2 = line.getCoordinate(index, 0);
+      final double y2 = line.getCoordinate(index, 1);
+      final double x3 = line.getCoordinate(index + 1, 0);
+      final double y3 = line.getCoordinate(index + 1, 1);
+      return Angle.angle(x1, y1, x2, y2, x3, y3);
+    }
+  }
+
+  public CoordinateEventListenerList getCoordinateListeners() {
+    return this.coordinateListeners;
+  }
+
+  public EdgeEventListenerList<T> getEdgeListeners() {
+    return this.edgeListeners;
   }
 
 }

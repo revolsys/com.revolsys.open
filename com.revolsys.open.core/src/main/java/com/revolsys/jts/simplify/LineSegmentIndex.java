@@ -35,8 +35,8 @@ package com.revolsys.jts.simplify;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.segment.LineSegment;
@@ -91,7 +91,7 @@ class LineSegmentIndex {
 /**
  * ItemVisitor subclass to reduce volume of query results.
  */
-class LineSegmentVisitor implements Visitor<LineSegment> {
+class LineSegmentVisitor implements Consumer<LineSegment> {
   // MD - only seems to make about a 10% difference in overall time.
 
   private final LineSegment querySeg;
@@ -102,16 +102,15 @@ class LineSegmentVisitor implements Visitor<LineSegment> {
     this.querySeg = querySeg;
   }
 
-  public List<LineSegment> getItems() {
-    return this.items;
-  }
-
   @Override
-  public boolean visit(final LineSegment seg) {
+  public void accept(final LineSegment seg) {
     if (BoundingBoxUtil.intersects(seg.getP0(), seg.getP1(), this.querySeg.getP0(),
       this.querySeg.getP1())) {
       this.items.add(seg);
     }
-    return true;
+  }
+
+  public List<LineSegment> getItems() {
+    return this.items;
   }
 }

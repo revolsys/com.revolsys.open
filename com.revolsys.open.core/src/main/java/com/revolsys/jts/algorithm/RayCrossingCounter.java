@@ -32,7 +32,8 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.collection.Visitor;
+import java.util.function.Consumer;
+
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
@@ -67,7 +68,7 @@ import com.revolsys.jts.geom.segment.Segment;
  * @author Martin Davis
  *
  */
-public class RayCrossingCounter implements Visitor<LineSegment> {
+public class RayCrossingCounter implements Consumer<LineSegment> {
 
   /**
    * Determines the {@link Location} of a point in a ring.
@@ -141,6 +142,16 @@ public class RayCrossingCounter implements Visitor<LineSegment> {
 
   public RayCrossingCounter(final Point point) {
     this(point.getX(), point.getY());
+  }
+
+  @Override
+  public void accept(final LineSegment segment) {
+    final double x1 = segment.getX(0);
+    final double y1 = segment.getY(0);
+    final double x2 = segment.getX(1);
+    final double y2 = segment.getY(1);
+
+    countSegment(x1, y1, x2, y2);
   }
 
   public void countSegment(final double x1, final double y1, final double x2, final double y2) {
@@ -290,17 +301,5 @@ public class RayCrossingCounter implements Visitor<LineSegment> {
 
   public void setPointOnSegment(final boolean pointOnSegment) {
     this.pointOnSegment = pointOnSegment;
-  }
-
-  @Override
-  public boolean visit(final LineSegment segment) {
-    final double x1 = segment.getX(0);
-    final double y1 = segment.getY(0);
-    final double x2 = segment.getX(1);
-    final double y2 = segment.getY(1);
-
-    countSegment(x1, y1, x2, y2);
-
-    return true;
   }
 }

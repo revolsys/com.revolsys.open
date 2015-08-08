@@ -1,10 +1,9 @@
 package com.revolsys.gis.graph;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
-
-public class EdgeCollectionVisitor<T> implements Visitor<Edge<T>> {
+public class EdgeCollectionVisitor<T> implements Consumer<Edge<T>> {
 
   private final Collection<T> objects;
 
@@ -13,9 +12,8 @@ public class EdgeCollectionVisitor<T> implements Visitor<Edge<T>> {
   }
 
   @Override
-  public boolean visit(final Edge<T> edge) {
+  public void accept(final Edge<T> edge) {
     final T object = edge.getObject();
     this.objects.add(object);
-    return true;
   }
 }

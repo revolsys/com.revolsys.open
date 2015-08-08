@@ -2,12 +2,12 @@ package com.revolsys.gis.algorithm.index.visitor;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.segment.LineSegment;
 
-public class LineSegmentIntersectionVisitor implements Visitor<LineSegment> {
+public class LineSegmentIntersectionVisitor implements Consumer<LineSegment> {
 
   private final Set<Geometry> intersections = new LinkedHashSet<>();
 
@@ -17,18 +17,17 @@ public class LineSegmentIntersectionVisitor implements Visitor<LineSegment> {
     this.querySeg = querySeg;
   }
 
-  public Set<Geometry> getIntersections() {
-    return this.intersections;
-  }
-
   @Override
-  public boolean visit(final LineSegment segment) {
+  public void accept(final LineSegment segment) {
     if (segment.getBoundingBox().intersects(this.querySeg.getBoundingBox())) {
       final Geometry intersection = this.querySeg.getIntersection(segment);
       if (intersection != null && intersection.isEmpty()) {
         this.intersections.add(intersection);
       }
     }
-    return true;
+  }
+
+  public Set<Geometry> getIntersections() {
+    return this.intersections;
   }
 }

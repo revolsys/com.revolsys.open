@@ -2,6 +2,7 @@ package com.revolsys.gis.graph.visitor;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
@@ -13,7 +14,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.visitor.CreateListVisitor;
 
-public class NodeLessThanDistanceOfGeometryVisitor<T> implements Visitor<Node<T>> {
+public class NodeLessThanDistanceOfGeometryVisitor<T> implements Consumer<Node<T>> {
   public static <T> List<Node<T>> getNodes(final Graph<T> graph, final Geometry geometry,
     final double maxDistance) {
     if (geometry == null) {

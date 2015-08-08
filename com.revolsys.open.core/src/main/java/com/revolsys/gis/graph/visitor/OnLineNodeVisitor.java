@@ -2,6 +2,7 @@ package com.revolsys.gis.graph.visitor;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
@@ -13,7 +14,7 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.visitor.CreateListVisitor;
 
-public class OnLineNodeVisitor<T> implements Visitor<Node<T>> {
+public class OnLineNodeVisitor<T> implements Consumer<Node<T>> {
   public static <T> List<Node<T>> getNodes(final Graph<T> graph, final LineString line,
     final double maxDistance) {
     if (line == null) {

@@ -1,10 +1,12 @@
 package com.revolsys.gis.graph.visitor;
 
+import java.util.function.Consumer;
+
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.jts.geom.Point;
 
-public class NodeWithinDistanceOfCoordinateVisitor<T> implements Visitor<Node<T>> {
+public class NodeWithinDistanceOfCoordinateVisitor<T> implements Consumer<Node<T>> {
   private final Point coordinates;
 
   private final Visitor<Node<T>> matchVisitor;

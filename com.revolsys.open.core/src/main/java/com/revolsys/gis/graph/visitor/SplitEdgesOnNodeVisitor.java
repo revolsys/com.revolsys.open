@@ -1,13 +1,19 @@
 package com.revolsys.gis.graph.visitor;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 
-public class SplitEdgesOnNodeVisitor<T> implements Visitor<Node<T>> {
+public class SplitEdgesOnNodeVisitor<T> implements Consumer<Node<T>> {
+
+  @Override
+  public void accept(final Node<T> node) {
+    while (splitEdgesCloseToNode(node)) {
+    }
+  }
 
   /**
    * Split edges which the node is on the line of the edge. The edge will only
@@ -30,13 +36,6 @@ public class SplitEdgesOnNodeVisitor<T> implements Visitor<Node<T>> {
       }
     }
     return false;
-  }
-
-  @Override
-  public boolean visit(final Node<T> node) {
-    while (splitEdgesCloseToNode(node)) {
-    }
-    return true;
   }
 
 }

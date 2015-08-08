@@ -1,6 +1,7 @@
 package com.revolsys.gis.graph.visitor;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
@@ -12,7 +13,7 @@ import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.visitor.CreateListVisitor;
 
-public class EdgeIntersectLineVisitor<T> implements Visitor<Edge<T>> {
+public class EdgeIntersectLineVisitor<T> implements Consumer<Edge<T>> {
 
   public static <T> List<Edge<T>> getEdges(final Graph<T> graph, final LineString line) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();

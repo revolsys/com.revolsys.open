@@ -326,7 +326,7 @@ public class Graph<T> {
       return Collections.emptyList();
     } else {
       final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
-      final Visitor<Node<T>> visitor = new NodeWithinDistanceOfGeometryVisitor<T>(geometry,
+      final Consumer<Node<T>> visitor = new NodeWithinDistanceOfGeometryVisitor<T>(geometry,
         distance, results);
       BoundingBox envelope = geometry.getBoundingBox();
       envelope = envelope.expand(distance);
@@ -358,7 +358,7 @@ public class Graph<T> {
    */
   public List<Node<T>> findNodes(final Point point, final double distance) {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
-    final Visitor<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<T>(point, distance,
+    final Consumer<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<T>(point, distance,
       results);
     BoundingBox envelope = new BoundingBoxDoubleGf(point);
     envelope = envelope.expand(distance);

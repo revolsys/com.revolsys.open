@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.data.equals.GeometryEqualsExact3d;
 import com.revolsys.data.record.Record;
 import com.revolsys.gis.algorithm.linematch.LineMatchGraph;
@@ -22,12 +22,48 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.predicate.Predicates;
 
-public class SplitIntersectingEdgeVisitor implements Visitor<Edge<Record>> {
+public class SplitIntersectingEdgeVisitor implements Consumer<Edge<Record>> {
 
   public static final String MTACHED = "mtached";
 
   static {
     GeometryEqualsExact3d.addExclude(MTACHED);
+  }
+
+  /**
+   * Visit each edge in the graph to find other edges which linearly intersect
+   * the edge and are not geometrically equal. The current edge and the matched
+   * edge will be split into parts for each section which is equal and each
+   * section which is not equal.
+   *
+   * @param edge The edge to process.
+   * @return True
+   */
+  @Override
+  public void accept(final Edge<Record> edge) {
+    final LineString line = edge.getLine();
+    final List<Edge<Record>> intersectEdges = EdgeIntersectsLinearlyEdgeVisitor
+      .getEdges(edge.getGraph(), edge);
+    if (!intersectEdges.isEmpty()) {
+      final Predicate<Edge<Record>> edgeEqualFilter = new LineFilter<Record>(
+        new EqualFilter<LineString>(line));
+      Predicates.remove(intersectEdges, edgeEqualFilter);
+      for (final Edge<Record> edge2 : intersectEdges) {
+        if (!edge2.isRemoved()) {
+          final LineString line2 = edge2.getLine();
+          final List<List<LineString>> lines = getSplitLines(line, line2);
+          final List<LineString> lines1 = lines.get(0);
+          final List<LineString> lines2 = lines.get(1);
+          if (!lines1.isEmpty() && !lines2.isEmpty()) {
+            if (lines1.size() > 1 && lines2.size() > 1) {
+              edge.replace(lines1);
+              edge2.replace(lines2);
+              return;
+            }
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -128,42 +164,5 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<Record>> {
     final List<LineString> lines2 = getSplitLines(graph, line2, 1);
     lines.add(lines2);
     return lines;
-  }
-
-  /**
-   * Visit each edge in the graph to find other edges which linearly intersect
-   * the edge and are not geometrically equal. The current edge and the matched
-   * edge will be split into parts for each section which is equal and each
-   * section which is not equal.
-   *
-   * @param edge The edge to process.
-   * @return True
-   */
-  @Override
-  public boolean visit(final Edge<Record> edge) {
-    final LineString line = edge.getLine();
-    final List<Edge<Record>> intersectEdges = EdgeIntersectsLinearlyEdgeVisitor
-      .getEdges(edge.getGraph(), edge);
-    if (!intersectEdges.isEmpty()) {
-      final Predicate<Edge<Record>> edgeEqualFilter = new LineFilter<Record>(
-        new EqualFilter<LineString>(line));
-      Predicates.remove(intersectEdges, edgeEqualFilter);
-      for (final Edge<Record> edge2 : intersectEdges) {
-        if (!edge2.isRemoved()) {
-          final LineString line2 = edge2.getLine();
-          final List<List<LineString>> lines = getSplitLines(line, line2);
-          final List<LineString> lines1 = lines.get(0);
-          final List<LineString> lines2 = lines.get(1);
-          if (!lines1.isEmpty() && !lines2.isEmpty()) {
-            if (lines1.size() > 1 && lines2.size() > 1) {
-              edge.replace(lines1);
-              edge2.replace(lines2);
-              return true;
-            }
-          }
-        }
-      }
-    }
-    return true;
   }
 }

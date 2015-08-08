@@ -2,6 +2,7 @@ package com.revolsys.gis.graph.visitor;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
@@ -12,11 +13,11 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.visitor.CreateListVisitor;
 
-public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements Visitor<Node<T>> {
+public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements Consumer<Node<T>> {
   public static <T> List<Node<T>> getNodes(final Graph<T> graph, final Point point,
     final double maxDistance) {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
-    final Visitor<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<T>(point,
+    final Consumer<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<T>(point,
       maxDistance, results);
     BoundingBox envelope = new BoundingBoxDoubleGf(point);
     envelope = envelope.expand(maxDistance);

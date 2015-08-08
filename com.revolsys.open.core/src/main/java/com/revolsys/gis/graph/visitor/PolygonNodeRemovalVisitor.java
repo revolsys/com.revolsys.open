@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -13,7 +13,7 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.RecordGraph;
 
-public class PolygonNodeRemovalVisitor implements Visitor<Node<Record>> {
+public class PolygonNodeRemovalVisitor implements Consumer<Node<Record>> {
 
   private final Collection<String> excludedAttributes = new HashSet<String>();
 
@@ -29,7 +29,7 @@ public class PolygonNodeRemovalVisitor implements Visitor<Node<Record>> {
   }
 
   @Override
-  public boolean visit(final Node<Record> node) {
+  public void accept(final Node<Record> node) {
     final Set<Edge<Record>> edges = new LinkedHashSet<Edge<Record>>(node.getEdges());
     while (edges.size() > 1) {
       final Edge<Record> edge = edges.iterator().next();
@@ -56,7 +56,6 @@ public class PolygonNodeRemovalVisitor implements Visitor<Node<Record>> {
       edges.removeAll(matchedEdges);
       edges.remove(edge);
     }
-    return true;
   }
 
 }

@@ -33,8 +33,8 @@
 package com.revolsys.jts.algorithm.locate;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.geom.Geometry;
@@ -75,7 +75,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
       }
     }
 
-    public void query(final double min, final double max, final Visitor<LineSegment> visitor) {
+    public void query(final double min, final double max, final Consumer<LineSegment> visitor) {
       this.index.query(min, max, visitor);
     }
   }

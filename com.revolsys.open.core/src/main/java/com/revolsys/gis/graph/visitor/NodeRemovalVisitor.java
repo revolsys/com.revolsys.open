@@ -3,8 +3,8 @@ package com.revolsys.gis.graph.visitor;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -12,7 +12,7 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.RecordGraph;
 
-public class NodeRemovalVisitor implements Visitor<Node<Record>> {
+public class NodeRemovalVisitor implements Consumer<Node<Record>> {
 
   private final Collection<String> excludedAttributes = new HashSet<String>();
 
@@ -28,7 +28,7 @@ public class NodeRemovalVisitor implements Visitor<Node<Record>> {
   }
 
   @Override
-  public boolean visit(final Node<Record> node) {
+  public void accept(final Node<Record> node) {
     if (node.getDegree() == 2) {
       final List<Edge<Record>> edges = node.getEdges();
       if (edges.size() == 2) {
@@ -40,7 +40,7 @@ public class NodeRemovalVisitor implements Visitor<Node<Record>> {
           if (EqualsInstance.INSTANCE.equals(object1, object2, this.excludedAttributes)) {
             if (edge1.isForwards(node) == edge2.isForwards(node)) {
               // if (!fixReversedEdges(node, reversedEdges, edge1, edge2)) {
-              return true;
+              return;
               // }
             }
             if (edge1.isForwards(node)) {
@@ -52,7 +52,6 @@ public class NodeRemovalVisitor implements Visitor<Node<Record>> {
         }
       }
     }
-    return true;
   }
 
 }
