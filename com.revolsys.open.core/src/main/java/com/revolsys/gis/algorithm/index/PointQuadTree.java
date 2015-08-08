@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.data.equals.GeometryEqualsExact3d;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
@@ -123,6 +123,20 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     return results;
   }
 
+  @Override
+  public void forEach(final Consumer<? super T> action, final BoundingBox envelope) {
+    if (this.root != null) {
+      this.root.forEach(action, envelope);
+    }
+  }
+
+  @Override
+  public void forEach(final Consumer<? super T> action) {
+    if (this.root != null) {
+      this.root.forEach(action);
+    }
+  }
+
   public void put(final double x, final double y, final T value) {
     final PointQuadTreeNode<T> node = new PointQuadTreeNode<T>(value, x, y);
     if (this.root == null) {
@@ -156,19 +170,5 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     final double x = point.getX();
     final double y = point.getY();
     return remove(x, y, value);
-  }
-
-  @Override
-  public void visit(final com.revolsys.jts.geom.BoundingBox envelope, final Visitor<T> visitor) {
-    if (this.root != null) {
-      this.root.visit(envelope, visitor);
-    }
-  }
-
-  @Override
-  public void visit(final Visitor<T> visitor) {
-    if (this.root != null) {
-      this.root.visit(visitor);
-    }
   }
 }

@@ -1,11 +1,12 @@
 package com.revolsys.io;
 
-import com.revolsys.collection.Visitor;
+import java.util.function.Consumer;
+
 import com.revolsys.properties.BaseObjectWithProperties;
 
 /**
  * The AbstracteReader is an implementation of the {@link Reader} interface,
- * which provides implementations of {@link #read()} and {@link #visit(Visitor)}
+ * which provides implementations of {@link #read()} and {@link #forEach(Consumer)}
  * which use the {@link Reader#iterator()} method which must be implemented by
  * subclasses.
  *

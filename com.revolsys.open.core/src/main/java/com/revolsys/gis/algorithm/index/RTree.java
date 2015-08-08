@@ -2,9 +2,9 @@ package com.revolsys.gis.algorithm.index;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.jts.geom.BoundingBox;
 
 public class RTree<T> extends AbstractSpatialIndex<T> {
@@ -49,6 +49,22 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
       }
       return chooseLeaf(path, next, envelope);
     }
+  }
+
+  @Override
+  public void forEach(final BoundingBox envelope, final Consumer<T> action) {
+    this.root.forEach(envelope, action);
+  }
+
+  @Override
+  public void forEach(final BoundingBox envelope, final Predicate<T> filter,
+    final Consumer<T> action) {
+    this.root.forEach(envelope, filter, action);
+  }
+
+  @Override
+  public void forEach(final Consumer<T> action) {
+    this.root.forEachValue(action);
   }
 
   private double getRequiredExpansion(final RTreeNode<T> node, final BoundingBox envelope) {
@@ -126,21 +142,6 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
       }
     }
 
-  }
-
-  @Override
-  public void visit(final BoundingBox envelope, final Predicate<T> filter, final Visitor<T> visitor) {
-    this.root.visit(envelope, filter, visitor);
-  }
-
-  @Override
-  public void visit(final BoundingBox envelope, final Visitor<T> visitor) {
-    this.root.visit(envelope, visitor);
-  }
-
-  @Override
-  public void visit(final Visitor<T> visitor) {
-    this.root.visit(visitor);
   }
 
 }

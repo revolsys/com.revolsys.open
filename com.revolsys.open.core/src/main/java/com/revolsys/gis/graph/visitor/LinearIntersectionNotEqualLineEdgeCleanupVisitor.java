@@ -48,6 +48,64 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVi
     super.setComparator(new EdgeLengthComparator<Record>(true));
   }
 
+  @Override
+  public void accept(final Edge<Record> edge) {
+    final String typePath = edge.getTypeName();
+
+    final Graph<Record> graph = edge.getGraph();
+    final LineString line = edge.getLine();
+
+    Predicate<Edge<Record>> attributeAndGeometryFilter = new EdgeTypeNameFilter<Record>(typePath);
+
+    final Predicate<Edge<Record>> filter = getPredicate();
+    if (filter != null) {
+      attributeAndGeometryFilter = attributeAndGeometryFilter.and(filter);
+    }
+
+    final Predicate<Record> notEqualLineFilter = new RecordGeometryFilter<LineString>(
+      new EqualFilter<LineString>(line)).negate();
+
+    final RecordGeometryFilter<LineString> linearIntersectionFilter = new RecordGeometryFilter<LineString>(
+      new LinearIntersectionFilter(line));
+
+    attributeAndGeometryFilter = attributeAndGeometryFilter
+      .and(new EdgeObjectFilter<Record>(notEqualLineFilter.and(linearIntersectionFilter)));
+
+    final List<Edge<Record>> intersectingEdges = graph.getEdges(attributeAndGeometryFilter, line);
+
+    if (!intersectingEdges.isEmpty()) {
+      if (intersectingEdges.size() == 1 && line.getLength() > 10) {
+        if (line.getVertexCount() > 2) {
+          final Edge<Record> edge2 = intersectingEdges.get(0);
+          final LineString line2 = edge2.getLine();
+
+          if (middleCoordinatesEqual(line, line2)) {
+            final boolean firstEqual = line.equalsVertex(2, 0, line2, 0);
+            if (!firstEqual) {
+              final Node<Record> fromNode1 = edge.getFromNode();
+              final Node<Record> fromNode2 = edge2.getFromNode();
+              if (fromNode1.distance(fromNode2) < 2) {
+                graph.moveNodesToMidpoint(typePath, fromNode1, fromNode2);
+                return;
+              }
+            }
+            final boolean lastEqual = line.equalsVertex(2, line.getVertexCount() - 1, line2,
+              line.getVertexCount() - 1);
+            if (!lastEqual) {
+              final Node<Record> toNode1 = edge.getToNode();
+              final Node<Record> toNode2 = edge2.getToNode();
+              if (toNode1.distance(toNode2) < 2) {
+                graph.moveNodesToMidpoint(typePath, toNode1, toNode2);
+                return;
+              }
+            }
+          }
+        }
+      }
+      LOG.error("Has intersecting edges " + line);
+    }
+  }
+
   @PreDestroy
   public void destroy() {
     if (this.duplicateStatistics != null) {
@@ -86,7 +144,7 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVi
 
   @Override
   public void process(final RecordGraph graph) {
-    graph.visitEdges(this);
+    graph.forEachEdge(this);
   }
 
   @Override
@@ -107,65 +165,4 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVi
   public void setNewerComparator(final Comparator<Record> newerComparator) {
     this.newerComparator = newerComparator;
   }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public boolean visit(final Edge<Record> edge) {
-    final String typePath = edge.getTypeName();
-
-    final Graph<Record> graph = edge.getGraph();
-    final LineString line = edge.getLine();
-
-    Predicate<Edge<Record>> attributeAndGeometryFilter = new EdgeTypeNameFilter<Record>(typePath);
-
-    final Predicate<Edge<Record>> filter = getPredicate();
-    if (filter != null) {
-      attributeAndGeometryFilter = attributeAndGeometryFilter.and(filter);
-    }
-
-    final Predicate<Record> notEqualLineFilter = new RecordGeometryFilter<LineString>(
-      new EqualFilter<LineString>(line)).negate();
-
-    final RecordGeometryFilter<LineString> linearIntersectionFilter = new RecordGeometryFilter<LineString>(
-      new LinearIntersectionFilter(line));
-
-    attributeAndGeometryFilter = attributeAndGeometryFilter
-      .and(new EdgeObjectFilter<Record>(notEqualLineFilter.and(linearIntersectionFilter)));
-
-    final List<Edge<Record>> intersectingEdges = graph.getEdges(attributeAndGeometryFilter, line);
-
-    if (!intersectingEdges.isEmpty()) {
-      if (intersectingEdges.size() == 1 && line.getLength() > 10) {
-        if (line.getVertexCount() > 2) {
-          final Edge<Record> edge2 = intersectingEdges.get(0);
-          final LineString line2 = edge2.getLine();
-
-          if (middleCoordinatesEqual(line, line2)) {
-            final boolean firstEqual = line.equalsVertex(2, 0, line2, 0);
-            if (!firstEqual) {
-              final Node<Record> fromNode1 = edge.getFromNode();
-              final Node<Record> fromNode2 = edge2.getFromNode();
-              if (fromNode1.distance(fromNode2) < 2) {
-                graph.moveNodesToMidpoint(typePath, fromNode1, fromNode2);
-                return true;
-              }
-            }
-            final boolean lastEqual = line.equalsVertex(2, line.getVertexCount() - 1, line2,
-              line.getVertexCount() - 1);
-            if (!lastEqual) {
-              final Node<Record> toNode1 = edge.getToNode();
-              final Node<Record> toNode2 = edge2.getToNode();
-              if (toNode1.distance(toNode2) < 2) {
-                graph.moveNodesToMidpoint(typePath, toNode1, toNode2);
-                return true;
-              }
-            }
-          }
-        }
-      }
-      LOG.error("Has intersecting edges " + line);
-    }
-    return true;
-  }
-
 }

@@ -20,7 +20,7 @@ public class EdgeIntersectsLinearlyEdgeVisitor<T> implements Visitor<Edge<T>> {
     final LineString line = edge.getLine();
     final BoundingBox env = line.getBoundingBox();
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
-    index.visit(env, new EdgeIntersectsLinearlyEdgeVisitor<T>(edge, results));
+    index.forEach(new EdgeIntersectsLinearlyEdgeVisitor<T>(edge, results), env);
     final List<Edge<T>> edges = results.getList();
     Collections.sort(edges);
     return edges;
@@ -38,7 +38,7 @@ public class EdgeIntersectsLinearlyEdgeVisitor<T> implements Visitor<Edge<T>> {
   }
 
   @Override
-  public boolean visit(final Edge<T> edge2) {
+  public void accept(final Edge<T> edge2) {
     if (edge2 != this.edge) {
       final LineString line1 = this.edge.getLine();
       final LineString line2 = edge2.getLine();
@@ -47,11 +47,10 @@ public class EdgeIntersectsLinearlyEdgeVisitor<T> implements Visitor<Edge<T>> {
       if (envelope1.intersects(envelope2)) {
         final IntersectionMatrix relate = line1.relate(line2);
         if (relate.get(0, 0) == Dimension.L) {
-          this.matchVisitor.visit(edge2);
+          this.matchVisitor.accept(edge2);
         }
       }
     }
-    return true;
   }
 
 }

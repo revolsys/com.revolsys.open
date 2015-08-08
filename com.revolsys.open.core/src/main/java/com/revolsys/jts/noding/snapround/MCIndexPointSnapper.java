@@ -34,7 +34,6 @@
 package com.revolsys.jts.noding.snapround;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.index.ItemVisitor;
 import com.revolsys.jts.index.SpatialIndex;
 import com.revolsys.jts.index.chain.MonotoneChain;
 import com.revolsys.jts.index.chain.MonotoneChainSelectAction;
@@ -122,12 +121,9 @@ public class MCIndexPointSnapper {
     final HotPixelSnapAction hotPixelSnapAction = new HotPixelSnapAction(hotPixel, parentEdge,
       hotPixelVertexIndex);
 
-    this.index.query(pixelEnv, new ItemVisitor() {
-      @Override
-      public void visitItem(final Object item) {
-        final MonotoneChain testChain = (MonotoneChain)item;
-        testChain.select(pixelEnv, hotPixelSnapAction);
-      }
+    this.index.query(pixelEnv, (item) -> {
+      final MonotoneChain testChain = (MonotoneChain)item;
+      testChain.select(pixelEnv, hotPixelSnapAction);
     });
     return hotPixelSnapAction.isNodeAdded();
   }

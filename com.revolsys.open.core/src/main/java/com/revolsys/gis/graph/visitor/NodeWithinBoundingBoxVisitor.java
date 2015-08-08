@@ -15,7 +15,7 @@ public class NodeWithinBoundingBoxVisitor<T> implements Visitor<Node<T>> {
     final IdObjectIndex<Node<T>> index = graph.getNodeIndex();
     final NodeWithinBoundingBoxVisitor<T> visitor = new NodeWithinBoundingBoxVisitor<T>(boundingBox,
       results);
-    index.visit(boundingBox, visitor);
+    index.forEach(visitor, boundingBox);
     return results.getList();
   }
 
@@ -30,11 +30,10 @@ public class NodeWithinBoundingBoxVisitor<T> implements Visitor<Node<T>> {
   }
 
   @Override
-  public boolean visit(final Node<T> node) {
+  public void accept(final Node<T> node) {
     if (this.boundingBox.covers(node)) {
-      this.matchVisitor.visit(node);
+      this.matchVisitor.accept(node);
     }
-    return true;
   }
 
 }

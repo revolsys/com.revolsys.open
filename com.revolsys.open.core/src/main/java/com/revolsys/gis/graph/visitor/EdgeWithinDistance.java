@@ -25,7 +25,7 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>>implements 
       final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
       BoundingBox env = geometry.getBoundingBox();
       env = env.expand(maxDistance);
-      graph.getEdgeIndex().visit(env, new EdgeWithinDistance<T>(geometry, maxDistance, results));
+      graph.getEdgeIndex().forEach(new EdgeWithinDistance<T>(geometry, maxDistance, results), env);
       return results.getList();
     }
   }
@@ -64,6 +64,13 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>>implements 
   }
 
   @Override
+  public void accept(final Edge<T> edge) {
+    if (test(edge)) {
+      super.visit(edge);
+    }
+  }
+
+  @Override
   public boolean test(final Edge<T> edge) {
     final LineString line = edge.getLine();
     final double distance = line.distance(this.geometry);
@@ -72,13 +79,5 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>>implements 
     } else {
       return false;
     }
-  }
-
-  @Override
-  public boolean visit(final Edge<T> edge) {
-    if (test(edge)) {
-      super.visit(edge);
-    }
-    return true;
   }
 }

@@ -25,28 +25,27 @@ public class EdgeLessThanLengthVisitor extends AbstractEdgeListenerVisitor<Recor
     this.visitor = visitor;
   }
 
+  @Override
+  public void accept(final Edge<Record> edge) {
+    final double length = edge.getLength();
+    if (length < this.minLength) {
+      edgeEvent(edge, "Edge less than length", "Review", length + " < " + this.minLength);
+      if (this.visitor != null) {
+        this.visitor.accept(edge);
+      }
+    }
+  }
+
   public double getMinLength() {
     return this.minLength;
   }
 
   @Override
   public void process(final RecordGraph graph) {
-    graph.visitEdges(this);
+    graph.forEachEdge(this);
   }
 
   public void setMinLength(final double minLength) {
     this.minLength = minLength;
-  }
-
-  @Override
-  public boolean visit(final Edge<Record> edge) {
-    final double length = edge.getLength();
-    if (length < this.minLength) {
-      edgeEvent(edge, "Edge less than length", "Review", length + " < " + this.minLength);
-      if (this.visitor != null) {
-        this.visitor.visit(edge);
-      }
-    }
-    return true;
   }
 }

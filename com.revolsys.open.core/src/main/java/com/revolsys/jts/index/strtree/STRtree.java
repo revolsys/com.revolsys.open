@@ -38,10 +38,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
-import com.revolsys.jts.index.ItemVisitor;
 import com.revolsys.jts.index.SpatialIndex;
 import com.revolsys.jts.util.Assert;
 import com.revolsys.jts.util.PriorityQueue;
@@ -353,7 +353,7 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
   /**
    * Returns items whose bounds intersect the given envelope.
    */
-  public void query(final BoundingBox searchEnv, final ItemVisitor visitor) {
+  public void query(final BoundingBox searchEnv, final Consumer<Object> visitor) {
     // Yes this method does something. It specifies that the bounds is an
     // BoundingBoxDoubleGf. super.query takes an Object, not an
     // BoundingBoxDoubleGf. [Jon Aquino

@@ -23,6 +23,7 @@ package com.revolsys.io;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.properties.ObjectWithProperties;
@@ -64,6 +65,20 @@ public interface Reader<T> extends Iterable<T>, ObjectWithProperties, AutoClosea
   }
 
   /**
+   * Visit each item returned from the reader until all items have been visited
+   * or the visit method returns false.
+   *
+   * @param visitor The visitor.
+   */
+  default void forEach(final Consumer<? super T> action) {
+    if (iterator() != null) {
+      for (final T item : this) {
+        action.accept(item);
+      }
+    }
+  }
+
+  /**
    * Open the reader so that it is ready to be read from.
    */
   default void open() {
@@ -82,21 +97,5 @@ public interface Reader<T> extends Iterable<T>, ObjectWithProperties, AutoClosea
       }
     }
     return items;
-  }
-
-  /**
-   * Visit each item returned from the reader until all items have been visited
-   * or the visit method returns false.
-   *
-   * @param visitor The visitor.
-   */
-  default void visit(final Visitor<T> visitor) {
-    if (iterator() != null) {
-      for (final T item : this) {
-        if (!visitor.visit(item)) {
-          return;
-        }
-      }
-    }
   }
 }

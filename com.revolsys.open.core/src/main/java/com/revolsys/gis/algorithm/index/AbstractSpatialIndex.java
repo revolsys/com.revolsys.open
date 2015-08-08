@@ -11,21 +11,21 @@ public abstract class AbstractSpatialIndex<T> implements EnvelopeSpatialIndex<T>
   @Override
   public List<T> find(final BoundingBox envelope) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
-    visit(envelope, visitor);
+    forEach(envelope, visitor);
     return visitor.getList();
   }
 
   @Override
   public List<T> find(final BoundingBox envelope, final Predicate<T> filter) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
-    visit(envelope, filter, visitor);
+    forEach(envelope, filter, visitor);
     return visitor.getList();
   }
 
   @Override
   public List<T> findAll() {
     final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
-    visit(visitor);
+    forEach(visitor);
     return visitor.getList();
   }
 }

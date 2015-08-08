@@ -1,7 +1,5 @@
 package com.revolsys.data.record.schema;
 
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -13,7 +11,6 @@ import java.util.TreeMap;
 
 import javax.annotation.PreDestroy;
 
-import com.revolsys.collection.EmptyReference;
 import com.revolsys.data.record.io.RecordStoreExtension;
 import com.revolsys.io.Path;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -22,7 +19,7 @@ import com.revolsys.util.Property;
 
 public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
 
-  private Reference<AbstractRecordStore> recordStore;
+  private AbstractRecordStore recordStore;
 
   private final Map<String, RecordStoreSchemaElement> elementsByPath = new TreeMap<>();
 
@@ -34,17 +31,16 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
 
   public RecordStoreSchema(final AbstractRecordStore recordStore) {
     super("/");
-    this.recordStore = new WeakReference<>(recordStore);
+    this.recordStore = recordStore;
   }
 
   protected RecordStoreSchema(final AbstractRecordStore recordStore, final String path) {
     super(path);
-    this.recordStore = new WeakReference<>(recordStore);
+    this.recordStore = recordStore;
   }
 
   public RecordStoreSchema(final RecordStoreSchema schema, final String path) {
     super(schema, path);
-    this.recordStore = new EmptyReference<>();
   }
 
   public void addElement(final RecordStoreSchemaElement element) {
@@ -75,7 +71,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
         recordDefinition.destroy();
       }
     }
-    this.recordStore = new WeakReference<AbstractRecordStore>(null);
+    this.recordStore = null;
     this.recordDefinitionsByPath.clear();
     this.elementsByPath.clear();
     this.schemasByPath.clear();
@@ -105,46 +101,52 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
 
   @SuppressWarnings("unchecked")
   public <V extends RecordStoreSchemaElement> V getElement(String path) {
-    if (path == null) {
-      return null;
-    } else {
-      refreshIfNeeded();
-      RecordStoreSchemaElement childElement = this.elementsByPath.get(path);
-      if (childElement == null) {
+    RecordStoreSchemaElement childElement = this.elementsByPath.get(path);
+    if (childElement != null) {
+      if (path != null) {
         path = Path.cleanUpper(path);
         if (equalPath(path)) {
           return (V)this;
         } else {
           final String schemaPath = getPath();
           if (Path.isAncestor(schemaPath, path)) {
-            synchronized (this) {
-              refreshIfNeeded();
-              final String childElementPath = Path.getChildPath(schemaPath, path);
-              childElement = this.elementsByPath.get(childElementPath);
-              if (childElement == null) {
-                return null;
-              } else if (childElement.equalPath(path)) {
-                return (V)childElement;
-              } else if (childElement instanceof RecordStoreSchema) {
-                final RecordStoreSchema childSchema = (RecordStoreSchema)childElement;
-                return childSchema.getElement(path);
-              } else {
-                return null;
+            childElement = this.elementsByPath.get(path);
+            if (childElement == null) {
+              synchronized (this) {
+                refreshIfNeeded();
+                final String childElementPath = Path.getChildPath(schemaPath, path);
+                childElement = this.elementsByPath.get(childElementPath);
+                if (childElement == null || childElement instanceof NonExistingSchemaElement) {
+                  return null;
+                } else if (childElement.equalPath(path)) {
+                  return (V)childElement;
+                } else if (childElement instanceof RecordStoreSchema) {
+                  final RecordStoreSchema childSchema = (RecordStoreSchema)childElement;
+                  return childSchema.getElement(path);
+                } else {
+                  return null;
+                }
               }
+            } else if (childElement instanceof NonExistingSchemaElement) {
+              return null;
+            } else {
+              return (V)childElement;
             }
           } else {
             final RecordStoreSchema parent = getSchema();
-            if (parent == null) {
-              return null;
-            } else {
+            if (parent != null) {
               return parent.getElement(path);
             }
           }
         }
+      }
+      if (this.recordStore == null) {
+        return null;
       } else {
-        return (V)childElement;
+        return (V)this.recordStore.getRootSchema();
       }
     }
+    return (V)childElement;
   }
 
   public List<RecordStoreSchemaElement> getElements() {
@@ -188,7 +190,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
   public <V extends RecordStore> V getRecordStore() {
     final RecordStoreSchema schema = getSchema();
     if (schema == null) {
-      return (V)this.recordStore.get();
+      return (V)this.recordStore;
     } else {
       return schema.getRecordStore();
     }
@@ -301,7 +303,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
 
   protected void refreshIfNeeded() {
     final RecordStore recordStore = getRecordStore();
-    if (!this.initialized && recordStore.isLoadFullSchema()) {
+    if (!isInitialized() && recordStore.isLoadFullSchema()) {
       refresh();
     }
   }

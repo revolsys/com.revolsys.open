@@ -4,8 +4,8 @@ import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
@@ -142,6 +142,66 @@ public class PointQuadTreeNode<T> {
     }
   }
 
+  public boolean forEach(final Consumer<? super T> action, final BoundingBox envelope) {
+    final double minX = envelope.getMinX();
+    final double maxX = envelope.getMaxX();
+    final double minY = envelope.getMinY();
+    final double maxY = envelope.getMaxY();
+    if (envelope.covers(this.x, this.y)) {
+      action.accept(this.value);
+    }
+    final boolean minXLess = isLessThanX(minX);
+    final boolean maxXLess = isLessThanX(maxX);
+    final boolean minYLess = isLessThanY(minY);
+    final boolean maxYLess = isLessThanY(maxY);
+    if (this.southWest != null && minXLess && minYLess) {
+      if (!this.southWest.forEach(action, envelope)) {
+        return false;
+      }
+    }
+    if (this.northWest != null && minXLess && !maxYLess) {
+      if (!this.northWest.forEach(action, envelope)) {
+        return false;
+      }
+    }
+    if (this.southEast != null && !maxXLess && minYLess) {
+      if (!this.southEast.forEach(action, envelope)) {
+        return false;
+      }
+    }
+    if (this.northEast != null && !maxXLess && !maxYLess) {
+      if (!this.northEast.forEach(action, envelope)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public boolean forEach(final Consumer<? super T> action) {
+    action.accept(this.value);
+    if (this.southWest != null) {
+      if (!this.southWest.forEach(action)) {
+        return false;
+      }
+    }
+    if (this.northWest != null) {
+      if (!this.northWest.forEach(action)) {
+        return false;
+      }
+    }
+    if (this.southEast != null) {
+      if (!this.southEast.forEach(action)) {
+        return false;
+      }
+    }
+    if (this.northEast != null) {
+      if (!this.northEast.forEach(action)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   public boolean isLessThanX(final double x) {
     return x < this.x;
   }
@@ -228,70 +288,6 @@ public class PointQuadTreeNode<T> {
 
   public void setValue(final int index, final double value) {
     throw new UnsupportedOperationException("Cannot change the coordinates on a quad tree");
-  }
-
-  public boolean visit(final BoundingBox envelope, final Visitor<T> visitor) {
-    final double minX = envelope.getMinX();
-    final double maxX = envelope.getMaxX();
-    final double minY = envelope.getMinY();
-    final double maxY = envelope.getMaxY();
-    if (envelope.covers(this.x, this.y)) {
-      if (!visitor.visit(this.value)) {
-        return false;
-      }
-    }
-    final boolean minXLess = isLessThanX(minX);
-    final boolean maxXLess = isLessThanX(maxX);
-    final boolean minYLess = isLessThanY(minY);
-    final boolean maxYLess = isLessThanY(maxY);
-    if (this.southWest != null && minXLess && minYLess) {
-      if (!this.southWest.visit(envelope, visitor)) {
-        return false;
-      }
-    }
-    if (this.northWest != null && minXLess && !maxYLess) {
-      if (!this.northWest.visit(envelope, visitor)) {
-        return false;
-      }
-    }
-    if (this.southEast != null && !maxXLess && minYLess) {
-      if (!this.southEast.visit(envelope, visitor)) {
-        return false;
-      }
-    }
-    if (this.northEast != null && !maxXLess && !maxYLess) {
-      if (!this.northEast.visit(envelope, visitor)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  public boolean visit(final Visitor<T> visitor) {
-    if (!visitor.visit(this.value)) {
-      return false;
-    }
-    if (this.southWest != null) {
-      if (!this.southWest.visit(visitor)) {
-        return false;
-      }
-    }
-    if (this.northWest != null) {
-      if (!this.northWest.visit(visitor)) {
-        return false;
-      }
-    }
-    if (this.southEast != null) {
-      if (!this.southEast.visit(visitor)) {
-        return false;
-      }
-    }
-    if (this.northEast != null) {
-      if (!this.northEast.visit(visitor)) {
-        return false;
-      }
-    }
-    return true;
   }
 
 }

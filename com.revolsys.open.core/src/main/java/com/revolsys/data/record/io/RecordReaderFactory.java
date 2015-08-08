@@ -100,8 +100,7 @@ public interface RecordReaderFactory
    * @throws IllegalArgumentException If the source is not a supported class.
    */
   default RecordReader createRecordReader(final Object source, final RecordFactory factory) {
-    final com.revolsys.spring.resource.Resource resource = com.revolsys.spring.resource.Resource
-      .getResource(source);
+    final Resource resource = com.revolsys.spring.resource.Resource.getResource(source);
     return createRecordReader(resource, factory);
   }
 

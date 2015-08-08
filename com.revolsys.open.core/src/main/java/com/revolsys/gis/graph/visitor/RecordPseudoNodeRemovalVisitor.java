@@ -36,6 +36,13 @@ public class RecordPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<
   public RecordPseudoNodeRemovalVisitor() {
   }
 
+  @Override
+  public void accept(final Node<Record> node) {
+    if (node.getEdges().size() > 1) {
+      processPseudoNodes(node);
+    }
+  }
+
   @PreDestroy
   public void destroy() {
     if (this.mergedStatistics != null) {
@@ -91,7 +98,7 @@ public class RecordPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<
 
   @Override
   public void process(final RecordGraph graph) {
-    graph.visitNodes(this);
+    graph.forEachNode(this);
   }
 
   private void processPseudoNodes(final Node<Record> node) {
@@ -114,13 +121,5 @@ public class RecordPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<
 
   public void setFilter(final Predicate<Node<Record>> filter) {
     this.predicate = filter;
-  }
-
-  @Override
-  public boolean visit(final Node<Record> node) {
-    if (node.getEdges().size() > 1) {
-      processPseudoNodes(node);
-    }
-    return true;
   }
 }

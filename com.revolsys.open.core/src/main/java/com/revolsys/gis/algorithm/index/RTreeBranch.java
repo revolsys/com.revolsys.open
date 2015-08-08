@@ -5,10 +5,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.revolsys.collection.ArrayUtil;
-import com.revolsys.collection.Visitor;
 import com.revolsys.jts.geom.BoundingBox;
 
 public class RTreeBranch<T> extends RTreeNode<T>implements Iterable<RTreeNode<T>> {
@@ -36,6 +36,35 @@ public class RTreeBranch<T> extends RTreeNode<T>implements Iterable<RTreeNode<T>
     this.nodes[this.size] = node;
     this.size++;
     setBoundingBox(getBoundingBox().expandToInclude(node.getBoundingBox()));
+  }
+
+  @Override
+  public void forEach(final BoundingBox envelope, final Consumer<T> action) {
+    for (int i = 0; i < this.size; i++) {
+      final RTreeNode<T> node = this.nodes[i];
+      if (envelope.intersects(node.getBoundingBox())) {
+        node.forEach(envelope, action);
+      }
+    }
+  }
+
+  @Override
+  public void forEach(final BoundingBox envelope, final Predicate<T> filter,
+    final Consumer<T> action) {
+    for (int i = 0; i < this.size; i++) {
+      final RTreeNode<T> node = this.nodes[i];
+      if (envelope.intersects(node.getBoundingBox())) {
+        node.forEach(envelope, filter, action);
+      }
+    }
+  }
+
+  @Override
+  public void forEachValue(final Consumer<? super T> action) {
+    for (int i = 0; i < this.size; i++) {
+      final RTreeNode<T> node = this.nodes[i];
+      node.forEachValue(action);
+    }
   }
 
   public List<RTreeNode<T>> getNodes() {
@@ -123,43 +152,5 @@ public class RTreeBranch<T> extends RTreeNode<T>implements Iterable<RTreeNode<T>
     }
     setBoundingBox(boundingBox);
 
-  }
-
-  @Override
-  public boolean visit(final BoundingBox envelope, final Predicate<T> filter,
-    final Visitor<T> visitor) {
-    for (int i = 0; i < this.size; i++) {
-      final RTreeNode<T> node = this.nodes[i];
-      if (envelope.intersects(node.getBoundingBox())) {
-        if (!node.visit(envelope, filter, visitor)) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public boolean visit(final BoundingBox envelope, final Visitor<T> visitor) {
-    for (int i = 0; i < this.size; i++) {
-      final RTreeNode<T> node = this.nodes[i];
-      if (envelope.intersects(node.getBoundingBox())) {
-        if (!node.visit(envelope, visitor)) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public boolean visit(final Visitor<T> visitor) {
-    for (int i = 0; i < this.size; i++) {
-      final RTreeNode<T> node = this.nodes[i];
-      if (!node.visit(visitor)) {
-        return false;
-      }
-    }
-    return true;
   }
 }

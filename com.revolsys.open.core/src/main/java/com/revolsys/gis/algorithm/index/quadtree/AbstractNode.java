@@ -2,8 +2,8 @@ package com.revolsys.gis.algorithm.index.quadtree;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.jts.index.DoubleBits;
 import com.revolsys.jts.index.IntervalSize;
 import com.revolsys.jts.util.BoundingBoxUtil;
@@ -203,6 +203,40 @@ public abstract class AbstractNode<T> implements Serializable {
       return node.find(bounds);
     }
     return this;
+  }
+
+  public void forEach(final QuadTree<T> tree, final Consumer<T> action) {
+    for (int i = 0; i < getItemCount(); i++) {
+      final T item = getItem(tree, i);
+      action.accept(item);
+    }
+
+    for (int i = 0; i < 4; i++) {
+      final AbstractNode<T> node = getNode(i);
+      if (node != null) {
+        node.forEach(tree, action);
+      }
+    }
+  }
+
+  public void forEach(final QuadTree<T> tree, final double[] bounds, final Consumer<T> action) {
+    if (isSearchMatch(bounds)) {
+      final int itemCount = getItemCount();
+      for (int i = 0; i < itemCount; i++) {
+        final double[] itemBounds = getBounds(tree, i);
+        if (BoundingBoxUtil.intersects(bounds, itemBounds)) {
+          final T item = getItem(tree, i);
+          action.accept(item);
+        }
+      }
+
+      for (int i = 0; i < 4; i++) {
+        final AbstractNode<T> node = getNode(i);
+        if (node != null) {
+          node.forEach(tree, bounds, action);
+        }
+      }
+    }
   }
 
   protected abstract double[] getBounds(QuadTree<T> tree, int i);
@@ -412,49 +446,5 @@ public abstract class AbstractNode<T> implements Serializable {
     } else {
       return Arrays.toString(this.nodes) + "=" + getItemCount();
     }
-  }
-
-  public boolean visit(final QuadTree<T> tree, final double[] bounds, final Visitor<T> visitor) {
-    if (isSearchMatch(bounds)) {
-      final int itemCount = getItemCount();
-      for (int i = 0; i < itemCount; i++) {
-        final double[] itemBounds = getBounds(tree, i);
-        if (BoundingBoxUtil.intersects(bounds, itemBounds)) {
-          final T item = getItem(tree, i);
-          if (!visitor.visit(item)) {
-            return false;
-          }
-        }
-      }
-
-      for (int i = 0; i < 4; i++) {
-        final AbstractNode<T> node = getNode(i);
-        if (node != null) {
-          if (!node.visit(tree, bounds, visitor)) {
-            return false;
-          }
-        }
-      }
-    }
-    return true;
-  }
-
-  public boolean visit(final QuadTree<T> tree, final Visitor<T> visitor) {
-    for (int i = 0; i < getItemCount(); i++) {
-      final T item = getItem(tree, i);
-      if (!visitor.visit(item)) {
-        return false;
-      }
-    }
-
-    for (int i = 0; i < 4; i++) {
-      final AbstractNode<T> node = getNode(i);
-      if (node != null) {
-        if (!node.visit(tree, visitor)) {
-          return false;
-        }
-      }
-    }
-    return true;
   }
 }

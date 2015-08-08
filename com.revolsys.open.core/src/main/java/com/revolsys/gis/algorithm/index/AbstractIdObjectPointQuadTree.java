@@ -1,8 +1,8 @@
 package com.revolsys.gis.algorithm.index;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Point;
 
@@ -23,6 +23,26 @@ public abstract class AbstractIdObjectPointQuadTree<T> extends AbstractPointSpat
     final Point point = getCoordinates(object);
     put(point, object);
     return object;
+  }
+
+  @Override
+  public void forEach(final Consumer<? super T> action) {
+    this.index.forEach((id) -> {
+      final T object = getObject(id);
+      action.accept(object);
+    });
+  }
+
+  @Override
+  public void forEach(final Consumer<? super T> action, final BoundingBox envelope) {
+    this.index.forEach((id) -> {
+      final T object = getObject(id);
+      final BoundingBox e = getEnvelope(object);
+      if (e.intersects(envelope)) {
+        action.accept(object);
+      }
+    }, envelope);
+
   }
 
   public abstract Point getCoordinates(T object);
@@ -49,19 +69,6 @@ public abstract class AbstractIdObjectPointQuadTree<T> extends AbstractPointSpat
     for (final T object : objects) {
       remove(object);
     }
-  }
-
-  @Override
-  public void visit(final BoundingBox envelope, final Visitor<T> visitor) {
-    final IdObjectIndexEnvelopeVisitor<T> itemVisitor = new IdObjectIndexEnvelopeVisitor<T>(this,
-      envelope, visitor);
-    this.index.visit(envelope, itemVisitor);
-  }
-
-  @Override
-  public void visit(final Visitor<T> visitor) {
-    final IdObjectIndexVisitor<T> itemVisitor = new IdObjectIndexVisitor<T>(this, visitor);
-    this.index.visit(itemVisitor);
   }
 
 }

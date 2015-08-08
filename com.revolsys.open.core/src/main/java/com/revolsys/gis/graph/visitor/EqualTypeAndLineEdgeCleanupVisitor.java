@@ -40,6 +40,35 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
   private Set<String> equalExcludeFieldNames = new HashSet<String>(
     Arrays.asList(RecordEquals.EXCLUDE_ID, RecordEquals.EXCLUDE_GEOMETRY));
 
+  @Override
+  public void accept(final Edge<Record> edge) {
+    if (edge.getProperty(EDGE_PROCESSED) == null) {
+      final String typePath = edge.getTypeName();
+      final Graph<Record> graph = edge.getGraph();
+      final LineString line = edge.getLine();
+
+      Predicate<Edge<Record>> attributeAndGeometryFilter = new EdgeTypeNameFilter<Record>(typePath);
+
+      final Predicate<Edge<Record>> filter = getPredicate();
+      if (filter != null) {
+        attributeAndGeometryFilter = attributeAndGeometryFilter.and(filter);
+      }
+
+      final Predicate<Record> equalLineFilter = new RecordGeometryFilter<LineString>(
+        new LineEqualIgnoreDirectionFilter(line, 2));
+      final EdgeObjectFilter<Record> edgeFilter = new EdgeObjectFilter<Record>(equalLineFilter);
+      attributeAndGeometryFilter = attributeAndGeometryFilter.and(edgeFilter);
+
+      final List<Edge<Record>> equalEdges;
+      if (getComparator() == null) {
+        equalEdges = graph.getEdges(attributeAndGeometryFilter, line);
+      } else {
+        equalEdges = graph.getEdges(attributeAndGeometryFilter, getComparator(), line);
+      }
+      processEqualEdges(equalEdges);
+    }
+  }
+
   @PreDestroy
   public void destroy() {
     if (this.duplicateStatistics != null) {
@@ -128,7 +157,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
 
   @Override
   public void process(final RecordGraph graph) {
-    graph.visitEdges(this);
+    graph.forEachEdge(this);
   }
 
   private void processEqualEdge(final Edge<Record> edge1, final Edge<Record> edge2) {
@@ -204,35 +233,5 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
     this.equalExcludeFieldNames = new HashSet<String>(equalExcludeFieldNames);
     this.equalExcludeFieldNames.add(RecordEquals.EXCLUDE_ID);
     this.equalExcludeFieldNames.add(RecordEquals.EXCLUDE_GEOMETRY);
-  }
-
-  @Override
-  public boolean visit(final Edge<Record> edge) {
-    if (edge.getProperty(EDGE_PROCESSED) == null) {
-      final String typePath = edge.getTypeName();
-      final Graph<Record> graph = edge.getGraph();
-      final LineString line = edge.getLine();
-
-      Predicate<Edge<Record>> attributeAndGeometryFilter = new EdgeTypeNameFilter<Record>(typePath);
-
-      final Predicate<Edge<Record>> filter = getPredicate();
-      if (filter != null) {
-        attributeAndGeometryFilter = attributeAndGeometryFilter.and(filter);
-      }
-
-      final Predicate<Record> equalLineFilter = new RecordGeometryFilter<LineString>(
-        new LineEqualIgnoreDirectionFilter(line, 2));
-      final EdgeObjectFilter<Record> edgeFilter = new EdgeObjectFilter<Record>(equalLineFilter);
-      attributeAndGeometryFilter = attributeAndGeometryFilter.and(edgeFilter);
-
-      final List<Edge<Record>> equalEdges;
-      if (getComparator() == null) {
-        equalEdges = graph.getEdges(attributeAndGeometryFilter, line);
-      } else {
-        equalEdges = graph.getEdges(attributeAndGeometryFilter, getComparator(), line);
-      }
-      processEqualEdges(equalEdges);
-    }
-    return true;
   }
 }

@@ -14,8 +14,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
 
-import com.revolsys.collection.InvokeMethodVisitor;
-import com.revolsys.collection.Visitor;
 import com.revolsys.comparator.CollectionComparator;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
@@ -373,11 +371,9 @@ public class LineStringGraph extends Graph<LineSegment> {
   }
 
   private void removeDuplicateEdges() {
-    final Visitor<Edge<LineSegment>> visitor = new InvokeMethodVisitor<Edge<LineSegment>>(this,
-      "removeDuplicateEdges");
     final Comparator<Edge<LineSegment>> comparator = new EdgeAttributeValueComparator<LineSegment>(
       INDEX);
-    visitEdges(comparator, visitor);
+    forEachEdge((edge) -> removeDuplicateEdges(edge), comparator);
   }
 
   /**
@@ -429,9 +425,7 @@ public class LineStringGraph extends Graph<LineSegment> {
   public void splitCrossingEdges() {
     final Comparator<Edge<LineSegment>> comparator = new EdgeAttributeValueComparator<LineSegment>(
       INDEX);
-    final Visitor<Edge<LineSegment>> visitor = new InvokeMethodVisitor<Edge<LineSegment>>(this,
-      "splitCrossingEdges");
-    visitEdges(comparator, visitor);
+    forEachEdge((edge) -> splitCrossingEdges(edge), comparator);
   }
 
   public boolean splitCrossingEdges(final Edge<LineSegment> edge1) {

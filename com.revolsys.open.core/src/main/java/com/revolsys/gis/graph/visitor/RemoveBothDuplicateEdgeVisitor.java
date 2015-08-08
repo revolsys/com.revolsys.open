@@ -17,12 +17,7 @@ import com.revolsys.visitor.AbstractVisitor;
 public class RemoveBothDuplicateEdgeVisitor<T> extends AbstractVisitor<Edge<T>>
   implements ObjectProcessor<Graph<T>> {
   @Override
-  public void process(final Graph<T> graph) {
-    graph.visitEdges(this);
-  }
-
-  @Override
-  public boolean visit(final Edge<T> edge) {
+  public void accept(final Edge<T> edge) {
     final LineString line = edge.getLine();
     final Node<T> fromNode = edge.getFromNode();
     final Node<T> toNode = edge.getToNode();
@@ -39,6 +34,10 @@ public class RemoveBothDuplicateEdgeVisitor<T> extends AbstractVisitor<Edge<T>>
     if (hasDuplicate) {
       edge.remove();
     }
-    return true;
+  }
+
+  @Override
+  public void process(final Graph<T> graph) {
+    graph.forEachEdge(this);
   }
 }

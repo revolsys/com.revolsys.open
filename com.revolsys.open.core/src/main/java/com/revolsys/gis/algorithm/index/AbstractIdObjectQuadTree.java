@@ -3,8 +3,8 @@ package com.revolsys.gis.algorithm.index;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.visitor.CreateListVisitor;
@@ -29,6 +29,17 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
   }
 
   @Override
+  public void forEach(final Consumer<? super T> action, final BoundingBox envelope) {
+    this.index.forEach((id) -> {
+      final T object = getObject(id);
+      final BoundingBox e = getEnvelope(object);
+      if (e.intersects(envelope)) {
+        action.accept(object);
+      }
+    } , envelope);
+  }
+
+  @Override
   public Iterator<T> iterator() {
     return queryAll().iterator();
   }
@@ -36,7 +47,7 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
   @Override
   public List<T> query(final BoundingBox envelope) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
-    visit(envelope, visitor);
+    forEach(visitor, envelope);
     return visitor.getList();
   }
 
@@ -56,13 +67,6 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
     for (final T object : objects) {
       remove(object);
     }
-  }
-
-  @Override
-  public void visit(final BoundingBox envelope, final Visitor<T> visitor) {
-    final IdObjectIndexItemVisitor<T> itemVisitor = new IdObjectIndexItemVisitor<T>(this, envelope,
-      visitor);
-    this.index.visit(envelope, itemVisitor);
   }
 
 }

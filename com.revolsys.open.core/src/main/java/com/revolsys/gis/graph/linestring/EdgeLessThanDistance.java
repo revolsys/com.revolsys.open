@@ -22,7 +22,7 @@ public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>>
     BoundingBox envelope = lineSegment.getBoundingBox();
     envelope = envelope.expand(maxDistance);
     final IdObjectIndex<Edge<LineSegment>> edgeIndex = graph.getEdgeIndex();
-    edgeIndex.visit(envelope, new EdgeLessThanDistance(lineSegment, maxDistance, results));
+    edgeIndex.forEach(new EdgeLessThanDistance(lineSegment, maxDistance, results), envelope);
     return results.getList();
   }
 
@@ -50,6 +50,13 @@ public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>>
   }
 
   @Override
+  public void accept(final Edge<LineSegment> edge) {
+    if (test(edge)) {
+      super.visit(edge);
+    }
+  }
+
+  @Override
   public boolean test(final Edge<LineSegment> edge) {
     final LineSegment lineSegment = edge.getObject();
     final double distance = lineSegment.distance(this.lineSegment);
@@ -58,13 +65,5 @@ public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>>
     } else {
       return false;
     }
-  }
-
-  @Override
-  public boolean visit(final Edge<LineSegment> edge) {
-    if (test(edge)) {
-      super.visit(edge);
-    }
-    return true;
   }
 }

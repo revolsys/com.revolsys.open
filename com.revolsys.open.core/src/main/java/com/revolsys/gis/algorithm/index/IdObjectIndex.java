@@ -1,12 +1,14 @@
 package com.revolsys.gis.algorithm.index;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.jts.geom.BoundingBox;
 
 public interface IdObjectIndex<T> extends Iterable<T> {
   public T add(final T object);
+
+  void forEach(Consumer<? super T> action, BoundingBox envelope);
 
   BoundingBox getEnvelope(T object);
 
@@ -19,6 +21,4 @@ public interface IdObjectIndex<T> extends Iterable<T> {
   List<T> query(BoundingBox envelope);
 
   boolean remove(T object);
-
-  void visit(BoundingBox envelope, Visitor<T> visitor);
 }

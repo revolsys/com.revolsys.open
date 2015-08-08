@@ -42,7 +42,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.index.ItemVisitor;
 import com.revolsys.jts.index.strtree.AbstractNode;
 import com.revolsys.jts.index.strtree.ItemBoundable;
 import com.revolsys.jts.index.strtree.STRtree;
@@ -121,11 +120,8 @@ public class STRtreeTest extends TestCase {
 
   public void testEmptyTreeUsingItemVisitorQuery() {
     final STRtree tree = new STRtree();
-    tree.query(new BoundingBoxDoubleGf(2, 0, 1, 0, 1), new ItemVisitor() {
-      @Override
-      public void visitItem(final Object item) {
-        assertTrue("Should never reach here", true);
-      }
+    tree.query(new BoundingBoxDoubleGf(2, 0, 1, 0, 1), (item) -> {
+      assertTrue("Should never reach here", true);
     });
   }
 

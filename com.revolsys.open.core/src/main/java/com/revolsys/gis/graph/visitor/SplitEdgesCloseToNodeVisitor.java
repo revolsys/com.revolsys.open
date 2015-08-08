@@ -32,6 +32,27 @@ public class SplitEdgesCloseToNodeVisitor<T> extends AbstractNodeListenerVisitor
     this.maxDistance = maxDistance;
   }
 
+  @Override
+  public void accept(final Node<T> node) {
+    final List<Edge<T>> closeEdges = EdgeLessThanDistanceToNodeVisitor
+      .edgesWithinDistance(this.graph, node, this.maxDistance);
+    for (final Edge<T> edge : closeEdges) {
+      final T object = edge.getObject();
+      final String typePath = this.graph.getTypeName(edge);
+      final List<Edge<T>> splitEdges = this.graph.splitEdge(edge, node);
+      if (splitEdges.size() > 1) {
+        nodeEvent(node, typePath, this.ruleName, "Fixed", null);
+        if (this.splitObjects != null) {
+          this.splitObjects.add(object);
+        }
+        if (this.newEdges != null) {
+          this.newEdges.remove(edge);
+          this.newEdges.addAll(splitEdges);
+        }
+      }
+    }
+  }
+
   public double getMaxDistance() {
     return this.maxDistance;
   }
@@ -50,28 +71,6 @@ public class SplitEdgesCloseToNodeVisitor<T> extends AbstractNodeListenerVisitor
 
   public void setSplitObjects(final Collection<T> splitObjects) {
     this.splitObjects = splitObjects;
-  }
-
-  @Override
-  public boolean visit(final Node<T> node) {
-    final List<Edge<T>> closeEdges = EdgeLessThanDistanceToNodeVisitor
-      .edgesWithinDistance(this.graph, node, this.maxDistance);
-    for (final Edge<T> edge : closeEdges) {
-      final T object = edge.getObject();
-      final String typePath = this.graph.getTypeName(edge);
-      final List<Edge<T>> splitEdges = this.graph.splitEdge(edge, node);
-      if (splitEdges.size() > 1) {
-        nodeEvent(node, typePath, this.ruleName, "Fixed", null);
-        if (this.splitObjects != null) {
-          this.splitObjects.add(object);
-        }
-        if (this.newEdges != null) {
-          this.newEdges.remove(edge);
-          this.newEdges.addAll(splitEdges);
-        }
-      }
-    }
-    return true;
   }
 
 }

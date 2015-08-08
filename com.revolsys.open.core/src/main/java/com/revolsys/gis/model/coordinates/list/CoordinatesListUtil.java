@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.collection.InvokeMethodVisitor;
 import com.revolsys.data.equals.NumberEquals;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
@@ -173,10 +172,8 @@ public class CoordinatesListUtil {
 
     final LineStringGraph graph1 = new LineStringGraph(points1);
     final LineStringGraph graph2 = new LineStringGraph(points2);
-    graph1.visitNodes(new InvokeMethodVisitor<Node<LineSegment>>(CoordinatesListUtil.class,
-      "movePointsWithinTolerance", null, graph2, tolerance));
-    graph2.visitNodes(new InvokeMethodVisitor<Node<LineSegment>>(CoordinatesListUtil.class,
-      "movePointsWithinTolerance", null, graph1, tolerance));
+    graph1.forEachNode((node) -> movePointsWithinTolerance(null, graph2, tolerance, node));
+    graph1.forEachNode((node) -> movePointsWithinTolerance(null, graph1, tolerance, node));
 
     final Map<Edge<LineSegment>, List<Node<LineSegment>>> pointsOnEdge1 = graph1
       .getPointsOnEdges(graph2, tolerance);
@@ -293,10 +290,8 @@ public class CoordinatesListUtil {
     final LineStringGraph graph2 = new LineStringGraph(points2);
     graph2.setPrecisionModel(geometryFactory);
     final Map<Point, Point> movedNodes = new HashMap<Point, Point>();
-    graph1.visitNodes(new InvokeMethodVisitor<Node<LineSegment>>(CoordinatesListUtil.class,
-      "movePointsWithinTolerance", movedNodes, graph2, maxDistance));
-    graph2.visitNodes(new InvokeMethodVisitor<Node<LineSegment>>(CoordinatesListUtil.class,
-      "movePointsWithinTolerance", movedNodes, graph1, maxDistance));
+    graph1.forEachNode((node) -> movePointsWithinTolerance(movedNodes, graph2, maxDistance, node));
+    graph2.forEachNode((node) -> movePointsWithinTolerance(movedNodes, graph1, maxDistance, node));
 
     final Map<Edge<LineSegment>, List<Node<LineSegment>>> pointsOnEdge1 = graph1
       .getPointsOnEdges(graph2, maxDistance);

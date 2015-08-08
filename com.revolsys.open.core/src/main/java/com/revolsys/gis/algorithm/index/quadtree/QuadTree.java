@@ -3,9 +3,9 @@ package com.revolsys.gis.algorithm.index.quadtree;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -91,15 +91,24 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     return this.root.depth();
   }
 
+  public void forEach(final Consumer<T> action) {
+    this.root.forEach(this, action);
+  }
+
+  public void forEach(final Consumer<T> action, final BoundingBox boundingBox) {
+    final double[] bounds = convert(boundingBox);
+    this.root.forEach(this, bounds, action);
+  }
+
   public List<T> getAll() {
     final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
-    this.root.visit(this, visitor);
+    this.root.forEach(this, visitor);
     return visitor.getList();
   }
 
   public T getFirst(final BoundingBox boundingBox, final Predicate<T> filter) {
     final SingleObjectVisitor<T> visitor = new SingleObjectVisitor<T>(filter);
-    visit(boundingBox, visitor);
+    forEach(visitor, boundingBox);
     return visitor.getObject();
   }
 
@@ -138,13 +147,13 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   @Override
   public List<T> query(final BoundingBox boundingBox) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
-    visit(boundingBox, visitor);
+    forEach(visitor, boundingBox);
     return visitor.getList();
   }
 
   public List<T> query(final BoundingBox boundingBox, final Predicate<T> filter) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<T>(filter);
-    visit(boundingBox, visitor);
+    forEach(visitor, boundingBox);
     return visitor.getList();
   }
 
@@ -174,14 +183,5 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   public int size() {
     return getSize();
-  }
-
-  public void visit(final BoundingBox boundingBox, final Visitor<T> visitor) {
-    final double[] bounds = convert(boundingBox);
-    this.root.visit(this, bounds, visitor);
-  }
-
-  public void visitAll(final Visitor<T> visitor) {
-    this.root.visit(this, visitor);
   }
 }

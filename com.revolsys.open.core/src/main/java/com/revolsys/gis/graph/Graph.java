@@ -37,7 +37,6 @@ import com.revolsys.gis.graph.event.NodeEvent;
 import com.revolsys.gis.graph.event.NodeEventListener;
 import com.revolsys.gis.graph.event.NodeEventListenerList;
 import com.revolsys.gis.graph.filter.IsPointOnLineEdgeFilter;
-import com.revolsys.gis.graph.visitor.DeleteEdgeVisitor;
 import com.revolsys.gis.graph.visitor.EdgeWithinDistance;
 import com.revolsys.gis.graph.visitor.NodeWithinBoundingBoxVisitor;
 import com.revolsys.gis.graph.visitor.NodeWithinDistanceOfCoordinateVisitor;
@@ -247,8 +246,7 @@ public class Graph<T> {
   }
 
   public void deleteEdges(final Predicate<Edge<T>> filter) {
-    final DeleteEdgeVisitor<T> visitor = new DeleteEdgeVisitor<T>();
-    visitEdges(filter, visitor);
+    forEachEdge((edge) -> remove(edge), filter);
   }
 
   public Iterable<Edge<T>> edges() {
@@ -332,7 +330,7 @@ public class Graph<T> {
         distance, results);
       BoundingBox envelope = geometry.getBoundingBox();
       envelope = envelope.expand(distance);
-      getNodeIndex().visit(envelope, visitor);
+      getNodeIndex().forEach(visitor, envelope);
       final List<Node<T>> nodes = results.getList();
       Collections.sort(nodes);
       return nodes;
@@ -364,7 +362,7 @@ public class Graph<T> {
       results);
     BoundingBox envelope = new BoundingBoxDoubleGf(point);
     envelope = envelope.expand(distance);
-    getNodeIndex().visit(envelope, visitor);
+    getNodeIndex().forEach(visitor, envelope);
     final List<Node<T>> nodes = results.getList();
     Collections.sort(nodes);
     return nodes;
@@ -442,7 +440,7 @@ public class Graph<T> {
   public void forEachEdge(final Visitor<Edge<T>> visitor,
     final com.revolsys.jts.geom.BoundingBox envelope) {
     final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
-    edgeIndex.visit(envelope, visitor);
+    edgeIndex.forEach(visitor, envelope);
   }
 
   @SuppressWarnings("unchecked")
@@ -644,7 +642,7 @@ public class Graph<T> {
     final com.revolsys.jts.geom.BoundingBox envelope) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>(filter);
     final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
-    edgeIndex.visit(envelope, results);
+    edgeIndex.forEach(results, envelope);
     final List<Edge<T>> edges = results.getList();
     Collections.sort(edges);
     return edges;
@@ -664,7 +662,7 @@ public class Graph<T> {
     final Comparator<Edge<T>> comparator, final com.revolsys.jts.geom.BoundingBox envelope) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>(filter);
     final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
-    edgeIndex.visit(envelope, results);
+    edgeIndex.forEach(results, envelope);
     final List<Edge<T>> targetEdges = results.getList();
     if (comparator == null) {
       Collections.sort(targetEdges);
@@ -789,7 +787,7 @@ public class Graph<T> {
     final Comparator<Node<T>> comparator, final BoundingBox boundingBox) {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>(filter);
     final IdObjectIndex<Node<T>> nodeIndex = getNodeIndex();
-    nodeIndex.visit(boundingBox, results);
+    nodeIndex.forEach(results, boundingBox);
     final List<Node<T>> nodes = results.getList();
     if (comparator == null) {
       Collections.sort(nodes);
@@ -1031,9 +1029,9 @@ public class Graph<T> {
   }
 
   public void queryEdges(final EdgeVisitor<T> visitor) {
-    final com.revolsys.jts.geom.BoundingBox env = visitor.getEnvelope();
+    final BoundingBox env = visitor.getEnvelope();
     final IdObjectIndex<Edge<T>> index = getEdgeIndex();
-    index.visit(env, visitor);
+    index.forEach(visitor, env);
   }
 
   public void queryEdges(final EdgeVisitor<T> visitor, final Visitor<Edge<T>> matchVisitor) {
@@ -1370,140 +1368,4 @@ public class Graph<T> {
     return splitEdge(edge, Arrays.asList(nodes));
   }
 
-  public void visitEdges(final Comparator<Edge<T>> comparator, final Visitor<Edge<T>> visitor) {
-    visitEdges(null, comparator, visitor);
-  }
-
-  public void visitEdges(final Predicate<Edge<T>> filter, final Comparator<Edge<T>> comparator,
-    final Visitor<Edge<T>> visitor) {
-    final LinkedList<Edge<T>> edges = new LinkedList<Edge<T>>(getEdges(filter));
-    if (comparator != null) {
-      Collections.sort(edges, comparator);
-    }
-    final EdgeEventListener<T> listener = new EdgeEventListener<T>() {
-      @Override
-      public void edgeEvent(final EdgeEvent<T> edgeEvent) {
-        final Edge<T> edge = edgeEvent.getEdge();
-        final String action = edgeEvent.getAction();
-        if (action.equals(EdgeEvent.EDGE_ADDED)) {
-          edges.addFirst(edge);
-          if (comparator == null) {
-            Collections.sort(edges);
-          } else {
-            Collections.sort(edges, comparator);
-          }
-        } else if (action.equals(EdgeEvent.EDGE_REMOVED)) {
-          if (comparator != null) {
-            edges.remove(edge);
-          }
-        }
-      }
-    };
-    this.edgeListeners.add(listener);
-    try {
-      while (!edges.isEmpty()) {
-        final Edge<T> edge = edges.remove(0);
-        if (!edge.isRemoved()) {
-          if (!visitor.visit(edge)) {
-            return;
-          }
-        }
-      }
-    } finally {
-      this.edgeListeners.remove(listener);
-    }
-  }
-
-  public void visitEdges(final Predicate<Edge<T>> filter, final Visitor<Edge<T>> visitor) {
-    visitEdges(filter, null, visitor);
-  }
-
-  @SuppressWarnings("unchecked")
-  public void visitEdges(final Visitor<Edge<T>> visitor) {
-    Predicate<Edge<T>> filter = null;
-    if (visitor instanceof PredicateProxy) {
-      filter = ((PredicateProxy<Edge<T>>)visitor).getPredicate();
-    }
-    Comparator<Edge<T>> comparator = null;
-    if (visitor instanceof ComparatorProxy) {
-      comparator = ((ComparatorProxy<Edge<T>>)visitor).getComparator();
-    }
-    visitEdges(filter, comparator, visitor);
-  }
-
-  public void visitEdges(final Visitor<Edge<T>> visitor,
-    final com.revolsys.jts.geom.BoundingBox envelope) {
-    final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
-    edgeIndex.visit(envelope, visitor);
-  }
-
-  // TODO make this work with cached nodes
-  public void visitNodes(final Predicate<Node<T>> filter, final Comparator<Node<T>> comparator,
-    final Visitor<Node<T>> visitor) {
-    final List<Node<T>> nodes = new LinkedList<Node<T>>();
-    if (filter == null) {
-      nodes.addAll(getNodes());
-    } else {
-      for (final Node<T> node : getNodes()) {
-        if (filter.test(node)) {
-          nodes.add(node);
-        }
-      }
-    }
-    if (comparator != null) {
-      Collections.sort(nodes, comparator);
-    }
-
-    final NodeEventListener<T> listener = new NodeEventListener<T>() {
-      @Override
-      public void nodeEvent(final NodeEvent<T> nodeEvent) {
-        final Node<T> node = nodeEvent.getNode();
-        final String action = nodeEvent.getAction();
-        if (action.equals(NodeEvent.NODE_ADDED)) {
-          nodes.add(node);
-          if (comparator == null) {
-            Collections.sort(nodes);
-          } else {
-            Collections.sort(nodes, comparator);
-          }
-        } else if (action.equals(NodeEvent.NODE_REMOVED)) {
-          nodes.remove(node);
-        }
-      }
-    };
-    this.nodeListeners.add(listener);
-    try {
-      while (!nodes.isEmpty()) {
-        final Node<T> node = nodes.remove(0);
-        if (!node.isRemoved()) {
-          if (!visitor.visit(node)) {
-            return;
-          }
-        }
-      }
-    } finally {
-      this.nodeListeners.remove(listener);
-    }
-  }
-
-  public void visitNodes(final Predicate<Node<T>> filter, final Visitor<Node<T>> visitor) {
-    visitNodes(filter, null, visitor);
-  }
-
-  @SuppressWarnings("unchecked")
-  public void visitNodes(final Visitor<Node<T>> visitor) {
-    Predicate<Node<T>> filter = null;
-    if (visitor instanceof PredicateProxy) {
-      filter = ((PredicateProxy<Node<T>>)visitor).getPredicate();
-    }
-    Comparator<Node<T>> comparator = null;
-    if (visitor instanceof ComparatorProxy) {
-      comparator = ((ComparatorProxy<Node<T>>)visitor).getComparator();
-    }
-    visitNodes(filter, comparator, visitor);
-  }
-
-  public void visitNodes(final Visitor<Node<T>> visitor, final Comparator<Node<T>> comparator) {
-    visitNodes(null, comparator, visitor);
-  }
 }

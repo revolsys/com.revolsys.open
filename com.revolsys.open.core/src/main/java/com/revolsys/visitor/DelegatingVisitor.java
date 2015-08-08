@@ -43,6 +43,14 @@ public class DelegatingVisitor<T> extends AbstractVisitor<T> {
     this.visitor = visitor;
   }
 
+  @Override
+  public void accept(final T item) {
+    final Predicate<T> predicate = getPredicate();
+    if (predicate.test(item)) {
+      this.visitor.accept(item);
+    }
+  }
+
   public Visitor<T> getVisitor() {
     return this.visitor;
   }
@@ -54,15 +62,5 @@ public class DelegatingVisitor<T> extends AbstractVisitor<T> {
   @Override
   public String toString() {
     return this.visitor.toString();
-  }
-
-  @Override
-  public boolean visit(final T item) {
-    final Predicate<T> predicate = getPredicate();
-    if (predicate.test(item)) {
-      return this.visitor.visit(item);
-    } else {
-      return true;
-    }
   }
 }

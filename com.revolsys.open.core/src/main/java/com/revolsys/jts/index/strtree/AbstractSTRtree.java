@@ -39,8 +39,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 
-import com.revolsys.jts.index.ItemVisitor;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -331,7 +331,7 @@ public abstract class AbstractSTRtree implements Serializable {
   }
 
   private void query(final Object searchBounds, final AbstractNode node,
-    final ItemVisitor visitor) {
+    final Consumer<Object> visitor) {
     final List childBoundables = node.getChildBoundables();
     for (int i = 0; i < childBoundables.size(); i++) {
       final Boundable childBoundable = (Boundable)childBoundables.get(i);
@@ -341,7 +341,7 @@ public abstract class AbstractSTRtree implements Serializable {
       if (childBoundable instanceof AbstractNode) {
         query(searchBounds, (AbstractNode)childBoundable, visitor);
       } else if (childBoundable instanceof ItemBoundable) {
-        visitor.visitItem(((ItemBoundable)childBoundable).getItem());
+        visitor.accept(((ItemBoundable)childBoundable).getItem());
       } else {
         Assert.shouldNeverReachHere();
       }
@@ -368,7 +368,7 @@ public abstract class AbstractSTRtree implements Serializable {
   /**
    *  Also builds the tree, if necessary.
    */
-  protected void query(final Object searchBounds, final ItemVisitor visitor) {
+  protected void query(final Object searchBounds, final Consumer<Object> visitor) {
     build();
     if (isEmpty()) {
       // nothing in tree, so return

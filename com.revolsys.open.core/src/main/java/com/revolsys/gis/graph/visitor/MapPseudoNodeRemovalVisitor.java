@@ -15,12 +15,7 @@ public class MapPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<Map
   }
 
   @Override
-  public void process(final Graph<Map<String, Object>> graph) {
-    graph.visitNodes(this);
-  }
-
-  @Override
-  public boolean visit(final Node<Map<String, Object>> node) {
+  public void accept(final Node<Map<String, Object>> node) {
     final List<Edge<Map<String, Object>>> edges = node.getEdges();
     if (edges.size() == 2) {
       final Edge<Map<String, Object>> edge1 = edges.get(0);
@@ -28,6 +23,10 @@ public class MapPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<Map
       final Graph<Map<String, Object>> graph = node.getGraph();
       graph.merge(node, edge1, edge2);
     }
-    return true;
+  }
+
+  @Override
+  public void process(final Graph<Map<String, Object>> graph) {
+    graph.forEachNode(this);
   }
 }

@@ -19,13 +19,12 @@ public class NodeWithinDistanceOfCoordinateVisitor<T> implements Visitor<Node<T>
   }
 
   @Override
-  public boolean visit(final Node<T> node) {
+  public void accept(final Node<T> node) {
     final Point coordinate = node;
     final double distance = this.coordinates.distance(coordinate);
     if (distance <= this.maxDistance) {
-      this.matchVisitor.visit(node);
+      this.matchVisitor.accept(node);
     }
-    return true;
   }
 
 }

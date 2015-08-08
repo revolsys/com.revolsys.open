@@ -18,7 +18,7 @@ public class EdgeIntersectLineVisitor<T> implements Visitor<Edge<T>> {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
     final BoundingBox env = line.getBoundingBox();
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
-    index.visit(env, new EdgeIntersectLineVisitor<T>(line, results));
+    index.forEach(new EdgeIntersectLineVisitor<T>(line, results), env);
     return results.getList();
 
   }
@@ -33,13 +33,12 @@ public class EdgeIntersectLineVisitor<T> implements Visitor<Edge<T>> {
   }
 
   @Override
-  public boolean visit(final Edge<T> edge) {
+  public void accept(final Edge<T> edge) {
     final LineString line = edge.getLine();
     final IntersectionMatrix relate = this.line.relate(line);
     if (relate.get(0, 0) == Dimension.L) {
-      this.matchVisitor.visit(edge);
+      this.matchVisitor.accept(edge);
     }
-    return true;
   }
 
 }

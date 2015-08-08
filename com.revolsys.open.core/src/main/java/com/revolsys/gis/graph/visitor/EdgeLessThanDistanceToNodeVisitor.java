@@ -19,8 +19,8 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends DelegatingVisitor<Edge
     final Point point = node;
     BoundingBox env = new BoundingBoxDoubleGf(point);
     env = env.expand(maxDistance);
-    graph.getEdgeIndex().visit(env,
-      new EdgeLessThanDistanceToNodeVisitor<T>(node, maxDistance, results));
+    graph.getEdgeIndex()
+      .forEach(new EdgeLessThanDistanceToNodeVisitor<T>(node, maxDistance, results), env);
     return results.getList();
 
   }
@@ -42,7 +42,7 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends DelegatingVisitor<Edge
   }
 
   @Override
-  public boolean visit(final Edge<T> edge) {
+  public void accept(final Edge<T> edge) {
     final com.revolsys.jts.geom.BoundingBox envelope = edge.getEnvelope();
     if (this.envelope.distance(envelope) < this.maxDistance) {
       if (!edge.hasNode(this.node)) {
@@ -51,7 +51,6 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends DelegatingVisitor<Edge
         }
       }
     }
-    return true;
   }
 
 }

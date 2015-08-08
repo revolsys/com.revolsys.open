@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.index.intervalrtree;
 
-import com.revolsys.collection.Visitor;
+import java.util.function.Consumer;
 
 public abstract class IntervalRTreeNode<V> {
 
@@ -63,7 +63,7 @@ public abstract class IntervalRTreeNode<V> {
     return true;
   }
 
-  public abstract void query(double queryMin, double queryMax, Visitor<V> visitor);
+  public abstract void query(double queryMin, double queryMax, Consumer<V> visitor);
 
   @Override
   public String toString() {

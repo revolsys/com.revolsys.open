@@ -429,8 +429,8 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   @Override
   public RecordDefinition getRecordDefinition(final String typePath) {
-    final String schemaName = Path.getPath(typePath);
-    final RecordStoreSchema schema = getSchema(schemaName);
+    final String schemaPath = Path.getPath(typePath);
+    final RecordStoreSchema schema = getSchema(schemaPath);
     if (schema == null) {
       return null;
     } else {

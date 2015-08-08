@@ -72,7 +72,7 @@ class LineSegmentIndex {
     final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(querySeg.getP0(), querySeg.getP1());
 
     final LineSegmentVisitor visitor = new LineSegmentVisitor(querySeg);
-    this.index.visit(env, visitor);
+    this.index.forEach(visitor, env);
     final List itemsFound = visitor.getItems();
 
     // List listQueryItems = index.query(env);

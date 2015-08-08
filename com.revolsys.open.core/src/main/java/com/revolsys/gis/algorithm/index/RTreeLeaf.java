@@ -3,9 +3,9 @@ package com.revolsys.gis.algorithm.index;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
@@ -30,6 +30,39 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
     this.objects[this.size] = object;
     this.size++;
     setBoundingBox(getBoundingBox().expandToInclude(envelope));
+  }
+
+  @Override
+  public void forEach(final BoundingBox envelope, final Consumer<T> action) {
+    for (int i = 0; i < this.size; i++) {
+      final BoundingBox objectEnvelope = this.envelopes[i];
+      if (envelope.intersects(objectEnvelope)) {
+        final T object = getObject(i);
+        action.accept(object);
+      }
+    }
+  }
+
+  @Override
+  public void forEach(final BoundingBox envelope, final Predicate<T> filter,
+    final Consumer<T> action) {
+    for (int i = 0; i < this.size; i++) {
+      final BoundingBox objectEnvelope = this.envelopes[i];
+      if (envelope.intersects(objectEnvelope)) {
+        final T object = getObject(i);
+        if (filter.test(object)) {
+          action.accept(object);
+        }
+      }
+    }
+  }
+
+  @Override
+  public void forEachValue(final Consumer<? super T> action) {
+    for (int i = 0; i < this.size; i++) {
+      final T object = getObject(i);
+      action.accept(object);
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -94,47 +127,5 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
       boundingBox = boundingBox.expandToInclude(envelope);
     }
     setBoundingBox(boundingBox);
-  }
-
-  @Override
-  public boolean visit(final BoundingBox envelope, final Predicate<T> filter,
-    final Visitor<T> visitor) {
-    for (int i = 0; i < this.size; i++) {
-      final BoundingBox objectEnvelope = this.envelopes[i];
-      if (envelope.intersects(objectEnvelope)) {
-        final T object = getObject(i);
-        if (filter.test(object)) {
-          if (!visitor.visit(object)) {
-            return false;
-          }
-        }
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public boolean visit(final BoundingBox envelope, final Visitor<T> visitor) {
-    for (int i = 0; i < this.size; i++) {
-      final BoundingBox objectEnvelope = this.envelopes[i];
-      if (envelope.intersects(objectEnvelope)) {
-        final T object = getObject(i);
-        if (!visitor.visit(object)) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public boolean visit(final Visitor<T> visitor) {
-    for (int i = 0; i < this.size; i++) {
-      final T object = getObject(i);
-      if (!visitor.visit(object)) {
-        return false;
-      }
-    }
-    return true;
   }
 }

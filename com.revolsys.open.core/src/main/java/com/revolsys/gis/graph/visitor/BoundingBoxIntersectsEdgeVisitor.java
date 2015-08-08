@@ -22,7 +22,7 @@ public class BoundingBoxIntersectsEdgeVisitor<T> extends DelegatingVisitor<Edge<
     final BoundingBoxIntersectsEdgeVisitor<T> visitor = new BoundingBoxIntersectsEdgeVisitor<T>(
       boundingBox, results);
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
-    index.visit(boundingBox, visitor);
+    index.forEach(visitor, boundingBox);
     final List<Edge<T>> list = results.getList();
     list.remove(edge);
     return list;
@@ -38,11 +38,10 @@ public class BoundingBoxIntersectsEdgeVisitor<T> extends DelegatingVisitor<Edge<
   }
 
   @Override
-  public boolean visit(final Edge<T> edge) {
+  public void accept(final Edge<T> edge) {
     final com.revolsys.jts.geom.BoundingBox envelope = edge.getEnvelope();
     if (this.boundingBox.intersects(envelope)) {
-      super.visit(edge);
+      super.accept(edge);
     }
-    return true;
   }
 }

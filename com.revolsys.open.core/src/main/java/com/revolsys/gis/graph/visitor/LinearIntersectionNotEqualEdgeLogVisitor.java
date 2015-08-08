@@ -29,13 +29,7 @@ public class LinearIntersectionNotEqualEdgeLogVisitor extends AbstractVisitor<Ed
   }
 
   @Override
-  public void process(final RecordGraph graph) {
-    graph.visitEdges(this);
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public boolean visit(final Edge<Record> edge) {
+  public void accept(final Edge<Record> edge) {
     final Record object = edge.getObject();
     final LineString line = edge.getLine();
     if (GeometryProperties.getGeometryProperty(line, PROCESSED) != Boolean.TRUE) {
@@ -73,6 +67,10 @@ public class LinearIntersectionNotEqualEdgeLogVisitor extends AbstractVisitor<Ed
         }
       }
     }
-    return true;
+  }
+
+  @Override
+  public void process(final RecordGraph graph) {
+    graph.forEachEdge(this);
   }
 }

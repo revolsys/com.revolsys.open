@@ -21,7 +21,7 @@ public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements Visitor<Node
     BoundingBox envelope = new BoundingBoxDoubleGf(point);
     envelope = envelope.expand(maxDistance);
     final IdObjectIndex<Node<T>> nodeIndex = graph.getNodeIndex();
-    nodeIndex.visit(envelope, visitor);
+    nodeIndex.forEach(visitor, envelope);
     final List<Node<T>> nodes = results.getList();
     Collections.sort(nodes);
     return nodes;
@@ -41,12 +41,11 @@ public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements Visitor<Node
   }
 
   @Override
-  public boolean visit(final Node<T> node) {
+  public void accept(final Node<T> node) {
     final double distance = this.coordinates.distance(node);
     if (distance < this.maxDistance) {
-      this.matchVisitor.visit(node);
+      this.matchVisitor.accept(node);
     }
-    return true;
   }
 
 }

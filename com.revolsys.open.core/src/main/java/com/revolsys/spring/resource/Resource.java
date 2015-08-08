@@ -9,6 +9,26 @@ import com.revolsys.io.FileNames;
 
 public interface Resource extends org.springframework.core.io.Resource {
 
+  static org.springframework.core.io.Resource getResource(final Object source) {
+    org.springframework.core.io.Resource resource;
+    if (source instanceof org.springframework.core.io.Resource) {
+      resource = (org.springframework.core.io.Resource)source;
+    } else if (source instanceof Path) {
+      resource = new PathResource((Path)source);
+    } else if (source instanceof File) {
+      resource = new FileSystemResource((File)source);
+    } else if (source instanceof URL) {
+      resource = new UrlResource((URL)source);
+    } else if (source instanceof URI) {
+      resource = new UrlResource((URI)source);
+    } else if (source instanceof String) {
+      return SpringUtil.getResource((String)source);
+    } else {
+      throw new IllegalArgumentException(source.getClass() + " is not supported");
+    }
+    return resource;
+  }
+
   @Override
   Resource createRelative(String relativePath);
 
@@ -35,25 +55,5 @@ public interface Resource extends org.springframework.core.io.Resource {
     } else {
       return parent.createRelative(newFileName);
     }
-  }
-
-  static Resource getResource(final Object source) {
-    Resource resource;
-    if (source instanceof Resource) {
-      resource = (Resource)source;
-    } else if (source instanceof Path) {
-      resource = new PathResource((Path)source);
-    } else if (source instanceof File) {
-      resource = new FileSystemResource((File)source);
-    } else if (source instanceof URL) {
-      resource = new UrlResource((URL)source);
-    } else if (source instanceof URI) {
-      resource = new UrlResource((URI)source);
-    } else if (source instanceof String) {
-      return SpringUtil.getResource((String)source);
-    } else {
-      throw new IllegalArgumentException(source.getClass() + " is not supported");
-    }
-    return resource;
   }
 }

@@ -1,9 +1,9 @@
 package com.revolsys.gis.algorithm.index;
 
 import java.util.LinkedList;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.collection.Visitor;
 import com.revolsys.jts.geom.BoundingBox;
 
 public abstract class RTreeNode<T> {
@@ -16,6 +16,12 @@ public abstract class RTreeNode<T> {
   public boolean contains(final BoundingBox boundingBox) {
     return boundingBox.covers(boundingBox);
   }
+
+  public abstract void forEach(BoundingBox envelope, Consumer<T> action);
+
+  public abstract void forEach(BoundingBox envelope, Predicate<T> filter, Consumer<T> action);
+
+  public abstract void forEachValue(Consumer<? super T> action);
 
   public double getArea() {
     return this.boundingBox.getArea();
@@ -37,10 +43,4 @@ public abstract class RTreeNode<T> {
   }
 
   protected abstract void updateEnvelope();
-
-  public abstract boolean visit(BoundingBox envelope, Predicate<T> filter, Visitor<T> visitor);
-
-  public abstract boolean visit(BoundingBox envelope, Visitor<T> visitor);
-
-  public abstract boolean visit(Visitor<T> visitor);
 }

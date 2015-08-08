@@ -79,7 +79,7 @@ public class RecordQuadTree extends QuadTree<Record> {
 
   public void query(final Geometry geometry, final Visitor<Record> visitor) {
     final BoundingBox boundingBox = geometry.getBoundingBox();
-    visit(boundingBox, visitor);
+    forEach(visitor, boundingBox);
   }
 
   public List<Record> queryDistance(final Geometry geometry, final double distance) {
@@ -148,7 +148,7 @@ public class RecordQuadTree extends QuadTree<Record> {
   public List<Record> queryList(final BoundingBox boundingBox, final Predicate<Record> filter,
     final Comparator<Record> comparator) {
     final CreateListVisitor<Record> listVisitor = new CreateListVisitor<Record>(filter);
-    visit(boundingBox, listVisitor);
+    forEach(listVisitor, boundingBox);
     final List<Record> list = listVisitor.getList();
     if (comparator != null) {
       Collections.sort(list, comparator);

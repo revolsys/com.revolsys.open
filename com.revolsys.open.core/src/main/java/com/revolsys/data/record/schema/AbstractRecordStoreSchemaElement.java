@@ -1,9 +1,5 @@
 package com.revolsys.data.record.schema;
 
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-
-import com.revolsys.collection.EmptyReference;
 import com.revolsys.io.Path;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.util.Property;
@@ -15,7 +11,7 @@ public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithPro
 
   private final String name;
 
-  private Reference<RecordStoreSchema> schema;
+  private RecordStoreSchema schema;
 
   public AbstractRecordStoreSchemaElement() {
     this.path = "";
@@ -32,11 +28,10 @@ public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithPro
       name = "/";
     }
     this.name = name;
+    this.schema = schema;
     if (schema == null) {
-      this.schema = new EmptyReference<>();
       this.path = path;
     } else {
-      this.schema = new WeakReference<>(schema);
       this.path = Path.toPath(schema.getPath(), name);
     }
   }
@@ -48,7 +43,7 @@ public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithPro
   @Override
   public void close() {
     super.close();
-    this.schema = new EmptyReference<>();
+    this.schema = null;
   }
 
   @Override
@@ -98,7 +93,7 @@ public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithPro
 
   @Override
   public RecordStoreSchema getSchema() {
-    return this.schema.get();
+    return this.schema;
   }
 
   @Override

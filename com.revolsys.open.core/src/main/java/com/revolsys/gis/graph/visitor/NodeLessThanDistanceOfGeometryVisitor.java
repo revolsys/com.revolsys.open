@@ -25,7 +25,7 @@ public class NodeLessThanDistanceOfGeometryVisitor<T> implements Visitor<Node<T>
       final IdObjectIndex<Node<T>> index = graph.getNodeIndex();
       final NodeLessThanDistanceOfGeometryVisitor<T> visitor = new NodeLessThanDistanceOfGeometryVisitor<T>(
         geometry, maxDistance, results);
-      index.visit(env, visitor);
+      index.forEach(visitor, env);
       return results.getList();
     }
   }
@@ -47,14 +47,13 @@ public class NodeLessThanDistanceOfGeometryVisitor<T> implements Visitor<Node<T>
   }
 
   @Override
-  public boolean visit(final Node<T> node) {
+  public void accept(final Node<T> node) {
     final Point coordinate = node;
     final Point point = this.geometryFactory.point(coordinate);
     final double distance = this.geometry.distance(point);
     if (distance < this.maxDistance) {
-      this.matchVisitor.visit(node);
+      this.matchVisitor.accept(node);
     }
-    return true;
   }
 
 }
