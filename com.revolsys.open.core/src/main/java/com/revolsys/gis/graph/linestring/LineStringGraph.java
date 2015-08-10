@@ -371,30 +371,18 @@ public class LineStringGraph extends Graph<LineSegment> {
   }
 
   private void removeDuplicateEdges() {
-    final Comparator<Edge<LineSegment>> comparator = new EdgeAttributeValueComparator<LineSegment>(
-      INDEX);
-    forEachEdge((edge) -> removeDuplicateEdges(edge), comparator);
-  }
+    final Comparator<Edge<LineSegment>> comparator = new EdgeAttributeValueComparator<>(INDEX);
+    forEachEdge((edge) -> {
+      final Node<LineSegment> fromNode = edge.getFromNode();
+      final Node<LineSegment> toNode = edge.getToNode();
 
-  /**
-   * Remove duplicate edges, edges must be processed in order of the index
-   * attribute.
-   *
-   * @param edge1
-   * @return
-   */
-  public boolean removeDuplicateEdges(final Edge<LineSegment> edge) {
-    final Node<LineSegment> fromNode = edge.getFromNode();
-
-    final Node<LineSegment> toNode = edge.getToNode();
-
-    final Collection<Edge<LineSegment>> edges = fromNode.getEdgesTo(toNode);
-    final int numDuplicates = edges.size();
-    if (numDuplicates > 1) {
-      edges.remove(edge);
-      Edge.remove(edges);
-    }
-    return true;
+      final Collection<Edge<LineSegment>> edges = fromNode.getEdgesTo(toNode);
+      final int duplicateCount = edges.size();
+      if (duplicateCount > 1) {
+        edges.remove(edge);
+        Edge.remove(edges);
+      }
+    } , comparator);
   }
 
   @Override
@@ -425,31 +413,28 @@ public class LineStringGraph extends Graph<LineSegment> {
   public void splitCrossingEdges() {
     final Comparator<Edge<LineSegment>> comparator = new EdgeAttributeValueComparator<LineSegment>(
       INDEX);
-    forEachEdge((edge) -> splitCrossingEdges(edge), comparator);
-  }
+    forEachEdge((edge) -> {
+      final LineSegment line1 = edge.getObject();
+      final Predicate<LineSegment> lineFilter = new CrossingLineSegmentFilter(line1);
+      final Predicate<Edge<LineSegment>> filter = new EdgeObjectFilter<LineSegment>(lineFilter);
+      final List<Edge<LineSegment>> edges = getEdges(filter, line1.getBoundingBox());
 
-  public boolean splitCrossingEdges(final Edge<LineSegment> edge1) {
-    final LineSegment line1 = edge1.getObject();
-    final Predicate<LineSegment> lineFilter = new CrossingLineSegmentFilter(line1);
-    final Predicate<Edge<LineSegment>> filter = new EdgeObjectFilter<LineSegment>(lineFilter);
-    final List<Edge<LineSegment>> edges = getEdges(filter, line1.getBoundingBox());
-
-    if (!edges.isEmpty()) {
-      final List<Point> points = new ArrayList<Point>();
-      for (final Edge<LineSegment> edge2 : edges) {
-        final LineSegment line2 = edge2.getObject();
-        final Geometry intersections = line1.getIntersection(line2);
-        if (intersections instanceof Point) {
-          final Point intersection = new PointDouble((Point)intersections);
-          points.add(intersection);
-          edge2.split(intersection);
+      if (!edges.isEmpty()) {
+        final List<Point> points = new ArrayList<Point>();
+        for (final Edge<LineSegment> edge2 : edges) {
+          final LineSegment line2 = edge2.getObject();
+          final Geometry intersections = line1.getIntersection(line2);
+          if (intersections instanceof Point) {
+            final Point intersection = new PointDouble((Point)intersections);
+            points.add(intersection);
+            edge2.split(intersection);
+          }
+        }
+        if (!points.isEmpty()) {
+          edge.split(points);
         }
       }
-      if (!points.isEmpty()) {
-        edge1.split(points);
-      }
-    }
-    return true;
+    } , comparator);
   }
 
   @Override

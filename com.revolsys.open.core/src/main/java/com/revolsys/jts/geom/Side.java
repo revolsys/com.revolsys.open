@@ -52,6 +52,14 @@ public enum Side {
     return this == RIGHT;
   }
 
+  public Side opposite() {
+    if (this == LEFT) {
+      return RIGHT;
+    } else {
+      return LEFT;
+    }
+  }
+
   @Override
   public String toString() {
     return this.name;

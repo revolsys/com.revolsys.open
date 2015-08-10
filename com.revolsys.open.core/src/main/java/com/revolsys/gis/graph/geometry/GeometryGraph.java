@@ -385,34 +385,23 @@ public class GeometryGraph extends Graph<LineSegment> {
   public void removeDuplicateLineEdges() {
     final Comparator<Edge<LineSegment>> comparator = new EdgeAttributeValueComparator<LineSegment>(
       "geometryIndex", "partIndex", "segmentIndex");
-    forEachEdge((edge) -> removeDuplicateLineEdges(edge), comparator);
-  }
+    forEachEdge((edge) -> {
+      if (isLineString(edge)) {
+        final Node<LineSegment> fromNode = edge.getFromNode();
+        final Node<LineSegment> toNode = edge.getToNode();
 
-  /**
-   * Remove duplicate edges, edges must be processed in order of the index
-   * attribute.
-   *
-   * @param edge1
-   * @return
-   */
-  public boolean removeDuplicateLineEdges(final Edge<LineSegment> edge) {
-    if (isLineString(edge)) {
-      final Node<LineSegment> fromNode = edge.getFromNode();
-
-      final Node<LineSegment> toNode = edge.getToNode();
-
-      final Collection<Edge<LineSegment>> edges = fromNode.getEdgesTo(toNode);
-      final int numDuplicates = edges.size();
-      if (numDuplicates > 1) {
-        edges.remove(edge);
-        for (final Edge<LineSegment> removeEdge : edges) {
-          if (isLineString(removeEdge)) {
-            removeEdge.remove();
+        final Collection<Edge<LineSegment>> edges = fromNode.getEdgesTo(toNode);
+        final int duplicateCount = edges.size();
+        if (duplicateCount > 1) {
+          edges.remove(edge);
+          for (final Edge<LineSegment> removeEdge : edges) {
+            if (isLineString(removeEdge)) {
+              removeEdge.remove();
+            }
           }
         }
       }
-    }
-    return true;
+    } , comparator);
   }
 
 }

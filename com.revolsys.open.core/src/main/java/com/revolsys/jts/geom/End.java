@@ -26,4 +26,20 @@ public enum End {
       return null;
     }
   }
+
+  public boolean isFrom() {
+    return this == FROM;
+  }
+
+  public boolean isTo() {
+    return this == TO;
+  }
+
+  public End opposite() {
+    if (isFrom()) {
+      return TO;
+    } else {
+      return FROM;
+    }
+  }
 }

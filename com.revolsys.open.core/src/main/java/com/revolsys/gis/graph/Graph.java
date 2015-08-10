@@ -416,10 +416,10 @@ public class Graph<T> {
         final Edge<T> edge = edgeEvent.getEdge();
         final String action = edgeEvent.getAction();
         if (action.equals(EdgeEvent.EDGE_ADDED)) {
-          edges.addFirst(edge);
-          if (comparator == null) {
-            Collections.sort(edges);
-          } else {
+          if (filter == null || filter.test(edge)) {
+            edges.addFirst(edge);
+          }
+          if (comparator != null) {
             Collections.sort(edges, comparator);
           }
         } else if (action.equals(EdgeEvent.EDGE_REMOVED)) {
@@ -487,10 +487,10 @@ public class Graph<T> {
         final Node<T> node = nodeEvent.getNode();
         final String action = nodeEvent.getAction();
         if (action.equals(NodeEvent.NODE_ADDED)) {
-          nodes.add(node);
-          if (comparator == null) {
-            Collections.sort(nodes);
-          } else {
+          if (filter == null || filter.test(node)) {
+            nodes.add(node);
+          }
+          if (comparator != null) {
             Collections.sort(nodes, comparator);
           }
         } else if (action.equals(NodeEvent.NODE_REMOVED)) {

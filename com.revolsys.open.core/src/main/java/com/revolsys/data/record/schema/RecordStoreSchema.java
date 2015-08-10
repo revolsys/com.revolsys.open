@@ -102,7 +102,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
   @SuppressWarnings("unchecked")
   public <V extends RecordStoreSchemaElement> V getElement(String path) {
     RecordStoreSchemaElement childElement = this.elementsByPath.get(path);
-    if (childElement != null) {
+    if (childElement == null) {
       if (path != null) {
         path = Path.cleanUpper(path);
         if (equalPath(path)) {
