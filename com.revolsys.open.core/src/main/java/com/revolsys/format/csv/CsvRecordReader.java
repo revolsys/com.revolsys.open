@@ -24,6 +24,7 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.PathName;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.spring.resource.SpringUtil;
@@ -150,7 +151,8 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
         typePath = schemaPath + typePath;
       }
     }
-    this.recordDefinition = new RecordDefinitionImpl(schema, typePath, getProperties(), fields);
+    final PathName pathName = PathName.create(typePath);
+    this.recordDefinition = new RecordDefinitionImpl(schema, pathName, getProperties(), fields);
   }
 
   /**

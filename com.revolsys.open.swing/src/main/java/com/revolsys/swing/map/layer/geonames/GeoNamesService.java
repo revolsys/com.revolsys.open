@@ -16,7 +16,7 @@ import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.format.json.JsonParser;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -30,7 +30,7 @@ public class GeoNamesService {
 
   static {
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
-      Path.toPath("/geoname.org", "name"));
+      PathName.create("/geoname.org/name"));
     recordDefinition.addField("geonameId", DataTypes.STRING, false);
     recordDefinition.addField("name", DataTypes.STRING, false);
     recordDefinition.addField("fcode", DataTypes.STRING, false);
@@ -50,7 +50,7 @@ public class GeoNamesService {
     NAME_RECORD_DEFINITION = recordDefinition;
 
     final RecordDefinitionImpl wikipediaRecordDefinition = new RecordDefinitionImpl(
-      Path.toPath("/geoname.org", "wikipedia"));
+      PathName.create("/geoname.org/wikipedia"));
     wikipediaRecordDefinition.addField("summary", DataTypes.STRING, false);
     wikipediaRecordDefinition.addField("title", DataTypes.STRING, false);
     wikipediaRecordDefinition.addField("wikipediaUrl", DataTypes.STRING, false);

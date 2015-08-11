@@ -27,6 +27,7 @@ import com.revolsys.gis.io.EndianMappedByteBuffer;
 import com.revolsys.gis.io.LittleEndianRandomAccessFile;
 import com.revolsys.io.EndianInput;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.PathName;
 import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.ExceptionUtil;
@@ -89,12 +90,14 @@ public class XbaseIterator extends AbstractIterator<Record>implements RecordRead
 
   private Charset charset = StandardCharsets.UTF_8;
 
-  private String typeName;
+  private PathName typeName;
 
   public XbaseIterator(final Resource resource, final RecordFactory recordFactory)
     throws IOException {
-    this.typeName = "/" + this.typeName;
+    this.typeName = PathName.ROOT;
     this.resource = resource;
+    final String baseName = FileUtil.getBaseName(SpringUtil.getFileName(resource));
+    this.typeName = PathName.create("/" + baseName);
 
     this.recordFactory = recordFactory;
     final Resource codePageResource = SpringUtil.getResourceWithExtension(resource, "cpg");
@@ -272,7 +275,7 @@ public class XbaseIterator extends AbstractIterator<Record>implements RecordRead
     return text.trim();
   }
 
-  public String getTypeName() {
+  public PathName getTypeName() {
     return this.typeName;
   }
 
@@ -391,7 +394,7 @@ public class XbaseIterator extends AbstractIterator<Record>implements RecordRead
     }
   }
 
-  public void setTypeName(final String typeName) {
+  public void setTypeName(final PathName typeName) {
     this.typeName = typeName;
   }
 

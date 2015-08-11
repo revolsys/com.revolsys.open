@@ -30,6 +30,7 @@ import com.revolsys.data.record.property.FieldProperties;
 import com.revolsys.data.record.property.RecordDefinitionProperty;
 import com.revolsys.data.record.property.ValueRecordDefinitionProperty;
 import com.revolsys.data.types.DataType;
+import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.Geometry;
@@ -103,11 +104,12 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   private final List<RecordDefinition> superClasses = new ArrayList<>();
 
   public RecordDefinitionImpl() {
+    super(null, (PathName)null);
   }
 
   @SuppressWarnings("unchecked")
   public RecordDefinitionImpl(final Map<String, Object> properties) {
-    this(Maps.getString(properties, "path"));
+    this(PathName.create(Maps.getString(properties, "path")));
     final List<Object> fields = (List<Object>)properties.get("fields");
     for (final Object object : fields) {
       if (object instanceof FieldDefinition) {
@@ -127,24 +129,43 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     }
   }
 
+  public RecordDefinitionImpl(final PathName path) {
+    super(path);
+    RECORD_DEFINITION_CACHE.put(this.instanceId, this);
+  }
+
+  public RecordDefinitionImpl(final PathName path, final FieldDefinition... fields) {
+    this(path, null, fields);
+  }
+
+  public RecordDefinitionImpl(final PathName path, final List<FieldDefinition> fields) {
+    this(path, null, fields);
+  }
+
+  public RecordDefinitionImpl(final PathName path, final Map<String, Object> properties,
+    final FieldDefinition... fields) {
+    this(path, properties, Arrays.asList(fields));
+  }
+
+  public RecordDefinitionImpl(final PathName path, final Map<String, Object> properties,
+    final List<FieldDefinition> fields) {
+    super(path);
+    for (final FieldDefinition field : fields) {
+      addField(field.clone());
+    }
+    cloneProperties(properties);
+    RECORD_DEFINITION_CACHE.put(this.instanceId, this);
+  }
+
   public RecordDefinitionImpl(final RecordDefinition recordDefinition) {
-    this(recordDefinition.getPath(), recordDefinition.getProperties(),
+    this(recordDefinition.getPathName(), recordDefinition.getProperties(),
       recordDefinition.getFields());
     setIdFieldIndex(recordDefinition.getIdFieldIndex());
     RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
 
-  public RecordDefinitionImpl(final RecordStoreSchema schema,
-    final RecordDefinition recordDefinition) {
-    this(schema, recordDefinition.getPath());
-    for (final FieldDefinition field : recordDefinition.getFields()) {
-      addField(field.clone());
-    }
-    cloneProperties(recordDefinition.getProperties());
-  }
-
-  public RecordDefinitionImpl(final RecordStoreSchema schema, final String path) {
-    super(schema, path);
+  public RecordDefinitionImpl(final RecordStoreSchema schema, final PathName pathName) {
+    super(schema, pathName);
     final RecordStore recordStore = getRecordStore();
     if (recordStore != null) {
       this.recordFactory = recordStore.getRecordFactory();
@@ -152,7 +173,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
 
-  public RecordDefinitionImpl(final RecordStoreSchema schema, final String path,
+  public RecordDefinitionImpl(final RecordStoreSchema schema, final PathName path,
     final Map<String, Object> properties, final List<FieldDefinition> fields) {
     this(schema, path);
     for (final FieldDefinition field : fields) {
@@ -161,32 +182,13 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     cloneProperties(properties);
   }
 
-  public RecordDefinitionImpl(final String path) {
-    super(path);
-    RECORD_DEFINITION_CACHE.put(this.instanceId, this);
-  }
-
-  public RecordDefinitionImpl(final String path, final FieldDefinition... fields) {
-    this(path, null, fields);
-  }
-
-  public RecordDefinitionImpl(final String path, final List<FieldDefinition> fields) {
-    this(path, null, fields);
-  }
-
-  public RecordDefinitionImpl(final String path, final Map<String, Object> properties,
-    final FieldDefinition... fields) {
-    this(path, properties, Arrays.asList(fields));
-  }
-
-  public RecordDefinitionImpl(final String path, final Map<String, Object> properties,
-    final List<FieldDefinition> fields) {
-    super(path);
-    for (final FieldDefinition field : fields) {
+  public RecordDefinitionImpl(final RecordStoreSchema schema,
+    final RecordDefinition recordDefinition) {
+    this(schema, recordDefinition.getPathName());
+    for (final FieldDefinition field : recordDefinition.getFields()) {
       addField(field.clone());
     }
-    cloneProperties(properties);
-    RECORD_DEFINITION_CACHE.put(this.instanceId, this);
+    cloneProperties(recordDefinition.getProperties());
   }
 
   @Override
@@ -646,7 +648,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   public RecordDefinitionImpl rename(final String path) {
-    final RecordDefinitionImpl clone = new RecordDefinitionImpl(path, getProperties(), this.fields);
+    final RecordDefinitionImpl clone = new RecordDefinitionImpl(PathName.create(path),
+      getProperties(), this.fields);
     clone.setIdFieldIndex(this.idFieldDefinitionIndex);
     clone.setProperties(getProperties());
     return clone;

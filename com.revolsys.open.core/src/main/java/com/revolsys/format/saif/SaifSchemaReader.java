@@ -50,6 +50,7 @@ import com.revolsys.data.types.DataTypes;
 import com.revolsys.data.types.EnumerationDataType;
 import com.revolsys.data.types.SimpleDataType;
 import com.revolsys.format.saif.util.CsnIterator;
+import com.revolsys.io.PathName;
 import com.revolsys.spring.resource.SpringUtil;
 
 public class SaifSchemaReader {
@@ -98,7 +99,7 @@ public class SaifSchemaReader {
 
   private void addExportedObjects() {
     final RecordDefinitionImpl exportedObjectHandle = new RecordDefinitionImpl(
-      "ExportedObjectHandle");
+      PathName.create("/ExportedObjectHandle"));
     this.schema.addRecordDefinition(exportedObjectHandle);
     exportedObjectHandle.addField("referenceID", DataTypes.STRING, true);
     exportedObjectHandle.addField("type", DataTypes.STRING, true);
@@ -276,8 +277,8 @@ public class SaifSchemaReader {
     if (this.schema == null) {
       this.schema = new RecordDefinitionFactoryImpl();
 
-      this.schema.addRecordDefinition(new RecordDefinitionImpl("/AggregateType"));
-      this.schema.addRecordDefinition(new RecordDefinitionImpl("/PrimitiveType"));
+      this.schema.addRecordDefinition(new RecordDefinitionImpl(PathName.create("/AggregateType")));
+      this.schema.addRecordDefinition(new RecordDefinitionImpl(PathName.create("/PrimitiveType")));
 
       addExportedObjects();
     }
@@ -442,7 +443,7 @@ public class SaifSchemaReader {
   public void subclass(final RecordDefinition type, final CsnIterator iterator) throws IOException {
     if (iterator.next() == CsnIterator.CLASS_NAME) {
       final String className = iterator.getPathValue();
-      this.currentClass = new RecordDefinitionImpl(className);
+      this.currentClass = new RecordDefinitionImpl(PathName.create(className));
       for (final RecordDefinition superClassDef : this.currentSuperClasses) {
         addSuperClass(this.currentClass, superClassDef);
       }

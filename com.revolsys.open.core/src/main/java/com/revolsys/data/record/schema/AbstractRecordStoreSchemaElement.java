@@ -1,39 +1,44 @@
 package com.revolsys.data.record.schema;
 
-import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithProperties
   implements RecordStoreSchemaElement, Comparable<RecordStoreSchemaElement> {
 
-  private final String path;
-
-  private final String name;
-
   private RecordStoreSchema schema;
 
+  private final PathName pathName;
+
   public AbstractRecordStoreSchemaElement() {
-    this.path = "";
-    this.name = "";
+    this(null, PathName.ROOT);
+  }
+
+  public AbstractRecordStoreSchemaElement(final PathName pathName) {
+    this(null, pathName);
+  }
+
+  public AbstractRecordStoreSchemaElement(final RecordStoreSchema schema, final PathName pathName) {
+    this.schema = schema;
+    this.pathName = pathName;
   }
 
   public AbstractRecordStoreSchemaElement(final RecordStoreSchema schema, final String path) {
     if (!Property.hasValue(path)) {
       throw new IllegalArgumentException("Path is required");
     }
+    this.pathName = PathName.create(path);
+    if (!Property.hasValue(path)) {
+      throw new IllegalArgumentException("Path is required");
+    }
 
-    String name = Path.getName(path);
-    if (!Property.hasValue(name)) {
-      name = "/";
-    }
-    this.name = name;
     this.schema = schema;
-    if (schema == null) {
-      this.path = path;
-    } else {
-      this.path = Path.toPath(schema.getPath(), name);
-    }
+    // if (schema == null) {
+    // this.path = path;
+    // } else {
+    // this.path = Path.toPath(schema.getPath(), name);
+    // }
   }
 
   public AbstractRecordStoreSchemaElement(final String path) {
@@ -48,15 +53,15 @@ public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithPro
 
   @Override
   public int compareTo(final RecordStoreSchemaElement other) {
-    final String otherPath = other.getPath();
-    if (otherPath == this.path) {
+    final PathName otherPath = other.getPathName();
+    if (otherPath == this.pathName) {
       return 0;
-    } else if (this.path == null) {
+    } else if (this.pathName == null) {
       return 1;
     } else if (otherPath == null) {
       return -1;
     } else {
-      return this.path.compareTo(otherPath);
+      return this.pathName.compareTo(otherPath);
     }
   }
 
@@ -72,12 +77,25 @@ public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithPro
 
   @Override
   public String getName() {
-    return this.name;
+    if (this.pathName == null) {
+      return "";
+    } else {
+      return this.pathName.getName();
+    }
   }
 
   @Override
   public String getPath() {
-    return this.path;
+    if (this.pathName == null) {
+      return "";
+    } else {
+      return this.pathName.getPath();
+    }
+  }
+
+  @Override
+  public PathName getPathName() {
+    return this.pathName;
   }
 
   @SuppressWarnings("unchecked")
@@ -98,10 +116,10 @@ public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithPro
 
   @Override
   public int hashCode() {
-    if (this.path == null) {
+    if (this.pathName == null) {
       return super.hashCode();
     } else {
-      return this.path.hashCode();
+      return this.pathName.hashCode();
     }
   }
 

@@ -51,6 +51,7 @@ import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.record.schema.RecordStoreSchemaElement;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
@@ -444,9 +445,10 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   public RecordDefinition getRecordDefinition(final String typePath,
     final ResultSetMetaData resultSetMetaData) {
     try {
-      final String schemaName = Path.getPath(typePath);
+      final PathName pathName = PathName.create(typePath);
+      final PathName schemaName = pathName.getParent();
       final RecordStoreSchema schema = getSchema(schemaName);
-      final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema, typePath);
+      final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema, pathName);
 
       final String idFieldName = getIdFieldName(typePath);
       for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {
@@ -792,8 +794,8 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   @Override
   protected synchronized RecordDefinition refreshRecordDefinition(final RecordStoreSchema schema,
-    final String typePath) {
-    final List<String> pathElements = Path.getPathElements(typePath);
+    final PathName typePath) {
+    final List<String> pathElements = typePath.getElements();
     if (pathElements.size() == 2) {
       final String schemaName = pathElements.get(0).toUpperCase();
       final String tableName = pathElements.get(1).toUpperCase();
@@ -854,12 +856,13 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   protected Map<String, ? extends RecordStoreSchemaElement> refreshSchemaElements(
     final RecordStoreSchema schema) {
     final RecordStoreSchema rootSchema = getRootSchema();
+    final PathName schemaPath = schema.getPathName();
     if (schema == rootSchema) {
       final Map<String, RecordStoreSchemaElement> schemas = new TreeMap<>();
       final Set<String> databaseSchemaNames = getDatabaseSchemaNames();
       for (final String dbSchemaName : databaseSchemaNames) {
-        final String childSchemaPath = Path.cleanUpper(dbSchemaName);
-        this.schemaNameMap.put(childSchemaPath, dbSchemaName);
+        final PathName childSchemaPath = schemaPath.createChild(dbSchemaName.toUpperCase());
+        this.schemaNameMap.put(dbSchemaName.toUpperCase(), dbSchemaName);
         RecordStoreSchema childSchema = schema.getSchema(childSchemaPath);
         if (childSchema == null) {
           childSchema = new RecordStoreSchema(rootSchema, childSchemaPath);
@@ -868,7 +871,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
             childSchema.refresh();
           }
         }
-        schemas.put(childSchemaPath.toUpperCase(), childSchema);
+        schemas.put(childSchemaPath.getUpperPath(), childSchema);
       }
       return schemas;
     } else {
@@ -889,9 +892,9 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
           final Set<String> tableNames = tablePermissionsMap.keySet();
           for (final String dbTableName : tableNames) {
             final String tableName = dbTableName.toUpperCase();
-            final String typePath = Path.toPath(schemaName, tableName);
-            removedPaths.remove(typePath);
-            this.tableNameMap.put(typePath, dbTableName);
+            final PathName typePath = schemaPath.createChild(tableName);
+            removedPaths.remove(typePath.getUpperPath());
+            this.tableNameMap.put(typePath.getUpperPath(), dbTableName);
             final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema,
               typePath);
             final String description = tableDescriptionMap.get(dbTableName);
@@ -899,8 +902,8 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
             final List<String> permissions = Maps.get(tablePermissionsMap, dbTableName,
               DEFAULT_PERMISSIONS);
             recordDefinition.setProperty("permissions", permissions);
-            recordDefinitionMap.put(typePath, recordDefinition);
-            elementsByPath.put(typePath.toUpperCase(), recordDefinition);
+            recordDefinitionMap.put(typePath.getUpperPath(), recordDefinition);
+            elementsByPath.put(typePath.getUpperPath(), recordDefinition);
           }
           try (
             final ResultSet columnsRs = databaseMetaData.getColumns(null, dbSchemaName, "%", "%")) {

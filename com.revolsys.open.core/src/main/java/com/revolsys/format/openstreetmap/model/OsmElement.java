@@ -13,6 +13,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.format.xml.StaxUtils;
+import com.revolsys.io.PathName;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.Property;
 
@@ -20,7 +21,8 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
   public static final RecordDefinition RECORD_DEFINITION;
 
   static {
-    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl("/osm/record");
+    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
+      PathName.create("/osm/record"));
     recordDefinition.addField("id", DataTypes.LONG);
     recordDefinition.addField("visible", DataTypes.BOOLEAN);
     recordDefinition.addField("version", DataTypes.INT);

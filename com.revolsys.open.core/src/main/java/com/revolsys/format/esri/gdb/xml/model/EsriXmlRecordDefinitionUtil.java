@@ -19,6 +19,7 @@ import com.revolsys.format.esri.gdb.xml.model.enums.GeometryType;
 import com.revolsys.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldType;
 import com.revolsys.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry;
 import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
@@ -294,7 +295,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
     } else {
       tableName = domain.getName();
     }
-    final String typePath = Path.toPath(schemaName, tableName);
+    final PathName typePath = PathName.create(Path.toPath(schemaName, tableName));
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(typePath);
     final FieldType fieldType = domain.getFieldType();
     final DataType dataType = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE.getDataType(fieldType);
@@ -324,7 +325,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
   public static RecordDefinition getRecordDefinition(final String schemaName, final DETable deTable,
     final boolean ignoreEsriFields) {
     final String tableName = deTable.getName();
-    final String typePath = Path.toPath(schemaName, tableName);
+    final PathName typePath = PathName.create(Path.toPath(schemaName, tableName));
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(typePath);
     final List<String> ignoreFieldNames = new ArrayList<String>();
     if (ignoreEsriFields) {

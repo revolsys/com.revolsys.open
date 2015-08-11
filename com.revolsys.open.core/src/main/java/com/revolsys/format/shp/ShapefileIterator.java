@@ -27,6 +27,7 @@ import com.revolsys.gis.io.LittleEndianRandomAccessFile;
 import com.revolsys.io.EndianInput;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
+import com.revolsys.io.PathName;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.spring.resource.SpringUtil;
@@ -58,7 +59,7 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
 
   private XbaseIterator xbaseIterator;
 
-  private String typeName;
+  private PathName typeName;
 
   private RecordDefinition returnRecordDefinition;
 
@@ -67,7 +68,7 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
     this.recordDefinitionFactory = factory;
     final String baseName = FileUtil.getBaseName(SpringUtil.getFileName(resource));
     this.name = baseName;
-    this.typeName = "/" + this.name;
+    this.typeName = PathName.create("/" + this.name);
     this.resource = resource;
   }
 
@@ -222,7 +223,7 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
     return this.recordDefinitionFactory;
   }
 
-  public String getTypeName() {
+  public PathName getTypeName() {
     return this.typeName;
   }
 
@@ -358,7 +359,7 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
     this.returnRecordDefinition = recordDefinition;
   }
 
-  public void setTypeName(final String typeName) {
+  public void setTypeName(final PathName typeName) {
     if (Property.hasValue(typeName)) {
       this.typeName = typeName;
     }

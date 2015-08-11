@@ -3,6 +3,7 @@ package com.revolsys.format.moep;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataTypes;
+import com.revolsys.io.PathName;
 
 public final class MoepConstants {
   public static final String ADMIT_INTEGRATION_DATE = "A_DATE";
@@ -60,7 +61,7 @@ public final class MoepConstants {
   }
 
   public static RecordDefinitionImpl createRecordDefinition(final String typePath) {
-    final RecordDefinitionImpl type = new RecordDefinitionImpl(typePath);
+    final RecordDefinitionImpl type = new RecordDefinitionImpl(PathName.create(typePath));
     type.addField(FEATURE_CODE, DataTypes.STRING, 10, true);
     type.addField(MAPSHEET_NAME, DataTypes.STRING, 7, false);
     type.addField(DISPLAY_TYPE, DataTypes.STRING, 20, true);

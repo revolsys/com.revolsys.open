@@ -6,6 +6,7 @@ import java.util.List;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.io.EndianInput;
+import com.revolsys.io.PathName;
 
 public class XbaseSchemaReader {
   private final List<XBaseFieldDefinition> fieldDefinitions;
@@ -14,9 +15,9 @@ public class XbaseSchemaReader {
 
   private RecordDefinitionImpl recordDefinition;
 
-  private final String typePath;
+  private final PathName typePath;
 
-  public XbaseSchemaReader(final EndianInput in, final String typePath,
+  public XbaseSchemaReader(final EndianInput in, final PathName typePath,
     final List<XBaseFieldDefinition> fieldDefinitions) {
     this.in = in;
     this.typePath = typePath;

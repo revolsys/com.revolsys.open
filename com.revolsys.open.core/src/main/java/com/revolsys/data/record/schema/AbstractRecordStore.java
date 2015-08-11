@@ -38,6 +38,7 @@ import com.revolsys.data.record.property.RecordDefinitionProperty;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
@@ -224,6 +225,16 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
       copy.setValues(record);
       copy.setIdValue(null);
       return copy;
+    }
+  }
+
+  @Override
+  public Record create(final PathName typePath) {
+    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      return create(recordDefinition);
     }
   }
 
@@ -421,6 +432,22 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
+  public RecordDefinition getRecordDefinition(final PathName typePath) {
+    if (typePath == null) {
+      return null;
+    } else {
+
+      final PathName schemaPath = typePath.getParent();
+      final RecordStoreSchema schema = getSchema(schemaPath);
+      if (schema == null) {
+        return null;
+      } else {
+        return schema.getRecordDefinition(typePath);
+      }
+    }
+  }
+
+  @Override
   public RecordDefinition getRecordDefinition(final RecordDefinition objectRecordDefinition) {
     final String typePath = objectRecordDefinition.getPath();
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
@@ -450,6 +477,12 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   @Override
   public RecordStoreSchema getRootSchema() {
     return this.rootSchema;
+  }
+
+  @Override
+  public RecordStoreSchema getSchema(final PathName pathName) {
+    final RecordStoreSchema rootSchema = getRootSchema();
+    return rootSchema.getSchema(pathName);
   }
 
   @Override
@@ -671,21 +704,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  public Reader<Record> query(final String path) {
-    final RecordStoreSchema schema = getSchema(path);
-    if (schema == null) {
-      final Query query = new Query(path);
-      return query(query);
-    } else {
-      final List<Query> queries = new ArrayList<Query>();
-      for (final String typeName : schema.getTypeNames()) {
-        queries.add(new Query(typeName));
-      }
-      return query(queries);
-    }
-  }
-
-  @Override
   public Record queryFirst(final Query query) {
     final Reader<Record> reader = query(query);
     try {
@@ -702,7 +720,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   protected RecordDefinition refreshRecordDefinition(final RecordStoreSchema schema,
-    final String typePath) {
+    final PathName typePath) {
     return null;
   }
 

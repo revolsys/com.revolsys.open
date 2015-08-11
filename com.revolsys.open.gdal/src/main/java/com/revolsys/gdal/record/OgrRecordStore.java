@@ -56,6 +56,7 @@ import com.revolsys.gdal.Gdal;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.io.Writer;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -342,7 +343,7 @@ public class OgrRecordStore extends AbstractRecordStore {
   protected RecordDefinitionImpl createRecordDefinition(final RecordStoreSchema schema,
     final Layer layer) {
     final String layerName = layer.GetName();
-    final String typePath = Path.clean(layerName);
+    final PathName typePath = PathName.create(layerName);
 
     /** This primes the layer so that the fidColumn is loaded correctly. */
     layer.GetNextFeature();
@@ -352,7 +353,7 @@ public class OgrRecordStore extends AbstractRecordStore {
     if (!Property.hasValue(idFieldName)) {
       idFieldName = "rowid";
     }
-    this.idFieldNames.put(typePath.toUpperCase(), idFieldName);
+    this.idFieldNames.put(typePath.getUpperPath(), idFieldName);
     final FeatureDefn layerDefinition = layer.GetLayerDefn();
     if (SQLITE.equals(this.driverName) || GEO_PAKCAGE.equals(this.driverName)) {
       recordDefinition.addField(idFieldName, DataTypes.LONG, true);

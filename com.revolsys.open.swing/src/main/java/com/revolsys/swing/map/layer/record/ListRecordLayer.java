@@ -12,6 +12,7 @@ import com.revolsys.data.record.Records;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
+import com.revolsys.io.PathName;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
@@ -24,7 +25,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
 
   public static RecordDefinitionImpl createRecordDefinition(final String name,
     final GeometryFactory geometryFactory, final DataType geometryType) {
-    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(name);
+    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(PathName.create(name));
     recordDefinition.addField("GEOMETRY", geometryType, true);
     recordDefinition.setGeometryFactory(geometryFactory);
     return recordDefinition;

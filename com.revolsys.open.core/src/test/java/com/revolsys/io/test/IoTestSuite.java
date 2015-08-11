@@ -9,7 +9,6 @@ import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import com.revolsys.spring.resource.FileSystemResource;
 
 import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;
@@ -19,6 +18,7 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.geometry.io.GeometryReader;
 import com.revolsys.io.IoConstants;
+import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.jts.geom.Geometry;
@@ -26,6 +26,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.test.geometry.GeometryTestUtil;
 import com.revolsys.jts.test.geometry.TestUtil;
 import com.revolsys.junit.InvokeMethodTestCase;
+import com.revolsys.spring.resource.FileSystemResource;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;
@@ -100,7 +101,8 @@ public class IoTestSuite {
   public static void doWriteReadTest(final GeometryFactory geometryFactory, final DataType dataType,
     final Geometry geometry, final String fileExtension) {
     final String geometryTypeString = dataType.toString();
-    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(geometryTypeString);
+    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
+      PathName.create(geometryTypeString));
     recordDefinition.addField("ID", DataTypes.INT, true);
     recordDefinition.addField("GEOMETRY", dataType, true);
     recordDefinition.setGeometryFactory(geometryFactory);

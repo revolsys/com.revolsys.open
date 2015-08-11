@@ -12,7 +12,6 @@ import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
 
-import com.revolsys.spring.resource.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.iterator.AbstractIterator;
@@ -29,9 +28,11 @@ import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.record.schema.RecordStoreSchemaElement;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.io.Writer;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 import com.revolsys.properties.ObjectWithProperties;
+import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.SpringUtil;
 
 public class DirectoryRecordStore extends AbstractRecordStore {
@@ -118,14 +119,14 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   public RecordDefinition getRecordDefinition(final RecordDefinition recordDefinition) {
     final RecordDefinition storeRecordDefinition = super.getRecordDefinition(recordDefinition);
     if (storeRecordDefinition == null && this.createMissingTables) {
-      final String typePath = recordDefinition.getPath();
-      final String schemaPath = Path.getPath(typePath);
+      final PathName typePath = recordDefinition.getPathName();
+      final PathName schemaPath = typePath.getParent();
       RecordStoreSchema schema = getSchema(schemaPath);
       if (schema == null && this.createMissingTables) {
         final RecordStoreSchema rootSchema = getRootSchema();
         schema = rootSchema.createSchema(schemaPath);
       }
-      final File schemaDirectory = new File(this.directory, schemaPath);
+      final File schemaDirectory = new File(this.directory, schemaPath.getPath());
       if (!schemaDirectory.exists()) {
         schemaDirectory.mkdirs();
       }
@@ -246,6 +247,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     final RecordStoreSchema schema) {
     final Map<String, RecordStoreSchemaElement> elements = new TreeMap<>();
     final String schemaPath = schema.getPath();
+    final PathName schemaPathName = schema.getPathName();
     final File subDirectory;
     if (schemaPath.equals("/")) {
       subDirectory = this.directory;
@@ -266,12 +268,8 @@ public class DirectoryRecordStore extends AbstractRecordStore {
             elements.put(pathUpper, recordDefinition);
           }
         } else if (file.isDirectory()) {
-          String childSchemaPath = file.getName();
-          if (schemaPath.equals("/")) {
-            childSchemaPath = "/" + childSchemaPath;
-          } else {
-            childSchemaPath = schemaPath + "/" + childSchemaPath;
-          }
+          final String name = file.getName();
+          final PathName childSchemaPath = schemaPathName.createChild(name);
           RecordStoreSchema childSchema = schema.getSchema(childSchemaPath);
           if (childSchema == null) {
             childSchema = new RecordStoreSchema(schema, childSchemaPath);
@@ -280,7 +278,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
               childSchema.refresh();
             }
           }
-          elements.put(childSchemaPath.toUpperCase(), childSchema);
+          elements.put(childSchemaPath.getUpperPath(), childSchema);
         }
       }
     }

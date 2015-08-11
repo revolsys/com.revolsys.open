@@ -88,6 +88,7 @@ import com.revolsys.gis.esri.gdb.file.capi.type.StringFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.XmlFieldDefinition;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.jdbc.JdbcUtils;
@@ -525,9 +526,10 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   private RecordStoreSchema createFeatureDatasetSchema(final RecordStoreSchema parentSchema,
     final String catalogPath) {
-    final String schemaPath = toPath(catalogPath);
-    final RecordStoreSchema schema = new RecordStoreSchema(parentSchema, schemaPath);
-    this.catalogPathByPath.put(schemaPath, catalogPath.replaceAll("/", "\\\\"));
+
+    final PathName childSchemaPath = PathName.create(toPath(catalogPath));
+    final RecordStoreSchema schema = new RecordStoreSchema(parentSchema, childSchemaPath);
+    this.catalogPathByPath.put(childSchemaPath.getUpperPath(), catalogPath.replaceAll("/", "\\\\"));
     return schema;
   }
 
@@ -963,7 +965,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           final XmlProcessor parser = new EsriGdbXmlParser();
           final DETable deTable = parser.process(tableDefinition);
           final String tableName = deTable.getName();
-          final String typePath = Path.toPath(schemaName, tableName);
+          final PathName typePath = PathName.create(Path.toPath(schemaName, tableName));
           final RecordStoreSchema schema = getSchema(schemaName);
           final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema, typePath);
           for (final Field field : deTable.getFields()) {
@@ -1009,7 +1011,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           if (recordDefinition.getIdFieldIndex() == -1) {
             recordDefinition.setIdFieldName(deTable.getOIDFieldName());
           }
-          this.catalogPathByPath.put(typePath, deTable.getCatalogPath());
+          this.catalogPathByPath.put(typePath.getUpperPath(), deTable.getCatalogPath());
           return recordDefinition;
         } catch (final RuntimeException e) {
           if (LOG.isDebugEnabled()) {

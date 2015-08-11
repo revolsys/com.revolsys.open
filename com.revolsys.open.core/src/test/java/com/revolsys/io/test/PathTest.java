@@ -7,6 +7,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
+import com.revolsys.util.Property;
 
 public class PathTest {
 
@@ -14,6 +16,28 @@ public class PathTest {
     final boolean expected) {
     final boolean ancestor = Path.isAncestor(parentPath, childPath);
     Assert.assertEquals(expected, ancestor);
+  }
+
+  private void assertAncestorOrDescendant(final String path1, final String path2,
+    final boolean expectedAncestor, final boolean expectedDescendant) {
+    {
+      final PathName pathName1 = PathName.create(path1);
+      final PathName pathName2 = PathName.create(path2);
+
+      final boolean isAncestor2 = pathName1.isAncestorOf(pathName2);
+      Assert.assertEquals(expectedAncestor, isAncestor2);
+
+      final boolean isDescendant12 = pathName1.isDescendantOf(pathName2);
+      Assert.assertEquals(expectedDescendant, isDescendant12);
+
+      if (expectedAncestor != expectedDescendant) {
+        final boolean isAncestor21 = pathName2.isAncestorOf(pathName1);
+        Assert.assertEquals(!expectedAncestor, isAncestor21);
+
+        final boolean isDescendant21 = pathName2.isDescendantOf(pathName1);
+        Assert.assertEquals(expectedAncestor, isDescendant21);
+      }
+    }
   }
 
   private void assertChildName(final String parentPath, final String childPath,
@@ -42,20 +66,51 @@ public class PathTest {
     Assert.assertEquals(expectedUpper, cleanedUpper);
   }
 
+  private void assertElements(final String path, final String... expected) {
+    final List<String> paths = PathName.create(path).getElements();
+    Assert.assertEquals(Arrays.asList(expected), paths);
+  }
+
   private void assertName(final String source, final String expected) {
     final String name = Path.getName(source);
     Assert.assertEquals(expected, name);
   }
 
   private void assertParent(final String parentPath, final String childPath,
-    final boolean expected) {
-    final boolean parent = Path.isParent(parentPath, childPath);
-    Assert.assertEquals(expected, parent);
+    final boolean expectedParent, final boolean expectedChild) {
+    {
+      final boolean parent = Path.isParent(parentPath, childPath);
+      Assert.assertEquals(expectedParent, parent);
+    }
+    {
+      final PathName path1 = PathName.create(parentPath);
+      final PathName path2 = PathName.create(childPath);
+
+      final boolean isParent12 = path1.isParentOf(path2);
+      Assert.assertEquals(expectedParent, isParent12);
+
+      final boolean isChild12 = path1.isChildOf(path2);
+      Assert.assertEquals(expectedChild, isChild12);
+
+      if (expectedParent != expectedChild) {
+        final boolean isParent21 = path2.isParentOf(path1);
+        Assert.assertEquals(!expectedParent, isParent21);
+
+        final boolean isChild21 = path2.isChildOf(path1);
+        Assert.assertEquals(expectedParent, isChild21);
+      }
+    }
   }
 
   private void assertPath(final String source, final String expected) {
     final String path = Path.getPath(source);
     Assert.assertEquals(expected, path);
+    if (Property.hasValue(source)) {
+      final PathName parent = PathName.create(source).getParent();
+      if (parent != null) {
+        Assert.assertEquals(expected, parent.toString());
+      }
+    }
   }
 
   private void assertPaths(final String path, final String... expected) {
@@ -80,6 +135,21 @@ public class PathTest {
     assertAncestor("/test/aaa", "/test", false);
     assertAncestor("/test/aaa", "/test/aaa/bbb", true);
     assertAncestor("/test/", "/test/aaa/bbb", true);
+  }
+
+  @Test
+  public void testAncestorOrDescendant() {
+    assertAncestorOrDescendant("/test", null, false, false);
+    assertAncestorOrDescendant("/", "", false, false);
+    assertAncestorOrDescendant("/", "/", false, false);
+    assertAncestorOrDescendant("", "/", false, false);
+    assertAncestorOrDescendant("/", "/test", true, false);
+    assertAncestorOrDescendant("/", "/test/aaa", true, false);
+    assertAncestorOrDescendant("/test", "/test/aaa", true, false);
+    assertAncestorOrDescendant("/test/aaa", "/test/aaa", false, false);
+    assertAncestorOrDescendant("/test/aaa", "/test", false, true);
+    assertAncestorOrDescendant("/test/aaa", "/test/aaa/bbb", true, false);
+    assertAncestorOrDescendant("/test/", "/test/aaa/bbb", true, false);
   }
 
   @Test
@@ -135,6 +205,14 @@ public class PathTest {
   }
 
   @Test
+  public void testElements() {
+    assertElements("/");
+    assertElements("/t", "t");
+    assertElements("/test", "test");
+    assertElements("/test/aaa", "test", "aaa");
+  }
+
+  @Test
   public void testName() {
     assertName(null, null);
     assertName("", "/");
@@ -150,19 +228,16 @@ public class PathTest {
 
   @Test
   public void testParent() {
-    assertParent(null, null, false);
-    assertParent("", null, false);
-    assertParent(null, "", false);
-    assertParent("/test", null, false);
-    assertParent(null, "/test", false);
-    assertParent("/", "", false);
-    assertParent("/", "/", false);
-    assertParent("", "/", false);
-    assertParent("/test", "/test/aaa", true);
-    assertParent("/test/aaa", "/test/aaa", false);
-    assertParent("/test/aaa", "/test", false);
-    assertParent("/test/aaa", "/test/aaa/bbb", true);
-    assertParent("/test/", "/test/aaa/bbb", false);
+    assertParent("/", null, false, false);
+    assertParent("/test", null, false, false);
+    assertParent("/", "", false, false);
+    assertParent("/", "/", false, false);
+    assertParent("", "/", false, false);
+    assertParent("/test", "/test/aaa", true, false);
+    assertParent("/test/aaa", "/test/aaa", false, false);
+    assertParent("/test/aaa", "/test", false, true);
+    assertParent("/test/aaa", "/test/aaa/bbb", true, false);
+    assertParent("/test/", "/test/aaa/bbb", false, false);
   }
 
   @Test

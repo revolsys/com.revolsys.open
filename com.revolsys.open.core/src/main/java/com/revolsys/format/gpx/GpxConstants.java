@@ -5,6 +5,7 @@ import javax.xml.namespace.QName;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
+import com.revolsys.io.PathName;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public final class GpxConstants {
@@ -27,13 +28,17 @@ public final class GpxConstants {
 
   public static final QName GPX_ELEMENT = new QName(GPX_NS_URI, "gpx");
 
-  public static final RecordDefinitionImpl GPX_TYPE = new RecordDefinitionImpl("gpx");
+  public static final RecordDefinitionImpl GPX_TYPE = new RecordDefinitionImpl(
+    PathName.create("/gpx"));
 
-  public static final RecordDefinitionImpl GPX_WAYPOINT = new RecordDefinitionImpl("/gpx/waypoint");
+  public static final RecordDefinitionImpl GPX_WAYPOINT = new RecordDefinitionImpl(
+    PathName.create("/gpx/waypoint"));
 
-  public static final RecordDefinitionImpl GPX_TRACK = new RecordDefinitionImpl("/gpx/track");
+  public static final RecordDefinitionImpl GPX_TRACK = new RecordDefinitionImpl(
+    PathName.create("/gpx/track"));
 
-  public static final RecordDefinitionImpl GPX_ROUTE = new RecordDefinitionImpl("/gpx/route");
+  public static final RecordDefinitionImpl GPX_ROUTE = new RecordDefinitionImpl(
+    PathName.create("/gpx/route"));
 
   public static final QName LAT_ATTRIBUTE = new QName(null, "lat");
 

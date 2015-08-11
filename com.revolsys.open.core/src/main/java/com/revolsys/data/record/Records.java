@@ -23,6 +23,7 @@ import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.jts.GeometryProperties;
+import com.revolsys.io.PathName;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -152,7 +153,7 @@ public final class Records {
 
   public static RecordDefinition createGeometryRecordDefinition() {
     final FieldDefinition geometryField = new FieldDefinition("geometry", DataTypes.GEOMETRY, true);
-    return new RecordDefinitionImpl("Feature", geometryField);
+    return new RecordDefinitionImpl(PathName.create("/Feature"), geometryField);
   }
 
   public static double distance(final Record record1, final Record record2) {

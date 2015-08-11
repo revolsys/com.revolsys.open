@@ -1,5 +1,6 @@
 package com.revolsys.data.record.schema;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
+import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.jts.geom.BoundingBox;
@@ -38,6 +40,8 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
   void close();
 
   Record copy(Record record);
+
+  Record create(PathName typePath);
 
   Record create(RecordDefinition recordDefinition);
 
@@ -74,14 +78,10 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
 
   String getLabel();
 
+  RecordDefinition getRecordDefinition(PathName typePath);
+
   RecordDefinition getRecordDefinition(RecordDefinition recordDefinition);
 
-  /**
-   * Get the meta data for the specified type.
-   *
-   * @param typePath The type name.
-   * @return The meta data.
-   */
   @Override
   RecordDefinition getRecordDefinition(String typePath);
 
@@ -90,6 +90,8 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
   RecordStoreSchema getRootSchema();
 
   int getRowCount(Query query);
+
+  RecordStoreSchema getSchema(PathName pathName);
 
   RecordStoreSchema getSchema(final String schemaName);
 
@@ -139,9 +141,30 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
 
   Reader<Record> query(List<?> queries);
 
+  default Reader<Record> query(final PathName path) {
+    if (path == null) {
+      return query();
+    } else {
+      final RecordStoreSchema schema = getSchema(path);
+      if (schema == null) {
+        final Query query = new Query(path);
+        return query(query);
+      } else {
+        final List<Query> queries = new ArrayList<Query>();
+        for (final String typeName : schema.getTypeNames()) {
+          queries.add(new Query(typeName));
+        }
+        return query(queries);
+      }
+    }
+  }
+
   Reader<Record> query(Query... queries);
 
-  Reader<Record> query(String typePath);
+  default Reader<Record> query(final String path) {
+    final PathName pathName = PathName.create(path);
+    return query(pathName);
+  }
 
   default Reader<Record> query(final String typePath, final BoundingBox boundingBox) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);

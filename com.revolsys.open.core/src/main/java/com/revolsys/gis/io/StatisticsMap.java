@@ -39,10 +39,15 @@ public class StatisticsMap {
     this.prefix = prefix;
   }
 
-  public void add(final String statisticName, final Record record) {
+  public void add(final CharSequence statisticName, final Record record) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(record);
 
+  }
+
+  public void add(final CharSequence statisticName, final String name) {
+    final Statistics statistics = getStatistics(statisticName);
+    statistics.add(name);
   }
 
   public void add(final String statisticName, final Record record, final long count) {
@@ -58,11 +63,6 @@ public class StatisticsMap {
   public void add(final String statisticName, final RecordDefinition type, final long count) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(type, count);
-  }
-
-  public void add(final String statisticName, final String name) {
-    final Statistics statistics = getStatistics(statisticName);
-    statistics.add(name);
   }
 
   public void add(final String statisticName, final String path, final long count) {
@@ -129,7 +129,7 @@ public class StatisticsMap {
     }
   }
 
-  public synchronized Statistics getStatistics(final String statisticName) {
+  public synchronized Statistics getStatistics(final CharSequence statisticName) {
     if (statisticName == null) {
       return null;
     } else {

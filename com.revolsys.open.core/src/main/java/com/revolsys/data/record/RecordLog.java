@@ -12,6 +12,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.io.Writer;
 
 public class RecordLog {
@@ -107,7 +108,7 @@ public class RecordLog {
       } else {
         logTableName = tableName + "_log";
       }
-      final String logTypeName = Path.toPath(parentPath, logTableName);
+      final PathName logTypeName = PathName.create(Path.toPath(parentPath, logTableName));
       logRecordDefinition = new RecordDefinitionImpl(logTypeName);
       logRecordDefinition.addField("LOGMESSAGE", DataTypes.STRING, 255, true);
       logRecordDefinition.addField("LOGLEVEL", DataTypes.STRING, 10, true);

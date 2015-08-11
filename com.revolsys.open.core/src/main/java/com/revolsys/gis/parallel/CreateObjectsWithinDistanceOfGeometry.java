@@ -15,6 +15,7 @@ import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.io.PathName;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.operation.buffer.Buffer;
 import com.revolsys.jts.operation.buffer.BufferParameters;
@@ -90,7 +91,8 @@ public class CreateObjectsWithinDistanceOfGeometry extends BaseInOutProcess<Reco
           context.setVars(vars);
           final String typePath = (String)JexlUtil.evaluateExpression(context,
             this.typePathTemplateExpression);
-          newRecordDefinition = new RecordDefinitionImpl(typePath, recordDefinition.getFields());
+          newRecordDefinition = new RecordDefinitionImpl(PathName.create(typePath),
+            recordDefinition.getFields());
           if (this.distance > 0) {
             final BufferParameters parameters = new BufferParameters(1, 3, 2, 1.0D);
             geometry = Buffer.buffer(geometry, this.distance, parameters);

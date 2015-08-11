@@ -1,5 +1,6 @@
 package com.revolsys.data.record.schema;
 
+import com.revolsys.io.PathName;
 import com.revolsys.properties.ObjectWithProperties;
 
 public interface RecordStoreSchemaElement
@@ -15,6 +16,8 @@ public interface RecordStoreSchemaElement
    * @return The name.
    */
   String getPath();
+
+  PathName getPathName();
 
   <V extends RecordStore> V getRecordStore();
 

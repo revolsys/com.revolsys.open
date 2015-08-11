@@ -34,6 +34,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.util.Property;
@@ -324,7 +325,7 @@ public final class JdbcUtils {
     RecordDefinition recordDefinition = query.getRecordDefinition();
     if (sql == null) {
       if (recordDefinition == null) {
-        recordDefinition = new RecordDefinitionImpl(tableName);
+        recordDefinition = new RecordDefinitionImpl(PathName.create(tableName));
         // throw new IllegalArgumentException("Unknown table name " +
         // tableName);
       }

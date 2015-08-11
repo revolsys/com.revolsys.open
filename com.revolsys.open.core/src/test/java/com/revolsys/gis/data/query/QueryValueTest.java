@@ -9,6 +9,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataTypes;
+import com.revolsys.io.PathName;
 
 import junit.framework.Assert;
 import junit.framework.Assert;
@@ -29,7 +30,7 @@ public class QueryValueTest {
   private final FieldDefinition descriptionAttribute;
 
   public QueryValueTest() {
-    this.recordDefinition = new RecordDefinitionImpl("Test");
+    this.recordDefinition = new RecordDefinitionImpl(PathName.create("/Test"));
     this.idField = this.recordDefinition.addField("ID", DataTypes.INT, true);
     this.nameAttribute = this.recordDefinition.addField("NAME", DataTypes.STRING, 255, true);
     this.descriptionAttribute = this.recordDefinition.addField("DESCRIPTION", DataTypes.STRING, 255,

@@ -14,6 +14,7 @@ import com.revolsys.data.query.functions.F;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.io.Statistics;
+import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.properties.BaseObjectWithProperties;
@@ -112,7 +113,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
 
   private String sql;
 
-  private String typeName;
+  private PathName typeName;
 
   private String typePathAlias;
 
@@ -121,6 +122,10 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
   private Statistics statistics;
 
   public Query() {
+  }
+
+  public Query(final PathName typePath) {
+    this.typeName = typePath;
   }
 
   public Query(final RecordDefinition recordDefinition) {
@@ -134,7 +139,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
   }
 
   public Query(final String typePath) {
-    this.typeName = typePath;
+    this.typeName = PathName.create(typePath);
   }
 
   public Query(final String typeName, final Condition whereCondition) {
@@ -220,11 +225,19 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
   }
 
   public String getTypeName() {
-    return this.typeName;
+    if (this.typeName == null) {
+      return null;
+    } else {
+      return this.typeName.getPath();
+    }
   }
 
   public String getTypeNameAlias() {
     return this.typePathAlias;
+  }
+
+  public PathName getTypePath() {
+    return this.typeName;
   }
 
   public String getWhere() {
@@ -316,7 +329,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
   }
 
   public void setTypeName(final String typeName) {
-    this.typeName = typeName;
+    this.typeName = PathName.create(typeName);
   }
 
   public void setTypeNameAlias(final String typePathAlias) {

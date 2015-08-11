@@ -13,6 +13,7 @@ import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStoreFactory;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.PathName;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -35,7 +36,7 @@ public class GeometryTest {
     final File file = new File("target/test-data/" + name + ".gdb");
     FileUtil.deleteDirectory(file);
 
-    RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(name);
+    RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(PathName.create(name));
     recordDefinition.addField("ID", DataTypes.INT, true);
     final FieldDefinition geometryField = recordDefinition.addField("Geometry", geometryDataType,
       true);

@@ -13,6 +13,7 @@ import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStoreFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
+import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.io.test.IoTestSuite;
@@ -55,7 +56,7 @@ public class FileGdbIoTest {
       recordStore.setCreateMissingRecordStore(true);
       recordStore.initialize();
 
-      final String typePath = "/" + geometryTypeString;
+      final PathName typePath = PathName.create("/" + geometryTypeString);
       final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(typePath);
       recordDefinition.addField("ID", DataTypes.INT, true);
       recordDefinition.addField("NAME", DataTypes.STRING, 50, false);

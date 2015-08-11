@@ -41,6 +41,23 @@ public class Statistics {
     this.message = message;
   }
 
+  public void add(final CharSequence name) {
+    add(name, 1);
+  }
+
+  public synchronized boolean add(final CharSequence name, final long count) {
+    final String name1 = name.toString();
+    Counter counter = this.counts.get(name1);
+    if (counter == null) {
+      counter = new LongCounter(name1, count);
+      this.counts.put(name1, counter);
+      return true;
+    } else {
+      counter.add(count);
+      return false;
+    }
+  }
+
   public void add(final Record object) {
     if (object != null) {
       final RecordDefinition type = object.getRecordDefinition();
@@ -62,22 +79,6 @@ public class Statistics {
   public void add(final RecordDefinition type, final long count) {
     final String path = type.getPath();
     add(path, count);
-  }
-
-  public void add(final String name) {
-    add(name, 1);
-  }
-
-  public synchronized boolean add(final String name, final long count) {
-    Counter counter = this.counts.get(name);
-    if (counter == null) {
-      counter = new LongCounter(name, count);
-      this.counts.put(name, counter);
-      return true;
-    } else {
-      counter.add(count);
-      return false;
-    }
   }
 
   public void addAll(final Statistics statistics) {

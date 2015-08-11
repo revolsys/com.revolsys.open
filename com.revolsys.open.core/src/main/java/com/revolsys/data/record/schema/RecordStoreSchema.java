@@ -13,6 +13,7 @@ import javax.annotation.PreDestroy;
 
 import com.revolsys.data.record.io.RecordStoreExtension;
 import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
@@ -30,17 +31,11 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
   private boolean initialized = false;
 
   public RecordStoreSchema(final AbstractRecordStore recordStore) {
-    super("/");
     this.recordStore = recordStore;
   }
 
-  protected RecordStoreSchema(final AbstractRecordStore recordStore, final String path) {
-    super(path);
-    this.recordStore = recordStore;
-  }
-
-  public RecordStoreSchema(final RecordStoreSchema schema, final String path) {
-    super(schema, path);
+  public RecordStoreSchema(final RecordStoreSchema schema, final PathName pathName) {
+    super(schema, pathName);
   }
 
   public void addElement(final RecordStoreSchemaElement element) {
@@ -78,7 +73,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
     super.close();
   }
 
-  public RecordStoreSchema createSchema(final String path) {
+  public RecordStoreSchema createSchema(final PathName path) {
     final RecordStoreSchemaElement element = getElement(path);
     if (element == null) {
       final RecordStoreSchema schema = new RecordStoreSchema(this, path);
@@ -97,6 +92,10 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
     refreshIfNeeded();
     final RecordDefinition recordDefinition = this.recordDefinitionsByPath.get(path);
     return recordDefinition;
+  }
+
+  public <V extends RecordStoreSchemaElement> V getElement(final PathName pathName) {
+    return getElement(pathName.getUpperPath());
   }
 
   @SuppressWarnings("unchecked")
@@ -171,6 +170,15 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
     }
   }
 
+  public RecordDefinition getRecordDefinition(final PathName path) {
+    final RecordStoreSchemaElement element = getElement(path);
+    if (element instanceof RecordDefinition) {
+      return (RecordDefinition)element;
+    } else {
+      return null;
+    }
+  }
+
   public synchronized RecordDefinition getRecordDefinition(final String path) {
     final RecordStoreSchemaElement element = getElement(path);
     if (element instanceof RecordDefinition) {
@@ -194,6 +202,10 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
     } else {
       return schema.getRecordStore();
     }
+  }
+
+  public RecordStoreSchema getSchema(final PathName pathName) {
+    return getSchema(pathName.getUpperPath());
   }
 
   public RecordStoreSchema getSchema(final String path) {
