@@ -8,6 +8,7 @@ import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.types.DataType;
+import com.revolsys.io.PathName;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -28,7 +29,7 @@ public class ArcSdeStGeometryFieldAdder extends JdbcFieldAdder {
     final String dataTypeName, final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
     final RecordStoreSchema schema = recordDefinition.getSchema();
-    final String typePath = recordDefinition.getPath();
+    final PathName typePath = recordDefinition.getPathName();
     final String owner = this.recordStore.getDatabaseSchemaName(schema);
     final String tableName = this.recordStore.getDatabaseTableName(typePath);
     final String columnName = name.toUpperCase();

@@ -9,6 +9,7 @@ import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.types.DataType;
+import com.revolsys.io.PathName;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 
 public class JdbcFieldAdder {
@@ -22,13 +23,13 @@ public class JdbcFieldAdder {
 
   public static final String TABLE_PROPERTIES = "tableProperties";
 
-  public static Map<String, Map<String, Map<String, Object>>> getColumnProperties(
+  public static Map<PathName, Map<String, Map<String, Object>>> getColumnProperties(
     final RecordStoreSchema schema) {
     synchronized (schema) {
-      Map<String, Map<String, Map<String, Object>>> columnProperties = schema
+      Map<PathName, Map<String, Map<String, Object>>> columnProperties = schema
         .getProperty(COLUMN_PROPERTIES);
       if (columnProperties == null) {
-        columnProperties = new HashMap<String, Map<String, Map<String, Object>>>();
+        columnProperties = new HashMap<PathName, Map<String, Map<String, Object>>>();
         schema.setProperty(COLUMN_PROPERTIES, columnProperties);
       }
       return columnProperties;
@@ -36,7 +37,7 @@ public class JdbcFieldAdder {
   }
 
   @SuppressWarnings("unchecked")
-  public static <V> V getColumnProperty(final RecordStoreSchema schema, final String typePath,
+  public static <V> V getColumnProperty(final RecordStoreSchema schema, final PathName typePath,
     final String columnName, final String propertyName) {
     final Map<String, Map<String, Object>> columnsProperties = getTypeColumnProperties(schema,
       typePath);
@@ -49,7 +50,7 @@ public class JdbcFieldAdder {
   }
 
   public static double getDoubleColumnProperty(final RecordStoreSchema schema,
-    final String typePath, final String columnName, final String propertyName) {
+    final PathName typePath, final String columnName, final String propertyName) {
     final Object value = getColumnProperty(schema, typePath, columnName, propertyName);
     if (value instanceof Number) {
       final Number number = (Number)value;
@@ -59,8 +60,8 @@ public class JdbcFieldAdder {
     }
   }
 
-  public static int getIntegerColumnProperty(final RecordStoreSchema schema, final String typePath,
-    final String columnName, final String propertyName) {
+  public static int getIntegerColumnProperty(final RecordStoreSchema schema,
+    final PathName typePath, final String columnName, final String propertyName) {
     final Object value = getColumnProperty(schema, typePath, columnName, propertyName);
     if (value instanceof Number) {
       final Number number = (Number)value;
@@ -104,8 +105,8 @@ public class JdbcFieldAdder {
   }
 
   public static Map<String, Map<String, Object>> getTypeColumnProperties(
-    final RecordStoreSchema schema, final String typePath) {
-    final Map<String, Map<String, Map<String, Object>>> esriColumnProperties = getColumnProperties(
+    final RecordStoreSchema schema, final PathName typePath) {
+    final Map<PathName, Map<String, Map<String, Object>>> esriColumnProperties = getColumnProperties(
       schema);
     final Map<String, Map<String, Object>> typeColumnProperties = esriColumnProperties
       .get(typePath);
@@ -116,9 +117,9 @@ public class JdbcFieldAdder {
     }
   }
 
-  public static void setColumnProperty(final RecordStoreSchema schema, final String typePath,
+  public static void setColumnProperty(final RecordStoreSchema schema, final PathName typePath,
     final String columnName, final String propertyName, final Object propertyValue) {
-    final Map<String, Map<String, Map<String, Object>>> tableColumnProperties = getColumnProperties(
+    final Map<PathName, Map<String, Map<String, Object>>> tableColumnProperties = getColumnProperties(
       schema);
     synchronized (tableColumnProperties) {
 

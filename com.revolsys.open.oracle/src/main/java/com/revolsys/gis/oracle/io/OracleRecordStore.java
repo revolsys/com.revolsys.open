@@ -31,7 +31,7 @@ import com.revolsys.gis.cs.WktCsParser;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.oracle.esri.ArcSdeStGeometryFieldDefinition;
 import com.revolsys.gis.oracle.esri.ArcSdeStGeometryRecordStoreExtension;
-import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
@@ -318,20 +318,21 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     if (recordDefinition == null) {
       return null;
     } else {
-      final String typePath = recordDefinition.getPath();
-      final String schema = getDatabaseSchemaName(Path.getPath(typePath));
+      final PathName typePath = recordDefinition.getPathName();
+      final PathName schemaPath = typePath.getParent();
+      final String dbSchemaName = getDatabaseSchemaName(schemaPath);
       final String shortName = ShortNameProperty.getShortName(recordDefinition);
       final String sequenceName;
       if (Property.hasValue(shortName)) {
         if (this.useSchemaSequencePrefix) {
-          sequenceName = schema + "." + shortName.toLowerCase() + "_SEQ";
+          sequenceName = dbSchemaName + "." + shortName.toLowerCase() + "_SEQ";
         } else {
           sequenceName = shortName.toLowerCase() + "_SEQ";
         }
       } else {
         final String tableName = getDatabaseTableName(typePath);
         if (this.useSchemaSequencePrefix) {
-          sequenceName = schema + "." + tableName + "_SEQ";
+          sequenceName = dbSchemaName + "." + tableName + "_SEQ";
         } else {
           sequenceName = tableName + "_SEQ";
         }

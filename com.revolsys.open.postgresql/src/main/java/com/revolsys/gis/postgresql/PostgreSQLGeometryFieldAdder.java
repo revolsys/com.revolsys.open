@@ -11,7 +11,7 @@ import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
@@ -45,10 +45,11 @@ public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
     final RecordDefinitionImpl recordDefinition, final String dbName, final String name,
     final String dataTypeName, final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
-    final String typePath = recordDefinition.getPath();
-    String owner = this.recordStore.getDatabaseSchemaName(Path.getPath(typePath));
-    if (!Property.hasValue(owner)) {
-      owner = "public";
+    final PathName typePath = recordDefinition.getPathName();
+    final PathName schemaPath = typePath.getParent();
+    String dbSchemaName = this.recordStore.getDatabaseSchemaName(schemaPath);
+    if (!Property.hasValue(dbSchemaName)) {
+      dbSchemaName = "public";
     }
     final String tableName = this.recordStore.getDatabaseTableName(typePath);
     final String columnName = name.toLowerCase();
@@ -58,7 +59,7 @@ public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
       int axisCount = 3;
       try {
         final String sql = "select SRID, TYPE, COORD_DIMENSION from GEOMETRY_COLUMNS where UPPER(F_TABLE_SCHEMA) = UPPER(?) AND UPPER(F_TABLE_NAME) = UPPER(?) AND UPPER(F_GEOMETRY_COLUMN) = UPPER(?)";
-        final Map<String, Object> values = JdbcUtils.selectMap(this.recordStore, sql, owner,
+        final Map<String, Object> values = JdbcUtils.selectMap(this.recordStore, sql, dbSchemaName,
           tableName, columnName);
         srid = (Integer)values.get("srid");
         type = (String)values.get("type");
@@ -82,9 +83,8 @@ public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
       field.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
       return field;
     } catch (final Throwable e) {
-      LOG.error(
-        "Attribute not registered in GEOMETRY_COLUMN table " + owner + "." + tableName + "." + name,
-        e);
+      LOG.error("Attribute not registered in GEOMETRY_COLUMN table " + dbSchemaName + "."
+        + tableName + "." + name, e);
       return null;
     }
   }

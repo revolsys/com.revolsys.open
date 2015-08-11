@@ -25,7 +25,7 @@ import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.postgresql.type.PostgreSQLBoundingBoxWrapper;
 import com.revolsys.gis.postgresql.type.PostgreSQLGeometryWrapper;
-import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
@@ -150,13 +150,14 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   }
 
   public String getSequenceName(final RecordDefinition recordDefinition) {
-    final String typePath = recordDefinition.getPath();
-    final String schema = getDatabaseSchemaName(Path.getPath(typePath));
+    final PathName typePath = recordDefinition.getPathName();
+    final PathName schemaPath = typePath.getParent();
+    final String dbSchemaName = getDatabaseSchemaName(schemaPath);
     final String shortName = ShortNameProperty.getShortName(recordDefinition);
     final String sequenceName;
     if (Property.hasValue(shortName)) {
       if (this.useSchemaSequencePrefix) {
-        sequenceName = schema + "." + shortName.toLowerCase() + "_seq";
+        sequenceName = dbSchemaName + "." + shortName.toLowerCase() + "_seq";
       } else {
         sequenceName = shortName.toLowerCase() + "_seq";
       }
@@ -164,7 +165,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
       final String tableName = getDatabaseTableName(typePath);
       final String idFieldName = recordDefinition.getIdFieldName().toLowerCase();
       if (this.useSchemaSequencePrefix) {
-        sequenceName = schema + "." + tableName + "_" + idFieldName + "_seq";
+        sequenceName = dbSchemaName + "." + tableName + "_" + idFieldName + "_seq";
       } else {
         sequenceName = tableName + "_" + idFieldName + "_seq";
       }

@@ -16,7 +16,7 @@ import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
@@ -115,7 +115,7 @@ public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
     final RecordDefinitionImpl recordDefinition, final String dbName, final String name,
     final String dataTypeName, final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
-    final String typePath = recordDefinition.getPath();
+    final PathName typePath = recordDefinition.getPathName();
     final String columnName = name.toUpperCase();
     final RecordStoreSchema schema = recordDefinition.getSchema();
 
@@ -178,7 +178,7 @@ public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
           while (resultSet.next()) {
             final String tableName = resultSet.getString(1);
             final String columnName = resultSet.getString(2);
-            final String typePath = Path.toPath(schemaName, tableName);
+            final PathName typePath = schema.getPathName().createChild(tableName);
 
             int srid = resultSet.getInt(3);
             if (resultSet.wasNull() || srid < 0) {

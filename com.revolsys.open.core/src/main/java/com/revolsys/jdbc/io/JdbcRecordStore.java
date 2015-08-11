@@ -6,6 +6,7 @@ import com.revolsys.data.record.io.RecordStoreQueryReader;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.gis.io.Statistics;
+import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcConnection;
 
 public interface JdbcRecordStore extends RecordStore {
@@ -15,11 +16,9 @@ public interface JdbcRecordStore extends RecordStore {
   @Override
   JdbcWriter createWriter();
 
-  String getDatabaseQualifiedTableName(final String typePath);
+  String getDatabaseSchemaName(final PathName schemaPath);
 
-  String getDatabaseSchemaName(final String schemaName);
-
-  String getDatabaseTableName(final String typePath);
+  String getDatabaseTableName(final PathName typePath);
 
   String getGeneratePrimaryKeySql(RecordDefinition recordDefinition);
 

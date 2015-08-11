@@ -14,6 +14,7 @@ import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.gis.oracle.io.OracleRecordStore;
 import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -51,7 +52,7 @@ public class ArcSdeStGeometryRecordStoreExtension implements RecordStoreExtensio
           final String tableName = resultSet.getString(1);
           final String columnName = resultSet.getString(2);
 
-          final String typePath = Path.toPath(schemaName, tableName);
+          final PathName typePath = PathName.create(Path.toPath(schemaName, tableName));
 
           final int esriSrid = resultSet.getInt(3);
           JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,

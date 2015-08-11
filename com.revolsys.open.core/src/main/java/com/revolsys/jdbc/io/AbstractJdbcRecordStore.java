@@ -88,9 +88,9 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   private String schemaPermissionsSql;
 
-  private final Map<String, String> schemaNameMap = new HashMap<String, String>();
+  private final Map<PathName, String> schemaNameMap = new HashMap<>();
 
-  private final Map<String, String> tableNameMap = new HashMap<String, String>();
+  private final Map<PathName, String> tableNameMap = new HashMap<>();
 
   private JdbcDatabaseFactory databaseFactory;
 
@@ -279,62 +279,9 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     writeAll(records, RecordState.Deleted);
   }
 
-  // protected Set<String> getDatabaseSchemaNames() {
-  // final Set<String> databaseSchemaNames = new TreeSet<String>();
-  // try {
-  // final Connection connection = getDbConnection();
-  // try {
-  // final DatabaseMetaData databaseMetaData = connection.getRecordDefinition();
-  // final ResultSet schemaRs = databaseMetaData.getSchemas();
-  //
-  // try {
-  // while (schemaRs.next()) {
-  // final String dbSchemaName = schemaRs.getString("TABLE_SCHEM");
-  // databaseSchemaNames.add(dbSchemaName);
-  // }
-  // } finally {
-  // JdbcUtils.close(schemaRs);
-  // }
-  // } finally {
-  // releaseConnection(connection);
-  // }
-  // } catch (final SQLException e) {
-  // throw new RuntimeException("Unable to get list of namespaces", e);
-  // }
-  // return databaseSchemaNames;
-  // }
-
   public Set<String> getAllSchemaNames() {
     return this.allSchemaNames;
   }
-
-  // protected Set<String> getDatabaseTableNames(final String dbSchemaName)
-  // throws SQLException {
-  // final Connection connection = getDbConnection();
-  // try {
-  // final Set<String> tableNames = new LinkedHashSet<String>();
-  //
-  // final DatabaseMetaData databaseMetaData = connection.getRecordDefinition();
-  // final ResultSet tablesRs = databaseMetaData.getTables(null, dbSchemaName,
-  // "%", null);
-  // try {
-  // while (tablesRs.next()) {
-  // final String dbTableName = tablesRs.getString("TABLE_NAME");
-  // final String tableName = dbTableName.toUpperCase();
-  // final String tableType = tablesRs.getString("TABLE_TYPE");
-  // final boolean excluded = !tableTypes.contains(tableType);
-  // if (!excluded && !isExcluded(dbSchemaName, dbTableName)) {
-  // tableNames.add(tableName);
-  // }
-  // }
-  // } finally {
-  // JdbcUtils.close(tablesRs);
-  // }
-  // return tableNames;
-  // } finally {
-  // releaseConnection(connection);
-  // }
-  // }
 
   public int getBatchSize() {
     return this.batchSize;
@@ -346,24 +293,17 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
-  public String getDatabaseQualifiedTableName(final String typePath) {
-    final String schema = getDatabaseSchemaName(Path.getPath(typePath));
-    final String tableName = getDatabaseTableName(typePath);
-    return schema + "." + tableName;
+  public String getDatabaseSchemaName(final PathName schemaPath) {
+    return this.schemaNameMap.get(schemaPath);
   }
 
   public String getDatabaseSchemaName(final RecordStoreSchema schema) {
     if (schema == null) {
       return null;
     } else {
-      final String schemaPath = schema.getPath();
+      final PathName schemaPath = schema.getPathName();
       return getDatabaseSchemaName(schemaPath);
     }
-  }
-
-  @Override
-  public String getDatabaseSchemaName(final String schemaPath) {
-    return this.schemaNameMap.get(schemaPath);
   }
 
   protected Set<String> getDatabaseSchemaNames() {
@@ -388,7 +328,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
-  public String getDatabaseTableName(final String typePath) {
+  public String getDatabaseTableName(final PathName typePath) {
     return this.tableNameMap.get(typePath);
   }
 
@@ -806,7 +746,8 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
       if (tableDescriptionMap.isEmpty()) {
         return null;
       } else {
-        final String dbSchemaName = getDatabaseSchemaName(schemaName);
+        final PathName schemaPath = schema.getPathName();
+        final String dbSchemaName = getDatabaseSchemaName(schemaPath);
         final Entry<String, String> descriptionEntry = tableDescriptionMap.entrySet()
           .iterator()
           .next();
@@ -862,7 +803,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
       final Set<String> databaseSchemaNames = getDatabaseSchemaNames();
       for (final String dbSchemaName : databaseSchemaNames) {
         final PathName childSchemaPath = schemaPath.createChild(dbSchemaName.toUpperCase());
-        this.schemaNameMap.put(dbSchemaName.toUpperCase(), dbSchemaName);
+        this.schemaNameMap.put(childSchemaPath, dbSchemaName);
         RecordStoreSchema childSchema = schema.getSchema(childSchemaPath);
         if (childSchema == null) {
           childSchema = new RecordStoreSchema(rootSchema, childSchemaPath);
@@ -876,7 +817,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
       return schemas;
     } else {
       final String schemaName = schema.getPath();
-      final String dbSchemaName = getDatabaseSchemaName(schemaName);
+      final String dbSchemaName = getDatabaseSchemaName(schemaPath);
       final Map<String, String> tableDescriptionMap = new HashMap<String, String>();
       final Map<String, List<String>> tablePermissionsMap = new TreeMap<String, List<String>>();
       loadSchemaTablePermissions(dbSchemaName, tablePermissionsMap, tableDescriptionMap);
@@ -894,7 +835,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
             final String tableName = dbTableName.toUpperCase();
             final PathName typePath = schemaPath.createChild(tableName);
             removedPaths.remove(typePath.getUpperPath());
-            this.tableNameMap.put(typePath.getUpperPath(), dbTableName);
+            this.tableNameMap.put(typePath, dbTableName);
             final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema,
               typePath);
             final String description = tableDescriptionMap.get(dbTableName);
