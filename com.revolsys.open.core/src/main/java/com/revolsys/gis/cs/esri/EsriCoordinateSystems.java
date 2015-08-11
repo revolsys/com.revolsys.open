@@ -156,7 +156,7 @@ public class EsriCoordinateSystems {
    */
   public static GeometryFactory getGeometryFactory(final Resource resource) {
     final Resource projResource = SpringUtil.getResourceWithExtension(resource, "prj");
-    if (projResource.exists()) {
+    if (com.revolsys.spring.resource.Resource.exists(projResource)) {
       try {
         final CoordinateSystem coordinateSystem = getCoordinateSystem(projResource);
         final int srid = EsriCoordinateSystems.getCrsId(coordinateSystem);

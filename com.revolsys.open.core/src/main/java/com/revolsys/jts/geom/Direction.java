@@ -34,4 +34,12 @@ public enum Direction {
   public boolean isForwards() {
     return this == FORWARDS;
   }
+
+  public Direction opposite() {
+    if (isForwards()) {
+      return BACKWARDS;
+    } else {
+      return FORWARDS;
+    }
+  }
 }

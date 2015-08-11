@@ -9,6 +9,14 @@ import com.revolsys.io.FileNames;
 
 public interface Resource extends org.springframework.core.io.Resource {
 
+  static boolean exists(final org.springframework.core.io.Resource resource) {
+    if (resource == null) {
+      return false;
+    } else {
+      return resource.exists();
+    }
+  }
+
   static org.springframework.core.io.Resource getResource(final Object source) {
     org.springframework.core.io.Resource resource;
     if (source instanceof org.springframework.core.io.Resource) {

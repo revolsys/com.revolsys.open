@@ -22,6 +22,7 @@ import com.revolsys.gis.algorithm.linematch.LineSegmentMatch;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Direction;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.properties.ObjectWithProperties;
@@ -300,6 +301,26 @@ public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Exter
     final Collection<Node<T>> nodes2 = edge.getNodes();
     nodes1.retainAll(nodes2);
     return nodes1;
+  }
+
+  /**
+   * Get the direction of the edge from the specified node. If the node is at
+   * the start of the edge then return true. If the node is at the end of the
+   * edge return false. Otherwise an exception is thrown.
+   *
+   * @param node The node to test the direction from.
+   * @return True if the node is at the start of the edge.
+   */
+  public Direction getDirection(final Node<T> node) {
+    if (node.getGraph() == this.graph) {
+      final int nodeId = node.getId();
+      if (this.fromNodeId == nodeId) {
+        return Direction.FORWARDS;
+      } else if (this.toNodeId == nodeId) {
+        return Direction.BACKWARDS;
+      }
+    }
+    throw new IllegalArgumentException("Node " + node + " is not part of the edge.");
   }
 
   public List<Edge<T>> getEdgesToNextJunctionNode(final Node<T> node) {

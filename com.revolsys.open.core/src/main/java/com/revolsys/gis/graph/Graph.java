@@ -583,6 +583,15 @@ public class Graph<T> {
     return this.edgeObjectsById.get(edgeId);
   }
 
+  public List<T> getEdgeObjects() {
+    final List<T> objects = new ArrayList<>();
+    for (final Edge<T> edge : getEdges()) {
+      final T object = edge.getObject();
+      objects.add(object);
+    }
+    return objects;
+  }
+
   protected Map<Integer, Map<String, Object>> getEdgePropertiesById() {
     return this.edgePropertiesById;
   }
