@@ -1,6 +1,7 @@
 package com.revolsys.data.record.schema;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.identifier.Identifier;
+import com.revolsys.data.query.Q;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.QueryValue;
 import com.revolsys.data.record.Record;
@@ -24,6 +26,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
+import com.revolsys.util.Property;
 
 public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
   void addCodeTable(CodeTable codeTable);
@@ -43,13 +46,47 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
 
   Record create(PathName typePath);
 
+  default Record create(final PathName typePath, final Map<String, ? extends Object> values) {
+    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+    if (recordDefinition == null) {
+      throw new IllegalArgumentException("Cannot find table " + typePath + " for " + this);
+    } else {
+      final Record record = create(recordDefinition);
+      if (record != null) {
+        record.setValues(values);
+        final String idFieldName = recordDefinition.getIdFieldName();
+        if (Property.hasValue(idFieldName)) {
+          if (values.get(idFieldName) == null) {
+            final Object id = createPrimaryIdValue(typePath);
+            record.setIdValue(id);
+          }
+        }
+      }
+      return record;
+    }
+
+  }
+
   Record create(RecordDefinition recordDefinition);
 
-  Record create(String typePath);
+  @Deprecated
+  default Record create(final String typePath) {
+    return create(PathName.create(typePath));
+  }
 
-  Record create(String typePath, Map<String, ? extends Object> values);
+  @Deprecated
+  default Record create(final String typePath, final Map<String, ? extends Object> values) {
+    return create(PathName.create(typePath), values);
+  }
 
-  <T> T createPrimaryIdValue(String typePath);
+  default <T> T createPrimaryIdValue(final PathName typePath) {
+    return null;
+  }
+
+  @Deprecated
+  default <T> T createPrimaryIdValue(final String typePath) {
+    return createPrimaryIdValue(PathName.create(typePath));
+  }
 
   Query createQuery(final String typePath, String whereClause,
     final BoundingBoxDoubleGf boundingBox);
@@ -130,6 +167,55 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
   boolean isEditable(String typePath);
 
   boolean isLoadFullSchema();
+
+  default Record load(final PathName typePath, final Identifier id) {
+    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+    if (recordDefinition == null || id == null) {
+      return null;
+    } else {
+      final List<Object> values = id.getValues();
+      final List<String> idFieldNames = recordDefinition.getIdFieldNames();
+      if (idFieldNames.isEmpty()) {
+        throw new IllegalArgumentException(typePath + " does not have a primary key");
+      } else if (values.size() != idFieldNames.size()) {
+        throw new IllegalArgumentException(
+          id + " not a valid id for " + typePath + " requires " + idFieldNames);
+      } else {
+        final Query query = new Query(recordDefinition);
+        for (int i = 0; i < idFieldNames.size(); i++) {
+          final String name = idFieldNames.get(i);
+          final Object value = values.get(i);
+          final FieldDefinition field = recordDefinition.getField(name);
+          query.and(Q.equal(field, value));
+        }
+        return queryFirst(query);
+      }
+    }
+  }
+
+  default Record load(final PathName typePath, final Object... id) {
+    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      final List<String> idFieldNames = recordDefinition.getIdFieldNames();
+      if (idFieldNames.isEmpty()) {
+        throw new IllegalArgumentException(typePath + " does not have a primary key");
+      } else if (id.length != idFieldNames.size()) {
+        throw new IllegalArgumentException(
+          Arrays.toString(id) + " not a valid id for " + typePath + " requires " + idFieldNames);
+      } else {
+        final Query query = new Query(recordDefinition);
+        for (int i = 0; i < idFieldNames.size(); i++) {
+          final String name = idFieldNames.get(i);
+          final Object value = id[i];
+          final FieldDefinition field = recordDefinition.getField(name);
+          query.and(Q.equal(field, value));
+        }
+        return queryFirst(query);
+      }
+    }
+  }
 
   Record load(String typePath, Identifier id);
 

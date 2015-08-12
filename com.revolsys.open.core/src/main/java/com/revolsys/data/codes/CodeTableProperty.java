@@ -21,7 +21,7 @@ import com.revolsys.data.record.property.RecordDefinitionProperty;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
-import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 import com.revolsys.util.Property;
 
@@ -53,7 +53,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
 
   private List<String> orderBy = DEFAULT_FIELD_NAMES;
 
-  private String typePath;
+  private PathName typePath;
 
   private String idFieldName;
 
@@ -213,7 +213,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
   }
 
   public String getTypeName() {
-    return this.typePath;
+    return this.typePath.getPath();
   }
 
   @Override
@@ -415,8 +415,8 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
         this.recordStore = null;
         this.typePath = null;
       } else {
-        this.typePath = recordDefinition.getPath();
-        setName(Path.getName(this.typePath));
+        this.typePath = recordDefinition.getPathName();
+        setName(this.typePath.getName());
         this.recordStore = this.recordDefinition.getRecordStore();
         recordDefinition.setProperty(getPropertyName(), this);
         this.recordStore.addCodeTable(this);

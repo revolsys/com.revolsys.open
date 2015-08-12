@@ -177,7 +177,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   private int geodatabaseReferenceCount;
 
-  private final Map<String, AtomicLong> idGenerators = new HashMap<>();
+  private final Map<PathName, AtomicLong> idGenerators = new HashMap<>();
 
   private boolean initialized;
 
@@ -613,7 +613,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> T createPrimaryIdValue(final String typePath) {
+  public <T> T createPrimaryIdValue(final PathName typePath) {
     synchronized (this.apiSync) {
       final RecordDefinition recordDefinition = getRecordDefinition(typePath);
       if (recordDefinition == null) {

@@ -199,7 +199,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> T createPrimaryIdValue(final String typePath) {
+  public <T> T createPrimaryIdValue(final PathName typePath) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     final GlobalIdProperty globalIdProperty = GlobalIdProperty.getProperty(recordDefinition);
     if (globalIdProperty == null) {

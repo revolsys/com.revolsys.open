@@ -20,6 +20,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
+import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -69,17 +70,17 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
+  public Record create(final PathName typePath) {
+    return this.recordStore.create(typePath);
+  }
+
+  @Override
   public Record create(final RecordDefinition recordDefinition) {
     return this.recordStore.create(recordDefinition);
   }
 
   @Override
-  public Record create(final String typePath) {
-    return this.recordStore.create(typePath);
-  }
-
-  @Override
-  public <T> T createPrimaryIdValue(final String typePath) {
+  public <T> T createPrimaryIdValue(final PathName typePath) {
     return this.recordStore.createPrimaryIdValue(typePath);
   }
 

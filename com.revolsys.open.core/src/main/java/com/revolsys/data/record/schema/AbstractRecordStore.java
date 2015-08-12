@@ -250,38 +250,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     }
   }
 
-  @Override
-  public Record create(final String typePath) {
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    if (recordDefinition == null) {
-      return null;
-    } else {
-      return create(recordDefinition);
-    }
-  }
-
-  @Override
-  public Record create(final String typePath, final Map<String, ? extends Object> values) {
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    if (recordDefinition == null) {
-      throw new IllegalArgumentException("Cannot find table " + typePath + " for " + this);
-    } else {
-      final Record record = create(recordDefinition);
-      if (record != null) {
-        record.setValues(values);
-        final String idFieldName = recordDefinition.getIdFieldName();
-        if (Property.hasValue(idFieldName)) {
-          if (values.get(idFieldName) == null) {
-            final Object id = createPrimaryIdValue(typePath);
-            record.setIdValue(id);
-          }
-        }
-      }
-      return record;
-    }
-
-  }
-
   public AbstractIterator<Record> createIterator(final Query query,
     Map<String, Object> properties) {
     if (properties == null) {
@@ -307,11 +275,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  public <T> T createPrimaryIdValue(final String typePath) {
-    return null;
-  }
-
-  @Override
   public Query createQuery(final String typePath, final String whereClause,
     final BoundingBoxDoubleGf boundingBox) {
     throw new UnsupportedOperationException();
@@ -334,7 +297,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     if (record != null) {
       final String idFieldName = recordDefinition.getIdFieldName();
       if (Property.hasValue(idFieldName)) {
-        final String typePath = recordDefinition.getPath();
+        final PathName typePath = recordDefinition.getPathName();
         final Object id = createPrimaryIdValue(typePath);
         record.setIdValue(id);
       }
@@ -603,7 +566,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  public Record load(final String typePath, final Identifier id) {
+  public final Record load(final String typePath, final Identifier id) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     if (recordDefinition == null || id == null) {
       return null;

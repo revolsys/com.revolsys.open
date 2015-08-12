@@ -148,7 +148,6 @@ public class PanelGroup extends ElementContainer {
               {
                 out.startTag(HtmlUtil.A);
                 Data.toggle(out, "collapse");
-                Data.parent(out, "#" + this.id);
                 out.attribute(HtmlUtil.ATTR_HREF, "#collapse" + fullPanelId);
                 Aria.expanded(out, true);
                 Aria.controls(out, "collapse" + fullPanelId);

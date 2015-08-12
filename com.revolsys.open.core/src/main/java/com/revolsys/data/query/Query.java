@@ -128,6 +128,11 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
     this.typeName = typePath;
   }
 
+  public Query(final PathName typePath, final Condition whereCondition) {
+    this(typePath);
+    this.whereCondition = whereCondition;
+  }
+
   public Query(final RecordDefinition recordDefinition) {
     this(recordDefinition.getPath());
     this.recordDefinition = recordDefinition;

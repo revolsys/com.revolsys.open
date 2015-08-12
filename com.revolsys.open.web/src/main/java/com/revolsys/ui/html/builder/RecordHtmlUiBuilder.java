@@ -20,6 +20,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
+import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 import com.revolsys.ui.html.serializer.key.KeySerializer;
 import com.revolsys.ui.html.view.TabElementContainer;
@@ -31,9 +32,16 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
 
   private RecordStore recordStore;
 
-  private String tableName;
+  private PathName tableName;
 
   public RecordHtmlUiBuilder() {
+  }
+
+  public RecordHtmlUiBuilder(final String typePath, final PathName tableName,
+    final String idPropertyName, final String title, final String pluralTitle) {
+    super(typePath, title, pluralTitle);
+    this.tableName = tableName;
+    setIdPropertyName(idPropertyName);
   }
 
   public RecordHtmlUiBuilder(final String typePath, final String title) {
@@ -42,13 +50,6 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
 
   public RecordHtmlUiBuilder(final String typePath, final String title, final String pluralTitle) {
     super(typePath, title, pluralTitle);
-  }
-
-  public RecordHtmlUiBuilder(final String typePath, final String tableName,
-    final String idPropertyName, final String title, final String pluralTitle) {
-    super(typePath, title, pluralTitle);
-    this.tableName = tableName;
-    setIdPropertyName(idPropertyName);
   }
 
   public Object createDataTableHandler(final HttpServletRequest request, final String pageName) {
@@ -159,7 +160,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
     return this.recordStore.page(query);
   }
 
-  public String getTableName() {
+  public PathName getTableName() {
     return this.tableName;
   }
 
@@ -202,7 +203,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
     return loadObject(this.tableName, id);
   }
 
-  public Record loadObject(final String typeName, final Object id) {
+  public Record loadObject(final PathName typeName, final Object id) {
     final Record object = this.recordStore.load(typeName, id);
     return object;
   }
@@ -211,7 +212,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
     this.recordStore = recordStore;
   }
 
-  public void setTableName(final String tableName) {
+  public void setTableName(final PathName tableName) {
     this.tableName = tableName;
   }
 
