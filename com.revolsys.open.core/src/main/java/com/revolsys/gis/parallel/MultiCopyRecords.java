@@ -10,6 +10,7 @@ import org.springframework.core.io.Resource;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.format.json.Json;
+import com.revolsys.io.PathName;
 import com.revolsys.parallel.process.AbstractMultipleProcess;
 import com.revolsys.parallel.process.Parallel;
 import com.revolsys.parallel.process.Process;
@@ -38,7 +39,7 @@ public class MultiCopyRecords implements Process {
     } else {
       final String type = (String)processDefinition.get("type");
       if ("copyRecords".equals(type)) {
-        final String typePath = (String)processDefinition.get("typePath");
+        final PathName typePath = PathName.create(processDefinition.get("typePath"));
         if (Property.hasValue(typePath)) {
           final boolean hasSequence = Maps.getBool(processDefinition, "hasSequence");
           final Map<String, Boolean> orderBy = Maps.get(processDefinition, "orderBy",

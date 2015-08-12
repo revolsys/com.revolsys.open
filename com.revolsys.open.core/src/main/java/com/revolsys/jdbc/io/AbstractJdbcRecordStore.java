@@ -794,12 +794,12 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
-  protected Map<String, ? extends RecordStoreSchemaElement> refreshSchemaElements(
+  protected Map<PathName, ? extends RecordStoreSchemaElement> refreshSchemaElements(
     final RecordStoreSchema schema) {
     final RecordStoreSchema rootSchema = getRootSchema();
     final PathName schemaPath = schema.getPathName();
     if (schema == rootSchema) {
-      final Map<String, RecordStoreSchemaElement> schemas = new TreeMap<>();
+      final Map<PathName, RecordStoreSchemaElement> schemas = new TreeMap<>();
       final Set<String> databaseSchemaNames = getDatabaseSchemaNames();
       for (final String dbSchemaName : databaseSchemaNames) {
         final PathName childSchemaPath = schemaPath.createChild(dbSchemaName.toUpperCase());
@@ -812,7 +812,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
             childSchema.refresh();
           }
         }
-        schemas.put(childSchemaPath.getUpperPath(), childSchema);
+        schemas.put(childSchemaPath, childSchema);
       }
       return schemas;
     } else {
@@ -822,19 +822,19 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
       final Map<String, List<String>> tablePermissionsMap = new TreeMap<String, List<String>>();
       loadSchemaTablePermissions(dbSchemaName, tablePermissionsMap, tableDescriptionMap);
 
-      final Map<String, RecordStoreSchemaElement> elementsByPath = new TreeMap<>();
-      final Map<String, RecordDefinition> recordDefinitionMap = new TreeMap<>();
+      final Map<PathName, RecordStoreSchemaElement> elementsByPath = new TreeMap<>();
+      final Map<PathName, RecordDefinition> recordDefinitionMap = new TreeMap<>();
       try {
         try (
           final Connection connection = getJdbcConnection()) {
           final DatabaseMetaData databaseMetaData = connection.getMetaData();
-          final List<String> removedPaths = schema.getTypeNames();
+          final List<PathName> removedPaths = schema.getTypePaths();
           final Map<String, List<String>> idFieldNameMap = loadIdFieldNames(dbSchemaName);
           final Set<String> tableNames = tablePermissionsMap.keySet();
           for (final String dbTableName : tableNames) {
             final String tableName = dbTableName.toUpperCase();
             final PathName typePath = schemaPath.createChild(tableName);
-            removedPaths.remove(typePath.getUpperPath());
+            removedPaths.remove(typePath);
             this.tableNameMap.put(typePath, dbTableName);
             final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema,
               typePath);
@@ -843,14 +843,14 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
             final List<String> permissions = Maps.get(tablePermissionsMap, dbTableName,
               DEFAULT_PERMISSIONS);
             recordDefinition.setProperty("permissions", permissions);
-            recordDefinitionMap.put(typePath.getUpperPath(), recordDefinition);
-            elementsByPath.put(typePath.getUpperPath(), recordDefinition);
+            recordDefinitionMap.put(typePath, recordDefinition);
+            elementsByPath.put(typePath, recordDefinition);
           }
           try (
             final ResultSet columnsRs = databaseMetaData.getColumns(null, dbSchemaName, "%", "%")) {
             while (columnsRs.next()) {
               final String tableName = columnsRs.getString("TABLE_NAME").toUpperCase();
-              final String typePath = Path.toPath(schemaName, tableName);
+              final PathName typePath = schemaPath.createChild(tableName);
               final RecordDefinitionImpl recordDefinition = (RecordDefinitionImpl)recordDefinitionMap
                 .get(typePath);
               if (recordDefinition != null) {

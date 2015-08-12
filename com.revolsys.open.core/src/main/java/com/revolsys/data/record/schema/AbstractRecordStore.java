@@ -24,7 +24,6 @@ import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.map.ThreadSharedAttributes;
 import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.codes.CodeTableProperty;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.query.Q;
 import com.revolsys.data.query.Query;
@@ -37,7 +36,6 @@ import com.revolsys.data.record.io.RecordStoreQueryReader;
 import com.revolsys.data.record.property.RecordDefinitionProperty;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
-import com.revolsys.io.Path;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
@@ -332,25 +330,13 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     }
   }
 
-  protected RecordDefinition findRecordDefinition(final String typePath) {
-    final String schemaName = Path.getPath(typePath);
+  protected RecordDefinition findRecordDefinition(final PathName typePath) {
+    final PathName schemaName = typePath.getParent();
     final RecordStoreSchema schema = getSchema(schemaName);
     if (schema == null) {
       return null;
     } else {
       return schema.findRecordDefinition(typePath);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <V extends CodeTable> V getCodeTable(final String typePath) {
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    if (recordDefinition == null) {
-      return null;
-    } else {
-      final CodeTableProperty codeTable = CodeTableProperty.getProperty(recordDefinition);
-      return (V)codeTable;
     }
   }
 
@@ -395,37 +381,10 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  public RecordDefinition getRecordDefinition(final PathName typePath) {
-    if (typePath == null) {
-      return null;
-    } else {
-
-      final PathName schemaPath = typePath.getParent();
-      final RecordStoreSchema schema = getSchema(schemaPath);
-      if (schema == null) {
-        return null;
-      } else {
-        return schema.getRecordDefinition(typePath);
-      }
-    }
-  }
-
-  @Override
   public RecordDefinition getRecordDefinition(final RecordDefinition objectRecordDefinition) {
     final String typePath = objectRecordDefinition.getPath();
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     return recordDefinition;
-  }
-
-  @Override
-  public RecordDefinition getRecordDefinition(final String typePath) {
-    final String schemaPath = Path.getPath(typePath);
-    final RecordStoreSchema schema = getSchema(schemaPath);
-    if (schema == null) {
-      return null;
-    } else {
-      return schema.getRecordDefinition(typePath);
-    }
   }
 
   @Override
@@ -440,18 +399,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   @Override
   public RecordStoreSchema getRootSchema() {
     return this.rootSchema;
-  }
-
-  @Override
-  public RecordStoreSchema getSchema(final PathName pathName) {
-    final RecordStoreSchema rootSchema = getRootSchema();
-    return rootSchema.getSchema(pathName);
-  }
-
-  @Override
-  public RecordStoreSchema getSchema(final String path) {
-    final RecordStoreSchema rootSchema = getRootSchema();
-    return rootSchema.getSchema(path);
   }
 
   @SuppressWarnings("unchecked")
@@ -494,25 +441,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  public List<String> getTypeNames(final String schemaName) {
-    final RecordStoreSchema schema = getSchema(schemaName);
-    if (schema == null) {
-      return Collections.emptyList();
-    } else {
-      return schema.getTypeNames();
-    }
-  }
-
-  @Override
-  public List<RecordDefinition> getTypes(final String namespace) {
-    final List<RecordDefinition> types = new ArrayList<RecordDefinition>();
-    for (final String typePath : getTypeNames(namespace)) {
-      types.add(getRecordDefinition(typePath));
-    }
-    return types;
-  }
-
-  @Override
   public String getUrl() {
     return (String)this.connectionProperties.get("url");
   }
@@ -530,11 +458,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   @Override
   public Writer<Record> getWriter(final boolean throwExceptions) {
     return getWriter();
-  }
-
-  @Override
-  public boolean hasSchema(final String schemaName) {
-    return getSchema(schemaName) != null;
   }
 
   @Override
@@ -691,14 +614,14 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     getRootSchema().refresh();
   }
 
-  protected void refreshSchema(final String schemaName) {
+  protected void refreshSchema(final PathName schemaName) {
     final RecordStoreSchema schema = getSchema(schemaName);
     if (schema != null) {
       schema.refresh();
     }
   }
 
-  protected Map<String, ? extends RecordStoreSchemaElement> refreshSchemaElements(
+  protected Map<PathName, ? extends RecordStoreSchemaElement> refreshSchemaElements(
     final RecordStoreSchema schema) {
     return Collections.emptyMap();
   }

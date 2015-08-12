@@ -9,6 +9,7 @@ import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
+import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.parallel.process.AbstractProcess;
@@ -20,7 +21,7 @@ public class CopyRecords extends AbstractProcess {
 
   private RecordStore sourceRecordStore;
 
-  private String typePath;
+  private PathName typePath;
 
   private boolean hasSequence;
 
@@ -29,7 +30,7 @@ public class CopyRecords extends AbstractProcess {
   public CopyRecords() {
   }
 
-  public CopyRecords(final RecordStore sourceRecordStore, final String typePath,
+  public CopyRecords(final RecordStore sourceRecordStore, final PathName typePath,
     final Map<String, Boolean> orderBy, final RecordStore targetRecordStore,
     final boolean hasSequence) {
     this.sourceRecordStore = sourceRecordStore;
@@ -39,7 +40,7 @@ public class CopyRecords extends AbstractProcess {
     this.hasSequence = hasSequence;
   }
 
-  public CopyRecords(final RecordStore sourceRecordStore, final String typePath,
+  public CopyRecords(final RecordStore sourceRecordStore, final PathName typePath,
     final RecordStore targetRecordStore, final boolean hasSequence) {
     this(sourceRecordStore, typePath, new HashMap<String, Boolean>(), targetRecordStore,
       hasSequence);
@@ -57,7 +58,7 @@ public class CopyRecords extends AbstractProcess {
     return this.targetRecordStore;
   }
 
-  public String getTypePath() {
+  public PathName getTypePath() {
     return this.typePath;
   }
 
@@ -113,7 +114,7 @@ public class CopyRecords extends AbstractProcess {
     this.targetRecordStore = targetRecordStore;
   }
 
-  public void setTypePath(final String typePath) {
+  public void setTypePath(final PathName typePath) {
     this.typePath = typePath;
   }
 

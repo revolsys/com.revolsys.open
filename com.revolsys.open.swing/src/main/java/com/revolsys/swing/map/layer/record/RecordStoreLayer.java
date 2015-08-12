@@ -37,7 +37,7 @@ import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.gis.algorithm.index.RecordQuadTree;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.io.Statistics;
-import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.io.map.MapSerializerUtil;
@@ -86,14 +86,14 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   /** Cache of records from {@link Record#getIdentifier()} to {@link Record}. */
   private Map<Identifier, LayerRecord> recordIdToRecordMap = new WeakHashMap<>();
 
-  private String typePath;
+  private PathName typePath;
 
   public RecordStoreLayer(final Map<String, ? extends Object> properties) {
     super(properties);
     setType("recordStoreLayer");
   }
 
-  public RecordStoreLayer(final RecordStore recordStore, final String typePath,
+  public RecordStoreLayer(final RecordStore recordStore, final PathName typePath,
     final boolean exists) {
     this.recordStore = recordStore;
     setExists(exists);
@@ -332,11 +332,12 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         }
       }
     }
-    final String typePath = getTypePath();
+    final PathName typePath = getTypePath();
     RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition == null) {
       recordDefinition = recordStore.getRecordDefinition(typePath);
       if (recordDefinition == null) {
+        recordDefinition = recordStore.getRecordDefinition(typePath);
         LoggerFactory.getLogger(getClass())
           .error("Cannot find table " + typePath + " for layer " + getPath());
         return false;
@@ -458,7 +459,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       cleanCachedRecords();
     }
     final RecordStore recordStore = getRecordStore();
-    final String typePath = getTypePath();
+    final PathName typePath = getTypePath();
     final CodeTable codeTable = recordStore.getCodeTable(typePath);
     if (codeTable != null) {
       codeTable.refresh();
@@ -714,7 +715,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public String getTypePath() {
+  public PathName getTypePath() {
     return this.typePath;
   }
 
@@ -837,6 +838,15 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     firePropertyChange("refresh", false, true);
   }
 
+  @Override
+  public void setProperty(final String name, final Object value) {
+    if ("typePath".equals(name)) {
+      super.setProperty(name, PathName.create(value));
+    } else {
+      super.setProperty(name, value);
+    }
+  }
+
   public <V extends LayerRecord> List<V> setRecordsToCache(final Label cacheId,
     final Collection<? extends LayerRecord> records) {
     synchronized (getSync()) {
@@ -849,16 +859,16 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     this.recordStore = recordStore;
   }
 
-  public void setTypePath(final String typePath) {
+  public void setTypePath(final PathName typePath) {
     this.typePath = typePath;
-    if (!Property.hasValue(getName())) {
-      setName(Path.getName(typePath));
-    }
-    if (Property.hasValue(typePath)) {
+    if (this.typePath != null) {
+      if (!Property.hasValue(getName())) {
+        setName(this.typePath.getName());
+      }
       if (isExists()) {
         final RecordStore recordStore = getRecordStore();
         if (recordStore != null) {
-          final RecordDefinition recordDefinition = recordStore.getRecordDefinition(typePath);
+          final RecordDefinition recordDefinition = recordStore.getRecordDefinition(this.typePath);
           if (recordDefinition != null) {
 
             setRecordDefinition(recordDefinition);

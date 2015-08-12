@@ -13,7 +13,6 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 
 import org.slf4j.LoggerFactory;
-import com.revolsys.spring.resource.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.Parent;
@@ -22,11 +21,13 @@ import com.revolsys.format.json.Json;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.raster.GeoreferencedImageFactory;
+import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.action.AddFileLayerAction;
@@ -351,6 +352,10 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     }
   }
 
+  public <V extends Layer> V getLayer(final PathName name) {
+    return getLayer(name.getPath());
+  }
+
   @SuppressWarnings("unchecked")
   public <V extends Layer> V getLayer(final String name) {
     return (V)getLayer(this, name);
@@ -404,9 +409,9 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     return layers;
   }
 
-  public <V extends Layer> List<V> getLayers(final List<String> names) {
+  public <V extends Layer> List<V> getLayers(final List<PathName> names) {
     final List<V> layers = new ArrayList<V>();
-    for (final String name : names) {
+    for (final PathName name : names) {
       final V layer = getLayer(name);
       if (layer != null) {
         layers.add(layer);
@@ -415,7 +420,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     return layers;
   }
 
-  public <V extends Layer> List<V> getLayers(final String... names) {
+  public <V extends Layer> List<V> getLayers(final PathName... names) {
     return getLayers(Arrays.asList(names));
   }
 

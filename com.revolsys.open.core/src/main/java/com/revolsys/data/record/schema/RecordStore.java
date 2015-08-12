@@ -3,6 +3,7 @@ package com.revolsys.data.record.schema;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import com.revolsys.collection.ResultPager;
 import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.codes.CodeTableProperty;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.query.Q;
 import com.revolsys.data.query.Query;
@@ -69,23 +71,8 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
 
   Record create(RecordDefinition recordDefinition);
 
-  @Deprecated
-  default Record create(final String typePath) {
-    return create(PathName.create(typePath));
-  }
-
-  @Deprecated
-  default Record create(final String typePath, final Map<String, ? extends Object> values) {
-    return create(PathName.create(typePath), values);
-  }
-
   default <T> T createPrimaryIdValue(final PathName typePath) {
     return null;
-  }
-
-  @Deprecated
-  default <T> T createPrimaryIdValue(final String typePath) {
-    return createPrimaryIdValue(PathName.create(typePath));
   }
 
   Query createQuery(final String typePath, String whereClause,
@@ -103,7 +90,20 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
 
   void deleteAll(Collection<Record> records);
 
-  <V extends CodeTable> V getCodeTable(String typePath);
+  @SuppressWarnings("unchecked")
+  default <V extends CodeTable> V getCodeTable(final PathName typePath) {
+    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      final CodeTableProperty codeTable = CodeTableProperty.getProperty(recordDefinition);
+      return (V)codeTable;
+    }
+  }
+
+  default <V extends CodeTable> V getCodeTable(final String typePath) {
+    return getCodeTable(PathName.create(typePath));
+  }
 
   CodeTable getCodeTableByFieldName(String fieldName);
 
@@ -115,12 +115,35 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
 
   String getLabel();
 
-  RecordDefinition getRecordDefinition(PathName typePath);
+  default RecordDefinition getRecordDefinition(final PathName path) {
+    if (path == null) {
+      return null;
+    } else {
+      final PathName schemaPath = path.getParent();
+      final RecordStoreSchema schema = getSchema(schemaPath);
+      if (schema == null) {
+        return null;
+      } else {
+        return schema.getRecordDefinition(path);
+      }
+    }
+  }
 
   RecordDefinition getRecordDefinition(RecordDefinition recordDefinition);
 
   @Override
-  RecordDefinition getRecordDefinition(String typePath);
+  default RecordDefinition getRecordDefinition(final String path) {
+    return getRecordDefinition(PathName.create(path));
+  }
+
+  default List<RecordDefinition> getRecordDefinitions(final PathName path) {
+    final RecordStoreSchema schema = getSchema(path);
+    if (schema == null) {
+      return Collections.emptyList();
+    } else {
+      return schema.getRecordDefinitions();
+    }
+  }
 
   RecordFactory getRecordFactory();
 
@@ -128,25 +151,20 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
 
   int getRowCount(Query query);
 
-  RecordStoreSchema getSchema(PathName pathName);
+  default RecordStoreSchema getSchema(final PathName pathName) {
+    final RecordStoreSchema rootSchema = getRootSchema();
+    return rootSchema.getSchema(pathName);
+  }
 
-  RecordStoreSchema getSchema(final String schemaName);
+  default RecordStoreSchema getSchema(final String path) {
+    return getSchema(PathName.create(path));
+  }
 
   StatisticsMap getStatistics();
 
   Statistics getStatistics(String string);
 
   PlatformTransactionManager getTransactionManager();
-
-  /**
-   * Get the list of type names (including name space) in the name space.
-   *
-   * @param namespace The name space.
-   * @return The type names.
-   */
-  List<String> getTypeNames(String namespace);
-
-  List<RecordDefinition> getTypes(String namespace);
 
   String getUrl();
 
@@ -156,7 +174,9 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
 
   Writer<Record> getWriter(boolean throwExceptions);
 
-  boolean hasSchema(String name);
+  default boolean hasSchema(final PathName schemaName) {
+    return getSchema(schemaName) != null;
+  }
 
   void initialize();
 

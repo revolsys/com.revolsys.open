@@ -12,6 +12,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
+import com.revolsys.io.PathName;
 import com.revolsys.io.Writer;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -34,7 +35,7 @@ public class GeometryTest {
     final GeometryFactory sourceGeometryFactory = GeometryFactory.floating(3857, axisCount);
     String typeName = geometryType.getName().toUpperCase();
     typeName = typeName.replace("MULTI", "MULTI_");
-    final String typePath = "/ORACLE_TEST/" + typeName + axisCount;
+    final PathName typePath = PathName.create("/ORACLE_TEST/" + typeName + axisCount);
     Geometry geometry = GeometryTestUtil.geometry(sourceGeometryFactory, geometryType, axisCount,
       partCount, ringCount);
     if (geometry instanceof Polygonal) {

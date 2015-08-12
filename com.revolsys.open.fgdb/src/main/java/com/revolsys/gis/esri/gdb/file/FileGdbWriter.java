@@ -20,6 +20,7 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
 import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.OidFieldDefinition;
 import com.revolsys.io.AbstractRecordWriter;
+import com.revolsys.io.PathName;
 
 public class FileGdbWriter extends AbstractRecordWriter {
   private FileGdbRecordStore recordStore;
@@ -45,7 +46,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
     }
   }
 
-  public synchronized void closeTable(final String typePath) {
+  public synchronized void closeTable(final PathName typePath) {
     if (this.tablesByCatalogPath != null) {
       final String catalogPath = this.recordStore.getCatalogPath(typePath);
       if (this.tablesByCatalogPath.remove(catalogPath) != null) {
@@ -58,7 +59,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
     final Object objectId = record.getValue("OBJECTID");
     if (objectId != null) {
       final RecordDefinition recordDefinition = record.getRecordDefinition();
-      final String typePath = recordDefinition.getPath();
+      final PathName typePath = recordDefinition.getPathName();
       final Table table = getTable(typePath);
       final String whereClause = "OBJECTID=" + objectId;
       final EnumRows rows = this.recordStore.search(typePath, table, "OBJECTID", whereClause,
@@ -87,7 +88,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
     close();
   }
 
-  private synchronized Table getTable(final String typePath) {
+  private synchronized Table getTable(final PathName typePath) {
     final String catalogPath = this.recordStore.getCatalogPath(typePath);
     Table table = this.tablesByCatalogPath.get(catalogPath);
     if (table == null) {
@@ -106,7 +107,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
 
     validateRequired(record, recordDefinition);
 
-    final String typePath = recordDefinition.getPath();
+    final PathName typePath = recordDefinition.getPathName();
     final Table table = getTable(typePath);
     if (table == null) {
       throw new ObjectException(record, "Cannot find table: " + typePath);
@@ -155,7 +156,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
     }
   }
 
-  public synchronized void openTable(final String typePath) {
+  public synchronized void openTable(final PathName typePath) {
     getTable(typePath);
   }
 
@@ -170,7 +171,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
 
       validateRequired(record, recordDefinition);
 
-      final String typePath = sourceRecordDefinition.getPath();
+      final PathName typePath = sourceRecordDefinition.getPathName();
       final Table table = getTable(typePath);
       final String whereClause = "OBJECTID=" + objectId;
       final EnumRows rows = this.recordStore.search(typePath, table, "*", whereClause, true);

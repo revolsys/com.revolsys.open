@@ -55,7 +55,6 @@ import com.revolsys.data.types.DataTypes;
 import com.revolsys.gdal.Gdal;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.Path;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Writer;
 import com.revolsys.jts.geom.BoundingBox;
@@ -80,9 +79,9 @@ public class OgrRecordStore extends AbstractRecordStore {
 
   private boolean closed;
 
-  private final Map<String, String> layerNameToPathMap = new HashMap<>();
+  private final Map<String, PathName> layerNameToPathMap = new HashMap<>();
 
-  private final Map<String, String> pathToLayerNameMap = new HashMap<>();
+  private final Map<PathName, String> pathToLayerNameMap = new HashMap<>();
 
   private final Set<Layer> layersToClose = new HashSet<>();
 
@@ -320,9 +319,9 @@ public class OgrRecordStore extends AbstractRecordStore {
 
   private RecordDefinition createLayer(final DataSource dataSource,
     final RecordDefinition sourceRecordDefinition) {
-    final String typePath = sourceRecordDefinition.getPath();
-    final String name = Path.getName(typePath);
-    final String parentPath = Path.getPath(typePath);
+    final PathName typePath = sourceRecordDefinition.getPathName();
+    final String name = typePath.getName();
+    final PathName parentPath = typePath.getParent();
     final RecordStoreSchema schema = getSchema(parentPath);
     Layer layer;
     if (sourceRecordDefinition.hasGeometryField()) {
@@ -330,7 +329,7 @@ public class OgrRecordStore extends AbstractRecordStore {
       final FieldDefinition geometryField = sourceRecordDefinition.getGeometryField();
       final int geometryFieldType = getGeometryFieldType(geometryFactory, geometryField);
       final SpatialReference spatialReference = Gdal.getSpatialReference(geometryFactory);
-      layer = dataSource.CreateLayer(typePath, spatialReference, geometryFieldType);
+      layer = dataSource.CreateLayer(typePath.getPath(), spatialReference, geometryFieldType);
     } else {
       layer = dataSource.CreateLayer(name);
     }
@@ -711,9 +710,9 @@ public class OgrRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  protected synchronized Map<String, ? extends RecordStoreSchemaElement> refreshSchemaElements(
+  protected synchronized Map<PathName, ? extends RecordStoreSchemaElement> refreshSchemaElements(
     final RecordStoreSchema schema) {
-    final Map<String, RecordStoreSchemaElement> elementsByPath = new TreeMap<>();
+    final Map<PathName, RecordStoreSchemaElement> elementsByPath = new TreeMap<>();
     if (!isClosed()) {
       final DataSource dataSource = getDataSource();
       if (dataSource != null) {
@@ -722,7 +721,7 @@ public class OgrRecordStore extends AbstractRecordStore {
           if (layer != null) {
             try {
               final RecordDefinitionImpl recordDefinition = createRecordDefinition(schema, layer);
-              final String typePath = recordDefinition.getPath().toUpperCase();
+              final PathName typePath = recordDefinition.getPathName();
               final String layerName = layer.GetName();
               this.layerNameToPathMap.put(layerName.toUpperCase(), typePath);
               this.pathToLayerNameMap.put(typePath, layerName);

@@ -17,6 +17,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.record.schema.RecordStoreSchemaElement;
+import com.revolsys.io.PathName;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
@@ -65,7 +66,7 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
     if (schema != null) {
       schema.refresh();
       for (final RecordStoreSchemaElement element : schema.getElements()) {
-        final String path = element.getPath();
+        final PathName path = element.getPathName();
 
         if (element instanceof RecordStoreSchema) {
           final RecordStoreSchemaTreeNode childNode = new RecordStoreSchemaTreeNode(connectionMap,

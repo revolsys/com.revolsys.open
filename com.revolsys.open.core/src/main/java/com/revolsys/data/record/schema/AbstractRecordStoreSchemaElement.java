@@ -66,11 +66,6 @@ public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithPro
   }
 
   @Override
-  public boolean equalPath(final String path) {
-    return path.equalsIgnoreCase(getPath());
-  }
-
-  @Override
   public boolean equals(final Object other) {
     return other == this;
   }

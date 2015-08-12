@@ -8,7 +8,7 @@ import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Project;
@@ -46,7 +46,7 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
 
   private final Map<String, Object> connectionMap;
 
-  public RecordStoreTableTreeNode(final Map<String, Object> connectionMap, final String typePath,
+  public RecordStoreTableTreeNode(final Map<String, Object> connectionMap, final PathName typePath,
     final String geometryType) {
     super(typePath);
     this.connectionMap = connectionMap;
@@ -56,7 +56,7 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
       setType("Data Table (" + CaseConverter.toCapitalizedWords(geometryType) + ")");
     }
 
-    final String name = Path.getName(typePath);
+    final String name = typePath.getName();
     setName(name);
 
     final Icon icon = getIcon(geometryType);
@@ -64,7 +64,7 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
   }
 
   public void addLayer() {
-    final String typePath = getTypePath();
+    final PathName typePath = getTypePath();
     final Map<String, Object> connection = getConnectionMap();
     final Map<String, Object> layerConfig = new LinkedHashMap<String, Object>();
     layerConfig.put("type", "recordStoreLayer");
@@ -86,7 +86,7 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
     return MENU;
   }
 
-  public String getTypePath() {
-    return (String)getUserObject();
+  public PathName getTypePath() {
+    return (PathName)getUserObject();
   }
 }

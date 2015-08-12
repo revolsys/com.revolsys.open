@@ -45,27 +45,27 @@ public class StatisticsMap {
 
   }
 
+  public void add(final CharSequence statisticName, final Record record, final long count) {
+    final Statistics statistics = getStatistics(statisticName);
+    statistics.add(record, count);
+  }
+
+  public void add(final CharSequence statisticName, final RecordDefinition type) {
+    final Statistics statistics = getStatistics(statisticName);
+    statistics.add(type);
+  }
+
+  public void add(final CharSequence statisticName, final RecordDefinition type, final long count) {
+    final Statistics statistics = getStatistics(statisticName);
+    statistics.add(type, count);
+  }
+
   public void add(final CharSequence statisticName, final String name) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(name);
   }
 
-  public void add(final String statisticName, final Record record, final long count) {
-    final Statistics statistics = getStatistics(statisticName);
-    statistics.add(record, count);
-  }
-
-  public void add(final String statisticName, final RecordDefinition type) {
-    final Statistics statistics = getStatistics(statisticName);
-    statistics.add(type);
-  }
-
-  public void add(final String statisticName, final RecordDefinition type, final long count) {
-    final Statistics statistics = getStatistics(statisticName);
-    statistics.add(type, count);
-  }
-
-  public void add(final String statisticName, final String path, final long count) {
+  public void add(final CharSequence statisticName, final String path, final long count) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(path, count);
   }

@@ -68,6 +68,7 @@ import com.revolsys.format.gpx.GpxWriter;
 import com.revolsys.gis.algorithm.index.RecordQuadTree;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
@@ -1465,12 +1466,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return getProperty("snapLayers", Collections.<String> emptyList());
   }
 
-  public String getTypePath() {
+  public PathName getTypePath() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition == null) {
       return null;
     } else {
-      return recordDefinition.getPath();
+      return recordDefinition.getPathName();
     }
   }
 

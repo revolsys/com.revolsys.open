@@ -26,6 +26,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionFactory;
 import com.revolsys.data.types.DataType;
 import com.revolsys.gis.jts.GeometryProperties;
+import com.revolsys.io.PathName;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -331,6 +332,10 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
 
   default String getTypePath() {
     return getRecordDefinition().getPath();
+  }
+
+  default PathName getTypePathName() {
+    return getRecordDefinition().getPathName();
   }
 
   /**

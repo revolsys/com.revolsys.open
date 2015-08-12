@@ -10,7 +10,7 @@ import com.revolsys.data.record.io.RecordStoreConnectionMapProxy;
 import com.revolsys.data.record.io.RecordStoreProxy;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
-import com.revolsys.io.Path;
+import com.revolsys.io.PathName;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.menu.MenuFactory;
@@ -35,16 +35,16 @@ public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode
 
   private final Map<String, Object> connectionMap;
 
-  private final String schemaPath;
+  private final PathName schemaPath;
 
   public RecordStoreSchemaTreeNode(final Map<String, Object> connectionMap,
-    final String schemaPath) {
+    final PathName schemaPath) {
     super(schemaPath);
     this.connectionMap = connectionMap;
     setType("Record Store Record Schema");
     setIcon(ICON_SCHEMA);
     this.schemaPath = schemaPath;
-    String name = Path.getName(schemaPath);
+    String name = schemaPath.getName();
     if (!Property.hasValue(name)) {
       name = "/";
     }

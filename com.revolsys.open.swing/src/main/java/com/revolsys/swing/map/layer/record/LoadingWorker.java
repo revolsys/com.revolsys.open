@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.functions.F;
 import com.revolsys.data.record.schema.FieldDefinition;
+import com.revolsys.io.PathName;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -58,7 +59,7 @@ public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> 
 
   @Override
   public String toString() {
-    final String typePath = this.layer.getTypePath();
+    final PathName typePath = this.layer.getTypePath();
     return "Loading: " + typePath;
   }
 
@@ -73,7 +74,7 @@ public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> 
     } catch (final CancellationException e) {
       this.layer.clearLoading(this.viewportBoundingBox);
     } catch (final Throwable t) {
-      final String typePath = this.layer.getTypePath();
+      final PathName typePath = this.layer.getTypePath();
       LoggerFactory.getLogger(getClass()).error("Unable to load " + typePath, t);
       this.layer.clearLoading(this.viewportBoundingBox);
     }

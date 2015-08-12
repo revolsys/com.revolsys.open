@@ -5,7 +5,10 @@ import com.revolsys.properties.ObjectWithProperties;
 
 public interface RecordStoreSchemaElement
   extends ObjectWithProperties, Comparable<RecordStoreSchemaElement> {
-  boolean equalPath(String path);
+
+  default boolean equalPath(final PathName path) {
+    return getPathName().equals(path);
+  }
 
   String getName();
 

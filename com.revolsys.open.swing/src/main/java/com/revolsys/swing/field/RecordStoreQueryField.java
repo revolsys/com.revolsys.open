@@ -8,13 +8,14 @@ import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
+import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 
 public class RecordStoreQueryField extends AbstractRecordQueryField {
   private static final long serialVersionUID = 1L;
 
   public static Supplier<Field> factory(final String fieldName, final RecordStore recordStore,
-    final String typePath, final String displayFieldName) {
+    final PathName typePath, final String displayFieldName) {
     return () -> {
       return new RecordStoreQueryField(fieldName, recordStore, typePath, displayFieldName);
     };
@@ -25,7 +26,7 @@ public class RecordStoreQueryField extends AbstractRecordQueryField {
   private final RecordDefinition recordDefinition;
 
   public RecordStoreQueryField(final String fieldName, final RecordStore recordStore,
-    final String typePath, final String displayFieldName) {
+    final PathName typePath, final String displayFieldName) {
     super(fieldName, typePath, displayFieldName);
     this.recordStore = recordStore;
     this.recordDefinition = recordStore.getRecordDefinition(typePath);
@@ -34,14 +35,14 @@ public class RecordStoreQueryField extends AbstractRecordQueryField {
   @Override
   public Field clone() {
     final String fieldName = getFieldName();
-    final String typePath = getTypePath();
+    final PathName typePath = getTypePath();
     final String displayFieldName = getDisplayFieldName();
     return new RecordStoreQueryField(fieldName, this.recordStore, typePath, displayFieldName);
   }
 
   @Override
   protected Record getRecord(final Identifier identifier) {
-    final String typePath = getTypePath();
+    final PathName typePath = getTypePath();
     return this.recordStore.load(typePath, identifier);
   }
 

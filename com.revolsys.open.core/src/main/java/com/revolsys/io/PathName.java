@@ -9,15 +9,17 @@ public class PathName implements Comparable<PathName>, CharSequence {
 
   public static final PathName ROOT = new PathName("/");
 
-  public static PathName create(String path) {
-    path = Path.clean(path);
-    if ("/".equals(path)) {
-      return ROOT;
-    } else if (Property.hasValue(path)) {
-      return new PathName(path);
-    } else {
-      return null;
+  public static PathName create(final Object path) {
+    if (Property.hasValue(path)) {
+      String pathString = path.toString();
+      pathString = Path.clean(pathString);
+      if ("/".equals(pathString)) {
+        return ROOT;
+      } else if (Property.hasValue(pathString)) {
+        return new PathName(pathString);
+      }
     }
+    return null;
   }
 
   private final String name;
@@ -86,7 +88,11 @@ public class PathName implements Comparable<PathName>, CharSequence {
       return null;
     } else if (this.path.length() > 1) {
       final int index = this.path.lastIndexOf('/');
-      return this.path.substring(0, index);
+      if (index == 0) {
+        return "/";
+      } else {
+        return this.path.substring(0, index);
+      }
     } else {
       return null;
     }
@@ -94,6 +100,16 @@ public class PathName implements Comparable<PathName>, CharSequence {
 
   public String getPath() {
     return this.path;
+  }
+
+  public List<PathName> getPaths() {
+    final LinkedList<PathName> elements = new LinkedList<>();
+    elements.add(this);
+    for (PathName parentPath = getParent(); parentPath != null; parentPath = parentPath
+      .getParent()) {
+      elements.addFirst(parentPath);
+    }
+    return elements;
   }
 
   public String getUpperPath() {

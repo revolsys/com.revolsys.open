@@ -243,9 +243,9 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  protected Map<String, RecordStoreSchemaElement> refreshSchemaElements(
+  protected Map<PathName, RecordStoreSchemaElement> refreshSchemaElements(
     final RecordStoreSchema schema) {
-    final Map<String, RecordStoreSchemaElement> elements = new TreeMap<>();
+    final Map<PathName, RecordStoreSchemaElement> elements = new TreeMap<>();
     final String schemaPath = schema.getPath();
     final PathName schemaPathName = schema.getPathName();
     final File subDirectory;
@@ -263,9 +263,8 @@ public class DirectoryRecordStore extends AbstractRecordStore {
           final RecordDefinition recordDefinition = loadRecordDefinition(schema, schemaPath,
             resource);
           if (recordDefinition != null) {
-            final String path = recordDefinition.getPath();
-            final String pathUpper = path.toUpperCase();
-            elements.put(pathUpper, recordDefinition);
+            final PathName path = recordDefinition.getPathName();
+            elements.put(path, recordDefinition);
           }
         } else if (file.isDirectory()) {
           final String name = file.getName();
@@ -278,7 +277,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
               childSchema.refresh();
             }
           }
-          elements.put(childSchemaPath.getUpperPath(), childSchema);
+          elements.put(childSchemaPath, childSchema);
         }
       }
     }

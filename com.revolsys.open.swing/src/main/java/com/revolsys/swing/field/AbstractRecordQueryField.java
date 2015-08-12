@@ -58,6 +58,7 @@ import com.revolsys.data.query.Value;
 import com.revolsys.data.query.functions.F;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.io.PathName;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
@@ -107,11 +108,11 @@ public abstract class AbstractRecordQueryField extends ValueField
 
   private int maxResults = Integer.MAX_VALUE;
 
-  private final String typePath;
+  private final PathName typePath;
 
   private int minSearchCharacters = 2;
 
-  public AbstractRecordQueryField(final String fieldName, final String typePath,
+  public AbstractRecordQueryField(final String fieldName, final PathName typePath,
     final String displayFieldName) {
     super(fieldName, null);
     this.typePath = typePath;
@@ -297,7 +298,7 @@ public abstract class AbstractRecordQueryField extends ValueField
     return this.selectedRecord;
   }
 
-  public String getTypePath() {
+  public PathName getTypePath() {
     return this.typePath;
   }
 

@@ -122,7 +122,7 @@ public class DelegatingRecordStore extends AbstractRecordStore {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends CodeTable> V getCodeTable(final String typePath) {
+  public <V extends CodeTable> V getCodeTable(final PathName typePath) {
     return (V)this.recordStore.getCodeTable(typePath);
   }
 
@@ -172,11 +172,6 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public RecordDefinition getRecordDefinition(final String typePath) {
-    return this.recordStore.getRecordDefinition(typePath);
-  }
-
-  @Override
   public RecordFactory getRecordFactory() {
     return this.recordStore.getRecordFactory();
   }
@@ -193,11 +188,6 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   @Override
   public int getRowCount(final Query query) {
     return this.recordStore.getRowCount(query);
-  }
-
-  @Override
-  public RecordStoreSchema getSchema(final String schemaName) {
-    return this.recordStore.getSchema(schemaName);
   }
 
   @Override
@@ -218,16 +208,6 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   @Override
   public PlatformTransactionManager getTransactionManager() {
     return this.recordStore.getTransactionManager();
-  }
-
-  @Override
-  public List<String> getTypeNames(final String schemaName) {
-    return this.recordStore.getTypeNames(schemaName);
-  }
-
-  @Override
-  public List<RecordDefinition> getTypes(final String namespace) {
-    return this.recordStore.getTypes(namespace);
   }
 
   @Override
