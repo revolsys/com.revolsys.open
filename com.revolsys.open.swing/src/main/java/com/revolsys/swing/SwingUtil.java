@@ -179,6 +179,15 @@ public class SwingUtil {
     setLocationCentre(bounds, window);
   }
 
+  public static void autoAdjustSize(final Window window) {
+    window.pack();
+
+    final Rectangle bounds = getScreenBounds();
+    final int width = Math.min(window.getWidth(), bounds.width - 20 - window.getX());
+    final int height = Math.min(window.getHeight(), bounds.height - 20 - window.getY());
+    window.setSize(width, height);
+  }
+
   public static ComboBox createComboBox(final CodeTable codeTable, final boolean required,
     final int maxLength) {
     return createComboBox("fieldValue", codeTable, required, maxLength);
@@ -826,6 +835,23 @@ public class SwingUtil {
   public static void setLocationCentre(final Window window) {
     final Rectangle bounds = getScreenBounds();
     setLocationCentre(bounds, window);
+  }
+
+  /**
+   * Set the location of the window in relation to the top left of the screen the current window is on
+   *
+   * @param window
+   * @param x
+   * @param y
+   */
+  public static void setLocationOffset(final Window window, int x, int y) {
+    final Rectangle bounds = getScreenBounds();
+
+    x += bounds.x;
+    y += bounds.y;
+
+    window.setLocation(x, y);
+
   }
 
   public static void setMaximumWidth(final JComponent component, final int width) {
