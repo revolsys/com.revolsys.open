@@ -34,13 +34,15 @@ package com.revolsys.jts.util;
 
 import java.util.ArrayList;
 
+import com.revolsys.util.Emptyable;
+
 /**
  * A priority queue over a set of {@link Comparable} objects.
  *
  * @author Martin Davis
  *
  */
-public class PriorityQueue {
+public class PriorityQueue implements Emptyable {
   private int size; // Number of elements in queue
 
   private final ArrayList items; // The queue binary heap array

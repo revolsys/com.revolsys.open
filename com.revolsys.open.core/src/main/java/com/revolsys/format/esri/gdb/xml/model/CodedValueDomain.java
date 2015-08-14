@@ -205,6 +205,11 @@ public class CodedValueDomain extends Domain implements CodeTable {
   }
 
   @Override
+  public boolean isEmpty() {
+    return this.idValueMap.isEmpty();
+  }
+
+  @Override
   public boolean isLoaded() {
     return true;
   }

@@ -31,6 +31,11 @@ public class EmptyRange extends AbstractRange<Object> {
   }
 
   @Override
+  public boolean isEmpty() {
+    return true;
+  }
+
+  @Override
   public long size() {
     return 0;
   }

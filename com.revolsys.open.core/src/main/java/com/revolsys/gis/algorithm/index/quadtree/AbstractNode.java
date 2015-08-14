@@ -7,8 +7,9 @@ import java.util.function.Consumer;
 import com.revolsys.jts.index.DoubleBits;
 import com.revolsys.jts.index.IntervalSize;
 import com.revolsys.jts.util.BoundingBoxUtil;
+import com.revolsys.util.Emptyable;
 
-public abstract class AbstractNode<T> implements Serializable {
+public abstract class AbstractNode<T> implements Emptyable, Serializable {
   /**
    *
    */
@@ -356,6 +357,7 @@ public abstract class AbstractNode<T> implements Serializable {
     }
   }
 
+  @Override
   public boolean isEmpty() {
     boolean isEmpty = !hasItems();
     for (int i = 0; i < 4; i++) {

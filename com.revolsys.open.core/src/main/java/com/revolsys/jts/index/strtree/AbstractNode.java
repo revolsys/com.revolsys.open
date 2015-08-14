@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.util.Assert;
+import com.revolsys.util.Emptyable;
 
 /**
  * A node of an {@link AbstractSTRtree}. A node is one of:
@@ -49,7 +50,7 @@ import com.revolsys.jts.util.Assert;
  *
  * @version 1.7
  */
-public abstract class AbstractNode implements Boundable, Serializable {
+public abstract class AbstractNode implements Emptyable, Boundable, Serializable {
   /**
    *
    */

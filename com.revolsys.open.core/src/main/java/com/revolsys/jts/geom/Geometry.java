@@ -48,6 +48,7 @@ import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.operation.buffer.Buffer;
 import com.revolsys.jts.operation.union.UnaryUnionOp;
 import com.revolsys.jts.operation.valid.IsValidOp;
+import com.revolsys.util.Emptyable;
 
 /**
  * A representation of a planar, linear vector geometry.
@@ -165,7 +166,8 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  *
  *@version 1.7
  */
-public interface Geometry extends Cloneable, Comparable<Object>, Serializable, DataTypeProxy {
+public interface Geometry
+  extends Cloneable, Comparable<Object>, Emptyable, Serializable, DataTypeProxy {
   List<String> sortedGeometryTypes = Collections
     .unmodifiableList(Arrays.asList("Point", "MultiPoint", "LineString", "LinearRing",
       "MultiLineString", "Polygon", "MultiPolygon", "GeometryCollection"));
@@ -1009,14 +1011,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable, D
   boolean intersects(final Geometry geometry);
 
   boolean intersects(Point point);
-
-  /**
-   * Tests whether the set of points covered by this <code>Geometry</code> is
-   * empty.
-   *
-   *@return <code>true</code> if this <code>Geometry</code> does not cover any points
-   */
-  boolean isEmpty();
 
   boolean isRectangle();
 

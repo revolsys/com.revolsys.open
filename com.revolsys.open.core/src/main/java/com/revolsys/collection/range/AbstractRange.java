@@ -5,10 +5,11 @@ import java.util.List;
 
 import com.revolsys.data.equals.Equals;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Emptyable;
 import com.revolsys.util.Numbers;
 
 public abstract class AbstractRange<V>
-  implements Iterable<V>, Comparable<AbstractRange<? extends Object>> {
+  implements Iterable<V>, Emptyable, Comparable<AbstractRange<? extends Object>> {
 
   public static int compare(final Object value1, final Object value2) {
     if (value1 == null) {
@@ -127,8 +128,7 @@ public abstract class AbstractRange<V>
         return this;
       } else if (compareToValue(rangeFrom) > 0) {
         return createNew(from, rangeTo);
-      } else
-        if (Equals.equal(to, previous(rangeFrom)) || Equals.equal(to, rangeFrom)) {
+      } else if (Equals.equal(to, previous(rangeFrom)) || Equals.equal(to, rangeFrom)) {
         return createNew(from, rangeTo);
       }
     } else if (fromCompare > 0) {
@@ -136,8 +136,7 @@ public abstract class AbstractRange<V>
         return range;
       } else if (compareFromValue(rangeTo) < 0) {
         return createNew(rangeFrom, to);
-      } else
-        if (Equals.equal(previous(from), rangeTo) || Equals.equal(from, rangeTo)) {
+      } else if (Equals.equal(previous(from), rangeTo) || Equals.equal(from, rangeTo)) {
         return createNew(rangeFrom, to);
       }
     }
@@ -189,6 +188,11 @@ public abstract class AbstractRange<V>
     result = prime * result + getFrom().hashCode();
     result = prime * result + getTo().hashCode();
     return result;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return false;
   }
 
   @Override

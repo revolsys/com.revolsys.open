@@ -153,6 +153,11 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   @Override
+  public boolean isEmpty() {
+    return this.domain.isEmpty();
+  }
+
+  @Override
   public boolean isLoaded() {
     return true;
   }

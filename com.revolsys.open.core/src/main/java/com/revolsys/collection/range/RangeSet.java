@@ -11,9 +11,10 @@ import com.revolsys.collection.MultiIterator;
 import com.revolsys.data.equals.Equals;
 import com.revolsys.jts.geom.End;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Emptyable;
 import com.revolsys.util.Property;
 
-public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Cloneable {
+public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Emptyable, Cloneable {
 
   private static void addPart(final RangeSet set, final List<AbstractRange<?>> crossProductRanges,
     final String fromValue, final String rangeSpec, final int partStart, final int partEnd) {

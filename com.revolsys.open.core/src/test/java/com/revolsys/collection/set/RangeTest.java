@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import com.revolsys.collection.range.AbstractRange;
 import com.revolsys.collection.range.IntRange;
+import com.revolsys.collection.range.MinMax;
 import com.revolsys.collection.range.RangeInvalidException;
 import com.revolsys.collection.range.RangeSet;
 import com.revolsys.collection.range.Ranges;
@@ -40,10 +41,10 @@ public class RangeTest {
 
   }
 
-  private static void assertRange(final int from, final int to, final long... numbers) {
+  private static void assertRange(final int from, final int to, final int... numbers) {
     final IntRange range = new IntRange(from, to);
-    final List<Long> list = new ArrayList<>();
-    for (final long i : numbers) {
+    final List<Integer> list = new ArrayList<>();
+    for (final int i : numbers) {
       list.add(i);
     }
     Assert.assertEquals(list.size(), range.size());
@@ -58,8 +59,8 @@ public class RangeTest {
     }
     Assert.assertEquals(list, range.toList());
     int i = 0;
-    for (final long value : range) {
-      final long expectedValue = list.get(i);
+    for (final int value : range) {
+      final int expectedValue = list.get(i);
       if (value != expectedValue) {
         Assert.fail("range(" + i + ") " + value + "!=" + expectedValue);
       }
@@ -345,4 +346,5 @@ public class RangeTest {
 
     assertRangeSetCreate("A~D+01~10", "A~D+01~10");
   }
+
 }

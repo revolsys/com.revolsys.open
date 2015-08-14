@@ -9,8 +9,9 @@ import javax.measure.unit.Unit;
 import com.revolsys.data.record.Record;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.util.Emptyable;
 
-public interface BoundingBox {
+public interface BoundingBox extends Emptyable {
 
   BoundingBox EMPTY = new BoundingBoxDoubleGf();
 
@@ -236,8 +237,6 @@ public interface BoundingBox {
    *@return        <code>true</code> if the point overlaps this <code>BoundingBox</code>
    */
   boolean intersects(Point p);
-
-  boolean isEmpty();
 
   boolean isWithinDistance(BoundingBox boundingBox, double maxDistance);
 

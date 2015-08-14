@@ -84,7 +84,7 @@ public class Ranges {
           + toValue + " (" + Classes.className(toValue.getClass()) + ")");
       }
     } else if (fromValue instanceof Integer) {
-      final long fromInt = (Integer)fromValue;
+      final int fromInt = (Integer)fromValue;
       if (toValue instanceof Long) {
         final long toLong = (Long)toValue;
         if (fromInt != 0 && from.toString().charAt(0) == '0'
@@ -94,7 +94,7 @@ public class Ranges {
           return create(fromInt, toLong);
         }
       } else if (toValue instanceof Integer) {
-        final long toInt = (Integer)toValue;
+        final int toInt = (Integer)toValue;
         if (fromInt != 0 && from.toString().charAt(0) == '0'
           || toInt != 0 && to.toString().charAt(0) == '0') {
           return new LongPaddedRange(fromInt, toInt);
@@ -187,7 +187,12 @@ public class Ranges {
         }
         return value;
       } else {
-        return longValue;
+        final int intValue = longValue.intValue();
+        if (intValue == longValue) {
+          return intValue;
+        } else {
+          return longValue;
+        }
       }
     } else {
       return null;

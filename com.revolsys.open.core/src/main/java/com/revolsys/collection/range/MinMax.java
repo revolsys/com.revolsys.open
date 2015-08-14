@@ -1,26 +1,30 @@
 package com.revolsys.collection.range;
 
+import com.revolsys.util.Emptyable;
 import com.revolsys.util.Numbers;
+import com.revolsys.util.Parity;
+import com.revolsys.util.Property;
 
-public class MinMax {
-  private int min = Integer.MAX_VALUE;
-
-  private int max = Integer.MIN_VALUE;
+public class MinMax extends IntRange implements Emptyable {
 
   public MinMax() {
+    setFrom(Integer.MAX_VALUE);
+    setTo(Integer.MIN_VALUE);
   }
 
   public MinMax(final int number) {
-    add(number);
+    super(number, number);
   }
 
   public MinMax(final int... numbers) {
+    this();
     for (final int number : numbers) {
       add(number);
     }
   }
 
   public MinMax(final int min, final int max) {
+    this();
     add(min);
     add(max);
   }
@@ -32,12 +36,12 @@ public class MinMax {
    */
   public boolean add(final int number) {
     boolean updated = false;
-    if (number < this.min) {
-      this.min = number;
+    if (number < getMin()) {
+      setFrom(number);
       updated = true;
     }
-    if (number > this.max) {
-      this.max = number;
+    if (number > getMax()) {
+      setTo(number);
       updated = true;
     }
     return updated;
@@ -52,36 +56,143 @@ public class MinMax {
   }
 
   public void clear() {
-    this.min = Integer.MAX_VALUE;
-    this.max = Integer.MIN_VALUE;
+    setFrom(Integer.MAX_VALUE);
+
+    setTo(Integer.MIN_VALUE);
+  }
+
+  public MinMax clip(int min, int max) {
+    if (min > max) {
+      return clip(max, min);
+    } else {
+      if (min > getMax() || getMin() > max) {
+        return new MinMax();
+      } else {
+        if (min < getMin()) {
+          min = getMin();
+        }
+        if (max > getMax()) {
+          max = getMax();
+        }
+        return new MinMax(min, max);
+      }
+    }
+  }
+
+  public MinMax clip(final MinMax minMax) {
+    if (isEmpty() || minMax.isEmpty()) {
+      return new MinMax();
+    } else {
+      final int min = minMax.getMin();
+      final int max = minMax.getMax();
+      return clip(min, max);
+    }
+  }
+
+  public MinMax clip(MinMax minMax, final Parity parity) {
+    minMax = clip(minMax);
+    if (Property.hasValue(minMax)) {
+      Boolean even = null;
+      if (Parity.isEven(parity)) {
+        even = true;
+      } else if (Parity.isOdd(parity)) {
+        even = false;
+      }
+      if (even != null) {
+        boolean changed = false;
+        int min = minMax.getMin();
+        int max = minMax.getMax();
+        if (Numbers.isEven(min) != even) {
+          min = min + 1;
+          changed = true;
+        }
+        if (Numbers.isEven(max) != even) {
+          max = max - 1;
+          changed = true;
+        }
+        if (changed) {
+          if (min > max) {
+            return new MinMax();
+          } else {
+            minMax = new MinMax(min, max);
+          }
+        }
+      }
+    }
+    return minMax;
   }
 
   public boolean contains(final int number) {
-    return number >= this.min && number <= this.max;
+    return number >= getMin() && number <= getMax();
   }
 
   public boolean contains(final int min, final int max) {
     if (min > max) {
       return contains(max, min);
     } else {
-      return min >= this.min && max <= this.max;
+      return min >= getMin() && max <= getMax();
     }
   }
 
+  public boolean contains(final MinMax minMax) {
+    if (isEmpty() || !Property.hasValue(minMax)) {
+      return false;
+    } else {
+      final int min = minMax.getMin();
+      final int max = minMax.getMax();
+      return contains(min, max);
+    }
+  }
+
+  @Override
+  public boolean equals(final Object object) {
+    if (object == this) {
+      return true;
+    } else if (object instanceof MinMax) {
+      final MinMax minMax = (MinMax)object;
+      if (getMin() == minMax.getMin()) {
+        if (getMax() == minMax.getMax()) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   public int getMax() {
-    return this.max;
+    return getTo();
   }
 
   public int getMin() {
-    return this.min;
+    return getFrom();
   }
 
+  @Override
+  public int hashCode() {
+    if (isEmpty()) {
+      return Integer.MAX_VALUE;
+    } else {
+      return 31 * getMin() + getMax();
+    }
+  }
+
+  @Override
   public boolean isEmpty() {
-    return this.min == Integer.MAX_VALUE;
+    return getMin() == Integer.MAX_VALUE;
   }
 
   public boolean overlaps(final int min, final int max) {
-    return Numbers.overlaps(min, max, this.min, this.max);
+    return Numbers.overlaps(getMin(), getMax(), min, max);
+  }
+
+  public boolean overlaps(final MinMax minMax) {
+    if (isEmpty() || !Property.hasValue(minMax)) {
+      return false;
+    } else {
+      final int min = minMax.getMin();
+      final int max = minMax.getMax();
+      return overlaps(min, max);
+    }
   }
 
   @Override
@@ -89,7 +200,7 @@ public class MinMax {
     if (isEmpty()) {
       return "EMPTY";
     } else {
-      return this.min + "-" + this.max;
+      return getMin() + "-" + getMax();
     }
   }
 }

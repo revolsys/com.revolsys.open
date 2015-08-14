@@ -11,6 +11,9 @@ public class IntRange extends AbstractRange<Integer> {
 
   private int to;
 
+  public IntRange() {
+  }
+
   public IntRange(final int value) {
     this(value, value);
   }
@@ -86,6 +89,14 @@ public class IntRange extends AbstractRange<Integer> {
         }
       }
     }
+  }
+
+  protected void setFrom(final int from) {
+    this.from = from;
+  }
+
+  protected void setTo(final int to) {
+    this.to = to;
   }
 
   @Override

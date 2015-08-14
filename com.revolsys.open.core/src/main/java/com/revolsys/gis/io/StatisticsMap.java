@@ -16,8 +16,9 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.tsv.Tsv;
 import com.revolsys.format.tsv.TsvWriter;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Emptyable;
 
-public class StatisticsMap {
+public class StatisticsMap implements Emptyable {
   private final Map<String, Statistics> statisticsMap = new TreeMap<>();
 
   private int providerCount = 0;
@@ -148,6 +149,7 @@ public class StatisticsMap {
     return this.statisticsMap.keySet();
   }
 
+  @Override
   public boolean isEmpty() {
     return this.statisticsMap.isEmpty();
   }

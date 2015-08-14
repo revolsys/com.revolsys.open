@@ -29,7 +29,6 @@ import com.revolsys.beans.WeakPropertyChangeListener;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.Equals;
 import com.revolsys.data.record.Record;
-import com.revolsys.jts.geom.Geometry;
 import com.revolsys.properties.ObjectWithProperties;
 
 public final class Property {
@@ -348,6 +347,14 @@ public final class Property {
     }
   }
 
+  public static boolean hasValue(final Emptyable value) {
+    if (value == null) {
+      return false;
+    } else {
+      return !value.isEmpty();
+    }
+  }
+
   public static boolean hasValue(final Object value) {
     if (value == null) {
       return false;
@@ -360,9 +367,9 @@ public final class Property {
     } else if (value instanceof Map<?, ?>) {
       final Map<?, ?> map = (Map<?, ?>)value;
       return !map.isEmpty();
-    } else if (value instanceof Geometry) {
-      final Geometry geometry = (Geometry)value;
-      return !geometry.isEmpty();
+    } else if (value instanceof Emptyable) {
+      final Emptyable emptyable = (Emptyable)value;
+      return !emptyable.isEmpty();
     } else {
       return true;
     }

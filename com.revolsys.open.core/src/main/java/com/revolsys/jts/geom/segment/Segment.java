@@ -24,12 +24,6 @@ public interface Segment extends LineSegment, Iterator<Segment>, GeometryCompone
 
   int getSegmentIndex();
 
-  @Override
-  int getSrid();
-
-  @Override
-  boolean isEmpty();
-
   boolean isLineClosed();
 
   boolean isLineEnd();

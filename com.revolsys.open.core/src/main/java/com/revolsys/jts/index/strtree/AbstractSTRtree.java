@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import com.revolsys.jts.util.Assert;
+import com.revolsys.util.Emptyable;
 import com.revolsys.util.ExitLoopException;
 
 /**
@@ -58,7 +59,7 @@ import com.revolsys.util.ExitLoopException;
  *
  * @version 1.7
  */
-public abstract class AbstractSTRtree implements Serializable {
+public abstract class AbstractSTRtree implements Emptyable, Serializable {
 
   /**
    * A test for intersection between two bounds, necessary because subclasses

@@ -38,6 +38,7 @@ import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.util.Emptyable;
 
 /**
  * An implementation of a 2-D KD-Tree. KD-trees provide fast range searching on
@@ -51,7 +52,7 @@ import com.revolsys.jts.geom.Point;
  * @author David Skea
  * @author Martin Davis
  */
-public class KdTree {
+public class KdTree implements Emptyable {
   private KdNode root = null;
 
   private final KdNode last = null;
