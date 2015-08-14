@@ -5,7 +5,7 @@ import com.revolsys.util.Numbers;
 import com.revolsys.util.Parity;
 import com.revolsys.util.Property;
 
-public class MinMax extends IntRange implements Emptyable {
+public class MinMax extends IntRange implements Cloneable, Emptyable {
 
   public MinMax() {
     setFrom(Integer.MAX_VALUE);
@@ -45,6 +45,16 @@ public class MinMax extends IntRange implements Emptyable {
       updated = true;
     }
     return updated;
+  }
+
+  public void add(final MinMax minMax) {
+    if (!minMax.isEmpty()) {
+      final int min = minMax.getMin();
+      add(min);
+
+      final int max = minMax.getMax();
+      add(max);
+    }
   }
 
   public boolean add(final Number number) {
@@ -91,35 +101,18 @@ public class MinMax extends IntRange implements Emptyable {
 
   public MinMax clip(MinMax minMax, final Parity parity) {
     minMax = clip(minMax);
-    if (Property.hasValue(minMax)) {
-      Boolean even = null;
-      if (Parity.isEven(parity)) {
-        even = true;
-      } else if (Parity.isOdd(parity)) {
-        even = false;
-      }
-      if (even != null) {
-        boolean changed = false;
-        int min = minMax.getMin();
-        int max = minMax.getMax();
-        if (Numbers.isEven(min) != even) {
-          min = min + 1;
-          changed = true;
-        }
-        if (Numbers.isEven(max) != even) {
-          max = max - 1;
-          changed = true;
-        }
-        if (changed) {
-          if (min > max) {
-            return new MinMax();
-          } else {
-            minMax = new MinMax(min, max);
-          }
-        }
-      }
+    return minMax.convert(parity);
+  }
+
+  @Override
+  public MinMax clone() {
+    if (isEmpty()) {
+      return new MinMax();
+    } else {
+      int min = getMin();
+      int max = getMax();
+      return new MinMax(min, max);
     }
-    return minMax;
   }
 
   public boolean contains(final int number) {
@@ -141,6 +134,40 @@ public class MinMax extends IntRange implements Emptyable {
       final int min = minMax.getMin();
       final int max = minMax.getMax();
       return contains(min, max);
+    }
+  }
+
+  public MinMax convert(final Parity parity) {
+    if (isEmpty()) {
+      return this;
+    } else {
+      Boolean even = null;
+      if (Parity.isEven(parity)) {
+        even = true;
+      } else if (Parity.isOdd(parity)) {
+        even = false;
+      }
+      if (even != null) {
+        boolean changed = false;
+        int min = getMin();
+        int max = getMax();
+        if (Numbers.isEven(min) != even) {
+          min = min + 1;
+          changed = true;
+        }
+        if (Numbers.isEven(max) != even) {
+          max = max - 1;
+          changed = true;
+        }
+        if (changed) {
+          if (min > max) {
+            return new MinMax();
+          } else {
+            return new MinMax(min, max);
+          }
+        }
+      }
+      return this;
     }
   }
 
