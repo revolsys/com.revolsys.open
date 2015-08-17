@@ -54,7 +54,7 @@ import com.revolsys.jts.geom.LineString;
  *
  *@version 1.7
  */
-public class LineStringDoubleGf extends AbstractLineString implements LineString {
+public class LineStringDoubleGf extends AbstractLineString {
 
   private static final long serialVersionUID = 3110669828065365560L;
 
@@ -283,10 +283,10 @@ public class LineStringDoubleGf extends AbstractLineString implements LineString
       if (axisIndex < 0 || axisIndex >= axisCount) {
         return Double.NaN;
       } else {
-        final int numPoints = getVertexCount();
-        if (vertexIndex < numPoints) {
+        final int vertexCount = getVertexCount();
+        if (vertexIndex < vertexCount) {
           while (vertexIndex < 0) {
-            vertexIndex += numPoints;
+            vertexIndex += vertexCount;
           }
           return this.coordinates[vertexIndex * axisCount + axisIndex];
         } else {

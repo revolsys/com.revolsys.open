@@ -168,6 +168,7 @@ import com.revolsys.util.Emptyable;
  */
 public interface Geometry
   extends Cloneable, Comparable<Object>, Emptyable, Serializable, DataTypeProxy {
+
   List<String> sortedGeometryTypes = Collections
     .unmodifiableList(Arrays.asList("Point", "MultiPoint", "LineString", "LinearRing",
       "MultiLineString", "Polygon", "MultiPolygon", "GeometryCollection"));

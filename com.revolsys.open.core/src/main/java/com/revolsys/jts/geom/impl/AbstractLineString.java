@@ -390,67 +390,6 @@ public abstract class AbstractLineString extends AbstractGeometry implements Lin
     return true;
   }
 
-  @Override
-  public boolean equalsVertex(final int vertexIndex, final double... coordinates) {
-    for (int axisIndex = 0; axisIndex < coordinates.length; axisIndex++) {
-      final double coordinate = coordinates[axisIndex];
-      final double matchCoordinate = getCoordinate(vertexIndex, axisIndex);
-      if (!NumberEquals.equal(coordinate, matchCoordinate)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public boolean equalsVertex(final int axisCount, final int vertexIndex1, final int vertexIndex2) {
-    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      final double coordinate1 = getCoordinate(vertexIndex1, axisIndex);
-      final double coordinate2 = getCoordinate(vertexIndex2, axisIndex);
-      if (!NumberEquals.equal(coordinate1, coordinate2)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public boolean equalsVertex(final int axisCount, final int vertexIndex, final LineString line2,
-    final int vertexIndex2) {
-    if (line2.isEmpty()) {
-      return false;
-    } else {
-      final Vertex vertex2 = line2.getVertex(vertexIndex2);
-      return equalsVertex(axisCount, vertexIndex, vertex2);
-    }
-  }
-
-  @Override
-  public boolean equalsVertex(final int axisCount, final int vertexIndex, Point point) {
-    point = point.convert(getGeometryFactory(), axisCount);
-    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      final double coordinate = point.getCoordinate(axisIndex);
-      final double matchCoordinate = getCoordinate(vertexIndex, axisIndex);
-      if (!NumberEquals.equal(coordinate, matchCoordinate)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public boolean equalsVertex(final int vertexIndex, Point point) {
-    point = point.convert(getGeometryFactory());
-    for (int axisIndex = 0; axisIndex < point.getAxisCount(); axisIndex++) {
-      final double coordinate = point.getCoordinate(axisIndex);
-      final double matchCoordinate = getCoordinate(vertexIndex, axisIndex);
-      if (!NumberEquals.equal(coordinate, matchCoordinate)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   /**
    * Gets the boundary of this geometry. The boundary of a lineal geometry is
    * always a zero-dimensional geometry (which may be empty).
@@ -530,15 +469,6 @@ public abstract class AbstractLineString extends AbstractGeometry implements Lin
     return 1;
   }
 
-  @Override
-  public Point getFromPoint() {
-    if (isEmpty()) {
-      return null;
-    } else {
-      return getPoint(0);
-    }
-  }
-
   /**
    * Returns the length of this <code>LineString</code>
    *
@@ -585,28 +515,6 @@ public abstract class AbstractLineString extends AbstractGeometry implements Lin
   }
 
   @Override
-  public final Point getPoint(int vertexIndex) {
-    if (isEmpty()) {
-      return null;
-    } else {
-      while (vertexIndex < 0) {
-        vertexIndex += getVertexCount();
-      }
-      if (vertexIndex > getVertexCount()) {
-        return null;
-      } else {
-        final int axisCount = getAxisCount();
-        final double[] coordinates = new double[axisCount];
-        for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-          coordinates[axisIndex] = getCoordinate(vertexIndex, axisIndex);
-        }
-        final GeometryFactory geometryFactory = getGeometryFactory();
-        return geometryFactory.point(coordinates);
-      }
-    }
-  }
-
-  @Override
   public Point getPointWithin() {
     if (isEmpty()) {
       return null;
@@ -637,14 +545,6 @@ public abstract class AbstractLineString extends AbstractGeometry implements Lin
     } else {
       return getVertexCount() - 1;
     }
-  }
-
-  @Override
-  public Point getToPoint() {
-    if (isEmpty()) {
-      return null;
-    }
-    return getPoint(getVertexCount() - 1);
   }
 
   @Override

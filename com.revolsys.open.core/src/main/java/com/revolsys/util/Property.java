@@ -449,12 +449,37 @@ public final class Property {
     }
   }
 
+  public static boolean isEmpty(final Emptyable value) {
+    if (value == null) {
+      return true;
+    } else {
+      return value.isEmpty();
+    }
+  }
+
   public static boolean isEmpty(final Object value) {
     if (value == null) {
       return true;
     } else if (value instanceof CharSequence) {
-      final CharSequence charSequence = (CharSequence)value;
-      return !Property.hasValue(charSequence);
+      final CharSequence string = (CharSequence)value;
+      return !hasText(string);
+    } else if (value instanceof Collection<?>) {
+      final Collection<?> collection = (Collection<?>)value;
+      return collection.isEmpty();
+    } else if (value instanceof Map<?, ?>) {
+      final Map<?, ?> map = (Map<?, ?>)value;
+      return map.isEmpty();
+    } else if (value instanceof Emptyable) {
+      final Emptyable emptyable = (Emptyable)value;
+      return emptyable.isEmpty();
+    } else {
+      return true;
+    }
+  }
+
+  public static boolean isEmpty(final Object[] value) {
+    if (value == null || value.length == 0) {
+      return true;
     } else {
       return false;
     }

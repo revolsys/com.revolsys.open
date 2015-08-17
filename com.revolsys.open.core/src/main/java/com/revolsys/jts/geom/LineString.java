@@ -34,9 +34,12 @@ package com.revolsys.jts.geom;
 
 import java.util.List;
 
+import com.revolsys.data.equals.NumberEquals;
 import com.revolsys.jts.geom.metrics.PointLineStringMetrics;
 import com.revolsys.jts.geom.segment.LineSegmentDouble;
 import com.revolsys.jts.geom.segment.Segment;
+import com.revolsys.jts.geom.vertex.Vertex;
+import com.revolsys.util.Property;
 
 /**
  *  Models an OGC-style <code>LineString</code>.
@@ -57,12 +60,10 @@ import com.revolsys.jts.geom.segment.Segment;
  */
 public interface LineString extends Lineal {
   /**
-   * Creates and returns a full copy of this {@link LineString} object.
-   * (including all coordinates contained by it).
+   * Creates and returns a full copy of this {@link LineString}.
    *
    * @return a clone of this instance
    */
-
   @Override
   LineString clone();
 
@@ -123,16 +124,72 @@ public interface LineString extends Lineal {
 
   boolean equals(int axisIndex, int vertexIndex, Point point);
 
-  boolean equalsVertex(final int vertexIndex, final double... coordinates);
+  default boolean equalsVertex(final int vertexIndex, final double... coordinates) {
+    if (isEmpty() || coordinates == null || coordinates.length < 2) {
+      return false;
+    } else {
+      for (int axisIndex = 0; axisIndex < coordinates.length; axisIndex++) {
+        final double coordinate = coordinates[axisIndex];
+        final double matchCoordinate = getCoordinate(vertexIndex, axisIndex);
+        if (!NumberEquals.equal(coordinate, matchCoordinate)) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
 
-  boolean equalsVertex(int axisCount, final int vertexIndex1, final int vertexIndex2);
+  default boolean equalsVertex(final int axisCount, final int vertexIndex1,
+    final int vertexIndex2) {
+    if (isEmpty()) {
+      return false;
+    } else {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        final double coordinate1 = getCoordinate(vertexIndex1, axisIndex);
+        final double coordinate2 = getCoordinate(vertexIndex2, axisIndex);
+        if (!NumberEquals.equal(coordinate1, coordinate2)) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
 
-  boolean equalsVertex(int axisCount, final int vertexIndex, final LineString line2,
-    int vertexIndex2);
+  default boolean equalsVertex(final int axisCount, final int vertexIndex, final LineString line2,
+    final int vertexIndex2) {
+    if (Property.isEmpty(line2)) {
+      return false;
+    } else {
+      final Vertex vertex2 = line2.getVertex(vertexIndex2);
+      return equalsVertex(axisCount, vertexIndex, vertex2);
+    }
+  }
 
-  boolean equalsVertex(int axisCount, final int vertexIndex, final Point point);
+  default boolean equalsVertex(final int axisCount, final int vertexIndex, Point point) {
+    if (isEmpty() || Property.isEmpty(point)) {
+      return false;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      point = point.convert(geometryFactory, axisCount);
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        final double coordinate = point.getCoordinate(axisIndex);
+        final double matchCoordinate = getCoordinate(vertexIndex, axisIndex);
+        if (!NumberEquals.equal(coordinate, matchCoordinate)) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
 
-  boolean equalsVertex(final int vertexIndex, final Point point);
+  default boolean equalsVertex(final int vertexIndex, final Point point) {
+    if (Property.isEmpty(point)) {
+      return false;
+    } else {
+      final int axisCount = point.getAxisCount();
+      return equalsVertex(axisCount, vertexIndex, point);
+    }
+  }
 
   double getCoordinate(int vertexIndex, final int axisIndex);
 
@@ -144,7 +201,13 @@ public interface LineString extends Lineal {
 
   LineString getCoordinatesList();
 
-  Point getFromPoint();
+  default Point getFromPoint() {
+    if (isEmpty()) {
+      return null;
+    } else {
+      return getPoint(0);
+    }
+  }
 
   double getM(int vertexIndex);
 
@@ -213,13 +276,32 @@ public interface LineString extends Lineal {
     }
   }
 
-  Point getPoint(final int vertexIndex);
-
   default Point getPoint(final End lineEnd) {
     if (End.isFrom(lineEnd)) {
       return getFromPoint();
     } else {
       return getToPoint();
+    }
+  }
+
+  default Point getPoint(int vertexIndex) {
+    if (isEmpty()) {
+      return null;
+    } else {
+      while (vertexIndex < 0) {
+        vertexIndex += getVertexCount();
+      }
+      if (vertexIndex > getVertexCount()) {
+        return null;
+      } else {
+        final int axisCount = getAxisCount();
+        final double[] coordinates = new double[axisCount];
+        for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+          coordinates[axisIndex] = getCoordinate(vertexIndex, axisIndex);
+        }
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return geometryFactory.point(coordinates);
+      }
     }
   }
 
@@ -265,7 +347,14 @@ public interface LineString extends Lineal {
     return side;
   }
 
-  Point getToPoint();
+  default Point getToPoint() {
+    if (isEmpty()) {
+      return null;
+    } else {
+      final int vertexCount = getVertexCount();
+      return getPoint(vertexCount - 1);
+    }
+  }
 
   double getX(int vertexIndex);
 
@@ -345,4 +434,66 @@ public interface LineString extends Lineal {
 
   LineString subLine(final Point fromPoint, final int fromVertexIndex, int vertexCount,
     final Point toPoint);
+
+  /**
+   * Get the end of this line that touches an end of the other line. If the lines don't touch at
+   * the ends then null will be returned.
+   *
+   * @return The end that touches.
+   */
+  default End touchingEnd(final LineString line) {
+    if (isEmpty() || Property.isEmpty(line)) {
+      return null;
+    } else {
+      for (final End end : End.VALUES) {
+        final Point point = line.getPoint(end);
+        final End touchingEnd = touchingEnd(point);
+        if (touchingEnd != null) {
+          return touchingEnd;
+        }
+      }
+      return null;
+    }
+  }
+
+  /**
+   * Get the end of this line that touches the other point. If the point and line don't touch at
+   * the end then null will be returned.
+   *
+   * @return The end that touches.
+   */
+  default End touchingEnd(final Point point) {
+    if (isEmpty() || Property.isEmpty(point)) {
+      return null;
+    } else if (equalsVertex(0, point)) {
+      return End.FROM;
+    } else if (equalsVertex(-1, point)) {
+      return End.TO;
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Get the end of this line that touches an end of the other line. If the lines don't touch at
+   * the ends then null will be returned.
+   *
+   * @return An array with the end of this line and then end of the other that touches, or null if they don't touch.
+   */
+  default End[] touchingEnds(final LineString line) {
+    if (isEmpty() || Property.isEmpty(line)) {
+      return null;
+    } else {
+      for (final End end : End.VALUES) {
+        final Point point = line.getPoint(end);
+        final End touchingEnd = touchingEnd(point);
+        if (touchingEnd != null) {
+          return new End[] {
+            touchingEnd, end
+          };
+        }
+      }
+      return null;
+    }
+  }
 }
