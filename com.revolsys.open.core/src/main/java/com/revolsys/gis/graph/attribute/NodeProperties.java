@@ -73,7 +73,7 @@ public class NodeProperties {
         Map<String, Set<Edge<T>>> edgesByType = edgesByTypeForLine(lineEdgeMap, line);
         if (edgesByType == null) {
           edgesByType = new HashMap<String, Set<Edge<T>>>();
-          if (!edge.isForwards(node)) {
+          if (edge.getEnd(node).isTo()) {
             line = line.reverse();
           }
           lineEdgeMap.put(line, edgesByType);

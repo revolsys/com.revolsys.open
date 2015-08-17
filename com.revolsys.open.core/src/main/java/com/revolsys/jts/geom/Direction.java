@@ -42,4 +42,12 @@ public enum Direction {
       return FORWARDS;
     }
   }
+
+  public boolean isOpposite(Direction direction) {
+    if (direction == null) {
+      return false;
+    } else {
+      return isForwards() !=direction.isForwards();
+    }
+  }
 }

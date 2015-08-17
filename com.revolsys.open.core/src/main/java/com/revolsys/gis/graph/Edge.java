@@ -22,10 +22,11 @@ import com.revolsys.gis.algorithm.linematch.LineSegmentMatch;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Direction;
+import com.revolsys.jts.geom.End;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.properties.ObjectWithProperties;
+import com.revolsys.util.Property;
 
 public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Externalizable {
 
@@ -57,7 +58,7 @@ public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Exter
       }
     }
     final HashSet<Edge<T>> edges = new HashSet<Edge<T>>();
-    if (edge.isForwards(node)) {
+    if (edge.getEnd(node).isFrom()) {
       line = line.reverse();
     }
     edges.add(edge);
@@ -303,26 +304,6 @@ public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Exter
     return nodes1;
   }
 
-  /**
-   * Get the direction of the edge from the specified node. If the node is at
-   * the start of the edge then return true. If the node is at the end of the
-   * edge return false. Otherwise an exception is thrown.
-   *
-   * @param node The node to test the direction from.
-   * @return True if the node is at the start of the edge.
-   */
-  public Direction getDirection(final Node<T> node) {
-    if (node.getGraph() == this.graph) {
-      final int nodeId = node.getId();
-      if (this.fromNodeId == nodeId) {
-        return Direction.FORWARDS;
-      } else if (this.toNodeId == nodeId) {
-        return Direction.BACKWARDS;
-      }
-    }
-    throw new IllegalArgumentException("Node " + node + " is not part of the edge.");
-  }
-
   public List<Edge<T>> getEdgesToNextJunctionNode(final Node<T> node) {
     final List<Edge<T>> edges = new ArrayList<Edge<T>>();
     edges.add(this);
@@ -339,6 +320,25 @@ public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Exter
       }
     }
     return edges;
+  }
+
+  /**
+   * Get the direction of the edge from the specified node. If the node is at
+   * the start of the edge then return {@link End#FROM}. If the node is at the end of the
+   * edge return {@link End#TO}. Otherwise return null if it's not at the node.
+   *
+   * @param node The node to test the direction from.
+   * @return True if the node is at the start of the edge.
+   */
+  public End getEnd(final Point point) {
+    if (Property.hasValue(point)) {
+      if (point.equals(getFromNode())) {
+        return End.FROM;
+      } else if (point.equals(getToNode())) {
+        return End.TO;
+      }
+    }
+    return null;
   }
 
   public com.revolsys.jts.geom.BoundingBox getEnvelope() {
@@ -477,26 +477,6 @@ public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Exter
     }
     return false;
 
-  }
-
-  /**
-   * Get the direction of the edge from the specified node. If the node is at
-   * the start of the edge then return true. If the node is at the end of the
-   * edge return false. Otherwise an exception is thrown.
-   *
-   * @param node The node to test the direction from.
-   * @return True if the node is at the start of the edge.
-   */
-  public boolean isForwards(final Node<T> node) {
-    if (node.getGraph() == this.graph) {
-      final int nodeId = node.getId();
-      if (this.fromNodeId == nodeId) {
-        return true;
-      } else if (this.toNodeId == nodeId) {
-        return false;
-      }
-    }
-    throw new IllegalArgumentException("Node " + node + " is not part of the edge.");
   }
 
   public boolean isLessThanDistance(final Node<T> node, final double distance) {

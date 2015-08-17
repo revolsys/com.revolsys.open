@@ -12,6 +12,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.RecordGraph;
+import com.revolsys.jts.geom.End;
 
 public class PolygonNodeRemovalVisitor implements Consumer<Node<Record>> {
 
@@ -35,10 +36,12 @@ public class PolygonNodeRemovalVisitor implements Consumer<Node<Record>> {
       final Edge<Record> edge = edges.iterator().next();
       final Record object = edge.getObject();
       final Set<Edge<Record>> matchedEdges = new HashSet<Edge<Record>>();
+      final End end = edge.getEnd(node);
       for (final Edge<Record> matchEdge : edges) {
         final Record matchObject = matchEdge.getObject();
         if (edge != matchEdge) {
-          if (edge.isForwards(node) != matchEdge.isForwards(node)) {
+          final End matchEnd = matchEdge.getEnd(node);
+          if (end != matchEnd) {
             if (EqualsInstance.INSTANCE.equals(object, matchObject, this.excludedAttributes)) {
               matchedEdges.add(matchEdge);
             }
@@ -47,7 +50,7 @@ public class PolygonNodeRemovalVisitor implements Consumer<Node<Record>> {
       }
       if (matchedEdges.size() == 1) {
         final Edge<Record> matchedEdge = matchedEdges.iterator().next();
-        if (edge.isForwards(node)) {
+        if (end.isFrom()) {
           this.graph.merge(node, matchedEdge, edge);
         } else {
           this.graph.merge(node, edge, matchedEdge);

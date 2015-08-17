@@ -83,7 +83,7 @@ public class PseudoNodeAttribute {
             final Edge<Record> edge2 = edges2.iterator().next();
             final EdgePair<Record> edgePair = createEdgePair(node, edge1, edge2);
             if (edgePair != null) {
-              if (edge1.isForwards(node) == edge2.isForwards(node)) {
+              if (edge1.getEnd(node) == edge2.getEnd(node)) {
                 this.reversedEdgePairs.add(edgePair);
               } else {
                 this.edgePairs.add(edgePair);
@@ -122,7 +122,7 @@ public class PseudoNodeAttribute {
       while (!matched && edgeIter2.hasNext()) {
         final Edge<Record> edge2 = edgeIter2.next();
         boolean match = false;
-        if (edge1.isForwards(node) == edge2.isForwards(node)) {
+        if (edge1.getEnd(node) == edge2.getEnd(node)) {
           match = reversed;
         } else {
           match = !reversed;

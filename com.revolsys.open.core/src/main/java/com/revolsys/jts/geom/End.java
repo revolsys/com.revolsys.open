@@ -9,6 +9,16 @@ public enum End {
 
   public static List<End> VALUES = Lists.array(FROM, TO);
 
+  public static End getFrom(final Direction direction) {
+    if (direction == null) {
+      return null;
+    } else if (direction.isForwards()) {
+      return FROM;
+    } else {
+      return TO;
+    }
+  }
+
   public static boolean isFrom(final End end) {
     return end == FROM;
   }
@@ -29,6 +39,14 @@ public enum End {
 
   public boolean isFrom() {
     return this == FROM;
+  }
+
+  public boolean isOpposite(final End end) {
+    if (end == null) {
+      return false;
+    } else {
+      return isFrom() != end.isFrom();
+    }
   }
 
   public boolean isTo() {

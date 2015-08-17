@@ -507,7 +507,7 @@ public class Node<T> extends AbstractPoint implements ObjectWithProperties, Exte
           if (!edge.isRemoved()) {
             final LineString line = edge.getLine();
             LineString newLine;
-            if (edge.isForwards(this)) {
+            if (edge.getEnd(this).isFrom()) {
               newLine = line.subLine(newNode, 1, line.getVertexCount() - 1, null);
             } else {
               newLine = line.subLine(null, 0, line.getVertexCount() - 1, newNode);
