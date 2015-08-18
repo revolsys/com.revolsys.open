@@ -586,7 +586,8 @@ public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Exter
       sb.append(toNode.getX());
       sb.append(" ");
       sb.append(toNode.getY());
-      sb.append(")");
+      sb.append(")\n");
+      sb.append(getObject());
     }
     return sb.toString();
   }
