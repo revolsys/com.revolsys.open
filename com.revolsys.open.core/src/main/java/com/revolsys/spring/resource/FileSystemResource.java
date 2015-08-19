@@ -158,6 +158,16 @@ public class FileSystemResource extends AbstractResource {
     return new FileOutputStream(this.file);
   }
 
+  @Override
+  public Resource getParent() {
+    final File parentFile = getFile().getParentFile();
+    if (parentFile == null) {
+      return null;
+    } else {
+      return new FileSystemResource(this.file);
+    }
+  }
+
   /**
    * Return the file path for this resource.
    */

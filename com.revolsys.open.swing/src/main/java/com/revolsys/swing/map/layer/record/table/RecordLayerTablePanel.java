@@ -188,60 +188,9 @@ public class RecordLayerTablePanel extends TablePanel
     }
     toolBar.addComponent("count", new TableRowCount(this.tableModel));
 
-    toolBar.addButtonTitleIcon("table", "Refresh", "table_refresh", this, "refresh");
+    toolBar.addButtonTitleIcon("table", "Refresh", "table_refresh", () -> refresh());
+    toolBar.addButtonTitleIcon("table", "Export Records", "table_save", () -> exportRecords());
 
-    toolBar.addButtonTitleIcon("table", "Export Records", "table_save", () -> {
-      final JFileChooser fileChooser = SwingUtil.createFileChooser("Export Records",
-        "com.revolsys.swing.map.table.export", "directory");
-      final String defaultFileExtension = PreferencesUtil
-        .getUserString("com.revolsys.swing.map.table.export", "fileExtension", "tsv");
-
-      final List<FileNameExtensionFilter> recordFileFilters = new ArrayList<>();
-      for (final RecordWriterFactory factory : IoFactoryRegistry.getInstance()
-        .getFactories(RecordWriterFactory.class)) {
-        if (recordDefinition.hasGeometryField() || factory.isCustomFieldsSupported()) {
-          recordFileFilters.add(AddFileLayerAction.createFilter(factory));
-        }
-      }
-      AddFileLayerAction.sortFilters(recordFileFilters);
-
-      fileChooser.setAcceptAllFileFilterUsed(false);
-      fileChooser.setSelectedFile(new File(fileChooser.getCurrentDirectory(), layer.getName()));
-      for (final FileNameExtensionFilter fileFilter : recordFileFilters) {
-        fileChooser.addChoosableFileFilter(fileFilter);
-        if (Arrays.asList(fileFilter.getExtensions()).contains(defaultFileExtension)) {
-          fileChooser.setFileFilter(fileFilter);
-        }
-      }
-
-      fileChooser.setMultiSelectionEnabled(false);
-      final int returnVal = fileChooser.showSaveDialog(SwingUtil.getActiveWindow());
-      if (returnVal == JFileChooser.APPROVE_OPTION) {
-        final FileNameExtensionFilter fileFilter = (FileNameExtensionFilter)fileChooser
-          .getFileFilter();
-        File file = fileChooser.getSelectedFile();
-        if (file != null) {
-          final String fileExtension = FileUtil.getFileNameExtension(file);
-          final String expectedExtension = fileFilter.getExtensions()[0];
-          if (!fileExtension.equals(expectedExtension)) {
-            file = FileUtil.getFileWithExtension(file, expectedExtension);
-          }
-          final File targetFile = file;
-          PreferencesUtil.setUserString("com.revolsys.swing.map.table.export", "fileExtension",
-            expectedExtension);
-          PreferencesUtil.setUserString("com.revolsys.swing.map.table.export", "directory",
-            file.getParent());
-          final String description = "Export " + layer.getPath() + " to "
-            + targetFile.getAbsolutePath();
-          Invoke.background(description, () -> {
-            try (
-              final RecordReader reader = this.tableModel.getReader()) {
-              RecordIo.copyRecords(reader, targetFile);
-            }
-          });
-        }
-      }
-    });
     this.fieldSetsButton = toolBar.addButtonTitleIcon("table", "Field Sets", "fields_filter", this,
       "actionShowFieldSetsMenu");
 
@@ -376,6 +325,60 @@ public class RecordLayerTablePanel extends TablePanel
   public void editRecord() {
     final LayerRecord record = getEventRowObject();
     this.layer.showForm(record);
+  }
+
+  private void exportRecords() {
+    final RecordDefinition recordDefinition = this.layer.getRecordDefinition();
+    final JFileChooser fileChooser = SwingUtil.createFileChooser("Export Records",
+      "com.revolsys.swing.map.table.export", "directory");
+    final String defaultFileExtension = PreferencesUtil
+      .getUserString("com.revolsys.swing.map.table.export", "fileExtension", "tsv");
+
+    final List<FileNameExtensionFilter> recordFileFilters = new ArrayList<>();
+    for (final RecordWriterFactory factory : IoFactoryRegistry.getInstance()
+      .getFactories(RecordWriterFactory.class)) {
+      if (recordDefinition.hasGeometryField() || factory.isCustomFieldsSupported()) {
+        recordFileFilters.add(AddFileLayerAction.createFilter(factory));
+      }
+    }
+    AddFileLayerAction.sortFilters(recordFileFilters);
+
+    fileChooser.setAcceptAllFileFilterUsed(false);
+    fileChooser.setSelectedFile(new File(fileChooser.getCurrentDirectory(), this.layer.getName()));
+    for (final FileNameExtensionFilter fileFilter : recordFileFilters) {
+      fileChooser.addChoosableFileFilter(fileFilter);
+      if (Arrays.asList(fileFilter.getExtensions()).contains(defaultFileExtension)) {
+        fileChooser.setFileFilter(fileFilter);
+      }
+    }
+
+    fileChooser.setMultiSelectionEnabled(false);
+    final int returnVal = fileChooser.showSaveDialog(SwingUtil.getActiveWindow());
+    if (returnVal == JFileChooser.APPROVE_OPTION) {
+      final FileNameExtensionFilter fileFilter = (FileNameExtensionFilter)fileChooser
+        .getFileFilter();
+      File file = fileChooser.getSelectedFile();
+      if (file != null) {
+        final String fileExtension = FileUtil.getFileNameExtension(file);
+        final String expectedExtension = fileFilter.getExtensions()[0];
+        if (!fileExtension.equals(expectedExtension)) {
+          file = FileUtil.getFileWithExtension(file, expectedExtension);
+        }
+        final File targetFile = file;
+        PreferencesUtil.setUserString("com.revolsys.swing.map.table.export", "fileExtension",
+          expectedExtension);
+        PreferencesUtil.setUserString("com.revolsys.swing.map.table.export", "directory",
+          file.getParent());
+        final String description = "Export " + this.layer.getPath() + " to "
+          + targetFile.getAbsolutePath();
+        Invoke.background(description, () -> {
+          try (
+            final RecordReader reader = this.tableModel.getReader()) {
+            RecordIo.copyRecords(reader, targetFile);
+          }
+        });
+      }
+    }
   }
 
   public void flipFields() {
