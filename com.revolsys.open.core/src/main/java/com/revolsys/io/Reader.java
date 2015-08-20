@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.util.ExitLoopException;
@@ -88,6 +90,10 @@ public interface Reader<T> extends Iterable<T>, ObjectWithProperties, AutoClosea
   default void open() {
   }
 
+  default Stream<T> parallelStream() {
+    return StreamSupport.stream(spliterator(), true);
+  }
+
   /**
    * Read all items and return a List containing the items.
    *
@@ -102,4 +108,9 @@ public interface Reader<T> extends Iterable<T>, ObjectWithProperties, AutoClosea
     }
     return items;
   }
+
+  default Stream<T> stream() {
+    return StreamSupport.stream(spliterator(), false);
+  }
+
 }
