@@ -2,7 +2,7 @@ package com.revolsys.data.record.io;
 
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.RecordFactory;

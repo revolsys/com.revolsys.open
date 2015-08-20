@@ -5,6 +5,8 @@ import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -19,7 +21,6 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.record.io.RecordStoreConnectionManager;
@@ -28,6 +29,7 @@ import com.revolsys.format.json.Json;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.Paths;
 import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
@@ -37,6 +39,8 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
@@ -48,6 +52,7 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.PreferencesUtil;
+import com.revolsys.util.WrappedException;
 import com.revolsys.util.enableable.Enabled;
 
 public class Project extends LayerGroup {
@@ -114,12 +119,8 @@ public class Project extends LayerGroup {
   protected ValueField createPropertiesTabGeneralPanelSource(final BasePanel parent) {
     final ValueField panel = super.createPropertiesTabGeneralPanelSource(parent);
     if (this.resource != null) {
-      try {
-        SwingUtil.addLabelledReadOnlyTextField(panel, "URL", this.resource.getURL());
-        GroupLayoutUtil.makeColumns(panel, 2, true);
-      } catch (final IOException e) {
-      }
-
+      SwingUtil.addLabelledReadOnlyTextField(panel, "URL", this.resource.getURL());
+      GroupLayoutUtil.makeColumns(panel, 2, true);
     }
     return panel;
   }
@@ -133,19 +134,19 @@ public class Project extends LayerGroup {
   }
 
   @Override
-  protected boolean doSaveSettings(final File directory) {
+  protected boolean doSaveSettings(final Path directory) {
     boolean saved = true;
-    FileUtil.deleteDirectory(directory, false);
-    directory.mkdir();
+    FileUtil.deleteDirectory(directory.toFile(), false);
+    Paths.createDirectories(directory);
 
     saved &= super.doSaveSettings(directory);
 
-    final File projectDirectory = getProjectDirectory();
-    final File baseMapsDirectory = new File(projectDirectory, "Base Maps");
-    FileUtil.deleteDirectory(baseMapsDirectory, false);
+    final Path projectPath = getProjectDirectory();
+    final Path baseMapsPath = projectPath.resolve("Base Maps");
+    FileUtil.deleteDirectory(baseMapsPath.toFile(), false);
     final LayerGroup baseMapLayers = getBaseMapLayers();
     if (baseMapLayers != null) {
-      saved &= baseMapLayers.saveAllSettings(projectDirectory);
+      saved &= baseMapLayers.saveAllSettings(projectPath);
     }
     return saved;
   }
@@ -155,12 +156,12 @@ public class Project extends LayerGroup {
   }
 
   @Override
-  public File getDirectory() {
-    final File directory = getProjectDirectory();
+  public Path getDirectory() {
+    final Path directory = getProjectDirectory();
     if (directory != null) {
-      final File layersDirectory = new File(directory, "Layers");
-      layersDirectory.mkdirs();
-      if (layersDirectory.isDirectory()) {
+      final Path layersDirectory = directory.resolve("Layers");
+      Paths.createDirectories(layersDirectory);
+      if (Files.isDirectory(layersDirectory)) {
         return layersDirectory;
       }
     }
@@ -172,7 +173,7 @@ public class Project extends LayerGroup {
   }
 
   @Override
-  protected File getGroupSettingsDirectory(final File directory) {
+  protected Path getGroupSettingsDirectory(final Path directory) {
     return directory;
   }
 
@@ -195,9 +196,9 @@ public class Project extends LayerGroup {
     return this;
   }
 
-  public File getProjectDirectory() {
+  public Path getProjectDirectory() {
     if (this.resource == null) {
-      final File directory = getSaveAsDirectory();
+      final Path directory = getSaveAsDirectory();
       return directory;
     }
     if (this.resource instanceof FileSystemResource) {
@@ -207,10 +208,22 @@ public class Project extends LayerGroup {
         directory.mkdirs();
       }
       if (directory.isDirectory()) {
+        return directory.toPath();
+      }
+    } else if (this.resource instanceof PathResource) {
+      final PathResource pathResource = (PathResource)this.resource;
+      final Path directory = pathResource.getPath();
+      if (!Files.exists(directory)) {
+        try {
+          Files.createDirectories(directory);
+        } catch (final IOException e) {
+          throw new WrappedException(e);
+        }
+      }
+      if (Files.isDirectory(directory)) {
         return directory;
       }
     }
-
     return null;
   }
 
@@ -218,7 +231,7 @@ public class Project extends LayerGroup {
     return this.recordStores;
   }
 
-  public File getSaveAsDirectory() {
+  public Path getSaveAsDirectory() {
     File directory = null;
     final JFileChooser fileChooser = SwingUtil.createFileChooser("Save Project",
       "com.revolsys.swing.map.project", "directory");
@@ -240,7 +253,7 @@ public class Project extends LayerGroup {
       directory.mkdirs();
       this.resource = new FileSystemResource(directory);
     }
-    return directory;
+    return directory.toPath();
   }
 
   public BoundingBox getViewBoundingBox() {
@@ -261,9 +274,8 @@ public class Project extends LayerGroup {
   }
 
   protected void readBaseMapsLayers(final Resource resource) {
-    final Resource baseMapsResource = SpringUtil.getResource(resource, "Base Maps");
-    final Resource layerGroupResource = SpringUtil.getResource(baseMapsResource,
-      "rgLayerGroup.rgobject");
+    final Resource baseMapsResource = resource.createChild("Base Maps");
+    final Resource layerGroupResource = baseMapsResource.createChild("rgLayerGroup.rgobject");
     if (layerGroupResource.exists()) {
       final Resource oldResource = SpringUtil.setBaseResource(baseMapsResource);
       try {
@@ -286,7 +298,7 @@ public class Project extends LayerGroup {
   }
 
   protected void readLayers(final Resource resource) {
-    final Resource layerGroupResource = SpringUtil.getResource(resource, "rgLayerGroup.rgobject");
+    final Resource layerGroupResource = resource.createChild("rgLayerGroup.rgobject");
     if (!layerGroupResource.exists()) {
       LoggerFactory.getLogger(getClass()).error("File not found: " + layerGroupResource);
     } else {
@@ -302,27 +314,29 @@ public class Project extends LayerGroup {
     }
   }
 
+  public void readProject(final Path path) {
+    final Resource resource = new PathResource(path);
+    readProject(resource);
+  }
+
   public void readProject(final Resource resource) {
     this.resource = resource;
     if (resource.exists()) {
       String name;
       try (
         final Enabled enabled = eventsDisabled()) {
-        final Resource layersDir = SpringUtil.getResource(resource, "Layers");
+        final Resource layersDir = resource.createChild("Layers");
         readProperties(layersDir);
 
         final RecordStoreConnectionRegistry oldRecordStoreConnections = RecordStoreConnectionRegistry
           .getForThread();
         try {
-          final Resource recordStoresDirectory = SpringUtil.getResource(resource, "Record Stores");
+          final Resource recordStoresDirectory = resource.createChild("Record Stores");
           if (!recordStoresDirectory.exists()) {
-            final Resource dataStoresDirectory = SpringUtil.getResource(resource, "Data Stores");
+            final Resource dataStoresDirectory = resource.createChild("Data Stores");
             if (dataStoresDirectory.exists()) {
-              try {
-                final File file = dataStoresDirectory.getFile();
-                file.renameTo(new File(file.getParentFile(), "Record Stores"));
-              } catch (final IOException e) {
-              }
+              final File file = dataStoresDirectory.getFile();
+              file.renameTo(new File(file.getParentFile(), "Record Stores"));
             }
           }
 
@@ -332,8 +346,7 @@ public class Project extends LayerGroup {
           setRecordStores(recordStores);
           RecordStoreConnectionRegistry.setForThread(recordStores);
 
-          final Resource folderConnectionsDirectory = SpringUtil.getResource(resource,
-            "Folder Connections");
+          final Resource folderConnectionsDirectory = resource.createChild("Folder Connections");
           this.folderConnections = new FolderConnectionRegistry("Project",
             folderConnectionsDirectory, readOnly);
 
@@ -351,7 +364,7 @@ public class Project extends LayerGroup {
   }
 
   protected void readProperties(final Resource resource) {
-    final Resource layerGroupResource = SpringUtil.getResource(resource, "rgLayerGroup.rgobject");
+    final Resource layerGroupResource = resource.createChild("rgLayerGroup.rgobject");
     if (!layerGroupResource.exists()) {
       LoggerFactory.getLogger(getClass()).error("File not found: " + layerGroupResource);
     } else {
@@ -392,7 +405,7 @@ public class Project extends LayerGroup {
     if (isReadOnly()) {
       return true;
     } else {
-      final File directory = getDirectory();
+      final Path directory = getDirectory();
       final boolean saveAllSettings = super.saveAllSettings(directory);
       if (saveAllSettings) {
         final RecordStoreConnectionManager recordStoreConnectionManager = RecordStoreConnectionManager
@@ -410,16 +423,16 @@ public class Project extends LayerGroup {
     }
   }
 
-  public File saveAllSettingsAs() {
+  public Path saveAllSettingsAs() {
     final Resource resource = this.resource;
     try {
       this.resource = null;
-      final File directory = getSaveAsDirectory();
-      if (directory != null) {
-        setName(FileUtil.getBaseName(directory));
+      final Path projectPath = getSaveAsDirectory();
+      if (projectPath != null) {
+        setName(Paths.getBaseName(projectPath));
         saveAllSettings();
       }
-      return directory;
+      return projectPath;
     } finally {
       if (this.resource == null) {
         this.resource = resource;

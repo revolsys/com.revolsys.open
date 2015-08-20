@@ -30,7 +30,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.io.input.XmlStreamReader;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.ExceptionUtil;
@@ -74,7 +74,7 @@ public final class StaxUtils {
   }
 
   public static XMLStreamReader createXmlReader(final Resource resource) {
-    final InputStream inputStream = SpringUtil.getInputStream(resource);
+    final InputStream inputStream = resource.getInputStream();
     return createXmlReader(inputStream);
   }
 

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
@@ -142,7 +142,8 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
     final RecordStoreSchema schema = getProperty("schema");
     String typePath = getProperty("typePath");
     if (!Property.hasValue(typePath)) {
-      typePath = "/" + FileUtil.getBaseName(SpringUtil.getFileName(this.resource));
+      final Resource resource1 = this.resource;
+      typePath = "/" + FileUtil.getBaseName(resource1.getFilename());
       String schemaPath = getProperty("schemaPath");
       if (Property.hasValue(schemaPath)) {
         if (!schemaPath.startsWith("/")) {

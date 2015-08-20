@@ -7,9 +7,10 @@ import java.awt.Window;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.File;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -172,14 +173,14 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     return 0;
   }
 
-  public boolean canSaveSettings(final File directory) {
+  public boolean canSaveSettings(final Path directory) {
     if (directory != null) {
       final Logger log = LoggerFactory.getLogger(getClass());
-      if (!directory.exists()) {
+      if (!Files.exists(directory)) {
         log.error("Unable to save layer " + getPath() + " directory does not exist " + directory);
-      } else if (!directory.isDirectory()) {
+      } else if (!Files.isDirectory(directory)) {
         log.error("Unable to save layer " + getPath() + " file is not a directory " + directory);
-      } else if (!directory.canWrite()) {
+      } else if (!Files.isWritable(directory)) {
         log.error("Unable to save layer " + getPath() + " directory is not writable " + directory);
       } else {
         return true;
@@ -408,9 +409,9 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     return true;
   }
 
-  protected boolean doSaveSettings(final File directory) {
+  protected boolean doSaveSettings(final java.nio.file.Path directory) {
     final String settingsFileName = getSettingsFileName();
-    final File settingsFile = new File(directory, settingsFileName);
+    final java.nio.file.Path settingsFile = directory.resolve(settingsFileName);
     MapObjectFactoryRegistry.write(settingsFile, this);
     return true;
   }
@@ -462,7 +463,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     return Collections.emptySet();
   }
 
-  public File getDirectory() {
+  public Path getDirectory() {
     final LayerGroup layerGroup = getLayerGroup();
     if (layerGroup == null) {
       return null;
@@ -765,12 +766,12 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   public boolean saveSettings() {
-    final File directory = getDirectory();
+    final Path directory = getDirectory();
     return saveSettings(directory);
   }
 
   @Override
-  public boolean saveSettings(final File directory) {
+  public boolean saveSettings(final Path directory) {
     if (directory != null) {
       if (canSaveSettings(directory)) {
         return doSaveSettings(directory);

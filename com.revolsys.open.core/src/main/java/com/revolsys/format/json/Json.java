@@ -8,22 +8,24 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.revolsys.spring.resource.FileSystemResource;
-import org.springframework.core.io.Resource;
-
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.Paths;
 import com.revolsys.io.Reader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapReaderFactory;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
-import com.revolsys.spring.resource.SpringUtil;
+import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
 public class Json extends AbstractIoFactory implements MapReaderFactory, MapWriterFactory {
@@ -70,14 +72,24 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
     }
   }
 
+  public static Map<String, Object> toMap(final Path directory, final String path) {
+    if (directory == null || path == null) {
+      return new LinkedHashMap<String, Object>();
+    } else {
+      final Path file = directory.resolve(path);
+      if (Paths.exists(file) && !Files.isDirectory(file)) {
+        final PathResource resource = new PathResource(file);
+        return toMap(resource);
+      } else {
+        return new LinkedHashMap<String, Object>();
+      }
+    }
+  }
+
   public static final Map<String, Object> toMap(final Resource resource) {
     if (resource != null && (!(resource instanceof FileSystemResource) || resource.exists())) {
-      try {
-        final InputStream in = resource.getInputStream();
-        return toMap(in);
-      } catch (final IOException e) {
-        throw new RuntimeException("Unable to open stream for " + resource, e);
-      }
+      final InputStream in = resource.getInputStream();
+      return toMap(in);
     } else {
       return new LinkedHashMap<String, Object>();
     }
@@ -164,9 +176,15 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
     write(object, resource, indent);
   }
 
+  public static void write(final Map<String, ? extends Object> object, final Path path,
+    final boolean indent) {
+    final PathResource resource = new PathResource(path);
+    write(object, resource, indent);
+  }
+
   public static void write(final Map<String, ? extends Object> object, final Resource resource) {
     try (
-      final Writer writer = SpringUtil.getWriter(resource);
+      final Writer writer = resource.newWriter();
       final JsonMapWriter out = new JsonMapWriter(writer);) {
       out.setSingleObject(true);
       out.write(object);
@@ -177,7 +195,7 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
   public static void write(final Map<String, ? extends Object> object, final Resource resource,
     final boolean indent) {
     try (
-      final Writer writer = SpringUtil.getWriter(resource);
+      final Writer writer = resource.newWriter();
       final JsonMapWriter out = new JsonMapWriter(writer, indent);) {
       out.setSingleObject(true);
       out.write(object);
@@ -192,11 +210,7 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
 
   @Override
   public MapReader createMapReader(final Resource resource) {
-    try {
-      return new JsonMapReader(resource.getInputStream());
-    } catch (final IOException e) {
-      throw new RuntimeException("Unable to open " + resource, e);
-    }
+    return new JsonMapReader(resource.getInputStream());
   }
 
   @Override

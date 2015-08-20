@@ -18,7 +18,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.log4j.Logger;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
@@ -85,7 +85,7 @@ public class GpxIterator extends BaseObjectWithProperties
     this(StaxUtils.createXmlReader(resource));
     this.recordFactory = recordFactory;
     this.typePath = path;
-    this.baseName = FileUtil.getBaseName(SpringUtil.getFileName(resource));
+    this.baseName = FileUtil.getBaseName(resource.getFilename());
   }
 
   public GpxIterator(final XMLStreamReader in) {

@@ -3,7 +3,7 @@ package com.revolsys.gis.tin;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.io.FileUtil;
@@ -48,7 +48,7 @@ public class TinReader {
   public TinReader(final BoundingBox boundingBox, final Resource resource) {
     this.boundingBox = boundingBox;
     this.geometryFactory = boundingBox.getGeometryFactory();
-    this.in = SpringUtil.getBufferedReader(resource);
+    this.in = resource.newBufferedReader();
     final String line = readLine();
     if (!"TIN".equals(line)) {
       throw new IllegalArgumentException("File does not contain a tin");
@@ -57,7 +57,7 @@ public class TinReader {
 
   public TinReader(final GeometryFactory geometryFactory, final Resource resource) {
     this.geometryFactory = geometryFactory;
-    this.in = SpringUtil.getBufferedReader(resource);
+    this.in = resource.newBufferedReader();
     final String line = readLine();
     if (!"TIN".equals(line)) {
       throw new IllegalArgumentException("File does not contain a tin");

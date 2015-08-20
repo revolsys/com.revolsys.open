@@ -10,9 +10,6 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-
 import com.revolsys.format.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.format.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.format.esri.gdb.xml.model.enums.GeometryType;
@@ -25,6 +22,8 @@ import com.revolsys.format.esri.gdb.xml.model.enums.RelNotification;
 import com.revolsys.format.esri.gdb.xml.model.enums.SplitPolicyType;
 import com.revolsys.format.esri.gdb.xml.model.enums.WorkspaceType;
 import com.revolsys.format.xml.XmlProcessor;
+import com.revolsys.spring.resource.ByteArrayResource;
+import com.revolsys.spring.resource.Resource;
 
 public class EsriGdbXmlParser extends XmlProcessor implements EsriGeodatabaseXmlConstants {
 

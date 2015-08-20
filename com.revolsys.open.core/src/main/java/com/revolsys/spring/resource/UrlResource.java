@@ -195,7 +195,7 @@ public class UrlResource extends AbstractResource {
         } else {
           return file.exists();
         }
-      } catch (final IOException e) {
+      } catch (final Throwable e) {
         return false;
       }
     } else {
@@ -269,13 +269,18 @@ public class UrlResource extends AbstractResource {
    * @see org.springframework.util.ResourceUtils#getFile(java.net.URL, String)
    */
   @Override
-  public File getFile() throws IOException {
-    final URL url = getURL();
-    if (isFolderConnection()) {
-      return FileUtil.getFile(url);
-    } else {
-      return ResourceUtils.getFile(url, getDescription());
+  public File getFile() {
+    try {
+      final URL url = getURL();
+      if (isFolderConnection()) {
+        return FileUtil.getFile(url);
+      } else {
+        return ResourceUtils.getFile(url, getDescription());
+      }
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
+
   }
 
   /**
@@ -304,12 +309,10 @@ public class UrlResource extends AbstractResource {
 
   /**
    * This implementation returns the name of the file that this URL refers to.
-   * @see java.net.URL#getFile()
-   * @see java.io.File#getName()
    */
   @Override
   public String getFilename() {
-    return new File(this.url.getFile()).getName();
+    return UrlUtil.getFileName(this.url);
   }
 
   /**
@@ -321,22 +324,26 @@ public class UrlResource extends AbstractResource {
    * @see java.net.URLConnection#getInputStream()
    */
   @Override
-  public InputStream getInputStream() throws IOException {
-    if (isFolderConnection()) {
-      final File file = getFile();
-      return new FileInputStream(file);
-    } else {
-      final URLConnection con = this.url.openConnection();
-      // ResourceUtils.useCachesIfNecessary(con);
-      try {
-        return con.getInputStream();
-      } catch (final IOException ex) {
-        // Close the HTTP connection (if applicable).
-        if (con instanceof HttpURLConnection) {
-          ((HttpURLConnection)con).disconnect();
+  public InputStream getInputStream() {
+    try {
+      if (isFolderConnection()) {
+        final File file = getFile();
+        return new FileInputStream(file);
+      } else {
+        final URLConnection con = this.url.openConnection();
+        // ResourceUtils.useCachesIfNecessary(con);
+        try {
+          return con.getInputStream();
+        } catch (final IOException e) {
+          // Close the HTTP connection (if applicable).
+          if (con instanceof HttpURLConnection) {
+            ((HttpURLConnection)con).disconnect();
+          }
+          throw new WrappedException(e);
         }
-        throw ex;
       }
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
   }
 
@@ -393,7 +400,7 @@ public class UrlResource extends AbstractResource {
       } else {
         return true;
       }
-    } catch (final IOException ex) {
+    } catch (final Throwable ex) {
       return false;
     }
   }

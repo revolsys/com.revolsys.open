@@ -34,7 +34,7 @@ package com.revolsys.jts.testold.algorithm;
 
 import java.util.List;
 
-import org.springframework.core.io.ClassPathResource;
+import com.revolsys.spring.resource.ClassPathResource;
 
 import com.revolsys.gis.geometry.io.GeometryReader;
 import com.revolsys.io.Reader;

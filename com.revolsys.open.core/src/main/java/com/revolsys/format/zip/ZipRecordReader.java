@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import com.revolsys.spring.resource.FileSystemResource;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.io.DelegatingReader;
 import com.revolsys.data.record.Record;
@@ -24,7 +24,7 @@ public class ZipRecordReader extends DelegatingReader<Record>implements RecordRe
   public ZipRecordReader(final Resource resource, final String fileExtension,
     final RecordFactory factory) {
     try {
-      final String baseName = FileUtil.getBaseName(SpringUtil.getFileName(resource));
+      final String baseName = FileUtil.getBaseName(resource.getFilename());
       final String zipEntryName = baseName + "." + fileExtension;
       this.directory = ZipUtil.unzipFile(resource);
       if (!openFile(resource, factory, zipEntryName)) {

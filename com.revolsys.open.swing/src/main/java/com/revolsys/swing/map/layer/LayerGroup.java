@@ -13,7 +13,6 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.data.record.io.RecordReaderFactory;
@@ -22,12 +21,14 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.Path;
 import com.revolsys.io.PathName;
+import com.revolsys.io.Paths;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.action.AddFileLayerAction;
@@ -260,8 +261,8 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   @Override
-  protected boolean doSaveSettings(final File directory) {
-    final File groupDirectory = getGroupSettingsDirectory(directory);
+  protected boolean doSaveSettings(final java.nio.file.Path directory) {
+    final java.nio.file.Path groupDirectory = getGroupSettingsDirectory(directory);
     return super.doSaveSettings(groupDirectory);
   }
 
@@ -307,12 +308,12 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   @Override
-  public File getDirectory() {
+  public java.nio.file.Path getDirectory() {
     final LayerGroup layerGroup = getLayerGroup();
     if (layerGroup != null) {
-      final File parentDirectory = layerGroup.getDirectory();
+      final java.nio.file.Path parentDirectory = layerGroup.getDirectory();
       if (parentDirectory != null) {
-        final File layerDirectory = getGroupSettingsDirectory(parentDirectory);
+        final java.nio.file.Path layerDirectory = getGroupSettingsDirectory(parentDirectory);
         return layerDirectory;
       }
     }
@@ -330,10 +331,10 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     }
   }
 
-  protected File getGroupSettingsDirectory(final File directory) {
+  protected java.nio.file.Path getGroupSettingsDirectory(final java.nio.file.Path directory) {
     final String name = getName();
     final String groupDirectoryName = FileUtil.getSafeFileName(name);
-    final File groupDirectory = FileUtil.getDirectory(directory, groupDirectoryName);
+    final java.nio.file.Path groupDirectory = Paths.getDirectoryPath(directory, groupDirectoryName);
     return groupDirectory;
   }
 
@@ -652,12 +653,12 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     }
   }
 
-  public boolean saveAllSettings(final File directory) {
+  public boolean saveAllSettings(final java.nio.file.Path directory) {
     if (directory == null) {
       return false;
     } else {
       boolean saved = true;
-      final File groupDirectory = getGroupSettingsDirectory(directory);
+      final java.nio.file.Path groupDirectory = getGroupSettingsDirectory(directory);
       if (canSaveSettings(directory)) {
         saved &= saveSettings(directory);
         for (final Layer layer : this) {

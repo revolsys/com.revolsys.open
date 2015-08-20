@@ -19,7 +19,7 @@ import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.data.record.io.RecordWriterFactory;
@@ -52,7 +52,7 @@ public class IoFactoryRegistry {
     String fileName = null;
     if (Property.hasValue(source)) {
       if (source instanceof Resource) {
-        fileName = SpringUtil.getFileName((Resource)source);
+        fileName = ((Resource)source).getFilename();
       } else if (source instanceof Path) {
         fileName = Paths.getFileName((Path)source);
       } else if (source instanceof File) {

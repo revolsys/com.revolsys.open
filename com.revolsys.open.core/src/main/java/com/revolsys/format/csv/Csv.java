@@ -19,7 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.io.IteratorReader;
@@ -158,7 +158,7 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
   @Override
   public MapReader createMapReader(final Resource resource) {
     try {
-      final CsvMapIterator iterator = new CsvMapIterator(SpringUtil.getReader(resource));
+      final CsvMapIterator iterator = new CsvMapIterator(resource.newReader());
       return new IteratorMapReader(iterator);
     } catch (final IOException e) {
       return ExceptionUtil.throwUncheckedException(e);

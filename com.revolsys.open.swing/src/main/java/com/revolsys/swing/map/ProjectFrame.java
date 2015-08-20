@@ -14,6 +14,8 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.net.ResponseCache;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,8 +40,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.TreePath;
 
-import com.revolsys.spring.resource.FileSystemResource;
-
 import com.revolsys.data.record.io.RecordStoreConnectionManager;
 import com.revolsys.data.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.io.FileUtil;
@@ -48,6 +48,7 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.net.urlcache.FileResponseCache;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
@@ -158,10 +159,10 @@ public class ProjectFrame extends BaseFrame {
     this(title, new Project());
   }
 
-  public ProjectFrame(final String title, final File projectDirectory) {
+  public ProjectFrame(final String title, final Path projectPath) {
     this(title);
-    if (projectDirectory != null) {
-      Invoke.background("Load project: " + projectDirectory, () -> loadProject(projectDirectory));
+    if (projectPath != null) {
+      Invoke.background("Load project: " + projectPath, () -> loadProject(projectPath));
     }
   }
 
@@ -194,7 +195,7 @@ public class ProjectFrame extends BaseFrame {
       final int returnVal = fileChooser.showOpenDialog(this);
       if (returnVal == JFileChooser.APPROVE_OPTION) {
         final File projectDirectory = fileChooser.getSelectedFile();
-        openProject(projectDirectory);
+        openProject(projectDirectory.toPath());
       }
     }
   }
@@ -224,9 +225,9 @@ public class ProjectFrame extends BaseFrame {
   }
 
   public void actionSaveProjectAs() {
-    final File directory = this.project.saveAllSettingsAs();
-    if (directory != null) {
-      addToRecentProjects(directory);
+    final Path path = this.project.saveAllSettingsAs();
+    if (path != null) {
+      addToRecentProjects(path);
       Invoke.later(this, "setTitle", this.project.getName() + " - " + this.frameTitle);
     }
   }
@@ -355,9 +356,9 @@ public class ProjectFrame extends BaseFrame {
     progressBar.add(viewTasksAction, BorderLayout.EAST);
   }
 
-  private void addToRecentProjects(final File projectDirectory) {
+  private void addToRecentProjects(final Path projectPath) {
     final List<String> recentProjects = getRecentProjectPaths();
-    final String filePath = FileUtil.getCanonicalPath(projectDirectory);
+    final String filePath = projectPath.toAbsolutePath().toString();
     recentProjects.remove(filePath);
     recentProjects.add(0, filePath);
     while (recentProjects.size() > 10) {
@@ -628,8 +629,8 @@ public class ProjectFrame extends BaseFrame {
     super.init();
   }
 
-  public void loadProject(final File projectDirectory) {
-    final FileSystemResource resource = new FileSystemResource(projectDirectory);
+  public void loadProject(final Path projectPathe) {
+    final PathResource resource = new PathResource(projectPathe);
     this.project.readProject(resource);
     Invoke.later(this, "setTitle", this.project.getName() + " - " + this.frameTitle);
 
@@ -660,17 +661,17 @@ public class ProjectFrame extends BaseFrame {
     viewport.setInitialized(true);
   }
 
-  public void openProject(final File projectDirectory) {
-    if (projectDirectory.exists()) {
+  public void openProject(final Path projectPath) {
+    if (Files.exists(projectPath)) {
       try {
-        addToRecentProjects(projectDirectory);
+        addToRecentProjects(projectPath);
 
         PreferencesUtil.setUserString("com.revolsys.swing.map.project", "directory",
-          projectDirectory.getParent());
+          projectPath.getParent().toString());
         this.project.reset();
-        Invoke.background("Load project", () -> loadProject(projectDirectory));
+        Invoke.background("Load project", () -> loadProject(projectPath));
       } catch (final Throwable e) {
-        ExceptionUtil.log(getClass(), "Unable to open project:" + projectDirectory, e);
+        ExceptionUtil.log(getClass(), "Unable to open project:" + projectPath, e);
       }
     }
   }

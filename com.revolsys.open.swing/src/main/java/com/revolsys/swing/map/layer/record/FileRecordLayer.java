@@ -3,7 +3,7 @@ package com.revolsys.swing.map.layer.record;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.io.RecordReader;
@@ -14,7 +14,6 @@ import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
@@ -65,7 +64,7 @@ public class FileRecordLayer extends ListRecordLayer {
   protected boolean doInitialize() {
     this.url = getProperty("url");
     if (Property.hasValue(this.url)) {
-      this.resource = SpringUtil.getResource(this.url);
+      this.resource = Resource.getResource(this.url);
       return revert();
     } else {
       LoggerFactory.getLogger(getClass())

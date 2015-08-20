@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.gdal.gdal.Band;
 import org.gdal.gdal.Dataset;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.gdal.Gdal;
 import com.revolsys.gis.cs.CoordinateSystem;

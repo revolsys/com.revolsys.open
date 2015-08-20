@@ -3,7 +3,7 @@ package com.revolsys.data.codes;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.Record;

@@ -1,6 +1,6 @@
 package com.revolsys.io.map;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.io.FileIoFactory;
 

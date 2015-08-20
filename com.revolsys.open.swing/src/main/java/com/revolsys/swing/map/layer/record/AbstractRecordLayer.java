@@ -37,7 +37,7 @@ import javax.swing.undo.UndoableEdit;
 
 import org.apache.commons.collections4.set.MapBackedSet;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;

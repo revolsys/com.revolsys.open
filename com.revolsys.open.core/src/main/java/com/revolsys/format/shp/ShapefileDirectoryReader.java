@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.io.AbstractDirectoryReader;
 import com.revolsys.data.record.ArrayRecordFactory;
@@ -55,7 +55,7 @@ public class ShapefileDirectoryReader extends RecordDirectoryReader {
     try {
       final ArrayRecordFactory factory = new ArrayRecordFactory();
       final ShapefileIterator iterator = new ShapefileIterator(resource, factory);
-      final String baseName = SpringUtil.getBaseName(resource).toUpperCase();
+      final String baseName = resource.getBaseName().toUpperCase();
       iterator.setTypeName(PathName.create(this.fileNameTypeMap.get(baseName)));
       iterator.setRecordDefinition(this.typeNameRecordDefinitionMap.get(iterator.getTypeName()));
       return iterator;

@@ -6,15 +6,33 @@ import java.util.List;
 public class FileNames {
 
   public static String getBaseName(final String fileName) {
-    int startIndex = fileName.lastIndexOf("/");
-    if (startIndex == -1) {
-      startIndex = 0;
+    int endIndex = fileName.length();
+    int slashIndex;
+    for (slashIndex = fileName.lastIndexOf("/", endIndex - 1); slashIndex != -1
+      && slashIndex == endIndex - 1; slashIndex = fileName.lastIndexOf("/", endIndex - 1)) {
+      endIndex--;
     }
-    final int dotIndex = fileName.lastIndexOf('.', startIndex);
-    if (dotIndex != -1) {
-      return fileName.substring(0, dotIndex);
+    final int dotIndex = fileName.lastIndexOf('.', endIndex - 1);
+    if (dotIndex == -1) {
+      if (slashIndex == -1) {
+        return fileName.substring(0, endIndex);
+      } else if (slashIndex == fileName.length() - 1) {
+        return "";
+      } else {
+        return fileName.substring(slashIndex + 1, endIndex);
+      }
     } else {
-      return fileName;
+      if (slashIndex == -1) {
+        return fileName.substring(0, dotIndex);
+      } else if (slashIndex > dotIndex) {
+        if (slashIndex == fileName.length() - 1) {
+          return "";
+        } else {
+          return fileName.substring(slashIndex + 1, endIndex);
+        }
+      } else {
+        return fileName.substring(slashIndex + 1, dotIndex);
+      }
     }
   }
 

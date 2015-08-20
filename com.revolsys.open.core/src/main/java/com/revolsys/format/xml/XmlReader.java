@@ -12,7 +12,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.io.input.XmlStreamReader;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.ExceptionUtil;
@@ -26,7 +26,7 @@ public class XmlReader implements XMLStreamConstants, AutoCloseable {
   private int depth = 0;
 
   public XmlReader(final Resource resource) {
-    final InputStream inputStream = SpringUtil.getInputStream(resource);
+    final InputStream inputStream = resource.getInputStream();
     try {
       final XmlStreamReader reader = new XmlStreamReader(inputStream);
       this.parser = FACTORY.createXMLStreamReader(reader);

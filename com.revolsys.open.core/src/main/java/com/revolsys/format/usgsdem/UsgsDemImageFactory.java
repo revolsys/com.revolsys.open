@@ -1,6 +1,6 @@
 package com.revolsys.format.usgsdem;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.raster.GeoreferencedImage;

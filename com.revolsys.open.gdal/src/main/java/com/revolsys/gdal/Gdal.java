@@ -29,7 +29,7 @@ import org.gdal.osr.SpatialReference;
 import org.gdal.osr.osr;
 import org.slf4j.LoggerFactory;
 import com.revolsys.spring.resource.FileSystemResource;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.format.json.Json;
 import com.revolsys.gdal.raster.GdalImageFactory;
@@ -489,7 +489,7 @@ public class Gdal {
   }
 
   public static long loadSettings(final Dataset dataset, final Resource resource) {
-    final Resource settingsFile = SpringUtil.addExtension(resource, "rgobject");
+    final Resource settingsFile = resource.createAddExtension("rgobject");
     if (settingsFile.exists()) {
       try {
 
@@ -512,7 +512,7 @@ public class Gdal {
           }
         }
 
-        return SpringUtil.getLastModified(settingsFile);
+        return settingsFile.getLastModified();
       } catch (final Throwable e) {
         ExceptionUtil.log(Gdal.class, "Unable to load:" + settingsFile, e);
         return -1;

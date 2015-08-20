@@ -1,20 +1,25 @@
 package com.revolsys.data.record.io;
 
-import java.io.File;
-
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 
 public class RecordIo {
-  public static void copyRecords(final Object source, final File targetFile) {
+  public static void copyRecords(final Iterable<Record> reader, final Writer<Record> writer) {
+    if (reader != null && writer != null) {
+      for (final Record record : reader) {
+        writer.write(record);
+      }
+    }
+  }
+
+  public static void copyRecords(final Object source, final Object target) {
     try (
       RecordReader reader = RecordReader.create(source)) {
       if (reader == null) {
         throw new IllegalArgumentException("Unable to read " + source);
       } else {
-        copyRecords(reader, targetFile);
+        copyRecords(reader, target);
       }
     }
 
@@ -26,29 +31,21 @@ public class RecordIo {
       if (reader == null) {
         throw new IllegalArgumentException("Unable to read " + source);
       } else {
-        copyRecords(reader, writer);
+        copyRecords((Iterable<Record>)reader, writer);
       }
     }
 
   }
 
-  public static void copyRecords(final Reader<Record> reader, final Writer<Record> writer) {
-    if (reader != null && writer != null) {
-      for (final Record record : reader) {
-        writer.write(record);
-      }
-    }
-  }
-
-  public static void copyRecords(final RecordReader reader, final File targetFile) {
+  public static void copyRecords(final RecordReader reader, final Object target) {
     if (reader != null) {
       final RecordDefinition recordDefinition = reader.getRecordDefinition();
       try (
-        Writer<Record> writer = RecordWriter.create(recordDefinition, targetFile)) {
+        RecordWriter writer = RecordWriter.create(recordDefinition, target)) {
         if (writer == null) {
-          throw new IllegalArgumentException("Unable to create writer " + targetFile);
+          throw new IllegalArgumentException("Unable to create writer " + target);
         } else {
-          copyRecords(reader, writer);
+          copyRecords((Iterable<Record>)reader, writer);
         }
       }
     }

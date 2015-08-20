@@ -3,18 +3,20 @@ package com.revolsys.io.map;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
-import com.revolsys.spring.resource.FileSystemResource;
-import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.format.json.Json;
 import com.revolsys.format.json.JsonParser;
+import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -94,7 +96,7 @@ public class MapObjectFactoryRegistry {
   }
 
   public static <V> V toObject(final Resource resource) {
-    final Resource oldResource = SpringUtil.setBaseResource(SpringUtil.getParentResource(resource));
+    final Resource oldResource = SpringUtil.setBaseResource(resource.getParent());
 
     try {
       final Map<String, Object> properties = Json.toMap(resource);
@@ -116,6 +118,11 @@ public class MapObjectFactoryRegistry {
   public static void write(final File file, final MapSerializer serializer) {
     final Map<String, Object> properties = serializer.toMap();
     Json.write(properties, file, true);
+  }
+
+  public static void write(final Path path, final MapSerializer serializer) {
+    final PathResource resource = new PathResource(path);
+    write(resource, serializer);
   }
 
   public static void write(final Resource resource, final MapSerializer serializer) {

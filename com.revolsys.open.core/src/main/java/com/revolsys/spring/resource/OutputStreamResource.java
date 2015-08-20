@@ -1,6 +1,5 @@
 package com.revolsys.spring.resource;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -52,11 +51,11 @@ public class OutputStreamResource extends AbstractResource {
   }
 
   @Override
-  public InputStream getInputStream() throws IOException {
+  public InputStream getInputStream() {
     throw new IllegalArgumentException("No input stream exists");
   }
 
-  public OutputStream getOutputStream() {
+  public OutputStream newOutputStream() {
     if (this.read) {
       throw new IllegalStateException("OutputStream has already been read - "
         + "do not use OutputStreamResource if a stream needs to be read multiple times");

@@ -1,7 +1,6 @@
 package com.revolsys.maven;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -13,9 +12,9 @@ import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.revolsys.spring.resource.FileSystemResource;
-import org.springframework.core.io.Resource;
 
+import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.Hex;
 import com.revolsys.util.Property;
@@ -38,7 +37,7 @@ public class MavenRepositoryCache extends MavenRepository {
       if (!repository.endsWith("/")) {
         repository += '/';
       }
-      final Resource resource = SpringUtil.getResource(repository);
+      final Resource resource = Resource.getResource(repository);
       this.repositories.add(new MavenRepository(resource));
     }
   }
@@ -49,29 +48,29 @@ public class MavenRepositoryCache extends MavenRepository {
 
   public boolean copyRepositoryResource(final Resource resource, final MavenRepository repository,
     final String path, final String sha1Digest) {
-    final Resource repositoryResource = SpringUtil.getResource(repository.getRoot(), path);
+    final Resource repositoryResource = repository.getRoot().createChild(path);
     if (repositoryResource.exists()) {
       try {
         if (Property.hasValue(sha1Digest)) {
-          final InputStream in = SpringUtil.getInputStream(repositoryResource);
+          final InputStream in = repositoryResource.getInputStream();
           final DigestInputStream digestIn = new DigestInputStream(in,
             MessageDigest.getInstance("SHA-1"));
-          SpringUtil.copy(digestIn, resource);
+          resource.copyFrom(digestIn);
           final MessageDigest messageDigest = digestIn.getMessageDigest();
           final byte[] digest = messageDigest.digest();
           final String fileDigest = Hex.toHex(digest);
           if (!sha1Digest.equals(fileDigest)) {
             LoggerFactory.getLogger(getClass())
               .error(".sha1 digest is different for: " + repositoryResource);
-            SpringUtil.delete(resource);
+            resource.delete();
             return false;
           }
         } else {
-          SpringUtil.copy(repositoryResource, resource);
+          repositoryResource.copyTo(resource);
         }
         return true;
       } catch (final Exception e) {
-        SpringUtil.delete(resource);
+        resource.delete();
         LOG.warn("Unable to download " + repositoryResource, e);
       }
     }
@@ -104,7 +103,7 @@ public class MavenRepositoryCache extends MavenRepository {
 
         final String path = getPath(groupId, artifactId, version, type, classifier,
           timestampVersion, algorithm);
-        final Resource cachedResource = SpringUtil.getResource(getRoot(), path);
+        final Resource cachedResource = getRoot().createChild(path);
         if (cachedResource.exists()) {
           return cachedResource;
         } else {
@@ -155,7 +154,7 @@ public class MavenRepositoryCache extends MavenRepository {
         }
         final FileSystemResource fileResource = new FileSystemResource(file);
         super.setRoot(fileResource);
-      } catch (final IOException e) {
+      } catch (final Throwable e) {
         throw new IllegalArgumentException("Maven cache must resolve to a local directory " + root);
       }
     }

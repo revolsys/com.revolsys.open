@@ -18,16 +18,20 @@ package com.revolsys.spring.resource;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 
 import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import com.revolsys.util.WrappedException;
 
 /**
  * {@link Resource} implementation for {@code java.io.File} handles.
@@ -85,6 +89,16 @@ public class FileSystemResource extends AbstractResource {
     return this.file.length();
   }
 
+  @Override
+  public void copyFrom(final InputStream in) {
+    final File file = getFile();
+    final File parent = file.getParentFile();
+    if (!parent.exists()) {
+      parent.mkdirs();
+    }
+    super.copyFrom(in);
+  }
+
   /**
    * This implementation creates a FileSystemResource, applying the given path
    * relative to the path of the underlying file of this resource descriptor.
@@ -94,6 +108,11 @@ public class FileSystemResource extends AbstractResource {
   public Resource createRelative(final String relativePath) {
     final String pathToUse = StringUtils.applyRelativePath(this.path, relativePath);
     return new FileSystemResource(pathToUse);
+  }
+
+  @Override
+  public boolean delete() {
+    return this.file.delete();
   }
 
   /**
@@ -146,16 +165,24 @@ public class FileSystemResource extends AbstractResource {
    * @see java.io.FileInputStream
    */
   @Override
-  public InputStream getInputStream() throws IOException {
-    return new FileInputStream(this.file);
+  public InputStream getInputStream() {
+    try {
+      return new FileInputStream(this.file);
+    } catch (final FileNotFoundException e) {
+      throw new WrappedException(e);
+    }
   }
 
   /**
    * This implementation opens a FileOutputStream for the underlying file.
    * @see java.io.FileOutputStream
    */
-  public OutputStream getOutputStream() throws IOException {
-    return new FileOutputStream(this.file);
+  public OutputStream getOutputStream() {
+    try {
+      return new FileOutputStream(this.file);
+    } catch (final FileNotFoundException e) {
+      throw new WrappedException(e);
+    }
   }
 
   @Override
@@ -184,16 +211,20 @@ public class FileSystemResource extends AbstractResource {
     return this.file.toURI();
   }
 
-  // implementation of WritableResource
-
   /**
    * This implementation returns a URL for the underlying file.
    * @see java.io.File#toURI()
    */
   @Override
-  public URL getURL() throws IOException {
-    return this.file.toURI().toURL();
+  public URL getURL() {
+    try {
+      return this.file.toURI().toURL();
+    } catch (final MalformedURLException e) {
+      throw new WrappedException(e);
+    }
   }
+
+  // implementation of WritableResource
 
   /**
    * This implementation returns the hash code of the underlying File reference.
@@ -222,6 +253,11 @@ public class FileSystemResource extends AbstractResource {
    */
   public boolean isWritable() {
     return this.file.canWrite() && !this.file.isDirectory();
+  }
+
+  @Override
+  public OutputStream newOutputStream() {
+    return getOutputStream();
   }
 
 }

@@ -50,7 +50,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.revolsys.spring.resource.FileSystemResource;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.io.file.FolderConnection;
 import com.revolsys.io.file.FolderConnectionManager;
@@ -656,7 +656,7 @@ public final class FileUtil {
       final FileSystemResource fileResource = (FileSystemResource)resource;
       return fileResource.getFile();
     } else {
-      final String fileName = SpringUtil.getFileName(resource);
+      final String fileName = resource.getFilename();
       final String ext = getFileNameExtension(fileName);
       final File file = File.createTempFile(fileName, "." + ext);
       copy(resource.getInputStream(), file);

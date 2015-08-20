@@ -6,7 +6,7 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Set;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.io.RecordWriterFactory;

@@ -12,7 +12,7 @@ import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.data.query.Query;
@@ -215,7 +215,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     final String schemaName, final Resource resource) {
     try (
       RecordReader recordReader = RecordReader.create(resource)) {
-      final String typePath = Path.toPath(schemaName, SpringUtil.getBaseName(resource));
+      final String typePath = Path.toPath(schemaName, resource.getBaseName());
       recordReader.setProperty("schema", schema);
       recordReader.setProperty("typePath", typePath);
       final RecordDefinition recordDefinition = recordReader.getRecordDefinition();

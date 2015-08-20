@@ -26,7 +26,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -517,9 +517,9 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
   protected void loadAuxXmlFile(final long modifiedTime) {
     final Resource resource = getImageResource();
 
-    final String extension = SpringUtil.getFileNameExtension(resource);
-    final Resource auxFile = SpringUtil.getResourceWithExtension(resource, extension + ".aux.xml");
-    if (auxFile.exists() && SpringUtil.getLastModified(auxFile) > modifiedTime) {
+    final String extension = resource.getFileNameExtension();
+    final Resource auxFile = resource.createChangeExtension(extension + ".aux.xml");
+    if (auxFile.exists() && auxFile.getLastModified() > modifiedTime) {
       loadWorldFileX();
       final int[] dpi = getDpi();
 
@@ -609,7 +609,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
 
   protected long loadSettings() {
     final Resource resource = getImageResource();
-    final Resource settingsFile = SpringUtil.addExtension(resource, "rgobject");
+    final Resource settingsFile = resource.createAddExtension("rgobject");
     if (settingsFile.exists()) {
       try {
         final Map<String, Object> settings = Json.toMap(settingsFile);
@@ -638,7 +638,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
           setTiePoints(tiePoints);
         }
 
-        return SpringUtil.getLastModified(settingsFile);
+        return settingsFile.getLastModified();
       } catch (final Throwable e) {
         ExceptionUtil.log(getClass(), "Unable to load:" + settingsFile, e);
         return -1;
@@ -650,8 +650,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
 
   protected void loadWorldFile() {
     final Resource resource = getImageResource();
-    final Resource worldFile = SpringUtil.getResourceWithExtension(resource,
-      getWorldFileExtension());
+    final Resource worldFile = resource.createChangeExtension(getWorldFileExtension());
     loadWorldFile(worldFile);
   }
 
@@ -660,7 +659,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
     if (worldFile.exists()) {
       try {
         try (
-          final BufferedReader reader = SpringUtil.getBufferedReader(worldFile)) {
+          final BufferedReader reader = worldFile.newBufferedReader()) {
           final double pixelWidth = Double.parseDouble(reader.readLine());
           final double yRotation = Double.parseDouble(reader.readLine());
           final double xRotation = Double.parseDouble(reader.readLine());
@@ -684,8 +683,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
 
   protected void loadWorldFileX() {
     final Resource resource = getImageResource();
-    final Resource worldFile = SpringUtil.getResourceWithExtension(resource,
-      getWorldFileExtension() + "x");
+    final Resource worldFile = resource.createChangeExtension(getWorldFileExtension() + "x");
     if (worldFile.exists()) {
       loadWorldFile(worldFile);
     } else {
@@ -723,7 +721,8 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
   @Override
   public boolean saveChanges() {
     try {
-      final Resource rgResource = SpringUtil.addExtension(this.imageResource, "rgobject");
+      final Resource resource = this.imageResource;
+      final Resource rgResource = resource.createAddExtension("rgobject");
       MapObjectFactoryRegistry.write(rgResource, this);
       setHasChanges(false);
       return true;

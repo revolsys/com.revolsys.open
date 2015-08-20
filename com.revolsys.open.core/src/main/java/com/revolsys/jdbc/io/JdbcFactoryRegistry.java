@@ -14,10 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
-import com.revolsys.spring.resource.UrlResource;
 
 import com.revolsys.io.map.MapReader;
 import com.revolsys.jdbc.JdbcUtils;
+import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
 
 public class JdbcFactoryRegistry {

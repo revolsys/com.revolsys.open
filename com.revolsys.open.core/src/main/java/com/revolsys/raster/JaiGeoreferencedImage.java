@@ -3,7 +3,7 @@ package com.revolsys.raster;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 public class JaiGeoreferencedImage extends AbstractGeoreferencedImage {
   protected JaiGeoreferencedImage() {

@@ -1,8 +1,8 @@
 package com.revolsys.jts.test.geometry;
 
 import org.junit.Assert;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.ClassPathResource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.io.RecordReader;

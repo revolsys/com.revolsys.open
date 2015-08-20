@@ -16,7 +16,7 @@ import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -351,7 +351,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
       url = markerFile;
     }
     if (url.toUpperCase().matches("[A-Z][A-Z0-9\\+\\.\\-]*:")) {
-      this.markerFileResource = SpringUtil.getResource(url);
+      this.markerFileResource = Resource.getResource(url);
     } else {
       this.markerFileResource = SpringUtil.getBaseResource(url);
     }

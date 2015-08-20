@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.jts.geom.Point;
 import com.revolsys.spring.resource.SpringUtil;
@@ -27,7 +27,7 @@ public class TinWriter {
   private int tinIndex = 0;
 
   public TinWriter(final Resource resource) {
-    this.out = SpringUtil.getPrintWriter(resource);
+    this.out = resource.newPrintWriter();
     this.out.println("TIN");
   }
 

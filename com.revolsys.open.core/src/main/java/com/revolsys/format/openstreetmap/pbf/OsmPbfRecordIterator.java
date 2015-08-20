@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.revolsys.collection.iterator.AbstractIterator;
@@ -93,7 +93,7 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record>implements Rec
   }
 
   public OsmPbfRecordIterator(final Resource resource) {
-    this(new DataInputStream(SpringUtil.getInputStream(resource)));
+    this(new DataInputStream(resource.getInputStream()));
   }
 
   protected void addNode(final List<Record> currentRecords, final OsmNode node) {

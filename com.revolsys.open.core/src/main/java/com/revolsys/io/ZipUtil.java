@@ -14,7 +14,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.spring.resource.SpringUtil;
 
@@ -104,7 +104,7 @@ public class ZipUtil {
   }
 
   public static File unzipFile(final Resource resource) throws IOException {
-    String filename = SpringUtil.getFileName(resource);
+    String filename = resource.getFilename();
     while (filename.length() < 3) {
       filename += "x";
     }

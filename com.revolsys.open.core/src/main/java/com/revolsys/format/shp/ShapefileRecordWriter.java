@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -71,7 +71,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
   private DataType geometryDataType;
 
   public ShapefileRecordWriter(final RecordDefinition recordDefinition, final Resource resource) {
-    super(recordDefinition, SpringUtil.getResourceWithExtension(resource, "dbf"));
+    super(recordDefinition, resource.createChangeExtension("dbf"));
     this.resource = resource;
   }
 
@@ -130,7 +130,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
           addFieldDefinition(this.geometryPropertyName, XBaseFieldDefinition.OBJECT_TYPE, 0, 0);
         }
 
-        final Resource indexResource = SpringUtil.getResourceWithExtension(this.resource, "shx");
+        final Resource indexResource = this.resource.createChangeExtension("shx");
         if (indexResource != null) {
           this.indexOut = new ResourceEndianOutput(indexResource);
           writeHeader(this.indexOut);

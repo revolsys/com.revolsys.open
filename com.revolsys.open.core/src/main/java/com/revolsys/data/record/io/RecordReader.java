@@ -3,7 +3,7 @@ package com.revolsys.data.record.io;
 import java.io.File;
 import java.nio.file.Path;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;

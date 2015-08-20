@@ -6,7 +6,7 @@ import java.util.NoSuchElementException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.io.FileUtil;
@@ -21,7 +21,7 @@ public class KmzGeometryIterator extends AbstractIterator<Geometry> {
 
   public KmzGeometryIterator(final Resource resource) {
     try {
-      final InputStream in = SpringUtil.getInputStream(resource);
+      final InputStream in = resource.getInputStream();
       this.zipIn = new ZipInputStream(in);
     } catch (final Throwable e) {
       throw new RuntimeException("Unable to reade KMZ file", e);

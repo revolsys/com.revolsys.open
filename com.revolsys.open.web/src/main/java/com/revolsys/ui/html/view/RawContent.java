@@ -1,6 +1,6 @@
 package com.revolsys.ui.html.view;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.spring.resource.SpringUtil;
@@ -13,7 +13,7 @@ public class RawContent extends Element {
   private final String content;
 
   public RawContent(final Resource resource) {
-    this(SpringUtil.getContents(resource));
+    this(resource.contentsAsString());
   }
 
   public RawContent(final String content) {
