@@ -732,31 +732,27 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   @Override
-  public void refresh() {
-    if (SwingUtil.isEventDispatchThread()) {
-      Invoke.background("Refresh " + getName(), this, "refresh");
-    } else {
+  public final void refresh() {
+    Invoke.background("Refresh " + getName(), () -> {
       try {
         doRefresh();
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error("Unable to refresh layer: " + getName(), e);
       }
       firePropertyChange("refresh", false, true);
-    }
+    });
   }
 
   @Override
-  public void refreshAll() {
-    if (SwingUtil.isEventDispatchThread()) {
-      Invoke.background("Refresh " + getName(), this, "refreshAll");
-    } else {
+  public final void refreshAll() {
+    Invoke.background("Refresh " + getName(), () -> {
       try {
         doRefreshAll();
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error("Unable to refresh layer: " + getName(), e);
       }
       firePropertyChange("refresh", false, true);
-    }
+    });
   }
 
   @Override
