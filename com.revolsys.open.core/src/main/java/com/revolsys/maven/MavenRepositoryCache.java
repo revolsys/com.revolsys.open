@@ -37,7 +37,7 @@ public class MavenRepositoryCache extends MavenRepository {
       if (!repository.endsWith("/")) {
         repository += '/';
       }
-      final Resource resource = SpringUtil.getResource(repository);
+      final Resource resource = Resource.getResource(repository);
       this.repositories.add(new MavenRepository(resource));
     }
   }
@@ -48,14 +48,14 @@ public class MavenRepositoryCache extends MavenRepository {
 
   public boolean copyRepositoryResource(final Resource resource, final MavenRepository repository,
     final String path, final String sha1Digest) {
-    final Resource repositoryResource = SpringUtil.getResource(repository.getRoot(), path);
+    final Resource repositoryResource = repository.getRoot().createChild(path);
     if (repositoryResource.exists()) {
       try {
         if (Property.hasValue(sha1Digest)) {
           final InputStream in = repositoryResource.getInputStream();
           final DigestInputStream digestIn = new DigestInputStream(in,
             MessageDigest.getInstance("SHA-1"));
-          SpringUtil.copy(digestIn, resource);
+          resource.copyFrom(digestIn);
           final MessageDigest messageDigest = digestIn.getMessageDigest();
           final byte[] digest = messageDigest.digest();
           final String fileDigest = Hex.toHex(digest);
@@ -66,7 +66,7 @@ public class MavenRepositoryCache extends MavenRepository {
             return false;
           }
         } else {
-          SpringUtil.copy(repositoryResource, resource);
+          repositoryResource.copyTo(resource);
         }
         return true;
       } catch (final Exception e) {
@@ -103,7 +103,7 @@ public class MavenRepositoryCache extends MavenRepository {
 
         final String path = getPath(groupId, artifactId, version, type, classifier,
           timestampVersion, algorithm);
-        final Resource cachedResource = SpringUtil.getResource(getRoot(), path);
+        final Resource cachedResource = getRoot().createChild(path);
         if (cachedResource.exists()) {
           return cachedResource;
         } else {

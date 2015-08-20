@@ -85,7 +85,7 @@ public class GpxIterator extends BaseObjectWithProperties
     this(StaxUtils.createXmlReader(resource));
     this.recordFactory = recordFactory;
     this.typePath = path;
-    this.baseName = FileUtil.getBaseName(SpringUtil.getFileName(resource));
+    this.baseName = FileUtil.getBaseName(resource.getFilename());
   }
 
   public GpxIterator(final XMLStreamReader in) {

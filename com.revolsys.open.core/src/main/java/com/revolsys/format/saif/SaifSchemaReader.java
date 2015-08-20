@@ -302,7 +302,7 @@ public class SaifSchemaReader {
   }
 
   public RecordDefinitionFactory loadSchema(final Resource resource) throws IOException {
-    return loadSchema(new CsnIterator(SpringUtil.getFileName(resource), resource.getInputStream()));
+    return loadSchema(new CsnIterator(resource.getFilename(), resource.getInputStream()));
 
   }
 

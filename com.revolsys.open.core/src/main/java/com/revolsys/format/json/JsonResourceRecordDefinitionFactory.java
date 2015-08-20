@@ -14,6 +14,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
 
 public class JsonResourceRecordDefinitionFactory extends BaseObjectWithProperties
@@ -40,7 +41,7 @@ public class JsonResourceRecordDefinitionFactory extends BaseObjectWithPropertie
       for (final org.springframework.core.io.Resource resource : this.applicationContext
         .getResources(this.locationPattern)) {
         final RecordDefinition recordDefinition = MapObjectFactoryRegistry
-          .toObject(SpringUtil.convertSpringResource(resource));
+          .toObject(Resource.getResource(resource));
         final String name = recordDefinition.getPath();
         this.recordDefinitionMap.put(name, recordDefinition);
       }

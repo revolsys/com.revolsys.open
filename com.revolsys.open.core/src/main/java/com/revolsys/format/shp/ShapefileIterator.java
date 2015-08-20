@@ -64,7 +64,7 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
   public ShapefileIterator(final Resource resource, final RecordFactory factory)
     throws IOException {
     this.recordDefinitionFactory = factory;
-    final String baseName = FileUtil.getBaseName(SpringUtil.getFileName(resource));
+    final String baseName = FileUtil.getBaseName(resource.getFilename());
     this.name = baseName;
     this.typeName = PathName.create("/" + this.name);
     this.resource = resource;
@@ -83,8 +83,7 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
       try {
         final Boolean memoryMapped = getProperty("memoryMapped");
         try {
-          final Resource resource1 = this.resource;
-          final File file = resource1.getFile();
+          final File file = this.resource.getFile();
           final File indexFile = new File(file.getParentFile(), this.name + ".shx");
           if (Boolean.TRUE == memoryMapped) {
             this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);
@@ -99,7 +98,7 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
           this.in = new EndianInputStream(this.resource.getInputStream());
         }
 
-        final Resource xbaseResource = this.resource.getResourceWithExtension("dbf");
+        final Resource xbaseResource = this.resource.createChangeExtension("dbf");
         if (xbaseResource.exists()) {
           this.xbaseIterator = new XbaseIterator(xbaseResource, this.recordDefinitionFactory,
             () -> updateRecordDefinition());

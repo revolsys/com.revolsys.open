@@ -55,7 +55,7 @@ public class ShapefileDirectoryReader extends RecordDirectoryReader {
     try {
       final ArrayRecordFactory factory = new ArrayRecordFactory();
       final ShapefileIterator iterator = new ShapefileIterator(resource, factory);
-      final String baseName = SpringUtil.getBaseName(resource).toUpperCase();
+      final String baseName = resource.getBaseName().toUpperCase();
       iterator.setTypeName(PathName.create(this.fileNameTypeMap.get(baseName)));
       iterator.setRecordDefinition(this.typeNameRecordDefinitionMap.get(iterator.getTypeName()));
       return iterator;

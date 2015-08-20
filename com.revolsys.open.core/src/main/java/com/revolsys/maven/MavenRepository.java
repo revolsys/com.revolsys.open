@@ -100,8 +100,8 @@ public class MavenRepository implements URLStreamHandlerFactory {
     final String version) {
     final String recordDefinitionPath = "/" + CollectionUtil.toString("/",
       groupId.replace('.', '/'), artifactId, version, "maven-metadata.xml");
-    final Resource recordDefinitionResource = SpringUtil.getResource(this.root,
-      recordDefinitionPath);
+    final Resource resource = this.root;
+    final Resource recordDefinitionResource = resource.createChild(recordDefinitionPath);
     if (recordDefinitionResource.exists()) {
       try {
         return XmlMapIoFactory.toMap(recordDefinitionResource);
@@ -212,7 +212,8 @@ public class MavenRepository implements URLStreamHandlerFactory {
     final String classifier, final String version, final String algorithm) {
 
     final String path = getPath(groupId, artifactId, version, type, classifier, version, algorithm);
-    final Resource artifactResource = SpringUtil.getResource(this.root, path);
+    final Resource resource = this.root;
+    final Resource artifactResource = resource.createChild(path);
     if (!artifactResource.exists()) {
       return handleMissingResource(artifactResource, groupId, artifactId, type, classifier, version,
         algorithm);

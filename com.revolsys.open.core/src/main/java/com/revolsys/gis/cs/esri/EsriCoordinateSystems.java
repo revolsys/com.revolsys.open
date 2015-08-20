@@ -74,7 +74,7 @@ public class EsriCoordinateSystems {
   }
 
   public static void createPrjFile(final Resource resource, final GeometryFactory geometryFactory) {
-    final Resource prjResource = resource.getResourceWithExtension("prj");
+    final Resource prjResource = resource.createChangeExtension("prj");
     if (prjResource != null) {
       try (
         final Writer writer = prjResource.newWriter(StandardCharsets.ISO_8859_1)) {
@@ -155,7 +155,7 @@ public class EsriCoordinateSystems {
    * @return
    */
   public static GeometryFactory getGeometryFactory(final Resource resource) {
-    final Resource projResource = resource.getResourceWithExtension("prj");
+    final Resource projResource = resource.createChangeExtension("prj");
     if (com.revolsys.spring.resource.Resource.exists(projResource)) {
       try {
         final CoordinateSystem coordinateSystem = getCoordinateSystem(projResource);

@@ -215,7 +215,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     final String schemaName, final Resource resource) {
     try (
       RecordReader recordReader = RecordReader.create(resource)) {
-      final String typePath = Path.toPath(schemaName, SpringUtil.getBaseName(resource));
+      final String typePath = Path.toPath(schemaName, resource.getBaseName());
       recordReader.setProperty("schema", schema);
       recordReader.setProperty("typePath", typePath);
       final RecordDefinition recordDefinition = recordReader.getRecordDefinition();

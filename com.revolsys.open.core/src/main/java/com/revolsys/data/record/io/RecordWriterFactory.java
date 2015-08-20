@@ -47,7 +47,7 @@ public interface RecordWriterFactory
   default RecordWriter createRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
     final OutputStream out = resource.newBufferedOutputStream();
-    final String fileName = SpringUtil.getFileName(resource);
+    final String fileName = resource.getFilename();
     final String baseName = FileUtil.getBaseName(fileName);
     return createRecordWriter(baseName, recordDefinition, out);
   }

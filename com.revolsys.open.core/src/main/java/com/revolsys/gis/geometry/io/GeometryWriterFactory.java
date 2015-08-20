@@ -26,7 +26,7 @@ public interface GeometryWriterFactory extends FileIoFactory, IoFactoryWithCoord
    */
   default GeometryWriter createGeometryWriter(final Resource resource) {
     final OutputStream out = resource.newBufferedOutputStream();
-    final String fileName = SpringUtil.getFileName(resource);
+    final String fileName = resource.getFilename();
     final String baseName = FileUtil.getBaseName(fileName);
     return createGeometryWriter(baseName, out);
   }

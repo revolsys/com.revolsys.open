@@ -65,7 +65,7 @@ public class TcxIterator extends BaseObjectWithProperties
     throws IOException {
     this(StaxUtils.createXmlReader(resource));
     this.typePath = path;
-    this.baseName = FileUtil.getBaseName(SpringUtil.getFileName(resource));
+    this.baseName = FileUtil.getBaseName(resource.getFilename());
   }
 
   public TcxIterator(final XMLStreamReader in) {

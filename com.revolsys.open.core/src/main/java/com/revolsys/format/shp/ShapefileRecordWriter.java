@@ -71,7 +71,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
   private DataType geometryDataType;
 
   public ShapefileRecordWriter(final RecordDefinition recordDefinition, final Resource resource) {
-    super(recordDefinition, resource.getResourceWithExtension("dbf"));
+    super(recordDefinition, resource.createChangeExtension("dbf"));
     this.resource = resource;
   }
 
@@ -130,7 +130,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
           addFieldDefinition(this.geometryPropertyName, XBaseFieldDefinition.OBJECT_TYPE, 0, 0);
         }
 
-        final Resource indexResource = this.resource.getResourceWithExtension("shx");
+        final Resource indexResource = this.resource.createChangeExtension("shx");
         if (indexResource != null) {
           this.indexOut = new ResourceEndianOutput(indexResource);
           writeHeader(this.indexOut);

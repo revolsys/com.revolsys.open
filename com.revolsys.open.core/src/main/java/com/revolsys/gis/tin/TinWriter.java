@@ -27,7 +27,7 @@ public class TinWriter {
   private int tinIndex = 0;
 
   public TinWriter(final Resource resource) {
-    this.out = SpringUtil.getPrintWriter(resource);
+    this.out = resource.newPrintWriter();
     this.out.println("TIN");
   }
 

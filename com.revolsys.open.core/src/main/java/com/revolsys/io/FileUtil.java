@@ -656,7 +656,7 @@ public final class FileUtil {
       final FileSystemResource fileResource = (FileSystemResource)resource;
       return fileResource.getFile();
     } else {
-      final String fileName = SpringUtil.getFileName(resource);
+      final String fileName = resource.getFilename();
       final String ext = getFileNameExtension(fileName);
       final File file = File.createTempFile(fileName, "." + ext);
       copy(resource.getInputStream(), file);

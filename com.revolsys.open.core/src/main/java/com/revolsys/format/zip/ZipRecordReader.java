@@ -24,7 +24,7 @@ public class ZipRecordReader extends DelegatingReader<Record>implements RecordRe
   public ZipRecordReader(final Resource resource, final String fileExtension,
     final RecordFactory factory) {
     try {
-      final String baseName = FileUtil.getBaseName(SpringUtil.getFileName(resource));
+      final String baseName = FileUtil.getBaseName(resource.getFilename());
       final String zipEntryName = baseName + "." + fileExtension;
       this.directory = ZipUtil.unzipFile(resource);
       if (!openFile(resource, factory, zipEntryName)) {

@@ -224,7 +224,7 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
   }
 
   public void saveAs(final Resource parentDirectory, final String directoryName) {
-    final Resource connectionsDirectory = SpringUtil.getResource(parentDirectory, directoryName);
+    final Resource connectionsDirectory = parentDirectory.createChild(directoryName);
     saveAs(connectionsDirectory);
   }
 

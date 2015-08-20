@@ -96,11 +96,11 @@ public class XbaseIterator extends AbstractIterator<Record>implements RecordRead
     throws IOException {
     this.typeName = PathName.ROOT;
     this.resource = resource;
-    final String baseName = FileUtil.getBaseName(SpringUtil.getFileName(resource));
+    final String baseName = FileUtil.getBaseName(resource.getFilename());
     this.typeName = PathName.create("/" + baseName);
 
     this.recordFactory = recordFactory;
-    final Resource codePageResource = resource.getResourceWithExtension("cpg");
+    final Resource codePageResource = resource.createChangeExtension("cpg");
     if (codePageResource != null && codePageResource.exists()) {
       final String charsetName = codePageResource.contentsAsString();
       try {

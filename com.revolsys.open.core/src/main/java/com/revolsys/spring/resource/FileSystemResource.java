@@ -89,6 +89,16 @@ public class FileSystemResource extends AbstractResource {
     return this.file.length();
   }
 
+  @Override
+  public void copyFrom(final InputStream in) {
+    final File file = getFile();
+    final File parent = file.getParentFile();
+    if (!parent.exists()) {
+      parent.mkdirs();
+    }
+    super.copyFrom(in);
+  }
+
   /**
    * This implementation creates a FileSystemResource, applying the given path
    * relative to the path of the underlying file of this resource descriptor.

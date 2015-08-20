@@ -11,7 +11,6 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.format.directory.DirectoryRecordStore;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
-import com.revolsys.spring.resource.SpringUtil;
 
 public abstract class AbstractRecordIoFactory extends AbstractIoFactoryWithCoordinateSystem
   implements RecordReaderFactory, RecordStoreFactory {
@@ -31,7 +30,7 @@ public abstract class AbstractRecordIoFactory extends AbstractIoFactoryWithCoord
   @Override
   public RecordStore createRecordStore(final Map<String, ? extends Object> connectionProperties) {
     final String url = (String)connectionProperties.get("url");
-    final Resource resource = SpringUtil.getResource(url);
+    final Resource resource = Resource.getResource(url);
     final File directory = resource.getFile();
     final List<String> fileExtensions = getFileExtensions();
     return new DirectoryRecordStore(directory, fileExtensions);

@@ -25,7 +25,6 @@ import com.revolsys.jts.geom.impl.PointDouble2D;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.raster.MappedLocation;
-import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
@@ -101,7 +100,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   public void cancelChanges() {
     if (this.image == null && this.resource != null) {
       GeoreferencedImage image = null;
-      final Resource imageResource = SpringUtil.getResource(this.url);
+      final Resource imageResource = Resource.getResource(this.url);
       if (imageResource.exists()) {
         try {
           image = GeoreferencedImageFactory.loadGeoreferencedImage(imageResource);
@@ -176,7 +175,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     final String url = getProperty("url");
     if (Property.hasValue(url)) {
       this.url = url;
-      this.resource = SpringUtil.getResource(url);
+      this.resource = Resource.getResource(url);
       cancelChanges();
       return true;
     } else {

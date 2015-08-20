@@ -96,6 +96,20 @@ public class PathResource extends AbstractResource implements WritableResource {
     return Files.size(this.path);
   }
 
+  @Override
+  public void copyFrom(final InputStream in) {
+    final Path path = getPath();
+    final Path parent = path.getParent();
+    if (!Files.exists(parent)) {
+      try {
+        Files.createDirectories(parent);
+      } catch (final IOException e) {
+        throw new WrappedException(e);
+      }
+    }
+    super.copyFrom(in);
+  }
+
   /**
    * This implementation creates a FileResource, applying the given path
    * relative to the path of the underlying file of this resource descriptor.
@@ -103,7 +117,8 @@ public class PathResource extends AbstractResource implements WritableResource {
    */
   @Override
   public Resource createRelative(final String relativePath) {
-    return new PathResource(this.path.resolve(relativePath));
+    Path childPath = this.path.resolve(relativePath);
+    return new PathResource(childPath);
   }
 
   @Override

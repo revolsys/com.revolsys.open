@@ -1,12 +1,15 @@
 package com.revolsys.spring.resource;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URI;
@@ -17,10 +20,11 @@ import java.nio.file.Path;
 
 import com.revolsys.io.FileNames;
 import com.revolsys.io.FileUtil;
+import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
 
 public interface Resource extends org.springframework.core.io.Resource {
-  static boolean exists(final com.revolsys.spring.resource.Resource resource) {
+  static boolean exists(final Resource resource) {
     if (resource == null) {
       return false;
     } else {
@@ -28,29 +32,120 @@ public interface Resource extends org.springframework.core.io.Resource {
     }
   }
 
-  static com.revolsys.spring.resource.Resource getResource(final Object source) {
-    com.revolsys.spring.resource.Resource resource;
-    if (source instanceof com.revolsys.spring.resource.Resource) {
-      resource = (com.revolsys.spring.resource.Resource)source;
+  static Resource getResource(final Object source) {
+    if (source instanceof Resource) {
+      return (Resource)source;
     } else if (source instanceof Path) {
-      resource = new PathResource((Path)source);
+      return new PathResource((Path)source);
     } else if (source instanceof File) {
-      resource = new FileSystemResource((File)source);
+      return new FileSystemResource((File)source);
     } else if (source instanceof URL) {
-      resource = new UrlResource((URL)source);
+      return new UrlResource((URL)source);
     } else if (source instanceof URI) {
-      resource = new UrlResource((URI)source);
+      return new UrlResource((URI)source);
     } else if (source instanceof String) {
-      return SpringUtil.getResource((String)source);
-    } else {
-      throw new IllegalArgumentException(source.getClass() + " is not supported");
+      return getResource((String)source);
+    } else if (source instanceof org.springframework.core.io.Resource) {
+      if (source instanceof org.springframework.core.io.ClassPathResource) {
+        final org.springframework.core.io.ClassPathResource springResource = (org.springframework.core.io.ClassPathResource)source;
+        return new ClassPathResource(springResource.getPath(), springResource.getClassLoader());
+      } else if (source instanceof org.springframework.core.io.FileSystemResource) {
+        final org.springframework.core.io.FileSystemResource springResource = (org.springframework.core.io.FileSystemResource)source;
+        return new FileSystemResource(springResource.getFile());
+      } else if (source instanceof org.springframework.core.io.PathResource) {
+        final org.springframework.core.io.PathResource springResource = (org.springframework.core.io.PathResource)source;
+        return new PathResource(springResource.getPath());
+      } else if (source instanceof org.springframework.core.io.UrlResource) {
+        final org.springframework.core.io.UrlResource springResource = (org.springframework.core.io.UrlResource)source;
+        try {
+          return new UrlResource(springResource.getURL());
+        } catch (final IOException e) {
+          throw new WrappedException(e);
+        }
+      }
     }
-    return resource;
+
+    throw new IllegalArgumentException(source.getClass() + " is not supported");
+  }
+
+  static Resource getResource(final String location) {
+    if (Property.hasValue(location)) {
+      if (location.charAt(0) == '/' || location.length() > 1 && location.charAt(1) == ':') {
+        return new PathResource(location);
+      } else {
+        return new UrlResource(location);
+      }
+    }
+    return null;
   }
 
   default String contentsAsString() {
     final Reader reader = newReader();
     return FileUtil.getString(reader);
+  }
+
+  default void copyFrom(final InputStream in) {
+    try (
+      final InputStream in2 = in;
+      final OutputStream out = newBufferedOutputStream();) {
+      FileUtil.copy(in2, out);
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
+  }
+
+  default void copyFrom(final Resource source) {
+    try (
+      final InputStream in = source.newBufferedInputStream()) {
+      copyFrom(in);
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
+  }
+
+  default void copyTo(final OutputStream out) {
+    try (
+      final OutputStream out2 = out;
+      final InputStream in = newBufferedInputStream();) {
+      FileUtil.copy(in, out2);
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
+  }
+
+  default void copyTo(final Resource target) {
+    try (
+      final OutputStream out = target.newBufferedOutputStream()) {
+      copyTo(out);
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
+  }
+
+  default Resource createAddExtension(final String extension) {
+    final String fileName = getFilename();
+    final String newFileName = fileName + "." + extension;
+    final Resource parent = getParent();
+    if (parent == null) {
+      return null;
+    } else {
+      return parent.createChild(newFileName);
+    }
+  }
+
+  default Resource createChangeExtension(final String extension) {
+    final String baseName = getBaseName();
+    final String newFileName = baseName + "." + extension;
+    final Resource parent = getParent();
+    if (parent == null) {
+      return null;
+    } else {
+      return parent.createChild(newFileName);
+    }
+  }
+
+  default Resource createChild(final CharSequence childPath) {
+    return createRelative(childPath.toString());
   }
 
   @Override
@@ -68,35 +163,42 @@ public interface Resource extends org.springframework.core.io.Resource {
   @Override
   File getFile();
 
-  default String getFileNameExtension(final Resource resource) {
-    final String filename = resource.getFilename();
+  default String getFileNameExtension() {
+    final String filename = getFilename();
     return FileNames.getFileNameExtension(filename);
   }
 
   @Override
   InputStream getInputStream();
 
-  default Resource getParent() {
-    return null;
+  default long getLastModified() {
+    try {
+      return lastModified();
+    } catch (final IOException e) {
+      return Long.MAX_VALUE;
+    }
   }
 
-  default Resource getResourceWithExtension(final String extension) {
-    final String baseName = getBaseName();
-    final String newFileName = baseName + "." + extension;
-    final Resource parent = getParent();
-    if (parent == null) {
-      return null;
-    } else {
-      return parent.createRelative(newFileName);
-    }
+  default Resource getParent() {
+    return null;
   }
 
   @Override
   URL getURL();
 
+  default InputStream newBufferedInputStream() {
+    final InputStream in = newInputStream();
+    return new BufferedInputStream(in);
+  }
+
   default OutputStream newBufferedOutputStream() {
     final OutputStream out = newOutputStream();
     return new BufferedOutputStream(out);
+  }
+
+  default BufferedReader newBufferedReader() {
+    final Reader in = newReader();
+    return new BufferedReader(in);
   }
 
   default InputStream newInputStream() {
@@ -118,6 +220,11 @@ public interface Resource extends org.springframework.core.io.Resource {
     } catch (final IOException e) {
       throw new WrappedException(e);
     }
+  }
+
+  default PrintWriter newPrintWriter() {
+    final Writer writer = newWriter();
+    return new PrintWriter(writer);
   }
 
   default Reader newReader() {

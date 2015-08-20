@@ -104,7 +104,7 @@ public class ZipUtil {
   }
 
   public static File unzipFile(final Resource resource) throws IOException {
-    String filename = SpringUtil.getFileName(resource);
+    String filename = resource.getFilename();
     while (filename.length() < 3) {
       filename += "x";
     }

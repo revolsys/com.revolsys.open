@@ -2,7 +2,7 @@ package com.revolsys.swing.map.layer;
 
 import java.awt.Component;
 import java.beans.PropertyChangeListener;
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -102,7 +102,7 @@ public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties,
 
   boolean saveChanges();
 
-  boolean saveSettings(File directory);
+  boolean saveSettings(Path directory);
 
   void setEditable(boolean editable);
 

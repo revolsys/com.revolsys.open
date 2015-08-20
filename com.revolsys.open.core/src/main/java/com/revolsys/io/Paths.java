@@ -39,6 +39,11 @@ public class Paths {
   }
 
   public static Path getDirectoryPath(final Path path) {
+    createDirectories(path);
+    return getPath(path);
+  }
+
+  public static void createDirectories(final Path path) {
     if (!Paths.exists(path)) {
       try {
         Files.createDirectories(path);
@@ -46,7 +51,6 @@ public class Paths {
         throw new WrappedException(e);
       }
     }
-    return getPath(path);
   }
 
   public static Path getDirectoryPath(final Path parent, final String path) {

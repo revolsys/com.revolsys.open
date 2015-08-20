@@ -52,7 +52,7 @@ public class IoFactoryRegistry {
     String fileName = null;
     if (Property.hasValue(source)) {
       if (source instanceof Resource) {
-        fileName = SpringUtil.getFileName((Resource)source);
+        fileName = ((Resource)source).getFilename();
       } else if (source instanceof Path) {
         fileName = Paths.getFileName((Path)source);
       } else if (source instanceof File) {

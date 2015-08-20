@@ -309,12 +309,10 @@ public class UrlResource extends AbstractResource {
 
   /**
    * This implementation returns the name of the file that this URL refers to.
-   * @see java.net.URL#getFile()
-   * @see java.io.File#getName()
    */
   @Override
   public String getFilename() {
-    return new File(this.url.getFile()).getName();
+    return UrlUtil.getFileName(this.url);
   }
 
   /**

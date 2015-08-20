@@ -8,6 +8,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,14 +17,15 @@ import java.util.Map.Entry;
 
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.Paths;
 import com.revolsys.io.Reader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapReaderFactory;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
 import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.Property;
 
 public class Json extends AbstractIoFactory implements MapReaderFactory, MapWriterFactory {
@@ -65,6 +68,20 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
         }
       } catch (final IOException e) {
         throw new RuntimeException("Unable to read JSON map", e);
+      }
+    }
+  }
+
+  public static Map<String, Object> toMap(final Path directory, final String path) {
+    if (directory == null || path == null) {
+      return new LinkedHashMap<String, Object>();
+    } else {
+      final Path file = directory.resolve(path);
+      if (Paths.exists(file) && !Files.isDirectory(file)) {
+        final PathResource resource = new PathResource(file);
+        return toMap(resource);
+      } else {
+        return new LinkedHashMap<String, Object>();
       }
     }
   }
@@ -156,6 +173,12 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
   public static void write(final Map<String, ? extends Object> object, final File file,
     final boolean indent) {
     final FileSystemResource resource = new FileSystemResource(file);
+    write(object, resource, indent);
+  }
+
+  public static void write(final Map<String, ? extends Object> object, final Path path,
+    final boolean indent) {
+    final PathResource resource = new PathResource(path);
     write(object, resource, indent);
   }
 

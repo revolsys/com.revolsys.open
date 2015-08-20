@@ -6,7 +6,6 @@ import java.util.Map;
 import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.format.json.Json;
-import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.UrlUtil;
 
 public class ArcGisResponse extends AbstractMapWrapper {
@@ -51,7 +50,7 @@ public class ArcGisResponse extends AbstractMapWrapper {
   public synchronized Map<String, Object> getValues() {
     Map<String, Object> values = super.getValues();
     if (values == null) {
-      final Resource resource = SpringUtil
+      final Resource resource = Resource
         .getResource(UrlUtil.getUrl(this.serviceUrl + this.path, FORMAT_PARAMETER));
       values = Json.toMap(resource);
       setValues(values);

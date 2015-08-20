@@ -142,7 +142,8 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
     final RecordStoreSchema schema = getProperty("schema");
     String typePath = getProperty("typePath");
     if (!Property.hasValue(typePath)) {
-      typePath = "/" + FileUtil.getBaseName(SpringUtil.getFileName(this.resource));
+      final Resource resource1 = this.resource;
+      typePath = "/" + FileUtil.getBaseName(resource1.getFilename());
       String schemaPath = getProperty("schemaPath");
       if (Property.hasValue(schemaPath)) {
         if (!schemaPath.startsWith("/")) {
