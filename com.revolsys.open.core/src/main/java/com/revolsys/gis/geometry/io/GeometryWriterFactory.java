@@ -4,7 +4,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.FileUtil;
@@ -25,7 +25,7 @@ public interface GeometryWriterFactory extends FileIoFactory, IoFactoryWithCoord
    * @return The writer.
    */
   default GeometryWriter createGeometryWriter(final Resource resource) {
-    final OutputStream out = SpringUtil.getOutputStream(resource);
+    final OutputStream out = resource.newBufferedOutputStream();
     final String fileName = SpringUtil.getFileName(resource);
     final String baseName = FileUtil.getBaseName(fileName);
     return createGeometryWriter(baseName, out);

@@ -3,7 +3,7 @@ package com.revolsys.gis.tin;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.io.FileUtil;

@@ -16,7 +16,7 @@ import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;

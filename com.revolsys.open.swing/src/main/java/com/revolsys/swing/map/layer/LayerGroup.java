@@ -13,7 +13,7 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.data.record.io.RecordReaderFactory;

@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.data.record.Record;
@@ -100,9 +100,9 @@ public class XbaseIterator extends AbstractIterator<Record>implements RecordRead
     this.typeName = PathName.create("/" + baseName);
 
     this.recordFactory = recordFactory;
-    final Resource codePageResource = SpringUtil.getResourceWithExtension(resource, "cpg");
+    final Resource codePageResource = resource.getResourceWithExtension("cpg");
     if (codePageResource != null && codePageResource.exists()) {
-      final String charsetName = SpringUtil.getContents(codePageResource);
+      final String charsetName = codePageResource.contentsAsString();
       try {
         this.charset = Charset.forName(charsetName);
       } catch (final Exception e) {
@@ -130,7 +130,8 @@ public class XbaseIterator extends AbstractIterator<Record>implements RecordRead
     if (this.in == null) {
       try {
         try {
-          final File file = SpringUtil.getFile(this.resource);
+          final Resource resource1 = this.resource;
+          final File file = resource1.getFile();
           final Boolean memoryMapped = getProperty("memoryMapped");
           if (Boolean.TRUE == memoryMapped) {
             this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);

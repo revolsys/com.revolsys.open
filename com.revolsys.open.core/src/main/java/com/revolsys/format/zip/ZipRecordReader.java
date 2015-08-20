@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import com.revolsys.spring.resource.FileSystemResource;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.io.DelegatingReader;
 import com.revolsys.data.record.Record;

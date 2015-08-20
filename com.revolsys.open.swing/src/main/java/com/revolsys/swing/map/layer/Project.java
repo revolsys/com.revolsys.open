@@ -3,7 +3,6 @@ package com.revolsys.swing.map.layer;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +18,6 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.record.io.RecordStoreConnectionManager;
@@ -37,6 +35,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
@@ -114,12 +113,8 @@ public class Project extends LayerGroup {
   protected ValueField createPropertiesTabGeneralPanelSource(final BasePanel parent) {
     final ValueField panel = super.createPropertiesTabGeneralPanelSource(parent);
     if (this.resource != null) {
-      try {
-        SwingUtil.addLabelledReadOnlyTextField(panel, "URL", this.resource.getURL());
-        GroupLayoutUtil.makeColumns(panel, 2, true);
-      } catch (final IOException e) {
-      }
-
+      SwingUtil.addLabelledReadOnlyTextField(panel, "URL", this.resource.getURL());
+      GroupLayoutUtil.makeColumns(panel, 2, true);
     }
     return panel;
   }
@@ -318,11 +313,8 @@ public class Project extends LayerGroup {
           if (!recordStoresDirectory.exists()) {
             final Resource dataStoresDirectory = SpringUtil.getResource(resource, "Data Stores");
             if (dataStoresDirectory.exists()) {
-              try {
-                final File file = dataStoresDirectory.getFile();
-                file.renameTo(new File(file.getParentFile(), "Record Stores"));
-              } catch (final IOException e) {
-              }
+              final File file = dataStoresDirectory.getFile();
+              file.renameTo(new File(file.getParentFile(), "Record Stores"));
             }
           }
 

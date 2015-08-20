@@ -29,7 +29,7 @@ import org.gdal.osr.SpatialReference;
 import org.gdal.osr.osr;
 import org.slf4j.LoggerFactory;
 import com.revolsys.spring.resource.FileSystemResource;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.format.json.Json;
 import com.revolsys.gdal.raster.GdalImageFactory;

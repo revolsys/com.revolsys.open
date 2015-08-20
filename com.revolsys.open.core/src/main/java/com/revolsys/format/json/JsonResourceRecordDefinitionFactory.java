@@ -9,12 +9,12 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.spring.resource.SpringUtil;
 
 public class JsonResourceRecordDefinitionFactory extends BaseObjectWithProperties
   implements ApplicationContextAware, RecordDefinitionFactory {
@@ -37,8 +37,10 @@ public class JsonResourceRecordDefinitionFactory extends BaseObjectWithPropertie
   @PostConstruct
   public void init() {
     try {
-      for (final Resource resource : this.applicationContext.getResources(this.locationPattern)) {
-        final RecordDefinition recordDefinition = MapObjectFactoryRegistry.toObject(resource);
+      for (final org.springframework.core.io.Resource resource : this.applicationContext
+        .getResources(this.locationPattern)) {
+        final RecordDefinition recordDefinition = MapObjectFactoryRegistry
+          .toObject(SpringUtil.convertSpringResource(resource));
         final String name = recordDefinition.getPath();
         this.recordDefinitionMap.put(name, recordDefinition);
       }

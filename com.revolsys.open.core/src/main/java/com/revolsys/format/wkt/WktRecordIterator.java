@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.data.record.Record;

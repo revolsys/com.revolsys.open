@@ -19,7 +19,7 @@ import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.data.record.io.RecordWriterFactory;

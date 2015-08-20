@@ -4,7 +4,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.io.RecordWriterFactory;

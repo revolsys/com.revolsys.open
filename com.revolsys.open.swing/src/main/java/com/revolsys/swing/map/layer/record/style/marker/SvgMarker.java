@@ -8,7 +8,7 @@ import javax.measure.Measure;
 import javax.measure.quantity.Length;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.kitfox.svg.SVGDiagram;
 import com.kitfox.svg.SVGException;

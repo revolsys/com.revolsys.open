@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.format.json.JsonParser;

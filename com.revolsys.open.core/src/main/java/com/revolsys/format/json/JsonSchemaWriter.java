@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 
 import javax.annotation.PreDestroy;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -23,7 +23,7 @@ public class JsonSchemaWriter {
   private final JsonMapWriter writer;
 
   public JsonSchemaWriter(final Resource resource) {
-    final Writer out = SpringUtil.getWriter(resource);
+    final Writer out = resource.newWriter();
     this.writer = new JsonMapWriter(out, true);
     this.writer.setListRoot(true);
   }

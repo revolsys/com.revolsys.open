@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import com.revolsys.spring.resource.FileSystemResource;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.types.DataTypes;

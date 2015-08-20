@@ -13,7 +13,7 @@ import org.libtiff.jai.codec.XTIFFDirectory;
 import org.libtiff.jai.codec.XTIFFField;
 import org.libtiff.jai.codecimpl.XTIFFCodec;
 import org.libtiff.jai.operator.XTIFFDescriptor;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.gis.cs.Area;

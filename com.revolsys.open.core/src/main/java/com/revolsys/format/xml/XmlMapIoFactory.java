@@ -3,7 +3,7 @@ package com.revolsys.format.xml;
 import java.io.Writer;
 import java.util.Map;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.map.IteratorMapReader;

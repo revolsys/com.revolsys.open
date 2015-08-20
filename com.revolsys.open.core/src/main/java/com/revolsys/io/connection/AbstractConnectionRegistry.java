@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.spring.resource.FileSystemResource;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.map.Maps;

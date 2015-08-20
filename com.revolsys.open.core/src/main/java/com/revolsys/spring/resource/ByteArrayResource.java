@@ -1,7 +1,6 @@
 package com.revolsys.spring.resource;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
@@ -106,7 +105,7 @@ public class ByteArrayResource extends AbstractResource {
    * @see java.io.ByteArrayInputStream
    */
   @Override
-  public InputStream getInputStream() throws IOException {
+  public InputStream getInputStream() {
     return new ByteArrayInputStream(this.data);
   }
 

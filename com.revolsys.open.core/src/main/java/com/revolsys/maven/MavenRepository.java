@@ -1,7 +1,6 @@
 package com.revolsys.maven;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -13,11 +12,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.DefaultResourceLoader;
-import com.revolsys.spring.resource.FileSystemResource;
-import org.springframework.core.io.Resource;
 
 import com.revolsys.format.xml.XmlMapIoFactory;
+import com.revolsys.spring.resource.DefaultResourceLoader;
+import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
@@ -116,7 +115,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
               LoggerFactory.getLogger(getClass())
                 .error("Deleting corrupt maven resource" + recordDefinitionResource, e);
             }
-          } catch (final IOException ioe) {
+          } catch (final Throwable ioe) {
           }
         }
         throw e;
@@ -233,7 +232,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
       if (digestResource.exists()) {
         String digestContents = null;
         try {
-          digestContents = SpringUtil.getContents(digestResource);
+          digestContents = digestResource.contentsAsString();
           return digestContents.trim().substring(0, 40);
         } catch (final Throwable e) {
           if (digestContents == null) {
@@ -294,7 +293,6 @@ public class MavenRepository implements URLStreamHandlerFactory {
   public void setRoot(final Resource root) {
     if (root == null) {
       this.root = new FileSystemResource(System.getProperty("user.home") + "/.m2/repository/");
-
     } else {
       try {
         String url = root.getURL().toExternalForm();
@@ -304,7 +302,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
           url += '/';
         }
         this.root = new DefaultResourceLoader().getResource(url);
-      } catch (final IOException e) {
+      } catch (final Throwable e) {
         this.root = root;
       }
     }

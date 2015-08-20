@@ -12,7 +12,7 @@ import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.data.query.Query;

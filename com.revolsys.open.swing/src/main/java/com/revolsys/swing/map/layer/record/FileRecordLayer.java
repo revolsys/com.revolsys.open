@@ -3,7 +3,7 @@ package com.revolsys.swing.map.layer.record;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.io.RecordReader;

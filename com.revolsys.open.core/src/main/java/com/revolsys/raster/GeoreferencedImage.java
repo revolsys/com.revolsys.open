@@ -7,7 +7,7 @@ import java.awt.image.RenderedImage;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.io.map.MapSerializer;

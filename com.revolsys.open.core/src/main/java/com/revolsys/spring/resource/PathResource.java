@@ -17,18 +17,22 @@
 package com.revolsys.spring.resource;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import com.revolsys.spring.resource.FileSystemResource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
+
+import com.revolsys.util.WrappedException;
 
 /**
  * {@link Resource} implementation for {@code java.nio.file.Path} handles.
@@ -39,7 +43,7 @@ import org.springframework.util.Assert;
  * @since 4.0
  * @see java.nio.file.Path
  */
-public class PathResource extends AbstractResource {
+public class PathResource extends AbstractResource implements WritableResource {
 
   private final Path path;
 
@@ -102,6 +106,17 @@ public class PathResource extends AbstractResource {
     return new PathResource(this.path.resolve(relativePath));
   }
 
+  @Override
+  public boolean delete() {
+    try {
+      return Files.deleteIfExists(this.path);
+    } catch (final DirectoryNotEmptyException e) {
+      return false;
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
+  }
+
   /**
    * This implementation compares the underlying Path references.
    */
@@ -128,14 +143,8 @@ public class PathResource extends AbstractResource {
    * This implementation returns the underlying File reference.
    */
   @Override
-  public File getFile() throws IOException {
-    try {
-      return this.path.toFile();
-    } catch (final UnsupportedOperationException ex) {
-      // only Paths on the default file system can be converted to a File
-      // do exception translation for cases where conversion is not possible
-      throw new FileNotFoundException(this.path + " cannot be resolved to " + "absolute file path");
-    }
+  public File getFile() {
+    return this.path.toFile();
   }
 
   /**
@@ -152,14 +161,27 @@ public class PathResource extends AbstractResource {
    * @see java.nio.file.spi.FileSystemProvider#newInputStream(Path, OpenOption...)
    */
   @Override
-  public InputStream getInputStream() throws IOException {
+  public InputStream getInputStream() {
     if (!exists()) {
-      throw new FileNotFoundException(getPath() + " (no such file or directory)");
+      throw new IllegalArgumentException(getPath() + " (no such file or directory)");
     }
     if (Files.isDirectory(this.path)) {
-      throw new FileNotFoundException(getPath() + " (is a directory)");
+      throw new IllegalArgumentException(getPath() + " (is a directory)");
     }
-    return Files.newInputStream(this.path);
+    try {
+      return Files.newInputStream(this.path);
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
+  }
+
+  @Override
+  public OutputStream getOutputStream() {
+    try {
+      return Files.newOutputStream(getPath());
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 
   @Override
@@ -194,11 +216,13 @@ public class PathResource extends AbstractResource {
    * @see java.net.URI#toURL()
    */
   @Override
-  public URL getURL() throws IOException {
-    return this.path.toUri().toURL();
+  public URL getURL() {
+    try {
+      return this.path.toUri().toURL();
+    } catch (final MalformedURLException e) {
+      throw new WrappedException(e);
+    }
   }
-
-  // implementation of WritableResource
 
   /**
    * This implementation returns the hash code of the underlying Path reference.
@@ -207,6 +231,8 @@ public class PathResource extends AbstractResource {
   public int hashCode() {
     return this.path.hashCode();
   }
+
+  // implementation of WritableResource
 
   /**
    * This implementation checks whether the underlying file is marked as readable
@@ -219,6 +245,11 @@ public class PathResource extends AbstractResource {
     return Files.isReadable(this.path) && !Files.isDirectory(this.path);
   }
 
+  @Override
+  public boolean isWritable() {
+    return Files.isWritable(this.path) && !Files.isDirectory(this.path);
+  }
+
   /**
    * This implementation returns the underlying File's timestamp.
    * @see java.nio.file.Files#getLastModifiedTime(Path, java.nio.file.LinkOption...)
@@ -229,6 +260,11 @@ public class PathResource extends AbstractResource {
     // and
     // only Paths on the default file system can be converted to a File
     return Files.getLastModifiedTime(this.path).toMillis();
+  }
+
+  @Override
+  public OutputStream newOutputStream() {
+    return getOutputStream();
   }
 
 }

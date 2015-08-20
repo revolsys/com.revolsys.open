@@ -5,7 +5,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.FileUtil;
@@ -14,7 +14,7 @@ import com.revolsys.spring.resource.SpringUtil;
 public interface MapWriterFactory extends FileIoFactory {
   default MapWriter createMapWriter(final Object source) {
     final Resource resource = com.revolsys.spring.resource.Resource.getResource(source);
-    final Writer writer = SpringUtil.getWriter(resource);
+    final Writer writer = resource.newWriter();
     return createMapWriter(writer);
   }
 

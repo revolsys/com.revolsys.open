@@ -5,7 +5,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
@@ -34,7 +34,7 @@ public class RecordStoreRecordAndGeometryWriterFactory extends AbstractIoFactory
   @Override
   public RecordWriter createRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
-    final File file = SpringUtil.getFile(resource);
+    final File file = resource.getFile();
     final RecordStore recordStore = RecordStoreFactoryRegistry.createRecordStore(file);
     if (recordStore == null) {
       return null;

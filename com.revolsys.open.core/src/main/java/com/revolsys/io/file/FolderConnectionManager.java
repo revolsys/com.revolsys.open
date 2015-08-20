@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.spring.resource.FileSystemResource;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.io.connection.AbstractConnectionRegistryManager;
 import com.revolsys.util.OS;

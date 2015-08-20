@@ -1,6 +1,6 @@
 package com.revolsys.gdal.raster;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.gdal.Gdal;
 import com.revolsys.io.AbstractIoFactory;

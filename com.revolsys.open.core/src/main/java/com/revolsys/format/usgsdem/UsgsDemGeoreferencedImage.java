@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.format.raster.RasterWriter;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -202,7 +202,7 @@ public class UsgsDemGeoreferencedImage extends BufferedGeoreferencedImage {
   public UsgsDemGeoreferencedImage(final Resource resource) {
     final byte[] buffer = new byte[1024];
     try (
-      InputStream in = SpringUtil.getInputStream(resource)) {
+      InputStream in = resource.getInputStream()) {
       if (in.read(buffer, 0, 1024) != -1) {
         final String fileName = getString(buffer, 1, 40);
         final String descriptor = getString(buffer, 41, 40);

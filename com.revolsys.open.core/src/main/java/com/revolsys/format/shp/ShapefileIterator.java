@@ -7,13 +7,10 @@ import java.io.IOException;
 import java.nio.channels.FileChannel.MapMode;
 import java.util.NoSuchElementException;
 
-import org.springframework.core.io.Resource;
-
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.Records;
-import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
@@ -30,6 +27,7 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.io.PathName;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.Property;
 
@@ -85,7 +83,8 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
       try {
         final Boolean memoryMapped = getProperty("memoryMapped");
         try {
-          final File file = SpringUtil.getFile(this.resource);
+          final Resource resource1 = this.resource;
+          final File file = resource1.getFile();
           final File indexFile = new File(file.getParentFile(), this.name + ".shx");
           if (Boolean.TRUE == memoryMapped) {
             this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);
@@ -100,7 +99,7 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
           this.in = new EndianInputStream(this.resource.getInputStream());
         }
 
-        final Resource xbaseResource = SpringUtil.getResourceWithExtension(this.resource, "dbf");
+        final Resource xbaseResource = this.resource.getResourceWithExtension("dbf");
         if (xbaseResource.exists()) {
           this.xbaseIterator = new XbaseIterator(xbaseResource, this.recordDefinitionFactory,
             () -> updateRecordDefinition());

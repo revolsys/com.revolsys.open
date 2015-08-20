@@ -10,7 +10,7 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 import com.revolsys.spring.resource.FileSystemResource;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.format.json.Json;
@@ -94,7 +94,7 @@ public class MapObjectFactoryRegistry {
   }
 
   public static <V> V toObject(final Resource resource) {
-    final Resource oldResource = SpringUtil.setBaseResource(SpringUtil.getParentResource(resource));
+    final Resource oldResource = SpringUtil.setBaseResource(resource.getParent());
 
     try {
       final Map<String, Object> properties = Json.toMap(resource);

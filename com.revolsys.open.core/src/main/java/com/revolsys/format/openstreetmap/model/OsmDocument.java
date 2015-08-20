@@ -7,7 +7,7 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.collection.map.LongHashMap;
 import com.revolsys.data.identifier.Identifier;

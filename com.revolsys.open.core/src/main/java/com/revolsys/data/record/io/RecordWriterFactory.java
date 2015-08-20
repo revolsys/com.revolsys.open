@@ -5,7 +5,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.Records;
@@ -46,7 +46,7 @@ public interface RecordWriterFactory
    */
   default RecordWriter createRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
-    final OutputStream out = SpringUtil.getOutputStream(resource);
+    final OutputStream out = resource.newBufferedOutputStream();
     final String fileName = SpringUtil.getFileName(resource);
     final String baseName = FileUtil.getBaseName(fileName);
     return createRecordWriter(baseName, recordDefinition, out);

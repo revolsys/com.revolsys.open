@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.record.Record;
@@ -216,10 +216,10 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
         this.out = new ResourceEndianOutput(this.resource);
         writeHeader();
       }
-      final Resource codePageResource = SpringUtil.getResourceWithExtension(this.resource, "cpg");
+      final Resource codePageResource = this.resource.getResourceWithExtension("cpg");
       if (codePageResource != null) {
         try (
-          final Writer writer = SpringUtil.getWriter(codePageResource)) {
+          final Writer writer = codePageResource.newWriter()) {
           writer.write(this.charset.name());
         }
       }

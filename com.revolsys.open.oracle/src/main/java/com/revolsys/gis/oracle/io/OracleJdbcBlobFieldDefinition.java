@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.util.Collections;
 
 import com.revolsys.spring.resource.FileSystemResource;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.types.DataTypes;
@@ -46,7 +46,7 @@ public class OracleJdbcBlobFieldDefinition extends JdbcFieldDefinition {
         InputStream in;
         if (value instanceof Resource) {
           final Resource resource = (Resource)value;
-          in = SpringUtil.getInputStream(resource);
+          in = resource.getInputStream();
         } else if (value instanceof Blob) {
           final Blob blob = (Blob)value;
           in = blob.getBinaryStream();
@@ -56,7 +56,7 @@ public class OracleJdbcBlobFieldDefinition extends JdbcFieldDefinition {
         } else if (value instanceof File) {
           final File file = (File)value;
           final FileSystemResource resource = new FileSystemResource(file);
-          in = SpringUtil.getInputStream(resource);
+          in = resource.getInputStream();
         } else {
           throw new IllegalArgumentException("Not valid for a blob column");
         }

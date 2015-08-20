@@ -7,7 +7,7 @@ import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 public class AttributeMap extends LinkedHashMap<String, Object> {
   private static final long serialVersionUID = 1L;

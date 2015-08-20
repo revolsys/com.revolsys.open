@@ -6,7 +6,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 public class MavenUrlStreamHandler extends URLStreamHandler {
 

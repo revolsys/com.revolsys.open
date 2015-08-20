@@ -37,7 +37,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
 import com.revolsys.spring.resource.FileSystemResource;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;

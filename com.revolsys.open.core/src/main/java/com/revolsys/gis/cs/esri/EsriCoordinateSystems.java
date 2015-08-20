@@ -13,7 +13,7 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.gis.cs.Authority;
 import com.revolsys.gis.cs.CoordinateSystem;
@@ -74,10 +74,10 @@ public class EsriCoordinateSystems {
   }
 
   public static void createPrjFile(final Resource resource, final GeometryFactory geometryFactory) {
-    final Resource prjResource = SpringUtil.getResourceWithExtension(resource, "prj");
+    final Resource prjResource = resource.getResourceWithExtension("prj");
     if (prjResource != null) {
       try (
-        final Writer writer = SpringUtil.getWriter(prjResource, StandardCharsets.ISO_8859_1)) {
+        final Writer writer = prjResource.newWriter(StandardCharsets.ISO_8859_1)) {
         createPrjFile(writer, geometryFactory);
       } catch (final Throwable e) {
         LoggerFactory.getLogger(EsriCoordinateSystems.class).error("Unable to create: " + resource,
@@ -155,7 +155,7 @@ public class EsriCoordinateSystems {
    * @return
    */
   public static GeometryFactory getGeometryFactory(final Resource resource) {
-    final Resource projResource = SpringUtil.getResourceWithExtension(resource, "prj");
+    final Resource projResource = resource.getResourceWithExtension("prj");
     if (com.revolsys.spring.resource.Resource.exists(projResource)) {
       try {
         final CoordinateSystem coordinateSystem = getCoordinateSystem(projResource);

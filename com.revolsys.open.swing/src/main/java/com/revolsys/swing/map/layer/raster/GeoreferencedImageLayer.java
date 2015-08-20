@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.collection.map.Maps;

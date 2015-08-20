@@ -26,7 +26,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -518,7 +518,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
     final Resource resource = getImageResource();
 
     final String extension = SpringUtil.getFileNameExtension(resource);
-    final Resource auxFile = SpringUtil.getResourceWithExtension(resource, extension + ".aux.xml");
+    final Resource auxFile = resource.getResourceWithExtension(extension + ".aux.xml");
     if (auxFile.exists() && SpringUtil.getLastModified(auxFile) > modifiedTime) {
       loadWorldFileX();
       final int[] dpi = getDpi();
@@ -650,8 +650,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
 
   protected void loadWorldFile() {
     final Resource resource = getImageResource();
-    final Resource worldFile = SpringUtil.getResourceWithExtension(resource,
-      getWorldFileExtension());
+    final Resource worldFile = resource.getResourceWithExtension(getWorldFileExtension());
     loadWorldFile(worldFile);
   }
 
@@ -684,8 +683,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
 
   protected void loadWorldFileX() {
     final Resource resource = getImageResource();
-    final Resource worldFile = SpringUtil.getResourceWithExtension(resource,
-      getWorldFileExtension() + "x");
+    final Resource worldFile = resource.getResourceWithExtension(getWorldFileExtension() + "x");
     if (worldFile.exists()) {
       loadWorldFile(worldFile);
     } else {

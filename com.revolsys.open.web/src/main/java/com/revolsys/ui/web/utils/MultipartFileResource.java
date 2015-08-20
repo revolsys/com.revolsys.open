@@ -3,8 +3,10 @@ package com.revolsys.ui.web.utils;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.springframework.core.io.AbstractResource;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.revolsys.spring.resource.AbstractResource;
+import com.revolsys.util.WrappedException;
 
 public class MultipartFileResource extends AbstractResource {
 
@@ -25,7 +27,11 @@ public class MultipartFileResource extends AbstractResource {
   }
 
   @Override
-  public InputStream getInputStream() throws IOException {
-    return this.file.getInputStream();
+  public InputStream getInputStream() {
+    try {
+      return this.file.getInputStream();
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 }

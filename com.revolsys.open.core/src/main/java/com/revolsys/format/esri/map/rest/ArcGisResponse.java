@@ -3,7 +3,7 @@ package com.revolsys.format.esri.map.rest;
 import java.util.Collections;
 import java.util.Map;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.format.json.Json;
 import com.revolsys.spring.resource.SpringUtil;

@@ -1,6 +1,6 @@
 package com.revolsys.gis.geometry.io;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.IoFactoryWithCoordinateSystem;

@@ -7,7 +7,7 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.io.AbstractRecordIoFactory;

@@ -8,9 +8,8 @@ import java.io.OutputStream;
 import java.sql.Blob;
 import java.sql.SQLException;
 
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-
+import com.revolsys.spring.resource.ByteArrayResource;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
 
 public class LocalBlob implements Blob {
@@ -35,7 +34,7 @@ public class LocalBlob implements Blob {
     if (this.resource == null) {
       return null;
     } else {
-      final InputStream in = SpringUtil.getInputStream(this.resource);
+      final InputStream in = this.resource.getInputStream();
       if (in instanceof FileInputStream) {
         final FileInputStream fileIn = (FileInputStream)in;
         return new BufferedInputStream(fileIn);

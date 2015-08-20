@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.SpringUtil;
@@ -35,7 +35,7 @@ public class WktCsParser {
   }
 
   public WktCsParser(final Resource resource) {
-    this(SpringUtil.getString(resource));
+    this(resource.contentsAsString());
   }
 
   public WktCsParser(final String value) {

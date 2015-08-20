@@ -10,7 +10,7 @@ import javax.imageio.ImageIO;
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
 
-import org.springframework.core.io.Resource;
+import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.SpringUtil;
@@ -26,7 +26,7 @@ public class ImageMarker extends AbstractMarker {
   }
 
   public ImageMarker(final Resource resource) {
-    final InputStream in = SpringUtil.getInputStream(resource);
+    final InputStream in = resource.getInputStream();
     try {
       this.image = ImageIO.read(in);
     } catch (final IOException e) {
