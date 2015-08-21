@@ -55,8 +55,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.undo.UndoableEdit;
 
-import org.apache.log4j.Logger;
 import org.jdesktop.swingx.VerticalLayout;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.beans.PropertyChangeSupportProxy;
@@ -86,7 +86,6 @@ import com.revolsys.swing.field.ObjectLabelField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.map.ProjectFrame;
-import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.component.RecordLayerFields;
@@ -236,10 +235,6 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     closeWindow();
   }
 
-  public void actionZoomToRecord() {
-    getLayer().zoomToRecord(getRecord());
-  }
-
   protected ObjectLabelField addCodeTableLabelField(final String fieldName) {
     final RecordStore recordStore = getRecordStore();
     final CodeTable codeTable = recordStore.getCodeTableByFieldName(fieldName);
@@ -317,7 +312,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   public <T> T addLabelledField(final Container container, final String fieldName) {
     final Field field = getField(fieldName);
     if (field == null) {
-      Logger.getLogger(getClass())
+      LoggerFactory.getLogger(getClass())
         .error("Cannot find field " + this.recordDefinition.getPath() + " " + fieldName);
     } else {
       addLabelledField(container, field);
@@ -468,7 +463,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     }
   }
 
-  public ToolBar addToolBar(final AbstractLayer layer) {
+  public ToolBar addToolBar(final AbstractRecordLayer layer) {
     this.toolBar = new ToolBar();
     add(this.toolBar, BorderLayout.NORTH);
     final RecordDefinition recordDefinition = getRecordDefinition();
@@ -522,8 +517,10 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     // Zoom
 
     if (hasGeometry) {
-      this.toolBar.addButtonTitleIcon("zoom", "Zoom to Record", "magnifier", this,
-        "actionZoomToRecord");
+      this.toolBar.addButtonTitleIcon("zoom", "Zoom to Record", "magnifier", () -> {
+        final LayerRecord record = getRecord();
+        layer.zoomToRecord(record);
+      });
     }
 
     // Geometry manipulation
@@ -637,7 +634,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
       parent.remove(this);
     }
 
-    final AbstractLayer layer = getLayer();
+    final AbstractRecordLayer layer = getLayer();
     if (layer != null) {
       this.layer = null;
       if (this.allFields != null) {
@@ -1077,7 +1074,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   }
 
   public void pasteValues(final Map<String, Object> map) {
-    final AbstractLayer layer = getLayer();
+    final AbstractRecordLayer layer = getLayer();
     if (layer != null) {
       final Map<String, Object> newValues = new LinkedHashMap<String, Object>(map);
       final Collection<String> ignorePasteFields = layer.getProperty("ignorePasteFields");

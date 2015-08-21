@@ -1267,8 +1267,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       if (compare > 0) {
         return getMergedRecord(point, record2, record1);
       } else {
-        final DirectionalFields property = DirectionalFields
-          .getProperty(getRecordDefinition());
+        final DirectionalFields property = DirectionalFields.getProperty(getRecordDefinition());
         final Map<String, Object> newValues = property.getMergedMap(point, record1, record2);
         newValues.remove(getIdFieldName());
         return new ArrayRecord(getRecordDefinition(), newValues);
@@ -2811,8 +2810,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void zoomToRecord(final Record record) {
-    final Geometry geometry = record.getGeometry();
-    zoomToGeometry(geometry);
+    if (record != null) {
+      final Geometry geometry = record.getGeometry();
+      zoomToGeometry(geometry);
+    }
   }
 
   public void zoomToRecords(final List<? extends LayerRecord> records) {

@@ -2,10 +2,7 @@ package com.revolsys.swing.map.layer.record;
 
 import java.beans.PropertyChangeEvent;
 
-import com.revolsys.data.equals.Equals;
-import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.AbstractRecord;
-import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -95,30 +92,6 @@ public abstract class AbstractLayerRecord extends AbstractRecord implements Laye
   @Override
   public boolean isModified(final String name) {
     return false;
-  }
-
-  @Override
-  public boolean isSame(final Record record) {
-    if (record == null) {
-      return false;
-    } else if (this == record) {
-      return true;
-    } else {
-      final AbstractRecordLayer layer = getLayer();
-      if (layer.isLayerRecord(record)) {
-        final Identifier id = getIdentifier();
-        final Identifier otherId = record.getIdentifier();
-        if (id == null || otherId == null) {
-          return false;
-        } else if (Equals.equal(id, otherId)) {
-          return true;
-        } else {
-          return false;
-        }
-      } else {
-        return false;
-      }
-    }
   }
 
   @Override
