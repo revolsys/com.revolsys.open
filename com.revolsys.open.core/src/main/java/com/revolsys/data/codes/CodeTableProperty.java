@@ -296,7 +296,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
       return null;
     }
     Identifier id = null;
-    if (createId && this.loadAll && !this.loaded) {
+    if (createId && this.loadAll && !isLoaded()) {
       loadAll();
       id = getId(values, false);
     } else {
@@ -336,7 +336,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
 
   @Override
   protected List<Object> loadValues(final Object id) {
-    if (this.loadAll && !this.loaded) {
+    if (this.loadAll && !isLoaded()) {
       loadAll();
     } else {
       try {

@@ -38,7 +38,9 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
 
   List<Object> getValues(final Identifier id);
 
-  boolean isLoaded();
+  default boolean isLoaded() {
+    return true;
+  }
 
   boolean isLoading();
 

@@ -1208,7 +1208,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
         final int tabIndex = getTabIndex(fieldName);
         Maps.addToSet(this.tabInvalidFieldMap, tabIndex, fieldName);
         updateTabValid(tabIndex);
-        updateInvalidFields();
+        updateInvalidFields(true);
       }
     } else {
       Invoke.later(this, "setFieldInvalid", fieldName, message);
@@ -1246,7 +1246,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
         final int tabIndex = getTabIndex(fieldName);
         Maps.removeFromSet(this.tabInvalidFieldMap, tabIndex, fieldName);
         updateTabValid(tabIndex);
-        updateInvalidFields();
+        updateInvalidFields(true);
         return true;
       }
     } else {
@@ -1431,12 +1431,12 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     }
   }
 
-  protected void updateInvalidFields() {
+  protected void updateInvalidFields(final boolean fieldsValid) {
     if (isAllowAddWithErrors()) {
       setAddOkButtonEnabled(true);
     } else {
-      final boolean valid = isFieldsValid();
-      setAddOkButtonEnabled(valid);
+      final boolean enabled = fieldsValid && isFieldsValid();
+      setAddOkButtonEnabled(enabled);
     }
   }
 
@@ -1514,12 +1514,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     final Set<String> fieldNames = getFieldNames();
     final boolean fieldsValid = validateFields(fieldNames);
     postValidate();
-    if (isAllowAddWithErrors()) {
-      setAddOkButtonEnabled(true);
-    } else {
-      final boolean enabled = fieldsValid && isFieldsValid();
-      setAddOkButtonEnabled(enabled);
-    }
+    updateInvalidFields(fieldsValid);
   }
 
   protected boolean validateFields(final Collection<String> fieldNames) {
