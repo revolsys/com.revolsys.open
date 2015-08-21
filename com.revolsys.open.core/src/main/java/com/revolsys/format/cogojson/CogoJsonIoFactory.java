@@ -13,8 +13,8 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.geojson.GeoJsonConstants;
 import com.revolsys.format.geojson.GeoJsonGeometryIterator;
 import com.revolsys.format.geojson.GeoJsonRecordWriter;
-import com.revolsys.gis.geometry.io.GeometryReader;
-import com.revolsys.gis.geometry.io.GeometryReaderFactory;
+import com.revolsys.geometry.io.GeometryReader;
+import com.revolsys.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.FileUtil;
 

@@ -9,7 +9,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.Segment;
-import com.revolsys.gis.jts.GeometryProperties;
+import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.gis.model.coordinates.filter.LineSegmentCoordinateDistanceFilter;
 
 public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {

@@ -1,7 +1,7 @@
 package com.revolsys.jts.testold.simplify;
 
-import com.revolsys.geometry.io.WKTReader;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.Assert;
 

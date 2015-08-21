@@ -4,10 +4,10 @@ import java.util.Collection;
 
 import org.junit.Assert;
 
-import com.revolsys.geometry.io.ParseException;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.operation.union.UnaryUnionOp;
+import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.jts.testold.junit.GeometryUtils;
 
 import junit.framework.TestCase;

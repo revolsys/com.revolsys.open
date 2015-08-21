@@ -5,9 +5,9 @@ import java.util.List;
 import com.revolsys.geometry.edgegraph.EdgeGraph;
 import com.revolsys.geometry.edgegraph.EdgeGraphBuilder;
 import com.revolsys.geometry.edgegraph.HalfEdge;
-import com.revolsys.geometry.io.ParseException;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.jts.testold.junit.GeometryUtils;
 
 import junit.framework.TestCase;

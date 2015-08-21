@@ -10,8 +10,8 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.gis.geometry.io.GeometryReader;
-import com.revolsys.gis.geometry.io.GeometryReaderFactory;
+import com.revolsys.geometry.io.GeometryReader;
+import com.revolsys.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.FileUtil;
 

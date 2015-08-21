@@ -1,6 +1,5 @@
 package com.revolsys.jts.testold.linearref;
 
-import com.revolsys.geometry.io.WKTReader;
 import com.revolsys.geometry.linearref.LinearLocation;
 import com.revolsys.geometry.linearref.LocationIndexedLine;
 import com.revolsys.geometry.model.Geometry;
@@ -8,6 +7,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
+import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;

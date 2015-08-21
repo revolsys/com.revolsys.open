@@ -419,7 +419,7 @@ public class TestReader {
   }
 
   private Geometry readGeometry(final Element geometryElement, final File wktFile)
-    throws FileNotFoundException, com.revolsys.geometry.io.ParseException, IOException {
+    throws FileNotFoundException, com.revolsys.geometry.wkb.ParseException, IOException {
     String geomText = null;
     if (wktFile != null) {
       final List wktList = FileUtil.getContents(wktFile.getPath());
@@ -466,7 +466,7 @@ public class TestReader {
    */
 
   private GeometryResult toGeometryResult(final String value, final TestFile testRun)
-    throws com.revolsys.geometry.io.ParseException {
+    throws com.revolsys.geometry.wkb.ParseException {
     final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
     final WKTOrWKBReader wktorbReader = new WKTOrWKBReader(geometryFactory);
     return new GeometryResult(wktorbReader.read(value));
@@ -481,7 +481,7 @@ public class TestReader {
   }
 
   private Result toResult(final String value, final String name, final TestFile testRun)
-    throws TestParseException, com.revolsys.geometry.io.ParseException {
+    throws TestParseException, com.revolsys.geometry.wkb.ParseException {
     if (isBooleanFunction(name)) {
       return toBooleanResult(value);
     }

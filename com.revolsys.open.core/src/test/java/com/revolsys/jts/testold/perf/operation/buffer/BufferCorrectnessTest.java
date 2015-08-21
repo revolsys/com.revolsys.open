@@ -32,11 +32,11 @@
  */
 package com.revolsys.jts.testold.perf.operation.buffer;
 
-import com.revolsys.geometry.io.WKTReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.operation.buffer.Buffer;
 import com.revolsys.geometry.operation.buffer.BufferParameters;
+import com.revolsys.geometry.wkb.WKTReader;
 
 /**
  * Tests self-snapping issues

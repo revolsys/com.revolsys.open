@@ -1,8 +1,8 @@
 package com.revolsys.jts.testold.algorithm.distance;
 
 import com.revolsys.geometry.algorithm.distance.DiscreteHausdorffDistance;
-import com.revolsys.geometry.io.ParseException;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.jts.testold.junit.GeometryUtils;
 
 import junit.framework.TestCase;

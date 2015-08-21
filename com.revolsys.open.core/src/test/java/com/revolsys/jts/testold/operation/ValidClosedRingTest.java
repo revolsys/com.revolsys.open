@@ -1,10 +1,10 @@
 package com.revolsys.jts.testold.operation;
 
-import com.revolsys.geometry.io.WKTReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.operation.valid.IsValidOp;
+import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 

@@ -37,7 +37,6 @@ import java.util.List;
 
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.PointLocator;
-import com.revolsys.geometry.io.WKTReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -48,6 +47,7 @@ import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.planargraph.DirectedEdge;
 import com.revolsys.geometry.planargraph.Node;
 import com.revolsys.geometry.util.UniqueCoordinateArrayFilter;
+import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;

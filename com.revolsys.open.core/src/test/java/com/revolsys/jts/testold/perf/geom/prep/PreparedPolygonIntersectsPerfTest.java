@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.geometry.io.WKTReader;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -46,6 +45,7 @@ import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.util.SineStarFactory;
 import com.revolsys.geometry.util.GeometricShapeFactory;
 import com.revolsys.geometry.util.Stopwatch;
+import com.revolsys.geometry.wkb.WKTReader;
 
 public class PreparedPolygonIntersectsPerfTest {
   static final int MAX_ITER = 10;

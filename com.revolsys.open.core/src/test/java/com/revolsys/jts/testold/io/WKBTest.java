@@ -2,17 +2,17 @@ package com.revolsys.jts.testold.io;
 
 import java.io.IOException;
 
-import com.revolsys.geometry.io.ByteOrderValues;
-import com.revolsys.geometry.io.ParseException;
-import com.revolsys.geometry.io.WKBReader;
-import com.revolsys.geometry.io.WKBWriter;
-import com.revolsys.geometry.io.WKTReader;
 import com.revolsys.geometry.model.CoordinateSequenceComparator;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.GeometricShapeFactory;
+import com.revolsys.geometry.wkb.ByteOrderValues;
+import com.revolsys.geometry.wkb.ParseException;
+import com.revolsys.geometry.wkb.WKBReader;
+import com.revolsys.geometry.wkb.WKBWriter;
+import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;

@@ -8,12 +8,12 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.event.NodeEventListener;
-import com.revolsys.gis.jts.LineStringUtil;
 
 public class SplitCrossingEdgesVisitor<T> extends AbstractEdgeListenerVisitor<T> {
 

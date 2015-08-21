@@ -6,7 +6,7 @@ import com.revolsys.data.equals.GeometryEqualsExact3d;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.gis.jts.GeometryProperties;
+import com.revolsys.geometry.util.GeometryProperties;
 
 public class GeometryVertexQuadTree extends IdObjectQuadTree<Vertex> {
 

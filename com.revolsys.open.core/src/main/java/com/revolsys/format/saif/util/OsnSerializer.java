@@ -45,7 +45,7 @@ import com.revolsys.format.saif.SaifConstants;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.gis.jts.GeometryProperties;
+import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.io.FileUtil;
 
 public class OsnSerializer {

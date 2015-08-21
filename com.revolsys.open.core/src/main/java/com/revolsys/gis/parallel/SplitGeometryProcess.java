@@ -8,9 +8,9 @@ import com.revolsys.data.record.Records;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.gis.algorithm.index.LineSegmentIndex;
 import com.revolsys.gis.io.Statistics;
-import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 

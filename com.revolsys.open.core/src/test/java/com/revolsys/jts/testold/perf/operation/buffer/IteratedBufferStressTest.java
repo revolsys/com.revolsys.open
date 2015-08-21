@@ -32,10 +32,10 @@
  */
 package com.revolsys.jts.testold.perf.operation.buffer;
 
-import com.revolsys.geometry.io.WKTReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.util.Stopwatch;
+import com.revolsys.geometry.wkb.WKTReader;
 
 /**
  * Test repeated buffering of a given input shape.

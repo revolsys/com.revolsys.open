@@ -12,9 +12,9 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletWebRequest;
 
+import com.revolsys.geometry.io.GeometryReader;
+import com.revolsys.geometry.io.GeometryReaderFactory;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.gis.geometry.io.GeometryReader;
-import com.revolsys.gis.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.spring.resource.InputStreamResource;

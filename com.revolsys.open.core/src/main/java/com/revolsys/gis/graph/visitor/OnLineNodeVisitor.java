@@ -7,10 +7,10 @@ import java.util.function.Consumer;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class OnLineNodeVisitor<T> implements Consumer<Node<T>> {

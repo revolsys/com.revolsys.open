@@ -12,7 +12,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.gis.jts.GeometryProperties;
+import com.revolsys.geometry.util.GeometryProperties;
 
 public class TextOnCurveConverter implements OsnConverter {
   private static final String TYPE = "type";

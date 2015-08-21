@@ -33,11 +33,11 @@
 
 package com.revolsys.jts.testold.geom;
 
-import com.revolsys.geometry.io.WKTReader;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryCollectionIterator;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.Test;
 import junit.framework.Test;

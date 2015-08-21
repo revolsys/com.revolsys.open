@@ -3,12 +3,12 @@ package com.revolsys.jts.testold.perf.operation.union;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.geometry.io.WKTReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.GeometricShapeFactory;
+import com.revolsys.geometry.wkb.WKTReader;
 
 public class PolygonUnionPerfTest {
 

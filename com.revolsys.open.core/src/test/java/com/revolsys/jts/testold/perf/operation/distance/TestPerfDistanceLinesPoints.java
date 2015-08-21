@@ -3,8 +3,6 @@ package com.revolsys.jts.testold.perf.operation.distance;
 import java.util.List;
 
 import com.revolsys.geometry.densify.Densifier;
-import com.revolsys.geometry.io.WKTFileReader;
-import com.revolsys.geometry.io.WKTReader;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -13,6 +11,8 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.operation.distance.IndexedFacetDistance;
 import com.revolsys.geometry.util.Stopwatch;
+import com.revolsys.geometry.wkb.WKTFileReader;
+import com.revolsys.geometry.wkb.WKTReader;
 import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 
 /**

@@ -1,9 +1,9 @@
 package com.revolsys.jts.testold.simplify;
 
-import com.revolsys.geometry.io.ParseException;
-import com.revolsys.geometry.io.WKTReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.simplify.TopologyPreservingSimplifier;
+import com.revolsys.geometry.wkb.ParseException;
+import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;

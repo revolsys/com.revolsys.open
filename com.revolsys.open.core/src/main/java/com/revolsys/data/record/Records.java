@@ -25,7 +25,7 @@ import com.revolsys.data.types.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.gis.jts.GeometryProperties;
+import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.io.PathName;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.CompareUtil;

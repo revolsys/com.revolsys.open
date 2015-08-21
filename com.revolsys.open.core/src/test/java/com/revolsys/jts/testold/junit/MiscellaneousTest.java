@@ -34,7 +34,6 @@
 package com.revolsys.jts.testold.junit;
 
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.geometry.io.WKTReader;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
@@ -50,6 +49,7 @@ import com.revolsys.geometry.model.impl.MultiLineStringImpl;
 import com.revolsys.geometry.model.impl.MultiPointImpl;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.Assert;
+import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;

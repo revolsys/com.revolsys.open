@@ -35,10 +35,10 @@ package com.revolsys.jts.testold.perf.operation.buffer;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.geometry.io.WKTReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.operation.buffer.validate.BufferResultValidator;
 import com.revolsys.geometry.util.Stopwatch;
+import com.revolsys.geometry.wkb.WKTReader;
 import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 
 import junit.framework.TestCase;

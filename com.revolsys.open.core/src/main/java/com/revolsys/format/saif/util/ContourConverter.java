@@ -8,7 +8,7 @@ import com.revolsys.format.saif.SaifConstants;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.gis.jts.GeometryProperties;
+import com.revolsys.geometry.util.GeometryProperties;
 
 public class ContourConverter extends ArcConverter {
   private static final String GEOMETRY_CLASS = SaifConstants.CONTOUR;

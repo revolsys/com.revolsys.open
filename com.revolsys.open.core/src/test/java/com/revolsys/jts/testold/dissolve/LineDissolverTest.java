@@ -3,8 +3,8 @@ package com.revolsys.jts.testold.dissolve;
 import java.util.List;
 
 import com.revolsys.geometry.dissolve.LineDissolver;
-import com.revolsys.geometry.io.ParseException;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.jts.testold.junit.GeometryUtils;
 
 import junit.framework.TestCase;

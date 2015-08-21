@@ -32,7 +32,6 @@
  */
 package com.revolsys.jts.testold.geom.prep;
 
-import com.revolsys.geometry.io.WKTReader;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -41,6 +40,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.util.SineStarFactory;
 import com.revolsys.geometry.util.GeometricShapeFactory;
+import com.revolsys.geometry.wkb.WKTReader;
 
 public abstract class StressTestHarness {
   static final int MAX_ITER = 10000;

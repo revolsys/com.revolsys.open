@@ -3,10 +3,10 @@ package com.revolsys.jts.testold.operation;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.geometry.io.ParseException;
-import com.revolsys.geometry.io.WKTReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.operation.linemerge.LineSequencer;
+import com.revolsys.geometry.wkb.ParseException;
+import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;

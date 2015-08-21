@@ -13,13 +13,13 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.LineSegment;
+import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.gis.algorithm.linematch.LineMatchGraph;
 import com.revolsys.gis.algorithm.linematch.LineSegmentMatch;
+import com.revolsys.gis.filter.EqualFilter;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.filter.LineFilter;
-import com.revolsys.gis.jts.GeometryProperties;
-import com.revolsys.gis.jts.filter.EqualFilter;
 import com.revolsys.predicate.Predicates;
 
 public class SplitIntersectingEdgeVisitor implements Consumer<Edge<Record>> {

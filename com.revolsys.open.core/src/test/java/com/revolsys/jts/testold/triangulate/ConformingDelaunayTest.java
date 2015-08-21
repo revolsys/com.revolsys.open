@@ -32,11 +32,11 @@
  */
 package com.revolsys.jts.testold.triangulate;
 
-import com.revolsys.geometry.io.ParseException;
-import com.revolsys.geometry.io.WKTReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.triangulate.ConformingDelaunayTriangulationBuilder;
+import com.revolsys.geometry.wkb.ParseException;
+import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;

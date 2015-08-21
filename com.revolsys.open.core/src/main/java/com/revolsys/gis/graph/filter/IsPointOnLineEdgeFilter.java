@@ -5,9 +5,9 @@ import java.util.function.Predicate;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.gis.jts.LineStringUtil;
 
 public class IsPointOnLineEdgeFilter<T> implements Predicate<Node<T>> {
 

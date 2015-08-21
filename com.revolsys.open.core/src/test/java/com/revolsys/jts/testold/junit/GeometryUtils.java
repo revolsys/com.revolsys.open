@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.revolsys.geometry.io.ParseException;
-import com.revolsys.geometry.io.WKTFileReader;
-import com.revolsys.geometry.io.WKTReader;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.wkb.ParseException;
+import com.revolsys.geometry.wkb.WKTFileReader;
+import com.revolsys.geometry.wkb.WKTReader;
 
 public class GeometryUtils {
   // TODO: allow specifying GeometryFactoryI

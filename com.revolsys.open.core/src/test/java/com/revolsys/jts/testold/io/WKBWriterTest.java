@@ -1,10 +1,10 @@
 package com.revolsys.jts.testold.io;
 
-import com.revolsys.geometry.io.WKBReader;
-import com.revolsys.geometry.io.WKBWriter;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.wkb.WKBReader;
+import com.revolsys.geometry.wkb.WKBWriter;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;

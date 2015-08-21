@@ -11,10 +11,10 @@ import java.util.Set;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.property.DirectionalAttributes;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.EdgePair;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.gis.jts.LineStringUtil;
 
 public class PseudoNodeAttribute {
   private final Set<String> equalExcludeFieldNames = new HashSet<String>();

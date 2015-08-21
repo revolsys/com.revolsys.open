@@ -19,9 +19,9 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.gis.algorithm.index.PointRecordMap;
 import com.revolsys.gis.algorithm.index.RecordQuadTree;
 import com.revolsys.gis.algorithm.linematch.LineMatchGraph;
+import com.revolsys.gis.filter.LineEqualIgnoreDirectionFilter;
+import com.revolsys.gis.filter.LineIntersectsFilter;
 import com.revolsys.gis.io.Statistics;
-import com.revolsys.gis.jts.filter.LineEqualIgnoreDirectionFilter;
-import com.revolsys.gis.jts.filter.LineIntersectsFilter;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.predicate.Predicates;
 

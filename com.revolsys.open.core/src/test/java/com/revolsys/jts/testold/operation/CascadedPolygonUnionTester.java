@@ -6,10 +6,10 @@ import java.util.Iterator;
 import com.revolsys.geometry.algorithm.match.AreaSimilarityMeasure;
 import com.revolsys.geometry.algorithm.match.HausdorffSimilarityMeasure;
 import com.revolsys.geometry.algorithm.match.SimilarityMeasureCombiner;
-import com.revolsys.geometry.io.WKTReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.operation.union.CascadedPolygonUnion;
+import com.revolsys.geometry.wkb.WKTReader;
 
 /**
  * Compares the results of CascadedPolygonUnion to Geometry.union()
