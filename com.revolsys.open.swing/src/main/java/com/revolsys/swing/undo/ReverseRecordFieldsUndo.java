@@ -5,7 +5,7 @@ import com.revolsys.data.record.property.DirectionalFields;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 
-public class ReverseRecordAttributesUndo extends AbstractUndoableEdit {
+public class ReverseRecordFieldsUndo extends AbstractUndoableEdit {
 
   /**
    *
@@ -16,7 +16,7 @@ public class ReverseRecordAttributesUndo extends AbstractUndoableEdit {
 
   private final Geometry oldValue;
 
-  public ReverseRecordAttributesUndo(final LayerRecord record) {
+  public ReverseRecordFieldsUndo(final LayerRecord record) {
     this.record = record;
     this.oldValue = record.getGeometry();
   }

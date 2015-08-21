@@ -101,7 +101,7 @@ import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
-import com.revolsys.swing.undo.ReverseRecordAttributesUndo;
+import com.revolsys.swing.undo.ReverseRecordFieldsUndo;
 import com.revolsys.swing.undo.ReverseRecordGeometryUndo;
 import com.revolsys.swing.undo.ReverseRecordUndo;
 import com.revolsys.swing.undo.UndoManager;
@@ -212,9 +212,9 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     this.undoManager.addKeyMap(this);
   }
 
-  public RecordLayerForm(final AbstractRecordLayer layer, final LayerRecord object) {
+  public RecordLayerForm(final AbstractRecordLayer layer, final LayerRecord record) {
     this(layer);
-    setRecord(object);
+    setRecord(record);
   }
 
   protected void actionAddCancel() {
@@ -605,9 +605,9 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   }
 
   public void deleteRecord() {
-    final LayerRecord object = getRecord();
-    if (object != null) {
-      getLayer().deleteRecords(object);
+    final LayerRecord record = getRecord();
+    if (record != null) {
+      getLayer().deleteRecords(record);
     }
   }
 
@@ -724,7 +724,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   }
 
   public void flipFields() {
-    addUndo(new ReverseRecordAttributesUndo(this.record));
+    addUndo(new ReverseRecordFieldsUndo(this.record));
   }
 
   public void flipLineOrientation() {
@@ -888,8 +888,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   }
 
   public <T> T getOriginalValue(final String fieldName) {
-    final LayerRecord object = getRecord();
-    return object.getOriginalValue(fieldName);
+    final LayerRecord record = getRecord();
+    return record.getOriginalValue(fieldName);
   }
 
   @Override
@@ -1033,11 +1033,11 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   }
 
   public boolean isModifiedOrDeleted() {
-    final LayerRecord object = getRecord();
-    if (object == null) {
+    final LayerRecord record = getRecord();
+    if (record == null) {
       return false;
     } else {
-      return object.isDeleted() || object.isModified();
+      return record.isDeleted() || record.isModified();
     }
   }
 
@@ -1183,10 +1183,10 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   }
 
   public void revertChanges() {
-    final LayerRecord object = getRecord();
-    if (object != null) {
-      object.revertChanges();
-      setValues(object);
+    final LayerRecord record = getRecord();
+    if (record != null) {
+      record.revertChanges();
+      setValues(record);
     }
   }
 
