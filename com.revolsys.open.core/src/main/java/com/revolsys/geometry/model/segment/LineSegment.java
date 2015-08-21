@@ -102,6 +102,7 @@ public interface LineSegment extends LineString {
 
   Point getP1();
 
+  @Override
   default Side getSide(final Point point) {
     final int orientationIndex = orientationIndex(point);
     switch (orientationIndex) {

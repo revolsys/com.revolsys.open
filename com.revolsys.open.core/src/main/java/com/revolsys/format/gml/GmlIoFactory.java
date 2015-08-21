@@ -4,8 +4,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -13,6 +11,7 @@ import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.FileUtil;
+import com.revolsys.spring.resource.Resource;
 
 public class GmlIoFactory extends AbstractIoFactoryWithCoordinateSystem
   implements RecordWriterFactory, GeometryReaderFactory {

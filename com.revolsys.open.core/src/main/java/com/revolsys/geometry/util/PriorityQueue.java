@@ -100,6 +100,7 @@ public class PriorityQueue implements Emptyable {
    * Test if the priority queue is logically empty.
    * @return true if empty, false otherwise.
    */
+  @Override
   public boolean isEmpty() {
     return this.size == 0;
   }

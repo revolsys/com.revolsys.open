@@ -3,8 +3,6 @@ package com.revolsys.gis.tin;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -12,7 +10,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.io.FileUtil;
-import com.revolsys.spring.resource.SpringUtil;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
 
 public class TinReader {

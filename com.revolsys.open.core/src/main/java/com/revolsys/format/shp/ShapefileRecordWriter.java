@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
-import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -40,7 +39,7 @@ import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.io.ResourceEndianOutput;
 import com.revolsys.io.IoConstants;
-import com.revolsys.spring.resource.SpringUtil;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
 
 public class ShapefileRecordWriter extends XbaseRecordWriter {

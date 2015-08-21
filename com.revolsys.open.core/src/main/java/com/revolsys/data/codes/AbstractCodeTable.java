@@ -362,6 +362,7 @@ public abstract class AbstractCodeTable
     return this.caseSensitive;
   }
 
+  @Override
   public boolean isEmpty() {
     return this.idIdCache.isEmpty();
   }

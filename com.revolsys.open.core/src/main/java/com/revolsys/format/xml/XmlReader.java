@@ -12,9 +12,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.io.input.XmlStreamReader;
-import com.revolsys.spring.resource.Resource;
 
-import com.revolsys.spring.resource.SpringUtil;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 

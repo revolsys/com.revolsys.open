@@ -9,7 +9,6 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.slf4j.LoggerFactory;
-import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.collection.map.Maps;
@@ -25,6 +24,7 @@ import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.raster.MappedLocation;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;

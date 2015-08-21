@@ -6,10 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
-
-import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.WrappedException;
 

@@ -4,8 +4,6 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Set;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -15,6 +13,7 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
+import com.revolsys.spring.resource.Resource;
 
 public class KmzIoFactory extends AbstractIoFactoryWithCoordinateSystem
   implements RecordWriterFactory, MapWriterFactory, GeometryReaderFactory {

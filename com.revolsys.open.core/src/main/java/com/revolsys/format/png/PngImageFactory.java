@@ -1,10 +1,9 @@
 package com.revolsys.format.png;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageFactory;
+import com.revolsys.spring.resource.Resource;
 
 public class PngImageFactory extends AbstractIoFactory implements GeoreferencedImageFactory {
 

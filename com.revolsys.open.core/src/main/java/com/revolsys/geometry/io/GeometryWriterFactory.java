@@ -4,12 +4,10 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryWithCoordinateSystem;
-import com.revolsys.spring.resource.SpringUtil;
+import com.revolsys.spring.resource.Resource;
 
 public interface GeometryWriterFactory extends FileIoFactory, IoFactoryWithCoordinateSystem {
 

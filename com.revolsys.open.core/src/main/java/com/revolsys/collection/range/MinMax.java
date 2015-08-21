@@ -109,8 +109,8 @@ public class MinMax extends IntRange implements Cloneable, Emptyable {
     if (isEmpty()) {
       return new MinMax();
     } else {
-      int min = getMin();
-      int max = getMax();
+      final int min = getMin();
+      final int max = getMax();
       return new MinMax(min, max);
     }
   }

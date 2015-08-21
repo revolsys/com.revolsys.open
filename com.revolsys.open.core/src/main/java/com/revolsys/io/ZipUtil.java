@@ -16,8 +16,6 @@ import java.util.zip.ZipOutputStream;
 
 import com.revolsys.spring.resource.Resource;
 
-import com.revolsys.spring.resource.SpringUtil;
-
 public class ZipUtil {
   /**
    * Add the all the sub directories and files below the directory to the zip

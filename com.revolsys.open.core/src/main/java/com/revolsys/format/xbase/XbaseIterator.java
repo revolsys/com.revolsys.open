@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.slf4j.LoggerFactory;
-import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.data.record.Record;
@@ -28,7 +27,7 @@ import com.revolsys.gis.io.LittleEndianRandomAccessFile;
 import com.revolsys.io.EndianInput;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;
-import com.revolsys.spring.resource.SpringUtil;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.ExceptionUtil;
 

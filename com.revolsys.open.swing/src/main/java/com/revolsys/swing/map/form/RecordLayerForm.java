@@ -570,13 +570,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   }
 
   public void clearTabColor(final int index) {
-    if (index > -1) {
-      if (SwingUtilities.isEventDispatchThread()) {
-        this.tabs.setTabComponentAt(index, null);
-      } else {
-        Invoke.later(this, "setTabColor", index);
-      }
-    }
+    setTabColor(index, null);
   }
 
   public void closeWindow() {
@@ -1355,26 +1349,24 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
   public void setTabColor(final int index, final Color foregroundColor) {
     if (index > -1) {
-      if (foregroundColor == null) {
-        this.tabs.setTabComponentAt(index, null);
-      } else {
-        if (SwingUtilities.isEventDispatchThread()) {
+      Invoke.later(() -> {
+        if (foregroundColor == null) {
+          this.tabs.setTabComponentAt(index, null);
+        } else {
           if (this.tabs != null) {
             final JLabel label = new JLabel(this.tabs.getTitleAt(index));
             label.setOpaque(false);
             label.setForeground(foregroundColor);
             this.tabs.setTabComponentAt(index, label);
           }
-        } else {
-          Invoke.later(this, "setTabColor", index, foregroundColor);
         }
-      }
+      });
     }
   }
 
   public void setValues(final Map<String, Object> values) {
     if (values != null) {
-      if (SwingUtilities.isEventDispatchThread()) {
+      Invoke.later(() -> {
         final Set<String> fieldNames = values.keySet();
         final boolean validationEnabled = setFieldValidationEnabled(false);
         try {
@@ -1390,9 +1382,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
           setFieldValidationEnabled(validationEnabled);
         }
         validateFields(fieldNames);
-      } else {
-        Invoke.later(this, "setValues", values);
-      }
+      });
     }
 
   }

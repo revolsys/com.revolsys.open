@@ -119,8 +119,8 @@ public class LineSequencer {
   private static DirectedEdge findUnvisitedBestOrientedDE(final Node node) {
     DirectedEdge wellOrientedDE = null;
     DirectedEdge unvisitedDE = null;
-    for (final Iterator i = node.getOutEdges().iterator(); i.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)i.next();
+    for (final Object element : node.getOutEdges()) {
+      final DirectedEdge de = (DirectedEdge)element;
       if (!de.getEdge().isVisited()) {
         unvisitedDE = de;
         if (de.getEdgeDirection()) {
@@ -320,7 +320,7 @@ public class LineSequencer {
     GraphComponent.setVisited(graph.edgeIterator(), false);
 
     final Node startNode = findLowestDegreeNode(graph);
-    final DirectedEdge startDE = (DirectedEdge)startNode.getOutEdges().iterator().next();
+    final DirectedEdge startDE = startNode.getOutEdges().iterator().next();
     final DirectedEdge startDESym = startDE.getSym();
 
     final List seq = new LinkedList();

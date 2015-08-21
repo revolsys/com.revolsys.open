@@ -19,8 +19,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.io.IteratorReader;
 import com.revolsys.data.record.RecordFactory;
@@ -35,7 +33,7 @@ import com.revolsys.io.map.IteratorMapReader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
-import com.revolsys.spring.resource.SpringUtil;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.WrappedException;
 

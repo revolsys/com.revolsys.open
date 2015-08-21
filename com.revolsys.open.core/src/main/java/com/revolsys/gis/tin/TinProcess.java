@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.revolsys.spring.resource.FileSystemResource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.geometry.model.BoundingBox;
@@ -19,6 +18,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.io.Reader;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
+import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.util.MathUtil;
 
 public class TinProcess extends BaseInOutProcess<Record, Record> {

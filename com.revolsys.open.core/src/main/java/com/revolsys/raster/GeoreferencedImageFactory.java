@@ -1,8 +1,7 @@
 package com.revolsys.raster;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.io.IoFactory;
+import com.revolsys.spring.resource.Resource;
 
 public interface GeoreferencedImageFactory extends IoFactory {
   static GeoreferencedImage loadGeoreferencedImage(final Resource resource) {

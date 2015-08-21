@@ -121,8 +121,8 @@ class PolygonizeGraph extends PlanarGraph {
     PolygonizeDirectedEdge prevDE = null;
 
     // the edges are stored in CCW order around the star
-    for (final Iterator i = deStar.getEdges().iterator(); i.hasNext();) {
-      final PolygonizeDirectedEdge outDE = (PolygonizeDirectedEdge)i.next();
+    for (final Object element : deStar.getEdges()) {
+      final PolygonizeDirectedEdge outDE = (PolygonizeDirectedEdge)element;
       if (outDE.isMarked()) {
         continue;
       }
@@ -381,8 +381,8 @@ class PolygonizeGraph extends PlanarGraph {
      * Delete them, and record them
      */
     final List cutLines = new ArrayList();
-    for (final Iterator i = this.dirEdges.iterator(); i.hasNext();) {
-      final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)i.next();
+    for (final Object element : this.dirEdges) {
+      final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)element;
       if (de.isMarked()) {
         continue;
       }
@@ -478,8 +478,8 @@ class PolygonizeGraph extends PlanarGraph {
 
     // find all edgerings (which will now be minimal ones, as required)
     final List edgeRingList = new ArrayList();
-    for (final Iterator i = this.dirEdges.iterator(); i.hasNext();) {
-      final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)i.next();
+    for (final Object element : this.dirEdges) {
+      final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)element;
       if (de.isMarked()) {
         continue;
       }

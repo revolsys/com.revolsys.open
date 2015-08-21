@@ -28,7 +28,6 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.PathName;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.Property;
 
 public class ShapefileIterator extends AbstractIterator<Record>implements RecordReader {

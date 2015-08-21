@@ -8,7 +8,6 @@ import java.util.Set;
 
 import com.revolsys.geometry.model.Point;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.SpringUtil;
 
 public class TinWriter {
 

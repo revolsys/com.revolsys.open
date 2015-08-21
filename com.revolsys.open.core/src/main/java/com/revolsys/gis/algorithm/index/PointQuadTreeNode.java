@@ -142,6 +142,31 @@ public class PointQuadTreeNode<T> {
     }
   }
 
+  public boolean forEach(final Consumer<? super T> action) {
+    action.accept(this.value);
+    if (this.southWest != null) {
+      if (!this.southWest.forEach(action)) {
+        return false;
+      }
+    }
+    if (this.northWest != null) {
+      if (!this.northWest.forEach(action)) {
+        return false;
+      }
+    }
+    if (this.southEast != null) {
+      if (!this.southEast.forEach(action)) {
+        return false;
+      }
+    }
+    if (this.northEast != null) {
+      if (!this.northEast.forEach(action)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   public boolean forEach(final Consumer<? super T> action, final BoundingBox envelope) {
     final double minX = envelope.getMinX();
     final double maxX = envelope.getMaxX();
@@ -171,31 +196,6 @@ public class PointQuadTreeNode<T> {
     }
     if (this.northEast != null && !maxXLess && !maxYLess) {
       if (!this.northEast.forEach(action, envelope)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  public boolean forEach(final Consumer<? super T> action) {
-    action.accept(this.value);
-    if (this.southWest != null) {
-      if (!this.southWest.forEach(action)) {
-        return false;
-      }
-    }
-    if (this.northWest != null) {
-      if (!this.northWest.forEach(action)) {
-        return false;
-      }
-    }
-    if (this.southEast != null) {
-      if (!this.southEast.forEach(action)) {
-        return false;
-      }
-    }
-    if (this.northEast != null) {
-      if (!this.northEast.forEach(action)) {
         return false;
       }
     }

@@ -35,7 +35,6 @@ package com.revolsys.geometry.planargraph;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.algorithm.CGAlgorithms;
@@ -59,8 +58,8 @@ public class DirectedEdge extends GraphComponent implements Comparable<DirectedE
    */
   public static List<Edge> toEdges(final Collection<DirectedEdge> dirEdges) {
     final List<Edge> edges = new ArrayList<Edge>();
-    for (final Iterator<DirectedEdge> i = dirEdges.iterator(); i.hasNext();) {
-      edges.add(i.next().parentEdge);
+    for (final DirectedEdge directedEdge : dirEdges) {
+      edges.add(directedEdge.parentEdge);
     }
     return edges;
   }

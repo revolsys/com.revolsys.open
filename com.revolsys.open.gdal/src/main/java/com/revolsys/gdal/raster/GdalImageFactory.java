@@ -1,11 +1,10 @@
 package com.revolsys.gdal.raster;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.gdal.Gdal;
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageFactory;
+import com.revolsys.spring.resource.Resource;
 
 public class GdalImageFactory extends AbstractIoFactory implements GeoreferencedImageFactory {
 

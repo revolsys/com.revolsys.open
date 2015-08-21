@@ -35,19 +35,19 @@ public enum Direction {
     return this == FORWARDS;
   }
 
+  public boolean isOpposite(final Direction direction) {
+    if (direction == null) {
+      return false;
+    } else {
+      return isForwards() !=direction.isForwards();
+    }
+  }
+
   public Direction opposite() {
     if (isForwards()) {
       return BACKWARDS;
     } else {
       return FORWARDS;
-    }
-  }
-
-  public boolean isOpposite(Direction direction) {
-    if (direction == null) {
-      return false;
-    } else {
-      return isForwards() !=direction.isForwards();
     }
   }
 }

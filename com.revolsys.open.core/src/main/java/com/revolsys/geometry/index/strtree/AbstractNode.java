@@ -132,6 +132,7 @@ public abstract class AbstractNode implements Emptyable, Boundable, Serializable
    *
    * @return true if there are boundables at this node
    */
+  @Override
   public boolean isEmpty() {
     return this.childBoundables.isEmpty();
   }

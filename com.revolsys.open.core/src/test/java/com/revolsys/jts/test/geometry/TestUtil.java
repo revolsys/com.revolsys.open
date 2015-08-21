@@ -1,8 +1,6 @@
 package com.revolsys.jts.test.geometry;
 
 import org.junit.Assert;
-import com.revolsys.spring.resource.ClassPathResource;
-import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.io.RecordReader;
@@ -11,6 +9,8 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.io.Reader;
+import com.revolsys.spring.resource.ClassPathResource;
+import com.revolsys.spring.resource.Resource;
 
 public class TestUtil {
 

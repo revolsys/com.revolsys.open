@@ -261,6 +261,7 @@ public abstract class AbstractSTRtree implements Emptyable, Serializable {
    *
    * @return true if the index does not contain any items
    */
+  @Override
   public boolean isEmpty() {
     if (!this.built) {
       return this.itemBoundables.isEmpty();

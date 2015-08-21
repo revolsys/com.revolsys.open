@@ -10,7 +10,6 @@ import java.sql.SQLException;
 
 import com.revolsys.spring.resource.ByteArrayResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.SpringUtil;
 
 public class LocalBlob implements Blob {
 

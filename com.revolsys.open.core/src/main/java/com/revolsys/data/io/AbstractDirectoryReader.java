@@ -36,13 +36,13 @@ import java.util.NoSuchElementException;
 import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
-import com.revolsys.spring.resource.FileSystemResource;
-import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
+import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.Resource;
 
 public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>implements Iterator<T> {
   /** The list of base file names to read. */

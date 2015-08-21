@@ -3,7 +3,6 @@ package com.revolsys.jts.test.geometry.operation;
 import java.util.Map;
 
 import org.junit.Assert;
-import com.revolsys.spring.resource.ClassPathResource;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.Geometry;
@@ -15,6 +14,7 @@ import com.revolsys.geometry.operation.buffer.BufferParameters;
 import com.revolsys.io.Reader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.jts.test.geometry.TestUtil;
+import com.revolsys.spring.resource.ClassPathResource;
 
 import junit.framework.Test;
 import junit.framework.Test;

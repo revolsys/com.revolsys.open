@@ -13,8 +13,6 @@ import java.util.NoSuchElementException;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.LongHashMap;
@@ -33,7 +31,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.ProtocolBufferInputStream;
-import com.revolsys.spring.resource.SpringUtil;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
 public class OsmPbfRecordIterator extends AbstractIterator<Record>implements RecordReader {

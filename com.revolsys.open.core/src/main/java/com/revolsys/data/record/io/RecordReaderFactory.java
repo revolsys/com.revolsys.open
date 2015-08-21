@@ -4,8 +4,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Iterator;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
@@ -15,6 +13,7 @@ import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.io.Reader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapReaderFactory;
+import com.revolsys.spring.resource.Resource;
 
 public interface RecordReaderFactory
   extends GeometryReaderFactory, MapReaderFactory, IoFactoryWithCoordinateSystem {

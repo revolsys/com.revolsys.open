@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.Hex;
 import com.revolsys.util.Property;
 

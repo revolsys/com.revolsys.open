@@ -3,8 +3,6 @@ package com.revolsys.data.record.io;
 import java.io.File;
 import java.nio.file.Path;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
@@ -12,6 +10,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Reader;
+import com.revolsys.spring.resource.Resource;
 
 public interface RecordReader extends Reader<Record> {
   /**

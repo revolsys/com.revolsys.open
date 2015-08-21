@@ -7,7 +7,6 @@ import java.util.Map;
 import javax.annotation.PreDestroy;
 
 import org.slf4j.LoggerFactory;
-import com.revolsys.spring.resource.FileSystemResource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.io.RecordWriter;
@@ -19,6 +18,7 @@ import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.Path;
 import com.revolsys.io.Writer;
+import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.util.Property;
 
 public class DirectoryRecordWriter extends AbstractRecordWriter {

@@ -1,8 +1,7 @@
 package com.revolsys.io.map;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.io.FileIoFactory;
+import com.revolsys.spring.resource.Resource;
 
 public interface MapReaderFactory extends FileIoFactory {
   default MapReader createMapReader(final Object source) {

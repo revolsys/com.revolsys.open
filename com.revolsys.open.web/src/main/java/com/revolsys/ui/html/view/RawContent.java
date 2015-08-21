@@ -1,9 +1,7 @@
 package com.revolsys.ui.html.view;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.format.xml.XmlWriter;
-import com.revolsys.spring.resource.SpringUtil;
+import com.revolsys.spring.resource.Resource;
 
 /**
  * @author paustin

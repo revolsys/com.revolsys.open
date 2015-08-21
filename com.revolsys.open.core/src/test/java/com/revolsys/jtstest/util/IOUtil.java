@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
-import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -13,6 +12,7 @@ import com.revolsys.geometry.wkb.WKBHexFileReader;
 import com.revolsys.geometry.wkb.WKBReader;
 import com.revolsys.geometry.wkb.WKTFileReader;
 import com.revolsys.geometry.wkb.WKTReader;
+import com.revolsys.spring.resource.FileSystemResource;
 
 public class IOUtil {
   public static Geometry readGeometriesFromFile(final String filename,

@@ -5,11 +5,9 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.FileUtil;
-import com.revolsys.spring.resource.SpringUtil;
+import com.revolsys.spring.resource.Resource;
 
 public interface MapWriterFactory extends FileIoFactory {
   default MapWriter createMapWriter(final Object source) {

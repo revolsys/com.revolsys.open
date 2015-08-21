@@ -9,8 +9,6 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.format.xml.StaxUtils;
 import com.revolsys.geometry.model.Geometry;
@@ -24,6 +22,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.io.IoConstants;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
 
 public class GmlGeometryIterator extends AbstractIterator<Geometry>implements GmlConstants {

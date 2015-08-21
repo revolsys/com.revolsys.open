@@ -37,7 +37,6 @@ import javax.swing.undo.UndoableEdit;
 
 import org.apache.commons.collections4.set.MapBackedSet;
 import org.slf4j.LoggerFactory;
-import com.revolsys.spring.resource.Resource;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -77,6 +76,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.resource.ByteArrayResource;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;

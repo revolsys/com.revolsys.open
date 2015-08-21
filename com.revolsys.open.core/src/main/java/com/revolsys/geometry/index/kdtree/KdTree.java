@@ -166,6 +166,7 @@ public class KdTree implements Emptyable {
    *
    * @return true if the index does not contain any items
    */
+  @Override
   public boolean isEmpty() {
     if (this.root == null) {
       return true;

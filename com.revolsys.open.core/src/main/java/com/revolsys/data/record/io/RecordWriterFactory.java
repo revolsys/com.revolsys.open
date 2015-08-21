@@ -5,8 +5,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.Records;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -17,7 +15,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.resource.PathResource;
-import com.revolsys.spring.resource.SpringUtil;
+import com.revolsys.spring.resource.Resource;
 
 public interface RecordWriterFactory
   extends FileIoFactory, GeometryWriterFactory, IoFactoryWithCoordinateSystem {

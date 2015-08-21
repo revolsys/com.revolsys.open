@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.record.Record;
@@ -24,7 +23,7 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.io.ResourceEndianOutput;
 import com.revolsys.io.AbstractRecordWriter;
-import com.revolsys.spring.resource.SpringUtil;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;

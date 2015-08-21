@@ -12,9 +12,10 @@ import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.slf4j.LoggerFactory;
-import com.revolsys.spring.resource.Resource;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.raster.JaiGeoreferencedImage;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
 
 public class PdfImage extends JaiGeoreferencedImage {
