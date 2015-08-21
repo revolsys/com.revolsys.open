@@ -67,7 +67,7 @@ import com.revolsys.data.equals.Equals;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
-import com.revolsys.data.record.property.DirectionalAttributes;
+import com.revolsys.data.record.property.DirectionalFields;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
@@ -129,7 +129,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
   private LayerRecord addRecord;
 
-  private LayerRecordTableModel allAttributes;
+  private LayerRecordTableModel allFields;
 
   private boolean allowAddWithErrors = false;
 
@@ -203,7 +203,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     addTabAllFields();
     final boolean editable = layer.isEditable();
     setEditable(editable);
-    getAllAttributes().setEditable(isEditable());
+    getAllFields().setEditable(isEditable());
     if (recordDefinition.getGeometryFieldName() != null) {
       addTabGeometry();
     }
@@ -404,8 +404,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   }
 
   protected void addTabAllFields() {
-    this.allAttributes = new LayerRecordTableModel(this);
-    final BaseJTable table = AbstractSingleRecordTableModel.createTable(this.allAttributes);
+    this.allFields = new LayerRecordTableModel(this);
+    final BaseJTable table = AbstractSingleRecordTableModel.createTable(this.allFields);
     final TableColumnModel columnModel = table.getColumnModel();
     FormAllFieldsModifiedPredicate.add(this, table);
     FormAllFieldsErrorPredicate.add(this, table);
@@ -448,7 +448,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
       maxHeight = Math.min(bounds.height, maxHeight);
     }
-    final int preferredHeight = Math.min(maxHeight, (this.allAttributes.getRowCount() + 1) * 20);
+    final int preferredHeight = Math.min(maxHeight, (this.allFields.getRowCount() + 1) * 20);
     scrollPane.setMinimumSize(new Dimension(100, preferredHeight));
     scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, maxHeight));
     scrollPane.setPreferredSize(new Dimension(800, preferredHeight));
@@ -531,7 +531,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
       final DataType geometryDataType = geometryField.getType();
       if (geometryDataType == DataTypes.LINE_STRING
         || geometryDataType == DataTypes.MULTI_LINE_STRING) {
-        if (DirectionalAttributes.getProperty(recordDefinition).hasDirectionalAttributes()) {
+        if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
           this.toolBar.addButton("geometry", FLIP_RECORD_NAME, FLIP_RECORD_ICON, editable, this,
             "flipRecordOrientation");
           this.toolBar.addButton("geometry", FLIP_LINE_ORIENTATION_NAME, FLIP_LINE_ORIENTATION_ICON,
@@ -613,7 +613,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
   public void destroy() {
     this.addOkButton = null;
-    this.allAttributes = null;
+    this.allFields = null;
     this.recordStore = null;
     this.fieldInValidMessage.clear();
     for (final Field field : this.fields.values()) {
@@ -640,9 +640,9 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     final AbstractLayer layer = getLayer();
     if (layer != null) {
       this.layer = null;
-      if (this.allAttributes != null) {
-        Property.removeListener(layer, this.allAttributes);
-        this.allAttributes = null;
+      if (this.allFields != null) {
+        Property.removeListener(layer, this.allFields);
+        this.allFields = null;
       }
       Property.removeListener(layer, this);
     }
@@ -767,8 +767,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     return this.addRecord;
   }
 
-  public LayerRecordTableModel getAllAttributes() {
-    return this.allAttributes;
+  public LayerRecordTableModel getAllFields() {
+    return this.allFields;
   }
 
   public String getCodeValue(final String fieldName, final Object value) {
@@ -1119,10 +1119,10 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
           this.fieldNameSetNamesField.setModel(fieldNamesSetNamesModel);
           this.fieldNameSetNamesField.setSelectedItem(selectedItem);
           final String fieldNamesSetName = (String)this.fieldNameSetNamesField.getSelectedItem();
-          this.allAttributes.setFieldNames(layer.getFieldNamesSet(fieldNamesSetName));
+          this.allFields.setFieldNames(layer.getFieldNamesSet(fieldNamesSetName));
         } else if (propertyName.equals("fieldNamesSetName")) {
           final String fieldNamesSetName = (String)event.getNewValue();
-          this.allAttributes.setFieldNames(layer.getFieldNamesSet(fieldNamesSetName));
+          this.allFields.setFieldNames(layer.getFieldNamesSet(fieldNamesSetName));
         } else if (source == layer) {
           if ("recordDeleted".equals(propertyName)) {
             if (record.isDeleted() || isSame(event.getNewValue())) {
@@ -1263,8 +1263,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition != null) {
       try {
-        final Class<?> attributeClass = recordDefinition.getFieldClass(fieldName);
-        value = StringConverterRegistry.toObject(attributeClass, value);
+        final Class<?> fieldClass = recordDefinition.getFieldClass(fieldName);
+        value = StringConverterRegistry.toObject(fieldClass, value);
       } catch (final Throwable e) {
       }
     }
@@ -1308,7 +1308,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     try {
       final boolean same = record != null && record.isSame(getRecord());
       this.record = record;
-      this.allAttributes.setRecord(record);
+      this.allFields.setRecord(record);
       if (!same) {
         setValues(record);
         this.undoManager.discardAllEdits();
@@ -1326,9 +1326,9 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     if (Property.hasValue(idFieldName)) {
       this.readOnlyFieldNames.add(idFieldName);
     }
-    for (final FieldDefinition attribute : recordDefinition.getFields()) {
-      if (attribute.isRequired()) {
-        final String name = attribute.getName();
+    for (final FieldDefinition field : recordDefinition.getFields()) {
+      if (field.isRequired()) {
+        final String name = field.getName();
         addRequiredFieldNames(name);
       }
 
@@ -1435,8 +1435,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
         field.setEditable(true);
       }
     }
-    if (this.allAttributes != null) {
-      this.allAttributes.setReadOnlyFieldNames(this.readOnlyFieldNames);
+    if (this.allFields != null) {
+      this.allFields.setReadOnlyFieldNames(this.readOnlyFieldNames);
     }
   }
 

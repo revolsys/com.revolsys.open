@@ -27,22 +27,22 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.gis.graph.Edge;
 
-public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
-  public static final String PROPERTY_NAME = DirectionalAttributes.class.getName()
+public class DirectionalFields extends AbstractRecordDefinitionProperty {
+  public static final String PROPERTY_NAME = DirectionalFields.class.getName()
     + ".propertyName";
 
-  private static final Logger LOG = LoggerFactory.getLogger(DirectionalAttributes.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DirectionalFields.class);
 
   public static boolean canMergeObjects(final Point point, final Record record1,
     final Record record2) {
     final Set<String> excludes = Collections.emptySet();
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(record1);
+    final DirectionalFields property = DirectionalFields.getProperty(record1);
     return property.canMerge(point, record1, record2, excludes);
   }
 
   public static boolean canMergeObjects(final Point point, final Record record1,
     final Record record2, final Set<String> equalExcludeFieldNames) {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(record1);
+    final DirectionalFields property = DirectionalFields.getProperty(record1);
     return property.canMerge(point, record1, record2, equalExcludeFieldNames);
   }
 
@@ -51,7 +51,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     if (!edges.isEmpty()) {
       final Edge<Record> firstEdge = edges.get(0);
       final Record record = firstEdge.getObject();
-      final DirectionalAttributes property = DirectionalAttributes.getProperty(record);
+      final DirectionalFields property = DirectionalFields.getProperty(record);
       property.setEdgeSplitAttributes(line, point, edges);
     }
   }
@@ -63,32 +63,32 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
 
   public static boolean equalsObjects(final Record record1, final Record record2,
     final Collection<String> equalExcludeFieldNames) {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(record1);
+    final DirectionalFields property = DirectionalFields.getProperty(record1);
     return property.equals(record1, record2, equalExcludeFieldNames);
   }
 
   public static Set<String> getCantMergeAttributesObjects(final Point point, final Record record1,
     final Record record2, final Set<String> equalExcludeFieldNames) {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(record1);
+    final DirectionalFields property = DirectionalFields.getProperty(record1);
     return property.getCantMergeAttributes(point, record1, record2, equalExcludeFieldNames);
   }
 
-  public static DirectionalAttributes getProperty(final Record record) {
+  public static DirectionalFields getProperty(final Record record) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     return getProperty(recordDefinition);
   }
 
-  public static DirectionalAttributes getProperty(final RecordDefinition recordDefinition) {
-    DirectionalAttributes property = recordDefinition.getProperty(PROPERTY_NAME);
+  public static DirectionalFields getProperty(final RecordDefinition recordDefinition) {
+    DirectionalFields property = recordDefinition.getProperty(PROPERTY_NAME);
     if (property == null) {
-      property = new DirectionalAttributes();
+      property = new DirectionalFields();
       property.setRecordDefinition(recordDefinition);
     }
     return property;
   }
 
   public static Record getReverseObject(final Record record) {
-    final DirectionalAttributes property = getProperty(record);
+    final DirectionalFields property = getProperty(record);
     final Record reverse = property.getReverse(record);
     return reverse;
   }
@@ -99,27 +99,27 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
   }
 
   public static Record merge(final Point point, final Record record1, final Record record2) {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(record1);
+    final DirectionalFields property = DirectionalFields.getProperty(record1);
     return property.getMergedRecord(point, record1, record2);
   }
 
   public static Record merge(final Record record1, final Record record2) {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(record1);
+    final DirectionalFields property = DirectionalFields.getProperty(record1);
     return property.getMergedRecord(record1, record2);
   }
 
   public static Record mergeLongest(final Point point, final Record record1, final Record record2) {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(record1);
+    final DirectionalFields property = DirectionalFields.getProperty(record1);
     return property.getMergedRecordReverseLongest(point, record1, record2);
   }
 
   public static Record mergeLongest(final Record record1, final Record record2) {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(record1);
+    final DirectionalFields property = DirectionalFields.getProperty(record1);
     return property.getMergedRecordReverseLongest(record1, record2);
   }
 
   public static void reverse(final Record record) {
-    final DirectionalAttributes property = getProperty(record);
+    final DirectionalFields property = getProperty(record);
     property.reverseAttributesAndGeometry(record);
   }
 
@@ -139,7 +139,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
 
   private final List<List<String>> endAndSideFieldNamePairs = new ArrayList<List<String>>();
 
-  public DirectionalAttributes() {
+  public DirectionalFields() {
   }
 
   public void addDirectionalAttributeValues(final String fieldName,
@@ -784,7 +784,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     return this.startFieldNames;
   }
 
-  public boolean hasDirectionalAttributes() {
+  public boolean hasDirectionalFields() {
     return !this.directionalAttributeValues.isEmpty() || !this.reverseFieldNameMap.isEmpty();
   }
 
@@ -916,6 +916,6 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
 
   @Override
   public String toString() {
-    return "DirectionalAttributes";
+    return "DirectionalFields";
   }
 }

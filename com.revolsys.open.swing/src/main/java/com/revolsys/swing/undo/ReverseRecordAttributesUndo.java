@@ -1,7 +1,7 @@
 package com.revolsys.swing.undo;
 
 import com.revolsys.data.equals.Equals;
-import com.revolsys.data.record.property.DirectionalAttributes;
+import com.revolsys.data.record.property.DirectionalFields;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 
@@ -45,13 +45,13 @@ public class ReverseRecordAttributesUndo extends AbstractUndoableEdit {
 
   @Override
   protected void doRedo() {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(this.record);
+    final DirectionalFields property = DirectionalFields.getProperty(this.record);
     property.reverseAttributes(this.record);
   }
 
   @Override
   protected void doUndo() {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(this.record);
+    final DirectionalFields property = DirectionalFields.getProperty(this.record);
     property.reverseAttributes(this.record);
   }
 

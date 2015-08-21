@@ -57,7 +57,7 @@ import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.io.ListRecordReader;
 import com.revolsys.data.record.io.RecordReader;
-import com.revolsys.data.record.property.DirectionalAttributes;
+import com.revolsys.data.record.property.DirectionalFields;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
@@ -1267,7 +1267,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       if (compare > 0) {
         return getMergedRecord(point, record2, record1);
       } else {
-        final DirectionalAttributes property = DirectionalAttributes
+        final DirectionalFields property = DirectionalFields
           .getProperty(getRecordDefinition());
         final Map<String, Object> newValues = property.getMergedMap(point, record1, record2);
         newValues.remove(getIdFieldName());
@@ -2678,7 +2678,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   /** Perform the actual split. */
   protected List<LayerRecord> splitRecord(final LayerRecord record, final LineString line,
     final Point point, final LineString line1, final LineString line2) {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(record);
+    final DirectionalFields property = DirectionalFields.getProperty(record);
 
     final LayerRecord record1 = copyRecord(record);
     final LayerRecord record2 = copyRecord(record);

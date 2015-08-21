@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.property.DirectionalAttributes;
+import com.revolsys.data.record.property.DirectionalFields;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.gis.graph.Edge;
@@ -41,7 +41,7 @@ public class PseudoNodeAttribute {
     final Edge<Record> edge2) {
     final Record object1 = edge1.getObject();
     final Record object2 = edge2.getObject();
-    if (DirectionalAttributes.canMergeObjects(node, object1, object2,
+    if (DirectionalFields.canMergeObjects(node, object1, object2,
       this.equalExcludeFieldNames)) {
       return new EdgePair<Record>(edge1, edge2);
     } else {
