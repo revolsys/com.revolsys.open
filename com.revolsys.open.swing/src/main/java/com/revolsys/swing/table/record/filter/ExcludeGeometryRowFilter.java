@@ -4,7 +4,7 @@ import javax.swing.RowFilter;
 import javax.swing.table.TableModel;
 
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.swing.table.record.model.AbstractRecordTableModel;
 
 public class ExcludeGeometryRowFilter extends RowFilter<TableModel, Integer> {

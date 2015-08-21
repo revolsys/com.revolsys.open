@@ -1,6 +1,6 @@
 package com.revolsys.jts;
 
-import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactory;
 
 public interface TestConstants {
 

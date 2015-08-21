@@ -8,11 +8,11 @@ import javax.measure.Measure;
 import javax.measure.quantity.Length;
 
 import org.slf4j.LoggerFactory;
-import com.revolsys.spring.resource.Resource;
 
 import com.kitfox.svg.SVGDiagram;
 import com.kitfox.svg.SVGException;
 import com.kitfox.svg.SVGUniverse;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 

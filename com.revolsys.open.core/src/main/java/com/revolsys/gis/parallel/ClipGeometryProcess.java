@@ -1,11 +1,11 @@
 package com.revolsys.gis.parallel;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.gis.jts.GeometryProperties;
-import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Polygon;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.util.GeometryProperties;
+import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 

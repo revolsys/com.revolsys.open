@@ -12,7 +12,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;

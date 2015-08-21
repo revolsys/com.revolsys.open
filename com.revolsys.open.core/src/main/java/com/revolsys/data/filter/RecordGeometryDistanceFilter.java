@@ -24,7 +24,7 @@ import java.util.Comparator;
 import java.util.function.Predicate;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 
 public class RecordGeometryDistanceFilter implements Predicate<Record>, Comparator<Record> {
   /** The geometry to compare the data objects to to. */

@@ -1,9 +1,9 @@
 package com.revolsys.jts.testold.linearref;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.linearref.LinearLocation;
-import com.revolsys.jts.linearref.LocationIndexedLine;
+import com.revolsys.geometry.linearref.LinearLocation;
+import com.revolsys.geometry.linearref.LocationIndexedLine;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.Point;
 
 /**
  * Tests the {@link LocationIndexedLine} class

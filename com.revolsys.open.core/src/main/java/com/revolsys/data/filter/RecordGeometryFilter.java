@@ -23,7 +23,7 @@ package com.revolsys.data.filter;
 import java.util.function.Predicate;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 
 public class RecordGeometryFilter<G extends Geometry> implements Predicate<Record> {
   private Predicate<G> filter;

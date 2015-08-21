@@ -10,8 +10,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.predicate.Predicates;
 

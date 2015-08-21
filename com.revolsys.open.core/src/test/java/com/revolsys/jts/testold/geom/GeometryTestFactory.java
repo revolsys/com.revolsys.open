@@ -32,11 +32,11 @@
  */
 package com.revolsys.jts.testold.geom;
 
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LinearRing;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LinearRing;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.impl.PointDouble;
 
 /**
  * @version 1.7

@@ -10,13 +10,13 @@ import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStoreFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
 
 public class GeometryTest {
   public static void createTestFile(final GeometryFactory geometryFactory, final String wkt) {
@@ -63,7 +63,7 @@ public class GeometryTest {
 
   public static void main(final String[] args) {
 
-    for (final GeometryFactory geometryFactory : new com.revolsys.jts.geom.GeometryFactory[] {
+    for (final GeometryFactory geometryFactory : new com.revolsys.geometry.model.GeometryFactory[] {
       GeometryFactory.fixed(3005, 1000.0), GeometryFactory.fixed(3005, 1000.0, 1.0)
     }) {
       createTestFile(geometryFactory, "POINT(1185093.8356 385662.9221)");

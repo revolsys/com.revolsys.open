@@ -3,7 +3,7 @@ package com.revolsys.gis.cs;
 import java.io.Serializable;
 
 import com.revolsys.data.equals.Equals;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
 public class Area implements Serializable {
   /**

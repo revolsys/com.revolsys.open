@@ -34,8 +34,8 @@ package com.revolsys.jts.testold.index;
 
 import java.util.List;
 
-import com.revolsys.jts.index.strtree.AbstractNode;
-import com.revolsys.jts.index.strtree.SIRtree;
+import com.revolsys.geometry.index.strtree.AbstractNode;
+import com.revolsys.geometry.index.strtree.SIRtree;
 
 import junit.framework.TestCase;
 

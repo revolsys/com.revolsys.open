@@ -13,9 +13,9 @@ import org.libtiff.jai.codec.XTIFFDirectory;
 import org.libtiff.jai.codec.XTIFFField;
 import org.libtiff.jai.codecimpl.XTIFFCodec;
 import org.libtiff.jai.operator.XTIFFDescriptor;
-import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.collection.map.IntHashMap;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.cs.Area;
 import com.revolsys.gis.cs.Authority;
 import com.revolsys.gis.cs.Axis;
@@ -27,8 +27,8 @@ import com.revolsys.gis.cs.Projection;
 import com.revolsys.gis.cs.ProjectionParameterNames;
 import com.revolsys.gis.cs.epsg.EpsgAuthority;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.raster.JaiGeoreferencedImage;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.ExceptionUtil;
 import com.sun.media.jai.codec.ImageCodec;
 

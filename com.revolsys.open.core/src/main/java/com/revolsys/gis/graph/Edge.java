@@ -18,13 +18,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.End;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.gis.algorithm.linematch.LineSegmentMatch;
-import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.End;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.util.Property;
 
@@ -341,7 +341,7 @@ public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Exter
     return null;
   }
 
-  public com.revolsys.jts.geom.BoundingBox getEnvelope() {
+  public com.revolsys.geometry.model.BoundingBox getEnvelope() {
     return getLine().getBoundingBox();
   }
 

@@ -35,11 +35,11 @@ package com.revolsys.jts.testold;
 
 import java.util.Date;
 
-import com.revolsys.jts.algorithm.LineIntersector;
-import com.revolsys.jts.algorithm.NonRobustLineIntersector;
-import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.geometry.algorithm.LineIntersector;
+import com.revolsys.geometry.algorithm.NonRobustLineIntersector;
+import com.revolsys.geometry.algorithm.RobustLineIntersector;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
 
 /**
  * @version 1.7

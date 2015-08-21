@@ -3,12 +3,12 @@ package com.revolsys.gis.graph.visitor;
 import java.util.List;
 import java.util.function.Consumer;
 
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
 
@@ -43,7 +43,7 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends DelegatingVisitor<Edge
 
   @Override
   public void accept(final Edge<T> edge) {
-    final com.revolsys.jts.geom.BoundingBox envelope = edge.getEnvelope();
+    final com.revolsys.geometry.model.BoundingBox envelope = edge.getEnvelope();
     if (this.envelope.distance(envelope) < this.maxDistance) {
       if (!edge.hasNode(this.node)) {
         if (edge.isLessThanDistance(this.node, this.maxDistance)) {

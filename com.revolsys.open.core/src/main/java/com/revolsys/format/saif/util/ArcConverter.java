@@ -7,11 +7,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.format.saif.SaifConstants;
-import com.revolsys.gis.jts.GeometryProperties;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.util.GeometryProperties;
 
 public class ArcConverter implements OsnConverter {
   private final GeometryFactory geometryFactory;

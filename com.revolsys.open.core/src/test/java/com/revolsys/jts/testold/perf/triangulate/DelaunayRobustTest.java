@@ -3,11 +3,11 @@ package com.revolsys.jts.testold.perf.triangulate;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.triangulate.DelaunayTriangulationBuilder;
-import com.revolsys.jts.util.Stopwatch;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.triangulate.DelaunayTriangulationBuilder;
+import com.revolsys.geometry.util.Stopwatch;
 
 /**
  * Test robustness of Delaunay computation.

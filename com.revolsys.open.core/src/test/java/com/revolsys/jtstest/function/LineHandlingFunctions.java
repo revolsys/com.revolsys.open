@@ -37,12 +37,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.geometry.dissolve.LineDissolver;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.operation.linemerge.LineSequencer;
 import com.revolsys.gis.graph.linemerge.LineMerger;
-import com.revolsys.jts.dissolve.LineDissolver;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.operation.linemerge.LineSequencer;
 
 public class LineHandlingFunctions {
 

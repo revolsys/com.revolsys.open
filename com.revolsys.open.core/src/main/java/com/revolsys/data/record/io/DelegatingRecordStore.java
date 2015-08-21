@@ -18,13 +18,13 @@ import com.revolsys.data.record.property.RecordDefinitionProperty;
 import com.revolsys.data.record.schema.AbstractRecordStore;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStoreSchema;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class DelegatingRecordStore extends AbstractRecordStore {
   private final AbstractRecordStore recordStore;

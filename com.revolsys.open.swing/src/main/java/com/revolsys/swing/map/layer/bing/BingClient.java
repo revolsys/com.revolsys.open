@@ -16,9 +16,9 @@ import javax.imageio.ImageIO;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.format.json.Json;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
 import com.revolsys.util.UriTemplate;

@@ -2,12 +2,12 @@ package com.revolsys.gis.graph.filter;
 
 import java.util.function.Predicate;
 
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class IsPointOnLineEdgeFilter<T> implements Predicate<Node<T>> {
 
@@ -24,7 +24,7 @@ public class IsPointOnLineEdgeFilter<T> implements Predicate<Node<T>> {
     this.envelope = this.envelope.expand(maxDistance);
   }
 
-  public com.revolsys.jts.geom.BoundingBox getEnvelope() {
+  public com.revolsys.geometry.model.BoundingBox getEnvelope() {
     return this.envelope;
   }
 

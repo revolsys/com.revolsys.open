@@ -13,10 +13,10 @@ import com.revolsys.data.query.functions.EnvelopeIntersects;
 import com.revolsys.data.query.functions.F;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.properties.BaseObjectWithProperties;
 
 public class Query extends BaseObjectWithProperties implements Cloneable {

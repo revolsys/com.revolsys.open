@@ -32,11 +32,11 @@
  */
 package com.revolsys.jtstest.function;
 
-import com.revolsys.jts.densify.Densifier;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.operation.buffer.Buffer;
-import com.revolsys.jts.operation.buffer.BufferParameters;
-import com.revolsys.jts.precision.MinimumClearance;
+import com.revolsys.geometry.densify.Densifier;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.operation.buffer.Buffer;
+import com.revolsys.geometry.operation.buffer.BufferParameters;
+import com.revolsys.geometry.precision.MinimumClearance;
 
 /**
  * Geometry functions which

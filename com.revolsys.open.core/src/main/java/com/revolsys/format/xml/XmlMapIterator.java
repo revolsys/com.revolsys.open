@@ -8,10 +8,9 @@ import java.util.NoSuchElementException;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.io.NamedLinkedHashMap;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
 public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {

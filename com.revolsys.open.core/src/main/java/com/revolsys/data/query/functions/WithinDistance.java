@@ -11,7 +11,7 @@ import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.QueryValue;
 import com.revolsys.data.record.schema.RecordStore;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 
 public class WithinDistance extends Condition {
   private QueryValue geometry1Value;

@@ -32,8 +32,8 @@
  */
 package com.revolsys.math;
 
-import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Point;
+import com.revolsys.geometry.algorithm.CGAlgorithms;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.util.MathUtil;
 
 /**

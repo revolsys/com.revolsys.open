@@ -6,19 +6,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.format.json.JsonParser;
 import com.revolsys.format.json.JsonParser.EventType;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.impl.LineStringDouble;
+import com.revolsys.spring.resource.Resource;
 
 public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>implements GeoJsonConstants {
 

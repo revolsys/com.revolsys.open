@@ -3,7 +3,7 @@ package com.revolsys.jtstest.function;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 
 interface GeometryPredicate {
   boolean isTrue(Geometry geom);

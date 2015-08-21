@@ -33,7 +33,7 @@
 package com.revolsys.jtstest.function;
 
 import com.revolsys.beans.Classes;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 
 /**
  * A base for implementations of

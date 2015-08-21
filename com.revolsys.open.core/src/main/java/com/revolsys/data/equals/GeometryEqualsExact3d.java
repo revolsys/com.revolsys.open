@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryCollection;
 
 public class GeometryEqualsExact3d implements Equals<Geometry> {
   public static final Set<String> USER_DATA_EXCLUDE = new TreeSet<String>();

@@ -7,8 +7,6 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.io.AbstractRecordIoFactory;
 import com.revolsys.data.record.io.RecordReader;
@@ -21,6 +19,7 @@ import com.revolsys.format.csv.CsvRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
+import com.revolsys.spring.resource.Resource;
 
 public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory, MapWriterFactory {
   public static final String DESCRIPTION = "Tab-Separated Values";

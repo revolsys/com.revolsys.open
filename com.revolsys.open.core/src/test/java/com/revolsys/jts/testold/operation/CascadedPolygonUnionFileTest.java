@@ -3,9 +3,9 @@ package com.revolsys.jts.testold.operation;
 import java.io.IOException;
 import java.util.List;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.io.ParseException;
-import com.revolsys.jts.operation.union.CascadedPolygonUnion;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.operation.union.CascadedPolygonUnion;
+import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 
 import junit.framework.TestCase;

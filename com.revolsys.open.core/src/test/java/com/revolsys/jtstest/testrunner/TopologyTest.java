@@ -2,7 +2,7 @@ package com.revolsys.jtstest.testrunner;
 
 import java.io.File;
 
-import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactory;
 
 import junit.textui.TestRunner;
 

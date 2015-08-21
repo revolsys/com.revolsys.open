@@ -3,11 +3,11 @@ package com.revolsys.raster;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 
 public class ProjectionImageFilter extends WholeImageFilter {
 

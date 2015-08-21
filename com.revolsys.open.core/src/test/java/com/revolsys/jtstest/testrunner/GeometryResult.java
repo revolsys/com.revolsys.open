@@ -32,7 +32,7 @@
  */
 package com.revolsys.jtstest.testrunner;
 
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 
 /**
  * @version 1.7

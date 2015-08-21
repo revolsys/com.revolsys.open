@@ -32,14 +32,14 @@
  */
 package com.revolsys.jtstest.function;
 
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Triangle;
+import com.revolsys.geometry.model.segment.LineSegmentDouble;
+import com.revolsys.geometry.model.util.GeometryMapper;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Triangle;
-import com.revolsys.jts.geom.segment.LineSegmentDouble;
-import com.revolsys.jts.geom.util.GeometryMapper;
 
 public class TriangleFunctions {
 

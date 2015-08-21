@@ -34,8 +34,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.property.FieldProperties;
 import com.revolsys.data.record.property.RecordDefinitionProperty;
@@ -51,7 +49,7 @@ import com.revolsys.data.types.EnumerationDataType;
 import com.revolsys.data.types.SimpleDataType;
 import com.revolsys.format.saif.util.CsnIterator;
 import com.revolsys.io.PathName;
-import com.revolsys.spring.resource.SpringUtil;
+import com.revolsys.spring.resource.Resource;
 
 public class SaifSchemaReader {
 

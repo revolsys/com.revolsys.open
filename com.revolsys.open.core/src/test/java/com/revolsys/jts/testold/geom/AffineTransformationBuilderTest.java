@@ -1,10 +1,10 @@
 package com.revolsys.jts.testold.geom;
 
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.geom.util.AffineTransformation;
-import com.revolsys.jts.geom.util.AffineTransformationBuilder;
-import com.revolsys.jts.geom.util.AffineTransformationFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.util.AffineTransformation;
+import com.revolsys.geometry.model.util.AffineTransformationBuilder;
+import com.revolsys.geometry.model.util.AffineTransformationFactory;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;

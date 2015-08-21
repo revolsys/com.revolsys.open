@@ -4,13 +4,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class NodeWithinDistanceOfGeometryVisitor<T> implements Consumer<Node<T>> {

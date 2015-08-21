@@ -9,13 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.revolsys.spring.resource.FileSystemResource;
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Paths;
 import com.revolsys.io.connection.AbstractConnectionRegistryManager;
+import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;

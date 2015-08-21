@@ -14,10 +14,10 @@ import com.revolsys.data.filter.RecordGeometryBoundingBoxIntersectsFilter;
 import com.revolsys.data.filter.RecordGeometryDistanceFilter;
 import com.revolsys.data.filter.RecordGeometryIntersectsFilter;
 import com.revolsys.data.record.Record;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class RecordQuadTree extends QuadTree<Record> {

@@ -8,7 +8,6 @@ import org.junit.Test;
 
 import com.revolsys.collection.range.AbstractRange;
 import com.revolsys.collection.range.IntRange;
-import com.revolsys.collection.range.MinMax;
 import com.revolsys.collection.range.RangeInvalidException;
 import com.revolsys.collection.range.RangeSet;
 import com.revolsys.collection.range.Ranges;

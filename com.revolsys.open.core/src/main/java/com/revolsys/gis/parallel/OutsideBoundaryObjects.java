@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 
 public class OutsideBoundaryObjects {
   private static final Logger LOG = LoggerFactory.getLogger(OutsideBoundaryObjects.class);

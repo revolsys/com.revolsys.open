@@ -1,10 +1,10 @@
 package com.revolsys.jts.testold.perf.geom.prep;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.geom.util.SineStarFactory;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.util.SineStarFactory;
 import com.revolsys.jts.testold.perf.ThreadTestCase;
 import com.revolsys.jts.testold.perf.ThreadTestRunner;
 

@@ -5,18 +5,17 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.geojson.GeoJsonConstants;
 import com.revolsys.format.geojson.GeoJsonGeometryIterator;
 import com.revolsys.format.geojson.GeoJsonRecordWriter;
-import com.revolsys.gis.geometry.io.GeometryReader;
-import com.revolsys.gis.geometry.io.GeometryReaderFactory;
+import com.revolsys.geometry.io.GeometryReader;
+import com.revolsys.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.FileUtil;
+import com.revolsys.spring.resource.Resource;
 
 public class CogoJsonIoFactory extends AbstractIoFactoryWithCoordinateSystem
   implements RecordWriterFactory, GeometryReaderFactory {

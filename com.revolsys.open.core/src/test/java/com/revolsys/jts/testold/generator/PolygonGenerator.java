@@ -35,13 +35,13 @@ package com.revolsys.jts.testold.generator;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LinearRing;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.operation.valid.IsValidOp;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LinearRing;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.operation.valid.IsValidOp;
 
 /**
  *
@@ -245,7 +245,7 @@ public class PolygonGenerator extends GeometryGenerator {
    * @see #BOX
    * @see #ARC
    *
-   * @see com.revolsys.jts.testold.generator.GeometryGenerator#create()
+   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#create()
    *
    * @throws IllegalStateException When the alg is not valid or the number of points is invalid
    * @throws NullPointerException when either the Geometry Factory, or the Bounding Box are undefined.

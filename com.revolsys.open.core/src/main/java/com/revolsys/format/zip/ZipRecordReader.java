@@ -3,9 +3,6 @@ package com.revolsys.format.zip;
 import java.io.File;
 import java.io.IOException;
 
-import com.revolsys.spring.resource.FileSystemResource;
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.data.io.DelegatingReader;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
@@ -14,7 +11,8 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.ZipUtil;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
-import com.revolsys.spring.resource.SpringUtil;
+import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.Resource;
 
 public class ZipRecordReader extends DelegatingReader<Record>implements RecordReader {
   private RecordReader reader;

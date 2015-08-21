@@ -32,9 +32,9 @@
  */
 package com.revolsys.jtstest.function;
 
-import com.revolsys.jts.densify.Densifier;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.OctagonalEnvelope;
+import com.revolsys.geometry.densify.Densifier;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.OctagonalEnvelope;
 
 public class ConstructionFunctions {
   public static Geometry boundary(final Geometry g) {

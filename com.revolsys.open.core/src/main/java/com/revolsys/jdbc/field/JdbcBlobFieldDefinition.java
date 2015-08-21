@@ -7,12 +7,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import com.revolsys.spring.resource.FileSystemResource;
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.data.record.Record;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.jdbc.LocalBlob;
+import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.Resource;
 
 public class JdbcBlobFieldDefinition extends JdbcFieldDefinition {
   public JdbcBlobFieldDefinition(final String dbName, final String name, final int sqlType,

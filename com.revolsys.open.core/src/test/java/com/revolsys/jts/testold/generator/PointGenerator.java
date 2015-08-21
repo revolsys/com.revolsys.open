@@ -32,8 +32,8 @@
  */
 package com.revolsys.jts.testold.generator;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.Point;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.Point;
 
 /**
  *
@@ -46,7 +46,7 @@ import com.revolsys.jts.geom.Point;
 public class PointGenerator extends GeometryGenerator {
 
   /**
-   * @see com.revolsys.jts.testold.generator.GeometryGenerator#create()
+   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#create()
    * @throws NullPointerException when either the Geometry Factory, or the Bounding Box are undefined.
    */
   @Override

@@ -3,10 +3,10 @@ package com.revolsys.gis.grid.filter;
 import java.util.function.Predicate;
 
 import com.revolsys.data.record.Record;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.gis.grid.RectangularMapGrid;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
 
 /**
  * The MapGridGeometrySheetFilter will compare the centroid of the Geometry for

@@ -2,10 +2,10 @@ package com.revolsys.gis.grid;
 
 import java.util.List;
 
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Polygon;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Polygon;
 
 public interface RectangularMapGrid {
   BoundingBox getBoundingBox(final String mapTileName, final int srid);

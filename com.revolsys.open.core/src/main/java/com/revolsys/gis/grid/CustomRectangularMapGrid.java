@@ -3,11 +3,11 @@ package com.revolsys.gis.grid;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.util.MathUtil;
 
 public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {

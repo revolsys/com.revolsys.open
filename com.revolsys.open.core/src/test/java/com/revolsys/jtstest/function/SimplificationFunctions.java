@@ -32,10 +32,10 @@
  */
 package com.revolsys.jtstest.function;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.simplify.DouglasPeuckerSimplifier;
-import com.revolsys.jts.simplify.TopologyPreservingSimplifier;
-import com.revolsys.jts.simplify.VWSimplifier;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.simplify.DouglasPeuckerSimplifier;
+import com.revolsys.geometry.simplify.TopologyPreservingSimplifier;
+import com.revolsys.geometry.simplify.VWSimplifier;
 
 public class SimplificationFunctions {
   public static Geometry simplifyDP(final Geometry g, final double distance) {

@@ -38,7 +38,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import com.revolsys.beans.Classes;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.jtstest.testrunner.StringUtil;
 
 import junit.framework.Assert;

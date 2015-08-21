@@ -4,8 +4,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.segment.LineSegment;
 
 public class LineSegmentIntersectionVisitor implements Consumer<LineSegment> {
 

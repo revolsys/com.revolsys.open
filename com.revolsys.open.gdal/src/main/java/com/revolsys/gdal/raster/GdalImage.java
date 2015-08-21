@@ -8,15 +8,15 @@ import java.util.List;
 
 import org.gdal.gdal.Band;
 import org.gdal.gdal.Dataset;
-import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.gdal.Gdal;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.raster.AbstractGeoreferencedImage;
+import com.revolsys.spring.resource.Resource;
 
 public class GdalImage extends AbstractGeoreferencedImage {
 

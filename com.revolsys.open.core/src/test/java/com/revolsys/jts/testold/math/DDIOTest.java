@@ -1,6 +1,6 @@
 package com.revolsys.jts.testold.math;
 
-import com.revolsys.jts.math.DD;
+import com.revolsys.geometry.math.DD;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;

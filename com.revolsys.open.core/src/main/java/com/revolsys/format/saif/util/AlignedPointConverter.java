@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import com.revolsys.format.saif.SaifConstants;
-import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactory;
 
 public class AlignedPointConverter extends PointConverter {
   public AlignedPointConverter(final GeometryFactory geometryFactory) {

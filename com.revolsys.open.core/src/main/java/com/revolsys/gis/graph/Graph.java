@@ -26,6 +26,15 @@ import com.revolsys.collection.bplus.BPlusTreeMap;
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.comparator.ComparatorProxy;
 import com.revolsys.data.record.Record;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.LineStringDouble;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.attribute.NodeProperties;
 import com.revolsys.gis.graph.comparator.NodeDistanceComparator;
@@ -40,21 +49,12 @@ import com.revolsys.gis.graph.visitor.EdgeWithinDistance;
 import com.revolsys.gis.graph.visitor.NodeWithinBoundingBoxVisitor;
 import com.revolsys.gis.graph.visitor.NodeWithinDistanceOfCoordinateVisitor;
 import com.revolsys.gis.graph.visitor.NodeWithinDistanceOfGeometryVisitor;
-import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.page.PageValueManager;
 import com.revolsys.io.page.SerializablePageValueManager;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
-import com.revolsys.jts.geom.impl.LineStringDouble;
-import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.predicate.PredicateProxy;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.util.ExitLoopException;
@@ -309,7 +309,7 @@ public class Graph<T> {
 
     final Comparator<Node<T>> comparator = new NodeDistanceComparator<T>(fromNode);
 
-    final com.revolsys.jts.geom.BoundingBox envelope = filter.getEnvelope();
+    final com.revolsys.geometry.model.BoundingBox envelope = filter.getEnvelope();
     return getNodes(filter, comparator, envelope);
 
   }
@@ -610,7 +610,7 @@ public class Graph<T> {
   }
 
   public List<Edge<T>> getEdges(final Edge<T> edge) {
-    final com.revolsys.jts.geom.BoundingBox envelope = edge.getEnvelope();
+    final com.revolsys.geometry.model.BoundingBox envelope = edge.getEnvelope();
     final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
     return edgeIndex.query(envelope);
   }
@@ -649,7 +649,7 @@ public class Graph<T> {
   }
 
   public List<Edge<T>> getEdges(final Predicate<Edge<T>> filter,
-    final com.revolsys.jts.geom.BoundingBox envelope) {
+    final com.revolsys.geometry.model.BoundingBox envelope) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>(filter);
     final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
     edgeIndex.forEach(results, envelope);
@@ -669,7 +669,7 @@ public class Graph<T> {
   }
 
   public List<Edge<T>> getEdges(final Predicate<Edge<T>> filter,
-    final Comparator<Edge<T>> comparator, final com.revolsys.jts.geom.BoundingBox envelope) {
+    final Comparator<Edge<T>> comparator, final com.revolsys.geometry.model.BoundingBox envelope) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>(filter);
     final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
     edgeIndex.forEach(results, envelope);
@@ -685,12 +685,12 @@ public class Graph<T> {
 
   public List<Edge<T>> getEdges(final Predicate<Edge<T>> filter,
     final Comparator<Edge<T>> comparator, final Geometry geometry) {
-    final com.revolsys.jts.geom.BoundingBox envelope = geometry.getBoundingBox();
+    final com.revolsys.geometry.model.BoundingBox envelope = geometry.getBoundingBox();
     return getEdges(filter, comparator, envelope);
   }
 
   public List<Edge<T>> getEdges(final Predicate<Edge<T>> filter, final Geometry geometry) {
-    final com.revolsys.jts.geom.BoundingBox envelope = geometry.getBoundingBox();
+    final com.revolsys.geometry.model.BoundingBox envelope = geometry.getBoundingBox();
     return getEdges(filter, envelope);
   }
 

@@ -34,8 +34,8 @@ package com.revolsys.jts.testold.geom;
 
 import java.io.IOException;
 
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Polygon;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Polygon;
 
 /**
  * @version 1.7

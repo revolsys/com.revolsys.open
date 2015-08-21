@@ -1,6 +1,6 @@
 package com.revolsys.jtstest.geomop;
 
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 
 public class PreparedGeometryTeeOperation extends TeeGeometryOperation {
   static class GeometryOp {

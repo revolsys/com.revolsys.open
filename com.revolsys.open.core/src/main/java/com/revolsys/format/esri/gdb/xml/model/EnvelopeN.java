@@ -1,7 +1,7 @@
 package com.revolsys.format.esri.gdb.xml.model;
 
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.jts.geom.BoundingBox;
 
 public class EnvelopeN extends Envelope {
   private double xMin;

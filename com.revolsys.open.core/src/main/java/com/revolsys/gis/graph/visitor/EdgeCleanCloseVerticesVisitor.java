@@ -3,15 +3,15 @@ package com.revolsys.gis.graph.visitor;
 import java.util.LinkedHashSet;
 import java.util.function.Consumer;
 
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.gis.event.CoordinateEventListenerList;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.event.EdgeEvent;
 import com.revolsys.gis.graph.event.EdgeEventListenerList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 

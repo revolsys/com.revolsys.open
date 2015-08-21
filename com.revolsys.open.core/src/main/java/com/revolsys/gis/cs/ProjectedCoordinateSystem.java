@@ -11,11 +11,11 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
 
 import com.revolsys.data.equals.Equals;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.gis.cs.projection.CoordinatesProjection;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class ProjectedCoordinateSystem implements CoordinateSystem {
   /**

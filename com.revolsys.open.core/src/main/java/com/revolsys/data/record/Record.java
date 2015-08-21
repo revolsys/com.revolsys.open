@@ -25,9 +25,9 @@ import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionFactory;
 import com.revolsys.data.types.DataType;
-import com.revolsys.gis.jts.GeometryProperties;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.io.PathName;
-import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 

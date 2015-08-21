@@ -47,8 +47,8 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.jtstest.function.GeometryFunctionRegistry;
 import com.revolsys.jtstest.function.TestCaseGeometryFunctions;
 import com.revolsys.jtstest.geomop.GeometryFunctionOperation;
@@ -419,7 +419,7 @@ public class TestReader {
   }
 
   private Geometry readGeometry(final Element geometryElement, final File wktFile)
-    throws FileNotFoundException, com.revolsys.jts.io.ParseException, IOException {
+    throws FileNotFoundException, com.revolsys.geometry.wkb.ParseException, IOException {
     String geomText = null;
     if (wktFile != null) {
       final List wktList = FileUtil.getContents(wktFile.getPath());
@@ -466,7 +466,7 @@ public class TestReader {
    */
 
   private GeometryResult toGeometryResult(final String value, final TestFile testRun)
-    throws com.revolsys.jts.io.ParseException {
+    throws com.revolsys.geometry.wkb.ParseException {
     final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
     final WKTOrWKBReader wktorbReader = new WKTOrWKBReader(geometryFactory);
     return new GeometryResult(wktorbReader.read(value));
@@ -481,7 +481,7 @@ public class TestReader {
   }
 
   private Result toResult(final String value, final String name, final TestFile testRun)
-    throws TestParseException, com.revolsys.jts.io.ParseException {
+    throws TestParseException, com.revolsys.geometry.wkb.ParseException {
     if (isBooleanFunction(name)) {
       return toBooleanResult(value);
     }

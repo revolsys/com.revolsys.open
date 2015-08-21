@@ -1,8 +1,8 @@
 package com.revolsys.jts.testold.noding;
 
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.noding.SegmentPointComparator;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.noding.SegmentPointComparator;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;

@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.util.Stopwatch;
+import com.revolsys.geometry.util.Stopwatch;
 
 /**
  * Runs {@link PerformanceTestCase} classes which contain performance tests.

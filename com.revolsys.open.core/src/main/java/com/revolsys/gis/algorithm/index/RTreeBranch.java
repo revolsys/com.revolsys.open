@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.revolsys.collection.ArrayUtil;
-import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.geometry.model.BoundingBox;
 
 public class RTreeBranch<T> extends RTreeNode<T>implements Iterable<RTreeNode<T>> {
 

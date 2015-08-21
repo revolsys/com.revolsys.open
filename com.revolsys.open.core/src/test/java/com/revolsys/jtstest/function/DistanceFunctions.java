@@ -34,10 +34,10 @@ package com.revolsys.jtstest.function;
 
 import java.util.List;
 
-import com.revolsys.jts.algorithm.distance.DiscreteHausdorffDistance;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.operation.distance.DistanceWithPoints;
+import com.revolsys.geometry.algorithm.distance.DiscreteHausdorffDistance;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.operation.distance.DistanceWithPoints;
 
 public class DistanceFunctions {
   public static Geometry densifiedDiscreteHausdorffDistanceLine(final Geometry a, final Geometry b,

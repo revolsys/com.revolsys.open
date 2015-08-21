@@ -3,12 +3,12 @@ package com.revolsys.jts.testold.perf.operation.union;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.operation.union.CascadedPolygonUnion;
-import com.revolsys.jts.util.Stopwatch;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.operation.union.CascadedPolygonUnion;
+import com.revolsys.geometry.util.Stopwatch;
+import com.revolsys.geometry.wkb.WKTReader;
 
 public class UnionPerfTester {
   public static final int CASCADED = 1;

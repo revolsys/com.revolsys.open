@@ -9,18 +9,17 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.format.xml.StaxUtils;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.LinearRing;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.impl.LineStringDouble;
-import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.LinearRing;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.impl.LineStringDouble;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
 public class KmlGeometryIterator extends AbstractIterator<Geometry>implements Kml22Constants {

@@ -4,14 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.data.io.AbstractDirectoryReader;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionFactory;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.Reader;
+import com.revolsys.spring.resource.Resource;
 
 public class RecordDirectoryReader extends AbstractDirectoryReader<Record>
   implements RecordDefinitionFactory {

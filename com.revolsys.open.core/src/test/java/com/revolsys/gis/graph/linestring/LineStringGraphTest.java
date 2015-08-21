@@ -2,8 +2,8 @@ package com.revolsys.gis.graph.linestring;
 
 import java.util.List;
 
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
 
 import junit.framework.Assert;
 import junit.framework.Assert;

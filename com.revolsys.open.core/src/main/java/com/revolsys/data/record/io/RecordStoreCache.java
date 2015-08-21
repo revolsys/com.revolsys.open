@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.data.record.schema.RecordStore;
-import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.geometry.model.BoundingBox;
 
 public class RecordStoreCache {
   public static RecordStoreCache getCache(final RecordStore recordStore) {

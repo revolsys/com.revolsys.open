@@ -35,14 +35,14 @@ package com.revolsys.jts.testold.perf.algorithm;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.geometry.algorithm.PointInRing;
+import com.revolsys.geometry.algorithm.RobustDeterminant;
+import com.revolsys.geometry.index.strtree.SIRtree;
+import com.revolsys.geometry.model.LinearRing;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.segment.LineSegment;
+import com.revolsys.geometry.model.segment.LineSegmentDouble;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.algorithm.PointInRing;
-import com.revolsys.jts.algorithm.RobustDeterminant;
-import com.revolsys.jts.geom.LinearRing;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.segment.LineSegment;
-import com.revolsys.jts.geom.segment.LineSegmentDouble;
-import com.revolsys.jts.index.strtree.SIRtree;
 
 /**
  * Implements {@link PointInRing}

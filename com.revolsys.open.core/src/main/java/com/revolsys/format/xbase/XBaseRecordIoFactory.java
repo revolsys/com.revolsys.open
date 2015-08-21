@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.io.RecordReaderFactory;
@@ -14,6 +12,7 @@ import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.spring.resource.OutputStreamResource;
+import com.revolsys.spring.resource.Resource;
 
 public class XBaseRecordIoFactory extends AbstractIoFactoryWithCoordinateSystem
   implements RecordReaderFactory, RecordWriterFactory {

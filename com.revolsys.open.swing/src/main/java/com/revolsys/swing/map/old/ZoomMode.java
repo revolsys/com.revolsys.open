@@ -1,6 +1,6 @@
 package com.revolsys.swing.map.old;
 
-import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.map.ComponentViewport2D;
 
 public interface ZoomMode {

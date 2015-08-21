@@ -5,8 +5,8 @@ import com.revolsys.data.query.QueryValue;
 import com.revolsys.data.query.Value;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
 
 public class F {
   public static WithinDistance dWithin(final FieldDefinition attribute, final Geometry geometry,

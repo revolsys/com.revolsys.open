@@ -2,9 +2,9 @@ package com.revolsys.gis.model.coordinates.filter;
 
 import java.util.function.Predicate;
 
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.segment.LineSegment;
 
 public class PointOnLineSegment implements Predicate<Point> {
 

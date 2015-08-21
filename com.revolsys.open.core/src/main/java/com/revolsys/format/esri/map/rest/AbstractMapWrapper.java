@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
 public class AbstractMapWrapper {
 

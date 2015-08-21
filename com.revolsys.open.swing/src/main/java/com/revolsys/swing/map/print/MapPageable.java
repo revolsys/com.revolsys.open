@@ -11,8 +11,8 @@ import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.swing.map.layer.Project;
 
 public class MapPageable implements Pageable {

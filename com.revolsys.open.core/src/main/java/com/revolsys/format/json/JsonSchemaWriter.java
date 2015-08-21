@@ -10,14 +10,12 @@ import java.util.Map.Entry;
 
 import javax.annotation.PreDestroy;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
-import com.revolsys.spring.resource.SpringUtil;
+import com.revolsys.spring.resource.Resource;
 
 public class JsonSchemaWriter {
   private final JsonMapWriter writer;

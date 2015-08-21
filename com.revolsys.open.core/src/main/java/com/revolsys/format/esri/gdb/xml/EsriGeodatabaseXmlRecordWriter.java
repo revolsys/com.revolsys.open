@@ -18,20 +18,20 @@ import com.revolsys.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry
 import com.revolsys.format.xml.XmlConstants;
 import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.format.xml.XsiConstants;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.MultiPoint;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.Path;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.MultiLineString;
-import com.revolsys.jts.geom.MultiPoint;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
 import com.revolsys.util.DateUtil;
 
 public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter

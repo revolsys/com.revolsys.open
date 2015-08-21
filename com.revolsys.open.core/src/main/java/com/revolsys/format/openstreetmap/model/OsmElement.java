@@ -13,8 +13,8 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.format.xml.StaxUtils;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.PathName;
-import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.Property;
 
 public class OsmElement extends AbstractRecord implements OsmConstants {

@@ -32,10 +32,10 @@
  */
 package com.revolsys.jts.testold.algorithm;
 
-import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
-import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.geometry.algorithm.locate.IndexedPointInAreaLocator;
+import com.revolsys.geometry.algorithm.locate.PointOnGeometryLocator;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.jts.testold.perf.algorithm.PointInAreaStressTester;
 
 import junit.framework.TestCase;

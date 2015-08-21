@@ -13,7 +13,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.TablePanel;

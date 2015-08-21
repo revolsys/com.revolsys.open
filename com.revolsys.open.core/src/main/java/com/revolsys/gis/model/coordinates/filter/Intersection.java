@@ -2,8 +2,8 @@ package com.revolsys.gis.model.coordinates.filter;
 
 import java.util.function.Predicate;
 
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.gis.graph.linestring.LineStringGraph;
-import com.revolsys.jts.geom.LineString;
 
 public class Intersection implements Predicate<LineString> {
 

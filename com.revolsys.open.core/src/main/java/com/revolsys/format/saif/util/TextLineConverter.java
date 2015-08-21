@@ -6,10 +6,10 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import com.revolsys.format.saif.SaifConstants;
-import com.revolsys.gis.jts.GeometryProperties;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.util.GeometryProperties;
 
 public class TextLineConverter implements OsnConverter {
   private static final String TYPE = "type";

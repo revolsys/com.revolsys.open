@@ -1,10 +1,10 @@
 package com.revolsys.gis.algorithm;
 
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.segment.Segment;
+import com.revolsys.geometry.util.Assert;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.segment.Segment;
-import com.revolsys.jts.util.Assert;
 
 /**
  * Computes the {@link LineStringLocation} of the point on a {@link LineString}

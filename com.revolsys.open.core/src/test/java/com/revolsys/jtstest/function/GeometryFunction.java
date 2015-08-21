@@ -32,7 +32,7 @@
  */
 package com.revolsys.jtstest.function;
 
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 
 /**
  * A reification of a function which can be executed on a

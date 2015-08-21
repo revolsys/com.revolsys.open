@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.properties.DelegatingObjectWithProperties;
 
 public class RecordGeometryIterator extends DelegatingObjectWithProperties

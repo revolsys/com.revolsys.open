@@ -27,8 +27,8 @@ import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.types.DataType;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.map.MapSerializer;
-import com.revolsys.jts.geom.GeometryFactory;
 
 public interface RecordDefinition extends RecordStoreSchemaElement, MapSerializer {
   void addDefaultValue(String fieldName, Object defaultValue);
@@ -210,5 +210,5 @@ public interface RecordDefinition extends RecordStoreSchemaElement, MapSerialize
 
   void setDefaultValues(Map<String, ? extends Object> defaultValues);
 
-  void setGeometryFactory(com.revolsys.jts.geom.GeometryFactory geometryFactory);
+  void setGeometryFactory(com.revolsys.geometry.model.GeometryFactory geometryFactory);
 }

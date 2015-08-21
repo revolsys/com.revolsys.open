@@ -2,7 +2,7 @@ package com.revolsys.data.record.property;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.jts.geom.LineString;
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.util.Property;
 
 public class LengthFieldName extends AbstractRecordDefinitionProperty {

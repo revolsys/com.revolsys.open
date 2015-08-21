@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.revolsys.spring.resource.Resource;
 
 public class AttributeMap extends LinkedHashMap<String, Object> {

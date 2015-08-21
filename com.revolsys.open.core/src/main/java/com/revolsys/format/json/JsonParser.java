@@ -17,9 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.io.FileUtil;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
 
 public class JsonParser implements Iterator<JsonParser.EventType>, AutoCloseable {

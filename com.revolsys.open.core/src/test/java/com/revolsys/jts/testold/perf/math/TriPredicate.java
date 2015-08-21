@@ -1,8 +1,8 @@
 package com.revolsys.jts.testold.perf.math;
 
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Triangle;
-import com.revolsys.jts.math.DD;
+import com.revolsys.geometry.math.DD;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Triangle;
 
 /**
  * Algorithms for computing values and predicates

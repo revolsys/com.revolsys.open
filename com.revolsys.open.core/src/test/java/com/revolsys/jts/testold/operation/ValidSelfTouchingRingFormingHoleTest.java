@@ -1,8 +1,8 @@
 package com.revolsys.jts.testold.operation;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.operation.valid.IsValidOp;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.operation.valid.IsValidOp;
+import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 

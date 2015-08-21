@@ -17,7 +17,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.AbstractRecordStore;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.util.Property;
 
 public class RecordStoreQueryReader extends IteratorReader<Record>implements RecordReader {

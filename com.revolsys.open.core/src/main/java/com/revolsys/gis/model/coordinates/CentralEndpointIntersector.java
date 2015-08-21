@@ -32,8 +32,8 @@
  */
 package com.revolsys.gis.model.coordinates;
 
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
 
 /**
  * Computes an approximate intersection of two line segments

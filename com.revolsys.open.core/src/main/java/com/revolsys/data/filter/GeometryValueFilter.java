@@ -3,7 +3,7 @@ package com.revolsys.data.filter;
 import java.util.function.Predicate;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 
 public class GeometryValueFilter implements Predicate<Record> {
   private final Geometry geometry;

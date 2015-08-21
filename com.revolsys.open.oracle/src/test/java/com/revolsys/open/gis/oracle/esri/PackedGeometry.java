@@ -5,11 +5,11 @@ import java.util.List;
 
 import com.revolsys.data.equals.GeometryEqualsExact3d;
 import com.revolsys.format.wkt.WktWriter;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.oracle.esri.ArcSdeConstants;
 import com.revolsys.gis.oracle.esri.ArcSdeStGeometryFieldDefinition;
 import com.revolsys.gis.oracle.esri.PackedCoordinateUtil;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
 
 public class PackedGeometry {
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(3005, 1.0, 1.0);

@@ -32,17 +32,17 @@
  */
 package com.revolsys.jts.testold.perf.algorithm;
 
+import com.revolsys.geometry.algorithm.LineIntersector;
+import com.revolsys.geometry.algorithm.RectangleLineIntersector;
+import com.revolsys.geometry.algorithm.RobustLineIntersector;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.util.Stopwatch;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.algorithm.LineIntersector;
-import com.revolsys.jts.algorithm.RectangleLineIntersector;
-import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.util.Stopwatch;
 
 public class RectangleLineIntersectorPerfTest {
   public static void main(final String[] args) {

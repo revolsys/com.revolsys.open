@@ -32,13 +32,13 @@
  */
 package com.revolsys.jts.testold.algorithm;
 
-import com.revolsys.jts.algorithm.MCPointInRing;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LinearRing;
-import com.revolsys.jts.geom.Location;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.io.WKTReader;
+import com.revolsys.geometry.algorithm.MCPointInRing;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.LinearRing;
+import com.revolsys.geometry.model.Location;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.textui.TestRunner;
 

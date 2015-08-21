@@ -6,11 +6,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.format.directory.DirectoryRecordStore;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
+import com.revolsys.spring.resource.Resource;
 
 public abstract class AbstractRecordIoFactory extends AbstractIoFactoryWithCoordinateSystem
   implements RecordReaderFactory, RecordStoreFactory {

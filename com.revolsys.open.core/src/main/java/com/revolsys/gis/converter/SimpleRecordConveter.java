@@ -9,10 +9,10 @@ import org.springframework.core.convert.converter.Converter;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.gis.converter.process.SourceToTargetProcess;
-import com.revolsys.gis.jts.GeometryProperties;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.CollectionUtil;
 
 public class SimpleRecordConveter implements Converter<Record, Record> {

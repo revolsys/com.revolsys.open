@@ -3,8 +3,8 @@ package com.revolsys.gis.algorithm.index;
 import java.util.Collection;
 import java.util.function.Consumer;
 
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Point;
 
 public abstract class AbstractIdObjectPointQuadTree<T> extends AbstractPointSpatialIndex<T>
   implements IdObjectIndex<T> {

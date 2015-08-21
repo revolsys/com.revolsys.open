@@ -1,12 +1,12 @@
 package com.revolsys.gis.model.coordinates;
 
-import com.revolsys.jts.algorithm.HCoordinate;
-import com.revolsys.jts.algorithm.NotRepresentableException;
-import com.revolsys.jts.algorithm.RobustDeterminant;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.geometry.algorithm.HCoordinate;
+import com.revolsys.geometry.algorithm.NotRepresentableException;
+import com.revolsys.geometry.algorithm.RobustDeterminant;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Trig;
 

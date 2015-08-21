@@ -55,15 +55,6 @@ public class OutputStreamResource extends AbstractResource {
     throw new IllegalArgumentException("No input stream exists");
   }
 
-  public OutputStream newOutputStream() {
-    if (this.read) {
-      throw new IllegalStateException("OutputStream has already been read - "
-        + "do not use OutputStreamResource if a stream needs to be read multiple times");
-    }
-    this.read = true;
-    return this.outputStream;
-  }
-
   @Override
   public int hashCode() {
     return this.outputStream.hashCode();
@@ -72,5 +63,15 @@ public class OutputStreamResource extends AbstractResource {
   @Override
   public boolean isOpen() {
     return true;
+  }
+
+  @Override
+  public OutputStream newOutputStream() {
+    if (this.read) {
+      throw new IllegalStateException("OutputStream has already been read - "
+        + "do not use OutputStreamResource if a stream needs to be read multiple times");
+    }
+    this.read = true;
+    return this.outputStream;
   }
 }

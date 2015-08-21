@@ -32,9 +32,9 @@
  */
 package com.revolsys.jts.testold.generator;
 
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 
 /**
  * This class illustrates the basic functionality and configuration options for generating spatial data.

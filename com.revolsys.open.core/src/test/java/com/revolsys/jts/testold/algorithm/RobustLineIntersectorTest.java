@@ -33,14 +33,14 @@
 
 package com.revolsys.jts.testold.algorithm;
 
-import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.algorithm.CGAlgorithmsDD;
-import com.revolsys.jts.algorithm.LineIntersector;
-import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.geometry.algorithm.CGAlgorithms;
+import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
+import com.revolsys.geometry.algorithm.LineIntersector;
+import com.revolsys.geometry.algorithm.RobustLineIntersector;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;

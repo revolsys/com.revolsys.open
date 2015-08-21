@@ -35,7 +35,7 @@ package com.revolsys.jtstest.geomop;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.jtstest.testrunner.BooleanResult;
 import com.revolsys.jtstest.testrunner.DoubleResult;
 import com.revolsys.jtstest.testrunner.GeometryResult;

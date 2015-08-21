@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.record.Record;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 
 public class RecordEqualsFilter implements Predicate<Record> {
   private EqualsRegistry equalsRegistry = EqualsInstance.INSTANCE;

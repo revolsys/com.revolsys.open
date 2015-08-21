@@ -8,9 +8,9 @@ import java.util.List;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.MappedLocation;
 import com.revolsys.swing.action.enablecheck.EnableCheck;

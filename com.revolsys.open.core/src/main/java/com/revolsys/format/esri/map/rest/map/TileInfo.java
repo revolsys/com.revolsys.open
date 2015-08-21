@@ -5,9 +5,9 @@ import java.util.Map;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.format.esri.map.rest.AbstractMapWrapper;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
 
 public class TileInfo extends AbstractMapWrapper {
   private double originX = Double.NaN;

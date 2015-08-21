@@ -1,10 +1,10 @@
 package com.revolsys.jtstest.function;
 
+import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
+import com.revolsys.geometry.algorithm.RobustLineIntersector;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.algorithm.CGAlgorithmsDD;
-import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.Point;
 
 public class CGAlgorithmFunctions {
   public static int orientationIndex(final Geometry segment, final Geometry ptGeom) {

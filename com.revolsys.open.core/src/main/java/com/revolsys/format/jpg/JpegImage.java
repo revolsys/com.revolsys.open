@@ -1,8 +1,7 @@
 package com.revolsys.format.jpg;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.raster.JaiGeoreferencedImage;
+import com.revolsys.spring.resource.Resource;
 
 public class JpegImage extends JaiGeoreferencedImage {
 

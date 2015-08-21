@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.data.io.AbstractDirectoryReader;
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
@@ -15,7 +13,7 @@ import com.revolsys.data.record.io.RecordDirectoryReader;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
-import com.revolsys.spring.resource.SpringUtil;
+import com.revolsys.spring.resource.Resource;
 
 /**
  * <p>

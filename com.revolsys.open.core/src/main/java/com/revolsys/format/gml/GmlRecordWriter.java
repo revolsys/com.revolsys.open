@@ -12,12 +12,12 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.format.gml.type.GmlFieldType;
 import com.revolsys.format.gml.type.GmlFieldTypeRegistry;
 import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.Path;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 
 public class GmlRecordWriter extends AbstractRecordWriter implements GmlConstants {
   public static final void srsName(final XmlWriter out, final GeometryFactory geometryFactory) {
@@ -81,7 +81,7 @@ public class GmlRecordWriter extends AbstractRecordWriter implements GmlConstant
   @Override
   public void setProperty(final String name, final Object value) {
     if (name.equals(IoConstants.GEOMETRY_FACTORY)) {
-      this.geometryFactory = (com.revolsys.jts.geom.GeometryFactory)value;
+      this.geometryFactory = (com.revolsys.geometry.model.GeometryFactory)value;
     }
     super.setProperty(name, value);
   }

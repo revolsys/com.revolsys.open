@@ -6,12 +6,12 @@ import java.util.Map;
 
 import com.revolsys.beans.AbstractPropertyChangeObject;
 import com.revolsys.collection.map.Maps;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.io.map.MapSerializer;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
 
 public class MappedLocation extends AbstractPropertyChangeObject implements MapSerializer {
   public static Point targetPointToPixel(final BoundingBox boundingBox, final Point point,

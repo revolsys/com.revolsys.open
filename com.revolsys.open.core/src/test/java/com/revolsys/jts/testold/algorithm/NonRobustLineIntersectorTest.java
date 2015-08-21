@@ -33,7 +33,7 @@
 
 package com.revolsys.jts.testold.algorithm;
 
-import com.revolsys.jts.algorithm.NonRobustLineIntersector;
+import com.revolsys.geometry.algorithm.NonRobustLineIntersector;
 
 import junit.framework.TestCase;
 

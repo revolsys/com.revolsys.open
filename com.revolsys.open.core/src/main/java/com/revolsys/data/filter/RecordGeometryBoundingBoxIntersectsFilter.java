@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.predicate.Predicates;
 
 public class RecordGeometryBoundingBoxIntersectsFilter implements Predicate<Record> {

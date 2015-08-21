@@ -32,12 +32,12 @@
  */
 package com.revolsys.jts.testold.generator;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.operation.valid.IsValidOp;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.operation.valid.IsValidOp;
 
 /**
  *
@@ -141,7 +141,7 @@ public class LineStringGenerator extends GeometryGenerator {
    * @see #HORZ
    * @see #ARC
    *
-   * @see com.revolsys.jts.testold.generator.GeometryGenerator#create()
+   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#create()
    *
    * @throws IllegalStateException When the alg is not valid or the number of points is invalid
    * @throws NullPointerException when either the Geometry Factory, or the Bounding Box are undefined.

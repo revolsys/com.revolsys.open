@@ -32,14 +32,14 @@
  */
 package com.revolsys.jts.testold.operation;
 
-import com.revolsys.jts.algorithm.BoundaryNodeRule;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.io.ParseException;
-import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.operation.IsSimpleOp;
+import com.revolsys.geometry.algorithm.BoundaryNodeRule;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.operation.IsSimpleOp;
+import com.revolsys.geometry.wkb.ParseException;
+import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;

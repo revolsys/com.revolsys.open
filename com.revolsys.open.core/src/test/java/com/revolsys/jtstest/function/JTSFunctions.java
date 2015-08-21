@@ -1,15 +1,15 @@
 package com.revolsys.jtstest.function;
 
+import com.revolsys.geometry.model.CoordinateList;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.operation.buffer.Buffer;
+import com.revolsys.geometry.operation.buffer.BufferParameters;
+import com.revolsys.geometry.util.GeometricShapeFactory;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.operation.buffer.Buffer;
-import com.revolsys.jts.operation.buffer.BufferParameters;
-import com.revolsys.jts.util.GeometricShapeFactory;
 
 public class JTSFunctions {
   private static final double HEIGHT = 70;

@@ -2,8 +2,8 @@ package com.revolsys.jts.testold.perf.operation.union;
 
 import java.util.List;
 
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.io.WKTReader;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.wkb.WKTReader;
 import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 
 public class FileUnionPerfTest {

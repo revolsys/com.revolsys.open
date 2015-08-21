@@ -12,8 +12,6 @@ import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
@@ -33,7 +31,7 @@ import com.revolsys.io.Writer;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.spring.resource.FileSystemResource;
-import com.revolsys.spring.resource.SpringUtil;
+import com.revolsys.spring.resource.Resource;
 
 public class DirectoryRecordStore extends AbstractRecordStore {
 

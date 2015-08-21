@@ -11,9 +11,9 @@ import javax.xml.stream.XMLStreamReader;
 
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.format.xml.StaxUtils;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
 
 public class OsmWay extends OsmElement {
 

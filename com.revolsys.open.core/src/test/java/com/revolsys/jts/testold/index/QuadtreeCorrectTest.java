@@ -35,9 +35,9 @@ package com.revolsys.jts.testold.index;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.util.Stopwatch;
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
-import com.revolsys.jts.util.Stopwatch;
 
 /**
  * @version 1.7

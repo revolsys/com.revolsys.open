@@ -8,9 +8,9 @@ import java.util.Set;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.gis.io.StatisticsMap;
-import com.revolsys.gis.jts.GeometryProperties;
-import com.revolsys.jts.geom.Geometry;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 

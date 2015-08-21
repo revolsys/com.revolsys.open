@@ -12,12 +12,12 @@ import com.revolsys.data.record.io.RecordStoreExtension;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.oracle.io.OracleRecordStore;
 import com.revolsys.io.Path;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.Property;
 
 public class ArcSdeStGeometryRecordStoreExtension implements RecordStoreExtension {

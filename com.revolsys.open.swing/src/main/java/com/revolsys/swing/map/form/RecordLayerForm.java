@@ -73,9 +73,9 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.dnd.transferhandler.RecordLayerFormTransferHandler;
@@ -125,15 +125,21 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
   private static final long serialVersionUID = 1L;
 
-  private JButton addOkButton = InvokeMethodAction.createButton("OK", this, "actionAddOk");
+  private JButton addOkButton = RunnableAction.createButton("OK", () -> actionAddOk());
+
+  private LayerRecord addRecord;
 
   private LayerRecordTableModel allAttributes;
 
   private boolean allowAddWithErrors = false;
 
+  private boolean cancelled = false;
+
   private boolean editable = true;
 
   private final Map<String, String> fieldInValidMessage = new HashMap<String, String>();
+
+  private ComboBox fieldNameSetNamesField;
 
   private final Map<String, Field> fields = new LinkedHashMap<String, Field>();
 
@@ -177,12 +183,6 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
   private UndoManager undoManager = new RecordLayerFormUndoManager(this);
 
-  private ComboBox fieldNameSetNamesField;
-
-  private boolean cancelled = false;
-
-  private LayerRecord addRecord;
-
   public RecordLayerForm(final AbstractRecordLayer layer) {
     ProjectFrame.addSaveActions(this, layer.getProject());
     setLayout(new BorderLayout());
@@ -217,7 +217,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     setRecord(object);
   }
 
-  public void actionAddCancel() {
+  protected void actionAddCancel() {
     final AbstractRecordLayer layer = getLayer();
     final LayerRecord record = getRecord();
     setRecord(null);
@@ -227,7 +227,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     closeWindow();
   }
 
-  public void actionAddOk() {
+  protected void actionAddOk() {
     final AbstractRecordLayer layer = getLayer();
     final LayerRecord record = getRecord();
     layer.saveChanges(record);
@@ -570,13 +570,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   }
 
   public void clearTabColor(final int index) {
-    if (index > -1) {
-      if (SwingUtilities.isEventDispatchThread()) {
-        this.tabs.setTabComponentAt(index, null);
-      } else {
-        Invoke.later(this, "setTabColor", index);
-      }
-    }
+    setTabColor(index, null);
   }
 
   public void closeWindow() {
@@ -659,8 +653,53 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     removeAll();
   }
 
-  protected boolean doValidateField(final String fieldName) {
-    return validateFieldInternal(fieldName);
+  protected void doSetFieldInvalid(final String fieldName, String message) {
+    final String oldValue = this.fieldInValidMessage.get(fieldName);
+    if (message == null) {
+      message = "Invalid value";
+    }
+    if (!Equals.equal(message, oldValue)) {
+      this.fieldInValidMessage.put(fieldName, message);
+      final Field field = getField(fieldName);
+      field.setFieldInvalid(message, WebColors.Red, WebColors.Pink);
+
+      this.invalidFieldNames.add(fieldName);
+      final int tabIndex = getTabIndex(fieldName);
+      Maps.addToSet(this.tabInvalidFieldMap, tabIndex, fieldName);
+      updateTabValid(tabIndex);
+      updateInvalidFields(true);
+    }
+  }
+
+  protected void doSetFieldValid(final String fieldName) {
+    final boolean valid = isFieldValid(fieldName);
+    final Field field = getField(fieldName);
+    field.setFieldValid();
+    if (this.record.isModified(fieldName)) {
+      final Object originalValue = this.record.getOriginalValue(fieldName);
+      String originalString;
+      if (originalValue == null) {
+        originalString = "-";
+      } else {
+        originalString = StringConverterRegistry.toString(originalValue);
+      }
+      field.setFieldToolTip(originalString);
+      field.setFieldBackgroundColor(new Color(0, 255, 0, 31));
+    } else {
+      field.setFieldToolTip("");
+    }
+    if (!valid) {
+      this.invalidFieldNames.remove(fieldName);
+      this.fieldInValidMessage.remove(fieldName);
+      final int tabIndex = getTabIndex(fieldName);
+      Maps.removeFromSet(this.tabInvalidFieldMap, tabIndex, fieldName);
+      updateTabValid(tabIndex);
+      updateInvalidFields(true);
+    }
+  }
+
+  protected void doValidateField(final String fieldName) {
+    validateFieldInternal(fieldName);
   }
 
   protected boolean doValidateFields(final Collection<String> fieldNames) {
@@ -1193,26 +1232,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     }
   }
 
-  public void setFieldInvalid(final String fieldName, String message) {
-    if (message == null) {
-      message = "Invalid value";
-    }
-    if (SwingUtilities.isEventDispatchThread()) {
-      final String oldValue = this.fieldInValidMessage.get(fieldName);
-      if (!Equals.equal(message, oldValue)) {
-        this.fieldInValidMessage.put(fieldName, message);
-        final Field field = getField(fieldName);
-        field.setFieldInvalid(message, WebColors.Red, WebColors.Pink);
-
-        this.invalidFieldNames.add(fieldName);
-        final int tabIndex = getTabIndex(fieldName);
-        Maps.addToSet(this.tabInvalidFieldMap, tabIndex, fieldName);
-        updateTabValid(tabIndex);
-        updateInvalidFields(true);
-      }
-    } else {
-      Invoke.later(this, "setFieldInvalid", fieldName, message);
-    }
+  public final void setFieldInvalid(final String fieldName, final String message) {
+    Invoke.later(() -> doSetFieldInvalid(fieldName, message));
   }
 
   public void setFieldInvalidToolTip(final String fieldName, final JComponent field) {
@@ -1222,39 +1243,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     }
   }
 
-  public boolean setFieldValid(final String fieldName) {
-    final boolean valid = isFieldValid(fieldName);
-    if (SwingUtilities.isEventDispatchThread()) {
-      final Field field = getField(fieldName);
-      field.setFieldValid();
-      if (this.record.isModified(fieldName)) {
-        final Object originalValue = this.record.getOriginalValue(fieldName);
-        String originalString;
-        if (originalValue == null) {
-          originalString = "-";
-        } else {
-          originalString = StringConverterRegistry.toString(originalValue);
-        }
-        field.setFieldToolTip(originalString);
-        field.setFieldBackgroundColor(new Color(0, 255, 0, 31));
-      } else {
-        field.setFieldToolTip("");
-      }
-      if (!valid) {
-        this.invalidFieldNames.remove(fieldName);
-        this.fieldInValidMessage.remove(fieldName);
-        final int tabIndex = getTabIndex(fieldName);
-        Maps.removeFromSet(this.tabInvalidFieldMap, tabIndex, fieldName);
-        updateTabValid(tabIndex);
-        updateInvalidFields(true);
-        return true;
-      }
-    } else {
-      Invoke.later(this, "setFieldValid", fieldName);
-      return false;
-    }
-
-    return false;
+  public final void setFieldValid(final String fieldName) {
+    Invoke.later(() -> doSetFieldValid(fieldName));
   }
 
   protected boolean setFieldValidationEnabled(final boolean fieldValidationEnabled) {
@@ -1353,28 +1343,26 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     this.requiredFieldNames = new HashSet<String>(requiredFieldNames);
   }
 
-  public void setTabColor(final int index, final Color foregroundColor) {
+  public final void setTabColor(final int index, final Color foregroundColor) {
     if (index > -1) {
-      if (foregroundColor == null) {
-        this.tabs.setTabComponentAt(index, null);
-      } else {
-        if (SwingUtilities.isEventDispatchThread()) {
+      Invoke.later(() -> {
+        if (foregroundColor == null) {
+          this.tabs.setTabComponentAt(index, null);
+        } else {
           if (this.tabs != null) {
             final JLabel label = new JLabel(this.tabs.getTitleAt(index));
             label.setOpaque(false);
             label.setForeground(foregroundColor);
             this.tabs.setTabComponentAt(index, label);
           }
-        } else {
-          Invoke.later(this, "setTabColor", index, foregroundColor);
         }
-      }
+      });
     }
   }
 
-  public void setValues(final Map<String, Object> values) {
+  public final void setValues(final Map<String, Object> values) {
     if (values != null) {
-      if (SwingUtilities.isEventDispatchThread()) {
+      Invoke.later(() -> {
         final Set<String> fieldNames = values.keySet();
         final boolean validationEnabled = setFieldValidationEnabled(false);
         try {
@@ -1390,9 +1378,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
           setFieldValidationEnabled(validationEnabled);
         }
         validateFields(fieldNames);
-      } else {
-        Invoke.later(this, "setValues", values);
-      }
+      });
     }
 
   }
@@ -1408,8 +1394,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
     final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     dialog.add(buttons, BorderLayout.SOUTH);
-    final JButton addCancelButton = InvokeMethodAction.createButton("Cancel", this,
-      "actionAddCancel");
+    final JButton addCancelButton = RunnableAction.createButton("Cancel", () -> actionAddCancel());
     buttons.add(addCancelButton);
     buttons.add(this.addOkButton);
 
@@ -1465,13 +1450,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     return tabValid;
   }
 
-  public boolean validateField(final String fieldName) {
-    if (SwingUtilities.isEventDispatchThread()) {
-      Invoke.background("Validate Field " + fieldName, this, "validateField", fieldName);
-      return false;
-    } else {
-      return doValidateField(fieldName);
-    }
+  public void validateField(final String fieldName) {
+    Invoke.background("Validate Field " + fieldName, () -> doValidateField(fieldName));
   }
 
   protected boolean validateFieldInternal(final String fieldName) {

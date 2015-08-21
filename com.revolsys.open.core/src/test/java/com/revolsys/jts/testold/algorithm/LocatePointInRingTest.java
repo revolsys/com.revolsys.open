@@ -32,11 +32,11 @@
  */
 package com.revolsys.jts.testold.algorithm;
 
-import com.revolsys.jts.algorithm.RayCrossingCounter;
-import com.revolsys.jts.geom.Location;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.io.WKTReader;
+import com.revolsys.geometry.algorithm.RayCrossingCounter;
+import com.revolsys.geometry.model.Location;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.textui.TestRunner;
 

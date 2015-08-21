@@ -20,7 +20,7 @@ import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.record.row.RecordRowTable;
 import com.revolsys.util.CollectionUtil;

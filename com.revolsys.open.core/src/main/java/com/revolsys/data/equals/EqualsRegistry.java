@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 
 public class EqualsRegistry implements Equals<Object> {
 

@@ -1,7 +1,7 @@
 package com.revolsys.gis.grid;
 
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Polygon;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Polygon;
 
 public interface RectangularMapTile {
   BoundingBox getBoundingBox();
@@ -12,9 +12,9 @@ public interface RectangularMapTile {
 
   String getName();
 
-  Polygon getPolygon(com.revolsys.jts.geom.GeometryFactory factory, int numPoints);
+  Polygon getPolygon(com.revolsys.geometry.model.GeometryFactory factory, int numPoints);
 
-  Polygon getPolygon(com.revolsys.jts.geom.GeometryFactory factory, final int numXPoints,
+  Polygon getPolygon(com.revolsys.geometry.model.GeometryFactory factory, final int numXPoints,
     final int numYPoints);
 
   Polygon getPolygon(int numPoints);

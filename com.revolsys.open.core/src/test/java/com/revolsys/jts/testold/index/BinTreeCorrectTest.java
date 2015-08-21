@@ -35,9 +35,9 @@ package com.revolsys.jts.testold.index;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.index.bintree.Bintree;
-import com.revolsys.jts.index.bintree.Interval;
-import com.revolsys.jts.util.Stopwatch;
+import com.revolsys.geometry.index.bintree.Bintree;
+import com.revolsys.geometry.index.bintree.Interval;
+import com.revolsys.geometry.util.Stopwatch;
 
 /**
  * @version 1.7

@@ -4,17 +4,17 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.revolsys.data.equals.NumberEquals;
+import com.revolsys.geometry.algorithm.LineIntersector;
+import com.revolsys.geometry.algorithm.RobustDeterminant;
+import com.revolsys.geometry.algorithm.RobustLineIntersector;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.LineStringDouble;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.algorithm.LineIntersector;
-import com.revolsys.jts.algorithm.RobustDeterminant;
-import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.LineStringDouble;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.util.MathUtil;
 
 public class LineSegmentUtil {

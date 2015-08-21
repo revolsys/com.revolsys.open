@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;

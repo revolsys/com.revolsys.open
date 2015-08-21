@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.index.bintree.Interval;
+import com.revolsys.geometry.index.bintree.Interval;
 
 /**
  * @version 1.7

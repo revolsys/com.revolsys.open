@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.equals.Geometry2DEquals;
 import com.revolsys.data.record.Record;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 
 /**
  * The exact match item visitor finds the first match in the archive features

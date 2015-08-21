@@ -36,7 +36,7 @@ public class DocletUtil {
 
   static {
     addPackageUrl("java.", "http://docs.oracle.com/javase/6/docs/api/");
-    addPackageUrl("com.revolsys.jts.", "http://tsusiatsoftware.net/jts/javadoc/");
+    addPackageUrl("com.revolsys.geometry.", "http://tsusiatsoftware.net/jts/javadoc/");
   }
 
   public static void addPackageUrl(final String packagePrefix, final String url) {

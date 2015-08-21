@@ -33,11 +33,11 @@
 
 package com.revolsys.jts.testold.geom;
 
-import com.revolsys.jts.geom.GeometryCollection;
-import com.revolsys.jts.geom.GeometryCollectionIterator;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.io.WKTReader;
+import com.revolsys.geometry.model.GeometryCollection;
+import com.revolsys.geometry.model.GeometryCollectionIterator;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.Test;
 import junit.framework.Test;
@@ -49,7 +49,7 @@ import junit.textui.TestRunner;
 import junit.textui.TestRunner;
 
 /**
- * Test for com.revolsys.jts.testold.geom.GeometryCollectionImpl.
+ * Test for com.revolsys.geometry.testold.geom.GeometryCollectionImpl.
  *
  * @version 1.7
  */

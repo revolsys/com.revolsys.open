@@ -3,14 +3,13 @@ package com.revolsys.format.xml;
 import java.io.Writer;
 import java.util.Map;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.map.IteratorMapReader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapReaderFactory;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
+import com.revolsys.spring.resource.Resource;
 
 public class XmlMapIoFactory extends AbstractIoFactory
   implements MapReaderFactory, MapWriterFactory {

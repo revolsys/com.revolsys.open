@@ -12,8 +12,8 @@ import java.util.TreeMap;
 import javax.annotation.PreDestroy;
 
 import com.revolsys.data.record.io.RecordStoreExtension;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 

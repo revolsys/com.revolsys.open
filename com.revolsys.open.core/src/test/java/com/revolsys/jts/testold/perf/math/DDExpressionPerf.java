@@ -2,8 +2,8 @@ package com.revolsys.jts.testold.perf.math;
 
 import java.math.BigDecimal;
 
-import com.revolsys.jts.math.DD;
-import com.revolsys.jts.util.Stopwatch;
+import com.revolsys.geometry.math.DD;
+import com.revolsys.geometry.util.Stopwatch;
 
 /**
  * Times evaluating floating-point expressions using

@@ -13,9 +13,6 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.revolsys.spring.resource.FileSystemResource;
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.functions.EnvelopeIntersects;
 import com.revolsys.data.query.functions.F;
@@ -23,8 +20,10 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.io.RecordReaderFactory;
 import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.io.Writer;
-import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.I18nAction;

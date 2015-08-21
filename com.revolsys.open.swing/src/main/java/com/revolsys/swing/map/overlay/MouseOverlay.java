@@ -21,8 +21,8 @@ import javax.swing.SwingUtilities;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;

@@ -2,7 +2,7 @@ package com.revolsys.jts.testold.index;
 
 import java.util.List;
 
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
 /**
  * Adapter for different kinds of indexes

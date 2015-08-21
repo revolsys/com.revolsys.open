@@ -35,9 +35,9 @@ package com.revolsys.jts.testold.io;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.util.GeometricShapeFactory;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.util.GeometricShapeFactory;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;

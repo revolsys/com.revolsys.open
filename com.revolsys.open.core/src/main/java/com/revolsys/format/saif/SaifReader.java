@@ -39,8 +39,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.log4j.Logger;
-import com.revolsys.spring.resource.ClassPathResource;
-import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
@@ -52,10 +50,12 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionFactory;
 import com.revolsys.data.record.schema.RecordDefinitionFactoryImpl;
 import com.revolsys.format.saif.util.PathCache;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Path;
-import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.spring.resource.ClassPathResource;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
 
 /**

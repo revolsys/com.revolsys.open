@@ -10,10 +10,8 @@ import javax.imageio.ImageIO;
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
 
-import com.revolsys.spring.resource.Resource;
-
 import com.revolsys.io.FileUtil;
-import com.revolsys.spring.resource.SpringUtil;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 

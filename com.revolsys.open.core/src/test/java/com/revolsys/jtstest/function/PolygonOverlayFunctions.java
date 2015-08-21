@@ -3,11 +3,11 @@ package com.revolsys.jtstest.function;
 import java.util.Collection;
 import java.util.List;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.noding.snapround.GeometryNoder;
-import com.revolsys.jts.operation.polygonize.Polygonizer;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.noding.snapround.GeometryNoder;
+import com.revolsys.geometry.operation.polygonize.Polygonizer;
 
 public class PolygonOverlayFunctions {
 

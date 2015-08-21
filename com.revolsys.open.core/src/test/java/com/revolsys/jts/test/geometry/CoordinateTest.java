@@ -3,8 +3,8 @@ package com.revolsys.jts.test.geometry;
 import java.util.Arrays;
 
 import com.revolsys.data.equals.NumberEquals;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;

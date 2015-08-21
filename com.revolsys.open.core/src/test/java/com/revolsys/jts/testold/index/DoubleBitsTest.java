@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.testold.index;
 
-import com.revolsys.jts.index.DoubleBits;
+import com.revolsys.geometry.index.DoubleBits;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;

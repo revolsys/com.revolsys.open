@@ -7,18 +7,18 @@ import java.util.Map;
 import javax.annotation.PreDestroy;
 
 import org.slf4j.LoggerFactory;
-import com.revolsys.spring.resource.FileSystemResource;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.Path;
 import com.revolsys.io.Writer;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.util.Property;
 
 public class DirectoryRecordWriter extends AbstractRecordWriter {

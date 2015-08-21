@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.util.LineStringExtracter;
-import com.revolsys.jts.operation.polygonize.Polygonizer;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.util.LineStringExtracter;
+import com.revolsys.geometry.operation.polygonize.Polygonizer;
 
 public class PolygonizeFunctions {
 

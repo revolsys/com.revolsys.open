@@ -42,11 +42,11 @@ import javax.swing.tree.TreePath;
 
 import com.revolsys.data.record.io.RecordStoreConnectionManager;
 import com.revolsys.data.record.io.RecordStoreConnectionRegistry;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.FolderConnectionManager;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.swing.Icons;
