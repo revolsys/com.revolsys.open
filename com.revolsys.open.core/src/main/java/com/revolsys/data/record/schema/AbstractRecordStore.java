@@ -31,6 +31,7 @@ import com.revolsys.data.query.QueryValue;
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.io.RecordStoreExtension;
 import com.revolsys.data.record.io.RecordStoreQueryReader;
 import com.revolsys.data.record.property.RecordDefinitionProperty;
@@ -39,7 +40,6 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.PathName;
-import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.properties.BaseObjectWithProperties;
@@ -306,7 +306,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   @Override
   public int delete(final Query query) {
     int i = 0;
-    final Reader<Record> reader = query(query);
+    final RecordReader reader = query(query);
     try {
       for (final Record object : reader) {
         delete(object);
@@ -561,13 +561,13 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   @Override
   public ResultPager<Record> page(final Query query) {
-    final Reader<Record> results = query(query);
+    final RecordReader results = query(query);
     final List<Record> list = results.read();
     return new ListResultPager<Record>(list);
   }
 
   @Override
-  public Reader<Record> query(final List<?> queries) {
+  public RecordReader query(final List<?> queries) {
     final List<Query> queryObjects = new ArrayList<Query>();
     for (final Object queryObject : queries) {
       if (queryObject instanceof Query) {
@@ -585,13 +585,13 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  public Reader<Record> query(final Query... queries) {
+  public RecordReader query(final Query... queries) {
     return query(Arrays.asList(queries));
   }
 
   @Override
   public Record queryFirst(final Query query) {
-    final Reader<Record> reader = query(query);
+    final RecordReader reader = query(query);
     try {
       final Iterator<Record> iterator = reader.iterator();
       if (iterator.hasNext()) {

@@ -18,13 +18,14 @@ import com.revolsys.data.query.Query;
 import com.revolsys.data.query.QueryValue;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.io.ListRecordReader;
+import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.PathName;
-import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
@@ -245,9 +246,9 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
 
   ResultPager<Record> page(Query query);
 
-  Reader<Record> query(List<?> queries);
+  RecordReader query(List<?> queries);
 
-  default Reader<Record> query(final PathName path) {
+  default RecordReader query(final PathName path) {
     if (path == null) {
       return query();
     } else {
@@ -265,20 +266,20 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
     }
   }
 
-  Reader<Record> query(Query... queries);
+  RecordReader query(Query... queries);
 
-  default Reader<Record> query(final String path) {
+  default RecordReader query(final String path) {
     final PathName pathName = PathName.create(path);
     return query(pathName);
   }
 
-  default Reader<Record> query(final String typePath, final BoundingBox boundingBox) {
+  default RecordReader query(final String typePath, final BoundingBox boundingBox) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     if (recordDefinition != null && recordDefinition.hasGeometryField()) {
       final Query query = Query.intersects(recordDefinition, boundingBox);
       return query(query);
     }
-    return Reader.empty();
+    return new ListRecordReader(recordDefinition);
   }
 
   Record queryFirst(Query query);

@@ -23,7 +23,6 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.PathName;
-import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 
 public class DelegatingRecordStore extends AbstractRecordStore {
@@ -257,17 +256,17 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public Reader<Record> query(final List<?> queries) {
+  public RecordReader query(final List<?> queries) {
     return this.recordStore.query(queries);
   }
 
   @Override
-  public Reader<Record> query(final Query... queries) {
+  public RecordReader query(final Query... queries) {
     return this.recordStore.query(queries);
   }
 
   @Override
-  public Reader<Record> query(final String path) {
+  public RecordReader query(final String path) {
     return this.recordStore.query(path);
   }
 
