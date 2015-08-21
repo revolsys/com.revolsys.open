@@ -127,13 +127,19 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
   private JButton addOkButton = RunnableAction.createButton("OK", () -> actionAddOk());
 
+  private LayerRecord addRecord;
+
   private LayerRecordTableModel allAttributes;
 
   private boolean allowAddWithErrors = false;
 
+  private boolean cancelled = false;
+
   private boolean editable = true;
 
   private final Map<String, String> fieldInValidMessage = new HashMap<String, String>();
+
+  private ComboBox fieldNameSetNamesField;
 
   private final Map<String, Field> fields = new LinkedHashMap<String, Field>();
 
@@ -176,12 +182,6 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   private ToolBar toolBar;
 
   private UndoManager undoManager = new RecordLayerFormUndoManager(this);
-
-  private ComboBox fieldNameSetNamesField;
-
-  private boolean cancelled = false;
-
-  private LayerRecord addRecord;
 
   public RecordLayerForm(final AbstractRecordLayer layer) {
     ProjectFrame.addSaveActions(this, layer.getProject());
