@@ -36,9 +36,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryCollection;
-import com.revolsys.jts.geom.GeometryCollectionIterator;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryCollection;
+import com.revolsys.geometry.model.GeometryCollectionIterator;
 
 public class BufferByUnionFunctions {
 

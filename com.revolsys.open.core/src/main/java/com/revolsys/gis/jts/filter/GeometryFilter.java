@@ -2,9 +2,9 @@ package com.revolsys.gis.jts.filter;
 
 import java.util.function.Predicate;
 
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineString;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.LineString;
 
 public class GeometryFilter {
   public static <T extends Geometry> Predicate<T> intersects(final BoundingBox boundingBox) {

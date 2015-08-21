@@ -36,9 +36,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
-import com.revolsys.jts.util.Assert;
-import com.revolsys.jts.util.Stopwatch;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.util.Assert;
+import com.revolsys.geometry.util.Stopwatch;
 
 /**
  * @version 1.7

@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.util.Property;
 
 public class LineMerger {

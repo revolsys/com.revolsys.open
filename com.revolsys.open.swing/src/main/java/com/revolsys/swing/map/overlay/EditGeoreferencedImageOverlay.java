@@ -17,12 +17,12 @@ import javax.swing.SwingUtilities;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.MappedLocation;

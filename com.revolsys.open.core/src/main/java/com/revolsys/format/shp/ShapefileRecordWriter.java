@@ -33,13 +33,13 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.format.xbase.XBaseFieldDefinition;
 import com.revolsys.format.xbase.XbaseRecordWriter;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.io.ResourceEndianOutput;
 import com.revolsys.io.IoConstants;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.MathUtil;
 

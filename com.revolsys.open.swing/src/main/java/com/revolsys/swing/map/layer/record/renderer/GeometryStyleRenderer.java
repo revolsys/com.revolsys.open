@@ -14,12 +14,12 @@ import javax.swing.ImageIcon;
 
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;

@@ -1,6 +1,6 @@
 package com.revolsys.swing.map.old;
 
-import com.revolsys.jts.geom.Point;
+import com.revolsys.geometry.model.Point;
 
 public class ViewportHotspot {
   private final Point coordinate;

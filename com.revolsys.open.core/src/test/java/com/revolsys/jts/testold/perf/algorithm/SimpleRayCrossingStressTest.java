@@ -32,13 +32,13 @@
  */
 package com.revolsys.jts.testold.perf.algorithm;
 
-import com.revolsys.jts.algorithm.RayCrossingCounter;
-import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Location;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.segment.Segment;
+import com.revolsys.geometry.algorithm.RayCrossingCounter;
+import com.revolsys.geometry.algorithm.locate.PointOnGeometryLocator;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Location;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.jts.testold.algorithm.PerturbedGridPolygonBuilder;
 
 import junit.framework.TestCase;

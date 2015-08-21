@@ -32,13 +32,13 @@
  */
 package com.revolsys.jtstest.function;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.triangulate.ConformingDelaunayTriangulationBuilder;
-import com.revolsys.jts.triangulate.DelaunayTriangulationBuilder;
-import com.revolsys.jts.triangulate.VertexTaggedGeometryDataMapper;
-import com.revolsys.jts.triangulate.VoronoiDiagramBuilder;
-import com.revolsys.jts.triangulate.quadedge.LocateFailureException;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.triangulate.ConformingDelaunayTriangulationBuilder;
+import com.revolsys.geometry.triangulate.DelaunayTriangulationBuilder;
+import com.revolsys.geometry.triangulate.VertexTaggedGeometryDataMapper;
+import com.revolsys.geometry.triangulate.VoronoiDiagramBuilder;
+import com.revolsys.geometry.triangulate.quadedge.LocateFailureException;
 
 public class TriangulationFunctions {
   private static final double TRIANGULATION_TOLERANCE = 0.0;

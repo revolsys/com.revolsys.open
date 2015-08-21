@@ -35,11 +35,10 @@ package com.revolsys.jts.testold.algorithm;
 import java.util.List;
 
 import com.revolsys.spring.resource.ClassPathResource;
-
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.gis.geometry.io.GeometryReader;
 import com.revolsys.io.Reader;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.Point;
 
 import junit.framework.TestCase;
 

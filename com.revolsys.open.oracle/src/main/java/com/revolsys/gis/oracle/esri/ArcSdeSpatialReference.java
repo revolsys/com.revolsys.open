@@ -1,6 +1,6 @@
 package com.revolsys.gis.oracle.esri;
 
-import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactory;
 
 public class ArcSdeSpatialReference {
   private String csWkt;

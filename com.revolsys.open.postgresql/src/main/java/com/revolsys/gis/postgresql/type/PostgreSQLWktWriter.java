@@ -3,15 +3,15 @@ package com.revolsys.gis.postgresql.type;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryCollection;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.LinearRing;
-import com.revolsys.jts.geom.MultiLineString;
-import com.revolsys.jts.geom.MultiPoint;
-import com.revolsys.jts.geom.MultiPolygon;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryCollection;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.LinearRing;
+import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.MultiPoint;
+import com.revolsys.geometry.model.MultiPolygon;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
 import com.revolsys.util.MathUtil;
 
 public class PostgreSQLWktWriter {

@@ -2,8 +2,8 @@ package com.revolsys.data.equals;
 
 import java.util.Collection;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryCollection;
 
 public class Geometry2DEquals implements Equals<Geometry> {
   public static final Geometry2DEquals INSTANCE = new Geometry2DEquals();

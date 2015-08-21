@@ -4,16 +4,16 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.event.NodeEventListener;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
 
 public class SplitCrossingEdgesVisitor<T> extends AbstractEdgeListenerVisitor<T> {
 

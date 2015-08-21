@@ -1,8 +1,8 @@
 package com.revolsys.jtstest.function;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.shape.fractal.KochSnowflakeBuilder;
-import com.revolsys.jts.shape.fractal.SierpinskiCarpetBuilder;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.shape.fractal.KochSnowflakeBuilder;
+import com.revolsys.geometry.shape.fractal.SierpinskiCarpetBuilder;
 
 public class CreateFractalShapeFunctions {
 

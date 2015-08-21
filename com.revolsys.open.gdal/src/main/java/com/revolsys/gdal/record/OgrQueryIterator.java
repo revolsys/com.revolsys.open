@@ -18,11 +18,11 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.gis.io.Statistics;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.LinearRing;
 
 public class OgrQueryIterator extends AbstractIterator<Record> {
 

@@ -7,21 +7,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.geometry.algorithm.RobustLineIntersector;
+import com.revolsys.geometry.model.End;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryComponent;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.segment.Segment;
+import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.gis.algorithm.index.LineSegmentIndex;
 import com.revolsys.gis.algorithm.linematch.LineMatchGraph;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.End;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryComponent;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.segment.Segment;
-import com.revolsys.jts.geom.vertex.Vertex;
 
 public final class LineStringUtil {
   public static final String COORDINATE_DISTANCE = "coordinateDistance";

@@ -1,8 +1,8 @@
 package com.revolsys.gis.algorithm;
 
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
 
 /**
  * Represents a location along a {@link LineString}.

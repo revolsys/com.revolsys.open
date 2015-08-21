@@ -33,15 +33,15 @@ import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.format.json.Json;
 import com.revolsys.gdal.raster.GdalImageFactory;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.OS;

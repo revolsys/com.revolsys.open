@@ -2,12 +2,12 @@ package com.revolsys.jts.testold.perf.operation.overlay;
 
 import java.util.Random;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.operation.overlay.snap.SnapIfNeededOverlayOp;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.operation.overlay.snap.SnapIfNeededOverlayOp;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;

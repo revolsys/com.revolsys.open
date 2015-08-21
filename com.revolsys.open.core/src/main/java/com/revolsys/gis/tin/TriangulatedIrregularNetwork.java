@@ -7,20 +7,20 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.revolsys.geometry.algorithm.CGAlgorithms;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.segment.LineSegment;
+import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.gis.algorithm.index.EnvelopeSpatialIndex;
 import com.revolsys.gis.algorithm.index.RTree;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.comparator.AngleFromPointComparator;
-import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.geom.segment.LineSegment;
-import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 import com.revolsys.math.Angle;
 
 public class TriangulatedIrregularNetwork {

@@ -2,8 +2,8 @@ package com.revolsys.gis.graph.filter;
 
 import java.util.function.Predicate;
 
+import com.revolsys.geometry.model.Point;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.jts.geom.Point;
 
 public class NodeCoordinatesFilter<T> implements Predicate<Node<T>> {
   private Predicate<Point> filter;

@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.segment.LineSegment;
+import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.segment.LineSegment;
-import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
 

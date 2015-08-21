@@ -36,11 +36,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.io.ParseException;
-import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.operation.polygonize.Polygonizer;
-import com.revolsys.jts.util.Assert;
+import com.revolsys.geometry.io.ParseException;
+import com.revolsys.geometry.io.WKTReader;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.operation.polygonize.Polygonizer;
+import com.revolsys.geometry.util.Assert;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;

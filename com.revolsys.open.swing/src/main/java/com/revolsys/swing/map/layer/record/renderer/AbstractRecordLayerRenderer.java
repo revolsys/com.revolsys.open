@@ -15,9 +15,9 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.data.filter.MultipleAttributeValuesFilter;
 import com.revolsys.data.record.Record;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.io.map.MapSerializerUtil;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.InvokeMethodAction;

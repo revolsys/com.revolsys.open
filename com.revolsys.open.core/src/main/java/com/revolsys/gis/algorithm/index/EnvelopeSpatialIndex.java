@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.geometry.model.BoundingBox;
 
 public interface EnvelopeSpatialIndex<T> {
   List<T> find(BoundingBox envelope);

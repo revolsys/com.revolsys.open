@@ -11,12 +11,12 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.spring.resource.FileSystemResource;
 
 import com.revolsys.data.record.Record;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.io.Reader;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.util.MathUtil;
@@ -145,7 +145,7 @@ public class TinProcess extends BaseInOutProcess<Record, Record> {
     final LineString geometry = object.getGeometry();
     if (geometry instanceof LineString) {
       final LineString line = geometry;
-      final com.revolsys.jts.geom.BoundingBox envelope = line.getBoundingBox();
+      final com.revolsys.geometry.model.BoundingBox envelope = line.getBoundingBox();
       if (envelope.intersects(this.boundingBox)) {
         final LineString newLine = this.tin.getElevation(line);
         if (line != newLine) {

@@ -3,8 +3,8 @@ package com.revolsys.data.filter;
 import java.util.function.Predicate;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineString;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.LineString;
 
 public class LineStringRecordFilter implements Predicate<Record> {
 

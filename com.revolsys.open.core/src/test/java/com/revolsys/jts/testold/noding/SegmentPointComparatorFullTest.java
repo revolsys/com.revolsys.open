@@ -1,11 +1,11 @@
 package com.revolsys.jts.testold.noding;
 
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.geom.segment.LineSegment;
-import com.revolsys.jts.geom.segment.LineSegmentDouble;
-import com.revolsys.jts.noding.Octant;
-import com.revolsys.jts.noding.SegmentPointComparator;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.segment.LineSegment;
+import com.revolsys.geometry.model.segment.LineSegmentDouble;
+import com.revolsys.geometry.noding.Octant;
+import com.revolsys.geometry.noding.SegmentPointComparator;
 import com.revolsys.util.MathUtil;
 
 import junit.framework.TestCase;

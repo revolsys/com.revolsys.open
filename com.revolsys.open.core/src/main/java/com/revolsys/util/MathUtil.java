@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.jts.geom.LineString;
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.math.Angle;
 
 /**

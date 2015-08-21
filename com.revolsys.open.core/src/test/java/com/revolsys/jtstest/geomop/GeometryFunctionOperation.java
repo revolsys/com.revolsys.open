@@ -32,7 +32,7 @@
  */
 package com.revolsys.jtstest.geomop;
 
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.jtstest.function.GeometryFunction;
 import com.revolsys.jtstest.function.GeometryFunctionRegistry;
 import com.revolsys.jtstest.testrunner.BooleanResult;

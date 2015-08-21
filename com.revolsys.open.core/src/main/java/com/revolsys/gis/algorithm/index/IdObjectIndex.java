@@ -3,7 +3,7 @@ package com.revolsys.gis.algorithm.index;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.geometry.model.BoundingBox;
 
 public interface IdObjectIndex<T> extends Iterable<T> {
   public T add(final T object);

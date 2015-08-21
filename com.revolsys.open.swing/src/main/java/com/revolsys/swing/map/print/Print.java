@@ -9,7 +9,7 @@ import java.awt.print.PrinterJob;
 import javax.print.PrintService;
 import javax.swing.ImageIcon;
 
-import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.I18nAction;
 import com.revolsys.swing.map.MapPanel;

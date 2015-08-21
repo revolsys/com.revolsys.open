@@ -2,7 +2,7 @@ package com.revolsys.swing.map.layer.raster;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.map.layer.MapTile;
 
 public class TileLoadTask implements Runnable {

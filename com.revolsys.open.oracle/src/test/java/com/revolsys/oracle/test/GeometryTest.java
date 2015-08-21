@@ -12,12 +12,12 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.util.GeometryTestUtil;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Writer;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Polygonal;
-import com.revolsys.jts.util.GeometryTestUtil;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 
@@ -56,7 +56,7 @@ public class GeometryTest {
       final Geometry savedGeometry = savedRecord.getGeometry();
       final GeometryFactory tableGeometryFactory = recordDefinition.getGeometryFactory();
       final Geometry expectedGeometry = geometry.convert(tableGeometryFactory);
-      com.revolsys.jts.util.Assert.equals("Saved geometry",
+      com.revolsys.geometry.util.Assert.equals("Saved geometry",
         savedGeometry.equalsExact(expectedGeometry), expectedGeometry, savedGeometry);
       transaction.setRollbackOnly();
     }

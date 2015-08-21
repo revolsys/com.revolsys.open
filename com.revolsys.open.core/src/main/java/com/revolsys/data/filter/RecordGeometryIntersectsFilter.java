@@ -23,9 +23,9 @@ package com.revolsys.data.filter;
 import java.util.function.Predicate;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.TopologyException;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.TopologyException;
 
 public class RecordGeometryIntersectsFilter implements Predicate<Record> {
   /** The geometry to compare the data objects to to. */

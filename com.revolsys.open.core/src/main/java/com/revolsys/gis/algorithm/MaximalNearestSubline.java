@@ -1,8 +1,8 @@
 package com.revolsys.gis.algorithm;
 
-import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
+import com.revolsys.geometry.model.CoordinateList;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
 
 /**
  * Computes the Maximal Nearest Subline of a given linestring relative to

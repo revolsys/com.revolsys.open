@@ -1,8 +1,8 @@
 package com.revolsys.gis.jts;
 
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble2D;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble2D;
 import com.revolsys.util.MathUtil;
 
 public class Points {

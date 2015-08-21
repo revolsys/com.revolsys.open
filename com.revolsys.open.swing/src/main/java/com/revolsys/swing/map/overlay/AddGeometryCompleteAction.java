@@ -1,6 +1,6 @@
 package com.revolsys.swing.map.overlay;
 
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 
 public interface AddGeometryCompleteAction {
   void addComplete(AbstractOverlay overlay, Geometry geometry);

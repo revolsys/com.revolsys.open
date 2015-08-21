@@ -2,8 +2,8 @@ package com.revolsys.gis.graph.event;
 
 import java.util.EventObject;
 
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.gis.graph.Edge;
-import com.revolsys.jts.geom.LineString;
 
 public class EdgeEvent<T> extends EventObject {
   /**

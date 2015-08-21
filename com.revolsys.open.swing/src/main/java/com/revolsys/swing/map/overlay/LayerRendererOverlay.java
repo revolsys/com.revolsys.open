@@ -10,7 +10,7 @@ import java.util.HashSet;
 
 import javax.swing.JComponent;
 
-import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.MapPanel;

@@ -1,7 +1,7 @@
 package com.revolsys.gis.geometry.io;
 
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.Writer;
-import com.revolsys.jts.geom.Geometry;
 
 public class GeometryIo {
   public static void copyGeometry(final Iterable<Geometry> reader, final Object target) {

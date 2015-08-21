@@ -14,7 +14,7 @@ import javax.xml.namespace.QName;
 
 import org.slf4j.LoggerFactory;
 import com.revolsys.spring.resource.Resource;
-
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.cs.Authority;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.CoordinateSystemParser;
@@ -23,7 +23,6 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.WktCsParser;
 import com.revolsys.io.Paths;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.WrappedException;

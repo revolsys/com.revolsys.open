@@ -22,9 +22,9 @@ package com.revolsys.gis.jts.filter;
 
 import java.util.function.Predicate;
 
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.LineString;
 
 public class LineContainsWithinToleranceFilter implements Predicate<LineString> {
   private final LineString points;

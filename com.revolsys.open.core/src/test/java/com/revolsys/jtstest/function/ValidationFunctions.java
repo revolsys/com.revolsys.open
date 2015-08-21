@@ -3,9 +3,9 @@ package com.revolsys.jtstest.function;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.operation.valid.GeometryValidationError;
-import com.revolsys.jts.operation.valid.IsValidOp;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.operation.valid.GeometryValidationError;
+import com.revolsys.geometry.operation.valid.IsValidOp;
 
 public class ValidationFunctions {
   public static Geometry invalidGeoms(final Geometry g) {

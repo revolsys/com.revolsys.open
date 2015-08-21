@@ -3,9 +3,9 @@ package com.revolsys.gis.graph;
 import java.util.Collection;
 import java.util.List;
 
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.gis.algorithm.index.AbstractIdObjectQuadTree;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.LineString;
 
 public class EdgeQuadTree<T> extends AbstractIdObjectQuadTree<Edge<T>> {
   private final Graph<T> graph;

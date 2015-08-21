@@ -9,8 +9,8 @@ import java.util.zip.ZipInputStream;
 import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.FileUtil;
-import com.revolsys.jts.geom.Geometry;
 import com.revolsys.spring.resource.SpringUtil;
 
 public class KmzGeometryIterator extends AbstractIterator<Geometry> {

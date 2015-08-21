@@ -40,9 +40,9 @@ import java.util.Map;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
-import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jtstest.geomop.GeometryOperation;
 import com.revolsys.util.Property;
 

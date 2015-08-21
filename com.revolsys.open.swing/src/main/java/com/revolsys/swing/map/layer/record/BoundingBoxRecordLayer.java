@@ -12,8 +12,8 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.data.equals.Equals;
 import com.revolsys.data.query.Query;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.parallel.Invoke;
 
 public class BoundingBoxRecordLayer extends AbstractRecordLayer {

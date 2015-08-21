@@ -1,6 +1,6 @@
 package com.revolsys.jtstest.function;
 
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 
 public class PreparedGeometryFunctions {
   private static Geometry createPG(final Geometry g) {

@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 import com.revolsys.format.xml.StaxUtils;
 import com.revolsys.format.xml.XmlProcessor;
 import com.revolsys.format.xml.XmlProcessorContext;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
 public class Parser extends XmlProcessor {
   private static final Logger log = Logger.getLogger(Parser.class);
@@ -74,7 +74,7 @@ public class Parser extends XmlProcessor {
     final double maxX = StaxUtils.getDoubleAttribute(parser, null, "maxx");
     final double minY = StaxUtils.getDoubleAttribute(parser, null, "miny");
     final double maxY = StaxUtils.getDoubleAttribute(parser, null, "maxy");
-    final com.revolsys.jts.geom.BoundingBox envelope = new BoundingBoxDoubleGf(2, minX, minY, maxX,
+    final com.revolsys.geometry.model.BoundingBox envelope = new BoundingBoxDoubleGf(2, minX, minY, maxX,
       maxY);
     boundingBox.setEnvelope(envelope);
     final double resX = StaxUtils.getDoubleAttribute(parser, null, "resx");
@@ -329,13 +329,13 @@ public class Parser extends XmlProcessor {
     return keywords;
   }
 
-  public com.revolsys.jts.geom.BoundingBox processLatLonBoundingBox(final XMLStreamReader parser)
+  public com.revolsys.geometry.model.BoundingBox processLatLonBoundingBox(final XMLStreamReader parser)
     throws XMLStreamException, IOException {
     final double minX = StaxUtils.getDoubleAttribute(parser, null, "minx");
     final double maxX = StaxUtils.getDoubleAttribute(parser, null, "maxx");
     final double minY = StaxUtils.getDoubleAttribute(parser, null, "miny");
     final double maxY = StaxUtils.getDoubleAttribute(parser, null, "maxy");
-    final com.revolsys.jts.geom.BoundingBox envelope = new BoundingBoxDoubleGf(2, minX, minY, maxX,
+    final com.revolsys.geometry.model.BoundingBox envelope = new BoundingBoxDoubleGf(2, minX, minY, maxX,
       maxY);
     StaxUtils.skipSubTree(parser);
     return envelope;
@@ -380,8 +380,8 @@ public class Parser extends XmlProcessor {
         layer.addFeatureListUrl(processFormatUrl(parser));
       } else {
         final Object object = process(parser);
-        if (object instanceof com.revolsys.jts.geom.BoundingBox) {
-          layer.setLatLonBoundingBox((com.revolsys.jts.geom.BoundingBox)object);
+        if (object instanceof com.revolsys.geometry.model.BoundingBox) {
+          layer.setLatLonBoundingBox((com.revolsys.geometry.model.BoundingBox)object);
         } else if (object instanceof BoundingBox) {
           layer.addBoundingBox((BoundingBox)object);
         } else if (object instanceof Dimension) {

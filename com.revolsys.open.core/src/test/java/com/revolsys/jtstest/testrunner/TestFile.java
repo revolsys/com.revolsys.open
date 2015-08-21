@@ -40,10 +40,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jtstest.geomop.GeometryOperation;
 import com.revolsys.util.Property;
 

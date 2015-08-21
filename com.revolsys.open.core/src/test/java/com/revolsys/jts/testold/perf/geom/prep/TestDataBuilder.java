@@ -35,13 +35,13 @@ package com.revolsys.jts.testold.perf.geom.prep;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.geom.util.SineStarFactory;
-import com.revolsys.jts.util.GeometricShapeFactory;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.util.SineStarFactory;
+import com.revolsys.geometry.util.GeometricShapeFactory;
 
 public class TestDataBuilder {
   private GeometryFactory geomFact = GeometryFactory.floating3();

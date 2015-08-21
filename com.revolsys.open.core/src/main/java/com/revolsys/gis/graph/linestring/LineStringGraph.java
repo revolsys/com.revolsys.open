@@ -15,6 +15,14 @@ import java.util.TreeSet;
 import java.util.function.Predicate;
 
 import com.revolsys.comparator.CollectionComparator;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.segment.LineSegment;
+import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -28,14 +36,6 @@ import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparat
 import com.revolsys.gis.model.coordinates.filter.CrossingLineSegmentFilter;
 import com.revolsys.gis.model.coordinates.filter.PointOnLineSegment;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.geom.segment.LineSegment;
-import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 
 public class LineStringGraph extends Graph<LineSegment> {
   private static final String INDEX = "INDEX";

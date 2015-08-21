@@ -37,16 +37,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.index.strtree.AbstractNode;
-import com.revolsys.jts.index.strtree.Boundable;
-import com.revolsys.jts.index.strtree.STRtree;
+import com.revolsys.geometry.index.strtree.AbstractNode;
+import com.revolsys.geometry.index.strtree.Boundable;
+import com.revolsys.geometry.index.strtree.STRtree;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.PointDouble;
 
 /**
  * @version 1.7

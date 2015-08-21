@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.function.Predicate;
 
 import com.revolsys.data.equals.Geometry2DEquals;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 
 public class Equals2DFilter<T extends Geometry> implements Predicate<T> {
   private final T geometry;

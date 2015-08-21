@@ -9,7 +9,7 @@ import java.util.ListIterator;
 
 import com.revolsys.collection.MultiIterator;
 import com.revolsys.data.equals.Equals;
-import com.revolsys.jts.geom.End;
+import com.revolsys.geometry.model.End;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Property;

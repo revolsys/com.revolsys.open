@@ -1,7 +1,7 @@
 package com.revolsys.jtstest.function;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.precision.MinimumClearance;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.precision.MinimumClearance;
 
 public class PrecisionFunctions {
 

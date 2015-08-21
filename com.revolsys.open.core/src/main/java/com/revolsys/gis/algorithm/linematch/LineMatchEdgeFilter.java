@@ -2,9 +2,9 @@ package com.revolsys.gis.algorithm.linematch;
 
 import java.util.function.Predicate;
 
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.jts.geom.BoundingBox;
 
 public class LineMatchEdgeFilter implements Predicate<Edge<LineSegmentMatch>> {
 
@@ -94,7 +94,7 @@ public class LineMatchEdgeFilter implements Predicate<Edge<LineSegmentMatch>> {
     }
   }
 
-  public com.revolsys.jts.geom.BoundingBox getEnvelope() {
+  public com.revolsys.geometry.model.BoundingBox getEnvelope() {
     return this.envelope;
   }
 

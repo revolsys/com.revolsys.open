@@ -5,8 +5,8 @@ import javax.xml.namespace.QName;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
-import com.revolsys.jts.geom.GeometryFactory;
 
 public final class GpxConstants {
 

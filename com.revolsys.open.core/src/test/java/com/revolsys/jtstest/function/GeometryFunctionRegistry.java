@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 
 /**
  * A registry to manage a collection of {@link GeometryFunction}s.

@@ -2,8 +2,8 @@ package com.revolsys.gis.jts.filter;
 
 import java.util.function.Predicate;
 
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.jts.geom.LineString;
 
 public class LineEqualIgnoreDirectionFilter implements Predicate<LineString> {
   private final int dimension;

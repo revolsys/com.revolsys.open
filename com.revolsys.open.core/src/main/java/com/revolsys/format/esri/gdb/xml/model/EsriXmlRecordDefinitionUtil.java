@@ -18,9 +18,9 @@ import com.revolsys.format.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.format.esri.gdb.xml.model.enums.GeometryType;
 import com.revolsys.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldType;
 import com.revolsys.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.Path;
 import com.revolsys.io.PathName;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 

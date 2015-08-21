@@ -3,7 +3,7 @@ package com.revolsys.gis.converter.string;
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.format.wkt.EWktWriter;
 import com.revolsys.format.wkt.WktParser;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 
 public class GeometryStringConverter implements StringConverter<Geometry> {
   @Override

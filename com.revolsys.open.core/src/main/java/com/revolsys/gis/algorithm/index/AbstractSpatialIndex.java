@@ -3,7 +3,7 @@ package com.revolsys.gis.algorithm.index;
 import java.util.List;
 import java.util.function.Predicate;
 
-import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.visitor.CreateListVisitor;
 
 public abstract class AbstractSpatialIndex<T> implements EnvelopeSpatialIndex<T> {

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.revolsys.format.saif.SaifConstants;
-import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactory;
 
 public class OsnConverterRegistry {
   private final Map<String, OsnConverter> converters = new HashMap<String, OsnConverter>();

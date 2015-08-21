@@ -32,11 +32,11 @@
  */
 package com.revolsys.jtstest.util;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.io.ParseException;
-import com.revolsys.jts.io.WKBReader;
-import com.revolsys.jts.io.WKTReader;
+import com.revolsys.geometry.io.ParseException;
+import com.revolsys.geometry.io.WKBReader;
+import com.revolsys.geometry.io.WKTReader;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 
 /**
  * Reads a {@link Geometry} from a string which is in either WKT or WKBHex format

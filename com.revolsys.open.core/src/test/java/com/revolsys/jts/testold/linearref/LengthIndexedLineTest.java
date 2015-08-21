@@ -1,9 +1,9 @@
 package com.revolsys.jts.testold.linearref;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.linearref.LengthIndexedLine;
+import com.revolsys.geometry.linearref.LengthIndexedLine;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
 
 /**
  * Tests the {@link LengthIndexedLine} class

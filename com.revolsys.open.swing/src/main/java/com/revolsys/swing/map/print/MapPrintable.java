@@ -16,7 +16,7 @@ import javax.measure.Measure;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 
-import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 

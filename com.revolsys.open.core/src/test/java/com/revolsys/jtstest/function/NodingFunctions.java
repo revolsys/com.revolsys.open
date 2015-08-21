@@ -5,20 +5,20 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.algorithm.LineIntersector;
-import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.noding.BasicSegmentString;
-import com.revolsys.jts.noding.FastNodingValidator;
-import com.revolsys.jts.noding.IntersectionAdder;
-import com.revolsys.jts.noding.MCIndexNoder;
-import com.revolsys.jts.noding.NodedSegmentString;
-import com.revolsys.jts.noding.Noder;
-import com.revolsys.jts.noding.ScaledNoder;
-import com.revolsys.jts.noding.SegmentString;
-import com.revolsys.jts.noding.snapround.MCIndexSnapRounder;
+import com.revolsys.geometry.algorithm.LineIntersector;
+import com.revolsys.geometry.algorithm.RobustLineIntersector;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.noding.BasicSegmentString;
+import com.revolsys.geometry.noding.FastNodingValidator;
+import com.revolsys.geometry.noding.IntersectionAdder;
+import com.revolsys.geometry.noding.MCIndexNoder;
+import com.revolsys.geometry.noding.NodedSegmentString;
+import com.revolsys.geometry.noding.Noder;
+import com.revolsys.geometry.noding.ScaledNoder;
+import com.revolsys.geometry.noding.SegmentString;
+import com.revolsys.geometry.noding.snapround.MCIndexSnapRounder;
 
 public class NodingFunctions {
 

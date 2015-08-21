@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
 public class RTreeLeaf<T> extends RTreeNode<T> {
 

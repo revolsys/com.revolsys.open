@@ -5,8 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
-import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.visitor.CreateListVisitor;
 
 public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {

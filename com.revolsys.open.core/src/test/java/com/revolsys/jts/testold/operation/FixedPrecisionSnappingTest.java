@@ -1,8 +1,8 @@
 package com.revolsys.jts.testold.operation;
 
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.io.ParseException;
+import com.revolsys.geometry.io.ParseException;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Polygon;
 
 import junit.framework.TestCase;
 

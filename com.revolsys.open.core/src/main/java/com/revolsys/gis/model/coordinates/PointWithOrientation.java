@@ -1,7 +1,7 @@
 package com.revolsys.gis.model.coordinates;
 
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
 
 @SuppressWarnings("serial")
 public class PointWithOrientation extends PointDouble {

@@ -41,7 +41,7 @@ import com.revolsys.data.record.io.ListRecordReader;
 import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.listener.EventQueueRunnableListener;
 import com.revolsys.swing.map.layer.Project;

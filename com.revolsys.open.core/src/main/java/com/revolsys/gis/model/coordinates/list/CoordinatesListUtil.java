@@ -7,22 +7,22 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.data.equals.NumberEquals;
+import com.revolsys.geometry.algorithm.RobustDeterminant;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.LineStringDouble;
+import com.revolsys.geometry.model.segment.LineSegment;
+import com.revolsys.geometry.model.segment.Segment;
+import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.linestring.LineStringGraph;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.jts.algorithm.RobustDeterminant;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
-import com.revolsys.jts.geom.impl.LineStringDouble;
-import com.revolsys.jts.geom.segment.LineSegment;
-import com.revolsys.jts.geom.segment.Segment;
-import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.math.Angle;
 
 public class CoordinatesListUtil {

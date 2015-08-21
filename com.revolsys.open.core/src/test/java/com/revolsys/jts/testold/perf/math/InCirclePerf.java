@@ -1,8 +1,8 @@
 package com.revolsys.jts.testold.perf.math;
 
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.util.Stopwatch;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.util.Stopwatch;
 
 /**
  * Test performance of evaluating Triangle predicate computations

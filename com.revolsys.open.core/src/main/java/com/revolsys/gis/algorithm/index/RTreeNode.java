@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.geometry.model.BoundingBox;
 
 public abstract class RTreeNode<T> {
 

@@ -3,8 +3,8 @@ package com.revolsys.data.filter;
 import java.util.function.Predicate;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.Point;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.Point;
 
 public class PointRecordFilter implements Predicate<Record> {
   public static final PointRecordFilter FILTER = new PointRecordFilter();

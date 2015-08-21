@@ -3,7 +3,7 @@ package com.revolsys.data.comparator;
 import java.util.Comparator;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.jts.geom.Polygon;
+import com.revolsys.geometry.model.Polygon;
 
 public class RecordGeometryAreaComparitor implements Comparator<Record> {
 

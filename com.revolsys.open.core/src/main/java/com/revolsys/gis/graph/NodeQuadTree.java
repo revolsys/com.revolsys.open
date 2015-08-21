@@ -3,10 +3,10 @@ package com.revolsys.gis.graph;
 import java.util.Collection;
 import java.util.List;
 
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.gis.algorithm.index.AbstractIdObjectPointQuadTree;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class NodeQuadTree<T> extends AbstractIdObjectPointQuadTree<Node<T>> {

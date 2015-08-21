@@ -32,11 +32,11 @@
  */
 package com.revolsys.jts.testold.perf.algorithm;
 
-import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.util.SineStarFactory;
-import com.revolsys.jts.util.Stopwatch;
+import com.revolsys.geometry.algorithm.locate.PointOnGeometryLocator;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.util.SineStarFactory;
+import com.revolsys.geometry.util.Stopwatch;
 
 public class PointInAreaPerfTest {
 

@@ -2,7 +2,7 @@ package com.revolsys.gis.parallel;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.Records;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 

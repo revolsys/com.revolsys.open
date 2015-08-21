@@ -3,7 +3,7 @@
     {
       "typeName": "geometryFactory",
       "description": "Geometry Factory",
-      "typeClass": "com.revolsys.jts.geom.GeometryFactory",
+      "typeClass": "com.revolsys.geometry.model.GeometryFactory",
       "methodName": "create"
     },
     {

@@ -1,7 +1,7 @@
 package com.revolsys.data.validator;
 
 import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 
 public class GeometryFieldValidator implements FieldValueValidator {
 

@@ -4,7 +4,7 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.LineString;
+import com.revolsys.geometry.model.LineString;
 
 public class EdgeLineList extends AbstractList<LineString> {
 

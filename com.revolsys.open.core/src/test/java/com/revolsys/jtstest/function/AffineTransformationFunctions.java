@@ -1,12 +1,12 @@
 package com.revolsys.jtstest.function;
 
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.util.AffineTransformation;
+import com.revolsys.geometry.model.util.AffineTransformationFactory;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.geom.util.AffineTransformation;
-import com.revolsys.jts.geom.util.AffineTransformationFactory;
 
 public class AffineTransformationFunctions {
   private static Point envelopeCentre(final Geometry g) {

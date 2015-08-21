@@ -32,10 +32,10 @@
  */
 package com.revolsys.jts.testold.algorithm;
 
-import com.revolsys.jts.algorithm.RobustDeterminant;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.io.WKTReader;
+import com.revolsys.geometry.algorithm.RobustDeterminant;
+import com.revolsys.geometry.io.WKTReader;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;

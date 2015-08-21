@@ -1,7 +1,7 @@
 package com.revolsys.gis.algorithm;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineString;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.LineString;
 
 /**
  * Computes various distance functions for determining how far apart are two

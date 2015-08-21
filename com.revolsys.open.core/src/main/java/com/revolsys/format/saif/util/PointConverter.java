@@ -5,11 +5,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.format.saif.SaifConstants;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.gis.jts.GeometryProperties;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
 
 public class PointConverter implements OsnConverter {
   private String geometryClass = SaifConstants.POINT;

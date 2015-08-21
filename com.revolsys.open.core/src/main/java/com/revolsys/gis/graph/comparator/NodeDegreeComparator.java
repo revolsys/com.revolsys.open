@@ -2,8 +2,8 @@ package com.revolsys.gis.graph.comparator;
 
 import java.util.Comparator;
 
+import com.revolsys.geometry.model.Point;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.jts.geom.Point;
 
 public class NodeDegreeComparator<T> implements Comparator<Node<T>> {
 

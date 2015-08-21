@@ -4,10 +4,10 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.format.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.format.xml.XsiConstants;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.MultiLineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
 
 public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
   public XmlGeometryFieldType(final FieldType esriFieldType, final DataType dataType) {

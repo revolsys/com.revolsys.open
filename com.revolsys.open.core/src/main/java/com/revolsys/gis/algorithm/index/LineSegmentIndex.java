@@ -3,16 +3,16 @@ package com.revolsys.gis.algorithm.index;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.segment.LineSegment;
+import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
 import com.revolsys.gis.algorithm.index.visitor.LineSegmentIntersectionVisitor;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Lineal;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
-import com.revolsys.jts.geom.segment.LineSegment;
-import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 
 public class LineSegmentIndex extends QuadTree<LineSegment> {
   /**

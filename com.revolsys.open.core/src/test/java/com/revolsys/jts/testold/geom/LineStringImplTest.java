@@ -33,14 +33,14 @@
 
 package com.revolsys.jts.testold.geom;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.LinearRing;
-import com.revolsys.jts.geom.MultiLineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.io.WKTReader;
+import com.revolsys.geometry.io.WKTReader;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.LinearRing;
+import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
 
 import junit.framework.Test;
 import junit.framework.Test;
@@ -52,7 +52,7 @@ import junit.textui.TestRunner;
 import junit.textui.TestRunner;
 
 /**
- * Test for com.revolsys.jts.testold.geom.impl.LineStringImpl.
+ * Test for com.revolsys.geometry.testold.geom.impl.LineStringImpl.
  *
  * @version 1.7
  */

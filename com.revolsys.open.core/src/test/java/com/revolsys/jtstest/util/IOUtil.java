@@ -5,15 +5,14 @@ import java.io.StringReader;
 import java.util.List;
 
 import com.revolsys.spring.resource.FileSystemResource;
-
+import com.revolsys.geometry.io.ParseException;
+import com.revolsys.geometry.io.WKBHexFileReader;
+import com.revolsys.geometry.io.WKBReader;
+import com.revolsys.geometry.io.WKTFileReader;
+import com.revolsys.geometry.io.WKTReader;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.geometry.io.GeometryReader;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.io.ParseException;
-import com.revolsys.jts.io.WKBHexFileReader;
-import com.revolsys.jts.io.WKBReader;
-import com.revolsys.jts.io.WKTFileReader;
-import com.revolsys.jts.io.WKTReader;
 
 public class IOUtil {
   public static Geometry readGeometriesFromFile(final String filename,

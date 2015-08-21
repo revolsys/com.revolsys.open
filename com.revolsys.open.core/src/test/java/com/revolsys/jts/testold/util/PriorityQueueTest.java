@@ -1,6 +1,6 @@
 package com.revolsys.jts.testold.util;
 
-import com.revolsys.jts.util.PriorityQueue;
+import com.revolsys.geometry.util.PriorityQueue;
 
 import junit.framework.TestCase;
 

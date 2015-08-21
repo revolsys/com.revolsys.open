@@ -17,9 +17,9 @@ import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.io.RecordReaderFactory;
 import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 

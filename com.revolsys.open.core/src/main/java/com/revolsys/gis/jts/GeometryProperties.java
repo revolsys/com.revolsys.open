@@ -7,7 +7,7 @@ import java.util.TreeMap;
 
 import com.revolsys.data.equals.GeometryEqualsExact3d;
 import com.revolsys.data.record.Record;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.util.JavaBeanUtil;
 
 public class GeometryProperties {

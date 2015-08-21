@@ -15,12 +15,12 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.format.json.JsonParser;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.io.PathName;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.util.UrlUtil;
 
 public class GeoNamesService {

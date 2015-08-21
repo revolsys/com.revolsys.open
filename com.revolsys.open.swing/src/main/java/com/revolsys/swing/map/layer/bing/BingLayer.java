@@ -7,10 +7,10 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.map.MapSerializerUtil;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.map.Viewport2D;

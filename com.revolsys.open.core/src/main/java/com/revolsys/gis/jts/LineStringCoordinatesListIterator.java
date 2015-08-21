@@ -2,8 +2,8 @@ package com.revolsys.gis.jts;
 
 import java.util.Iterator;
 
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
 
 public class LineStringCoordinatesListIterator
   implements Iterator<LineString>, Iterable<LineString> {

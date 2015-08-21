@@ -34,9 +34,9 @@ package com.revolsys.jts.testold.generator;
 
 import java.util.ArrayList;
 
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 
 /**
  *
@@ -78,7 +78,7 @@ public class MultiGenerator extends GeometryGenerator {
    * Creates a geometry collection representing the set of child geometries created.
    *
    * @see #setNumberGeometries(int)
-   * @see com.revolsys.jts.testold.generator.GeometryGenerator#create()
+   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#create()
    *
    * @see #BOX
    * @see #VERT
@@ -174,7 +174,7 @@ public class MultiGenerator extends GeometryGenerator {
   }
 
   /**
-   * @see com.revolsys.jts.testold.generator.GeometryGenerator#setDimensions(int)
+   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#setDimensions(int)
    */
   @Override
   public void setDimensions(final int dimensions) {
@@ -185,7 +185,7 @@ public class MultiGenerator extends GeometryGenerator {
   }
 
   /**
-   * @see com.revolsys.jts.testold.generator.GeometryGenerator#setGeometryFactory(com.revolsys.jts.geom.GeometryFactory)
+   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#setGeometryFactory(com.revolsys.geometry.model.GeometryFactory)
    */
   @Override
   public void setGeometryFactory(final GeometryFactory geometryFactory) {

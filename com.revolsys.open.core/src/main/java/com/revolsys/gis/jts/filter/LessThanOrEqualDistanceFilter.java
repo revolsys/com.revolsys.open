@@ -22,7 +22,7 @@ package com.revolsys.gis.jts.filter;
 
 import java.util.function.Predicate;
 
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.model.Geometry;
 
 public class LessThanOrEqualDistanceFilter implements Predicate<Geometry> {
   /** The geometry to compare the data objects to to. */

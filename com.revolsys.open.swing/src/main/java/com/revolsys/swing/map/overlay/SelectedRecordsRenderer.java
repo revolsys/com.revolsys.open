@@ -7,9 +7,9 @@ import java.awt.geom.GeneralPath;
 import java.util.List;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;

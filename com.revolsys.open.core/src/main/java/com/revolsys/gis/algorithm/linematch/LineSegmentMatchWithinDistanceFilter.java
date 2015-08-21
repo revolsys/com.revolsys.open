@@ -2,10 +2,10 @@ package com.revolsys.gis.algorithm.linematch;
 
 import java.util.function.Predicate;
 
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class LineSegmentMatchWithinDistanceFilter implements Predicate<Edge<LineSegmentMatch>> {
   private BoundingBox boundingBox;

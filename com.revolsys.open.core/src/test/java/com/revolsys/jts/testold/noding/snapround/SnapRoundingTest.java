@@ -3,12 +3,12 @@ package com.revolsys.jts.testold.noding.snapround;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.segment.LineSegment;
-import com.revolsys.jts.geom.segment.LineSegmentDouble;
-import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.noding.snapround.GeometryNoder;
+import com.revolsys.geometry.io.WKTReader;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.segment.LineSegment;
+import com.revolsys.geometry.model.segment.LineSegmentDouble;
+import com.revolsys.geometry.noding.snapround.GeometryNoder;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;

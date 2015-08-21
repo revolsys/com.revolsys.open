@@ -1,9 +1,9 @@
 package com.revolsys.gis.geometry.io;
 
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Writer;
-import com.revolsys.jts.geom.Geometry;
 
 public interface GeometryWriter extends Writer<Geometry> {
   public static GeometryWriter create(final Object source) {

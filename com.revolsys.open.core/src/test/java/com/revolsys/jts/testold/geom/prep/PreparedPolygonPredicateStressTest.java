@@ -32,8 +32,8 @@
  */
 package com.revolsys.jts.testold.geom.prep;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.prep.PreparedPolygon;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.prep.PreparedPolygon;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;

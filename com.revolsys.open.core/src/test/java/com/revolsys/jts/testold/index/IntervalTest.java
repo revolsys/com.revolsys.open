@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.testold.index;
 
-import com.revolsys.jts.index.strtree.Interval;
+import com.revolsys.geometry.index.strtree.Interval;
 
 import junit.framework.TestCase;
 

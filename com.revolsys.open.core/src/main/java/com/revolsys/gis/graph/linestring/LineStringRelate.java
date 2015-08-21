@@ -5,14 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.MultiLineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.segment.LineSegment;
 
 public class LineStringRelate {
   private final LineString line1;

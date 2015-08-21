@@ -2,18 +2,18 @@ package com.revolsys.jts.testold.perf.operation.distance;
 
 import java.util.List;
 
-import com.revolsys.jts.densify.Densifier;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.io.WKTFileReader;
-import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.operation.distance.IndexedFacetDistance;
+import com.revolsys.geometry.densify.Densifier;
+import com.revolsys.geometry.io.WKTFileReader;
+import com.revolsys.geometry.io.WKTReader;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.operation.distance.IndexedFacetDistance;
+import com.revolsys.geometry.util.Stopwatch;
 import com.revolsys.jts.testold.algorithm.InteriorPointTest;
-import com.revolsys.jts.util.Stopwatch;
 
 /**
  * Tests performance of {@link IndexedFacetDistance} versus standard

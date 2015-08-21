@@ -11,14 +11,14 @@ import javax.measure.unit.Unit;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.jts.TestConstants;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
 

@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.parallel.channel.ChannelInput;
 import com.revolsys.parallel.channel.ChannelOutput;
 import com.revolsys.parallel.tools.ScriptExecutorRunnable;

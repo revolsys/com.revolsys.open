@@ -2,9 +2,9 @@ package com.revolsys.jts.testold.dissolve;
 
 import java.util.List;
 
-import com.revolsys.jts.dissolve.LineDissolver;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.io.ParseException;
+import com.revolsys.geometry.dissolve.LineDissolver;
+import com.revolsys.geometry.io.ParseException;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.jts.testold.junit.GeometryUtils;
 
 import junit.framework.TestCase;

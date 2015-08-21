@@ -32,11 +32,11 @@
  */
 package com.revolsys.jts.testold.geom;
 
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.geom.segment.LineSegment;
-import com.revolsys.jts.geom.segment.LineSegmentDouble;
-import com.revolsys.jts.io.WKTReader;
+import com.revolsys.geometry.io.WKTReader;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.segment.LineSegment;
+import com.revolsys.geometry.model.segment.LineSegmentDouble;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;

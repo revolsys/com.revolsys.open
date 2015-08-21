@@ -8,8 +8,8 @@ import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.gis.oracle.io.OracleRecordStore;
-import com.revolsys.jts.geom.Geometry;
 
 public final class ArcSdeConstants {
 

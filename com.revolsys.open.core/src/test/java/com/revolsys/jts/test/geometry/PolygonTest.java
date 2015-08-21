@@ -7,11 +7,11 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.geom.vertex.Vertex;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.vertex.Vertex;
 
 public class PolygonTest {
 

@@ -22,7 +22,7 @@ package com.revolsys.gis.jts.filter;
 
 import java.util.function.Predicate;
 
-import com.revolsys.jts.geom.LineString;
+import com.revolsys.geometry.model.LineString;
 
 public class LineStartsSharesStartOrEndFilter implements Predicate<LineString> {
   private final LineString line;

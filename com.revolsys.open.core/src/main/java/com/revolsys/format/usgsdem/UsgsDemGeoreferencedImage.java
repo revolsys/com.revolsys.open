@@ -13,8 +13,8 @@ import java.nio.charset.StandardCharsets;
 import com.revolsys.spring.resource.Resource;
 
 import com.revolsys.format.raster.RasterWriter;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Polygon;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Polygon;
 import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.WrappedException;

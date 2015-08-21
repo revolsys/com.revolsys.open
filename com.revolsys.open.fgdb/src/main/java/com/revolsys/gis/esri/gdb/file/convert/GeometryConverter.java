@@ -1,6 +1,6 @@
 package com.revolsys.gis.esri.gdb.file.convert;
 
-import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.geometry.model.BoundingBox;
 
 public class GeometryConverter {
   public static com.revolsys.gis.esri.gdb.file.capi.swig.Envelope toEsri(

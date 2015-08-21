@@ -1,11 +1,11 @@
 package com.revolsys.jts.testold.perf.operation.distance;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.geom.util.SineStarFactory;
-import com.revolsys.jts.util.Stopwatch;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.util.SineStarFactory;
+import com.revolsys.geometry.util.Stopwatch;
 
 public class TestPerfDistanceGeomSet {
   static final int MAX_ITER = 1;

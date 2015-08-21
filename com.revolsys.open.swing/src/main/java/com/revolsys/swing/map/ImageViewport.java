@@ -3,7 +3,7 @@ package com.revolsys.swing.map;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.map.layer.Project;
 
 public class ImageViewport extends Viewport2D implements AutoCloseable {

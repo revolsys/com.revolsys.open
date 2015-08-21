@@ -4,7 +4,7 @@ import java.sql.SQLException;
 
 import org.postgresql.util.PGobject;
 
-import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.geometry.model.BoundingBox;
 
 public class PostgreSQLBoundingBoxWrapper extends PGobject {
 

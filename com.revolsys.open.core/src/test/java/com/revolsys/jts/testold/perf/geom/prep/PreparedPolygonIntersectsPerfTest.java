@@ -36,16 +36,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.geom.util.SineStarFactory;
-import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.util.GeometricShapeFactory;
-import com.revolsys.jts.util.Stopwatch;
+import com.revolsys.geometry.io.WKTReader;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.util.SineStarFactory;
+import com.revolsys.geometry.util.GeometricShapeFactory;
+import com.revolsys.geometry.util.Stopwatch;
 
 public class PreparedPolygonIntersectsPerfTest {
   static final int MAX_ITER = 10;

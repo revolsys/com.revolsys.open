@@ -3,13 +3,13 @@ package com.revolsys.gis.graph.visitor;
 import java.util.List;
 import java.util.function.Consumer;
 
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Dimension;
+import com.revolsys.geometry.model.IntersectionMatrix;
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Dimension;
-import com.revolsys.jts.geom.IntersectionMatrix;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class EdgeIntersectLineVisitor<T> implements Consumer<Edge<T>> {

@@ -2,13 +2,13 @@ package com.revolsys.jts.testold.geom;
 
 import java.io.IOException;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.geom.util.AffineTransformation;
-import com.revolsys.jts.geom.util.NoninvertibleTransformationException;
-import com.revolsys.jts.io.ParseException;
-import com.revolsys.jts.io.WKTReader;
+import com.revolsys.geometry.io.ParseException;
+import com.revolsys.geometry.io.WKTReader;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.util.AffineTransformation;
+import com.revolsys.geometry.model.util.NoninvertibleTransformationException;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;

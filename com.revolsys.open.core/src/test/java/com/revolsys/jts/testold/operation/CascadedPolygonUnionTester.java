@@ -3,13 +3,13 @@ package com.revolsys.jts.testold.operation;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.revolsys.jts.algorithm.match.AreaSimilarityMeasure;
-import com.revolsys.jts.algorithm.match.HausdorffSimilarityMeasure;
-import com.revolsys.jts.algorithm.match.SimilarityMeasureCombiner;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.operation.union.CascadedPolygonUnion;
+import com.revolsys.geometry.algorithm.match.AreaSimilarityMeasure;
+import com.revolsys.geometry.algorithm.match.HausdorffSimilarityMeasure;
+import com.revolsys.geometry.algorithm.match.SimilarityMeasureCombiner;
+import com.revolsys.geometry.io.WKTReader;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.operation.union.CascadedPolygonUnion;
 
 /**
  * Compares the results of CascadedPolygonUnion to Geometry.union()

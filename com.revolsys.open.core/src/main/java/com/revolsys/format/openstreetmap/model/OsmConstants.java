@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactory;
 
 public interface OsmConstants {
   QName BOUNDS = new QName("bounds");

@@ -1,10 +1,10 @@
 package com.revolsys.gis.jts;
 
-import com.revolsys.jts.algorithm.PointInArea;
-import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Location;
+import com.revolsys.geometry.algorithm.PointInArea;
+import com.revolsys.geometry.algorithm.locate.IndexedPointInAreaLocator;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Location;
 
 public class GeometryFactoryIndexedPointInAreaLocator extends IndexedPointInAreaLocator {
 

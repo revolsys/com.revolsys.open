@@ -7,6 +7,19 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.LinearRing;
+import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.MultiPoint;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.segment.LineSegment;
+import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -14,19 +27,6 @@ import com.revolsys.gis.graph.comparator.EdgeAttributeValueComparator;
 import com.revolsys.gis.graph.linemerge.LineMerger;
 import com.revolsys.gis.graph.linestring.EdgeLessThanDistance;
 import com.revolsys.gis.graph.visitor.NodeLessThanDistanceOfCoordinatesVisitor;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.LinearRing;
-import com.revolsys.jts.geom.MultiLineString;
-import com.revolsys.jts.geom.MultiPoint;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.geom.segment.LineSegment;
-import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 
 public class GeometryGraph extends Graph<LineSegment> {
 

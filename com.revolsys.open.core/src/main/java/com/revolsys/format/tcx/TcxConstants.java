@@ -2,7 +2,7 @@ package com.revolsys.format.tcx;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactory;
 
 public interface TcxConstants {
 

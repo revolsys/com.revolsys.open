@@ -3,10 +3,10 @@ package com.revolsys.gis.algorithm.index.quadtree;
 import java.lang.ref.Reference;
 
 import com.revolsys.data.equals.GeometryEqualsExact3d;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.gis.jts.GeometryProperties;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.vertex.Vertex;
 
 public class GeometryVertexQuadTree extends IdObjectQuadTree<Vertex> {
 

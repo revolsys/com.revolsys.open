@@ -32,8 +32,8 @@
  */
 package com.revolsys.jtstest.testrunner;
 
-import com.revolsys.jts.algorithm.distance.DiscreteHausdorffDistance;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.geometry.algorithm.distance.DiscreteHausdorffDistance;
+import com.revolsys.geometry.model.Geometry;
 
 import junit.framework.Assert;
 import junit.framework.Assert;

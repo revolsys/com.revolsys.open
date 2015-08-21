@@ -33,13 +33,13 @@
 
 package com.revolsys.jts.testold.geom;
 
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.MultiPoint;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.io.WKTReader;
+import com.revolsys.geometry.io.WKTReader;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.MultiPoint;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
 
 import junit.framework.Test;
 import junit.framework.Test;
@@ -51,7 +51,7 @@ import junit.textui.TestRunner;
 import junit.textui.TestRunner;
 
 /**
- * Test for com.revolsys.jts.testold.geom.impl.MultiPointImpl.
+ * Test for com.revolsys.geometry.testold.geom.impl.MultiPointImpl.
  *
  * @version 1.7
  */

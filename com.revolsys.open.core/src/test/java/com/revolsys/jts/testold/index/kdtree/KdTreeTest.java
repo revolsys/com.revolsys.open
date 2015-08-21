@@ -2,12 +2,12 @@ package com.revolsys.jts.testold.index.kdtree;
 
 import java.util.List;
 
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.index.kdtree.KdNode;
-import com.revolsys.jts.index.kdtree.KdTree;
+import com.revolsys.geometry.index.kdtree.KdNode;
+import com.revolsys.geometry.index.kdtree.KdTree;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.PointDouble;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;

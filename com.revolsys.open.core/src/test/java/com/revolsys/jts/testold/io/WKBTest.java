@@ -2,17 +2,17 @@ package com.revolsys.jts.testold.io;
 
 import java.io.IOException;
 
-import com.revolsys.jts.geom.CoordinateSequenceComparator;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.io.ByteOrderValues;
-import com.revolsys.jts.io.ParseException;
-import com.revolsys.jts.io.WKBReader;
-import com.revolsys.jts.io.WKBWriter;
-import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.util.GeometricShapeFactory;
+import com.revolsys.geometry.io.ByteOrderValues;
+import com.revolsys.geometry.io.ParseException;
+import com.revolsys.geometry.io.WKBReader;
+import com.revolsys.geometry.io.WKBWriter;
+import com.revolsys.geometry.io.WKTReader;
+import com.revolsys.geometry.model.CoordinateSequenceComparator;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.util.GeometricShapeFactory;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;

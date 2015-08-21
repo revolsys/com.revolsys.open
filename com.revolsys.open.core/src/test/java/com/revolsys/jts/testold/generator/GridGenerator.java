@@ -34,10 +34,10 @@ package com.revolsys.jts.testold.generator;
 
 import java.util.NoSuchElementException;
 
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
 /**
  * This class should be used to generate a grid of bounding boxes,
@@ -75,7 +75,7 @@ public class GridGenerator extends GeometryGenerator {
 
   /**
    *
-   * @see com.revolsys.jts.testold.generator.GeometryGenerator#create()
+   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#create()
    *
    * @throws NoSuchElementException when all the grids have been created (@see #create())
    * @throws NullPointerException when either the Geometry Factory, or the Bounding Box are undefined.
@@ -90,7 +90,7 @@ public class GridGenerator extends GeometryGenerator {
    *
    * @return BoundingBoxDoubleGf
    *
-   * @see com.revolsys.jts.testold.generator.GeometryGenerator#create()
+   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#create()
    *
    * @throws NoSuchElementException when all the grids have been created (@see #create())
    * @throws NullPointerException when either the Geometry Factory, or the Bounding Box are undefined.
@@ -153,7 +153,7 @@ public class GridGenerator extends GeometryGenerator {
   }
 
   /**
-   * @see com.revolsys.jts.testold.generator.GeometryGenerator#setDimensions(int)
+   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#setDimensions(int)
    */
   @Override
   public void setDimensions(final int dimensions) {

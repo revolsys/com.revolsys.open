@@ -32,10 +32,10 @@
 
 package com.revolsys.gis.algorithm;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.segment.LineSegment;
-import com.revolsys.jts.geom.vertex.Vertex;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.segment.LineSegment;
+import com.revolsys.geometry.model.vertex.Vertex;
 
 /**
  * Implements algorithm for computing a distance metric which can be thought of

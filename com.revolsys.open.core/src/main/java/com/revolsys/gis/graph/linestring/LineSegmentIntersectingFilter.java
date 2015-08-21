@@ -2,8 +2,8 @@ package com.revolsys.gis.graph.linestring;
 
 import java.util.function.Predicate;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.segment.LineSegment;
 
 public class LineSegmentIntersectingFilter implements Predicate<LineSegment> {
 

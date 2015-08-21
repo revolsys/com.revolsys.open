@@ -9,16 +9,16 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.property.FieldProperties;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryCollection;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
 import com.revolsys.gis.postgresql.type.PostgreSQLBoundingBoxWrapper;
 import com.revolsys.gis.postgresql.type.PostgreSQLGeometryWrapper;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryCollection;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
 
 public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   private final GeometryFactory geometryFactory;
@@ -139,7 +139,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   }
 
   public Object toJdbc(final Object object) throws SQLException {
-    if (object instanceof com.revolsys.jts.geom.Geometry) {
+    if (object instanceof com.revolsys.geometry.model.Geometry) {
       final Geometry geometry = (Geometry)object;
       return new PostgreSQLGeometryWrapper(geometry);
     } else if (object instanceof BoundingBox) {

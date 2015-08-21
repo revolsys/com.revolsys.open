@@ -17,6 +17,7 @@ import com.revolsys.data.equals.RecordEquals;
 import com.revolsys.data.filter.RecordGeometryFilter;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordLog;
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.RecordGraph;
@@ -24,7 +25,6 @@ import com.revolsys.gis.graph.filter.EdgeObjectFilter;
 import com.revolsys.gis.graph.filter.EdgeTypeNameFilter;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jts.filter.LineEqualIgnoreDirectionFilter;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 

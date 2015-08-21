@@ -3,14 +3,14 @@ package com.revolsys.jtstest.function;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.shape.random.RandomPointsBuilder;
+import com.revolsys.geometry.shape.random.RandomPointsInGridBuilder;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.shape.random.RandomPointsBuilder;
-import com.revolsys.jts.shape.random.RandomPointsInGridBuilder;
 
 public class CreateRandomShapeFunctions {
 

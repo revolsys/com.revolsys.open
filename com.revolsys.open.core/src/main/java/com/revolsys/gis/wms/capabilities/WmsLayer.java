@@ -14,7 +14,7 @@ public class WmsLayer {
 
   private final List<String> srs = new ArrayList<String>();
 
-  private com.revolsys.jts.geom.BoundingBox latLonBoundingBox;
+  private com.revolsys.geometry.model.BoundingBox latLonBoundingBox;
 
   private List<BoundingBox> boundingBoxes = new ArrayList<BoundingBox>();
 
@@ -158,7 +158,7 @@ public class WmsLayer {
     return this.keywords;
   }
 
-  public com.revolsys.jts.geom.BoundingBox getLatLonBoundingBox() {
+  public com.revolsys.geometry.model.BoundingBox getLatLonBoundingBox() {
     return this.latLonBoundingBox;
   }
 
@@ -258,7 +258,7 @@ public class WmsLayer {
     this.keywords = keywords;
   }
 
-  public void setLatLonBoundingBox(final com.revolsys.jts.geom.BoundingBox latLonBoundingBox) {
+  public void setLatLonBoundingBox(final com.revolsys.geometry.model.BoundingBox latLonBoundingBox) {
     this.latLonBoundingBox = latLonBoundingBox;
   }
 

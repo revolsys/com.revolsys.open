@@ -32,8 +32,8 @@
 
 package com.revolsys.gis.algorithm;
 
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDouble;
 
 /**
  * Contains a pair of points and the distance between them. Provides methods to

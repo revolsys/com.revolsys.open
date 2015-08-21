@@ -13,10 +13,10 @@ import java.util.TreeSet;
 import com.revolsys.comparator.NumericComparator;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.properties.ObjectPropertyProxy;
 
 public class NodeProperties {

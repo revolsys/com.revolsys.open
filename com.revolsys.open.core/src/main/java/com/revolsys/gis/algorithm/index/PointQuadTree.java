@@ -9,14 +9,14 @@ import java.util.Map.Entry;
 import java.util.function.Consumer;
 
 import com.revolsys.data.equals.GeometryEqualsExact3d;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
-import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.util.ExitLoopException;
 
 public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {

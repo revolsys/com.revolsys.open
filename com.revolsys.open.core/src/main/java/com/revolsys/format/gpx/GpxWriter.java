@@ -14,10 +14,10 @@ import javax.xml.namespace.QName;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.io.AbstractRecordWriter;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
 
 public class GpxWriter extends AbstractRecordWriter {
 

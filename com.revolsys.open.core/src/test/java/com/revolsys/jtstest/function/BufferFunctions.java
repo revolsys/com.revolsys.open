@@ -36,19 +36,19 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.util.GeometryMapper;
+import com.revolsys.geometry.model.util.GeometryMapper.MapOp;
+import com.revolsys.geometry.noding.SegmentString;
+import com.revolsys.geometry.operation.buffer.Buffer;
+import com.revolsys.geometry.operation.buffer.BufferInputLineSimplifier;
+import com.revolsys.geometry.operation.buffer.BufferParameters;
+import com.revolsys.geometry.operation.buffer.OffsetCurveSetBuilder;
+import com.revolsys.geometry.operation.buffer.validate.BufferResultValidator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.util.GeometryMapper;
-import com.revolsys.jts.geom.util.GeometryMapper.MapOp;
-import com.revolsys.jts.noding.SegmentString;
-import com.revolsys.jts.operation.buffer.Buffer;
-import com.revolsys.jts.operation.buffer.BufferInputLineSimplifier;
-import com.revolsys.jts.operation.buffer.BufferParameters;
-import com.revolsys.jts.operation.buffer.OffsetCurveSetBuilder;
-import com.revolsys.jts.operation.buffer.validate.BufferResultValidator;
 
 public class BufferFunctions {
 

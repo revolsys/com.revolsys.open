@@ -1,7 +1,7 @@
 package com.revolsys.gis.model.coordinates.list;
 
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.impl.LineStringDouble;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.impl.LineStringDouble;
 
 public class RingCoordinatesList extends LineStringDouble {
 

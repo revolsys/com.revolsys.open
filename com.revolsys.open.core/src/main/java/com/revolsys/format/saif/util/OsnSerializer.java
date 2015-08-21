@@ -42,11 +42,11 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.EnumerationDataType;
 import com.revolsys.format.saif.SaifConstants;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.io.FileUtil;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
 
 public class OsnSerializer {
   private static final String ATTRIBUTE_SCOPE = "attribute";

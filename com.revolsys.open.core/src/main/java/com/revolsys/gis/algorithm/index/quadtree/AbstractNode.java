@@ -4,9 +4,9 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
-import com.revolsys.jts.index.DoubleBits;
-import com.revolsys.jts.index.IntervalSize;
-import com.revolsys.jts.util.BoundingBoxUtil;
+import com.revolsys.geometry.index.DoubleBits;
+import com.revolsys.geometry.index.IntervalSize;
+import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.util.Emptyable;
 
 public abstract class AbstractNode<T> implements Emptyable, Serializable {

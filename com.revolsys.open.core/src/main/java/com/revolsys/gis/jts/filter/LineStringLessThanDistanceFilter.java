@@ -24,9 +24,9 @@ import java.util.function.Predicate;
 
 import com.revolsys.data.filter.RecordGeometryFilter;
 import com.revolsys.data.record.Record;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.LineString;
 
 public class LineStringLessThanDistanceFilter implements Predicate<LineString> {
 
@@ -68,7 +68,7 @@ public class LineStringLessThanDistanceFilter implements Predicate<LineString> {
     return this.distance;
   }
 
-  public com.revolsys.jts.geom.BoundingBox getEnvelope() {
+  public com.revolsys.geometry.model.BoundingBox getEnvelope() {
     return this.envelope;
   }
 

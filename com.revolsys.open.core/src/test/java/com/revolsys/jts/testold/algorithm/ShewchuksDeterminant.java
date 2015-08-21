@@ -1,6 +1,6 @@
 package com.revolsys.jts.testold.algorithm;
 
-import com.revolsys.jts.geom.Point;
+import com.revolsys.geometry.model.Point;
 
 /**
  * This implementation is a port of Shewchuks original implementation in c
@@ -46,7 +46,7 @@ import com.revolsys.jts.geom.Point;
  *   reasonable by a quick look at the code, but this needs to be more thoroughly analyzed.
  *
  * - Function orientationIndex is new and its contract is copied from
- *   com.revolsys.jts.testold.algorithm.CGAlgorithms.orientationIndex so that the current implementation of that method
+ *   com.revolsys.geometry.testold.algorithm.CGAlgorithms.orientationIndex so that the current implementation of that method
  *   can be easily replaced.
  *
  * Some relevant comments in the original code has been kept untouched in its entirety. For more in-depth information

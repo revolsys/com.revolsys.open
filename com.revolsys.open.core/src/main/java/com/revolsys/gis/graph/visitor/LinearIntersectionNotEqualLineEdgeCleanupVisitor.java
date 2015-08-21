@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.data.equals.RecordEquals;
 import com.revolsys.data.filter.RecordGeometryFilter;
 import com.revolsys.data.record.Record;
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -27,7 +28,6 @@ import com.revolsys.gis.graph.filter.EdgeTypeNameFilter;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jts.filter.EqualFilter;
 import com.revolsys.gis.jts.filter.LinearIntersectionFilter;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 

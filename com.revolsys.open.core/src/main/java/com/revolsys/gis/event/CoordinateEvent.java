@@ -2,7 +2,7 @@ package com.revolsys.gis.event;
 
 import java.util.EventObject;
 
-import com.revolsys.jts.geom.Point;
+import com.revolsys.geometry.model.Point;
 
 public class CoordinateEvent extends EventObject {
   /**

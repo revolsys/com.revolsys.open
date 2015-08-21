@@ -26,6 +26,9 @@ import com.revolsys.data.record.property.ShortNameProperty;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataTypes;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.WktCsParser;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
@@ -36,9 +39,6 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.Property;
 
 public class OracleRecordStore extends AbstractJdbcRecordStore {
