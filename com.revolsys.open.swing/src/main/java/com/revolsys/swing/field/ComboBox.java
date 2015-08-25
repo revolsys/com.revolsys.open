@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.Closeable;
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,6 +16,7 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
@@ -23,7 +26,7 @@ import com.revolsys.data.equals.Equals;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.ExceptionUtil;
 
-public class ComboBox extends JComboBox implements Field {
+public class ComboBox extends JComboBox implements Field, KeyListener {
   private static final long serialVersionUID = 1L;
 
   public static <V> DefaultComboBoxModel<V> model(final Collection<V> items) {
@@ -34,7 +37,7 @@ public class ComboBox extends JComboBox implements Field {
   private final FieldSupport support;
 
   public ComboBox() {
-    this("fieldValue", null);
+    this("fieldValue");
   }
 
   public ComboBox(final boolean editable, final Object... items) {
@@ -102,6 +105,11 @@ public class ComboBox extends JComboBox implements Field {
     });
   }
 
+  public ComboBox(final String fieldName, final Object... items) {
+    this(fieldName, new DefaultComboBoxModel(items),
+      ObjectToStringConverter.DEFAULT_IMPLEMENTATION);
+  }
+
   @Override
   public Field clone() {
     try {
@@ -145,6 +153,38 @@ public class ComboBox extends JComboBox implements Field {
   @Override
   public boolean isFieldValid() {
     return true;
+  }
+
+  @Override
+  public void keyPressed(final KeyEvent e) {
+  }
+
+  @Override
+  public void keyReleased(final KeyEvent e) {
+  }
+
+  @Override
+  public void keyTyped(final KeyEvent e) {
+    final char keyChar = e.getKeyChar();
+    if (keyChar == KeyEvent.VK_BACK_SPACE || keyChar == KeyEvent.VK_DELETE) {
+      final Component editorComponent = getEditor().getEditorComponent();
+      if (editorComponent instanceof JTextField) {
+        final JTextField textField = (JTextField)editorComponent;
+        if (textField.getSelectedText().equals(textField.getText())) {
+          setSelectedItem(null);
+        }
+      }
+    }
+  }
+
+  @Override
+  public void setEditor(final ComboBoxEditor editor) {
+    final ComboBoxEditor oldEditor = getEditor();
+    super.setEditor(editor);
+    editor.getEditorComponent().addKeyListener(this);
+    if (oldEditor != null) {
+      oldEditor.getEditorComponent().removeKeyListener(this);
+    }
   }
 
   @Override

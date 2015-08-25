@@ -182,6 +182,10 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
   private UndoManager undoManager = new RecordLayerFormUndoManager(this);
 
+  private final Map<String, List<String>> fieldErrors = new HashMap<>();
+
+  private final Map<String, List<String>> fieldWarnings = new HashMap<>();
+
   public RecordLayerForm(final AbstractRecordLayer layer) {
     ProjectFrame.addSaveActions(this, layer.getProject());
     setLayout(new BorderLayout());
@@ -291,10 +295,20 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     return field;
   }
 
+  protected boolean addFieldError(final String fieldName, final String message) {
+    Maps.addToList(this.fieldErrors, fieldName, message);
+    return false;
+  }
+
   public void addFields(final Collection<? extends Field> fields) {
     for (final Field field : fields) {
       addField(field);
     }
+  }
+
+  protected boolean addFieldWarning(final String fieldName, final String message) {
+    Maps.addToList(this.fieldWarnings, fieldName, message);
+    return false;
   }
 
   protected void addLabel(final Container container, final String fieldName) {
@@ -669,6 +683,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   }
 
   protected void doSetFieldValid(final String fieldName) {
+    this.fieldErrors.remove(fieldName);
+    this.fieldWarnings.remove(fieldName);
     final boolean valid = isFieldValid(fieldName);
     final Field field = getField(fieldName);
     field.setFieldValid();
@@ -695,15 +711,68 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     }
   }
 
-  protected void doValidateField(final String fieldName) {
-    validateFieldInternal(fieldName);
+  protected void doUpdateErrors() {
+    for (final Field field : getFields()) {
+      final String fieldName = field.getFieldName();
+      final List<String> errors = this.fieldErrors.get(fieldName);
+      final List<String> warnings = this.fieldWarnings.get(fieldName);
+      if (Property.hasValue(errors)) {
+        String message = CollectionUtil.toString("<br />", errors);
+        if (Property.hasValue(warnings)) {
+          message += "<br />" + warnings;
+        }
+        field.setFieldInvalid("<html>" + message + "</html>", WebColors.Red, WebColors.Pink);
+      } else {
+        field.setFieldValid();
+        if (Property.hasValue(warnings)) {
+          field.setFieldToolTip("<html>" + CollectionUtil.toString("<br />", warnings) + "</html>");
+          field.setFieldBackgroundColor(WebColors.Yellow);
+        }
+      }
+    }
+  }
+
+  protected boolean doValidateFieldInternal(final String fieldName) {
+    final boolean oldValid = isFieldValid(fieldName);
+    final Field field = getField(fieldName);
+    boolean valid = true;
+    if (!field.isFieldValid()) {
+      final String message = field.getFieldValidationMessage();
+      setFieldInvalid(fieldName, message);
+      valid = false;
+    }
+
+    if (valid) {
+      final Set<String> requiredFieldNames = getRequiredFieldNames();
+      if (requiredFieldNames.contains(fieldName)) {
+        boolean run = true;
+        if (this.record.getState() == RecordState.New) {
+          final String idFieldName = getRecordDefinition().getIdFieldName();
+          if (fieldName.equals(idFieldName)) {
+            run = false;
+          }
+        }
+        if (run) {
+          final Object value = getFieldValue(fieldName);
+          if (!Property.hasValue(value)) {
+            valid = addFieldError(fieldName, "Required");
+          }
+        }
+      }
+    }
+
+    if (oldValid != valid) {
+      final int tabIndex = getTabIndex(fieldName);
+      updateTabValid(tabIndex);
+    }
+    return valid;
   }
 
   protected boolean doValidateFields(final Collection<String> fieldNames) {
     boolean valid = true;
     for (final String fieldName : fieldNames) {
       setFieldValid(fieldName);
-      valid &= validateFieldInternal(fieldName);
+      valid &= doValidateFieldInternal(fieldName);
     }
     return valid;
   }
@@ -812,6 +881,10 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     }
   }
 
+  public Map<String, List<String>> getFieldErrors() {
+    return this.fieldErrors;
+  }
+
   public String getFieldName(Component field) {
     String fieldName = null;
     do {
@@ -855,6 +928,10 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
       final Object id = codeTable.getId(value);
       return (T)id;
     }
+  }
+
+  public Map<String, List<String>> getFieldWarnings() {
+    return this.fieldWarnings;
   }
 
   public GeometryCoordinatesPanel getGeometryCoordinatesPanel() {
@@ -968,6 +1045,10 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     return values;
   }
 
+  public boolean hasErrors() {
+    return !this.fieldErrors.isEmpty();
+  }
+
   public boolean hasFieldValue(final String fieldName) {
     final Field field = getField(fieldName);
     if (field == null) {
@@ -980,6 +1061,10 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
   public boolean hasOriginalValue(final String name) {
     return getRecordDefinition().hasField(name);
+  }
+
+  public boolean hasWarnings() {
+    return !this.fieldWarnings.isEmpty();
   }
 
   protected void invokeAction(final String actionName) {
@@ -1280,7 +1365,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     SwingUtil.setFieldValue(field, value);
     if (changed) {
       if (validate) {
-        validateField(fieldName);
+        validateFields(fieldName);
       } else {
         final Set<String> fieldsToValidate = this.fieldsToValidate.get();
         if (fieldsToValidate != null) {
@@ -1403,7 +1488,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     return !this.cancelled;
   }
 
-  protected void updateErrors() {
+  protected final void updateErrors() {
+    Invoke.later(() -> doUpdateErrors());
   }
 
   public void updateFocussedField() {
@@ -1447,59 +1533,21 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     return tabValid;
   }
 
-  public void validateField(final String fieldName) {
-    Invoke.background("Validate Field " + fieldName, () -> doValidateField(fieldName));
-  }
-
-  protected boolean validateFieldInternal(final String fieldName) {
-    final boolean oldValid = isFieldValid(fieldName);
-    final Field field = getField(fieldName);
-    boolean valid = true;
-    if (!field.isFieldValid()) {
-      final String message = field.getFieldValidationMessage();
-      setFieldInvalid(fieldName, message);
-      valid = false;
-    }
-
-    if (valid) {
-      final Set<String> requiredFieldNames = getRequiredFieldNames();
-      if (requiredFieldNames.contains(fieldName)) {
-        boolean run = true;
-        if (this.record.getState() == RecordState.New) {
-          final String idFieldName = getRecordDefinition().getIdFieldName();
-          if (fieldName.equals(idFieldName)) {
-            run = false;
-          }
-        }
-        if (run) {
-          final Object value = getFieldValue(fieldName);
-          if (!Property.hasValue(value)) {
-            setFieldInvalid(fieldName, "Required");
-          }
-        }
-      }
-    }
-
-    if (oldValid != valid) {
-      final int tabIndex = getTabIndex(fieldName);
-      updateTabValid(tabIndex);
-    }
-    return valid;
-  }
-
-  public void validateFields() {
+  public final void validateFields() {
     final Set<String> fieldNames = getFieldNames();
-    final boolean fieldsValid = validateFields(fieldNames);
-    postValidate();
-    updateInvalidFields(fieldsValid);
+    validateFields(fieldNames);
   }
 
-  protected boolean validateFields(final Collection<String> fieldNames) {
+  protected final void validateFields(final Collection<String> fieldNames) {
     if (isFieldValidationEnabled()) {
-      return doValidateFields(fieldNames);
-    } else {
-      return true;
+      final boolean valid = doValidateFields(fieldNames);
+      postValidate();
+      updateInvalidFields(valid);
     }
+  }
+
+  public void validateFields(final String... fieldNames) {
+    validateFields(Arrays.asList(fieldNames));
   }
 
   @Override

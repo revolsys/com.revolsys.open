@@ -1555,7 +1555,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected boolean internalIsDeleted(final LayerRecord record) {
-    return isRecordCached(this.cacheIdDeleted, record);
+    if (record.getState() == RecordState.Deleted) {
+      return true;
+    } else {
+      return isRecordCached(this.cacheIdDeleted, record);
+    }
   }
 
   /**

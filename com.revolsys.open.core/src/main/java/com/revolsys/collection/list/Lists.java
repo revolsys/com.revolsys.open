@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 
 import com.revolsys.util.Property;
 
-public class Lists {
+public interface Lists {
   public static <V> void addAll(final List<V> list, final Iterable<? extends V> values) {
     if (values != null) {
       for (final V value : values) {
@@ -107,8 +107,8 @@ public class Lists {
     return list;
   }
 
-  public static <V> List<V> array(@SuppressWarnings("unchecked") final V... values) {
-    final List<V> list = new ArrayList<>();
+  public static <V> ArrayList<V> array(@SuppressWarnings("unchecked") final V... values) {
+    final ArrayList<V> list = new ArrayList<>();
     addAll(list, values);
     return list;
   }
@@ -119,6 +119,12 @@ public class Lists {
     };
   }
 
+  public static <V> LinkedList<V> linked(@SuppressWarnings("unchecked") final V... values) {
+    final LinkedList<V> list = new LinkedList<>();
+    addAll(list, values);
+    return list;
+  }
+
   public static <V> Supplier<List<V>> linkedFactory() {
     return () -> {
       return new LinkedList<V>();
@@ -127,11 +133,9 @@ public class Lists {
 
   public static <V> List<V> unmodifiable(final Iterable<? extends V> values) {
     return new UnmodifiableArrayList<V>(values);
-
   }
 
   public static <V> List<V> unmodifiable(@SuppressWarnings("unchecked") final V... values) {
     return new UnmodifiableArrayList<V>(values);
-
   }
 }

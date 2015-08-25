@@ -1,6 +1,16 @@
 package com.revolsys.util;
 
-public class Strings {
+import com.revolsys.data.equals.Equals;
+
+public interface Strings {
+
+  public static String cleanWhitespace(final String text) {
+    if (text == null) {
+      return text;
+    } else {
+      return text.replaceAll("\\s+", " ").trim();
+    }
+  }
 
   public static boolean contains(final String text, final String matchText) {
     if (text == null || matchText == null) {
@@ -74,12 +84,42 @@ public class Strings {
     }
   }
 
+  public static boolean equalsIgnoreCase(final String string1, final String string2) {
+    if (Property.hasValue(string1)) {
+      return string1.equalsIgnoreCase(string2);
+    } else {
+      return Property.isEmpty(string2);
+    }
+  }
+
   public static String firstPart(final String text, final char character) {
     final int index = text.indexOf(character);
     if (index == -1) {
       return "";
     } else {
       return text.substring(0, index);
+    }
+  }
+
+  static boolean isEqualTrim(final String oldValue, final String newValue) {
+    final boolean oldHasValue = Property.hasValue(oldValue);
+    final boolean newHasValue = Property.hasValue(newValue);
+    if (oldHasValue) {
+      if (newHasValue) {
+        if (Equals.equal(oldValue.trim(), newValue.trim())) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    } else {
+      if (newHasValue) {
+        return false;
+      } else {
+        return true;
+      }
     }
   }
 
@@ -166,11 +206,27 @@ public class Strings {
     }
   }
 
+  public static String toString(final Object value) {
+    if (value == null) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
   public static String trim(final String text) {
     if (text == null) {
       return null;
     } else {
       return text.trim();
+    }
+  }
+
+  public static int trimLength(final String text) {
+    if (text == null) {
+      return 0;
+    } else {
+      return text.trim().length();
     }
   }
 

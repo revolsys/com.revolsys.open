@@ -485,28 +485,6 @@ public final class Property {
     }
   }
 
-  public static boolean isEqualTrim(final String oldValue, final String newValue) {
-    final boolean oldHasValue = Property.hasValue(oldValue);
-    final boolean newHasValue = Property.hasValue(newValue);
-    if (oldHasValue) {
-      if (newHasValue) {
-        if (Equals.equal(oldValue.trim(), newValue.trim())) {
-          return true;
-        } else {
-          return false;
-        }
-      } else {
-        return false;
-      }
-    } else {
-      if (newHasValue) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-  }
-
   public static PropertyChangeSupport propertyChangeSupport(final Object object) {
     if (object instanceof PropertyChangeSupport) {
       return (PropertyChangeSupport)object;

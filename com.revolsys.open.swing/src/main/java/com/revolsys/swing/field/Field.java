@@ -64,5 +64,4 @@ public interface Field extends Cloneable {
   void setUndoManager(UndoManager undoManager);
 
   void updateFieldValue();
-
 }
