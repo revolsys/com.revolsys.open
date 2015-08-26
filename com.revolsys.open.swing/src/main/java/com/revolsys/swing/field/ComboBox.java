@@ -25,6 +25,7 @@ import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 import com.revolsys.data.equals.Equals;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Strings;
 
 public class ComboBox extends JComboBox implements Field, KeyListener {
   private static final long serialVersionUID = 1L;
@@ -50,10 +51,6 @@ public class ComboBox extends JComboBox implements Field, KeyListener {
 
   public ComboBox(final ComboBoxModel model) {
     this("fieldValue", model);
-  }
-
-  public ComboBox(final Object... items) {
-    this(false, items);
   }
 
   public ComboBox(final ObjectToStringConverter converter, final boolean editable,
@@ -170,7 +167,7 @@ public class ComboBox extends JComboBox implements Field, KeyListener {
       final Component editorComponent = getEditor().getEditorComponent();
       if (editorComponent instanceof JTextField) {
         final JTextField textField = (JTextField)editorComponent;
-        if (textField.getSelectedText().equals(textField.getText())) {
+        if (Strings.equals(textField.getSelectedText(), textField.getText())) {
           setSelectedItem(null);
         }
       }

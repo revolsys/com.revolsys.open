@@ -36,7 +36,7 @@ public class RecordGeometryBoundingBoxIntersectsFilter implements Predicate<Reco
   public static <D extends Record> List<D> predicate(final Collection<D> collection,
     final BoundingBox boundingBox) {
     final Predicate predicate = new RecordGeometryBoundingBoxIntersectsFilter(boundingBox);
-    return Predicates.predicate(collection, predicate);
+    return Predicates.filter(collection, predicate);
   }
 
   private final BoundingBox boundingBox;

@@ -70,10 +70,11 @@ public class FieldFilterPanel extends JComponent
 
   private CodeTable codeTable;
 
-  private final ComboBox codeTableOperatorField = new ComboBox("=", "<>", "IS NULL", "IS NOT NULL");
+  private final ComboBox codeTableOperatorField = new ComboBox("operator", "=", "<>", "IS NULL",
+    "IS NOT NULL");
 
-  private final ComboBox dateOperatorField = new ComboBox("=", "<>", "IS NULL", "IS NOT NULL", "<",
-    "<=", ">", ">=");
+  private final ComboBox dateOperatorField = new ComboBox("operator", "=", "<>", "IS NULL",
+    "IS NOT NULL", "<", "<=", ">", ">=");
 
   private final boolean eventsEnabled = true;
 
@@ -81,8 +82,8 @@ public class FieldFilterPanel extends JComponent
 
   private final List<String> fieldNames;
 
-  private final ComboBox generalOperatorField = new ComboBox("=", "<>", "Like", "IS NULL",
-    "IS NOT NULL");
+  private final ComboBox generalOperatorField = new ComboBox("operator", "=", "<>", "Like",
+    "IS NULL", "IS NOT NULL");
 
   private Object lastValue = null;
 
@@ -90,8 +91,8 @@ public class FieldFilterPanel extends JComponent
 
   private final ComboBox nameField;
 
-  private final ComboBox numericOperatorField = new ComboBox("=", "<>", "IS NULL", "IS NOT NULL",
-    "<", "<=", ">", ">=");
+  private final ComboBox numericOperatorField = new ComboBox("operator", "=", "<>", "IS NULL",
+    "IS NOT NULL", "<", "<=", ">", ">=");
 
   private ComboBox operatorField;
 

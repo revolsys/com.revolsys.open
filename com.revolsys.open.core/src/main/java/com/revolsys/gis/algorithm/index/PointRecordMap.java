@@ -103,7 +103,7 @@ public class PointRecordMap {
 
   public List<Record> getMatches(final Record record, final Predicate<Record> predicate) {
     final List<Record> records = getRecords(record);
-    final List<Record> filteredRecords = Predicates.predicate(records, predicate);
+    final List<Record> filteredRecords = Predicates.filter(records, predicate);
     return filteredRecords;
   }
 

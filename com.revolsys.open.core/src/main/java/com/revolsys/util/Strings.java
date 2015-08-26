@@ -84,6 +84,14 @@ public interface Strings {
     }
   }
 
+  public static boolean equals(final String string1, final String string2) {
+    if (string1 == null) {
+      return string2 == null;
+    } else {
+      return string1.equals(string2);
+    }
+  }
+
   public static boolean equalsIgnoreCase(final String string1, final String string2) {
     if (Property.hasValue(string1)) {
       return string1.equalsIgnoreCase(string2);

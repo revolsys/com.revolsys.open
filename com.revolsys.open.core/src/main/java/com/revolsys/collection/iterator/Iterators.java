@@ -9,7 +9,7 @@ public class Iterators {
       return iterable;
     } else {
       final Iterator<V> iterator = iterable.iterator();
-      return new PredicateIterator<>(filter, iterator);
+      return new FilterIterator<>(filter, iterator);
     }
   }
 
@@ -17,7 +17,7 @@ public class Iterators {
     if (filter == null) {
       return iterator;
     } else {
-      return new PredicateIterator<>(filter, iterator);
+      return new FilterIterator<>(filter, iterator);
     }
   }
 }

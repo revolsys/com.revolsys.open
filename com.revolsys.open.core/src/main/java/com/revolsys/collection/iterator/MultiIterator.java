@@ -1,11 +1,9 @@
-package com.revolsys.collection;
+package com.revolsys.collection.iterator;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
-
-import com.revolsys.collection.iterator.AbstractIterator;
 
 public class MultiIterator<V> extends AbstractIterator<V> {
 

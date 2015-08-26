@@ -775,7 +775,7 @@ public class Graph<T> {
     if (filter == null) {
       return getNodes();
     } else {
-      final List<Node<T>> filteredNodes = Predicates.predicate(getNodes(), filter);
+      final List<Node<T>> filteredNodes = Predicates.filter(getNodes(), filter);
       return filteredNodes;
     }
   }

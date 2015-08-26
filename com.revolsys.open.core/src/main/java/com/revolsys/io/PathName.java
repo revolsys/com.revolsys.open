@@ -53,11 +53,21 @@ public class PathName implements Comparable<PathName>, CharSequence {
 
   @Override
   public boolean equals(final Object object) {
-    if (object instanceof PathName) {
-      final PathName path = (PathName)object;
-      return path.getUpperPath().equals(getUpperPath());
+    if (object == null) {
+      return false;
+    } else if (object == this) {
+      return true;
+    } else {
+      final String upperPath = getUpperPath();
+      String upperPath2;
+      if (object instanceof PathName) {
+        final PathName path = (PathName)object;
+        upperPath2 = path.getUpperPath();
+      } else {
+        upperPath2 = object.toString().toUpperCase();
+      }
+      return upperPath.equals(upperPath2);
     }
-    return false;
   }
 
   public List<String> getElements() {

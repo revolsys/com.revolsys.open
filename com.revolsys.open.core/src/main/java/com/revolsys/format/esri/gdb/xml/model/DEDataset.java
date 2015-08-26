@@ -9,9 +9,9 @@ public class DEDataset extends DataElement {
 
   private String datasetType;
 
-  private int dsid = this.DSID.incrementAndGet();
-
   private final AtomicInteger DSID = new AtomicInteger(0);
+
+  private int dsid = this.DSID.incrementAndGet();
 
   private boolean versioned;
 

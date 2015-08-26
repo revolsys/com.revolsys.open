@@ -13,29 +13,58 @@ public class Predicates {
     };
   }
 
-  public static <T> AndPredicate<T> and(final Iterable<Predicate<T>> predicates) {
-    return new AndPredicate<>(predicates);
+  public static <T> AndPredicate<T> and(final Iterable<Predicate<T>> filters) {
+    return new AndPredicate<>(filters);
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> AndPredicate<T> and(final Predicate<T>... predicates) {
-    return new AndPredicate<>(predicates);
+  public static <T> AndPredicate<T> and(final Predicate<T>... filters) {
+    return new AndPredicate<>(filters);
   }
 
-  public static <T> boolean matches(final List<T> objects, final Predicate<T> predicate) {
+  public static <T> List<T> filter(final Collection<T> collection, final Predicate<T> filter) {
+    final List<T> list = new ArrayList<T>();
+    filterCopy(collection, list, filter);
+    return list;
+  }
+
+  public static <T> List<T> filterAndRemove(final Collection<T> collection,
+    final Predicate<T> filter) {
+    final List<T> list = new ArrayList<T>();
+    final Iterator<T> iterator = collection.iterator();
+    while (iterator.hasNext()) {
+      final T object = iterator.next();
+      if (filter.test(object)) {
+        iterator.remove();
+        list.add(object);
+      }
+    }
+    return list;
+  }
+
+  public static <T> void filterCopy(final Collection<T> source, final Collection<T> target,
+    final Predicate<T> filter) {
+    for (final T value : source) {
+      if (filter.test(value)) {
+        target.add(value);
+      }
+    }
+  }
+
+  public static <T> boolean matches(final List<T> objects, final Predicate<T> filter) {
     for (final T object : objects) {
-      if (predicate.test(object)) {
+      if (filter.test(object)) {
         return true;
       }
     }
     return false;
   }
 
-  public static <T> boolean matches(final Predicate<T> predicate, final T object) {
-    if (predicate == null) {
+  public static <T> boolean matches(final Predicate<T> filter, final T object) {
+    if (filter == null) {
       return true;
     } else {
-      if (predicate.test(object)) {
+      if (filter.test(object)) {
         return true;
       } else {
         return false;
@@ -50,55 +79,25 @@ public class Predicates {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> OrPredicate<T> or(final Predicate<T>... predicates) {
-    return new OrPredicate<T>(predicates);
+  public static <T> OrPredicate<T> or(final Predicate<T>... filters) {
+    return new OrPredicate<T>(filters);
   }
 
-  public static <T> List<T> predicate(final Collection<T> collection,
-    final Predicate<T> predicate) {
-    final List<T> list = new ArrayList<T>();
-    predicateCopy(collection, list, predicate);
-    return list;
-  }
-
-  public static <T> List<T> predicateAndRemove(final Collection<T> collection,
-    final Predicate<T> predicate) {
-    final List<T> list = new ArrayList<T>();
-    final Iterator<T> iterator = collection.iterator();
-    while (iterator.hasNext()) {
-      final T object = iterator.next();
-      if (predicate.test(object)) {
-        iterator.remove();
-        list.add(object);
-      }
-    }
-    return list;
-  }
-
-  public static <T> void predicateCopy(final Collection<T> source, final Collection<T> target,
-    final Predicate<T> predicate) {
-    for (final T value : source) {
-      if (predicate.test(value)) {
-        target.add(value);
-      }
-    }
-  }
-
-  public static <T> void remove(final Collection<T> collection, final Predicate<T> predicate) {
+  public static <T> void remove(final Collection<T> collection, final Predicate<T> filter) {
     final Iterator<T> iterator = collection.iterator();
     while (iterator.hasNext()) {
       final T value = iterator.next();
-      if (predicate.test(value)) {
+      if (filter.test(value)) {
         iterator.remove();
       }
     }
   }
 
-  public static <T> void retain(final Collection<T> collection, final Predicate<T> predicate) {
+  public static <T> void retain(final Collection<T> collection, final Predicate<T> filter) {
     final Iterator<T> iterator = collection.iterator();
     while (iterator.hasNext()) {
       final T value = iterator.next();
-      if (!predicate.test(value)) {
+      if (!filter.test(value)) {
         iterator.remove();
       }
     }

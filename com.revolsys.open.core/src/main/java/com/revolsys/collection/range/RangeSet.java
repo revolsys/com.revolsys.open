@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.revolsys.collection.MultiIterator;
+import com.revolsys.collection.iterator.MultiIterator;
 import com.revolsys.data.equals.Equals;
 import com.revolsys.geometry.model.End;
 import com.revolsys.util.CollectionUtil;

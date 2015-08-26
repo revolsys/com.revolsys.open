@@ -1,9 +1,8 @@
-package com.revolsys.collection;
+package com.revolsys.collection.iterator;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.util.Cancellable;
 
 public class CancelIterable<T> extends AbstractIterator<T> {
