@@ -112,5 +112,4 @@ public interface Reader<T> extends Iterable<T>, ObjectWithProperties, AutoClosea
   default Stream<T> stream() {
     return StreamSupport.stream(spliterator(), false);
   }
-
 }
