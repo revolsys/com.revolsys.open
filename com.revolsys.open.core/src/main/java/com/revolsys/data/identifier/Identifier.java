@@ -12,7 +12,13 @@ public interface Identifier extends Comparable<Identifier> {
     if (value == null) {
       return null;
     } else if (value instanceof Long) {
-      return new LongIdentifier((Long)value);
+      final long longValue = (Long)value;
+      final int intValue = (int)longValue;
+      if (longValue == intValue) {
+        return new IntegerIdentifier(intValue);
+      } else {
+        return new LongIdentifier(longValue);
+      }
     } else if (Numbers.isPrimitiveIntegral(value)) {
       final Number number = (Number)value;
       return new IntegerIdentifier(number.intValue());
