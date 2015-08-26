@@ -61,8 +61,6 @@ import com.revolsys.geometry.operation.distance.DistanceWithPoints;
  *
  */
 public class BufferDistanceValidator {
-  private static boolean VERBOSE = false;
-
   /**
    * Maximum allowable fraction of buffer distance the
    * actual distance can differ by.
@@ -70,27 +68,29 @@ public class BufferDistanceValidator {
    */
   private static final double MAX_DISTANCE_DIFF_FRAC = .012;
 
-  private final Geometry input;
+  private static boolean VERBOSE = false;
 
   private final double bufDistance;
 
-  private final Geometry result;
+  private String errMsg = null;
 
-  private double minValidDistance;
+  private Geometry errorIndicator = null;
+
+  private Point errorLocation = null;
+
+  private final Geometry input;
+
+  private boolean isValid = true;
+
+  private double maxDistanceFound;
 
   private double maxValidDistance;
 
   private double minDistanceFound;
 
-  private double maxDistanceFound;
+  private double minValidDistance;
 
-  private boolean isValid = true;
-
-  private String errMsg = null;
-
-  private Point errorLocation = null;
-
-  private Geometry errorIndicator = null;
+  private final Geometry result;
 
   public BufferDistanceValidator(final Geometry input, final double bufDistance,
     final Geometry result) {

@@ -28,15 +28,11 @@ import com.revolsys.util.UrlUtil;
 public class MenuItem implements Cloneable, Comparable {
   private static final Logger log = Logger.getLogger(MenuItem.class);
 
-  private String title;
-
-  private String name;
-
   private String anchor;
 
-  private String uri;
+  private Expression condition;
 
-  private Expression uriExpression;
+  private String name;
 
   private final Map parameters = new HashMap();
 
@@ -44,9 +40,13 @@ public class MenuItem implements Cloneable, Comparable {
 
   private Map staticParameters = new HashMap();
 
-  private Expression condition;
+  private String title;
 
   private Expression titleExpression;
+
+  private String uri;
+
+  private Expression uriExpression;
 
   public MenuItem() {
   }

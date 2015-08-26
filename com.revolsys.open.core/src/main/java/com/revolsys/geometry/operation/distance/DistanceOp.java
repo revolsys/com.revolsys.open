@@ -60,18 +60,18 @@ import com.revolsys.geometry.model.Polygon;
  * @version 1.7
  */
 public class DistanceOp {
+  private boolean computed = false;
+
   private final Geometry geometry1;
 
   private final Geometry geometry2;
 
-  private double terminateDistance = 0.0;
+  private double minDistance = Double.MAX_VALUE;
 
   // working
   private final PointLocator pointLocator = new PointLocator();
 
-  private double minDistance = Double.MAX_VALUE;
-
-  private boolean computed = false;
+  private double terminateDistance = 0.0;
 
   /**
    * Constructs a DistanceOp that computes the distance and nearest points between

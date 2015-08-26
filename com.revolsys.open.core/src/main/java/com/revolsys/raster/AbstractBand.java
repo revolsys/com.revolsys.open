@@ -3,11 +3,11 @@ package com.revolsys.raster;
 import com.revolsys.data.types.DataType;
 
 public abstract class AbstractBand implements Band {
-  private int width;
+  private DataType dataType;
 
   private int height;
 
-  private DataType dataType;
+  private int width;
 
   @Override
   public byte getByte(final double x, final double y) {

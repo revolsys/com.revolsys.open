@@ -16,13 +16,13 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
 
   private GeometryFactory geometryFactory;
 
-  private double tileHeight = DEFAULT_TILE_SIZE;
-
-  private double tileWidth = DEFAULT_TILE_SIZE;
-
   private double originX;
 
   private double originY;
+
+  private double tileHeight = DEFAULT_TILE_SIZE;
+
+  private double tileWidth = DEFAULT_TILE_SIZE;
 
   public CustomRectangularMapGrid() {
   }

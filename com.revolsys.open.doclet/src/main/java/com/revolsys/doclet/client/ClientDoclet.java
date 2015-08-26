@@ -88,21 +88,21 @@ public class ClientDoclet {
     return flag;
   }
 
-  private String docTitle;
+  private String destDir = ".";
 
   private String docId;
+
+  private String docTitle;
+
+  private String footer;
+
+  private String header;
+
+  private boolean packagesOpen = true;
 
   private final RootDoc root;
 
   private XmlWriter writer;
-
-  private String destDir = ".";
-
-  private String header;
-
-  private String footer;
-
-  private boolean packagesOpen = true;
 
   public ClientDoclet(final RootDoc root) {
     this.root = root;

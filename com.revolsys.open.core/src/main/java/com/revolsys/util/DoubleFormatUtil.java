@@ -44,12 +44,12 @@ package com.revolsys.util;
  */
 public final class DoubleFormatUtil {
 
+  private static final double[] POWERS_OF_TEN_DOUBLE = new double[30];
+
   /**
    * Most used power of ten (to avoid the cost of Math.pow(10, n)
    */
   private static final long[] POWERS_OF_TEN_LONG = new long[19];
-
-  private static final double[] POWERS_OF_TEN_DOUBLE = new double[30];
 
   static {
     POWERS_OF_TEN_LONG[0] = 1L;

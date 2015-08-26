@@ -13,13 +13,13 @@ import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 public class InvokeMethodStringConverter extends ObjectToStringConverter
   implements ListCellRenderer {
 
-  private final DefaultListCellRenderer renderer = new DefaultListCellRenderer();
-
-  private final Object object;
+  private int horizontalAlignment = JLabel.LEFT;
 
   private final String methodName;
 
-  private int horizontalAlignment = JLabel.LEFT;
+  private final Object object;
+
+  private final DefaultListCellRenderer renderer = new DefaultListCellRenderer();
 
   public InvokeMethodStringConverter(final Object object, final String methodName) {
     if (object == null) {

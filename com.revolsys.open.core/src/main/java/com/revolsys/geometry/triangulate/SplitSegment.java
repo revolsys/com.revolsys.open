@@ -63,13 +63,13 @@ public class SplitSegment {
     return coord;
   }
 
+  private double minimumLen = 0.0;
+
   private final LineSegment seg;
 
   private final double segLen;
 
   private Point splitPt;
-
-  private double minimumLen = 0.0;
 
   public SplitSegment(final LineSegment seg) {
     this.seg = seg;

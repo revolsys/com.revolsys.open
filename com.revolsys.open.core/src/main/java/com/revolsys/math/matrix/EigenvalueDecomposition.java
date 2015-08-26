@@ -26,30 +26,27 @@ public class EigenvalueDecomposition implements java.io.Serializable {
 
   private static final long serialVersionUID = 1;
 
-  /** Row and column dimension (square matrix).
-  @serial matrix dimension.
-  */
-  private final int n;
-
-  /** Symmetry flag.
-  @serial internal symmetry flag.
-  */
-  private boolean issymmetric;
+  private transient double cdivr, cdivi;
 
   /** Arrays for internal storage of eigenvalues.
   @serial internal storage of eigenvalues.
   */
   private final double[] d, e;
 
-  /** Array for internal storage of eigenvectors.
-  @serial internal storage of eigenvectors.
-  */
-  private final double[][] V;
-
   /** Array for internal storage of nonsymmetric Hessenberg form.
   @serial internal storage of nonsymmetric Hessenberg form.
   */
   private double[][] H;
+
+  /** Symmetry flag.
+  @serial internal symmetry flag.
+  */
+  private boolean issymmetric;
+
+  /** Row and column dimension (square matrix).
+  @serial matrix dimension.
+  */
+  private final int n;
 
   /*
    * ------------------------ Private Methods ------------------------
@@ -64,7 +61,10 @@ public class EigenvalueDecomposition implements java.io.Serializable {
 
   // Symmetric tridiagonal QL algorithm.
 
-  private transient double cdivr, cdivi;
+  /** Array for internal storage of eigenvectors.
+  @serial internal storage of eigenvectors.
+  */
+  private final double[][] V;
 
   // Nonsymmetric reduction to Hessenberg form.
 

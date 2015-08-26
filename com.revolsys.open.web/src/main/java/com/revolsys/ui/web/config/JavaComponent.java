@@ -44,9 +44,9 @@ public class JavaComponent extends Component {
 
   private String className;
 
-  private final Map properties = new HashMap();
-
   private Class componentClass;
+
+  private final Map properties = new HashMap();
 
   private Method serializeMethod;
 

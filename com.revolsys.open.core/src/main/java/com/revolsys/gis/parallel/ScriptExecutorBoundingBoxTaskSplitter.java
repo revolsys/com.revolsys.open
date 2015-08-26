@@ -12,8 +12,6 @@ import com.revolsys.parallel.tools.ScriptExecutorRunnable;
 
 public class ScriptExecutorBoundingBoxTaskSplitter extends BoundingBoxTaskSplitter {
 
-  private String scriptName;
-
   private Map<String, Object> attributes = new LinkedHashMap<String, Object>();
 
   private Map<String, Object> beans = new LinkedHashMap<String, Object>();
@@ -23,6 +21,8 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends BoundingBoxTaskSplitt
   private Map<String, ChannelOutput<?>> outChannels = new LinkedHashMap<String, ChannelOutput<?>>();
 
   private OutsideBoundaryObjects outsideBoundaryObjects = new OutsideBoundaryObjects();
+
+  private String scriptName;
 
   @Override
   public void execute(final BoundingBox boundingBox) {

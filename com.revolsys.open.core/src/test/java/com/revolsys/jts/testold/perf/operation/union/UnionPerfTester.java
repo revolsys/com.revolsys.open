@@ -11,17 +11,17 @@ import com.revolsys.geometry.util.Stopwatch;
 import com.revolsys.geometry.wkb.WKTReader;
 
 public class UnionPerfTester {
+  public static final int BUFFER0 = 3;
+
   public static final int CASCADED = 1;
+
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
 
   public static final int ITERATED = 2;
 
-  public static final int BUFFER0 = 3;
-
-  public static final int ORDERED = 4;
-
   static final int MAX_ITER = 1;
 
-  private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+  public static final int ORDERED = 4;
 
   static WKTReader wktRdr = new WKTReader(geometryFactory);
 
@@ -35,11 +35,11 @@ public class UnionPerfTester {
     test.runAll();
   }
 
-  Stopwatch sw = new Stopwatch();
-
   GeometryFactory factory = GeometryFactory.floating3();
 
   private final List polys;
+
+  Stopwatch sw = new Stopwatch();
 
   public UnionPerfTester(final List polys) {
     this.polys = polys;

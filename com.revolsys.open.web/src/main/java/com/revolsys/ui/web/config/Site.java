@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Site implements Cloneable {
-  /** The list of pages defined as direct children of the site. */
-  private final Map pages = new HashMap();
+  private String name;
 
   /** The cache of pages that can be found from the decendents of this site. */
   private final Map pageCache = new HashMap();
 
-  private String name;
+  /** The list of pages defined as direct children of the site. */
+  private final Map pages = new HashMap();
 
   private SiteNode rootNode = new SiteNode();
 

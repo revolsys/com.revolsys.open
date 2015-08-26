@@ -13,13 +13,13 @@ import com.revolsys.parallel.process.AbstractProcess;
 
 public class RecordStoreQueryTask extends AbstractProcess {
 
-  private final RecordStore recordStore;
-
   private final BoundingBox boundingBox;
 
   private List<Record> objects;
 
   private final String path;
+
+  private final RecordStore recordStore;
 
   public RecordStoreQueryTask(final RecordStore recordStore, final String path,
     final BoundingBox boundingBox) {

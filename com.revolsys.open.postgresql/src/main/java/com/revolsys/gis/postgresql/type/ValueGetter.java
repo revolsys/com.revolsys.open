@@ -71,9 +71,9 @@ public abstract class ValueGetter {
     }
   }
 
-  protected EndianInputStream data;
-
   private final boolean bigEndian;
+
+  protected EndianInputStream data;
 
   public ValueGetter(final InputStream data, final boolean bigEndian) {
     this.data = new EndianInputStream(data);

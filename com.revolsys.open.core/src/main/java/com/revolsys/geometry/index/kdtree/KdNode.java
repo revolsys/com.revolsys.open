@@ -43,15 +43,15 @@ import com.revolsys.geometry.model.impl.PointDouble;
  */
 public class KdNode {
 
-  private Point p = null;
+  private int count;
 
   private final Object data;
 
   private KdNode left;
 
-  private KdNode right;
+  private Point p = null;
 
-  private int count;
+  private KdNode right;
 
   /**
    * Creates a new KdNode.

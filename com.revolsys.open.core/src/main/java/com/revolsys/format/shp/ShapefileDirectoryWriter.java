@@ -22,17 +22,17 @@ import com.revolsys.util.Property;
 public class ShapefileDirectoryWriter extends AbstractRecordWriter {
   private File directory;
 
-  private boolean useZeroForNull = true;
-
-  private Map<String, Writer<Record>> writers = new HashMap<>();
+  private String nameSuffix = "";
 
   private Map<String, RecordDefinition> recordDefinitionMap = new HashMap<>();
 
-  private boolean useNamespaceAsSubDirectory;
-
   private Statistics statistics;
 
-  private String nameSuffix = "";
+  private boolean useNamespaceAsSubDirectory;
+
+  private boolean useZeroForNull = true;
+
+  private Map<String, Writer<Record>> writers = new HashMap<>();
 
   public ShapefileDirectoryWriter() {
   }

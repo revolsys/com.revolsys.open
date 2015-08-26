@@ -34,17 +34,17 @@ public class StringListField extends ValueField {
 
   private static final long serialVersionUID = 1L;
 
-  private final JTextField valueEntry = new JTextField();
-
-  private final ArrayListModel<String> values = new ArrayListModel<String>();
-
   private final JButton addButton;
 
   private final Comparator<String> comparator;
 
-  private final JXList valuesField;
-
   private final ToolBar toolBar = new ToolBar();
+
+  private final JTextField valueEntry = new JTextField();
+
+  private final ArrayListModel<String> values = new ArrayListModel<String>();
+
+  private final JXList valuesField;
 
   public StringListField(final Comparator<String> comparator, final String fieldName) {
     super(fieldName, "");

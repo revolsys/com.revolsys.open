@@ -59,19 +59,19 @@ import junit.framework.Test;
  * @version 1.7
  */
 public class TestCase extends junit.framework.TestSuite implements MapSerializer {
-  private String testDescription;
-
   private Geometry a;
 
   private Geometry b;
 
-  private final TestFile testFile;
-
   private final int caseIndex;
+
+  private GeometryFactory geometryFactory;
 
   private final boolean isRun = false;
 
-  private GeometryFactory geometryFactory;
+  private String testDescription;
+
+  private final TestFile testFile;
 
   /**
    *  Creates a TestCase with the given description. The tests will be applied

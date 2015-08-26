@@ -114,11 +114,11 @@ public abstract class GeometryGenerator {
     return pg;
   }
 
+  protected BoundingBox boundingBox;
+
   protected int dimensions = 2;
 
   protected GeometryFactory geometryFactory; // includes srid
-
-  protected BoundingBox boundingBox;
 
   /**
    * @return A Geometry which uses some or all of the Bounding Box specified.

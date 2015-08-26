@@ -24,11 +24,11 @@ public class SingularValueDecomposition implements java.io.Serializable {
 
   private static final long serialVersionUID = 1;
 
-  /** Arrays for internal storage of U and V.
-  @serial internal storage of U.
-  @serial internal storage of V.
+  /** Row and column dimensions.
+  @serial row dimension.
+  @serial column dimension.
   */
-  private final double[][] U, V;
+  private final int m, n;
 
   /** Array for internal storage of singular values.
   @serial internal storage of singular values.
@@ -39,11 +39,11 @@ public class SingularValueDecomposition implements java.io.Serializable {
    * ------------------------ Constructor ------------------------
    */
 
-  /** Row and column dimensions.
-  @serial row dimension.
-  @serial column dimension.
+  /** Arrays for internal storage of U and V.
+  @serial internal storage of U.
+  @serial internal storage of V.
   */
-  private final int m, n;
+  private final double[][] U, V;
 
   /*
    * ------------------------ Public Methods ------------------------

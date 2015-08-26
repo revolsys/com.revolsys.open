@@ -62,12 +62,6 @@ import com.revolsys.geometry.model.Point;
  * @author Martin Davis
  */
 public class AffineTransformationBuilder {
-  private final Point src0;
-
-  private final Point src1;
-
-  private final Point src2;
-
   private final Point dest0;
 
   private final Point dest1;
@@ -76,6 +70,12 @@ public class AffineTransformationBuilder {
 
   // the matrix entries for the transformation
   private double m00, m01, m02, m10, m11, m12;
+
+  private final Point src0;
+
+  private final Point src1;
+
+  private final Point src2;
 
   /**
    * Constructs a new builder for

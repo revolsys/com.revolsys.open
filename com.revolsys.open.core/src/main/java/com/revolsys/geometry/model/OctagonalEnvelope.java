@@ -56,22 +56,22 @@ public class OctagonalEnvelope {
     return x - y;
   }
 
-  // initialize in the null state
-  private double minX = Double.NaN;
+  private double maxA;
+
+  private double maxB;
 
   private double maxX;
-
-  private double minY;
 
   private double maxY;
 
   private double minA;
 
-  private double maxA;
-
   private double minB;
 
-  private double maxB;
+  // initialize in the null state
+  private double minX = Double.NaN;
+
+  private double minY;
 
   /**
    * Creates a new null bounding octagon

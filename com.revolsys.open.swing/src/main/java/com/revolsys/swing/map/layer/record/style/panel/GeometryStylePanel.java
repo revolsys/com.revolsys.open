@@ -25,11 +25,11 @@ import com.revolsys.util.JavaBeanUtil;
 public class GeometryStylePanel extends BaseStylePanel implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
-  private final GeometryStyleRenderer geometryStyleRenderer;
+  private DataType geometryDataType;
 
   private final GeometryStyle geometryStyle;
 
-  private DataType geometryDataType;
+  private final GeometryStyleRenderer geometryStyleRenderer;
 
   private JPanel previews;
 

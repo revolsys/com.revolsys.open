@@ -53,13 +53,13 @@ import com.revolsys.geometry.model.Point;
 public class IndexedNestedRingTester {
   private final GeometryGraph graph; // used to find non-node vertices
 
-  private final List rings = new ArrayList();
-
-  private final BoundingBox totalEnv = BoundingBox.EMPTY;
-
   private SpatialIndex index;
 
   private Point nestedPt;
+
+  private final List rings = new ArrayList();
+
+  private final BoundingBox totalEnv = BoundingBox.EMPTY;
 
   public IndexedNestedRingTester(final GeometryGraph graph) {
     this.graph = graph;

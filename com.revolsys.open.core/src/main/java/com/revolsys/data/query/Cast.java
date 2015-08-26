@@ -7,9 +7,9 @@ import com.revolsys.data.equals.Equals;
 import com.revolsys.data.record.schema.RecordStore;
 
 public class Cast extends QueryValue {
-  private final QueryValue value;
-
   private final String dataType;
+
+  private final QueryValue value;
 
   public Cast(final QueryValue queryValue, final String dataType) {
     this.value = queryValue;

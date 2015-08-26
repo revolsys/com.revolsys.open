@@ -14,9 +14,9 @@ public class MultiInputSelector {
 
   private long maxWait;
 
-  private boolean scheduled;
-
   private final Object monitor = new Object();
+
+  private boolean scheduled;
 
   void closeChannel() {
     synchronized (this.monitor) {

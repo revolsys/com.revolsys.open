@@ -47,9 +47,9 @@ public class AttributesEqualFilter implements Predicate<Record> {
 
   private final Collection<String> fieldNames;
 
-  private final Record object;
-
   private boolean nullEqualsEmptyString;
+
+  private final Record object;
 
   public AttributesEqualFilter(final Record object, final Collection<String> fieldNames) {
     this.fieldNames = fieldNames;

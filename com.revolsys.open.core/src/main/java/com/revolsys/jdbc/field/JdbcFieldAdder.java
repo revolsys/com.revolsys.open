@@ -13,13 +13,13 @@ import com.revolsys.io.PathName;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 
 public class JdbcFieldAdder {
-  public static String GEOMETRY_FACTORY = "geometryFactory";
-
   public static String AXIS_COUNT = "axisCount";
 
-  public static String GEOMETRY_TYPE = "geometryType";
-
   public static final String COLUMN_PROPERTIES = "columnProperties";
+
+  public static String GEOMETRY_FACTORY = "geometryFactory";
+
+  public static String GEOMETRY_TYPE = "geometryType";
 
   public static final String TABLE_PROPERTIES = "tableProperties";
 

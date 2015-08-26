@@ -64,21 +64,21 @@ public class DirectedEdge extends GraphComponent implements Comparable<DirectedE
     return edges;
   }
 
-  protected Edge parentEdge;
-
-  protected Node from;
-
-  protected Node to;
-
-  protected Point p0, p1;
-
-  protected DirectedEdge sym = null; // optional
+  protected double angle;
 
   protected boolean edgeDirection;
 
+  protected Node from;
+
+  protected Point p0, p1;
+
+  protected Edge parentEdge;
+
   protected int quadrant;
 
-  protected double angle;
+  protected DirectedEdge sym = null; // optional
+
+  protected Node to;
 
   /**
    * Constructs a DirectedEdge connecting the <code>from</code> node to the

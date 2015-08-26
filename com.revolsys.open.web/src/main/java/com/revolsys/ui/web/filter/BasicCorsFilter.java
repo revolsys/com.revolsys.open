@@ -19,6 +19,10 @@ import com.revolsys.util.Property;
 
 public class BasicCorsFilter extends OncePerRequestFilter {
 
+  private Set<String> allowedHeaders;
+
+  private String allowedHeadersString;
+
   private Set<String> allowedMethods;
 
   private String allowedMethodsString;
@@ -26,10 +30,6 @@ public class BasicCorsFilter extends OncePerRequestFilter {
   private int maxAge;
 
   private String maxAgeString;
-
-  private Set<String> allowedHeaders;
-
-  private String allowedHeadersString;
 
   public BasicCorsFilter() {
     setAllowedMethods(Arrays.asList("DELETE", "GET", "POST", "PUT"));

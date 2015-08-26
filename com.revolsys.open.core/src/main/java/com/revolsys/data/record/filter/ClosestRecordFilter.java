@@ -30,15 +30,15 @@ public class ClosestRecordFilter implements Predicate<Record> {
     return closestFilter;
   }
 
+  private double closestDistance = Double.MAX_VALUE;
+
+  private Record closestRecord;
+
   private final Predicate<Record> filter;
 
   private final Geometry geometry;
 
   private final double maxDistance;
-
-  private Record closestRecord;
-
-  private double closestDistance = Double.MAX_VALUE;
 
   public ClosestRecordFilter(final Geometry geometry, final double maxDistance) {
     this(geometry, maxDistance, Predicates.all());

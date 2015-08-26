@@ -47,6 +47,8 @@ public class IntersectionAdder implements SegmentIntersector {
     return Math.abs(i1 - i2) == 1;
   }
 
+  private boolean hasInterior = false;
+
   /**
    * These variables keep track of what types of intersections were
    * found during ALL edges that have been intersected.
@@ -57,22 +59,20 @@ public class IntersectionAdder implements SegmentIntersector {
 
   private boolean hasProperInterior = false;
 
-  private boolean hasInterior = false;
-
-  // the proper intersection point found
-  private final Point properIntersectionPoint = null;
-
   private final LineIntersector li;
+
+  public int numInteriorIntersections = 0;
 
   // private boolean intersectionFound;
   public int numIntersections = 0;
-
-  public int numInteriorIntersections = 0;
 
   public int numProperIntersections = 0;
 
   // testing only
   public int numTests = 0;
+
+  // the proper intersection point found
+  private final Point properIntersectionPoint = null;
 
   public IntersectionAdder(final LineIntersector li) {
     this.li = li;

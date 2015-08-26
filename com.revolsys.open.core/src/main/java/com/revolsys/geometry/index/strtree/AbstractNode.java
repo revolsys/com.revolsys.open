@@ -56,9 +56,9 @@ public abstract class AbstractNode implements Emptyable, Boundable, Serializable
    */
   private static final long serialVersionUID = 6493722185909573708L;
 
-  private final ArrayList childBoundables = new ArrayList();
-
   private Object bounds = null;
+
+  private final ArrayList childBoundables = new ArrayList();
 
   private int level;
 

@@ -3,9 +3,9 @@ package com.revolsys.parallel.process;
 import com.revolsys.parallel.AbstractRunnable;
 
 public class ProcessRunnable extends AbstractRunnable {
-  private final ProcessNetwork processManager;
-
   private final Process process;
+
+  private final ProcessNetwork processManager;
 
   public ProcessRunnable(final ProcessNetwork processManager, final Process process) {
     this.processManager = processManager;

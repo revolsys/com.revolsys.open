@@ -98,13 +98,13 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
   }
 
   private abstract class HashIterator<V> implements Iterator<V> {
-    IntEntry<T> next; // next entry to return
+    IntEntry<T> current; // current entry
 
     int expectedModCount; // For fast-fail
 
     int index; // current slot
 
-    IntEntry<T> current; // current entry
+    IntEntry<T> next; // next entry to return
 
     HashIterator() {
       this.expectedModCount = IntHashMap.this.modCount;
@@ -173,9 +173,9 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
   public static class IntEntry<T> implements Entry<Integer, T> {
     final int key;
 
-    T value;
-
     IntEntry<T> next;
+
+    T value;
 
     /**
      * Create new entry.
@@ -368,15 +368,15 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
   static final int DEFAULT_INITIAL_CAPACITY = 16;
 
   /**
+   * The load factor used when none specified in constructor.
+   */
+  static final float DEFAULT_LOAD_FACTOR = 0.75f;
+
+  /**
    * The maximum capacity, used if a higher value is implicitly specified by
    * either of the constructors with arguments. MUST be a power of two <= 1<<30.
    */
   static final int MAXIMUM_CAPACITY = 1 << 30;
-
-  /**
-   * The load factor used when none specified in constructor.
-   */
-  static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
   private static final long serialVersionUID = 362498820763181265L;
 
@@ -393,26 +393,9 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
 
   // internal utilities
 
+  private transient Set<IntEntry<T>> entrySet = null;
+
   transient volatile Set<Integer> keySet = null;
-
-  transient volatile Collection<T> values = null;
-
-  /**
-   * The table, resized as necessary. Length MUST Always be a power of two.
-   */
-  transient IntEntry<T>[] table;
-
-  /**
-   * The number of key-value mappings contained in this identity hash map.
-   */
-  transient int size;
-
-  /**
-   * The next size value at which to resize (capacity * load factor).
-   *
-   * @serial
-   */
-  int threshold;
 
   /**
    * The load factor for the hash table.
@@ -430,7 +413,24 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
    */
   transient volatile int modCount;
 
-  private transient Set<IntEntry<T>> entrySet = null;
+  /**
+   * The number of key-value mappings contained in this identity hash map.
+   */
+  transient int size;
+
+  /**
+   * The table, resized as necessary. Length MUST Always be a power of two.
+   */
+  transient IntEntry<T>[] table;
+
+  /**
+   * The next size value at which to resize (capacity * load factor).
+   *
+   * @serial
+   */
+  int threshold;
+
+  transient volatile Collection<T> values = null;
 
   /**
    * Constructs an empty <tt>HashMap</tt> with the default initial capacity (16)

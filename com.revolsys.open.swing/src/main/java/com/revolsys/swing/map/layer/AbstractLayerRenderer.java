@@ -25,6 +25,8 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends AbstractPro
 
   private static final Icon ICON = Icons.getIcon("palette");
 
+  private boolean editing = true;
+
   private Icon icon = ICON;
 
   private Reference<T> layer;
@@ -40,8 +42,6 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends AbstractPro
   private final String type;
 
   private boolean visible = true;
-
-  private boolean editing = true;
 
   public AbstractLayerRenderer(final String type, String name, final T layer,
     final LayerRenderer<?> parent, final Map<String, Object> style) {

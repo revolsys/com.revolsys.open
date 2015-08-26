@@ -17,9 +17,9 @@ import com.revolsys.util.Property;
 public class SearchField extends JXSearchField implements FocusListener, Field {
   private static final long serialVersionUID = 1L;
 
-  private final String fieldName;
-
   private String errorMessage;
+
+  private final String fieldName;
 
   private String fieldValue;
 

@@ -65,9 +65,9 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
     return new PointDouble(x0, y0, Point.NULL_ORDINATE);
   }
 
-  private boolean isConstrainedToCircle = false;
-
   private double gutterFraction = 0;
+
+  private boolean isConstrainedToCircle = false;
 
   /**
    * Create a builder which will create shapes using the default

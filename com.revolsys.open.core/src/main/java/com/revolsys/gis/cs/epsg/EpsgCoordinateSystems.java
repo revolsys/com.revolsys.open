@@ -42,17 +42,17 @@ public final class EpsgCoordinateSystems {
 
   private static Map<String, CoordinateSystem> coordinateSystemsByName = new TreeMap<String, CoordinateSystem>();
 
-  private static Map<String, Projection> projectionsByName = new TreeMap<String, Projection>();
-
-  private static Map<Integer, Projection> projectionsByCode = new TreeMap<Integer, Projection>();
-
   private static boolean initialized = false;
-
-  private static int nextSrid = 2000000;
 
   private static final IntHashMap<LinearUnit> linearUnits = new IntHashMap<>();
 
   private static Map<String, LinearUnit> linearUnitsByName = new TreeMap<String, LinearUnit>();
+
+  private static int nextSrid = 2000000;
+
+  private static Map<Integer, Projection> projectionsByCode = new TreeMap<Integer, Projection>();
+
+  private static Map<String, Projection> projectionsByName = new TreeMap<String, Projection>();
 
   private static void addCoordinateSystem(final CoordinateSystem coordinateSystem) {
     final Integer id = coordinateSystem.getId();

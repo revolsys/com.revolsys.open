@@ -27,19 +27,19 @@ import com.revolsys.util.Property;
 
 public class ActionFormKeySerializer extends AbstractKeySerializer
   implements HtmlUiBuilderAware<HtmlUiBuilder<?>> {
-  private String iconName;
-
   private String cssClass;
 
   private Expression enabledExpression;
+
+  private String iconName;
 
   private Map<String, String> parameterNameMap = new LinkedHashMap<String, String>();
 
   private List<String> parameterNames = new ArrayList<String>();
 
-  private HtmlUiBuilder<?> uiBuilder;
-
   private String target;
+
+  private HtmlUiBuilder<?> uiBuilder;
 
   public ActionFormKeySerializer() {
     setProperties(null);

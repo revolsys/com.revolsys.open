@@ -38,19 +38,19 @@ public class BaseTableCellEditor extends AbstractCellEditor
 
   private static final long serialVersionUID = 1L;
 
-  private JComponent editorComponent;
-
-  private final BaseJTable table;
-
-  private int rowIndex;
-
   private int columnIndex;
-
-  private PopupMenu popupMenu = null;
 
   private DataType dataType;
 
+  private JComponent editorComponent;
+
   private MouseListener mouseListener;
+
+  private PopupMenu popupMenu = null;
+
+  private int rowIndex;
+
+  private final BaseJTable table;
 
   public BaseTableCellEditor(final BaseJTable table) {
     this.table = table;

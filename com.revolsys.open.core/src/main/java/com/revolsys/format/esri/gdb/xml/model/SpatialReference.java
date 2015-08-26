@@ -22,39 +22,39 @@ public class SpatialReference {
     return null;
   }
 
-  private String wkt;
+  private CoordinateSystem coordinateSystem;
 
-  private double xOrigin;
+  private GeometryFactory geometryFactory;
 
-  private double yOrigin;
+  private boolean highPrecision;
 
-  private double xYScale;
+  private int latestWKID;
 
-  private double zOrigin;
-
-  private double zScale;
+  private double leftLongitude;
 
   private double mOrigin;
 
   private double mScale;
 
-  private double xYTolerance;
-
-  private double zTolerance;
-
   private double mTolerance;
-
-  private boolean highPrecision;
-
-  private double leftLongitude;
 
   private int wkid;
 
-  private int latestWKID;
+  private String wkt;
 
-  private CoordinateSystem coordinateSystem;
+  private double xOrigin;
 
-  private GeometryFactory geometryFactory;
+  private double xYScale;
+
+  private double xYTolerance;
+
+  private double yOrigin;
+
+  private double zOrigin;
+
+  private double zScale;
+
+  private double zTolerance;
 
   public SpatialReference() {
   }

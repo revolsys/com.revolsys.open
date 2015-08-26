@@ -53,11 +53,11 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
  */
 public class GridGenerator extends GeometryGenerator {
 
+  protected int index = 0;
+
   protected int numberColumns = 1;
 
   protected int numberRows = 1;
-
-  protected int index = 0;
 
   /**
    * Sets some default values.

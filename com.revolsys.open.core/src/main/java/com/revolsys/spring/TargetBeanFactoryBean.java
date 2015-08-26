@@ -6,15 +6,15 @@ import org.springframework.beans.factory.config.BeanDefinition;
 
 public class TargetBeanFactoryBean extends AbstractFactoryBean<Object> {
 
-  private BeanFactory targetBeanFactory;
-
-  private String targetBeanName;
-
-  private BeanDefinition targetBeanDefinition;
+  private boolean instanceCreated = false;
 
   private Class<?> targetBeanClass;
 
-  private boolean instanceCreated = false;
+  private BeanDefinition targetBeanDefinition;
+
+  private BeanFactory targetBeanFactory;
+
+  private String targetBeanName;
 
   public TargetBeanFactoryBean() {
   }

@@ -6,9 +6,9 @@ import com.revolsys.util.Property;
 
 public abstract class NumberField extends TextField {
 
-  private Number minimumValue;
-
   private Number maximumValue;
+
+  private Number minimumValue;
 
   private String units;
 

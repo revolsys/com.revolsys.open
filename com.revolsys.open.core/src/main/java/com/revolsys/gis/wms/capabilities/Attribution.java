@@ -3,11 +3,11 @@ package com.revolsys.gis.wms.capabilities;
 import java.net.URL;
 
 public class Attribution {
-  private String title;
+  private ImageUrl logoUrl;
 
   private URL onlineResource;
 
-  private ImageUrl logoUrl;
+  private String title;
 
   public ImageUrl getLogoUrl() {
     return this.logoUrl;

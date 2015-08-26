@@ -100,9 +100,9 @@ import com.revolsys.gis.algorithm.index.LineSegmentIndex;
  */
 public class IsSimpleOp {
 
-  private final Geometry geometry;
-
   private final List<GeometryValidationError> errors = new ArrayList<>();
+
+  private final Geometry geometry;
 
   private boolean shortCircuit = true;
 

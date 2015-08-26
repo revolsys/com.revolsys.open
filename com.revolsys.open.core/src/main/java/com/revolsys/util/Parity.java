@@ -5,7 +5,7 @@ import java.util.List;
 import com.revolsys.collection.list.Lists;
 
 public enum Parity {
-  EVEN("Even"), ODD("Odd"), CONTINUOUS("Continuous");
+  CONTINUOUS("Continuous"), EVEN("Even"), ODD("Odd");
 
   public static List<Parity> VALUES = Lists.array(EVEN, ODD);
 
@@ -41,9 +41,9 @@ public enum Parity {
     }
   }
 
-  private String name;
-
   private char letter;
+
+  private String name;
 
   private Parity(final String name) {
     this.name = name;

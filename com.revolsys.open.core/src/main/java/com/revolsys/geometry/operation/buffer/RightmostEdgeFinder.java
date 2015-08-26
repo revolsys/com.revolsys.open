@@ -55,12 +55,12 @@ import com.revolsys.geometry.util.Assert;
  */
 class RightmostEdgeFinder {
 
-  // private Point extremeCoord;
-  private int minIndex = -1;
-
   private Point minCoord = null;
 
   private DirectedEdge minDe = null;
+
+  // private Point extremeCoord;
+  private int minIndex = -1;
 
   private DirectedEdge orientedDe = null;
 

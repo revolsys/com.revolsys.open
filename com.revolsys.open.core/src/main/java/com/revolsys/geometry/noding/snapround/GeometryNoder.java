@@ -64,9 +64,9 @@ import com.revolsys.geometry.noding.NodingValidator;
 public class GeometryNoder {
   private GeometryFactory geomFact;
 
-  private final double scale;
-
   private boolean isValidityChecked = false;
+
+  private final double scale;
 
   /**
    * Creates a new noder which snap-rounds to a grid specified

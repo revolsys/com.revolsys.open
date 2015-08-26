@@ -8,13 +8,13 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class MemoryPageManager implements PageManager {
-  int pageSize = 64;
+  private final Set<Page> freePages = new TreeSet<Page>();
 
   private final List<Page> pages = new ArrayList<Page>();
 
   private final Set<Page> pagesInUse = new HashSet<Page>();
 
-  private final Set<Page> freePages = new TreeSet<Page>();
+  int pageSize = 64;
 
   @Override
   public synchronized Page createPage() {

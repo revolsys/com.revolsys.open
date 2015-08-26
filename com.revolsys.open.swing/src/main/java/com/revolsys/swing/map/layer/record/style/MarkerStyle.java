@@ -153,9 +153,6 @@ public class MarkerStyle implements Cloneable, MapSerializer {
 
   private Color markerFill = new Color(0, 0, 255, 255);
 
-  /** The orientation of the text in a clockwise direction from the east axis. */
-  private double markerOrientation = 0;
-
   private int markerFillOpacity = 255;
 
   private Measure<Length> markerHeight = TEN_PIXELS;
@@ -171,6 +168,9 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   private Measure<Length> markerLineWidth = ONE_PIXEL;
 
   private int markerOpacity = 255;
+
+  /** The orientation of the text in a clockwise direction from the east axis. */
+  private double markerOrientation = 0;
 
   private String markerOrientationType = "none";
 

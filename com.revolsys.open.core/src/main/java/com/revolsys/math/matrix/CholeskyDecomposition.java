@@ -18,24 +18,24 @@ public class CholeskyDecomposition implements java.io.Serializable {
 
   private static final long serialVersionUID = 1;
 
+  /** Symmetric and positive definite flag.
+  @serial is symmetric and positive definite flag.
+  */
+  private boolean isspd;
+
   /** Array for internal storage of decomposition.
   @serial internal array storage.
   */
   private final double[][] L;
 
-  /** Row and column dimension (square matrix).
-  @serial matrix dimension.
-  */
-  private final int n;
-
   /*
    * ------------------------ Constructor ------------------------
    */
 
-  /** Symmetric and positive definite flag.
-  @serial is symmetric and positive definite flag.
+  /** Row and column dimension (square matrix).
+  @serial matrix dimension.
   */
-  private boolean isspd;
+  private final int n;
 
   /*
    * ------------------------ Temporary, experimental code.

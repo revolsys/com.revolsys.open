@@ -48,9 +48,9 @@ public class UriTemplate implements Serializable {
    */
   private static class Parser {
 
-    private final List<String> variableNames = new LinkedList<String>();
-
     private final StringBuilder patternBuilder = new StringBuilder();
+
+    private final List<String> variableNames = new LinkedList<String>();
 
     private Parser(final String uriTemplate) {
       Assert.hasText(uriTemplate, "'uriTemplate' must not be null");
@@ -85,22 +85,22 @@ public class UriTemplate implements Serializable {
     }
   }
 
+  /** Captures URI template variable names. */
+  private static final Pattern NAMES_PATTERN = Pattern.compile("\\{([^/]+?)\\}");
+
   /**
    *
    */
   private static final long serialVersionUID = 1L;
 
-  /** Captures URI template variable names. */
-  private static final Pattern NAMES_PATTERN = Pattern.compile("\\{([^/]+?)\\}");
-
   /** Replaces template variables in the URI template. */
   private static final String VALUE_REGEX = "(.*)";
-
-  private final List<String> variableNames;
 
   private final Pattern matchPattern;
 
   private final String uriTemplate;
+
+  private final List<String> variableNames;
 
   /**
    * Construct a new {@link UriTemplate} with the given URI String.

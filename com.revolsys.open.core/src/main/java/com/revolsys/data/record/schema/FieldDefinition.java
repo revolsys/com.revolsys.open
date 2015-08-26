@@ -55,8 +55,14 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
   /** The maximum length of an attribute value. */
   private int length;
 
+  private Object maxValue;
+
+  private Object minValue;
+
   /** The name of the attribute. */
   private String name;
+
+  private Reference<RecordDefinition> recordDefinition;
 
   /** The flag indicating if a value is required for the attribute. */
   private boolean required;
@@ -64,16 +70,10 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
   /** The maximum number of decimal places. */
   private int scale;
 
-  /** The data type of the attribute value. */
-  private DataType type;
-
-  private Reference<RecordDefinition> recordDefinition;
-
   private String title;
 
-  private Object minValue;
-
-  private Object maxValue;
+  /** The data type of the attribute value. */
+  private DataType type;
 
   public FieldDefinition() {
   }

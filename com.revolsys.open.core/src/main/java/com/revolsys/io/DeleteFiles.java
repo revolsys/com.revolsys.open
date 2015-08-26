@@ -14,9 +14,9 @@ public class DeleteFiles {
 
   private static final ResourcePatternResolver RESOLVER = new PathMatchingResourcePatternResolver();
 
-  private List<String> filePatterns = new ArrayList<String>();
-
   private boolean deleteDirectories = true;
+
+  private List<String> filePatterns = new ArrayList<String>();
 
   @PostConstruct
   public void deleteFiles() {

@@ -71,15 +71,15 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
  * @version 1.7
  */
 class BufferSubgraph implements Comparable {
-  private final RightmostEdgeFinder finder;
-
   private final List<DirectedEdge> dirEdgeList = new ArrayList<DirectedEdge>();
+
+  private BoundingBox env = null;
+
+  private final RightmostEdgeFinder finder;
 
   private final List<Node> nodes = new ArrayList<>();
 
   private Point rightMostCoord = null;
-
-  private BoundingBox env = null;
 
   public BufferSubgraph() {
     this.finder = new RightmostEdgeFinder();

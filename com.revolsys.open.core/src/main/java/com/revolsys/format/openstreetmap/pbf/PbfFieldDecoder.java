@@ -15,8 +15,6 @@ import com.revolsys.format.openstreetmap.pbf.Osmformat.StringTable;
 public class PbfFieldDecoder {
   private static final double COORDINATE_SCALING_FACTOR = 0.000000001;
 
-  private final String[] strings;
-
   private final int coordGranularity;
 
   private final long coordLatitudeOffset;
@@ -24,6 +22,8 @@ public class PbfFieldDecoder {
   private final long coordLongitudeOffset;
 
   private final int dateGranularity;
+
+  private final String[] strings;
 
   /**
    * Creates a new instance.

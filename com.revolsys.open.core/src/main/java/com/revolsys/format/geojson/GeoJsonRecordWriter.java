@@ -23,16 +23,16 @@ import com.revolsys.util.MathUtil;
 
 public class GeoJsonRecordWriter extends AbstractRecordWriter implements GeoJsonConstants {
 
-  boolean initialized = false;
+  private final boolean cogo;
 
-  private int srid = -1;
+  boolean initialized = false;
 
   /** The writer */
   private JsonWriter out;
 
   private boolean singleObject;
 
-  private final boolean cogo;
+  private int srid = -1;
 
   public GeoJsonRecordWriter(final Writer out) {
     this(out, false);

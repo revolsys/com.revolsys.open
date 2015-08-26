@@ -100,10 +100,9 @@ public class LineStringDoubleGf extends AbstractLineString {
   private BoundingBox boundingBox;
 
   /**
-   * An object reference which can be used to carry ancillary data defined
-   * by the client.
+   *  The points of this <code>LineString</code>.
    */
-  private Object userData;
+  private double[] coordinates;
 
   /**
    * The {@link GeometryFactory} used to create this Geometry
@@ -111,9 +110,10 @@ public class LineStringDoubleGf extends AbstractLineString {
   private final GeometryFactory geometryFactory;
 
   /**
-   *  The points of this <code>LineString</code>.
+   * An object reference which can be used to carry ancillary data defined
+   * by the client.
    */
-  private double[] coordinates;
+  private Object userData;
 
   public LineStringDoubleGf(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;

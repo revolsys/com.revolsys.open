@@ -20,9 +20,9 @@ public class SpringExpresssionLanguageFilter implements Predicate<Record>, MapSe
   private static final SpelExpressionParser EXPRESSION_PARSER = new SpelExpressionParser(
     EXPRESSION_CONFIGURATION);
 
-  private final Expression expression;
-
   private final StandardEvaluationContext context = new StandardEvaluationContext();
+
+  private final Expression expression;
 
   private final String query;
 

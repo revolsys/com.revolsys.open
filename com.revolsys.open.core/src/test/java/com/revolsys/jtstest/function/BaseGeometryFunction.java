@@ -76,9 +76,9 @@ public abstract class BaseGeometryFunction implements GeometryFunction, Comparab
 
   protected String category = null;
 
-  protected String name;
-
   protected String description;
+
+  protected String name;
 
   protected String[] parameterNames;
 

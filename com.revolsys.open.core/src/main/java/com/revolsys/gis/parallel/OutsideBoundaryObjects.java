@@ -12,9 +12,9 @@ import com.revolsys.geometry.model.Geometry;
 public class OutsideBoundaryObjects {
   private static final Logger LOG = LoggerFactory.getLogger(OutsideBoundaryObjects.class);
 
-  private Set<Record> objects = new LinkedHashSet<Record>();
-
   private Geometry boundary;
+
+  private Set<Record> objects = new LinkedHashSet<Record>();
 
   private Geometry preparedBoundary;
 

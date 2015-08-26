@@ -12,9 +12,9 @@ public abstract class AbstractMultipleIteratorReader<T> extends AbstractReader<T
 
   private AbstractIterator<T> iterator;
 
-  private boolean open;
-
   private boolean loadNext = true;
+
+  private boolean open;
 
   @Override
   @PreDestroy

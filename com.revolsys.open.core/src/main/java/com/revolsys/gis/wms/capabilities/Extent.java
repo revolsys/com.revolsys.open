@@ -1,15 +1,15 @@
 package com.revolsys.gis.wms.capabilities;
 
 public class Extent {
-  private String name;
+  private boolean current = false;
 
   private String defaultValue;
 
-  private boolean nearestValue = false;
-
   private boolean multipleValues = false;
 
-  private boolean current = false;
+  private String name;
+
+  private boolean nearestValue = false;
 
   public String getDefaultValue() {
     return this.defaultValue;

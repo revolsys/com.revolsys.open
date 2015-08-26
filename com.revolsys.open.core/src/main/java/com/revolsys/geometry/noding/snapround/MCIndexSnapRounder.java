@@ -67,13 +67,13 @@ public class MCIndexSnapRounder implements Noder {
 
   private final LineIntersector li;
 
-  private final double scaleFactor;
+  private Collection nodedSegStrings;
 
   private MCIndexNoder noder;
 
   private MCIndexPointSnapper pointSnapper;
 
-  private Collection nodedSegStrings;
+  private final double scaleFactor;
 
   public MCIndexSnapRounder(final double scale) {
     this.li = new RobustLineIntersector(scale);

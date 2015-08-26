@@ -28,15 +28,15 @@ public class TriangulatedIrregularNetwork {
     2, 1, 0
   };
 
+  private final BoundingBox boundingBox;
+
   private RTree<Triangle> circumCircleIndex;
 
   private GeometryFactory geometryFactory;
 
-  private RTree<Triangle> triangleIndex;
-
-  private final BoundingBox boundingBox;
-
   private final Set<Point> nodes = new HashSet<Point>();
+
+  private RTree<Triangle> triangleIndex;
 
   public TriangulatedIrregularNetwork(final BoundingBox boundingBox) {
     this(boundingBox.getGeometryFactory(), boundingBox);

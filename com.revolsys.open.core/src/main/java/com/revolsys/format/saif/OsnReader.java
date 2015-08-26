@@ -31,11 +31,11 @@ public class OsnReader implements Iterator<Record>, AutoCloseable {
 
   private final String fileName;
 
-  private final RecordDefinitionFactory recordDefinitionFactory;
-
   private boolean nextChecked = false;
 
   private OsnIterator osnIterator;
+
+  private final RecordDefinitionFactory recordDefinitionFactory;
 
   private ZipFile zipFile;
 

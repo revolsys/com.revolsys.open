@@ -35,11 +35,11 @@ public class ValueField extends JPanel implements Field {
 
   private Object fieldValue;
 
-  private String title;
-
   private String originalToolTip;
 
   private boolean saved = false;
+
+  private String title;
 
   public ValueField() {
     this("fieldValue", null);

@@ -7,9 +7,9 @@ import javax.swing.RowFilter;
 
 public class CollectionRowFilter extends RowFilter<ListModel, Integer> {
 
-  private final Collection<? extends Object> values;
-
   private final boolean match;
+
+  private final Collection<? extends Object> values;
 
   public CollectionRowFilter(final Collection<? extends Object> values) {
     this(values, true);

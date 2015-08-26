@@ -39,9 +39,9 @@ import com.revolsys.swing.parallel.Invoke;
  * @author Paul Austin
  */
 public class InvokeMethodListSelectionListener implements ListSelectionListener {
-  private final Runnable runnable;
-
   private final boolean invokeLater;
+
+  private final Runnable runnable;
 
   public InvokeMethodListSelectionListener(final Object object, final String methodName) {
     this(object, methodName, new Object[0]);

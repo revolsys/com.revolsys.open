@@ -23,16 +23,16 @@ public class QRDecomposition implements java.io.Serializable {
 
   private static final long serialVersionUID = 1;
 
-  /** Array for internal storage of decomposition.
-  @serial internal array storage.
-  */
-  private final double[][] QR;
-
   /** Row and column dimensions.
   @serial column dimension.
   @serial row dimension.
   */
   private final int m, n;
+
+  /** Array for internal storage of decomposition.
+  @serial internal array storage.
+  */
+  private final double[][] QR;
 
   /*
    * ------------------------ Constructor ------------------------

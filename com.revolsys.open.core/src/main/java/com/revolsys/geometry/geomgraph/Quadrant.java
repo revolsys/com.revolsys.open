@@ -49,9 +49,9 @@ public class Quadrant {
 
   public static final int NW = 1;
 
-  public static final int SW = 2;
-
   public static final int SE = 3;
+
+  public static final int SW = 2;
 
   /**
    * Returns the right-hand quadrant of the halfplane defined by the two quadrants,

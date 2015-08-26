@@ -25,11 +25,11 @@ import com.revolsys.util.Property;
 public class TextAreaField extends Field {
   private int cols = 50;
 
-  private int minLength = 0;
+  private String inputValue = "";
 
   private int maxLength = Integer.MAX_VALUE;
 
-  private String inputValue = "";
+  private int minLength = 0;
 
   private int rows = 5;
 

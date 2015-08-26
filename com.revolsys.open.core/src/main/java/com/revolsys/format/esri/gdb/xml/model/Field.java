@@ -3,33 +3,33 @@ package com.revolsys.format.esri.gdb.xml.model;
 import com.revolsys.format.esri.gdb.xml.model.enums.FieldType;
 
 public class Field {
-  private String name;
+  private String aliasName;
 
-  private FieldType type;
+  private Object defaultValue;
+
+  private Domain domain;
+
+  private Boolean domainFixed;
+
+  private Boolean editable;
+
+  private GeometryDef geometryDef;
 
   private boolean isNullable;
 
   private int length;
 
-  private int precision;
+  private String modelName;
 
-  private int scale;
+  private String name;
+
+  private int precision;
 
   private Boolean required;
 
-  private Boolean editable;
+  private int scale;
 
-  private String aliasName;
-
-  private String modelName;
-
-  private GeometryDef geometryDef;
-
-  private Boolean domainFixed;
-
-  private Object defaultValue;
-
-  private Domain domain;
+  private FieldType type;
 
   // TODO RasterDef rasterDef
 

@@ -31,9 +31,9 @@ public class TextNameField extends ValueField {
    */
   private static final long serialVersionUID = 1L;
 
-  private final TextArea textNameField;
-
   private final ComboBox fieldNamesField;
+
+  private final TextArea textNameField;
 
   public TextNameField(final AbstractRecordLayer layer, final String fieldName,
     final Object fieldValue) {

@@ -17,9 +17,9 @@ import com.revolsys.io.FileUtil;
 public class TemplateController extends AbstractController {
   private Map<String, Object> attributes = Collections.emptyMap();
 
-  private String viewName;
-
   private UrlPathHelper urlPathHelper = new UrlPathHelper();
+
+  private String viewName;
 
   public TemplateController() {
     this.urlPathHelper.setAlwaysUseFullPath(true);

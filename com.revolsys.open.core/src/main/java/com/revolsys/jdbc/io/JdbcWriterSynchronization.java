@@ -5,11 +5,11 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 public class JdbcWriterSynchronization extends TransactionSynchronizationAdapter {
 
-  private final JdbcWriterResourceHolder writerHolder;
+  private boolean holderActive = true;
 
   private final Object key;
 
-  private boolean holderActive = true;
+  private final JdbcWriterResourceHolder writerHolder;
 
   public JdbcWriterSynchronization(final AbstractJdbcRecordStore recordStore,
     final JdbcWriterResourceHolder writerHolder, final Object key) {

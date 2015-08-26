@@ -71,11 +71,11 @@ public class NodedSegmentString implements NodableSegmentString {
     return nodedSegments;
   }
 
+  private Object data;
+
   private final SegmentNodeList nodeList = new SegmentNodeList(this);
 
   private final LineString points;
-
-  private Object data;
 
   /**
    * Creates a new segment string from a list of vertices.

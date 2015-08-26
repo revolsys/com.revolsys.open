@@ -57,9 +57,9 @@ public class GeometryLocation {
 
   private Geometry component = null;
 
-  private final int segIndex;
-
   private Point pt = null;
+
+  private final int segIndex;
 
   /**
    * Constructs a GeometryLocation specifying a point on a geometry, as well as the

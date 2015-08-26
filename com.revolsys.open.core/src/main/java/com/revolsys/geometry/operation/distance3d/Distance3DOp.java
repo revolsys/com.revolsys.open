@@ -148,14 +148,14 @@ public class Distance3DOp {
   // input
   private final Geometry[] geom;
 
-  private double terminateDistance = 0.0;
+  private boolean isDone = false;
+
+  private double minDistance = Double.MAX_VALUE;
 
   // working
   private GeometryLocation[] minDistanceLocation;
 
-  private double minDistance = Double.MAX_VALUE;
-
-  private boolean isDone = false;
+  private double terminateDistance = 0.0;
 
   /**
    * Constructs a Distance3DOp that computes the distance and nearest points

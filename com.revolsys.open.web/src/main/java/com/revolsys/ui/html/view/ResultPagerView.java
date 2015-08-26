@@ -14,11 +14,11 @@ import com.revolsys.util.UrlUtil;
  * @version 1.0
  */
 public class ResultPagerView extends Element {
-  /** The result pager. */
-  private final ResultPager<?> pager;
-
   /** The base URL. */
   private final String baseUrl;
+
+  /** The result pager. */
+  private final ResultPager<?> pager;
 
   /** The parameters to include in the URLs. */
   private final Map<String, Object> parameters = new HashMap<String, Object>();

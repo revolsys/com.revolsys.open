@@ -275,19 +275,19 @@ public class JavaDoclet {
     return flag;
   }
 
+  private String destDir = ".";
+
   private String docId;
 
   private String docTitle;
 
-  private final RootDoc root;
-
-  private XmlWriter writer;
-
-  private String destDir = ".";
+  private String footer;
 
   private String header;
 
-  private String footer;
+  private final RootDoc root;
+
+  private XmlWriter writer;
 
   public JavaDoclet(final RootDoc root) {
     this.root = root;

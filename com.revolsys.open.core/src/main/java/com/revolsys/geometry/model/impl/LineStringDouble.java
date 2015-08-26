@@ -13,9 +13,9 @@ import com.revolsys.util.MathUtil;
 public class LineStringDouble extends AbstractLineString {
   private static final long serialVersionUID = 7579865828939708871L;
 
-  private double[] coordinates;
-
   private final int axisCount;
+
+  private double[] coordinates;
 
   public LineStringDouble(final int axisCount) {
     this(0, axisCount);

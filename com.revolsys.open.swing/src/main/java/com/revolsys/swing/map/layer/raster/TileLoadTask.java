@@ -6,9 +6,9 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.map.layer.MapTile;
 
 public class TileLoadTask implements Runnable {
-  private final MapTile mapTile;
-
   private final GeometryFactory geometryFactory;
+
+  private final MapTile mapTile;
 
   private final TiledImageLayerRenderer renderer;
 

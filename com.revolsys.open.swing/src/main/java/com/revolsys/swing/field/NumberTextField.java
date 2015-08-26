@@ -129,15 +129,15 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
 
   private final DataType dataType;
 
+  private boolean fieldValid = true;
+
   private final int length;
-
-  private final int scale;
-
-  private BigDecimal minimumValue;
 
   private BigDecimal maximumValue;
 
-  private boolean fieldValid = true;
+  private BigDecimal minimumValue;
+
+  private final int scale;
 
   private final FieldSupport support;
 

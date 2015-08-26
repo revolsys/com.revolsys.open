@@ -24,17 +24,19 @@ public final class MoepConstants {
 
   public static final String FEATURE_CODE = "FEAT_CODE";
 
+  public static final String FONT_NAME = "FONT_NAME";
+
   public static final String FONT_SIZE = "FONT_SIZE";
 
-  public static final String FONT_NAME = "FONT_NAME";
+  public static final String FONT_WEIGHT = "FONTWEIGHT";
 
   public static final String GEOMETRY = "geometry";
 
   public static final String MAPSHEET_NAME = "MAPSHEET";
 
-  public static final RecordDefinition RECORD_DEFINITION;
-
   public static final String ORIGINAL_FILE_TYPE = "FILE_TYPE";
+
+  public static final RecordDefinition RECORD_DEFINITION;
 
   public static final String RETIRE_INTEGRATION_DATE = "R_DATE";
 
@@ -48,13 +50,11 @@ public final class MoepConstants {
 
   public static final String TEXT = "TEXT";
 
-  public static final String TYPE_NAME = "/MOEP/Feature";
-
-  public static final String FONT_WEIGHT = "FONTWEIGHT";
-
   public static final String TEXT_GROUP = "TEXT_GROUP";
 
   public static final String TEXT_INDEX = "TEXT_INDEX";
+
+  public static final String TYPE_NAME = "/MOEP/Feature";
 
   static {
     RECORD_DEFINITION = createRecordDefinition(TYPE_NAME);

@@ -13,9 +13,9 @@ import com.revolsys.swing.parallel.Invoke;
  * @author Paul Austin
  */
 public class InvokeMethodTreeSelectionListener implements TreeSelectionListener {
-  private final Runnable runnable;
-
   private final boolean invokeLater;
+
+  private final Runnable runnable;
 
   public InvokeMethodTreeSelectionListener(final Object object, final String methodName) {
     this(object, methodName, new Object[0]);

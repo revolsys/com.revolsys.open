@@ -100,6 +100,8 @@ public class IsValidOp {
     return isValidOp.isValid();
   }
 
+  private final List<GeometryValidationError> errors = new ArrayList<>();
+
   private final Geometry geometry; // the base Geometry to be validated
 
   /**
@@ -107,8 +109,6 @@ public class IsValidOp {
    * (the ESRI SDE model)
    */
   private boolean isSelfTouchingRingFormingHoleValid = false;
-
-  private final List<GeometryValidationError> errors = new ArrayList<>();
 
   private boolean shortCircuit = true;
 

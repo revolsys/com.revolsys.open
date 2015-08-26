@@ -1,13 +1,13 @@
 package com.revolsys.gis.wms.capabilities;
 
 public class BoundingBox {
-  private String srs;
-
   private com.revolsys.geometry.model.BoundingBox envelope;
 
   private double resX;
 
   private double resY;
+
+  private String srs;
 
   public com.revolsys.geometry.model.BoundingBox getEnvelope() {
     return this.envelope;

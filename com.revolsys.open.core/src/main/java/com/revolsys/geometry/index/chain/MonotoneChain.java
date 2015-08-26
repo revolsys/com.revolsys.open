@@ -84,15 +84,15 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
  */
 public class MonotoneChain {
 
-  private final LineString points;
-
-  private final int start, end;
+  private Object context = null;// user-defined information
 
   private BoundingBoxDoubleGf env = null;
 
-  private Object context = null;// user-defined information
-
   private int id;// useful for optimizing chain comparisons
+
+  private final LineString points;
+
+  private final int start, end;
 
   public MonotoneChain(final LineString pts, final int start, final int end, final Object context) {
     this.points = pts;

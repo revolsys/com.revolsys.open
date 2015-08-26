@@ -55,11 +55,11 @@ public class UnionInteracting {
     return uue.union();
   }
 
-  private final GeometryFactory geomFactory;
-
   private final Geometry g0;
 
   private final Geometry g1;
+
+  private final GeometryFactory geomFactory;
 
   private final boolean[] interacts0;
 

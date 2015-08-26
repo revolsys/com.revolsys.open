@@ -68,11 +68,19 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     return new JdbcQueryIterator(recordStore, query, properties);
   }
 
+  private final Set<String> allSchemaNames = new TreeSet<String>();
+
   private final Map<String, JdbcFieldAdder> attributeAdders = new HashMap<String, JdbcFieldAdder>();
 
   private int batchSize;
 
+  private JdbcDatabaseFactory databaseFactory;
+
   private DataSource dataSource;
+
+  private final Object exceptionWriterKey = new Object();
+
+  private Set<String> excludeTablePaths = new HashSet<String>();
 
   private List<String> excludeTablePatterns = new ArrayList<String>();
 
@@ -80,37 +88,29 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   private String hints;
 
+  private String primaryKeySql;
+
+  private String primaryKeyTableCondition;
+
+  private final Map<PathName, String> schemaNameMap = new HashMap<>();
+
+  private String schemaPermissionsSql;
+
+  private String schemaTablePermissionsSql;
+
   private final Map<String, String> sequenceTypeSqlMap = new HashMap<String, String>();
 
   private String sqlPrefix;
 
   private String sqlSuffix;
 
-  private String schemaPermissionsSql;
-
-  private final Map<PathName, String> schemaNameMap = new HashMap<>();
-
   private final Map<PathName, String> tableNameMap = new HashMap<>();
 
-  private JdbcDatabaseFactory databaseFactory;
-
-  private final Object writerKey = new Object();
-
-  private final Object exceptionWriterKey = new Object();
-
-  private String primaryKeySql;
-
-  private final Set<String> allSchemaNames = new TreeSet<String>();
-
-  private String schemaTablePermissionsSql;
-
-  private Set<String> excludeTablePaths = new HashSet<String>();
+  private String tablePermissionsSql;
 
   private DataSourceTransactionManager transactionManager;
 
-  private String primaryKeyTableCondition;
-
-  private String tablePermissionsSql;
+  private final Object writerKey = new Object();
 
   public AbstractJdbcRecordStore() {
     this(new ArrayRecordFactory());

@@ -4,9 +4,9 @@ import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
 
 public class AutoCompleteTextField extends TextField {
-  private int maxResults = 25;
-
   private String dataUrl;
+
+  private int maxResults = 25;
 
   public AutoCompleteTextField() {
   }

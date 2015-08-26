@@ -169,9 +169,9 @@ public class VWSimplifier {
     return simp.getResultGeometry();
   }
 
-  private final Geometry inputGeom;
-
   private double distanceTolerance;
+
+  private final Geometry inputGeom;
 
   private boolean isEnsureValidTopology = true;
 

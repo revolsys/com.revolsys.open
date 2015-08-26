@@ -63,9 +63,9 @@ public class Invoke {
   private static final PropertyChangeSupport PROPERTY_CHANGE_SUPPORT = new PropertyChangeSupport(
     Invoke.class);
 
-  private static final List<WeakReference<SwingWorker<?, ?>>> WORKERS = new ArrayList<WeakReference<SwingWorker<?, ?>>>();
-
   private static final List<WeakReference<SwingWorker<?, ?>>> RUNNING_WORKERS = new ArrayList<WeakReference<SwingWorker<?, ?>>>();
+
+  private static final List<WeakReference<SwingWorker<?, ?>>> WORKERS = new ArrayList<WeakReference<SwingWorker<?, ?>>>();
 
   public static void andWait(final Object object, final String methodName,
     final Object... parameters) {

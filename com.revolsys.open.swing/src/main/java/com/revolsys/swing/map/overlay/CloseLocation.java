@@ -17,13 +17,13 @@ public class CloseLocation implements Comparable<CloseLocation> {
 
   private final AbstractRecordLayer layer;
 
-  private final LayerRecord record;
+  private final Point point;
 
-  private Vertex vertex;
+  private final LayerRecord record;
 
   private Segment segment;
 
-  private final Point point;
+  private Vertex vertex;
 
   public CloseLocation(final AbstractRecordLayer layer, final LayerRecord object,
     final Segment segment, final Point point) {

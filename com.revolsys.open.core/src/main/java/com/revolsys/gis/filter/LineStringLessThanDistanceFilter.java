@@ -37,13 +37,13 @@ public class LineStringLessThanDistanceFilter implements Predicate<LineString> {
     return new RecordGeometryFilter<LineString>(lineFilter);
   }
 
+  /** The maximum distance the object can be from the source geometry. */
+  private double distance;
+
   private BoundingBox envelope;
 
   /** The geometry to compare the data objects to to. */
   private LineString geometry;
-
-  /** The maximum distance the object can be from the source geometry. */
-  private double distance;
 
   public LineStringLessThanDistanceFilter() {
   }

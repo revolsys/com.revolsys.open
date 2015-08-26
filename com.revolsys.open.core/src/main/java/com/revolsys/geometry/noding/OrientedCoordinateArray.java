@@ -100,9 +100,9 @@ public class OrientedCoordinateArray implements Comparable<OrientedCoordinateArr
     return 1;
   }
 
-  private final LineString points;
-
   private final boolean orientation;
+
+  private final LineString points;
 
   /**
    * Creates a new {@link OrientedCoordinateArray}

@@ -14,9 +14,9 @@ import com.revolsys.util.ExceptionUtil;
 
 public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
 
-  private EnableCheck checkBoxSelectedCheck;
-
   private final AbstractAction action;
+
+  private EnableCheck checkBoxSelectedCheck;
 
   private String iconName;
 

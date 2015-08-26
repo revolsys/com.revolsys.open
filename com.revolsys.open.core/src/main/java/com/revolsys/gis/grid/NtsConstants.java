@@ -17,6 +17,18 @@ public interface NtsConstants {
 
   double MAX_LONGITUDE = -48;
 
+  String REGEX_1000000 = "([0-9]{2,3})";
+
+  String REGEX_250000 = REGEX_1000000 + "([a-pA-P])";
+
+  String REGEX_125000 = REGEX_250000 + "/?" + "([nsNS])\\.?([ewEW])\\.?";
+
+  String REGEX_50000 = REGEX_250000 + "/?" + "(1[0-6]|0?[1-9])";
+
+  String REGEX_25000 = REGEX_50000 + "([a-hA-H])";
+
+  String REGEX_500000 = REGEX_1000000 + "([nsNS])\\.?([ewEW])\\.?";
+
   String REGEX_EIGHTH_LETTER = "([a-hA-H])";
 
   String REGEX_QUARTER = "([nsNS])\\.?([ewEW])\\.?";
@@ -24,18 +36,6 @@ public interface NtsConstants {
   String REGEX_SIXTEENTH_LETTER = "([a-pA-P])";
 
   String REGEX_SIXTEENTH_NUMBER = "(1[0-6]|0?[1-9])";
-
-  String REGEX_1000000 = "([0-9]{2,3})";
-
-  String REGEX_500000 = REGEX_1000000 + REGEX_QUARTER;
-
-  String REGEX_250000 = REGEX_1000000 + REGEX_SIXTEENTH_LETTER;
-
-  String REGEX_125000 = REGEX_250000 + "/?" + REGEX_QUARTER;
-
-  String REGEX_50000 = REGEX_250000 + "/?" + REGEX_SIXTEENTH_NUMBER;
-
-  String REGEX_25000 = REGEX_50000 + REGEX_EIGHTH_LETTER;
 
   double WIDTH_1000000 = 8;
 

@@ -43,11 +43,11 @@ import java.util.Vector;
  */
 public class CommandLine {
 
+  char optionChar; // the char that indicates an option. Default is '/', which
+
   Hashtable optSpecs = new Hashtable();
 
   Vector optVec = new Vector(); // used to store options in order of entry
-
-  char optionChar; // the char that indicates an option. Default is '/', which
 
   // is
   // NT Standard, but this causes problems on Unix systems, so

@@ -37,13 +37,13 @@ public final class EpsgCoordinateSystemsLoader {
     new EpsgCoordinateSystemsLoader().load();
   }
 
-  private final RecordStore recordStore;
+  private final Map<Integer, Unit<Angle>> angularUnits = new HashMap<Integer, Unit<Angle>>();
 
   private final Map<Integer, Integer> coordinateSystemUnitMap = new HashMap<Integer, Integer>();
 
   private final Map<Integer, Unit<Length>> linearUnits = new HashMap<Integer, Unit<Length>>();
 
-  private final Map<Integer, Unit<Angle>> angularUnits = new HashMap<Integer, Unit<Angle>>();
+  private final RecordStore recordStore;
 
   public EpsgCoordinateSystemsLoader() {
     final Map<String, Object> parameters = new HashMap<String, Object>();

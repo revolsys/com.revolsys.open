@@ -5,11 +5,11 @@ import org.springframework.transaction.TransactionDefinition;
 
 public class TransactionRunnable implements Runnable {
 
-  private final PlatformTransactionManager transactionManager;
+  private final Runnable runnable;
 
   private final TransactionDefinition transactionDefinition;
 
-  private final Runnable runnable;
+  private final PlatformTransactionManager transactionManager;
 
   public TransactionRunnable(final PlatformTransactionManager transactionManager,
     final TransactionDefinition transactionDefinition, final Runnable runnable) {

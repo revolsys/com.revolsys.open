@@ -23,15 +23,15 @@ import org.springframework.util.ReflectionUtils;
 public class HttpSessionSecurityContextRepository implements SecurityContextRepository {
   final class SaveToSessionResponseWrapper extends HttpServletResponseWrapper {
 
-    private final HttpServletRequest request;
-
-    private final boolean httpSessionExistedAtStartOfRequest;
-
     private final int contextHashBeforeChainExecution;
 
     private boolean contextSaved = false;
 
     private final boolean disableUrlRewriting;
+
+    private final boolean httpSessionExistedAtStartOfRequest;
+
+    private final HttpServletRequest request;
 
     SaveToSessionResponseWrapper(final HttpServletResponse response,
       final HttpServletRequest request, final boolean httpSessionExistedAtStartOfRequest,
@@ -158,21 +158,21 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
     }
   }
 
-  public String springSecurityContextKey = "SPRING_SECURITY_CONTEXT";
+  private boolean allowSessionCreation = true;
+
+  private final AuthenticationTrustResolver authenticationTrustResolver = new AuthenticationTrustResolverImpl();
+
+  private final boolean cloneFromHttpSession = false;
+
+  private final Object contextObject = SecurityContextHolder.createEmptyContext();
+
+  private boolean disableUrlRewriting = false;
 
   protected final Log logger = LogFactory.getLog(this.getClass());
 
   private final Class<? extends SecurityContext> securityContextClass = null;
 
-  private final Object contextObject = SecurityContextHolder.createEmptyContext();
-
-  private final boolean cloneFromHttpSession = false;
-
-  private boolean allowSessionCreation = true;
-
-  private boolean disableUrlRewriting = false;
-
-  private final AuthenticationTrustResolver authenticationTrustResolver = new AuthenticationTrustResolverImpl();
+  public String springSecurityContextKey = "SPRING_SECURITY_CONTEXT";
 
   private Object cloneContext(final Object context) {
     Object clonedContext = null;

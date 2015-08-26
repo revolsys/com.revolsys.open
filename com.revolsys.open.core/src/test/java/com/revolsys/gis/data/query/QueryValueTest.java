@@ -19,15 +19,15 @@ public class QueryValueTest {
     new QueryValueTest().run();
   }
 
-  private final RecordDefinitionImpl recordDefinition;
+  private final FieldDefinition descriptionAttribute;
 
   private final FieldDefinition idField;
 
-  private final Record record;
-
   private final FieldDefinition nameAttribute;
 
-  private final FieldDefinition descriptionAttribute;
+  private final Record record;
+
+  private final RecordDefinitionImpl recordDefinition;
 
   public QueryValueTest() {
     this.recordDefinition = new RecordDefinitionImpl(PathName.create("/Test"));

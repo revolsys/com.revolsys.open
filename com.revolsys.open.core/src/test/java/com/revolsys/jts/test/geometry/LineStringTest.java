@@ -17,9 +17,9 @@ import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 
 public class LineStringTest {
 
-  private static final double START_Y = 6000000;
-
   private static final double START_X = 500000;
+
+  private static final double START_Y = 6000000;
 
   public static void assertCoordinatesEquals(final Point point, final double... coordinates) {
     Assert.assertEquals("Is Empty", false, point.isEmpty());

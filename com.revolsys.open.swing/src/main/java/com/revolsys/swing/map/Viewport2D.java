@@ -82,14 +82,6 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     }
   }
 
-  private double pixelsPerXUnit;
-
-  private double pixelsPerYUnit;
-
-  private double originX;
-
-  private double originY;
-
   /** The current bounding box of the project. */
   private BoundingBox boundingBox = BoundingBox.EMPTY;
 
@@ -97,26 +89,34 @@ public class Viewport2D implements PropertyChangeSupportProxy {
 
   private GeometryFactory geometryFactory2d = GeometryFactory.floating(3857, 2);
 
-  private Reference<Project> project;
+  private boolean initialized = false;
 
   private AffineTransform modelToScreenTransform;
 
+  private double originX;
+
+  private double originY;
+
+  private double pixelsPerXUnit;
+
+  private double pixelsPerYUnit;
+
+  private Reference<Project> project;
+
   /** The property change listener support. */
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-
-  private AffineTransform screenToModelTransform;
-
-  private int viewWidth;
-
-  private int viewHeight;
-
-  private double unitsPerPixel;
 
   private double scale;
 
   private List<Long> scales = new ArrayList<Long>();
 
-  private boolean initialized = false;
+  private AffineTransform screenToModelTransform;
+
+  private double unitsPerPixel;
+
+  private int viewHeight;
+
+  private int viewWidth;
 
   public Viewport2D() {
   }

@@ -33,16 +33,16 @@ public class LUDecomposition implements java.io.Serializable {
   */
   private final int m, n;
 
-  private int pivsign;
+  /** Internal storage of pivot vector.
+  @serial pivot vector.
+  */
+  private final int[] piv;
 
   /*
    * ------------------------ Constructor ------------------------
    */
 
-  /** Internal storage of pivot vector.
-  @serial pivot vector.
-  */
-  private final int[] piv;
+  private int pivsign;
 
   /*
    * ------------------------ Temporary, experimental code.

@@ -23,21 +23,21 @@ import com.revolsys.util.Property;
 
 public class RecordStoreQueryListModel implements ListModel {
 
-  private final RecordStore recordStore;
-
   private final String displayFieldName;
 
   protected EventListenerList listDataListeners = new EventListenerList();
+
+  private int maxResults = Integer.MAX_VALUE;
 
   private List<Record> objects = new ArrayList<Record>();
 
   private final List<Query> queries = new ArrayList<Query>();
 
-  private Record selectedItem;
+  private final RecordStore recordStore;
 
   private String searchText = "";
 
-  private int maxResults = Integer.MAX_VALUE;
+  private Record selectedItem;
 
   public RecordStoreQueryListModel(final RecordStore recordStore, final String displayFieldName,
     final List<Query> queries) {

@@ -21,25 +21,25 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 
 public class MapPrintable implements Printable {
-  private double millimetre = Measure.valueOf(1, SI.MILLIMETRE).doubleValue(NonSI.INCH.divide(72));
-
-  private final Rectangle2D contentRect;
-
-  private final Project map;
-
   private final BoundingBox boundingBox;
-
-  private double minorDivisions = 200;
-
-  private double majorDivisions = 1000;
-
-  private final double rulerSizePixels;
 
   private final int column;
 
-  private final int row;
+  private final Rectangle2D contentRect;
 
   private final int dpi;
+
+  private double majorDivisions = 1000;
+
+  private final Project map;
+
+  private double millimetre = Measure.valueOf(1, SI.MILLIMETRE).doubleValue(NonSI.INCH.divide(72));
+
+  private double minorDivisions = 200;
+
+  private final int row;
+
+  private final double rulerSizePixels;
 
   private final double scale;
 

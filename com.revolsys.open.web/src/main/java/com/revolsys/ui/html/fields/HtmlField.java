@@ -23,11 +23,11 @@ import com.revolsys.util.HtmlUtil;
 
 public class HtmlField extends Field {
 
-  private int minLength = 0;
+  private String inputValue = "";
 
   private int maxLength = Integer.MAX_VALUE;
 
-  private String inputValue = "";
+  private int minLength = 0;
 
   public HtmlField(final String name, final boolean required) {
     super(name, required);

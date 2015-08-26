@@ -71,11 +71,11 @@ import com.revolsys.ui.web.config.WebUiContext;
  * @see PageController#getStyles()
  */
 public class StylesTag extends TagSupport {
-  /** The unique serial version UID for the class. */
-  private static final long serialVersionUID = 6250507916829639809L;
-
   /** The log instance. */
   private static final Logger log = Logger.getLogger(StylesTag.class);
+
+  /** The unique serial version UID for the class. */
+  private static final long serialVersionUID = 6250507916829639809L;
 
   /**
    * Process the end tag.

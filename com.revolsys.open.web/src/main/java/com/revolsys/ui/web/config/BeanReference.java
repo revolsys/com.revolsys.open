@@ -6,9 +6,9 @@ import org.springframework.beans.factory.BeanFactoryAware;
 public class BeanReference implements BeanFactoryAware {
   private String bean;
 
-  private String name;
-
   private BeanFactory factory;
+
+  private String name;
 
   /**
    * @return Returns the bean.

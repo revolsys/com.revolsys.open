@@ -9,19 +9,19 @@ import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
 public class TextField extends Field {
-  private String type = "text";
+  private String cssClass = "";
+
+  private String inputValue = "";
+
+  private int maxLength = Integer.MAX_VALUE;
+
+  private int minLength = 0;
 
   private int size = 25;
 
   private String style = null;
 
-  private int minLength = 0;
-
-  private int maxLength = Integer.MAX_VALUE;
-
-  private String inputValue = "";
-
-  private String cssClass = "";
+  private String type = "text";
 
   public TextField() {
   }

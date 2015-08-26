@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ClassClassRegistry<T> {
-  /** The registry of classes to values. */
-  private final Map<Class<?>, Class<?>> registry = new HashMap<Class<?>, Class<?>>();
-
   /** The cache for super class matches. */
   private final Map<Class<?>, Class<?>> findCache = new HashMap<Class<?>, Class<?>>();
+
+  /** The registry of classes to values. */
+  private final Map<Class<?>, Class<?>> registry = new HashMap<Class<?>, Class<?>>();
 
   /**
    * Clear the cache used by the {@link ClassClassRegistry#findClass(Class)}

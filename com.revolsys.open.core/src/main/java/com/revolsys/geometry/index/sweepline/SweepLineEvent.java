@@ -36,19 +36,19 @@ package com.revolsys.geometry.index.sweepline;
  * @version 1.7
  */
 public class SweepLineEvent implements Comparable {
-  public static final int INSERT = 1;
-
   public static final int DELETE = 2;
 
-  private final double xValue;
+  public static final int INSERT = 1;
+
+  private int deleteEventIndex;
 
   private int eventType;
 
   private final SweepLineEvent insertEvent; // null if this is an INSERT event
 
-  private int deleteEventIndex;
-
   SweepLineInterval sweepInt;
+
+  private final double xValue;
 
   public SweepLineEvent(final double x, final SweepLineEvent insertEvent,
     final SweepLineInterval sweepInt) {

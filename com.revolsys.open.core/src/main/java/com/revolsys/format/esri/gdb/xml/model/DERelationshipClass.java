@@ -9,33 +9,33 @@ import com.revolsys.format.esri.gdb.xml.model.enums.RelKeyType;
 import com.revolsys.format.esri.gdb.xml.model.enums.RelNotification;
 
 public class DERelationshipClass extends DETable {
+  private String backwardPathLabel;
+
   private RelCardinality cardinality;
 
-  private RelNotification notification;
+  private RelClassKey classKey;
+
+  private List<RelationshipClassKey> destinationClassKeys;
+
+  private List<String> destinationClassNames = new ArrayList<String>();
+
+  private String forwardPathLabel;
 
   private boolean isAttributed;
 
   private boolean isComposite;
 
-  private List<String> originClassNames = new ArrayList<String>();
-
-  private List<String> destinationClassNames = new ArrayList<String>();
-
-  private RelKeyType reyType;
-
-  private RelClassKey classKey;
-
-  private String forwardPathLabel;
-
-  private String backwardPathLabel;
-
   private boolean isReflexive;
+
+  private RelNotification notification;
 
   private List<RelationshipClassKey> originClassKeys = new ArrayList<RelationshipClassKey>();
 
-  private List<RelationshipClassKey> destinationClassKeys;
+  private List<String> originClassNames = new ArrayList<String>();
 
   private List<RelationshipRule> relationshipRules = new ArrayList<RelationshipRule>();
+
+  private RelKeyType reyType;
 
   public DERelationshipClass() {
     super("");

@@ -61,11 +61,11 @@ public class Node extends GraphComponent {
     return commonEdges;
   }
 
-  /** The location of this Node */
-  protected Point pt;
-
   /** The collection of DirectedEdges that leave this Node */
   protected DirectedEdgeStar deStar;
+
+  /** The location of this Node */
+  protected Point pt;
 
   /**
    * Constructs a Node with the given location.

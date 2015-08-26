@@ -27,9 +27,9 @@ public enum Side {
     }
   }
 
-  private String name;
-
   private char letter;
+
+  private String name;
 
   private Side(final String name) {
     this.name = name;

@@ -23,9 +23,9 @@ import com.revolsys.util.ExceptionUtil;
 
 public class TreeItemScaleMenu implements ComponentFactory<JMenu> {
 
-  private final boolean min;
-
   private final EnableCheck enableCheck;
+
+  private final boolean min;
 
   private String name;
 

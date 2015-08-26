@@ -6,9 +6,9 @@ import com.revolsys.format.xml.XmlWriter;
 
 public class SimpleFieldType extends AbstractEsriGeodatabaseXmlFieldType {
 
-  private final boolean usePrecision;
-
   private int fixedLength = -1;
+
+  private final boolean usePrecision;
 
   public SimpleFieldType(final FieldType esriFieldType, final DataType dataType,
     final boolean usePrecision) {

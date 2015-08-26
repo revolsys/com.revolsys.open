@@ -17,11 +17,11 @@ import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.util.CollectionUtil;
 
 public class CollectionValue extends QueryValue {
-  private List<QueryValue> queryValues = new ArrayList<QueryValue>();
+  private FieldDefinition attribute;
 
   private JdbcFieldDefinition jdbcAttribute;
 
-  private FieldDefinition attribute;
+  private List<QueryValue> queryValues = new ArrayList<QueryValue>();
 
   public CollectionValue(final Collection<? extends Object> values) {
     this(null, values);

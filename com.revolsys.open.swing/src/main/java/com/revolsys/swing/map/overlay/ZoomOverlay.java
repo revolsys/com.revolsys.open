@@ -31,16 +31,11 @@ import com.revolsys.swing.preferences.PreferencesDialog;
 import com.revolsys.util.OS;
 
 public class ZoomOverlay extends AbstractOverlay {
-  public static final BasicStroke ZOOM_BOX_STROKE = new BasicStroke(2, BasicStroke.CAP_SQUARE,
-    BasicStroke.JOIN_MITER, 2, new float[] {
-      6, 6
-  }, 0f);
-
   public static final String ACTION_PAN = "pan";
 
-  public static final String ACTION_ZOOM_BOX = "zoomBox";
-
   public static final String ACTION_ZOOM = "zoom";
+
+  public static final String ACTION_ZOOM_BOX = "zoomBox";
 
   private static final Cursor CURSOR_PAN = new Cursor(Cursor.HAND_CURSOR);
 
@@ -50,30 +45,35 @@ public class ZoomOverlay extends AbstractOverlay {
 
   private static final Color TRANS_BG = new Color(0, 0, 0, 30);
 
+  public static final BasicStroke ZOOM_BOX_STROKE = new BasicStroke(2, BasicStroke.CAP_SQUARE,
+    BasicStroke.JOIN_MITER, 2, new float[] {
+      6, 6
+  }, 0f);
+
   static {
     PreferencesDialog.get().addPreference("Zoom", "com.revolsys.gis", "/com/revolsys/gis/zoom",
       "wheelForwardsZoomIn", Boolean.class, true);
   }
 
-  private BufferedImage panImage;
-
   private int panButton;
 
-  private int zoomBoxX1 = -1;
-
-  private int zoomBoxY1;
-
-  private int zoomBoxX2;
-
-  private int zoomBoxY2;
+  private BufferedImage panImage;
 
   private int panX1 = -1;
 
-  private int panY1 = -1;
-
   private int panX2 = -1;
 
+  private int panY1 = -1;
+
   private int panY2 = -1;
+
+  private int zoomBoxX1 = -1;
+
+  private int zoomBoxX2;
+
+  private int zoomBoxY1;
+
+  private int zoomBoxY2;
 
   public ZoomOverlay(final MapPanel map) {
     super(map);

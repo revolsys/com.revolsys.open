@@ -29,23 +29,23 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   private final List<Axis> axis = new ArrayList<Axis>();
 
+  private CoordinatesProjection coordinatesProjection;
+
   private boolean deprecated;
 
   private final GeographicCoordinateSystem geographicCoordinateSystem;
 
-  private final LinearUnit linearUnit;
-
   private int id;
+
+  private final LinearUnit linearUnit;
 
   private final String name;
 
-  private final Map<String, Object> parameters = new LinkedHashMap<String, Object>();
-
   private final Map<String, Object> normalizedParameters = new TreeMap<String, Object>();
 
-  private final Projection projection;
+  private final Map<String, Object> parameters = new LinkedHashMap<String, Object>();
 
-  private CoordinatesProjection coordinatesProjection;
+  private final Projection projection;
 
   public ProjectedCoordinateSystem(final int id, final String name,
     final GeographicCoordinateSystem geographicCoordinateSystem, final Area area,

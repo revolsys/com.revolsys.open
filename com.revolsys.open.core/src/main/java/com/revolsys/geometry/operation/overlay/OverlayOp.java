@@ -70,24 +70,24 @@ public class OverlayOp extends GeometryGraphOperation {
    */
 
   /**
-   * The code for the Intersection overlay operation.
-   */
-  public static final int INTERSECTION = 1;
-
-  /**
-   * The code for the Union overlay operation.
-   */
-  public static final int UNION = 2;
-
-  /**
    *  The code for the Difference overlay operation.
    */
   public static final int DIFFERENCE = 3;
 
   /**
+   * The code for the Intersection overlay operation.
+   */
+  public static final int INTERSECTION = 1;
+
+  /**
    *  The code for the Symmetric Difference overlay operation.
    */
   public static final int SYMDIFFERENCE = 4;
+
+  /**
+   * The code for the Union overlay operation.
+   */
+  public static final int UNION = 2;
 
   /**
    * Creates an empty result geometry of the appropriate dimension,
@@ -227,21 +227,21 @@ public class OverlayOp extends GeometryGraphOperation {
     return resultDimension;
   }
 
-  private final PointLocator ptLocator = new PointLocator();
+  private final EdgeList edgeList = new EdgeList();
 
   private final GeometryFactory geomFact;
 
-  private Geometry resultGeom;
-
   private final PlanarGraph graph;
 
-  private final EdgeList edgeList = new EdgeList();
+  private final PointLocator ptLocator = new PointLocator();
 
-  private List<Polygon> resultPolyList = new ArrayList<>();
+  private Geometry resultGeom;
 
   private List<LineString> resultLineList = new ArrayList<>();
 
   private List<Point> resultLineString = new ArrayList<>();
+
+  private List<Polygon> resultPolyList = new ArrayList<>();
 
   /**
    * Constructs an instance to compute a single overlay operation

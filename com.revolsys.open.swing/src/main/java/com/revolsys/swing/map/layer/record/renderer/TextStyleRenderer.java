@@ -50,9 +50,9 @@ import com.revolsys.util.Property;
 
 public class TextStyleRenderer extends AbstractRecordLayerRenderer {
 
-  public static final AffineTransform NOOP_TRANSFORM = AffineTransform.getTranslateInstance(0, 0);
-
   private static final Icon ICON = Icons.getIcon("style_text");
+
+  public static final AffineTransform NOOP_TRANSFORM = AffineTransform.getTranslateInstance(0, 0);
 
   public static String getLabel(final Record object, final TextStyle style) {
     if (object == null) {

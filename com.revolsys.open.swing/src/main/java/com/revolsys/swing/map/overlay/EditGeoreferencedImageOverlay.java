@@ -41,22 +41,30 @@ import com.revolsys.swing.undo.ListAddUndo;
 import com.revolsys.swing.undo.SetObjectProperty;
 
 public class EditGeoreferencedImageOverlay extends AbstractOverlay {
+  public static final String ACTION_MOVE_IMAGE = "moveImage";
+
+  private static final String ACTION_MOVE_IMAGE_CORNER = "moveImageCorner";
+
   private static final String ACTION_TIE_POINT_ADD = "Add Tie Point";
+
+  private static final String ACTION_TIE_POINT_MOVE_SOURCE = "moveSourceTiePoint";
+
+  private static final String ACTION_TIE_POINT_MOVE_TARGET = "moveTargetTiePoint";
+
+  private static final Color COLOR_OUTLINE = WebColors.Black;
+
+  private static final Color COLOR_SELECT = WebColors.Cyan;
 
   private static final Cursor CURSOR_MOVE_IMAGE = Icons.getCursor("cursor_move", 8, 7);
 
   private static final Cursor CURSOR_SOURCE_PIXEL_ADD = Icons.getCursor("cursor_source_pixel_add",
     5, 5);
 
-  private static final Color COLOR_OUTLINE = WebColors.Black;
-
-  private static final Color COLOR_SELECT = WebColors.Cyan;
-
   private static final long serialVersionUID = 1L;
 
-  private static final GeometryStyle STYLE_MAPPED_LINE = GeometryStyle.line(COLOR_SELECT, 3);
-
   private static final GeometryStyle STYLE_IMAGE_LINE = GeometryStyle.line(COLOR_SELECT, 1);
+
+  private static final GeometryStyle STYLE_MAPPED_LINE = GeometryStyle.line(COLOR_SELECT, 3);
 
   private static final MarkerStyle STYLE_VERTEX_FIRST_POINT = MarkerStyle
     .marker(SelectedRecordsRenderer.firstVertexShape(), 9, COLOR_OUTLINE, 1, COLOR_SELECT);
@@ -74,15 +82,15 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
     STYLE_VERTEX_LAST_POINT.setMarkerHorizontalAlignment("right");
   }
 
-  public static final String ACTION_MOVE_IMAGE = "moveImage";
-
-  private static final String ACTION_MOVE_IMAGE_CORNER = "moveImageCorner";
-
-  private static final String ACTION_TIE_POINT_MOVE_SOURCE = "moveSourceTiePoint";
-
-  private static final String ACTION_TIE_POINT_MOVE_TARGET = "moveTargetTiePoint";
-
   private Point addTiePointFirstPoint;
+
+  private Point addTiePointMove;
+
+  private GeoreferencedImage cachedImage;
+
+  private List<Integer> closeSourcePixelIndexes = new ArrayList<Integer>();
+
+  private List<Integer> closeTargetPointIndexes = new ArrayList<Integer>();
 
   private GeoreferencedImage image;
 
@@ -92,27 +100,19 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
 
   private Point moveCornerPoint;
 
-  private Point moveImageFirstPoint;
-
   private BoundingBox moveImageBoundingBox;
 
-  private Point addTiePointMove;
-
-  private GeoreferencedImage cachedImage;
-
-  private int moveTiePointIndex = -1;
+  private Point moveImageFirstPoint;
 
   private java.awt.Point moveTiePointEventPoint;
 
-  private List<Integer> closeSourcePixelIndexes = new ArrayList<Integer>();
+  private int moveTiePointIndex = -1;
 
-  private List<Integer> closeTargetPointIndexes = new ArrayList<Integer>();
-
-  private boolean moveTiePointStarted;
+  private Point moveTiePointLocation;
 
   private boolean moveTiePointSource;
 
-  private Point moveTiePointLocation;
+  private boolean moveTiePointStarted;
 
   public EditGeoreferencedImageOverlay(final MapPanel map) {
     super(map);

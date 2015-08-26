@@ -32,11 +32,11 @@ public class NodeLessThanDistanceOfGeometryVisitor<T> implements Consumer<Node<T
 
   private final Geometry geometry;
 
+  private final GeometryFactory geometryFactory;
+
   private final Consumer<Node<T>> matchVisitor;
 
   private final double maxDistance;
-
-  private final GeometryFactory geometryFactory;
 
   public NodeLessThanDistanceOfGeometryVisitor(final Geometry geometry, final double maxDistance,
     final Consumer<Node<T>> matchVisitor) {

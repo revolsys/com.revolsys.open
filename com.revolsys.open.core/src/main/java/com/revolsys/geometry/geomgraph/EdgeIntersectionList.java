@@ -50,10 +50,10 @@ import com.revolsys.geometry.model.impl.PointDouble;
  * @version 1.7
  */
 public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
+  Edge edge; // the parent edge
+
   // a Map <EdgeIntersection, EdgeIntersection>
   private final Map nodeMap = new TreeMap();
-
-  Edge edge; // the parent edge
 
   public EdgeIntersectionList(final Edge edge) {
     this.edge = edge;

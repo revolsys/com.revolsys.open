@@ -1,41 +1,41 @@
 package com.revolsys.format.esri.gdb.xml.model.enums;
 
 public enum FieldType {
-  /** Long Integer. */
-  esriFieldTypeInteger,
-
-  /** Integer. */
-  esriFieldTypeSmallInteger,
-
-  /** Double-precision floating-point number. */
-  esriFieldTypeDouble,
-
-  /** Single-precision floating-point number. */
-  esriFieldTypeSingle,
-
-  /** Character string. */
-  esriFieldTypeString,
+  /** Binary Large Object. */
+  esriFieldTypeBlob,
 
   /** Date. */
   esriFieldTypeDate,
 
+  /** Double-precision floating-point number. */
+  esriFieldTypeDouble,
+
   /** Geometry. */
   esriFieldTypeGeometry,
-
-  /** Long Integer representing an object identifier. */
-  esriFieldTypeOID,
-
-  /** Binary Large Object. */
-  esriFieldTypeBlob,
 
   /** ESRI Global ID. */
   esriFieldTypeGlobalID,
 
+  /** Globally Unique Idendifier. */
+  esriFieldTypeGUID,
+
+  /** Long Integer. */
+  esriFieldTypeInteger,
+
+  /** Long Integer representing an object identifier. */
+  esriFieldTypeOID,
+
   /** Raster. */
   esriFieldTypeRaster,
 
-  /** Globally Unique Idendifier. */
-  esriFieldTypeGUID,
+  /** Single-precision floating-point number. */
+  esriFieldTypeSingle,
+
+  /** Integer. */
+  esriFieldTypeSmallInteger,
+
+  /** Character string. */
+  esriFieldTypeString,
 
   /** XML Document. */
   esriFieldTypeXML,

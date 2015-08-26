@@ -51,11 +51,11 @@ public class EdgeIntersection implements Comparable {
 
   public Point coord; // the point of intersection
 
-  public int segmentIndex; // the index of the containing line segment in the
+  public double dist; // the edge distance of this point along the containing
 
   // parent edge
 
-  public double dist; // the edge distance of this point along the containing
+  public int segmentIndex; // the index of the containing line segment in the
 
   // line segment
 

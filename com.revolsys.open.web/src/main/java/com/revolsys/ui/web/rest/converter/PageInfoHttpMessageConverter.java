@@ -45,13 +45,13 @@ public class PageInfoHttpMessageConverter extends AbstractHttpMessageConverter<P
   private static final MediaType APPLICATION_VND_SUN_WADL_XML = MediaType
     .parseMediaType("application/vnd.sun.wadl+xml");
 
+  private static Map<MediaType, String> MEDIA_TYPE_TO_EXTENSION_MAP = new HashMap<MediaType, String>();
+
   private static final MediaType TEXT_URI_LIST = MediaType.parseMediaType("text/uri-list");
 
   private static final Collection<MediaType> WRITE_MEDIA_TYPES = Arrays.asList(
     MediaType.APPLICATION_XHTML_XML, MediaType.TEXT_HTML, APPLICATION_VND_SUN_WADL_XML,
     TEXT_URI_LIST, MediaType.APPLICATION_JSON, MediaType.TEXT_XML);
-
-  private static Map<MediaType, String> MEDIA_TYPE_TO_EXTENSION_MAP = new HashMap<MediaType, String>();
 
   static {
     MEDIA_TYPE_TO_EXTENSION_MAP.put(MediaType.APPLICATION_XHTML_XML, ".html");

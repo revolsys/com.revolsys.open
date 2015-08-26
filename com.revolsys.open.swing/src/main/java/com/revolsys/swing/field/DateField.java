@@ -18,9 +18,9 @@ import com.revolsys.util.Property;
 public class DateField extends JXDatePicker implements Field, PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
-  private String fieldName;
-
   private String errorMessage;
+
+  private String fieldName;
 
   private Date fieldValue;
 

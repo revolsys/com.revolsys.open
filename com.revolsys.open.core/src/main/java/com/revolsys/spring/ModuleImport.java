@@ -73,27 +73,27 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware, Di
 
   private GenericApplicationContext applicationContext;
 
-  private Map<String, String> exportBeanAliases = Collections.emptyMap();
-
-  private Map<String, String> importBeanAliases = Collections.emptyMap();
-
-  private List<String> exportBeanNames = Collections.emptyList();
-
-  private List<String> importBeanNames = Collections.emptyList();
-
-  private boolean exportAllBeans = false;
-
-  private Map<String, Object> parameters = new HashMap<String, Object>();
-
-  private Collection<Resource> resources = new LinkedHashSet<Resource>();
-
-  private boolean enabled = true;
-
-  private ResourceEditorRegistrar resourceEditorRegistrar = new ResourceEditorRegistrar();
-
   private String beanName;
 
   private Set<String> beanNamesNotToExport = new HashSet<String>();
+
+  private boolean enabled = true;
+
+  private boolean exportAllBeans = false;
+
+  private Map<String, String> exportBeanAliases = Collections.emptyMap();
+
+  private List<String> exportBeanNames = Collections.emptyList();
+
+  private Map<String, String> importBeanAliases = Collections.emptyMap();
+
+  private List<String> importBeanNames = Collections.emptyList();
+
+  private Map<String, Object> parameters = new HashMap<String, Object>();
+
+  private ResourceEditorRegistrar resourceEditorRegistrar = new ResourceEditorRegistrar();
+
+  private Collection<Resource> resources = new LinkedHashSet<Resource>();
 
   public ModuleImport() {
     this.beanNamesNotToExport.add("com.revolsys.spring.config.AttributesBeanConfigurer");

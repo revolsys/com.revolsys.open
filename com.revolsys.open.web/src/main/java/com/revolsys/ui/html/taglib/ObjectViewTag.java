@@ -26,9 +26,9 @@ public class ObjectViewTag extends TagSupport {
 
   private String name;
 
-  private String viewClass;
-
   private ObjectView view;
+
+  private String viewClass;
 
   @Override
   public int doEndTag() throws JspException {

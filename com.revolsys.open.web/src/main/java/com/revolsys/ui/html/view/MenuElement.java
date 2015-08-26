@@ -15,13 +15,13 @@ import com.revolsys.util.Property;
 public class MenuElement extends Element {
   private String cssClass = "menu";
 
+  private JexlHttpServletRequestContext jexlContext;
+
   private Menu menu;
 
   private int numLevels = 1;
 
   private boolean showRoot = true;
-
-  private JexlHttpServletRequestContext jexlContext;
 
   public MenuElement() {
   }

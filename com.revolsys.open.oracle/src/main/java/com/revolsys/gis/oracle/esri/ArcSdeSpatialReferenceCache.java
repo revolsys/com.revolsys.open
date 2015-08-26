@@ -38,9 +38,9 @@ public class ArcSdeSpatialReferenceCache {
     return get(schema).getSpatialReference(esriSrid);
   }
 
-  private final Map<Integer, ArcSdeSpatialReference> spatialReferences = new HashMap<Integer, ArcSdeSpatialReference>();
-
   private AbstractJdbcRecordStore recordStore;
+
+  private final Map<Integer, ArcSdeSpatialReference> spatialReferences = new HashMap<Integer, ArcSdeSpatialReference>();
 
   public ArcSdeSpatialReferenceCache() {
   }

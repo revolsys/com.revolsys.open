@@ -94,6 +94,10 @@ public class Centroid {
 
   private double areasum2 = 0; /* Partial area sum */
 
+  private double centSumX = 0;
+
+  private double centSumY = 0;
+
   private double cg3X;
 
   private double cg3Y;
@@ -103,13 +107,9 @@ public class Centroid {
 
   private double lineCenterY = 0;
 
-  private double totalLength = 0.0;
-
   private int ptCount = 0;
 
-  private double centSumX = 0;
-
-  private double centSumY = 0;
+  private double totalLength = 0.0;
 
   /**
    * Creates a new instance for computing the centroid of a geometry

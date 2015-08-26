@@ -18,12 +18,12 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.parallel.Invoke;
 
 public class Print extends I18nAction {
+  private static final ImageIcon ICON = Icons.getIcon("printer");
+
   /**
    *
    */
   private static final long serialVersionUID = 8194892040166851551L;
-
-  private static final ImageIcon ICON = Icons.getIcon("printer");
 
   private PrintService printService;
 

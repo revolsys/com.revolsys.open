@@ -10,13 +10,13 @@ import com.revolsys.util.ExceptionUtil;
 
 public class LayerInitializer extends SwingWorker<Void, Void> {
 
-  private static final int MAX_WORKERS = 5;
-
-  private static final LinkedList<Layer> LAYERS_TO_INITIALIZE = new LinkedList<Layer>();
+  private static int instanceCount;
 
   private static final LinkedList<Layer> LAYERS_CURRENTLY_INITIALIZING = new LinkedList<Layer>();
 
-  private static int instanceCount;
+  private static final LinkedList<Layer> LAYERS_TO_INITIALIZE = new LinkedList<Layer>();
+
+  private static final int MAX_WORKERS = 5;
 
   public static void initialize(final Layer layer) {
     synchronized (LAYERS_TO_INITIALIZE) {
@@ -32,9 +32,9 @@ public class LayerInitializer extends SwingWorker<Void, Void> {
     }
   }
 
-  private final RecordStoreConnectionRegistry recordStoreRegistry;
-
   private Layer layer;
+
+  private final RecordStoreConnectionRegistry recordStoreRegistry;
 
   public LayerInitializer() {
     this.recordStoreRegistry = RecordStoreConnectionRegistry.getForThread();

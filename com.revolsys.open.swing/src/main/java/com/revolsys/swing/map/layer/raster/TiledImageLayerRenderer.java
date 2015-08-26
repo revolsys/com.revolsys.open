@@ -30,9 +30,9 @@ public class TiledImageLayerRenderer extends AbstractLayerRenderer<AbstractTiled
 
   private GeometryFactory geometryFactory;
 
-  private double resolution;
-
   private final List<Runnable> loadingTasks = new ArrayList<Runnable>();
+
+  private double resolution;
 
   public TiledImageLayerRenderer(final AbstractTiledImageLayer layer) {
     super("tiledImage", layer);

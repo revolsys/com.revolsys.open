@@ -8,13 +8,13 @@ import com.revolsys.geometry.model.util.SineStarFactory;
 import com.revolsys.geometry.util.Stopwatch;
 
 public class TestPerfDistanceGeomSet {
-  static final int MAX_ITER = 1;
-
-  static final int NUM_GEOM = 100;
-
   static final double GEOM_SIZE = 1;
 
+  static final int MAX_ITER = 1;
+
   static final double MAX_X = 100;
+
+  static final int NUM_GEOM = 100;
 
   public static void main(final String[] args) {
     final TestPerfDistanceGeomSet test = new TestPerfDistanceGeomSet();
@@ -22,13 +22,13 @@ public class TestPerfDistanceGeomSet {
     test.test();
   }
 
-  boolean testFailed = false;
-
-  boolean verbose = false;
+  double separationDist = this.size * 2;
 
   double size = 100;
 
-  double separationDist = this.size * 2;
+  boolean testFailed = false;
+
+  boolean verbose = false;
 
   public TestPerfDistanceGeomSet() {
   }

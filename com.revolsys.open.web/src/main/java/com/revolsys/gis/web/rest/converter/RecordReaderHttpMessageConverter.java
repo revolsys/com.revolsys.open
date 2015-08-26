@@ -39,15 +39,15 @@ import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class RecordReaderHttpMessageConverter extends AbstractHttpMessageConverter<RecordReader> {
 
+  private GeometryFactory geometryFactory;
+
+  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
+
   private List<String> requestAttributeNames = Arrays.asList(IoConstants.SINGLE_OBJECT_PROPERTY,
     Kml22Constants.STYLE_URL_PROPERTY, Kml22Constants.LOOK_AT_POINT_PROPERTY,
     Kml22Constants.LOOK_AT_RANGE_PROPERTY, Kml22Constants.LOOK_AT_MIN_RANGE_PROPERTY,
     Kml22Constants.LOOK_AT_MAX_RANGE_PROPERTY, IoConstants.JSONP_PROPERTY,
     IoConstants.TITLE_PROPERTY, IoConstants.DESCRIPTION_PROPERTY);
-
-  private GeometryFactory geometryFactory;
-
-  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
   public RecordReaderHttpMessageConverter() {
     super(RecordReader.class,

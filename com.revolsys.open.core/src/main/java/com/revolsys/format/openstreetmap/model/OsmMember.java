@@ -1,11 +1,11 @@
 package com.revolsys.format.openstreetmap.model;
 
 public class OsmMember {
-  private String type;
+  private long ref;
 
   private String role;
 
-  private long ref;
+  private String type;
 
   public long getRef() {
     return this.ref;

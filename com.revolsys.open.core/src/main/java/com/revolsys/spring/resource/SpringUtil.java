@@ -15,10 +15,10 @@ import com.revolsys.spring.config.AttributesBeanConfigurer;
 
 public class SpringUtil {
 
+  private static final ThreadLocal<Resource> BASE_RESOURCE = new ThreadLocal<Resource>();
+
   public static final Pattern KEY_PATTERN = Pattern
     .compile("(\\w[\\w\\d]*)(?:(?:\\[([\\w\\d]+)\\])|(?:\\.([\\w\\d]+)))?");
-
-  private static final ThreadLocal<Resource> BASE_RESOURCE = new ThreadLocal<Resource>();
 
   public static void close(final ConfigurableApplicationContext applicationContext) {
     if (applicationContext != null) {

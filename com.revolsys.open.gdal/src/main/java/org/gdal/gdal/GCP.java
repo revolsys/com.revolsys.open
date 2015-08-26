@@ -13,9 +13,9 @@ public class GCP {
     return obj == null ? 0 : obj.swigCPtr;
   }
 
-  private long swigCPtr;
-
   protected boolean swigCMemOwn;
+
+  private long swigCPtr;
 
   public GCP(final double x, final double y, final double pixel, final double line) {
     this(x, y, 0.0, pixel, line, "", "");

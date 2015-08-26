@@ -42,9 +42,9 @@ import com.revolsys.geometry.util.Assert;
  */
 public class Interval {
 
-  private double min;
-
   private double max;
+
+  private double min;
 
   public Interval(final double min, final double max) {
     Assert.isTrue(min <= max);

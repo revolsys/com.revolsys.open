@@ -35,21 +35,21 @@ import com.revolsys.spring.resource.Resource;
 
 public class DirectoryRecordStore extends AbstractRecordStore {
 
-  private boolean createMissingTables = true;
+  private boolean createMissingRecordStore = true;
 
-  private final Map<String, Writer<Record>> writers = new HashMap<>();
+  private boolean createMissingTables = true;
 
   private File directory;
 
   private List<String> fileExtensions;
 
-  private Writer<Record> writer;
-
-  private boolean createMissingRecordStore = true;
-
   private final Map<RecordDefinition, Resource> resourcesByRecordDefinition = new HashMap<>();
 
   private final Map<Resource, String> typePathByResource = new HashMap<>();
+
+  private Writer<Record> writer;
+
+  private final Map<String, Writer<Record>> writers = new HashMap<>();
 
   public DirectoryRecordStore(final File directory, final Collection<String> fileExtensions) {
     this.directory = directory;

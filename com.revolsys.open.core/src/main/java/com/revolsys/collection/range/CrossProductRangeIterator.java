@@ -11,9 +11,9 @@ import com.revolsys.util.CollectionUtil;
 public class CrossProductRangeIterator extends AbstractIterator<String> {
   private final List<String> currentValues = new ArrayList<>();
 
-  private final CrossProductRange range;
-
   private List<Iterator<? extends Object>> iterators = new ArrayList<>();
+
+  private final CrossProductRange range;
 
   public CrossProductRangeIterator(final CrossProductRange range) {
     this.range = range;

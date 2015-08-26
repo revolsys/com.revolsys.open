@@ -13,11 +13,11 @@ import com.revolsys.util.HtmlUtil;
 
 public class RegionField extends Field {
 
-  private String stringValue;
+  private String countryCode;
 
   private List<Region> regions = new ArrayList<Region>();
 
-  private String countryCode;
+  private String stringValue;
 
   public RegionField(final String name, final boolean required) {
     super(name, required);

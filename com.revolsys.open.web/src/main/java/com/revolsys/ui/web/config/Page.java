@@ -54,6 +54,10 @@ public class Page extends Component {
 
   private Map<String, Page> pathMap = new HashMap<String, Page>();
 
+  private String permission;
+
+  private Expression permissionExpression;
+
   private final Map<String, String> properties = new HashMap<String, String>();
 
   private boolean secure;
@@ -62,13 +66,9 @@ public class Page extends Component {
 
   private org.apache.commons.jexl.Expression titleExpression;
 
-  private UriTemplate uriTemplate;
-
   private StringTemplate titleTemplate;
 
-  private String permission;
-
-  private Expression permissionExpression;
+  private UriTemplate uriTemplate;
 
   public Page() {
   }

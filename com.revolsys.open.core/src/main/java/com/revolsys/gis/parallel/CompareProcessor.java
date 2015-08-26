@@ -45,6 +45,8 @@ public class CompareProcessor extends AbstractMergeProcess {
 
   private String label;
 
+  private boolean logNotEqualSource = true;
+
   private Statistics notEqualOtherStatistics = new Statistics("Not Equal Other");
 
   private Statistics notEqualSourceStatistics = new Statistics("Not Equal Source");
@@ -56,8 +58,6 @@ public class CompareProcessor extends AbstractMergeProcess {
   private Set<Record> sourceObjects = new LinkedHashSet<Record>();
 
   private final PointRecordMap sourcePointMap = new PointRecordMap();
-
-  private boolean logNotEqualSource = true;
 
   @Override
   protected void addOtherObject(final Record record) {

@@ -53,12 +53,12 @@ public class MCIndexPointSnapper {
   public class HotPixelSnapAction extends MonotoneChainSelectAction {
     private final HotPixel hotPixel;
 
-    private final SegmentString parentEdge;
-
     // is -1 if hotPixel is not a vertex
     private final int hotPixelVertexIndex;
 
     private boolean isNodeAdded = false;
+
+    private final SegmentString parentEdge;
 
     public HotPixelSnapAction(final HotPixel hotPixel, final SegmentString parentEdge,
       final int hotPixelVertexIndex) {

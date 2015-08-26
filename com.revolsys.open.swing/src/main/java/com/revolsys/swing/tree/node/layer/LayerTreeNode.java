@@ -26,11 +26,11 @@ public class LayerTreeNode extends AbstractLayerTreeNode implements MouseListene
 
   private static final Icon EDIT_ICON = Icons.getIcon("pencil");
 
-  private static final Icon SELECT_ICON = Icons.getIcon("map_select");
+  private static final Map<List<Icon>, Icon> ICON_CACHE = new HashMap<List<Icon>, Icon>();
 
   private static final Icon NOT_EXISTS_ICON = Icons.getIcon("error");
 
-  private static final Map<List<Icon>, Icon> ICON_CACHE = new HashMap<List<Icon>, Icon>();
+  private static final Icon SELECT_ICON = Icons.getIcon("map_select");
 
   public LayerTreeNode(final Layer layer) {
     super(layer);

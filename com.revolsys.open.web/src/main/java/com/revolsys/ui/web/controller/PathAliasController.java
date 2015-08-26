@@ -88,9 +88,9 @@ public class PathAliasController implements Controller {
     }
   }
 
-  private String prefix;
-
   private String aliasPrefix;
+
+  private String prefix;
 
   public String getAliasPrefix() {
     return this.aliasPrefix;

@@ -13,21 +13,21 @@ import com.revolsys.ui.html.view.Element;
 
 public class PageInfo extends AbstractDocumentedObject {
 
-  private Map<String, PageInfo> pages = new LinkedHashMap<String, PageInfo>();
-
-  private Map<String, ParameterInfo> parameters = new LinkedHashMap<String, ParameterInfo>();
-
-  private final List<String> methods = new ArrayList<String>();
-
-  private List<MediaType> mediaTypes = new ArrayList<MediaType>();
+  private Map<String, Object> attributes = new LinkedHashMap<String, Object>();
 
   private List<MediaType> inputContentTypes = new ArrayList<MediaType>();
 
-  private String url;
+  private List<MediaType> mediaTypes = new ArrayList<MediaType>();
 
-  private Map<String, Object> attributes = new LinkedHashMap<String, Object>();
+  private final List<String> methods = new ArrayList<String>();
+
+  private Map<String, PageInfo> pages = new LinkedHashMap<String, PageInfo>();
 
   private Element pagesElement;
+
+  private Map<String, ParameterInfo> parameters = new LinkedHashMap<String, ParameterInfo>();
+
+  private String url;
 
   public PageInfo() {
   }

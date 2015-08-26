@@ -18,8 +18,6 @@ import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
 
 public class FontChooserField extends ComboBox {
-  private static final long serialVersionUID = 1L;
-
   private static final String[] FONT_NAMES = getFontNames();
 
   private static final Map<String, Reference<Font>> fontCache = new HashMap<>();
@@ -42,6 +40,8 @@ public class FontChooserField extends ComboBox {
       return renderer;
     }
   };
+
+  private static final long serialVersionUID = 1L;
 
   private static Font getFont(final String name) {
     Reference<Font> reference = fontCache.get(name);

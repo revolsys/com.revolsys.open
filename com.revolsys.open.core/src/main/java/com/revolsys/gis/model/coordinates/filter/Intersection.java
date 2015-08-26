@@ -7,9 +7,9 @@ import com.revolsys.gis.graph.linestring.LineStringGraph;
 
 public class Intersection implements Predicate<LineString> {
 
-  private final LineString line;
-
   private final LineStringGraph graph;
+
+  private final LineString line;
 
   public Intersection(final LineString line) {
     this.line = line;

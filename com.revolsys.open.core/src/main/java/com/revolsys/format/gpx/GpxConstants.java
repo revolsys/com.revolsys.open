@@ -9,9 +9,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 
 public final class GpxConstants {
-
-  public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3(4326);
-
   public static final String GPX_NS = "gpx";
 
   public static final String GPX_NS_URI = "http://www.topografix.com/GPX/1/1";
@@ -26,7 +23,17 @@ public final class GpxConstants {
 
   public static final QName EXTENSION_ELEMENT = new QName(GPX_NS_URI, "extensions");
 
+  public static final String FILE_EXTENSION = "gpx";
+
+  public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3(4326);
+
   public static final QName GPX_ELEMENT = new QName(GPX_NS_URI, "gpx");
+
+  public static final RecordDefinitionImpl GPX_ROUTE = new RecordDefinitionImpl(
+    PathName.create("/gpx/route"));
+
+  public static final RecordDefinitionImpl GPX_TRACK = new RecordDefinitionImpl(
+    PathName.create("/gpx/track"));
 
   public static final RecordDefinitionImpl GPX_TYPE = new RecordDefinitionImpl(
     PathName.create("/gpx"));
@@ -34,15 +41,11 @@ public final class GpxConstants {
   public static final RecordDefinitionImpl GPX_WAYPOINT = new RecordDefinitionImpl(
     PathName.create("/gpx/waypoint"));
 
-  public static final RecordDefinitionImpl GPX_TRACK = new RecordDefinitionImpl(
-    PathName.create("/gpx/track"));
-
-  public static final RecordDefinitionImpl GPX_ROUTE = new RecordDefinitionImpl(
-    PathName.create("/gpx/route"));
-
   public static final QName LAT_ATTRIBUTE = new QName(null, "lat");
 
   public static final QName LON_ATTRIBUTE = new QName(null, "lon");
+
+  public static final String MEDIA_TYPE = "application/gpx+xml";
 
   public static final QName METADATA_ELEMENT = new QName(GPX_NS_URI, "metadata");
 
@@ -67,10 +70,6 @@ public final class GpxConstants {
   public static final QName VERSION_ATTRIBUTE = new QName(null, "version");
 
   public static final QName WAYPOINT_ELEMENT = new QName(GPX_NS_URI, "wpt");
-
-  public static final String FILE_EXTENSION = "gpx";
-
-  public static final String MEDIA_TYPE = "application/gpx+xml";
 
   static {
     addField("dataset_name", DataTypes.STRING, false);

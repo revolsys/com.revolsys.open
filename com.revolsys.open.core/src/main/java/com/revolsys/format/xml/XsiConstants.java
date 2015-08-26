@@ -11,10 +11,10 @@ public class XsiConstants {
 
   public static final QName NIL = new QName(_NAMESPACE_URI, "nil", _PREFIX);
 
+  public static final QName NO_NAMESPACE_SCHEMA_LOCATION = new QName(_NAMESPACE_URI,
+    "noNamespaceSchemaLocation", _PREFIX);
+
   public static final String PREFIX = _PREFIX;
 
   public static final QName TYPE = new QName(_NAMESPACE_URI, "type", _PREFIX);
-
-  public static final QName NO_NAMESPACE_SCHEMA_LOCATION = new QName(_NAMESPACE_URI,
-    "noNamespaceSchemaLocation", _PREFIX);
 }

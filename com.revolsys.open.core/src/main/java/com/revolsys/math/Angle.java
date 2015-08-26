@@ -41,20 +41,20 @@ import com.revolsys.util.MathUtil;
  * Unless otherwise noted, methods in this class express angles in radians.
  */
 public class Angle {
-  public static final double PI_TIMES_2 = 2.0 * Math.PI;
+  /** Constant representing clockwise orientation */
+  public static final int CLOCKWISE = CGAlgorithms.CLOCKWISE;
+
+  /** Constant representing counterclockwise orientation */
+  public static final int COUNTERCLOCKWISE = CGAlgorithms.COUNTERCLOCKWISE;
+
+  /** Constant representing no orientation */
+  public static final int NONE = CGAlgorithms.COLLINEAR;
 
   public static final double PI_OVER_2 = Math.PI / 2.0;
 
   public static final double PI_OVER_4 = Math.PI / 4.0;
 
-  /** Constant representing counterclockwise orientation */
-  public static final int COUNTERCLOCKWISE = CGAlgorithms.COUNTERCLOCKWISE;
-
-  /** Constant representing clockwise orientation */
-  public static final int CLOCKWISE = CGAlgorithms.CLOCKWISE;
-
-  /** Constant representing no orientation */
-  public static final int NONE = CGAlgorithms.COLLINEAR;
+  public static final double PI_TIMES_2 = 2.0 * Math.PI;
 
   /**
    * Calculate the angle of a coordinates

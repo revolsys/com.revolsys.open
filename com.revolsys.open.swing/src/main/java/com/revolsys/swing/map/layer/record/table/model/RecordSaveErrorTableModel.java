@@ -40,11 +40,11 @@ public class RecordSaveErrorTableModel extends RecordListTableModel
     return new TablePanel(table);
   }
 
+  private final List<Throwable> exceptions = new ArrayList<>();
+
   private final AbstractRecordLayer layer;
 
   private final List<String> messages = new ArrayList<>();
-
-  private final List<Throwable> exceptions = new ArrayList<>();
 
   public RecordSaveErrorTableModel(final AbstractRecordLayer layer) {
     super(layer.getRecordDefinition(), Collections.<LayerRecord> emptyList(),

@@ -46,11 +46,11 @@ public class Stopwatch {
     return totalTimeStr;
   }
 
+  private boolean isRunning = false;
+
   private long startTimestamp;
 
   private long totalTime = 0;
-
-  private boolean isRunning = false;
 
   public Stopwatch() {
     start();

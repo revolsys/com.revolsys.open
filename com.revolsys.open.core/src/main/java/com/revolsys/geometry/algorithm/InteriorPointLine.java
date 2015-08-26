@@ -55,9 +55,9 @@ public class InteriorPointLine {
 
   private final Point centroid;
 
-  private double minDistance = Double.MAX_VALUE;
-
   private Point interiorPoint = null;
+
+  private double minDistance = Double.MAX_VALUE;
 
   public InteriorPointLine(final Geometry g) {
     this.centroid = g.getCentroid();

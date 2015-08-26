@@ -16,9 +16,9 @@ public interface OsmConstants {
 
   String OSM = "osm";
 
-  QName TAG = new QName("tag");
-
   QName RELATION = new QName("relation");
+
+  QName TAG = new QName("tag");
 
   QName WAY = new QName("way");
 
@@ -26,9 +26,9 @@ public interface OsmConstants {
 
   List<QName> NODE_XML_ELEMENTS = Arrays.asList(TAG);
 
-  List<QName> WAY_XML_ELEMENTS = Arrays.asList(TAG, ND);
+  List<QName> OSM_XML_ELEMENTS = Arrays.asList(BOUNDS, NODE, WAY, RELATION);
 
   List<QName> RELATION_XML_ELEMENTS = Arrays.asList(TAG);
 
-  List<QName> OSM_XML_ELEMENTS = Arrays.asList(BOUNDS, NODE, WAY, RELATION);
+  List<QName> WAY_XML_ELEMENTS = Arrays.asList(TAG, ND);
 }

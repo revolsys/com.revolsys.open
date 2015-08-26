@@ -34,8 +34,6 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
 
   private boolean closeFile = true;
 
-  private RecordFactory recordDefinitionFactory;
-
   private GeometryFactory geometryFactory;
 
   private EndianInput in;
@@ -44,21 +42,23 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
 
   private boolean mappedFile;
 
-  private RecordDefinition recordDefinition;
-
   private final String name;
 
   private int position;
 
+  private RecordDefinition recordDefinition;
+
+  private RecordFactory recordDefinitionFactory;
+
   private Resource resource;
+
+  private RecordDefinition returnRecordDefinition;
 
   private int shapeType;
 
-  private XbaseIterator xbaseIterator;
-
   private PathName typeName;
 
-  private RecordDefinition returnRecordDefinition;
+  private XbaseIterator xbaseIterator;
 
   public ShapefileIterator(final Resource resource, final RecordFactory factory)
     throws IOException {

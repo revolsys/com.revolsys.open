@@ -16,11 +16,11 @@ import com.revolsys.gis.converter.process.SourceToTargetProcess;
 import com.revolsys.util.CollectionUtil;
 
 public class SimpleRecordConveter implements Converter<Record, Record> {
-  private RecordDefinition recordDefinition;
-
   private RecordFactory factory;
 
   private List<SourceToTargetProcess<Record, Record>> processors = new ArrayList<SourceToTargetProcess<Record, Record>>();
+
+  private RecordDefinition recordDefinition;
 
   public SimpleRecordConveter() {
   }

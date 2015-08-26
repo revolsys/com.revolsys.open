@@ -20,9 +20,9 @@ public class StringTemplate implements Serializable {
    */
   private static class Parser {
 
-    private final List<String> variableNames = new LinkedList<String>();
-
     private final StringBuilder patternBuilder = new StringBuilder();
+
+    private final List<String> variableNames = new LinkedList<String>();
 
     private Parser(final String uriTemplate) {
       Assert.hasText(uriTemplate, "'template' must not be null");
@@ -53,15 +53,15 @@ public class StringTemplate implements Serializable {
     }
   }
 
-  private static final long serialVersionUID = 1L;
-
   private static final Pattern NAMES_PATTERN = Pattern.compile("\\{([^/]+?)\\}");
+
+  private static final long serialVersionUID = 1L;
 
   private static final String VALUE_REGEX = "(.*)";
 
-  private List<String> variableNames;
-
   private final String template;
+
+  private List<String> variableNames;
 
   public StringTemplate(final String template) {
     this.template = template;

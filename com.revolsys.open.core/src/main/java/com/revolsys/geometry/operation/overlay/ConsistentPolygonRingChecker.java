@@ -57,9 +57,9 @@ import com.revolsys.geometry.model.TopologyException;
 public class ConsistentPolygonRingChecker {
   private final PlanarGraph graph;
 
-  private final int SCANNING_FOR_INCOMING = 1;
-
   private final int LINKING_TO_OUTGOING = 2;
+
+  private final int SCANNING_FOR_INCOMING = 1;
 
   public ConsistentPolygonRingChecker(final PlanarGraph graph) {
     this.graph = graph;

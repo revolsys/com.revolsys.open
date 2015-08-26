@@ -42,14 +42,6 @@ package com.revolsys.geometry.model;
  */
 public enum Location {
   /**
-   *  Used for uninitialized location values.
-   */
-  NONE(-1), /**
-            * The location value for the interior of a geometry.
-            * Also, DE-9IM row index of the interior of the first geometry and column index of
-            *  the interior of the second geometry.
-            */
-  INTERIOR(0), /**
                * The location value for the boundary of a geometry.
                * Also, DE-9IM row index of the boundary of the first geometry and column index of
                *  the boundary of the second geometry.
@@ -59,7 +51,15 @@ public enum Location {
                * Also, DE-9IM row index of the exterior of the first geometry and column index of
                *  the exterior of the second geometry.
                */
-  EXTERIOR(2);
+  EXTERIOR(2), /**
+            * The location value for the interior of a geometry.
+            * Also, DE-9IM row index of the interior of the first geometry and column index of
+            *  the interior of the second geometry.
+            */
+  INTERIOR(0), /**
+   *  Used for uninitialized location values.
+   */
+  NONE(-1);
 
   /**
    *  Converts the location value to a location symbol, for example, <code>EXTERIOR => 'e'</code>

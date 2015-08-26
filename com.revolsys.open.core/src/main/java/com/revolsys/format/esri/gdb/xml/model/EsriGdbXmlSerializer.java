@@ -37,29 +37,29 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     return writer.toString();
   }
 
+  private final Map<Class<?>, Map<QName, Method>> classPropertyMethodMap = new HashMap<Class<?>, Map<QName, Method>>();
+
   private final Map<Class<?>, Set<QName>> classPropertyTagNamesMap = new HashMap<Class<?>, Set<QName>>();
 
   private final Map<Class<?>, QName> classTagNameMap = new HashMap<Class<?>, QName>();
 
+  private final Map<Class<?>, QName> classTypeNameMap = new LinkedHashMap<Class<?>, QName>();
+
   private final Map<Class<?>, QName> classXsiTagNameMap = new HashMap<Class<?>, QName>();
 
-  private final Map<QName, QName> tagNameXsiTagNameMap = new HashMap<QName, QName>();
+  private XmlWriter out;
 
   private final Map<QName, QName> tagNameChildTagNameMap = new HashMap<QName, QName>();
 
   private final Map<QName, QName> tagNameListElementTagNameMap = new HashMap<QName, QName>();
 
-  private final Map<Class<?>, Map<QName, Method>> classPropertyMethodMap = new HashMap<Class<?>, Map<QName, Method>>();
-
-  private XmlWriter out;
-
-  private boolean writeNamespaces;
+  private final Map<QName, QName> tagNameXsiTagNameMap = new HashMap<QName, QName>();
 
   private boolean writeFirstNamespace;
 
-  private boolean writeNull;
+  private boolean writeNamespaces;
 
-  private final Map<Class<?>, QName> classTypeNameMap = new LinkedHashMap<Class<?>, QName>();
+  private boolean writeNull;
 
   private final Set<QName> xsiTypeTypeNames = new HashSet<QName>();
 

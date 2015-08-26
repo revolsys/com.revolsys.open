@@ -20,6 +20,8 @@ import com.revolsys.io.Paths;
 import com.revolsys.util.WrappedException;
 
 public class CsvRecordWriter extends AbstractRecordWriter {
+  private final boolean ewkt;
+
   private final char fieldSeparator;
 
   /** The writer */
@@ -28,8 +30,6 @@ public class CsvRecordWriter extends AbstractRecordWriter {
   private final RecordDefinition recordDefinition;
 
   private final boolean useQuotes;
-
-  private final boolean ewkt;
 
   public CsvRecordWriter(final RecordDefinition recordDefinition, final Path path,
     final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {

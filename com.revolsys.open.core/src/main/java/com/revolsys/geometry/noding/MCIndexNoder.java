@@ -69,11 +69,11 @@ public class MCIndexNoder extends SinglePassNoder {
 
   }
 
-  private final List<MonotoneChain> monoChains = new ArrayList<>();
+  private int idCounter = 0;
 
   private final SpatialIndex index = new STRtree();
 
-  private int idCounter = 0;
+  private final List<MonotoneChain> monoChains = new ArrayList<>();
 
   private Collection<NodedSegmentString> nodedSegStrings;
 

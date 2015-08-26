@@ -64,10 +64,10 @@ import com.revolsys.ui.web.config.WebUiContext;
  * @see Layout
  */
 public class IncludeTag extends TagSupport {
+  private static final Logger log = Logger.getLogger(IncludeTag.class);
+
   /** The unique serial version UID for the class. */
   private static final long serialVersionUID = -4012541088677153589L;
-
-  private static final Logger log = Logger.getLogger(IncludeTag.class);
 
   /** The name of the component to include */
   private String name;

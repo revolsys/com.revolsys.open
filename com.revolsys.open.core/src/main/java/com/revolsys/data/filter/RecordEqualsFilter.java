@@ -10,9 +10,9 @@ import com.revolsys.data.record.Record;
 import com.revolsys.geometry.model.Geometry;
 
 public class RecordEqualsFilter implements Predicate<Record> {
-  private EqualsRegistry equalsRegistry = EqualsInstance.INSTANCE;
-
   private final Collection<String> equalExclude = new HashSet<String>();
+
+  private EqualsRegistry equalsRegistry = EqualsInstance.INSTANCE;
 
   private final Record searchObject;
 

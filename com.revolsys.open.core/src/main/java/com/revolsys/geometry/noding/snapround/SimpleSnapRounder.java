@@ -68,9 +68,9 @@ public class SimpleSnapRounder implements Noder {
 
   private final LineIntersector li;
 
-  private final double scaleFactor;
-
   private Collection nodedSegStrings;
+
+  private final double scaleFactor;
 
   public SimpleSnapRounder(final double scale) {
     this.scaleFactor = scale;

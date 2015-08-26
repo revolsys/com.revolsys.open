@@ -248,13 +248,19 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   private boolean canEditRecords = true;
 
-  private List<String> fieldNames = Collections.emptyList();
-
   private Object editSync;
 
-  private List<Record> formRecords = new LinkedList<>();
+  private List<String> fieldNames = Collections.emptyList();
+
+  private String fieldNamesSetName = ALL;
+
+  private List<String> fieldNamesSetNames = new ArrayList<>();
+
+  private Map<String, List<String>> fieldNamesSets = new HashMap<>();
 
   private List<Component> formComponents = new LinkedList<>();
+
+  private List<Record> formRecords = new LinkedList<>();
 
   private List<Window> formWindows = new LinkedList<>();
 
@@ -274,12 +280,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   private boolean useFieldTitles = false;
 
   private Set<String> userReadOnlyFieldNames = new LinkedHashSet<>();
-
-  private List<String> fieldNamesSetNames = new ArrayList<>();
-
-  private Map<String, List<String>> fieldNamesSets = new HashMap<>();
-
-  private String fieldNamesSetName = ALL;
 
   private String where;
 

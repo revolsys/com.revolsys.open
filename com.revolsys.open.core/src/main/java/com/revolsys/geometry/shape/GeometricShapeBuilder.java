@@ -45,9 +45,9 @@ import com.revolsys.geometry.model.segment.LineSegmentDouble;
 public abstract class GeometricShapeBuilder {
   protected BoundingBox extent = new BoundingBoxDoubleGf(2, 0, 0, 1, 1);
 
-  protected int numPts = 0;
-
   protected GeometryFactory geometryFactory;
+
+  protected int numPts = 0;
 
   public GeometricShapeBuilder(final GeometryFactory geomFactory) {
     this.geometryFactory = geomFactory;

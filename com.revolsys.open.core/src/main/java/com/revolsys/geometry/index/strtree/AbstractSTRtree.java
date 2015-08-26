@@ -76,18 +76,16 @@ public abstract class AbstractSTRtree implements Emptyable, Serializable {
     boolean intersects(Object aBounds, Object bBounds);
   }
 
+  private static final int DEFAULT_NODE_CAPACITY = 10;
+
   /**
    *
    */
   private static final long serialVersionUID = -3886435814360241337L;
 
-  private static final int DEFAULT_NODE_CAPACITY = 10;
-
   protected static int compareDoubles(final double a, final double b) {
     return a > b ? 1 : a < b ? -1 : 0;
   }
-
-  protected AbstractNode root;
 
   private boolean built = false;
 
@@ -97,6 +95,8 @@ public abstract class AbstractSTRtree implements Emptyable, Serializable {
   private ArrayList itemBoundables = new ArrayList();
 
   private final int nodeCapacity;
+
+  protected AbstractNode root;
 
   /**
    * Constructs an AbstractSTRtree with the

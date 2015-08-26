@@ -17,13 +17,13 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.util.UriTemplate;
 
 public class SqlLayerFilter implements Predicate<Record>, MapSerializer {
-  private final String query;
-
   private Condition condition;
+
+  private boolean initialized;
 
   private final AbstractRecordLayer layer;
 
-  private boolean initialized;
+  private final String query;
 
   public SqlLayerFilter(final AbstractRecordLayer layer, final String query) {
     this.layer = layer;

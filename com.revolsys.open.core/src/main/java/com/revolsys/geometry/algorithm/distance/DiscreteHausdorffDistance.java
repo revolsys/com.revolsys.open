@@ -87,16 +87,16 @@ public class DiscreteHausdorffDistance {
     return dist.distance();
   }
 
+  /**
+   * Value of 0.0 indicates that no densification should take place
+   */
+  private double densifyFrac = 0.0;
+
   private final Geometry g0;
 
   private final Geometry g1;
 
   private final PointPairDistance ptDist = new PointPairDistance();
-
-  /**
-   * Value of 0.0 indicates that no densification should take place
-   */
-  private double densifyFrac = 0.0;
 
   public DiscreteHausdorffDistance(final Geometry g0, final Geometry g1) {
     this.g0 = g0;

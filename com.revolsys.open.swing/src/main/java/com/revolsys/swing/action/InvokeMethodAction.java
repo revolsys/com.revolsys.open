@@ -62,11 +62,11 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
     return action.createComponent();
   }
 
+  private String iconName;
+
   private boolean invokeLater;
 
   private Runnable runnable;
-
-  private String iconName;
 
   public InvokeMethodAction() {
   }

@@ -59,9 +59,9 @@ public class PreparedMultiLineString extends AbstractMultiLineString {
    */
   private static final long serialVersionUID = 1L;
 
-  private FastSegmentSetIntersectionFinder segIntFinder = null;
-
   private final MultiLineString multiLine;
+
+  private FastSegmentSetIntersectionFinder segIntFinder = null;
 
   public PreparedMultiLineString(final MultiLineString multiLine) {
     this.multiLine = multiLine;

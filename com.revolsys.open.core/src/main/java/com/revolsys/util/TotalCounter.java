@@ -1,9 +1,9 @@
 package com.revolsys.util;
 
 public class TotalCounter implements Counter {
-  private final Counter total;
-
   private final Counter counter;
+
+  private final Counter total;
 
   public TotalCounter(final Counter total, final Counter counter) {
     this.total = total;

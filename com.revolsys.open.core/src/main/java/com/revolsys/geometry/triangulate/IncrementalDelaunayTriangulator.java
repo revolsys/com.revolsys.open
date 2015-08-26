@@ -49,9 +49,9 @@ import com.revolsys.geometry.triangulate.quadedge.Vertex;
  * @version 1.0
  */
 public class IncrementalDelaunayTriangulator {
-  private final QuadEdgeSubdivision subdiv;
-
   private boolean isUsingTolerance = false;
+
+  private final QuadEdgeSubdivision subdiv;
 
   /**
    * Creates a new triangulator using the given {@link QuadEdgeSubdivision}.

@@ -165,7 +165,6 @@ public class LineSegmentUtil {
         return Math.abs(s) * Math.sqrt(dx2x1 * dx2x1 + dy2y1 * dy2y1);
       }
     }
-
   }
 
   /**

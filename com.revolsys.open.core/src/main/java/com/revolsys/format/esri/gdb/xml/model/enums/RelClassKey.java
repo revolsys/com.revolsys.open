@@ -1,8 +1,8 @@
 package com.revolsys.format.esri.gdb.xml.model.enums;
 
 public enum RelClassKey {
-  /** Code is undefined */
-  esriRelClassKeyUndefined, /** GDB ClassID is used */
-  esriRelClassKeyClassID, /** User provided code is used */
-  esriRelClassKeyClassCode;
+  /** User provided code is used */
+  esriRelClassKeyClassCode, /** GDB ClassID is used */
+  esriRelClassKeyClassID, /** Code is undefined */
+  esriRelClassKeyUndefined;
 }

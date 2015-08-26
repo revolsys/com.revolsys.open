@@ -8,9 +8,9 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.swing.SwingUtil;
 
 public class DefaultValueUiBuilder implements ValueUiBuilder {
-  private final JLabel defaultRenderer;
-
   private JComponent component;
+
+  private final JLabel defaultRenderer;
 
   public DefaultValueUiBuilder() {
     this.defaultRenderer = new JLabel();

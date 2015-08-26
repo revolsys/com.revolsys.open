@@ -20,11 +20,11 @@ import com.revolsys.swing.table.record.renderer.SingleRecordTableCellRenderer;
 import com.revolsys.util.CollectionUtil;
 
 public abstract class AbstractSingleRecordTableModel extends AbstractRecordTableModel {
-  private static final long serialVersionUID = 1L;
-
   private static final String[] COLUMN_NAMES = {
     "#", "Name", "Value"
   };
+
+  private static final long serialVersionUID = 1L;
 
   public static BaseJTable createTable(final AbstractSingleRecordTableModel model) {
     final BaseJTable table = new BaseJTable(model);

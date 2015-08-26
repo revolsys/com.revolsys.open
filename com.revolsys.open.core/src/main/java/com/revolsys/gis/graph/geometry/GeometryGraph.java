@@ -30,15 +30,15 @@ import com.revolsys.gis.graph.visitor.NodeLessThanDistanceOfCoordinatesVisitor;
 
 public class GeometryGraph extends Graph<LineSegment> {
 
-  private final List<Point> points = new ArrayList<Point>();
+  private BoundingBox boundingBox;
 
   private final List<Geometry> geometries = new ArrayList<Geometry>();
 
-  private final List<Point> startPoints = new ArrayList<Point>();
-
-  private BoundingBox boundingBox;
-
   private double maxDistance;
+
+  private final List<Point> points = new ArrayList<Point>();
+
+  private final List<Point> startPoints = new ArrayList<Point>();
 
   public GeometryGraph(final Geometry geometry) {
     this(geometry.getGeometryFactory());

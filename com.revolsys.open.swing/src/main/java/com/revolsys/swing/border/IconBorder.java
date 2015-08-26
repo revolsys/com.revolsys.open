@@ -52,22 +52,22 @@ import org.jdesktop.swingx.icon.EmptyIcon;
 public class IconBorder implements Border, Serializable {
 
   /**
-   *
-   */
-  private static final long serialVersionUID = 1L;
-
-  /**
    * An empty icon.
    */
   public static final Icon EMPTY_ICON = new EmptyIcon(16, 16);
 
-  private int padding;
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
 
   private Icon icon;
 
+  private final Rectangle iconBounds = new Rectangle();
+
   private int iconPosition;
 
-  private final Rectangle iconBounds = new Rectangle();
+  private int padding;
 
   /**
    * Creates an {@code IconBorder} with an empty icon in a trailing position

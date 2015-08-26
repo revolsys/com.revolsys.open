@@ -1,17 +1,17 @@
 package com.revolsys.gis.wms.capabilities;
 
 public class ContactInformation {
+  private ContactAddress contactAddress;
+
+  private String contactElectronicMailAddress;
+
+  private String contactFacsimileTelephone;
+
   private ContactPersonPrimary contactPersonPrimary;
 
   private String contactPosition;
 
-  private ContactAddress contactAddress;
-
   private String contactVoiceTelephone;
-
-  private String contactFacsimileTelephone;
-
-  private String contactElectronicMailAddress;
 
   public ContactAddress getContactAddress() {
     return this.contactAddress;

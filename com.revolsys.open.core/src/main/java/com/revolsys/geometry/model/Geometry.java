@@ -169,6 +169,8 @@ import com.revolsys.util.Emptyable;
 public interface Geometry
   extends Cloneable, Comparable<Object>, Emptyable, Serializable, DataTypeProxy {
 
+  int M = 3;
+
   List<String> sortedGeometryTypes = Collections
     .unmodifiableList(Arrays.asList("Point", "MultiPoint", "LineString", "LinearRing",
       "MultiLineString", "Polygon", "MultiPolygon", "GeometryCollection"));
@@ -181,8 +183,6 @@ public interface Geometry
   int Y = 1;
 
   int Z = 2;
-
-  int M = 3;
 
   <V extends Geometry> V appendVertex(Point newPoint, int... geometryId);
 

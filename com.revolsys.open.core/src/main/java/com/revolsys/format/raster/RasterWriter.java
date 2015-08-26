@@ -8,23 +8,23 @@ import com.revolsys.util.Property;
 
 public class RasterWriter implements AutoCloseable {
 
+  private static final int ELEVATIONS = 9;
+
   private static final byte PROPERTY_BOOLEAN = 1;
 
   private static final byte PROPERTY_BYTE = 2;
 
-  private static final byte PROPERTY_SHORT = 3;
+  private static final byte PROPERTY_DOUBLE = 7;
+
+  private static final byte PROPERTY_FLOAT = 6;
 
   private static final byte PROPERTY_INT = 4;
 
   private static final byte PROPERTY_LONG = 5;
 
-  private static final byte PROPERTY_FLOAT = 6;
-
-  private static final byte PROPERTY_DOUBLE = 7;
+  private static final byte PROPERTY_SHORT = 3;
 
   private static final byte PROPERTY_STRING = 8;
-
-  private static final int ELEVATIONS = 9;
 
   private final EndianOutputStream out;
 

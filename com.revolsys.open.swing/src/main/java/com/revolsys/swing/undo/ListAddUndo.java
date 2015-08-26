@@ -8,11 +8,11 @@ import java.util.List;
 public class ListAddUndo extends AbstractUndoableEdit {
   private static final long serialVersionUID = 1;
 
+  private int index;
+
   private final List list;
 
   private final Object value;
-
-  private int index;
 
   public ListAddUndo(final List list, final int index, final Object value) {
     super();

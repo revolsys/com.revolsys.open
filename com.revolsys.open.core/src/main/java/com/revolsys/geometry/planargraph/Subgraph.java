@@ -49,13 +49,13 @@ import java.util.Set;
  * all associated components must already exist in the parent graph.
  */
 public class Subgraph {
-  protected PlanarGraph parentGraph;
+  protected List dirEdges = new ArrayList();
 
   protected Set edges = new HashSet();
 
-  protected List dirEdges = new ArrayList();
-
   protected NodeMap nodeMap = new NodeMap();
+
+  protected PlanarGraph parentGraph;
 
   /**
    * Creates a new subgraph of the given {@link PlanarGraph}

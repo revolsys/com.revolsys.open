@@ -81,15 +81,15 @@ public class OverlayResultValidator {
     return validator.isValid(overlayOp);
   }
 
+  private double boundaryDistanceTolerance = TOLERANCE;
+
   private final Geometry[] geom;
-
-  private final FuzzyPointLocator[] locFinder;
-
-  private final Location[] location = new Location[3];
 
   private Point invalidLocation = null;
 
-  private double boundaryDistanceTolerance = TOLERANCE;
+  private final Location[] location = new Location[3];
+
+  private final FuzzyPointLocator[] locFinder;
 
   private final List<Point> testCoords = new ArrayList<>();
 

@@ -18,11 +18,11 @@ import java.util.Set;
 /* without needing a finalize() method */
 
 class FeatureNative extends WeakReference {
-  static private ReferenceQueue refQueue = new ReferenceQueue();
+  static private Thread cleanupThread = null;
 
   static private Set refList = Collections.synchronizedSet(new HashSet());
 
-  static private Thread cleanupThread = null;
+  static private ReferenceQueue refQueue = new ReferenceQueue();
 
   /* We start a cleanup thread in daemon mode */
   /* If we can't, we'll cleanup garbaged features at creation time */

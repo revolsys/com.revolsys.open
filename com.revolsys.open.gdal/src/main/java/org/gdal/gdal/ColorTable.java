@@ -17,9 +17,9 @@ public class ColorTable implements Cloneable {
     return obj == null ? 0 : obj.swigCPtr;
   }
 
-  private long swigCPtr;
-
   protected boolean swigCMemOwn;
+
+  private long swigCPtr;
 
   public ColorTable() {
     this(gdalJNI.new_ColorTable__SWIG_1(), true);

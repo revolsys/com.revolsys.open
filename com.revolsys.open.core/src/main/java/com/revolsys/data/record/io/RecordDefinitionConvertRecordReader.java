@@ -15,13 +15,13 @@ import com.revolsys.io.Reader;
 public class RecordDefinitionConvertRecordReader extends AbstractReader<Record>
   implements RecordReader, Iterator<Record> {
 
-  private final RecordDefinition recordDefinition;
-
-  private final Reader<Record> reader;
+  private Iterator<Record> iterator;
 
   private boolean open;
 
-  private Iterator<Record> iterator;
+  private final Reader<Record> reader;
+
+  private final RecordDefinition recordDefinition;
 
   public RecordDefinitionConvertRecordReader(final RecordDefinition recordDefinition,
     final Reader<Record> reader) {

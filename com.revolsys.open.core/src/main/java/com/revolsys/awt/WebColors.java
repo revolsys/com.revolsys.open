@@ -9,8 +9,6 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 
 public class WebColors {
-  private static final Map<Color, String> COLOR_NAMES = new LinkedHashMap<Color, String>();
-
   public static final Color AliceBlue = new Color(240, 248, 255);
 
   public static final Color AntiqueWhite = new Color(250, 235, 215);
@@ -42,6 +40,8 @@ public class WebColors {
   public static final Color Chartreuse = new Color(127, 255, 0);
 
   public static final Color Chocolate = new Color(210, 105, 30);
+
+  private static final Map<Color, String> COLOR_NAMES = new LinkedHashMap<Color, String>();
 
   public static final Color Coral = new Color(255, 127, 80);
 

@@ -80,14 +80,14 @@ public class ConnectedInteriorTester {
     return null;
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.floating3();
-
-  private final GeometryGraph geomGraph;
-
   // save a coordinate for any disconnected interior found
   // the coordinate will be somewhere on the ring surrounding the disconnected
   // interior
   private Point disconnectedRingcoord;
+
+  private final GeometryFactory geometryFactory = GeometryFactory.floating3();
+
+  private final GeometryGraph geomGraph;
 
   public ConnectedInteriorTester(final GeometryGraph geomGraph) {
     this.geomGraph = geomGraph;

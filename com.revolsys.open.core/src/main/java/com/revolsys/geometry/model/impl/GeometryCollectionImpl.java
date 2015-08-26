@@ -54,25 +54,25 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection {
   private static final long serialVersionUID = -5694727726395021467L;
 
   /**
-   * The {@link GeometryFactory} used to create this Geometry
-   */
-  private final GeometryFactory geometryFactory;
-
-  /**
    *  The bounding box of this <code>Geometry</code>.
    */
   private BoundingBox boundingBox;
+
+  /**
+   *  Internal representation of this <code>GeometryCollection</code>.
+   */
+  private Geometry[] geometries;
+
+  /**
+   * The {@link GeometryFactory} used to create this Geometry
+   */
+  private final GeometryFactory geometryFactory;
 
   /**
    * An object reference which can be used to carry ancillary data defined
    * by the client.
    */
   private Object userData;
-
-  /**
-   *  Internal representation of this <code>GeometryCollection</code>.
-   */
-  private Geometry[] geometries;
 
   public GeometryCollectionImpl(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;

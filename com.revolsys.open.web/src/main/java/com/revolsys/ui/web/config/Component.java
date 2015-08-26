@@ -33,21 +33,21 @@ import com.revolsys.ui.html.view.Style;
 public class Component {
   private static final String EMPTY_STRING = "";
 
-  private String name;
+  private Collection actions = new LinkedHashSet();
 
-  private String file;
+  private String area;
 
   private final HashMap fields = new HashMap();
 
-  private Collection actions = new LinkedHashSet();
+  private String file;
 
-  private Collection styles = new LinkedHashSet();
-
-  private Collection scripts = new LinkedHashSet();
+  private String name;
 
   private final Collection onLoads = new LinkedHashSet();
 
-  private String area;
+  private Collection scripts = new LinkedHashSet();
+
+  private Collection styles = new LinkedHashSet();
 
   public Component() {
   }

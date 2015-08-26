@@ -17,17 +17,17 @@ import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.field.Field;
 
 public class PreferencesDialog extends JDialog {
-  private static final long serialVersionUID = 1L;
-
   private static final PreferencesDialog INSTANCE = new PreferencesDialog();
+
+  private static final long serialVersionUID = 1L;
 
   public static PreferencesDialog get() {
     return INSTANCE;
   }
 
-  private final JTabbedPane tabs = new JTabbedPane();
-
   private final Map<String, PreferencesPanel> panels = new HashMap<String, PreferencesPanel>();
+
+  private final JTabbedPane tabs = new JTabbedPane();
 
   public PreferencesDialog() {
     super(null, "Preferences", ModalityType.APPLICATION_MODAL);

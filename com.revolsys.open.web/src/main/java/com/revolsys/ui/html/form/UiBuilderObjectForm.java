@@ -18,11 +18,11 @@ import com.revolsys.util.Property;
 public class UiBuilderObjectForm extends Form {
   private final HtmlUiBuilder<?> builder;
 
+  private final ElementContainer fieldContainer = new ElementContainer(new TableBody());
+
   private List<String> fieldKeys;
 
   private final Object object;
-
-  private final ElementContainer fieldContainer = new ElementContainer(new TableBody());
 
   public UiBuilderObjectForm(final Object object, final HtmlUiBuilder<?> uiBuilder,
     final List<String> fieldKeys) {

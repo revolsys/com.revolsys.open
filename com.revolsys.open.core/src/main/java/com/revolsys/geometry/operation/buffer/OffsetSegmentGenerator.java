@@ -62,10 +62,9 @@ import com.revolsys.math.Angle;
 class OffsetSegmentGenerator {
 
   /**
-   * Factor which controls how close offset segments can be to
-   * skip adding a filler or mitre.
+   * Factor which controls how close curve vertices can be to be snapped
    */
-  private static final double OFFSET_SEGMENT_SEPARATION_FACTOR = 1.0E-3;
+  private static final double CURVE_VERTEX_SNAP_DISTANCE_FACTOR = 1.0E-6;
 
   /**
    * Factor which controls how close curve vertices on inside turns can be to be snapped
@@ -73,20 +72,17 @@ class OffsetSegmentGenerator {
   private static final double INSIDE_TURN_VERTEX_SNAP_DISTANCE_FACTOR = 1.0E-3;
 
   /**
-   * Factor which controls how close curve vertices can be to be snapped
-   */
-  private static final double CURVE_VERTEX_SNAP_DISTANCE_FACTOR = 1.0E-6;
-
-  /**
    * Factor which determines how short closing segs can be for round buffers
    */
   private static final int MAX_CLOSING_SEG_LEN_FACTOR = 80;
 
   /**
-   * The angle quantum with which to approximate a fillet curve
-   * (based on the input # of quadrant segments)
+   * Factor which controls how close offset segments can be to
+   * skip adding a filler or mitre.
    */
-  private final double filletAngleQuantum;
+  private static final double OFFSET_SEGMENT_SEPARATION_FACTOR = 1.0E-3;
+
+  private final BufferParameters bufParams;
 
   /**
    * The Closing Segment Length Factor controls how long
@@ -105,15 +101,23 @@ class OffsetSegmentGenerator {
    */
   private int closingSegLengthFactor = 1;
 
-  private OffsetSegmentString segList;
-
   private double distance = 0.0;
 
-  private final GeometryFactory precisionModel;
+  /**
+   * The angle quantum with which to approximate a fillet curve
+   * (based on the input # of quadrant segments)
+   */
+  private final double filletAngleQuantum;
 
-  private final BufferParameters bufParams;
+  private boolean hasNarrowConcaveAngle = false;
 
   private final LineIntersector li;
+
+  private LineSegment offset0;
+
+  private LineSegment offset1;
+
+  private final GeometryFactory precisionModel;
 
   private Point s0;
 
@@ -121,13 +125,9 @@ class OffsetSegmentGenerator {
 
   private Point s2;
 
-  private LineSegment offset0;
-
-  private LineSegment offset1;
+  private OffsetSegmentString segList;
 
   private int side = 0;
-
-  private boolean hasNarrowConcaveAngle = false;
 
   public OffsetSegmentGenerator(final GeometryFactory precisionModel,
     final BufferParameters bufParams, final double distance) {

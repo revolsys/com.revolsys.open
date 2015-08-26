@@ -21,11 +21,11 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
 
   private static final long serialVersionUID = 1L;
 
-  private LayerRecord record;
+  private final Reference<RecordLayerForm> form;
 
   private final AbstractRecordLayer layer;
 
-  private final Reference<RecordLayerForm> form;
+  private LayerRecord record;
 
   public LayerRecordTableModel(final RecordLayerForm form) {
     super(form.getRecordDefinition(), true);

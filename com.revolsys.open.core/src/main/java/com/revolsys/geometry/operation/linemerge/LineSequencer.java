@@ -190,18 +190,18 @@ public class LineSequencer {
     return sequencer.getSequencedLineStrings();
   }
 
-  private final LineMergeGraph graph = new LineMergeGraph();
-
   // initialize with default, in case no lines are input
   private GeometryFactory factory = GeometryFactory.floating3();
 
-  private int lineCount = 0;
+  private final LineMergeGraph graph = new LineMergeGraph();
 
   private boolean isRun = false;
 
-  private Geometry sequencedGeometry = null;
-
   private boolean isSequenceable = false;
+
+  private int lineCount = 0;
+
+  private Geometry sequencedGeometry = null;
 
   /**
    * Adds a {@link Collection} of {@link Geometry}s to be sequenced.

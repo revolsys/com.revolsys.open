@@ -8,12 +8,12 @@ import com.revolsys.util.Label;
 
 public class CachedLayerRecordArrayList extends ArrayList<LayerRecord> {
 
+  private static final AtomicInteger COUNT = new AtomicInteger();
+
   /**
    *
    */
   private static final long serialVersionUID = 1L;
-
-  private static final AtomicInteger COUNT = new AtomicInteger();
 
   private final Label cacheId = new Label("list_" + COUNT.incrementAndGet());
 

@@ -54,14 +54,14 @@ import com.revolsys.geometry.model.Polygon;
  * @author Martin Davis
  */
 public class BufferResultValidator {
-  private static boolean VERBOSE = false;
-
   /**
    * Maximum allowable fraction of buffer distance the
    * actual distance can differ by.
    * 1% sometimes causes an error - 1.2% should be safe.
    */
   private static final double MAX_ENV_DIFF_FRAC = .012;
+
+  private static boolean VERBOSE = false;
 
   public static boolean isValid(final Geometry g, final double distance, final Geometry result) {
     final BufferResultValidator validator = new BufferResultValidator(g, distance, result);
@@ -89,19 +89,19 @@ public class BufferResultValidator {
     return null;
   }
 
-  private final Geometry input;
-
   private final double distance;
 
-  private final Geometry result;
-
-  private boolean isValid = true;
-
-  private String errorMsg = null;
+  private Geometry errorIndicator = null;
 
   private Point errorLocation = null;
 
-  private Geometry errorIndicator = null;
+  private String errorMsg = null;
+
+  private final Geometry input;
+
+  private boolean isValid = true;
+
+  private final Geometry result;
 
   public BufferResultValidator(final Geometry input, final double distance, final Geometry result) {
     this.input = input;

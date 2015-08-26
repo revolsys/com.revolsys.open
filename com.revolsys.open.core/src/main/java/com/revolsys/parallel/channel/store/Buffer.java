@@ -24,10 +24,10 @@ public class Buffer<T> extends ChannelValueStore<T> {
   /** The storage for the buffered Objects */
   private Queue<T> buffer = new LinkedList<T>();
 
+  private boolean discardIfFull;
+
   /** The max size of the Buffer */
   private int maxSize;
-
-  private boolean discardIfFull;
 
   /**
    * Construct a new Buffer with no maximum size.

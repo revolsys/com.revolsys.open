@@ -43,9 +43,9 @@ import com.revolsys.geometry.triangulate.quadedge.Vertex;
  * @author Martin Davis
  */
 public class ConstraintVertex extends Vertex {
-  private boolean isOnConstraint;
-
   private Object constraint = null;
+
+  private boolean isOnConstraint;
 
   /**
    * Creates a new constraint vertex

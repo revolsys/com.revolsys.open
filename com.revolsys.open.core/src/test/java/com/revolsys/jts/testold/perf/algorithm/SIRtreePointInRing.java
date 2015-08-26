@@ -55,11 +55,11 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 @Deprecated
 public class SIRtreePointInRing implements PointInRing {
 
+  private int crossings = 0; // number of segment/ray crossings
+
   private final LinearRing ring;
 
   private SIRtree sirTree;
-
-  private int crossings = 0; // number of segment/ray crossings
 
   public SIRtreePointInRing(final LinearRing ring) {
     this.ring = ring;

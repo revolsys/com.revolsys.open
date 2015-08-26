@@ -24,11 +24,11 @@ import com.revolsys.util.Property;
 public class TextStylePanel extends BaseStylePanel implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
-  private final TextStyleRenderer textStyleRenderer;
+  private JPanel previews;
 
   private final TextStyle textStyle;
 
-  private JPanel previews;
+  private final TextStyleRenderer textStyleRenderer;
 
   public TextStylePanel(final TextStyleRenderer textStyleRenderer) {
     super(textStyleRenderer);

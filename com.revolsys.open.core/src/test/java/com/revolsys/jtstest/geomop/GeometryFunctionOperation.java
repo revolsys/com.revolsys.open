@@ -55,11 +55,11 @@ import com.revolsys.jtstest.testrunner.Result;
  */
 public class GeometryFunctionOperation implements GeometryOperation {
 
-  private GeometryFunctionRegistry registry = null;
+  private final ArgumentConverter argConverter = new ArgumentConverter();
 
   private final GeometryOperation defaultOp = new GeometryMethodOperation();
 
-  private final ArgumentConverter argConverter = new ArgumentConverter();
+  private GeometryFunctionRegistry registry = null;
 
   public GeometryFunctionOperation() {
   }

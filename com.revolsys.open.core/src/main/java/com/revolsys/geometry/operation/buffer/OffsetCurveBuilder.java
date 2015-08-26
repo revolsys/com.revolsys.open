@@ -71,11 +71,11 @@ public class OffsetCurveBuilder {
     return bufDistance / SIMPLIFY_FACTOR;
   }
 
+  private final BufferParameters bufParams;
+
   private double distance = 0.0;
 
   private final GeometryFactory precisionModel;
-
-  private final BufferParameters bufParams;
 
   public OffsetCurveBuilder(final GeometryFactory precisionModel,
     final BufferParameters bufParams) {

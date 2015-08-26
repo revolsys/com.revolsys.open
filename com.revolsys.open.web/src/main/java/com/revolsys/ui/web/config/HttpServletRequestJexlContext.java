@@ -31,11 +31,11 @@ import org.springframework.web.util.UrlPathHelper;
 
 public class HttpServletRequestJexlContext implements JexlContext {
 
-  private final UrlPathHelper urlPathHelper = new UrlPathHelper();
+  private final ThreadLocal<Map<String, Object>> localAttributes = new ThreadLocal<Map<String, Object>>();
 
   private final ServletContext servletContext;
 
-  private final ThreadLocal<Map<String, Object>> localAttributes = new ThreadLocal<Map<String, Object>>();
+  private final UrlPathHelper urlPathHelper = new UrlPathHelper();
 
   public HttpServletRequestJexlContext(final ServletContext servletContext) {
     this.servletContext = servletContext;

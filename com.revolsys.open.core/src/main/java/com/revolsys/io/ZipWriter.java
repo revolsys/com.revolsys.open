@@ -15,9 +15,9 @@ import java.io.OutputStream;
  */
 public class ZipWriter<T> extends DelegatingWriter<T> {
 
-  private final File tempDirectory;
-
   private final OutputStream out;
+
+  private final File tempDirectory;
 
   public ZipWriter(final File tempDirectory, final Writer<T> writer, final OutputStream out) {
     super(writer);

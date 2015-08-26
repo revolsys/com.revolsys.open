@@ -12,17 +12,17 @@ import com.revolsys.geometry.model.impl.PointDouble;
 public class PerturbedGridPolygonBuilder {
   private final GeometryFactory geomFactory;
 
-  private final double gridWidth = 1000;
+  private Geometry grid;
 
-  private int numLines = 10;
+  private final double gridWidth = 1000;
 
   private double lineWidth = 20;
 
-  private long seed = 0;
+  private int numLines = 10;
 
   private Random rand;
 
-  private Geometry grid;
+  private long seed = 0;
 
   public PerturbedGridPolygonBuilder(final GeometryFactory geomFactory) {
     this.geomFactory = geomFactory;

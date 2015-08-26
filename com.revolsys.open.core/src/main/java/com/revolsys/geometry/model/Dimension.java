@@ -43,29 +43,9 @@ package com.revolsys.geometry.model;
 public class Dimension {
 
   /**
-   *  Dimension value of a point (0).
-   */
-  public final static int P = 0;
-
-  /**
-   *  Dimension value of a curve (1).
-   */
-  public final static int L = 1;
-
-  /**
    *  Dimension value of a surface (2).
    */
   public final static int A = 2;
-
-  /**
-   *  Dimension value of the empty geometry (-1).
-   */
-  public final static int FALSE = -1;
-
-  /**
-   *  Dimension value of non-empty geometries (= {P, L, A}).
-   */
-  public final static int TRUE = -2;
 
   /**
    *  Dimension value for any dimension (= {FALSE, TRUE}).
@@ -73,14 +53,24 @@ public class Dimension {
   public final static int DONTCARE = -3;
 
   /**
-   * Symbol for the FALSE pattern matrix entry
+   *  Dimension value of the empty geometry (-1).
    */
-  public final static char SYM_FALSE = 'F';
+  public final static int FALSE = -1;
 
   /**
-   * Symbol for the TRUE pattern matrix entry
+   *  Dimension value of a curve (1).
    */
-  public final static char SYM_TRUE = 'T';
+  public final static int L = 1;
+
+  /**
+   *  Dimension value of a point (0).
+   */
+  public final static int P = 0;
+
+  /**
+   * Symbol for the A (dimension 2) pattern matrix entry
+   */
+  public final static char SYM_A = '2';
 
   /**
    * Symbol for the DONTCARE pattern matrix entry
@@ -88,9 +78,9 @@ public class Dimension {
   public final static char SYM_DONTCARE = '*';
 
   /**
-   * Symbol for the P (dimension 0) pattern matrix entry
+   * Symbol for the FALSE pattern matrix entry
    */
-  public final static char SYM_P = '0';
+  public final static char SYM_FALSE = 'F';
 
   /**
    * Symbol for the L (dimension 1) pattern matrix entry
@@ -98,9 +88,19 @@ public class Dimension {
   public final static char SYM_L = '1';
 
   /**
-   * Symbol for the A (dimension 2) pattern matrix entry
+   * Symbol for the P (dimension 0) pattern matrix entry
    */
-  public final static char SYM_A = '2';
+  public final static char SYM_P = '0';
+
+  /**
+   * Symbol for the TRUE pattern matrix entry
+   */
+  public final static char SYM_TRUE = 'T';
+
+  /**
+   *  Dimension value of non-empty geometries (= {P, L, A}).
+   */
+  public final static int TRUE = -2;
 
   /**
    *  Converts the dimension value to a dimension symbol, for example, <code>TRUE => 'T'</code>

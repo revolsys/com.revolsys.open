@@ -99,11 +99,11 @@ public abstract class GraphComponent {
     }
   }
 
+  private Object data;
+
   protected boolean isMarked = false;
 
   protected boolean isVisited = false;
-
-  private Object data;
 
   public GraphComponent() {
   }

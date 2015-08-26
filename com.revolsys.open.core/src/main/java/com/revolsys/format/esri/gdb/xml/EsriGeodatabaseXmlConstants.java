@@ -18,12 +18,10 @@ public interface EsriGeodatabaseXmlConstants {
 
   QName AREA_FIELD_NAME = new QName(_NAMESPACE_URI, "AreaFieldName", _NAMESPACE_PREFIX);
 
-  QName ARRAY_OF_CONTROLLER_MEMBERSHIP = new QName(_NAMESPACE_URI, "ArrayOfControllerMembership",
-    _NAMESPACE_PREFIX);
-
   QName ARRAY_OF_CODED_VALUE = new QName(_NAMESPACE_URI, "ArrayOfCodedValue", _NAMESPACE_PREFIX);
 
-  QName CODE = new QName(_NAMESPACE_URI, "Code", _NAMESPACE_PREFIX);
+  QName ARRAY_OF_CONTROLLER_MEMBERSHIP = new QName(_NAMESPACE_URI, "ArrayOfControllerMembership",
+    _NAMESPACE_PREFIX);
 
   QName ARRAY_OF_DATA_ELEMENT = new QName(_NAMESPACE_URI, "ArrayOfDataElement", _NAMESPACE_PREFIX);
 
@@ -47,6 +45,8 @@ public interface EsriGeodatabaseXmlConstants {
   QName CHILDREN_EXPANDED = new QName(_NAMESPACE_URI, "ChildrenExpanded", _NAMESPACE_PREFIX);
 
   QName CLSID = new QName(_NAMESPACE_URI, "CLSID", _NAMESPACE_PREFIX);
+
+  QName CODE = new QName(_NAMESPACE_URI, "Code", _NAMESPACE_PREFIX);
 
   QName CODED_VALUE = new QName(_NAMESPACE_URI, "CodedValue", _NAMESPACE_PREFIX);
 
@@ -107,13 +107,15 @@ public interface EsriGeodatabaseXmlConstants {
 
   QName DEFAULT_VALUE = new QName(_NAMESPACE_URI, "DefaultValue", _NAMESPACE_PREFIX);
 
-  QName DOMAIN_NAME = new QName(_NAMESPACE_URI, "DomainName", _NAMESPACE_PREFIX);
-
-  QName DOMAINS = new QName(_NAMESPACE_URI, "Domains", _NAMESPACE_PREFIX);
+  QName DESCRIPTION = new QName(_NAMESPACE_URI, "Description", _NAMESPACE_PREFIX);
 
   QName DOMAIN = new QName(_NAMESPACE_URI, "Domain", _NAMESPACE_PREFIX);
 
   QName DOMAIN_FIXED = new QName(_NAMESPACE_URI, "DomainFixed", _NAMESPACE_PREFIX);
+
+  QName DOMAIN_NAME = new QName(_NAMESPACE_URI, "DomainName", _NAMESPACE_PREFIX);
+
+  QName DOMAINS = new QName(_NAMESPACE_URI, "Domains", _NAMESPACE_PREFIX);
 
   String DOMAINS_TYPE = "esri:ArrayOfDomain";
 
@@ -126,6 +128,8 @@ public interface EsriGeodatabaseXmlConstants {
   QName ENVELOPE_N = new QName(_NAMESPACE_URI, "EnvelopeN", _NAMESPACE_PREFIX);
 
   String ENVELOPE_N_TYPE = "esri:EnvelopeN";
+
+  String ESRI_OBJECT_ID_FIELD_NAME = "ESRI_OBJECT_ID_FIELD_NAME";
 
   QName EXTCLSID = new QName(_NAMESPACE_URI, "EXTCLSID", _NAMESPACE_PREFIX);
 
@@ -148,14 +152,6 @@ public interface EsriGeodatabaseXmlConstants {
   QName FIELD_NAME = new QName(_NAMESPACE_URI, "FieldName", _NAMESPACE_PREFIX);
 
   QName FIELD_TYPE = new QName(_NAMESPACE_URI, "FieldType", _NAMESPACE_PREFIX);
-
-  QName MERGE_POLICY = new QName(_NAMESPACE_URI, "MergePolicy", _NAMESPACE_PREFIX);
-
-  QName SPLIT_POLICY = new QName(_NAMESPACE_URI, "SplitPolicy", _NAMESPACE_PREFIX);
-
-  QName DESCRIPTION = new QName(_NAMESPACE_URI, "Description", _NAMESPACE_PREFIX);
-
-  QName OWNER = new QName(_NAMESPACE_URI, "Owner", _NAMESPACE_PREFIX);
 
   String FIELD_TYPE_BLOB = "esriFieldTypeBlob";
 
@@ -272,6 +268,8 @@ public interface EsriGeodatabaseXmlConstants {
 
   String MEDIA_TYPE = "text/xml";
 
+  QName MERGE_POLICY = new QName(_NAMESPACE_URI, "MergePolicy", _NAMESPACE_PREFIX);
+
   QName METADATA = new QName(_NAMESPACE_URI, "Metadata", _NAMESPACE_PREFIX);
 
   QName METADATA_RETRIEVED = new QName(_NAMESPACE_URI, "MetadataRetrieved", _NAMESPACE_PREFIX);
@@ -286,9 +284,9 @@ public interface EsriGeodatabaseXmlConstants {
 
   String NAMESPACE_URI_93 = "http://www.esri.com/schemas/ArcGIS/9.3";
 
-  String ESRI_OBJECT_ID_FIELD_NAME = "ESRI_OBJECT_ID_FIELD_NAME";
-
   QName OBJECT_ID_FIELD_NAME = new QName(_NAMESPACE_URI, "OIDFieldName", _NAMESPACE_PREFIX);
+
+  QName OWNER = new QName(_NAMESPACE_URI, "Owner", _NAMESPACE_PREFIX);
 
   QName PATH = new QName(_NAMESPACE_URI, "Path", _NAMESPACE_PREFIX);
 
@@ -357,6 +355,8 @@ public interface EsriGeodatabaseXmlConstants {
   QName SHAPE_TYPE = new QName(_NAMESPACE_URI, "ShapeType", _NAMESPACE_PREFIX);
 
   QName SPATIAL_REFERENCE = new QName(_NAMESPACE_URI, "SpatialReference", _NAMESPACE_PREFIX);
+
+  QName SPLIT_POLICY = new QName(_NAMESPACE_URI, "SplitPolicy", _NAMESPACE_PREFIX);
 
   QName SUBTYPE = new QName(_NAMESPACE_URI, "Subtype", _NAMESPACE_PREFIX);
 

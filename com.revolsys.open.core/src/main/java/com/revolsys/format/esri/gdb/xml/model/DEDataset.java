@@ -3,17 +3,17 @@ package com.revolsys.format.esri.gdb.xml.model;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class DEDataset extends DataElement {
-  private final AtomicInteger DSID = new AtomicInteger(0);
+  private boolean canVersion;
+
+  private String configurationKeyword = "";
 
   private String datasetType;
 
   private int dsid = this.DSID.incrementAndGet();
 
+  private final AtomicInteger DSID = new AtomicInteger(0);
+
   private boolean versioned;
-
-  private boolean canVersion;
-
-  private String configurationKeyword = "";
 
   public String getConfigurationKeyword() {
     return this.configurationKeyword;

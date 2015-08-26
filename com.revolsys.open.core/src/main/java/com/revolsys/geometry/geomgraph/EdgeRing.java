@@ -50,20 +50,20 @@ import com.revolsys.geometry.util.Assert;
  */
 public abstract class EdgeRing {
 
-  protected DirectedEdge startDe; // the directed edge which starts the list of
+  private final List<DirectedEdge> edges = new ArrayList<>(); // the
 
   // edges for this EdgeRing
 
-  private int maxNodeDegree = -1;
+  protected GeometryFactory geometryFactory;
 
-  private final List<DirectedEdge> edges = new ArrayList<>(); // the
+  private final List<EdgeRing> holes = new ArrayList<EdgeRing>(); // a list of
 
   // DirectedEdges
   // making up
 
   // this EdgeRing
 
-  private final List<Point> pts = new ArrayList<>();
+  private boolean isHole;
 
   private final Label label = new Label(Location.NONE); // label stores the
 
@@ -72,22 +72,22 @@ public abstract class EdgeRing {
   // surrounded by this
   // ring
 
+  private int maxNodeDegree = -1;
+
+  private final List<Point> pts = new ArrayList<>();
+
   private LinearRing ring; // the ring created for this EdgeRing
-
-  private boolean isHole;
-
-  private EdgeRing shell; // if non-null, the ring is a hole and this EdgeRing
 
   // is its containing shell
 
-  private final List<EdgeRing> holes = new ArrayList<EdgeRing>(); // a list of
+  private EdgeRing shell; // if non-null, the ring is a hole and this EdgeRing
 
   // EdgeRings
   // which
 
   // are holes in this EdgeRing
 
-  protected GeometryFactory geometryFactory;
+  protected DirectedEdge startDe; // the directed edge which starts the list of
 
   public EdgeRing(final DirectedEdge start, final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;

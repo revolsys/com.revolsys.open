@@ -56,9 +56,9 @@ import com.revolsys.geometry.model.Point;
  * @version 1.7
  */
 public abstract class PlanarGraph {
-  protected Set<Edge> edges = new HashSet<Edge>();
-
   protected Set<DirectedEdge> dirEdges = new HashSet<DirectedEdge>();
+
+  protected Set<Edge> edges = new HashSet<Edge>();
 
   protected NodeMap nodeMap = new NodeMap();
 

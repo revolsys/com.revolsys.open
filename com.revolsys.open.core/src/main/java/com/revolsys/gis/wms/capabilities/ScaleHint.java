@@ -1,9 +1,9 @@
 package com.revolsys.gis.wms.capabilities;
 
 public class ScaleHint {
-  private double min;
-
   private double max;
+
+  private double min;
 
   public double getMax() {
     return this.max;

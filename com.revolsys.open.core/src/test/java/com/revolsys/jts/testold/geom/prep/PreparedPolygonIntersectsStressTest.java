@@ -54,9 +54,9 @@ import junit.textui.TestRunner;
  *
  */
 public class PreparedPolygonIntersectsStressTest extends TestCase {
-  static final int MAX_ITER = 10000;
-
   private static final GeometryFactory fact = GeometryFactory.floating(0, 2);
+
+  static final int MAX_ITER = 10000;
 
   private static WKTReader wktRdr = new WKTReader(fact);
 

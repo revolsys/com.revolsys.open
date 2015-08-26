@@ -9,11 +9,11 @@ import com.revolsys.format.xml.XsiConstants;
 public abstract class AbstractEsriGeodatabaseXmlFieldType
   implements EsriGeodatabaseXmlFieldType, EsriGeodatabaseXmlConstants {
 
+  private final DataType dataType;
+
   private final FieldType esriFieldType;
 
   private final String xmlSchemaTypeName;
-
-  private final DataType dataType;
 
   public AbstractEsriGeodatabaseXmlFieldType(final DataType dataType,
     final String xmlSchemaTypeName, final FieldType esriFieldType) {

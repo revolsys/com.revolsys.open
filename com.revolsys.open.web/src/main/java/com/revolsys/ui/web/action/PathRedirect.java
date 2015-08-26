@@ -11,9 +11,9 @@ import com.revolsys.ui.web.exception.ActionException;
 import com.revolsys.ui.web.exception.ActionInitException;
 
 public class PathRedirect extends IafAction {
-  private String path;
-
   private String basePath;
+
+  private String path;
 
   @Override
   public void init(final ActionConfig config) throws ActionInitException {

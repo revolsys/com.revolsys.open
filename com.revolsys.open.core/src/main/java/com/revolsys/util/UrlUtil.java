@@ -40,13 +40,13 @@ import com.revolsys.io.FileUtil;
  */
 public final class UrlUtil {
 
-  private static final String DOMAIN_PART = "\\p{Alpha}[\\p{Alpha}0-9\\-]*\\.";
-
   private static final String TLD = "\\p{Alpha}+";
 
-  private static final String DOMAIN_NAME = "(?:" + DOMAIN_PART + ")+" + TLD;
-
   private static final String IP4_ADDRESS = "\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}";
+
+  private static final String DOMAIN_PART = "\\p{Alpha}[\\p{Alpha}0-9\\-]*\\.";
+
+  private static final String DOMAIN_NAME = "(?:" + DOMAIN_PART + ")+" + TLD;
 
   private static final String DOMAIN = "(?:" + IP4_ADDRESS + "|" + DOMAIN_NAME + ")";
 

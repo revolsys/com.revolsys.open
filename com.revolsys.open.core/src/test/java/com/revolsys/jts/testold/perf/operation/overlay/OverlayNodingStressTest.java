@@ -29,9 +29,9 @@ import junit.framework.TestCase;
  * @version 1.7
  */
 public class OverlayNodingStressTest extends TestCase {
-  private static final int ITER_LIMIT = 10000;
-
   private static final int BATCH_SIZE = 20;
+
+  private static final int ITER_LIMIT = 10000;
 
   private static final double MAX_DISPLACEMENT = 60;
 
@@ -39,11 +39,11 @@ public class OverlayNodingStressTest extends TestCase {
     junit.textui.TestRunner.run(OverlayNodingStressTest.class);
   }
 
-  private final Random rand = new Random((long)(Math.PI * 10e8));
-
   private Geometry baseAccum = null;
 
   private int geomCount = 0;
+
+  private final Random rand = new Random((long)(Math.PI * 10e8));
 
   public OverlayNodingStressTest(final String name) {
     super(name);

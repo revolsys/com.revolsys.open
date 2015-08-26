@@ -34,15 +34,15 @@ public class RandomOffsetLineStringGenerator {
     return pow2;
   }
 
+  private Point endPoint;
+
+  private int exponent2 = 5;
+
   private final double maxSegLen;
 
   private final int numPts;
 
-  private int exponent2 = 5;
-
   private Point[] pts;
-
-  private Point endPoint;
 
   public RandomOffsetLineStringGenerator(final double maxSegLen, final int numPts) {
     this.maxSegLen = maxSegLen;

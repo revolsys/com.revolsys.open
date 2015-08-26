@@ -43,9 +43,9 @@ import com.revolsys.geometry.util.GeometricShapeFactory;
 import com.revolsys.geometry.wkb.WKTReader;
 
 public abstract class StressTestHarness {
-  static final int MAX_ITER = 10000;
-
   private static final GeometryFactory fact = GeometryFactory.floating(0, 2);
+
+  static final int MAX_ITER = 10000;
 
   static WKTReader wktRdr = new WKTReader(fact);
 

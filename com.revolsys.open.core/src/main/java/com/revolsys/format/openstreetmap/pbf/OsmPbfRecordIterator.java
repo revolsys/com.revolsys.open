@@ -58,6 +58,8 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record>implements Rec
 
   private String blobType = null;
 
+  private final ProtocolBufferInputStream blockIn = new ProtocolBufferInputStream();
+
   private final LinkedList<Record> currentRecords = new LinkedList<>();
 
   private boolean eof;
@@ -66,25 +68,23 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record>implements Rec
 
   private final LongHashMap<Point> nodePoints = new LongHashMap<>();
 
-  private final LongHashMap<Geometry> wayGeometries = new LongHashMap<>();
-
   private final LongHashMap<Geometry> relationGeometries = new LongHashMap<>();
-
-  private final LinkedList<List<Integer>> relationMemberTypes = new LinkedList<>();
-
-  private final LinkedList<List<String>> relationMemberRoles = new LinkedList<>();
 
   private final LinkedList<List<Long>> relationMemberIds = new LinkedList<>();
 
+  private final LinkedList<List<String>> relationMemberRoles = new LinkedList<>();
+
+  private final LinkedList<List<Integer>> relationMemberTypes = new LinkedList<>();
+
   private final LinkedList<OsmRelation> relations = new LinkedList<>();
+
+  private List<String> strings = Collections.emptyList();
+
+  private final LongHashMap<Geometry> wayGeometries = new LongHashMap<>();
 
   private final LinkedList<List<Long>> wayNodeIds = new LinkedList<>();
 
   private final LinkedList<OsmWay> ways = new LinkedList<>();
-
-  private List<String> strings = Collections.emptyList();
-
-  private final ProtocolBufferInputStream blockIn = new ProtocolBufferInputStream();
 
   public OsmPbfRecordIterator(final DataInputStream in) {
     this.in = in;

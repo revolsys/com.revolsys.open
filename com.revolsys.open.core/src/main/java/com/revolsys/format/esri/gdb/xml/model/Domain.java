@@ -6,17 +6,17 @@ import com.revolsys.format.esri.gdb.xml.model.enums.SplitPolicyType;
 
 public class Domain implements Cloneable {
 
+  private String description;
+
   private String domainName;
 
   private FieldType fieldType;
 
   private MergePolicyType mergePolicy;
 
-  private SplitPolicyType splitPolicy;
-
-  private String description;
-
   private String owner;
+
+  private SplitPolicyType splitPolicy;
 
   @Override
   public Domain clone() {

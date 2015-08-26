@@ -13,9 +13,9 @@ public class Feature implements Cloneable {
     return obj == null ? 0 : obj.swigCPtr;
   }
 
-  private final long swigCPtr;
-
   private FeatureNative nativeObject;
+
+  private final long swigCPtr;
 
   public Feature(final FeatureDefn feature_def) {
     this(ogrJNI.new_Feature(FeatureDefn.getCPtr(feature_def), feature_def), true);

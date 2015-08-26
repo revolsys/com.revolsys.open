@@ -4,23 +4,23 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 
 public class EnvelopeN extends Envelope {
-  private double xMin;
-
-  private double yMin;
-
-  private double xMax;
-
-  private double yMax;
-
-  private double zMin;
-
-  private double zMax;
+  private double mMax;
 
   private double mMin;
 
-  private double mMax;
-
   private SpatialReference spatialReference;
+
+  private double xMax;
+
+  private double xMin;
+
+  private double yMax;
+
+  private double yMin;
+
+  private double zMax;
+
+  private double zMin;
 
   public EnvelopeN() {
   }

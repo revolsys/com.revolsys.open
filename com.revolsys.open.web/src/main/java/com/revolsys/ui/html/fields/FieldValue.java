@@ -16,11 +16,11 @@
 package com.revolsys.ui.html.fields;
 
 public class FieldValue {
-  private Object value = null;
+  private String label = "";
 
   private String stringValue = "";
 
-  private String label = "";
+  private Object value = null;
 
   public FieldValue(final Object value, final String stringValue, final String label) {
     this.value = value;

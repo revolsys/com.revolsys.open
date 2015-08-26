@@ -55,7 +55,13 @@ public class FieldNamesSetPanel extends ValueField
 
   private final ArrayListModel<String> allFieldNamesModel;
 
+  private final StringContainsRowFilter allFieldNamesTextFilter;
+
+  private final JButton deleteButton;
+
   private final List<String> fieldNamesSetNames;
+
+  private final DefaultComboBoxModel<String> fieldNamesSetNamesModel;
 
   private final Map<String, List<String>> fieldNamesSets;
 
@@ -65,23 +71,17 @@ public class FieldNamesSetPanel extends ValueField
 
   private final AbstractRecordLayer layer;
 
-  private final StringContainsRowFilter allFieldNamesTextFilter;
+  private final JButton moveDownButton;
+
+  private final JButton moveUpButton;
 
   private final JButton removeButton;
+
+  private final JButton renameButton;
 
   private final JXList selectedFieldNames;
 
   private final ArrayListModel<String> selectedFieldNamesModel;
-
-  private final JButton moveUpButton;
-
-  private final JButton moveDownButton;
-
-  private final DefaultComboBoxModel<String> fieldNamesSetNamesModel;
-
-  private final JButton renameButton;
-
-  private final JButton deleteButton;
 
   public FieldNamesSetPanel(final AbstractRecordLayer layer) {
     super(new VerticalLayout(5));

@@ -22,13 +22,13 @@ public class PanelGroup extends ElementContainer {
 
   private final Map<String, ElementContainer> containers = new LinkedHashMap<>();
 
-  private final Map<String, String> titles = new HashMap<>();
-
   private String id;
 
   private boolean multipleSelect = true;
 
   private final Map<String, Boolean> states = new HashMap<>();
+
+  private final Map<String, String> titles = new HashMap<>();
 
   public PanelGroup() {
     this("panel" + ID_GEN.incrementAndGet());

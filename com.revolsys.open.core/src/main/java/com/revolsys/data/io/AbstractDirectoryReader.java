@@ -60,9 +60,6 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>implem
   /** The directory of data to read from. */
   private File directory;
 
-  /** The files to be read by this reader. */
-  private Iterator<Entry<File, Reader<T>>> readerIterator;
-
   /** The filter used to select files from the directory. */
   private FilenameFilter fileNameFilter;
 
@@ -74,6 +71,9 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>implem
 
   /** The logging instance. */
   private final Logger log = Logger.getLogger(getClass());
+
+  /** The files to be read by this reader. */
+  private Iterator<Entry<File, Reader<T>>> readerIterator;
 
   private final Map<File, Reader<T>> readers = new LinkedHashMap<File, Reader<T>>();
 

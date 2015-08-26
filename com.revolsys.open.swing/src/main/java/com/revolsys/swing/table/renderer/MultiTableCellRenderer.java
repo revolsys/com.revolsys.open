@@ -15,9 +15,9 @@ import org.jdesktop.swingx.VerticalLayout;
 
 public class MultiTableCellRenderer implements TableCellRenderer, MouseListener {
 
-  private final List<Object> renderers;
-
   private final JPanel panel = new JPanel();
+
+  private final List<Object> renderers;
 
   public MultiTableCellRenderer(final Object... renderers) {
     if (renderers == null) {

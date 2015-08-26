@@ -49,6 +49,8 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
 
   private BoundingBox envelope = BoundingBox.EMPTY;
 
+  private DataType geometryDataType;
+
   private GeometryFactory geometryFactory;
 
   private String geometryPropertyName = "geometry";
@@ -66,8 +68,6 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
   private final Resource resource;
 
   private int shapeType = ShapefileConstants.NULL_SHAPE;
-
-  private DataType geometryDataType;
 
   public ShapefileRecordWriter(final RecordDefinition recordDefinition, final Resource resource) {
     super(recordDefinition, resource.createChangeExtension("dbf"));

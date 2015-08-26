@@ -44,9 +44,9 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   private GeometryFactory geometryFactory;
 
-  private AbstractNode<T> root;
-
   private double minExtent = 1.0;
+
+  private AbstractNode<T> root;
 
   private int size = 0;
 

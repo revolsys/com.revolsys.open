@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.util.Property;
 
 public class RectangularMapGridFactory {
-  public static final List<String> gridNames;
-
   public static final Map<String, String> gridClassNamesByName = new LinkedHashMap<String, String>();
+
+  public static final List<String> gridNames;
 
   static {
     addGrid("NTS 1:1 000 000", Nts1000000RectangularMapGrid.class);

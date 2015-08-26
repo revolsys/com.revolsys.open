@@ -20,9 +20,9 @@ public class Driver {
     return getCPtr(obj);
   }
 
-  private long swigCPtr;
-
   protected boolean swigCMemOwn;
+
+  private long swigCPtr;
 
   protected Driver(final long cPtr, final boolean cMemoryOwn) {
     if (cPtr == 0) {

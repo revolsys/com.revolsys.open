@@ -5,9 +5,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class MapKeySetEntryIterator<K, V> implements Iterator<Entry<K, V>> {
-  private final Map<K, V> map;
-
   private final Iterator<K> keyInterator;
+
+  private final Map<K, V> map;
 
   public MapKeySetEntryIterator(final Map<K, V> map) {
     this.map = map;

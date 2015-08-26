@@ -20,9 +20,9 @@ public class StyleTable {
     return getCPtr(obj);
   }
 
-  private long swigCPtr;
-
   protected boolean swigCMemOwn;
+
+  private long swigCPtr;
 
   public StyleTable() {
     this(ogrJNI.new_StyleTable(), true);

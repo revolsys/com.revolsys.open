@@ -56,11 +56,11 @@ public class RunnableAction extends AbstractActionMainMenuItemFactory {
     return action.createComponent();
   }
 
+  private String iconName;
+
   private boolean invokeLater;
 
   private Runnable runnable;
-
-  private String iconName;
 
   public RunnableAction() {
   }

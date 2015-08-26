@@ -31,6 +31,8 @@ public final class ShapefileGeometryUtil {
 
   public static final Map<String, Method> GEOMETRY_TYPE_WRITE_METHOD_MAP = new LinkedHashMap<String, Method>();
 
+  public static final ShapefileGeometryUtil SHP_INSTANCE = new ShapefileGeometryUtil(true);
+
   static {
     addReadWriteMethods("Point");
     addReadWriteMethods("Polygon");
@@ -57,8 +59,6 @@ public final class ShapefileGeometryUtil {
     }
 
   }
-
-  public static final ShapefileGeometryUtil SHP_INSTANCE = new ShapefileGeometryUtil(true);
 
   private static void addMethod(final String action, final Map<String, Method> methodMap,
     final String geometryType, final boolean hasZ, final boolean hasM,
@@ -126,9 +126,9 @@ public final class ShapefileGeometryUtil {
 
   private final boolean clockwise = true;
 
-  private final boolean writeLength;
-
   private final boolean shpFile;
+
+  private final boolean writeLength;
 
   public ShapefileGeometryUtil(final boolean shpFile) {
     this.shpFile = shpFile;

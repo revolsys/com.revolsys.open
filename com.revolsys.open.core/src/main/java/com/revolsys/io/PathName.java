@@ -24,11 +24,11 @@ public class PathName implements Comparable<PathName>, CharSequence {
 
   private final String name;
 
+  private PathName parent;
+
   private final String path;
 
   private final String upperPath;
-
-  private PathName parent;
 
   protected PathName(final String path) {
     this.path = path;

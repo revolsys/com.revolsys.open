@@ -80,15 +80,15 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   private long redrawId = -1;
 
-  private double selectBoxX1 = -1;
+  private int selectBoxButton;
 
-  private double selectBoxY1 = -1;
+  private double selectBoxX1 = -1;
 
   private double selectBoxX2 = -1;
 
-  private double selectBoxY2 = -1;
+  private double selectBoxY1 = -1;
 
-  private int selectBoxButton;
+  private double selectBoxY2 = -1;
 
   private BufferedImage selectImage;
 

@@ -56,9 +56,9 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
  * @version 1.7
  */
 public class FuzzyPointLocator {
-  private final Geometry g;
-
   private final double boundaryDistanceTolerance;
+
+  private final Geometry g;
 
   private final MultiLineString linework;
 

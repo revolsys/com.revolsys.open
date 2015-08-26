@@ -3,7 +3,6 @@ package com.revolsys.format.kml;
 import javax.xml.namespace.QName;
 
 public interface Kml22Constants {
-
   String KML_NS_URI = "http://www.opengis.net/kml/2.2";
 
   QName ALTITUDE = new QName(KML_NS_URI, "altitude");

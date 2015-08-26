@@ -103,23 +103,23 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
 
   private boolean lockResults = false;
 
-  private RecordDefinition recordDefinition;
-
   private int offset = 0;
 
   private Map<String, Boolean> orderBy = new HashMap<String, Boolean>();
 
   private List<Object> parameters = new ArrayList<Object>();
 
+  private RecordDefinition recordDefinition;
+
   private String sql;
+
+  private Statistics statistics;
 
   private PathName typeName;
 
   private String typePathAlias;
 
   private Condition whereCondition;
-
-  private Statistics statistics;
 
   public Query() {
   }

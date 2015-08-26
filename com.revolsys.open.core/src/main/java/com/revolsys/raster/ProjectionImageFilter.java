@@ -16,15 +16,15 @@ public class ProjectionImageFilter extends WholeImageFilter {
    */
   private static final long serialVersionUID = 1L;
 
-  private final BoundingBox sourceBoundingBox;
-
   private final BoundingBox destBoundingBox;
+
+  private final int destHeight;
 
   private final double destPixelSize;
 
   private final int destWidth;
 
-  private final int destHeight;
+  private final BoundingBox sourceBoundingBox;
 
   public ProjectionImageFilter(final BoundingBox imageBoundingBox,
     final CoordinateSystem destCoordinateSystem, final double resolution) {

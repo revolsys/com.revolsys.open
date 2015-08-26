@@ -20,11 +20,11 @@ public class InvokeMethodObjectPropertyProxy<T, O> extends AbstractObjectPropert
 
   private String methodName;
 
+  private Object object;
+
   private Class<?> parameterClass;
 
   private Object[] parameters;
-
-  private Object object;
 
   public InvokeMethodObjectPropertyProxy() {
   }

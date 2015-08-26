@@ -23,11 +23,11 @@ import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 
 public class HtmlUiBuilderCollectionTableSerializer implements RowsTableSerializer {
+  private final HtmlUiBuilder builder;
+
   private final int colCount;
 
   private final List keys;
-
-  private final HtmlUiBuilder builder;
 
   private int rowCount;
 

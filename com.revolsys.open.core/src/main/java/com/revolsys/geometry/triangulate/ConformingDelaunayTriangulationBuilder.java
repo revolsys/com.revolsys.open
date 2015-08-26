@@ -77,15 +77,15 @@ public class ConformingDelaunayTriangulationBuilder {
     }
   }
 
-  private Collection siteCoords;
-
   private Geometry constraintLines;
 
-  private double tolerance = 0.0;
+  private final Map constraintVertexMap = new TreeMap();
+
+  private Collection siteCoords;
 
   private QuadEdgeSubdivision subdiv = null;
 
-  private final Map constraintVertexMap = new TreeMap();
+  private double tolerance = 0.0;
 
   public ConformingDelaunayTriangulationBuilder() {
   }

@@ -9,9 +9,9 @@ import com.revolsys.util.Property;
 
 public class FileField extends Field {
 
-  private String style = null;
-
   private String inputValue = "";
+
+  private String style = null;
 
   public FileField() {
   }

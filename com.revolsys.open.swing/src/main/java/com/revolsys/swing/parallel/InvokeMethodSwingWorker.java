@@ -18,13 +18,13 @@ import com.revolsys.util.Property;
 public class InvokeMethodSwingWorker<T, V> extends AbstractSwingWorker<T, V> {
   private Callable<T> backgroundTask;
 
-  private Object doneObject;
+  private String description;
 
   private String doneMethodName;
 
-  private String description;
-
   private Collection<? extends Object> doneMethodParameters;
+
+  private Object doneObject;
 
   public InvokeMethodSwingWorker(final String description, final Object object,
     final String backgroundMethodName) {

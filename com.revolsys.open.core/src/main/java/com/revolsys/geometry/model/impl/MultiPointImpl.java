@@ -54,20 +54,20 @@ public class MultiPointImpl extends AbstractMultiPoint implements MultiPoint {
 
   private static final long serialVersionUID = -8048474874175355449L;
 
-  private Point[] points;
-
   /**
    *  The bounding box of this <code>Geometry</code>.
    */
   private BoundingBox boundingBox;
+
+  private final GeometryFactory geometryFactory;
+
+  private Point[] points;
 
   /**
    * An object reference which can be used to carry ancillary data defined
    * by the client.
    */
   private Object userData;
-
-  private final GeometryFactory geometryFactory;
 
   public MultiPointImpl(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;

@@ -1,9 +1,9 @@
 package com.revolsys.gis.wms.capabilities;
 
 public class ImageUrl extends FormatUrl {
-  private int width;
-
   private int height;
+
+  private int width;
 
   public int getHeight() {
     return this.height;

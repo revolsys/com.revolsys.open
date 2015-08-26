@@ -22,15 +22,15 @@ import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.HtmlUtil;
 
 public class CheckBoxField extends Field {
-  private boolean selected = false;
-
-  private Object trueValue = Boolean.TRUE;
-
   private Object falseValue = Boolean.FALSE;
+
+  private String onClick = null;
+
+  private boolean selected = false;
 
   private final String selectedValue = "on";
 
-  private String onClick = null;
+  private Object trueValue = Boolean.TRUE;
 
   public CheckBoxField() {
   }

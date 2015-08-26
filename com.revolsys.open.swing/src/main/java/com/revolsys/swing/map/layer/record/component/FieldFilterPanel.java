@@ -68,50 +68,50 @@ public class FieldFilterPanel extends JComponent
 
   private static final long serialVersionUID = 1L;
 
-  private String previousSearchFieldName;
+  private CodeTable codeTable;
+
+  private final ComboBox codeTableOperatorField = new ComboBox("=", "<>", "IS NULL", "IS NOT NULL");
+
+  private final ComboBox dateOperatorField = new ComboBox("=", "<>", "IS NULL", "IS NOT NULL", "<",
+    "<=", ">", ">=");
+
+  private final boolean eventsEnabled = true;
+
+  private FieldDefinition field;
 
   private final List<String> fieldNames;
+
+  private final ComboBox generalOperatorField = new ComboBox("=", "<>", "Like", "IS NULL",
+    "IS NOT NULL");
+
+  private Object lastValue = null;
+
+  private final AbstractRecordLayer layer;
+
+  private final ComboBox nameField;
+
+  private final ComboBox numericOperatorField = new ComboBox("=", "<>", "IS NULL", "IS NOT NULL",
+    "<", "<=", ">", ">=");
+
+  private ComboBox operatorField;
+
+  private final JPanel operatorFieldPanel = new JPanel();
+
+  private String previousSearchFieldName;
+
+  private final RecordDefinition recordDefinition;
 
   private JComponent searchField;
 
   private final JPanel searchFieldPanel = new JPanel();
 
-  private final JPanel operatorFieldPanel = new JPanel();
-
-  private final ComboBox nameField;
-
   private final TextField searchTextField;
-
-  private final RecordDefinition recordDefinition;
-
-  private final AbstractRecordLayer layer;
-
-  private final ComboBox numericOperatorField = new ComboBox("=", "<>", "IS NULL", "IS NOT NULL",
-    "<", "<=", ">", ">=");
-
-  private final ComboBox dateOperatorField = new ComboBox("=", "<>", "IS NULL", "IS NOT NULL", "<",
-    "<=", ">", ">=");
-
-  private final ComboBox generalOperatorField = new ComboBox("=", "<>", "Like", "IS NULL",
-    "IS NOT NULL");
-
-  private final ComboBox codeTableOperatorField = new ComboBox("=", "<>", "IS NULL", "IS NOT NULL");
-
-  private ComboBox operatorField;
-
-  private RecordLayerTableModel tableModel;
-
-  private final boolean eventsEnabled = true;
-
-  private final JLabel whereLabel;
-
-  private Object lastValue = null;
-
-  private CodeTable codeTable;
 
   private boolean settingFilter = false;
 
-  private FieldDefinition field;
+  private RecordLayerTableModel tableModel;
+
+  private final JLabel whereLabel;
 
   public FieldFilterPanel(final TablePanel tablePanel, final RecordLayerTableModel tableModel) {
     this.tableModel = tableModel;

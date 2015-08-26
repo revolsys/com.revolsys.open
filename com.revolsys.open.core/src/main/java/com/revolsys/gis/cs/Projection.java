@@ -28,6 +28,13 @@ public class Projection implements Serializable, Comparable<Projection> {
 
   private static final Map<String, String> PROJECTION_ALIASES = new TreeMap<>();
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 6199958151692874551L;
+
+  public static final String TRANSVERSE_MERCATOR = "Transverse_Mercator";
+
   static {
     for (final String alias : Arrays.asList(ALBERS_EQUAL_AREA, "Albers", "Albers_Equal_Area_Conic",
       "Albers_Conic_Equal_Area")) {
@@ -50,13 +57,6 @@ public class Projection implements Serializable, Comparable<Projection> {
 
     addAlias(POPULAR_VISUALISATION_PSEUDO_MERCATOR, POPULAR_VISUALISATION_PSEUDO_MERCATOR);
   }
-
-  /**
-   *
-   */
-  private static final long serialVersionUID = 6199958151692874551L;
-
-  public static final String TRANSVERSE_MERCATOR = "Transverse_Mercator";
 
   public static void addAlias(String name, final String normalizedName) {
     name = name.toLowerCase().replaceAll("[^a-z0-9]", "");

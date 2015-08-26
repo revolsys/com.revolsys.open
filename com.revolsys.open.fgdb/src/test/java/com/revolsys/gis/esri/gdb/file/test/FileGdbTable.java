@@ -18,9 +18,9 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.gis.io.LittleEndianRandomAccessFile;
 
 public class FileGdbTable {
-  private final LittleEndianRandomAccessFile out;
-
   private final long fieldHeaderOffset = 40;
+
+  private final LittleEndianRandomAccessFile out;
 
   public FileGdbTable(final File file) {
     this.out = new LittleEndianRandomAccessFile(file, "rw");

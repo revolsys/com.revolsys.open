@@ -9,9 +9,9 @@ import com.revolsys.collection.iterator.AbstractIterator;
 
 public class MultiIterator<V> extends AbstractIterator<V> {
 
-  private final List<Iterator<V>> iterators = new LinkedList<>();
-
   private Iterator<V> iterator;
+
+  private final List<Iterator<V>> iterators = new LinkedList<>();
 
   @SuppressWarnings("unchecked")
   public MultiIterator(final Iterable<? extends Object> iterables) {

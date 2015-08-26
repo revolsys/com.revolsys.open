@@ -24,19 +24,19 @@ public class OpenStreetMapApiLayer extends AbstractRecordLayer {
 
   private static final int TILE_SCALE_X = 50;
 
-  private static final double TILE_WIDTH = 1.0 / TILE_SCALE_X;
-
   private static final int TILE_SCALE_Y = 50;
 
   private static final double TILE_HEIGHT = 1.0 / TILE_SCALE_Y;
+
+  private static final double TILE_WIDTH = 1.0 / TILE_SCALE_X;
 
   public static AbstractLayer create(final Map<String, Object> properties) {
     return new OpenStreetMapApiLayer(properties);
   }
 
-  private String serverUrl = "http://www.overpass-api.de/api/xapi?";
-
   private Map<BoundingBox, OsmDocument> boundingBoxTileMap = new HashMap<>();
+
+  private String serverUrl = "http://www.overpass-api.de/api/xapi?";
 
   public OpenStreetMapApiLayer(final Map<String, Object> properties) {
     super(properties);

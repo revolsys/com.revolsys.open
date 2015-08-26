@@ -14,17 +14,17 @@ import org.springframework.context.ApplicationContextAware;
 public class JdbcDataSourceFactoryBean extends AbstractFactoryBean<DataSource>
   implements ApplicationContextAware {
 
+  private ApplicationContext applicationContext;
+
   private Map<String, Object> config = new HashMap<String, Object>();
+
+  private JdbcDatabaseFactory databaseFactory;
+
+  private String password;
 
   private String url;
 
   private String username;
-
-  private String password;
-
-  private JdbcDatabaseFactory databaseFactory;
-
-  private ApplicationContext applicationContext;
 
   @Override
   protected DataSource createInstance() throws Exception {

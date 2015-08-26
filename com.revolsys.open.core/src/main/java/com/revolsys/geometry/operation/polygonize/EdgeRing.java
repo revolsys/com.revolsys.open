@@ -161,16 +161,16 @@ class EdgeRing {
     return null;
   }
 
+  private final List<DirectedEdge> deList = new ArrayList<DirectedEdge>();
+
   private final GeometryFactory factory;
 
-  private final List<DirectedEdge> deList = new ArrayList<DirectedEdge>();
+  private List<LinearRing> holes;
 
   // cache the following data for efficiency
   private LinearRing ring = null;
 
   private Point[] ringPts = null;
-
-  private List<LinearRing> holes;
 
   public EdgeRing(final GeometryFactory factory) {
     this.factory = factory;

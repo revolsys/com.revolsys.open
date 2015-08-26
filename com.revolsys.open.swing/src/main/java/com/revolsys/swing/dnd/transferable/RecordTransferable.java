@@ -12,7 +12,6 @@ import com.revolsys.data.record.Record;
 import com.revolsys.format.csv.Csv;
 
 public class RecordTransferable implements Transferable {
-
   public static final DataFlavor DATA_OBJECT_FLAVOR = new DataFlavor(Record.class, "Data Object");
 
   private static final DataFlavor[] DATA_FLAVORS = {

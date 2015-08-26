@@ -66,7 +66,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     return new RecordStoreLayer(properties);
   }
 
-  private BoundingBox loadedBoundingBox = BoundingBox.EMPTY;
+  private final Label cacheIdForm = new Label("form");
 
   /**
    * Caches of sets of {@link Record#getIdentifier()} for different purposes (e.g. selected records, deleted records).
@@ -75,9 +75,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
    */
   private Map<Label, Set<Identifier>> cacheIdToRecordIdMap = new WeakHashMap<>();
 
-  private RecordStore recordStore;
-
-  private final Label cacheIdForm = new Label("form");
+  private BoundingBox loadedBoundingBox = BoundingBox.EMPTY;
 
   private BoundingBox loadingBoundingBox = BoundingBox.EMPTY;
 
@@ -85,6 +83,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
   /** Cache of records from {@link Record#getIdentifier()} to {@link Record}. */
   private Map<Identifier, LayerRecord> recordIdToRecordMap = new WeakHashMap<>();
+
+  private RecordStore recordStore;
 
   private PathName typePath;
 

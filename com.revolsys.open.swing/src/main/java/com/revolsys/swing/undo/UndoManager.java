@@ -26,9 +26,9 @@ public class UndoManager extends javax.swing.undo.UndoManager
    */
   private static final long serialVersionUID = 1L;
 
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-
   private boolean eventsEnabled = true;
+
+  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   @Override
   public synchronized boolean addEdit(final UndoableEdit edit) {

@@ -72,12 +72,12 @@ public class PreparedPolygon extends AbstractPolygon {
 
   private final boolean isRectangle;
 
-  // create these lazily, since they are expensive
-  private FastSegmentSetIntersectionFinder segIntFinder = null;
-
   private PointOnGeometryLocator pia = null;
 
   private final Polygon polygon;
+
+  // create these lazily, since they are expensive
+  private FastSegmentSetIntersectionFinder segIntFinder = null;
 
   public PreparedPolygon(final Polygon polygon) {
     this.polygon = polygon;

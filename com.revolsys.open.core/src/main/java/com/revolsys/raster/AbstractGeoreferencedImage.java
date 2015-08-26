@@ -156,31 +156,31 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
     return xMatrix;
   }
 
-  private List<Dimension> overviewSizes = new ArrayList<>();
-
   private BoundingBox boundingBox = BoundingBox.EMPTY;
-
-  private int imageWidth = -1;
-
-  private int imageHeight = -1;
-
-  private GeometryFactory geometryFactory = GeometryFactory.floating3();
-
-  private RenderedImage renderedImage;
-
-  private Resource imageResource;
-
-  private double resolution;
-
-  private final Map<CoordinateSystem, AbstractGeoreferencedImage> projectedImages = new HashMap<CoordinateSystem, AbstractGeoreferencedImage>();
-
-  private final PropertyChangeArrayList<MappedLocation> tiePoints = new PropertyChangeArrayList<MappedLocation>();
-
-  private boolean hasChanges;
 
   private int[] dpi;
 
   private File file;
+
+  private GeometryFactory geometryFactory = GeometryFactory.floating3();
+
+  private boolean hasChanges;
+
+  private int imageHeight = -1;
+
+  private Resource imageResource;
+
+  private int imageWidth = -1;
+
+  private List<Dimension> overviewSizes = new ArrayList<>();
+
+  private final Map<CoordinateSystem, AbstractGeoreferencedImage> projectedImages = new HashMap<CoordinateSystem, AbstractGeoreferencedImage>();
+
+  private RenderedImage renderedImage;
+
+  private double resolution;
+
+  private final PropertyChangeArrayList<MappedLocation> tiePoints = new PropertyChangeArrayList<MappedLocation>();
 
   public AbstractGeoreferencedImage() {
   }

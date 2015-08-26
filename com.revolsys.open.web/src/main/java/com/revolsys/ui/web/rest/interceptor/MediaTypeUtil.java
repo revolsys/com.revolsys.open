@@ -19,8 +19,6 @@ import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.Property;
 
 public class MediaTypeUtil {
-  private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
-
   private static final String ACCEPT_HEADER = "Accept";
 
   public static final String CONTENT_TYPE_HEADER = "Content-type";
@@ -28,6 +26,8 @@ public class MediaTypeUtil {
   private static Map<String, MediaType> extensionToMediaTypeMap = new HashMap<String, MediaType>();
 
   private static Map<MediaType, String> mediaTypeToExtensionMap = new HashMap<MediaType, String>();
+
+  private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
 
   static {
     for (final Entry<String, String> entry : IoFactoryRegistry.getInstance()

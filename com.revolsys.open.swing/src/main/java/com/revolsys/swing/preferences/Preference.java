@@ -12,19 +12,19 @@ public class Preference {
 
   private final String applicationName;
 
+  private final Field field;
+
+  private final JComponent fieldComponent;
+
   private final String path;
 
   private final String propertyName;
-
-  private final Class<?> valueClass;
 
   private Object savedValue;
 
   private Object value;
 
-  private final Field field;
-
-  private final JComponent fieldComponent;
+  private final Class<?> valueClass;
 
   public Preference(final String applicationName, final String path, final String propertyName,
     final Class<?> valueClass, final Object defaultValue) {

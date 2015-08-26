@@ -9,9 +9,9 @@ import com.revolsys.data.record.schema.RecordStore;
 
 public class LeftUnaryCondition extends Condition {
 
-  private QueryValue value;
-
   private final String operator;
+
+  private QueryValue value;
 
   public LeftUnaryCondition(final String operator, final QueryValue value) {
     this.operator = operator;

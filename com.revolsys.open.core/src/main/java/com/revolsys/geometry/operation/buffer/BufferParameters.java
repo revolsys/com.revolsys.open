@@ -50,14 +50,14 @@ package com.revolsys.geometry.operation.buffer;
  */
 public class BufferParameters {
   /**
-   * Specifies a round line buffer end cap style.
-   */
-  public static final int CAP_ROUND = 1;
-
-  /**
    * Specifies a flat line buffer end cap style.
    */
   public static final int CAP_FLAT = 2;
+
+  /**
+   * Specifies a round line buffer end cap style.
+   */
+  public static final int CAP_ROUND = 1;
 
   /**
    * Specifies a square line buffer end cap style.
@@ -65,19 +65,10 @@ public class BufferParameters {
   public static final int CAP_SQUARE = 3;
 
   /**
-   * Specifies a round join style.
+   * The default mitre limit
+   * Allows fairly pointy mitres.
    */
-  public static final int JOIN_ROUND = 1;
-
-  /**
-   * Specifies a mitre join style.
-   */
-  public static final int JOIN_MITRE = 2;
-
-  /**
-   * Specifies a bevel join style.
-   */
-  public static final int JOIN_BEVEL = 3;
+  public static final double DEFAULT_MITRE_LIMIT = 5.0;
 
   /**
    * The default number of facets into which to divide a fillet of 90 degrees.
@@ -88,10 +79,19 @@ public class BufferParameters {
   public static final int DEFAULT_QUADRANT_SEGMENTS = 8;
 
   /**
-   * The default mitre limit
-   * Allows fairly pointy mitres.
+   * Specifies a bevel join style.
    */
-  public static final double DEFAULT_MITRE_LIMIT = 5.0;
+  public static final int JOIN_BEVEL = 3;
+
+  /**
+   * Specifies a mitre join style.
+   */
+  public static final int JOIN_MITRE = 2;
+
+  /**
+   * Specifies a round join style.
+   */
+  public static final int JOIN_ROUND = 1;
 
   /**
    * Computes the maximum distance error due to a given level
@@ -105,15 +105,15 @@ public class BufferParameters {
     return 1 - Math.cos(alpha / 2.0);
   }
 
-  private int quadrantSegments = DEFAULT_QUADRANT_SEGMENTS;
-
   private int endCapStyle = CAP_ROUND;
+
+  private boolean isSingleSided = false;
 
   private int joinStyle = JOIN_ROUND;
 
   private double mitreLimit = DEFAULT_MITRE_LIMIT;
 
-  private boolean isSingleSided = false;
+  private int quadrantSegments = DEFAULT_QUADRANT_SEGMENTS;
 
   /**
    * Creates a default set of parameters

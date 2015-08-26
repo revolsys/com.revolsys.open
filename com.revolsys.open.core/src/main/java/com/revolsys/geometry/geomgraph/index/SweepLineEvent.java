@@ -36,21 +36,21 @@ package com.revolsys.geometry.geomgraph.index;
  * @version 1.7
  */
 public class SweepLineEvent implements Comparable {
-  private static final int INSERT = 1;
-
   private static final int DELETE = 2;
 
-  private Object label; // used for red-blue intersection detection
+  private static final int INSERT = 1;
 
-  private final double xValue;
+  private int deleteEventIndex;
 
   private final int eventType;
 
   private SweepLineEvent insertEvent = null; // null if this is an INSERT event
 
-  private int deleteEventIndex;
+  private Object label; // used for red-blue intersection detection
 
   private Object obj;
+
+  private final double xValue;
 
   /**
    * Creates a DELETE event.

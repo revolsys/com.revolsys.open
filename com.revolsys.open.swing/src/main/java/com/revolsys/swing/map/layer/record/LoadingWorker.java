@@ -16,9 +16,9 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 
 public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> {
-  private final BoundingBox viewportBoundingBox;
-
   private final RecordStoreLayer layer;
+
+  private final BoundingBox viewportBoundingBox;
 
   public LoadingWorker(final RecordStoreLayer layer, final BoundingBox viewportBoundingBox) {
     this.layer = layer;

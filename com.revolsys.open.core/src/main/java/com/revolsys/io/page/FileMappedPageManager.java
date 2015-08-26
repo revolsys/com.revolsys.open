@@ -17,18 +17,18 @@ import com.revolsys.collection.map.LruMap;
 import com.revolsys.io.FileUtil;
 
 public class FileMappedPageManager implements PageManager {
-  int pageSize = 2048;
-
-  private RandomAccessFile randomAccessFile;
-
   private FileChannel fileChannel;
+
+  private final Set<Integer> freePageIndexes = new TreeSet<Integer>();
 
   // TODO
   private final Map<Integer, Page> pages = new LruMap<Integer, Page>(1000);
 
-  private final Set<Integer> freePageIndexes = new TreeSet<Integer>();
-
   private final Set<Page> pagesInUse = new HashSet<Page>();
+
+  int pageSize = 2048;
+
+  private RandomAccessFile randomAccessFile;
 
   public FileMappedPageManager() {
     this(FileUtil.createTempFile("pages", ".pf"));

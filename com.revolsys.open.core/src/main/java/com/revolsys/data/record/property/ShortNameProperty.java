@@ -33,9 +33,9 @@ public class ShortNameProperty extends AbstractRecordDefinitionProperty {
     }
   }
 
-  private boolean useForSequence = true;
-
   private String shortName;
+
+  private boolean useForSequence = true;
 
   public ShortNameProperty() {
   }

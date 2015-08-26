@@ -37,11 +37,11 @@ public class TinReader {
     }
   }
 
-  private final BufferedReader in;
+  private BoundingBox boundingBox;
 
   private final GeometryFactory geometryFactory;
 
-  private BoundingBox boundingBox;
+  private final BufferedReader in;
 
   public TinReader(final BoundingBox boundingBox, final Resource resource) {
     this.boundingBox = boundingBox;

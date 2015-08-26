@@ -68,9 +68,9 @@ public class WKTOrWKBReader {
     return false;
   }
 
-  private final WKTReader wktReader;
-
   private final WKBReader wkbReader;
+
+  private final WKTReader wktReader;
 
   public WKTOrWKBReader(final GeometryFactory geomFactory) {
     this.wktReader = new WKTReader(geomFactory);

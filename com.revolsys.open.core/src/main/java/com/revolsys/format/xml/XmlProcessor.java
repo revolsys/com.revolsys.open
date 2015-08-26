@@ -136,10 +136,6 @@ import com.revolsys.util.CaseConverter;
  * @author Paul Austin
  */
 public abstract class XmlProcessor {
-  static {
-    registerEnumConverter(Enum.class);
-  }
-
   /** The arguments a processor method must have. */
   private static final Class<?>[] PROCESS_METHOD_ARGS = new Class[] {
     XMLStreamReader.class
@@ -147,6 +143,10 @@ public abstract class XmlProcessor {
 
   /** The cache of processor classes to method caches. */
   private static final Map<Class<?>, Map<String, Method>> PROCESSOR_METHOD_CACHE = new HashMap<Class<?>, Map<String, Method>>();
+
+  static {
+    registerEnumConverter(Enum.class);
+  }
 
   /**
    * Create the cache of process methods from the specified class.

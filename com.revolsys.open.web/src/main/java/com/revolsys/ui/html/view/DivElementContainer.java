@@ -23,9 +23,9 @@ import com.revolsys.util.HtmlUtil;
  * @version 1.0
  */
 public class DivElementContainer extends ElementContainer {
-  private String id;
-
   private String cssClass;
+
+  private String id;
 
   private String style;
 

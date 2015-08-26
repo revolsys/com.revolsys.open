@@ -36,9 +36,9 @@ public class FormAllFieldsErrorPredicate implements HighlightPredicate {
         WebColors.LightCoral, WebColors.Black, WebColors.DarkRed, WebColors.White));
   }
 
-  private final LayerRecordTableModel model;
-
   private final Reference<RecordLayerForm> form;
+
+  private final LayerRecordTableModel model;
 
   public FormAllFieldsErrorPredicate(final RecordLayerForm form,
     final LayerRecordTableModel model) {

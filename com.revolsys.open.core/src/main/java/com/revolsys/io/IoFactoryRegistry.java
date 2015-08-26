@@ -28,9 +28,9 @@ import com.revolsys.util.UrlUtil;
 
 public class IoFactoryRegistry {
 
-  private static final Logger LOG = LoggerFactory.getLogger(IoFactoryRegistry.class);
-
   private static IoFactoryRegistry instance = new IoFactoryRegistry();
+
+  private static final Logger LOG = LoggerFactory.getLogger(IoFactoryRegistry.class);
 
   public static void clearInstance() {
     instance = null;
@@ -88,17 +88,17 @@ public class IoFactoryRegistry {
     return ioFactoryRegistry.isFileExtensionSupported(factoryClass, source);
   }
 
-  private final Map<Class<? extends IoFactory>, Set<String>> classFileExtensions = new HashMap<>();
-
   private final Map<Class<? extends IoFactory>, Set<IoFactory>> classFactories = new HashMap<>();
 
   private final Map<Class<? extends IoFactory>, Map<String, IoFactory>> classFactoriesByFileExtension = new HashMap<>();
 
   private final Map<Class<? extends IoFactory>, Map<String, IoFactory>> classFactoriesByMediaType = new HashMap<>();
 
-  private final Set<IoFactory> factories = new HashSet<>();
+  private final Map<Class<? extends IoFactory>, Set<String>> classFileExtensions = new HashMap<>();
 
   private final Map<String, String> extensionMimeTypeMap = new HashMap<>();
+
+  private final Set<IoFactory> factories = new HashSet<>();
 
   public IoFactoryRegistry() {
     synchronized (IoFactoryRegistry.class) {

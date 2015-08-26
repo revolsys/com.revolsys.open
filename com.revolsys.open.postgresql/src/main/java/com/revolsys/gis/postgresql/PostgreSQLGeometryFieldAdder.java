@@ -20,9 +20,9 @@ import com.revolsys.util.Property;
 
 public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
 
-  private static final Logger LOG = LoggerFactory.getLogger(PostgreSQLGeometryFieldAdder.class);
-
   private static final Map<String, DataType> DATA_TYPE_MAP = new HashMap<String, DataType>();
+
+  private static final Logger LOG = LoggerFactory.getLogger(PostgreSQLGeometryFieldAdder.class);
 
   static {
     DATA_TYPE_MAP.put("GEOMETRY", DataTypes.GEOMETRY);

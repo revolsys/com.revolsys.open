@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Workspace implements Cloneable {
-  private WorkspaceDefinition workspaceDefinition = new WorkspaceDefinition();
-
   private List<AnyDatasetData> workspaceData = new ArrayList<AnyDatasetData>();
+
+  private WorkspaceDefinition workspaceDefinition = new WorkspaceDefinition();
 
   public Workspace() {
   }

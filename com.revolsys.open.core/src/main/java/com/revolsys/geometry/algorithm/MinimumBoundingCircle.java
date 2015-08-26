@@ -141,11 +141,11 @@ public class MinimumBoundingCircle {
     return minAngPt;
   }
 
-  private final Geometry input;
+  private Point centre = null;
 
   private Point[] extremalPts = null;
 
-  private Point centre = null;
+  private final Geometry input;
 
   private double radius = 0.0;
 

@@ -72,14 +72,14 @@ public class PolygonImpl extends AbstractPolygon implements Polygon {
 
   private BoundingBox boundingBox;
 
-  private Object userData;
-
   /**
    * The {@link GeometryFactory} used to create this Geometry
    */
   private final GeometryFactory geometryFactory;
 
   private LinearRing[] rings;
+
+  private Object userData;
 
   public PolygonImpl(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;

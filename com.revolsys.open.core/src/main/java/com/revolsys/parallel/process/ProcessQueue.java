@@ -8,16 +8,16 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.store.Buffer;
 
 public class ProcessQueue {
+  private final int maxWorkerIdleTime;
+
+  private final int maxWorkers;
+
   private final Buffer<Process> processBuffer = new Buffer<Process>(200);
 
   private final Channel<Process> processChannel = new Channel<Process>(this.processBuffer);
 
   private final Set<ProcessQueueWorker> workers = Collections
     .synchronizedSet(new HashSet<ProcessQueueWorker>());
-
-  private final int maxWorkers;
-
-  private final int maxWorkerIdleTime;
 
   public ProcessQueue(final int maxWorkers, final int maxWorkerIdleTime) {
     this.maxWorkers = maxWorkers;

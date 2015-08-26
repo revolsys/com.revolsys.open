@@ -12,9 +12,9 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements EsriGeodatabaseXmlCo
 
   public static final EsriGeodatabaseXmlFieldTypeRegistry INSTANCE = new EsriGeodatabaseXmlFieldTypeRegistry();
 
-  private final Map<DataType, EsriGeodatabaseXmlFieldType> typeMapping = new HashMap<DataType, EsriGeodatabaseXmlFieldType>();
-
   private final Map<FieldType, DataType> esriToDataType = new HashMap<FieldType, DataType>();
+
+  private final Map<DataType, EsriGeodatabaseXmlFieldType> typeMapping = new HashMap<DataType, EsriGeodatabaseXmlFieldType>();
 
   public EsriGeodatabaseXmlFieldTypeRegistry() {
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeOID, DataTypes.INT, false));

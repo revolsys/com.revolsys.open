@@ -154,6 +154,17 @@ abstract class AbstractPreparedPolygonContains {
     return false;
   }
 
+  private boolean hasNonProperIntersection = false;
+
+  private boolean hasProperIntersection = false;
+
+  // information about geometric situation
+  private boolean hasSegmentIntersection = false;
+
+  private final Geometry originalGeometry;
+
+  protected Geometry preparedGeometry;
+
   /**
    * This flag controls a difference between contains and covers.
    *
@@ -161,17 +172,6 @@ abstract class AbstractPreparedPolygonContains {
    * For covers the value is false.
    */
   protected boolean requireSomePointInInterior = true;
-
-  // information about geometric situation
-  private boolean hasSegmentIntersection = false;
-
-  private boolean hasProperIntersection = false;
-
-  private boolean hasNonProperIntersection = false;
-
-  protected Geometry preparedGeometry;
-
-  private final Geometry originalGeometry;
 
   public AbstractPreparedPolygonContains(final Geometry preparedPolygon, final Geometry polygon) {
     this.preparedGeometry = preparedPolygon;

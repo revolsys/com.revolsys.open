@@ -28,9 +28,9 @@ import com.revolsys.predicate.PredicateProxy;
 public class RecordPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<Record>
   implements PredicateProxy<Node<Record>> {
 
-  private Predicate<Node<Record>> predicate;
-
   private Statistics mergedStatistics;
+
+  private Predicate<Node<Record>> predicate;
 
   public RecordPseudoNodeRemovalVisitor() {
   }

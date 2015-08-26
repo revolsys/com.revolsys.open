@@ -11,9 +11,9 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.spring.resource.Resource;
 
 public class AttributeMap extends LinkedHashMap<String, Object> {
-  private static final long serialVersionUID = 1L;
-
   private static final Logger LOG = LoggerFactory.getLogger(AttributeMap.class);
+
+  private static final long serialVersionUID = 1L;
 
   public AttributeMap() {
   }

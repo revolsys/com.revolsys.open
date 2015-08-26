@@ -20,9 +20,9 @@ import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.util.HtmlUtil;
 
 public class ElementLabel implements Decorator {
-  private String label = "";
-
   private String instructions = "";
+
+  private String label = "";
 
   public ElementLabel(final String label) {
     this.label = label;

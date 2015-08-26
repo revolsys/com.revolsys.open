@@ -31,13 +31,13 @@ import com.revolsys.util.Numbers;
 
 public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
 
-  private static final String MDSYS_SDO_GEOMETRY = "MDSYS.SDO_GEOMETRY";
-
-  private static final String MDSYS_SDO_POINT_TYPE = "MDSYS.SDO_POINT_TYPE";
-
   private static final int[] LINESTRING_ELEM_INFO = new int[] {
     1, 2, 1
   };
+
+  private static final String MDSYS_SDO_GEOMETRY = "MDSYS.SDO_GEOMETRY";
+
+  private static final String MDSYS_SDO_POINT_TYPE = "MDSYS.SDO_POINT_TYPE";
 
   private static final int[] RECTANGLE_ELEM_INFO = new int[] {
     1, 1003, 3

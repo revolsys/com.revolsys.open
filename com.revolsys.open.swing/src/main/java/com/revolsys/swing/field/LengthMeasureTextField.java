@@ -34,11 +34,11 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
 
   private Number number;
 
-  private final NumberTextField valueField;
-
   private Unit<Length> unit;
 
   private final ComboBox unitField;
+
+  private final NumberTextField valueField;
 
   public LengthMeasureTextField(final Measure<Length> value, final Unit<Length> unit) {
     this(null, value, unit);

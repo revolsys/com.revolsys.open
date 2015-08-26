@@ -16,17 +16,17 @@ import com.revolsys.util.Property;
 public class AddRecordStoreConnectionPanel extends ValueField {
   private static final long serialVersionUID = 2750736040832727823L;
 
-  private final JTextField passwordField;
-
-  private final JTextField usernameField;
-
-  private final JTextField urlField;
+  private final String name;
 
   private final JTextField nameField;
 
+  private final JTextField passwordField;
+
   private final ConnectionRegistry<RecordStoreConnection> registry;
 
-  private final String name;
+  private final JTextField urlField;
+
+  private final JTextField usernameField;
 
   public AddRecordStoreConnectionPanel(final ConnectionRegistry<RecordStoreConnection> registry) {
     this(registry, null);

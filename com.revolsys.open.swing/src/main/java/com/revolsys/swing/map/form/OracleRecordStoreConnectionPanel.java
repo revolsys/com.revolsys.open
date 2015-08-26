@@ -27,9 +27,9 @@ import com.revolsys.util.Property;
 public class OracleRecordStoreConnectionPanel extends ValueField implements PropertyChangeListener {
   private static final long serialVersionUID = 2750736040832727823L;
 
-  private String name;
-
   private final Map<String, Field> fieldsByName = new HashMap<>();
+
+  private String name;
 
   @SuppressWarnings("unchecked")
   public OracleRecordStoreConnectionPanel(final ConnectionRegistry<RecordStoreConnection> registry,

@@ -92,15 +92,15 @@ public class STRtreeDemo {
 
   private static final double EXTENT = 100;
 
+  private static GeometryFactory factory = GeometryFactory.floating3();
+
+  private static final int ITEM_COUNT = 20;
+
   private static final double MAX_ITEM_EXTENT = 15;
 
   private static final double MIN_ITEM_EXTENT = 3;
 
-  private static final int ITEM_COUNT = 20;
-
   private static final int NODE_CAPACITY = 4;
-
-  private static GeometryFactory factory = GeometryFactory.floating3();
 
   private static BoundingBox envelope(final Boundable b) {
     return (BoundingBox)b.getBounds();

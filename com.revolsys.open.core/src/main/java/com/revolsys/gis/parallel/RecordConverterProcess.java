@@ -27,15 +27,15 @@ public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
 
   private Converter<Record, Record> defaultConverter;
 
-  private Map<String, Collection<FilterRecordConverter>> typeFilterConverterMap = new LinkedHashMap<String, Collection<FilterRecordConverter>>();
-
-  private Map<String, Converter<Record, Record>> typeConverterMap = new HashMap<String, Converter<Record, Record>>();
-
-  private RecordDefinitionFactory targetRecordDefinitionFactory;
-
   private Map<Object, Map<String, Object>> simpleMapping;
 
   private Statistics statistics = new Statistics("Converted");
+
+  private RecordDefinitionFactory targetRecordDefinitionFactory;
+
+  private Map<String, Converter<Record, Record>> typeConverterMap = new HashMap<String, Converter<Record, Record>>();
+
+  private Map<String, Collection<FilterRecordConverter>> typeFilterConverterMap = new LinkedHashMap<String, Collection<FilterRecordConverter>>();
 
   //
   // private Statistics ignoredStatistics = new Statistics("Ignored");

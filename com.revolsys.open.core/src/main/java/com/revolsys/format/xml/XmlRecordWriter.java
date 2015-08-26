@@ -18,15 +18,15 @@ import com.revolsys.io.NamedObject;
 
 public class XmlRecordWriter extends AbstractRecordWriter {
 
-  private final RecordDefinition recordDefinition;
+  private boolean opened;
 
   private XmlWriter out;
 
-  boolean startAttribute;
+  private final RecordDefinition recordDefinition;
 
   private boolean singleObject;
 
-  private boolean opened;
+  boolean startAttribute;
 
   public XmlRecordWriter(final RecordDefinition recordDefinition, final java.io.Writer out) {
     this.recordDefinition = recordDefinition;

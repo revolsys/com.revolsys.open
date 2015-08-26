@@ -9,11 +9,11 @@ import com.revolsys.util.Property;
 
 public abstract class AbstractKeySerializer extends BaseObjectWithProperties
   implements KeySerializer {
-  private String name;
+  private String key;
 
   private String label;
 
-  private String key;
+  private String name;
 
   private String width;
 

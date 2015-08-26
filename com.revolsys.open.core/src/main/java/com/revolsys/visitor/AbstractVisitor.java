@@ -10,9 +10,9 @@ import com.revolsys.predicate.Predicates;
 
 public abstract class AbstractVisitor<T>
   implements Consumer<T>, PredicateProxy<T>, ComparatorProxy<T> {
-  private Predicate<T> predicate = Predicates.all();
-
   private Comparator<T> comparator;
+
+  private Predicate<T> predicate = Predicates.all();
 
   public AbstractVisitor() {
   }

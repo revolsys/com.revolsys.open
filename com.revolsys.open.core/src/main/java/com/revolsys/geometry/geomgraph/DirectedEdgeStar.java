@@ -50,16 +50,16 @@ import com.revolsys.geometry.util.Assert;
  */
 public class DirectedEdgeStar extends EdgeEndStar {
 
+  private Label label;
+
+  private final int LINKING_TO_OUTGOING = 2;
+
   /**
    * A list of all outgoing edges in the result, in CCW order
    */
   private List resultAreaEdgeList;
 
-  private Label label;
-
   private final int SCANNING_FOR_INCOMING = 1;
-
-  private final int LINKING_TO_OUTGOING = 2;
 
   public DirectedEdgeStar() {
   }

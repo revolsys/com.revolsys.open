@@ -48,9 +48,9 @@ import com.revolsys.geometry.model.Point;
  * @version 1.7
  */
 public class BasicSegmentString implements SegmentString {
-  private final LineString points;
-
   private Object data;
+
+  private final LineString points;
 
   /**
    * Creates a new segment string from a list of vertices.

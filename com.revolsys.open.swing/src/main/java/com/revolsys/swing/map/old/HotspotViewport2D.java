@@ -14,9 +14,9 @@ import com.revolsys.swing.map.layer.Project;
 
 public class HotspotViewport2D extends com.revolsys.swing.map.ComponentViewport2D {
 
-  private ZoomMode zoomMode = FixedScaleZoomMode.METRIC;
-
   private QuadTree<ViewportHotspot> toolTipIndex = new QuadTree<>();
+
+  private ZoomMode zoomMode = FixedScaleZoomMode.METRIC;
 
   public HotspotViewport2D(final Project project, final JComponent component) {
     super(project, component);

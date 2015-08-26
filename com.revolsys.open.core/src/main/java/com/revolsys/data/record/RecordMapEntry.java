@@ -6,9 +6,9 @@ import com.revolsys.data.record.schema.RecordDefinition;
 
 public class RecordMapEntry implements Entry<String, Object> {
 
-  private final Record record;
-
   private final int index;
+
+  private final Record record;
 
   public RecordMapEntry(final Record record, final int index) {
     this.record = record;

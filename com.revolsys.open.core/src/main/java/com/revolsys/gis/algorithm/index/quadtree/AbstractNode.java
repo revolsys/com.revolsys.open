@@ -63,17 +63,17 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     newBounds[3] = y2;
   }
 
-  private AbstractNode<T>[] nodes;
-
-  private double minX;
-
-  private double minY;
+  private final int level;
 
   private double maxX;
 
   private double maxY;
 
-  private final int level;
+  private double minX;
+
+  private double minY;
+
+  private AbstractNode<T>[] nodes;
 
   protected AbstractNode() {
     this.level = Integer.MIN_VALUE;

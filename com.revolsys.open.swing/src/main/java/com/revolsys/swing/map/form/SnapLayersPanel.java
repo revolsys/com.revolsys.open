@@ -40,29 +40,29 @@ public class SnapLayersPanel extends ValueField implements ActionListener, ListS
 
   private static final long serialVersionUID = 1L;
 
+  private final JButton addButton;
+
+  private final JPanel fieldsPanel;
+
+  private final JPanel filterPanel;
+
   private final AbstractRecordLayer layer;
 
-  private final CheckBox snapToAllLayers;
-
-  private final JXList snapLayerPathsField;
-
   private final JXList layerPathsField;
-
-  private final ArrayListModel<String> snapLayerPathsModel;
 
   private final ArrayListModel<String> layerPathsModel;
 
   private final StringContainsRowFilter layerPathsTextFilter;
 
+  private final JButton removeButton;
+
+  private final JXList snapLayerPathsField;
+
+  private final ArrayListModel<String> snapLayerPathsModel;
+
   private final StringContainsRowFilter snapLayerPathsTextFilter;
 
-  private final JPanel filterPanel;
-
-  private final JPanel fieldsPanel;
-
-  private final JButton addButton;
-
-  private final JButton removeButton;
+  private final CheckBox snapToAllLayers;
 
   public SnapLayersPanel(final AbstractRecordLayer layer) {
     super(new VerticalLayout(5));

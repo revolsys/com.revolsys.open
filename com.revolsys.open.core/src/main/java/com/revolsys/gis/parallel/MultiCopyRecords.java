@@ -20,17 +20,17 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
 public class MultiCopyRecords implements Process {
-  private RecordStore targetRecordStore;
-
-  private RecordStore sourceRecordStore;
+  private String name;
 
   private Process process;
 
-  private String name;
+  private Map<String, Object> processDefinition;
 
   private ProcessNetwork processNetwork;
 
-  private Map<String, Object> processDefinition;
+  private RecordStore sourceRecordStore;
+
+  private RecordStore targetRecordStore;
 
   @SuppressWarnings("unchecked")
   protected Process createProcess(final Map<String, Object> processDefinition) {

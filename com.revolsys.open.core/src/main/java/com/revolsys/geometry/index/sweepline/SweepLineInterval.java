@@ -37,9 +37,9 @@ package com.revolsys.geometry.index.sweepline;
  */
 public class SweepLineInterval {
 
-  private final double min, max;
-
   private final Object item;
+
+  private final double min, max;
 
   public SweepLineInterval(final double min, final double max) {
     this(min, max, null);

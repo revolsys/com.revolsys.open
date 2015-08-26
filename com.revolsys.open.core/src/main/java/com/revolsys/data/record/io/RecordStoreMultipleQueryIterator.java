@@ -9,9 +9,9 @@ import com.revolsys.data.record.schema.RecordDefinition;
 
 public class RecordStoreMultipleQueryIterator extends AbstractMultipleIterator<Record> {
 
-  private RecordStoreQueryReader reader;
-
   private int queryIndex = 0;
+
+  private RecordStoreQueryReader reader;
 
   public RecordStoreMultipleQueryIterator(final RecordStoreQueryReader reader) {
     this.reader = reader;

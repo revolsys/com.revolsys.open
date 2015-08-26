@@ -4,21 +4,21 @@ import java.net.URL;
 import java.util.List;
 
 public class Service {
-  private String name;
-
-  private String title;
-
   private String abstractDescription;
 
-  private List<String> keywords;
-
-  private URL onlineResource;
+  private String accessConstraints;
 
   private ContactInformation contactInformation;
 
   private String fees;
 
-  private String accessConstraints;
+  private List<String> keywords;
+
+  private String name;
+
+  private URL onlineResource;
+
+  private String title;
 
   public String getAbstractDescription() {
     return this.abstractDescription;

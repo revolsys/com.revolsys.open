@@ -37,9 +37,9 @@ package com.revolsys.jtstest.testrunner;
  * @version 1.7
  */
 public class Option {
-  OptionSpec optSpec;
-
   String[] args; // the actual option args found
+
+  OptionSpec optSpec;
 
   public Option(final OptionSpec spec, final String[] _args) {
     this.optSpec = spec;

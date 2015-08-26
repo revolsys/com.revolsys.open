@@ -39,27 +39,27 @@ import com.revolsys.util.MathUtil;
 
 public class MeasureOverlay extends AbstractOverlay {
 
-  /**
-   *
-   */
-  private static final long serialVersionUID = 1L;
+  private static final Cursor CURSOR = Icons.getCursor("cursor_ruler", 8, 7);
 
   private static final Geometry EMPTY_GEOMETRY = GeometryFactory.wgs84().geometry();
 
   public static final String MEASURE = "Measure";
 
-  private static final Cursor CURSOR = Icons.getCursor("cursor_ruler", 8, 7);
-
   private static final SelectedRecordsRenderer MEASURE_RENDERER = new SelectedRecordsRenderer(
     WebColors.Black, WebColors.Magenta);
 
-  private Geometry measureGeometry = EMPTY_GEOMETRY;
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
 
   private double area;
 
+  private boolean dragged = false;
+
   private double length;
 
-  private boolean dragged = false;
+  private Geometry measureGeometry = EMPTY_GEOMETRY;
 
   private List<CloseLocation> mouseOverLocations = Collections.emptyList();
 

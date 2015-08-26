@@ -52,9 +52,9 @@ public class TypedIdentifier extends AbstractIdentifier {
     }
   }
 
-  private final String type;
-
   private final Identifier id;
+
+  private final String type;
 
   public TypedIdentifier(final String type, final Identifier id) {
     this.type = type;

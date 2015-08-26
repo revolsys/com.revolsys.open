@@ -56,14 +56,14 @@ import com.revolsys.geometry.util.Assert;
 abstract public class EdgeEndStar {
 
   /**
-   * A map which maintains the edges in sorted order around the node
-   */
-  protected Map edgeMap = new TreeMap();
-
-  /**
    * A list of all outgoing edges in the result, in CCW order
    */
   protected List edgeList;
+
+  /**
+   * A map which maintains the edges in sorted order around the node
+   */
+  protected Map edgeMap = new TreeMap();
 
   /**
    * The location of the point for this star in Geometry i Areas

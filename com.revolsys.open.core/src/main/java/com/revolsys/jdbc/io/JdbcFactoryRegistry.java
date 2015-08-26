@@ -22,11 +22,11 @@ import com.revolsys.util.Property;
 
 public class JdbcFactoryRegistry {
 
+  private static Map<ApplicationContext, WeakReference<JdbcFactoryRegistry>> factoriesByApplicationContext = new WeakHashMap<ApplicationContext, WeakReference<JdbcFactoryRegistry>>();
+
   private static JdbcFactoryRegistry instance;
 
   private static final Logger LOG = LoggerFactory.getLogger(JdbcFactoryRegistry.class);
-
-  private static Map<ApplicationContext, WeakReference<JdbcFactoryRegistry>> factoriesByApplicationContext = new WeakHashMap<ApplicationContext, WeakReference<JdbcFactoryRegistry>>();
 
   public static void clearInstance() {
     instance = null;

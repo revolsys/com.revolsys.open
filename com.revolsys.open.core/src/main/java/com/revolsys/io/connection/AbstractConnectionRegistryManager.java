@@ -8,11 +8,11 @@ import java.util.List;
 public class AbstractConnectionRegistryManager<T extends ConnectionRegistry<V>, V>
   implements ConnectionRegistryManager<T> {
 
+  private final String name;
+
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   private final List<T> registries = new ArrayList<T>();
-
-  private final String name;
 
   public AbstractConnectionRegistryManager(final String name) {
     this.name = name;

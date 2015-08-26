@@ -28,9 +28,9 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.AbstractRecordWriter;
 
 public class OgrRecordWriter extends AbstractRecordWriter {
-  private OgrRecordStore recordStore;
-
   private DataSource dataSource;
+
+  private OgrRecordStore recordStore;
 
   OgrRecordWriter(final OgrRecordStore recordStore) {
     this.recordStore = recordStore;

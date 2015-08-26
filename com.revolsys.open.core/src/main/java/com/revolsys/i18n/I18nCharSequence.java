@@ -1,9 +1,9 @@
 package com.revolsys.i18n;
 
 public class I18nCharSequence implements CharSequence {
-  private final String key;
-
   private final I18n i18n;
+
+  private final String key;
 
   public I18nCharSequence(final I18n i18n, final String key) {
     this.i18n = i18n;

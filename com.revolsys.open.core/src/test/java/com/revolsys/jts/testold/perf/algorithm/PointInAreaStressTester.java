@@ -50,19 +50,19 @@ import com.revolsys.geometry.util.Stopwatch;
  *
  */
 public class PointInAreaStressTester {
-  private final GeometryFactory geomFactory;
-
   private final Geometry area;
 
+  private final GeometryFactory geomFactory;
+
   private boolean ignoreBoundaryResults = true;
+
+  private final int[] locationCount = new int[3];
 
   private int numPts = 10000;
 
   private PointOnGeometryLocator pia1;
 
   private PointOnGeometryLocator pia2;
-
-  private final int[] locationCount = new int[3];
 
   public PointInAreaStressTester(final GeometryFactory geomFactory, final Geometry area) {
     this.geomFactory = geomFactory;

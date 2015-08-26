@@ -8,9 +8,9 @@ import com.revolsys.parallel.channel.store.Buffer;
 
 public abstract class AbstractInProcess<T> extends AbstractProcess implements InProcess<T> {
 
-  private int inBufferSize = 0;
-
   private Channel<T> in;
+
+  private int inBufferSize = 0;
 
   public AbstractInProcess() {
   }

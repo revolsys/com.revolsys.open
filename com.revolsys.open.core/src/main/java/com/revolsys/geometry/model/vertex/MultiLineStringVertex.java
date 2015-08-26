@@ -11,9 +11,9 @@ public class MultiLineStringVertex extends AbstractVertex {
    */
   private static final long serialVersionUID = 1L;
 
-  private int vertexIndex;
-
   private int partIndex;
+
+  private int vertexIndex;
 
   public MultiLineStringVertex(final MultiLineString multiLineString, final int... vertexId) {
     super(multiLineString);

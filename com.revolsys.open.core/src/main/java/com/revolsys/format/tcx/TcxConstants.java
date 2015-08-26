@@ -50,8 +50,6 @@ public interface TcxConstants {
 
   QName TIME = new QName(_NS_URI, "Time");
 
-  QName TRIGGER_METHOD = new QName(_NS_URI, "TriggerMethod");
-
   QName TOTAL_TIME_SECONDS = new QName(_NS_URI, "TotalTimeSeconds");
 
   QName TPX = new QName(_ACTIVITY_EXTENSION_NS_URI, "TPX");
@@ -61,6 +59,8 @@ public interface TcxConstants {
   QName TRACKPOINT = new QName(_NS_URI, "Trackpoint");
 
   QName TRAINING_CENTER_DATABASE = new QName(_NS_URI, "TrainingCenterDatabase");
+
+  QName TRIGGER_METHOD = new QName(_NS_URI, "TriggerMethod");
 
   QName VALUE = new QName(_NS_URI, "Value");
 

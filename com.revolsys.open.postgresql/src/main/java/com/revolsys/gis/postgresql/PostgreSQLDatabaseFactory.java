@@ -18,9 +18,9 @@ import com.revolsys.jdbc.io.JdbcRecordStore;
 public class PostgreSQLDatabaseFactory extends AbstractJdbcDatabaseFactory {
   private static final String URL_REGEX = "jdbc:postgresql:(?://([^:]+)(?::(\\d+))?/)?(.+)";
 
-  public static final List<String> URL_PATTERNS = Arrays.asList(URL_REGEX);
-
   private static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX);
+
+  public static final List<String> URL_PATTERNS = Arrays.asList(URL_REGEX);
 
   @Override
   public boolean canHandleUrl(final String url) {

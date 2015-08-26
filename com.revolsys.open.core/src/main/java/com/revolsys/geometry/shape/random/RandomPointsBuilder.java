@@ -52,9 +52,9 @@ import com.revolsys.geometry.shape.GeometricShapeBuilder;
  *
  */
 public class RandomPointsBuilder extends GeometricShapeBuilder {
-  protected Geometry maskPoly = null;
-
   private PointOnGeometryLocator extentLocator;
+
+  protected Geometry maskPoly = null;
 
   /**
    * Create a shape factory which will create shapes using the default

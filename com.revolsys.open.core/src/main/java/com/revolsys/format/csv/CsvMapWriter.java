@@ -21,12 +21,12 @@ import com.revolsys.util.WrappedException;
 public class CsvMapWriter extends AbstractMapWriter {
   private List<String> fieldNames;
 
+  private final char fieldSeparator;
+
   /** The writer */
   private final Writer out;
 
   private final boolean useQuotes;
-
-  private final char fieldSeparator;
 
   public CsvMapWriter(final File file) throws FileNotFoundException {
     this(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));

@@ -79,15 +79,15 @@ public class VoronoiDiagramBuilder {
     return geom.getGeometryFactory().geometryCollection(clipped);
   }
 
-  private Collection siteCoords;
-
-  private double tolerance = 0.0;
-
-  private QuadEdgeSubdivision subdiv = null;
-
   private BoundingBox clipEnv = null;
 
   private BoundingBox diagramEnv = null;
+
+  private Collection siteCoords;
+
+  private QuadEdgeSubdivision subdiv = null;
+
+  private double tolerance = 0.0;
 
   /**
    * Creates a new Voronoi diagram builder.

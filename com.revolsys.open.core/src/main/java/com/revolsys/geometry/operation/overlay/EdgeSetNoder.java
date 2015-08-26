@@ -51,9 +51,9 @@ import com.revolsys.geometry.geomgraph.index.SimpleMCSweepLineIntersector;
  */
 public class EdgeSetNoder {
 
-  private final LineIntersector li;
-
   private final List inputEdges = new ArrayList();
+
+  private final LineIntersector li;
 
   public EdgeSetNoder(final LineIntersector li) {
     this.li = li;

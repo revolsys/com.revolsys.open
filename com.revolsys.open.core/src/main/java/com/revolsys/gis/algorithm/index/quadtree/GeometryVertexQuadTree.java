@@ -10,12 +10,12 @@ import com.revolsys.geometry.util.GeometryProperties;
 
 public class GeometryVertexQuadTree extends IdObjectQuadTree<Vertex> {
 
+  public static final String GEOMETRY_VERTEX_INDEX = "GeometryVertexQuadTree";
+
   /**
    *
    */
   private static final long serialVersionUID = 1L;
-
-  public static final String GEOMETRY_VERTEX_INDEX = "GeometryVertexQuadTree";
 
   static {
     GeometryEqualsExact3d.addExclude(GEOMETRY_VERTEX_INDEX);

@@ -50,25 +50,25 @@ import com.revolsys.util.Property;
 public class XbaseRecordWriter extends AbstractRecordWriter {
   private static final Logger log = Logger.getLogger(XbaseRecordWriter.class);
 
-  private final List<XBaseFieldDefinition> fields = new ArrayList<>();
+  private Charset charset = StandardCharsets.UTF_8;
 
   private final List<String> fieldNames = new ArrayList<String>();
 
-  private final Resource resource;
+  private final List<XBaseFieldDefinition> fields = new ArrayList<>();
 
-  private final RecordDefinition recordDefinition;
+  private boolean initialized;
 
   private int numRecords = 0;
 
   private ResourceEndianOutput out;
 
-  private boolean useZeroForNull = true;
+  private final RecordDefinition recordDefinition;
 
-  private boolean initialized;
+  private final Resource resource;
 
   private Map<String, String> shortNames = new HashMap<String, String>();
 
-  private Charset charset = StandardCharsets.UTF_8;
+  private boolean useZeroForNull = true;
 
   public XbaseRecordWriter(final RecordDefinition recordDefinition, final Resource resource) {
     this.recordDefinition = recordDefinition;

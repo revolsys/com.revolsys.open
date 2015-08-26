@@ -14,7 +14,6 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.csv.Csv;
 
 public class RecordReaderTransferable implements Transferable {
-
   public static final DataFlavor DATA_OBJECT_READER_FLAVOR = new DataFlavor(RecordReader.class,
     "Data Object List");
 

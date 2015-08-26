@@ -36,8 +36,6 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
 
   private JdbcConnection connection;
 
-  private JdbcRecordStore recordStore;
-
   private boolean flushBetweenTypes = false;
 
   private String hints = null;
@@ -48,9 +46,15 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
 
   private boolean quoteColumnNames = true;
 
+  private JdbcRecordStore recordStore;
+
   private String sqlPrefix;
 
   private String sqlSuffix;
+
+  private StatisticsMap statistics;
+
+  private boolean throwExceptions = false;
 
   private final Map<String, Integer> typeCountMap = new LinkedHashMap<String, Integer>();
 
@@ -77,10 +81,6 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
   private Map<String, String> typeUpdateSqlMap = new LinkedHashMap<String, String>();
 
   private Map<String, PreparedStatement> typeUpdateStatementMap = new LinkedHashMap<String, PreparedStatement>();
-
-  private StatisticsMap statistics;
-
-  private boolean throwExceptions = false;
 
   public JdbcWriterImpl(final JdbcRecordStore recordStore) {
     this(recordStore, recordStore.getStatistics());

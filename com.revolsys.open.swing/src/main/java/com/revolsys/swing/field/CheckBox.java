@@ -15,19 +15,19 @@ import com.revolsys.util.Property;
 
 public class CheckBox extends JCheckBox implements Field, ActionListener {
 
-  private static final long serialVersionUID = 1L;
-
-  public static final Color DEFAULT_SELECTED_FOREGROUND = new JTextField().getSelectedTextColor();
-
   public static final Color DEFAULT_BACKGROUND = new JTextField().getBackground();
 
   public static final Color DEFAULT_FOREGROUND = new JTextField().getForeground();
 
+  public static final Color DEFAULT_SELECTED_FOREGROUND = new JTextField().getSelectedTextColor();
+
+  private static final long serialVersionUID = 1L;
+
+  private String errorMessage;
+
   private final String fieldName;
 
   private boolean fieldValue;
-
-  private String errorMessage;
 
   private String originalToolTip;
 

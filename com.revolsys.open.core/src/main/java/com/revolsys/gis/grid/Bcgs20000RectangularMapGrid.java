@@ -4,13 +4,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Bcgs20000RectangularMapGrid extends Nts250000RectangularMapGrid {
-  private static final Pattern NAME_PATTERN = Pattern
-    .compile("^" + BcgsConstants.REGEX_20000 + ".*");
-
   private static final Pattern FIND_NAME_PATTERN = Pattern
     .compile(".*(" + BcgsConstants.REGEX_20000 + ").*");
 
   public static final Bcgs20000RectangularMapGrid INSTANCE = new Bcgs20000RectangularMapGrid();
+
+  private static final Pattern NAME_PATTERN = Pattern
+    .compile("^" + BcgsConstants.REGEX_20000 + ".*");
 
   public static String getTileName(final String mapTileName) {
     final Matcher matcher = FIND_NAME_PATTERN.matcher(mapTileName);

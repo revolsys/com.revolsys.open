@@ -56,11 +56,11 @@ public class IndexTester {
     }
   }
 
-  static final int NUM_ITEMS = 2000;
+  static final double EXTENT_MAX = 1000.0;
 
   static final double EXTENT_MIN = -1000.0;
 
-  static final double EXTENT_MAX = 1000.0;
+  static final int NUM_ITEMS = 2000;
 
   public static List createGridItems(final int nGridCells) {
     final ArrayList items = new ArrayList();

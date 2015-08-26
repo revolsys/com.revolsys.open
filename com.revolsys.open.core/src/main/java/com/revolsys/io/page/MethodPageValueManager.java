@@ -147,11 +147,11 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
     return bytes;
   }
 
-  private Method getValueMethod;
-
   private Method byteArrayWriteMethod;
 
   private Method getBytesMethod;
+
+  private Method getValueMethod;
 
   private String typePath;
 

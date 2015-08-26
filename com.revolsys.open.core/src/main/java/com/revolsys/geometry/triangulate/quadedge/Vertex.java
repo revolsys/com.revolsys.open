@@ -56,19 +56,19 @@ import com.revolsys.geometry.model.impl.PointDouble;
  * @author Martin Davis
  */
 public class Vertex {
-  public static final int LEFT = 0;
-
-  public static final int RIGHT = 1;
-
-  public static final int BEYOND = 2;
-
   public static final int BEHIND = 3;
 
   public static final int BETWEEN = 4;
 
-  public static final int ORIGIN = 5;
+  public static final int BEYOND = 2;
 
   public static final int DESTINATION = 6;
+
+  public static final int LEFT = 0;
+
+  public static final int ORIGIN = 5;
+
+  public static final int RIGHT = 1;
 
   /**
    * Computes the interpolated Z-value for a point p lying on the segment p0-p1

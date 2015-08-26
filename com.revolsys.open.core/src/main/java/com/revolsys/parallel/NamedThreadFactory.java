@@ -11,15 +11,15 @@ public class NamedThreadFactory implements ThreadFactory {
 
   private ThreadGroup group;
 
+  private String namePrefix;
+
   private ThreadGroup parentGroup;
 
-  private final AtomicInteger threadNumber = new AtomicInteger(1);
-
-  private String namePrefix;
+  private int priority;
 
   private String threadNamePrefix;
 
-  private int priority;
+  private final AtomicInteger threadNumber = new AtomicInteger(1);
 
   public NamedThreadFactory() {
     this(Thread.NORM_PRIORITY);

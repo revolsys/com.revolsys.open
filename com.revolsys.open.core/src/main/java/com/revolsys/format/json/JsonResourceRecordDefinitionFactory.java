@@ -19,11 +19,11 @@ import com.revolsys.spring.resource.Resource;
 public class JsonResourceRecordDefinitionFactory extends BaseObjectWithProperties
   implements ApplicationContextAware, RecordDefinitionFactory {
 
-  private final Map<String, RecordDefinition> recordDefinitionMap = new HashMap<String, RecordDefinition>();
+  private ApplicationContext applicationContext;
 
   private String locationPattern;
 
-  private ApplicationContext applicationContext;
+  private final Map<String, RecordDefinition> recordDefinitionMap = new HashMap<String, RecordDefinition>();
 
   public String getLocationPattern() {
     return this.locationPattern;

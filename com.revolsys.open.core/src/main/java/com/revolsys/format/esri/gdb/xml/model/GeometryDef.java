@@ -8,17 +8,17 @@ public class GeometryDef {
 
   private GeometryType geometryType;
 
-  private boolean hasM;
-
-  private boolean hasZ;
-
-  private SpatialReference spatialReference;
-
   private double gridSize0;
 
   private Double gridSize1;
 
   private Double gridSize2;
+
+  private boolean hasM;
+
+  private boolean hasZ;
+
+  private SpatialReference spatialReference;
 
   public GeometryDef() {
   }

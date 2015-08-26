@@ -22,9 +22,9 @@ import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.serializer.key.KeySerializer;
 
 public class KeySerializerDetailSerializer implements LabelValueListSerializer {
-  private final List<KeySerializer> serializers;
-
   private Object object;
+
+  private final List<KeySerializer> serializers;
 
   public KeySerializerDetailSerializer(final List<KeySerializer> serializers) {
     if (serializers == null) {

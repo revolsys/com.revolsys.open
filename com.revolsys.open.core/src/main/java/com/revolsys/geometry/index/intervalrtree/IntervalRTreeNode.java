@@ -36,9 +36,9 @@ import java.util.function.Consumer;
 
 public abstract class IntervalRTreeNode<V> {
 
-  private double min = Double.POSITIVE_INFINITY;
-
   private double max = Double.NEGATIVE_INFINITY;
+
+  private double min = Double.POSITIVE_INFINITY;
 
   public IntervalRTreeNode() {
   }

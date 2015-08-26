@@ -23,13 +23,13 @@ public class FormHorizontalDecorator implements Decorator {
     container.add(element, decorator);
   }
 
-  private String label = "";
-
   private String instructions = "";
 
-  private boolean required;
+  private String label = "";
 
   private String labelUrl;
+
+  private boolean required;
 
   public FormHorizontalDecorator(final String label) {
     this.label = label;

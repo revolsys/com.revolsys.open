@@ -23,11 +23,11 @@ import com.revolsys.util.HtmlUtil;
 
 public class Button extends Field {
 
+  private String cssClass;
+
   private String text;
 
   private String type;
-
-  private String cssClass;
 
   public Button(final String name) {
     this(name, false, "submit", name, name, null);

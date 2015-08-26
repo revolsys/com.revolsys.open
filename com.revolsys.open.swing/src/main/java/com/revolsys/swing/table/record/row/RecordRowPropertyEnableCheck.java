@@ -10,11 +10,11 @@ import com.revolsys.swing.table.record.model.RecordRowTableModel;
 import com.revolsys.util.JavaBeanUtil;
 
 public class RecordRowPropertyEnableCheck extends AbstractEnableCheck {
+  private boolean invert = false;
+
   private final String propertyName;
 
   private final Object value;
-
-  private boolean invert = false;
 
   public RecordRowPropertyEnableCheck(final boolean invert, final String propertyName) {
     this(invert, propertyName, true);

@@ -44,11 +44,11 @@ import java.util.Iterator;
  */
 @SuppressWarnings("deprecation")
 class TaggedLinesSimplifier {
+  private double distanceTolerance = 0.0;
+
   private final LineSegmentIndex inputIndex = new LineSegmentIndex();
 
   private final LineSegmentIndex outputIndex = new LineSegmentIndex();
-
-  private double distanceTolerance = 0.0;
 
   public TaggedLinesSimplifier() {
 

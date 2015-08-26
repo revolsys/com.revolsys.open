@@ -6,13 +6,13 @@ import com.revolsys.util.Property;
 public class SetObjectProperty extends AbstractUndoableEdit {
   private static final long serialVersionUID = 1L;
 
-  private final Object object;
+  private final Object newValue;
 
-  private final String propertyName;
+  private final Object object;
 
   private final Object oldValue;
 
-  private final Object newValue;
+  private final String propertyName;
 
   public SetObjectProperty(final Object object, final String propertyName, final Object oldValue,
     final Object newValue) {

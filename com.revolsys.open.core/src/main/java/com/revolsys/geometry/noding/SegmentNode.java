@@ -45,13 +45,13 @@ import com.revolsys.geometry.model.impl.PointDouble;
 public class SegmentNode implements Comparable {
   public final Point coord; // the point of intersection
 
-  public final int segmentIndex; // the index of the containing line segment in
+  private final boolean isInterior;
 
   // the parent edge
 
-  private final int segmentOctant;
+  public final int segmentIndex; // the index of the containing line segment in
 
-  private final boolean isInterior;
+  private final int segmentOctant;
 
   public SegmentNode(final NodedSegmentString segString, final Point coord, final int segmentIndex,
     final int segmentOctant) {

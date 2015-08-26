@@ -23,9 +23,9 @@ import com.revolsys.ui.html.view.Element;
 import com.revolsys.util.HtmlUtil;
 
 public class FieldLabelDecorator implements Decorator {
-  private String label = "";
-
   private String instructions = "";
+
+  private String label = "";
 
   public FieldLabelDecorator(final String label) {
     this.label = label;

@@ -83,9 +83,9 @@ public class BeanConfigurrer
     }
   }
 
-  private final Map<String, Object> attributes = new LinkedHashMap<String, Object>();
-
   private ApplicationContext applicationContext;
+
+  private final Map<String, Object> attributes = new LinkedHashMap<String, Object>();
 
   private String beanName;
 

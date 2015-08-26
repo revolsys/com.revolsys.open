@@ -8,17 +8,17 @@ import javax.xml.namespace.QName;
 public class DataElement implements Cloneable {
   private String catalogPath;
 
-  private String name;
+  private List<DataElement> children;
 
   private Boolean childrenExpanded;
 
   private Boolean fullPropsRetrieved;
 
-  private Boolean metadataRetrieved;
-
   private String metadata;
 
-  private List<DataElement> children;
+  private Boolean metadataRetrieved;
+
+  private String name;
 
   @Override
   public DataElement clone() {

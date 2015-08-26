@@ -20,13 +20,13 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
     return new ArcGisServerRestLayer(properties);
   }
 
-  private MapServer mapServer;
-
   private GeometryFactory geometryFactory;
 
-  private String url;
-
   private final Object initSync = new Object();
+
+  private MapServer mapServer;
+
+  private String url;
 
   public ArcGisServerRestLayer(final Map<String, Object> properties) {
     super(properties);

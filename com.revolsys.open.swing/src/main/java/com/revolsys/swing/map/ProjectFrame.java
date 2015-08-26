@@ -89,9 +89,9 @@ import groovy.lang.GroovyShell;
 public class ProjectFrame extends BaseFrame {
   public static final String PROJECT_FRAME = "projectFrame";
 
-  public static final String SAVE_PROJECT_KEY = "Save Project";
-
   public static final String SAVE_CHANGES_KEY = "Save Changes";
+
+  public static final String SAVE_PROJECT_KEY = "Save Project";
 
   private static final long serialVersionUID = 1L;
 
@@ -133,27 +133,27 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
-  private Project project;
-
-  private JTabbedPane leftTabs = new JTabbedPane();
-
   private DnDTabbedPane bottomTabs = new DnDTabbedPane();
-
-  private MapPanel mapPanel;
 
   private BaseTree catalogTree;
 
   private boolean exitOnClose = true;
 
-  private BaseTree tocTree;
+  private final String frameTitle;
 
   private JSplitPane leftRightSplit;
 
-  private JSplitPane topBottomSplit;
+  private JTabbedPane leftTabs = new JTabbedPane();
 
-  private final String frameTitle;
+  private MapPanel mapPanel;
 
   private final JMenu openRecentMenu = new JMenu("Open Recent Project");
+
+  private Project project;
+
+  private BaseTree tocTree;
+
+  private JSplitPane topBottomSplit;
 
   public ProjectFrame(final String title) {
     this(title, new Project());

@@ -56,9 +56,9 @@ public class IteratedNoder implements Noder {
 
   private final LineIntersector li;
 
-  private Collection nodedSegStrings;
-
   private int maxIter = MAX_ITER;
+
+  private Collection nodedSegStrings;
 
   public IteratedNoder(final double scale) {
     this.li = new RobustLineIntersector(scale);

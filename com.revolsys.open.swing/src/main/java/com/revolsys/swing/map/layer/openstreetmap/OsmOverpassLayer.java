@@ -21,22 +21,21 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.util.MathUtil;
 
 public class OsmOverpassLayer extends AbstractRecordLayer {
-
   private static final int TILE_SCALE_X = 50;
-
-  private static final double TILE_WIDTH = 1.0 / TILE_SCALE_X;
 
   private static final int TILE_SCALE_Y = 50;
 
   private static final double TILE_HEIGHT = 1.0 / TILE_SCALE_Y;
 
+  private static final double TILE_WIDTH = 1.0 / TILE_SCALE_X;
+
   public static AbstractLayer create(final Map<String, Object> properties) {
     return new OsmOverpassLayer(properties);
   }
 
-  private String serverUrl = "http://api.openstreetmap.org/";
-
   private Map<BoundingBox, OsmDocument> boundingBoxTileMap = new HashMap<>();
+
+  private String serverUrl = "http://api.openstreetmap.org/";
 
   public OsmOverpassLayer(final Map<String, Object> properties) {
     super(properties);

@@ -22,9 +22,9 @@ import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.HtmlUtil;
 
 public class HiddenField extends Field {
-  private String inputValue = "";
-
   private boolean fixedValue = false;
+
+  private String inputValue = "";
 
   /**
    * @param name

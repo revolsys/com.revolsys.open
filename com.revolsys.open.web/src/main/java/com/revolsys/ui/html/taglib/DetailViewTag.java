@@ -28,11 +28,11 @@ public class DetailViewTag extends TagSupport {
   /** The unique serial version UID for the class. */
   private static final long serialVersionUID = 5852237847322159567L;
 
-  private String name;
+  private LabelValueListSerializer model;
 
   private String modelClass;
 
-  private LabelValueListSerializer model;
+  private String name;
 
   @Override
   public int doEndTag() throws JspException {

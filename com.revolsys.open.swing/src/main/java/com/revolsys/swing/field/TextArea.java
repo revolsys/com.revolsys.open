@@ -18,11 +18,11 @@ import com.revolsys.util.Property;
 public class TextArea extends JTextArea implements Field, FocusListener {
   private static final long serialVersionUID = 1L;
 
+  private String errorMessage;
+
   private final String fieldName;
 
   private String fieldValue;
-
-  private String errorMessage;
 
   private String originalToolTip;
 

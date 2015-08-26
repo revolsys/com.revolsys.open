@@ -27,11 +27,11 @@ import javax.servlet.jsp.PageContext;
 
 public class Layout extends Component {
 
-  private boolean page;
-
   private final Set areas = new HashSet();
 
   private final Map components = new HashMap();
+
+  private boolean page;
 
   public Layout() {
   }

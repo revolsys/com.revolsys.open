@@ -12,9 +12,9 @@ public class InvokeMethodPropertyChangeListener implements PropertyChangeListene
 
   private final boolean invokeLater;
 
-  private final Object object;
-
   private final String methodName;
+
+  private final Object object;
 
   private final Object[] parameters;
 

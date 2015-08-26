@@ -15,13 +15,13 @@ import com.revolsys.util.Property;
 public class JdbcRecordStoreFactoryBean extends AbstractFactoryBean<JdbcRecordStore>
   implements ApplicationContextAware {
 
-  private Map<String, Object> config = new LinkedHashMap<String, Object>();
+  private ApplicationContext applicationContext;
 
-  private Map<String, Object> properties = new LinkedHashMap<String, Object>();
+  private Map<String, Object> config = new LinkedHashMap<String, Object>();
 
   private DataSource dataSource;
 
-  private ApplicationContext applicationContext;
+  private Map<String, Object> properties = new LinkedHashMap<String, Object>();
 
   @Override
   protected JdbcRecordStore createInstance() throws Exception {

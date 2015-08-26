@@ -51,15 +51,15 @@ public class ProgressMonitor extends JDialog implements WindowListener {
     progressMonitor.setVisible(true);
   }
 
-  private final JProgressBar progressBar = new JProgressBar();
-
-  private final JLabel noteLabel;
-
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-
   private final JButton cancelButton;
 
   private boolean cancelled = false;
+
+  private final JLabel noteLabel;
+
+  private final JProgressBar progressBar = new JProgressBar();
+
+  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   private ProgressMonitor(final Component component, final String title, final String note,
     final boolean canCancel) {

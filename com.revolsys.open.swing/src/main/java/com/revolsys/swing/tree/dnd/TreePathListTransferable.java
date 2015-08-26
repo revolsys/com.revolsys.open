@@ -32,11 +32,11 @@ public class TreePathListTransferable implements Transferable {
     };
   }
 
-  private final List<TreePath> paths;
-
   private final Set<TreePath> copiedPaths = new HashSet<>();
 
   private final Set<TreePath> movedPaths = new HashSet<>();
+
+  private final List<TreePath> paths;
 
   private final Map<TreePath, Boolean> sameParent = new HashMap<TreePath, Boolean>();
 

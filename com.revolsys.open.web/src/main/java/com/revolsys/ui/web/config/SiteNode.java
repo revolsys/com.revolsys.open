@@ -15,17 +15,17 @@ import org.apache.log4j.Logger;
 public final class SiteNode implements Comparable, Cloneable {
   private static final Logger log = Logger.getLogger(SiteNode.class);
 
-  /** The parent node. */
-  private SiteNode parent;
-
   /** The controller for the node. */
   private SiteNodeController controller;
+
+  /** The map of node names to nodes. */
+  private final Map nodeMap = new TreeMap();
 
   /** The direct child nodes. */
   private final Collection nodes = new ArrayList();
 
-  /** The map of node names to nodes. */
-  private final Map nodeMap = new TreeMap();
+  /** The parent node. */
+  private SiteNode parent;
 
   /** The path to the node. */
   private String path;

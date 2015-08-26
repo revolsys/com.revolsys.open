@@ -61,13 +61,13 @@ public class LineStringGraph extends Graph<LineSegment> {
     }
   }
 
-  private GeometryFactory geometryFactory;
-
-  private LineString points;
+  private BoundingBox envelope;
 
   private Point fromPoint;
 
-  private BoundingBox envelope;
+  private GeometryFactory geometryFactory;
+
+  private LineString points;
 
   public LineStringGraph(final GeometryFactory geometryFactory, final LineString line) {
     super(false);

@@ -7,9 +7,9 @@ import com.revolsys.collection.map.ThreadSharedAttributes;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 
 public class ExecutorServiceFactory {
-  private static final Object SYNC = new Object();
-
   private static final String KEY = ExecutorServiceFactory.class.getName() + ".key";
+
+  private static final Object SYNC = new Object();
 
   public static ExecutorService getExecutorService() {
     synchronized (SYNC) {

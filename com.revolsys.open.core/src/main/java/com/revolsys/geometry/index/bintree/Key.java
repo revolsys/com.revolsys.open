@@ -50,13 +50,13 @@ public class Key {
     return level;
   }
 
-  // the fields which make up the key
-  private double pt = 0.0;
+  // auxiliary data which is derived from the key for use in computation
+  private Interval interval;
 
   private int level = 0;
 
-  // auxiliary data which is derived from the key for use in computation
-  private Interval interval;
+  // the fields which make up the key
+  private double pt = 0.0;
 
   public Key(final Interval interval) {
     computeKey(interval);

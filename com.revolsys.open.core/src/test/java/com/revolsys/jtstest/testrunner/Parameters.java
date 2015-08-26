@@ -47,13 +47,13 @@ import junit.framework.Assert;
  * @version 1.7
  */
 public class Parameters {
-  private static List arguments = null;
-
-  private static List requiredKeys = new Vector();
-
   private static List allowedKeys = new Vector();
 
+  private static List arguments = null;
+
   private static Parameters instance = null;
+
+  private static List requiredKeys = new Vector();
 
   /**
    * Returns the singleton. Be sure to call #setParameters first.

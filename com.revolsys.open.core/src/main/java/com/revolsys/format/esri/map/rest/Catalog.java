@@ -8,9 +8,9 @@ import com.revolsys.util.UrlUtil;
 
 public class Catalog extends ArcGisResponse {
 
-  private String name;
-
   private List<Catalog> folders;
+
+  private String name;
 
   private List<Service> services;
 

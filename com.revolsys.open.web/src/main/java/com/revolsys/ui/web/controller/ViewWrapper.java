@@ -7,13 +7,13 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.Controller;
 
 public class ViewWrapper implements Controller {
-  private String viewName = "jspView";
-
   private String attributeName = "body";
 
   private String prefix = "/jsp";
 
   private String suffix = ".jsp";
+
+  private String viewName = "jspView";
 
   public String getFieldName() {
     return this.attributeName;

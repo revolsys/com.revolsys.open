@@ -98,33 +98,33 @@ public class ConformingDelaunayTriangulator {
     return env;
   }
 
+  // allPointsEnv expanded by a small buffer
+  private BoundingBox computeAreaEnv;
+
+  private Geometry convexHull;
+
+  private IncrementalDelaunayTriangulator incDel;
+
   private final List initialVertices; // List<Vertex>
 
-  private List segVertices; // List<Vertex>
+  private KdTree kdt = null;
 
   // MD - using a Set doesn't seem to be much faster
   // private Set segments = new HashSet();
   private List segments = new ArrayList(); // List<Segment>
 
-  private QuadEdgeSubdivision subdiv = null;
-
-  private IncrementalDelaunayTriangulator incDel;
-
-  private Geometry convexHull;
+  private List segVertices; // List<Vertex>
 
   private ConstraintSplitPointFinder splitFinder = new NonEncroachingSplitPointFinder();
-
-  private KdTree kdt = null;
-
-  private ConstraintVertexFactory vertexFactory = null;
-
-  // allPointsEnv expanded by a small buffer
-  private BoundingBox computeAreaEnv;
 
   // records the last split point computed, for error reporting
   private Point splitPt = null;
 
+  private QuadEdgeSubdivision subdiv = null;
+
   private final double tolerance; // defines if two sites are the same.
+
+  private ConstraintVertexFactory vertexFactory = null;
 
   /**
    * Creates a Conforming Delaunay Triangulation based on the given

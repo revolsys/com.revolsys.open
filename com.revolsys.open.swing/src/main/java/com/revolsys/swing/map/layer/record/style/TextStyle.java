@@ -93,6 +93,8 @@ public class TextStyle implements MapSerializer, Cloneable {
 
   private Color textBoxColor = WebColors.Gainsboro;
 
+  private int textBoxOpacity = 255;
+
   private Measure<Length> textDx = GeometryStyle.ZERO_PIXEL;
 
   private Measure<Length> textDy = GeometryStyle.ZERO_PIXEL;
@@ -121,8 +123,6 @@ public class TextStyle implements MapSerializer, Cloneable {
   private Measure<Length> textSize = GeometryStyle.TEN_PIXELS;
 
   private String textVerticalAlignment = AUTO;
-
-  private int textBoxOpacity = 255;
 
   public TextStyle() {
   }

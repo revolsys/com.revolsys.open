@@ -5,16 +5,16 @@ import java.util.EventObject;
 import com.revolsys.gis.graph.Node;
 
 public class NodeEvent<T> extends EventObject {
-  /**
-   *
-   */
-  private static final long serialVersionUID = 6966061452365729885L;
-
   public static final String NODE_ADDED = "Added";
 
   public static final String NODE_CHANGED = "Changed";
 
   public static final String NODE_REMOVED = "Removed";
+
+  /**
+   *
+   */
+  private static final long serialVersionUID = 6966061452365729885L;
 
   private String action;
 

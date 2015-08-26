@@ -65,13 +65,13 @@ import com.revolsys.util.Property;
 public class RecordLayerTableModel extends RecordRowTableModel
   implements SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
 
-  private static final long serialVersionUID = 1L;
-
   public static final String MODE_ALL = "all";
+
+  public static final String MODE_EDITS = "edits";
 
   public static final String MODE_SELECTED = "selected";
 
-  public static final String MODE_EDITS = "edits";
+  private static final long serialVersionUID = 1L;
 
   public static RecordLayerTable createTable(final AbstractRecordLayer layer) {
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
@@ -101,53 +101,53 @@ public class RecordLayerTableModel extends RecordRowTableModel
     }
   }
 
-  private EventQueueRunnableListener selectionChangedListener;
-
-  private ListSelectionModel selectionModel = new RecordLayerListSelectionModel(this);
-
-  private ListSelectionModel highlightedModel = new RecordLayerHighlightedListSelectionModel(this);
-
-  private Condition filter;
-
-  private final LinkedList<Condition> filterHistory = new LinkedList<>();
-
-  private boolean filterByBoundingBox;
-
-  private List<String> fieldFilterModes = Arrays.asList(MODE_ALL, MODE_SELECTED, MODE_EDITS);
-
-  private List<String> sortableModes = Arrays.asList(MODE_SELECTED, MODE_EDITS);
-
-  private SwingWorker<?, ?> loadObjectsWorker;
-
-  private Map<Integer, List<LayerRecord>> pageCache = new LruMap<Integer, List<LayerRecord>>(5);
+  private boolean countLoaded;
 
   private String fieldFilterMode = MODE_ALL;
 
-  private final int pageSize = 40;
+  private List<String> fieldFilterModes = Arrays.asList(MODE_ALL, MODE_SELECTED, MODE_EDITS);
+
+  private Condition filter;
+
+  private boolean filterByBoundingBox;
+
+  private final LinkedList<Condition> filterHistory = new LinkedList<>();
+
+  private ListSelectionModel highlightedModel = new RecordLayerHighlightedListSelectionModel(this);
 
   private final AbstractRecordLayer layer;
-
-  private boolean countLoaded;
-
-  private int rowCount;
-
-  private SwingWorker<?, ?> rowCountWorker;
-
-  private final Object sync = new Object();
 
   private final Set<Integer> loadingPageNumbers = new LinkedHashSet<>();
 
   private final Set<Integer> loadingPageNumbersToProcess = new LinkedHashSet<>();
 
+  private final LayerRecord loadingRecord;
+
+  private SwingWorker<?, ?> loadObjectsWorker;
+
   private Map<String, Boolean> orderBy;
+
+  private Map<Integer, List<LayerRecord>> pageCache = new LruMap<Integer, List<LayerRecord>>(5);
+
+  private final int pageSize = 40;
 
   private int refreshIndex = 0;
 
-  private final Object selectedSync = new Object();
+  private int rowCount;
+
+  private SwingWorker<?, ?> rowCountWorker;
 
   private List<LayerRecord> selectedRecords = Collections.emptyList();
 
-  private final LayerRecord loadingRecord;
+  private final Object selectedSync = new Object();
+
+  private EventQueueRunnableListener selectionChangedListener;
+
+  private ListSelectionModel selectionModel = new RecordLayerListSelectionModel(this);
+
+  private List<String> sortableModes = Arrays.asList(MODE_SELECTED, MODE_EDITS);
+
+  private final Object sync = new Object();
 
   public RecordLayerTableModel(final AbstractRecordLayer layer) {
     super(layer.getRecordDefinition());

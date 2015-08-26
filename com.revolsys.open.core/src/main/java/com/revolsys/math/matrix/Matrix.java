@@ -414,10 +414,10 @@ public class Matrix implements Cloneable, java.io.Serializable {
     return buffer.toString();
   }
 
-  /** Array for internal storage of elements.
-  @serial internal array storage.
+  /** column dimension.
+  @serial column dimension.
   */
-  private final double[][] values;
+  private final int columnCount;
 
   /*
    * ------------------------ Public Methods ------------------------
@@ -428,10 +428,10 @@ public class Matrix implements Cloneable, java.io.Serializable {
    */
   private final int rowCount;
 
-  /** column dimension.
-  @serial column dimension.
+  /** Array for internal storage of elements.
+  @serial internal array storage.
   */
-  private final int columnCount;
+  private final double[][] values;
 
   /** Construct a matrix from a one-dimensional packed array
   @param vals One-dimensional array of doubles, packed by columns (ala Fortran).

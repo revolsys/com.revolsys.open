@@ -120,14 +120,16 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   private MouseOverlay mouseOverlay;
 
-  private final LinkedList<String> overlayActionStack = new LinkedList<>();
+  private final Map<String, Cursor> overlayActionCursors = new HashMap<>();
 
   private final LinkedList<Cursor> overlayActionCursorStack = new LinkedList<>();
+
+  private JLabel overlayActionLabel;
 
   /** Map from an overlay action (current) to the overlay actions that can override it (new). */
   private final Map<String, Set<String>> overlayActionOverrides = new HashMap<>();
 
-  private JLabel overlayActionLabel;
+  private final LinkedList<String> overlayActionStack = new LinkedList<>();
 
   private int overlayIndex = 1;
 
@@ -166,8 +168,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   private final LinkedList<BoundingBox> zoomHistory = new LinkedList<>();
 
   private int zoomHistoryIndex = -1;
-
-  private final Map<String, Cursor> overlayActionCursors = new HashMap<>();
 
   public MapPanel() {
     this(new Project());

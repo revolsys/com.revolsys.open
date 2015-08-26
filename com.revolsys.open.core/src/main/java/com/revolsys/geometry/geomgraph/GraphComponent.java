@@ -44,18 +44,18 @@ import com.revolsys.geometry.util.Assert;
  */
 abstract public class GraphComponent {
 
-  protected Label label;
+  private boolean isCovered = false;
+
+  private boolean isCoveredSet = false;
 
   /**
    * isInResult indicates if this component has already been included in the result
    */
   private boolean isInResult = false;
 
-  private boolean isCovered = false;
-
-  private boolean isCoveredSet = false;
-
   private boolean isVisited = false;
+
+  protected Label label;
 
   public GraphComponent() {
   }

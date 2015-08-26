@@ -17,13 +17,6 @@ public class NamedChannelBundle<T> {
   /** Flag indicating if the channel has been closed. */
   private boolean closed = false;
 
-  /** The ChannelValueStore used to store the valueQueueByName for the Channel */
-  protected Map<String, Queue<T>> valueQueueByName = new HashMap<String, Queue<T>>();
-
-  private AtomicLong sequence = new AtomicLong();
-
-  private Map<String, Queue<Long>> sequenceQueueByName = new HashMap<String, Queue<Long>>();
-
   /** The monitor reads must synchronize on */
   private final Object monitor = new Object();
 
@@ -36,16 +29,23 @@ public class NamedChannelBundle<T> {
   /** Number of writers connected to the channel. */
   private int numWriters = 0;
 
+  private int readerNotifyCount = 0;
+
   /** The monitor reads must synchronize on */
   private final Object readMonitor = new Object();
+
+  private AtomicLong sequence = new AtomicLong();
+
+  private Map<String, Queue<Long>> sequenceQueueByName = new HashMap<String, Queue<Long>>();
+
+  /** The ChannelValueStore used to store the valueQueueByName for the Channel */
+  protected Map<String, Queue<T>> valueQueueByName = new HashMap<String, Queue<T>>();
 
   /** Flag indicating if the channel is closed for writing. */
   private boolean writeClosed;
 
   /** The monitor writes must synchronize on */
   private final Object writeMonitor = new Object();
-
-  private int readerNotifyCount = 0;
 
   public NamedChannelBundle() {
   }

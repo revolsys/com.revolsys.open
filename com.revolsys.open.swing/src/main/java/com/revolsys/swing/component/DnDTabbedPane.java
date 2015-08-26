@@ -213,25 +213,25 @@ public class DnDTabbedPane extends JTabbedPane {
     }
   }
 
-  public static final long serialVersionUID = 1L;
+  private static GhostGlassPane glassPane = new GhostGlassPane();
 
   private static final int LINEWIDTH = 3;
 
   private static final String NAME = "TabTransferData";
 
-  private static GhostGlassPane glassPane = new GhostGlassPane();
-
-  private final DataFlavor FLAVOR = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType, NAME);
-
-  private boolean isDrawRect = false;
-
-  private final Rectangle2D lineRect = new Rectangle2D.Double();
-
-  private final Color lineColor = new Color(0, 100, 255);
+  public static final long serialVersionUID = 1L;
 
   private TabAcceptor acceptor = null;
 
+  private final DataFlavor FLAVOR = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType, NAME);
+
   private boolean hasGhost = false;
+
+  private boolean isDrawRect = false;
+
+  private final Color lineColor = new Color(0, 100, 255);
+
+  private final Rectangle2D lineRect = new Rectangle2D.Double();
 
   private boolean movingTab = false;
 
@@ -617,16 +617,16 @@ public class DnDTabbedPane extends JTabbedPane {
 }
 
 class GhostGlassPane extends JPanel {
-  public static final long serialVersionUID = 1L;
-
   private static final AlphaComposite COMPOSITE = AlphaComposite
     .getInstance(AlphaComposite.SRC_OVER, 0.7f);
+
+  public static final long serialVersionUID = 1L;
+
+  private BufferedImage draggingGhost = null;
 
   private int x;
 
   private int y;
-
-  private BufferedImage draggingGhost = null;
 
   public GhostGlassPane() {
     setOpaque(false);

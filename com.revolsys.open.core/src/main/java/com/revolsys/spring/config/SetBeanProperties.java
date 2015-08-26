@@ -16,13 +16,13 @@ import org.springframework.beans.factory.config.TypedStringValue;
 public class SetBeanProperties implements BeanFactoryPostProcessor, InitializingBean {
   private Map<String, String> beanPropertyNames = new LinkedHashMap<String, String>();
 
-  private String targetTypeName;
-
-  private Object value;
+  private Object propertyValue;
 
   private String ref;
 
-  private Object propertyValue;
+  private String targetTypeName;
+
+  private Object value;
 
   public void addBeanPropertyName(final String beanName, final String propertyName) {
     this.beanPropertyNames.put(beanName, propertyName);

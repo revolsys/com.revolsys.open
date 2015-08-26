@@ -8,9 +8,9 @@ import com.revolsys.geometry.model.LineString;
 
 public class EdgeLineList extends AbstractList<LineString> {
 
-  private final Graph<?> graph;
-
   private final List<Integer> edgeIds;
+
+  private final Graph<?> graph;
 
   public EdgeLineList(final Graph<?> graph) {
     this(graph, new ArrayList<Integer>());

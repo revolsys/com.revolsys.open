@@ -20,9 +20,9 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
    */
   private static final long serialVersionUID = 1L;
 
-  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-
   private MenuFactory menu = new MenuFactory(getClass().getName());
+
+  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   public AbstractTableModel() {
   }

@@ -66,13 +66,13 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
  */
 public class OffsetCurveSetBuilder {
 
-  private final Geometry geometry;
-
-  private final double distance;
-
   private final OffsetCurveBuilder curveBuilder;
 
   private final List<NodedSegmentString> curveList = new ArrayList<>();
+
+  private final double distance;
+
+  private final Geometry geometry;
 
   public OffsetCurveSetBuilder(final Geometry inputGeom, final double distance,
     final GeometryFactory precisionModel, final BufferParameters parameters) {

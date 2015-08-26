@@ -57,17 +57,17 @@ import com.revolsys.geometry.model.Geometry;
 public class WKBHexFileReader {
   private static final int MAX_LOOKAHEAD = 1000;
 
-  private File file = null;
-
-  private Reader reader;
-
-  private final WKBReader wkbReader;
-
   private int count = 0;
+
+  private File file = null;
 
   private int limit = -1;
 
   private int offset = 0;
+
+  private Reader reader;
+
+  private final WKBReader wkbReader;
 
   /**
    * Creates a new <tt>WKBHexFileReader</tt> given the <tt>File</tt> to read from

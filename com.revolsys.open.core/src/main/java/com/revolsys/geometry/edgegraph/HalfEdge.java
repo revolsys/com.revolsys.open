@@ -68,11 +68,11 @@ public class HalfEdge {
     return e0;
   }
 
+  private HalfEdge next;
+
   private final Point orig;
 
   private HalfEdge sym;
-
-  private HalfEdge next;
 
   /**
    * Creates an edge originating from a given coordinate.

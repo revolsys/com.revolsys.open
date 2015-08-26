@@ -12,9 +12,9 @@ public class PolygonVertex extends AbstractVertex {
    */
   private static final long serialVersionUID = 1L;
 
-  private int vertexIndex;
-
   private int ringIndex;
+
+  private int vertexIndex;
 
   public PolygonVertex(final Polygon polygon, final int... vertexId) {
     super(polygon);

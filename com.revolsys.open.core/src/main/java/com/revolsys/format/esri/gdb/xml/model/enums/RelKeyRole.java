@@ -1,8 +1,8 @@
 package com.revolsys.format.esri.gdb.xml.model.enums;
 
 public enum RelKeyRole {
-  /** Origin Primary Key */
-  esriRelKeyRoleOriginPrimary,
+  /** Destination Foreign Key */
+  esriRelKeyRoleDestinationForeign,
 
   /** Destination Primary Key */
   esriRelKeyRoleDestinationPrimary,
@@ -10,6 +10,6 @@ public enum RelKeyRole {
   /** Origin Foreign Key */
   esriRelKeyRoleOriginForeign,
 
-  /** Destination Foreign Key */
-  esriRelKeyRoleDestinationForeign;
+  /** Origin Primary Key */
+  esriRelKeyRoleOriginPrimary;
 }

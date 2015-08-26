@@ -31,13 +31,13 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
 
   }
 
-  private final KmlXmlWriter writer;
+  private String defaultStyleUrl;
 
   private boolean opened;
 
-  private String defaultStyleUrl;
-
   private String styleUrl;
+
+  private final KmlXmlWriter writer;
 
   public KmlRecordWriter(final java.io.Writer out) {
     this.writer = new KmlXmlWriter(out);

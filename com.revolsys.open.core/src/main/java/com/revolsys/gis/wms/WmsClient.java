@@ -27,11 +27,11 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.UrlUtil;
 
 public class WmsClient {
+  private WmsCapabilities capabilities;
+
   private String name;
 
   private final URL serviceUrl;
-
-  private WmsCapabilities capabilities;
 
   public WmsClient(final String url) throws MalformedURLException {
     this(new URL(url));

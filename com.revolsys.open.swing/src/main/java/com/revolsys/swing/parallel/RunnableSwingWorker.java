@@ -3,9 +3,9 @@ package com.revolsys.swing.parallel;
 import org.slf4j.LoggerFactory;
 
 public class RunnableSwingWorker extends AbstractSwingWorker<Void, Void> {
-  private final String description;
-
   private final Runnable backgroundTask;
+
+  private final String description;
 
   public RunnableSwingWorker(final Runnable backgroundTask) {
     this(backgroundTask.toString(), backgroundTask);

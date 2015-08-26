@@ -36,9 +36,9 @@ import com.revolsys.data.types.EnumerationDataType;
 public class RecordValidator {
   private static final Logger log = Logger.getLogger(RecordValidator.class);
 
-  private final FieldValueValidator recordAttributeValidator = new RecordAttributeValidator(this);
-
   private final Map<DataType, FieldValueValidator> objectValidators = new HashMap<DataType, FieldValueValidator>();
+
+  private final FieldValueValidator recordAttributeValidator = new RecordAttributeValidator(this);
 
   public RecordValidator() {
     setObjectValidator(DataTypes.BOOLEAN, new BooleanAttributeValidator());

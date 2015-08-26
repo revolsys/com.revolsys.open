@@ -26,6 +26,8 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
   private BoundingBox boundingBox;
 
+  private final String catalogPath;
+
   private int count;
 
   private String fields;
@@ -47,8 +49,6 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
   private Statistics statistics;
 
   private Table table;
-
-  private final String catalogPath;
 
   FileGdbQueryIterator(final FileGdbRecordStore recordStore, final String catalogPath) {
     this(recordStore, catalogPath, "*", "", null, 0, -1);

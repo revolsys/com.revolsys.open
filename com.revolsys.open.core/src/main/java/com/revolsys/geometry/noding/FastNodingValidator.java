@@ -61,15 +61,15 @@ import com.revolsys.geometry.model.TopologyException;
  * @version 1.7
  */
 public class FastNodingValidator {
-  private final LineIntersector li = new RobustLineIntersector();
-
-  private final Collection segStrings;
-
   private boolean findAllIntersections = false;
+
+  private boolean isValid = true;
+
+  private final LineIntersector li = new RobustLineIntersector();
 
   private InteriorIntersectionFinder segInt = null;
 
-  private boolean isValid = true;
+  private final Collection segStrings;
 
   /**
    * Creates a new noding validator for a given set of linework.

@@ -79,12 +79,12 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   private static final AtomicLong ID_GEN = new AtomicLong();
 
+  public static final String PLUGIN_TABLE_VIEW = "tableView";
+
   static {
     MenuFactory.createMenu(AbstractLayer.class, "ZoomToLayer", "MinScale", "MaxScale", "Refresh",
       "DeleteLayer", "LayerProperties");
   }
-
-  public static final String PLUGIN_TABLE_VIEW = "tableView";
 
   private PropertyChangeListener beanPropertyListener = new BeanPropertyListener(this);
 

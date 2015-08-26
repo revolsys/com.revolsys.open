@@ -25,9 +25,9 @@ import java.util.function.Predicate;
 import com.revolsys.geometry.model.LineString;
 
 public class LineEqualExactFilter implements Predicate<LineString> {
-  private final LineString line;
-
   int axisCount = -1;
+
+  private final LineString line;
 
   public LineEqualExactFilter(final LineString line) {
     this.line = line;

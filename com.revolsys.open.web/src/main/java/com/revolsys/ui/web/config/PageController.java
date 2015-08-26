@@ -28,41 +28,41 @@ public class PageController implements SiteNodeController {
 
   private static final Logger log = Logger.getLogger(PageController.class);
 
+  /** The list of actions to perform on this page. */
+  private Collection actions = new ArrayList();
+
   protected List arguments = new ArrayList();
-
-  protected Config config;
-
-  protected long menuId;
-
-  protected String title = "";
-
-  protected Map properties = new HashMap();
-
-  private Map menus = new HashMap();
-
-  private Layout layout;
 
   protected Map argumentsMap = new HashMap();
 
-  private Expression titleExpression;
+  protected List attributes = new ArrayList();
 
   protected HashMap attributesMap = new HashMap();
 
-  protected List attributes = new ArrayList();
+  protected Config config;
 
-  protected boolean secure;
+  private Layout layout;
 
-  /** The list of actions to perform on this page. */
-  private Collection actions = new ArrayList();
+  protected long menuId;
+
+  private Map menus = new HashMap();
 
   /** The site node for this page. */
   private SiteNode node = new SiteNode(this);
 
+  protected Map properties = new HashMap();
+
   /** The list of client side scripts for the page. */
   private final Collection scripts = new ArrayList();
 
+  protected boolean secure;
+
   /** The list of style sheets for the page. */
   private final Collection styles = new ArrayList();
+
+  protected String title = "";
+
+  private Expression titleExpression;
 
   public PageController() {
   }

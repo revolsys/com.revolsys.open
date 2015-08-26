@@ -72,19 +72,19 @@ public class RectangleLineIntersectorTest extends TestCase {
  *
  */
 class RectangleLineIntersectorValidator {
-  private final GeometryFactory geomFact = GeometryFactory.floating3();
-
   private final double baseX = 0;
 
   private final double baseY = 0;
 
-  private final double rectSize = 100;
+  private final GeometryFactory geomFact = GeometryFactory.floating3();
 
-  private BoundingBox rectEnv;
+  private boolean isValid = true;
 
   private Point[] pts;
 
-  private boolean isValid = true;
+  private BoundingBox rectEnv;
+
+  private final double rectSize = 100;
 
   public RectangleLineIntersectorValidator() {
 
@@ -147,17 +147,17 @@ class RectangleLineIntersectorValidator {
 }
 
 class SimpleRectangleIntersector {
-  // for intersection testing, don't need to set precision model
-  private final LineIntersector li = new RobustLineIntersector();
-
-  private final BoundingBox rectEnv;
-
   /**
    * The corners of the rectangle, in the order:
    *  10
    *  23
    */
   private final Point[] corner = new Point[4];
+
+  // for intersection testing, don't need to set precision model
+  private final LineIntersector li = new RobustLineIntersector();
+
+  private final BoundingBox rectEnv;
 
   public SimpleRectangleIntersector(final BoundingBox rectEnv) {
     this.rectEnv = rectEnv;

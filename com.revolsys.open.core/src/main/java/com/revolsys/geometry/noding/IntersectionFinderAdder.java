@@ -52,9 +52,9 @@ import com.revolsys.geometry.model.Point;
  */
 @Deprecated
 public class IntersectionFinderAdder implements SegmentIntersector {
-  private final LineIntersector li;
-
   private final List interiorIntersections;
+
+  private final LineIntersector li;
 
   /**
    * Creates an intersection finder which finds all proper intersections

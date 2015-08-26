@@ -47,10 +47,10 @@ import com.revolsys.geometry.model.Point;
  * @version 1.7
  */
 public class NodeMap implements Iterable<Node> {
+  NodeFactory nodeFact;
+
   // Map nodeMap = new HashMap();
   Map<Point, Node> nodeMap = new TreeMap<>();
-
-  NodeFactory nodeFact;
 
   public NodeMap(final NodeFactory nodeFact) {
     this.nodeFact = nodeFact;

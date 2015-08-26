@@ -4,17 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Style {
-  private String name;
-
-  private String title;
-
   private String abstractDescription;
 
   private List<ImageUrl> legendUrls = new ArrayList<ImageUrl>();
 
+  private String name;
+
   private FormatUrl styleSheetUrl;
 
   private FormatUrl styleUrl;
+
+  private String title;
 
   public void addLegendUrl(final ImageUrl legendUrl) {
     this.legendUrls.add(legendUrl);

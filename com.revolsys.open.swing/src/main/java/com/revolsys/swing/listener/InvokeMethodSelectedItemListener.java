@@ -10,9 +10,9 @@ public class InvokeMethodSelectedItemListener implements ItemListener {
 
   private final boolean invokeLater;
 
-  private final Object object;
-
   private final String methodName;
+
+  private final Object object;
 
   public InvokeMethodSelectedItemListener(final boolean invokeLater, final Object object,
     final String methodName) {

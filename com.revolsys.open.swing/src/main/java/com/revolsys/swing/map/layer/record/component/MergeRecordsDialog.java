@@ -63,17 +63,17 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
     dialog.showDialog();
   }
 
-  private JButton okButton;
-
   private final AbstractRecordLayer layer;
 
   private final Map<Record, LayerRecord> mergeableToOiginalRecordMap = new HashMap<Record, LayerRecord>();
 
   private JPanel mergedObjectsPanel;
 
-  private final Set<LayerRecord> replacedOriginalRecords = new LinkedHashSet<LayerRecord>();
-
   private Map<Record, Set<LayerRecord>> mergedRecords = Collections.emptyMap();
+
+  private JButton okButton;
+
+  private final Set<LayerRecord> replacedOriginalRecords = new LinkedHashSet<LayerRecord>();
 
   private final UndoManager undoManager;
 

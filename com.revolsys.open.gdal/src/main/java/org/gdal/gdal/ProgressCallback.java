@@ -13,9 +13,9 @@ public class ProgressCallback {
     return obj == null ? 0 : obj.swigCPtr;
   }
 
-  private long swigCPtr;
-
   protected boolean swigCMemOwn;
+
+  private long swigCPtr;
 
   public ProgressCallback() {
     this(gdalJNI.new_ProgressCallback(), true);

@@ -9,11 +9,11 @@ import org.springframework.beans.factory.BeanNameAware;
 import com.revolsys.data.record.Record;
 
 public class StatisticsIterable implements Iterable<Record>, BeanNameAware {
-  private String statsName;
-
   private Iterable<Record> iterable;
 
   private Statistics statistics;
+
+  private String statsName;
 
   public StatisticsIterable() {
   }

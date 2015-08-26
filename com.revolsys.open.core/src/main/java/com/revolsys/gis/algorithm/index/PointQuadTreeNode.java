@@ -12,19 +12,19 @@ import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.util.MathUtil;
 
 public class PointQuadTreeNode<T> {
-  private final double x;
-
-  private final double y;
-
-  private final T value;
+  private PointQuadTreeNode<T> northEast;
 
   private PointQuadTreeNode<T> northWest;
 
-  private PointQuadTreeNode<T> northEast;
+  private PointQuadTreeNode<T> southEast;
 
   private PointQuadTreeNode<T> southWest;
 
-  private PointQuadTreeNode<T> southEast;
+  private final T value;
+
+  private final double x;
+
+  private final double y;
 
   public PointQuadTreeNode(final T value, final double x, final double y) {
     this.value = value;

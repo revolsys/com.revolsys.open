@@ -89,9 +89,9 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Em
     return set;
   }
 
-  private int size;
-
   private final List<AbstractRange<?>> ranges = new LinkedList<>();
+
+  private int size;
 
   public RangeSet() {
   }

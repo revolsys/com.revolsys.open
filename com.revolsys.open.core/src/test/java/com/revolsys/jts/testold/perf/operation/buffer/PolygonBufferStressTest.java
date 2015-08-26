@@ -22,9 +22,9 @@ import com.revolsys.geometry.wkb.WKTReader;
  */
 public class PolygonBufferStressTest {
 
-  static final int MAX_ITER = 50;
-
   private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+
+  static final int MAX_ITER = 50;
 
   static WKTReader wktRdr = new WKTReader(geometryFactory);
 

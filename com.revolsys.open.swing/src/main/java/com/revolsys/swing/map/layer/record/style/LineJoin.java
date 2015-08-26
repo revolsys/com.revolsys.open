@@ -3,7 +3,7 @@ package com.revolsys.swing.map.layer.record.style;
 import java.awt.BasicStroke;
 
 public enum LineJoin {
-  MITER(BasicStroke.JOIN_MITER), ROUND(BasicStroke.JOIN_ROUND), BEVEL(BasicStroke.JOIN_BEVEL);
+  BEVEL(BasicStroke.JOIN_BEVEL), MITER(BasicStroke.JOIN_MITER), ROUND(BasicStroke.JOIN_ROUND);
 
   private int awtValue;
 

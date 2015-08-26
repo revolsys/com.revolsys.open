@@ -21,6 +21,11 @@ import com.revolsys.util.WrappedException;
 public class UrlResource extends AbstractResource {
 
   /**
+   * Cleaned URL (with normalized path), used for comparisons.
+   */
+  private final URL cleanedUrl;
+
+  /**
    * Original URI, if available; used for URI and File access.
    */
   private final URI uri;
@@ -29,11 +34,6 @@ public class UrlResource extends AbstractResource {
    * Original URL, used for actual access.
    */
   private final URL url;
-
-  /**
-   * Cleaned URL (with normalized path), used for comparisons.
-   */
-  private final URL cleanedUrl;
 
   /**
    * Create a new UrlResource based on a URL path.

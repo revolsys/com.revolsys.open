@@ -9,15 +9,15 @@ import com.revolsys.collection.iterator.AbstractIterator;
 
 class BPlusTreeLeafIterator<T> extends AbstractIterator<T> {
 
-  private final BPlusTreeMap<?, ?> map;
-
-  private final int modCount;
-
-  private final boolean key;
+  private int currentIndex = 0;
 
   private final List<T> currentValues = new ArrayList<T>();
 
-  private int currentIndex = 0;
+  private final boolean key;
+
+  private final BPlusTreeMap<?, ?> map;
+
+  private final int modCount;
 
   private int nextPageId = 0;
 

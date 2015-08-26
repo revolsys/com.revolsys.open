@@ -80,6 +80,37 @@ import com.revolsys.util.Property;
  */
 public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
+  /**
+   * The bitmask that indicates that a point lies below
+   * this <code>Rectangle2D</code>.
+   * @since 1.2
+   */
+  public static final int OUT_BOTTOM = 8;
+
+  /**
+   * The bitmask that indicates that a point lies to the left of
+   * this <code>Rectangle2D</code>.
+   * @since 1.2
+   */
+  public static final int OUT_LEFT = 1;
+
+  /**
+   * The bitmask that indicates that a point lies to the right of
+   * this <code>Rectangle2D</code>.
+   * @since 1.2
+   */
+  public static final int OUT_RIGHT = 4;
+
+  /**
+   * The bitmask that indicates that a point lies above
+   * this <code>Rectangle2D</code>.
+   * @since 1.2
+   */
+  public static final int OUT_TOP = 2;
+
+  /** The serialization version. */
+  private static final long serialVersionUID = -810356856421113732L;
+
   static {
     ConvertUtils.register(new Converter() {
 
@@ -99,37 +130,6 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
       }
     }, BoundingBox.class);
   }
-
-  /** The serialization version. */
-  private static final long serialVersionUID = -810356856421113732L;
-
-  /**
-   * The bitmask that indicates that a point lies to the left of
-   * this <code>Rectangle2D</code>.
-   * @since 1.2
-   */
-  public static final int OUT_LEFT = 1;
-
-  /**
-   * The bitmask that indicates that a point lies above
-   * this <code>Rectangle2D</code>.
-   * @since 1.2
-   */
-  public static final int OUT_TOP = 2;
-
-  /**
-   * The bitmask that indicates that a point lies to the right of
-   * this <code>Rectangle2D</code>.
-   * @since 1.2
-   */
-  public static final int OUT_RIGHT = 4;
-
-  /**
-   * The bitmask that indicates that a point lies below
-   * this <code>Rectangle2D</code>.
-   * @since 1.2
-   */
-  public static final int OUT_BOTTOM = 8;
 
   public static BoundingBox create(final String wkt) {
     if (Property.hasValue(wkt)) {

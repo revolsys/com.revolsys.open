@@ -4,55 +4,55 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WmsLayer {
-  private String name;
-
-  private String title;
-
   private String abstractDescription;
-
-  private List<String> keywords = new ArrayList<String>();
-
-  private final List<String> srs = new ArrayList<String>();
-
-  private com.revolsys.geometry.model.BoundingBox latLonBoundingBox;
-
-  private List<BoundingBox> boundingBoxes = new ArrayList<BoundingBox>();
-
-  private List<Dimension> dimensions = new ArrayList<Dimension>();
-
-  private List<Extent> extents = new ArrayList<Extent>();
 
   private Attribution attribution;
 
   private List<AuthorityUrl> authorityUrls = new ArrayList<AuthorityUrl>();
 
-  private List<Identifier> identifiers = new ArrayList<Identifier>();
-
-  private List<MetadataUrl> recordDefinitionUrls = new ArrayList<MetadataUrl>();
-
-  private List<FormatUrl> dataUrls = new ArrayList<FormatUrl>();
-
-  private List<FormatUrl> featureListUrls = new ArrayList<FormatUrl>();
-
-  private List<Style> styles = new ArrayList<Style>();
-
-  private ScaleHint scaleHint;
-
-  private List<WmsLayer> layers = new ArrayList<WmsLayer>();
-
-  private boolean queryable;
+  private List<BoundingBox> boundingBoxes = new ArrayList<BoundingBox>();
 
   private int cascaded;
 
-  private boolean opaque;
+  private List<FormatUrl> dataUrls = new ArrayList<FormatUrl>();
 
-  private boolean noSubsets;
+  private List<Dimension> dimensions = new ArrayList<Dimension>();
 
-  private int fixedWidth;
+  private List<Extent> extents = new ArrayList<Extent>();
+
+  private List<FormatUrl> featureListUrls = new ArrayList<FormatUrl>();
 
   private int fixedHeight;
 
+  private int fixedWidth;
+
+  private List<Identifier> identifiers = new ArrayList<Identifier>();
+
+  private List<String> keywords = new ArrayList<String>();
+
+  private com.revolsys.geometry.model.BoundingBox latLonBoundingBox;
+
+  private List<WmsLayer> layers = new ArrayList<WmsLayer>();
+
+  private String name;
+
+  private boolean noSubsets;
+
+  private boolean opaque;
+
   private WmsLayer parent;
+
+  private boolean queryable;
+
+  private List<MetadataUrl> recordDefinitionUrls = new ArrayList<MetadataUrl>();
+
+  private ScaleHint scaleHint;
+
+  private final List<String> srs = new ArrayList<String>();
+
+  private List<Style> styles = new ArrayList<Style>();
+
+  private String title;
 
   public void addAuthorityUrl(final AuthorityUrl authorityUrl) {
     this.authorityUrls.add(authorityUrl);

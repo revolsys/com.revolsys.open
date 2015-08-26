@@ -224,22 +224,22 @@ public class WKBReader {
       && seq.getCoordinate(0, Geometry.Y) == seq.getCoordinate(n - 1, Geometry.Y);
   }
 
-  private final GeometryFactory factory;
+  private final ByteOrderDataInStream dis = new ByteOrderDataInStream();
 
   // private final PrecisionModel precisionModel;
 
-  // default dimension - will be set on read
-  private int inputDimension = 2;
+  private final GeometryFactory factory;
 
   private boolean hasSRID = false;
+
+  // default dimension - will be set on read
+  private int inputDimension = 2;
 
   /**
    * true if structurally invalid input should be reported rather than repaired.
    * At some point this could be made client-controllable.
    */
   private final boolean isStrict = false;
-
-  private final ByteOrderDataInStream dis = new ByteOrderDataInStream();
 
   private double[] ordValues;
 

@@ -100,9 +100,23 @@ import java.io.Serializable;
  */
 public strictfp final class DD implements Serializable, Comparable, Cloneable {
   /**
-   *
+   * The value nearest to the constant e (the natural logarithm base).
    */
-  private static final long serialVersionUID = 1L;
+  public static final DD E = new DD(2.718281828459045091e+00, 1.445646891729250158e-16);
+
+  /**
+   * The smallest representable relative difference between two {link @ DoubleDouble} values
+   */
+  public static final double EPS = 1.23259516440783e-32; /* = 2^-106 */
+
+  private static final int MAX_PRINT_DIGITS = 32;
+
+  /**
+   * A value representing the result of an operation which does not return a valid number.
+   */
+  public static final DD NaN = new DD(Double.NaN, Double.NaN);
+
+  private static final DD ONE = DD.valueOf(1.0);
 
   /**
    * The value nearest to the constant Pi.
@@ -110,44 +124,30 @@ public strictfp final class DD implements Serializable, Comparable, Cloneable {
   public static final DD PI = new DD(3.141592653589793116e+00, 1.224646799147353207e-16);
 
   /**
-   * The value nearest to the constant 2 * Pi.
-   */
-  public static final DD TWO_PI = new DD(6.283185307179586232e+00, 2.449293598294706414e-16);
-
-  /**
    * The value nearest to the constant Pi / 2.
    */
   public static final DD PI_2 = new DD(1.570796326794896558e+00, 6.123233995736766036e-17);
 
-  /**
-   * The value nearest to the constant e (the natural logarithm base).
-   */
-  public static final DD E = new DD(2.718281828459045091e+00, 1.445646891729250158e-16);
+  private static final String SCI_NOT_EXPONENT_CHAR = "E";
+
+  private static final String SCI_NOT_ZERO = "0.0E0";
 
   /**
-   * A value representing the result of an operation which does not return a valid number.
+   *
    */
-  public static final DD NaN = new DD(Double.NaN, Double.NaN);
-
-  /**
-   * The smallest representable relative difference between two {link @ DoubleDouble} values
-   */
-  public static final double EPS = 1.23259516440783e-32; /* = 2^-106 */
+  private static final long serialVersionUID = 1L;
 
   /**
    * The value to split a double-precision value on during multiplication
    */
   private static final double SPLIT = 134217729.0D; // 2^27+1, for IEEE double
 
-  private static final int MAX_PRINT_DIGITS = 32;
-
   private static final DD TEN = DD.valueOf(10.0);
 
-  private static final DD ONE = DD.valueOf(1.0);
-
-  private static final String SCI_NOT_EXPONENT_CHAR = "E";
-
-  private static final String SCI_NOT_ZERO = "0.0E0";
+  /**
+   * The value nearest to the constant 2 * Pi.
+   */
+  public static final DD TWO_PI = new DD(6.283185307179586232e+00, 2.449293598294706414e-16);
 
   /**
    * Creates a new DoubleDouble with the value of the argument.

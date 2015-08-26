@@ -8,9 +8,9 @@ import org.apache.log4j.spi.LoggingEvent;
 
 public class ListLog4jAppender extends AppenderSkeleton {
 
-  private int maxSize = 100;
-
   private final LinkedList<LoggingEvent> loggingEvents = new LinkedList<LoggingEvent>();
+
+  private int maxSize = 100;
 
   private final Log4jTableModel tableModel;
 

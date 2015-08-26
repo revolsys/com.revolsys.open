@@ -59,11 +59,11 @@ public class PointGeometryUnion {
     return unioner.union();
   }
 
-  private final Geometry pointGeom;
+  private final GeometryFactory geomFact;
 
   private final Geometry otherGeom;
 
-  private final GeometryFactory geomFact;
+  private final Geometry pointGeom;
 
   public PointGeometryUnion(final Puntal pointGeom, final Geometry otherGeom) {
     this.pointGeom = pointGeom;

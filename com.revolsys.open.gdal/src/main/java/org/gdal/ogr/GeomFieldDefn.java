@@ -22,9 +22,9 @@ public class GeomFieldDefn {
     return getCPtr(obj);
   }
 
-  private long swigCPtr;
-
   protected boolean swigCMemOwn;
+
+  private long swigCPtr;
 
   public GeomFieldDefn() {
     this(ogrJNI.new_GeomFieldDefn__SWIG_2(), true);

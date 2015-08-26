@@ -68,15 +68,15 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
     }
   }
 
-  private final List<String> urlPatterns = new ArrayList<>();
+  private boolean available;
+
+  private final String driverName;
 
   private final List<String> fileNameExtensions;
 
   private final String name;
 
-  private boolean available;
-
-  private final String driverName;
+  private final List<String> urlPatterns = new ArrayList<>();
 
   public OgrRecordStoreFactory(final String name, final String driverName, final String mediaType,
     final List<String> fileNameExtensions) {

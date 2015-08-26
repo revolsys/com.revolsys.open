@@ -161,9 +161,9 @@ public class DouglasPeuckerSimplifier {
     return tss.getResultGeometry();
   }
 
-  private final Geometry inputGeom;
-
   private double distanceTolerance;
+
+  private final Geometry inputGeom;
 
   private boolean isEnsureValidTopology = true;
 

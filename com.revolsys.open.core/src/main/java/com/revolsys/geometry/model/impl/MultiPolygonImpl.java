@@ -64,15 +64,15 @@ public class MultiPolygonImpl extends AbstractMultiPolygon implements MultiPolyg
    */
   private BoundingBox boundingBox;
 
+  private final GeometryFactory geometryFactory;
+
+  private Polygon[] polygons;
+
   /**
    * An object reference which can be used to carry ancillary data defined
    * by the client.
    */
   private Object userData;
-
-  private final GeometryFactory geometryFactory;
-
-  private Polygon[] polygons;
 
   public MultiPolygonImpl(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;

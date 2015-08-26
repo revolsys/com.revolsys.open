@@ -20,9 +20,9 @@ public class FieldDefn {
     return getCPtr(obj);
   }
 
-  private long swigCPtr;
-
   protected boolean swigCMemOwn;
+
+  private long swigCPtr;
 
   public FieldDefn() {
     this(ogrJNI.new_FieldDefn__SWIG_2(), true);

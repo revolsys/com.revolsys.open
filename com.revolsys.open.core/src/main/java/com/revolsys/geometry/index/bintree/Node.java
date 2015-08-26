@@ -62,9 +62,9 @@ public class Node extends NodeBase {
     return node;
   }
 
-  private final Interval interval;
-
   private final double centre;
+
+  private final Interval interval;
 
   private final int level;
 

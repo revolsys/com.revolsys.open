@@ -8,9 +8,9 @@ import com.revolsys.parallel.channel.store.Buffer;
 
 public abstract class AbstractOutProcess<T> extends AbstractProcess implements OutProcess<T> {
 
-  private int outBufferSize = 0;
-
   private Channel<T> out;
+
+  private int outBufferSize = 0;
 
   public AbstractOutProcess() {
   }

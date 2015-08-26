@@ -16,9 +16,9 @@
 package com.revolsys.ui.web.config;
 
 public class Area {
-  private final String name;
-
   private final String componentName;
+
+  private final String name;
 
   public Area(final String name, final String componentName) {
     this.name = name;

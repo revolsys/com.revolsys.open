@@ -20,19 +20,19 @@ public class LineSegmentTest {
 
   private final Point c_0_0_N = GEOMETRY_FACTORY_3D.point(0, 0, Double.NaN);
 
-  private final Point c_50_0_5 = GEOMETRY_FACTORY_3D.point(50, 0, 5);
-
-  private final Point c_50_0 = GEOMETRY_FACTORY_2D.point(50, 0);
-
-  private final Point c_70_0_7 = GEOMETRY_FACTORY_3D.point(70, 0, 7);
-
-  private final Point c_70_0 = GEOMETRY_FACTORY_2D.point(70, 0);
+  private final Point c_0_100_1 = GEOMETRY_FACTORY_3D.point(0, 100, 1);
 
   private final Point c_100_0_10 = GEOMETRY_FACTORY_3D.point(100, 0, 10);
 
   private final Point c_100_100_10 = GEOMETRY_FACTORY_3D.point(100, 100, 10);
 
-  private final Point c_0_100_1 = GEOMETRY_FACTORY_3D.point(0, 100, 1);
+  private final Point c_50_0 = GEOMETRY_FACTORY_2D.point(50, 0);
+
+  private final Point c_50_0_5 = GEOMETRY_FACTORY_3D.point(50, 0, 5);
+
+  private final Point c_70_0 = GEOMETRY_FACTORY_2D.point(70, 0);
+
+  private final Point c_70_0_7 = GEOMETRY_FACTORY_3D.point(70, 0, 7);
 
   public void assertIntersection3d(final Point line1Start, final Point line1End,
     final Point line2Start, final Point line2End, final Geometry expectedIntersection) {

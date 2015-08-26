@@ -165,10 +165,6 @@ public class GeometryStyle extends MarkerStyle {
     return style;
   }
 
-  private double lineDashOffset = 0;
-
-  private List<Double> lineDashArray = Collections.emptyList();
-
   private LineCap lineCap = LineCap.ROUND;
 
   private boolean lineClip = true;
@@ -176,6 +172,10 @@ public class GeometryStyle extends MarkerStyle {
   private Color lineColor = new Color(128, 128, 128, 255);
 
   private CompositionOperation lineCompOp = CompositionOperation.src_over;
+
+  private List<Double> lineDashArray = Collections.emptyList();
+
+  private double lineDashOffset = 0;
 
   private double lineGamma = 1.0;
 

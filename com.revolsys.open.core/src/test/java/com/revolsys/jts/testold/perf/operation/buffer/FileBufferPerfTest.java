@@ -10,9 +10,9 @@ import com.revolsys.geometry.wkb.WKTReader;
 import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 
 public class FileBufferPerfTest {
-  static final int MAX_ITER = 1;
-
   private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+
+  static final int MAX_ITER = 1;
 
   static WKTReader wktRdr = new WKTReader(geometryFactory);
 

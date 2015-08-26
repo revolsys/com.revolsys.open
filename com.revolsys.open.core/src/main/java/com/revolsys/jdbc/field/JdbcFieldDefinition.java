@@ -51,11 +51,11 @@ public class JdbcFieldDefinition extends FieldDefinition {
     }
   }
 
+  private String dbName;
+
   private boolean quoteName = false;
 
   private int sqlType;
-
-  private String dbName;
 
   private JdbcFieldDefinition() {
   }

@@ -54,11 +54,11 @@ import org.slf4j.LoggerFactory;
  * @author Paul Austin
  */
 public final class JavaBeanUtil {
-  private static PropertyUtilsBean propertiesUtilBean;
-
   private static ConvertUtilsBean convertUtilsBean;
 
   static final Logger LOG = LoggerFactory.getLogger(JavaBeanUtil.class);
+
+  private static PropertyUtilsBean propertiesUtilBean;
 
   public static void clearCache() {
     propertiesUtilBean = null;

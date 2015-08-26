@@ -11,9 +11,9 @@ import com.revolsys.util.ExceptionUtil;
 public class InvokeMethodMapObjectFactory extends AbstractMapObjectFactory
   implements MapSerializer {
 
-  private final Class<?> typeClass;
-
   private final String methodName;
+
+  private final Class<?> typeClass;
 
   public InvokeMethodMapObjectFactory(final String typeName, final String description,
     final Class<?> typeClass, final String methodName) {

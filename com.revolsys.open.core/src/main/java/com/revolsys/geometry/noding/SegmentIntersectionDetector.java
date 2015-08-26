@@ -47,21 +47,21 @@ import com.revolsys.geometry.model.Point;
  * @version 1.7
  */
 public class SegmentIntersectionDetector implements SegmentIntersector {
-  private final LineIntersector li;
+  private boolean findAllTypes = false;
 
   private boolean findProper = false;
 
-  private boolean findAllTypes = false;
-
   private boolean hasIntersection = false;
 
-  private boolean hasProperIntersection = false;
-
   private boolean hasNonProperIntersection = false;
+
+  private boolean hasProperIntersection = false;
 
   private Point intPt = null;
 
   private Point[] intSegments = null;
+
+  private final LineIntersector li;
 
   /**
    * Creates an intersection finder using a {@link RobustLineIntersector}.

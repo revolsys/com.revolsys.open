@@ -11,9 +11,9 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
 public class RTreeLeaf<T> extends RTreeNode<T> {
 
-  private Object[] objects;
-
   private BoundingBox[] envelopes;
+
+  private Object[] objects;
 
   private int size = 0;
 

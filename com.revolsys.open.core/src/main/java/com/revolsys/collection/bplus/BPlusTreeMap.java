@@ -25,13 +25,13 @@ import com.revolsys.io.page.SerializablePageValueManager;
 public class BPlusTreeMap<K, V> extends AbstractMap<K, V> {
 
   private class PutResult {
+    private boolean hasOldValue;
+
     private byte[] newKeyBytes;
 
     private byte[] newPageIndexBytes;
 
     private V oldValue;
-
-    private boolean hasOldValue;
 
     public void clear() {
       this.newKeyBytes = null;
@@ -178,21 +178,21 @@ public class BPlusTreeMap<K, V> extends AbstractMap<K, V> {
 
   private final int headerSize = 3;
 
-  private final int leafHeaderSize = 7;
-
   private final PageValueManager<K> keyManager;
 
+  private final int leafHeaderSize = 7;
+
   private final int minSize;
+
+  private volatile transient int modCount;
 
   private final PageManager pages;
 
   private final int rootPageIndex = 0;
 
-  private final PageValueManager<V> valueManager;
-
   private int size = 0;
 
-  private volatile transient int modCount;
+  private final PageValueManager<V> valueManager;
 
   public BPlusTreeMap(final PageManager pages, final Comparator<K> comparator,
     final PageValueManager<K> keyManager, final PageValueManager<V> valueManager) {

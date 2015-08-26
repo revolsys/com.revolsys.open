@@ -81,9 +81,9 @@ public class RestDoclet {
     return flag;
   }
 
-  private String docId;
-
   private String destDir = ".";
+
+  private String docId;
 
   private String docTitle;
 

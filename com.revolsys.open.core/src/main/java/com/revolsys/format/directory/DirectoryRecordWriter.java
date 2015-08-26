@@ -24,17 +24,17 @@ import com.revolsys.util.Property;
 public class DirectoryRecordWriter extends AbstractRecordWriter {
   private File directory;
 
-  private Map<String, Writer<Record>> writers = new HashMap<>();
-
-  private Map<String, RecordDefinition> recordDefinitionMap = new HashMap<>();
-
-  private boolean useNamespaceAsSubDirectory;
-
-  private Statistics statistics;
+  private String fileExtension = "";
 
   private String nameSuffix = "";
 
-  private String fileExtension = "";
+  private Map<String, RecordDefinition> recordDefinitionMap = new HashMap<>();
+
+  private Statistics statistics;
+
+  private boolean useNamespaceAsSubDirectory;
+
+  private Map<String, Writer<Record>> writers = new HashMap<>();
 
   public DirectoryRecordWriter() {
   }

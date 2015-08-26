@@ -37,35 +37,35 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     return property;
   }
 
-  private String creationTimestampFieldName;
+  private boolean createMissingCodes = true;
 
-  private String modificationTimestampFieldName;
+  private String creationTimestampFieldName;
 
   private List<String> fieldAliases = new ArrayList<>();
 
-  private RecordStore recordStore;
+  private String idFieldName;
 
   private boolean loadAll = true;
 
-  private RecordDefinition recordDefinition;
-
-  private List<String> valueFieldNames = DEFAULT_FIELD_NAMES;
-
-  private List<String> orderBy = DEFAULT_FIELD_NAMES;
-
-  private PathName typePath;
-
-  private String idFieldName;
-
-  private boolean createMissingCodes = true;
+  private boolean loaded = false;
 
   private boolean loading = false;
 
   private boolean loadMissingCodes = true;
 
+  private String modificationTimestampFieldName;
+
+  private List<String> orderBy = DEFAULT_FIELD_NAMES;
+
+  private RecordDefinition recordDefinition;
+
+  private RecordStore recordStore;
+
   private final ThreadLocal<Boolean> threadLoading = new ThreadLocal<Boolean>();
 
-  private boolean loaded = false;
+  private PathName typePath;
+
+  private List<String> valueFieldNames = DEFAULT_FIELD_NAMES;
 
   public CodeTableProperty() {
   }

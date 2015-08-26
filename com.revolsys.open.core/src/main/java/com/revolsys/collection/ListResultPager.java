@@ -8,11 +8,11 @@ import java.util.List;
 public class ListResultPager<T> implements ResultPager<T> {
   private final List<T> list = new ArrayList<T>();
 
-  /** The number of objects in a page. */
-  private int pageSize = 10;
-
   /** The current page number. */
   private int pageNumber = -1;
+
+  /** The number of objects in a page. */
+  private int pageSize = 10;
 
   public ListResultPager(final Collection<? extends T> list) {
     this.list.addAll(list);

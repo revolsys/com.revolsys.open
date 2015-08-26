@@ -16,11 +16,11 @@ public class Datum implements Serializable {
 
   private final String name;
 
+  private PrimeMeridian primeMeridian;
+
   private final Spheroid spheroid;
 
   private ToWgs84 toWgs84;
-
-  private PrimeMeridian primeMeridian;
 
   public Datum(final String name, final Spheroid spheroid, final Authority authority) {
     this.name = name;

@@ -42,13 +42,13 @@ public class Value extends QueryValue {
     return newValue;
   }
 
-  private JdbcFieldDefinition jdbcAttribute;
-
-  private Object queryValue;
+  private FieldDefinition attribute;
 
   private Object displayValue;
 
-  private FieldDefinition attribute;
+  private JdbcFieldDefinition jdbcAttribute;
+
+  private Object queryValue;
 
   public Value(final FieldDefinition attribute, final Object value) {
     setQueryValue(value);

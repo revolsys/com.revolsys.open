@@ -101,9 +101,9 @@ public class AxisPlaneCoordinateSequence extends AbstractLineString {
     return new AxisPlaneCoordinateSequence(seq, YZ_INDEX);
   }
 
-  private final LineString seq;
-
   private final int[] indexMap;
+
+  private final LineString seq;
 
   private AxisPlaneCoordinateSequence(final LineString seq, final int[] indexMap) {
     this.seq = seq;

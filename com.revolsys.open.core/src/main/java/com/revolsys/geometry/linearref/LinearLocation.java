@@ -136,9 +136,9 @@ public class LinearLocation implements Comparable {
 
   private int componentIndex = 0;
 
-  private int segmentIndex = 0;
-
   private double segmentFraction = 0.0;
+
+  private int segmentIndex = 0;
 
   /**
    * Creates a location referring to the start of a linear geometry

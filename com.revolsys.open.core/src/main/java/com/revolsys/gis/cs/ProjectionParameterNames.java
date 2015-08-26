@@ -5,8 +5,6 @@ import java.util.TreeMap;
 
 public class ProjectionParameterNames {
 
-  private static final String RECTIFIED_GRID_ANGLE = "rectified_grid_angle";
-
   private static final Map<String, String> ALIASES = new TreeMap<>();
 
   private static final String ANGLE_FROM_RECTIFIED_TO_SKEW_GRID = "angle_from_rectified_to_skew_grid";
@@ -45,8 +43,6 @@ public class ProjectionParameterNames {
 
   private static final String LATITUDE_OF_PSEUDO_STANDARD_PARALLEL = "latitude_of_pseudo_standard_parallel";
 
-  private static final String PSEUDO_STANDARD_PARALLEL_1 = "pseudo_standard_parallel_1";
-
   private static final String LATITUDE_OF_STANDARD_PARALLEL = "latitude_of_standard_parallel";
 
   public static final String LONGITUDE_OF_CENTER = "longitude_of_center";
@@ -62,6 +58,10 @@ public class ProjectionParameterNames {
   private static final String NORTHING_AT_FALSE_ORIGIN = "northing_at_false_origin";
 
   private static final String NORTHING_AT_PROJECTION_CENTRE = "northing_at_projection_centre";
+
+  private static final String PSEUDO_STANDARD_PARALLEL_1 = "pseudo_standard_parallel_1";
+
+  private static final String RECTIFIED_GRID_ANGLE = "rectified_grid_angle";
 
   public static final String SCALE_FACTOR = "scale_factor";
 

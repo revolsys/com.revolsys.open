@@ -55,17 +55,17 @@ import com.revolsys.jtstest.testrunner.Result;
  */
 public class BufferValidatedGeometryOperation implements GeometryOperation {
 
-  private final boolean returnEmptyGC = false;
+  private int argCount = 0;
 
   private GeometryMethodOperation chainOp = new GeometryMethodOperation();
 
-  private int argCount = 0;
-
   private double distance;
+
+  private int endCapStyle;
 
   private int quadSegments;
 
-  private int endCapStyle;
+  private final boolean returnEmptyGC = false;
 
   public BufferValidatedGeometryOperation() {
 

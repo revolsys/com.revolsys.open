@@ -65,31 +65,31 @@ import com.revolsys.util.Property;
 
 public class OgrRecordStore extends AbstractRecordStore {
 
-  public static final String ROWID = "ROWID";
-
-  public static final String SQLITE = "SQLite";
-
   public static final String GEO_PAKCAGE = "GPKG";
 
   private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\?");
 
-  private final File file;
+  public static final String ROWID = "ROWID";
 
-  private DataSource dataSource;
+  public static final String SQLITE = "SQLite";
 
   private boolean closed;
 
-  private final Map<String, PathName> layerNameToPathMap = new HashMap<>();
+  private boolean createMissingTables = true;
 
-  private final Map<PathName, String> pathToLayerNameMap = new HashMap<>();
-
-  private final Set<Layer> layersToClose = new HashSet<>();
+  private DataSource dataSource;
 
   private String driverName;
 
+  private final File file;
+
   private final Map<String, String> idFieldNames = new HashMap<>();
 
-  private boolean createMissingTables = true;
+  private final Map<String, PathName> layerNameToPathMap = new HashMap<>();
+
+  private final Set<Layer> layersToClose = new HashSet<>();
+
+  private final Map<PathName, String> pathToLayerNameMap = new HashMap<>();
 
   protected OgrRecordStore(final String driverName, final File file) {
     this.driverName = driverName;

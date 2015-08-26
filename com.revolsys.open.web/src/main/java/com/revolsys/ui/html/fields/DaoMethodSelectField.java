@@ -15,9 +15,9 @@ public class DaoMethodSelectField extends SelectField {
 
   private DataAccessObject<?> dataAccessObject;
 
-  private String methodName;
-
   private List<Object> methodArguments = Collections.emptyList();
+
+  private String methodName;
 
   public DaoMethodSelectField() {
   }

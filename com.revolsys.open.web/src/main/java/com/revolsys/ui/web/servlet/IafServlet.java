@@ -45,11 +45,11 @@ import com.revolsys.ui.web.exception.PageNotFoundException;
 import com.revolsys.ui.web.exception.RedirectException;
 
 public final class IafServlet extends HttpServlet {
-  /** The unique serial version UID for the class. */
-  private static final long serialVersionUID = -5543695651259069014L;
-
   /** The logging category */
   private static final Logger log = Logger.getLogger(IafServlet.class);
+
+  /** The unique serial version UID for the class. */
+  private static final long serialVersionUID = -5543695651259069014L;
 
   /** The defintion of the application */
   private Config applicationConfig;

@@ -24,17 +24,17 @@ import com.revolsys.util.MathUtil;
 public class TinProcess extends BaseInOutProcess<Record, Record> {
   private static final Logger LOG = LoggerFactory.getLogger(TinProcess.class);
 
+  private BoundingBox boundingBox;
+
   private TriangulatedIrregularNetwork tin;
+
+  private File tinCache;
 
   private Channel<Record> tinIn;
 
   private Reader<Record> tinReader;
 
-  private BoundingBox boundingBox;
-
   private Map<String, Object> updatedAttributeValues;
-
-  private File tinCache;
 
   public BoundingBox getBoundingBox() {
     return this.boundingBox;

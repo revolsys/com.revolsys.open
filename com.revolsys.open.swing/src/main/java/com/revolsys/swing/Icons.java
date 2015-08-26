@@ -24,21 +24,21 @@ import com.revolsys.collection.map.WeakCache;
 import com.revolsys.util.OS;
 
 public class Icons {
+  public static final String BADGE_FOLDER = "/com/revolsys/famfamfam/silk/badges/";
+
   private static final Map<Icon, Reference<ImageIcon>> DISABLED_ICON_BY_ICON = new WeakCache<>();
 
   private static final Map<String, Reference<ImageIcon>> DISABLED_ICON_CACHE = new HashMap<>();
 
-  private static final Map<String, Reference<BufferedImage>> NAMED_DISABLED_IMAGE_CACHE = new HashMap<>();
+  private static final Map<Image, BufferedImage> DISABLED_IMAGE_CACHE = new WeakCache<>();
 
   private static final Map<String, Reference<ImageIcon>> ICON_CACHE = new HashMap<>();
 
+  private static final Map<String, Reference<BufferedImage>> NAMED_DISABLED_IMAGE_CACHE = new HashMap<>();
+
   private static final Map<String, Reference<BufferedImage>> NAMED_IMAGE_CACHE = new HashMap<>();
 
-  private static final Map<Image, BufferedImage> DISABLED_IMAGE_CACHE = new WeakCache<>();
-
   public static final String RESOURCE_FOLDER = "/com/revolsys/famfamfam/silk/icons/";
-
-  public static final String BADGE_FOLDER = "/com/revolsys/famfamfam/silk/badges/";
 
   public static void addIcon(final List<Icon> icons, Icon icon, final boolean enabled) {
     if (icon != null) {

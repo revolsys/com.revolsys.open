@@ -1,11 +1,11 @@
 package com.revolsys.format.esri.gdb.xml.model;
 
 public class SubtypeFieldInfo {
-  private String fieldName;
+  private Object defaultValue;
 
   private String domainName;
 
-  private Object defaultValue;
+  private String fieldName;
 
   public Object getDefaultValue() {
     return this.defaultValue;

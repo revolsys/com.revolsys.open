@@ -9,11 +9,11 @@ import com.revolsys.geometry.model.LineString;
 
 public class LinearIntersectionFilter implements Predicate<LineString> {
 
+  private final BoundingBox envelope;
+
   private final LineString line;
 
   private final Geometry preparedLine;
-
-  private final BoundingBox envelope;
 
   public LinearIntersectionFilter(final LineString line) {
     this.line = line;

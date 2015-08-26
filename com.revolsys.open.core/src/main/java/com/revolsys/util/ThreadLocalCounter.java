@@ -1,9 +1,9 @@
 package com.revolsys.util;
 
 public class ThreadLocalCounter implements Counter {
-  private final String name;
-
   private final ThreadLocal<Long> counts = new ThreadLocal<>();
+
+  private final String name;
 
   public ThreadLocalCounter(final String name) {
     this.name = name;

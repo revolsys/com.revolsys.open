@@ -21,9 +21,9 @@ import java.lang.reflect.InvocationTargetException;
 public class Parameter {
   private final String name;
 
-  private Object value;
-
   private final Class type;
+
+  private Object value;
 
   public Parameter(final String name, final String value) {
     this(name, value, String.class);

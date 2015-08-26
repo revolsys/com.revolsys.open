@@ -55,21 +55,21 @@ import junit.framework.TestSuite;
  */
 public class TestFile extends TestSuite implements MapSerializer {
 
-  private String testDescription;
+  private final File file;
 
   private final GeometryFactory geometryFactory;
 
   private GeometryOperation geometryOperation = TestReader.GEOMETRY_FUNCTION_OPERATION;
 
+  private final TestDirectory parent;
+
   private ResultMatcher resultMatcher = TestReader.EQUALITY_RESULT_MATCHER;
 
   private final int runIndex;
 
-  private final File file;
+  private String testDescription;
 
   private File workspace;
-
-  private final TestDirectory parent;
 
   /**
    *

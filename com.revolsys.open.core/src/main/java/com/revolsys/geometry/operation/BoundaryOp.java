@@ -61,13 +61,13 @@ import com.revolsys.geometry.model.Point;
  */
 
 public class BoundaryOp {
-  private final Geometry geom;
-
-  private final GeometryFactory geomFact;
-
   private final BoundaryNodeRule bnRule;
 
   private Map endpointMap;
+
+  private final Geometry geom;
+
+  private final GeometryFactory geomFact;
 
   public BoundaryOp(final Geometry geom) {
     this(geom, BoundaryNodeRule.MOD2_BOUNDARY_RULE);

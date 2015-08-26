@@ -28,10 +28,10 @@ public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record
 
   private static final Logger LOG = LoggerFactory.getLogger(ItersectsNodeEdgeCleanupVisitor.class);
 
-  private Statistics splitStatistics;
-
   private final Set<String> equalExcludeFieldNames = new HashSet<String>(
     Arrays.asList(RecordEquals.EXCLUDE_ID, RecordEquals.EXCLUDE_GEOMETRY));
+
+  private Statistics splitStatistics;
 
   @Override
   public void accept(final Edge<Record> edge) {

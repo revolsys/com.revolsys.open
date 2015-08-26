@@ -10,9 +10,9 @@ public class Node<T> extends AbstractNode<T> {
    */
   private static final long serialVersionUID = 1L;
 
-  private final List<T> items = new ArrayList<>();
-
   private final List<double[]> boundingBoxes = new ArrayList<>();
+
+  private final List<T> items = new ArrayList<>();
 
   public Node() {
   }

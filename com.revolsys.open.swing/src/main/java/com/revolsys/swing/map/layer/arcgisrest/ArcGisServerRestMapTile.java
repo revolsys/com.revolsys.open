@@ -7,15 +7,15 @@ import com.revolsys.swing.map.layer.MapTile;
 
 public class ArcGisServerRestMapTile extends MapTile {
 
-  private final MapServer mapServer;
+  private final ArcGisServerRestLayer layer;
 
-  private final int zoomLevel;
+  private final MapServer mapServer;
 
   private final int tileX;
 
   private final int tileY;
 
-  private final ArcGisServerRestLayer layer;
+  private final int zoomLevel;
 
   public ArcGisServerRestMapTile(final ArcGisServerRestLayer layer, final MapServer mapServer,
     final int zoomLevel, final double resolution, final int tileX, final int tileY) {

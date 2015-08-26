@@ -29,17 +29,17 @@ public class LayerStylePanel extends ValueField implements MouseListener, Proper
 
   private static final long serialVersionUID = 1L;
 
-  private final JScrollPane editStyleContainer = new JScrollPane();
+  private LayerRendererTreeNode currentNode;
 
-  private final BaseTree tree;
+  private final JScrollPane editStyleContainer = new JScrollPane();
 
   private final AbstractLayer layer;
 
-  private LayerRenderer<? extends Layer> rootRenderer;
-
   private final ListTreeNode rootNode;
 
-  private LayerRendererTreeNode currentNode;
+  private LayerRenderer<? extends Layer> rootRenderer;
+
+  private final BaseTree tree;
 
   public LayerStylePanel(final AbstractLayer layer) {
     this.layer = layer;

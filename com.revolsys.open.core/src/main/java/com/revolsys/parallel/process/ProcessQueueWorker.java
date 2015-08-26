@@ -7,11 +7,11 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 
 public class ProcessQueueWorker extends Thread {
-  private final ProcessQueue queue;
-
   private final Channel<Process> in;
 
   private Process process;
+
+  private final ProcessQueue queue;
 
   public ProcessQueueWorker(final ProcessQueue queue) {
     this.queue = queue;

@@ -7,14 +7,14 @@ import com.revolsys.util.JavaBeanUtil;
 
 public class MethodInvoker extends AbstractRunnable {
 
+  /** The name of the method to invoke. */
+  private final Method method;
+
   /** The object to invoke the method on. */
   private final Object object;
 
   /** The parameters to pass to the method. */
   private final Object[] parameters;
-
-  /** The name of the method to invoke. */
-  private final Method method;
 
   /**
    * Construct a new MethodInvoker.

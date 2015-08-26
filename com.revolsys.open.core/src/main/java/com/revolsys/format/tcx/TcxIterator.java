@@ -29,6 +29,8 @@ public class TcxIterator extends BaseObjectWithProperties
 
   private static final Logger LOG = Logger.getLogger(TcxIterator.class);
 
+  private String baseName;
+
   private Record currentRecord;
 
   private File file;
@@ -39,13 +41,11 @@ public class TcxIterator extends BaseObjectWithProperties
 
   private boolean loadNextObject = true;
 
+  private final Queue<Record> records = new LinkedList<Record>();
+
   private final String schemaName = TcxConstants._NS_URI;
 
   private String typePath;
-
-  private String baseName;
-
-  private final Queue<Record> records = new LinkedList<Record>();
 
   public TcxIterator(final File file) throws IOException, XMLStreamException {
     this(new FileReader(file));

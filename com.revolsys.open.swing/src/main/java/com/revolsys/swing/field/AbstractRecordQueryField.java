@@ -80,37 +80,37 @@ public abstract class AbstractRecordQueryField extends ValueField
 
   private static final long serialVersionUID = 1L;
 
-  private final ThreadEnableable eventsEnabled = new ThreadEnableable();
+  private final JXBusyLabel busyLabel = new JXBusyLabel(new Dimension(16, 16));
 
   private final String displayFieldName;
+
+  private final ThreadEnableable eventsEnabled = new ThreadEnableable();
+
+  private final Map<Identifier, String> idToDisplayMap = new LruMap<>(100);
 
   private final JXList list;
 
   private final ArrayListModel<Record> listModel = new ArrayListModel<>();
 
+  private int maxResults = Integer.MAX_VALUE;
+
   private final JPopupMenu menu = new JPopupMenu();
 
+  private int minSearchCharacters = 2;
+
   private final JLabel oldValueItem;
-
-  private final TextField searchField = new TextField("search", 50);
-
-  private final JXBusyLabel busyLabel = new JXBusyLabel(new Dimension(16, 16));
-
-  private Record selectedRecord;
-
-  private final Map<Identifier, String> idToDisplayMap = new LruMap<>(100);
 
   private Identifier originalValue;
 
   private final List<Query> queries;
 
+  private final TextField searchField = new TextField("search", 50);
+
   private final AtomicInteger searchIndex = new AtomicInteger();
 
-  private int maxResults = Integer.MAX_VALUE;
+  private Record selectedRecord;
 
   private final PathName typePath;
-
-  private int minSearchCharacters = 2;
 
   public AbstractRecordQueryField(final String fieldName, final PathName typePath,
     final String displayFieldName) {

@@ -72,13 +72,13 @@ public class TestReader {
 
   private GeometryFactory geometryFactory;
 
-  private WKTOrWKBReader wktorbReader;
-
-  private double tolerance = 0.0;
-
   private GeometryOperation geomOp = GEOMETRY_FUNCTION_OPERATION;
 
   private ResultMatcher resultMatcher = EQUALITY_RESULT_MATCHER;
+
+  private double tolerance = 0.0;
+
+  private WKTOrWKBReader wktorbReader;
 
   public TestReader() {
   }

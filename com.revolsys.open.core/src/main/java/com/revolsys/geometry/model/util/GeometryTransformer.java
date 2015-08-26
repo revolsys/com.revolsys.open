@@ -85,20 +85,14 @@ import com.revolsys.geometry.model.Polygon;
  */
 public abstract class GeometryTransformer {
 
+  protected GeometryFactory factory = null;
+
   /**
    * Possible extensions:
    * getParent() method to return immediate parent e.g. of LinearRings in Polygons
    */
 
   private Geometry inputGeom;
-
-  protected GeometryFactory factory = null;
-
-  // these could eventually be exposed to clients
-  /**
-   * <code>true</code> if empty geometries should not be included in the result
-   */
-  private final boolean pruneEmptyGeometry = true;
 
   /**
    * <code>true</code> if a homogenous collection result
@@ -111,6 +105,12 @@ public abstract class GeometryTransformer {
    * <code>true</code> if the type of the input should be preserved
    */
   private final boolean preserveType = false;
+
+  // these could eventually be exposed to clients
+  /**
+   * <code>true</code> if empty geometries should not be included in the result
+   */
+  private final boolean pruneEmptyGeometry = true;
 
   public GeometryTransformer() {
   }

@@ -20,9 +20,9 @@ import com.revolsys.util.Property;
 public class XmlReader implements XMLStreamConstants, AutoCloseable {
   private static final XMLInputFactory FACTORY = XMLInputFactory.newInstance();
 
-  private XMLStreamReader parser;
-
   private int depth = 0;
+
+  private XMLStreamReader parser;
 
   public XmlReader(final Resource resource) {
     final InputStream inputStream = resource.getInputStream();

@@ -14,15 +14,15 @@ import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Property;
 
 public class FieldSupport {
-  private final Field field;
-
   private final JComponent component;
 
-  private final String name;
-
-  private Object value;
-
   private String errorMessage;
+
+  private final Field field;
+
+  private final IconBorder iconBorder;
+
+  private final String name;
 
   private final Color originalBackgroundColor;
 
@@ -34,9 +34,9 @@ public class FieldSupport {
 
   private final CascadingUndoManager undoManager = new CascadingUndoManager();
 
-  private final IconBorder iconBorder;
-
   private boolean updating = false;
+
+  private Object value;
 
   public FieldSupport(final Field field, final JComponent component, final String name,
     final Object value) {

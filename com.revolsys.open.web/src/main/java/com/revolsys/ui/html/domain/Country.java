@@ -32,16 +32,16 @@ import com.revolsys.io.FileUtil;
  * @version 1.0
  */
 public final class Country implements Serializable {
-  /** The unique serial version UID for the class. */
-  private static final long serialVersionUID = -3530333279679048002L;
-
   private static List<Country> countries;
 
   private static Map<String, Country> countryCodeAlpha2Map = new HashMap<String, Country>();
 
+  private static Map<String, Country> countryNameMap = new HashMap<String, Country>();
+
   private static Map<String, Country> countryPhoneCodeMap = new HashMap<String, Country>();
 
-  private static Map<String, Country> countryNameMap = new HashMap<String, Country>();
+  /** The unique serial version UID for the class. */
+  private static final long serialVersionUID = -3530333279679048002L;
 
   static {
     loadCountryCodes();
@@ -163,21 +163,21 @@ public final class Country implements Serializable {
 
   }
 
-  private final short codeNum;
+  private final String codeAlpha3;
 
   private final String codeAplha2;
 
-  private final String codeAlpha3;
+  private final short codeNum;
 
   private final String name;
 
   private String phoneCode;
 
-  private String phoneRegEx;
+  private String phoneInternationalFormat;
 
   private String phoneNationalFormat;
 
-  private String phoneInternationalFormat;
+  private String phoneRegEx;
 
   private Country(final short codeNum, final String codeAplha2, final String codeAlpha3,
     final String name) {

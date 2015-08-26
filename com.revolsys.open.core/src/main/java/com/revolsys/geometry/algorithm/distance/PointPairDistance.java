@@ -44,13 +44,13 @@ import com.revolsys.geometry.model.impl.PointDouble;
  */
 public class PointPairDistance {
 
-  private final Point[] pt = {
-    new PointDouble(), new PointDouble()
-  };
-
   private double distance = Double.NaN;
 
   private boolean isNull = true;
+
+  private final Point[] pt = {
+    new PointDouble(), new PointDouble()
+  };
 
   public PointPairDistance() {
   }

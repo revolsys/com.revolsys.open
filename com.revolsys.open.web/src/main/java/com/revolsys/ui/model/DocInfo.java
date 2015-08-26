@@ -3,13 +3,13 @@ package com.revolsys.ui.model;
 import java.util.Locale;
 
 public class DocInfo {
-  private Locale locale;
-
-  private String title;
-
   private String description;
 
   private boolean html = false;
+
+  private Locale locale;
+
+  private String title;
 
   public DocInfo() {
   }

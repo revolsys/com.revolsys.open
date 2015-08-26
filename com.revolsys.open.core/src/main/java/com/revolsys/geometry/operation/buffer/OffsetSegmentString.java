@@ -51,16 +51,16 @@ import com.revolsys.geometry.model.impl.PointDouble;
  */
 class OffsetSegmentString {
 
-  private final List<Point> points = new ArrayList<>();
-
-  private GeometryFactory precisionModel = null;
-
   /**
    * The distance below which two adjacent points on the curve
    * are considered to be coincident.
    * This is chosen to be a small fraction of the offset distance.
    */
   private double minimimVertexDistance = 0.0;
+
+  private final List<Point> points = new ArrayList<>();
+
+  private GeometryFactory precisionModel = null;
 
   public void addPt(final double... coordinates) {
     if (!this.precisionModel.isFloating()) {

@@ -3,9 +3,9 @@ package com.revolsys.spring.factory;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
 public class SystemPropertyFactoryBean extends AbstractFactoryBean<String> {
-  private String name;
-
   private String defaultValue;
+
+  private String name;
 
   @Override
   protected String createInstance() throws Exception {

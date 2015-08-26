@@ -57,9 +57,9 @@ import com.revolsys.util.ExitLoopException;
 public class SortedPackedIntervalRTree<V> {
   private List<IntervalRTreeNode<V>> leaves = new ArrayList<>();
 
-  private IntervalRTreeNode<V> root = null;
-
   private int level = 0;
+
+  private IntervalRTreeNode<V> root = null;
 
   public SortedPackedIntervalRTree() {
 

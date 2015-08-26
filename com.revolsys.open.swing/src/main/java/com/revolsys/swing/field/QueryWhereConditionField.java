@@ -118,13 +118,23 @@ public class QueryWhereConditionField extends ValueField
 
   private final BasePanel binaryConditionPanel;
 
-  private final BasePanel inConditionPanel;
-
-  private JComponent inConditionField;
+  private CodeTable codeTable;
 
   private final ComboBox fieldNamesList;
 
+  private JComponent inConditionField;
+
+  private final BasePanel inConditionPanel;
+
+  private final AbstractRecordLayer layer;
+
+  private final TextField likeConditionField;
+
+  private final BasePanel likePanel;
+
   private final PropertyChangeListener listener;
+
+  private final Condition originalFilter;
 
   private final RecordDefinition recordDefinition;
 
@@ -141,16 +151,6 @@ public class QueryWhereConditionField extends ValueField
   private boolean validating;
 
   private final TextPane whereTextField;
-
-  private CodeTable codeTable;
-
-  private final BasePanel likePanel;
-
-  private final TextField likeConditionField;
-
-  private final Condition originalFilter;
-
-  private final AbstractRecordLayer layer;
 
   public QueryWhereConditionField(final AbstractRecordLayer layer,
     final PropertyChangeListener listener, final Condition filter) {

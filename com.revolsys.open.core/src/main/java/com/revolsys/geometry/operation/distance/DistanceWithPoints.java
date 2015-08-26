@@ -102,22 +102,22 @@ public class DistanceWithPoints {
     return distOp.nearestPoints();
   }
 
+  private boolean computed = false;
+
   private final Geometry geometry1;
 
   private final Geometry geometry2;
 
-  private double terminateDistance = 0.0;
-
-  // working
-  private final PointLocator pointLocator = new PointLocator();
+  private double minDistance = Double.MAX_VALUE;
 
   private Point minDistancePoint1;
 
   private Point minDistancePoint2;
 
-  private double minDistance = Double.MAX_VALUE;
+  // working
+  private final PointLocator pointLocator = new PointLocator();
 
-  private boolean computed = false;
+  private double terminateDistance = 0.0;
 
   /**
    * Constructs a DistanceWithPoints that computes the distance and nearest points between

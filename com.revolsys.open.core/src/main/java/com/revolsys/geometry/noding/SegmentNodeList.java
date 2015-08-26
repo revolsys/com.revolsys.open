@@ -47,13 +47,13 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 
 // INCOMPLETE!
 class NodeVertexIterator implements Iterator {
-  private final NodedSegmentString edge;
-
-  private final Iterator nodeIt;
-
   private SegmentNode currNode = null;
 
+  private final NodedSegmentString edge;
+
   private SegmentNode nextNode = null;
+
+  private final Iterator nodeIt;
 
   NodeVertexIterator(final SegmentNodeList nodeList) {
     this.edge = nodeList.getEdge();
@@ -119,9 +119,9 @@ class NodeVertexIterator implements Iterator {
  * @version 1.7
  */
 public class SegmentNodeList {
-  private final Map nodeMap = new TreeMap();
-
   private final NodedSegmentString edge; // the parent edge
+
+  private final Map nodeMap = new TreeMap();
 
   public SegmentNodeList(final NodedSegmentString edge) {
     this.edge = edge;

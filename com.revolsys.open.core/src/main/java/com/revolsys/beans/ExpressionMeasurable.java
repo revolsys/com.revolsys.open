@@ -16,11 +16,11 @@ import com.revolsys.util.JexlUtil;
 public class ExpressionMeasurable<Q extends Quantity> extends Measure<Q> {
   private static final long serialVersionUID = 1L;
 
+  private JexlContext context;
+
   private final Expression expression;
 
   private final Unit<Q> unit;
-
-  private JexlContext context;
 
   protected ExpressionMeasurable(final Expression expression, final JexlContext context,
     final Unit<Q> unit) {

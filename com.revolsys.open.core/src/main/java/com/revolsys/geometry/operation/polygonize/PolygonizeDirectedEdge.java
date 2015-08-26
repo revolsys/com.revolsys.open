@@ -47,9 +47,9 @@ class PolygonizeDirectedEdge extends DirectedEdge {
 
   private EdgeRing edgeRing = null;
 
-  private PolygonizeDirectedEdge next = null;
-
   private long label = -1;
+
+  private PolygonizeDirectedEdge next = null;
 
   /**
    * Constructs a directed edge connecting the <code>from</code> node to the

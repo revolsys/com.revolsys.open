@@ -16,9 +16,9 @@ import com.revolsys.util.Property;
 
 public class CodeTableComboBoxModel extends AbstractListModel<Object>
   implements ComboBoxModel<Object>, PropertyChangeListener, Closeable {
-  private static final long serialVersionUID = 1L;
-
   public static final Object NULL = new Object();
+
+  private static final long serialVersionUID = 1L;
 
   public static ComboBox create(final String fieldName, final CodeTable codeTable,
     final boolean allowNull) {
@@ -31,11 +31,11 @@ public class CodeTableComboBoxModel extends AbstractListModel<Object>
     return comboBox;
   }
 
-  private Object selectedItem;
+  private final boolean allowNull;
 
   private CodeTable codeTable;
 
-  private final boolean allowNull;
+  private Object selectedItem;
 
   public CodeTableComboBoxModel(final CodeTable codeTable) {
     this(codeTable, true);

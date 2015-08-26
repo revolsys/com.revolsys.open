@@ -49,16 +49,6 @@ import com.revolsys.geometry.operation.valid.IsValidOp;
  */
 public class LineStringGenerator extends GeometryGenerator {
   /**
-   * Create the points in a vertical line
-   */
-  public static final int VERT = 1;
-
-  /**
-   * Create the points in a horizontal line
-   */
-  public static final int HORZ = 2;
-
-  /**
    * Create the points in an approximation of an open circle (one edge will not be included).
    *
    * Note: this requires the number of points to be greater than 2.
@@ -69,9 +59,19 @@ public class LineStringGenerator extends GeometryGenerator {
   public static final int ARC = 0;
 
   /**
+   * Create the points in a horizontal line
+   */
+  public static final int HORZ = 2;
+
+  /**
    * Number of interations attempting to create a valid line string
    */
   private static final int RUNS = 5;
+
+  /**
+   * Create the points in a vertical line
+   */
+  public static final int VERT = 1;
 
   private static void fillArc(final double x, final double dx, final double y, final double dy,
     final Point[] coords, final GeometryFactory gf) {
@@ -122,9 +122,9 @@ public class LineStringGenerator extends GeometryGenerator {
     coords[coords.length - 1] = new PointDouble(gf.makePrecise(0, fx), gf.makePrecise(1, y + dy));
   }
 
-  protected int numberPoints = 2;
-
   protected int generationAlgorithm = 0;
+
+  protected int numberPoints = 2;
 
   /**
    * As the user increases the number of points, the probability of creating a random valid linestring decreases.

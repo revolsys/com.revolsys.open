@@ -27,9 +27,9 @@ public class FileRecordLayer extends ListRecordLayer {
     return new FileRecordLayer(properties);
   }
 
-  private String url;
-
   private Resource resource;
+
+  private String url;
 
   public FileRecordLayer(final Map<String, ? extends Object> properties) {
     super(properties);

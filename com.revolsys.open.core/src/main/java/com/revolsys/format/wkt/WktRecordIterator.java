@@ -24,9 +24,9 @@ public class WktRecordIterator extends AbstractIterator<Record>implements Record
 
   private BufferedReader in;
 
-  private WktParser wktParser;
-
   private RecordDefinition recordDefinition;
+
+  private WktParser wktParser;
 
   public WktRecordIterator(final RecordFactory factory, final Resource resource)
     throws IOException {

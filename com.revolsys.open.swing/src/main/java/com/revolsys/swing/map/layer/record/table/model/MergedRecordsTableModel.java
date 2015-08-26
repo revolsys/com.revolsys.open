@@ -35,9 +35,9 @@ public class MergedRecordsTableModel extends RecordListTableModel
     return new TablePanel(table);
   }
 
-  private final Record mergedRecord;
-
   private final AbstractRecordLayer layer;
+
+  private final Record mergedRecord;
 
   public MergedRecordsTableModel(final AbstractRecordLayer layer) {
     this(layer, null, null);

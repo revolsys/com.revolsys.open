@@ -19,9 +19,9 @@ import com.revolsys.io.FileUtil;
 
 public class JsonRecordIterator extends AbstractIterator<Record>implements RecordReader {
 
-  private RecordDefinition recordDefinition;
-
   private JsonMapIterator iterator;
+
+  private RecordDefinition recordDefinition;
 
   public JsonRecordIterator(final RecordDefinition recordDefinition, final InputStream in) {
     this(recordDefinition, FileUtil.createUtf8Reader(in));

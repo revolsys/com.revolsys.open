@@ -25,9 +25,9 @@ import com.revolsys.util.HtmlUtil;
  * @version 1.0
  */
 public class XmlTagElementContainer extends ElementContainer {
-  private final QName tagName;
-
   private final String cssClass;
+
+  private final QName tagName;
 
   public XmlTagElementContainer(final QName tagName) {
     this(tagName, null, null);

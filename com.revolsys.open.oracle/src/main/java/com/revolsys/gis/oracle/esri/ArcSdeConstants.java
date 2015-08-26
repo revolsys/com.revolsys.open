@@ -23,9 +23,9 @@ public final class ArcSdeConstants {
 
   public static final int GEOMETRY = 0;
 
-  public static final Map<DataType, Integer> GEOMETRY_DATA_TYPE_ST_TYPE = new HashMap<DataType, Integer>();
-
   public static String GEOMETRY_COLUMN_TYPE = "geometryColumnType";
+
+  public static final Map<DataType, Integer> GEOMETRY_DATA_TYPE_ST_TYPE = new HashMap<DataType, Integer>();
 
   public static final int LINESTRING = 3;
 

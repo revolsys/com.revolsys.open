@@ -4,23 +4,23 @@ import com.revolsys.format.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.format.esri.gdb.xml.model.enums.GeometryType;
 
 public class DEFeatureClass extends DETable {
+  private String areaFieldName = "";
+
+  private Envelope extent;
+
   private String featureType = EsriGeodatabaseXmlConstants.FEATURE_TYPE_SIMPLE;
-
-  private GeometryType shapeType;
-
-  private String shapeFieldName;
 
   private boolean hasM;
 
-  private boolean hasZ;
-
   private boolean hasSpatialIndex = true;
 
-  private String areaFieldName = "";
+  private boolean hasZ;
 
   private String lengthFieldName = "";
 
-  private Envelope extent;
+  private String shapeFieldName;
+
+  private GeometryType shapeType;
 
   private SpatialReference spatialReference;
 

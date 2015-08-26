@@ -346,20 +346,20 @@ public final class Osmformat {
 
       private int bitField0_;
 
-      // repeated int32 version = 1 [packed = true];
-      private java.util.List<java.lang.Integer> version_ = java.util.Collections.emptyList();
+      // repeated sint64 changeset = 3 [packed = true];
+      private java.util.List<java.lang.Long> changeset_ = java.util.Collections.emptyList();
 
       // repeated sint64 timestamp = 2 [packed = true];
       private java.util.List<java.lang.Long> timestamp_ = java.util.Collections.emptyList();
-
-      // repeated sint64 changeset = 3 [packed = true];
-      private java.util.List<java.lang.Long> changeset_ = java.util.Collections.emptyList();
 
       // repeated sint32 uid = 4 [packed = true];
       private java.util.List<java.lang.Integer> uid_ = java.util.Collections.emptyList();
 
       // repeated sint32 user_sid = 5 [packed = true];
       private java.util.List<java.lang.Integer> userSid_ = java.util.Collections.emptyList();
+
+      // repeated int32 version = 1 [packed = true];
+      private java.util.List<java.lang.Integer> version_ = java.util.Collections.emptyList();
 
       // repeated bool visible = 6 [packed = true];
       private java.util.List<java.lang.Boolean> visible_ = java.util.Collections.emptyList();
@@ -947,16 +947,15 @@ public final class Osmformat {
       // @@protoc_insertion_point(builder_scope:OSMPBF.DenseInfo)
     }
 
+    // repeated sint64 changeset = 3 [packed = true];
+    public static final int CHANGESET_FIELD_NUMBER = 3;
+
     private static final DenseInfo defaultInstance;
 
-    // repeated int32 version = 1 [packed = true];
-    public static final int VERSION_FIELD_NUMBER = 1;
+    private static final long serialVersionUID = 0L;
 
     // repeated sint64 timestamp = 2 [packed = true];
     public static final int TIMESTAMP_FIELD_NUMBER = 2;
-
-    // repeated sint64 changeset = 3 [packed = true];
-    public static final int CHANGESET_FIELD_NUMBER = 3;
 
     // repeated sint32 uid = 4 [packed = true];
     public static final int UID_FIELD_NUMBER = 4;
@@ -964,10 +963,11 @@ public final class Osmformat {
     // repeated sint32 user_sid = 5 [packed = true];
     public static final int USER_SID_FIELD_NUMBER = 5;
 
+    // repeated int32 version = 1 [packed = true];
+    public static final int VERSION_FIELD_NUMBER = 1;
+
     // repeated bool visible = 6 [packed = true];
     public static final int VISIBLE_FIELD_NUMBER = 6;
-
-    private static final long serialVersionUID = 0L;
 
     static {
       defaultInstance = new DenseInfo(true);
@@ -1050,17 +1050,17 @@ public final class Osmformat {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    private java.util.List<java.lang.Integer> version_;
+    private java.util.List<java.lang.Long> changeset_;
 
-    private int versionMemoizedSerializedSize = -1;
+    private int changesetMemoizedSerializedSize = -1;
+
+    private byte memoizedIsInitialized = -1;
+
+    private int memoizedSerializedSize = -1;
 
     private java.util.List<java.lang.Long> timestamp_;
 
     private int timestampMemoizedSerializedSize = -1;
-
-    private java.util.List<java.lang.Long> changeset_;
-
-    private int changesetMemoizedSerializedSize = -1;
 
     private java.util.List<java.lang.Integer> uid_;
 
@@ -1070,13 +1070,13 @@ public final class Osmformat {
 
     private int userSidMemoizedSerializedSize = -1;
 
+    private java.util.List<java.lang.Integer> version_;
+
+    private int versionMemoizedSerializedSize = -1;
+
     private java.util.List<java.lang.Boolean> visible_;
 
     private int visibleMemoizedSerializedSize = -1;
-
-    private byte memoizedIsInitialized = -1;
-
-    private int memoizedSerializedSize = -1;
 
     private DenseInfo(final boolean noInit) {
     }
@@ -1416,20 +1416,20 @@ public final class Osmformat {
 
       private int bitField0_;
 
+      // optional .OSMPBF.DenseInfo denseinfo = 5;
+      private DenseInfo denseinfo_ = DenseInfo.getDefaultInstance();
+
       // repeated sint64 id = 1 [packed = true];
       private java.util.List<java.lang.Long> id_ = java.util.Collections.emptyList();
 
-      // optional .OSMPBF.DenseInfo denseinfo = 5;
-      private DenseInfo denseinfo_ = DenseInfo.getDefaultInstance();
+      // repeated int32 keys_vals = 10 [packed = true];
+      private java.util.List<java.lang.Integer> keysVals_ = java.util.Collections.emptyList();
 
       // repeated sint64 lat = 8 [packed = true];
       private java.util.List<java.lang.Long> lat_ = java.util.Collections.emptyList();
 
       // repeated sint64 lon = 9 [packed = true];
       private java.util.List<java.lang.Long> lon_ = java.util.Collections.emptyList();
-
-      // repeated int32 keys_vals = 10 [packed = true];
-      private java.util.List<java.lang.Integer> keysVals_ = java.util.Collections.emptyList();
 
       // Construct using DenseNodes.newBuilder()
       private Builder() {
@@ -1916,20 +1916,20 @@ public final class Osmformat {
 
     private static final DenseNodes defaultInstance;
 
+    // optional .OSMPBF.DenseInfo denseinfo = 5;
+    public static final int DENSEINFO_FIELD_NUMBER = 5;
+
     // repeated sint64 id = 1 [packed = true];
     public static final int ID_FIELD_NUMBER = 1;
 
-    // optional .OSMPBF.DenseInfo denseinfo = 5;
-    public static final int DENSEINFO_FIELD_NUMBER = 5;
+    // repeated int32 keys_vals = 10 [packed = true];
+    public static final int KEYS_VALS_FIELD_NUMBER = 10;
 
     // repeated sint64 lat = 8 [packed = true];
     public static final int LAT_FIELD_NUMBER = 8;
 
     // repeated sint64 lon = 9 [packed = true];
     public static final int LON_FIELD_NUMBER = 9;
-
-    // repeated int32 keys_vals = 10 [packed = true];
-    public static final int KEYS_VALS_FIELD_NUMBER = 10;
 
     private static final long serialVersionUID = 0L;
 
@@ -2016,11 +2016,15 @@ public final class Osmformat {
 
     private int bitField0_;
 
+    private DenseInfo denseinfo_;
+
     private java.util.List<java.lang.Long> id_;
 
     private int idMemoizedSerializedSize = -1;
 
-    private DenseInfo denseinfo_;
+    private java.util.List<java.lang.Integer> keysVals_;
+
+    private int keysValsMemoizedSerializedSize = -1;
 
     private java.util.List<java.lang.Long> lat_;
 
@@ -2029,10 +2033,6 @@ public final class Osmformat {
     private java.util.List<java.lang.Long> lon_;
 
     private int lonMemoizedSerializedSize = -1;
-
-    private java.util.List<java.lang.Integer> keysVals_;
-
-    private int keysValsMemoizedSerializedSize = -1;
 
     private byte memoizedIsInitialized = -1;
 
@@ -2312,6 +2312,9 @@ public final class Osmformat {
 
       private int bitField0_;
 
+      // required sint64 bottom = 4;
+      private long bottom_;
+
       // required sint64 left = 1;
       private long left_;
 
@@ -2320,9 +2323,6 @@ public final class Osmformat {
 
       // required sint64 top = 3;
       private long top_;
-
-      // required sint64 bottom = 4;
-      private long bottom_;
 
       // Construct using HeaderBBox.newBuilder()
       private Builder() {
@@ -2579,6 +2579,9 @@ public final class Osmformat {
       // @@protoc_insertion_point(builder_scope:OSMPBF.HeaderBBox)
     }
 
+    // required sint64 bottom = 4;
+    public static final int BOTTOM_FIELD_NUMBER = 4;
+
     private static final HeaderBBox defaultInstance;
 
     // required sint64 left = 1;
@@ -2587,13 +2590,10 @@ public final class Osmformat {
     // required sint64 right = 2;
     public static final int RIGHT_FIELD_NUMBER = 2;
 
+    private static final long serialVersionUID = 0L;
+
     // required sint64 top = 3;
     public static final int TOP_FIELD_NUMBER = 3;
-
-    // required sint64 bottom = 4;
-    public static final int BOTTOM_FIELD_NUMBER = 4;
-
-    private static final long serialVersionUID = 0L;
 
     static {
       defaultInstance = new HeaderBBox(true);
@@ -2678,17 +2678,17 @@ public final class Osmformat {
 
     private int bitField0_;
 
-    private long left_;
-
-    private long right_;
-
-    private long top_;
-
     private long bottom_;
+
+    private long left_;
 
     private byte memoizedIsInitialized = -1;
 
     private int memoizedSerializedSize = -1;
+
+    private long right_;
+
+    private long top_;
 
     private HeaderBBox(final boolean noInit) {
     }
@@ -2869,31 +2869,31 @@ public final class Osmformat {
         return new Builder();
       }
 
-      private int bitField0_;
-
       // optional .OSMPBF.HeaderBBox bbox = 1;
       private HeaderBBox bbox_ = HeaderBBox.getDefaultInstance();
 
-      // repeated string required_features = 4;
-      private com.google.protobuf.LazyStringList requiredFeatures_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private int bitField0_;
 
       // repeated string optional_features = 5;
       private com.google.protobuf.LazyStringList optionalFeatures_ = com.google.protobuf.LazyStringArrayList.EMPTY;
 
-      // optional string writingprogram = 16;
-      private java.lang.Object writingprogram_ = "";
-
-      // optional string source = 17;
-      private java.lang.Object source_ = "";
-
-      // optional int64 osmosis_replication_timestamp = 32;
-      private long osmosisReplicationTimestamp_;
+      // optional string osmosis_replication_base_url = 34;
+      private java.lang.Object osmosisReplicationBaseUrl_ = "";
 
       // optional int64 osmosis_replication_sequence_number = 33;
       private long osmosisReplicationSequenceNumber_;
 
-      // optional string osmosis_replication_base_url = 34;
-      private java.lang.Object osmosisReplicationBaseUrl_ = "";
+      // optional int64 osmosis_replication_timestamp = 32;
+      private long osmosisReplicationTimestamp_;
+
+      // repeated string required_features = 4;
+      private com.google.protobuf.LazyStringList requiredFeatures_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+
+      // optional string source = 17;
+      private java.lang.Object source_ = "";
+
+      // optional string writingprogram = 16;
+      private java.lang.Object writingprogram_ = "";
 
       // Construct using HeaderBlock.newBuilder()
       private Builder() {
@@ -3462,33 +3462,33 @@ public final class Osmformat {
       // @@protoc_insertion_point(builder_scope:OSMPBF.HeaderBlock)
     }
 
-    private static final HeaderBlock defaultInstance;
-
     // optional .OSMPBF.HeaderBBox bbox = 1;
     public static final int BBOX_FIELD_NUMBER = 1;
 
-    // repeated string required_features = 4;
-    public static final int REQUIRED_FEATURES_FIELD_NUMBER = 4;
+    private static final HeaderBlock defaultInstance;
 
     // repeated string optional_features = 5;
     public static final int OPTIONAL_FEATURES_FIELD_NUMBER = 5;
 
-    // optional string writingprogram = 16;
-    public static final int WRITINGPROGRAM_FIELD_NUMBER = 16;
-
-    // optional string source = 17;
-    public static final int SOURCE_FIELD_NUMBER = 17;
-
-    // optional int64 osmosis_replication_timestamp = 32;
-    public static final int OSMOSIS_REPLICATION_TIMESTAMP_FIELD_NUMBER = 32;
+    // optional string osmosis_replication_base_url = 34;
+    public static final int OSMOSIS_REPLICATION_BASE_URL_FIELD_NUMBER = 34;
 
     // optional int64 osmosis_replication_sequence_number = 33;
     public static final int OSMOSIS_REPLICATION_SEQUENCE_NUMBER_FIELD_NUMBER = 33;
 
-    // optional string osmosis_replication_base_url = 34;
-    public static final int OSMOSIS_REPLICATION_BASE_URL_FIELD_NUMBER = 34;
+    // optional int64 osmosis_replication_timestamp = 32;
+    public static final int OSMOSIS_REPLICATION_TIMESTAMP_FIELD_NUMBER = 32;
+
+    // repeated string required_features = 4;
+    public static final int REQUIRED_FEATURES_FIELD_NUMBER = 4;
 
     private static final long serialVersionUID = 0L;
+
+    // optional string source = 17;
+    public static final int SOURCE_FIELD_NUMBER = 17;
+
+    // optional string writingprogram = 16;
+    public static final int WRITINGPROGRAM_FIELD_NUMBER = 16;
 
     static {
       defaultInstance = new HeaderBlock(true);
@@ -3572,27 +3572,27 @@ public final class Osmformat {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    private int bitField0_;
-
     private HeaderBBox bbox_;
 
-    private com.google.protobuf.LazyStringList requiredFeatures_;
-
-    private com.google.protobuf.LazyStringList optionalFeatures_;
-
-    private java.lang.Object writingprogram_;
-
-    private java.lang.Object source_;
-
-    private long osmosisReplicationTimestamp_;
-
-    private long osmosisReplicationSequenceNumber_;
-
-    private java.lang.Object osmosisReplicationBaseUrl_;
+    private int bitField0_;
 
     private byte memoizedIsInitialized = -1;
 
     private int memoizedSerializedSize = -1;
+
+    private com.google.protobuf.LazyStringList optionalFeatures_;
+
+    private java.lang.Object osmosisReplicationBaseUrl_;
+
+    private long osmosisReplicationSequenceNumber_;
+
+    private long osmosisReplicationTimestamp_;
+
+    private com.google.protobuf.LazyStringList requiredFeatures_;
+
+    private java.lang.Object source_;
+
+    private java.lang.Object writingprogram_;
 
     private HeaderBlock(final boolean noInit) {
     }
@@ -3948,20 +3948,20 @@ public final class Osmformat {
 
       private int bitField0_;
 
-      // optional int32 version = 1 [default = -1];
-      private int version_ = -1;
+      // optional int64 changeset = 3;
+      private long changeset_;
 
       // optional int64 timestamp = 2;
       private long timestamp_;
-
-      // optional int64 changeset = 3;
-      private long changeset_;
 
       // optional int32 uid = 4;
       private int uid_;
 
       // optional uint32 user_sid = 5;
       private int userSid_;
+
+      // optional int32 version = 1 [default = -1];
+      private int version_ = -1;
 
       // optional bool visible = 6;
       private boolean visible_;
@@ -4281,16 +4281,15 @@ public final class Osmformat {
       // @@protoc_insertion_point(builder_scope:OSMPBF.Info)
     }
 
+    // optional int64 changeset = 3;
+    public static final int CHANGESET_FIELD_NUMBER = 3;
+
     private static final Info defaultInstance;
 
-    // optional int32 version = 1 [default = -1];
-    public static final int VERSION_FIELD_NUMBER = 1;
+    private static final long serialVersionUID = 0L;
 
     // optional int64 timestamp = 2;
     public static final int TIMESTAMP_FIELD_NUMBER = 2;
-
-    // optional int64 changeset = 3;
-    public static final int CHANGESET_FIELD_NUMBER = 3;
 
     // optional int32 uid = 4;
     public static final int UID_FIELD_NUMBER = 4;
@@ -4298,10 +4297,11 @@ public final class Osmformat {
     // optional uint32 user_sid = 5;
     public static final int USER_SID_FIELD_NUMBER = 5;
 
+    // optional int32 version = 1 [default = -1];
+    public static final int VERSION_FIELD_NUMBER = 1;
+
     // optional bool visible = 6;
     public static final int VISIBLE_FIELD_NUMBER = 6;
-
-    private static final long serialVersionUID = 0L;
 
     static {
       defaultInstance = new Info(true);
@@ -4386,21 +4386,21 @@ public final class Osmformat {
 
     private int bitField0_;
 
-    private int version_;
+    private long changeset_;
+
+    private byte memoizedIsInitialized = -1;
+
+    private int memoizedSerializedSize = -1;
 
     private long timestamp_;
-
-    private long changeset_;
 
     private int uid_;
 
     private int userSid_;
 
+    private int version_;
+
     private boolean visible_;
-
-    private byte memoizedIsInitialized = -1;
-
-    private int memoizedSerializedSize = -1;
 
     private Info(final boolean noInit) {
     }
@@ -4613,20 +4613,20 @@ public final class Osmformat {
       // required sint64 id = 1;
       private long id_;
 
-      // repeated uint32 keys = 2 [packed = true];
-      private java.util.List<java.lang.Integer> keys_ = java.util.Collections.emptyList();
-
-      // repeated uint32 vals = 3 [packed = true];
-      private java.util.List<java.lang.Integer> vals_ = java.util.Collections.emptyList();
-
       // optional .OSMPBF.Info info = 4;
       private Info info_ = Info.getDefaultInstance();
+
+      // repeated uint32 keys = 2 [packed = true];
+      private java.util.List<java.lang.Integer> keys_ = java.util.Collections.emptyList();
 
       // required sint64 lat = 8;
       private long lat_;
 
       // required sint64 lon = 9;
       private long lon_;
+
+      // repeated uint32 vals = 3 [packed = true];
+      private java.util.List<java.lang.Integer> vals_ = java.util.Collections.emptyList();
 
       // Construct using Node.newBuilder()
       private Builder() {
@@ -5076,14 +5076,11 @@ public final class Osmformat {
     // required sint64 id = 1;
     public static final int ID_FIELD_NUMBER = 1;
 
-    // repeated uint32 keys = 2 [packed = true];
-    public static final int KEYS_FIELD_NUMBER = 2;
-
-    // repeated uint32 vals = 3 [packed = true];
-    public static final int VALS_FIELD_NUMBER = 3;
-
     // optional .OSMPBF.Info info = 4;
     public static final int INFO_FIELD_NUMBER = 4;
+
+    // repeated uint32 keys = 2 [packed = true];
+    public static final int KEYS_FIELD_NUMBER = 2;
 
     // required sint64 lat = 8;
     public static final int LAT_FIELD_NUMBER = 8;
@@ -5092,6 +5089,9 @@ public final class Osmformat {
     public static final int LON_FIELD_NUMBER = 9;
 
     private static final long serialVersionUID = 0L;
+
+    // repeated uint32 vals = 3 [packed = true];
+    public static final int VALS_FIELD_NUMBER = 3;
 
     static {
       defaultInstance = new Node(true);
@@ -5178,15 +5178,11 @@ public final class Osmformat {
 
     private long id_;
 
+    private Info info_;
+
     private java.util.List<java.lang.Integer> keys_;
 
     private int keysMemoizedSerializedSize = -1;
-
-    private java.util.List<java.lang.Integer> vals_;
-
-    private int valsMemoizedSerializedSize = -1;
-
-    private Info info_;
 
     private long lat_;
 
@@ -5195,6 +5191,10 @@ public final class Osmformat {
     private byte memoizedIsInitialized = -1;
 
     private int memoizedSerializedSize = -1;
+
+    private java.util.List<java.lang.Integer> vals_;
+
+    private int valsMemoizedSerializedSize = -1;
 
     private Node(final boolean noInit) {
     }
@@ -5461,11 +5461,8 @@ public final class Osmformat {
 
       private int bitField0_;
 
-      // required .OSMPBF.StringTable stringtable = 1;
-      private StringTable stringtable_ = StringTable.getDefaultInstance();
-
-      // repeated .OSMPBF.PrimitiveGroup primitivegroup = 2;
-      private java.util.List<PrimitiveGroup> primitivegroup_ = java.util.Collections.emptyList();
+      // optional int32 date_granularity = 18 [default = 1000];
+      private int dateGranularity_ = 1000;
 
       // optional int32 granularity = 17 [default = 100];
       private int granularity_ = 100;
@@ -5476,8 +5473,11 @@ public final class Osmformat {
       // optional int64 lon_offset = 20 [default = 0];
       private long lonOffset_;
 
-      // optional int32 date_granularity = 18 [default = 1000];
-      private int dateGranularity_ = 1000;
+      // repeated .OSMPBF.PrimitiveGroup primitivegroup = 2;
+      private java.util.List<PrimitiveGroup> primitivegroup_ = java.util.Collections.emptyList();
+
+      // required .OSMPBF.StringTable stringtable = 1;
+      private StringTable stringtable_ = StringTable.getDefaultInstance();
 
       // Construct using PrimitiveBlock.newBuilder()
       private Builder() {
@@ -5915,13 +5915,10 @@ public final class Osmformat {
       // @@protoc_insertion_point(builder_scope:OSMPBF.PrimitiveBlock)
     }
 
+    // optional int32 date_granularity = 18 [default = 1000];
+    public static final int DATE_GRANULARITY_FIELD_NUMBER = 18;
+
     private static final PrimitiveBlock defaultInstance;
-
-    // required .OSMPBF.StringTable stringtable = 1;
-    public static final int STRINGTABLE_FIELD_NUMBER = 1;
-
-    // repeated .OSMPBF.PrimitiveGroup primitivegroup = 2;
-    public static final int PRIMITIVEGROUP_FIELD_NUMBER = 2;
 
     // optional int32 granularity = 17 [default = 100];
     public static final int GRANULARITY_FIELD_NUMBER = 17;
@@ -5932,10 +5929,13 @@ public final class Osmformat {
     // optional int64 lon_offset = 20 [default = 0];
     public static final int LON_OFFSET_FIELD_NUMBER = 20;
 
-    // optional int32 date_granularity = 18 [default = 1000];
-    public static final int DATE_GRANULARITY_FIELD_NUMBER = 18;
+    // repeated .OSMPBF.PrimitiveGroup primitivegroup = 2;
+    public static final int PRIMITIVEGROUP_FIELD_NUMBER = 2;
 
     private static final long serialVersionUID = 0L;
+
+    // required .OSMPBF.StringTable stringtable = 1;
+    public static final int STRINGTABLE_FIELD_NUMBER = 1;
 
     static {
       defaultInstance = new PrimitiveBlock(true);
@@ -6021,9 +6021,7 @@ public final class Osmformat {
 
     private int bitField0_;
 
-    private StringTable stringtable_;
-
-    private java.util.List<PrimitiveGroup> primitivegroup_;
+    private int dateGranularity_;
 
     private int granularity_;
 
@@ -6031,11 +6029,13 @@ public final class Osmformat {
 
     private long lonOffset_;
 
-    private int dateGranularity_;
-
     private byte memoizedIsInitialized = -1;
 
     private int memoizedSerializedSize = -1;
+
+    private java.util.List<PrimitiveGroup> primitivegroup_;
+
+    private StringTable stringtable_;
 
     private PrimitiveBlock(final boolean noInit) {
     }
@@ -6272,20 +6272,20 @@ public final class Osmformat {
 
       private int bitField0_;
 
-      // repeated .OSMPBF.Node nodes = 1;
-      private java.util.List<Node> nodes_ = java.util.Collections.emptyList();
+      // repeated .OSMPBF.ChangeSet changesets = 5;
+      private java.util.List<ChangeSet> changesets_ = java.util.Collections.emptyList();
 
       // optional .OSMPBF.DenseNodes dense = 2;
       private DenseNodes dense_ = DenseNodes.getDefaultInstance();
 
-      // repeated .OSMPBF.Way ways = 3;
-      private java.util.List<Way> ways_ = java.util.Collections.emptyList();
+      // repeated .OSMPBF.Node nodes = 1;
+      private java.util.List<Node> nodes_ = java.util.Collections.emptyList();
 
       // repeated .OSMPBF.Relation relations = 4;
       private java.util.List<Relation> relations_ = java.util.Collections.emptyList();
 
-      // repeated .OSMPBF.ChangeSet changesets = 5;
-      private java.util.List<ChangeSet> changesets_ = java.util.Collections.emptyList();
+      // repeated .OSMPBF.Way ways = 3;
+      private java.util.List<Way> ways_ = java.util.Collections.emptyList();
 
       // Construct using PrimitiveGroup.newBuilder()
       private Builder() {
@@ -6931,24 +6931,24 @@ public final class Osmformat {
       // @@protoc_insertion_point(builder_scope:OSMPBF.PrimitiveGroup)
     }
 
-    private static final PrimitiveGroup defaultInstance;
+    // repeated .OSMPBF.ChangeSet changesets = 5;
+    public static final int CHANGESETS_FIELD_NUMBER = 5;
 
-    // repeated .OSMPBF.Node nodes = 1;
-    public static final int NODES_FIELD_NUMBER = 1;
+    private static final PrimitiveGroup defaultInstance;
 
     // optional .OSMPBF.DenseNodes dense = 2;
     public static final int DENSE_FIELD_NUMBER = 2;
 
-    // repeated .OSMPBF.Way ways = 3;
-    public static final int WAYS_FIELD_NUMBER = 3;
+    // repeated .OSMPBF.Node nodes = 1;
+    public static final int NODES_FIELD_NUMBER = 1;
 
     // repeated .OSMPBF.Relation relations = 4;
     public static final int RELATIONS_FIELD_NUMBER = 4;
 
-    // repeated .OSMPBF.ChangeSet changesets = 5;
-    public static final int CHANGESETS_FIELD_NUMBER = 5;
-
     private static final long serialVersionUID = 0L;
+
+    // repeated .OSMPBF.Way ways = 3;
+    public static final int WAYS_FIELD_NUMBER = 3;
 
     static {
       defaultInstance = new PrimitiveGroup(true);
@@ -7034,19 +7034,19 @@ public final class Osmformat {
 
     private int bitField0_;
 
-    private java.util.List<Node> nodes_;
+    private java.util.List<ChangeSet> changesets_;
 
     private DenseNodes dense_;
-
-    private java.util.List<Way> ways_;
-
-    private java.util.List<Relation> relations_;
-
-    private java.util.List<ChangeSet> changesets_;
 
     private byte memoizedIsInitialized = -1;
 
     private int memoizedSerializedSize = -1;
+
+    private java.util.List<Node> nodes_;
+
+    private java.util.List<Relation> relations_;
+
+    private java.util.List<Way> ways_;
 
     private PrimitiveGroup(final boolean noInit) {
     }
@@ -7323,23 +7323,23 @@ public final class Osmformat {
       // required int64 id = 1;
       private long id_;
 
-      // repeated uint32 keys = 2 [packed = true];
-      private java.util.List<java.lang.Integer> keys_ = java.util.Collections.emptyList();
-
-      // repeated uint32 vals = 3 [packed = true];
-      private java.util.List<java.lang.Integer> vals_ = java.util.Collections.emptyList();
-
       // optional .OSMPBF.Info info = 4;
       private Info info_ = Info.getDefaultInstance();
 
-      // repeated int32 roles_sid = 8 [packed = true];
-      private java.util.List<java.lang.Integer> rolesSid_ = java.util.Collections.emptyList();
+      // repeated uint32 keys = 2 [packed = true];
+      private java.util.List<java.lang.Integer> keys_ = java.util.Collections.emptyList();
 
       // repeated sint64 memids = 9 [packed = true];
       private java.util.List<java.lang.Long> memids_ = java.util.Collections.emptyList();
 
+      // repeated int32 roles_sid = 8 [packed = true];
+      private java.util.List<java.lang.Integer> rolesSid_ = java.util.Collections.emptyList();
+
       // repeated .OSMPBF.Relation.MemberType types = 10 [packed = true];
       private java.util.List<Relation.MemberType> types_ = java.util.Collections.emptyList();
+
+      // repeated uint32 vals = 3 [packed = true];
+      private java.util.List<java.lang.Integer> vals_ = java.util.Collections.emptyList();
 
       // Construct using Relation.newBuilder()
       private Builder() {
@@ -7961,13 +7961,7 @@ public final class Osmformat {
     }
 
     public enum MemberType implements com.google.protobuf.Internal.EnumLite {
-      NODE(0, 0), WAY(1, 1), RELATION(2, 2),;
-
-      public static final int NODE_VALUE = 0;
-
-      public static final int WAY_VALUE = 1;
-
-      public static final int RELATION_VALUE = 2;
+      NODE(0, 0), RELATION(2, 2), WAY(1, 1),;
 
       private static com.google.protobuf.Internal.EnumLiteMap<MemberType> internalValueMap = new com.google.protobuf.Internal.EnumLiteMap<MemberType>() {
         @Override
@@ -7975,6 +7969,12 @@ public final class Osmformat {
           return MemberType.valueOf(number);
         }
       };
+
+      public static final int NODE_VALUE = 0;
+
+      public static final int RELATION_VALUE = 2;
+
+      public static final int WAY_VALUE = 1;
 
       public static com.google.protobuf.Internal.EnumLiteMap<MemberType> internalGetValueMap() {
         return internalValueMap;
@@ -8012,25 +8012,25 @@ public final class Osmformat {
     // required int64 id = 1;
     public static final int ID_FIELD_NUMBER = 1;
 
-    // repeated uint32 keys = 2 [packed = true];
-    public static final int KEYS_FIELD_NUMBER = 2;
-
-    // repeated uint32 vals = 3 [packed = true];
-    public static final int VALS_FIELD_NUMBER = 3;
-
     // optional .OSMPBF.Info info = 4;
     public static final int INFO_FIELD_NUMBER = 4;
 
-    // repeated int32 roles_sid = 8 [packed = true];
-    public static final int ROLES_SID_FIELD_NUMBER = 8;
+    // repeated uint32 keys = 2 [packed = true];
+    public static final int KEYS_FIELD_NUMBER = 2;
 
     // repeated sint64 memids = 9 [packed = true];
     public static final int MEMIDS_FIELD_NUMBER = 9;
 
+    // repeated int32 roles_sid = 8 [packed = true];
+    public static final int ROLES_SID_FIELD_NUMBER = 8;
+
+    private static final long serialVersionUID = 0L;
+
     // repeated .OSMPBF.Relation.MemberType types = 10 [packed = true];
     public static final int TYPES_FIELD_NUMBER = 10;
 
-    private static final long serialVersionUID = 0L;
+    // repeated uint32 vals = 3 [packed = true];
+    public static final int VALS_FIELD_NUMBER = 3;
 
     static {
       defaultInstance = new Relation(true);
@@ -8117,31 +8117,31 @@ public final class Osmformat {
 
     private long id_;
 
+    private Info info_;
+
     private java.util.List<java.lang.Integer> keys_;
 
     private int keysMemoizedSerializedSize = -1;
-
-    private java.util.List<java.lang.Integer> vals_;
-
-    private int valsMemoizedSerializedSize = -1;
-
-    private Info info_;
-
-    private java.util.List<java.lang.Integer> rolesSid_;
-
-    private int rolesSidMemoizedSerializedSize = -1;
 
     private java.util.List<java.lang.Long> memids_;
 
     private int memidsMemoizedSerializedSize = -1;
 
+    private byte memoizedIsInitialized = -1;
+
+    private int memoizedSerializedSize = -1;
+
+    private java.util.List<java.lang.Integer> rolesSid_;
+
+    private int rolesSidMemoizedSerializedSize = -1;
+
     private java.util.List<Relation.MemberType> types_;
 
     private int typesMemoizedSerializedSize;
 
-    private byte memoizedIsInitialized = -1;
+    private java.util.List<java.lang.Integer> vals_;
 
-    private int memoizedSerializedSize = -1;
+    private int valsMemoizedSerializedSize = -1;
 
     private Relation(final boolean noInit) {
     }
@@ -8745,11 +8745,11 @@ public final class Osmformat {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
-    private java.util.List<com.google.protobuf.ByteString> s_;
-
     private byte memoizedIsInitialized = -1;
 
     private int memoizedSerializedSize = -1;
+
+    private java.util.List<com.google.protobuf.ByteString> s_;
 
     private StringTable(final boolean noInit) {
     }
@@ -8865,17 +8865,17 @@ public final class Osmformat {
       // required int64 id = 1;
       private long id_;
 
-      // repeated uint32 keys = 2 [packed = true];
-      private java.util.List<java.lang.Integer> keys_ = java.util.Collections.emptyList();
-
-      // repeated uint32 vals = 3 [packed = true];
-      private java.util.List<java.lang.Integer> vals_ = java.util.Collections.emptyList();
-
       // optional .OSMPBF.Info info = 4;
       private Info info_ = Info.getDefaultInstance();
 
+      // repeated uint32 keys = 2 [packed = true];
+      private java.util.List<java.lang.Integer> keys_ = java.util.Collections.emptyList();
+
       // repeated sint64 refs = 8 [packed = true];
       private java.util.List<java.lang.Long> refs_ = java.util.Collections.emptyList();
+
+      // repeated uint32 vals = 3 [packed = true];
+      private java.util.List<java.lang.Integer> vals_ = java.util.Collections.emptyList();
 
       // Construct using Way.newBuilder()
       private Builder() {
@@ -9324,19 +9324,19 @@ public final class Osmformat {
     // required int64 id = 1;
     public static final int ID_FIELD_NUMBER = 1;
 
-    // repeated uint32 keys = 2 [packed = true];
-    public static final int KEYS_FIELD_NUMBER = 2;
-
-    // repeated uint32 vals = 3 [packed = true];
-    public static final int VALS_FIELD_NUMBER = 3;
-
     // optional .OSMPBF.Info info = 4;
     public static final int INFO_FIELD_NUMBER = 4;
+
+    // repeated uint32 keys = 2 [packed = true];
+    public static final int KEYS_FIELD_NUMBER = 2;
 
     // repeated sint64 refs = 8 [packed = true];
     public static final int REFS_FIELD_NUMBER = 8;
 
     private static final long serialVersionUID = 0L;
+
+    // repeated uint32 vals = 3 [packed = true];
+    public static final int VALS_FIELD_NUMBER = 3;
 
     static {
       defaultInstance = new Way(true);
@@ -9423,23 +9423,23 @@ public final class Osmformat {
 
     private long id_;
 
+    private Info info_;
+
     private java.util.List<java.lang.Integer> keys_;
 
     private int keysMemoizedSerializedSize = -1;
 
-    private java.util.List<java.lang.Integer> vals_;
+    private byte memoizedIsInitialized = -1;
 
-    private int valsMemoizedSerializedSize = -1;
-
-    private Info info_;
+    private int memoizedSerializedSize = -1;
 
     private java.util.List<java.lang.Long> refs_;
 
     private int refsMemoizedSerializedSize = -1;
 
-    private byte memoizedIsInitialized = -1;
+    private java.util.List<java.lang.Integer> vals_;
 
-    private int memoizedSerializedSize = -1;
+    private int valsMemoizedSerializedSize = -1;
 
     private Way(final boolean noInit) {
     }

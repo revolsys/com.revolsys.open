@@ -12,9 +12,9 @@ import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
 
 public class SelectMapScaleEditor implements ComboBoxEditor {
-  final ComboBoxEditor wrapped;
-
   final ObjectToStringConverter stringConverter;
+
+  final ComboBoxEditor wrapped;
 
   public SelectMapScaleEditor(final ComboBoxEditor editor,
     final ObjectToStringConverter stringConverter) {

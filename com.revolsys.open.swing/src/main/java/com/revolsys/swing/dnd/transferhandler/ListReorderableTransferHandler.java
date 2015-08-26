@@ -19,11 +19,11 @@ import com.revolsys.util.Reorderable;
 public class ListReorderableTransferHandler extends TransferHandler {
   private static final long serialVersionUID = 1L;
 
+  private final JList list;
+
   private final DataFlavor localObjectFlavor = new DataFlavor(int[].class, "Integer[]");
 
   private final String mimeType = this.localObjectFlavor.getMimeType();
-
-  private final JList list;
 
   public ListReorderableTransferHandler(final JList list) {
     this.list = list;

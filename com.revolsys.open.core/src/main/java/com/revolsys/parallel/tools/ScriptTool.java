@@ -106,9 +106,9 @@ public class ScriptTool {
 
   private String propertiesName;
 
-  private String scriptFileName;
-
   private File scriptFile;
+
+  private String scriptFileName;
 
   public ScriptTool() {
     createOptions();

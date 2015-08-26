@@ -48,9 +48,9 @@ public class InteriorPointPoint {
 
   private final Point centroid;
 
-  private double minDistance = Double.MAX_VALUE;
-
   private Point interiorPoint = null;
+
+  private double minDistance = Double.MAX_VALUE;
 
   public InteriorPointPoint(final Geometry g) {
     this.centroid = g.getCentroid().getPoint();

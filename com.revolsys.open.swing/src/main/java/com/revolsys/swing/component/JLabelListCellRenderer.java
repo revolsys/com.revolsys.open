@@ -14,9 +14,9 @@ public class JLabelListCellRenderer extends BasicComboBoxRenderer {
    */
   private static final long serialVersionUID = -8014837570227669960L;
 
-  private final Map<Object, String> labels = new HashMap<Object, String>();
-
   private final Map<Object, Icon> icons = new HashMap<Object, Icon>();
+
+  private final Map<Object, String> labels = new HashMap<Object, String>();
 
   @Override
   public Component getListCellRendererComponent(final JList list, final Object value,

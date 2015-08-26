@@ -77,11 +77,11 @@ public class PlanarGraph {
     }
   }
 
+  protected List<DirectedEdge> edgeEndList = new ArrayList<>();
+
   protected List<Edge> edges = new ArrayList<>();
 
   private final NodeMap nodes;
-
-  protected List<DirectedEdge> edgeEndList = new ArrayList<>();
 
   public PlanarGraph() {
     this(new NodeFactory());

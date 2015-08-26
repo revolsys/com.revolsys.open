@@ -10,12 +10,12 @@ import java.util.ResourceBundle;
 import com.revolsys.beans.AbstractPropertyChangeObject;
 
 public final class I18n extends AbstractPropertyChangeObject {
-  private static final I18n NULL_INSTANCE = new I18n();
-
   /** The map from category names to I18n instances. */
   private static Map<String, WeakReference<I18n>> instances = new HashMap<String, WeakReference<I18n>>();
 
   private static Locale locale = Locale.getDefault();
+
+  private static final I18n NULL_INSTANCE = new I18n();
 
   public static CharSequence getCharSequence(final Class<?> clazz, final String key) {
     final I18n i18n = I18n.getInstance(clazz);
@@ -95,11 +95,11 @@ public final class I18n extends AbstractPropertyChangeObject {
     }
   }
 
+  private WeakReference<ClassLoader> classLoaderReference;
+
   private ResourceBundle resourceBundle;
 
   private String resourcePath;
-
-  private WeakReference<ClassLoader> classLoaderReference;
 
   private I18n() {
   }

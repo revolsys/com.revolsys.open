@@ -13,9 +13,9 @@ import com.revolsys.swing.parallel.Invoke;
  * @author Paul Austin
  */
 public class InvokeMethodChangeListener implements ChangeListener {
-  private final Runnable runnable;
-
   private boolean invokeLater;
+
+  private final Runnable runnable;
 
   public InvokeMethodChangeListener(final Class<?> clazz, final String methodName,
     final boolean invokeLater, final Object... parameters) {

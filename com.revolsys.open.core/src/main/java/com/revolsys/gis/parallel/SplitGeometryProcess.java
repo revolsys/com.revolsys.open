@@ -20,14 +20,14 @@ public class SplitGeometryProcess extends BaseInOutProcess<Record, Record> {
 
   private Geometry geometry;
 
+  private GeometryFactory geometryFactory;
+
   private LineSegmentIndex index = new LineSegmentIndex();
 
   /** The statistics to record the number of observations ignored. */
   private Statistics notWrittenStatistics;
 
   private double tolerance = 2.0;
-
-  private GeometryFactory geometryFactory;
 
   protected Record createSplitObject(final Record object, final LineString newLine) {
     return Records.copy(object, newLine);

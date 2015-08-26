@@ -61,21 +61,21 @@ public class Edge extends GraphComponent {
     }
   }
 
-  private final LineString points;
-
-  private BoundingBoxDoubleGf env;
-
-  private final EdgeIntersectionList eiList = new EdgeIntersectionList(this);
-
-  private String name;
-
-  private MonotoneChainEdge mce;
-
-  private boolean isIsolated = true;
-
   private final Depth depth = new Depth();
 
   private int depthDelta = 0; // the change in area depth from the R to L side
+
+  private final EdgeIntersectionList eiList = new EdgeIntersectionList(this);
+
+  private BoundingBoxDoubleGf env;
+
+  private boolean isIsolated = true;
+
+  private MonotoneChainEdge mce;
+
+  private String name;
+
+  private final LineString points;
 
   // of this edge
 

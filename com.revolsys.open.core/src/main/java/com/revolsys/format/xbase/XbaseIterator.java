@@ -59,35 +59,35 @@ public class XbaseIterator extends AbstractIterator<Record>implements RecordRead
 
   }
 
+  private Charset charset = StandardCharsets.UTF_8;
+
   private boolean closeFile = true;
 
   private int currentDeletedCount = 0;
 
-  private RecordFactory recordFactory;
-
   private int deletedCount = 0;
+
+  private long firstIndex;
 
   private EndianInput in;
 
-  private RecordDefinitionImpl recordDefinition;
-
-  private byte[] recordBuffer;
-
-  private short recordSize;
-
   private Runnable initCallback;
+
+  private boolean mappedFile;
 
   private int numRecords;
 
   private int position = 0;
 
-  private long firstIndex;
+  private byte[] recordBuffer;
 
-  private boolean mappedFile;
+  private RecordDefinitionImpl recordDefinition;
+
+  private RecordFactory recordFactory;
+
+  private short recordSize;
 
   private Resource resource;
-
-  private Charset charset = StandardCharsets.UTF_8;
 
   private PathName typeName;
 

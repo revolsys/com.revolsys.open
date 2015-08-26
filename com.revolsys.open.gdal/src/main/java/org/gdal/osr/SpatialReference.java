@@ -13,9 +13,9 @@ public class SpatialReference implements Cloneable {
     return obj == null ? 0 : obj.swigCPtr;
   }
 
-  private long swigCPtr;
-
   protected boolean swigCMemOwn;
+
+  private long swigCPtr;
 
   public SpatialReference() {
     this(osrJNI.new_SpatialReference__SWIG_1(), true);

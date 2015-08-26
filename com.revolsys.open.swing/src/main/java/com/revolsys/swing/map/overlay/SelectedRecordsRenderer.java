@@ -56,15 +56,15 @@ public class SelectedRecordsRenderer {
 
   private final MarkerStyle erroStyle;
 
+  private final MarkerStyle firstVertexStyle;
+
   private final GeometryStyle highlightStyle;
+
+  private final MarkerStyle lastVertexStyle;
 
   private final GeometryStyle outlineStyle;
 
   private final MarkerStyle vertexStyle;
-
-  private final MarkerStyle lastVertexStyle;
-
-  private final MarkerStyle firstVertexStyle;
 
   {
   }

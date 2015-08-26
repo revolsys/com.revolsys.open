@@ -1,9 +1,9 @@
 package com.revolsys.gis.wms.capabilities;
 
 public class Identifier {
-  private String value;
-
   private String authority;
+
+  private String value;
 
   public String getAuthority() {
     return this.authority;

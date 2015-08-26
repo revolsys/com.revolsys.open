@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Index {
-  private String name;
-
-  private boolean isUnique;
+  private List<Field> fields = new ArrayList<Field>();
 
   private boolean isAscending = true;
 
-  private List<Field> fields = new ArrayList<Field>();
+  private boolean isUnique;
+
+  private String name;
 
   public void addField(final Field field) {
     this.fields.add(field);

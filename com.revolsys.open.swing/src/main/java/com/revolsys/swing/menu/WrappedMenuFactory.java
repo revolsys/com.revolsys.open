@@ -8,9 +8,9 @@ import javax.swing.JMenuItem;
 import com.revolsys.swing.component.ComponentFactory;
 
 public class WrappedMenuFactory implements ComponentFactory<JMenuItem> {
-  private final String name;
-
   private final MenuFactory menuFactory;
+
+  private final String name;
 
   public WrappedMenuFactory(final String name, final MenuFactory menuFactory) {
     this.name = name;

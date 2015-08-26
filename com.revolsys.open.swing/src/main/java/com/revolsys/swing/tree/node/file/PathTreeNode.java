@@ -216,9 +216,9 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       fileNameExtension);
   }
 
-  private boolean hasFile;
-
   private boolean exists;
+
+  private boolean hasFile;
 
   public PathTreeNode(final Path path) {
     super(path);

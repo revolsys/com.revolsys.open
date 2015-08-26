@@ -7,13 +7,27 @@ import java.util.TreeSet;
 
 public interface GeoJsonConstants {
 
+  String COGO_DESCRIPTION = "CogoJSON";
+
+  String COGO_FILE_EXTENSION = "cogojson";
+
+  String COGO_LINE_STRING = "CogoLineString";
+
+  String COGO_MEDIA_TYPE = "application/x-cogo+json";
+
+  String COGO_MULTI_LINE_STRING = "CogoMultiLineString";
+
+  String COGO_MULTI_POLYGON = "CogoMultiPolygon";
+
+  String COGO_POLYGON = "CogoPolygon";
+
   String COORDINATES = "coordinates";
 
   String CRS = "crs";
 
   String DESCRIPTION = "GeoJSON";
 
-  String COGO_DESCRIPTION = "CogoJSON";
+  public static final String EPSG = "EPSG:";
 
   String FEATURE = "Feature";
 
@@ -23,11 +37,9 @@ public interface GeoJsonConstants {
 
   String FILE_EXTENSION = "geojson";
 
-  String COGO_FILE_EXTENSION = "cogojson";
+  String GEOMETRIES = "geometries";
 
   String GEOMETRY = "geometry";
-
-  String GEOMETRIES = "geometries";
 
   String GEOMETRY_COLLECTION = "GeometryCollection";
 
@@ -37,17 +49,7 @@ public interface GeoJsonConstants {
 
   String MEDIA_TYPE_OLD = "application/x-geo+json";
 
-  String COGO_MEDIA_TYPE = "application/x-cogo+json";
-
   String MULTI_LINE_STRING = "MultiLineString";
-
-  String COGO_MULTI_LINE_STRING = "CogoMultiLineString";
-
-  String COGO_LINE_STRING = "CogoLineString";
-
-  String COGO_MULTI_POLYGON = "CogoMultiPolygon";
-
-  String COGO_POLYGON = "CogoPolygon";
 
   String MULTI_POINT = "MultiPoint";
 
@@ -63,15 +65,13 @@ public interface GeoJsonConstants {
 
   String TYPE = "type";
 
-  Set<String> OBJECT_TYPE_NAMES = new TreeSet<String>(
-    Arrays.asList(FEATURE, FEATURE_COLLECTION, POINT, LINE_STRING, POLYGON, MULTI_POINT,
-      MULTI_LINE_STRING, MULTI_POLYGON, GEOMETRY_COLLECTION));
+  public static final String URN_OGC_DEF_CRS_EPSG = "urn:ogc:def:crs:EPSG::";
 
   Set<String> GEOMETRY_TYPE_NAMES = new LinkedHashSet<String>(Arrays.asList(POINT, LINE_STRING,
     POLYGON, MULTI_POINT, MULTI_LINE_STRING, MULTI_POLYGON, GEOMETRY_COLLECTION, COGO_LINE_STRING,
     COGO_MULTI_LINE_STRING, COGO_POLYGON, COGO_MULTI_POLYGON));
 
-  public static final String URN_OGC_DEF_CRS_EPSG = "urn:ogc:def:crs:EPSG::";
-
-  public static final String EPSG = "EPSG:";
+  Set<String> OBJECT_TYPE_NAMES = new TreeSet<String>(
+    Arrays.asList(FEATURE, FEATURE_COLLECTION, POINT, LINE_STRING, POLYGON, MULTI_POINT,
+      MULTI_LINE_STRING, MULTI_POLYGON, GEOMETRY_COLLECTION));
 }

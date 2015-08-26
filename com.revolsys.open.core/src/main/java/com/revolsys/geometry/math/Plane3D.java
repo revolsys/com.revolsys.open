@@ -48,13 +48,13 @@ public class Plane3D {
    */
   public static final int XY_PLANE = 1;
 
-  public static final int YZ_PLANE = 2;
-
   public static final int XZ_PLANE = 3;
 
-  private final Vector3D normal;
+  public static final int YZ_PLANE = 2;
 
   private final Point basePt;
+
+  private final Vector3D normal;
 
   public Plane3D(final Vector3D normal, final Point basePt) {
     this.normal = normal;

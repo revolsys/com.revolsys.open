@@ -16,9 +16,9 @@ import com.revolsys.collection.map.Maps;
 
 public class WmsConnectionManager {
 
-  private static final Logger LOG = LoggerFactory.getLogger(WmsConnectionManager.class);
-
   private static WmsConnectionManager INSTANCE = new WmsConnectionManager();
+
+  private static final Logger LOG = LoggerFactory.getLogger(WmsConnectionManager.class);
 
   public static WmsConnectionManager get() {
     return INSTANCE;

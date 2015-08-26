@@ -19,9 +19,9 @@ public class CoordinateTransformation {
     return obj == null ? 0 : obj.swigCPtr;
   }
 
-  private long swigCPtr;
-
   protected boolean swigCMemOwn;
+
+  private long swigCPtr;
 
   public CoordinateTransformation(final long cPtr, final boolean cMemoryOwn) {
     this.swigCMemOwn = cMemoryOwn;

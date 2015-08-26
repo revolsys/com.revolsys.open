@@ -23,11 +23,11 @@ public abstract class AbstractRecordTableModel extends com.revolsys.swing.table.
 
   private static final long serialVersionUID = 1L;
 
-  private RecordDefinition recordDefinition;
+  private boolean editable;
 
   private Set<String> readOnlyFieldNames = new HashSet<String>();
 
-  private boolean editable;
+  private RecordDefinition recordDefinition;
 
   public AbstractRecordTableModel() {
     this(null);

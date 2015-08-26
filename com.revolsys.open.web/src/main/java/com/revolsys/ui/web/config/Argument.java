@@ -24,20 +24,20 @@ import org.apache.log4j.Logger;
 public class Argument {
   private static final Logger log = Logger.getLogger(Argument.class);
 
-  private final String name;
+  private Constructor constructor;
 
   private final String defaultValue;
 
-  private final Class type;
-
-  private final boolean required;
-
-  private Constructor constructor;
-
   private final boolean inheritable;
+
+  private final String name;
 
   /** The initialization parameters for the argument. */
   private final HashMap parameters = new HashMap();
+
+  private final boolean required;
+
+  private final Class type;
 
   public Argument(final String name, final Class type, final String defaultValue,
     final boolean required, final boolean inheritable) {

@@ -33,19 +33,19 @@ import com.revolsys.util.HtmlUtil;
 
 public class SqlDateSelectField extends Field {
 
-  private static final String YEAR_KEY = "Year";
-
   private static final String DAY_KEY = "Day";
 
-  private static final String MONTH_KEY = "Month";
-
   private static final List DAY_OPTIONS;
+
+  private static final String MONTH_KEY = "Month";
 
   private static final List MONTH_OPTIONS;
 
   private static final String[] MONTHS = {
     "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   };
+
+  private static final String YEAR_KEY = "Year";
 
   static {
     final List dayOptions = new ArrayList();
@@ -68,19 +68,19 @@ public class SqlDateSelectField extends Field {
     return date.get(Calendar.YEAR);
   }
 
-  private final Logger log = Logger.getLogger(SqlDateSelectField.class);
-
-  private final List yearOptions = new ArrayList();
-
   private String dayStringValue;
+
+  private final int endYear;
+
+  private final Logger log = Logger.getLogger(SqlDateSelectField.class);
 
   private String monthStringValue;
 
-  private String yearStringValue;
-
   private final int startYear;
 
-  private final int endYear;
+  private final List yearOptions = new ArrayList();
+
+  private String yearStringValue;
 
   /**
    * @param name

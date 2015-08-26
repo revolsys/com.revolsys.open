@@ -30,9 +30,9 @@ public class TableBodyLayout implements ElementContainerLayout {
 
   private final String cssClass;
 
-  private final int numColumns;
-
   private final List<String> cssClasses = new ArrayList<String>();
+
+  private final int numColumns;
 
   public TableBodyLayout(final int numColumns) {
     this(null, numColumns);

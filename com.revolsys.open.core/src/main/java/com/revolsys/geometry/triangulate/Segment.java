@@ -47,9 +47,9 @@ import com.revolsys.geometry.model.segment.LineSegmentDouble;
  * @author Martin Davis
  */
 public class Segment {
-  private final LineSegment ls;
-
   private Object data = null;
+
+  private final LineSegment ls;
 
   /**
    * Creates a new instance for the given ordinates.

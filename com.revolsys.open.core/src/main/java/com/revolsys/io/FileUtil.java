@@ -75,24 +75,24 @@ public final class FileUtil {
   /** The thread that deletes files on exit. */
   private static Thread deleteFilesOnExitThread;
 
+  public static final FilenameFilter IMAGE_FILENAME_FILTER = new ExtensionFilenameFilter(
+    Arrays.asList(new String[] {
+      "gif", "jpg", "png", "tif", "tiff", "bmp"
+  }));
+
   /** The logger to record errors to. */
   private static final Logger LOG = LoggerFactory.getLogger(FileUtil.class);
 
   /** The file path separator for UNIX based systems. */
   public static final char UNIX_FILE_SEPARATOR = '/';
 
-  /** The file path separator for Windows based systems. */
-  public static final char WINDOWS_FILE_SEPARATOR = '\\';
-
-  public static final FilenameFilter IMAGE_FILENAME_FILTER = new ExtensionFilenameFilter(
-    Arrays.asList(new String[] {
-      "gif", "jpg", "png", "tif", "tiff", "bmp"
-  }));
-
   public static final FilenameFilter VIDEO_FILENAME_FILTER = new ExtensionFilenameFilter(
     Arrays.asList(new String[] {
       "avi", "wmv", "flv", "mpg"
   }));
+
+  /** The file path separator for Windows based systems. */
+  public static final char WINDOWS_FILE_SEPARATOR = '\\';
 
   /**
    * Close the writer without throwing an I/O exception if the close failed. The

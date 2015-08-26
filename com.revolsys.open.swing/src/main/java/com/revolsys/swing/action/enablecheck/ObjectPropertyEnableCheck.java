@@ -7,13 +7,13 @@ import com.revolsys.data.equals.Equals;
 import com.revolsys.util.Property;
 
 public class ObjectPropertyEnableCheck extends AbstractEnableCheck {
+  private boolean inverse = false;
+
   private final Reference<Object> object;
 
   private final String propertyName;
 
   private final Object value;
-
-  private boolean inverse = false;
 
   public ObjectPropertyEnableCheck(final Object object, final String propertyName) {
     this(object, propertyName, true);

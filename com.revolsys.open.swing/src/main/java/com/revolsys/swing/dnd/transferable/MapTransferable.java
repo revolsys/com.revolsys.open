@@ -12,7 +12,6 @@ import java.util.Map;
 import com.revolsys.format.csv.Csv;
 
 public class MapTransferable implements Transferable {
-
   public static final DataFlavor MAP_FLAVOR = new DataFlavor(Map.class, "Java Map");
 
   private static final DataFlavor[] DATA_FLAVORS = {

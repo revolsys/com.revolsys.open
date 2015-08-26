@@ -33,12 +33,6 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
   /**
-   * The pattern for setting the value for a property of a bean (e.g.
-   * bean.property).
-   */
-  private static final Pattern SIMPLE_PROPERTY_PATTERN = Pattern.compile("(\\w+)\\.(\\w+)");
-
-  /**
    * The pattern for setting the value for a key in a Map property of a bean
    * (e.g. bean.property[key]).
    */
@@ -46,13 +40,19 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
     .compile("(\\w+)\\.(\\w+)\\[([a-z]\\w*)\\]");
 
   /**
+   * The pattern for setting the value for a property of a bean (e.g.
+   * bean.property).
+   */
+  private static final Pattern SIMPLE_PROPERTY_PATTERN = Pattern.compile("(\\w+)\\.(\\w+)");
+
+  /** Contains names of beans that have overrides */
+  private final Set<String> beanNames = Collections.synchronizedSet(new HashSet<String>());
+
+  /**
    * The flag indictaing if invalid keys should be ignored or an exception
    * thrown.
    */
   private boolean ignoreInvalidKeys = false;
-
-  /** Contains names of beans that have overrides */
-  private final Set<String> beanNames = Collections.synchronizedSet(new HashSet<String>());
 
   /**
    * Apply the given property value to the corresponding map property on the

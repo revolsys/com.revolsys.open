@@ -19,9 +19,9 @@ public class LineNumberElement extends Element {
    */
   private static final long serialVersionUID = 1L;
 
-  private int _startLine;
-
   private int _endLine;
+
+  private int _startLine;
 
   public LineNumberElement() {
     super();

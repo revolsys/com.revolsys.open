@@ -1,9 +1,9 @@
 package com.revolsys.gis.wms.capabilities;
 
 public class ContactPersonPrimary {
-  private String contactPerson;
-
   private String contactOrganization;
+
+  private String contactPerson;
 
   public String getContactOrganization() {
     return this.contactOrganization;

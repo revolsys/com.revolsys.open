@@ -17,11 +17,11 @@ public class LayerGroupListModel extends AbstractListModel
   implements ComboBoxModel, Reorderable, PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
+  private final boolean allowNull;
+
   private final LayerGroup group;
 
   private Layer selectedItem;
-
-  private final boolean allowNull;
 
   public LayerGroupListModel(final LayerGroup group) {
     this(group, false);

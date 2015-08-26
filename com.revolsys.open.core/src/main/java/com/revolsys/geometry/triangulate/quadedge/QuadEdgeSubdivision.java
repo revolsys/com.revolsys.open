@@ -192,20 +192,20 @@ public class QuadEdgeSubdivision {
     }
   }
 
+  private final double edgeCoincidenceTolerance;
+
+  private BoundingBoxDoubleGf frameEnv;
+
+  private final Vertex[] frameVertex = new Vertex[3];
+
+  private QuadEdgeLocator locator = null;
+
   // private Set quadEdges = new HashSet();
   private final List quadEdges = new ArrayList();
 
   private final QuadEdge startingEdge;
 
   private final double tolerance;
-
-  private final double edgeCoincidenceTolerance;
-
-  private final Vertex[] frameVertex = new Vertex[3];
-
-  private BoundingBoxDoubleGf frameEnv;
-
-  private QuadEdgeLocator locator = null;
 
   /**
    * The quadedges forming a single triangle.

@@ -26,9 +26,9 @@ public class RecordStoreQueryField extends AbstractRecordQueryField {
     return factory(fieldName, recordStore, PathName.create(typePath), displayFieldName);
   }
 
-  private final RecordStore recordStore;
-
   private final RecordDefinition recordDefinition;
+
+  private final RecordStore recordStore;
 
   public RecordStoreQueryField(final String fieldName, final RecordStore recordStore,
     final PathName typePath, final String displayFieldName) {

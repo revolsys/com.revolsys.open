@@ -22,11 +22,11 @@ import com.revolsys.util.HtmlUtil;
 public class DetailView extends Element {
   private String cssClass = "detail";
 
+  private final int numColumns;
+
   private final LabelValueListSerializer serializer;
 
   private String title;
-
-  private final int numColumns;
 
   public DetailView(final LabelValueListSerializer serializer) {
     this(serializer, null, null);

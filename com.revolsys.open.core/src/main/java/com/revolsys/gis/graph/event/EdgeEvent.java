@@ -6,16 +6,16 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.gis.graph.Edge;
 
 public class EdgeEvent<T> extends EventObject {
-  /**
-   *
-   */
-  private static final long serialVersionUID = -2271176357444777709L;
-
   public static final String EDGE_ADDED = "Added";
 
   public static final String EDGE_CHANGED = "Changed";
 
   public static final String EDGE_REMOVED = "Removed";
+
+  /**
+   *
+   */
+  private static final long serialVersionUID = -2271176357444777709L;
 
   private String action;
 

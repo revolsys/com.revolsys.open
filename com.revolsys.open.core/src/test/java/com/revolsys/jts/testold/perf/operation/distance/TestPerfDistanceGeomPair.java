@@ -18,13 +18,13 @@ public class TestPerfDistanceGeomPair {
     test.test2();
   }
 
-  boolean testFailed = false;
-
-  boolean verbose = true;
+  double separationDist = this.size * 2;
 
   double size = 100;
 
-  double separationDist = this.size * 2;
+  boolean testFailed = false;
+
+  boolean verbose = true;
 
   public TestPerfDistanceGeomPair() {
   }

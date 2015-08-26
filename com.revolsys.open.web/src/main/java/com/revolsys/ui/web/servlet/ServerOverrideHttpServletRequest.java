@@ -7,15 +7,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
 public class ServerOverrideHttpServletRequest extends HttpServletRequestWrapper {
-  private String serverUrl;
+  private String scheme;
 
   private String secureServerUrl;
 
   private String serverName;
 
-  private String scheme;
-
   private int serverPort;
+
+  private String serverUrl;
 
   public ServerOverrideHttpServletRequest(final String serverUrl,
     final HttpServletRequest request) {

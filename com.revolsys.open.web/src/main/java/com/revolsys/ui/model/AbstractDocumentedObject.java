@@ -7,9 +7,9 @@ import java.util.Map;
 
 public class AbstractDocumentedObject {
 
-  private final Map<Locale, DocInfo> documentationByLocale = new LinkedHashMap<Locale, DocInfo>();
-
   private final Map<String, Map<String, DocInfo>> documentationByLanguageAndCountry = new LinkedHashMap<String, Map<String, DocInfo>>();
+
+  private final Map<Locale, DocInfo> documentationByLocale = new LinkedHashMap<Locale, DocInfo>();
 
   public AbstractDocumentedObject() {
   }

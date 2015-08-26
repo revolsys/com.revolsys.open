@@ -13,9 +13,9 @@ public class MultiLineStringSegment extends AbstractSegment implements Iterator<
    */
   private static final long serialVersionUID = 1L;
 
-  private int segmentIndex;
-
   private int partIndex;
+
+  private int segmentIndex;
 
   public MultiLineStringSegment(final MultiLineString line, final int... segmentId) {
     super(line);

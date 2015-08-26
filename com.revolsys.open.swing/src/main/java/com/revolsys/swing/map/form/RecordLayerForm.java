@@ -136,6 +136,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
   private boolean editable = true;
 
+  private final Map<String, List<String>> fieldErrors = new HashMap<>();
+
   private final Map<String, String> fieldInValidMessage = new HashMap<String, String>();
 
   private ComboBox fieldNameSetNamesField;
@@ -151,6 +153,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   private final ThreadLocal<Boolean> fieldValidationDisabled = new ThreadLocal<Boolean>();
 
   private final Map<String, Object> fieldValues = new HashMap<String, Object>();
+
+  private final Map<String, List<String>> fieldWarnings = new HashMap<>();
 
   private String focussedFieldName;
 
@@ -181,10 +185,6 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   private ToolBar toolBar;
 
   private UndoManager undoManager = new RecordLayerFormUndoManager(this);
-
-  private final Map<String, List<String>> fieldErrors = new HashMap<>();
-
-  private final Map<String, List<String>> fieldWarnings = new HashMap<>();
 
   public RecordLayerForm(final AbstractRecordLayer layer) {
     ProjectFrame.addSaveActions(this, layer.getProject());

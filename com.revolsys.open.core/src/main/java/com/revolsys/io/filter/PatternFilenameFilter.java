@@ -27,10 +27,10 @@ import java.util.regex.Pattern;
  * @author Paul Austin
  */
 public class PatternFilenameFilter implements FilenameFilter {
+  private boolean ignoreCase;
+
   /** The regular expression pattern to match file names. */
   private final Pattern pattern;
-
-  private boolean ignoreCase;
 
   /**
    * Construct a new PatternFileNameFilter.

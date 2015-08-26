@@ -7,11 +7,11 @@ import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.HtmlUtil;
 
 public class CheckBox01Field extends Field {
+  private String onClick = null;
+
   private boolean selected = false;
 
   private final String selectedValue = "on";
-
-  private String onClick = null;
 
   public CheckBox01Field() {
   }

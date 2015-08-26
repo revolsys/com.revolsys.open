@@ -14,10 +14,10 @@ import com.revolsys.io.NamedObject;
 
 public class XmlMapWriter extends AbstractMapWriter {
 
+  private boolean opened;
+
   /** The writer */
   private XmlWriter out;
-
-  private boolean opened;
 
   private boolean singleObject;
 

@@ -11,9 +11,9 @@ import junit.framework.Assert;
 public class GeometryOperationValidator {
   private static WKTReader rdr = new WKTReader();
 
-  private final Geometry[] ioGeometry;
-
   private boolean expectedSameStructure = false;
+
+  private final Geometry[] ioGeometry;
 
   private String wktExpected = null;
 

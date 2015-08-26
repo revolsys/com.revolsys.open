@@ -11,11 +11,11 @@ public class ArcGisResponse extends AbstractMapWrapper {
   public static final Map<String, ? extends Object> FORMAT_PARAMETER = Collections.singletonMap("f",
     "json");
 
-  private String serviceUrl;
+  private Catalog catalog;
 
   private String path;
 
-  private Catalog catalog;
+  private String serviceUrl;
 
   public ArcGisResponse() {
   }

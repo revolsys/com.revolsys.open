@@ -23,14 +23,14 @@ public class InvokeMethodCallable<T> implements Callable<T> {
     return RunnableCallable.invokeAndWait(callable);
   }
 
+  /** The name of the method to invoke. */
+  private final String methodName;
+
   /** The object to invoke the method on. */
   private final Object object;
 
   /** The parameters to pass to the method. */
   private final Object[] parameters;
-
-  /** The name of the method to invoke. */
-  private final String methodName;
 
   /**
    * Construct a new InvokeMethodCallable.

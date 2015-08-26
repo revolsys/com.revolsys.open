@@ -28,13 +28,13 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.util.LineStringUtil;
 
 public class LessThanDistanceFilter implements Predicate<Geometry> {
+  /** The maximum distance the object can be from the source geometry. */
+  private double distance;
+
   private BoundingBox envelope;
 
   /** The geometry to compare the data objects to to. */
   private Geometry geometry;
-
-  /** The maximum distance the object can be from the source geometry. */
-  private double distance;
 
   public LessThanDistanceFilter() {
   }

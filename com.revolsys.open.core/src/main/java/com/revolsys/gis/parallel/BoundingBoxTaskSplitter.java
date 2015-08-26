@@ -10,17 +10,17 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.parallel.process.AbstractProcess;
 
 public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
-  private final Logger log = LoggerFactory.getLogger(getClass());
+  private Geometry boundary;
 
   private BoundingBox boundingBox;
+
+  private final Logger log = LoggerFactory.getLogger(getClass());
+
+  private boolean logScriptInfo;
 
   private int numX = 10;
 
   private int numY = 10;
-
-  private boolean logScriptInfo;
-
-  private Geometry boundary;
 
   private Geometry preparedBoundary;
 

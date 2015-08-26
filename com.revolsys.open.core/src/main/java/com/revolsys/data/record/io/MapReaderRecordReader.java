@@ -16,13 +16,13 @@ import com.revolsys.io.Reader;
 public class MapReaderRecordReader extends AbstractReader<Record>
   implements RecordReader, Iterator<Record> {
 
-  private final RecordDefinition recordDefinition;
+  private Iterator<Map<String, Object>> mapIterator;
 
   private final Reader<Map<String, Object>> mapReader;
 
   private boolean open;
 
-  private Iterator<Map<String, Object>> mapIterator;
+  private final RecordDefinition recordDefinition;
 
   public MapReaderRecordReader(final RecordDefinition recordDefinition,
     final Reader<Map<String, Object>> mapReader) {

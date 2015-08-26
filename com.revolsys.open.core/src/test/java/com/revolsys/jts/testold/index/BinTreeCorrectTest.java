@@ -44,11 +44,11 @@ import com.revolsys.geometry.util.Stopwatch;
  */
 public class BinTreeCorrectTest {
 
-  static final int NUM_ITEMS = 20000;
+  static final double MAX_EXTENT = 1000.0;
 
   static final double MIN_EXTENT = -1000.0;
 
-  static final double MAX_EXTENT = 1000.0;
+  static final int NUM_ITEMS = 20000;
 
   public static void main(final String[] args) throws Exception {
     // testBinaryPower();
@@ -56,9 +56,9 @@ public class BinTreeCorrectTest {
     test.run();
   }
 
-  IntervalList intervalList = new IntervalList();
-
   Bintree btree = new Bintree();
+
+  IntervalList intervalList = new IntervalList();
 
   public BinTreeCorrectTest() {
   }

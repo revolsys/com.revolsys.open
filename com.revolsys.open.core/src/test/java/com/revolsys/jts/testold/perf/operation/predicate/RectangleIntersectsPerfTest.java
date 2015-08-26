@@ -48,15 +48,15 @@ import com.revolsys.geometry.util.Stopwatch;
 import com.revolsys.geometry.wkb.WKTReader;
 
 public class RectangleIntersectsPerfTest {
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+
   static final int MAX_ITER = 10;
 
   static final int NUM_AOI_PTS = 2000;
 
-  static final int NUM_LINES = 5000;
-
   static final int NUM_LINE_PTS = 1000;
 
-  private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+  static final int NUM_LINES = 5000;
 
   static WKTReader wktRdr = new WKTReader(geometryFactory);
 

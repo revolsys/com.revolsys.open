@@ -24,6 +24,10 @@ public class Menu implements Cloneable, BeanNameAware {
 
   private final Map<String, Expression> dynamicParameters = new HashMap<String, Expression>();
 
+  private String iconName;
+
+  private String id;
+
   private List<Menu> menus = new ArrayList<Menu>();
 
   private String name;
@@ -34,6 +38,8 @@ public class Menu implements Cloneable, BeanNameAware {
 
   private final Map<String, Object> staticParameters = new HashMap<String, Object>();
 
+  private String target;
+
   private String title;
 
   private Expression titleExpression;
@@ -43,12 +49,6 @@ public class Menu implements Cloneable, BeanNameAware {
   private Expression uriExpression;
 
   private boolean visible = true;
-
-  private String target;
-
-  private String id;
-
-  private String iconName;
 
   public Menu() {
   }

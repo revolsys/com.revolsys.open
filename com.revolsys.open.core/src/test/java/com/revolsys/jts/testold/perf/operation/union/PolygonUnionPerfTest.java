@@ -12,9 +12,9 @@ import com.revolsys.geometry.wkb.WKTReader;
 
 public class PolygonUnionPerfTest {
 
-  static final int MAX_ITER = 1;
-
   private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+
+  static final int MAX_ITER = 1;
 
   static WKTReader wktRdr = new WKTReader(geometryFactory);
 

@@ -58,11 +58,11 @@ import com.revolsys.geometry.model.segment.Segment;
  * @version 1.7
  */
 public class OffsetPointGenerator {
-  private final Geometry g;
-
   private boolean doLeft = true;
 
   private boolean doRight = true;
+
+  private final Geometry g;
 
   public OffsetPointGenerator(final Geometry g) {
     this.g = g;

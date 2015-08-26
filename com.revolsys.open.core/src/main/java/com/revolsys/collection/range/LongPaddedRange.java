@@ -3,11 +3,11 @@ package com.revolsys.collection.range;
 import com.revolsys.util.Numbers;
 
 public class LongPaddedRange extends AbstractRange<String> {
+  private byte digitCount;
+
   private long from;
 
   private long to;
-
-  private byte digitCount;
 
   public LongPaddedRange(final long value) {
     this(value, value);

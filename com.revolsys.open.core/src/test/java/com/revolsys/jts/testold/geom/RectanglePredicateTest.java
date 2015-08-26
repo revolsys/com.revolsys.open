@@ -18,9 +18,9 @@ public class RectanglePredicateTest extends TestCase {
     TestRunner.run(RectanglePredicateTest.class);
   }
 
-  private final WKTReader rdr = new WKTReader();
-
   private final GeometryFactory fact = GeometryFactory.floating3();
+
+  private final WKTReader rdr = new WKTReader();
 
   public RectanglePredicateTest(final String name) {
     super(name);

@@ -39,43 +39,43 @@ public class OsmDocument implements OsmConstants {
     return new OsmDocument();
   }
 
-  private String version;
-
-  private String generator;
-
-  private String copyright;
-
-  private String license;
-
-  private OsmUser user;
-
-  private OsmPreferences preferences;
-
-  private OsmGpxFile gpxFile;
-
   private OsmApi api;
+
+  private String attribution;
+
+  private BoundingBox bounds;
 
   private OsmChangeset changeset;
 
-  private final List<OsmNode> nodes = new ArrayList<>();
+  private String copyright;
 
-  private final List<OsmWay> ways = new ArrayList<>();
+  private String generator;
 
-  private final List<OsmRelation> relations = new ArrayList<>();
+  private OsmGpxFile gpxFile;
 
-  private BoundingBox bounds;
+  private String license;
 
   private final LongHashMap<OsmNode> nodeMap = new LongHashMap<>();
 
   private final LongHashMap<Point> nodePointMap = new LongHashMap<>();
 
-  private final LongHashMap<OsmWay> wayMap = new LongHashMap<>();
+  private final List<OsmNode> nodes = new ArrayList<>();
 
-  private final LongHashMap<OsmRelation> relationMap = new LongHashMap<>();
+  private OsmPreferences preferences;
 
   private final List<OsmElement> records = new ArrayList<>();
 
-  private String attribution;
+  private final LongHashMap<OsmRelation> relationMap = new LongHashMap<>();
+
+  private final List<OsmRelation> relations = new ArrayList<>();
+
+  private OsmUser user;
+
+  private String version;
+
+  private final LongHashMap<OsmWay> wayMap = new LongHashMap<>();
+
+  private final List<OsmWay> ways = new ArrayList<>();
 
   public OsmDocument() {
   }

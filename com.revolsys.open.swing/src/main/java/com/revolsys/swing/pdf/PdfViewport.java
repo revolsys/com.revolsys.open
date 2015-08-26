@@ -55,21 +55,21 @@ import com.revolsys.util.Property;
 
 public class PdfViewport extends Viewport2D implements AutoCloseable {
 
-  private final PDDocument document;
+  private final Set<Float> alphaSet = new HashSet<>();
 
-  private final PDPage page;
+  private final Canvas canvas = new Canvas();
 
   private final PDPageContentStream contentStream;
 
-  private final Set<Float> alphaSet = new HashSet<>();
+  private final PDDocument document;
+
+  private final Map<String, PDFont> fonts = new HashMap<>();
+
+  private final PDPage page;
 
   private int styleId = 0;
 
   private final Map<GeometryStyle, String> styleNames = new HashMap<>();
-
-  private final Canvas canvas = new Canvas();
-
-  private final Map<String, PDFont> fonts = new HashMap<>();
 
   public PdfViewport(final PDDocument document, final PDPage page, final Project project,
     final int width, final int height, final BoundingBox boundingBox) throws IOException {

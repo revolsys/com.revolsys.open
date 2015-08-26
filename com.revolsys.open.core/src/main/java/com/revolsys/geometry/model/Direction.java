@@ -5,7 +5,7 @@ import java.util.List;
 import com.revolsys.collection.list.Lists;
 
 public enum Direction {
-  FORWARDS, BACKWARDS;
+  BACKWARDS, FORWARDS;
 
   public static List<Direction> VALUES = Lists.array(FORWARDS, BACKWARDS);
 

@@ -46,14 +46,14 @@ import com.revolsys.geometry.model.impl.PointDouble;
  * @version 1.7
  */
 public class CoordinateList extends ArrayList<Point> {
+  // With contributions from Markus Schaber [schabios@logi-track.com]
+  // [Jon Aquino 2004-03-25]
+  private final static Point[] coordArrayType = new Point[0];
+
   /**
    *
    */
   private static final long serialVersionUID = 1L;
-
-  // With contributions from Markus Schaber [schabios@logi-track.com]
-  // [Jon Aquino 2004-03-25]
-  private final static Point[] coordArrayType = new Point[0];
 
   /**
    * Constructs a new list without any coordinates

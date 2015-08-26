@@ -26,27 +26,27 @@ import com.revolsys.gis.io.Statistics;
 
 public class OgrQueryIterator extends AbstractIterator<Record> {
 
-  private OgrRecordStore recordStore;
-
-  private Query query;
-
-  private Layer layer;
-
-  private RecordFactory recordFactory;
-
-  private Statistics statistics;
-
-  private RecordDefinition recordDefinition;
-
-  private final int offset;
-
-  private final int limit;
-
   private int count;
 
   private GeometryFactory geometryFactory;
 
   private final String idFieldName;
+
+  private Layer layer;
+
+  private final int limit;
+
+  private final int offset;
+
+  private Query query;
+
+  private RecordDefinition recordDefinition;
+
+  private RecordFactory recordFactory;
+
+  private OgrRecordStore recordStore;
+
+  private Statistics statistics;
 
   protected OgrQueryIterator(final OgrRecordStore recordStore, final Query query) {
     this.recordStore = recordStore;

@@ -25,9 +25,9 @@ import com.revolsys.gis.graph.visitor.BoundingBoxIntersectsEdgeVisitor;
 public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   private final GeometryFactory geometryFactory;
 
-  private final List<Set<Node<LineSegmentMatch>>> startNodes = new ArrayList<Set<Node<LineSegmentMatch>>>();
-
   private final List<T> objects = new ArrayList<T>();
+
+  private final List<Set<Node<LineSegmentMatch>>> startNodes = new ArrayList<Set<Node<LineSegmentMatch>>>();
 
   private final int tolerance = 1;
 

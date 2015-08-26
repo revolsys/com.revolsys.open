@@ -5,13 +5,13 @@ import java.io.InputStream;
 
 public class InputStreamResource extends AbstractResource {
 
-  private String filename;
+  private final String description;
 
-  private long length = -1;
+  private String filename;
 
   private final InputStream inputStream;
 
-  private final String description;
+  private long length = -1;
 
   private boolean read = false;
 

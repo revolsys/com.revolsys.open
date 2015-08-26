@@ -50,15 +50,16 @@ import java.util.NoSuchElementException;
 public class GeometryCollectionIterator implements Iterator<Geometry> {
 
   /**
-   *  The <code>Geometry</code> being iterated over.
-   */
-  private final Geometry parent;
-
-  /**
    *  Indicates whether or not the first element
    *  (the root <code>GeometryCollection</code>) has been returned.
    */
   private boolean atStart;
+
+  /**
+   *  The index of the <code>Geometry</code> that will be returned when <code>next</code>
+   *  is called.
+   */
+  private int index;
 
   /**
    *  The number of <code>Geometry</code>s in the the <code>GeometryCollection</code>.
@@ -66,10 +67,9 @@ public class GeometryCollectionIterator implements Iterator<Geometry> {
   private final int max;
 
   /**
-   *  The index of the <code>Geometry</code> that will be returned when <code>next</code>
-   *  is called.
+   *  The <code>Geometry</code> being iterated over.
    */
-  private int index;
+  private final Geometry parent;
 
   /**
    *  The iterator over a nested <code>Geometry</code>, or <code>null</code>

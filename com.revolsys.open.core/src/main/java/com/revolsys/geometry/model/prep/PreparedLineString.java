@@ -59,9 +59,9 @@ public class PreparedLineString extends AbstractLineString {
    */
   private static final long serialVersionUID = 1L;
 
-  private FastSegmentSetIntersectionFinder segIntFinder = null;
-
   private final LineString line;
+
+  private FastSegmentSetIntersectionFinder segIntFinder = null;
 
   public PreparedLineString(final LineString line) {
     this.line = line;

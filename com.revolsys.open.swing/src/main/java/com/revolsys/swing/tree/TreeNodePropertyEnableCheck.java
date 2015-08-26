@@ -8,11 +8,11 @@ import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.util.Property;
 
 public class TreeNodePropertyEnableCheck extends AbstractEnableCheck {
+  private boolean inverse = false;
+
   private final String propertyName;
 
   private final Object value;
-
-  private boolean inverse = false;
 
   public TreeNodePropertyEnableCheck(final String propertyName) {
     this(propertyName, true);

@@ -9,11 +9,11 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 public class SetRecordValuesUndo extends AbstractUndoableEdit {
   private static final long serialVersionUID = 1L;
 
-  private final LayerRecord record;
+  private final Map<String, Object> newValues = new HashMap<String, Object>();
 
   private final Map<String, Object> originalValues = new HashMap<String, Object>();
 
-  private final Map<String, Object> newValues = new HashMap<String, Object>();
+  private final LayerRecord record;
 
   public SetRecordValuesUndo(final LayerRecord record, final Map<String, Object> newValues) {
     this.record = record;

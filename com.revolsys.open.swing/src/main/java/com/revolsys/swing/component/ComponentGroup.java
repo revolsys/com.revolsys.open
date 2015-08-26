@@ -15,11 +15,11 @@ import javax.swing.JToolBar;
 
 public class ComponentGroup {
 
-  private final Map<String, List<Component>> groups = new HashMap<String, List<Component>>();
-
   private final Map<String, ButtonGroup> buttonGroups = new HashMap<String, ButtonGroup>();
 
   private final List<String> groupNames = new ArrayList<String>();
+
+  private final Map<String, List<Component>> groups = new HashMap<String, List<Component>>();
 
   public ComponentGroup() {
   }

@@ -50,11 +50,11 @@ import com.revolsys.util.MathUtil;
  *
  */
 public class LineFacetSequence implements FacetSequence {
+  private final int end;
+
   private final LineString line;
 
   private final int start;
-
-  private final int end;
 
   /**
    * Creates a new sequence for a single point from a LineString.

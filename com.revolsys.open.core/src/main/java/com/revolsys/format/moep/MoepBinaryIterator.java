@@ -81,8 +81,6 @@ public class MoepBinaryIterator extends BaseObjectWithProperties implements Iter
 
   private Record currentRecord;
 
-  private final RecordFactory recordFactory;
-
   private final MoepDirectoryReader directoryReader;
 
   private GeometryFactory factory;
@@ -97,9 +95,11 @@ public class MoepBinaryIterator extends BaseObjectWithProperties implements Iter
 
   private boolean loadNextObject = true;
 
+  private final String mapsheet;
+
   private String originalFileType;
 
-  private final String mapsheet;
+  private final RecordFactory recordFactory;
 
   public MoepBinaryIterator(final MoepDirectoryReader directoryReader, final String fileName,
     final InputStream in, final RecordFactory recordFactory) {

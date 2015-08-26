@@ -94,9 +94,9 @@ class LineSegmentIndex {
 class LineSegmentVisitor implements Consumer<LineSegment> {
   // MD - only seems to make about a 10% difference in overall time.
 
-  private final LineSegment querySeg;
-
   private final ArrayList<LineSegment> items = new ArrayList<>();
+
+  private final LineSegment querySeg;
 
   public LineSegmentVisitor(final LineSegment querySeg) {
     this.querySeg = querySeg;

@@ -17,11 +17,11 @@ import com.revolsys.util.WrappedException;
 
 public class WktRecordWriter extends AbstractRecordWriter {
 
-  private final RecordDefinition recordDefinition;
+  private boolean open;
 
   private final Writer out;
 
-  private boolean open;
+  private final RecordDefinition recordDefinition;
 
   public WktRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
     this.recordDefinition = recordDefinition;

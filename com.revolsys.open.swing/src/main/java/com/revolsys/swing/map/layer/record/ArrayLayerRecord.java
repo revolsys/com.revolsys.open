@@ -20,11 +20,11 @@ import com.revolsys.util.Property;
 public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   private static final long serialVersionUID = 1L;
 
+  private Reference<Identifier> identifier = new WeakReference<>(null);
+
   private final AbstractRecordLayer layer;
 
   private Map<String, Object> originalValues;
-
-  private Reference<Identifier> identifier = new WeakReference<>(null);
 
   public ArrayLayerRecord(final AbstractRecordLayer layer) {
     super(layer.getRecordDefinition());

@@ -34,9 +34,9 @@ import org.springframework.web.context.WebApplicationContext;
  */
 public class SpringConfigurator extends Configurator {
 
-  private static Log logger = LogFactory.getLog(SpringConfigurator.class);
-
   private static final Map<String, Map<Class<?>, String>> cache = new ConcurrentHashMap<String, Map<Class<?>, String>>();
+
+  private static Log logger = LogFactory.getLog(SpringConfigurator.class);
 
   private static final String NO_VALUE = ObjectUtils.identityToString(new Object());
 

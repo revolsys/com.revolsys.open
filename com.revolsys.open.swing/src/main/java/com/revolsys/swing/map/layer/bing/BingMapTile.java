@@ -6,9 +6,9 @@ import com.revolsys.swing.map.layer.MapTile;
 
 public class BingMapTile extends MapTile {
 
-  private final String quadKey;
-
   private final BingLayer layer;
+
+  private final String quadKey;
 
   public BingMapTile(final BingLayer layer, final int zoomLevel, final double resolution,
     final int tileX, final int tileY) {

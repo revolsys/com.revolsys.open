@@ -7,9 +7,9 @@ import java.io.IOException;
 
 public class StringTransferable implements Transferable {
 
-  private final String value;
-
   private final DataFlavor dataFlavor;
+
+  private final String value;
 
   public StringTransferable(final DataFlavor dataFlavor, final String value) {
     this.dataFlavor = dataFlavor;

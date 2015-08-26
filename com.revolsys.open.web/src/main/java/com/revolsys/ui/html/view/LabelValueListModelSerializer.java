@@ -24,9 +24,9 @@ import com.revolsys.ui.model.LabelValueListModel;
  * @version 1.0
  */
 public class LabelValueListModelSerializer implements LabelValueListSerializer {
-  private final LabelValueListModel model;
-
   private String labelCss;
+
+  private final LabelValueListModel model;
 
   private String valueCss;
 

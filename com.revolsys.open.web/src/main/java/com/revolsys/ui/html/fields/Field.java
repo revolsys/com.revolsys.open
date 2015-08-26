@@ -29,21 +29,21 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
 public abstract class Field extends Element {
+  private String defaultInstructions;
+
+  private Object initialValue;
+
+  private String label;
+
   private String name = "";
+
+  private boolean readOnly = false;
+
+  private boolean required = false;
 
   private List<String> validationErrors = Collections.emptyList();
 
   private Object value;
-
-  private boolean required = false;
-
-  private boolean readOnly = false;
-
-  private Object initialValue;
-
-  private String defaultInstructions;
-
-  private String label;
 
   public Field() {
   }

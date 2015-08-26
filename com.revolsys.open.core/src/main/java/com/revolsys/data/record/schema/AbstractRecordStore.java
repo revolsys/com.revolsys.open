@@ -50,31 +50,31 @@ import com.revolsys.util.Property;
 
 public abstract class AbstractRecordStore extends BaseObjectWithProperties implements RecordStore {
 
-  private Map<String, Object> connectionProperties = new HashMap<String, Object>();
-
   private Map<String, List<String>> codeTableColumNames = new HashMap<String, List<String>>();
-
-  private RecordFactory recordFactory;
 
   private final Map<String, CodeTable> columnToTableMap = new HashMap<String, CodeTable>();
 
-  private String label;
-
-  private final RecordStoreSchema rootSchema = new RecordStoreSchema(this);
-
   private List<RecordDefinitionProperty> commonRecordDefinitionProperties = new ArrayList<RecordDefinitionProperty>();
 
-  private final Map<String, Map<String, Object>> typeRecordDefinitionProperties = new HashMap<String, Map<String, Object>>();
-
-  private final StatisticsMap statistics = new StatisticsMap();
+  private Map<String, Object> connectionProperties = new HashMap<String, Object>();
 
   private GeometryFactory geometryFactory;
 
   private RecordStoreIteratorFactory iteratorFactory = new RecordStoreIteratorFactory();
 
-  private final Set<RecordStoreExtension> recordStoreExtensions = new LinkedHashSet<RecordStoreExtension>();
+  private String label;
 
   private boolean loadFullSchema = true;
+
+  private RecordFactory recordFactory;
+
+  private final Set<RecordStoreExtension> recordStoreExtensions = new LinkedHashSet<RecordStoreExtension>();
+
+  private final RecordStoreSchema rootSchema = new RecordStoreSchema(this);
+
+  private final StatisticsMap statistics = new StatisticsMap();
+
+  private final Map<String, Map<String, Object>> typeRecordDefinitionProperties = new HashMap<String, Map<String, Object>>();
 
   public AbstractRecordStore() {
     this(new ArrayRecordFactory());

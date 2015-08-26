@@ -22,11 +22,11 @@ import com.revolsys.util.Property;
 
 public class RecordStoreQueryReader extends IteratorReader<Record>implements RecordReader {
 
-  private AbstractRecordStore recordStore;
+  private BoundingBox boundingBox;
 
   private List<Query> queries = new ArrayList<Query>();
 
-  private BoundingBox boundingBox;
+  private AbstractRecordStore recordStore;
 
   private List<String> typePaths;
 

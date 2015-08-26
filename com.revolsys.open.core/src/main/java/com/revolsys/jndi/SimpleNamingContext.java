@@ -139,13 +139,13 @@ public class SimpleNamingContext implements Context {
     }
   }
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
-  private final String root;
-
   private final Hashtable<String, Object> boundObjects;
 
   private final Hashtable<String, Object> environment = new Hashtable<String, Object>();
+
+  private final Logger logger = LoggerFactory.getLogger(getClass());
+
+  private final String root;
 
   // Actual implementations of Context methods follow
 

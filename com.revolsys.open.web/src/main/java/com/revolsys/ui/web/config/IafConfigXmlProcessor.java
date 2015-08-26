@@ -50,13 +50,13 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     standardTypes.put("string", String.class);
   }
 
-  private final ServletContext servletContext;
-
   private boolean child = false;
 
   private Config config;
 
   private final LinkedList pageStack = new LinkedList();
+
+  private final ServletContext servletContext;
 
   public IafConfigXmlProcessor(final IafConfigXmlProcessor parent) {
     super("urn:x-revolsys-com:iaf:core:config");

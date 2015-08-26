@@ -19,9 +19,9 @@ import com.revolsys.geometry.wkb.WKTReader;
  *
  */
 public class CascadedPolygonUnionTester {
-  public static final double MIN_SIMILARITY_MEAURE = 0.999999;;
+  private static final GeometryFactory fact = GeometryFactory.floating(0, 2);;
 
-  private static final GeometryFactory fact = GeometryFactory.floating(0, 2);
+  public static final double MIN_SIMILARITY_MEAURE = 0.999999;
 
   static WKTReader wktRdr = new WKTReader(fact);
 

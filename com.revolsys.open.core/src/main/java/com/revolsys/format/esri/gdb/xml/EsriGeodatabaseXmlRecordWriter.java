@@ -40,19 +40,19 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
 
   private int datasetId = 1;
 
-  private int objectId = 1;
-
-  private final XmlWriter out;
-
-  private boolean opened;
-
-  private final RecordDefinition recordDefinition;
-
   private String datasetType;
 
   private final EsriGeodatabaseXmlFieldTypeRegistry fieldTypes = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE;
 
   private String geometryType;
+
+  private int objectId = 1;
+
+  private boolean opened;
+
+  private final XmlWriter out;
+
+  private final RecordDefinition recordDefinition;
 
   public EsriGeodatabaseXmlRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
     this.recordDefinition = recordDefinition;

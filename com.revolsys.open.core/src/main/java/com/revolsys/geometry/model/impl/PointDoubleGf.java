@@ -56,15 +56,15 @@ public class PointDoubleGf extends PointDouble {
   private BoundingBox boundingBox;
 
   /**
+   * The {@link GeometryFactory} used to create this Geometry
+   */
+  private final GeometryFactory geometryFactory;
+
+  /**
    * An object reference which can be used to carry ancillary data defined
    * by the client.
    */
   private Object userData;
-
-  /**
-   * The {@link GeometryFactory} used to create this Geometry
-   */
-  private final GeometryFactory geometryFactory;
 
   public PointDoubleGf(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;

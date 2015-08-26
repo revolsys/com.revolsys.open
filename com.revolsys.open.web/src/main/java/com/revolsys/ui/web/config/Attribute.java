@@ -24,18 +24,18 @@ import org.apache.log4j.Logger;
 public class Attribute {
   private static final Logger log = Logger.getLogger(Attribute.class);
 
-  private final String name;
+  private final Config config;
 
   private final boolean inheritable;
 
-  private final Config config;
-
-  /** The initialization parameters for the argument. */
-  private final HashMap parameters = new HashMap();
+  private AttributeLoader loader;
 
   private final Class loaderClass;
 
-  private AttributeLoader loader;
+  private final String name;
+
+  /** The initialization parameters for the argument. */
+  private final HashMap parameters = new HashMap();
 
   private Object value;
 

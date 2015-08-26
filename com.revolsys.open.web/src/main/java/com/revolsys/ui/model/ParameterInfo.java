@@ -9,17 +9,17 @@ import java.util.Map.Entry;
 import com.revolsys.data.types.DataType;
 
 public class ParameterInfo {
+  private final Map<Object, Object> allowedValues = new LinkedHashMap<Object, Object>();
+
+  private Object defaultValue;
+
+  private final String description;
+
   private final String name;
 
   private final boolean required;
 
   private final DataType type;
-
-  private final String description;
-
-  private final Map<Object, Object> allowedValues = new LinkedHashMap<Object, Object>();
-
-  private Object defaultValue;
 
   public ParameterInfo(final String name, final boolean required, final DataType type,
     final String description) {

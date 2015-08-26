@@ -52,6 +52,8 @@ public class SegmentIntersector {
     return Math.abs(i1 - i2) == 1;
   }
 
+  private Collection[] bdyNodes;
+
   /**
    * These variables keep track of what types of intersections were
    * found during ALL edges that have been intersected.
@@ -62,19 +64,17 @@ public class SegmentIntersector {
 
   private boolean hasProperInterior = false;
 
-  // the proper intersection point found
-  private Point properIntersectionPoint = null;
-
-  private final LineIntersector li;
-
   private final boolean includeProper;
 
-  private final boolean recordIsolated;
+  private final LineIntersector li;
 
   // testing only
   public int numTests = 0;
 
-  private Collection[] bdyNodes;
+  // the proper intersection point found
+  private Point properIntersectionPoint = null;
+
+  private final boolean recordIsolated;
 
   /*
    * public SegmentIntersector() { }

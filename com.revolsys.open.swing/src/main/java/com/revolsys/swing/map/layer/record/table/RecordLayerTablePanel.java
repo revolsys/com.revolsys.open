@@ -76,21 +76,21 @@ import com.revolsys.util.Property;
 
 public class RecordLayerTablePanel extends TablePanel
   implements PropertyChangeListener, MapSerializer {
-  private static final long serialVersionUID = 1L;
+  public static final String FILTER_FIELD = "filter_field";
 
   public static final String FILTER_GEOMETRY = "filter_geometry";
 
-  public static final String FILTER_FIELD = "filter_field";
+  private static final long serialVersionUID = 1L;
+
+  private final Map<String, JToggleButton> buttonByMode = new HashMap<>();
+
+  private FieldFilterPanel fieldFilterPanel;
+
+  private final JButton fieldSetsButton;
 
   private AbstractRecordLayer layer;
 
   private RecordLayerTableModel tableModel;
-
-  private final JButton fieldSetsButton;
-
-  private FieldFilterPanel fieldFilterPanel;
-
-  private final Map<String, JToggleButton> buttonByMode = new HashMap<>();
 
   public RecordLayerTablePanel(final AbstractRecordLayer layer, final RecordLayerTable table,
     final Map<String, Object> config) {

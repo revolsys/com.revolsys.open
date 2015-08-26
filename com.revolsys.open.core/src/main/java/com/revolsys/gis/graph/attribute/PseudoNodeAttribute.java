@@ -17,9 +17,9 @@ import com.revolsys.gis.graph.EdgePair;
 import com.revolsys.gis.graph.Node;
 
 public class PseudoNodeAttribute {
-  private final Set<String> equalExcludeFieldNames = new HashSet<String>();
-
   private final List<EdgePair<Record>> edgePairs = new ArrayList<EdgePair<Record>>();
+
+  private final Set<String> equalExcludeFieldNames = new HashSet<String>();
 
   private final List<EdgePair<Record>> reversedEdgePairs = new ArrayList<EdgePair<Record>>();
 

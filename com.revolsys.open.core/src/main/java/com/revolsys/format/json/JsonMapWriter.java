@@ -10,16 +10,16 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.util.WrappedException;
 
 public class JsonMapWriter extends AbstractMapWriter {
-  /** The writer */
-  private Writer out;
-
-  private boolean written = false;
-
-  private boolean singleObject;
+  private final boolean indent;
 
   private boolean listRoot;
 
-  private final boolean indent;
+  /** The writer */
+  private Writer out;
+
+  private boolean singleObject;
+
+  private boolean written = false;
 
   public JsonMapWriter(final Writer out) {
     this(out, true);

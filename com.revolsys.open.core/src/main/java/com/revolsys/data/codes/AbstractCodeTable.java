@@ -27,25 +27,25 @@ public abstract class AbstractCodeTable
 
   private boolean capitalizeWords = false;
 
-  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+  private boolean caseSensitive = false;
 
-  private Map<Identifier, List<Object>> idValueCache = new LinkedHashMap<>();
+  private List<Identifier> identifiers = new ArrayList<>();
 
   private Map<Identifier, Identifier> idIdCache = new LinkedHashMap<>();
 
-  private Map<List<Object>, Identifier> valueIdCache = new LinkedHashMap<>();
-
-  private final Map<String, Identifier> stringIdMap = new HashMap<>();
-
-  private JComponent swingEditor;
+  private Map<Identifier, List<Object>> idValueCache = new LinkedHashMap<>();
 
   private long maxId;
 
   private String name;
 
-  private boolean caseSensitive = false;
+  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
-  private List<Identifier> identifiers = new ArrayList<>();
+  private final Map<String, Identifier> stringIdMap = new HashMap<>();
+
+  private JComponent swingEditor;
+
+  private Map<List<Object>, Identifier> valueIdCache = new LinkedHashMap<>();
 
   public AbstractCodeTable() {
   }

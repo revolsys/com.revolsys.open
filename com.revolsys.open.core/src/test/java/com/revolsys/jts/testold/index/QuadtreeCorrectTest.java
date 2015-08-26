@@ -44,6 +44,10 @@ import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
  */
 public class QuadtreeCorrectTest {
 
+  static final double MAX_EXTENT = 1000.0;
+
+  static final double MIN_EXTENT = -1000.0;
+
   /*
    * public static void testBinaryPower() { printBinaryPower(1004573397.0);
    * printBinaryPower(100.0); printBinaryPower(0.234);
@@ -54,10 +58,6 @@ public class QuadtreeCorrectTest {
    * exp + "   2^exp = " + p2); }
    */
   static final int NUM_ITEMS = 2000;
-
-  static final double MIN_EXTENT = -1000.0;
-
-  static final double MAX_EXTENT = 1000.0;
 
   public static void main(final String[] args) throws Exception {
     // testBinaryPower();

@@ -55,9 +55,9 @@ public class MavenRepository implements URLStreamHandlerFactory {
     return path.toString();
   }
 
-  private final URLStreamHandler urlHandler = new MavenUrlStreamHandler(this);
-
   private Resource root;
+
+  private final URLStreamHandler urlHandler = new MavenUrlStreamHandler(this);
 
   public MavenRepository() {
     this(null);

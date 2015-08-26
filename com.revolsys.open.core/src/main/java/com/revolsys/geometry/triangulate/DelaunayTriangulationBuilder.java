@@ -108,9 +108,9 @@ public class DelaunayTriangulationBuilder {
 
   private Collection siteCoords;
 
-  private double tolerance = 0.0;
-
   private QuadEdgeSubdivision subdiv = null;
+
+  private double tolerance = 0.0;
 
   /**
    * Creates a new triangulation builder.

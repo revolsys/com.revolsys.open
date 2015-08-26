@@ -54,10 +54,10 @@ public class XmlWriter extends Writer {
     /** The namespaces defined on the element. */
     private final List<String> attributeDefinedNamespaces = new ArrayList<String>();
 
-    private String tagDefinedNamespace;
-
     /** The QName of the current element. */
     private final QName element;
+
+    private String tagDefinedNamespace;
 
     /**
      * Construct a new TagConfiguration
@@ -138,12 +138,10 @@ public class XmlWriter extends Writer {
   /** Flag indicating that the xml elements should be indented. */
   private boolean indent;
 
-  private boolean writeNewLine = true;
+  private final Map<String, String> namespaceAliasMap = new LinkedHashMap<String, String>();
 
   /** The map of XML Namespace URIs to prefixes. */
   private final Map<String, String> namespacePrefixMap = new LinkedHashMap<String, String>();
-
-  private final Map<String, String> namespaceAliasMap = new LinkedHashMap<String, String>();
 
   /** The string of characters to use for a new line. */
   private final String newLine = "\n";
@@ -151,16 +149,18 @@ public class XmlWriter extends Writer {
   /** The underlying writer to write to. */
   private final Writer out;
 
+  private int prefixNum;
+
   /** Flag indicating that XML namespaces should be written to the output. */
   private final boolean useNamespaces;
+
+  private boolean writeNewLine = true;
 
   /** Flag indicating that a start tag has been written by not closed. */
   private boolean writingStartTag = false;
 
   /** Flag indicating that an XML declaration has been written. */
   private boolean xmlDeclarationWritten = false;
-
-  private int prefixNum;
 
   /**
    * Construct a new XmlWriter.

@@ -52,20 +52,20 @@ public class MultiGenerator extends GeometryGenerator {
   public static final int BOX = 0;
 
   /**
-   * vertical strips
-   */
-  public static final int VERT = 1;
-
-  /**
    * Horizontal strips
    */
   public static final int HORZ = 2;
 
+  /**
+   * vertical strips
+   */
+  public static final int VERT = 1;
+
+  private final int generationAlgorithm = 0;
+
   private GeometryGenerator generator = null;
 
   private int numberGeometries = 2;
-
-  private final int generationAlgorithm = 0;
 
   /**
    * @param generator

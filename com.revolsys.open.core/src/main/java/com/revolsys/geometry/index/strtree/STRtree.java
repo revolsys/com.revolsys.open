@@ -89,6 +89,15 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
     }
   }
 
+  private static final int DEFAULT_NODE_CAPACITY = 10;
+
+  private static IntersectsOp intersectsOp = new IntersectsOp() {
+    @Override
+    public boolean intersects(final Object aBounds, final Object bBounds) {
+      return ((BoundingBox)aBounds).intersects((BoundingBoxDoubleGf)bBounds);
+    }
+  };
+
   /**
    *
    */
@@ -109,15 +118,6 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
         centreY((BoundingBox)((Boundable)o2).getBounds()));
     }
   };
-
-  private static IntersectsOp intersectsOp = new IntersectsOp() {
-    @Override
-    public boolean intersects(final Object aBounds, final Object bBounds) {
-      return ((BoundingBox)aBounds).intersects((BoundingBoxDoubleGf)bBounds);
-    }
-  };
-
-  private static final int DEFAULT_NODE_CAPACITY = 10;
 
   private static double avg(final double a, final double b) {
     return (a + b) / 2d;

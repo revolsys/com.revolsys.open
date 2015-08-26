@@ -55,29 +55,29 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     return pointIndexes;
   }
 
+  private int axisCount;
+
   private List<String> axisNames = Arrays.asList("#", "X", "Y", "Z", "M");
+
+  private int columnCount = 0;
+
+  private Reference<RecordLayerForm> form;
 
   private Geometry geometry;
 
+  private final GeometryCoordinatesPanel geometryCoordinatesPanel;
+
   private GeometryFactory geometryFactory;
 
-  private int columnCount = 0;
+  private int numIndexItems;
+
+  private int segmentIndexColumn;
+
+  private int vertexIndexColumn;
 
   private Map<int[], Vertex> vertexIndexMap = Collections.emptyMap();
 
   private List<int[]> vertexIndices = Collections.emptyList();
-
-  private int axisCount;
-
-  private int numIndexItems;
-
-  private Reference<RecordLayerForm> form;
-
-  private int vertexIndexColumn;
-
-  private int segmentIndexColumn;
-
-  private final GeometryCoordinatesPanel geometryCoordinatesPanel;
 
   public GeometryCoordinatesTableModel() {
     this(null);

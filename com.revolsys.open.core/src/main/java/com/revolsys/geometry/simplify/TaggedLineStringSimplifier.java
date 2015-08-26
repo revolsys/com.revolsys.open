@@ -72,17 +72,17 @@ public class TaggedLineStringSimplifier {
     return false;
   }
 
-  private final LineIntersector li = new RobustLineIntersector();
+  private double distanceTolerance = 0.0;
 
   private LineSegmentIndex inputIndex = new LineSegmentIndex();
+
+  private final LineIntersector li = new RobustLineIntersector();
+
+  private LineString line;
 
   private LineSegmentIndex outputIndex = new LineSegmentIndex();
 
   private TaggedLineString taggedLine;
-
-  private LineString line;
-
-  private double distanceTolerance = 0.0;
 
   public TaggedLineStringSimplifier(final LineSegmentIndex inputIndex,
     final LineSegmentIndex outputIndex) {

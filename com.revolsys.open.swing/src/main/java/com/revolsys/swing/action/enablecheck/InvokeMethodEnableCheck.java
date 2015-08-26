@@ -9,9 +9,9 @@ import com.revolsys.util.ExceptionUtil;
 public class InvokeMethodEnableCheck extends AbstractEnableCheck {
   private final Callable<Object> callable;
 
-  private final Object value;
-
   private boolean inverse = false;
+
+  private final Object value;
 
   public InvokeMethodEnableCheck(final boolean inverse, final Object object,
     final String methodName, final Object value) {

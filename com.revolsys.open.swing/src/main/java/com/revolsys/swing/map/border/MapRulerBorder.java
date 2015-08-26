@@ -36,10 +36,17 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.Property;
 
 public class MapRulerBorder extends AbstractBorder implements PropertyChangeListener {
-  /**
-   *
-   */
-  private static final long serialVersionUID = -3070841484052913548L;
+  private static final List<Unit<Length>> IMPERIAL_FOOT_STEPS = createSteps(
+    NonSI.FOOT.times(1000000), NonSI.FOOT.times(100000), NonSI.FOOT.times(10000),
+    NonSI.FOOT.times(1000), NonSI.FOOT.times(100), NonSI.FOOT.times(10), NonSI.FOOT);
+
+  private static final List<Unit<Length>> IMPERIAL_MILE_STEPS = createSteps(NonSI.MILE.times(1000),
+    NonSI.MILE.times(100), NonSI.MILE.times(10), NonSI.MILE, NonSI.MILE.divide(10),
+    NonSI.MILE.divide(100));
+
+  private static final List<Unit<Length>> IMPERIAL_PROJECTED_STEPS = createSteps(
+    NonSI.MILE.times(1000), NonSI.MILE.times(100), NonSI.MILE.times(10), NonSI.MILE,
+    NonSI.MILE.divide(16), NonSI.MILE.divide(32), NonSI.FOOT, NonSI.INCH);
 
   private static final List<Unit<Angle>> METRIC_GEOGRAPHICS_STEPS = createSteps(NonSI.DEGREE_ANGLE,
     30, 10, 1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10, 1e-11, 1e-12, 1e-13,
@@ -49,17 +56,10 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
     1e6, 1e5, 1e4, 1e3, 1e2, 1e1, 1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10,
     1e-11, 1e-12, 1e-13, 1e-14, 1e-15);
 
-  private static final List<Unit<Length>> IMPERIAL_PROJECTED_STEPS = createSteps(
-    NonSI.MILE.times(1000), NonSI.MILE.times(100), NonSI.MILE.times(10), NonSI.MILE,
-    NonSI.MILE.divide(16), NonSI.MILE.divide(32), NonSI.FOOT, NonSI.INCH);
-
-  private static final List<Unit<Length>> IMPERIAL_MILE_STEPS = createSteps(NonSI.MILE.times(1000),
-    NonSI.MILE.times(100), NonSI.MILE.times(10), NonSI.MILE, NonSI.MILE.divide(10),
-    NonSI.MILE.divide(100));
-
-  private static final List<Unit<Length>> IMPERIAL_FOOT_STEPS = createSteps(
-    NonSI.FOOT.times(1000000), NonSI.FOOT.times(100000), NonSI.FOOT.times(10000),
-    NonSI.FOOT.times(1000), NonSI.FOOT.times(100), NonSI.FOOT.times(10), NonSI.FOOT);
+  /**
+   *
+   */
+  private static final long serialVersionUID = -3070841484052913548L;
 
   public static <U extends Quantity> List<Unit<U>> createSteps(final Unit<U>... steps) {
     final List<Unit<U>> stepList = new ArrayList<Unit<U>>();
@@ -90,26 +90,26 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
     return stepList;
   }
 
-  private final int rulerSize = 25;
+  private double areaMaxX;
 
-  private final Viewport2D viewport;
+  private double areaMaxY;
 
-  private int labelHeight;
+  private double areaMinX;
 
-  private GeometryFactory rulerGeometryFactory;
-
-  private CoordinateSystem rulerCoordinateSystem;
+  private double areaMinY;
 
   @SuppressWarnings("rawtypes")
   private Unit baseUnit;
 
-  private double areaMinX;
+  private int labelHeight;
 
-  private double areaMaxX;
+  private CoordinateSystem rulerCoordinateSystem;
 
-  private double areaMinY;
+  private GeometryFactory rulerGeometryFactory;
 
-  private double areaMaxY;
+  private final int rulerSize = 25;
+
+  private final Viewport2D viewport;
 
   public MapRulerBorder(final Viewport2D viewport) {
     this.viewport = viewport;

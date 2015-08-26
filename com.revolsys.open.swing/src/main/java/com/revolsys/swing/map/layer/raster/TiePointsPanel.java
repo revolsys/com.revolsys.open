@@ -28,10 +28,10 @@ import com.revolsys.swing.tree.MenuSourceRunnable;
 import com.revolsys.util.Property;
 
 public class TiePointsPanel extends TablePanel implements PropertyChangeListener {
-  private static final long serialVersionUID = 1L;
-
   private static final List<String> COLUMN_NAMES = Arrays.asList("sourcePixel.x", "sourcePixel.y",
     "targetPoint.x", "targetPoint.y");
+
+  private static final long serialVersionUID = 1L;
 
   private static final List<String> TITLES = Arrays.asList("Source Pixel X", "Source Pixel Y",
     "Target Point X", "Target Point Y");

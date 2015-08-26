@@ -30,9 +30,9 @@ import com.revolsys.swing.table.record.renderer.RecordRowTableCellRenderer;
 public class RecordRowTable extends BaseJTable implements MouseListener {
   private static final long serialVersionUID = 1L;
 
-  private RecordTableCellEditor tableCellEditor;
-
   private TableCellRenderer cellRenderer;
+
+  private RecordTableCellEditor tableCellEditor;
 
   public RecordRowTable(final RecordRowTableModel model) {
     this(model, new RecordRowTableCellRenderer());

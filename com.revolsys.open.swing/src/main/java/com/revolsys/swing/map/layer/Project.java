@@ -57,12 +57,12 @@ import com.revolsys.util.enableable.Enabled;
 
 public class Project extends LayerGroup {
 
+  private static WeakReference<Project> project = new WeakReference<Project>(null);
+
   static {
     final MenuFactory menu = MenuFactory.getMenu(Project.class);
     menu.deleteMenuItem("layer", "Delete Layer");
   }
-
-  private static WeakReference<Project> project = new WeakReference<Project>(null);
 
   public static Project get() {
     return Project.project.get();
@@ -74,11 +74,11 @@ public class Project extends LayerGroup {
 
   private BaseMapLayerGroup baseMapLayers = new BaseMapLayerGroup();
 
-  private RecordStoreConnectionRegistry recordStores = new RecordStoreConnectionRegistry("Project");
-
   private FolderConnectionRegistry folderConnections = new FolderConnectionRegistry("Project");
 
   private BoundingBox initialBoundingBox;
+
+  private RecordStoreConnectionRegistry recordStores = new RecordStoreConnectionRegistry("Project");
 
   private Resource resource;
 

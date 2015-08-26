@@ -28,9 +28,11 @@ public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
 
   private static final Map<String, Integer> GEOMETRY_TYPE_TO_ID = new HashMap<String, Integer>();
 
+  private static final Map<Integer, DataType> ID_TO_DATA_TYPE = new HashMap<Integer, DataType>();
+
   private static final Map<Integer, String> ID_TO_GEOMETRY_TYPE = new HashMap<Integer, String>();
 
-  private static final Map<Integer, DataType> ID_TO_DATA_TYPE = new HashMap<Integer, DataType>();
+  private static final Logger LOG = LoggerFactory.getLogger(OracleSdoGeometryFieldAdder.class);
 
   public static final String ORACLE_SRID = "ORACLE_SRID";
 
@@ -80,8 +82,6 @@ public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
     addGeometryType(null, "SURFACEZM", 3014);
     addGeometryType(null, "POLYHEDRALSURFACEZM", 3015);
   }
-
-  private static final Logger LOG = LoggerFactory.getLogger(OracleSdoGeometryFieldAdder.class);
 
   private static void addGeometryType(final DataType dataType, final String name,
     final Integer id) {

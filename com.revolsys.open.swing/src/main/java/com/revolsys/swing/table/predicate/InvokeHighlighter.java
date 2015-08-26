@@ -50,9 +50,9 @@ public class InvokeHighlighter implements HighlightPredicate {
     return new OutsideBorderHighlighter(predicate, color, thickness, true, false);
   }
 
-  private final Object object;
-
   private Method method;
+
+  private final Object object;
 
   public InvokeHighlighter(final Object object, final String methodName) {
     this.object = object;

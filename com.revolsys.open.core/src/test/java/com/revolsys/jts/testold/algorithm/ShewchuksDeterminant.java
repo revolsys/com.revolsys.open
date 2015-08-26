@@ -170,15 +170,15 @@ import com.revolsys.geometry.model.Point;
 
 public class ShewchuksDeterminant {
 
-  private static final double splitter;
-
-  private static final double resulterrbound;
-
   private static final double ccwerrboundA;
 
   private static final double ccwerrboundB;
 
   private static final double ccwerrboundC;
+
+  private static final double resulterrbound;
+
+  private static final double splitter;
 
   /*****************************************************************************/
   /*                                                                           */

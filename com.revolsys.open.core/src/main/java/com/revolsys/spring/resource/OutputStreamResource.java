@@ -5,11 +5,11 @@ import java.io.OutputStream;
 
 public class OutputStreamResource extends AbstractResource {
 
+  private String description;
+
   private final String filename;
 
   private final OutputStream outputStream;
-
-  private String description;
 
   private boolean read;
 

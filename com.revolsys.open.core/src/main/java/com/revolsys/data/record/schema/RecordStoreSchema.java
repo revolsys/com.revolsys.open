@@ -19,15 +19,15 @@ import com.revolsys.util.Property;
 
 public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
 
-  private AbstractRecordStore recordStore;
-
   private final Map<PathName, RecordStoreSchemaElement> elementsByPath = new TreeMap<>();
+
+  private boolean initialized = false;
 
   private final Map<PathName, RecordDefinition> recordDefinitionsByPath = new TreeMap<>();
 
-  private final Map<PathName, RecordStoreSchema> schemasByPath = new TreeMap<>();
+  private AbstractRecordStore recordStore;
 
-  private boolean initialized = false;
+  private final Map<PathName, RecordStoreSchema> schemasByPath = new TreeMap<>();
 
   public RecordStoreSchema(final AbstractRecordStore recordStore) {
     this.recordStore = recordStore;

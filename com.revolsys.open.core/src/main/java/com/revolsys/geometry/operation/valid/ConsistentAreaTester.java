@@ -68,14 +68,14 @@ import com.revolsys.geometry.operation.relate.RelateNodeGraph;
  */
 public class ConsistentAreaTester {
 
-  private final LineIntersector li = new RobustLineIntersector();
-
   private final GeometryGraph geomGraph;
-
-  private final RelateNodeGraph nodeGraph = new RelateNodeGraph();
 
   // the intersection point found (if any)
   private Point invalidPoint;
+
+  private final LineIntersector li = new RobustLineIntersector();
+
+  private final RelateNodeGraph nodeGraph = new RelateNodeGraph();
 
   /**
    * Creates a new tester for consistent areas.

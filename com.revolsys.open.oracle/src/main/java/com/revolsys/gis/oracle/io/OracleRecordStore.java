@@ -50,9 +50,9 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
 
   private boolean initialized;
 
-  private boolean useSchemaSequencePrefix = true;
-
   private final IntHashMap<CoordinateSystem> oracleCoordinateSystems = new IntHashMap<>();
+
+  private boolean useSchemaSequencePrefix = true;
 
   public OracleRecordStore() {
     this(new ArrayRecordFactory());

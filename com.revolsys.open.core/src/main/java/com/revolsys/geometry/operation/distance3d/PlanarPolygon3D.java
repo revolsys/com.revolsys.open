@@ -80,11 +80,11 @@ public class PlanarPolygon3D {
     }
   }
 
+  private int facingPlane = -1;
+
   private final Plane3D plane;
 
   private final Polygon poly;
-
-  private int facingPlane = -1;
 
   public PlanarPolygon3D(final Polygon poly) {
     this.poly = poly;

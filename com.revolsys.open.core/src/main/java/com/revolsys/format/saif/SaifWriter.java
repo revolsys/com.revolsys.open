@@ -70,8 +70,6 @@ public class SaifWriter extends AbstractRecordWriter {
 
   protected OsnConverterRegistry converters = new OsnConverterRegistry();
 
-  private RecordDefinitionFactory recordDefinitionFactory;
-
   private final Set<String> exportedTypes = new LinkedHashSet<String>();
 
   private final Map<String, Map<String, Object>> exports = new TreeMap<String, Map<String, Object>>();
@@ -87,6 +85,8 @@ public class SaifWriter extends AbstractRecordWriter {
   private final Map<String, String> objectIdentifiers = new HashMap<String, String>();
 
   private final Map<String, String> objectSetNames = new HashMap<String, String>();
+
+  private RecordDefinitionFactory recordDefinitionFactory;
 
   private List<Resource> schemaFileNames;
 

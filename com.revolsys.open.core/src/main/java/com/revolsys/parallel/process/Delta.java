@@ -10,11 +10,11 @@ import com.revolsys.parallel.channel.ChannelOutput;
 
 public final class Delta<T> extends AbstractInProcess<T> {
 
+  private boolean clone = true;
+
   private List<ChannelOutput<T>> out = new ArrayList<ChannelOutput<T>>();
 
   private boolean running;
-
-  private boolean clone = true;
 
   public Delta() {
   }

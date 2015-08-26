@@ -126,14 +126,14 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
     return counter.getLocation();
   }
 
-  private final double x;
-
-  private final double y;
-
   private int crossingCount = 0;
 
   // true if the test point lies on an input segment
   private boolean pointOnSegment = false;
+
+  private final double x;
+
+  private final double y;
 
   public RayCrossingCounter(final double x, final double y) {
     this.x = x;

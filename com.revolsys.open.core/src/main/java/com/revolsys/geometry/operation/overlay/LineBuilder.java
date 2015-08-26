@@ -52,11 +52,11 @@ import com.revolsys.geometry.util.Assert;
  * @version 1.7
  */
 public class LineBuilder {
-  private final OverlayOp op;
-
   private final GeometryFactory geometryFactory;
 
   private final List<Edge> lineEdgesList = new ArrayList<>();
+
+  private final OverlayOp op;
 
   private final List<LineString> resultLineList = new ArrayList<>();
 

@@ -23,9 +23,9 @@ import com.revolsys.util.HtmlUtil;
  * @version 1.0
  */
 public class ImageElement extends Element {
-  private final String src;
-
   private final String alt;
+
+  private final String src;
 
   public ImageElement(final String src) {
     this(src, null);

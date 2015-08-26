@@ -11,11 +11,11 @@ import com.revolsys.data.record.io.RecordReader;
 
 public class RecordReaderQueryIterator extends AbstractIterator<Record> {
 
-  private final Condition whereCondition;
+  private Iterator<Record> iterator;
 
   private final RecordReader reader;
 
-  private Iterator<Record> iterator;
+  private final Condition whereCondition;
 
   public RecordReaderQueryIterator(final RecordReader reader, final Query query) {
     this.reader = reader;

@@ -11,11 +11,11 @@ import com.revolsys.util.Property;
 public class KeySerializerTableSerializer implements RowsTableSerializer {
   private int colCount = 0;
 
-  private final List<KeySerializer> serializers;
-
   private int rowCount;
 
   private final List<Object> rows = new ArrayList<Object>();
+
+  private final List<KeySerializer> serializers;
 
   public KeySerializerTableSerializer(final List<KeySerializer> serializers) {
     this.serializers = serializers;

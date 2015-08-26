@@ -19,13 +19,13 @@ import com.revolsys.swing.parallel.Invoke;
 public class BoundingBoxRecordLayer extends AbstractRecordLayer {
   private static final Logger LOG = Logger.getLogger(BoundingBoxRecordLayer.class);
 
-  private boolean loading = false;
-
   private BoundingBox boundingBox;
 
-  private final Class<?> workerClass;
+  private boolean loading = false;
 
   private SwingWorker worker;
+
+  private final Class<?> workerClass;
 
   public BoundingBoxRecordLayer(final String type, final String name, final Class<?> workerClass,
     final GeometryFactory geometryFactory) {

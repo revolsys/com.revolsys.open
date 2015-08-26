@@ -49,8 +49,6 @@ public class LineDissolver {
     return d.getResult();
   }
 
-  private Geometry result;
-
   private GeometryFactory factory;
 
   private final DissolveEdgeGraph graph;
@@ -58,6 +56,8 @@ public class LineDissolver {
   private final List lines = new ArrayList();
 
   private final Stack nodeEdgeStack = new Stack();
+
+  private Geometry result;
 
   private DissolveHalfEdge ringStartEdge;
 

@@ -16,11 +16,11 @@ public class MenuSourcePropertyEnableCheck extends AbstractEnableCheck {
     return new MenuSourcePropertyEnableCheck(config);
   }
 
+  private boolean inverse = false;
+
   private final String propertyName;
 
   private final Object value;
-
-  private boolean inverse = false;
 
   public MenuSourcePropertyEnableCheck(final Map<String, Object> config) {
     this.propertyName = (String)config.get("propertyName");

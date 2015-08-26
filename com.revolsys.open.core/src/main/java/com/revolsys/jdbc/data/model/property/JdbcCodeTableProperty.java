@@ -14,9 +14,9 @@ import com.revolsys.util.Property;
 
 public class JdbcCodeTableProperty extends CodeTableProperty {
 
-  private JdbcRecordStore recordStore;
-
   private String insertSql;
+
+  private JdbcRecordStore recordStore;
 
   private String tableName;
 

@@ -21,11 +21,11 @@ import com.revolsys.geometry.util.Stopwatch;
  *
  */
 public class DelaunayRobustTest {
+  final static double BASE_OFFSET = 1.0e7;
+
   final static GeometryFactory geomFact = GeometryFactory.floating3();
 
   final static double SIDE_LEN = 1.0;
-
-  final static double BASE_OFFSET = 1.0e7;
 
   public static void main(final String args[]) {
     final DelaunayRobustTest test = new DelaunayRobustTest();

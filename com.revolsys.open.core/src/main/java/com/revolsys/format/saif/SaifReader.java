@@ -109,11 +109,13 @@ public class SaifReader extends AbstractReader<Record>
   /** Flag indicating if a new data object should be read. */
   private boolean loadNewObject = true;
 
-  /** The schema definition that will be set on each data object. */
-  private RecordDefinitionFactory recordDefinitionFactory;
+  private boolean opened = false;
 
   /** The iterator for the current object set. */
   private OsnReader osnReader;
+
+  /** The schema definition that will be set on each data object. */
+  private RecordDefinitionFactory recordDefinitionFactory;
 
   /** The directory the SAIF archive is extracted to. */
   private File saifArchiveDirectory;
@@ -130,8 +132,6 @@ public class SaifReader extends AbstractReader<Record>
 
   /** The zip file. */
   private ZipFile zipFile;
-
-  private boolean opened = false;
 
   public SaifReader() {
   }

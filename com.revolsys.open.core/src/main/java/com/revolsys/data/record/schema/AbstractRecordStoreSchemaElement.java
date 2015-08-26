@@ -7,9 +7,9 @@ import com.revolsys.util.Property;
 public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithProperties
   implements RecordStoreSchemaElement, Comparable<RecordStoreSchemaElement> {
 
-  private RecordStoreSchema schema;
-
   private final PathName pathName;
+
+  private RecordStoreSchema schema;
 
   public AbstractRecordStoreSchemaElement() {
     this(null, PathName.ROOT);

@@ -51,11 +51,11 @@ import com.google.protobuf.ByteString;
  * @author kenton@google.com Kenton Varda
  */
 public final class ProtocolBufferInputStream {
+  private static final int BUFFER_SIZE = 4096;
+
   private static final int DEFAULT_RECURSION_LIMIT = 64;
 
   private static final int DEFAULT_SIZE_LIMIT = 64 << 20; // 64MB
-
-  private static final int BUFFER_SIZE = 4096;
 
   /**
    * Decode a ZigZag-encoded 32-bit value.  ZigZag encodes signed integers
@@ -182,27 +182,21 @@ public final class ProtocolBufferInputStream {
 
   private byte[] buffer;
 
+  private int bufferPos;
+
   private int bufferSize;
 
   private int bufferSizeAfterLimit;
 
-  private int bufferPos;
+  /** The absolute position of the end of the current message. */
+  private int currentLimit = Integer.MAX_VALUE;
 
   private InputStream input;
 
   private int lastTag;
 
-  /**
-   * The total number of bytes read before the current buffer.  The total
-   * bytes read up to the current position can be computed as
-   * {@code totalBytesRetired + bufferPos}.  This value may be negative if
-   * reading started in the middle of the current buffer (e.g. if the
-   * constructor that takes a byte array and an offset was used).
-   */
-  private int totalBytesRetired;
-
-  /** The absolute position of the end of the current message. */
-  private int currentLimit = Integer.MAX_VALUE;
+  /** See setRecursionLimit() */
+  private int recursionDepth;
 
   // /**
   // * Reads a {@code group} field value from the stream and merges it into the
@@ -258,13 +252,19 @@ public final class ProtocolBufferInputStream {
   // return result;
   // }
 
-  /** See setRecursionLimit() */
-  private int recursionDepth;
-
   private int recursionLimit = DEFAULT_RECURSION_LIMIT;
 
   /** See setSizeLimit() */
   private int sizeLimit = DEFAULT_SIZE_LIMIT;
+
+  /**
+   * The total number of bytes read before the current buffer.  The total
+   * bytes read up to the current position can be computed as
+   * {@code totalBytesRetired + bufferPos}.  This value may be negative if
+   * reading started in the middle of the current buffer (e.g. if the
+   * constructor that takes a byte array and an offset was used).
+   */
+  private int totalBytesRetired;
 
   public ProtocolBufferInputStream() {
     this(new byte[0]);

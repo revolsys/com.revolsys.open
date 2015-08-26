@@ -8,9 +8,9 @@ import com.revolsys.io.AbstractReader;
 import com.revolsys.io.Reader;
 
 public class DelegatingReader<T> extends AbstractReader<T> {
-  private Reader<T> reader;
-
   private Iterator<T> iterator;
+
+  private Reader<T> reader;
 
   public DelegatingReader() {
   }

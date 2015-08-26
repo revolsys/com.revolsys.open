@@ -34,11 +34,11 @@ public abstract class AbstractMapElementTag extends SimpleTagSupport {
   /** The log instance. */
   private static final Logger log = Logger.getLogger(AbstractMapElementTag.class);
 
-  /** The exression to get the elements to write. */
-  private final String mapExpression;
-
   /** The key to the element in the map. */
   private String key;
+
+  /** The exression to get the elements to write. */
+  private final String mapExpression;
 
   /**
    * Construct a new AbstractElementTag.

@@ -44,8 +44,6 @@ public final class MathUtil {
   /** The number of cents in a dollar. */
   public static final BigDecimal CURRENCY_CENTS_PER_DOLLAR = getInteger(100);
 
-  private static final Random RANDOM = new Random();
-
   /** The scale for currency numbers. */
   public static final int CURRENCY_SCALE = 2;
 
@@ -60,6 +58,10 @@ public final class MathUtil {
 
   /** A 1 integer. */
   public static final BigDecimal INTEGER1 = getInteger(1);
+
+  public static String MAX_DOUBLE_STRING = toString(Double.MAX_VALUE);
+
+  public static String MIN_DOUBLE_STRING = toString(-Double.MAX_VALUE);
 
   /** The scale for percent numbers. */
   public static final int PERCENT_SCALE = 4;
@@ -76,9 +78,7 @@ public final class MathUtil {
 
   public static final double PI_TIMES_2 = 2.0 * Math.PI;
 
-  public static String MAX_DOUBLE_STRING = toString(Double.MAX_VALUE);
-
-  public static String MIN_DOUBLE_STRING = toString(-Double.MAX_VALUE);
+  private static final Random RANDOM = new Random();
 
   /**
    *

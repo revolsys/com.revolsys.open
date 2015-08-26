@@ -1,38 +1,38 @@
 package com.revolsys.gis.wms;
 
 public interface WmsParameters {
-  String WMTVER = "WMTVER";
-
-  String VERSION = "VERSION";
-
-  String REQUEST = "REQUEST";
-
-  String LAYERS = "LAYERS";
-
-  String STYLES = "STYLES";
-
-  String CRS = "CRS";
-
-  String SRS = "SRS";
-
   String BBOX = "BBOX";
-
-  String WIDTH = "WIDTH";
-
-  String HEIGHT = "HEIGHT";
-
-  String FORMAT = "FORMAT";
-
-  String TRANSPARENT = "TRANSPARENT";
 
   String BGCOLOR = "BGCOLOR";
 
+  String CRS = "CRS";
+
   String EXCEPTIONS = "EXCEPTIONS";
 
-  String TIME = "TIME";
+  String FORMAT = "FORMAT";
+
+  String HEIGHT = "HEIGHT";
+
+  String LAYERS = "LAYERS";
+
+  String REQUEST = "REQUEST";
+
+  String SERVICE = "SERVICE";
 
   String SLD = "SLD";
 
-  String SERVICE = "SERVICE";
+  String SRS = "SRS";
+
+  String STYLES = "STYLES";
+
+  String TIME = "TIME";
+
+  String TRANSPARENT = "TRANSPARENT";
+
+  String VERSION = "VERSION";
+
+  String WIDTH = "WIDTH";
+
+  String WMTVER = "WMTVER";
 
 }

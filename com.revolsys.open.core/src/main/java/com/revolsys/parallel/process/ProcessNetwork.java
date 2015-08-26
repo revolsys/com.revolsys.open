@@ -32,23 +32,23 @@ public class ProcessNetwork
     processNetwork.startAndWait();
   }
 
-  private int count = 0;
-
-  private final Map<Process, Thread> processes = new HashMap<Process, Thread>();
-
-  private boolean running = false;
-
-  private ThreadGroup threadGroup;
-
   private boolean autoStart;
+
+  private int count = 0;
 
   private String name = "processNetwork";
 
   private ProcessNetwork parent;
 
-  private final Object sync = new Object();
+  private final Map<Process, Thread> processes = new HashMap<Process, Thread>();
+
+  private boolean running = false;
 
   private boolean stopping = false;
+
+  private final Object sync = new Object();
+
+  private ThreadGroup threadGroup;
 
   public ProcessNetwork() {
   }

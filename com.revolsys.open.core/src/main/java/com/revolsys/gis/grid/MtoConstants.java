@@ -7,13 +7,13 @@ public interface MtoConstants {
 
   double HEIGHT_TWELTH = 5.0 / 60.0;
 
+  String REGEX_MTO = "([0-9]{2,3})" + NtsConstants.REGEX_SIXTEENTH_LETTER
+    + NtsConstants.REGEX_SIXTEENTH_NUMBER + "([a-lA-L])"
+    + BcgsConstants.REGEX_HUNDRETH_NUMBER + "([a-dA-D])";
+
   String REGEX_QUARTER_LETTER = "([a-dA-D])";
 
   String REGEX_TWELTH_LETTER = "([a-lA-L])";
-
-  String REGEX_MTO = "([0-9]{2,3})" + NtsConstants.REGEX_SIXTEENTH_LETTER
-    + NtsConstants.REGEX_SIXTEENTH_NUMBER + REGEX_TWELTH_LETTER
-    + BcgsConstants.REGEX_HUNDRETH_NUMBER + REGEX_QUARTER_LETTER;
 
   double WIDTH_HUNDRETH = 0.0125;
 

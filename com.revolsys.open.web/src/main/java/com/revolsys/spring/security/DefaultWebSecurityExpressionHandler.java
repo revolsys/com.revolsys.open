@@ -18,9 +18,9 @@ public class DefaultWebSecurityExpressionHandler
   extends AbstractSecurityExpressionHandler<FilterInvocation>
   implements SecurityExpressionHandler<FilterInvocation> {
 
-  private AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
-
   private String defaultRolePrefix = "ROLE_";
+
+  private AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
 
   @Override
   protected SecurityExpressionOperations createSecurityExpressionRoot(

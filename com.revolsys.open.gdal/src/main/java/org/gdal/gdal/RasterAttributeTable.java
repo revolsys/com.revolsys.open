@@ -13,9 +13,9 @@ public class RasterAttributeTable implements Cloneable {
     return obj == null ? 0 : obj.swigCPtr;
   }
 
-  private long swigCPtr;
-
   protected boolean swigCMemOwn;
+
+  private long swigCPtr;
 
   public RasterAttributeTable() {
     this(gdalJNI.new_RasterAttributeTable(), true);

@@ -2,9 +2,9 @@ package com.revolsys.data.record.property;
 
 public class ValueRecordDefinitionProperty extends AbstractRecordDefinitionProperty {
 
-  private Object value;
-
   private String propertyName;
+
+  private Object value;
 
   @Override
   public String getPropertyName() {

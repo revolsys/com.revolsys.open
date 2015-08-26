@@ -20,13 +20,13 @@ public class JsonAsyncSender implements SendHandler {
 
   private final Async async;
 
-  private final LinkedList<Map<String, Object>> messages = new LinkedList<>();
-
-  private final Session session;
-
   private final Map<String, AsyncResult<Map<String, Object>>> messageCallbackById = new HashMap<>();
 
   private final Map<String, Map<String, Object>> messageResultById = new HashMap<>();
+
+  private final LinkedList<Map<String, Object>> messages = new LinkedList<>();
+
+  private final Session session;
 
   public JsonAsyncSender(final Session session) {
     this.session = session;

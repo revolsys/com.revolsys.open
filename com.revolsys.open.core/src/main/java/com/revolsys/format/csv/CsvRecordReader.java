@@ -33,25 +33,25 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
 
   private final char fieldSeparator;
 
+  private String geometryColumnName;
+
+  private GeometryFactory geometryFactory = GeometryFactory.floating3();
+
+  private DataType geometryType = DataTypes.GEOMETRY;
+
+  private boolean hasPointFields;
+
+  private BufferedReader in;
+
   private String pointXFieldName;
 
   private String pointYFieldName;
 
-  private String geometryColumnName;
-
-  private DataType geometryType = DataTypes.GEOMETRY;
-
-  private GeometryFactory geometryFactory = GeometryFactory.floating3();
+  private RecordDefinition recordDefinition;
 
   private RecordFactory recordFactory;
 
-  private BufferedReader in;
-
-  private RecordDefinition recordDefinition;
-
   private Resource resource;
-
-  private boolean hasPointFields;
 
   public CsvRecordReader(final Resource resource) {
     this(resource, new ArrayRecordFactory(), Csv.FIELD_SEPARATOR);

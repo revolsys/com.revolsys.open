@@ -8,9 +8,9 @@ import junit.framework.TestCase;
 
 public class InvokeMethodTestCase extends TestCase {
 
-  private final Object object;
-
   private final String methodName;
+
+  private final Object object;
 
   private final Object[] parameters;
 

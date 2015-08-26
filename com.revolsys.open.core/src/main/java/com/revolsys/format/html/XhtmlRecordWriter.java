@@ -21,12 +21,12 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
 
   private String cssClass;
 
-  private final RecordDefinition recordDefinition;
-
   private boolean opened = false;
 
   /** The writer */
   private XmlWriter out;
+
+  private final RecordDefinition recordDefinition;
 
   private boolean singleObject;
 

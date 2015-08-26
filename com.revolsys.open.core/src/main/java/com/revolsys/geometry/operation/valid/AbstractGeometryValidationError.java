@@ -5,9 +5,9 @@ import com.revolsys.geometry.model.Point;
 
 public abstract class AbstractGeometryValidationError implements GeometryValidationError {
 
-  private final String message;
-
   private final Geometry geometry;
+
+  private final String message;
 
   public AbstractGeometryValidationError(final String message, final Geometry geometry) {
     this.message = message;

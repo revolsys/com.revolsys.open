@@ -32,9 +32,9 @@ import com.revolsys.util.Property;
 
 public class MenuFactory extends BaseObjectWithProperties implements ComponentFactory<JMenuItem> {
 
-  private static Object menuSource;
-
   private static final ClassRegistry<MenuFactory> CLASS_MENUS = new ClassRegistry<>();
+
+  private static Object menuSource;
 
   public static MenuFactory createMenu(final Class<?> clazz, final String... menuNames) {
     final MenuFactory menu = getMenu(clazz);
@@ -110,9 +110,9 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
 
   private EnableCheck enableCheck;
 
-  private final Map<String, List<ComponentFactory<?>>> groups = new HashMap<>();
-
   private final List<String> groupNames = new ArrayList<String>();
+
+  private final Map<String, List<ComponentFactory<?>>> groups = new HashMap<>();
 
   private String name;
 

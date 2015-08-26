@@ -22,9 +22,9 @@ import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 
 public class Triangle extends AbstractLineString {
-  private static final long serialVersionUID = -4513931832875328029L;
-
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(0, 1.0);
+
+  private static final long serialVersionUID = -4513931832875328029L;
 
   public static Triangle createClockwiseTriangle(final Point c0, final Point c1, final Point c2) {
     try {

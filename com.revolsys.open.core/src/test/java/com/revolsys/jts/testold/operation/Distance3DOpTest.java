@@ -12,11 +12,11 @@ import junit.textui.TestRunner;
 import junit.textui.TestRunner;
 
 public class Distance3DOpTest extends TestCase {
+  private static final double DIST_TOLERANCE = 0.00001;
+
   static GeometryFactory geomFact = GeometryFactory.floating3();
 
   static WKTReader rdr = new WKTReader();
-
-  private static final double DIST_TOLERANCE = 0.00001;
 
   public static void main(final String args[]) {
     TestRunner.run(Distance3DOpTest.class);
@@ -28,9 +28,9 @@ public class Distance3DOpTest extends TestCase {
    * 70.71067811865476); testLinePolygonFlat(); }
    */
 
-  String polyHoleFlat = "POLYGON ((100 200 0, 200 200 0, 200 100 0, 100 100 0, 100 200 0), (120 180 0, 180 180 0, 180 120 0, 120 120 0, 120 180 0))";
-
   String poly2HoleFlat = "POLYGON ((100 200 0, 200 200 0, 200 100 0, 100 100 0, 100 200 0), (110 110 0, 110 130 0, 130 130 0, 130 110 0, 110 110 0), (190 110 0, 170 110 0, 170 130 0, 190 130 0, 190 110 0))";
+
+  String polyHoleFlat = "POLYGON ((100 200 0, 200 200 0, 200 100 0, 100 100 0, 100 200 0), (120 180 0, 180 180 0, 180 120 0, 120 120 0, 120 180 0))";
 
   public Distance3DOpTest(final String name) {
     super(name);

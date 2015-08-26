@@ -48,11 +48,11 @@ public class ClassLoaderFactoryBean extends AbstractFactoryBean<ClassLoader> {
     return createClassLoader(parentClassLoader, urls);
   }
 
-  private Collection<URL> urls = new LinkedHashSet<URL>();
+  private Collection<File> libDirectories = new LinkedHashSet<File>();
 
   private final Collection<URL> mergedUrls = new LinkedHashSet<URL>();
 
-  private Collection<File> libDirectories = new LinkedHashSet<File>();
+  private Collection<URL> urls = new LinkedHashSet<URL>();
 
   @Override
   protected ClassLoader createInstance() throws Exception {

@@ -37,9 +37,9 @@ package com.revolsys.geometry.geomgraph.index;
  */
 public class MonotoneChain {
 
-  MonotoneChainEdge mce;
-
   int chainIndex;
+
+  MonotoneChainEdge mce;
 
   public MonotoneChain(final MonotoneChainEdge mce, final int chainIndex) {
     this.mce = mce;

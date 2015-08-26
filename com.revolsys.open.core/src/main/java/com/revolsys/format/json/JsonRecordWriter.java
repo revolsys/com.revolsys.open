@@ -19,15 +19,15 @@ import com.revolsys.util.WrappedException;
 
 public class JsonRecordWriter extends AbstractRecordWriter {
 
-  private RecordDefinition recordDefinition;
+  private int depth = 0;
 
   private Writer out;
 
-  private int depth = 0;
-
-  private boolean startAttribute;
+  private RecordDefinition recordDefinition;
 
   private boolean singleObject;
+
+  private boolean startAttribute;
 
   private boolean written;
 

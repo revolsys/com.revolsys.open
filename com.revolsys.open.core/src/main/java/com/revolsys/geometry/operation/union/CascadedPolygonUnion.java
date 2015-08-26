@@ -136,9 +136,9 @@ public class CascadedPolygonUnion {
     return op.union();
   }
 
-  private Collection inputPolys;
-
   private GeometryFactory geomFactory = null;
+
+  private Collection inputPolys;
 
   /**
    * Creates a new instance to union

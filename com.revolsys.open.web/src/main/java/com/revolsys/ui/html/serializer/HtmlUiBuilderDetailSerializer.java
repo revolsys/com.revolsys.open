@@ -21,13 +21,13 @@ import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 
 public class HtmlUiBuilderDetailSerializer implements LabelValueListSerializer {
-  private final List keys;
-
   private final HtmlUiBuilder builder;
 
-  private int size;
+  private final List keys;
 
   private Object object;
+
+  private int size;
 
   public HtmlUiBuilderDetailSerializer(final HtmlUiBuilder builder, final List keys) {
     this.builder = builder;

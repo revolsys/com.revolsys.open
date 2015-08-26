@@ -28,11 +28,11 @@ import java.util.StringTokenizer;
 import com.revolsys.io.FileUtil;
 
 public final class Region {
-  private static Map<Country, List<Region>> countryRegions = new HashMap<>();
-
   private static Map<Country, Map<String, Region>> countryRegionCodeMap = new HashMap<>();
 
   private static Map<Country, Map<String, Region>> countryRegionNameMap = new HashMap<>();
+
+  private static Map<Country, List<Region>> countryRegions = new HashMap<>();
 
   public static Region getRegion(final String countryRegioncode) {
     final StringTokenizer st = new StringTokenizer(countryRegioncode, "-");
@@ -130,9 +130,9 @@ public final class Region {
     countryRegionNameMap.put(country, regionNameMap);
   }
 
-  private final Country country;
-
   private final String code;
+
+  private final Country country;
 
   private final String name;
 

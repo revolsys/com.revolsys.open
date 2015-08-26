@@ -41,11 +41,11 @@ public class ExportLayerRecordsPanel extends BasePanel {
    */
   private static final long serialVersionUID = 1L;
 
+  private Resource exportResource;
+
   private final AbstractRecordLayer layer;
 
   private TogglePanel recordsFilterType;
-
-  private Resource exportResource;
 
   public ExportLayerRecordsPanel(final AbstractRecordLayer layer) {
     super(new BorderLayout());

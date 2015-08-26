@@ -51,9 +51,9 @@ class TaggedLineSegment extends LineSegmentDouble {
    */
   private static final long serialVersionUID = 1L;
 
-  private final Geometry parent;
-
   private final int index;
+
+  private final Geometry parent;
 
   public TaggedLineSegment(final Geometry parent, final int index, final int axisCount,
     final double... coordinates) {

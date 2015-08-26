@@ -57,17 +57,17 @@ public class RectangleLineIntersectorPerfTest {
     test.runBoth(6000);
   }
 
-  private final GeometryFactory geomFact = GeometryFactory.floating3();
-
   private final double baseX = 0;
 
   private final double baseY = 0;
 
-  private final double rectSize = 100;
+  private final GeometryFactory geomFact = GeometryFactory.floating3();
+
+  private Point[] pts;
 
   private BoundingBox rectEnv;
 
-  private Point[] pts;
+  private final double rectSize = 100;
 
   public RectangleLineIntersectorPerfTest() {
 
@@ -150,17 +150,17 @@ public class RectangleLineIntersectorPerfTest {
  *
  */
 class SimpleRectangleIntersector {
-  // for intersection testing, don't need to set precision model
-  private final LineIntersector li = new RobustLineIntersector();
-
-  private final BoundingBox rectEnv;
-
   /**
    * The corners of the rectangle, in the order:
    *  10
    *  23
    */
   private final Point[] corner = new Point[4];
+
+  // for intersection testing, don't need to set precision model
+  private final LineIntersector li = new RobustLineIntersector();
+
+  private final BoundingBox rectEnv;
 
   public SimpleRectangleIntersector(final BoundingBox rectEnv) {
     this.rectEnv = rectEnv;

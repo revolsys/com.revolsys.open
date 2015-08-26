@@ -62,23 +62,23 @@ public class JdbcQueryIterator extends AbstractIterator<Record>implements Record
 
   private final int currentQueryIndex = -1;
 
+  private final int fetchSize = 10;
+
+  private List<FieldDefinition> fields = new ArrayList<FieldDefinition>();
+
+  private List<Query> queries;
+
+  private Query query;
+
+  private RecordDefinition recordDefinition;
+
   private RecordFactory recordFactory;
 
   private JdbcRecordStore recordStore;
 
-  private final int fetchSize = 10;
-
-  private RecordDefinition recordDefinition;
-
-  private List<Query> queries;
-
   private ResultSet resultSet;
 
   private PreparedStatement statement;
-
-  private List<FieldDefinition> fields = new ArrayList<FieldDefinition>();
-
-  private Query query;
 
   private Statistics statistics;
 

@@ -71,12 +71,12 @@ public class PreparedMultiPolygon extends AbstractMultiPolygon {
 
   private final boolean isRectangle;
 
-  // create these lazily, since they are expensive
-  private FastSegmentSetIntersectionFinder segIntFinder = null;
+  private final MultiPolygon multiPolygon;
 
   private PointOnGeometryLocator pia = null;
 
-  private final MultiPolygon multiPolygon;
+  // create these lazily, since they are expensive
+  private FastSegmentSetIntersectionFinder segIntFinder = null;
 
   public PreparedMultiPolygon(final MultiPolygon polygon) {
     this.multiPolygon = polygon;

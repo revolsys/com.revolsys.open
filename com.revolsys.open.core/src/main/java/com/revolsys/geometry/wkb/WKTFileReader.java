@@ -56,18 +56,18 @@ import com.revolsys.geometry.model.Geometry;
 public class WKTFileReader {
   private static final int MAX_LOOKAHEAD = 1000;
 
+  private int count = 0;
+
   private File file = null;
+
+  private int limit = -1;
+
+  private int offset = 0;
 
   private Reader reader;
 
   // private Reader fileReader = new FileReader(file);
   private final WKTReader wktReader;
-
-  private int count = 0;
-
-  private int limit = -1;
-
-  private int offset = 0;
 
   /**
    * Creates a new <tt>WKTFileReader</tt> given the <tt>File</tt> to read from

@@ -8,11 +8,11 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.format.xml.XmlWriter;
 
 public class ListElement extends Element {
+  private final QName elementTag;
+
   private final Collection<? extends Object> objects;
 
   private final QName parentTag;
-
-  private final QName elementTag;
 
   public ListElement(final QName parentTag, final QName elementTag,
     final Collection<? extends Object> objects) {

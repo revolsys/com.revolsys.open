@@ -25,9 +25,9 @@ import com.revolsys.swing.SwingUtil;
 public class TabClosableTitle extends JLabel implements MouseListener {
   private static final long serialVersionUID = 1L;
 
-  private final JTabbedPane tabs;
-
   private final Runnable closeAction;
+
+  private final JTabbedPane tabs;
 
   public TabClosableTitle(final JTabbedPane tabs, final Runnable closeAction) {
     this.tabs = tabs;

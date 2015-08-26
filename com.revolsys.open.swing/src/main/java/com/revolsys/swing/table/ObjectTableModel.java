@@ -11,9 +11,9 @@ public class ObjectTableModel<T> extends AbstractTableModel {
    */
   private static final long serialVersionUID = -1243907349293763360L;
 
-  private final String[] propertyNames;
-
   private final String[] lables;
+
+  private final String[] propertyNames;
 
   private final List<T> rows = new ArrayList<T>();
 

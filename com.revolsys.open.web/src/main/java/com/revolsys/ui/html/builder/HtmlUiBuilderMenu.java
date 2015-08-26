@@ -12,9 +12,9 @@ import com.revolsys.util.Property;
 public class HtmlUiBuilderMenu extends Menu implements BeanFactoryAware {
   private BeanFactory beanFactory;
 
-  private String typePath;
-
   private String pageName;
+
+  private String typePath;
 
   @Override
   public String getLink(final JexlContext context) {

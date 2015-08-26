@@ -26,11 +26,11 @@ import com.revolsys.io.Paths;
 
 public class RecordStoreFactoryRegistry {
 
-  private static Map<Pattern, RecordStoreFactory> recordStoreFactoryUrlPatterns = new HashMap<>();
+  private static Set<String> fileExtensions = new TreeSet<String>();
 
   private static List<RecordStoreFactory> fileRecordStoreFactories = new ArrayList<>();
 
-  private static Set<String> fileExtensions = new TreeSet<String>();
+  private static Map<Pattern, RecordStoreFactory> recordStoreFactoryUrlPatterns = new HashMap<>();
 
   static {
     try {

@@ -32,11 +32,11 @@ public class TableLayout implements ElementContainerLayout {
 
   private final String cssClass;
 
+  private final List cssClasses = new ArrayList();
+
   private final int numColumns;
 
   private final List titles;
-
-  private final List cssClasses = new ArrayList();
 
   public TableLayout(final int numColumns) {
     this(null, numColumns);

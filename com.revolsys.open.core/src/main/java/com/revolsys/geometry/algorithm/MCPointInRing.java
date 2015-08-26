@@ -73,13 +73,13 @@ public class MCPointInRing implements PointInRing {
     }
   }
 
-  private final LinearRing ring;
-
-  private Bintree tree;
-
   private int crossings = 0; // number of segment/ray crossings
 
   private final Interval interval = new Interval();
+
+  private final LinearRing ring;
+
+  private Bintree tree;
 
   public MCPointInRing(final LinearRing ring) {
     this.ring = ring;

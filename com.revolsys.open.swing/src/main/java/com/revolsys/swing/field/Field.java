@@ -11,13 +11,13 @@ import com.revolsys.swing.undo.UndoManager;
 
 public interface Field extends Cloneable {
 
-  ImageIcon ERROR_ICON = Icons.getIcon("exclamation");
-
   Color DEFAULT_BACKGROUND = new JTextField().getBackground();
 
   Color DEFAULT_FOREGROUND = new JTextField().getForeground();
 
   Color DEFAULT_SELECTED_FOREGROUND = new JTextField().getSelectedTextColor();
+
+  ImageIcon ERROR_ICON = Icons.getIcon("exclamation");
 
   Field clone();
 

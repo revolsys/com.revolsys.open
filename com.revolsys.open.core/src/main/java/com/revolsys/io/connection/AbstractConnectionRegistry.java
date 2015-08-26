@@ -21,23 +21,23 @@ import com.revolsys.util.Property;
 public abstract class AbstractConnectionRegistry<T extends MapSerializer>
   implements ConnectionRegistry<T>, PropertyChangeListener {
 
-  private Map<String, T> connections;
-
-  private boolean visible = true;
+  private ConnectionRegistryManager<ConnectionRegistry<T>> connectionManager;
 
   private final Map<String, String> connectionNames = new TreeMap<String, String>();
 
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+  private Map<String, T> connections;
 
   private File directory;
 
+  private final String fileExtension = "rgobject";
+
   private final String name;
+
+  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   private boolean readOnly;
 
-  private final String fileExtension = "rgobject";
-
-  private ConnectionRegistryManager<ConnectionRegistry<T>> connectionManager;
+  private boolean visible = true;
 
   public AbstractConnectionRegistry(
     final ConnectionRegistryManager<? extends ConnectionRegistry<T>> connectionManager,

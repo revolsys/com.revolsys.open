@@ -14,16 +14,16 @@ import com.revolsys.collection.map.WeakCache;
 import com.revolsys.io.FileUtil;
 
 public class FilePageManager implements PageManager {
-  int pageSize = 64;
-
-  private RandomAccessFile randomAccessFile;
+  private final Set<Integer> freePageIndexes = new TreeSet<Integer>();
 
   // TODO
   private final Map<Integer, Page> pages = new WeakCache<Integer, Page>();
 
-  private final Set<Integer> freePageIndexes = new TreeSet<Integer>();
-
   private final Set<Page> pagesInUse = new HashSet<Page>();
+
+  int pageSize = 64;
+
+  private RandomAccessFile randomAccessFile;
 
   public FilePageManager() {
     this(FileUtil.createTempFile("pages", ".pf"));

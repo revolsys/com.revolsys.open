@@ -27,9 +27,9 @@ public class HttpMessageConverterView extends AbstractView {
     return view;
   }
 
-  private final HttpMessageConverter<Object> messageConverter;
-
   private final MediaType mediaType;
+
+  private final HttpMessageConverter<Object> messageConverter;
 
   private final Object returnValue;
 

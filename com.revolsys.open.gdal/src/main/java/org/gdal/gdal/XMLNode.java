@@ -25,9 +25,9 @@ public class XMLNode {
     return cPtr == 0 ? null : new XMLNode(cPtr, true);
   }
 
-  private long swigCPtr;
-
   protected boolean swigCMemOwn;
+
+  private long swigCPtr;
 
   protected XMLNode(final long cPtr, final boolean cMemoryOwn) {
     if (cPtr == 0) {

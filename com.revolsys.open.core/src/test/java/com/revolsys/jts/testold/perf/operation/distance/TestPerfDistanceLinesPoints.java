@@ -23,17 +23,17 @@ import com.revolsys.jts.testold.algorithm.InteriorPointTest;
  *
  */
 public class TestPerfDistanceLinesPoints {
-  static final boolean USE_INDEXED_DIST = true;
+  static final double EXTENT = 1000;
 
   static GeometryFactory geomFact = GeometryFactory.floating3();
 
   static final int MAX_ITER = 1;
 
+  static final int NUM_PTS_SIDE = 100;
+
   static final int NUM_TARGET_ITEMS = 4000;
 
-  static final double EXTENT = 1000;
-
-  static final int NUM_PTS_SIDE = 100;
+  static final boolean USE_INDEXED_DIST = true;
 
   public static void main(final String[] args) {
     final TestPerfDistanceLinesPoints test = new TestPerfDistanceLinesPoints();

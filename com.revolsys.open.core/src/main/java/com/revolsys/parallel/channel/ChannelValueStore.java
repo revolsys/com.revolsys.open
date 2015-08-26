@@ -5,17 +5,17 @@ package com.revolsys.parallel.channel;
  * @param <T> The type of Object stored
  */
 public abstract class ChannelValueStore<T> implements Cloneable {
-  /**
-   * Specifies that the ChannelValueStore is neither empty or full and can give
-   * and accept further data.
-   */
-  protected static int NONEMPTYFULL = 0;
-
   /** Specifies that the ChannelValueStore is empty and cannot give further data */
   protected static int EMPTY = 1;
 
   /** Specifies that the ChannelValueStore is full and cannot accept further data */
   protected static int FULL = 2;
+
+  /**
+   * Specifies that the ChannelValueStore is neither empty or full and can give
+   * and accept further data.
+   */
+  protected static int NONEMPTYFULL = 0;
 
   /**
    * Returns a new Object with the same creation parameters as this Object. This

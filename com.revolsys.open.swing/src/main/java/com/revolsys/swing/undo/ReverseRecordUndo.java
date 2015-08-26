@@ -12,9 +12,9 @@ public class ReverseRecordUndo extends AbstractUndoableEdit {
    */
   private static final long serialVersionUID = 1L;
 
-  private final LayerRecord record;
-
   private final Geometry oldValue;
+
+  private final LayerRecord record;
 
   public ReverseRecordUndo(final LayerRecord record) {
     this.record = record;

@@ -25,15 +25,15 @@ public class MapPointerLocation extends JLabel
 
   private static final long serialVersionUID = 1L;
 
-  private final Viewport2D viewport;
+  private final boolean geographics;
 
   private GeometryFactory geometryFactory;
 
+  private final Reference<MapPanel> map;
+
   private String title;
 
-  private final boolean geographics;
-
-  private final Reference<MapPanel> map;
+  private final Viewport2D viewport;
 
   public MapPointerLocation(final MapPanel map, final boolean geographics) {
     this.map = new WeakReference<MapPanel>(map);

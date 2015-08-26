@@ -14,11 +14,11 @@ import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.geometry.model.Geometry;
 
 public class WithinDistance extends Condition {
+  private QueryValue distanceValue;
+
   private QueryValue geometry1Value;
 
   private QueryValue geometry2Value;
-
-  private QueryValue distanceValue;
 
   public WithinDistance(final QueryValue geometry1Value, final QueryValue geometry2Value,
     final QueryValue distanceValue) {

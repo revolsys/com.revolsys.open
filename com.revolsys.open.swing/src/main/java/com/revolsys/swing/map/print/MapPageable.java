@@ -17,33 +17,33 @@ import com.revolsys.swing.map.layer.Project;
 
 public class MapPageable implements Pageable {
 
-  private final int numPages;
+  private final Rectangle2D.Double contentRect;
 
-  private final PageFormat pageFormat;
+  private double coreCellsPerHeight;
 
-  private BoundingBox mapBoundingBox;
+  private double coreCellsPerWidth;
+
+  private final int dpi;
 
   private final Project map;
 
+  private BoundingBox mapBoundingBox;
+
   private double modelGridSizeMetres = 200;
+
+  private final double modelPageHeight;
+
+  private final double modelPageWidth;
+
+  private final int numPages;
 
   private final int numXPages;
 
   private final int numYPages;
 
-  private double coreCellsPerWidth;
-
-  private double coreCellsPerHeight;
-
-  private final double modelPageWidth;
-
-  private final double modelPageHeight;
+  private final PageFormat pageFormat;
 
   private final double rulerSizePixels;
-
-  private final Rectangle2D.Double contentRect;
-
-  private final int dpi;
 
   private final double scale;
 

@@ -8,9 +8,9 @@ import com.revolsys.geometry.model.segment.LineSegmentDouble;
  * for its sides.
  */
 public class DepthSegment implements Comparable<DepthSegment> {
-  private final LineSegment upwardSeg;
-
   private final int leftDepth;
+
+  private final LineSegment upwardSeg;
 
   public DepthSegment(final LineSegment seg, final int depth) {
     // input seg is assumed to be normalized

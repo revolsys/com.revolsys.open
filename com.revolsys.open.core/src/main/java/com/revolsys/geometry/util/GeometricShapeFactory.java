@@ -67,9 +67,9 @@ public class GeometricShapeFactory {
 
     public Point centre;
 
-    public double width;
-
     public double height;
+
+    public double width;
 
     public Point getBase() {
       return this.base;
@@ -138,9 +138,9 @@ public class GeometricShapeFactory {
 
   }
 
-  protected GeometryFactory geomFact;
-
   protected Dimensions dim = new Dimensions();
+
+  protected GeometryFactory geomFact;
 
   protected int nPts = 100;
 

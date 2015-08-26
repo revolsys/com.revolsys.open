@@ -10,11 +10,11 @@ import com.revolsys.swing.tree.BaseTreeNodeLoadingIcon;
 
 public abstract class LazyLoadTreeNode extends BaseTreeNode {
 
-  private final AtomicInteger updateIndicies = new AtomicInteger();
-
   private List<BaseTreeNode> children = Collections.emptyList();
 
   private boolean loaded = false;
+
+  private final AtomicInteger updateIndicies = new AtomicInteger();
 
   public LazyLoadTreeNode() {
     this(null);

@@ -79,13 +79,13 @@ public class OsnSerializer {
 
   private OutputStream out;
 
+  private final String path;
+
   private final String prefix;
 
   private final LinkedList<Object> scope = new LinkedList<Object>();
 
   private int size = 0;
-
-  private final String path;
 
   public OsnSerializer(final String path, final File file, final long maxSize,
     final OsnConverterRegistry converters) throws IOException {

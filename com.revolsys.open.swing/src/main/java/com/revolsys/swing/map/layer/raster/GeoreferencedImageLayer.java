@@ -78,13 +78,13 @@ public class GeoreferencedImageLayer extends AbstractLayer {
 
   private GeoreferencedImage image;
 
-  private Resource resource;
+  private int opacity = 255;
 
-  private String url;
+  private Resource resource;
 
   private boolean showOriginalImage = false;
 
-  private int opacity = 255;
+  private String url;
 
   public GeoreferencedImageLayer(final Map<String, Object> properties) {
     super(properties);

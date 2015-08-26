@@ -25,17 +25,17 @@ import com.revolsys.util.Property;
 public class GeometryCoordinatesPanel extends ValueField implements TableModelListener {
   private static final long serialVersionUID = 1L;
 
+  final BaseTableCellEditor cellEditor;
+
+  final TableCellRenderer cellRenderer = new BaseTableCellRenderer();
+
+  private final Reference<RecordLayerForm> form;
+
   private final GeometryCoordinatesTableModel model = new GeometryCoordinatesTableModel(this);
 
   private final BaseJTable table;
 
   private final TablePanel tablePanel;
-
-  private final Reference<RecordLayerForm> form;
-
-  final TableCellRenderer cellRenderer = new BaseTableCellRenderer();
-
-  final BaseTableCellEditor cellEditor;
 
   public GeometryCoordinatesPanel(final RecordLayerForm form, final String fieldName) {
     super(fieldName, null);

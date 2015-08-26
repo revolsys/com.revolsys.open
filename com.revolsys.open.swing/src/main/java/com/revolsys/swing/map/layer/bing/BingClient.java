@@ -26,13 +26,13 @@ import com.revolsys.util.UrlUtil;
 
 public class BingClient {
 
-  public static final int TILE_SIZE = 256;
-
   private static final double[] METRES_PER_PIXEL = {
     78271.517, 39135.7585, 19567.8792, 9783.9396, 4891.9698, 2445.9849, 1222.9925, 611.4962,
     305.7481, 152.8741, 76.437, 38.2185, 19.1093, 9.5546, 4.7773, 2.3887, 1.1943, 0.5972, 0.2986,
     0.1493, 0.0746
   };
+
+  public static final int TILE_SIZE = 256;
 
   private final String bingMapsKey;
 

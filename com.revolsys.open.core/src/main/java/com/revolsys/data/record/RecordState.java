@@ -1,5 +1,5 @@
 package com.revolsys.data.record;
 
 public enum RecordState {
-  Deleted, Modified, New, Persisted, Initalizing
+  Deleted, Initalizing, Modified, New, Persisted
 }

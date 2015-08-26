@@ -6,9 +6,9 @@ import java.util.Map.Entry;
 import com.revolsys.collection.bplus.BPlusTreeMap;
 
 public class MapKeyEntry<K, V> implements Entry<K, V> {
-  private Map<K, V> map;
-
   private final K key;
+
+  private Map<K, V> map;
 
   public MapKeyEntry(final Map<K, V> map, final K key) {
     this.key = key;

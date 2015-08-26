@@ -53,11 +53,11 @@ import com.revolsys.util.Emptyable;
  * @author Martin Davis
  */
 public class KdTree implements Emptyable {
-  private KdNode root = null;
-
   private final KdNode last = null;
 
   private long numberOfNodes;
+
+  private KdNode root = null;
 
   private final double tolerance;
 

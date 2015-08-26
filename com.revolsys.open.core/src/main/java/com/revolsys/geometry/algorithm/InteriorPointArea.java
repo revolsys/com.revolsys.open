@@ -84,13 +84,13 @@ public class InteriorPointArea {
       return finder.getBisectorY();
     }
 
-    private final Polygon poly;
-
     private final double centreY;
 
     private double hiY = Double.MAX_VALUE;
 
     private double loY = -Double.MAX_VALUE;
+
+    private final Polygon poly;
 
     public SafeBisectorFinder(final Polygon poly) {
       this.poly = poly;

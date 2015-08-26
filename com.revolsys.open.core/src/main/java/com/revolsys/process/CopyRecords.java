@@ -17,15 +17,15 @@ import com.revolsys.util.CompareUtil;
 
 public class CopyRecords extends AbstractProcess {
 
-  private RecordStore targetRecordStore;
-
-  private RecordStore sourceRecordStore;
-
-  private PathName typePath;
-
   private boolean hasSequence;
 
   private Map<String, Boolean> orderBy = new HashMap<String, Boolean>();
+
+  private RecordStore sourceRecordStore;
+
+  private RecordStore targetRecordStore;
+
+  private PathName typePath;
 
   public CopyRecords() {
   }

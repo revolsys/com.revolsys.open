@@ -5,9 +5,9 @@ import com.revolsys.geometry.operation.distance.IndexedFacetDistance;
 
 public class CachedBABDistance {
 
-  private static Geometry cacheGeom = null;
-
   private static IndexedFacetDistance babDist;
+
+  private static Geometry cacheGeom = null;
 
   static double getDistance(final Geometry g1, final Geometry g2) {
     if (cacheGeom != g1) {

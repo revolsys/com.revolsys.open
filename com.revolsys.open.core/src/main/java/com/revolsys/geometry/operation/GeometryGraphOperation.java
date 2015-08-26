@@ -45,12 +45,12 @@ import com.revolsys.geometry.model.GeometryFactory;
  * @version 1.7
  */
 public class GeometryGraphOperation {
-  protected final LineIntersector li = new RobustLineIntersector();
-
   /**
    * The operation args into an array so they can be accessed by index
    */
   protected GeometryGraph[] arg; // the arg(s) of the operation
+
+  protected final LineIntersector li = new RobustLineIntersector();
 
   public GeometryGraphOperation(final Geometry g0, final Geometry g1) {
     this(g0, g1, BoundaryNodeRule.OGC_SFS_BOUNDARY_RULE

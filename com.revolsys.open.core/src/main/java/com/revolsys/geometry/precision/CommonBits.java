@@ -101,13 +101,13 @@ public class CommonBits {
     return zeroed;
   }
 
-  private boolean isFirst = true;
+  private long commonBits = 0;
 
   private int commonMantissaBitsCount = 53;
 
-  private long commonBits = 0;
-
   private long commonSignExp;
+
+  private boolean isFirst = true;
 
   public CommonBits() {
   }

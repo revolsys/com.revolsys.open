@@ -21,13 +21,13 @@ public class DatabaseBeanConfigurator extends BeanConfigurrer {
 
   private DataSource dataSource;
 
-  private String tableName;
-
   private String propertyColumnName;
 
-  private String valueColumnName;
+  private String tableName;
 
   private String typeColumnName;
+
+  private String valueColumnName;
 
   private String whereClause;
 

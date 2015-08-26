@@ -155,9 +155,9 @@ public class NodeProperties {
 
   private static String EDGE_ANGLES_BY_TYPE = "edgeAnglesByType";
 
-  private static String EDGE_TYPE_NAMES = "edgeTypeNames";
-
   private static String EDGE_RECORD_DEFINITIONS = "edgeRecordDefinitions";
+
+  private static String EDGE_TYPE_NAMES = "edgeTypeNames";
 
   private static String EDGES_BY_LINE_AND_TYPE_NAME = "edgesByLineAndTypeName";
 

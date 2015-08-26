@@ -88,9 +88,9 @@ import com.revolsys.util.Property;
  * @version 1.7
  */
 public class GeometryFactory implements Serializable, MapSerializer {
-  private static final long serialVersionUID = 4328651897279304108L;
-
   private static IntHashMap<IntHashMap<List<GeometryFactory>>> factoriesBySrid = new IntHashMap<>();
+
+  private static final long serialVersionUID = 4328651897279304108L;
 
   public static final BoundingBox boundingBox(final Geometry geometry) {
     if (geometry == null) {
@@ -371,15 +371,15 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return floating3(3857);
   }
 
-  private final CoordinateSystem coordinateSystem;
-
   private int axisCount = 2;
 
-  private final int srid;
+  private final CoordinateSystem coordinateSystem;
 
   private final WktParser parser = new WktParser(this);
 
   private double[] scales;
+
+  private final int srid;
 
   protected GeometryFactory(final CoordinateSystem coordinateSystem, final int axisCount,
     final double... scales) {

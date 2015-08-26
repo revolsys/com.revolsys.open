@@ -27,24 +27,24 @@ public class RectanglePredicateSyntheticTest extends TestCase {
     TestRunner.run(RectanglePredicateSyntheticTest.class);
   }
 
-  private final GeometryFactory fact = GeometryFactory.floating3();
-
   double baseX = 10;
 
   double baseY = 10;
 
-  double rectSize = 20;
+  double bufferWidth = 1.0;
 
   double bufSize = 10;
 
-  double testGeomSize = 10;
+  private final GeometryFactory fact = GeometryFactory.floating3();
 
-  double bufferWidth = 1.0;
+  Geometry rect = this.rectEnv.toGeometry();
 
   BoundingBox rectEnv = new BoundingBoxDoubleGf(2, this.baseX, this.baseY,
     this.baseX + this.rectSize, this.baseY + this.rectSize);
 
-  Geometry rect = this.rectEnv.toGeometry();
+  double rectSize = 20;
+
+  double testGeomSize = 10;
 
   public RectanglePredicateSyntheticTest(final String name) {
     super(name);

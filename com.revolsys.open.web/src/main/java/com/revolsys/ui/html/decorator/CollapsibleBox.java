@@ -6,11 +6,11 @@ import com.revolsys.util.HtmlUtil;
 
 public class CollapsibleBox implements Decorator {
 
-  private String title;
-
   private boolean open;
 
   private String style;
+
+  private String title;
 
   public CollapsibleBox() {
   }

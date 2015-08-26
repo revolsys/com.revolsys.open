@@ -91,9 +91,9 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     return locator;
   }
 
-  private final IntervalIndexedGeometry index;
-
   private final Geometry geometry;
+
+  private final IntervalIndexedGeometry index;
 
   /**
    * Creates a new locator for a given {@link Geometry}

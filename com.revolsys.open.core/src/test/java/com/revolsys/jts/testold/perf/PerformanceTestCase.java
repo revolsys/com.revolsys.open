@@ -19,11 +19,11 @@ package com.revolsys.jts.testold.perf;
 public abstract class PerformanceTestCase {
   private final String name;
 
+  private int runIter = 1;
+
   private int[] runSize = new int[] {
     1
   };
-
-  private int runIter = 1;
 
   public PerformanceTestCase(final String name) {
     this.name = name;

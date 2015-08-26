@@ -43,9 +43,9 @@ import com.revolsys.util.Emptyable;
  *
  */
 public class PriorityQueue implements Emptyable {
-  private int size; // Number of elements in queue
-
   private final ArrayList items; // The queue binary heap array
+
+  private int size; // Number of elements in queue
 
   /**
    * Creates a new empty priority queue

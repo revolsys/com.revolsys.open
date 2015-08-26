@@ -8,11 +8,11 @@ public class OpenStreetMapTile extends MapTile {
 
   private final OpenStreetMapLayer layer;
 
-  private final int zoomLevel;
-
   private final int tileX;
 
   private final int tileY;
+
+  private final int zoomLevel;
 
   public OpenStreetMapTile(final OpenStreetMapLayer layer, final int zoomLevel,
     final double resolution, final int tileX, final int tileY) {

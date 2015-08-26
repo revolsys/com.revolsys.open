@@ -215,11 +215,11 @@ public class GeometrySnapper {
 }
 
 class SnapTransformer extends GeometryTransformer {
-  private final double snapTolerance;
+  private boolean isSelfSnap = false;
 
   private final Point[] snapPts;
 
-  private boolean isSelfSnap = false;
+  private final double snapTolerance;
 
   SnapTransformer(final double snapTolerance, final Point[] snapPts) {
     this.snapTolerance = snapTolerance;

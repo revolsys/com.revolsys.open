@@ -15,17 +15,17 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 
 public class LineStringRelate {
-  private final LineString line1;
-
-  private final LineString line2;
-
-  private final LineStringGraph graph1;
-
   private final Point fromPoint1;
 
   private final Point fromPoint2;
 
+  private final LineStringGraph graph1;
+
   private final LineStringGraph graph2;
+
+  private final LineString line1;
+
+  private final LineString line2;
 
   private final Point toPoint1;
 

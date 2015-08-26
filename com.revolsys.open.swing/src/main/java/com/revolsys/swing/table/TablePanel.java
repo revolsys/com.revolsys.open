@@ -71,11 +71,11 @@ public class TablePanel extends JPanel implements MouseListener, AutoCloseable {
     }
   }
 
+  private JScrollPane scrollPane;
+
   private JTable table;
 
   private ToolBar toolBar = new ToolBar();
-
-  private JScrollPane scrollPane;
 
   public TablePanel(final JTable table) {
     super(new BorderLayout());

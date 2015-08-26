@@ -135,17 +135,17 @@ import com.revolsys.geometry.model.impl.PointDouble;
  *@version 1.7
  */
 public class WKTReader {
-  private static final String EMPTY = "EMPTY";
+  private static final boolean ALLOW_OLD_JTS_MULTIPOINT_SYNTAX = true;
 
   private static final String COMMA = ",";
 
-  private static final String L_PAREN = "(";
+  private static final String EMPTY = "EMPTY";
 
-  private static final String R_PAREN = ")";
+  private static final String L_PAREN = "(";
 
   private static final String NAN_SYMBOL = "NaN";
 
-  private static final boolean ALLOW_OLD_JTS_MULTIPOINT_SYNTAX = true;
+  private static final String R_PAREN = ")";
 
   private final GeometryFactory geometryFactory;
 

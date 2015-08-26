@@ -5,16 +5,16 @@ import java.util.EventObject;
 import com.revolsys.geometry.model.Point;
 
 public class CoordinateEvent extends EventObject {
-  /**
-   *
-   */
-  private static final long serialVersionUID = -1809350055079477785L;
-
   public static final String NODE_ADDED = "Coordinate added";
 
   public static final String NODE_CHANGED = "Coordinate changed";
 
   public static final String NODE_REMOVED = "Coordinate removed";
+
+  /**
+   *
+   */
+  private static final long serialVersionUID = -1809350055079477785L;
 
   private String action;
 

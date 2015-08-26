@@ -41,17 +41,21 @@ public class Form extends ElementContainer {
 
   public static final String GET_METHOD = "get";
 
+  public static final String MULTIPART_FORM_DATA = "multipart/form-data";
+
   public static final String POST_METHOD = "post";
 
   private static final UrlPathHelper URL_HELPER = new UrlPathHelper();
 
-  public static final String MULTIPART_FORM_DATA = "multipart/form-data";
+  private String acceptCharset = "UTF-8";
 
   private String action = "";
 
   private String cssClass = "form";
 
   private String defaultFormTask;
+
+  private String encType = "application/x-www-form-urlencoded";
 
   private String formTask;
 
@@ -67,11 +71,7 @@ public class Form extends ElementContainer {
 
   private String title;
 
-  private String encType = "application/x-www-form-urlencoded";
-
   private boolean valid = true;
-
-  private String acceptCharset = "UTF-8";
 
   public Form() {
   }

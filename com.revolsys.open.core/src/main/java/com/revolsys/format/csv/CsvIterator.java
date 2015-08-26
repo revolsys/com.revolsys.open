@@ -14,6 +14,8 @@ public class CsvIterator implements Iterator<List<String>>, Iterable<List<String
 
   private static final int BUFFER_SIZE = 8096;
 
+  private final char[] buffer = new char[BUFFER_SIZE];
+
   /** The current record. */
   private List<String> currentRecord;
 
@@ -23,11 +25,9 @@ public class CsvIterator implements Iterator<List<String>>, Iterable<List<String
   /** The reader to */
   private final Reader in;
 
-  private final char[] buffer = new char[BUFFER_SIZE];
+  private int index = 0;
 
   private int readCount;
-
-  private int index = 0;
 
   private final StringBuilder sb = new StringBuilder();
 

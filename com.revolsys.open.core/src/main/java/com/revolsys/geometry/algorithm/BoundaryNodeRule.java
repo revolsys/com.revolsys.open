@@ -163,28 +163,28 @@ public interface BoundaryNodeRule {
   }
 
   /**
-   * The Mod-2 Boundary Node Rule (which is the rule specified in the OGC SFS).
-   * @see Mod2BoundaryNodeRule
-   */
-  public static final BoundaryNodeRule MOD2_BOUNDARY_RULE = new Mod2BoundaryNodeRule();
-
-  /**
    * The Endpoint Boundary Node Rule.
    * @see EndPointBoundaryNodeRule
    */
   public static final BoundaryNodeRule ENDPOINT_BOUNDARY_RULE = new EndPointBoundaryNodeRule();
 
   /**
-   * The MultiValent Endpoint Boundary Node Rule.
-   * @see MultiValentEndPointBoundaryNodeRule
+   * The Mod-2 Boundary Node Rule (which is the rule specified in the OGC SFS).
+   * @see Mod2BoundaryNodeRule
    */
-  public static final BoundaryNodeRule MULTIVALENT_ENDPOINT_BOUNDARY_RULE = new MultiValentEndPointBoundaryNodeRule();
+  public static final BoundaryNodeRule MOD2_BOUNDARY_RULE = new Mod2BoundaryNodeRule();
 
   /**
    * The Monovalent Endpoint Boundary Node Rule.
    * @see MonoValentEndPointBoundaryNodeRule
    */
   public static final BoundaryNodeRule MONOVALENT_ENDPOINT_BOUNDARY_RULE = new MonoValentEndPointBoundaryNodeRule();
+
+  /**
+   * The MultiValent Endpoint Boundary Node Rule.
+   * @see MultiValentEndPointBoundaryNodeRule
+   */
+  public static final BoundaryNodeRule MULTIVALENT_ENDPOINT_BOUNDARY_RULE = new MultiValentEndPointBoundaryNodeRule();
 
   /**
    * The Boundary Node Rule specified by the OGC Simple Features Specification,

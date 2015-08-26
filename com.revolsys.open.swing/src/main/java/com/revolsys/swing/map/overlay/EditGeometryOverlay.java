@@ -150,11 +150,11 @@ public class EditGeometryOverlay extends AbstractOverlay
 
   private List<CloseLocation> mouseOverLocations = Collections.emptyList();
 
+  private Point moveGeometryEnd;
+
   private List<CloseLocation> moveGeometryLocations;
 
   private Point moveGeometryStart;
-
-  private Point moveGeometryEnd;
 
   public EditGeometryOverlay(final MapPanel map) {
     super(map);

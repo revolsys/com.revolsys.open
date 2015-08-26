@@ -51,11 +51,11 @@ class DouglasPeuckerLineSimplifier {
     return simp.simplify();
   }
 
+  private double distanceTolerance;
+
   private final LineString pts;
 
   private boolean[] usePt;
-
-  private double distanceTolerance;
 
   public DouglasPeuckerLineSimplifier(final LineString pts) {
     this.pts = pts;

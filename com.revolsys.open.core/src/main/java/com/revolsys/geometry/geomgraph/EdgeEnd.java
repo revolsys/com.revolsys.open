@@ -50,6 +50,8 @@ import com.revolsys.geometry.util.Assert;
  * @version 1.7
  */
 public class EdgeEnd implements Comparable {
+  private double dx, dy; // the direction vector for this edge from its starting
+
   protected Edge edge; // the parent edge of this edge end
 
   private Label label;
@@ -57,8 +59,6 @@ public class EdgeEnd implements Comparable {
   private Node node; // the node this edge end originates at
 
   private Point p0, p1; // points of initial line segment
-
-  private double dx, dy; // the direction vector for this edge from its starting
 
   // point
 

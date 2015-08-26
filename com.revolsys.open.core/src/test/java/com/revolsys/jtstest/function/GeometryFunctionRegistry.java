@@ -89,13 +89,13 @@ public class GeometryFunctionRegistry {
     return Geometry.class.isAssignableFrom(func.getReturnType());
   }
 
-  private final List functions = new ArrayList();
-
-  private final Map sortedFunctions = new TreeMap();
-
   private final DoubleKeyMap categorizedFunctions = new DoubleKeyMap();
 
   private final DoubleKeyMap categorizedGeometryFunctions = new DoubleKeyMap();
+
+  private final List functions = new ArrayList();
+
+  private final Map sortedFunctions = new TreeMap();
 
   public GeometryFunctionRegistry() {
   }

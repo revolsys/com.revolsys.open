@@ -148,14 +148,14 @@ public class QuadEdge {
     e.setDest(b.dest());
   }
 
+  private Object data = null;
+
+  private QuadEdge next; // A reference to a connected edge
+
   // the dual of this edge, directed from right to left
   private QuadEdge rot;
 
   private Vertex vertex; // The vertex that this edge represents
-
-  private QuadEdge next; // A reference to a connected edge
-
-  private Object data = null;
 
   // private int visitedKey = 0;
 

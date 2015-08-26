@@ -32,13 +32,13 @@ import com.revolsys.ui.web.exception.PageNotFoundException;
 public class WebUiFilter implements Filter {
   private static final Logger LOG = Logger.getLogger(WebUiFilter.class);
 
-  private Config rsWebUiConfig;
+  private ApplicationContext applicationContext;
 
-  private Site site;
+  private Config rsWebUiConfig;
 
   private ServletContext servletContext;
 
-  private ApplicationContext applicationContext;
+  private Site site;
 
   @Override
   public void destroy() {

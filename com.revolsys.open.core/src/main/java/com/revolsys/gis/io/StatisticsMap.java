@@ -19,13 +19,13 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Emptyable;
 
 public class StatisticsMap implements Emptyable {
-  private final Map<String, Statistics> statisticsMap = new TreeMap<>();
-
-  private int providerCount = 0;
+  private boolean logCounts;
 
   private String prefix;
 
-  private boolean logCounts;
+  private int providerCount = 0;
+
+  private final Map<String, Statistics> statisticsMap = new TreeMap<>();
 
   public StatisticsMap() {
   }

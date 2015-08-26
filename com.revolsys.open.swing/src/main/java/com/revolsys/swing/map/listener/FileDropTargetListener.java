@@ -26,9 +26,9 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.parallel.Invoke;
 
 public class FileDropTargetListener implements DropTargetListener, HierarchyListener {
-  private static final String ZERO_CHAR_STRING = String.valueOf((char)0);
-
   private static final Logger LOG = Logger.getLogger(FileDropTargetListener.class);
+
+  private static final String ZERO_CHAR_STRING = String.valueOf((char)0);
 
   public FileDropTargetListener(final MapPanel map) {
     addDropTarget(map);

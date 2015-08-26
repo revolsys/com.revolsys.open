@@ -40,23 +40,23 @@ public class RecordTableCellEditor extends AbstractCellEditor
 
   private static final long serialVersionUID = 1L;
 
+  private int columnIndex;
+
+  private DataType dataType;
+
   private JComponent editorComponent;
 
   private String fieldName;
 
-  private BaseJTable table;
-
-  private int rowIndex;
+  private MouseListener mouseListener;
 
   private Object oldValue;
 
-  private int columnIndex;
-
   private PopupMenu popupMenu = null;
 
-  private DataType dataType;
+  private int rowIndex;
 
-  private MouseListener mouseListener;
+  private BaseJTable table;
 
   public RecordTableCellEditor(final BaseJTable table) {
     this.table = table;

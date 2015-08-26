@@ -28,9 +28,9 @@ import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 
 public class BaseTree extends JTree
   implements MouseListener, TreeWillExpandListener, TreeExpansionListener {
-  private static final long serialVersionUID = 1L;
-
   private static Reference<BaseTreeNode> menuNode = new EmptyReference<>();
+
+  private static final long serialVersionUID = 1L;
 
   @SuppressWarnings("unchecked")
   public static <V extends BaseTreeNode> V getMenuNode() {

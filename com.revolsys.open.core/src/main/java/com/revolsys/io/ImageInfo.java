@@ -153,14 +153,12 @@ import com.revolsys.util.Base64InputStream;
 @SuppressWarnings("unchecked")
 public class ImageInfo {
   /**
-   * Return value of {@link #getFormat()} for JPEG streams.
-   * ImageInfo can extract physical resolution and comments
-   * from JPEGs (only from APP0 headers).
-   * Only one image can be stored in a file.
-   * It is determined whether the JPEG stream is progressive
-   * (see {@link #isProgressive()}).
+   * Return value of {@link #getFormat()} for BMP streams.
+   * BMP only supports one image per file.
+   * BMP does not allow for comments.
+   * The physical resolution can be stored.
    */
-  public static final int FORMAT_JPEG = 0;
+  public static final int FORMAT_BMP = 3;
 
   /**
    * Return value of {@link #getFormat()} for GIF streams.
@@ -171,21 +169,31 @@ public class ImageInfo {
   public static final int FORMAT_GIF = 1;
 
   /**
-   * Return value of {@link #getFormat()} for PNG streams.
-   * PNG only supports one image per file.
-   * Both physical resolution and comments can be stored with PNG,
-   * but ImageInfo is currently not able to extract those.
-   * It is determined whether the PNG stream is interlaced (see {@link #isProgressive()}).
+   * Return value of {@link #getFormat()} for IFF streams.
    */
-  public static final int FORMAT_PNG = 2;
+  public static final int FORMAT_IFF = 5;
 
   /**
-   * Return value of {@link #getFormat()} for BMP streams.
-   * BMP only supports one image per file.
-   * BMP does not allow for comments.
-   * The physical resolution can be stored.
+   * Return value of {@link #getFormat()} for JPEG streams.
+   * ImageInfo can extract physical resolution and comments
+   * from JPEGs (only from APP0 headers).
+   * Only one image can be stored in a file.
+   * It is determined whether the JPEG stream is progressive
+   * (see {@link #isProgressive()}).
    */
-  public static final int FORMAT_BMP = 3;
+  public static final int FORMAT_JPEG = 0;
+
+  /**
+   * The names of all supported file formats.
+   * The FORMAT_xyz int constants can be used as index values for
+   * this array.
+   */
+  private static final String[] FORMAT_NAMES = {
+    "JPEG", "GIF", "PNG", "BMP", "PCX", "IFF", "RAS", "PBM", "PGM", "PPM", "PSD"
+  };
+
+  /** Return value of {@link #getFormat()} for PBM streams. */
+  public static final int FORMAT_PBM = 7;
 
   /**
    * Return value of {@link #getFormat()} for PCX streams.
@@ -194,23 +202,17 @@ public class ImageInfo {
    */
   public static final int FORMAT_PCX = 4;
 
-  /**
-   * Return value of {@link #getFormat()} for IFF streams.
-   */
-  public static final int FORMAT_IFF = 5;
-
-  /**
-   * Return value of {@link #getFormat()} for RAS streams.
-   * Sun Raster allows for one image per file only and is not able to
-   * store physical resolution or comments.
-   */
-  public static final int FORMAT_RAS = 6;
-
-  /** Return value of {@link #getFormat()} for PBM streams. */
-  public static final int FORMAT_PBM = 7;
-
   /** Return value of {@link #getFormat()} for PGM streams. */
   public static final int FORMAT_PGM = 8;
+
+  /**
+   * Return value of {@link #getFormat()} for PNG streams.
+   * PNG only supports one image per file.
+   * Both physical resolution and comments can be stored with PNG,
+   * but ImageInfo is currently not able to extract those.
+   * It is determined whether the PNG stream is interlaced (see {@link #isProgressive()}).
+   */
+  public static final int FORMAT_PNG = 2;
 
   /** Return value of {@link #getFormat()} for PPM streams. */
   public static final int FORMAT_PPM = 9;
@@ -226,13 +228,11 @@ public class ImageInfo {
    */
 
   /**
-   * The names of all supported file formats.
-   * The FORMAT_xyz int constants can be used as index values for
-   * this array.
+   * Return value of {@link #getFormat()} for RAS streams.
+   * Sun Raster allows for one image per file only and is not able to
+   * store physical resolution or comments.
    */
-  private static final String[] FORMAT_NAMES = {
-    "JPEG", "GIF", "PNG", "BMP", "PCX", "IFF", "RAS", "PBM", "PGM", "PPM", "PSD"
-  };
+  public static final int FORMAT_RAS = 6;
 
   /**
    * The names of the MIME types for all supported file formats.
@@ -406,20 +406,7 @@ public class ImageInfo {
     }
   }
 
-  private int width;
-
-  private int height;
-
   private int bitsPerPixel;
-
-  // private int colorType = COLOR_TYPE_UNKNOWN;
-  private boolean progressive;
-
-  private int format;
-
-  private InputStream in;
-
-  private DataInput din;
 
   private boolean collectComments = true;
 
@@ -427,11 +414,24 @@ public class ImageInfo {
 
   private boolean determineNumberOfImages;
 
+  private DataInput din;
+
+  private int format;
+
+  private int height;
+
+  private InputStream in;
+
   private int numberOfImages;
 
   private int physicalHeightDpi;
 
   private int physicalWidthDpi;
+
+  // private int colorType = COLOR_TYPE_UNKNOWN;
+  private boolean progressive;
+
+  private int width;
 
   public ImageInfo() {
     // TODO Auto-generated constructor stub

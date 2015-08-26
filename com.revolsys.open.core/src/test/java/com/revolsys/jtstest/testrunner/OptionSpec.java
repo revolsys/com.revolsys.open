@@ -53,9 +53,9 @@ import java.util.Vector;
  */
 public class OptionSpec {
 
-  public final static int NARGS_ZERO_OR_MORE = -1;
-
   public final static int NARGS_ONE_OR_MORE = -2;
+
+  public final static int NARGS_ZERO_OR_MORE = -1;
 
   public final static int NARGS_ZERO_OR_ONE = -3;
 
@@ -64,17 +64,17 @@ public class OptionSpec {
   // for free
   // args
 
-  String name;
-
-  int nAllowedArgs = 0; // number of arguments allowed
-
-  String syntaxPattern;
-
   String argDoc = ""; // arg syntax description
 
   String doc = ""; // option description
 
+  int nAllowedArgs = 0; // number of arguments allowed
+
+  String name;
+
   Vector options = new Vector();
+
+  String syntaxPattern;
 
   public OptionSpec(final String optName) {
     this.name = optName;

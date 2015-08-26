@@ -53,14 +53,14 @@ import com.revolsys.geometry.operation.valid.IsValidOp;
  */
 public class PolygonGenerator extends GeometryGenerator {
   /**
-   * Creates rectangular polygons
-   */
-  public static final int BOX = 0;
-
-  /**
    * Creates polygons whose points will not be rectangular when there are more than 4 points
    */
   public static final int ARC = 1;
+
+  /**
+   * Creates rectangular polygons
+   */
+  public static final int BOX = 0;
 
   private static final int RUNS = 5;
 
@@ -225,11 +225,11 @@ public class PolygonGenerator extends GeometryGenerator {
     return gf.linearRing(2, cxp, cyp, cx + fx1, cy + fy1, cx + fx2, cy + fy2, cxp, cyp);
   }
 
-  protected int numberPoints = 4;
+  protected int generationAlgorithm = 0;
 
   protected int numberHoles = 0;
 
-  protected int generationAlgorithm = 0;
+  protected int numberPoints = 4;
 
   /**
    * As the user increases the number of points, the probability of creating a random valid polygon decreases.

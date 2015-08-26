@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Request {
-  private String name;
+  private final List<DcpType> dcpTypes = new ArrayList<DcpType>();
 
   private final List<String> formats = new ArrayList<String>();
 
-  private final List<DcpType> dcpTypes = new ArrayList<DcpType>();
+  private String name;
 
   public void addDcpType(final DcpType dcpType) {
     this.dcpTypes.add(dcpType);

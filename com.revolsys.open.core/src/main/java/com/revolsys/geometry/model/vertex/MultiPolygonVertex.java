@@ -13,11 +13,11 @@ public class MultiPolygonVertex extends AbstractVertex {
    */
   private static final long serialVersionUID = 1L;
 
-  private int vertexIndex;
-
   private int partIndex;
 
   private int ringIndex;
+
+  private int vertexIndex;
 
   public MultiPolygonVertex(final MultiPolygon multiPolygon, final int... vertexId) {
     super(multiPolygon);

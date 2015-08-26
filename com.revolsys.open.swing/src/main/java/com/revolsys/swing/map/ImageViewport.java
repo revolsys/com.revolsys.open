@@ -8,9 +8,9 @@ import com.revolsys.swing.map.layer.Project;
 
 public class ImageViewport extends Viewport2D implements AutoCloseable {
 
-  private final BufferedImage image;
-
   private final Graphics2D graphics;
+
+  private final BufferedImage image;
 
   public ImageViewport(final Project project, final int width, final int height,
     final BoundingBox boundingBox) {

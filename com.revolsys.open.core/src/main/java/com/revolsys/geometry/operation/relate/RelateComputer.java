@@ -71,16 +71,16 @@ import com.revolsys.geometry.util.Assert;
  * @version 1.7
  */
 public class RelateComputer {
-  private final LineIntersector li = new RobustLineIntersector();
-
-  private final PointLocator ptLocator = new PointLocator();
-
   private final GeometryGraph[] arg; // the arg(s) of the operation
-
-  private final NodeMap nodes = new NodeMap(new RelateNodeFactory());
 
   // this intersection matrix will hold the results compute for the relate
   private final ArrayList isolatedEdges = new ArrayList();
+
+  private final LineIntersector li = new RobustLineIntersector();
+
+  private final NodeMap nodes = new NodeMap(new RelateNodeFactory());
+
+  private final PointLocator ptLocator = new PointLocator();
 
   public RelateComputer(final GeometryGraph[] arg) {
     this.arg = arg;

@@ -18,9 +18,9 @@ import com.revolsys.util.WrappedException;
 
 public class ServletContextResource extends AbstractResource implements ContextResource {
 
-  private final ServletContext servletContext;
-
   private final String path;
+
+  private final ServletContext servletContext;
 
   public ServletContextResource(final ServletContext servletContext, final String path) {
     // check ServletContext

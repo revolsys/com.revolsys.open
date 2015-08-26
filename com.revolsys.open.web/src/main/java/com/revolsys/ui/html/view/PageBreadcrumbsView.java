@@ -21,9 +21,9 @@ import com.revolsys.ui.web.config.WebUiContext;
 import com.revolsys.util.HtmlUtil;
 
 public class PageBreadcrumbsView extends ObjectView {
-  private String cssClass = "breadcrumbsMenu";
-
   private final WebUiContext context;
+
+  private String cssClass = "breadcrumbsMenu";
 
   public PageBreadcrumbsView() {
     this.context = WebUiContext.get();

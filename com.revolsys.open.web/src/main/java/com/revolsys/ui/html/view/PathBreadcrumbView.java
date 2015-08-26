@@ -23,11 +23,11 @@ import com.revolsys.util.HtmlUtil;
 
 public class PathBreadcrumbView extends Element {
 
+  private boolean addSlash;
+
   private final String contextPath;
 
   private final String path;
-
-  private boolean addSlash;
 
   public PathBreadcrumbView(final String contextPath, final String path) {
     this.contextPath = contextPath;

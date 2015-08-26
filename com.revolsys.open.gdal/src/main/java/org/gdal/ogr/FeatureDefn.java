@@ -20,9 +20,9 @@ public class FeatureDefn {
     return getCPtr(obj);
   }
 
-  private long swigCPtr;
-
   protected boolean swigCMemOwn;
+
+  private long swigCPtr;
 
   public FeatureDefn() {
     this(ogrJNI.new_FeatureDefn__SWIG_1(), true);

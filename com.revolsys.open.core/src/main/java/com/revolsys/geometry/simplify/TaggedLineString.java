@@ -63,13 +63,13 @@ class TaggedLineString {
     return pts;
   }
 
-  private final LineString parentLine;
+  private final int minimumSize;
 
-  private TaggedLineSegment[] segs;
+  private final LineString parentLine;
 
   private final List resultSegs = new ArrayList();
 
-  private final int minimumSize;
+  private TaggedLineSegment[] segs;
 
   public TaggedLineString(final LineString parentLine) {
     this(parentLine, 2);

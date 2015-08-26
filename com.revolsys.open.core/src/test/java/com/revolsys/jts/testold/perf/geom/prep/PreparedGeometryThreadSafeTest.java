@@ -19,13 +19,13 @@ public class PreparedGeometryThreadSafeTest extends ThreadTestCase {
     ThreadTestRunner.run(new PreparedGeometryThreadSafeTest());
   }
 
-  int nPts = 1000;
-
   GeometryFactory factory = GeometryFactory.fixed(0, 1.0);
 
-  protected Geometry pg;
-
   protected Geometry g;
+
+  int nPts = 1000;
+
+  protected Geometry pg;
 
   public PreparedGeometryThreadSafeTest() {
 

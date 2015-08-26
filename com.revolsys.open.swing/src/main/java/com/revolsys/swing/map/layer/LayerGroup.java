@@ -85,9 +85,9 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     return null;
   }
 
-  private List<Layer> layers = new ArrayList<Layer>();
-
   private boolean deleted = false;
+
+  private List<Layer> layers = new ArrayList<Layer>();
 
   public LayerGroup() {
     this(null);

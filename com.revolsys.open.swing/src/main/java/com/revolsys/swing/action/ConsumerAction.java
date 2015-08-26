@@ -101,9 +101,9 @@ public class ConsumerAction extends AbstractActionMainMenuItemFactory {
     return menuItem(name, null, icon, null, false, handler);
   }
 
-  private final boolean invokeLater;
-
   private final Consumer<ActionEvent> handler;
+
+  private final boolean invokeLater;
 
   public ConsumerAction(final CharSequence name, final String toolTip, final Icon icon,
     final EnableCheck enableCheck, final boolean invokeLater, final Consumer<ActionEvent> handler) {

@@ -66,9 +66,9 @@ package com.revolsys.geometry.model;
  *@version 1.7
  */
 public class IntersectionMatrix implements Cloneable {
-  public static final int EXTERIOR = Location.EXTERIOR.getIndex();
-
   public static final int BOUNDARY = Location.BOUNDARY.getIndex();
+
+  public static final int EXTERIOR = Location.EXTERIOR.getIndex();
 
   public static final int INTERIOR = Location.INTERIOR.getIndex();
 

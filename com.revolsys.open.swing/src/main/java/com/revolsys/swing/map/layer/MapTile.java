@@ -11,15 +11,15 @@ import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImage;
 
 public abstract class MapTile {
-  private final double resolution;
+  private final BoundingBox boundingBox;
+
+  private final int height;
 
   private final Map<CoordinateSystem, GeoreferencedImage> projectedImages = new HashMap<CoordinateSystem, GeoreferencedImage>();
 
-  private final BoundingBox boundingBox;
+  private final double resolution;
 
   private final int width;
-
-  private final int height;
 
   public MapTile(final BoundingBox boundingBox, final int width, final int height,
     final double resolution) {

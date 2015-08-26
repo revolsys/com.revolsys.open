@@ -87,8 +87,6 @@ public class Bintree {
     return new Interval(min, max);
   }
 
-  private final Root root;
-
   /**
    *  Statistics
    *
@@ -100,6 +98,8 @@ public class Bintree {
    * only one feature will be inserted with this value.
    **/
   private double minExtent = 1.0;
+
+  private final Root root;
 
   public Bintree() {
     this.root = new Root();

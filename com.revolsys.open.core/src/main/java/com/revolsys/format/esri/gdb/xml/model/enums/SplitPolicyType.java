@@ -1,12 +1,12 @@
 package com.revolsys.format.esri.gdb.xml.model.enums;
 
 public enum SplitPolicyType {
-  /** Geometry-ratioed split policy. */
-  esriSPTGeometryRatio,
+  /** Default value split policy. */
+  esriSPTDefaultValue,
 
   /** Duplicate split policy. */
   esriSPTDuplicate,
 
-  /** Default value split policy. */
-  esriSPTDefaultValue;
+  /** Geometry-ratioed split policy. */
+  esriSPTGeometryRatio;
 }

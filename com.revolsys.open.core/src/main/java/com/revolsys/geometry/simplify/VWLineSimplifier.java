@@ -36,15 +36,15 @@ class VWLineSimplifier {
       return first;
     }
 
-    private final Point pt;
-
-    private VWLineSimplifier.VWVertex prev;
-
-    private VWLineSimplifier.VWVertex next;
-
     private double area = MAX_AREA;
 
     private boolean isLive = true;
+
+    private VWLineSimplifier.VWVertex next;
+
+    private VWLineSimplifier.VWVertex prev;
+
+    private final Point pt;
 
     public VWVertex(final Point pt) {
       this.pt = pt;

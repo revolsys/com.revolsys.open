@@ -13,9 +13,9 @@ import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
 public class ButtonsToolbarElement extends Element {
-  private final Menu menu;
-
   private JexlHttpServletRequestContext jexlContext;
+
+  private final Menu menu;
 
   public ButtonsToolbarElement(final Menu menu) {
     this.menu = menu;

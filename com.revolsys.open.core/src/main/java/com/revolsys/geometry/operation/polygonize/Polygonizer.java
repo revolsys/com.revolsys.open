@@ -78,22 +78,22 @@ public class Polygonizer {
     }
   }
 
-  protected PolygonizeGraph graph;
+  protected List cutEdges = new ArrayList();
 
   // initialize with empty collections, in case nothing is computed
   protected Collection dangles = new ArrayList();
 
-  protected List cutEdges = new ArrayList();
-
-  protected List invalidRingLines = new ArrayList();
+  protected PolygonizeGraph graph;
 
   protected List holeList = null;
 
-  protected List shellList = null;
+  protected List invalidRingLines = new ArrayList();
+
+  private boolean isCheckingRingsValid = true;
 
   protected List polyList = null;
 
-  private boolean isCheckingRingsValid = true;
+  protected List shellList = null;
 
   /**
    * Create a polygonizer with the same {@link GeometryFactory}

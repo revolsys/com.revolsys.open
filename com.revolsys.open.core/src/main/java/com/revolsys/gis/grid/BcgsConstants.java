@@ -1,8 +1,6 @@
 package com.revolsys.gis.grid;
 
 public interface BcgsConstants {
-  public static final String REGEX_HUNDRETH_NUMBER = "(100|0[1-9][0-9]|00[1-9])";
-
   double HEIGHT_1000 = 0.005;
 
   double HEIGHT_10000 = 0.05;
@@ -19,29 +17,31 @@ public interface BcgsConstants {
 
   double HEIGHT_5000 = 0.025;
 
+  String REGEX_20000 = NtsConstants.REGEX_250000 + "\\.?" + "(100|0[1-9][0-9]|00[1-9])";
+
+  String REGEX_10000 = REGEX_20000 + "\\.?" + "([1-4])";
+
+  String REGEX_5000 = REGEX_10000 + "\\.?" + "([1-4])";
+
+  String REGEX_2500 = REGEX_5000 + "\\.?" + "([1-4])";
+
+  String REGEX_2000 = REGEX_20000 + "\\.?" + "(100|0[1-9][0-9]|00[1-9])";
+
+  String REGEX_1250 = REGEX_2500 + "\\.?" + "([1-4])";
+
+  String REGEX_1000 = REGEX_2000 + "\\.?" + "([1-4])";
+
+  String REGEX_500 = REGEX_1000 + "\\.?" + "([1-4])";
+
   String REGEX_EIGHTH_LETTER = "([a-hA-H])";
+
+  public static final String REGEX_HUNDRETH_NUMBER = "(100|0[1-9][0-9]|00[1-9])";
 
   String REGEX_QUARTER = "([nsNS])\\.?([ewEW])\\.?";
 
   String REGEX_QUARTER_NUMBER = "([1-4])";
 
   String REGEX_SIXTEENTH_LETTER = "([a-pA-P])";
-
-  String REGEX_20000 = NtsConstants.REGEX_250000 + "\\.?" + REGEX_HUNDRETH_NUMBER;
-
-  String REGEX_2000 = REGEX_20000 + "\\.?" + REGEX_HUNDRETH_NUMBER;
-
-  String REGEX_10000 = REGEX_20000 + "\\.?" + REGEX_QUARTER_NUMBER;
-
-  String REGEX_1000 = REGEX_2000 + "\\.?" + REGEX_QUARTER_NUMBER;
-
-  String REGEX_5000 = REGEX_10000 + "\\.?" + REGEX_QUARTER_NUMBER;
-
-  String REGEX_2500 = REGEX_5000 + "\\.?" + REGEX_QUARTER_NUMBER;
-
-  String REGEX_1250 = REGEX_2500 + "\\.?" + REGEX_QUARTER_NUMBER;
-
-  String REGEX_500 = REGEX_1000 + "\\.?" + REGEX_QUARTER_NUMBER;
 
   double WIDTH_1000 = 0.01;
 

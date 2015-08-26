@@ -39,11 +39,11 @@ package com.revolsys.geometry.util;
  *
  */
 public class Memory {
+  public static final double GB = 1073741824;
+
   public static final double KB = 1024;
 
   public static final double MB = 1048576;
-
-  public static final double GB = 1073741824;
 
   public static String allString() {
     return "Used: " + usedString() + "   Free: " + freeString() + "   Total: " + totalString();

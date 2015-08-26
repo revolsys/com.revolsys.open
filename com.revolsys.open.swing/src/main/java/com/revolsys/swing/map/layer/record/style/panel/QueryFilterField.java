@@ -24,11 +24,11 @@ public class QueryFilterField extends ValueField implements PropertyChangeListen
    */
   private static final long serialVersionUID = 1L;
 
-  private final TextArea queryField;
-
   private final JButton clearButton;
 
   private final AbstractRecordLayer layer;
+
+  private final TextArea queryField;
 
   public QueryFilterField(final AbstractRecordLayer layer, final String fieldName,
     final String query) {

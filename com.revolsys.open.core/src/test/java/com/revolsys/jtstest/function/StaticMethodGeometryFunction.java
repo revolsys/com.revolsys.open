@@ -52,11 +52,11 @@ import junit.framework.Assert;
  *
  */
 public class StaticMethodGeometryFunction extends BaseGeometryFunction {
+  private static final String DESCRIPTION_SUFFIX = "Description";
+
   private static final String FUNCTIONS_SUFFIX = "Functions";
 
   private static final String PARAMETERS_SUFFIX = "Parameters";
-
-  private static final String DESCRIPTION_SUFFIX = "Description";
 
   /**
    * Creates an arg array which includes the target geometry as the first argument

@@ -13,13 +13,13 @@ import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.WrappedException;
 
 public class ResourceEndianOutput implements EndianOutput {
-  private final Resource resource;
-
-  private OutputStream resourceOut;
-
   private final File file;
 
   private EndianOutput out;
+
+  private final Resource resource;
+
+  private OutputStream resourceOut;
 
   public ResourceEndianOutput(final Resource resource) throws IOException {
     this.resource = resource;

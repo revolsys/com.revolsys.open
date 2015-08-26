@@ -52,25 +52,25 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
     return (V)value;
   }
 
-  private boolean visible = true;
-
   private boolean allowsChildren;
-
-  private Object userObject;
-
-  private Reference<BaseTreeNode> parent;
-
-  private String name;
-
-  private Icon icon;
 
   private Icon disabledIcon;
 
-  private String type;
+  private Icon icon;
+
+  private String name;
+
+  private Reference<BaseTreeNode> parent;
 
   private JTree tree;
 
+  private String type;
+
+  private Object userObject;
+
   private boolean userObjectInitialized = true;
+
+  private boolean visible = true;
 
   public BaseTreeNode(final boolean allowsChildren) {
     this(null, allowsChildren);

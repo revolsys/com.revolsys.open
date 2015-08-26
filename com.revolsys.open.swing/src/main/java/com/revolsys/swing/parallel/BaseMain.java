@@ -54,9 +54,9 @@ public class BaseMain implements UncaughtExceptionHandler {
     }
   }
 
-  private final String name;
-
   private String lookAndFeelName;
+
+  private final String name;
 
   public BaseMain(final String name) {
     this.name = name;

@@ -12,9 +12,9 @@ public class PointLineStringMetrics {
 
   private final double distanceAlong;
 
-  private final Side side;
-
   private final double lineLength;
+
+  private final Side side;
 
   public PointLineStringMetrics(final double lineLength, final double distanceAlong,
     final double distance, final Side side) {

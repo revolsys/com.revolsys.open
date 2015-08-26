@@ -3,11 +3,11 @@ package com.revolsys.format.esri.gdb.xml.model;
 import java.util.List;
 
 public class Subtype {
-  private String subtypePath;
+  private List<SubtypeFieldInfo> fieldInfos;
 
   private int subtypeCode;
 
-  private List<SubtypeFieldInfo> fieldInfos;
+  private String subtypePath;
 
   public List<SubtypeFieldInfo> getFieldInfos() {
     return this.fieldInfos;

@@ -214,18 +214,18 @@ public class WKBWriter {
     return (char)('A' + (n - 10));
   }
 
-  private int outputDimension = 2;
-
-  private final int byteOrder;
-
-  private boolean includeSRID = false;
+  // holds output data values
+  private final byte[] buf = new byte[8];
 
   private final ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
 
   private final OutStream byteArrayOutStream = new OutputStreamOutStream(this.byteArrayOS);
 
-  // holds output data values
-  private final byte[] buf = new byte[8];
+  private final int byteOrder;
+
+  private boolean includeSRID = false;
+
+  private int outputDimension = 2;
 
   /**
    * Creates a writer that writes {@link Geometry}s with

@@ -28,10 +28,10 @@ import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.web.servlet.HttpServletLogUtil;
 
 public class DisplayElementTag extends TagSupport {
+  private static final Logger log = LoggerFactory.getLogger(DisplayElementTag.class);
+
   /** The unique serial version UID for the class. */
   private static final long serialVersionUID = 7616198383718213550L;
-
-  private static final Logger log = LoggerFactory.getLogger(DisplayElementTag.class);
 
   private String name;
 

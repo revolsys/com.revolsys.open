@@ -43,8 +43,6 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
  * @version 1.7
  */
 public class SpatialIndexTester {
-  private static boolean VERBOSE = false;
-
   private static final double CELL_EXTENT = 20.31;
 
   private static final int CELLS_PER_GRID_SIDE = 10;
@@ -57,11 +55,13 @@ public class SpatialIndexTester {
 
   private static final double QUERY_ENVELOPE_EXTENT_2 = 11.7;
 
+  private static boolean VERBOSE = false;
+
   private SpatialIndex index;
 
-  private ArrayList sourceData;
-
   private boolean isSuccess = true;
+
+  private ArrayList sourceData;
 
   public SpatialIndexTester() {
   }

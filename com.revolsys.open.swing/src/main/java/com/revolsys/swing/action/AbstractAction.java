@@ -18,12 +18,12 @@ import com.revolsys.util.OS;
 public abstract class AbstractAction extends javax.swing.AbstractAction {
   private static final long serialVersionUID = 1L;
 
-  private final ActionEnabledPropertyChangeListener enabledListener = new ActionEnabledPropertyChangeListener(
-    this);
-
   private boolean checkBox;
 
   private EnableCheck enableCheck;
+
+  private final ActionEnabledPropertyChangeListener enabledListener = new ActionEnabledPropertyChangeListener(
+    this);
 
   public JButton createButton() {
     final Button button = new Button(this);

@@ -14,9 +14,9 @@ public class PolygonSegment extends AbstractSegment implements Iterator<Segment>
    */
   private static final long serialVersionUID = 1L;
 
-  private int segmentIndex;
-
   private int ringIndex;
+
+  private int segmentIndex;
 
   public PolygonSegment(final Polygon polygon, final int... segmentId) {
     super(polygon);

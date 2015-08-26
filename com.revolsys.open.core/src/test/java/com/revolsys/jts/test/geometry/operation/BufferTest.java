@@ -88,21 +88,21 @@ public class BufferTest extends TestCase {
     return suite;
   }
 
-  private final Geometry source;
+  private final double distance;
 
   private final Geometry expected;
 
-  private final BufferParameters parameters;
+  private final Double expectedArea;
 
-  private final double distance;
+  private final Boolean expectedContains;
 
   private final Boolean expectedEmpty;
 
   private final Boolean expectedHoles;
 
-  private final Boolean expectedContains;
+  private final BufferParameters parameters;
 
-  private final Double expectedArea;
+  private final Geometry source;
 
   public BufferTest(final int index, final Geometry source, final double distance,
     final BufferParameters parameters, final Boolean expectedEmpty, final Boolean expectedHoles,

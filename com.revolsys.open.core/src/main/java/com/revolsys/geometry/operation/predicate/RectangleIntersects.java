@@ -54,9 +54,9 @@ import com.revolsys.geometry.model.util.ShortCircuitedGeometryVisitor;
  * @version 1.7
  */
 class EnvelopeIntersectsVisitor extends ShortCircuitedGeometryVisitor {
-  private final BoundingBox rectEnv;
-
   private boolean intersects = false;
+
+  private final BoundingBox rectEnv;
 
   public EnvelopeIntersectsVisitor(final BoundingBox rectEnv) {
     this.rectEnv = rectEnv;
@@ -122,11 +122,11 @@ class EnvelopeIntersectsVisitor extends ShortCircuitedGeometryVisitor {
  * @version 1.7
  */
 class GeometryContainsPointVisitor extends ShortCircuitedGeometryVisitor {
-  private final LineString rectSeq;
+  private boolean containsPoint = false;
 
   private final BoundingBox rectEnv;
 
-  private boolean containsPoint = false;
+  private final LineString rectSeq;
 
   public GeometryContainsPointVisitor(final Polygon rectangle) {
     this.rectSeq = rectangle.getShell();
@@ -275,11 +275,11 @@ public class RectangleIntersects {
  *
  */
 class RectangleIntersectsSegmentVisitor extends ShortCircuitedGeometryVisitor {
+  private boolean hasIntersection = false;
+
   private final BoundingBox rectEnv;
 
   private final RectangleLineIntersector rectIntersector;
-
-  private boolean hasIntersection = false;
 
   /**
    * Creates a visitor for checking rectangle intersection

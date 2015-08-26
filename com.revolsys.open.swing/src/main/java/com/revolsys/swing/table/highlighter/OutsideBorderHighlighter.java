@@ -13,15 +13,15 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 
 public class OutsideBorderHighlighter extends AbstractHighlighter {
 
-  private final Border topBorder;
-
-  private final Border middleBorder;
-
   private final Border bottomBorder;
+
+  private final boolean compound;
 
   private final boolean inner;
 
-  private final boolean compound;
+  private final Border middleBorder;
+
+  private final Border topBorder;
 
   public OutsideBorderHighlighter(final HighlightPredicate predicate, final Color color,
     final int thickness, final boolean compound, final boolean inner) {

@@ -15,9 +15,9 @@ import com.revolsys.spring.resource.Resource;
 public class RecordDirectoryReader extends AbstractDirectoryReader<Record>
   implements RecordDefinitionFactory {
 
-  private final Map<String, RecordDefinition> typePathRecordDefinitionMap = new HashMap<String, RecordDefinition>();
-
   private Statistics statistics = new Statistics();
+
+  private final Map<String, RecordDefinition> typePathRecordDefinitionMap = new HashMap<String, RecordDefinition>();
 
   public RecordDirectoryReader() {
   }

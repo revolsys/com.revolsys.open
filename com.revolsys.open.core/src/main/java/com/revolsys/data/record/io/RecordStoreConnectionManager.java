@@ -24,6 +24,11 @@ public class RecordStoreConnectionManager
 
   private static final RecordStoreConnectionManager INSTANCE;
 
+  // TODO make this garbage collectable with reference counting.
+  private static Map<Map<String, Object>, RecordStore> recordStoreByConfig = new HashMap<>();
+
+  private static Map<Map<String, Object>, AtomicInteger> recordStoreCounts = new HashMap<>();
+
   static {
     INSTANCE = new RecordStoreConnectionManager();
     final File appsDirectory = OS.getApplicationDataDirectory();
@@ -35,11 +40,6 @@ public class RecordStoreConnectionManager
       .getApplicationDataDirectory("com.revolsys.gis/Record Stores");
     INSTANCE.addConnectionRegistry("User", new FileSystemResource(recordStoresDirectory));
   }
-
-  // TODO make this garbage collectable with reference counting.
-  private static Map<Map<String, Object>, RecordStore> recordStoreByConfig = new HashMap<>();
-
-  private static Map<Map<String, Object>, AtomicInteger> recordStoreCounts = new HashMap<>();
 
   public static RecordStoreConnectionManager get() {
     return INSTANCE;

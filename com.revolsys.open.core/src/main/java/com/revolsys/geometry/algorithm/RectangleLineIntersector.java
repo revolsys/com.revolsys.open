@@ -53,18 +53,18 @@ import com.revolsys.geometry.model.impl.PointDouble;
  *
  */
 public class RectangleLineIntersector {
-  // for intersection testing, don't need to set precision model
-  private final LineIntersector li = new RobustLineIntersector();
+  private final Point diagDown0;
 
-  private final BoundingBox rectEnv;
+  private final Point diagDown1;
 
   private final Point diagUp0;
 
   private final Point diagUp1;
 
-  private final Point diagDown0;
+  // for intersection testing, don't need to set precision model
+  private final LineIntersector li = new RobustLineIntersector();
 
-  private final Point diagDown1;
+  private final BoundingBox rectEnv;
 
   /**
    * Creates a new intersector for the given query rectangle,

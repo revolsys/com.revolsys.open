@@ -46,9 +46,9 @@ import com.revolsys.geometry.model.Point;
  * @version 1.7
  */
 public class PointBuilder {
-  private final OverlayOp op;
-
   private final GeometryFactory geometryFactory;
+
+  private final OverlayOp op;
 
   private final List<Point> resultLineString = new ArrayList<Point>();
 

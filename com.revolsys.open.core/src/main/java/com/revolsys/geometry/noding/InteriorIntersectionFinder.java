@@ -47,15 +47,15 @@ import com.revolsys.geometry.model.Point;
 public class InteriorIntersectionFinder implements SegmentIntersector {
   private boolean findAllIntersections = false;
 
-  private boolean isCheckEndSegmentsOnly = false;
-
-  private final LineIntersector li;
-
   private Point interiorIntersection = null;
+
+  private final List intersections = new ArrayList();
 
   private Point[] intSegments = null;
 
-  private final List intersections = new ArrayList();
+  private boolean isCheckEndSegmentsOnly = false;
+
+  private final LineIntersector li;
 
   /**
    * Creates an intersection finder which finds an interior intersection

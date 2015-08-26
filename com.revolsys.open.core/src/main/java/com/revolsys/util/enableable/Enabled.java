@@ -1,11 +1,11 @@
 package com.revolsys.util.enableable;
 
 public class Enabled implements AutoCloseable {
-  private boolean originalEnabled;
-
   private final Enableable enableable;
 
   private final boolean enabled;
+
+  private boolean originalEnabled;
 
   public Enabled(final Enableable enableable, final boolean enabled) {
     this.enableable = enableable;

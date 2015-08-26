@@ -50,17 +50,17 @@ import com.revolsys.geometry.model.Point;
  * @version 1.7
  */
 public class LinearGeometryBuilder {
-  private final GeometryFactory geomFact;
-
-  private final List lines = new ArrayList();
-
   private CoordinateList coordList = null;
-
-  private boolean ignoreInvalidLines = false;
 
   private boolean fixInvalidLines = false;
 
+  private final GeometryFactory geomFact;
+
+  private boolean ignoreInvalidLines = false;
+
   private Point lastPt = null;
+
+  private final List lines = new ArrayList();
 
   public LinearGeometryBuilder(final GeometryFactory geomFact) {
     this.geomFact = geomFact;

@@ -39,20 +39,20 @@ public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor, Or
   /** The LOG for the instance. */
   private static final Logger LOG = Logger.getLogger(DatabaseConfigurer.class);
 
+  /** The data source used to load properties from. */
+  private DataSource dataSource;
+
+  /** The name of the column containing property keys. */
+  private String keyColumnName = "key";
+
   /**
    * The order value of this object, higher value meaning greater in terms of
    * sorting.
    */
   private int order = Integer.MAX_VALUE;
 
-  /** The data source used to load properties from. */
-  private DataSource dataSource;
-
   /** The name of the table containing configuration properties. */
   private String tableName;
-
-  /** The name of the column containing property keys. */
-  private String keyColumnName = "key";
 
   /** The name of the column containing property values. */
   private String valueColumnName = "value";

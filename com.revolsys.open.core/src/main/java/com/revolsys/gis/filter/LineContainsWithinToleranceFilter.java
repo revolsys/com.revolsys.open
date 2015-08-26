@@ -27,13 +27,13 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 
 public class LineContainsWithinToleranceFilter implements Predicate<LineString> {
-  private final LineString points;
-
   private BoundingBox envelope;
 
-  private double tolerance;
-
   private boolean flip = false;
+
+  private final LineString points;
+
+  private double tolerance;
 
   public LineContainsWithinToleranceFilter(final LineString line) {
     this.points = line;

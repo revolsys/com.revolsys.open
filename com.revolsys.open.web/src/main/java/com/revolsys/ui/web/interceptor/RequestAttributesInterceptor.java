@@ -18,10 +18,10 @@ import org.springframework.web.util.UrlPathHelper;
 public class RequestAttributesInterceptor implements HandlerInterceptor {
   private Map<String, Map<String, Object>> attributeMappings = new LinkedHashMap<String, Map<String, Object>>();
 
+  private PathMatcher pathMatcher = new AntPathMatcher();
+
   /** The UrlPathHelper to use for resolution of lookup paths. */
   private UrlPathHelper urlPathHelper = new UrlPathHelper();
-
-  private PathMatcher pathMatcher = new AntPathMatcher();
 
   public RequestAttributesInterceptor() {
     this.urlPathHelper.setAlwaysUseFullPath(true);

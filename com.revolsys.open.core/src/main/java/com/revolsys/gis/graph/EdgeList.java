@@ -7,9 +7,9 @@ import java.util.List;
 
 public class EdgeList<T> extends AbstractList<Edge<T>> {
 
-  private final Graph<T> graph;
-
   private List<Integer> edgeIds;
+
+  private final Graph<T> graph;
 
   public EdgeList(final Graph<T> graph) {
     this(graph, new ArrayList<Integer>());

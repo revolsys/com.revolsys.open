@@ -55,26 +55,6 @@ public class DirectedEdge extends EdgeEnd {
     return 0;
   }
 
-  protected boolean isForward;
-
-  private boolean isInResult = false;
-
-  private boolean isVisited = false;
-
-  private DirectedEdge sym; // the symmetric edge
-
-  private DirectedEdge next; // the next edge in the edge ring for the polygon
-
-  // containing this edge
-
-  private DirectedEdge nextMin; // the next edge in the MinimalEdgeRing that
-
-  // contains this edge
-
-  private EdgeRing edgeRing; // the EdgeRing that this edge is part of
-
-  private EdgeRing minEdgeRing; // the MinimalEdgeRing that this edge is part of
-
   /**
    * The depth of each side (position) of this edge.
    * The 0 element of the array is never used.
@@ -82,6 +62,26 @@ public class DirectedEdge extends EdgeEnd {
   private final int[] depth = {
     0, -999, -999
   };
+
+  private EdgeRing edgeRing; // the EdgeRing that this edge is part of
+
+  protected boolean isForward;
+
+  private boolean isInResult = false;
+
+  private boolean isVisited = false;
+
+  // containing this edge
+
+  private EdgeRing minEdgeRing; // the MinimalEdgeRing that this edge is part of
+
+  // contains this edge
+
+  private DirectedEdge next; // the next edge in the edge ring for the polygon
+
+  private DirectedEdge nextMin; // the next edge in the MinimalEdgeRing that
+
+  private DirectedEdge sym; // the symmetric edge
 
   public DirectedEdge(final Edge edge, final boolean isForward) {
     super(edge);

@@ -22,11 +22,11 @@ import org.springframework.security.core.Authentication;
 public class MethodSecurityEvaluationContext extends StandardEvaluationContext {
   private static Log logger = LogFactory.getLog(MethodSecurityEvaluationContext.class);
 
-  private ParameterNameDiscoverer parameterNameDiscoverer;
-
   private boolean argumentsAdded;
 
   private final MethodInvocation mi;
+
+  private ParameterNameDiscoverer parameterNameDiscoverer;
 
   /**
    * Intended for testing. Don't use in practice as it creates a new parameter

@@ -15,9 +15,9 @@ public class BPlusTreeList<T> extends AbstractList<T> {
     return new BPlusTreeList<T>(pageManager, valueManager);
   }
 
-  private final Map<Integer, T> tree;
-
   int size = 0;
+
+  private final Map<Integer, T> tree;
 
   public BPlusTreeList(final PageManager pageManager, final PageValueManager<T> valueSerializer) {
     final ComparableComparator<Integer> comparator = new ComparableComparator<Integer>();

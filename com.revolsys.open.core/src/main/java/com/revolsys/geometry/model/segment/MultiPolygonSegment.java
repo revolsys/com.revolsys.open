@@ -15,11 +15,11 @@ public class MultiPolygonSegment extends AbstractSegment implements Iterator<Seg
    */
   private static final long serialVersionUID = 1L;
 
-  private int segmentIndex;
+  private int partIndex;
 
   private int ringIndex;
 
-  private int partIndex;
+  private int segmentIndex;
 
   public MultiPolygonSegment(final MultiPolygon multiPolygon, final int... segmentId) {
     super(multiPolygon);

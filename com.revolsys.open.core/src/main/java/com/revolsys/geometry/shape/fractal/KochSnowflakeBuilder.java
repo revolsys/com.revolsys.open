@@ -43,12 +43,12 @@ import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.shape.GeometricShapeBuilder;
 
 public class KochSnowflakeBuilder extends GeometricShapeBuilder {
-  private static final double ONE_THIRD = 1.0 / 3.0;
-
   /**
    * The height of an equilateral triangle of side one
    */
   private static final double HEIGHT_FACTOR = Math.sin(Math.PI / 3.0);
+
+  private static final double ONE_THIRD = 1.0 / 3.0;
 
   private static final double THIRD_HEIGHT = HEIGHT_FACTOR / 3.0;
 

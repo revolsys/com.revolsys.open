@@ -43,9 +43,9 @@ import java.util.Collection;
  * @author Martin Davis
  */
 public class LastFoundQuadEdgeLocator implements QuadEdgeLocator {
-  private final QuadEdgeSubdivision subdiv;
-
   private QuadEdge lastEdge = null;
+
+  private final QuadEdgeSubdivision subdiv;
 
   public LastFoundQuadEdgeLocator(final QuadEdgeSubdivision subdiv) {
     this.subdiv = subdiv;

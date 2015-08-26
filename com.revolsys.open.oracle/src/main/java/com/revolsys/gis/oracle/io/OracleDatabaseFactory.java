@@ -34,9 +34,9 @@ jdbc:oracle:oci:@<host>:<port>/<service>
 public class OracleDatabaseFactory extends AbstractJdbcDatabaseFactory {
   public static final String URL_REGEX = "jdbc:oracle:thin:(.+)";
 
-  public static final List<String> URL_PATTERNS = Arrays.asList(URL_REGEX);
-
   private static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX);
+
+  public static final List<String> URL_PATTERNS = Arrays.asList(URL_REGEX);
 
   public static List<String> getTnsConnectionNames() {
     File tnsFile = new File(System.getProperty("oracle.net.tns_admin"), "tnsnames.ora");

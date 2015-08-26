@@ -20,9 +20,9 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
 
   private XMLStreamReader in;
 
-  private final boolean single;
-
   private Resource resource;
+
+  private final boolean single;
 
   public XmlMapIterator(final Resource resource) {
     this(resource, false);

@@ -17,11 +17,11 @@ import com.revolsys.util.Property;
 public class FileField extends ValueField implements Field {
   private static final long serialVersionUID = -8433151755294925911L;
 
-  private final TextField fileName = new TextField(70);
-
   private final JButton browseButton = new JButton();
 
   private final JFileChooser fileChooser = new JFileChooser();
+
+  private final TextField fileName = new TextField(70);
 
   public FileField(final int fileSelectionMode) {
     this("file", fileSelectionMode);

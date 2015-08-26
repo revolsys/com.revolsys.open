@@ -27,9 +27,9 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
 
   private final JComponent component;
 
-  private int maxIntegerDigits;
-
   private int maxDecimalDigits;
+
+  private int maxIntegerDigits;
 
   public ComponentViewport2D(final Project project, final JComponent component) {
     super(project);

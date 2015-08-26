@@ -71,13 +71,13 @@ public class LineStringSnapper {
     return pts.getPoint(0).equals(2, pts.getPoint(pts.getVertexCount() - 1));
   }
 
-  private double snapTolerance = 0.0;
-
-  private final LineString srcPts;
-
   private boolean allowSnappingToSourceVertices = false;
 
   private boolean isClosed = false;
+
+  private double snapTolerance = 0.0;
+
+  private final LineString srcPts;
 
   /**
    * Creates a new snapper using the given points

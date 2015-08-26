@@ -37,10 +37,10 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVi
   private static final Logger LOG = LoggerFactory
     .getLogger(LinearIntersectionNotEqualLineEdgeCleanupVisitor.class);
 
+  private Statistics duplicateStatistics;
+
   private Set<String> equalExcludeFieldNames = new HashSet<String>(
     Arrays.asList(RecordEquals.EXCLUDE_ID, RecordEquals.EXCLUDE_GEOMETRY));
-
-  private Statistics duplicateStatistics;
 
   private Comparator<Record> newerComparator;
 

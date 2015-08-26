@@ -24,17 +24,17 @@ import org.springframework.security.core.Authentication;
 
 public class RsMethodSecurityExpressionHandler implements MethodSecurityExpressionHandler {
 
+  private final ExpressionParser expressionParser = new SpelExpressionParser();
+
   protected final Log logger = LogFactory.getLog(getClass());
 
   private ParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
   private PermissionEvaluator permissionEvaluator = new DenyAllPermissionEvaluator();
 
-  private AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
-
-  private final ExpressionParser expressionParser = new SpelExpressionParser();
-
   private RoleHierarchy roleHierarchy;
+
+  private AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
 
   public RsMethodSecurityExpressionHandler() {
   }

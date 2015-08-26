@@ -35,13 +35,13 @@ public class GeoNamesBoundingBoxLayerWorker extends AbstractSwingWorker<List<Lay
     return layer;
   }
 
-  private final BoundingBoxRecordLayer layer;
-
   private final BoundingBox boundingBox;
+
+  private final GeometryFactory geometryFactory;
 
   private final GeoNamesService geoNamesService = new GeoNamesService();
 
-  private final GeometryFactory geometryFactory;
+  private final BoundingBoxRecordLayer layer;
 
   public GeoNamesBoundingBoxLayerWorker(final BoundingBoxRecordLayer layer,
     final BoundingBox boundingBox) {

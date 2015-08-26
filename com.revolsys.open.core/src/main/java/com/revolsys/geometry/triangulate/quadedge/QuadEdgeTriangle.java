@@ -159,9 +159,9 @@ public class QuadEdgeTriangle {
     return tri;
   }
 
-  private QuadEdge[] edge;
-
   private Object data;
+
+  private QuadEdge[] edge;
 
   /**
    * Creates a new triangle from the given edges.

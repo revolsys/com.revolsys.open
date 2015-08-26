@@ -9,37 +9,37 @@ import com.revolsys.util.Property;
 
 public class DETable extends DEDataset {
 
-  private boolean hasOID;
-
-  private String oidFieldName;
-
-  private List<Field> fields = new ArrayList<Field>();
-
-  private List<Index> indexes = new ArrayList<Index>();
+  private String aliasName;
 
   private String clsid = "{7A566981-C114-11D2-8A28-006097AFF44E}";
 
-  private String extclsid = "";
-
-  private List<String> relationshipClassNames = new ArrayList<String>();
-
-  private String aliasName;
-
-  private String modelName = "";
-
-  private String globalIDFieldName = "";
-
-  private String rasterFieldName = "";
-
-  private List<PropertySetProperty> extensionProperties = new ArrayList<PropertySetProperty>();
-
-  private String subtypeFieldName;
+  private List<ControllerMembership> controllerMemberships = new ArrayList<ControllerMembership>();
 
   private String defaultSubtypeCode;
 
-  private List<Subtype> subtypes = null;
+  private String extclsid = "";
 
-  private List<ControllerMembership> controllerMemberships = new ArrayList<ControllerMembership>();
+  private List<PropertySetProperty> extensionProperties = new ArrayList<PropertySetProperty>();
+
+  private List<Field> fields = new ArrayList<Field>();
+
+  private String globalIDFieldName = "";
+
+  private boolean hasOID;
+
+  private List<Index> indexes = new ArrayList<Index>();
+
+  private String modelName = "";
+
+  private String oidFieldName;
+
+  private String rasterFieldName = "";
+
+  private List<String> relationshipClassNames = new ArrayList<String>();
+
+  private String subtypeFieldName;
+
+  private List<Subtype> subtypes = null;
 
   public DETable() {
     setDatasetType(EsriGeodatabaseXmlConstants.DATASET_TYPE_TABLE);

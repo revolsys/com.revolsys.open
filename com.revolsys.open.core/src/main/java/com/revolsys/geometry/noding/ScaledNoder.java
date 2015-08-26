@@ -57,15 +57,15 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
  * @version 1.7
  */
 public class ScaledNoder implements Noder {
-  private final Noder noder;
+  private boolean isScaled = false;
 
-  private final double scaleFactor;
+  private final Noder noder;
 
   private double offsetX;
 
   private double offsetY;
 
-  private boolean isScaled = false;
+  private final double scaleFactor;
 
   public ScaledNoder(final Noder noder, final double scaleFactor) {
     this(noder, scaleFactor, 0, 0);

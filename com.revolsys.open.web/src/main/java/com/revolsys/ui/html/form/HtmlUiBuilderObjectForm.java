@@ -31,11 +31,11 @@ public class HtmlUiBuilderObjectForm extends Form {
 
   private final HtmlUiBuilder builder;
 
-  private final String typeLabel;
-
   private List<String> fieldKeys;
 
   private final Object object;
+
+  private final String typeLabel;
 
   public HtmlUiBuilderObjectForm(final Object object, final HtmlUiBuilder uiBuilder,
     final List<String> fieldKeys) {

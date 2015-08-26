@@ -16,9 +16,9 @@ import com.revolsys.util.CompareUtil;
  * @author Paul Austin
  */
 public class EqualAttributeCountComparator implements Comparator<Record> {
-  private final Record object;
-
   private final List<String> fieldNames;
+
+  private final Record object;
 
   public EqualAttributeCountComparator(final Record object) {
     this(object, false);

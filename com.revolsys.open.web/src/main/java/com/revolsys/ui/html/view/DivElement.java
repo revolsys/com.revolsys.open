@@ -23,9 +23,9 @@ import com.revolsys.util.HtmlUtil;
  * @version 1.0
  */
 public class DivElement extends Element {
-  private final String cssClass;
-
   private final String content;
+
+  private final String cssClass;
 
   public DivElement(final String content) {
     this(null, content);

@@ -10,9 +10,9 @@ import javax.swing.undo.UndoableEdit;
 public abstract class AbstractUndoableEdit implements UndoableEdit, Serializable {
   private static final long serialVersionUID = 1L;
 
-  private boolean hasBeenDone = false;
-
   private boolean alive = true;
+
+  private boolean hasBeenDone = false;
 
   public AbstractUndoableEdit() {
   }

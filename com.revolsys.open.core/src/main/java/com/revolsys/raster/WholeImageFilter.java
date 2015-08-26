@@ -33,9 +33,9 @@ public abstract class WholeImageFilter extends AbstractBufferedImageOp
    */
   private static final long serialVersionUID = 1L;
 
-  protected Rectangle transformedSpace;
-
   protected Rectangle originalSpace;
+
+  protected Rectangle transformedSpace;
 
   /**
    * Construct a WholeImageFilter

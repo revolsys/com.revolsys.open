@@ -52,9 +52,9 @@ public class ScriptExecutorRunnable extends AbstractRunnable {
 
   private Map<String, Object> beans = new LinkedHashMap<String, Object>();
 
-  private final String script;
-
   private boolean logScriptInfo = true;
+
+  private final String script;
 
   public ScriptExecutorRunnable(final String script) {
     this.script = script;

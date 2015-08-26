@@ -32,11 +32,11 @@ import com.revolsys.geometry.model.Polygon;
 
 public final class DataTypes {
 
-  public static final DataType OBJECT = new SimpleDataType("object", Object.class);
-
   public static final DataType ANY_URI = new SimpleDataType("anyURI", URI.class);
 
   public static final DataType BASE64_BINARY = new SimpleDataType("base64Binary", byte[].class);
+
+  public static final DataType BLOB = new SimpleDataType("blob", Blob.class);
 
   public static final DataType BOOLEAN = new SimpleDataType("boolean", Boolean.class);
 
@@ -44,8 +44,7 @@ public final class DataTypes {
 
   static final Map<String, DataType> CLASS_TYPE_MAP = new HashMap<String, DataType>();
 
-  public static final DataType COLLECTION = new CollectionDataType("Collection", Collection.class,
-    OBJECT);
+  public static final DataType COLOR = new SimpleDataType("color", Color.class);
 
   public static final DataType DATA_OBJECT = new SimpleDataType("Record", Record.class);
 
@@ -74,8 +73,6 @@ public final class DataTypes {
 
   public static final DataType LINEAR_RING = new SimpleDataType("LinearRing", LinearRing.class);
 
-  public static final DataType LIST = new CollectionDataType("List", List.class, OBJECT);
-
   private static final Logger LOG = Logger.getLogger(DataTypes.class);
 
   public static final DataType LONG = new SimpleDataType("long", Long.class);
@@ -91,6 +88,13 @@ public final class DataTypes {
     MultiPolygon.class);
 
   static final Map<String, DataType> NAME_TYPE_MAP = new HashMap<String, DataType>();
+
+  public static final DataType OBJECT = new SimpleDataType("object", Object.class);
+
+  public static final DataType COLLECTION = new CollectionDataType("Collection", Collection.class,
+    OBJECT);
+
+  public static final DataType LIST = new CollectionDataType("List", List.class, OBJECT);
 
   public static final DataType POINT = new SimpleDataType("Point", Point.class);
 
@@ -108,10 +112,6 @@ public final class DataTypes {
   public static final DataType STRING = new SimpleDataType("string", String.class);
 
   public static final DataType URL = new SimpleDataType("url", java.net.URL.class);
-
-  public static final DataType BLOB = new SimpleDataType("blob", Blob.class);
-
-  public static final DataType COLOR = new SimpleDataType("color", Color.class);
 
   static {
     final Field[] fields = DataTypes.class.getDeclaredFields();

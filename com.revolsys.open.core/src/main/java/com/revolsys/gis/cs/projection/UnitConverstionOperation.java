@@ -4,13 +4,13 @@ import javax.measure.converter.UnitConverter;
 import javax.measure.unit.Unit;
 
 public class UnitConverstionOperation implements CoordinatesOperation {
+  private int axisCount = 0;
+
   private final UnitConverter converter;
 
   private final Unit sourceUnit;
 
   private final Unit targetUnit;
-
-  private int axisCount = 0;
 
   public UnitConverstionOperation(final Unit sourceUnit, final Unit targetUnit) {
     this.sourceUnit = sourceUnit;

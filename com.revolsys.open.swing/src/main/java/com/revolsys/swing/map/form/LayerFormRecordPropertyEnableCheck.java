@@ -12,11 +12,11 @@ import com.revolsys.util.Property;
 public class LayerFormRecordPropertyEnableCheck extends AbstractEnableCheck {
   private final Reference<RecordLayerForm> form;
 
+  private boolean inverse = false;
+
   private final String propertyName;
 
   private final Object value;
-
-  private boolean inverse = false;
 
   public LayerFormRecordPropertyEnableCheck(final RecordLayerForm form, final String propertyName) {
     this(form, propertyName, true);

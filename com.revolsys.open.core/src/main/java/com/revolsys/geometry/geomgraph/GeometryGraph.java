@@ -87,7 +87,21 @@ public class GeometryGraph extends PlanarGraph {
     return boundaryNodeRule.isInBoundary(boundaryCount) ? Location.BOUNDARY : Location.INTERIOR;
   }
 
+  private PointOnGeometryLocator areaPtLocator = null;
+
+  private final int argIndex; // the index of this geometry as an argument to a
+
+  private BoundaryNodeRule boundaryNodeRule = null;
+
+  private Collection<Node> boundaryNodes;
+
   private final Geometry geometry;
+
+  // spatial function (used for labelling)
+
+  private boolean hasTooFewPoints = false;
+
+  private Point invalidPoint = null;
 
   /**
    * The lineEdgeMap is a map of the linestring components of the
@@ -96,28 +110,14 @@ public class GeometryGraph extends PlanarGraph {
    */
   private final Map<LineString, Edge> lineEdgeMap = new HashMap<>();
 
-  private BoundaryNodeRule boundaryNodeRule = null;
+  // for use if geometry is not Polygonal
+  private final PointLocator ptLocator = new PointLocator();
 
   /**
    * If this flag is true, the Boundary Determination Rule will used when deciding
    * whether nodes are in the boundary or not
    */
   private boolean useBoundaryDeterminationRule = true;
-
-  private final int argIndex; // the index of this geometry as an argument to a
-
-  // spatial function (used for labelling)
-
-  private Collection<Node> boundaryNodes;
-
-  private boolean hasTooFewPoints = false;
-
-  private Point invalidPoint = null;
-
-  private PointOnGeometryLocator areaPtLocator = null;
-
-  // for use if geometry is not Polygonal
-  private final PointLocator ptLocator = new PointLocator();
 
   public GeometryGraph(final int argIndex, final Geometry geometry) {
     this(argIndex, geometry, BoundaryNodeRule.OGC_SFS_BOUNDARY_RULE);

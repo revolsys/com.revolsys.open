@@ -71,11 +71,11 @@ public class SnapOverlayOp {
     return overlayOp(g0, g1, OverlayOp.UNION);
   }
 
+  private CommonBitsRemover cbr;
+
   private final Geometry[] geom = new Geometry[2];
 
   private double snapTolerance;
-
-  private CommonBitsRemover cbr;
 
   public SnapOverlayOp(final Geometry g1, final Geometry g2) {
     this.geom[0] = g1;

@@ -71,11 +71,11 @@ import com.revolsys.ui.web.config.WebUiContext;
  * @see PageController#getScripts()
  */
 public class ScriptsTag extends TagSupport {
-  /** The unique serial version UID for the class. */
-  private static final long serialVersionUID = -2928296078151434180L;
-
   /** The logging instance. */
   private static final Logger log = Logger.getLogger(ScriptsTag.class);
+
+  /** The unique serial version UID for the class. */
+  private static final long serialVersionUID = -2928296078151434180L;
 
   /**
    * Process the end tag.

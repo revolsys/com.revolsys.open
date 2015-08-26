@@ -21,11 +21,11 @@ import com.revolsys.gis.postgresql.type.PostgreSQLGeometryWrapper;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 
 public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
+  private final int axisCount;
+
   private final GeometryFactory geometryFactory;
 
   private final int srid;
-
-  private final int axisCount;
 
   public PostgreSQLGeometryJdbcFieldDefinition(final String dbName, final String name,
     final DataType type, final boolean required, final String description,

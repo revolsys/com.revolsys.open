@@ -52,9 +52,9 @@ import com.revolsys.geometry.util.GeometricShapeFactory;
  *
  */
 public class SineStarFactory extends GeometricShapeFactory {
-  protected int numArms = 8;
-
   protected double armLengthRatio = 0.5;
+
+  protected int numArms = 8;
 
   /**
    * Creates a factory which will create sine stars using the default

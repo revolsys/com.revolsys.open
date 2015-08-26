@@ -23,25 +23,25 @@ import com.revolsys.util.Property;
 
 public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
 
+  private List<String> equalExclude = new ArrayList<String>();
+
+  private String fieldName;
+
+  private final Set<String> fieldNames = new TreeSet<String>();
+
   private Channel<Record> otherIn;
 
   private int otherInBufferSize = 0;
 
-  private String fieldName;
-
-  private boolean running;
-
-  private String sourceName = "Source";
-
   private String otherName = "Other";
-
-  private List<String> equalExclude = new ArrayList<String>();
 
   private RecordDefinition recordDefinition1;
 
   private RecordDefinition recordDefinition2;
 
-  private final Set<String> fieldNames = new TreeSet<String>();
+  private boolean running;
+
+  private String sourceName = "Source";
 
   private boolean equals(final Geometry geometry1, final Geometry geometry2) {
     if (geometry1 == null) {

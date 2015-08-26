@@ -27,13 +27,13 @@ import com.revolsys.util.HtmlUtil;
  * @version 1.0
  */
 public class PhoneNumberField extends Field {
-  public static final int FIELD_SIZE = 20;
-
   public static final int FIELD_MAX_LENGTH = 20;
 
-  public static final int VALUE_MIN_LENGTH = 10;
+  public static final int FIELD_SIZE = 20;
 
   public static final int VALUE_MAX_LENGTH = 12;
+
+  public static final int VALUE_MIN_LENGTH = 10;
 
   private String inputValue = "";
 

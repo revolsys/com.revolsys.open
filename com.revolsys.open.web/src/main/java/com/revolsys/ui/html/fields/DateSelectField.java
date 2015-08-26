@@ -32,19 +32,19 @@ import com.revolsys.util.HtmlUtil;
 
 public class DateSelectField extends Field {
 
-  private static final String YEAR_KEY = "Year";
-
   private static final String DAY_KEY = "Day";
 
-  private static final String MONTH_KEY = "Month";
-
   private static final List<FieldValue> DAY_OPTIONS;
+
+  private static final String MONTH_KEY = "Month";
 
   private static final List<FieldValue> MONTH_OPTIONS;
 
   private static final String[] MONTHS = {
     "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   };
+
+  private static final String YEAR_KEY = "Year";
 
   static {
     final List<FieldValue> dayOptions = new ArrayList<FieldValue>();
@@ -67,19 +67,19 @@ public class DateSelectField extends Field {
     return date.get(Calendar.YEAR);
   }
 
-  private final Logger log = Logger.getLogger(DateSelectField.class);
-
-  private final List<FieldValue> yearOptions = new ArrayList<FieldValue>();
-
   private String dayStringValue;
+
+  private final int endYear;
+
+  private final Logger log = Logger.getLogger(DateSelectField.class);
 
   private String monthStringValue;
 
-  private String yearStringValue;
-
   private final int startYear;
 
-  private final int endYear;
+  private final List<FieldValue> yearOptions = new ArrayList<FieldValue>();
+
+  private String yearStringValue;
 
   /**
    * @param name

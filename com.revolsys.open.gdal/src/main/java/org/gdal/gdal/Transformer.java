@@ -20,9 +20,9 @@ public class Transformer {
     return getCPtr(obj);
   }
 
-  private long swigCPtr;
-
   protected boolean swigCMemOwn;
+
+  private long swigCPtr;
 
   public Transformer(final Dataset src, final Dataset dst, final java.util.Vector options) {
     this(gdalJNI.new_Transformer(Dataset.getCPtr(src), src, Dataset.getCPtr(dst), dst, options),

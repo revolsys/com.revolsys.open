@@ -58,22 +58,6 @@ public class HotPixel {
 
   private static final double SAFE_ENV_EXPANSION_FACTOR = 0.75;
 
-  private final LineIntersector li;
-
-  private Point pt;
-
-  private final Point originalPt;
-
-  private final double scaleFactor;
-
-  private double minx;
-
-  private double maxx;
-
-  private double miny;
-
-  private double maxy;
-
   /**
    * The corners of the hot pixel, in the order:
    *  10
@@ -81,7 +65,23 @@ public class HotPixel {
    */
   private final Point[] corner = new Point[4];
 
+  private final LineIntersector li;
+
+  private double maxx;
+
+  private double maxy;
+
+  private double minx;
+
+  private double miny;
+
+  private final Point originalPt;
+
+  private Point pt;
+
   private BoundingBox safeEnv = null;
+
+  private final double scaleFactor;
 
   /**
    * Creates a new hot pixel, using a given scale factor.

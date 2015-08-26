@@ -15,15 +15,15 @@ import com.revolsys.parallel.process.BaseInOutProcess;
 
 public class CopyProcess extends BaseInOutProcess<Record, Record> {
 
-  private String typeName;
-
-  private RecordDefinitionFactory recordDefinitionFactory;
+  private Map<String, String> attributeMap = new HashMap<String, String>();
 
   private RecordDefinition recordDefinition;
 
-  private Map<String, Map<Object, Object>> valueMaps = new HashMap<String, Map<Object, Object>>();
+  private RecordDefinitionFactory recordDefinitionFactory;
 
-  private Map<String, String> attributeMap = new HashMap<String, String>();
+  private String typeName;
+
+  private Map<String, Map<Object, Object>> valueMaps = new HashMap<String, Map<Object, Object>>();
 
   public CopyProcess() {
   }

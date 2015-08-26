@@ -49,9 +49,9 @@ import junit.framework.Assert;
  */
 @SuppressWarnings("deprecation")
 public class BufferResultMatcher implements ResultMatcher {
-  private static final double MAX_RELATIVE_AREA_DIFFERENCE = 1.0E-3;
-
   private static final double MAX_HAUSDORFF_DISTANCE_FACTOR = 100;
+
+  private static final double MAX_RELATIVE_AREA_DIFFERENCE = 1.0E-3;
 
   /**
    * The minimum distance tolerance which will be used.

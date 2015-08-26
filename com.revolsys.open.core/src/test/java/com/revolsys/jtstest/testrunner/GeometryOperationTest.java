@@ -54,34 +54,34 @@ import junit.framework.Assert;
  * @version 1.7
  */
 public class GeometryOperationTest extends junit.framework.TestCase implements MapSerializer {
-  private String testDescription;
-
-  private final String operation;
-
-  private Result expectedResult;
-
-  private final int testIndex;
-
-  private final String geometryIndex;
+  private Result actualResult = null;
 
   private List<String> arguments = new ArrayList<String>();
 
-  private final TestCase testCase;
+  private final Exception exception = null;
+
+  private Result expectedResult;
+
+  private final String geometryIndex;
+
+  private boolean isRun = false;
+
+  private final String operation;
+
+  private Object[] operationArgs;
 
   private boolean passed;
-
-  private final double tolerance;
 
   // cache for actual computed result
   private Geometry targetGeometry;
 
-  private Object[] operationArgs;
+  private final TestCase testCase;
 
-  private boolean isRun = false;
+  private String testDescription;
 
-  private Result actualResult = null;
+  private final int testIndex;
 
-  private final Exception exception = null;
+  private final double tolerance;
 
   /**
    *  Creates a Test with the given description. The given operation (e.g.

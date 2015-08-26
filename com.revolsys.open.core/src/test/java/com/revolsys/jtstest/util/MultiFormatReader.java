@@ -48,13 +48,13 @@ import com.revolsys.geometry.wkb.WKTReader;
  * @version 1.7
  */
 public class MultiFormatReader {
-  public static final int FORMAT_UNKNOWN = 0;
+  public static final int FORMAT_GML = 3;
 
-  public static final int FORMAT_WKT = 1;
+  public static final int FORMAT_UNKNOWN = 0;
 
   public static final int FORMAT_WKB = 2;
 
-  public static final int FORMAT_GML = 3;
+  public static final int FORMAT_WKT = 1;
 
   private static final int MAX_CHARS_TO_CHECK = 6;
 
@@ -106,9 +106,9 @@ public class MultiFormatReader {
 
   private final GeometryFactory geomFactory;
 
-  private final WKTReader wktReader;
-
   private final WKBReader wkbReader;
+
+  private final WKTReader wktReader;
 
   public MultiFormatReader() {
     this(GeometryFactory.floating3());

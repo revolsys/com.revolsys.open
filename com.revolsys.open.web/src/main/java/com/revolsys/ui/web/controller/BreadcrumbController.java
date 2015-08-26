@@ -33,9 +33,9 @@ import com.revolsys.ui.html.view.PathBreadcrumbView;
 
 public class BreadcrumbController implements Controller {
 
-  private final UrlPathHelper urlPathHelper = new UrlPathHelper();
-
   private boolean addSlash;
+
+  private final UrlPathHelper urlPathHelper = new UrlPathHelper();
 
   public BreadcrumbController() {
     this.urlPathHelper.setAlwaysUseFullPath(true);

@@ -40,16 +40,16 @@ import java.io.IOException;
  * with the representation being in either common byte ordering.
  */
 public class ByteOrderDataInStream {
-  private int byteOrder = ByteOrderValues.BIG_ENDIAN;
-
-  private InStream stream;
-
   // buffers to hold primitive datatypes
   private final byte[] buf1 = new byte[1];
 
   private final byte[] buf4 = new byte[4];
 
   private final byte[] buf8 = new byte[8];
+
+  private int byteOrder = ByteOrderValues.BIG_ENDIAN;
+
+  private InStream stream;
 
   public ByteOrderDataInStream() {
     this.stream = null;

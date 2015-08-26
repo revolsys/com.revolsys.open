@@ -6,15 +6,15 @@ import java.util.List;
 import com.revolsys.format.esri.gdb.xml.model.enums.WorkspaceType;
 
 public class WorkspaceDefinition implements Cloneable {
-  private WorkspaceType workspaceType = WorkspaceType.esriLocalDatabaseWorkspace;
-
-  private String version = "";
+  private List<DataElement> datasetDefinitions = new ArrayList<DataElement>();
 
   private List<Domain> domains = new ArrayList<Domain>();
 
-  private List<DataElement> datasetDefinitions = new ArrayList<DataElement>();
-
   private String metadata;
+
+  private String version = "";
+
+  private WorkspaceType workspaceType = WorkspaceType.esriLocalDatabaseWorkspace;
 
   public void addDatasetDefinition(final DataElement datasetDefinition) {
     this.datasetDefinitions.add(datasetDefinition);

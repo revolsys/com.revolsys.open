@@ -49,6 +49,8 @@ public final class HtmlUtil {
 
   public static final QName ATTR_COLS = new QName("cols");
 
+  public static final QName ATTR_CONTENT = new QName("content");
+
   public static final QName ATTR_ENCTYPE = new QName("enctype");
 
   public static final QName ATTR_FOR = new QName("for");
@@ -56,6 +58,8 @@ public final class HtmlUtil {
   public static final QName ATTR_HEIGHT = new QName("height");
 
   public static final QName ATTR_HREF = new QName("href");
+
+  public static final QName ATTR_HTTP_EQUIV = new QName("http-equiv");
 
   public static final QName ATTR_ID = new QName("id");
 
@@ -79,6 +83,10 @@ public final class HtmlUtil {
 
   public static final QName ATTR_REL = new QName("rel");
 
+  public static final String ATTR_REQUIRED = "required";
+
+  public static final String ATTR_ROLE = "role";
+
   public static final QName ATTR_ROWS = new QName("rows");
 
   public static final QName ATTR_SELECTED = new QName("selected");
@@ -88,6 +96,8 @@ public final class HtmlUtil {
   public static final QName ATTR_SRC = new QName("src");
 
   public static final QName ATTR_STYLE = new QName("style");
+
+  public static final QName ATTR_TARGET = new QName("target");
 
   public static final QName ATTR_TITLE = new QName("title");
 
@@ -105,6 +115,8 @@ public final class HtmlUtil {
 
   public static final QName BUTTON = new QName(HTML_NS_URI, "button", HTML_NS_PREFIX);
 
+  public static final QName CODE = new QName(HTML_NS_URI, "code", HTML_NS_PREFIX);
+
   public static final QName DD = new QName(HTML_NS_URI, "dd", HTML_NS_PREFIX);
 
   public static final QName DIV = new QName(HTML_NS_URI, "div", HTML_NS_PREFIX);
@@ -112,6 +124,10 @@ public final class HtmlUtil {
   public static final QName DL = new QName(HTML_NS_URI, "dl", HTML_NS_PREFIX);
 
   public static final QName DT = new QName(HTML_NS_URI, "dt", HTML_NS_PREFIX);
+
+  public static final QName FIGCAPTION = new QName(HTML_NS_URI, "figcaption", HTML_NS_PREFIX);
+
+  public static final QName FIGURE = new QName(HTML_NS_URI, "figure", HTML_NS_PREFIX);
 
   public static final QName FORM = new QName(HTML_NS_URI, "form", HTML_NS_PREFIX);
 
@@ -129,6 +145,8 @@ public final class HtmlUtil {
 
   public static final QName HEAD = new QName(HTML_NS_URI, "head", HTML_NS_PREFIX);
 
+  public static final QName HR = new QName(HTML_NS_URI, "hr", HTML_NS_PREFIX);
+
   public static final QName HTML = new QName(HTML_NS_URI, "html", HTML_NS_PREFIX);
 
   public static final QName I = new QName(HTML_NS_URI, "i", HTML_NS_PREFIX);
@@ -142,6 +160,10 @@ public final class HtmlUtil {
   public static final QName LI = new QName(HTML_NS_URI, "li", HTML_NS_PREFIX);
 
   public static final QName LINK = new QName(HTML_NS_URI, "link", HTML_NS_PREFIX);
+
+  public static final QName META = new QName(HTML_NS_URI, "meta", HTML_NS_PREFIX);
+
+  public static final QName NAV = new QName(HTML_NS_URI, "nav", HTML_NS_PREFIX);
 
   public static final QName OL = new QName(HTML_NS_URI, "ol", HTML_NS_PREFIX);
 
@@ -178,28 +200,6 @@ public final class HtmlUtil {
   public static final QName TR = new QName(HTML_NS_URI, "tr", HTML_NS_PREFIX);
 
   public static final QName UL = new QName(HTML_NS_URI, "ul", HTML_NS_PREFIX);
-
-  public static final QName ATTR_TARGET = new QName("target");
-
-  public static final QName HR = new QName(HTML_NS_URI, "hr", HTML_NS_PREFIX);
-
-  public static final QName CODE = new QName(HTML_NS_URI, "code", HTML_NS_PREFIX);
-
-  public static final QName META = new QName(HTML_NS_URI, "meta", HTML_NS_PREFIX);
-
-  public static final QName ATTR_HTTP_EQUIV = new QName("http-equiv");
-
-  public static final QName ATTR_CONTENT = new QName("content");
-
-  public static final QName FIGURE = new QName(HTML_NS_URI, "figure", HTML_NS_PREFIX);
-
-  public static final QName FIGCAPTION = new QName(HTML_NS_URI, "figcaption", HTML_NS_PREFIX);
-
-  public static final String ATTR_ROLE = "role";
-
-  public static final QName NAV = new QName(HTML_NS_URI, "nav", HTML_NS_PREFIX);
-
-  public static final String ATTR_REQUIRED = "required";
 
   public static void elementWithId(final XmlWriter writer, final QName tag, final String id,
     final Object content) {

@@ -4,13 +4,13 @@ import java.net.URL;
 import java.util.List;
 
 public class WmsCapabilities {
-  private String version;
-
-  private String updateSequence;
+  private Capability capability;
 
   private Service service;
 
-  private Capability capability;
+  private String updateSequence;
+
+  private String version;
 
   public Capability getCapability() {
     return this.capability;

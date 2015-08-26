@@ -22,17 +22,17 @@ import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.HtmlUtil;
 
 public class MultiCheckBoxField extends Field {
-  private boolean selected = false;
-
-  private final Object trueValue = Boolean.TRUE;
+  private boolean defaultValue;
 
   private final Object falseValue = Boolean.FALSE;
 
-  private String selectedValue = "on";
-
   private String onClick = null;
 
-  private boolean defaultValue;
+  private boolean selected = false;
+
+  private String selectedValue = "on";
+
+  private final Object trueValue = Boolean.TRUE;
 
   public MultiCheckBoxField(final String name, final boolean required) {
     super(name, required);

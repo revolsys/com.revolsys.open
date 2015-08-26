@@ -93,15 +93,15 @@ public class BufferInputLineSimplifier {
     return simp.simplify(distanceTol);
   }
 
-  private final LineString inputLine;
-
-  private double distanceTol;
-
-  private byte[] isDeleted;
-
   private int angleOrientation = CGAlgorithms.COUNTERCLOCKWISE;
 
   private final int deleteCount = 0;
+
+  private double distanceTol;
+
+  private final LineString inputLine;
+
+  private byte[] isDeleted;
 
   public BufferInputLineSimplifier(final LineString inputLine) {
     this.inputLine = inputLine;

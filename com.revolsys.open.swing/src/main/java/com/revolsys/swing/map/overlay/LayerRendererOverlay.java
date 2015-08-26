@@ -27,22 +27,22 @@ import com.revolsys.util.Property;
  * <p>A lightweight component that users the {@link Layer}'s {@link LayerRenderer} to render the layer.</p>
  */
 public class LayerRendererOverlay extends JComponent implements PropertyChangeListener {
-  private static final long serialVersionUID = 1L;
-
   private static final Collection<String> IGNORE_PROPERTY_NAMES = new HashSet<>(
     Arrays.asList("selectionCount", "hasHighlightedRecords", "highlightedCount", "scale"));
 
-  private Layer layer;
-
-  private Viewport2D viewport;
+  private static final long serialVersionUID = 1L;
 
   private GeoreferencedImage image;
 
-  private final Object loadSync = new Object();
-
   private LayerRendererOverlaySwingWorker imageWorker;
 
+  private Layer layer;
+
   private boolean loadImage = true;
+
+  private final Object loadSync = new Object();
+
+  private Viewport2D viewport;
 
   public LayerRendererOverlay(final MapPanel mapPanel) {
     this(mapPanel, null);

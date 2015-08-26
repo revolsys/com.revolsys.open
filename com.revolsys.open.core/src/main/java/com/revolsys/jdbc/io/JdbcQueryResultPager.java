@@ -20,36 +20,36 @@ import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 
 public class JdbcQueryResultPager implements ResultPager<Record> {
-  /** The objects in the current page. */
-  private List<Record> results;
-
-  /** The number of objects in a page. */
-  private int pageSize = 10;
-
-  /** The current page number. */
-  private int pageNumber = -1;
-
-  /** The total number of results. */
-  private int numResults;
+  private JdbcConnection connection;
 
   /** The number of pages. */
   private int numPages;
 
-  private JdbcConnection connection;
+  /** The total number of results. */
+  private int numResults;
+
+  /** The current page number. */
+  private int pageNumber = -1;
+
+  /** The number of objects in a page. */
+  private int pageSize = 10;
+
+  private final Query query;
+
+  private RecordDefinition recordDefinition;
 
   private RecordFactory recordFactory;
 
   private JdbcRecordStore recordStore;
 
-  private RecordDefinition recordDefinition;
-
-  private PreparedStatement statement;
+  /** The objects in the current page. */
+  private List<Record> results;
 
   private ResultSet resultSet;
 
-  private final Query query;
-
   private final String sql;
+
+  private PreparedStatement statement;
 
   public JdbcQueryResultPager(final JdbcRecordStore recordStore,
     final Map<String, Object> properties, final Query query) {

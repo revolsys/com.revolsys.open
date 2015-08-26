@@ -64,16 +64,16 @@ public class LinearIterator {
     return loc.getSegmentIndex();
   }
 
-  private final Geometry linearGeom;
-
-  private final int numLines;
+  private int componentIndex = 0;
 
   /**
    * Invariant: currentLine <> null if the iterator is pointing at a valid coordinate
    */
   private LineString currentLine;
 
-  private int componentIndex = 0;
+  private final Geometry linearGeom;
+
+  private final int numLines;
 
   private int vertexIndex = 0;
 

@@ -30,16 +30,18 @@ import org.apache.log4j.Logger;
 import com.revolsys.ui.web.exception.PageNotFoundException;
 
 public class Config implements Serializable {
+  private static final Logger log = Logger.getLogger(Config.class);
+
   /** The unique serial version UID for the class. */
   private static final long serialVersionUID = 4510031487114008232L;
 
-  private static final Logger log = Logger.getLogger(Config.class);
+  private String basePath = "";
 
   private final Map components = new HashMap();
 
   private final Map layouts = new HashMap();
 
-  private final Map<String, Page> pages = new HashMap<String, Page>();
+  private final Map menus = new HashMap();
 
   private final Map<String, Page> pageByName = new HashMap<String, Page>();
 
@@ -49,11 +51,9 @@ public class Config implements Serializable {
 
   private final List<Pattern> pagePatterns = new ArrayList<Pattern>();
 
-  private final Map menus = new HashMap();
+  private final Map<String, Page> pages = new HashMap<String, Page>();
 
   private final ServletContext servletContext;
-
-  private String basePath = "";
 
   public Config(final ServletContext servletContext, final String basePath) {
     this.servletContext = servletContext;

@@ -11,11 +11,11 @@ import org.springframework.util.StringUtils;
 
 public class ClassPathResource extends AbstractResource {
 
-  private final String path;
-
   private ClassLoader classLoader;
 
   private Class<?> clazz;
+
+  private final String path;
 
   public ClassPathResource(final String path) {
     this(path, (ClassLoader)null);

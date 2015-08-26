@@ -28,10 +28,10 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.gis.graph.Edge;
 
 public class DirectionalFields extends AbstractRecordDefinitionProperty {
+  private static final Logger LOG = LoggerFactory.getLogger(DirectionalFields.class);
+
   public static final String PROPERTY_NAME = DirectionalFields.class.getName()
     + ".propertyName";
-
-  private static final Logger LOG = LoggerFactory.getLogger(DirectionalFields.class);
 
   public static boolean canMergeObjects(final Point point, final Record record1,
     final Record record2) {
@@ -123,21 +123,21 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     property.reverseAttributesAndGeometry(record);
   }
 
-  private final Map<String, String> endFieldNamePairs = new HashMap<String, String>();
-
-  private final Map<String, String> sideFieldNamePairs = new HashMap<String, String>();
-
-  private final Map<String, String> reverseFieldNameMap = new HashMap<String, String>();
-
-  private final Set<String> startFieldNames = new HashSet<String>();
-
-  private final Set<String> sideFieldNames = new HashSet<String>();
-
-  private final Set<String> endFieldNames = new HashSet<String>();
-
   private final Map<String, Map<Object, Object>> directionalAttributeValues = new HashMap<String, Map<Object, Object>>();
 
   private final List<List<String>> endAndSideFieldNamePairs = new ArrayList<List<String>>();
+
+  private final Map<String, String> endFieldNamePairs = new HashMap<String, String>();
+
+  private final Set<String> endFieldNames = new HashSet<String>();
+
+  private final Map<String, String> reverseFieldNameMap = new HashMap<String, String>();
+
+  private final Map<String, String> sideFieldNamePairs = new HashMap<String, String>();
+
+  private final Set<String> sideFieldNames = new HashSet<String>();
+
+  private final Set<String> startFieldNames = new HashSet<String>();
 
   public DirectionalFields() {
   }
@@ -784,12 +784,12 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     return this.startFieldNames;
   }
 
-  public boolean hasDirectionalFields() {
-    return !this.directionalAttributeValues.isEmpty() || !this.reverseFieldNameMap.isEmpty();
-  }
-
   public boolean hasDirectionalAttributeValues(final String fieldName) {
     return this.directionalAttributeValues.containsKey(fieldName);
+  }
+
+  public boolean hasDirectionalFields() {
+    return !this.directionalAttributeValues.isEmpty() || !this.reverseFieldNameMap.isEmpty();
   }
 
   public boolean isEndAttribute(final String fieldName) {

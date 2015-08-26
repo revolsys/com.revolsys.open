@@ -13,10 +13,10 @@ import com.revolsys.io.FileUtil;
  * @author Paul Austin
  */
 public class PatternFileFilter implements FileFilter {
+  private boolean ignoreCase;
+
   /** The regular expression pattern to match file names. */
   private final Pattern pattern;
-
-  private boolean ignoreCase;
 
   /**
    * Construct a new PatternFileNameFilter.

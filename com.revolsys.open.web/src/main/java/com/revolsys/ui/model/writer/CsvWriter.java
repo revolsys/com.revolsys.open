@@ -26,9 +26,9 @@ import com.revolsys.ui.model.TableModel;
  * @version 1.0
  */
 public class CsvWriter {
-  private final Writer out;
-
   private boolean firstCol = true;
+
+  private final Writer out;
 
   public CsvWriter(final Writer out) {
     this.out = out;

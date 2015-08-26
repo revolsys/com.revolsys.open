@@ -35,15 +35,15 @@ public class MultiSelectField extends Field {
 
   private boolean hasInvalidOptions = false;
 
-  private final Map selectedValues = new HashMap();
-
-  private final List options = new ArrayList();
+  private String onChange;
 
   private final Map optionMap = new HashMap();
 
+  private final List options = new ArrayList();
+
   private final Map optionValueMap = new HashMap();
 
-  private String onChange;
+  private final Map selectedValues = new HashMap();
 
   private final int size = 4;
 

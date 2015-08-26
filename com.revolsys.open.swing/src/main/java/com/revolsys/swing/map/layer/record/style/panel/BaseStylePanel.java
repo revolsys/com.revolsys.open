@@ -56,19 +56,19 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
 public class BaseStylePanel extends ValueField implements PropertyChangeListener {
-  private static final long serialVersionUID = 1L;
-
   public static final List<Action> HORIZONTAL_ALIGNMENT_ACTIONS = getTextAlignActions("left",
     "center", "right");
 
-  public static final List<Action> VERTICAL_ALIGNMENT_ACTIONS = getTextAlignActions("top", "middle",
-    "bottom");
+  public static final List<Action> LINE_CAP_ACTIONS = getLineActions("cap", "BUTT", "ROUND",
+    "SQUARE");
 
   public static final List<Action> LINE_JOIN_ACTIONS = getLineActions("join", "MITER", "ROUND",
     "BEVEL");
 
-  public static final List<Action> LINE_CAP_ACTIONS = getLineActions("cap", "BUTT", "ROUND",
-    "SQUARE");
+  private static final long serialVersionUID = 1L;
+
+  public static final List<Action> VERTICAL_ALIGNMENT_ACTIONS = getTextAlignActions("top", "middle",
+    "bottom");
 
   public static List<Action> getLineActions(final String type, final String... alignmentTypes) {
     final List<Action> actions = new ArrayList<Action>();

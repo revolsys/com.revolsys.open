@@ -43,11 +43,11 @@ public class GeometryStylePreview extends JPanel {
     return path;
   }
 
-  private Shape shape = getLineShape(100);
+  private final DataType geometryDataType;
 
   private final GeometryStyle geometryStyle;
 
-  private final DataType geometryDataType;
+  private Shape shape = getLineShape(100);
 
   public GeometryStylePreview(final GeometryStyle geometryStyle, final DataType geometryDataType) {
     final Dimension size = new Dimension(100, 100);

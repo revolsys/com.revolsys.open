@@ -26,11 +26,11 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
     DefaultSyntaxKit.initKit();
   }
 
+  private String errorMessage;
+
   private final String fieldName;
 
   private String fieldValue;
-
-  private String errorMessage;
 
   private String originalToolTip;
 

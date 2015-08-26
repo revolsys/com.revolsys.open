@@ -64,11 +64,11 @@ public class GeoNamesService {
     WIKIPEDIA_RECORD_DEFINITION = wikipediaRecordDefinition;
   }
 
+  private URL findNearbyBoundingBoxJsonUrl;
+
   private URL searchJsonUrl;
 
   private URL wikipediaBoundingBoxJsonUrl;
-
-  private URL findNearbyBoundingBoxJsonUrl;
 
   public GeoNamesService() {
     final String url = "Http://ws.geonames.org";

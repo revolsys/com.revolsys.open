@@ -1,17 +1,17 @@
 package com.revolsys.gis.wms.capabilities;
 
 public class ContactAddress {
-  private String addressType;
-
   private String address;
+
+  private String addressType;
 
   private String city;
 
-  private String stateOrProvince;
+  private String country;
 
   private String postCode;
 
-  private String country;
+  private String stateOrProvince;
 
   public String getAddress() {
     return this.address;

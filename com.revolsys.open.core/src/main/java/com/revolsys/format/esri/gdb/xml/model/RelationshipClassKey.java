@@ -3,11 +3,11 @@ package com.revolsys.format.esri.gdb.xml.model;
 import com.revolsys.format.esri.gdb.xml.model.enums.RelKeyRole;
 
 public class RelationshipClassKey {
-  private String objectKeyName;
-
   private String classKeyName;
 
   private RelKeyRole keyRole;
+
+  private String objectKeyName;
 
   public String getClassKeyName() {
     return this.classKeyName;

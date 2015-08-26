@@ -39,17 +39,17 @@ public class XBaseFieldDefinition {
 
   private final int decimalPlaces;
 
+  private final String fullName;
+
   private final int length;
 
   private final String name;
 
-  private final String fullName;
-
   private DecimalFormat numberFormat;
 
-  private final char type;
-
   private double precisionScale;
+
+  private final char type;
 
   public XBaseFieldDefinition(final String name, final String fullName, final char type,
     final int length) {

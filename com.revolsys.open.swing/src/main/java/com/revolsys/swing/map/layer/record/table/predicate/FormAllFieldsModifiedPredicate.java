@@ -23,9 +23,9 @@ public class FormAllFieldsModifiedPredicate implements HighlightPredicate {
     ModifiedAttributePredicate.addModifiedHighlighters(table, predicate);
   }
 
-  private final LayerRecordTableModel model;
-
   private final Reference<RecordLayerForm> form;
+
+  private final LayerRecordTableModel model;
 
   public FormAllFieldsModifiedPredicate(final RecordLayerForm form,
     final LayerRecordTableModel model) {
