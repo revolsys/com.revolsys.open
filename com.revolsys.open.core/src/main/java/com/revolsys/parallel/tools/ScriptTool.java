@@ -36,7 +36,7 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.annotation.AnnotationConfigUtils;
 import org.springframework.context.support.GenericApplicationContext;
 
-import com.revolsys.beans.ResourceEditorRegistrar;
+import com.revolsys.beans.propertyeditor.ResourceEditorRegistrar;
 import com.revolsys.collection.map.ThreadSharedAttributes;
 import com.revolsys.logging.log4j.ThreadLocalFileAppender;
 import com.revolsys.parallel.process.ProcessNetwork;

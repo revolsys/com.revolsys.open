@@ -24,6 +24,8 @@ import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
 
 public interface Resource extends org.springframework.core.io.Resource {
+  static String CLASSPATH_URL_PREFIX = "classpath:";
+
   static boolean exists(final Resource resource) {
     if (resource == null) {
       return false;
@@ -72,6 +74,10 @@ public interface Resource extends org.springframework.core.io.Resource {
     if (Property.hasValue(location)) {
       if (location.charAt(0) == '/' || location.length() > 1 && location.charAt(1) == ':') {
         return new PathResource(location);
+      } else if (location.startsWith(CLASSPATH_URL_PREFIX)) {
+        final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        final String path = location.substring(CLASSPATH_URL_PREFIX.length());
+        return new ClassPathResource(path, classLoader);
       } else {
         return new UrlResource(location);
       }

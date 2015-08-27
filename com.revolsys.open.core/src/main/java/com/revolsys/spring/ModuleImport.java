@@ -28,7 +28,7 @@ import org.springframework.context.annotation.AnnotationConfigUtils;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ResourceLoader;
 
-import com.revolsys.beans.ResourceEditorRegistrar;
+import com.revolsys.beans.propertyeditor.ResourceEditorRegistrar;
 import com.revolsys.collection.map.AttributeMap;
 import com.revolsys.spring.config.AttributesBeanConfigurer;
 import com.revolsys.spring.resource.Resource;

@@ -24,6 +24,7 @@ import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
@@ -56,31 +57,31 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
 
   private boolean throwExceptions = false;
 
-  private final Map<String, Integer> typeCountMap = new LinkedHashMap<String, Integer>();
+  private final Map<PathName, Integer> typeCountMap = new LinkedHashMap<>();
 
-  private Map<String, Integer> typeDeleteBatchCountMap = new LinkedHashMap<String, Integer>();
+  private Map<PathName, Integer> typeDeleteBatchCountMap = new LinkedHashMap<>();
 
-  private Map<String, String> typeDeleteSqlMap = new LinkedHashMap<String, String>();
+  private Map<PathName, String> typeDeleteSqlMap = new LinkedHashMap<>();
 
-  private Map<String, PreparedStatement> typeDeleteStatementMap = new LinkedHashMap<String, PreparedStatement>();
+  private Map<PathName, PreparedStatement> typeDeleteStatementMap = new LinkedHashMap<>();
 
-  private Map<String, Integer> typeInsertBatchCountMap = new LinkedHashMap<String, Integer>();
+  private Map<PathName, Integer> typeInsertBatchCountMap = new LinkedHashMap<>();
 
-  private Map<String, Integer> typeInsertSequenceBatchCountMap = new LinkedHashMap<String, Integer>();
+  private Map<PathName, Integer> typeInsertSequenceBatchCountMap = new LinkedHashMap<>();
 
-  private Map<String, String> typeInsertSequenceSqlMap = new LinkedHashMap<String, String>();
+  private Map<PathName, String> typeInsertSequenceSqlMap = new LinkedHashMap<>();
 
-  private Map<String, PreparedStatement> typeInsertSequenceStatementMap = new LinkedHashMap<String, PreparedStatement>();
+  private Map<PathName, PreparedStatement> typeInsertSequenceStatementMap = new LinkedHashMap<>();
 
-  private Map<String, String> typeInsertSqlMap = new LinkedHashMap<String, String>();
+  private Map<PathName, String> typeInsertSqlMap = new LinkedHashMap<>();
 
-  private Map<String, PreparedStatement> typeInsertStatementMap = new LinkedHashMap<String, PreparedStatement>();
+  private Map<PathName, PreparedStatement> typeInsertStatementMap = new LinkedHashMap<>();
 
-  private Map<String, Integer> typeUpdateBatchCountMap = new LinkedHashMap<String, Integer>();
+  private Map<PathName, Integer> typeUpdateBatchCountMap = new LinkedHashMap<>();
 
-  private Map<String, String> typeUpdateSqlMap = new LinkedHashMap<String, String>();
+  private Map<PathName, String> typeUpdateSqlMap = new LinkedHashMap<>();
 
-  private Map<String, PreparedStatement> typeUpdateStatementMap = new LinkedHashMap<String, PreparedStatement>();
+  private Map<PathName, PreparedStatement> typeUpdateStatementMap = new LinkedHashMap<>();
 
   public JdbcWriterImpl(final JdbcRecordStore recordStore) {
     this(recordStore, recordStore.getStatistics());
@@ -120,10 +121,11 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
     doClose();
   }
 
-  private void close(final Map<String, String> sqlMap,
-    final Map<String, PreparedStatement> statementMap, final Map<String, Integer> batchCountMap) {
-    for (final Entry<String, PreparedStatement> entry : statementMap.entrySet()) {
-      final String typePath = entry.getKey();
+  private void close(final Map<PathName, String> sqlMap,
+    final Map<PathName, PreparedStatement> statementMap,
+    final Map<PathName, Integer> batchCountMap) {
+    for (final Entry<PathName, PreparedStatement> entry : statementMap.entrySet()) {
+      final PathName typePath = entry.getKey();
       final PreparedStatement statement = entry.getValue();
       final String sql = sqlMap.get(typePath);
       try {
@@ -146,7 +148,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
 
   private void delete(final Record object) throws SQLException {
     final RecordDefinition objectType = object.getRecordDefinition();
-    final String typePath = objectType.getPath();
+    final PathName typePath = objectType.getPathName();
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     flushIfRequired(recordDefinition);
     PreparedStatement statement = this.typeDeleteStatementMap.get(typePath);
@@ -234,11 +236,12 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
     flush(this.typeDeleteSqlMap, this.typeDeleteStatementMap, this.typeDeleteBatchCountMap);
   }
 
-  private void flush(final Map<String, String> sqlMap,
-    final Map<String, PreparedStatement> statementMap, final Map<String, Integer> batchCountMap) {
+  private void flush(final Map<PathName, String> sqlMap,
+    final Map<PathName, PreparedStatement> statementMap,
+    final Map<PathName, Integer> batchCountMap) {
     if (statementMap != null) {
-      for (final Entry<String, PreparedStatement> entry : statementMap.entrySet()) {
-        final String typePath = entry.getKey();
+      for (final Entry<PathName, PreparedStatement> entry : statementMap.entrySet()) {
+        final PathName typePath = entry.getKey();
         final PreparedStatement statement = entry.getValue();
         final String sql = sqlMap.get(typePath);
         try {
@@ -266,8 +269,8 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
   }
 
   private String getDeleteSql(final RecordDefinition type) {
-    final String typePath = type.getPath();
-    final String tableName = JdbcUtils.getQualifiedTableName(typePath);
+    final PathName typePath = type.getPathName();
+    final String tableName = this.recordStore.getDatabaseQualifiedTableName(typePath);
     String sql = this.typeDeleteSqlMap.get(typePath);
     if (sql == null) {
       final StringBuilder sqlBuffer = new StringBuilder();
@@ -310,8 +313,8 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
   }
 
   private String getInsertSql(final RecordDefinition type, final boolean generatePrimaryKey) {
-    final String typePath = type.getPath();
-    final String tableName = JdbcUtils.getQualifiedTableName(typePath);
+    final PathName typePath = type.getPathName();
+    final String tableName = this.recordStore.getDatabaseQualifiedTableName(typePath);
     String sql;
     if (generatePrimaryKey) {
       sql = this.typeInsertSequenceSqlMap.get(typePath);
@@ -384,7 +387,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
     return this.label;
   }
 
-  private RecordDefinition getRecordDefinition(final String typePath) {
+  private RecordDefinition getRecordDefinition(final PathName typePath) {
     if (this.recordStore == null) {
       return null;
     } else {
@@ -402,8 +405,8 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
   }
 
   private String getUpdateSql(final RecordDefinition type) {
-    final String typePath = type.getPath();
-    final String tableName = JdbcUtils.getQualifiedTableName(typePath);
+    final PathName typePath = type.getPathName();
+    final String tableName = this.recordStore.getDatabaseQualifiedTableName(typePath);
     String sql = this.typeUpdateSqlMap.get(typePath);
     if (sql == null) {
       final StringBuilder sqlBuffer = new StringBuilder();
@@ -454,7 +457,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
 
   private void insert(final Record object) throws SQLException {
     final RecordDefinition objectType = object.getRecordDefinition();
-    final String typePath = objectType.getPath();
+    final PathName typePath = objectType.getPathName();
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     flushIfRequired(recordDefinition);
     final String idFieldName = recordDefinition.getIdFieldName();
@@ -478,7 +481,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
     this.recordStore.addStatistic("Insert", object);
   }
 
-  private void insert(final Record object, final String typePath,
+  private void insert(final Record object, final PathName typePath,
     final RecordDefinition recordDefinition) throws SQLException {
     PreparedStatement statement = this.typeInsertStatementMap.get(typePath);
     if (statement == null) {
@@ -511,7 +514,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
     }
   }
 
-  private void insertSequence(final Record object, final String typePath,
+  private void insertSequence(final Record object, final PathName typePath,
     final RecordDefinition recordDefinition) throws SQLException {
     PreparedStatement statement = this.typeInsertSequenceStatementMap.get(typePath);
     if (statement == null) {
@@ -559,8 +562,8 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
     return this.throwExceptions;
   }
 
-  private void processCurrentBatch(final String typePath, final String sql,
-    final PreparedStatement statement, final Map<String, Integer> batchCountMap) {
+  private void processCurrentBatch(final PathName typePath, final String sql,
+    final PreparedStatement statement, final Map<PathName, Integer> batchCountMap) {
     Integer batchCount = batchCountMap.get(typePath);
     if (batchCount == null) {
       batchCount = 0;
@@ -630,7 +633,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
 
   private void update(final Record object) throws SQLException {
     final RecordDefinition objectType = object.getRecordDefinition();
-    final String typePath = objectType.getPath();
+    final PathName typePath = objectType.getPathName();
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     flushIfRequired(recordDefinition);
     PreparedStatement statement = this.typeUpdateStatementMap.get(typePath);

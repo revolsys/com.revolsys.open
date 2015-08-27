@@ -1,4 +1,4 @@
-package com.revolsys.beans;
+package com.revolsys.beans.propertyeditor;
 
 import java.beans.PropertyEditorSupport;
 

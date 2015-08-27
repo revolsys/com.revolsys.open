@@ -16,6 +16,8 @@ public interface JdbcRecordStore extends RecordStore {
   @Override
   JdbcWriter createWriter();
 
+  String getDatabaseQualifiedTableName(PathName typePath);
+
   String getDatabaseSchemaName(final PathName schemaPath);
 
   String getDatabaseTableName(final PathName typePath);

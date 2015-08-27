@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package com.revolsys.beans;
+package com.revolsys.beans.propertyeditor;
 
 import javax.xml.namespace.QName;
 
 import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.PropertyEditorRegistry;
 
+import com.revolsys.io.PathName;
+import com.revolsys.spring.resource.Resource;
+
 public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
   @Override
   public void registerCustomEditors(final PropertyEditorRegistry registry) {
     registry.registerCustomEditor(QName.class, new QNameEditor());
     registry.registerCustomEditor(Boolean.class, new BooleanEditor());
+    registry.registerCustomEditor(Resource.class, new ResourceEditor());
+    registry.registerCustomEditor(PathName.class, new PathNameEditor());
   }
 }

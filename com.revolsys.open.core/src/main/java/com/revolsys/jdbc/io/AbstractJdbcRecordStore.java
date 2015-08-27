@@ -106,6 +106,8 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   private final Map<PathName, String> tableNameMap = new HashMap<>();
 
+  private final Map<PathName, String> qualifiedTableNameMap = new HashMap<>();
+
   private String tablePermissionsSql;
 
   private DataSourceTransactionManager transactionManager;
@@ -290,6 +292,11 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   public List<String> getColumnNames(final String typePath) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     return recordDefinition.getFieldNames();
+  }
+
+  @Override
+  public String getDatabaseQualifiedTableName(final PathName typePath) {
+    return this.qualifiedTableNameMap.get(typePath);
   }
 
   @Override
@@ -836,6 +843,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
             final PathName typePath = schemaPath.createChild(tableName);
             removedPaths.remove(typePath);
             this.tableNameMap.put(typePath, dbTableName);
+            this.qualifiedTableNameMap.put(typePath, dbSchemaName + "." + dbTableName);
             final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema,
               typePath);
             final String description = tableDescriptionMap.get(dbTableName);
