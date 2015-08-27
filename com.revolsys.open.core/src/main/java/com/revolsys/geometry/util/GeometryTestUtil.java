@@ -2,6 +2,7 @@ package com.revolsys.geometry.util;
 
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
+import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -12,7 +13,6 @@ import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.util.MathUtil;
 
 public class GeometryTestUtil {

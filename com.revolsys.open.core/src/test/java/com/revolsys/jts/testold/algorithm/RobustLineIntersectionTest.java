@@ -6,10 +6,10 @@ import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.geometry.wkb.WKTReader;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;

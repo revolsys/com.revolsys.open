@@ -1,10 +1,10 @@
 package com.revolsys.format.esri.gdb.xml.model;
 
+import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 
 public class SpatialReference {
 
@@ -13,9 +13,9 @@ public class SpatialReference {
   public static SpatialReference get(final GeometryFactory geometryFactory, final String wkt) {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      if (coordinateSystem instanceof com.revolsys.gis.cs.GeographicCoordinateSystem) {
+      if (coordinateSystem instanceof com.revolsys.geometry.cs.GeographicCoordinateSystem) {
         return new GeographicCoordinateSystem(geometryFactory, wkt);
-      } else if (coordinateSystem instanceof com.revolsys.gis.cs.ProjectedCoordinateSystem) {
+      } else if (coordinateSystem instanceof com.revolsys.geometry.cs.ProjectedCoordinateSystem) {
         return new ProjectedCoordinateSystem(geometryFactory, wkt);
       }
     }

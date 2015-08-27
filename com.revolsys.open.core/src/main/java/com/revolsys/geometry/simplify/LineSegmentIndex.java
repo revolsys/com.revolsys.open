@@ -37,11 +37,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import com.revolsys.geometry.algorithm.index.quadtree.QuadTree;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 import com.revolsys.geometry.util.BoundingBoxUtil;
-import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
 
 /**
  * An spatial index on a set of {@link LineSegmentDouble}s.

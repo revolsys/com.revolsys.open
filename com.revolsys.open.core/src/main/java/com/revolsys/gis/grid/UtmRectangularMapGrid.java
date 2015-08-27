@@ -3,12 +3,12 @@ package com.revolsys.gis.grid;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.util.MathUtil;
 
 public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {

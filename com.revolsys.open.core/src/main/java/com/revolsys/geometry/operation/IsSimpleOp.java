@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.revolsys.geometry.algorithm.BoundaryNodeRule;
+import com.revolsys.geometry.algorithm.index.LineSegmentIndex;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
@@ -55,7 +56,6 @@ import com.revolsys.geometry.operation.simple.SelfIntersectionVertexError;
 import com.revolsys.geometry.operation.simple.SelfOverlapLineSegmentError;
 import com.revolsys.geometry.operation.simple.SelfOverlapSegmentError;
 import com.revolsys.geometry.operation.valid.GeometryValidationError;
-import com.revolsys.gis.algorithm.index.LineSegmentIndex;
 
 /**
  * Tests whether a <code>Geometry</code> is simple.

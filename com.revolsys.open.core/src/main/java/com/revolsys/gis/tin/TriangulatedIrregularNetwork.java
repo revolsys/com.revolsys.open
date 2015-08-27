@@ -8,19 +8,19 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.revolsys.geometry.algorithm.CGAlgorithms;
+import com.revolsys.geometry.algorithm.index.EnvelopeSpatialIndex;
+import com.revolsys.geometry.algorithm.index.RTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
+import com.revolsys.geometry.model.coordinates.comparator.AngleFromPointComparator;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
-import com.revolsys.gis.algorithm.index.EnvelopeSpatialIndex;
-import com.revolsys.gis.algorithm.index.RTree;
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.comparator.AngleFromPointComparator;
 import com.revolsys.math.Angle;
 
 public class TriangulatedIrregularNetwork {

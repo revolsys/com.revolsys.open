@@ -8,11 +8,11 @@ import java.util.TreeMap;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.gis.cs.Projection;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
+import com.revolsys.geometry.cs.Projection;
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 
 public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
   private static final Object ROOT = new Object();

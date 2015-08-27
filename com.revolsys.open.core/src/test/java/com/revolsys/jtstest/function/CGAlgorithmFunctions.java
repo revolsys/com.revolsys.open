@@ -4,7 +4,7 @@ import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 
 public class CGAlgorithmFunctions {
   public static int orientationIndex(final Geometry segment, final Geometry ptGeom) {

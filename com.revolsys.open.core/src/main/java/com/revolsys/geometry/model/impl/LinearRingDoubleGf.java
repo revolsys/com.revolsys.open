@@ -40,9 +40,9 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.GeometryProperties;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 
 /**
  * Models an OGC SFS <code>LinearRing</code>.

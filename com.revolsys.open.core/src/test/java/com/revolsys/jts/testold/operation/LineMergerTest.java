@@ -37,12 +37,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.util.Assert;
 import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.geometry.wkb.WKTReader;
-import com.revolsys.gis.graph.linemerge.LineMerger;
 
 import junit.framework.TestCase;
 

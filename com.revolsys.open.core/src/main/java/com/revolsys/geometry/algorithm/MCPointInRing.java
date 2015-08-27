@@ -47,7 +47,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.util.CleanDuplicatePoints;
-import com.revolsys.gis.algorithm.GeometryFactoryIndexedPointInAreaLocator;
 
 /**
  * Implements {@link PointInRing}

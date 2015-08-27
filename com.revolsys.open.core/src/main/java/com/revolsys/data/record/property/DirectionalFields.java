@@ -21,11 +21,11 @@ import com.revolsys.data.equals.RecordEquals;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.Records;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.gis.graph.Edge;
 
 public class DirectionalFields extends AbstractRecordDefinitionProperty {
   private static final Logger LOG = LoggerFactory.getLogger(DirectionalFields.class);

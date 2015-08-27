@@ -37,18 +37,6 @@ public class ComboBox extends JComboBox implements Field, KeyListener {
 
   private final FieldSupport support;
 
-  public ComboBox() {
-    this("fieldValue");
-  }
-
-  public ComboBox(final boolean editable, final Object... items) {
-    this(null, editable, items);
-  }
-
-  public ComboBox(final Collection<?> items) {
-    this(null, false, items);
-  }
-
   public ComboBox(final ComboBoxModel model) {
     this("fieldValue", model);
   }

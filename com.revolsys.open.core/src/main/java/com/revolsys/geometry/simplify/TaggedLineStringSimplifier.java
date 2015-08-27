@@ -39,9 +39,9 @@ import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
-import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 
 /**
  * Simplifies a TaggedLineString, preserving topology

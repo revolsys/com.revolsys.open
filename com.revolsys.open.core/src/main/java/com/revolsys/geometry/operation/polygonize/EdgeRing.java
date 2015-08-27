@@ -44,8 +44,8 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.planargraph.DirectedEdge;
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 
 /**
  * Represents a ring of {@link PolygonizeDirectedEdge}s which form

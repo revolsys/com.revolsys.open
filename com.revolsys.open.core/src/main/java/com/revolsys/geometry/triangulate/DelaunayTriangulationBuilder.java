@@ -47,10 +47,10 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
 import com.revolsys.geometry.triangulate.quadedge.Vertex;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 
 /**
  * A utility class which creates Delaunay Trianglulations

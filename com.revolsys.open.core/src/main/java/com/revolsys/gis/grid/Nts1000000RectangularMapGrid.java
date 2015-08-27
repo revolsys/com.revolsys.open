@@ -7,10 +7,10 @@ import java.util.regex.Pattern;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 

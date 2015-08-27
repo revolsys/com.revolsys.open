@@ -7,7 +7,7 @@ import java.util.List;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.util.MathUtil;
 
 public class LineStringDouble extends AbstractLineString {

@@ -8,20 +8,20 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
+import com.revolsys.geometry.algorithm.index.LineSegmentIndex;
+import com.revolsys.geometry.algorithm.linematch.LineMatchGraph;
 import com.revolsys.geometry.model.End;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryComponent;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
+import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceComparator;
+import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.gis.algorithm.index.LineSegmentIndex;
-import com.revolsys.gis.algorithm.linematch.LineMatchGraph;
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 
 public final class LineStringUtil {
   public static final String COORDINATE_DISTANCE = "coordinateDistance";

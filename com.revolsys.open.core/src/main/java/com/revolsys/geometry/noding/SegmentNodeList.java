@@ -41,9 +41,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.util.Assert;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 
 // INCOMPLETE!
 class NodeVertexIterator implements Iterator {

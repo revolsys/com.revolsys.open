@@ -39,14 +39,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.data.types.DataTypeProxy;
+import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.buffer.Buffer;
 import com.revolsys.geometry.operation.union.UnaryUnionOp;
 import com.revolsys.geometry.operation.valid.IsValidOp;
-import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.graph.linemerge.LineMerger;
 import com.revolsys.io.Reader;
 import com.revolsys.util.Emptyable;
 

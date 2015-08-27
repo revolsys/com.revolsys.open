@@ -5,6 +5,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -12,8 +14,6 @@ import com.revolsys.geometry.model.Side;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.metrics.PointLineStringMetrics;
-import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 
 public class LineStringTest {
 

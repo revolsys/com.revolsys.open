@@ -39,8 +39,8 @@ import java.util.List;
 
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.LineStringDouble;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 
 /**
  * Wraps a {@link Noder} and transforms its input

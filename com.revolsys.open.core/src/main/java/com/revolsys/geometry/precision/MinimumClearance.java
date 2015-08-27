@@ -41,12 +41,12 @@ import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Puntal;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 import com.revolsys.geometry.operation.distance.FacetSequence;
 import com.revolsys.geometry.operation.distance.FacetSequenceTreeBuilder;
-import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 
 /**
  * Computes the Minimum Clearance of a {@link Geometry}.

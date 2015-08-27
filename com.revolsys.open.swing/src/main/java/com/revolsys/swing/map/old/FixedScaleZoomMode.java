@@ -7,10 +7,10 @@ import java.util.List;
 import javax.measure.Measurable;
 import javax.measure.quantity.Length;
 
+import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.swing.map.ComponentViewport2D;
 import com.revolsys.swing.map.Viewport2D;
 

@@ -53,10 +53,10 @@ import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Triangle;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.util.CleanDuplicatePoints;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.noding.SegmentString;
-import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 
 /**
  * Creates all the raw offset curves for a buffer of a {@link Geometry}.

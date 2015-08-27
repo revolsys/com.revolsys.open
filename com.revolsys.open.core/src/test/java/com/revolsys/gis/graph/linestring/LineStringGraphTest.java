@@ -2,6 +2,7 @@ package com.revolsys.gis.graph.linestring;
 
 import java.util.List;
 
+import com.revolsys.geometry.graph.linestring.LineStringGraph;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 

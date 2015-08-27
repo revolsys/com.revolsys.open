@@ -51,8 +51,8 @@ import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Triangle;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 
 /**
  * A class that contains the {@link QuadEdge}s representing a planar

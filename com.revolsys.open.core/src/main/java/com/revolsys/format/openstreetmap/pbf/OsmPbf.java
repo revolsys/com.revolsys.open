@@ -6,9 +6,9 @@ import java.util.Set;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.io.AbstractRecordIoFactory;
 import com.revolsys.data.record.io.RecordReader;
-import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.spring.resource.Resource;
 
 public class OsmPbf extends AbstractRecordIoFactory {

@@ -3,11 +3,11 @@ package com.revolsys.data.record.filter;
 import java.util.function.Predicate;
 
 import com.revolsys.data.record.Record;
+import com.revolsys.geometry.algorithm.index.RecordQuadTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.gis.algorithm.index.RecordQuadTree;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.util.Property;
 

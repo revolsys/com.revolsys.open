@@ -7,7 +7,7 @@ import java.nio.charset.Charset;
 import com.revolsys.data.record.io.RecordWriter;
 import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 
 public class EsriGeodatabaseXmlRecordWriterFactory extends AbstractIoFactoryWithCoordinateSystem

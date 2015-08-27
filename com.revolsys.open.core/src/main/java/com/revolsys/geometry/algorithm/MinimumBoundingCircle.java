@@ -37,9 +37,9 @@ import com.revolsys.geometry.model.CoordinateArrays;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Triangle;
+import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.Assert;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.math.Angle;
 
 /**

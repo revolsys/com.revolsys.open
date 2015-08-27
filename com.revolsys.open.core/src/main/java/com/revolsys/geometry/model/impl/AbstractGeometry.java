@@ -49,6 +49,8 @@ import com.revolsys.geometry.algorithm.InteriorPointArea;
 import com.revolsys.geometry.algorithm.InteriorPointLine;
 import com.revolsys.geometry.algorithm.InteriorPointPoint;
 import com.revolsys.geometry.algorithm.PointLocator;
+import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
@@ -72,8 +74,6 @@ import com.revolsys.geometry.operation.predicate.RectangleIntersects;
 import com.revolsys.geometry.operation.relate.RelateOp;
 import com.revolsys.geometry.operation.union.UnaryUnionOp;
 import com.revolsys.geometry.operation.valid.IsValidOp;
-import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.graph.linemerge.LineMerger;
 
 /**
  * A representation of a planar, linear vector geometry.

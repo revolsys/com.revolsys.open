@@ -40,7 +40,7 @@ import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 
 /**
  * Implementations for various geometry functions.

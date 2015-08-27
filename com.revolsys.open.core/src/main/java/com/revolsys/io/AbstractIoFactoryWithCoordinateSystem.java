@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 
 public abstract class AbstractIoFactoryWithCoordinateSystem extends AbstractIoFactory
   implements IoFactoryWithCoordinateSystem {

@@ -36,9 +36,9 @@ import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
+import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.LineStringDouble;
-import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 
 /**
  * Simplifies a buffer input line to

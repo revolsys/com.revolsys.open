@@ -3,10 +3,10 @@ package com.revolsys.jtstest.function;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.util.AffineTransformation;
 import com.revolsys.geometry.model.util.AffineTransformationFactory;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 
 public class AffineTransformationFunctions {
   private static Point envelopeCentre(final Geometry g) {

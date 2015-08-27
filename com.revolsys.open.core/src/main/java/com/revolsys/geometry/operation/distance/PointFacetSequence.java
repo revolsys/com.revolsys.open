@@ -37,7 +37,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.gis.model.coordinates.LineSegmentUtil;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 
 /**
  * Represents a sequence of facets (points or line segments)

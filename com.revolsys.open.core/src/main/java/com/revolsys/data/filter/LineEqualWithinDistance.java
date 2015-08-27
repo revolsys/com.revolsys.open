@@ -3,8 +3,8 @@ package com.revolsys.data.filter;
 import java.util.function.Predicate;
 
 import com.revolsys.data.record.Record;
+import com.revolsys.geometry.graph.linestring.LineStringRelate;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.gis.graph.linestring.LineStringRelate;
 
 public class LineEqualWithinDistance implements Predicate<LineString> {
 

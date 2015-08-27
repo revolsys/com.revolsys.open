@@ -36,7 +36,7 @@ package com.revolsys.geometry.simplify;
 import com.revolsys.geometry.model.CoordinateList;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.gis.model.coordinates.LineSegmentUtil;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 
 /**
  * Simplifies a linestring (sequence of points) using

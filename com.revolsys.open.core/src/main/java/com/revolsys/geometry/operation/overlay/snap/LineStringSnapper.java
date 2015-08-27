@@ -36,8 +36,8 @@ package com.revolsys.geometry.operation.overlay.snap;
 import com.revolsys.geometry.model.CoordinateList;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 
 /**
  * Snaps the vertices and segments of a {@link LineString}

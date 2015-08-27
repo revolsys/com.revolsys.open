@@ -1,11 +1,11 @@
 package com.revolsys.gis.grid;
 
+import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.gis.cs.CoordinateSystem;
 
 public abstract class AbstractRectangularMapGrid implements RectangularMapGrid {
   private String name;

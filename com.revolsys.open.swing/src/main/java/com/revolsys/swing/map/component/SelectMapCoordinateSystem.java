@@ -13,9 +13,9 @@ import javax.swing.DefaultComboBoxModel;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.InvokeMethodStringConverter;
 import com.revolsys.swing.map.MapPanel;

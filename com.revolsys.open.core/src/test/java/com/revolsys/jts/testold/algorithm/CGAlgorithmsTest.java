@@ -2,8 +2,8 @@ package com.revolsys.jts.testold.algorithm;
 
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;

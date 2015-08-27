@@ -32,7 +32,7 @@
  
   <bean
     id="kmlFileWriterProjectionProcess"
-    class="com.revolsys.gis.cs.parallel.GeometryProjection"
+    class="com.revolsys.geometry.cs.parallel.GeometryProjection"
     p:srid-ref="4326" 
   >
     <property name="out">

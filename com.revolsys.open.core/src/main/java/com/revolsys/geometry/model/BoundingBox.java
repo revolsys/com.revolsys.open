@@ -7,8 +7,8 @@ import javax.measure.quantity.Quantity;
 import javax.measure.unit.Unit;
 
 import com.revolsys.data.record.Record;
+import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.util.Emptyable;
 
 public interface BoundingBox extends Emptyable {

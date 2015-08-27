@@ -9,7 +9,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Side;
-import com.revolsys.gis.model.coordinates.LineSegmentUtil;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 
 public interface LineSegment extends LineString {
 

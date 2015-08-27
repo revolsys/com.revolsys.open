@@ -35,8 +35,8 @@ package com.revolsys.jts.testold.perf.algorithm;
 import java.util.Random;
 
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;

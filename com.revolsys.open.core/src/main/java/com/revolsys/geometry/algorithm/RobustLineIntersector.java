@@ -34,17 +34,12 @@ package com.revolsys.geometry.algorithm;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.coordinates.CentralEndpointIntersector;
+import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.BoundingBoxUtil;
-
-/**
- *@version 1.7
- */
-
-import com.revolsys.gis.model.coordinates.CentralEndpointIntersector;
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 
 /**
  * A robust version of {@link LineIntersector}.

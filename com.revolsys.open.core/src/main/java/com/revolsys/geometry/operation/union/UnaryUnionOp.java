@@ -37,6 +37,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -46,7 +47,6 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Puntal;
 import com.revolsys.geometry.operation.overlay.OverlayOp;
 import com.revolsys.geometry.operation.overlay.snap.SnapIfNeededOverlayOp;
-import com.revolsys.gis.graph.linemerge.LineMerger;
 
 /**
  * Unions a <code>Collection</code> of {@link Geometry}s or a single Geometry

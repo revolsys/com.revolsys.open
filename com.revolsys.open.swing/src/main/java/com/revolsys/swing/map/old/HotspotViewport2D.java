@@ -4,12 +4,12 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
+import com.revolsys.geometry.algorithm.index.quadtree.QuadTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
 import com.revolsys.swing.map.layer.Project;
 
 public class HotspotViewport2D extends com.revolsys.swing.map.ComponentViewport2D {

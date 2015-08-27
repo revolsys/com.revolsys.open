@@ -40,9 +40,9 @@ import com.revolsys.geometry.algorithm.RobustDeterminant;
 import com.revolsys.geometry.index.strtree.SIRtree;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 
 /**
  * Implements {@link PointInRing}

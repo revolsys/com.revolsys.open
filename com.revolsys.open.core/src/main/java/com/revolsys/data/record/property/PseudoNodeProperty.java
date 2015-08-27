@@ -9,9 +9,9 @@ import java.util.Set;
 import com.revolsys.data.equals.RecordEquals;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.gis.graph.Node;
-import com.revolsys.gis.graph.attribute.InvokeMethodObjectPropertyProxy;
-import com.revolsys.gis.graph.attribute.PseudoNodeAttribute;
+import com.revolsys.geometry.graph.Node;
+import com.revolsys.geometry.graph.attribute.InvokeMethodObjectPropertyProxy;
+import com.revolsys.geometry.graph.attribute.PseudoNodeAttribute;
 import com.revolsys.properties.ObjectPropertyProxy;
 
 public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {

@@ -7,10 +7,10 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.shape.random.RandomPointsBuilder;
 import com.revolsys.geometry.shape.random.RandomPointsInGridBuilder;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 
 public class CreateRandomShapeFunctions {
 

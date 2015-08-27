@@ -25,13 +25,13 @@ import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 import javax.swing.border.AbstractBorder;
 
+import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
-import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.Property;
 

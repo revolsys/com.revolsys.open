@@ -37,9 +37,9 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Triangle;
+import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 import com.revolsys.geometry.model.util.GeometryMapper;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 
 public class TriangleFunctions {
 

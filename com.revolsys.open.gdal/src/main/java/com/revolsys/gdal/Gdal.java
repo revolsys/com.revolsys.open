@@ -31,13 +31,13 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.format.json.Json;
 import com.revolsys.gdal.raster.GdalImageFactory;
+import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
+import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
-import com.revolsys.gis.cs.esri.EsriCsWktWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.spring.resource.FileSystemResource;

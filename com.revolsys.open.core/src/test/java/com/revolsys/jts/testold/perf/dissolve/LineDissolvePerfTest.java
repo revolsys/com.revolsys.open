@@ -7,11 +7,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.dissolve.LineDissolver;
+import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.wkb.ParseException;
-import com.revolsys.gis.graph.linemerge.LineMerger;
 import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 import com.revolsys.jts.testold.perf.PerformanceTestCase;
 import com.revolsys.jts.testold.perf.PerformanceTestRunner;

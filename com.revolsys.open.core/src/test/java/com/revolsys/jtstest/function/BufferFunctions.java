@@ -40,6 +40,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.util.GeometryMapper;
 import com.revolsys.geometry.model.util.GeometryMapper.MapOp;
 import com.revolsys.geometry.noding.SegmentString;
@@ -48,7 +49,6 @@ import com.revolsys.geometry.operation.buffer.BufferInputLineSimplifier;
 import com.revolsys.geometry.operation.buffer.BufferParameters;
 import com.revolsys.geometry.operation.buffer.OffsetCurveSetBuilder;
 import com.revolsys.geometry.operation.buffer.validate.BufferResultValidator;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 
 public class BufferFunctions {
 

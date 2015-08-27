@@ -45,7 +45,7 @@ import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 
 /**
  * @version 1.7

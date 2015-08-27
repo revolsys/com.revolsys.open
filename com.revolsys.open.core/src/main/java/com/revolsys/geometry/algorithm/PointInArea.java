@@ -3,8 +3,8 @@ package com.revolsys.geometry.algorithm;
 import java.util.function.Consumer;
 
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.segment.LineSegment;
-import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 
 public class PointInArea extends RayCrossingCounter implements Consumer<LineSegment> {
 

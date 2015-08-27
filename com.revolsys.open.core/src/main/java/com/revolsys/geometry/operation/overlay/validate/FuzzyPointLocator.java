@@ -41,7 +41,7 @@ import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.gis.model.coordinates.LineSegmentUtil;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 
 /**
  * Finds the most likely {@link Location} of a point relative to

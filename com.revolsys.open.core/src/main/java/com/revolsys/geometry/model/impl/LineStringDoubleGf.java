@@ -32,10 +32,10 @@
  */
 package com.revolsys.geometry.model.impl;
 
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.gis.cs.projection.CoordinatesOperation;
 
 /**
  *  Models an OGC-style <code>LineString</code>.

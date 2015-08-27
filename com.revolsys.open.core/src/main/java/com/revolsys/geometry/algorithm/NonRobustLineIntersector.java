@@ -33,8 +33,8 @@
 package com.revolsys.geometry.algorithm;
 
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 
 /**
  * A non-robust version of {@link LineIntersector}.
