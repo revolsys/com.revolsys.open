@@ -1,4 +1,4 @@
-package com.revolsys.data.record.property;
+package com.revolsys.geometry.graph.attribute;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -8,10 +8,9 @@ import java.util.Set;
 
 import com.revolsys.data.equals.RecordEquals;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.property.AbstractRecordDefinitionProperty;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.geometry.graph.Node;
-import com.revolsys.geometry.graph.attribute.InvokeMethodObjectPropertyProxy;
-import com.revolsys.geometry.graph.attribute.PseudoNodeAttribute;
 import com.revolsys.properties.ObjectPropertyProxy;
 
 public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {

@@ -3,6 +3,7 @@ package com.revolsys.geometry.graph.visitor;
 import java.util.LinkedHashSet;
 import java.util.function.Consumer;
 
+import com.revolsys.geometry.event.CoordinateEventListenerList;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Graph;
 import com.revolsys.geometry.graph.event.EdgeEvent;
@@ -11,7 +12,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.gis.event.CoordinateEventListenerList;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 

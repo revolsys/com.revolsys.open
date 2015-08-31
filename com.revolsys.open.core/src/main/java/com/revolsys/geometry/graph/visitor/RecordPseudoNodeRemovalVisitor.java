@@ -8,7 +8,6 @@ import javax.annotation.PreDestroy;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.property.DirectionalFields;
-import com.revolsys.data.record.property.PseudoNodeProperty;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.EdgePair;
@@ -16,6 +15,7 @@ import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.graph.RecordGraph;
 import com.revolsys.geometry.graph.attribute.NodeProperties;
 import com.revolsys.geometry.graph.attribute.PseudoNodeAttribute;
+import com.revolsys.geometry.graph.attribute.PseudoNodeProperty;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.predicate.PredicateProxy;
 

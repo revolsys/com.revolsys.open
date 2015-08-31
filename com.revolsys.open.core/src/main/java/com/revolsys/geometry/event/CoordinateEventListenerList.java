@@ -1,4 +1,4 @@
-package com.revolsys.gis.event;
+package com.revolsys.geometry.event;
 
 import java.util.LinkedHashSet;
 
