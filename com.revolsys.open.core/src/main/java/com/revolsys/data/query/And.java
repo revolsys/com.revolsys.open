@@ -16,6 +16,12 @@ public class And extends AbstractMultiCondition {
   }
 
   @Override
+  public And and(final Condition condition) {
+    add(condition);
+    return this;
+  }
+
+  @Override
   public And clone() {
     return (And)super.clone();
   }

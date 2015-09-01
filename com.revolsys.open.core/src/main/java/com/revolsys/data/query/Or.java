@@ -29,6 +29,12 @@ public class Or extends AbstractMultiCondition {
   }
 
   @Override
+  public Or or(final Condition condition) {
+    add(condition);
+    return this;
+  }
+
+  @Override
   public boolean test(final Map<String, Object> object) {
     final List<Condition> conditions = (List)getQueryValues();
     if (conditions.isEmpty()) {

@@ -290,6 +290,10 @@ public abstract class AbstractRecordQueryField extends ValueField
 
   protected abstract List<Record> getRecords(Query query);
 
+  public TextField getSearchField() {
+    return this.searchField;
+  }
+
   public String getSearchText() {
     return this.searchField.getText();
   }
@@ -451,6 +455,7 @@ public abstract class AbstractRecordQueryField extends ValueField
         this.listModel.clear();
         this.menu.setVisible(false);
         setSelectedRecord(null);
+        this.searchField.setFieldValid();
       }
     }
   }

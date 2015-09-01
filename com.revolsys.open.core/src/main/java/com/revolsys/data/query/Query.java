@@ -165,7 +165,10 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
     final Condition whereCondition = getWhereCondition();
     if (whereCondition == null) {
       setWhereCondition(condition);
-    } else if (condition != null) {
+    } else if (whereCondition instanceof And) {
+      final And and = (And)whereCondition;
+      and.add(condition);
+    } else {
       setWhereCondition(new And(whereCondition, condition));
     }
   }
@@ -265,7 +268,10 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
     final Condition whereCondition = getWhereCondition();
     if (whereCondition == null) {
       setWhereCondition(condition);
-    } else if (condition != null) {
+    } else if (whereCondition instanceof Or) {
+      final Or or = (Or)whereCondition;
+      or.add(condition);
+    } else {
       setWhereCondition(new Or(whereCondition, condition));
     }
   }

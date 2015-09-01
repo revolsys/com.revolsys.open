@@ -29,6 +29,7 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.AbstractRecordQueryField;
 import com.revolsys.swing.field.Field;
+import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.listener.Listeners;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.PopupMenu;
@@ -149,11 +150,16 @@ public class RecordTableCellEditor extends AbstractCellEditor
     this.editorComponent.addKeyListener(this);
     this.editorComponent.addMouseListener(this);
     if (this.editorComponent instanceof JComboBox) {
-      final JComboBox comboBox = (JComboBox)this.editorComponent;
+      final JComboBox<?> comboBox = (JComboBox<?>)this.editorComponent;
       final ComboBoxEditor editor = comboBox.getEditor();
       final Component comboEditorComponent = editor.getEditorComponent();
       comboEditorComponent.addKeyListener(this);
       comboEditorComponent.addMouseListener(this);
+    } else if (this.editorComponent instanceof AbstractRecordQueryField) {
+      final AbstractRecordQueryField queryField = (AbstractRecordQueryField)this.editorComponent;
+      final TextField searchField = queryField.getSearchField();
+      searchField.addKeyListener(this);
+      searchField.addMouseListener(this);
     }
     if (this.popupMenu != null) {
       this.popupMenu.addToComponent(this.editorComponent);
@@ -280,11 +286,16 @@ public class RecordTableCellEditor extends AbstractCellEditor
           this.editorComponent.removeMouseListener(this);
           this.editorComponent.removeKeyListener(this);
           if (this.editorComponent instanceof JComboBox) {
-            final JComboBox comboBox = (JComboBox)this.editorComponent;
+            final JComboBox<?> comboBox = (JComboBox<?>)this.editorComponent;
             final ComboBoxEditor editor = comboBox.getEditor();
             final Component comboEditorComponent = editor.getEditorComponent();
             comboEditorComponent.removeKeyListener(this);
             comboEditorComponent.removeMouseListener(this);
+          } else if (this.editorComponent instanceof AbstractRecordQueryField) {
+            final AbstractRecordQueryField queryField = (AbstractRecordQueryField)this.editorComponent;
+            final TextField searchField = queryField.getSearchField();
+            searchField.removeKeyListener(this);
+            searchField.removeMouseListener(this);
           }
           if (this.popupMenu != null) {
             PopupMenu.removeFromComponent(this.editorComponent);

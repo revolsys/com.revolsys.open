@@ -14,6 +14,10 @@ public abstract class Condition extends QueryValue implements Predicate<Map<Stri
     }
   }
 
+  public And and(final Condition condition) {
+    return new And(this, condition);
+  }
+
   @Override
   public Condition clone() {
     return (Condition)super.clone();
@@ -28,6 +32,10 @@ public abstract class Condition extends QueryValue implements Predicate<Map<Stri
 
   public boolean isEmpty() {
     return false;
+  }
+
+  public Or or(final Condition condition) {
+    return new Or(this, condition);
   }
 
   @Override
