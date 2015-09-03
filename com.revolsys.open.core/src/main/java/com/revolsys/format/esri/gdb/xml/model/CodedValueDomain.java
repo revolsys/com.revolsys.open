@@ -104,15 +104,9 @@ public class CodedValueDomain extends Domain implements CodeTable {
   }
 
   @Override
-  public Identifier getId(final Map<String, ? extends Object> values) {
-    final Object name = getName(values);
-    return getId(name);
-  }
-
-  @Override
-  public Identifier getId(final Object... values) {
-    if (values.length == 1) {
-      final Object value = values[0];
+  public Identifier getIdentifier(final List<Object> values, final boolean loadMissing) {
+    if (values.size() == 1) {
+      final Object value = values.get(0);
       if (value == null) {
         return null;
       } else if (this.idValueMap.containsKey(value)) {
@@ -130,13 +124,14 @@ public class CodedValueDomain extends Domain implements CodeTable {
   }
 
   @Override
-  public List<Identifier> getIdentifiers() {
-    return new ArrayList<>(this.idValueMap.keySet());
+  public Identifier getIdentifier(final Map<String, ? extends Object> values) {
+    final Object name = getName(values);
+    return getIdentifier(name);
   }
 
   @Override
-  public Identifier getIdExact(final Object... values) {
-    return getId(values);
+  public List<Identifier> getIdentifiers() {
+    return new ArrayList<>(this.idValueMap.keySet());
   }
 
   @Override

@@ -542,7 +542,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
       if (value != null) {
         final CodeTable codeTable = getCodeTable();
         if (codeTable != null) {
-          final Identifier id = codeTable.getId(value);
+          final Identifier id = codeTable.getIdentifier(value);
           if (id != null) {
             value = Value.getValue(id);
           }
@@ -736,7 +736,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
           }
         }
       } else {
-        final Identifier id = codeTable.getId(value);
+        final Identifier id = codeTable.getIdentifier(value);
         if (id == null) {
           String codeTableName;
           if (codeTable instanceof CodeTableProperty) {

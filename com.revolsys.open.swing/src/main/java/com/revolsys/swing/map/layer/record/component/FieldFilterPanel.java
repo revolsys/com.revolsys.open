@@ -604,7 +604,7 @@ public class FieldFilterPanel extends JComponent
                 return;
               }
             } else {
-              value = this.codeTable.getId(searchValue);
+              value = this.codeTable.getIdentifier(searchValue);
               if (value == null) {
                 return;
               }

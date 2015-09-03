@@ -342,24 +342,37 @@ public class RecordLayerTableModel extends RecordRowTableModel
   @Override
   public final int getRowCount() {
     synchronized (getSync()) {
-      synchronized (getSync()) {
-        if (this.countLoaded) {
-          int count = this.rowCount;
-          if (!this.fieldFilterMode.equals(MODE_SELECTED)
-            && !this.fieldFilterMode.equals(MODE_EDITS)) {
-            final AbstractRecordLayer layer = getLayer();
-            final int newRecordCount = layer.getNewRecordCount();
-            count += newRecordCount;
-          }
-          return count;
-
-        } else {
-          if (this.rowCountWorker == null) {
-            this.rowCountWorker = Invoke.background("Query row count " + this.layer.getName(), this,
-              "loadRowCount", this.refreshIndex);
-          }
-          return 0;
+      if (this.countLoaded) {
+        int count = this.rowCount;
+        if (!this.fieldFilterMode.equals(MODE_SELECTED)
+          && !this.fieldFilterMode.equals(MODE_EDITS)) {
+          final AbstractRecordLayer layer = getLayer();
+          final int newRecordCount = layer.getNewRecordCount();
+          count += newRecordCount;
         }
+        return count;
+      } else {
+        if (this.rowCountWorker == null) {
+          this.rowCountWorker = Invoke.background("Query row count " + this.layer.getName(), () -> {
+            final int refreshIndex = this.refreshIndex;
+            final int rowCount = getRowCountInternal();
+            Invoke.later(() -> {
+              boolean updated = false;
+              synchronized (getSync()) {
+                if (refreshIndex == this.refreshIndex) {
+                  this.rowCount = rowCount;
+                  this.countLoaded = true;
+                  this.rowCountWorker = null;
+                  updated = true;
+                }
+              }
+              if (updated) {
+                fireTableDataChanged();
+              }
+            });
+          });
+        }
+        return 0;
       }
     }
   }
@@ -367,9 +380,9 @@ public class RecordLayerTableModel extends RecordRowTableModel
   protected int getRowCountInternal() {
     if (this.fieldFilterMode.equals(MODE_SELECTED)) {
       synchronized (this.selectedSync) {
-        this.selectedRecords = new ArrayList<LayerRecord>();
+        this.selectedRecords = new ArrayList<>();
         for (final LayerRecord record : getLayerSelectedRecords()) {
-          if (!record.isDeleted()) {
+          if (!record.isDeleted() && (this.filter == null || this.filter.test(record))) {
             this.selectedRecords.add(record);
           }
         }
@@ -471,11 +484,6 @@ public class RecordLayerTableModel extends RecordRowTableModel
     }
   }
 
-  public void loadRowCount(final int refreshIndex) {
-    final int rowCount = getRowCountInternal();
-    Invoke.later(this, "setRowCount", refreshIndex, rowCount);
-  }
-
   @Override
   public void propertyChange(final PropertyChangeEvent e) {
     final String propertyName = e.getPropertyName();
@@ -484,8 +492,8 @@ public class RecordLayerTableModel extends RecordRowTableModel
       final List<String> fieldNamesSet = layer.getFieldNamesSet();
       setFieldNames(fieldNamesSet);
     } else if (e.getSource() == this.layer) {
-      if (Arrays.asList("query", "editable", "recordInserted", "recordsInserted", "recordDeleted",
-        "recordsChanged").contains(propertyName)) {
+      if (Arrays.asList("filter", "query", "editable", "recordInserted", "recordsInserted",
+        "recordDeleted", "recordsChanged").contains(propertyName)) {
         refresh();
       } else if ("recordUpdated".equals(propertyName)) {
         repaint();
@@ -638,21 +646,6 @@ public class RecordLayerTableModel extends RecordRowTableModel
         fireTableRowsUpdated(pageNumber * this.pageSize,
           Math.min(getRowCount(), (pageNumber + 1) * this.pageSize - 1));
       }
-    }
-  }
-
-  public void setRowCount(final int refreshIndex, final int rowCount) {
-    boolean updated = false;
-    synchronized (getSync()) {
-      if (refreshIndex == this.refreshIndex) {
-        this.rowCount = rowCount;
-        this.countLoaded = true;
-        this.rowCountWorker = null;
-        updated = true;
-      }
-    }
-    if (updated) {
-      fireTableDataChanged();
     }
   }
 

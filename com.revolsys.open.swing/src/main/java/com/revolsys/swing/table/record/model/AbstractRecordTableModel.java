@@ -168,7 +168,7 @@ public abstract class AbstractRecordTableModel extends com.revolsys.swing.table.
         final Identifier identifier = (Identifier)displayValue;
         return identifier;
       } else {
-        final Object objectValue = codeTable.getId(displayValue);
+        final Object objectValue = codeTable.getIdentifier(displayValue);
         return objectValue;
       }
     }

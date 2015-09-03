@@ -18,9 +18,7 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.CompareUtil;
 import com.revolsys.util.MathUtil;
-import com.revolsys.util.Property;
 
 public abstract class AbstractCodeTable
   implements Closeable, PropertyChangeSupportProxy, CodeTable, Cloneable {
@@ -77,11 +75,9 @@ public abstract class AbstractCodeTable
   protected void addValue(final Identifier id, final Object... values) {
     final List<Object> valueList = Arrays.asList(values);
     addValue(id, valueList);
-
   }
 
   protected synchronized void addValues(final Map<Identifier, List<Object>> valueMap) {
-
     for (final Entry<Identifier, List<Object>> entry : valueMap.entrySet()) {
       final Identifier id = entry.getKey();
       final List<Object> values = entry.getValue();
@@ -116,37 +112,21 @@ public abstract class AbstractCodeTable
   }
 
   @Override
-  public int compare(final Object value1, final Object value2) {
-    if (value1 == null) {
-      if (value2 == null) {
-        return 0;
-      } else {
-        return 1;
-      }
-    } else if (value2 == null) {
-      return -1;
-    } else {
-      final Object codeValue1 = getValue(Identifier.create(value1));
-      final Object codeValue2 = getValue(Identifier.create(value2));
-      return CompareUtil.compare(codeValue1, codeValue2);
-    }
-  }
-
-  @Override
   public Map<Identifier, List<Object>> getCodes() {
     return Collections.unmodifiableMap(this.idValueCache);
   }
 
-  @Override
-  public List<String> getFieldAliases() {
-    return Collections.emptyList();
+  protected Identifier getIdByValue(final List<Object> valueList) {
+    processValues(valueList);
+    Identifier id = this.valueIdCache.get(valueList);
+    if (id == null) {
+      final List<Object> normalizedValues = getNormalizedValues(valueList);
+      id = this.valueIdCache.get(normalizedValues);
+    }
+    return id;
   }
 
-  public Identifier getId(final List<Object> values) {
-    return getId(values, true);
-  }
-
-  public Identifier getId(final List<Object> values, final boolean loadValues) {
+  public Identifier getIdentifier(final List<Object> values, final boolean loadValues) {
     if (values.size() == 1) {
       final Object id = values.get(0);
       if (id == null) {
@@ -181,42 +161,11 @@ public abstract class AbstractCodeTable
   }
 
   @Override
-  public Identifier getId(final Map<String, ? extends Object> valueMap) {
-    final List<String> valueFieldNames = getValueFieldNames();
-    final Object[] values = new Object[valueFieldNames.size()];
-    for (int i = 0; i < values.length; i++) {
-      final String name = valueFieldNames.get(i);
-      final Object value = valueMap.get(name);
-      values[i] = value;
-    }
-    return getId(values);
-  }
-
-  @Override
-  public Identifier getId(final Object... values) {
-    final List<Object> valueList = Arrays.asList(values);
-    return getId(valueList);
-  }
-
-  protected Identifier getIdByValue(final List<Object> valueList) {
-    processValues(valueList);
-    Identifier id = this.valueIdCache.get(valueList);
-    if (id == null) {
-      final List<Object> normalizedValues = getNormalizedValues(valueList);
-      id = this.valueIdCache.get(normalizedValues);
-    }
-    return id;
-  }
-
-  @Override
   public List<Identifier> getIdentifiers() {
     return Collections.unmodifiableList(this.identifiers);
   }
 
-  public Identifier getIdExact(final List<Object> values) {
-    return getIdExact(values, true);
-  }
-
+  @Override
   public Identifier getIdExact(final List<Object> values, final boolean loadValues) {
     Identifier id = this.valueIdCache.get(values);
     if (id == null && loadValues) {
@@ -228,30 +177,8 @@ public abstract class AbstractCodeTable
     return id;
   }
 
-  @Override
-  public Identifier getIdExact(final Object... values) {
-    final List<Object> valueList = Arrays.asList(values);
-    return getIdExact(valueList);
-  }
-
   public Map<Identifier, List<Object>> getIdValueCache() {
     return this.idValueCache;
-  }
-
-  @Override
-  public Map<String, ? extends Object> getMap(final Identifier id) {
-    final List<Object> values = getValues(id);
-    if (values == null) {
-      return Collections.emptyMap();
-    } else {
-      final Map<String, Object> map = new HashMap<String, Object>();
-      for (int i = 0; i < values.size(); i++) {
-        final String name = getValueFieldNames().get(i);
-        final Object value = values.get(i);
-        map.put(name, value);
-      }
-      return map;
-    }
   }
 
   @Override
@@ -263,7 +190,7 @@ public abstract class AbstractCodeTable
     return ++this.maxId;
   }
 
-  List<Object> getNormalizedValues(final List<Object> values) {
+  private List<Object> getNormalizedValues(final List<Object> values) {
     final List<Object> normalizedValues = new ArrayList<Object>();
     for (final Object value : values) {
       if (value == null) {
@@ -288,22 +215,6 @@ public abstract class AbstractCodeTable
     return this.swingEditor;
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public <V> V getValue(final Identifier id) {
-    final List<Object> values = getValues(id);
-    if (Property.hasValue(values)) {
-      return (V)values.get(0);
-    } else {
-      return null;
-    }
-  }
-
-  @Override
-  public <V> V getValue(final Object id) {
-    return getValue(Identifier.create(id));
-  }
-
   protected List<Object> getValueById(Object id) {
     if (this.valueIdCache.containsKey(Collections.singletonList(id))) {
       if (id instanceof SingleIdentifier) {
@@ -326,11 +237,6 @@ public abstract class AbstractCodeTable
       }
       return values;
     }
-  }
-
-  @Override
-  public List<String> getValueFieldNames() {
-    return Arrays.asList("VALUE");
   }
 
   @Override
@@ -365,11 +271,6 @@ public abstract class AbstractCodeTable
   @Override
   public boolean isEmpty() {
     return this.idIdCache.isEmpty();
-  }
-
-  @Override
-  public boolean isLoading() {
-    return false;
   }
 
   protected Identifier loadId(final List<Object> values, final boolean createId) {

@@ -298,7 +298,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     Identifier id = null;
     if (createId && this.loadAll && !isLoaded()) {
       loadAll();
-      id = getId(values, false);
+      id = getIdentifier(values, false);
     } else {
       final Query query = new Query(this.typePath);
       final And and = new And();

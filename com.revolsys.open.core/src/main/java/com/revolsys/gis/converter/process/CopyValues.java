@@ -47,7 +47,7 @@ public class CopyValues extends AbstractSourceToTargetProcess<Record, Record> {
         if (codeTable == null) {
           target.setValue(targetName, value);
         } else {
-          final Object codeId = codeTable.getId(value);
+          final Object codeId = codeTable.getIdentifier(value);
           target.setValue(targetName, codeId);
         }
       }

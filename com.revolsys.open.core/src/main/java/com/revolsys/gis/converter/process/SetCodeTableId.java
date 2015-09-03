@@ -44,16 +44,16 @@ public class SetCodeTableId extends AbstractSourceToTargetProcess<Record, Record
           .getCodeTableByFieldName(codeTableFieldName);
         if (targetCodeTable != null) {
           if (codeTableValueName == null) {
-            sourceValue = targetCodeTable.getId(sourceValue);
+            sourceValue = targetCodeTable.getIdentifier(sourceValue);
           } else {
             sourceValue = targetCodeTable
-              .getId(Collections.singletonMap(codeTableValueName, sourceValue));
+              .getIdentifier(Collections.singletonMap(codeTableValueName, sourceValue));
           }
         }
       }
       codeTableValues.put(codeTableFieldName, sourceValue);
     }
-    final Object codeId = this.codeTable.getId(codeTableValues);
+    final Object codeId = this.codeTable.getIdentifier(codeTableValues);
     target.setValue(this.targetFieldName, codeId);
   }
 

@@ -113,15 +113,18 @@ public class Invoke {
     return worker;
   }
 
-  public static void background(final String description, final Runnable backgroundTask) {
+  public static SwingWorker<?, ?> background(final String description,
+    final Runnable backgroundTask) {
     if (backgroundTask != null) {
       if (SwingUtilities.isEventDispatchThread()) {
         final RunnableSwingWorker worker = new RunnableSwingWorker(description, backgroundTask);
         worker(worker);
+        return worker;
       } else {
         backgroundTask.run();
       }
     }
+    return null;
   }
 
   public static PropertyChangeSupport getPropertyChangeSupport() {

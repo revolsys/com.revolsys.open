@@ -17,17 +17,17 @@ public class In extends Condition {
 
   private CollectionValue values;
 
-  public In(final FieldDefinition attribute, final Collection<? extends Object> values) {
-    this(attribute.getName(), new CollectionValue(attribute, values));
+  public In(final FieldDefinition field, final Collection<? extends Object> values) {
+    this(field.getName(), new CollectionValue(field, values));
   }
 
   public In(final QueryValue left, final CollectionValue values) {
     this.left = left;
     if (left instanceof Column) {
       final Column column = (Column)left;
-      final FieldDefinition attribute = column.getField();
-      if (attribute != null) {
-        values.setAttribute(attribute);
+      final FieldDefinition field = column.getField();
+      if (field != null) {
+        values.setField(field);
       }
     }
     this.values = values;

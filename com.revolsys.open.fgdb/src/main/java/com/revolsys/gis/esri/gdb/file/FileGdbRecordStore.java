@@ -297,7 +297,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       }
     } else if (condition instanceof Value) {
       final Value valueCondition = (Value)condition;
-      final Object value = valueCondition.getValue();
+      Object value = valueCondition.getValue();
+      if (value instanceof Identifier) {
+        final Identifier identifier = (Identifier)value;
+        value = identifier.getValue(0);
+      }
       appendValue(buffer, value);
     } else if (condition instanceof CollectionValue) {
       final CollectionValue collectionValue = (CollectionValue)condition;

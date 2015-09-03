@@ -20,6 +20,7 @@ import com.revolsys.data.identifier.AbstractIdentifier;
 import com.revolsys.data.identifier.Identifiable;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.ListIdentifier;
+import com.revolsys.data.identifier.TypedIdentifier;
 import com.revolsys.data.query.Value;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -330,6 +331,11 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
     }
   }
 
+  default TypedIdentifier getTypedIdentifier(final String type) {
+    final Identifier identifier = getIdentifier();
+    return TypedIdentifier.create(type, identifier);
+  }
+
   default String getTypePath() {
     return getRecordDefinition().getPath();
   }
@@ -636,9 +642,9 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
         Identifier id;
         if (value instanceof List) {
           final List list = (List)value;
-          id = codeTable.getId(list.toArray());
+          id = codeTable.getIdentifier(list.toArray());
         } else {
-          id = codeTable.getId(value);
+          id = codeTable.getIdentifier(value);
         }
         if (id == null) {
           targetValue = value;
@@ -646,7 +652,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
           targetValue = Value.getValue(id);
         }
       } else {
-        targetValue = codeTable.getId(Collections.singletonMap(codeTableValueName, value));
+        targetValue = codeTable.getIdentifier(Collections.singletonMap(codeTableValueName, value));
       }
       if (targetValue == null) {
         targetValue = value;

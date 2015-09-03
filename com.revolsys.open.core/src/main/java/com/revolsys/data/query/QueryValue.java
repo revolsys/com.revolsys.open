@@ -223,9 +223,9 @@ public abstract class QueryValue implements Cloneable {
                 if (value instanceof String) {
                   final String string = (String)value;
                   final String[] values = string.split(":");
-                  id = codeTable.getId((Object[])values);
+                  id = codeTable.getIdentifier((Object[])values);
                 } else {
-                  id = codeTable.getId(value);
+                  id = codeTable.getIdentifier(value);
                 }
                 if (id == null) {
                   throw new IllegalArgumentException(name + "='" + value

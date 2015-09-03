@@ -17,9 +17,9 @@ import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.util.CollectionUtil;
 
 public class CollectionValue extends QueryValue {
-  private FieldDefinition attribute;
+  private FieldDefinition field;
 
-  private JdbcFieldDefinition jdbcAttribute;
+  private JdbcFieldDefinition jdbcField;
 
   private List<QueryValue> queryValues = new ArrayList<QueryValue>();
 
@@ -27,9 +27,8 @@ public class CollectionValue extends QueryValue {
     this(null, values);
   }
 
-  public CollectionValue(final FieldDefinition attribute,
-    final Collection<? extends Object> values) {
-    setAttribute(attribute);
+  public CollectionValue(final FieldDefinition field, final Collection<? extends Object> values) {
+    setField(field);
     for (final Object value : values) {
       QueryValue queryValue;
       if (value instanceof QueryValue) {
@@ -53,10 +52,10 @@ public class CollectionValue extends QueryValue {
 
       final QueryValue queryValue = this.queryValues.get(i);
       if (queryValue instanceof Value) {
-        if (this.jdbcAttribute == null) {
+        if (this.jdbcField == null) {
           queryValue.appendSql(query, recordStore, buffer);
         } else {
-          this.jdbcAttribute.addSelectStatementPlaceHolder(buffer);
+          this.jdbcField.addSelectStatementPlaceHolder(buffer);
         }
       } else {
         queryValue.appendSql(query, recordStore, buffer);
@@ -69,15 +68,15 @@ public class CollectionValue extends QueryValue {
   @Override
   public int appendParameters(int index, final PreparedStatement statement) {
     for (final QueryValue queryValue : this.queryValues) {
-      JdbcFieldDefinition jdbcAttribute = this.jdbcAttribute;
+      JdbcFieldDefinition jdbcField = this.jdbcField;
       if (queryValue instanceof Value) {
         final Value valueWrapper = (Value)queryValue;
         final Object value = valueWrapper.getQueryValue();
-        if (jdbcAttribute == null) {
-          jdbcAttribute = JdbcFieldDefinition.createField(value);
+        if (jdbcField == null) {
+          jdbcField = JdbcFieldDefinition.createField(value);
         }
         try {
-          index = jdbcAttribute.setPreparedStatementValue(statement, index, value);
+          index = jdbcField.setPreparedStatementValue(statement, index, value);
         } catch (final SQLException e) {
           ExceptionUtil.throwIfUnchecked(e);
         }
@@ -106,7 +105,7 @@ public class CollectionValue extends QueryValue {
   }
 
   public FieldDefinition getField() {
-    return this.attribute;
+    return this.field;
   }
 
   @Override
@@ -127,9 +126,9 @@ public class CollectionValue extends QueryValue {
 
   public List<Object> getValues() {
     CodeTable codeTable = null;
-    if (this.attribute != null) {
-      final RecordDefinition recordDefinition = this.attribute.getRecordDefinition();
-      final String fieldName = this.attribute.getName();
+    if (this.field != null) {
+      final RecordDefinition recordDefinition = this.field.getRecordDefinition();
+      final String fieldName = this.field.getName();
       codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
     }
     final List<Object> values = new ArrayList<Object>();
@@ -143,7 +142,7 @@ public class CollectionValue extends QueryValue {
       }
       if (value != null) {
         if (codeTable != null) {
-          value = codeTable.getId(value);
+          value = codeTable.getIdentifier(value);
         }
         value = Value.getValue(value);
         values.add(value);
@@ -152,20 +151,20 @@ public class CollectionValue extends QueryValue {
     return values;
   }
 
-  public void setAttribute(final FieldDefinition attribute) {
-    this.attribute = attribute;
-    if (attribute == null) {
-      this.jdbcAttribute = null;
+  public void setField(final FieldDefinition field) {
+    this.field = field;
+    if (field == null) {
+      this.jdbcField = null;
     } else {
-      if (attribute instanceof JdbcFieldDefinition) {
-        this.jdbcAttribute = (JdbcFieldDefinition)attribute;
+      if (field instanceof JdbcFieldDefinition) {
+        this.jdbcField = (JdbcFieldDefinition)field;
       } else {
-        this.jdbcAttribute = null;
+        this.jdbcField = null;
       }
       for (final QueryValue queryValue : this.queryValues) {
         if (queryValue instanceof Value) {
           final Value value = (Value)queryValue;
-          value.setAttribute(attribute);
+          value.setField(field);
         }
       }
     }

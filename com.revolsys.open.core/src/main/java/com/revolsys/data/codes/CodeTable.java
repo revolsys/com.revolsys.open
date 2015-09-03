@@ -1,40 +1,118 @@
 package com.revolsys.data.codes;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.JComponent;
 
 import com.revolsys.data.identifier.Identifier;
+import com.revolsys.util.CompareUtil;
 import com.revolsys.util.Emptyable;
+import com.revolsys.util.Property;
 
 public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
+  @Override
+  default int compare(final Object value1, final Object value2) {
+    if (value1 == null) {
+      if (value2 == null) {
+        return 0;
+      } else {
+        return 1;
+      }
+    } else if (value2 == null) {
+      return -1;
+    } else {
+      final Object codeValue1 = getValue(Identifier.create(value1));
+      final Object codeValue2 = getValue(Identifier.create(value2));
+      return CompareUtil.compare(codeValue1, codeValue2);
+    }
+  }
+
   Map<Identifier, List<Object>> getCodes();
 
-  List<String> getFieldAliases();
+  default List<String> getFieldAliases() {
+    return Collections.emptyList();
+  }
 
-  Identifier getId(final Map<String, ? extends Object> values);
+  default Identifier getIdentifier(final List<Object> values) {
+    return getIdentifier(values, true);
+  }
 
-  Identifier getId(final Object... values);
+  Identifier getIdentifier(final List<Object> values, boolean loadMissing);
+
+  default Identifier getIdentifier(final Map<String, ? extends Object> valueMap) {
+    final List<String> valueFieldNames = getValueFieldNames();
+    final List<Object> values = new ArrayList<>();
+    for (final String name : valueFieldNames) {
+      final Object value = valueMap.get(name);
+      values.add(value);
+    }
+    return getIdentifier(values);
+  }
+
+  default Identifier getIdentifier(final Object... values) {
+    final List<Object> valueList = Arrays.asList(values);
+    return getIdentifier(valueList);
+  }
 
   List<Identifier> getIdentifiers();
 
-  Identifier getIdExact(final Object... values);
+  default Identifier getIdExact(final List<Object> values) {
+    return getIdExact(values, true);
+  }
+
+  default Identifier getIdExact(final List<Object> values, final boolean loadValues) {
+    return getIdentifier(values);
+  }
+
+  default Identifier getIdExact(final Object... values) {
+    final List<Object> valueList = Arrays.asList(values);
+    return getIdExact(valueList);
+  }
 
   String getIdFieldName();
 
-  Map<String, ? extends Object> getMap(final Identifier id);
+  default Map<String, ? extends Object> getMap(final Identifier id) {
+    final List<Object> values = getValues(id);
+    if (values == null) {
+      return Collections.emptyMap();
+    } else {
+      final Map<String, Object> map = new HashMap<String, Object>();
+      for (int i = 0; i < values.size(); i++) {
+        final String name = getValueFieldNames().get(i);
+        final Object value = values.get(i);
+        map.put(name, value);
+      }
+      return map;
+    }
+  }
 
   String getName();
 
   JComponent getSwingEditor();
 
-  <V> V getValue(final Identifier id);
+  @SuppressWarnings("unchecked")
+  default <V> V getValue(final Identifier id) {
+    final List<Object> values = getValues(id);
+    if (Property.hasValue(values)) {
+      return (V)values.get(0);
+    } else {
+      return null;
+    }
+  }
 
-  <V> V getValue(final Object id);
+  default <V> V getValue(final Object id) {
+    return getValue(Identifier.create(id));
+  }
 
-  List<String> getValueFieldNames();
+  default List<String> getValueFieldNames() {
+    return Arrays.asList("VALUE");
+  }
 
   List<Object> getValues(final Identifier id);
 
@@ -42,7 +120,10 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
     return true;
   }
 
-  boolean isLoading();
+  default boolean isLoading() {
+    return false;
+  }
 
-  void refresh();
+  default void refresh() {
+  }
 }

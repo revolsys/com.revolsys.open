@@ -743,9 +743,9 @@ public class QueryWhereConditionField extends ValueField
                 if (value instanceof String) {
                   final String string = (String)value;
                   final String[] values = string.split(":");
-                  id = codeTable.getId((Object[])values);
+                  id = codeTable.getIdentifier((Object[])values);
                 } else {
-                  id = codeTable.getId(value);
+                  id = codeTable.getIdentifier(value);
                 }
                 if (id == null) {
                   setInvalidMessage(name + "='" + value + "' could not be found in the code table "
