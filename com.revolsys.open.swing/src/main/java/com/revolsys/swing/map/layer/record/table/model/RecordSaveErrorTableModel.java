@@ -22,6 +22,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.record.model.RecordListTableModel;
@@ -120,26 +121,28 @@ public class RecordSaveErrorTableModel extends RecordListTableModel
     if (isEmpty()) {
       return true;
     } else {
-      final String layerPath = this.layer.getPath();
-      final BasePanel panel = new BasePanel(new VerticalLayout(),
-        new JLabel("<html><p><b style=\"color:red\">Error saving changes for layer:</b></p><p>"
-          + layerPath + "</p>"),
-        RecordSaveErrorTableModel.createPanel(this));
-      final Rectangle screenBounds = SwingUtil.getScreenBounds();
-      panel.setPreferredSize(new Dimension(screenBounds.width - 300, getRowCount() * 22 + 75));
+      Invoke.later(() -> {
+        final String layerPath = this.layer.getPath();
+        final BasePanel panel = new BasePanel(new VerticalLayout(),
+          new JLabel("<html><p><b style=\"color:red\">Error saving changes for layer:</b></p><p>"
+            + layerPath + "</p>"),
+          RecordSaveErrorTableModel.createPanel(this));
+        final Rectangle screenBounds = SwingUtil.getScreenBounds();
+        panel.setPreferredSize(new Dimension(screenBounds.width - 300, getRowCount() * 22 + 75));
 
-      final Window window = SwingUtil.getActiveWindow();
-      final JOptionPane pane = new JOptionPane(panel, JOptionPane.ERROR_MESSAGE,
-        JOptionPane.DEFAULT_OPTION, null, null, null);
+        final Window window = SwingUtil.getActiveWindow();
+        final JOptionPane pane = new JOptionPane(panel, JOptionPane.ERROR_MESSAGE,
+          JOptionPane.DEFAULT_OPTION, null, null, null);
 
-      pane.setComponentOrientation(window.getComponentOrientation());
+        pane.setComponentOrientation(window.getComponentOrientation());
 
-      final JDialog dialog = pane.createDialog(window, "Error Saving Changes: " + layerPath);
+        final JDialog dialog = pane.createDialog(window, "Error Saving Changes: " + layerPath);
 
-      dialog.pack();
-      SwingUtil.setLocationCentre(screenBounds, dialog);
-      dialog.setVisible(true);
-      dialog.dispose();
+        dialog.pack();
+        SwingUtil.setLocationCentre(screenBounds, dialog);
+        dialog.setVisible(true);
+        dialog.dispose();
+      });
       return false;
     }
   }
