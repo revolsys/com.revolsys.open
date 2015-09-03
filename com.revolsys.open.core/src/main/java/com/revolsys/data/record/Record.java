@@ -110,20 +110,30 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
   }
 
   default Byte getByte(final CharSequence name) {
-    final Number value = getValue(name);
-    if (value == null) {
-      return null;
+    final Object value = getValue(name);
+    if (Property.hasValue(value)) {
+      if (value instanceof Number) {
+        final Number number = (Number)value;
+        return number.byteValue();
+      } else {
+        return Byte.valueOf(value.toString());
+      }
     } else {
-      return value.byteValue();
+      return null;
     }
   }
 
   default Double getDouble(final CharSequence name) {
-    final Number value = getValue(name);
-    if (value == null) {
-      return null;
+    final Object value = getValue(name);
+    if (Property.hasValue(value)) {
+      if (value instanceof Number) {
+        final Number number = (Number)value;
+        return number.doubleValue();
+      } else {
+        return Double.valueOf(value.toString());
+      }
     } else {
-      return value.doubleValue();
+      return null;
     }
   }
 
@@ -162,11 +172,16 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
   }
 
   default Float getFloat(final CharSequence name) {
-    final Number value = getValue(name);
-    if (value == null) {
-      return null;
+    final Object value = getValue(name);
+    if (Property.hasValue(value)) {
+      if (value instanceof Number) {
+        final Number number = (Number)value;
+        return number.floatValue();
+      } else {
+        return Float.valueOf(value.toString());
+      }
     } else {
-      return value.floatValue();
+      return null;
     }
   }
 
@@ -258,13 +273,15 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
 
   default Integer getInteger(final CharSequence name) {
     final Object value = getValue(name);
-    if (value == null) {
-      return null;
-    } else if (value instanceof Number) {
-      final Number number = (Number)value;
-      return number.intValue();
+    if (Property.hasValue(value)) {
+      if (value instanceof Number) {
+        final Number number = (Number)value;
+        return number.intValue();
+      } else {
+        return Integer.valueOf(value.toString());
+      }
     } else {
-      return Integer.valueOf(value.toString());
+      return null;
     }
   }
 
@@ -278,11 +295,16 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
   }
 
   default Long getLong(final CharSequence name) {
-    final Number value = getValue(name);
-    if (value == null) {
-      return null;
+    final Object value = getValue(name);
+    if (Property.hasValue(value)) {
+      if (value instanceof Number) {
+        final Number number = (Number)value;
+        return number.longValue();
+      } else {
+        return Long.valueOf(value.toString());
+      }
     } else {
-      return value.longValue();
+      return null;
     }
   }
 
@@ -294,11 +316,16 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
   RecordDefinition getRecordDefinition();
 
   default Short getShort(final CharSequence name) {
-    final Number value = getValue(name);
-    if (value == null) {
-      return null;
+    final Object value = getValue(name);
+    if (Property.hasValue(value)) {
+      if (value instanceof Number) {
+        final Number number = (Number)value;
+        return number.shortValue();
+      } else {
+        return Short.valueOf(value.toString());
+      }
     } else {
-      return value.shortValue();
+      return null;
     }
   }
 
