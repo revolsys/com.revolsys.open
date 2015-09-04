@@ -9,3 +9,4 @@ set PATH=%VSINSTALLDIR%\VC\bin\x86_amd64;%PATH%
 nmake ARCH=x86_64 /f Makefile.nmake
 
 pause
+
