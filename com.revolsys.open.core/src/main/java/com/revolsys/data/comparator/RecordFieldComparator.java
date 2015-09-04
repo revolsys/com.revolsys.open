@@ -8,26 +8,26 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.Records;
 import com.revolsys.util.CompareUtil;
 
-public class RecordAttributeComparator implements Comparator<Record> {
+public class RecordFieldComparator implements Comparator<Record> {
   private List<String> fieldNames;
 
   private boolean invert;
 
   private boolean nullFirst;
 
-  public RecordAttributeComparator() {
+  public RecordFieldComparator() {
   }
 
-  public RecordAttributeComparator(final boolean sortAsceding, final String... fieldNames) {
+  public RecordFieldComparator(final boolean sortAsceding, final String... fieldNames) {
     this(Arrays.asList(fieldNames));
     this.invert = !sortAsceding;
   }
 
-  public RecordAttributeComparator(final List<String> fieldNames) {
+  public RecordFieldComparator(final List<String> fieldNames) {
     this.fieldNames = fieldNames;
   }
 
-  public RecordAttributeComparator(final String... fieldNames) {
+  public RecordFieldComparator(final String... fieldNames) {
     this(Arrays.asList(fieldNames));
   }
 
@@ -95,5 +95,4 @@ public class RecordAttributeComparator implements Comparator<Record> {
   public void setNullFirst(final boolean nullFirst) {
     this.nullFirst = nullFirst;
   }
-
 }

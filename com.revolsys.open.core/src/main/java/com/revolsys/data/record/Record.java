@@ -86,17 +86,50 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
     getRecordDefinition().delete(this);
   }
 
-  default boolean equalValue(final Record otherRecord, final String fieldName) {
+  default boolean equalPathValue(final CharSequence fieldPath, final Object value) {
+    final Object fieldValue = getValueByPath(fieldPath);
+    final boolean hasValue1 = Property.hasValue(value);
+    final boolean hasValue2 = Property.hasValue(fieldValue);
+    if (hasValue1) {
+      if (hasValue2) {
+        return Equals.equal(fieldValue, value);
+      } else {
+        return false;
+      }
+    } else {
+      if (hasValue2) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
+
+  default boolean equalValue(final CharSequence fieldName, final Object value) {
+    final Object fieldValue = getValue(fieldName);
+    final boolean hasValue1 = Property.hasValue(value);
+    final boolean hasValue2 = Property.hasValue(fieldValue);
+    if (hasValue1) {
+      if (hasValue2) {
+        return Equals.equal(fieldValue, value);
+      } else {
+        return false;
+      }
+    } else {
+      if (hasValue2) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
+
+  default boolean equalValue(final Record otherRecord, final CharSequence fieldName) {
     if (otherRecord != null) {
       final Object value = getValue(fieldName);
       return otherRecord.equalValue(fieldName, value);
     }
     return false;
-  }
-
-  default boolean equalValue(final String fieldName, final Object value) {
-    final Object fieldValue = getValue(fieldName);
-    return Equals.equal(fieldValue, value);
   }
 
   @Override

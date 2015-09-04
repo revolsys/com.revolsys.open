@@ -11,7 +11,7 @@ public class RecordEquals implements Equals<Record> {
 
   public static final String EXCLUDE_ID = RecordEquals.class.getName() + ".excludeId";
 
-  public static boolean equalAttributes(final Collection<String> excludedAttributes,
+  public static boolean equalFields(final Collection<String> excludedAttributes,
     final Record object1, final Record object2, final Collection<String> fieldNames) {
     for (final String fieldName : fieldNames) {
       if (!equals(excludedAttributes, object1, object2, fieldName)) {
@@ -21,7 +21,7 @@ public class RecordEquals implements Equals<Record> {
     return true;
   }
 
-  public static boolean equalAttributes(final Record object1, final Map<String, Object> values2) {
+  public static boolean equalFields(final Record object1, final Map<String, Object> values2) {
     if (object1 == null) {
       return values2 == null;
     } else if (values2 == null) {
@@ -36,7 +36,7 @@ public class RecordEquals implements Equals<Record> {
     }
   }
 
-  public static boolean equalAttributes(final Record object1, final Record object2,
+  public static boolean equalFields(final Record object1, final Record object2,
     final Collection<String> fieldNames) {
     for (final String fieldName : fieldNames) {
       if (!equals(object1, object2, fieldName)) {

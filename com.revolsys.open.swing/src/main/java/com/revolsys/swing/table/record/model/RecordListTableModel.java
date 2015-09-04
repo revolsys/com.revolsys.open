@@ -12,7 +12,7 @@ import javax.annotation.PreDestroy;
 import javax.swing.JTable;
 import javax.swing.SortOrder;
 
-import com.revolsys.data.comparator.RecordAttributeComparator;
+import com.revolsys.data.comparator.RecordFieldComparator;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
@@ -180,7 +180,7 @@ public class RecordListTableModel extends RecordRowTableModel implements Reorder
     final SortOrder sortOrder = super.setSortOrder(column);
     if (this.records != null) {
       final String fieldName = getFieldName(column);
-      final Comparator<Record> comparitor = new RecordAttributeComparator(
+      final Comparator<Record> comparitor = new RecordFieldComparator(
         sortOrder == SortOrder.ASCENDING, fieldName);
       Collections.sort(this.records, comparitor);
       fireTableDataChanged();

@@ -43,7 +43,7 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
     return getIdentifier(values, true);
   }
 
-  Identifier getIdentifier(final List<Object> values, boolean loadMissing);
+  Identifier getIdentifier(List<Object> values, boolean loadMissing);
 
   default Identifier getIdentifier(final Map<String, ? extends Object> valueMap) {
     final List<String> valueFieldNames = getValueFieldNames();
@@ -77,6 +77,19 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
 
   String getIdFieldName();
 
+  default <V> V getIdValue(final Object value) {
+    if (value == null) {
+      return null;
+    } else {
+      final Identifier identifier = getIdentifier(value);
+      if (identifier == null) {
+        return null;
+      } else {
+        return identifier.getValue(0);
+      }
+    }
+  }
+
   default Map<String, ? extends Object> getMap(final Identifier id) {
     final List<Object> values = getValues(id);
     if (values == null) {
@@ -90,6 +103,11 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
       }
       return map;
     }
+  }
+
+  default Map<String, ? extends Object> getMap(final Object id) {
+    final Identifier identifier = Identifier.create(id);
+    return getMap(identifier);
   }
 
   String getName();
@@ -107,14 +125,20 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
   }
 
   default <V> V getValue(final Object id) {
-    return getValue(Identifier.create(id));
+    final Identifier identifier = Identifier.create(id);
+    return getValue(identifier);
   }
 
   default List<String> getValueFieldNames() {
     return Arrays.asList("VALUE");
   }
 
-  List<Object> getValues(final Identifier id);
+  List<Object> getValues(Identifier id);
+
+  default List<Object> getValues(final Object id) {
+    final Identifier identifier = Identifier.create(id);
+    return getValues(identifier);
+  }
 
   default boolean isLoaded() {
     return true;

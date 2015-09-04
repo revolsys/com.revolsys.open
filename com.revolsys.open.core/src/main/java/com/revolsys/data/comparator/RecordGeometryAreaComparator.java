@@ -5,16 +5,16 @@ import java.util.Comparator;
 import com.revolsys.data.record.Record;
 import com.revolsys.geometry.model.Polygon;
 
-public class RecordGeometryAreaComparitor implements Comparator<Record> {
+public class RecordGeometryAreaComparator implements Comparator<Record> {
 
   private boolean clockwise = false;
 
   private boolean decending = false;
 
-  public RecordGeometryAreaComparitor() {
+  public RecordGeometryAreaComparator() {
   }
 
-  public RecordGeometryAreaComparitor(final boolean decending, final boolean clockwise) {
+  public RecordGeometryAreaComparator(final boolean decending, final boolean clockwise) {
     this.decending = decending;
     this.clockwise = clockwise;
   }

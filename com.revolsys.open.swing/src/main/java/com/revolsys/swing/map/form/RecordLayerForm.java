@@ -925,7 +925,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
         return (T)value;
       }
     } else {
-      final Object id = codeTable.getIdentifier(value);
+      final Identifier id = codeTable.getIdentifier(value);
       return (T)id;
     }
   }

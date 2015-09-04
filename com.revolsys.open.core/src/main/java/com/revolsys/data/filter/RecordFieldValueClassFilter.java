@@ -10,7 +10,7 @@ import com.revolsys.data.record.Records;
  *
  * @author Paul Austin
  */
-public class AttributeValueClassFilter implements Predicate<Record> {
+public class RecordFieldValueClassFilter implements Predicate<Record> {
   /** The fieldName name, or path to match. */
   private String fieldName;
 

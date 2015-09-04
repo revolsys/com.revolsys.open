@@ -5,10 +5,10 @@ import java.util.Comparator;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.util.CompareUtil;
 
-public class CodeTableValueComaprator implements Comparator<Identifier> {
+public class CodeTableValueComparator implements Comparator<Identifier> {
   private final CodeTable codeTable;
 
-  public CodeTableValueComaprator(final CodeTable codeTable) {
+  public CodeTableValueComparator(final CodeTable codeTable) {
     this.codeTable = codeTable;
   }
 
