@@ -473,7 +473,7 @@ public final class Property {
       final Emptyable emptyable = (Emptyable)value;
       return emptyable.isEmpty();
     } else {
-      return true;
+      return false;
     }
   }
 

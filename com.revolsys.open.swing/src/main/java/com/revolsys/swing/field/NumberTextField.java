@@ -241,7 +241,7 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
   }
 
   private Object getTypedValue(final Object value) {
-    if (value == null) {
+    if (Property.isEmpty(value)) {
       return null;
     } else {
       if ("NaN".equalsIgnoreCase(value.toString())) {
