@@ -678,7 +678,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected ValueField createPropertiesTabGeneralPanelFilter(final BasePanel parent) {
-
     final ValueField filterPanel = new ValueField(this);
     SwingUtil.setTitledBorder(filterPanel, "Filter");
 
@@ -2688,8 +2687,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     record1.setGeometryValue(line1);
     record2.setGeometryValue(line2);
 
-    property.setSplitAttributes(line, point, record1);
-    property.setSplitAttributes(line, point, record2);
+    property.setSplitFieldValues(line, point, record1);
+    property.setSplitFieldValues(line, point, record2);
     deleteRecord(record);
 
     saveChanges(record, record1, record2);

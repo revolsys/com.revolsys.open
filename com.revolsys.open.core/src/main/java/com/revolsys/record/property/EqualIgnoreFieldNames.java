@@ -9,19 +9,19 @@ import com.revolsys.equals.RecordEquals;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 
-public class EqualIgnoreAttributes extends AbstractRecordDefinitionProperty {
-  public static final String PROPERTY_NAME = EqualIgnoreAttributes.class.getName()
+public class EqualIgnoreFieldNames extends AbstractRecordDefinitionProperty {
+  public static final String PROPERTY_NAME = EqualIgnoreFieldNames.class.getName()
     + ".propertyName";
 
-  public static EqualIgnoreAttributes getProperty(final Record object) {
+  public static EqualIgnoreFieldNames getProperty(final Record object) {
     final RecordDefinition recordDefinition = object.getRecordDefinition();
     return getProperty(recordDefinition);
   }
 
-  public static EqualIgnoreAttributes getProperty(final RecordDefinition recordDefinition) {
-    EqualIgnoreAttributes property = recordDefinition.getProperty(PROPERTY_NAME);
+  public static EqualIgnoreFieldNames getProperty(final RecordDefinition recordDefinition) {
+    EqualIgnoreFieldNames property = recordDefinition.getProperty(PROPERTY_NAME);
     if (property == null) {
-      property = new EqualIgnoreAttributes();
+      property = new EqualIgnoreFieldNames();
       property.setRecordDefinition(recordDefinition);
     }
     return property;
@@ -29,14 +29,14 @@ public class EqualIgnoreAttributes extends AbstractRecordDefinitionProperty {
 
   private Set<String> fieldNames = new LinkedHashSet<String>();
 
-  public EqualIgnoreAttributes() {
+  public EqualIgnoreFieldNames() {
   }
 
-  public EqualIgnoreAttributes(final Collection<String> fieldNames) {
+  public EqualIgnoreFieldNames(final Collection<String> fieldNames) {
     this.fieldNames.addAll(fieldNames);
   }
 
-  public EqualIgnoreAttributes(final String... fieldNames) {
+  public EqualIgnoreFieldNames(final String... fieldNames) {
     this(Arrays.asList(fieldNames));
   }
 

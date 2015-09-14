@@ -22,7 +22,7 @@ public class LengthFieldName extends AbstractRecordDefinitionProperty {
     return property;
   }
 
-  public static void setObjectLength(final Record object) {
+  public static void setRecordLength(final Record object) {
     final LengthFieldName property = getProperty(object);
     property.setLength(object);
   }

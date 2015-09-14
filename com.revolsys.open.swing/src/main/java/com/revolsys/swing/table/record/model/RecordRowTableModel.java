@@ -84,16 +84,6 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
   public void editingStopped(final ChangeEvent event) {
   }
 
-  public FieldDefinition getColumnAttribute(final int columnIndex) {
-    if (columnIndex < this.fieldsOffset) {
-      return null;
-    } else {
-      final String name = getFieldName(columnIndex);
-      final RecordDefinition recordDefinition = getRecordDefinition();
-      return recordDefinition.getField(name);
-    }
-  }
-
   @Override
   public Class<?> getColumnClass(final int columnIndex) {
     if (columnIndex < this.fieldsOffset) {
@@ -114,6 +104,16 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
   public int getColumnCount() {
     final int numColumns = this.fieldsOffset + this.fieldNames.size();
     return numColumns;
+  }
+
+  public FieldDefinition getColumnFieldDefinition(final int columnIndex) {
+    if (columnIndex < this.fieldsOffset) {
+      return null;
+    } else {
+      final String name = getFieldName(columnIndex);
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      return recordDefinition.getField(name);
+    }
   }
 
   @Override
@@ -225,8 +225,8 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
           if (fieldName != null) {
             if (!isReadOnly(fieldName)) {
               final RecordDefinition recordDefinition = getRecordDefinition();
-              final Class<?> attributeClass = recordDefinition.getFieldClass(fieldName);
-              if (!Geometry.class.isAssignableFrom(attributeClass)) {
+              final Class<?> fieldClass = recordDefinition.getFieldClass(fieldName);
+              if (!Geometry.class.isAssignableFrom(fieldClass)) {
                 return true;
               }
             }
@@ -275,16 +275,16 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
       } else {
         final String fieldName = getFieldName(i);
         final RecordDefinition recordDefinition = getRecordDefinition();
-        final FieldDefinition attribute = recordDefinition.getField(fieldName);
-        title = attribute.getTitle();
+        final FieldDefinition fieldDefinition = recordDefinition.getField(fieldName);
+        title = fieldDefinition.getTitle();
       }
       this.fieldTitles.add(title);
     }
     fireTableStructureChanged();
   }
 
-  public void setFieldsOffset(final int attributesOffset) {
-    this.fieldsOffset = attributesOffset;
+  public void setFieldsOffset(final int fieldsOffset) {
+    this.fieldsOffset = fieldsOffset;
   }
 
   public void setFieldTitles(final List<String> fieldTitles) {
@@ -296,8 +296,8 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
       } else {
         final String fieldName = getFieldName(i);
         final RecordDefinition recordDefinition = getRecordDefinition();
-        final FieldDefinition attribute = recordDefinition.getField(fieldName);
-        title = attribute.getTitle();
+        final FieldDefinition fieldDefinition = recordDefinition.getField(fieldName);
+        title = fieldDefinition.getTitle();
       }
       this.fieldTitles.add(title);
     }
@@ -360,20 +360,20 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
   }
 
   @Override
-  public String toCopyValue(final int rowIndex, int attributeIndex, final Object objectValue) {
-    if (attributeIndex < this.fieldsOffset) {
-      return StringConverterRegistry.toString(objectValue);
+  public String toCopyValue(final int rowIndex, int fieldIndex, final Object recordValue) {
+    if (fieldIndex < this.fieldsOffset) {
+      return StringConverterRegistry.toString(recordValue);
     } else {
-      attributeIndex -= this.fieldsOffset;
+      fieldIndex -= this.fieldsOffset;
       String text;
       final RecordDefinition recordDefinition = getRecordDefinition();
       final String idFieldName = recordDefinition.getIdFieldName();
-      final String name = getFieldName(attributeIndex);
-      if (objectValue == null) {
+      final String name = getFieldName(fieldIndex);
+      if (recordValue == null) {
         return null;
       } else {
-        if (objectValue instanceof Geometry) {
-          final Geometry geometry = (Geometry)objectValue;
+        if (recordValue instanceof Geometry) {
+          final Geometry geometry = (Geometry)recordValue;
           return geometry.toString();
         }
         CodeTable codeTable = null;
@@ -381,9 +381,9 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
           codeTable = recordDefinition.getCodeTableByFieldName(name);
         }
         if (codeTable == null) {
-          text = StringConverterRegistry.toString(objectValue);
+          text = StringConverterRegistry.toString(recordValue);
         } else {
-          final List<Object> values = codeTable.getValues(Identifier.create(objectValue));
+          final List<Object> values = codeTable.getValues(Identifier.create(recordValue));
           if (values == null || values.isEmpty()) {
             return null;
           } else {
@@ -399,7 +399,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
   }
 
   @Override
-  public final String toDisplayValue(final int rowIndex, final int attributeIndex,
+  public final String toDisplayValue(final int rowIndex, final int fieldIndex,
     final Object objectValue) {
     int rowHeight = this.table.getRowHeight();
     String displayValue;
@@ -411,7 +411,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
       if (record.getState() == RecordState.Initalizing) {
         displayValue = LOADING_VALUE;
       } else {
-        displayValue = toDisplayValueInternal(rowIndex, attributeIndex, objectValue);
+        displayValue = toDisplayValueInternal(rowIndex, fieldIndex, objectValue);
       }
     }
     if (rowHeight != this.table.getRowHeight(rowIndex)) {
@@ -420,8 +420,8 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     return displayValue;
   }
 
-  protected String toDisplayValueInternal(final int rowIndex, final int attributeIndex,
+  protected String toDisplayValueInternal(final int rowIndex, final int fieldIndex,
     final Object objectValue) {
-    return super.toDisplayValue(rowIndex, attributeIndex, objectValue);
+    return super.toDisplayValue(rowIndex, fieldIndex, objectValue);
   }
 }

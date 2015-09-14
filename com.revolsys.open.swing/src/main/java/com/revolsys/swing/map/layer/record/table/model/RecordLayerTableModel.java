@@ -170,13 +170,6 @@ public class RecordLayerTableModel extends RecordRowTableModel
     super.dispose();
   }
 
-  @Override
-  public String getColumnName(final int columnIndex) {
-    // final String fieldName = getFieldName(columnIndex);
-    // return this.layer.getFieldTitle(fieldName);
-    return super.getColumnName(columnIndex);
-  }
-
   public String getFieldFilterMode() {
     return this.fieldFilterMode;
   }
@@ -737,14 +730,14 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   @Override
-  public String toDisplayValueInternal(final int rowIndex, final int attributeIndex,
+  public String toDisplayValueInternal(final int rowIndex, final int fieldIndex,
     final Object objectValue) {
     if (objectValue == null) {
-      final String fieldName = getFieldName(attributeIndex);
+      final String fieldName = getFieldName(fieldIndex);
       if (getRecordDefinition().getIdFieldNames().contains(fieldName)) {
         return "NEW";
       }
     }
-    return super.toDisplayValueInternal(rowIndex, attributeIndex, objectValue);
+    return super.toDisplayValueInternal(rowIndex, fieldIndex, objectValue);
   }
 }
