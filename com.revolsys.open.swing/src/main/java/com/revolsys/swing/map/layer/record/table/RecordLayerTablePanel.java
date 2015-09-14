@@ -191,8 +191,8 @@ public class RecordLayerTablePanel extends TablePanel
     toolBar.addButtonTitleIcon("table", "Refresh", "table_refresh", () -> refresh());
     toolBar.addButtonTitleIcon("table", "Export Records", "table_save", () -> exportRecords());
 
-    this.fieldSetsButton = toolBar.addButtonTitleIcon("table", "Field Sets", "fields_filter", this,
-      "actionShowFieldSetsMenu");
+    this.fieldSetsButton = toolBar.addButtonTitleIcon("table", "Field Sets", "fields_filter",
+      () -> actionShowFieldSetsMenu());
 
     this.fieldFilterPanel = new FieldFilterPanel(this, this.tableModel, pluginConfig);
     toolBar.addComponent("search", this.fieldFilterPanel);

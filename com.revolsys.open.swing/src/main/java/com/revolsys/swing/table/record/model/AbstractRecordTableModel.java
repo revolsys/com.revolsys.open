@@ -15,10 +15,11 @@ import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractRecordTableModel extends com.revolsys.swing.table.AbstractTableModel
+public abstract class AbstractRecordTableModel extends AbstractTableModel
   implements PropertyChangeSupportProxy {
 
   private static final long serialVersionUID = 1L;
@@ -173,5 +174,4 @@ public abstract class AbstractRecordTableModel extends com.revolsys.swing.table.
       }
     }
   }
-
 }
