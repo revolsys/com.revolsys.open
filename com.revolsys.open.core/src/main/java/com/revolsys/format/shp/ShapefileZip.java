@@ -4,15 +4,15 @@ import java.io.File;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
-import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.io.AbstractRecordIoFactory;
-import com.revolsys.data.record.io.RecordReader;
-import com.revolsys.data.record.io.RecordWriter;
-import com.revolsys.data.record.io.RecordWriterFactory;
-import com.revolsys.data.record.io.ZipRecordWriter;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.zip.ZipRecordReader;
 import com.revolsys.io.FileUtil;
+import com.revolsys.record.RecordFactory;
+import com.revolsys.record.io.AbstractRecordIoFactory;
+import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.io.RecordWriterFactory;
+import com.revolsys.record.io.ZipRecordWriter;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 

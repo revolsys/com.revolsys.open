@@ -6,7 +6,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.record.Record;
+import com.revolsys.record.Record;
 
 public class RecordListCellRenderer extends DefaultListCellRenderer {
   private static final long serialVersionUID = 1L;

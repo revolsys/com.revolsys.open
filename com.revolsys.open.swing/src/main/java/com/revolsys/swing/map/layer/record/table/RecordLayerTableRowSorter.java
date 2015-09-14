@@ -6,8 +6,8 @@ import java.util.Comparator;
 import org.jdesktop.swingx.sort.TableSortController;
 
 import com.revolsys.comparator.NumericComparator;
-import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 

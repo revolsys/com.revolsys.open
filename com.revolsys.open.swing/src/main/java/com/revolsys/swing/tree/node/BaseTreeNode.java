@@ -26,7 +26,7 @@ import javax.swing.tree.TreePath;
 
 import com.revolsys.collection.iterator.IteratorEnumeration;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.Equals;
+import com.revolsys.equals.Equals;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.MenuFactory;

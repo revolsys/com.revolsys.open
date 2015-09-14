@@ -5,17 +5,17 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import com.revolsys.collection.iterator.AbstractIterator;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.Records;
-import com.revolsys.data.record.io.RecordReader;
-import com.revolsys.data.record.property.FieldProperties;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordFactory;
+import com.revolsys.record.Records;
+import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.property.FieldProperties;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
 public class WktRecordIterator extends AbstractIterator<Record>implements RecordReader {

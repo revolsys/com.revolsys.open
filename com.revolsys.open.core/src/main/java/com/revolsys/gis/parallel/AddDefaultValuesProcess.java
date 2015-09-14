@@ -29,13 +29,13 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordDefinitionFactory;
-import com.revolsys.data.types.DataType;
+import com.revolsys.datatype.DataType;
 import com.revolsys.io.Path;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.AbstractInOutProcess;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionFactory;
 
 public class AddDefaultValuesProcess extends AbstractInOutProcess<Record, Record> {
   private static final Logger log = Logger.getLogger(AddDefaultValuesProcess.class);

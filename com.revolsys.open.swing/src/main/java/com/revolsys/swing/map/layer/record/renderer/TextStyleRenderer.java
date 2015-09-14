@@ -27,7 +27,6 @@ import javax.measure.unit.Unit;
 import javax.swing.Icon;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.record.Record;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -37,6 +36,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.PointWithOrientation;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.record.Record;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;

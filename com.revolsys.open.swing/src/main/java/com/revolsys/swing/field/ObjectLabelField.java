@@ -3,8 +3,8 @@ package com.revolsys.swing.field;
 import java.util.List;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.identifier.Identifier;
+import com.revolsys.identifier.Identifier;
+import com.revolsys.record.code.CodeTable;
 import com.revolsys.util.CollectionUtil;
 
 public class ObjectLabelField extends TextField {

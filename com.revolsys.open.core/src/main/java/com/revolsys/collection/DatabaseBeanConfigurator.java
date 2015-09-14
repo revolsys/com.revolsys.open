@@ -11,8 +11,8 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.spring.config.BeanConfigurrer;
 import com.revolsys.util.Property;

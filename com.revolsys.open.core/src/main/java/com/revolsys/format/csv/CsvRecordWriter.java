@@ -7,9 +7,7 @@ import java.nio.file.Path;
 
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.types.DataType;
+import com.revolsys.datatype.DataType;
 import com.revolsys.format.wkt.EWktWriter;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.Geometry;
@@ -17,6 +15,8 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Paths;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.WrappedException;
 
 public class CsvRecordWriter extends AbstractRecordWriter {

@@ -11,7 +11,7 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.data.record.RecordState;
+import com.revolsys.record.RecordState;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.table.record.row.RecordRowTable;

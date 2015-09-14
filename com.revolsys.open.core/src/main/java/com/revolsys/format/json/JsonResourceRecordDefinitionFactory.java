@@ -10,10 +10,10 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordDefinitionFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionFactory;
 import com.revolsys.spring.resource.Resource;
 
 public class JsonResourceRecordDefinitionFactory extends BaseObjectWithProperties

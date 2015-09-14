@@ -22,7 +22,7 @@ import javax.swing.ListCellRenderer;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
-import com.revolsys.data.equals.Equals;
+import com.revolsys.equals.Equals;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Strings;
@@ -155,7 +155,9 @@ public class ComboBox extends JComboBox implements Field, KeyListener {
       final Component editorComponent = getEditor().getEditorComponent();
       if (editorComponent instanceof JTextField) {
         final JTextField textField = (JTextField)editorComponent;
-        if (Strings.equals(textField.getSelectedText(), textField.getText())) {
+        String selectedText = textField.getSelectedText();
+        String text = textField.getText();
+        if (Strings.equals(selectedText, text)) {
           setSelectedItem(null);
         }
       }

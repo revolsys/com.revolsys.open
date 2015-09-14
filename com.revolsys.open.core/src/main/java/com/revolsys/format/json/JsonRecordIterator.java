@@ -9,13 +9,13 @@ import java.util.NoSuchElementException;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.record.ArrayRecord;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.io.RecordReader;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.types.DataType;
+import com.revolsys.datatype.DataType;
 import com.revolsys.io.FileUtil;
+import com.revolsys.record.ArrayRecord;
+import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class JsonRecordIterator extends AbstractIterator<Record>implements RecordReader {
 

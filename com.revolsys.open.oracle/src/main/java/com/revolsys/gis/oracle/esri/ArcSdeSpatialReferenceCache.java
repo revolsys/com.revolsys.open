@@ -8,12 +8,12 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.WktCsParser;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
+import com.revolsys.record.schema.RecordStoreSchema;
 
 public class ArcSdeSpatialReferenceCache {
 

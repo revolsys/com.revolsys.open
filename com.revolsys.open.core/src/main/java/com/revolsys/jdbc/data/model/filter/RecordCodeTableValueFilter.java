@@ -6,10 +6,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
-import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.identifier.Identifier;
+import com.revolsys.record.Record;
+import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.schema.RecordDefinition;
 
 /**
  * Filter Records by the value of the fieldName.

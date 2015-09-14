@@ -3,7 +3,7 @@ package com.revolsys.geometry.model.coordinates;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.revolsys.data.equals.NumberEquals;
+import com.revolsys.equals.NumberEquals;
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.RobustDeterminant;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;

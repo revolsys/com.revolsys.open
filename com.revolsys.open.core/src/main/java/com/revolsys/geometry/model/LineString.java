@@ -34,7 +34,7 @@ package com.revolsys.geometry.model;
 
 import java.util.List;
 
-import com.revolsys.data.equals.NumberEquals;
+import com.revolsys.equals.NumberEquals;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.metrics.PointLineStringMetrics;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;

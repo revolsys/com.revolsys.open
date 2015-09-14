@@ -4,11 +4,11 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordDefinitionImpl;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionImpl;
 
 public class ArcSdeObjectIdJdbcFieldDefinition extends JdbcFieldDefinition {
   public static void replaceAttribute(final String schemaName,

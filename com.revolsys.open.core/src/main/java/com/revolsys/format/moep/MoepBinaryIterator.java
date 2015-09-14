@@ -10,8 +10,6 @@ import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordFactory;
 import com.revolsys.format.saif.SaifConstants;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
@@ -26,6 +24,8 @@ import com.revolsys.gis.grid.UtmRectangularMapGrid;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordFactory;
 
 public class MoepBinaryIterator extends BaseObjectWithProperties implements Iterator<Record> {
   private static final int COMPLEX_LINE = 3;

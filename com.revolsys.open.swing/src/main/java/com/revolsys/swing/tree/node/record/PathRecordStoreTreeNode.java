@@ -14,12 +14,12 @@ import javax.swing.Icon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
-import com.revolsys.data.record.io.RecordStoreConnectionManager;
-import com.revolsys.data.record.io.RecordStoreConnectionMapProxy;
-import com.revolsys.data.record.io.RecordStoreConnectionRegistry;
-import com.revolsys.data.record.io.RecordStoreProxy;
-import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.Paths;
+import com.revolsys.record.io.RecordStoreConnectionManager;
+import com.revolsys.record.io.RecordStoreConnectionMapProxy;
+import com.revolsys.record.io.RecordStoreConnectionRegistry;
+import com.revolsys.record.io.RecordStoreProxy;
+import com.revolsys.record.schema.RecordStore;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.ValueField;

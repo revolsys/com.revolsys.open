@@ -4,8 +4,8 @@ import java.util.Map;
 
 import org.springframework.core.convert.converter.Converter;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.Records;
+import com.revolsys.record.Record;
+import com.revolsys.record.Records;
 
 public class GetRecordValue implements Converter<Record, Object> {
   private String attributePath;

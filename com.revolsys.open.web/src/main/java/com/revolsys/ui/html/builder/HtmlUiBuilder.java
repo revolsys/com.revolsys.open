@@ -41,12 +41,12 @@ import org.springframework.web.servlet.HandlerMapping;
 
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.data.query.Query;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.format.json.Json;
 import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.io.Reader;
+import com.revolsys.record.Record;
+import com.revolsys.record.query.Query;
+import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.InvokeMethodAfterCommit;
 import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.ui.html.decorator.FieldLabelDecorator;

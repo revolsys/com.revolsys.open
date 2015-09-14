@@ -6,10 +6,10 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 
-import com.revolsys.data.equals.Equals;
-import com.revolsys.data.record.RecordState;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.equals.Equals;
+import com.revolsys.record.RecordState;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.form.RecordLayerForm;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;

@@ -11,7 +11,7 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;

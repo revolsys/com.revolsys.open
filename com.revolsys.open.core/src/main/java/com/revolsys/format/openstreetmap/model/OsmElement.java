@@ -7,14 +7,14 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
 
-import com.revolsys.data.record.AbstractRecord;
-import com.revolsys.data.record.RecordState;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordDefinitionImpl;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.format.xml.StaxUtils;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.PathName;
+import com.revolsys.record.AbstractRecord;
+import com.revolsys.record.RecordState;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.util.Property;
 
 public class OsmElement extends AbstractRecord implements OsmConstants {

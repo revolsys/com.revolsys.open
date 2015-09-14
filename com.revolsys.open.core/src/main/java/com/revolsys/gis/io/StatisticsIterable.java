@@ -6,7 +6,7 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.BeanNameAware;
 
-import com.revolsys.data.record.Record;
+import com.revolsys.record.Record;
 
 public class StatisticsIterable implements Iterable<Record>, BeanNameAware {
   private Iterable<Record> iterable;

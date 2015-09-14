@@ -6,11 +6,11 @@ import java.util.Map;
 
 import javax.swing.Icon;
 
-import com.revolsys.data.record.io.RecordStoreConnectionMapProxy;
-import com.revolsys.data.record.io.RecordStoreProxy;
-import com.revolsys.data.record.schema.RecordStore;
-import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.io.PathName;
+import com.revolsys.record.io.RecordStoreConnectionMapProxy;
+import com.revolsys.record.io.RecordStoreProxy;
+import com.revolsys.record.schema.RecordStore;
+import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.menu.MenuFactory;

@@ -11,10 +11,10 @@ import java.util.TreeMap;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.tsv.Tsv;
 import com.revolsys.format.tsv.TsvWriter;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Emptyable;
 

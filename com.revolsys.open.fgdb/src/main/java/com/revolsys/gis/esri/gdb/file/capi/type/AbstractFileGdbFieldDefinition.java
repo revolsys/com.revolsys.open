@@ -3,11 +3,11 @@ package com.revolsys.gis.esri.gdb.file.capi.type;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.types.DataType;
+import com.revolsys.datatype.DataType;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.FieldDefinition;
 
 public abstract class AbstractFileGdbFieldDefinition extends FieldDefinition {
 

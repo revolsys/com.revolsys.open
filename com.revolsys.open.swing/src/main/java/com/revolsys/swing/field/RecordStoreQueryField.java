@@ -3,13 +3,13 @@ package com.revolsys.swing.field;
 import java.util.List;
 import java.util.function.Supplier;
 
-import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.query.Query;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordStore;
+import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
+import com.revolsys.record.Record;
+import com.revolsys.record.query.Query;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordStore;
 
 public class RecordStoreQueryField extends AbstractRecordQueryField {
   private static final long serialVersionUID = 1L;

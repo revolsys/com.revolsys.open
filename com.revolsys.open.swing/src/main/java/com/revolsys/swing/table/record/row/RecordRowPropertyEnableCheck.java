@@ -2,8 +2,8 @@ package com.revolsys.swing.table.record.row;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.equals.Equals;
-import com.revolsys.data.record.Record;
+import com.revolsys.equals.Equals;
+import com.revolsys.record.Record;
 import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;

@@ -12,11 +12,11 @@ import javax.annotation.PreDestroy;
 import javax.swing.JTable;
 import javax.swing.SortOrder;
 
-import com.revolsys.data.comparator.RecordFieldComparator;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.types.DataType;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.record.Record;
+import com.revolsys.record.comparator.RecordFieldComparator;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.record.row.RecordRowTable;

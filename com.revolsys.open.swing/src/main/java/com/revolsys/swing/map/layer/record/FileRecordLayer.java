@@ -4,15 +4,15 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.io.RecordReader;
-import com.revolsys.data.record.io.RecordReaderFactory;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.RecordReaderFactory;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;

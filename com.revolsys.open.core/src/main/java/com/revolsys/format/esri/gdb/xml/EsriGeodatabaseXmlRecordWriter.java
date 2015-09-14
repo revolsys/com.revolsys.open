@@ -7,12 +7,8 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.property.FieldProperties;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldType;
 import com.revolsys.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry;
 import com.revolsys.format.xml.XmlConstants;
@@ -32,6 +28,10 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.Path;
+import com.revolsys.record.Record;
+import com.revolsys.record.property.FieldProperties;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.DateUtil;
 
 public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter

@@ -2,13 +2,13 @@ package com.revolsys.format.shp;
 
 import java.io.File;
 
-import com.revolsys.data.query.Query;
-import com.revolsys.data.record.ArrayRecord;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.AbstractRecordStore;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
+import com.revolsys.record.ArrayRecord;
+import com.revolsys.record.Record;
+import com.revolsys.record.query.Query;
+import com.revolsys.record.schema.AbstractRecordStore;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class ShapefileRecordStore extends AbstractRecordStore {
 

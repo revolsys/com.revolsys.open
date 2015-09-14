@@ -13,9 +13,9 @@ import org.jdesktop.swingx.JXTextField;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.Equals;
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
+import com.revolsys.equals.Equals;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.PopupMenu;

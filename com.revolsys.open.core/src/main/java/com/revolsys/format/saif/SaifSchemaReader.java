@@ -34,21 +34,21 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.property.FieldProperties;
-import com.revolsys.data.record.property.RecordDefinitionProperty;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordDefinitionFactory;
-import com.revolsys.data.record.schema.RecordDefinitionFactoryImpl;
-import com.revolsys.data.record.schema.RecordDefinitionImpl;
-import com.revolsys.data.types.CollectionDataType;
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
-import com.revolsys.data.types.EnumerationDataType;
-import com.revolsys.data.types.SimpleDataType;
+import com.revolsys.datatype.CollectionDataType;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
+import com.revolsys.datatype.EnumerationDataType;
+import com.revolsys.datatype.SimpleDataType;
 import com.revolsys.format.saif.util.CsnIterator;
 import com.revolsys.io.PathName;
+import com.revolsys.record.Record;
+import com.revolsys.record.property.FieldProperties;
+import com.revolsys.record.property.RecordDefinitionProperty;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionFactory;
+import com.revolsys.record.schema.RecordDefinitionFactoryImpl;
+import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.Resource;
 
 public class SaifSchemaReader {

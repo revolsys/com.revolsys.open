@@ -3,10 +3,10 @@ package com.revolsys.gis.model.schema;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.converter.ObjectConverter;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class SchemaMapper {
   private final Map<FieldDefinition, FieldDefinition> attributeMapping = new LinkedHashMap<>();

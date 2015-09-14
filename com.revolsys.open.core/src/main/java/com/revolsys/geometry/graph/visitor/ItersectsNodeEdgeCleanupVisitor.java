@@ -12,14 +12,14 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.equals.RecordEquals;
-import com.revolsys.data.record.Record;
+import com.revolsys.equals.RecordEquals;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Graph;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.graph.RecordGraph;
 import com.revolsys.geometry.graph.attribute.NodeProperties;
 import com.revolsys.gis.io.Statistics;
+import com.revolsys.record.Record;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 

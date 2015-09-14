@@ -13,16 +13,7 @@ import org.postgresql.jdbc2.AbstractJdbc2Connection;
 
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.iterator.AbstractIterator;
-import com.revolsys.data.query.Query;
-import com.revolsys.data.query.QueryValue;
-import com.revolsys.data.query.functions.EnvelopeIntersects;
-import com.revolsys.data.record.ArrayRecordFactory;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.property.ShortNameProperty;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordDefinitionImpl;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.gis.postgresql.type.PostgreSQLBoundingBoxWrapper;
 import com.revolsys.gis.postgresql.type.PostgreSQLGeometryWrapper;
 import com.revolsys.io.PathName;
@@ -32,6 +23,15 @@ import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
+import com.revolsys.record.ArrayRecordFactory;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordFactory;
+import com.revolsys.record.property.ShortNameProperty;
+import com.revolsys.record.query.Query;
+import com.revolsys.record.query.QueryValue;
+import com.revolsys.record.query.functions.EnvelopeIntersects;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.util.Property;
 
 public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {

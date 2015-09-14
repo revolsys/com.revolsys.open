@@ -1,7 +1,7 @@
 package com.revolsys.jdbc.io;
 
-import com.revolsys.data.record.Record;
 import com.revolsys.io.Writer;
+import com.revolsys.record.Record;
 
 public interface JdbcWriter extends Writer<Record> {
 

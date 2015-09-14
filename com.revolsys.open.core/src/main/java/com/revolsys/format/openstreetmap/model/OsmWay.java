@@ -9,11 +9,11 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
-import com.revolsys.data.identifier.Identifier;
 import com.revolsys.format.xml.StaxUtils;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.identifier.Identifier;
 
 public class OsmWay extends OsmElement {
 

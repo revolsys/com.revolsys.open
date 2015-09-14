@@ -1,6 +1,5 @@
 package com.revolsys.gis.parallel;
 
-import com.revolsys.data.record.Record;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Polygon;
@@ -8,6 +7,7 @@ import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
+import com.revolsys.record.Record;
 
 public class ClipGeometryProcess extends BaseInOutProcess<Record, Record> {
 

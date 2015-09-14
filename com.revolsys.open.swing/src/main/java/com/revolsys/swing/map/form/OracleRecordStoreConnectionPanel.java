@@ -12,9 +12,9 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.revolsys.data.record.io.RecordStoreConnection;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.connection.ConnectionRegistry;
+import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.Field;

@@ -22,7 +22,7 @@ import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
-import com.revolsys.data.equals.Equals;
+import com.revolsys.equals.Equals;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;

@@ -5,11 +5,11 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.data.comparator.RecordDefinitionNameComparator;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
+import com.revolsys.record.Record;
+import com.revolsys.record.comparator.RecordDefinitionNameComparator;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class SortByType extends BaseInOutProcess<Record, Record> {
 

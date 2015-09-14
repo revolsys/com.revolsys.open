@@ -3,7 +3,7 @@ package com.revolsys.swing.map.form;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
-import com.revolsys.data.equals.Equals;
+import com.revolsys.equals.Equals;
 import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.util.JavaBeanUtil;

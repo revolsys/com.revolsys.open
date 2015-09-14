@@ -23,8 +23,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.record.io.RecordStoreConnectionManager;
-import com.revolsys.data.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.format.json.Json;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
@@ -38,6 +36,8 @@ import com.revolsys.io.Paths;
 import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.record.io.RecordStoreConnectionManager;
+import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;

@@ -1,13 +1,13 @@
 package com.revolsys.swing.map.overlay;
 
-import com.revolsys.data.equals.Equals;
-import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.equals.Equals;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.identifier.Identifier;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.util.CollectionUtil;

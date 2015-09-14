@@ -8,8 +8,8 @@ import java.util.List;
 import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
 
-import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.identifier.Identifier;
+import com.revolsys.identifier.Identifier;
+import com.revolsys.record.code.CodeTable;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;

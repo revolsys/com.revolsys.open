@@ -13,7 +13,7 @@ import javax.swing.table.TableCellRenderer;
 import org.jdesktop.swingx.JXTable;
 
 import com.revolsys.converter.string.BigDecimalStringConverter;
-import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
 

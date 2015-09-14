@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import com.revolsys.data.record.Record;
 import com.revolsys.geometry.graph.attribute.NodeProperties;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -26,6 +25,7 @@ import com.revolsys.geometry.model.impl.AbstractPoint;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.properties.ObjectPropertyProxy;
 import com.revolsys.properties.ObjectWithProperties;
+import com.revolsys.record.Record;
 
 public class Node<T> extends AbstractPoint implements ObjectWithProperties, Externalizable {
   public static <V> Predicate<Node<V>> filterDegree(final int degree) {

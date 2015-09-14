@@ -4,9 +4,9 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.BeanNameAware;
 
-import com.revolsys.data.record.Record;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.Writer;
+import com.revolsys.record.Record;
 
 public class StatisticsWriter extends AbstractRecordWriter implements BeanNameAware {
   private String beanName;

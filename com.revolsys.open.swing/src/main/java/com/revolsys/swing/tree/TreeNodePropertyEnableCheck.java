@@ -2,7 +2,7 @@ package com.revolsys.swing.tree;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.equals.Equals;
+import com.revolsys.equals.Equals;
 import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.util.Property;

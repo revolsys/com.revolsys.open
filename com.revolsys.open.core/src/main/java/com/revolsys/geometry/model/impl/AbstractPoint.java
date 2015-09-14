@@ -34,10 +34,9 @@ package com.revolsys.geometry.model.impl;
 
 import java.util.Arrays;
 
-import com.revolsys.data.equals.NumberEquals;
-import com.revolsys.data.io.IteratorReader;
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
+import com.revolsys.equals.NumberEquals;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Dimension;
@@ -51,6 +50,7 @@ import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.PointVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.NumberUtil;
+import com.revolsys.io.IteratorReader;
 import com.revolsys.io.Reader;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;

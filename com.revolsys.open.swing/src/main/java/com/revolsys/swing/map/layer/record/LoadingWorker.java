@@ -6,12 +6,12 @@ import java.util.concurrent.CancellationException;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.query.Query;
-import com.revolsys.data.query.functions.F;
-import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
+import com.revolsys.record.query.Query;
+import com.revolsys.record.query.functions.F;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 

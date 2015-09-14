@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import com.revolsys.data.filter.AttributesEqualFilter;
-import com.revolsys.data.filter.AttributesEqualOrNullFilter;
-import com.revolsys.data.record.Record;
 import com.revolsys.predicate.Predicates;
+import com.revolsys.record.Record;
+import com.revolsys.record.filter.AttributesEqualFilter;
+import com.revolsys.record.filter.AttributesEqualOrNullFilter;
 
 public class CompareFilterFactory implements Function<Record, Predicate<Record>> {
   private List<String> equalFieldNames = new ArrayList<String>();

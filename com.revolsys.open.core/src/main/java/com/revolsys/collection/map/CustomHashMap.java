@@ -6,7 +6,7 @@ import java.util.Set;
 import org.apache.commons.collections4.map.HashedMap;
 import org.apache.commons.collections4.set.MapBackedSet;
 
-import com.revolsys.data.hash.HashEquals;
+import com.revolsys.util.HashEquals;
 
 public class CustomHashMap<K, V> extends HashedMap<K, V> {
   private static final long serialVersionUID = 1L;

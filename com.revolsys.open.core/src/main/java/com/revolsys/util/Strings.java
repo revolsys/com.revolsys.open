@@ -1,6 +1,6 @@
 package com.revolsys.util;
 
-import com.revolsys.data.equals.Equals;
+import com.revolsys.equals.Equals;
 
 public interface Strings {
 

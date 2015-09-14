@@ -6,8 +6,8 @@ import java.util.Map;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-import com.revolsys.data.record.io.RecordStoreConnection;
 import com.revolsys.io.connection.ConnectionRegistry;
+import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.util.PasswordUtil;

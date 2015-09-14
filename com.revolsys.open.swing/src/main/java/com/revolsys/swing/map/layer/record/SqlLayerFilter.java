@@ -9,11 +9,11 @@ import java.util.function.Predicate;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.query.Condition;
-import com.revolsys.data.query.QueryValue;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.record.Record;
+import com.revolsys.record.query.Condition;
+import com.revolsys.record.query.QueryValue;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.UriTemplate;
 
 public class SqlLayerFilter implements Predicate<Record>, MapSerializer {

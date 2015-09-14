@@ -9,7 +9,7 @@ import javax.swing.ListCellRenderer;
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.record.schema.FieldDefinition;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 
 public class AttributeTitleStringConveter extends ObjectToStringConverter

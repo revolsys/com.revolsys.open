@@ -2,9 +2,9 @@ package com.revolsys.format.directory;
 
 import javax.annotation.PreDestroy;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordState;
 import com.revolsys.io.AbstractRecordWriter;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordState;
 
 public class DirectoryRecordStoreWriter extends AbstractRecordWriter {
 

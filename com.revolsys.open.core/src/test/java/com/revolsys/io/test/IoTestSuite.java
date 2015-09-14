@@ -10,12 +10,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.revolsys.data.record.ArrayRecord;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.io.RecordWriter;
-import com.revolsys.data.record.schema.RecordDefinitionImpl;
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -26,6 +22,10 @@ import com.revolsys.io.Writer;
 import com.revolsys.jts.test.geometry.GeometryTestUtil;
 import com.revolsys.jts.test.geometry.TestUtil;
 import com.revolsys.junit.InvokeMethodTestCase;
+import com.revolsys.record.ArrayRecord;
+import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.FileSystemResource;
 
 import junit.framework.TestCase;

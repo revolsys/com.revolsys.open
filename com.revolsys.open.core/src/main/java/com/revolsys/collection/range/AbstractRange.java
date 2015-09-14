@@ -3,7 +3,7 @@ package com.revolsys.collection.range;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.data.equals.Equals;
+import com.revolsys.equals.Equals;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Numbers;

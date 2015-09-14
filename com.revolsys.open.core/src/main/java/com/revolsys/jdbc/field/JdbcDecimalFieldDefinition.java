@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
 
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataTypes;
 
 public class JdbcDecimalFieldDefinition extends JdbcFieldDefinition {
   public JdbcDecimalFieldDefinition(final String dbName, final String name, final int sqlType,

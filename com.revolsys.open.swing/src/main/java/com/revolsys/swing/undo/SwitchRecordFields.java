@@ -3,7 +3,7 @@ package com.revolsys.swing.undo;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.revolsys.data.equals.Equals;
+import com.revolsys.equals.Equals;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 
 public class SwitchRecordFields extends AbstractUndoableEdit {

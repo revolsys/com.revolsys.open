@@ -7,11 +7,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import com.revolsys.data.filter.RecordGeometryFilter;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordLog;
-import com.revolsys.data.record.Records;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.geometry.algorithm.index.PointRecordMap;
 import com.revolsys.geometry.algorithm.index.RecordQuadTree;
 import com.revolsys.geometry.algorithm.linematch.LineMatchGraph;
@@ -24,6 +19,11 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.predicate.Predicates;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordLog;
+import com.revolsys.record.Records;
+import com.revolsys.record.filter.RecordGeometryFilter;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class CompareProcessor extends AbstractMergeProcess {
 

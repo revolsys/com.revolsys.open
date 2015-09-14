@@ -19,10 +19,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.io.RecordReader;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.xml.StaxUtils;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -32,6 +28,10 @@ import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.io.FileUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordFactory;
+import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.MathUtil;

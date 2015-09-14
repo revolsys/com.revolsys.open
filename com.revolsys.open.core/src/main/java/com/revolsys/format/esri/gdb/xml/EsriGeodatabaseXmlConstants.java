@@ -5,8 +5,8 @@ import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 
 public interface EsriGeodatabaseXmlConstants {
 

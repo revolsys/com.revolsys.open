@@ -3,7 +3,7 @@ package com.revolsys.io;
 import java.util.List;
 import java.util.Set;
 
-import com.revolsys.data.record.Available;
+import com.revolsys.record.Available;
 
 public interface IoFactory extends Available {
   /**

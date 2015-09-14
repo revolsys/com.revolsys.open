@@ -6,11 +6,11 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.io.RecordReader;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.AbstractReader;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordFactory;
+import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
 public class MoepBinaryReader extends AbstractReader<Record>implements RecordReader {

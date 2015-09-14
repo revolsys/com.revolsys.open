@@ -46,8 +46,8 @@ import java.util.Set;
 
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.format.wkt.WktParser;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;

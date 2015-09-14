@@ -4,11 +4,11 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 
-import com.revolsys.data.record.io.RecordWriter;
-import com.revolsys.data.record.io.RecordWriterFactory;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.FileUtil;
+import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.io.RecordWriterFactory;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class XhtmlRecordWriterFactory extends AbstractIoFactoryWithCoordinateSystem
   implements RecordWriterFactory {

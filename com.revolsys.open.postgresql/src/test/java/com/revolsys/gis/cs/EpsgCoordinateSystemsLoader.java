@@ -16,10 +16,6 @@ import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
-import com.revolsys.data.query.Query;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.io.RecordStoreFactoryRegistry;
-import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.format.csv.CsvWriter;
 import com.revolsys.format.json.Json;
 import com.revolsys.geometry.cs.AngularUnit;
@@ -28,6 +24,10 @@ import com.revolsys.geometry.cs.LinearUnit;
 import com.revolsys.geometry.cs.epsg.EpsgUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Reader;
+import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordStoreFactoryRegistry;
+import com.revolsys.record.query.Query;
+import com.revolsys.record.schema.RecordStore;
 
 /**
  * Make sure to watch out for parameter value conversions.

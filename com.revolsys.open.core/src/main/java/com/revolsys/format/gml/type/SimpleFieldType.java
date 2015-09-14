@@ -1,7 +1,7 @@
 package com.revolsys.format.gml.type;
 
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.format.xml.XmlWriter;
 
 public class SimpleFieldType extends AbstractGmlFieldType {

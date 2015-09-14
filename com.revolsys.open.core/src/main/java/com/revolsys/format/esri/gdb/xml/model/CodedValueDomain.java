@@ -9,8 +9,8 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 
-import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.identifier.Identifier;
+import com.revolsys.identifier.Identifier;
+import com.revolsys.record.code.CodeTable;
 import com.revolsys.util.CompareUtil;
 
 public class CodedValueDomain extends Domain implements CodeTable {

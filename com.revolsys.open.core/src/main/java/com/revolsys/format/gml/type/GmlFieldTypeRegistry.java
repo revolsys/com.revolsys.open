@@ -3,8 +3,8 @@ package com.revolsys.format.gml.type;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 
 public class GmlFieldTypeRegistry {
 

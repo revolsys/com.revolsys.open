@@ -6,15 +6,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.query.Query;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.openstreetmap.model.OsmConstants;
 import com.revolsys.format.openstreetmap.model.OsmDocument;
 import com.revolsys.format.openstreetmap.model.OsmElement;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.identifier.Identifier;
+import com.revolsys.record.query.Query;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;

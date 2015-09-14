@@ -1,6 +1,6 @@
 package com.revolsys.raster;
 
-import com.revolsys.data.types.DataType;
+import com.revolsys.datatype.DataType;
 
 public interface Band {
 

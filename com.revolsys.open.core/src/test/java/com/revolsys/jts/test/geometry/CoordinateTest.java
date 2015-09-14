@@ -2,7 +2,7 @@ package com.revolsys.jts.test.geometry;
 
 import java.util.Arrays;
 
-import com.revolsys.data.equals.NumberEquals;
+import com.revolsys.equals.NumberEquals;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 

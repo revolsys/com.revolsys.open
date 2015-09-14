@@ -2,12 +2,12 @@ package com.revolsys.gis.util;
 
 import java.sql.Timestamp;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordState;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordState;
 
 public class Debug {
   public static boolean equals(final Geometry geometry, final double x, final double y) {

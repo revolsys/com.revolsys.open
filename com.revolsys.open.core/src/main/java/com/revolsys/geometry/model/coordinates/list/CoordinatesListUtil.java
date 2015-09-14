@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.data.equals.NumberEquals;
+import com.revolsys.equals.NumberEquals;
 import com.revolsys.geometry.algorithm.RobustDeterminant;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Graph;

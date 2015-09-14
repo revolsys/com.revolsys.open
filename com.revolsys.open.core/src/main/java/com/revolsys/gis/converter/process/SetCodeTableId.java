@@ -7,9 +7,9 @@ import java.util.Map.Entry;
 
 import org.springframework.core.convert.converter.Converter;
 
-import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.record.Record;
+import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class SetCodeTableId extends AbstractSourceToTargetProcess<Record, Record> {
   private final CodeTable codeTable;

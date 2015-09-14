@@ -10,7 +10,7 @@
   "
 >
   <bean
-    class="com.revolsys.data.record.io.RecordStoreFactoryRegistry"
+    class="com.revolsys.record.io.RecordStoreFactoryRegistry"
     factory-method="register"
   >
     <constructor-arg>

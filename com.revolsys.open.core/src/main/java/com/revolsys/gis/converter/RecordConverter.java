@@ -22,7 +22,7 @@ package com.revolsys.gis.converter;
 
 import org.springframework.core.convert.converter.Converter;
 
-import com.revolsys.data.record.Record;
+import com.revolsys.record.Record;
 
 public interface RecordConverter<T> extends Converter<Record, T> {
 

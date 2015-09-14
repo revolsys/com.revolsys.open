@@ -22,13 +22,13 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 
 import com.revolsys.collection.map.ThreadSharedAttributes;
-import com.revolsys.data.record.Record;
 import com.revolsys.parallel.ThreadInterruptedException;
 import com.revolsys.parallel.ThreadUtil;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 import com.revolsys.parallel.process.BaseInProcess;
 import com.revolsys.parallel.tools.ScriptExecutorRunnable;
+import com.revolsys.record.Record;
 import com.revolsys.util.JexlUtil;
 
 public class ScriptExecutorProcess extends BaseInProcess<Record>implements BeanFactoryAware {

@@ -11,9 +11,9 @@ import javax.sql.DataSource;
 
 import org.postgresql.Driver;
 
-import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.jdbc.io.AbstractJdbcDatabaseFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
+import com.revolsys.record.schema.RecordStore;
 
 public class PostgreSQLDatabaseFactory extends AbstractJdbcDatabaseFactory {
   private static final String URL_REGEX = "jdbc:postgresql:(?://([^:]+)(?::(\\d+))?/)?(.+)";

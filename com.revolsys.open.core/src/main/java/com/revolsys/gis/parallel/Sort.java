@@ -5,10 +5,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import com.revolsys.data.comparator.RecordFieldComparator;
-import com.revolsys.data.record.Record;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
+import com.revolsys.record.Record;
+import com.revolsys.record.comparator.RecordFieldComparator;
 
 public class Sort extends BaseInOutProcess<Record, Record> {
 

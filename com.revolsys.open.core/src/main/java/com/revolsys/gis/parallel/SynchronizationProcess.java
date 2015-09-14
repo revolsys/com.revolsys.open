@@ -1,8 +1,8 @@
 package com.revolsys.gis.parallel;
 
-import com.revolsys.data.record.Record;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.AbstractInOutProcess;
+import com.revolsys.record.Record;
 
 public class SynchronizationProcess extends AbstractInOutProcess<Record, Record> {
   private int count = 0;

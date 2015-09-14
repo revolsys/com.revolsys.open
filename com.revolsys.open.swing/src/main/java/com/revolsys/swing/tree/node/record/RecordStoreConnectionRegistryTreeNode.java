@@ -5,8 +5,8 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.data.record.io.RecordStoreConnection;
-import com.revolsys.data.record.io.RecordStoreConnectionRegistry;
+import com.revolsys.record.io.RecordStoreConnection;
+import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.swing.map.form.RecordStoreConnectionDialog;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeNodeRunnable;

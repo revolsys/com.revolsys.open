@@ -6,14 +6,14 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.data.equals.Equals;
-import com.revolsys.data.equals.EqualsInstance;
-import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.record.ArrayRecord;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordState;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.equals.Equals;
+import com.revolsys.equals.EqualsInstance;
+import com.revolsys.identifier.Identifier;
+import com.revolsys.record.ArrayRecord;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordState;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.util.Property;
 

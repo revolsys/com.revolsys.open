@@ -3,11 +3,11 @@ package com.revolsys.gis.esri.gdb.file.capi.type;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.format.esri.gdb.xml.model.Field;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
+import com.revolsys.record.Record;
 
 public class StringFieldDefinition extends AbstractFileGdbFieldDefinition {
   public StringFieldDefinition(final Field field) {

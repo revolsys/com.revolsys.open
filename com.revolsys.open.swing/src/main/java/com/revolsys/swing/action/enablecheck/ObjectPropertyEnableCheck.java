@@ -3,7 +3,7 @@ package com.revolsys.swing.action.enablecheck;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
-import com.revolsys.data.equals.Equals;
+import com.revolsys.equals.Equals;
 import com.revolsys.util.Property;
 
 public class ObjectPropertyEnableCheck extends AbstractEnableCheck {

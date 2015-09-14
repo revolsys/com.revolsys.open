@@ -45,8 +45,7 @@ import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.Converter;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.equals.NumberEquals;
-import com.revolsys.data.record.Record;
+import com.revolsys.equals.NumberEquals;
 import com.revolsys.format.wkt.WktParser;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
@@ -61,6 +60,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.record.Record;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;

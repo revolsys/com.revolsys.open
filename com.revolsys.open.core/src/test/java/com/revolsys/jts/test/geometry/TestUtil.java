@@ -2,13 +2,13 @@ package com.revolsys.jts.test.geometry;
 
 import org.junit.Assert;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.Reader;
+import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordReader;
 import com.revolsys.spring.resource.ClassPathResource;
 import com.revolsys.spring.resource.Resource;
 

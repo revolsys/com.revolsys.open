@@ -6,9 +6,6 @@ import java.util.function.Predicate;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.property.DirectionalFields;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.EdgePair;
 import com.revolsys.geometry.graph.Node;
@@ -18,6 +15,9 @@ import com.revolsys.geometry.graph.attribute.PseudoNodeAttribute;
 import com.revolsys.geometry.graph.attribute.PseudoNodeProperty;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.predicate.PredicateProxy;
+import com.revolsys.record.Record;
+import com.revolsys.record.property.DirectionalFields;
+import com.revolsys.record.schema.RecordDefinition;
 
 /**
  * Find and remove nodes that have exactly two edges for each feature type with

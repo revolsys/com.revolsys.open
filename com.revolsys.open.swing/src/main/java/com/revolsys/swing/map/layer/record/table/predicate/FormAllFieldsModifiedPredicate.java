@@ -7,8 +7,8 @@ import java.lang.ref.WeakReference;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 
-import com.revolsys.data.equals.Equals;
-import com.revolsys.data.identifier.SingleIdentifier;
+import com.revolsys.equals.Equals;
+import com.revolsys.identifier.SingleIdentifier;
 import com.revolsys.swing.map.form.RecordLayerForm;
 import com.revolsys.swing.map.layer.record.table.model.LayerRecordTableModel;
 import com.revolsys.swing.table.BaseJTable;

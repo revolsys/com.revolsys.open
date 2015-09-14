@@ -9,7 +9,7 @@ import javax.swing.JEditorPane;
 import javax.swing.text.Element;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.Equals;
+import com.revolsys.equals.Equals;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.undo.CascadingUndoManager;

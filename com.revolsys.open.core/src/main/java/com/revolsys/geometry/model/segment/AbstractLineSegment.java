@@ -1,6 +1,6 @@
 package com.revolsys.geometry.model.segment;
 
-import com.revolsys.data.equals.NumberEquals;
+import com.revolsys.equals.NumberEquals;
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.HCoordinate;
 import com.revolsys.geometry.algorithm.NotRepresentableException;

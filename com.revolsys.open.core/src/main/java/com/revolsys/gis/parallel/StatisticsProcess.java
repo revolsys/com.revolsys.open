@@ -1,9 +1,9 @@
 package com.revolsys.gis.parallel;
 
-import com.revolsys.data.record.Record;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
+import com.revolsys.record.Record;
 
 public class StatisticsProcess extends BaseInOutProcess<Record, Record> {
 

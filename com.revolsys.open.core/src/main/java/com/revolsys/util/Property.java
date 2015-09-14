@@ -27,9 +27,9 @@ import com.revolsys.beans.NonWeakListener;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.beans.WeakPropertyChangeListener;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.Equals;
-import com.revolsys.data.record.Record;
+import com.revolsys.equals.Equals;
 import com.revolsys.properties.ObjectWithProperties;
+import com.revolsys.record.Record;
 
 public final class Property {
   public static void addListener(final Object source, final Object listener) {

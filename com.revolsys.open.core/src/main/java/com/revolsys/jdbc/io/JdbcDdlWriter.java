@@ -7,11 +7,11 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.property.ShortNameProperty;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.Path;
+import com.revolsys.record.Record;
+import com.revolsys.record.property.ShortNameProperty;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;

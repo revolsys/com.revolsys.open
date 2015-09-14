@@ -1,13 +1,13 @@
 package com.revolsys.gis.parallel;
 
 import com.revolsys.collection.ArrayUtil;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 import com.revolsys.parallel.channel.MultiInputSelector;
 import com.revolsys.parallel.channel.store.Buffer;
 import com.revolsys.parallel.process.AbstractInOutProcess;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.RecordDefinition;
 
 public abstract class AbstractMergeProcess extends AbstractInOutProcess<Record, Record> {
 

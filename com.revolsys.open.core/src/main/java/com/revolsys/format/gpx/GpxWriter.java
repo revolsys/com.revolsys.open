@@ -12,12 +12,12 @@ import java.util.TimeZone;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.data.record.Record;
 import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.io.AbstractRecordWriter;
+import com.revolsys.record.Record;
 
 public class GpxWriter extends AbstractRecordWriter {
 

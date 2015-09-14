@@ -12,11 +12,8 @@ import java.util.function.Predicate;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import com.revolsys.data.equals.EqualsInstance;
-import com.revolsys.data.equals.RecordEquals;
-import com.revolsys.data.filter.RecordGeometryFilter;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordLog;
+import com.revolsys.equals.EqualsInstance;
+import com.revolsys.equals.RecordEquals;
 import com.revolsys.geometry.filter.LineEqualIgnoreDirectionFilter;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Graph;
@@ -25,6 +22,9 @@ import com.revolsys.geometry.graph.filter.EdgeObjectFilter;
 import com.revolsys.geometry.graph.filter.EdgeTypeNameFilter;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.gis.io.Statistics;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordLog;
+import com.revolsys.record.filter.RecordGeometryFilter;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 

@@ -3,9 +3,6 @@ package com.revolsys.format.geojson;
 import java.io.BufferedWriter;
 import java.io.Writer;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.json.JsonWriter;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
@@ -19,6 +16,9 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.math.Angle;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.MathUtil;
 
 public class GeoJsonRecordWriter extends AbstractRecordWriter implements GeoJsonConstants {

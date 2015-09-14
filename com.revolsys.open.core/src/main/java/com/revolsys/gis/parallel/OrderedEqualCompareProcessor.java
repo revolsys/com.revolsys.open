@@ -8,16 +8,16 @@ import java.util.TreeSet;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.equals.EqualsInstance;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordLog;
-import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.equals.EqualsInstance;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.MultiInputSelector;
 import com.revolsys.parallel.channel.store.Buffer;
 import com.revolsys.parallel.process.AbstractInProcess;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordLog;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 

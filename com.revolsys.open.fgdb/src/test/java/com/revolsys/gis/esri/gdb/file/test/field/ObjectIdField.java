@@ -2,9 +2,9 @@ package com.revolsys.gis.esri.gdb.file.test.field;
 
 import java.io.IOException;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.EndianInput;
+import com.revolsys.record.Record;
 
 public class ObjectIdField extends FgdbField {
   public ObjectIdField(final String name, final boolean required) {

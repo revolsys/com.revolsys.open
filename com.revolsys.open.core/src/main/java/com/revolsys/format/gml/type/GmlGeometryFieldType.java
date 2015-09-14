@@ -2,7 +2,7 @@ package com.revolsys.format.gml.type;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.data.types.DataType;
+import com.revolsys.datatype.DataType;
 import com.revolsys.format.gml.GmlConstants;
 import com.revolsys.format.gml.GmlRecordWriter;
 import com.revolsys.format.xml.XmlWriter;

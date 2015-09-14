@@ -13,19 +13,19 @@ import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.data.query.Query;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.RecordState;
-import com.revolsys.data.record.io.RecordReader;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordFactory;
+import com.revolsys.record.RecordState;
+import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.query.Query;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionImpl;
 
 public class JdbcQueryIterator extends AbstractIterator<Record>implements RecordReader {
 

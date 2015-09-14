@@ -38,9 +38,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordDefinitionFactory;
 import com.revolsys.format.saif.util.ObjectSetUtil;
 import com.revolsys.format.saif.util.OsnConverterRegistry;
 import com.revolsys.format.saif.util.OsnSerializer;
@@ -48,6 +45,9 @@ import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Path;
 import com.revolsys.io.ZipUtil;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionFactory;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 

@@ -2,9 +2,9 @@ package com.revolsys.geometry.graph.visitor;
 
 import java.util.function.Consumer;
 
-import com.revolsys.data.record.Record;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.RecordGraph;
+import com.revolsys.record.Record;
 import com.revolsys.util.ObjectProcessor;
 
 public class EdgeLessThanLengthVisitor extends AbstractEdgeListenerVisitor<Record>

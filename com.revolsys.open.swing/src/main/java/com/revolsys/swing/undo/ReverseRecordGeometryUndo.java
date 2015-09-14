@@ -1,8 +1,8 @@
 package com.revolsys.swing.undo;
 
-import com.revolsys.data.equals.Equals;
-import com.revolsys.data.record.property.DirectionalFields;
+import com.revolsys.equals.Equals;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.record.property.DirectionalFields;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 
 public class ReverseRecordGeometryUndo extends AbstractUndoableEdit {

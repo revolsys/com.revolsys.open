@@ -2,7 +2,7 @@ package com.revolsys.gis.converter.process;
 
 import org.springframework.core.convert.converter.Converter;
 
-import com.revolsys.data.record.Record;
+import com.revolsys.record.Record;
 
 public class SourceValueConverter extends AbstractSourceToTargetProcess<Record, Record> {
   private Converter<Record, ? extends Object> sourceValueConverter;

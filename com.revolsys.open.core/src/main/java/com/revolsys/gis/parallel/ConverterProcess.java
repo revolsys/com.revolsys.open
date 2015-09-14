@@ -2,9 +2,9 @@ package com.revolsys.gis.parallel;
 
 import org.springframework.core.convert.converter.Converter;
 
-import com.revolsys.data.record.Record;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
+import com.revolsys.record.Record;
 
 public class ConverterProcess extends BaseInOutProcess<Record, Record> {
 

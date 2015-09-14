@@ -6,8 +6,6 @@ import java.math.BigInteger;
 import java.util.Date;
 
 import com.revolsys.beans.Classes;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.MultiLineString;
@@ -16,6 +14,8 @@ import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.gis.io.LittleEndianRandomAccessFile;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class FileGdbTable {
   private final long fieldHeaderOffset = 40;

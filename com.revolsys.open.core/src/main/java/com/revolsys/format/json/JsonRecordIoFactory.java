@@ -9,14 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.data.record.ArrayRecord;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.io.RecordWriter;
-import com.revolsys.data.record.io.RecordWriterFactory;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
+import com.revolsys.record.ArrayRecord;
+import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.io.RecordWriterFactory;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class JsonRecordIoFactory extends AbstractIoFactoryWithCoordinateSystem
   implements RecordWriterFactory {

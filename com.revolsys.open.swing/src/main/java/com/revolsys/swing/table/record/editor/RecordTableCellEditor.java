@@ -24,8 +24,8 @@ import javax.swing.table.TableCellEditor;
 import org.jdesktop.swingx.JXTable;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.types.DataType;
+import com.revolsys.datatype.DataType;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.AbstractRecordQueryField;
 import com.revolsys.swing.field.Field;

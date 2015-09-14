@@ -21,7 +21,7 @@ import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.format.xml.XmlConstants;
 import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.format.xml.wadl.WadlConstants;

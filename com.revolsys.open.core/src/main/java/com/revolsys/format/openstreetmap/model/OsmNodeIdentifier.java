@@ -1,6 +1,6 @@
 package com.revolsys.format.openstreetmap.model;
 
-import com.revolsys.data.identifier.SingleIdentifier;
+import com.revolsys.identifier.SingleIdentifier;
 
 public class OsmNodeIdentifier extends SingleIdentifier {
 

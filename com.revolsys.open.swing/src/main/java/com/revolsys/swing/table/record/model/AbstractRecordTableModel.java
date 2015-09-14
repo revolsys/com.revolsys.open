@@ -10,10 +10,10 @@ import javax.annotation.PreDestroy;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.identifier.Identifier;
+import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;

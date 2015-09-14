@@ -1,9 +1,9 @@
 package com.revolsys.format.moep;
 
-import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.io.AbstractRecordIoFactory;
-import com.revolsys.data.record.io.RecordReader;
-import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.record.RecordFactory;
+import com.revolsys.record.io.AbstractRecordIoFactory;
+import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
 public class MoepBinary extends AbstractRecordIoFactory {

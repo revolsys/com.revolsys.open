@@ -4,13 +4,13 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.data.record.Record;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.record.Record;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.record.BoundingBoxRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;

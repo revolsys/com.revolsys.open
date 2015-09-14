@@ -4,7 +4,7 @@ import java.util.function.Predicate;
 
 import org.springframework.core.convert.converter.Converter;
 
-import com.revolsys.data.record.Record;
+import com.revolsys.record.Record;
 
 public class FilterRecordConverter {
   private Converter<Record, Record> converter;

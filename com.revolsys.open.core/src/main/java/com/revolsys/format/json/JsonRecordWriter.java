@@ -8,12 +8,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.types.DataType;
+import com.revolsys.datatype.DataType;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.WrappedException;
 

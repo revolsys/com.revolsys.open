@@ -1,9 +1,9 @@
 package com.revolsys.gis.oracle.io;
 
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinitionImpl;
 
 public class OracleClobFieldAdder extends JdbcFieldAdder {
 

@@ -5,10 +5,8 @@ import java.util.List;
 
 import org.junit.Assert;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinitionImpl;
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -23,6 +21,8 @@ import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.io.test.IoTestSuite;
 import com.revolsys.jts.test.geometry.TestUtil;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.RecordDefinitionImpl;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;

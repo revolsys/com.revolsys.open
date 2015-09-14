@@ -1,6 +1,6 @@
 package com.revolsys.swing.undo;
 
-import com.revolsys.data.equals.Equals;
+import com.revolsys.equals.Equals;
 import com.revolsys.util.Property;
 
 public class SetObjectProperty extends AbstractUndoableEdit {

@@ -7,18 +7,18 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
-import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.io.AbstractRecordIoFactory;
-import com.revolsys.data.record.io.RecordReader;
-import com.revolsys.data.record.io.RecordWriter;
-import com.revolsys.data.record.io.RecordWriterFactory;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.csv.CsvMapWriter;
 import com.revolsys.format.csv.CsvRecordReader;
 import com.revolsys.format.csv.CsvRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
+import com.revolsys.record.RecordFactory;
+import com.revolsys.record.io.AbstractRecordIoFactory;
+import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.io.RecordWriterFactory;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
 public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory, MapWriterFactory {

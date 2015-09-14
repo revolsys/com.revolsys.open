@@ -1,8 +1,8 @@
 package com.revolsys.geometry.model.segment;
 
-import com.revolsys.data.io.IteratorReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.io.IteratorReader;
 import com.revolsys.io.Reader;
 
 public abstract class AbstractSegment extends AbstractLineSegment implements Segment {

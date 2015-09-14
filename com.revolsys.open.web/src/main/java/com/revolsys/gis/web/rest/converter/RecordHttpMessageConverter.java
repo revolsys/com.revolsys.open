@@ -11,15 +11,15 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.io.ListRecordReader;
-import com.revolsys.data.record.io.RecordReader;
-import com.revolsys.data.record.io.RecordReaderFactory;
-import com.revolsys.data.record.io.RecordWriterFactory;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.record.Record;
+import com.revolsys.record.io.ListRecordReader;
+import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.RecordReaderFactory;
+import com.revolsys.record.io.RecordWriterFactory;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 

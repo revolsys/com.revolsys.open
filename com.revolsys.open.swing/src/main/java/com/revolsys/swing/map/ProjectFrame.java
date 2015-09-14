@@ -40,14 +40,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.TreePath;
 
-import com.revolsys.data.record.io.RecordStoreConnectionManager;
-import com.revolsys.data.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.net.urlcache.FileResponseCache;
+import com.revolsys.record.io.RecordStoreConnectionManager;
+import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;

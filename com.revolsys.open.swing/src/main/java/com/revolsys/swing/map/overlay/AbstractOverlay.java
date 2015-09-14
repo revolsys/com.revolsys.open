@@ -35,7 +35,7 @@ import javax.swing.undo.UndoableEdit;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.data.equals.Equals;
+import com.revolsys.equals.Equals;
 import com.revolsys.geometry.algorithm.index.quadtree.GeometrySegmentQuadTree;
 import com.revolsys.geometry.algorithm.index.quadtree.GeometryVertexQuadTree;
 import com.revolsys.geometry.model.BoundingBox;

@@ -23,7 +23,7 @@ package com.revolsys.geometry.filter;
 import java.util.Collections;
 import java.util.function.Predicate;
 
-import com.revolsys.data.equals.Geometry2DEquals;
+import com.revolsys.equals.Geometry2DEquals;
 import com.revolsys.geometry.model.Geometry;
 
 public class Equals2DFilter<T extends Geometry> implements Predicate<T> {

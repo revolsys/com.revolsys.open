@@ -3,12 +3,12 @@ package com.revolsys.gis.esri.gdb.file.capi.type;
 import java.util.Date;
 
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordLog;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.format.esri.gdb.xml.model.Field;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordLog;
 import com.revolsys.util.DateUtil;
 
 public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {

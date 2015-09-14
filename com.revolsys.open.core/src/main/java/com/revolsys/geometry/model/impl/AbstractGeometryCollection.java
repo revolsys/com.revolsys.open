@@ -39,8 +39,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Dimension;

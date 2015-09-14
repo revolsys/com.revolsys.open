@@ -3,20 +3,20 @@ package com.revolsys.gis.postgresql;
 import java.io.PrintWriter;
 import java.util.List;
 
-import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.property.FieldProperties;
-import com.revolsys.data.record.property.ShortNameProperty;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.identifier.Identifier;
 import com.revolsys.io.Path;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.JdbcDdlWriter;
+import com.revolsys.record.Record;
+import com.revolsys.record.property.FieldProperties;
+import com.revolsys.record.property.ShortNameProperty;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Property;
 
 public class PostgreSQLDdlWriter extends JdbcDdlWriter {

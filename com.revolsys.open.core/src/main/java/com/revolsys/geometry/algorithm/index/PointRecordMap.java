@@ -9,11 +9,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import com.revolsys.data.record.Record;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.predicate.Predicates;
+import com.revolsys.record.Record;
 
 public class PointRecordMap {
 

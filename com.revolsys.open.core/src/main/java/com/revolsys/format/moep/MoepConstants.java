@@ -1,9 +1,9 @@
 package com.revolsys.format.moep;
 
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordDefinitionImpl;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.PathName;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionImpl;
 
 public final class MoepConstants {
   public static final String ADMIT_INTEGRATION_DATE = "A_DATE";

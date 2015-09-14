@@ -1,7 +1,7 @@
 package com.revolsys.swing.field;
 
-import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.identifier.TypedIdentifier;
+import com.revolsys.identifier.Identifier;
+import com.revolsys.identifier.TypedIdentifier;
 
 public class IdentifierField extends TextField {
   private static final long serialVersionUID = 1L;

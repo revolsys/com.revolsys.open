@@ -22,11 +22,11 @@ package com.revolsys.geometry.filter;
 
 import java.util.function.Predicate;
 
-import com.revolsys.data.filter.RecordGeometryFilter;
-import com.revolsys.data.record.Record;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.util.LineStringUtil;
+import com.revolsys.record.Record;
+import com.revolsys.record.filter.RecordGeometryFilter;
 
 public class LineStringLessThanDistanceFilter implements Predicate<LineString> {
 

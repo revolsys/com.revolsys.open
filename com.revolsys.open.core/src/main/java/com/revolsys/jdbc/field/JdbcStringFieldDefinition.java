@@ -5,8 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataTypes;
+import com.revolsys.record.Record;
 import com.revolsys.util.Property;
 
 public class JdbcStringFieldDefinition extends JdbcFieldDefinition {

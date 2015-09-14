@@ -1,10 +1,10 @@
 package com.revolsys.gis.parallel;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.Records;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
+import com.revolsys.record.Record;
+import com.revolsys.record.Records;
 
 public class GeometryBufferProcess extends BaseInOutProcess<Record, Record> {
 

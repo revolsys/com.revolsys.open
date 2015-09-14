@@ -3,12 +3,12 @@ package com.revolsys.format.openstreetmap.pbf;
 import java.util.Collections;
 import java.util.Set;
 
-import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.io.AbstractRecordIoFactory;
-import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.record.RecordFactory;
+import com.revolsys.record.io.AbstractRecordIoFactory;
+import com.revolsys.record.io.RecordReader;
 import com.revolsys.spring.resource.Resource;
 
 public class OsmPbf extends AbstractRecordIoFactory {

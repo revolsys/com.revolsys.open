@@ -11,10 +11,10 @@ import java.util.Map;
 
 import org.springframework.asm.Type;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.FieldDefinition;
 
 public class JdbcFieldDefinition extends FieldDefinition {
   public static JdbcFieldDefinition createField(final Object value) {

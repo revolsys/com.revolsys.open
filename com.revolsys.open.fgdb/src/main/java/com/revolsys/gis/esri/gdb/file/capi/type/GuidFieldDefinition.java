@@ -3,11 +3,11 @@ package com.revolsys.gis.esri.gdb.file.capi.type;
 import java.util.WeakHashMap;
 
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.format.esri.gdb.xml.model.Field;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Guid;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
+import com.revolsys.record.Record;
 
 public class GuidFieldDefinition extends AbstractFileGdbFieldDefinition {
   private static final WeakHashMap<String, Guid> GUID_CACHE = new WeakHashMap<String, Guid>();

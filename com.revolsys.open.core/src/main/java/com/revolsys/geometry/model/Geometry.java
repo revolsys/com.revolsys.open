@@ -38,7 +38,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.data.types.DataTypeProxy;
+import com.revolsys.datatype.DataTypeProxy;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;

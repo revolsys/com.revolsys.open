@@ -4,7 +4,7 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 
-import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class RecordMapTableModel extends AbstractSingleRecordTableModel {
 

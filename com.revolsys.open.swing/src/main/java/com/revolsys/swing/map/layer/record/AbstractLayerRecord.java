@@ -2,10 +2,10 @@ package com.revolsys.swing.map.layer.record;
 
 import java.beans.PropertyChangeEvent;
 
-import com.revolsys.data.record.AbstractRecord;
-import com.revolsys.data.record.RecordState;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.record.AbstractRecord;
+import com.revolsys.record.RecordState;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.util.Property;
 

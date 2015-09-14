@@ -9,11 +9,6 @@ import javax.annotation.PreDestroy;
 
 import com.revolsys.beans.ObjectException;
 import com.revolsys.beans.ObjectPropertyException;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordState;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
@@ -21,6 +16,11 @@ import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.OidFieldDefinition;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.PathName;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordState;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordStore;
 
 public class FileGdbWriter extends AbstractRecordWriter {
   private FileGdbRecordStore recordStore;

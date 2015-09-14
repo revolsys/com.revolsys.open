@@ -7,9 +7,9 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.data.equals.Equals;
-import com.revolsys.data.record.Record;
+import com.revolsys.equals.Equals;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.record.Record;
 import com.revolsys.swing.map.layer.record.table.model.MergedRecordsTableModel;
 import com.revolsys.swing.table.record.row.RecordRowTable;
 

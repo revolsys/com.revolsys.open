@@ -12,13 +12,13 @@ import javax.swing.event.EventListenerList;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import com.revolsys.data.query.BinaryCondition;
-import com.revolsys.data.query.Condition;
-import com.revolsys.data.query.Q;
-import com.revolsys.data.query.Query;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.Reader;
+import com.revolsys.record.Record;
+import com.revolsys.record.query.BinaryCondition;
+import com.revolsys.record.query.Condition;
+import com.revolsys.record.query.Q;
+import com.revolsys.record.query.Query;
+import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
 public class RecordStoreQueryListModel implements ListModel {

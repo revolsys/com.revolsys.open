@@ -2,7 +2,7 @@ package com.revolsys.geometry.graph.filter;
 
 import java.util.function.Predicate;
 
-import com.revolsys.data.equals.EqualsInstance;
+import com.revolsys.equals.EqualsInstance;
 import com.revolsys.properties.ObjectWithProperties;
 
 public class AttributeFilter<T extends ObjectWithProperties> implements Predicate<T> {

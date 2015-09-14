@@ -39,9 +39,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.data.equals.NumberEquals;
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
+import com.revolsys.equals.NumberEquals;
 import com.revolsys.format.wkt.EWktWriter;
 import com.revolsys.geometry.algorithm.Centroid;
 import com.revolsys.geometry.algorithm.ConvexHull;

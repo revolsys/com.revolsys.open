@@ -10,13 +10,13 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.data.record.io.RecordStoreFactory;
-import com.revolsys.data.record.io.RecordStoreFactoryRegistry;
-import com.revolsys.data.record.io.RecordStoreRecordAndGeometryWriterFactory;
-import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Paths;
+import com.revolsys.record.io.RecordStoreFactory;
+import com.revolsys.record.io.RecordStoreFactoryRegistry;
+import com.revolsys.record.io.RecordStoreRecordAndGeometryWriterFactory;
+import com.revolsys.record.schema.RecordStore;
 
 public class FileGdbRecordStoreFactory implements RecordStoreFactory {
 

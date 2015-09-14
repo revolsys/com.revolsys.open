@@ -13,16 +13,16 @@ import org.gdal.ogr.Feature;
 import org.gdal.ogr.Layer;
 
 import com.revolsys.collection.iterator.AbstractIterator;
-import com.revolsys.data.query.Query;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.RecordState;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.gis.io.Statistics;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordFactory;
+import com.revolsys.record.RecordState;
+import com.revolsys.record.query.Query;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class OgrQueryIterator extends AbstractIterator<Record> {
 

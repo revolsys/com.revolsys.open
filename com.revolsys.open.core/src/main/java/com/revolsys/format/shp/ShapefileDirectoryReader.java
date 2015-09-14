@@ -6,13 +6,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.revolsys.data.io.AbstractDirectoryReader;
-import com.revolsys.data.record.ArrayRecordFactory;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.io.RecordDirectoryReader;
-import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.io.AbstractDirectoryReader;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
+import com.revolsys.record.ArrayRecordFactory;
+import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordDirectoryReader;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
 /**

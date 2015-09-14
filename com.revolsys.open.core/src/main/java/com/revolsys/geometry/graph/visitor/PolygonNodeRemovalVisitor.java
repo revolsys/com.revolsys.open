@@ -6,13 +6,13 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import com.revolsys.data.equals.EqualsInstance;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.equals.EqualsInstance;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.graph.RecordGraph;
 import com.revolsys.geometry.model.End;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class PolygonNodeRemovalVisitor implements Consumer<Node<Record>> {
 

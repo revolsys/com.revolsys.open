@@ -2,14 +2,14 @@ package com.revolsys.gis.data.query;
 
 import java.util.Arrays;
 
-import com.revolsys.data.query.Condition;
-import com.revolsys.data.query.Q;
-import com.revolsys.data.record.ArrayRecord;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.record.schema.RecordDefinitionImpl;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.PathName;
+import com.revolsys.record.ArrayRecord;
+import com.revolsys.record.Record;
+import com.revolsys.record.query.Condition;
+import com.revolsys.record.query.Q;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinitionImpl;
 
 import junit.framework.Assert;
 import junit.framework.Assert;

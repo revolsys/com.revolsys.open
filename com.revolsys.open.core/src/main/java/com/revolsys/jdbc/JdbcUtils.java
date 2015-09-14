@@ -27,16 +27,16 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 
-import com.revolsys.data.query.Condition;
-import com.revolsys.data.query.Query;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordDefinitionImpl;
-import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.Path;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStore;
+import com.revolsys.record.query.Condition;
+import com.revolsys.record.query.Query;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionImpl;
+import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
 public final class JdbcUtils {

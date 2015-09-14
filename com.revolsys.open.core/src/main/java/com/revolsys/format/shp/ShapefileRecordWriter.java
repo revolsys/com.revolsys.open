@@ -25,11 +25,8 @@ import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordDefinitionImpl;
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.format.xbase.XBaseFieldDefinition;
 import com.revolsys.format.xbase.XbaseRecordWriter;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
@@ -39,6 +36,9 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.io.ResourceEndianOutput;
 import com.revolsys.io.IoConstants;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
 

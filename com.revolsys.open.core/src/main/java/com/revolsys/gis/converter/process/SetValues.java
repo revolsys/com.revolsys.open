@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.revolsys.data.record.Record;
+import com.revolsys.record.Record;
 
 public class SetValues extends AbstractSourceToTargetProcess<Record, Record> {
   private Map<String, ? extends Object> values = Collections.emptyMap();

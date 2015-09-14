@@ -17,8 +17,8 @@ import javax.management.ObjectName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.io.map.MapWriter;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.util.ExceptionUtil;
 
 /**

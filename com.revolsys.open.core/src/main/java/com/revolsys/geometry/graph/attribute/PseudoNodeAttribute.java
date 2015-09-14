@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.property.DirectionalFields;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.EdgePair;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.util.LineStringUtil;
+import com.revolsys.record.Record;
+import com.revolsys.record.property.DirectionalFields;
 
 public class PseudoNodeAttribute {
   private final List<EdgePair<Record>> edgePairs = new ArrayList<EdgePair<Record>>();

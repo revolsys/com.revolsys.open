@@ -3,7 +3,7 @@ package com.revolsys.open.gis.oracle.esri;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.data.equals.GeometryEqualsExact3d;
+import com.revolsys.equals.GeometryEqualsExact3d;
 import com.revolsys.format.wkt.WktWriter;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;

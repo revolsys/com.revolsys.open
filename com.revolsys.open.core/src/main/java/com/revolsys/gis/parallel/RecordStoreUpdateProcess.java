@@ -2,11 +2,11 @@ package com.revolsys.gis.parallel;
 
 import javax.annotation.PreDestroy;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordState;
-import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInProcess;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordState;
+import com.revolsys.record.schema.RecordStore;
 
 /**
  * <p>

@@ -17,12 +17,12 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.gis.io.ResourceEndianOutput;
 import com.revolsys.io.AbstractRecordWriter;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.MathUtil;

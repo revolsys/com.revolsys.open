@@ -9,10 +9,10 @@ import org.jdesktop.swingx.table.TableColumnExt;
 
 import com.revolsys.comparator.NumericComparator;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.identifier.Identifier;
+import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;

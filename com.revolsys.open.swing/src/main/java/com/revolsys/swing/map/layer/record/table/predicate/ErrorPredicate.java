@@ -9,7 +9,7 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.data.record.Record;
+import com.revolsys.record.Record;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
 import com.revolsys.swing.table.record.row.RecordRowTable;
 

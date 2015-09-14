@@ -11,10 +11,6 @@ import org.apache.commons.jexl.Expression;
 import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.context.HashMapContext;
 
-import com.revolsys.data.record.ArrayRecord;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.operation.buffer.Buffer;
 import com.revolsys.geometry.operation.buffer.BufferParameters;
@@ -22,6 +18,10 @@ import com.revolsys.geometry.simplify.DouglasPeuckerSimplifier;
 import com.revolsys.io.PathName;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
+import com.revolsys.record.ArrayRecord;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.util.JexlUtil;
 
 public class CreateObjectsWithinDistanceOfGeometry extends BaseInOutProcess<Record, Record> {

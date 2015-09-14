@@ -4,11 +4,7 @@ import java.io.Writer;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.property.RecordProperties;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.types.DataType;
+import com.revolsys.datatype.DataType;
 import com.revolsys.format.gml.type.GmlFieldType;
 import com.revolsys.format.gml.type.GmlFieldTypeRegistry;
 import com.revolsys.format.xml.XmlWriter;
@@ -18,6 +14,10 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.Path;
+import com.revolsys.record.Record;
+import com.revolsys.record.property.RecordProperties;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class GmlRecordWriter extends AbstractRecordWriter implements GmlConstants {
   public static final void srsName(final XmlWriter out, final GeometryFactory geometryFactory) {

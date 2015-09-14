@@ -1,6 +1,6 @@
 package com.revolsys.format.esri.gdb.xml.type;
 
-import com.revolsys.data.types.DataType;
+import com.revolsys.datatype.DataType;
 import com.revolsys.format.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.format.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.format.xml.XmlWriter;

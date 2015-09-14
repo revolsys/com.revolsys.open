@@ -1,8 +1,8 @@
 package com.revolsys.gis.parallel;
 
-import com.revolsys.data.record.Record;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
+import com.revolsys.record.Record;
 
 public class OutsideBoundaryInOutProcess extends BaseInOutProcess<Record, Record> {
 

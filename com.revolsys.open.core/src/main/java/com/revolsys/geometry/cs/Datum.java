@@ -2,7 +2,7 @@ package com.revolsys.geometry.cs;
 
 import java.io.Serializable;
 
-import com.revolsys.data.equals.Equals;
+import com.revolsys.equals.Equals;
 
 public class Datum implements Serializable {
   /**

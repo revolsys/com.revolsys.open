@@ -7,7 +7,7 @@ import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
-import com.revolsys.data.equals.Equals;
+import com.revolsys.equals.Equals;
 
 public class AngularUnit implements Serializable {
   /**

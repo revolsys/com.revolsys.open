@@ -14,18 +14,18 @@ import org.gdal.ogr.Layer;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordState;
-import com.revolsys.data.record.property.FieldProperties;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.AbstractRecordWriter;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordState;
+import com.revolsys.record.property.FieldProperties;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordStore;
 
 public class OgrRecordWriter extends AbstractRecordWriter {
   private DataSource dataSource;

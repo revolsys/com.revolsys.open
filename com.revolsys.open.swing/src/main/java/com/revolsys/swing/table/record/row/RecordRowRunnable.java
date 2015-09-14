@@ -3,8 +3,8 @@ package com.revolsys.swing.table.record.row;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import com.revolsys.data.record.Record;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
+import com.revolsys.record.Record;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;

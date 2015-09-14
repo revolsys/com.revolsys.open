@@ -4,7 +4,7 @@ import java.util.LinkedList;
 
 import javax.swing.SwingWorker;
 
-import com.revolsys.data.record.io.RecordStoreConnectionRegistry;
+import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.ExceptionUtil;
 

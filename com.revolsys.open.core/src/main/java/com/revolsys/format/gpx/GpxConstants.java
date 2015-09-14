@@ -2,11 +2,11 @@ package com.revolsys.format.gpx;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.data.record.schema.RecordDefinitionImpl;
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
+import com.revolsys.record.schema.RecordDefinitionImpl;
 
 public final class GpxConstants {
   public static final String GPX_NS = "gpx";

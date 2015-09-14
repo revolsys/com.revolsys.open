@@ -5,7 +5,7 @@ import java.awt.Component;
 
 import javax.swing.JTabbedPane;
 
-import com.revolsys.data.equals.Equals;
+import com.revolsys.equals.Equals;
 import com.revolsys.util.Property;
 
 public class TabbedValuePanel extends ValueField {

@@ -11,11 +11,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.gdal.ogr.ogr;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.data.record.io.RecordStoreFactory;
-import com.revolsys.data.record.io.RecordStoreFactoryRegistry;
-import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.gdal.Gdal;
 import com.revolsys.io.FileUtil;
+import com.revolsys.record.io.RecordStoreFactory;
+import com.revolsys.record.io.RecordStoreFactoryRegistry;
+import com.revolsys.record.schema.RecordStore;
 
 public class OgrRecordStoreFactory implements RecordStoreFactory {
 

@@ -23,10 +23,7 @@ import javax.swing.UIManager;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.equals.Equals;
-import com.revolsys.data.record.io.RecordReader;
-import com.revolsys.data.record.io.RecordReaderFactory;
-import com.revolsys.data.record.io.RecordStoreFactoryRegistry;
+import com.revolsys.equals.Equals;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
@@ -34,6 +31,9 @@ import com.revolsys.io.Paths;
 import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.raster.GeoreferencedImageFactory;
+import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.RecordReaderFactory;
+import com.revolsys.record.io.RecordStoreFactoryRegistry;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;

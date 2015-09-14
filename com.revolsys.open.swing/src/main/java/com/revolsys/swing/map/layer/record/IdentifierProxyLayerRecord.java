@@ -1,6 +1,6 @@
 package com.revolsys.swing.map.layer.record;
 
-import com.revolsys.data.identifier.Identifier;
+import com.revolsys.identifier.Identifier;
 
 public class IdentifierProxyLayerRecord extends AbstractProxyLayerRecord {
 

@@ -2,7 +2,7 @@ package com.revolsys.swing.field;
 
 import javax.swing.JComponent;
 
-import com.revolsys.data.equals.Equals;
+import com.revolsys.equals.Equals;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.UndoManager;
 

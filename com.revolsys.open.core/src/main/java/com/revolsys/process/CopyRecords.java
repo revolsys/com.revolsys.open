@@ -5,14 +5,14 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.query.Query;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.parallel.process.AbstractProcess;
+import com.revolsys.record.Record;
+import com.revolsys.record.query.Query;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.CompareUtil;
 
 public class CopyRecords extends AbstractProcess {

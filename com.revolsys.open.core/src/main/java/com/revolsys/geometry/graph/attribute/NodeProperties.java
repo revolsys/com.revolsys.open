@@ -11,13 +11,13 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.revolsys.comparator.NumericComparator;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.properties.ObjectPropertyProxy;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class NodeProperties {
   protected static class Methods {

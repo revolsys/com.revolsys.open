@@ -3,9 +3,9 @@ package com.revolsys.format.moep;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordDefinitionFactory;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionFactory;
 
 public class MoepRecordDefinitionFactory extends BaseObjectWithProperties
   implements RecordDefinitionFactory {

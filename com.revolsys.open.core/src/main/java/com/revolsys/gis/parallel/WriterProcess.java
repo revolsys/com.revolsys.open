@@ -1,9 +1,9 @@
 package com.revolsys.gis.parallel;
 
-import com.revolsys.data.record.Record;
 import com.revolsys.io.Writer;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInProcess;
+import com.revolsys.record.Record;
 
 public class WriterProcess extends BaseInProcess<Record> {
   private Writer<Record> writer;

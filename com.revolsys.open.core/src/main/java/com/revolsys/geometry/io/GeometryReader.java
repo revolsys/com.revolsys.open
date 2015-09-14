@@ -2,10 +2,10 @@ package com.revolsys.geometry.io;
 
 import java.util.Iterator;
 
-import com.revolsys.data.io.IteratorReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.io.IteratorReader;
 
 public class GeometryReader extends IteratorReader<Geometry> {
   public static GeometryReader create(final Object source) {

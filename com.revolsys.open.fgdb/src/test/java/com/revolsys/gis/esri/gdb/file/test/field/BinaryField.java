@@ -2,7 +2,7 @@ package com.revolsys.gis.esri.gdb.file.test.field;
 
 import java.io.IOException;
 
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.gis.esri.gdb.file.test.FgdbReader;
 import com.revolsys.io.EndianInput;
 

@@ -1,8 +1,8 @@
 package com.revolsys.swing.map.layer.record;
 
-import com.revolsys.data.equals.Equals;
-import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.record.Record;
+import com.revolsys.equals.Equals;
+import com.revolsys.identifier.Identifier;
+import com.revolsys.record.Record;
 
 public interface LayerRecord extends Record {
   void cancelChanges();

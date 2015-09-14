@@ -15,7 +15,6 @@ import javax.swing.JOptionPane;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.Parent;
-import com.revolsys.data.record.io.RecordReaderFactory;
 import com.revolsys.format.json.Json;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -27,6 +26,7 @@ import com.revolsys.io.PathName;
 import com.revolsys.io.Paths;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.raster.GeoreferencedImageFactory;
+import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;

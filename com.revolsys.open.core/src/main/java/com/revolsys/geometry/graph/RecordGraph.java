@@ -5,16 +5,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-import com.revolsys.data.filter.RecordGeometryFilter;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.Records;
-import com.revolsys.data.record.property.DirectionalFields;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.geometry.graph.filter.EdgeObjectFilter;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.record.Record;
+import com.revolsys.record.Records;
+import com.revolsys.record.filter.RecordGeometryFilter;
+import com.revolsys.record.property.DirectionalFields;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class RecordGraph extends Graph<Record> {
 

@@ -37,9 +37,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.data.io.IteratorReader;
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -51,6 +50,7 @@ import com.revolsys.geometry.model.segment.MultiPolygonSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.MultiPolygonVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.io.IteratorReader;
 import com.revolsys.io.Reader;
 
 /**

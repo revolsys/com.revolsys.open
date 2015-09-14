@@ -39,7 +39,7 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.map.MapSerializerMap;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.EqualsInstance;
+import com.revolsys.equals.EqualsInstance;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.esri.EsriCsWktWriter;

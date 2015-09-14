@@ -3,7 +3,7 @@ package com.revolsys.geometry.graph;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.data.record.Record;
+import com.revolsys.record.Record;
 
 public class EdgePair<T> {
   private final Edge<T> edge1;

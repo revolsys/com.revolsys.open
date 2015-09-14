@@ -11,14 +11,14 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.zip.ZipFile;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordDefinitionFactory;
-import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.format.saif.util.OsnConverter;
 import com.revolsys.format.saif.util.OsnConverterRegistry;
 import com.revolsys.format.saif.util.OsnIterator;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordFactory;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionFactory;
+import com.revolsys.record.schema.RecordDefinitionImpl;
 
 public class OsnReader implements Iterator<Record>, AutoCloseable {
   private final OsnConverterRegistry converters;

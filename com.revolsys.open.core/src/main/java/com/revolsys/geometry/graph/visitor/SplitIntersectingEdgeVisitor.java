@@ -7,8 +7,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.data.equals.GeometryEqualsExact3d;
-import com.revolsys.data.record.Record;
+import com.revolsys.equals.GeometryEqualsExact3d;
 import com.revolsys.geometry.algorithm.linematch.LineMatchGraph;
 import com.revolsys.geometry.algorithm.linematch.LineSegmentMatch;
 import com.revolsys.geometry.filter.EqualFilter;
@@ -21,6 +20,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.predicate.Predicates;
+import com.revolsys.record.Record;
 
 public class SplitIntersectingEdgeVisitor implements Consumer<Edge<Record>> {
 

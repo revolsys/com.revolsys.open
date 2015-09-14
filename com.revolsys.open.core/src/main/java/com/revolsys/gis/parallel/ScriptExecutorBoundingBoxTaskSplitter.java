@@ -4,11 +4,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.revolsys.data.record.Record;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.parallel.channel.ChannelInput;
 import com.revolsys.parallel.channel.ChannelOutput;
 import com.revolsys.parallel.tools.ScriptExecutorRunnable;
+import com.revolsys.record.Record;
 
 public class ScriptExecutorBoundingBoxTaskSplitter extends BoundingBoxTaskSplitter {
 

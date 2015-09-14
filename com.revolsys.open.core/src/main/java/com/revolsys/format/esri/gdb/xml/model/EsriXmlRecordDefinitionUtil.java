@@ -5,14 +5,8 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.data.record.ArrayRecord;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.property.FieldProperties;
-import com.revolsys.data.record.schema.FieldDefinition;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordDefinitionImpl;
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.format.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.format.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.format.esri.gdb.xml.model.enums.GeometryType;
@@ -21,6 +15,12 @@ import com.revolsys.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.Path;
 import com.revolsys.io.PathName;
+import com.revolsys.record.ArrayRecord;
+import com.revolsys.record.Record;
+import com.revolsys.record.property.FieldProperties;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 

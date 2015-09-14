@@ -4,11 +4,11 @@ import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.data.query.Query;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.types.DataType;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.record.Record;
+import com.revolsys.record.query.Query;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.ListRecordLayer;

@@ -5,7 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.revolsys.data.types.DataType;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.MultiPoint;

@@ -8,10 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.property.FieldProperties;
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.format.esri.gdb.xml.model.Field;
 import com.revolsys.format.esri.gdb.xml.model.GeometryDef;
 import com.revolsys.format.esri.gdb.xml.model.SpatialReference;
@@ -27,6 +25,8 @@ import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.io.EndianOutputStream;
 import com.revolsys.io.EndianInput;
 import com.revolsys.io.FileUtil;
+import com.revolsys.record.Record;
+import com.revolsys.record.property.FieldProperties;
 
 public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
 

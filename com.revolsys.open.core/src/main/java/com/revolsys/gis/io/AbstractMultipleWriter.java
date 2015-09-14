@@ -5,10 +5,10 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.Writer;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.RecordDefinition;
 
 public abstract class AbstractMultipleWriter extends AbstractRecordWriter {
   private static final Logger LOG = Logger.getLogger(AbstractMultipleWriter.class);

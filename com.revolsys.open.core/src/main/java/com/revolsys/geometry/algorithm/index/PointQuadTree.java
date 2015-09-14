@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
-import com.revolsys.data.equals.GeometryEqualsExact3d;
+import com.revolsys.equals.GeometryEqualsExact3d;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;

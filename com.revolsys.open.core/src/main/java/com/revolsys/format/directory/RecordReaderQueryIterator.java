@@ -4,10 +4,10 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import com.revolsys.collection.iterator.AbstractIterator;
-import com.revolsys.data.query.Condition;
-import com.revolsys.data.query.Query;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.io.RecordReader;
+import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.query.Condition;
+import com.revolsys.record.query.Query;
 
 public class RecordReaderQueryIterator extends AbstractIterator<Record> {
 

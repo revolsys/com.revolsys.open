@@ -1,6 +1,6 @@
 package com.revolsys.swing.undo;
 
-import com.revolsys.data.record.Record;
+import com.revolsys.record.Record;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 

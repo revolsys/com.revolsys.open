@@ -7,7 +7,7 @@ import java.awt.event.FocusListener;
 import org.jdesktop.swingx.JXSearchField;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.Equals;
+import com.revolsys.equals.Equals;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.ExceptionUtil;

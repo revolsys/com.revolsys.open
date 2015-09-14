@@ -5,8 +5,8 @@ import java.util.List;
 
 import javax.swing.Icon;
 
-import com.revolsys.data.record.io.RecordStoreConnectionManager;
-import com.revolsys.data.record.io.RecordStoreConnectionRegistry;
+import com.revolsys.record.io.RecordStoreConnectionManager;
+import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.tree.node.BaseTreeNode;

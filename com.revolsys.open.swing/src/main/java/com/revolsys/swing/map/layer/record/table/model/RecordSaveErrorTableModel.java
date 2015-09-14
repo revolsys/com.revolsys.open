@@ -17,7 +17,7 @@ import javax.swing.event.ListSelectionListener;
 import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.beans.ObjectPropertyException;
-import com.revolsys.data.record.Record;
+import com.revolsys.record.Record;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;

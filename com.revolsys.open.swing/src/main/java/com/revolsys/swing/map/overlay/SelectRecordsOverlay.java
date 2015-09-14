@@ -20,12 +20,12 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.data.record.Record;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.record.Record;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.ImageViewport;

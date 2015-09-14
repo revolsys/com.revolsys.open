@@ -9,15 +9,15 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.data.filter.RecordEqualsFilter;
-import com.revolsys.data.filter.RecordGeometryBoundingBoxIntersectsFilter;
-import com.revolsys.data.filter.RecordGeometryDistanceFilter;
-import com.revolsys.data.filter.RecordGeometryIntersectsFilter;
-import com.revolsys.data.record.Record;
 import com.revolsys.geometry.algorithm.index.quadtree.QuadTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.record.Record;
+import com.revolsys.record.filter.RecordEqualsFilter;
+import com.revolsys.record.filter.RecordGeometryBoundingBoxIntersectsFilter;
+import com.revolsys.record.filter.RecordGeometryDistanceFilter;
+import com.revolsys.record.filter.RecordGeometryIntersectsFilter;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class RecordQuadTree extends QuadTree<Record> {

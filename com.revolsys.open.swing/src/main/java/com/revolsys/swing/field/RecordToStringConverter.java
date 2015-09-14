@@ -7,7 +7,7 @@ import java.util.List;
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.record.Record;
+import com.revolsys.record.Record;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 

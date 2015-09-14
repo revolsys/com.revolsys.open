@@ -38,9 +38,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.revolsys.data.io.IteratorReader;
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.DataTypes;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Dimension;
 import com.revolsys.geometry.model.Geometry;
@@ -53,6 +52,7 @@ import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.MultiLineStringVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.BoundaryOp;
+import com.revolsys.io.IteratorReader;
 import com.revolsys.io.Reader;
 
 /**

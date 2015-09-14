@@ -3,10 +3,7 @@ package com.revolsys.geometry.graph.visitor;
 import java.util.List;
 import java.util.function.Predicate;
 
-import com.revolsys.data.equals.GeometryEqualsExact3d;
-import com.revolsys.data.filter.RecordGeometryFilter;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordLog;
+import com.revolsys.equals.GeometryEqualsExact3d;
 import com.revolsys.geometry.filter.EqualFilter;
 import com.revolsys.geometry.filter.LinearIntersectionFilter;
 import com.revolsys.geometry.graph.Edge;
@@ -16,6 +13,9 @@ import com.revolsys.geometry.graph.filter.EdgeObjectFilter;
 import com.revolsys.geometry.graph.filter.EdgeTypeNameFilter;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.util.GeometryProperties;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordLog;
+import com.revolsys.record.filter.RecordGeometryFilter;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 

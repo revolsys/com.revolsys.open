@@ -1,6 +1,6 @@
 package com.revolsys.format.gml.type;
 
-import com.revolsys.data.types.DataType;
+import com.revolsys.datatype.DataType;
 import com.revolsys.format.gml.GmlConstants;
 import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.format.xml.XsiConstants;

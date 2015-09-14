@@ -1,8 +1,8 @@
 package com.revolsys.gis.parallel;
 
-import com.revolsys.data.record.Record;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.parallel.process.FilterProcess;
+import com.revolsys.record.Record;
 
 public class StatisticsFilterProcess extends FilterProcess<Record> {
 

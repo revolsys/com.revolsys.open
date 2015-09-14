@@ -37,16 +37,16 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.types.DataType;
-import com.revolsys.data.types.EnumerationDataType;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.EnumerationDataType;
 import com.revolsys.format.saif.SaifConstants;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.io.FileUtil;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class OsnSerializer {
   private static final String ATTRIBUTE_SCOPE = "attribute";

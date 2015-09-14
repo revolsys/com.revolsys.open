@@ -2,7 +2,7 @@ package com.revolsys.gis.io;
 
 import java.util.Iterator;
 
-import com.revolsys.data.record.Record;
+import com.revolsys.record.Record;
 
 public class StatisticsIterator implements Iterator<Record> {
   private final Iterator<Record> iterator;

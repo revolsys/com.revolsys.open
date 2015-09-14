@@ -5,14 +5,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.gis.io.StatisticsMap;
+import com.revolsys.identifier.Identifier;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class ExcludeSavedObjectsInOutProcess extends BaseInOutProcess<Record, Record> {
 

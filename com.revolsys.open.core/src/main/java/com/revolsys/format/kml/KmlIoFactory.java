@@ -6,9 +6,6 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Set;
 
-import com.revolsys.data.record.io.RecordWriter;
-import com.revolsys.data.record.io.RecordWriterFactory;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.io.GeometryReader;
@@ -17,6 +14,9 @@ import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
+import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.io.RecordWriterFactory;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
 public class KmlIoFactory extends AbstractIoFactoryWithCoordinateSystem
