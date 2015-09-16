@@ -23,6 +23,16 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class Maps {
+  public static <K1, V> boolean addAllToSet(final Map<K1, Set<V>> map, final K1 key1,
+    final Collection<? extends V> values) {
+    if (Property.hasValue(values)) {
+      final Set<V> set = getSet(map, key1);
+      return set.addAll(values);
+    } else {
+      return true;
+    }
+  }
+
   public static <T> Integer addCount(final Map<T, Integer> counts, final T key) {
     Integer count = counts.get(key);
     if (count == null) {
