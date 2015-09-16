@@ -1,12 +1,13 @@
 package com.revolsys.format.raster;
 
 import java.io.BufferedOutputStream;
+import java.io.Closeable;
 import java.io.OutputStream;
 
 import com.revolsys.gis.io.EndianOutputStream;
 import com.revolsys.util.Property;
 
-public class RasterWriter implements AutoCloseable {
+public class RasterWriter implements Closeable {
 
   private static final int ELEVATIONS = 9;
 

@@ -1,5 +1,6 @@
 package com.revolsys.record.schema;
 
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,7 +32,7 @@ import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.Property;
 
-public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
+public interface RecordStore extends RecordDefinitionFactory, Closeable {
   void addCodeTable(CodeTable codeTable);
 
   void addCodeTables(Collection<CodeTable> codeTables);

@@ -1,6 +1,8 @@
 package com.revolsys.util.enableable;
 
-public class Enabled implements AutoCloseable {
+import java.io.Closeable;
+
+public class Enabled implements Closeable {
   private final Enableable enableable;
 
   private final boolean enabled;

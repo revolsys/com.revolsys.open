@@ -1,6 +1,7 @@
 package com.revolsys.format.csv;
 
 import java.io.BufferedWriter;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
@@ -8,7 +9,7 @@ import java.util.Collection;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.WrappedException;
 
-public class CsvWriter implements AutoCloseable {
+public class CsvWriter implements Closeable {
 
   /** The writer */
   private final Writer out;

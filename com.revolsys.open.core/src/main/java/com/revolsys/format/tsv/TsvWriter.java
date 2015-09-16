@@ -1,5 +1,6 @@
 package com.revolsys.format.tsv;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
@@ -7,7 +8,7 @@ import java.util.Collection;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.WrappedException;
 
-public class TsvWriter implements AutoCloseable {
+public class TsvWriter implements Closeable {
 
   /** The writer */
   private final Writer out;

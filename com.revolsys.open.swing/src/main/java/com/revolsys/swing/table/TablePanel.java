@@ -7,6 +7,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.Closeable;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
@@ -24,7 +25,7 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
-public class TablePanel extends JPanel implements MouseListener, AutoCloseable {
+public class TablePanel extends JPanel implements MouseListener, Closeable {
   private static int eventColumn;
 
   private static int eventRow;

@@ -1,6 +1,8 @@
 package com.revolsys.record.schema;
 
-public class RecordStoreConnected implements AutoCloseable {
+import java.io.Closeable;
+
+public class RecordStoreConnected implements Closeable {
 
   private AbstractRecordStore recordStore;
 

@@ -1,12 +1,13 @@
 package com.revolsys.io;
 
 import java.io.ByteArrayInputStream;
+import java.io.Closeable;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
-public class FileBackedCache implements AutoCloseable {
+public class FileBackedCache implements Closeable {
 
   private byte[] buffer;
 

@@ -1,5 +1,6 @@
 package com.revolsys.format.saif;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionFactory;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 
-public class OsnReader implements Iterator<Record>, AutoCloseable {
+public class OsnReader implements Iterator<Record>, Closeable {
   private final OsnConverterRegistry converters;
 
   private File directory;
