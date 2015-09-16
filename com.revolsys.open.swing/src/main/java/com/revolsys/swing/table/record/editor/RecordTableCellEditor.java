@@ -268,7 +268,6 @@ public class RecordTableCellEditor extends AbstractCellEditor
     } catch (final IndexOutOfBoundsException e) {
       return true;
     } catch (final Throwable t) {
-      t.printStackTrace();
       final int result = JOptionPane.showConfirmDialog(this.editorComponent,
         "<html><p><b>'" + getCellEditorValue() + "' is not a valid "
           + this.dataType.getValidationName()

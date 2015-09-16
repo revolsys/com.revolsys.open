@@ -8,7 +8,6 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
 
 public class Listeners {
-
   public static void addKey(final Object object, final KeyListener listener) {
     if (object instanceof Component) {
       final Component component = (Component)object;
