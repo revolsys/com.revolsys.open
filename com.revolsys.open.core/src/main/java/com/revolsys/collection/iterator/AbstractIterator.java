@@ -9,7 +9,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.properties.BaseObjectWithProperties;
 
 public abstract class AbstractIterator<T> extends BaseObjectWithProperties
-  implements Iterator<T>, Reader<T>, AutoCloseable {
+  implements Iterator<T>, Reader<T> {
 
   private boolean hasNext = true;
 

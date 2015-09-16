@@ -1,8 +1,9 @@
 package com.revolsys.gis.io;
 
+import java.io.Closeable;
 import java.io.IOException;
 
-public interface EndianOutput extends AutoCloseable {
+public interface EndianOutput extends Closeable {
   @Override
   void close();
 

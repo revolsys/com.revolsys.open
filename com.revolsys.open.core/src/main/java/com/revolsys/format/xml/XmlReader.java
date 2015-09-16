@@ -1,5 +1,6 @@
 package com.revolsys.format.xml;
 
+import java.io.Closeable;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,7 +18,7 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
-public class XmlReader implements XMLStreamConstants, AutoCloseable {
+public class XmlReader implements XMLStreamConstants, Closeable {
   private static final XMLInputFactory FACTORY = XMLInputFactory.newInstance();
 
   private int depth = 0;

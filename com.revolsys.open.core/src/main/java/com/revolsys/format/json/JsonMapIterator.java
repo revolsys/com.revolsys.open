@@ -1,5 +1,6 @@
 package com.revolsys.format.json;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
@@ -8,7 +9,7 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.format.json.JsonParser.EventType;
 
-public class JsonMapIterator implements Iterator<Map<String, Object>>, AutoCloseable {
+public class JsonMapIterator implements Iterator<Map<String, Object>>, Closeable {
 
   /** The current record. */
   private Map<String, Object> currentRecord;

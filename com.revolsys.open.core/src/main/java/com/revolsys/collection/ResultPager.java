@@ -15,6 +15,7 @@
  */
 package com.revolsys.collection;
 
+import java.io.Closeable;
 import java.util.List;
 
 /**
@@ -31,7 +32,7 @@ import java.util.List;
  * @author Paul Austin
  * @param <T> The type of object to page.
  */
-public interface ResultPager<T> extends AutoCloseable {
+public interface ResultPager<T> extends Closeable {
   @Override
   void close();
 

@@ -1,5 +1,7 @@
 package com.revolsys.transaction;
 
+import java.io.Closeable;
+
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -7,7 +9,7 @@ import org.springframework.transaction.support.DefaultTransactionStatus;
 
 import com.revolsys.util.ExceptionUtil;
 
-public class Transaction implements AutoCloseable {
+public class Transaction implements Closeable {
 
   private static ThreadLocal<Transaction> currentTransaction = new ThreadLocal<>();
 

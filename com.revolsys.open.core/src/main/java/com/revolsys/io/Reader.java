@@ -20,6 +20,7 @@
  */
 package com.revolsys.io;
 
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -51,7 +52,7 @@ import com.revolsys.util.ExitLoopException;
  * @author Paul Austin
  * @param <T> The type of the item to read.
  */
-public interface Reader<T> extends Iterable<T>, ObjectWithProperties, AutoCloseable {
+public interface Reader<T> extends Iterable<T>, ObjectWithProperties, Closeable {
   Reader<?> EMPTY = new ListReader<>();
 
   @SuppressWarnings("unchecked")

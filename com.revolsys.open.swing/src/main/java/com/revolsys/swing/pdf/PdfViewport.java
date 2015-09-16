@@ -7,6 +7,7 @@ import java.awt.FontMetrics;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -53,7 +54,7 @@ import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.util.Property;
 
-public class PdfViewport extends Viewport2D implements AutoCloseable {
+public class PdfViewport extends Viewport2D implements Closeable {
 
   private final Set<Float> alphaSet = new HashSet<>();
 

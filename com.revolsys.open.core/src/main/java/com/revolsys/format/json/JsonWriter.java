@@ -1,5 +1,6 @@
 package com.revolsys.format.json;
 
+import java.io.Closeable;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,7 +15,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.WrappedException;
 
-public final class JsonWriter implements AutoCloseable {
+public final class JsonWriter implements Closeable {
 
   private int depth = 0;
 
