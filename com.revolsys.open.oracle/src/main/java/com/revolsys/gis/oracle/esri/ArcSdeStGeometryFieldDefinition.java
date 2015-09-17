@@ -28,7 +28,8 @@ import com.revolsys.util.WrappedException;
 
 public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
 
-  public static List<List<Geometry>> getParts(final Geometry geometry, final boolean clockwise) {
+  public static List<List<Geometry>> getParts(final Geometry geometry,
+    final boolean clockwise) {
     final List<List<Geometry>> partsList = new ArrayList<>();
     if (geometry != null) {
       for (final Geometry part : geometry.geometries()) {
@@ -62,22 +63,28 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
     return partsList;
   }
 
-  private final int dimension;
+  private final int axisCount;
 
   private final GeometryFactory geometryFactory;
 
   private final ArcSdeSpatialReference spatialReference;
 
-  public ArcSdeStGeometryFieldDefinition(final String dbName, final String name,
-    final DataType type, final boolean required, final String description,
-    final Map<String, Object> properties, final ArcSdeSpatialReference spatialReference,
-    final int dimension) {
+  public ArcSdeStGeometryFieldDefinition(final String dbName,
+    final String name, final DataType type, final boolean required,
+    final String description, final Map<String, Object> properties,
+    final ArcSdeSpatialReference spatialReference, final int axisCount) {
     super(dbName, name, type, -1, 0, 0, required, description, properties);
     this.spatialReference = spatialReference;
     final GeometryFactory factory = spatialReference.getGeometryFactory();
-    this.geometryFactory = GeometryFactory.fixed(factory.getSrid(), dimension, factory.getScaleXY(),
-      factory.getScaleZ());
-    this.dimension = dimension;
+
+    if (axisCount == 3) {
+      this.geometryFactory = GeometryFactory.fixed(factory.getSrid(),
+        axisCount, factory.getScaleXY(), factory.getScaleZ());
+    } else {
+      this.geometryFactory = GeometryFactory.fixed(factory.getSrid(),
+        axisCount, factory.getScaleXY());
+    }
+    this.axisCount = axisCount;
     setProperty(FieldProperties.GEOMETRY_FACTORY, this.geometryFactory);
   }
 
@@ -98,19 +105,20 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public ArcSdeStGeometryFieldDefinition clone() {
-    return new ArcSdeStGeometryFieldDefinition(getDbName(), getName(), getType(), isRequired(),
-      getDescription(), getProperties(), this.spatialReference, this.dimension);
+    return new ArcSdeStGeometryFieldDefinition(getDbName(), getName(),
+      getType(), isRequired(), getDescription(), getProperties(),
+      this.spatialReference, this.axisCount);
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record object) throws SQLException {
+  public int setFieldValueFromResultSet(final ResultSet resultSet,
+    final int columnIndex, final Record object) throws SQLException {
     final int geometryType = resultSet.getInt(columnIndex);
     if (!resultSet.wasNull()) {
       final int numPoints = resultSet.getInt(columnIndex + 1);
       final Blob blob = resultSet.getBlob(columnIndex + 2);
-      try (
-        final InputStream pointsIn = new BufferedInputStream(blob.getBinaryStream(), 32000)) {
+      try (final InputStream pointsIn = new BufferedInputStream(
+        blob.getBinaryStream(), 32000)) {
 
         final Double xOffset = this.spatialReference.getXOffset();
         final Double yOffset = this.spatialReference.getYOffset();
@@ -120,9 +128,10 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
         final Double mScale = this.spatialReference.getMScale();
         final Double mOffset = this.spatialReference.getMOffset();
 
-        final GeometryFactory geometryFactory = this.spatialReference.getGeometryFactory();
-        final Geometry geometry = PackedCoordinateUtil.getGeometry(pointsIn, geometryFactory,
-          geometryType, numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset, mScale);
+        final GeometryFactory geometryFactory = this.geometryFactory;
+        final Geometry geometry = PackedCoordinateUtil.getGeometry(pointsIn,
+          geometryFactory, geometryType, numPoints, xOffset, yOffset, xyScale,
+          zOffset, zScale, mOffset, mScale);
         object.setValue(getIndex(), geometry);
       } catch (final IOException e) {
         throw new WrappedException(e);
@@ -131,8 +140,8 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
     return columnIndex + 3;
   }
 
-  public void setFloat(final PreparedStatement statement, int index, final Double value,
-    final Number defaultValue) throws SQLException {
+  public void setFloat(final PreparedStatement statement, int index,
+    final Double value, final Number defaultValue) throws SQLException {
     if (value == null || Double.isInfinite(value) || Double.isNaN(value)) {
       if (defaultValue == null) {
         statement.setNull(index++, Types.FLOAT);
@@ -145,8 +154,8 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setPreparedStatementValue(final PreparedStatement statement, final int parameterIndex,
-    Object value) throws SQLException {
+  public int setPreparedStatementValue(final PreparedStatement statement,
+    final int parameterIndex, Object value) throws SQLException {
     int index = parameterIndex;
 
     if (value instanceof BoundingBox) {
@@ -175,8 +184,10 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
       final double area = geometry.getArea();
       final double length = geometry.getLength();
 
-      final boolean hasZ = this.dimension > 2 && zOffset != null && zScale != null;
-      final boolean hasM = this.dimension > 3 && mOffset != null && mScale != null;
+      final boolean hasZ = this.axisCount > 2 && zOffset != null
+        && zScale != null;
+      final boolean hasM = this.axisCount > 3 && mOffset != null
+        && mScale != null;
 
       int numPoints = 0;
       byte[] data;
@@ -184,8 +195,8 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
       final List<List<Geometry>> parts = getParts(geometry, false);
       final int entityType = ArcSdeConstants.getStGeometryType(geometry);
       numPoints = PackedCoordinateUtil.getNumPoints(parts);
-      data = PackedCoordinateUtil.getPackedBytes(xOffset, yOffset, xyScale, hasZ, zOffset, zScale,
-        hasM, mScale, mOffset, parts);
+      data = PackedCoordinateUtil.getPackedBytes(xOffset, yOffset, xyScale,
+        hasZ, zOffset, zScale, hasM, mScale, mOffset, parts);
 
       statement.setInt(index++, entityType);
       statement.setInt(index++, numPoints);

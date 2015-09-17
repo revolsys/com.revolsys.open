@@ -32,7 +32,8 @@ import com.revolsys.record.schema.RecordDefinitionFactory;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public interface Record extends Map<String, Object>, Comparable<Record>, Identifiable {
+public interface Record extends Map<String, Object>, Comparable<Record>,
+  Identifiable {
   /**
    * Create a clone of the data object.
    *
@@ -45,8 +46,8 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
     if (this == other) {
       return 0;
     } else {
-      final int recordDefinitionCompare = getRecordDefinition()
-        .compareTo(other.getRecordDefinition());
+      final int recordDefinitionCompare = getRecordDefinition().compareTo(
+        other.getRecordDefinition());
       if (recordDefinitionCompare == 0) {
         final Identifier id1 = getIdentifier();
         final Identifier id2 = other.getIdentifier();
@@ -86,7 +87,8 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
     getRecordDefinition().delete(this);
   }
 
-  default boolean equalPathValue(final CharSequence fieldPath, final Object value) {
+  default boolean equalPathValue(final CharSequence fieldPath,
+    final Object value) {
     final Object fieldValue = getValueByPath(fieldPath);
     final boolean hasValue1 = Property.hasValue(value);
     final boolean hasValue2 = Property.hasValue(fieldValue);
@@ -124,7 +126,8 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
     }
   }
 
-  default boolean equalValue(final Record otherRecord, final CharSequence fieldName) {
+  default boolean equalValue(final Record otherRecord,
+    final CharSequence fieldName) {
     if (otherRecord != null) {
       final Object value = getValue(fieldName);
       return otherRecord.equalValue(fieldName, value);
@@ -170,7 +173,8 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
     }
   }
 
-  default <E extends Enum<E>> E getEnum(final Class<E> enumType, final CharSequence fieldName) {
+  default <E extends Enum<E>> E getEnum(final Class<E> enumType,
+    final CharSequence fieldName) {
     final String value = getString(fieldName);
     if (Property.hasValue(value)) {
       return Enum.valueOf(enumType, value);
@@ -418,8 +422,9 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
       final int index = recordDefinition.getFieldIndex(name);
       return (T)getValue(index);
     } catch (final NullPointerException e) {
-      LoggerFactory.getLogger(getClass())
-        .warn("Attribute " + recordDefinition.getPath() + "." + name + " does not exist");
+      LoggerFactory.getLogger(getClass()).warn(
+        "Attribute " + recordDefinition.getPath() + "." + name
+          + " does not exist");
       return null;
     }
   }
@@ -447,7 +452,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
             return null;
           } else if (i + 1 < propertyPath.length) {
             final CodeTable codeTable = this.getRecordDefinition()
-              .getCodeTableByFieldName(propertyName);
+                .getCodeTableByFieldName(propertyName);
             if (codeTable != null) {
               propertyValue = codeTable.getMap(Identifier.create(propertyValue));
             }
@@ -457,7 +462,8 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
         }
       } else if (propertyValue instanceof Geometry) {
         final Geometry geometry = (Geometry)propertyValue;
-        propertyValue = GeometryProperties.getGeometryProperty(geometry, propertyName);
+        propertyValue = GeometryProperties.getGeometryProperty(geometry,
+          propertyName);
       } else if (propertyValue instanceof Map) {
         final Map<String, Object> map = (Map<String, Object>)propertyValue;
         propertyValue = map.get(propertyName);
@@ -465,7 +471,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
           return null;
         } else if (i + 1 < propertyPath.length) {
           final CodeTable codeTable = this.getRecordDefinition()
-            .getCodeTableByFieldName(propertyName);
+              .getCodeTableByFieldName(propertyName);
           if (codeTable != null) {
             propertyValue = codeTable.getMap(Identifier.create(propertyValue));
           }
@@ -474,7 +480,8 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
         try {
           propertyValue = JavaBeanUtil.getProperty(propertyValue, propertyName);
         } catch (final IllegalArgumentException e) {
-          LoggerFactory.getLogger(getClass()).error("Path does not exist " + path, e);
+          LoggerFactory.getLogger(getClass()).error(
+            "Path does not exist " + path, e);
           return null;
         }
       }
@@ -482,7 +489,8 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
     return (T)propertyValue;
   }
 
-  default Map<String, Object> getValueMap(final Collection<? extends CharSequence> fieldNames) {
+  default Map<String, Object> getValueMap(
+    final Collection<? extends CharSequence> fieldNames) {
     final Map<String, Object> values = new HashMap<String, Object>();
     for (final CharSequence name : fieldNames) {
       final Object value = getValue(name);
@@ -530,6 +538,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
 
   /**
    * Check if any of the fields have a value.
+   * 
    * @param fieldNames
    * @return True if any of the fields have a value, false otherwise.
    */
@@ -593,12 +602,14 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
 
   default void setIdValue(final Object id) {
     final int index = this.getRecordDefinition().getIdFieldIndex();
-    if (this.getState() == RecordState.New || this.getState() == RecordState.Initalizing) {
+    if (this.getState() == RecordState.New
+      || this.getState() == RecordState.Initalizing) {
       setValue(index, id);
     } else {
       final Object oldId = getValue(index);
       if (oldId != null && !Equals.equal(id, oldId)) {
-        throw new IllegalStateException("Cannot change the ID on a persisted object");
+        throw new IllegalStateException(
+          "Cannot change the ID on a persisted object");
       }
     }
   }
@@ -624,17 +635,18 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
 
       } else {
         final CharSequence key = name.subSequence(0, dotIndex);
-        final CharSequence subKey = name.subSequence(dotIndex + 1, name.length());
+        final CharSequence subKey = name.subSequence(dotIndex + 1,
+          name.length());
         final Object objectValue = getValue(key);
         if (objectValue == null) {
-          final DataType fieldType = this.getRecordDefinition().getFieldType(key);
+          final DataType fieldType = this.getRecordDefinition().getFieldType(
+            key);
           if (fieldType != null) {
             if (fieldType.getJavaClass() == Record.class) {
               final String typePath = fieldType.getName();
               final RecordDefinitionFactory recordDefinitionFactory = this.getRecordDefinition()
-                .getRecordDefinitionFactory();
-              final RecordDefinition subRecordDefinition = recordDefinitionFactory
-                .getRecordDefinition(typePath);
+                  .getRecordDefinitionFactory();
+              final RecordDefinition subRecordDefinition = recordDefinitionFactory.getRecordDefinition(typePath);
               final RecordFactory recordFactory = subRecordDefinition.getRecordFactory();
               final Record subRecord = recordFactory.createRecord(subRecordDefinition);
               updated |= subRecord.setValue(subKey, value);
@@ -668,7 +680,6 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
   boolean setValue(int index, Object value);
 
   @SuppressWarnings("rawtypes")
-
   default boolean setValueByPath(final CharSequence path, final Object value) {
     boolean updated = false;
     final String name = path.toString();
@@ -686,11 +697,12 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
       codeTableValueName = name.substring(dotIndex + 1);
     }
     final CodeTable codeTable = this.getRecordDefinition()
-      .getCodeTableByFieldName(codeTableFieldName);
+        .getCodeTableByFieldName(codeTableFieldName);
     if (codeTable == null) {
       if (dotIndex != -1) {
-        LoggerFactory.getLogger(getClass())
-          .debug("Cannot get code table for " + this.getRecordDefinition().getPath() + "." + name);
+        LoggerFactory.getLogger(getClass()).debug(
+          "Cannot get code table for " + this.getRecordDefinition().getPath()
+            + "." + name);
         return false;
       }
       updated = setValue(name, value);
@@ -712,7 +724,8 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
           targetValue = Value.getValue(id);
         }
       } else {
-        targetValue = codeTable.getIdentifier(Collections.singletonMap(codeTableValueName, value));
+        targetValue = codeTable.getIdentifier(Collections.singletonMap(
+          codeTableValueName, value));
       }
       if (targetValue == null) {
         targetValue = value;
@@ -722,8 +735,8 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
     return updated;
   }
 
-  default <T> T setValueByPath(final CharSequence attributePath, final Record source,
-    final String sourceAttributePath) {
+  default <T> T setValueByPath(final CharSequence attributePath,
+    final Record source, final String sourceAttributePath) {
     @SuppressWarnings("unchecked")
     final T value = (T)source.getValueByPath(sourceAttributePath);
     setValueByPath(attributePath, value);
@@ -733,7 +746,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
   default void setValues(final Map<? extends String, ? extends Object> values) {
     if (values != null) {
       for (final Entry<? extends String, ? extends Object> entry : new ArrayList<>(
-        values.entrySet())) {
+          values.entrySet())) {
         final String name = entry.getKey();
         final Object value = entry.getValue();
         setValue(name, value);
@@ -759,17 +772,22 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
   }
 
   default void setValues(final Record object) {
-    for (final String name : this.getRecordDefinition().getFieldNames()) {
-      final Object value = JavaBeanUtil.clone(object.getValue(name));
+    for (final FieldDefinition fieldDefintion : this.getRecordDefinition()
+      .getFields()) {
+      final String name = fieldDefintion.getName();
+      Object value = object.getValue(name);
+      value = StringConverterRegistry.toObject(fieldDefintion.getType(), value);
+      value = JavaBeanUtil.clone(value);
       setValue(name, value);
     }
     setGeometryValue(JavaBeanUtil.clone(object.getGeometry()));
   }
 
-  default void setValuesByPath(final Map<? extends String, ? extends Object> values) {
+  default void setValuesByPath(
+    final Map<? extends String, ? extends Object> values) {
     if (values != null) {
       for (final Entry<? extends String, ? extends Object> defaultValue : new ArrayList<>(
-        values.entrySet())) {
+          values.entrySet())) {
         final String name = defaultValue.getKey();
         final Object value = defaultValue.getValue();
         setValueByPath(name, value);

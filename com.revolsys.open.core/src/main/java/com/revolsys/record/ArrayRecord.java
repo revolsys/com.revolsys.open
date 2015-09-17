@@ -10,8 +10,8 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Property;
 
 /**
- * The ArrayRecord is an implementation of {@link Record} which uses an
- * array of Objects as the storage for the attribute values.
+ * The ArrayRecord is an implementation of {@link Record} which uses an array of
+ * Objects as the storage for the attribute values.
  *
  * @author Paul Austin
  */
