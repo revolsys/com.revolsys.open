@@ -3,9 +3,9 @@ package com.revolsys.format.shp;
 import java.io.File;
 
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.Writer;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.AbstractRecordStore;
 import com.revolsys.record.schema.RecordDefinition;
@@ -39,7 +39,7 @@ public class ShapefileRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public Writer<Record> createWriter() {
+  public RecordWriter createWriter() {
     return this.writer;
   }
 

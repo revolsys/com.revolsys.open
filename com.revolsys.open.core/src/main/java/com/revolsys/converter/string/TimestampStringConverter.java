@@ -1,7 +1,6 @@
 package com.revolsys.converter.string;
 
 import java.sql.Timestamp;
-import java.util.Date;
 
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.Property;
@@ -22,18 +21,7 @@ public class TimestampStringConverter implements StringConverter<Timestamp> {
 
   @Override
   public Timestamp toObject(final Object value) {
-    if (value == null) {
-      return null;
-    } else if (value instanceof Timestamp) {
-      final Timestamp timestamp = (Timestamp)value;
-      return timestamp;
-    } else if (value instanceof Date) {
-      final Date date = (Date)value;
-      final long time = date.getTime();
-      return new Timestamp(time);
-    } else {
-      return toObject(value.toString());
-    }
+    return DateUtil.getTimestamp(value);
   }
 
   @Override

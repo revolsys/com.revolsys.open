@@ -35,8 +35,8 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;
-import com.revolsys.io.Writer;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.query.AbstractMultiCondition;
 import com.revolsys.record.query.BinaryCondition;
@@ -469,7 +469,7 @@ public class OgrRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public Writer<Record> createWriter() {
+  public RecordWriter createWriter() {
     return new OgrRecordWriter(this);
   }
 

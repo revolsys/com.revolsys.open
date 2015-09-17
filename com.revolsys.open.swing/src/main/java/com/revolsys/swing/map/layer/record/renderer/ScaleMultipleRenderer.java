@@ -70,7 +70,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
 
   @Override
   public void render(final Viewport2D viewport, final AbstractRecordLayer layer) {
-    if (layer.hasGeometryAttribute()) {
+    if (layer.hasGeometryField()) {
       final AbstractRecordLayerRenderer renderer = getRenderer(viewport);
       if (renderer != null) {
         renderer.render(viewport, layer);

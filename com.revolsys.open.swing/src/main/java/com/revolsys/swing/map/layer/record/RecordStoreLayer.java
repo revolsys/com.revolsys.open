@@ -522,7 +522,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
   @Override
   public BoundingBox getBoundingBox() {
-    if (hasGeometryAttribute()) {
+    if (hasGeometryField()) {
       final CoordinateSystem coordinateSystem = getCoordinateSystem();
       if (coordinateSystem != null) {
         return coordinateSystem.getAreaBoundingBox();

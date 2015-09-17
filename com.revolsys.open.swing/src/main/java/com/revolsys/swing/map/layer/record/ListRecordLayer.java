@@ -128,6 +128,12 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
+  protected void doRefresh() {
+    super.doRefresh();
+    setIndexRecords(getRecords());
+  }
+
+  @Override
   protected boolean doSaveChanges(final RecordSaveErrorTableModel errors,
     final LayerRecord record) {
     if (record.isDeleted()) {

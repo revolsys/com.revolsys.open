@@ -15,6 +15,7 @@ import com.revolsys.format.json.Json;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
@@ -244,6 +245,21 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
     if (resource instanceof FileSystemResource) {
       final FileSystemResource fileResource = (FileSystemResource)resource;
       final File directory = fileResource.getFile();
+      boolean readOnly = isReadOnly();
+      if (!readOnly) {
+        if (resource.exists()) {
+          readOnly = !directory.canWrite();
+        } else if (directory.mkdirs()) {
+          readOnly = false;
+        } else {
+          readOnly = true;
+        }
+      }
+      setReadOnly(readOnly);
+      this.directory = directory;
+    } else if (resource instanceof PathResource) {
+      final PathResource pathResource = (PathResource)resource;
+      final File directory = pathResource.getFile();
       boolean readOnly = isReadOnly();
       if (!readOnly) {
         if (resource.exists()) {

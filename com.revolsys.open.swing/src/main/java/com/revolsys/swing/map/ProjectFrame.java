@@ -44,6 +44,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.Paths;
 import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.record.io.RecordStoreConnectionManager;
@@ -52,6 +53,7 @@ import com.revolsys.spring.resource.PathResource;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BaseFrame;
 import com.revolsys.swing.component.DnDTabbedPane;
@@ -173,14 +175,14 @@ public class ProjectFrame extends BaseFrame {
     init();
   }
 
-  public void actionNewProject() {
+  private void actionNewProject() {
     if (this.project != null && this.project.saveWithPrompt()) {
       this.project.reset();
       super.setTitle("NEW - " + this.frameTitle);
     }
   }
 
-  public void actionOpenProject() {
+  private void actionOpenProject() {
     if (this.project != null && this.project.saveWithPrompt()) {
 
       final JFileChooser fileChooser = SwingUtil.createFileChooser("Open Project",
@@ -191,6 +193,7 @@ public class ProjectFrame extends BaseFrame {
       fileChooser.setAcceptAllFileFilterUsed(false);
       fileChooser.addChoosableFileFilter(filter);
       fileChooser.setFileFilter(filter);
+      fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
       final int returnVal = fileChooser.showOpenDialog(this);
       if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -760,11 +763,11 @@ public class ProjectFrame extends BaseFrame {
 
     this.openRecentMenu.removeAll();
     for (final String filePath : recentProjects) {
-      final File file = FileUtil.getFile(filePath);
-      final String fileName = FileUtil.getFileName(file);
-      final String path = file.getParent();
-      this.openRecentMenu.add(InvokeMethodAction.createMenuItem(fileName + " - " + path,
-        "layout_add", this, "openProject", file));
+      final Path file = Paths.getPath(filePath);
+      final String fileName = Paths.getFileName(file);
+      final String path = file.getParent().toString();
+      this.openRecentMenu.add(RunnableAction.createMenuItem(fileName + " - " + path, "layout_add",
+        () -> openProject(file)));
     }
   }
 

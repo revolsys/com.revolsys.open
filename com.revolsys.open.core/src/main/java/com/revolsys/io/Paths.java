@@ -7,12 +7,15 @@ import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributes;
 import java.util.List;
 
+import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
 
 public class Paths {
@@ -24,6 +27,38 @@ public class Paths {
         throw new WrappedException(e);
       }
     }
+  }
+
+  public static boolean deleteDirectories(final Path path) {
+    if (Paths.exists(path)) {
+      try {
+        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+
+          @Override
+          public FileVisitResult postVisitDirectory(final Path dir, final IOException exception)
+            throws IOException {
+
+            if (exception == null) {
+              Files.delete(dir);
+              return FileVisitResult.CONTINUE;
+            } else {
+              throw exception;
+            }
+          }
+
+          @Override
+          public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
+            throws IOException {
+            Files.delete(file);
+            return FileVisitResult.CONTINUE;
+          }
+        });
+        return true;
+      } catch (final IOException e) {
+        return false;
+      }
+    }
+    return true;
   }
 
   public static boolean exists(final Path path) {
@@ -97,8 +132,12 @@ public class Paths {
   }
 
   public static Path getPath(final String name) {
-    final Path path = Paths.get(name);
-    return getPath(path);
+    if (Property.hasValue(name)) {
+      final Path path = Paths.get(name);
+      return getPath(path);
+    } else {
+      return null;
+    }
   }
 
   public static boolean isHidden(final Path path) {

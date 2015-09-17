@@ -95,7 +95,7 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public Writer<Record> createWriter() {
+  public RecordWriter createWriter() {
     return this.recordStore.createWriter();
   }
 

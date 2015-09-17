@@ -1495,7 +1495,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return false;
   }
 
-  public boolean hasGeometryAttribute() {
+  public boolean hasGeometryField() {
     return getRecordDefinition().getGeometryField() != null;
   }
 
@@ -1978,7 +1978,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     "rawtypes", "unchecked"
   })
   public final List<LayerRecord> query(BoundingBox boundingBox) {
-    if (hasGeometryAttribute()) {
+    if (hasGeometryField()) {
       final GeometryFactory geometryFactory = getGeometryFactory();
       boundingBox = boundingBox.convert(geometryFactory);
       final List<LayerRecord> results = doQuery(boundingBox);
@@ -1993,7 +1993,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     "rawtypes", "unchecked"
   })
   public List<LayerRecord> query(final Geometry geometry, final double maxDistance) {
-    if (hasGeometryAttribute()) {
+    if (hasGeometryField()) {
       final List<LayerRecord> results = doQuery(geometry, maxDistance);
       final Predicate predicate = new RecordGeometryDistanceFilter(geometry, maxDistance);
       return filterQueryResults(results, predicate);
@@ -2010,7 +2010,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public final List<LayerRecord> queryBackground(BoundingBox boundingBox) {
-    if (hasGeometryAttribute()) {
+    if (hasGeometryField()) {
       final GeometryFactory geometryFactory = getGeometryFactory();
       boundingBox = boundingBox.convert(geometryFactory);
       final List<LayerRecord> results = doQueryBackground(boundingBox);

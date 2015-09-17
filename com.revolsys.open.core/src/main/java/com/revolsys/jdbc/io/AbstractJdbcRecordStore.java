@@ -47,6 +47,7 @@ import com.revolsys.record.RecordState;
 import com.revolsys.record.code.AbstractCodeTable;
 import com.revolsys.record.io.RecordStoreExtension;
 import com.revolsys.record.io.RecordStoreQueryReader;
+import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.property.GlobalIdProperty;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.AbstractRecordStore;
@@ -218,12 +219,12 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
-  public JdbcWriter createWriter() {
+  public RecordWriter createWriter() {
     final int size = this.batchSize;
     return createWriter(size);
   }
 
-  public JdbcWriter createWriter(final int batchSize) {
+  public RecordWriter createWriter(final int batchSize) {
     final JdbcWriterImpl writer = new JdbcWriterImpl(this);
     writer.setSqlPrefix(this.sqlPrefix);
     writer.setSqlSuffix(this.sqlSuffix);
@@ -499,12 +500,12 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
-  public JdbcWriter getWriter() {
+  public RecordWriter getWriter() {
     return getWriter(false);
   }
 
   @Override
-  public JdbcWriter getWriter(final boolean throwExceptions) {
+  public RecordWriter getWriter(final boolean throwExceptions) {
     Object writerKey;
     if (throwExceptions) {
       writerKey = this.exceptionWriterKey;
@@ -966,18 +967,6 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     writeAll(records, null);
   }
 
-  protected Record write(final JdbcWriter writer, Record record, final RecordState state) {
-    if (state == RecordState.New) {
-      if (record.getState() != state) {
-        record = copy(record);
-      }
-    } else if (state != null) {
-      record.setState(state);
-    }
-    writer.write(record);
-    return record;
-  }
-
   protected void write(final Record record, final RecordState state) {
     try (
       Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
@@ -985,7 +974,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
       // won't get caught on closing the writer and the transaction won't get
       // rolled back.
       try (
-        JdbcWriter writer = getWriter(true)) {
+        RecordWriter writer = getWriter(true)) {
         write(writer, record, state);
       } catch (final RuntimeException e) {
         transaction.setRollbackOnly();
@@ -997,6 +986,18 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     }
   }
 
+  protected Record write(final RecordWriter writer, Record record, final RecordState state) {
+    if (state == RecordState.New) {
+      if (record.getState() != state) {
+        record = copy(record);
+      }
+    } else if (state != null) {
+      record.setState(state);
+    }
+    writer.write(record);
+    return record;
+  }
+
   protected void writeAll(final Collection<Record> records, final RecordState state) {
     try (
       Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
@@ -1004,7 +1005,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
       // won't get caught on closing the writer and the transaction won't get
       // rolled back.
       try (
-        final JdbcWriter writer = getWriter(true)) {
+        final RecordWriter writer = getWriter(true)) {
         for (final Record record : records) {
           write(writer, record, state);
         }

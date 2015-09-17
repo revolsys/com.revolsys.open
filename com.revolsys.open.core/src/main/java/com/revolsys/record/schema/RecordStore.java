@@ -25,6 +25,7 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.record.io.ListRecordReader;
 import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
@@ -84,7 +85,19 @@ public interface RecordStore extends RecordDefinitionFactory, Closeable {
 
   Record createWithId(RecordDefinition recordDefinition);
 
-  Writer<Record> createWriter();
+  RecordWriter createWriter();
+
+  default int delete(final PathName typePath, final Identifier identifier) {
+    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+    if (recordDefinition != null) {
+      final String idFieldName = recordDefinition.getIdFieldName();
+      if (idFieldName != null) {
+        final Query query = Query.equal(recordDefinition, idFieldName, identifier);
+        return delete(query);
+      }
+    }
+    return 0;
+  }
 
   int delete(Query query);
 

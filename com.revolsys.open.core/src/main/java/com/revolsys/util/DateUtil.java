@@ -97,6 +97,17 @@ public class DateUtil {
     }
   }
 
+  public static java.util.Date getDate(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof java.util.Date) {
+      final java.util.Date date = (java.util.Date)value;
+      return date;
+    } else {
+      return getDate(value.toString());
+    }
+  }
+
   public static Date getDate(final String dateString) {
     if (Property.hasValue(dateString)) {
       final Pattern pattern = Pattern.compile(DATE_TIME_NANOS_PATTERN);
@@ -243,6 +254,20 @@ public class DateUtil {
     return new java.sql.Date(System.currentTimeMillis());
   }
 
+  public static java.sql.Date getSqlDate(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof java.sql.Date) {
+      final java.sql.Date date = (java.sql.Date)value;
+      return date;
+    } else if (value instanceof Date) {
+      final Date date = (Date)value;
+      return new java.sql.Date(date.getTime());
+    } else {
+      return getSqlDate(value.toString());
+    }
+  }
+
   public static java.sql.Date getSqlDate(final String dateString) {
     if (Property.hasValue(dateString)) {
       final Pattern pattern = Pattern.compile(DATE_TIME_NANOS_PATTERN);
@@ -281,6 +306,20 @@ public class DateUtil {
 
   public static Timestamp getTimestamp() {
     return new Timestamp(System.currentTimeMillis());
+  }
+
+  public static Timestamp getTimestamp(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof Timestamp) {
+      final Timestamp date = (Timestamp)value;
+      return date;
+    } else if (value instanceof Date) {
+      final Date date = (Date)value;
+      return new Timestamp(date.getTime());
+    } else {
+      return getTimestamp(value.toString());
+    }
   }
 
   public static Timestamp getTimestamp(final String dateString) {

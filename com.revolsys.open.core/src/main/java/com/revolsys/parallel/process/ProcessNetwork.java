@@ -53,13 +53,18 @@ public class ProcessNetwork
   public ProcessNetwork() {
   }
 
-  public ProcessNetwork(final List<Process> processes) {
-    for (final Process process : processes) {
-      addProcess(process);
+  public ProcessNetwork(final Collection<? extends Runnable> processes) {
+    for (final Runnable runnable : processes) {
+      if (runnable instanceof Process) {
+        final Process process = (Process)runnable;
+        addProcess(process);
+      } else {
+        addProcess(runnable);
+      }
     }
   }
 
-  public ProcessNetwork(final Process... processes) {
+  public ProcessNetwork(final Runnable... processes) {
     this(Arrays.asList(processes));
   }
 
@@ -81,6 +86,13 @@ public class ProcessNetwork
       }
     } else {
       this.parent.addProcess(process);
+    }
+  }
+
+  public void addProcess(final Runnable runnable) {
+    if (runnable != null) {
+      final RunnableProcess process = new RunnableProcess(runnable);
+      addProcess(process);
     }
   }
 

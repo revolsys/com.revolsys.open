@@ -1,9 +1,8 @@
 package com.revolsys.jdbc.io;
 
-import com.revolsys.io.Writer;
-import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordWriter;
 
-public interface JdbcWriter extends Writer<Record> {
+public interface JdbcWriter extends RecordWriter {
 
   @Override
   public void flush();

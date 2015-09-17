@@ -24,13 +24,14 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
+import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.property.GlobalIdProperty;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.transaction.Transaction;
 
-public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
+public class JdbcWriterImpl extends AbstractRecordWriter implements RecordWriter {
   private static final Logger LOG = Logger.getLogger(JdbcWriterImpl.class);
 
   private int batchSize = 1;

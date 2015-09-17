@@ -2,11 +2,12 @@ package com.revolsys.jdbc.io;
 
 import com.revolsys.properties.DelegatingObjectWithProperties;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordWriter;
 
-public class JdbcWriterWrapper extends DelegatingObjectWithProperties implements JdbcWriter {
-  private JdbcWriter writer;
+public class JdbcWriterWrapper extends DelegatingObjectWithProperties implements RecordWriter {
+  private RecordWriter writer;
 
-  public JdbcWriterWrapper(final JdbcWriter writer) {
+  public JdbcWriterWrapper(final RecordWriter writer) {
     super(writer);
     this.writer = writer;
   }
