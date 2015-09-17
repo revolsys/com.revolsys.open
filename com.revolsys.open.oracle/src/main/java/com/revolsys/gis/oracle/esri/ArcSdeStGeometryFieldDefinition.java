@@ -1,6 +1,7 @@
 package com.revolsys.gis.oracle.esri;
 
 import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Blob;
 import java.sql.PreparedStatement;
@@ -23,6 +24,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
 import com.revolsys.record.property.FieldProperties;
+import com.revolsys.util.WrappedException;
 
 public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
 
@@ -107,20 +109,24 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
     if (!resultSet.wasNull()) {
       final int numPoints = resultSet.getInt(columnIndex + 1);
       final Blob blob = resultSet.getBlob(columnIndex + 2);
-      final InputStream pointsIn = new BufferedInputStream(blob.getBinaryStream(), 32000);
+      try (
+        final InputStream pointsIn = new BufferedInputStream(blob.getBinaryStream(), 32000)) {
 
-      final Double xOffset = this.spatialReference.getXOffset();
-      final Double yOffset = this.spatialReference.getYOffset();
-      final Double xyScale = this.spatialReference.getXyScale();
-      final Double zScale = this.spatialReference.getZScale();
-      final Double zOffset = this.spatialReference.getZOffset();
-      final Double mScale = this.spatialReference.getMScale();
-      final Double mOffset = this.spatialReference.getMOffset();
+        final Double xOffset = this.spatialReference.getXOffset();
+        final Double yOffset = this.spatialReference.getYOffset();
+        final Double xyScale = this.spatialReference.getXyScale();
+        final Double zScale = this.spatialReference.getZScale();
+        final Double zOffset = this.spatialReference.getZOffset();
+        final Double mScale = this.spatialReference.getMScale();
+        final Double mOffset = this.spatialReference.getMOffset();
 
-      final GeometryFactory geometryFactory = this.spatialReference.getGeometryFactory();
-      final Geometry geometry = PackedCoordinateUtil.getGeometry(pointsIn, geometryFactory,
-        geometryType, numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset, mScale);
-      object.setValue(getIndex(), geometry);
+        final GeometryFactory geometryFactory = this.spatialReference.getGeometryFactory();
+        final Geometry geometry = PackedCoordinateUtil.getGeometry(pointsIn, geometryFactory,
+          geometryType, numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset, mScale);
+        object.setValue(getIndex(), geometry);
+      } catch (final IOException e) {
+        throw new WrappedException(e);
+      }
     }
     return columnIndex + 3;
   }

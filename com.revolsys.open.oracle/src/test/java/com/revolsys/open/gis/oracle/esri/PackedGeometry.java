@@ -1,5 +1,6 @@
 package com.revolsys.open.gis.oracle.esri;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.oracle.esri.ArcSdeConstants;
 import com.revolsys.gis.oracle.esri.ArcSdeStGeometryFieldDefinition;
 import com.revolsys.gis.oracle.esri.PackedCoordinateUtil;
+import com.revolsys.util.WrappedException;
 
 public class PackedGeometry {
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(3005, 1.0, 1.0);
@@ -34,13 +36,17 @@ public class PackedGeometry {
       zOffset, zScale, hasM, mScale, mOffset, parts);
 
     final int geometryType = ArcSdeConstants.getStGeometryType(geometry);
-    final Geometry geometry2 = PackedCoordinateUtil.getGeometry(data, geometryFactory, geometryType,
-      numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset, mScale);
-    System.out.println(WktWriter.toString(geometry));
-    if (!new GeometryEqualsExact3d().equals(geometry, geometry2,
-      Collections.<String> emptyList())) {
-      System.err.println(WktWriter.toString(geometry2));
-      throw new RuntimeException("Geometry not equal");
+    try {
+      final Geometry geometry2 = PackedCoordinateUtil.getGeometry(data, geometryFactory,
+        geometryType, numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset, mScale);
+      System.out.println(WktWriter.toString(geometry));
+      if (!new GeometryEqualsExact3d().equals(geometry, geometry2,
+        Collections.<String> emptyList())) {
+        System.err.println(WktWriter.toString(geometry2));
+        throw new RuntimeException("Geometry not equal");
+      }
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
   }
 
