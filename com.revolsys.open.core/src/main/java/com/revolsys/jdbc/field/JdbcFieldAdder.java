@@ -226,6 +226,7 @@ public class JdbcFieldAdder {
           field = new JdbcDateFieldDefinition(dbName, name, sqlType, required, description, null);
         break;
         case Types.TIMESTAMP:
+        case Types.TIMESTAMP_WITH_TIMEZONE:
           field = new JdbcTimestampFieldDefinition(dbName, name, sqlType, required, description,
             null);
         break;

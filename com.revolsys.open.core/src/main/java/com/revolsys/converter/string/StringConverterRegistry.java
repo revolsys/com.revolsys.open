@@ -116,6 +116,7 @@ public class StringConverterRegistry {
     addConverter(new ShortStringConverter());
     addConverter(new StringStringConverter());
     addConverter(new UrlStringConverter());
+    addConverter(new UriStringConverter());
     final GeometryStringConverter geometryConverter = new GeometryStringConverter();
     addConverter(geometryConverter);
     addConverter(Point.class, geometryConverter);

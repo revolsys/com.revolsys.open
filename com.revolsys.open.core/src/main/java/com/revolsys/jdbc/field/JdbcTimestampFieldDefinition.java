@@ -8,12 +8,13 @@ import java.util.Map;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.record.Record;
+import com.revolsys.util.DateUtil;
 import com.revolsys.util.Property;
 
 public class JdbcTimestampFieldDefinition extends JdbcFieldDefinition {
   public JdbcTimestampFieldDefinition(final String dbName, final String name, final int sqlType,
     final boolean required, final String description, final Map<String, Object> properties) {
-    super(dbName, name, DataTypes.DATE_TIME, sqlType, 0, 0, required, description, properties);
+    super(dbName, name, DataTypes.TIMESTAMP, sqlType, 0, 0, required, description, properties);
   }
 
   @Override
@@ -37,16 +38,8 @@ public class JdbcTimestampFieldDefinition extends JdbcFieldDefinition {
       final int sqlType = getSqlType();
       statement.setNull(parameterIndex, sqlType);
     } else {
-      if (value instanceof Timestamp) {
-        final Timestamp timestamp = (Timestamp)value;
-        statement.setTimestamp(parameterIndex, timestamp);
-      } else if (value instanceof java.util.Date) {
-        final java.util.Date date = (java.util.Date)value;
-        statement.setTimestamp(parameterIndex, new Timestamp(date.getTime()));
-      } else {
-        final Timestamp date = Timestamp.valueOf(value.toString());
-        statement.setTimestamp(parameterIndex, date);
-      }
+      final Timestamp timestamp = DateUtil.getTimestamp(value);
+      statement.setTimestamp(parameterIndex, timestamp);
     }
     return parameterIndex + 1;
   }

@@ -9,9 +9,6 @@ import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 
@@ -172,27 +169,38 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     return geometryFactory.lineString(axisCount, coordinates);
   }
 
-  private MultiLineString parseMultiLineString(final GeometryFactory geometryFactory,
+  private Geometry parseMultiLineString(final GeometryFactory geometryFactory,
     final ValueGetter data) {
     final int count = data.getInt();
     final LineString[] lines = new LineString[count];
     parseGeometryArray(data, lines);
-    return geometryFactory.multiLineString(lines);
+    if (lines.length == 1) {
+      return lines[0];
+    } else {
+      return geometryFactory.multiLineString(lines);
+    }
   }
 
-  private MultiPoint parseMultiPoint(final GeometryFactory geometryFactory,
-    final ValueGetter data) {
+  private Geometry parseMultiPoint(final GeometryFactory geometryFactory, final ValueGetter data) {
     final Point[] points = new Point[data.getInt()];
     parseGeometryArray(data, points);
-    return geometryFactory.multiPoint(points);
+    if (points.length == 1) {
+      return points[0];
+    } else {
+      return geometryFactory.multiPoint(points);
+    }
   }
 
-  private MultiPolygon parseMultiPolygon(final GeometryFactory geometryFactory,
+  private Geometry parseMultiPolygon(final GeometryFactory geometryFactory,
     final ValueGetter data) {
     final int count = data.getInt();
     final Polygon[] polys = new Polygon[count];
     parseGeometryArray(data, polys);
-    return geometryFactory.multiPolygon(polys);
+    if (polys.length == 1) {
+      return polys[0];
+    } else {
+      return geometryFactory.multiPolygon(polys);
+    }
   }
 
   private Point parsePoint(final GeometryFactory geometryFactory, final ValueGetter data,

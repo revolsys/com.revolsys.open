@@ -1,13 +1,29 @@
 package com.revolsys.datatype;
 
+import com.revolsys.converter.string.ObjectStringConverter;
+import com.revolsys.converter.string.StringConverter;
+import com.revolsys.converter.string.StringConverterRegistry;
+
 public class SimpleDataType implements DataType {
   private final Class<?> javaClass;
 
   private final String name;
 
+  private StringConverter<?> converter;
+
   public SimpleDataType(final String name, final Class<?> javaClass) {
     this.name = name;
     this.javaClass = javaClass;
+    this.converter = StringConverterRegistry.getInstance().getConverter(javaClass);
+    if (this.converter == null) {
+      this.converter = new ObjectStringConverter();
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V> StringConverter<V> getConverter() {
+    return (StringConverter<V>)this.converter;
   }
 
   @Override

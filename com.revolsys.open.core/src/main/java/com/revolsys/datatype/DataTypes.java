@@ -77,8 +77,6 @@ public final class DataTypes {
 
   public static final DataType LONG = new SimpleDataType("long", Long.class);
 
-  public static final DataType MAP = new SimpleDataType("Map", Map.class);
-
   public static final DataType MULTI_LINE_STRING = new SimpleDataType("MultiLineString",
     MultiLineString.class);
 
@@ -91,27 +89,33 @@ public final class DataTypes {
 
   public static final DataType OBJECT = new SimpleDataType("object", Object.class);
 
-  public static final DataType COLLECTION = new CollectionDataType("Collection", Collection.class,
-    OBJECT);
-
-  public static final DataType LIST = new CollectionDataType("List", List.class, OBJECT);
-
   public static final DataType POINT = new SimpleDataType("Point", Point.class);
 
   public static final DataType POLYGON = new SimpleDataType("Polygon", Polygon.class);
 
   public static final DataType QNAME = new SimpleDataType("QName", QName.class);
 
+  public static final DataType SHORT = new SimpleDataType("short", Short.class);
+
+  public static final DataType SQL_DATE = new SimpleDataType("date", java.sql.Date.class);
+
+  public static final DataType STRING = new SimpleDataType("string", String.class);
+
+  public static final DataType TIMESTAMP = new SimpleDataType("timestamp", Timestamp.class);
+
+  public static final DataType URL = new SimpleDataType("url", java.net.URL.class);
+
+  public static final DataType COLLECTION = new CollectionDataType("Collection", Collection.class,
+    OBJECT);
+
+  public static final DataType LIST = new CollectionDataType("List", List.class, OBJECT);
+
+  public static final DataType MAP = new SimpleDataType("Map", Map.class);
+
   public static final DataType RELATION = new CollectionDataType("Relation", Collection.class,
     OBJECT);
 
   public static final DataType SET = new CollectionDataType("Set", Set.class, OBJECT);
-
-  public static final DataType SHORT = new SimpleDataType("short", Short.class);
-
-  public static final DataType STRING = new SimpleDataType("string", String.class);
-
-  public static final DataType URL = new SimpleDataType("url", java.net.URL.class);
 
   static {
     final Field[] fields = DataTypes.class.getDeclaredFields();
@@ -181,7 +185,9 @@ public final class DataTypes {
 
   public static void register(final DataType type) {
     final String name = type.getName();
-    NAME_TYPE_MAP.put(name, type);
+    if (!NAME_TYPE_MAP.containsKey(name)) {
+      NAME_TYPE_MAP.put(name, type);
+    }
     final Class<?> typeClass = type.getJavaClass();
     register(typeClass, type);
   }
