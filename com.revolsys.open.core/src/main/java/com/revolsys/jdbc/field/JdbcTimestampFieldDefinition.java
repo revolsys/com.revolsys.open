@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.record.Record;
+import com.revolsys.util.Property;
 
 public class JdbcTimestampFieldDefinition extends JdbcFieldDefinition {
   public JdbcTimestampFieldDefinition(final String dbName, final String name, final int sqlType,
@@ -32,7 +33,7 @@ public class JdbcTimestampFieldDefinition extends JdbcFieldDefinition {
   @Override
   public int setPreparedStatementValue(final PreparedStatement statement, final int parameterIndex,
     final Object value) throws SQLException {
-    if (value == null) {
+    if (Property.isEmpty(value)) {
       final int sqlType = getSqlType();
       statement.setNull(parameterIndex, sqlType);
     } else {
