@@ -74,6 +74,11 @@ public interface RecordStore extends RecordDefinitionFactory, Closeable {
 
   Record create(RecordDefinition recordDefinition);
 
+  default Identifier createPrimaryIdentifier(final PathName typePath) {
+    final Object identifier = createPrimaryIdValue(typePath);
+    return Identifier.create(identifier);
+  }
+
   default <T> T createPrimaryIdValue(final PathName typePath) {
     return null;
   }
