@@ -53,6 +53,11 @@ public class ListRecordLayer extends AbstractRecordLayer {
     setRecordDefinition(recordDefinition);
   }
 
+  protected void clearRecords() {
+    this.records.clear();
+    fireEmpty();
+  }
+
   @Override
   public ListRecordLayer clone() {
     final ListRecordLayer clone = (ListRecordLayer)super.clone();

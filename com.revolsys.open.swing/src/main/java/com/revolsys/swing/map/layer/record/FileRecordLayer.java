@@ -14,14 +14,26 @@ import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.MenuSourceAction;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
 public class FileRecordLayer extends ListRecordLayer {
+
+  static {
+    final Class<AbstractRecordLayer> clazz = AbstractRecordLayer.class;
+    final MenuFactory menu = MenuFactory.getMenu(clazz);
+    menu.addMenuItem("refresh", MenuSourceAction.createAction("Reload from File",
+      Icons.getIconWithBadge("page", "refresh"), (final FileRecordLayer layer) -> {
+        layer.revert();
+      }));
+  }
 
   public static FileRecordLayer create(final Map<String, Object> properties) {
     return new FileRecordLayer(properties);
@@ -89,12 +101,12 @@ public class FileRecordLayer extends ListRecordLayer {
             LoggerFactory.getLogger(getClass()).error("Cannot find reader for: " + this.resource);
             return false;
           } else {
-
             final Map<String, Object> properties = getProperties();
             reader.setProperties(properties);
             final RecordDefinition recordDefinition = reader.getRecordDefinition();
             setRecordDefinition(recordDefinition);
             GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
+            clearRecords();
             for (final Record record : reader) {
               final Geometry geometry = record.getGeometry();
               if (geometry != null) {

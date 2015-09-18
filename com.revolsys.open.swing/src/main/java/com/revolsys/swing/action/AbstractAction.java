@@ -1,6 +1,8 @@
 package com.revolsys.swing.action;
 
 import java.awt.event.InputEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -8,6 +10,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 
+import com.revolsys.i18n.I18nCharSequence;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.Button;
@@ -24,6 +27,30 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
 
   private final ActionEnabledPropertyChangeListener enabledListener = new ActionEnabledPropertyChangeListener(
     this);
+
+  public AbstractAction() {
+  }
+
+  public AbstractAction(final CharSequence name, final String toolTip, final Icon icon) {
+    if (name != null) {
+      putValue(NAME, name.toString());
+    }
+    if (toolTip != null) {
+      putValue(SHORT_DESCRIPTION, toolTip.toString());
+    }
+    if (icon != null) {
+      putValue(SMALL_ICON, icon);
+    }
+    if (name instanceof I18nCharSequence) {
+      final I18nCharSequence i18nName = (I18nCharSequence)name;
+      i18nName.getI18n().addListener("locale", new PropertyChangeListener() {
+        @Override
+        public void propertyChange(final PropertyChangeEvent evt) {
+          putValue(NAME, name.toString());
+        }
+      });
+    }
+  }
 
   public JButton createButton() {
     final Button button = new Button(this);

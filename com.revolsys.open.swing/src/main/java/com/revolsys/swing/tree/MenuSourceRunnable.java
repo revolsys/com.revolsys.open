@@ -36,6 +36,12 @@ public class MenuSourceRunnable extends InvokeMethodRunnable {
     return action;
   }
 
+  public static InvokeMethodAction createAction(final CharSequence name, final Icon icon,
+    final String methodName, final Object... parameters) {
+    final InvokeMethodAction action = createAction(name, icon, null, methodName, parameters);
+    return action;
+  }
+
   public static InvokeMethodAction createAction(final CharSequence name, final String iconName,
     final EnableCheck enableCheck, final String methodName, final Object... parameters) {
     final ImageIcon icon = Icons.getIcon(iconName);

@@ -30,7 +30,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
       final String iconName = ("style_" + type + "_add").toLowerCase();
       final ImageIcon icon = Icons.getIcon(iconName);
       final InvokeMethodAction action = MenuSourceRunnable.createAction("Add " + type + " Style",
-        icon, null, "add" + type + "Style");
+        icon, "add" + type + "Style");
       menu.addMenuItem("add", action);
     }
 

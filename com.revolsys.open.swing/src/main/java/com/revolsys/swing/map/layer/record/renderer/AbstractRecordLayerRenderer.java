@@ -62,7 +62,7 @@ public abstract class AbstractRecordLayerRenderer
       final String iconName = ("style_" + type + "_wrap").toLowerCase();
       final ImageIcon icon = Icons.getIcon(iconName);
       final InvokeMethodAction action = MenuSourceRunnable
-        .createAction("Wrap With " + type + " Style", icon, null, "wrapWith" + type + "Style");
+        .createAction("Wrap With " + type + " Style", icon, "wrapWith" + type + "Style");
       menu.addMenuItem("wrap", action);
     }
 
