@@ -84,9 +84,10 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
     final List<FieldDefinition> fields = new ArrayList<>();
     FieldDefinition geometryField = null;
     for (final String fieldName : fieldNames) {
-      DataType type = DataTypes.STRING;
-      boolean isGeometryField = false;
       if (fieldName != null) {
+        DataType type;
+        int length = 0;
+        boolean isGeometryField = false;
         if (fieldName.equalsIgnoreCase(this.geometryColumnName)) {
           type = this.geometryType;
           isGeometryField = true;
@@ -120,13 +121,16 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
           || "MULTIPOLYGON".equalsIgnoreCase(fieldName)) {
           type = DataTypes.MULTI_POLYGON;
           isGeometryField = true;
+        } else {
+          type = DataTypes.STRING;
+          length = 4000;
         }
+        final FieldDefinition field = new FieldDefinition(fieldName, type, length, false);
+        if (isGeometryField) {
+          geometryField = field;
+        }
+        fields.add(field);
       }
-      final FieldDefinition field = new FieldDefinition(fieldName, type, false);
-      if (isGeometryField) {
-        geometryField = field;
-      }
-      fields.add(field);
     }
     if (this.hasPointFields) {
       if (geometryField == null) {
