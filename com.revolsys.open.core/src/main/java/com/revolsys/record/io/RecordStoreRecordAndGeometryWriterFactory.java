@@ -38,7 +38,7 @@ public class RecordStoreRecordAndGeometryWriterFactory extends AbstractIoFactory
       return null;
     } else {
       recordStore.initialize();
-      return new RecordStoreRecordWriter(recordStore);
+      return new RecordStoreRecordWriter(recordStore, recordDefinition);
     }
   }
 

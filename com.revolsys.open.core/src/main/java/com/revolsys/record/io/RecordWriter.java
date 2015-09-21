@@ -1,6 +1,7 @@
 package com.revolsys.record.io;
 
 import java.io.File;
+import java.util.Map;
 
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.io.FileUtil;
@@ -8,6 +9,7 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Writer;
+import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
@@ -38,6 +40,16 @@ public interface RecordWriter extends Writer<Record> {
   static boolean isWritable(final String fileNameExtension) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
     return ioFactoryRegistry.isFileExtensionSupported(RecordWriterFactory.class, fileNameExtension);
+  }
+
+  default Record createRecord() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return new ArrayRecord(recordDefinition);
+  }
+
+  default Record createRecord(final Map<String, ? extends Object> values) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return new ArrayRecord(recordDefinition, values);
   }
 
   default RecordDefinition getRecordDefinition() {

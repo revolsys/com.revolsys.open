@@ -227,17 +227,17 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  public Record create(final PathName typePath) {
+  public Record newRecord(final PathName typePath) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     if (recordDefinition == null) {
       return null;
     } else {
-      return create(recordDefinition);
+      return newRecord(recordDefinition);
     }
   }
 
   @Override
-  public Record create(final RecordDefinition objectRecordDefinition) {
+  public Record newRecord(final RecordDefinition objectRecordDefinition) {
     final RecordDefinition recordDefinition = getRecordDefinition(objectRecordDefinition);
     final RecordFactory recordFactory = this.recordFactory;
     if (recordDefinition == null || recordFactory == null) {
@@ -291,7 +291,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   @Override
   public Record createWithId(final RecordDefinition recordDefinition) {
-    final Record record = create(recordDefinition);
+    final Record record = newRecord(recordDefinition);
     if (record != null) {
       final String idFieldName = recordDefinition.getIdFieldName();
       if (Property.hasValue(idFieldName)) {

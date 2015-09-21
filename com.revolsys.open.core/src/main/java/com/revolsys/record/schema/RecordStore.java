@@ -49,31 +49,6 @@ public interface RecordStore extends RecordDefinitionFactory, Closeable {
 
   Record copy(Record record);
 
-  Record create(PathName typePath);
-
-  default Record create(final PathName typePath, final Map<String, ? extends Object> values) {
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    if (recordDefinition == null) {
-      throw new IllegalArgumentException("Cannot find table " + typePath + " for " + this);
-    } else {
-      final Record record = create(recordDefinition);
-      if (record != null) {
-        record.setValues(values);
-        final String idFieldName = recordDefinition.getIdFieldName();
-        if (Property.hasValue(idFieldName)) {
-          if (values.get(idFieldName) == null) {
-            final Object id = createPrimaryIdValue(typePath);
-            record.setIdValue(id);
-          }
-        }
-      }
-      return record;
-    }
-
-  }
-
-  Record create(RecordDefinition recordDefinition);
-
   default Identifier createPrimaryIdentifier(final PathName typePath) {
     final Object identifier = createPrimaryIdValue(typePath);
     return Identifier.create(identifier);
@@ -91,6 +66,10 @@ public interface RecordStore extends RecordDefinitionFactory, Closeable {
   Record createWithId(RecordDefinition recordDefinition);
 
   RecordWriter createWriter();
+
+  default RecordWriter createWriter(final RecordDefinition recordDefinition) {
+    return createWriter();
+  }
 
   default int delete(final PathName typePath, final Identifier identifier) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
@@ -262,6 +241,52 @@ public interface RecordStore extends RecordDefinitionFactory, Closeable {
   Record load(String typePath, Object... id);
 
   Record lock(String typePath, Object id);
+
+  Record newRecord(PathName typePath);
+
+  default Record newRecord(final PathName typePath, final Map<String, ? extends Object> values) {
+    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+    if (recordDefinition == null) {
+      throw new IllegalArgumentException("Cannot find table " + typePath + " for " + this);
+    } else {
+      final Record record = newRecord(recordDefinition);
+      if (record != null) {
+        record.setValues(values);
+        final String idFieldName = recordDefinition.getIdFieldName();
+        if (Property.hasValue(idFieldName)) {
+          if (values.get(idFieldName) == null) {
+            final Object id = createPrimaryIdValue(typePath);
+            record.setIdValue(id);
+          }
+        }
+      }
+      return record;
+    }
+  }
+
+  Record newRecord(RecordDefinition recordDefinition);
+
+  default Record newRecord(RecordDefinition recordDefinition,
+    final Map<String, ? extends Object> values) {
+    final PathName typePath = recordDefinition.getPathName();
+    recordDefinition = getRecordDefinition(recordDefinition);
+    if (recordDefinition == null) {
+      throw new IllegalArgumentException("Cannot find table " + typePath + " for " + this);
+    } else {
+      final Record record = newRecord(recordDefinition);
+      if (record != null) {
+        record.setValues(values);
+        final String idFieldName = recordDefinition.getIdFieldName();
+        if (Property.hasValue(idFieldName)) {
+          if (values.get(idFieldName) == null) {
+            final Object id = createPrimaryIdValue(typePath);
+            record.setIdValue(id);
+          }
+        }
+      }
+      return record;
+    }
+  }
 
   ResultPager<Record> page(Query query);
 

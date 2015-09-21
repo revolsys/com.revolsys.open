@@ -107,7 +107,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
   protected synchronized Identifier createId(final List<Object> values) {
     if (this.createMissingCodes) {
       // TODO prevent duplicates from other threads/processes
-      final Record code = this.recordStore.create(this.typePath);
+      final Record code = this.recordStore.newRecord(this.typePath);
       final RecordDefinition recordDefinition = code.getRecordDefinition();
       Object id = this.recordStore.createPrimaryIdValue(this.typePath);
       if (id == null) {

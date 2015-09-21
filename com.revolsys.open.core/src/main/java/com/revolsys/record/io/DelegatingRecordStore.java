@@ -69,13 +69,13 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public Record create(final PathName typePath) {
-    return this.recordStore.create(typePath);
+  public Record newRecord(final PathName typePath) {
+    return this.recordStore.newRecord(typePath);
   }
 
   @Override
-  public Record create(final RecordDefinition recordDefinition) {
-    return this.recordStore.create(recordDefinition);
+  public Record newRecord(final RecordDefinition recordDefinition) {
+    return this.recordStore.newRecord(recordDefinition);
   }
 
   @Override

@@ -44,7 +44,7 @@ public class GeometryTest {
     try (
       Transaction transaction = this.recordStore.createTransaction(Propagation.REQUIRES_NEW)) {
       final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(typePath);
-      final Record record = this.recordStore.create(typePath,
+      final Record record = this.recordStore.newRecord(typePath,
         Collections.singletonMap("GEOMETRY", geometry));
       try (
         Writer<Record> writer = this.recordStore.createWriter()) {

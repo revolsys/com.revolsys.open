@@ -28,7 +28,7 @@ public class ShapefileRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public Record create(final RecordDefinition recordDefinition) {
+  public Record newRecord(final RecordDefinition recordDefinition) {
     final String typePath = recordDefinition.getPath();
     final RecordDefinition savedRecordDefinition = getRecordDefinition(typePath);
     if (savedRecordDefinition == null) {

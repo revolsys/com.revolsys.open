@@ -84,7 +84,7 @@ public class CopyRecords extends AbstractProcess {
             final String idFieldName = targetRecordDefinition.getIdFieldName();
             Object maxId = this.targetRecordStore.createPrimaryIdValue(this.typePath);
             for (final Record sourceRecord : reader) {
-              final Record targetRecord = this.targetRecordStore.create(this.typePath,
+              final Record targetRecord = this.targetRecordStore.newRecord(this.typePath,
                 sourceRecord);
               final Object sourceId = sourceRecord.getValue(idFieldName);
               while (CompareUtil.compare(maxId, sourceId) < 0) {
@@ -94,7 +94,7 @@ public class CopyRecords extends AbstractProcess {
             }
           } else {
             for (final Record sourceRecord : reader) {
-              final Record targetRecord = this.targetRecordStore.create(this.typePath,
+              final Record targetRecord = this.targetRecordStore.newRecord(this.typePath,
                 sourceRecord);
               targetWriter.write(targetRecord);
             }

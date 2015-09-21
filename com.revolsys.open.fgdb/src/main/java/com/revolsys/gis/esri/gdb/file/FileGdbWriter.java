@@ -27,8 +27,15 @@ public class FileGdbWriter extends AbstractRecordWriter {
 
   private Map<String, Table> tablesByCatalogPath = new HashMap<>();
 
+  private RecordDefinition recordDefinition;
+
   FileGdbWriter(final FileGdbRecordStore recordStore) {
     this.recordStore = recordStore;
+  }
+
+  FileGdbWriter(final FileGdbRecordStore recordStore, final RecordDefinition recordDefinition) {
+    this.recordStore = recordStore;
+    this.recordDefinition = recordDefinition;
   }
 
   @Override
@@ -86,6 +93,11 @@ public class FileGdbWriter extends AbstractRecordWriter {
   @Override
   protected void finalize() throws Throwable {
     close();
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
   }
 
   private synchronized Table getTable(final PathName typePath) {

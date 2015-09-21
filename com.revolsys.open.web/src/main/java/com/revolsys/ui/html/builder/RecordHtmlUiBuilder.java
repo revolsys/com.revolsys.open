@@ -130,7 +130,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
 
   @Override
   protected Record createObject() {
-    return this.recordStore.create(this.tableName);
+    return this.recordStore.newRecord(this.tableName);
   }
 
   public void deleteObject(final Object id) {

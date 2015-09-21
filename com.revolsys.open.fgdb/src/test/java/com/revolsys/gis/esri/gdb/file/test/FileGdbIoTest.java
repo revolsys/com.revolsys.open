@@ -68,7 +68,7 @@ public class FileGdbIoTest {
         writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
         writer.setProperty(IoConstants.GEOMETRY_TYPE, dataType);
 
-        final Record record = recordStore.create(typePath);
+        final Record record = recordStore.newRecord(typePath);
         record.setValue("ID", 1);
         record.setGeometryValue(geometry);
         writer.write(record);
