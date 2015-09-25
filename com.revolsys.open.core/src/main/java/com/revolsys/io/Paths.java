@@ -18,7 +18,7 @@ import java.util.List;
 import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
 
-public class Paths {
+public interface Paths {
   public static void createDirectories(final Path path) {
     if (!Paths.exists(path)) {
       try {
@@ -162,6 +162,14 @@ public class Paths {
     return false;
   }
 
+  public static Writer newWriter(final Path path) {
+    try {
+      return Files.newBufferedWriter(path, StandardCharsets.UTF_8);
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
+  }
+
   public static OutputStream outputStream(final Path path) {
     try {
       return Files.newOutputStream(path);
@@ -191,13 +199,5 @@ public class Paths {
     final String newFileName = baseName + "." + extension;
     final Path parent = path.getParent();
     return parent.resolve(newFileName);
-  }
-
-  public static Writer newWriter(final Path path) {
-    try {
-      return Files.newBufferedWriter(path, StandardCharsets.UTF_8);
-    } catch (final IOException e) {
-      throw new WrappedException(e);
-    }
   }
 }

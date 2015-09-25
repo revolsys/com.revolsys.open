@@ -226,28 +226,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     }
   }
 
-  @Override
-  public Record newRecord(final PathName typePath) {
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    if (recordDefinition == null) {
-      return null;
-    } else {
-      return newRecord(recordDefinition);
-    }
-  }
-
-  @Override
-  public Record newRecord(final RecordDefinition objectRecordDefinition) {
-    final RecordDefinition recordDefinition = getRecordDefinition(objectRecordDefinition);
-    final RecordFactory recordFactory = this.recordFactory;
-    if (recordDefinition == null || recordFactory == null) {
-      return null;
-    } else {
-      final Record object = recordFactory.createRecord(recordDefinition);
-      return object;
-    }
-  }
-
   public AbstractIterator<Record> createIterator(final Query query,
     Map<String, Object> properties) {
     if (properties == null) {
@@ -553,6 +531,28 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
         query.setLockResults(true);
         return queryFirst(query);
       }
+    }
+  }
+
+  @Override
+  public Record newRecord(final PathName typePath) {
+    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      return newRecord(recordDefinition);
+    }
+  }
+
+  @Override
+  public Record newRecord(final RecordDefinition objectRecordDefinition) {
+    final RecordDefinition recordDefinition = getRecordDefinition(objectRecordDefinition);
+    final RecordFactory recordFactory = this.recordFactory;
+    if (recordDefinition == null || recordFactory == null) {
+      return null;
+    } else {
+      final Record object = recordFactory.createRecord(recordDefinition);
+      return object;
     }
   }
 

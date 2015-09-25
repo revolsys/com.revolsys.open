@@ -6,10 +6,10 @@ import java.util.function.Predicate;
 
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.parallel.channel.Channel;
-import com.revolsys.parallel.process.MultiplePredicateProcess;
+import com.revolsys.parallel.process.MultipleFilterProcess;
 import com.revolsys.record.Record;
 
-public class StatisticsMultipleFilterProcess extends MultiplePredicateProcess<Record> {
+public class StatisticsMultipleFilterProcess extends MultipleFilterProcess<Record> {
 
   private final Map<Predicate<Record>, Statistics> statisticsMap = new HashMap<Predicate<Record>, Statistics>();
 

@@ -41,8 +41,7 @@ public class PseudoNodeAttribute {
     final Edge<Record> edge2) {
     final Record object1 = edge1.getObject();
     final Record object2 = edge2.getObject();
-    if (DirectionalFields.canMergeRecords(node, object1, object2,
-      this.equalExcludeFieldNames)) {
+    if (DirectionalFields.canMergeRecords(node, object1, object2, this.equalExcludeFieldNames)) {
       return new EdgePair<Record>(edge1, edge2);
     } else {
       return null;

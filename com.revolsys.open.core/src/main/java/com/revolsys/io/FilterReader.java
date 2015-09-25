@@ -1,6 +1,7 @@
 package com.revolsys.io;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import javax.annotation.PreDestroy;
@@ -31,6 +32,11 @@ public class FilterReader<T> extends AbstractReader<T> {
 
   protected Predicate<T> getFilter() {
     return this.filter;
+  }
+
+  @Override
+  public Map<String, Object> getProperties() {
+    return this.reader.getProperties();
   }
 
   protected Reader<T> getReader() {

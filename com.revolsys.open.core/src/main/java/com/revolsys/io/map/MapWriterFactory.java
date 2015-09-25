@@ -11,7 +11,7 @@ import com.revolsys.spring.resource.Resource;
 
 public interface MapWriterFactory extends FileIoFactory {
   default MapWriter createMapWriter(final Object source) {
-    final Resource resource = com.revolsys.spring.resource.Resource.getResource(source);
+    final Resource resource = Resource.getResource(source);
     final Writer writer = resource.newWriter();
     return createMapWriter(writer);
   }

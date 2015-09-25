@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.collection.map.Maps;
 
 public class WmsConnectionManager {
-
   private static WmsConnectionManager INSTANCE = new WmsConnectionManager();
 
   private static final Logger LOG = LoggerFactory.getLogger(WmsConnectionManager.class);

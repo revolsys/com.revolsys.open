@@ -176,7 +176,8 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
 
   @Override
   public List<RectangularMapTile> getTiles(final BoundingBox boundingBox) {
-    final com.revolsys.geometry.model.BoundingBox envelope = boundingBox.convert(getGeometryFactory());
+    final com.revolsys.geometry.model.BoundingBox envelope = boundingBox
+      .convert(getGeometryFactory());
     final List<RectangularMapTile> tiles = new ArrayList<RectangularMapTile>();
     final int minXCeil = (int)Math.ceil(envelope.getMinX() / this.tileWidth);
     final double minX = minXCeil * this.tileWidth;

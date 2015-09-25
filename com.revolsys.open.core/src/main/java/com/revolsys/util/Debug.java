@@ -1,4 +1,4 @@
-package com.revolsys.gis.util;
+package com.revolsys.util;
 
 import java.sql.Timestamp;
 

@@ -52,13 +52,13 @@ public enum Location {
                *  the exterior of the second geometry.
                */
   EXTERIOR(2), /**
-            * The location value for the interior of a geometry.
-            * Also, DE-9IM row index of the interior of the first geometry and column index of
-            *  the interior of the second geometry.
-            */
+               * The location value for the interior of a geometry.
+               * Also, DE-9IM row index of the interior of the first geometry and column index of
+               *  the interior of the second geometry.
+               */
   INTERIOR(0), /**
-   *  Used for uninitialized location values.
-   */
+               *  Used for uninitialized location values.
+               */
   NONE(-1);
 
   /**

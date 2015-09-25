@@ -2,7 +2,7 @@ package com.revolsys.gis.esri.gdb.file.test;
 
 import java.io.File;
 
-import com.revolsys.gis.io.LittleEndianRandomAccessFile;
+import com.revolsys.io.endian.LittleEndianRandomAccessFile;
 
 public class FgdbUtil {
 

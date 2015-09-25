@@ -21,8 +21,8 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.io.EndianInput;
+import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.MathUtil;
 

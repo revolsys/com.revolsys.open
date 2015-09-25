@@ -8,6 +8,7 @@ import javax.measure.unit.Unit;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.gis.wms.capabilities.WmsBoundingBox;
 import com.revolsys.record.Record;
 import com.revolsys.util.Emptyable;
 

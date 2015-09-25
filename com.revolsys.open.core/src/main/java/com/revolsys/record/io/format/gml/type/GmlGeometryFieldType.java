@@ -82,7 +82,8 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
 
   private void geometryCollection(final XmlWriter out, final GeometryCollection geometryCollection,
     final boolean writeSrsName) {
-    geometryCollection(out, Gml.MULTI_GEOMETRY, Gml.GEOMETRY_MEMBER, geometryCollection, writeSrsName);
+    geometryCollection(out, Gml.MULTI_GEOMETRY, Gml.GEOMETRY_MEMBER, geometryCollection,
+      writeSrsName);
   }
 
   private void geometryCollection(final XmlWriter out, final QName tag, final QName memberTag,

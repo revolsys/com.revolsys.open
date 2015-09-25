@@ -18,7 +18,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.revolsys.gis.io;
+package com.revolsys.io.endian;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,7 +26,6 @@ import java.io.OutputStream;
 import com.revolsys.util.WrappedException;
 
 public class EndianOutputStream extends OutputStream implements EndianOutput {
-
   private final OutputStream out;
 
   private final byte writeBuffer[] = new byte[8];

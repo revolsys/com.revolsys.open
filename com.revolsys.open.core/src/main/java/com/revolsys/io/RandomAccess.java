@@ -1,4 +1,4 @@
-package com.revolsys.gis.io;
+package com.revolsys.io;
 
 import java.io.IOException;
 

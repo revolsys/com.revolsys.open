@@ -28,17 +28,6 @@ public class ShapefileRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public Record newRecord(final RecordDefinition recordDefinition) {
-    final String typePath = recordDefinition.getPath();
-    final RecordDefinition savedRecordDefinition = getRecordDefinition(typePath);
-    if (savedRecordDefinition == null) {
-      return new ArrayRecord(recordDefinition);
-    } else {
-      return new ArrayRecord(savedRecordDefinition);
-    }
-  }
-
-  @Override
   public RecordWriter createWriter() {
     return this.writer;
   }
@@ -57,6 +46,17 @@ public class ShapefileRecordStore extends AbstractRecordStore {
   @Override
   public void insert(final Record record) {
     this.writer.write(record);
+  }
+
+  @Override
+  public Record newRecord(final RecordDefinition recordDefinition) {
+    final String typePath = recordDefinition.getPath();
+    final RecordDefinition savedRecordDefinition = getRecordDefinition(typePath);
+    if (savedRecordDefinition == null) {
+      return new ArrayRecord(recordDefinition);
+    } else {
+      return new ArrayRecord(savedRecordDefinition);
+    }
   }
 
 }

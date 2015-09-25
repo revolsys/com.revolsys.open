@@ -35,5 +35,4 @@ public interface IoFactory extends Available {
   String getName();
 
   void init();
-
 }

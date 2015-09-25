@@ -3,7 +3,7 @@ package com.revolsys.gis.postgresql.type;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.revolsys.gis.io.EndianInputStream;
+import com.revolsys.io.endian.EndianInputStream;
 import com.revolsys.util.ExceptionUtil;
 
 public abstract class ValueGetter {

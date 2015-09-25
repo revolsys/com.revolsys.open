@@ -4,7 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.Closeable;
 import java.io.OutputStream;
 
-import com.revolsys.gis.io.EndianOutputStream;
+import com.revolsys.io.endian.EndianOutputStream;
 import com.revolsys.util.Property;
 
 public class RasterWriter implements Closeable {

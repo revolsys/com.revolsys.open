@@ -159,20 +159,20 @@ public class TriangulatedIrregularNetwork {
   }
 
   private void addBreaklineIntersect(final Triangle triangle, final Point intersectCoord) {
-    Point previousCoord = triangle.getPoint(0);
+    Point previousPoint = triangle.getPoint(0);
     for (int i = 1; i < 3; i++) {
       final Point triCorner = triangle.getPoint(i);
-      if (!triCorner.equals(2, intersectCoord) && !previousCoord.equals(2, intersectCoord)) {
-        final double distance = new LineSegmentDoubleGF(previousCoord, triCorner)
+      if (!triCorner.equals(2, intersectCoord) && !previousPoint.equals(2, intersectCoord)) {
+        final double distance = new LineSegmentDoubleGF(previousPoint, triCorner)
           .distance(intersectCoord);
         if (distance == 0) {
-          final Point nextCoordinates = triangle.getPoint((i + 1) % 3);
+          final Point nextPoint = triangle.getPoint((i + 1) % 3);
           replaceTriangle(triangle,
-            Triangle.createClockwiseTriangle(intersectCoord, triCorner, nextCoordinates),
-            Triangle.createClockwiseTriangle(intersectCoord, nextCoordinates, previousCoord));
+            Triangle.createClockwiseTriangle(intersectCoord, triCorner, nextPoint),
+            Triangle.createClockwiseTriangle(intersectCoord, nextPoint, previousPoint));
         }
       }
-      previousCoord = triCorner;
+      previousPoint = triCorner;
     }
   }
 
@@ -565,13 +565,13 @@ public class TriangulatedIrregularNetwork {
   }
 
   public void insertEdge(final LineString coordinates) {
-    Point previousCoordinates = coordinates.getPoint(0);
+    Point previousPoint = coordinates.getPoint(0);
     for (int i = 1; i < coordinates.getVertexCount(); i++) {
       final Point coordinate = coordinates.getPoint(i);
-      final LineSegment segment = new LineSegmentDoubleGF(this.geometryFactory, previousCoordinates,
+      final LineSegment segment = new LineSegmentDoubleGF(this.geometryFactory, previousPoint,
         coordinate);
       insertEdge(segment);
-      previousCoordinates = coordinate;
+      previousPoint = coordinate;
     }
   }
 

@@ -1,4 +1,4 @@
-package com.revolsys.gis.io;
+package com.revolsys.io.endian;
 
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -9,16 +9,13 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.log4j.Logger;
-
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.record.io.format.xml.StaxUtils;
 import com.revolsys.record.io.format.xml.XmlProcessor;
 import com.revolsys.record.io.format.xml.XmlProcessorContext;
 
 public class Parser extends XmlProcessor {
-  private static final Logger log = Logger.getLogger(Parser.class);
-
   private WmsCapabilities capabilities;
 
   public Parser(final XmlProcessorContext processorContext) {
@@ -74,8 +71,7 @@ public class Parser extends XmlProcessor {
     final double maxX = StaxUtils.getDoubleAttribute(parser, null, "maxx");
     final double minY = StaxUtils.getDoubleAttribute(parser, null, "miny");
     final double maxY = StaxUtils.getDoubleAttribute(parser, null, "maxy");
-    final com.revolsys.geometry.model.BoundingBox envelope = new BoundingBoxDoubleGf(2, minX, minY, maxX,
-      maxY);
+    final BoundingBox envelope = new BoundingBoxDoubleGf(2, minX, minY, maxX, maxY);
     wmsBoundingBox.setEnvelope(envelope);
     final double resX = StaxUtils.getDoubleAttribute(parser, null, "resx");
     wmsBoundingBox.setResX(resX);
@@ -329,14 +325,13 @@ public class Parser extends XmlProcessor {
     return keywords;
   }
 
-  public com.revolsys.geometry.model.BoundingBox processLatLonBoundingBox(final XMLStreamReader parser)
+  public BoundingBox processLatLonBoundingBox(final XMLStreamReader parser)
     throws XMLStreamException, IOException {
     final double minX = StaxUtils.getDoubleAttribute(parser, null, "minx");
     final double maxX = StaxUtils.getDoubleAttribute(parser, null, "maxx");
     final double minY = StaxUtils.getDoubleAttribute(parser, null, "miny");
     final double maxY = StaxUtils.getDoubleAttribute(parser, null, "maxy");
-    final com.revolsys.geometry.model.BoundingBox envelope = new BoundingBoxDoubleGf(2, minX, minY, maxX,
-      maxY);
+    final BoundingBox envelope = new BoundingBoxDoubleGf(2, minX, minY, maxX, maxY);
     StaxUtils.skipSubTree(parser);
     return envelope;
 
@@ -380,8 +375,8 @@ public class Parser extends XmlProcessor {
         layer.addFeatureListUrl(processFormatUrl(parser));
       } else {
         final Object object = process(parser);
-        if (object instanceof com.revolsys.geometry.model.BoundingBox) {
-          layer.setLatLonBoundingBox((com.revolsys.geometry.model.BoundingBox)object);
+        if (object instanceof BoundingBox) {
+          layer.setLatLonBoundingBox((BoundingBox)object);
         } else if (object instanceof WmsBoundingBox) {
           layer.addBoundingBox((WmsBoundingBox)object);
         } else if (object instanceof Dimension) {

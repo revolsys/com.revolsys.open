@@ -39,7 +39,7 @@ public enum Direction {
     if (direction == null) {
       return false;
     } else {
-      return isForwards() !=direction.isForwards();
+      return isForwards() != direction.isForwards();
     }
   }
 

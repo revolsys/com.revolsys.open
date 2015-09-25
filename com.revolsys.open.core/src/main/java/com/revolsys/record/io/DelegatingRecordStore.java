@@ -69,16 +69,6 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public Record newRecord(final PathName typePath) {
-    return this.recordStore.newRecord(typePath);
-  }
-
-  @Override
-  public Record newRecord(final RecordDefinition recordDefinition) {
-    return this.recordStore.newRecord(recordDefinition);
-  }
-
-  @Override
   public <T> T createPrimaryIdValue(final PathName typePath) {
     return this.recordStore.createPrimaryIdValue(typePath);
   }
@@ -248,6 +238,16 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   @Override
   public Record lock(final String typePath, final Object id) {
     return this.recordStore.lock(typePath, id);
+  }
+
+  @Override
+  public Record newRecord(final PathName typePath) {
+    return this.recordStore.newRecord(typePath);
+  }
+
+  @Override
+  public Record newRecord(final RecordDefinition recordDefinition) {
+    return this.recordStore.newRecord(recordDefinition);
   }
 
   @Override

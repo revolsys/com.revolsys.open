@@ -1,4 +1,4 @@
-package com.revolsys.gis.io;
+package com.revolsys.io.endian;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -90,7 +90,7 @@ public class ResourceEndianOutput implements EndianOutput {
   }
 
   @Override
-  public void write(final byte[] bytes, final int offset, final int length) throws IOException {
+  public void write(final byte[] bytes, final int offset, final int length) {
     this.out.write(bytes, offset, length);
   }
 
@@ -154,5 +154,4 @@ public class ResourceEndianOutput implements EndianOutput {
   public void writeShort(final short s) {
     this.out.writeShort(s);
   }
-
 }

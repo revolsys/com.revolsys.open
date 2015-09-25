@@ -218,8 +218,8 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   }
 
-  public void writeNetworkLink(final com.revolsys.geometry.model.BoundingBox envelope, final String name,
-    final Integer minLod, final Integer maxLod, final String href) {
+  public void writeNetworkLink(final com.revolsys.geometry.model.BoundingBox envelope,
+    final String name, final Integer minLod, final Integer maxLod, final String href) {
 
     startTag(NETWORK_LINK);
     if (name != null) {
@@ -384,8 +384,8 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     endTag();
   }
 
-  public void writeRegion(final com.revolsys.geometry.model.BoundingBox envelope, final Integer minLod,
-    final Integer maxLod) {
+  public void writeRegion(final com.revolsys.geometry.model.BoundingBox envelope,
+    final Integer minLod, final Integer maxLod) {
     startTag(REGION);
 
     startTag(LAT_LON_ALT_BOX);

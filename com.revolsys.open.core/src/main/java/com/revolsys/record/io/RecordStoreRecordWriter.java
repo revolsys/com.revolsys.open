@@ -36,6 +36,16 @@ public class RecordStoreRecordWriter extends AbstractRecordWriter {
   }
 
   @Override
+  public void flush() {
+    this.writer.flush();
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
+  }
+
+  @Override
   public Record newRecord() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return this.recordStore.newRecord(recordDefinition);
@@ -45,16 +55,6 @@ public class RecordStoreRecordWriter extends AbstractRecordWriter {
   public Record newRecord(final Map<String, ? extends Object> values) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return this.recordStore.newRecord(recordDefinition, values);
-  }
-
-  @Override
-  public void flush() {
-    this.writer.flush();
-  }
-
-  @Override
-  public RecordDefinition getRecordDefinition() {
-    return this.recordDefinition;
   }
 
   @Override

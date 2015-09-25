@@ -1,4 +1,4 @@
-package com.revolsys.gis.io;
+package com.revolsys.io.endian;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -15,7 +15,7 @@ public interface EndianOutput extends Closeable {
 
   void write(byte[] bytes);
 
-  void write(byte[] bytes, int offset, int length) throws IOException;
+  void write(byte[] bytes, int offset, int length);
 
   /**
    * Write a big endian int.
