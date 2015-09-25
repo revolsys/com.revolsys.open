@@ -1,4 +1,4 @@
-package com.revolsys.record.io.format.gif;
+package com.revolsys.raster.io.format.gif;
 
 import com.revolsys.raster.JaiGeoreferencedImage;
 import com.revolsys.spring.resource.Resource;

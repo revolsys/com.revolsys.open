@@ -1,4 +1,4 @@
-package com.revolsys.record.io.format.usgsdem;
+package com.revolsys.raster.io.format.usgsdem;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.raster.BufferedGeoreferencedImage;
-import com.revolsys.record.io.format.raster.RasterWriter;
+import com.revolsys.raster.io.format.RasterWriter;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.WrappedException;
 

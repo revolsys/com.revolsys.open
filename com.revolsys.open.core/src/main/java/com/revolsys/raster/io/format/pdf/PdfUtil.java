@@ -1,4 +1,4 @@
-package com.revolsys.record.io.format.pdf;
+package com.revolsys.raster.io.format.pdf;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;

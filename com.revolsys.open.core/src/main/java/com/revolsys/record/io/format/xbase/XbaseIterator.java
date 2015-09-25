@@ -93,9 +93,8 @@ public class XbaseIterator extends AbstractIterator<Record>implements RecordRead
 
   public XbaseIterator(final Resource resource, final RecordFactory recordFactory)
     throws IOException {
-    this.typeName = PathName.ROOT;
     this.resource = resource;
-    final String baseName = FileUtil.getBaseName(resource.getFilename());
+    final String baseName = resource.getBaseName();
     this.typeName = PathName.create("/" + baseName);
 
     this.recordFactory = recordFactory;
@@ -129,8 +128,7 @@ public class XbaseIterator extends AbstractIterator<Record>implements RecordRead
     if (this.in == null) {
       try {
         try {
-          final Resource resource1 = this.resource;
-          final File file = resource1.getFile();
+          final File file = this.resource.getFile();
           final Boolean memoryMapped = getProperty("memoryMapped");
           if (Boolean.TRUE == memoryMapped) {
             this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);

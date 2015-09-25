@@ -44,7 +44,7 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.coordinates.PointWithOrientation;
-import com.revolsys.record.io.format.pdf.PdfUtil;
+import com.revolsys.raster.io.format.pdf.PdfUtil;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;

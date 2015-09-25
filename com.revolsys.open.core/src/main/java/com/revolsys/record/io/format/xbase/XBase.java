@@ -14,9 +14,9 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.OutputStreamResource;
 import com.revolsys.spring.resource.Resource;
 
-public class XBaseRecordIoFactory extends AbstractIoFactoryWithCoordinateSystem
+public class XBase extends AbstractIoFactoryWithCoordinateSystem
   implements RecordReaderFactory, RecordWriterFactory {
-  public XBaseRecordIoFactory() {
+  public XBase() {
     super("D-Base");
     addMediaTypeAndFileExtension("application/dbase", "dbf");
     addMediaTypeAndFileExtension("application/dbf", "dbf");

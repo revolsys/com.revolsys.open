@@ -1,16 +1,16 @@
-package com.revolsys.record.io.format.png;
+package com.revolsys.raster.io.format.jpg;
 
 import com.revolsys.raster.JaiGeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
 
-public class PngImage extends JaiGeoreferencedImage {
+public class JpegImage extends JaiGeoreferencedImage {
 
-  public PngImage(final Resource imageResource) {
+  public JpegImage(final Resource imageResource) {
     super(imageResource);
   }
 
   @Override
   public String getWorldFileExtension() {
-    return "pgw";
+    return "jgw";
   }
 }

@@ -1,4 +1,4 @@
-package com.revolsys.record.io.format.raster;
+package com.revolsys.raster.io.format;
 
 import java.io.BufferedOutputStream;
 import java.io.Closeable;

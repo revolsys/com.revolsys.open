@@ -1,4 +1,4 @@
-package com.revolsys.record.io.format.jpg;
+package com.revolsys.raster.io.format.jpg;
 
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.raster.GeoreferencedImage;

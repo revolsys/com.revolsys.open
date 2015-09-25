@@ -1,4 +1,4 @@
-package com.revolsys.record.io.format.tiff;
+package com.revolsys.raster.io.format.tiff;
 
 import java.awt.image.RenderedImage;
 import java.util.LinkedHashMap;
