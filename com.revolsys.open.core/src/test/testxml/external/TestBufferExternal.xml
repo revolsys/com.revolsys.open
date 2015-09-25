@@ -5,7 +5,7 @@
     The cases in this file should all pass in the current version of JTS.
   </desc>
   <precisionModel type="FLOATING" />
-  <resultMatcher>com.revolsys.jtstest.testrunner.BufferResultMatcher</resultMatcher>
+  <resultMatcher>com.revolsys.geometry.test.testrunner.BufferResultMatcher</resultMatcher>
 
 <case>
   <desc>

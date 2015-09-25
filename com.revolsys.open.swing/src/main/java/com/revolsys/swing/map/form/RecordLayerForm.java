@@ -5,13 +5,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dialog.ModalityType;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
-import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
@@ -36,7 +31,6 @@ import java.util.TreeSet;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -50,9 +44,6 @@ import javax.swing.TransferHandler;
 import javax.swing.WindowConstants;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 import javax.swing.undo.UndoableEdit;
 
 import org.jdesktop.swingx.VerticalLayout;
@@ -91,14 +82,10 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.component.RecordLayerFields;
 import com.revolsys.swing.map.layer.record.table.model.LayerRecordTableModel;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
-import com.revolsys.swing.map.layer.record.table.predicate.FormAllFieldsErrorPredicate;
-import com.revolsys.swing.map.layer.record.table.predicate.FormAllFieldsModifiedPredicate;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
-import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.undo.ReverseRecordFieldsUndo;
 import com.revolsys.swing.undo.ReverseRecordGeometryUndo;
@@ -128,7 +115,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
   private LayerRecord addRecord;
 
-  private LayerRecordTableModel allFields;
+  private LayerRecordTableModel fieldsTableModel;
 
   private boolean allowAddWithErrors = false;
 
@@ -139,8 +126,6 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   private final Map<String, List<String>> fieldErrors = new HashMap<>();
 
   private final Map<String, String> fieldInValidMessage = new HashMap<String, String>();
-
-  private ComboBox fieldNameSetNamesField;
 
   private final Map<String, Field> fields = new LinkedHashMap<String, Field>();
 
@@ -203,10 +188,10 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     setTransferHandler(transferHandler);
     setFont(SwingUtil.FONT);
 
-    addTabAllFields();
+    addTabFields();
     final boolean editable = layer.isEditable();
     setEditable(editable);
-    getAllFields().setEditable(isEditable());
+    getFieldsTableModel().setEditable(isEditable());
     if (recordDefinition.getGeometryFieldName() != null) {
       addTabGeometry();
     }
@@ -377,14 +362,15 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     addRequiredFieldNames(Arrays.asList(requiredFieldNames));
   }
 
-  protected JPanel addTab(final int index, final String title) {
+  protected JPanel addScrollPaneTab(final int index, final String title) {
     final JPanel panel = new JPanel(new VerticalLayout());
     panel.setOpaque(false);
-    addTab(index, title, panel);
+    addScrollPaneTab(index, title, panel);
     return panel;
   }
 
-  public JScrollPane addTab(final int index, final String name, final Component component) {
+  public JScrollPane addScrollPaneTab(final int index, final String name,
+    final Component component) {
     boolean init = false;
     final Container parent = this.tabs.getParent();
     if (parent != this) {
@@ -401,66 +387,40 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     return scrollPane;
   }
 
-  protected JPanel addTab(final String title) {
+  protected JPanel addScrollPaneTab(final String title) {
     final JPanel panel = new JPanel(new VerticalLayout());
     panel.setOpaque(false);
-    addTab(title, panel);
+    addScrollPaneTab(title, panel);
     return panel;
   }
 
-  public JScrollPane addTab(final String name, final Component component) {
-    return addTab(this.tabs.getTabCount(), name, component);
+  public JScrollPane addScrollPaneTab(final String name, final Component component) {
+    return addScrollPaneTab(this.tabs.getTabCount(), name, component);
   }
 
-  protected void addTabAllFields() {
-    this.allFields = new LayerRecordTableModel(this);
-    final BaseJTable table = AbstractSingleRecordTableModel.createTable(this.allFields);
-    final TableColumnModel columnModel = table.getColumnModel();
-    FormAllFieldsModifiedPredicate.add(this, table);
-    FormAllFieldsErrorPredicate.add(this, table);
-
-    for (int i = 0; i < columnModel.getColumnCount(); i++) {
-      final TableColumn column = columnModel.getColumn(i);
-      if (i == 2) {
-        final TableCellEditor cellEditor = column.getCellEditor();
-        cellEditor.addCellEditorListener(this);
-      }
+  public void addTab(final int index, final String name, final Component component) {
+    boolean init = false;
+    final Container parent = this.tabs.getParent();
+    if (parent != this) {
+      add(this.tabs, BorderLayout.CENTER);
+      init = true;
     }
-    final TablePanel tablePanel = new TablePanel(table);
-
-    final List<String> fieldNamesSetNames = this.layer.getFieldNamesSetNames();
-    final DefaultComboBoxModel<String> fieldNamesSetNamesModel = ComboBox.model(fieldNamesSetNames);
-    this.fieldNameSetNamesField = new ComboBox("fieldNamesSetName", fieldNamesSetNamesModel);
-    int maxLength = 3;
-    for (final String name : fieldNamesSetNames) {
-      maxLength = Math.max(maxLength, name.length());
+    this.tabs.insertTab(name, null, component, null, index);
+    if (init) {
+      this.tabs.setSelectedIndex(0);
     }
-    this.fieldNameSetNamesField
-      .setMaximumSize(new Dimension(Math.max(300, maxLength * 11 + 40), 22));
-    Property.addListener(this.fieldNameSetNamesField, "fieldNamesSetName", this);
+    final JLabel label = new JLabel(name);
+    this.tabs.setTabComponentAt(index, label);
+  }
 
-    final ToolBar toolBar = new ToolBar();
-    toolBar.addComponent("default", this.fieldNameSetNamesField);
-    toolBar.addButtonTitleIcon("default", "Edit Field Sets", "fields_filter_edit", this.layer,
-      "showProperties", "Field Sets");
+  public void addTab(final String name, final Component component) {
+    addTab(this.tabs.getTabCount(), name, component);
+  }
 
-    final JPanel panel = new JPanel(new BorderLayout());
-    panel.add(toolBar, BorderLayout.NORTH);
-    panel.add(tablePanel, BorderLayout.CENTER);
-    final JScrollPane scrollPane = addTab("All Fields", panel);
-
-    int maxHeight = 500;
-    for (final GraphicsDevice device : GraphicsEnvironment.getLocalGraphicsEnvironment()
-      .getScreenDevices()) {
-      final GraphicsConfiguration graphicsConfiguration = device.getDefaultConfiguration();
-      final Rectangle bounds = graphicsConfiguration.getBounds();
-
-      maxHeight = Math.min(bounds.height, maxHeight);
-    }
-    final int preferredHeight = Math.min(maxHeight, (this.allFields.getRowCount() + 1) * 20);
-    scrollPane.setMinimumSize(new Dimension(100, preferredHeight));
-    scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, maxHeight));
-    scrollPane.setPreferredSize(new Dimension(800, preferredHeight));
+  protected void addTabFields() {
+    final TablePanel tablePanel = LayerRecordTableModel.newTablePanel(this);
+    this.fieldsTableModel = tablePanel.getTableModel();
+    addTab("Fields", tablePanel);
   }
 
   protected void addTabGeometry() {
@@ -473,7 +433,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
       SwingUtil.setTitledBorder(this.geometryCoordinatesPanel, "Coordinates");
       panel.add(this.geometryCoordinatesPanel);
 
-      addTab("Geometry", panel);
+      addScrollPaneTab("Geometry", panel);
     }
   }
 
@@ -624,7 +584,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
   public void destroy() {
     this.addOkButton = null;
-    this.allFields = null;
+    this.fieldsTableModel = null;
     this.recordStore = null;
     this.fieldInValidMessage.clear();
     for (final Field field : this.fields.values()) {
@@ -651,9 +611,9 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     final AbstractRecordLayer layer = getLayer();
     if (layer != null) {
       this.layer = null;
-      if (this.allFields != null) {
-        Property.removeListener(layer, this.allFields);
-        this.allFields = null;
+      if (this.fieldsTableModel != null) {
+        Property.removeListener(layer, this.fieldsTableModel);
+        this.fieldsTableModel = null;
       }
       Property.removeListener(layer, this);
     }
@@ -833,10 +793,6 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     return this.addRecord;
   }
 
-  public LayerRecordTableModel getAllFields() {
-    return this.allFields;
-  }
-
   public String getCodeValue(final String fieldName, final Object value) {
     final CodeTable codeTable = this.recordDefinition.getCodeTableByFieldName(fieldName);
     String string;
@@ -845,7 +801,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     } else if (codeTable == null) {
       string = StringConverterRegistry.toString(value);
     } else {
-      final List<Object> values = codeTable.getValues(Identifier.create(value));
+      final List<Object> values = codeTable.getValues(value);
       if (values == null || values.isEmpty()) {
         string = "-";
       } else {
@@ -900,6 +856,10 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
   public Collection<Field> getFields() {
     return this.fields.values();
+  }
+
+  public LayerRecordTableModel getFieldsTableModel() {
+    return this.fieldsTableModel;
   }
 
   public Set<String> getFieldsToValidate() {
@@ -1193,18 +1153,6 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
           if (propertyName.equals("geometry")) {
             record.setGeometryValue((Geometry)event.getNewValue());
           }
-        } else if (propertyName.equals("fieldNamesSets")) {
-          final Object selectedItem = this.fieldNameSetNamesField.getSelectedItem();
-          final List<String> fieldNamesSetNames = this.layer.getFieldNamesSetNames();
-          final DefaultComboBoxModel<String> fieldNamesSetNamesModel = ComboBox
-            .model(fieldNamesSetNames);
-          this.fieldNameSetNamesField.setModel(fieldNamesSetNamesModel);
-          this.fieldNameSetNamesField.setSelectedItem(selectedItem);
-          final String fieldNamesSetName = (String)this.fieldNameSetNamesField.getSelectedItem();
-          this.allFields.setFieldNames(layer.getFieldNamesSet(fieldNamesSetName));
-        } else if (propertyName.equals("fieldNamesSetName")) {
-          final String fieldNamesSetName = (String)event.getNewValue();
-          this.allFields.setFieldNames(layer.getFieldNamesSet(fieldNamesSetName));
         } else if (source == layer) {
           if ("recordDeleted".equals(propertyName)) {
             if (record.isDeleted() || isSame(event.getNewValue())) {
@@ -1390,7 +1338,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     try {
       final boolean same = record != null && record.isSame(getRecord());
       this.record = record;
-      this.allFields.setRecord(record);
+      this.fieldsTableModel.setRecord(record);
       if (!same) {
         setValues(record);
         this.undoManager.discardAllEdits();
@@ -1518,8 +1466,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
         field.setEditable(true);
       }
     }
-    if (this.allFields != null) {
-      this.allFields.setReadOnlyFieldNames(this.readOnlyFieldNames);
+    if (this.fieldsTableModel != null) {
+      this.fieldsTableModel.setReadOnlyFieldNames(this.readOnlyFieldNames);
     }
   }
 

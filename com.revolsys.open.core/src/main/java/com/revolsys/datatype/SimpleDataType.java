@@ -54,5 +54,4 @@ public class SimpleDataType implements DataType {
   public String toString() {
     return this.name.toString();
   }
-
 }

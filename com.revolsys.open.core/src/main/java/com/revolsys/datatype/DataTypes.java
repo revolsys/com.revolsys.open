@@ -31,7 +31,6 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.record.Record;
 
 public final class DataTypes {
-
   public static final DataType ANY_URI = new SimpleDataType("anyURI", URI.class);
 
   public static final DataType BASE64_BINARY = new SimpleDataType("base64Binary", byte[].class);
@@ -45,8 +44,6 @@ public final class DataTypes {
   static final Map<String, DataType> CLASS_TYPE_MAP = new HashMap<String, DataType>();
 
   public static final DataType COLOR = new SimpleDataType("color", Color.class);
-
-  public static final DataType DATA_OBJECT = new SimpleDataType("Record", Record.class);
 
   public static final DataType DATE = new SimpleDataType("date", java.util.Date.class);
 
@@ -94,6 +91,8 @@ public final class DataTypes {
   public static final DataType POLYGON = new SimpleDataType("Polygon", Polygon.class);
 
   public static final DataType QNAME = new SimpleDataType("QName", QName.class);
+
+  public static final DataType RECORD = new SimpleDataType("Record", Record.class);
 
   public static final DataType SHORT = new SimpleDataType("short", Short.class);
 
@@ -199,5 +198,4 @@ public final class DataTypes {
 
   private DataTypes() {
   }
-
 }

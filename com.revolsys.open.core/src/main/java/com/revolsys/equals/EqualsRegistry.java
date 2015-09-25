@@ -62,7 +62,6 @@ public class EqualsRegistry implements Equals<Object> {
         final Equals<Object> equals = getEquals(object1.getClass());
         return equals.equals(object1, object2, exclude);
       } catch (final ClassCastException e) {
-        e.printStackTrace();
         return false;
       }
     }

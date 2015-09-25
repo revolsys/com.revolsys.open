@@ -166,7 +166,7 @@ public class SaifSchemaReader {
                 final DataType collectionDataType = nameTypeMap.get(collectionType);
                 DataType contentDataType = nameTypeMap.get(contentTypeName);
                 if (contentDataType == null) {
-                  contentDataType = DataTypes.DATA_OBJECT;
+                  contentDataType = DataTypes.RECORD;
                 }
                 this.currentClass.addField(fieldName,
                   new CollectionDataType(collectionDataType.getName(),

@@ -8,7 +8,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
-import com.revolsys.jts.test.geometry.TestUtil;
+import com.revolsys.geometry.test.model.TestUtil;
 
 public class LineSegmentTest {
   private static final GeometryFactory GEOMETRY_FACTORY_2D = GeometryFactory.fixed(3005, 1000.0);

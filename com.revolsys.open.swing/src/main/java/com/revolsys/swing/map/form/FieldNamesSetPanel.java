@@ -13,7 +13,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultRowSorter;
 import javax.swing.DropMode;
 import javax.swing.JButton;
@@ -26,8 +25,6 @@ import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.JXList;
@@ -36,6 +33,7 @@ import org.jdesktop.swingx.VerticalLayout;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.dnd.transferhandler.ListReorderableTransferHandler;
+import com.revolsys.swing.field.ArrayListComboBoxModel;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.SearchField;
 import com.revolsys.swing.list.ArrayListModel;
@@ -45,9 +43,14 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
 public class FieldNamesSetPanel extends ValueField
-  implements ActionListener, ListSelectionListener, PropertyChangeListener {
+  implements ActionListener, PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
+
+  public static String showDialog(final AbstractRecordLayer layer) {
+    final FieldNamesSetPanel dialog = new FieldNamesSetPanel(layer);
+    return dialog.showDialog();
+  }
 
   private final JButton addButton;
 
@@ -59,9 +62,9 @@ public class FieldNamesSetPanel extends ValueField
 
   private final JButton deleteButton;
 
-  private final List<String> fieldNamesSetNames;
+  private final ComboBox<String> fieldNamesSetNamesField;
 
-  private final DefaultComboBoxModel<String> fieldNamesSetNamesModel;
+  private final ArrayListComboBoxModel<String> fieldNamesSetNamesModel;
 
   private final Map<String, List<String>> fieldNamesSets;
 
@@ -84,31 +87,30 @@ public class FieldNamesSetPanel extends ValueField
   private final ArrayListModel<String> selectedFieldNamesModel;
 
   public FieldNamesSetPanel(final AbstractRecordLayer layer) {
-    super(new VerticalLayout(5));
+    super("fieldNamesSetName", layer.getFieldNamesSetName());
+    setLayout(new VerticalLayout(5));
     this.layer = layer;
-    this.fieldNamesSetNames = layer.getFieldNamesSetNames();
     this.fieldNamesSets = new HashMap<>(layer.getFieldNamesSets());
-    SwingUtil.setTitledBorder(this, "Field Sets");
 
     final List<String> fieldNamesSetNames = this.layer.getFieldNamesSetNames();
-    this.fieldNamesSetNamesModel = ComboBox.model(fieldNamesSetNames);
-    final ComboBox fieldNameSetNamesField = new ComboBox("fieldNamesSetName",
-      this.fieldNamesSetNamesModel);
+    this.fieldNamesSetNamesField = ComboBox.newComboBox("fieldNamesSetName", fieldNamesSetNames);
+    this.fieldNamesSetNamesModel = this.fieldNamesSetNamesField.getComboBoxModel();
     int maxLength = 3;
     for (final String name : fieldNamesSetNames) {
       maxLength = Math.max(maxLength, name.length());
     }
-    fieldNameSetNamesField.setMaximumSize(new Dimension(Math.max(300, maxLength * 11 + 40), 22));
-    Property.addListener(fieldNameSetNamesField, "fieldNamesSetName", this);
+    this.fieldNamesSetNamesField
+      .setMaximumSize(new Dimension(Math.max(300, maxLength * 11 + 40), 22));
+    Property.addListener(this.fieldNamesSetNamesField, "fieldNamesSetName", this);
 
     final ToolBar toolBar = new ToolBar();
     toolBar.setOpaque(false);
-    toolBar.addComponent("default", fieldNameSetNamesField);
+    toolBar.addComponent("default", this.fieldNamesSetNamesField);
     this.renameButton = toolBar.addButtonTitleIcon("default", "Rename Field Set",
-      "fields_filter_edit", this, "actionRename");
+      "fields_filter_edit", () -> actionRename());
     this.deleteButton = toolBar.addButtonTitleIcon("default", "Delete Field Set",
-      "fields_filter_delete", this, "actionDelete");
-    toolBar.addButtonTitleIcon("default", "Add Field Set", "fields_filter_add", this, "actionAdd");
+      "fields_filter_delete", () -> actionDelete());
+    toolBar.addButtonTitleIcon("default", "Add Field Set", "fields_filter_add", () -> actionAdd());
 
     add(toolBar);
 
@@ -129,7 +131,8 @@ public class FieldNamesSetPanel extends ValueField
     this.allFieldNames.setAutoCreateRowSorter(true);
     this.allFieldNames.setSortable(true);
     this.allFieldNames.setSortOrder(SortOrder.ASCENDING);
-    this.allFieldNames.addListSelectionListener(this);
+    this.allFieldNames.addListSelectionListener(event -> updateEnabledState());
+
     final JScrollPane layerPathsScrollPane = new JScrollPane(this.allFieldNames);
     layerPathsScrollPane.setPreferredSize(new Dimension(350, 400));
     this.fieldsPanel.add(layerPathsScrollPane);
@@ -139,22 +142,22 @@ public class FieldNamesSetPanel extends ValueField
     fieldsToolBar.setMinimumSize(new Dimension(25, 25));
     this.fieldsPanel.add(fieldsToolBar);
 
-    this.addButton = fieldsToolBar.addButtonTitleIcon("default", "Add", "add", this,
-      "actionAddSelected");
-    this.removeButton = fieldsToolBar.addButtonTitleIcon("default", "Remove", "delete", this,
-      "actionRemoveSelected");
+    this.addButton = fieldsToolBar.addButtonTitleIcon("default", "Add", "add",
+      () -> actionAddSelected());
+    this.removeButton = fieldsToolBar.addButtonTitleIcon("default", "Remove", "delete",
+      () -> actionRemoveSelected());
 
-    this.moveUpButton = fieldsToolBar.addButtonTitleIcon("default", "Move Up", "arrow_up", this,
-      "actionMoveSelectedUp");
+    this.moveUpButton = fieldsToolBar.addButtonTitleIcon("default", "Move Up", "arrow_up",
+      () -> actionMoveSelectedUp());
     this.moveDownButton = fieldsToolBar.addButtonTitleIcon("default", "Move Down", "arrow_down",
-      this, "actionMoveSelectedDown");
+      () -> actionMoveSelectedDown());
 
     this.selectedFieldNamesModel = new ArrayListModel<String>();
 
     this.selectedFieldNames = new JXList(this.selectedFieldNamesModel);
     this.selectedFieldNames.setAutoCreateRowSorter(false);
     this.selectedFieldNames.setSortable(false);
-    this.selectedFieldNames.addListSelectionListener(this);
+    this.selectedFieldNames.addListSelectionListener(event -> updateEnabledState());
     this.selectedFieldNames.setDragEnabled(true);
     this.selectedFieldNames.setDropMode(DropMode.INSERT);
     this.selectedFieldNames
@@ -170,33 +173,33 @@ public class FieldNamesSetPanel extends ValueField
       new CollectionRowFilter(this.selectedFieldNamesModel, false), this.allFieldNamesTextFilter));
     this.allFieldNames.setRowFilter(allFieldNamesFilter);
 
-    setFieldNamesSetName("All");
+    final String fieldNamesSetName = layer.getFieldNamesSetName();
+    setFieldNamesSetName(fieldNamesSetName);
     updateEnabledState();
   }
 
-  public void actionAdd() {
+  private void actionAdd() {
     final String name = JOptionPane.showInputDialog(SwingUtil.getActiveWindow(),
       "Enter the name of the new field set.", "Add Field Set", JOptionPane.PLAIN_MESSAGE);
     if (Property.hasValue(name)) {
       boolean found = false;
-      for (int i = 0; i < this.fieldNamesSetNames.size(); i++) {
-        final String name2 = this.fieldNamesSetNames.get(i);
+      for (int i = 0; i < this.fieldNamesSetNamesModel.size(); i++) {
+        final String name2 = this.fieldNamesSetNamesModel.get(i);
         if (name2.equalsIgnoreCase(name)) {
-          this.fieldNamesSetNames.set(i, name);
+          this.fieldNamesSetNamesModel.set(i, name);
           final List<String> names = this.fieldNamesSets.remove(name2);
           this.fieldNamesSets.put(name, names);
           found = true;
         }
       }
       if (!found) {
-        this.fieldNamesSetNames.add(name);
-        this.fieldNamesSetNamesModel.addElement(name);
+        this.fieldNamesSetNamesModel.add(name);
         this.fieldNamesSetNamesModel.setSelectedItem(name);
       }
     }
   }
 
-  public void actionAddSelected() {
+  private void actionAddSelected() {
     this.selectedFieldNames.clearSelection();
     for (final Object selectedValue : this.allFieldNames.getSelectedValues()) {
       final String fieldName = (String)selectedValue;
@@ -211,27 +214,26 @@ public class FieldNamesSetPanel extends ValueField
     updateEnabledState();
   }
 
-  public void actionDelete() {
-    final String fieldSetName = (String)this.fieldNamesSetNamesModel.getSelectedItem();
+  private void actionDelete() {
+    final String fieldSetName = this.fieldNamesSetNamesModel.getSelectedItem();
     if ("All".equalsIgnoreCase(fieldSetName)) {
       Toolkit.getDefaultToolkit().beep();
     } else {
       final int result = JOptionPane.showConfirmDialog(SwingUtil.getActiveWindow(),
         "Delete field set " + fieldSetName + ".", "Delete Field Set", JOptionPane.YES_NO_OPTION);
       if (result == JOptionPane.OK_OPTION) {
-        for (int i = 0; i < this.fieldNamesSetNames.size(); i++) {
-          final String name2 = this.fieldNamesSetNames.get(i);
+        for (int i = 0; i < this.fieldNamesSetNamesModel.size(); i++) {
+          final String name2 = this.fieldNamesSetNamesModel.get(i);
           if (fieldSetName.equalsIgnoreCase(name2)) {
-            this.fieldNamesSetNames.remove(i);
+            this.fieldNamesSetNamesModel.remove(i);
             this.fieldNamesSets.remove(name2);
-            this.fieldNamesSetNamesModel.removeElement(name2);
           }
         }
       }
     }
   }
 
-  public void actionMoveSelectedDown() {
+  private void actionMoveSelectedDown() {
     final int selectedIndex = this.selectedFieldNames.getSelectedIndex();
     if (selectedIndex < this.selectedFieldNamesModel.getSize() - 1) {
       final int newStartIndex = selectedIndex + 1;
@@ -248,7 +250,7 @@ public class FieldNamesSetPanel extends ValueField
     updateEnabledState();
   }
 
-  public void actionMoveSelectedUp() {
+  private void actionMoveSelectedUp() {
     final int selectedIndex = this.selectedFieldNames.getSelectedIndex();
     if (selectedIndex > 0) {
       final int newStartIndex = selectedIndex - 1;
@@ -279,7 +281,7 @@ public class FieldNamesSetPanel extends ValueField
     }
   }
 
-  public void actionRemoveSelected() {
+  private void actionRemoveSelected() {
     final Object[] selectedValues = this.selectedFieldNames.getSelectedValues();
     this.selectedFieldNamesModel.removeAll(selectedValues);
     for (final Object selectedValue : selectedValues) {
@@ -290,29 +292,30 @@ public class FieldNamesSetPanel extends ValueField
     updateEnabledState();
   }
 
-  public void actionRename() {
-    final String fieldSetName = (String)this.fieldNamesSetNamesModel.getSelectedItem();
-    if ("All".equalsIgnoreCase(fieldSetName)) {
+  private void actionRename() {
+    final String oldName = this.fieldNamesSetNamesModel.getSelectedItem();
+    if ("All".equalsIgnoreCase(oldName)) {
       Toolkit.getDefaultToolkit().beep();
     } else {
-      final String name = (String)JOptionPane.showInputDialog(SwingUtil.getActiveWindow(),
+      final String newName = (String)JOptionPane.showInputDialog(SwingUtil.getActiveWindow(),
         "Enter the new name for the field set.", "Rename Field Set", JOptionPane.PLAIN_MESSAGE,
-        null, null, fieldSetName);
-      if (Property.hasValue(name)) {
-        for (int i = 0; i < this.fieldNamesSetNames.size(); i++) {
-          final String name2 = this.fieldNamesSetNames.get(i);
-          if (fieldSetName.equalsIgnoreCase(name2)) {
-            this.fieldNamesSetNames.set(i, name);
-            this.fieldNamesSets.put(name, new ArrayList<>(this.selectedFieldNamesModel));
-            this.fieldNamesSetNamesModel.removeElement(name2);
-            this.fieldNamesSetNamesModel.insertElementAt(name, i);
-            this.fieldNamesSetNamesModel.setSelectedItem(name);
-          } else if (name2.equalsIgnoreCase(name)) {
+        null, null, oldName);
+      if (Property.hasValue(newName)) {
+        int index = -1;
+        for (int i = 0; i < this.fieldNamesSetNamesModel.size(); i++) {
+          final String name = this.fieldNamesSetNamesModel.get(i);
+          if (oldName.equalsIgnoreCase(name)) {
+            index = i;
+          } else if (newName.equalsIgnoreCase(name)) {
             JOptionPane.showMessageDialog(SwingUtil.getActiveWindow(),
-              "New name already in use: " + name2, "Rename Field Set", JOptionPane.ERROR_MESSAGE);
+              "New name already in use: " + newName, "Rename Field Set", JOptionPane.ERROR_MESSAGE);
             return;
           }
         }
+
+        this.fieldNamesSets.put(newName, new ArrayList<>(this.selectedFieldNamesModel));
+        this.fieldNamesSetNamesModel.set(index, newName);
+        this.fieldNamesSetNamesModel.setSelectedItem(newName);
       }
     }
   }
@@ -340,20 +343,25 @@ public class FieldNamesSetPanel extends ValueField
       final String fieldName = this.selectedFieldNamesModel.get(i);
       namesToSave.add(fieldName);
     }
-    final String fieldSetName = (String)this.fieldNamesSetNamesModel.getSelectedItem();
-    this.fieldNamesSets.put(fieldSetName, namesToSave);
+    final String fieldNamesSetName = (String)this.fieldNamesSetNamesField.getSelectedItem();
+    this.fieldNamesSets.put(fieldNamesSetName, namesToSave);
 
     final Map<String, List<String>> fieldNamesSets = new LinkedHashMap<>();
-    for (final String fieldNamesSetName : this.fieldNamesSetNames) {
-      final List<String> fieldNames = this.fieldNamesSets.get(fieldNamesSetName);
+    for (final String name : this.fieldNamesSetNamesModel) {
+      final List<String> fieldNames = this.fieldNamesSets.get(name);
       if (Property.hasValue(fieldNames)) {
-        fieldNamesSets.put(fieldNamesSetName, fieldNames);
+        fieldNamesSets.put(name, fieldNames);
       }
     }
     this.layer.setFieldNamesSets(fieldNamesSets);
   }
 
-  public void setFieldNamesSetName(final String fieldNamesSetName) {
+  public void setFieldNamesSetName(String fieldNamesSetName) {
+    if (Property.isEmpty(fieldNamesSetName)
+      || !this.fieldNamesSetNamesModel.contains(fieldNamesSetName)) {
+      fieldNamesSetName = "All";
+    }
+    super.setFieldValue(fieldNamesSetName);
     final List<String> allFieldNames = new ArrayList<>(this.layer.getFieldNames());
     List<String> selectedFieldNames = this.fieldNamesSets.get(fieldNamesSetName);
     if (selectedFieldNames == null) {
@@ -366,6 +374,7 @@ public class FieldNamesSetPanel extends ValueField
     this.allFieldNames.setRowFilter(this.allFieldNamesTextFilter);
     this.selectedFieldNamesModel.setAll(selectedFieldNames);
     this.selectedFieldNames.setSelectedIndex(0);
+    this.fieldNamesSetNamesField.setSelectedItem(fieldNamesSetName);
   }
 
   @SuppressWarnings("rawtypes")
@@ -378,7 +387,7 @@ public class FieldNamesSetPanel extends ValueField
   }
 
   public void updateEnabledState() {
-    final String fieldSetName = (String)this.fieldNamesSetNamesModel.getSelectedItem();
+    final String fieldSetName = this.fieldNamesSetNamesModel.getSelectedItem();
     final boolean editEnabled = !"All".equalsIgnoreCase(fieldSetName);
     this.deleteButton.setEnabled(editEnabled);
     this.renameButton.setEnabled(editEnabled);
@@ -387,14 +396,9 @@ public class FieldNamesSetPanel extends ValueField
     final int selectedFieldIndex = this.selectedFieldNames.getSelectedIndex();
     final int lastSelectedFieldIndex = this.selectedFieldNames.getSelectionModel()
       .getMaxSelectionIndex();
-    this.removeButton.setEnabled(selectedFieldIndex > -1);
+    this.removeButton.setEnabled(editEnabled && selectedFieldIndex > -1);
     this.moveUpButton.setEnabled(selectedFieldIndex > 0);
     this.moveDownButton.setEnabled(selectedFieldIndex > -1
       && lastSelectedFieldIndex < this.selectedFieldNamesModel.getSize() - 1);
-  }
-
-  @Override
-  public void valueChanged(final ListSelectionEvent event) {
-    updateEnabledState();
   }
 }

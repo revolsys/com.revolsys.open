@@ -36,13 +36,13 @@ public class RecordStoreRecordWriter extends AbstractRecordWriter {
   }
 
   @Override
-  public Record createRecord() {
+  public Record newRecord() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return this.recordStore.newRecord(recordDefinition);
   }
 
   @Override
-  public Record createRecord(final Map<String, ? extends Object> values) {
+  public Record newRecord(final Map<String, ? extends Object> values) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return this.recordStore.newRecord(recordDefinition, values);
   }

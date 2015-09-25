@@ -42,16 +42,6 @@ public interface RecordWriter extends Writer<Record> {
     return ioFactoryRegistry.isFileExtensionSupported(RecordWriterFactory.class, fileNameExtension);
   }
 
-  default Record createRecord() {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    return new ArrayRecord(recordDefinition);
-  }
-
-  default Record createRecord(final Map<String, ? extends Object> values) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    return new ArrayRecord(recordDefinition, values);
-  }
-
   default RecordDefinition getRecordDefinition() {
     return null;
   }
@@ -66,6 +56,16 @@ public interface RecordWriter extends Writer<Record> {
 
   default boolean isWriteNulls() {
     return BooleanStringConverter.isTrue(getProperty(IoConstants.WRITE_NULLS));
+  }
+
+  default Record newRecord() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return new ArrayRecord(recordDefinition);
+  }
+
+  default Record newRecord(final Map<String, ? extends Object> values) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return new ArrayRecord(recordDefinition, values);
   }
 
   default void setIndent(final boolean indent) {

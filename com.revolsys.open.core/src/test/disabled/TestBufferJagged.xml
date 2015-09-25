@@ -1,6 +1,6 @@
 <run>
 <precisionModel type="FLOATING"/>
-<resultMatcher>com.revolsys.jtstest.testrunner.BufferResultMatcher</resultMatcher>
+<resultMatcher>com.revolsys.geometry.test.testrunner.BufferResultMatcher</resultMatcher>
 
 <case>
 

@@ -49,11 +49,15 @@ public final class Property {
     }
   }
 
+  public static void addListener(final Object source, final PropertyChangeListener listener) {
+    addListener(source, (Object)listener);
+  }
+
   public static void addListener(final Object source, final String propertyName,
     final Object listener) {
-    if (source != null) {
-      final PropertyChangeListener propertyChangeListener = getPropertyChangeListener(listener);
-      if (propertyChangeListener != null) {
+    final PropertyChangeListener propertyChangeListener = getPropertyChangeListener(listener);
+    if (propertyChangeListener != null) {
+      if (source != null) {
         final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
         if (propertyChangeSupport == null) {
           if (source instanceof JComponent) {
@@ -65,6 +69,11 @@ public final class Property {
         }
       }
     }
+  }
+
+  public static void addListener(final Object source, final String propertyName,
+    final PropertyChangeListener listener) {
+    addListener(source, propertyName, (Object)listener);
   }
 
   public static PropertyDescriptor descriptor(final Class<?> beanClass, final String name) {

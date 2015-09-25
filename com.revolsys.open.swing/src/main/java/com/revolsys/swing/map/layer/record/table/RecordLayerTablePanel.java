@@ -45,13 +45,14 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.ConsumerAction;
-import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.InvokeMethodEnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.action.enablecheck.OrEnableCheck;
 import com.revolsys.swing.map.action.AddFileLayerAction;
+import com.revolsys.swing.map.form.FieldNamesSetPanel;
 import com.revolsys.swing.map.form.RecordLayerForm;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Project;
@@ -249,21 +250,26 @@ public class RecordLayerTablePanel extends TablePanel
     Property.addListener(layer, this);
   }
 
-  public void actionShowFieldSetsMenu() {
+  private void actionShowFieldSetsMenu() {
     final JPopupMenu menu = new JPopupMenu();
 
-    final JMenuItem editMenuItem = InvokeMethodAction.createMenuItem("Edit Field Sets",
-      "fields_filter_edit", this.layer, "showProperties", "Field Sets");
+    final JMenuItem editMenuItem = RunnableAction.createMenuItem("Edit Field Sets",
+      "fields_filter_edit", () -> {
+        final String fieldNamesSetName = FieldNamesSetPanel.showDialog(this.layer);
+        if (Property.hasValue(fieldNamesSetName)) {
+          this.tableModel.setFieldNamesSetName(fieldNamesSetName);
+        }
+      });
     menu.add(editMenuItem);
 
     menu.addSeparator();
 
     final AbstractRecordLayer layer = getLayer();
-    final String fieldSetName = layer.getFieldNamesSetName();
-    for (final String fieldSetName2 : layer.getFieldNamesSetNames()) {
-      final JCheckBoxMenuItem menuItem = InvokeMethodAction.createCheckBoxMenuItem(fieldSetName2,
-        layer, "setFieldNamesSetName", fieldSetName2);
-      if (fieldSetName2.equalsIgnoreCase(fieldSetName)) {
+    final String selectedFieldSetName = layer.getFieldNamesSetName();
+    for (final String fieldSetName : layer.getFieldNamesSetNames()) {
+      final JCheckBoxMenuItem menuItem = RunnableAction.createCheckBoxMenuItem(fieldSetName,
+        () -> this.tableModel.setFieldNamesSetName(fieldSetName));
+      if (fieldSetName.equalsIgnoreCase(selectedFieldSetName)) {
         menuItem.setSelected(true);
       }
       menu.add(menuItem);

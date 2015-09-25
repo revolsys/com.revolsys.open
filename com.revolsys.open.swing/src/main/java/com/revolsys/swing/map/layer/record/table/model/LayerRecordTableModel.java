@@ -1,19 +1,37 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
+import java.awt.Dimension;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.util.List;
 import java.util.Map;
+
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import com.revolsys.equals.Equals;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.swing.field.ArrayListComboBoxModel;
+import com.revolsys.swing.field.ComboBox;
+import com.revolsys.swing.map.form.FieldNamesSetPanel;
 import com.revolsys.swing.map.form.RecordLayerForm;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.table.predicate.FormAllFieldsErrorPredicate;
+import com.revolsys.swing.map.layer.record.table.predicate.FormAllFieldsModifiedPredicate;
+import com.revolsys.swing.table.BaseJTable;
+import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
+import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
 public class LayerRecordTableModel extends AbstractSingleRecordTableModel
@@ -21,19 +39,48 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
 
   private static final long serialVersionUID = 1L;
 
+  public static TablePanel newTablePanel(final RecordLayerForm form) {
+    final LayerRecordTableModel tableModel = new LayerRecordTableModel(form);
+
+    return tableModel.newTablePanel();
+  }
+
   private final Reference<RecordLayerForm> form;
 
   private final AbstractRecordLayer layer;
 
   private LayerRecord record;
 
+  private final ComboBox<String> fieldNamesSetNamesField;
+
   public LayerRecordTableModel(final RecordLayerForm form) {
     super(form.getRecordDefinition(), true);
     this.form = new WeakReference<>(form);
     this.layer = form.getLayer();
     this.record = form.getRecord();
-    setFieldNames(this.layer.getFieldNamesSet());
+
+    final List<String> fieldNamesSetNames = this.layer.getFieldNamesSetNames();
+    this.fieldNamesSetNamesField = ComboBox.newComboBox("fieldNamesSetName", fieldNamesSetNames);
+    int maxLength = 3;
+    for (final String name : fieldNamesSetNames) {
+      maxLength = Math.max(maxLength, name.length());
+    }
+    this.fieldNamesSetNamesField
+      .setMaximumSize(new Dimension(Math.max(300, maxLength * 11 + 40), 22));
+
+    final String fieldNamesSetName = this.layer.getFieldNamesSetName();
+    this.fieldNamesSetNamesField.setSelectedItem(fieldNamesSetName);
+
+    Property.addListener(this.fieldNamesSetNamesField, "fieldNamesSetName", this);
     Property.addListener(this.layer, this);
+
+    refreshFieldNames();
+  }
+
+  @Override
+  public void dispose() {
+    super.dispose();
+    Property.removeListener(this.layer, this);
   }
 
   @Override
@@ -129,11 +176,55 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
     return !Equals.equal(originalValue, value);
   }
 
+  public TablePanel newTablePanel() {
+    final RecordLayerForm form = this.form.get();
+    final BaseJTable table = AbstractSingleRecordTableModel.createTable(this);
+
+    FormAllFieldsModifiedPredicate.add(form, table);
+    FormAllFieldsErrorPredicate.add(form, table);
+
+    final TableColumnModel columnModel = table.getColumnModel();
+    for (int i = 0; i < columnModel.getColumnCount(); i++) {
+      final TableColumn column = columnModel.getColumn(i);
+      if (i == 2) {
+        final TableCellEditor cellEditor = column.getCellEditor();
+        cellEditor.addCellEditorListener(form);
+      }
+    }
+
+    final TablePanel tablePanel = new TablePanel(table);
+    final ToolBar toolBar = tablePanel.getToolBar();
+
+    toolBar.addComponent("default", this.fieldNamesSetNamesField);
+
+    toolBar.addButtonTitleIcon("default", "Edit Field Sets", "fields_filter_edit", () -> {
+      final String fieldNamesSetName = FieldNamesSetPanel.showDialog(this.layer);
+      if (Property.hasValue(fieldNamesSetName)) {
+        this.fieldNamesSetNamesField.setFieldValue(fieldNamesSetName);
+      }
+    });
+
+    int maxHeight = 500;
+    for (final GraphicsDevice device : GraphicsEnvironment.getLocalGraphicsEnvironment()
+      .getScreenDevices()) {
+      final GraphicsConfiguration graphicsConfiguration = device.getDefaultConfiguration();
+      final Rectangle bounds = graphicsConfiguration.getBounds();
+
+      maxHeight = Math.min(bounds.height, maxHeight);
+    }
+    final int preferredHeight = Math.min(maxHeight, (this.getRowCount() + 1) * 20);
+    tablePanel.setMinimumSize(new Dimension(100, preferredHeight));
+    tablePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, maxHeight));
+    tablePanel.setPreferredSize(new Dimension(800, preferredHeight));
+
+    return tablePanel;
+  }
+
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();
+    final String propertyName = event.getPropertyName();
     if (source == this.record) {
-      final String propertyName = event.getPropertyName();
       final RecordDefinition recordDefinition = getRecordDefinition();
       final int index = recordDefinition.getFieldIndex(propertyName);
       if (index > -1) {
@@ -142,7 +233,26 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
         } catch (final Throwable t) {
         }
       }
+    } else if (source == this.layer) {
+      if ("fieldNamesSets".equals(propertyName)) {
+        refreshFieldNames();
+      }
+    } else if (source == this.fieldNamesSetNamesField) {
+      final String fieldNamesSetName = this.fieldNamesSetNamesField.getFieldValue();
+      final List<String> fieldNames = this.layer.getFieldNamesSet(fieldNamesSetName);
+      if (fieldNames != null) {
+        setFieldNames(fieldNames);
+      }
     }
+  }
+
+  protected void refreshFieldNames() {
+    final ArrayListComboBoxModel<String> model = this.fieldNamesSetNamesField.getComboBoxModel();
+    final List<String> fieldNamesSetNames = this.layer.getFieldNamesSetNames();
+    model.setAll(fieldNamesSetNames);
+
+    setFieldNames(this.layer.getFieldNamesSet());
+
   }
 
   public void removeListener() {

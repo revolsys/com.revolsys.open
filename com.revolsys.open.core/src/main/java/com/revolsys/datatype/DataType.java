@@ -3,7 +3,6 @@ package com.revolsys.datatype;
 import com.revolsys.converter.string.StringConverter;
 
 public interface DataType {
-
   <V> StringConverter<V> getConverter();
 
   Class<?> getJavaClass();

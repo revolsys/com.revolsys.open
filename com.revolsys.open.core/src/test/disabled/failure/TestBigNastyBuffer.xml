@@ -8,7 +8,7 @@
  by email on the 22 Dec 2006.
   </desc>
   <precisionModel type='FLOATING'/>
-  <resultMatcher>com.revolsys.jtstest.testrunner.BufferResultMatcher</resultMatcher>
+  <resultMatcher>com.revolsys.geometry.test.testrunner.BufferResultMatcher</resultMatcher>
 <case>
   <desc>
   	Big Bad Nasty buffer

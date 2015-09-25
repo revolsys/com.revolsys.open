@@ -3,7 +3,6 @@ package com.revolsys.converter.string;
 import java.sql.Timestamp;
 
 import com.revolsys.util.DateUtil;
-import com.revolsys.util.Property;
 
 public class TimestampStringConverter implements StringConverter<Timestamp> {
   public TimestampStringConverter() {
@@ -26,11 +25,7 @@ public class TimestampStringConverter implements StringConverter<Timestamp> {
 
   @Override
   public Timestamp toObject(final String string) {
-    if (Property.hasValue(string)) {
-      return DateUtil.getTimestamp(string);
-    } else {
-      return null;
-    }
+    return DateUtil.getTimestamp(string);
   }
 
   @Override

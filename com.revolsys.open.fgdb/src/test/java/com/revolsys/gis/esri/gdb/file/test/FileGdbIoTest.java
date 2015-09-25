@@ -12,6 +12,7 @@ import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.test.model.TestUtil;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStoreFactory;
 import com.revolsys.io.FileUtil;
@@ -20,7 +21,6 @@ import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.io.test.IoTestSuite;
-import com.revolsys.jts.test.geometry.TestUtil;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 
