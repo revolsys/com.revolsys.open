@@ -16,12 +16,12 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import com.revolsys.format.xml.SimpleXmlProcessorContext;
-import com.revolsys.format.xml.StaxUtils;
-import com.revolsys.format.xml.XmlProcessorContext;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.gis.wms.capabilities.Parser;
 import com.revolsys.gis.wms.capabilities.WmsCapabilities;
+import com.revolsys.record.io.format.xml.SimpleXmlProcessorContext;
+import com.revolsys.record.io.format.xml.StaxUtils;
+import com.revolsys.record.io.format.xml.XmlProcessorContext;
 import com.revolsys.util.Base64;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.UrlUtil;

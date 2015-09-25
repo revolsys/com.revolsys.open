@@ -32,13 +32,13 @@
  */
 package com.revolsys.geometry.test.geomop;
 
-import com.revolsys.format.wkt.EWktWriter;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.operation.overlay.OverlayOp;
 import com.revolsys.geometry.operation.overlay.validate.OverlayResultValidator;
 import com.revolsys.geometry.test.testrunner.GeometryResult;
 import com.revolsys.geometry.test.testrunner.Result;
+import com.revolsys.record.io.format.wkt.EWktWriter;
 
 /**
  * A {@link GeometryOperation} which validates the result of overlay operations.

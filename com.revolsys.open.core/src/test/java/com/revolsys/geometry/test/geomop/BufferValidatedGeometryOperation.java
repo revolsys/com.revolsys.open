@@ -32,13 +32,13 @@
  */
 package com.revolsys.geometry.test.geomop;
 
-import com.revolsys.format.wkt.EWktWriter;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.operation.buffer.validate.BufferResultValidator;
 import com.revolsys.geometry.test.testrunner.GeometryResult;
 import com.revolsys.geometry.test.testrunner.Result;
 import com.revolsys.geometry.util.Assert;
+import com.revolsys.record.io.format.wkt.EWktWriter;
 
 /**
  * A {@link GeometryOperation} which validates the results of the

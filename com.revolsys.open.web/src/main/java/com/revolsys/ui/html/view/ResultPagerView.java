@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.revolsys.collection.ResultPager;
-import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.UrlUtil;
 

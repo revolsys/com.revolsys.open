@@ -8,8 +8,8 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 
-import com.revolsys.format.csv.Csv;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.format.csv.Csv;
 
 public class RecordTransferable implements Transferable {
   public static final DataFlavor DATA_OBJECT_FLAVOR = new DataFlavor(Record.class, "Data Object");

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.view.BootstrapUtil;
 import com.revolsys.ui.html.view.MenuElement;
 import com.revolsys.ui.model.Menu;

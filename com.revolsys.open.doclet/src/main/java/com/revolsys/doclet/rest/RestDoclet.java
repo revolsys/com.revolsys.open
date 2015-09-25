@@ -10,8 +10,8 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import com.revolsys.doclet.DocletUtil;
-import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.io.FileUtil;
+import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.HtmlUtil;
 import com.sun.javadoc.AnnotationDesc;

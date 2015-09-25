@@ -14,8 +14,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import com.revolsys.collection.map.IntHashMap;
-import com.revolsys.format.csv.CsvIterator;
-import com.revolsys.format.json.Json;
 import com.revolsys.geometry.cs.AngularUnit;
 import com.revolsys.geometry.cs.Area;
 import com.revolsys.geometry.cs.Authority;
@@ -31,6 +29,8 @@ import com.revolsys.geometry.cs.Spheroid;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.FileUtil;
+import com.revolsys.record.io.format.csv.CsvIterator;
+import com.revolsys.record.io.format.json.Json;
 import com.revolsys.util.Property;
 
 public final class EpsgCoordinateSystems {

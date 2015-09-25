@@ -226,7 +226,7 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
   public void propertyChange(final PropertyChangeEvent event) {
     if (isInitialized() && event.getSource() == getProject()) {
       if (event.getPropertyName().equals("viewBoundingBox")) {
-        // final BoundingBox boundingBox = (BoundingBox)event.getNewValue();
+        // final WmsBoundingBox boundingBox = (WmsBoundingBox)event.getNewValue();
         // if (isInitialized()) {
         // updateCachedFields();
         // } else {

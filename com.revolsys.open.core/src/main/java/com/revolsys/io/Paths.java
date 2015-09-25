@@ -193,7 +193,7 @@ public class Paths {
     return parent.resolve(newFileName);
   }
 
-  public static Writer writer(final Path path) {
+  public static Writer newWriter(final Path path) {
     try {
       return Files.newBufferedWriter(path, StandardCharsets.UTF_8);
     } catch (final IOException e) {

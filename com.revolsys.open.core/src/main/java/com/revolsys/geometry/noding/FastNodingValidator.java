@@ -35,11 +35,11 @@ package com.revolsys.geometry.noding;
 import java.util.Collection;
 import java.util.List;
 
-import com.revolsys.format.wkt.EWktWriter;
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.TopologyException;
+import com.revolsys.record.io.format.wkt.EWktWriter;
 
 /**
  * Validates that a collection of {@link SegmentString}s is correctly noded.

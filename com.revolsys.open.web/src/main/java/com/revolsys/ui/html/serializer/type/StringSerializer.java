@@ -2,7 +2,7 @@ package com.revolsys.ui.html.serializer.type;
 
 import java.io.IOException;
 
-import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.record.io.format.xml.XmlWriter;
 
 /**
  * Serialize an object as a string..

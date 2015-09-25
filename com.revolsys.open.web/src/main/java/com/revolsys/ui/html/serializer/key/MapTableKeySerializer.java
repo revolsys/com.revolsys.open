@@ -4,8 +4,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.revolsys.format.json.Json;
-import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.record.io.format.json.Json;
+import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;

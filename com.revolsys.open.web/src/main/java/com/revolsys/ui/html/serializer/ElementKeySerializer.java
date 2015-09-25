@@ -2,7 +2,7 @@ package com.revolsys.ui.html.serializer;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.serializer.key.AbstractKeySerializer;
 import com.revolsys.util.JavaBeanUtil;
 

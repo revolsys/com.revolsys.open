@@ -1,6 +1,5 @@
 package com.revolsys.geometry.test.old.algorithm;
 
-import com.revolsys.format.wkt.EWktWriter;
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.model.Geometry;
@@ -10,6 +9,7 @@ import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.geometry.wkb.WKTReader;
+import com.revolsys.record.io.format.wkt.EWktWriter;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;

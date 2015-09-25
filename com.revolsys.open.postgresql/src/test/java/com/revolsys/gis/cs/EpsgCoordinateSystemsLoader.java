@@ -16,8 +16,6 @@ import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
-import com.revolsys.format.csv.CsvWriter;
-import com.revolsys.format.json.Json;
 import com.revolsys.geometry.cs.AngularUnit;
 import com.revolsys.geometry.cs.Axis;
 import com.revolsys.geometry.cs.LinearUnit;
@@ -26,6 +24,8 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordStoreFactoryRegistry;
+import com.revolsys.record.io.format.csv.CsvWriter;
+import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordStore;
 

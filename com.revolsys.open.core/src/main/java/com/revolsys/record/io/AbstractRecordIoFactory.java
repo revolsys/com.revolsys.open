@@ -6,8 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.format.directory.DirectoryRecordStore;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
+import com.revolsys.record.io.format.directory.DirectoryRecordStore;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.Resource;
 

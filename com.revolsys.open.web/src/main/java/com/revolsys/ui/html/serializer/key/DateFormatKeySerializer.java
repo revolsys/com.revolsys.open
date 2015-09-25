@@ -2,7 +2,7 @@ package com.revolsys.ui.html.serializer.key;
 
 import java.util.Date;
 
-import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.JavaBeanUtil;
 

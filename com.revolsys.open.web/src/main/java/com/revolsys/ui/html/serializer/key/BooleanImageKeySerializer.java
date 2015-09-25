@@ -1,6 +1,6 @@
 package com.revolsys.ui.html.serializer.key;
 
-import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.JavaBeanUtil;

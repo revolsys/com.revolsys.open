@@ -11,9 +11,9 @@ import java.util.TreeMap;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.format.json.Json;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;

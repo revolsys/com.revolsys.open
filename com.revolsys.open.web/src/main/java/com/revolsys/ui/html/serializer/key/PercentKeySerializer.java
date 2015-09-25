@@ -2,7 +2,7 @@ package com.revolsys.ui.html.serializer.key;
 
 import java.math.BigDecimal;
 
-import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.MathUtil;
 

@@ -13,7 +13,7 @@ import java.util.Set;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.format.xml.XmlMapIoFactory;
+import com.revolsys.record.io.format.xml.XmlMapIoFactory;
 import com.revolsys.spring.resource.DefaultResourceLoader;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;

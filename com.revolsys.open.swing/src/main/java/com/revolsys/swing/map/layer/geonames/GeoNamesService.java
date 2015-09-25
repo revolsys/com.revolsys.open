@@ -11,7 +11,6 @@ import java.util.Map;
 import javax.measure.unit.SI;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.format.json.JsonParser;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -19,6 +18,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.io.PathName;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.util.UrlUtil;

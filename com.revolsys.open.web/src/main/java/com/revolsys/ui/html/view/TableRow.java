@@ -1,6 +1,6 @@
 package com.revolsys.ui.html.view;
 
-import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
 
 public class TableRow extends ElementContainer {

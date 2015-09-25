@@ -312,9 +312,9 @@ public class RobustLineIntersector extends LineIntersector {
     final double normY = (intMinY + intMaxY) / 2.0;
 
     /*
-     * // equilavalent code using more modular but slower method BoundingBox
-     * env0 = new BoundingBoxDoubleGf(n00, n01); BoundingBox env1 = new
-     * BoundingBoxDoubleGf(n10, n11); BoundingBox intEnv =
+     * // equilavalent code using more modular but slower method WmsBoundingBox
+     * env0 = new BoundingBoxDoubleGf(n00, n01); WmsBoundingBox env1 = new
+     * BoundingBoxDoubleGf(n10, n11); WmsBoundingBox intEnv =
      * env0.intersection(env1); Point intMidPt = intEnv.centre(); normPt.getX()
      * = intMidPt.getX(); normPt.getY() = intMidPt.getY();
      */

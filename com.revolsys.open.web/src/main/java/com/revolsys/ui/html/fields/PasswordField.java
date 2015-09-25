@@ -1,6 +1,6 @@
 package com.revolsys.ui.html.fields;
 
-import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 

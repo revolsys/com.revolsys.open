@@ -15,7 +15,7 @@
  */
 package com.revolsys.ui.html.view;
 
-import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.serializer.LabelValueListSerializer;
 import com.revolsys.ui.model.LabelValueListModel;
 

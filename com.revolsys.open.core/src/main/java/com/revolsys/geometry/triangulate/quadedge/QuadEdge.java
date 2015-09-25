@@ -33,10 +33,10 @@
 
 package com.revolsys.geometry.triangulate.quadedge;
 
-import com.revolsys.format.wkt.EWktWriter;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
+import com.revolsys.record.io.format.wkt.EWktWriter;
 
 /**
  * A class that represents the edge data structure which implements the quadedge algebra.

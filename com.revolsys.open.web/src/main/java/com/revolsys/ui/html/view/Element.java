@@ -20,8 +20,8 @@ import java.io.Writer;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.io.FileUtil;
+import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.ui.html.form.Form;
 

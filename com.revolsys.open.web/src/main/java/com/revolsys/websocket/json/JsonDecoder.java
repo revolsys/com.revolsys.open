@@ -5,7 +5,7 @@ import java.util.Map;
 import javax.websocket.Decoder;
 import javax.websocket.EndpointConfig;
 
-import com.revolsys.format.json.Json;
+import com.revolsys.record.io.format.json.Json;
 
 public class JsonDecoder implements Decoder.Text<Map<String, Object>> {
 

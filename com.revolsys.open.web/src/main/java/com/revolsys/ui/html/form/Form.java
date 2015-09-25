@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.util.UrlPathHelper;
 
-import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.view.ElementContainer;
 import com.revolsys.util.HtmlUtil;

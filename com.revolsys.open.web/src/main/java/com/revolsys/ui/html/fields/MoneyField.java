@@ -15,7 +15,7 @@
  */
 package com.revolsys.ui.html.fields;
 
-import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.record.io.format.xml.XmlWriter;
 
 public class MoneyField extends BigDecimalField {
   public MoneyField(final String name, final boolean required) {

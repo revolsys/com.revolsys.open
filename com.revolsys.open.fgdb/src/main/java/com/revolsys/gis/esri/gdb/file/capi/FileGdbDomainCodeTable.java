@@ -9,11 +9,11 @@ import javax.swing.JComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.format.esri.gdb.xml.model.CodedValueDomain;
-import com.revolsys.format.esri.gdb.xml.model.Domain;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.io.format.esri.gdb.xml.model.CodedValueDomain;
+import com.revolsys.record.io.format.esri.gdb.xml.model.Domain;
 import com.revolsys.util.CompareUtil;
 
 public class FileGdbDomainCodeTable implements CodeTable {

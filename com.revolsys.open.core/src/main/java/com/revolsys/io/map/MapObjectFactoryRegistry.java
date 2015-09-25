@@ -12,8 +12,8 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.format.json.Json;
-import com.revolsys.format.json.JsonParser;
+import com.revolsys.record.io.format.json.Json;
+import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;

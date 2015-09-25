@@ -1,9 +1,9 @@
 package com.revolsys.gis.converter.string;
 
 import com.revolsys.converter.string.StringConverter;
-import com.revolsys.format.wkt.EWktWriter;
-import com.revolsys.format.wkt.WktParser;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.record.io.format.wkt.EWktWriter;
+import com.revolsys.record.io.format.wkt.WktParser;
 
 public class GeometryStringConverter implements StringConverter<Geometry> {
   @Override

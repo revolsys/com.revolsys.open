@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.web.config.Menu;
 import com.revolsys.ui.web.config.MenuItem;
 import com.revolsys.ui.web.config.WebUiContext;

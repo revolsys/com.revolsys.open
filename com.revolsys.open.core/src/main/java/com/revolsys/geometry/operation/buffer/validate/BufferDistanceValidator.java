@@ -35,7 +35,6 @@ package com.revolsys.geometry.operation.buffer.validate;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.format.wkt.EWktWriter;
 import com.revolsys.geometry.algorithm.distance.DiscreteHausdorffDistance;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
@@ -45,6 +44,7 @@ import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.operation.distance.DistanceWithPoints;
+import com.revolsys.record.io.format.wkt.EWktWriter;
 
 /**
  * Validates that a given buffer curve lies an appropriate distance

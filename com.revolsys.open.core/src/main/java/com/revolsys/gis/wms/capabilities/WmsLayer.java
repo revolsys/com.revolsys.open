@@ -10,7 +10,7 @@ public class WmsLayer {
 
   private List<AuthorityUrl> authorityUrls = new ArrayList<AuthorityUrl>();
 
-  private List<BoundingBox> boundingBoxes = new ArrayList<BoundingBox>();
+  private List<WmsBoundingBox> boundingBoxes = new ArrayList<WmsBoundingBox>();
 
   private int cascaded;
 
@@ -59,8 +59,8 @@ public class WmsLayer {
 
   }
 
-  public void addBoundingBox(final BoundingBox boundingBox) {
-    this.boundingBoxes.add(boundingBox);
+  public void addBoundingBox(final WmsBoundingBox wmsBoundingBox) {
+    this.boundingBoxes.add(wmsBoundingBox);
   }
 
   public void addDataUrl(final FormatUrl dataUrl) {
@@ -118,7 +118,7 @@ public class WmsLayer {
     return this.authorityUrls;
   }
 
-  public List<BoundingBox> getBoundingBoxes() {
+  public List<WmsBoundingBox> getBoundingBoxes() {
     return this.boundingBoxes;
   }
 
@@ -218,7 +218,7 @@ public class WmsLayer {
     this.authorityUrls = authorityUrls;
   }
 
-  public void setBoundingBoxes(final List<BoundingBox> boundingBoxes) {
+  public void setBoundingBoxes(final List<WmsBoundingBox> boundingBoxes) {
     this.boundingBoxes = boundingBoxes;
   }
 

@@ -8,9 +8,9 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 
-import com.revolsys.format.csv.Csv;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.format.csv.Csv;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class RecordReaderTransferable implements Transferable {

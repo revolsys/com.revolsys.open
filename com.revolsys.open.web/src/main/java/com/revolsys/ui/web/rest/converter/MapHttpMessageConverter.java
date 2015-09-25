@@ -16,11 +16,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
-import com.revolsys.format.json.JsonParser;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
+import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {

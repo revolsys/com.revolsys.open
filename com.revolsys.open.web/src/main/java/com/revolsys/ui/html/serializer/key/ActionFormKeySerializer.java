@@ -16,8 +16,8 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.security.access.expression.ExpressionUtils;
 
-import com.revolsys.format.html.Aria;
-import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.record.io.format.html.Aria;
+import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.builder.HtmlUiBuilderAware;
 import com.revolsys.ui.html.view.BootstrapUtil;

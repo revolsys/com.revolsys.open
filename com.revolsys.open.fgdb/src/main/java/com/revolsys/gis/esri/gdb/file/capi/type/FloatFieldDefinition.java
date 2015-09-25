@@ -2,10 +2,10 @@ package com.revolsys.gis.esri.gdb.file.capi.type;
 
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.format.esri.gdb.xml.model.Field;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.format.esri.gdb.xml.model.Field;
 
 public class FloatFieldDefinition extends AbstractFileGdbFieldDefinition {
   public FloatFieldDefinition(final Field field) {

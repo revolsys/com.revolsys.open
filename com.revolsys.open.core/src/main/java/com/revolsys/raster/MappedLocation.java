@@ -103,7 +103,7 @@ public class MappedLocation extends AbstractPropertyChangeObject implements MapS
   }
 
   // public Point getSourcePoint(final WarpFilter filter,
-  // final BoundingBox boundingBox) {
+  // final WmsBoundingBox boundingBox) {
   // if (filter == null) {
   // return null;
   // } else {

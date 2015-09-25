@@ -1,6 +1,6 @@
 package com.revolsys.ui.html.view;
 
-import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.model.Menu;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;

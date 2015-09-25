@@ -33,9 +33,9 @@
 
 package com.revolsys.geometry.triangulate;
 
-import com.revolsys.format.wkt.EWktWriter;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.record.io.format.wkt.EWktWriter;
 
 /**
  * Indicates a failure during constraint enforcement.

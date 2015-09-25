@@ -29,7 +29,6 @@ import org.gdal.osr.SpatialReference;
 import org.gdal.osr.osr;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.format.json.Json;
 import com.revolsys.gdal.raster.GdalImageFactory;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
@@ -40,6 +39,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.ExceptionUtil;

@@ -32,13 +32,10 @@
  */
 package com.revolsys.geometry.algorithm;
 
-/**
- * @version 1.7
- */
-import com.revolsys.format.wkt.EWktWriter;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.Assert;
+import com.revolsys.record.io.format.wkt.EWktWriter;
 
 /**
  * A <code>LineIntersector</code> is an algorithm that can both test whether

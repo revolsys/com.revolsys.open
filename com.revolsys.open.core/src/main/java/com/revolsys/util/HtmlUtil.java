@@ -22,7 +22,7 @@ import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.record.io.format.xml.XmlWriter;
 
 public final class HtmlUtil {
   public static final String HTML_NS_PREFIX = "";

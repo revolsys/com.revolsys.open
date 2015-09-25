@@ -10,9 +10,9 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.format.tsv.Tsv;
-import com.revolsys.format.tsv.TsvWriter;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.format.tsv.Tsv;
+import com.revolsys.record.io.format.tsv.TsvWriter;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Counter;
 import com.revolsys.util.LongCounter;

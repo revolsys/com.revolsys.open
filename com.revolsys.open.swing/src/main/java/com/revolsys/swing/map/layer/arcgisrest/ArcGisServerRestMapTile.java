@@ -2,7 +2,7 @@ package com.revolsys.swing.map.layer.arcgisrest;
 
 import java.awt.image.BufferedImage;
 
-import com.revolsys.format.esri.map.rest.MapServer;
+import com.revolsys.record.io.format.esri.map.rest.MapServer;
 import com.revolsys.swing.map.layer.MapTile;
 
 public class ArcGisServerRestMapTile extends MapTile {

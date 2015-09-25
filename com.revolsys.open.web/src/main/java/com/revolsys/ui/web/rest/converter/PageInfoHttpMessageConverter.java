@@ -22,15 +22,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.format.xml.XmlConstants;
-import com.revolsys.format.xml.XmlWriter;
-import com.revolsys.format.xml.wadl.WadlConstants;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.NamedLinkedHashMap;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
+import com.revolsys.record.io.format.xml.XmlConstants;
+import com.revolsys.record.io.format.xml.XmlWriter;
+import com.revolsys.record.io.format.xml.wadl.WadlConstants;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.model.DocInfo;
 import com.revolsys.ui.model.PageInfo;

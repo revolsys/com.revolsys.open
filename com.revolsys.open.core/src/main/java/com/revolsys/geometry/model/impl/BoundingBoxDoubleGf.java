@@ -46,7 +46,6 @@ import org.apache.commons.beanutils.Converter;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.equals.NumberEquals;
-import com.revolsys.format.wkt.WktParser;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
@@ -61,6 +60,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
@@ -1111,7 +1111,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
    * Computes the intersection of two {@link BoundingBoxDoubleGf}s.
    *
    * @param env the envelope to intersect with
-   * @return a new BoundingBox representing the intersection of the envelopes (this will be
+   * @return a new WmsBoundingBox representing the intersection of the envelopes (this will be
    * the null envelope if either argument is null, or they do not intersect
    */
   @Override
@@ -1275,7 +1275,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   }
 
   /**
-   * <p>Create a new BoundingBox by moving the min/max x coordinates by xDisplacement and
+   * <p>Create a new WmsBoundingBox by moving the min/max x coordinates by xDisplacement and
    * the min/max y coordinates by yDisplacement. If the bounding box is null or the xDisplacement
    * and yDisplacement are 0 then this bounding box will be returned.</p>
    *

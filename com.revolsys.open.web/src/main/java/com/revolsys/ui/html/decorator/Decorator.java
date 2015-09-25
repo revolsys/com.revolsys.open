@@ -15,7 +15,7 @@
  */
 package com.revolsys.ui.html.decorator;
 
-import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.view.Element;
 
 public interface Decorator {

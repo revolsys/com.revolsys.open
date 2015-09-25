@@ -41,10 +41,10 @@ import org.springframework.web.servlet.HandlerMapping;
 
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.format.json.Json;
-import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.io.Reader;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.format.json.Json;
+import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.InvokeMethodAfterCommit;

@@ -1,6 +1,6 @@
 package com.revolsys.ui.html.serializer.type;
 
-import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.record.io.format.xml.XmlWriter;
 
 /**
  * Serialize a date with just the date fields.

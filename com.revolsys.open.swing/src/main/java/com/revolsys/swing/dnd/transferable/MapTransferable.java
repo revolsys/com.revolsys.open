@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
-import com.revolsys.format.csv.Csv;
+import com.revolsys.record.io.format.csv.Csv;
 
 public class MapTransferable implements Transferable {
   public static final DataFlavor MAP_FLAVOR = new DataFlavor(Map.class, "Java Map");

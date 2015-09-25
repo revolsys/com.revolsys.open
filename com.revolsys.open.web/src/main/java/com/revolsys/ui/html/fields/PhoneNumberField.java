@@ -17,7 +17,7 @@ package com.revolsys.ui.html.fields;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.revolsys.format.xml.XmlWriter;
+import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.domain.PhoneNumber;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.HtmlUtil;

@@ -42,7 +42,6 @@ import java.util.List;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.NumberEquals;
-import com.revolsys.format.wkt.EWktWriter;
 import com.revolsys.geometry.algorithm.Centroid;
 import com.revolsys.geometry.algorithm.ConvexHull;
 import com.revolsys.geometry.algorithm.InteriorPointArea;
@@ -74,6 +73,7 @@ import com.revolsys.geometry.operation.predicate.RectangleIntersects;
 import com.revolsys.geometry.operation.relate.RelateOp;
 import com.revolsys.geometry.operation.union.UnaryUnionOp;
 import com.revolsys.geometry.operation.valid.IsValidOp;
+import com.revolsys.record.io.format.wkt.EWktWriter;
 
 /**
  * A representation of a planar, linear vector geometry.
@@ -1111,7 +1111,7 @@ public abstract class AbstractGeometry implements Geometry {
    * boundingBox frequently should cache the return value.
    *
    *@return the boundingBox of this <code>Geometry</code>.
-   *@return an empty BoundingBox if this Geometry is empty
+   *@return an empty WmsBoundingBox if this Geometry is empty
    */
   @Override
   public BoundingBox getBoundingBox() {

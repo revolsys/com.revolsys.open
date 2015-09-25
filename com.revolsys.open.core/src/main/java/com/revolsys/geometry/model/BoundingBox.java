@@ -24,23 +24,23 @@ public interface BoundingBox extends Emptyable {
   boolean coveredBy(double... bounds);
 
   /**
-   * Tests if the <code>BoundingBox other</code>
-   * lies wholely inside this <code>BoundingBox</code> (inclusive of the boundary).
+   * Tests if the <code>WmsBoundingBox other</code>
+   * lies wholely inside this <code>WmsBoundingBox</code> (inclusive of the boundary).
    *
-   *@param  other the <code>BoundingBox</code> to check
-   *@return true if this <code>BoundingBox</code> covers the <code>other</code>
+   *@param  other the <code>WmsBoundingBox</code> to check
+   *@return true if this <code>WmsBoundingBox</code> covers the <code>other</code>
    */
   boolean covers(BoundingBox other);
 
   /**
    * Tests if the given point lies in or on the envelope.
    *
-   *@param  x  the x-coordinate of the point which this <code>BoundingBox</code> is
+   *@param  x  the x-coordinate of the point which this <code>WmsBoundingBox</code> is
    *      being checked for containing
-   *@param  y  the y-coordinate of the point which this <code>BoundingBox</code> is
+   *@param  y  the y-coordinate of the point which this <code>WmsBoundingBox</code> is
    *      being checked for containing
    *@return    <code>true</code> if <code>(x, y)</code> lies in the interior or
-   *      on the boundary of this <code>BoundingBox</code>.
+   *      on the boundary of this <code>WmsBoundingBox</code>.
    */
   boolean covers(double x, double y);
 
@@ -49,16 +49,16 @@ public interface BoundingBox extends Emptyable {
   /**
    * Tests if the given point lies in or on the envelope.
    *
-   *@param  p  the point which this <code>BoundingBox</code> is
+   *@param  p  the point which this <code>WmsBoundingBox</code> is
    *      being checked for containing
    *@return    <code>true</code> if the point lies in the interior or
-   *      on the boundary of this <code>BoundingBox</code>.
+   *      on the boundary of this <code>WmsBoundingBox</code>.
    */
   boolean covers(Point point);
 
   /**
    * Computes the distance between this and another
-   * <code>BoundingBox</code>.
+   * <code>WmsBoundingBox</code>.
    * The distance between overlapping BoundingBoxs is 0.  Otherwise, the
    * distance is the Euclidean distance between the closest points.
    */
@@ -125,7 +125,7 @@ public interface BoundingBox extends Emptyable {
   /**
    *  Returns the difference between the maximum and minimum y values.
    *
-   *@return    max y - min y, or 0 if this is a null <code>BoundingBox</code>
+   *@return    max y - min y, or 0 if this is a null <code>WmsBoundingBox</code>
    */
   double getHeight();
 
@@ -139,16 +139,16 @@ public interface BoundingBox extends Emptyable {
   <Q extends Quantity> double getMaximum(int axisIndex, final Unit convertUnit);
 
   /**
-   *  Returns the <code>BoundingBox</code>s maximum x-value. min x > max x
-   *  indicates that this is a null <code>BoundingBox</code>.
+   *  Returns the <code>WmsBoundingBox</code>s maximum x-value. min x > max x
+   *  indicates that this is a null <code>WmsBoundingBox</code>.
    *
    *@return    the maximum x-coordinate
    */
   double getMaxX();
 
   /**
-   *  Returns the <code>BoundingBox</code>s maximum y-value. min y > max y
-   *  indicates that this is a null <code>BoundingBox</code>.
+   *  Returns the <code>WmsBoundingBox</code>s maximum y-value. min y > max y
+   *  indicates that this is a null <code>WmsBoundingBox</code>.
    *
    *@return    the maximum y-coordinate
    */
@@ -162,16 +162,16 @@ public interface BoundingBox extends Emptyable {
   <Q extends Quantity> double getMinimum(int axisIndex, final Unit convertUnit);
 
   /**
-   *  Returns the <code>BoundingBox</code>s minimum x-value. min x > max x
-   *  indicates that this is a null <code>BoundingBox</code>.
+   *  Returns the <code>WmsBoundingBox</code>s minimum x-value. min x > max x
+   *  indicates that this is a null <code>WmsBoundingBox</code>.
    *
    *@return    the minimum x-coordinate
    */
   double getMinX();
 
   /**
-   *  Returns the <code>BoundingBox</code>s minimum y-value. min y > max y
-   *  indicates that this is a null <code>BoundingBox</code>.
+   *  Returns the <code>WmsBoundingBox</code>s minimum y-value. min y > max y
+   *  indicates that this is a null <code>WmsBoundingBox</code>.
    *
    *@return    the minimum y-coordinate
    */
@@ -186,55 +186,55 @@ public interface BoundingBox extends Emptyable {
   /**
    *  Returns the difference between the maximum and minimum x values.
    *
-   *@return    max x - min x, or 0 if this is a null <code>BoundingBox</code>
+   *@return    max x - min x, or 0 if this is a null <code>WmsBoundingBox</code>
    */
   double getWidth();
 
   Measure<Length> getWidthLength();
 
   /**
-   * Computes the intersection of two {@link BoundingBox}s.
+   * Computes the intersection of two {@link WmsBoundingBox}s.
    *
    * @param env the envelope to intersect with
-   * @return a new BoundingBox representing the intersection of the envelopes (this will be
+   * @return a new WmsBoundingBox representing the intersection of the envelopes (this will be
    * the null envelope if either argument is null, or they do not intersect
    */
   BoundingBox intersection(BoundingBox env);
 
   /**
    *  Check if the region defined by <code>other</code>
-   *  overlaps (intersects) the region of this <code>BoundingBox</code>.
+   *  overlaps (intersects) the region of this <code>WmsBoundingBox</code>.
    *
-   *@param  other  the <code>BoundingBox</code> which this <code>BoundingBox</code> is
+   *@param  other  the <code>WmsBoundingBox</code> which this <code>WmsBoundingBox</code> is
    *          being checked for overlapping
-   *@return        <code>true</code> if the <code>BoundingBox</code>s overlap
+   *@return        <code>true</code> if the <code>WmsBoundingBox</code>s overlap
    */
   boolean intersects(BoundingBox other);
 
   /**
    *  Check if the point <code>(x, y)</code>
-   *  overlaps (lies inside) the region of this <code>BoundingBox</code>.
+   *  overlaps (lies inside) the region of this <code>WmsBoundingBox</code>.
    *
    *@param  x  the x-ordinate of the point
    *@param  y  the y-ordinate of the point
-   *@return        <code>true</code> if the point overlaps this <code>BoundingBox</code>
+   *@return        <code>true</code> if the point overlaps this <code>WmsBoundingBox</code>
    */
   boolean intersects(double x, double y);
 
   /**
    *  Check if the line <code>(x1, y1) -> (x2, y2)</code>
-   *  intersects (covered by or crosses) the region of this <code>BoundingBox</code>.
+   *  intersects (covered by or crosses) the region of this <code>WmsBoundingBox</code>.
    *
-   *@return        <code>true</code> if the line overlaps this <code>BoundingBox</code>
+   *@return        <code>true</code> if the line overlaps this <code>WmsBoundingBox</code>
    */
   boolean intersects(double x1, double y1, double x2, double y2);
 
   /**
    *  Check if the point <code>p</code>
-   *  overlaps (lies inside) the region of this <code>BoundingBox</code>.
+   *  overlaps (lies inside) the region of this <code>WmsBoundingBox</code>.
    *
    *@param  p  the <code>Coordinate</code> to be tested
-   *@return        <code>true</code> if the point overlaps this <code>BoundingBox</code>
+   *@return        <code>true</code> if the point overlaps this <code>WmsBoundingBox</code>
    */
   boolean intersects(Point p);
 

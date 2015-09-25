@@ -741,7 +741,7 @@ public interface Geometry
    * envelope frequently should cache the return value.
    *
    *@return the envelope of this <code>Geometry</code>.
-   *@return an empty BoundingBox if this Geometry is empty
+   *@return an empty WmsBoundingBox if this Geometry is empty
    */
   BoundingBox getBoundingBox();
 
