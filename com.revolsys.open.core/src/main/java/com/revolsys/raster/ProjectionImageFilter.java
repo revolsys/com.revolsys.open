@@ -10,10 +10,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
 public class ProjectionImageFilter extends WholeImageFilter {
-
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private final BoundingBox destBoundingBox;
