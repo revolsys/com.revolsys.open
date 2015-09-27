@@ -96,50 +96,54 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
 
   @SuppressWarnings("unchecked")
   public <V extends RecordStoreSchemaElement> V getElement(final PathName path) {
-    RecordStoreSchemaElement childElement = this.elementsByPath.get(path);
-    if (childElement == null) {
-      if (path != null) {
-        final PathName schemaPath = getPathName();
-        if (schemaPath.equals(path)) {
-          return (V)this;
-        } else {
-          if (schemaPath.isAncestorOf(path)) {
-            childElement = this.elementsByPath.get(path);
-            if (childElement == null) {
-              synchronized (this) {
-                refreshIfNeeded();
-                childElement = this.elementsByPath.get(path);
-                if (childElement == null || childElement instanceof NonExistingSchemaElement) {
-                  return null;
-                } else if (childElement.equalPath(path)) {
-                  return (V)childElement;
-                } else if (childElement instanceof RecordStoreSchema) {
-                  final RecordStoreSchema childSchema = (RecordStoreSchema)childElement;
-                  return childSchema.getElement(path);
-                } else {
-                  return null;
-                }
-              }
-            } else if (childElement instanceof NonExistingSchemaElement) {
-              return null;
-            } else {
-              return (V)childElement;
-            }
+    if (path == null) {
+      return null;
+    } else {
+      RecordStoreSchemaElement childElement = this.elementsByPath.get(path);
+      if (childElement == null) {
+        if (path != null) {
+          final PathName schemaPath = getPathName();
+          if (schemaPath.equals(path)) {
+            return (V)this;
           } else {
-            final RecordStoreSchema parent = getSchema();
-            if (parent != null) {
-              return parent.getElement(path);
+            if (schemaPath.isAncestorOf(path)) {
+              childElement = this.elementsByPath.get(path);
+              if (childElement == null) {
+                synchronized (this) {
+                  refreshIfNeeded();
+                  childElement = this.elementsByPath.get(path);
+                  if (childElement == null || childElement instanceof NonExistingSchemaElement) {
+                    return null;
+                  } else if (childElement.equalPath(path)) {
+                    return (V)childElement;
+                  } else if (childElement instanceof RecordStoreSchema) {
+                    final RecordStoreSchema childSchema = (RecordStoreSchema)childElement;
+                    return childSchema.getElement(path);
+                  } else {
+                    return null;
+                  }
+                }
+              } else if (childElement instanceof NonExistingSchemaElement) {
+                return null;
+              } else {
+                return (V)childElement;
+              }
+            } else {
+              final RecordStoreSchema parent = getSchema();
+              if (parent != null) {
+                return parent.getElement(path);
+              }
             }
           }
         }
+        if (this.recordStore == null) {
+          return null;
+        } else {
+          return (V)this.recordStore.getRootSchema();
+        }
       }
-      if (this.recordStore == null) {
-        return null;
-      } else {
-        return (V)this.recordStore.getRootSchema();
-      }
+      return (V)childElement;
     }
-    return (V)childElement;
   }
 
   public List<RecordStoreSchemaElement> getElements() {

@@ -882,10 +882,10 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         try {
           if (!isClosed()) {
             if (this.geodatabase != null) {
-              final Writer<Record> writer = getSharedAttribute("writer");
+              final Writer<Record> writer = getThreadProperty("writer");
               if (writer != null) {
                 writer.close();
-                setSharedAttribute("writer", null);
+                setThreadProperty("writer", null);
               }
               closeEnumRows();
               closeTables();
@@ -1205,10 +1205,10 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   @Override
   public FileGdbWriter getWriter() {
     synchronized (this.apiSync) {
-      FileGdbWriter writer = getSharedAttribute("writer");
+      FileGdbWriter writer = getThreadProperty("writer");
       if (writer == null) {
         writer = createWriter();
-        setSharedAttribute("writer", writer);
+        setThreadProperty("writer", writer);
       }
       return writer;
     }
