@@ -190,11 +190,6 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public String getString(final Object name) {
-    return this.recordStore.getString(name);
-  }
-
-  @Override
   public PlatformTransactionManager getTransactionManager() {
     return this.recordStore.getTransactionManager();
   }
@@ -253,26 +248,6 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   @Override
   public ResultPager<Record> page(final Query query) {
     return this.recordStore.page(query);
-  }
-
-  @Override
-  public RecordReader query(final List<?> queries) {
-    return this.recordStore.query(queries);
-  }
-
-  @Override
-  public RecordReader query(final Query... queries) {
-    return this.recordStore.query(queries);
-  }
-
-  @Override
-  public RecordReader query(final String path) {
-    return this.recordStore.query(path);
-  }
-
-  @Override
-  public Record queryFirst(final Query query) {
-    return this.recordStore.queryFirst(query);
   }
 
   @Override

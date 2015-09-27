@@ -5,6 +5,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.revolsys.record.schema.RecordDefinition;
+
 public abstract class AbstractRecord extends AbstractMap<String, Object>
   implements Record, Cloneable {
 
@@ -16,9 +18,9 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   @Override
   public AbstractRecord clone() {
     try {
-      final AbstractRecord newObject = (AbstractRecord)super.clone();
-      newObject.setState(RecordState.New);
-      return newObject;
+      final AbstractRecord record = (AbstractRecord)super.clone();
+      record.setState(RecordState.New);
+      return record;
     } catch (final CloneNotSupportedException e) {
       throw new RuntimeException("Unable to clone", e);
     }
@@ -26,9 +28,11 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
 
   @Override
   public Set<Entry<String, Object>> entrySet() {
-    final Set<Entry<String, Object>> entries = new LinkedHashSet<Entry<String, Object>>();
-    for (int i = 0; i < this.getRecordDefinition().getFieldCount(); i++) {
-      entries.add(new RecordMapEntry(this, i));
+    final Set<Entry<String, Object>> entries = new LinkedHashSet<>();
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
+      final RecordMapEntry entry = new RecordMapEntry(this, i);
+      entries.add(entry);
     }
     return entries;
   }

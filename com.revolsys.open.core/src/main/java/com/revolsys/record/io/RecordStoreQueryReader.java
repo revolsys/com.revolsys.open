@@ -15,9 +15,9 @@ import com.revolsys.record.Record;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.SqlCondition;
 import com.revolsys.record.query.functions.F;
-import com.revolsys.record.schema.AbstractRecordStore;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
 public class RecordStoreQueryReader extends IteratorReader<Record>implements RecordReader {
@@ -26,7 +26,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record>implements Rec
 
   private List<Query> queries = new ArrayList<Query>();
 
-  private AbstractRecordStore recordStore;
+  private RecordStore recordStore;
 
   private List<String> typePaths;
 
@@ -36,7 +36,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record>implements Rec
     setIterator(new RecordStoreMultipleQueryIterator(this));
   }
 
-  public RecordStoreQueryReader(final AbstractRecordStore recordStore) {
+  public RecordStoreQueryReader(final RecordStore recordStore) {
     this();
     setRecordStore(recordStore);
   }
@@ -87,7 +87,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record>implements Rec
     return iterator().getRecordDefinition();
   }
 
-  public AbstractRecordStore getRecordStore() {
+  public RecordStore getRecordStore() {
     return this.recordStore;
   }
 
@@ -142,7 +142,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record>implements Rec
     }
   }
 
-  public void setRecordStore(final AbstractRecordStore recordStore) {
+  public void setRecordStore(final RecordStore recordStore) {
     this.recordStore = recordStore;
   }
 

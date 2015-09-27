@@ -3,11 +3,13 @@ package com.revolsys.properties;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.PreDestroy;
 
+import com.revolsys.collection.map.ThreadSharedAttributes;
 import com.revolsys.util.Property;
 
 public interface ObjectWithProperties {
@@ -65,6 +67,22 @@ public interface ObjectWithProperties {
     }
   }
 
+  default Map<String, Object> getThreadProperties() {
+    Map<String, Object> properties = ThreadSharedAttributes.getAttribute(this);
+    if (properties == null) {
+      properties = new HashMap<String, Object>();
+      ThreadSharedAttributes.setAttribute(this, properties);
+    }
+    return properties;
+  }
+
+  @SuppressWarnings("unchecked")
+  default <T> T getThreadProperty(final String name) {
+    final Map<String, Object> properties = getThreadProperties();
+    final T value = (T)properties.get(name);
+    return value;
+  }
+
   default boolean hasProperty(final String name) {
     final Object value = getProperty(name);
     return Property.hasValue(value);
@@ -96,5 +114,10 @@ public interface ObjectWithProperties {
 
   default void setPropertyWeak(final String name, final Object value) {
     setProperty(name, new WeakReference<Object>(value));
+  }
+
+  default void setThreadProperty(final String name, final Object value) {
+    final Map<String, Object> properties = getThreadProperties();
+    properties.put(name, value);
   }
 }

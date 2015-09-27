@@ -1,11 +1,9 @@
 package com.revolsys.record.schema;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -16,40 +14,21 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.springframework.transaction.PlatformTransactionManager;
-
-import com.revolsys.collection.ListResultPager;
-import com.revolsys.collection.ResultPager;
-import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.collection.map.ThreadSharedAttributes;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
-import com.revolsys.io.Writer;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.ArrayRecordFactory;
-import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;
-import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordStoreExtension;
-import com.revolsys.record.io.RecordStoreQueryReader;
 import com.revolsys.record.property.RecordDefinitionProperty;
-import com.revolsys.record.query.Q;
-import com.revolsys.record.query.Query;
-import com.revolsys.record.query.QueryValue;
-import com.revolsys.transaction.Propagation;
-import com.revolsys.transaction.Transaction;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordStore extends BaseObjectWithProperties implements RecordStore {
-
   private Map<String, List<String>> codeTableColumNames = new HashMap<String, List<String>>();
 
   private final Map<String, CodeTable> columnToTableMap = new HashMap<String, CodeTable>();
@@ -127,19 +106,12 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     }
   }
 
-  @Override
-  public void addCodeTables(final Collection<CodeTable> codeTables) {
-    for (final CodeTable codeTable : codeTables) {
-      addCodeTable(codeTable);
-    }
-  }
-
   protected void addRecordDefinition(final RecordDefinition recordDefinition) {
     final String idFieldName = recordDefinition.getIdFieldName();
     for (final FieldDefinition field : recordDefinition.getFields()) {
       final String fieldName = field.getName();
       if (!fieldName.equals(idFieldName)) {
-        final CodeTable codeTable = this.columnToTableMap.get(fieldName);
+        final CodeTable codeTable = getCodeTableByFieldName(fieldName);
         if (codeTable != null) {
           field.setCodeTable(codeTable);
         }
@@ -170,26 +142,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  public void addStatistic(final String statisticName, final Record object) {
-    if (this.statistics != null) {
-      this.statistics.add(statisticName, object);
-    }
-  }
-
-  @Override
-  public void addStatistic(final String statisticName, final String typePath, final int count) {
-    if (this.statistics != null) {
-      this.statistics.add(statisticName, typePath, count);
-    }
-  }
-
-  @Override
-  public void appendQueryValue(final Query query, final StringBuilder sql,
-    final QueryValue queryValue) {
-    queryValue.appendDefaultSql(query, this, sql);
-  }
-
-  @Override
   @PreDestroy
   public void close() {
     try {
@@ -213,117 +165,9 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  public Record copy(final Record record) {
-    final RecordDefinition recordDefinition = getRecordDefinition(record.getRecordDefinition());
-    final RecordFactory recordFactory = this.recordFactory;
-    if (recordDefinition == null || recordFactory == null) {
-      return null;
-    } else {
-      final Record copy = recordFactory.createRecord(recordDefinition);
-      copy.setValues(record);
-      copy.setIdValue(null);
-      return copy;
-    }
-  }
-
-  public AbstractIterator<Record> createIterator(final Query query,
-    Map<String, Object> properties) {
-    if (properties == null) {
-      properties = Collections.emptyMap();
-    }
-    if (query == null) {
-      return null;
-    } else {
-      final RecordDefinition recordDefinition = query.getRecordDefinition();
-      if (recordDefinition != null) {
-        final RecordStoreIteratorFactory recordDefinitionIteratorFactory = recordDefinition
-          .getProperty("recordStoreIteratorFactory");
-        if (recordDefinitionIteratorFactory != null) {
-          final AbstractIterator<Record> iterator = recordDefinitionIteratorFactory
-            .createIterator(this, query, properties);
-          if (iterator != null) {
-            return iterator;
-          }
-        }
-      }
-      return this.iteratorFactory.createIterator(this, query, properties);
-    }
-  }
-
-  @Override
-  public Query createQuery(final String typePath, final String whereClause,
-    final BoundingBoxDoubleGf boundingBox) {
-    throw new UnsupportedOperationException();
-  }
-
-  public RecordStoreQueryReader createReader() {
-    final RecordStoreQueryReader reader = new RecordStoreQueryReader(this);
-    return reader;
-  }
-
-  @Override
-  public Transaction createTransaction(final Propagation propagation) {
-    final PlatformTransactionManager transactionManager = getTransactionManager();
-    return new Transaction(transactionManager, propagation);
-  }
-
-  @Override
-  public Record createWithId(final RecordDefinition recordDefinition) {
-    final Record record = newRecord(recordDefinition);
-    if (record != null) {
-      final String idFieldName = recordDefinition.getIdFieldName();
-      if (Property.hasValue(idFieldName)) {
-        final PathName typePath = recordDefinition.getPathName();
-        final Object id = createPrimaryIdValue(typePath);
-        record.setIdValue(id);
-      }
-    }
-    return record;
-  }
-
-  @Override
-  public int delete(final Query query) {
-    int i = 0;
-    final RecordReader reader = query(query);
-    try {
-      for (final Record object : reader) {
-        delete(object);
-        i++;
-      }
-    } finally {
-      reader.close();
-    }
-    return i;
-  }
-
-  @Override
-  public void delete(final Record object) {
-    throw new UnsupportedOperationException("Delete not supported");
-  }
-
-  @Override
-  public void deleteAll(final Collection<Record> objects) {
-    for (final Record object : objects) {
-      delete(object);
-    }
-  }
-
-  protected RecordDefinition findRecordDefinition(final PathName typePath) {
-    final PathName schemaName = typePath.getParent();
-    final RecordStoreSchema schema = getSchema(schemaName);
-    if (schema == null) {
-      return null;
-    } else {
-      return schema.findRecordDefinition(typePath);
-    }
-  }
-
-  @Override
   public CodeTable getCodeTableByFieldName(final String columnName) {
     final CodeTable codeTable = this.columnToTableMap.get(columnName);
-
     return codeTable;
-
   }
 
   @Override
@@ -349,6 +193,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     return this.geometryFactory;
   }
 
+  @Override
   public RecordStoreIteratorFactory getIteratorFactory() {
     return this.iteratorFactory;
   }
@@ -356,13 +201,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   @Override
   public String getLabel() {
     return this.label;
-  }
-
-  @Override
-  public RecordDefinition getRecordDefinition(final RecordDefinition objectRecordDefinition) {
-    final String typePath = objectRecordDefinition.getPath();
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    return recordDefinition;
   }
 
   @Override
@@ -379,43 +217,9 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     return this.rootSchema;
   }
 
-  @SuppressWarnings("unchecked")
-  protected <T> T getSharedAttribute(final String name) {
-    final Map<String, Object> sharedAttributes = getSharedAttributes();
-    final T value = (T)sharedAttributes.get(name);
-    return value;
-  }
-
-  protected Map<String, Object> getSharedAttributes() {
-    Map<String, Object> sharedAttributes = ThreadSharedAttributes.getAttribute(this);
-    if (sharedAttributes == null) {
-      sharedAttributes = new HashMap<String, Object>();
-      ThreadSharedAttributes.setAttribute(this, sharedAttributes);
-    }
-    return sharedAttributes;
-  }
-
   @Override
   public StatisticsMap getStatistics() {
     return this.statistics;
-  }
-
-  @Override
-  public Statistics getStatistics(final String name) {
-    return this.statistics.getStatistics(name);
-  }
-
-  public String getString(final Object name) {
-    if (name instanceof String) {
-      return (String)name;
-    } else {
-      return String.valueOf(name.toString());
-    }
-  }
-
-  @Override
-  public PlatformTransactionManager getTransactionManager() {
-    return null;
   }
 
   @Override
@@ -429,36 +233,9 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  public Writer<Record> getWriter() {
-    return createWriter();
-  }
-
-  @Override
-  public Writer<Record> getWriter(final boolean throwExceptions) {
-    return getWriter();
-  }
-
-  @Override
   @PostConstruct
   public void initialize() {
-    this.statistics.connect();
-  }
-
-  @Override
-  public void insert(final Record record) {
-    throw new UnsupportedOperationException("Insert not supported");
-  }
-
-  @Override
-  public void insertAll(final Collection<Record> objects) {
-    for (final Record object : objects) {
-      insert(object);
-    }
-  }
-
-  @Override
-  public boolean isEditable(final String typePath) {
-    return false;
+    getStatistics().connect();
   }
 
   @Override
@@ -466,143 +243,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     return this.loadFullSchema;
   }
 
-  @Override
-  public final Record load(final String typePath, final Identifier id) {
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    if (recordDefinition == null || id == null) {
-      return null;
-    } else {
-      final List<Object> values = id.getValues();
-      final List<String> idFieldNames = recordDefinition.getIdFieldNames();
-      if (idFieldNames.isEmpty()) {
-        throw new IllegalArgumentException(typePath + " does not have a primary key");
-      } else if (values.size() != idFieldNames.size()) {
-        throw new IllegalArgumentException(
-          id + " not a valid id for " + typePath + " requires " + idFieldNames);
-      } else {
-        final Query query = new Query(recordDefinition);
-        for (int i = 0; i < idFieldNames.size(); i++) {
-          final String name = idFieldNames.get(i);
-          final Object value = values.get(i);
-          final FieldDefinition field = recordDefinition.getField(name);
-          query.and(Q.equal(field, value));
-        }
-        return queryFirst(query);
-      }
-    }
-  }
-
-  @Override
-  public Record load(final String typePath, final Object... id) {
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    if (recordDefinition == null) {
-      return null;
-    } else {
-      final List<String> idFieldNames = recordDefinition.getIdFieldNames();
-      if (idFieldNames.isEmpty()) {
-        throw new IllegalArgumentException(typePath + " does not have a primary key");
-      } else if (id.length != idFieldNames.size()) {
-        throw new IllegalArgumentException(
-          Arrays.toString(id) + " not a valid id for " + typePath + " requires " + idFieldNames);
-      } else {
-        final Query query = new Query(recordDefinition);
-        for (int i = 0; i < idFieldNames.size(); i++) {
-          final String name = idFieldNames.get(i);
-          final Object value = id[i];
-          final FieldDefinition field = recordDefinition.getField(name);
-          query.and(Q.equal(field, value));
-        }
-        return queryFirst(query);
-      }
-    }
-  }
-
-  @Override
-  public Record lock(final String typePath, final Object id) {
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    if (recordDefinition == null) {
-      return null;
-    } else {
-      final String idFieldName = recordDefinition.getIdFieldName();
-      if (idFieldName == null) {
-        throw new IllegalArgumentException(typePath + " does not have a primary key");
-      } else {
-        final Query query = Query.equal(recordDefinition, idFieldName, id);
-        query.setLockResults(true);
-        return queryFirst(query);
-      }
-    }
-  }
-
-  @Override
-  public Record newRecord(final PathName typePath) {
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    if (recordDefinition == null) {
-      return null;
-    } else {
-      return newRecord(recordDefinition);
-    }
-  }
-
-  @Override
-  public Record newRecord(final RecordDefinition objectRecordDefinition) {
-    final RecordDefinition recordDefinition = getRecordDefinition(objectRecordDefinition);
-    final RecordFactory recordFactory = this.recordFactory;
-    if (recordDefinition == null || recordFactory == null) {
-      return null;
-    } else {
-      final Record object = recordFactory.createRecord(recordDefinition);
-      return object;
-    }
-  }
-
   protected void obtainConnected() {
-  }
-
-  @Override
-  public ResultPager<Record> page(final Query query) {
-    final RecordReader results = query(query);
-    final List<Record> list = results.read();
-    return new ListResultPager<Record>(list);
-  }
-
-  @Override
-  public RecordReader query(final List<?> queries) {
-    final List<Query> queryObjects = new ArrayList<Query>();
-    for (final Object queryObject : queries) {
-      if (queryObject instanceof Query) {
-        final Query query = (Query)queryObject;
-        queryObjects.add(query);
-      } else {
-        final Query query = new Query(queryObject.toString());
-        queryObjects.add(query);
-      }
-    }
-    final RecordStoreQueryReader reader = createReader();
-    reader.setQueries(queryObjects);
-
-    return reader;
-  }
-
-  @Override
-  public RecordReader query(final Query... queries) {
-    return query(Arrays.asList(queries));
-  }
-
-  @Override
-  public Record queryFirst(final Query query) {
-    final RecordReader reader = query(query);
-    try {
-      final Iterator<Record> iterator = reader.iterator();
-      if (iterator.hasNext()) {
-        final Record object = iterator.next();
-        return object;
-      } else {
-        return null;
-      }
-    } finally {
-      reader.close();
-    }
   }
 
   protected RecordDefinition refreshRecordDefinition(final RecordStoreSchema schema,
@@ -653,7 +294,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   @Override
   public void setLabel(final String label) {
     this.label = label;
-    this.statistics.setPrefix(label);
+    getStatistics().setPrefix(label);
   }
 
   @Override
@@ -663,17 +304,12 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   @Override
   public void setLogCounts(final boolean logCounts) {
-    this.statistics.setLogCounts(logCounts);
+    getStatistics().setLogCounts(logCounts);
   }
 
   @Override
   public void setRecordFactory(final RecordFactory recordFactory) {
     this.recordFactory = recordFactory;
-  }
-
-  protected void setSharedAttribute(final String name, final Object value) {
-    final Map<String, Object> sharedAttributes = getSharedAttributes();
-    sharedAttributes.put(name, value);
   }
 
   public void setTypeRecordDefinitionProperties(
@@ -700,18 +336,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
       return this.label;
     } else {
       return super.toString();
-    }
-  }
-
-  @Override
-  public void update(final Record object) {
-    throw new UnsupportedOperationException("Update not supported");
-  }
-
-  @Override
-  public void updateAll(final Collection<Record> objects) {
-    for (final Record object : objects) {
-      update(object);
     }
   }
 }
