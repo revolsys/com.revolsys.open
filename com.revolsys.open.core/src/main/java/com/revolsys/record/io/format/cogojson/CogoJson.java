@@ -35,7 +35,7 @@ public class CogoJson extends AbstractIoFactoryWithCoordinateSystem
   public GeometryReader newGeometryReader(final Resource resource) {
     try {
       final GeoJsonGeometryIterator iterator = new GeoJsonGeometryIterator(resource);
-      return new GeometryReader(iterator);
+      return iterator;
     } catch (final IOException e) {
       throw new RuntimeException("Unable to create reader for " + resource, e);
     }

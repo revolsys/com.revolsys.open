@@ -38,7 +38,7 @@ public class Kml extends AbstractIoFactoryWithCoordinateSystem
   @Override
   public GeometryReader newGeometryReader(final Resource resource) {
     final KmlGeometryIterator iterator = new KmlGeometryIterator(resource);
-    return new GeometryReader(iterator);
+    return iterator;
   }
 
   @Override

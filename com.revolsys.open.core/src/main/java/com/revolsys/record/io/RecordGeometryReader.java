@@ -1,30 +1,43 @@
 package com.revolsys.record.io;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
+import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.properties.DelegatingObjectWithProperties;
+import com.revolsys.io.Reader;
 import com.revolsys.record.Record;
 
-public class RecordGeometryIterator extends DelegatingObjectWithProperties
-  implements Iterator<Geometry> {
+public class RecordGeometryReader implements Iterator<Geometry>, GeometryReader {
+  private Reader<Record> reader;
+
   private Iterator<Record> iterator;
 
-  public RecordGeometryIterator(final Iterator<Record> iterator) {
-    super(iterator);
-    this.iterator = iterator;
+  public RecordGeometryReader(final Reader<Record> reader) {
+    this.reader = reader;
+    this.iterator = reader.iterator();
   }
 
   @Override
   public void close() {
-    super.close();
+    this.reader = null;
     this.iterator = null;
+  }
+
+  @Override
+  public final Map<String, Object> getProperties() {
+    return this.reader.getProperties();
   }
 
   @Override
   public boolean hasNext() {
     return this.iterator.hasNext();
+  }
+
+  @Override
+  public Iterator<Geometry> iterator() {
+    return this;
   }
 
   @Override

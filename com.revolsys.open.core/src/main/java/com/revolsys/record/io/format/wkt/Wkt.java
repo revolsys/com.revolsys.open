@@ -1,6 +1,5 @@
 package com.revolsys.record.io.format.wkt;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
@@ -27,11 +26,7 @@ public class Wkt extends AbstractRecordIoFactory implements RecordWriterFactory,
 
   @Override
   public RecordReader newRecordReader(final Resource resource, final RecordFactory factory) {
-    try {
-      return new WktRecordIterator(factory, resource);
-    } catch (final IOException e) {
-      throw new RuntimeException("Unable to create reader for " + resource, e);
-    }
+    return new WktRecordReader(factory, resource);
   }
 
   @Override

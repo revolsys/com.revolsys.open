@@ -10,6 +10,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -22,7 +23,8 @@ import com.revolsys.record.io.format.xml.StaxUtils;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
-public class KmlGeometryIterator extends AbstractIterator<Geometry>implements Kml22Constants {
+public class KmlGeometryIterator extends AbstractIterator<Geometry>
+  implements GeometryReader, Kml22Constants {
   private GeometryFactory geometryFactory = GeometryFactory.floating3(COORDINATE_SYSTEM_ID);
 
   private XMLStreamReader in;

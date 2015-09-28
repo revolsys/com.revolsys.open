@@ -20,7 +20,6 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
-import com.revolsys.io.test.IoTestSuite;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 
@@ -96,7 +95,8 @@ public class FileGdbIoTest {
 
   public static Test suite() {
     final TestSuite suite = new TestSuite("File GDB Geometry");
-    IoTestSuite.addGeometryTestSuites(suite, "File GDB", FileGdbIoTest.class, "doWriteReadTest");
+    // RecordIoTestSuite.addWriteReadTest(suite, "File GDB",
+    // FileGdbIoTest.class, "doWriteReadTest");
     return suite;
   }
 

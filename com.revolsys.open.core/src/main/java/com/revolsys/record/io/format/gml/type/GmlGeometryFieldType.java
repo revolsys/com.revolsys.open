@@ -181,6 +181,12 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
   }
 
   @Override
+  public void writeValue(final XmlWriter out, final Object value) {
+    // TODO Auto-generated method stub
+    super.writeValue(out, value);
+  }
+
+  @Override
   protected void writeValueText(final XmlWriter out, final Object value) {
     geometry(out, value, true);
   }

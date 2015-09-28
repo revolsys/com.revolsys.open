@@ -32,7 +32,7 @@ public class Gml extends AbstractIoFactoryWithCoordinateSystem
 
   public static final QName DIMENSION = new QName("dimension");
 
-  public static final QName ENVELOPE = new QName(_NS_URI, "BoundingBoxDoubleGf", _NS_PREFIX);
+  public static final QName ENVELOPE = new QName(_NS_URI, "Envelope", _NS_PREFIX);
 
   public static final QName FEATURE_COLLECTION = new QName(_NS_URI, "FeatureCollection",
     _NS_PREFIX);
@@ -93,8 +93,8 @@ public class Gml extends AbstractIoFactoryWithCoordinateSystem
 
   @Override
   public GeometryReader newGeometryReader(final Resource resource) {
-    final GmlGeometryIterator iterator = new GmlGeometryIterator(resource);
-    return new GeometryReader(iterator);
+    final GmlGeometryReader iterator = new GmlGeometryReader(resource);
+    return iterator;
   }
 
   @Override

@@ -10,6 +10,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -25,8 +26,7 @@ import com.revolsys.record.io.format.xml.StaxUtils;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
 
-public class GmlGeometryIterator extends AbstractIterator<Geometry> {
-
+public class GmlGeometryReader extends AbstractIterator<Geometry>implements GeometryReader {
   public static final LineString parse(final String value, final String separator,
     final int axisCount) {
     final String[] values = value.split(separator);
@@ -91,7 +91,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> {
 
   private XMLStreamReader in;
 
-  public GmlGeometryIterator(final Resource resource) {
+  public GmlGeometryReader(final Resource resource) {
     try {
       this.in = StaxUtils.createXmlReader(resource);
     } catch (final Exception e) {
@@ -168,7 +168,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> {
     }
     final String value = this.in.getElementText();
 
-    final LineString points = GmlGeometryIterator.parse(value, decimal, coordSeperator,
+    final LineString points = GmlGeometryReader.parse(value, decimal, coordSeperator,
       toupleSeperator);
     StaxUtils.skipToEndElement(this.in);
     return points;
@@ -343,7 +343,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> {
     } else {
       final int axisCount = Integer.parseInt(dimension);
       final String value = this.in.getElementText();
-      final LineString points = GmlGeometryIterator.parse(value, "\\s+", axisCount);
+      final LineString points = GmlGeometryReader.parse(value, "\\s+", axisCount);
       StaxUtils.skipToEndElement(this.in);
       return points;
     }

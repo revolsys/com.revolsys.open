@@ -103,13 +103,13 @@ public class GmlRecordWriter extends AbstractRecordWriter {
     }
     this.out.startTag(qualifiedName);
 
-    for (final FieldDefinition attribute : recordDefinition.getFields()) {
-      final String fieldName = attribute.getName();
+    for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
+      final String fieldName = fieldDefinition.getName();
       final Object value = object.getValue(fieldName);
       if (isValueWritable(value)) {
         this.out.startTag(this.namespaceUri, fieldName);
-        final DataType type = attribute.getType();
-        final GmlFieldType fieldType = this.fieldTypes.getFieldType(type);
+        final DataType dataType = fieldDefinition.getType();
+        final GmlFieldType fieldType = this.fieldTypes.getFieldType(dataType);
         if (fieldType != null) {
           fieldType.writeValue(this.out, value);
         }

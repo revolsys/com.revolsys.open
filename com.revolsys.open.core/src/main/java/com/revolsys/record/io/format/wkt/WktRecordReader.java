@@ -18,7 +18,7 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
-public class WktRecordIterator extends AbstractIterator<Record>implements RecordReader {
+public class WktRecordReader extends AbstractIterator<Record>implements RecordReader {
 
   private RecordFactory factory;
 
@@ -28,10 +28,9 @@ public class WktRecordIterator extends AbstractIterator<Record>implements Record
 
   private WktParser wktParser;
 
-  public WktRecordIterator(final RecordFactory factory, final Resource resource)
-    throws IOException {
+  public WktRecordReader(final RecordFactory factory, final Resource resource) {
     this.factory = factory;
-    this.in = new BufferedReader(FileUtil.createUtf8Reader(resource.getInputStream()));
+    this.in = resource.newBufferedReader();
     this.recordDefinition = Records.newGeometryRecordDefinition();
   }
 
@@ -67,7 +66,7 @@ public class WktRecordIterator extends AbstractIterator<Record>implements Record
   protected Record getNext() {
     try {
       final String wkt = this.in.readLine();
-      final Geometry geometry = this.wktParser.parseGeometry(wkt);
+      final Geometry geometry = this.wktParser.parseGeometry(wkt, false);
       if (geometry == null) {
         throw new NoSuchElementException();
       } else {

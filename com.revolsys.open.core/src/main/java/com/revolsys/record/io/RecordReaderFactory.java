@@ -2,7 +2,6 @@ package com.revolsys.record.io;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Iterator;
 
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.io.GeometryReaderFactory;
@@ -59,9 +58,7 @@ public interface RecordReaderFactory
   @Override
   default GeometryReader newGeometryReader(final Resource resource) {
     final Reader<Record> recordReader = newRecordReader(resource);
-    final Iterator<Record> recordIterator = recordReader.iterator();
-    final RecordGeometryIterator iterator = new RecordGeometryIterator(recordIterator);
-    final GeometryReader geometryReader = new GeometryReader(iterator);
+    final RecordGeometryReader geometryReader = new RecordGeometryReader(recordReader);
     return geometryReader;
   }
 

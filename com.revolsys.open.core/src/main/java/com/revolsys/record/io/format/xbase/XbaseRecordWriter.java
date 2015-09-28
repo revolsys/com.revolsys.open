@@ -108,6 +108,10 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
       if (length < 1) {
         length = 18;
       } else {
+        if (scale > 0) {
+          // Allow for . and sign
+          length += 2;
+        }
         length = Math.min(18, length);
       }
       if (scale < 0) {

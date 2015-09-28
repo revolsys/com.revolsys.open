@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Map;
 
 import com.revolsys.converter.string.BooleanStringConverter;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactory;
@@ -30,6 +31,14 @@ public interface RecordWriter extends Writer<Record> {
     return ioFactoryRegistry.isFileExtensionSupported(RecordWriterFactory.class, fileNameExtension);
   }
 
+  static RecordWriter newRecordWriter(final Record record, final Object target) {
+    if (record != null) {
+      final RecordDefinition recordDefinition = record.getRecordDefinition();
+      return newRecordWriter(recordDefinition, target);
+    }
+    return null;
+  }
+
   static RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
     final Object target) {
     final Resource resource = Resource.getResource(target);
@@ -52,7 +61,7 @@ public interface RecordWriter extends Writer<Record> {
   }
 
   default boolean isValueWritable(final Object value) {
-    return Property.hasValue(value) || isWriteNulls();
+    return Property.hasValue(value) || isWriteNulls() || value instanceof Geometry;
   }
 
   default boolean isWriteNulls() {

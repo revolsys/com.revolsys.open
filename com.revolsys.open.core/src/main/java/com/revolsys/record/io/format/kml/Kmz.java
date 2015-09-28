@@ -36,7 +36,7 @@ public class Kmz extends AbstractIoFactoryWithCoordinateSystem
   @Override
   public GeometryReader newGeometryReader(final Resource resource) {
     final KmzGeometryIterator iterator = new KmzGeometryIterator(resource);
-    return new GeometryReader(iterator);
+    return iterator;
   }
 
   @Override

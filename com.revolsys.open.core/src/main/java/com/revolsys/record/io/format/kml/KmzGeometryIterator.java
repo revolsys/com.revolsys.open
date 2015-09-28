@@ -7,11 +7,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
 
-public class KmzGeometryIterator extends AbstractIterator<Geometry> {
+public class KmzGeometryIterator extends AbstractIterator<Geometry>implements GeometryReader {
 
   private KmlGeometryIterator kmlIterator;
 

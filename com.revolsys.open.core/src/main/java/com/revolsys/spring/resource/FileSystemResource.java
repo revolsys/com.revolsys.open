@@ -46,7 +46,7 @@ public class FileSystemResource extends AbstractResource {
 
   private final File file;
 
-  private final String path;
+  private String path;
 
   /**
    * Construct a new new {@code FileSystemResource} from a {@link File} handle.
@@ -63,6 +63,9 @@ public class FileSystemResource extends AbstractResource {
     Assert.notNull(file, "File must not be null");
     this.file = file;
     this.path = StringUtils.cleanPath(file.getPath());
+    if (file.isDirectory()) {
+      this.path += "/";
+    }
   }
 
   /**
@@ -79,6 +82,9 @@ public class FileSystemResource extends AbstractResource {
     Assert.notNull(path, "Path must not be null");
     this.file = new File(path);
     this.path = StringUtils.cleanPath(path);
+    if (this.file.isDirectory()) {
+      this.path += "/";
+    }
   }
 
   /**

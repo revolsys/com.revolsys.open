@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -20,7 +21,7 @@ import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.io.format.json.JsonParser.EventType;
 import com.revolsys.spring.resource.Resource;
 
-public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> {
+public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>implements GeometryReader {
 
   private GeometryFactory geometryFactory;
 
