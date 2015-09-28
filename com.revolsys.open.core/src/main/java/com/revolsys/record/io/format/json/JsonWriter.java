@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.io.FileUtil;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.WrappedException;
 
@@ -238,7 +238,7 @@ public final class JsonWriter implements Closeable {
         charSequence(string);
         this.out.write('"');
       } else if (value.getClass().isArray()) {
-        final List<? extends Object> list = CollectionUtil.arrayToList(value);
+        final List<? extends Object> list = Lists.arrayToList(value);
         write(list);
       } else {
         value(StringConverterRegistry.toString(value));

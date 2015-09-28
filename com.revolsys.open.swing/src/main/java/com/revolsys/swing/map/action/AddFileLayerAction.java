@@ -30,7 +30,7 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.node.layer.LayerGroupTreeNode;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Strings;
 
 public class AddFileLayerAction extends AbstractAction {
 
@@ -45,7 +45,7 @@ public class AddFileLayerAction extends AbstractAction {
   public static FileNameExtensionFilter createFilter(final IoFactory factory) {
     final List<String> fileExtensions = factory.getFileExtensions();
     String description = factory.getName();
-    description += " (" + CollectionUtil.toString(fileExtensions) + ")";
+    description += " (" + Strings.toString(fileExtensions) + ")";
     return createFileFilter(description, fileExtensions);
   }
 

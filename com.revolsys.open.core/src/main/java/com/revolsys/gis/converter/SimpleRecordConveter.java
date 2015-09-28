@@ -13,7 +13,7 @@ import com.revolsys.gis.converter.process.SourceToTargetProcess;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Strings;
 
 public class SimpleRecordConveter implements Converter<Record, Record> {
   private RecordFactory factory;
@@ -77,7 +77,6 @@ public class SimpleRecordConveter implements Converter<Record, Record> {
 
   @Override
   public String toString() {
-    return this.recordDefinition.getPath() + "\n  "
-      + CollectionUtil.toString("\n  ", this.processors);
+    return this.recordDefinition.getPath() + "\n  " + Strings.toString("\n  ", this.processors);
   }
 }

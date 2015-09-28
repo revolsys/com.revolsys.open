@@ -11,6 +11,7 @@ import javax.measure.unit.Unit;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -19,7 +20,6 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.test.TestConstants;
 import com.revolsys.geometry.util.BoundingBoxUtil;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
 
 // TODO
@@ -78,8 +78,7 @@ public class BoundingBoxTest implements TestConstants {
     Assert.assertEquals("Geometry Factory", geometryFactory, boundingBox.getGeometryFactory());
     Assert.assertEquals("Empty", empty, boundingBox.isEmpty());
     Assert.assertEquals("Axis Count", axisCount, boundingBox.getAxisCount());
-    Assert.assertEquals("Bounds", CollectionUtil.toList(bounds),
-      CollectionUtil.toList(boundingBox.getBounds()));
+    Assert.assertEquals("Bounds", Lists.array(bounds), Lists.array(boundingBox.getBounds()));
 
     Unit unit = SI.METRE;
     Unit lengthUnit = SI.METRE;

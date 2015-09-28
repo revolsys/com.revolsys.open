@@ -92,8 +92,8 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.component.AttributeTitleStringConveter;
 import com.revolsys.swing.map.layer.record.component.RecordLayerFields;
 import com.revolsys.swing.toolbar.ToolBar;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public class QueryWhereConditionField extends ValueField
   implements MouseListener, CaretListener, ItemListener {
@@ -313,7 +313,7 @@ public class QueryWhereConditionField extends ValueField
             if (values.size() == 1) {
               fieldValue = values.get(0);
             } else {
-              fieldValue = CollectionUtil.toString(":", values);
+              fieldValue = Strings.toString(":", values);
             }
             if (fieldValue != null) {
               attributeClass = fieldValue.getClass();

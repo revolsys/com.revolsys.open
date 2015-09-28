@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import com.revolsys.collection.iterator.AbstractIterator;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Strings;
 
 public class CrossProductRangeIterator extends AbstractIterator<String> {
   private final List<String> currentValues = new ArrayList<>();
@@ -38,7 +38,7 @@ public class CrossProductRangeIterator extends AbstractIterator<String> {
     if (this.iterators == null) {
       throw new NoSuchElementException();
     } else {
-      final String value = CollectionUtil.toString("", this.currentValues);
+      final String value = Strings.toString("", this.currentValues);
       updateValues();
       return value;
     }

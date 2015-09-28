@@ -1,6 +1,6 @@
 package com.revolsys.parallel.channel;
 
-import com.revolsys.util.ThreadLocalMap;
+import com.revolsys.collection.map.ThreadLocalMap;
 
 public class ChannelThreadConnection {
 

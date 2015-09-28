@@ -97,11 +97,11 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.StringBuilders;
 
 public class FileGdbRecordStore extends AbstractRecordStore {
 
@@ -1220,9 +1220,9 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
       final List<String> fieldNames = query.getFieldNames();
       if (fieldNames.isEmpty()) {
-        CollectionUtil.append(sql, recordDefinition.getFieldNames());
+        StringBuilders.append(sql, recordDefinition.getFieldNames());
       } else {
-        CollectionUtil.append(sql, fieldNames);
+        StringBuilders.append(sql, fieldNames);
       }
       sql.append(" FROM ");
       sql.append(JdbcUtils.getTableName(catalogPath));

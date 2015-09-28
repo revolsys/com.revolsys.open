@@ -20,7 +20,7 @@ import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Strings;
 
 public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
@@ -77,7 +77,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
     this.recordDefinition = recordStore.getRecordDefinition(catalogPath);
     this.table = recordStore.getTable(catalogPath);
     if (this.recordDefinition != null && "*".equals(fields)) {
-      this.fields = CollectionUtil.toString(this.recordDefinition.getFieldNames());
+      this.fields = Strings.toString(this.recordDefinition.getFieldNames());
     } else {
       this.fields = fields;
     }

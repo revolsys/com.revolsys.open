@@ -59,9 +59,9 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.StringBuilders;
 
 public class OgrRecordStore extends AbstractRecordStore {
 
@@ -476,7 +476,7 @@ public class OgrRecordStore extends AbstractRecordStore {
       fieldNames = recordDefinition.getFieldNames();
     }
     fieldNames.remove("ROWID");
-    CollectionUtil.append(sql, fieldNames);
+    StringBuilders.append(sql, fieldNames);
     sql.append(" FROM ");
     final String layerName = getLayerName(typePath);
     sql.append(layerName);

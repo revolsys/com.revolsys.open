@@ -81,11 +81,11 @@ import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.OS;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public class SwingUtil {
   public static final Font BOLD_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 11);
@@ -536,7 +536,7 @@ public class SwingUtil {
       for (final Entry<Identifier, List<Object>> codes : codeTable.getCodes().entrySet()) {
         final List<Object> values = codes.getValue();
         if (values != null && !values.isEmpty()) {
-          final String text = CollectionUtil.toString(values);
+          final String text = Strings.toString(values);
           final int length = text.length();
           if (length > longestLength) {
             longestLength = length;

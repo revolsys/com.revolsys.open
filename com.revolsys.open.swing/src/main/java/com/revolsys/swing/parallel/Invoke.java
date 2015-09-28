@@ -18,9 +18,9 @@ import javax.swing.SwingWorker.StateValue;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.beans.MethodInvoker;
+import com.revolsys.collection.list.Lists;
 import com.revolsys.parallel.ThreadInterruptedException;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
 
 public class Invoke {
@@ -31,7 +31,7 @@ public class Invoke {
       if (event.getPropertyName().equals("state")) {
         if (event.getNewValue().equals(StateValue.STARTED)) {
           final List<SwingWorker<?, ?>> oldRunningWorkers = getRunningWorkers();
-          if (!CollectionUtil.containsReference(RUNNING_WORKERS, worker)) {
+          if (!Lists.containsReference(RUNNING_WORKERS, worker)) {
             RUNNING_WORKERS.add(new WeakReference<SwingWorker<?, ?>>(worker));
           }
           PROPERTY_CHANGE_SUPPORT.firePropertyChange("runningWorkers", oldRunningWorkers,
@@ -42,14 +42,14 @@ public class Invoke {
       if (worker.isCancelled() || worker.isDone()) {
         try {
           final List<SwingWorker<?, ?>> oldRunningWorkers = getRunningWorkers();
-          CollectionUtil.removeReference(RUNNING_WORKERS, worker);
+          Lists.removeReference(RUNNING_WORKERS, worker);
           PROPERTY_CHANGE_SUPPORT.firePropertyChange("runningWorkers", oldRunningWorkers,
             RUNNING_WORKERS);
         } finally {
           try {
             final List<SwingWorker<?, ?>> oldWorkers = getWorkers();
             synchronized (WORKERS) {
-              CollectionUtil.removeReference(WORKERS, worker);
+              Lists.removeReference(WORKERS, worker);
             }
             PROPERTY_CHANGE_SUPPORT.firePropertyChange("workers", oldWorkers, WORKERS);
           } finally {
@@ -132,7 +132,7 @@ public class Invoke {
   }
 
   public static List<SwingWorker<?, ?>> getRunningWorkers() {
-    return CollectionUtil.getReferences(WORKERS);
+    return Lists.getReferences(WORKERS);
   }
 
   public static SwingWorker<?, ?> getWorker(final int i) {
@@ -149,11 +149,11 @@ public class Invoke {
   }
 
   public static List<SwingWorker<?, ?>> getWorkers() {
-    return CollectionUtil.getReferences(WORKERS);
+    return Lists.getReferences(WORKERS);
   }
 
   public static boolean isWorkerRunning(final SwingWorker<?, ?> worker) {
-    return CollectionUtil.containsReference(RUNNING_WORKERS, worker);
+    return Lists.containsReference(RUNNING_WORKERS, worker);
   }
 
   public static void later(final Object object, final Method method, final Object... parameters) {
@@ -202,7 +202,7 @@ public class Invoke {
   public static void worker(final SwingWorker<? extends Object, ? extends Object> worker) {
     synchronized (WORKERS) {
       final List<SwingWorker<?, ?>> oldWorkers = getWorkers();
-      if (!CollectionUtil.containsReference(WORKERS, worker)) {
+      if (!Lists.containsReference(WORKERS, worker)) {
         WORKERS.add(new WeakReference<SwingWorker<?, ?>>(worker));
       }
       PROPERTY_CHANGE_SUPPORT.firePropertyChange("workers", oldWorkers, WORKERS);

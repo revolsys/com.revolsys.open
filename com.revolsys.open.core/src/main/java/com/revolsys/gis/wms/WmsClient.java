@@ -23,7 +23,7 @@ import com.revolsys.record.io.format.xml.SimpleXmlProcessorContext;
 import com.revolsys.record.io.format.xml.StaxUtils;
 import com.revolsys.record.io.format.xml.XmlProcessorContext;
 import com.revolsys.util.Base64;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Strings;
 import com.revolsys.util.UrlUtil;
 
 public class WmsClient {
@@ -81,12 +81,12 @@ public class WmsClient {
       parameters.put(WmsParameters.VERSION, version);
       parameters.put(WmsParameters.REQUEST, WmsParameterValues.GET_MAP);
     }
-    parameters.put(WmsParameters.LAYERS, CollectionUtil.toString(layers));
+    parameters.put(WmsParameters.LAYERS, Strings.toString(layers));
     String style;
     if (styles == null) {
       style = "";
     } else {
-      style = CollectionUtil.toString(styles);
+      style = Strings.toString(styles);
       for (int i = styles.size(); i < layers.size(); i++) {
         style += ",";
       }

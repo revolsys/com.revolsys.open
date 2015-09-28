@@ -28,6 +28,7 @@ import org.jdesktop.swingx.ScrollableSizeHint;
 import org.jdesktop.swingx.VerticalLayout;
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.collection.CollectionUtil;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.graph.Edge;
@@ -50,7 +51,6 @@ import com.revolsys.swing.undo.CreateRecordUndo;
 import com.revolsys.swing.undo.DeleteLayerRecordUndo;
 import com.revolsys.swing.undo.MultipleUndo;
 import com.revolsys.swing.undo.UndoManager;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class MergeRecordsDialog extends JDialog implements WindowListener {

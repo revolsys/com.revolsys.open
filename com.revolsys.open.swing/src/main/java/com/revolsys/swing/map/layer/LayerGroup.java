@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.Parent;
+import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
@@ -38,7 +39,6 @@ import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.MenuSourceRunnable;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable<Layer> {
@@ -380,8 +380,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   public Layer getLayerByPath(final String layerPath) {
-    final List<String> path = CollectionUtil.split(layerPath.replaceAll("^\\s*/+\\s*", ""),
-      "(\\s*/+\\s*)+");
+    final List<String> path = Lists.split(layerPath.replaceAll("^\\s*/+\\s*", ""), "(\\s*/+\\s*)+");
     return getLayerByPath(path);
   }
 

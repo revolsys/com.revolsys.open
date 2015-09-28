@@ -17,14 +17,14 @@ import com.revolsys.record.io.format.xml.XmlMapIoFactory;
 import com.revolsys.spring.resource.DefaultResourceLoader;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public class MavenRepository implements URLStreamHandlerFactory {
 
   public static String getMavenId(final String groupId, final String artifactId, final String type,
     final String classifier, final String version, final String scope) {
-    return CollectionUtil.toString(":", groupId, artifactId, type, classifier, version, scope);
+    return Strings.toString(":", groupId, artifactId, type, classifier, version, scope);
   }
 
   public static String getPath(final String groupId, final String artifactId,
@@ -97,8 +97,8 @@ public class MavenRepository implements URLStreamHandlerFactory {
 
   public Map<String, Object> getMavenMetadata(final String groupId, final String artifactId,
     final String version) {
-    final String recordDefinitionPath = "/" + CollectionUtil.toString("/",
-      groupId.replace('.', '/'), artifactId, version, "maven-metadata.xml");
+    final String recordDefinitionPath = "/"
+      + Strings.toString("/", groupId.replace('.', '/'), artifactId, version, "maven-metadata.xml");
     final Resource resource = this.root;
     final Resource recordDefinitionResource = resource.newChildResource(recordDefinitionPath);
     if (recordDefinitionResource.exists()) {

@@ -49,9 +49,9 @@ import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.PreferencesUtil;
+import com.revolsys.util.Strings;
 import com.revolsys.util.WrappedException;
 import com.revolsys.util.enableable.Enabled;
 
@@ -459,8 +459,7 @@ public class Project extends LayerGroup {
         final JLabel message = new JLabel(
           "<html><body><p><b>The following layers have un-saved changes.</b></p>"
             + "<p><b>Do you want to save the changes before continuing?</b></p><ul><li>"
-            + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
-            + "</li></ul></body></html>");
+            + Strings.toString("</li>\n<li>", layersWithChanges) + "</li></ul></body></html>");
 
         final int option = JOptionPane.showConfirmDialog(mapPanel, message, "Save Changes",
           optionType, JOptionPane.WARNING_MESSAGE);
@@ -481,8 +480,7 @@ public class Project extends LayerGroup {
             final JLabel message2 = new JLabel(
               "<html><body><p><b>The following layers could not be saved.</b></p>"
                 + "<p><b>Do you want to ignore these changes and continue?</b></p><ul><li>"
-                + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
-                + "</li></ul></body></html>");
+                + Strings.toString("</li>\n<li>", layersWithChanges) + "</li></ul></body></html>");
 
             final int option2 = JOptionPane.showConfirmDialog(mapPanel, message2, "Ignore Changes",
               JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);

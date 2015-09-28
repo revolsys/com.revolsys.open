@@ -14,8 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public class BasicCorsFilter extends OncePerRequestFilter {
 
@@ -74,7 +74,7 @@ public class BasicCorsFilter extends OncePerRequestFilter {
     } else {
       this.allowedHeaders = new TreeSet<String>(allowedHeaders);
     }
-    this.allowedHeadersString = CollectionUtil.toString(" ,", allowedHeaders);
+    this.allowedHeadersString = Strings.toString(" ,", allowedHeaders);
   }
 
   public void setAllowedMethods(final Collection<String> allowedMethods) {
@@ -83,7 +83,7 @@ public class BasicCorsFilter extends OncePerRequestFilter {
     } else {
       this.allowedMethods = new TreeSet<String>(allowedMethods);
     }
-    this.allowedMethodsString = CollectionUtil.toString(" ,", allowedMethods);
+    this.allowedMethodsString = Strings.toString(" ,", allowedMethods);
   }
 
   public void setMaxAge(final int maxAge) {

@@ -58,7 +58,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.Assert;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Strings;
 
 /**
  * Implements the algorithms required to compute the <code>isValid()</code> method
@@ -727,7 +727,7 @@ public class IsValidOp {
   @Override
   public String toString() {
     if (isErrorReturn()) {
-      return CollectionUtil.toString("\n", this.errors);
+      return Strings.toString("\n", this.errors);
     } else {
       return "Valid";
     }

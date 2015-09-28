@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
@@ -72,7 +73,6 @@ import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.wkt.WktParser;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 

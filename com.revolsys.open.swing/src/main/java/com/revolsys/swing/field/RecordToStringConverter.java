@@ -8,8 +8,8 @@ import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.record.Record;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public class RecordToStringConverter extends ObjectToStringConverter {
 
@@ -35,7 +35,7 @@ public class RecordToStringConverter extends ObjectToStringConverter {
         final String text = StringConverterRegistry.toString(Property.get(object, fieldName));
         values.add(text);
       }
-      return CollectionUtil.toString(values);
+      return Strings.toString(values);
 
     } else {
       return StringConverterRegistry.toString(value);

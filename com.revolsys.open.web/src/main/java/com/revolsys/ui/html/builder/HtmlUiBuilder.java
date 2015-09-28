@@ -84,11 +84,11 @@ import com.revolsys.ui.web.exception.PageNotFoundException;
 import com.revolsys.ui.web.rest.interceptor.MediaTypeUtil;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.JexlUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 import com.revolsys.util.UrlUtil;
 
 @ResponseStatus(reason = "Access Denied", value = HttpStatus.FORBIDDEN)
@@ -1412,7 +1412,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
                   final String stringValue;
                   if (value instanceof Collection) {
                     final Collection<?> collection = (Collection<?>)value;
-                    stringValue = CollectionUtil.toString(", ", collection);
+                    stringValue = Strings.toString(", ", collection);
                   } else {
                     stringValue = value.toString();
                   }

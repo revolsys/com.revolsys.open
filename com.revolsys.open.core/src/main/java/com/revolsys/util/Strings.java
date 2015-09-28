@@ -1,9 +1,15 @@
 package com.revolsys.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.equals.Equals;
 
 public interface Strings {
-
   public static String cleanWhitespace(final String text) {
     if (text == null) {
       return text;
@@ -214,12 +220,120 @@ public interface Strings {
     }
   }
 
+  /**
+   * Construct a new string using the same style as java.util.List.toString.
+   * @param iterator
+   * @return
+   */
+  static String toListString(final Iterable<? extends Object> iterable) {
+    if (iterable == null) {
+      return "[]";
+    } else {
+      final Iterator<? extends Object> iterator = iterable.iterator();
+      return toListString(iterator);
+    }
+  }
+
+  static String toListString(final Iterator<? extends Object> iterator) {
+    if (iterator == null) {
+      return "[]";
+    } else {
+      final StringBuilder string = new StringBuilder("[");
+      if (iterator.hasNext()) {
+        string.append(iterator.next());
+        while (iterator.hasNext()) {
+          string.append(", ");
+          string.append(iterator.next());
+        }
+      }
+      string.append("]");
+      return string.toString();
+    }
+  }
+
+  static String toString(final boolean skipNulls, final String separator,
+    final Collection<? extends Object> values) {
+    if (values == null) {
+      return null;
+    } else {
+      final StringBuilder string = new StringBuilder();
+      StringBuilders.append(string, values, skipNulls, separator);
+      return string.toString();
+    }
+  }
+
+  static String toString(final boolean skipNulls, final String separator, final Object... values) {
+    return toString(skipNulls, separator, Arrays.asList(values));
+  }
+
+  /**
+   * Convert the collection to a string, using the "," separator between each
+   * value. Nulls will be the empty string "".
+   *
+   * @param values The values.
+   * @param separator The separator.
+   * @return The string.
+   */
+  static String toString(final Collection<? extends Object> values) {
+    return toString(",", values);
+  }
+
   public static String toString(final Object value) {
     if (value == null) {
       return null;
     } else {
       return value.toString();
     }
+  }
+
+  /**
+   * Convert the collection to a string, using the separator between each value.
+   * Nulls will be the empty string "".
+   *
+   * @param separator The separator.
+   * @param values The values.
+   * @return The string.
+   */
+  static String toString(final String separator, final Collection<? extends Object> values) {
+    if (values == null) {
+      return null;
+    } else {
+      final StringBuilder string = new StringBuilder();
+      StringBuilders.append(string, values, separator);
+      return string.toString();
+    }
+  }
+
+  static String toString(final String separator, final int... values) {
+    if (values == null) {
+      return null;
+    } else {
+      final StringBuilder string = new StringBuilder();
+      boolean first = true;
+      for (final int value : values) {
+        if (first) {
+          first = false;
+        } else {
+          string.append(separator);
+        }
+        string.append(value);
+      }
+      return string.toString();
+    }
+  }
+
+  static String toString(final String separator, final Object... values) {
+    return toString(separator, Arrays.asList(values));
+  }
+
+  static List<String> toStringList(final Collection<?> values) {
+    final List<String> strings = new ArrayList<>();
+    if (values != null) {
+      for (final Object value : values) {
+        strings.add(StringConverterRegistry.toString(value));
+      }
+    }
+    return strings;
   }
 
   public static String trim(final String text) {

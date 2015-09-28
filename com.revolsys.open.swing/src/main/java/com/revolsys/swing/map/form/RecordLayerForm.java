@@ -91,8 +91,8 @@ import com.revolsys.swing.undo.ReverseRecordFieldsUndo;
 import com.revolsys.swing.undo.ReverseRecordGeometryUndo;
 import com.revolsys.swing.undo.ReverseRecordUndo;
 import com.revolsys.swing.undo.UndoManager;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public class RecordLayerForm extends JPanel implements PropertyChangeListener, CellEditorListener,
   FocusListener, PropertyChangeSupportProxy, WindowListener {
@@ -677,7 +677,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
       final List<String> errors = this.fieldErrors.get(fieldName);
       final List<String> warnings = this.fieldWarnings.get(fieldName);
       if (Property.hasValue(errors)) {
-        String message = CollectionUtil.toString("<br />", errors);
+        String message = Strings.toString("<br />", errors);
         if (Property.hasValue(warnings)) {
           message += "<br />" + warnings;
         }
@@ -685,7 +685,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
       } else {
         field.setFieldValid();
         if (Property.hasValue(warnings)) {
-          field.setFieldToolTip("<html>" + CollectionUtil.toString("<br />", warnings) + "</html>");
+          field.setFieldToolTip("<html>" + Strings.toString("<br />", warnings) + "</html>");
           field.setFieldBackgroundColor(WebColors.Yellow);
         }
       }
@@ -805,7 +805,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
       if (values == null || values.isEmpty()) {
         string = "-";
       } else {
-        string = CollectionUtil.toString(values);
+        string = Strings.toString(values);
       }
     }
     if (!Property.hasValue(string)) {

@@ -23,8 +23,8 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.record.row.RecordRowTable;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public abstract class RecordRowTableModel extends AbstractRecordTableModel
   implements SortableTableModel, CellEditorListener {
@@ -387,7 +387,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
           if (values == null || values.isEmpty()) {
             return null;
           } else {
-            text = CollectionUtil.toString(values);
+            text = Strings.toString(values);
           }
         }
         if (text.length() == 0) {

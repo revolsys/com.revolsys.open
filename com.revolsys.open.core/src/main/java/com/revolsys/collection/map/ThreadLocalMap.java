@@ -1,4 +1,4 @@
-package com.revolsys.util;
+package com.revolsys.collection.map;
 
 import java.util.Collection;
 import java.util.HashMap;

@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 /**
  *
@@ -80,6 +80,6 @@ public class CrossProductRange extends AbstractRange<String> {
 
   @Override
   public String toString() {
-    return CollectionUtil.toString("+", this.ranges);
+    return Strings.toString("+", this.ranges);
   }
 }

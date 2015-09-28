@@ -12,9 +12,9 @@ import com.revolsys.record.Record;
 import com.revolsys.record.property.ShortNameProperty;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public abstract class JdbcDdlWriter implements Cloneable {
   private PrintWriter out;
@@ -201,7 +201,7 @@ public abstract class JdbcDdlWriter implements Cloneable {
     this.out.println(" AS ( ");
     this.out.println("  SELECT ");
     this.out.print("  ");
-    this.out.println(CollectionUtil.toString(",\n  ", columnNames));
+    this.out.println(Strings.toString(",\n  ", columnNames));
     this.out.print("  FROM ");
     writeTableName(queryTypeName);
     this.out.println();
@@ -227,7 +227,7 @@ public abstract class JdbcDdlWriter implements Cloneable {
     if (delete) {
       perms.add("DELETE");
     }
-    this.out.print(CollectionUtil.toString(", ", perms));
+    this.out.print(Strings.toString(", ", perms));
     this.out.print(" ON ");
     writeTableName(typePath);
     this.out.print(" TO ");

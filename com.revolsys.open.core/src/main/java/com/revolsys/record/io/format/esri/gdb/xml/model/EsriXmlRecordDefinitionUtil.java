@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.collection.CollectionUtil;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -21,7 +22,6 @@ import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants {

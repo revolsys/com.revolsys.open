@@ -16,8 +16,8 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.AbstractTableModel;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public abstract class AbstractRecordTableModel extends AbstractTableModel
   implements PropertyChangeSupportProxy {
@@ -138,7 +138,7 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel
           if (values == null || values.isEmpty()) {
             text = StringConverterRegistry.toString(objectValue);
           } else {
-            text = CollectionUtil.toString(values);
+            text = Strings.toString(values);
           }
         } else {
           if (!codeTable.isLoading()) {

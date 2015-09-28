@@ -18,9 +18,9 @@ import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public class Value extends QueryValue {
   public static Object getValue(final Object value) {
@@ -178,7 +178,7 @@ public class Value extends QueryValue {
               if (values.size() == 1) {
                 this.displayValue = values.get(0);
               } else {
-                this.displayValue = CollectionUtil.toString(":", values);
+                this.displayValue = Strings.toString(":", values);
               }
             }
           }

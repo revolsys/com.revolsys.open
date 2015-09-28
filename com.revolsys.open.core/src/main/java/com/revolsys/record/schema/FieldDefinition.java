@@ -23,9 +23,9 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.record.query.Value;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 /**
  * The FieldDefinition class defines the name, type and other properties about each
@@ -649,7 +649,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
         if (!this.allowedValues.isEmpty()) {
           if (!this.allowedValues.containsKey(value)) {
             throw new IllegalArgumentException(fieldName + "=" + value + " not in ("
-              + CollectionUtil.toString(",", this.allowedValues) + ")");
+              + Strings.toString(",", this.allowedValues) + ")");
           }
         }
       }
@@ -731,7 +731,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
           if (!this.allowedValues.isEmpty()) {
             if (!this.allowedValues.containsKey(value)) {
               throw new ObjectPropertyException(record, fieldName,
-                "'" + value + " not in (" + CollectionUtil.toString(",", this.allowedValues) + ")");
+                "'" + value + " not in (" + Strings.toString(",", this.allowedValues) + ")");
             }
           }
         }

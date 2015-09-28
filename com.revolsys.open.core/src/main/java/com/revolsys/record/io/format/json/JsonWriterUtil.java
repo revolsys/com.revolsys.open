@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.io.StringPrinter;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
 
 public final class JsonWriterUtil {
@@ -183,7 +183,7 @@ public final class JsonWriterUtil {
       charSequence(out, string);
       out.write('"');
     } else if (value.getClass().isArray()) {
-      final List<? extends Object> list = CollectionUtil.arrayToList(value);
+      final List<? extends Object> list = Lists.arrayToList(value);
       write(out, list, indent, writeNulls);
     } else {
       write(out, StringConverterRegistry.toString(value), indent, writeNulls);

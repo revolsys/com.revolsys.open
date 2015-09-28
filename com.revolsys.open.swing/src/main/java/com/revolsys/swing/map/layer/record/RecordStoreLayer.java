@@ -55,7 +55,6 @@ import com.revolsys.swing.map.layer.record.table.model.RecordSaveErrorTableModel
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Label;
 import com.revolsys.util.Property;
 import com.revolsys.util.enableable.Enabled;
@@ -722,7 +721,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   public boolean isCached(final Label cacheId, final LayerRecord record) {
     if (isLayerRecord(record)) {
       final Identifier identifier = record.getIdentifier();
-      if (CollectionUtil.setContains(this.cacheIdToRecordIdMap, cacheId, identifier)) {
+      if (Maps.setContains(this.cacheIdToRecordIdMap, cacheId, identifier)) {
         return true;
       } else {
         return false;

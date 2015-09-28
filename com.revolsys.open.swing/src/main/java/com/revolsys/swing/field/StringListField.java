@@ -26,8 +26,8 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.list.ArrayListModel;
 import com.revolsys.swing.listener.EventQueueRunnableListener;
 import com.revolsys.swing.toolbar.ToolBar;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public class StringListField extends ValueField {
   public static final String SELECTED = "selected";
@@ -121,7 +121,7 @@ public class StringListField extends ValueField {
           }
         }
         updateFields();
-        setFieldValue(CollectionUtil.toString(this.values));
+        setFieldValue(Strings.toString(this.values));
         return true;
       }
     }
@@ -149,7 +149,7 @@ public class StringListField extends ValueField {
         selectionModel.setSelectionInterval(index, index);
       }
     }
-    setFieldValue(CollectionUtil.toString(this.values));
+    setFieldValue(Strings.toString(this.values));
     updateFields();
     this.valueEntry.requestFocusInWindow();
   }
@@ -181,7 +181,7 @@ public class StringListField extends ValueField {
             }
           }
         }
-        super.setFieldValue(CollectionUtil.toString(this.values));
+        super.setFieldValue(Strings.toString(this.values));
       }
     }
   }

@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.revolsys.collection.CollectionUtil;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.MultiLineString;
@@ -14,7 +15,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.gis.converter.string.BoundingBoxStringConverter;
 import com.revolsys.gis.converter.string.GeometryStringConverter;
-import com.revolsys.util.CollectionUtil;
 
 public class StringConverterRegistry {
 

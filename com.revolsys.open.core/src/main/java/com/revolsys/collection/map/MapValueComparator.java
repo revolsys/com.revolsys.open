@@ -1,4 +1,4 @@
-package com.revolsys.util;
+package com.revolsys.collection.map;
 
 import java.util.Comparator;
 import java.util.Map;

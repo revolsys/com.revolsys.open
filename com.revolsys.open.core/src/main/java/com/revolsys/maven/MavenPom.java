@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class MavenPom extends LinkedHashMap<String, Object> {

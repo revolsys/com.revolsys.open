@@ -39,6 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.collection.CollectionUtil;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.NumberEquals;
@@ -64,7 +65,6 @@ import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.io.IteratorReader;
 import com.revolsys.io.Reader;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
 
 /**

@@ -14,7 +14,7 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Strings;
 
 public class CollectionValue extends QueryValue {
   private FieldDefinition field;
@@ -172,6 +172,6 @@ public class CollectionValue extends QueryValue {
 
   @Override
   public String toString() {
-    return "(" + CollectionUtil.toString(this.queryValues) + ")";
+    return "(" + Strings.toString(this.queryValues) + ")";
   }
 }

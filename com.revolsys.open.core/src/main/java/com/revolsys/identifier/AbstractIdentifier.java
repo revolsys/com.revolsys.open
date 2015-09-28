@@ -8,8 +8,8 @@ import java.util.Map;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.equals.Equals;
 import com.revolsys.record.Record;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.CompareUtil;
+import com.revolsys.util.Strings;
 
 public abstract class AbstractIdentifier implements Identifier {
 
@@ -163,6 +163,6 @@ public abstract class AbstractIdentifier implements Identifier {
   @Override
   public String toString() {
     final List<Object> values = getValues();
-    return CollectionUtil.toString(":", values);
+    return Strings.toString(":", values);
   }
 }

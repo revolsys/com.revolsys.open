@@ -3,8 +3,8 @@ package com.revolsys.collection.range;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.equals.Equals;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Numbers;
 
@@ -213,7 +213,7 @@ public abstract class AbstractRange<V>
   }
 
   public List<V> toList() {
-    return CollectionUtil.list(this);
+    return Lists.array(this);
   }
 
   @Override

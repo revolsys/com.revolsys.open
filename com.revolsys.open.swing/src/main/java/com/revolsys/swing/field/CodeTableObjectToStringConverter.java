@@ -6,7 +6,7 @@ import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Strings;
 
 public class CodeTableObjectToStringConverter extends ObjectToStringConverter {
 
@@ -25,7 +25,7 @@ public class CodeTableObjectToStringConverter extends ObjectToStringConverter {
       if (values == null || values.isEmpty()) {
         return null;
       } else {
-        return CollectionUtil.toString(":", values);
+        return Strings.toString(":", values);
       }
     }
   }

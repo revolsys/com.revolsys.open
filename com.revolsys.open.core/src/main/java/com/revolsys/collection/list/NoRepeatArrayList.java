@@ -1,4 +1,4 @@
-package com.revolsys.util.collections;
+package com.revolsys.collection.list;
 
 import java.util.ArrayList;
 import java.util.Collection;

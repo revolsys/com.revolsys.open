@@ -5,7 +5,7 @@ import java.util.List;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Strings;
 
 public class ObjectLabelField extends TextField {
   private static final long serialVersionUID = 1L;
@@ -41,7 +41,7 @@ public class ObjectLabelField extends TextField {
       if (values == null || values.isEmpty()) {
         return StringConverterRegistry.toString(fieldValue);
       } else {
-        return CollectionUtil.toString(values);
+        return Strings.toString(values);
       }
     }
   }

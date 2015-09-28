@@ -105,6 +105,20 @@ public class Maps {
     }
   }
 
+  public static <V> boolean collectionContains(final Map<Object, Collection<V>> map,
+    final Object key, final V value) {
+    if (map == null) {
+      return false;
+    } else {
+      final Collection<V> collection = map.get(key);
+      if (collection == null) {
+        return false;
+      } else {
+        return collection.contains(key);
+      }
+    }
+  }
+
   public static <K1, V> boolean containsInCollection(final Map<K1, ? extends Collection<V>> map,
     final K1 key, final V value) {
     final Collection<V> collection = map.get(key);
@@ -639,6 +653,27 @@ public class Maps {
         map.remove(key);
       }
     }
+  }
+
+  public static <K, V> boolean setContains(final Map<K, Set<V>> map, final K key, final V value) {
+    if (map == null) {
+      return false;
+    } else {
+      final Collection<? extends V> collection = map.get(key);
+      if (collection == null) {
+        return false;
+      } else {
+        return collection.contains(value);
+      }
+    }
+  }
+
+  public static <K extends Comparable<K>, V extends Comparable<V>> Map<K, V> sortByValues(
+    final Map<K, V> map) {
+    final MapValueComparator<K, V> comparator = new MapValueComparator<K, V>(map);
+    final Map<K, V> sortedMap = new TreeMap<K, V>(comparator);
+    sortedMap.putAll(map);
+    return new LinkedHashMap<K, V>(sortedMap);
   }
 
   public static Map<String, Object> toMap(final Preferences preferences) {

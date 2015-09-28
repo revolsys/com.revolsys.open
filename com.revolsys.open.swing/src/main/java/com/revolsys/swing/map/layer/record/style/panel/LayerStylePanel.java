@@ -14,6 +14,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.tree.TreePath;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -22,7 +23,6 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.node.ListTreeNode;
 import com.revolsys.swing.tree.node.layer.LayerRendererTreeNode;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class LayerStylePanel extends ValueField implements MouseListener, PropertyChangeListener {
@@ -170,7 +170,7 @@ public class LayerStylePanel extends ValueField implements MouseListener, Proper
     final List<String> pathNames = renderer.getPathNames();
     final LayerRenderer<?> selectedRenderer = this.rootRenderer.getRenderer(pathNames);
     if (selectedRenderer != null) {
-      final List<Object> path = CollectionUtil.<Object> list(this.rootNode);
+      final List<Object> path = Lists.array(this.rootNode);
       path.addAll(selectedRenderer.getPathRenderers());
       final TreePath treePath = this.tree.getTreePath(path);
       this.tree.setSelectionPath(treePath);

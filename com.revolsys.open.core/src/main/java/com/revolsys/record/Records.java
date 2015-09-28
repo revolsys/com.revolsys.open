@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.comparator.StringNumberComparator;
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -27,10 +28,10 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public final class Records {
   public static BoundingBox boundingBox(final Iterable<Record> records) {
@@ -457,9 +458,9 @@ public final class Records {
       value = value1;
     } else {
       final Set<String> values = new TreeSet<>(new StringNumberComparator());
-      values.addAll(CollectionUtil.split(value1, ","));
-      values.addAll(CollectionUtil.split(value2, ","));
-      value = CollectionUtil.toString(values);
+      values.addAll(Lists.split(value1, ","));
+      values.addAll(Lists.split(value2, ","));
+      value = Strings.toString(values);
     }
     record.put(fieldName, value);
   }

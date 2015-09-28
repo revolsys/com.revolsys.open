@@ -8,7 +8,7 @@ import java.util.List;
 
 import com.revolsys.equals.Equals;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Strings;
 
 public abstract class AbstractMultiCondition extends Condition {
 
@@ -112,6 +112,6 @@ public abstract class AbstractMultiCondition extends Condition {
 
   @Override
   public String toString() {
-    return "(" + CollectionUtil.toString(") " + this.operator + " (", getQueryValues()) + ")";
+    return "(" + Strings.toString(") " + this.operator + " (", getQueryValues()) + ")";
   }
 }

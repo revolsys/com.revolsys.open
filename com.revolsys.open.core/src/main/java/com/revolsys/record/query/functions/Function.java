@@ -11,7 +11,7 @@ import com.revolsys.equals.Equals;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Strings;
 
 public class Function extends QueryValue {
 
@@ -140,6 +140,6 @@ public class Function extends QueryValue {
   @Override
   public String toString() {
     final List<QueryValue> parameters = getParameters();
-    return getName() + "(" + CollectionUtil.toString(", ", parameters) + ")";
+    return getName() + "(" + Strings.toString(", ", parameters) + ")";
   }
 }

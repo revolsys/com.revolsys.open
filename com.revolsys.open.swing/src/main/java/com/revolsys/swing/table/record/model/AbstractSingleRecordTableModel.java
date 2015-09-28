@@ -17,7 +17,7 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.table.record.renderer.SingleRecordTableCellRenderer;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Strings;
 
 public abstract class AbstractSingleRecordTableModel extends AbstractRecordTableModel {
   private static final String[] COLUMN_NAMES = {
@@ -235,7 +235,7 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
         if (values == null || values.isEmpty()) {
           return null;
         } else {
-          text = CollectionUtil.toString(values);
+          text = Strings.toString(values);
         }
       }
       if (text.length() == 0) {

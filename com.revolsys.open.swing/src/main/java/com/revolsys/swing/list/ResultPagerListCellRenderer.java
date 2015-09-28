@@ -11,8 +11,8 @@ import javax.swing.JList;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.swing.field.ResultPagerComboBoxModel;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public class ResultPagerListCellRenderer extends DefaultListCellRenderer {
   private static final long serialVersionUID = 1L;
@@ -46,7 +46,7 @@ public class ResultPagerListCellRenderer extends DefaultListCellRenderer {
         final String text = StringConverterRegistry.toString(Property.get(value, fieldName));
         values.add(text);
       }
-      label = CollectionUtil.toString(values);
+      label = Strings.toString(values);
     }
     setText(label);
     return component;

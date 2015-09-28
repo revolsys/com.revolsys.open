@@ -45,6 +45,7 @@ import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.Converter;
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.equals.NumberEquals;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
@@ -61,7 +62,6 @@ import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.wkt.WktParser;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
@@ -243,7 +243,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   }
 
   public BoundingBoxDoubleGf(final GeometryFactory geometryFactory, final Point... points) {
-    this(geometryFactory, CollectionUtil.toList(points));
+    this(geometryFactory, Lists.array(points));
   }
 
   public BoundingBoxDoubleGf(final int axisCount, final double... bounds) {

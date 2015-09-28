@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.overlay;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.equals.Equals;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -10,8 +11,8 @@ import com.revolsys.identifier.Identifier;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public class CloseLocation implements Comparable<CloseLocation> {
 
@@ -113,7 +114,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
     } else {
       index = this.segment.getSegmentId();
     }
-    return CollectionUtil.toString(CollectionUtil.arrayToList(index));
+    return Strings.toString(Lists.arrayToList(index));
   }
 
   public AbstractRecordLayer getLayer() {
@@ -209,7 +210,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
       string.append(", index=");
       index = getSegmentId();
     }
-    final String indexString = CollectionUtil.toString(CollectionUtil.arrayToList(index));
+    final String indexString = Strings.toString(Lists.arrayToList(index));
     string.append(indexString);
     return string.toString();
   }

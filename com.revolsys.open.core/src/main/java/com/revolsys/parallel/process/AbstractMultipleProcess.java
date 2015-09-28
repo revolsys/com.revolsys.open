@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Strings;
 
 public abstract class AbstractMultipleProcess extends AbstractProcess {
 
@@ -32,7 +32,7 @@ public abstract class AbstractMultipleProcess extends AbstractProcess {
 
   @Override
   public String toString() {
-    return CollectionUtil.toString("\n  ", this.processes);
+    return Strings.toString("\n  ", this.processes);
   }
 
 }

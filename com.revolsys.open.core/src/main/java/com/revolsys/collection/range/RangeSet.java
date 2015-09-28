@@ -8,11 +8,12 @@ import java.util.List;
 import java.util.ListIterator;
 
 import com.revolsys.collection.iterator.MultiIterator;
+import com.revolsys.collection.list.Lists;
 import com.revolsys.equals.Equals;
 import com.revolsys.geometry.model.End;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Emptyable, Cloneable {
 
@@ -410,11 +411,11 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Em
   }
 
   public List<Object> toList() {
-    return CollectionUtil.list(this);
+    return Lists.array(this);
   }
 
   @Override
   public String toString() {
-    return CollectionUtil.toString(",", this.ranges);
+    return Strings.toString(",", this.ranges);
   }
 }

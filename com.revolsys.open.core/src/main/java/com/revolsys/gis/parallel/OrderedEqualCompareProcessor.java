@@ -18,8 +18,8 @@ import com.revolsys.parallel.process.AbstractInProcess;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordLog;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
 
@@ -170,7 +170,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
 
   protected void logNotEqual(final Record sourceObject, final Record otherObject,
     final Set<String> notEqualFieldNames, final boolean geometryEquals) {
-    final String fieldNames = CollectionUtil.toString(",", notEqualFieldNames);
+    final String fieldNames = Strings.toString(",", notEqualFieldNames);
     RecordLog.error(getClass(), this.sourceName + " " + fieldNames, sourceObject);
     RecordLog.error(getClass(), this.otherName + " " + fieldNames, otherObject);
   }

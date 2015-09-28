@@ -15,8 +15,8 @@ import com.revolsys.record.Record;
 import com.revolsys.record.io.format.tsv.Tsv;
 import com.revolsys.record.io.format.tsv.TsvWriter;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Emptyable;
+import com.revolsys.util.Strings;
 
 public class StatisticsMap implements Emptyable {
   private boolean logCounts;
@@ -134,7 +134,7 @@ public class StatisticsMap implements Emptyable {
     if (statisticName == null) {
       return null;
     } else {
-      final String name = CollectionUtil.toString(" ", this.prefix, statisticName);
+      final String name = Strings.toString(" ", this.prefix, statisticName);
       Statistics statistics = this.statisticsMap.get(name);
       if (statistics == null) {
         statistics = new Statistics(name);

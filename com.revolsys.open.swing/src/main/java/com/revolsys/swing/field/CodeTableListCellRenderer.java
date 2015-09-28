@@ -8,7 +8,7 @@ import javax.swing.JList;
 
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Strings;
 
 @SuppressWarnings("serial")
 public class CodeTableListCellRenderer extends DefaultListCellRenderer {
@@ -33,7 +33,7 @@ public class CodeTableListCellRenderer extends DefaultListCellRenderer {
       if (values == null || values.isEmpty()) {
         value = "-";
       } else {
-        value = CollectionUtil.toString(":", values);
+        value = Strings.toString(":", values);
       }
     }
     return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);

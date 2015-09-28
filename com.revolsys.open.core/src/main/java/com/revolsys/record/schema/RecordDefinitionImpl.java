@@ -17,6 +17,7 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.map.WeakCache;
@@ -36,7 +37,6 @@ import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.property.RecordDefinitionProperty;
 import com.revolsys.record.property.ValueRecordDefinitionProperty;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.JavaBeanUtil;
 
 public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
