@@ -126,7 +126,7 @@ public class DirectoryRecordWriter extends AbstractRecordWriter {
       final String fileName = getFileName(recordDefinition);
       final File file = new File(directory, fileName + this.nameSuffix + "." + this.fileExtension);
       final FileSystemResource resource = new FileSystemResource(file);
-      writer = RecordWriter.create(recordDefinition, resource);
+      writer = RecordWriter.newRecordWriter(recordDefinition, resource);
       if (writer == null) {
         throw new IllegalArgumentException("Unable to create writer for " + resource);
       } else {

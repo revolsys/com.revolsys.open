@@ -17,7 +17,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 
 public class JdbcFieldDefinition extends FieldDefinition {
-  public static JdbcFieldDefinition createField(final Object value) {
+  public static JdbcFieldDefinition newFieldDefinition(final Object value) {
     if (value == null) {
       return new JdbcFieldDefinition(null, null, DataTypes.OBJECT, Types.OTHER, 0, 0, false, null,
         null);

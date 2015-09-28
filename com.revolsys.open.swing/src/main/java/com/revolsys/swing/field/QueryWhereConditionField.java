@@ -191,14 +191,14 @@ public class QueryWhereConditionField extends ValueField
     final JButton likeConditionAddButton = InvokeMethodAction.createButton("",
       "Add Unary Condition", ICON, this, "actionAddLikeCondition");
     this.likeConditionField = new TextField(20);
-    this.likePanel = new BasePanel(SwingUtil.createLabel("LIKE"), new JLabel(" '%"),
+    this.likePanel = new BasePanel(SwingUtil.newLabel("LIKE"), new JLabel(" '%"),
       this.likeConditionField, new JLabel("%' "), likeConditionAddButton);
     GroupLayoutUtil.makeColumns(this.likePanel, false);
 
     final JButton inConditionAddButton = InvokeMethodAction.createButton("", "Add Unary Condition",
       ICON, this, "actionAddInCondition");
     this.inConditionField = new TextField(20);
-    this.inConditionPanel = new BasePanel(SwingUtil.createLabel("IN"), this.inConditionField,
+    this.inConditionPanel = new BasePanel(SwingUtil.newLabel("IN"), this.inConditionField,
       inConditionAddButton);
     setInConditionField(null);
 

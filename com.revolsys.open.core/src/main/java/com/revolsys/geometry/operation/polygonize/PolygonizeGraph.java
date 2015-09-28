@@ -272,7 +272,7 @@ class PolygonizeGraph extends PlanarGraph {
   private final GeometryFactory factory;
 
   /**
-   * Create a new polygonization graph.
+   * Construct a new new polygonization graph.
    */
   public PolygonizeGraph(final GeometryFactory factory) {
     this.factory = factory;

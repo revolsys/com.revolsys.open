@@ -41,7 +41,7 @@ import com.revolsys.geometry.operation.valid.IsValidOp;
 
 /**
  *
- * This class is used to create a line string within the specified bounding box.
+ * This class is used to Construct a new line string within the specified bounding box.
  *
  * Sucessive calls to create may or may not return the same geometry topology.
  *
@@ -64,7 +64,7 @@ public class LineStringGenerator extends GeometryGenerator {
   public static final int HORZ = 2;
 
   /**
-   * Number of interations attempting to create a valid line string
+   * Number of interations attempting to Construct a new valid line string
    */
   private static final int RUNS = 5;
 

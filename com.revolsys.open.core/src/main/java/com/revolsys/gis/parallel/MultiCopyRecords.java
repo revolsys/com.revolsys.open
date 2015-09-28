@@ -39,7 +39,7 @@ public class MultiCopyRecords implements Process {
     } else {
       final String type = (String)processDefinition.get("type");
       if ("copyRecords".equals(type)) {
-        final PathName typePath = PathName.create(processDefinition.get("typePath"));
+        final PathName typePath = PathName.newPathName(processDefinition.get("typePath"));
         if (Property.hasValue(typePath)) {
           final boolean hasSequence = Maps.getBool(processDefinition, "hasSequence");
           final Map<String, Boolean> orderBy = Maps.get(processDefinition, "orderBy",

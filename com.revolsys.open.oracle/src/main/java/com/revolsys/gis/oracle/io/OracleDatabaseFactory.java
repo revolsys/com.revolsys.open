@@ -93,17 +93,6 @@ public class OracleDatabaseFactory extends AbstractJdbcDatabaseFactory {
   }
 
   @Override
-  public JdbcRecordStore createRecordStore(final DataSource dataSource) {
-    return new OracleRecordStore(dataSource);
-  }
-
-  @Override
-  public JdbcRecordStore createRecordStore(
-    final Map<String, ? extends Object> connectionProperties) {
-    return new OracleRecordStore(this, connectionProperties);
-  }
-
-  @Override
   public String getConnectionValidationQuery() {
     return "SELECT 1 FROM DUAL";
   }
@@ -137,5 +126,15 @@ public class OracleDatabaseFactory extends AbstractJdbcDatabaseFactory {
   @Override
   public List<String> getUrlPatterns() {
     return URL_PATTERNS;
+  }
+
+  @Override
+  public JdbcRecordStore newRecordStore(final DataSource dataSource) {
+    return new OracleRecordStore(dataSource);
+  }
+
+  @Override
+  public JdbcRecordStore newRecordStore(final Map<String, ? extends Object> connectionProperties) {
+    return new OracleRecordStore(this, connectionProperties);
   }
 }

@@ -137,7 +137,7 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
   protected abstract AbstractNode<T> createNode(int level, double... newBounds);
 
   private AbstractNode<T> createSubnode(final int index) {
-    // create a new subquad in the appropriate quadrant
+    // Construct a new new subquad in the appropriate quadrant
 
     double minX = 0.0;
     double maxX = 0.0;

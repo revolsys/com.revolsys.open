@@ -625,7 +625,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   /**
-   * Create a form for the object using the specified list of fields keys. The
+   * Construct a new form for the object using the specified list of fields keys. The
    * form is created without the form title.
    *
    * @param <T> The type of form to return.
@@ -802,7 +802,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   /**
-   * Create a new field (or element) for the named key. The parameters from the
+   * Construct a new new field (or element) for the named key. The parameters from the
    * HttpRequest can be used to customise the look of the field.
    *
    * @param request The servlet request.

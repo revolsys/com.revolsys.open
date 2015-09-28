@@ -60,7 +60,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
 
   private Geometry parse(final String value) {
     final InputStream in = new StringByteInputStream(value);
-    final ValueGetter valueGetter = ValueGetter.create(in);
+    final ValueGetter valueGetter = ValueGetter.newValueGetter(in);
     return parseGeometry(valueGetter);
   }
 

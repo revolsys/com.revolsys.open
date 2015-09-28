@@ -53,7 +53,7 @@ public final class EpsgCoordinateSystemsLoader {
     parameters.put("url", "jdbc:postgresql://localhost:5432/epsg");
     parameters.put("username", "epsg");
     parameters.put("password", "epsg");
-    this.recordStore = RecordStoreFactoryRegistry.createRecordStore(parameters);
+    this.recordStore = RecordStoreFactoryRegistry.newRecordStore(parameters);
   }
 
   protected Double getDoubleNaN(final Record object, final String name) {

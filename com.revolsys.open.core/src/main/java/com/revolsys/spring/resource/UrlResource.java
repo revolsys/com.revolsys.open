@@ -36,7 +36,7 @@ public class UrlResource extends AbstractResource {
   private final URL url;
 
   /**
-   * Create a new UrlResource based on a URL path.
+   * Construct a new new UrlResource based on a URL path.
    * <p>Note: The given path needs to be pre-encoded if necessary.
    * @param path a URL path
    * @throws MalformedURLException if the given URL path is not valid
@@ -54,7 +54,7 @@ public class UrlResource extends AbstractResource {
   }
 
   /**
-   * Create a new UrlResource based on a URI specification.
+   * Construct a new new UrlResource based on a URI specification.
    * <p>The given parts will automatically get encoded if necessary.
    * @param protocol the URL protocol to use (e.g. "jar" or "file" - without colon);
    * also known as "scheme"
@@ -68,7 +68,7 @@ public class UrlResource extends AbstractResource {
   }
 
   /**
-   * Create a new UrlResource based on a URI specification.
+   * Construct a new new UrlResource based on a URI specification.
    * <p>The given parts will automatically get encoded if necessary.
    * @param protocol the URL protocol to use (e.g. "jar" or "file" - without colon);
    * also known as "scheme"
@@ -90,7 +90,7 @@ public class UrlResource extends AbstractResource {
   }
 
   /**
-   * Create a new UrlResource based on the given URI object.
+   * Construct a new new UrlResource based on the given URI object.
    * @param uri a URI
    * @throws MalformedURLException if the given URL path is not valid
    */
@@ -106,7 +106,7 @@ public class UrlResource extends AbstractResource {
   }
 
   /**
-   * Create a new UrlResource based on the given URL object.
+   * Construct a new new UrlResource based on the given URL object.
    * @param url a URL
    */
   public UrlResource(final URL url) {

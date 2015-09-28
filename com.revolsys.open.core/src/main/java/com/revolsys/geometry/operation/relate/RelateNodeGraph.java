@@ -52,7 +52,7 @@ import com.revolsys.geometry.model.Location;
  * Also supports building a topological graph of a single Geometry, to
  * allow verification of valid topology.
  * <p>
- * It is <b>not</b> necessary to create a fully linked
+ * It is <b>not</b> necessary to Construct a new fully linked
  * PlanarGraph to determine relationships, since it is sufficient
  * to know how the Geometries interact locally around the nodes.
  * In fact, this is not even feasible, since it is not possible to compute

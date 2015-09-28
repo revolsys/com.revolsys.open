@@ -5,11 +5,10 @@ import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.spring.resource.Resource;
 
 public interface GeometryReaderFactory extends FileIoFactory, IoFactoryWithCoordinateSystem {
-  default GeometryReader createGeometryReader(final Object source) {
-    final Resource resource = com.revolsys.spring.resource.Resource.getResource(source);
-    return createGeometryReader(resource);
+  default GeometryReader newGeometryReader(final Object source) {
+    final Resource resource = Resource.getResource(source);
+    return newGeometryReader(resource);
   }
 
-  GeometryReader createGeometryReader(final Resource resource);
-
+  GeometryReader newGeometryReader(final Resource resource);
 }

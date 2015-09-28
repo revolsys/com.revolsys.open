@@ -56,7 +56,7 @@ public class SpringUtil {
 
   public static Resource getBaseResource(final String childPath) {
     final Resource baseResource = getBaseResource();
-    return baseResource.createChild(childPath);
+    return baseResource.newChildResource(childPath);
   }
 
   public static File getFileOrCreateTempFile(final Resource resource) {

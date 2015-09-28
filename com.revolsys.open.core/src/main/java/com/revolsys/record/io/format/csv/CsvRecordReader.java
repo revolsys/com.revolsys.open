@@ -72,7 +72,91 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
     this.fieldSeparator = fieldSeparator;
   }
 
-  private void createRecordDefinition(final String[] fieldNames) throws IOException {
+  /**
+   * Closes the underlying reader.
+   */
+  @Override
+  protected void doClose() {
+    FileUtil.closeSilent(this.in);
+    this.recordFactory = null;
+    this.geometryFactory = null;
+    this.in = null;
+    this.resource = null;
+  }
+
+  @Override
+  protected void doInit() {
+    try {
+      this.pointXFieldName = getProperty("pointXFieldName");
+      this.pointYFieldName = getProperty("pointYFieldName");
+      this.geometryColumnName = getProperty("geometryColumnName", "GEOMETRY");
+
+      this.geometryFactory = GeometryFactory.get(getProperty("geometryFactory"));
+      if (this.geometryFactory == null) {
+        final Integer geometrySrid = Property.getInteger(this, "geometrySrid");
+        if (geometrySrid == null) {
+          this.geometryFactory = EsriCoordinateSystems.getGeometryFactory(this.resource);
+        } else {
+          this.geometryFactory = GeometryFactory.floating3(geometrySrid);
+        }
+      }
+      if (this.geometryFactory == null) {
+        this.geometryFactory = GeometryFactory.floating3();
+      }
+      final DataType geometryType = DataTypes.getType((String)getProperty("geometryType"));
+      if (Geometry.class.isAssignableFrom(geometryType.getJavaClass())) {
+        this.geometryType = geometryType;
+      }
+
+      this.in = new BufferedReader(FileUtil.createUtf8Reader(this.resource.getInputStream()));
+      final String[] line = readNextRecord();
+      newRecordDefinition(line);
+    } catch (final IOException e) {
+      ExceptionUtil.log(getClass(), "Unable to open " + this.resource, e);
+    } catch (final NoSuchElementException e) {
+    }
+  }
+
+  @Override
+  protected Record getNext() {
+    try {
+      final String[] record = readNextRecord();
+      if (record != null && record.length > 0) {
+        return parseRecord(record);
+      } else {
+        throw new NoSuchElementException();
+      }
+    } catch (final IOException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Reads the next line from the file.
+   *
+   * @return the next line from the file without trailing newline
+   * @throws IOException if bad things happen during the read
+   */
+  private String getNextLine() throws IOException {
+    final BufferedReader in = this.in;
+    if (in == null) {
+      throw new NoSuchElementException();
+    } else {
+      final String nextLine = this.in.readLine();
+      if (nextLine == null) {
+        throw new NoSuchElementException();
+      }
+      return nextLine;
+    }
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition() {
+    open();
+    return this.recordDefinition;
+  }
+
+  private void newRecordDefinition(final String[] fieldNames) throws IOException {
     this.hasPointFields = Property.hasValue(this.pointXFieldName)
       && Property.hasValue(this.pointYFieldName);
     if (this.hasPointFields) {
@@ -154,92 +238,8 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
         typePath = schemaPath + typePath;
       }
     }
-    final PathName pathName = PathName.create(typePath);
+    final PathName pathName = PathName.newPathName(typePath);
     this.recordDefinition = new RecordDefinitionImpl(schema, pathName, getProperties(), fields);
-  }
-
-  /**
-   * Closes the underlying reader.
-   */
-  @Override
-  protected void doClose() {
-    FileUtil.closeSilent(this.in);
-    this.recordFactory = null;
-    this.geometryFactory = null;
-    this.in = null;
-    this.resource = null;
-  }
-
-  @Override
-  protected void doInit() {
-    try {
-      this.pointXFieldName = getProperty("pointXFieldName");
-      this.pointYFieldName = getProperty("pointYFieldName");
-      this.geometryColumnName = getProperty("geometryColumnName", "GEOMETRY");
-
-      this.geometryFactory = GeometryFactory.get(getProperty("geometryFactory"));
-      if (this.geometryFactory == null) {
-        final Integer geometrySrid = Property.getInteger(this, "geometrySrid");
-        if (geometrySrid == null) {
-          this.geometryFactory = EsriCoordinateSystems.getGeometryFactory(this.resource);
-        } else {
-          this.geometryFactory = GeometryFactory.floating3(geometrySrid);
-        }
-      }
-      if (this.geometryFactory == null) {
-        this.geometryFactory = GeometryFactory.floating3();
-      }
-      final DataType geometryType = DataTypes.getType((String)getProperty("geometryType"));
-      if (Geometry.class.isAssignableFrom(geometryType.getJavaClass())) {
-        this.geometryType = geometryType;
-      }
-
-      this.in = new BufferedReader(FileUtil.createUtf8Reader(this.resource.getInputStream()));
-      final String[] line = readNextRecord();
-      createRecordDefinition(line);
-    } catch (final IOException e) {
-      ExceptionUtil.log(getClass(), "Unable to open " + this.resource, e);
-    } catch (final NoSuchElementException e) {
-    }
-  }
-
-  @Override
-  protected Record getNext() {
-    try {
-      final String[] record = readNextRecord();
-      if (record != null && record.length > 0) {
-        return parseRecord(record);
-      } else {
-        throw new NoSuchElementException();
-      }
-    } catch (final IOException e) {
-      throw new RuntimeException(e.getMessage(), e);
-    }
-  }
-
-  /**
-   * Reads the next line from the file.
-   *
-   * @return the next line from the file without trailing newline
-   * @throws IOException if bad things happen during the read
-   */
-  private String getNextLine() throws IOException {
-    final BufferedReader in = this.in;
-    if (in == null) {
-      throw new NoSuchElementException();
-    } else {
-      final String nextLine = this.in.readLine();
-      if (nextLine == null) {
-        throw new NoSuchElementException();
-      }
-      return nextLine;
-    }
-  }
-
-  @Override
-  public RecordDefinition getRecordDefinition() {
-    open();
-    return this.recordDefinition;
   }
 
   /**
@@ -313,7 +313,7 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
    * @return The Record.
    */
   private Record parseRecord(final String[] record) {
-    final Record object = this.recordFactory.createRecord(this.recordDefinition);
+    final Record object = this.recordFactory.newRecord(this.recordDefinition);
     for (int i = 0; i < this.recordDefinition.getFieldCount(); i++) {
       String value = null;
       if (i < record.length) {

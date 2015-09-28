@@ -5,10 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -159,24 +157,6 @@ public final class CollectionUtil {
     }
   }
 
-  public static <V> Set<V> createHashSet(final Collection<? extends V> set) {
-    final Set<V> copy = new HashSet<V>();
-    if (set != null) {
-      copy.addAll(set);
-    }
-    return copy;
-
-  }
-
-  public static <V> Set<V> createLinkedHashSet(final Collection<? extends V> set) {
-    final Set<V> copy = new LinkedHashSet<V>();
-    if (set != null) {
-      copy.addAll(set);
-    }
-    return copy;
-
-  }
-
   /**
    * Filter the collection by applying the filter.
    * @param collection
@@ -229,16 +209,6 @@ public final class CollectionUtil {
   }
 
   public static <V> List<V> list(final Iterable<? extends V> values) {
-    final ArrayList<V> list = new ArrayList<V>();
-    if (values != null) {
-      for (final V value : values) {
-        list.add(value);
-      }
-    }
-    return list;
-  }
-
-  public static <V> List<V> list(final V... values) {
     final ArrayList<V> list = new ArrayList<V>();
     if (values != null) {
       for (final V value : values) {
@@ -397,7 +367,7 @@ public final class CollectionUtil {
   }
 
   /**
-   * Create a string using the same style as java.util.List.toString.
+   * Construct a new string using the same style as java.util.List.toString.
    * @param iterator
    * @return
    */

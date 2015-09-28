@@ -32,7 +32,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record>implements Record
   public static Record getNextRecord(final JdbcRecordStore recordStore,
     final RecordDefinition recordDefinition, final List<FieldDefinition> fields,
     final RecordFactory recordFactory, final ResultSet resultSet) {
-    final Record record = recordFactory.createRecord(recordDefinition);
+    final Record record = recordFactory.newRecord(recordDefinition);
     if (record != null) {
       record.setState(RecordState.Initalizing);
       int columnIndex = 1;

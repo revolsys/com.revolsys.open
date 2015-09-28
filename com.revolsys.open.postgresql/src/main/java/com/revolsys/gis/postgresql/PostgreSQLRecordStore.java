@@ -39,7 +39,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   public static final List<String> POSTGRESQL_INTERNAL_SCHEMAS = Arrays.asList("information_schema",
     "pg_catalog", "pg_toast_temp_1");
 
-  public static final AbstractIterator<Record> createPostgreSQLIterator(
+  public static final AbstractIterator<Record> newPostgreSQLIterator(
     final PostgreSQLRecordStore recordStore, final Query query,
     final Map<String, Object> properties) {
     return new PostgreSQLJdbcQueryIterator(recordStore, query, properties);
@@ -59,7 +59,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   public PostgreSQLRecordStore(final PostgreSQLDatabaseFactory databaseFactory,
     final Map<String, ? extends Object> connectionProperties) {
     super(databaseFactory);
-    final DataSource dataSource = databaseFactory.createDataSource(connectionProperties);
+    final DataSource dataSource = databaseFactory.newDataSource(connectionProperties);
     setDataSource(dataSource);
     initSettings();
     setConnectionProperties(connectionProperties);
@@ -238,7 +238,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
 
   protected void initSettings() {
     setIteratorFactory(
-      new RecordStoreIteratorFactory(PostgreSQLRecordStore.class, "createPostgreSQLIterator"));
+      new RecordStoreIteratorFactory(PostgreSQLRecordStore.class, "newPostgreSQLIterator"));
   }
 
   @Override

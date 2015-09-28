@@ -109,7 +109,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
       // TODO prevent duplicates from other threads/processes
       final Record code = this.recordStore.newRecord(this.typePath);
       final RecordDefinition recordDefinition = code.getRecordDefinition();
-      Object id = this.recordStore.createPrimaryIdValue(this.typePath);
+      Object id = this.recordStore.newPrimaryIdValue(this.typePath);
       if (id == null) {
         final FieldDefinition idField = recordDefinition.getIdField();
         if (idField != null) {

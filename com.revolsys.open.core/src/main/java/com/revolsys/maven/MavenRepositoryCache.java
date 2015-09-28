@@ -47,7 +47,7 @@ public class MavenRepositoryCache extends MavenRepository {
 
   public boolean copyRepositoryResource(final Resource resource, final MavenRepository repository,
     final String path, final String sha1Digest) {
-    final Resource repositoryResource = repository.getRoot().createChild(path);
+    final Resource repositoryResource = repository.getRoot().newChildResource(path);
     if (repositoryResource.exists()) {
       try {
         if (Property.hasValue(sha1Digest)) {
@@ -102,7 +102,7 @@ public class MavenRepositoryCache extends MavenRepository {
 
         final String path = getPath(groupId, artifactId, version, type, classifier,
           timestampVersion, algorithm);
-        final Resource cachedResource = getRoot().createChild(path);
+        final Resource cachedResource = getRoot().newChildResource(path);
         if (cachedResource.exists()) {
           return cachedResource;
         } else {

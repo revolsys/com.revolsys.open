@@ -34,18 +34,6 @@ public class MoepDirectoryReader extends RecordDirectoryReader implements Record
     setDirectory(directory);
   }
 
-  /**
-   * Create a new {@link MoepBinaryReader} to read the file.
-   *
-   * @param file The file to read.
-   * @return The reader for the file.
-   * @throws IOException If an I/O error occurs.
-   */
-  @Override
-  protected Reader<Record> createReader(final Resource resource) {
-    return new MoepBinaryReader(this, resource, new ArrayRecordFactory());
-  }
-
   public Date getIntegrationDate() {
     return this.integrationDate;
   }
@@ -71,12 +59,24 @@ public class MoepDirectoryReader extends RecordDirectoryReader implements Record
     return this.submissionDate;
   }
 
+  /**
+   * Construct a new new {@link MoepBinaryReader} to read the file.
+   *
+   * @param file The file to read.
+   * @return The reader for the file.
+   * @throws IOException If an I/O error occurs.
+   */
+  @Override
+  protected Reader<Record> newReader(final Resource resource) {
+    return new MoepBinaryReader(this, resource, new ArrayRecordFactory());
+  }
+
   @Override
   public void setDirectory(final File directory) {
     super.setDirectory(directory);
     final String name = FileUtil.getFileName(directory);
     final File file = new File(directory, name + "s.bin");
-    final Reader<Record> supDataReader = createReader(new FileSystemResource(file));
+    final Reader<Record> supDataReader = newReader(new FileSystemResource(file));
     for (final Record supData : supDataReader) {
       final String featureCode = supData.getValue(MoepConstants.FEATURE_CODE);
       if (featureCode.equals("KN00020000")) {

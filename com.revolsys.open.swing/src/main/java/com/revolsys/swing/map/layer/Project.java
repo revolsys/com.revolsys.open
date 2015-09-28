@@ -233,7 +233,7 @@ public class Project extends LayerGroup {
 
   public Path getSaveAsDirectory() {
     File directory = null;
-    final JFileChooser fileChooser = SwingUtil.createFileChooser("Save Project",
+    final JFileChooser fileChooser = SwingUtil.newFileChooser("Save Project",
       "com.revolsys.swing.map.project", "directory");
     fileChooser.setFileFilter(new FileNameExtensionFilter("Project", "rgmap"));
     fileChooser.setMultiSelectionEnabled(false);
@@ -274,8 +274,8 @@ public class Project extends LayerGroup {
   }
 
   protected void readBaseMapsLayers(final Resource resource) {
-    final Resource baseMapsResource = resource.createChild("Base Maps");
-    final Resource layerGroupResource = baseMapsResource.createChild("rgLayerGroup.rgobject");
+    final Resource baseMapsResource = resource.newChildResource("Base Maps");
+    final Resource layerGroupResource = baseMapsResource.newChildResource("rgLayerGroup.rgobject");
     if (layerGroupResource.exists()) {
       final Resource oldResource = SpringUtil.setBaseResource(baseMapsResource);
       try {
@@ -298,7 +298,7 @@ public class Project extends LayerGroup {
   }
 
   protected void readLayers(final Resource resource) {
-    final Resource layerGroupResource = resource.createChild("rgLayerGroup.rgobject");
+    final Resource layerGroupResource = resource.newChildResource("rgLayerGroup.rgobject");
     if (!layerGroupResource.exists()) {
       LoggerFactory.getLogger(getClass()).error("File not found: " + layerGroupResource);
     } else {
@@ -325,15 +325,15 @@ public class Project extends LayerGroup {
       String name;
       try (
         final Enabled enabled = eventsDisabled()) {
-        final Resource layersDir = resource.createChild("Layers");
+        final Resource layersDir = resource.newChildResource("Layers");
         readProperties(layersDir);
 
         final RecordStoreConnectionRegistry oldRecordStoreConnections = RecordStoreConnectionRegistry
           .getForThread();
         try {
-          final Resource recordStoresDirectory = resource.createChild("Record Stores");
+          final Resource recordStoresDirectory = resource.newChildResource("Record Stores");
           if (!recordStoresDirectory.exists()) {
-            final Resource dataStoresDirectory = resource.createChild("Data Stores");
+            final Resource dataStoresDirectory = resource.newChildResource("Data Stores");
             if (dataStoresDirectory.exists()) {
               final File file = dataStoresDirectory.getFile();
               file.renameTo(new File(file.getParentFile(), "Record Stores"));
@@ -346,7 +346,8 @@ public class Project extends LayerGroup {
           setRecordStores(recordStores);
           RecordStoreConnectionRegistry.setForThread(recordStores);
 
-          final Resource folderConnectionsDirectory = resource.createChild("Folder Connections");
+          final Resource folderConnectionsDirectory = resource
+            .newChildResource("Folder Connections");
           this.folderConnections = new FolderConnectionRegistry("Project",
             folderConnectionsDirectory, readOnly);
 
@@ -364,7 +365,7 @@ public class Project extends LayerGroup {
   }
 
   protected void readProperties(final Resource resource) {
-    final Resource layerGroupResource = resource.createChild("rgLayerGroup.rgobject");
+    final Resource layerGroupResource = resource.newChildResource("rgLayerGroup.rgobject");
     if (!layerGroupResource.exists()) {
       LoggerFactory.getLogger(getClass()).error("File not found: " + layerGroupResource);
     } else {

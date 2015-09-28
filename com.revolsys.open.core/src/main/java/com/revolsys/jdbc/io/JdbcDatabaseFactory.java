@@ -14,13 +14,6 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
 
   void closeDataSource(DataSource dataSource);
 
-  DataSource createDataSource(Map<String, ? extends Object> connectionProperties);
-
-  JdbcRecordStore createRecordStore(DataSource dataSource);
-
-  @Override
-  JdbcRecordStore createRecordStore(Map<String, ? extends Object> connectionProperties);
-
   List<String> getProductNames();
 
   @Override
@@ -29,4 +22,11 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
 
   @Override
   List<String> getUrlPatterns();
+
+  DataSource newDataSource(Map<String, ? extends Object> connectionProperties);
+
+  JdbcRecordStore newRecordStore(DataSource dataSource);
+
+  @Override
+  JdbcRecordStore newRecordStore(Map<String, ? extends Object> connectionProperties);
 }

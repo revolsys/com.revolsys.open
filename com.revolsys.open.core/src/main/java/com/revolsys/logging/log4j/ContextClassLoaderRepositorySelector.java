@@ -28,7 +28,7 @@ import org.apache.log4j.spi.RootLogger;
 /**
  * The ContextClassLoaderRepositorySelector class is used to manage different
  * {@link LoggerRepository} heirarchies for different context class loaders. The
- * {@link #add()} method can be used to create a seperate logger repository for
+ * {@link #add()} method can be used to Construct a new seperate logger repository for
  * the current thread context class loader. When the class loader is about to be
  * destroyed use the {@link #remove()} method to clean up the logger repository
  * for the class loader. See the Log4jServletContextListener for use in web

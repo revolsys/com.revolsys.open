@@ -247,7 +247,7 @@ public final class UrlUtil {
   }
 
   /**
-   * Create a new URL from the baseUrl with the additional query string
+   * Construct a new new URL from the baseUrl with the additional query string
    * parameters.
    *
    * @param baseUrl The baseUrl.
@@ -303,7 +303,7 @@ public final class UrlUtil {
   }
 
   /**
-   * Create a new URL from the baseUrl with the additional query string
+   * Construct a new new URL from the baseUrl with the additional query string
    * parameters.
    *
    * @param baseUrl The baseUrl.
@@ -324,7 +324,7 @@ public final class UrlUtil {
   }
 
   /**
-   * Create a new URL from the baseUrl with the additional query string
+   * Construct a new new URL from the baseUrl with the additional query string
    * parameters.
    *
    * @param baseUrl The baseUrl.

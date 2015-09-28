@@ -31,11 +31,11 @@ public class JdbcRecordStoreFactoryBean extends AbstractFactoryBean<JdbcRecordSt
     if (this.dataSource == null) {
       final JdbcDatabaseFactory databaseFactory = jdbcFactoryRegistry
         .getDatabaseFactory(this.config);
-      recordStore = databaseFactory.createRecordStore(this.config);
+      recordStore = databaseFactory.newRecordStore(this.config);
     } else {
       final JdbcDatabaseFactory databaseFactory = jdbcFactoryRegistry
         .getDatabaseFactory(this.dataSource);
-      recordStore = databaseFactory.createRecordStore(this.dataSource);
+      recordStore = databaseFactory.newRecordStore(this.dataSource);
     }
     Property.set(recordStore, this.properties);
     recordStore.initialize();

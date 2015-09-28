@@ -73,7 +73,7 @@ public class EsriCoordinateSystems {
   }
 
   public static void createPrjFile(final Resource resource, final GeometryFactory geometryFactory) {
-    final Resource prjResource = resource.createChangeExtension("prj");
+    final Resource prjResource = resource.newResourceChangeExtension("prj");
     if (prjResource != null) {
       try (
         final Writer writer = prjResource.newWriter(StandardCharsets.ISO_8859_1)) {
@@ -149,12 +149,12 @@ public class EsriCoordinateSystems {
   }
 
   /**
-   * Create a geometry factory from a .prj with the same base name as the resource if it exists. Returns null if the prj file does not exist.
+   * Construct a new geometry factory from a .prj with the same base name as the resource if it exists. Returns null if the prj file does not exist.
    * @param resource
    * @return
    */
   public static GeometryFactory getGeometryFactory(final Resource resource) {
-    final Resource projResource = resource.createChangeExtension("prj");
+    final Resource projResource = resource.newResourceChangeExtension("prj");
     if (Resource.exists(projResource)) {
       try {
         final CoordinateSystem coordinateSystem = getCoordinateSystem(projResource);

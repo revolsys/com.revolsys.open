@@ -92,13 +92,13 @@ public class Gml extends AbstractIoFactoryWithCoordinateSystem
   }
 
   @Override
-  public GeometryReader createGeometryReader(final Resource resource) {
+  public GeometryReader newGeometryReader(final Resource resource) {
     final GmlGeometryIterator iterator = new GmlGeometryIterator(resource);
     return new GeometryReader(iterator);
   }
 
   @Override
-  public RecordWriter createRecordWriter(final String baseName,
+  public RecordWriter newRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);

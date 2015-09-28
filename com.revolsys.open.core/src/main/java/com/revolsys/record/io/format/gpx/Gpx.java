@@ -25,16 +25,20 @@ public class Gpx extends AbstractRecordIoFactory implements RecordWriterFactory 
     throw new UnsupportedOperationException();
   }
 
+  @Override
+  public boolean isCustomFieldsSupported() {
+    return false;
+  }
+
   /**
-   * Create a reader for the file using the specified data object factory.
+   * Construct a new reader for the file using the specified data object factory.
    *
    * @param inputStream The file to read.
    * @param factory The factory used to create data objects.
    * @return The reader for the file.
    */
   @Override
-  public RecordReader createRecordReader(final Resource resource,
-    final RecordFactory recordFactory) {
+  public RecordReader newRecordReader(final Resource resource, final RecordFactory recordFactory) {
     try {
       return new GpxIterator(resource, recordFactory, null);
     } catch (final IOException e) {
@@ -43,15 +47,10 @@ public class Gpx extends AbstractRecordIoFactory implements RecordWriterFactory 
   }
 
   @Override
-  public RecordWriter createRecordWriter(final String baseName,
+  public RecordWriter newRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
     return new GpxWriter(writer);
-  }
-
-  @Override
-  public boolean isCustomFieldsSupported() {
-    return false;
   }
 }

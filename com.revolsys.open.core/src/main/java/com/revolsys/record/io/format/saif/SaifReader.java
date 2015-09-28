@@ -137,7 +137,7 @@ public class SaifReader extends AbstractReader<Record>
   }
 
   /**
-   * Create a new SaifReader to read the SAIF archive from the specified file .
+   * Construct a new new SaifReader to read the SAIF archive from the specified file .
    * If the file is a directory, then in must contain an expanded SAIF archive,
    * otherwise the file must be a compressed SAIF archive (.zip or.saf).
    *
@@ -152,7 +152,7 @@ public class SaifReader extends AbstractReader<Record>
   }
 
   /**
-   * Create a new SaifReader to read the SAIF archive from the specified file
+   * Construct a new new SaifReader to read the SAIF archive from the specified file
    * name. If the file is a directory, then in must contain an expanded SAIF
    * archive, otherwise the file must be a compressed SAIF archive (.zip
    * or.saf).

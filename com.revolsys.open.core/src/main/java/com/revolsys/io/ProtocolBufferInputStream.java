@@ -88,14 +88,14 @@ public final class ProtocolBufferInputStream {
   // -----------------------------------------------------------------
 
   /**
-   * Create a new CodedInputStream wrapping the given byte array.
+   * Construct a new new CodedInputStream wrapping the given byte array.
    */
   public static ProtocolBufferInputStream newInstance(final byte[] buf) {
     return newInstance(buf, 0, buf.length);
   }
 
   /**
-   * Create a new CodedInputStream wrapping the given byte array slice.
+   * Construct a new new CodedInputStream wrapping the given byte array slice.
    */
   public static ProtocolBufferInputStream newInstance(final byte[] buf, final int off,
     final int len) {
@@ -121,7 +121,7 @@ public final class ProtocolBufferInputStream {
   }
 
   /**
-   * Create a new CodedInputStream wrapping the given InputStream.
+   * Construct a new new CodedInputStream wrapping the given InputStream.
    */
   public static ProtocolBufferInputStream newInstance(final InputStream input) {
     return new ProtocolBufferInputStream(input);

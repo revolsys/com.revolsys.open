@@ -102,7 +102,7 @@ public abstract class GeometricShapeBuilder {
   /**
    * Sets the total number of points in the created {@link Geometry}.
    * The created geometry will have no more than this number of points,
-   * unless more are needed to create a valid geometry.
+   * unless more are needed to Construct a new valid geometry.
    */
   public void setNumPoints(final int numPts) {
     this.numPts = numPts;

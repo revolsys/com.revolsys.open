@@ -185,7 +185,7 @@ public class ProjectFrame extends BaseFrame {
   private void actionOpenProject() {
     if (this.project != null && this.project.saveWithPrompt()) {
 
-      final JFileChooser fileChooser = SwingUtil.createFileChooser("Open Project",
+      final JFileChooser fileChooser = SwingUtil.newFileChooser("Open Project",
         "com.revolsys.swing.map.project", "directory");
 
       final FileNameExtensionFilter filter = new FileNameExtensionFilter(
@@ -204,7 +204,7 @@ public class ProjectFrame extends BaseFrame {
   }
 
   public void actionRunScript() {
-    final JFileChooser fileChooser = SwingUtil.createFileChooser("Select Script",
+    final JFileChooser fileChooser = SwingUtil.newFileChooser("Select Script",
       "com.revolsys.swing.tools.script", "directory");
     final FileNameExtensionFilter groovyFilter = new FileNameExtensionFilter("Groovy Script",
       "groovy");

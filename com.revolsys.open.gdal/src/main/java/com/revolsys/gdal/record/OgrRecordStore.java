@@ -284,7 +284,243 @@ public class OgrRecordStore extends AbstractRecordStore {
     }
   }
 
-  protected DataSource createDataSource(final boolean update) {
+  public void doClose() {
+    synchronized (this) {
+      if (!isClosed()) {
+        if (this.dataSource != null) {
+          try {
+            for (final Layer layer : this.layersToClose) {
+              this.dataSource.ReleaseResultSet(layer);
+            }
+            this.layersToClose.clear();
+            this.dataSource.delete();
+          } finally {
+            this.dataSource = null;
+            this.closed = true;
+            super.close();
+          }
+        }
+      }
+    }
+  }
+
+  protected DataSource getDataSource() {
+    if (isClosed()) {
+      return null;
+    } else {
+      if (this.dataSource == null) {
+        this.dataSource = newDataSource(false);
+        this.driverName = this.dataSource.GetDriver().getName();
+      }
+      return this.dataSource;
+    }
+  }
+
+  public String getDriverName() {
+    return this.driverName;
+  }
+
+  private int getGeometryFieldType(final GeometryFactory geometryFactory,
+    final FieldDefinition field) {
+    int type;
+    final DataType dataType = field.getType();
+
+    if (DataTypes.POINT.equals(dataType)) {
+      type = 1;
+    } else if (DataTypes.LINE_STRING.equals(dataType)) {
+      type = 2;
+    } else if (DataTypes.POLYGON.equals(dataType)) {
+      type = 3;
+    } else if (DataTypes.MULTI_POINT.equals(dataType)) {
+      type = 4;
+    } else if (DataTypes.MULTI_LINE_STRING.equals(dataType)) {
+      type = 5;
+    } else if (DataTypes.MULTI_POINT.equals(dataType)) {
+      type = 6;
+    } else if (DataTypes.GEOMETRY_COLLECTION.equals(dataType)) {
+      type = 7;
+    } else if (DataTypes.LINEAR_RING.equals(dataType)) {
+      type = 101;
+    } else {
+      throw new IllegalArgumentException("Unsupported geometry type " + dataType + " for " + field);
+    }
+
+    if (geometryFactory.getAxisCount() > 2) {
+      type += 0x80000000;
+    }
+    return type;
+  }
+
+  public String getIdFieldName(final RecordDefinition recordDefinition) {
+    String path;
+    if (recordDefinition == null) {
+      path = null;
+    } else {
+      path = recordDefinition.getPath();
+    }
+
+    return getIdFieldName(path);
+  }
+
+  public String getIdFieldName(final String typePath) {
+    if (typePath != null) {
+      final String idFieldName = this.idFieldNames.get(typePath.toUpperCase());
+      if (idFieldName != null) {
+        return idFieldName;
+      }
+    }
+    return ROWID;
+  }
+
+  protected Layer getLayer(final String typePath) {
+    final DataSource dataSource = getDataSource();
+    if (dataSource == null) {
+      return null;
+    } else {
+      final String layerName = getLayerName(typePath);
+      if (layerName == null) {
+        return null;
+      } else {
+        return dataSource.GetLayer(layerName);
+      }
+    }
+  }
+
+  protected String getLayerName(final String typePath) {
+    if (typePath == null) {
+      return null;
+    } else {
+      final String layerName = this.pathToLayerNameMap.get(typePath.toUpperCase());
+      if (layerName == null) {
+        return typePath;
+      } else {
+        return layerName;
+      }
+    }
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition(final RecordDefinition sourceRecordDefinition) {
+    final DataSource dataSource = getDataSource();
+    synchronized (dataSource) {
+      if (getGeometryFactory() == null) {
+        setGeometryFactory(sourceRecordDefinition.getGeometryFactory());
+      }
+      RecordDefinition recordDefinition = super.getRecordDefinition(sourceRecordDefinition);
+      if (this.createMissingTables && recordDefinition == null) {
+        recordDefinition = newLayerRecordDefinition(dataSource, sourceRecordDefinition);
+      }
+      return recordDefinition;
+    }
+  }
+
+  @Override
+  public int getRowCount(final Query query) {
+    if (query == null) {
+      return 0;
+    } else {
+      String typePath = query.getTypeName();
+      RecordDefinition recordDefinition = query.getRecordDefinition();
+      if (recordDefinition == null) {
+        typePath = query.getTypeName();
+        recordDefinition = getRecordDefinition(typePath);
+        if (recordDefinition == null) {
+          return 0;
+        }
+      } else {
+        typePath = recordDefinition.getPath();
+      }
+      final StringBuilder whereClause = getWhereClause(query);
+
+      final StringBuilder sql = new StringBuilder();
+      sql.append("SELECT COUNT(*) FROM ");
+      final String layerName = getLayerName(typePath);
+      sql.append(layerName);
+      if (whereClause.length() > 0) {
+        sql.append(" WHERE ");
+        sql.append(whereClause);
+      }
+      final DataSource dataSource = getDataSource();
+      if (dataSource != null) {
+        final Layer result = dataSource.ExecuteSQL(sql.toString());
+        if (result != null) {
+
+          addLayerToClose(result);
+          try {
+            final Feature feature = result.GetNextFeature();
+            if (feature != null) {
+              try {
+                return feature.GetFieldAsInteger(0);
+              } finally {
+                feature.delete();
+              }
+            }
+          } finally {
+            releaseLayerToClose(result);
+          }
+        }
+      }
+    }
+    return 0;
+  }
+
+  protected String getSql(final Query query) {
+    final RecordDefinition recordDefinition = query.getRecordDefinition();
+    final String typePath = recordDefinition.getPath();
+    final Map<String, Boolean> orderBy = query.getOrderBy();
+    final StringBuilder sql = new StringBuilder();
+    sql.append("SELECT ");
+
+    List<String> fieldNames = query.getFieldNames();
+    if (fieldNames.isEmpty()) {
+      fieldNames = recordDefinition.getFieldNames();
+    }
+    fieldNames.remove("ROWID");
+    CollectionUtil.append(sql, fieldNames);
+    sql.append(" FROM ");
+    final String layerName = getLayerName(typePath);
+    sql.append(layerName);
+    final StringBuilder whereClause = getWhereClause(query);
+    if (whereClause.length() > 0) {
+      sql.append(" WHERE ");
+      sql.append(whereClause);
+    }
+    boolean first = true;
+    for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
+      final String column = entry.getKey();
+      if (first) {
+        sql.append(" ORDER BY ");
+        first = false;
+      } else {
+        sql.append(", ");
+      }
+      sql.append(column);
+      final Boolean ascending = entry.getValue();
+      if (!ascending) {
+        sql.append(" DESC");
+      }
+    }
+    return sql.toString();
+  }
+
+  protected StringBuilder getWhereClause(final Query query) {
+    final StringBuilder whereClause = new StringBuilder();
+    final Condition whereCondition = query.getWhereCondition();
+    if (whereCondition != null) {
+      appendQueryValue(query, whereClause, whereCondition);
+    }
+    return whereClause;
+  }
+
+  public boolean isClosed() {
+    return this.closed;
+  }
+
+  public boolean isCreateMissingTables() {
+    return this.createMissingTables;
+  }
+
+  protected DataSource newDataSource(final boolean update) {
     final String path = FileUtil.getCanonicalPath(this.file);
     DataSource dataSource;
     if (this.file.exists()) {
@@ -297,7 +533,7 @@ public class OgrRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public AbstractIterator<Record> createIterator(final Query query,
+  public AbstractIterator<Record> newIterator(final Query query,
     final Map<String, Object> properties) {
     String typePath = query.getTypeName();
     RecordDefinition recordDefinition = query.getRecordDefinition();
@@ -317,7 +553,7 @@ public class OgrRecordStore extends AbstractRecordStore {
     return iterator;
   }
 
-  private RecordDefinition createLayer(final DataSource dataSource,
+  private RecordDefinition newLayerRecordDefinition(final DataSource dataSource,
     final RecordDefinition sourceRecordDefinition) {
     final PathName typePath = sourceRecordDefinition.getPathName();
     final String name = typePath.getName();
@@ -336,13 +572,13 @@ public class OgrRecordStore extends AbstractRecordStore {
     if (dataSource.TestCapability(ogrConstants.ODsCCreateLayer) == false) {
       System.err.println("CreateLayer not supported by driver.");
     }
-    return createRecordDefinition(schema, layer);
+    return newLayerRecordDefinition(schema, layer);
   }
 
-  protected RecordDefinitionImpl createRecordDefinition(final RecordStoreSchema schema,
+  protected RecordDefinitionImpl newLayerRecordDefinition(final RecordStoreSchema schema,
     final Layer layer) {
     final String layerName = layer.GetName();
-    final PathName typePath = PathName.create(layerName);
+    final PathName typePath = PathName.newPathName(layerName);
 
     /** This primes the layer so that the fidColumn is loaded correctly. */
     layer.GetNextFeature();
@@ -469,244 +705,8 @@ public class OgrRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public RecordWriter createWriter() {
+  public RecordWriter newWriter() {
     return new OgrRecordWriter(this);
-  }
-
-  public void doClose() {
-    synchronized (this) {
-      if (!isClosed()) {
-        if (this.dataSource != null) {
-          try {
-            for (final Layer layer : this.layersToClose) {
-              this.dataSource.ReleaseResultSet(layer);
-            }
-            this.layersToClose.clear();
-            this.dataSource.delete();
-          } finally {
-            this.dataSource = null;
-            this.closed = true;
-            super.close();
-          }
-        }
-      }
-    }
-  }
-
-  protected DataSource getDataSource() {
-    if (isClosed()) {
-      return null;
-    } else {
-      if (this.dataSource == null) {
-        this.dataSource = createDataSource(false);
-        this.driverName = this.dataSource.GetDriver().getName();
-      }
-      return this.dataSource;
-    }
-  }
-
-  public String getDriverName() {
-    return this.driverName;
-  }
-
-  private int getGeometryFieldType(final GeometryFactory geometryFactory,
-    final FieldDefinition field) {
-    int type;
-    final DataType dataType = field.getType();
-
-    if (DataTypes.POINT.equals(dataType)) {
-      type = 1;
-    } else if (DataTypes.LINE_STRING.equals(dataType)) {
-      type = 2;
-    } else if (DataTypes.POLYGON.equals(dataType)) {
-      type = 3;
-    } else if (DataTypes.MULTI_POINT.equals(dataType)) {
-      type = 4;
-    } else if (DataTypes.MULTI_LINE_STRING.equals(dataType)) {
-      type = 5;
-    } else if (DataTypes.MULTI_POINT.equals(dataType)) {
-      type = 6;
-    } else if (DataTypes.GEOMETRY_COLLECTION.equals(dataType)) {
-      type = 7;
-    } else if (DataTypes.LINEAR_RING.equals(dataType)) {
-      type = 101;
-    } else {
-      throw new IllegalArgumentException("Unsupported geometry type " + dataType + " for " + field);
-    }
-
-    if (geometryFactory.getAxisCount() > 2) {
-      type += 0x80000000;
-    }
-    return type;
-  }
-
-  public String getIdFieldName(final RecordDefinition recordDefinition) {
-    String path;
-    if (recordDefinition == null) {
-      path = null;
-    } else {
-      path = recordDefinition.getPath();
-    }
-
-    return getIdFieldName(path);
-  }
-
-  public String getIdFieldName(final String typePath) {
-    if (typePath != null) {
-      final String idFieldName = this.idFieldNames.get(typePath.toUpperCase());
-      if (idFieldName != null) {
-        return idFieldName;
-      }
-    }
-    return ROWID;
-  }
-
-  protected Layer getLayer(final String typePath) {
-    final DataSource dataSource = getDataSource();
-    if (dataSource == null) {
-      return null;
-    } else {
-      final String layerName = getLayerName(typePath);
-      if (layerName == null) {
-        return null;
-      } else {
-        return dataSource.GetLayer(layerName);
-      }
-    }
-  }
-
-  protected String getLayerName(final String typePath) {
-    if (typePath == null) {
-      return null;
-    } else {
-      final String layerName = this.pathToLayerNameMap.get(typePath.toUpperCase());
-      if (layerName == null) {
-        return typePath;
-      } else {
-        return layerName;
-      }
-    }
-  }
-
-  @Override
-  public RecordDefinition getRecordDefinition(final RecordDefinition sourceRecordDefinition) {
-    final DataSource dataSource = getDataSource();
-    synchronized (dataSource) {
-      if (getGeometryFactory() == null) {
-        setGeometryFactory(sourceRecordDefinition.getGeometryFactory());
-      }
-      RecordDefinition recordDefinition = super.getRecordDefinition(sourceRecordDefinition);
-      if (this.createMissingTables && recordDefinition == null) {
-        recordDefinition = createLayer(dataSource, sourceRecordDefinition);
-      }
-      return recordDefinition;
-    }
-  }
-
-  @Override
-  public int getRowCount(final Query query) {
-    if (query == null) {
-      return 0;
-    } else {
-      String typePath = query.getTypeName();
-      RecordDefinition recordDefinition = query.getRecordDefinition();
-      if (recordDefinition == null) {
-        typePath = query.getTypeName();
-        recordDefinition = getRecordDefinition(typePath);
-        if (recordDefinition == null) {
-          return 0;
-        }
-      } else {
-        typePath = recordDefinition.getPath();
-      }
-      final StringBuilder whereClause = getWhereClause(query);
-
-      final StringBuilder sql = new StringBuilder();
-      sql.append("SELECT COUNT(*) FROM ");
-      final String layerName = getLayerName(typePath);
-      sql.append(layerName);
-      if (whereClause.length() > 0) {
-        sql.append(" WHERE ");
-        sql.append(whereClause);
-      }
-      final DataSource dataSource = getDataSource();
-      if (dataSource != null) {
-        final Layer result = dataSource.ExecuteSQL(sql.toString());
-        if (result != null) {
-
-          addLayerToClose(result);
-          try {
-            final Feature feature = result.GetNextFeature();
-            if (feature != null) {
-              try {
-                return feature.GetFieldAsInteger(0);
-              } finally {
-                feature.delete();
-              }
-            }
-          } finally {
-            releaseLayerToClose(result);
-          }
-        }
-      }
-    }
-    return 0;
-  }
-
-  protected String getSql(final Query query) {
-    final RecordDefinition recordDefinition = query.getRecordDefinition();
-    final String typePath = recordDefinition.getPath();
-    final Map<String, Boolean> orderBy = query.getOrderBy();
-    final StringBuilder sql = new StringBuilder();
-    sql.append("SELECT ");
-
-    List<String> fieldNames = query.getFieldNames();
-    if (fieldNames.isEmpty()) {
-      fieldNames = recordDefinition.getFieldNames();
-    }
-    fieldNames.remove("ROWID");
-    CollectionUtil.append(sql, fieldNames);
-    sql.append(" FROM ");
-    final String layerName = getLayerName(typePath);
-    sql.append(layerName);
-    final StringBuilder whereClause = getWhereClause(query);
-    if (whereClause.length() > 0) {
-      sql.append(" WHERE ");
-      sql.append(whereClause);
-    }
-    boolean first = true;
-    for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
-      final String column = entry.getKey();
-      if (first) {
-        sql.append(" ORDER BY ");
-        first = false;
-      } else {
-        sql.append(", ");
-      }
-      sql.append(column);
-      final Boolean ascending = entry.getValue();
-      if (!ascending) {
-        sql.append(" DESC");
-      }
-    }
-    return sql.toString();
-  }
-
-  protected StringBuilder getWhereClause(final Query query) {
-    final StringBuilder whereClause = new StringBuilder();
-    final Condition whereCondition = query.getWhereCondition();
-    if (whereCondition != null) {
-      appendQueryValue(query, whereClause, whereCondition);
-    }
-    return whereClause;
-  }
-
-  public boolean isClosed() {
-    return this.closed;
-  }
-
-  public boolean isCreateMissingTables() {
-    return this.createMissingTables;
   }
 
   @Override
@@ -720,7 +720,7 @@ public class OgrRecordStore extends AbstractRecordStore {
           final Layer layer = dataSource.GetLayer(layerIndex);
           if (layer != null) {
             try {
-              final RecordDefinitionImpl recordDefinition = createRecordDefinition(schema, layer);
+              final RecordDefinitionImpl recordDefinition = newLayerRecordDefinition(schema, layer);
               final PathName typePath = recordDefinition.getPathName();
               final String layerName = layer.GetName();
               this.layerNameToPathMap.put(layerName.toUpperCase(), typePath);

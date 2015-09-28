@@ -153,7 +153,7 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
         throw new NoSuchElementException();
       } else {
         try {
-          final Record record = this.recordFactory.createRecord(this.recordDefinition);
+          final Record record = this.recordFactory.newRecord(this.recordDefinition);
           record.setState(RecordState.Initalizing);
           if (this.statistics == null) {
             this.recordStore.addStatistic("query", record);

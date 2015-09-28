@@ -4,10 +4,10 @@ import com.revolsys.io.FileIoFactory;
 import com.revolsys.spring.resource.Resource;
 
 public interface MapReaderFactory extends FileIoFactory {
-  default MapReader createMapReader(final Object source) {
+  default MapReader newMapreader(final Object source) {
     final Resource resource = Resource.getResource(source);
-    return createMapReader(resource);
+    return newMapreader(resource);
   }
 
-  MapReader createMapReader(final Resource resource);
+  MapReader newMapreader(final Resource resource);
 }

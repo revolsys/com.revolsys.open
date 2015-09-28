@@ -75,7 +75,7 @@ public class GeoJson extends AbstractIoFactoryWithCoordinateSystem
   }
 
   @Override
-  public GeometryReader createGeometryReader(final Resource resource) {
+  public GeometryReader newGeometryReader(final Resource resource) {
     try {
       final GeoJsonGeometryIterator iterator = new GeoJsonGeometryIterator(resource);
       return new GeometryReader(iterator);
@@ -85,7 +85,7 @@ public class GeoJson extends AbstractIoFactoryWithCoordinateSystem
   }
 
   @Override
-  public RecordWriter createRecordWriter(final String baseName,
+  public RecordWriter newRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);

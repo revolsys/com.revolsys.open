@@ -91,7 +91,7 @@ public class AddFileLayerAction extends AbstractAction {
       window = null;
     }
 
-    final JFileChooser fileChooser = SwingUtil.createFileChooser(getClass(), "currentDirectory");
+    final JFileChooser fileChooser = SwingUtil.newFileChooser(getClass(), "currentDirectory");
     fileChooser.setMultiSelectionEnabled(true);
 
     final Set<String> allImageExtensions = new TreeSet<String>();

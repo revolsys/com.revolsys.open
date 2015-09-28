@@ -90,7 +90,7 @@ public class Root extends NodeBase {
   private void insertContained(final Node tree, final Interval itemInterval, final Object item) {
     Assert.isTrue(tree.getInterval().contains(itemInterval));
     /**
-     * Do NOT create a new node for zero-area intervals - this would lead
+     * Do NOT Construct a new new node for zero-area intervals - this would lead
      * to infinite recursion. Instead, use a heuristic of simply returning
      * the smallest existing node containing the query
      */

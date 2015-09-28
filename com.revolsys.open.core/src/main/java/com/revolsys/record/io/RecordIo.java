@@ -15,7 +15,7 @@ public class RecordIo {
 
   public static void copyRecords(final Object source, final Object target) {
     try (
-      RecordReader reader = RecordReader.create(source)) {
+      RecordReader reader = RecordReader.newRecordReader(source)) {
       if (reader == null) {
         throw new IllegalArgumentException("Unable to read " + source);
       } else {
@@ -27,7 +27,7 @@ public class RecordIo {
 
   public static void copyRecords(final Object source, final Writer<Record> writer) {
     try (
-      RecordReader reader = RecordReader.create(source)) {
+      RecordReader reader = RecordReader.newRecordReader(source)) {
       if (reader == null) {
         throw new IllegalArgumentException("Unable to read " + source);
       } else {
@@ -41,7 +41,7 @@ public class RecordIo {
     if (reader != null) {
       final RecordDefinition recordDefinition = reader.getRecordDefinition();
       try (
-        RecordWriter writer = RecordWriter.create(recordDefinition, target)) {
+        RecordWriter writer = RecordWriter.newRecordWriter(recordDefinition, target)) {
         if (writer == null) {
           throw new IllegalArgumentException("Unable to create writer " + target);
         } else {

@@ -28,7 +28,7 @@ public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithPro
     if (!Property.hasValue(path)) {
       throw new IllegalArgumentException("Path is required");
     }
-    this.pathName = PathName.create(path);
+    this.pathName = PathName.newPathName(path);
     if (!Property.hasValue(path)) {
       throw new IllegalArgumentException("Path is required");
     }

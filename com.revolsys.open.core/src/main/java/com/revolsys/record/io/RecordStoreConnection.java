@@ -68,7 +68,7 @@ public class RecordStoreConnection implements MapSerializer {
             LoggerFactory.getLogger(getClass())
               .error("Record store must include a 'connection' map property: " + this.name);
           } else {
-            this.recordStore = RecordStoreFactoryRegistry.createRecordStore(connectionProperties);
+            this.recordStore = RecordStoreFactoryRegistry.newRecordStore(connectionProperties);
             this.recordStore.initialize();
           }
         } catch (final Throwable e) {

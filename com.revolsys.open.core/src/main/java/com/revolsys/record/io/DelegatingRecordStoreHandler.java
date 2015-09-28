@@ -62,18 +62,9 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
     this.recordStore = recordStore;
   }
 
-  protected RecordStore createRecordStore() {
-    if (this.config != null) {
-      final RecordStore recordStore = RecordStoreFactoryRegistry.createRecordStore(this.config);
-      return recordStore;
-    } else {
-      throw new UnsupportedOperationException("Record store must be set manually");
-    }
-  }
-
   public RecordStore getRecordStore() {
     if (this.recordStore == null) {
-      this.recordStore = createRecordStore();
+      this.recordStore = newRecordStore();
       this.recordStore.initialize();
     }
     return this.recordStore;
@@ -108,6 +99,15 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
     } else {
       final RecordStore recordStore = getRecordStore();
       return method.invoke(recordStore, args);
+    }
+  }
+
+  protected RecordStore newRecordStore() {
+    if (this.config != null) {
+      final RecordStore recordStore = RecordStoreFactoryRegistry.newRecordStore(this.config);
+      return recordStore;
+    } else {
+      throw new UnsupportedOperationException("Record store must be set manually");
     }
   }
 }

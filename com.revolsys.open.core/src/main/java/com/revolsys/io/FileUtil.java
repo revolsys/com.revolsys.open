@@ -356,7 +356,7 @@ public final class FileUtil {
   }
 
   /**
-   * Create a new temporary directory.
+   * Construct a new new temporary directory.
    *
    * @param prefix The file name prefix.
    * @param suffix The file name suffix.

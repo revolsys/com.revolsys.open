@@ -69,27 +69,6 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public <T> T createPrimaryIdValue(final PathName typePath) {
-    return this.recordStore.createPrimaryIdValue(typePath);
-  }
-
-  @Override
-  public Query createQuery(final String typePath, final String whereClause,
-    final BoundingBoxDoubleGf boundingBox) {
-    return this.recordStore.createQuery(typePath, whereClause, boundingBox);
-  }
-
-  @Override
-  public RecordStoreQueryReader createReader() {
-    return this.recordStore.createReader();
-  }
-
-  @Override
-  public RecordWriter createWriter() {
-    return this.recordStore.createWriter();
-  }
-
-  @Override
   public int delete(final Query query) {
     return this.recordStore.delete(query);
   }
@@ -236,6 +215,22 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
+  public <T> T newPrimaryIdValue(final PathName typePath) {
+    return this.recordStore.newPrimaryIdValue(typePath);
+  }
+
+  @Override
+  public Query newQuery(final String typePath, final String whereClause,
+    final BoundingBoxDoubleGf boundingBox) {
+    return this.recordStore.newQuery(typePath, whereClause, boundingBox);
+  }
+
+  @Override
+  public RecordStoreQueryReader newReader() {
+    return this.recordStore.newReader();
+  }
+
+  @Override
   public Record newRecord(final PathName typePath) {
     return this.recordStore.newRecord(typePath);
   }
@@ -243,6 +238,11 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   @Override
   public Record newRecord(final RecordDefinition recordDefinition) {
     return this.recordStore.newRecord(recordDefinition);
+  }
+
+  @Override
+  public RecordWriter newWriter() {
+    return this.recordStore.newWriter();
   }
 
   @Override

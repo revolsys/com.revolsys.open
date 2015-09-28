@@ -109,7 +109,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   @SuppressWarnings("unchecked")
   public RecordDefinitionImpl(final Map<String, Object> properties) {
-    this(PathName.create(Maps.getString(properties, "path")));
+    this(PathName.newPathName(Maps.getString(properties, "path")));
     final List<Object> fields = (List<Object>)properties.get("fields");
     for (final Object object : fields) {
       if (object instanceof FieldDefinition) {
@@ -300,7 +300,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     if (recordFactory == null) {
       return new ArrayRecord(this);
     } else {
-      return recordFactory.createRecord(this);
+      return recordFactory.newRecord(this);
     }
   }
 
@@ -648,7 +648,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   public RecordDefinitionImpl rename(final String path) {
-    final RecordDefinitionImpl clone = new RecordDefinitionImpl(PathName.create(path),
+    final RecordDefinitionImpl clone = new RecordDefinitionImpl(PathName.newPathName(path),
       getProperties(), this.fields);
     clone.setIdFieldIndex(this.idFieldDefinitionIndex);
     clone.setProperties(getProperties());

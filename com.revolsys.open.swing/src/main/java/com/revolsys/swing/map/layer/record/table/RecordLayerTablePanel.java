@@ -335,7 +335,7 @@ public class RecordLayerTablePanel extends TablePanel
 
   private void exportRecords() {
     final RecordDefinition recordDefinition = this.layer.getRecordDefinition();
-    final JFileChooser fileChooser = SwingUtil.createFileChooser("Export Records",
+    final JFileChooser fileChooser = SwingUtil.newFileChooser("Export Records",
       "com.revolsys.swing.map.table.export", "directory");
     final String defaultFileExtension = PreferencesUtil
       .getUserString("com.revolsys.swing.map.table.export", "fileExtension", "tsv");

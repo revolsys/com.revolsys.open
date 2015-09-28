@@ -70,7 +70,7 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
   private boolean isConstrainedToCircle = false;
 
   /**
-   * Create a builder which will create shapes using the default
+   * Construct a new builder which will create shapes using the default
    * {@link GeometryFactory}.
    */
   public RandomPointsInGridBuilder() {
@@ -78,7 +78,7 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
   }
 
   /**
-   * Create a builder which will create shapes using the given
+   * Construct a new builder which will create shapes using the given
    * {@link GeometryFactory}.
    *
    * @param geomFact the factory to use

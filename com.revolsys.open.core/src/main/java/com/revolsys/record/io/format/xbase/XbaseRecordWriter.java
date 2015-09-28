@@ -215,7 +215,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
         this.out = new ResourceEndianOutput(this.resource);
         writeHeader();
       }
-      final Resource codePageResource = this.resource.createChangeExtension("cpg");
+      final Resource codePageResource = this.resource.newResourceChangeExtension("cpg");
       if (codePageResource != null) {
         try (
           final Writer writer = codePageResource.newWriter()) {

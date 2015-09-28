@@ -150,7 +150,7 @@ public class GeometricShapeFactory {
   protected double rotationAngle = 0.0;
 
   /**
-   * Create a shape factory which will create shapes using the default
+   * Construct a new shape factory which will create shapes using the default
    * {@link GeometryFactory}.
    */
   public GeometricShapeFactory() {
@@ -158,7 +158,7 @@ public class GeometricShapeFactory {
   }
 
   /**
-   * Create a shape factory which will create shapes using the given
+   * Construct a new shape factory which will create shapes using the given
    * {@link GeometryFactory}.
    *
    * @param geomFact the factory to use
@@ -455,7 +455,7 @@ public class GeometricShapeFactory {
   /**
    * Sets the total number of points in the created {@link Geometry}.
    * The created geometry will have no more than this number of points,
-   * unless more are needed to create a valid geometry.
+   * unless more are needed to Construct a new valid geometry.
    */
   public void setNumPoints(final int nPts) {
     this.nPts = nPts;

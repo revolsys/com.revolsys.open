@@ -19,7 +19,7 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Em
   private static void addPart(final RangeSet set, final List<AbstractRange<?>> crossProductRanges,
     final String fromValue, final String rangeSpec, final int partStart, final int partEnd) {
     final String toValue = rangeSpec.substring(partStart, partEnd);
-    final AbstractRange<?> partRange = Ranges.create(fromValue, toValue);
+    final AbstractRange<?> partRange = Ranges.newRange(fromValue, toValue);
     if (crossProductRanges == null) {
       set.addRange(partRange);
     } else {
@@ -27,13 +27,13 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Em
     }
   }
 
-  public static RangeSet create(final int from, final int to) {
+  public static RangeSet newRangeSet(final int from, final int to) {
     final RangeSet range = new RangeSet();
     range.addRange(from, to);
     return range;
   }
 
-  public static RangeSet create(final String rangeSpec) {
+  public static RangeSet newRangeSet(final String rangeSpec) {
     final RangeSet set = new RangeSet();
     if (Property.hasValue(rangeSpec)) {
       int partStart = 0;
@@ -138,12 +138,12 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Em
           return true;
         } else if (range.compareFromValue(value) > 0) {
           iterator.previous();
-          iterator.add(Ranges.create(value));
+          iterator.add(Ranges.newRange(value));
           return true;
 
         }
       }
-      this.ranges.add(Ranges.create(value));
+      this.ranges.add(Ranges.newRange(value));
       this.size++;
       return true;
     }
@@ -194,7 +194,7 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Em
   }
 
   public boolean addRange(final char from, final char to) {
-    final AbstractRange<?> addRange = Ranges.create(from, to);
+    final AbstractRange<?> addRange = Ranges.newRange(from, to);
     return addRange(addRange);
   }
 
@@ -204,7 +204,7 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Em
   }
 
   public boolean addRange(final Object from, final Object to) {
-    final AbstractRange<?> addRange = Ranges.create(from, to);
+    final AbstractRange<?> addRange = Ranges.newRange(from, to);
     return addRange(addRange);
   }
 
@@ -291,24 +291,24 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Em
             iterator.remove();
           } else {
             final Object next = range.next(value);
-            final AbstractRange<?> newRange = range.createNew(next, to);
+            final AbstractRange<?> newRange = range.newRange(next, to);
             iterator.set(newRange);
           }
           this.size--;
           return true;
         } else if (Equals.equal(to, value)) {
           final Object previous = range.previous(value);
-          final AbstractRange<?> newRange = range.createNew(from, previous);
+          final AbstractRange<?> newRange = range.newRange(from, previous);
           iterator.set(newRange);
           this.size--;
           return true;
         } else {
           final Object previous = range.previous(value);
-          final AbstractRange<?> newRange1 = range.createNew(from, previous);
+          final AbstractRange<?> newRange1 = range.newRange(from, previous);
           iterator.set(newRange1);
 
           final Object next = range.next(value);
-          final AbstractRange<?> newRange2 = range.createNew(next, to);
+          final AbstractRange<?> newRange2 = range.newRange(next, to);
           iterator.add(newRange2);
           this.size--;
           return true;
@@ -363,7 +363,7 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Em
           iterator.remove();
         } else {
           final Object next = range.next(to);
-          final AbstractRange<?> newRange = range.createNew(next, rangeTo);
+          final AbstractRange<?> newRange = range.newRange(next, rangeTo);
           this.size -= range.size();
           this.size += newRange.size();
           iterator.set(newRange);
@@ -372,9 +372,9 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Em
         if (range.compareToValue(to) > 0) {
           final Object next = range.next(to);
           final Object previous = range.previous(from);
-          final AbstractRange<?> newRange1 = range.createNew(rangeFrom, previous);
+          final AbstractRange<?> newRange1 = range.newRange(rangeFrom, previous);
           iterator.set(newRange1);
-          final AbstractRange<?> newRange2 = range.createNew(next, rangeTo);
+          final AbstractRange<?> newRange2 = range.newRange(next, rangeTo);
           iterator.add(newRange2);
           this.size -= range.size();
           this.size += newRange1.size();
@@ -382,7 +382,7 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Em
 
         } else {
           final Object previous = range.previous(from);
-          final AbstractRange<?> newRange = range.createNew(rangeFrom, previous);
+          final AbstractRange<?> newRange = range.newRange(rangeFrom, previous);
           this.size -= range.size();
           this.size += newRange.size();
           iterator.set(newRange);

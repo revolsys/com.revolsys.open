@@ -72,7 +72,7 @@ public class MaximalNearestSubline {
   private final LineStringLocation[] maxInterval = new LineStringLocation[2];
 
   /**
-   * Create a new Maximal Nearest Subline of {@link LineString} <code>a</code>
+   * Construct a new new Maximal Nearest Subline of {@link LineString} <code>a</code>
    * relative to {@link LineString} <code>b</code>
    *
    * @param a the LineString on which to compute the subline

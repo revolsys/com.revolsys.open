@@ -38,7 +38,7 @@ import org.jdesktop.swingx.icon.EmptyIcon;
  * {@code IconBorder} creates a border that places an {@code Icon} in the border
  * on the horizontal axis. The border does not add any additional insets other
  * than the inset required to produce the space for the icon. If additional
- * insets are required, users should create a
+ * insets are required, users should Construct a new
  * {@link javax.swing.border.CompoundBorder compund border}.
  * <p>
  * This border is useful when attempting to add {@code Icon}s to pre-existing

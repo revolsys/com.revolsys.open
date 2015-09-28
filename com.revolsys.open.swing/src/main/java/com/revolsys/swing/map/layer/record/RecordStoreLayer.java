@@ -480,7 +480,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
           Transaction transaction = new Transaction(transactionManager, Propagation.REQUIRES_NEW)) {
           try {
             try (
-              final Writer<Record> writer = recordStore.createWriter()) {
+              final Writer<Record> writer = recordStore.newWriter()) {
               if (isCached(this.getCacheIdDeleted(), record) || super.isDeleted(record)) {
                 preDeleteRecord(record);
                 record.setState(RecordState.Deleted);
@@ -497,7 +497,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
                   Identifier identifier = record.getIdentifier();
                   final List<String> idFieldNames = recordDefinition.getIdFieldNames();
                   if (identifier == null && !idFieldNames.isEmpty()) {
-                    final Object idValue = recordStore.createPrimaryIdValue(this.typePath);
+                    final Object idValue = recordStore.newPrimaryIdValue(this.typePath);
                     if (idValue != null) {
                       identifier = Identifier.create(idValue);
                       identifier.setIdentifier(record, idFieldNames);
@@ -841,7 +841,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   @Override
   public void setProperty(final String name, final Object value) {
     if ("typePath".equals(name)) {
-      super.setProperty(name, PathName.create(value));
+      super.setProperty(name, PathName.newPathName(value));
     } else {
       super.setProperty(name, value);
     }

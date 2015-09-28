@@ -101,7 +101,7 @@ public class PlanarGraph {
    * will be created.  DirectedEdges are NOT linked by this method.
    */
   public void addEdges(final List edgesToAdd) {
-    // create all the nodes for the edges
+    // Construct a newll the nodes for the edges
     for (final Iterator it = edgesToAdd.iterator(); it.hasNext();) {
       final Edge e = (Edge)it.next();
       this.edges.add(e);

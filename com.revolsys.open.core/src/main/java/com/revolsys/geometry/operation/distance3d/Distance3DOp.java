@@ -106,7 +106,7 @@ public class Distance3DOp {
   }
 
   /**
-   * Convenience method to create a Plane3DPolygon
+   * Convenience method to Construct a new Plane3DPolygon
    * @param poly
    * @return
    */

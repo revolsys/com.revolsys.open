@@ -153,7 +153,7 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   @Override
-  public MapReader createMapReader(final Resource resource) {
+  public MapReader newMapreader(final Resource resource) {
     try {
       final CsvMapIterator iterator = new CsvMapIterator(resource.newReader());
       return new IteratorMapReader(iterator);
@@ -163,23 +163,22 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   @Override
-  public MapWriter createMapWriter(final java.io.Writer out) {
+  public MapWriter newMapWriter(final java.io.Writer out) {
     return new CsvMapWriter(out);
   }
 
   @Override
-  public RecordReader createRecordReader(final Resource resource,
-    final RecordFactory recordFactory) {
+  public RecordReader newRecordReader(final Resource resource, final RecordFactory recordFactory) {
     return new CsvRecordReader(resource, recordFactory);
   }
 
   @Override
-  public RecordWriter createRecordWriter(final RecordDefinition recordDefinition, final Path path) {
+  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition, final Path path) {
     return new CsvRecordWriter(recordDefinition, path, Csv.FIELD_SEPARATOR, true, true);
   }
 
   @Override
-  public RecordWriter createRecordWriter(final String baseName,
+  public RecordWriter newRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream, charset);

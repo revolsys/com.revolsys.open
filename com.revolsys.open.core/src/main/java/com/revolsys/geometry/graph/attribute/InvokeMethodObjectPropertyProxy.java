@@ -43,26 +43,6 @@ public class InvokeMethodObjectPropertyProxy<T, O> extends AbstractObjectPropert
     init();
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public T createValue(final O value) {
-    try {
-      if (this.parameters == null) {
-        return (T)this.method.invoke(this.object, value);
-      } else {
-        final Object[] parameters = new Object[this.parameters.length + 1];
-        parameters[0] = value;
-        for (int i = 0; i < this.parameters.length; i++) {
-          final Object parameter = this.parameters[i];
-          parameters[i + 1] = parameter;
-        }
-        return (T)this.method.invoke(this.object, parameters);
-      }
-    } catch (final Throwable e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   public void init() {
     try {
       final Class<?>[] parameterClasses = new Class<?>[this.parameters.length + 1];
@@ -98,6 +78,26 @@ public class InvokeMethodObjectPropertyProxy<T, O> extends AbstractObjectPropert
     if (this.method == null) {
       throw new IllegalArgumentException(
         "Method could not be found " + this.clazz + "." + this.methodName);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public T newValue(final O value) {
+    try {
+      if (this.parameters == null) {
+        return (T)this.method.invoke(this.object, value);
+      } else {
+        final Object[] parameters = new Object[this.parameters.length + 1];
+        parameters[0] = value;
+        for (int i = 0; i < this.parameters.length; i++) {
+          final Object parameter = this.parameters[i];
+          parameters[i + 1] = parameter;
+        }
+        return (T)this.method.invoke(this.object, parameters);
+      }
+    } catch (final Throwable e) {
+      throw new RuntimeException(e);
     }
   }
 

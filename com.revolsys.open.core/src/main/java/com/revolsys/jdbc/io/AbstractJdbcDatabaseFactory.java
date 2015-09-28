@@ -26,8 +26,19 @@ public abstract class AbstractJdbcDatabaseFactory implements JdbcDatabaseFactory
     }
   }
 
+  public String getConnectionValidationQuery() {
+    return "SELECT 1";
+  }
+
+  public abstract String getDriverClassName();
+
   @Override
-  public DataSource createDataSource(final Map<String, ? extends Object> config) {
+  public boolean isAvailable() {
+    return true;
+  }
+
+  @Override
+  public DataSource newDataSource(final Map<String, ? extends Object> config) {
     try {
       final Map<String, Object> newConfig = new HashMap<String, Object>(config);
       final String url = (String)newConfig.remove("url");
@@ -77,16 +88,5 @@ public abstract class AbstractJdbcDatabaseFactory implements JdbcDatabaseFactory
     } catch (final Throwable e) {
       throw new IllegalArgumentException("Unable to create data source for " + config, e);
     }
-  }
-
-  public String getConnectionValidationQuery() {
-    return "SELECT 1";
-  }
-
-  public abstract String getDriverClassName();
-
-  @Override
-  public boolean isAvailable() {
-    return true;
   }
 }

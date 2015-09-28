@@ -49,7 +49,7 @@ public class FileSystemResource extends AbstractResource {
   private final String path;
 
   /**
-   * Create a new {@code FileSystemResource} from a {@link File} handle.
+   * Construct a new new {@code FileSystemResource} from a {@link File} handle.
    * <p>Note: When building relative resources via {@link #createRelative},
    * the relative path will apply <i>at the same directory level</i>:
    * e.g. new File("C:/dir1"), relative path "dir2" -> "C:/dir2"!
@@ -66,7 +66,7 @@ public class FileSystemResource extends AbstractResource {
   }
 
   /**
-   * Create a new {@code FileSystemResource} from a file path.
+   * Construct a new new {@code FileSystemResource} from a file path.
    * <p>Note: When building relative resources via {@link #createRelative},
    * it makes a difference whether the specified resource base path here
    * ends with a slash or not. In the case of "C:/dir1/", relative paths

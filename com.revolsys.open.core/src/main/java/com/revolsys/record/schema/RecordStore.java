@@ -34,11 +34,10 @@ import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
-import com.revolsys.transaction.Propagation;
-import com.revolsys.transaction.Transaction;
+import com.revolsys.transaction.Transactionable;
 import com.revolsys.util.Property;
 
-public interface RecordStore extends RecordDefinitionFactory, Closeable {
+public interface RecordStore extends RecordDefinitionFactory, Transactionable, Closeable {
   void addCodeTable(CodeTable codeTable);
 
   default void addCodeTables(final Collection<CodeTable> codeTables) {
@@ -73,79 +72,11 @@ public interface RecordStore extends RecordDefinitionFactory, Closeable {
     if (recordDefinition == null || recordFactory == null) {
       return null;
     } else {
-      final Record copy = recordFactory.createRecord(recordDefinition);
+      final Record copy = recordFactory.newRecord(recordDefinition);
       copy.setValues(record);
       copy.setIdValue(null);
       return copy;
     }
-  }
-
-  default AbstractIterator<Record> createIterator(final Query query,
-    Map<String, Object> properties) {
-    if (properties == null) {
-      properties = Collections.emptyMap();
-    }
-    if (query == null) {
-      return null;
-    } else {
-      final RecordDefinition recordDefinition = query.getRecordDefinition();
-      if (recordDefinition != null) {
-        final RecordStoreIteratorFactory recordDefinitionIteratorFactory = recordDefinition
-          .getProperty("recordStoreIteratorFactory");
-        if (recordDefinitionIteratorFactory != null) {
-          final AbstractIterator<Record> iterator = recordDefinitionIteratorFactory
-            .createIterator(this, query, properties);
-          if (iterator != null) {
-            return iterator;
-          }
-        }
-      }
-      final RecordStoreIteratorFactory iteratorFactory = getIteratorFactory();
-      return iteratorFactory.createIterator(this, query, properties);
-    }
-  }
-
-  default Identifier createPrimaryIdentifier(final PathName typePath) {
-    final Object identifier = createPrimaryIdValue(typePath);
-    return Identifier.create(identifier);
-  }
-
-  default <T> T createPrimaryIdValue(final PathName typePath) {
-    return null;
-  }
-
-  default Query createQuery(final String typePath, final String whereClause,
-    final BoundingBoxDoubleGf boundingBox) {
-    throw new UnsupportedOperationException();
-  }
-
-  default RecordStoreQueryReader createReader() {
-    final RecordStoreQueryReader reader = new RecordStoreQueryReader(this);
-    return reader;
-  }
-
-  default Transaction createTransaction(final Propagation propagation) {
-    final PlatformTransactionManager transactionManager = getTransactionManager();
-    return new Transaction(transactionManager, propagation);
-  }
-
-  default Record createWithId(final RecordDefinition recordDefinition) {
-    final Record record = newRecord(recordDefinition);
-    if (record != null) {
-      final String idFieldName = recordDefinition.getIdFieldName();
-      if (Property.hasValue(idFieldName)) {
-        final PathName typePath = recordDefinition.getPathName();
-        final Object id = createPrimaryIdValue(typePath);
-        record.setIdValue(id);
-      }
-    }
-    return record;
-  }
-
-  RecordWriter createWriter();
-
-  default RecordWriter createWriter(final RecordDefinition recordDefinition) {
-    return createWriter();
   }
 
   default int delete(final PathName typePath, final Identifier identifier) {
@@ -204,7 +135,7 @@ public interface RecordStore extends RecordDefinitionFactory, Closeable {
   }
 
   default <V extends CodeTable> V getCodeTable(final String typePath) {
-    return getCodeTable(PathName.create(typePath));
+    return getCodeTable(PathName.newPathName(typePath));
   }
 
   CodeTable getCodeTableByFieldName(String fieldName);
@@ -241,7 +172,7 @@ public interface RecordStore extends RecordDefinitionFactory, Closeable {
 
   @Override
   default RecordDefinition getRecordDefinition(final String path) {
-    return getRecordDefinition(PathName.create(path));
+    return getRecordDefinition(PathName.newPathName(path));
   }
 
   default List<RecordDefinition> getRecordDefinitions(final PathName path) {
@@ -265,7 +196,7 @@ public interface RecordStore extends RecordDefinitionFactory, Closeable {
   }
 
   default RecordStoreSchema getSchema(final String path) {
-    return getSchema(PathName.create(path));
+    return getSchema(PathName.newPathName(path));
   }
 
   StatisticsMap getStatistics();
@@ -275,6 +206,7 @@ public interface RecordStore extends RecordDefinitionFactory, Closeable {
     return statistics.getStatistics(name);
   }
 
+  @Override
   default PlatformTransactionManager getTransactionManager() {
     return null;
   }
@@ -284,7 +216,7 @@ public interface RecordStore extends RecordDefinitionFactory, Closeable {
   String getUsername();
 
   default Writer<Record> getWriter() {
-    return createWriter();
+    return newWriter();
   }
 
   default Writer<Record> getWriter(final boolean throwExceptions) {
@@ -427,6 +359,49 @@ public interface RecordStore extends RecordDefinitionFactory, Closeable {
     }
   }
 
+  default AbstractIterator<Record> newIterator(final Query query, Map<String, Object> properties) {
+    if (properties == null) {
+      properties = Collections.emptyMap();
+    }
+    if (query == null) {
+      return null;
+    } else {
+      final RecordDefinition recordDefinition = query.getRecordDefinition();
+      if (recordDefinition != null) {
+        final RecordStoreIteratorFactory recordDefinitionIteratorFactory = recordDefinition
+          .getProperty("recordStoreIteratorFactory");
+        if (recordDefinitionIteratorFactory != null) {
+          final AbstractIterator<Record> iterator = recordDefinitionIteratorFactory
+            .newIterator(this, query, properties);
+          if (iterator != null) {
+            return iterator;
+          }
+        }
+      }
+      final RecordStoreIteratorFactory iteratorFactory = getIteratorFactory();
+      return iteratorFactory.newIterator(this, query, properties);
+    }
+  }
+
+  default Identifier newPrimaryIdentifier(final PathName typePath) {
+    final Object identifier = newPrimaryIdValue(typePath);
+    return Identifier.create(identifier);
+  }
+
+  default <T> T newPrimaryIdValue(final PathName typePath) {
+    return null;
+  }
+
+  default Query newQuery(final String typePath, final String whereClause,
+    final BoundingBoxDoubleGf boundingBox) {
+    throw new UnsupportedOperationException();
+  }
+
+  default RecordStoreQueryReader newReader() {
+    final RecordStoreQueryReader reader = new RecordStoreQueryReader(this);
+    return reader;
+  }
+
   default Record newRecord(final PathName typePath) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     if (recordDefinition == null) {
@@ -447,7 +422,7 @@ public interface RecordStore extends RecordDefinitionFactory, Closeable {
         final String idFieldName = recordDefinition.getIdFieldName();
         if (Property.hasValue(idFieldName)) {
           if (values.get(idFieldName) == null) {
-            final Object id = createPrimaryIdValue(typePath);
+            final Object id = newPrimaryIdValue(typePath);
             record.setIdValue(id);
           }
         }
@@ -462,7 +437,7 @@ public interface RecordStore extends RecordDefinitionFactory, Closeable {
     if (recordDefinition == null || recordFactory == null) {
       return null;
     } else {
-      final Record record = recordFactory.createRecord(recordDefinition);
+      final Record record = recordFactory.newRecord(recordDefinition);
       return record;
     }
   }
@@ -480,13 +455,32 @@ public interface RecordStore extends RecordDefinitionFactory, Closeable {
         final String idFieldName = recordDefinition.getIdFieldName();
         if (Property.hasValue(idFieldName)) {
           if (values.get(idFieldName) == null) {
-            final Object id = createPrimaryIdValue(typePath);
+            final Object id = newPrimaryIdValue(typePath);
             record.setIdValue(id);
           }
         }
       }
       return record;
     }
+  }
+
+  default Record newRecordWithIdentifier(final RecordDefinition recordDefinition) {
+    final Record record = newRecord(recordDefinition);
+    if (record != null) {
+      final String idFieldName = recordDefinition.getIdFieldName();
+      if (Property.hasValue(idFieldName)) {
+        final PathName typePath = recordDefinition.getPathName();
+        final Object id = newPrimaryIdValue(typePath);
+        record.setIdValue(id);
+      }
+    }
+    return record;
+  }
+
+  RecordWriter newWriter();
+
+  default RecordWriter newWriter(final RecordDefinition recordDefinition) {
+    return newWriter();
   }
 
   default ResultPager<Record> page(final Query query) {
@@ -496,7 +490,7 @@ public interface RecordStore extends RecordDefinitionFactory, Closeable {
   }
 
   default RecordReader query(final Iterable<?> queries) {
-    final RecordStoreQueryReader reader = createReader();
+    final RecordStoreQueryReader reader = newReader();
     for (final Object queryObject : queries) {
       if (queryObject instanceof Query) {
         final Query query = (Query)queryObject;
@@ -528,7 +522,7 @@ public interface RecordStore extends RecordDefinitionFactory, Closeable {
   }
 
   default RecordReader query(final Query query) {
-    final RecordStoreQueryReader reader = createReader();
+    final RecordStoreQueryReader reader = newReader();
     reader.addQuery(query);
     return reader;
   }
@@ -538,7 +532,7 @@ public interface RecordStore extends RecordDefinitionFactory, Closeable {
   }
 
   default RecordReader query(final String path) {
-    final PathName pathName = PathName.create(path);
+    final PathName pathName = PathName.newPathName(path);
     return query(pathName);
   }
 

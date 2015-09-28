@@ -140,7 +140,7 @@ public class OsnReader implements Iterator<Record>, Closeable {
       return converter.read(this.osnIterator);
     } else {
       final RecordDefinition type = this.recordDefinitionFactory.getRecordDefinition(typePath);
-      final Record record = this.factory.createRecord(type);
+      final Record record = this.factory.newRecord(type);
       while (this.osnIterator.next() != OsnIterator.END_OBJECT) {
         addField(record);
       }

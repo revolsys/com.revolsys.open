@@ -5,16 +5,15 @@ import java.util.Map;
 import com.revolsys.geometry.io.GeometryWriter;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.AbstractWriter;
-import com.revolsys.io.Writer;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.Records;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class RecordWriterGeometryWriter extends AbstractWriter<Geometry>implements GeometryWriter {
-  private final Writer<Record> writer;
+  private final RecordWriter writer;
 
-  public RecordWriterGeometryWriter(final Writer<Record> writer) {
+  public RecordWriterGeometryWriter(final RecordWriter writer) {
     this.writer = writer;
   }
 
@@ -45,7 +44,7 @@ public class RecordWriterGeometryWriter extends AbstractWriter<Geometry>implemen
 
   @Override
   public void write(final Geometry geometry) {
-    final RecordDefinition recordDefinition = Records.createGeometryRecordDefinition();
+    final RecordDefinition recordDefinition = Records.newGeometryRecordDefinition();
     final Record object = new ArrayRecord(recordDefinition);
     object.setGeometryValue(geometry);
     this.writer.write(object);

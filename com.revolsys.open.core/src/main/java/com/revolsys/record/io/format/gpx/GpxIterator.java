@@ -213,7 +213,7 @@ public class GpxIterator extends BaseObjectWithProperties
 
   protected Record parsePoint(final String featureType, final double index)
     throws XMLStreamException {
-    final Record record = this.recordFactory.createRecord(GpxConstants.GPX_TYPE);
+    final Record record = this.recordFactory.newRecord(GpxConstants.GPX_TYPE);
     record.setValue("dataset_name", this.baseName);
     record.setValue("index", index);
     record.setValue("feature_type", featureType);
@@ -269,7 +269,7 @@ public class GpxIterator extends BaseObjectWithProperties
 
   private Record parseRoute() throws XMLStreamException {
     this.index++;
-    final Record record = this.recordFactory.createRecord(GpxConstants.GPX_TYPE);
+    final Record record = this.recordFactory.newRecord(GpxConstants.GPX_TYPE);
     record.setValue("dataset_name", this.baseName);
     record.setValue("index", this.index);
     record.setValue("feature_type", "rte");
@@ -314,7 +314,7 @@ public class GpxIterator extends BaseObjectWithProperties
 
   private Record parseTrack() throws XMLStreamException {
     this.index++;
-    final Record record = this.recordFactory.createRecord(GpxConstants.GPX_TYPE);
+    final Record record = this.recordFactory.newRecord(GpxConstants.GPX_TYPE);
     record.setValue("dataset_name", this.baseName);
     record.setValue("index", this.index);
     record.setValue("feature_type", "trk");

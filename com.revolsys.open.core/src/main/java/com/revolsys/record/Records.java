@@ -134,7 +134,7 @@ public final class Records {
   }
 
   /**
-   * Create a copy of the data record replacing the geometry with the new
+   * Construct a new copy of the data record replacing the geometry with the new
    * geometry. If the existing geometry on the record has user data it will be
    * cloned to the new geometry.
    *
@@ -149,11 +149,6 @@ public final class Records {
     newObject.setGeometryValue(geometry);
     GeometryProperties.copyUserData(oldGeometry, geometry);
     return newObject;
-  }
-
-  public static RecordDefinition createGeometryRecordDefinition() {
-    final FieldDefinition geometryField = new FieldDefinition("geometry", DataTypes.GEOMETRY, true);
-    return new RecordDefinitionImpl(PathName.create("/Feature"), geometryField);
   }
 
   public static double distance(final Record record1, final Record record2) {
@@ -484,6 +479,11 @@ public final class Records {
       value = value1 + separator + value2;
     }
     record.put(fieldName, value);
+  }
+
+  public static RecordDefinition newGeometryRecordDefinition() {
+    final FieldDefinition geometryField = new FieldDefinition("geometry", DataTypes.GEOMETRY, true);
+    return new RecordDefinitionImpl(PathName.newPathName("/Feature"), geometryField);
   }
 
   public static void removeDeleted(final Collection<? extends Record> records) {

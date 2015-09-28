@@ -221,7 +221,7 @@ public class MoepBinaryIterator extends BaseObjectWithProperties implements Iter
       final int extraParams = featureKey % 100 / 10;
       final int featureType = featureKey % 10;
       final byte numBytes = (byte)read();
-      final Record object = this.recordFactory.createRecord(MoepConstants.RECORD_DEFINITION);
+      final Record object = this.recordFactory.newRecord(MoepConstants.RECORD_DEFINITION);
       object.setValue(MoepConstants.MAPSHEET_NAME, this.mapsheet);
       object.setValue(MoepConstants.FEATURE_CODE, this.featureCode);
       object.setValue(MoepConstants.ORIGINAL_FILE_TYPE, this.originalFileType);

@@ -51,23 +51,22 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   @Override
-  public MapWriter createMapWriter(final Writer out) {
+  public MapWriter newMapWriter(final Writer out) {
     return new CsvMapWriter(out, Tsv.FIELD_SEPARATOR, true);
   }
 
   @Override
-  public RecordReader createRecordReader(final Resource resource,
-    final RecordFactory recordFactory) {
+  public RecordReader newRecordReader(final Resource resource, final RecordFactory recordFactory) {
     return new CsvRecordReader(resource, recordFactory, Tsv.FIELD_SEPARATOR);
   }
 
   @Override
-  public RecordWriter createRecordWriter(final RecordDefinition recordDefinition, final Path path) {
+  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition, final Path path) {
     return new CsvRecordWriter(recordDefinition, path, Tsv.FIELD_SEPARATOR, true, true);
   }
 
   @Override
-  public RecordWriter createRecordWriter(final String baseName,
+  public RecordWriter newRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream, charset);

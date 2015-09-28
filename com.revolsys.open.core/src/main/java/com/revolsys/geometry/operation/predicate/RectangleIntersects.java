@@ -211,7 +211,7 @@ public class RectangleIntersects {
   private final BoundingBox rectEnv;
 
   /**
-   * Create a new intersects computer for a rectangle.
+   * Construct a new new intersects computer for a rectangle.
    *
    * @param rectangle
    *          a rectangular Polygon

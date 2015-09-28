@@ -18,7 +18,7 @@ public class PathNameEditor extends PropertyEditorSupport {
 
   @Override
   public void setAsText(final String text) throws IllegalArgumentException {
-    final PathName pathName = PathName.create(text);
+    final PathName pathName = PathName.newPathName(text);
     setValue(pathName);
   }
 

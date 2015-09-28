@@ -23,7 +23,7 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
 
   private static final Map<String, OgrRecordStore> DATA_STORES = new HashMap<>();
 
-  private static OgrRecordStore create(final String driverName, File file) {
+  private static OgrRecordStore newRecordStore(final String driverName, File file) {
     if (file == null) {
       return null;
     } else {
@@ -103,18 +103,6 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
   }
 
   @Override
-  public OgrRecordStore createRecordStore(
-    final Map<String, ? extends Object> connectionProperties) {
-    final Map<String, Object> properties = new LinkedHashMap<String, Object>(connectionProperties);
-    final String url = (String)properties.remove("url");
-    final File file = FileUtil.getUrlFile(url);
-
-    final OgrRecordStore recordStore = create(this.driverName, file);
-    RecordStoreFactoryRegistry.setConnectionProperties(recordStore, properties);
-    return recordStore;
-  }
-
-  @Override
   public String getName() {
     return this.name;
   }
@@ -138,5 +126,16 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
   @Override
   public boolean isAvailable() {
     return this.available;
+  }
+
+  @Override
+  public OgrRecordStore newRecordStore(final Map<String, ? extends Object> connectionProperties) {
+    final Map<String, Object> properties = new LinkedHashMap<String, Object>(connectionProperties);
+    final String url = (String)properties.remove("url");
+    final File file = FileUtil.getUrlFile(url);
+
+    final OgrRecordStore recordStore = newRecordStore(this.driverName, file);
+    RecordStoreFactoryRegistry.setConnectionProperties(recordStore, properties);
+    return recordStore;
   }
 }

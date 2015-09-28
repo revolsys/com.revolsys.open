@@ -14,8 +14,6 @@ public interface RecordStoreFactory extends Available {
     return getRecordStoreFileExtensions().contains(fileNameExtension);
   }
 
-  RecordStore createRecordStore(Map<String, ? extends Object> connectionProperties);
-
   String getName();
 
   List<String> getRecordStoreFileExtensions();
@@ -24,4 +22,6 @@ public interface RecordStoreFactory extends Available {
     Map<String, ? extends Object> connectionProperties);
 
   List<String> getUrlPatterns();
+
+  RecordStore newRecordStore(Map<String, ? extends Object> connectionProperties);
 }

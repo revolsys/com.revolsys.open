@@ -63,7 +63,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   implements JdbcRecordStore, RecordStoreExtension {
   public static final List<String> DEFAULT_PERMISSIONS = Arrays.asList("SELECT");
 
-  public static final AbstractIterator<Record> createJdbcIterator(
+  public static final AbstractIterator<Record> newJdbcIterator(
     final AbstractJdbcRecordStore recordStore, final Query query,
     final Map<String, Object> properties) {
     return new JdbcQueryIterator(recordStore, query, properties);
@@ -71,7 +71,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   private final Set<String> allSchemaNames = new TreeSet<String>();
 
-  private final Map<String, JdbcFieldAdder> attributeAdders = new HashMap<String, JdbcFieldAdder>();
+  private final Map<String, JdbcFieldAdder> attributeAdders = new HashMap<>();
 
   private int batchSize;
 
@@ -200,28 +200,10 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     }
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> T createPrimaryIdValue(final PathName typePath) {
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    final GlobalIdProperty globalIdProperty = GlobalIdProperty.getProperty(recordDefinition);
-    if (globalIdProperty == null) {
-      return (T)getNextPrimaryKey(recordDefinition);
-    } else {
-      return (T)UUID.randomUUID().toString();
-    }
-  }
-
   protected RecordStoreQueryReader createReader(final Query query) {
-    final RecordStoreQueryReader reader = createReader();
+    final RecordStoreQueryReader reader = newReader();
     reader.addQuery(query);
     return reader;
-  }
-
-  @Override
-  public RecordWriter createWriter() {
-    final int size = this.batchSize;
-    return createWriter(size);
   }
 
   public RecordWriter createWriter(final int batchSize) {
@@ -248,7 +230,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     }
     final String sql = JdbcUtils.getDeleteSql(query);
     try (
-      Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
+      Transaction transaction = newTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
       // It's important to have this in an inner try. Otherwise the exceptions
       // won't get caught on closing the writer and the transaction won't get
       // rolled back.
@@ -393,7 +375,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   public RecordDefinition getRecordDefinition(final String typePath,
     final ResultSetMetaData resultSetMetaData) {
     try {
-      final PathName pathName = PathName.create(typePath);
+      final PathName pathName = PathName.newPathName(typePath);
       final PathName schemaName = pathName.getParent();
       final RecordStoreSchema schema = getSchema(schemaName);
       final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema, pathName);
@@ -724,6 +706,24 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     }
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> T newPrimaryIdValue(final PathName typePath) {
+    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+    final GlobalIdProperty globalIdProperty = GlobalIdProperty.getProperty(recordDefinition);
+    if (globalIdProperty == null) {
+      return (T)getNextPrimaryKey(recordDefinition);
+    } else {
+      return (T)UUID.randomUUID().toString();
+    }
+  }
+
+  @Override
+  public RecordWriter newWriter() {
+    final int size = this.batchSize;
+    return createWriter(size);
+  }
+
   @Override
   public ResultPager<Record> page(final Query query) {
     return new JdbcQueryResultPager(this, getProperties(), query);
@@ -969,7 +969,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   protected void write(final Record record, final RecordState state) {
     try (
-      Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
+      Transaction transaction = newTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
       // It's important to have this in an inner try. Otherwise the exceptions
       // won't get caught on closing the writer and the transaction won't get
       // rolled back.
@@ -1000,7 +1000,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   protected void writeAll(final Collection<Record> records, final RecordState state) {
     try (
-      Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
+      Transaction transaction = newTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
       // It's important to have this in an inner try. Otherwise the exceptions
       // won't get caught on closing the writer and the transaction won't get
       // rolled back.

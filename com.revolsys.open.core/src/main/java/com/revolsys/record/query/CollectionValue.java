@@ -73,7 +73,7 @@ public class CollectionValue extends QueryValue {
         final Value valueWrapper = (Value)queryValue;
         final Object value = valueWrapper.getQueryValue();
         if (jdbcField == null) {
-          jdbcField = JdbcFieldDefinition.createField(value);
+          jdbcField = JdbcFieldDefinition.newFieldDefinition(value);
         }
         try {
           index = jdbcField.setPreparedStatementValue(statement, index, value);

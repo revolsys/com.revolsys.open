@@ -6,16 +6,16 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Writer;
 
 public interface GeometryWriter extends Writer<Geometry> {
-  public static GeometryWriter create(final Object source) {
+  public static boolean isWritable(final Object source) {
+    return IoFactoryRegistry.isAvailable(GeometryWriterFactory.class, source);
+  }
+
+  public static GeometryWriter newGeometryWriter(final Object source) {
     final GeometryWriterFactory factory = IoFactory.factory(GeometryWriterFactory.class, source);
     if (factory == null) {
       return null;
     } else {
-      return factory.createGeometryWriter(source);
+      return factory.newGeometryWriter(source);
     }
-  }
-
-  public static boolean isWritable(final Object source) {
-    return IoFactoryRegistry.isAvailable(GeometryWriterFactory.class, source);
   }
 }

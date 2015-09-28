@@ -34,7 +34,7 @@ import com.revolsys.util.Property;
 
 public interface Record extends Map<String, Object>, Comparable<Record>, Identifiable {
   /**
-   * Create a clone of the data record.
+   * Construct a new clone of the data record.
    *
    * @return The data record.
    */
@@ -639,7 +639,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
               final RecordDefinition subRecordDefinition = recordDefinitionFactory
                 .getRecordDefinition(typePath);
               final RecordFactory recordFactory = subRecordDefinition.getRecordFactory();
-              final Record subRecord = recordFactory.createRecord(subRecordDefinition);
+              final Record subRecord = recordFactory.newRecord(subRecordDefinition);
               updated |= subRecord.setValue(subKey, value);
               updated |= setValue(key, subRecord);
             }

@@ -7,7 +7,7 @@ public class GeometryIo {
   public static void copyGeometry(final Iterable<Geometry> reader, final Object target) {
     if (reader != null) {
       try (
-        Writer<Geometry> writer = GeometryWriter.create(target)) {
+        Writer<Geometry> writer = GeometryWriter.newGeometryWriter(target)) {
         if (writer == null) {
           throw new IllegalArgumentException("Unable to create writer " + target);
         } else {
@@ -27,7 +27,7 @@ public class GeometryIo {
 
   public static void copyGeometry(final Object source, final Object target) {
     try (
-      GeometryReader reader = GeometryReader.create(source)) {
+      GeometryReader reader = GeometryReader.newGeometryReader(source)) {
       if (reader == null) {
         throw new IllegalArgumentException("Unable to read " + source);
       } else {
@@ -39,7 +39,7 @@ public class GeometryIo {
 
   public static void copyGeometry(final Object source, final Writer<Geometry> writer) {
     try (
-      GeometryReader reader = GeometryReader.create(source)) {
+      GeometryReader reader = GeometryReader.newGeometryReader(source)) {
       if (reader == null) {
         throw new IllegalArgumentException("Unable to read " + source);
       } else {

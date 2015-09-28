@@ -108,7 +108,7 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
   }
 
   /**
-   * Create a new "split edge" with the section of points between
+   * Construct a new new "split edge" with the section of points between
    * (and including) the two intersections.
    * The label for the new edge is the same as the label for the parent edge.
    */

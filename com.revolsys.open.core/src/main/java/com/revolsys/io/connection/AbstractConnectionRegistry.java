@@ -223,7 +223,7 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
   }
 
   public void saveAs(final Resource parentDirectory, final String directoryName) {
-    final Resource connectionsDirectory = parentDirectory.createChild(directoryName);
+    final Resource connectionsDirectory = parentDirectory.newChildResource(directoryName);
     saveAs(connectionsDirectory);
   }
 

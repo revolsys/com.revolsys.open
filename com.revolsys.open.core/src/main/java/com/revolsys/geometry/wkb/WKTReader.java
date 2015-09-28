@@ -442,7 +442,7 @@ public class WKTReader {
    *      format. The next tokens must form a &lt;GeometryCollection Text&gt;.
    *@return                  a <code>GeometryCollection</code> specified by the
    *      next token in the stream
-   *@throws  ParseException  if the coordinates used to create a <code>Polygon</code>
+   *@throws  ParseException  if the coordinates used to Construct a new <code>Polygon</code>
    *      shell and holes do not form closed linestrings, or if an unexpected
    *      token was encountered
    *@throws  IOException     if an I/O error occurs
@@ -472,7 +472,7 @@ public class WKTReader {
    *      format. The next tokens must form a &lt;Geometry Tagged Text&gt;.
    *@return                  a <code>Geometry</code> specified by the next token
    *      in the stream
-   *@throws  ParseException  if the coordinates used to create a <code>Polygon</code>
+   *@throws  ParseException  if the coordinates used to Construct a new <code>Polygon</code>
    *      shell and holes do not form closed linestrings, or if an unexpected
    *      token was encountered
    *@throws  IOException     if an I/O error occurs

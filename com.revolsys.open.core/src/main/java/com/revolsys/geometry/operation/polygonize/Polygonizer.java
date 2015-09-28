@@ -96,7 +96,7 @@ public class Polygonizer {
   protected List shellList = null;
 
   /**
-   * Create a polygonizer with the same {@link GeometryFactory}
+   * Construct a new polygonizer with the same {@link GeometryFactory}
    * as the input {@link Geometry}s
    */
   public Polygonizer() {
@@ -137,7 +137,7 @@ public class Polygonizer {
    * @param line the {@link LineString} to add
    */
   private void add(final LineString line) {
-    // create a new graph using the factory from the input Geometry
+    // Construct a new new graph using the factory from the input Geometry
     if (this.graph == null) {
       this.graph = new PolygonizeGraph(line.getGeometryFactory());
     }

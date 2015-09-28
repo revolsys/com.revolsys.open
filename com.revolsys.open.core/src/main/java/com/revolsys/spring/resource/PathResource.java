@@ -48,7 +48,7 @@ public class PathResource extends AbstractResource implements WritableResource {
   private final Path path;
 
   /**
-   * Create a new PathResource from a Path handle.
+   * Construct a new new PathResource from a Path handle.
    * <p>Note: Unlike {@link FileSystemResource}, when building relative resources
    * via {@link #createRelative}, the relative path will be built <i>underneath</i>
    * the given root:
@@ -61,7 +61,7 @@ public class PathResource extends AbstractResource implements WritableResource {
   }
 
   /**
-   * Create a new PathResource from a Path handle.
+   * Construct a new new PathResource from a Path handle.
    * <p>Note: Unlike {@link FileSystemResource}, when building relative resources
    * via {@link #createRelative}, the relative path will be built <i>underneath</i>
    * the given root:
@@ -75,7 +75,7 @@ public class PathResource extends AbstractResource implements WritableResource {
   }
 
   /**
-   * Create a new PathResource from a Path handle.
+   * Construct a new new PathResource from a Path handle.
    * <p>Note: Unlike {@link FileSystemResource}, when building relative resources
    * via {@link #createRelative}, the relative path will be built <i>underneath</i>
    * the given root:

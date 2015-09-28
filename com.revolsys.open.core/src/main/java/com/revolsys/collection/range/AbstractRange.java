@@ -70,10 +70,6 @@ public abstract class AbstractRange<V>
     return false;
   }
 
-  protected AbstractRange<?> createNew(final Object from, final Object to) {
-    throw new UnsupportedOperationException();
-  }
-
   @Override
   public boolean equals(final Object other) {
     if (this == other) {
@@ -98,7 +94,7 @@ public abstract class AbstractRange<V>
   }
 
   /**
-   * Create an expanded range if the this range and the other overlap or touch
+   * Construct a newn expanded range if the this range and the other overlap or touch
    *
    * @param range
    * @return
@@ -127,24 +123,24 @@ public abstract class AbstractRange<V>
       if (toCompare > 0) {
         return this;
       } else if (compareToValue(rangeFrom) > 0) {
-        return createNew(from, rangeTo);
+        return newRange(from, rangeTo);
       } else if (Equals.equal(to, previous(rangeFrom)) || Equals.equal(to, rangeFrom)) {
-        return createNew(from, rangeTo);
+        return newRange(from, rangeTo);
       }
     } else if (fromCompare > 0) {
       if (toCompare < 0) {
         return range;
       } else if (compareFromValue(rangeTo) < 0) {
-        return createNew(rangeFrom, to);
+        return newRange(rangeFrom, to);
       } else if (Equals.equal(previous(from), rangeTo) || Equals.equal(from, rangeTo)) {
-        return createNew(rangeFrom, to);
+        return newRange(rangeFrom, to);
       }
     }
     return null;
   }
 
   /**
-   * Create an expanded range to include the specified value if possible.
+   * Construct a newn expanded range to include the specified value if possible.
    * <ul>
    * <li>If the range contains this value return this instance.</li>
    * <li>If the value = from - 1 return a new range from value-to</li>
@@ -163,13 +159,13 @@ public abstract class AbstractRange<V>
       if (next == null) {
         return null;
       } else if (compareFromValue(next) == 0) { // value == from -1
-        return createNew(value, to);
+        return newRange(value, to);
       } else {
         final V previous = previous(value);
         if (previous == null) {
           return null;
         } else if (compareToValue(previous) == 0) { // value == to + 1
-          return createNew(from, value);
+          return newRange(from, value);
         } else {
           return null;
         }
@@ -198,6 +194,10 @@ public abstract class AbstractRange<V>
   @Override
   public Iterator<V> iterator() {
     return new RangeIterator<V>(this);
+  }
+
+  protected AbstractRange<?> newRange(final Object from, final Object to) {
+    throw new UnsupportedOperationException();
   }
 
   public V next(final Object value) {

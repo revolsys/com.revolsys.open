@@ -44,7 +44,7 @@ public class Preference {
     this.valueClass = valueClass;
     this.savedValue = OS.getPreference(applicationName, path, propertyName, defaultValue);
     if (field == null) {
-      this.fieldComponent = SwingUtil.createField(valueClass, propertyName, defaultValue);
+      this.fieldComponent = SwingUtil.newField(valueClass, propertyName, defaultValue);
     } else {
       this.fieldComponent = field;
     }

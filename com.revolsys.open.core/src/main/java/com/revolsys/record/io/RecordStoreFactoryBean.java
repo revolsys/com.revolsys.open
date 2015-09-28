@@ -16,7 +16,7 @@ public class RecordStoreFactoryBean extends AbstractFactoryBean<RecordStore> {
 
   @Override
   protected RecordStore createInstance() throws Exception {
-    final RecordStore recordStore = RecordStoreFactoryRegistry.createRecordStore(this.config);
+    final RecordStore recordStore = RecordStoreFactoryRegistry.newRecordStore(this.config);
     Property.set(recordStore, this.properties);
     recordStore.initialize();
     return recordStore;

@@ -169,7 +169,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
         throw new NoSuchElementException();
       } else {
         try {
-          final Record record = this.recordFactory.createRecord(this.recordDefinition);
+          final Record record = this.recordFactory.newRecord(this.recordDefinition);
           if (this.statistics == null) {
             this.recordStore.addStatistic("query", record);
           } else {

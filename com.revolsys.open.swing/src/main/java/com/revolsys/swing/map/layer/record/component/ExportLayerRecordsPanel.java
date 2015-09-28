@@ -59,7 +59,7 @@ public class ExportLayerRecordsPanel extends BasePanel {
 
   private void addFileChooser(final JComponent component) {
 
-    final JFileChooser fileChooser = SwingUtil.createFileChooser(getClass(), "currentDirectory");
+    final JFileChooser fileChooser = SwingUtil.newFileChooser(getClass(), "currentDirectory");
 
     final Set<String> allRecordExtensions = new TreeSet<>();
     final List<FileNameExtensionFilter> recordFileFilters = AddFileLayerAction
@@ -123,7 +123,7 @@ public class ExportLayerRecordsPanel extends BasePanel {
 
   private void writeRecords(final Iterable<LayerRecord> records) {
     try (
-      Writer<Record> writer = RecordWriter.create(this.layer.getRecordDefinition(),
+      Writer<Record> writer = RecordWriter.newRecordWriter(this.layer.getRecordDefinition(),
         this.exportResource)) {
       for (final LayerRecord record : records) {
         writer.write(record);

@@ -104,7 +104,7 @@ public final class SiteNode implements Comparable, Cloneable {
   }
 
   /**
-   * Create a deep copy of this node. Does not retain the reference to the
+   * Construct a new deep copy of this node. Does not retain the reference to the
    * parent node.
    *
    * @return The cloned node.
@@ -345,7 +345,7 @@ public final class SiteNode implements Comparable, Cloneable {
                 }
                 childNode.setPath(name);
               } else {
-                // Otherwise create a new node
+                // Otherwise Construct a new new node
                 childNode = new SiteNode(name);
               }
               currentNode.addNode(childNode);

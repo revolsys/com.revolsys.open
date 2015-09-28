@@ -325,7 +325,7 @@ public final class JdbcUtils {
     RecordDefinition recordDefinition = query.getRecordDefinition();
     if (sql == null) {
       if (recordDefinition == null) {
-        recordDefinition = new RecordDefinitionImpl(PathName.create(tableName));
+        recordDefinition = new RecordDefinitionImpl(PathName.newPathName(tableName));
         // throw new IllegalArgumentException("Unknown table name " +
         // tableName);
       }
@@ -703,7 +703,7 @@ public final class JdbcUtils {
     final Query query) {
     int index = 1;
     for (final Object parameter : query.getParameters()) {
-      final JdbcFieldDefinition attribute = JdbcFieldDefinition.createField(parameter);
+      final JdbcFieldDefinition attribute = JdbcFieldDefinition.newFieldDefinition(parameter);
       try {
         index = attribute.setPreparedStatementValue(statement, index, parameter);
       } catch (final SQLException e) {
@@ -718,7 +718,7 @@ public final class JdbcUtils {
 
   public static int setValue(final PreparedStatement statement, final int index, final Object value)
     throws SQLException {
-    final JdbcFieldDefinition attribute = JdbcFieldDefinition.createField(value);
+    final JdbcFieldDefinition attribute = JdbcFieldDefinition.newFieldDefinition(value);
     return attribute.setPreparedStatementValue(statement, index, value);
   }
 

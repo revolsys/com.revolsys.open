@@ -63,7 +63,8 @@ public class PriorityQueue implements Emptyable {
    * @param x the item to insert.
    */
   public void add(final Comparable x) {
-    // increase the size of the items heap to create a hole for the new item
+    // increase the size of the items heap to Construct a new hole for the new
+    // item
     this.items.add(null);
 
     // Insert item at end of heap and then re-establish ordering

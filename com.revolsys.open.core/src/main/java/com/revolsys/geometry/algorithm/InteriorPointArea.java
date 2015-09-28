@@ -49,7 +49,7 @@ import com.revolsys.geometry.model.impl.PointDouble;
  *   <li>Find a Y value which is close to the centre of
  *       the geometry's vertical extent but is different
  *       to any of it's Y ordinates.
- *   <li>Create a horizontal bisector line using the Y value
+ *   <li>Construct a new horizontal bisector line using the Y value
  *       and the geometry's horizontal extent
  *   <li>Find the intersection between the geometry
  *       and the horizontal bisector line.

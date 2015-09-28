@@ -17,39 +17,38 @@ import com.revolsys.spring.resource.Resource;
 
 public interface RecordReaderFactory
   extends GeometryReaderFactory, MapReaderFactory, IoFactoryWithCoordinateSystem {
-
   /**
-   * Create a directory reader using the ({@link ArrayRecordFactory}).
+   * Construct a new directory reader using the ({@link ArrayRecordFactory}).
    *
    * @return The reader.
    */
-  default Reader<Record> createDirectoryRecordReader() {
+  default Reader<Record> newDirectoryRecordReader() {
     final RecordDirectoryReader directoryReader = new RecordDirectoryReader();
     directoryReader.setFileExtensions(getFileExtensions());
     return directoryReader;
   }
 
   /**
-   * Create a reader for the directory using the ({@link ArrayRecordFactory}
+   * Construct a new reader for the directory using the ({@link ArrayRecordFactory}
    * ).
    *
    * @param directory The directory to read.
    * @return The reader for the file.
    */
-  default Reader<Record> createDirectoryRecordReader(final File directory) {
-    return createDirectoryRecordReader(directory, ArrayRecordFactory.INSTANCE);
+  default Reader<Record> newDirectoryRecordReader(final File directory) {
+    return newDirectoryRecordReader(directory, ArrayRecordFactory.INSTANCE);
 
   }
 
   /**
-   * Create a reader for the directory using the specified data object
+   * Construct a new reader for the directory using the specified data object
    * recordFactory.
    *
    * @param directory directory file to read.
    * @param recordFactory The recordFactory used to create data objects.
    * @return The reader for the file.
    */
-  default Reader<Record> createDirectoryRecordReader(final File directory,
+  default Reader<Record> newDirectoryRecordReader(final File directory,
     final RecordFactory recordFactory) {
     final RecordDirectoryReader directoryReader = new RecordDirectoryReader();
     directoryReader.setFileExtensions(getFileExtensions());
@@ -58,8 +57,8 @@ public interface RecordReaderFactory
   }
 
   @Override
-  default GeometryReader createGeometryReader(final Resource resource) {
-    final Reader<Record> recordReader = createRecordReader(resource);
+  default GeometryReader newGeometryReader(final Resource resource) {
+    final Reader<Record> recordReader = newRecordReader(resource);
     final Iterator<Record> recordIterator = recordReader.iterator();
     final RecordGeometryIterator iterator = new RecordGeometryIterator(recordIterator);
     final GeometryReader geometryReader = new GeometryReader(iterator);
@@ -67,25 +66,25 @@ public interface RecordReaderFactory
   }
 
   @Override
-  default MapReader createMapReader(final Resource resource) {
-    final RecordReader reader = createRecordReader(resource);
+  default MapReader newMapreader(final Resource resource) {
+    final RecordReader reader = newRecordReader(resource);
     return new RecordMapReader(reader);
   }
 
   /**
-   * Create a reader for the resource using the ({@link ArrayRecordFactory}
+   * Construct a new reader for the resource using the ({@link ArrayRecordFactory}
    * ).
    *
    * @param file The file to read.
    * @return The reader for the file.
    */
-  default RecordReader createRecordReader(final Object object) {
-    return createRecordReader(object, ArrayRecordFactory.INSTANCE);
+  default RecordReader newRecordReader(final Object object) {
+    return newRecordReader(object, ArrayRecordFactory.INSTANCE);
 
   }
 
   /**
-   * Create a {@link RecordReader} for the given source. The source can be one of the following
+   * Construct a new {@link RecordReader} for the given source. The source can be one of the following
    * classes.
    *
    * <ul>
@@ -98,10 +97,10 @@ public interface RecordReaderFactory
    * @return The reader.
    * @throws IllegalArgumentException If the source is not a supported class.
    */
-  default RecordReader createRecordReader(final Object source, final RecordFactory factory) {
-    final Resource resource = com.revolsys.spring.resource.Resource.getResource(source);
-    return createRecordReader(resource, factory);
+  default RecordReader newRecordReader(final Object source, final RecordFactory factory) {
+    final Resource resource = Resource.getResource(source);
+    return newRecordReader(resource, factory);
   }
 
-  RecordReader createRecordReader(Resource resource, RecordFactory factory);
+  RecordReader newRecordReader(Resource resource, RecordFactory factory);
 }

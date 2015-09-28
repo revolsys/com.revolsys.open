@@ -20,8 +20,17 @@ public class Shapefile extends AbstractRecordIoFactory implements RecordWriterFa
   }
 
   @Override
-  public RecordReader createRecordReader(final Resource resource,
-    final RecordFactory recordFactory) {
+  public boolean isBinary() {
+    return true;
+  }
+
+  @Override
+  public boolean isSingleFile() {
+    return false;
+  }
+
+  @Override
+  public RecordReader newRecordReader(final Resource resource, final RecordFactory recordFactory) {
     try {
       return new ShapefileIterator(resource, recordFactory);
     } catch (final IOException e) {
@@ -30,25 +39,15 @@ public class Shapefile extends AbstractRecordIoFactory implements RecordWriterFa
   }
 
   @Override
-  public RecordWriter createRecordWriter(final RecordDefinition recordDefinition,
+  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
     return new ShapefileRecordWriter(recordDefinition, resource);
   }
 
   @Override
-  public RecordWriter createRecordWriter(final String baseName,
+  public RecordWriter newRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
-    return createRecordWriter(recordDefinition, new OutputStreamResource(baseName, outputStream));
-  }
-
-  @Override
-  public boolean isBinary() {
-    return true;
-  }
-
-  @Override
-  public boolean isSingleFile() {
-    return false;
+    return newRecordWriter(recordDefinition, new OutputStreamResource(baseName, outputStream));
   }
 }

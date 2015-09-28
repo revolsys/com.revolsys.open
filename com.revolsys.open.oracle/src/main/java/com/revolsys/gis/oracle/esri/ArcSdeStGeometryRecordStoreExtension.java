@@ -52,7 +52,7 @@ public class ArcSdeStGeometryRecordStoreExtension implements RecordStoreExtensio
           final String tableName = resultSet.getString(1);
           final String columnName = resultSet.getString(2);
 
-          final PathName typePath = PathName.create(Path.toPath(schemaName, tableName));
+          final PathName typePath = PathName.newPathName(Path.toPath(schemaName, tableName));
 
           final int esriSrid = resultSet.getInt(3);
           JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,

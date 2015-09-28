@@ -28,16 +28,16 @@ public final class GpxConstants {
   public static final QName GPX_ELEMENT = new QName(GPX_NS_URI, "gpx");
 
   public static final RecordDefinitionImpl GPX_ROUTE = new RecordDefinitionImpl(
-    PathName.create("/gpx/route"));
+    PathName.newPathName("/gpx/route"));
 
   public static final RecordDefinitionImpl GPX_TRACK = new RecordDefinitionImpl(
-    PathName.create("/gpx/track"));
+    PathName.newPathName("/gpx/track"));
 
   public static final RecordDefinitionImpl GPX_TYPE = new RecordDefinitionImpl(
-    PathName.create("/gpx"));
+    PathName.newPathName("/gpx"));
 
   public static final RecordDefinitionImpl GPX_WAYPOINT = new RecordDefinitionImpl(
-    PathName.create("/gpx/waypoint"));
+    PathName.newPathName("/gpx/waypoint"));
 
   public static final QName LAT_ATTRIBUTE = new QName(null, "lat");
 

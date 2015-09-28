@@ -24,12 +24,17 @@ public class ShapefileZip extends AbstractRecordIoFactory implements RecordWrite
   }
 
   @Override
-  public RecordReader createRecordReader(final Resource resource, final RecordFactory factory) {
+  public boolean isBinary() {
+    return true;
+  }
+
+  @Override
+  public RecordReader newRecordReader(final Resource resource, final RecordFactory factory) {
     return new ZipRecordReader(resource, ShapefileConstants.FILE_EXTENSION, factory);
   }
 
   @Override
-  public RecordWriter createRecordWriter(final String baseName,
+  public RecordWriter newRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     File directory;
@@ -41,10 +46,5 @@ public class ShapefileZip extends AbstractRecordIoFactory implements RecordWrite
     final Resource tempResource = new FileSystemResource(new File(directory, baseName + ".shp"));
     final RecordWriter shapeWriter = new ShapefileRecordWriter(recordDefinition, tempResource);
     return new ZipRecordWriter(directory, shapeWriter, outputStream);
-  }
-
-  @Override
-  public boolean isBinary() {
-    return true;
   }
 }

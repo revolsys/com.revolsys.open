@@ -36,7 +36,7 @@ package com.revolsys.geometry.triangulate;
 import com.revolsys.geometry.model.Point;
 
 /**
- * An interface for factories which create a {@link ConstraintVertex}
+ * An interface for factories which Construct a new {@link ConstraintVertex}
  *
  * @author Martin Davis
  */

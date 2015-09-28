@@ -32,13 +32,13 @@ public class XmlMapIoFactory extends AbstractIoFactory
   }
 
   @Override
-  public MapReader createMapReader(final Resource resource) {
+  public MapReader newMapreader(final Resource resource) {
     final XmlMapIterator iterator = new XmlMapIterator(resource);
     return new IteratorMapReader(iterator);
   }
 
   @Override
-  public MapWriter createMapWriter(final Writer out) {
+  public MapWriter newMapWriter(final Writer out) {
     return new XmlMapWriter(out);
   }
 }

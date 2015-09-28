@@ -167,7 +167,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
   @Override
   protected void insertObject(final Record object) {
     if (object.getIdentifier() == null) {
-      object.setIdValue(this.recordStore.createPrimaryIdValue(this.tableName));
+      object.setIdValue(this.recordStore.newPrimaryIdValue(this.tableName));
     }
     this.recordStore.insert(object);
   }

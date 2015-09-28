@@ -67,7 +67,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     final Map<String, ? extends Object> connectionProperties) {
     super(databaseFactory);
     setConnectionProperties(connectionProperties);
-    final DataSource dataSource = databaseFactory.createDataSource(connectionProperties);
+    final DataSource dataSource = databaseFactory.newDataSource(connectionProperties);
     setDataSource(dataSource);
     initSettings();
 
@@ -250,11 +250,6 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     }
   }
 
-  public AbstractIterator<Record> createOracleIterator(final OracleRecordStore recordStore,
-    final Query query, final Map<String, Object> properties) {
-    return new OracleJdbcQueryIterator(recordStore, query, properties);
-  }
-
   public synchronized CoordinateSystem getCoordinateSystem(final int oracleSrid) {
     CoordinateSystem coordinateSystem = this.oracleCoordinateSystems.get(oracleSrid);
     if (coordinateSystem == null) {
@@ -396,7 +391,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     setExcludeTablePatterns(".*\\$");
     setSqlPrefix("BEGIN ");
     setSqlSuffix(";END;");
-    setIteratorFactory(new RecordStoreIteratorFactory(this, "createOracleIterator"));
+    setIteratorFactory(new RecordStoreIteratorFactory(this, "newOracleIterator"));
   }
 
   @Override
@@ -406,6 +401,11 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
 
   public boolean isUseSchemaSequencePrefix() {
     return this.useSchemaSequencePrefix;
+  }
+
+  public AbstractIterator<Record> newOracleIterator(final OracleRecordStore recordStore,
+    final Query query, final Map<String, Object> properties) {
+    return new OracleJdbcQueryIterator(recordStore, query, properties);
   }
 
   @Override

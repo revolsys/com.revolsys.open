@@ -295,7 +295,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
     } else {
       tableName = domain.getName();
     }
-    final PathName typePath = PathName.create(Path.toPath(schemaName, tableName));
+    final PathName typePath = PathName.newPathName(Path.toPath(schemaName, tableName));
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(typePath);
     final FieldType fieldType = domain.getFieldType();
     final DataType dataType = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE.getDataType(fieldType);
@@ -325,7 +325,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
   public static RecordDefinition getRecordDefinition(final String schemaName, final DETable deTable,
     final boolean ignoreEsriFields) {
     final String tableName = deTable.getName();
-    final PathName typePath = PathName.create(Path.toPath(schemaName, tableName));
+    final PathName typePath = PathName.newPathName(Path.toPath(schemaName, tableName));
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(typePath);
     final List<String> ignoreFieldNames = new ArrayList<String>();
     if (ignoreEsriFields) {

@@ -24,34 +24,6 @@ public class Kmz extends AbstractIoFactoryWithCoordinateSystem
   }
 
   @Override
-  public GeometryReader createGeometryReader(final Resource resource) {
-    final KmzGeometryIterator iterator = new KmzGeometryIterator(resource);
-    return new GeometryReader(iterator);
-  }
-
-  @Override
-  public MapWriter createMapWriter(final java.io.Writer out) {
-    throw new IllegalArgumentException("Cannot use a writer");
-  }
-
-  @Override
-  public MapWriter createMapWriter(final OutputStream out) {
-    return new KmzMapWriter(out);
-  }
-
-  @Override
-  public MapWriter createMapWriter(final OutputStream out, final Charset charset) {
-    return createMapWriter(out);
-  }
-
-  @Override
-  public RecordWriter createRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream,
-    final Charset charset) {
-    return new KmzRecordWriter(outputStream, charset);
-  }
-
-  @Override
   public Set<CoordinateSystem> getCoordinateSystems() {
     return Kml.COORDINATE_SYSTEMS;
   }
@@ -59,5 +31,33 @@ public class Kmz extends AbstractIoFactoryWithCoordinateSystem
   @Override
   public boolean isBinary() {
     return true;
+  }
+
+  @Override
+  public GeometryReader newGeometryReader(final Resource resource) {
+    final KmzGeometryIterator iterator = new KmzGeometryIterator(resource);
+    return new GeometryReader(iterator);
+  }
+
+  @Override
+  public MapWriter newMapWriter(final java.io.Writer out) {
+    throw new IllegalArgumentException("Cannot use a writer");
+  }
+
+  @Override
+  public MapWriter newMapWriter(final OutputStream out) {
+    return new KmzMapWriter(out);
+  }
+
+  @Override
+  public MapWriter newMapWriter(final OutputStream out, final Charset charset) {
+    return newMapWriter(out);
+  }
+
+  @Override
+  public RecordWriter newRecordWriter(final String baseName,
+    final RecordDefinition recordDefinition, final OutputStream outputStream,
+    final Charset charset) {
+    return new KmzRecordWriter(outputStream, charset);
   }
 }

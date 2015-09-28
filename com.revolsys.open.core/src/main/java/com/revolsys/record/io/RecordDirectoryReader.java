@@ -31,13 +31,6 @@ public class RecordDirectoryReader extends AbstractDirectoryReader<Record>
   }
 
   @Override
-  protected Reader<Record> createReader(final Resource resource) {
-    final RecordReader reader = RecordReader.create(resource);
-    addRecordDefinition(reader);
-    return reader;
-  }
-
-  @Override
   public RecordDefinition getRecordDefinition(final String path) {
     final RecordDefinition recordDefinition = this.typePathRecordDefinitionMap.get(path);
     return recordDefinition;
@@ -45,6 +38,13 @@ public class RecordDirectoryReader extends AbstractDirectoryReader<Record>
 
   public Statistics getStatistics() {
     return this.statistics;
+  }
+
+  @Override
+  protected Reader<Record> newReader(final Resource resource) {
+    final RecordReader reader = RecordReader.newRecordReader(resource);
+    addRecordDefinition(reader);
+    return reader;
   }
 
   /**

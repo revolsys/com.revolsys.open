@@ -518,7 +518,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
     final Resource resource = getImageResource();
 
     final String extension = resource.getFileNameExtension();
-    final Resource auxFile = resource.createChangeExtension(extension + ".aux.xml");
+    final Resource auxFile = resource.newResourceChangeExtension(extension + ".aux.xml");
     if (auxFile.exists() && auxFile.getLastModified() > modifiedTime) {
       loadWorldFileX();
       final int[] dpi = getDpi();
@@ -609,7 +609,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
 
   protected long loadSettings() {
     final Resource resource = getImageResource();
-    final Resource settingsFile = resource.createAddExtension("rgobject");
+    final Resource settingsFile = resource.newResourceAddExtension("rgobject");
     if (settingsFile.exists()) {
       try {
         final Map<String, Object> settings = Json.toMap(settingsFile);
@@ -650,7 +650,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
 
   protected void loadWorldFile() {
     final Resource resource = getImageResource();
-    final Resource worldFile = resource.createChangeExtension(getWorldFileExtension());
+    final Resource worldFile = resource.newResourceChangeExtension(getWorldFileExtension());
     loadWorldFile(worldFile);
   }
 
@@ -683,7 +683,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
 
   protected void loadWorldFileX() {
     final Resource resource = getImageResource();
-    final Resource worldFile = resource.createChangeExtension(getWorldFileExtension() + "x");
+    final Resource worldFile = resource.newResourceChangeExtension(getWorldFileExtension() + "x");
     if (worldFile.exists()) {
       loadWorldFile(worldFile);
     } else {
@@ -722,7 +722,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
   public boolean saveChanges() {
     try {
       final Resource resource = this.imageResource;
-      final Resource rgResource = resource.createAddExtension("rgobject");
+      final Resource rgResource = resource.newResourceAddExtension("rgobject");
       MapObjectFactoryRegistry.write(rgResource, this);
       setHasChanges(false);
       return true;

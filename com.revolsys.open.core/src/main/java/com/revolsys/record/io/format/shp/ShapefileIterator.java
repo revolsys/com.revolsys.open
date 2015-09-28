@@ -65,7 +65,7 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
     this.recordFactory = factory;
     final String baseName = resource.getBaseName();
     this.name = baseName;
-    this.typeName = PathName.create("/" + this.name);
+    this.typeName = PathName.newPathName("/" + this.name);
     this.resource = resource;
   }
 
@@ -97,7 +97,7 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
           this.in = new EndianInputStream(this.resource.getInputStream());
         }
 
-        final Resource xbaseResource = this.resource.createChangeExtension("dbf");
+        final Resource xbaseResource = this.resource.newResourceChangeExtension("dbf");
         if (xbaseResource.exists()) {
           this.xbaseIterator = new XbaseIterator(xbaseResource, this.recordFactory,
             () -> updateRecordDefinition());
@@ -149,7 +149,7 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
           this.xbaseIterator.hasNext();
         }
         if (this.recordDefinition == null) {
-          this.recordDefinition = Records.createGeometryRecordDefinition();
+          this.recordDefinition = Records.newGeometryRecordDefinition();
         }
         this.recordDefinition.setGeometryFactory(this.geometryFactory);
       } catch (final IOException e) {
@@ -187,7 +187,7 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
           throw new NoSuchElementException();
         }
       } else {
-        record = this.recordFactory.createRecord(this.recordDefinition);
+        record = this.recordFactory.newRecord(this.recordDefinition);
       }
 
       final Geometry geometry = readGeometry();
@@ -200,7 +200,7 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
     if (this.returnRecordDefinition == null) {
       return record;
     } else {
-      final Record copy = this.recordFactory.createRecord(this.returnRecordDefinition);
+      final Record copy = this.recordFactory.newRecord(this.returnRecordDefinition);
       copy.setValues(record);
       return copy;
     }

@@ -29,12 +29,12 @@ public class Html extends AbstractIoFactoryWithCoordinateSystem
   }
 
   @Override
-  public MapWriter createMapWriter(final Writer out) {
+  public MapWriter newMapWriter(final Writer out) {
     return new XhtmlMapWriter(out);
   }
 
   @Override
-  public RecordWriter createRecordWriter(final String baseName,
+  public RecordWriter newRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);

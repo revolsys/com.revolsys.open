@@ -55,11 +55,6 @@ public class CharRange extends AbstractRange<Character> {
   }
 
   @Override
-  protected AbstractRange<?> createNew(final Object from, final Object to) {
-    return Ranges.create(((Character)from).charValue(), ((Character)to).charValue());
-  }
-
-  @Override
   public AbstractRange<?> expand(final Object value) {
     if (value instanceof Character) {
       final Character character = (Character)value;
@@ -82,6 +77,11 @@ public class CharRange extends AbstractRange<Character> {
   @Override
   public Character getTo() {
     return this.to;
+  }
+
+  @Override
+  protected AbstractRange<?> newRange(final Object from, final Object to) {
+    return Ranges.newRange(((Character)from).charValue(), ((Character)to).charValue());
   }
 
   @Override

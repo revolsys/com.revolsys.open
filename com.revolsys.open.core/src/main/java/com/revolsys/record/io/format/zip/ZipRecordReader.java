@@ -58,7 +58,7 @@ public class ZipRecordReader extends DelegatingReader<Record>implements RecordRe
     final File file = new File(this.directory, zipEntryName);
     if (file.exists()) {
       final FileSystemResource fileResource = new FileSystemResource(file);
-      this.reader = RecordReader.create(fileResource, factory);
+      this.reader = RecordReader.newRecordReader(fileResource, factory);
       if (this.reader == null) {
         close();
         throw new IllegalArgumentException(

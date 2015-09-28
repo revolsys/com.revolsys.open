@@ -54,7 +54,7 @@ public class GeometryReaderHttpMessageConverter
         throw new HttpMessageNotReadableException("Cannot read data in format" + mediaType);
       } else {
         final InputStreamResource resource = new InputStreamResource("geometryInput", body);
-        final GeometryReader reader = readerFactory.createGeometryReader(resource);
+        final GeometryReader reader = readerFactory.newGeometryReader(resource);
         GeometryFactory factory = this.geometryFactory;
         final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder
           .getRequestAttributes();

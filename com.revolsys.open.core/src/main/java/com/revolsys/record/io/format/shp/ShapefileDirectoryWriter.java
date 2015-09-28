@@ -118,7 +118,7 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
       directory.mkdirs();
       final File file = new File(directory,
         getFileName(recordDefinition) + this.nameSuffix + ".shp");
-      writer = RecordWriter.create(recordDefinition, new FileSystemResource(file));
+      writer = RecordWriter.newRecordWriter(recordDefinition, new FileSystemResource(file));
 
       ((XbaseRecordWriter)writer).setUseZeroForNull(this.useZeroForNull);
       final Geometry geometry = object.getGeometry();

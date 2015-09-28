@@ -60,15 +60,6 @@ public class FileGdbDomainCodeTable implements CodeTable {
     }
   }
 
-  private Identifier createValue(final String name) {
-    synchronized (this.recordStore) {
-      final Identifier id = this.domain.addCodedValue(name);
-      this.recordStore.alterDomain(this.domain);
-      LOG.info(this.domain.getDomainName() + " created code " + id + "=" + name);
-      return id;
-    }
-  }
-
   @Override
   public Map<Identifier, List<Object>> getCodes() {
     return this.domain.getCodes();
@@ -87,7 +78,7 @@ public class FileGdbDomainCodeTable implements CodeTable {
   public Identifier getIdentifier(final List<Object> values, final boolean loadMissing) {
     final Identifier id = this.domain.getIdentifier(values, loadMissing);
     if (id == null) {
-      return createValue((String)values.get(0));
+      return newIdentifier((String)values.get(0));
     }
     return id;
   }
@@ -96,7 +87,7 @@ public class FileGdbDomainCodeTable implements CodeTable {
   public Identifier getIdentifier(final Map<String, ? extends Object> values) {
     final Identifier id = this.domain.getIdentifier(values);
     if (id == null) {
-      return createValue(this.domain.getName(values));
+      return newIdentifier(this.domain.getName(values));
     }
     return id;
   }
@@ -160,6 +151,15 @@ public class FileGdbDomainCodeTable implements CodeTable {
   @Override
   public boolean isLoading() {
     return false;
+  }
+
+  private Identifier newIdentifier(final String name) {
+    synchronized (this.recordStore) {
+      final Identifier id = this.domain.addCodedValue(name);
+      this.recordStore.alterDomain(this.domain);
+      LOG.info(this.domain.getDomainName() + " created code " + id + "=" + name);
+      return id;
+    }
   }
 
   @Override

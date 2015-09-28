@@ -117,14 +117,14 @@ public class SwingUtil {
   public static JComponent addField(final Container panel, final String fieldName,
     final String label, final Object fieldValue) {
     addLabel(panel, label);
-    final JComponent field = SwingUtil.createField(fieldValue.getClass(), fieldName, fieldValue);
+    final JComponent field = SwingUtil.newField(fieldValue.getClass(), fieldName, fieldValue);
     panel.add(field);
     return field;
   }
 
   public static JLabel addLabel(final Container container, final String text) {
     final String labelText = CaseConverter.toCapitalizedWords(text) + " ";
-    final JLabel label = createLabel(labelText);
+    final JLabel label = newLabel(labelText);
     container.add(label);
     return label;
   }
@@ -186,238 +186,6 @@ public class SwingUtil {
     final int width = Math.min(window.getWidth(), bounds.width - 20 - window.getX());
     final int height = Math.min(window.getHeight(), bounds.height - 20 - window.getY());
     window.setSize(width, height);
-  }
-
-  public static ComboBox createComboBox(final CodeTable codeTable, final boolean required,
-    final int maxLength) {
-    return createComboBox("fieldValue", codeTable, required, maxLength);
-  }
-
-  public static ComboBox createComboBox(final String fieldName, final CodeTable codeTable,
-    final boolean required, final int maxLength) {
-    if (codeTable == null) {
-      return null;
-    } else {
-      final ComboBox comboBox = CodeTableComboBoxModel.create(fieldName, codeTable, !required);
-      if (comboBox.getModel().getSize() > 0) {
-        comboBox.setSelectedIndex(0);
-      }
-      int longestLength = -1;
-      for (final Entry<Identifier, List<Object>> codes : codeTable.getCodes().entrySet()) {
-        final List<Object> values = codes.getValue();
-        if (values != null && !values.isEmpty()) {
-          final String text = CollectionUtil.toString(values);
-          final int length = text.length();
-          if (length > longestLength) {
-            longestLength = length;
-          }
-        }
-      }
-      if (longestLength == -1) {
-        longestLength = 10;
-      }
-      if (maxLength > 0 && longestLength > maxLength) {
-        longestLength = maxLength;
-      }
-      final StringBuilder value = new StringBuilder();
-      for (int i = 0; i < longestLength; i++) {
-        value.append("W");
-      }
-      comboBox.setPrototypeDisplayValue(value.toString());
-
-      final ComboBoxEditor editor = comboBox.getEditor();
-      final Component editorComponent = editor.getEditorComponent();
-      if (editorComponent instanceof JTextComponent) {
-        final JTextField textComponent = (JTextField)editorComponent;
-        textComponent.setColumns((int)(longestLength * 0.8));
-        final PopupMenu menu = PopupMenu.getPopupMenu(textComponent);
-        menu.addToComponent(comboBox);
-      } else {
-        PopupMenu.getPopupMenuFactory(comboBox);
-      }
-      return comboBox;
-    }
-  }
-
-  public static DataFlavor createDataFlavor(final String mimeType) {
-    try {
-      return new DataFlavor(mimeType);
-    } catch (final ClassNotFoundException e) {
-      throw new IllegalArgumentException("Cannot create data flavor for " + mimeType, e);
-    }
-  }
-
-  public static DateField createDateField(final String fieldName) {
-    final DateField dateField = new DateField(fieldName);
-    dateField.setFormats("yyyy-MM-dd", "yyyy/MM/dd", "yyyy-MMM-dd", "yyyy/MMM/dd");
-    PopupMenu.getPopupMenuFactory(dateField.getEditor());
-    return dateField;
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <T extends JComponent> T createField(final Class<?> fieldClass,
-    final String fieldName, final Object fieldValue) {
-    JComponent field;
-    if (Number.class.isAssignableFrom(fieldClass)) {
-      final NumberTextField numberTextField = new NumberTextField(fieldName, DataTypes.DOUBLE, 10,
-        2);
-      if (fieldValue instanceof Number) {
-        final Number number = (Number)fieldValue;
-        numberTextField.setFieldValue(number);
-      }
-      field = numberTextField;
-    } else if (Date.class.isAssignableFrom(fieldClass)) {
-      final DateField dateField = createDateField(fieldName);
-      if (fieldValue instanceof Date) {
-        final Date date = (Date)fieldValue;
-        dateField.setDate(date);
-      }
-      field = dateField;
-    } else if (Geometry.class.isAssignableFrom(fieldClass)) {
-      final ObjectLabelField objectField = new ObjectLabelField(fieldName);
-      objectField.setFieldValue(fieldValue);
-      field = objectField;
-    } else if (Color.class.isAssignableFrom(fieldClass)) {
-      field = new ColorChooserField(fieldName, (Color)fieldValue);
-    } else if (Boolean.class.isAssignableFrom(fieldClass)) {
-      field = new CheckBox(fieldName, fieldValue);
-    } else {
-      final TextField textField = new TextField(fieldName, fieldValue);
-      textField.setColumns(50);
-      PopupMenu.getPopupMenuFactory(textField);
-      field = textField;
-    }
-    if (field instanceof JTextField) {
-      final JTextField textField = (JTextField)field;
-      final int preferedWidth = textField.getPreferredSize().width;
-      textField.setMinimumSize(new Dimension(preferedWidth, 0));
-      textField.setMaximumSize(new Dimension(preferedWidth, Integer.MAX_VALUE));
-      textField.setText(StringConverterRegistry.toString(fieldValue));
-    }
-    field.setFont(FONT);
-
-    return (T)field;
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <T extends Field> T createField(final RecordDefinition recordDefinition,
-    final String fieldName, final boolean editable) {
-    Field field;
-    final FieldDefinition fieldDefinition = recordDefinition.getField(fieldName);
-    if (fieldDefinition == null) {
-      throw new IllegalArgumentException("Cannot find field " + fieldName);
-    } else {
-      final boolean required = fieldDefinition.isRequired();
-      final int length = fieldDefinition.getLength();
-      CodeTable codeTable;
-      if (recordDefinition.getIdFieldNames().contains(fieldName)) {
-        codeTable = null;
-      } else {
-        codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
-      }
-
-      final DataType type = fieldDefinition.getType();
-      int columns = length;
-      if (columns <= 0) {
-        columns = 10;
-      } else if (columns > 50) {
-        columns = 50;
-      }
-      final Class<?> javaClass = type.getJavaClass();
-      if (codeTable != null) {
-        if (editable) {
-          final JComponent component = codeTable.getSwingEditor();
-          if (component == null) {
-            field = createComboBox(fieldName, codeTable, required, -1);
-          } else {
-            field = ((Field)component).clone();
-          }
-        } else {
-          field = new ObjectLabelField(fieldName, columns, codeTable);
-        }
-      } else if (!editable) {
-        final TextField textField = createTextField(fieldName, columns);
-        textField.setEditable(false);
-        field = textField;
-      } else if (Number.class.isAssignableFrom(javaClass)) {
-        final int scale = fieldDefinition.getScale();
-        final Number minValue = fieldDefinition.getMinValue();
-        final Number maxValue = fieldDefinition.getMaxValue();
-        final NumberTextField numberTextField = new NumberTextField(fieldName, type, length, scale,
-          minValue, maxValue);
-        field = numberTextField;
-      } else if (Date.class.isAssignableFrom(javaClass)) {
-        field = createDateField(fieldName);
-      } else if (Geometry.class.isAssignableFrom(javaClass)) {
-        field = new ObjectLabelField(fieldName);
-      } else {
-        field = createTextField(fieldName, columns);
-      }
-    }
-    if (field instanceof JTextField) {
-      final JTextField textField = (JTextField)field;
-      final int preferedWidth = textField.getPreferredSize().width;
-      textField.setMinimumSize(new Dimension(preferedWidth, 0));
-      textField.setMaximumSize(new Dimension(preferedWidth, Integer.MAX_VALUE));
-    }
-
-    ((JComponent)field).setFont(FONT);
-    return (T)field;
-  }
-
-  public static JFileChooser createFileChooser(final Class<?> preferencesClass,
-    final String preferenceName) {
-    final JFileChooser fileChooser = new JFileChooser();
-    fileChooser.setDialogTitle("Open File");
-    final String currentDirectoryName = PreferencesUtil.getString(preferencesClass, preferenceName);
-    if (Property.hasValue(currentDirectoryName)) {
-      final File directory = new File(currentDirectoryName);
-      if (directory.exists() && directory.canRead()) {
-        fileChooser.setCurrentDirectory(directory);
-      }
-    }
-    return fileChooser;
-  }
-
-  public static JFileChooser createFileChooser(final String title, final String preferencesGroup,
-    final String preferenceName) {
-    final JFileChooser fileChooser = new JFileChooser();
-    fileChooser.setDialogTitle(title);
-    final String currentDirectoryName = PreferencesUtil.getUserString(preferencesGroup,
-      preferenceName);
-    if (Property.hasValue(currentDirectoryName)) {
-      final File directory = new File(currentDirectoryName);
-      if (directory.exists() && directory.canRead()) {
-        fileChooser.setCurrentDirectory(directory);
-      }
-    }
-    return fileChooser;
-  }
-
-  public static JLabel createLabel(final String text) {
-    final JLabel label = new JLabel(text);
-    label.setFont(BOLD_FONT);
-    return label;
-  }
-
-  public static TextArea createTextArea(final int rows, final int columns) {
-    final TextArea textField = new TextArea(rows, columns);
-    return textField;
-  }
-
-  public static TextArea createTextArea(final String fieldName, final int rows, final int columns) {
-    final TextArea textField = new TextArea(fieldName, rows, columns);
-    return textField;
-  }
-
-  public static TextField createTextField(final int columns) {
-    final TextField textField = new TextField(columns);
-    return textField;
-  }
-
-  public static TextField createTextField(final String fieldName, final int columns) {
-    final TextField textField = new TextField(fieldName, columns);
-    return textField;
   }
 
   public static void dndCopy(final Component component) {
@@ -748,6 +516,238 @@ public class SwingUtil {
     final int modifiersEx = event.getModifiersEx();
     final int flag = modifiersEx & InputEvent.SHIFT_DOWN_MASK;
     return flag != 0;
+  }
+
+  public static ComboBox newComboBox(final CodeTable codeTable, final boolean required,
+    final int maxLength) {
+    return newComboBox("fieldValue", codeTable, required, maxLength);
+  }
+
+  public static ComboBox newComboBox(final String fieldName, final CodeTable codeTable,
+    final boolean required, final int maxLength) {
+    if (codeTable == null) {
+      return null;
+    } else {
+      final ComboBox comboBox = CodeTableComboBoxModel.create(fieldName, codeTable, !required);
+      if (comboBox.getModel().getSize() > 0) {
+        comboBox.setSelectedIndex(0);
+      }
+      int longestLength = -1;
+      for (final Entry<Identifier, List<Object>> codes : codeTable.getCodes().entrySet()) {
+        final List<Object> values = codes.getValue();
+        if (values != null && !values.isEmpty()) {
+          final String text = CollectionUtil.toString(values);
+          final int length = text.length();
+          if (length > longestLength) {
+            longestLength = length;
+          }
+        }
+      }
+      if (longestLength == -1) {
+        longestLength = 10;
+      }
+      if (maxLength > 0 && longestLength > maxLength) {
+        longestLength = maxLength;
+      }
+      final StringBuilder value = new StringBuilder();
+      for (int i = 0; i < longestLength; i++) {
+        value.append("W");
+      }
+      comboBox.setPrototypeDisplayValue(value.toString());
+
+      final ComboBoxEditor editor = comboBox.getEditor();
+      final Component editorComponent = editor.getEditorComponent();
+      if (editorComponent instanceof JTextComponent) {
+        final JTextField textComponent = (JTextField)editorComponent;
+        textComponent.setColumns((int)(longestLength * 0.8));
+        final PopupMenu menu = PopupMenu.getPopupMenu(textComponent);
+        menu.addToComponent(comboBox);
+      } else {
+        PopupMenu.getPopupMenuFactory(comboBox);
+      }
+      return comboBox;
+    }
+  }
+
+  public static DataFlavor newDataFlavor(final String mimeType) {
+    try {
+      return new DataFlavor(mimeType);
+    } catch (final ClassNotFoundException e) {
+      throw new IllegalArgumentException("Cannot create data flavor for " + mimeType, e);
+    }
+  }
+
+  public static DateField newDateField(final String fieldName) {
+    final DateField dateField = new DateField(fieldName);
+    dateField.setFormats("yyyy-MM-dd", "yyyy/MM/dd", "yyyy-MMM-dd", "yyyy/MMM/dd");
+    PopupMenu.getPopupMenuFactory(dateField.getEditor());
+    return dateField;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends JComponent> T newField(final Class<?> fieldClass, final String fieldName,
+    final Object fieldValue) {
+    JComponent field;
+    if (Number.class.isAssignableFrom(fieldClass)) {
+      final NumberTextField numberTextField = new NumberTextField(fieldName, DataTypes.DOUBLE, 10,
+        2);
+      if (fieldValue instanceof Number) {
+        final Number number = (Number)fieldValue;
+        numberTextField.setFieldValue(number);
+      }
+      field = numberTextField;
+    } else if (Date.class.isAssignableFrom(fieldClass)) {
+      final DateField dateField = newDateField(fieldName);
+      if (fieldValue instanceof Date) {
+        final Date date = (Date)fieldValue;
+        dateField.setDate(date);
+      }
+      field = dateField;
+    } else if (Geometry.class.isAssignableFrom(fieldClass)) {
+      final ObjectLabelField objectField = new ObjectLabelField(fieldName);
+      objectField.setFieldValue(fieldValue);
+      field = objectField;
+    } else if (Color.class.isAssignableFrom(fieldClass)) {
+      field = new ColorChooserField(fieldName, (Color)fieldValue);
+    } else if (Boolean.class.isAssignableFrom(fieldClass)) {
+      field = new CheckBox(fieldName, fieldValue);
+    } else {
+      final TextField textField = new TextField(fieldName, fieldValue);
+      textField.setColumns(50);
+      PopupMenu.getPopupMenuFactory(textField);
+      field = textField;
+    }
+    if (field instanceof JTextField) {
+      final JTextField textField = (JTextField)field;
+      final int preferedWidth = textField.getPreferredSize().width;
+      textField.setMinimumSize(new Dimension(preferedWidth, 0));
+      textField.setMaximumSize(new Dimension(preferedWidth, Integer.MAX_VALUE));
+      textField.setText(StringConverterRegistry.toString(fieldValue));
+    }
+    field.setFont(FONT);
+
+    return (T)field;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends Field> T newField(final RecordDefinition recordDefinition,
+    final String fieldName, final boolean editable) {
+    Field field;
+    final FieldDefinition fieldDefinition = recordDefinition.getField(fieldName);
+    if (fieldDefinition == null) {
+      throw new IllegalArgumentException("Cannot find field " + fieldName);
+    } else {
+      final boolean required = fieldDefinition.isRequired();
+      final int length = fieldDefinition.getLength();
+      CodeTable codeTable;
+      if (recordDefinition.getIdFieldNames().contains(fieldName)) {
+        codeTable = null;
+      } else {
+        codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
+      }
+
+      final DataType type = fieldDefinition.getType();
+      int columns = length;
+      if (columns <= 0) {
+        columns = 10;
+      } else if (columns > 50) {
+        columns = 50;
+      }
+      final Class<?> javaClass = type.getJavaClass();
+      if (codeTable != null) {
+        if (editable) {
+          final JComponent component = codeTable.getSwingEditor();
+          if (component == null) {
+            field = newComboBox(fieldName, codeTable, required, -1);
+          } else {
+            field = ((Field)component).clone();
+          }
+        } else {
+          field = new ObjectLabelField(fieldName, columns, codeTable);
+        }
+      } else if (!editable) {
+        final TextField textField = newTextField(fieldName, columns);
+        textField.setEditable(false);
+        field = textField;
+      } else if (Number.class.isAssignableFrom(javaClass)) {
+        final int scale = fieldDefinition.getScale();
+        final Number minValue = fieldDefinition.getMinValue();
+        final Number maxValue = fieldDefinition.getMaxValue();
+        final NumberTextField numberTextField = new NumberTextField(fieldName, type, length, scale,
+          minValue, maxValue);
+        field = numberTextField;
+      } else if (Date.class.isAssignableFrom(javaClass)) {
+        field = newDateField(fieldName);
+      } else if (Geometry.class.isAssignableFrom(javaClass)) {
+        field = new ObjectLabelField(fieldName);
+      } else {
+        field = newTextField(fieldName, columns);
+      }
+    }
+    if (field instanceof JTextField) {
+      final JTextField textField = (JTextField)field;
+      final int preferedWidth = textField.getPreferredSize().width;
+      textField.setMinimumSize(new Dimension(preferedWidth, 0));
+      textField.setMaximumSize(new Dimension(preferedWidth, Integer.MAX_VALUE));
+    }
+
+    ((JComponent)field).setFont(FONT);
+    return (T)field;
+  }
+
+  public static JFileChooser newFileChooser(final Class<?> preferencesClass,
+    final String preferenceName) {
+    final JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Open File");
+    final String currentDirectoryName = PreferencesUtil.getString(preferencesClass, preferenceName);
+    if (Property.hasValue(currentDirectoryName)) {
+      final File directory = new File(currentDirectoryName);
+      if (directory.exists() && directory.canRead()) {
+        fileChooser.setCurrentDirectory(directory);
+      }
+    }
+    return fileChooser;
+  }
+
+  public static JFileChooser newFileChooser(final String title, final String preferencesGroup,
+    final String preferenceName) {
+    final JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle(title);
+    final String currentDirectoryName = PreferencesUtil.getUserString(preferencesGroup,
+      preferenceName);
+    if (Property.hasValue(currentDirectoryName)) {
+      final File directory = new File(currentDirectoryName);
+      if (directory.exists() && directory.canRead()) {
+        fileChooser.setCurrentDirectory(directory);
+      }
+    }
+    return fileChooser;
+  }
+
+  public static JLabel newLabel(final String text) {
+    final JLabel label = new JLabel(text);
+    label.setFont(BOLD_FONT);
+    return label;
+  }
+
+  public static TextArea newTextArea(final int rows, final int columns) {
+    final TextArea textField = new TextArea(rows, columns);
+    return textField;
+  }
+
+  public static TextArea newTextArea(final String fieldName, final int rows, final int columns) {
+    final TextArea textField = new TextArea(fieldName, rows, columns);
+    return textField;
+  }
+
+  public static TextField newTextField(final int columns) {
+    final TextField textField = new TextField(columns);
+    return textField;
+  }
+
+  public static TextField newTextField(final String fieldName, final int columns) {
+    final TextField textField = new TextField(fieldName, columns);
+    return textField;
   }
 
   public static void saveFileChooserDirectory(final Class<?> preferencesClass,

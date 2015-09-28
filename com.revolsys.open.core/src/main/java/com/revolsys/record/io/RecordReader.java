@@ -13,8 +13,12 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
 public interface RecordReader extends Reader<Record> {
+  static boolean isReadable(final Object source) {
+    return IoFactoryRegistry.isAvailable(RecordReaderFactory.class, source);
+  }
+
   /**
-   * Create a {@link RecordReader} for the given source. The source can be one of the following
+   * Construct a new {@link RecordReader} for the given source. The source can be one of the following
    * classes.
    *
    * <ul>
@@ -26,13 +30,13 @@ public interface RecordReader extends Reader<Record> {
    * @return The reader.
    * @throws IllegalArgumentException If the source is not a supported class.
    */
-  static RecordReader create(final Object source) {
+  static RecordReader newRecordReader(final Object source) {
     final RecordFactory recordFactory = ArrayRecordFactory.INSTANCE;
-    return create(source, recordFactory);
+    return newRecordReader(source, recordFactory);
   }
 
   /**
-   * Create a {@link RecordReader} for the given source. The source can be one of the following
+   * Construct a new {@link RecordReader} for the given source. The source can be one of the following
    * classes.
    *
    * <ul>
@@ -45,18 +49,14 @@ public interface RecordReader extends Reader<Record> {
    * @return The reader.
    * @throws IllegalArgumentException If the source is not a supported class.
    */
-  static RecordReader create(final Object source, final RecordFactory recordFactory) {
+  static RecordReader newRecordReader(final Object source, final RecordFactory recordFactory) {
     final RecordReaderFactory readerFactory = IoFactory.factory(RecordReaderFactory.class, source);
     if (readerFactory == null) {
       return null;
     } else {
-      final RecordReader reader = readerFactory.createRecordReader(source, recordFactory);
+      final RecordReader reader = readerFactory.newRecordReader(source, recordFactory);
       return reader;
     }
-  }
-
-  static boolean isReadable(final Object source) {
-    return IoFactoryRegistry.isAvailable(RecordReaderFactory.class, source);
   }
 
   RecordDefinition getRecordDefinition();

@@ -53,66 +53,6 @@ public class RecordStoreFactoryRegistry {
     IoFactoryRegistry.getInstance();
   }
 
-  public static <T extends RecordStore> T createRecordStore(final File file) {
-    return createRecordStore(FileUtil.toUrlString(file));
-  }
-
-  public static <T extends RecordStore> T createRecordStore(final File directory,
-    final String fileExtension) {
-    if (!directory.exists()) {
-      throw new IllegalArgumentException("Directory does not exist: " + directory);
-    } else if (!directory.isDirectory()) {
-      throw new IllegalArgumentException("File is not a directory: " + directory);
-    } else {
-      final String url = FileUtil.toUrlString(directory) + "?format=" + fileExtension;
-      return createRecordStore(url);
-    }
-  }
-
-  /**
-   * Create an initialized record store.
-   * @param connectionProperties
-   * @return
-   */
-  @SuppressWarnings("unchecked")
-  public static <T extends RecordStore> T createRecordStore(
-    final Map<String, ? extends Object> connectionProperties) {
-    final String url = (String)connectionProperties.get("url");
-    final RecordStoreFactory factory = getRecordStoreFactory(url);
-    if (factory == null) {
-      throw new IllegalArgumentException("Record Store Factory not found for " + url);
-    } else {
-      return (T)factory.createRecordStore(connectionProperties);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <T extends RecordStore> T createRecordStore(final String url) {
-    final RecordStoreFactory factory = getRecordStoreFactory(url);
-    if (factory == null) {
-      throw new IllegalArgumentException("Record Store Factory not found for " + url);
-    } else {
-      final Map<String, Object> connectionProperties = new HashMap<String, Object>();
-      connectionProperties.put("url", url);
-      return (T)factory.createRecordStore(connectionProperties);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <T extends RecordStore> T createRecordStore(final String url, final String username,
-    final String password) {
-    final RecordStoreFactory factory = getRecordStoreFactory(url);
-    if (factory == null) {
-      throw new IllegalArgumentException("Record Store Factory not found for " + url);
-    } else {
-      final Map<String, Object> connectionProperties = new HashMap<String, Object>();
-      connectionProperties.put("url", url);
-      connectionProperties.put("username", username);
-      connectionProperties.put("password", password);
-      return (T)factory.createRecordStore(connectionProperties);
-    }
-  }
-
   public static Set<String> getFileExtensions() {
     return fileExtensions;
   }
@@ -158,6 +98,66 @@ public class RecordStoreFactoryRegistry {
       }
     }
     return false;
+  }
+
+  public static <T extends RecordStore> T newRecordStore(final File file) {
+    return newRecordStore(FileUtil.toUrlString(file));
+  }
+
+  public static <T extends RecordStore> T newRecordStore(final File directory,
+    final String fileExtension) {
+    if (!directory.exists()) {
+      throw new IllegalArgumentException("Directory does not exist: " + directory);
+    } else if (!directory.isDirectory()) {
+      throw new IllegalArgumentException("File is not a directory: " + directory);
+    } else {
+      final String url = FileUtil.toUrlString(directory) + "?format=" + fileExtension;
+      return newRecordStore(url);
+    }
+  }
+
+  /**
+   * Construct a newn initialized record store.
+   * @param connectionProperties
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  public static <T extends RecordStore> T newRecordStore(
+    final Map<String, ? extends Object> connectionProperties) {
+    final String url = (String)connectionProperties.get("url");
+    final RecordStoreFactory factory = getRecordStoreFactory(url);
+    if (factory == null) {
+      throw new IllegalArgumentException("Record Store Factory not found for " + url);
+    } else {
+      return (T)factory.newRecordStore(connectionProperties);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends RecordStore> T newRecordStore(final String url) {
+    final RecordStoreFactory factory = getRecordStoreFactory(url);
+    if (factory == null) {
+      throw new IllegalArgumentException("Record Store Factory not found for " + url);
+    } else {
+      final Map<String, Object> connectionProperties = new HashMap<String, Object>();
+      connectionProperties.put("url", url);
+      return (T)factory.newRecordStore(connectionProperties);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends RecordStore> T newRecordStore(final String url, final String username,
+    final String password) {
+    final RecordStoreFactory factory = getRecordStoreFactory(url);
+    if (factory == null) {
+      throw new IllegalArgumentException("Record Store Factory not found for " + url);
+    } else {
+      final Map<String, Object> connectionProperties = new HashMap<String, Object>();
+      connectionProperties.put("url", url);
+      connectionProperties.put("username", username);
+      connectionProperties.put("password", password);
+      return (T)factory.newRecordStore(connectionProperties);
+    }
   }
 
   public static RecordStoreFactory register(final RecordStoreFactory factory) {

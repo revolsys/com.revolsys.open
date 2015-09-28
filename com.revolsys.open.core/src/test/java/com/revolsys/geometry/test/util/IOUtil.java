@@ -20,7 +20,8 @@ public class IOUtil {
     final String ext = FileUtil.extension(filename);
     if (ext.equalsIgnoreCase(".shp")) {
       try (
-        GeometryReader reader = GeometryReader.create(new FileSystemResource(filename))) {
+        GeometryReader reader = GeometryReader
+          .newGeometryReader(new FileSystemResource(filename))) {
         final List<Geometry> geometries = reader.read();
         if (geometries.isEmpty()) {
           return geomFact.geometryCollection();

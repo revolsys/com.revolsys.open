@@ -10,35 +10,35 @@ import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.spring.resource.Resource;
 
 public interface GeometryWriterFactory extends FileIoFactory, IoFactoryWithCoordinateSystem {
-  default GeometryWriter createGeometryWriter(final Object source) {
-    final Resource resource = com.revolsys.spring.resource.Resource.getResource(source);
-    return createGeometryWriter(resource);
+  default GeometryWriter newGeometryWriter(final Object source) {
+    final Resource resource = Resource.getResource(source);
+    return newGeometryWriter(resource);
   }
 
   /**
-   * Create a writer to write to the specified resource.
+   * Construct a new writer to write to the specified resource.
    *
    * @param resource The resource to write to.
    * @return The writer.
    */
-  default GeometryWriter createGeometryWriter(final Resource resource) {
+  default GeometryWriter newGeometryWriter(final Resource resource) {
     final OutputStream out = resource.newBufferedOutputStream();
     final String fileName = resource.getFilename();
     final String baseName = FileUtil.getBaseName(fileName);
-    return createGeometryWriter(baseName, out);
+    return newGeometryWriter(baseName, out);
   }
 
   /**
-   * Create a reader for the file using the ({@link ArrayGeometryFactory}).
+   * Construct a new reader for the file using the ({@link ArrayGeometryFactory}).
    *
    * @param baseName The base file name to write to.
    * @param out The output stream to write to.
    * @return The writer.
    */
-  default GeometryWriter createGeometryWriter(final String baseName, final OutputStream out) {
-    return createGeometryWriter(baseName, out, StandardCharsets.UTF_8);
+  default GeometryWriter newGeometryWriter(final String baseName, final OutputStream out) {
+    return newGeometryWriter(baseName, out, StandardCharsets.UTF_8);
 
   }
 
-  GeometryWriter createGeometryWriter(String baseName, OutputStream out, Charset charset);
+  GeometryWriter newGeometryWriter(String baseName, OutputStream out, Charset charset);
 }

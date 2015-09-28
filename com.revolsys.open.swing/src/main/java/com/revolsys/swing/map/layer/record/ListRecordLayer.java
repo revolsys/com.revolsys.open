@@ -25,7 +25,8 @@ public class ListRecordLayer extends AbstractRecordLayer {
 
   public static RecordDefinitionImpl createRecordDefinition(final String name,
     final GeometryFactory geometryFactory, final DataType geometryType) {
-    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(PathName.create(name));
+    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
+      PathName.newPathName(name));
     recordDefinition.addField("GEOMETRY", geometryType, true);
     recordDefinition.setGeometryFactory(geometryFactory);
     return recordDefinition;
@@ -74,7 +75,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   protected void createRecordInternal(final Map<String, Object> values) {
-    final LayerRecord record = createRecord(getRecordDefinition());
+    final LayerRecord record = newRecord(getRecordDefinition());
     record.setState(RecordState.Initalizing);
     try {
       record.setValues(values);

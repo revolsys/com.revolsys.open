@@ -22,7 +22,7 @@ public class RecordStoreRecordWriter extends AbstractRecordWriter {
       throw new IllegalArgumentException(
         "Cannot find recordDefinition=" + recordDefinition.getPathName() + " for " + recordStore);
     }
-    this.writer = recordStore.createWriter(recordDefinition);
+    this.writer = recordStore.newWriter(recordDefinition);
 
   }
 

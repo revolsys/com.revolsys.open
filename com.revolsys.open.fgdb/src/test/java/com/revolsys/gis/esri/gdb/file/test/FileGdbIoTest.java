@@ -51,12 +51,12 @@ public class FileGdbIoTest {
     FileUtil.deleteDirectory(file);
     file.getParentFile().mkdirs();
     try (
-      final FileGdbRecordStore recordStore = FileGdbRecordStoreFactory.create(file)) {
+      final FileGdbRecordStore recordStore = FileGdbRecordStoreFactory.newRecordStore(file)) {
       recordStore.setCreateMissingTables(true);
       recordStore.setCreateMissingRecordStore(true);
       recordStore.initialize();
 
-      final PathName typePath = PathName.create("/" + geometryTypeString);
+      final PathName typePath = PathName.newPathName("/" + geometryTypeString);
       final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(typePath);
       recordDefinition.addField("ID", DataTypes.INT, true);
       recordDefinition.addField("NAME", DataTypes.STRING, 50, false);
@@ -64,7 +64,7 @@ public class FileGdbIoTest {
       recordDefinition.setGeometryFactory(geometryFactory);
       recordStore.getRecordDefinition(recordDefinition);
       try (
-        Writer<Record> writer = recordStore.createWriter()) {
+        Writer<Record> writer = recordStore.newWriter()) {
         writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
         writer.setProperty(IoConstants.GEOMETRY_TYPE, dataType);
 

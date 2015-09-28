@@ -108,7 +108,7 @@ public class RecordLog {
       } else {
         logTableName = tableName + "_log";
       }
-      final PathName logTypeName = PathName.create(Path.toPath(parentPath, logTableName));
+      final PathName logTypeName = PathName.newPathName(Path.toPath(parentPath, logTableName));
       logRecordDefinition = new RecordDefinitionImpl(logTypeName);
       logRecordDefinition.addField("LOGMESSAGE", DataTypes.STRING, 255, true);
       logRecordDefinition.addField("LOGLEVEL", DataTypes.STRING, 10, true);

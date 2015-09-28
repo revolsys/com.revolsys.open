@@ -10,8 +10,6 @@ import com.revolsys.geometry.io.GeometryWriterFactory;
 import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryWithCoordinateSystem;
-import com.revolsys.io.Writer;
-import com.revolsys.record.Record;
 import com.revolsys.record.Records;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.PathResource;
@@ -21,40 +19,38 @@ public interface RecordWriterFactory
   extends FileIoFactory, GeometryWriterFactory, IoFactoryWithCoordinateSystem {
 
   @Override
-  default GeometryWriter createGeometryWriter(final String baseName, final OutputStream out,
+  default GeometryWriter newGeometryWriter(final String baseName, final OutputStream out,
     final Charset charset) {
-    final RecordDefinition recordDefinition = Records.createGeometryRecordDefinition();
-    final Writer<Record> recordWriter = createRecordWriter(baseName, recordDefinition, out,
-      charset);
+    final RecordDefinition recordDefinition = Records.newGeometryRecordDefinition();
+    final RecordWriter recordWriter = newRecordWriter(baseName, recordDefinition, out, charset);
     return new RecordWriterGeometryWriter(recordWriter);
   }
 
-  default RecordWriter createRecordWriter(final RecordDefinition recordDefinition,
-    final Path path) {
+  default RecordWriter newRecordWriter(final RecordDefinition recordDefinition, final Path path) {
     final PathResource resource = new PathResource(path);
-    return createRecordWriter(recordDefinition, resource);
+    return newRecordWriter(recordDefinition, resource);
   }
 
   /**
-   * Create a writer to write to the specified resource.
+   * Construct a new writer to write to the specified resource.
    *
    * @param recordDefinition The recordDefinition for the type of data to write.
    * @param resource The resource to write to.
    * @return The writer.
    */
-  default RecordWriter createRecordWriter(final RecordDefinition recordDefinition,
+  default RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
     final OutputStream out = resource.newBufferedOutputStream();
     final String fileName = resource.getFilename();
     final String baseName = FileUtil.getBaseName(fileName);
-    return createRecordWriter(baseName, recordDefinition, out);
+    return newRecordWriter(baseName, recordDefinition, out);
   }
 
-  default RecordWriter createRecordWriter(final String baseName,
+  default RecordWriter newRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream) {
-    return createRecordWriter(baseName, recordDefinition, outputStream, StandardCharsets.UTF_8);
+    return newRecordWriter(baseName, recordDefinition, outputStream, StandardCharsets.UTF_8);
   }
 
-  RecordWriter createRecordWriter(String baseName, RecordDefinition recordDefinition,
+  RecordWriter newRecordWriter(String baseName, RecordDefinition recordDefinition,
     OutputStream outputStream, Charset charset);
 }

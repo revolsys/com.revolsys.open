@@ -105,7 +105,7 @@ public class EdgeEndBuilder {
   }
 
   /**
-   * Create a StubEdge for the edge after the intersection eiCurr.
+   * Construct a new StubEdge for the edge after the intersection eiCurr.
    * The next intersection is provided
    * in case it is the endpoint for the stub edge.
    * Otherwise, the next point from the parent edge will be the endpoint.
@@ -135,7 +135,7 @@ public class EdgeEndBuilder {
   }
 
   /**
-   * Create a EdgeStub for the edge before the intersection eiCurr.
+   * Construct a new EdgeStub for the edge before the intersection eiCurr.
    * The previous intersection is provided
    * in case it is the endpoint for the stub edge.
    * Otherwise, the previous point from the parent edge will be the endpoint.

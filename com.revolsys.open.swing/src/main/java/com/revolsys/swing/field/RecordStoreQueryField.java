@@ -23,7 +23,7 @@ public class RecordStoreQueryField extends AbstractRecordQueryField {
 
   public static Supplier<Field> factory(final String fieldName, final RecordStore recordStore,
     final String typePath, final String displayFieldName) {
-    return factory(fieldName, recordStore, PathName.create(typePath), displayFieldName);
+    return factory(fieldName, recordStore, PathName.newPathName(typePath), displayFieldName);
   }
 
   private final RecordDefinition recordDefinition;

@@ -102,7 +102,7 @@ public class IoTestSuite {
     final Geometry geometry, final String fileExtension) {
     final String geometryTypeString = dataType.toString();
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
-      PathName.create(geometryTypeString));
+      PathName.newPathName(geometryTypeString));
     recordDefinition.addField("ID", DataTypes.INT, true);
     recordDefinition.addField("GEOMETRY", dataType, true);
     recordDefinition.setGeometryFactory(geometryFactory);
@@ -113,7 +113,7 @@ public class IoTestSuite {
     file.getParentFile().mkdirs();
     final FileSystemResource resource = new FileSystemResource(file);
     try (
-      Writer<Record> writer = RecordWriter.create(recordDefinition, resource)) {
+      Writer<Record> writer = RecordWriter.newRecordWriter(recordDefinition, resource)) {
       writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
       writer.setProperty(IoConstants.GEOMETRY_TYPE, dataType);
 
@@ -123,7 +123,7 @@ public class IoTestSuite {
       writer.write(record);
     }
     try (
-      Reader<Geometry> reader = GeometryReader.create(resource)) {
+      Reader<Geometry> reader = GeometryReader.newGeometryReader(resource)) {
       reader.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
       final List<Geometry> geometries = reader.read();
       Assert.assertEquals("Geometry Count", 1, geometries.size());

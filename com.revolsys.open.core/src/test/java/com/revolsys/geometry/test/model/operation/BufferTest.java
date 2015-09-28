@@ -45,8 +45,8 @@ public class BufferTest extends TestCase {
     final TestSuite suite = new TestSuite("Buffer");
     int i = 0;
     try (
-      Reader<Map<String, Object>> reader = MapReader
-        .create(new ClassPathResource("/com/revolsys/jts/test/geometry/operation/buffer.csv"))) {
+      Reader<Map<String, Object>> reader = MapReader.newMapReader(
+        new ClassPathResource("/com/revolsys/jts/test/geometry/operation/buffer.csv"))) {
       for (final Map<String, Object> map : reader) {
         i++;
         final int srid = Maps.getInteger(map, "srid", 0);

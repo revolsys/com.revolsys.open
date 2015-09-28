@@ -162,14 +162,14 @@ public class ConvexHull {
   private final Point[] inputPts;
 
   /**
-   * Create a new convex hull construction for the input {@link Geometry}.
+   * Construct a new new convex hull construction for the input {@link Geometry}.
    */
   public ConvexHull(final Geometry geometry) {
     this(UniqueCoordinateArrayFilter.getUniquePointsArray(geometry), geometry.getGeometryFactory());
   }
 
   /**
-   * Create a new convex hull construction for the input {@link Coordinates} array.
+   * Construct a new new convex hull construction for the input {@link Coordinates} array.
    */
   public ConvexHull(final Point[] pts, final GeometryFactory geomFactory) {
     this.inputPts = UniqueCoordinateArrayFilter.getUniquePointsArray(Arrays.asList(pts));

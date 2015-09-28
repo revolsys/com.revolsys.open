@@ -36,14 +36,14 @@ public class GeometryTest {
     final File file = new File("target/test-data/" + name + ".gdb");
     FileUtil.deleteDirectory(file);
 
-    RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(PathName.create(name));
+    RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(PathName.newPathName(name));
     recordDefinition.addField("ID", DataTypes.INT, true);
     final FieldDefinition geometryField = recordDefinition.addField("Geometry", geometryDataType,
       true);
     geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
     recordDefinition.setIdFieldName("ID");
 
-    final FileGdbRecordStore recordStore = FileGdbRecordStoreFactory.create(file);
+    final FileGdbRecordStore recordStore = FileGdbRecordStoreFactory.newRecordStore(file);
     recordStore.initialize();
     recordDefinition = (RecordDefinitionImpl)recordStore.getRecordDefinition(recordDefinition);
     final Record object = new ArrayRecord(recordDefinition);

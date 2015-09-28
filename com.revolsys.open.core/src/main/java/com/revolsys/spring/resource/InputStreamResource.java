@@ -16,7 +16,7 @@ public class InputStreamResource extends AbstractResource {
   private boolean read = false;
 
   /**
-   * Create a new InputStreamResource.
+   * Construct a new new InputStreamResource.
    * @param inputStream the InputStream to use
    */
   public InputStreamResource(final InputStream inputStream) {
@@ -24,7 +24,7 @@ public class InputStreamResource extends AbstractResource {
   }
 
   /**
-   * Create a new InputStreamResource.
+   * Construct a new new InputStreamResource.
    * @param inputStream the InputStream to use
    * @param description where the InputStream comes from
    */

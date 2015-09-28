@@ -95,10 +95,10 @@ public class XbaseIterator extends AbstractIterator<Record>implements RecordRead
     throws IOException {
     this.resource = resource;
     final String baseName = resource.getBaseName();
-    this.typeName = PathName.create("/" + baseName);
+    this.typeName = PathName.newPathName("/" + baseName);
 
     this.recordFactory = recordFactory;
-    final Resource codePageResource = resource.createChangeExtension("cpg");
+    final Resource codePageResource = resource.newResourceChangeExtension("cpg");
     if (codePageResource != null && codePageResource.exists()) {
       final String charsetName = codePageResource.contentsAsString();
       try {
@@ -304,7 +304,7 @@ public class XbaseIterator extends AbstractIterator<Record>implements RecordRead
     if (this.in.read(this.recordBuffer) != this.recordBuffer.length) {
       throw new IllegalStateException("Unexpected end of mappedFile");
     }
-    final Record object = this.recordFactory.createRecord(this.recordDefinition);
+    final Record object = this.recordFactory.newRecord(this.recordDefinition);
     int startIndex = 0;
     for (int i = 0; i < this.recordDefinition.getFieldCount(); i++) {
       int len = this.recordDefinition.getFieldLength(i);

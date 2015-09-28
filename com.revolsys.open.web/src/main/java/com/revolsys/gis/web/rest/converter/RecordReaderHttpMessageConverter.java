@@ -81,7 +81,7 @@ public class RecordReaderHttpMessageConverter extends AbstractHttpMessageConvert
         throw new HttpMessageNotReadableException("Cannot read data in format" + mediaType);
       } else {
         final Reader<Record> reader = readerFactory
-          .createRecordReader(new InputStreamResource("recordInput", body));
+          .newRecordReader(new InputStreamResource("recordInput", body));
 
         GeometryFactory factory = this.geometryFactory;
         final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder
@@ -143,7 +143,7 @@ public class RecordReaderHttpMessageConverter extends AbstractHttpMessageConvert
           headers.set("Content-Disposition", contentDisposition + "; filename=" + fileName);
 
           final OutputStream body = outputMessage.getBody();
-          final Writer<Record> writer = writerFactory.createRecordWriter(baseName, recordDefinition,
+          final Writer<Record> writer = writerFactory.newRecordWriter(baseName, recordDefinition,
             body, charset);
           if (Boolean.FALSE
             .equals(requestAttributes.getAttribute("wrapHtml", RequestAttributes.SCOPE_REQUEST))) {

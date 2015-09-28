@@ -13,7 +13,7 @@ public class ByteArrayResource extends AbstractResource {
   private String filename;
 
   /**
-   * Create a new ByteArrayResource.
+   * Construct a new new ByteArrayResource.
    * @param data the byte array to wrap
    */
   public ByteArrayResource(final byte[] data) {
@@ -21,7 +21,7 @@ public class ByteArrayResource extends AbstractResource {
   }
 
   /**
-   * Create a new ByteArrayResource.
+   * Construct a new new ByteArrayResource.
    * @param data the byte array to wrap
    * @param description where the byte array comes from
    */

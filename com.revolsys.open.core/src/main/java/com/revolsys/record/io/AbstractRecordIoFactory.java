@@ -27,15 +27,6 @@ public abstract class AbstractRecordIoFactory extends AbstractIoFactoryWithCoord
   }
 
   @Override
-  public RecordStore createRecordStore(final Map<String, ? extends Object> connectionProperties) {
-    final String url = (String)connectionProperties.get("url");
-    final Resource resource = Resource.getResource(url);
-    final File directory = resource.getFile();
-    final List<String> fileExtensions = getFileExtensions();
-    return new DirectoryRecordStore(directory, fileExtensions);
-  }
-
-  @Override
   public List<String> getRecordStoreFileExtensions() {
     return Collections.emptyList();
   }
@@ -55,5 +46,14 @@ public abstract class AbstractRecordIoFactory extends AbstractIoFactoryWithCoord
   public void init() {
     super.init();
     RecordStoreFactoryRegistry.register(this);
+  }
+
+  @Override
+  public RecordStore newRecordStore(final Map<String, ? extends Object> connectionProperties) {
+    final String url = (String)connectionProperties.get("url");
+    final Resource resource = Resource.getResource(url);
+    final File directory = resource.getFile();
+    final List<String> fileExtensions = getFileExtensions();
+    return new DirectoryRecordStore(directory, fileExtensions);
   }
 }

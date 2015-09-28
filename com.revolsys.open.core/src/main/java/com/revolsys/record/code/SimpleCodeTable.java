@@ -13,7 +13,7 @@ public class SimpleCodeTable extends AbstractCodeTable {
   public static CodeTable create(final String name, final Resource resource) {
     final SimpleCodeTable codeTable = new SimpleCodeTable(name);
     try (
-      final RecordReader reader = RecordReader.create(resource)) {
+      final RecordReader reader = RecordReader.newRecordReader(resource)) {
       for (final Record record : reader) {
         final Identifier id = Identifier.create(record.getValue(0));
         final List<Object> values = new ArrayList<>();

@@ -35,7 +35,7 @@ public class JdbcDataSourceFactoryBean extends AbstractFactoryBean<DataSource>
     final JdbcFactoryRegistry jdbcFactoryRegistry = JdbcFactoryRegistry
       .getFactory(this.applicationContext);
     this.databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(config);
-    final DataSource dataSource = this.databaseFactory.createDataSource(config);
+    final DataSource dataSource = this.databaseFactory.newDataSource(config);
     return dataSource;
   }
 

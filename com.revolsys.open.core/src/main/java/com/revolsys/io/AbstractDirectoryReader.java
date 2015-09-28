@@ -91,14 +91,6 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>implem
   }
 
   /**
-   * Create a new {@link Reader} to read the file.
-   *
-   * @param file The file to read.
-   * @return The reader for the file.
-   */
-  protected abstract Reader<T> createReader(Resource file);
-
-  /**
    * Get the list of base file names to read.
    *
    * @return The list of base file names to read.
@@ -128,7 +120,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>implem
   /**
    * Get the files that are to be read by this reader. This must be overwritten
    * in sub classes to return the files in the working directory that are to be
-   * read by instances of the write returned by {@link #createReader(File)}.
+   * read by instances of the write returned by {@link #newReader(File)}.
    *
    * @return The list of files.
    */
@@ -204,6 +196,14 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>implem
   }
 
   /**
+   * Construct a new new {@link Reader} to read the file.
+   *
+   * @param file The file to read.
+   * @return The reader for the file.
+   */
+  protected abstract Reader<T> newReader(Resource file);
+
+  /**
    * Get the next data object read by this reader.
    *
    * @return The next Record.
@@ -224,7 +224,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>implem
   public void open() {
     for (final File file : getFiles()) {
       final FileSystemResource resource = new FileSystemResource(file);
-      final Reader<T> reader = createReader(resource);
+      final Reader<T> reader = newReader(resource);
       reader.open();
       if (reader != null) {
         this.readers.put(file, reader);

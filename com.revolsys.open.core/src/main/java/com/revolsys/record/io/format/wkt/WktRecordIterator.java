@@ -32,7 +32,7 @@ public class WktRecordIterator extends AbstractIterator<Record>implements Record
     throws IOException {
     this.factory = factory;
     this.in = new BufferedReader(FileUtil.createUtf8Reader(resource.getInputStream()));
-    this.recordDefinition = Records.createGeometryRecordDefinition();
+    this.recordDefinition = Records.newGeometryRecordDefinition();
   }
 
   @Override
@@ -71,7 +71,7 @@ public class WktRecordIterator extends AbstractIterator<Record>implements Record
       if (geometry == null) {
         throw new NoSuchElementException();
       } else {
-        final Record object = this.factory.createRecord(getRecordDefinition());
+        final Record object = this.factory.newRecord(getRecordDefinition());
         object.setGeometryValue(geometry);
         return object;
       }

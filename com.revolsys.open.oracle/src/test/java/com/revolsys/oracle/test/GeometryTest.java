@@ -24,7 +24,7 @@ import com.revolsys.transaction.Transaction;
 public class GeometryTest {
 
   private final RecordStore recordStore = RecordStoreFactoryRegistry
-    .createRecordStore("jdbc:oracle:thin:@//192.168.1.105:1521/TEST", "ORACLE_TEST", "test");
+    .newRecordStore("jdbc:oracle:thin:@//192.168.1.105:1521/TEST", "ORACLE_TEST", "test");
 
   public GeometryTest() {
     this.recordStore.initialize();
@@ -35,19 +35,19 @@ public class GeometryTest {
     final GeometryFactory sourceGeometryFactory = GeometryFactory.floating(3857, axisCount);
     String typeName = geometryType.getName().toUpperCase();
     typeName = typeName.replace("MULTI", "MULTI_");
-    final PathName typePath = PathName.create("/ORACLE_TEST/" + typeName + axisCount);
+    final PathName typePath = PathName.newPathName("/ORACLE_TEST/" + typeName + axisCount);
     Geometry geometry = GeometryTestUtil.geometry(sourceGeometryFactory, geometryType, axisCount,
       partCount, ringCount);
     if (geometry instanceof Polygonal) {
       geometry = geometry.toCounterClockwise();
     }
     try (
-      Transaction transaction = this.recordStore.createTransaction(Propagation.REQUIRES_NEW)) {
+      Transaction transaction = this.recordStore.newTransaction(Propagation.REQUIRES_NEW)) {
       final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(typePath);
       final Record record = this.recordStore.newRecord(typePath,
         Collections.singletonMap("GEOMETRY", geometry));
       try (
-        Writer<Record> writer = this.recordStore.createWriter()) {
+        Writer<Record> writer = this.recordStore.newWriter()) {
         writer.write(record);
       }
       final Identifier identifier = record.getIdentifier();

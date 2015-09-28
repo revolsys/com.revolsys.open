@@ -56,7 +56,7 @@ public abstract class ValueGetter {
     }
   }
 
-  public static ValueGetter create(final InputStream in) {
+  public static ValueGetter newValueGetter(final InputStream in) {
     try {
       final int endianType = in.read();
       if (endianType == 0) { // BigEndian

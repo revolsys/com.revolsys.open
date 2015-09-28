@@ -13,14 +13,13 @@ public class Saif extends AbstractRecordIoFactory {
   }
 
   @Override
-  public RecordReader createRecordReader(final Resource resource,
-    final RecordFactory recordFactory) {
-    final SaifReader reader = new SaifReader(resource);
-    return reader;
+  public boolean isBinary() {
+    return true;
   }
 
   @Override
-  public boolean isBinary() {
-    return true;
+  public RecordReader newRecordReader(final Resource resource, final RecordFactory recordFactory) {
+    final SaifReader reader = new SaifReader(resource);
+    return reader;
   }
 }

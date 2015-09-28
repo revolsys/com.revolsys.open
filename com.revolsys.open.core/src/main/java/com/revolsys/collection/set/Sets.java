@@ -34,7 +34,7 @@ public class Sets {
     return set;
   }
 
-  public static <V> HashSet<V> hash(final Iterable<V> values) {
+  public static <V> HashSet<V> hash(final Iterable<? extends V> values) {
     final HashSet<V> set = new HashSet<>();
     for (final V value : values) {
       set.add(value);
@@ -56,7 +56,7 @@ public class Sets {
     };
   }
 
-  public static <V> LinkedHashSet<V> linkedHash(final Iterable<V> values) {
+  public static <V> LinkedHashSet<V> linkedHash(final Iterable<? extends V> values) {
     final LinkedHashSet<V> set = new LinkedHashSet<>();
     addAll(set, values);
     return set;

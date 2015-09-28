@@ -29,11 +29,6 @@ public class IntRange extends AbstractRange<Integer> {
   }
 
   @Override
-  protected IntRange createNew(final Object from, final Object to) {
-    return new IntRange((Integer)from, (Integer)to);
-  }
-
-  @Override
   public AbstractRange<?> expand(final Object value) {
     final Integer intValue = Numbers.toInt(value);
     if (intValue == null) {
@@ -51,6 +46,11 @@ public class IntRange extends AbstractRange<Integer> {
   @Override
   public Integer getTo() {
     return this.to;
+  }
+
+  @Override
+  protected IntRange newRange(final Object from, final Object to) {
+    return new IntRange((Integer)from, (Integer)to);
   }
 
   @Override

@@ -91,7 +91,7 @@ public class CreateObjectsWithinDistanceOfGeometry extends BaseInOutProcess<Reco
           context.setVars(vars);
           final String typePath = (String)JexlUtil.evaluateExpression(context,
             this.typePathTemplateExpression);
-          newRecordDefinition = new RecordDefinitionImpl(PathName.create(typePath),
+          newRecordDefinition = new RecordDefinitionImpl(PathName.newPathName(typePath),
             recordDefinition.getFields());
           if (this.distance > 0) {
             final BufferParameters parameters = new BufferParameters(1, 3, 2, 1.0D);

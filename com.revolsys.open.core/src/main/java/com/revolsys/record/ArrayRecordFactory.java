@@ -13,13 +13,13 @@ public class ArrayRecordFactory implements RecordFactory {
   public static final ArrayRecordFactory INSTANCE = new ArrayRecordFactory();
 
   /**
-   * Create an instance of ArrayRecord using the record definition
+   * Construct a new ArrayRecord using the record definition
    *
    * @param recordDefinition The record definition used to create the instance.
    * @return The Record instance.
    */
   @Override
-  public ArrayRecord createRecord(final RecordDefinition recordDefinition) {
+  public ArrayRecord newRecord(final RecordDefinition recordDefinition) {
     return new ArrayRecord(recordDefinition);
   }
 }

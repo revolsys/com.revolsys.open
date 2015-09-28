@@ -67,7 +67,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record>implements Rec
         query.and(F.envelopeIntersects(geometryField, this.boundingBox));
       }
 
-      final AbstractIterator<Record> iterator = this.recordStore.createIterator(query,
+      final AbstractIterator<Record> iterator = this.recordStore.newIterator(query,
         getProperties());
       return iterator;
     }

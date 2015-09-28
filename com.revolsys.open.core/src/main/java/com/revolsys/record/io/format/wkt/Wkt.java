@@ -21,7 +21,12 @@ public class Wkt extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   @Override
-  public RecordReader createRecordReader(final Resource resource, final RecordFactory factory) {
+  public boolean isCustomFieldsSupported() {
+    return false;
+  }
+
+  @Override
+  public RecordReader newRecordReader(final Resource resource, final RecordFactory factory) {
     try {
       return new WktRecordIterator(factory, resource);
     } catch (final IOException e) {
@@ -30,15 +35,10 @@ public class Wkt extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   @Override
-  public RecordWriter createRecordWriter(final String baseName,
+  public RecordWriter newRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
     return new WktRecordWriter(recordDefinition, writer);
-  }
-
-  @Override
-  public boolean isCustomFieldsSupported() {
-    return false;
   }
 }

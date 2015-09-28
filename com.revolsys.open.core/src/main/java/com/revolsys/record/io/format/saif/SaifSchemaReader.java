@@ -97,7 +97,7 @@ public class SaifSchemaReader {
 
   private void addExportedObjects() {
     final RecordDefinitionImpl exportedObjectHandle = new RecordDefinitionImpl(
-      PathName.create("/ExportedObjectHandle"));
+      PathName.newPathName("/ExportedObjectHandle"));
     this.schema.addRecordDefinition(exportedObjectHandle);
     exportedObjectHandle.addField("referenceID", DataTypes.STRING, true);
     exportedObjectHandle.addField("type", DataTypes.STRING, true);
@@ -275,8 +275,10 @@ public class SaifSchemaReader {
     if (this.schema == null) {
       this.schema = new RecordDefinitionFactoryImpl();
 
-      this.schema.addRecordDefinition(new RecordDefinitionImpl(PathName.create("/AggregateType")));
-      this.schema.addRecordDefinition(new RecordDefinitionImpl(PathName.create("/PrimitiveType")));
+      this.schema
+        .addRecordDefinition(new RecordDefinitionImpl(PathName.newPathName("/AggregateType")));
+      this.schema
+        .addRecordDefinition(new RecordDefinitionImpl(PathName.newPathName("/PrimitiveType")));
 
       addExportedObjects();
     }
@@ -441,7 +443,7 @@ public class SaifSchemaReader {
   public void subclass(final RecordDefinition type, final CsnIterator iterator) throws IOException {
     if (iterator.next() == CsnIterator.CLASS_NAME) {
       final String className = iterator.getPathValue();
-      this.currentClass = new RecordDefinitionImpl(PathName.create(className));
+      this.currentClass = new RecordDefinitionImpl(PathName.newPathName(className));
       for (final RecordDefinition superClassDef : this.currentSuperClasses) {
         addSuperClass(this.currentClass, superClassDef);
       }

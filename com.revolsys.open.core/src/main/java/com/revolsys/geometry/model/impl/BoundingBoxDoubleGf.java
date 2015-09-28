@@ -1275,7 +1275,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   }
 
   /**
-   * <p>Create a new WmsBoundingBox by moving the min/max x coordinates by xDisplacement and
+   * <p>Construct a new new WmsBoundingBox by moving the min/max x coordinates by xDisplacement and
    * the min/max y coordinates by yDisplacement. If the bounding box is null or the xDisplacement
    * and yDisplacement are 0 then this bounding box will be returned.</p>
    *

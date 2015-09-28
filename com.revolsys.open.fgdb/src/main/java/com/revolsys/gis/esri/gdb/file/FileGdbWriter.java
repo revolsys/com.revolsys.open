@@ -125,7 +125,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
       throw new ObjectException(record, "Cannot find table: " + typePath);
     } else {
       try {
-        final Row row = this.recordStore.createRowObject(table);
+        final Row row = this.recordStore.newRowObject(table);
 
         try {
           final List<Object> values = new ArrayList<>();

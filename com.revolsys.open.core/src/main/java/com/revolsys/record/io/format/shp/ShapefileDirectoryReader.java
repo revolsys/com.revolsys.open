@@ -48,26 +48,26 @@ public class ShapefileDirectoryReader extends RecordDirectoryReader {
     setDirectory(directory);
   }
 
-  @Override
-  protected Reader<Record> createReader(final Resource resource) {
-    try {
-      final ArrayRecordFactory factory = new ArrayRecordFactory();
-      final ShapefileIterator iterator = new ShapefileIterator(resource, factory);
-      final String baseName = resource.getBaseName().toUpperCase();
-      iterator.setTypeName(PathName.create(this.fileNameTypeMap.get(baseName)));
-      iterator.setRecordDefinition(this.typeNameRecordDefinitionMap.get(iterator.getTypeName()));
-      return iterator;
-    } catch (final IOException e) {
-      throw new RuntimeException("Unable to create reader for " + resource, e);
-    }
-  }
-
   public Map<String, String> getFileNameTypeMap() {
     return this.fileNameTypeMap;
   }
 
   public Map<String, RecordDefinition> getTypeNameRecordDefinitionMap() {
     return this.typeNameRecordDefinitionMap;
+  }
+
+  @Override
+  protected Reader<Record> newReader(final Resource resource) {
+    try {
+      final ArrayRecordFactory factory = new ArrayRecordFactory();
+      final ShapefileIterator iterator = new ShapefileIterator(resource, factory);
+      final String baseName = resource.getBaseName().toUpperCase();
+      iterator.setTypeName(PathName.newPathName(this.fileNameTypeMap.get(baseName)));
+      iterator.setRecordDefinition(this.typeNameRecordDefinitionMap.get(iterator.getTypeName()));
+      return iterator;
+    } catch (final IOException e) {
+      throw new RuntimeException("Unable to create reader for " + resource, e);
+    }
   }
 
   public void setFileNameTypeMap(final Map<String, String> fileNameTypeMap) {

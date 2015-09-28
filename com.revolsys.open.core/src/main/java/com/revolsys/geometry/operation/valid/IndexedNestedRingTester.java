@@ -110,7 +110,7 @@ public class IndexedNestedRingTester {
          * If no non-node pts can be found, this means
          * that the searchRing touches ALL of the innerRing vertices.
          * This indicates an invalid polygon, since either
-         * the two holes create a disconnected interior,
+         * the two holes Construct a new disconnected interior,
          * or they touch in an infinite number of points
          * (i.e. along a line segment).
          * Both of these cases are caught by other tests,

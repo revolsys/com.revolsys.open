@@ -18,12 +18,6 @@ public class MoepBinary extends AbstractRecordIoFactory {
   }
 
   @Override
-  public RecordReader createRecordReader(final Resource resource,
-    final RecordFactory recordFactory) {
-    return new MoepBinaryReader(null, resource, recordFactory);
-  }
-
-  @Override
   public boolean isBinary() {
     return true;
   }
@@ -31,5 +25,10 @@ public class MoepBinary extends AbstractRecordIoFactory {
   @Override
   public boolean isCustomFieldsSupported() {
     return false;
+  }
+
+  @Override
+  public RecordReader newRecordReader(final Resource resource, final RecordFactory recordFactory) {
+    return new MoepBinaryReader(null, resource, recordFactory);
   }
 }

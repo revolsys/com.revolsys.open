@@ -564,7 +564,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
 
   /**
    * <p>
-   * Create a new geometry of the requested target geometry class.
+   * Construct a new new geometry of the requested target geometry class.
    * <p>
    *
    * @param targetClass
@@ -631,7 +631,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
   }
 
   /**
-   * Create a new geometry my flattening the input geometries, ignoring and null or empty
+   * Construct a new new geometry my flattening the input geometries, ignoring and null or empty
    * geometries. If there are no geometries an empty {@link GeometryCollection} will be returned.
    * If there is one geometry that single geometry will be returned. Otherwise the result
    * will be a subclass of {@link GeometryCollection}.
@@ -1269,7 +1269,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
 
   /**
    * Creates a MultiLineString using the given LineStrings; a null or empty
-   * array will create an empty MultiLineString.
+   * array will Construct a newn empty MultiLineString.
    *
    * @param lineStrings LineStrings, each of which may be empty but not null
    * @return the created MultiLineString
@@ -1362,7 +1362,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
 
   /**
    * Creates a {@link MultiPoint} using the given {@link Point}s.
-   * A null or empty array will create an empty MultiPoint.
+   * A null or empty array will Construct a newn empty MultiPoint.
    *
    * @param coordinates an array (without null elements), or an empty array, or <code>null</code>
    * @return a MultiPoint object
@@ -1411,7 +1411,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
 
   /**
    * Creates a MultiPolygon using the given Polygons; a null or empty array
-   * will create an empty Polygon. The polygons must conform to the
+   * will Construct a newn empty Polygon. The polygons must conform to the
    * assertions specified in the <A
    * HREF="http://www.opengis.org/techno/specs.htm">OpenGIS Simple Features
    * Specification for SQL</A>.
@@ -1425,7 +1425,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
   }
 
   /**
-   * <p>Create an empty {@link Point}.</p>
+   * <p>Construct a newn empty {@link Point}.</p>
    *
    * @return The point.
    */
@@ -1434,7 +1434,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
   }
 
   /**
-   * <p>Create a new {@link Point} from the specified point coordinates.
+   * <p>Construct a new new {@link Point} from the specified point coordinates.
    * If the point is null or has length < 2 an empty point will be returned.
    * The result point will have the same  {@link #getAxisCount()} from this factory.
    * Additional coordinates in the point will be ignored. If the point length is &lt;
@@ -1453,7 +1453,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
 
   /**
    * Creates a Point using the given LineString; a null or empty
-   * LineString will create an empty Point.
+   * LineString will Construct a newn empty Point.
    *
    * @param points a LineString (possibly empty), or null
    * @return the created Point
@@ -1480,7 +1480,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
   }
 
   /**
-   * <p>Create a new {@link Point} from the object using the following rules.<p>
+   * <p>Construct a new new {@link Point} from the object using the following rules.<p>
    * <ul>
    *   <li><code>null</code> using {@link #point()}</li>
    *   <li>Instances of {@link Point} using {@link Point#copy(GeometryFactory)}</li>
@@ -1507,12 +1507,12 @@ public class GeometryFactory implements Serializable, MapSerializer {
     } else if (object instanceof LineString) {
       return point((LineString)object);
     } else {
-      throw new IllegalArgumentException("Cannot create a point from " + object.getClass());
+      throw new IllegalArgumentException("Cannot Construct a new point from " + object.getClass());
     }
   }
 
   /**
-   * <p>Create a new {@link Point} from the specified point ({@link Coordinates}).
+   * <p>Construct a new new {@link Point} from the specified point ({@link Coordinates}).
    * If the point is null or has {@link Coordinates#getAxisCount()} &lt; 2 an empty
    * point will be returned. The result point will have the same  {@link #getAxisCount()} from this
    * factory. Additional axis in the point will be ignored. If the point has a smaller

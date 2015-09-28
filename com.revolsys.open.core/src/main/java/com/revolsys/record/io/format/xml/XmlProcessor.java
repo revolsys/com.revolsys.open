@@ -43,7 +43,7 @@ import com.revolsys.util.CaseConverter;
 /**
  * <p>
  * The XmlProcessor class provides a framework for processing an XML Document to
- * create a Java Object representation of the document or to perform other
+ * Construct a new Java Object representation of the document or to perform other
  * actions on the contents of the document. The XmlProcessor uses the STAX API
  * to read the XML document using the {@link XMLStreamReader}, by using the
  * streaming API the XML parser will not load the XML document into memory
@@ -83,7 +83,7 @@ import com.revolsys.util.CaseConverter;
  * </pre>
  * <p>
  * The process methods read the attributes from the element and can either
- * create an Object for the XML element or perform other processing on the
+ * Construct a newn Object for the XML element or perform other processing on the
  * element. This object can be returned from the process method so that the
  * calling method can access the object. If an XML element has child elements it
  * can either ignore them using the

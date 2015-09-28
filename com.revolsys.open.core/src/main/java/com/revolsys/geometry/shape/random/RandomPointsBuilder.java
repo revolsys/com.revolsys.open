@@ -57,7 +57,7 @@ public class RandomPointsBuilder extends GeometricShapeBuilder {
   protected Geometry maskPoly = null;
 
   /**
-   * Create a shape factory which will create shapes using the default
+   * Construct a new shape factory which will create shapes using the default
    * {@link GeometryFactory}.
    */
   public RandomPointsBuilder() {
@@ -65,7 +65,7 @@ public class RandomPointsBuilder extends GeometricShapeBuilder {
   }
 
   /**
-   * Create a shape factory which will create shapes using the given
+   * Construct a new shape factory which will create shapes using the given
    * {@link GeometryFactory}.
    *
    * @param geomFact the factory to use

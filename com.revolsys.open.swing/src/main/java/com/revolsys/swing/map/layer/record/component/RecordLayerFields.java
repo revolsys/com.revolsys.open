@@ -24,7 +24,7 @@ public class RecordLayerFields {
       final RecordDefinition recordDefinition = layer.getRecordDefinition();
       field = createField(recordDefinition, "fieldFactories", fieldName, editable);
       if (field == null) {
-        field = SwingUtil.createField(recordDefinition, fieldName, editable);
+        field = SwingUtil.newField(recordDefinition, fieldName, editable);
       }
     }
     field.setEditable(editable);

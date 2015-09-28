@@ -82,7 +82,7 @@ public class RecordTableCellEditor extends AbstractCellEditor
 
   protected Field createField(final String fieldName) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    return SwingUtil.createField(recordDefinition, fieldName, true);
+    return SwingUtil.newField(recordDefinition, fieldName, true);
   }
 
   @Override

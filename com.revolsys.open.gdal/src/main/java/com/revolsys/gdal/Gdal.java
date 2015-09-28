@@ -488,7 +488,7 @@ public class Gdal {
   }
 
   public static long loadSettings(final Dataset dataset, final Resource resource) {
-    final Resource settingsFile = resource.createAddExtension("rgobject");
+    final Resource settingsFile = resource.newResourceAddExtension("rgobject");
     if (settingsFile.exists()) {
       try {
 

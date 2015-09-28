@@ -31,31 +31,31 @@ public class Kml extends AbstractIoFactoryWithCoordinateSystem
   }
 
   @Override
-  public GeometryReader createGeometryReader(final Resource resource) {
+  public Set<CoordinateSystem> getCoordinateSystems() {
+    return COORDINATE_SYSTEMS;
+  }
+
+  @Override
+  public GeometryReader newGeometryReader(final Resource resource) {
     final KmlGeometryIterator iterator = new KmlGeometryIterator(resource);
     return new GeometryReader(iterator);
   }
 
   @Override
-  public MapWriter createMapWriter(final java.io.Writer out) {
+  public MapWriter newMapWriter(final java.io.Writer out) {
     return new KmlMapWriter(out);
   }
 
   @Override
-  public MapWriter createMapWriter(final OutputStream out, final Charset charset) {
-    return createMapWriter(out);
+  public MapWriter newMapWriter(final OutputStream out, final Charset charset) {
+    return newMapWriter(out);
   }
 
   @Override
-  public RecordWriter createRecordWriter(final String baseName,
+  public RecordWriter newRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
     return new KmlRecordWriter(writer);
-  }
-
-  @Override
-  public Set<CoordinateSystem> getCoordinateSystems() {
-    return COORDINATE_SYSTEMS;
   }
 }

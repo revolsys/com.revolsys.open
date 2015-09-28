@@ -128,32 +128,6 @@ public interface Resource extends org.springframework.core.io.Resource {
     }
   }
 
-  default Resource createAddExtension(final String extension) {
-    final String fileName = getFilename();
-    final String newFileName = fileName + "." + extension;
-    final Resource parent = getParent();
-    if (parent == null) {
-      return null;
-    } else {
-      return parent.createChild(newFileName);
-    }
-  }
-
-  default Resource createChangeExtension(final String extension) {
-    final String baseName = getBaseName();
-    final String newFileName = baseName + "." + extension;
-    final Resource parent = getParent();
-    if (parent == null) {
-      return null;
-    } else {
-      return parent.createChild(newFileName);
-    }
-  }
-
-  default Resource createChild(final CharSequence childPath) {
-    return createRelative(childPath.toString());
-  }
-
   @Override
   Resource createRelative(String relativePath);
 
@@ -207,6 +181,10 @@ public interface Resource extends org.springframework.core.io.Resource {
     return new BufferedReader(in);
   }
 
+  default Resource newChildResource(final CharSequence childPath) {
+    return createRelative(childPath.toString());
+  }
+
   default InputStream newInputStream() {
     return getInputStream();
   }
@@ -236,6 +214,28 @@ public interface Resource extends org.springframework.core.io.Resource {
   default Reader newReader() {
     final InputStream in = getInputStream();
     return FileUtil.createUtf8Reader(in);
+  }
+
+  default Resource newResourceAddExtension(final String extension) {
+    final String fileName = getFilename();
+    final String newFileName = fileName + "." + extension;
+    final Resource parent = getParent();
+    if (parent == null) {
+      return null;
+    } else {
+      return parent.newChildResource(newFileName);
+    }
+  }
+
+  default Resource newResourceChangeExtension(final String extension) {
+    final String baseName = getBaseName();
+    final String newFileName = baseName + "." + extension;
+    final Resource parent = getParent();
+    if (parent == null) {
+      return null;
+    } else {
+      return parent.newChildResource(newFileName);
+    }
   }
 
   default Writer newWriter() {

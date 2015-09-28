@@ -15,7 +15,7 @@ import com.revolsys.collection.range.Ranges;
 public class RangeTest {
 
   private static void assertCharRange(final char from, final char to, final char... characters) {
-    final AbstractRange<?> range = Ranges.create(from, to);
+    final AbstractRange<?> range = Ranges.newRange(from, to);
     final List<Object> list = new ArrayList<>();
     for (final char character : characters) {
       list.add(character);
@@ -81,10 +81,10 @@ public class RangeTest {
   }
 
   private static void assertRangeSetCreate(final String range, final String expected) {
-    final RangeSet set = RangeSet.create(range);
+    final RangeSet set = RangeSet.newRangeSet(range);
     Assert.assertEquals(expected, set.toString());
 
-    final RangeSet expectedSet = RangeSet.create(expected);
+    final RangeSet expectedSet = RangeSet.newRangeSet(expected);
     Assert.assertEquals(expectedSet, set);
 
     final int size = set.size();
@@ -98,7 +98,7 @@ public class RangeTest {
 
   private static void assertRangeSetException(final String range) {
     try {
-      final RangeSet set = RangeSet.create(range);
+      final RangeSet set = RangeSet.newRangeSet(range);
       Assert.fail("Range is not supposed to be valid " + range + ", created " + set);
     } catch (final RangeInvalidException e) {
     }
@@ -118,11 +118,11 @@ public class RangeTest {
 
   @Test
   public void testCharRange() {
-    Assert.assertEquals("A", Ranges.create('A').toString());
-    Assert.assertEquals("A~E", Ranges.create('A', 'E').toString());
-    Assert.assertEquals("A~E", Ranges.create('E', 'A').toString());
-    Assert.assertEquals("0~9", Ranges.create('0', '9').toString());
-    Assert.assertEquals("0~9", Ranges.create('9', '0').toString());
+    Assert.assertEquals("A", Ranges.newRange('A').toString());
+    Assert.assertEquals("A~E", Ranges.newRange('A', 'E').toString());
+    Assert.assertEquals("A~E", Ranges.newRange('E', 'A').toString());
+    Assert.assertEquals("0~9", Ranges.newRange('0', '9').toString());
+    Assert.assertEquals("0~9", Ranges.newRange('9', '0').toString());
 
     assertCharRange('A', 'A', 'A');
     assertCharRange('Z', 'Z', 'Z');
@@ -130,8 +130,8 @@ public class RangeTest {
     assertCharRange('C', 'A', 'A', 'B', 'C');
     assertCharRange('Z', 'X', 'X', 'Y', 'Z');
 
-    Assert.assertEquals("a", Ranges.create('a').toString());
-    Assert.assertEquals("a~e", Ranges.create('a', 'e').toString());
+    Assert.assertEquals("a", Ranges.newRange('a').toString());
+    Assert.assertEquals("a~e", Ranges.newRange('a', 'e').toString());
 
     assertCharRange('a', 'a', 'a');
     assertCharRange('z', 'z', 'z');

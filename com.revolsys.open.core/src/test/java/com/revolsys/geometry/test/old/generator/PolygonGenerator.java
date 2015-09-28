@@ -45,7 +45,7 @@ import com.revolsys.geometry.operation.valid.IsValidOp;
 
 /**
  *
- * This class is used to create a polygon within the specified bounding box.
+ * This class is used to Construct a new polygon within the specified bounding box.
  *
  * Sucessive calls to create may or may not return the same geometry topology.
  *

@@ -29,11 +29,10 @@ import com.revolsys.record.schema.RecordDefinition;
  */
 public interface RecordFactory {
   /**
-   * Create an instance of Record implementation supported by this factory
-   * using the record definition
+   * Construct a new Record using the record definition
    *
-   * @param recordDefinition The record definition used to create the instance.
+   * @param recordDefinition The record definition used to construct the instance.
    * @return The Record instance.
    */
-  Record createRecord(RecordDefinition recordDefinition);
+  Record newRecord(RecordDefinition recordDefinition);
 }

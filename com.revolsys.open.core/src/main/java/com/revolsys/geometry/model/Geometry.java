@@ -399,7 +399,7 @@ public interface Geometry
   Geometry convexHull();
 
   /**
-   * Create a copy of the geometry io the requried geometry factory. Projecting to the required
+   * Construct a new copy of the geometry io the requried geometry factory. Projecting to the required
    * coordinate system and applying the precision model.
    *
    * @author Paul Austin <paul.austin@revolsys.com>

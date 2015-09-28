@@ -28,11 +28,6 @@ public class ShapefileRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public RecordWriter createWriter() {
-    return this.writer;
-  }
-
-  @Override
   public RecordDefinition getRecordDefinition(final String typePath) {
     return this.writer.getRecordDefinition(typePath);
   }
@@ -57,6 +52,11 @@ public class ShapefileRecordStore extends AbstractRecordStore {
     } else {
       return new ArrayRecord(savedRecordDefinition);
     }
+  }
+
+  @Override
+  public RecordWriter newWriter() {
+    return this.writer;
   }
 
 }

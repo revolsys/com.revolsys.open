@@ -9,7 +9,7 @@ public class PathName implements Comparable<PathName>, CharSequence {
 
   public static final PathName ROOT = new PathName("/");
 
-  public static PathName create(final Object path) {
+  public static PathName newPathName(final Object path) {
     if (Property.hasValue(path)) {
       String pathString = path.toString();
       pathString = Path.clean(pathString);
@@ -48,7 +48,7 @@ public class PathName implements Comparable<PathName>, CharSequence {
 
   public PathName createChild(final String name) {
     final String childPath = getPath() + "/" + name;
-    return create(childPath);
+    return newPathName(childPath);
   }
 
   @Override
@@ -88,7 +88,7 @@ public class PathName implements Comparable<PathName>, CharSequence {
   public PathName getParent() {
     if (this.parent == null && this.path.length() > 1) {
       final String parentPath = getParentPath();
-      this.parent = create(parentPath);
+      this.parent = newPathName(parentPath);
     }
     return this.parent;
   }

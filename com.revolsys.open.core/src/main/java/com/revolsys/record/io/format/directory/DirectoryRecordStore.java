@@ -79,20 +79,6 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public AbstractIterator<Record> createIterator(final Query query,
-    final Map<String, Object> properties) {
-    final String path = query.getTypeName();
-    final RecordReader reader = query(path);
-    reader.setProperties(properties);
-    return new RecordReaderQueryIterator(reader, query);
-  }
-
-  @Override
-  public RecordWriter createWriter() {
-    return new DirectoryRecordStoreWriter(this);
-  }
-
-  @Override
   public void delete(final Record record) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     final RecordStore recordStore = recordDefinition.getRecordStore();
@@ -188,7 +174,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
       final String fileExtension = getFileExtension();
       final File file = new File(subDirectory, recordDefinition.getName() + "." + fileExtension);
       final Resource resource = new FileSystemResource(file);
-      writer = RecordWriter.create(recordDefinition, resource);
+      writer = RecordWriter.newRecordWriter(recordDefinition, resource);
       if (writer == null) {
         throw new RuntimeException("Cannot create writer for: " + typePath);
       } else if (writer instanceof ObjectWithProperties) {
@@ -212,7 +198,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   protected RecordDefinition loadRecordDefinition(final RecordStoreSchema schema,
     final String schemaName, final Resource resource) {
     try (
-      RecordReader recordReader = RecordReader.create(resource)) {
+      RecordReader recordReader = RecordReader.newRecordReader(resource)) {
       final String typePath = Path.toPath(schemaName, resource.getBaseName());
       recordReader.setProperty("schema", schema);
       recordReader.setProperty("typePath", typePath);
@@ -226,10 +212,24 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   }
 
   @Override
+  public AbstractIterator<Record> newIterator(final Query query,
+    final Map<String, Object> properties) {
+    final String path = query.getTypeName();
+    final RecordReader reader = query(path);
+    reader.setProperties(properties);
+    return new RecordReaderQueryIterator(reader, query);
+  }
+
+  @Override
+  public RecordWriter newWriter() {
+    return new DirectoryRecordStoreWriter(this);
+  }
+
+  @Override
   public RecordReader query(final String path) {
     final RecordDefinition recordDefinition = getRecordDefinition(path);
     final Resource resource = getResource(path, recordDefinition);
-    final RecordReader reader = RecordReader.create(resource);
+    final RecordReader reader = RecordReader.newRecordReader(resource);
     if (reader == null) {
       throw new IllegalArgumentException("Cannot find reader for: " + path);
     } else {

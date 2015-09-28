@@ -73,7 +73,7 @@ public class LoggingEventPanel extends JPanel {
     addLabel("Stack Trace");
     final String[] stack = event.getThrowableStrRep();
     if (stack != null) {
-      final TextArea textArea = SwingUtil.createTextArea(Math.min(20, stack.length), 80);
+      final TextArea textArea = SwingUtil.newTextArea(Math.min(20, stack.length), 80);
       textArea.setEditable(false);
       for (final String trace : stack) {
         textArea.append(trace);
@@ -97,12 +97,12 @@ public class LoggingEventPanel extends JPanel {
         value = "";
       }
       final TextArea textArea = SwingUtil
-        .createTextArea(Math.min(20, value.toString().split("\n").length), 80);
+        .newTextArea(Math.min(20, value.toString().split("\n").length), 80);
       textArea.setEditable(false);
       textArea.append(value.toString());
       add(textArea);
     } else {
-      final TextField field = SwingUtil.createTextField(Math.min(80, stringValue.length()));
+      final TextField field = SwingUtil.newTextField(Math.min(80, stringValue.length()));
       field.setEditable(false);
       field.setText(stringValue);
       add(field);

@@ -17,7 +17,7 @@ public class EmptyRange extends AbstractRange<Object> {
 
   @Override
   public AbstractRange<?> expand(final Object value) {
-    return Ranges.create(value);
+    return Ranges.newRange(value);
   }
 
   @Override

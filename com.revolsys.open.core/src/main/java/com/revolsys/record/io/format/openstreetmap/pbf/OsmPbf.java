@@ -18,12 +18,6 @@ public class OsmPbf extends AbstractRecordIoFactory {
   }
 
   @Override
-  public RecordReader createRecordReader(final Resource resource,
-    final RecordFactory recordFactory) {
-    return new OsmPbfRecordIterator(resource);
-  }
-
-  @Override
   public Set<CoordinateSystem> getCoordinateSystems() {
     return Collections.singleton(EpsgCoordinateSystems.wgs84());
   }
@@ -36,5 +30,10 @@ public class OsmPbf extends AbstractRecordIoFactory {
   @Override
   public boolean isCoordinateSystemSupported(final CoordinateSystem coordinateSystem) {
     return coordinateSystem instanceof GeographicCoordinateSystem;
+  }
+
+  @Override
+  public RecordReader newRecordReader(final Resource resource, final RecordFactory recordFactory) {
+    return new OsmPbfRecordIterator(resource);
   }
 }

@@ -61,7 +61,7 @@ public final class MoepConstants {
   }
 
   public static RecordDefinitionImpl createRecordDefinition(final String typePath) {
-    final RecordDefinitionImpl type = new RecordDefinitionImpl(PathName.create(typePath));
+    final RecordDefinitionImpl type = new RecordDefinitionImpl(PathName.newPathName(typePath));
     type.addField(FEATURE_CODE, DataTypes.STRING, 10, true);
     type.addField(MAPSHEET_NAME, DataTypes.STRING, 7, false);
     type.addField(DISPLAY_TYPE, DataTypes.STRING, 20, true);

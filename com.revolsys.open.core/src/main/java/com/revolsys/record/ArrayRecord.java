@@ -58,7 +58,7 @@ public class ArrayRecord extends BaseRecord {
   }
 
   /**
-   * Create a clone of the object.
+   * Construct a new clone of the object.
    *
    * @return The cloned object.
    */

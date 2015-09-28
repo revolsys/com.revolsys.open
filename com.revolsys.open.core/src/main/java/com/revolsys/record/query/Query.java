@@ -144,7 +144,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
   }
 
   public Query(final String typePath) {
-    this.typeName = PathName.create(typePath);
+    this.typeName = PathName.newPathName(typePath);
   }
 
   public Query(final String typeName, final Condition whereCondition) {
@@ -340,7 +340,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
   }
 
   public void setTypeName(final String typeName) {
-    this.typeName = PathName.create(typeName);
+    this.typeName = PathName.newPathName(typeName);
   }
 
   public void setTypeNameAlias(final String typePathAlias) {

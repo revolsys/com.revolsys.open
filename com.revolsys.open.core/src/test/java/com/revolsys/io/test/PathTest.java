@@ -21,8 +21,8 @@ public class PathTest {
   private void assertAncestorOrDescendant(final String path1, final String path2,
     final boolean expectedAncestor, final boolean expectedDescendant) {
     {
-      final PathName pathName1 = PathName.create(path1);
-      final PathName pathName2 = PathName.create(path2);
+      final PathName pathName1 = PathName.newPathName(path1);
+      final PathName pathName2 = PathName.newPathName(path2);
 
       final boolean isAncestor2 = pathName1.isAncestorOf(pathName2);
       Assert.assertEquals(expectedAncestor, isAncestor2);
@@ -67,7 +67,7 @@ public class PathTest {
   }
 
   private void assertElements(final String path, final String... expected) {
-    final List<String> paths = PathName.create(path).getElements();
+    final List<String> paths = PathName.newPathName(path).getElements();
     Assert.assertEquals(Arrays.asList(expected), paths);
   }
 
@@ -83,8 +83,8 @@ public class PathTest {
       Assert.assertEquals(expectedParent, parent);
     }
     {
-      final PathName path1 = PathName.create(parentPath);
-      final PathName path2 = PathName.create(childPath);
+      final PathName path1 = PathName.newPathName(parentPath);
+      final PathName path2 = PathName.newPathName(childPath);
 
       final boolean isParent12 = path1.isParentOf(path2);
       Assert.assertEquals(expectedParent, isParent12);
@@ -106,7 +106,7 @@ public class PathTest {
     final String path = Path.getPath(source);
     Assert.assertEquals(expected, path);
     if (Property.hasValue(source)) {
-      final PathName parent = PathName.create(source).getParent();
+      final PathName parent = PathName.newPathName(source).getParent();
       if (parent != null) {
         Assert.assertEquals(expected, parent.toString());
       }

@@ -209,17 +209,17 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
   }
 
   @Override
-  public MapReader createMapReader(final Resource resource) {
+  public MapReader newMapreader(final Resource resource) {
     return new JsonMapReader(resource.getInputStream());
   }
 
   @Override
-  public MapWriter createMapWriter(final OutputStream out, final Charset charset) {
-    return createMapWriter(out);
+  public MapWriter newMapWriter(final OutputStream out, final Charset charset) {
+    return newMapWriter(out);
   }
 
   @Override
-  public MapWriter createMapWriter(final Writer out) {
+  public MapWriter newMapWriter(final Writer out) {
     return new JsonMapWriter(out);
   }
 }

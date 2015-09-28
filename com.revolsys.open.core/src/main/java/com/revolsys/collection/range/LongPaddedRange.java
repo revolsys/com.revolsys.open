@@ -48,11 +48,6 @@ public class LongPaddedRange extends AbstractRange<String> {
   }
 
   @Override
-  protected LongPaddedRange createNew(final Object from, final Object to) {
-    return new LongPaddedRange((Long)from, (Long)to);
-  }
-
-  @Override
   public AbstractRange<?> expand(final Object value) {
     final Long longValue = Numbers.toLong(value);
     if (longValue == null) {
@@ -70,6 +65,11 @@ public class LongPaddedRange extends AbstractRange<String> {
   @Override
   public String getTo() {
     return toString(this.to);
+  }
+
+  @Override
+  protected LongPaddedRange newRange(final Object from, final Object to) {
+    return new LongPaddedRange((Long)from, (Long)to);
   }
 
   @Override

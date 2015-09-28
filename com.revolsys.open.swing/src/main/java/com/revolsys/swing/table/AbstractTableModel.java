@@ -72,7 +72,7 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
 
   public JComponent getEditorField(final int rowIndex, final int columnIndex, final Object value) {
     final Class<?> clazz = getColumnClass(columnIndex);
-    return SwingUtil.createField(clazz, "field", value);
+    return SwingUtil.newField(clazz, "field", value);
   }
 
   public MenuFactory getMenu() {

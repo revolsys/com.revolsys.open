@@ -76,7 +76,7 @@ public class RecordStoreConnectionManager
             return null;
           }
         } else {
-          recordStore = RecordStoreFactoryRegistry.createRecordStore(connectionProperties);
+          recordStore = RecordStoreFactoryRegistry.newRecordStore(connectionProperties);
           recordStore.setProperties(config);
           recordStore.initialize();
         }

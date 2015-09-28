@@ -29,17 +29,6 @@ public class PostgreSQLDatabaseFactory extends AbstractJdbcDatabaseFactory {
   }
 
   @Override
-  public JdbcRecordStore createRecordStore(final DataSource dataSource) {
-    return new PostgreSQLRecordStore(dataSource);
-  }
-
-  @Override
-  public JdbcRecordStore createRecordStore(
-    final Map<String, ? extends Object> connectionProperties) {
-    return new PostgreSQLRecordStore(this, connectionProperties);
-  }
-
-  @Override
   public String getDriverClassName() {
     return Driver.class.getName();
   }
@@ -68,5 +57,15 @@ public class PostgreSQLDatabaseFactory extends AbstractJdbcDatabaseFactory {
   @Override
   public List<String> getUrlPatterns() {
     return URL_PATTERNS;
+  }
+
+  @Override
+  public JdbcRecordStore newRecordStore(final DataSource dataSource) {
+    return new PostgreSQLRecordStore(dataSource);
+  }
+
+  @Override
+  public JdbcRecordStore newRecordStore(final Map<String, ? extends Object> connectionProperties) {
+    return new PostgreSQLRecordStore(this, connectionProperties);
   }
 }

@@ -71,7 +71,7 @@ public class RectangleContains {
   private final BoundingBox rectEnv;
 
   /**
-   * Create a new contains computer for two geometries.
+   * Construct a new new contains computer for two geometries.
    *
    * @param rectangle a rectangular geometry
    */

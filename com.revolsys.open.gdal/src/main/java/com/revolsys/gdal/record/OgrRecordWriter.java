@@ -34,7 +34,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
 
   OgrRecordWriter(final OgrRecordStore recordStore) {
     this.recordStore = recordStore;
-    this.dataSource = recordStore.createDataSource(true);
+    this.dataSource = recordStore.newDataSource(true);
   }
 
   private void addParts(final org.gdal.ogr.Geometry ogrGeometry, final Geometry geometry,

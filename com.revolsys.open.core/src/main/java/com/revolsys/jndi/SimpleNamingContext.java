@@ -150,14 +150,14 @@ public class SimpleNamingContext implements Context {
   // Actual implementations of Context methods follow
 
   /**
-   * Create a new naming context.
+   * Construct a new new naming context.
    */
   public SimpleNamingContext() {
     this("");
   }
 
   /**
-   * Create a new naming context with the given naming root.
+   * Construct a new new naming context with the given naming root.
    */
   public SimpleNamingContext(final String root) {
     this.root = root;
@@ -165,7 +165,7 @@ public class SimpleNamingContext implements Context {
   }
 
   /**
-   * Create a new naming context with the given naming root, the given
+   * Construct a new new naming context with the given naming root, the given
    * name/object map, and the JNDI environment entries.
    */
   public SimpleNamingContext(final String root, final Hashtable<String, Object> boundObjects,

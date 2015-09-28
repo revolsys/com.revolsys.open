@@ -75,7 +75,7 @@ public class Node extends NodeBase {
   }
 
   private Node createSubnode(final int index) {
-    // create a new subnode in the appropriate interval
+    // Construct a new new subnode in the appropriate interval
 
     double min = 0.0;
     double max = 0.0;

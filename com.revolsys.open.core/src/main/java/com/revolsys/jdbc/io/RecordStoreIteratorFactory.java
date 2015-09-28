@@ -24,7 +24,7 @@ public class RecordStoreIteratorFactory {
     this.methodName = methodName;
   }
 
-  public AbstractIterator<Record> createIterator(final RecordStore recordStore, final Query query,
+  public AbstractIterator<Record> newIterator(final RecordStore recordStore, final Query query,
     final Map<String, Object> properties) {
     final Object factory = this.factory.get();
     if (factory != null && Property.hasValue(this.methodName)) {

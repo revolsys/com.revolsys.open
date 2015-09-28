@@ -70,7 +70,7 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
   }
 
   /**
-   * Create a list of steps in measurable units from the double array.
+   * Construct a new list of steps in measurable units from the double array.
    *
    * @param <U> The type of unit (e.g. {@link Angle} or {@link Length}).
    * @param unit The unit of measure.

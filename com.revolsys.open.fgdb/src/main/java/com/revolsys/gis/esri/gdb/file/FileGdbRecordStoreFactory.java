@@ -35,7 +35,7 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
     IoFactoryRegistry.getInstance().addFactory(writerFactory);
   }
 
-  public static FileGdbRecordStore create(final File file) {
+  public static FileGdbRecordStore newRecordStore(final File file) {
     if (file == null) {
       return null;
     } else {
@@ -89,18 +89,6 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
   }
 
   @Override
-  public FileGdbRecordStore createRecordStore(
-    final Map<String, ? extends Object> connectionProperties) {
-    final Map<String, Object> properties = new LinkedHashMap<String, Object>(connectionProperties);
-    final String url = (String)properties.remove("url");
-    final File file = FileUtil.getUrlFile(url);
-
-    final FileGdbRecordStore recordStore = create(file);
-    RecordStoreFactoryRegistry.setConnectionProperties(recordStore, properties);
-    return recordStore;
-  }
-
-  @Override
   public String getName() {
     return "ESRI File Geodatabase";
   }
@@ -124,6 +112,18 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
   @Override
   public boolean isAvailable() {
     return true;
+  }
+
+  @Override
+  public FileGdbRecordStore newRecordStore(
+    final Map<String, ? extends Object> connectionProperties) {
+    final Map<String, Object> properties = new LinkedHashMap<String, Object>(connectionProperties);
+    final String url = (String)properties.remove("url");
+    final File file = FileUtil.getUrlFile(url);
+
+    final FileGdbRecordStore recordStore = newRecordStore(file);
+    RecordStoreFactoryRegistry.setConnectionProperties(recordStore, properties);
+    return recordStore;
   }
 
 }

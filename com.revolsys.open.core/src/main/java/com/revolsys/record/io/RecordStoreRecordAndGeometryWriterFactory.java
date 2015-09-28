@@ -30,10 +30,10 @@ public class RecordStoreRecordAndGeometryWriterFactory extends AbstractIoFactory
   }
 
   @Override
-  public RecordWriter createRecordWriter(final RecordDefinition recordDefinition,
+  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
     final File file = resource.getFile();
-    final RecordStore recordStore = RecordStoreFactoryRegistry.createRecordStore(file);
+    final RecordStore recordStore = RecordStoreFactoryRegistry.newRecordStore(file);
     if (recordStore == null) {
       return null;
     } else {
@@ -43,7 +43,7 @@ public class RecordStoreRecordAndGeometryWriterFactory extends AbstractIoFactory
   }
 
   @Override
-  public RecordWriter createRecordWriter(final String baseName,
+  public RecordWriter newRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     throw new UnsupportedOperationException("Writing to a stream not currently supported");

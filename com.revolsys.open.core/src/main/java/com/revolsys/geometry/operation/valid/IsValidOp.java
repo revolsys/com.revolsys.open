@@ -702,7 +702,7 @@ public class IsValidOp {
    * If this flag is set, the following Self-Touching conditions
    * are treated as being valid:
    * <ul>
-   * <li>the shell ring self-touches to create a hole touching the shell
+   * <li>the shell ring self-touches to Construct a new hole touching the shell
    * <li>a hole ring self-touches to create two holes touching at a point
    * </ul>
    * <p>

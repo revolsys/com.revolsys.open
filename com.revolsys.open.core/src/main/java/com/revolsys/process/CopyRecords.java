@@ -74,7 +74,7 @@ public class CopyRecords extends AbstractProcess {
 
       try (
         final Reader<Record> reader = this.sourceRecordStore.query(query);
-        final Writer<Record> targetWriter = this.targetRecordStore.createWriter();) {
+        final Writer<Record> targetWriter = this.targetRecordStore.newWriter();) {
         final RecordDefinition targetRecordDefinition = this.targetRecordStore
           .getRecordDefinition(this.typePath);
         if (targetRecordDefinition == null) {
@@ -82,13 +82,13 @@ public class CopyRecords extends AbstractProcess {
         } else {
           if (this.hasSequence) {
             final String idFieldName = targetRecordDefinition.getIdFieldName();
-            Object maxId = this.targetRecordStore.createPrimaryIdValue(this.typePath);
+            Object maxId = this.targetRecordStore.newPrimaryIdValue(this.typePath);
             for (final Record sourceRecord : reader) {
               final Record targetRecord = this.targetRecordStore.newRecord(this.typePath,
                 sourceRecord);
               final Object sourceId = sourceRecord.getValue(idFieldName);
               while (CompareUtil.compare(maxId, sourceId) < 0) {
-                maxId = this.targetRecordStore.createPrimaryIdValue(this.typePath);
+                maxId = this.targetRecordStore.newPrimaryIdValue(this.typePath);
               }
               targetWriter.write(targetRecord);
             }

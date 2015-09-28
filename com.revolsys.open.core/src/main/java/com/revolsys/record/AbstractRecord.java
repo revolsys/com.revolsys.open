@@ -11,7 +11,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   implements Record, Cloneable {
 
   /**
-   * Create a clone of the object.
+   * Construct a new clone of the object.
    *
    * @return The cloned object.
    */

@@ -30,7 +30,7 @@ public class GeoNamesService {
 
   static {
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
-      PathName.create("/geoname.org/name"));
+      PathName.newPathName("/geoname.org/name"));
     recordDefinition.addField("geonameId", DataTypes.STRING, false);
     recordDefinition.addField("name", DataTypes.STRING, false);
     recordDefinition.addField("fcode", DataTypes.STRING, false);
@@ -50,7 +50,7 @@ public class GeoNamesService {
     NAME_RECORD_DEFINITION = recordDefinition;
 
     final RecordDefinitionImpl wikipediaRecordDefinition = new RecordDefinitionImpl(
-      PathName.create("/geoname.org/wikipedia"));
+      PathName.newPathName("/geoname.org/wikipedia"));
     wikipediaRecordDefinition.addField("summary", DataTypes.STRING, false);
     wikipediaRecordDefinition.addField("title", DataTypes.STRING, false);
     wikipediaRecordDefinition.addField("wikipediaUrl", DataTypes.STRING, false);

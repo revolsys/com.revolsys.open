@@ -407,7 +407,7 @@ public class PageInfoHttpMessageConverter extends AbstractHttpMessageConverter<P
     final MapWriterFactory writerFactory = this.ioFactoryRegistry
       .getFactoryByMediaType(MapWriterFactory.class, mediaTypeString);
     if (writerFactory != null) {
-      final MapWriter writer = writerFactory.createMapWriter(out, charset);
+      final MapWriter writer = writerFactory.newMapWriter(out, charset);
       writer.setProperty(IoConstants.INDENT, true);
       writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);
       final HttpServletRequest request = HttpServletUtils.getRequest();

@@ -22,7 +22,7 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
 
   static {
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
-      PathName.create("/osm/record"));
+      PathName.newPathName("/osm/record"));
     recordDefinition.addField("id", DataTypes.LONG);
     recordDefinition.addField("visible", DataTypes.BOOLEAN);
     recordDefinition.addField("version", DataTypes.INT);

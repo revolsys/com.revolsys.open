@@ -13,7 +13,7 @@ public class RecordDefinitionConstructor {
   }
 
   public RecordDefinitionConstructor(final String pathName) {
-    this(PathName.create(pathName));
+    this(PathName.newPathName(pathName));
   }
 
   public RecordDefinitionConstructor addField(final String fieldName, final DataType type) {

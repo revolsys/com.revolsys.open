@@ -63,7 +63,7 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
         return this.request.getSession(true);
       } catch (final IllegalStateException e) {
         HttpSessionSecurityContextRepository.this.logger
-          .warn("Failed to create a session, as response has been committed. Unable to store"
+          .warn("Failed to Construct a new session, as response has been committed. Unable to store"
             + " SecurityContext.");
       }
 

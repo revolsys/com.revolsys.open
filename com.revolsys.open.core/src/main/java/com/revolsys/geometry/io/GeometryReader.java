@@ -8,17 +8,17 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.IteratorReader;
 
 public class GeometryReader extends IteratorReader<Geometry> {
-  public static GeometryReader create(final Object source) {
+  public static boolean isReadable(final Object source) {
+    return IoFactoryRegistry.isAvailable(GeometryReaderFactory.class, source);
+  }
+
+  public static GeometryReader newGeometryReader(final Object source) {
     final GeometryReaderFactory factory = IoFactory.factory(GeometryReaderFactory.class, source);
     if (factory == null) {
       return null;
     } else {
-      return factory.createGeometryReader(source);
+      return factory.newGeometryReader(source);
     }
-  }
-
-  public static boolean isReadable(final Object source) {
-    return IoFactoryRegistry.isAvailable(GeometryReaderFactory.class, source);
   }
 
   public GeometryReader(final Iterator<Geometry> iterator) {

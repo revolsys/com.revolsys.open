@@ -704,7 +704,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public LayerRecord createRecord(final Map<String, Object> values) {
     if (!isReadOnly() && isEditable() && isCanAddRecords()) {
-      final LayerRecord record = createRecord(getRecordDefinition());
+      final LayerRecord record = newRecord(getRecordDefinition());
       record.setState(RecordState.Initalizing);
       try {
         if (values != null && !values.isEmpty()) {
@@ -719,15 +719,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       return record;
     } else {
       return null;
-    }
-  }
-
-  @Override
-  public LayerRecord createRecord(final RecordDefinition recordDefinition) {
-    if (recordDefinition.equals(getRecordDefinition())) {
-      return new ArrayLayerRecord(this);
-    } else {
-      throw new IllegalArgumentException("Cannot create records for " + recordDefinition);
     }
   }
 
@@ -1319,7 +1310,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
               } catch (final Throwable e) {
               }
               final Resource resource = new ByteArrayResource("t.csv", string);
-              reader = RecordReader.create(resource);
+              reader = RecordReader.newRecordReader(resource);
             } else {
               return null;
             }
@@ -1810,6 +1801,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
+  @Override
+  public LayerRecord newRecord(final RecordDefinition recordDefinition) {
+    if (recordDefinition.equals(getRecordDefinition())) {
+      return new ArrayLayerRecord(this);
+    } else {
+      throw new IllegalArgumentException("Cannot create records for " + recordDefinition);
+    }
+  }
+
   public void pasteRecordGeometry(final LayerRecord record) {
     final Geometry geometry = getPasteRecordGeometry(record, true);
     if (geometry != null) {
@@ -1828,10 +1828,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         if (Property.hasValue(string)) {
           if (string.contains("\t")) {
             final Resource tsvResource = new ByteArrayResource("t.tsv", string);
-            reader = RecordReader.create(tsvResource);
+            reader = RecordReader.newRecordReader(tsvResource);
           } else {
             final Resource csvResource = new ByteArrayResource("t.csv", string);
-            reader = RecordReader.create(csvResource);
+            reader = RecordReader.newRecordReader(csvResource);
           }
         }
       }

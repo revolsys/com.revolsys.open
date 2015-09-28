@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
  * that can
  * <dl>
  * <dt>{@link PageController}</dt>
- * <dd>A controller that can be used to create a web page using a series of
+ * <dd>A controller that can be used to Construct a new web page using a series of
  * {@link IafAction}s with a {@link Layout} to display some {@link Component}s.</dd>
  *
  * @author paustin

@@ -30,7 +30,7 @@ public class QueryValueTest {
   private final RecordDefinitionImpl recordDefinition;
 
   public QueryValueTest() {
-    this.recordDefinition = new RecordDefinitionImpl(PathName.create("/Test"));
+    this.recordDefinition = new RecordDefinitionImpl(PathName.newPathName("/Test"));
     this.idField = this.recordDefinition.addField("ID", DataTypes.INT, true);
     this.nameAttribute = this.recordDefinition.addField("NAME", DataTypes.STRING, 255, true);
     this.descriptionAttribute = this.recordDefinition.addField("DESCRIPTION", DataTypes.STRING, 255,

@@ -12,7 +12,7 @@ public interface MapWriter extends Writer<Map<String, ? extends Object>> {
     if (factory == null) {
       return null;
     } else {
-      return factory.createMapWriter(source);
+      return factory.newMapWriter(source);
     }
   }
 

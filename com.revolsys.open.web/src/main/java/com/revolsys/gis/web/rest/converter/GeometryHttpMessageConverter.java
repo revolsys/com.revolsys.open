@@ -64,7 +64,7 @@ public class GeometryHttpMessageConverter extends AbstractHttpMessageConverter<G
         throw new HttpMessageNotReadableException("Cannot read data in format" + mediaType);
       } else {
         final Reader<Geometry> reader = readerFactory
-          .createGeometryReader(new InputStreamResource("geometryUpload", body));
+          .newGeometryReader(new InputStreamResource("geometryUpload", body));
         GeometryFactory factory = this.geometryFactory;
         final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder
           .getRequestAttributes();
@@ -112,8 +112,7 @@ public class GeometryHttpMessageConverter extends AbstractHttpMessageConverter<G
           throw new IllegalArgumentException("Media type " + actualMediaType + " not supported");
         } else {
           final String baseName = HttpServletUtils.getRequestBaseFileName();
-          final Writer<Geometry> writer = writerFactory.createGeometryWriter(baseName, body,
-            charset);
+          final Writer<Geometry> writer = writerFactory.newGeometryWriter(baseName, body, charset);
           writer.write(geometry);
           writer.close();
         }
