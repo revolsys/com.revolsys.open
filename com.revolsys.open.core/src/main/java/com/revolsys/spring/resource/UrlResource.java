@@ -143,7 +143,8 @@ public class UrlResource extends AbstractResource {
       }
       final URL url = getURL();
       final URL relativeUrl = UrlUtil.getUrl(url, relativePath);
-      return new UrlResource(relativeUrl);
+      UrlResource relativeResource = new UrlResource(relativeUrl);
+      return relativeResource;
     } catch (final Throwable e) {
       throw new IllegalArgumentException(
         "Unable to create relative URL " + this + " " + relativePath, e);

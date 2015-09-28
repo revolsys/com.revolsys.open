@@ -187,11 +187,12 @@ public class FileSystemResource extends AbstractResource {
 
   @Override
   public Resource getParent() {
-    final File parentFile = getFile().getParentFile();
+    final File file = getFile();
+    final File parentFile = file.getParentFile();
     if (parentFile == null) {
       return null;
     } else {
-      return new FileSystemResource(this.file);
+      return new FileSystemResource(parentFile);
     }
   }
 

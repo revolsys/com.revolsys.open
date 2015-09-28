@@ -30,8 +30,7 @@ import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
-public class ShapefileIterator extends AbstractIterator<Record>implements RecordReader {
-
+public class ShapefileRecordReader extends AbstractIterator<Record>implements RecordReader {
   private boolean closeFile = true;
 
   private GeometryFactory geometryFactory;
@@ -60,7 +59,7 @@ public class ShapefileIterator extends AbstractIterator<Record>implements Record
 
   private XbaseIterator xbaseIterator;
 
-  public ShapefileIterator(final Resource resource, final RecordFactory factory)
+  public ShapefileRecordReader(final Resource resource, final RecordFactory factory)
     throws IOException {
     this.recordFactory = factory;
     final String baseName = resource.getBaseName();

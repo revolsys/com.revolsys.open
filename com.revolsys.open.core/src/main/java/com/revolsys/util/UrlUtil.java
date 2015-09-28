@@ -233,11 +233,11 @@ public final class UrlUtil {
   public static URL getParent(final URL url) {
     final String urlString = url.toString();
     final int index = urlString.lastIndexOf('/');
-    if (index != -1) {
-      final String parentPath = urlString.substring(0, index);
-      return getUrl(parentPath);
-    } else {
+    if (index == -1) {
       return url;
+    } else {
+      final String parentPath = urlString.substring(0, index + 1);
+      return getUrl(parentPath);
     }
   }
 

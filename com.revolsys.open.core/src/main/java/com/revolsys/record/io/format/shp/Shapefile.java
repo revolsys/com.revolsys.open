@@ -32,7 +32,7 @@ public class Shapefile extends AbstractRecordIoFactory implements RecordWriterFa
   @Override
   public RecordReader newRecordReader(final Resource resource, final RecordFactory recordFactory) {
     try {
-      return new ShapefileIterator(resource, recordFactory);
+      return new ShapefileRecordReader(resource, recordFactory);
     } catch (final IOException e) {
       throw new RuntimeException("Unable to create reader for " + resource, e);
     }
