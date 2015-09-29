@@ -24,13 +24,14 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.datatype.DataType;
-import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;
 
-public interface RecordDefinition extends RecordStoreSchemaElement, MapSerializer {
+public interface RecordDefinition
+  extends GeometryFactoryProxy, RecordStoreSchemaElement, MapSerializer {
   void addDefaultValue(String fieldName, Object defaultValue);
 
   Record createRecord();
@@ -115,8 +116,6 @@ public interface RecordDefinition extends RecordStoreSchemaElement, MapSerialize
    * @return The field type name.
    */
   DataType getFieldType(int index);
-
-  GeometryFactory getGeometryFactory();
 
   FieldDefinition getGeometryField();
 

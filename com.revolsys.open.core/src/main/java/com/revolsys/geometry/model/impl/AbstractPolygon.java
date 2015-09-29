@@ -425,11 +425,6 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
   }
 
   @Override
-  public GeometryFactory getGeometryFactory() {
-    return GeometryFactory.floating3();
-  }
-
-  @Override
   public LinearRing getHole(final int ringIndex) {
     return getRing(ringIndex + 1);
   }

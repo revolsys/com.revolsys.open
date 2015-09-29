@@ -38,6 +38,7 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.record.Record;
@@ -78,7 +79,7 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
-public class MapPanel extends JPanel implements PropertyChangeListener {
+public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyChangeListener {
   public static final String MAP_CONTROLS_WORKING_AREA = "mapControlsCWorkingArea";
 
   public static final String MAP_PANEL = "mapPanel";
@@ -544,6 +545,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     return this.fileDropListener;
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.project.getGeometryFactory();
   }

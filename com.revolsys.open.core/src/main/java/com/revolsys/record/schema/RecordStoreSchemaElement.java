@@ -1,10 +1,11 @@
 package com.revolsys.record.schema;
 
+import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.io.PathName;
 import com.revolsys.properties.ObjectWithProperties;
 
 public interface RecordStoreSchemaElement
-  extends ObjectWithProperties, Comparable<RecordStoreSchemaElement> {
+  extends GeometryFactoryProxy, ObjectWithProperties, Comparable<RecordStoreSchemaElement> {
 
   default boolean equalPath(final PathName path) {
     return getPathName().equals(path);

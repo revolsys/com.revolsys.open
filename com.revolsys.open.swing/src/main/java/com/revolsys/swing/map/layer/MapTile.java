@@ -7,10 +7,11 @@ import java.util.Map;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImage;
 
-public abstract class MapTile {
+public abstract class MapTile implements GeometryFactoryProxy {
   private final BoundingBox boundingBox;
 
   private final int height;
@@ -42,6 +43,7 @@ public abstract class MapTile {
     return this.boundingBox;
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.boundingBox.getGeometryFactory();
   }

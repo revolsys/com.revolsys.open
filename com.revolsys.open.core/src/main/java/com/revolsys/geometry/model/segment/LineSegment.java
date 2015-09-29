@@ -5,14 +5,12 @@ import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Side;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 
 public interface LineSegment extends LineString {
-
   /**
    * Computes the angle that the vector defined by this segment
    * makes with the X-axis.
@@ -46,18 +44,7 @@ public interface LineSegment extends LineString {
    */
   double distance(LineSegment ls);
 
-  /**
-   * Computes the distance between this line segment and a given point.
-   *
-   * @return the distance from this segment to the given point
-   */
-  @Override
-  double distance(Point p);
-
   double distanceAlong(final double x, final double y);
-
-  @Override
-  double distanceAlong(final Point point);
 
   /**
    * Computes the perpendicular distance between the (infinite) line defined
@@ -80,19 +67,7 @@ public interface LineSegment extends LineString {
    */
   boolean equalsTopo(LineSegment other);
 
-  @Override
-  int getAxisCount();
-
-  @Override
-  BoundingBox getBoundingBox();
-
-  @Override
-  double getCoordinate(int vertexIndex, int axisIndex);
-
   double getElevation(Point point);
-
-  @Override
-  GeometryFactory getGeometryFactory();
 
   LineSegment getIntersection(BoundingBox boundingBox);
 

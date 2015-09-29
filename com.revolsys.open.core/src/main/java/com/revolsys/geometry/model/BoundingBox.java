@@ -6,14 +6,12 @@ import javax.measure.quantity.Length;
 import javax.measure.quantity.Quantity;
 import javax.measure.unit.Unit;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.gis.wms.capabilities.WmsBoundingBox;
 import com.revolsys.record.Record;
 import com.revolsys.util.Emptyable;
 
-public interface BoundingBox extends Emptyable {
-
+public interface BoundingBox extends Emptyable, GeometryFactoryProxy {
   BoundingBox EMPTY = new BoundingBoxDoubleGf();
 
   BoundingBox clipToCoordinateSystem();
@@ -109,8 +107,6 @@ public interface BoundingBox extends Emptyable {
 
   double getCentreY();
 
-  CoordinateSystem getCoordinateSystem();
-
   /**
    * maxX,minY
    * minX,minY
@@ -120,8 +116,6 @@ public interface BoundingBox extends Emptyable {
   Point getCornerPoint(int i);
 
   LineString getCornerPoints();
-
-  GeometryFactory getGeometryFactory();
 
   /**
    *  Returns the difference between the maximum and minimum y values.
@@ -179,8 +173,6 @@ public interface BoundingBox extends Emptyable {
   double getMinY();
 
   Point getRandomPointWithin();
-
-  int getSrid();
 
   Point getTopLeftPoint();
 

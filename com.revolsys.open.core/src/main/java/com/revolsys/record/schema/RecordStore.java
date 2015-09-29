@@ -15,7 +15,7 @@ import com.revolsys.collection.ListResultPager;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
@@ -37,7 +37,8 @@ import com.revolsys.record.query.QueryValue;
 import com.revolsys.transaction.Transactionable;
 import com.revolsys.util.Property;
 
-public interface RecordStore extends RecordDefinitionFactory, Transactionable, Closeable {
+public interface RecordStore
+  extends GeometryFactoryProxy, RecordDefinitionFactory, Transactionable, Closeable {
   void addCodeTable(CodeTable codeTable);
 
   default void addCodeTables(final Collection<CodeTable> codeTables) {
@@ -143,8 +144,6 @@ public interface RecordStore extends RecordDefinitionFactory, Transactionable, C
   Map<String, CodeTable> getCodeTableByFieldNameMap();
 
   RecordStoreConnected getConnected();
-
-  GeometryFactory getGeometryFactory();
 
   RecordStoreIteratorFactory getIteratorFactory();
 

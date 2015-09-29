@@ -39,7 +39,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.datatype.DataTypeProxy;
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.segment.Segment;
@@ -166,8 +165,8 @@ import com.revolsys.util.Emptyable;
  *
  *@version 1.7
  */
-public interface Geometry
-  extends Cloneable, Comparable<Object>, Emptyable, Serializable, DataTypeProxy {
+public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, GeometryFactoryProxy,
+  Serializable, DataTypeProxy {
 
   int M = 3;
 
@@ -761,13 +760,6 @@ public interface Geometry
   int getClassSortIndex();
 
   /**
-   *
-   * @author Paul Austin <paul.austin@revolsys.com>
-   * @return
-   */
-  CoordinateSystem getCoordinateSystem();
-
-  /**
    * Returns the dimension of this geometry.
    * The dimension of a geometry is is the topological
    * dimension of its embedding in the 2-D Euclidean plane.
@@ -839,14 +831,6 @@ public interface Geometry
   int getGeometryCount();
 
   /**
-   * Gets the geometryFactory which contains the context in which this geometry was created.
-   *
-   * @return the geometryFactory for this geometry
-   * @author Paul Austin <paul.austin@revolsys.com>
-   */
-  GeometryFactory getGeometryFactory();
-
-  /**
    * Returns the name of this Geometry's actual class.
    *
    *@return the name of this <code>Geometry</code>s actual class
@@ -900,22 +884,6 @@ public interface Geometry
   Segment getSegment(final int... segmentId);
 
   /**
-   *  Returns the ID of the Spatial Reference System used by the <code>Geometry</code>.
-   *  <P>
-   *
-   *  JTS supports Spatial Reference System information in the simple way
-   *  defined in the SFS. A Spatial Reference System ID (SRID) is present in
-   *  each <code>Geometry</code> object. <code>Geometry</code> provides basic
-   *  accessor operations for this field, but no others. The SRID is represented
-   *  as an integer.
-   *
-   *@return    the ID of the coordinate space in which the <code>Geometry</code>
-   *      is defined.
-   *
-   */
-  int getSrid();
-
-  /**
    * <p>Get the {@link Vertex} at the specified vertexId starting at the end of the geometry (see {@link Vertex#getVertexId()}).</p>
    *
    * @author Paul Austin <paul.austin@revolsys.com>
@@ -948,14 +916,6 @@ public interface Geometry
    *@return    the number of vertices in this <code>Geometry</code>
    */
   int getVertexCount();
-
-  /**
-   * Gets a hash code for the Geometry.
-   *
-   * @return an integer value suitable for use as a hashcode
-   */
-  @Override
-  int hashCode();
 
   boolean hasInvalidXyCoordinates();
 

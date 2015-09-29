@@ -5,16 +5,13 @@ import java.util.List;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Polygon;
 
-public interface RectangularMapGrid {
+public interface RectangularMapGrid extends GeometryFactoryProxy {
   BoundingBox getBoundingBox(final String mapTileName, final int srid);
 
-  CoordinateSystem getCoordinateSystem();
-
   String getFormattedMapTileName(String name);
-
-  GeometryFactory getGeometryFactory();
 
   String getMapTileName(final double x, final double y);
 

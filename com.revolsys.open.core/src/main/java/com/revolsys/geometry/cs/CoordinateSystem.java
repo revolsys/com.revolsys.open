@@ -9,9 +9,9 @@ import javax.measure.unit.Unit;
 
 import com.revolsys.geometry.cs.projection.CoordinatesProjection;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactoryProxy;
 
-public interface CoordinateSystem extends Serializable {
+public interface CoordinateSystem extends GeometryFactoryProxy, Serializable {
   CoordinateSystem clone();
 
   Area getArea();
@@ -23,8 +23,6 @@ public interface CoordinateSystem extends Serializable {
   List<Axis> getAxis();
 
   CoordinatesProjection getCoordinatesProjection();
-
-  GeometryFactory getGeometryFactory();
 
   int getId();
 

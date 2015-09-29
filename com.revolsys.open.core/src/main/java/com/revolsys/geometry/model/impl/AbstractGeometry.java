@@ -1265,16 +1265,6 @@ public abstract class AbstractGeometry implements Geometry {
   }
 
   /**
-   *
-   * @author Paul Austin <paul.austin@revolsys.com>
-   * @return
-   */
-  @Override
-  public GeometryFactory getGeometryFactory() {
-    return GeometryFactory.floating3();
-  }
-
-  /**
    * Returns the name of this Geometry's actual class.
    *
    *@return the name of this <code>Geometry</code>s actual class

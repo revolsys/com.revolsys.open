@@ -393,11 +393,6 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
   }
 
   @Override
-  public GeometryFactory getGeometryFactory() {
-    return GeometryFactory.floating3();
-  }
-
-  @Override
   public double getM() {
     return getCoordinate(3);
   }

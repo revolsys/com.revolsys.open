@@ -42,6 +42,7 @@ import com.revolsys.geometry.graph.visitor.NodeWithinDistanceOfGeometryVisitor;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
@@ -61,7 +62,7 @@ import com.revolsys.util.ExitLoopException;
 import com.revolsys.util.MathUtil;
 import com.revolsys.visitor.CreateListVisitor;
 
-public class Graph<T> {
+public class Graph<T> implements GeometryFactoryProxy {
 
   private static final AtomicInteger GRAPH_IDS = new AtomicInteger();
 
@@ -694,6 +695,7 @@ public class Graph<T> {
     return getEdges(filter, envelope);
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }

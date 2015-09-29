@@ -18,7 +18,6 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
 public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
-
   private final Map<PathName, RecordStoreSchemaElement> elementsByPath = new TreeMap<>();
 
   private boolean initialized = false;
@@ -154,6 +153,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
     return elements;
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     final GeometryFactory geometryFactory = getProperty("geometryFactory");
     if (geometryFactory == null) {

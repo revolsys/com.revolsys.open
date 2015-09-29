@@ -28,6 +28,7 @@ import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
@@ -42,7 +43,7 @@ import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.overlay.MouseOverlay;
 
-public class Viewport2D implements PropertyChangeSupportProxy {
+public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportProxy {
 
   public static final Geometry EMPTY_GEOMETRY = GeometryFactory.floating3().geometry();
 
@@ -228,6 +229,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
    *
    * @return The coordinate system the project is displayed in.
    */
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
