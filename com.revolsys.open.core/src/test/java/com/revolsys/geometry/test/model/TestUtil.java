@@ -44,7 +44,7 @@ public class TestUtil {
         GeometryFactory otherGeometryFactory;
         if (coordinateSystem instanceof ProjectedCoordinateSystem) {
           final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
-          otherGeometryFactory = GeometryFactory.fixed(projectedCoordinateSystem.getId(), axisCount,
+          otherGeometryFactory = GeometryFactory.fixed(projectedCoordinateSystem.getCoordinateSystemId(), axisCount,
             scaleXy, scaleZ);
         } else {
           otherGeometryFactory = GeometryFactory.fixed(3005, axisCount, scaleXy, scaleZ);

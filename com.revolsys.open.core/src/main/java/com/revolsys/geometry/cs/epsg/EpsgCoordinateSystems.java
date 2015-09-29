@@ -55,8 +55,8 @@ public final class EpsgCoordinateSystems {
   private static Map<String, Projection> projectionsByName = new TreeMap<String, Projection>();
 
   private static void addCoordinateSystem(final CoordinateSystem coordinateSystem) {
-    final Integer id = coordinateSystem.getId();
-    final String name = coordinateSystem.getName();
+    final Integer id = coordinateSystem.getCoordinateSystemId();
+    final String name = coordinateSystem.getCoordinateSystemName();
     coordinateSystemsById.put(id, coordinateSystem);
     final int hashCode = coordinateSystem.hashCode();
     List<CoordinateSystem> coordinateSystems = coordinateSystemsByCoordinateSystem.get(hashCode);
@@ -81,10 +81,10 @@ public final class EpsgCoordinateSystems {
     if (coordinateSystem == null) {
       return null;
     } else {
-      int srid = coordinateSystem.getId();
+      int srid = coordinateSystem.getCoordinateSystemId();
       CoordinateSystem matchedCoordinateSystem = coordinateSystemsById.get(srid);
       if (matchedCoordinateSystem == null) {
-        matchedCoordinateSystem = coordinateSystemsByName.get(coordinateSystem.getName());
+        matchedCoordinateSystem = coordinateSystemsByName.get(coordinateSystem.getCoordinateSystemName());
         if (matchedCoordinateSystem == null) {
           final int hashCode = coordinateSystem.hashCode();
           int matchCoordinateSystemId = 0;
@@ -93,7 +93,7 @@ public final class EpsgCoordinateSystems {
           if (coordinateSystems != null) {
             for (final CoordinateSystem coordinateSystem3 : coordinateSystems) {
               if (coordinateSystem3.equals(coordinateSystem)) {
-                final int srid3 = coordinateSystem3.getId();
+                final int srid3 = coordinateSystem3.getCoordinateSystemId();
                 if (matchedCoordinateSystem == null) {
                   matchedCoordinateSystem = coordinateSystem3;
                   matchCoordinateSystemId = srid3;
@@ -111,7 +111,7 @@ public final class EpsgCoordinateSystems {
             if (srid <= 0) {
               srid = nextSrid++;
             }
-            final String name = coordinateSystem.getName();
+            final String name = coordinateSystem.getCoordinateSystemName();
             final List<Axis> axis = coordinateSystem.getAxis();
             final Area area = coordinateSystem.getArea();
             final Authority authority = coordinateSystem.getAuthority();

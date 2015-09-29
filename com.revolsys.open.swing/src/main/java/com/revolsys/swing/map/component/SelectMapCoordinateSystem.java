@@ -48,7 +48,7 @@ public class SelectMapCoordinateSystem extends ComboBox
   }
 
   public void addCoordinateSystem(final CoordinateSystem coordinateSystem) {
-    final int srid = coordinateSystem.getId();
+    final int srid = coordinateSystem.getCoordinateSystemId();
     addCoordinateSystem(srid);
   }
 
@@ -65,7 +65,7 @@ public class SelectMapCoordinateSystem extends ComboBox
     if (coordinateSystem == null) {
       return StringConverterRegistry.toString(value);
     } else {
-      return coordinateSystem.getId() + " " + coordinateSystem.getName();
+      return coordinateSystem.getCoordinateSystemId() + " " + coordinateSystem.getCoordinateSystemName();
     }
   }
 

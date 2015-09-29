@@ -26,7 +26,7 @@ public interface GeometryFactoryProxy {
     if (coordinateSystem == null) {
       return "Unknown";
     } else {
-      return coordinateSystem.getName();
+      return coordinateSystem.getCoordinateSystemName();
     }
   }
 

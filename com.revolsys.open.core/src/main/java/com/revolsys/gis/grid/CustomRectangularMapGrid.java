@@ -185,7 +185,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
   public String toString() {
     final StringBuilder string = new StringBuilder();
     if (this.geometryFactory != null) {
-      string.append(this.geometryFactory.getCoordinateSystem().getName());
+      string.append(this.geometryFactory.getCoordinateSystem().getCoordinateSystemName());
       string.append(" ");
     }
     if (this.originX != 0 && this.originY != 0) {

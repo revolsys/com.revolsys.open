@@ -117,7 +117,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     if (coordinateSystem == null) {
       return fixed(0, axisCount, scales);
     } else {
-      final int coordinateSystemId = coordinateSystem.getId();
+      final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
       if (coordinateSystemId == 0) {
         return new GeometryFactory(coordinateSystem, axisCount, scales);
       } else {
@@ -221,7 +221,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     if (coordinateSystem == null) {
       return floating(0, axisCount);
     } else {
-      final int coordinateSystemId = coordinateSystem.getId();
+      final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
       if (coordinateSystemId == 0) {
         return new GeometryFactory(coordinateSystem, axisCount);
       } else {
@@ -265,7 +265,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     if (coordinateSystem == null) {
       return floating3();
     } else {
-      final int coordinateSystemId = coordinateSystem.getId();
+      final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
       if (coordinateSystemId == 0) {
         return new GeometryFactory(coordinateSystem, 3);
       } else {
@@ -332,7 +332,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     } else {
       final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems
         .getCoordinateSystem(esriCoordinateSystem);
-      final int coordinateSystemId = epsgCoordinateSystem.getId();
+      final int coordinateSystemId = epsgCoordinateSystem.getCoordinateSystemId();
       return fixed(coordinateSystemId, 0.0, 0.0);
     }
   }
@@ -385,7 +385,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   protected GeometryFactory(final CoordinateSystem coordinateSystem, final int axisCount,
     final double... scales) {
-    this.coordinateSystemId = coordinateSystem.getId();
+    this.coordinateSystemId = coordinateSystem.getCoordinateSystemId();
     this.coordinateSystem = coordinateSystem;
     init(axisCount, scales);
   }
@@ -842,7 +842,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     } else if (this.coordinateSystem instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)this.coordinateSystem;
       final GeographicCoordinateSystem geographicCs = projectedCs.getGeographicCoordinateSystem();
-      final int coordinateSystemId = geographicCs.getId();
+      final int coordinateSystemId = geographicCs.getCoordinateSystemId();
       return fixed(coordinateSystemId, getAxisCount(), 0.0, 0.0);
     } else {
       return fixed(4326, getAxisCount(), 0.0, 0.0);
@@ -1621,7 +1621,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     final StringBuilder string = new StringBuilder();
     final int coordinateSystemId = getCoordinateSystemId();
     if (this.coordinateSystem != null) {
-      string.append(this.coordinateSystem.getName());
+      string.append(this.coordinateSystem.getCoordinateSystemName());
       string.append(", ");
     }
     string.append("coordinateSystemId=");

@@ -75,7 +75,7 @@ public class EpsgCsWktWriter {
     final GeographicCoordinateSystem coordinateSystem) {
     if (coordinateSystem != null) {
       out.print("GEOGCS[");
-      write(out, coordinateSystem.getName());
+      write(out, coordinateSystem.getCoordinateSystemName());
       final Datum datum = coordinateSystem.getDatum();
       write(out, datum);
       final PrimeMeridian primeMeridian = coordinateSystem.getPrimeMeridian();
@@ -122,7 +122,7 @@ public class EpsgCsWktWriter {
     final ProjectedCoordinateSystem coordinateSystem) {
     if (coordinateSystem != null) {
       out.print("PROJCS[");
-      write(out, coordinateSystem.getName());
+      write(out, coordinateSystem.getCoordinateSystemName());
       final GeographicCoordinateSystem geoCs = coordinateSystem.getGeographicCoordinateSystem();
       out.print(",");
       write(out, geoCs);

@@ -9,6 +9,7 @@ import javax.measure.unit.Unit;
 
 import com.revolsys.geometry.cs.projection.CoordinatesProjection;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 
 public interface CoordinateSystem extends GeometryFactoryProxy, Serializable {
@@ -24,11 +25,17 @@ public interface CoordinateSystem extends GeometryFactoryProxy, Serializable {
 
   CoordinatesProjection getCoordinatesProjection();
 
-  int getId();
+  @Override
+  default CoordinateSystem getCoordinateSystem() {
+    return this;
+  }
+
+  @Override
+  default GeometryFactory getGeometryFactory() {
+    return GeometryFactory.floating3(this);
+  }
 
   Unit<Length> getLengthUnit();
-
-  String getName();
 
   <Q extends Quantity> Unit<Q> getUnit();
 

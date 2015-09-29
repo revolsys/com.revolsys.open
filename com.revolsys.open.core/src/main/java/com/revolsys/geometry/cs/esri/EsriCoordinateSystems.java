@@ -41,7 +41,7 @@ public class EsriCoordinateSystems {
     for (final GeographicCoordinateSystem cs : geographicCoordinateSystems) {
       final int id = getCrsId(cs);
       coordinateSystemsById.put(id, cs);
-      coordinateSystemsByName.put(cs.getName(), cs);
+      coordinateSystemsByName.put(cs.getCoordinateSystemName(), cs);
       coordinateSystems.put(cs, cs);
     }
     final List<ProjectedCoordinateSystem> projectedCoordinateSystems = CoordinateSystemParser
@@ -50,7 +50,7 @@ public class EsriCoordinateSystems {
     for (final ProjectedCoordinateSystem cs : projectedCoordinateSystems) {
       final int id = getCrsId(cs);
       coordinateSystemsById.put(id, cs);
-      coordinateSystemsByName.put(cs.getName(), cs);
+      coordinateSystemsByName.put(cs.getCoordinateSystemName(), cs);
       coordinateSystems.put(cs, cs);
     }
   }
@@ -89,7 +89,7 @@ public class EsriCoordinateSystems {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem != null) {
-        final int srid = coordinateSystem.getId();
+        final int srid = coordinateSystem.getCoordinateSystemId();
         final CoordinateSystem esriCoordinateSystem = CoordinateSystems
           .getCoordinateSystem(new QName("ESRI", String.valueOf(srid)));
         EsriCsWktWriter.write(writer, esriCoordinateSystem, -1);
@@ -101,7 +101,7 @@ public class EsriCoordinateSystems {
     if (coordinateSystem == null) {
       return null;
     } else {
-      CoordinateSystem coordinateSystem2 = coordinateSystemsByName.get(coordinateSystem.getName());
+      CoordinateSystem coordinateSystem2 = coordinateSystemsByName.get(coordinateSystem.getCoordinateSystemName());
       if (coordinateSystem2 == null) {
         coordinateSystem2 = coordinateSystems.get(coordinateSystem);
         if (coordinateSystem2 == null) {

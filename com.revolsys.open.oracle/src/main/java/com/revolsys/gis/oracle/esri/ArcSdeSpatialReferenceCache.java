@@ -88,7 +88,7 @@ public class ArcSdeSpatialReferenceCache {
               final CoordinateSystem coordinateSystem = new WktCsParser(wkt).parse();
               final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
                 .getCoordinateSystem(coordinateSystem);
-              srid = esriCoordinateSystem.getId();
+              srid = esriCoordinateSystem.getCoordinateSystemId();
               if (srid <= 0) {
                 geometryFactory = GeometryFactory.fixed(coordinateSystem, 3, scale.doubleValue(),
                   zScale.doubleValue());

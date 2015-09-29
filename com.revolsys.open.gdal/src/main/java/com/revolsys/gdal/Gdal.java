@@ -407,7 +407,7 @@ public class Gdal {
     if (coordinateSystem == null) {
       return null;
     } else {
-      final int srid = coordinateSystem.getId();
+      final int srid = coordinateSystem.getCoordinateSystemId();
       if (srid <= 0) {
         coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
         final String wkt = EsriCsWktWriter.toWkt(coordinateSystem);

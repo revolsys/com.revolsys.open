@@ -248,6 +248,6 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
    */
   @Override
   public String toString() {
-    return this.coordinateSystem.getName();
+    return this.coordinateSystem.getCoordinateSystemName();
   }
 }

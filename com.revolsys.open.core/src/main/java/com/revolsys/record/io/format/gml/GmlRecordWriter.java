@@ -22,7 +22,7 @@ import com.revolsys.record.schema.RecordDefinition;
 public class GmlRecordWriter extends AbstractRecordWriter {
   public static final void srsName(final XmlWriter out, final GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-    final int csId = coordinateSystem.getId();
+    final int csId = coordinateSystem.getCoordinateSystemId();
     out.attribute(Gml.SRS_NAME, "EPSG:" + csId);
   }
 

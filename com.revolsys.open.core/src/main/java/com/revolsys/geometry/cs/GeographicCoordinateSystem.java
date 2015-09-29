@@ -17,9 +17,6 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 public class GeographicCoordinateSystem implements CoordinateSystem {
   public static final double EARTH_RADIUS = 6378137;
 
-  /**
-   *
-   */
   private static final long serialVersionUID = 8655274386401351222L;
 
   public static double distanceMetres(final double lon1, final double lat1, final double lon2,
@@ -208,18 +205,18 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     return null;
   }
 
+  @Override
+  public int getCoordinateSystemId() {
+    return this.id;
+  }
+
+  @Override
+  public String getCoordinateSystemName() {
+    return this.name;
+  }
+
   public Datum getDatum() {
     return this.datum;
-  }
-
-  @Override
-  public GeometryFactory getGeometryFactory() {
-    return GeometryFactory.floating3(this);
-  }
-
-  @Override
-  public int getId() {
-    return this.id;
   }
 
   @Override
@@ -231,11 +228,6 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     final double radius = spheroid.getSemiMajorAxis();
     final double radianFactor = radianConverter.convert(1);
     return SI.METRE.times(radius).times(radianFactor);
-  }
-
-  @Override
-  public String getName() {
-    return this.name;
   }
 
   public PrimeMeridian getPrimeMeridian() {
@@ -255,10 +247,6 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
   public Unit<Angle> getUnit() {
     return this.angularUnit.getUnit();
   }
-
-  // public Unit<Angle> getUnit() {
-  // return angularUnit.getUnit();
-  // }
 
   @Override
   public int hashCode() {

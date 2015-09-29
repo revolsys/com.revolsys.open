@@ -87,7 +87,7 @@ public class LineStringTest {
         .getCoordinateSystem();
       final GeographicCoordinateSystem geographicCoordinateSystem = projectedCs
         .getGeographicCoordinateSystem();
-      geometryFactory2 = GeometryFactory.floating(geographicCoordinateSystem.getId(), axisCount);
+      geometryFactory2 = GeometryFactory.floating(geographicCoordinateSystem.getCoordinateSystemId(), axisCount);
     } else {
       geometryFactory2 = GeometryFactory.floating(26910, axisCount);
     }

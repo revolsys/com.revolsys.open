@@ -62,7 +62,7 @@ public class MapPrintable implements Printable {
   private void drawFooter(final Graphics2D graphics2d) {
     graphics2d.setFont(new Font("Arial", Font.PLAIN, 12));
     final String sheetName = (char)('A' + this.column) + "" + this.row;
-    final String text = this.boundingBox.getCoordinateSystem().getName() + " - 1:" + this.scale
+    final String text = this.boundingBox.getCoordinateSystem().getCoordinateSystemName() + " - 1:" + this.scale
       + " - " + sheetName;
 
     graphics2d.drawString(text, 0, (float)(this.contentRect.getMaxY() + this.rulerSizePixels * 2));

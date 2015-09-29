@@ -18,9 +18,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
 public class ProjectedCoordinateSystem implements CoordinateSystem {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1902383026085071877L;
 
   private Area area;
@@ -187,6 +184,16 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     return this.coordinatesProjection;
   }
 
+  @Override
+  public int getCoordinateSystemId() {
+    return this.id;
+  }
+
+  @Override
+  public String getCoordinateSystemName() {
+    return this.name;
+  }
+
   public double getDoubleParameter(final String key) {
     final Number value = getParameter(key);
     if (value == null) {
@@ -201,27 +208,12 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   }
 
   @Override
-  public GeometryFactory getGeometryFactory() {
-    return GeometryFactory.floating3(this);
-  }
-
-  @Override
-  public int getId() {
-    return this.id;
-  }
-
-  @Override
   public Unit<Length> getLengthUnit() {
     return this.linearUnit.getUnit();
   }
 
   public LinearUnit getLinearUnit() {
     return this.linearUnit;
-  }
-
-  @Override
-  public String getName() {
-    return this.name;
   }
 
   @SuppressWarnings("unchecked")

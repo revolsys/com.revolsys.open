@@ -102,7 +102,7 @@ public class MapPointerLocation extends JLabel
     final int srid = geometryFactory.getCoordinateSystemId();
     this.geometryFactory = geometryFactory;
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-    this.setToolTipText(coordinateSystem.getName());
+    this.setToolTipText(coordinateSystem.getCoordinateSystemName());
     this.title = String.valueOf(srid);
 
   }

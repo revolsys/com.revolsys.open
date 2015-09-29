@@ -91,7 +91,7 @@ public class EsriCsWktWriter {
   public static void write(final Writer out, final GeographicCoordinateSystem coordinateSystem,
     final int indentLevel) throws IOException {
     out.write("GEOGCS[");
-    write(out, coordinateSystem.getName(), incrementIndent(indentLevel));
+    write(out, coordinateSystem.getCoordinateSystemName(), incrementIndent(indentLevel));
     final Datum datum = coordinateSystem.getDatum();
     if (datum != null) {
       out.write(",");
@@ -144,7 +144,7 @@ public class EsriCsWktWriter {
   public static void write(final Writer out, final ProjectedCoordinateSystem coordinateSystem,
     final int indentLevel) throws IOException {
     out.write("PROJCS[");
-    write(out, coordinateSystem.getName(), incrementIndent(indentLevel));
+    write(out, coordinateSystem.getCoordinateSystemName(), incrementIndent(indentLevel));
     final GeographicCoordinateSystem geoCs = coordinateSystem.getGeographicCoordinateSystem();
     if (geoCs != null) {
       out.write(",");

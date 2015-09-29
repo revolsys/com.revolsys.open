@@ -280,7 +280,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       } else {
         final int axisCount = geometryFactory.getAxisCount();
         SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "ID",
-          coordinateSystem.getId(), 10);
+          coordinateSystem.getCoordinateSystemId(), 10);
         SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "axisCount", axisCount, 10);
 
         final double scaleXY = geometryFactory.getScaleXY();

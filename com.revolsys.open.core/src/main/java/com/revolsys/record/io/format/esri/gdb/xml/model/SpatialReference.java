@@ -65,7 +65,7 @@ public class SpatialReference {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem != null) {
         final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
-          .getCoordinateSystem(coordinateSystem.getId());
+          .getCoordinateSystem(coordinateSystem.getCoordinateSystemId());
         if (esriCoordinateSystem != null) {
           final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
           this.wkt = wkt;
@@ -90,7 +90,7 @@ public class SpatialReference {
           this.zTolerance = 1.0 / this.zScale;
           this.mTolerance = 1.0 / this.mScale;
           this.highPrecision = true;
-          this.wkid = coordinateSystem.getId();
+          this.wkid = coordinateSystem.getCoordinateSystemId();
         }
       }
     }
@@ -111,9 +111,9 @@ public class SpatialReference {
       final CoordinateSystem coordinateSystem = getCoordinateSystem();
       if (coordinateSystem != null) {
         if (this.xYScale == FLOATING_SCALE) {
-          this.geometryFactory = GeometryFactory.fixed(coordinateSystem.getId(), 0.0, this.zScale);
+          this.geometryFactory = GeometryFactory.fixed(coordinateSystem.getCoordinateSystemId(), 0.0, this.zScale);
         } else {
-          this.geometryFactory = GeometryFactory.fixed(coordinateSystem.getId(), this.xYScale,
+          this.geometryFactory = GeometryFactory.fixed(coordinateSystem.getCoordinateSystemId(), this.xYScale,
             this.zScale);
         }
       }

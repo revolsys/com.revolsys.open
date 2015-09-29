@@ -166,10 +166,10 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
     } else if (node instanceof CoordinateSystem) {
       final CoordinateSystem coordinateSystem = (CoordinateSystem)node;
       if (column == 0) {
-        final String name = coordinateSystem.getName();
+        final String name = coordinateSystem.getCoordinateSystemName();
         return name;
       } else if (column == 1) {
-        return coordinateSystem.getId();
+        return coordinateSystem.getCoordinateSystemId();
       } else {
         return null;
       }

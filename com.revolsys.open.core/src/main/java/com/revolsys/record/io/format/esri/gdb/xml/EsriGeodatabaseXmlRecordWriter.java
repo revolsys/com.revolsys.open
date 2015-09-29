@@ -387,7 +387,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
           this.out.element(Z_TOLERANCE, 1.0 / scaleZ * 2.0);
           this.out.element(M_TOLERANCE, 1);
           this.out.element(HIGH_PRECISION, true);
-          this.out.element(WKID, coordinateSystem.getId());
+          this.out.element(WKID, coordinateSystem.getCoordinateSystemId());
           this.out.endTag(SPATIAL_REFERENCE);
         }
       }
