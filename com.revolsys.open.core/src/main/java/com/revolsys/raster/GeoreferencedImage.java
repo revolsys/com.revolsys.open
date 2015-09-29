@@ -277,7 +277,7 @@ public interface GeoreferencedImage
   }
 
   default boolean hasGeometryFactory() {
-    return getGeometryFactory().getSrid() > 0;
+    return getGeometryFactory().getCoordinateSystemId() > 0;
   }
 
   boolean isHasChanages();

@@ -413,7 +413,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
 
   protected int writeSrid(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
-      final int srid = geometryFactory.getSrid();
+      final int srid = geometryFactory.getCoordinateSystemId();
       if (srid != 0 && srid != this.srid) {
         this.out.endAttribute();
         srid(srid);

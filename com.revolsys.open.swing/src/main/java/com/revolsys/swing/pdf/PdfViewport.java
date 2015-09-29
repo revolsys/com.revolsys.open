@@ -119,7 +119,7 @@ public class PdfViewport extends Viewport2D implements Closeable {
     } else {
       gcs.setName(COSName.TYPE, "GEOGCS");
     }
-    final int srid = geometryFactory.getSrid();
+    final int srid = geometryFactory.getCoordinateSystemId();
     gcs.setInt("EPSG", srid);
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
     final CoordinateSystem esri = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);

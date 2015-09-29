@@ -181,7 +181,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
   @Override
   public AbstractGeoreferencedImage getImage(final CoordinateSystem coordinateSystem,
     final double resolution) {
-    final int imageSrid = getGeometryFactory().getSrid();
+    final int imageSrid = getGeometryFactory().getCoordinateSystemId();
     if (imageSrid > 0 && imageSrid != coordinateSystem.getId()) {
       final BoundingBox boundingBox = getBoundingBox();
       final ProjectionImageFilter filter = new ProjectionImageFilter(boundingBox, coordinateSystem,

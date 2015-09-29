@@ -65,12 +65,6 @@ public abstract class AbstractSegment extends AbstractLineSegment implements Seg
   }
 
   @Override
-  public int getSrid() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.getSrid();
-  }
-
-  @Override
   public boolean isEmpty() {
     return false;
   }

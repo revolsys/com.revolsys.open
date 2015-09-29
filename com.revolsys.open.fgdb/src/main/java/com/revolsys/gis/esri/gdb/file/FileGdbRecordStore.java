@@ -151,12 +151,12 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   public static SpatialReference getSpatialReference(final GeometryFactory geometryFactory) {
-    if (geometryFactory == null || geometryFactory.getSrid() == 0) {
+    if (geometryFactory == null || geometryFactory.getCoordinateSystemId() == 0) {
       return null;
     } else {
       final String wkt;
       synchronized (API_SYNC) {
-        wkt = EsriFileGdb.getSpatialReferenceWkt(geometryFactory.getSrid());
+        wkt = EsriFileGdb.getSpatialReferenceWkt(geometryFactory.getCoordinateSystemId());
       }
       final SpatialReference spatialReference = SpatialReference.get(geometryFactory, wkt);
       return spatialReference;

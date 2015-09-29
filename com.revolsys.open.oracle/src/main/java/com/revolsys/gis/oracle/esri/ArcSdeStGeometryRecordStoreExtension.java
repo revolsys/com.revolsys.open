@@ -70,11 +70,11 @@ public class ArcSdeStGeometryRecordStoreExtension implements RecordStoreExtensio
 
           GeometryFactory geometryFactory = JdbcFieldAdder.getColumnProperty(schema, typePath,
             columnName, JdbcFieldAdder.GEOMETRY_FACTORY);
-          int srid = spatialReference.getSrid();
+          int srid = spatialReference.getCoordinateSystemId();
           final double scaleXy = spatialReference.getXyScale();
           final double scaleZ = spatialReference.getZScale();
           if (srid <= 0) {
-            srid = geometryFactory.getSrid();
+            srid = geometryFactory.getCoordinateSystemId();
           }
           axisCount = Math.min(axisCount, 3);
           geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXy, scaleZ);

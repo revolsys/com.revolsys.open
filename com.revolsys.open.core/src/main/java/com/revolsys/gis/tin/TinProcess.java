@@ -49,7 +49,7 @@ public class TinProcess extends BaseInOutProcess<Record, Record> {
     if (geometryFactory == null) {
       return string;
     } else {
-      return geometryFactory.getSrid() + "-" + string;
+      return geometryFactory.getCoordinateSystemId() + "-" + string;
     }
 
   }

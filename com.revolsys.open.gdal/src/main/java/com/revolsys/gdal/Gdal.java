@@ -423,7 +423,7 @@ public class Gdal {
     if (geometryFactory == null) {
       return null;
     } else {
-      final int srid = geometryFactory.getSrid();
+      final int srid = geometryFactory.getCoordinateSystemId();
       if (srid <= 0) {
         final GeometryFactory coordinateSystem = geometryFactory;
         return getSpatialReference(coordinateSystem);

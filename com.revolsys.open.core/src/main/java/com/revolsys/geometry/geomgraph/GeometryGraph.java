@@ -389,7 +389,6 @@ public class GeometryGraph extends PlanarGraph {
   // {
   // return precisionModel;
   // }
-  // public int getSRID() { return SRID; }
 
   public boolean hasTooFewPoints() {
     return this.hasTooFewPoints;

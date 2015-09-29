@@ -72,8 +72,8 @@ public class TestUtil {
 
   public static boolean equalsExpectedGeometry(final int i, final Geometry actualGeometry,
     final Geometry expectedGeometry) {
-    final int actualSrid = actualGeometry.getSrid();
-    final int expectedSrid = expectedGeometry.getSrid();
+    final int actualSrid = actualGeometry.getCoordinateSystemId();
+    final int expectedSrid = expectedGeometry.getCoordinateSystemId();
     if (actualSrid != expectedSrid) {
       System.err.println(i + "\tEquals Srid\t" + expectedSrid + "\t" + actualSrid);
       return false;

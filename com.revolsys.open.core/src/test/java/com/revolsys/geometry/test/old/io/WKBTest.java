@@ -69,7 +69,7 @@ public class WKBTest extends TestCase {
     assertTrue(isEqual);
 
     if (includeSRID) {
-      final boolean isSRIDEqual = g.getSrid() == g2.getSrid();
+      final boolean isSRIDEqual = g.getCoordinateSystemId() == g2.getCoordinateSystemId();
       assertTrue(isSRIDEqual);
     }
   }

@@ -31,6 +31,10 @@ public class ArcSdeSpatialReference {
     this.geometryFactory = geometryFactory;
   }
 
+  public int getCoordinateSystemId() {
+    return this.srid;
+  }
+
   public String getCsWkt() {
     return this.csWkt;
   }
@@ -53,10 +57,6 @@ public class ArcSdeSpatialReference {
 
   public String getName() {
     return this.name;
-  }
-
-  public int getSrid() {
-    return this.srid;
   }
 
   public Double getXOffset() {

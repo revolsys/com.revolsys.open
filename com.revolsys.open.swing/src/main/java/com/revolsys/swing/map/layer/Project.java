@@ -544,7 +544,7 @@ public class Project extends LayerGroup {
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       super.setGeometryFactory(geometryFactory);
-      firePropertyChange("srid", -2, geometryFactory.getSrid());
+      firePropertyChange("srid", -2, geometryFactory.getCoordinateSystemId());
     }
   }
 

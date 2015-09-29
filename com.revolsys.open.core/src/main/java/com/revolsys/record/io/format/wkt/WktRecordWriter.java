@@ -60,7 +60,7 @@ public class WktRecordWriter extends AbstractRecordWriter {
         this.open = true;
       }
       final Geometry geometry = object.getGeometry();
-      final int srid = geometry.getSrid();
+      final int srid = geometry.getCoordinateSystemId();
       if (srid > 0) {
         this.out.write("SRID=");
         this.out.write(Integer.toString(srid));

@@ -87,7 +87,7 @@ import com.revolsys.util.Property;
  *
  * @version 1.7
  */
-public class GeometryFactory implements Serializable, MapSerializer {
+public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapSerializer {
   private static IntHashMap<IntHashMap<List<GeometryFactory>>> factoriesBySrid = new IntHashMap<>();
 
   private static final long serialVersionUID = 4328651897279304108L;
@@ -105,11 +105,11 @@ public class GeometryFactory implements Serializable, MapSerializer {
   }
 
   public static GeometryFactory create(final Map<String, Object> properties) {
-    final int srid = Maps.getInteger(properties, "srid", 0);
+    final int coordinateSystemId = Maps.getInteger(properties, "srid", 0);
     final int axisCount = Maps.getInteger(properties, "axisCount", 2);
     final double scaleXY = Maps.getDouble(properties, "scaleXy", 0.0);
     final double scaleZ = Maps.getDouble(properties, "scaleZ", 0.0);
-    return GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
+    return GeometryFactory.fixed(coordinateSystemId, axisCount, scaleXY, scaleZ);
   }
 
   public static GeometryFactory fixed(final CoordinateSystem coordinateSystem, final int axisCount,
@@ -117,11 +117,11 @@ public class GeometryFactory implements Serializable, MapSerializer {
     if (coordinateSystem == null) {
       return fixed(0, axisCount, scales);
     } else {
-      final int srid = coordinateSystem.getId();
-      if (srid == 0) {
+      final int coordinateSystemId = coordinateSystem.getId();
+      if (coordinateSystemId == 0) {
         return new GeometryFactory(coordinateSystem, axisCount, scales);
       } else {
-        return fixed(srid, axisCount, scales);
+        return fixed(coordinateSystemId, axisCount, scales);
       }
     }
 
@@ -133,7 +133,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
    * fixed x, y precision model.
    * </p>
    *
-   * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG
+   * @param coordinateSystemId The <a href="http://spatialreference.org/ref/epsg/">EPSG
    *          coordinate system id</a>.
    * @param scaleXY The scale factor used to round the x, y coordinates. The
    *          precision is 1 / scaleXy. A scale factor of 1000 will give a
@@ -141,8 +141,8 @@ public class GeometryFactory implements Serializable, MapSerializer {
    *          metres.
    * @return The geometry factory.
    */
-  public static GeometryFactory fixed(final int srid, final double... scales) {
-    return fixed(srid, scales.length + 1, scales);
+  public static GeometryFactory fixed(final int coordinateSystemId, final double... scales) {
+    return fixed(coordinateSystemId, scales.length + 1, scales);
   }
 
   /**
@@ -151,7 +151,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
    * fixed x, y &amp; fixed z precision models.
    * </p>
    *
-   * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG
+   * @param coordinateSystemId The <a href="http://spatialreference.org/ref/epsg/">EPSG
    *          coordinate system id</a>.
    * @param axisCount The number of coordinate axis. 2 for 2D x &amp; y
    *          coordinates. 3 for 3D x, y &amp; z coordinates.
@@ -165,14 +165,16 @@ public class GeometryFactory implements Serializable, MapSerializer {
    *          metres.
    * @return The geometry factory.
    */
-  public static GeometryFactory fixed(final int srid, final int axisCount, double... scales) {
+  public static GeometryFactory fixed(final int coordinateSystemId, final int axisCount,
+    double... scales) {
     synchronized (factoriesBySrid) {
       scales = getScales(axisCount, scales);
       GeometryFactory factory = null;
-      IntHashMap<List<GeometryFactory>> factoriesByAxisCount = factoriesBySrid.get(srid);
+      IntHashMap<List<GeometryFactory>> factoriesByAxisCount = factoriesBySrid
+        .get(coordinateSystemId);
       if (factoriesByAxisCount == null) {
         factoriesByAxisCount = new IntHashMap<>();
-        factoriesBySrid.put(srid, factoriesByAxisCount);
+        factoriesBySrid.put(coordinateSystemId, factoriesByAxisCount);
       }
       List<GeometryFactory> factories = factoriesByAxisCount.get(axisCount);
       if (factories == null) {
@@ -188,7 +190,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
         }
       }
       if (factory == null) {
-        factory = new GeometryFactory(srid, axisCount, scales);
+        factory = new GeometryFactory(coordinateSystemId, axisCount, scales);
         factories.add(factory);
       }
       return factory;
@@ -219,11 +221,11 @@ public class GeometryFactory implements Serializable, MapSerializer {
     if (coordinateSystem == null) {
       return floating(0, axisCount);
     } else {
-      final int srid = coordinateSystem.getId();
-      if (srid == 0) {
+      final int coordinateSystemId = coordinateSystem.getId();
+      if (coordinateSystemId == 0) {
         return new GeometryFactory(coordinateSystem, axisCount);
       } else {
-        return floating(srid, axisCount);
+        return floating(coordinateSystemId, axisCount);
       }
     }
   }
@@ -234,14 +236,14 @@ public class GeometryFactory implements Serializable, MapSerializer {
    * floating precision model.
    * </p>
    *
-   * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG
+   * @param coordinateSystemId The <a href="http://spatialreference.org/ref/epsg/">EPSG
    *          coordinate system id</a>.
    * @param axisCount The number of coordinate axis. 2 for 2D x &amp; y
    *          coordinates. 3 for 3D x, y &amp; z coordinates.
    * @return The geometry factory.
    */
-  public static GeometryFactory floating(final int srid, final int axisCount) {
-    return fixed(srid, axisCount);
+  public static GeometryFactory floating(final int coordinateSystemId, final int axisCount) {
+    return fixed(coordinateSystemId, axisCount);
   }
 
   /**
@@ -263,11 +265,11 @@ public class GeometryFactory implements Serializable, MapSerializer {
     if (coordinateSystem == null) {
       return floating3();
     } else {
-      final int srid = coordinateSystem.getId();
-      if (srid == 0) {
+      final int coordinateSystemId = coordinateSystem.getId();
+      if (coordinateSystemId == 0) {
         return new GeometryFactory(coordinateSystem, 3);
       } else {
-        return floating3(srid);
+        return floating3(coordinateSystemId);
       }
     }
   }
@@ -278,12 +280,12 @@ public class GeometryFactory implements Serializable, MapSerializer {
    * and a floating precision models.
    * </p>
    *
-   * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG
+   * @param coordinateSystemId The <a href="http://spatialreference.org/ref/epsg/">EPSG
    *          coordinate system id</a>.
    * @return The geometry factory.
    */
-  public static GeometryFactory floating3(final int srid) {
-    return fixed(srid, 0.0, 0.0);
+  public static GeometryFactory floating3(final int coordinateSystemId) {
+    return fixed(coordinateSystemId, 0.0, 0.0);
   }
 
   public static GeometryFactory get(final Object factory) {
@@ -319,7 +321,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
    * and a floating precision models.
    * </p>
    *
-   * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG
+   * @param coordinateSystemId The <a href="http://spatialreference.org/ref/epsg/">EPSG
    *          coordinate system id</a>.
    * @return The geometry factory.
    */
@@ -330,8 +332,8 @@ public class GeometryFactory implements Serializable, MapSerializer {
     } else {
       final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems
         .getCoordinateSystem(esriCoordinateSystem);
-      final int srid = epsgCoordinateSystem.getId();
-      return fixed(srid, 0.0, 0.0);
+      final int coordinateSystemId = epsgCoordinateSystem.getId();
+      return fixed(coordinateSystemId, 0.0, 0.0);
     }
   }
 
@@ -375,22 +377,23 @@ public class GeometryFactory implements Serializable, MapSerializer {
 
   private final CoordinateSystem coordinateSystem;
 
+  private final int coordinateSystemId;
+
   private final WktParser parser = new WktParser(this);
 
   private double[] scales;
 
-  private final int srid;
-
   protected GeometryFactory(final CoordinateSystem coordinateSystem, final int axisCount,
     final double... scales) {
-    this.srid = coordinateSystem.getId();
+    this.coordinateSystemId = coordinateSystem.getId();
     this.coordinateSystem = coordinateSystem;
     init(axisCount, scales);
   }
 
-  protected GeometryFactory(final int srid, final int axisCount, final double... scales) {
-    this.srid = srid;
-    this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
+  protected GeometryFactory(final int coordinateSystemId, final int axisCount,
+    final double... scales) {
+    this.coordinateSystemId = coordinateSystemId;
+    this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
     init(axisCount, scales);
   }
 
@@ -485,25 +488,25 @@ public class GeometryFactory implements Serializable, MapSerializer {
     if (axisCount == getAxisCount()) {
       return this;
     } else {
-      final int srid = getSrid();
+      final int coordinateSystemId = getCoordinateSystemId();
       final double[] scales = new double[this.scales.length - 1];
       System.arraycopy(this.scales, 1, scales, 0, scales.length);
-      return GeometryFactory.fixed(srid, axisCount, scales);
+      return GeometryFactory.fixed(coordinateSystemId, axisCount, scales);
     }
   }
 
   public GeometryFactory convertScales(final double... scales) {
-    final int srid = getSrid();
+    final int coordinateSystemId = getCoordinateSystemId();
     final int axisCount = getAxisCount();
-    return GeometryFactory.fixed(srid, axisCount, scales);
+    return GeometryFactory.fixed(coordinateSystemId, axisCount, scales);
   }
 
-  public GeometryFactory convertSrid(final int srid) {
-    if (srid == getSrid()) {
+  public GeometryFactory convertSrid(final int coordinateSystemId) {
+    if (coordinateSystemId == getCoordinateSystemId()) {
       return this;
     } else {
       final int axisCount = getAxisCount();
-      return GeometryFactory.fixed(srid, axisCount, this.scales);
+      return GeometryFactory.fixed(coordinateSystemId, axisCount, this.scales);
     }
   }
 
@@ -686,13 +689,14 @@ public class GeometryFactory implements Serializable, MapSerializer {
     if (geometry == null) {
       return null;
     } else {
-      final int srid = getSrid();
-      final int geometrySrid = geometry.getSrid();
-      if (srid == 0 && geometrySrid != 0) {
+      final int coordinateSystemId = getCoordinateSystemId();
+      final int geometrySrid = geometry.getCoordinateSystemId();
+      if (coordinateSystemId == 0 && geometrySrid != 0) {
         final GeometryFactory geometryFactory = GeometryFactory.fixed(geometrySrid, this.axisCount,
           getScaleXY(), getScaleZ());
         return geometryFactory.geometry(geometry);
-      } else if (srid != 0 && geometrySrid != 0 && geometrySrid != srid) {
+      } else
+        if (coordinateSystemId != 0 && geometrySrid != 0 && geometrySrid != coordinateSystemId) {
         if (geometry instanceof MultiPoint) {
           final List<Geometry> geometries = new ArrayList<Geometry>();
           addGeometries(geometries, geometry);
@@ -822,8 +826,14 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return ProjectionFactory.getCoordinatesOperation(coordinateSystem, otherCoordinateSystem);
   }
 
+  @Override
   public CoordinateSystem getCoordinateSystem() {
     return this.coordinateSystem;
+  }
+
+  @Override
+  public int getCoordinateSystemId() {
+    return this.coordinateSystemId;
   }
 
   public GeometryFactory getGeographicGeometryFactory() {
@@ -832,8 +842,8 @@ public class GeometryFactory implements Serializable, MapSerializer {
     } else if (this.coordinateSystem instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)this.coordinateSystem;
       final GeographicCoordinateSystem geographicCs = projectedCs.getGeographicCoordinateSystem();
-      final int srid = geographicCs.getId();
-      return fixed(srid, getAxisCount(), 0.0, 0.0);
+      final int coordinateSystemId = geographicCs.getId();
+      return fixed(coordinateSystemId, getAxisCount(), 0.0, 0.0);
     } else {
       return fixed(4326, getAxisCount(), 0.0, 0.0);
     }
@@ -845,6 +855,11 @@ public class GeometryFactory implements Serializable, MapSerializer {
       addGeometries(geometryList, geometry);
     }
     return geometryList;
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return this;
   }
 
   private LinearRing getLinearRing(final List<?> rings, final int index) {
@@ -1011,13 +1026,9 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return getScale(2);
   }
 
-  public int getSrid() {
-    return this.srid;
-  }
-
   @Override
   public int hashCode() {
-    return this.srid;
+    return this.coordinateSystemId;
   }
 
   public boolean hasM() {
@@ -1053,25 +1064,25 @@ public class GeometryFactory implements Serializable, MapSerializer {
     if (geometryFactory == null) {
       return false;
     } else {
-      final int srid = getSrid();
-      final int srid2 = geometryFactory.getSrid();
-      if (srid == srid2) {
+      final int coordinateSystemId = getCoordinateSystemId();
+      final int coordinateSystemId2 = geometryFactory.getCoordinateSystemId();
+      if (coordinateSystemId == coordinateSystemId2) {
         return true;
       } else {
         final CoordinateSystem coordinateSystem = getCoordinateSystem();
         final CoordinateSystem coordinateSystem2 = geometryFactory.getCoordinateSystem();
         if (coordinateSystem == null) {
-          if (srid <= 0) {
+          if (coordinateSystemId <= 0) {
             return true;
-          } else if (coordinateSystem2 == null && srid2 <= 0) {
+          } else if (coordinateSystem2 == null && coordinateSystemId2 <= 0) {
             return true;
           } else {
             return false;
           }
         } else if (coordinateSystem2 == null) {
-          if (srid2 <= 0) {
+          if (coordinateSystemId2 <= 0) {
             return true;
-          } else if (srid <= 0) {
+          } else if (coordinateSystemId <= 0) {
             return true;
           } else {
             return false;
@@ -1589,7 +1600,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     map.put("type", "geometryFactory");
-    map.put("srid", getSrid());
+    map.put("srid", getCoordinateSystemId());
     map.put("axisCount", getAxisCount());
 
     final double scaleXY = getScaleXY();
@@ -1608,13 +1619,13 @@ public class GeometryFactory implements Serializable, MapSerializer {
   @Override
   public String toString() {
     final StringBuilder string = new StringBuilder();
-    final int srid = getSrid();
+    final int coordinateSystemId = getCoordinateSystemId();
     if (this.coordinateSystem != null) {
       string.append(this.coordinateSystem.getName());
       string.append(", ");
     }
-    string.append("srid=");
-    string.append(srid);
+    string.append("coordinateSystemId=");
+    string.append(coordinateSystemId);
     string.append(", axisCount=");
     string.append(this.axisCount);
     string.append(", scales=");

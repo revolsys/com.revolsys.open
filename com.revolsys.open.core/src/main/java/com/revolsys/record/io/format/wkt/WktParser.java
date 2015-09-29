@@ -201,7 +201,7 @@ public class WktParser {
       final StringBuilder text = new StringBuilder(value);
       if (hasText(text, "SRID=")) {
         final Integer srid = parseInteger(text);
-        if (srid != null && srid != this.geometryFactory.getSrid()) {
+        if (srid != null && srid != this.geometryFactory.getCoordinateSystemId()) {
           geometryFactory = GeometryFactory.floating(srid, axisCount);
         }
         hasText(text, ";");
@@ -224,8 +224,8 @@ public class WktParser {
       } else {
         throw new IllegalArgumentException("Unknown geometry type " + text);
       }
-      if (this.geometryFactory.getSrid() == 0) {
-        final int srid = geometry.getSrid();
+      if (this.geometryFactory.getCoordinateSystemId() == 0) {
+        final int srid = geometry.getCoordinateSystemId();
         if (useAxisCountFromGeometryFactory) {
           geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
           return (T)geometryFactory.geometry(geometry);
@@ -247,7 +247,7 @@ public class WktParser {
     final int axisCount = getAxisCount(text);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
-        final int srid = geometryFactory.getSrid();
+        final int srid = geometryFactory.getCoordinateSystemId();
         final double scaleXY = geometryFactory.getScaleXY();
         final double scaleZ = geometryFactory.getScaleZ();
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
@@ -270,7 +270,7 @@ public class WktParser {
     final int axisCount = getAxisCount(text);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
-        final int srid = geometryFactory.getSrid();
+        final int srid = geometryFactory.getCoordinateSystemId();
         final double scaleXY = geometryFactory.getScaleXY();
         final double scaleZ = geometryFactory.getScaleZ();
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
@@ -290,7 +290,7 @@ public class WktParser {
     final int axisCount = getAxisCount(text);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
-        final int srid = geometryFactory.getSrid();
+        final int srid = geometryFactory.getCoordinateSystemId();
         final double scaleXY = geometryFactory.getScaleXY();
         final double scaleZ = geometryFactory.getScaleZ();
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
@@ -310,7 +310,7 @@ public class WktParser {
     final int axisCount = getAxisCount(text);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
-        final int srid = geometryFactory.getSrid();
+        final int srid = geometryFactory.getCoordinateSystemId();
         final double scaleXY = geometryFactory.getScaleXY();
         final double scaleZ = geometryFactory.getScaleZ();
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
@@ -385,7 +385,7 @@ public class WktParser {
     final int axisCount = getAxisCount(text);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
-        final int srid = geometryFactory.getSrid();
+        final int srid = geometryFactory.getCoordinateSystemId();
         final double scaleXY = geometryFactory.getScaleXY();
         final double scaleZ = geometryFactory.getScaleZ();
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
@@ -407,7 +407,7 @@ public class WktParser {
     final int axisCount = getAxisCount(text);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
-        final int srid = geometryFactory.getSrid();
+        final int srid = geometryFactory.getCoordinateSystemId();
         final double scaleXY = geometryFactory.getScaleXY();
         final double scaleZ = geometryFactory.getScaleZ();
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);

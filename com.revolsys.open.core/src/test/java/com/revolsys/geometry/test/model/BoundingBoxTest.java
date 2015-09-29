@@ -83,7 +83,7 @@ public class BoundingBoxTest implements TestConstants {
     Unit unit = SI.METRE;
     Unit lengthUnit = SI.METRE;
     final StringBuilder wkt = new StringBuilder();
-    final int srid = boundingBox.getSrid();
+    final int srid = boundingBox.getCoordinateSystemId();
     if (geometryFactory == null) {
       Assert.assertEquals("coordinateSystem", null, boundingBox.getCoordinateSystem());
       Assert.assertEquals("srid", 0, srid);
@@ -93,7 +93,7 @@ public class BoundingBoxTest implements TestConstants {
         wkt.append(srid);
         wkt.append(";");
       }
-      Assert.assertEquals("srid", geometryFactory.getSrid(), srid);
+      Assert.assertEquals("srid", geometryFactory.getCoordinateSystemId(), srid);
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       Assert.assertEquals("coordinateSystem", coordinateSystem, boundingBox.getCoordinateSystem());
       if (coordinateSystem != null) {

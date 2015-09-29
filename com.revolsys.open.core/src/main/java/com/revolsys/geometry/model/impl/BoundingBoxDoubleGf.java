@@ -359,8 +359,8 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
       geometryFactory = geometryFactory.convertAxisCount(axisCount);
       boolean copy = false;
       if (geometryFactory != null && sourceGeometryFactory != geometryFactory) {
-        final int srid = getSrid();
-        final int srid2 = geometryFactory.getSrid();
+        final int srid = getCoordinateSystemId();
+        final int srid2 = geometryFactory.getCoordinateSystemId();
         if (srid <= 0) {
           if (srid2 > 0) {
             copy = true;
@@ -593,7 +593,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
         return boundingBox.isEmpty();
       } else if (boundingBox.isEmpty()) {
         return false;
-      } else if (getSrid() == boundingBox.getSrid()) {
+      } else if (getCoordinateSystemId() == boundingBox.getCoordinateSystemId()) {
         if (getMaxX() == boundingBox.getMaxX()) {
           if (getMaxY() == boundingBox.getMaxY()) {
             if (getMinX() == boundingBox.getMinX()) {
@@ -1037,16 +1037,6 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   }
 
   @Override
-  public int getSrid() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (geometryFactory == null) {
-      return 0;
-    } else {
-      return geometryFactory.getSrid();
-    }
-  }
-
-  @Override
   public Point getTopLeftPoint() {
     return getGeometryFactory().point(getMinX(), getMaxY());
   }
@@ -1467,7 +1457,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   @Override
   public String toString() {
     final StringBuilder s = new StringBuilder();
-    final int srid = getSrid();
+    final int srid = getCoordinateSystemId();
     if (srid > 0) {
       s.append("SRID=");
       s.append(srid);

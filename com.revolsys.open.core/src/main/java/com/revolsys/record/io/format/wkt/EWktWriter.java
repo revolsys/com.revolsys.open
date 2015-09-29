@@ -125,7 +125,7 @@ public class EWktWriter {
 
   public static String toString(final Geometry geometry) {
     final StringWriter out = new StringWriter();
-    final int srid = geometry.getSrid();
+    final int srid = geometry.getCoordinateSystemId();
     if (srid > 0) {
       out.write("SRID=");
       out.write(Integer.toString(srid));

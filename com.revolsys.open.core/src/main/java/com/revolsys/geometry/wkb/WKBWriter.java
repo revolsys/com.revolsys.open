@@ -420,7 +420,7 @@ public class WKBWriter {
     typeInt |= this.includeSRID ? 0x20000000 : 0;
     writeInt(typeInt, os);
     if (this.includeSRID) {
-      writeInt(g.getSrid(), os);
+      writeInt(g.getCoordinateSystemId(), os);
     }
   }
 

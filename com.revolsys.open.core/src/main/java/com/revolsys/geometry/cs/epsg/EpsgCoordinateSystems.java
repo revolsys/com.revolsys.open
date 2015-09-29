@@ -148,7 +148,7 @@ public final class EpsgCoordinateSystems {
 
   @SuppressWarnings("unchecked")
   public static <C extends CoordinateSystem> C getCoordinateSystem(final Geometry geometry) {
-    return (C)getCoordinateSystem(geometry.getSrid());
+    return (C)getCoordinateSystem(geometry.getCoordinateSystemId());
   }
 
   @SuppressWarnings("unchecked")

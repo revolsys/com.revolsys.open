@@ -75,12 +75,6 @@ public abstract class AbstractVertex extends AbstractPoint implements Vertex {
   }
 
   @Override
-  public int getSrid() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.getSrid();
-  }
-
-  @Override
   public abstract int[] getVertexId();
 
   @Override

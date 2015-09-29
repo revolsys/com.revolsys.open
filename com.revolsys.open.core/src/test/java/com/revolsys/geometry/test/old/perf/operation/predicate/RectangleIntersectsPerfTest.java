@@ -158,7 +158,7 @@ public class RectangleIntersectsPerfTest {
     final Point origin = new PointDouble((double)0, 0, Point.NULL_ORDINATE);
     final Geometry sinePoly = createSineStar(origin, size, nPts).getBoundary();
     GeometryFactory geometryFactory = sinePoly.getGeometryFactory();
-    geometryFactory = GeometryFactory.fixed(geometryFactory.getSrid(),
+    geometryFactory = GeometryFactory.fixed(geometryFactory.getCoordinateSystemId(),
       geometryFactory.getAxisCount(), size / 10, geometryFactory.getScaleZ());
     final Geometry newGeometry = sinePoly.convert(geometryFactory);
     /**

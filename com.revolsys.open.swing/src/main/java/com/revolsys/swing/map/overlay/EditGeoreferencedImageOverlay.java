@@ -277,7 +277,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
         appendPoint(toolTip, point);
         if (!source) {
           toolTip.append(" (");
-          toolTip.append(point.getSrid());
+          toolTip.append(point.getCoordinateSystemId());
           toolTip.append(")");
         }
         toolTip.append("</li>");

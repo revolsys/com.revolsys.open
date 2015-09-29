@@ -92,7 +92,7 @@ public class PostgreSQLWktWriter {
   public static String toString(final Geometry geometry) {
     final StringWriter out = new StringWriter();
     final PrintWriter writer = new PrintWriter(out);
-    final int srid = geometry.getSrid();
+    final int srid = geometry.getCoordinateSystemId();
     if (srid > 0) {
       writer.print("SRID=");
       writer.print(srid);

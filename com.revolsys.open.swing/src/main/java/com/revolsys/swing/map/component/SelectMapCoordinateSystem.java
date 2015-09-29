@@ -34,7 +34,7 @@ public class SelectMapCoordinateSystem extends ComboBox
     super("srid", 3857, 3005, 26907, 26908, 26909, 26910, 26911, 4326, 4269, 4267);
 
     this.map = new WeakReference<MapPanel>(map);
-    setSelectedItem(map.getGeometryFactory().getSrid());
+    setSelectedItem(map.getGeometryFactory().getCoordinateSystemId());
     setEditable(true);
     final InvokeMethodStringConverter renderer = new InvokeMethodStringConverter(this,
       "formatCoordinateSystem");
@@ -108,7 +108,7 @@ public class SelectMapCoordinateSystem extends ComboBox
       final String propertyName = event.getPropertyName();
       if ("geometryFactory".equals(propertyName)) {
         final GeometryFactory geometryFactory = map.getGeometryFactory();
-        final int srid = geometryFactory.getSrid();
+        final int srid = geometryFactory.getCoordinateSystemId();
         setSelectedItem(srid);
       }
     }

@@ -569,8 +569,8 @@ public abstract class AbstractGeometry implements Geometry {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
     boolean copy = false;
     if (geometryFactory != null && sourceGeometryFactory != geometryFactory) {
-      final int srid = getSrid();
-      final int srid2 = geometryFactory.getSrid();
+      final int srid = getCoordinateSystemId();
+      final int srid2 = geometryFactory.getCoordinateSystemId();
       if (srid <= 0) {
         if (srid2 > 0) {
           copy = true;
@@ -956,8 +956,8 @@ public abstract class AbstractGeometry implements Geometry {
       final int axisCount = getAxisCount();
       final int axisCount2 = geometry.getAxisCount();
       if (axisCount == axisCount2) {
-        final int srid = getSrid();
-        final int otherSrid = geometry.getSrid();
+        final int srid = getCoordinateSystemId();
+        final int otherSrid = geometry.getCoordinateSystemId();
         if (srid == 0 || otherSrid == 0 || srid == otherSrid) {
           return equals(axisCount, geometry);
         }
@@ -1322,8 +1322,8 @@ public abstract class AbstractGeometry implements Geometry {
     if (geometryFactory == null) {
       return GeometryFactory.floating3();
     } else {
-      final int geometrySrid = getSrid();
-      final int srid = geometryFactory.getSrid();
+      final int geometrySrid = getCoordinateSystemId();
+      final int srid = geometryFactory.getCoordinateSystemId();
       if (srid == 0 && geometrySrid != 0) {
         geometryFactory = geometryFactory.convertSrid(geometrySrid);
       }
@@ -1343,25 +1343,6 @@ public abstract class AbstractGeometry implements Geometry {
    */
   @Override
   public abstract Point getPoint();
-
-  /**
-   *  Returns the ID of the Spatial Reference System used by the <code>Geometry</code>.
-   *  <P>
-   *
-   *  JTS supports Spatial Reference System information in the simple way
-   *  defined in the SFS. A Spatial Reference System ID (SRID) is present in
-   *  each <code>Geometry</code> object. <code>Geometry</code> provides basic
-   *  accessor operations for this field, but no others. The SRID is represented
-   *  as an integer.
-   *
-   *@return    the ID of the coordinate space in which the <code>Geometry</code>
-   *      is defined.
-   *
-   */
-  @Override
-  public int getSrid() {
-    return getGeometryFactory().getSrid();
-  }
 
   /**
    * Gets the user data object for this geometry, if any.

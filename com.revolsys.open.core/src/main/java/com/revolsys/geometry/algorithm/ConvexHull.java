@@ -359,9 +359,6 @@ public class ConvexHull {
     coordinates = cleanRing(coordinates);
     if (coordinates.length == 3) {
       return this.geomFactory.lineString(coordinates[0], coordinates[1]);
-      // return new LineString(new Point[]{coordinates[0],
-      // coordinates[1]},
-      // geometry.getPrecisionModel(), geometry.getSRID());
     }
     final LinearRing ring = this.geomFactory.linearRing(coordinates);
     return this.geomFactory.polygon(ring);

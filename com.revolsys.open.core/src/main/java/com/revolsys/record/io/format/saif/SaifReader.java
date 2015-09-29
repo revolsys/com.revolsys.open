@@ -329,7 +329,7 @@ public class SaifReader extends AbstractReader<Record>
     return this.recordDefinitionFactory;
   }
 
-  public int getSrid() {
+  public int getCoordinateSystemId() {
     return this.srid;
   }
 

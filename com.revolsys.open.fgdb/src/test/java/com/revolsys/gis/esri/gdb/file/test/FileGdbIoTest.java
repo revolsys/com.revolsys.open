@@ -33,7 +33,7 @@ public class FileGdbIoTest {
     if (geometry.isEmpty() || geometryFactory.getAxisCount() == 4) {
       return;
     }
-    geometryFactory = GeometryFactory.fixed(geometryFactory.getSrid(),
+    geometryFactory = GeometryFactory.fixed(geometryFactory.getCoordinateSystemId(),
       geometryFactory.getAxisCount(), 10000000.0, 10000000.0);
 
     geometry = geometry.convert(geometryFactory);

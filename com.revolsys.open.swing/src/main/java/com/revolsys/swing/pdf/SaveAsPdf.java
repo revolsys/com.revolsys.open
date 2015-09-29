@@ -33,7 +33,7 @@ public class SaveAsPdf {
       final int width = viewport.getViewWidthPixels();
       final int height = viewport.getViewHeightPixels();
 
-      final int srid = boundingBox.getSrid();
+      final int srid = boundingBox.getCoordinateSystemId();
       if (srid == 3857) {
         boundingBox = boundingBox
           .convert(boundingBox.getGeometryFactory().getGeographicGeometryFactory());

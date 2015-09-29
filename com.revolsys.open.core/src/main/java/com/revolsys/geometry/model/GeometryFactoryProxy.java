@@ -5,20 +5,32 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 public interface GeometryFactoryProxy {
   default CoordinateSystem getCoordinateSystem() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.getCoordinateSystem();
+    if (geometryFactory == null) {
+      return null;
+    } else {
+      return geometryFactory.getCoordinateSystem();
+    }
   }
 
   default int getCoordinateSystemId() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.getSrid();
+    if (geometryFactory == null) {
+      return 0;
+    } else {
+      return geometryFactory.getCoordinateSystemId();
+    }
+  }
+
+  default String getCoordinateSystemName() {
+    final CoordinateSystem coordinateSystem = getCoordinateSystem();
+    if (coordinateSystem == null) {
+      return "Unknown";
+    } else {
+      return coordinateSystem.getName();
+    }
   }
 
   default GeometryFactory getGeometryFactory() {
     return GeometryFactory.floating3();
-  }
-
-  default int getSrid() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.getSrid();
   }
 }
