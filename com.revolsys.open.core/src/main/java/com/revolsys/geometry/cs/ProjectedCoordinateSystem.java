@@ -40,7 +40,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   private final Map<String, Object> normalizedParameters = new TreeMap<String, Object>();
 
-  private final Map<String, Object> parameters = new LinkedHashMap<String, Object>();
+  private final Map<String, Object> parameters = new LinkedHashMap<>();
 
   private final Projection projection;
 

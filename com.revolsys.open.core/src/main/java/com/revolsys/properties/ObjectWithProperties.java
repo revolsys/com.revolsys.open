@@ -70,7 +70,7 @@ public interface ObjectWithProperties {
   default Map<String, Object> getThreadProperties() {
     Map<String, Object> properties = ThreadSharedAttributes.getAttribute(this);
     if (properties == null) {
-      properties = new HashMap<String, Object>();
+      properties = new HashMap<>();
       ThreadSharedAttributes.setAttribute(this, properties);
     }
     return properties;

@@ -529,7 +529,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   @Override
   public Map<String, Object> toMap() {
     final boolean geometryStyle = this instanceof GeometryStyle;
-    final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    final Map<String, Object> map = new LinkedHashMap<>();
     for (final String name : PROPERTIES.keySet()) {
       if (geometryStyle || name.startsWith("marker")) {
         final Object value = Property.get(this, name);

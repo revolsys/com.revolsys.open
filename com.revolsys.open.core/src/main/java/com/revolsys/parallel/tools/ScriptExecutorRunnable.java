@@ -48,9 +48,9 @@ public class ScriptExecutorRunnable extends AbstractRunnable {
     return cause;
   }
 
-  private Map<String, Object> attributes = new LinkedHashMap<String, Object>();
+  private Map<String, Object> attributes = new LinkedHashMap<>();
 
-  private Map<String, Object> beans = new LinkedHashMap<String, Object>();
+  private Map<String, Object> beans = new LinkedHashMap<>();
 
   private boolean logScriptInfo = true;
 

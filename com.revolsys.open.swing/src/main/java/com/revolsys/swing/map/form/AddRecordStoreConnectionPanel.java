@@ -63,7 +63,7 @@ public class AddRecordStoreConnectionPanel extends ValueField {
   @Override
   public void save() {
     super.save();
-    final Map<String, Object> properties = new LinkedHashMap<String, Object>();
+    final Map<String, Object> properties = new LinkedHashMap<>();
     if (Property.hasValue(this.name)) {
       properties.put("name", this.name);
     } else {

@@ -10,9 +10,9 @@ public class EdgePair<T> {
 
   private final Edge<T> edge2;
 
-  private final Map<String, Object> properties1 = new HashMap<String, Object>();
+  private final Map<String, Object> properties1 = new HashMap<>();
 
-  private final Map<String, Object> properties2 = new HashMap<String, Object>();
+  private final Map<String, Object> properties2 = new HashMap<>();
 
   public EdgePair(final Edge<T> edge1, final Edge<T> edge2) {
     this.edge1 = edge1;

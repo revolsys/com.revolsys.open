@@ -49,7 +49,7 @@ public final class EpsgCoordinateSystemsLoader {
   private final RecordStore recordStore;
 
   public EpsgCoordinateSystemsLoader() {
-    final Map<String, Object> parameters = new HashMap<String, Object>();
+    final Map<String, Object> parameters = new HashMap<>();
     parameters.put("url", "jdbc:postgresql://localhost:5432/epsg");
     parameters.put("username", "epsg");
     parameters.put("password", "epsg");
@@ -229,7 +229,7 @@ public final class EpsgCoordinateSystemsLoader {
         value = normalizeValue(uomCode, value);
         Map<String, Object> parameters = coordinateOperationParamValues.get(code);
         if (parameters == null) {
-          parameters = new HashMap<String, Object>();
+          parameters = new HashMap<>();
           coordinateOperationParamValues.put(code, parameters);
         }
         String paramName = coordinateOperationParamNames.get(nameCode);

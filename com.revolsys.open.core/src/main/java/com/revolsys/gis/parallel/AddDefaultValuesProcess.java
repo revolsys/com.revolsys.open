@@ -61,7 +61,7 @@ public class AddDefaultValuesProcess extends AbstractInOutProcess<Record, Record
     } else {
       Map<String, Object> defaultValues = this.typeDefaultValues.get(type);
       if (defaultValues == null) {
-        defaultValues = new HashMap<String, Object>();
+        defaultValues = new HashMap<>();
         addDefaultValues(defaultValues, type);
         this.typeDefaultValues.put(type, defaultValues);
       }

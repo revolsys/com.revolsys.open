@@ -90,7 +90,7 @@ public class OS {
     if (file.exists()) {
       return Json.toMap(file);
     } else {
-      return new LinkedHashMap<String, Object>();
+      return new LinkedHashMap<>();
     }
   }
 

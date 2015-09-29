@@ -26,7 +26,7 @@ import com.revolsys.util.JexlUtil;
 
 public class CreateObjectsWithinDistanceOfGeometry extends BaseInOutProcess<Record, Record> {
 
-  private Map<String, Object> attributes = new HashMap<String, Object>();
+  private Map<String, Object> attributes = new HashMap<>();
 
   private double distance;
 
@@ -85,7 +85,7 @@ public class CreateObjectsWithinDistanceOfGeometry extends BaseInOutProcess<Reco
         Geometry geometry = record.getGeometry();
         if (geometry != null) {
           final JexlContext context = new HashMapContext();
-          final Map<String, Object> vars = new HashMap<String, Object>(this.attributes);
+          final Map<String, Object> vars = new HashMap<>(this.attributes);
           vars.putAll(record);
           vars.put("typePath", recordDefinition.getPath());
           context.setVars(vars);

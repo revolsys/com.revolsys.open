@@ -89,7 +89,7 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware, Di
 
   private List<String> importBeanNames = Collections.emptyList();
 
-  private Map<String, Object> parameters = new HashMap<String, Object>();
+  private Map<String, Object> parameters = new HashMap<>();
 
   private ResourceEditorRegistrar resourceEditorRegistrar = new ResourceEditorRegistrar();
 

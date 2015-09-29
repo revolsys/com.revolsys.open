@@ -13,7 +13,7 @@ import com.revolsys.ui.html.view.Element;
 
 public class PageInfo extends AbstractDocumentedObject {
 
-  private Map<String, Object> attributes = new LinkedHashMap<String, Object>();
+  private Map<String, Object> attributes = new LinkedHashMap<>();
 
   private List<MediaType> inputContentTypes = new ArrayList<MediaType>();
 

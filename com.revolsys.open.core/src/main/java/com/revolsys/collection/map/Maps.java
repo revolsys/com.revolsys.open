@@ -678,7 +678,7 @@ public class Maps {
 
   public static Map<String, Object> toMap(final Preferences preferences) {
     try {
-      final Map<String, Object> map = new HashMap<String, Object>();
+      final Map<String, Object> map = new HashMap<>();
       for (final String name : preferences.keys()) {
         final Object value = preferences.get(name, null);
         map.put(name, value);

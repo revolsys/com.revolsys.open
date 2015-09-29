@@ -54,7 +54,7 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
   public DelegatingRecordStoreHandler(final String label,
     final Map<String, ? extends Object> config) {
     this.label = label;
-    this.config = new HashMap<String, Object>(config);
+    this.config = new HashMap<>(config);
   }
 
   public DelegatingRecordStoreHandler(final String label, final RecordStore recordStore) {

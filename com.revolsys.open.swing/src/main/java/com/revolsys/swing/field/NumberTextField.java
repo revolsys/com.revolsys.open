@@ -5,7 +5,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.math.BigDecimal;
 
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -292,11 +291,8 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
   }
 
   @Override
-  public void setFieldValue(Object value) {
-    if (value == null) {
-      value = "";
-    }
-    if (SwingUtilities.isEventDispatchThread()) {
+  public void setFieldValue(final Object value) {
+    Invoke.later(() -> {
       final Object newValue = getTypedValue(value);
       final Object oldValue = getFieldValue();
       String newText;
@@ -324,9 +320,7 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
         validateField();
         this.support.setValue(newValue);
       }
-    } else {
-      Invoke.later(this, "setFieldValue", value);
-    }
+    });
   }
 
   public void setMaximumValue(final Number maximumValue) {

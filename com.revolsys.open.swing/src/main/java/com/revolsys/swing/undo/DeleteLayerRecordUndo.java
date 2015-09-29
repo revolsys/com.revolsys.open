@@ -17,7 +17,7 @@ public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
   public DeleteLayerRecordUndo(final LayerRecord record) {
     this.record = record;
     if (record != null) {
-      this.values = new HashMap<String, Object>(record);
+      this.values = new HashMap<>(record);
     }
   }
 

@@ -67,7 +67,7 @@ public class Form extends ElementContainer {
 
   private boolean posted = false;
 
-  private final Map<String, Object> savedParameters = new HashMap<String, Object>();
+  private final Map<String, Object> savedParameters = new HashMap<>();
 
   private String title;
 

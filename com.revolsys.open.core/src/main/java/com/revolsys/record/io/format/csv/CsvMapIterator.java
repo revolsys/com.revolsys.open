@@ -58,7 +58,7 @@ public class CsvMapIterator implements Iterator<Map<String, Object>> {
   }
 
   private Map<String, Object> parseMap(final List<String> record) {
-    final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    final Map<String, Object> map = new LinkedHashMap<>();
     for (int i = 0; i < this.fieldNames.size() && i < record.size(); i++) {
       final String fieldName = this.fieldNames.get(i);
       final String value = record.get(i);

@@ -481,7 +481,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
   }
 
   default Map<String, Object> getValueMap(final Collection<? extends CharSequence> fieldNames) {
-    final Map<String, Object> values = new HashMap<String, Object>();
+    final Map<String, Object> values = new HashMap<>();
     for (final CharSequence name : fieldNames) {
       final Object value = getValue(name);
       if (value != null) {

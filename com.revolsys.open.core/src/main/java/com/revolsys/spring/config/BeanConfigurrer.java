@@ -85,7 +85,7 @@ public class BeanConfigurrer
 
   private ApplicationContext applicationContext;
 
-  private final Map<String, Object> attributes = new LinkedHashMap<String, Object>();
+  private final Map<String, Object> attributes = new LinkedHashMap<>();
 
   private String beanName;
 
@@ -228,7 +228,7 @@ public class BeanConfigurrer
 
   protected void processPlaceholderAttributes(final ConfigurableListableBeanFactory beanFactory,
     final Map<String, Object> attributes) throws BeansException {
-    final Map<String, Object> attributeMap = new LinkedHashMap<String, Object>();
+    final Map<String, Object> attributeMap = new LinkedHashMap<>();
     for (final Entry<String, Object> entry : attributes.entrySet()) {
       final String key = entry.getKey();
       final Object value = entry.getValue();

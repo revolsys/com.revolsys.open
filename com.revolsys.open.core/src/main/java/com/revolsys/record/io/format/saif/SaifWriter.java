@@ -122,7 +122,7 @@ public class SaifWriter extends AbstractRecordWriter {
   protected void addExport(final String typePath, final String compositeType,
     final String objectSubset) {
     if (!this.exports.containsKey(typePath)) {
-      final Map<String, Object> export = new HashMap<String, Object>();
+      final Map<String, Object> export = new HashMap<>();
       this.exports.put(typePath, export);
       final String referenceId = getObjectIdentifier(typePath);
       export.put("referenceId", referenceId);

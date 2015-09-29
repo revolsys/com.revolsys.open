@@ -64,7 +64,7 @@ public class AttributesBeanConfigurer extends BeanConfigurrer {
   @Override
   public void postProcessBeanFactory(final ConfigurableListableBeanFactory beanFactory)
     throws BeansException {
-    final Map<String, Object> allAttributes = new LinkedHashMap<String, Object>();
+    final Map<String, Object> allAttributes = new LinkedHashMap<>();
     final Map<String, Object> threadAttributes = ThreadSharedAttributes.getAttributes();
     allAttributes.putAll(threadAttributes);
     processPlaceholderAttributes(beanFactory, threadAttributes);

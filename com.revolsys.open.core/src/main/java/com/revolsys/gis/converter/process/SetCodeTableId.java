@@ -25,7 +25,7 @@ public class SetCodeTableId extends AbstractSourceToTargetProcess<Record, Record
 
   @Override
   public void process(final Record source, final Record target) {
-    final Map<String, Object> codeTableValues = new HashMap<String, Object>();
+    final Map<String, Object> codeTableValues = new HashMap<>();
 
     for (final Entry<String, Converter<Record, Object>> entry : this.codeTableValueConverters
       .entrySet()) {

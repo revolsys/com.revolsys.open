@@ -40,7 +40,7 @@ public abstract class AbstractJdbcDatabaseFactory implements JdbcDatabaseFactory
   @Override
   public DataSource newDataSource(final Map<String, ? extends Object> config) {
     try {
-      final Map<String, Object> newConfig = new HashMap<String, Object>(config);
+      final Map<String, Object> newConfig = new HashMap<>(config);
       final String url = (String)newConfig.remove("url");
       final String username = (String)newConfig.remove("username");
       String password = (String)newConfig.remove("password");

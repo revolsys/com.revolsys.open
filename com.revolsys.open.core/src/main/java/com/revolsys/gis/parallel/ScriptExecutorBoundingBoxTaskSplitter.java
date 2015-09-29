@@ -12,9 +12,9 @@ import com.revolsys.record.Record;
 
 public class ScriptExecutorBoundingBoxTaskSplitter extends BoundingBoxTaskSplitter {
 
-  private Map<String, Object> attributes = new LinkedHashMap<String, Object>();
+  private Map<String, Object> attributes = new LinkedHashMap<>();
 
-  private Map<String, Object> beans = new LinkedHashMap<String, Object>();
+  private Map<String, Object> beans = new LinkedHashMap<>();
 
   private Map<String, ChannelInput<?>> inChannels = new LinkedHashMap<String, ChannelInput<?>>();
 

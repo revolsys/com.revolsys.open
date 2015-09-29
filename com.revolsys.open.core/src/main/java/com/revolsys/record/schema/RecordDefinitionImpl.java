@@ -780,7 +780,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   @Override
   public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    final Map<String, Object> map = new LinkedHashMap<>();
     map.put("type", "recordDefinition");
     final String path = getPath();
     map.put("path", path);

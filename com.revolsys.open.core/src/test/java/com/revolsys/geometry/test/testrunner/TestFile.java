@@ -116,7 +116,7 @@ public class TestFile extends TestSuite implements MapSerializer {
   }
 
   public Map<String, Object> getProperties() {
-    final Map<String, Object> properties = new LinkedHashMap<String, Object>();
+    final Map<String, Object> properties = new LinkedHashMap<>();
     MapSerializerUtil.add(properties, "geometryFactory", this.geometryFactory);
     return properties;
   }
@@ -162,7 +162,7 @@ public class TestFile extends TestSuite implements MapSerializer {
 
   @Override
   public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    final Map<String, Object> map = new LinkedHashMap<>();
     map.put("type", "test");
     MapSerializerUtil.add(map, "testDescription", this.testDescription);
 

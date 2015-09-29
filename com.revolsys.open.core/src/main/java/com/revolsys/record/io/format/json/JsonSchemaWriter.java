@@ -46,7 +46,7 @@ public class JsonSchemaWriter {
   }
 
   public Map<String, Object> toJsonMap(final Map<String, ?> map) {
-    final Map<String, Object> jsonMap = new LinkedHashMap<String, Object>();
+    final Map<String, Object> jsonMap = new LinkedHashMap<>();
     for (final Entry<String, ?> entry : map.entrySet()) {
       final String name = entry.getKey();
       final Object value = entry.getValue();
@@ -85,13 +85,13 @@ public class JsonSchemaWriter {
   }
 
   public void write(final RecordDefinition recordDefinition) {
-    final Map<String, Object> recordDefinitionMap = new LinkedHashMap<String, Object>();
+    final Map<String, Object> recordDefinitionMap = new LinkedHashMap<>();
     recordDefinitionMap.put("name", recordDefinition.getPath());
 
     final List<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
     recordDefinitionMap.put("fields", fields);
     for (final FieldDefinition attribute : recordDefinition.getFields()) {
-      final Map<String, Object> field = new LinkedHashMap<String, Object>();
+      final Map<String, Object> field = new LinkedHashMap<>();
       final String name = attribute.getName();
       field.put("name", name);
       final DataType dataType = attribute.getType();

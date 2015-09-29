@@ -11,7 +11,7 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.util.Property;
 
 public class FolderConnection implements MapSerializer {
-  private final Map<String, Object> config = new LinkedHashMap<String, Object>();
+  private final Map<String, Object> config = new LinkedHashMap<>();
 
   private File file;
 

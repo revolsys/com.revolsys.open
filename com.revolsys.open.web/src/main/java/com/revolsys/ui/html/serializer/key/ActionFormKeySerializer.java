@@ -84,7 +84,7 @@ public class ActionFormKeySerializer extends AbstractKeySerializer
     final String target, final String label, final Expression enabledExpression, final String name,
     String cssClass) {
     try {
-      final Map<String, Object> parameters = new HashMap<String, Object>();
+      final Map<String, Object> parameters = new HashMap<>();
       for (final String parameterName : parameterNames) {
         final Object value = Property.get(object, parameterName);
         parameters.put(parameterName, value);

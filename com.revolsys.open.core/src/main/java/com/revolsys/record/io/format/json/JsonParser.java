@@ -99,7 +99,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
     if (parser.getEvent() == EventType.startObject
       || parser.hasNext() && parser.next() == EventType.startObject) {
       EventType event = parser.getEvent();
-      final Map<String, Object> map = new LinkedHashMap<String, Object>();
+      final Map<String, Object> map = new LinkedHashMap<>();
       do {
         if (parser.hasNext() && parser.next() == EventType.string) {
           final String key = getString(parser);

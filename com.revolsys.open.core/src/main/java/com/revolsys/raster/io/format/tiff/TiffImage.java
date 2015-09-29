@@ -259,7 +259,7 @@ public class TiffImage extends JaiGeoreferencedImage {
           final Projection projection = getProjection(geoKeys);
           final Area area = null;
 
-          final Map<String, Object> parameters = new LinkedHashMap<String, Object>();
+          final Map<String, Object> parameters = new LinkedHashMap<>();
           addDoubleParameter(parameters, ProjectionParameterNames.STANDARD_PARALLEL_1, geoKeys,
             STANDARD_PARALLEL_1_KEY);
           addDoubleParameter(parameters, ProjectionParameterNames.STANDARD_PARALLEL_2, geoKeys,

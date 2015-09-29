@@ -31,8 +31,11 @@ public enum Side {
 
   private String name;
 
+  private String upperName;
+
   private Side(final String name) {
     this.name = name;
+    this.upperName = name.toUpperCase();
     this.letter = name.charAt(0);
   }
 
@@ -42,6 +45,10 @@ public enum Side {
 
   public String getName() {
     return this.name;
+  }
+
+  public String getUpperName() {
+    return this.upperName;
   }
 
   public boolean isLeft() {

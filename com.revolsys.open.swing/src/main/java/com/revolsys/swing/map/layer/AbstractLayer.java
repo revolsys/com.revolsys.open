@@ -1040,7 +1040,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   @SuppressWarnings("unchecked")
   @Override
   public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    final Map<String, Object> map = new LinkedHashMap<>();
     MapSerializerUtil.add(map, "type", this.type);
     MapSerializerUtil.add(map, "name", this.name);
     MapSerializerUtil.add(map, "visible", this.visible);

@@ -391,7 +391,7 @@ public final class JdbcUtils {
   }
 
   public static Map<String, Object> readMap(final ResultSet rs) throws SQLException {
-    final Map<String, Object> values = new LinkedHashMap<String, Object>();
+    final Map<String, Object> values = new LinkedHashMap<>();
     final ResultSetMetaData metaData = rs.getMetaData();
     for (int i = 1; i <= metaData.getColumnCount(); i++) {
       final String name = metaData.getColumnName(i);

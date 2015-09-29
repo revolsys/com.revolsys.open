@@ -555,7 +555,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
 
   @Override
   public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    final Map<String, Object> map = new LinkedHashMap<>();
     map.put("type", "field");
     map.put("name", getName());
     map.put("title", getTitle());

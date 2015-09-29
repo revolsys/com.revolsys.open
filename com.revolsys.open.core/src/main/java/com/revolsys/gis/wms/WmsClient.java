@@ -73,7 +73,7 @@ public class WmsClient {
   public URL getMapUrl(final List<String> layers, final List<String> styles, final String srid,
     final BoundingBox envelope, final String format, final int width, final int height) {
     final String version = getCapabilities().getVersion();
-    final Map<String, Object> parameters = new LinkedHashMap<String, Object>();
+    final Map<String, Object> parameters = new LinkedHashMap<>();
     if (version.equals("1.0.0")) {
       parameters.put(WmsParameters.WMTVER, version);
       parameters.put(WmsParameters.REQUEST, WmsParameterValues.MAP);
@@ -130,7 +130,7 @@ public class WmsClient {
   }
 
   public void loadCapabilities() {
-    final Map<String, Object> parameters = new LinkedHashMap<String, Object>();
+    final Map<String, Object> parameters = new LinkedHashMap<>();
     parameters.put(WmsParameters.SERVICE, WmsParameterValues.WMS);
     parameters.put(WmsParameters.REQUEST, WmsParameterValues.GET_CAPABILITIES);
     final String urlString = UrlUtil.getUrl(this.serviceUrl, parameters);

@@ -95,7 +95,7 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
     if (values == null) {
       return Collections.emptyMap();
     } else {
-      final Map<String, Object> map = new HashMap<String, Object>();
+      final Map<String, Object> map = new HashMap<>();
       for (int i = 0; i < values.size(); i++) {
         final String name = getValueFieldNames().get(i);
         final Object value = values.get(i);

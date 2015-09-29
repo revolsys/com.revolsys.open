@@ -288,7 +288,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends AbstractPro
 
   @Override
   public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    final Map<String, Object> map = new LinkedHashMap<>();
     MapSerializerUtil.add(map, "type", this.type);
     MapSerializerUtil.add(map, "name", this.name);
     MapSerializerUtil.add(map, "visible", this.visible);

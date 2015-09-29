@@ -279,7 +279,7 @@ public class MavenPom extends LinkedHashMap<String, Object> {
 
   public Map<String, Object> getProperties() {
     if (this.properties == null) {
-      this.properties = new LinkedHashMap<String, Object>();
+      this.properties = new LinkedHashMap<>();
       final MavenPom parentPom = getParentPom();
       if (parentPom != null) {
         final Map<String, Object> parentProperties = parentPom.getProperties();

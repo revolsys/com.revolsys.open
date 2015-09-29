@@ -246,7 +246,7 @@ public class GeometryOperationTest extends junit.framework.TestCase implements M
 
   @Override
   public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    final Map<String, Object> map = new LinkedHashMap<>();
     map.put("type", "test");
     MapSerializerUtil.add(map, "description", this.testDescription);
 

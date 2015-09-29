@@ -16,7 +16,7 @@ public class JdbcDataSourceFactoryBean extends AbstractFactoryBean<DataSource>
 
   private ApplicationContext applicationContext;
 
-  private Map<String, Object> config = new HashMap<String, Object>();
+  private Map<String, Object> config = new HashMap<>();
 
   private JdbcDatabaseFactory databaseFactory;
 
@@ -28,7 +28,7 @@ public class JdbcDataSourceFactoryBean extends AbstractFactoryBean<DataSource>
 
   @Override
   protected DataSource createInstance() throws Exception {
-    final Map<String, Object> config = new HashMap<String, Object>(this.config);
+    final Map<String, Object> config = new HashMap<>(this.config);
     config.put("url", this.url);
     config.put("username", this.username);
     config.put("password", this.password);

@@ -73,7 +73,7 @@ public class MapSerializerUtil {
         if (mapObject.isEmpty()) {
           return null;
         }
-        final Map<String, Object> map = new LinkedHashMap<String, Object>();
+        final Map<String, Object> map = new LinkedHashMap<>();
         for (final Entry<String, Object> entry : mapObject.entrySet()) {
           final String name = entry.getKey();
           final Object object = entry.getValue();

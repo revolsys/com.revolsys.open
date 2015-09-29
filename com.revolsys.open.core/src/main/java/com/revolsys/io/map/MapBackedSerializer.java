@@ -9,11 +9,11 @@ import com.revolsys.collection.map.DelegatingMap;
 
 public class MapBackedSerializer extends DelegatingMap<String, Object>implements MapSerializer {
   public static MapBackedSerializer hash() {
-    return new MapBackedSerializer(new HashMap<String, Object>());
+    return new MapBackedSerializer(new HashMap<>());
   }
 
   public static MapBackedSerializer linked() {
-    return new MapBackedSerializer(new LinkedHashMap<String, Object>());
+    return new MapBackedSerializer(new LinkedHashMap<>());
   }
 
   public static MapBackedSerializer tree() {

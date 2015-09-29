@@ -31,7 +31,7 @@ import com.revolsys.util.Property;
 public class Json extends AbstractIoFactory implements MapReaderFactory, MapWriterFactory {
   public static Map<String, Object> toMap(final File file) {
     if (file == null) {
-      return new LinkedHashMap<String, Object>();
+      return new LinkedHashMap<>();
     } else {
       final FileSystemResource resource = new FileSystemResource(file);
       return toMap(resource);
@@ -40,21 +40,21 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
 
   public static Map<String, Object> toMap(final File directory, final String path) {
     if (directory == null || path == null) {
-      return new LinkedHashMap<String, Object>();
+      return new LinkedHashMap<>();
     } else {
       final File file = FileUtil.getFile(directory, path);
       if (file.exists() && !file.isDirectory()) {
         final FileSystemResource resource = new FileSystemResource(file);
         return toMap(resource);
       } else {
-        return new LinkedHashMap<String, Object>();
+        return new LinkedHashMap<>();
       }
     }
   }
 
   public static Map<String, Object> toMap(final InputStream in) {
     if (in == null) {
-      return new LinkedHashMap<String, Object>();
+      return new LinkedHashMap<>();
     } else {
       try {
         final java.io.Reader reader = FileUtil.createUtf8Reader(in);
@@ -74,14 +74,14 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
 
   public static Map<String, Object> toMap(final Path directory, final String path) {
     if (directory == null || path == null) {
-      return new LinkedHashMap<String, Object>();
+      return new LinkedHashMap<>();
     } else {
       final Path file = directory.resolve(path);
       if (Paths.exists(file) && !Files.isDirectory(file)) {
         final PathResource resource = new PathResource(file);
         return toMap(resource);
       } else {
-        return new LinkedHashMap<String, Object>();
+        return new LinkedHashMap<>();
       }
     }
   }
@@ -91,7 +91,7 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
       final InputStream in = resource.getInputStream();
       return toMap(in);
     } else {
-      return new LinkedHashMap<String, Object>();
+      return new LinkedHashMap<>();
     }
   }
 

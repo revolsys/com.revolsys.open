@@ -26,7 +26,6 @@ public interface GeoreferencedImage
   extends GeometryFactoryProxy, MapSerializer, PropertyChangeListener {
   static double[] calculateLSM(final BoundingBox boundingBox, final int imageWidth,
     final int imageHeight, final List<MappedLocation> mappings) {
-
     final Matrix A = getAMatrix(mappings, imageHeight);
 
     final Matrix X = getXMatrix(boundingBox, imageWidth, imageHeight, mappings);
@@ -176,6 +175,7 @@ public interface GeoreferencedImage
             }
           }
         } catch (final Throwable e) {
+          e.printStackTrace();
         } finally {
           graphics.setTransform(transform);
         }

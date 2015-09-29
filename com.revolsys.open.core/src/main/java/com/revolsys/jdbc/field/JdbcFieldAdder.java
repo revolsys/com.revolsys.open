@@ -89,7 +89,7 @@ public class JdbcFieldAdder {
     synchronized (tableProperties) {
       Map<String, Object> properties = tableProperties.get(typePath);
       if (properties == null) {
-        properties = new HashMap<String, Object>();
+        properties = new HashMap<>();
         tableProperties.put(typePath, properties);
       }
       return properties;
@@ -130,7 +130,7 @@ public class JdbcFieldAdder {
       }
       Map<String, Object> columnProperties = typeColumnMap.get(columnName);
       if (columnProperties == null) {
-        columnProperties = new HashMap<String, Object>();
+        columnProperties = new HashMap<>();
         typeColumnMap.put(columnName, columnProperties);
       }
       columnProperties.put(propertyName, propertyValue);

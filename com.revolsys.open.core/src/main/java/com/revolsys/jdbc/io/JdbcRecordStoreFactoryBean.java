@@ -17,11 +17,11 @@ public class JdbcRecordStoreFactoryBean extends AbstractFactoryBean<JdbcRecordSt
 
   private ApplicationContext applicationContext;
 
-  private Map<String, Object> config = new LinkedHashMap<String, Object>();
+  private Map<String, Object> config = new LinkedHashMap<>();
 
   private DataSource dataSource;
 
-  private Map<String, Object> properties = new LinkedHashMap<String, Object>();
+  private Map<String, Object> properties = new LinkedHashMap<>();
 
   @Override
   protected JdbcRecordStore createInstance() throws Exception {

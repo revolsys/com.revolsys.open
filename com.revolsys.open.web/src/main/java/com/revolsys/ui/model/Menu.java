@@ -34,9 +34,9 @@ public class Menu implements Cloneable, BeanNameAware {
 
   private String onClick;
 
-  private Map<String, Object> parameters = new HashMap<String, Object>();
+  private Map<String, Object> parameters = new HashMap<>();
 
-  private final Map<String, Object> staticParameters = new HashMap<String, Object>();
+  private final Map<String, Object> staticParameters = new HashMap<>();
 
   private String target;
 
@@ -178,7 +178,7 @@ public class Menu implements Cloneable, BeanNameAware {
 
       Map<String, Object> params;
       if (context != null) {
-        params = new HashMap<String, Object>(this.staticParameters);
+        params = new HashMap<>(this.staticParameters);
         for (final Entry<String, Expression> param : this.dynamicParameters.entrySet()) {
           final String key = param.getKey();
           final Expression expression = param.getValue();

@@ -587,7 +587,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
   public int openFile(int index, final URL url) {
     final String urlString = url.toString();
-    final Map<String, Object> properties = new HashMap<String, Object>();
+    final Map<String, Object> properties = new HashMap<>();
     properties.put("url", urlString);
     String name = FileUtil.getFileName(urlString);
     name = FileUtil.fromSafeName(name);

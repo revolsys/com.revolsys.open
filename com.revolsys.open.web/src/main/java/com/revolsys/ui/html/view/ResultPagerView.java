@@ -21,7 +21,7 @@ public class ResultPagerView extends Element {
   private final ResultPager<?> pager;
 
   /** The parameters to include in the URLs. */
-  private final Map<String, Object> parameters = new HashMap<String, Object>();
+  private final Map<String, Object> parameters = new HashMap<>();
 
   /**
    * Construct a new ResultPagerView.

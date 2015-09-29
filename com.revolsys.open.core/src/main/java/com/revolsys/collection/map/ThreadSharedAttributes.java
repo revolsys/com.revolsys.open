@@ -36,7 +36,7 @@ public class ThreadSharedAttributes {
   public static Map<String, Object> getAttributes() {
     final Map<Object, Object> attributes = getLocalAttributes();
     synchronized (attributes) {
-      final HashMap<String, Object> map = new HashMap<String, Object>();
+      final HashMap<String, Object> map = new HashMap<>();
       for (final Entry<Object, Object> entry : attributes.entrySet()) {
         final Object key = entry.getKey();
         if (key instanceof String) {

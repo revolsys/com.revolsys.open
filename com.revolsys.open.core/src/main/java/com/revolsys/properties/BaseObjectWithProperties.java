@@ -6,7 +6,7 @@ import java.util.Map;
 import javax.annotation.PreDestroy;
 
 public class BaseObjectWithProperties implements ObjectWithProperties {
-  private final Map<String, Object> properties = new LinkedHashMap<String, Object>();
+  private final Map<String, Object> properties = new LinkedHashMap<>();
 
   public BaseObjectWithProperties() {
   }

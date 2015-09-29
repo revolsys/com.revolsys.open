@@ -53,7 +53,7 @@ public class HttpServletRequestJexlContext implements JexlContext {
   private Map<String, Object> getAttributes() {
     Map<String, Object> attributes = this.localAttributes.get();
     if (attributes == null) {
-      attributes = new HashMap<String, Object>();
+      attributes = new HashMap<>();
       this.localAttributes.set(attributes);
     }
     return attributes;
@@ -73,7 +73,7 @@ public class HttpServletRequestJexlContext implements JexlContext {
       @SuppressWarnings("unchecked")
       public Set<Entry<String, Object>> entrySet() {
         final HttpServletRequest request = getRequest();
-        final Map<String, Object> map = new HashMap<String, Object>();
+        final Map<String, Object> map = new HashMap<>();
         map.putAll(request.getParameterMap());
         for (final Enumeration<String> names = request.getAttributeNames(); names
           .hasMoreElements();) {

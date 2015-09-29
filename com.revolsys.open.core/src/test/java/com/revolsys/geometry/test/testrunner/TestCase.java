@@ -168,14 +168,14 @@ public class TestCase extends junit.framework.TestSuite implements MapSerializer
 
   @Override
   public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    final Map<String, Object> map = new LinkedHashMap<>();
     map.put("type", "test");
 
     if (Property.hasValue(this.testDescription)) {
       map.put("description", this.testDescription);
     }
     MapSerializerUtil.add(map, "geometryFactory", this.geometryFactory);
-    final Map<String, Object> properties = new LinkedHashMap<String, Object>();
+    final Map<String, Object> properties = new LinkedHashMap<>();
     if (this.testFile != null) {
       MapSerializerUtil.addAll(properties, this.testFile.getProperties());
     }

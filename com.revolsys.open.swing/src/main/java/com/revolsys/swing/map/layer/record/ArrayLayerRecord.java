@@ -276,7 +276,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
             }
           } else {
             if (this.originalValues == null) {
-              this.originalValues = new HashMap<String, Object>();
+              this.originalValues = new HashMap<>();
             }
             this.originalValues.put(fieldName, originalValue);
           }

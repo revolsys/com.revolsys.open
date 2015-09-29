@@ -341,7 +341,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (geometry != null) {
       final RecordDefinition recordDefinition = getRecordDefinition();
       final String geometryFieldName = recordDefinition.getGeometryFieldName();
-      final Map<String, Object> parameters = new HashMap<String, Object>();
+      final Map<String, Object> parameters = new HashMap<>();
       parameters.put(geometryFieldName, geometry);
       showAddForm(parameters);
     }

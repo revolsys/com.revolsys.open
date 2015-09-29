@@ -312,7 +312,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final String pageName, Map<String, Object> parameters) {
     final HtmlUiBuilder<?> builder = getBuilder(builderName);
     if (builder != null) {
-      parameters = new HashMap<String, Object>(parameters);
+      parameters = new HashMap<>(parameters);
       parameters.put("deferLoading", 0);
       parameters.put("tabbed", true);
       parameters.put("scrollYPercent", 1);
@@ -335,7 +335,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final Map<String, ? extends Object> parameters) {
     final String pageUrl = getPageUrl(pageName);
     if (Property.hasValue(pageUrl)) {
-      final Map<String, Object> params = new HashMap<String, Object>();
+      final Map<String, Object> params = new HashMap<>();
       params.putAll(parameters);
       params.put("ajaxSource", pageUrl.replaceAll("/+$", ".json"));
       final List<T> rows = Collections.emptyList();
@@ -349,7 +349,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public ElementContainer createDataTable(final HttpServletRequest request, final String pageName,
     Map<String, ? extends Object> parameters, final Collection<? extends Object> rows) {
-    parameters = new HashMap<String, Object>(parameters);
+    parameters = new HashMap<>(parameters);
     final List<KeySerializer> serializers = getSerializers(pageName, "list");
     final RowsTableSerializer model = new KeySerializerTableSerializer(serializers, rows);
     final String typeName = getTypeName();
@@ -359,7 +359,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     tableView.setId(tableId);
     tableView.setNoRecordsMessgae(null);
 
-    final Map<String, Object> tableParams = new LinkedHashMap<String, Object>();
+    final Map<String, Object> tableParams = new LinkedHashMap<>();
     tableParams.put("stateSave", true);
     tableParams.put("autoWidth", true);
     tableParams.put("dom", Maps.getString(parameters, "dom", "frtiS"));
@@ -398,7 +398,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final List<Map<String, Object>> columnDefs = new ArrayList<Map<String, Object>>();
     int i = 0;
     for (final KeySerializer serializer : serializers) {
-      final Map<String, Object> columnDef = new LinkedHashMap<String, Object>();
+      final Map<String, Object> columnDef = new LinkedHashMap<>();
       columnDef.put("targets", Arrays.asList(i));
       columnDef.put("name", serializer.getKey());
       columnDef.put("className", serializer.getKey().replaceAll("[^A-Za-z0-9]", "_"));
@@ -471,13 +471,13 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public Object createDataTableHandler(final HttpServletRequest request, final String pageName,
     final Callable<Collection<? extends Object>> rowsCallable) {
-    final Map<String, Object> parameters = new HashMap<String, Object>();
+    final Map<String, Object> parameters = new HashMap<>();
     return createDataTableHandler(request, pageName, parameters, rowsCallable);
   }
 
   public Object createDataTableHandler(final HttpServletRequest request, final String pageName,
     final Collection<? extends Object> rows) {
-    final Map<String, Object> parameters = new HashMap<String, Object>();
+    final Map<String, Object> parameters = new HashMap<>();
     return createDataTableHandler(request, pageName, parameters, rows);
   }
 
@@ -568,7 +568,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       rows.add(row);
     }
 
-    final Map<String, Object> response = new LinkedHashMap<String, Object>();
+    final Map<String, Object> response = new LinkedHashMap<>();
     response.put("data", rows);
     return response;
 
@@ -608,7 +608,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         rows.add(row);
       }
     }
-    final Map<String, Object> response = new LinkedHashMap<String, Object>();
+    final Map<String, Object> response = new LinkedHashMap<>();
     response.put("draw", HttpServletUtils.getIntegerParameter(request, "draw"));
     response.put("recordsTotal", numRecords);
     response.put("recordsFiltered", numRecords);
@@ -670,7 +670,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     // "No permission to edit " + getTypeName() + " #" + getId());
     // return null;
     // }
-    final Map<String, Object> parameters = new HashMap<String, Object>();
+    final Map<String, Object> parameters = new HashMap<>();
 
     final String pageName = getName(prefix, "add");
     final Set<String> parameterNamesToSave = new HashSet<String>();
@@ -736,7 +736,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
           updateObject(object);
           postUpdate(object);
 
-          final Map<String, Object> parameters = new HashMap<String, Object>();
+          final Map<String, Object> parameters = new HashMap<>();
           // Get after object has changed
           final Object id = Property.get(object, getIdPropertyName());
           parameters.put(getIdParameterName(), id);
@@ -1309,7 +1309,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public void redirectAfterCommit(String url) {
-    final Map<String, Object> parameters = new HashMap<String, Object>();
+    final Map<String, Object> parameters = new HashMap<>();
     final HttpServletRequest request = HttpServletUtils.getRequest();
     for (final String parameterName : Arrays.asList("plain", "htmlCss")) {
       final String value = request.getParameter(parameterName);
@@ -1456,7 +1456,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public void serializeLink(final XmlWriter out, final Object object, final String key,
     final String pageName) {
-    final Map<String, Object> parameters = new HashMap<String, Object>();
+    final Map<String, Object> parameters = new HashMap<>();
     final Object id = getIdValue(object);
     parameters.put(this.idParameterName, id);
     parameters.put(key, getProperty(object, key));
@@ -1474,7 +1474,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public void serializeLink(final XmlWriter out, final Object object, final String key,
     final String pageName, final Map<String, String> parameterKeys) {
-    final Map<String, Object> parameters = new HashMap<String, Object>();
+    final Map<String, Object> parameters = new HashMap<>();
     if (parameterKeys.isEmpty()) {
       final Object id = getIdValue(object);
       parameters.put(this.idParameterName, id);

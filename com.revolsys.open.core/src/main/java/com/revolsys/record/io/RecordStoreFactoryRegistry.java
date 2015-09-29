@@ -139,7 +139,7 @@ public class RecordStoreFactoryRegistry {
     if (factory == null) {
       throw new IllegalArgumentException("Record Store Factory not found for " + url);
     } else {
-      final Map<String, Object> connectionProperties = new HashMap<String, Object>();
+      final Map<String, Object> connectionProperties = new HashMap<>();
       connectionProperties.put("url", url);
       return (T)factory.newRecordStore(connectionProperties);
     }
@@ -152,7 +152,7 @@ public class RecordStoreFactoryRegistry {
     if (factory == null) {
       throw new IllegalArgumentException("Record Store Factory not found for " + url);
     } else {
-      final Map<String, Object> connectionProperties = new HashMap<String, Object>();
+      final Map<String, Object> connectionProperties = new HashMap<>();
       connectionProperties.put("url", url);
       connectionProperties.put("username", username);
       connectionProperties.put("password", password);

@@ -231,7 +231,7 @@ public class Page extends Component {
   }
 
   public String getFullUrl(final Map<String, ? extends Object> parameters) {
-    final Map<String, Object> uriParameters = new HashMap<String, Object>(parameters);
+    final Map<String, Object> uriParameters = new HashMap<>(parameters);
     final HttpServletRequest request = HttpServletUtils.getRequest();
     if (request != null) {
 
@@ -350,7 +350,7 @@ public class Page extends Component {
   public Map<String, Object> getUriTemplateVariables(final Map<String, Object> parameters) {
     final HttpServletRequest request = HttpServletUtils.getRequest();
     final Map<String, String> pathVariables = HttpServletUtils.getPathVariables();
-    final Map<String, Object> uriTemplateVariables = new HashMap<String, Object>();
+    final Map<String, Object> uriTemplateVariables = new HashMap<>();
 
     for (final String name : this.uriTemplate.getVariableNames()) {
       Object value = parameters.remove(name);

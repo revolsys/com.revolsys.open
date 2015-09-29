@@ -282,7 +282,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     if (this.recordStore != null) {
       final Map<String, String> connectionProperties = getProperty("connection");
       if (connectionProperties != null) {
-        final Map<String, Object> config = new HashMap<String, Object>();
+        final Map<String, Object> config = new HashMap<>();
         config.put("connection", connectionProperties);
         RecordStoreConnectionManager.releaseRecordStore(config);
       }
@@ -311,7 +311,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
             + getPath());
         return false;
       } else {
-        final Map<String, Object> config = new HashMap<String, Object>();
+        final Map<String, Object> config = new HashMap<>();
         config.put("connection", connectionProperties);
         recordStore = RecordStoreConnectionManager.getRecordStore(config);
 

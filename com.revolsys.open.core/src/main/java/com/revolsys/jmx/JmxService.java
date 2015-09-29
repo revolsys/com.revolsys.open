@@ -415,7 +415,7 @@ public class JmxService {
   public void writeAttribute(final MapWriter mapWriter, final String serverId,
     final String objectId, final String attributeId, final Object value) {
 
-    final Map<String, Object> attributeMap = new LinkedHashMap<String, Object>();
+    final Map<String, Object> attributeMap = new LinkedHashMap<>();
     attributeMap.put("serverId", serverId);
     attributeMap.put("objectId", objectId);
     attributeMap.put("attributeId", attributeId);
@@ -475,7 +475,7 @@ public class JmxService {
   public void writeOperation(final MapWriter mapWriter, final String serverId,
     final String objectId, final MBeanOperationInfo operation, final Object returnValue) {
 
-    final Map<String, Object> attributeMap = new LinkedHashMap<String, Object>();
+    final Map<String, Object> attributeMap = new LinkedHashMap<>();
     attributeMap.put("serverId", serverId);
     attributeMap.put("objectId", objectId);
     attributeMap.put("operationId", operation.getName());

@@ -110,7 +110,7 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   public static Map<String, Object> toObjectMap(final String businessApplicationParameters) {
-    final HashMap<String, Object> map = new LinkedHashMap<String, Object>();
+    final HashMap<String, Object> map = new LinkedHashMap<>();
     final CsvIterator iterator = new CsvIterator(new StringReader(businessApplicationParameters));
     if (iterator.hasNext()) {
       final List<String> keys = iterator.next();

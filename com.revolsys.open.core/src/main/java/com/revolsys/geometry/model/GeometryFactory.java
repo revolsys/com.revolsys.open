@@ -1598,7 +1598,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   @Override
   public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    final Map<String, Object> map = new LinkedHashMap<>();
     map.put("type", "geometryFactory");
     map.put("srid", getCoordinateSystemId());
     map.put("axisCount", getAxisCount());

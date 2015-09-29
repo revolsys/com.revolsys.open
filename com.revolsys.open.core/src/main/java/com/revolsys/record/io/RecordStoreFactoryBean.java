@@ -10,9 +10,9 @@ import com.revolsys.util.Property;
 
 public class RecordStoreFactoryBean extends AbstractFactoryBean<RecordStore> {
 
-  private Map<String, Object> config = new LinkedHashMap<String, Object>();
+  private Map<String, Object> config = new LinkedHashMap<>();
 
-  private Map<String, Object> properties = new LinkedHashMap<String, Object>();
+  private Map<String, Object> properties = new LinkedHashMap<>();
 
   @Override
   protected RecordStore createInstance() throws Exception {

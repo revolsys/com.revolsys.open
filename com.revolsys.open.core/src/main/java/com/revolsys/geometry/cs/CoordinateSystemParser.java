@@ -79,7 +79,7 @@ public class CoordinateSystemParser {
           final String unitName = fields[5];
           final double conversionFactor = Double.parseDouble(fields[6]);
 
-          final Map<String, Object> parameters = new LinkedHashMap<String, Object>();
+          final Map<String, Object> parameters = new LinkedHashMap<>();
           for (final String param : parameterString.substring(1, parameterString.length() - 1)
             .split(",")) {
             final String[] paramValues = param.split("=");

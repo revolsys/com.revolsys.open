@@ -38,7 +38,7 @@ public class SqlLayerFilter implements Predicate<Record>, MapSerializer {
           this.initialized = true;
           try {
             final Properties properties = System.getProperties();
-            final HashMap<String, Object> uriVariables = new HashMap<String, Object>();
+            final HashMap<String, Object> uriVariables = new HashMap<>();
             for (final Entry<Object, Object> entry : properties.entrySet()) {
               final String key = (String)entry.getKey();
               final Object value = entry.getValue();
@@ -78,7 +78,7 @@ public class SqlLayerFilter implements Predicate<Record>, MapSerializer {
 
   @Override
   public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    final Map<String, Object> map = new LinkedHashMap<>();
     map.put("type", "sqlFilter");
     map.put("query", this.query);
     return map;

@@ -34,7 +34,7 @@ import com.revolsys.util.JexlUtil;
 public class ScriptExecutorProcess extends BaseInProcess<Record>implements BeanFactoryAware {
   private static final Logger LOG = LoggerFactory.getLogger(ScriptExecutorProcess.class);
 
-  private final Map<String, Object> attributes = new HashMap<String, Object>();
+  private final Map<String, Object> attributes = new HashMap<>();
 
   private ExecutorService executor;
 
@@ -70,10 +70,10 @@ public class ScriptExecutorProcess extends BaseInProcess<Record>implements BeanF
   private void executeScript(final Record record) {
     try {
       final JexlContext context = new HashMapContext();
-      final Map<String, Object> vars = new HashMap<String, Object>(this.attributes);
+      final Map<String, Object> vars = new HashMap<>(this.attributes);
       vars.putAll(record);
       context.setVars(vars);
-      final Map<String, Object> scriptParams = new HashMap<String, Object>();
+      final Map<String, Object> scriptParams = new HashMap<>();
       scriptParams.putAll(this.attributes);
       for (final Entry<String, Expression> param : this.expressions.entrySet()) {
         final String key = param.getKey();

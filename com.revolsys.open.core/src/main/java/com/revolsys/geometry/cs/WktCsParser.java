@@ -241,7 +241,7 @@ public class WktCsParser {
     final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)values
       .get(index++);
     Projection projection = null;
-    final Map<String, Object> parameters = new HashMap<String, Object>();
+    final Map<String, Object> parameters = new HashMap<>();
 
     LinearUnit linearUnit = null;
     final List<Axis> axis = new ArrayList<Axis>();

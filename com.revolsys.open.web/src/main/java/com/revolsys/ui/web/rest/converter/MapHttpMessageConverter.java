@@ -36,7 +36,7 @@ public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
   public Map read(final Class<? extends Map> clazz, final HttpInputMessage inputMessage)
     throws IOException, HttpMessageNotReadableException {
     try {
-      final Map<String, Object> map = new HashMap<String, Object>();
+      final Map<String, Object> map = new HashMap<>();
       final InputStream in = inputMessage.getBody();
       final Map<String, Object> readMap = JsonParser.read(in);
       if (readMap != null) {

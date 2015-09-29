@@ -137,7 +137,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
   private final ThreadLocal<Boolean> fieldValidationDisabled = new ThreadLocal<Boolean>();
 
-  private final Map<String, Object> fieldValues = new HashMap<String, Object>();
+  private final Map<String, Object> fieldValues = new HashMap<>();
 
   private final Map<String, List<String>> fieldWarnings = new HashMap<>();
 
@@ -998,7 +998,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   }
 
   public Map<String, Object> getValues() {
-    final Map<String, Object> values = new LinkedHashMap<String, Object>();
+    final Map<String, Object> values = new LinkedHashMap<>();
     if (this.record != null) {
       values.putAll(this.record);
     }
