@@ -17,7 +17,6 @@ import java.util.List;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler.TransferSupport;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
@@ -627,11 +626,7 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
 
   @Override
   public final void propertyChange(final PropertyChangeEvent e) {
-    if (SwingUtilities.isEventDispatchThread()) {
-      doPropertyChange(e);
-    } else {
-      Invoke.later(this, "propertyChange", e);
-    }
+    Invoke.later(() -> doPropertyChange(e));
   }
 
   public boolean removeChild(final Object child) {

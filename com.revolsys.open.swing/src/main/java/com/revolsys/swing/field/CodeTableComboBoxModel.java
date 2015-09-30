@@ -10,7 +10,6 @@ import javax.swing.ComboBoxModel;
 
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
-import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
@@ -101,11 +100,7 @@ public class CodeTableComboBoxModel extends AbstractListModel<Object>
   public void propertyChange(final PropertyChangeEvent event) {
     if (event.getPropertyName().equals("valuesChanged")) {
       final int size = getSize();
-      if (SwingUtil.isEventDispatchThread()) {
-        fireContentsChanged(this, 0, size);
-      } else {
-        Invoke.later(this, "fireContentsChanged", this, 0, size);
-      }
+      Invoke.later(() -> fireContentsChanged(this, 0, size));
     }
   }
 

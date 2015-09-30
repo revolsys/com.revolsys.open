@@ -107,7 +107,7 @@ public class SelectMapScale extends JComboBox
 
         if (scale > 0 && !Double.isInfinite(scale) && !Double.isNaN(scale)) {
           if (currentScale != newValue.doubleValue()) {
-            Invoke.later(this, "setSelectedItem", scale);
+            Invoke.later(() -> setSelectedItem(scale));
           }
         }
       }

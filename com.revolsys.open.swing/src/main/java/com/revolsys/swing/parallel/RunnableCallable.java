@@ -1,8 +1,6 @@
-package com.revolsys.beans;
+package com.revolsys.swing.parallel;
 
 import java.util.concurrent.Callable;
-
-import javax.swing.SwingUtilities;
 
 import com.revolsys.parallel.AbstractRunnable;
 import com.revolsys.util.ExceptionUtil;
@@ -16,17 +14,6 @@ import com.revolsys.util.ExceptionUtil;
  * @param <T> The type of the result.
  */
 public class RunnableCallable<T> extends AbstractRunnable {
-
-  public static <V> V invokeAndWait(final Callable<V> callable) {
-    final RunnableCallable<V> runnable = new RunnableCallable<V>(callable);
-    try {
-      SwingUtilities.invokeAndWait(runnable);
-    } catch (final Throwable e) {
-      ExceptionUtil.throwUncheckedException(e);
-    }
-    return runnable.getResult();
-  }
-
   /** The callable to invoke. */
   private final Callable<T> callable;
 

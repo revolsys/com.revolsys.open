@@ -17,6 +17,7 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.util.ExceptionUtil;
 
 public class SinglePage extends Viewport2D implements Pageable, Printable {
 
@@ -41,7 +42,13 @@ public class SinglePage extends Viewport2D implements Pageable, Printable {
     job.setPageable(pageable);
     final boolean doPrint = job.printDialog();
     if (doPrint) {
-      Invoke.background("Print", job, "print");
+      Invoke.background("Print", () -> {
+        try {
+          job.print();
+        } catch (final Exception e) {
+          ExceptionUtil.log(SinglePage.class, "Unable to print", e);
+        }
+      });
     }
   }
 

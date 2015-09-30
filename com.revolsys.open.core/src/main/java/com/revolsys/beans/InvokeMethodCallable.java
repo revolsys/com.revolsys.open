@@ -15,14 +15,6 @@ import com.revolsys.util.Property;
  * @author Paul Austin
  */
 public class InvokeMethodCallable<T> implements Callable<T> {
-
-  public static <V> V invokeAndWait(final Object object, final String methodName,
-    final Object... parameters) {
-    final InvokeMethodCallable<V> callable = new InvokeMethodCallable<V>(object, methodName,
-      parameters);
-    return RunnableCallable.invokeAndWait(callable);
-  }
-
   /** The name of the method to invoke. */
   private final String methodName;
 

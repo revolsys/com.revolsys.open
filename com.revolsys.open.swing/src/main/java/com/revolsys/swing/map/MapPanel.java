@@ -27,7 +27,6 @@ import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.undo.UndoableEdit;
 
@@ -47,7 +46,7 @@ import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.listener.EnableComponentListener;
-import com.revolsys.swing.listener.InvokeMethodSelectedItemListener;
+import com.revolsys.swing.listener.ConsumerSelectedItemListener;
 import com.revolsys.swing.map.border.FullSizeLayoutManager;
 import com.revolsys.swing.map.border.MapRulerBorder;
 import com.revolsys.swing.map.component.MapPointerLocation;
@@ -105,7 +104,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     }
   }
 
-  private ComboBox baseMapLayerField;
+  private ComboBox<Layer> baseMapLayerField;
 
   private LayerGroup baseMapLayers;
 
@@ -253,10 +252,9 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
     final LayerGroupListModel baseMapLayersModel = new LayerGroupListModel(this.baseMapLayers,
       true);
-    this.baseMapLayerField = new ComboBox(baseMapLayersModel);
+    this.baseMapLayerField = new ComboBox<Layer>(baseMapLayersModel);
     this.baseMapLayerField.setMaximumSize(new Dimension(200, 22));
-    this.baseMapLayerField
-      .addItemListener(new InvokeMethodSelectedItemListener(this, "setBaseMapLayer"));
+    ConsumerSelectedItemListener.addItemListener(this.baseMapLayerField, this::setBaseMapLayer);
     if (this.baseMapLayers.getLayerCount() > 0) {
       this.baseMapLayerField.setSelectedIndex(1);
     }
@@ -884,15 +882,10 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     }
   }
 
-  public void setToolTipText(final Point2D location, CharSequence text) {
-    if (text == null) {
-      text = "";
-    }
-    if (SwingUtilities.isEventDispatchThread()) {
+  public void setToolTipText(final Point2D location, final CharSequence text) {
+    Invoke.later(() -> {
       this.toolTipOverlay.setText(location, text);
-    } else {
-      Invoke.later(this.toolTipOverlay, "setText", location, text);
-    }
+    });
   }
 
   public void setUnitsPerPixel(final double unitsPerPixel) {

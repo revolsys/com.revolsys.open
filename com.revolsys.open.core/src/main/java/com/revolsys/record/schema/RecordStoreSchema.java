@@ -105,7 +105,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
           if (schemaPath.equals(path)) {
             return (V)this;
           } else {
-            if (schemaPath.isAncestorOf(path)) {
+            if (schemaPath.isParentOf(path)) {
               childElement = this.elementsByPath.get(path);
               if (childElement == null) {
                 synchronized (this) {
@@ -126,6 +126,12 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
                 return null;
               } else {
                 return (V)childElement;
+              }
+            } else if (schemaPath.isAncestorOf(path)) {
+              final PathName childPath = schemaPath.getChild(path);
+              final RecordStoreSchema schema = getSchema(childPath);
+              if (schema != null) {
+                return schema.getElement(path);
               }
             } else {
               final RecordStoreSchema parent = getSchema();

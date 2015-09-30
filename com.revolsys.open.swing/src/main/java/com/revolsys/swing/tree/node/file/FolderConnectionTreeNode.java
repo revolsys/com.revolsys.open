@@ -9,11 +9,10 @@ import javax.swing.JOptionPane;
 import com.revolsys.io.Paths;
 import com.revolsys.io.file.FolderConnection;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.TreeNodeAction;
 import com.revolsys.swing.tree.TreeNodePropertyEnableCheck;
-import com.revolsys.swing.tree.TreeNodeRunnable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.util.UrlProxy;
@@ -23,13 +22,11 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements UrlPro
   private static final MenuFactory MENU = new MenuFactory("Folder Connection");
 
   static {
-    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh", "arrow_refresh",
-      NODE_EXISTS, "refresh");
-    MENU.addMenuItem("default", refresh);
+    addRefreshMenuItem(MENU);
 
     final EnableCheck readOnly = new TreeNodePropertyEnableCheck("readOnly", false);
-    MENU.addMenuItem("default", TreeNodeRunnable.createAction("Delete Folder Connection", "delete",
-      readOnly, "deleteConnection"));
+    TreeNodeAction.addMenuItem(MENU, "default", "Delete Folder Connection", "delete", readOnly,
+      FolderConnectionTreeNode::deleteConnection);
   }
 
   public FolderConnectionTreeNode(final FolderConnection connection) {
@@ -39,7 +36,7 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements UrlPro
     setIcon(PathTreeNode.ICON_FOLDER_LINK);
   }
 
-  public void deleteConnection() {
+  private void deleteConnection() {
     final FolderConnection connection = getConnection();
     final int confirm = JOptionPane.showConfirmDialog(SwingUtil.getActiveWindow(),
       "Delete folder connection '" + connection.getName() + "'? This action cannot be undone.",

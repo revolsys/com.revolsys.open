@@ -3,7 +3,6 @@ package com.revolsys.swing.table;
 import java.awt.Component;
 
 import javax.swing.JTable;
-import javax.swing.SwingUtilities;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -14,7 +13,7 @@ import com.revolsys.swing.parallel.Invoke;
 public class JTableUtil {
 
   public static void sizeColumnsToFit(final JTable table) {
-    if (SwingUtilities.isEventDispatchThread()) {
+    Invoke.later(() -> {
       final JTableHeader tableHeader = table.getTableHeader();
       final TableColumnModel columnModel = table.getColumnModel();
       for (int columnIndex = 0; columnIndex < table.getColumnCount(); columnIndex++) {
@@ -34,8 +33,6 @@ public class JTableUtil {
         }
         column.setPreferredWidth(maxwidth + 5);
       }
-    } else {
-      Invoke.later(JTableUtil.class, "sizeColumnsToFit", table);
-    }
+    });
   }
 }

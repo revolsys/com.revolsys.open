@@ -295,8 +295,8 @@ public class RecordLayerTableModel extends RecordRowTableModel
           this.loadingPageNumbers.add(pageNumber);
           this.loadingPageNumbersToProcess.add(pageNumber);
           if (this.loadObjectsWorker == null) {
-            this.loadObjectsWorker = Invoke.background("Loading records " + getTypeName(), this,
-              "loadPages", this.refreshIndex);
+            this.loadObjectsWorker = Invoke.background("Loading records " + getTypeName(),
+              () -> loadPages(this.refreshIndex));
           }
         }
         return this.loadingRecord;
@@ -490,7 +490,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
         } else {
           records = loadPage(pageNumber);
         }
-        Invoke.later(this, "setRecords", refreshIndex, pageNumber, records);
+        Invoke.later(() -> setRecords(refreshIndex, pageNumber, records));
       }
     }
   }

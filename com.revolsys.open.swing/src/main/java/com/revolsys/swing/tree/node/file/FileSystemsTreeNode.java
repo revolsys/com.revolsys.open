@@ -5,20 +5,15 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.List;
 
-import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.TreeNodeRunnable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 
 public class FileSystemsTreeNode extends LazyLoadTreeNode {
-
   private static final MenuFactory MENU = new MenuFactory("File Systems");
 
   static {
-    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh", "arrow_refresh",
-      "refresh");
-    MENU.addMenuItem("default", refresh);
+    addRefreshMenuItem(MENU);
   }
 
   public FileSystemsTreeNode() {

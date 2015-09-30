@@ -127,51 +127,52 @@ public class SelectMapUnitsPerPixel extends JComboBox
         final double unitsPerPixel = map.getUnitsPerPixel();
         if (unitsPerPixel > 0 && !Double.isInfinite(unitsPerPixel)
           && !Double.isNaN(unitsPerPixel)) {
-          Invoke.later(this, "setSelectedItem", unitsPerPixel);
+          Invoke.later(() -> setSelectedItem(unitsPerPixel));
         }
       } else if ("boundingBox".equals(propertyName)) {
         String toolTip;
         final BoundingBox boundingBox = map.getBoundingBox();
-        ComboBoxModel model = PROJECTED_MODEL;
+        ComboBoxModel model;
         if (boundingBox == null) {
           toolTip = "Map Resolution (m/pixel)";
+          model = PROJECTED_MODEL;
         } else {
           final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
           final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
           if (coordinateSystem instanceof GeographicCoordinateSystem) {
             model = GEOGRAPHIC_MODEL;
-          } else if (coordinateSystem instanceof GeographicCoordinateSystem) {
-            model = GEOGRAPHIC_MODEL;
+          } else {
+            model = PROJECTED_MODEL;
           }
           final Unit<Quantity> unit = coordinateSystem.getUnit();
           this.unitString = unit.toString();
           toolTip = "Map Resolution (" + unit + "/pixel)";
         }
-        Invoke.later(this, "setToolTipText", toolTip);
 
-        if (model != getModel()) {
-          Invoke.later(this, "setModel", model);
-        }
       } else if ("geometryFactory".equals(propertyName)) {
         String toolTip;
         final GeometryFactory geometryFactory = map.getGeometryFactory();
-        ComboBoxModel model = PROJECTED_MODEL;
+        ComboBoxModel model;
         if (geometryFactory == null) {
           toolTip = "Map Resolution (m/pixel)";
+          model = PROJECTED_MODEL;
         } else {
           final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
           if (geometryFactory.isGeographics()) {
             model = GEOGRAPHIC_MODEL;
+          } else {
+            model = PROJECTED_MODEL;
           }
           final Unit<Quantity> unit = coordinateSystem.getUnit();
           this.unitString = unit.toString();
           toolTip = "Map Resolution (" + unit + "/pixel)";
         }
-        Invoke.later(this, "setToolTipText", toolTip);
-
-        if (model != getModel()) {
-          Invoke.later(this, "setModel", model);
-        }
+        Invoke.later(() -> {
+          setToolTipText(toolTip);
+          if (model != getModel()) {
+            setModel(model);
+          }
+        });
       }
     }
   }

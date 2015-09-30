@@ -32,6 +32,11 @@ public class ProcessNetwork
     processNetwork.startAndWait();
   }
 
+  public static void startAndWait(final Runnable... processes) {
+    final ProcessNetwork processNetwork = new ProcessNetwork(processes);
+    processNetwork.startAndWait();
+  }
+
   private boolean autoStart;
 
   private int count = 0;

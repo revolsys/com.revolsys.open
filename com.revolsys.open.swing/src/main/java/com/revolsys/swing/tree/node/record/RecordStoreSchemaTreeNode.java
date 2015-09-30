@@ -12,9 +12,7 @@ import com.revolsys.record.io.RecordStoreProxy;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.swing.Icons;
-import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.TreeNodeRunnable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
@@ -28,9 +26,7 @@ public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode
   private static final MenuFactory MENU = new MenuFactory("Record Store Schema");
 
   static {
-    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh", "arrow_refresh",
-      "refresh");
-    MENU.addMenuItem("default", refresh);
+    addRefreshMenuItem(MENU);
   }
 
   private final Map<String, Object> connectionMap;

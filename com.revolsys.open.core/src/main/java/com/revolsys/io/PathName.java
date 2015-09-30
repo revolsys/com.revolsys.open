@@ -70,6 +70,26 @@ public class PathName implements Comparable<PathName>, CharSequence {
     }
   }
 
+  /**
+   * If this path is an ancestor of the other path return the path that is a direct child of this path.
+   * Returns null if this path is not an ancestor of the current path.
+   *
+   * @param path The path to test.
+   * @return True if this path is an ancestor of the other path.
+   */
+  public PathName getChild(PathName path) {
+    if (path != null) {
+      for (PathName parentPath = path.getParent(); parentPath != null; parentPath = parentPath
+        .getParent()) {
+        if (equals(parentPath)) {
+          return path;
+        }
+        path = parentPath;
+      }
+    }
+    return null;
+  }
+
   public List<String> getElements() {
     final LinkedList<String> elements = new LinkedList<>();
     PathName currentPath = this;

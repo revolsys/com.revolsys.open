@@ -20,12 +20,11 @@ import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.map.form.RecordStoreConnectionDialog;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.TreeNodeAction;
 import com.revolsys.swing.tree.TreeNodePropertyEnableCheck;
-import com.revolsys.swing.tree.TreeNodeRunnable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.util.OS;
@@ -38,16 +37,14 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
 
   static {
     final EnableCheck notReadOnly = new TreeNodePropertyEnableCheck("readOnly", false);
+    addRefreshMenuItem(MENU);
 
-    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh", "arrow_refresh",
-      "refresh");
-    MENU.addMenuItem("default", refresh);
     if (OS.isMac()) {
-      MENU.addMenuItem("default", TreeNodeRunnable.createAction("Edit Connection", "database_edit",
-        notReadOnly, "editConnection"));
+      TreeNodeAction.addMenuItem(MENU, "default", "Edit Connection", "database_edit", notReadOnly,
+        RecordStoreConnectionTreeNode::editConnection);
     }
-    MENU.addMenuItem("default", TreeNodeRunnable.createAction("Delete Record Store Connection",
-      "database_delete", notReadOnly, "deleteConnection"));
+    TreeNodeAction.addMenuItem(MENU, "default", "Delete Record Store Connection", "database_delete",
+      notReadOnly, RecordStoreConnectionTreeNode::deleteConnection);
   }
 
   public static List<BaseTreeNode> getChildren(final Map<String, Object> connectionMap,
@@ -95,7 +92,7 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
     setIcon(ICON);
   }
 
-  public void deleteConnection() {
+  private void deleteConnection() {
     final RecordStoreConnection connection = getConnection();
     final int confirm = JOptionPane.showConfirmDialog(SwingUtil.getActiveWindow(),
       "Delete record store connection '" + connection.getName()
@@ -112,7 +109,7 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
     return getChildren(getRecordStoreConnectionMap(), recordStore);
   }
 
-  public void editConnection() {
+  private void editConnection() {
     final RecordStoreConnectionRegistry registry = ((RecordStoreConnectionRegistryTreeNode)getParent())
       .getRegistry();
     final RecordStoreConnection connection = getConnection();

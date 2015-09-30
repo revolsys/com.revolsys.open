@@ -131,15 +131,13 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   }
 
   protected void doSelectRecords(final InputEvent event, final BoundingBox boundingBox) {
-    String methodName;
     if (SwingUtil.isShiftDown(event)) {
-      methodName = "addSelectedRecords";
+      Invoke.background("Select records", () -> addSelectedRecords(boundingBox));
     } else if (SwingUtil.isAltDown(event)) {
-      methodName = "unSelectRecords";
+      Invoke.background("Unselect records", () -> unSelectRecords(boundingBox));
     } else {
-      methodName = "selectRecords";
+      Invoke.background("Select records", () -> selectRecords(boundingBox));
     }
-    Invoke.background("Select records", this, methodName, boundingBox);
   }
 
   @Override

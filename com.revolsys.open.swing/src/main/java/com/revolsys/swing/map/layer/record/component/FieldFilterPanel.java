@@ -7,7 +7,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -19,7 +18,6 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
@@ -60,7 +58,6 @@ import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.TablePanel;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class FieldFilterPanel extends JComponent
@@ -223,13 +220,7 @@ public class FieldFilterPanel extends JComponent
   public void fireSearchChanged(final String propertyName, final Object oldValue,
     final Object newValue) {
     if (!Equals.equal(oldValue, newValue)) {
-      if (SwingUtilities.isEventDispatchThread()) {
-        final Method method = JavaBeanUtil.getMethod(getClass(), "fireSearchChanged", String.class,
-          Object.class, Object.class);
-        Invoke.background("Change search", this, method, propertyName, oldValue, newValue);
-      } else {
-        firePropertyChange(propertyName, oldValue, newValue);
-      }
+      Invoke.background("Change search", () -> fireSearchChanged(propertyName, oldValue, newValue));
     }
   }
 

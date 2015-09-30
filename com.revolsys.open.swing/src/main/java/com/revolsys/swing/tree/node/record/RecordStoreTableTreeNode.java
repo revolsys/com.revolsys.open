@@ -14,7 +14,7 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.RecordStoreLayer;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.TreeNodeRunnable;
+import com.revolsys.swing.tree.TreeNodeAction;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.util.CaseConverter;
 
@@ -33,7 +33,8 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
     }
     ICONS_GEOMETRY.put("GeometryCollection", Icons.getIcon("table_geometry"));
 
-    MENU.addMenuItem("default", TreeNodeRunnable.createAction("Add Layer", "map_add", "addLayer"));
+    TreeNodeAction.addMenuItem(MENU, "default", "Add Layer", "map_add",
+      RecordStoreTableTreeNode::addLayer);
   }
 
   public static Icon getIcon(final String geometryType) {
@@ -63,7 +64,7 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
     setIcon(icon);
   }
 
-  public void addLayer() {
+  private void addLayer() {
     final PathName typePath = getTypePath();
     final Map<String, Object> connection = getConnectionMap();
     final Map<String, Object> layerConfig = new LinkedHashMap<>();

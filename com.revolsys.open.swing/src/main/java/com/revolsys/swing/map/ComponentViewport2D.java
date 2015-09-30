@@ -234,7 +234,7 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
         // setBoundingBoxInternal(boundingBox);
         // }
       } else {
-        Invoke.later(this, "updateCachedFields");
+        Invoke.later(this::updateCachedFields);
       }
     }
   }

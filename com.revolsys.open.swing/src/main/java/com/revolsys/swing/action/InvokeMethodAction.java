@@ -71,11 +71,6 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
   public InvokeMethodAction() {
   }
 
-  public InvokeMethodAction(final CharSequence name, final boolean invokeLater, final Object object,
-    final String methodName, final Object... parameters) {
-    this(name, null, invokeLater, object, methodName, parameters);
-  }
-
   public InvokeMethodAction(final CharSequence name, final Icon icon, final boolean invokeLater,
     final Object object, final String methodName, final Object... parameters) {
     this.runnable = new InvokeMethodRunnable(object, methodName, parameters);
@@ -150,16 +145,6 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
   public InvokeMethodAction(final CharSequence name, final String toolTip, final Icon icon,
     final Object object, final String methodName, final Object... parameters) {
     this(name, toolTip, icon, true, object, methodName, parameters);
-  }
-
-  public InvokeMethodAction(final Icon icon, final boolean invokeLater, final Object object,
-    final String methodName, final Object... parameters) {
-    this(null, icon, invokeLater, object, methodName, parameters);
-  }
-
-  public InvokeMethodAction(final Icon icon, final Object object, final String methodName,
-    final Object... parameters) {
-    this(null, icon, false, object, methodName, parameters);
   }
 
   @Override

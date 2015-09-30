@@ -7,7 +7,6 @@ import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -54,12 +53,7 @@ public class EnableComponentListener implements ItemListener, ListSelectionListe
     final Object newValue = event.getNewValue();
     if (newValue instanceof Boolean) {
       final Boolean enabled = (Boolean)newValue;
-      if (SwingUtilities.isEventDispatchThread()) {
-        this.component.setEnabled(enabled);
-      } else {
-        Invoke.later(this.component, "setEnabled", enabled);
-      }
-
+      Invoke.later(() -> this.component.setEnabled(enabled));
     }
   }
 

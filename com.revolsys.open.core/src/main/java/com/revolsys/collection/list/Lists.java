@@ -213,6 +213,33 @@ public interface Lists {
     return false;
   }
 
+  static int getClassCount(final List<?> list, final Class<?> clazz) {
+    int count = 0;
+    for (int i = 0; i < list.size(); i++) {
+      final Object value = list.get(i);
+      if (value == null) {
+        list.remove(i);
+      } else if (clazz.isAssignableFrom(value.getClass())) {
+        count++;
+      }
+    }
+    return count++;
+  }
+
+  static <T> int getReferenceClassCount(final List<WeakReference<T>> list, final Class<?> clazz) {
+    int count = 0;
+    for (int i = 0; i < list.size(); i++) {
+      final WeakReference<?> reference = list.get(i);
+      final Object value = reference.get();
+      if (value == null) {
+        list.remove(i);
+      } else if (clazz.isAssignableFrom(value.getClass())) {
+        count++;
+      }
+    }
+    return count++;
+  }
+
   static <T> List<T> getReferences(final List<WeakReference<T>> list) {
     final List<T> values = new ArrayList<T>();
     for (int i = 0; i < list.size(); i++) {

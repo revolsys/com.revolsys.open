@@ -7,9 +7,7 @@ import java.awt.Window;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.beans.PropertyChangeSupport;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.function.Consumer;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -17,7 +15,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.VerticalLayout;
@@ -29,25 +26,10 @@ import com.revolsys.swing.parallel.Invoke;
 public class ProgressMonitor extends JDialog implements WindowListener {
   private static final long serialVersionUID = -5843323756390303783L;
 
-  public static void background(final Component component, final String title, final String note,
-    final boolean canCancel, final Object object, final String methodName,
-    final Object... parameters) {
-    final ProgressMonitor progressMonitor = new ProgressMonitor(component, title, note, canCancel);
-    final List<Object> params = new ArrayList<Object>();
-    params.add(progressMonitor);
-    params.addAll(Arrays.asList(parameters));
-    Invoke.background(title, object, methodName, params);
-    progressMonitor.setVisible(true);
-  }
-
   public static void ui(final Component component, final String title, final String note,
-    final boolean canCancel, final Object object, final String methodName,
-    final Object... parameters) {
+    final boolean canCancel, final Consumer<ProgressMonitor> task) {
     final ProgressMonitor progressMonitor = new ProgressMonitor(component, title, note, canCancel);
-    final List<Object> params = new ArrayList<Object>();
-    params.add(progressMonitor);
-    params.addAll(Arrays.asList(parameters));
-    Invoke.worker(title, object, null, null, methodName, params);
+    Invoke.workerDone(title, () -> task.accept(progressMonitor));
     progressMonitor.setVisible(true);
   }
 
@@ -99,12 +81,10 @@ public class ProgressMonitor extends JDialog implements WindowListener {
   }
 
   public void close() {
-    if (SwingUtilities.isEventDispatchThread()) {
+    Invoke.later(() -> {
       setVisible(false);
       dispose();
-    } else {
-      Invoke.later(this, "close");
-    }
+    });
   }
 
   public PropertyChangeSupport getPropertyChangeSupport() {

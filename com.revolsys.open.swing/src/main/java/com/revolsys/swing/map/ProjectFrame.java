@@ -36,7 +36,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.TreePath;
 
@@ -58,7 +57,6 @@ import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BaseFrame;
 import com.revolsys.swing.component.DnDTabbedPane;
 import com.revolsys.swing.component.TabClosableTitle;
-import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.logging.Log4jTableModel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
@@ -231,7 +229,7 @@ public class ProjectFrame extends BaseFrame {
     final Path path = this.project.saveAllSettingsAs();
     if (path != null) {
       addToRecentProjects(path);
-      Invoke.later(this, "setTitle", this.project.getName() + " - " + this.frameTitle);
+      Invoke.later(() -> setTitle(this.project.getName() + " - " + this.frameTitle));
     }
   }
 
@@ -340,8 +338,7 @@ public class ProjectFrame extends BaseFrame {
     final Project project = getProject();
     this.tocTree = ProjectTreeNode.createTree(project);
 
-    Property.addListener(this.project, "layers", new InvokeMethodPropertyChangeListener(true, this,
-      "expandLayers", PropertyChangeEvent.class));
+    Property.addListener(this.project, "layers", this::expandLayers);
 
     addTabIcon(this.leftTabs, "tree_layers", "TOC", this.tocTree, true);
 
@@ -482,7 +479,7 @@ public class ProjectFrame extends BaseFrame {
 
   public void expandLayers(final Layer layer) {
     if (layer != null) {
-      if (SwingUtilities.isEventDispatchThread()) {
+      Invoke.later(() -> {
         final LayerGroup group;
         if (layer instanceof LayerGroup) {
           group = (LayerGroup)layer;
@@ -493,20 +490,20 @@ public class ProjectFrame extends BaseFrame {
           final List<Layer> layerPath = group.getPathList();
           this.tocTree.expandPath(layerPath);
         }
-      } else {
-        Invoke.later(this, "expandLayers", layer);
-      }
+      });
     }
   }
 
   public void expandLayers(final PropertyChangeEvent event) {
-    final Object source = event.getSource();
-    if (source instanceof LayerGroup) {
-      final Object newValue = event.getNewValue();
-      if (newValue instanceof LayerGroup) {
-        expandLayers((LayerGroup)newValue);
+    Invoke.later(() -> {
+      final Object source = event.getSource();
+      if (source instanceof LayerGroup) {
+        final Object newValue = event.getNewValue();
+        if (newValue instanceof LayerGroup) {
+          expandLayers((LayerGroup)newValue);
+        }
       }
-    }
+    });
   }
 
   public JTabbedPane getBottomTabs() {
@@ -635,7 +632,7 @@ public class ProjectFrame extends BaseFrame {
   public void loadProject(final Path projectPathe) {
     final PathResource resource = new PathResource(projectPathe);
     this.project.readProject(resource);
-    Invoke.later(this, "setTitle", this.project.getName() + " - " + this.frameTitle);
+    Invoke.later(() -> setTitle(this.project.getName() + " - " + this.frameTitle));
 
     final Object frameBoundsObject = this.project.getProperty("frameBounds");
     setBounds(frameBoundsObject, true);

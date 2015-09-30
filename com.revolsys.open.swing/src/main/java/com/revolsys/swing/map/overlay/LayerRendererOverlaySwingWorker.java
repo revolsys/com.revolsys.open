@@ -25,7 +25,7 @@ public class LayerRendererOverlaySwingWorker extends AbstractSwingWorker<Void, V
   }
 
   @Override
-  protected Void doInBackground() throws Exception {
+  protected Void handleBackground() throws Exception {
     try {
       final Layer layer = this.overlay.getLayer();
       if (layer != null) {
@@ -68,7 +68,7 @@ public class LayerRendererOverlaySwingWorker extends AbstractSwingWorker<Void, V
   }
 
   @Override
-  protected void uiTask() {
+  protected void handleDone(final Void result) {
     this.overlay.setImage(this);
   }
 }

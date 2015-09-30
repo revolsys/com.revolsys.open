@@ -9,7 +9,7 @@ import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.swing.map.form.RecordStoreConnectionDialog;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.TreeNodeRunnable;
+import com.revolsys.swing.tree.TreeNodeAction;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
@@ -22,8 +22,8 @@ public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
 
   static {
     if (OS.isMac()) {
-      MENU.addMenuItem("default",
-        TreeNodeRunnable.createAction("Add Connection", "database_add", "addConnection"));
+      TreeNodeAction.addMenuItem(MENU, "default", "Add Connection", "database_add",
+        RecordStoreConnectionRegistryTreeNode::addConnection);
     }
   }
 
@@ -34,7 +34,7 @@ public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
     setIcon(PathTreeNode.ICON_FOLDER_LINK);
   }
 
-  public void addConnection() {
+  private void addConnection() {
     final RecordStoreConnectionRegistry registry = getRegistry();
     final RecordStoreConnectionDialog dialog = new RecordStoreConnectionDialog(registry);
     dialog.setVisible(true);

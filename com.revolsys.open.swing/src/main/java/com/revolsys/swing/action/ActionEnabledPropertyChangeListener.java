@@ -23,6 +23,6 @@ public class ActionEnabledPropertyChangeListener implements PropertyChangeListen
     } else {
       enabled = false;
     }
-    Invoke.later(this.action, "setEnabled", enabled);
+    Invoke.later(() -> this.action.setEnabled(enabled));
   }
 }

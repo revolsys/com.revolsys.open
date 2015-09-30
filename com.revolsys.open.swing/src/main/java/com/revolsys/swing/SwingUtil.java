@@ -27,7 +27,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -56,7 +55,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.beans.MethodInvoker;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -81,7 +79,6 @@ import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.OS;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
@@ -770,7 +767,7 @@ public class SwingUtil {
   }
 
   public static void setFieldValue(final JComponent field, final Object value) {
-    if (SwingUtilities.isEventDispatchThread()) {
+    Invoke.later(() -> {
       if (field instanceof Field) {
         final Field fieldObject = (Field)field;
         fieldObject.setFieldValue(value);
@@ -810,16 +807,7 @@ public class SwingUtil {
         }
         field.revalidate();
       }
-    } else {
-      try {
-        final Method method = SwingUtil.class.getMethod("setFieldValue", JComponent.class,
-          Object.class);
-        final MethodInvoker runnable = new MethodInvoker(method, SwingUtil.class, field, value);
-        Invoke.later(runnable);
-      } catch (final Throwable t) {
-        ExceptionUtil.throwUncheckedException(t);
-      }
-    }
+    });
   }
 
   public static void setLocationCentre(final Rectangle bounds, final Window window) {
@@ -905,11 +893,9 @@ public class SwingUtil {
 
   public static void setVisible(final Component component, final boolean visible) {
     if (component != null) {
-      if (SwingUtilities.isEventDispatchThread()) {
+      Invoke.later(() -> {
         component.setVisible(visible);
-      } else {
-        Invoke.later(component, "setVisible", visible);
-      }
+      });
     }
   }
 

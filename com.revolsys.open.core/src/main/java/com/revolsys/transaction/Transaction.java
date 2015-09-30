@@ -6,6 +6,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.DefaultTransactionStatus;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.revolsys.util.ExceptionUtil;
 
@@ -162,5 +163,16 @@ public class Transaction implements Closeable {
   public RuntimeException setRollbackOnly(final Throwable e) {
     setRollbackOnly();
     return ExceptionUtil.throwUncheckedException(e);
+  }
+
+  public static void afterCommit(final Runnable runnable) {
+    if (runnable != null) {
+      if (TransactionSynchronizationManager.isSynchronizationActive()) {
+        final RunnableAfterCommit synchronization = new RunnableAfterCommit(runnable);
+        TransactionSynchronizationManager.registerSynchronization(synchronization);
+      } else {
+        runnable.run();
+      }
+    }
   }
 }

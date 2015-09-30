@@ -6,11 +6,9 @@ import java.beans.PropertyChangeEvent;
 import java.util.Map;
 
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -302,19 +300,18 @@ public class GeoreferencedImageLayer extends AbstractLayer {
 
   @Override
   public void setEditable(final boolean editable) {
-    if (SwingUtilities.isEventDispatchThread()) {
-      Invoke.background("Set editable", this, "setEditable", editable);
-    } else {
+    Invoke.background("Set Editable " + this, () -> {
       synchronized (getSync()) {
         if (editable) {
           setShowOriginalImage(true);
         } else {
           firePropertyChange("preEditable", false, true);
           if (isHasChanges()) {
-            final Integer result = InvokeMethodCallable.invokeAndWait(JOptionPane.class,
-              "showConfirmDialog", JOptionPane.getRootFrame(),
-              "The layer has unsaved changes. Click Yes to save changes. Click No to discard changes. Click Cancel to continue editing.",
-              "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION);
+            final Integer result = Invoke.andWait(() -> {
+              return JOptionPane.showConfirmDialog(JOptionPane.getRootFrame(),
+                "The layer has unsaved changes. Click Yes to save changes. Click No to discard changes. Click Cancel to continue editing.",
+                "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION);
+            });
 
             if (result == JOptionPane.YES_OPTION) {
               if (!saveChanges()) {
@@ -336,7 +333,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
           setShowOriginalImage(false);
         }
       }
-    }
+    });
   }
 
   public void setImage(final GeoreferencedImage image) {
@@ -378,11 +375,9 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   }
 
   public void showTiePointsTable() {
-    if (SwingUtilities.isEventDispatchThread()) {
+    Invoke.later(() -> {
       showTableView(null);
-    } else {
-      Invoke.later(this, "showTiePointsTable");
-    }
+    });
   }
 
   public Point sourcePixelToTargetPoint(final BoundingBox boundingBox, final boolean useTransform,

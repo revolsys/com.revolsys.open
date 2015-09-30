@@ -36,15 +36,14 @@ import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.RecordStoreFactoryRegistry;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.TreeNodeAction;
 import com.revolsys.swing.tree.TreeNodePropertyEnableCheck;
-import com.revolsys.swing.tree.TreeNodeRunnable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.record.PathRecordStoreTreeNode;
@@ -83,15 +82,13 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
     final EnableCheck isDirectory = new TreeNodePropertyEnableCheck("directory");
     final EnableCheck isFileLayer = new TreeNodePropertyEnableCheck("fileLayer");
 
-    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh", "arrow_refresh",
-      NODE_EXISTS, "refresh");
-    MENU.addMenuItem("default", refresh);
+    addRefreshMenuItem(MENU);
 
-    MENU.addMenuItem("default",
-      TreeNodeRunnable.createAction("Add Layer", "map_add", isFileLayer, "addLayer"));
+    TreeNodeAction.addMenuItem(MENU, "default", "Add Layer", "map_add", isFileLayer,
+      PathTreeNode::addLayer);
 
-    MENU.addMenuItem("default", TreeNodeRunnable.createAction("Add Folder Connection", "link_add",
-      new AndEnableCheck(isDirectory, NODE_EXISTS), "addFolderConnection"));
+    TreeNodeAction.addMenuItem(MENU, "default", "Add Folder Connection", "link_add",
+      new AndEnableCheck(isDirectory, NODE_EXISTS), PathTreeNode::addFolderConnection);
   }
 
   public static void addPathNode(final List<BaseTreeNode> children, final Path path,
@@ -190,7 +187,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       return UrlUtil.getUrl(parentProxy, childPath);
     } else {
       try {
-        URL url = path.toUri().toURL();
+        final URL url = path.toUri().toURL();
         return url;
       } catch (final MalformedURLException e) {
         throw new WrappedException(e);

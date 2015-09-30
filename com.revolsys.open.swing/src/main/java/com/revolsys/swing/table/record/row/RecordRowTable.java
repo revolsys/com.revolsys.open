@@ -17,7 +17,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.layer.record.table.predicate.ErrorPredicate;
 import com.revolsys.swing.map.layer.record.table.predicate.ModifiedAttributePredicate;
@@ -162,7 +161,7 @@ public class RecordRowTable extends BaseJTable implements MouseListener {
 
   @Override
   public void tableChanged(final TableModelEvent event) {
-    if (SwingUtil.isEventDispatchThread()) {
+    Invoke.later(() -> {
       final TableModel model = getModel();
       int fieldsOffset = 0;
       if (model instanceof RecordLayerTableModel) {
@@ -200,9 +199,7 @@ public class RecordRowTable extends BaseJTable implements MouseListener {
       if (this.tableHeader != null) {
         this.tableHeader.resizeAndRepaint();
       }
-    } else {
-      Invoke.later(this, "tableChanged", event);
-    }
+    });
   }
 
   @Override

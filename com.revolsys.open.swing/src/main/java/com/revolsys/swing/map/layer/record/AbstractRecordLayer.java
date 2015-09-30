@@ -42,7 +42,6 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
-import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.datatype.DataType;
@@ -741,14 +740,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     super.delete();
     for (final Window window : this.formWindows) {
       if (window != null) {
-        Invoke.later(window, "dispose");
+        Invoke.later(window::dispose);
       }
     }
     for (final Component form : this.formComponents) {
       if (form != null) {
         if (form instanceof RecordLayerForm) {
           final RecordLayerForm recordForm = (RecordLayerForm)form;
-          Invoke.later(recordForm, "destroy");
+          Invoke.later(recordForm::destroy);
         }
       }
     }
@@ -1060,6 +1059,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return Collections.<Class<?>> singleton(AbstractRecordLayerRenderer.class);
   }
 
+  @Override
   public CoordinateSystem getCoordinateSystem() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
@@ -1797,7 +1797,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void mergeSelectedRecords() {
     if (isCanMergeRecords()) {
-      Invoke.later(MergeRecordsDialog.class, "showDialog", this);
+      Invoke.later(() -> MergeRecordsDialog.showDialog(this));
     }
   }
 
@@ -2025,7 +2025,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   protected void removeForm(final LayerRecord record) {
     if (record != null) {
-      if (SwingUtilities.isEventDispatchThread()) {
+      Invoke.later(() -> {
         final int index = this.formRecords.indexOf(record);
         if (index != -1) {
           this.formRecords.remove(index);
@@ -2043,21 +2043,17 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         }
 
         cleanCachedRecords();
-      } else {
-        Invoke.later(this, "removeForm", record);
-      }
+      });
     }
   }
 
   public void removeForms(final Collection<LayerRecord> records) {
     if (records != null && !records.isEmpty()) {
-      if (SwingUtilities.isEventDispatchThread()) {
+      Invoke.later(() -> {
         for (final LayerRecord record : records) {
           removeForm(record);
         }
-      } else {
-        Invoke.later(this, "removeForms", records);
-      }
+      });
     }
   }
 
@@ -2251,18 +2247,16 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   @Override
   public void setEditable(final boolean editable) {
-    if (SwingUtilities.isEventDispatchThread()) {
-      Invoke.background("Set editable", this, "setEditable", editable);
-    } else {
+    Invoke.background("Set Editable " + this, () -> {
       synchronized (this.getEditSync()) {
         if (editable == false) {
           firePropertyChange("preEditable", false, true);
           if (isHasChanges()) {
-            final Integer result = InvokeMethodCallable.invokeAndWait(JOptionPane.class,
-              "showConfirmDialog", JOptionPane.getRootFrame(),
-              "The layer has unsaved changes. Click Yes to save changes. Click No to discard changes. Click Cancel to continue editing.",
-              "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION);
-
+            final Integer result = Invoke.andWait(() -> {
+              return JOptionPane.showConfirmDialog(JOptionPane.getRootFrame(),
+                "The layer has unsaved changes. Click Yes to save changes. Click No to discard changes. Click Cancel to continue editing.",
+                "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION);
+            });
             if (result == JOptionPane.YES_OPTION) {
               if (!saveChanges()) {
                 return;
@@ -2281,7 +2275,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         setCanDeleteRecords(this.canDeleteRecords);
         setCanEditRecords(this.canEditRecords);
       }
-    }
+    });
   }
 
   public void setFieldNamesSetName(final String fieldNamesSetName) {
@@ -2622,7 +2616,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           return null;
         }
       } else {
-        Invoke.later(this, "showForm", record);
+        Invoke.later(() -> showForm(record));
         return null;
       }
     }

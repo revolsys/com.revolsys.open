@@ -21,11 +21,10 @@ import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.record.io.RecordStoreProxy;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.TreeNodeRunnable;
+import com.revolsys.swing.tree.TreeNodeAction;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.Property;
@@ -35,12 +34,10 @@ public class PathRecordStoreTreeNode extends PathTreeNode
   private static final MenuFactory MENU = new MenuFactory("File Record Store");
 
   static {
-    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh", "arrow_refresh",
-      NODE_EXISTS, "refresh");
-    MENU.addMenuItem("default", refresh);
+    addRefreshMenuItem(MENU);
 
-    MENU.addMenuItem("default", TreeNodeRunnable.createAction("Add Record Store Connection",
-      "link_add", NODE_EXISTS, "addRecordStoreConnection"));
+    TreeNodeAction.addMenuItem(MENU, "default", "Add Record Store Connection", "link_add",
+      NODE_EXISTS, PathRecordStoreTreeNode::addRecordStoreConnection);
   }
 
   public PathRecordStoreTreeNode(final Path path) {

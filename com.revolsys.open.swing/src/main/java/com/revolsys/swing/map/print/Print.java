@@ -16,6 +16,7 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.util.ExceptionUtil;
 
 public class Print extends I18nAction {
   private static final ImageIcon ICON = Icons.getIcon("printer");
@@ -58,7 +59,13 @@ public class Print extends I18nAction {
     final boolean doPrint = job.printDialog();
     if (doPrint) {
       this.printService = job.getPrintService();
-      Invoke.background("Print", job, "print");
+      Invoke.background("Print", () -> {
+        try {
+          job.print();
+        } catch (final Exception e) {
+          ExceptionUtil.log(getClass(), "Unable to print", e);
+        }
+      });
     }
 
   }

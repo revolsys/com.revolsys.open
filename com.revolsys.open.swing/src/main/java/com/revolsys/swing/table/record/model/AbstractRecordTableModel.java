@@ -142,7 +142,8 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel
           }
         } else {
           if (!codeTable.isLoading()) {
-            Invoke.background("Load " + codeTable, this, "loadCodeTable", codeTable);
+            final CodeTable tableToLoad = codeTable;
+            Invoke.background("Load " + codeTable, () -> loadCodeTable(tableToLoad));
           }
           text = "...";
         }

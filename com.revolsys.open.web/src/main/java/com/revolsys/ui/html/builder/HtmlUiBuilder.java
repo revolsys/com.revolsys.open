@@ -47,7 +47,7 @@ import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.spring.InvokeMethodAfterCommit;
+import com.revolsys.transaction.Transaction;
 import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.ui.html.decorator.FieldLabelDecorator;
 import com.revolsys.ui.html.decorator.TableHeadingDecorator;
@@ -1308,7 +1308,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return true;
   }
 
-  public void redirectAfterCommit(String url) {
+  public void redirectAfterCommit(final String url) {
     final Map<String, Object> parameters = new HashMap<>();
     final HttpServletRequest request = HttpServletUtils.getRequest();
     for (final String parameterName : Arrays.asList("plain", "htmlCss")) {
@@ -1317,8 +1317,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         parameters.put(parameterName, value);
       }
     }
-    url = UrlUtil.getUrl(url, parameters);
-    InvokeMethodAfterCommit.invoke(HttpServletUtils.class, "redirect", url);
+    final String urlWithParameters = UrlUtil.getUrl(url, parameters);
+    Transaction.afterCommit(() -> HttpServletUtils.redirect(urlWithParameters));
   }
 
   public Void redirectPage(final String pageName) {

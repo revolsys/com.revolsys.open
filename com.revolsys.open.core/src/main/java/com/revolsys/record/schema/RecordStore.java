@@ -516,8 +516,9 @@ public interface RecordStore
         queries.add(query);
       }
       return query(queries);
+    } else {
+      return new ListRecordReader(null, Collections.emptyList());
     }
-    return new ListRecordReader(null, Collections.emptyList());
   }
 
   default RecordReader query(final Query query) {

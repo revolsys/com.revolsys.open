@@ -1,9 +1,11 @@
 package com.revolsys.swing.table.worker;
 
 import java.awt.BorderLayout;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -13,12 +15,11 @@ import javax.swing.SwingWorker;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 
-import com.revolsys.swing.listener.EventQueueRunnableListener;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJTable;
 
-public class SwingWorkerTableModel extends AbstractTableModel {
+public class SwingWorkerTableModel extends AbstractTableModel implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   public static JPanel createPanel() {
@@ -51,12 +52,17 @@ public class SwingWorkerTableModel extends AbstractTableModel {
 
   private final List<String> columnTitles = Arrays.asList("Description", "Status");
 
-  private final PropertyChangeListener listener = new EventQueueRunnableListener(
-    () -> fireTableDataChanged());
+  private List<SwingWorker<?, ?>> workers = Collections.emptyList();
 
   public SwingWorkerTableModel() {
     final PropertyChangeSupport propertyChangeSupport = Invoke.getPropertyChangeSupport();
-    propertyChangeSupport.addPropertyChangeListener(this.listener);
+    propertyChangeSupport.addPropertyChangeListener(this);
+  }
+
+  @Override
+  public void dispose() {
+    super.dispose();
+    Invoke.getPropertyChangeSupport().removePropertyChangeListener("workers", this);
   }
 
   @Override
@@ -76,21 +82,17 @@ public class SwingWorkerTableModel extends AbstractTableModel {
 
   @Override
   public int getRowCount() {
-    return Invoke.getWorkerCount();
+    return this.workers.size();
   }
 
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
-    final SwingWorker<?, ?> worker = Invoke.getWorker(rowIndex);
+    final SwingWorker<?, ?> worker = this.workers.get(rowIndex);
     if (worker == null) {
       return "-";
     } else {
       if (columnIndex == 1) {
-        if (Invoke.isWorkerRunning(worker)) {
-          return "Running";
-        } else {
-          return "Waiting";
-        }
+        return worker.getState().name();
       } else {
         return worker.toString();
       }
@@ -100,6 +102,13 @@ public class SwingWorkerTableModel extends AbstractTableModel {
   @Override
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
     return false;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    this.workers = (List<SwingWorker<?, ?>>)event.getNewValue();
+    fireTableDataChanged();
   }
 
   @Override

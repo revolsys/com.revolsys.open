@@ -208,7 +208,8 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
           }
         }
       }
-      Invoke.later(this, "setMergedRecords", errorMessage, this.mergedRecords);
+      final String message = errorMessage;
+      Invoke.later(() -> setMergedRecords(message, this.mergedRecords));
 
     } catch (final Throwable e) {
       LoggerFactory.getLogger(getClass()).error("Error " + this, e);
@@ -275,7 +276,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
   }
 
   private void showDialog() {
-    Invoke.background(toString(), this, "run");
+    Invoke.background(toString(), this::run);
   }
 
   @Override

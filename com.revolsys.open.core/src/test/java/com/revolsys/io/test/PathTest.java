@@ -24,11 +24,12 @@ public class PathTest {
       final PathName pathName1 = PathName.newPathName(path1);
       final PathName pathName2 = PathName.newPathName(path2);
 
-      final boolean isAncestor2 = pathName1.isAncestorOf(pathName2);
-      Assert.assertEquals(expectedAncestor, isAncestor2);
-
-      final boolean isDescendant12 = pathName1.isDescendantOf(pathName2);
-      Assert.assertEquals(expectedDescendant, isDescendant12);
+      if (pathName1 != null) {
+        final boolean isAncestor2 = pathName1.isAncestorOf(pathName2);
+        Assert.assertEquals(expectedAncestor, isAncestor2);
+        final boolean isDescendant12 = pathName1.isDescendantOf(pathName2);
+        Assert.assertEquals(expectedDescendant, isDescendant12);
+      }
 
       if (expectedAncestor != expectedDescendant) {
         final boolean isAncestor21 = pathName2.isAncestorOf(pathName1);
@@ -50,6 +51,19 @@ public class PathTest {
     final String expected) {
     final String childName = Path.getChildPath(parentPath, childPath);
     Assert.assertEquals(expected, childName);
+
+    final PathName pathName1 = PathName.newPathName(parentPath);
+    final PathName pathName2 = PathName.newPathName(childPath);
+    if (pathName1 != null) {
+      final PathName childPathName = pathName1.getChild(pathName2);
+      if (expected == null) {
+        Assert.assertNull("getChildPath", childPathName);
+      } else {
+        Assert.assertEquals("getChildPath " + pathName1 + ", " + pathName2,
+          PathName.newPathName(expected), childPathName);
+
+      }
+    }
   }
 
   private void assertClean(final String source, final String expected) {
@@ -85,13 +99,13 @@ public class PathTest {
     {
       final PathName path1 = PathName.newPathName(parentPath);
       final PathName path2 = PathName.newPathName(childPath);
+      if (path1 != null) {
+        final boolean isParent12 = path1.isParentOf(path2);
+        Assert.assertEquals(expectedParent, isParent12);
 
-      final boolean isParent12 = path1.isParentOf(path2);
-      Assert.assertEquals(expectedParent, isParent12);
-
-      final boolean isChild12 = path1.isChildOf(path2);
-      Assert.assertEquals(expectedChild, isChild12);
-
+        final boolean isChild12 = path1.isChildOf(path2);
+        Assert.assertEquals(expectedChild, isChild12);
+      }
       if (expectedParent != expectedChild) {
         final boolean isParent21 = path2.isParentOf(path1);
         Assert.assertEquals(!expectedParent, isParent21);

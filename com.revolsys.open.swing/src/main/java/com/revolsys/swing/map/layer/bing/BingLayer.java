@@ -12,7 +12,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.parallel.ExecutorServiceFactory;
-import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
 import com.revolsys.swing.map.layer.MapTile;
@@ -135,7 +134,7 @@ public class BingLayer extends AbstractTiledImageLayer {
 
   public void setClient(final BingClient client) {
     this.client = client;
-    ExecutorServiceFactory.getExecutorService().execute(new InvokeMethodRunnable(this, "init"));
+    ExecutorServiceFactory.getExecutorService().execute(this::initialize);
   }
 
   public void setImagerySet(final ImagerySet imagerySet) {

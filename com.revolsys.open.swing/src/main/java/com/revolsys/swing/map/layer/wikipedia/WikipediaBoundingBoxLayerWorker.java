@@ -52,7 +52,7 @@ public class WikipediaBoundingBoxLayerWorker extends AbstractSwingWorker<List<La
   }
 
   @Override
-  protected List<LayerRecord> doInBackground() throws Exception {
+  protected List<LayerRecord> handleBackground() throws Exception {
     BoundingBox boundingBox = this.boundingBox;
     GeometryFactory geometryFactory = this.geometryFactory;
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
@@ -86,14 +86,24 @@ public class WikipediaBoundingBoxLayerWorker extends AbstractSwingWorker<List<La
   }
 
   @Override
+  protected void handleCancelled() {
+    this.layer.setIndexRecords(this.boundingBox, null);
+  }
+
+  @Override
+  protected void handleException(final Throwable exception) {
+    super.handleException(exception);
+    this.layer.setIndexRecords(this.boundingBox, null);
+  }
+
+  @Override
   public String toString() {
     return "Load Wikipedia Articles";
   }
 
   @Override
-  protected void uiTask() {
+  protected void handleDone(final List<LayerRecord> records) {
     try {
-      final List<LayerRecord> records = get();
       this.layer.setIndexRecords(this.boundingBox, records);
     } catch (final Throwable e) {
       this.layer.setIndexRecords(this.boundingBox, null);

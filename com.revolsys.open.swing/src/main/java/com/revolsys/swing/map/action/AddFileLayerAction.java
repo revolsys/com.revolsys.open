@@ -138,8 +138,8 @@ public class AddFileLayerAction extends AbstractAction {
         layerGroup = Project.get();
       }
       for (final File file : fileChooser.getSelectedFiles()) {
-        Invoke.background("Open file: " + FileUtil.getCanonicalPath(file), layerGroup, "openFile",
-          file);
+        Invoke.background("Open file: " + FileUtil.getCanonicalPath(file),
+          () -> layerGroup.openFile(file));
       }
     }
     SwingUtil.saveFileChooserDirectory(getClass(), "currentDirectory", fileChooser);
