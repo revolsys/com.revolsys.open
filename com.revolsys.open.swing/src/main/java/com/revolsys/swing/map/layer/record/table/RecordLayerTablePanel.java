@@ -116,8 +116,8 @@ public class RecordLayerTablePanel extends TablePanel
 
     final EnableCheck modifiedEnableCheck = RecordRowFunctionEnableCheck.newEnableCheck(true,
       Record::isModified);
-    final EnableCheck notDeletedEnableCheck = RecordRowFunctionEnableCheck.newEnableCheck(true,
-      false, this::isRecordDeleted);
+    final EnableCheck notDeletedEnableCheck = RecordRowFunctionEnableCheck.newEnableCheck(false,
+      this::isRecordDeleted);
     final OrEnableCheck modifiedOrDeleted = new OrEnableCheck(modifiedEnableCheck,
       RecordRowFunctionEnableCheck.newEnableCheck(true, LayerRecord::isDeleted));
 

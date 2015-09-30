@@ -9,13 +9,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
 
 import com.revolsys.comparator.NumericComparator;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.util.LineStringUtil;
-import com.revolsys.properties.ObjectPropertyProxy;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 
@@ -151,26 +151,12 @@ public class NodeProperties {
     }
   }
 
-  private static String EDGE_ANGLES = "edgeAngles";
-
-  private static String EDGE_ANGLES_BY_TYPE = "edgeAnglesByType";
-
-  private static String EDGE_RECORD_DEFINITIONS = "edgeRecordDefinitions";
-
-  private static String EDGE_TYPE_NAMES = "edgeTypeNames";
-
-  private static String EDGES_BY_LINE_AND_TYPE_NAME = "edgesByLineAndTypeName";
-
-  private static String EDGES_BY_TYPE = "edgesByType";
-
-  private static String EDGES_BY_TYPE_NAME_AND_LINE = "edgesByTypeNameAndLine";
-
   public static Set<Double> getEdgeAngles(final Node<?> node) {
-    return getField(node, EDGE_ANGLES);
+    return getField(node, "edgeAngles", Methods::edgeAngles);
   }
 
   public static Map<String, Set<Double>> getEdgeAnglesByType(final Node<?> node) {
-    return getField(node, EDGE_ANGLES_BY_TYPE);
+    return getField(node, "edgeAnglesByType", Methods::edgeAnglesByType);
   }
 
   public static <T> Set<Double> getEdgeAnglesByType(final Node<T> node, final String typePath) {
@@ -180,7 +166,7 @@ public class NodeProperties {
   }
 
   public static Set<RecordDefinition> getEdgeRecordDefinitions(final Node<? extends Object> node) {
-    return getField(node, EDGE_RECORD_DEFINITIONS);
+    return getField(node, "edgeRecordDefinitions", Methods::edgeRecordDefinitions);
   }
 
   /**
@@ -193,37 +179,38 @@ public class NodeProperties {
    */
   public static <T> Map<LineString, Map<String, Set<Edge<T>>>> getEdgesByLineAndTypeName(
     final Node<T> node) {
-    return getField(node, EDGES_BY_LINE_AND_TYPE_NAME);
+    return getField(node, "edgesByLineAndTypeName", Methods::edgesByLineAndTypeName);
   }
 
   public static <T> Map<String, List<Edge<T>>> getEdgesByType(final Node<T> node) {
-    return getField(node, EDGES_BY_TYPE);
+    return getField(node, "edgesByType", Methods::edgesByType);
   }
 
   public static <T> List<Edge<T>> getEdgesByType(final Node<T> node, final String typePath) {
     final Map<String, List<Edge<T>>> edgesByType = getEdgesByType(node);
     final List<Edge<T>> edges = edgesByType.get(typePath);
     if (edges != null) {
-      return new ArrayList<Edge<T>>(edges);
+      return new ArrayList<>(edges);
     }
     return Collections.emptyList();
   }
 
   public static <T> Map<String, Map<LineString, Set<Edge<T>>>> getEdgesByTypeNameAndLine(
     final Node<T> node) {
-    return getField(node, EDGES_BY_TYPE_NAME_AND_LINE);
+    return getField(node, "edgesByTypeNameAndLine", Methods::edgesByTypeNameAndLine);
   }
 
   public static Set<String> getEdgeTypeNames(final Node<? extends Object> node) {
-    return getField(node, EDGE_TYPE_NAMES);
+    return getField(node, "edgeTypeNames", Methods::edgeTypeNames);
   }
 
   @SuppressWarnings("unchecked")
-  private static <T, V> V getField(final Node<T> node, final String name) {
+  private static <T, V> V getField(final Node<T> node, final String name,
+    final Function<Node<T>, V> function) {
     final String fieldName = NodeProperties.class.getName() + "." + name;
     if (!node.hasProperty(fieldName)) {
-      final ObjectPropertyProxy<T, V> proxy = new InvokeMethodObjectPropertyProxy<T, V>(
-        Methods.class, name, Node.class);
+      final FunctionObjectPropertyProxy<Node<T>, V> proxy = new FunctionObjectPropertyProxy<Node<T>, V>(
+        function);
       node.setProperty(fieldName, proxy);
     }
     final V value = (V)node.getProperty(fieldName);
