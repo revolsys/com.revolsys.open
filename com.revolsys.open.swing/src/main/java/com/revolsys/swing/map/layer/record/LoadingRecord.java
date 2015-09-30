@@ -26,6 +26,11 @@ public class LoadingRecord extends AbstractLayerRecord {
   }
 
   @Override
+  public int hashCode() {
+    return 1;
+  }
+
+  @Override
   public boolean isSame(final Record record) {
     return record instanceof LoadingRecord;
   }

@@ -734,11 +734,11 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public final void refresh() {
-    Invoke.background("Refresh " + getName(), () -> {
+    Invoke.background("Refresh Layer " + getName(), () -> {
       try {
         doRefresh();
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error("Unable to refresh layer: " + getName(), e);
+        ExceptionUtil.log(getClass(), "Unable to refresh layer: " + getName(), e);
       }
       firePropertyChange("refresh", false, true);
     });
@@ -746,11 +746,11 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public final void refreshAll() {
-    Invoke.background("Refresh " + getName(), () -> {
+    Invoke.background("Refresh Layer All " + getName(), () -> {
       try {
         doRefreshAll();
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error("Unable to refresh layer: " + getName(), e);
+        ExceptionUtil.log(getClass(), "Unable to refresh layer: " + getName(), e);
       }
       firePropertyChange("refresh", false, true);
     });

@@ -7,8 +7,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.LoggerFactory;
 
@@ -83,6 +85,11 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
 
   default void delete() {
     getRecordDefinition().delete(this);
+  }
+
+  @Override
+  default Set<Entry<String, Object>> entrySet() {
+    return new RecordEntrySet(this);
   }
 
   default boolean equalPathValue(final CharSequence fieldPath, final Object value) {
@@ -561,10 +568,26 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
   }
 
   @Override
+  default Set<String> keySet() {
+    return new LinkedHashSet<>(getRecordDefinition().getFieldNames());
+  }
+
+  @Override
   default Object put(final String key, final Object value) {
     final Object oldValue = getValue(key);
     setValue(key, value);
     return oldValue;
+  }
+
+  @Override
+  default Object remove(final Object key) {
+    if (key instanceof CharSequence) {
+      final CharSequence name = (CharSequence)key;
+      final Object value = getValue(name);
+      setValue(name, null);
+      return value;
+    }
+    return null;
   }
 
   /**
@@ -780,6 +803,11 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
         setValueByPath(name, value);
       }
     }
+  }
+
+  @Override
+  default int size() {
+    return getRecordDefinition().getFieldCount();
   }
 
   default void validateField(final int fieldIndex) {

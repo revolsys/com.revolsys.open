@@ -5,7 +5,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 
 public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
-
   public AbstractProxyLayerRecord(final AbstractRecordLayer layer) {
     super(layer);
     layer.addProxyRecord(this);

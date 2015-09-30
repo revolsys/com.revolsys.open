@@ -5,11 +5,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.revolsys.record.schema.RecordDefinition;
-
 public abstract class AbstractRecord extends AbstractMap<String, Object>
   implements Record, Cloneable {
-
   /**
    * Construct a new clone of the object.
    *
@@ -28,13 +25,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
 
   @Override
   public Set<Entry<String, Object>> entrySet() {
-    final Set<Entry<String, Object>> entries = new LinkedHashSet<>();
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
-      final RecordMapEntry entry = new RecordMapEntry(this, i);
-      entries.add(entry);
-    }
-    return entries;
+    return new RecordEntrySet(this);
   }
 
   @Override
@@ -43,7 +34,30 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   }
 
   @Override
+  public Object get(final Object key) {
+    // Don't remove this speeds up field access
+    if (key instanceof CharSequence) {
+      final CharSequence name = (String)key;
+      return getValue(name);
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    return System.identityHashCode(this);
+  }
+
+  @Override
+  public Set<String> keySet() {
+    // Don't remove this speeds up field access
+    return new LinkedHashSet<>(getRecordDefinition().getFieldNames());
+  }
+
+  @Override
   public Object put(final String key, final Object value) {
+    // Don't remove this speeds up field access
     final Object oldValue = getValue(key);
     setValue(key, value);
     return oldValue;
@@ -51,7 +65,26 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
 
   @Override
   public void putAll(final Map<? extends String, ? extends Object> values) {
+    // Don't remove this speeds up field access
     setValues(values);
+  }
+
+  @Override
+  public Object remove(final Object key) {
+    // Don't remove this speeds up field access
+    if (key instanceof CharSequence) {
+      final CharSequence name = (CharSequence)key;
+      final Object value = getValue(name);
+      setValue(name, null);
+      return value;
+    }
+    return null;
+  }
+
+  @Override
+  public int size() {
+    // Don't remove this speeds up field access
+    return getRecordDefinition().getFieldCount();
   }
 
   /**
