@@ -16,7 +16,7 @@ import com.revolsys.util.ExceptionUtil;
 public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V> {
   private static final Cursor WAIT_CURSOR = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 
-  private final boolean logTimes = true;
+  private final boolean logTimes = false;
 
   private boolean showBusyCursor = true;
 
