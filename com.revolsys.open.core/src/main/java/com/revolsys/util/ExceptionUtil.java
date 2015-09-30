@@ -15,6 +15,14 @@ public final class ExceptionUtil {
     log(clazz, e.getMessage(), e);
   }
 
+  public static void log(final String name, final String message, final Throwable e) {
+    LoggerFactory.getLogger(name).error(message, e);
+  }
+
+  public static void log(final String name, final Throwable e) {
+    log(name, e.getMessage(), e);
+  }
+
   @SuppressWarnings("unchecked")
   public static <T> T throwCauseException(final Throwable e) {
     final Throwable cause = e.getCause();
