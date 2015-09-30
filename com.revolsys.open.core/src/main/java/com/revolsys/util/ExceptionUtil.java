@@ -7,12 +7,12 @@ import java.lang.reflect.InvocationTargetException;
 import org.slf4j.LoggerFactory;
 
 public final class ExceptionUtil {
-  public static void log(final Class<?> clazz, final String message, final Throwable exception) {
-    LoggerFactory.getLogger(clazz).error(message, exception);
+  public static void log(final Class<?> clazz, final String message, final Throwable e) {
+    LoggerFactory.getLogger(clazz).error(message, e);
   }
 
-  public static void log(final Class<?> clazz, final Throwable exception) {
-    log(clazz, exception.getMessage(), exception);
+  public static void log(final Class<?> clazz, final Throwable e) {
+    log(clazz, e.getMessage(), e);
   }
 
   @SuppressWarnings("unchecked")
@@ -22,15 +22,15 @@ public final class ExceptionUtil {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T throwUncheckedException(final Throwable exception) {
-    if (exception instanceof InvocationTargetException) {
-      return (T)throwCauseException(exception);
-    } else if (exception instanceof RuntimeException) {
-      throw (RuntimeException)exception;
-    } else if (exception instanceof Error) {
-      throw (Error)exception;
+  public static <T> T throwUncheckedException(final Throwable e) {
+    if (e instanceof InvocationTargetException) {
+      return (T)throwCauseException(e);
+    } else if (e instanceof RuntimeException) {
+      throw (RuntimeException)e;
+    } else if (e instanceof Error) {
+      throw (Error)e;
     } else {
-      throw new WrappedException(exception);
+      throw new WrappedException(e);
     }
   }
 

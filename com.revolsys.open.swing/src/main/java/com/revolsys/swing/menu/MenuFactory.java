@@ -159,9 +159,12 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     factories.add(factory);
   }
 
-  public void addComponentFactory(final String groupName, final int index,
+  public void addComponentFactory(final String groupName, int index,
     final ComponentFactory<?> factory) {
     final List<ComponentFactory<?>> factories = getGroup(groupName);
+    if (index < 0) {
+      index = factories.size();
+    }
     factories.add(index, factory);
   }
 
@@ -263,6 +266,31 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     }
   }
 
+  public RunnableAction addMenuItemTitleIcon(final String groupName, final CharSequence name,
+    final String iconName, final EnableCheck enableCheck, final Runnable runnable) {
+    final ImageIcon icon = Icons.getIcon(iconName);
+    final RunnableAction action = createMenuItem(name, null, icon, enableCheck, runnable);
+    addComponentFactory(groupName, action);
+    return action;
+  }
+
+  public RunnableAction addMenuItemTitleIcon(final String groupName, final CharSequence name,
+    final String iconName, final Runnable runnable) {
+    final ImageIcon icon = Icons.getIcon(iconName);
+    final RunnableAction action = createMenuItem(name, null, icon, null, runnable);
+    addComponentFactory(groupName, action);
+    return action;
+  }
+
+  public RunnableAction addMenuItemTitleIcon(final String groupName, final int index,
+    final CharSequence name, final String iconName, final EnableCheck enableCheck,
+    final Runnable runnable) {
+    final ImageIcon icon = Icons.getIcon(iconName);
+    final RunnableAction action = createMenuItem(name, null, icon, enableCheck, runnable);
+    addComponentFactory(groupName, index, action);
+    return action;
+  }
+
   public void addMenuItemTitleIcon(final String groupName, final String name, final String iconName,
     final EnableCheck enableCheck, final Object object, final String methodName,
     final Object... parameters) {
@@ -276,14 +304,6 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     final ImageIcon icon = Icons.getIcon(iconName);
     final InvokeMethodAction action = createMenuItem(title, null, icon, null, object, methodName,
       parameters);
-    addComponentFactory(groupName, action);
-    return action;
-  }
-
-  public RunnableAction addMenuItemTitleIcon(final String groupName, final String title,
-    final String iconName, final Runnable runnable) {
-    final ImageIcon icon = Icons.getIcon(iconName);
-    final RunnableAction action = createMenuItem(title, null, icon, null, runnable);
     addComponentFactory(groupName, action);
     return action;
   }
@@ -387,18 +407,18 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     return menu;
   }
 
+  public RunnableAction createMenuItem(final CharSequence name, final String toolTip,
+    final Icon icon, final EnableCheck enableCheck, final Runnable runnable) {
+    final RunnableAction action = new RunnableAction(name, toolTip, icon, runnable);
+    action.setEnableCheck(enableCheck);
+    return action;
+  }
+
   public InvokeMethodAction createMenuItem(final String name, final String title, final Icon icon,
     final EnableCheck enableCheck, final Object object, final String methodName,
     final Object... parameters) {
     final InvokeMethodAction action = new InvokeMethodAction(name, title, icon, object, methodName,
       parameters);
-    action.setEnableCheck(enableCheck);
-    return action;
-  }
-
-  public RunnableAction createMenuItem(final String name, final String title, final Icon icon,
-    final EnableCheck enableCheck, final Runnable runnable) {
-    final RunnableAction action = new RunnableAction(name, title, icon, runnable);
     action.setEnableCheck(enableCheck);
     return action;
   }

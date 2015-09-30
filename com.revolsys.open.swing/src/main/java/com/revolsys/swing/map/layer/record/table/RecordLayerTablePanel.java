@@ -69,8 +69,8 @@ import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.TableRowCount;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
-import com.revolsys.swing.table.record.row.RecordRowPropertyEnableCheck;
-import com.revolsys.swing.table.record.row.RecordRowRunnable;
+import com.revolsys.swing.table.record.row.RecordRowFunctionEnableCheck;
+import com.revolsys.swing.table.record.row.RecordRowTable;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
@@ -110,13 +110,16 @@ public class RecordLayerTablePanel extends TablePanel
     table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
     final boolean hasGeometry = recordDefinition.getGeometryFieldIndex() != -1;
-    final EnableCheck deletableEnableCheck = new RecordRowPropertyEnableCheck("deletable");
 
-    final EnableCheck modifiedEnableCheck = new RecordRowPropertyEnableCheck("modified");
-    final EnableCheck notDeletedEnableCheck = new ObjectPropertyEnableCheck(this, "recordDeleted",
-      false);
+    final EnableCheck deletableEnableCheck = RecordRowFunctionEnableCheck.newEnableCheck(true,
+      LayerRecord::isDeletable);
+
+    final EnableCheck modifiedEnableCheck = RecordRowFunctionEnableCheck.newEnableCheck(true,
+      Record::isModified);
+    final EnableCheck notDeletedEnableCheck = RecordRowFunctionEnableCheck.newEnableCheck(true,
+      false, this::isRecordDeleted);
     final OrEnableCheck modifiedOrDeleted = new OrEnableCheck(modifiedEnableCheck,
-      new RecordRowPropertyEnableCheck("deleted"));
+      RecordRowFunctionEnableCheck.newEnableCheck(true, LayerRecord::isDeleted));
 
     final EnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(layer, "editable");
 
@@ -129,29 +132,29 @@ public class RecordLayerTablePanel extends TablePanel
       menu.addComponentFactory("default", 0, new WrappedMenuFactory("Layer", layerMenuFactory));
     }
 
-    menu.addMenuItemTitleIcon("record", "View/Edit Record", "table_edit", notDeletedEnableCheck,
-      this, "editRecord");
+    this.tableModel.addMenuItem("record", "View/Edit Record", "table_edit", notDeletedEnableCheck,
+      this::editRecord);
 
     if (hasGeometry) {
-      menu.addMenuItemTitleIcon("record", "Zoom to Record", "magnifier_zoom_selected",
-        notDeletedEnableCheck, this, "zoomToRecord");
+      this.tableModel.addMenuItem("record", "Zoom to Record", "magnifier_zoom_selected",
+        notDeletedEnableCheck, this::zoomToRecord);
     }
-    menu.addMenuItemTitleIcon("record", "Delete Record", "table_row_delete", deletableEnableCheck,
-      this, "deleteRecord");
+    this.tableModel.addMenuItem("record", "Delete Record", "table_row_delete", deletableEnableCheck,
+      this::deleteRecord);
 
-    menu.addMenuItem("record", RecordRowRunnable.createAction("Revert Record", "arrow_revert",
-      modifiedOrDeleted, "revertChanges"));
+    this.tableModel.addMenuItem("record", "Revert Record", "arrow_revert", modifiedOrDeleted,
+      LayerRecord::revertChanges);
 
-    menu.addMenuItem("record", RecordRowRunnable.createAction("Revert Empty Fields",
-      "field_empty_revert", modifiedEnableCheck, "revertEmptyFields"));
+    this.tableModel.addMenuItem("record", "Revert Empty Fields", "field_empty_revert",
+      modifiedEnableCheck, LayerRecord::revertEmptyFields);
 
-    menu.addMenuItemTitleIcon("dnd", "Copy Record", "page_copy", this, "copyRecord");
+    this.tableModel.addMenuItem("dnd", "Copy Record", "page_copy", this::copyRecord);
 
     if (hasGeometry) {
-      menu.addMenuItemTitleIcon("dnd", "Paste Geometry", "geometry_paste",
+      this.tableModel.addMenuItem("dnd", "Paste Geometry", "geometry_paste",
         new AndEnableCheck(editableEnableCheck,
           new InvokeMethodEnableCheck(this, "canPasteRecordGeometry")),
-        this, "pasteGeometry");
+        this::pasteGeometry);
 
       final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
       editMenu.setEnableCheck(notDeletedEnableCheck);
@@ -159,16 +162,18 @@ public class RecordLayerTablePanel extends TablePanel
       if (geometryDataType == DataTypes.LINE_STRING
         || geometryDataType == DataTypes.MULTI_LINE_STRING) {
         if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
-          editMenu.addMenuItemTitleIcon("geometry", RecordLayerForm.FLIP_RECORD_NAME,
-            RecordLayerForm.FLIP_RECORD_ICON, editableEnableCheck, this, "flipRecordOrientation");
-          editMenu.addMenuItemTitleIcon("geometry", RecordLayerForm.FLIP_LINE_ORIENTATION_NAME,
-            RecordLayerForm.FLIP_LINE_ORIENTATION_ICON, editableEnableCheck, this,
-            "flipLineOrientation");
-          editMenu.addMenuItemTitleIcon("geometry", RecordLayerForm.FLIP_FIELDS_NAME,
-            RecordLayerForm.FLIP_FIELDS_ICON, editableEnableCheck, this, "flipFields");
+          RecordRowTableModel.addMenuItem(editMenu, "geometry", RecordLayerForm.FLIP_RECORD_NAME,
+            RecordLayerForm.FLIP_RECORD_ICON, editableEnableCheck, this::flipRecordOrientation);
+
+          RecordRowTableModel.addMenuItem(editMenu, "geometry",
+            RecordLayerForm.FLIP_LINE_ORIENTATION_NAME, RecordLayerForm.FLIP_LINE_ORIENTATION_ICON,
+            editableEnableCheck, this::flipLineOrientation);
+
+          RecordRowTableModel.addMenuItem(editMenu, "geometry", RecordLayerForm.FLIP_FIELDS_NAME,
+            RecordLayerForm.FLIP_FIELDS_ICON, editableEnableCheck, this::flipFields);
         } else {
-          editMenu.addMenuItemTitleIcon("geometry", "Flip Line Orientation", "flip_line",
-            editableEnableCheck, this, "flipLineOrientation");
+          RecordRowTableModel.addMenuItem(editMenu, "geometry", "Flip Line Orientation",
+            "flip_line", editableEnableCheck, this::flipLineOrientation);
         }
       }
       menu.addComponentFactory("record", 2, editMenu);
@@ -318,18 +323,15 @@ public class RecordLayerTablePanel extends TablePanel
     }
   }
 
-  public void copyRecord() {
-    final LayerRecord record = getEventRowObject();
+  public void copyRecord(final LayerRecord record) {
     this.layer.copyRecordsToClipboard(Collections.singletonList(record));
   }
 
-  public void deleteRecord() {
-    final LayerRecord record = getEventRowObject();
+  private void deleteRecord(final LayerRecord record) {
     this.layer.deleteRecords(record);
   }
 
-  public void editRecord() {
-    final LayerRecord record = getEventRowObject();
+  private void editRecord(final LayerRecord record) {
     this.layer.showForm(record);
   }
 
@@ -387,20 +389,17 @@ public class RecordLayerTablePanel extends TablePanel
     }
   }
 
-  public void flipFields() {
-    final LayerRecord record = getEventRowObject();
+  private void flipFields(final LayerRecord record) {
     final DirectionalFields property = DirectionalFields.getProperty(record);
     property.reverseFieldValues(record);
   }
 
-  public void flipLineOrientation() {
-    final LayerRecord record = getEventRowObject();
+  private void flipLineOrientation(final LayerRecord record) {
     final DirectionalFields property = DirectionalFields.getProperty(record);
     property.reverseGeometry(record);
   }
 
-  public void flipRecordOrientation() {
-    final LayerRecord record = getEventRowObject();
+  private void flipRecordOrientation(final LayerRecord record) {
     DirectionalFields.reverse(record);
   }
 
@@ -409,14 +408,8 @@ public class RecordLayerTablePanel extends TablePanel
   }
 
   protected LayerRecord getEventRowObject() {
-    final RecordRowTableModel model = getTableModel();
-    final int row = getEventRow();
-    if (row > -1) {
-      final LayerRecord record = model.getRecord(row);
-      return record;
-    } else {
-      return null;
-    }
+    final LayerRecord record = RecordRowTable.getEventRecord();
+    return record;
   }
 
   public AbstractRecordLayer getLayer() {
@@ -446,13 +439,8 @@ public class RecordLayerTablePanel extends TablePanel
     return super.isCurrentCellEditable() && this.layer.isCanEditRecords();
   }
 
-  public boolean isRecordDeleted() {
-    final int eventRow = TablePanel.getEventRow();
-    if (eventRow != -1) {
-      final LayerRecord record = this.tableModel.getRecord(eventRow);
-      return record.isDeleted();
-    }
-    return false;
+  protected boolean isRecordDeleted(final LayerRecord record) {
+    return record.isDeleted();
   }
 
   @Override
@@ -464,12 +452,12 @@ public class RecordLayerTablePanel extends TablePanel
         final TableCellEditor cellEditor = table.getCellEditor();
         cellEditor.stopCellEditing();
       }
-      editRecord();
+      final LayerRecord record = RecordRowTable.getEventRecord();
+      editRecord(record);
     }
   }
 
-  public void pasteGeometry() {
-    final LayerRecord record = getEventRowObject();
+  private void pasteGeometry(final LayerRecord record) {
     this.layer.pasteRecordGeometry(record);
   }
 
@@ -554,10 +542,9 @@ public class RecordLayerTablePanel extends TablePanel
     return map;
   }
 
-  public void zoomToRecord() {
-    final Record object = getEventRowObject();
+  private void zoomToRecord(final Record record) {
     final Project project = this.layer.getProject();
-    final Geometry geometry = object.getGeometry();
+    final Geometry geometry = record.getGeometry();
     if (geometry != null) {
       final GeometryFactory geometryFactory = project.getGeometryFactory();
       final BoundingBox boundingBox = geometry.getBoundingBox()

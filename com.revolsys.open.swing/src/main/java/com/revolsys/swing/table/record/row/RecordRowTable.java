@@ -22,6 +22,7 @@ import com.revolsys.swing.map.layer.record.table.predicate.ErrorPredicate;
 import com.revolsys.swing.map.layer.record.table.predicate.ModifiedAttributePredicate;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJTable;
+import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
 import com.revolsys.swing.table.record.renderer.RecordRowTableCellRenderer;
@@ -205,5 +206,18 @@ public class RecordRowTable extends BaseJTable implements MouseListener {
   @Override
   public String toString() {
     return getRecordDefinition().getPath();
+  }
+
+  public static <V extends Record> V getEventRecord() {
+    final RecordRowTable table = TablePanel.getEventTable();
+    if (table != null) {
+      final int eventRow = TablePanel.getEventRow();
+      if (eventRow != -1) {
+        final RecordRowTableModel model = table.getTableModel();
+        final V record = model.getRecord(eventRow);
+        return record;
+      }
+    }
+    return null;
   }
 }
