@@ -53,6 +53,7 @@ import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.border.TitledBorder;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
@@ -63,8 +64,11 @@ import com.revolsys.swing.listener.BeanPropertyListener;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.map.ProjectFramePanel;
+import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.menu.MenuSourceAction;
+import com.revolsys.swing.menu.MenuSourceCallableEnableCheck;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.ExceptionUtil;
@@ -82,8 +86,27 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   public static final String PLUGIN_TABLE_VIEW = "tableView";
 
   static {
-    MenuFactory.createMenu(AbstractLayer.class, "ZoomToLayer", "MinScale", "MaxScale", "Refresh",
-      "DeleteLayer", "LayerProperties");
+    final MenuFactory menu = MenuFactory.getMenu(AbstractLayer.class);
+
+    MenuSourceAction.<AbstractLayer> addMenuItem(menu, "zoom", "Zoom to Layer", "magnifier",
+      new MenuSourceCallableEnableCheck<>(AbstractLayer::isZoomToLayerEnabled),
+      AbstractLayer::zoomToLayer);
+
+    final EnableCheck hasGeometry = new MenuSourceCallableEnableCheck<>(
+      AbstractLayer::isHasGeometry);
+    menu.addComponentFactory("scale", new TreeItemScaleMenu(true, hasGeometry));
+    menu.addComponentFactory("scale", new TreeItemScaleMenu(false, hasGeometry));
+
+    final EnableCheck exists = new MenuSourceCallableEnableCheck<>(AbstractLayer::isExists);
+
+    MenuSourceAction.<AbstractLayer> addMenuItem(menu, "refresh", "Refresh", "arrow_refresh",
+      exists, AbstractLayer::refreshAll);
+
+    MenuSourceAction.<AbstractLayer> addMenuItem(menu, "layer", "Delete", "delete",
+      AbstractLayer::deleteWithConfirm);
+
+    MenuSourceAction.<AbstractLayer> addMenuItem(menu, "layer", "Layer Properties", "information",
+      exists, AbstractLayer::showProperties);
   }
 
   private PropertyChangeListener beanPropertyListener = new BeanPropertyListener(this);
@@ -649,11 +672,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   @Override
   public boolean isHasChanges() {
     return false;
-  }
-
-  @Override
-  public boolean isHasGeometry() {
-    return true;
   }
 
   @Override

@@ -1,9 +1,0 @@
-{
-  "group":"layer",
-  "name": "Delete Layer",
-  "icon": "delete",
-  "type": "menuSourceRunnable",
-  "methodName": "deleteWithConfirm",
-  "parameters": [
-  ]
-}

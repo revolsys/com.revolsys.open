@@ -22,7 +22,7 @@ import org.apache.log4j.spi.LoggingEvent;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.field.TextArea;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
@@ -52,7 +52,7 @@ public class LoggingEventPanel extends JPanel {
     dialog.setLayout(new BorderLayout());
     dialog.add(new LoggingEventPanel(event), BorderLayout.CENTER);
     final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    buttons.add(InvokeMethodAction.createButton("OK", dialog, "setVisible", false));
+    buttons.add(RunnableAction.createButton("OK", () -> dialog.setVisible(false)));
     dialog.add(buttons, BorderLayout.SOUTH);
     dialog.pack();
     dialog.setVisible(true);

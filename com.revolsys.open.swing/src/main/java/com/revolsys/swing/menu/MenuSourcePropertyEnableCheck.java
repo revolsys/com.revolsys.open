@@ -1,4 +1,4 @@
-package com.revolsys.swing.tree;
+package com.revolsys.swing.menu;
 
 import java.util.Map;
 
@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.equals.Equals;
 import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
-import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.Property;
 
 public class MenuSourcePropertyEnableCheck extends AbstractEnableCheck {

@@ -39,7 +39,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
@@ -129,10 +129,10 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
     final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     add(buttonsPanel, BorderLayout.SOUTH);
 
-    final JButton cancelButton = InvokeMethodAction.createButton("Cancel", this, "cancel");
+    final JButton cancelButton = RunnableAction.createButton("Cancel", this::cancel);
     buttonsPanel.add(cancelButton);
 
-    this.okButton = InvokeMethodAction.createButton("OK", this, "finish");
+    this.okButton = RunnableAction.createButton("OK", this::finish);
     this.okButton.setEnabled(false);
     buttonsPanel.add(this.okButton);
 

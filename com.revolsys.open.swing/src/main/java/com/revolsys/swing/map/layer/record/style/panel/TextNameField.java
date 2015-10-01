@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -14,7 +15,7 @@ import javax.swing.text.Document;
 
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
-import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.ComboBox;
@@ -31,7 +32,7 @@ public class TextNameField extends ValueField {
    */
   private static final long serialVersionUID = 1L;
 
-  private final ComboBox fieldNamesField;
+  private final ComboBox<String> fieldNamesField;
 
   private final TextArea textNameField;
 
@@ -41,15 +42,15 @@ public class TextNameField extends ValueField {
     this.textNameField = new TextArea(fieldName, fieldValue, 3, 30);
     add(new JScrollPane(this.textNameField), BorderLayout.NORTH);
 
-    final ArrayList<String> fieldNames = new ArrayList<String>(layer.getFieldNames());
+    final List<String> fieldNames = new ArrayList<String>(layer.getFieldNames());
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
     fieldNames.remove(recordDefinition.getGeometryFieldName());
     final AttributeTitleStringConveter converter = new AttributeTitleStringConveter(layer);
-    this.fieldNamesField = new ComboBox(converter, false, fieldNames.toArray());
+    this.fieldNamesField = new ComboBox<String>(converter, false, fieldNames);
     this.fieldNamesField.setRenderer(converter);
 
-    final JButton addButton = InvokeMethodAction.createButton(null, "Add field name",
-      Icons.getIcon("add"), this, "addFieldName");
+    final JButton addButton = RunnableAction.createButton(null, "Add field name",
+      Icons.getIcon("add"), this::addFieldName);
     addButton.setIcon(Icons.getIcon("add"));
     addButton.setToolTipText("Add field Name");
 

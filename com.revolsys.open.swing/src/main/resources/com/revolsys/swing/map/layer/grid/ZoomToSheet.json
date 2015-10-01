@@ -1,7 +1,0 @@
-{
-  "group":"zoom",
-  "name": "Zoom to Mapsheet",
-  "icon": "magnifier_zoom_grid",
-  "type": "menuSourceRunnable",
-  "methodName": "zoomToSheet"
-}

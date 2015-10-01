@@ -13,7 +13,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.WindowConstants;
 
-import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.field.Field;
 
 public class PreferencesDialog extends JDialog {
@@ -34,8 +34,8 @@ public class PreferencesDialog extends JDialog {
     add(this.tabs, BorderLayout.CENTER);
 
     final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    buttonsPanel.add(InvokeMethodAction.createButton("Cancel", this, "cancel"));
-    buttonsPanel.add(InvokeMethodAction.createButton("Save", this, "save"));
+    buttonsPanel.add(RunnableAction.createButton("Cancel", this::cancel));
+    buttonsPanel.add(RunnableAction.createButton("Save", this::save));
     add(buttonsPanel, BorderLayout.SOUTH);
   }
 

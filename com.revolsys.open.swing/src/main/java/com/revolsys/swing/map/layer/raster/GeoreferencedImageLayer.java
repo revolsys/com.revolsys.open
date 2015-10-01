@@ -34,9 +34,9 @@ import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.menu.MenuSourceAction;
+import com.revolsys.swing.menu.MenuSourcePropertyEnableCheck;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.swing.tree.MenuSourcePropertyEnableCheck;
-import com.revolsys.swing.tree.MenuSourceRunnable;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
@@ -52,20 +52,18 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     final EnableCheck showOriginalImage = new MenuSourcePropertyEnableCheck("showOriginalImage");
     final EnableCheck hasTransform = new MenuSourcePropertyEnableCheck("hasTransform");
 
-    menu.addMenuItem("table",
-      MenuSourceRunnable.createAction("View Tie-Points", "table_go", "showTiePointsTable"));
+    MenuSourceAction.<GeoreferencedImageLayer> addMenuItem(menu, "table", "View Tie-Points",
+      "table_go", GeoreferencedImageLayer::showTiePointsTable);
 
-    menu.addCheckboxMenuItem("edit",
-      MenuSourceRunnable.createAction("Editable", "pencil", readonly, "toggleEditable"), editable);
+    MenuSourceAction.<GeoreferencedImageLayer> addCheckboxMenuItem(menu, "edit", "Editable",
+      "pencil", readonly, GeoreferencedImageLayer::toggleEditable, editable);
 
-    menu
-      .addCheckboxMenuItem("edit",
-        MenuSourceRunnable.createAction("Show Original Image", (String)null,
-          new AndEnableCheck(editable, hasTransform), "toggleShowOriginalImage"),
-      showOriginalImage);
+    MenuSourceAction.<GeoreferencedImageLayer> addCheckboxMenuItem(menu, "edit",
+      "Show Original Image", (String)null, new AndEnableCheck(editable, hasTransform),
+      GeoreferencedImageLayer::toggleShowOriginalImage, showOriginalImage);
 
-    menu.addMenuItem("edit",
-      MenuSourceRunnable.createAction("Fit to Screen", "arrow_out", editable, "fitToViewport"));
+    MenuSourceAction.<GeoreferencedImageLayer> addMenuItem(menu, "edit", "Fit to Screen",
+      "arrow_out", editable, GeoreferencedImageLayer::fitToViewport);
 
     menu.deleteMenuItem("refresh", "Refresh");
   }

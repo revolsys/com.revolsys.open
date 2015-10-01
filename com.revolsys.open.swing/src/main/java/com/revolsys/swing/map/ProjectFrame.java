@@ -51,7 +51,6 @@ import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BaseFrame;
@@ -114,10 +113,8 @@ public class ProjectFrame extends BaseFrame {
       SAVE_CHANGES_KEY);
 
     final ActionMap actionMap = component.getActionMap();
-    actionMap.put(SAVE_PROJECT_KEY,
-      new InvokeMethodAction(SAVE_PROJECT_KEY, project, "saveAllSettings"));
-    actionMap.put(SAVE_CHANGES_KEY,
-      new InvokeMethodAction(SAVE_CHANGES_KEY, project, "saveChanges"));
+    actionMap.put(SAVE_PROJECT_KEY, new RunnableAction(SAVE_PROJECT_KEY, project::saveAllSettings));
+    actionMap.put(SAVE_CHANGES_KEY, new RunnableAction(SAVE_CHANGES_KEY, project::saveChanges));
   }
 
   public static ProjectFrame get(final Layer layer) {
@@ -349,8 +346,8 @@ public class ProjectFrame extends BaseFrame {
     final int tabIndex = addTabIcon(this.bottomTabs, "time", "Background Tasks", panel, false);
 
     final SwingWorkerProgressBar progressBar = this.mapPanel.getProgressBar();
-    final JButton viewTasksAction = InvokeMethodAction.createButton(null, "View Running Tasks",
-      Icons.getIcon("time_go"), this.bottomTabs, "setSelectedIndex", tabIndex);
+    final JButton viewTasksAction = RunnableAction.createButton(null, "View Running Tasks",
+      Icons.getIcon("time_go"), () -> this.bottomTabs.setSelectedIndex(tabIndex));
     viewTasksAction.setBorderPainted(false);
     viewTasksAction.setBorder(null);
     progressBar.add(viewTasksAction, BorderLayout.EAST);
@@ -423,8 +420,8 @@ public class ProjectFrame extends BaseFrame {
     final MenuFactory tools = new MenuFactory("Tools");
     final MapPanel map = getMapPanel();
     tools.addCheckboxMenuItem("map",
-      new InvokeMethodAction("Measure", Icons.getIcon("ruler"), map, "toggleMode",
-        MeasureOverlay.MEASURE),
+      new RunnableAction("Measure", Icons.getIcon("ruler"),
+        () -> map.toggleMode(MeasureOverlay.MEASURE)),
       new ObjectPropertyEnableCheck(map, "overlayAction", MeasureOverlay.MEASURE));
 
     tools.addMenuItemTitleIcon("script", "Run Script...", "script_go", () -> actionRunScript());

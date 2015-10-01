@@ -73,7 +73,9 @@ public interface Layer
 
   boolean isHasChanges();
 
-  boolean isHasGeometry();
+  default boolean isHasGeometry() {
+    return true;
+  }
 
   boolean isHasSelectedRecords();
 

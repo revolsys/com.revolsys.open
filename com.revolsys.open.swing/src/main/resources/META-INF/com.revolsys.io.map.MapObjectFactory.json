@@ -14,18 +14,6 @@
       "methodName": "create"
     },
     {
-      "typeName": "menuSourceEnableCheck",
-      "description": "Menu Source Enable Check",
-      "typeClass": "com.revolsys.swing.tree.MenuSourcePropertyEnableCheck",
-      "methodName": "create"
-    },
-    {
-      "typeName": "menuSourceRunnable",
-      "description": "Menu Source Menu Factory",
-      "typeClass": "com.revolsys.swing.tree.MenuSourceRunnable",
-      "methodName": "create"
-    },
-    {
       "typeName": "layerGroup",
       "description": "Layer Group",
       "typeClass": "com.revolsys.swing.map.layer.LayerGroup",

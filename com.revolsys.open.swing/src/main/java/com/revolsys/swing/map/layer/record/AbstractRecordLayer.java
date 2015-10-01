@@ -114,10 +114,10 @@ import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
 import com.revolsys.swing.map.overlay.CloseLocation;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.menu.MenuSourceAction;
+import com.revolsys.swing.menu.MenuSourcePropertyEnableCheck;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJTable;
-import com.revolsys.swing.tree.MenuSourcePropertyEnableCheck;
-import com.revolsys.swing.tree.MenuSourceRunnable;
 import com.revolsys.swing.tree.node.record.RecordStoreTableTreeNode;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.CompareUtil;
@@ -143,13 +143,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
     final EnableCheck exists = new MenuSourcePropertyEnableCheck("exists");
 
-    menu.addMenuItem(clazz, "ViewRecords");
+    MenuSourceAction.<AbstractRecordLayer> addMenuItem(menu, "table", "View Records", "table_go",
+      exists, AbstractRecordLayer::showRecordsTable);
 
     final EnableCheck hasSelectedRecords = new MenuSourcePropertyEnableCheck("hasSelectedRecords");
     final EnableCheck hasGeometry = new MenuSourcePropertyEnableCheck("hasGeometry");
-    menu.addMenuItem("zoom",
-      MenuSourceRunnable.createAction("Zoom to Selected", "magnifier_zoom_selected",
-        new AndEnableCheck(exists, hasGeometry, hasSelectedRecords), "zoomToSelected"));
+    MenuSourceAction.<AbstractRecordLayer> addMenuItem(menu, "zoom", "Zoom to Selected",
+      "magnifier_zoom_selected", new AndEnableCheck(exists, hasGeometry, hasSelectedRecords),
+      AbstractRecordLayer::zoomToSelected);
 
     final EnableCheck editable = new MenuSourcePropertyEnableCheck("editable");
     final EnableCheck readonly = new MenuSourcePropertyEnableCheck("readOnly", false);
@@ -159,35 +160,37 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final EnableCheck canMergeRecords = new MenuSourcePropertyEnableCheck("canMergeRecords");
     final EnableCheck canPaste = new MenuSourcePropertyEnableCheck("canPaste");
 
-    menu.addCheckboxMenuItem("edit",
-      MenuSourceRunnable.createAction("Editable", "pencil", readonly, "toggleEditable"), editable);
+    MenuSourceAction.<AbstractRecordLayer> addCheckboxMenuItem(menu, "edit", "Editable", "pencil",
+      readonly, AbstractRecordLayer::toggleEditable, editable);
 
-    menu.addMenuItem("edit",
-      MenuSourceRunnable.createAction("Save Changes", "table_save", hasChanges, "saveChanges"));
+    MenuSourceAction.<AbstractRecordLayer> addMenuItem(menu, "edit", "Save Changes", "table_save",
+      hasChanges, AbstractRecordLayer::saveChanges);
 
-    menu.addMenuItem("edit", MenuSourceRunnable.createAction("Cancel Changes", "table_cancel",
-      hasChanges, "cancelChanges"));
+    MenuSourceAction.<AbstractRecordLayer> addMenuItem(menu, "edit", "Cancel Changes",
+      "table_cancel", hasChanges, AbstractRecordLayer::cancelChanges);
 
-    menu.addMenuItem("edit", MenuSourceRunnable.createAction("Add New Record", "table_row_insert",
-      canAdd, "addNewRecord"));
+    MenuSourceAction.<AbstractRecordLayer> addMenuItem(menu, "edit", "Add New Record",
+      "table_row_insert", canAdd, AbstractRecordLayer::addNewRecord);
 
-    menu.addMenuItem("edit",
-      MenuSourceRunnable.createAction("Delete Selected Records", "table_row_delete",
-        new AndEnableCheck(hasSelectedRecords, canDelete), "deleteSelectedRecords"));
+    MenuSourceAction.<AbstractRecordLayer> addMenuItem(menu, "edit", "Delete Selected Records",
+      "table_row_delete", new AndEnableCheck(hasSelectedRecords, canDelete),
+      AbstractRecordLayer::deleteSelectedRecords);
 
-    menu.addMenuItem("edit", MenuSourceRunnable.createAction("Merge Selected Records",
-      "shape_group", canMergeRecords, "mergeSelectedRecords"));
+    MenuSourceAction.<AbstractRecordLayer> addMenuItem(menu, "edit", "Merge Selected Records",
+      "shape_group", canMergeRecords, AbstractRecordLayer::mergeSelectedRecords);
 
-    menu.addMenuItem("dnd", MenuSourceRunnable.createAction("Copy Selected Records", "page_copy",
-      hasSelectedRecords, "copySelectedRecords"));
+    MenuSourceAction.<AbstractRecordLayer> addMenuItem(menu, "dnd", "Copy Selected Records",
+      "page_copy", hasSelectedRecords, AbstractRecordLayer::copySelectedRecords);
 
-    menu.addMenuItem("dnd", MenuSourceRunnable.createAction("Paste New Records", "paste_plain",
-      new AndEnableCheck(canAdd, canPaste), "pasteRecords"));
+    MenuSourceAction.<AbstractRecordLayer> addMenuItem(menu, "dnd", "Paste New Records",
+      "paste_plain", new AndEnableCheck(canAdd, canPaste), AbstractRecordLayer::pasteRecords);
 
-    menu.addMenuItem("layer", 0, MenuSourceRunnable.createAction("Layer Style", "palette",
-      new AndEnableCheck(exists, hasGeometry), "showProperties", "Style"));
+    MenuSourceAction.<AbstractRecordLayer> addMenuItem(menu, "layer", 0, "Layer Style", "palette",
+      new AndEnableCheck(exists, hasGeometry),
+      (final AbstractRecordLayer layer) -> layer.showProperties("Style"));
 
-    // menu.addMenuItem("edit", 0, MenuSourceRunnable.createAction(
+    // menu.addMenuItem("edit", 0,
+    // MenuSourceAction.<AbstractRecordLayer>addMenuItem(menu,"",
     // "Export Records", "disk", new AndEnableCheck(exists, hasSelectedRecords),
     // "exportRecords"));
   }
@@ -1694,7 +1697,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   @Override
   public boolean isHasGeometry() {
-    return getGeometryFieldName() != null;
+    return isExists() && getGeometryFieldName() != null;
   }
 
   @Override

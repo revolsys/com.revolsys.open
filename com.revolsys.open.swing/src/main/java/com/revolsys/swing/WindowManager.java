@@ -15,7 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
-import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.RunnableAction;
 
 public class WindowManager implements WindowFocusListener {
 
@@ -46,8 +46,8 @@ public class WindowManager implements WindowFocusListener {
       } else {
         title = window.getName();
       }
-      final JCheckBoxMenuItem menuItem = InvokeMethodAction.createCheckBoxMenuItem(title,
-        WindowManager.class, "requestFocus", window);
+      final JCheckBoxMenuItem menuItem = RunnableAction.createCheckBoxMenuItem(title,
+        () -> requestFocus(window));
       menuItem.setSelected(true);
       menu.add(menuItem);
       windowMenuItemMap.put(window, menuItem);

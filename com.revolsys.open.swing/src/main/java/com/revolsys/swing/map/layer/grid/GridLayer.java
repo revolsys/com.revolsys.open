@@ -17,16 +17,20 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.menu.MenuSourceAction;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 
 public class GridLayer extends AbstractLayer {
   static {
-    final MenuFactory menu = MenuFactory.createMenu(GridLayer.class, "ZoomToSheet");
+    final MenuFactory menu = MenuFactory.getMenu(GridLayer.class);
 
     menu.deleteMenuItem("zoom", "Zoom to Layer");
     menu.deleteMenuItem("refresh", "Refresh");
+
+    MenuSourceAction.<GridLayer> addMenuItem(menu, "zoom", "Zoom to Mapsheet",
+      "magnifier_zoom_grid", GridLayer::zoomToSheet);
   }
 
   public static GridLayer create(final Map<String, Object> properties) {

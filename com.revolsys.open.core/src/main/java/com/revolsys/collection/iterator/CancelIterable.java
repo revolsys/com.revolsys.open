@@ -20,8 +20,12 @@ public class CancelIterable<T> extends AbstractIterator<T> {
   private Iterator<T> iterator;
 
   public CancelIterable(final Cancellable cancellable, final Iterable<T> iterable) {
+    this(cancellable, iterable.iterator());
+  }
+
+  public CancelIterable(final Cancellable cancellable, final Iterator<T> iterator) {
     this.cancellable = cancellable;
-    this.iterator = iterable.iterator();
+    this.iterator = iterator;
   }
 
   @Override

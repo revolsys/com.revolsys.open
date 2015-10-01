@@ -20,7 +20,7 @@ import javax.swing.UIManager;
 import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.parallel.Invoke;
 
 public class ProgressMonitor extends JDialog implements WindowListener {
@@ -65,7 +65,7 @@ public class ProgressMonitor extends JDialog implements WindowListener {
     }
     final String cancelText = UIManager.getString("OptionPane.cancelButtonText");
     final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    this.cancelButton = InvokeMethodAction.createButton(cancelText, this, "cancel");
+    this.cancelButton = RunnableAction.createButton(cancelText, this::cancel);
     this.cancelButton.setEnabled(canCancel);
     buttonPanel.add(this.cancelButton);
     add(this.progressBar);

@@ -15,7 +15,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CaseConverter;
@@ -237,8 +237,8 @@ public class ValueField extends JPanel implements Field {
     dialog.add(this, BorderLayout.CENTER);
 
     final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    buttons.add(InvokeMethodAction.createButton("Cancel", this, "cancel", dialog));
-    buttons.add(InvokeMethodAction.createButton("OK", this, "save", dialog));
+    buttons.add(RunnableAction.createButton("Cancel", () -> cancel(dialog)));
+    buttons.add(RunnableAction.createButton("OK", () -> save(dialog)));
     dialog.add(buttons, BorderLayout.SOUTH);
 
     dialog.pack();

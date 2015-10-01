@@ -18,13 +18,13 @@ import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.field.Slider;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.menu.MenuSourceAction;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.NumberTableCellRenderer;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.object.ObjectListTable;
 import com.revolsys.swing.table.object.ObjectListTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
-import com.revolsys.swing.tree.MenuSourceRunnable;
 import com.revolsys.util.Property;
 
 public class TiePointsPanel extends TablePanel implements PropertyChangeListener {
@@ -69,14 +69,13 @@ public class TiePointsPanel extends TablePanel implements PropertyChangeListener
         10);
     }
 
-    menu.addMenuItem("zoom",
-      MenuSourceRunnable.createAction("Zoom to Layer", "magnifier", "zoomToLayer"));
+    MenuSourceAction.<GeoreferencedImageLayer> addMenuItem(menu, "zoom", "Zoom to Layer",
+      "magnifier", GeoreferencedImageLayer::zoomToLayer);
 
-    toolBar.addButton("zoom", "Zoom to Layer", "magnifier", (EnableCheck)null, layer,
-      "zoomToLayer");
+    toolBar.addButton("zoom", "Zoom to Layer", "magnifier", (EnableCheck)null, layer::zoomToLayer);
 
-    toolBar.addButton("edit", "Fit to Screen", "arrow_out", editableEnableCheck, layer,
-      "fitToViewport");
+    toolBar.addButton("edit", "Fit to Screen", "arrow_out", editableEnableCheck,
+      layer::fitToViewport);
 
     this.opacityField = new Slider("opacity", 0, 256, layer.getOpacity());
     this.opacityField.setMajorTickSpacing(64);

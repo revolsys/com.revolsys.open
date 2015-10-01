@@ -1,23 +1,19 @@
 package com.revolsys.swing.map.layer.record.renderer;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import javax.swing.ImageIcon;
+import java.util.function.Consumer;
 
 import com.revolsys.equals.Equals;
 import com.revolsys.io.map.MapSerializerUtil;
-import com.revolsys.swing.Icons;
-import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.MenuSourcePropertyEnableCheck;
-import com.revolsys.swing.tree.MenuSourceRunnable;
+import com.revolsys.swing.menu.MenuSourceAction;
+import com.revolsys.swing.menu.MenuSourcePropertyEnableCheck;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -25,29 +21,34 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
   static {
     final MenuFactory menu = MenuFactory.getMenu(AbstractMultipleRenderer.class);
 
-    for (final String type : Arrays.asList("Geometry", "Text", "Marker", "Multiple", "Filter",
-      "Scale")) {
-      final String iconName = ("style_" + type + "_add").toLowerCase();
-      final ImageIcon icon = Icons.getIcon(iconName);
-      final InvokeMethodAction action = MenuSourceRunnable.createAction("Add " + type + " Style",
-        icon, "add" + type + "Style");
-      menu.addMenuItem("add", action);
-    }
+    addAddMenuItem(menu, "Geometry", AbstractMultipleRenderer::addGeometryStyle);
+    addAddMenuItem(menu, "Text", AbstractMultipleRenderer::addTextStyle);
+    addAddMenuItem(menu, "Marker", AbstractMultipleRenderer::addMarkerStyle);
+    addAddMenuItem(menu, "Multiple", AbstractMultipleRenderer::addMultipleStyle);
+    addAddMenuItem(menu, "Filter", AbstractMultipleRenderer::addFilterStyle);
+    addAddMenuItem(menu, "Scale", AbstractMultipleRenderer::addScaleStyle);
 
-    addMenuItem(menu, "Multiple", MultipleRenderer.class);
-    addMenuItem(menu, "Filter", FilterMultipleRenderer.class);
-    addMenuItem(menu, "Scale", ScaleMultipleRenderer.class);
+    addConvertMenuItem(menu, "Multiple", MultipleRenderer.class,
+      AbstractMultipleRenderer::convertToMultipleStyle);
+    addConvertMenuItem(menu, "Filter", FilterMultipleRenderer.class,
+      AbstractMultipleRenderer::convertToFilterStyle);
+    addConvertMenuItem(menu, "Scale", ScaleMultipleRenderer.class,
+      AbstractMultipleRenderer::convertToScaleStyle);
   }
 
-  protected static void addMenuItem(final MenuFactory menu, final String type,
-    final Class<?> rendererClass) {
-    final String iconName = ("style_" + type + "_go").toLowerCase();
-    final ImageIcon icon = Icons.getIcon(iconName);
+  protected static void addAddMenuItem(final MenuFactory menu, final String type,
+    final Consumer<AbstractMultipleRenderer> consumer) {
+    final String iconName = ("style_" + type + "_add").toLowerCase();
+    final String name = "Add " + type + " Style";
+    MenuSourceAction.addMenuItem(menu, "add", name, iconName, consumer);
+  }
 
+  protected static void addConvertMenuItem(final MenuFactory menu, final String type,
+    final Class<?> rendererClass, final Consumer<AbstractMultipleRenderer> consumer) {
+    final String iconName = ("style_" + type + "_go").toLowerCase();
     final EnableCheck enableCheck = new MenuSourcePropertyEnableCheck("class", rendererClass, true);
-    final InvokeMethodAction action = MenuSourceRunnable.createAction(
-      "Convert to " + type + " Style", icon, enableCheck, "convertTo" + type + "Style");
-    menu.addMenuItem("convert", action);
+    final String name = "Convert to " + type + " Style";
+    MenuSourceAction.addMenuItem(menu, "convert", name, iconName, enableCheck, consumer);
   }
 
   private List<AbstractRecordLayerRenderer> renderers = new ArrayList<AbstractRecordLayerRenderer>();

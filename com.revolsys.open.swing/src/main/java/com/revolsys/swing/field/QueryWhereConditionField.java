@@ -84,7 +84,7 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
@@ -114,13 +114,13 @@ public class QueryWhereConditionField extends ValueField
 
   private JComponent binaryConditionField;
 
-  private final ComboBox binaryConditionOperator;
+  private final ComboBox<String> binaryConditionOperator;
 
   private final BasePanel binaryConditionPanel;
 
   private CodeTable codeTable;
 
-  private final ComboBox fieldNamesList;
+  private final ComboBox<FieldDefinition> fieldNamesList;
 
   private JComponent inConditionField;
 
@@ -138,7 +138,7 @@ public class QueryWhereConditionField extends ValueField
 
   private final RecordDefinition recordDefinition;
 
-  private final ComboBox rightUnaryConditionOperator;
+  private final ComboBox<String> rightUnaryConditionOperator;
 
   private final Color selectionColor;
 
@@ -165,38 +165,40 @@ public class QueryWhereConditionField extends ValueField
     this.originalFilter = filter;
     this.listener = listener;
     this.recordDefinition = layer.getRecordDefinition();
-    final List<FieldDefinition> attributes = this.recordDefinition.getFields();
+    final List<FieldDefinition> fieldDefinitions = this.recordDefinition.getFields();
 
-    this.fieldNamesList = new ComboBox(new AttributeTitleStringConveter(layer), false, attributes);
+    this.fieldNamesList = new ComboBox<FieldDefinition>(new AttributeTitleStringConveter(layer),
+      false, fieldDefinitions);
     this.fieldNamesList.addItemListener(this);
     this.fieldNamesList.addMouseListener(this);
 
     final BasePanel fieldNamePanel = new BasePanel(this.fieldNamesList);
     GroupLayoutUtil.makeColumns(fieldNamePanel, 1, false);
 
-    this.binaryConditionOperator = new ComboBox("operator", "=", "<>", "<", "<=", ">", ">=");
-    final JButton binaryConditionAddButton = InvokeMethodAction.createButton("",
-      "Add Binary Condition", ICON, this, "actionAddBinaryCondition");
+    this.binaryConditionOperator = new ComboBox<String>("operator", "=", "<>", "<", "<=", ">",
+      ">=");
+    final JButton binaryConditionAddButton = RunnableAction.createButton("", "Add Binary Condition",
+      ICON, this::actionAddBinaryCondition);
     this.binaryConditionPanel = new BasePanel(this.binaryConditionOperator,
       binaryConditionAddButton);
     setBinaryConditionField(null);
 
-    this.rightUnaryConditionOperator = new ComboBox("operator", "IS NULL", "IS NOT NULL");
-    final JButton rightUnaryConditionAddButton = InvokeMethodAction.createButton("",
-      "Add Unary Condition", ICON, this, "actionAddRightUnaryCondition");
+    this.rightUnaryConditionOperator = new ComboBox<String>("operator", "IS NULL", "IS NOT NULL");
+    final JButton rightUnaryConditionAddButton = RunnableAction.createButton("",
+      "Add Unary Condition", ICON, this::actionAddRightUnaryCondition);
     final BasePanel rightUnaryConditionPanel = new BasePanel(this.rightUnaryConditionOperator,
       rightUnaryConditionAddButton);
     GroupLayoutUtil.makeColumns(rightUnaryConditionPanel, false);
 
-    final JButton likeConditionAddButton = InvokeMethodAction.createButton("",
-      "Add Unary Condition", ICON, this, "actionAddLikeCondition");
+    final JButton likeConditionAddButton = RunnableAction.createButton("", "Add Unary Condition",
+      ICON, this::actionAddLikeCondition);
     this.likeConditionField = new TextField(20);
     this.likePanel = new BasePanel(SwingUtil.newLabel("LIKE"), new JLabel(" '%"),
       this.likeConditionField, new JLabel("%' "), likeConditionAddButton);
     GroupLayoutUtil.makeColumns(this.likePanel, false);
 
-    final JButton inConditionAddButton = InvokeMethodAction.createButton("", "Add Unary Condition",
-      ICON, this, "actionAddInCondition");
+    final JButton inConditionAddButton = RunnableAction.createButton("", "Add Unary Condition",
+      ICON, this::actionAddInCondition);
     this.inConditionField = new TextField(20);
     this.inConditionPanel = new BasePanel(SwingUtil.newLabel("IN"), this.inConditionField,
       inConditionAddButton);

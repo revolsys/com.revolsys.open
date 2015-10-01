@@ -1,15 +1,12 @@
 package com.revolsys.swing.map.layer.record.renderer;
 
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-
-import javax.swing.ImageIcon;
 
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +16,6 @@ import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 import com.revolsys.record.filter.MultipleAttributeValuesFilter;
-import com.revolsys.swing.Icons;
-import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
@@ -30,8 +25,8 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.SqlLayerFilter;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.MenuSourcePropertyEnableCheck;
-import com.revolsys.swing.tree.MenuSourceRunnable;
+import com.revolsys.swing.menu.MenuSourceAction;
+import com.revolsys.swing.menu.MenuSourcePropertyEnableCheck;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -50,22 +45,27 @@ public abstract class AbstractRecordLayerRenderer
     addRendererClass("filterStyle", FilterMultipleRenderer.class);
 
     final MenuFactory menu = MenuFactory.getMenu(AbstractRecordLayerRenderer.class);
-    menu.addMenuItem("layer", MenuSourceRunnable.createAction("View/Edit Style", "palette",
-      new MenuSourcePropertyEnableCheck("editing", false), "showProperties"));
-    menu.addMenuItem("layer", MenuSourceRunnable.createAction("Delete", "delete",
-      new MenuSourcePropertyEnableCheck("parent", null, true), "delete"));
+
+    MenuSourceAction.<AbstractRecordLayerRenderer> addMenuItem(menu, "layer", "View/Edit Style",
+      "palette", new MenuSourcePropertyEnableCheck("editing", false),
+      AbstractRecordLayerRenderer::showProperties);
+
+    MenuSourceAction.<AbstractRecordLayerRenderer> addMenuItem(menu, "layer", "Delete", "delete",
+      new MenuSourcePropertyEnableCheck("parent", null, true), AbstractRecordLayerRenderer::delete);
 
     menu.addComponentFactory("scale", new TreeItemScaleMenu(true, null));
     menu.addComponentFactory("scale", new TreeItemScaleMenu(false, null));
 
-    for (final String type : Arrays.asList("Multiple", "Filter", "Scale")) {
-      final String iconName = ("style_" + type + "_wrap").toLowerCase();
-      final ImageIcon icon = Icons.getIcon(iconName);
-      final InvokeMethodAction action = MenuSourceRunnable
-        .createAction("Wrap With " + type + " Style", icon, "wrapWith" + type + "Style");
-      menu.addMenuItem("wrap", action);
-    }
+    MenuSourceAction.<AbstractRecordLayerRenderer> addMenuItem(menu, "wrap",
+      "Wrap With Multiple Style", "style_multiple_wrap",
+      AbstractRecordLayerRenderer::wrapWithMultipleStyle);
 
+    MenuSourceAction.<AbstractRecordLayerRenderer> addMenuItem(menu, "wrap",
+      "Wrap With Filter Style", "style_filter_wrap",
+      AbstractRecordLayerRenderer::wrapWithFilterStyle);
+
+    MenuSourceAction.<AbstractRecordLayerRenderer> addMenuItem(menu, "wrap",
+      "Wrap With Scale Style", "style_scale_wrap", AbstractRecordLayerRenderer::wrapWithScaleStyle);
   }
 
   public static void addRendererClass(final String name,

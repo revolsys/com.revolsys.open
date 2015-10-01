@@ -99,6 +99,21 @@ public class ToolBar extends JToolBar {
     return addButton(groupName, action);
   }
 
+  public JButton addButton(final String groupName, String title, final String iconName,
+    final EnableCheck enableCheck, final Runnable runnable) {
+    String name = null;
+    Icon icon = null;
+    if (Property.hasValue(iconName)) {
+      icon = Icons.getIcon(iconName);
+    } else {
+      name = title;
+      title = null;
+    }
+
+    final RunnableAction action = new RunnableAction(name, title, icon, enableCheck, runnable);
+    return addButton(groupName, action);
+  }
+
   public JButton addButton(final String groupName, final String name, final String title,
     final Icon icon, final Object object, final String methodName, final Object... parameters) {
     final InvokeMethodAction action = new InvokeMethodAction(name, title, icon, object, methodName,
