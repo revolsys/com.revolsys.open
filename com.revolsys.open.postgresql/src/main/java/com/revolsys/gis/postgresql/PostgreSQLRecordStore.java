@@ -32,6 +32,7 @@ import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.functions.EnvelopeIntersects;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
+import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
 public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
@@ -39,10 +40,9 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   public static final List<String> POSTGRESQL_INTERNAL_SCHEMAS = Arrays.asList("information_schema",
     "pg_catalog", "pg_toast_temp_1");
 
-  public static final AbstractIterator<Record> newPostgreSQLIterator(
-    final PostgreSQLRecordStore recordStore, final Query query,
-    final Map<String, Object> properties) {
-    return new PostgreSQLJdbcQueryIterator(recordStore, query, properties);
+  private static final AbstractIterator<Record> newPostgreSQLIterator(final RecordStore recordStore,
+    final Query query, final Map<String, Object> properties) {
+    return new PostgreSQLJdbcQueryIterator((PostgreSQLRecordStore)recordStore, query, properties);
   }
 
   private boolean useSchemaSequencePrefix = true;
@@ -238,7 +238,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
 
   protected void initSettings() {
     setIteratorFactory(
-      new RecordStoreIteratorFactory(PostgreSQLRecordStore.class, "newPostgreSQLIterator"));
+      new RecordStoreIteratorFactory(PostgreSQLRecordStore::newPostgreSQLIterator));
   }
 
   @Override

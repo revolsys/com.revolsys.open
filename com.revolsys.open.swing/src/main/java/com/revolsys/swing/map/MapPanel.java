@@ -45,8 +45,8 @@ import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.field.ComboBox;
-import com.revolsys.swing.listener.EnableComponentListener;
 import com.revolsys.swing.listener.ConsumerSelectedItemListener;
+import com.revolsys.swing.listener.EnableComponentListener;
 import com.revolsys.swing.map.border.FullSizeLayoutManager;
 import com.revolsys.swing.map.border.MapRulerBorder;
 import com.revolsys.swing.map.component.MapPointerLocation;
@@ -244,8 +244,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   }
 
   private void addLayerControls() {
-    this.toolBar.addButtonTitleIcon("layers", "Refresh All Layers", "arrow_refresh", this,
-      "refresh");
+    this.toolBar.addButtonTitleIcon("layers", "Refresh All Layers", "arrow_refresh", this::refresh);
 
     this.selectCoordinateSystem = new SelectMapCoordinateSystem(this);
     this.toolBar.addComponent("layers", this.selectCoordinateSystem);
@@ -263,7 +262,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     Property.addListener(this.baseMapOverlay, "layer", this);
     this.baseMapLayerField.setSelectedIndex(0);
     this.toolBar.addButtonTitleIcon("layers", "Refresh Base Map", "map_refresh",
-      this.baseMapOverlay, "refresh");
+      this.baseMapOverlay::refresh);
   }
 
   public void addMapOverlay(final int zIndex, final JComponent overlay) {
@@ -344,8 +343,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager, "canUndo");
     final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager, "canRedo");
 
-    this.toolBar.addButton("undo", "Undo", "arrow_undo", canUndo, this.undoManager, "undo");
-    this.toolBar.addButton("undo", "Redo", "arrow_redo", canRedo, this.undoManager, "redo");
+    this.toolBar.addButton("undo", "Undo", "arrow_undo", canUndo, this.undoManager::undo);
+    this.toolBar.addButton("undo", "Redo", "arrow_redo", canRedo, this.undoManager::redo);
   }
 
   public void addZoomBookmark() {
@@ -361,32 +360,32 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   }
 
   private void addZoomButtons() {
-    this.toolBar.addButtonTitleIcon("zoom", "Zoom to World", "magnifier_zoom_world", this,
-      "zoomToWorld");
+    this.toolBar.addButtonTitleIcon("zoom", "Zoom to World", "magnifier_zoom_world",
+      this::zoomToWorld);
 
-    this.toolBar.addButtonTitleIcon("zoom", "Zoom In", "magnifier_zoom_in", this, "zoomIn");
+    this.toolBar.addButtonTitleIcon("zoom", "Zoom In", "magnifier_zoom_in", this::zoomIn);
 
-    this.toolBar.addButtonTitleIcon("zoom", "Zoom Out", "magnifier_zoom_out", this, "zoomOut");
+    this.toolBar.addButtonTitleIcon("zoom", "Zoom Out", "magnifier_zoom_out", this::zoomOut);
 
     final JButton zoomPreviousButton = this.toolBar.addButtonTitleIcon("zoom", "Zoom Previous",
-      "magnifier_zoom_left", this, "zoomPrevious");
+      "magnifier_zoom_left", this::zoomPrevious);
     zoomPreviousButton.setEnabled(false);
     Property.addListener(this, "zoomPreviousEnabled",
       new EnableComponentListener(zoomPreviousButton));
 
     final JButton zoomNextButton = this.toolBar.addButtonTitleIcon("zoom", "Zoom Next",
-      "magnifier_zoom_right", this, "zoomNext");
+      "magnifier_zoom_right", this::zoomNext);
     zoomNextButton.setEnabled(false);
     Property.addListener(this, "zoomNextEnabled", new EnableComponentListener(zoomNextButton));
 
     final JButton zoomSelectedButton = this.toolBar.addButtonTitleIcon("zoom", "Zoom To Selected",
-      "magnifier_zoom_selected", this, "zoomToSelected");
+      "magnifier_zoom_selected", this::zoomToSelected);
     zoomSelectedButton.setEnabled(false);
     Property.addListener(this.project, "hasSelectedRecords",
       new EnableComponentListener(zoomSelectedButton));
 
     this.zoomBookmarkButton = this.toolBar.addButtonTitleIcon("zoom", "Zoom Bookmarks",
-      "zoom_bookmark", this, "showZoomBookmarkMenu");
+      "zoom_bookmark", this::showZoomBookmarkMenu);
 
     this.toolBar.addComponent("zoom", new SelectMapScale(this));
     this.toolBar.addComponent("zoom", new SelectMapUnitsPerPixel(this));
@@ -942,14 +941,14 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   public void showZoomBookmarkMenu() {
     final PopupMenu menu = new PopupMenu("Zoom Bookmark");
     final MenuFactory factory = menu.getMenu();
-    factory.addMenuItemTitleIcon("default", "Add Bookmark", "add", this, "addZoomBookmark");
+    factory.addMenuItemTitleIcon("default", "Add Bookmark", "add", this::addZoomBookmark);
 
     final Project project = getProject();
     for (final Entry<String, BoundingBox> entry : project.getZoomBookmarks().entrySet()) {
       final String name = entry.getKey();
       final BoundingBox boundingBox = entry.getValue();
-      factory.addMenuItemTitleIcon("bookmark", "Zoom to " + name, "magnifier", this,
-        "zoomToBoundingBox", boundingBox);
+      factory.addMenuItemTitleIcon("bookmark", "Zoom to " + name, "magnifier",
+        () -> zoomToBoundingBox(boundingBox));
     }
     menu.show(this.zoomBookmarkButton, 0, 20);
   }

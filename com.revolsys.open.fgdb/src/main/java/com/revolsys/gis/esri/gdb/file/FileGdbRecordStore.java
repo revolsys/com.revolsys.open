@@ -104,7 +104,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.StringBuilders;
 
 public class FileGdbRecordStore extends AbstractRecordStore {
-  static final Object API_SYNC = new Object();
+  private static final Object API_SYNC = new Object();
 
   private static final Map<FieldType, Constructor<? extends AbstractFileGdbFieldDefinition>> ESRI_FIELD_TYPE_ATTRIBUTE_MAP = new HashMap<FieldType, Constructor<? extends AbstractFileGdbFieldDefinition>>();
 
@@ -112,7 +112,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\?");
 
-  private static SingleThreadExecutor TASK_EXECUTOR = new SingleThreadExecutor(
+  private static final SingleThreadExecutor TASK_EXECUTOR = new SingleThreadExecutor(
     "ESRI FGDB Create Thread");
 
   static {

@@ -96,13 +96,13 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
     final MenuFactory menu = model.getMenu();
 
     menu.addMenuItemTitleIcon("dataTransfer", "Copy Field Value", "page_copy",
-      new ObjectPropertyEnableCheck(this, "canCopy"), this, "copyFieldValue");
+      new ObjectPropertyEnableCheck(this, "canCopy"), this::copyFieldValue);
 
     menu.addMenuItemTitleIcon("dataTransfer", "Cut Field Value", "cut",
-      new ObjectPropertyEnableCheck(this, "canCut"), this, "cutFieldValue");
+      new ObjectPropertyEnableCheck(this, "canCut"), this::cutFieldValue);
 
     menu.addMenuItemTitleIcon("dataTransfer", "Paste Field Value", "paste_plain",
-      new ObjectPropertyEnableCheck(this, "canPaste"), this, "pasteFieldValue");
+      new ObjectPropertyEnableCheck(this, "canPaste"), this::pasteFieldValue);
   }
 
   @Override

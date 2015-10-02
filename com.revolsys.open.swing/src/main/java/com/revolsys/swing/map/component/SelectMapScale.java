@@ -15,7 +15,7 @@ import javax.swing.JComboBox;
 import javax.swing.SwingConstants;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.swing.field.InvokeMethodStringConverter;
+import com.revolsys.swing.field.FunctionStringConverter;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
@@ -31,8 +31,7 @@ public class SelectMapScale extends JComboBox
     this.map = new WeakReference<MapPanel>(map);
 
     setEditable(true);
-    final InvokeMethodStringConverter renderer = new InvokeMethodStringConverter(MapScale.class,
-      "formatScale");
+    final FunctionStringConverter renderer = new FunctionStringConverter(MapScale::formatScale);
     renderer.setHorizontalAlignment(SwingConstants.RIGHT);
     final SelectMapScaleEditor editor = new SelectMapScaleEditor(getEditor(), renderer);
     setEditor(editor);

@@ -2,36 +2,40 @@ package com.revolsys.swing.map.layer.menu;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.util.Map;
+import java.util.function.Function;
 
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.SwingConstants;
 
-import com.revolsys.collection.map.Maps;
-import com.revolsys.swing.action.InvokeMethodAction;
-import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
+import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.component.MapScale;
-import com.revolsys.swing.map.layer.Layer;
-import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.function.Function2;
 
-public class TreeItemScaleMenu implements ComponentFactory<JMenu> {
+public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
 
   private final EnableCheck enableCheck;
+
+  private final Function<T, Long> getScaleFunction;
 
   private final boolean min;
 
   private String name;
 
-  public TreeItemScaleMenu(final boolean min, final EnableCheck enableCheck) {
+  private final Function2<T, Long, ?> setScaleFunction;
+
+  public TreeItemScaleMenu(final boolean min, final EnableCheck enableCheck,
+    final Function<T, Long> getScaleFunction, final Function2<T, Long, ?> setScaleFunction) {
     this.min = min;
     this.enableCheck = enableCheck;
+    this.getScaleFunction = getScaleFunction;
+    this.setScaleFunction = setScaleFunction;
     if (this.min) {
       this.name = "Hide zoomed out beyond (minimum) scale";
     } else {
@@ -39,16 +43,8 @@ public class TreeItemScaleMenu implements ComponentFactory<JMenu> {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public TreeItemScaleMenu(final Map<String, Object> config) {
-    this.name = Maps.getString(config, "name");
-    this.min = Maps.getBool(config, "min");
-    final Map<String, Object> enableCheckConfig = (Map<String, Object>)config.get("enableCheck");
-    this.enableCheck = AbstractEnableCheck.enableCheck(enableCheckConfig);
-  }
-
-  protected void addScaleMenuItem(final long layerScale, final Object object,
-    final String methodName, final JMenu menu, final long scale) {
+  protected void addScaleMenuItem(final long layerScale, final JMenu menu, final T object,
+    final long scale) {
     final String label;
     if (scale <= 0) {
       label = "Unlimited";
@@ -56,7 +52,8 @@ public class TreeItemScaleMenu implements ComponentFactory<JMenu> {
       label = MapScale.formatScale(scale);
     }
 
-    final InvokeMethodAction action = new InvokeMethodAction(label, object, methodName, scale);
+    final RunnableAction action = new RunnableAction(label,
+      () -> this.setScaleFunction.apply(object, scale));
     final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(action);
     final boolean selected = scale == layerScale;
     menuItem.setSelected(selected);
@@ -66,9 +63,9 @@ public class TreeItemScaleMenu implements ComponentFactory<JMenu> {
   }
 
   @Override
-  public TreeItemScaleMenu clone() {
+  public TreeItemScaleMenu<T> clone() {
     try {
-      return (TreeItemScaleMenu)super.clone();
+      return (TreeItemScaleMenu<T>)super.clone();
     } catch (final CloneNotSupportedException e) {
       return ExceptionUtil.throwUncheckedException(e);
     }
@@ -80,52 +77,28 @@ public class TreeItemScaleMenu implements ComponentFactory<JMenu> {
 
   @Override
   public JMenu createComponent() {
-
     final JMenu menu = new JMenu(this.name);
     if (this.enableCheck == null || this.enableCheck.isEnabled()) {
-      long layerScale = 0;
-      final Object object = MenuFactory.getMenuSource();
-      if (object instanceof Layer) {
-        final Layer layer = (Layer)object;
-        if (layer.isHasGeometry()) {
-          if (this.min) {
-            layerScale = layer.getMinimumScale();
-          } else {
-            layerScale = layer.getMaximumScale();
-          }
-        }
-      } else if (object instanceof AbstractRecordLayerRenderer) {
-        final AbstractRecordLayerRenderer renderer = (AbstractRecordLayerRenderer)object;
-        if (this.min) {
-          layerScale = renderer.getMinimumScale();
-        } else {
-          layerScale = renderer.getMaximumScale();
-        }
-      }
-      String methodName;
-      if (this.min) {
-        methodName = "setMinimumScale";
-      } else {
-        methodName = "setMaximumScale";
-      }
+      final T object = MenuFactory.getMenuSource();
+      long layerScale = this.getScaleFunction.apply(object);
       if (layerScale == Long.MAX_VALUE) {
         layerScale = 0;
       }
-      addScaleMenuItem(layerScale, object, methodName, menu, 0);
+      addScaleMenuItem(layerScale, menu, object, 0);
       boolean scaleIncluded = layerScale == 0;
       for (final long scale : MapPanel.SCALES) {
         if (layerScale == scale) {
           scaleIncluded = true;
         } else if (!scaleIncluded) {
           if (layerScale > scale) {
-            addScaleMenuItem(layerScale, object, methodName, menu, layerScale);
+            addScaleMenuItem(layerScale, menu, object, layerScale);
             scaleIncluded = true;
           }
         }
-        addScaleMenuItem(layerScale, object, methodName, menu, scale);
+        addScaleMenuItem(layerScale, menu, object, scale);
       }
       if (!scaleIncluded) {
-        addScaleMenuItem(layerScale, object, methodName, menu, layerScale);
+        addScaleMenuItem(layerScale, menu, object, layerScale);
       }
     } else {
       menu.setEnabled(false);

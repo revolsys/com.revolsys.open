@@ -115,7 +115,7 @@ public interface Layer
    * is inverse from the logical definition of maximum. If scale < maximumScale
    * it will not be shown.
    */
-  void setMaximumScale(long maximumScale);
+  long setMaximumScale(long maximumScale);
 
   /**
    * Set the minimum scale. This is the scale that if you zoom out to a less
@@ -123,7 +123,7 @@ public interface Layer
    * is inverse from the logical definition of minimum. If scale > minimumScale
    * it will not be shown.
    */
-  void setMinimumScale(long minimumScale);
+  long setMinimumScale(long minimumScale);
 
   void setName(String name);
 

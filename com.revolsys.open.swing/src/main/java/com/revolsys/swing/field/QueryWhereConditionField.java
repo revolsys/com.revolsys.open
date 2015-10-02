@@ -212,14 +212,14 @@ public class QueryWhereConditionField extends ValueField
 
     final ToolBar buttonsPanel = new ToolBar();
     buttonsPanel.setBorderPainted(true);
-    buttonsPanel.addButton("relational", "AND", this, "insertText", "AND").setBorderPainted(true);
-    buttonsPanel.addButton("relational", "OR", this, "insertText", "OR").setBorderPainted(true);
-    buttonsPanel.addButton("relational", "NOT", this, "insertText", "NOT").setBorderPainted(true);
-    buttonsPanel.addButton("grouping", "( )", this, "insertText", "( )").setBorderPainted(true);
-    buttonsPanel.addButton("math", "+", this, "insertText", "+").setBorderPainted(true);
-    buttonsPanel.addButton("math", "-", this, "insertText", "-").setBorderPainted(true);
-    buttonsPanel.addButton("math", "*", this, "insertText", "*").setBorderPainted(true);
-    buttonsPanel.addButton("math", "/", this, "insertText", "/").setBorderPainted(true);
+    buttonsPanel.addButton("relational", "AND", () -> insertText("AND")).setBorderPainted(true);
+    buttonsPanel.addButton("relational", "OR", () -> insertText("OR")).setBorderPainted(true);
+    buttonsPanel.addButton("relational", "NOT", () -> insertText("NOT")).setBorderPainted(true);
+    buttonsPanel.addButton("grouping", "( )", () -> insertText("( )")).setBorderPainted(true);
+    buttonsPanel.addButton("math", "+", () -> insertText("+")).setBorderPainted(true);
+    buttonsPanel.addButton("math", "-", () -> insertText("-")).setBorderPainted(true);
+    buttonsPanel.addButton("math", "*", () -> insertText("*")).setBorderPainted(true);
+    buttonsPanel.addButton("math", "/", () -> insertText("/")).setBorderPainted(true);
 
     final BasePanel widgetPanel = new BasePanel(new VerticalLayout(5), fieldConditions,
       buttonsPanel);
@@ -243,8 +243,8 @@ public class QueryWhereConditionField extends ValueField
 
     final ToolBar statusToolBar = new ToolBar();
     statusToolBar.setOpaque(false);
-    final JButton verifyButton = statusToolBar.addButton("default", "Verify", this,
-      "verifyCondition");
+    final JButton verifyButton = statusToolBar.addButton("default", "Verify",
+      this::verifyCondition);
     verifyButton.setBorderPainted(true);
 
     final JPanel queryPanel = new JPanel(new BorderLayout());

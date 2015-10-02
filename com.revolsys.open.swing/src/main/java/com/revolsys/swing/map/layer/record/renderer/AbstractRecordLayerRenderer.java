@@ -53,8 +53,12 @@ public abstract class AbstractRecordLayerRenderer
     MenuSourceAction.<AbstractRecordLayerRenderer> addMenuItem(menu, "layer", "Delete", "delete",
       new MenuSourcePropertyEnableCheck("parent", null, true), AbstractRecordLayerRenderer::delete);
 
-    menu.addComponentFactory("scale", new TreeItemScaleMenu(true, null));
-    menu.addComponentFactory("scale", new TreeItemScaleMenu(false, null));
+    menu.addComponentFactory("scale", new TreeItemScaleMenu<AbstractRecordLayerRenderer>(true, null,
+      AbstractRecordLayerRenderer::getMinimumScale, AbstractRecordLayerRenderer::setMinimumScale));
+    menu.addComponentFactory("scale",
+      new TreeItemScaleMenu<AbstractRecordLayerRenderer>(false, null,
+        AbstractRecordLayerRenderer::getMaximumScale,
+        AbstractRecordLayerRenderer::setMaximumScale));
 
     MenuSourceAction.<AbstractRecordLayerRenderer> addMenuItem(menu, "wrap",
       "Wrap With Multiple Style", "style_multiple_wrap",

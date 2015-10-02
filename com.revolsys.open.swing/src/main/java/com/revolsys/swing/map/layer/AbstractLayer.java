@@ -94,8 +94,10 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
     final EnableCheck hasGeometry = new MenuSourceCallableEnableCheck<>(
       AbstractLayer::isHasGeometry);
-    menu.addComponentFactory("scale", new TreeItemScaleMenu(true, hasGeometry));
-    menu.addComponentFactory("scale", new TreeItemScaleMenu(false, hasGeometry));
+    menu.addComponentFactory("scale", new TreeItemScaleMenu<AbstractLayer>(true, hasGeometry,
+      AbstractLayer::getMinimumScale, AbstractLayer::setMinimumScale));
+    menu.addComponentFactory("scale", new TreeItemScaleMenu<AbstractLayer>(false, hasGeometry,
+      AbstractLayer::getMaximumScale, AbstractLayer::setMaximumScale));
 
     final EnableCheck exists = new MenuSourceCallableEnableCheck<>(AbstractLayer::isExists);
 
@@ -856,23 +858,25 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   @Override
-  public void setMaximumScale(long maximumScale) {
-    final double oldValue = this.maximumScale;
+  public long setMaximumScale(long maximumScale) {
+    final long oldValue = this.maximumScale;
     if (maximumScale < 0) {
       maximumScale = 0;
     }
     this.maximumScale = maximumScale;
     firePropertyChange("maximumScale", oldValue, this.minimumScale);
+    return oldValue;
   }
 
   @Override
-  public void setMinimumScale(long minimumScale) {
-    final double oldValue = this.minimumScale;
+  public long setMinimumScale(long minimumScale) {
+    final long oldValue = this.minimumScale;
     if (minimumScale <= 0) {
       minimumScale = Long.MAX_VALUE;
     }
     this.minimumScale = minimumScale;
     firePropertyChange("minimumScale", oldValue, this.minimumScale);
+    return oldValue;
   }
 
   @Override

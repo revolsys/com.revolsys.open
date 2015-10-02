@@ -64,7 +64,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.border.TitledBorder;
 import com.revolsys.swing.field.CheckBox;
 import com.revolsys.swing.field.CodeTableComboBoxModel;
@@ -90,19 +90,17 @@ public class SwingUtil {
   public static final Font FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 11);
 
   public static void addAction(final JComponent component, final KeyStroke keyStroke,
-    final String actionKey, final Object object, final String methodName,
-    final Object... parameters) {
+    final String actionKey, final Runnable runnable) {
     final InputMap inputMap = component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     inputMap.put(keyStroke, actionKey);
 
     final ActionMap actionMap = component.getActionMap();
-    final InvokeMethodAction action = new InvokeMethodAction(actionKey, object, methodName,
-      parameters);
+    final RunnableAction action = new RunnableAction(actionKey, runnable);
     actionMap.put(actionKey, action);
     if (component instanceof JComboBox) {
       final JComboBox comboBox = (JComboBox)component;
       final JComponent editorComponent = (JComponent)comboBox.getEditor().getEditorComponent();
-      addAction(editorComponent, keyStroke, actionKey, object, methodName, parameters);
+      addAction(editorComponent, keyStroke, actionKey, runnable);
     }
   }
 

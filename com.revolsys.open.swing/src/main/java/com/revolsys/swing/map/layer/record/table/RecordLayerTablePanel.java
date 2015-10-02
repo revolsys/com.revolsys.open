@@ -47,8 +47,8 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.ConsumerAction;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
+import com.revolsys.swing.action.enablecheck.CallableEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
-import com.revolsys.swing.action.enablecheck.InvokeMethodEnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.action.enablecheck.OrEnableCheck;
 import com.revolsys.swing.map.action.AddFileLayerAction;
@@ -153,7 +153,7 @@ public class RecordLayerTablePanel extends TablePanel
     if (hasGeometry) {
       this.tableModel.addMenuItem("dnd", "Paste Geometry", "geometry_paste",
         new AndEnableCheck(editableEnableCheck,
-          new InvokeMethodEnableCheck(this, "canPasteRecordGeometry")),
+          new CallableEnableCheck<>(true, this::canPasteRecordGeometry)),
         this::pasteGeometry);
 
       final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
@@ -183,14 +183,14 @@ public class RecordLayerTablePanel extends TablePanel
     final ToolBar toolBar = getToolBar();
 
     if (layerMenuFactory != null) {
-      toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu", layerMenuFactory, "show", layer,
-        this, 10, 10);
+      toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu",
+        () -> layerMenuFactory.show(layer, this, 10, 10));
     }
     if (hasGeometry) {
       final EnableCheck hasSelectedRecords = new ObjectPropertyEnableCheck(layer,
         "hasSelectedRecords");
       toolBar.addButton("layer", "Zoom to Selected", "magnifier_zoom_selected", hasSelectedRecords,
-        layer, "zoomToSelected");
+        layer::zoomToSelected);
     }
     toolBar.addComponent("count", new TableRowCount(this.tableModel));
 
@@ -203,13 +203,13 @@ public class RecordLayerTablePanel extends TablePanel
     this.fieldFilterPanel = new FieldFilterPanel(this, this.tableModel, pluginConfig);
     toolBar.addComponent("search", this.fieldFilterPanel);
 
-    toolBar.addButtonTitleIcon("search", "Advanced Search", "filter_edits", this.fieldFilterPanel,
-      "showAdvancedFilter");
+    toolBar.addButtonTitleIcon("search", "Advanced Search", "filter_edits",
+      this.fieldFilterPanel::showAdvancedFilter);
 
     final EnableCheck hasFilter = new ObjectPropertyEnableCheck(this.tableModel, "hasFilter");
 
-    toolBar.addButton("search", "Clear Search", "filter_delete", hasFilter, this.fieldFilterPanel,
-      "clear");
+    toolBar.addButton("search", "Clear Search", "filter_delete", hasFilter,
+      this.fieldFilterPanel::clear);
 
     toolBar.addButton("search",
       ConsumerAction.action(Icons.getIconWithBadge("book", "filter"), "Query History", (event) -> {

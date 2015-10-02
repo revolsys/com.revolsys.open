@@ -39,6 +39,7 @@ import com.revolsys.record.query.functions.GeometryEqual2d;
 import com.revolsys.record.query.functions.WithinDistance;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
 public class OracleRecordStore extends AbstractJdbcRecordStore {
@@ -391,7 +392,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     setExcludeTablePatterns(".*\\$");
     setSqlPrefix("BEGIN ");
     setSqlSuffix(";END;");
-    setIteratorFactory(new RecordStoreIteratorFactory(this, "newOracleIterator"));
+    setIteratorFactory(new RecordStoreIteratorFactory(this::newOracleIterator));
   }
 
   @Override
@@ -403,9 +404,9 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     return this.useSchemaSequencePrefix;
   }
 
-  public AbstractIterator<Record> newOracleIterator(final OracleRecordStore recordStore,
+  private AbstractIterator<Record> newOracleIterator(final RecordStore recordStore,
     final Query query, final Map<String, Object> properties) {
-    return new OracleJdbcQueryIterator(recordStore, query, properties);
+    return new OracleJdbcQueryIterator((OracleRecordStore)recordStore, query, properties);
   }
 
   @Override

@@ -55,18 +55,18 @@ public class TiePointsPanel extends TablePanel implements PropertyChangeListener
     final EnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(layer, "editable");
 
     final MenuFactory menu = getTableModel().getMenu();
-    menu.addMenuItemTitleIcon("zoom", "Zoom to Tie Point", "magnifier_zoom_selected", this,
-      "zoomToTiePoint");
+    menu.addMenuItemTitleIcon("zoom", "Zoom to Tie Point", "magnifier_zoom_selected",
+      this::zoomToTiePoint);
 
     menu.addMenuItemTitleIcon("record", "Delete Tie Point", "table_row_delete", editableEnableCheck,
-      this, "deleteTiePoint");
+      this::deleteTiePoint);
 
     final ToolBar toolBar = getToolBar();
 
     final MenuFactory menuFactory = MenuFactory.findMenu(layer);
     if (menuFactory != null) {
-      toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu", menuFactory, "show", layer, this, 10,
-        10);
+      toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu",
+        () -> menuFactory.show(layer, this, 10, 10));
     }
 
     MenuSourceAction.<GeoreferencedImageLayer> addMenuItem(menu, "zoom", "Zoom to Layer",

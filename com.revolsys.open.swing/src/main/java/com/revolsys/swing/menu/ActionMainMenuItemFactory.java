@@ -7,7 +7,6 @@ import javax.swing.Icon;
 import javax.swing.JMenuItem;
 
 import com.revolsys.swing.action.AbstractAction;
-import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
@@ -23,10 +22,6 @@ public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
 
   public ActionMainMenuItemFactory(final AbstractAction action) {
     this.action = action;
-    if (action instanceof InvokeMethodAction) {
-      final InvokeMethodAction invokeAction = (InvokeMethodAction)action;
-      this.iconName = invokeAction.getIconName();
-    }
     if (action instanceof RunnableAction) {
       final RunnableAction runnableAction = (RunnableAction)action;
       this.iconName = runnableAction.getIconName();

@@ -38,7 +38,7 @@ import com.revolsys.swing.field.ColorChooserField;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.FontChooserField;
-import com.revolsys.swing.field.InvokeMethodStringConverter;
+import com.revolsys.swing.field.FunctionStringConverter;
 import com.revolsys.swing.field.LengthMeasureTextField;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
@@ -306,8 +306,7 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
     final Vector<Long> scales = new Vector<Long>();
     scales.add(Long.MAX_VALUE);
     scales.addAll(MapPanel.SCALES);
-    final InvokeMethodStringConverter converter = new InvokeMethodStringConverter(MapScale.class,
-      "formatScale");
+    final FunctionStringConverter converter = new FunctionStringConverter(MapScale::formatScale);
     converter.setHorizontalAlignment(SwingConstants.RIGHT);
     final ComboBox field = new ComboBox(fieldName, new DefaultComboBoxModel(scales), converter,
       converter);

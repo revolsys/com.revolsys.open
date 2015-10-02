@@ -46,13 +46,13 @@ public class BaseJTable extends JXTable {
     setFont(SwingUtil.FONT);
 
     SwingUtil.addAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK),
-      "selectPreviousColumnCell", this, "editRelativeCell", 0, -1);
+      "selectPreviousColumnCell", () -> editRelativeCell(0, -1));
     SwingUtil.addAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), "selectNextColumnCell",
-      this, "editRelativeCell", 0, 1);
+      () -> editRelativeCell(0, 1));
     SwingUtil.addAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK),
-      "selectPreviousRowCell", this, "editRelativeCell", -1, 0);
-    SwingUtil.addAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enterPressed", this,
-      "editRelativeCell", 1, 0);
+      "selectPreviousRowCell", () -> editRelativeCell(-1, 0));
+    SwingUtil.addAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enterPressed",
+      () -> editRelativeCell(1, 0));
 
     putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
   }

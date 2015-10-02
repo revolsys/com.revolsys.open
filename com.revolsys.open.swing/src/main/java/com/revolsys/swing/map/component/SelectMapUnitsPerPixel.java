@@ -24,7 +24,7 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.swing.field.InvokeMethodStringConverter;
+import com.revolsys.swing.field.FunctionStringConverter;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.MathUtil;
@@ -53,7 +53,7 @@ public class SelectMapUnitsPerPixel extends JComboBox
     this.map = new WeakReference<MapPanel>(map);
 
     setEditable(true);
-    final InvokeMethodStringConverter renderer = new InvokeMethodStringConverter(this, "format");
+    final FunctionStringConverter renderer = new FunctionStringConverter(this::format);
     renderer.setHorizontalAlignment(SwingConstants.RIGHT);
     final SelectMapScaleEditor editor = new SelectMapScaleEditor(getEditor(), renderer);
     setEditor(editor);

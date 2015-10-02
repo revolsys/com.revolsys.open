@@ -448,30 +448,29 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     if (layer != null) {
       final MenuFactory menuFactory = MenuFactory.findMenu(layer);
       if (menuFactory != null) {
-        this.toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu", menuFactory, "show", layer,
-          this, 10, 10);
+        this.toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu",
+          () -> menuFactory.show(layer, this, 10, 10));
       }
     }
     final EnableCheck deletableEnableCheck = new ObjectPropertyEnableCheck(this, "deletable");
     this.toolBar.addButton("record", "Delete Record", "table_row_delete", deletableEnableCheck,
-      this, "deleteRecord");
+      this::deleteRecord);
 
     // Cut, Copy Paste
 
-    this.toolBar.addButton("dnd", "Copy Record", "page_copy", (EnableCheck)null, this,
-      "dataTransferCopy");
+    this.toolBar.addButton("dnd", "Copy Record", "page_copy", (EnableCheck)null,
+      this::dataTransferCopy);
 
     if (hasGeometry) {
-      this.toolBar.addButton("dnd", "Copy Geometry", "geometry_copy", (EnableCheck)null, this,
-        "copyGeometry");
+      this.toolBar.addButton("dnd", "Copy Geometry", "geometry_copy", (EnableCheck)null,
+        this::copyGeometry);
     }
 
-    this.toolBar.addButton("dnd", "Paste Record", "paste_plain", editable, this,
-      "dataTransferPaste");
+    this.toolBar.addButton("dnd", "Paste Record", "paste_plain", editable, this::dataTransferPaste);
 
     if (hasGeometry) {
-      this.toolBar.addButton("dnd", "Paste Geometry", "geometry_paste", editable, this,
-        "pasteGeometry");
+      this.toolBar.addButton("dnd", "Paste Geometry", "geometry_paste", editable,
+        this::pasteGeometry);
     }
 
     final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager, "canUndo");
@@ -479,14 +478,14 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
     final EnableCheck modifiedOrDeleted = new ObjectPropertyEnableCheck(this, "modifiedOrDeleted");
 
-    this.toolBar.addButton("changes", "Revert Record", "arrow_revert", modifiedOrDeleted, this,
-      "revertChanges");
+    this.toolBar.addButton("changes", "Revert Record", "arrow_revert", modifiedOrDeleted,
+      this::revertChanges);
 
     this.toolBar.addButton("changes", "Revert Empty Fields", "field_empty_revert",
-      modifiedOrDeleted, this, "revertEmptyFields");
+      modifiedOrDeleted, this::revertEmptyFields);
 
-    this.toolBar.addButton("changes", "Undo", "arrow_undo", canUndo, this.undoManager, "undo");
-    this.toolBar.addButton("changes", "Redo", "arrow_redo", canRedo, this.undoManager, "redo");
+    this.toolBar.addButton("changes", "Undo", "arrow_undo", canUndo, this.undoManager::undo);
+    this.toolBar.addButton("changes", "Redo", "arrow_redo", canRedo, this.undoManager::redo);
 
     // Zoom
 
@@ -503,15 +502,15 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
       if (geometryDataType == DataTypes.LINE_STRING
         || geometryDataType == DataTypes.MULTI_LINE_STRING) {
         if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
-          this.toolBar.addButton("geometry", FLIP_RECORD_NAME, FLIP_RECORD_ICON, editable, this,
-            "flipRecordOrientation");
+          this.toolBar.addButton("geometry", FLIP_RECORD_NAME, FLIP_RECORD_ICON, editable,
+            this::flipRecordOrientation);
           this.toolBar.addButton("geometry", FLIP_LINE_ORIENTATION_NAME, FLIP_LINE_ORIENTATION_ICON,
-            editable, this, "flipLineOrientation");
-          this.toolBar.addButton("geometry", FLIP_FIELDS_NAME, FLIP_FIELDS_ICON, editable, this,
-            "flipFields");
+            editable, this::flipLineOrientation);
+          this.toolBar.addButton("geometry", FLIP_FIELDS_NAME, FLIP_FIELDS_ICON, editable,
+            this::flipFields);
         } else {
-          this.toolBar.addButton("geometry", "Flip Line Orientation", "flip_line", editable, this,
-            "flipLineOrientation");
+          this.toolBar.addButton("geometry", "Flip Line Orientation", "flip_line", editable,
+            this::flipLineOrientation);
         }
       }
     }

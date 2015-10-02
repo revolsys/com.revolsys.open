@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.concurrent.Callable;
 
 import javax.swing.SwingUtilities;
 
@@ -12,6 +13,7 @@ import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.util.ExceptionUtil;
 
 public class TitleCollapsiblePanel extends BasePanel implements MouseListener {
 
@@ -22,19 +24,15 @@ public class TitleCollapsiblePanel extends BasePanel implements MouseListener {
 
   private final JXCollapsiblePane collapsible;
 
-  private final ComponentFactory<?> componentFactory;
+  private final Callable<Component> componentFactory;
 
   private boolean created = false;
 
-  public TitleCollapsiblePanel(final String title, final Component component) {
-    this(title, null, component);
-  }
-
-  public TitleCollapsiblePanel(final String title, final ComponentFactory<?> componentFactory) {
+  public TitleCollapsiblePanel(final String title, final Callable<Component> componentFactory) {
     this(title, componentFactory, null);
   }
 
-  private TitleCollapsiblePanel(final String title, final ComponentFactory<?> componentFactory,
+  private TitleCollapsiblePanel(final String title, final Callable<Component> componentFactory,
     final Component component) {
     super(new VerticalLayout());
     this.componentFactory = componentFactory;
@@ -51,6 +49,10 @@ public class TitleCollapsiblePanel extends BasePanel implements MouseListener {
       this.created = true;
     }
     addMouseListener(this);
+  }
+
+  public TitleCollapsiblePanel(final String title, final Component component) {
+    this(title, null, component);
   }
 
   public boolean isCollapsed() {
@@ -91,8 +93,12 @@ public class TitleCollapsiblePanel extends BasePanel implements MouseListener {
         if (!this.created) {
           this.created = true;
           if (this.componentFactory != null) {
-            final Component component = this.componentFactory.createComponent();
-            this.collapsible.add(component);
+            try {
+              final Component component = this.componentFactory.call();
+              this.collapsible.add(component);
+            } catch (final Exception e) {
+              ExceptionUtil.log(getClass(), e);
+            }
           }
         }
       }

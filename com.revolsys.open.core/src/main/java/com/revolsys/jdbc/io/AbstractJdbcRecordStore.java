@@ -63,10 +63,9 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   implements JdbcRecordStore, RecordStoreExtension {
   public static final List<String> DEFAULT_PERMISSIONS = Arrays.asList("SELECT");
 
-  public static final AbstractIterator<Record> newJdbcIterator(
-    final AbstractJdbcRecordStore recordStore, final Query query,
-    final Map<String, Object> properties) {
-    return new JdbcQueryIterator(recordStore, query, properties);
+  public static final AbstractIterator<Record> newJdbcIterator(final RecordStore recordStore,
+    final Query query, final Map<String, Object> properties) {
+    return new JdbcQueryIterator((AbstractJdbcRecordStore)recordStore, query, properties);
   }
 
   private final Set<String> allSchemaNames = new TreeSet<String>();
@@ -136,8 +135,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   public AbstractJdbcRecordStore(final RecordFactory recordFactory) {
     super(recordFactory);
-    setIteratorFactory(
-      new RecordStoreIteratorFactory(AbstractJdbcRecordStore.class, "createJdbcIterator"));
+    setIteratorFactory(new RecordStoreIteratorFactory(AbstractJdbcRecordStore::newJdbcIterator));
     addRecordStoreExtension(this);
   }
 

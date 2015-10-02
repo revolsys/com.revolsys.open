@@ -17,7 +17,7 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.field.ComboBox;
-import com.revolsys.swing.field.InvokeMethodStringConverter;
+import com.revolsys.swing.field.FunctionStringConverter;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.util.Property;
 
@@ -36,8 +36,8 @@ public class SelectMapCoordinateSystem extends ComboBox
     this.map = new WeakReference<MapPanel>(map);
     setSelectedItem(map.getGeometryFactory().getCoordinateSystemId());
     setEditable(true);
-    final InvokeMethodStringConverter renderer = new InvokeMethodStringConverter(this,
-      "formatCoordinateSystem");
+    final FunctionStringConverter renderer = new FunctionStringConverter(
+      this::formatCoordinateSystem);
     setRenderer(renderer);
     AutoCompleteDecorator.decorate(this, renderer);
     addItemListener(this);
@@ -65,7 +65,8 @@ public class SelectMapCoordinateSystem extends ComboBox
     if (coordinateSystem == null) {
       return StringConverterRegistry.toString(value);
     } else {
-      return coordinateSystem.getCoordinateSystemId() + " " + coordinateSystem.getCoordinateSystemName();
+      return coordinateSystem.getCoordinateSystemId() + " "
+        + coordinateSystem.getCoordinateSystemName();
     }
   }
 

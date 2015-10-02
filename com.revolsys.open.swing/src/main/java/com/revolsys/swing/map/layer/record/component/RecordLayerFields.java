@@ -81,11 +81,15 @@ public class RecordLayerFields {
 
   private static Map<String, Object> getFieldFactoryMap(final ObjectWithProperties properties,
     final String propertyName) {
-    Map<String, Object> factories = properties.getProperty(propertyName);
-    if (factories == null) {
-      factories = new TreeMap<>();
-      properties.setProperty("fieldFactories", factories);
+    if (properties == null) {
+      return new TreeMap<>();
+    } else {
+      Map<String, Object> factories = properties.getProperty(propertyName);
+      if (factories == null) {
+        factories = new TreeMap<>();
+        properties.setProperty("fieldFactories", factories);
+      }
+      return factories;
     }
-    return factories;
   }
 }

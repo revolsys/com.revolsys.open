@@ -1,76 +1,86 @@
 package com.revolsys.parallel;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.concurrent.Callable;
 
-import com.revolsys.parallel.channel.Channel;
-import com.revolsys.parallel.channel.ClosedException;
-import com.revolsys.util.ExceptionUtil;
-
 public class SingleThreadExecutor implements Closeable {
+  private final Object callSync = new Object();
 
-  private static Channel<Callable<? extends Object>> in = new Channel<>();
+  private final Object handleSync = new Object();
 
-  private static Channel<Object> out = new Channel<>();
+  private Throwable exception;
 
-  private final String threadName;
-
-  private final Thread thread;
+  private Object result;
 
   private boolean running = true;
 
+  private Callable<? extends Object> task;
+
+  private final Thread thread;
+
+  private final String threadName;
+
   public SingleThreadExecutor(final String threadName) {
     this.threadName = threadName;
-    in.writeConnect();
-    out.readConnect();
     this.thread = new Thread(this::taskHandler, threadName);
     this.thread.setDaemon(true);
     this.thread.start();
   }
 
   @SuppressWarnings("unchecked")
-  public <V> V call(final Callable<V> callable) {
-    synchronized (this) {
-      in.write(callable);
-      final V result = (V)out.read();
-      return result;
+  public <V> V call(final Callable<V> task) {
+    if (task != null) {
+      synchronized (this.callSync) {
+        synchronized (this.handleSync) {
+          try {
+            this.task = task;
+            this.handleSync.notifyAll();
+            this.handleSync.wait();
+            if (this.exception == null) {
+              return (V)this.result;
+            } else {
+              throw new RuntimeException(this.threadName + ": error running task", this.exception);
+            }
+          } catch (final InterruptedException e) {
+            // Ignore
+          } finally {
+            this.task = null;
+            this.result = null;
+            this.exception = null;
+          }
+        }
+      }
     }
+    return null;
   }
 
   @Override
-  public void close() throws IOException {
+  public void close() {
     if (this.running) {
       this.running = false;
-      in.close();
-      in.readDisconnect();
-      in.writeDisconnect();
-
-      out.close();
-      out.writeDisconnect();
-      out.readDisconnect();
       this.thread.interrupt();
     }
   }
 
   private void taskHandler() {
-    in.readConnect();
-    out.writeConnect();
     while (this.running) {
-      try {
-        final Callable<? extends Object> callable = in.read();
-        Object result = null;
-        try {
-          result = callable.call();
-        } catch (final Throwable e) {
-          ExceptionUtil.log(this.threadName, "Unable to run" + callable, e);
-        } finally {
-          out.write(result);
+      synchronized (this.handleSync) {
+        if (this.task == null) {
+          try {
+            this.handleSync.wait();
+          } catch (final InterruptedException e) {
+            // Ignore
+          }
+        } else {
+          try {
+            this.result = this.task.call();
+          } catch (final Throwable e) {
+            this.exception = e;
+          } finally {
+            this.task = null;
+          }
+          this.handleSync.notifyAll();
         }
-      } catch (final ClosedException t) {
-        return;
-      } catch (final Throwable e) {
-        ExceptionUtil.log(this.threadName, "Error getting next task", e);
       }
     }
   }

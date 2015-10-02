@@ -375,8 +375,8 @@ public class ProjectFrame extends BaseFrame {
     final MenuFactory tools = createMenuTools();
 
     if (OS.isWindows()) {
-      tools.addMenuItem("options", "Options...", "Options...", null, null, PreferencesDialog.get(),
-        "showPanel");
+      tools.addMenuItem("options", "Options...", "Options...", null,
+        () -> PreferencesDialog.get().showPanel());
     }
     addMenu(menuBar, tools);
     return menuBar;

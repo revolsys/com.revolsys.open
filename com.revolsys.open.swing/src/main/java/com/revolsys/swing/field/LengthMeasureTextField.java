@@ -71,8 +71,7 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
     add(this.valueField);
     this.valueField.addActionListener(updateNumberListener);
 
-    this.unitField = new ComboBox(new InvokeMethodStringConverter(UNITS, "get"), true,
-      UNITS.keySet());
+    this.unitField = new ComboBox(new FunctionStringConverter(UNITS::get), true, UNITS.keySet());
     this.unitField.addItemListener(this);
     this.unitField.setSelectedItem(this.unit);
     add(this.unitField);
