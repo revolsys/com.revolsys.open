@@ -17,7 +17,9 @@ public class And extends AbstractMultiCondition {
 
   @Override
   public And and(final Condition condition) {
-    add(condition);
+    if (condition != null) {
+      add(condition);
+    }
     return this;
   }
 

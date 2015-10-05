@@ -27,7 +27,9 @@ public abstract class AbstractMultiCondition extends Condition {
   }
 
   public void add(final QueryValue value) {
-    this.values.add(value);
+    if (value != null) {
+      this.values.add(value);
+    }
   }
 
   public void add(final String sql) {
