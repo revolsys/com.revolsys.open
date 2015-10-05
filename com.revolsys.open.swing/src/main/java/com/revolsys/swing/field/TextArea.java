@@ -10,23 +10,12 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.equals.Equals;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.PopupMenu;
-import com.revolsys.swing.undo.CascadingUndoManager;
-import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.ExceptionUtil;
-import com.revolsys.util.Property;
 
 public class TextArea extends JTextArea implements Field, FocusListener {
   private static final long serialVersionUID = 1L;
 
-  private String errorMessage;
-
-  private final String fieldName;
-
-  private String fieldValue;
-
-  private String originalToolTip;
-
-  private final CascadingUndoManager undoManager = new CascadingUndoManager();
+  private final FieldSupport fieldSupport;
 
   public TextArea() {
     this("fieldValue");
@@ -50,15 +39,15 @@ public class TextArea extends JTextArea implements Field, FocusListener {
 
   public TextArea(final String fieldName, final Object fieldValue, final int rows,
     final int columns) {
+    final String text = StringConverterRegistry.toString(fieldValue);
+    this.fieldSupport = new FieldSupport(this, fieldName, text);
     setRows(rows);
     setColumns(columns);
-    this.fieldName = fieldName;
-    this.fieldValue = StringConverterRegistry.toString(fieldValue);
     setDocument(new PropertyChangeDocument(this));
-    setText(this.fieldValue);
+    setText(text);
     addFocusListener(new WeakFocusListener(this));
     PopupMenu.getPopupMenuFactory(this);
-    this.undoManager.addKeyMap(this);
+    getUndoManager().addKeyMap(this);
     setRows(rows);
     setColumns(columns);
   }
@@ -89,39 +78,14 @@ public class TextArea extends JTextArea implements Field, FocusListener {
   }
 
   @Override
-  public String getFieldName() {
-    return this.fieldName;
-  }
-
-  @Override
   public Color getFieldSelectedTextColor() {
     return getSelectedTextColor();
-  }
-
-  @Override
-  public String getFieldValidationMessage() {
-    return this.errorMessage;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <T> T getFieldValue() {
     return (T)getText();
-  }
-
-  @Override
-  public boolean isFieldValid() {
-    return true;
-  }
-
-  @Override
-  public void setFieldInvalid(final String message, final Color foregroundColor,
-    final Color backgroundColor) {
-    setForeground(foregroundColor);
-    setSelectedTextColor(foregroundColor);
-    setBackground(backgroundColor);
-    this.errorMessage = message;
-    super.setToolTipText(this.errorMessage);
   }
 
   @Override
@@ -138,39 +102,19 @@ public class TextArea extends JTextArea implements Field, FocusListener {
   }
 
   @Override
-  public void setFieldValid() {
-    setForeground(Field.DEFAULT_FOREGROUND);
-    setSelectedTextColor(Field.DEFAULT_SELECTED_FOREGROUND);
-    setBackground(Field.DEFAULT_BACKGROUND);
-    this.errorMessage = null;
-    super.setToolTipText(this.originalToolTip);
-  }
-
-  @Override
   public void setFieldValue(final Object value) {
     final String newValue = StringConverterRegistry.toString(value);
-    final String oldValue = this.fieldValue;
     if (!Equals.equal(getText(), newValue)) {
       setText(newValue);
     }
-    if (!Equals.equal(oldValue, value)) {
-      this.fieldValue = (String)value;
-      firePropertyChange(this.fieldName, oldValue, value);
-      SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this, oldValue, value);
-    }
+    this.fieldSupport.setValue(newValue);
   }
 
   @Override
   public void setToolTipText(final String text) {
-    this.originalToolTip = text;
-    if (!Property.hasValue(this.errorMessage)) {
+    if (this.fieldSupport.setOriginalTooltipText(text)) {
       super.setToolTipText(text);
     }
-  }
-
-  @Override
-  public void setUndoManager(final UndoManager undoManager) {
-    this.undoManager.setParent(undoManager);
   }
 
   @Override

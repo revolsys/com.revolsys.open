@@ -8,32 +8,21 @@ import org.jdesktop.swingx.JXSearchField;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.equals.Equals;
-import com.revolsys.swing.undo.CascadingUndoManager;
-import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.OS;
-import com.revolsys.util.Property;
 
 public class SearchField extends JXSearchField implements FocusListener, Field {
   private static final long serialVersionUID = 1L;
 
-  private String errorMessage;
-
-  private final String fieldName;
-
-  private String fieldValue;
-
-  private String originalToolTip;
-
-  private final CascadingUndoManager undoManager = new CascadingUndoManager();
+  private final FieldSupport fieldSupport;
 
   public SearchField() {
     this("fieldValue");
   }
 
   public SearchField(final String fieldName) {
-    this.fieldName = fieldName;
-    this.undoManager.addKeyMap(this);
+    this.fieldSupport = new FieldSupport(this, fieldName, "");
+    getUndoManager().addKeyMap(this);
   }
 
   @Override
@@ -62,39 +51,19 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
   }
 
   @Override
-  public String getFieldName() {
-    return this.fieldName;
-  }
-
-  @Override
   public Color getFieldSelectedTextColor() {
     return getSelectedTextColor();
   }
 
   @Override
-  public String getFieldValidationMessage() {
-    return this.errorMessage;
+  public FieldSupport getFieldSupport() {
+    return this.fieldSupport;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <T> T getFieldValue() {
     return (T)getText();
-  }
-
-  @Override
-  public boolean isFieldValid() {
-    return true;
-  }
-
-  @Override
-  public void setFieldInvalid(final String message, final Color foregroundColor,
-    final Color backgroundColor) {
-    setForeground(foregroundColor);
-    setSelectedTextColor(foregroundColor);
-    setBackground(backgroundColor);
-    this.errorMessage = message;
-    super.setToolTipText(this.errorMessage);
   }
 
   @Override
@@ -107,43 +76,23 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
 
   @Override
   public void setFieldToolTip(final String toolTip) {
-    setToolTipText(toolTip);
-  }
-
-  @Override
-  public void setFieldValid() {
-    setForeground(Field.DEFAULT_FOREGROUND);
-    setSelectedTextColor(Field.DEFAULT_SELECTED_FOREGROUND);
-    setBackground(Field.DEFAULT_BACKGROUND);
-    this.errorMessage = null;
-    super.setToolTipText(this.originalToolTip);
+    super.setToolTipText(toolTip);
   }
 
   @Override
   public void setFieldValue(final Object value) {
     final String newValue = StringConverterRegistry.toString(value);
-    final String oldValue = this.fieldValue;
     if (!Equals.equal(getText(), newValue)) {
       setText(newValue);
     }
-    if (!Equals.equal(oldValue, value)) {
-      this.fieldValue = (String)value;
-      firePropertyChange(this.fieldName, oldValue, value);
-      SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this, oldValue, value);
-    }
+    this.fieldSupport.setValue(newValue);
   }
 
   @Override
   public void setToolTipText(final String text) {
-    this.originalToolTip = text;
-    if (!Property.hasValue(this.errorMessage)) {
+    if (this.fieldSupport.setOriginalTooltipText(text)) {
       super.setToolTipText(text);
     }
-  }
-
-  @Override
-  public void setUndoManager(final UndoManager undoManager) {
-    this.undoManager.setParent(undoManager);
   }
 
   @Override
@@ -163,5 +112,4 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
   public void updateFieldValue() {
     setFieldValue(getText());
   }
-
 }

@@ -12,10 +12,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.equals.Equals;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.PopupMenu;
-import com.revolsys.swing.undo.CascadingUndoManager;
-import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.ExceptionUtil;
-import com.revolsys.util.Property;
 
 import jsyntaxpane.DefaultSyntaxKit;
 
@@ -26,15 +23,7 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
     DefaultSyntaxKit.initKit();
   }
 
-  private String errorMessage;
-
-  private final String fieldName;
-
-  private String fieldValue;
-
-  private String originalToolTip;
-
-  private final CascadingUndoManager undoManager = new CascadingUndoManager();
+  private final FieldSupport fieldSupport;
 
   public TextPane() {
     this("fieldValue");
@@ -55,13 +44,14 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
   }
 
   public TextPane(final String fieldName, final Object fieldValue) {
-    this.fieldName = fieldName;
-    this.fieldValue = StringConverterRegistry.toString(fieldValue);
+    final String text = StringConverterRegistry.toString(fieldValue);
+    this.fieldSupport = new FieldSupport(this, fieldName, text);
+
     setDocument(new PropertyChangeStyledDocument(this));
-    setText(this.fieldValue);
+    setText(text);
     addFocusListener(new WeakFocusListener(this));
     PopupMenu.getPopupMenuFactory(this);
-    this.undoManager.addKeyMap(this);
+    getUndoManager().addKeyMap(this);
   }
 
   @Override
@@ -90,18 +80,8 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
   }
 
   @Override
-  public String getFieldName() {
-    return this.fieldName;
-  }
-
-  @Override
   public Color getFieldSelectedTextColor() {
     return getSelectedTextColor();
-  }
-
-  @Override
-  public String getFieldValidationMessage() {
-    return this.errorMessage;
   }
 
   @SuppressWarnings("unchecked")
@@ -125,21 +105,6 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
   }
 
   @Override
-  public boolean isFieldValid() {
-    return true;
-  }
-
-  @Override
-  public void setFieldInvalid(final String message, final Color foregroundColor,
-    final Color backgroundColor) {
-    setForeground(foregroundColor);
-    setSelectedTextColor(foregroundColor);
-    setBackground(backgroundColor);
-    this.errorMessage = message;
-    super.setToolTipText(this.errorMessage);
-  }
-
-  @Override
   public void setFieldSelectedTextColor(Color color) {
     if (color == null) {
       color = Field.DEFAULT_SELECTED_FOREGROUND;
@@ -153,26 +118,12 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
   }
 
   @Override
-  public void setFieldValid() {
-    setForeground(Field.DEFAULT_FOREGROUND);
-    setSelectedTextColor(Field.DEFAULT_SELECTED_FOREGROUND);
-    setBackground(Field.DEFAULT_BACKGROUND);
-    this.errorMessage = null;
-    super.setToolTipText(this.originalToolTip);
-  }
-
-  @Override
   public void setFieldValue(final Object value) {
     final String newValue = StringConverterRegistry.toString(value);
-    final String oldValue = this.fieldValue;
     if (!Equals.equal(getText(), newValue)) {
       setText(newValue);
     }
-    if (!Equals.equal(oldValue, value)) {
-      this.fieldValue = (String)value;
-      firePropertyChange(this.fieldName, oldValue, value);
-      SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this, oldValue, value);
-    }
+    this.fieldSupport.setValue(newValue);
   }
 
   protected void setRowsAndColumns(final int rows, final int columns) {
@@ -181,15 +132,9 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
 
   @Override
   public void setToolTipText(final String text) {
-    this.originalToolTip = text;
-    if (!Property.hasValue(this.errorMessage)) {
+    if (this.fieldSupport.setOriginalTooltipText(text)) {
       super.setToolTipText(text);
     }
-  }
-
-  @Override
-  public void setUndoManager(final UndoManager undoManager) {
-    this.undoManager.setParent(undoManager);
   }
 
   @Override

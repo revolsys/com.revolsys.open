@@ -1,6 +1,6 @@
 package com.revolsys.converter.string;
 
-import com.revolsys.util.Property;
+import com.revolsys.util.Numbers;
 
 public class IntegerStringConverter extends AbstractNumberStringConverter<Integer> {
   public IntegerStringConverter() {
@@ -19,26 +19,11 @@ public class IntegerStringConverter extends AbstractNumberStringConverter<Intege
 
   @Override
   public Integer toObject(final Object value) {
-    if (value instanceof Integer) {
-      final Integer integer = (Integer)value;
-      return integer;
-    } else if (value instanceof Number) {
-      final Number number = (Number)value;
-      return number.intValue();
-    } else if (value == null) {
-      return null;
-    } else {
-      return toObject(value.toString());
-    }
+    return Numbers.toInteger(value);
   }
 
   @Override
   public Integer toObject(final String string) {
-    if (Property.hasValue(string)) {
-      return Integer.valueOf(string);
-    } else {
-      return null;
-    }
+    return Numbers.toInteger(string);
   }
-
 }

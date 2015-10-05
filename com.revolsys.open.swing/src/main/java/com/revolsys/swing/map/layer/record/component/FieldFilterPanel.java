@@ -67,11 +67,11 @@ public class FieldFilterPanel extends JComponent
 
   private CodeTable codeTable;
 
-  private final ComboBox codeTableOperatorField = new ComboBox("operator", "=", "<>", "IS NULL",
-    "IS NOT NULL");
+  private final ComboBox<String> codeTableOperatorField = new ComboBox<>("operator", "=", "<>",
+    "IS NULL", "IS NOT NULL");
 
-  private final ComboBox dateOperatorField = new ComboBox("operator", "=", "<>", "IS NULL",
-    "IS NOT NULL", "<", "<=", ">", ">=");
+  private final ComboBox<String> dateOperatorField = new ComboBox<>("operator", "=", "<>",
+    "IS NULL", "IS NOT NULL", "<", "<=", ">", ">=");
 
   private final boolean eventsEnabled = true;
 
@@ -79,19 +79,19 @@ public class FieldFilterPanel extends JComponent
 
   private final List<String> fieldNames;
 
-  private final ComboBox generalOperatorField = new ComboBox("operator", "=", "<>", "Like",
-    "IS NULL", "IS NOT NULL");
+  private final ComboBox<String> generalOperatorField = new ComboBox<>("operator", "=", "<>",
+    "Like", "IS NULL", "IS NOT NULL");
 
   private Object lastValue = null;
 
   private final AbstractRecordLayer layer;
 
-  private final ComboBox nameField;
+  private final ComboBox<String> nameField;
 
-  private final ComboBox numericOperatorField = new ComboBox("operator", "=", "<>", "IS NULL",
-    "IS NOT NULL", "<", "<=", ">", ">=");
+  private final ComboBox<String> numericOperatorField = new ComboBox<>("operator", "=", "<>",
+    "IS NULL", "IS NOT NULL", "<", "<=", ">", ">=");
 
-  private ComboBox operatorField;
+  private ComboBox<String> operatorField;
 
   private final JPanel operatorFieldPanel = new JPanel();
 
@@ -125,10 +125,10 @@ public class FieldFilterPanel extends JComponent
     this.whereLabel.setBackground(WebColors.White);
     add(this.whereLabel);
 
-    this.fieldNames = new ArrayList<String>(this.layer.getFieldNamesSet());
+    this.fieldNames = new ArrayList<>(this.layer.getFieldNamesSet());
     this.fieldNames.remove(this.recordDefinition.getGeometryFieldName());
-    final AttributeTitleStringConveter converter = new AttributeTitleStringConveter(this.layer);
-    this.nameField = new ComboBox(converter, false, this.fieldNames.toArray());
+    final FieldTitleStringConveter converter = new FieldTitleStringConveter(this.layer);
+    this.nameField = new ComboBox<>(converter, false, this.fieldNames);
     this.nameField.setRenderer(converter);
     this.nameField.addActionListener(this);
     add(this.nameField);
@@ -438,7 +438,7 @@ public class FieldFilterPanel extends JComponent
     }
   }
 
-  private void setOperatorField(final ComboBox field) {
+  private void setOperatorField(final ComboBox<String> field) {
     if (field != this.operatorField) {
       final String operator = getSearchOperator();
       if (this.operatorField != null) {
@@ -490,7 +490,7 @@ public class FieldFilterPanel extends JComponent
       this.previousSearchFieldName = searchFieldName;
       final RecordDefinition recordDefinition = this.tableModel.getRecordDefinition();
       this.field = recordDefinition.getField(searchFieldName);
-      final Class<?> attributeClass = this.field.getTypeClass();
+      final Class<?> fieldClass = this.field.getTypeClass();
       if (!Equals.equal(searchFieldName, this.nameField.getSelectedItem())) {
         this.nameField.setFieldValue(searchFieldName);
       }
@@ -499,12 +499,12 @@ public class FieldFilterPanel extends JComponent
       } else {
         this.codeTable = this.recordDefinition.getCodeTableByFieldName(searchFieldName);
       }
-      ComboBox operatorField;
+      ComboBox<String> operatorField;
       if (this.codeTable != null) {
         operatorField = this.codeTableOperatorField;
-      } else if (Number.class.isAssignableFrom(attributeClass)) {
+      } else if (Number.class.isAssignableFrom(fieldClass)) {
         operatorField = this.numericOperatorField;
-      } else if (Date.class.isAssignableFrom(attributeClass)) {
+      } else if (Date.class.isAssignableFrom(fieldClass)) {
         operatorField = this.dateOperatorField;
       } else {
         operatorField = this.generalOperatorField;
@@ -589,8 +589,8 @@ public class FieldFilterPanel extends JComponent
             Object value = null;
             if (this.codeTable == null) {
               try {
-                final Class<?> attributeClass = this.field.getTypeClass();
-                value = StringConverterRegistry.toObject(attributeClass, searchValue);
+                final Class<?> fieldClass = this.field.getTypeClass();
+                value = StringConverterRegistry.toObject(fieldClass, searchValue);
               } catch (final Throwable t) {
                 return;
               }

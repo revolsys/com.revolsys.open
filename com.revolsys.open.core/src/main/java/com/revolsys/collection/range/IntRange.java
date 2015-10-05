@@ -30,7 +30,7 @@ public class IntRange extends AbstractRange<Integer> {
 
   @Override
   public AbstractRange<?> expand(final Object value) {
-    final Integer intValue = Numbers.toInt(value);
+    final Integer intValue = Numbers.toInteger(value);
     if (intValue == null) {
       return null;
     } else {
@@ -58,7 +58,7 @@ public class IntRange extends AbstractRange<Integer> {
     if (value == null) {
       return null;
     } else {
-      final Integer intValue = Numbers.toInt(value);
+      final Integer intValue = Numbers.toInteger(value);
       if (intValue == null) {
         return null;
       } else {
@@ -77,7 +77,7 @@ public class IntRange extends AbstractRange<Integer> {
     if (value == null) {
       return null;
     } else {
-      final Integer intValue = Numbers.toInt(value);
+      final Integer intValue = Numbers.toInteger(value);
       if (intValue == null) {
         return null;
       } else {

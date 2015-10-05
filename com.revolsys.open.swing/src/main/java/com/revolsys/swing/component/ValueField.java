@@ -17,27 +17,17 @@ import javax.swing.WindowConstants;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.field.Field;
+import com.revolsys.swing.field.FieldSupport;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.ExceptionUtil;
-import com.revolsys.util.Property;
 
 public class ValueField extends JPanel implements Field {
   private static final long serialVersionUID = 1L;
 
-  private final Color defaultBackground = getBackground();
-
-  private final Color defaultForeground = getBackground();
-
-  private String errorMessage;
-
-  private String fieldName;
-
-  private Object fieldValue;
-
-  private String originalToolTip;
-
   private boolean saved = false;
+
+  private FieldSupport fieldSupport;
 
   private String title;
 
@@ -65,8 +55,7 @@ public class ValueField extends JPanel implements Field {
   }
 
   public ValueField(final String fieldName, final Object fieldValue) {
-    setFieldName(fieldName);
-    setFieldValue(fieldValue);
+    this.fieldSupport = new FieldSupport(this, fieldName, fieldValue);
     setTitle(CaseConverter.toCapitalizedWords(fieldName));
     setOpaque(false);
   }
@@ -98,29 +87,8 @@ public class ValueField extends JPanel implements Field {
     super.firePropertyChange(propertyName, oldValue, newValue);
   }
 
-  @Override
-  public String getFieldName() {
-    return this.fieldName;
-  }
-
-  @Override
-  public String getFieldValidationMessage() {
-    return this.errorMessage;
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public <T> T getFieldValue() {
-    return (T)this.fieldValue;
-  }
-
   public String getTitle() {
     return this.title;
-  }
-
-  @Override
-  public boolean isFieldValid() {
-    return true;
   }
 
   public boolean isSaved() {
@@ -166,37 +134,8 @@ public class ValueField extends JPanel implements Field {
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color foregroundColor,
-    final Color backgroundColor) {
-    setColor(foregroundColor, backgroundColor);
-    this.errorMessage = message;
-    super.setToolTipText(this.errorMessage);
-  }
-
-  public void setFieldName(final String fieldName) {
-    this.fieldName = fieldName;
-  }
-
-  @Override
   public void setFieldToolTip(final String toolTip) {
     setToolTipText(toolTip);
-  }
-
-  @Override
-  public void setFieldValid() {
-    setColor(this.defaultForeground, this.defaultBackground);
-    super.setToolTipText(this.originalToolTip);
-    this.errorMessage = null;
-  }
-
-  @Override
-  public void setFieldValue(final Object value) {
-    final Object oldValue = this.fieldValue;
-    this.fieldValue = value;
-    firePropertyChange("fieldValue", oldValue, value);
-    if (Property.hasValue(this.fieldName)) {
-      firePropertyChange(this.fieldName, oldValue, value);
-    }
   }
 
   public void setTitle(final String title) {
@@ -205,8 +144,7 @@ public class ValueField extends JPanel implements Field {
 
   @Override
   public void setToolTipText(final String text) {
-    this.originalToolTip = text;
-    if (!Property.hasValue(this.errorMessage)) {
+    if (this.fieldSupport.setOriginalTooltipText(text)) {
       super.setToolTipText(text);
     }
   }

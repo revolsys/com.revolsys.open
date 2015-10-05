@@ -167,7 +167,8 @@ public class FieldSupport {
     if (!Equals.equal(oldValue, value)) {
       this.value = value;
       this.field.firePropertyChange(this.name, oldValue, value);
-      SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this.field, oldValue, value);
+      UndoManager parent = this.undoManager.getParent();
+      SetFieldValueUndoableEdit.create(parent, this.field, oldValue, value);
     }
   }
 }

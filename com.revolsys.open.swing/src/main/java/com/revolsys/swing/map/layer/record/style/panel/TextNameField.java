@@ -22,14 +22,10 @@ import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.TextArea;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
-import com.revolsys.swing.map.layer.record.component.AttributeTitleStringConveter;
+import com.revolsys.swing.map.layer.record.component.FieldTitleStringConveter;
 import com.revolsys.util.Property;
 
 public class TextNameField extends ValueField {
-
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private final ComboBox<String> fieldNamesField;
@@ -45,7 +41,7 @@ public class TextNameField extends ValueField {
     final List<String> fieldNames = new ArrayList<String>(layer.getFieldNames());
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
     fieldNames.remove(recordDefinition.getGeometryFieldName());
-    final AttributeTitleStringConveter converter = new AttributeTitleStringConveter(layer);
+    final FieldTitleStringConveter converter = new FieldTitleStringConveter(layer);
     this.fieldNamesField = new ComboBox<String>(converter, false, fieldNames);
     this.fieldNamesField.setRenderer(converter);
 
@@ -58,7 +54,6 @@ public class TextNameField extends ValueField {
       this.fieldNamesField, addButton);
     GroupLayoutUtil.makeColumns(fieldNamesPanel, 2, false);
     add(fieldNamesPanel, BorderLayout.SOUTH);
-
   }
 
   public void addFieldName() {

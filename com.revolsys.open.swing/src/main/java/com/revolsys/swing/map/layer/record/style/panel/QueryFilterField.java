@@ -18,10 +18,6 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
 public class QueryFilterField extends ValueField implements PropertyChangeListener {
-
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private final JButton clearButton;

@@ -4,75 +4,48 @@ import java.awt.Color;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
-import javax.swing.BoundedRangeModel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.swing.undo.CascadingUndoManager;
-import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Numbers;
 import com.revolsys.util.Property;
 
 public class Slider extends JSlider implements Field, FocusListener, ChangeListener {
-
   public static final Color DEFAULT_SELECTED_FOREGROUND = new JTextField().getSelectedTextColor();
 
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
-  private String errorMessage;
-
-  private String fieldName;
-
-  private int fieldValue;
-
-  private String originalToolTip;
-
-  private final CascadingUndoManager undoManager = new CascadingUndoManager();
+  private final FieldSupport fieldSupport;
 
   public Slider(final String fieldName) {
-    super();
-    setFieldName(fieldName);
-    addChangeListener(this);
-  }
-
-  public Slider(final String fieldName, final BoundedRangeModel brm) {
-    super(brm);
-    setFieldName(fieldName);
-    addChangeListener(this);
+    this(fieldName, HORIZONTAL, 0, 100, 50);
   }
 
   public Slider(final String fieldName, final int orientation) {
-    super(orientation);
-    setFieldName(fieldName);
-    addChangeListener(this);
+    this(fieldName, orientation, 0, 100, 50);
   }
 
   public Slider(final String fieldName, final int min, final int max) {
-    super(min, max);
-    setFieldName(fieldName);
-    addChangeListener(this);
+    this(fieldName, min, max, (min + max) / 2);
   }
 
   public Slider(final String fieldName, final int min, final int max, final int value) {
-    super(min, max, value);
-    setFieldName(fieldName);
-    addChangeListener(this);
-    this.fieldValue = value;
+    this(fieldName, HORIZONTAL, min, max, value);
   }
 
   public Slider(final String fieldName, final int orientation, final int min, final int max,
     final int value) {
     super(orientation, min, max, value);
-    setFieldName(fieldName);
+    if (Property.hasValue(fieldName)) {
+      setToolTipText(CaseConverter.toCapitalizedWords(fieldName));
+    }
+    this.fieldSupport = new FieldSupport(this, fieldName, value);
     addChangeListener(this);
-    this.fieldValue = value;
   }
 
   @Override
@@ -105,13 +78,8 @@ public class Slider extends JSlider implements Field, FocusListener, ChangeListe
   }
 
   @Override
-  public String getFieldName() {
-    return this.fieldName;
-  }
-
-  @Override
-  public String getFieldValidationMessage() {
-    return this.errorMessage;
+  public FieldSupport getFieldSupport() {
+    return this.fieldSupport;
   }
 
   @SuppressWarnings("unchecked")
@@ -132,66 +100,28 @@ public class Slider extends JSlider implements Field, FocusListener, ChangeListe
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color foregroundColor,
-    final Color backgroundColor) {
-    setForeground(foregroundColor);
-    setBackground(backgroundColor);
-    this.errorMessage = message;
-    super.setToolTipText(this.errorMessage);
-  }
-
-  private void setFieldName(final String fieldName) {
-    this.fieldName = fieldName;
-    if (Property.hasValue(fieldName)) {
-      setToolTipText(CaseConverter.toCapitalizedWords(fieldName));
-    }
-  }
-
-  @Override
   public void setFieldToolTip(final String toolTip) {
     setToolTipText(toolTip);
   }
 
   @Override
-  public void setFieldValid() {
-    setForeground(Field.DEFAULT_FOREGROUND);
-    setBackground(Field.DEFAULT_BACKGROUND);
-    this.errorMessage = null;
-    super.setToolTipText(this.originalToolTip);
-  }
-
-  @Override
   public void setFieldValue(final Object value) {
-    if (value instanceof Number) {
-      final Number newNumber = (Number)value;
-      final int newValue = newNumber.intValue();
-      final int oldValue = this.fieldValue;
-      final int fieldValue = getValue();
-      this.undoManager.discardAllEdits();
-      if (fieldValue != newValue) {
-        setValue(newValue);
-        this.undoManager.discardAllEdits();
-      }
-      if (oldValue != newValue) {
-        this.fieldValue = newValue;
-        firePropertyChange(this.getFieldName(), oldValue, newValue);
-        SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this, oldValue, newValue);
-      }
+    final Integer newValue = Numbers.toInteger(value);
+    final Integer fieldValue = getValue();
+    getUndoManager().discardAllEdits();
+    if (Numbers.equal(fieldValue, newValue)) {
+      setValue(newValue);
+      getUndoManager().discardAllEdits();
     }
+    this.fieldSupport.setValue(newValue);
 
   }
 
   @Override
   public void setToolTipText(final String text) {
-    this.originalToolTip = text;
-    if (!Property.hasValue(this.errorMessage)) {
-      super.setToolTipText(text);
+    if (this.fieldSupport.setOriginalTooltipText(text)) {
+      setFieldToolTip(text);
     }
-  }
-
-  @Override
-  public void setUndoManager(final UndoManager undoManager) {
-    this.undoManager.setParent(undoManager);
   }
 
   @Override

@@ -1,7 +1,6 @@
 package com.revolsys.util;
 
 public class Numbers {
-
   public static boolean between(final int min, final int value, final int max) {
     if (min > max) {
       if (value < max) {
@@ -66,6 +65,66 @@ public class Numbers {
       return 18;
     } else {
       return 19;
+    }
+  }
+
+  public static boolean equal(final Byte value1, final Byte value2) {
+    if (value1 == null) {
+      return value2 == null;
+    } else if (value2 == null) {
+      return false;
+    } else {
+      return value1.equals(value2);
+    }
+  }
+
+  public static boolean equal(final Double value1, final Double value2) {
+    if (value1 == null) {
+      return value2 == null;
+    } else if (value2 == null) {
+      return false;
+    } else {
+      return value1.equals(value2);
+    }
+  }
+
+  public static boolean equal(final Float value1, final Float value2) {
+    if (value1 == null) {
+      return value2 == null;
+    } else if (value2 == null) {
+      return false;
+    } else {
+      return value1.equals(value2);
+    }
+  }
+
+  public static boolean equal(final Integer value1, final Integer value2) {
+    if (value1 == null) {
+      return value2 == null;
+    } else if (value2 == null) {
+      return false;
+    } else {
+      return value1.equals(value2);
+    }
+  }
+
+  public static boolean equal(final Long value1, final Long value2) {
+    if (value1 == null) {
+      return value2 == null;
+    } else if (value2 == null) {
+      return false;
+    } else {
+      return value1.equals(value2);
+    }
+  }
+
+  public static boolean equal(final Short value1, final Short value2) {
+    if (value1 == null) {
+      return value2 == null;
+    } else if (value2 == null) {
+      return false;
+    } else {
+      return value1.equals(value2);
     }
   }
 
@@ -340,7 +399,7 @@ public class Numbers {
    * Convert the value to a Long. If the value cannot be converted to a number
    * null is returned instead of an exception.
    */
-  public static Integer toInt(final Object value) {
+  public static Integer toInteger(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Number) {
@@ -348,7 +407,7 @@ public class Numbers {
       return number.intValue();
     } else {
       final String string = value.toString();
-      return toInt(string);
+      return toInteger(string);
     }
   }
 
@@ -356,7 +415,7 @@ public class Numbers {
    * Convert the value to a Long. If the value cannot be converted to a number
    * null is returned instead of an exception.
    */
-  public static Integer toInt(final String string) {
+  public static Integer toInteger(final String string) {
     if (string == null) {
       return null;
     } else {
