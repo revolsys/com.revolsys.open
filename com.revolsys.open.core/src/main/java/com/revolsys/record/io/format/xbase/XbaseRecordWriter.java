@@ -19,6 +19,8 @@ import org.apache.log4j.Logger;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.identifier.SingleIdentifier;
+import com.revolsys.identifier.TypedIdentifier;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.endian.ResourceEndianOutput;
 import com.revolsys.record.Record;
@@ -282,7 +284,14 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
       return true;
     } else {
       final String fieldName = field.getFullName();
-      final Object value = object.getValue(fieldName);
+      Object value = object.getValue(fieldName);
+      if (value instanceof SingleIdentifier) {
+        final SingleIdentifier identifier = (SingleIdentifier)value;
+        value = identifier.getValue(0);
+      } else if (value instanceof TypedIdentifier) {
+        final TypedIdentifier identifier = (TypedIdentifier)value;
+        value = identifier.getIdentifier().getValue(0);
+      }
       final int fieldLength = field.getLength();
       switch (field.getType()) {
         case XBaseFieldDefinition.NUMBER_TYPE:
@@ -292,22 +301,24 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
             if (this.useZeroForNull) {
               numString = numberFormat.format(0);
             }
-          } else if (value instanceof Number) {
-            Number number = (Number)value;
-            final int decimalPlaces = field.getDecimalPlaces();
-            if (decimalPlaces >= 0) {
-              if (number instanceof BigDecimal) {
-                final BigDecimal bigDecimal = new BigDecimal(number.toString());
-                number = bigDecimal.setScale(decimalPlaces, RoundingMode.HALF_UP);
-              } else if (number instanceof Double || number instanceof Float) {
-                final double doubleValue = number.doubleValue();
-                final double precisionScale = field.getPrecisionScale();
-                number = MathUtil.makePrecise(precisionScale, doubleValue);
-              }
-            }
-            numString = numberFormat.format(number);
           } else {
-            throw new IllegalArgumentException("Not a number " + fieldName + "=" + value);
+            if (value instanceof Number) {
+              Number number = (Number)value;
+              final int decimalPlaces = field.getDecimalPlaces();
+              if (decimalPlaces >= 0) {
+                if (number instanceof BigDecimal) {
+                  final BigDecimal bigDecimal = new BigDecimal(number.toString());
+                  number = bigDecimal.setScale(decimalPlaces, RoundingMode.HALF_UP);
+                } else if (number instanceof Double || number instanceof Float) {
+                  final double doubleValue = number.doubleValue();
+                  final double precisionScale = field.getPrecisionScale();
+                  number = MathUtil.makePrecise(precisionScale, doubleValue);
+                }
+              }
+              numString = numberFormat.format(number);
+            } else {
+              throw new IllegalArgumentException("Not a number " + fieldName + "=" + value);
+            }
           }
           final int numLength = numString.length();
           if (numLength > fieldLength) {

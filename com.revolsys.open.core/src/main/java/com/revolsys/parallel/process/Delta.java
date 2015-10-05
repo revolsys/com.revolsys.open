@@ -12,11 +12,27 @@ public final class Delta<T> extends AbstractInProcess<T> {
 
   private boolean clone = true;
 
-  private List<ChannelOutput<T>> out = new ArrayList<ChannelOutput<T>>();
+  private List<ChannelOutput<T>> out = new ArrayList<>();
 
   private boolean running;
 
   public Delta() {
+  }
+
+  public Delta(final InProcess<T>... processes) {
+    if (processes != null) {
+      for (final InProcess<T> process : processes) {
+        final Channel<T> channel = process.getIn();
+        addOut(channel);
+      }
+    }
+  }
+
+  private void addOut(final ChannelOutput<T> channel) {
+    if (channel != null) {
+      channel.writeConnect();
+      this.out.add(channel);
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -104,10 +120,7 @@ public final class Delta<T> extends AbstractInProcess<T> {
     disconnectOut();
     this.out = new ArrayList<>();
     for (final ChannelOutput<T> channel : out) {
-      if (channel != null) {
-        channel.writeConnect();
-        this.out.add(channel);
-      }
+      addOut(channel);
     }
   }
 

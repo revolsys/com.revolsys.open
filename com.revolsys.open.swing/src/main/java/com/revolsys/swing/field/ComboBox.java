@@ -17,12 +17,12 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
+import javax.swing.text.JTextComponent;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
 import com.revolsys.equals.Equals;
-import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Strings;
 
@@ -39,7 +39,7 @@ public class ComboBox<T> extends JComboBox<T>implements Field, KeyListener {
     return new ComboBox<>(fieldName, model);
   }
 
-  private final FieldSupport support;
+  private final FieldSupport fieldSupport;
 
   public ComboBox() {
     this("fieldValue");
@@ -67,7 +67,7 @@ public class ComboBox<T> extends JComboBox<T>implements Field, KeyListener {
       setRenderer(renderer);
     }
     final JComponent editorComponent = (JComponent)getEditor().getEditorComponent();
-    this.support = new FieldSupport(this, editorComponent, "fieldValue", null);
+    this.fieldSupport = new FieldSupport(this, editorComponent, "fieldValue", null);
   }
 
   public ComboBox(final ObjectToStringConverter converter, final boolean editable,
@@ -95,7 +95,7 @@ public class ComboBox<T> extends JComboBox<T>implements Field, KeyListener {
       AutoCompleteDecorator.decorate(this, converter);
     }
     final JComponent editorComponent = (JComponent)getEditor().getEditorComponent();
-    this.support = new FieldSupport(this, editorComponent, fieldName, null);
+    this.fieldSupport = new FieldSupport(this, editorComponent, fieldName, null);
     addActionListener(new ActionListener() {
 
       @Override
@@ -141,24 +141,20 @@ public class ComboBox<T> extends JComboBox<T>implements Field, KeyListener {
   }
 
   @Override
-  public String getFieldName() {
-    return this.support.getName();
+  public Color getFieldSelectedTextColor() {
+    final ComboBoxEditor editor = getEditor();
+    final Component component = editor.getEditorComponent();
+    if (component instanceof JTextComponent) {
+      final JTextComponent textField = (JTextComponent)component;
+      return textField.getSelectedTextColor();
+    } else {
+      return Field.DEFAULT_SELECTED_FOREGROUND;
+    }
   }
 
   @Override
-  public String getFieldValidationMessage() {
-    return this.support.getErrorMessage();
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> T getFieldValue() {
-    return (T)getSelectedItem();
-  }
-
-  @Override
-  public boolean isFieldValid() {
-    return true;
+  public FieldSupport getFieldSupport() {
+    return this.fieldSupport;
   }
 
   @Override
@@ -216,9 +212,16 @@ public class ComboBox<T> extends JComboBox<T>implements Field, KeyListener {
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color foregroundColor,
-    final Color backgroundColor) {
-    this.support.setFieldInvalid(message, foregroundColor, backgroundColor);
+  public void setFieldSelectedTextColor(Color color) {
+    if (color == null) {
+      color = Field.DEFAULT_SELECTED_FOREGROUND;
+    }
+    final ComboBoxEditor editor = getEditor();
+    final Component component = editor.getEditorComponent();
+    if (component instanceof JTextComponent) {
+      final JTextComponent textField = (JTextComponent)component;
+      textField.setSelectedTextColor(color);
+    }
   }
 
   @Override
@@ -229,28 +232,19 @@ public class ComboBox<T> extends JComboBox<T>implements Field, KeyListener {
   }
 
   @Override
-  public void setFieldValid() {
-    this.support.setFieldValid();
-  }
-
-  @Override
   public synchronized void setFieldValue(final Object value) {
     if (!Equals.equal(getSelectedItem(), value)) {
       setSelectedItem(value);
     }
-    this.support.setValue(value);
+    this.fieldSupport.setValue(value);
   }
 
   @Override
   public void setToolTipText(final String text) {
-    if (this.support.setOriginalTooltipText(text)) {
+    final FieldSupport fieldSupport = getFieldSupport();
+    if (fieldSupport.setOriginalTooltipText(text)) {
       super.setToolTipText(text);
     }
-  }
-
-  @Override
-  public void setUndoManager(final UndoManager undoManager) {
-    this.support.setUndoManager(undoManager);
   }
 
   @Override

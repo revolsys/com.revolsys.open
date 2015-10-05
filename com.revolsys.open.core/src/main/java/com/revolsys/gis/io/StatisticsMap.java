@@ -165,6 +165,15 @@ public class StatisticsMap implements Emptyable {
     this.prefix = prefix;
   }
 
+  public synchronized void setStatistics(final CharSequence statisticName,
+    final Statistics statistics) {
+    if (statisticName != null) {
+      final String name = Strings.toString(" ", this.prefix, statisticName);
+      statistics.setLogCounts(this.logCounts);
+      this.statisticsMap.put(name, statistics);
+    }
+  }
+
   public String toTsv() {
     return toTsv("CATEGORY", "NAME", "COUNT");
   }

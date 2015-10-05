@@ -331,21 +331,6 @@ public final class Records {
     return getIdentifiers(record, Arrays.asList(fieldNames));
   }
 
-  public static Integer getInteger(final Record record, final String fieldName) {
-    if (record == null) {
-      return null;
-    } else {
-      final Number value = record.getValue(fieldName);
-      if (value == null) {
-        return null;
-      } else if (value instanceof Integer) {
-        return (Integer)value;
-      } else {
-        return value.intValue();
-      }
-    }
-  }
-
   public static Integer getInteger(final Record record, final String fieldName,
     final Integer defaultValue) {
     if (record == null) {

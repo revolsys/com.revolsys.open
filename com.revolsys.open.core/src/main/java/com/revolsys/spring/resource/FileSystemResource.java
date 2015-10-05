@@ -231,14 +231,19 @@ public class FileSystemResource extends AbstractResource {
     }
   }
 
-  // implementation of WritableResource
-
   /**
    * This implementation returns the hash code of the underlying File reference.
    */
   @Override
   public int hashCode() {
     return this.path.hashCode();
+  }
+
+  // implementation of WritableResource
+
+  @Override
+  public boolean isFile() {
+    return true;
   }
 
   /**

@@ -15,6 +15,7 @@
  */
 package com.revolsys.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -23,6 +24,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -170,6 +173,16 @@ public final class UrlUtil {
       return FileUtil.getString(in);
     } catch (final IOException e) {
       throw new RuntimeException("Unable to read " + urlString, e);
+    }
+  }
+
+  public static File toFile(final URL url) {
+    try {
+      final URI uri = url.toURI();
+      final Path path = Paths.get(uri);
+      return path.toFile();
+    } catch (final URISyntaxException e) {
+      throw new WrappedException(e);
     }
   }
 

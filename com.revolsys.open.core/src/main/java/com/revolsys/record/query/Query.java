@@ -54,8 +54,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
 
   public static Query and(final RecordDefinition recordDefinition, final Map<String, ?> filter) {
     final Query query = new Query(recordDefinition);
-    final Condition[] conditions = {};
-    final And and = new And(conditions);
+    final And and = new And();
     addFilter(query, recordDefinition, filter, and);
     return query;
   }
@@ -89,9 +88,14 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
 
   public static Query or(final RecordDefinition recordDefinition, final Map<String, ?> filter) {
     final Query query = new Query(recordDefinition);
-    final Condition[] conditions = {};
-    final Or or = new Or(conditions);
+    final Or or = new Or();
     addFilter(query, recordDefinition, filter, or);
+    return query;
+  }
+
+  public static Query orderBy(final PathName pathName, final String... orderBy) {
+    final Query query = new Query(pathName);
+    query.setOrderByFieldNames(orderBy);
     return query;
   }
 
@@ -313,15 +317,15 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
     }
   }
 
-  public void setOrderByColumns(final List<String> orderBy) {
+  public void setOrderByFieldNames(final List<String> orderBy) {
     this.orderBy.clear();
     for (final String column : orderBy) {
       this.orderBy.put(column, Boolean.TRUE);
     }
   }
 
-  public void setOrderByColumns(final String... orderBy) {
-    setOrderByColumns(Arrays.asList(orderBy));
+  public void setOrderByFieldNames(final String... orderBy) {
+    setOrderByFieldNames(Arrays.asList(orderBy));
   }
 
   public void setRecordDefinition(final RecordDefinition recordDefinition) {

@@ -7,4 +7,12 @@ public interface InProcess<T> extends Process {
 
   void setIn(Channel<T> in);
 
+  default void setIn(final OutProcess<T> process) {
+    if (process != null) {
+      final Channel<T> in = process.getOut();
+      if (in != null) {
+        setIn(in);
+      }
+    }
+  }
 }

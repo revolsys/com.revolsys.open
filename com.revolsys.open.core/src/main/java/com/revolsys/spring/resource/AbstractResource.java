@@ -3,6 +3,8 @@ package com.revolsys.spring.resource;
 import java.io.File;
 import java.net.URL;
 
+import com.revolsys.util.UrlUtil;
+
 public abstract class AbstractResource extends org.springframework.core.io.AbstractResource
   implements Resource {
 
@@ -11,14 +13,10 @@ public abstract class AbstractResource extends org.springframework.core.io.Abstr
     throw new UnsupportedOperationException("Cannot create relative resource for: " + relativePath);
   }
 
-  /**
-   * This implementation throws a FileNotFoundException, assuming
-   * that the resource cannot be resolved to an absolute file path.
-   */
   @Override
   public File getFile() {
-    throw new UnsupportedOperationException(
-      getDescription() + " cannot be resolved to absolute file path");
+    final URL url = getURL();
+    return UrlUtil.toFile(url);
   }
 
   @Override

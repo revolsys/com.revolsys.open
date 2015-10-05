@@ -7,6 +7,8 @@ public interface Process extends Runnable, BeanNameAware {
 
   ProcessNetwork getProcessNetwork();
 
-  void setProcessNetwork(final ProcessNetwork processNetwork);
+  default void initialize() {
+  }
 
+  void setProcessNetwork(final ProcessNetwork processNetwork);
 }

@@ -17,9 +17,15 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Predicate;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.io.FileNames;
 import com.revolsys.io.FileUtil;
+import com.revolsys.predicate.Predicates;
 import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
 
@@ -140,6 +146,40 @@ public interface Resource extends org.springframework.core.io.Resource {
     return FileNames.getBaseName(filename);
   }
 
+  default List<String> getChildFileNames() {
+    if (isFile()) {
+      final File file = getFile();
+      final List<String> childFileNames = Lists.array(file.list());
+      Collections.sort(childFileNames);
+      return childFileNames;
+    } else {
+      return Collections.emptyList();
+    }
+  }
+
+  default List<String> getChildFileNames(final Predicate<String> filter) {
+    final List<String> fileNames = getChildFileNames();
+    return Predicates.filter(fileNames, filter);
+  }
+
+  default List<Resource> getChildren() {
+    final List<Resource> children = new ArrayList<>();
+    for (final String fileName : getChildFileNames()) {
+      final Resource newChildResource = newChildResource(fileName);
+      children.add(newChildResource);
+    }
+    return children;
+  }
+
+  default List<Resource> getChildren(final Predicate<String> filter) {
+    final List<Resource> children = new ArrayList<>();
+    for (final String fileName : getChildFileNames(filter)) {
+      final Resource newChildResource = newChildResource(fileName);
+      children.add(newChildResource);
+    }
+    return children;
+  }
+
   @Override
   File getFile();
 
@@ -165,6 +205,15 @@ public interface Resource extends org.springframework.core.io.Resource {
 
   @Override
   URL getURL();
+
+  default boolean isFile() {
+    try {
+      getFile();
+      return true;
+    } catch (final Throwable e) {
+      return false;
+    }
+  }
 
   default InputStream newBufferedInputStream() {
     final InputStream in = newInputStream();

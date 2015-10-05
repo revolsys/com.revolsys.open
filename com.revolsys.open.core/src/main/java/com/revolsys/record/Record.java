@@ -757,10 +757,8 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
 
   default void setValues(final Map<? extends String, ? extends Object> values) {
     if (values != null) {
-      for (final Entry<? extends String, ? extends Object> entry : new ArrayList<>(
-        values.entrySet())) {
-        final String name = entry.getKey();
-        final Object value = entry.getValue();
+      for (final String name : new ArrayList<>(values.keySet())) {
+        final Object value = values.get(name);
         setValue(name, value);
       }
     }

@@ -33,7 +33,6 @@ public class FileField extends ValueField implements Field {
 
   public FileField(final String fieldName, final int fileSelectionMode) {
     super(fieldName, null);
-
     add(this.fileName);
     this.browseButton.setText("Browse...");
     EventQueue.addAction(this.browseButton, () -> browseClick());
@@ -71,6 +70,16 @@ public class FileField extends ValueField implements Field {
   @Override
   public Field clone() {
     return new FileField(JFileChooser.DIRECTORIES_ONLY);
+  }
+
+  @Override
+  public Color getFieldSelectedTextColor() {
+    return this.fileName.getSelectedTextColor();
+  }
+
+  @Override
+  public FieldSupport getFieldSupport() {
+    return this.fileName.getFieldSupport();
   }
 
   @Override
@@ -139,6 +148,14 @@ public class FileField extends ValueField implements Field {
   }
 
   @Override
+  public void setFieldSelectedTextColor(Color color) {
+    if (color == null) {
+      color = Field.DEFAULT_SELECTED_FOREGROUND;
+    }
+    this.fileName.setSelectedTextColor(color);
+  }
+
+  @Override
   public void setFieldValid() {
     super.setFieldValid();
     this.fileName.setSelectedTextColor(Field.DEFAULT_SELECTED_FOREGROUND);
@@ -146,11 +163,13 @@ public class FileField extends ValueField implements Field {
 
   @Override
   public void setFieldValue(final Object fieldValue) {
+    final String fileName;
     if (fieldValue == null) {
-      setPath("");
+      fileName = "";
     } else {
-      setPath(fieldValue.toString());
+      fileName = fieldValue.toString();
     }
+    setPath(fileName);
   }
 
   public void setPath(final String directoryPath) {

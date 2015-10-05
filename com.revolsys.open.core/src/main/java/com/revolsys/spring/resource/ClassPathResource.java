@@ -66,7 +66,12 @@ public class ClassPathResource extends AbstractResource {
 
   @Override
   public boolean exists() {
-    return resolveURL() != null;
+    try {
+      getURL();
+      return true;
+    } catch (final Throwable t) {
+      return false;
+    }
   }
 
   public final ClassLoader getClassLoader() {
@@ -117,7 +122,14 @@ public class ClassPathResource extends AbstractResource {
 
   @Override
   public URL getURL() {
-    final URL url = resolveURL();
+    URL url;
+    if (this.clazz != null) {
+      url = this.clazz.getResource(this.path);
+    } else if (this.classLoader != null) {
+      url = this.classLoader.getResource(this.path);
+    } else {
+      url = ClassLoader.getSystemResource(this.path);
+    }
     if (url == null) {
       throw new IllegalArgumentException(
         getDescription() + " cannot be resolved to URL because it does not exist");
@@ -128,16 +140,6 @@ public class ClassPathResource extends AbstractResource {
   @Override
   public int hashCode() {
     return this.path.hashCode();
-  }
-
-  protected URL resolveURL() {
-    if (this.clazz != null) {
-      return this.clazz.getResource(this.path);
-    } else if (this.classLoader != null) {
-      return this.classLoader.getResource(this.path);
-    } else {
-      return ClassLoader.getSystemResource(this.path);
-    }
   }
 
 }

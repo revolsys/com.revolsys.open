@@ -16,6 +16,7 @@ import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
@@ -23,6 +24,7 @@ import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.ArrayRecordFactory;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordStoreExtension;
 import com.revolsys.record.property.RecordDefinitionProperty;
 import com.revolsys.util.ExceptionUtil;
@@ -223,6 +225,12 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
+  public Statistics getStatistics(final String name) {
+    final StatisticsMap statistics = getStatistics();
+    return statistics.getStatistics(name);
+  }
+
+  @Override
   public String getUrl() {
     return (String)this.connectionProperties.get("url");
   }
@@ -244,6 +252,11 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   protected void obtainConnected() {
+  }
+
+  @Override
+  public RecordReader query(final List<?> queries) {
+    return query((Iterable<?>)queries);
   }
 
   protected RecordDefinition refreshRecordDefinition(final RecordStoreSchema schema,
@@ -280,7 +293,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   protected void setConnectionProperties(final Map<String, ? extends Object> connectionProperties) {
-    this.connectionProperties = Maps.createHashMap(connectionProperties);
+    this.connectionProperties = Maps.newHash(connectionProperties);
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {

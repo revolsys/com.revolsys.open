@@ -63,7 +63,9 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
       for (final Map<String, Object> childStyle : styles) {
         final AbstractRecordLayerRenderer renderer = AbstractRecordLayerRenderer.getRenderer(layer,
           this, childStyle);
-        renderers.add(renderer);
+        if (renderer != null) {
+          renderers.add(renderer);
+        }
       }
       setRenderers(renderers);
     }

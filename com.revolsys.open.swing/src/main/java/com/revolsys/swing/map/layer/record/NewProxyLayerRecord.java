@@ -6,7 +6,6 @@ import com.revolsys.identifier.Identifier;
 import com.revolsys.record.RecordState;
 
 public class NewProxyLayerRecord extends AbstractProxyLayerRecord {
-
   private Identifier identifier;
 
   private LayerRecord record;

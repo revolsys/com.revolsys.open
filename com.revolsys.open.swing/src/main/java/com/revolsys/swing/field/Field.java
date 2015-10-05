@@ -10,7 +10,6 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.undo.UndoManager;
 
 public interface Field extends Cloneable {
-
   Color DEFAULT_BACKGROUND = new JTextField().getBackground();
 
   Color DEFAULT_FOREGROUND = new JTextField().getForeground();
@@ -23,19 +22,44 @@ public interface Field extends Cloneable {
 
   void firePropertyChange(String propertyName, Object oldValue, Object newValue);
 
-  String getFieldName();
+  default String getFieldName() {
+    final FieldSupport fieldSupport = getFieldSupport();
+    return fieldSupport.getName();
+  }
 
-  String getFieldValidationMessage();
+  default Color getFieldSelectedTextColor() {
+    return DEFAULT_SELECTED_FOREGROUND;
+  }
 
-  <T> T getFieldValue();
+  default FieldSupport getFieldSupport() {
+    throw new UnsupportedOperationException("Field support not yet implemented");
+  }
 
-  boolean isFieldValid();
+  default String getFieldValidationMessage() {
+    final FieldSupport fieldSupport = getFieldSupport();
+    return fieldSupport.getErrorMessage();
+  }
+
+  default <T> T getFieldValue() {
+    final FieldSupport fieldSupport = getFieldSupport();
+    return fieldSupport.getValue();
+  }
+
+  default UndoManager getUndoManager() {
+    final FieldSupport fieldSupport = getFieldSupport();
+    return fieldSupport.getUndoManager();
+  }
+
+  default boolean isFieldValid() {
+    final FieldSupport fieldSupport = getFieldSupport();
+    return fieldSupport.isFieldValid();
+  }
 
   void setEditable(boolean editable);
 
   default void setFieldBackgroundColor(Color color) {
     if (color == null) {
-      color = Field.DEFAULT_BACKGROUND;
+      color = DEFAULT_BACKGROUND;
     }
     if (this instanceof JComponent) {
       final JComponent component = (JComponent)this;
@@ -45,7 +69,7 @@ public interface Field extends Cloneable {
 
   default void setFieldForegroundColor(Color color) {
     if (color == null) {
-      color = Field.DEFAULT_BACKGROUND;
+      color = DEFAULT_BACKGROUND;
     }
     if (this instanceof JComponent) {
       final JComponent component = (JComponent)this;
@@ -53,15 +77,34 @@ public interface Field extends Cloneable {
     }
   }
 
-  void setFieldInvalid(String message, Color foregroundColor, Color backgroundColor);
+  default void setFieldInvalid(final String message, final Color foregroundColor,
+    final Color backgroundColor) {
+    final FieldSupport fieldSupport = getFieldSupport();
+    fieldSupport.setFieldInvalid(message, foregroundColor, backgroundColor);
+  }
 
-  void setFieldToolTip(String toolTip);
+  default void setFieldSelectedTextColor(final Color color) {
+  }
 
-  void setFieldValid();
+  default void setFieldToolTip(final String toolTip) {
+    final FieldSupport fieldSupport = getFieldSupport();
+    fieldSupport.setFieldToolTip(toolTip);
+  }
 
-  void setFieldValue(Object value);
+  default void setFieldValid() {
+    final FieldSupport fieldSupport = getFieldSupport();
+    fieldSupport.setFieldValid();
+  }
 
-  void setUndoManager(UndoManager undoManager);
+  default void setFieldValue(final Object value) {
+    final FieldSupport fieldSupport = getFieldSupport();
+    fieldSupport.setValue(value);
+  }
+
+  default void setUndoManager(final UndoManager undoManager) {
+    final FieldSupport fieldSupport = getFieldSupport();
+    fieldSupport.setUndoManager(undoManager);
+  }
 
   void updateFieldValue();
 }

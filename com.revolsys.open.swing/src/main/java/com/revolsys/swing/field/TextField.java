@@ -100,6 +100,11 @@ public class TextField extends JXTextField implements Field, FocusListener {
   }
 
   @Override
+  public Color getFieldSelectedTextColor() {
+    return getSelectedTextColor();
+  }
+
+  @Override
   public String getFieldValidationMessage() {
     return this.support.getErrorMessage();
   }
@@ -117,7 +122,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
 
   @Override
   public boolean isFieldValid() {
-    return true;
+    return this.support.isFieldValid();
   }
 
   @Override
@@ -138,6 +143,14 @@ public class TextField extends JXTextField implements Field, FocusListener {
   public void setFieldInvalid(final String message, final Color foregroundColor,
     final Color backgroundColor) {
     this.support.setFieldInvalid(message, foregroundColor, backgroundColor);
+  }
+
+  @Override
+  public void setFieldSelectedTextColor(Color color) {
+    if (color == null) {
+      color = Field.DEFAULT_SELECTED_FOREGROUND;
+    }
+    setSelectedTextColor(color);
   }
 
   @Override

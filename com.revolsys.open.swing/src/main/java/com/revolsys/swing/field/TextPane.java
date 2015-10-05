@@ -95,6 +95,11 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
   }
 
   @Override
+  public Color getFieldSelectedTextColor() {
+    return getSelectedTextColor();
+  }
+
+  @Override
   public String getFieldValidationMessage() {
     return this.errorMessage;
   }
@@ -132,6 +137,14 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
     setBackground(backgroundColor);
     this.errorMessage = message;
     super.setToolTipText(this.errorMessage);
+  }
+
+  @Override
+  public void setFieldSelectedTextColor(Color color) {
+    if (color == null) {
+      color = Field.DEFAULT_SELECTED_FOREGROUND;
+    }
+    setSelectedTextColor(color);
   }
 
   @Override

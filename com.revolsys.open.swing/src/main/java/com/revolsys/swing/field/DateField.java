@@ -11,22 +11,12 @@ import org.jdesktop.swingx.JXDatePicker;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.equals.Equals;
-import com.revolsys.swing.undo.CascadingUndoManager;
-import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Property;
 
 public class DateField extends JXDatePicker implements Field, PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
-  private String errorMessage;
-
-  private String fieldName;
-
-  private Date fieldValue;
-
-  private String originalToolTip;
-
-  private final CascadingUndoManager undoManager = new CascadingUndoManager();
+  private final FieldSupport fieldSupport;
 
   public DateField() {
     this("fieldValue");
@@ -37,14 +27,14 @@ public class DateField extends JXDatePicker implements Field, PropertyChangeList
   }
 
   public DateField(final String fieldName, final Object fieldValue) {
-    this.fieldName = fieldName;
+    this.fieldSupport = new FieldSupport(this, fieldName, fieldValue);
     Property.addListener(this, "date", this);
-    this.undoManager.addKeyMap(getEditor());
+    getUndoManager().addKeyMap(getEditor());
   }
 
   @Override
   public DateField clone() {
-    return new DateField(this.fieldName, getFieldValue());
+    return new DateField(getFieldName(), getFieldValue());
   }
 
   @Override
@@ -54,24 +44,13 @@ public class DateField extends JXDatePicker implements Field, PropertyChangeList
   }
 
   @Override
-  public String getFieldName() {
-    return this.fieldName;
+  public Color getFieldSelectedTextColor() {
+    return getEditor().getSelectedTextColor();
   }
 
   @Override
-  public String getFieldValidationMessage() {
-    return this.errorMessage;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> T getFieldValue() {
-    return (T)this.fieldValue;
-  }
-
-  @Override
-  public boolean isFieldValid() {
-    return true;
+  public FieldSupport getFieldSupport() {
+    return this.fieldSupport;
   }
 
   @Override
@@ -81,7 +60,6 @@ public class DateField extends JXDatePicker implements Field, PropertyChangeList
       final Object date = evt.getNewValue();
       setFieldValue(date);
     }
-
   }
 
   @Override
@@ -108,18 +86,12 @@ public class DateField extends JXDatePicker implements Field, PropertyChangeList
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color foregroundColor,
-    final Color backgroundColor) {
+  public void setFieldSelectedTextColor(Color color) {
+    if (color == null) {
+      color = Field.DEFAULT_SELECTED_FOREGROUND;
+    }
     final JFormattedTextField editor = getEditor();
-    editor.setForeground(foregroundColor);
-    editor.setSelectedTextColor(foregroundColor);
-    editor.setBackground(backgroundColor);
-    this.errorMessage = message;
-    setFieldToolTip(this.errorMessage);
-  }
-
-  public void setFieldName(final String fieldName) {
-    this.fieldName = fieldName;
+    editor.setSelectedTextColor(color);
   }
 
   @Override
@@ -129,40 +101,20 @@ public class DateField extends JXDatePicker implements Field, PropertyChangeList
   }
 
   @Override
-  public void setFieldValid() {
-    final JFormattedTextField editor = getEditor();
-    editor.setForeground(Field.DEFAULT_FOREGROUND);
-    editor.setSelectedTextColor(Field.DEFAULT_SELECTED_FOREGROUND);
-    editor.setBackground(Field.DEFAULT_BACKGROUND);
-    this.errorMessage = null;
-    setFieldToolTip(this.originalToolTip);
-  }
-
-  @Override
   public void setFieldValue(final Object value) {
-    final Date oldValue = this.fieldValue;
     final Date date = StringConverterRegistry.toObject(Date.class, value);
     if (!Equals.equal(getDate(), date)) {
       setDate(date);
     }
-    if (!Equals.equal(oldValue, date)) {
-      this.fieldValue = date;
-      firePropertyChange(this.fieldName, oldValue, date);
-      SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this, oldValue, date);
-    }
+    this.fieldSupport.setValue(date);
   }
 
   @Override
   public void setToolTipText(final String text) {
-    this.originalToolTip = text;
-    if (!Property.hasValue(this.errorMessage)) {
+    final FieldSupport fieldSupport = getFieldSupport();
+    if (fieldSupport.setOriginalTooltipText(text)) {
       super.setToolTipText(text);
     }
-  }
-
-  @Override
-  public void setUndoManager(final UndoManager undoManager) {
-    this.undoManager.setParent(undoManager);
   }
 
   @Override

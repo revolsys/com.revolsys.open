@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
+import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 
 public class JdbcConnection implements Connection {
@@ -170,11 +171,13 @@ public class JdbcConnection implements Connection {
 
   public DataAccessException getException(final String task, final String sql,
     final SQLException e) {
+    SQLExceptionTranslator exceptionTransaltor;
     if (this.dataSource == null) {
-      return new SQLStateSQLExceptionTranslator().translate(task, sql, e);
+      exceptionTransaltor = new SQLStateSQLExceptionTranslator();
     } else {
-      return new SQLErrorCodeSQLExceptionTranslator(this.dataSource).translate(task, sql, e);
+      exceptionTransaltor = new SQLErrorCodeSQLExceptionTranslator(this.dataSource);
     }
+    return exceptionTransaltor.translate(task, sql, e);
   }
 
   @Override

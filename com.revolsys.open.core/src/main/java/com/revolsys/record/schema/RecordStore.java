@@ -502,6 +502,20 @@ public interface RecordStore
     return reader;
   }
 
+  default RecordReader query(final List<?> queries) {
+    final RecordStoreQueryReader reader = newReader();
+    for (final Object queryObject : queries) {
+      if (queryObject instanceof Query) {
+        final Query query = (Query)queryObject;
+        reader.addQuery(query);
+      } else {
+        final Query query = new Query(queryObject.toString());
+        reader.addQuery(query);
+      }
+    }
+    return reader;
+  }
+
   default RecordReader query(final PathName path) {
     final RecordStoreSchemaElement element = getRootSchema().getElement(path);
     if (element instanceof RecordDefinition) {
@@ -565,6 +579,11 @@ public interface RecordStore
   void setLogCounts(boolean logCounts);
 
   void setRecordFactory(RecordFactory recordFactory);
+
+  default void setStatistics(final String name, final Statistics statistics) {
+    final StatisticsMap statisticsMap = getStatistics();
+    statisticsMap.setStatistics(name, statistics);
+  }
 
   default void update(final Record object) {
     throw new UnsupportedOperationException("Update not supported");

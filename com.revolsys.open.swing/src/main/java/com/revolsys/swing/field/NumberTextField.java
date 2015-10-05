@@ -19,7 +19,6 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
@@ -128,8 +127,6 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
 
   private final DataType dataType;
 
-  private boolean fieldValid = true;
-
   private final int length;
 
   private BigDecimal maximumValue;
@@ -138,7 +135,7 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
 
   private final int scale;
 
-  private final FieldSupport support;
+  private final FieldSupport fieldSupport;
 
   public NumberTextField(final DataType dataType, final int length) {
     this(dataType, length, 0);
@@ -158,12 +155,9 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
     this(fieldName, dataType, length, scale, null, createMaximumValue(dataType, length, scale));
   }
 
-  public NumberTextField(String fieldName, final DataType dataType, final int length,
+  public NumberTextField(final String fieldName, final DataType dataType, final int length,
     final int scale, final Number minimumValue, final Number maximumValue) {
-    if (!Property.hasValue(fieldName)) {
-      fieldName = "fieldValue";
-    }
-    this.support = new FieldSupport(this, fieldName, null);
+    this.fieldSupport = new FieldSupport(this, fieldName, null);
     this.dataType = dataType;
     this.length = length;
     this.scale = scale;
@@ -199,28 +193,23 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
 
   @Override
   public void focusGained(final FocusEvent e) {
-    this.support.discardAllEdits();
+    this.fieldSupport.discardAllEdits();
   }
 
   @Override
   public void focusLost(final FocusEvent e) {
     updateFieldValue();
-    this.support.discardAllEdits();
+    this.fieldSupport.discardAllEdits();
   }
 
   @Override
-  public String getFieldName() {
-    return this.support.getName();
+  public Color getFieldSelectedTextColor() {
+    return getSelectedTextColor();
   }
 
   @Override
-  public String getFieldValidationMessage() {
-    return this.support.getErrorMessage();
-  }
-
-  @Override
-  public <V> V getFieldValue() {
-    return this.support.getValue();
+  public FieldSupport getFieldSupport() {
+    return this.fieldSupport;
   }
 
   public int getLength() {
@@ -265,29 +254,16 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
   }
 
   @Override
-  public boolean isFieldValid() {
-    return this.fieldValid;
-  }
-
-  @Override
   public void removeUpdate(final DocumentEvent e) {
     validateField();
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color foregroundColor,
-    final Color backgroundColor) {
-    this.support.setFieldInvalid(message, foregroundColor, backgroundColor);
-  }
-
-  @Override
-  public void setFieldToolTip(final String toolTip) {
-    setToolTipText(toolTip);
-  }
-
-  @Override
-  public void setFieldValid() {
-    this.support.setFieldValid();
+  public void setFieldSelectedTextColor(Color color) {
+    if (color == null) {
+      color = Field.DEFAULT_SELECTED_FOREGROUND;
+    }
+    setSelectedTextColor(color);
   }
 
   @Override
@@ -318,7 +294,7 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
       }
       if (!Equals.equal(oldValue, newValue)) {
         validateField();
-        this.support.setValue(newValue);
+        this.fieldSupport.setValue(newValue);
       }
     });
   }
@@ -341,14 +317,10 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
 
   @Override
   public void setToolTipText(final String text) {
-    if (this.support.setOriginalTooltipText(text)) {
+    final FieldSupport fieldSupport = getFieldSupport();
+    if (fieldSupport.setOriginalTooltipText(text)) {
       super.setToolTipText(text);
     }
-  }
-
-  @Override
-  public void setUndoManager(final UndoManager undoManager) {
-    this.support.setUndoManager(undoManager);
   }
 
   @Override
@@ -363,7 +335,6 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
   }
 
   private void validateField() {
-    final boolean oldValid = this.fieldValid;
     final String text = getText();
     String message = null;
     if (Property.hasValue(text)) {
@@ -412,15 +383,11 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
         }
       }
     }
-    final boolean valid = !Property.hasValue(message);
-    if (valid != oldValid) {
-      this.fieldValid = valid;
-      firePropertyChange("fieldValid", oldValid, this.fieldValid);
-    }
+    final boolean valid = Property.isEmpty(message);
     if (valid) {
-      this.support.setFieldValid();
+      this.fieldSupport.setFieldValid();
     } else {
-      this.support.setFieldInvalid(message, WebColors.Red, WebColors.Pink);
+      this.fieldSupport.setFieldInvalid(message, WebColors.Red, WebColors.Pink);
     }
   }
 }

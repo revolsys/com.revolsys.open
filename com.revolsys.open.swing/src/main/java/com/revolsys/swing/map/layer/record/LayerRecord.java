@@ -9,7 +9,7 @@ public interface LayerRecord extends Record {
 
   void clearChanges();
 
-  void firePropertyChange(String propertyName, Object oldValue, Object newValue);
+  void firePropertyChange(final String fieldName, final Object oldValue, final Object newValue);
 
   AbstractRecordLayer getLayer();
 

@@ -81,6 +81,7 @@ public class ProcessNetwork
         if (!this.stopping) {
           if (this.processes != null && !this.processes.containsKey(process)) {
             this.processes.put(process, null);
+            process.initialize();
           }
         }
       }

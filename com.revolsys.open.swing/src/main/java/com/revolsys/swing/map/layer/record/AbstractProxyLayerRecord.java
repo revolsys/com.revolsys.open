@@ -12,17 +12,17 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
 
   @Override
   public void cancelChanges() {
-    final LayerRecord record = getLayerRecord();
-    if (record != null) {
-      record.cancelChanges();
+    final LayerRecord layerRecord = getLayerRecord();
+    if (layerRecord != null) {
+      layerRecord.cancelChanges();
     }
   }
 
   @Override
   public void clearChanges() {
-    final LayerRecord record = getLayerRecord();
-    if (record != null) {
-      record.clearChanges();
+    final LayerRecord layerRecord = getLayerRecord();
+    if (layerRecord != null) {
+      layerRecord.clearChanges();
     }
   }
 
@@ -35,23 +35,23 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   @Override
   public void firePropertyChange(final String propertyName, final Object oldValue,
     final Object newValue) {
-    final LayerRecord record = getLayerRecord();
-    if (record != null) {
-      record.firePropertyChange(propertyName, oldValue, newValue);
+    final LayerRecord layerRecord = getLayerRecord();
+    if (layerRecord != null) {
+      layerRecord.firePropertyChange(propertyName, oldValue, newValue);
     }
   }
 
   protected LayerRecord getLayerRecord() {
     final AbstractRecordLayer layer = getLayer();
     final Identifier identifier = getIdentifier();
-    final LayerRecord record = layer.getCachedRecord(identifier);
-    return record;
+    final LayerRecord layerRecord = layer.getCachedRecord(identifier);
+    return layerRecord;
   }
 
   @Override
   public <T> T getOriginalValue(final String name) {
-    final LayerRecord record = getLayerRecord();
-    return record.getOriginalValue(name);
+    final LayerRecord layerRecord = getLayerRecord();
+    return layerRecord.getOriginalValue(name);
   }
 
   protected Record getRecord() {
@@ -112,14 +112,14 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
 
   @Override
   public boolean isSame(final Record record) {
-    final LayerRecord record2 = getLayerRecord();
-    return record2.isSame(record);
+    final LayerRecord layerRecord = getLayerRecord();
+    return layerRecord.isSame(record);
   }
 
   @Override
   public LayerRecord revertChanges() {
-    final LayerRecord record = getLayerRecord();
-    return record;
+    final LayerRecord layerRecord = getLayerRecord();
+    return layerRecord;
   }
 
   @Override

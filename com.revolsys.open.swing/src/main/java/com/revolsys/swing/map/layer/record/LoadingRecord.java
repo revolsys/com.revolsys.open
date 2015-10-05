@@ -5,7 +5,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 
 public class LoadingRecord extends AbstractLayerRecord {
-
   public LoadingRecord(final AbstractRecordLayer layer) {
     super(layer);
   }
@@ -43,5 +42,4 @@ public class LoadingRecord extends AbstractLayerRecord {
   public boolean setValue(final int index, final Object value) {
     return false;
   }
-
 }

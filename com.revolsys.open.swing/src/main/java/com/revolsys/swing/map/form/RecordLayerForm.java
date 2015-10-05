@@ -1144,67 +1144,70 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     final AbstractRecordLayer layer = getLayer();
     if (layer != null) {
       final LayerRecord record = getRecord();
-      if (record != null && !record.getState().equals(RecordState.Deleted)) {
-        final Object source = event.getSource();
+      if (record != null) {
+        final RecordState state = record.getState();
+        if (!state.equals(RecordState.Deleted)) {
+          final Object source = event.getSource();
 
-        if (this.geometryCoordinatesPanel != null
-          && source == this.geometryCoordinatesPanel.getTable().getModel()) {
-          if (propertyName.equals("geometry")) {
-            record.setGeometryValue((Geometry)event.getNewValue());
-          }
-        } else if (source == layer) {
-          if ("recordDeleted".equals(propertyName)) {
-            if (record.isDeleted() || isSame(event.getNewValue())) {
-              final Window window = SwingUtilities.getWindowAncestor(this);
-              SwingUtil.setVisible(window, false);
+          if (this.geometryCoordinatesPanel != null
+            && source == this.geometryCoordinatesPanel.getTable().getModel()) {
+            if (propertyName.equals("geometry")) {
+              record.setGeometryValue((Geometry)event.getNewValue());
             }
-          } else if ("recordsChanged".equals(propertyName)) {
-            if (record.isDeleted()) {
-              final Window window = SwingUtilities.getWindowAncestor(this);
-              SwingUtil.setVisible(window, false);
+          } else if (source == layer) {
+            if ("recordDeleted".equals(propertyName)) {
+              if (record.isDeleted() || isSame(event.getNewValue())) {
+                final Window window = SwingUtilities.getWindowAncestor(this);
+                SwingUtil.setVisible(window, false);
+              }
+            } else if ("recordsChanged".equals(propertyName)) {
+              if (record.isDeleted()) {
+                final Window window = SwingUtilities.getWindowAncestor(this);
+                SwingUtil.setVisible(window, false);
+              }
+              setRecord(record);
             }
-            setRecord(record);
-          }
-        } else if (source instanceof Field) {
-          final Field field = (Field)source;
-          final String fieldName = field.getFieldName();
-          final Object fieldValue = field.getFieldValue();
-          final Object recordValue = this.record.getValue(fieldName);
-          if (!Equals.equal(recordValue, fieldValue)) {
-            boolean equal = false;
-            if (fieldValue instanceof String) {
-              final String string = (String)fieldValue;
-              if (!Property.hasValue(string) && recordValue == null) {
-                equal = true;
+          } else if (source instanceof Field) {
+            final Field field = (Field)source;
+            final String fieldName = field.getFieldName();
+            final Object fieldValue = field.getFieldValue();
+            final Object recordValue = this.record.getValue(fieldName);
+            if (!Equals.equal(recordValue, fieldValue)) {
+              boolean equal = false;
+              if (fieldValue instanceof String) {
+                final String string = (String)fieldValue;
+                if (!Property.hasValue(string) && recordValue == null) {
+                  equal = true;
+                }
+              }
+              if (!equal && layer.isEditable()
+                && (state == RecordState.New && layer.isCanAddRecords()
+                  || layer.isCanEditRecords())) {
+                record.setValueByPath(fieldName, fieldValue);
               }
             }
-            if (!equal && layer.isEditable()
-              && (record.getState() == RecordState.New && layer.isCanAddRecords()
-                || layer.isCanEditRecords())) {
-              record.setValueByPath(fieldName, fieldValue);
+          } else {
+            if (isSame(source)) {
+              if (record.isDeleted()) {
+                final Window window = SwingUtilities.getWindowAncestor(this);
+                SwingUtil.setVisible(window, false);
+              }
+              final Object value = event.getNewValue();
+              final RecordDefinition recordDefinition = getRecordDefinition();
+              if ("qaMessagesUpdated".equals(propertyName)) {
+                updateErrors();
+              } else if (recordDefinition.hasField(propertyName)) {
+                setFieldValue(propertyName, value, isFieldValidationEnabled());
+              }
+              final boolean modifiedOrDeleted = isModifiedOrDeleted();
+              if (this.propertyChangeSupport != null) {
+                this.propertyChangeSupport.firePropertyChange("modifiedOrDeleted",
+                  !modifiedOrDeleted, modifiedOrDeleted);
+                final boolean deletable = isDeletable();
+                this.propertyChangeSupport.firePropertyChange("deletable", !deletable, deletable);
+              }
+              repaint();
             }
-          }
-        } else {
-          if (isSame(source)) {
-            if (record.isDeleted()) {
-              final Window window = SwingUtilities.getWindowAncestor(this);
-              SwingUtil.setVisible(window, false);
-            }
-            final Object value = event.getNewValue();
-            final RecordDefinition recordDefinition = getRecordDefinition();
-            if ("qaMessagesUpdated".equals(propertyName)) {
-              updateErrors();
-            } else if (recordDefinition.hasField(propertyName)) {
-              setFieldValue(propertyName, value, isFieldValidationEnabled());
-            }
-            final boolean modifiedOrDeleted = isModifiedOrDeleted();
-            if (this.propertyChangeSupport != null) {
-              this.propertyChangeSupport.firePropertyChange("modifiedOrDeleted", !modifiedOrDeleted,
-                modifiedOrDeleted);
-              final boolean deletable = isDeletable();
-              this.propertyChangeSupport.firePropertyChange("deletable", !deletable, deletable);
-            }
-            repaint();
           }
         }
       }

@@ -763,6 +763,15 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
+  public LayerRecord newRecord(final RecordDefinition recordDefinition) {
+    if (recordDefinition.equals(getRecordDefinition())) {
+      return new RecordStoreLayerRecord(this);
+    } else {
+      throw new IllegalArgumentException("Cannot create records for " + recordDefinition);
+    }
+  }
+
+  @Override
   protected boolean postSaveDeletedRecord(final LayerRecord record) {
     final boolean deleted = super.postSaveDeletedRecord(record);
     if (deleted) {

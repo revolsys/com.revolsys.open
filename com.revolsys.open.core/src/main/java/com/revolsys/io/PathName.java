@@ -10,7 +10,9 @@ public class PathName implements Comparable<PathName>, CharSequence {
   public static final PathName ROOT = new PathName("/");
 
   public static PathName newPathName(final Object path) {
-    if (Property.hasValue(path)) {
+    if (path instanceof PathName) {
+      return (PathName)path;
+    } else if (Property.hasValue(path)) {
       String pathString = path.toString();
       pathString = Path.clean(pathString);
       if ("/".equals(pathString)) {
