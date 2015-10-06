@@ -25,7 +25,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.field.TextArea;
 import com.revolsys.swing.field.TextField;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
@@ -82,7 +82,7 @@ public class LoggingEventPanel extends JPanel {
       add(new JScrollPane(textArea));
       textArea.setCaretPosition(0);
     }
-    GroupLayoutUtil.makeColumns(this, 2, true);
+    GroupLayouts.makeColumns(this, 2, true);
   }
 
   private void addField(final String fieldName, Object value) {

@@ -56,7 +56,8 @@ public class PointTest implements TestConstants {
         .getCoordinateSystem();
       final GeographicCoordinateSystem geographicCoordinateSystem = projectedCs
         .getGeographicCoordinateSystem();
-      geometryFactory2 = GeometryFactory.floating(geographicCoordinateSystem.getCoordinateSystemId(), axisCount);
+      geometryFactory2 = GeometryFactory
+        .floating(geographicCoordinateSystem.getCoordinateSystemId(), axisCount);
     } else {
       geometryFactory2 = GeometryFactory.floating(26910, axisCount);
     }

@@ -6,11 +6,13 @@ import java.awt.LayoutManager;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.GroupLayout.Group;
 import javax.swing.GroupLayout.ParallelGroup;
 import javax.swing.GroupLayout.SequentialGroup;
+import javax.swing.JPanel;
 import javax.swing.LayoutStyle;
 
-public class GroupLayoutUtil {
+public class GroupLayouts {
   public static GroupLayout getLayout(final Container container, final boolean containerGaps) {
     LayoutManager layout = container.getLayout();
     if (!(layout instanceof GroupLayout)) {
@@ -75,7 +77,7 @@ public class GroupLayoutUtil {
 
   public static void makeColumns(final Container container, final int numColumns,
     final boolean containerGaps, final boolean gaps) {
-    final GroupLayout groupLayout = getLayout(container, true);
+    final GroupLayout groupLayout = getLayout(container, containerGaps);
     groupLayout.setAutoCreateContainerGaps(containerGaps);
     groupLayout.setAutoCreateGaps(gaps);
     groupLayout.setLayoutStyle(LayoutStyle.getInstance());
@@ -89,6 +91,59 @@ public class GroupLayoutUtil {
     groupLayout.setAutoCreateGaps(true);
     groupLayout.setLayoutStyle(layoutStyle);
     makeColumns(container, groupLayout, numColumns);
+  }
+
+  public static JPanel panelColumns(final Component... components) {
+    final JPanel panel = new JPanel();
+    panel.setOpaque(false);
+    for (final Component component : components) {
+      panel.add(component);
+    }
+    makeColumns(panel, components.length, false, true);
+    return panel;
+  }
+
+  public static ParallelGroup parallel(final GroupLayout layout, final Alignment alignment,
+    final Object... elements) {
+    final ParallelGroup group = layout.createParallelGroup(alignment);
+    for (final Object element : elements) {
+      if (element instanceof Component) {
+        final Component component = (Component)element;
+        group.addComponent(component);
+      } else if (element instanceof Group) {
+        final Group childGroup = (Group)element;
+        group.addGroup(childGroup);
+      }
+    }
+    return group;
+  }
+
+  public static ParallelGroup parallel(final GroupLayout layout, final Object... elements) {
+    final ParallelGroup group = layout.createParallelGroup();
+    for (final Object element : elements) {
+      if (element instanceof Component) {
+        final Component component = (Component)element;
+        group.addComponent(component);
+      } else if (element instanceof Group) {
+        final Group childGroup = (Group)element;
+        group.addGroup(childGroup);
+      }
+    }
+    return group;
+  }
+
+  public static SequentialGroup sequential(final GroupLayout layout, final Object... elements) {
+    final SequentialGroup group = layout.createSequentialGroup();
+    for (final Object element : elements) {
+      if (element instanceof Component) {
+        final Component component = (Component)element;
+        group.addComponent(component);
+      } else if (element instanceof Group) {
+        final Group childGroup = (Group)element;
+        group.addGroup(childGroup);
+      }
+    }
+    return group;
   }
 
 }

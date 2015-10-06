@@ -30,7 +30,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
 
   private static final long serialVersionUID = 1L;
 
-  private final FieldSupport support;
+  private final FieldSupport fieldSupport;
 
   public TextField(final int columns) {
     this("text");
@@ -47,13 +47,13 @@ public class TextField extends JXTextField implements Field, FocusListener {
   }
 
   public TextField(String fieldName, final Object fieldValue) {
+    final String text = StringConverterRegistry.toString(fieldValue);
+    this.fieldSupport = new FieldSupport(this, fieldName, text, true);
     setFont(SwingUtil.FONT);
     setDocument(new PropertyChangeDocument(this));
     if (!Property.hasValue(fieldName)) {
       fieldName = "fieldValue";
     }
-    final String text = StringConverterRegistry.toString(fieldValue);
-    this.support = new FieldSupport(this, fieldName, text);
     setText(text);
     addFocusListener(new WeakFocusListener(this));
     PopupMenu.getPopupMenuFactory(this);
@@ -96,7 +96,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
 
   @Override
   public String getFieldName() {
-    return this.support.getName();
+    return this.fieldSupport.getName();
   }
 
   @Override
@@ -105,8 +105,13 @@ public class TextField extends JXTextField implements Field, FocusListener {
   }
 
   @Override
+  public FieldSupport getFieldSupport() {
+    return this.fieldSupport;
+  }
+
+  @Override
   public String getFieldValidationMessage() {
-    return this.support.getErrorMessage();
+    return this.fieldSupport.getErrorMessage();
   }
 
   @SuppressWarnings("unchecked")
@@ -117,12 +122,12 @@ public class TextField extends JXTextField implements Field, FocusListener {
   }
 
   protected <T> T getFieldValueInternal() {
-    return this.support.getValue();
+    return this.fieldSupport.getValue();
   }
 
   @Override
   public boolean isFieldValid() {
-    return this.support.isFieldValid();
+    return this.fieldSupport.isFieldValid();
   }
 
   @Override
@@ -142,7 +147,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
   @Override
   public void setFieldInvalid(final String message, final Color foregroundColor,
     final Color backgroundColor) {
-    this.support.setFieldInvalid(message, foregroundColor, backgroundColor);
+    this.fieldSupport.setFieldInvalid(message, foregroundColor, backgroundColor);
   }
 
   @Override
@@ -160,14 +165,14 @@ public class TextField extends JXTextField implements Field, FocusListener {
 
   @Override
   public void setFieldValid() {
-    this.support.setFieldValid();
+    this.fieldSupport.setFieldValid();
   }
 
   @Override
   public void setFieldValue(final Object value) {
     final String newText = getDisplayText(value);
     final String text = getText();
-    this.support.discardAllEdits();
+    this.fieldSupport.discardAllEdits();
     if (!Equals.equal(text, newText)) {
       if (newText == null) {
         if (Property.hasValue(text)) {
@@ -176,9 +181,9 @@ public class TextField extends JXTextField implements Field, FocusListener {
       } else {
         setText(newText);
       }
-      this.support.discardAllEdits();
+      this.fieldSupport.discardAllEdits();
     }
-    this.support.setValue(value);
+    this.fieldSupport.setValue(value);
   }
 
   @Override
@@ -191,14 +196,14 @@ public class TextField extends JXTextField implements Field, FocusListener {
 
   @Override
   public void setToolTipText(final String text) {
-    if (this.support.setOriginalTooltipText(text)) {
+    if (this.fieldSupport.setOriginalTooltipText(text)) {
       super.setToolTipText(text);
     }
   }
 
   @Override
   public void setUndoManager(final UndoManager undoManager) {
-    this.support.setUndoManager(undoManager);
+    this.fieldSupport.setUndoManager(undoManager);
   }
 
   @Override

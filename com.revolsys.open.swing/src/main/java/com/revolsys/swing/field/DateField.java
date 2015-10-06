@@ -27,7 +27,7 @@ public class DateField extends JXDatePicker implements Field, PropertyChangeList
   }
 
   public DateField(final String fieldName, final Object fieldValue) {
-    this.fieldSupport = new FieldSupport(this, fieldName, fieldValue);
+    this.fieldSupport = new FieldSupport(this, fieldName, fieldValue, true);
     Property.addListener(this, "date", this);
     getUndoManager().addKeyMap(getEditor());
   }
@@ -112,7 +112,7 @@ public class DateField extends JXDatePicker implements Field, PropertyChangeList
   @Override
   public void setToolTipText(final String text) {
     final FieldSupport fieldSupport = getFieldSupport();
-    if (fieldSupport.setOriginalTooltipText(text)) {
+    if (fieldSupport == null || fieldSupport.setOriginalTooltipText(text)) {
       super.setToolTipText(text);
     }
   }

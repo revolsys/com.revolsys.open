@@ -190,6 +190,10 @@ public class SaifReader extends AbstractReader<Record>
     }
   }
 
+  public int getCoordinateSystemId() {
+    return this.srid;
+  }
+
   /**
    * Get the schema definition declared in the SAIF archive.
    *
@@ -327,10 +331,6 @@ public class SaifReader extends AbstractReader<Record>
    */
   public RecordDefinitionFactory getRecordDefinitionFactory() {
     return this.recordDefinitionFactory;
-  }
-
-  public int getCoordinateSystemId() {
-    return this.srid;
   }
 
   private String getTypeName(final String fileName) {

@@ -12,10 +12,11 @@ import javax.swing.JFileChooser;
 
 import com.revolsys.io.file.FolderConnection;
 import com.revolsys.io.file.FolderConnectionRegistry;
+import com.revolsys.swing.Borders;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.FileField;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
@@ -38,7 +39,7 @@ public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
     final FolderConnectionRegistry registry = getRegistry();
     final ValueField panel = new ValueField();
     panel.setTitle("Add Folder Connection");
-    SwingUtil.setTitledBorder(panel, "Folder Connection");
+    Borders.titled(panel, "Folder Connection");
     SwingUtil.addLabel(panel, "Name");
     final TextField nameField = new TextField(20);
     panel.add(nameField);
@@ -47,7 +48,7 @@ public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
     final FileField folderField = new FileField(JFileChooser.DIRECTORIES_ONLY);
     panel.add(folderField);
 
-    GroupLayoutUtil.makeColumns(panel, 2, true);
+    GroupLayouts.makeColumns(panel, 2, true);
     panel.showDialog();
     if (panel.isSaved()) {
       final File file = folderField.getFile();

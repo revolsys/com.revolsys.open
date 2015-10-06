@@ -38,9 +38,8 @@ public class TogglePanel extends ValueField implements ItemListener {
 
   public TogglePanel(final String fieldName, final String value, final Dimension dimension,
     final List<Action> actions) {
-    super(fieldName, value);
+    super(new SpringLayout(), fieldName, value);
     setOpaque(false);
-    setLayout(new SpringLayout());
     setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 0));
     this.group = new ButtonGroup();
     for (final Action action : actions) {

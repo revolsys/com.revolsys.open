@@ -38,7 +38,7 @@ public class GeometryCoordinatesPanel extends ValueField implements TableModelLi
   private final TablePanel tablePanel;
 
   public GeometryCoordinatesPanel(final RecordLayerForm form, final String fieldName) {
-    super(fieldName, null);
+    super(new BorderLayout(), fieldName, null);
     setLayout(new BorderLayout());
 
     this.form = new WeakReference<>(form);

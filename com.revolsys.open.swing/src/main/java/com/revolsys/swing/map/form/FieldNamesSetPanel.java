@@ -87,8 +87,8 @@ public class FieldNamesSetPanel extends ValueField
   private final ArrayListModel<String> selectedFieldNamesModel;
 
   public FieldNamesSetPanel(final AbstractRecordLayer layer) {
-    super("fieldNamesSetName", layer.getFieldNamesSetName());
-    setLayout(new VerticalLayout(5));
+    super(new VerticalLayout(5), "fieldNamesSetName", layer.getFieldNamesSetName());
+
     this.layer = layer;
     this.fieldNamesSets = new HashMap<>(layer.getFieldNamesSets());
 

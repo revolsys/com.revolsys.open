@@ -14,7 +14,7 @@ import javax.measure.unit.Unit;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.listener.EventQueueRunnableListener;
 import com.revolsys.swing.listener.WeakFocusListener;
 
@@ -75,7 +75,7 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
     this.unitField.addItemListener(this);
     this.unitField.setSelectedItem(this.unit);
     add(this.unitField);
-    GroupLayoutUtil.makeColumns(this, 2, true);
+    GroupLayouts.makeColumns(this, 2, true);
   }
 
   public Measure<Length> getLength() {

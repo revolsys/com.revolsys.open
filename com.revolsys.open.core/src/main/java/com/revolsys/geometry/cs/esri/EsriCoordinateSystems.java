@@ -101,7 +101,8 @@ public class EsriCoordinateSystems {
     if (coordinateSystem == null) {
       return null;
     } else {
-      CoordinateSystem coordinateSystem2 = coordinateSystemsByName.get(coordinateSystem.getCoordinateSystemName());
+      CoordinateSystem coordinateSystem2 = coordinateSystemsByName
+        .get(coordinateSystem.getCoordinateSystemName());
       if (coordinateSystem2 == null) {
         coordinateSystem2 = coordinateSystems.get(coordinateSystem);
         if (coordinateSystem2 == null) {

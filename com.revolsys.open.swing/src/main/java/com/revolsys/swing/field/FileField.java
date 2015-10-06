@@ -6,6 +6,7 @@ import java.io.File;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 
 import com.revolsys.swing.EventQueue;
@@ -32,7 +33,7 @@ public class FileField extends ValueField implements Field {
   }
 
   public FileField(final String fieldName, final int fileSelectionMode) {
-    super(fieldName, null);
+    super(new SpringLayout(), fieldName, null);
     add(this.fileName);
     this.browseButton.setText("Browse...");
     EventQueue.addAction(this.browseButton, () -> browseClick());

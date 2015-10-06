@@ -14,7 +14,10 @@ import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -62,6 +65,7 @@ import com.akiban.sql.parser.ValueNode;
 import com.akiban.sql.parser.ValueNodeList;
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.equals.Equals;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.And;
@@ -82,12 +86,14 @@ import com.revolsys.record.query.Value;
 import com.revolsys.record.query.functions.Function;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.swing.Borders;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
+import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.component.FieldTitleStringConveter;
 import com.revolsys.swing.map.layer.record.component.RecordLayerFields;
@@ -96,7 +102,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
 public class QueryWhereConditionField extends ValueField
-  implements MouseListener, CaretListener, ItemListener {
+  implements MouseListener, CaretListener, ItemListener, PropertyChangeListener {
 
   private static final ImageIcon ICON = Icons.getIcon("add");
 
@@ -112,33 +118,29 @@ public class QueryWhereConditionField extends ValueField
     }
   }
 
-  private JComponent binaryConditionField;
+  private JComponent searchField;
 
-  private final ComboBox<String> binaryConditionOperator;
-
-  private final BasePanel binaryConditionPanel;
+  private final JPanel searchFieldPanel;
 
   private CodeTable codeTable;
 
   private final ComboBox<FieldDefinition> fieldNamesList;
 
-  private JComponent inConditionField;
-
-  private final BasePanel inConditionPanel;
-
   private final AbstractRecordLayer layer;
 
-  private final TextField likeConditionField;
+  private final JButton likeAddButton;
 
-  private final BasePanel likePanel;
+  private final TextField likeField;
+
+  private final JLabel likeLabel;
+
+  private final JPanel likePanel;
 
   private final PropertyChangeListener listener;
 
   private final Condition originalFilter;
 
   private final RecordDefinition recordDefinition;
-
-  private final ComboBox<String> rightUnaryConditionOperator;
 
   private final Color selectionColor;
 
@@ -151,6 +153,8 @@ public class QueryWhereConditionField extends ValueField
   private boolean validating;
 
   private final TextPane whereTextField;
+
+  private boolean hasSearchText;
 
   public QueryWhereConditionField(final AbstractRecordLayer layer,
     final PropertyChangeListener listener, final Condition filter) {
@@ -167,62 +171,88 @@ public class QueryWhereConditionField extends ValueField
     this.recordDefinition = layer.getRecordDefinition();
     final List<FieldDefinition> fieldDefinitions = this.recordDefinition.getFields();
 
-    this.fieldNamesList = new ComboBox<FieldDefinition>(new FieldTitleStringConveter(layer),
-      false, fieldDefinitions);
+    this.fieldNamesList = new ComboBox<FieldDefinition>(new FieldTitleStringConveter(layer), false,
+      fieldDefinitions);
+    this.fieldNamesList.setShowErrorIcon(false);
     this.fieldNamesList.addItemListener(this);
     this.fieldNamesList.addMouseListener(this);
 
-    final BasePanel fieldNamePanel = new BasePanel(this.fieldNamesList);
-    GroupLayoutUtil.makeColumns(fieldNamePanel, 1, false);
+    this.searchFieldPanel = new JPanel();
+    this.searchFieldPanel.setOpaque(false);
 
-    this.binaryConditionOperator = new ComboBox<String>("operator", "=", "<>", "<", "<=", ">",
-      ">=");
-    final JButton binaryConditionAddButton = RunnableAction.createButton("", "Add Binary Condition",
-      ICON, this::actionAddBinaryCondition);
-    this.binaryConditionPanel = new BasePanel(this.binaryConditionOperator,
-      binaryConditionAddButton);
-    setBinaryConditionField(null);
+    this.likeLabel = SwingUtil.newLabel("LIKE");
+    this.likeField = new TextField(20);
+    this.likeField.setShowErrorIcon(false);
+    this.likePanel = new JPanel(new VerticalLayout());
+    this.likePanel.setOpaque(false);
+    this.likePanel.add(this.likeField, BorderLayout.NORTH);
+    this.likeAddButton = RunnableAction.createButton("", "Add Unary Condition", ICON,
+      this::actionAddLikeCondition);
 
-    this.rightUnaryConditionOperator = new ComboBox<String>("operator", "IS NULL", "IS NOT NULL");
-    final JButton rightUnaryConditionAddButton = RunnableAction.createButton("",
-      "Add Unary Condition", ICON, this::actionAddRightUnaryCondition);
-    final BasePanel rightUnaryConditionPanel = new BasePanel(this.rightUnaryConditionOperator,
-      rightUnaryConditionAddButton);
-    GroupLayoutUtil.makeColumns(rightUnaryConditionPanel, false);
+    final ObjectPropertyEnableCheck hasSearchText = new ObjectPropertyEnableCheck(this,
+      "hasSearchText", true);
+    // final GroupLayout layout = new GroupLayout(fieldConditions);
+    // fieldConditions.setLayout(layout);
+    // layout.setAutoCreateContainerGaps(false);
+    // layout.setAutoCreateGaps(true);
+    //
+    // fieldConditions.add(this.likeLabel);
+    // fieldConditions.add(this.likePanel);
+    // fieldConditions.add(this.likeAddButton);
+    //
+    //
+    // final int PREFERRED_SIZE = GroupLayout.PREFERRED_SIZE;
+    // final int DEFAULT_SIZE = GroupLayout.DEFAULT_SIZE;
+    // layout.setHorizontalGroup(layout.sequential() //
+    // .addGroup(layout.parallel(Alignment.LEADING) //
+    // .addComponent(this.likeLabel, PREFERRED_SIZE, PREFERRED_SIZE,
+    // PREFERRED_SIZE)//
+    // .addGroup(layout.parallel(Alignment.LEADING) //
+    // .addComponent(this.likePanel, 100, DEFAULT_SIZE, 250) //
+    // .addGroup(layout.parallel(Alignment.LEADING, //
+    // this.likeAddButton))//
+    // );
+    //
+    // layout.setVerticalGroup(layout.sequential() //
+    // .addGroup(layout.parallel(Alignment.BASELINE, //
+    // this.likeLabel, //
+    // this.likePanel, //
+    // this.likeAddButton)) //
+    // );
 
-    final JButton likeConditionAddButton = RunnableAction.createButton("", "Add Unary Condition",
-      ICON, this::actionAddLikeCondition);
-    this.likeConditionField = new TextField(20);
-    this.likePanel = new BasePanel(SwingUtil.newLabel("LIKE"), new JLabel(" '%"),
-      this.likeConditionField, new JLabel("%' "), likeConditionAddButton);
-    GroupLayoutUtil.makeColumns(this.likePanel, false);
+    final ToolBar operatorToolBar = new ToolBar();
+    operatorToolBar.setOpaque(false);
+    operatorToolBar.setBorderPainted(true);
+    for (final String binaryOperator : Arrays.asList("=", "<>", "<", "<=", ">", ">=")) {
+      final JButton button = operatorToolBar.addButton("binary", binaryOperator, hasSearchText,
+        () -> actionAddBinaryCondition(binaryOperator));
+      button.setBorderPainted(true);
+    }
+    for (final String rightUnaryOperator : Arrays.asList("IS NULL", "IS NOT NULL")) {
+      final JButton button = operatorToolBar.addButton("rightUnary", rightUnaryOperator,
+        hasSearchText, () -> actionAddRightUnaryCondition(rightUnaryOperator));
+      button.setBorderPainted(true);
+    }
+    final JButton button = operatorToolBar.addButton("in", "IN", hasSearchText,
+      this::actionAddInCondition);
+    button.setBorderPainted(true);
+    final ToolBar buttonsToolBar = new ToolBar();
+    buttonsToolBar.setOpaque(false);
+    buttonsToolBar.setBorderPainted(true);
+    buttonsToolBar.addButton("relational", "AND", () -> insertText("AND")).setBorderPainted(true);
+    buttonsToolBar.addButton("relational", "OR", () -> insertText("OR")).setBorderPainted(true);
+    buttonsToolBar.addButton("relational", "NOT", () -> insertText("NOT")).setBorderPainted(true);
+    buttonsToolBar.addButton("grouping", "( )", () -> insertText("( )")).setBorderPainted(true);
+    buttonsToolBar.addButton("math", "+", () -> insertText("+")).setBorderPainted(true);
+    buttonsToolBar.addButton("math", "-", () -> insertText("-")).setBorderPainted(true);
+    buttonsToolBar.addButton("math", "*", () -> insertText("*")).setBorderPainted(true);
+    buttonsToolBar.addButton("math", "/", () -> insertText("/")).setBorderPainted(true);
 
-    final JButton inConditionAddButton = RunnableAction.createButton("", "Add Unary Condition",
-      ICON, this::actionAddInCondition);
-    this.inConditionField = new TextField(20);
-    this.inConditionPanel = new BasePanel(SwingUtil.newLabel("IN"), this.inConditionField,
-      inConditionAddButton);
-    setInConditionField(null);
-
-    final BasePanel operatorPanel = new BasePanel(new VerticalLayout(), this.binaryConditionPanel,
-      rightUnaryConditionPanel, this.likePanel, this.inConditionPanel);
-
-    final BasePanel fieldConditions = new BasePanel(fieldNamePanel, operatorPanel);
-    GroupLayoutUtil.makeColumns(fieldConditions, 2, false);
-
-    final ToolBar buttonsPanel = new ToolBar();
-    buttonsPanel.setBorderPainted(true);
-    buttonsPanel.addButton("relational", "AND", () -> insertText("AND")).setBorderPainted(true);
-    buttonsPanel.addButton("relational", "OR", () -> insertText("OR")).setBorderPainted(true);
-    buttonsPanel.addButton("relational", "NOT", () -> insertText("NOT")).setBorderPainted(true);
-    buttonsPanel.addButton("grouping", "( )", () -> insertText("( )")).setBorderPainted(true);
-    buttonsPanel.addButton("math", "+", () -> insertText("+")).setBorderPainted(true);
-    buttonsPanel.addButton("math", "-", () -> insertText("-")).setBorderPainted(true);
-    buttonsPanel.addButton("math", "*", () -> insertText("*")).setBorderPainted(true);
-    buttonsPanel.addButton("math", "/", () -> insertText("/")).setBorderPainted(true);
-
-    final BasePanel widgetPanel = new BasePanel(new VerticalLayout(5), fieldConditions,
-      buttonsPanel);
+    final BasePanel widgetPanel = new BasePanel(new VerticalLayout(5), //
+      GroupLayouts.panelColumns(this.fieldNamesList), //
+      operatorToolBar, //
+      this.searchFieldPanel, //
+      buttonsToolBar);
 
     this.whereTextField = new TextPane(5, 20);
     this.whereTextField.setFont(new Font("Monospaced", Font.PLAIN, 11));
@@ -248,7 +278,7 @@ public class QueryWhereConditionField extends ValueField
     verifyButton.setBorderPainted(true);
 
     final JPanel queryPanel = new JPanel(new BorderLayout());
-    SwingUtil.setTitledBorder(queryPanel, "Query");
+    Borders.titled(queryPanel, "Query");
     queryPanel.setOpaque(false);
     queryPanel.add(widgetPanel, BorderLayout.NORTH);
     queryPanel.add(filterTextPanel, BorderLayout.CENTER);
@@ -261,7 +291,7 @@ public class QueryWhereConditionField extends ValueField
     statusPane.setPreferredSize(new Dimension(500, 100));
 
     final JPanel statusPanel = new JPanel(new BorderLayout());
-    SwingUtil.setTitledBorder(statusPanel, "Messages");
+    Borders.titled(statusPanel, "Messages");
     statusPanel.setOpaque(false);
     statusPanel.add(statusPane, BorderLayout.CENTER);
 
@@ -280,12 +310,12 @@ public class QueryWhereConditionField extends ValueField
       this.whereTextField.setText(query);
     }
     final String searchField = layer.getProperty("searchField");
-    final FieldDefinition searchAttribute = this.recordDefinition.getField(searchField);
-    if (searchAttribute == null) {
-      this.fieldNamesList.setSelectedIndex(0);
-    } else {
-      this.fieldNamesList.setSelectedItem(searchAttribute);
+    FieldDefinition searchFieldDefinition = this.recordDefinition.getField(searchField);
+    if (searchFieldDefinition == null) {
+      searchFieldDefinition = fieldDefinitions.get(0);
     }
+    this.fieldNamesList.setSelectedItem(searchFieldDefinition);
+    setSearchField(searchFieldDefinition);
   }
 
   public QueryWhereConditionField(final AbstractRecordLayer layer,
@@ -293,52 +323,49 @@ public class QueryWhereConditionField extends ValueField
     this(layer, listener, null, query);
   }
 
-  public void actionAddBinaryCondition() {
-    final FieldDefinition attribute = (FieldDefinition)this.fieldNamesList.getSelectedItem();
-    if (attribute != null) {
-      final String operator = (String)this.binaryConditionOperator.getSelectedItem();
-      if (Property.hasValue(operator)) {
-        Object fieldValue = ((Field)this.binaryConditionField).getFieldValue();
-        if (fieldValue != null) {
-          final int position = this.whereTextField.getCaretPosition();
-          Class<?> attributeClass = attribute.getTypeClass();
-          if (this.codeTable == null) {
-            try {
-              fieldValue = StringConverterRegistry.toObject(attributeClass, fieldValue);
-            } catch (final Throwable e) {
-              setInvalidMessage(
-                "'" + fieldValue + "' is not a valid " + attribute.getType().getValidationName());
-              return;
-            }
+  private void actionAddBinaryCondition(final String operator) {
+    final FieldDefinition fieldDefinition = (FieldDefinition)this.fieldNamesList.getSelectedItem();
+    if (fieldDefinition != null) {
+      Object fieldValue = ((Field)this.searchField).getFieldValue();
+      if (fieldValue != null) {
+        final int position = this.whereTextField.getCaretPosition();
+        Class<?> fieldClass = fieldDefinition.getTypeClass();
+        if (this.codeTable == null) {
+          try {
+            fieldValue = StringConverterRegistry.toObject(fieldClass, fieldValue);
+          } catch (final Throwable e) {
+            setInvalidMessage("'" + fieldValue + "' is not a valid "
+              + fieldDefinition.getType().getValidationName());
+            return;
+          }
+        } else {
+          final List<Object> values = this.codeTable.getValues(Identifier.create(fieldValue));
+          if (values.size() == 1) {
+            fieldValue = values.get(0);
           } else {
-            final List<Object> values = this.codeTable.getValues(Identifier.create(fieldValue));
-            if (values.size() == 1) {
-              fieldValue = values.get(0);
-            } else {
-              fieldValue = Strings.toString(":", values);
-            }
-            if (fieldValue != null) {
-              attributeClass = fieldValue.getClass();
-            }
+            fieldValue = Strings.toString(":", values);
           }
           if (fieldValue != null) {
+            fieldClass = fieldValue.getClass();
+          }
+        }
+        if (fieldValue != null) {
 
-            final Document document = this.whereTextField.getDocument();
-            final StringBuilder text = new StringBuilder();
-            if (position > 0) {
-              text.append(" ");
-            }
-            text.append(attribute.getName());
+          final Document document = this.whereTextField.getDocument();
+          final StringBuilder text = new StringBuilder();
+          if (position > 0) {
             text.append(" ");
-            text.append(operator);
-            text.append(" ");
-            appendValue(text, attributeClass, fieldValue);
-            text.append(" ");
-            try {
-              document.insertString(position, text.toString(), null);
-            } catch (final BadLocationException e) {
-              LoggerFactory.getLogger(getClass()).error("Error inserting text: " + text, e);
-            }
+          }
+          text.append(fieldDefinition.getName());
+          text.append(" ");
+          text.append(operator);
+          text.append(" ");
+          appendValue(text, fieldClass, fieldValue);
+          text.append(" ");
+          try {
+            document.insertString(position, text.toString(), null);
+          } catch (final BadLocationException e) {
+            LoggerFactory.getLogger(getClass()).error("Error inserting text: " + text, e);
           }
         }
       }
@@ -346,25 +373,25 @@ public class QueryWhereConditionField extends ValueField
   }
 
   public void actionAddInCondition() {
-    final FieldDefinition attribute = (FieldDefinition)this.fieldNamesList.getSelectedItem();
-    if (attribute != null) {
-      Object fieldValue = ((Field)this.inConditionField).getFieldValue();
-      if (fieldValue != null) {
+    final FieldDefinition fieldDefinition = (FieldDefinition)this.fieldNamesList.getSelectedItem();
+    if (fieldDefinition != null) {
+      Object fieldValue = ((Field)this.searchField).getFieldValue();
+      if (Property.hasValue(fieldValue)) {
         int position = this.whereTextField.getCaretPosition();
-        Class<?> attributeClass = attribute.getTypeClass();
+        Class<?> fieldClass = fieldDefinition.getTypeClass();
         if (fieldValue != null) {
           if (this.codeTable == null) {
             try {
-              fieldValue = StringConverterRegistry.toObject(attributeClass, fieldValue);
+              fieldValue = StringConverterRegistry.toObject(fieldClass, fieldValue);
             } catch (final Throwable e) {
-              setInvalidMessage(
-                "'" + fieldValue + "' is not a valid " + attribute.getType().getValidationName());
+              setInvalidMessage("'" + fieldValue + "' is not a valid "
+                + fieldDefinition.getType().getValidationName());
               return;
             }
           } else {
             fieldValue = this.codeTable.getValue(Identifier.create(fieldValue));
             if (fieldValue != null) {
-              attributeClass = fieldValue.getClass();
+              fieldClass = fieldValue.getClass();
             }
           }
           if (fieldValue != null) {
@@ -372,19 +399,23 @@ public class QueryWhereConditionField extends ValueField
             try {
               final Document document = this.whereTextField.getDocument();
               final String currentText = document.getText(0, position);
-              final String endText = attribute.getName() + " IN (.+) $";
-              if (currentText.matches(endText)) {
-                position -= 2;
-                text.append(", ");
-                appendValue(text, attributeClass, fieldValue);
+              final Matcher matcher = Pattern
+                .compile(".+ ?" + fieldDefinition.getName() + " IN \\((?:.+,)* *'?(.+)'?\\) $")
+                .matcher(currentText);
+              if (matcher.matches()) {
+                final String previousValue = matcher.group(1);
+                if (!Equals.equal(fieldValue, previousValue)) {
+                  position -= 2;
+                  text.append(", ");
+                  appendValue(text, fieldClass, fieldValue);
+                }
               } else {
-
                 if (position > 0) {
                   text.append(" ");
                 }
-                text.append(attribute.getName());
+                text.append(fieldDefinition.getName());
                 text.append(" IN (");
-                appendValue(text, attributeClass, fieldValue);
+                appendValue(text, fieldClass, fieldValue);
                 text.append(") ");
               }
               document.insertString(position, text.toString(), null);
@@ -399,22 +430,22 @@ public class QueryWhereConditionField extends ValueField
   }
 
   public void actionAddLikeCondition() {
-    final FieldDefinition attribute = (FieldDefinition)this.fieldNamesList.getSelectedItem();
-    if (attribute != null) {
-      final Object fieldValue = ((Field)this.likeConditionField).getFieldValue();
+    final FieldDefinition fieldDefinition = (FieldDefinition)this.fieldNamesList.getSelectedItem();
+    if (fieldDefinition != null) {
+      final Object fieldValue = this.likeField.getFieldValue();
       if (fieldValue != null) {
         if (this.codeTable == null) {
           final int position = this.whereTextField.getCaretPosition();
-          final Class<?> attributeClass = attribute.getTypeClass();
+          final Class<?> fieldClass = fieldDefinition.getTypeClass();
           if (fieldValue != null) {
-            final String valueString = StringConverterRegistry.toString(attributeClass, fieldValue);
+            final String valueString = StringConverterRegistry.toString(fieldClass, fieldValue);
 
             final Document document = this.whereTextField.getDocument();
             final StringBuilder text = new StringBuilder();
             if (position > 0) {
               text.append(" ");
             }
-            text.append(attribute.getName());
+            text.append(fieldDefinition.getName());
             text.append(" LIKE '%");
             text.append(valueString.replaceAll("'", "''"));
             text.append("%' ");
@@ -429,28 +460,25 @@ public class QueryWhereConditionField extends ValueField
     }
   }
 
-  public void actionAddRightUnaryCondition() {
-    final FieldDefinition attribute = (FieldDefinition)this.fieldNamesList.getSelectedItem();
-    if (attribute != null) {
-      final String operator = (String)this.rightUnaryConditionOperator.getSelectedItem();
-      if (Property.hasValue(operator)) {
-        final int position = this.whereTextField.getCaretPosition();
+  public void actionAddRightUnaryCondition(final String operator) {
+    final FieldDefinition fieldDefinition = (FieldDefinition)this.fieldNamesList.getSelectedItem();
+    if (fieldDefinition != null) {
+      final int position = this.whereTextField.getCaretPosition();
 
-        final Document document = this.whereTextField.getDocument();
-        final StringBuilder text = new StringBuilder();
-        if (position > 0) {
-          text.append(" ");
-        }
-        text.append(attribute.getName());
+      final Document document = this.whereTextField.getDocument();
+      final StringBuilder text = new StringBuilder();
+      if (position > 0) {
         text.append(" ");
-        text.append(operator);
-        text.append(" ");
+      }
+      text.append(fieldDefinition.getName());
+      text.append(" ");
+      text.append(operator);
+      text.append(" ");
 
-        try {
-          document.insertString(position, text.toString(), null);
-        } catch (final BadLocationException e) {
-          LoggerFactory.getLogger(getClass()).error("Error inserting text: " + text, e);
-        }
+      try {
+        document.insertString(position, text.toString(), null);
+      } catch (final BadLocationException e) {
+        LoggerFactory.getLogger(getClass()).error("Error inserting text: " + text, e);
       }
     }
   }
@@ -511,28 +539,16 @@ public class QueryWhereConditionField extends ValueField
     this.whereTextField.requestFocusInWindow();
   }
 
+  public boolean isHasSearchText() {
+    return this.hasSearchText;
+  }
+
   @Override
   public void itemStateChanged(final ItemEvent event) {
     if (event.getSource() == this.fieldNamesList) {
       if (event.getStateChange() == ItemEvent.SELECTED) {
-        final FieldDefinition field = (FieldDefinition)event.getItem();
-        final String fieldName = field.getName();
-        this.codeTable = this.recordDefinition.getCodeTableByFieldName(fieldName);
-        final JComponent binaryConditionField = createSearchField(this.layer, field,
-          this.codeTable);
-        final JComponent inConditionField = createSearchField(this.layer, field, this.codeTable);
-
-        if (this.codeTable == null) {
-          if (binaryConditionField instanceof DateField) {
-            this.likePanel.setVisible(false);
-          } else {
-            this.likePanel.setVisible(true);
-          }
-        } else {
-          this.likePanel.setVisible(false);
-        }
-        setBinaryConditionField(binaryConditionField);
-        setInConditionField(inConditionField);
+        final FieldDefinition fieldDefinition = (FieldDefinition)event.getItem();
+        setSearchField(fieldDefinition);
       }
     }
   }
@@ -591,6 +607,15 @@ public class QueryWhereConditionField extends ValueField
   }
 
   @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    final Object source = event.getSource();
+    if (source == this.searchField) {
+      final boolean fieldValid = ((Field)this.searchField).isHasValidValue();
+      setHasSearchText(fieldValid);
+    }
+  }
+
+  @Override
   public void save() {
     super.save();
     final Condition condition = getFieldValue();
@@ -610,18 +635,6 @@ public class QueryWhereConditionField extends ValueField
     }
   }
 
-  private void setBinaryConditionField(JComponent field) {
-    if (this.binaryConditionField != null) {
-      this.binaryConditionPanel.remove(1);
-    }
-    if (field == null) {
-      field = new TextField(20);
-    }
-    this.binaryConditionPanel.add(field, 1);
-    GroupLayoutUtil.makeColumns(this.binaryConditionPanel, false);
-    this.binaryConditionField = field;
-  }
-
   @Override
   public void setFieldValue(final Object value) {
     if (value instanceof Condition) {
@@ -629,17 +642,10 @@ public class QueryWhereConditionField extends ValueField
     }
   }
 
-  private void setInConditionField(JComponent field) {
-    if (this.inConditionField != null) {
-      this.inConditionPanel.remove(1);
-    }
-    if (field == null) {
-      field = new TextField(20);
-    }
-
-    this.inConditionPanel.add(field, 1);
-    GroupLayoutUtil.makeColumns(this.inConditionPanel, false);
-    this.inConditionField = field;
+  public void setHasSearchText(final boolean hasSearchText) {
+    final boolean oldValue = this.hasSearchText;
+    this.hasSearchText = hasSearchText;
+    firePropertyChange("hasSearchText", oldValue, hasSearchText);
   }
 
   protected void setInvalidMessage(final int offset, final String message) {
@@ -658,6 +664,33 @@ public class QueryWhereConditionField extends ValueField
     this.statusLabel.append(message + "\n");
     this.valid = false;
     this.statusLabel.setCaretPosition(0);
+  }
+
+  private void setSearchField(final FieldDefinition fieldDefinition) {
+    if (this.searchField != null) {
+      Property.removeListener(this.searchField, this);
+    }
+    this.searchFieldPanel.removeAll();
+    final String fieldName = fieldDefinition.getName();
+    this.codeTable = this.recordDefinition.getCodeTableByFieldName(fieldName);
+    this.searchField = createSearchField(this.layer, fieldDefinition, this.codeTable);
+
+    boolean likeVisible = true;
+    if (this.codeTable == null) {
+      if (this.searchField instanceof DateField) {
+        likeVisible = false;
+      }
+    } else {
+      likeVisible = false;
+    }
+    this.likeLabel.setVisible(likeVisible);
+    this.likePanel.setVisible(likeVisible);
+    this.likeAddButton.setVisible(likeVisible);
+
+    this.searchFieldPanel.add(this.searchField);
+    setHasSearchText(((Field)this.searchField).isHasValidValue());
+    Property.addListener(this.searchField, this);
+    GroupLayouts.makeColumns(this.searchFieldPanel, false);
   }
 
   @SuppressWarnings("unchecked")
@@ -684,9 +717,9 @@ public class QueryWhereConditionField extends ValueField
       final Column column = toQueryValue(leftValueNode);
       final Value min = toQueryValue(betweenExpressionStart);
       final Value max = toQueryValue(betweenExpressionEnd);
-      final FieldDefinition attribute = this.recordDefinition.getField(column.getName());
-      min.convert(attribute);
-      max.convert(attribute);
+      final FieldDefinition fieldDefinition = this.recordDefinition.getField(column.getName());
+      min.convert(fieldDefinition);
+      max.convert(fieldDefinition);
       return (V)new Between(column, min, max);
     } else if (expression instanceof BinaryLogicalOperatorNode) {
       final BinaryLogicalOperatorNode binaryOperatorNode = (BinaryLogicalOperatorNode)expression;
@@ -722,22 +755,22 @@ public class QueryWhereConditionField extends ValueField
               final Column column = (Column)leftCondition;
 
               final String name = column.getName();
-              final FieldDefinition attribute = this.recordDefinition.getField(name);
+              final FieldDefinition fieldDefinition = this.recordDefinition.getField(name);
               final CodeTable codeTable = this.recordDefinition.getCodeTableByFieldName(name);
-              if (codeTable == null || attribute == this.recordDefinition.getIdField()) {
-                final Class<?> typeClass = attribute.getTypeClass();
+              if (codeTable == null || fieldDefinition == this.recordDefinition.getIdField()) {
+                final Class<?> typeClass = fieldDefinition.getTypeClass();
                 try {
                   final Object convertedValue = StringConverterRegistry.toObject(typeClass, value);
                   if (convertedValue == null || !typeClass.isAssignableFrom(typeClass)) {
                     setInvalidMessage(name + "='" + value + "' is not a valid "
-                      + attribute.getType().getValidationName());
+                      + fieldDefinition.getType().getValidationName());
                     return null;
                   } else {
-                    rightCondition = new Value(attribute, convertedValue);
+                    rightCondition = new Value(fieldDefinition, convertedValue);
                   }
                 } catch (final Throwable t) {
                   setInvalidMessage(name + "='" + value + "' is not a valid "
-                    + attribute.getType().getValidationName());
+                    + fieldDefinition.getType().getValidationName());
                 }
               } else {
                 Object id;
@@ -753,7 +786,7 @@ public class QueryWhereConditionField extends ValueField
                   setInvalidMessage(name + "='" + value + "' could not be found in the code table "
                     + codeTable.getName());
                 } else {
-                  rightCondition = new Value(attribute, id);
+                  rightCondition = new Value(fieldDefinition, id);
                 }
               }
             }
@@ -775,11 +808,11 @@ public class QueryWhereConditionField extends ValueField
       final ColumnReference column = (ColumnReference)expression;
       String columnName = column.getColumnName();
       columnName = columnName.replaceAll("\"", "");
-      final FieldDefinition attribute = this.recordDefinition.getField(columnName);
-      if (attribute == null) {
-        setInvalidMessage("Invalid column name " + columnName);
+      final FieldDefinition fieldDefinition = this.recordDefinition.getField(columnName);
+      if (fieldDefinition == null) {
+        setInvalidMessage("Invalid field name " + columnName);
       } else {
-        return (V)new Column(attribute);
+        return (V)new Column(fieldDefinition);
       }
     } else if (expression instanceof LikeEscapeOperatorNode) {
       final LikeEscapeOperatorNode likeEscapeOperatorNode = (LikeEscapeOperatorNode)expression;

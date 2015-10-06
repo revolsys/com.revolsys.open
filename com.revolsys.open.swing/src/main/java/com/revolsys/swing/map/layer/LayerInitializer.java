@@ -10,13 +10,9 @@ import com.revolsys.util.ExceptionUtil;
 
 public class LayerInitializer extends AbstractSwingWorker<Void, Void>
   implements MaxThreadsSwingWorker {
-  private static int instanceCount;
-
   private static final LinkedList<Layer> LAYERS_CURRENTLY_INITIALIZING = new LinkedList<>();
 
   private static final LinkedList<Layer> LAYERS_TO_INITIALIZE = new LinkedList<>();
-
-  private static final int MAX_WORKERS = 5;
 
   public static void initialize(final Layer layer) {
     synchronized (LAYERS_TO_INITIALIZE) {
@@ -40,6 +36,11 @@ public class LayerInitializer extends AbstractSwingWorker<Void, Void>
     super(false);
     this.layer = layer;
     this.recordStoreRegistry = RecordStoreConnectionRegistry.getForThread();
+  }
+
+  @Override
+  public int getMaxThreads() {
+    return 5;
   }
 
   @Override
@@ -69,11 +70,6 @@ public class LayerInitializer extends AbstractSwingWorker<Void, Void>
     } finally {
       RecordStoreConnectionRegistry.setForThread(null);
     }
-  }
-
-  @Override
-  public int getMaxThreads() {
-    return 5;
   }
 
   @Override

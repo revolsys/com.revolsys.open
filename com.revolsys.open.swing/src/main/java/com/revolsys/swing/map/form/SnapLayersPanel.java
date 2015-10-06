@@ -25,11 +25,12 @@ import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.VerticalLayout;
 
+import com.revolsys.swing.Borders;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.CheckBox;
 import com.revolsys.swing.field.SearchField;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.list.ArrayListModel;
 import com.revolsys.swing.list.filter.StringContainsRowFilter;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -68,7 +69,7 @@ public class SnapLayersPanel extends ValueField implements ActionListener, ListS
     super(new VerticalLayout(5));
     this.layer = layer;
 
-    SwingUtil.setTitledBorder(this, "Snapping");
+    Borders.titled(this, "Snapping");
     final JPanel snapAllPanel = new JPanel();
     snapAllPanel.setOpaque(false);
     add(snapAllPanel);
@@ -77,7 +78,7 @@ public class SnapLayersPanel extends ValueField implements ActionListener, ListS
     this.snapToAllLayers = new CheckBox("snapToAllLayers", layer.isSnapToAllLayers());
     this.snapToAllLayers.addActionListener(this);
     snapAllPanel.add(this.snapToAllLayers);
-    GroupLayoutUtil.makeColumns(snapAllPanel, 2, false);
+    GroupLayouts.makeColumns(snapAllPanel, 2, false);
 
     this.filterPanel = new JPanel(new HorizontalLayout(46));
     this.filterPanel.setOpaque(false);

@@ -42,12 +42,12 @@ public class WriterProcess extends BaseInProcess<Record> {
     write(record);
   }
 
-  public void write(final Record record) {
-    this.writer.write(record);
-  }
-
   public void setWriter(final Writer<Record> writer) {
     this.writer = writer;
+  }
+
+  public void write(final Record record) {
+    this.writer.write(record);
   }
 
 }

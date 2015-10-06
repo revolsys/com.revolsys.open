@@ -14,6 +14,17 @@ public class Transaction implements Closeable {
 
   private static ThreadLocal<Transaction> currentTransaction = new ThreadLocal<>();
 
+  public static void afterCommit(final Runnable runnable) {
+    if (runnable != null) {
+      if (TransactionSynchronizationManager.isSynchronizationActive()) {
+        final RunnableAfterCommit synchronization = new RunnableAfterCommit(runnable);
+        TransactionSynchronizationManager.registerSynchronization(synchronization);
+      } else {
+        runnable.run();
+      }
+    }
+  }
+
   public static Transaction getCurrentTransaction() {
     return currentTransaction.get();
   }
@@ -163,16 +174,5 @@ public class Transaction implements Closeable {
   public RuntimeException setRollbackOnly(final Throwable e) {
     setRollbackOnly();
     return ExceptionUtil.throwUncheckedException(e);
-  }
-
-  public static void afterCommit(final Runnable runnable) {
-    if (runnable != null) {
-      if (TransactionSynchronizationManager.isSynchronizationActive()) {
-        final RunnableAfterCommit synchronization = new RunnableAfterCommit(runnable);
-        TransactionSynchronizationManager.registerSynchronization(synchronization);
-      } else {
-        runnable.run();
-      }
-    }
   }
 }

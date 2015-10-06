@@ -50,7 +50,7 @@ import com.revolsys.swing.field.DateField;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.QueryWhereConditionField;
 import com.revolsys.swing.field.TextField;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.SqlLayerFilter;
@@ -140,7 +140,7 @@ public class FieldFilterPanel extends JComponent
     this.searchTextField.addActionListener(this);
     this.searchTextField.setPreferredSize(new Dimension(200, 22));
     add(this.searchFieldPanel);
-    GroupLayoutUtil.makeColumns(this, 4, false);
+    GroupLayouts.makeColumns(this, 4, false);
     clear();
   }
 
@@ -453,7 +453,7 @@ public class FieldFilterPanel extends JComponent
         }
         this.operatorField.addItemListener(this);
         this.operatorFieldPanel.add(field);
-        GroupLayoutUtil.makeColumns(this.operatorFieldPanel, 1, false);
+        GroupLayouts.makeColumns(this.operatorFieldPanel, 1, false);
       }
     }
   }
@@ -479,7 +479,7 @@ public class FieldFilterPanel extends JComponent
         searchTextField.setPreferredSize(new Dimension(200, 22));
       }
       this.searchFieldPanel.add(this.searchField);
-      GroupLayoutUtil.makeColumns(this.searchFieldPanel, 1, false);
+      GroupLayouts.makeColumns(this.searchFieldPanel, 1, false);
     }
   }
 

@@ -17,7 +17,7 @@ import org.jdesktop.swingx.JXBusyLabel;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.parallel.Invoke;
 
 public class WindowOpener extends JFrame implements WindowListener {
@@ -48,7 +48,7 @@ public class WindowOpener extends JFrame implements WindowListener {
     panel.add(busyLabel);
     panel.add(new JLabel(message));
 
-    GroupLayoutUtil.makeColumns(LayoutStyle.getInstance(), panel, 2);
+    GroupLayouts.makeColumns(LayoutStyle.getInstance(), panel, 2);
     setMinimumSize(new Dimension(title.length() * 15 + 40, 70));
     pack();
     SwingUtil.setLocationCentre(this);

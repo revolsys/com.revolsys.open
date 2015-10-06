@@ -29,6 +29,7 @@ import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.swing.Icons;
+import com.revolsys.swing.Panels;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.I18nAction;
 import com.revolsys.swing.component.TogglePanel;
@@ -41,7 +42,7 @@ import com.revolsys.swing.field.FontChooserField;
 import com.revolsys.swing.field.FunctionStringConverter;
 import com.revolsys.swing.field.LengthMeasureTextField;
 import com.revolsys.swing.field.TextField;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.component.MapScale;
 import com.revolsys.swing.map.component.MarkerField;
@@ -100,7 +101,7 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
   private Field visibleField;
 
   public BaseStylePanel(final LayerRenderer<?> renderer) {
-    super(renderer);
+    super(new VerticalLayout(), null, renderer);
     setTitle("Style");
     setBackground(WebColors.White);
     setLayout(new VerticalLayout());
@@ -180,16 +181,15 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
   }
 
   protected void addLineStylePanel(final JPanel stylePanels, final GeometryStyle geometryStyle) {
-    final JPanel panel = new JPanel();
+    final JPanel panel = Panels.titledTransparent("Line Style");
     panel.setMinimumSize(new Dimension(300, 0));
-    SwingUtil.setTitledBorder(panel, "Line Style");
     addField(panel, geometryStyle, "lineColor");
     addLengthMeasureField(panel, geometryStyle, "lineWidth");
     addField(panel, geometryStyle, "lineJoin");
     addField(panel, geometryStyle, "lineCap");
     addField(panel, geometryStyle, "lineDashArray");
     addField(panel, geometryStyle, "lineDashOffset");
-    GroupLayoutUtil.makeColumns(panel, 2, true);
+    GroupLayouts.makeColumns(panel, 2, true);
     stylePanels.add(panel);
   }
 
@@ -205,11 +205,10 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
 
   protected JPanel addPanel(final Container container, final String title, final Object object,
     final String... fieldNames) {
-    final JPanel panel = new JPanel();
-    SwingUtil.setTitledBorder(panel, title);
+    final JPanel panel = Panels.titledTransparent(title);
 
     addFields(panel, object, fieldNames);
-    GroupLayoutUtil.makeColumns(panel, 2, true);
+    GroupLayouts.makeColumns(panel, 2, true);
     container.add(panel);
     return panel;
   }

@@ -45,13 +45,12 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
 
   public TextPane(final String fieldName, final Object fieldValue) {
     final String text = StringConverterRegistry.toString(fieldValue);
-    this.fieldSupport = new FieldSupport(this, fieldName, text);
+    this.fieldSupport = new FieldSupport(this, fieldName, text, true);
 
     setDocument(new PropertyChangeStyledDocument(this));
     setText(text);
     addFocusListener(new WeakFocusListener(this));
     PopupMenu.getPopupMenuFactory(this);
-    getUndoManager().addKeyMap(this);
   }
 
   @Override
@@ -82,6 +81,11 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
   @Override
   public Color getFieldSelectedTextColor() {
     return getSelectedTextColor();
+  }
+
+  @Override
+  public FieldSupport getFieldSupport() {
+    return this.fieldSupport;
   }
 
   @SuppressWarnings("unchecked")
@@ -132,7 +136,7 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
 
   @Override
   public void setToolTipText(final String text) {
-    if (this.fieldSupport.setOriginalTooltipText(text)) {
+    if (this.fieldSupport == null || this.fieldSupport.setOriginalTooltipText(text)) {
       super.setToolTipText(text);
     }
   }

@@ -157,7 +157,7 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
 
   public NumberTextField(final String fieldName, final DataType dataType, final int length,
     final int scale, final Number minimumValue, final Number maximumValue) {
-    this.fieldSupport = new FieldSupport(this, fieldName, null);
+    this.fieldSupport = new FieldSupport(this, fieldName, null, true);
     this.dataType = dataType;
     this.length = length;
     this.scale = scale;
@@ -318,7 +318,7 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
   @Override
   public void setToolTipText(final String text) {
     final FieldSupport fieldSupport = getFieldSupport();
-    if (fieldSupport.setOriginalTooltipText(text)) {
+    if (fieldSupport == null || fieldSupport.setOriginalTooltipText(text)) {
       super.setToolTipText(text);
     }
   }

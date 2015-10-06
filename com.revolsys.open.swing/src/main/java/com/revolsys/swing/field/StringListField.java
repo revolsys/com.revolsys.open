@@ -47,11 +47,9 @@ public class StringListField extends ValueField {
   private final JXList valuesField;
 
   public StringListField(final Comparator<String> comparator, final String fieldName) {
-    super(fieldName, "");
+    super(new HorizontalLayout(2), fieldName, "");
     setOpaque(false);
     this.comparator = comparator;
-
-    setLayout(new HorizontalLayout(2));
 
     final JPanel fieldPanel = new JPanel(new VerticalLayout(2));
     fieldPanel.setOpaque(false);

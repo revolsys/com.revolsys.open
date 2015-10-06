@@ -176,16 +176,6 @@ public final class UrlUtil {
     }
   }
 
-  public static File toFile(final URL url) {
-    try {
-      final URI uri = url.toURI();
-      final Path path = Paths.get(uri);
-      return path.toFile();
-    } catch (final URISyntaxException e) {
-      throw new WrappedException(e);
-    }
-  }
-
   public static String getFileBaseName(final URL url) {
     final String name = getFileName(url);
     final int dotIndex = name.lastIndexOf('.');
@@ -452,6 +442,16 @@ public final class UrlUtil {
       }
     }
     return encoded.toString();
+  }
+
+  public static File toFile(final URL url) {
+    try {
+      final URI uri = url.toURI();
+      final Path path = Paths.get(uri);
+      return path.toFile();
+    } catch (final URISyntaxException e) {
+      throw new WrappedException(e);
+    }
   }
 
   /**

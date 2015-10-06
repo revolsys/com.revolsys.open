@@ -65,6 +65,7 @@ import com.revolsys.record.property.DirectionalFields;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
+import com.revolsys.swing.Panels;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -74,7 +75,7 @@ import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.field.ObjectLabelField;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -334,7 +335,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
       addLabelledField(panel, fieldName);
     }
 
-    GroupLayoutUtil.makeColumns(panel, 2, true);
+    GroupLayouts.makeColumns(panel, 2, true);
   }
 
   public void addReadOnlyFieldNames(final Collection<String> readOnlyFieldNames) {
@@ -378,6 +379,9 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
       init = true;
     }
     final JScrollPane scrollPane = new JScrollPane(component);
+    scrollPane.getViewport().setOpaque(false);
+    scrollPane.setOpaque(false);
+    scrollPane.setBorder(null);
     this.tabs.insertTab(name, null, scrollPane, null, index);
     if (init) {
       this.tabs.setSelectedIndex(0);
@@ -428,9 +432,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     if (this.geometryCoordinatesPanel == null && geometryFieldName != null) {
       this.geometryCoordinatesPanel = new GeometryCoordinatesPanel(this, geometryFieldName);
       addField(geometryFieldName, this.geometryCoordinatesPanel);
-      final JPanel panel = new JPanel(new GridLayout(1, 1));
-
-      SwingUtil.setTitledBorder(this.geometryCoordinatesPanel, "Coordinates");
+      final JPanel panel = Panels.titledTransparent(new GridLayout(1, 1), "Vertices");
       panel.add(this.geometryCoordinatesPanel);
 
       addScrollPaneTab("Geometry", panel);
@@ -559,10 +561,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   }
 
   protected JPanel createPanel(final JPanel container, final String title) {
-    final JPanel panel = new JPanel();
-    panel.setOpaque(false);
+    final JPanel panel = Panels.titledTransparentBorderLayout(title);
     container.add(panel);
-    SwingUtil.setTitledBorder(panel, title);
     return panel;
   }
 

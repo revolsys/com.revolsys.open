@@ -44,7 +44,7 @@ public class Slider extends JSlider implements Field, FocusListener, ChangeListe
     if (Property.hasValue(fieldName)) {
       setToolTipText(CaseConverter.toCapitalizedWords(fieldName));
     }
-    this.fieldSupport = new FieldSupport(this, fieldName, value);
+    this.fieldSupport = new FieldSupport(this, fieldName, value, true);
     addChangeListener(this);
   }
 
@@ -119,7 +119,7 @@ public class Slider extends JSlider implements Field, FocusListener, ChangeListe
 
   @Override
   public void setToolTipText(final String text) {
-    if (this.fieldSupport.setOriginalTooltipText(text)) {
+    if (this.fieldSupport == null || this.fieldSupport.setOriginalTooltipText(text)) {
       setFieldToolTip(text);
     }
   }

@@ -39,8 +39,12 @@ public class FieldSupport {
 
   private boolean fieldValid = true;
 
+  private final Border originalBorder;
+
+  private boolean showErrorIcon = true;
+
   public FieldSupport(final Field field, final JComponent component, final String name,
-    final Object value) {
+    final Object value, final boolean showErrorIcon) {
     this.field = field;
     if (Property.isEmpty(name)) {
       this.name = "fieldValue";
@@ -55,12 +59,13 @@ public class FieldSupport {
     this.originalSelectedTextColor = field.getFieldSelectedTextColor();
     this.originalTooltipText = this.component.getToolTipText();
     this.iconBorder = new IconBorder(null);
-    final Border originalBorder = this.component.getBorder();
-    this.component.setBorder(BorderFactory.createCompoundBorder(originalBorder, this.iconBorder));
+    this.originalBorder = this.component.getBorder();
+    setShowErrorIcon(showErrorIcon);
   }
 
-  public FieldSupport(final Field field, final String name, final Object value) {
-    this(field, (JComponent)field, name, value);
+  public FieldSupport(final Field field, final String name, final Object value,
+    final boolean useIconBorder) {
+    this(field, (JComponent)field, name, value, useIconBorder);
   }
 
   public void discardAllEdits() {
@@ -152,6 +157,18 @@ public class FieldSupport {
     }
   }
 
+  public void setShowErrorIcon(final boolean showErrorIcon) {
+    if (showErrorIcon != this.showErrorIcon) {
+      this.showErrorIcon = showErrorIcon;
+      if (showErrorIcon) {
+        this.component
+          .setBorder(BorderFactory.createCompoundBorder(this.originalBorder, this.iconBorder));
+      } else {
+        this.component.setBorder(this.originalBorder);
+      }
+    }
+  }
+
   public void setToolTipText(final String text) {
     if (setOriginalTooltipText(text)) {
       this.component.setToolTipText(text);
@@ -167,7 +184,7 @@ public class FieldSupport {
     if (!Equals.equal(oldValue, value)) {
       this.value = value;
       this.field.firePropertyChange(this.name, oldValue, value);
-      UndoManager parent = this.undoManager.getParent();
+      final UndoManager parent = this.undoManager.getParent();
       SetFieldValueUndoableEdit.create(parent, this.field, oldValue, value);
     }
   }

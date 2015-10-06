@@ -62,7 +62,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.list.ArrayListModel;
 import com.revolsys.swing.listener.ActionListenable;
 import com.revolsys.swing.listener.WeakFocusListener;
@@ -157,7 +157,7 @@ public abstract class AbstractRecordQueryField extends ValueField
     add(this.searchField);
     this.busyLabel.setVisible(false);
     add(this.busyLabel);
-    GroupLayoutUtil.makeColumns(this, false);
+    GroupLayouts.makeColumns(this, false);
   }
 
   @Override

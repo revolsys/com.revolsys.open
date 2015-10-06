@@ -91,6 +91,15 @@ public class WikipediaBoundingBoxLayerWorker extends AbstractSwingWorker<List<La
   }
 
   @Override
+  protected void handleDone(final List<LayerRecord> records) {
+    try {
+      this.layer.setIndexRecords(this.boundingBox, records);
+    } catch (final Throwable e) {
+      this.layer.setIndexRecords(this.boundingBox, null);
+    }
+  }
+
+  @Override
   protected void handleException(final Throwable exception) {
     super.handleException(exception);
     this.layer.setIndexRecords(this.boundingBox, null);
@@ -99,14 +108,5 @@ public class WikipediaBoundingBoxLayerWorker extends AbstractSwingWorker<List<La
   @Override
   public String toString() {
     return "Load Wikipedia Articles";
-  }
-
-  @Override
-  protected void handleDone(final List<LayerRecord> records) {
-    try {
-      this.layer.setIndexRecords(this.boundingBox, records);
-    } catch (final Throwable e) {
-      this.layer.setIndexRecords(this.boundingBox, null);
-    }
   }
 }

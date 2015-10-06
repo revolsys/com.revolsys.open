@@ -42,9 +42,10 @@ public class ComboBox<T> extends JComboBox<T>implements Field, KeyListener {
   private final FieldSupport fieldSupport;
 
   public ComboBox() {
-    this("fieldValue");
+    this("fieldValue", (ComboBoxModel<T>)null);
   }
 
+  @SafeVarargs
   public ComboBox(final boolean editable, final T... items) {
     this(null, editable, items);
   }
@@ -67,24 +68,25 @@ public class ComboBox<T> extends JComboBox<T>implements Field, KeyListener {
       setRenderer(renderer);
     }
     final JComponent editorComponent = (JComponent)getEditor().getEditorComponent();
-    this.fieldSupport = new FieldSupport(this, editorComponent, "fieldValue", null);
+    this.fieldSupport = new FieldSupport(this, editorComponent, "fieldValue", null, true);
   }
 
+  @SafeVarargs
   public ComboBox(final ObjectToStringConverter converter, final boolean editable,
     final T... items) {
     this(converter, editable, Arrays.asList(items));
   }
 
-  public ComboBox(final String fieldName, final ComboBoxModel model) {
+  public ComboBox(final String fieldName, final ComboBoxModel<T> model) {
     this(fieldName, model, ObjectToStringConverter.DEFAULT_IMPLEMENTATION);
   }
 
-  public ComboBox(final String fieldName, final ComboBoxModel model,
+  public ComboBox(final String fieldName, final ComboBoxModel<T> model,
     final ObjectToStringConverter converter) {
     this(fieldName, model, converter, null);
   }
 
-  public ComboBox(final String fieldName, final ComboBoxModel model,
+  public ComboBox(final String fieldName, final ComboBoxModel<T> model,
     final ObjectToStringConverter converter, final ListCellRenderer renderer) {
     super(model);
     setEditable(false);
@@ -95,7 +97,7 @@ public class ComboBox<T> extends JComboBox<T>implements Field, KeyListener {
       AutoCompleteDecorator.decorate(this, converter);
     }
     final JComponent editorComponent = (JComponent)getEditor().getEditorComponent();
-    this.fieldSupport = new FieldSupport(this, editorComponent, fieldName, null);
+    this.fieldSupport = new FieldSupport(this, editorComponent, fieldName, null, true);
     addActionListener(new ActionListener() {
 
       @Override
@@ -106,6 +108,7 @@ public class ComboBox<T> extends JComboBox<T>implements Field, KeyListener {
     });
   }
 
+  @SafeVarargs
   public ComboBox(final String fieldName, final T... items) {
     this(fieldName, new ArrayListComboBoxModel<T>(items),
       ObjectToStringConverter.DEFAULT_IMPLEMENTATION);
@@ -242,7 +245,7 @@ public class ComboBox<T> extends JComboBox<T>implements Field, KeyListener {
   @Override
   public void setToolTipText(final String text) {
     final FieldSupport fieldSupport = getFieldSupport();
-    if (fieldSupport.setOriginalTooltipText(text)) {
+    if (fieldSupport == null || fieldSupport.setOriginalTooltipText(text)) {
       super.setToolTipText(text);
     }
   }

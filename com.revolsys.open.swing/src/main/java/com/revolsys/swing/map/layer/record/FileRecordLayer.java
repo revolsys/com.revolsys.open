@@ -18,7 +18,7 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.MenuSourceAction;
 import com.revolsys.util.ExceptionUtil;
@@ -66,7 +66,7 @@ public class FileRecordLayer extends ListRecordLayer {
         SwingUtil.addLabelledReadOnlyTextField(panel, "File Type", factory.getName());
       }
     }
-    GroupLayoutUtil.makeColumns(panel, 2, true);
+    GroupLayouts.makeColumns(panel, 2, true);
     return panel;
   }
 

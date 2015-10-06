@@ -82,6 +82,11 @@ public class GeoNamesBoundingBoxLayerWorker extends AbstractSwingWorker<List<Lay
   }
 
   @Override
+  protected void handleDone(final List<LayerRecord> records) {
+    this.layer.setIndexRecords(this.boundingBox, records);
+  }
+
+  @Override
   protected void handleException(final Throwable exception) {
     super.handleException(exception);
     this.layer.setIndexRecords(this.boundingBox, null);
@@ -90,10 +95,5 @@ public class GeoNamesBoundingBoxLayerWorker extends AbstractSwingWorker<List<Lay
   @Override
   public String toString() {
     return "Load Geo Names";
-  }
-
-  @Override
-  protected void handleDone(final List<LayerRecord> records) {
-    this.layer.setIndexRecords(this.boundingBox, records);
   }
 }

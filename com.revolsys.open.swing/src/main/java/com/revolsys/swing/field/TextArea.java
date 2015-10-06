@@ -40,14 +40,13 @@ public class TextArea extends JTextArea implements Field, FocusListener {
   public TextArea(final String fieldName, final Object fieldValue, final int rows,
     final int columns) {
     final String text = StringConverterRegistry.toString(fieldValue);
-    this.fieldSupport = new FieldSupport(this, fieldName, text);
+    this.fieldSupport = new FieldSupport(this, fieldName, text, true);
     setRows(rows);
     setColumns(columns);
     setDocument(new PropertyChangeDocument(this));
     setText(text);
     addFocusListener(new WeakFocusListener(this));
     PopupMenu.getPopupMenuFactory(this);
-    getUndoManager().addKeyMap(this);
     setRows(rows);
     setColumns(columns);
   }
@@ -82,6 +81,11 @@ public class TextArea extends JTextArea implements Field, FocusListener {
     return getSelectedTextColor();
   }
 
+  @Override
+  public FieldSupport getFieldSupport() {
+    return this.fieldSupport;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <T> T getFieldValue() {
@@ -112,7 +116,7 @@ public class TextArea extends JTextArea implements Field, FocusListener {
 
   @Override
   public void setToolTipText(final String text) {
-    if (this.fieldSupport.setOriginalTooltipText(text)) {
+    if (this.fieldSupport == null || this.fieldSupport.setOriginalTooltipText(text)) {
       super.setToolTipText(text);
     }
   }

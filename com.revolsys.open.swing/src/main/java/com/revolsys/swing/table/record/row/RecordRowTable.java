@@ -30,6 +30,19 @@ import com.revolsys.swing.table.record.renderer.RecordRowTableCellRenderer;
 public class RecordRowTable extends BaseJTable implements MouseListener {
   private static final long serialVersionUID = 1L;
 
+  public static <V extends Record> V getEventRecord() {
+    final RecordRowTable table = TablePanel.getEventTable();
+    if (table != null) {
+      final int eventRow = TablePanel.getEventRow();
+      if (eventRow != -1) {
+        final RecordRowTableModel model = table.getTableModel();
+        final V record = model.getRecord(eventRow);
+        return record;
+      }
+    }
+    return null;
+  }
+
   private TableCellRenderer cellRenderer;
 
   private RecordTableCellEditor tableCellEditor;
@@ -136,8 +149,8 @@ public class RecordRowTable extends BaseJTable implements MouseListener {
       final int column = columnAtPoint(e.getPoint());
       if (column > -1 && SwingUtilities.isLeftMouseButton(e)) {
         final int index = convertColumnIndexToModel(column);
-        final Class<?> attributeClass = recordDefinition.getFieldClass(index);
-        if (!Geometry.class.isAssignableFrom(attributeClass)) {
+        final Class<?> fieldClass = recordDefinition.getFieldClass(index);
+        if (!Geometry.class.isAssignableFrom(fieldClass)) {
           model.setSortOrder(index);
         }
       }
@@ -206,18 +219,5 @@ public class RecordRowTable extends BaseJTable implements MouseListener {
   @Override
   public String toString() {
     return getRecordDefinition().getPath();
-  }
-
-  public static <V extends Record> V getEventRecord() {
-    final RecordRowTable table = TablePanel.getEventTable();
-    if (table != null) {
-      final int eventRow = TablePanel.getEventRow();
-      if (eventRow != -1) {
-        final RecordRowTableModel model = table.getTableModel();
-        final V record = model.getRecord(eventRow);
-        return record;
-      }
-    }
-    return null;
   }
 }

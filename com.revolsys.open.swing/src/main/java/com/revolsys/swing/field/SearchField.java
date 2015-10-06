@@ -21,8 +21,7 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
   }
 
   public SearchField(final String fieldName) {
-    this.fieldSupport = new FieldSupport(this, fieldName, "");
-    getUndoManager().addKeyMap(this);
+    this.fieldSupport = new FieldSupport(this, fieldName, "", false);
   }
 
   @Override
@@ -90,7 +89,7 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
 
   @Override
   public void setToolTipText(final String text) {
-    if (this.fieldSupport.setOriginalTooltipText(text)) {
+    if (this.fieldSupport == null || this.fieldSupport.setOriginalTooltipText(text)) {
       super.setToolTipText(text);
     }
   }

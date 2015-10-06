@@ -13,7 +13,7 @@ import org.jdesktop.swingx.VerticalLayout;
 import com.revolsys.awt.WebColors;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.Panels;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
@@ -48,8 +48,7 @@ public class TextStylePanel extends BaseStylePanel implements PropertyChangeList
       stylePanels.setBackground(WebColors.White);
       panel.add(stylePanels, BorderLayout.CENTER);
 
-      this.previews = new JPanel(new VerticalLayout(5));
-      SwingUtil.setTitledBorder(this.previews, "Preview");
+      this.previews = Panels.titledTransparentVerticalLayout("Previw", 5);
 
       final JPanel previewContainer = new JPanel(new VerticalLayout());
       previewContainer.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));

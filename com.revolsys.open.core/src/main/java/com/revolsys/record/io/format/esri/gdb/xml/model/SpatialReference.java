@@ -111,10 +111,11 @@ public class SpatialReference {
       final CoordinateSystem coordinateSystem = getCoordinateSystem();
       if (coordinateSystem != null) {
         if (this.xYScale == FLOATING_SCALE) {
-          this.geometryFactory = GeometryFactory.fixed(coordinateSystem.getCoordinateSystemId(), 0.0, this.zScale);
+          this.geometryFactory = GeometryFactory.fixed(coordinateSystem.getCoordinateSystemId(),
+            0.0, this.zScale);
         } else {
-          this.geometryFactory = GeometryFactory.fixed(coordinateSystem.getCoordinateSystemId(), this.xYScale,
-            this.zScale);
+          this.geometryFactory = GeometryFactory.fixed(coordinateSystem.getCoordinateSystemId(),
+            this.xYScale, this.zScale);
         }
       }
     }

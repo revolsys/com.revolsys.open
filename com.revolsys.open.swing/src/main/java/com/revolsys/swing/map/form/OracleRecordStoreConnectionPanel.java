@@ -20,7 +20,7 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.field.TextField;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
 
@@ -48,7 +48,7 @@ public class OracleRecordStoreConnectionPanel extends ValueField implements Prop
 
     addField(new TextField("password", 30));
 
-    GroupLayoutUtil.makeColumns(this, 2, true);
+    GroupLayouts.makeColumns(this, 2, true);
 
     if (connection != null) {
       this.name = connection.getName();

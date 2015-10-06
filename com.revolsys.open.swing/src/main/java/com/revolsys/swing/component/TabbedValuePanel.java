@@ -14,7 +14,7 @@ public class TabbedValuePanel extends ValueField {
   private final JTabbedPane tabs = new JTabbedPane();
 
   public TabbedValuePanel() {
-    super(new BorderLayout());
+    setLayout(new BorderLayout());
     add(this.tabs, BorderLayout.CENTER);
   }
 

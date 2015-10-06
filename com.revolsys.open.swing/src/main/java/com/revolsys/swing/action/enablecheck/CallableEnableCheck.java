@@ -7,14 +7,14 @@ import com.revolsys.util.ExceptionUtil;
 public class CallableEnableCheck<V> extends AbstractValueEnableCheck {
   private Callable<V> callable;
 
-  public CallableEnableCheck(final Object expectedValue, final Callable<V> callable) {
-    this(false, expectedValue, callable);
-  }
-
   public CallableEnableCheck(final boolean inverse, final Object expectedValue,
     final Callable<V> callable) {
     super(inverse, expectedValue);
     this.callable = callable;
+  }
+
+  public CallableEnableCheck(final Object expectedValue, final Callable<V> callable) {
+    this(false, expectedValue, callable);
   }
 
   @Override

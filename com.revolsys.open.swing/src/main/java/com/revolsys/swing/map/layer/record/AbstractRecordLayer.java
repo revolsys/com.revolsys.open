@@ -76,6 +76,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.ByteArrayResource;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.swing.Borders;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -86,7 +87,7 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.dnd.transferable.RecordReaderTransferable;
 import com.revolsys.swing.dnd.transferable.StringTransferable;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.form.FieldNamesSetPanel;
 import com.revolsys.swing.map.form.RecordLayerForm;
@@ -681,14 +682,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   protected ValueField createPropertiesTabGeneralPanelFilter(final BasePanel parent) {
     final ValueField filterPanel = new ValueField(this);
-    SwingUtil.setTitledBorder(filterPanel, "Filter");
+    Borders.titled(filterPanel, "Filter");
 
     final QueryFilterField field = new QueryFilterField(this, "where", getWhere());
     SwingUtil.addLabel(filterPanel, "Filter");
     filterPanel.add(field);
     Property.addListener(field, "where", getBeanPropertyListener());
 
-    GroupLayoutUtil.makeColumns(filterPanel, 2, true);
+    GroupLayouts.makeColumns(filterPanel, 2, true);
 
     parent.add(filterPanel);
     return filterPanel;

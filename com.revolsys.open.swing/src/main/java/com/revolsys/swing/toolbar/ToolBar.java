@@ -65,6 +65,12 @@ public class ToolBar extends JToolBar {
     return button;
   }
 
+  public JButton addButton(final String groupName, final String title,
+    final EnableCheck enableCheck, final Runnable runnable) {
+    final RunnableAction action = new RunnableAction(title, null, null, enableCheck, runnable);
+    return addButton(groupName, action);
+  }
+
   public JButton addButton(final String groupName, final String title, final Runnable runnable) {
     final RunnableAction action = new RunnableAction(title, runnable);
     return addButton(groupName, action);

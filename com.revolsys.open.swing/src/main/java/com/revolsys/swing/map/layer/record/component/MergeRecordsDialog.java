@@ -38,6 +38,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
+import com.revolsys.swing.Panels;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.map.MapPanel;
@@ -224,9 +225,9 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
     final TablePanel tablePanel = MergedRecordsTableModel.createPanel(this.layer, mergedObject,
       objects);
 
-    final JPanel panel = new JPanel(new VerticalLayout());
+    final JPanel panel = Panels
+      .titledTransparentVerticalLayout("Merged " + objects.size() + " Records");
     panel.add(tablePanel);
-    SwingUtil.setTitledBorder(panel, "Merged " + objects.size() + " Records");
     this.mergedObjectsPanel.add(panel);
 
   }
@@ -259,7 +260,8 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
       tableModel.setEditable(false);
       tablePanel.setPreferredSize(new Dimension(100, 50 + unMergeableRecords.size() * 22));
 
-      final JPanel panel = new JPanel(new BorderLayout());
+      final JPanel panel = Panels
+        .titledTransparentBorderLayout(unMergeableRecords.size() + " Un-Mergeable Records");
       if (!Property.hasValue(errorMessage)) {
         errorMessage = "The following records could not be merged and will not be modified.";
       }
@@ -267,7 +269,6 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
         "<html><p style=\"color:red\">" + errorMessage + "</p></html>");
       panel.add(unMergeLabel, BorderLayout.NORTH);
       panel.add(tablePanel, BorderLayout.SOUTH);
-      SwingUtil.setTitledBorder(panel, unMergeableRecords.size() + " Un-Mergeable Records");
 
       this.mergedObjectsPanel.add(panel);
     }

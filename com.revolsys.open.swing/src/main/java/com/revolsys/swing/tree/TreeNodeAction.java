@@ -14,15 +14,21 @@ import com.revolsys.swing.tree.node.BaseTreeNode;
 
 @SuppressWarnings("serial")
 public class TreeNodeAction<T extends BaseTreeNode> extends ConsumerObjectAction<T> {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public static <V extends BaseTreeNode> void addMenuItem(final MenuFactory menu,
     final String groupName, final CharSequence name, final String iconName,
     final Consumer<V> consumer) {
     final AbstractAction action = createAction(name, iconName, null, consumer);
     menu.addMenuItem(groupName, action);
   }
+
   public static <V extends BaseTreeNode> void addMenuItem(final MenuFactory menu,
     final String groupName, final CharSequence name, final String iconName,
-    final EnableCheck enableCheck,  final Consumer<V> consumer) {
+    final EnableCheck enableCheck, final Consumer<V> consumer) {
     final AbstractAction action = createAction(name, iconName, enableCheck, consumer);
     menu.addMenuItem(groupName, action);
   }

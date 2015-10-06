@@ -17,6 +17,7 @@ import org.jdesktop.swingx.JXList;
 
 import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
+import com.revolsys.swing.Borders;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
@@ -55,15 +56,15 @@ public class RecordStoreConnectionDialog extends BaseDialog {
     this.panels.setPreferredSize(new Dimension(500, 310));
     final OracleRecordStoreConnectionPanel oraclePanel = new OracleRecordStoreConnectionPanel(
       registry, connection);
-    SwingUtil.setTitledBorder(oraclePanel, "Oracle");
+    Borders.titled(oraclePanel, "Oracle");
     this.panels.add(oraclePanel, 0);
 
     final AddRecordStoreConnectionPanel postgresPanel = new AddRecordStoreConnectionPanel(registry);
-    SwingUtil.setTitledBorder(postgresPanel, "PostgreSQL/PostGIS");
+    Borders.titled(postgresPanel, "PostgreSQL/PostGIS");
     this.panels.add(postgresPanel, new Integer(index++));
 
     final AddRecordStoreConnectionPanel filePanel = new AddRecordStoreConnectionPanel(registry);
-    SwingUtil.setTitledBorder(filePanel, "File");
+    Borders.titled(filePanel, "File");
     this.panels.add(filePanel, new Integer(index++));
 
     this.buttons = new JXList(new Object[] {

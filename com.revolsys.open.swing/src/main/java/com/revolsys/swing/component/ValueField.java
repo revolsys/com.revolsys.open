@@ -14,6 +14,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import org.jdesktop.swingx.VerticalLayout;
+
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.field.Field;
@@ -27,7 +29,7 @@ public class ValueField extends JPanel implements Field {
 
   private boolean saved = false;
 
-  private FieldSupport fieldSupport;
+  private final FieldSupport fieldSupport;
 
   private String title;
 
@@ -35,19 +37,16 @@ public class ValueField extends JPanel implements Field {
     this("fieldValue", null);
   }
 
-  public ValueField(final boolean isDoubleBuffered) {
-    super(isDoubleBuffered);
-    setOpaque(false);
-  }
-
   public ValueField(final LayoutManager layout) {
-    super(layout);
+    this(layout, null, null);
     setOpaque(false);
   }
 
-  public ValueField(final LayoutManager layout, final boolean isDoubleBuffered) {
-    super(layout, isDoubleBuffered);
+  public ValueField(final LayoutManager layout, final String fieldName, final Object fieldValue) {
+    super(layout, true);
     setOpaque(false);
+    this.fieldSupport = new FieldSupport(this, fieldName, fieldValue, true);
+    setTitle(CaseConverter.toCapitalizedWords(fieldName));
   }
 
   public ValueField(final Object fieldValue) {
@@ -55,9 +54,7 @@ public class ValueField extends JPanel implements Field {
   }
 
   public ValueField(final String fieldName, final Object fieldValue) {
-    this.fieldSupport = new FieldSupport(this, fieldName, fieldValue);
-    setTitle(CaseConverter.toCapitalizedWords(fieldName));
-    setOpaque(false);
+    this(new VerticalLayout(), fieldName, fieldValue);
   }
 
   public void cancel() {
@@ -85,6 +82,11 @@ public class ValueField extends JPanel implements Field {
   public void firePropertyChange(final String propertyName, final Object oldValue,
     final Object newValue) {
     super.firePropertyChange(propertyName, oldValue, newValue);
+  }
+
+  @Override
+  public FieldSupport getFieldSupport() {
+    return this.fieldSupport;
   }
 
   public String getTitle() {
@@ -144,7 +146,7 @@ public class ValueField extends JPanel implements Field {
 
   @Override
   public void setToolTipText(final String text) {
-    if (this.fieldSupport.setOriginalTooltipText(text)) {
+    if (this.fieldSupport == null || this.fieldSupport.setOriginalTooltipText(text)) {
       super.setToolTipText(text);
     }
   }

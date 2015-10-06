@@ -9,7 +9,7 @@ import javax.swing.JTextField;
 import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
 
@@ -56,7 +56,7 @@ public class AddRecordStoreConnectionPanel extends ValueField {
     add(new JLabel("Password:"));
     this.passwordField = new JTextField("", 20);
     add(this.passwordField);
-    GroupLayoutUtil.makeColumns(this, 2, true);
+    GroupLayouts.makeColumns(this, 2, true);
 
   }
 

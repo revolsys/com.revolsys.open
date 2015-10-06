@@ -8,7 +8,7 @@ import javax.swing.JPanel;
 
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 
 public abstract class AbstractPreferencesPanel extends JPanel implements PreferencesPanel {
   private static final long serialVersionUID = 1L;
@@ -35,7 +35,7 @@ public abstract class AbstractPreferencesPanel extends JPanel implements Prefere
   public void addField(final String title, final Component component) {
     SwingUtil.addLabel(this.fieldPanel, title);
     this.fieldPanel.add(component);
-    GroupLayoutUtil.makeColumns(this.fieldPanel, 2, true);
+    GroupLayouts.makeColumns(this.fieldPanel, 2, true);
   }
 
   @Override

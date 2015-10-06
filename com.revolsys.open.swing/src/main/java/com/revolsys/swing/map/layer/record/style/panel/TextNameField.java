@@ -20,7 +20,7 @@ import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.TextArea;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.component.FieldTitleStringConveter;
 import com.revolsys.util.Property;
@@ -52,7 +52,7 @@ public class TextNameField extends ValueField {
 
     final BasePanel fieldNamesPanel = new BasePanel(new FlowLayout(FlowLayout.LEFT),
       this.fieldNamesField, addButton);
-    GroupLayoutUtil.makeColumns(fieldNamesPanel, 2, false);
+    GroupLayouts.makeColumns(fieldNamesPanel, 2, false);
     add(fieldNamesPanel, BorderLayout.SOUTH);
   }
 

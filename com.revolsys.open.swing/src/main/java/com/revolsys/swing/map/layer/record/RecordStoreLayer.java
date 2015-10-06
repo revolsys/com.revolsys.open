@@ -48,7 +48,7 @@ import com.revolsys.record.schema.RecordStore;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.layer.record.table.model.RecordSaveErrorTableModel;
@@ -253,7 +253,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     }
     SwingUtil.addLabelledReadOnlyTextField(panel, "Type Path", this.typePath);
 
-    GroupLayoutUtil.makeColumns(panel, 2, true);
+    GroupLayouts.makeColumns(panel, 2, true);
     return panel;
   }
 

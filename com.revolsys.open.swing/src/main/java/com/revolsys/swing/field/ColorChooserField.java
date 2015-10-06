@@ -6,7 +6,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JColorChooser;
 
 import org.jdesktop.swingx.JXColorSelectionButton;
-import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.component.ColorAlphaPanel;
@@ -20,7 +19,6 @@ public class ColorChooserField extends ValueField {
   public ColorChooserField(final String fieldName, final Color color) {
     super(fieldName, color);
     EventQueue.addPropertyChange(this.colorButton, "background", () -> updateFieldValue());
-    setLayout(new VerticalLayout());
     setBorder(BorderFactory.createEmptyBorder(0, 3, 3, 0));
     add(this.colorButton);
     final JColorChooser chooser = this.colorButton.getChooser();

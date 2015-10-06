@@ -23,6 +23,14 @@ public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> 
 
   }
 
+  public AbstractLayer getLayer() {
+    return this.layer;
+  }
+
+  public BoundingBox getViewportBoundingBox() {
+    return this.viewportBoundingBox;
+  }
+
   @Override
   protected List<LayerRecord> handleBackground() throws Exception {
     try {
@@ -46,17 +54,14 @@ public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> 
     }
   }
 
-  public AbstractLayer getLayer() {
-    return this.layer;
-  }
-
-  public BoundingBox getViewportBoundingBox() {
-    return this.viewportBoundingBox;
-  }
-
   @Override
   protected void handleCancelled() {
     this.layer.clearLoading(this.viewportBoundingBox);
+  }
+
+  @Override
+  protected void handleDone(final List<LayerRecord> records) {
+    this.layer.setIndexRecords(this.viewportBoundingBox, records);
   }
 
   @Override
@@ -69,10 +74,5 @@ public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> 
   public String toString() {
     final PathName typePath = this.layer.getTypePath();
     return "Load " + typePath;
-  }
-
-  @Override
-  protected void handleDone(final List<LayerRecord> records) {
-    this.layer.setIndexRecords(this.viewportBoundingBox, records);
   }
 }

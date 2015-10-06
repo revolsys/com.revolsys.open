@@ -19,10 +19,9 @@ public class CheckBox extends JCheckBox implements Field, ActionListener {
   }
 
   public CheckBox(final String fieldName, final Object fieldValue) {
-    this.fieldSupport = new FieldSupport(this, this, fieldName, fieldValue);
+    this.fieldSupport = new FieldSupport(this, this, fieldName, fieldValue, true);
     setFieldValue(BooleanStringConverter.getBoolean(fieldValue));
     addActionListener(this);
-    getUndoManager().addKeyMap(this);
     PopupMenu.getPopupMenuFactory(this);
     setOpaque(false);
   }
@@ -60,6 +59,11 @@ public class CheckBox extends JCheckBox implements Field, ActionListener {
   }
 
   @Override
+  public void setFieldToolTip(final String toolTip) {
+    super.setToolTipText(toolTip);
+  }
+
+  @Override
   public void setFieldValue(final Object value) {
     final boolean newValue = BooleanStringConverter.getBoolean(value);
     final boolean selected = isSelected();
@@ -74,7 +78,7 @@ public class CheckBox extends JCheckBox implements Field, ActionListener {
   @Override
   public void setToolTipText(final String text) {
     final FieldSupport fieldSupport = getFieldSupport();
-    if (fieldSupport.setOriginalTooltipText(text)) {
+    if (fieldSupport == null || fieldSupport.setOriginalTooltipText(text)) {
       super.setToolTipText(text);
     }
   }

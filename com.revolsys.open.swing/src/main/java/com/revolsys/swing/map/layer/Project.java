@@ -45,7 +45,7 @@ import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.menu.MenuFactory;
@@ -120,7 +120,7 @@ public class Project extends LayerGroup {
     final ValueField panel = super.createPropertiesTabGeneralPanelSource(parent);
     if (this.resource != null) {
       SwingUtil.addLabelledReadOnlyTextField(panel, "URL", this.resource.getURL());
-      GroupLayoutUtil.makeColumns(panel, 2, true);
+      GroupLayouts.makeColumns(panel, 2, true);
     }
     return panel;
   }

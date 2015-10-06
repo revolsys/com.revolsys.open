@@ -24,8 +24,7 @@ public class DashField extends ValueField implements ItemListener {
   private final JComboBox<List<Double>> dashField;
 
   public DashField(final String fieldName, final List<Measure<Length>> dash) {
-    super(fieldName, dash);
-    setLayout(new SpringLayout());
+    super(new SpringLayout(), fieldName, dash);
 
     final Vector<List<Double>> dashes = new Vector<>();
     dashes.add(null);

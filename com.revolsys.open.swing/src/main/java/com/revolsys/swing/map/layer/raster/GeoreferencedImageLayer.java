@@ -23,6 +23,7 @@ import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.raster.MappedLocation;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.swing.Borders;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
@@ -30,7 +31,7 @@ import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
@@ -123,7 +124,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   public TabbedValuePanel createPropertiesPanel() {
     final TabbedValuePanel propertiesPanel = super.createPropertiesPanel();
     final TiePointsPanel tiePointsPanel = createTableViewComponent(null);
-    SwingUtil.setTitledBorder(tiePointsPanel, "Tie Points");
+    Borders.titled(tiePointsPanel, "Tie Points");
 
     propertiesPanel.addTab("Geo-Referencing", tiePointsPanel);
     return propertiesPanel;
@@ -148,7 +149,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
         SwingUtil.addLabelledReadOnlyTextField(panel, "File Type", factory.getName());
       }
     }
-    GroupLayoutUtil.makeColumns(panel, 2, true);
+    GroupLayouts.makeColumns(panel, 2, true);
     return panel;
   }
 

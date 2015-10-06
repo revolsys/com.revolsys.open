@@ -8,6 +8,7 @@ import javax.swing.JTextField;
 
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.undo.UndoManager;
+import com.revolsys.util.Property;
 
 public interface Field extends Cloneable {
   Color DEFAULT_BACKGROUND = new JTextField().getBackground();
@@ -31,9 +32,7 @@ public interface Field extends Cloneable {
     return DEFAULT_SELECTED_FOREGROUND;
   }
 
-  default FieldSupport getFieldSupport() {
-    throw new UnsupportedOperationException("Field support not yet implemented");
-  }
+  FieldSupport getFieldSupport();
 
   default String getFieldValidationMessage() {
     final FieldSupport fieldSupport = getFieldSupport();
@@ -53,6 +52,12 @@ public interface Field extends Cloneable {
   default boolean isFieldValid() {
     final FieldSupport fieldSupport = getFieldSupport();
     return fieldSupport.isFieldValid();
+  }
+
+  default boolean isHasValidValue() {
+    final FieldSupport fieldSupport = getFieldSupport();
+    final Object fieldValue = getFieldValue();
+    return Property.hasValue(fieldValue) && fieldSupport.isFieldValid();
   }
 
   void setEditable(boolean editable);
@@ -99,6 +104,11 @@ public interface Field extends Cloneable {
   default void setFieldValue(final Object value) {
     final FieldSupport fieldSupport = getFieldSupport();
     fieldSupport.setValue(value);
+  }
+
+  default void setShowErrorIcon(final boolean showErrorIcon) {
+    final FieldSupport fieldSupport = getFieldSupport();
+    fieldSupport.setShowErrorIcon(showErrorIcon);
   }
 
   default void setUndoManager(final UndoManager undoManager) {

@@ -8,7 +8,7 @@ import com.revolsys.record.io.RecordIo;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.FileField;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.menu.MenuFactory;
 
 public class ConvertFileTool extends ValueField implements PropertyChangeListener {
@@ -31,7 +31,7 @@ public class ConvertFileTool extends ValueField implements PropertyChangeListene
     add(this.sourceFileField);
     SwingUtil.addLabel(this, "Target File");
     add(this.targetFileField);
-    GroupLayoutUtil.makeColumns(this, 2, true, true);
+    GroupLayouts.makeColumns(this, 2, true, true);
   }
 
   @Override

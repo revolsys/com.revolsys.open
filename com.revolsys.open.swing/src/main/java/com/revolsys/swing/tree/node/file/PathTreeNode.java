@@ -34,12 +34,13 @@ import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.RecordStoreFactoryRegistry;
+import com.revolsys.swing.Borders;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeNodeAction;
@@ -232,7 +233,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
       final ValueField panel = new ValueField();
       panel.setTitle("Add Folder Connection");
-      SwingUtil.setTitledBorder(panel, "Folder Connection");
+      Borders.titled(panel, "Folder Connection");
 
       SwingUtil.addLabel(panel, "Folder");
       final JLabel fileLabel = new JLabel(getIconFile(path).getAbsolutePath());
@@ -256,7 +257,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
       panel.add(registryField);
 
-      GroupLayoutUtil.makeColumns(panel, 2, true);
+      GroupLayouts.makeColumns(panel, 2, true);
       panel.showDialog();
       if (panel.isSaved()) {
         final FolderConnectionRegistry registry = (FolderConnectionRegistry)registryField

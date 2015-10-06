@@ -59,7 +59,14 @@ public class LayerStylePanel extends ValueField implements MouseListener, Proper
     this.tree.addMouseListener(this);
     setEditStylePanel(this.rootRenderer);
 
+    this.editStyleContainer.setOpaque(false);
+    this.editStyleContainer.getViewport().setOpaque(false);
+    this.editStyleContainer.setBorder(null);
+    this.editStyleContainer.setViewportBorder(null);
+
     final JScrollPane treeScroll = new JScrollPane(this.tree);
+    treeScroll.setBorder(null);
+    treeScroll.setViewportBorder(null);
     final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, treeScroll,
       this.editStyleContainer);
 

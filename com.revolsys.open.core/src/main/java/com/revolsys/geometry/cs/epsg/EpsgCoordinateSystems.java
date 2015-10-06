@@ -84,7 +84,8 @@ public final class EpsgCoordinateSystems {
       int srid = coordinateSystem.getCoordinateSystemId();
       CoordinateSystem matchedCoordinateSystem = coordinateSystemsById.get(srid);
       if (matchedCoordinateSystem == null) {
-        matchedCoordinateSystem = coordinateSystemsByName.get(coordinateSystem.getCoordinateSystemName());
+        matchedCoordinateSystem = coordinateSystemsByName
+          .get(coordinateSystem.getCoordinateSystemName());
         if (matchedCoordinateSystem == null) {
           final int hashCode = coordinateSystem.hashCode();
           int matchCoordinateSystemId = 0;

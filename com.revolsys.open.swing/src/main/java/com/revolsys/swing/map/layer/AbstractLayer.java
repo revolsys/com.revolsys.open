@@ -26,7 +26,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.ScrollableSizeHint;
@@ -51,15 +50,16 @@ import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.swing.Borders;
 import com.revolsys.swing.Icons;
+import com.revolsys.swing.Panels;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
-import com.revolsys.swing.border.TitledBorder;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.Field;
-import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.listener.BeanPropertyListener;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
@@ -273,8 +273,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       final JPanel panel = new JPanel(new VerticalLayout(5));
       tabPanel.addTab("Spatial", panel);
 
-      final JPanel extentPanel = new JPanel();
-      SwingUtil.setTitledBorder(extentPanel, "Extent");
+      final JPanel extentPanel = Panels.titledTransparent("Extent");
       final BoundingBox boundingBox = getBoundingBox();
       if (boundingBox == null || boundingBox.isEmpty()) {
         extentPanel.add(new JLabel("Unknown"));
@@ -294,11 +293,10 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
         extentPanel.add(extentLabel);
 
       }
-      GroupLayoutUtil.makeColumns(extentPanel, 1, true);
+      GroupLayouts.makeColumns(extentPanel, 1, true);
       panel.add(extentPanel);
 
-      final JPanel coordinateSystemPanel = new JPanel();
-      coordinateSystemPanel.setBorder(new TitledBorder("Coordinate System"));
+      final JPanel coordinateSystemPanel = Panels.titledTransparent("Coordinate System");
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem == null) {
         coordinateSystemPanel.add(new JLabel("Unknown"));
@@ -333,9 +331,9 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
         wktTextArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
         coordinateSystemPanel.add(wktTextArea);
 
-        GroupLayoutUtil.makeColumns(coordinateSystemPanel, 2, true);
+        GroupLayouts.makeColumns(coordinateSystemPanel, 2, true);
       }
-      panel.add(new JScrollPane(coordinateSystemPanel));
+      panel.add(coordinateSystemPanel);
 
       return panel;
     }
@@ -358,7 +356,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   protected ValueField createPropertiesTabGeneralPanelGeneral(final BasePanel parent) {
     final ValueField panel = new ValueField(this);
-    SwingUtil.setTitledBorder(panel, "General");
+    Borders.titled(panel, "General");
     final Field nameField = (Field)SwingUtil.addObjectField(panel, this, "name");
     Property.addListener(nameField, "name", this.beanPropertyListener);
 
@@ -366,7 +364,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     final String typeLabel = CaseConverter.toCapitalizedWords(type);
     SwingUtil.addLabelledReadOnlyTextField(panel, "Type", typeLabel);
 
-    GroupLayoutUtil.makeColumns(panel, 2, true);
+    GroupLayouts.makeColumns(panel, 2, true);
 
     parent.add(panel);
     return panel;
@@ -374,7 +372,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   protected ValueField createPropertiesTabGeneralPanelSource(final BasePanel parent) {
     final ValueField panel = new ValueField(this);
-    SwingUtil.setTitledBorder(panel, "Source");
+    Borders.titled(panel, "Source");
 
     parent.add(panel);
     return panel;

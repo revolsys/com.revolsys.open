@@ -24,6 +24,10 @@ public class LayerRendererOverlaySwingWorker extends AbstractSwingWorker<Void, V
     this.referencedImage = image;
   }
 
+  public GeoreferencedImage getReferencedImage() {
+    return this.referencedImage;
+  }
+
   @Override
   protected Void handleBackground() throws Exception {
     try {
@@ -58,17 +62,13 @@ public class LayerRendererOverlaySwingWorker extends AbstractSwingWorker<Void, V
     }
   }
 
-  public GeoreferencedImage getReferencedImage() {
-    return this.referencedImage;
+  @Override
+  protected void handleDone(final Void result) {
+    this.overlay.setImage(this);
   }
 
   @Override
   public String toString() {
     return "Render layers";
-  }
-
-  @Override
-  protected void handleDone(final Void result) {
-    this.overlay.setImage(this);
   }
 }
