@@ -305,7 +305,7 @@ public final class Records {
   }
 
   public static Set<Identifier> getIdentifiers(final Collection<? extends Record> records) {
-    final Set<Identifier> identifiers = new TreeSet<>();
+    final Set<Identifier> identifiers = Identifier.newTreeSet();
     for (final Record record : records) {
       final Identifier identifier = record.getIdentifier();
       if (identifier != null) {

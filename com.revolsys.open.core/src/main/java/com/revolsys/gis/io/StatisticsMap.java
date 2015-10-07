@@ -40,6 +40,16 @@ public class StatisticsMap implements Emptyable {
     this.prefix = prefix;
   }
 
+  public void add(final CharSequence statisticName, final CharSequence name) {
+    final Statistics statistics = getStatistics(statisticName);
+    statistics.add(name);
+  }
+
+  public void add(final CharSequence statisticName, final CharSequence path, final long count) {
+    final Statistics statistics = getStatistics(statisticName);
+    statistics.add(path, count);
+  }
+
   public void add(final CharSequence statisticName, final Record record) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(record);
@@ -59,16 +69,6 @@ public class StatisticsMap implements Emptyable {
   public void add(final CharSequence statisticName, final RecordDefinition type, final long count) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(type, count);
-  }
-
-  public void add(final CharSequence statisticName, final String name) {
-    final Statistics statistics = getStatistics(statisticName);
-    statistics.add(name);
-  }
-
-  public void add(final CharSequence statisticName, final String path, final long count) {
-    final Statistics statistics = getStatistics(statisticName);
-    statistics.add(path, count);
   }
 
   public void addAll(final StatisticsMap statisticsMap) {

@@ -13,6 +13,7 @@ import java.util.Set;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
+import com.revolsys.record.code.Code;
 
 public class EqualsRegistry implements Equals<Object> {
 
@@ -39,6 +40,7 @@ public class EqualsRegistry implements Equals<Object> {
     register(Map.class, new MapEquals());
     register(List.class, new ListEquals());
     register(Record.class, new RecordEquals());
+    register(Code.class, new CodeEquals());
   }
 
   public boolean equals(final Object object1, final Object object2) {

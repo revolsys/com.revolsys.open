@@ -7,9 +7,14 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.swing.JComponent;
 
+import com.revolsys.beans.Classes;
+import com.revolsys.collection.list.Lists;
+import com.revolsys.equals.Equals;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.Emptyable;
@@ -43,7 +48,14 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
     return getIdentifier(values, true);
   }
 
-  Identifier getIdentifier(List<Object> values, boolean loadMissing);
+  default Identifier getIdentifier(final List<Object> values, final boolean loadMissing) {
+    for (final Entry<Identifier, List<Object>> entry : getCodes().entrySet()) {
+      if (Equals.equal(entry.getValue(), values)) {
+        return entry.getKey();
+      }
+    }
+    return null;
+  }
 
   default Identifier getIdentifier(final Map<String, ? extends Object> valueMap) {
     final List<String> valueFieldNames = getValueFieldNames();
@@ -60,7 +72,11 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
     return getIdentifier(valueList);
   }
 
-  List<Identifier> getIdentifiers();
+  default List<Identifier> getIdentifiers() {
+    final Map<Identifier, List<Object>> codes = getCodes();
+    final Set<Identifier> keySet = codes.keySet();
+    return Lists.array(keySet);
+  }
 
   default Identifier getIdExact(final List<Object> values) {
     return getIdExact(values, true);
@@ -110,9 +126,13 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
     return getMap(identifier);
   }
 
-  String getName();
+  default String getName() {
+    return Classes.className(getClass());
+  }
 
-  JComponent getSwingEditor();
+  default JComponent getSwingEditor() {
+    return null;
+  }
 
   @SuppressWarnings("unchecked")
   default <V> V getValue(final Identifier id) {
@@ -133,7 +153,16 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
     return Arrays.asList("VALUE");
   }
 
-  List<Object> getValues(Identifier id);
+  default List<Object> getValues(final Identifier id) {
+    if (id != null) {
+      final Map<Identifier, List<Object>> codes = getCodes();
+      final List<Object> values = codes.get(id);
+      if (values != null) {
+        return Collections.unmodifiableList(values);
+      }
+    }
+    return null;
+  }
 
   default List<Object> getValues(final Object id) {
     final Identifier identifier = Identifier.create(id);

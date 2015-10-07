@@ -104,7 +104,7 @@ public class StringTemplate implements Serializable {
       final Object uriVariable = uriVariableValues[i++];
       String replacement;
       if (uriVariable == null) {
-        replacement = Matcher.quoteReplacement("");
+        replacement = Matcher.quoteReplacement("null");
       } else {
         replacement = Matcher.quoteReplacement(uriVariable.toString());
       }

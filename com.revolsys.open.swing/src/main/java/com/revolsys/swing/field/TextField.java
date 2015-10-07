@@ -4,10 +4,6 @@ import java.awt.Color;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
-import javax.swing.BorderFactory;
-import javax.swing.JTextField;
-import javax.swing.border.CompoundBorder;
-
 import org.jdesktop.swingx.JXTextField;
 
 import com.revolsys.awt.WebColors;
@@ -22,12 +18,6 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
 public class TextField extends JXTextField implements Field, FocusListener {
-  public static final CompoundBorder READ_ONLY_BORDER = BorderFactory
-    .createCompoundBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3),
-      BorderFactory.createCompoundBorder(
-        BorderFactory.createLineBorder(new Color(224, 224, 224), 1),
-        BorderFactory.createEmptyBorder(1, 2, 1, 2)));
-
   private static final long serialVersionUID = 1L;
 
   private final FieldSupport fieldSupport;
@@ -134,11 +124,6 @@ public class TextField extends JXTextField implements Field, FocusListener {
   public void setEditable(final boolean editable) {
     final boolean oldEditable = isEditable();
     if (editable != oldEditable) {
-      if (editable) {
-        setBorder(new JTextField().getBorder());
-      } else {
-        setBorder(READ_ONLY_BORDER);
-      }
       super.setEditable(editable);
       setForeground(getForeground());
     }

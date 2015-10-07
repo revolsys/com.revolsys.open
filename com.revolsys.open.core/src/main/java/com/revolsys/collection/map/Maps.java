@@ -104,7 +104,12 @@ public interface Maps {
   }
 
   static <K, V> MapBuilder<K, V> buildLinkedHash() {
-    final LinkedHashMap<K, V> map = new LinkedHashMap<>();
+    final Map<K, V> map = new LinkedHashMap<>();
+    return new MapBuilder<>(map);
+  }
+
+  static <K, V> MapBuilder<K, V> buildTree() {
+    final Map<K, V> map = new TreeMap<>();
     return new MapBuilder<>(map);
   }
 
@@ -715,9 +720,25 @@ public interface Maps {
     };
   }
 
+  static <K, V> Map<K, V> treeMap(final Comparator<K> comparator, final Map<K, ? extends V> map) {
+    final Map<K, V> newMap = new TreeMap<>(comparator);
+    if (map != null) {
+      newMap.putAll(map);
+    }
+    return newMap;
+  }
+
   static <K, V> Map<K, V> treeMap(final K key, final V value) {
     final Map<K, V> map = new TreeMap<>();
     map.put(key, value);
     return map;
+  }
+
+  static <K, V> Map<K, V> treeMap(final Map<K, ? extends V> map) {
+    final Map<K, V> newMap = new TreeMap<>();
+    if (map != null) {
+      newMap.putAll(map);
+    }
+    return newMap;
   }
 }

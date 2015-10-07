@@ -20,7 +20,6 @@ import com.revolsys.equals.Equals;
 import com.revolsys.equals.EqualsInstance;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.util.GeometryProperties;
-import com.revolsys.identifier.AbstractIdentifier;
 import com.revolsys.identifier.Identifiable;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.identifier.ListIdentifier;
@@ -605,7 +604,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
   default void setIdentifier(final Identifier identifier) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     final List<String> idFieldNames = recordDefinition.getIdFieldNames();
-    AbstractIdentifier.setIdentifier(this, idFieldNames, identifier);
+    Identifier.setIdentifier(this, idFieldNames, identifier);
   }
 
   /**
