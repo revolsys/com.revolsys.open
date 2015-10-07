@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -46,11 +47,8 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.ConsumerAction;
 import com.revolsys.swing.action.RunnableAction;
-import com.revolsys.swing.action.enablecheck.AndEnableCheck;
-import com.revolsys.swing.action.enablecheck.CallableEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
-import com.revolsys.swing.action.enablecheck.OrEnableCheck;
 import com.revolsys.swing.map.action.AddFileLayerAction;
 import com.revolsys.swing.map.form.FieldNamesSetPanel;
 import com.revolsys.swing.map.form.RecordLayerForm;
@@ -67,10 +65,9 @@ import com.revolsys.swing.menu.WrappedMenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.TableRowCount;
+import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
-import com.revolsys.swing.table.record.row.RecordRowFunctionEnableCheck;
-import com.revolsys.swing.table.record.row.RecordRowTable;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
@@ -87,7 +84,7 @@ public class RecordLayerTablePanel extends TablePanel
 
   private FieldFilterPanel fieldFilterPanel;
 
-  private final JButton fieldSetsButton;
+  private JButton fieldSetsButton;
 
   private AbstractRecordLayer layer;
 
@@ -100,156 +97,16 @@ public class RecordLayerTablePanel extends TablePanel
     this.tableModel = getTableModel();
     final Map<String, Object> pluginConfig = layer.getPluginConfig(AbstractLayer.PLUGIN_TABLE_VIEW);
 
-    // Right click Menu
-    final MenuFactory menu = this.tableModel.getMenu();
+    table.getTableCellEditor().addMouseListener(this);
+    table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+
+    final MenuFactory menu = initMenu();
 
     final RecordTableCellEditor tableCellEditor = table.getTableCellEditor();
     tableCellEditor.setPopupMenu(menu);
 
-    table.getTableCellEditor().addMouseListener(this);
-    table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
-    final RecordDefinition recordDefinition = layer.getRecordDefinition();
-    final boolean hasGeometry = recordDefinition.getGeometryFieldIndex() != -1;
+    initToolBar(pluginConfig);
 
-    final EnableCheck deletableEnableCheck = RecordRowFunctionEnableCheck.newEnableCheck(true,
-      LayerRecord::isDeletable);
-
-    final EnableCheck modifiedEnableCheck = RecordRowFunctionEnableCheck.newEnableCheck(true,
-      Record::isModified);
-    final EnableCheck notDeletedEnableCheck = RecordRowFunctionEnableCheck.newEnableCheck(false,
-      this::isRecordDeleted);
-    final OrEnableCheck modifiedOrDeleted = new OrEnableCheck(modifiedEnableCheck,
-      RecordRowFunctionEnableCheck.newEnableCheck(true, LayerRecord::isDeleted));
-
-    final EnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(layer, "editable");
-
-    menu.addGroup(0, "default");
-    menu.addGroup(1, "record");
-    menu.addGroup(2, "dnd");
-
-    final MenuFactory layerMenuFactory = MenuFactory.findMenu(layer);
-    if (layerMenuFactory != null) {
-      menu.addComponentFactory("default", 0, new WrappedMenuFactory("Layer", layerMenuFactory));
-    }
-
-    this.tableModel.addMenuItem("record", "View/Edit Record", "table_edit", notDeletedEnableCheck,
-      this::editRecord);
-
-    if (hasGeometry) {
-      this.tableModel.addMenuItem("record", "Zoom to Record", "magnifier_zoom_selected",
-        notDeletedEnableCheck, this::zoomToRecord);
-    }
-    this.tableModel.addMenuItem("record", "Delete Record", "table_row_delete", deletableEnableCheck,
-      this::deleteRecord);
-
-    this.tableModel.addMenuItem("record", "Revert Record", "arrow_revert", modifiedOrDeleted,
-      LayerRecord::revertChanges);
-
-    this.tableModel.addMenuItem("record", "Revert Empty Fields", "field_empty_revert",
-      modifiedEnableCheck, LayerRecord::revertEmptyFields);
-
-    this.tableModel.addMenuItem("dnd", "Copy Record", "page_copy", this::copyRecord);
-
-    if (hasGeometry) {
-      this.tableModel.addMenuItem("dnd", "Paste Geometry", "geometry_paste",
-        new AndEnableCheck(editableEnableCheck,
-          new CallableEnableCheck<>(true, this::canPasteRecordGeometry)),
-        this::pasteGeometry);
-
-      final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
-      editMenu.setEnableCheck(notDeletedEnableCheck);
-      final DataType geometryDataType = recordDefinition.getGeometryField().getType();
-      if (geometryDataType == DataTypes.LINE_STRING
-        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
-        if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
-          RecordRowTableModel.addMenuItem(editMenu, "geometry", RecordLayerForm.FLIP_RECORD_NAME,
-            RecordLayerForm.FLIP_RECORD_ICON, editableEnableCheck, this::flipRecordOrientation);
-
-          RecordRowTableModel.addMenuItem(editMenu, "geometry",
-            RecordLayerForm.FLIP_LINE_ORIENTATION_NAME, RecordLayerForm.FLIP_LINE_ORIENTATION_ICON,
-            editableEnableCheck, this::flipLineOrientation);
-
-          RecordRowTableModel.addMenuItem(editMenu, "geometry", RecordLayerForm.FLIP_FIELDS_NAME,
-            RecordLayerForm.FLIP_FIELDS_ICON, editableEnableCheck, this::flipFields);
-        } else {
-          RecordRowTableModel.addMenuItem(editMenu, "geometry", "Flip Line Orientation",
-            "flip_line", editableEnableCheck, this::flipLineOrientation);
-        }
-      }
-      menu.addComponentFactory("record", 2, editMenu);
-    }
-
-    // Toolbar
-    final ToolBar toolBar = getToolBar();
-
-    if (layerMenuFactory != null) {
-      toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu",
-        () -> layerMenuFactory.show(layer, this, 10, 10));
-    }
-    if (hasGeometry) {
-      final EnableCheck hasSelectedRecords = new ObjectPropertyEnableCheck(layer,
-        "hasSelectedRecords");
-      toolBar.addButton("layer", "Zoom to Selected", "magnifier_zoom_selected", hasSelectedRecords,
-        layer::zoomToSelected);
-    }
-    toolBar.addComponent("count", new TableRowCount(this.tableModel));
-
-    toolBar.addButtonTitleIcon("table", "Refresh", "table_refresh", () -> refresh());
-    toolBar.addButtonTitleIcon("table", "Export Records", "table_save", () -> exportRecords());
-
-    this.fieldSetsButton = toolBar.addButtonTitleIcon("table", "Field Sets", "fields_filter",
-      () -> actionShowFieldSetsMenu());
-
-    this.fieldFilterPanel = new FieldFilterPanel(this, this.tableModel, pluginConfig);
-    toolBar.addComponent("search", this.fieldFilterPanel);
-
-    toolBar.addButtonTitleIcon("search", "Advanced Search", "filter_edits",
-      this.fieldFilterPanel::showAdvancedFilter);
-
-    final EnableCheck hasFilter = new ObjectPropertyEnableCheck(this.tableModel, "hasFilter");
-
-    toolBar.addButton("search", "Clear Search", "filter_delete", hasFilter,
-      this.fieldFilterPanel::clear);
-
-    toolBar.addButton("search",
-      ConsumerAction.action(Icons.getIconWithBadge("book", "filter"), "Query History", (event) -> {
-        final Object source = event.getSource();
-        Component component = null;
-        if (source instanceof Component) {
-          component = (Component)source;
-        }
-        final PopupMenu queryMenu = new PopupMenu("Query History");
-        final MenuFactory factory = queryMenu.getMenu();
-        // factory.addMenuItemTitleIcon("default", "Add Bookmark", "add", this,
-        // "addZoomBookmark");
-
-        for (final Condition filter : this.tableModel.getFilterHistory()) {
-          factory.addMenuItemTitleIcon("bookmark", filter.toString(), null,
-            () -> this.fieldFilterPanel.setFilter(filter));
-        }
-        queryMenu.show(component, 0, 20);
-      }));
-
-    // Filter buttons
-
-    final JToggleButton clearFilter = addFieldFilterToggleButton(toolBar, -1, "Show All Records",
-      "table_filter", RecordLayerTableModel.MODE_ALL, null);
-    clearFilter.doClick();
-
-    addFieldFilterToggleButton(toolBar, -1, "Show Only Changed Records", "change_table_filter",
-      RecordLayerTableModel.MODE_EDITS, editableEnableCheck);
-
-    addFieldFilterToggleButton(toolBar, -1, "Show Only Selected Records", "filter_selected",
-      RecordLayerTableModel.MODE_SELECTED, null);
-
-    if (hasGeometry) {
-      final JToggleButton showAllGeometries = addGeometryFilterToggleButton(toolBar, -1,
-        "Show All Records ", "world_filter", "all", null);
-      showAllGeometries.doClick();
-
-      addGeometryFilterToggleButton(toolBar, -1, "Show Records on Map", "map_filter", "boundingBox",
-        null);
-    }
     setPluginConfig(pluginConfig);
     layer.setPluginConfig(AbstractLayer.PLUGIN_TABLE_VIEW, this);
     Property.addListener(layer, this);
@@ -336,7 +193,7 @@ public class RecordLayerTablePanel extends TablePanel
   }
 
   private void exportRecords() {
-    final RecordDefinition recordDefinition = this.layer.getRecordDefinition();
+    final RecordDefinition recordDefinition = getRecordDefinition();
     final JFileChooser fileChooser = SwingUtil.newFileChooser("Export Records",
       "com.revolsys.swing.map.table.export", "directory");
     final String defaultFileExtension = PreferencesUtil
@@ -432,6 +289,158 @@ public class RecordLayerTablePanel extends TablePanel
   public RecordLayerTableModel getTableModel() {
     final JTable table = getTable();
     return (RecordLayerTableModel)table.getModel();
+  }
+
+  protected MenuFactory initMenu() {
+    // Right click Menu
+    final MenuFactory menu = this.tableModel.getMenu();
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final boolean hasGeometry = recordDefinition.hasGeometryField();
+
+    final Predicate<LayerRecord> modified = LayerRecord::isModified;
+    final Predicate<LayerRecord> notDeleted = ((Predicate<LayerRecord>)this::isRecordDeleted)
+      .negate();
+    final Predicate<LayerRecord> modifiedOrDeleted = modified.or(LayerRecord::isDeleted);
+
+    final EnableCheck editableEnableCheck = this.layer::isEditable;
+
+    menu.addGroup(0, "default");
+    menu.addGroup(1, "record");
+    menu.addGroup(2, "dnd");
+
+    final MenuFactory layerMenuFactory = MenuFactory.findMenu(this.layer);
+    if (layerMenuFactory != null) {
+      menu.addComponentFactory("default", 0, new WrappedMenuFactory("Layer", layerMenuFactory));
+    }
+
+    this.tableModel.addMenuItem("record", "View/Edit Record", "table_edit", notDeleted,
+      this::editRecord);
+
+    if (hasGeometry) {
+      this.tableModel.addMenuItem("record", "Zoom to Record", "magnifier_zoom_selected", notDeleted,
+        this::zoomToRecord);
+    }
+    this.tableModel.addMenuItem("record", "Delete Record", "table_row_delete",
+      LayerRecord::isDeletable, this::deleteRecord);
+
+    this.tableModel.addMenuItem("record", "Revert Record", "arrow_revert", modifiedOrDeleted,
+      LayerRecord::revertChanges);
+
+    this.tableModel.addMenuItem("record", "Revert Empty Fields", "field_empty_revert", modified,
+      LayerRecord::revertEmptyFields);
+
+    this.tableModel.addMenuItem("dnd", "Copy Record", "page_copy", this::copyRecord);
+
+    if (hasGeometry) {
+      this.tableModel.addMenuItem("dnd", "Paste Geometry", "geometry_paste",
+        this::canPasteRecordGeometry, this::pasteGeometry);
+
+      final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
+      editMenu.setEnableCheck(RecordRowTable.enableCheck(notDeleted));
+      final DataType geometryDataType = recordDefinition.getGeometryField().getType();
+      if (geometryDataType == DataTypes.LINE_STRING
+        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+        if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
+          RecordRowTableModel.addMenuItem(editMenu, "geometry", RecordLayerForm.FLIP_RECORD_NAME,
+            RecordLayerForm.FLIP_RECORD_ICON, editableEnableCheck, this::flipRecordOrientation);
+
+          RecordRowTableModel.addMenuItem(editMenu, "geometry",
+            RecordLayerForm.FLIP_LINE_ORIENTATION_NAME, RecordLayerForm.FLIP_LINE_ORIENTATION_ICON,
+            editableEnableCheck, this::flipLineOrientation);
+
+          RecordRowTableModel.addMenuItem(editMenu, "geometry", RecordLayerForm.FLIP_FIELDS_NAME,
+            RecordLayerForm.FLIP_FIELDS_ICON, editableEnableCheck, this::flipFields);
+        } else {
+          RecordRowTableModel.addMenuItem(editMenu, "geometry", "Flip Line Orientation",
+            "flip_line", editableEnableCheck, this::flipLineOrientation);
+        }
+      }
+      menu.addComponentFactory("record", 2, editMenu);
+    }
+    return layerMenuFactory;
+  }
+
+  public RecordDefinition getRecordDefinition() {
+    return this.layer.getRecordDefinition();
+  }
+
+  protected void initToolBar(final Map<String, Object> pluginConfig) {
+    final ToolBar toolBar = getToolBar();
+
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final boolean hasGeometry = recordDefinition.hasGeometryField();
+
+    final MenuFactory layerMenuFactory = MenuFactory.findMenu(this.layer);
+    if (layerMenuFactory != null) {
+      toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu",
+        () -> layerMenuFactory.show(this.layer, this, 10, 10));
+    }
+
+    if (hasGeometry) {
+      final EnableCheck hasSelectedRecords = new ObjectPropertyEnableCheck(this.layer,
+        "hasSelectedRecords");
+      toolBar.addButton("layer", "Zoom to Selected", "magnifier_zoom_selected", hasSelectedRecords,
+        this.layer::zoomToSelected);
+    }
+    toolBar.addComponent("count", new TableRowCount(this.tableModel));
+
+    toolBar.addButtonTitleIcon("table", "Refresh", "table_refresh", () -> refresh());
+    toolBar.addButtonTitleIcon("table", "Export Records", "table_save", () -> exportRecords());
+
+    this.fieldSetsButton = toolBar.addButtonTitleIcon("table", "Field Sets", "fields_filter",
+      () -> actionShowFieldSetsMenu());
+
+    this.fieldFilterPanel = new FieldFilterPanel(this, this.tableModel, pluginConfig);
+    toolBar.addComponent("search", this.fieldFilterPanel);
+
+    toolBar.addButtonTitleIcon("search", "Advanced Search", "filter_edits",
+      this.fieldFilterPanel::showAdvancedFilter);
+
+    final EnableCheck hasFilter = new ObjectPropertyEnableCheck(this.tableModel, "hasFilter");
+
+    toolBar.addButton("search", "Clear Search", "filter_delete", hasFilter,
+      this.fieldFilterPanel::clear);
+
+    toolBar.addButton("search",
+      ConsumerAction.action(Icons.getIconWithBadge("book", "filter"), "Query History", (event) -> {
+        final Object source = event.getSource();
+        Component component = null;
+        if (source instanceof Component) {
+          component = (Component)source;
+        }
+        final PopupMenu queryMenu = new PopupMenu("Query History");
+        final MenuFactory factory = queryMenu.getMenu();
+        // factory.addMenuItemTitleIcon("default", "Add Bookmark", "add", this,
+        // "addZoomBookmark");
+
+        for (final Condition filter : this.tableModel.getFilterHistory()) {
+          factory.addMenuItemTitleIcon("bookmark", filter.toString(), null,
+            () -> this.fieldFilterPanel.setFilter(filter));
+        }
+        queryMenu.show(component, 0, 20);
+      }));
+
+    // Filter buttons
+
+    final JToggleButton clearFilter = addFieldFilterToggleButton(toolBar, -1, "Show All Records",
+      "table_filter", RecordLayerTableModel.MODE_ALL, null);
+    clearFilter.doClick();
+
+    final EnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(this.layer, "editable");
+    addFieldFilterToggleButton(toolBar, -1, "Show Only Changed Records", "change_table_filter",
+      RecordLayerTableModel.MODE_EDITS, editableEnableCheck);
+
+    addFieldFilterToggleButton(toolBar, -1, "Show Only Selected Records", "filter_selected",
+      RecordLayerTableModel.MODE_SELECTED, null);
+
+    if (hasGeometry) {
+      final JToggleButton showAllGeometries = addGeometryFilterToggleButton(toolBar, -1,
+        "Show All Records ", "world_filter", "all", null);
+      showAllGeometries.doClick();
+
+      addGeometryFilterToggleButton(toolBar, -1, "Show Records on Map", "map_filter", "boundingBox",
+        null);
+    }
   }
 
   @Override

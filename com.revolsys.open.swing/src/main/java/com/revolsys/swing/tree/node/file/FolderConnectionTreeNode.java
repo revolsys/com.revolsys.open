@@ -9,10 +9,8 @@ import javax.swing.JOptionPane;
 import com.revolsys.io.Paths;
 import com.revolsys.io.file.FolderConnection;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.TreeNodeAction;
-import com.revolsys.swing.tree.TreeNodePropertyEnableCheck;
+import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.util.UrlProxy;
@@ -24,9 +22,8 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements UrlPro
   static {
     addRefreshMenuItem(MENU);
 
-    final EnableCheck readOnly = new TreeNodePropertyEnableCheck("readOnly", false);
-    TreeNodeAction.addMenuItem(MENU, "default", "Delete Folder Connection", "delete", readOnly,
-      FolderConnectionTreeNode::deleteConnection);
+    TreeNodes.addMenuItem(MENU, "default", "Delete Folder Connection", "delete",
+      FolderConnectionTreeNode::isEditable, FolderConnectionTreeNode::deleteConnection);
   }
 
   public FolderConnectionTreeNode(final FolderConnection connection) {
@@ -78,6 +75,10 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements UrlPro
     }
   }
 
+  public boolean isEditable() {
+    return !isReadOnly();
+  }
+
   @Override
   public boolean isExists() {
     final Path path = getPath();
@@ -88,5 +89,4 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements UrlPro
     final FolderConnection connection = getConnection();
     return connection.isReadOnly();
   }
-
 }

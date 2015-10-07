@@ -25,8 +25,8 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.TablePanel;
+import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.swing.table.record.model.RecordListTableModel;
-import com.revolsys.swing.table.record.row.RecordRowTable;
 
 public class RecordSaveErrorTableModel extends RecordListTableModel
   implements SortableTableModel, ListSelectionListener {

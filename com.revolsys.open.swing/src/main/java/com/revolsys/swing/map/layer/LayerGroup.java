@@ -38,7 +38,7 @@ import com.revolsys.swing.map.layer.record.FileRecordLayer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.MenuSourceAction;
+import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.Property;
 
 public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable<Layer> {
@@ -46,7 +46,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   static {
     final MenuFactory menu = MenuFactory.getMenu(LayerGroup.class);
     menu.addGroup(0, "group");
-    MenuSourceAction.<LayerGroup> addMenuItem(menu, "group", "Add Group", "folder_add",
+    Menus.<LayerGroup> addMenuItem(menu, "group", "Add Group", "folder_add",
       LayerGroup::addLayerGroup);
     menu.addMenuItem("group", new AddFileLayerAction());
   }

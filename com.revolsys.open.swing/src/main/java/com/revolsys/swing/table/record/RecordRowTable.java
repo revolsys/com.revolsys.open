@@ -1,8 +1,9 @@
-package com.revolsys.swing.table.record.row;
+package com.revolsys.swing.table.record;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -13,10 +14,13 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import org.slf4j.LoggerFactory;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.layer.record.table.predicate.ErrorPredicate;
 import com.revolsys.swing.map.layer.record.table.predicate.ModifiedAttributePredicate;
@@ -26,9 +30,30 @@ import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
 import com.revolsys.swing.table.record.renderer.RecordRowTableCellRenderer;
+import com.revolsys.swing.tree.TreeNodes;
 
 public class RecordRowTable extends BaseJTable implements MouseListener {
   private static final long serialVersionUID = 1L;
+
+  public static <V extends Record> EnableCheck enableCheck(final Predicate<V> filter) {
+    if (filter == null) {
+      return null;
+    } else {
+      return () -> {
+        final V node = getEventRecord();
+        if (node == null) {
+          return false;
+        } else {
+          try {
+            return filter.test(node);
+          } catch (final Throwable e) {
+            LoggerFactory.getLogger(TreeNodes.class).debug("Exception processing enable check", e);
+            return false;
+          }
+        }
+      };
+    }
+  }
 
   public static <V extends Record> V getEventRecord() {
     final RecordRowTable table = TablePanel.getEventTable();

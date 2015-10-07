@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
@@ -20,11 +21,9 @@ import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.map.form.RecordStoreConnectionDialog;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.TreeNodeAction;
-import com.revolsys.swing.tree.TreeNodePropertyEnableCheck;
+import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.util.OS;
@@ -36,15 +35,15 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
   private static final MenuFactory MENU = new MenuFactory("Record Store Connection");
 
   static {
-    final EnableCheck notReadOnly = new TreeNodePropertyEnableCheck("readOnly", false);
     addRefreshMenuItem(MENU);
 
+    final Predicate<RecordStoreConnectionTreeNode> editableFilter = RecordStoreConnectionTreeNode::isEditable;
     if (OS.isMac()) {
-      TreeNodeAction.addMenuItem(MENU, "default", "Edit Connection", "database_edit", notReadOnly,
-        RecordStoreConnectionTreeNode::editConnection);
+      TreeNodes.addMenuItem(MENU, "default", "Edit Connection", "database_edit",
+        editableFilter, RecordStoreConnectionTreeNode::editConnection);
     }
-    TreeNodeAction.addMenuItem(MENU, "default", "Delete Record Store Connection", "database_delete",
-      notReadOnly, RecordStoreConnectionTreeNode::deleteConnection);
+    TreeNodes.addMenuItem(MENU, "default", "Delete Record Store Connection", "database_delete",
+      editableFilter, RecordStoreConnectionTreeNode::deleteConnection);
   }
 
   public static List<BaseTreeNode> getChildren(final Map<String, Object> connectionMap,
@@ -140,9 +139,12 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
     return Collections.<String, Object> singletonMap("name", getName());
   }
 
+  public boolean isEditable() {
+    return !isReadOnly();
+  }
+
   public boolean isReadOnly() {
     final RecordStoreConnection connection = getConnection();
     return connection.isReadOnly();
   }
-
 }

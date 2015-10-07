@@ -14,7 +14,7 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.RecordStoreLayer;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.TreeNodeAction;
+import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.util.CaseConverter;
 
@@ -33,7 +33,7 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
     }
     ICONS_GEOMETRY.put("GeometryCollection", Icons.getIcon("table_geometry"));
 
-    TreeNodeAction.addMenuItem(MENU, "default", "Add Layer", "map_add",
+    TreeNodes.addMenuItem(MENU, "default", "Add Layer", "map_add",
       RecordStoreTableTreeNode::addLayer);
   }
 

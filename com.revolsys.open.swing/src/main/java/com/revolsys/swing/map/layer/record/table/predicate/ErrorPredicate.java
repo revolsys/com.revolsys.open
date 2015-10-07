@@ -10,8 +10,8 @@ import org.jdesktop.swingx.decorator.Highlighter;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.record.Record;
+import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
-import com.revolsys.swing.table.record.row.RecordRowTable;
 
 public class ErrorPredicate implements HighlightPredicate {
 

@@ -19,7 +19,7 @@ import com.revolsys.record.comparator.RecordFieldComparator;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.table.TablePanel;
-import com.revolsys.swing.table.record.row.RecordRowTable;
+import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.util.Reorderable;
 
 public class RecordListTableModel extends RecordRowTableModel implements Reorderable {

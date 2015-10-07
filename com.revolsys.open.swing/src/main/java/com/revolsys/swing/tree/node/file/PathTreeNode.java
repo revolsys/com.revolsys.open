@@ -37,14 +37,11 @@ import com.revolsys.record.io.RecordStoreFactoryRegistry;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.enablecheck.AndEnableCheck;
-import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.TreeNodeAction;
-import com.revolsys.swing.tree.TreeNodePropertyEnableCheck;
+import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.record.PathRecordStoreTreeNode;
@@ -80,16 +77,13 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
   private static final MenuFactory MENU = new MenuFactory("File");
 
   static {
-    final EnableCheck isDirectory = new TreeNodePropertyEnableCheck("directory");
-    final EnableCheck isFileLayer = new TreeNodePropertyEnableCheck("fileLayer");
-
     addRefreshMenuItem(MENU);
 
-    TreeNodeAction.addMenuItem(MENU, "default", "Add Layer", "map_add", isFileLayer,
+    TreeNodes.addMenuItem(MENU, "default", "Add Layer", "map_add", PathTreeNode::isFileLayer,
       PathTreeNode::addLayer);
 
-    TreeNodeAction.addMenuItem(MENU, "default", "Add Folder Connection", "link_add",
-      new AndEnableCheck(isDirectory, NODE_EXISTS), PathTreeNode::addFolderConnection);
+    TreeNodes.addMenuItem(MENU, "default", "Add Folder Connection", "link_add",
+      PathTreeNode::isDirectory, PathTreeNode::addFolderConnection);
   }
 
   public static void addPathNode(final List<BaseTreeNode> children, final Path path,
@@ -380,8 +374,12 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
   }
 
   public boolean isDirectory() {
-    final Path path = getPath();
-    return Files.isDirectory(path);
+    if (isExists()) {
+      final Path path = getPath();
+      return Files.isDirectory(path);
+    } else {
+      return false;
+    }
   }
 
   @Override
@@ -390,16 +388,17 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
   }
 
   public boolean isFileLayer() {
-    final Path path = getPath();
-    if (!this.hasFile) {
-      return false;
-    } else if (IoFactory.hasFactory(GeoreferencedImageFactory.class, path)) {
-      return true;
-    } else if (IoFactory.hasFactory(RecordReaderFactory.class, path)) {
-      return true;
-    } else {
-      return false;
+    if (isExists()) {
+      final Path path = getPath();
+      if (!this.hasFile) {
+        return false;
+      } else if (IoFactory.hasFactory(GeoreferencedImageFactory.class, path)) {
+        return true;
+      } else if (IoFactory.hasFactory(RecordReaderFactory.class, path)) {
+        return true;
+      }
     }
+    return false;
   }
 
   public boolean isHasFile() {

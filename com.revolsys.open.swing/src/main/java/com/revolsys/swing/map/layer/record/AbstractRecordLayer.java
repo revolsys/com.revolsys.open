@@ -78,8 +78,6 @@ import com.revolsys.spring.resource.ByteArrayResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.enablecheck.AndEnableCheck;
-import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.BaseDialog;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
@@ -115,8 +113,7 @@ import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
 import com.revolsys.swing.map.overlay.CloseLocation;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.MenuSourceAction;
-import com.revolsys.swing.menu.MenuSourcePropertyEnableCheck;
+import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.tree.node.record.RecordStoreTableTreeNode;
@@ -142,52 +139,46 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     menu.addGroup(2, "edit");
     menu.addGroup(3, "dnd");
 
-    final EnableCheck exists = new MenuSourcePropertyEnableCheck("exists");
+    final Predicate<AbstractRecordLayer> exists = AbstractRecordLayer::isExists;
 
-    MenuSourceAction.<AbstractRecordLayer> addMenuItem(menu, "table", "View Records", "table_go",
-      exists, AbstractRecordLayer::showRecordsTable);
+    Menus.addMenuItem(menu, "table", "View Records", "table_go", exists,
+      AbstractRecordLayer::showRecordsTable);
 
-    final EnableCheck hasSelectedRecords = new MenuSourcePropertyEnableCheck("hasSelectedRecords");
-    final EnableCheck hasGeometry = new MenuSourcePropertyEnableCheck("hasGeometry");
-    MenuSourceAction.<AbstractRecordLayer> addMenuItem(menu, "zoom", "Zoom to Selected",
-      "magnifier_zoom_selected", new AndEnableCheck(exists, hasGeometry, hasSelectedRecords),
-      AbstractRecordLayer::zoomToSelected);
+    final Predicate<AbstractRecordLayer> hasSelectedRecords = AbstractRecordLayer::isHasSelectedRecords;
+    Menus.addMenuItem(menu, "zoom", "Zoom to Selected", "magnifier_zoom_selected",
+      hasSelectedRecords, AbstractRecordLayer::zoomToSelected);
 
-    final EnableCheck editable = new MenuSourcePropertyEnableCheck("editable");
-    final EnableCheck readonly = new MenuSourcePropertyEnableCheck("readOnly", false);
-    final EnableCheck hasChanges = new MenuSourcePropertyEnableCheck("hasChanges");
-    final EnableCheck canAdd = new MenuSourcePropertyEnableCheck("canAddRecords");
-    final EnableCheck canDelete = new MenuSourcePropertyEnableCheck("canDeleteRecords");
-    final EnableCheck canMergeRecords = new MenuSourcePropertyEnableCheck("canMergeRecords");
-    final EnableCheck canPaste = new MenuSourcePropertyEnableCheck("canPaste");
+    final Predicate<AbstractRecordLayer> notReadOnly = ((Predicate<AbstractRecordLayer>)AbstractRecordLayer::isReadOnly)
+      .negate();
+    final Predicate<AbstractRecordLayer> canAdd = AbstractRecordLayer::isCanAddRecords;
 
-    MenuSourceAction.<AbstractRecordLayer> addCheckboxMenuItem(menu, "edit", "Editable", "pencil",
-      readonly, AbstractRecordLayer::toggleEditable, editable);
+    Menus.addCheckboxMenuItem(menu, "edit", "Editable", "pencil", notReadOnly,
+      AbstractRecordLayer::toggleEditable, AbstractRecordLayer::isEditable);
 
-    MenuSourceAction.<AbstractRecordLayer> addMenuItem(menu, "edit", "Save Changes", "table_save",
-      hasChanges, AbstractRecordLayer::saveChanges);
+    Menus.addMenuItem(menu, "edit", "Save Changes", "table_save", AbstractLayer::isHasChanges,
+      AbstractLayer::saveChanges);
 
-    MenuSourceAction.<AbstractRecordLayer> addMenuItem(menu, "edit", "Cancel Changes",
-      "table_cancel", hasChanges, AbstractRecordLayer::cancelChanges);
+    Menus.addMenuItem(menu, "edit", "Cancel Changes", "table_cancel", AbstractLayer::isHasChanges,
+      AbstractRecordLayer::cancelChanges);
 
-    MenuSourceAction.<AbstractRecordLayer> addMenuItem(menu, "edit", "Add New Record",
-      "table_row_insert", canAdd, AbstractRecordLayer::addNewRecord);
+    Menus.addMenuItem(menu, "edit", "Add New Record", "table_row_insert", canAdd,
+      AbstractRecordLayer::addNewRecord);
 
-    MenuSourceAction.<AbstractRecordLayer> addMenuItem(menu, "edit", "Delete Selected Records",
-      "table_row_delete", new AndEnableCheck(hasSelectedRecords, canDelete),
+    Menus.addMenuItem(menu, "edit", "Delete Selected Records", "table_row_delete",
+      hasSelectedRecords.and(AbstractRecordLayer::isCanDeleteRecords),
       AbstractRecordLayer::deleteSelectedRecords);
 
-    MenuSourceAction.<AbstractRecordLayer> addMenuItem(menu, "edit", "Merge Selected Records",
-      "shape_group", canMergeRecords, AbstractRecordLayer::mergeSelectedRecords);
+    Menus.addMenuItem(menu, "edit", "Merge Selected Records", "shape_group",
+      AbstractRecordLayer::isCanMergeRecords, AbstractRecordLayer::mergeSelectedRecords);
 
-    MenuSourceAction.<AbstractRecordLayer> addMenuItem(menu, "dnd", "Copy Selected Records",
-      "page_copy", hasSelectedRecords, AbstractRecordLayer::copySelectedRecords);
+    Menus.addMenuItem(menu, "dnd", "Copy Selected Records", "page_copy", hasSelectedRecords,
+      AbstractRecordLayer::copySelectedRecords);
 
-    MenuSourceAction.<AbstractRecordLayer> addMenuItem(menu, "dnd", "Paste New Records",
-      "paste_plain", new AndEnableCheck(canAdd, canPaste), AbstractRecordLayer::pasteRecords);
+    Menus.addMenuItem(menu, "dnd", "Paste New Records", "paste_plain",
+      canAdd.and(AbstractRecordLayer::isCanPaste), AbstractRecordLayer::pasteRecords);
 
-    MenuSourceAction.<AbstractRecordLayer> addMenuItem(menu, "layer", 0, "Layer Style", "palette",
-      new AndEnableCheck(exists, hasGeometry),
+    Menus.addMenuItem(menu, "layer", 0, "Layer Style", "palette",
+      AbstractRecordLayer::isHasGeometry,
       (final AbstractRecordLayer layer) -> layer.showProperties("Style"));
 
     // menu.addMenuItem("edit", 0,
@@ -530,9 +521,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public boolean canPasteRecordGeometry(final LayerRecord record) {
-    final Geometry geometry = getPasteRecordGeometry(record, false);
-
-    return geometry != null;
+    if (isEditable()) {
+      final Geometry geometry = getPasteRecordGeometry(record, false);
+      return geometry != null;
+    } else {
+      return false;
+    }
   }
 
   protected void cleanCachedRecords() {
@@ -1703,7 +1697,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   @Override
   public boolean isHasSelectedRecords() {
-    return isHasCachedRecords(this.cacheIdSelected);
+    return isExists() && isHasGeometry() && isHasCachedRecords(this.cacheIdSelected);
   }
 
   public boolean isHidden(final LayerRecord record) {

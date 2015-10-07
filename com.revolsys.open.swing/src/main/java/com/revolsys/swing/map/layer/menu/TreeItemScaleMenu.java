@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.menu;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
@@ -10,7 +11,6 @@ import javax.swing.JMenu;
 import javax.swing.SwingConstants;
 
 import com.revolsys.swing.action.RunnableAction;
-import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.component.MapScale;
@@ -20,7 +20,7 @@ import com.revolsys.util.function.Function2;
 
 public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
 
-  private final EnableCheck enableCheck;
+  private final Predicate<T> enableCheck;
 
   private final Function<T, Long> getScaleFunction;
 
@@ -30,7 +30,7 @@ public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
 
   private final Function2<T, Long, ?> setScaleFunction;
 
-  public TreeItemScaleMenu(final boolean min, final EnableCheck enableCheck,
+  public TreeItemScaleMenu(final boolean min, final Predicate<T> enableCheck,
     final Function<T, Long> getScaleFunction, final Function2<T, Long, ?> setScaleFunction) {
     this.min = min;
     this.enableCheck = enableCheck;
@@ -62,6 +62,7 @@ public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
     menu.add(menuItem);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public TreeItemScaleMenu<T> clone() {
     try {
@@ -78,8 +79,8 @@ public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
   @Override
   public JMenu createComponent() {
     final JMenu menu = new JMenu(this.name);
-    if (this.enableCheck == null || this.enableCheck.isEnabled()) {
-      final T object = MenuFactory.getMenuSource();
+    final T object = MenuFactory.getMenuSource();
+    if (this.enableCheck == null || this.enableCheck.test(object)) {
       long layerScale = this.getScaleFunction.apply(object);
       if (layerScale == Long.MAX_VALUE) {
         layerScale = 0;

@@ -14,7 +14,7 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.record.RecordState;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
-import com.revolsys.swing.table.record.row.RecordRowTable;
+import com.revolsys.swing.table.record.RecordRowTable;
 
 public class NewPredicate implements HighlightPredicate {
 

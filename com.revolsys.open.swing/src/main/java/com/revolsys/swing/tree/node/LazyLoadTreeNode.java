@@ -8,12 +8,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.BaseTreeNodeLoadingIcon;
-import com.revolsys.swing.tree.TreeNodeAction;
+import com.revolsys.swing.tree.TreeNodes;
 
 public abstract class LazyLoadTreeNode extends BaseTreeNode {
   public static void addRefreshMenuItem(final MenuFactory menu) {
-    TreeNodeAction.addMenuItem(menu, "default", "Refresh", "arrow_refresh",
-      LazyLoadTreeNode::refresh);
+    TreeNodes.addMenuItem(menu, "default", "Refresh", "arrow_refresh", LazyLoadTreeNode::refresh);
   }
 
   private List<BaseTreeNode> children = Collections.emptyList();
@@ -103,9 +102,7 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
   }
 
   public final void refresh() {
-    Invoke.background("Refresh tree nodes " + this.getName(), () -> {
-      doRefresh();
-    });
+    Invoke.background("Refresh tree nodes " + this.getName(), this::doRefresh);
   }
 
   public final void removeNode(final BaseTreeNode node) {

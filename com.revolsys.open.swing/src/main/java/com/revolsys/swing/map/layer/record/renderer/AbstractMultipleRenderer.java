@@ -4,16 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import com.revolsys.equals.Equals;
 import com.revolsys.io.map.MapSerializerUtil;
-import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.MenuSourceAction;
-import com.revolsys.swing.menu.MenuSourcePropertyEnableCheck;
+import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -40,15 +39,18 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
     final Consumer<AbstractMultipleRenderer> consumer) {
     final String iconName = ("style_" + type + "_add").toLowerCase();
     final String name = "Add " + type + " Style";
-    MenuSourceAction.addMenuItem(menu, "add", name, iconName, consumer);
+    Menus.addMenuItem(menu, "add", name, iconName, consumer);
   }
 
   protected static void addConvertMenuItem(final MenuFactory menu, final String type,
     final Class<?> rendererClass, final Consumer<AbstractMultipleRenderer> consumer) {
     final String iconName = ("style_" + type + "_go").toLowerCase();
-    final EnableCheck enableCheck = new MenuSourcePropertyEnableCheck("class", rendererClass, true);
+    final Predicate<AbstractMultipleRenderer> enabledFilter = (
+      final AbstractMultipleRenderer renderer) -> {
+      return renderer.getClass() != rendererClass;
+    };
     final String name = "Convert to " + type + " Style";
-    MenuSourceAction.addMenuItem(menu, "convert", name, iconName, enableCheck, consumer);
+    Menus.addMenuItem(menu, "convert", name, iconName, enabledFilter, consumer);
   }
 
   private List<AbstractRecordLayerRenderer> renderers = new ArrayList<AbstractRecordLayerRenderer>();

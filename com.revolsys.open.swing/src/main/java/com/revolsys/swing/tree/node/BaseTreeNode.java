@@ -27,10 +27,8 @@ import com.revolsys.collection.iterator.IteratorEnumeration;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.equals.Equals;
 import com.revolsys.swing.Icons;
-import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.swing.tree.TreeNodePropertyEnableCheck;
 import com.revolsys.swing.tree.dnd.TreePathListTransferable;
 import com.revolsys.swing.tree.dnd.TreeTransferHandler;
 import com.revolsys.util.ExceptionUtil;
@@ -38,9 +36,6 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyChangeListener {
-
-  public static final EnableCheck NODE_EXISTS = new TreeNodePropertyEnableCheck("exists");
-
   @SuppressWarnings("unchecked")
   public static <V> V getUserData(final TreePath path) {
     Object value = path.getLastPathComponent();

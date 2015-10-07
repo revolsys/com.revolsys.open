@@ -18,7 +18,7 @@ import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.field.Slider;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.MenuSourceAction;
+import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.NumberTableCellRenderer;
 import com.revolsys.swing.table.TablePanel;
@@ -69,7 +69,7 @@ public class TiePointsPanel extends TablePanel implements PropertyChangeListener
         () -> menuFactory.show(layer, this, 10, 10));
     }
 
-    MenuSourceAction.<GeoreferencedImageLayer> addMenuItem(menu, "zoom", "Zoom to Layer",
+    Menus.<GeoreferencedImageLayer> addMenuItem(menu, "zoom", "Zoom to Layer",
       "magnifier", GeoreferencedImageLayer::zoomToLayer);
 
     toolBar.addButton("zoom", "Zoom to Layer", "magnifier", (EnableCheck)null, layer::zoomToLayer);

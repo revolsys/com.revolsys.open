@@ -25,8 +25,7 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.SqlLayerFilter;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.MenuSourceAction;
-import com.revolsys.swing.menu.MenuSourcePropertyEnableCheck;
+import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -46,12 +45,12 @@ public abstract class AbstractRecordLayerRenderer
 
     final MenuFactory menu = MenuFactory.getMenu(AbstractRecordLayerRenderer.class);
 
-    MenuSourceAction.<AbstractRecordLayerRenderer> addMenuItem(menu, "layer", "View/Edit Style",
-      "palette", new MenuSourcePropertyEnableCheck("editing", false),
+    Menus.addMenuItem(menu, "layer", "View/Edit Style", "palette",
+      ((Predicate<AbstractRecordLayerRenderer>)AbstractRecordLayerRenderer::isEditing).negate(),
       AbstractRecordLayerRenderer::showProperties);
 
-    MenuSourceAction.<AbstractRecordLayerRenderer> addMenuItem(menu, "layer", "Delete", "delete",
-      new MenuSourcePropertyEnableCheck("parent", null, true), AbstractRecordLayerRenderer::delete);
+    Menus.addMenuItem(menu, "layer", "Delete", "delete", AbstractRecordLayerRenderer::isHasParent,
+      AbstractRecordLayerRenderer::delete);
 
     menu.addComponentFactory("scale", new TreeItemScaleMenu<AbstractRecordLayerRenderer>(true, null,
       AbstractRecordLayerRenderer::getMinimumScale, AbstractRecordLayerRenderer::setMinimumScale));
@@ -60,16 +59,14 @@ public abstract class AbstractRecordLayerRenderer
         AbstractRecordLayerRenderer::getMaximumScale,
         AbstractRecordLayerRenderer::setMaximumScale));
 
-    MenuSourceAction.<AbstractRecordLayerRenderer> addMenuItem(menu, "wrap",
-      "Wrap With Multiple Style", "style_multiple_wrap",
+    Menus.addMenuItem(menu, "wrap", "Wrap With Multiple Style", "style_multiple_wrap",
       AbstractRecordLayerRenderer::wrapWithMultipleStyle);
 
-    MenuSourceAction.<AbstractRecordLayerRenderer> addMenuItem(menu, "wrap",
-      "Wrap With Filter Style", "style_filter_wrap",
+    Menus.addMenuItem(menu, "wrap", "Wrap With Filter Style", "style_filter_wrap",
       AbstractRecordLayerRenderer::wrapWithFilterStyle);
 
-    MenuSourceAction.<AbstractRecordLayerRenderer> addMenuItem(menu, "wrap",
-      "Wrap With Scale Style", "style_scale_wrap", AbstractRecordLayerRenderer::wrapWithScaleStyle);
+    Menus.addMenuItem(menu, "wrap", "Wrap With Scale Style", "style_scale_wrap",
+      AbstractRecordLayerRenderer::wrapWithScaleStyle);
   }
 
   public static void addRendererClass(final String name,
@@ -188,6 +185,10 @@ public abstract class AbstractRecordLayerRenderer
     } catch (final Throwable e) {
       return false;
     }
+  }
+
+  public boolean isHasParent() {
+    return getParent() != null;
   }
 
   public boolean isVisible(final LayerRecord record) {

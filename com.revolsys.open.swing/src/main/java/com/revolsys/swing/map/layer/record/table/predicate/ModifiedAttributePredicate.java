@@ -18,8 +18,8 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
-import com.revolsys.swing.table.record.row.RecordRowTable;
 
 public class ModifiedAttributePredicate implements HighlightPredicate {
   public static void add(final RecordRowTable table) {

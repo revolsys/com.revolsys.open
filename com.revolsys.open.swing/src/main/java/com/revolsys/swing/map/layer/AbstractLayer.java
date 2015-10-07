@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Predicate;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -54,7 +55,6 @@ import com.revolsys.swing.Borders;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.Panels;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
@@ -67,8 +67,7 @@ import com.revolsys.swing.map.ProjectFramePanel;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.MenuSourceAction;
-import com.revolsys.swing.menu.MenuSourceCallableEnableCheck;
+import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.ExceptionUtil;
@@ -88,27 +87,25 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   static {
     final MenuFactory menu = MenuFactory.getMenu(AbstractLayer.class);
 
-    MenuSourceAction.<AbstractLayer> addMenuItem(menu, "zoom", "Zoom to Layer", "magnifier",
-      new MenuSourceCallableEnableCheck<>(AbstractLayer::isZoomToLayerEnabled),
-      AbstractLayer::zoomToLayer);
+    Menus.addMenuItem(menu, "zoom", "Zoom to Layer", "magnifier",
+      AbstractLayer::isZoomToLayerEnabled, AbstractLayer::zoomToLayer);
 
-    final EnableCheck hasGeometry = new MenuSourceCallableEnableCheck<>(
-      AbstractLayer::isHasGeometry);
+    final Predicate<AbstractLayer> hasGeometry = AbstractLayer::isHasGeometry;
     menu.addComponentFactory("scale", new TreeItemScaleMenu<AbstractLayer>(true, hasGeometry,
       AbstractLayer::getMinimumScale, AbstractLayer::setMinimumScale));
     menu.addComponentFactory("scale", new TreeItemScaleMenu<AbstractLayer>(false, hasGeometry,
       AbstractLayer::getMaximumScale, AbstractLayer::setMaximumScale));
 
-    final EnableCheck exists = new MenuSourceCallableEnableCheck<>(AbstractLayer::isExists);
+    final Predicate<AbstractLayer> exists = AbstractLayer::isExists;
 
-    MenuSourceAction.<AbstractLayer> addMenuItem(menu, "refresh", "Refresh", "arrow_refresh",
-      exists, AbstractLayer::refreshAll);
+    Menus.<AbstractLayer> addMenuItem(menu, "refresh", "Refresh", "arrow_refresh", exists,
+      AbstractLayer::refreshAll);
 
-    MenuSourceAction.<AbstractLayer> addMenuItem(menu, "layer", "Delete", "delete",
+    Menus.<AbstractLayer> addMenuItem(menu, "layer", "Delete", "delete",
       AbstractLayer::deleteWithConfirm);
 
-    MenuSourceAction.<AbstractLayer> addMenuItem(menu, "layer", "Layer Properties", "information",
-      exists, AbstractLayer::showProperties);
+    Menus.<AbstractLayer> addMenuItem(menu, "layer", "Layer Properties", "information", exists,
+      AbstractLayer::showProperties);
   }
 
   private PropertyChangeListener beanPropertyListener = new BeanPropertyListener(this);

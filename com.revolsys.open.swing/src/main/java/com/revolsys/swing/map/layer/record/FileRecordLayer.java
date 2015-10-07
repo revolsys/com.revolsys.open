@@ -20,7 +20,7 @@ import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.MenuSourceAction;
+import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
@@ -29,7 +29,7 @@ public class FileRecordLayer extends ListRecordLayer {
   static {
     final Class<AbstractRecordLayer> clazz = AbstractRecordLayer.class;
     final MenuFactory menu = MenuFactory.getMenu(clazz);
-    MenuSourceAction.<FileRecordLayer> addMenuItem(menu, "refresh", "Reload from File",
+    Menus.<FileRecordLayer> addMenuItem(menu, "refresh", "Reload from File",
       Icons.getIconWithBadge("page", "refresh"), FileRecordLayer::revert);
   }
 

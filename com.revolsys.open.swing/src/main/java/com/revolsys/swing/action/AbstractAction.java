@@ -17,6 +17,7 @@ import com.revolsys.swing.menu.Button;
 import com.revolsys.swing.menu.CheckBoxMenuItem;
 import com.revolsys.swing.menu.ToggleButton;
 import com.revolsys.util.OS;
+import com.revolsys.util.Property;
 
 public abstract class AbstractAction extends javax.swing.AbstractAction {
   private static final long serialVersionUID = 1L;
@@ -151,12 +152,10 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
   }
 
   public void setEnableCheck(final EnableCheck enableCheck) {
-    if (this.enableCheck != null) {
-      this.enableCheck.removeListener("enabled", this.enabledListener);
-    }
+    Property.removeListener(this.enableCheck, "enabled", this.enabledListener);
     this.enableCheck = enableCheck;
     if (this.enableCheck != null) {
-      this.enableCheck.addListener("enabled", this.enabledListener);
+      Property.addListener(this.enableCheck, "enabled", this.enabledListener);
       final boolean enabled = enableCheck.isEnabled();
       firePropertyChange("enabled", !enabled, enabled);
     }

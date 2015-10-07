@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public abstract class MultiEnableCheck extends AbstractEnableCheck
   implements Iterable<EnableCheck> {
@@ -21,22 +20,6 @@ public abstract class MultiEnableCheck extends AbstractEnableCheck
 
   public MultiEnableCheck(final EnableCheck... enableChecks) {
     this(Arrays.asList(enableChecks));
-  }
-
-  @SuppressWarnings("unchecked")
-  public MultiEnableCheck(final Map<String, Object> config) {
-    final List<?> enableChecks = (List<?>)config.get("enableChecks");
-    if (enableChecks != null) {
-      for (final Object object : enableChecks) {
-        if (object instanceof Map) {
-          final Map<String, Object> subConfig = (Map<String, Object>)object;
-          final EnableCheck enableCheck = AbstractEnableCheck.enableCheck(subConfig);
-          if (enableCheck != null) {
-            this.enableChecks.add(enableCheck);
-          }
-        }
-      }
-    }
   }
 
   public List<EnableCheck> getEnableChecks() {

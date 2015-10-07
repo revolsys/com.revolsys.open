@@ -15,8 +15,8 @@ import com.revolsys.swing.map.layer.record.table.predicate.MergedRecordPredicate
 import com.revolsys.swing.map.layer.record.table.predicate.MergedValuePredicate;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.TablePanel;
+import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.swing.table.record.model.RecordListTableModel;
-import com.revolsys.swing.table.record.row.RecordRowTable;
 
 public class MergedRecordsTableModel extends RecordListTableModel
   implements SortableTableModel, ListSelectionListener {

@@ -25,7 +25,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.TreeNodeAction;
+import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.Property;
@@ -37,8 +37,8 @@ public class PathRecordStoreTreeNode extends PathTreeNode
   static {
     addRefreshMenuItem(MENU);
 
-    TreeNodeAction.addMenuItem(MENU, "default", "Add Record Store Connection", "link_add",
-      NODE_EXISTS, PathRecordStoreTreeNode::addRecordStoreConnection);
+    TreeNodes.addMenuItem(MENU, "default", "Add Record Store Connection", "link_add",
+      PathRecordStoreTreeNode::isExists, PathRecordStoreTreeNode::addRecordStoreConnection);
   }
 
   public PathRecordStoreTreeNode(final Path path) {

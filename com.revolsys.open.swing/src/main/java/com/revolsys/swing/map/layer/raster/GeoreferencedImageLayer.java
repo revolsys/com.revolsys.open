@@ -4,6 +4,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.beans.PropertyChangeEvent;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import javax.swing.JOptionPane;
 
@@ -26,8 +27,6 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.enablecheck.AndEnableCheck;
-import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
@@ -35,8 +34,7 @@ import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.MenuSourceAction;
-import com.revolsys.swing.menu.MenuSourcePropertyEnableCheck;
+import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
@@ -48,23 +46,23 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     menu.addGroup(0, "table");
     menu.addGroup(2, "edit");
 
-    final EnableCheck readonly = new MenuSourcePropertyEnableCheck("readOnly", false);
-    final EnableCheck editable = new MenuSourcePropertyEnableCheck("editable");
-    final EnableCheck showOriginalImage = new MenuSourcePropertyEnableCheck("showOriginalImage");
-    final EnableCheck hasTransform = new MenuSourcePropertyEnableCheck("hasTransform");
+    final Predicate<GeoreferencedImageLayer> notReadOnly = ((Predicate<GeoreferencedImageLayer>)GeoreferencedImageLayer::isReadOnly)
+      .negate();
+    final Predicate<GeoreferencedImageLayer> editable = GeoreferencedImageLayer::isEditable;
 
-    MenuSourceAction.<GeoreferencedImageLayer> addMenuItem(menu, "table", "View Tie-Points",
-      "table_go", GeoreferencedImageLayer::showTiePointsTable);
+    Menus.<GeoreferencedImageLayer> addMenuItem(menu, "table", "View Tie-Points", "table_go",
+      GeoreferencedImageLayer::showTiePointsTable);
 
-    MenuSourceAction.<GeoreferencedImageLayer> addCheckboxMenuItem(menu, "edit", "Editable",
-      "pencil", readonly, GeoreferencedImageLayer::toggleEditable, editable);
+    Menus.<GeoreferencedImageLayer> addCheckboxMenuItem(menu, "edit", "Editable", "pencil",
+      notReadOnly, GeoreferencedImageLayer::toggleEditable, editable);
 
-    MenuSourceAction.<GeoreferencedImageLayer> addCheckboxMenuItem(menu, "edit",
-      "Show Original Image", (String)null, new AndEnableCheck(editable, hasTransform),
-      GeoreferencedImageLayer::toggleShowOriginalImage, showOriginalImage);
+    Menus.<GeoreferencedImageLayer> addCheckboxMenuItem(menu, "edit", "Show Original Image",
+      (String)null, editable.and(GeoreferencedImageLayer::isHasTransform),
+      GeoreferencedImageLayer::toggleShowOriginalImage,
+      GeoreferencedImageLayer::isShowOriginalImage);
 
-    MenuSourceAction.<GeoreferencedImageLayer> addMenuItem(menu, "edit", "Fit to Screen",
-      "arrow_out", editable, GeoreferencedImageLayer::fitToViewport);
+    Menus.<GeoreferencedImageLayer> addMenuItem(menu, "edit", "Fit to Screen", "arrow_out",
+      editable, GeoreferencedImageLayer::fitToViewport);
 
     menu.deleteMenuItem("refresh", "Refresh");
   }

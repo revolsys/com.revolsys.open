@@ -11,7 +11,7 @@ import com.revolsys.equals.Equals;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
 import com.revolsys.swing.map.layer.record.table.model.MergedRecordsTableModel;
-import com.revolsys.swing.table.record.row.RecordRowTable;
+import com.revolsys.swing.table.record.RecordRowTable;
 
 public class MergedValuePredicate implements HighlightPredicate {
 

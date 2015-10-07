@@ -56,8 +56,8 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.filter.ContainsFilter;
 import com.revolsys.swing.table.filter.EqualFilter;
+import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
-import com.revolsys.swing.table.record.row.RecordRowTable;
 import com.revolsys.swing.table.selection.NullSelectionModel;
 import com.revolsys.util.Property;
 
