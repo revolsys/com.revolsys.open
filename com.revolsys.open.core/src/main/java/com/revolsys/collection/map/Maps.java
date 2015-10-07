@@ -103,6 +103,11 @@ public interface Maps {
     }
   }
 
+  static <K, V> MapBuilder<K, V> buildLinkedHash() {
+    final LinkedHashMap<K, V> map = new LinkedHashMap<>();
+    return new MapBuilder<>(map);
+  }
+
   static <V> boolean collectionContains(final Map<Object, Collection<V>> map, final Object key,
     final V value) {
     if (map == null) {
@@ -131,22 +136,6 @@ public interface Maps {
     final K2 key2) {
     final Map<K2, V> mapValue = getMap(map, key1);
     return mapValue.containsKey(key2);
-  }
-
-  static <K, V> Map<K, V> create(final K key, final V value) {
-    final Map<K, V> map = new LinkedHashMap<>();
-    map.put(key, value);
-    return map;
-  }
-
-  static <T1, T2> Map<T1, T2> createMap(final List<T1> sourceValues, final List<T2> targetValues) {
-    final Map<T1, T2> map = new HashMap<T1, T2>();
-    for (int i = 0; i < sourceValues.size() && i < targetValues.size(); i++) {
-      final T1 sourceValue = sourceValues.get(i);
-      final T2 targetValue = targetValues.get(i);
-      map.put(sourceValue, targetValue);
-    }
-    return map;
   }
 
   static <T> Integer decrementCount(final Map<T, Integer> counts, final T key) {
@@ -577,6 +566,23 @@ public interface Maps {
       copy.putAll(map);
     }
     return copy;
+  }
+
+  static <K, V> Map<K, V> newLinkedHash(final K key, final V value) {
+    final Map<K, V> map = new LinkedHashMap<>();
+    map.put(key, value);
+    return map;
+  }
+
+  static <T1, T2> Map<T1, T2> newLinkedHash(final List<T1> sourceValues,
+    final List<T2> targetValues) {
+    final Map<T1, T2> map = new LinkedHashMap<T1, T2>();
+    for (int i = 0; i < sourceValues.size() && i < targetValues.size(); i++) {
+      final T1 sourceValue = sourceValues.get(i);
+      final T2 targetValue = targetValues.get(i);
+      map.put(sourceValue, targetValue);
+    }
+    return map;
   }
 
   static <K, V> Map<K, V> newLinkedHash(final Map<K, ? extends V> map) {

@@ -2626,7 +2626,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void showRecordsTable(final String fieldFilterMode) {
     Invoke.later(() -> {
-      final Map<String, Object> config = Maps.create("fieldFilterMode", fieldFilterMode);
+      final Map<String, Object> config = Maps.newLinkedHash("fieldFilterMode", fieldFilterMode);
       showTableView(config);
     });
   }

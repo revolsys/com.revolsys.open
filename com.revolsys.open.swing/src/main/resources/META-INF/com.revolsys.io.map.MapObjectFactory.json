@@ -2,18 +2,6 @@
   "factories": 
   [
     {
-      "typeName": "andEnableCheck",
-      "description": "And Enable Check",
-      "typeClass": "com.revolsys.swing.action.enablecheck.AndEnableCheck",
-      "methodName": "create"
-    },
-    {
-      "typeName": "orEnableCheck",
-      "description": "Or Enable Check",
-      "typeClass": "com.revolsys.swing.action.enablecheck.OrEnableCheck",
-      "methodName": "create"
-    },
-    {
       "typeName": "layerGroup",
       "description": "Layer Group",
       "typeClass": "com.revolsys.swing.map.layer.LayerGroup",

@@ -278,6 +278,10 @@ public class RecordLayerTablePanel extends TablePanel
     return this.layer;
   }
 
+  public RecordDefinition getRecordDefinition() {
+    return this.layer.getRecordDefinition();
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public RecordLayerTable getTable() {
@@ -357,11 +361,7 @@ public class RecordLayerTablePanel extends TablePanel
       }
       menu.addComponentFactory("record", 2, editMenu);
     }
-    return layerMenuFactory;
-  }
-
-  public RecordDefinition getRecordDefinition() {
-    return this.layer.getRecordDefinition();
+    return menu;
   }
 
   protected void initToolBar(final Map<String, Object> pluginConfig) {
