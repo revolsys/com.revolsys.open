@@ -315,8 +315,10 @@ public interface Point extends Punctual, Serializable {
           }
         }
       }
+      return true;
+    } else {
+      return false;
     }
-    return true;
   }
 
   default boolean equals(final Point point) {

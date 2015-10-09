@@ -37,10 +37,10 @@ public class RectanglePredicateSyntheticTest extends TestCase {
 
   private final GeometryFactory fact = GeometryFactory.floating3();
 
-  Geometry rect = this.rectEnv.toGeometry();
-
   BoundingBox rectEnv = new BoundingBoxDoubleGf(2, this.baseX, this.baseY,
     this.baseX + this.rectSize, this.baseY + this.rectSize);
+
+  Geometry rect = this.rectEnv.toGeometry();
 
   double rectSize = 20;
 
