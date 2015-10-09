@@ -40,6 +40,6 @@ package com.revolsys.geometry.model;
  * @author Martin Davis
  *
  */
-public interface Puntal extends Geometry {
+public interface Punctual extends Geometry {
 
 }

@@ -34,15 +34,16 @@ public interface Identifier {
       return null;
     } else if (value instanceof Long) {
       final long longValue = (Long)value;
-      final int intValue = (int)longValue;
-      if (longValue == intValue) {
-        return new IntegerIdentifier(intValue);
-      } else {
+      if (longValue < Integer.MIN_VALUE || longValue > Integer.MAX_VALUE) {
         return new LongIdentifier(longValue);
+      } else {
+        final int intValue = (int)longValue;
+        return new IntegerIdentifier(intValue);
       }
     } else if (Numbers.isPrimitiveIntegral(value)) {
       final Number number = (Number)value;
-      return new IntegerIdentifier(number.intValue());
+      int intValue = number.intValue();
+      return new IntegerIdentifier(intValue);
     } else if (value instanceof Identifier) {
       return (Identifier)value;
     } else if (value instanceof Collection) {

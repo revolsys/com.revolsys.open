@@ -73,7 +73,7 @@ public class ConformingDelaunayTriangulationBuilder {
     final List<Segment> constraintSegs) {
     for (final com.revolsys.geometry.model.segment.Segment segment : line.segments()) {
       constraintSegs
-        .add(new Segment(segment.getPoint(0).clonePoint(), segment.getPoint(1).clonePoint()));
+        .add(new Segment(segment.getPoint(0).newPointDouble(), segment.getPoint(1).newPointDouble()));
     }
   }
 

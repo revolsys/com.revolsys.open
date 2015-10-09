@@ -103,7 +103,7 @@ public class PreparedGeometryCollection extends AbstractGeometryCollection {
   public List<Point> getRepresentativePoints() {
     final List<Point> points = new ArrayList<Point>();
     for (final Vertex vertex : vertices()) {
-      points.add(vertex.clonePoint());
+      points.add(vertex.newPointDouble());
     }
     return points;
   }

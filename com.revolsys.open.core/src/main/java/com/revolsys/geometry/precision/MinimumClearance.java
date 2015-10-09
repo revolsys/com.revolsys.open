@@ -40,7 +40,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Puntal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
@@ -83,7 +83,7 @@ import com.revolsys.geometry.operation.distance.FacetSequenceTreeBuilder;
  * {@link Point}), the value of the minimum clearance
  * is {@link Double#MAX_VALUE}.
  * <p>
- * If G is a {@link Puntal} or {@link Lineal} geometry,
+ * If G is a {@link Punctual} or {@link Lineal} geometry,
  * then in fact no amount of perturbation
  * will render the geometry invalid.
  * In this case a Minimum Clearance is still computed

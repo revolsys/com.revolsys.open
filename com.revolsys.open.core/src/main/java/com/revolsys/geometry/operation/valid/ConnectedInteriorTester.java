@@ -74,7 +74,7 @@ public class ConnectedInteriorTester {
   public static Point findDifferentPoint(final LineString line, final Point point) {
     for (final Vertex vertex : line.vertices()) {
       if (!vertex.equals(point)) {
-        return vertex.clonePoint();
+        return vertex.newPointDouble();
       }
     }
     return null;
@@ -198,7 +198,7 @@ public class ConnectedInteriorTester {
   }
 
   private void visitInteriorRing(final LineString ring, final PlanarGraph graph) {
-    final Point pt0 = ring.getVertex(0).clonePoint();
+    final Point pt0 = ring.getVertex(0).newPointDouble();
     /**
      * Find first point in coord list different to initial point.
      * Need special check since the first point may be repeated.

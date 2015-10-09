@@ -259,7 +259,7 @@ public class CoordinateList extends ArrayList<Point> {
   public Object clone() {
     final CoordinateList clone = (CoordinateList)super.clone();
     for (int i = 0; i < this.size(); i++) {
-      clone.add(i, this.get(i).clonePoint());
+      clone.add(i, this.get(i).newPointDouble());
     }
     return clone;
   }

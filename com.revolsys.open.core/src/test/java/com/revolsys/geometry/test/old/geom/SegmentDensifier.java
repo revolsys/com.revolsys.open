@@ -25,7 +25,7 @@ public class SegmentDensifier {
 
     final LineString seq = this.inputLine;
 
-    this.newCoords.add(seq.getPoint(0).clonePoint());
+    this.newCoords.add(seq.getPoint(0).newPointDouble());
 
     for (int i = 0; i < seq.getVertexCount() - 1; i++) {
       final Point p0 = seq.getPoint(i);

@@ -33,8 +33,6 @@
 
 package com.revolsys.geometry.model;
 
-public interface Polygonal {
-  BoundingBox getBoundingBox();
-
+public interface Polygonal extends Geometry {
   Iterable<Polygon> polygons();
 }

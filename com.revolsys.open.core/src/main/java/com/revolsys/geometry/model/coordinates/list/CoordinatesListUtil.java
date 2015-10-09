@@ -277,7 +277,7 @@ public class CoordinatesListUtil {
       if (i > vertexCount) {
         break;
       }
-      coordinates.add(vertex.clonePoint());
+      coordinates.add(vertex.newPointDouble());
     }
     return coordinates.toArray(new Point[coordinates.size()]);
   }
@@ -363,13 +363,13 @@ public class CoordinatesListUtil {
         final Point midPoint = LineSegmentUtil.midPoint(precisionModel, node1, node2);
         if (!node1.equals(2, midPoint)) {
           if (movedNodes != null) {
-            movedNodes.put(node1.clonePoint(), midPoint);
+            movedNodes.put(node1.newPointDouble(), midPoint);
           }
           node1.move(midPoint);
         }
         if (!node2.equals(2, midPoint)) {
           if (movedNodes != null) {
-            movedNodes.put(node2.clonePoint(), midPoint);
+            movedNodes.put(node2.newPointDouble(), midPoint);
           }
           node2.move(midPoint);
         }

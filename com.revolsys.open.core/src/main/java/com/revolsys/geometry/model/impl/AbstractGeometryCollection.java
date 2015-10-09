@@ -32,29 +32,9 @@
  */
 package com.revolsys.geometry.model.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.algorithm.PointLocator;
-import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.Dimension;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
-import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Location;
-import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.segment.GeometryCollectionSegment;
-import com.revolsys.geometry.model.segment.Segment;
-import com.revolsys.geometry.model.vertex.GeometryCollectionVertex;
-import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.geometry.operation.distance.DistanceOp;
-import com.revolsys.io.Reader;
+import com.revolsys.util.WrappedException;
 
 /**
  * Models a collection of {@link Geometry}s of
@@ -63,41 +43,8 @@ import com.revolsys.io.Reader;
  *
  *@version 1.7
  */
-public abstract class AbstractGeometryCollection extends AbstractGeometry
-  implements GeometryCollection {
+public abstract class AbstractGeometryCollection implements GeometryCollection {
   private static final long serialVersionUID = -8159852648192400768L;
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <V extends Geometry> V appendVertex(final Point newPoint, final int... geometryId) {
-    if (newPoint == null || newPoint.isEmpty()) {
-      return (V)this;
-    } else if (geometryId.length > 0) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      if (isEmpty()) {
-        return newPoint.copy(geometryFactory);
-      } else {
-        final int partIndex = geometryId[0];
-        final int partCount = getGeometryCount();
-        if (partIndex >= 0 && partIndex < partCount) {
-          final int[] subId = new int[geometryId.length - 1];
-          System.arraycopy(geometryId, 1, subId, 0, subId.length);
-          final Geometry geometry = getGeometry(partIndex);
-          final Geometry newGeometry = geometry.appendVertex(newPoint, subId);
-
-          final List<Geometry> geometries = new ArrayList<>(getGeometries());
-          geometries.set(partIndex, newGeometry);
-          return (V)geometryFactory.geometryCollection(geometries);
-        } else {
-          throw new IllegalArgumentException(
-            "Part index must be between 0 and " + partCount + " not " + partIndex);
-        }
-      }
-    } else {
-      throw new IllegalArgumentException(
-        "Vertex id's for GeometryCollection must have length > 1. " + Arrays.toString(geometryId));
-    }
-  }
 
   /**
    * Creates and returns a full copy of this {@link GeometryCollection} object.
@@ -107,422 +54,65 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
    */
   @Override
   public AbstractGeometryCollection clone() {
-    final AbstractGeometryCollection gc = (AbstractGeometryCollection)super.clone();
-    return gc;
-  }
-
-  @Override
-  public int compareToSameClass(final Geometry geometry) {
-    final Set<Geometry> theseElements = new TreeSet<>(getGeometries());
-    final Set<Geometry> otherElements = new TreeSet<>(geometry.getGeometries());
-    return compare(theseElements, otherElements);
-  }
-
-  @Override
-  protected BoundingBox computeBoundingBox() {
-    BoundingBox envelope = new BoundingBoxDoubleGf(getGeometryFactory());
-    for (final Geometry geometry : geometries()) {
-      envelope = envelope.expandToInclude(geometry);
+    try {
+      return (AbstractGeometryCollection)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      throw new WrappedException(e);
     }
-    return envelope;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
-    final List<Geometry> geometries = new ArrayList<Geometry>();
-    for (final Geometry geometry : geometries()) {
-      geometries.add(geometry.copy(geometryFactory));
-    }
-    return (V)geometryFactory.geometryCollection(geometries);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <V extends Geometry> V deleteVertex(final int... vertexId) {
-    if (vertexId.length > 1) {
-      if (isEmpty()) {
-        throw new IllegalArgumentException("Cannot delete vertex for empty MultiPoint");
-      } else {
-        final int partIndex = vertexId[0];
-        final int partCount = getGeometryCount();
-        if (partIndex >= 0 && partIndex < partCount) {
-          final GeometryFactory geometryFactory = getGeometryFactory();
-
-          final int[] subId = new int[vertexId.length - 1];
-          System.arraycopy(vertexId, 1, subId, 0, subId.length);
-          final Geometry geometry = getGeometry(partIndex);
-          final Geometry newGeometry = geometry.deleteVertex(subId);
-
-          final List<Geometry> geometries = new ArrayList<>(getGeometries());
-          geometries.set(partIndex, newGeometry);
-          return (V)geometryFactory.geometryCollection(geometries);
-        } else {
-          throw new IllegalArgumentException(
-            "Part index must be between 0 and " + partCount + " not " + partIndex);
-        }
-      }
-    } else {
-      throw new IllegalArgumentException(
-        "Vertex id's for GeometryCollection must have length > 1. " + Arrays.toString(vertexId));
-    }
-  }
-
-  @Override
-  protected double doDistance(final Geometry geometry, final double terminateDistance) {
-    final DistanceOp distOp = new DistanceOp(this, geometry, terminateDistance);
-    final double distance = distOp.distance();
-    return distance;
-  }
-
-  @Override
-  protected boolean doEquals(final int axisCount, final Geometry geometry) {
-    final int geometryCount1 = getGeometryCount();
-    final int geometryCount2 = geometry.getGeometryCount();
-    if (geometryCount1 == geometryCount2) {
-      for (int i = 0; i < geometryCount1; i++) {
-        final Geometry part1 = getGeometry(i);
-        final Geometry part2 = geometry.getGeometry(i);
-        if (!part1.equals(axisCount, part2)) {
-          return false;
-        }
-      }
-      return true;
-    }
-    return false;
-  }
-
-  @Override
-  public boolean equalsExact(final Geometry other, final double tolerance) {
-    if (!isEquivalentClass(other)) {
-      return false;
-    }
-    final GeometryCollection otherCollection = (GeometryCollection)other;
-    if (getGeometryCount() != otherCollection.getGeometryCount()) {
-      return false;
-    }
-    int i = 0;
-    for (final Geometry geometry : geometries()) {
-      if (!geometry.equalsExact(otherCollection.getGeometry(i), tolerance)) {
-        return false;
-      }
-      i++;
-    }
-    return true;
-  }
-
-  @Override
-  public Iterable<Geometry> geometries() {
-    return getGeometries();
   }
 
   /**
-   *  Returns the area of this <code>GeometryCollection</code>
+   * Tests whether this geometry is structurally and numerically equal
+   * to a given <code>Object</code>.
+   * If the argument <code>Object</code> is not a <code>Geometry</code>,
+   * the result is <code>false</code>.
+   * Otherwise, the result is computed using
+   * {@link #equals(2,Geometry)}.
+   * <p>
+   * This method is provided to fulfill the Java contract
+   * for value-based object equality.
+   * In conjunction with {@link #hashCode()}
+   * it provides semantics which are most useful
+   * for using
+   * <code>Geometry</code>s as keys and values in Java collections.
+   * <p>
+   * Note that to produce the expected result the input geometries
+   * should be in normal form.  It is the caller's
+   * responsibility to perform this where required
+   * (using {@link Geometry#norm()
+   * or {@link #normalize()} as appropriate).
    *
-   * @return the area of the polygon
+   * @param other the Object to compare
+   * @return true if this geometry is exactly equal to the argument
+   *
+   * @see #equals(2,Geometry)
+   * @see #hashCode()
+   * @see #norm()
+   * @see #normalize()
    */
   @Override
-  public double getArea() {
-    double area = 0.0;
-    for (final Geometry geometry : geometries()) {
-      area += geometry.getArea();
-    }
-    return area;
-  }
-
-  @Override
-  public Geometry getBoundary() {
-    throw new IllegalArgumentException("This method does not support GeometryCollection arguments");
-  }
-
-  @Override
-  public int getBoundaryDimension() {
-    int dimension = Dimension.FALSE;
-    for (final Geometry geometry : geometries()) {
-      dimension = Math.max(dimension, geometry.getBoundaryDimension());
-    }
-    return dimension;
-  }
-
-  @Override
-  public DataType getDataType() {
-    return DataTypes.GEOMETRY_COLLECTION;
-  }
-
-  @Override
-  public int getDimension() {
-    int dimension = Dimension.FALSE;
-    for (final Geometry geometry : geometries()) {
-      dimension = Math.max(dimension, geometry.getDimension());
-    }
-    return dimension;
-  }
-
-  @Override
-  public <V extends Geometry> List<V> getGeometries(final Class<V> geometryClass) {
-    final List<V> geometries = super.getGeometries(geometryClass);
-    for (final Geometry geometry : geometries()) {
-      if (geometry != null) {
-        final List<V> partGeometries = geometry.getGeometries(geometryClass);
-        geometries.addAll(partGeometries);
-      }
-    }
-    return geometries;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <V extends Geometry> List<V> getGeometryComponents(final Class<V> geometryClass) {
-    final List<V> geometries = new ArrayList<V>();
-    if (geometryClass.isAssignableFrom(getClass())) {
-      geometries.add((V)this);
-    }
-    for (final Geometry geometry : geometries()) {
-      if (geometry != null) {
-        final List<V> partGeometries = geometry.getGeometryComponents(geometryClass);
-        geometries.addAll(partGeometries);
-      }
-    }
-    return geometries;
-  }
-
-  @Override
-  public double getLength() {
-    double sum = 0.0;
-    for (final Geometry geometry : geometries()) {
-      sum += geometry.getLength();
-    }
-    return sum;
-  }
-
-  @Override
-  public Point getPoint() {
-    if (isEmpty()) {
-      return null;
+  public boolean equals(final Object other) {
+    if (other instanceof Geometry) {
+      final Geometry geometry = (Geometry)other;
+      return equals(2, geometry);
     } else {
-      return getGeometry(0).getPoint();
-    }
-  }
-
-  @Override
-  public Point getPointWithin() {
-    if (isEmpty()) {
-      return null;
-    } else {
-      for (final Geometry geometry : geometries()) {
-        final Point point = geometry.getPointWithin();
-        if (point != null) {
-          return point;
-        }
-      }
-      return null;
-    }
-  }
-
-  @Override
-  public Segment getSegment(final int... segmentId) {
-    return new GeometryCollectionSegment(this, segmentId);
-  }
-
-  @Override
-  public Vertex getToVertex(final int... vertexId) {
-    return new GeometryCollectionVertex(this, vertexId);
-  }
-
-  @Override
-  public Vertex getVertex(final int... vertexId) {
-    return new GeometryCollectionVertex(this, vertexId);
-  }
-
-  @Override
-  public int getVertexCount() {
-    int numPoints = 0;
-    for (final Geometry geometry : geometries()) {
-      numPoints += geometry.getVertexCount();
-    }
-    return numPoints;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <V extends Geometry> V insertVertex(final Point newPoint, final int... vertexId) {
-    if (newPoint == null || newPoint.isEmpty()) {
-      return (V)this;
-    } else if (vertexId.length > 1) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      if (isEmpty()) {
-        return newPoint.convert(geometryFactory);
-      } else {
-        final int partIndex = vertexId[0];
-        final int partCount = getGeometryCount();
-        if (partIndex >= 0 && partIndex < partCount) {
-          final int[] subId = new int[vertexId.length - 1];
-          System.arraycopy(vertexId, 1, subId, 0, subId.length);
-          final Geometry geometry = getGeometry(partIndex);
-          final Geometry newGeometry = geometry.moveVertex(newPoint, subId);
-
-          final List<Geometry> geometries = new ArrayList<>(getGeometries());
-          geometries.set(partIndex, newGeometry);
-          return (V)geometryFactory.geometryCollection(geometries);
-        } else {
-          throw new IllegalArgumentException(
-            "Part index must be between 0 and " + partCount + " not " + partIndex);
-        }
-      }
-    } else {
-      throw new IllegalArgumentException("Vertex id's for " + getGeometryType()
-        + " must have length > 1. " + Arrays.toString(vertexId));
-    }
-  }
-
-  @Override
-  public boolean intersects(final BoundingBox boundingBox) {
-    if (isEmpty() || boundingBox.isEmpty()) {
-      return false;
-    } else {
-      for (final Geometry geometry : geometries()) {
-        if (geometry.intersects(boundingBox)) {
-          return true;
-        }
-      }
       return false;
     }
-  }
-
-  @Override
-  public boolean isEmpty() {
-    if (getGeometryCount() == 0) {
-      return true;
-    } else {
-      for (final Geometry geometry : geometries()) {
-        if (!geometry.isEmpty()) {
-          return false;
-        }
-      }
-      return true;
-    }
-  }
-
-  @Override
-  protected boolean isEquivalentClass(final Geometry other) {
-    return other instanceof GeometryCollection;
-  }
-
-  @Override
-  public Location locate(final Point point) {
-    return new PointLocator().locate(point, this);
-  }
-
-  @Override
-  public Geometry move(final double... deltas) {
-    if (deltas == null || isEmpty()) {
-      return this;
-    } else {
-      final List<Geometry> parts = new ArrayList<>();
-      for (final Geometry part : geometries()) {
-        final Geometry movedPart = part.move(deltas);
-        parts.add(movedPart);
-      }
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      return geometryFactory.geometryCollection(parts);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <V extends Geometry> V moveVertex(final Point newPoint, final int... vertexId) {
-    if (newPoint == null || newPoint.isEmpty()) {
-      return (V)this;
-    } else if (vertexId.length > 1) {
-      if (isEmpty()) {
-        throw new IllegalArgumentException("Cannot move vertex for empty " + getGeometryType());
-      } else {
-        final int partIndex = vertexId[0];
-        final int partCount = getGeometryCount();
-        if (partIndex >= 0 && partIndex < partCount) {
-          final GeometryFactory geometryFactory = getGeometryFactory();
-
-          final int[] subId = new int[vertexId.length - 1];
-          System.arraycopy(vertexId, 1, subId, 0, subId.length);
-          final Geometry geometry = getGeometry(partIndex);
-          final Geometry newGeometry = geometry.moveVertex(newPoint, subId);
-
-          final List<Geometry> geometries = new ArrayList<>(getGeometries());
-          geometries.set(partIndex, newGeometry);
-          return (V)geometryFactory.geometryCollection(geometries);
-        } else {
-          throw new IllegalArgumentException(
-            "Part index must be between 0 and " + partCount + " not " + partIndex);
-        }
-      }
-    } else {
-      throw new IllegalArgumentException("Vertex id's for " + getGeometryType()
-        + " must have length > 1. " + Arrays.toString(vertexId));
-    }
-  }
-
-  @Override
-  public GeometryCollection normalize() {
-    final List<Geometry> geometries = new ArrayList<>();
-    for (final Geometry part : geometries()) {
-      final Geometry normalizedPart = part.normalize();
-      geometries.add(normalizedPart);
-    }
-    Collections.sort(geometries);
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final GeometryCollection normalizedGeometry = geometryFactory.geometryCollection(geometries);
-    return normalizedGeometry;
   }
 
   /**
-   * Creates a {@link GeometryCollection} with
-   * every component reversed.
-   * The order of the components in the collection are not reversed.
+   * Gets a hash code for the Geometry.
    *
-   * @return a {@link GeometryCollection} in the reverse order
+   * @return an integer value suitable for use as a hashcode
    */
+
   @Override
-  public GeometryCollection reverse() {
-    final List<Geometry> revGeoms = new ArrayList<>();
-    for (final Geometry geometry : geometries()) {
-      if (!geometry.isEmpty()) {
-        final Geometry reverse = geometry.reverse();
-        revGeoms.add(reverse);
-      }
-    }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.geometryCollection(revGeoms);
+  public int hashCode() {
+    return getBoundingBox().hashCode();
   }
 
   @Override
-  public Reader<Segment> segments() {
-    final GeometryCollectionSegment iterator = new GeometryCollectionSegment(this, -1);
-    return iterator.reader();
-  }
-
-  @Override
-  public <G extends Geometry> G toClockwise() {
-    final List<Geometry> geometries = new ArrayList<>();
-    for (final Geometry geometry : geometries()) {
-      geometries.add(geometry.toClockwise());
-    }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.geometry(geometries);
-  }
-
-  @Override
-  public <G extends Geometry> G toCounterClockwise() {
-    final List<Geometry> geometries = new ArrayList<>();
-    for (final Geometry geometry : geometries()) {
-      geometries.add(geometry.toCounterClockwise());
-    }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.geometry(geometries);
-  }
-
-  @Override
-  public Reader<Vertex> vertices() {
-    final GeometryCollectionVertex iterator = new GeometryCollectionVertex(this, -1);
-    return iterator.reader();
+  public String toString() {
+    return toWkt();
   }
 }

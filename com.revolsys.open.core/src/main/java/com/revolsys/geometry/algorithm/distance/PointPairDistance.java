@@ -82,8 +82,8 @@ public class PointPairDistance {
    * @param distance the distance between p0 and p1
    */
   private void initialize(final Point p0, final Point p1, final double distance) {
-    this.pt[0] = p0.clonePoint();
-    this.pt[1] = p1.clonePoint();
+    this.pt[0] = p0.newPointDouble();
+    this.pt[1] = p1.newPointDouble();
     this.distance = distance;
     this.isNull = false;
   }

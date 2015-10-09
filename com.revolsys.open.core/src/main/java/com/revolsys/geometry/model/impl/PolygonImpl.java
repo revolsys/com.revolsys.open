@@ -32,11 +32,11 @@
  */
 package com.revolsys.geometry.model.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
@@ -67,7 +67,7 @@ import com.revolsys.geometry.model.Polygon;
  *
  *@version 1.7
  */
-public class PolygonImpl extends AbstractPolygon implements Polygon {
+public class PolygonImpl extends AbstractPolygon {
   private static final long serialVersionUID = 1L;
 
   private BoundingBox boundingBox;
@@ -100,7 +100,7 @@ public class PolygonImpl extends AbstractPolygon implements Polygon {
     this.geometryFactory = factory;
     if (rings == null || rings.length == 0) {
 
-    } else if (hasNullElements(rings)) {
+    } else if (Geometry.hasNullElements(rings)) {
       throw new IllegalArgumentException("rings must not contain null elements");
     } else {
       if (rings[0].isEmpty()) {
@@ -140,7 +140,7 @@ public class PolygonImpl extends AbstractPolygon implements Polygon {
       if (isEmpty()) {
         this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
       } else {
-        this.boundingBox = computeBoundingBox();
+        this.boundingBox = newBoundingBox();
       }
     }
     return this.boundingBox;
@@ -153,7 +153,7 @@ public class PolygonImpl extends AbstractPolygon implements Polygon {
 
   @Override
   public LinearRing getRing(final int ringIndex) {
-    if (isEmpty() || ringIndex < 0 || ringIndex >= this.rings.length) {
+    if (this.rings == null || ringIndex < 0 || ringIndex >= this.rings.length) {
       return null;
     } else {
       return this.rings[ringIndex];
@@ -162,7 +162,7 @@ public class PolygonImpl extends AbstractPolygon implements Polygon {
 
   @Override
   public int getRingCount() {
-    if (isEmpty()) {
+    if (this.rings == null) {
       return 0;
     } else {
       return this.rings.length;
@@ -171,7 +171,7 @@ public class PolygonImpl extends AbstractPolygon implements Polygon {
 
   @Override
   public List<LinearRing> getRings() {
-    return new ArrayList<>(Arrays.asList(this.rings));
+    return Lists.array(this.rings);
   }
 
   /**

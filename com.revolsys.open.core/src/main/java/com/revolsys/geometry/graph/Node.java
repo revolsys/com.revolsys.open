@@ -37,7 +37,7 @@ public class Node<T> extends AbstractPoint implements ObjectWithProperties, Exte
   public static List<Point> getCoordinates(final Collection<Node<Record>> nodes) {
     final List<Point> points = new ArrayList<Point>(nodes.size());
     for (final Node<Record> node : nodes) {
-      final Point point = node.clonePoint();
+      final Point point = node.newPointDouble();
       points.add(point);
     }
     return points;
@@ -166,7 +166,7 @@ public class Node<T> extends AbstractPoint implements ObjectWithProperties, Exte
   }
 
   @Override
-  public PointDouble clonePoint() {
+  public PointDouble newPointDouble() {
     return new PointDouble(this.x, this.y);
   }
 

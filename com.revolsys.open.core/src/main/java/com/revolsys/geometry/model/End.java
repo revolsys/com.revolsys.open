@@ -3,6 +3,7 @@ package com.revolsys.geometry.model;
 import java.util.List;
 
 import com.revolsys.collection.list.Lists;
+import com.revolsys.util.CaseConverter;
 
 public enum End {
   FROM, TO;
@@ -35,6 +36,16 @@ public enum End {
     } else {
       return null;
     }
+  }
+
+  private final String title;
+
+  private End() {
+    this.title = CaseConverter.captialize(name());
+  }
+
+  public String getTitle() {
+    return this.title;
   }
 
   public boolean isFrom() {

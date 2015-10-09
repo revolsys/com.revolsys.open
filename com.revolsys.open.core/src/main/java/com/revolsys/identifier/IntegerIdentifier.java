@@ -4,20 +4,44 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.equals.Equals;
+import com.revolsys.util.Numbers;
 
-public final class IntegerIdentifier extends AbstractIdentifier {
+public final class IntegerIdentifier extends Number implements Identifier, Comparable<Object> {
+  private static final long serialVersionUID = 1L;
 
   private final int value;
 
-  protected IntegerIdentifier(final int value) {
+  IntegerIdentifier(final int value) {
     this.value = value;
   }
 
   @Override
+  public int compareTo(final Object object) {
+    int intValue;
+    if (object instanceof Number) {
+      final Number number = (Number)object;
+      intValue = number.intValue();
+    } else {
+      final Integer integer = Numbers.toInteger(object);
+      if (integer == null) {
+        return -1;
+      } else {
+        intValue = integer;
+      }
+    }
+    return Integer.compare(this.value, intValue);
+  }
+
+  @Override
+  public double doubleValue() {
+    return this.value;
+  }
+
+  @Override
   public boolean equals(final Object other) {
-    if (other instanceof IntegerIdentifier) {
-      final IntegerIdentifier identifier = (IntegerIdentifier)other;
-      return this.value == identifier.getIntValue();
+    if (other instanceof Number) {
+      final Number number = (Number)other;
+      return this.value == number.intValue();
     } else if (other instanceof Identifier) {
       final Identifier identifier = (Identifier)other;
       final List<Object> values = identifier.getValues();
@@ -32,7 +56,8 @@ public final class IntegerIdentifier extends AbstractIdentifier {
     }
   }
 
-  public int getIntValue() {
+  @Override
+  public float floatValue() {
     return this.value;
   }
 
@@ -53,6 +78,21 @@ public final class IntegerIdentifier extends AbstractIdentifier {
 
   @Override
   public int hashCode() {
+    return this.value;
+  }
+
+  @Override
+  public int intValue() {
+    return this.value;
+  }
+
+  @Override
+  public boolean isSingle() {
+    return true;
+  }
+
+  @Override
+  public long longValue() {
     return this.value;
   }
 

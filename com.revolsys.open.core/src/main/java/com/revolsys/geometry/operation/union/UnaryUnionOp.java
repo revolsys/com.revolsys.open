@@ -44,7 +44,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.Puntal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.operation.overlay.OverlayOp;
 import com.revolsys.geometry.operation.overlay.snap.SnapIfNeededOverlayOp;
 
@@ -187,7 +187,7 @@ public class UnaryUnionOp {
       } else if (unionLA == null) {
         union = unionPoints;
       } else {
-        union = PointGeometryUnion.union((Puntal)unionPoints, unionLA);
+        union = PointGeometryUnion.union((Punctual)unionPoints, unionLA);
       }
 
       if (union == null) {

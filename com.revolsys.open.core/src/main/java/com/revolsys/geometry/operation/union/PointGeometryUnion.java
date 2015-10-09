@@ -42,11 +42,11 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Puntal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.util.GeometryCombiner;
 
 /**
- * Computes the union of a {@link Puntal} geometry with
+ * Computes the union of a {@link Punctual} geometry with
  * another arbitrary {@link Geometry}.
  * Does not copy any component geometries.
  *
@@ -54,7 +54,7 @@ import com.revolsys.geometry.model.util.GeometryCombiner;
  *
  */
 public class PointGeometryUnion {
-  public static Geometry union(final Puntal pointGeom, final Geometry otherGeom) {
+  public static Geometry union(final Punctual pointGeom, final Geometry otherGeom) {
     final PointGeometryUnion unioner = new PointGeometryUnion(pointGeom, otherGeom);
     return unioner.union();
   }
@@ -65,7 +65,7 @@ public class PointGeometryUnion {
 
   private final Geometry pointGeom;
 
-  public PointGeometryUnion(final Puntal pointGeom, final Geometry otherGeom) {
+  public PointGeometryUnion(final Punctual pointGeom, final Geometry otherGeom) {
     this.pointGeom = pointGeom;
     this.otherGeom = otherGeom;
     this.geomFact = otherGeom.getGeometryFactory();

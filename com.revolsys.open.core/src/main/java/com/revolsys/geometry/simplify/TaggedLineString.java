@@ -122,8 +122,8 @@ class TaggedLineString {
     this.segs = new TaggedLineSegment[this.parentLine.getVertexCount() - 1];
     int i = 0;
     for (final Segment segment : this.parentLine.segments()) {
-      final TaggedLineSegment seg = new TaggedLineSegment(segment.getPoint(0).clonePoint(),
-        segment.getPoint(1).clonePoint(), this.parentLine, i);
+      final TaggedLineSegment seg = new TaggedLineSegment(segment.getPoint(0).newPointDouble(),
+        segment.getPoint(1).newPointDouble(), this.parentLine, i);
       this.segs[i] = seg;
       i++;
     }

@@ -90,7 +90,7 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection {
     this.geometryFactory = geometryFactory;
     if (geometries == null || geometries.length == 0) {
       this.geometries = null;
-    } else if (hasNullElements(geometries)) {
+    } else if (Geometry.hasNullElements(geometries)) {
       throw new IllegalArgumentException("geometries must not contain null elements");
     } else {
       this.geometries = geometries;
@@ -119,7 +119,7 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection {
       if (isEmpty()) {
         this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
       } else {
-        this.boundingBox = computeBoundingBox();
+        this.boundingBox = newBoundingBox();
       }
     }
     return this.boundingBox;

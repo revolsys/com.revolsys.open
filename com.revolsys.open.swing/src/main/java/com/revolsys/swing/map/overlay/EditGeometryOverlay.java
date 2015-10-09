@@ -42,7 +42,6 @@ import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.AbstractGeometry;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.record.schema.FieldDefinition;
@@ -693,7 +692,7 @@ public class EditGeometryOverlay extends AbstractOverlay
             if (this.addGeometry.isEmpty()) {
               setAddGeometry(point);
             } else {
-              final int[] toVertexId = AbstractGeometry.createVertexId(this.addGeometryPartIndex,
+              final int[] toVertexId = Geometry.createVertexId(this.addGeometryPartIndex,
                 0);
               final Point previousPoint = this.addGeometry.getToVertex(toVertexId);
               if (!point.equals(previousPoint)) {
@@ -730,7 +729,7 @@ public class EditGeometryOverlay extends AbstractOverlay
           setXorGeometry(null);
           event.consume();
           if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
-            final int[] toVertexId = AbstractGeometry.createVertexId(this.addGeometryPartIndex, 0);
+            final int[] toVertexId = Geometry.createVertexId(this.addGeometryPartIndex, 0);
             final Point previousPoint = this.addGeometry.getToVertex(toVertexId);
             if (!point.equals(previousPoint)) {
               final Geometry newGeometry = appendVertex(point);
@@ -876,7 +875,7 @@ public class EditGeometryOverlay extends AbstractOverlay
     if (!hasSnapPoint(boundingBox)) {
       setMapCursor(CURSOR_NODE_ADD);
     }
-    final int[] firstVertexId = AbstractGeometry.createVertexId(this.addGeometryPartIndex, 0);
+    final int[] firstVertexId = Geometry.createVertexId(this.addGeometryPartIndex, 0);
     Geometry xorGeometry = null;
 
     if (DataTypes.POINT.equals(this.addGeometryPartDataType)) {

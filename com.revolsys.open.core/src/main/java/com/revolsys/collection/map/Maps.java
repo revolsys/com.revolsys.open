@@ -19,6 +19,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.record.Record;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 

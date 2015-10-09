@@ -138,7 +138,7 @@ public class PreparedLineString extends AbstractLineString {
       final int dimension = geometry.getDimension();
       if (dimension == 1) {
         return false;
-      } else if (dimension == 2 && isAnyTargetComponentInTest(geometry)) {
+      } else if (dimension == 2 && Geometry.isAnyTargetComponentInTest(this, geometry)) {
         /**
          * For L/A case, need to check for proper inclusion of the target in the test
          */
@@ -159,9 +159,9 @@ public class PreparedLineString extends AbstractLineString {
   /**
    * Tests whether any representative point of the test Geometry intersects
    * the target geometry.
-   * Only handles test geometries which are Puntal (dimension 0)
+   * Only handles test geometries which are Punctual (dimension 0)
    *
-   * @param geom a Puntal geometry to test
+   * @param geom a Punctual geometry to test
    * @return true if any point of the argument intersects the prepared geometry
    */
   public boolean isAnyTestPointInTarget(final Geometry geometry) {

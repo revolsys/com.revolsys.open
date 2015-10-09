@@ -39,7 +39,7 @@ import com.revolsys.geometry.index.strtree.STRtree;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.Puntal;
+import com.revolsys.geometry.model.Punctual;
 
 /**
  * Computes the distance between the facets (segments and vertices)
@@ -126,7 +126,7 @@ public class IndexedFacetDistance {
    * Distances will be computed to all facets of the input geometry.
    * The facets of the geometry are the discrete segments and points
    * contained in its components.
-   * In the case of {@link Lineal} and {@link Puntal} inputs,
+   * In the case of {@link Lineal} and {@link Punctual} inputs,
    * this is equivalent to computing the conventional distance.
    * In the case of {@link Polygonal} inputs, this is equivalent
    * to computing the distance to the polygons boundaries.

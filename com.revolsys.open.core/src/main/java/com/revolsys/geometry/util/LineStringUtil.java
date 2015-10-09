@@ -771,7 +771,7 @@ public final class LineStringUtil {
       final List<Point> intersections = new ArrayList<Point>();
       for (final Geometry intersection : intersectionPoints) {
         for (final Point point : intersection.vertices()) {
-          intersections.add(point.clonePoint());
+          intersections.add(point.newPointDouble());
         }
       }
       if (intersections.size() > 0) {

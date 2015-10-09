@@ -5,13 +5,29 @@ import java.util.List;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.equals.Equals;
+import com.revolsys.util.CompareUtil;
 
-public class SingleIdentifier extends AbstractIdentifier {
-
+public class SingleIdentifier implements Identifier, Comparable<Object> {
   private final Object value;
 
   protected SingleIdentifier(final Object value) {
     this.value = value;
+  }
+
+  @Override
+  public int compareTo(final Object object) {
+    Object otherValue;
+    if (object instanceof Identifier) {
+      final Identifier identifier = (Identifier)object;
+      if (identifier.isSingle()) {
+        otherValue = identifier.getValue(0);
+      } else {
+        return -1;
+      }
+    } else {
+      otherValue = object;
+    }
+    return CompareUtil.compare(this.value, otherValue);
   }
 
   @Override
@@ -42,6 +58,11 @@ public class SingleIdentifier extends AbstractIdentifier {
     } else {
       return this.value.hashCode();
     }
+  }
+
+  @Override
+  public boolean isSingle() {
+    return true;
   }
 
   @Override

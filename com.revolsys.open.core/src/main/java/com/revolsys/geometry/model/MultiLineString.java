@@ -32,7 +32,22 @@
  */
 package com.revolsys.geometry.model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.segment.MultiLineStringSegment;
+import com.revolsys.geometry.model.segment.Segment;
+import com.revolsys.geometry.model.vertex.MultiLineStringVertex;
+import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.geometry.operation.BoundaryOp;
+import com.revolsys.io.IteratorReader;
+import com.revolsys.io.Reader;
+import com.revolsys.util.Property;
 
 /**
  * Models a collection of (@link LineString}s.
@@ -42,19 +57,224 @@ import java.util.List;
  *@version 1.7
  */
 public interface MultiLineString extends GeometryCollection, Lineal {
-  LineString getLineString(int partIndex);
-
-  <V extends LineString> List<V> getLineStrings();
-
-  boolean isClosed();
-
-  Iterable<LineString> lineStrings();
+  @Override
+  MultiLineString clone();
 
   @Override
-  MultiLineString normalize();
+  @SuppressWarnings("unchecked")
+  default <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
+    final List<LineString> lines = new ArrayList<LineString>();
+    for (final LineString line : getLineStrings()) {
+      final LineString newLine = line.copy(geometryFactory);
+      lines.add(newLine);
+    }
+    return (V)geometryFactory.multiLineString(lines);
+  }
 
   @Override
-  MultiLineString prepare();
+  default double distance(Geometry geometry, final double terminateDistance) {
+    if (isEmpty()) {
+      return 0.0;
+    } else if (Property.isEmpty(geometry)) {
+      return 0.0;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      geometry = geometry.convert(geometryFactory, 2);
+      double minDistance = Double.MAX_VALUE;
+      for (final LineString line : lineStrings()) {
+        final double distance = geometry.distance(line);
+        if (distance < minDistance) {
+          minDistance = distance;
+          if (distance <= terminateDistance) {
+            return distance;
+          }
+        }
+      }
+      return minDistance;
+    }
+  }
+
+  @Override
+  default boolean equalsExact(final Geometry other, final double tolerance) {
+    if (!isEquivalentClass(other)) {
+      return false;
+    } else {
+      return GeometryCollection.super.equalsExact(other, tolerance);
+    }
+  }
+
+  /**
+   * Gets the boundary of this geometry.
+   * The boundary of a lineal geometry is always a zero-dimensional geometry (which may be empty).
+   *
+   * @return the boundary geometry
+   * @see Geometry#getBoundary
+   */
+  @Override
+  default Geometry getBoundary() {
+    return new BoundaryOp(this).getBoundary();
+  }
+
+  @Override
+  default int getBoundaryDimension() {
+    if (isClosed()) {
+      return Dimension.FALSE;
+    }
+    return 0;
+  }
+
+  @Override
+  default DataType getDataType() {
+    return DataTypes.MULTI_LINE_STRING;
+  }
+
+  @Override
+  default int getDimension() {
+    return 1;
+  }
+
+  default LineString getLineString(final int partIndex) {
+    return (LineString)getGeometry(partIndex);
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  default <V extends LineString> List<V> getLineStrings() {
+    return (List)getGeometries();
+  }
+
+  @Override
+  default Segment getSegment(final int... segmentId) {
+    if (segmentId == null || segmentId.length != 2) {
+      return null;
+    } else {
+      final int partIndex = segmentId[0];
+      if (partIndex >= 0 && partIndex < getGeometryCount()) {
+        final LineString line = getLineString(partIndex);
+        final int segmentIndex = segmentId[1];
+        if (segmentIndex >= 0 && segmentIndex < line.getSegmentCount()) {
+          return new MultiLineStringSegment(this, segmentId);
+        }
+      }
+      return null;
+    }
+  }
+
+  @Override
+  default Vertex getToVertex(int... vertexId) {
+    if (vertexId == null || vertexId.length != 2) {
+      return null;
+    } else {
+      final int partIndex = vertexId[0];
+      if (partIndex >= 0 && partIndex < getGeometryCount()) {
+        final LineString line = getLineString(partIndex);
+        int vertexIndex = vertexId[1];
+        final int vertexCount = line.getVertexCount();
+        vertexIndex = vertexCount - 1 - vertexIndex;
+        if (vertexIndex <= vertexCount) {
+          while (vertexIndex < 0) {
+            vertexIndex += vertexCount - 1;
+          }
+          vertexId = Geometry.setVertexIndex(vertexId, vertexIndex);
+          return new MultiLineStringVertex(this, vertexId);
+        }
+      }
+      return null;
+    }
+  }
+
+  @Override
+  default Vertex getVertex(final int... vertexId) {
+    if (vertexId == null || vertexId.length != 2) {
+      return null;
+    } else {
+      final int partIndex = vertexId[0];
+      if (partIndex >= 0 && partIndex < getGeometryCount()) {
+        final LineString line = getLineString(partIndex);
+        int vertexIndex = vertexId[1];
+        final int vertexCount = line.getVertexCount();
+        if (vertexIndex <= vertexCount) {
+          while (vertexIndex < 0) {
+            vertexIndex += vertexCount - 1;
+          }
+          return new MultiLineStringVertex(this, vertexId);
+        }
+      }
+      return null;
+    }
+  }
+
+  default boolean isClosed() {
+    if (isEmpty()) {
+      return false;
+    }
+    for (final LineString line : getLineStrings()) {
+      if (line.isEmpty()) {
+        return false;
+      } else if (!line.isClosed()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
+  default boolean isEquivalentClass(final Geometry other) {
+    return other instanceof MultiLineString;
+  }
+
+  default Iterable<LineString> lineStrings() {
+    return getGeometries();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  default <V extends Geometry> V moveVertex(final Point newPoint, final int... vertexId) {
+    if (newPoint == null || newPoint.isEmpty()) {
+      return (V)this;
+    } else if (vertexId.length == 2) {
+      if (isEmpty()) {
+        throw new IllegalArgumentException("Cannot move vertex for empty MultiLineString");
+      } else {
+        final int partIndex = vertexId[0];
+        final int vertexIndex = vertexId[1];
+        final int partCount = getGeometryCount();
+        if (partIndex >= 0 && partIndex < partCount) {
+          final GeometryFactory geometryFactory = getGeometryFactory();
+
+          final LineString line = getLineString(partIndex);
+          final LineString newLine = line.moveVertex(newPoint, vertexIndex);
+          final List<LineString> lines = new ArrayList<>(getLineStrings());
+          lines.set(partIndex, newLine);
+          return (V)geometryFactory.multiLineString(lines);
+        } else {
+          throw new IllegalArgumentException(
+            "Part index must be between 0 and " + partCount + " not " + partIndex);
+        }
+      }
+    } else {
+      throw new IllegalArgumentException(
+        "Vertex id's for MultiLineStrings must have length 2. " + Arrays.toString(vertexId));
+    }
+  }
+
+  @Override
+  default MultiLineString normalize() {
+    if (isEmpty()) {
+      return this;
+    } else {
+      final List<LineString> geometries = new ArrayList<>();
+      for (final Geometry part : geometries()) {
+        final LineString normalizedPart = (LineString)part.normalize();
+        geometries.add(normalizedPart);
+      }
+      Collections.sort(geometries);
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final MultiLineString normalizedGeometry = geometryFactory.multiLineString(geometries);
+      return normalizedGeometry;
+    }
+  }
 
   /**
    * Creates a {@link MultiLineString} in the reverse
@@ -66,5 +286,27 @@ public interface MultiLineString extends GeometryCollection, Lineal {
    * @return a {@link MultiLineString} in the reverse order
    */
   @Override
-  MultiLineString reverse();
+  default MultiLineString reverse() {
+    final LinkedList<LineString> revLines = new LinkedList<LineString>();
+    for (final Geometry geometry : geometries()) {
+      final LineString line = (LineString)geometry;
+      final LineString reverse = line.reverse();
+      revLines.addFirst(reverse);
+    }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.multiLineString(revLines);
+  }
+
+  @Override
+  default Reader<Segment> segments() {
+    final MultiLineStringSegment iterator = new MultiLineStringSegment(this, 0, -1);
+    return new IteratorReader<Segment>(iterator);
+  }
+
+  @Override
+  default Reader<Vertex> vertices() {
+    final MultiLineStringVertex vertex = new MultiLineStringVertex(this, 0, -1);
+    return vertex.reader();
+  }
+
 }

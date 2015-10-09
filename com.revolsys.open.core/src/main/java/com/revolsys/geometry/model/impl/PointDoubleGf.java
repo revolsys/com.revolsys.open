@@ -90,7 +90,7 @@ public class PointDoubleGf extends PointDouble {
       if (isEmpty()) {
         this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
       } else {
-        this.boundingBox = computeBoundingBox();
+        this.boundingBox = newBoundingBox();
       }
     }
     return this.boundingBox;

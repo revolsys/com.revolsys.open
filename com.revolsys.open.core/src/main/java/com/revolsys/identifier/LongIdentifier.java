@@ -4,20 +4,44 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.equals.Equals;
+import com.revolsys.util.Numbers;
 
-public final class LongIdentifier extends AbstractIdentifier {
+public final class LongIdentifier extends Number implements Identifier, Comparable<Object> {
+  private static final long serialVersionUID = 1L;
 
   private final long value;
 
-  protected LongIdentifier(final long value) {
+  LongIdentifier(final long value) {
     this.value = value;
   }
 
   @Override
+  public int compareTo(final Object object) {
+    long longValue;
+    if (object instanceof Number) {
+      final Number number = (Number)object;
+      longValue = number.longValue();
+    } else {
+      final Integer longeger = Numbers.toInteger(object);
+      if (longeger == null) {
+        return -1;
+      } else {
+        longValue = longeger;
+      }
+    }
+    return Long.compare(this.value, longValue);
+  }
+
+  @Override
+  public double doubleValue() {
+    return this.value;
+  }
+
+  @Override
   public boolean equals(final Object other) {
-    if (other instanceof LongIdentifier) {
-      final LongIdentifier identifier = (LongIdentifier)other;
-      return this.value == identifier.getLongValue();
+    if (other instanceof Number) {
+      final Number number = (Number)other;
+      return this.value == number.longValue();
     } else if (other instanceof Identifier) {
       final Identifier identifier = (Identifier)other;
       final List<Object> values = identifier.getValues();
@@ -32,7 +56,8 @@ public final class LongIdentifier extends AbstractIdentifier {
     }
   }
 
-  public long getLongValue() {
+  @Override
+  public float floatValue() {
     return this.value;
   }
 
@@ -53,7 +78,22 @@ public final class LongIdentifier extends AbstractIdentifier {
 
   @Override
   public int hashCode() {
+    return Long.hashCode(this.value);
+  }
+
+  @Override
+  public int intValue() {
     return (int)this.value;
+  }
+
+  @Override
+  public boolean isSingle() {
+    return true;
+  }
+
+  @Override
+  public long longValue() {
+    return this.value;
   }
 
   @Override

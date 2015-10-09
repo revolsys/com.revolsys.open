@@ -34,16 +34,17 @@ package com.revolsys.geometry.model.prep;
 
 import java.util.List;
 
-import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.impl.AbstractMultiLineString;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.noding.FastSegmentSetIntersectionFinder;
+import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.noding.SegmentStringUtil;
+import com.revolsys.util.WrappedException;
 
 /**
  * A prepared version for {@link Lineal} geometries.
@@ -53,11 +54,14 @@ import com.revolsys.geometry.noding.SegmentStringUtil;
  * @author mbdavis
  *
  */
-public class PreparedMultiLineString extends AbstractMultiLineString {
-  /**
-   *
-   */
+public class PreparedMultiLineString implements MultiLineString {
   private static final long serialVersionUID = 1L;
+
+  /**
+   * An object reference which can be used to carry ancillary data defined
+   * by the client.
+   */
+  private Object userData;
 
   private final MultiLineString multiLine;
 
@@ -65,6 +69,60 @@ public class PreparedMultiLineString extends AbstractMultiLineString {
 
   public PreparedMultiLineString(final MultiLineString multiLine) {
     this.multiLine = multiLine;
+  }
+
+  /**
+   * Creates and returns a full copy of this {@link GeometryCollection} object.
+   * (including all coordinates contained by it).
+   *
+   * @return a clone of this instance
+   */
+  @Override
+  public MultiLineString clone() {
+    try {
+      return (MultiLineString)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      throw new WrappedException(e);
+    }
+  }
+
+  /**
+   * Tests whether this geometry is structurally and numerically equal
+   * to a given <code>Object</code>.
+   * If the argument <code>Object</code> is not a <code>Geometry</code>,
+   * the result is <code>false</code>.
+   * Otherwise, the result is computed using
+   * {@link #equals(2,Geometry)}.
+   * <p>
+   * This method is provided to fulfill the Java contract
+   * for value-based object equality.
+   * In conjunction with {@link #hashCode()}
+   * it provides semantics which are most useful
+   * for using
+   * <code>Geometry</code>s as keys and values in Java collections.
+   * <p>
+   * Note that to produce the expected result the input geometries
+   * should be in normal form.  It is the caller's
+   * responsibility to perform this where required
+   * (using {@link Geometry#norm()
+   * or {@link #normalize()} as appropriate).
+   *
+   * @param other the Object to compare
+   * @return true if this geometry is exactly equal to the argument
+   *
+   * @see #equals(2,Geometry)
+   * @see #hashCode()
+   * @see #norm()
+   * @see #normalize()
+   */
+  @Override
+  public boolean equals(final Object other) {
+    if (other instanceof Geometry) {
+      final Geometry geometry = (Geometry)other;
+      return equals(2, geometry);
+    } else {
+      return false;
+    }
   }
 
   @Override
@@ -85,7 +143,7 @@ public class PreparedMultiLineString extends AbstractMultiLineString {
   @Override
   public int getGeometryCount() {
     return this.multiLine.getGeometryCount();
-  };
+  }
 
   @Override
   public GeometryFactory getGeometryFactory() {
@@ -106,13 +164,34 @@ public class PreparedMultiLineString extends AbstractMultiLineString {
     return this.segIntFinder;
   }
 
+  /**
+   * Gets the user data object for this geometry, if any.
+   *
+   * @return the user data object, or <code>null</code> if none set
+   */
+  @Override
+  public Object getUserData() {
+    return this.userData;
+  }
+
+  /**
+   * Gets a hash code for the Geometry.
+   *
+   * @return an integer value suitable for use as a hashcode
+   */
+
+  @Override
+  public int hashCode() {
+    return this.multiLine.hashCode();
+  };
+
   @Override
   public boolean intersects(final Geometry geometry) {
     if (envelopesIntersect(geometry)) {
       /**
        * If any segments intersect, obviously intersects = true
        */
-      final List lineSegStr = SegmentStringUtil.extractSegmentStrings(geometry);
+      final List<NodedSegmentString> lineSegStr = SegmentStringUtil.extractSegmentStrings(geometry);
       // only request intersection finder if there are segments (ie NOT for
       // point
       // inputs)
@@ -130,7 +209,7 @@ public class PreparedMultiLineString extends AbstractMultiLineString {
       final int dimension = geometry.getDimension();
       if (dimension == 1) {
         return false;
-      } else if (dimension == 2 && isAnyTargetComponentInTest(geometry)) {
+      } else if (dimension == 2 && Geometry.isAnyTargetComponentInTest(this, geometry)) {
         /**
          * For L/A case, need to check for proper inclusion of the target in the test
          */
@@ -151,9 +230,9 @@ public class PreparedMultiLineString extends AbstractMultiLineString {
   /**
    * Tests whether any representative point of the test Geometry intersects
    * the target geometry.
-   * Only handles test geometries which are Puntal (dimension 0)
+   * Only handles test geometries which are Punctual (dimension 0)
    *
-   * @param geom a Puntal geometry to test
+   * @param geom a Punctual geometry to test
    * @return true if any point of the argument intersects the prepared geometry
    */
   public boolean isAnyTestPointInTarget(final Geometry geometry) {
@@ -161,7 +240,6 @@ public class PreparedMultiLineString extends AbstractMultiLineString {
      * This could be optimized by using the segment index on the lineal target.
      * However, it seems like the L/P case would be pretty rare in practice.
      */
-    final PointLocator locator = new PointLocator();
     for (final Vertex vertex : geometry.vertices()) {
       if (this.multiLine.intersects(vertex)) {
         return true;
@@ -178,5 +256,25 @@ public class PreparedMultiLineString extends AbstractMultiLineString {
   @Override
   public MultiLineString prepare() {
     return this;
+  }
+
+  /**
+   * A simple scheme for applications to add their own custom data to a Geometry.
+   * An example use might be to add an object representing a Point Reference System.
+   * <p>
+   * Note that user data objects are not present in geometries created by
+   * construction methods.
+   *
+   * @param userData an object, the semantics for which are defined by the
+   * application using this Geometry
+   */
+  @Override
+  public void setUserData(final Object userData) {
+    this.userData = userData;
+  }
+
+  @Override
+  public String toString() {
+    return toWkt();
   }
 }

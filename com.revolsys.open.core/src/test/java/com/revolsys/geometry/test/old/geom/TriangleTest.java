@@ -164,8 +164,8 @@ public class TriangleTest extends TestCase {
   }
 
   public Triangle createTriangle(final LineString line) {
-    final Triangle t = new Triangle(line.getVertex(0).clonePoint(), line.getVertex(1).clonePoint(),
-      line.getVertex(2).clonePoint());
+    final Triangle t = new Triangle(line.getVertex(0).newPointDouble(), line.getVertex(1).newPointDouble(),
+      line.getVertex(2).newPointDouble());
     return t;
   }
 

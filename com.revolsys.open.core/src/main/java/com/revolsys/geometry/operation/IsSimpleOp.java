@@ -264,7 +264,7 @@ public class IsSimpleOp {
                     error = new SelfIntersectionVertexError(vertex);
                   } else {
                     error = new SelfIntersectionPointError(this.geometry,
-                      pointIntersection.clonePoint());
+                      pointIntersection.newPointDouble());
                   }
                   this.errors.add(error);
                   if (this.shortCircuit) {

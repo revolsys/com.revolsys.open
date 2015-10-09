@@ -169,7 +169,7 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
   }
 
   @Override
-  public LineString deleteVertex(final int vertexIndex) {
+  public LinearRing deleteVertex(final int vertexIndex) {
     if (isEmpty()) {
       throw new IllegalArgumentException("Cannot delete vertex for empty LinearRing");
     } else {

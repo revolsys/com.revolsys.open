@@ -77,7 +77,7 @@ public class PreparedPoint extends AbstractPoint {
       /**
        * This avoids computing topology for the test geometry
        */
-      return isAnyTargetComponentInTest(geometry);
+      return Geometry.isAnyTargetComponentInTest(this, geometry);
     } else {
       return false;
     }

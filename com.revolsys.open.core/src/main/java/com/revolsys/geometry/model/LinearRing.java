@@ -58,11 +58,22 @@ public interface LinearRing extends LineString {
   LinearRing clone();
 
   @Override
-  LinearRing move(double... deltas);
+  default LinearRing deleteVertex(final int vertexIndex) {
+    return (LinearRing)LineString.super.deleteVertex(vertexIndex);
+  }
 
   @Override
-  LinearRing moveVertex(Point newPoint, int vertexIndex);
+  default LinearRing move(final double... deltas) {
+    return (LinearRing)LineString.super.move(deltas);
+  }
 
   @Override
-  LinearRing reverse();
+  default LinearRing moveVertex(final Point newPoint, final int vertexIndex) {
+    return (LinearRing)LineString.super.moveVertex(newPoint, vertexIndex);
+  }
+
+  @Override
+  default LinearRing reverse() {
+    return (LinearRing)LineString.super.reverse();
+  }
 }

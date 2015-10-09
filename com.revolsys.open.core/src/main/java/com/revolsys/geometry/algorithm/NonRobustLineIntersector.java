@@ -96,22 +96,22 @@ public class NonRobustLineIntersector extends LineIntersector {
 
     // check for single point intersection
     if (q4 == p1) {
-      this.pa = p1.clonePoint();
+      this.pa = p1.newPointDouble();
       return POINT_INTERSECTION;
     }
     if (q3 == p2) {
-      this.pa = p2.clonePoint();
+      this.pa = p2.newPointDouble();
       return POINT_INTERSECTION;
     }
 
     // intersection MUST be a segment - compute endpoints
-    this.pa = p1.clonePoint();
+    this.pa = p1.newPointDouble();
     if (t3 > r1) {
-      this.pa = q3.clonePoint();
+      this.pa = q3.newPointDouble();
     }
-    this.pb = p2.clonePoint();
+    this.pb = p2.newPointDouble();
     if (t4 < r2) {
-      this.pb = q4.clonePoint();
+      this.pb = q4.newPointDouble();
     }
     return COLLINEAR_INTERSECTION;
   }

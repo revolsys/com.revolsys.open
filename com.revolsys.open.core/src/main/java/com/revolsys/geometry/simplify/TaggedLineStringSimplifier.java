@@ -120,8 +120,8 @@ public class TaggedLineStringSimplifier {
    */
   private LineSegment flatten(final int start, final int end) {
     // make a new segment for the simplified geometry
-    final Point p0 = this.line.getVertex(start).clonePoint();
-    final Point p1 = this.line.getVertex(end).clonePoint();
+    final Point p0 = this.line.getVertex(start).newPointDouble();
+    final Point p1 = this.line.getVertex(end).newPointDouble();
     final LineSegment newSeg = new LineSegmentDouble(p0, p1);
     // update the indexes
     remove(this.taggedLine, start, end);
@@ -239,8 +239,8 @@ public class TaggedLineStringSimplifier {
     }
     // test if flattened section would cause intersection
     // final LineSegment candidateSeg = new LineSegmentDouble();
-    final Point p0 = this.line.getVertex(i).clonePoint();
-    final Point p1 = this.line.getVertex(j).clonePoint();
+    final Point p0 = this.line.getVertex(i).newPointDouble();
+    final Point p1 = this.line.getVertex(j).newPointDouble();
     final LineSegment candidateSeg = new LineSegmentDouble(p0, p1);
     sectionIndex[0] = i;
     sectionIndex[1] = j;
