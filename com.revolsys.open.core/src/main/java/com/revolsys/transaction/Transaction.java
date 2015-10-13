@@ -8,7 +8,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 public class Transaction implements Closeable {
 
@@ -132,7 +132,7 @@ public class Transaction implements Closeable {
           try {
             this.transactionManager.commit(this.transactionStatus);
           } catch (final Throwable e) {
-            ExceptionUtil.throwUncheckedException(e);
+            Exceptions.throwUncheckedException(e);
           }
         }
       }
@@ -173,6 +173,6 @@ public class Transaction implements Closeable {
 
   public RuntimeException setRollbackOnly(final Throwable e) {
     setRollbackOnly();
-    return ExceptionUtil.throwUncheckedException(e);
+    return Exceptions.throwUncheckedException(e);
   }
 }

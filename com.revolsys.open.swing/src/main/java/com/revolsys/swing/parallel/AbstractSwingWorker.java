@@ -11,7 +11,7 @@ import javax.swing.SwingWorker;
 
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.util.Debug;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V> {
   private static final Cursor WAIT_CURSOR = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
@@ -105,7 +105,7 @@ public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V> {
   }
 
   protected void handleException(final Throwable exception) {
-    ExceptionUtil.log(getClass(), "Unable to execute:" + this, exception);
+    Exceptions.log(getClass(), "Unable to execute:" + this, exception);
   }
 
   public boolean isShowBusyCursor() {

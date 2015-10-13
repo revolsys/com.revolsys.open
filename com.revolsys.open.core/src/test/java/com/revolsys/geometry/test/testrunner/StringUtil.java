@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 /**
  *  Useful string utilities
@@ -208,7 +208,7 @@ public class StringUtil {
       try {
         stackTrace += lineNumberReader.readLine() + newLine;
       } catch (final IOException e) {
-        return ExceptionUtil.throwUncheckedException(e);
+        return Exceptions.throwUncheckedException(e);
       }
     }
     return stackTrace;

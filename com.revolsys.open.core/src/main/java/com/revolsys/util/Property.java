@@ -87,7 +87,7 @@ public final class Property {
           }
         }
       } catch (final IntrospectionException e) {
-        ExceptionUtil.log(Property.class, e);
+        Exceptions.log(Property.class, e);
       }
     }
     return null;
@@ -429,7 +429,7 @@ public final class Property {
         return (V)MethodUtils.invokeMethod(object, methodName, parameterArray);
       }
     } catch (final InvocationTargetException e) {
-      return (V)ExceptionUtil.throwCauseException(e);
+      return (V)Exceptions.throwCauseException(e);
     } catch (final Throwable e) {
       throw new RuntimeException("Unable to invoke " + toString(object, methodName, parameterArray),
         e);
@@ -661,7 +661,7 @@ public final class Property {
         try {
           set(object, propertyName, value);
         } catch (final Throwable e) {
-          ExceptionUtil.log(Property.class, "Unable to set property " + propertyName, e);
+          Exceptions.log(Property.class, "Unable to set property " + propertyName, e);
         }
       }
     }

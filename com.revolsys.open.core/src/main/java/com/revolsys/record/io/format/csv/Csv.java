@@ -34,7 +34,7 @@ import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.WrappedException;
 
 public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory, MapWriterFactory {
@@ -158,7 +158,7 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
       final CsvMapIterator iterator = new CsvMapIterator(resource.newReader());
       return new IteratorMapReader(iterator);
     } catch (final IOException e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 

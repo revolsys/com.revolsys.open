@@ -42,7 +42,7 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;
 
@@ -513,7 +513,7 @@ public class Gdal {
 
         return settingsFile.getLastModified();
       } catch (final Throwable e) {
-        ExceptionUtil.log(Gdal.class, "Unable to load:" + settingsFile, e);
+        Exceptions.log(Gdal.class, "Unable to load:" + settingsFile, e);
         return -1;
       }
     } else {

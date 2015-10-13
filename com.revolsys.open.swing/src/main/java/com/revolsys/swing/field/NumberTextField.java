@@ -19,7 +19,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
@@ -181,7 +181,7 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
     try {
       return (Field)super.clone();
     } catch (final CloneNotSupportedException e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 

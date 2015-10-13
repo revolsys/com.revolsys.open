@@ -7,7 +7,7 @@ import javax.swing.JMenuItem;
 
 import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.component.ComponentFactory;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 public abstract class AbstractActionMainMenuItemFactory extends AbstractAction
   implements ComponentFactory<JMenuItem> {
@@ -31,7 +31,7 @@ public abstract class AbstractActionMainMenuItemFactory extends AbstractAction
     try {
       return (AbstractActionMainMenuItemFactory)super.clone();
     } catch (final CloneNotSupportedException e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 

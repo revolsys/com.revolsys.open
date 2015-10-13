@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import com.revolsys.io.FileUtil;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 public class CsvIterator implements Iterator<List<String>>, Iterable<List<String>> {
 
@@ -194,7 +194,7 @@ public class CsvIterator implements Iterator<List<String>>, Iterable<List<String
       try {
         this.currentRecord = parseRecord();
       } catch (final IOException e) {
-        ExceptionUtil.throwUncheckedException(e);
+        Exceptions.throwUncheckedException(e);
       }
       return this.currentRecord;
     } else {

@@ -72,17 +72,17 @@ class TaggedLineSegment extends LineSegmentDouble {
     this.index = index;
   }
 
-  @Override
-  protected LineSegment createLineSegment(final GeometryFactory geometryFactory,
-    final int axisCount, final double... coordinates) {
-    return new LineSegmentDoubleGF(this.parent.getGeometryFactory(), axisCount, coordinates);
-  }
-
   public int getIndex() {
     return this.index;
   }
 
   public Geometry getParent() {
     return this.parent;
+  }
+
+  @Override
+  public LineSegment newLineSegment(final int axisCount, final double... coordinates) {
+    final GeometryFactory geometryFactory = this.parent.getGeometryFactory();
+    return new LineSegmentDoubleGF(geometryFactory, axisCount, coordinates);
   }
 }

@@ -13,9 +13,12 @@ public class PointDouble2D extends AbstractPoint {
     return new PointDouble2D(x, y);
   }
 
-  private final double x;
+  private double x;
 
-  private final double y;
+  private double y;
+
+  protected PointDouble2D() {
+  }
 
   public PointDouble2D(final double x, final double y) {
     this.x = x;
@@ -51,6 +54,14 @@ public class PointDouble2D extends AbstractPoint {
   @Override
   public double getY() {
     return this.y;
+  }
+
+  protected void setX(final double x) {
+    this.x = x;
+  }
+
+  protected void setY(final double y) {
+    this.y = y;
   }
 
 }

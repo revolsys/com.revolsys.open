@@ -18,7 +18,7 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 /**
  * For each object render using the first renderer that matches the filter.
@@ -86,7 +86,7 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
             renderer.renderRecord(viewport, visibleArea, layer, record);
           } catch (final TopologyException e) {
           } catch (final Throwable e) {
-            ExceptionUtil.log(getClass(),
+            Exceptions.log(getClass(),
               "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
           }
         }
@@ -107,7 +107,7 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
               try {
                 renderer.renderSelectedRecord(viewport, layer, record);
               } catch (final Throwable e) {
-                ExceptionUtil.log(getClass(),
+                Exceptions.log(getClass(),
                   "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
               }
             }

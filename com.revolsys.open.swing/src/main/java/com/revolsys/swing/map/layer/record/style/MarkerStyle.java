@@ -28,7 +28,7 @@ import com.revolsys.swing.map.layer.record.style.marker.AbstractMarker;
 import com.revolsys.swing.map.layer.record.style.marker.ImageMarker;
 import com.revolsys.swing.map.layer.record.style.marker.Marker;
 import com.revolsys.swing.map.layer.record.style.marker.ShapeMarker;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -519,7 +519,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
         try {
           JavaBeanUtil.setProperty(this, propertyName, propertyValue);
         } catch (final Throwable e) {
-          ExceptionUtil.log(getClass(), "Unable to set style " + propertyName + "=" + propertyValue,
+          Exceptions.log(getClass(), "Unable to set style " + propertyName + "=" + propertyValue,
             e);
         }
       }

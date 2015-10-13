@@ -49,7 +49,7 @@ import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Strings;
 import com.revolsys.util.WrappedException;
@@ -625,7 +625,7 @@ public class Project extends LayerGroup {
               bookmarks.put(name, boundingBox);
             }
           } catch (final Throwable e) {
-            ExceptionUtil.log(getClass(), "Not a valid bounding box " + name + "=" + object, e);
+            Exceptions.log(getClass(), "Not a valid bounding box " + name + "=" + object, e);
           }
         }
       }

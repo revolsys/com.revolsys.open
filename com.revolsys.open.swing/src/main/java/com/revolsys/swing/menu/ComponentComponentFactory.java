@@ -5,7 +5,7 @@ import java.awt.Component;
 import javax.swing.Icon;
 
 import com.revolsys.swing.component.ComponentFactory;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 public class ComponentComponentFactory implements ComponentFactory<Component> {
   private final Component component;
@@ -19,7 +19,7 @@ public class ComponentComponentFactory implements ComponentFactory<Component> {
     try {
       return (ComponentComponentFactory)super.clone();
     } catch (final CloneNotSupportedException e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 

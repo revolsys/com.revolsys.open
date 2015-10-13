@@ -42,7 +42,6 @@ import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.prep.PreparedMultiPoint;
 import com.revolsys.util.WrappedException;
 
 /**
@@ -213,7 +212,7 @@ public class MultiPointImpl implements MultiPoint {
 
   @Override
   public Geometry prepare() {
-    return new PreparedMultiPoint(this);
+    return this;
   }
 
   /**

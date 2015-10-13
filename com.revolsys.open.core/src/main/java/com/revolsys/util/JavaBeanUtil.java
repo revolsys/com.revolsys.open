@@ -136,9 +136,9 @@ public final class JavaBeanUtil {
       final Class<?> clazz = Class.forName(className);
       return (V)clazz.newInstance();
     } catch (final InstantiationException e) {
-      return (V)ExceptionUtil.throwCauseException(e);
+      return (V)Exceptions.throwCauseException(e);
     } catch (final Throwable e) {
-      return (V)ExceptionUtil.throwUncheckedException(e);
+      return (V)Exceptions.throwUncheckedException(e);
     }
   }
 
@@ -173,7 +173,7 @@ public final class JavaBeanUtil {
     } catch (final NoSuchMethodException e) {
       return null;
     } catch (final Throwable e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 
@@ -186,7 +186,7 @@ public final class JavaBeanUtil {
     } catch (final NoSuchMethodException e) {
       return null;
     } catch (final Throwable e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 

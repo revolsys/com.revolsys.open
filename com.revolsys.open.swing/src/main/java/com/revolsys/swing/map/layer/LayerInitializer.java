@@ -6,7 +6,7 @@ import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.MaxThreadsSwingWorker;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 public class LayerInitializer extends AbstractSwingWorker<Void, Void>
   implements MaxThreadsSwingWorker {
@@ -61,7 +61,7 @@ public class LayerInitializer extends AbstractSwingWorker<Void, Void>
       try {
         this.layer.initialize();
       } catch (final Throwable e) {
-        ExceptionUtil.log(this.layer.getClass(),
+        Exceptions.log(this.layer.getClass(),
           "Unable to iniaitlize layer: " + this.layer.getName(), e);
       } finally {
         LAYERS_CURRENTLY_INITIALIZING.remove(this.layer);

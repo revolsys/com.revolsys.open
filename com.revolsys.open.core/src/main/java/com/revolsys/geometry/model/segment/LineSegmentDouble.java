@@ -130,17 +130,6 @@ public class LineSegmentDouble extends AbstractLineSegment {
   }
 
   @Override
-  protected LineSegment createLineSegment(final GeometryFactory geometryFactory,
-    final int axisCount, final double... coordinates) {
-    return new LineSegmentDouble(axisCount, coordinates);
-  }
-
-  @Override
-  protected Point createPoint(final GeometryFactory geometryFactory, final double... coordinates) {
-    return new PointDouble(coordinates);
-  }
-
-  @Override
   public int getAxisCount() {
     return this.coordinates.length / 2;
   }
@@ -170,6 +159,16 @@ public class LineSegmentDouble extends AbstractLineSegment {
   @Override
   public boolean isEmpty() {
     return this.coordinates == null;
+  }
+
+  @Override
+  public LineSegment newLineSegment(final int axisCount, final double... coordinates) {
+    return new LineSegmentDouble(axisCount, coordinates);
+  }
+
+  @Override
+  public Point newPoint(final double... coordinates) {
+    return new PointDouble(coordinates);
   }
 
 }

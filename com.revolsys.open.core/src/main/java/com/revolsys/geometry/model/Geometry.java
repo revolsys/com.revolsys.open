@@ -57,7 +57,6 @@ import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.util.GeometryCollectionMapper;
 import com.revolsys.geometry.model.util.GeometryIntersectionMapOp;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.geometry.operation.IsSimpleOp;
 import com.revolsys.geometry.operation.buffer.Buffer;
 import com.revolsys.geometry.operation.distance.DistanceOp;
 import com.revolsys.geometry.operation.overlay.OverlayOp;
@@ -66,6 +65,7 @@ import com.revolsys.geometry.operation.predicate.RectangleContains;
 import com.revolsys.geometry.operation.predicate.RectangleIntersects;
 import com.revolsys.geometry.operation.relate.RelateOp;
 import com.revolsys.geometry.operation.union.UnaryUnionOp;
+import com.revolsys.geometry.operation.valid.GeometryValidationError;
 import com.revolsys.geometry.operation.valid.IsValidOp;
 import com.revolsys.io.Reader;
 import com.revolsys.record.io.format.wkt.EWktWriter;
@@ -338,7 +338,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   static boolean isAnyTargetComponentInTest(final Geometry geometry, final Geometry testGeom) {
     final PointLocator locator = new PointLocator();
     for (final Vertex vertex : geometry.vertices()) {
-      final boolean intersects = testGeom.intersects(vertex);
+      final boolean intersects = locator.intersects(vertex, testGeom);
       if (intersects) {
         return true;
       }
@@ -353,6 +353,11 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     System.arraycopy(vertexId, 0, newVertextId, 0, lastIndex);
     newVertextId[lastIndex] = vertexIndex;
     return newVertextId;
+  }
+
+  default boolean addIsSimpleErrors(final List<GeometryValidationError> errors,
+    final boolean shortCircuit) {
+    return true;
   }
 
   <V extends Geometry> V appendVertex(Point newPoint, int... geometryId);
@@ -1271,6 +1276,16 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     return getGeometryFactory().point(interiorPt);
   }
 
+  default List<GeometryValidationError> getIsSimpleErrors() {
+    return getIsSimpleErrors(false);
+  }
+
+  default List<GeometryValidationError> getIsSimpleErrors(final boolean shortCircuit) {
+    final List<GeometryValidationError> errors = new ArrayList<>();
+    addIsSimpleErrors(errors, shortCircuit);
+    return errors;
+  }
+
   /**
    *  Returns the length of this <code>Geometry</code>.
    *  Linear geometries return their length.
@@ -1524,10 +1539,9 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    * @return <code>true</code> if this <code>Geometry</code> is simple
    * @see #isValid
    */
-
   default boolean isSimple() {
-    final IsSimpleOp op = new IsSimpleOp(this);
-    return op.isSimple();
+    final List<GeometryValidationError> errors = new ArrayList<>();
+    return addIsSimpleErrors(errors, true);
   }
 
   /**

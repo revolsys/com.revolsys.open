@@ -8,7 +8,7 @@ import org.jdesktop.swingx.JXSearchField;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.equals.Equals;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.OS;
 
 public class SearchField extends JXSearchField implements FocusListener, Field {
@@ -29,7 +29,7 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
     try {
       return (Field)super.clone();
     } catch (final CloneNotSupportedException e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 

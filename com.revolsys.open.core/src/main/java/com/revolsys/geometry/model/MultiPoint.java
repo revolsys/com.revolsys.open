@@ -36,12 +36,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.MultiPointVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.geometry.operation.simple.DuplicateVertexError;
+import com.revolsys.geometry.operation.valid.GeometryValidationError;
 import com.revolsys.io.IteratorReader;
 import com.revolsys.io.Reader;
 import com.revolsys.util.Property;
@@ -55,8 +60,27 @@ import com.revolsys.util.Property;
  */
 public interface MultiPoint extends GeometryCollection, Punctual {
   @Override
-  @SuppressWarnings("unchecked")
+  default boolean addIsSimpleErrors(final List<GeometryValidationError> errors,
+    final boolean shortCircuit) {
+    final Set<Point> points = new TreeSet<>();
+    for (final Vertex vertex : vertices()) {
+      final Point point = new PointDouble(vertex, 2);
+      if (points.contains(point)) {
+        final DuplicateVertexError error = new DuplicateVertexError(vertex);
+        if (shortCircuit) {
+          return false;
+        } else {
+          errors.add(error);
+        }
+      } else {
+        points.add(point);
+      }
+    }
+    return errors.isEmpty();
+  }
 
+  @Override
+  @SuppressWarnings("unchecked")
   default <V extends Geometry> V appendVertex(final Point newPoint, final int... geometryId) {
     if (newPoint == null || newPoint.isEmpty()) {
       return (V)this;
@@ -205,6 +229,16 @@ public interface MultiPoint extends GeometryCollection, Punctual {
       }
     }
     return null;
+  }
+
+  @Override
+  default boolean intersects(final Geometry geometry) {
+    for (final Point point : points()) {
+      if (point.intersects(geometry)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

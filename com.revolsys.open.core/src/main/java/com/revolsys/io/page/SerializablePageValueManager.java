@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 public class SerializablePageValueManager<T> implements PageValueManager<T> {
   @Override
@@ -38,7 +38,7 @@ public class SerializablePageValueManager<T> implements PageValueManager<T> {
       System.arraycopy(valueBytes, 0, bytes, sizeBytes.length, valueBytes.length);
       return bytes;
     } catch (final Exception e) {
-      return (byte[])ExceptionUtil.throwUncheckedException(e);
+      return (byte[])Exceptions.throwUncheckedException(e);
     }
   }
 
@@ -50,7 +50,7 @@ public class SerializablePageValueManager<T> implements PageValueManager<T> {
       final ObjectInputStream in = new ObjectInputStream(bIn);
       return (V)in.readObject();
     } catch (final Exception e) {
-      return (V)ExceptionUtil.throwUncheckedException(e);
+      return (V)Exceptions.throwUncheckedException(e);
     }
   }
 

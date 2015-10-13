@@ -41,7 +41,7 @@ public class Uuid {
       final byte[] digest = digester.digest();
       return Uuid.toUuid(type, digest);
     } catch (final NoSuchAlgorithmException e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 
@@ -70,7 +70,7 @@ public class Uuid {
       final byte[] digest = digester.digest();
       return Uuid.toUuid(type, digest);
     } catch (final NoSuchAlgorithmException e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 

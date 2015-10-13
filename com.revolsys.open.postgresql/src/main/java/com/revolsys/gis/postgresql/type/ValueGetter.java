@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import com.revolsys.io.endian.EndianInputStream;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 public abstract class ValueGetter {
   protected static class BigEndian extends ValueGetter {
@@ -18,7 +18,7 @@ public abstract class ValueGetter {
       try {
         return this.data.readInt();
       } catch (final IOException e) {
-        return ExceptionUtil.throwUncheckedException(e);
+        return Exceptions.throwUncheckedException(e);
       }
     }
 
@@ -27,7 +27,7 @@ public abstract class ValueGetter {
       try {
         return this.data.readLELong();
       } catch (final IOException e) {
-        return ExceptionUtil.throwUncheckedException(e);
+        return Exceptions.throwUncheckedException(e);
       }
     }
   }
@@ -42,7 +42,7 @@ public abstract class ValueGetter {
       try {
         return this.data.readLEInt();
       } catch (final IOException e) {
-        return ExceptionUtil.throwUncheckedException(e);
+        return Exceptions.throwUncheckedException(e);
       }
     }
 
@@ -51,7 +51,7 @@ public abstract class ValueGetter {
       try {
         return this.data.readLELong();
       } catch (final IOException e) {
-        return ExceptionUtil.throwUncheckedException(e);
+        return Exceptions.throwUncheckedException(e);
       }
     }
   }
@@ -67,7 +67,7 @@ public abstract class ValueGetter {
         throw new IllegalArgumentException("Unknown Endian type:" + endianType);
       }
     } catch (final IOException e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 
@@ -87,7 +87,7 @@ public abstract class ValueGetter {
     try {
       return this.data.readByte();
     } catch (final IOException e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 

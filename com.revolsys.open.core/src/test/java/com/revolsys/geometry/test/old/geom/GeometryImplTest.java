@@ -227,7 +227,7 @@ public class GeometryImplTest extends TestCase {
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry createCollection(final Geometry... geometries) {
-        return GeometryImplTest.this.geometryFactory.multiLineString((Object[])geometries);
+        return GeometryImplTest.this.geometryFactory.multiLineString(geometries);
       }
     };
 
@@ -255,7 +255,7 @@ public class GeometryImplTest extends TestCase {
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry createCollection(final Geometry... geometries) {
-        return GeometryImplTest.this.geometryFactory.multiLineString((Object[])geometries);
+        return GeometryImplTest.this.geometryFactory.multiLineString(geometries);
       }
     };
 
@@ -265,7 +265,7 @@ public class GeometryImplTest extends TestCase {
     final CollectionFactory collectionFactory2 = new CollectionFactory() {
       @Override
       public Geometry createCollection(final Geometry... geometries) {
-        return GeometryImplTest.this.geometryFactory.multiLineString((Object[])geometries);
+        return GeometryImplTest.this.geometryFactory.multiLineString(geometries);
       }
     };
 
@@ -282,7 +282,7 @@ public class GeometryImplTest extends TestCase {
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry createCollection(final Geometry... geometries) {
-        return GeometryImplTest.this.geometryFactory.multiPoint((Object[])geometries);
+        return GeometryImplTest.this.geometryFactory.multiPoint(geometries);
       }
     };
 

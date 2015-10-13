@@ -17,7 +17,7 @@ import javax.swing.SwingWorker;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.parallel.ThreadInterruptedException;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class Invoke {
@@ -82,7 +82,7 @@ public class Invoke {
         return runnable.getResult();
       }
     } catch (final Throwable e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 
@@ -95,7 +95,7 @@ public class Invoke {
       } catch (final InterruptedException e) {
         throw new ThreadInterruptedException(e);
       } catch (final InvocationTargetException e) {
-        ExceptionUtil.throwCauseException(e);
+        Exceptions.throwCauseException(e);
       }
     }
   }
@@ -111,7 +111,7 @@ public class Invoke {
         try {
           backgroundTask.call();
         } catch (final Exception e) {
-          ExceptionUtil.throwUncheckedException(e);
+          Exceptions.throwUncheckedException(e);
         }
       }
     }

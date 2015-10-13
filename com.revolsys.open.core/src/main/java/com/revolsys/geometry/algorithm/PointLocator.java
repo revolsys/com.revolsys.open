@@ -82,6 +82,10 @@ public class PointLocator {
     return numBoundaries;
   }
 
+  public boolean intersects(final Point point, final Geometry geometry) {
+    return locate(point, geometry) != Location.EXTERIOR;
+  }
+
   /**
    * Computes the topological relationship ({@link Location}) of a single point
    * to a Geometry.
@@ -96,9 +100,9 @@ public class PointLocator {
     if (geometry.isEmpty()) {
       return Location.EXTERIOR;
     } else if (geometry instanceof LineString) {
-      return ((LineString)geometry).locate(point);
+      return geometry.locate(point);
     } else if (geometry instanceof Polygon) {
-      return ((Polygon)geometry).locate(point);
+      return geometry.locate(point);
     }
 
     this.isIn = false;

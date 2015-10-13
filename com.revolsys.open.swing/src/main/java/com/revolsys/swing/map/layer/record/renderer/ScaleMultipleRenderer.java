@@ -14,7 +14,7 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 /**
  * Use the first renderer which is visible at the current scale, ignore all
@@ -89,7 +89,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
           renderer.renderRecord(viewport, visibleArea, layer, object);
         } catch (final TopologyException e) {
         } catch (final Throwable e) {
-          ExceptionUtil.log(getClass(),
+          Exceptions.log(getClass(),
             "Unabled to render " + layer.getName() + " #" + object.getIdentifier(), e);
         }
       }
@@ -123,7 +123,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
         try {
           renderer.renderSelectedRecord(viewport, layer, object);
         } catch (final Throwable e) {
-          ExceptionUtil.log(getClass(),
+          Exceptions.log(getClass(),
             "Unabled to render " + layer.getName() + " #" + object.getIdentifier(), e);
         }
       }

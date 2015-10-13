@@ -11,7 +11,7 @@ import javax.swing.event.ChangeListener;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Numbers;
 import com.revolsys.util.Property;
 
@@ -53,7 +53,7 @@ public class Slider extends JSlider implements Field, FocusListener, ChangeListe
     try {
       return (Field)super.clone();
     } catch (final CloneNotSupportedException e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 

@@ -47,6 +47,7 @@ import com.revolsys.geometry.model.segment.GeometryCollectionSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.GeometryCollectionVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.geometry.operation.valid.GeometryValidationError;
 import com.revolsys.io.Reader;
 
 /**
@@ -57,6 +58,17 @@ import com.revolsys.io.Reader;
  *@version 1.7
  */
 public interface GeometryCollection extends Geometry {
+  @Override
+  default boolean addIsSimpleErrors(final List<GeometryValidationError> errors,
+    final boolean shortCircuit) {
+    for (final Geometry geometry : geometries()) {
+      if (!geometry.addIsSimpleErrors(errors, shortCircuit) && shortCircuit) {
+        return false;
+      }
+    }
+    return errors.isEmpty();
+  }
+
   @Override
   @SuppressWarnings("unchecked")
   default <V extends Geometry> V appendVertex(final Point newPoint, final int... geometryId) {

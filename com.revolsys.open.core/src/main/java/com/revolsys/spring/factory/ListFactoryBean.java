@@ -7,7 +7,7 @@ import org.springframework.beans.TypeConverter;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.core.GenericCollectionTypeResolver;
 
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 @SuppressWarnings("rawtypes")
 public class ListFactoryBean<T> extends AbstractFactoryBean<List> {
@@ -27,7 +27,7 @@ public class ListFactoryBean<T> extends AbstractFactoryBean<List> {
       try {
         result = this.targetListClass.newInstance();
       } catch (final Exception e) {
-        ExceptionUtil.throwUncheckedException(e);
+        Exceptions.throwUncheckedException(e);
       }
     } else {
       result = new ArrayList();

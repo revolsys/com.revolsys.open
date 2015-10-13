@@ -37,7 +37,6 @@ import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.operation.BoundaryOp;
-import com.revolsys.geometry.operation.IsSimpleOp;
 import com.revolsys.geometry.operation.relate.RelateOp;
 
 /**
@@ -50,7 +49,7 @@ import com.revolsys.geometry.operation.relate.RelateOp;
  * in specific situations (for instance, linear network topology
  * usually follows the {@link EndPointBoundaryNodeRule}.)
  * Some JTS operations
- * (such as {@link RelateOp}, {@link BoundaryOp} and {@link IsSimpleOp})
+ * (such as {@link RelateOp}, {@link BoundaryOp} and )
  * allow the BoundaryNodeRule to be specified,
  * and respect the supplied rule when computing the results of the operation.
  * <p>
@@ -73,7 +72,6 @@ import com.revolsys.geometry.operation.relate.RelateOp;
  *
  * @see RelateOp
  * @see BoundaryOp
- * @see IsSimpleOp
  * @see PointLocator
  */
 public interface BoundaryNodeRule {

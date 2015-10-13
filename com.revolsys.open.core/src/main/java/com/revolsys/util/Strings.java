@@ -162,6 +162,28 @@ public interface Strings {
     }
   }
 
+  static String replaceAll(final String text, final String from, final Object to) {
+    if (text == null) {
+      return null;
+    } else {
+      String toText;
+      if (to == null) {
+        toText = "";
+      } else {
+        toText = to.toString();
+      }
+      return text.replaceAll(from, toText);
+    }
+  }
+
+  static String replaceAll(final String text, final String from, final String to) {
+    if (text == null) {
+      return null;
+    } else {
+      return text.replaceAll(from, to);
+    }
+  }
+
   public static boolean startsWith(final String text, final String prefix) {
     if (text != null && prefix != null) {
       return text.startsWith(prefix);

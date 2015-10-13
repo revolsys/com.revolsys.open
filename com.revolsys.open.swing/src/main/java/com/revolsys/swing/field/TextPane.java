@@ -12,7 +12,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.equals.Equals;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.PopupMenu;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 import jsyntaxpane.DefaultSyntaxKit;
 
@@ -58,7 +58,7 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
     try {
       return (Field)super.clone();
     } catch (final CloneNotSupportedException e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 

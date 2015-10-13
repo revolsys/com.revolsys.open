@@ -77,7 +77,7 @@ import com.revolsys.swing.tree.node.file.FolderConnectionsTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.swing.tree.node.layer.ProjectTreeNode;
 import com.revolsys.swing.tree.node.record.RecordStoreConnectionsTreeNode;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.OS;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
@@ -217,7 +217,7 @@ public class ProjectFrame extends BaseFrame {
           scriptFile.getParent());
         shell.run(scriptFile, args);
       } catch (final Throwable e) {
-        ExceptionUtil.log(getClass(), "Unable to run script:" + scriptFile, e);
+        Exceptions.log(getClass(), "Unable to run script:" + scriptFile, e);
       }
     }
   }
@@ -668,7 +668,7 @@ public class ProjectFrame extends BaseFrame {
         this.project.reset();
         Invoke.background("Load project", () -> loadProject(projectPath));
       } catch (final Throwable e) {
-        ExceptionUtil.log(getClass(), "Unable to open project:" + projectPath, e);
+        Exceptions.log(getClass(), "Unable to open project:" + projectPath, e);
       }
     }
   }

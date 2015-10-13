@@ -15,7 +15,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.io.input.XmlStreamReader;
 
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class XmlReader implements XMLStreamConstants, Closeable {
@@ -32,7 +32,7 @@ public class XmlReader implements XMLStreamConstants, Closeable {
       this.parser = FACTORY.createXMLStreamReader(reader);
       skipToStartElement();
     } catch (final Throwable e) {
-      ExceptionUtil.throwUncheckedException(e);
+      Exceptions.throwUncheckedException(e);
     }
   }
 
@@ -41,7 +41,7 @@ public class XmlReader implements XMLStreamConstants, Closeable {
     try {
       this.parser.close();
     } catch (final XMLStreamException e) {
-      ExceptionUtil.throwUncheckedException(e);
+      Exceptions.throwUncheckedException(e);
     }
   }
 
@@ -120,7 +120,7 @@ public class XmlReader implements XMLStreamConstants, Closeable {
       }
       return next;
     } catch (final XMLStreamException e) {
-      return (Integer)ExceptionUtil.throwUncheckedException(e);
+      return (Integer)Exceptions.throwUncheckedException(e);
     }
   }
 

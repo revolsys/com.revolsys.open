@@ -3,7 +3,7 @@ package com.revolsys.swing.parallel;
 import java.util.concurrent.Callable;
 
 import com.revolsys.parallel.AbstractRunnable;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 /**
  * <p>A {@link Runnable} wrapper for a {@link Callable}. The result of the {@link Callable} can
@@ -29,7 +29,7 @@ public class RunnableCallable<T> extends AbstractRunnable {
     try {
       this.result = this.callable.call();
     } catch (final Exception e) {
-      ExceptionUtil.throwUncheckedException(e);
+      Exceptions.throwUncheckedException(e);
     }
   }
 

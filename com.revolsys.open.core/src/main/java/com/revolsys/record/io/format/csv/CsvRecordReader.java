@@ -26,7 +26,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class CsvRecordReader extends AbstractIterator<Record>implements RecordReader {
@@ -112,7 +112,7 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
       final String[] line = readNextRecord();
       newRecordDefinition(line);
     } catch (final IOException e) {
-      ExceptionUtil.log(getClass(), "Unable to open " + this.resource, e);
+      Exceptions.log(getClass(), "Unable to open " + this.resource, e);
     } catch (final NoSuchElementException e) {
     }
   }

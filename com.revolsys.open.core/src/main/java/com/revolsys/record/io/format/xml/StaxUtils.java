@@ -32,7 +32,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.io.input.XmlStreamReader;
 
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 /**
@@ -58,7 +58,7 @@ public final class StaxUtils {
       final XmlStreamReader reader = new XmlStreamReader(inputStream);
       return StaxUtils.FACTORY.createXMLStreamReader(reader);
     } catch (final Throwable e) {
-      ExceptionUtil.throwUncheckedException(e);
+      Exceptions.throwUncheckedException(e);
       return null;
     }
   }
@@ -67,7 +67,7 @@ public final class StaxUtils {
     try {
       return StaxUtils.FACTORY.createXMLStreamReader(reader);
     } catch (final Throwable e) {
-      ExceptionUtil.throwUncheckedException(e);
+      Exceptions.throwUncheckedException(e);
       return null;
     }
   }
@@ -213,7 +213,7 @@ public final class StaxUtils {
     try {
       return parser.next();
     } catch (final XMLStreamException e) {
-      return (Integer)ExceptionUtil.throwUncheckedException(e);
+      return (Integer)Exceptions.throwUncheckedException(e);
     }
   }
 
@@ -221,7 +221,7 @@ public final class StaxUtils {
     try {
       return parser.nextTag();
     } catch (final XMLStreamException e) {
-      return (Integer)ExceptionUtil.throwUncheckedException(e);
+      return (Integer)Exceptions.throwUncheckedException(e);
     }
   }
 
@@ -230,7 +230,7 @@ public final class StaxUtils {
     try {
       parser.require(type, namespaceURI, localPart);
     } catch (final XMLStreamException e) {
-      ExceptionUtil.throwUncheckedException(e);
+      Exceptions.throwUncheckedException(e);
     }
   }
 
@@ -483,7 +483,7 @@ public final class StaxUtils {
       writer.writeStartElement(element.getPrefix(), element.getLocalPart(),
         element.getNamespaceURI());
     } catch (final XMLStreamException e) {
-      ExceptionUtil.throwUncheckedException(e);
+      Exceptions.throwUncheckedException(e);
     }
   }
 

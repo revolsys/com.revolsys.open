@@ -27,7 +27,7 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordStoreExtension;
 import com.revolsys.record.property.RecordDefinitionProperty;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordStore extends BaseObjectWithProperties implements RecordStore {
@@ -138,7 +138,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
         extension.initialize(this, connectionProperties);
         this.recordStoreExtensions.add(extension);
       } catch (final Throwable e) {
-        ExceptionUtil.log(extension.getClass(), "Unable to initialize", e);
+        Exceptions.log(extension.getClass(), "Unable to initialize", e);
       }
     }
   }

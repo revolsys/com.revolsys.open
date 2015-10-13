@@ -32,12 +32,14 @@
  */
 package com.revolsys.geometry.test.old.operation;
 
+import java.util.List;
+
 import com.revolsys.geometry.algorithm.BoundaryNodeRule;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.geometry.operation.IsSimpleOp;
+import com.revolsys.geometry.operation.valid.GeometryValidationError;
 import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.geometry.wkb.WKTReader;
 
@@ -45,7 +47,7 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 /**
- * Tests {@link IsSimpleOp} with different {@link BoundaryNodeRule}s.
+ * Tests with different {@link BoundaryNodeRule}s.
  *
  * @author Martin Davis
  * @version 1.7
@@ -73,17 +75,16 @@ public class IsSimpleTest extends TestCase {
   private void runIsSimpleTest(final String wkt, final boolean expectedResult,
     final Point expectedLocation) throws ParseException {
     final Geometry g = this.rdr.read(wkt);
-    final IsSimpleOp op = new IsSimpleOp(g);
-    boolean isSimple = false;
-    isSimple = op.isSimple();
-    final Point nonSimpleLoc = op.getNonSimpleLocation();
+    final List<GeometryValidationError> errors = g.getIsSimpleErrors();
+    final boolean isSimple = g.isSimple();
 
     // if geom is not simple, should have a valid location
-    assertTrue(isSimple || nonSimpleLoc != null);
+    assertTrue(isSimple || !errors.isEmpty());
 
     assertTrue(expectedResult == isSimple);
 
     if (!isSimple && expectedLocation != null) {
+      final Point nonSimpleLoc = errors.get(0).getErrorPoint();
       assertTrue(expectedLocation.distance(nonSimpleLoc) < TOLERANCE);
     }
   }

@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.apache.commons.beanutils.MethodUtils;
 
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 public class InvokeMethodMapObjectFactory extends AbstractMapObjectFactory
   implements MapSerializer {
@@ -38,11 +38,11 @@ public class InvokeMethodMapObjectFactory extends AbstractMapObjectFactory
       final Class<?> clazz = this.typeClass;
       return (V)MethodUtils.invokeStaticMethod(clazz, this.methodName, properties);
     } catch (final NoSuchMethodException e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     } catch (final IllegalAccessException e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     } catch (final InvocationTargetException e) {
-      return ExceptionUtil.throwCauseException(e);
+      return Exceptions.throwCauseException(e);
     }
   }
 }

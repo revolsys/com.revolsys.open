@@ -521,7 +521,8 @@ public final class ShapefileGeometryUtil {
         readCoordinates(in, vertexCount, axisCount, coordinates, 3);
       }
 
-      return geometryFactory.multiLineString(axisCount, coordinatesList);
+      return geometryFactory.multiLineString(axisCount,
+        coordinatesList.toArray(new double[coordinatesList.size()][]));
     }
   }
 

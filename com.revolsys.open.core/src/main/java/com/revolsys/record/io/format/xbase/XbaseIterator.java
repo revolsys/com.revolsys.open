@@ -29,7 +29,7 @@ import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.DateUtil;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 public class XbaseIterator extends AbstractIterator<Record>implements RecordReader {
   public static final char CHARACTER_TYPE = 'C';
@@ -248,7 +248,7 @@ public class XbaseIterator extends AbstractIterator<Record>implements RecordRead
       try {
         number = new BigDecimal(numberString.trim());
       } catch (final Throwable e) {
-        ExceptionUtil.log(getClass(), "'" + numberString + " 'is not a valid number", e);
+        Exceptions.log(getClass(), "'" + numberString + " 'is not a valid number", e);
       }
     }
     return number;

@@ -2,8 +2,6 @@ package com.revolsys.geometry.model.segment;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.IteratorReader;
-import com.revolsys.io.Reader;
 
 public abstract class AbstractSegment extends AbstractLineSegment implements Segment {
   private static final long serialVersionUID = 1L;
@@ -47,31 +45,4 @@ public abstract class AbstractSegment extends AbstractLineSegment implements Seg
   public GeometryFactory getGeometryFactory() {
     return this.geometry.getGeometryFactory();
   }
-
-  @Override
-  public int getPartIndex() {
-    return -1;
-  }
-
-  @Override
-  public int getRingIndex() {
-    return -1;
-  }
-
-  @Override
-  public int getSegmentIndex() {
-    final int[] vertexId = getSegmentId();
-    return vertexId[vertexId.length - 1];
-  }
-
-  @Override
-  public boolean isEmpty() {
-    return false;
-  }
-
-  @Override
-  public Reader<Segment> reader() {
-    return new IteratorReader<Segment>(this);
-  }
-
 }

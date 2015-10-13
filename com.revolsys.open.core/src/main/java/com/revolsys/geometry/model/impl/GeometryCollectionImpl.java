@@ -40,7 +40,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.prep.PreparedGeometryCollection;
+import com.revolsys.util.Exceptions;
 
 /**
  * Models a collection of {@link Geometry}s of
@@ -49,8 +49,7 @@ import com.revolsys.geometry.model.prep.PreparedGeometryCollection;
  *
  *@version 1.7
  */
-public class GeometryCollectionImpl extends AbstractGeometryCollection {
-  // With contributions from Markus Schaber [schabios@logi-track.com] 2004-03-26
+public class GeometryCollectionImpl implements GeometryCollection {
   private static final long serialVersionUID = -5694727726395021467L;
 
   /**
@@ -105,12 +104,55 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection {
    */
   @Override
   public GeometryCollectionImpl clone() {
-    final GeometryCollectionImpl gc = (GeometryCollectionImpl)super.clone();
-    gc.geometries = new Geometry[this.geometries.length];
-    for (int i = 0; i < this.geometries.length; i++) {
-      gc.geometries[i] = this.geometries[i].clone();
+    try {
+      final GeometryCollectionImpl geometryCollection = (GeometryCollectionImpl)super.clone();
+      geometryCollection.geometries = new Geometry[this.geometries.length];
+      for (int i = 0; i < this.geometries.length; i++) {
+        geometryCollection.geometries[i] = this.geometries[i].clone();
+      }
+      return geometryCollection;
+    } catch (final CloneNotSupportedException e) {
+      throw Exceptions.wrap(e);
     }
-    return gc;
+  }
+
+  /**
+   * Tests whether this geometry is structurally and numerically equal
+   * to a given <code>Object</code>.
+   * If the argument <code>Object</code> is not a <code>Geometry</code>,
+   * the result is <code>false</code>.
+   * Otherwise, the result is computed using
+   * {@link #equals(2,Geometry)}.
+   * <p>
+   * This method is provided to fulfill the Java contract
+   * for value-based object equality.
+   * In conjunction with {@link #hashCode()}
+   * it provides semantics which are most useful
+   * for using
+   * <code>Geometry</code>s as keys and values in Java collections.
+   * <p>
+   * Note that to produce the expected result the input geometries
+   * should be in normal form.  It is the caller's
+   * responsibility to perform this where required
+   * (using {@link Geometry#norm()
+   * or {@link #normalize()} as appropriate).
+   *
+   * @param other the Object to compare
+   * @return true if this geometry is exactly equal to the argument
+   *
+   * @see #equals(2,Geometry)
+   * @see #hashCode()
+   * @see #norm()
+   * @see #normalize()
+   */
+  @Override
+  public boolean equals(final Object other) {
+    if (other instanceof Geometry) {
+      final Geometry geometry = (Geometry)other;
+      return equals(2, geometry);
+    } else {
+      return false;
+    }
   }
 
   @Override
@@ -169,6 +211,17 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection {
     return this.userData;
   }
 
+  /**
+   * Gets a hash code for the Geometry.
+   *
+   * @return an integer value suitable for use as a hashcode
+   */
+
+  @Override
+  public int hashCode() {
+    return getBoundingBox().hashCode();
+  }
+
   @Override
   public boolean isEmpty() {
     return this.geometries == null;
@@ -176,7 +229,7 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection {
 
   @Override
   public GeometryCollection prepare() {
-    return new PreparedGeometryCollection(this);
+    return this;
   }
 
   /**
@@ -192,6 +245,11 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection {
   @Override
   public void setUserData(final Object userData) {
     this.userData = userData;
+  }
+
+  @Override
+  public String toString() {
+    return toWkt();
   }
 
 }

@@ -47,6 +47,7 @@ import com.revolsys.geometry.model.segment.PolygonSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.PolygonVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.geometry.operation.valid.GeometryValidationError;
 import com.revolsys.io.IteratorReader;
 import com.revolsys.io.Reader;
 import com.revolsys.util.Property;
@@ -78,7 +79,6 @@ import com.revolsys.util.Property;
  *@version 1.7
  */
 public interface Polygon extends Polygonal {
-
   /**
    *  Returns the minimum coordinate, using the usual lexicographic comparison.
    *
@@ -138,6 +138,17 @@ public interface Polygon extends Polygonal {
     CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexCount - 1, points, index);
     final GeometryFactory geometryFactory = ring.getGeometryFactory();
     return geometryFactory.linearRing(axisCount, coordinates);
+  }
+
+  @Override
+  default boolean addIsSimpleErrors(final List<GeometryValidationError> errors,
+    final boolean shortCircuit) {
+    for (final LinearRing ring : rings()) {
+      if (!ring.addIsSimpleErrors(errors, shortCircuit) && shortCircuit) {
+        return false;
+      }
+    }
+    return errors.isEmpty();
   }
 
   @Override

@@ -22,7 +22,7 @@ import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.FieldSupport;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 public class ValueField extends JPanel implements Field {
   private static final long serialVersionUID = 1L;
@@ -71,7 +71,7 @@ public class ValueField extends JPanel implements Field {
     try {
       return (Field)super.clone();
     } catch (final CloneNotSupportedException e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 

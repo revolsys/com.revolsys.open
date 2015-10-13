@@ -45,7 +45,7 @@ import com.revolsys.record.query.functions.WithinDistance;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public abstract class QueryValue implements Cloneable {
@@ -376,7 +376,7 @@ public abstract class QueryValue implements Cloneable {
       final QueryValue clone = (QueryValue)super.clone();
       return clone;
     } catch (final CloneNotSupportedException e) {
-      ExceptionUtil.throwUncheckedException(e);
+      Exceptions.throwUncheckedException(e);
       return null;
     }
   }

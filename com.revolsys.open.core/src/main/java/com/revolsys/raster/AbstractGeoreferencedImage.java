@@ -45,7 +45,7 @@ import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.xml.DomUtil;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeObject
@@ -387,7 +387,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
 
         return settingsFile.getLastModified();
       } catch (final Throwable e) {
-        ExceptionUtil.log(getClass(), "Unable to load:" + settingsFile, e);
+        Exceptions.log(getClass(), "Unable to load:" + settingsFile, e);
         return -1;
       }
     } else {
@@ -474,7 +474,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
       setHasChanges(false);
       return true;
     } catch (final Throwable e) {
-      ExceptionUtil.log(getClass(), "Unable to save: " + this.imageResource + ".rgobject", e);
+      Exceptions.log(getClass(), "Unable to save: " + this.imageResource + ".rgobject", e);
       return false;
     }
   }

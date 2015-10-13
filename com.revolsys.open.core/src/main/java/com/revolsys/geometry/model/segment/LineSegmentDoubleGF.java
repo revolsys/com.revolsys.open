@@ -48,19 +48,20 @@ public class LineSegmentDoubleGF extends LineSegmentDouble {
   }
 
   @Override
-  protected LineSegment createLineSegment(final GeometryFactory geometryFactory,
-    final int axisCount, final double... coordinates) {
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
+  }
+
+  @Override
+  public LineSegment newLineSegment(final int axisCount, final double... coordinates) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
     return new LineSegmentDoubleGF(geometryFactory, axisCount, coordinates);
   }
 
   @Override
-  protected Point createPoint(final GeometryFactory geometryFactory, final double... coordinates) {
+  public Point newPoint(final double... coordinates) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
     return new PointDoubleGf(geometryFactory, coordinates);
-  }
-
-  @Override
-  public GeometryFactory getGeometryFactory() {
-    return this.geometryFactory;
   }
 
   private void setGeometryFactory(final GeometryFactory geometryFactory) {

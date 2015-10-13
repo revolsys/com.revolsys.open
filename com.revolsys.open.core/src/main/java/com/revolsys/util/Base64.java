@@ -1356,7 +1356,7 @@ public class Base64 {
     try {
       return new String(outBuff, 0, e, PREFERRED_ENCODING);
     } catch (final java.io.UnsupportedEncodingException uue) {
-      ExceptionUtil.throwUncheckedException(uue);
+      Exceptions.throwUncheckedException(uue);
       return null;
     }
 

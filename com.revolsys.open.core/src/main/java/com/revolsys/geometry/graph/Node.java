@@ -21,13 +21,13 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.AbstractPoint;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDouble2D;
 import com.revolsys.properties.ObjectPropertyProxy;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.Record;
 
-public class Node<T> extends AbstractPoint implements ObjectWithProperties, Externalizable {
+public class Node<T> extends PointDouble2D implements ObjectWithProperties, Externalizable {
   public static <V> Predicate<Node<V>> filterDegree(final int degree) {
     return (node) -> {
       return node.getDegree() == degree;
@@ -124,18 +124,13 @@ public class Node<T> extends AbstractPoint implements ObjectWithProperties, Exte
 
   private int[] outEdgeIds = new int[0];
 
-  private double x;
-
-  private double y;
-
   public Node() {
   }
 
   protected Node(final int nodeId, final Graph<T> graph, final Point point) {
+    super(point);
     this.id = nodeId;
     this.graph = graph;
-    this.x = point.getX();
-    this.y = point.getY();
   }
 
   private int[] addEdge(final int[] oldEdgeIds, final Edge<T> edge) {
@@ -165,11 +160,6 @@ public class Node<T> extends AbstractPoint implements ObjectWithProperties, Exte
     }
   }
 
-  @Override
-  public PointDouble newPointDouble() {
-    return new PointDouble(this.x, this.y);
-  }
-
   public int compareTo(final Node<T> node) {
     return compareTo((Point)node);
   }
@@ -194,7 +184,7 @@ public class Node<T> extends AbstractPoint implements ObjectWithProperties, Exte
   }
 
   public boolean equalsCoordinate(final double x, final double y) {
-    return this.x == x && this.y == y;
+    return this.getX() == x && this.getY() == y;
   }
 
   @Override
@@ -240,9 +230,9 @@ public class Node<T> extends AbstractPoint implements ObjectWithProperties, Exte
   public double getCoordinate(final int index) {
     switch (index) {
       case 0:
-        return this.x;
+        return this.getX();
       case 1:
-        return this.y;
+        return this.getY();
 
       default:
         return Double.NaN;
@@ -530,14 +520,19 @@ public class Node<T> extends AbstractPoint implements ObjectWithProperties, Exte
   }
 
   @Override
+  public PointDouble newPointDouble() {
+    return new PointDouble(this.getX(), this.getY());
+  }
+
+  @Override
   public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
     final int graphId = in.readInt();
     this.graph = Graph.getGraph(graphId);
     this.id = in.readInt();
     this.inEdgeIds = (int[])in.readObject();
     this.outEdgeIds = (int[])in.readObject();
-    this.x = in.readDouble();
-    this.y = in.readDouble();
+    setX(in.readDouble());
+    setY(in.readDouble());
   }
 
   void remove() {
@@ -604,7 +599,7 @@ public class Node<T> extends AbstractPoint implements ObjectWithProperties, Exte
     out.writeInt(this.id);
     out.writeObject(this.inEdgeIds);
     out.writeObject(this.outEdgeIds);
-    out.writeDouble(this.x);
-    out.writeDouble(this.y);
+    out.writeDouble(this.getX());
+    out.writeDouble(this.getY());
   }
 }

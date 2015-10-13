@@ -8,7 +8,7 @@ import java.awt.Window;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 public abstract class AbstractRunnable implements Runnable {
   private static final Cursor WAIT_CURSOR = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
@@ -80,7 +80,7 @@ public abstract class AbstractRunnable implements Runnable {
         doRun();
       }
     } catch (final Throwable t) {
-      ExceptionUtil.log(getClass(), t);
+      Exceptions.log(getClass(), t);
     }
   }
 

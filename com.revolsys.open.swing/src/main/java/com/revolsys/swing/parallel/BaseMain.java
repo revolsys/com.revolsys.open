@@ -20,7 +20,7 @@ import org.apache.log4j.spi.LoggingEvent;
 import com.revolsys.swing.listener.MacApplicationListenerHandler;
 import com.revolsys.swing.logging.ListLog4jAppender;
 import com.revolsys.swing.logging.LoggingEventPanel;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class BaseMain implements UncaughtExceptionHandler {
@@ -31,7 +31,7 @@ public class BaseMain implements UncaughtExceptionHandler {
       main.processArguments(args);
       main.run();
     } catch (final Throwable e) {
-      ExceptionUtil.log(mainClass, e);
+      Exceptions.log(mainClass, e);
     }
   }
 
@@ -101,7 +101,7 @@ public class BaseMain implements UncaughtExceptionHandler {
       "Unable to start application", e);
 
     LoggingEventPanel.showDialog(null, event);
-    ExceptionUtil.log(getClass(), "Unable to start application " + this.name, e);
+    Exceptions.log(getClass(), "Unable to start application " + this.name, e);
   }
 
   public void processArguments(final String[] args) {
@@ -137,7 +137,7 @@ public class BaseMain implements UncaughtExceptionHandler {
         message = "Unknown error";
       }
     }
-    ExceptionUtil.log(logClass, message, e);
+    Exceptions.log(logClass, message, e);
     @SuppressWarnings("unchecked")
     final Enumeration<Appender> allAppenders = Logger.getRootLogger().getAllAppenders();
     while (allAppenders.hasMoreElements()) {

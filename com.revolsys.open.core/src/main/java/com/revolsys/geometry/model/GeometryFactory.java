@@ -935,7 +935,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public Point[] getPointArray(final Collection<?> pointsList) {
-    final List<Point> points = new ArrayList<Point>();
+    final List<Point> points = new ArrayList<>();
     for (final Object object : pointsList) {
       final Point point = point(object);
       if (point != null && !point.isEmpty()) {
@@ -1264,6 +1264,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
+  public MultiLineString multiLineString(final Geometry... lines) {
+    return multiLineString(Arrays.asList(lines));
+  }
+
   public MultiLineString multiLineString(final int axisCount, final double[]... linesCoordinates) {
     if (linesCoordinates == null) {
       return multiLineString();
@@ -1280,17 +1284,13 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   /**
    * Creates a MultiLineString using the given LineStrings; a null or empty
-   * array will Construct a newn empty MultiLineString.
+   * array will Construct a new empty MultiLineString.
    *
    * @param lineStrings LineStrings, each of which may be empty but not null
    * @return the created MultiLineString
    */
   public MultiLineString multiLineString(final LineString... lines) {
     return new MultiLineStringImpl(this, lines);
-  }
-
-  public MultiLineString multiLineString(final Object... lines) {
-    return multiLineString(Arrays.asList(lines));
   }
 
   public MultiPoint multiPoint() {
@@ -1325,6 +1325,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       throw new IllegalArgumentException("Cannot convert class " + geometry.getClass() + " to "
         + MultiPoint.class + "\n" + geometry);
     }
+  }
+
+  public MultiPoint multiPoint(final Geometry... points) {
+    return multiPoint(Arrays.asList(points));
   }
 
   public MultiPoint multiPoint(final int axisCount, final double... coordinates) {
@@ -1365,10 +1369,6 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       }
       return multiPoint(points);
     }
-  }
-
-  public MultiPoint multiPoint(final Object... points) {
-    return multiPoint(Arrays.asList(points));
   }
 
   /**
@@ -1544,6 +1544,24 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return new PolygonImpl(this);
   }
 
+  public Polygon polygon(final Geometry... rings) {
+    return polygon(Arrays.asList(rings));
+  }
+
+  public Polygon polygon(final int axisCount, final double[]... ringsCoordinates) {
+    if (ringsCoordinates == null) {
+      return polygon();
+    } else {
+      final int ringCount = ringsCoordinates.length;
+      final LinearRing[] rings = new LinearRing[ringCount];
+      for (int i = 0; i < ringCount; i++) {
+        final double[] ringCoordinates = ringsCoordinates[i];
+        rings[i] = linearRing(axisCount, ringCoordinates);
+      }
+      return new PolygonImpl(this, rings);
+    }
+  }
+
   /**
    * Constructs a <code>Polygon</code> with the given exterior boundary.
    *
@@ -1572,10 +1590,6 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       }
       return new PolygonImpl(this, linearRings);
     }
-  }
-
-  public Polygon polygon(final Object... rings) {
-    return polygon(Arrays.asList(rings));
   }
 
   public Polygon polygon(final Polygon polygon) {

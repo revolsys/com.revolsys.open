@@ -57,7 +57,7 @@ import com.revolsys.io.filter.ExtensionFilenameFilter;
 import com.revolsys.io.filter.PatternFilenameFilter;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 import com.revolsys.util.WrappedException;
@@ -165,7 +165,7 @@ public final class FileUtil {
         }
         copy(in, destFile);
       } catch (final FileNotFoundException e) {
-        ExceptionUtil.throwUncheckedException(e);
+        Exceptions.throwUncheckedException(e);
       }
     }
   }
@@ -293,7 +293,7 @@ public final class FileUtil {
         }
         return numBytes;
       } catch (final IOException e) {
-        return (Long)ExceptionUtil.throwUncheckedException(e);
+        return (Long)Exceptions.throwUncheckedException(e);
       }
     }
   }
@@ -375,7 +375,7 @@ public final class FileUtil {
       file.deleteOnExit();
       return file;
     } catch (final Exception e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 
@@ -396,7 +396,7 @@ public final class FileUtil {
     try {
       return new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
     } catch (final FileNotFoundException e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 
@@ -926,7 +926,7 @@ public final class FileUtil {
       final URI uri = new URI(url);
       return getFile(uri);
     } catch (final URISyntaxException e) {
-      ExceptionUtil.throwUncheckedException(e);
+      Exceptions.throwUncheckedException(e);
       return null;
     }
   }

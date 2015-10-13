@@ -21,7 +21,7 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class FileRecordLayer extends ListRecordLayer {
@@ -124,7 +124,7 @@ public class FileRecordLayer extends ListRecordLayer {
             return true;
           }
         } catch (final Throwable e) {
-          ExceptionUtil.log(getClass(), "Error reading: " + this.resource, e);
+          Exceptions.log(getClass(), "Error reading: " + this.resource, e);
         } finally {
           fireRecordsChanged();
         }

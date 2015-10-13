@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.record.schema.FieldDefinition;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 /**
  * <p>
@@ -79,7 +79,7 @@ public class JmxService {
         throw new IllegalArgumentException(
           "MBean attribute not found " + serverId + " " + objectId + "." + attributeId);
       } catch (final Throwable e) {
-        return ExceptionUtil.throwUncheckedException(e);
+        return Exceptions.throwUncheckedException(e);
       }
     } else {
       throw new IllegalArgumentException(
@@ -132,7 +132,7 @@ public class JmxService {
     } catch (final MalformedObjectNameException e) {
       throw new IllegalArgumentException("MBean name not valid " + serverId + " " + objectId);
     } catch (final Throwable e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 
@@ -239,7 +239,7 @@ public class JmxService {
       } catch (final MalformedObjectNameException e) {
         throw new IllegalArgumentException("MBean name not valid " + serverId + " " + objectId);
       } catch (final Throwable e) {
-        return ExceptionUtil.throwUncheckedException(e);
+        return Exceptions.throwUncheckedException(e);
       }
     } else {
       throw new IllegalArgumentException(
@@ -300,7 +300,7 @@ public class JmxService {
     } catch (final MalformedObjectNameException e) {
       throw new IllegalArgumentException("MBean name not valid " + serverId + " " + objectId);
     } catch (final Throwable e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 
@@ -380,7 +380,7 @@ public class JmxService {
     } catch (final MalformedObjectNameException e) {
       throw new IllegalArgumentException("MBean name not valid " + serverId + " " + objectId);
     } catch (final Throwable e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 

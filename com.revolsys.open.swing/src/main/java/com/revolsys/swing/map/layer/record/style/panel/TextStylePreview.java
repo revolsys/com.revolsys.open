@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 import com.revolsys.awt.WebColors;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 public class TextStylePreview extends JPanel {
   private static final long serialVersionUID = 1L;
@@ -40,7 +40,7 @@ public class TextStylePreview extends JPanel {
     try {
       TextStyleRenderer.renderText(null, graphics, "Text", null, this.textStyle);
     } catch (final Throwable e) {
-      ExceptionUtil.log(getClass(), e);
+      Exceptions.log(getClass(), e);
     }
     graphics.translate(-50, -50);
   }

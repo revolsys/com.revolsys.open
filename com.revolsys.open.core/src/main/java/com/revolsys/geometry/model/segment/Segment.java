@@ -4,11 +4,12 @@ import java.util.Iterator;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryComponent;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.io.IteratorReader;
 import com.revolsys.io.Reader;
 
 public interface Segment extends LineSegment, Iterator<Segment>, GeometryComponent {
-
   @Override
   Segment clone();
 
@@ -16,13 +17,35 @@ public interface Segment extends LineSegment, Iterator<Segment>, GeometryCompone
 
   Vertex getGeometryVertex(int index);
 
-  int getPartIndex();
+  default int getPartIndex() {
+    return -1;
+  }
 
-  int getRingIndex();
+  default int getRingIndex() {
+    return -1;
+  }
 
   int[] getSegmentId();
 
-  int getSegmentIndex();
+  default int getSegmentIndex() {
+    final int[] vertexId = getSegmentId();
+    return vertexId[vertexId.length - 1];
+  }
+
+  @Override
+  default boolean isEmpty() {
+    return false;
+  }
+
+  default boolean isEndIntersection(final Point point) {
+    if (isLineStart()) {
+      return equalsVertex(2, 0, point);
+    } else if (isLineEnd()) {
+      return equalsVertex(2, 1, point);
+    } else {
+      return false;
+    }
+  }
 
   boolean isLineClosed();
 
@@ -30,7 +53,9 @@ public interface Segment extends LineSegment, Iterator<Segment>, GeometryCompone
 
   boolean isLineStart();
 
-  Reader<Segment> reader();
+  default Reader<Segment> reader() {
+    return new IteratorReader<Segment>(this);
+  }
 
   void setSegmentId(int[] segmentId);
 }

@@ -18,7 +18,7 @@ import com.revolsys.equals.Equals;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -142,7 +142,7 @@ public class TextStyle implements MapSerializer, Cloneable {
         try {
           JavaBeanUtil.setProperty(this, propertyName, propertyValue);
         } catch (final Throwable e) {
-          ExceptionUtil.log(getClass(), "Unable to set style " + propertyName + "=" + propertyValue,
+          Exceptions.log(getClass(), "Unable to set style " + propertyName + "=" + propertyValue,
             e);
         }
       }

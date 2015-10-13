@@ -42,7 +42,6 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.geometry.model.prep.PreparedPoint;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.PointVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -522,6 +521,30 @@ public interface Point extends Punctual, Serializable {
   }
 
   @Override
+  default boolean intersects(final Geometry geometry) {
+    if (geometry instanceof Point) {
+      final Point point = (Point)geometry;
+      return intersects(point);
+    } else {
+      final BoundingBox boundingBox = geometry.getBoundingBox();
+      if (boundingBox.intersects(this)) {
+        return geometry.locate(this) != Location.EXTERIOR;
+      } else {
+        return false;
+      }
+    }
+  }
+
+  @Override
+  default boolean intersects(final Point point) {
+    if (isEmpty()) {
+      return false;
+    } else {
+      return equals(point);
+    }
+  }
+
+  @Override
   default boolean isEmpty() {
     return getCoordinates() == null;
   }
@@ -604,7 +627,7 @@ public interface Point extends Punctual, Serializable {
 
   @Override
   default Point prepare() {
-    return new PreparedPoint(this);
+    return this;
   }
 
   @Override

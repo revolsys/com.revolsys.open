@@ -98,7 +98,7 @@ import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.util.DateUtil;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.StringBuilders;
@@ -984,7 +984,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             this.exists = true;
           } catch (final Throwable e) {
             this.closed = true;
-            ExceptionUtil.throwUncheckedException(e);
+            Exceptions.throwUncheckedException(e);
           } finally {
             if (geodatabase != null) {
               closeGeodatabase(geodatabase);

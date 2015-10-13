@@ -7,7 +7,7 @@ import java.lang.reflect.Modifier;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class ColorStringConverter implements StringConverter<Color> {
@@ -92,7 +92,7 @@ public class ColorStringConverter implements StringConverter<Color> {
             try {
               return (Color)field.get(WebColors.class);
             } catch (final Throwable e) {
-              ExceptionUtil.throwUncheckedException(e);
+              Exceptions.throwUncheckedException(e);
             }
           }
         }

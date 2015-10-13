@@ -18,7 +18,7 @@ import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Strings;
 
 public class FileGdbQueryIterator extends AbstractIterator<Record> {
@@ -99,7 +99,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
           this.recordStore.releaseTable(this.catalogPath);
         }
       } catch (final Throwable e) {
-        ExceptionUtil.log(getClass(), "Error closing query: " + this.catalogPath, e);
+        Exceptions.log(getClass(), "Error closing query: " + this.catalogPath, e);
       } finally {
         this.boundingBox = null;
         this.recordStore = null;

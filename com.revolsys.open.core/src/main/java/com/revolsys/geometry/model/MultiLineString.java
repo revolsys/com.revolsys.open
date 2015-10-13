@@ -45,6 +45,7 @@ import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.MultiLineStringVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.BoundaryOp;
+import com.revolsys.geometry.operation.valid.GeometryValidationError;
 import com.revolsys.io.IteratorReader;
 import com.revolsys.io.Reader;
 import com.revolsys.util.Property;
@@ -57,6 +58,12 @@ import com.revolsys.util.Property;
  *@version 1.7
  */
 public interface MultiLineString extends GeometryCollection, Lineal {
+  @Override
+  default boolean addIsSimpleErrors(final List<GeometryValidationError> errors,
+    final boolean shortCircuit) {
+    return Lineal.addIsSimpleErrors(this, errors, shortCircuit);
+  }
+
   @Override
   MultiLineString clone();
 

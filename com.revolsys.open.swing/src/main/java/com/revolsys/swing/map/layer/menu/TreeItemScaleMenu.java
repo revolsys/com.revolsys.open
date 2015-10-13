@@ -15,7 +15,7 @@ import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.component.MapScale;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.function.Function2;
 
 public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
@@ -68,7 +68,7 @@ public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
     try {
       return (TreeItemScaleMenu<T>)super.clone();
     } catch (final CloneNotSupportedException e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 

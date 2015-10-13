@@ -4,7 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class AbstractPropertyChangeObject implements PropertyChangeSupportProxy, Cloneable {
@@ -25,7 +25,7 @@ public class AbstractPropertyChangeObject implements PropertyChangeSupportProxy,
       clone.propertyChangeSupport = new PropertyChangeSupport(clone);
       return clone;
     } catch (final CloneNotSupportedException e) {
-      ExceptionUtil.throwUncheckedException(e);
+      Exceptions.throwUncheckedException(e);
       return null;
     }
   }

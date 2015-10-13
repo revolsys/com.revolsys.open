@@ -119,7 +119,7 @@ import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.tree.node.record.RecordStoreTableTreeNode;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.CompareUtil;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Label;
 import com.revolsys.util.Property;
 import com.revolsys.util.enableable.Enabled;
@@ -1524,7 +1524,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           addToIndex(record);
         }
       } catch (final Throwable e) {
-        ExceptionUtil.log(getClass(), "Unable to cancel changes.\n" + record, e);
+        Exceptions.log(getClass(), "Unable to cancel changes.\n" + record, e);
         cancelled = false;
       }
     }

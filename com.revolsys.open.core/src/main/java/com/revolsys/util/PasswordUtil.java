@@ -49,7 +49,7 @@ public class PasswordUtil {
       cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, new IvParameterSpec(iv));
       return cipher.doFinal(encryptedPassword);
     } catch (final Throwable e) {
-      ExceptionUtil.throwUncheckedException(e);
+      Exceptions.throwUncheckedException(e);
       return null;
     }
   }

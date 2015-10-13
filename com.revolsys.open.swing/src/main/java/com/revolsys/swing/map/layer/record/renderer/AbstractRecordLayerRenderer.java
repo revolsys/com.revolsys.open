@@ -26,7 +26,7 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.SqlLayerFilter;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -130,7 +130,7 @@ public abstract class AbstractRecordLayerRenderer
       try {
         return constructor.newInstance(layer, parent, style);
       } catch (final Throwable e) {
-        ExceptionUtil.log(AbstractRecordLayerRenderer.class, "Unable to create renderer", e);
+        Exceptions.log(AbstractRecordLayerRenderer.class, "Unable to create renderer", e);
         return null;
       }
     }
@@ -223,7 +223,7 @@ public abstract class AbstractRecordLayerRenderer
             renderRecord(viewport, visibleArea, layer, record);
           } catch (final TopologyException e) {
           } catch (final Throwable e) {
-            ExceptionUtil.log(getClass(),
+            Exceptions.log(getClass(),
               "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
           }
         }

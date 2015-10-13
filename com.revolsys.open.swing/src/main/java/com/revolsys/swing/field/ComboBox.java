@@ -23,7 +23,7 @@ import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
 import com.revolsys.equals.Equals;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Strings;
 
 public class ComboBox<T> extends JComboBox<T>implements Field, KeyListener {
@@ -119,7 +119,7 @@ public class ComboBox<T> extends JComboBox<T>implements Field, KeyListener {
     try {
       return (Field)super.clone();
     } catch (final CloneNotSupportedException e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return Exceptions.throwUncheckedException(e);
     }
   }
 

@@ -31,7 +31,7 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.dnd.TreePathListTransferable;
 import com.revolsys.swing.tree.dnd.TreeTransferHandler;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -117,7 +117,7 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
       delete(children);
       doClose();
     } catch (final Throwable e) {
-      ExceptionUtil.log(getClass(), "Error deleting tree node: " + getName(), e);
+      Exceptions.log(getClass(), "Error deleting tree node: " + getName(), e);
     } finally {
       setParent(null);
       this.name = "";
@@ -132,7 +132,7 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
       try {
         child.delete();
       } catch (final Throwable e) {
-        ExceptionUtil.log(getClass(), "Error deleting tree node: " + child, e);
+        Exceptions.log(getClass(), "Error deleting tree node: " + child, e);
       }
     }
   }

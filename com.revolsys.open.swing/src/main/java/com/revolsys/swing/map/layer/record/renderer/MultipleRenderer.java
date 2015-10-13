@@ -16,7 +16,7 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Exceptions;
 
 /**
  * Use all the specified renderers to render the layer. All features are
@@ -53,7 +53,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
             renderer.renderRecord(viewport, visibleArea, layer, record);
           } catch (final TopologyException e) {
           } catch (final Throwable e) {
-            ExceptionUtil.log(getClass(),
+            Exceptions.log(getClass(),
               "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
           }
         }
@@ -92,7 +92,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
           try {
             renderer.renderSelectedRecord(viewport, layer, object);
           } catch (final Throwable e) {
-            ExceptionUtil.log(getClass(),
+            Exceptions.log(getClass(),
               "Unabled to render " + layer.getName() + " #" + object.getIdentifier(), e);
           }
         }
