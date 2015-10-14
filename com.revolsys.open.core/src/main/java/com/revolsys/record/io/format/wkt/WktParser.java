@@ -127,13 +127,12 @@ public class WktParser {
     }
   }
 
-  private LineString parseCoordinates(final GeometryFactory geometryFactory,
-    final StringBuilder text, final int axisCount) {
-    final int geometryFactoryAxisCount = geometryFactory.getAxisCount();
+  private List<Double> parseCoordinates(final StringBuilder text, final int axisCount,
+    final int geometryFactoryAxisCount) {
+    final List<Double> coordinates = new ArrayList<>();
     char c = text.charAt(0);
     if (c == '(') {
       text.delete(0, 1);
-      final List<Double> coordinates = new ArrayList<Double>();
       int axisNum = 0;
       boolean finished = false;
       while (!finished) {
@@ -179,10 +178,17 @@ public class WktParser {
         }
       }
       text.delete(0, 1);
-      return new LineStringDouble(geometryFactoryAxisCount, coordinates);
     } else {
       throw new IllegalArgumentException("Expecting start of coordinates '(' not: " + text);
     }
+    return coordinates;
+  }
+
+  private LineString parseCoordinatesLineString(final GeometryFactory geometryFactory,
+    final StringBuilder text, final int axisCount) {
+    final int geometryFactoryAxisCount = geometryFactory.getAxisCount();
+    final List<Double> coordinates = parseCoordinates(text, axisCount, geometryFactoryAxisCount);
+    return new LineStringDouble(geometryFactoryAxisCount, coordinates);
   }
 
   public <T extends Geometry> T parseGeometry(final String value) {
@@ -256,7 +262,7 @@ public class WktParser {
     if (isEmpty(text)) {
       return geometryFactory.lineString();
     } else {
-      final LineString points = parseCoordinates(geometryFactory, text, axisCount);
+      final LineString points = parseCoordinatesLineString(geometryFactory, text, axisCount);
       if (points.getVertexCount() == 1) {
         return geometryFactory.point(points);
       } else {
@@ -334,7 +340,8 @@ public class WktParser {
       case '(':
         do {
           text.delete(0, 1);
-          final LineString coordinates = parseCoordinates(geometryFactory, text, axisCount);
+          final LineString coordinates = parseCoordinatesLineString(geometryFactory, text,
+            axisCount);
           parts.add(coordinates);
         } while (text.charAt(0) == ',');
         if (text.charAt(0) == ')') {
@@ -394,7 +401,7 @@ public class WktParser {
     if (isEmpty(text)) {
       return geometryFactory.point();
     } else {
-      final LineString points = parseCoordinates(geometryFactory, text, axisCount);
+      final LineString points = parseCoordinatesLineString(geometryFactory, text, axisCount);
       if (points.getVertexCount() > 1) {
         throw new IllegalArgumentException("Points may only have 1 vertex");
       }

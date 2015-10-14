@@ -125,7 +125,7 @@ public class NodedSegmentString implements NodableSegmentString {
     // normalize the intersection point location
     final int nextSegIndex = normalizedSegmentIndex + 1;
     if (nextSegIndex < size()) {
-      final Point nextPt = getCoordinate(nextSegIndex);
+      final Point nextPt = getPoint(nextSegIndex);
 
       // Normalize segment index if point falls on vertex
       // The check for point equality is 2D only - Z values are ignored
@@ -152,7 +152,7 @@ public class NodedSegmentString implements NodableSegmentString {
   }
 
   @Override
-  public Point getCoordinate(final int i) {
+  public Point getPoint(final int i) {
     return this.points.getPoint(i);
   }
 
@@ -186,13 +186,13 @@ public class NodedSegmentString implements NodableSegmentString {
     if (index == size() - 1) {
       return -1;
     }
-    return safeOctant(getCoordinate(index), getCoordinate(index + 1));
+    return safeOctant(getPoint(index), getPoint(index + 1));
     // return Octant.octant(getCoordinate(index), getCoordinate(index + 1));
   }
 
   @Override
   public boolean isClosed() {
-    return getCoordinate(0).equals(getCoordinate(size() - 1));
+    return getPoint(0).equals(getPoint(size() - 1));
   }
 
   private int safeOctant(final Point p0, final Point p1) {

@@ -40,6 +40,7 @@ import com.revolsys.geometry.algorithm.NotRepresentableException;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.geomgraph.Position;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
@@ -145,7 +146,7 @@ class OffsetSegmentGenerator {
      * small buffer distances.
      */
     if (bufParams.getQuadrantSegments() >= 8
-      && bufParams.getJoinStyle() == BufferParameters.JOIN_ROUND) {
+      && bufParams.getJoinStyle() == LineJoin.ROUND) {
       this.closingSegLengthFactor = MAX_CLOSING_SEG_LEN_FACTOR;
     }
     init(distance);
@@ -185,8 +186,8 @@ class OffsetSegmentGenerator {
        * because that would be a self intersection.
        *
        */
-      if (this.bufParams.getJoinStyle() == BufferParameters.JOIN_BEVEL
-        || this.bufParams.getJoinStyle() == BufferParameters.JOIN_MITRE) {
+      if (this.bufParams.getJoinStyle() == LineJoin.BEVEL
+        || this.bufParams.getJoinStyle() == LineJoin.MITER) {
         if (addStartPoint) {
           this.segList.addPt(this.offset0.getP1());
         }
@@ -438,19 +439,19 @@ class OffsetSegmentGenerator {
     final Point lp1 = offsetL.getP1();
     final Point rp1 = offsetR.getP1();
     switch (this.bufParams.getEndCapStyle()) {
-      case BufferParameters.CAP_ROUND:
+      case ROUND:
         // add offset seg points with a fillet between them
         this.segList.addPt(lp1);
         addFillet(p1, angle + Math.PI / 2, angle - Math.PI / 2, CGAlgorithms.CLOCKWISE,
           this.distance);
         this.segList.addPt(rp1);
       break;
-      case BufferParameters.CAP_FLAT:
+      case BUTT:
         // only offset segment points are added
         this.segList.addPt(lp1);
         this.segList.addPt(rp1);
       break;
-      case BufferParameters.CAP_SQUARE:
+      case SQUARE:
         // add a square defined by extensions of the offset segment endpoints
         final Point squareCapSideOffset = new PointDouble(Math.abs(this.distance) * Math.cos(angle),
           Math.abs(this.distance) * Math.sin(angle));
@@ -553,9 +554,9 @@ class OffsetSegmentGenerator {
       return;
     }
 
-    if (this.bufParams.getJoinStyle() == BufferParameters.JOIN_MITRE) {
+    if (this.bufParams.getJoinStyle() == LineJoin.MITER) {
       addMitreJoin(this.s1, this.offset0, this.offset1, this.distance);
-    } else if (this.bufParams.getJoinStyle() == BufferParameters.JOIN_BEVEL) {
+    } else if (this.bufParams.getJoinStyle() == LineJoin.BEVEL) {
       addBevelJoin(this.offset0, this.offset1);
     } else {
       // add a circular fillet connecting the endpoints of the offset segments

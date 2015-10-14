@@ -43,7 +43,7 @@ import com.revolsys.geometry.model.Point;
  * @version 1.7
  */
 public interface SegmentString {
-  Point getCoordinate(int i);
+  Point getPoint(int i);
 
   /**
    * Gets the user-defined data for this segment string.

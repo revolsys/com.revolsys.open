@@ -15,6 +15,8 @@ import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.geometry.model.LineCap;
+import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;

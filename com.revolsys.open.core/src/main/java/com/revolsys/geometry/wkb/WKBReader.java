@@ -293,7 +293,7 @@ public class WKBReader {
     }
   }
 
-  private LineString readCoordinateSequence(final int size) throws IOException {
+  private double[] readCoordinates(final int size) throws IOException {
     final double[] coordinates = new double[size * this.inputDimension];
 
     for (int i = 0; i < size; i++) {
@@ -302,6 +302,11 @@ public class WKBReader {
         coordinates[i * this.inputDimension + j] = this.ordValues[j];
       }
     }
+    return coordinates;
+  }
+
+  private LineString readCoordinateSequence(final int size) throws IOException {
+    final double[] coordinates = readCoordinates(size);
     return new LineStringDouble(this.inputDimension, coordinates);
   }
 
@@ -459,8 +464,8 @@ public class WKBReader {
   }
 
   private Point readPoint() throws IOException {
-    final LineString pts = readCoordinateSequence(1);
-    return this.factory.point(pts);
+    final double[] coordinates = readCoordinates(1);
+    return this.factory.point(coordinates);
   }
 
   private Polygon readPolygon() throws IOException {

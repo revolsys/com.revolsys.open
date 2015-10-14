@@ -95,7 +95,7 @@ public class BufferInputLineSimplifier {
 
   private int angleOrientation = CGAlgorithms.COUNTERCLOCKWISE;
 
-  private final int deleteCount = 0;
+  private int deleteCount = 0;
 
   private double distanceTol;
 
@@ -142,6 +142,7 @@ public class BufferInputLineSimplifier {
       // test triple for shallow concavity
       boolean isMiddleVertexDeleted = false;
       if (isDeletable(index, midIndex, lastIndex, this.distanceTol)) {
+        this.deleteCount++;
         this.isDeleted[midIndex] = DELETE;
         isMiddleVertexDeleted = true;
         isChanged = true;

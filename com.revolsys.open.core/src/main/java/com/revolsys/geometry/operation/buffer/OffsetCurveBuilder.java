@@ -162,17 +162,19 @@ public class OffsetCurveBuilder {
 
   private void computePointCurve(final Point point, final OffsetSegmentGenerator segGen) {
     switch (this.bufParams.getEndCapStyle()) {
-      case BufferParameters.CAP_ROUND:
+      case ROUND:
         segGen.createCircle(point);
       break;
-      case BufferParameters.CAP_SQUARE:
+      case SQUARE:
         segGen.createSquare(point);
+      break;
+      case BUTT:
       break;
       // otherwise curve is empty (e.g. for a butt cap);
     }
   }
 
-  private void computeRingBufferCurve(final LineString inputPts, final int side,
+  private void computeRingBufferCurve(final LineString inputLine, final int side,
     final OffsetSegmentGenerator segGen) {
     // simplify input line to improve performance
     double distTol = simplifyTolerance(this.distance);
@@ -180,14 +182,17 @@ public class OffsetCurveBuilder {
     if (side == Position.RIGHT) {
       distTol = -distTol;
     }
-    final LineString simp = BufferInputLineSimplifier.simplify(inputPts, distTol);
-    // Point[] simp = inputPts;
+    final LineString simplifiedLine = BufferInputLineSimplifier.simplify(inputLine, distTol);
 
-    final int n = simp.getVertexCount() - 1;
-    segGen.initSideSegments(simp.getPoint(n - 1), simp.getPoint(0), side);
-    for (int i = 1; i <= n; i++) {
-      final boolean addStartPoint = i != 1;
-      segGen.addNextSegment(simp.getPoint(i), addStartPoint);
+    final int n = simplifiedLine.getVertexCount() - 1;
+    final Point firstPoint = simplifiedLine.getPoint(0);
+    final Point lastPoint = simplifiedLine.getPoint(n - 1);
+    segGen.initSideSegments(lastPoint, firstPoint, side);
+    boolean addStartPoint = false;
+    for (int vertexIndex = 1; vertexIndex <= n; vertexIndex++) {
+      final Point point = simplifiedLine.getPoint(vertexIndex);
+      segGen.addNextSegment(point, addStartPoint);
+      addStartPoint = true;
     }
     segGen.closeRing();
   }

@@ -17,10 +17,6 @@ public class LineStringDouble extends AbstractLineString {
 
   private double[] coordinates;
 
-  public LineStringDouble(final int axisCount) {
-    this(0, axisCount);
-  }
-
   public LineStringDouble(final int axisCount, final Collection<Point> points) {
     this(points.size(), axisCount);
     int i = 0;
@@ -40,7 +36,7 @@ public class LineStringDouble extends AbstractLineString {
     }
   }
 
-  public LineStringDouble(final int size, final int axisCount) {
+  protected LineStringDouble(final int size, final int axisCount) {
     assert axisCount >= 2;
     assert size >= 0;
     this.coordinates = new double[size * axisCount];

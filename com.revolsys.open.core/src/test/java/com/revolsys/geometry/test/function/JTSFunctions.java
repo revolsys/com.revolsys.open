@@ -3,11 +3,11 @@ package com.revolsys.geometry.test.function;
 import com.revolsys.geometry.model.CoordinateList;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineCap;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.geometry.operation.buffer.Buffer;
 import com.revolsys.geometry.operation.buffer.BufferParameters;
 import com.revolsys.geometry.util.GeometricShapeFactory;
 
@@ -108,8 +108,8 @@ public class JTSFunctions {
   public static Geometry logoBuffer(final Geometry g, final double distance) {
     final Geometry lines = logoLines(g);
     final BufferParameters bufParams = new BufferParameters();
-    bufParams.setEndCapStyle(BufferParameters.CAP_SQUARE);
-    return Buffer.buffer(lines, distance, bufParams);
+    bufParams.setEndCapStyle(LineCap.SQUARE);
+    return lines.buffer(distance, bufParams);
   }
 
   public static Geometry logoLines(final Geometry g) {

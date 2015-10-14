@@ -61,31 +61,32 @@ public class SegmentPointComparator {
     // nodes can only be equal if their coordinates are equal
     if (p0.equals(2, p1)) {
       return 0;
-    }
+    } else {
 
-    final int xSign = relativeSign(p0.getX(), p1.getX());
-    final int ySign = relativeSign(p0.getY(), p1.getY());
+      final int xSign = relativeSign(p0.getX(), p1.getX());
+      final int ySign = relativeSign(p0.getY(), p1.getY());
 
-    switch (octant) {
-      case 0:
-        return compareValue(xSign, ySign);
-      case 1:
-        return compareValue(ySign, xSign);
-      case 2:
-        return compareValue(ySign, -xSign);
-      case 3:
-        return compareValue(-xSign, ySign);
-      case 4:
-        return compareValue(-xSign, -ySign);
-      case 5:
-        return compareValue(-ySign, -xSign);
-      case 6:
-        return compareValue(-ySign, xSign);
-      case 7:
-        return compareValue(xSign, -ySign);
+      switch (octant) {
+        case 0:
+          return compareValue(xSign, ySign);
+        case 1:
+          return compareValue(ySign, xSign);
+        case 2:
+          return compareValue(ySign, -xSign);
+        case 3:
+          return compareValue(-xSign, ySign);
+        case 4:
+          return compareValue(-xSign, -ySign);
+        case 5:
+          return compareValue(-ySign, -xSign);
+        case 6:
+          return compareValue(-ySign, xSign);
+        case 7:
+          return compareValue(xSign, -ySign);
+      }
+      Assert.shouldNeverReachHere("invalid octant value");
+      return 0;
     }
-    Assert.shouldNeverReachHere("invalid octant value");
-    return 0;
   }
 
   private static int compareValue(final int compareSign0, final int compareSign1) {

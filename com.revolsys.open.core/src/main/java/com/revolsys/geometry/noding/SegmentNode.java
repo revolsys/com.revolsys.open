@@ -42,23 +42,21 @@ import com.revolsys.geometry.model.impl.PointDouble;
  *
  * @version 1.7
  */
-public class SegmentNode implements Comparable {
-  public final Point coord; // the point of intersection
+public class SegmentNode extends PointDouble {
+  private static final long serialVersionUID = 1L;
 
   private final boolean isInterior;
 
-  // the parent edge
-
-  public final int segmentIndex; // the index of the containing line segment in
+  private final int segmentIndex;
 
   private final int segmentOctant;
 
-  public SegmentNode(final NodedSegmentString segString, final Point coord, final int segmentIndex,
+  public SegmentNode(final NodedSegmentString segString, final Point point, final int segmentIndex,
     final int segmentOctant) {
-    this.coord = new PointDouble(coord);
+    super(point, 2);
     this.segmentIndex = segmentIndex;
     this.segmentOctant = segmentOctant;
-    this.isInterior = !coord.equals(2, segString.getCoordinate(segmentIndex));
+    this.isInterior = !point.equals(2, segString.getPoint(segmentIndex));
   }
 
   /**
@@ -67,31 +65,23 @@ public class SegmentNode implements Comparable {
    * 1 this SegmentNode is located after the argument location
    */
   @Override
-  public int compareTo(final Object obj) {
-    final SegmentNode other = (SegmentNode)obj;
-
+  public int compareTo(final Object object) {
+    final SegmentNode other = (SegmentNode)object;
     if (this.segmentIndex < other.segmentIndex) {
       return -1;
-    }
-    if (this.segmentIndex > other.segmentIndex) {
+    } else if (this.segmentIndex > other.segmentIndex) {
       return 1;
+    } else {
+      return SegmentPointComparator.compare(this.segmentOctant, this, other);
     }
-
-    if (this.coord.equals(2, other.coord)) {
-      return 0;
-    }
-
-    return SegmentPointComparator.compare(this.segmentOctant, this.coord, other.coord);
-    // return segment.compareNodePosition(this, other);
   }
 
-  /**
-   * Gets the {@link Coordinates} giving the location of this node.
-   *
-   * @return the coordinate of the node
-   */
-  public Point getCoordinate() {
-    return this.coord;
+  public int getSegmentIndex() {
+    return this.segmentIndex;
+  }
+
+  public int getSegmentOctant() {
+    return this.segmentOctant;
   }
 
   public boolean isEndPoint(final int maxSegmentIndex) {
@@ -109,7 +99,7 @@ public class SegmentNode implements Comparable {
   }
 
   public void print(final PrintStream out) {
-    out.print(this.coord);
+    out.print(this);
     out.print(" seg # = " + this.segmentIndex);
   }
 }

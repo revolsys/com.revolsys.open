@@ -116,8 +116,8 @@ public class HotPixel {
    * @return true if a node was added to the segment
    */
   public boolean addSnappedNode(final NodedSegmentString segStr, final int segIndex) {
-    final Point p0 = segStr.getCoordinate(segIndex);
-    final Point p1 = segStr.getCoordinate(segIndex + 1);
+    final Point p0 = segStr.getPoint(segIndex);
+    final Point p1 = segStr.getPoint(segIndex + 1);
 
     if (intersects(p0, p1)) {
       // System.out.println("snapped: " + snapPt);

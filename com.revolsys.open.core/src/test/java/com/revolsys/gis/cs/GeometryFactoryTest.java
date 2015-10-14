@@ -87,7 +87,7 @@ public class GeometryFactoryTest {
     final LineString ring3Points = new LineStringDouble(2, 120.0, 120, 120, 180, 180, 180, 180, 120,
       120, 120);
 
-    final Point point = GEOMETRY_FACTORY.point(pointPoints);
+    final Point point = GEOMETRY_FACTORY.point(2, 0.0, 0);
     assertCopyGeometry(point, pointPoints);
 
     final LineString line = GEOMETRY_FACTORY.lineString(ringPoints);

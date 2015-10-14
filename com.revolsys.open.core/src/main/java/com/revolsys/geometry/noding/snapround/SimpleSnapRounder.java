@@ -132,7 +132,7 @@ public class SimpleSnapRounder implements Noder {
   private void computeVertexSnaps(final NodedSegmentString segment1,
     final NodedSegmentString segment2) {
     for (int i0 = 0; i0 < segment1.size() - 1; i0++) {
-      final Point point1 = segment1.getCoordinate(i0);
+      final Point point1 = segment1.getPoint(i0);
       final HotPixel hotPixel = new HotPixel(point1, this.scaleFactor, this.li);
       for (int i1 = 0; i1 < segment2.size() - 1; i1++) {
         // don't snap a vertex to itself

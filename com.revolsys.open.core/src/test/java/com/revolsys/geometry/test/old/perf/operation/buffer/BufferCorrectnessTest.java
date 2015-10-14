@@ -34,7 +34,8 @@ package com.revolsys.geometry.test.old.perf.operation.buffer;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.operation.buffer.Buffer;
+import com.revolsys.geometry.model.LineCap;
+import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.geometry.operation.buffer.BufferParameters;
 import com.revolsys.geometry.wkb.WKTReader;
 
@@ -108,9 +109,8 @@ public class BufferCorrectnessTest {
     final String wkt = "LINESTRING (1872612.157 530840.503, 1872624.713 530767.14, 1872637.269 530693.777)";
     final Geometry g = this.rdr.read(wkt);
 
-    final BufferParameters params = new BufferParameters(10, BufferParameters.CAP_SQUARE,
-      BufferParameters.JOIN_MITRE, 10);
-    final Geometry buf = Buffer.buffer(g, 200, params);
+    final BufferParameters params = new BufferParameters(10, LineCap.SQUARE, LineJoin.MITER, 10);
+    final Geometry buf = g.buffer(200, params);
 
     // System.out.println(buf);
   }
@@ -121,9 +121,8 @@ public class BufferCorrectnessTest {
     final String wkt = "POLYGON ((588722.7612465625 4518964.956739423, 588755.2073151038 4518948.2420851765, 588750.2892019567 4518938.490656119, 588750.2892047082 4518938.490654858, 588741.1098934844 4518920.290260831, 588722.7612465625 4518964.956739423))";
     final Geometry g = this.rdr.read(wkt);
 
-    final BufferParameters params = new BufferParameters(8, BufferParameters.CAP_ROUND,
-      BufferParameters.JOIN_MITRE, 5);
-    final Geometry buf = Buffer.buffer(g, -5, params);
+    final BufferParameters params = new BufferParameters(8, LineCap.ROUND, LineJoin.MITER, 5);
+    final Geometry buf = g.buffer(-5, params);
 
     // System.out.println(buf);
   };
@@ -134,9 +133,8 @@ public class BufferCorrectnessTest {
     final String wkt = "POLYGON ((589081.1515112884 4518509.334764771, 589103.7370954598 4518497.015419995, 589099.8017397423 4518490.719003885, 589097.1198886324 4518486.20858194, 589090.9424687021 4518475.819013388, 589081.1515112884 4518509.334764771))";
     final Geometry g = this.rdr.read(wkt);
 
-    final BufferParameters params = new BufferParameters(8, BufferParameters.CAP_ROUND,
-      BufferParameters.JOIN_MITRE, 5);
-    final Geometry buf = Buffer.buffer(g, -5, params);
+    final BufferParameters params = new BufferParameters(8, LineCap.ROUND, LineJoin.MITER, 5);
+    final Geometry buf = g.buffer(-5, params);
 
     // System.out.println(buf);
   };

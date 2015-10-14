@@ -38,13 +38,14 @@ import java.util.List;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineCap;
+import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.util.GeometryMapper;
 import com.revolsys.geometry.model.util.GeometryMapper.MapOp;
 import com.revolsys.geometry.noding.SegmentString;
-import com.revolsys.geometry.operation.buffer.Buffer;
 import com.revolsys.geometry.operation.buffer.BufferInputLineSimplifier;
 import com.revolsys.geometry.operation.buffer.BufferParameters;
 import com.revolsys.geometry.operation.buffer.OffsetCurveSetBuilder;
@@ -75,10 +76,10 @@ public class BufferFunctions {
       bufParams.setQuadrantSegments(quadrantSegments.intValue());
     }
     if (capStyle != null) {
-      bufParams.setEndCapStyle(capStyle.intValue());
+      bufParams.setEndCapStyle(LineCap.fromGeometryValue(capStyle));
     }
     if (joinStyle != null) {
-      bufParams.setJoinStyle(joinStyle.intValue());
+      bufParams.setJoinStyle(LineJoin.fromGeometryValue(joinStyle));
     }
     if (mitreLimit != null) {
       bufParams.setMitreLimit(mitreLimit.doubleValue());
@@ -131,16 +132,16 @@ public class BufferFunctions {
       bufParams.setQuadrantSegments(quadrantSegments.intValue());
     }
     if (capStyle != null) {
-      bufParams.setEndCapStyle(capStyle.intValue());
+      bufParams.setEndCapStyle(LineCap.fromGeometryValue(capStyle));
     }
     if (joinStyle != null) {
-      bufParams.setJoinStyle(joinStyle.intValue());
+      bufParams.setJoinStyle(LineJoin.fromGeometryValue(joinStyle));
     }
     if (mitreLimit != null) {
       bufParams.setMitreLimit(mitreLimit.doubleValue());
     }
 
-    return Buffer.buffer(g, dist, bufParams);
+    return g.buffer(dist, bufParams);
   }
 
   private static Geometry buildBufferLineSimplifiedSet(final Geometry geometry,
@@ -178,7 +179,7 @@ public class BufferFunctions {
   public static Geometry singleSidedBuffer(final Geometry geom, final double distance) {
     final BufferParameters bufParams = new BufferParameters();
     bufParams.setSingleSided(true);
-    return Buffer.buffer(geom, distance, bufParams);
+    return geom.buffer(distance, bufParams);
   }
 
 }

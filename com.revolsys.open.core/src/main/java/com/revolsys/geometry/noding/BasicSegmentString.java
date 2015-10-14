@@ -64,7 +64,7 @@ public class BasicSegmentString implements SegmentString {
   }
 
   @Override
-  public Point getCoordinate(final int i) {
+  public Point getPoint(final int i) {
     return this.points.getPoint(i);
   }
 
@@ -94,7 +94,7 @@ public class BasicSegmentString implements SegmentString {
     if (index == this.points.getVertexCount() - 1) {
       return -1;
     }
-    return Octant.octant(getCoordinate(index), getCoordinate(index + 1));
+    return Octant.octant(getPoint(index), getPoint(index + 1));
   }
 
   @Override

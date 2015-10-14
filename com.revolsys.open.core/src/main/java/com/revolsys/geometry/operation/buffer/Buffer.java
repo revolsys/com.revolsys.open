@@ -115,18 +115,6 @@ public class Buffer {
   private static int MAX_PRECISION_DIGITS = 12;
 
   /**
-   * Computes the buffer of a geometry for a given buffer distance.
-   *
-   * @param g the geometry to buffer
-   * @param distance the buffer distance
-   * @return the buffer of the input geometry
-   */
-  public static Geometry buffer(final Geometry geometry, final double distance) {
-    final BufferParameters parameters = new BufferParameters();
-    return buffer(geometry, distance, parameters);
-  }
-
-  /**
    * Comutes the buffer for a geometry for a given buffer distance
    * and accuracy of approximation.
    *
@@ -136,66 +124,22 @@ public class Buffer {
    * @return the buffer of the input geometry
    *
    */
-  public static Geometry buffer(final Geometry geometry, final double distance,
+  @SuppressWarnings("unchecked")
+  public static <G extends Geometry> G buffer(final Geometry geometry, final double distance,
     final BufferParameters parameters) {
     final GeometryFactory geometryFactory = geometry.getGeometryFactory();
     try {
       final MCIndexNoder noder = new MCIndexNoder();
       final LineIntersector li = new RobustLineIntersector(geometryFactory.getScaleXY());
       noder.setSegmentIntersector(new IntersectionAdder(li));
-      return buffer(noder, geometryFactory, geometry, distance, parameters);
+      return (G)buffer(noder, geometryFactory, geometry, distance, parameters);
     } catch (final RuntimeException e) {
       if (geometryFactory.isFloating()) {
-        return bufferReducedPrecision(geometry, distance, parameters);
+        return (G)bufferReducedPrecision(geometry, distance, parameters);
       } else {
-        return bufferFixedPrecision(geometryFactory, geometry, distance, parameters);
+        return (G)bufferFixedPrecision(geometryFactory, geometry, distance, parameters);
       }
-
     }
-  }
-
-  /**
-   * Comutes the buffer for a geometry for a given buffer distance
-   * and accuracy of approximation.
-   *
-   * @param g the geometry to buffer
-   * @param distance the buffer distance
-   * @param quadrantSegments the number of segments used to approximate a quarter circle
-   * @return the buffer of the input geometry
-   *
-   */
-  public static Geometry buffer(final Geometry geometry, final double distance,
-    final int quadrantSegments) {
-    final BufferParameters parameters = new BufferParameters();
-    parameters.setQuadrantSegments(quadrantSegments);
-    return buffer(geometry, distance, parameters);
-  }
-
-  /**
-   * Comutes the buffer for a geometry for a given buffer distance
-   * and accuracy of approximation.
-   *
-   * @param g the geometry to buffer
-   * @param distance the buffer distance
-   * @param quadrantSegments the number of segments used to approximate a quarter circle
-   * @param endCapStyle the end cap style to use
-   * @return the buffer of the input geometry
-   *
-   */
-  public static Geometry buffer(final Geometry geometry, final double distance,
-    final int quadrantSegments, final int endCapStyle) {
-    final BufferParameters parameters = new BufferParameters();
-    parameters.setQuadrantSegments(quadrantSegments);
-    parameters.setEndCapStyle(endCapStyle);
-
-    return buffer(geometry, distance, parameters);
-  }
-
-  public static Geometry buffer(final Geometry geometry, final double distance,
-    final int quadrantSegments, final int endCapStyle, final int joinStyle,
-    final double mitreLimit) {
-    return buffer(geometry, distance,
-      new BufferParameters(quadrantSegments, endCapStyle, joinStyle, mitreLimit));
   }
 
   private static Geometry buffer(final Noder noder, final GeometryFactory precisionModel,
@@ -287,7 +231,7 @@ public class Buffer {
     for (final SegmentString segment : nodedSegments) {
       final int vertexCount = segment.size();
       if (vertexCount > 2
-        || vertexCount == 2 && !segment.getCoordinate(0).equals(2, segment.getCoordinate(1))) {
+        || vertexCount == 2 && !segment.getPoint(0).equals(2, segment.getPoint(1))) {
         final Label oldLabel = (Label)segment.getData();
         final Label label = new Label(oldLabel);
         final LineString points = segment.getPoints();

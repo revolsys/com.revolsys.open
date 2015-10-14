@@ -6,9 +6,7 @@ import org.junit.Test;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.test.TestConstants;
 
@@ -142,12 +140,8 @@ public class PointTest implements TestConstants {
       final Point pointCoordinatesSize1 = geometryFactory.point(new PointDouble(1));
       assertEmpty(pointCoordinatesSize1);
 
-      final Point pointCoordinatesListNull = geometryFactory.point((LineString)null);
+      final Point pointCoordinatesListNull = geometryFactory.point();
       assertEmpty(pointCoordinatesListNull);
-
-      final Point pointCoordinatesListSize0 = geometryFactory
-        .point(new LineStringDouble(0, axisCount));
-      assertEmpty(pointCoordinatesListSize0);
 
       final Point pointObjectNull = geometryFactory.point((Object)null);
       assertEmpty(pointObjectNull);
@@ -220,18 +214,6 @@ public class PointTest implements TestConstants {
         pointCoordinatesExtraAxis, pointCoordinatesLessAxis);
       assertObjectContsructor(geometryFactory, coordinates, coordinatesLessNaN,
         pointCoordinatesAllAxis, pointCoordinatesExtraAxis, pointCoordinatesLessAxis);
-
-      // LineString
-      final Point pointCoordinatesListAllAxis = geometryFactory
-        .point(new LineStringDouble(axisCount, coordinates));
-      final Point pointCoordinatesListExtraAxis = geometryFactory
-        .point(new LineStringDouble(axisCount, coordinatesExtra));
-      final Point pointCoordinatesListLessAxis = geometryFactory
-        .point(new LineStringDouble(axisCountLess, coordinatesLess));
-      assertEquals(coordinates, coordinatesLessNaN, pointCoordinatesListAllAxis,
-        pointCoordinatesListExtraAxis, pointCoordinatesListLessAxis);
-      assertObjectContsructor(geometryFactory, coordinates, coordinatesLessNaN,
-        pointCoordinatesListAllAxis, pointCoordinatesListExtraAxis, pointCoordinatesListLessAxis);
 
       // Object Point
       final Point pointAll = pointDoubleAllAxis;

@@ -148,7 +148,7 @@ public class ScaledNoder implements Noder {
     double previousY = Double.NaN;
     int j = 0;
     for (int i = 0; i < vertexCount; i++) {
-      final Point point = segment.getCoordinate(i);
+      final Point point = segment.getPoint(i);
       final double x = Math.round((point.getX() - this.offsetX) * this.scaleFactor);
       final double y = Math.round((point.getY() - this.offsetY) * this.scaleFactor);
       final double z = point.getZ();

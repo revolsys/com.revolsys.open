@@ -28,6 +28,8 @@ import javax.swing.SwingConstants;
 import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.geometry.model.LineCap;
+import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.Panels;
 import com.revolsys.swing.SwingUtil;
@@ -50,8 +52,6 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
-import com.revolsys.swing.map.layer.record.style.LineCap;
-import com.revolsys.swing.map.layer.record.style.LineJoin;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;

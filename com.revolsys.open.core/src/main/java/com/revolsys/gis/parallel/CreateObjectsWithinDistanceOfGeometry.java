@@ -12,8 +12,8 @@ import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.context.HashMapContext;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.operation.buffer.Buffer;
-import com.revolsys.geometry.operation.buffer.BufferParameters;
+import com.revolsys.geometry.model.LineCap;
+import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.geometry.simplify.DouglasPeuckerSimplifier;
 import com.revolsys.io.PathName;
 import com.revolsys.parallel.channel.Channel;
@@ -94,8 +94,7 @@ public class CreateObjectsWithinDistanceOfGeometry extends BaseInOutProcess<Reco
           newRecordDefinition = new RecordDefinitionImpl(PathName.newPathName(typePath),
             recordDefinition.getFields());
           if (this.distance > 0) {
-            final BufferParameters parameters = new BufferParameters(1, 3, 2, 1.0D);
-            geometry = Buffer.buffer(geometry, this.distance, parameters);
+            geometry = geometry.buffer(this.distance, 1, LineCap.SQUARE, LineJoin.MITER, 1.0D);
           }
           geometry = DouglasPeuckerSimplifier.simplify(geometry, 2D);
           preparedGeometry = geometry.prepare();

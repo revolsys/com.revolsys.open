@@ -58,6 +58,7 @@ import com.revolsys.geometry.model.util.GeometryCollectionMapper;
 import com.revolsys.geometry.model.util.GeometryIntersectionMapOp;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.buffer.Buffer;
+import com.revolsys.geometry.operation.buffer.BufferParameters;
 import com.revolsys.geometry.operation.distance.DistanceOp;
 import com.revolsys.geometry.operation.overlay.OverlayOp;
 import com.revolsys.geometry.operation.overlay.snap.SnapIfNeededOverlayOp;
@@ -390,7 +391,12 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    */
 
   default Geometry buffer(final double distance) {
-    return Buffer.buffer(this, distance);
+    return buffer(distance, BufferParameters.DEFAULT_QUADRANT_SEGMENTS, LineCap.ROUND,
+      LineJoin.ROUND, BufferParameters.DEFAULT_MITRE_LIMIT);
+  }
+
+  default <G extends Geometry> G buffer(final double distance, final BufferParameters parameters) {
+    return Buffer.buffer(this, distance, parameters);
   }
 
   /**
@@ -424,7 +430,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    */
 
   default Geometry buffer(final double distance, final int quadrantSegments) {
-    return Buffer.buffer(this, distance, quadrantSegments);
+    return buffer(distance, quadrantSegments, LineCap.ROUND, LineJoin.ROUND,
+      BufferParameters.DEFAULT_MITRE_LIMIT);
   }
 
   /**
@@ -441,9 +448,9 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    * The end cap style specifies the buffer geometry that will be
    * created at the ends of linestrings.  The styles provided are:
    * <ul>
-   * <li><code>Buffer.CAP_ROUND</code> - (default) a semi-circle
-   * <li><code>Buffer.CAP_BUTT</code> - a straight line perpendicular to the end segment
-   * <li><code>Buffer.CAP_SQUARE</code> - a half-square
+   * <li><code>{@link LineCap#ROUND}</code> - (default) a semi-circle
+   * <li><code>{@link LineCap#BUTT}</code> - a straight line perpendicular to the end segment
+   * <li><code>{@link LineCap#SQUARE}</code> - a half-square
    * </ul>
    * <p>
    * The buffer operation always returns a polygonal result. The negative or
@@ -463,8 +470,16 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    */
 
   default Geometry buffer(final double distance, final int quadrantSegments,
-    final int endCapStyle) {
-    return Buffer.buffer(this, distance, quadrantSegments, endCapStyle);
+    final LineCap endCapStyle) {
+    return buffer(distance, quadrantSegments, endCapStyle, LineJoin.ROUND,
+      BufferParameters.DEFAULT_MITRE_LIMIT);
+  }
+
+  default <G extends Geometry> G buffer(final double distance, final int quadrantSegments,
+    final LineCap endCapStyle, final LineJoin joinStyle, final double mitreLimit) {
+    final BufferParameters parameters = new BufferParameters(quadrantSegments, endCapStyle,
+      joinStyle, mitreLimit);
+    return buffer(distance, parameters);
   }
 
   Geometry clone();
@@ -625,6 +640,12 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     } else {
       return (V)this;
     }
+  }
+
+  default <V extends Geometry> V convertScales(final double... scales) {
+    GeometryFactory geometryFactory = getGeometryFactory();
+    geometryFactory = geometryFactory.convertScales(scales);
+    return convert(geometryFactory);
   }
 
   /**

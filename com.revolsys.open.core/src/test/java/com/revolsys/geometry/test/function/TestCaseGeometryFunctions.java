@@ -34,7 +34,7 @@ package com.revolsys.geometry.test.function;
 
 import com.revolsys.geometry.densify.Densifier;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.operation.buffer.Buffer;
+import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.geometry.operation.buffer.BufferParameters;
 import com.revolsys.geometry.precision.MinimumClearance;
 
@@ -56,9 +56,9 @@ import com.revolsys.geometry.precision.MinimumClearance;
 public class TestCaseGeometryFunctions {
   public static Geometry bufferMitredJoin(final Geometry g, final double distance) {
     final BufferParameters bufParams = new BufferParameters();
-    bufParams.setJoinStyle(BufferParameters.JOIN_MITRE);
+    bufParams.setJoinStyle(LineJoin.MITER);
 
-    return Buffer.buffer(g, distance, bufParams);
+    return g.buffer(distance, bufParams);
   }
 
   public static Geometry densify(final Geometry g, final double distance) {

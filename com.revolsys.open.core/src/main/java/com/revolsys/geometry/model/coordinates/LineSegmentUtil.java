@@ -403,7 +403,7 @@ public class LineSegmentUtil {
         return geometryFactory.createCoordinatesList(intersections);
       }
     }
-    return new LineStringDouble(2);
+    return geometryFactory.lineString();
   }
 
   public static boolean intersects(final Point line1p1, final Point line1p2, final Point line2p1,

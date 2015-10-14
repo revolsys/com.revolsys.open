@@ -7,9 +7,10 @@ import org.junit.Assert;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineCap;
+import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.operation.buffer.Buffer;
 import com.revolsys.geometry.operation.buffer.BufferParameters;
 import com.revolsys.geometry.test.model.TestUtil;
 import com.revolsys.io.Reader;
@@ -17,10 +18,7 @@ import com.revolsys.io.map.MapReader;
 import com.revolsys.spring.resource.ClassPathResource;
 
 import junit.framework.Test;
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import junit.framework.TestSuite;
 
 public class BufferTest extends TestCase {
@@ -63,8 +61,10 @@ public class BufferTest extends TestCase {
 
         final int quadrantSegments = Maps.getInteger(map, "quadrantSegments",
           BufferParameters.DEFAULT_QUADRANT_SEGMENTS);
-        final int endCapStyle = Maps.getInteger(map, "endCapStyle", BufferParameters.CAP_ROUND);
-        final int joinStyle = Maps.getInteger(map, "joinStyle", BufferParameters.JOIN_ROUND);
+        final LineCap endCapStyle = LineCap
+          .fromGeometryValue(Maps.getInteger(map, "endCapStyle", LineCap.ROUND.getGeometryValue()));
+        final LineJoin joinStyle = LineJoin
+          .fromGeometryValue(Maps.getInteger(map, "joinStyle", LineJoin.ROUND.getGeometryValue()));
         final double mitreLimit = Maps.getDouble(map, "mitreLimit",
           BufferParameters.DEFAULT_MITRE_LIMIT);
 
@@ -133,7 +133,7 @@ public class BufferTest extends TestCase {
 
   @Override
   protected void runTest() throws Throwable {
-    final Geometry actual = Buffer.buffer(this.source, this.distance, this.parameters);
+    final Geometry actual = this.source.buffer(this.distance, this.parameters);
     final boolean empty = actual.isEmpty();
     if (this.expectedEmpty != null) {
       Assert.assertEquals(message("Empty", actual), this.expectedEmpty, empty);

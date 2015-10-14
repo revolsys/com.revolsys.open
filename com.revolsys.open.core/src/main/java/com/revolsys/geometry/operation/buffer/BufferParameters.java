@@ -32,6 +32,9 @@
  */
 package com.revolsys.geometry.operation.buffer;
 
+import com.revolsys.geometry.model.LineCap;
+import com.revolsys.geometry.model.LineJoin;
+
 /**
  * A value class containing the parameters which
  * specify how a buffer should be constructed.
@@ -50,21 +53,6 @@ package com.revolsys.geometry.operation.buffer;
  */
 public class BufferParameters {
   /**
-   * Specifies a flat line buffer end cap style.
-   */
-  public static final int CAP_FLAT = 2;
-
-  /**
-   * Specifies a round line buffer end cap style.
-   */
-  public static final int CAP_ROUND = 1;
-
-  /**
-   * Specifies a square line buffer end cap style.
-   */
-  public static final int CAP_SQUARE = 3;
-
-  /**
    * The default mitre limit
    * Allows fairly pointy mitres.
    */
@@ -79,21 +67,6 @@ public class BufferParameters {
   public static final int DEFAULT_QUADRANT_SEGMENTS = 8;
 
   /**
-   * Specifies a bevel join style.
-   */
-  public static final int JOIN_BEVEL = 3;
-
-  /**
-   * Specifies a mitre join style.
-   */
-  public static final int JOIN_MITRE = 2;
-
-  /**
-   * Specifies a round join style.
-   */
-  public static final int JOIN_ROUND = 1;
-
-  /**
    * Computes the maximum distance error due to a given level
    * of approximation to a true arc.
    *
@@ -105,11 +78,11 @@ public class BufferParameters {
     return 1 - Math.cos(alpha / 2.0);
   }
 
-  private int endCapStyle = CAP_ROUND;
+  private LineCap endCapStyle = LineCap.ROUND;
 
   private boolean isSingleSided = false;
 
-  private int joinStyle = JOIN_ROUND;
+  private LineJoin joinStyle = LineJoin.ROUND;
 
   private double mitreLimit = DEFAULT_MITRE_LIMIT;
 
@@ -139,7 +112,7 @@ public class BufferParameters {
    * @param quadrantSegments the number of quadrant segments to use
    * @param endCapStyle the end cap style to use
    */
-  public BufferParameters(final int quadrantSegments, final int endCapStyle) {
+  public BufferParameters(final int quadrantSegments, final LineCap endCapStyle) {
     setQuadrantSegments(quadrantSegments);
     setEndCapStyle(endCapStyle);
   }
@@ -153,8 +126,8 @@ public class BufferParameters {
    * @param joinStyle the join style to use
    * @param mitreLimit the mitre limit to use
    */
-  public BufferParameters(final int quadrantSegments, final int endCapStyle, final int joinStyle,
-    final double mitreLimit) {
+  public BufferParameters(final int quadrantSegments, final LineCap endCapStyle,
+    final LineJoin joinStyle, final double mitreLimit) {
     setQuadrantSegments(quadrantSegments);
     setEndCapStyle(endCapStyle);
     setJoinStyle(joinStyle);
@@ -166,7 +139,7 @@ public class BufferParameters {
    *
    * @return the end cap style
    */
-  public int getEndCapStyle() {
+  public LineCap getEndCapStyle() {
     return this.endCapStyle;
   }
 
@@ -175,7 +148,7 @@ public class BufferParameters {
    *
    * @return the join style code
    */
-  public int getJoinStyle() {
+  public LineJoin getJoinStyle() {
     return this.joinStyle;
   }
 
@@ -213,7 +186,7 @@ public class BufferParameters {
    *
    * @param endCapStyle the end cap style to specify
    */
-  public void setEndCapStyle(final int endCapStyle) {
+  public void setEndCapStyle(final LineCap endCapStyle) {
     this.endCapStyle = endCapStyle;
   }
 
@@ -224,7 +197,7 @@ public class BufferParameters {
    *
    * @param joinStyle the code for the join style
    */
-  public void setJoinStyle(final int joinStyle) {
+  public void setJoinStyle(final LineJoin joinStyle) {
     this.joinStyle = joinStyle;
   }
 
@@ -282,10 +255,10 @@ public class BufferParameters {
      * mitreLimit = |qs|
      */
     if (this.quadrantSegments == 0) {
-      this.joinStyle = JOIN_BEVEL;
+      this.joinStyle = LineJoin.BEVEL;
     }
     if (this.quadrantSegments < 0) {
-      this.joinStyle = JOIN_MITRE;
+      this.joinStyle = LineJoin.MITER;
       this.mitreLimit = Math.abs(this.quadrantSegments);
     }
 
@@ -297,7 +270,7 @@ public class BufferParameters {
      * If join style was set by the quadSegs value,
      * use the default for the actual quadrantSegments value.
      */
-    if (this.joinStyle != JOIN_ROUND) {
+    if (this.joinStyle != LineJoin.ROUND) {
       this.quadrantSegments = DEFAULT_QUADRANT_SEGMENTS;
     }
   }

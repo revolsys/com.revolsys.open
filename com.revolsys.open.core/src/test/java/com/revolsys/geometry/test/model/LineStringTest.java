@@ -11,7 +11,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Side;
-import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.metrics.PointLineStringMetrics;
 
@@ -207,7 +206,7 @@ public class LineStringTest {
       assertEmpty(pointCoordinatesListNull);
 
       final LineString pointCoordinatesListSize0 = geometryFactory
-        .lineString(new LineStringDouble(0, axisCount));
+        .lineString(geometryFactory.lineString());
       assertEmpty(pointCoordinatesListSize0);
 
       // double[] Constructor
@@ -286,18 +285,6 @@ public class LineStringTest {
         pointCoordinatesExtraAxis, pointCoordinatesLessAxis);
       assertObjectContsructor(geometryFactory, coordinates, coordinatesLessNaN,
         pointCoordinatesAllAxis, pointCoordinatesExtraAxis, pointCoordinatesLessAxis);
-
-      // LineString
-      final Point pointCoordinatesListAllAxis = geometryFactory
-        .point(new LineStringDouble(axisCount, coordinates));
-      final Point pointCoordinatesListExtraAxis = geometryFactory
-        .point(new LineStringDouble(axisCount, coordinatesExtra));
-      final Point pointCoordinatesListLessAxis = geometryFactory
-        .point(new LineStringDouble(axisCountLess, coordinatesLess));
-      assertEquals(coordinates, coordinatesLessNaN, pointCoordinatesListAllAxis,
-        pointCoordinatesListExtraAxis, pointCoordinatesListLessAxis);
-      assertObjectContsructor(geometryFactory, coordinates, coordinatesLessNaN,
-        pointCoordinatesListAllAxis, pointCoordinatesListExtraAxis, pointCoordinatesListLessAxis);
 
       // Object Point
       final Point pointAll = pointDoubleAllAxis;

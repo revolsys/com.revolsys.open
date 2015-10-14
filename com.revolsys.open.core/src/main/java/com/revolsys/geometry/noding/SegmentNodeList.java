@@ -46,17 +46,14 @@ import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.util.Assert;
 
 // INCOMPLETE!
-class NodeVertexIterator implements Iterator {
+class NodeVertexIterator implements Iterator<SegmentNode> {
   private SegmentNode currNode = null;
-
-  private final NodedSegmentString edge;
 
   private SegmentNode nextNode = null;
 
-  private final Iterator nodeIt;
+  private final Iterator<SegmentNode> nodeIt;
 
   NodeVertexIterator(final SegmentNodeList nodeList) {
-    this.edge = nodeList.getEdge();
     this.nodeIt = nodeList.iterator();
     readNextNode();
   }
@@ -70,7 +67,7 @@ class NodeVertexIterator implements Iterator {
   }
 
   @Override
-  public Object next() {
+  public SegmentNode next() {
     if (this.currNode == null) {
       this.currNode = this.nextNode;
       readNextNode();
@@ -81,13 +78,13 @@ class NodeVertexIterator implements Iterator {
       return null;
     }
 
-    if (this.nextNode.segmentIndex == this.currNode.segmentIndex) {
+    if (this.nextNode.getSegmentIndex() == this.currNode.getSegmentIndex()) {
       this.currNode = this.nextNode;
       readNextNode();
       return this.currNode;
     }
 
-    if (this.nextNode.segmentIndex > this.currNode.segmentIndex) {
+    if (this.nextNode.getSegmentIndex() > this.currNode.getSegmentIndex()) {
 
     }
     return null;
@@ -95,7 +92,7 @@ class NodeVertexIterator implements Iterator {
 
   private void readNextNode() {
     if (this.nodeIt.hasNext()) {
-      this.nextNode = (SegmentNode)this.nodeIt.next();
+      this.nextNode = this.nodeIt.next();
     } else {
       this.nextNode = null;
     }
@@ -118,10 +115,10 @@ class NodeVertexIterator implements Iterator {
  *
  * @version 1.7
  */
-public class SegmentNodeList {
-  private final NodedSegmentString edge; // the parent edge
+public class SegmentNodeList implements Iterable<SegmentNode> {
+  private final NodedSegmentString edge;
 
-  private final Map nodeMap = new TreeMap();
+  private final Map<SegmentNode, SegmentNode> nodeMap = new TreeMap<>();
 
   public SegmentNodeList(final NodedSegmentString edge) {
     this.edge = edge;
@@ -133,21 +130,25 @@ public class SegmentNodeList {
    *
    * @return the SegmentIntersection found or added
    */
-  public SegmentNode add(final Point intPt, final int segmentIndex) {
-    final SegmentNode eiNew = new SegmentNode(this.edge, intPt, segmentIndex,
-      this.edge.getSegmentOctant(segmentIndex));
-    final SegmentNode ei = (SegmentNode)this.nodeMap.get(eiNew);
-    if (ei != null) {
-      // debugging sanity check
-      Assert.isTrue(ei.coord.equals(2, intPt), "Found equal nodes with different coordinates");
-      // if (! ei.coord.equals2D(intPt))
-      // Debug.println("Found equal nodes with different coordinates");
-
-      return ei;
+  public SegmentNode add(final Point point, final int segmentIndex) {
+    if (point.isEmpty()) {
+      throw new IllegalArgumentException("Cannot add an empty point to a SegmentNodeList");
+    } else {
+      final int segmentOctant = this.edge.getSegmentOctant(segmentIndex);
+      final SegmentNode newNode = new SegmentNode(this.edge, point, segmentIndex, segmentOctant);
+      SegmentNode node = this.nodeMap.get(newNode);
+      if (node == null) {
+        node = newNode;
+        this.nodeMap.put(node, node);
+      } else {
+        // debugging sanity check
+        final boolean equals = node.equals(2, point);
+        if (!equals) {
+          Assert.isTrue(equals, "Found equal nodes with different coordinates");
+        }
+      }
+      return node;
     }
-    // node does not exist, so create it
-    this.nodeMap.put(eiNew, eiNew);
-    return eiNew;
   }
 
   /**
@@ -158,15 +159,14 @@ public class SegmentNodeList {
    * the vertex at the base of a collapsed pair must also be added as a node.
    */
   private void addCollapsedNodes() {
-    final List collapsedVertexIndexes = new ArrayList();
+    final List<Integer> collapsedVertexIndexes = new ArrayList<>();
 
     findCollapsesFromInsertedNodes(collapsedVertexIndexes);
     findCollapsesFromExistingVertices(collapsedVertexIndexes);
 
     // node the collapses
-    for (final Iterator it = collapsedVertexIndexes.iterator(); it.hasNext();) {
-      final int vertexIndex = ((Integer)it.next()).intValue();
-      add(this.edge.getCoordinate(vertexIndex), vertexIndex);
+    for (final int vertexIndex : collapsedVertexIndexes) {
+      add(this.edge.getPoint(vertexIndex), vertexIndex);
     }
   }
 
@@ -175,8 +175,11 @@ public class SegmentNodeList {
    */
   private void addEndpoints() {
     final int maxSegIndex = this.edge.size() - 1;
-    add(this.edge.getCoordinate(0), 0);
-    add(this.edge.getCoordinate(maxSegIndex), maxSegIndex);
+    final Point fromPoint = this.edge.getPoint(0);
+    add(fromPoint, 0);
+
+    final Point toPoint = this.edge.getPoint(maxSegIndex);
+    add(toPoint, maxSegIndex);
   }
 
   /**
@@ -215,15 +218,15 @@ public class SegmentNodeList {
    */
   SegmentString createSplitEdge(final SegmentNode ei0, final SegmentNode ei1) {
     // Debug.println("\ncreateSplitEdge"); Debug.print(ei0); Debug.print(ei1);
-    int npts = ei1.segmentIndex - ei0.segmentIndex + 2;
+    int npts = ei1.getSegmentIndex() - ei0.getSegmentIndex() + 2;
 
-    final Point lastSegStartPt = this.edge.getCoordinate(ei1.segmentIndex);
+    final Point lastSegStartPt = this.edge.getPoint(ei1.getSegmentIndex());
     // if the last intersection point is not equal to the its segment start pt,
     // add it to the points list as well.
     // (This check is needed because the distance metric is not totally
     // reliable!)
     // The check for point equality is 2D only - Z values are ignored
-    final boolean useIntPt1 = ei1.isInterior() || !ei1.coord.equals(2, lastSegStartPt);
+    final boolean useIntPt1 = ei1.isInterior() || !ei1.equals(2, lastSegStartPt);
     if (!useIntPt1) {
       npts--;
     }
@@ -232,13 +235,13 @@ public class SegmentNodeList {
     final double[] coordinates = new double[npts * axisCount];
 
     int ipt = 0;
-    CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, ei0.coord);
-    for (int i = ei0.segmentIndex + 1; i <= ei1.segmentIndex; i++) {
-      final Point point = this.edge.getCoordinate(i);
+    CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, ei0);
+    for (int i = ei0.getSegmentIndex() + 1; i <= ei1.getSegmentIndex(); i++) {
+      final Point point = this.edge.getPoint(i);
       CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, point);
     }
     if (useIntPt1) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, ei1.coord);
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, ei1);
     }
 
     final LineStringDouble points = new LineStringDouble(axisCount, coordinates);
@@ -248,11 +251,11 @@ public class SegmentNodeList {
   private boolean findCollapseIndex(final SegmentNode ei0, final SegmentNode ei1,
     final int[] collapsedVertexIndex) {
     // only looking for equal nodes
-    if (!ei0.coord.equals(2, ei1.coord)) {
+    if (!ei0.equals(2, ei1)) {
       return false;
     }
 
-    int numVerticesBetween = ei1.segmentIndex - ei0.segmentIndex;
+    int numVerticesBetween = ei1.getSegmentIndex() - ei0.getSegmentIndex();
     if (!ei1.isInterior()) {
       numVerticesBetween--;
     }
@@ -260,7 +263,7 @@ public class SegmentNodeList {
     // if there is a single vertex between the two equal nodes, this is a
     // collapse
     if (numVerticesBetween == 1) {
-      collapsedVertexIndex[0] = ei0.segmentIndex + 1;
+      collapsedVertexIndex[0] = ei0.getSegmentIndex() + 1;
       return true;
     }
     return false;
@@ -270,11 +273,10 @@ public class SegmentNodeList {
    * Adds nodes for any collapsed edge pairs
    * which are pre-existing in the vertex list.
    */
-  private void findCollapsesFromExistingVertices(final List collapsedVertexIndexes) {
+  private void findCollapsesFromExistingVertices(final List<Integer> collapsedVertexIndexes) {
     for (int i = 0; i < this.edge.size() - 2; i++) {
-      final Point p0 = this.edge.getCoordinate(i);
-      final Point p1 = this.edge.getCoordinate(i + 1);
-      final Point p2 = this.edge.getCoordinate(i + 2);
+      final Point p0 = this.edge.getPoint(i);
+      final Point p2 = this.edge.getPoint(i + 2);
       if (p0.equals(2, p2)) {
         // add base of collapse as node
         collapsedVertexIndexes.add(new Integer(i + 1));
@@ -289,17 +291,17 @@ public class SegmentNodeList {
    * To provide the correct fully noded semantics,
    * the vertex must be added as a node as well.
    */
-  private void findCollapsesFromInsertedNodes(final List collapsedVertexIndexes) {
+  private void findCollapsesFromInsertedNodes(final List<Integer> collapsedVertexIndexes) {
     final int[] collapsedVertexIndex = new int[1];
-    final Iterator it = iterator();
+    final Iterator<SegmentNode> it = iterator();
     // there should always be at least two entries in the list, since the
     // endpoints are nodes
-    SegmentNode eiPrev = (SegmentNode)it.next();
+    SegmentNode eiPrev = it.next();
     while (it.hasNext()) {
-      final SegmentNode ei = (SegmentNode)it.next();
+      final SegmentNode ei = it.next();
       final boolean isCollapsed = findCollapseIndex(eiPrev, ei, collapsedVertexIndex);
       if (isCollapsed) {
-        collapsedVertexIndexes.add(new Integer(collapsedVertexIndex[0]));
+        collapsedVertexIndexes.add(collapsedVertexIndex[0]);
       }
 
       eiPrev = ei;
@@ -313,15 +315,15 @@ public class SegmentNodeList {
   /**
    * returns an iterator of SegmentNodes
    */
-  public Iterator iterator() {
+  @Override
+  public Iterator<SegmentNode> iterator() {
     return this.nodeMap.values().iterator();
   }
 
   public void print(final PrintStream out) {
     out.println("Intersections:");
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final SegmentNode ei = (SegmentNode)it.next();
-      ei.print(out);
+    for (final SegmentNode node : this) {
+      node.print(out);
     }
   }
 }

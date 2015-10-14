@@ -384,7 +384,7 @@ public class OctagonalEnvelope {
 
   public Geometry toGeometry(final GeometryFactory geometryFactory) {
     if (isNull()) {
-      return geometryFactory.point((LineString)null);
+      return geometryFactory.point();
     }
 
     final Point px00 = new PointDouble(geometryFactory.makePrecise(0, this.minX),
