@@ -235,19 +235,23 @@ public class BoundingBoxUtil {
   }
 
   public static boolean intersects(final double[] bounds1, final double[] bounds2) {
-    final int axisCount1 = bounds1.length / 2;
-    final double minX1 = bounds1[0];
-    final double minY1 = bounds1[1];
-    final double maxX1 = bounds1[axisCount1];
-    final double maxY1 = bounds1[axisCount1 + 1];
+    if (bounds1 == null || bounds2 == null) {
+      return false;
+    } else {
+      final int axisCount1 = bounds1.length / 2;
+      final double minX1 = bounds1[0];
+      final double minY1 = bounds1[1];
+      final double maxX1 = bounds1[axisCount1];
+      final double maxY1 = bounds1[axisCount1 + 1];
 
-    final int axisCount2 = bounds2.length / 2;
-    final double minX2 = bounds2[0];
-    final double minY2 = bounds2[1];
-    final double maxX2 = bounds2[axisCount2];
-    final double maxY2 = bounds2[axisCount2 + 1];
+      final int axisCount2 = bounds2.length / 2;
+      final double minX2 = bounds2[0];
+      final double minY2 = bounds2[1];
+      final double maxX2 = bounds2[axisCount2];
+      final double maxY2 = bounds2[axisCount2 + 1];
 
-    return !(minX2 > maxX1 || maxX2 < minX1 || minY2 > maxY1 || maxY2 < minY1);
+      return !(minX2 > maxX1 || maxX2 < minX1 || minY2 > maxY1 || maxY2 < minY1);
+    }
   }
 
   /**

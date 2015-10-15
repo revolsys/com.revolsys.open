@@ -132,15 +132,17 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   public Object toJava(final Object object) throws SQLException {
     if (object instanceof PostgreSQLGeometryWrapper) {
       final PostgreSQLGeometryWrapper geometryType = (PostgreSQLGeometryWrapper)object;
-      return geometryType.getGeometry();
+      final Geometry geometry = geometryType.getGeometry();
+      return geometry.convert(this.geometryFactory);
     } else {
       return object;
     }
   }
 
   public Object toJdbc(final Object object) throws SQLException {
-    if (object instanceof com.revolsys.geometry.model.Geometry) {
-      final Geometry geometry = (Geometry)object;
+    if (object instanceof Geometry) {
+      Geometry geometry = (Geometry)object;
+      geometry = geometry.convert(this.geometryFactory);
       return new PostgreSQLGeometryWrapper(geometry);
     } else if (object instanceof BoundingBox) {
       BoundingBox boundingBox = (BoundingBox)object;

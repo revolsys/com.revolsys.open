@@ -49,7 +49,7 @@ import com.revolsys.geometry.model.impl.PointDouble;
  * Models a triangle formed from {@link QuadEdge}s in a {@link QuadEdgeSubdivision}
  * which forms a triangulation. The class provides methods to access the
  * topological and geometric properties of the triangle and its neighbours in
- * the triangulation. Triangle vertices are ordered in CCW orientation in the
+ * the triangulation. TriangleImpl vertices are ordered in CCW orientation in the
  * structure.
  * <p>
  * QuadEdgeTriangles support having an external data attribute attached to them.

@@ -35,7 +35,7 @@ package com.revolsys.geometry.triangulate.quadedge;
 
 import com.revolsys.geometry.math.DD;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Triangle;
+import com.revolsys.geometry.util.Triangles;
 
 /**
  * Algorithms for computing values and predicates
@@ -72,7 +72,7 @@ public class TrianglePredicate {
    * @return true if this point is inside the circle defined by the points a, b, c
    */
   public static boolean isInCircleCC(final Point a, final Point b, final Point c, final Point p) {
-    final Point cc = Triangle.circumcentre(a, b, c);
+    final Point cc = Triangles.circumcentre(a, b, c);
     final double ccRadius = a.distance(cc);
     final double pRadiusDiff = p.distance(cc) - ccRadius;
     return pRadiusDiff <= 0;

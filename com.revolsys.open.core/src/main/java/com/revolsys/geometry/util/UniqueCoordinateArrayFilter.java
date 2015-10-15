@@ -8,11 +8,10 @@ import java.util.TreeSet;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.io.Reader;
 
 public class UniqueCoordinateArrayFilter {
   public static List<Point> getUniquePoints(final Geometry geometry) {
-    final Reader<Vertex> vertices = geometry.vertices();
+    final Iterable<Vertex> vertices = geometry.vertices();
     return getUniquePoints(vertices);
   }
 

@@ -311,9 +311,8 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   }
 
   @Override
-  default Reader<Vertex> vertices() {
-    final MultiLineStringVertex vertex = new MultiLineStringVertex(this, 0, -1);
-    return vertex.reader();
+  default Vertex vertices() {
+    return new MultiLineStringVertex(this, 0, -1);
   }
 
 }

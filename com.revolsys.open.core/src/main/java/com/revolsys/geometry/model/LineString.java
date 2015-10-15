@@ -1202,7 +1202,8 @@ public interface LineString extends Lineal {
     if (isEmpty()) {
       return new BoundingBoxDoubleGf(geometryFactory);
     } else {
-      return new BoundingBoxDoubleGf(geometryFactory, vertices());
+      final Iterable<Vertex> vertices = vertices();
+      return new BoundingBoxDoubleGf(geometryFactory, vertices);
     }
   }
 
@@ -1453,9 +1454,7 @@ public interface LineString extends Lineal {
   }
 
   @Override
-  default Reader<Vertex> vertices() {
-    final LineStringVertex vertex = new LineStringVertex(this, -1);
-    return vertex.reader();
+  default LineStringVertex vertices() {
+    return new LineStringVertex(this, -1);
   }
-
 }

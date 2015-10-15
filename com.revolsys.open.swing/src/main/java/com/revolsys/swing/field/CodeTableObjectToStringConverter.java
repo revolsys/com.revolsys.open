@@ -18,7 +18,7 @@ public class CodeTableObjectToStringConverter extends ObjectToStringConverter {
 
   @Override
   public String getPreferredStringForItem(final Object value) {
-    if (value == null || value == CodeTableComboBoxModel.NULL) {
+    if (value == null || value == Identifier.NULL) {
       return null;
     } else {
       final List<Object> values = this.codeTable.getValues(Identifier.create(value));

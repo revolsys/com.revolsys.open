@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.util.Map;
@@ -29,7 +30,6 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePanel;
 import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePreview;
-import com.revolsys.swing.map.util.GeometryShapeUtil;
 
 public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
 
@@ -57,52 +57,47 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     return path;
   }
 
-  public static Shape getShape(final Viewport2D viewport, final GeometryStyle style,
-    final Geometry geometry) {
-    final BoundingBox viewExtent = viewport.getBoundingBox();
-    if (geometry != null) {
-      if (!viewExtent.isEmpty()) {
-        final BoundingBox geometryExtent = geometry.getBoundingBox();
-        if (geometryExtent.intersects(viewExtent)) {
-          final GeometryFactory geometryFactory = viewport.getGeometryFactory();
-          final Geometry convertedGeometry = geometry.convert(geometryFactory);
-          // TODO clipping
-          return GeometryShapeUtil.toShape(viewport, convertedGeometry);
-        }
-      }
-    }
-    return null;
-  }
-
   public static final void renderGeometry(final Viewport2D viewport, final Graphics2D graphics,
     final Geometry geometry, final GeometryStyle style) {
     if (geometry != null) {
-      for (int i = 0; i < geometry.getGeometryCount(); i++) {
-        final Geometry part = geometry.getGeometry(i);
-        if (part instanceof Point) {
-          final Point point = (Point)part;
-          MarkerStyleRenderer.renderMarker(viewport, graphics, point, style);
-        } else if (part instanceof LineString) {
-          final LineString lineString = (LineString)part;
-          renderLineString(viewport, graphics, lineString, style);
-        } else if (part instanceof Polygon) {
-          final Polygon polygon = (Polygon)part;
-          renderPolygon(viewport, graphics, polygon, style);
+      final BoundingBox viewExtent = viewport.getBoundingBox();
+      if (!viewExtent.isEmpty()) {
+        final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory();
+        for (int i = 0; i < geometry.getGeometryCount(); i++) {
+          final Geometry part = geometry.getGeometry(i);
+          final BoundingBox partExtent = part.getBoundingBox();
+          if (partExtent.intersects(viewExtent)) {
+            final Geometry convertedPart = part.convert(viewGeometryFactory);
+            if (convertedPart instanceof Point) {
+              final Point point = (Point)convertedPart;
+              MarkerStyleRenderer.renderMarker(viewport, graphics, point, style);
+            } else if (convertedPart instanceof LineString) {
+              final LineString lineString = (LineString)convertedPart;
+              renderLineString(viewport, graphics, lineString, style);
+            } else if (convertedPart instanceof Polygon) {
+              final Polygon polygon = (Polygon)convertedPart;
+              renderPolygon(viewport, graphics, polygon, style);
+            }
+          }
         }
       }
     }
   }
 
   public static final void renderLineString(final Viewport2D viewport, final Graphics2D graphics,
-    final LineString lineString, final GeometryStyle style) {
-    final Shape shape = getShape(viewport, style, lineString);
-    if (shape != null) {
+    LineString line, final GeometryStyle style) {
+    final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory();
+    line = line.convert(viewGeometryFactory, 2);
+    if (!line.isEmpty()) {
       final Paint paint = graphics.getPaint();
+      final AffineTransform transform = graphics.getTransform();
       try {
+        graphics.setTransform(viewport.getModelToScreenTransform());
         style.setLineStyle(viewport, graphics);
-        graphics.draw(shape);
+        graphics.draw(line);
       } finally {
         graphics.setPaint(paint);
+        graphics.setTransform(transform);
       }
     }
   }
@@ -110,20 +105,28 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
   public static final void renderOutline(final Viewport2D viewport, final Graphics2D graphics,
     final Geometry geometry, final GeometryStyle style) {
     if (geometry != null) {
-      for (int i = 0; i < geometry.getGeometryCount(); i++) {
-        final Geometry part = geometry.getGeometry(i);
-        if (geometry instanceof Point) {
-          final Point point = (Point)geometry;
-          MarkerStyleRenderer.renderMarker(viewport, graphics, point, style);
-        } else if (part instanceof LineString) {
-          final LineString lineString = (LineString)part;
-          renderLineString(viewport, graphics, lineString, style);
-        } else if (part instanceof Polygon) {
-          final Polygon polygon = (Polygon)part;
-          renderLineString(viewport, graphics, polygon.getShell(), style);
-          for (int j = 0; j < polygon.getHoleCount(); j++) {
-            final LineString ring = polygon.getHole(j);
-            renderLineString(viewport, graphics, ring, style);
+      final BoundingBox viewExtent = viewport.getBoundingBox();
+      if (!viewExtent.isEmpty()) {
+        final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory();
+        for (int i = 0; i < geometry.getGeometryCount(); i++) {
+          final Geometry part = geometry.getGeometry(i);
+          final BoundingBox partExtent = part.getBoundingBox();
+          if (partExtent.intersects(viewExtent)) {
+            final Geometry convertedPart = part.convert(viewGeometryFactory);
+            if (convertedPart instanceof Point) {
+              final Point point = (Point)convertedPart;
+              MarkerStyleRenderer.renderMarker(viewport, graphics, point, style);
+            } else if (convertedPart instanceof LineString) {
+              final LineString lineString = (LineString)convertedPart;
+              renderLineString(viewport, graphics, lineString, style);
+            } else if (convertedPart instanceof Polygon) {
+              final Polygon polygon = (Polygon)convertedPart;
+              renderLineString(viewport, graphics, polygon.getShell(), style);
+              for (int j = 0; j < polygon.getHoleCount(); j++) {
+                final LineString ring = polygon.getHole(j);
+                renderLineString(viewport, graphics, ring, style);
+              }
+            }
           }
         }
       }
@@ -131,17 +134,21 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   public static final void renderPolygon(final Viewport2D viewport, final Graphics2D graphics,
-    final Polygon polygon, final GeometryStyle style) {
-    final Shape shape = getShape(viewport, style, polygon);
-    if (shape != null) {
+    Polygon polygon, final GeometryStyle style) {
+    final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory();
+    polygon = polygon.convert(viewGeometryFactory, 2);
+    if (!polygon.isEmpty()) {
       final Paint paint = graphics.getPaint();
+      final AffineTransform transform = graphics.getTransform();
       try {
+        graphics.setTransform(viewport.getModelToScreenTransform());
         style.setFillStyle(viewport, graphics);
-        graphics.fill(shape);
+        graphics.fill(polygon);
         style.setLineStyle(viewport, graphics);
-        graphics.draw(shape);
+        graphics.draw(polygon);
       } finally {
         graphics.setPaint(paint);
+        graphics.setTransform(transform);
       }
     }
   }

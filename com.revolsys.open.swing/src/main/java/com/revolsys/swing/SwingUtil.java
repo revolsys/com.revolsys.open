@@ -307,7 +307,7 @@ public class SwingUtil {
     if (component instanceof JTextComponent) {
       return (JTextComponent)component;
     } else if (component instanceof JComboBox) {
-      final JComboBox comboBox = (JComboBox)component;
+      final JComboBox<?> comboBox = (JComboBox<?>)component;
       final ComboBoxEditor editor = comboBox.getEditor();
       final Component editorComponent = editor.getEditorComponent();
       return getTextComponent(editorComponent);
@@ -513,17 +513,18 @@ public class SwingUtil {
     return flag != 0;
   }
 
-  public static ComboBox newComboBox(final CodeTable codeTable, final boolean required,
+  public static ComboBox<Identifier> newComboBox(final CodeTable codeTable, final boolean required,
     final int maxLength) {
     return newComboBox("fieldValue", codeTable, required, maxLength);
   }
 
-  public static ComboBox newComboBox(final String fieldName, final CodeTable codeTable,
+  public static ComboBox<Identifier> newComboBox(final String fieldName, final CodeTable codeTable,
     final boolean required, final int maxLength) {
     if (codeTable == null) {
       return null;
     } else {
-      final ComboBox comboBox = CodeTableComboBoxModel.create(fieldName, codeTable, !required);
+      final ComboBox<Identifier> comboBox = CodeTableComboBoxModel.create(fieldName, codeTable,
+        !required);
       if (comboBox.getModel().getSize() > 0) {
         comboBox.setSelectedIndex(0);
       }
@@ -548,7 +549,7 @@ public class SwingUtil {
       for (int i = 0; i < longestLength; i++) {
         value.append("W");
       }
-      comboBox.setPrototypeDisplayValue(value.toString());
+      comboBox.setPrototypeDisplayValue(Identifier.create(value));
 
       final ComboBoxEditor editor = comboBox.getEditor();
       final Component editorComponent = editor.getEditorComponent();

@@ -527,8 +527,8 @@ public interface GeometryCollection extends Geometry {
   }
 
   @Override
-  default Reader<Vertex> vertices() {
-    final GeometryCollectionVertex iterator = new GeometryCollectionVertex(this, -1);
-    return iterator.reader();
+  default Vertex vertices() {
+    final GeometryCollectionVertex vertex = new GeometryCollectionVertex(this, -1);
+    return vertex;
   }
 }

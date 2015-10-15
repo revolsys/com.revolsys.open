@@ -37,8 +37,9 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.util.TriangleImpl;
+import com.revolsys.geometry.util.Triangles;
 import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
@@ -67,7 +68,7 @@ public class TriangleTest extends TestCase {
 
   public void checkAcute(final String wkt, final boolean expectedValue) throws Exception {
     final Polygon g = (Polygon)this.reader.read(wkt);
-    final Triangle t = createTriangle(g);
+    final TriangleImpl t = createTriangle(g);
     final boolean isAcute = t.isAcute();
     // System.out.println("isAcute = " + isAcute);
     assertEquals(expectedValue, isAcute);
@@ -76,7 +77,7 @@ public class TriangleTest extends TestCase {
   public void checkArea(final String wkt, final double expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
 
-    final Triangle t = createTriangle(g);
+    final TriangleImpl t = createTriangle(g);
     final double signedArea = t.signedArea();
     // System.out.println("signed area = " + signedArea);
     assertEquals(expectedValue, signedArea, TOLERANCE);
@@ -88,7 +89,7 @@ public class TriangleTest extends TestCase {
 
   public void checkArea3D(final String wkt, final double expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final Triangle t = createTriangle(g);
+    final TriangleImpl t = createTriangle(g);
     final double area3D = t.area3D();
     // System.out.println("area3D = " + area3D);
     assertEquals(expectedValue, area3D, TOLERANCE);
@@ -97,8 +98,8 @@ public class TriangleTest extends TestCase {
   public void checkCentroid(final String wkt, final Point expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
 
-    final Triangle t = createTriangle(g);
-    Point centroid = Triangle.centroid(t.p0, t.p1, t.p2);
+    final TriangleImpl t = createTriangle(g);
+    Point centroid = Triangles.centroid(t.p0, t.p1, t.p2);
     // System.out.println("(Static) centroid = " + centroid);
     assertEquals(expectedValue.toString(), centroid.toString());
 
@@ -112,8 +113,8 @@ public class TriangleTest extends TestCase {
   public void checkCircumCentre(final String wkt, final Point expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
 
-    final Triangle t = createTriangle(g);
-    Point circumcentre = Triangle.circumcentre(t.p0, t.p1, t.p2);
+    final TriangleImpl t = createTriangle(g);
+    Point circumcentre = Triangles.circumcentre(t.p0, t.p1, t.p2);
     // System.out.println("(Static) circumcentre = " + circumcentre);
     assertEquals(expectedValue.toString(), circumcentre.toString());
 
@@ -129,7 +130,7 @@ public class TriangleTest extends TestCase {
     throws Exception {
     final Geometry g = this.reader.read(wkt);
 
-    final Triangle t = createTriangle(g);
+    final TriangleImpl t = createTriangle(g);
     final double z = t.interpolateZ(p);
     // System.out.println("Z = " + z);
     assertEquals(expectedValue, z, 0.000001);
@@ -139,8 +140,8 @@ public class TriangleTest extends TestCase {
     throws Exception {
     final Geometry g = this.reader.read(wkt);
 
-    final Triangle t = createTriangle(g);
-    double length = Triangle.longestSideLength(t.p0, t.p1, t.p2);
+    final TriangleImpl t = createTriangle(g);
+    double length = Triangles.longestSideLength(t.p0, t.p1, t.p2);
     // System.out.println("(Static) longestSideLength = " + length);
     assertEquals(expectedValue, length, 0.00000001);
 
@@ -151,7 +152,7 @@ public class TriangleTest extends TestCase {
     assertEquals(expectedValue, length, 0.00000001);
   }
 
-  public Triangle createTriangle(final Geometry g) {
+  public TriangleImpl createTriangle(final Geometry g) {
     if (g instanceof Polygon) {
       final Polygon polygon = (Polygon)g;
       return createTriangle(polygon);
@@ -163,15 +164,15 @@ public class TriangleTest extends TestCase {
     }
   }
 
-  public Triangle createTriangle(final LineString line) {
-    final Triangle t = new Triangle(line.getVertex(0).newPointDouble(), line.getVertex(1).newPointDouble(),
+  public TriangleImpl createTriangle(final LineString line) {
+    final TriangleImpl t = new TriangleImpl(line.getVertex(0).newPointDouble(), line.getVertex(1).newPointDouble(),
       line.getVertex(2).newPointDouble());
     return t;
   }
 
-  public Triangle createTriangle(final Polygon g) {
+  public TriangleImpl createTriangle(final Polygon g) {
     final LineString line = g.getShell();
-    final Triangle t = createTriangle(line);
+    final TriangleImpl t = createTriangle(line);
     return t;
   }
 

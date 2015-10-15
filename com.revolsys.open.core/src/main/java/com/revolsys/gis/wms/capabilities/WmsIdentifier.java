@@ -1,6 +1,6 @@
 package com.revolsys.gis.wms.capabilities;
 
-public class Identifier {
+public class WmsIdentifier {
   private String authority;
 
   private String value;

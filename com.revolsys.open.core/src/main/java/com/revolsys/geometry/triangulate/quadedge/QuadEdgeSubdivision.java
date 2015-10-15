@@ -50,9 +50,9 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.util.Triangles;
 
 /**
  * A class that contains the {@link QuadEdge}s representing a planar
@@ -99,7 +99,7 @@ public class QuadEdgeSubdivision {
       final Point c = triEdges[2].orig().getCoordinate();
 
       // TODO: choose the most accurate circumcentre based on the edges
-      final Point cc = Triangle.circumcentre(a, b, c);
+      final Point cc = Triangles.circumcentre(a, b, c);
       final Vertex ccVertex = new Vertex(cc);
       // save the circumcentre as the origin for the dual edges originating in
       // this triangle

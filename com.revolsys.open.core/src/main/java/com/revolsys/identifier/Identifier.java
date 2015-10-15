@@ -17,6 +17,8 @@ import com.revolsys.util.CompareUtil;
 import com.revolsys.util.Numbers;
 
 public interface Identifier {
+  Identifier NULL = new SingleIdentifier(null);
+
   static Comparator<Identifier> comparator() {
     return (identifier1, identifier2) -> {
       if (identifier1 == identifier2) {
@@ -42,7 +44,7 @@ public interface Identifier {
       }
     } else if (Numbers.isPrimitiveIntegral(value)) {
       final Number number = (Number)value;
-      int intValue = number.intValue();
+      final int intValue = number.intValue();
       return new IntegerIdentifier(intValue);
     } else if (value instanceof Identifier) {
       return (Identifier)value;

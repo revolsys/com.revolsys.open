@@ -178,7 +178,7 @@ public class Buffer {
     final MCIndexSnapRounder rounder = new MCIndexSnapRounder(1.0);
     final double scale = precisionModel.getScale(0);
     final Noder noder = new ScaledNoder(rounder, scale);
-    return Buffer.buffer(noder, precisionModel, geometry, distance, parameters);
+    return buffer(noder, precisionModel, geometry, distance, parameters);
   }
 
   private static Geometry bufferReducedPrecision(final Geometry geometry, final double distance,

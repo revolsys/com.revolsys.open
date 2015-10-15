@@ -83,6 +83,14 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     }
   }
 
+  public static double toModelValue(final Viewport2D viewport, final Measure<Length> measure) {
+    if (viewport == null) {
+      return measure.getValue().doubleValue();
+    } else {
+      return viewport.toModelValue(measure);
+    }
+  }
+
   /** The current bounding box of the project. */
   private BoundingBox boundingBox = BoundingBox.EMPTY;
 
@@ -674,6 +682,26 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
   public Point toModelPointRounded(GeometryFactory geometryFactory, final int x, final int y) {
     geometryFactory = getRoundedGeometryFactory(geometryFactory);
     return toModelPoint(geometryFactory, x, y);
+  }
+
+  public double toModelValue(final Measure<Length> value) {
+    double convertedValue;
+    final Unit<Length> unit = value.getUnit();
+    if (unit.equals(NonSI.PIXEL)) {
+      convertedValue = value.doubleValue(NonSI.PIXEL);
+      final double modelUnitsPerViewUnit = getModelUnitsPerViewUnit();
+      convertedValue *= modelUnitsPerViewUnit;
+    } else {
+      convertedValue = value.doubleValue(SI.METRE);
+      final CoordinateSystem coordinateSystem = this.geometryFactory2d.getCoordinateSystem();
+      if (coordinateSystem instanceof GeographicCoordinateSystem) {
+        final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)coordinateSystem;
+        final double radius = geoCs.getDatum().getSpheroid().getSemiMajorAxis();
+        convertedValue = Math.toDegrees(convertedValue / radius);
+
+      }
+    }
+    return convertedValue;
   }
 
   public double[] toViewCoordinates(final double... modelCoordinates) {

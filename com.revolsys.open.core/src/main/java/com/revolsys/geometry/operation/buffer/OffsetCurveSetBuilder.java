@@ -52,9 +52,9 @@ import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.util.CleanDuplicatePoints;
+import com.revolsys.geometry.model.util.TriangleImpl;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.noding.SegmentString;
 
@@ -291,7 +291,7 @@ public class OffsetCurveSetBuilder {
    */
   private boolean isTriangleErodedCompletely(final LinearRing triangleCoord,
     final double bufferDistance) {
-    final Triangle tri = new Triangle(triangleCoord.getVertex(0), triangleCoord.getVertex(1),
+    final TriangleImpl tri = new TriangleImpl(triangleCoord.getVertex(0), triangleCoord.getVertex(1),
       triangleCoord.getVertex(2));
     final Point inCentre = tri.inCentre();
     final double distToCentre = LineSegmentUtil.distanceLinePoint(tri.p0, tri.p1, inCentre);

@@ -5,7 +5,7 @@ import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.Stopwatch;
 
 /**
- * Test performance of evaluating Triangle predicate computations
+ * Test performance of evaluating TriangleImpl predicate computations
  * using
  * various extended precision APIs.
  *

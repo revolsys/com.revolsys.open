@@ -56,9 +56,13 @@ public abstract class QueryValue implements Cloneable {
   public static <V extends QueryValue> List<V> cloneQueryValues(final List<V> values) {
     final List<V> clonedValues = new ArrayList<V>();
     for (final V value : values) {
-      @SuppressWarnings("unchecked")
-      final V clonedValue = (V)value.clone();
-      clonedValues.add(clonedValue);
+      if (value == null) {
+        clonedValues.add(value);
+      } else {
+        @SuppressWarnings("unchecked")
+        final V clonedValue = (V)value.clone();
+        clonedValues.add(clonedValue);
+      }
     }
     return clonedValues;
   }

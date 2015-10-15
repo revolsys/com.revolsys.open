@@ -277,14 +277,14 @@ public class Parser extends XmlProcessor {
     return type;
   }
 
-  public Identifier processIdentifier(final XMLStreamReader parser)
+  public WmsIdentifier processIdentifier(final XMLStreamReader parser)
     throws XMLStreamException, IOException {
-    final Identifier identifier = new Identifier();
+    final WmsIdentifier wmsIdentifier = new WmsIdentifier();
     final String authority = parser.getAttributeValue(null, "authority");
-    identifier.setAuthority(authority);
+    wmsIdentifier.setAuthority(authority);
     final String value = StaxUtils.getElementText(parser);
-    identifier.setValue(value);
-    return identifier;
+    wmsIdentifier.setValue(value);
+    return wmsIdentifier;
   }
 
   public ImageUrl processImageUrl(final XMLStreamReader parser)
@@ -387,8 +387,8 @@ public class Parser extends XmlProcessor {
           layer.setAttribution((Attribution)object);
         } else if (object instanceof AuthorityUrl) {
           layer.addAuthorityUrl((AuthorityUrl)object);
-        } else if (object instanceof Identifier) {
-          layer.addIdentifier((Identifier)object);
+        } else if (object instanceof WmsIdentifier) {
+          layer.addIdentifier((WmsIdentifier)object);
         } else if (object instanceof MetadataUrl) {
           layer.addMetaDataUrl((MetadataUrl)object);
         } else if (object instanceof Style) {

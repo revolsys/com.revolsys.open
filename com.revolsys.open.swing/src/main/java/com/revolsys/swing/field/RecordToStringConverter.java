@@ -7,6 +7,7 @@ import java.util.List;
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.identifier.Identifier;
 import com.revolsys.record.Record;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
@@ -26,7 +27,7 @@ public class RecordToStringConverter extends ObjectToStringConverter {
 
   @Override
   public String getPreferredStringForItem(final Object value) {
-    if (value == null || value == CodeTableComboBoxModel.NULL) {
+    if (value == null || value == Identifier.NULL) {
       return "";
     } else if (value instanceof Record) {
       final Record object = (Record)value;

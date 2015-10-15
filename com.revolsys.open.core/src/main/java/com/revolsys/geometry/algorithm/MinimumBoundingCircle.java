@@ -36,10 +36,10 @@ package com.revolsys.geometry.algorithm;
 import com.revolsys.geometry.model.CoordinateArrays;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.Assert;
+import com.revolsys.geometry.util.Triangles;
 import com.revolsys.math.Angle;
 
 /**
@@ -185,7 +185,7 @@ public class MinimumBoundingCircle {
           (this.extremalPts[0].getY() + this.extremalPts[1].getY()) / 2.0, Point.NULL_ORDINATE);
       break;
       case 3:
-        this.centre = Triangle.circumcentre(this.extremalPts[0], this.extremalPts[1],
+        this.centre = Triangles.circumcentre(this.extremalPts[0], this.extremalPts[1],
           this.extremalPts[2]);
       break;
     }

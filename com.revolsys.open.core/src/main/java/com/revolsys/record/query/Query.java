@@ -156,8 +156,13 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
     this.whereCondition = whereCondition;
   }
 
-  public void addOrderBy(final String column, final boolean ascending) {
+  public Query addOrderBy(final String column) {
+    return addOrderBy(column, true);
+  }
+
+  public Query addOrderBy(final String column, final boolean ascending) {
     this.orderBy.put(column, ascending);
+    return this;
   }
 
   @Deprecated
@@ -166,14 +171,16 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
   }
 
   public void and(final Condition condition) {
-    final Condition whereCondition = getWhereCondition();
-    if (whereCondition == null) {
-      setWhereCondition(condition);
-    } else if (whereCondition instanceof And) {
-      final And and = (And)whereCondition;
-      and.add(condition);
-    } else {
-      setWhereCondition(new And(whereCondition, condition));
+    if (condition != null) {
+      final Condition whereCondition = getWhereCondition();
+      if (whereCondition == null) {
+        setWhereCondition(condition);
+      } else if (whereCondition instanceof And) {
+        final And and = (And)whereCondition;
+        and.add(condition);
+      } else {
+        setWhereCondition(new And(whereCondition, condition));
+      }
     }
   }
 

@@ -1,5 +1,6 @@
 package com.revolsys.geometry.model.vertex;
 
+import java.awt.geom.PathIterator;
 import java.util.Iterator;
 
 import com.revolsys.geometry.model.BoundingBox;
@@ -7,14 +8,19 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryComponent;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.io.IteratorReader;
-import com.revolsys.io.Reader;
 
-public interface Vertex extends Point, Iterator<Vertex>, GeometryComponent {
+public interface Vertex extends Point, Iterator<Vertex>, Iterable<Vertex>, GeometryComponent {
 
   @Override
   Vertex clone();
+
+  default int getAwtType() {
+    if (isFrom()) {
+      return PathIterator.SEG_MOVETO;
+    } else {
+      return PathIterator.SEG_LINETO;
+    }
+  }
 
   @Override
   default int getAxisCount() {
@@ -24,8 +30,7 @@ public interface Vertex extends Point, Iterator<Vertex>, GeometryComponent {
 
   @Override
   default BoundingBox getBoundingBox() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return new BoundingBoxDoubleGf(geometryFactory, this);
+    return newBoundingBox();
   }
 
   @Override
@@ -71,7 +76,8 @@ public interface Vertex extends Point, Iterator<Vertex>, GeometryComponent {
     return false;
   }
 
-  default Reader<Vertex> reader() {
-    return new IteratorReader<Vertex>(this);
+  @Override
+  default Iterator<Vertex> iterator() {
+    return this;
   }
 }

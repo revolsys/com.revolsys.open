@@ -293,8 +293,7 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   }
 
   @Override
-  default Reader<Vertex> vertices() {
-    final MultiPolygonVertex vertex = new MultiPolygonVertex(this, 0, 0, -1);
-    return vertex.reader();
+  default MultiPolygonVertex vertices() {
+    return new MultiPolygonVertex(this, 0, 0, -1);
   }
 }

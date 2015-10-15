@@ -2,7 +2,6 @@ package com.revolsys.record.query;
 
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -12,23 +11,25 @@ import com.revolsys.util.Strings;
 
 public abstract class AbstractMultiCondition extends Condition {
 
-  private String operator;
+  private final String operator;
 
-  private List<QueryValue> values;
-
-  public AbstractMultiCondition(final Collection<? extends QueryValue> values) {
-    this.values = new ArrayList<QueryValue>(values);
-  }
+  private List<QueryValue> values = new ArrayList<>();
 
   public AbstractMultiCondition(final String operator,
-    final Collection<? extends QueryValue> values) {
+    final Iterable<? extends QueryValue> values) {
     this.operator = operator;
-    this.values = new ArrayList<QueryValue>(values);
+    if (values != null) {
+      for (final QueryValue value : values) {
+        add(value);
+      }
+    }
   }
 
-  public void add(final QueryValue value) {
-    if (value != null) {
-      this.values.add(value);
+  public boolean add(final QueryValue value) {
+    if (value == null) {
+      return false;
+    } else {
+      return this.values.add(value);
     }
   }
 
@@ -51,7 +52,11 @@ public abstract class AbstractMultiCondition extends Condition {
         buffer.append(this.operator);
         buffer.append(" ");
       }
-      value.appendSql(query, recordStore, buffer);
+      if (value == null) {
+        buffer.append("NULL");
+      } else {
+        value.appendSql(query, recordStore, buffer);
+      }
     }
     buffer.append(")");
   }
@@ -59,7 +64,9 @@ public abstract class AbstractMultiCondition extends Condition {
   @Override
   public int appendParameters(int index, final PreparedStatement statement) {
     for (final QueryValue value : getQueryValues()) {
-      index = value.appendParameters(index, statement);
+      if (value != null) {
+        index = value.appendParameters(index, statement);
+      }
     }
     return index;
   }

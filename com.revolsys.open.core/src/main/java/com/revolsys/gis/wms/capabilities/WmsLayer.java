@@ -28,7 +28,7 @@ public class WmsLayer {
 
   private int fixedWidth;
 
-  private List<Identifier> identifiers = new ArrayList<Identifier>();
+  private List<WmsIdentifier> wmsIdentifiers = new ArrayList<WmsIdentifier>();
 
   private List<String> keywords = new ArrayList<String>();
 
@@ -85,8 +85,8 @@ public class WmsLayer {
 
   }
 
-  public void addIdentifier(final Identifier identifier) {
-    this.identifiers.add(identifier);
+  public void addIdentifier(final WmsIdentifier wmsIdentifier) {
+    this.wmsIdentifiers.add(wmsIdentifier);
   }
 
   public void addLayer(final WmsLayer layer) {
@@ -152,8 +152,8 @@ public class WmsLayer {
     return this.fixedWidth;
   }
 
-  public List<Identifier> getIdentifiers() {
-    return this.identifiers;
+  public List<WmsIdentifier> getIdentifiers() {
+    return this.wmsIdentifiers;
   }
 
   public List<String> getKeywords() {
@@ -252,8 +252,8 @@ public class WmsLayer {
     this.fixedWidth = fixedWidth;
   }
 
-  public void setIdentifiers(final List<Identifier> identifiers) {
-    this.identifiers = identifiers;
+  public void setIdentifiers(final List<WmsIdentifier> wmsIdentifiers) {
+    this.wmsIdentifiers = wmsIdentifiers;
   }
 
   public void setKeywords(final List<String> keywords) {

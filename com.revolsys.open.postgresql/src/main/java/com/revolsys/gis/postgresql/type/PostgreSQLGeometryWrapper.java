@@ -61,14 +61,14 @@ public class PostgreSQLGeometryWrapper extends PGobject {
   private Geometry parse(final String value) {
     final InputStream in = new StringByteInputStream(value);
     final ValueGetter valueGetter = ValueGetter.newValueGetter(in);
-    return parseGeometry(valueGetter);
+    return parseGeometry(null, valueGetter);
   }
 
   private GeometryCollection parseCollection(final GeometryFactory geometryFactory,
     final ValueGetter data) {
     final int count = data.getInt();
     final Geometry[] geoms = new Geometry[count];
-    parseGeometryArray(data, geoms);
+    parseGeometryArray(geometryFactory, data, geoms);
     return geometryFactory.geometryCollection(geoms);
   }
 
@@ -105,7 +105,8 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     return coordinates;
   }
 
-  private Geometry parseGeometry(final ValueGetter data) {
+  private Geometry parseGeometry(final GeometryFactory parentGeometryFactory,
+    final ValueGetter data) {
     final int typeword = data.getInt();
 
     final int realtype = typeword & 0x1FFFFFFF;
@@ -114,44 +115,65 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     final boolean hasM = (typeword & 0x40000000) != 0;
     final boolean hasS = (typeword & 0x20000000) != 0;
 
-    int srid = 0;
+    int coordinateSystemId;
+    final int parentCoordinateSystemId;
+    if (parentGeometryFactory == null) {
+      parentCoordinateSystemId = 0;
+    } else {
+      parentCoordinateSystemId = parentGeometryFactory.getCoordinateSystemId();
+    }
     if (hasS) {
-      srid = data.getInt();
+      coordinateSystemId = data.getInt();
+    } else {
+      coordinateSystemId = parentCoordinateSystemId;
     }
     GeometryFactory geometryFactory;
     if (hasM) {
-      geometryFactory = GeometryFactory.floating(srid, 4);
+      geometryFactory = GeometryFactory.floating(coordinateSystemId, 4);
     } else if (hasZ) {
-      geometryFactory = GeometryFactory.floating(srid, 3);
+      geometryFactory = GeometryFactory.floating(coordinateSystemId, 3);
     } else {
-      geometryFactory = GeometryFactory.floating(srid, 2);
+      geometryFactory = GeometryFactory.floating(coordinateSystemId, 2);
     }
 
+    Geometry geometry;
     switch (realtype) {
       case 1:
-        return parsePoint(geometryFactory, data, hasZ, hasM);
+        geometry = parsePoint(geometryFactory, data, hasZ, hasM);
+      break;
       case 2:
-        return parseLineString(geometryFactory, data, hasZ, hasM);
+        geometry = parseLineString(geometryFactory, data, hasZ, hasM);
+      break;
       case 3:
-        return parsePolygon(geometryFactory, data, hasZ, hasM);
+        geometry = parsePolygon(geometryFactory, data, hasZ, hasM);
+      break;
       case 4:
-        return parseMultiPoint(geometryFactory, data);
+        geometry = parseMultiPoint(geometryFactory, data);
+      break;
       case 5:
-        return parseMultiLineString(geometryFactory, data);
+        geometry = parseMultiLineString(geometryFactory, data);
+      break;
       case 6:
-        return parseMultiPolygon(geometryFactory, data);
+        geometry = parseMultiPolygon(geometryFactory, data);
+      break;
       case 7:
-        return parseCollection(geometryFactory, data);
+        geometry = parseCollection(geometryFactory, data);
+      break;
       default:
         throw new IllegalArgumentException("Unknown Geometry Type: " + realtype);
     }
-
+    if (parentCoordinateSystemId == 0 || parentCoordinateSystemId == coordinateSystemId) {
+      return geometry;
+    } else {
+      return geometry.convert(parentGeometryFactory);
+    }
   }
 
-  private void parseGeometryArray(final ValueGetter data, final Geometry[] container) {
+  private void parseGeometryArray(final GeometryFactory geometryFactory, final ValueGetter data,
+    final Geometry[] container) {
     for (int i = 0; i < container.length; ++i) {
       data.getByte(); // read endian
-      container[i] = parseGeometry(data);
+      container[i] = parseGeometry(geometryFactory, data);
     }
   }
 
@@ -173,7 +195,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     final ValueGetter data) {
     final int count = data.getInt();
     final LineString[] lines = new LineString[count];
-    parseGeometryArray(data, lines);
+    parseGeometryArray(geometryFactory, data, lines);
     if (lines.length == 1) {
       return lines[0];
     } else {
@@ -183,7 +205,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
 
   private Geometry parseMultiPoint(final GeometryFactory geometryFactory, final ValueGetter data) {
     final Point[] points = new Point[data.getInt()];
-    parseGeometryArray(data, points);
+    parseGeometryArray(geometryFactory, data, points);
     if (points.length == 1) {
       return points[0];
     } else {
@@ -195,7 +217,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     final ValueGetter data) {
     final int count = data.getInt();
     final Polygon[] polys = new Polygon[count];
-    parseGeometryArray(data, polys);
+    parseGeometryArray(geometryFactory, data, polys);
     if (polys.length == 1) {
       return polys[0];
     } else {
@@ -237,6 +259,5 @@ public class PostgreSQLGeometryWrapper extends PGobject {
 
   public void setGeometry(final Geometry geometry) {
     this.value = PostgreSQLWktWriter.toString(geometry);
-    ;
   }
 }

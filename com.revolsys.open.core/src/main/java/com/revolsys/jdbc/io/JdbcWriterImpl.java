@@ -649,17 +649,17 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements RecordWriter
     }
     int parameterIndex = 1;
     final List<FieldDefinition> idFields = recordDefinition.getIdFields();
-    for (final FieldDefinition attribute : recordDefinition.getFields()) {
-      if (!idFields.contains(attribute)) {
-        final JdbcFieldDefinition jdbcAttribute = (JdbcFieldDefinition)attribute;
-        parameterIndex = jdbcAttribute.setInsertPreparedStatementValue(statement, parameterIndex,
-          object);
+    for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
+      if (!idFields.contains(fieldDefinition)) {
+        final JdbcFieldDefinition jdbcFieldDefinition = (JdbcFieldDefinition)fieldDefinition;
+        parameterIndex = jdbcFieldDefinition.setInsertPreparedStatementValue(statement,
+          parameterIndex, object);
       }
     }
     for (final FieldDefinition idField : idFields) {
-      final JdbcFieldDefinition jdbcAttribute = (JdbcFieldDefinition)idField;
-      parameterIndex = jdbcAttribute.setInsertPreparedStatementValue(statement, parameterIndex,
-        object);
+      final JdbcFieldDefinition jdbcFieldDefinition = (JdbcFieldDefinition)idField;
+      parameterIndex = jdbcFieldDefinition.setInsertPreparedStatementValue(statement,
+        parameterIndex, object);
 
     }
     statement.addBatch();

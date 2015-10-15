@@ -127,7 +127,7 @@ public class Triangle extends AbstractLineString {
   }
 
   /**
-   * Get the envelope of the Triangle.
+   * Get the envelope of the TriangleImpl.
    *
    * @return The envelope.
    */
@@ -183,10 +183,10 @@ public class Triangle extends AbstractLineString {
   }
 
   /**
-   * Returns true if the coordinate lies inside or on the edge of the Triangle.
+   * Returns true if the coordinate lies inside or on the edge of the TriangleImpl.
    *
    * @param coordinate The coordinate.
-   * @return True if the coordinate lies inside or on the edge of the Triangle.
+   * @return True if the coordinate lies inside or on the edge of the TriangleImpl.
    */
   @Override
   public boolean hasVertex(final Point coordinate) {

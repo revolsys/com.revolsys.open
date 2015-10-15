@@ -32,6 +32,12 @@
  */
 package com.revolsys.geometry.model;
 
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -190,7 +196,7 @@ import com.revolsys.util.Property;
  *@version 1.7
  */
 public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, GeometryFactoryProxy,
-  Serializable, DataTypeProxy {
+  Serializable, DataTypeProxy, Shape {
   /**
    * The value used to indicate a null or missing ordinate value.
    * In particular, used for the value of ordinates for dimensions
@@ -466,7 +472,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    *
    * @see #buffer(double)
    * @see #buffer(double, int)
-   * @see Buffer
    */
 
   default Geometry buffer(final double distance, final int quadrantSegments,
@@ -547,6 +552,16 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    */
   int compareToSameClass(Geometry o);
 
+  @Override
+  default boolean contains(final double x, final double y) {
+    return false;
+  }
+
+  @Override
+  default boolean contains(final double x, final double y, final double w, final double h) {
+    return false;
+  }
+
   /**
    * Tests whether this geometry contains the
    * argument geometry.
@@ -588,6 +603,16 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     }
     // general case
     return relate(g).isContains();
+  }
+
+  @Override
+  default boolean contains(final Point2D point) {
+    return false;
+  }
+
+  @Override
+  default boolean contains(final Rectangle2D rectangle) {
+    return false;
   }
 
   default boolean containsProperly(final Geometry geometry) {
@@ -1118,6 +1143,30 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     return newBoundingBox();
   }
 
+  @Override
+  default Rectangle getBounds() {
+    final Rectangle2D bounds2d = getBounds2D();
+    if (bounds2d == null) {
+      return null;
+    } else {
+      return bounds2d.getBounds();
+    }
+  }
+
+  @Override
+  default Rectangle2D getBounds2D() {
+    final BoundingBox boundingBox = getBoundingBox();
+    if (boundingBox.isEmpty()) {
+      return null;
+    } else {
+      final double x = boundingBox.getMinX();
+      final double y = boundingBox.getMinY();
+      final double width = boundingBox.getWidth();
+      final double height = boundingBox.getHeight();
+      return new Rectangle2D.Double(x, y, width, height);
+    }
+  }
+
   /**
    * Computes the centroid of this <code>Geometry</code>.
    * The centroid
@@ -1321,6 +1370,21 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     return 0.0;
   }
 
+  @Override
+  default PathIterator getPathIterator(final AffineTransform transform) {
+    final Vertex vertex = vertices();
+    if (transform == null) {
+      return new VertexPathIterator(vertex);
+    } else {
+      return new VertexPathIteratorTransform(vertex, transform);
+    }
+  }
+
+  @Override
+  default PathIterator getPathIterator(final AffineTransform transform, final double flatness) {
+    return getPathIterator(transform);
+  }
+
   /**
    *  Returns a vertex of this <code>Geometry</code>
    *  (usually, but not necessarily, the first one).
@@ -1444,6 +1508,14 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
 
   boolean intersects(BoundingBox boundingBox);
 
+  @Override
+  default boolean intersects(final double x, final double y, final double width,
+    final double height) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final BoundingBox boundingBox = geometryFactory.boundingBox(x, y, x + width, y + height);
+    return intersects(boundingBox);
+  }
+
   /**
    * Tests whether this geometry intersects the argument geometry.
    * <p>
@@ -1504,6 +1576,15 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
 
   default boolean intersects(final Point point) {
     return locate(point) != Location.EXTERIOR;
+  }
+
+  @Override
+  default boolean intersects(final Rectangle2D rectangle) {
+    final double x = rectangle.getX();
+    final double y = rectangle.getY();
+    final double width = rectangle.getWidth();
+    final double height = rectangle.getHeight();
+    return intersects(x, y, width, height);
   }
 
   /**
@@ -1932,7 +2013,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    * @author Paul Austin <paul.austin@revolsys.com>
    * @return The iterator over the vertices of the geometry.
    */
-  Reader<Vertex> vertices();
+  Vertex vertices();
 
   /**
    * Tests whether this geometry is within the

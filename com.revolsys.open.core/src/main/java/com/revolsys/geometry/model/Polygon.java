@@ -852,8 +852,7 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
-  default Reader<Vertex> vertices() {
-    final PolygonVertex vertex = new PolygonVertex(this, 0, -1);
-    return vertex.reader();
+  default PolygonVertex vertices() {
+    return new PolygonVertex(this, 0, -1);
   }
 }

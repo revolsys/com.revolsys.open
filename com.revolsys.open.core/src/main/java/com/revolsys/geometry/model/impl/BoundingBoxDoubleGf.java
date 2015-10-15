@@ -59,6 +59,7 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.wkt.WktParser;
@@ -242,8 +243,21 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     this.bounds = bounds;
   }
 
+  public BoundingBoxDoubleGf(final GeometryFactory geometryFactory, final Point point) {
+    this.geometryFactory = geometryFactory;
+    double[] bounds = null;
+    if (point != null) {
+      bounds = BoundingBoxUtil.createBounds(geometryFactory, point);
+    }
+    this.bounds = bounds;
+  }
+
   public BoundingBoxDoubleGf(final GeometryFactory geometryFactory, final Point... points) {
     this(geometryFactory, Lists.array(points));
+  }
+
+  public BoundingBoxDoubleGf(final GeometryFactory geometryFactory, final Vertex vertex) {
+    this((Point)vertex);
   }
 
   public BoundingBoxDoubleGf(final int axisCount, final double... bounds) {
@@ -653,13 +667,13 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   }
 
   @Override
-  public BoundingBox expand(final Point coordinates) {
+  public BoundingBox expand(final Point point) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (isEmpty()) {
-      return new BoundingBoxDoubleGf(geometryFactory, coordinates);
+      return new BoundingBoxDoubleGf(geometryFactory, point);
     } else {
-      final double x = coordinates.getX();
-      final double y = coordinates.getY();
+      final double x = point.getX();
+      final double y = point.getY();
 
       double minX = getMinX();
       double maxX = getMaxX();

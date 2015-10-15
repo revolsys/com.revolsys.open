@@ -641,8 +641,7 @@ public interface Point extends Punctual, Serializable {
   }
 
   @Override
-  default Reader<Vertex> vertices() {
-    final PointVertex vertex = new PointVertex(this, -1);
-    return vertex.reader();
+  default PointVertex vertices() {
+    return new PointVertex(this, -1);
   }
 }

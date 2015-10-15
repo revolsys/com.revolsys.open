@@ -36,16 +36,16 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 import com.revolsys.geometry.model.util.GeometryMapper;
+import com.revolsys.geometry.util.Triangles;
 
 public class TriangleFunctions {
 
   public static Geometry angleBisectors(final Geometry g) {
     final Point[] pts = trianglePts(g);
-    final Point cc = Triangle.inCentre(pts[0], pts[1], pts[2]);
+    final Point cc = Triangles.inCentre(pts[0], pts[1], pts[2]);
     final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
     final LineString[] line = new LineString[3];
     line[0] = geomFact.lineString(pts[0], cc);
@@ -59,7 +59,7 @@ public class TriangleFunctions {
       @Override
       public Geometry map(final Geometry g) {
         final Point[] pts = trianglePts(g);
-        final Point cc = Triangle.centroid(pts[0], pts[1], pts[2]);
+        final Point cc = Triangles.centroid(pts[0], pts[1], pts[2]);
         final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
         return geomFact.point(cc);
       }
@@ -71,7 +71,7 @@ public class TriangleFunctions {
       @Override
       public Geometry map(final Geometry g) {
         final Point[] pts = trianglePts(g);
-        final Point cc = Triangle.circumcentre(pts[0], pts[1], pts[2]);
+        final Point cc = Triangles.circumcentre(pts[0], pts[1], pts[2]);
         final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
         return geomFact.point(cc);
       }
@@ -83,7 +83,7 @@ public class TriangleFunctions {
       @Override
       public Geometry map(final Geometry g) {
         final Point[] pts = trianglePts(g);
-        final Point cc = Triangle.inCentre(pts[0], pts[1], pts[2]);
+        final Point cc = Triangles.inCentre(pts[0], pts[1], pts[2]);
         final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
         return geomFact.point(cc);
       }
@@ -92,7 +92,7 @@ public class TriangleFunctions {
 
   public static Geometry perpendicularBisectors(final Geometry g) {
     final Point[] pts = trianglePts(g);
-    final Point cc = Triangle.circumcentre(pts[0], pts[1], pts[2]);
+    final Point cc = Triangles.circumcentre(pts[0], pts[1], pts[2]);
     final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
     final LineString[] line = new LineString[3];
     final Point p0 = new LineSegmentDouble(pts[1], pts[2]).closestPoint(cc);

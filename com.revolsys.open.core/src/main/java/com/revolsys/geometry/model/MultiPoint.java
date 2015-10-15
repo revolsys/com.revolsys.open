@@ -48,7 +48,6 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.simple.DuplicateVertexError;
 import com.revolsys.geometry.operation.valid.GeometryValidationError;
 import com.revolsys.io.IteratorReader;
-import com.revolsys.io.Reader;
 import com.revolsys.util.Property;
 
 /**
@@ -320,8 +319,7 @@ public interface MultiPoint extends GeometryCollection, Punctual {
   }
 
   @Override
-  default Reader<Vertex> vertices() {
-    final MultiPointVertex vertex = new MultiPointVertex(this, -1);
-    return vertex.reader();
+  default MultiPointVertex vertices() {
+    return new MultiPointVertex(this, -1);
   }
 }

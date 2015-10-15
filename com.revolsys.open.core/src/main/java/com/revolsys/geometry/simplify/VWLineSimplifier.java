@@ -3,8 +3,8 @@ package com.revolsys.geometry.simplify;
 import com.revolsys.geometry.model.CoordinateList;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.util.Triangles;
 
 /**
  * Simplifies a linestring (sequence of points) using the
@@ -101,7 +101,7 @@ class VWLineSimplifier {
         this.area = MAX_AREA;
         return;
       }
-      this.area = Math.abs(Triangle.area(this.prev.pt, this.pt, this.next.pt));
+      this.area = Math.abs(Triangles.area(this.prev.pt, this.pt, this.next.pt));
     }
   }
 

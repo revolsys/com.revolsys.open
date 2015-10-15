@@ -425,9 +425,9 @@ public class GeometryStyle extends MarkerStyle {
     final Color color = getLineColor();
     graphics.setColor(color);
     final Unit<Length> unit = this.lineWidth.getUnit();
-    final float width = (float)Viewport2D.toDisplayValue(viewport, this.lineWidth);
+    final float width = (float)Viewport2D.toModelValue(viewport, this.lineWidth);
 
-    final float dashOffset = (float)Viewport2D.toDisplayValue(viewport,
+    final float dashOffset = (float)Viewport2D.toModelValue(viewport,
       Measure.valueOf(this.lineDashOffset, unit));
 
     final float[] dashArray;
@@ -438,7 +438,7 @@ public class GeometryStyle extends MarkerStyle {
       dashArray = new float[dashArraySize];
       for (int i = 0; i < dashArray.length; i++) {
         final Double dashDouble = this.lineDashArray.get(i);
-        final float dashFloat = (float)Viewport2D.toDisplayValue(viewport,
+        final float dashFloat = (float)Viewport2D.toModelValue(viewport,
           Measure.valueOf(dashDouble, unit));
         dashArray[i] = dashFloat;
       }
