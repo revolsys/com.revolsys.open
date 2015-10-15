@@ -52,9 +52,9 @@ import com.revolsys.geometry.model.Location;
  *
  * @version 1.7
  */
-public class EdgeEndBundle extends EdgeEnd {
+public class EdgeEndBundle extends EdgeEnd implements Iterable<EdgeEnd> {
   // private BoundaryNodeRule boundaryNodeRule;
-  private final List edgeEnds = new ArrayList();
+  private final List<EdgeEnd> edgeEnds = new ArrayList<>();
 
   public EdgeEndBundle(final BoundaryNodeRule boundaryNodeRule, final EdgeEnd e) {
     super(e.getEdge(), e.getCoordinate(), e.getDirectedCoordinate(), new Label(e.getLabel()));
@@ -79,9 +79,8 @@ public class EdgeEndBundle extends EdgeEnd {
     // create the label. If any of the edges belong to areas,
     // the label must be an area label
     boolean isArea = false;
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final EdgeEnd e = (EdgeEnd)it.next();
-      if (e.getLabel().isArea()) {
+    for (final EdgeEnd edgeEnd : this) {
+      if (edgeEnd.getLabel().isArea()) {
         isArea = true;
       }
     }
@@ -125,8 +124,7 @@ public class EdgeEndBundle extends EdgeEnd {
     int boundaryCount = 0;
     boolean foundInterior = false;
 
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final EdgeEnd e = (EdgeEnd)it.next();
+    for (final EdgeEnd e : this) {
       final Location loc = e.getLabel().getLocation(geomIndex);
       if (loc == Location.BOUNDARY) {
         boundaryCount++;
@@ -161,8 +159,7 @@ public class EdgeEndBundle extends EdgeEnd {
    *  results in the summary label having the Geometry interior on <b>both</b> sides.
    */
   private void computeLabelSide(final int geomIndex, final int side) {
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final EdgeEnd e = (EdgeEnd)it.next();
+    for (final EdgeEnd e : this) {
       if (e.getLabel().isArea()) {
         final Location loc = e.getLabel().getLocation(geomIndex, side);
         if (loc == Location.INTERIOR) {
@@ -183,7 +180,7 @@ public class EdgeEndBundle extends EdgeEnd {
     computeLabelSide(geomIndex, Position.RIGHT);
   }
 
-  public List getEdgeEnds() {
+  public List<EdgeEnd> getEdgeEnds() {
     return this.edgeEnds;
   }
 
@@ -193,16 +190,16 @@ public class EdgeEndBundle extends EdgeEnd {
     this.edgeEnds.add(e);
   }
 
-  public Iterator iterator() {
+  @Override
+  public Iterator<EdgeEnd> iterator() {
     return this.edgeEnds.iterator();
   }
 
   @Override
   public void print(final PrintStream out) {
     out.println("EdgeEndBundle--> Label: " + getLabel());
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final EdgeEnd ee = (EdgeEnd)it.next();
-      ee.print(out);
+    for (final EdgeEnd e : this) {
+      e.print(out);
       out.println();
     }
   }

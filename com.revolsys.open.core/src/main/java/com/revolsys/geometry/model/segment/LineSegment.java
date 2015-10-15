@@ -228,17 +228,17 @@ public interface LineSegment extends LineString {
     return LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
   }
 
-  default double distance(LineSegment line) {
+  default double distance(final LineSegment line) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    line = line.convert(geometryFactory, 2);
+    final LineString convertedLine = line.convert(geometryFactory, 2);
     final double line1X1 = getX(0);
     final double line1Y1 = getY(0);
     final double line1X2 = getX(1);
     final double line1Y2 = getY(1);
-    final double line2X1 = line.getX(0);
-    final double line2Y1 = line.getY(0);
-    final double line2X2 = line.getX(1);
-    final double line2Y2 = line.getY(1);
+    final double line2X1 = convertedLine.getX(0);
+    final double line2Y1 = convertedLine.getY(0);
+    final double line2X2 = convertedLine.getX(1);
+    final double line2Y2 = convertedLine.getY(1);
     return LineSegmentUtil.distanceLineLine(line1X1, line1Y1, line1X2, line1Y2, line2X1, line2Y1,
       line2X2, line2Y2);
   }

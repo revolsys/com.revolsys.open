@@ -1,15 +1,11 @@
 package com.revolsys.geometry.model.segment;
 
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.vertex.Vertex;
 
-public class LineStringSegment extends AbstractSegment implements Iterator<Segment> {
-  /**
-   *
-   */
+public class LineStringSegment extends AbstractSegment {
   private static final long serialVersionUID = 1L;
 
   private int segmentIndex;

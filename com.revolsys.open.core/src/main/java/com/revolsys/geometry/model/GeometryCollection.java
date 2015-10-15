@@ -48,7 +48,6 @@ import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.GeometryCollectionVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.valid.GeometryValidationError;
-import com.revolsys.io.Reader;
 
 /**
  * Models a collection of {@link Geometry}s of
@@ -501,9 +500,8 @@ public interface GeometryCollection extends Geometry {
   }
 
   @Override
-  default Reader<Segment> segments() {
-    final GeometryCollectionSegment iterator = new GeometryCollectionSegment(this, -1);
-    return iterator.reader();
+  default Iterable<Segment> segments() {
+    return new GeometryCollectionSegment(this, -1);
   }
 
   @Override

@@ -43,8 +43,6 @@ import com.revolsys.geometry.model.segment.MultiPolygonSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.MultiPolygonVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.io.IteratorReader;
-import com.revolsys.io.Reader;
 
 /**
  * Models a collection of {@link Polygon}s.
@@ -287,9 +285,8 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   }
 
   @Override
-  default Reader<Segment> segments() {
-    final MultiPolygonSegment iterator = new MultiPolygonSegment(this, 0, 0, -1);
-    return new IteratorReader<>(iterator);
+  default Iterable<Segment> segments() {
+    return new MultiPolygonSegment(this, 0, 0, -1);
   }
 
   @Override

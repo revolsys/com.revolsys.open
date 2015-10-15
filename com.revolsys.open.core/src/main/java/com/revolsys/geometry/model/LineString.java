@@ -58,8 +58,6 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.BoundaryOp;
 import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.geometry.util.LineStringUtil;
-import com.revolsys.io.IteratorReader;
-import com.revolsys.io.Reader;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
@@ -1278,9 +1276,8 @@ public interface LineString extends Lineal {
   }
 
   @Override
-  default Reader<Segment> segments() {
-    final LineStringSegment iterator = new LineStringSegment(this, -1);
-    return new IteratorReader<Segment>(iterator);
+  default Iterable<Segment> segments() {
+    return new LineStringSegment(this, -1);
   }
 
   default List<LineString> split(Point point) {

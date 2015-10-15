@@ -46,8 +46,6 @@ import com.revolsys.geometry.model.vertex.MultiLineStringVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.BoundaryOp;
 import com.revolsys.geometry.operation.valid.GeometryValidationError;
-import com.revolsys.io.IteratorReader;
-import com.revolsys.io.Reader;
 import com.revolsys.util.Property;
 
 /**
@@ -305,9 +303,8 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   }
 
   @Override
-  default Reader<Segment> segments() {
-    final MultiLineStringSegment iterator = new MultiLineStringSegment(this, 0, -1);
-    return new IteratorReader<Segment>(iterator);
+  default Iterable<Segment> segments() {
+    return new MultiLineStringSegment(this, 0, -1);
   }
 
   @Override

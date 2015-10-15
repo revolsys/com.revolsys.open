@@ -46,8 +46,6 @@ import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.PointVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.NumberUtil;
-import com.revolsys.io.IteratorReader;
-import com.revolsys.io.Reader;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
@@ -513,7 +511,12 @@ public interface Point extends Punctual, Serializable {
       return false;
     } else {
       final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-      final Point point = this.convert(geometryFactory, 2);
+      final Point point;
+      if (this.getGeometryFactory().isHasCoordinateSystem()) {
+        point = this.convert(geometryFactory, 2);
+      } else {
+        point = this;
+      }
       final double x = point.getX();
       final double y = point.getY();
       return boundingBox.intersects(x, y);
@@ -633,11 +636,6 @@ public interface Point extends Punctual, Serializable {
   @Override
   default Point reverse() {
     return this;
-  }
-
-  @Override
-  default Reader<Segment> segments() {
-    return new IteratorReader<>();
   }
 
   @Override

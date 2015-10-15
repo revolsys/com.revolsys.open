@@ -48,8 +48,6 @@ import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.PolygonVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.valid.GeometryValidationError;
-import com.revolsys.io.IteratorReader;
-import com.revolsys.io.Reader;
 import com.revolsys.util.Property;
 
 /**
@@ -814,9 +812,8 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
-  default Reader<Segment> segments() {
-    final PolygonSegment iterator = new PolygonSegment(this, 0, -1);
-    return new IteratorReader<>(iterator);
+  default Iterable<Segment> segments() {
+    return new PolygonSegment(this, 0, -1);
   }
 
   @Override

@@ -6,10 +6,9 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryComponent;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.io.IteratorReader;
-import com.revolsys.io.Reader;
 
-public interface Segment extends LineSegment, Iterator<Segment>, GeometryComponent {
+public interface Segment
+  extends LineSegment, Iterator<Segment>, Iterable<Segment>, GeometryComponent {
   @Override
   Segment clone();
 
@@ -53,8 +52,9 @@ public interface Segment extends LineSegment, Iterator<Segment>, GeometryCompone
 
   boolean isLineStart();
 
-  default Reader<Segment> reader() {
-    return new IteratorReader<Segment>(this);
+  @Override
+  default Iterator<Segment> iterator() {
+    return this;
   }
 
   void setSegmentId(int[] segmentId);

@@ -40,7 +40,6 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.LineStringDouble;
-import com.revolsys.geometry.model.impl.PointDouble;
 
 /**
  * @version 1.7
@@ -95,7 +94,7 @@ public class Edge extends GraphComponent {
    */
   public void addIntersection(final LineIntersector li, final int segmentIndex, final int geomIndex,
     final int intIndex) {
-    final Point intPt = new PointDouble(li.getIntersection(intIndex));
+    final Point intPt = li.getIntersection(intIndex);
     int normalizedSegmentIndex = segmentIndex;
     double dist = li.getEdgeDistance(geomIndex, intIndex);
     // normalize the intersection point location

@@ -35,7 +35,6 @@ package com.revolsys.geometry.geomgraph;
 import java.io.PrintStream;
 
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
 
 /**
  * Represents a point on an
@@ -60,7 +59,7 @@ public class EdgeIntersection implements Comparable {
   // line segment
 
   public EdgeIntersection(final Point coord, final int segmentIndex, final double dist) {
-    this.coord = new PointDouble(coord);
+    this.coord = coord;
     this.segmentIndex = segmentIndex;
     this.dist = dist;
   }

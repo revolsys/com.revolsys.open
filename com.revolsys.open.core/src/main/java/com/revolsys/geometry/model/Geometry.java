@@ -74,7 +74,6 @@ import com.revolsys.geometry.operation.relate.RelateOp;
 import com.revolsys.geometry.operation.union.UnaryUnionOp;
 import com.revolsys.geometry.operation.valid.GeometryValidationError;
 import com.revolsys.geometry.operation.valid.IsValidOp;
-import com.revolsys.io.Reader;
 import com.revolsys.record.io.format.wkt.EWktWriter;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Property;
@@ -634,34 +633,34 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   }
 
   @SuppressWarnings("unchecked")
-  default <V extends Geometry> V convert(GeometryFactory geometryFactory, final int axisCount) {
-    if (geometryFactory != null) {
-      geometryFactory = geometryFactory.convertAxisCount(axisCount);
+  default <V extends Geometry> V convert(GeometryFactory targetGeometryFactory,
+    final int targetAxisCount) {
+    if (targetGeometryFactory != null) {
+      targetGeometryFactory = targetGeometryFactory.convertAxisCount(targetAxisCount);
     }
-    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
     boolean copy = false;
-    if (geometryFactory != null && sourceGeometryFactory != geometryFactory) {
-      final int srid = getCoordinateSystemId();
-      final int srid2 = geometryFactory.getCoordinateSystemId();
-      if (srid <= 0) {
-        if (srid2 > 0) {
-          copy = true;
-        }
-      } else if (srid != srid2) {
-        copy = true;
-      }
-      if (!copy) {
-        for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-          final double scale = sourceGeometryFactory.getScale(axisIndex);
-          final double scale1 = geometryFactory.getScale(axisIndex);
-          if (!NumberEquals.equal(scale, scale1)) {
-            copy = true;
+    if (targetGeometryFactory != null) {
+      final GeometryFactory sourceGeometryFactory = getGeometryFactory();
+      if (sourceGeometryFactory != targetGeometryFactory) {
+        if (sourceGeometryFactory.hasSameCoordinateSystem(targetGeometryFactory)) {
+          if (!targetGeometryFactory.isFloating()) {
+            final int sourceAxisCount = sourceGeometryFactory.getAxisCount();
+            final int minAxisCount = Math.min(sourceAxisCount, targetAxisCount);
+            for (int axisIndex = 0; axisIndex < minAxisCount; axisIndex++) {
+              final double sourceScale = sourceGeometryFactory.getScale(axisIndex);
+              final double targetScale = targetGeometryFactory.getScale(axisIndex);
+              if (!NumberEquals.equal(sourceScale, targetScale)) {
+                copy = true;
+              }
+            }
           }
+        } else {
+          copy = true;
         }
       }
     }
     if (copy) {
-      return (V)copy(geometryFactory);
+      return (V)copy(targetGeometryFactory);
     } else {
       return (V)this;
     }
@@ -1803,7 +1802,9 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
 
   Geometry reverse();
 
-  Reader<Segment> segments();
+  default Iterable<Segment> segments() {
+    return Collections.emptyList();
+  }
 
   /**
    * A simple scheme for applications to add their own custom data to a Geometry.
