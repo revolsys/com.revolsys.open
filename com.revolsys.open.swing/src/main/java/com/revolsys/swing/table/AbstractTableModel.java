@@ -2,12 +2,18 @@ package com.revolsys.swing.table;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeSupport;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.PreDestroy;
 import javax.swing.JComponent;
+import javax.swing.event.TableModelEvent;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.record.io.format.tsv.Tsv;
+import com.revolsys.record.io.format.tsv.TsvWriter;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
@@ -66,8 +72,8 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
   }
 
   @Override
-  public final void fireTableStructureChanged() {
-    Invoke.later(() -> super.fireTableStructureChanged());
+  public void fireTableChanged(final TableModelEvent e) {
+    Invoke.later(() -> super.fireTableChanged(e));
   }
 
   public JComponent getEditorField(final int rowIndex, final int columnIndex, final Object value) {
@@ -98,5 +104,24 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
 
   public String toCopyValue(final int row, final int column, final Object value) {
     return StringConverterRegistry.toString(value);
+  }
+
+  public void toTsv(final Writer out) {
+    try (
+      TsvWriter tsv = Tsv.plainWriter(out)) {
+      final List<Object> values = new ArrayList<>();
+      for (int i = 0; i < getColumnCount(); i++) {
+        final Object value = getColumnName(i);
+        values.add(value);
+      }
+      tsv.write(values);
+      for (int rowIndex = 0; rowIndex < getRowCount(); rowIndex++) {
+        for (int columnIndex = 0; columnIndex < getColumnCount(); columnIndex++) {
+          final Object value = getValueAt(rowIndex, columnIndex);
+          values.set(columnIndex, value);
+        }
+        tsv.write(values);
+      }
+    }
   }
 }

@@ -228,6 +228,11 @@ public class BaseJTable extends JXTable {
     column.setMaxWidth(width);
   }
 
+  public void setMinWidth(final int columnIndex, final int width) {
+    final TableColumnExt column = getColumnExt(columnIndex);
+    column.setMinWidth(width);
+  }
+
   @Override
   public void setModel(final TableModel model) {
     final boolean createColumns = getAutoCreateColumnsFromModel();
