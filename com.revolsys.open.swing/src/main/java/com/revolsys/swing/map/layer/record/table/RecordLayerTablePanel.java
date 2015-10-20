@@ -155,11 +155,6 @@ public class RecordLayerTablePanel extends TablePanel
     return button;
   }
 
-  public boolean canPasteRecordGeometry() {
-    final LayerRecord record = getEventRowObject();
-    return this.layer.canPasteRecordGeometry(record);
-  }
-
   @Override
   public void close() {
     final RecordLayerTable table = getTable();
@@ -337,7 +332,7 @@ public class RecordLayerTablePanel extends TablePanel
 
     if (hasGeometry) {
       this.tableModel.addMenuItem("dnd", "Paste Geometry", "geometry_paste",
-        this::canPasteRecordGeometry, this::pasteGeometry);
+        this.layer::canPasteRecordGeometry, this::pasteGeometry);
 
       final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
       editMenu.setEnableCheck(RecordRowTable.enableCheck(notDeleted));
