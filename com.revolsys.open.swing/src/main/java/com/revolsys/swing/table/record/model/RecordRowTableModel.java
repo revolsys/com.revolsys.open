@@ -102,7 +102,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
 
   public <V extends Record> RunnableAction addMenuItem(final String groupName,
     final CharSequence name, final String iconName, final Consumer<V> consumer) {
-    return addMenuItem(groupName, name, iconName, (EnableCheck)null, consumer);
+    return addMenuItem(groupName, name, iconName, (Predicate<V>)null, consumer);
   }
 
   public <V extends Record> RunnableAction addMenuItem(final String groupName,
