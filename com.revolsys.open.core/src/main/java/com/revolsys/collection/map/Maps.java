@@ -19,7 +19,6 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.record.Record;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -105,12 +104,17 @@ public interface Maps {
   }
 
   static <K, V> MapBuilder<K, V> buildLinkedHash() {
-    final Map<K, V> map = new LinkedHashMap<>();
+    final Map<K, V> map = newLinkedHash();
+    return new MapBuilder<>(map);
+  }
+
+  static <K, V> MapBuilder<K, V> buildLinkedHash(final Map<K, V> values) {
+    final Map<K, V> map = newLinkedHash(values);
     return new MapBuilder<>(map);
   }
 
   static <K, V> MapBuilder<K, V> buildTree() {
-    final Map<K, V> map = new TreeMap<>();
+    final Map<K, V> map = newTree();
     return new MapBuilder<>(map);
   }
 
@@ -411,7 +415,7 @@ public interface Maps {
   static <K1, K2, V> Map<K2, V> getMap(final Map<K1, Map<K2, V>> map, final K1 key) {
     Map<K2, V> value = map.get(key);
     if (value == null) {
-      value = new LinkedHashMap<K2, V>();
+      value = newLinkedHash();
       map.put(key, value);
     }
     return value;
@@ -482,7 +486,7 @@ public interface Maps {
   static <K1, K2, V> Map<K2, V> getTreeMap(final Map<K1, Map<K2, V>> map, final K1 key) {
     Map<K2, V> value = map.get(key);
     if (value == null) {
-      value = new TreeMap<K2, V>();
+      value = newTree();
       map.put(key, value);
     }
     return value;
@@ -513,14 +517,8 @@ public interface Maps {
 
   static <K, V> Supplier<Map<K, V>> hashFactory() {
     return () -> {
-      return new HashMap<K, V>();
+      return newHash();
     };
-  }
-
-  static <K, V> Map<K, V> hashMap(final K key, final V value) {
-    final Map<K, V> map = new HashMap<>();
-    map.put(key, value);
-    return map;
   }
 
   static <K> boolean hasValue(final Map<K, ?> map, final K key) {
@@ -543,7 +541,7 @@ public interface Maps {
 
   static <K, V> Supplier<Map<K, V>> linkedHashFactory() {
     return () -> {
-      return new LinkedHashMap<K, V>();
+      return newLinkedHash();
     };
   }
 
@@ -566,23 +564,37 @@ public interface Maps {
     }
   }
 
+  static <V, K> HashMap<K, V> newHash() {
+    return new HashMap<K, V>();
+  }
+
+  static <K, V> Map<K, V> newHash(final K key, final V value) {
+    final Map<K, V> map = newHash();
+    map.put(key, value);
+    return map;
+  }
+
   static <K, V> Map<K, V> newHash(final Map<K, ? extends V> map) {
-    final Map<K, V> copy = new HashMap<K, V>();
+    final Map<K, V> copy = newHash();
     if (map != null) {
       copy.putAll(map);
     }
     return copy;
   }
 
+  static <K, V> LinkedHashMap<K, V> newLinkedHash() {
+    return new LinkedHashMap<>();
+  }
+
   static <K, V> Map<K, V> newLinkedHash(final K key, final V value) {
-    final Map<K, V> map = new LinkedHashMap<>();
+    final Map<K, V> map = newLinkedHash();
     map.put(key, value);
     return map;
   }
 
   static <T1, T2> Map<T1, T2> newLinkedHash(final List<T1> sourceValues,
     final List<T2> targetValues) {
-    final Map<T1, T2> map = new LinkedHashMap<T1, T2>();
+    final Map<T1, T2> map = newLinkedHash();
     for (int i = 0; i < sourceValues.size() && i < targetValues.size(); i++) {
       final T1 sourceValue = sourceValues.get(i);
       final T2 targetValue = targetValues.get(i);
@@ -592,11 +604,42 @@ public interface Maps {
   }
 
   static <K, V> Map<K, V> newLinkedHash(final Map<K, ? extends V> map) {
-    final Map<K, V> copy = new LinkedHashMap<K, V>();
+    final Map<K, V> copy = newLinkedHash();
     if (map != null) {
       copy.putAll(map);
     }
     return copy;
+  }
+
+  static <K, V> Map<K, V> newTree() {
+    return new TreeMap<>();
+  }
+
+  static <K extends Comparable<K>, V extends Comparable<V>> TreeMap<K, V> newTree(
+    final Comparator<K> comparator) {
+    return new TreeMap<>(comparator);
+  }
+
+  static <K, V> Map<K, V> newTree(final Comparator<K> comparator, final Map<K, ? extends V> map) {
+    final Map<K, V> newMap = newTree();
+    if (map != null) {
+      newMap.putAll(map);
+    }
+    return newMap;
+  }
+
+  static <K, V> Map<K, V> newTree(final K key, final V value) {
+    final Map<K, V> map = newTree();
+    map.put(key, value);
+    return map;
+  }
+
+  static <K, V> Map<K, V> newTree(final Map<K, ? extends V> map) {
+    final Map<K, V> newMap = newTree();
+    if (map != null) {
+      newMap.putAll(map);
+    }
+    return newMap;
   }
 
   static <K1, K2, V> V put(final Map<K1, Map<K2, V>> map, final K1 key1, final K2 key2,
@@ -678,14 +721,14 @@ public interface Maps {
   static <K extends Comparable<K>, V extends Comparable<V>> Map<K, V> sortByValues(
     final Map<K, V> map) {
     final MapValueComparator<K, V> comparator = new MapValueComparator<K, V>(map);
-    final Map<K, V> sortedMap = new TreeMap<K, V>(comparator);
+    final Map<K, V> sortedMap = newTree(comparator);
     sortedMap.putAll(map);
-    return new LinkedHashMap<K, V>(sortedMap);
+    return newLinkedHash(sortedMap);
   }
 
   static Map<String, Object> toMap(final Preferences preferences) {
     try {
-      final Map<String, Object> map = new HashMap<>();
+      final Map<String, Object> map = newHash();
       for (final String name : preferences.keys()) {
         final Object value = preferences.get(name, null);
         map.put(name, value);
@@ -700,7 +743,7 @@ public interface Maps {
     if (string == null) {
       return Collections.emptyMap();
     } else {
-      final Map<String, String> map = new LinkedHashMap<String, String>();
+      final Map<String, String> map = newLinkedHash();
       for (final String entry : string.split("\n")) {
         final String[] pair = entry.split("=");
         if (pair.length == 2) {
@@ -717,29 +760,7 @@ public interface Maps {
 
   static <K, V> Supplier<Map<K, V>> treeFactory() {
     return () -> {
-      return new TreeMap<K, V>();
+      return newTree();
     };
-  }
-
-  static <K, V> Map<K, V> treeMap(final Comparator<K> comparator, final Map<K, ? extends V> map) {
-    final Map<K, V> newMap = new TreeMap<>(comparator);
-    if (map != null) {
-      newMap.putAll(map);
-    }
-    return newMap;
-  }
-
-  static <K, V> Map<K, V> treeMap(final K key, final V value) {
-    final Map<K, V> map = new TreeMap<>();
-    map.put(key, value);
-    return map;
-  }
-
-  static <K, V> Map<K, V> treeMap(final Map<K, ? extends V> map) {
-    final Map<K, V> newMap = new TreeMap<>();
-    if (map != null) {
-      newMap.putAll(map);
-    }
-    return newMap;
   }
 }

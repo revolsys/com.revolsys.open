@@ -61,7 +61,7 @@ public interface Identifier {
   }
 
   static <V> Map<Identifier, V> newTreeMap(final Map<Identifier, ? extends V> map) {
-    return Maps.treeMap(comparator(), map);
+    return Maps.newTree(comparator(), map);
   }
 
   static TreeSet<Identifier> newTreeSet() {

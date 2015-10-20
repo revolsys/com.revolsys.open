@@ -7,7 +7,6 @@ import java.util.List;
 
 import com.revolsys.equals.Equals;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.util.Strings;
 
 public abstract class AbstractMultiCondition extends Condition {
 
@@ -121,6 +120,25 @@ public abstract class AbstractMultiCondition extends Condition {
 
   @Override
   public String toString() {
-    return "(" + Strings.toString(") " + this.operator + " (", getQueryValues()) + ")";
+    final StringBuilder string = new StringBuilder();
+    boolean first = true;
+    for (final QueryValue value : getQueryValues()) {
+      if (first) {
+        first = false;
+      } else {
+        string.append(' ');
+        string.append(this.operator);
+        string.append(' ');
+      }
+      if (value instanceof Or && !(this instanceof Or)) {
+        string.append('(');
+        string.append(value);
+        string.append(')');
+
+      } else {
+        string.append(value);
+      }
+    }
+    return string.toString();
   }
 }
