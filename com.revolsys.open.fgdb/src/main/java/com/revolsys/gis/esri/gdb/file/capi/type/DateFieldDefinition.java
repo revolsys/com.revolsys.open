@@ -49,16 +49,11 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
   }
 
   @Override
-  public Object setValue(final Record record, final Row row, Object value) {
-    final String name = getName();
+  public void setValue(final Record record, final Row row, Object value) {
     if (value == null) {
-      if (isRequired()) {
-        throw new IllegalArgumentException(name + " is required and cannot be null");
-      } else {
-        getRecordStore().setNull(row, name);
-      }
-      return null;
+      setNull(row);
     } else {
+      final String name = getName();
       if (value instanceof String) {
         try {
           value = DateUtil.getDate("yyyy-MM-dd", (String)value);
@@ -74,8 +69,7 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
           if (isRequired()) {
             date = MIN_DATE;
           } else {
-            getRecordStore().setNull(row, name);
-            return null;
+            row.setNull(name);
           }
         } else if (date.after(MAX_DATE)) {
           RecordLog.warn(getClass(), name + "=" + date + " is after " + MAX_DATE
@@ -83,8 +77,7 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
           if (isRequired()) {
             date = MAX_DATE;
           } else {
-            getRecordStore().setNull(row, name);
-            return null;
+            row.setNull(name);
           }
         }
         synchronized (getSync()) {
@@ -92,7 +85,6 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
           synchronized (LOCK) {
             row.setDate(name, time);
           }
-          return time;
         }
       } else {
         throw new IllegalArgumentException(

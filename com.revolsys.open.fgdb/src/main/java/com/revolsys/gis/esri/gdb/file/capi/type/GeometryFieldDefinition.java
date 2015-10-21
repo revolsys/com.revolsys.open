@@ -151,15 +151,10 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
   }
 
   @Override
-  public Object setValue(final Record record, final Row row, final Object value) {
+  public void setValue(final Record record, final Row row, final Object value) {
     final String name = getName();
     if (value == null) {
-      if (isRequired()) {
-        throw new IllegalArgumentException(name + " is required and cannot be null");
-      } else {
-        getRecordStore().setNull(row, name);
-      }
-      return null;
+      setNull(row);
     } else if (value instanceof Geometry) {
       final Geometry geometry = (Geometry)value;
       final Geometry projectedGeometry = geometry.convert(this.geometryFactory);
@@ -174,7 +169,6 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
       synchronized (getSync()) {
         row.setGeometry(bytes);
       }
-      return bytes;
     } else {
       throw new IllegalArgumentException(
         "Expecting a " + Geometry.class + " not a " + value.getClass() + "=" + value);

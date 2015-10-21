@@ -33,22 +33,16 @@ public class IntegerFieldDefinition extends AbstractFileGdbFieldDefinition {
   }
 
   @Override
-  public Object setValue(final Record record, final Row row, final Object value) {
+  public void setValue(final Record record, final Row row, final Object value) {
     final String name = getName();
     if (value == null) {
-      if (isRequired()) {
-        throw new IllegalArgumentException(name + " is required and cannot be null");
-      } else {
-        getRecordStore().setNull(row, name);
-      }
-      return null;
+      setNull(row);
     } else if (value instanceof Number) {
       final Number number = (Number)value;
       final int intValue = number.intValue();
       synchronized (getSync()) {
         row.setInteger(name, intValue);
       }
-      return intValue;
     } else {
       final String string = value.toString().trim();
       if (Property.hasValue(string)) {
@@ -56,13 +50,11 @@ public class IntegerFieldDefinition extends AbstractFileGdbFieldDefinition {
         synchronized (getSync()) {
           row.setInteger(name, intValue);
         }
-        return intValue;
       } else {
         if (isRequired()) {
           throw new IllegalArgumentException(name + " is required and cannot be null");
         } else {
-          getRecordStore().setNull(row, name);
-          return null;
+          row.setNull(name);
         }
       }
     }

@@ -36,8 +36,6 @@ public class GlobalIdFieldDefinition extends AbstractFileGdbFieldDefinition {
   }
 
   @Override
-  public Object setValue(final Record record, final Row row, final Object value) {
-    return null;
+  public void setValue(final Record record, final Row row, final Object value) {
   }
-
 }

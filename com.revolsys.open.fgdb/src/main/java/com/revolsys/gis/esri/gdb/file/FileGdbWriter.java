@@ -1,8 +1,6 @@
 package com.revolsys.gis.esri.gdb.file;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PreDestroy;
@@ -128,14 +126,12 @@ public class FileGdbWriter extends AbstractRecordWriter {
         final Row row = this.recordStore.newRowObject(table);
 
         try {
-          final List<Object> values = new ArrayList<>();
           for (final FieldDefinition field : recordDefinition.getFields()) {
             final String name = field.getName();
             try {
               final Object value = record.getValue(name);
               final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
-              final Object esriValue = esriField.setInsertValue(record, row, value);
-              values.add(esriValue);
+              esriField.setInsertValue(record, row, value);
             } catch (final Throwable e) {
               throw new ObjectPropertyException(record, name, e);
             }
@@ -192,15 +188,13 @@ public class FileGdbWriter extends AbstractRecordWriter {
           final Row row = this.recordStore.nextRow(rows);
           if (row != null) {
             try {
-              final List<Object> esriValues = new ArrayList<>();
               try {
                 for (final FieldDefinition field : recordDefinition.getFields()) {
                   final String name = field.getName();
                   try {
                     final Object value = record.getValue(name);
                     final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
-                    final Object esriValue = esriField.setUpdateValue(record, row, value);
-                    esriValues.add(esriValue);
+                    esriField.setUpdateValue(record, row, value);
                   } catch (final Throwable e) {
                     throw new ObjectPropertyException(record, name, e);
                   }

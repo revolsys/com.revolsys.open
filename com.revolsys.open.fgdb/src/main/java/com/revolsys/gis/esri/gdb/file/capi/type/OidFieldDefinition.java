@@ -41,13 +41,11 @@ public class OidFieldDefinition extends AbstractFileGdbFieldDefinition {
   }
 
   @Override
-  public Object setUpdateValue(final Record record, final Row row, final Object value) {
-    return value;
+  public void setUpdateValue(final Record record, final Row row, final Object value) {
   }
 
   @Override
-  public Object setValue(final Record record, final Row row, final Object value) {
-    return null;
+  public void setValue(final Record record, final Row row, final Object value) {
   }
 
 }

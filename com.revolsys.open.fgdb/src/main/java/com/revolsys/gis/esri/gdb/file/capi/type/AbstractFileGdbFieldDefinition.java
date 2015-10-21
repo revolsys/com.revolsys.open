@@ -37,8 +37,17 @@ public abstract class AbstractFileGdbFieldDefinition extends FieldDefinition {
 
   public abstract Object getValue(Row row);
 
-  public Object setInsertValue(final Record record, final Row row, final Object value) {
-    return setValue(record, row, value);
+  public void setInsertValue(final Record record, final Row row, final Object value) {
+    setValue(record, row, value);
+  }
+
+  protected void setNull(final Row row) {
+    final String name = getName();
+    if (isRequired()) {
+      throw new IllegalArgumentException(name + " is required and cannot be null");
+    } else {
+      row.setNull(name);
+    }
   }
 
   public void setPostInsertValue(final Record record, final Row row) {
@@ -48,9 +57,9 @@ public abstract class AbstractFileGdbFieldDefinition extends FieldDefinition {
     this.recordStore = new WeakReference<FileGdbRecordStore>(recordStore);
   }
 
-  public Object setUpdateValue(final Record record, final Row row, final Object value) {
-    return setValue(record, row, value);
+  public void setUpdateValue(final Record record, final Row row, final Object value) {
+    setValue(record, row, value);
   }
 
-  public abstract Object setValue(Record record, Row row, Object value);
+  public abstract void setValue(Record record, Row row, Object value);
 }

@@ -57,22 +57,16 @@ public class GuidFieldDefinition extends AbstractFileGdbFieldDefinition {
   }
 
   @Override
-  public Object setValue(final Record record, final Row row, final Object value) {
+  public void setValue(final Record record, final Row row, final Object value) {
     final String name = getName();
     if (value == null) {
-      if (isRequired()) {
-        throw new IllegalArgumentException(name + " is required and cannot be null");
-      } else {
-        getRecordStore().setNull(row, name);
-      }
-      return null;
+      setNull(row);
     } else {
       final String guidString = value.toString();
       final Guid guid = getGuid(guidString);
       synchronized (getSync()) {
         row.setGuid(name, guid);
       }
-      return guid;
     }
   }
 

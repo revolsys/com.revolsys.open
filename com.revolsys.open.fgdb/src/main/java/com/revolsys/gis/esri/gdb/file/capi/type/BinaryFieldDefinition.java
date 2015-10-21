@@ -20,13 +20,10 @@ public class BinaryFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   @Override
   public Object getValue(final Row row) {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Object setValue(final Record record, final Row row, final Object value) {
-    return null;
+  public void setValue(final Record record, final Row row, final Object value) {
   }
-
 }
