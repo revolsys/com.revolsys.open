@@ -764,6 +764,17 @@ public interface Polygon extends Polygonal {
     return boundingBox;
   }
 
+  default Polygon newPolygonWithoutHoles() {
+    if (isEmpty()) {
+      return this;
+    } else if (getRingCount() == 1) {
+      return this;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.polygon(getShell());
+    }
+  }
+
   @Override
   default Polygon normalize() {
     if (isEmpty()) {

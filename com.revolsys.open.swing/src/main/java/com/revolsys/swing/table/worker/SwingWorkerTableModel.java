@@ -22,6 +22,8 @@ import com.revolsys.swing.table.BaseJTable;
 public class SwingWorkerTableModel extends AbstractTableModel implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
+  private static final List<String> COLUMN_TITLES = Arrays.asList("Description", "Status");
+
   public static JPanel createPanel() {
     final JPanel taskPanel = new JPanel(new BorderLayout());
     final BaseJTable table = SwingWorkerTableModel.createTable();
@@ -50,8 +52,6 @@ public class SwingWorkerTableModel extends AbstractTableModel implements Propert
     return table;
   }
 
-  private final List<String> columnTitles = Arrays.asList("Description", "Status");
-
   private List<SwingWorker<?, ?>> workers = Collections.emptyList();
 
   public SwingWorkerTableModel() {
@@ -77,7 +77,7 @@ public class SwingWorkerTableModel extends AbstractTableModel implements Propert
 
   @Override
   public String getColumnName(final int columnIndex) {
-    return this.columnTitles.get(columnIndex);
+    return COLUMN_TITLES.get(columnIndex);
   }
 
   @Override
@@ -107,8 +107,10 @@ public class SwingWorkerTableModel extends AbstractTableModel implements Propert
   @SuppressWarnings("unchecked")
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    this.workers = (List<SwingWorker<?, ?>>)event.getNewValue();
-    fireTableDataChanged();
+    Invoke.later(() -> {
+      this.workers = (List<SwingWorker<?, ?>>)event.getNewValue();
+      fireTableDataChanged();
+    });
   }
 
   @Override

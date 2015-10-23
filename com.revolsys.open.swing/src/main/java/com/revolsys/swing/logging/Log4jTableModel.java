@@ -1,37 +1,36 @@
 package com.revolsys.swing.logging;
 
-import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.jdesktop.swingx.table.TableColumnExt;
 
+import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJTable;
+import com.revolsys.swing.table.TablePanel;
 
 public class Log4jTableModel extends AbstractTableModel {
-  private static final List<String> columnNames = Arrays.asList("Time", "Level", "Category",
+  private static final List<String> COLUMN_NAMES = Arrays.asList("Time", "Level", "Logger Name",
     "Message");
 
   private static final long serialVersionUID = 1L;
 
-  public static JPanel createPanel() {
-    final JPanel taskPanel = new JPanel(new BorderLayout());
+  public static TablePanel createPanel() {
     final BaseJTable table = createTable();
-    final JScrollPane scrollPane = new JScrollPane(table);
-    taskPanel.add(scrollPane, BorderLayout.CENTER);
-    return taskPanel;
+    return new TablePanel(table);
   }
 
   public static BaseJTable createTable() {
@@ -76,8 +75,57 @@ public class Log4jTableModel extends AbstractTableModel {
 
   private final ListLog4jAppender appender = new ListLog4jAppender(this);
 
+  private List<LoggingEvent> rows = new ArrayList<>();
+
+  private boolean hasNewErrors = false;
+
   public Log4jTableModel() {
     Logger.getRootLogger().addAppender(this.appender);
+    final MenuFactory menu = getMenu();
+    menu.addMenuItem("all", "Delete all messages", "delete", this::clear);
+    addMenuItem("message", "Delete message", "delete", this::removeLoggingEvent);
+    addMenuItem("selected", "Delete selected messages", "delete", (final BaseJTable table) -> {
+      int count = 0;
+
+      final int[] selectedRows = table.getSelectedRowsInModel();
+      for (final int row : selectedRows) {
+        final int rowIndex = row - count;
+        this.rows.remove(rowIndex);
+        count++;
+      }
+      this.hasNewErrors = false;
+      fireTableDataChanged();
+    });
+  }
+
+  public void addLoggingEvent(final LoggingEvent event) {
+    if (event != null) {
+      Invoke.later(() -> {
+        if (event.getLevel().isGreaterOrEqual(Level.ERROR)) {
+          this.hasNewErrors = true;
+        }
+        this.rows.add(event);
+        while (this.rows.size() > 99) {
+          this.rows.remove(0);
+        }
+        fireTableDataChanged();
+      });
+    }
+  }
+
+  public void clear() {
+    Invoke.later(() -> {
+      this.rows.clear();
+      this.hasNewErrors = false;
+      fireTableDataChanged();
+    });
+  }
+
+  public void clearHasNewErrors() {
+    Invoke.later(() -> {
+      this.hasNewErrors = false;
+      fireTableDataChanged();
+    });
   }
 
   @Override
@@ -88,30 +136,37 @@ public class Log4jTableModel extends AbstractTableModel {
 
   @Override
   public int getColumnCount() {
-    return columnNames.size();
+    return COLUMN_NAMES.size();
   }
 
   @Override
   public String getColumnName(final int column) {
-    return columnNames.get(column);
+    return COLUMN_NAMES.get(column);
   }
 
   public LoggingEvent getLoggingEvent(final int rowIndex) {
-    LoggingEvent event = null;
     try {
-      final List<LoggingEvent> loggingEvents = this.appender.getLoggingEvents();
-      if (rowIndex < loggingEvents.size()) {
-        event = loggingEvents.get(rowIndex);
+      if (rowIndex < this.rows.size()) {
+        return this.rows.get(rowIndex);
       }
     } catch (final Throwable e) {
     }
-    return event;
+    return null;
+  }
+
+  @Override
+  public MenuFactory getMenu(final int rowIndex, final int columnIndex) {
+    clearHasNewErrors();
+    return super.getMenu(rowIndex, columnIndex);
+  }
+
+  public int getMessageCount() {
+    return this.rows.size();
   }
 
   @Override
   public int getRowCount() {
-    final List<LoggingEvent> loggingEvents = this.appender.getLoggingEvents();
-    return loggingEvents.size();
+    return this.rows.size();
   }
 
   @Override
@@ -137,4 +192,22 @@ public class Log4jTableModel extends AbstractTableModel {
     }
   }
 
+  public boolean isHasNewErrors() {
+    return this.hasNewErrors;
+  }
+
+  public void removeLoggingEvent(final int index) {
+    Invoke.later(() -> {
+      this.rows.remove(index);
+      this.hasNewErrors = false;
+      fireTableDataChanged();
+    });
+  }
+
+  public void setRows(final List<LoggingEvent> rows) {
+    Invoke.later(() -> {
+      this.rows = new ArrayList<>(rows);
+      fireTableDataChanged();
+    });
+  }
 }

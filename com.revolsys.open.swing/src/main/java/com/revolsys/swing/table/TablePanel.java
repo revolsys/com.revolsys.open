@@ -30,9 +30,9 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
 
   private static int eventRow;
 
-  private static Reference<JTable> eventTable = new WeakReference<JTable>(null);
+  private static Reference<BaseJTable> eventTable = new WeakReference<>(null);
 
-  private static Reference<MouseEvent> popupMouseEvent = new WeakReference<MouseEvent>(null);
+  private static Reference<MouseEvent> popupMouseEvent = new WeakReference<>(null);
 
   private static final long serialVersionUID = 1L;
 
@@ -53,10 +53,10 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
     return popupMouseEvent.get();
   }
 
-  protected static void setEventRow(final JTable table, final MouseEvent e) {
+  protected static void setEventRow(final BaseJTable table, final MouseEvent e) {
     if (e.getSource() == table) {
       final Point point = e.getPoint();
-      eventTable = new WeakReference<JTable>(table);
+      eventTable = new WeakReference<>(table);
       final int eventRow = table.rowAtPoint(point);
       final int eventColumn = table.columnAtPoint(point);
       if (eventRow > -1 && eventColumn > -1) {
@@ -75,11 +75,11 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
 
   private JScrollPane scrollPane;
 
-  private JTable table;
+  private BaseJTable table;
 
   private ToolBar toolBar = new ToolBar();
 
-  public TablePanel(final JTable table) {
+  public TablePanel(final BaseJTable table) {
     super(new BorderLayout());
     eventRow = -1;
     eventColumn = -1;
@@ -198,7 +198,7 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends JTable> T getTable() {
+  public <T extends BaseJTable> T getTable() {
     return (T)this.table;
   }
 

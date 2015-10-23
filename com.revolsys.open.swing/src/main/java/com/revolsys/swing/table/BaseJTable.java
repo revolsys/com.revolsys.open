@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -27,7 +28,6 @@ public class BaseJTable extends JXTable {
   private static final long serialVersionUID = 1L;
 
   public BaseJTable() {
-
   }
 
   public BaseJTable(final TableModel model) {
@@ -164,6 +164,16 @@ public class BaseJTable extends JXTable {
       selectedRow = convertRowIndexToView(selectedRow);
     }
     return selectedRow;
+  }
+
+  public int[] getSelectedRowsInModel() {
+    final int[] selectedRows = getSelectedRows();
+    for (int i = 0; i < selectedRows.length; i++) {
+      final int row = selectedRows[i];
+      selectedRows[i] = convertRowIndexToModel(row);
+    }
+    Arrays.sort(selectedRows);
+    return selectedRows;
   }
 
   @SuppressWarnings("unchecked")

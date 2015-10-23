@@ -73,8 +73,6 @@ public class OgrRecordStore extends AbstractRecordStore {
 
   public static final String SQLITE = "SQLite";
 
-  private boolean closed;
-
   private boolean createMissingTables = true;
 
   private DataSource dataSource;
@@ -296,7 +294,6 @@ public class OgrRecordStore extends AbstractRecordStore {
             this.dataSource.delete();
           } finally {
             this.dataSource = null;
-            this.closed = true;
             super.close();
           }
         }
@@ -510,10 +507,6 @@ public class OgrRecordStore extends AbstractRecordStore {
       appendQueryValue(query, whereClause, whereCondition);
     }
     return whereClause;
-  }
-
-  public boolean isClosed() {
-    return this.closed;
   }
 
   public boolean isCreateMissingTables() {

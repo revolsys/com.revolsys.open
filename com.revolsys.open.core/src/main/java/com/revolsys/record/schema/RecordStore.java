@@ -238,6 +238,10 @@ public interface RecordStore
     }
   }
 
+  default boolean isClosed() {
+    return false;
+  }
+
   default boolean isEditable(final String typePath) {
     return false;
   }
@@ -575,8 +579,6 @@ public interface RecordStore
   void setLabel(String label);
 
   void setLoadFullSchema(boolean loadFullSchema);
-
-  void setLogCounts(boolean logCounts);
 
   void setRecordFactory(RecordFactory recordFactory);
 

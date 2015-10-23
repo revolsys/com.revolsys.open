@@ -161,8 +161,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   private final Map<PathName, String> catalogPathByPath = new HashMap<>();
 
-  private boolean closed = false;
-
   private boolean createMissingRecordStore = true;
 
   private boolean createMissingTables = true;
@@ -599,7 +597,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             }
           }
         } finally {
-          this.closed = true;
           super.close();
         }
       }
@@ -983,8 +980,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             }
             this.exists = true;
           } catch (final Throwable e) {
-            this.closed = true;
-            Exceptions.throwUncheckedException(e);
+            try {
+              doClose();
+            } finally {
+              Exceptions.throwUncheckedException(e);
+            }
           } finally {
             if (geodatabase != null) {
               closeGeodatabase(geodatabase);
@@ -1011,10 +1011,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         table.insertRow(row);
       }
     }
-  }
-
-  public boolean isClosed() {
-    return this.closed;
   }
 
   public boolean isCreateMissingRecordStore() {

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +83,20 @@ public class Icons {
       }
     }
     return newImage;
+  }
+
+  public static ImageIcon getAnimatedIcon(final String imageFileName) {
+    final Class<?> clazz = Icons.class;
+    final String resourceName = RESOURCE_FOLDER + imageFileName;
+    URL url = clazz.getResource(resourceName);
+    if (url == null) {
+      ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+      url = classLoader.getResource("images/" + imageFileName);
+      if (url == null) {
+        url = classLoader.getResource("icons/" + imageFileName);
+      }
+    }
+    return new ImageIcon(url);
   }
 
   public static BufferedImage getBadgeImage(final String imageName) {
@@ -242,15 +257,16 @@ public class Icons {
       image = imageReference.get();
     }
     if (image == null) {
-      final String fileExtension = "png";
-      image = getImage(imageName, fileExtension);
+      image = getImage(imageName, "png");
+      if (image == null) {
+        image = getImage(imageName, "gif");
+      }
       NAMED_IMAGE_CACHE.put(imageName, new WeakReference<>(image));
     }
     return image;
   }
 
   public static BufferedImage getImage(final String imageName, final String fileExtension) {
-    BufferedImage image;
     final Class<?> clazz = Icons.class;
     final String resourceName = RESOURCE_FOLDER + imageName + "." + fileExtension;
     InputStream in = clazz.getResourceAsStream(resourceName);
@@ -264,8 +280,7 @@ public class Icons {
           .getResourceAsStream("icons/" + imageName + "." + fileExtension);
       }
     }
-    image = getImage(in);
-    return image;
+    return getImage(in);
   }
 
   public static BufferedImage grayscale(final BufferedImage original) {

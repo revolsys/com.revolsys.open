@@ -65,6 +65,11 @@ public class RecordStoreConnectionManager
     final Map<String, Object> configClone = (Map)JavaBeanUtil.clone(config);
     synchronized (recordStoreByConfig) {
       RecordStore recordStore = recordStoreByConfig.get(configClone);
+      if (recordStore != null && recordStore.isClosed()) {
+        recordStoreByConfig.remove(configClone);
+        recordStoreCounts.remove(configClone);
+        recordStore = null;
+      }
       if (recordStore == null) {
         final Map<String, ? extends Object> connectionProperties = (Map<String, ? extends Object>)configClone
           .get("connection");

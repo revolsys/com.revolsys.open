@@ -26,4 +26,13 @@ public interface RecordStoreSchemaElement
   <V extends RecordStore> V getRecordStore();
 
   RecordStoreSchema getSchema();
+
+  default boolean isClosed() {
+    final RecordStoreSchema schema = getSchema();
+    if (schema == null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

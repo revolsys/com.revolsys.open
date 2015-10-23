@@ -9,7 +9,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.annotation.PreDestroy;
-import javax.swing.JTable;
 import javax.swing.SortOrder;
 
 import com.revolsys.datatype.DataType;
@@ -18,6 +17,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.comparator.RecordFieldComparator;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
+import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.util.Reorderable;
@@ -39,7 +39,7 @@ public class RecordListTableModel extends RecordRowTableModel implements Reorder
     final Collection<? extends Record> records, final Collection<String> fieldNames) {
     final RecordListTableModel model = new RecordListTableModel(recordDefinition, records,
       fieldNames);
-    final JTable table = new RecordRowTable(model);
+    final BaseJTable table = new RecordRowTable(model);
     return new TablePanel(table);
   }
 

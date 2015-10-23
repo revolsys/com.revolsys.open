@@ -56,6 +56,7 @@ import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BaseFrame;
 import com.revolsys.swing.component.DnDTabbedPane;
 import com.revolsys.swing.component.TabClosableTitle;
+import com.revolsys.swing.logging.Log4jTabLabel;
 import com.revolsys.swing.logging.Log4jTableModel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
@@ -68,6 +69,7 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.pdf.SaveAsPdf;
 import com.revolsys.swing.preferences.PreferencesDialog;
+import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.worker.SwingWorkerTableModel;
 import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.node.BaseTreeNode;
@@ -290,8 +292,16 @@ public class ProjectFrame extends BaseFrame {
   }
 
   protected void addLogPanel() {
-    final JPanel panel = Log4jTableModel.createPanel();
-    addTabIcon(this.bottomTabs, "error", "Logging", panel, false);
+    final TablePanel panel = Log4jTableModel.createPanel();
+
+    final Log4jTableModel tableModel = panel.getTableModel();
+
+    final int tabIndex = this.bottomTabs.getTabCount();
+    this.bottomTabs.addTab(null, Icons.getIcon("error"), panel);
+
+    final Log4jTabLabel tabLabel = new Log4jTabLabel(this.bottomTabs, tableModel);
+    this.bottomTabs.setTabComponentAt(tabIndex, tabLabel);
+    this.bottomTabs.setSelectedIndex(tabIndex);
   }
 
   protected MapPanel addMapPanel() {

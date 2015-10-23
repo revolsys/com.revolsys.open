@@ -16,7 +16,6 @@ import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
@@ -31,11 +30,13 @@ import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordStore extends BaseObjectWithProperties implements RecordStore {
-  private Map<String, List<String>> codeTableColumNames = new HashMap<String, List<String>>();
+  private boolean closed = false;
 
-  private final Map<String, CodeTable> columnToTableMap = new HashMap<String, CodeTable>();
+  private Map<String, List<String>> codeTableFieldNames = new HashMap<>();
 
-  private List<RecordDefinitionProperty> commonRecordDefinitionProperties = new ArrayList<RecordDefinitionProperty>();
+  private final Map<String, CodeTable> fieldNameToTableMap = new HashMap<>();
+
+  private List<RecordDefinitionProperty> commonRecordDefinitionProperties = new ArrayList<>();
 
   private Map<String, Object> connectionProperties = new HashMap<>();
 
@@ -55,7 +56,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   private final StatisticsMap statistics = new StatisticsMap();
 
-  private final Map<String, Map<String, Object>> typeRecordDefinitionProperties = new HashMap<String, Map<String, Object>>();
+  private final Map<String, Map<String, Object>> typeRecordDefinitionProperties = new HashMap<>();
 
   public AbstractRecordStore() {
     this(new ArrayRecordFactory());
@@ -67,40 +68,40 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   @Override
   public void addCodeTable(final CodeTable codeTable) {
-    final String idColumn = codeTable.getIdFieldName();
-    addCodeTable(idColumn, codeTable);
+    final String idFieldName = codeTable.getIdFieldName();
+    addCodeTable(idFieldName, codeTable);
     final List<String> fieldAliases = codeTable.getFieldAliases();
     for (final String alias : fieldAliases) {
       addCodeTable(alias, codeTable);
     }
     final String codeTableName = codeTable.getName();
-    final List<String> columnNames = this.codeTableColumNames.get(codeTableName);
-    if (columnNames != null) {
-      for (final String columnName : columnNames) {
-        addCodeTable(columnName, codeTable);
+    final List<String> fieldNames = this.codeTableFieldNames.get(codeTableName);
+    if (fieldNames != null) {
+      for (final String fieldName : fieldNames) {
+        addCodeTable(fieldName, codeTable);
       }
     }
   }
 
-  public void addCodeTable(final String columnName, final CodeTable codeTable) {
-    if (columnName != null && !columnName.equalsIgnoreCase("ID")) {
-      this.columnToTableMap.put(columnName, codeTable);
+  public void addCodeTable(final String fieldName, final CodeTable codeTable) {
+    if (fieldName != null && !fieldName.equalsIgnoreCase("ID")) {
+      this.fieldNameToTableMap.put(fieldName, codeTable);
       final RecordStoreSchema rootSchema = getRootSchema();
-      addCodeTableColumns(rootSchema, codeTable, columnName);
+      addCodeTableFieldNames(rootSchema, codeTable, fieldName);
     }
   }
 
-  protected void addCodeTableColumns(final RecordStoreSchema schema, final CodeTable codeTable,
-    final String columnName) {
+  protected void addCodeTableFieldNames(final RecordStoreSchema schema, final CodeTable codeTable,
+    final String fieldName) {
     if (schema.isInitialized()) {
       for (final RecordStoreSchema childSchema : schema.getSchemas()) {
-        addCodeTableColumns(childSchema, codeTable, columnName);
+        addCodeTableFieldNames(childSchema, codeTable, fieldName);
       }
       for (final RecordDefinition recordDefinition : schema.getRecordDefinitions()) {
         final String idFieldName = recordDefinition.getIdFieldName();
         for (final FieldDefinition field : recordDefinition.getFields()) {
-          final String fieldName = field.getName();
-          if (fieldName.equals(columnName) && !fieldName.equals(idFieldName)) {
+          final String name = field.getName();
+          if (name.equals(fieldName) && !name.equals(idFieldName)) {
             field.setCodeTable(codeTable);
           }
         }
@@ -146,6 +147,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   @Override
   @PreDestroy
   public void close() {
+    this.closed = true;
     try {
       super.close();
       if (this.statistics != null) {
@@ -153,8 +155,8 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
       }
       getRootSchema().close();
     } finally {
-      this.codeTableColumNames.clear();
-      this.columnToTableMap.clear();
+      this.codeTableFieldNames.clear();
+      this.fieldNameToTableMap.clear();
       this.commonRecordDefinitionProperties.clear();
       this.connectionProperties.clear();
       this.recordFactory = null;
@@ -167,18 +169,18 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  public CodeTable getCodeTableByFieldName(final String columnName) {
-    final CodeTable codeTable = this.columnToTableMap.get(columnName);
+  public CodeTable getCodeTableByFieldName(final String fieldName) {
+    final CodeTable codeTable = this.fieldNameToTableMap.get(fieldName);
     return codeTable;
   }
 
   @Override
   public Map<String, CodeTable> getCodeTableByFieldNameMap() {
-    return new HashMap<String, CodeTable>(this.columnToTableMap);
+    return new HashMap<>(this.fieldNameToTableMap);
   }
 
   public Map<String, List<String>> getCodeTableColumNames() {
-    return this.codeTableColumNames;
+    return this.codeTableFieldNames;
   }
 
   @Override
@@ -225,12 +227,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  public Statistics getStatistics(final String name) {
-    final StatisticsMap statistics = getStatistics();
-    return statistics.getStatistics(name);
-  }
-
-  @Override
   public String getUrl() {
     return (String)this.connectionProperties.get("url");
   }
@@ -244,6 +240,11 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   @PostConstruct
   public void initialize() {
     getStatistics().connect();
+  }
+
+  @Override
+  public boolean isClosed() {
+    return this.closed;
   }
 
   @Override
@@ -284,7 +285,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   public void setCodeTableColumNames(final Map<String, List<String>> domainColumNames) {
-    this.codeTableColumNames = domainColumNames;
+    this.codeTableFieldNames = domainColumNames;
   }
 
   public void setCommonRecordDefinitionProperties(
@@ -313,11 +314,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   @Override
   public void setLoadFullSchema(final boolean loadFullSchema) {
     this.loadFullSchema = loadFullSchema;
-  }
-
-  @Override
-  public void setLogCounts(final boolean logCounts) {
-    getStatistics().setLogCounts(logCounts);
   }
 
   @Override

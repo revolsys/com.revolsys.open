@@ -95,7 +95,9 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
 
   @SuppressWarnings("unchecked")
   public <V extends RecordStoreSchemaElement> V getElement(final PathName path) {
-    if (path == null) {
+    if (isClosed()) {
+      throw new IllegalStateException("Record store is closed");
+    } else if (path == null) {
       return null;
     } else {
       RecordStoreSchemaElement childElement = this.elementsByPath.get(path);
@@ -230,6 +232,16 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
   public List<PathName> getTypePaths() {
     refreshIfNeeded();
     return new ArrayList<>(this.recordDefinitionsByPath.keySet());
+  }
+
+  @Override
+  public boolean isClosed() {
+    final AbstractRecordStore recordStore = getRecordStore();
+    if (recordStore == null) {
+      return super.isClosed();
+    } else {
+      return recordStore.isClosed();
+    }
   }
 
   private boolean isEqual(final RecordStoreSchemaElement oldElement,
