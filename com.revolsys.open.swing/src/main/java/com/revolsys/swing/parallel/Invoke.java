@@ -21,7 +21,6 @@ import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class Invoke {
-
   private static PropertyChangeListener PROPERTY_CHANGE_LISTENER = new PropertyChangeListener() {
     @Override
     public synchronized void propertyChange(final PropertyChangeEvent event) {
