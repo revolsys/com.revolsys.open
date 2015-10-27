@@ -122,7 +122,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   private final LayerRecord loadingRecord;
 
-  private SwingWorker<?, ?> loadObjectsWorker;
+  private SwingWorker<?, ?> loadRecordsWorker;
 
   private Map<String, Boolean> orderBy;
 
@@ -172,9 +172,9 @@ public class RecordLayerTableModel extends RecordRowTableModel
   protected void doRefresh() {
     synchronized (getSync()) {
       this.refreshIndex++;
-      if (this.loadObjectsWorker != null) {
-        this.loadObjectsWorker.cancel(true);
-        this.loadObjectsWorker = null;
+      if (this.loadRecordsWorker != null) {
+        this.loadRecordsWorker.cancel(true);
+        this.loadRecordsWorker = null;
       }
       if (this.rowCountWorker != null) {
         this.rowCountWorker.cancel(true);
@@ -201,24 +201,19 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   protected Query getFilterQuery() {
-    Query query = this.layer.getQuery();
-    if (query == null) {
-      return null;
-    } else {
-      query = query.clone();
-      query.and(this.filter);
-      query.setOrderBy(this.orderBy);
-      if (this.filterByBoundingBox) {
-        final Project project = this.layer.getProject();
-        final BoundingBox viewBoundingBox = project.getViewBoundingBox();
-        final RecordDefinition recordDefinition = this.layer.getRecordDefinition();
-        final FieldDefinition geometryField = recordDefinition.getGeometryField();
-        if (geometryField != null) {
-          query.and(F.envelopeIntersects(geometryField, viewBoundingBox));
-        }
+    final Query query = this.layer.getQuery();
+    query.and(this.filter);
+    query.setOrderBy(this.orderBy);
+    if (this.filterByBoundingBox) {
+      final Project project = this.layer.getProject();
+      final BoundingBox viewBoundingBox = project.getViewBoundingBox();
+      final RecordDefinition recordDefinition = this.layer.getRecordDefinition();
+      final FieldDefinition geometryField = recordDefinition.getGeometryField();
+      if (geometryField != null) {
+        query.and(F.envelopeIntersects(geometryField, viewBoundingBox));
       }
-      return query;
     }
+    return query;
   }
 
   public String getGeometryFilterMode() {
@@ -244,9 +239,9 @@ public class RecordLayerTableModel extends RecordRowTableModel
   protected int getLayerRowCount() {
     final Query query = getFilterQuery();
     if (query == null) {
-      return this.layer.getRowCount();
+      return this.layer.getRecordCount();
     } else {
-      return this.layer.getRowCount(query);
+      return this.layer.getRecordCount(query);
     }
   }
 
@@ -269,7 +264,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
     synchronized (getSync()) {
       if (this.refreshIndex == refreshIndex) {
         if (this.loadingPageNumbersToProcess.isEmpty()) {
-          this.loadObjectsWorker = null;
+          this.loadRecordsWorker = null;
         } else {
           final Iterator<Integer> iterator = this.loadingPageNumbersToProcess.iterator();
           if (iterator.hasNext()) {
@@ -294,8 +289,8 @@ public class RecordLayerTableModel extends RecordRowTableModel
         if (!this.loadingPageNumbers.contains(pageNumber)) {
           this.loadingPageNumbers.add(pageNumber);
           this.loadingPageNumbersToProcess.add(pageNumber);
-          if (this.loadObjectsWorker == null) {
-            this.loadObjectsWorker = Invoke.background("Loading records " + getTypeName(),
+          if (this.loadRecordsWorker == null) {
+            this.loadRecordsWorker = Invoke.background("Loading records " + getTypeName(),
               () -> loadPages(this.refreshIndex));
           }
         }
@@ -458,11 +453,11 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   protected LayerRecord loadLayerRecord(int row) {
     final AbstractRecordLayer layer = getLayer();
-    final int newObjectCount = layer.getNewRecordCount();
-    if (row < newObjectCount) {
+    final int newRecordCount = layer.getNewRecordCount();
+    if (row < newRecordCount) {
       return layer.getNewRecords().get(row);
     } else {
-      row -= newObjectCount;
+      row -= newRecordCount;
     }
     final int pageSize = getPageSize();
     final int pageNumber = row / pageSize;
@@ -523,14 +518,14 @@ public class RecordLayerTableModel extends RecordRowTableModel
     getTable().repaint();
   }
 
-  protected void replaceCachedObject(final LayerRecord oldObject, final LayerRecord newObject) {
+  protected void replaceCachedRecord(final LayerRecord oldRecord, final LayerRecord newRecord) {
     synchronized (this.pageCache) {
-      for (final List<LayerRecord> objects : this.pageCache.values()) {
-        for (final ListIterator<LayerRecord> iterator = objects.listIterator(); iterator
+      for (final List<LayerRecord> records : this.pageCache.values()) {
+        for (final ListIterator<LayerRecord> iterator = records.listIterator(); iterator
           .hasNext();) {
-          final LayerRecord object = iterator.next();
-          if (object == oldObject) {
-            iterator.set(newObject);
+          final LayerRecord record = iterator.next();
+          if (record == oldRecord) {
+            iterator.set(newRecord);
             return;
           }
         }

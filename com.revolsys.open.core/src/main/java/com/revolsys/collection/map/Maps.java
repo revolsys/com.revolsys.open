@@ -118,16 +118,16 @@ public interface Maps {
     return new MapBuilder<>(map);
   }
 
-  static <V> boolean collectionContains(final Map<Object, Collection<V>> map, final Object key,
-    final V value) {
-    if (map == null) {
+  static <K, V> boolean collectionContains(final Map<K, ? extends Collection<? extends V>> map,
+    final K key, final V value) {
+    if (map == null || key == null) {
       return false;
     } else {
-      final Collection<V> collection = map.get(key);
+      final Collection<? extends V> collection = map.get(key);
       if (collection == null) {
         return false;
       } else {
-        return collection.contains(key);
+        return collection.contains(value);
       }
     }
   }
@@ -701,19 +701,6 @@ public interface Maps {
       final V lastValue = map.get(key);
       if (lastValue == null || value.compareTo(lastValue) <= 0) {
         map.remove(key);
-      }
-    }
-  }
-
-  static <K, V> boolean setContains(final Map<K, Set<V>> map, final K key, final V value) {
-    if (map == null) {
-      return false;
-    } else {
-      final Collection<? extends V> collection = map.get(key);
-      if (collection == null) {
-        return false;
-      } else {
-        return collection.contains(value);
       }
     }
   }

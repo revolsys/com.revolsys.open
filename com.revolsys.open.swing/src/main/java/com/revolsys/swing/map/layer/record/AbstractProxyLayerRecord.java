@@ -1,8 +1,12 @@
 package com.revolsys.swing.map.layer.record;
 
+import java.util.Collection;
+import java.util.Map;
+
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
+import com.revolsys.record.schema.FieldDefinition;
 
 public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   public AbstractProxyLayerRecord(final AbstractRecordLayer layer) {
@@ -112,8 +116,12 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
 
   @Override
   public boolean isSame(final Record record) {
-    final LayerRecord layerRecord = getLayerRecord();
-    return layerRecord.isSame(record);
+    if (record == this) {
+      return true;
+    } else {
+      final LayerRecord layerRecord = getLayerRecord();
+      return layerRecord.isSame(record);
+    }
   }
 
   @Override
@@ -131,9 +139,16 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   }
 
   @Override
-  public boolean setValue(final int index, final Object value) {
+  protected boolean setValue(final FieldDefinition fieldDefinition, final Object value) {
+    final int index = fieldDefinition.getIndex();
     final Record record = getRecord();
     return record.setValue(index, value);
   }
 
+  @Override
+  public void setValues(final Map<? extends String, ? extends Object> values,
+    final Collection<String> fieldNames) {
+    final Record record = getRecord();
+    record.setValues(values, fieldNames);
+  }
 }

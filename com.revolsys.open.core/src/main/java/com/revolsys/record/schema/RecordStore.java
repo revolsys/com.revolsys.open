@@ -74,8 +74,8 @@ public interface RecordStore
       return null;
     } else {
       final Record copy = recordFactory.newRecord(recordDefinition);
-      copy.setValues(record);
-      copy.setIdValue(null);
+      copy.setValuesClone(record);
+      copy.setIdentifier(null);
       return copy;
     }
   }
@@ -425,8 +425,8 @@ public interface RecordStore
         final String idFieldName = recordDefinition.getIdFieldName();
         if (Property.hasValue(idFieldName)) {
           if (values.get(idFieldName) == null) {
-            final Object id = newPrimaryIdValue(typePath);
-            record.setIdValue(id);
+            final Identifier id = newPrimaryIdentifier(typePath);
+            record.setIdentifier(id);
           }
         }
       }
@@ -458,8 +458,8 @@ public interface RecordStore
         final String idFieldName = recordDefinition.getIdFieldName();
         if (Property.hasValue(idFieldName)) {
           if (values.get(idFieldName) == null) {
-            final Object id = newPrimaryIdValue(typePath);
-            record.setIdValue(id);
+            final Identifier id = newPrimaryIdentifier(typePath);
+            record.setIdentifier(id);
           }
         }
       }
@@ -473,8 +473,8 @@ public interface RecordStore
       final String idFieldName = recordDefinition.getIdFieldName();
       if (Property.hasValue(idFieldName)) {
         final PathName typePath = recordDefinition.getPathName();
-        final Object id = newPrimaryIdValue(typePath);
-        record.setIdValue(id);
+        final Identifier id = newPrimaryIdentifier(typePath);
+        record.setIdentifier(id);
       }
     }
     return record;

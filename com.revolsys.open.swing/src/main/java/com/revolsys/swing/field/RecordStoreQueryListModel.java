@@ -29,7 +29,7 @@ public class RecordStoreQueryListModel implements ListModel {
 
   private int maxResults = Integer.MAX_VALUE;
 
-  private List<Record> objects = new ArrayList<Record>();
+  private List<Record> records = new ArrayList<Record>();
 
   private final List<Query> queries = new ArrayList<Query>();
 
@@ -76,18 +76,18 @@ public class RecordStoreQueryListModel implements ListModel {
 
   @Override
   public Record getElementAt(final int index) {
-    return this.objects.get(index);
+    return this.records.get(index);
   }
 
   public ListDataListener[] getListDataListeners() {
     return this.listDataListeners.getListeners(ListDataListener.class);
   }
 
-  public List<Record> getObjects() {
-    return this.objects;
+  public List<Record> getRecords() {
+    return this.records;
   }
 
-  protected List<Record> getObjects(final String searchParam) {
+  protected List<Record> getRecords(final String searchParam) {
     if (Property.hasValue(searchParam) && searchParam.length() >= 2) {
       final Map<String, Record> allObjects = new TreeMap<String, Record>();
       for (Query query : this.queries) {
@@ -141,7 +141,7 @@ public class RecordStoreQueryListModel implements ListModel {
 
   @Override
   public int getSize() {
-    return this.objects.size();
+    return this.records.size();
   }
 
   @Override
@@ -157,13 +157,13 @@ public class RecordStoreQueryListModel implements ListModel {
     if (Property.hasValue(searchText)) {
       if (!this.searchText.equals(searchText)) {
         this.searchText = searchText;
-        this.objects = getObjects(this.searchText);
-        fireContentsChanged(this, 0, this.objects.size());
+        this.records = getRecords(this.searchText);
+        fireContentsChanged(this, 0, this.records.size());
       }
     } else {
       this.searchText = "";
-      this.objects = Collections.emptyList();
-      fireContentsChanged(this, 0, this.objects.size());
+      this.records = Collections.emptyList();
+      fireContentsChanged(this, 0, this.records.size());
       this.selectedItem = null;
     }
   }

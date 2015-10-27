@@ -1,6 +1,6 @@
 package com.revolsys.record.query;
 
-import java.util.Map;
+import com.revolsys.record.Record;
 
 public class Not extends LeftUnaryCondition {
 
@@ -22,7 +22,7 @@ public class Not extends LeftUnaryCondition {
   }
 
   @Override
-  public boolean test(final Map<String, Object> object) {
+  public boolean test(final Record object) {
     final Condition condition = getQueryValue();
     if (condition.test(object)) {
       return false;

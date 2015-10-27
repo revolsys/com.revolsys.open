@@ -222,6 +222,15 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy {
    */
   boolean intersects(double x1, double y1, double x2, double y2);
 
+  default boolean intersects(final Geometry geometry) {
+    if (geometry != null) {
+      final BoundingBox boundingBox = geometry.getBoundingBox();
+      return intersects(boundingBox);
+    }
+    return false;
+
+  }
+
   /**
    *  Check if the point <code>p</code>
    *  overlaps (lies inside) the region of this <code>WmsBoundingBox</code>.
@@ -230,6 +239,14 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy {
    *@return        <code>true</code> if the point overlaps this <code>WmsBoundingBox</code>
    */
   boolean intersects(Point p);
+
+  default boolean intersects(final Record record) {
+    if (record != null) {
+      final Geometry geometry = record.getGeometry();
+      return intersects(geometry);
+    }
+    return false;
+  }
 
   boolean isWithinDistance(BoundingBox boundingBox, double maxDistance);
 

@@ -6,13 +6,13 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Map;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.datatype.DataType;
 import com.revolsys.equals.Equals;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.record.schema.FieldDefinition;
@@ -24,22 +24,12 @@ import com.revolsys.util.Strings;
 
 public class Value extends QueryValue {
   public static Object getValue(final Object value) {
-    Object newValue;
     if (value instanceof Identifier) {
       final Identifier identifier = (Identifier)value;
-      final List<Object> values = identifier.getValues();
-      if (values.size() == 0) {
-        newValue = null;
-      } else if (values.size() == 1) {
-        newValue = values.get(0);
-      } else {
-        throw new IllegalArgumentException(
-          "Cannot create value for identifier with multiple parts " + value);
-      }
+      return identifier.toSingleValue();
     } else {
-      newValue = value;
+      return value;
     }
-    return newValue;
   }
 
   private FieldDefinition field;
@@ -127,7 +117,7 @@ public class Value extends QueryValue {
   }
 
   @Override
-  public String getStringValue(final Map<String, Object> record) {
+  public String getStringValue(final Record record) {
     final Object value = getValue(record);
     if (this.field == null) {
       return StringConverterRegistry.toString(value);
@@ -143,7 +133,7 @@ public class Value extends QueryValue {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V> V getValue(final Map<String, Object> record) {
+  public <V> V getValue(final Record record) {
     return (V)this.queryValue;
   }
 

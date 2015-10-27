@@ -1,9 +1,9 @@
 package com.revolsys.record.query;
 
 import java.math.BigDecimal;
-import java.util.Map;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.record.Record;
 
 public class Multiply extends BinaryArithmatic {
 
@@ -25,7 +25,7 @@ public class Multiply extends BinaryArithmatic {
   }
 
   @Override
-  public <V> V getValue(final Map<String, Object> record) {
+  public <V> V getValue(final Record record) {
     final Object leftValue = getLeft().getValue(record);
     final Object rightValue = getRight().getValue(record);
     if (leftValue instanceof Number && rightValue instanceof Number) {

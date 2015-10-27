@@ -3,9 +3,9 @@ package com.revolsys.record.query;
 import java.sql.PreparedStatement;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import com.revolsys.equals.Equals;
+import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordStore;
 
 public class ParenthesisCondition extends Condition {
@@ -57,12 +57,12 @@ public class ParenthesisCondition extends Condition {
   }
 
   @Override
-  public <V> V getValue(final Map<String, Object> record) {
+  public <V> V getValue(final Record record) {
     return this.condition.getValue(record);
   }
 
   @Override
-  public boolean test(final Map<String, Object> record) {
+  public boolean test(final Record record) {
     return this.condition.test(record);
   }
 

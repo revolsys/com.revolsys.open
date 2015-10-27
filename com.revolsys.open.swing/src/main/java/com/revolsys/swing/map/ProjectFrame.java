@@ -315,7 +315,7 @@ public class ProjectFrame extends BaseFrame {
 
   protected void addMenu(final JMenuBar menuBar, final MenuFactory menuFactory) {
     if (menuFactory != null) {
-      final JMenu menu = menuFactory.createComponent();
+      final JMenu menu = menuFactory.newComponent();
       menuBar.add(menu, menuBar.getMenuCount() - 1);
     }
   }

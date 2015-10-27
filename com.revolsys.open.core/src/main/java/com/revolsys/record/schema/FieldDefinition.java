@@ -21,8 +21,8 @@ import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.code.CodeTableProperty;
-import com.revolsys.record.query.Value;
 import com.revolsys.util.CaseConverter;
+import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
@@ -36,7 +36,6 @@ import com.revolsys.util.Strings;
  * @see RecordDefinition
  */
 public class FieldDefinition extends BaseObjectWithProperties implements Cloneable, MapSerializer {
-
   public static FieldDefinition create(final Map<String, Object> properties) {
     return new FieldDefinition(properties);
   }
@@ -304,10 +303,6 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
     return new FieldDefinition(this);
   }
 
-  public <V> V convert(final Object value) {
-    return StringConverterRegistry.toObject(this.type, value);
-  }
-
   @Override
   public boolean equals(final Object object) {
     if (object instanceof FieldDefinition) {
@@ -478,6 +473,16 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
     return this.required;
   }
 
+  public boolean isValid(final Object value) {
+    try {
+      validate(value);
+      return true;
+    } catch (final Throwable e) {
+      return false;
+    }
+
+  }
+
   public void setAllowedValues(final Collection<?> allowedValues) {
     for (final Object allowedValue : allowedValues) {
       this.allowedValues.put(allowedValue, allowedValue);
@@ -539,17 +544,60 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
   public void setValue(final Record record, Object value) {
     if (record != null) {
       final int index = getIndex();
-      if (value != null) {
-        final CodeTable codeTable = getCodeTable();
-        if (codeTable != null) {
-          final Identifier id = codeTable.getIdentifier(value);
-          if (id != null) {
-            value = Value.getValue(id);
+      value = toFieldValue(value);
+      record.setValue(index, value);
+    }
+  }
+
+  public void setValueClone(final Record record, Object value) {
+    if (record != null) {
+      final int index = getIndex();
+      value = toFieldValue(value);
+      value = JavaBeanUtil.clone(value);
+      record.setValue(index, value);
+    }
+  }
+
+  /**
+   * Convert the object to a value that is valid for the field. If the value can't be converted then
+   * the original value will be returned. This can result in invalid values in the record but those can be picked up
+   * with validation. Otherwise invalid values would silently be removed.
+   *
+   * @param value
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  public <V> V toFieldValue(final Object value) {
+    try {
+      return toFieldValueException(value);
+    } catch (final Throwable e) {
+      return (V)value;
+    }
+  }
+
+  public <V> V toFieldValueException(Object value) {
+    if (value == null) {
+      return null;
+    } else {
+      try {
+        if (this.codeTable != null) {
+          final Identifier identifier = this.codeTable.getIdentifier(value);
+          if (identifier != null) {
+            value = identifier.toSingleValue();
           }
         }
+        V fieldValue = this.type.toObject(value);
+        if (value instanceof String) {
+          final String string = (String)value;
+          if (!Property.hasValue(string)) {
+            fieldValue = null;
+          }
+        }
+        return fieldValue;
+      } catch (final Throwable e) {
+        throw new IllegalArgumentException(
+          getName() + "='" + value + "' is not a valid " + getType().getValidationName(), e);
       }
-      record.setValue(index, value);
-
     }
   }
 
@@ -581,29 +629,15 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
 
   public Object validate(Object value) {
     final String fieldName = getName();
-
-    if (isRequired()) {
-      if (value == null || value instanceof String && !Property.hasValue((String)value)) {
+    value = toFieldValueException(value);
+    if (value == null) {
+      if (isRequired()) {
         throw new IllegalArgumentException(fieldName + " is required");
       }
-    }
-    final DataType fieldType = getType();
-    if (value != null) {
-      final Class<?> fieldClass = fieldType.getJavaClass();
-      final Class<? extends Object> valueClass = value.getClass();
-      if (!fieldClass.isAssignableFrom(valueClass)) {
-        try {
-          value = StringConverterRegistry.toObject(fieldType, value);
-        } catch (final Throwable t) {
-          throw new IllegalArgumentException(
-            fieldName + "='" + value + "' is not a valid " + fieldType.getValidationName());
-        }
-        if (value == null) {
-          throw new IllegalArgumentException(
-            fieldName + "='" + value + "' is not a valid " + fieldType.getValidationName());
-        }
-      }
-      if (value != null) {
+    } else {
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
+      if (codeTable == null) {
         final int maxLength = getLength();
         if (value instanceof Number) {
           final Number number = (Number)value;
@@ -652,89 +686,6 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
               + Strings.toString(",", this.allowedValues) + ")");
           }
         }
-      }
-    }
-    return value;
-  }
-
-  public Object validate(final Record record, Object value) {
-    final String fieldName = getName();
-    if (isRequired()) {
-      if (value == null || value instanceof String && !Property.hasValue((String)value)) {
-        throw new ObjectPropertyException(record, fieldName, "Required");
-      }
-    }
-    final DataType fieldType = getType();
-    if (value != null) {
-      final RecordDefinition recordDefinition = getRecordDefinition();
-      final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
-      if (codeTable == null) {
-        final Class<?> fieldClass = fieldType.getJavaClass();
-        final Class<? extends Object> valueClass = value.getClass();
-        if (!fieldClass.isAssignableFrom(valueClass)) {
-          try {
-            value = StringConverterRegistry.toObject(fieldType, value);
-          } catch (final Throwable t) {
-            throw new ObjectPropertyException(record, fieldName,
-              "'" + value + "' is not a valid " + fieldType.getValidationName(), t);
-          }
-          if (value == null) {
-            throw new ObjectPropertyException(record, fieldName,
-              "'" + value + "' is not a valid " + fieldType.getValidationName());
-          }
-        }
-        if (value != null) {
-          final int maxLength = getLength();
-          if (value instanceof Number) {
-            final Number number = (Number)value;
-            final BigDecimal bigNumber = new BigDecimal(number.toString());
-            final int length = bigNumber.precision();
-            if (maxLength > 0) {
-              if (length > maxLength) {
-                throw new ObjectPropertyException(record, fieldName,
-                  "'" + value + "' length " + length + " > " + maxLength);
-              }
-            }
-
-            final int scale = bigNumber.scale();
-            final int maxScale = getScale();
-            if (maxScale > 0) {
-              if (scale > maxScale) {
-                throw new ObjectPropertyException(record, fieldName,
-                  "'" + value + "' scale " + scale + " > " + maxScale);
-              }
-            }
-            final Number minValue = getMinValue();
-            if (minValue != null) {
-              if (NumericComparator.numericCompare(number, minValue) < 0) {
-                throw new ObjectPropertyException(record, fieldName,
-                  "'" + value + "' > " + minValue);
-              }
-            }
-            final Number maxValue = getMaxValue();
-            if (maxValue != null) {
-              if (NumericComparator.numericCompare(number, maxValue) > 0) {
-                throw new ObjectPropertyException(record, fieldName,
-                  "'" + value + "' < " + maxValue);
-              }
-            }
-          } else if (value instanceof String) {
-            final String string = (String)value;
-            final int length = string.length();
-            if (maxLength > 0) {
-              if (length > maxLength) {
-                throw new ObjectPropertyException(record, fieldName,
-                  "'" + value + "' length " + length + " > " + maxLength);
-              }
-            }
-          }
-          if (!this.allowedValues.isEmpty()) {
-            if (!this.allowedValues.containsKey(value)) {
-              throw new ObjectPropertyException(record, fieldName,
-                "'" + value + " not in (" + Strings.toString(",", this.allowedValues) + ")");
-            }
-          }
-        }
       } else {
         final Identifier id = codeTable.getIdentifier(value);
         if (id == null) {
@@ -746,11 +697,20 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
           } else {
             codeTableName = codeTable.toString();
           }
-          throw new ObjectPropertyException(record, fieldName,
+          throw new IllegalArgumentException(
             "Unable to find code for '" + value + "' in " + codeTableName);
         }
       }
     }
     return value;
+  }
+
+  public Object validate(final Record record, final Object value) {
+    final String fieldName = getName();
+    try {
+      return validate(value);
+    } catch (final Throwable e) {
+      throw new ObjectPropertyException(record, fieldName, e.getMessage(), e);
+    }
   }
 }

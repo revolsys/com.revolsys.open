@@ -1,20 +1,13 @@
 package com.revolsys.record.query;
 
-import java.util.Map;
 import java.util.function.Predicate;
 
-public abstract class Condition extends QueryValue implements Predicate<Map<String, Object>> {
+import com.revolsys.record.Record;
 
-  public static boolean test(final Predicate<Map<String, Object>> condition,
-    final Map<String, Object> record) {
-    if (condition == null) {
-      return true;
-    } else {
-      return condition.test(record);
-    }
-  }
+public abstract class Condition extends QueryValue implements Predicate<Record> {
+  public static final AcceptAllCondition ALL = new AcceptAllCondition();
 
-  public And and(final Condition condition) {
+  public Condition and(final Condition condition) {
     return new And(this, condition);
   }
 
@@ -25,7 +18,7 @@ public abstract class Condition extends QueryValue implements Predicate<Map<Stri
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V> V getValue(final Map<String, Object> record) {
+  public <V> V getValue(final Record record) {
     final Boolean value = test(record);
     return (V)value;
   }
@@ -34,12 +27,12 @@ public abstract class Condition extends QueryValue implements Predicate<Map<Stri
     return false;
   }
 
-  public Or or(final Condition condition) {
+  public Condition or(final Condition condition) {
     return new Or(this, condition);
   }
 
   @Override
-  public boolean test(final Map<String, Object> record) {
+  public boolean test(final Record record) {
     throw new UnsupportedOperationException("Cannot filter using " + toString());
   }
 

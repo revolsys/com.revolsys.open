@@ -54,6 +54,10 @@ import org.slf4j.LoggerFactory;
  * @author Paul Austin
  */
 public final class JavaBeanUtil {
+  private static final Class[] ARRAY_CLASS_0 = new Class[0];
+
+  private static final Object[] ARRAY_OBJECT_0 = new Object[0];
+
   private static ConvertUtilsBean convertUtilsBean;
 
   static final Logger LOG = LoggerFactory.getLogger(JavaBeanUtil.class);
@@ -74,16 +78,18 @@ public final class JavaBeanUtil {
   @SuppressWarnings("unchecked")
   public static <V> V clone(final V value) {
     if (value instanceof Map) {
-      final Map<Object, Object> map = new LinkedHashMap<Object, Object>((Map<Object, Object>)value);
-      for (final Entry<Object, Object> entry : map.entrySet()) {
+      final Map<Object, Object> sourceMap = (Map<Object, Object>)value;
+      final Map<Object, Object> map = new LinkedHashMap<>(sourceMap);
+      for (final Entry<Object, Object> entry : sourceMap.entrySet()) {
+        final Object key = entry.getKey();
         final Object mapValue = entry.getValue();
         final Object clonedMapValue = clone(mapValue);
-        entry.setValue(clonedMapValue);
+        map.put(key, clonedMapValue);
       }
       return (V)map;
     } else if (value instanceof List) {
       final List<?> list = (List<?>)value;
-      final List<Object> cloneList = new ArrayList<Object>();
+      final List<Object> cloneList = new ArrayList<>();
       for (final Object object : list) {
         final Object clonedObject = clone(object);
         cloneList.add(clonedObject);
@@ -92,30 +98,13 @@ public final class JavaBeanUtil {
     } else if (value instanceof Cloneable) {
       try {
         final Class<? extends Object> valueClass = value.getClass();
-        final Method method = valueClass.getMethod("clone", new Class[0]);
+        final Method method = valueClass.getMethod("clone", ARRAY_CLASS_0);
         if (method != null) {
-          return (V)method.invoke(value, new Object[0]);
+          return (V)method.invoke(value, ARRAY_OBJECT_0);
         }
-      } catch (final IllegalArgumentException e) {
-        throw e;
-      } catch (final InvocationTargetException e) {
-
-        final Throwable cause = e.getCause();
-        if (cause instanceof RuntimeException) {
-          final RuntimeException re = (RuntimeException)cause;
-          throw re;
-        } else if (cause instanceof Error) {
-          final Error ee = (Error)cause;
-          throw ee;
-        } else {
-          throw new RuntimeException(cause.getMessage(), cause);
-        }
-      } catch (final RuntimeException e) {
-        throw e;
-      } catch (final Exception e) {
-        throw new RuntimeException(e.getMessage(), e);
+      } catch (final Throwable e) {
+        return Exceptions.throwUncheckedException(e);
       }
-
     }
     return value;
   }

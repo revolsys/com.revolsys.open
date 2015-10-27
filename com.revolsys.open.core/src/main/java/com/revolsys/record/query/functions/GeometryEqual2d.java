@@ -3,11 +3,11 @@ package com.revolsys.record.query.functions;
 import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.equals.Equals;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.record.Record;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
@@ -91,7 +91,7 @@ public class GeometryEqual2d extends Condition {
   }
 
   @Override
-  public boolean test(final Map<String, Object> record) {
+  public boolean test(final Record record) {
     final Geometry geometry1 = this.geometry1Value.getValue(record);
     final Geometry geometry2 = this.geometry2Value.getValue(record);
     if (geometry1 == null || geometry2 == null) {

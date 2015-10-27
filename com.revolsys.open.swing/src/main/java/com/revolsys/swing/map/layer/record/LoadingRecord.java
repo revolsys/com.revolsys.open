@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.record;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
+import com.revolsys.record.schema.FieldDefinition;
 
 public class LoadingRecord extends AbstractLayerRecord {
   public LoadingRecord(final AbstractRecordLayer layer) {
@@ -16,7 +17,7 @@ public class LoadingRecord extends AbstractLayerRecord {
 
   @Override
   public RecordState getState() {
-    return RecordState.Initalizing;
+    return RecordState.Initializing;
   }
 
   @Override
@@ -39,7 +40,7 @@ public class LoadingRecord extends AbstractLayerRecord {
   }
 
   @Override
-  public boolean setValue(final int index, final Object value) {
+  public boolean setValue(final FieldDefinition fieldDefinition, final Object value) {
     return false;
   }
 }

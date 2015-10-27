@@ -1,7 +1,6 @@
 package com.revolsys.swing.map.layer.openstreetmap;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +12,6 @@ import com.revolsys.identifier.Identifier;
 import com.revolsys.record.io.format.openstreetmap.model.OsmConstants;
 import com.revolsys.record.io.format.openstreetmap.model.OsmDocument;
 import com.revolsys.record.io.format.openstreetmap.model.OsmElement;
-import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -70,11 +68,6 @@ public class OpenStreetMapApiLayer extends AbstractRecordLayer {
     }
     this.boundingBoxTileMap.keySet().retainAll(boundingBoxes);
     return new ArrayList<>(recordMap.values());
-  }
-
-  @Override
-  protected List<LayerRecord> doQuery(final Query query) {
-    return Collections.emptyList();
   }
 
   @Override

@@ -1,29 +1,138 @@
 package com.revolsys.swing.map.layer.record;
 
+import java.beans.PropertyChangeEvent;
+
 import com.revolsys.equals.Equals;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.Record;
+import com.revolsys.record.RecordState;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.swing.map.layer.AbstractLayer;
+import com.revolsys.util.Property;
+import com.revolsys.util.enableable.Enabled;
 
 public interface LayerRecord extends Record {
-  void cancelChanges();
+  default void cancelChanges() {
+  }
 
-  void clearChanges();
+  default void clearChanges() {
+  }
 
-  void firePropertyChange(final String fieldName, final Object oldValue, final Object newValue);
+  default Enabled eventsDisabled() {
+    final AbstractRecordLayer layer = getLayer();
+    if (layer == null) {
+      return null;
+    } else {
+      return layer.eventsDisabled();
+    }
+  }
+
+  default Enabled eventsEnabled() {
+    final AbstractRecordLayer layer = getLayer();
+    if (layer == null) {
+      return null;
+    } else {
+      return layer.eventsEnabled();
+    }
+  }
+
+  default void firePropertyChange(final String fieldName, final Object oldValue,
+    final Object newValue) {
+    final AbstractLayer layer = getLayer();
+    if (layer.isEventsEnabled()) {
+      final LayerRecord record = getEventRecord();
+      final PropertyChangeEvent event = new PropertyChangeEvent(record, fieldName, oldValue,
+        newValue);
+      layer.propertyChange(event);
+    }
+  }
+
+  /**
+   * Get the record to use for property change events.
+   *
+   * @return The record;
+   */
+  default LayerRecord getEventRecord() {
+    return this;
+  }
 
   AbstractRecordLayer getLayer();
 
-  <T> T getOriginalValue(String fieldName);
+  default LayerRecord getOriginalRecord() {
+    return new LayerRecord() {
+      @Override
+      public LayerRecord clone() {
+        return this;
+      }
 
-  boolean isDeletable();
+      @Override
+      public AbstractRecordLayer getLayer() {
+        return LayerRecord.this.getLayer();
+      }
 
-  boolean isDeleted();
+      @Override
+      public RecordDefinition getRecordDefinition() {
+        return LayerRecord.this.getRecordDefinition();
+      }
 
-  boolean isGeometryEditable();
+      @Override
+      public <T> T getValue(final int index) {
+        final String fieldName = getFieldName(index);
+        return LayerRecord.this.getOriginalValue(fieldName);
+      }
 
-  boolean isModified(int attributeIndex);
+      @Override
+      public void setState(final RecordState state) {
+        throw new UnsupportedOperationException();
+      }
 
-  boolean isModified(String name);
+      @Override
+      public boolean setValue(final int index, final Object value) {
+        throw new UnsupportedOperationException();
+      }
+    };
+  }
+
+  @SuppressWarnings("unchecked")
+  default <T> T getOriginalValue(final String name) {
+    return (T)getValue(name);
+  }
+
+  @Override
+  default RecordDefinition getRecordDefinition() {
+    final AbstractRecordLayer layer = getLayer();
+    if (layer == null) {
+      return null;
+    } else {
+      return layer.getRecordDefinition();
+    }
+  }
+
+  default boolean isDeletable() {
+    final AbstractRecordLayer layer = getLayer();
+    if (layer.isCanDeleteRecords()) {
+      return !isDeleted();
+    }
+    return false;
+  }
+
+  default boolean isDeleted() {
+    return getState() == RecordState.Deleted;
+  }
+
+  default boolean isGeometryEditable() {
+    return true;
+  }
+
+  default boolean isModified(final int index) {
+    final String fieldName = getFieldName(index);
+    return isModified(fieldName);
+  }
+
+  default boolean isModified(final String name) {
+    return false;
+  }
 
   default boolean isSame(final Record record) {
     if (record == null) {
@@ -48,15 +157,62 @@ public interface LayerRecord extends Record {
     }
   }
 
-  void postSaveDeleted();
+  @Override
+  default boolean isValid(final int index) {
+    if (getState() == RecordState.Initializing) {
+      return true;
+    } else {
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      final String name = recordDefinition.getFieldName(index);
+      return isValid(name);
+    }
+  }
 
-  void postSaveModified();
+  @Override
+  default boolean isValid(final String name) {
+    if (getState() == RecordState.Initializing) {
+      return true;
+    } else {
+      final FieldDefinition fieldDefinition = getFieldDefinition(name);
+      if (fieldDefinition != null && fieldDefinition.isRequired()) {
+        final Object value = getValue(name);
+        return fieldDefinition.isValid(value);
+      }
+      return true;
+    }
+  }
 
-  void postSaveNew();
+  default void postSaveDeleted() {
+  }
 
-  LayerRecord revertChanges();
+  default void postSaveModified() {
+    if (getState() == RecordState.Persisted) {
+      clearChanges();
+    }
+  }
 
-  void revertEmptyFields();
+  default void postSaveNew() {
+  }
 
-  void validate();
+  default LayerRecord revertChanges() {
+    return this;
+  }
+
+  default void revertEmptyFields() {
+    final AbstractRecordLayer layer = getLayer();
+    for (final String fieldName : getRecordDefinition().getFieldNames()) {
+      final Object value = getValue(fieldName);
+      if (Property.isEmpty(value)) {
+        if (!layer.isFieldUserReadOnly(fieldName)) {
+          final Object originalValue = getOriginalValue(fieldName);
+          if (!Property.isEmpty(originalValue)) {
+            setValue(fieldName, originalValue);
+          }
+        }
+      }
+    }
+  }
+
+  default void validate() {
+  }
 }

@@ -7,7 +7,6 @@ import javax.annotation.PreDestroy;
 
 import com.revolsys.beans.ObjectException;
 import com.revolsys.beans.ObjectPropertyException;
-import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
 import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbFieldDefinition;
@@ -61,31 +60,8 @@ public class FileGdbWriter extends AbstractRecordWriter {
   }
 
   private void delete(final Record record) {
-    final Object objectId = record.getValue("OBJECTID");
-    if (objectId != null) {
-      final RecordDefinition recordDefinition = record.getRecordDefinition();
-      final PathName typePath = recordDefinition.getPathName();
-      final Table table = getTable(typePath);
-      final String whereClause = "OBJECTID=" + objectId;
-      final EnumRows rows = this.recordStore.search(typePath, table, "OBJECTID", whereClause,
-        false);
-      if (rows != null) {
-        try {
-          final Row row = this.recordStore.nextRow(rows);
-          if (row != null) {
-            try {
-              this.recordStore.deleteRow(typePath, table, row);
-              record.setState(RecordState.Deleted);
-            } finally {
-              this.recordStore.closeRow(row);
-              this.recordStore.addStatistic("Delete", record);
-            }
-          }
-        } finally {
-          this.recordStore.closeEnumRows(rows);
-        }
-      }
-    }
+    final Table table = getTable(record);
+    this.recordStore.delete(table, record);
   }
 
   @Override
@@ -107,6 +83,13 @@ public class FileGdbWriter extends AbstractRecordWriter {
         this.tablesByCatalogPath.put(catalogPath, table);
       }
     }
+    return table;
+  }
+
+  private Table getTable(final Record record) {
+    final RecordDefinition recordDefinition = record.getRecordDefinition();
+    final PathName typePath = recordDefinition.getPathName();
+    final Table table = getTable(typePath);
     return table;
   }
 
@@ -182,41 +165,32 @@ public class FileGdbWriter extends AbstractRecordWriter {
       final PathName typePath = sourceRecordDefinition.getPathName();
       final Table table = getTable(typePath);
       final String whereClause = "OBJECTID=" + objectId;
-      final EnumRows rows = this.recordStore.search(typePath, table, "*", whereClause, true);
-      if (rows != null) {
-        try {
-          final Row row = this.recordStore.nextRow(rows);
-          if (row != null) {
-            try {
+      try (
+        final FileGdbEnumRowsIterator rows = this.recordStore.search(typePath, table, "*",
+          whereClause, false)) {
+        for (final Row row : rows) {
+          try {
+            for (final FieldDefinition field : recordDefinition.getFields()) {
+              final String name = field.getName();
               try {
-                for (final FieldDefinition field : recordDefinition.getFields()) {
-                  final String name = field.getName();
-                  try {
-                    final Object value = record.getValue(name);
-                    final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
-                    esriField.setUpdateValue(record, row, value);
-                  } catch (final Throwable e) {
-                    throw new ObjectPropertyException(record, name, e);
-                  }
-                }
-                this.recordStore.updateRow(typePath, table, row);
-              } finally {
-                this.recordStore.addStatistic("Update", record);
+                final Object value = record.getValue(name);
+                final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
+                esriField.setUpdateValue(record, row, value);
+              } catch (final Throwable e) {
+                throw new ObjectPropertyException(record, name, e);
               }
-            } catch (final ObjectException e) {
-              if (e.getObject() == record) {
-                throw e;
-              } else {
-                throw new ObjectException(record, e);
-              }
-            } catch (final Throwable e) {
-              throw new ObjectException(record, e);
-            } finally {
-              this.recordStore.closeRow(row);
             }
+            this.recordStore.updateRow(typePath, table, row);
+            this.recordStore.addStatistic("Update", record);
+          } catch (final ObjectException e) {
+            if (e.getObject() == record) {
+              throw e;
+            } else {
+              throw new ObjectException(record, e);
+            }
+          } catch (final Throwable e) {
+            throw new ObjectException(record, e);
           }
-        } finally {
-          this.recordStore.closeEnumRows(rows);
         }
       }
     }

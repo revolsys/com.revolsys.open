@@ -34,7 +34,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record>implements Record
     final RecordFactory recordFactory, final ResultSet resultSet) {
     final Record record = recordFactory.newRecord(recordDefinition);
     if (record != null) {
-      record.setState(RecordState.Initalizing);
+      record.setState(RecordState.Initializing);
       int columnIndex = 1;
       for (final FieldDefinition field : fields) {
         final JdbcFieldDefinition jdbcField = (JdbcFieldDefinition)field;

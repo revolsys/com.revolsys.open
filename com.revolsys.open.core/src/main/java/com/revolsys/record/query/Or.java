@@ -3,7 +3,8 @@ package com.revolsys.record.query;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+
+import com.revolsys.record.Record;
 
 public class Or extends AbstractMultiCondition {
 
@@ -35,7 +36,7 @@ public class Or extends AbstractMultiCondition {
   }
 
   @Override
-  public boolean test(final Map<String, Object> object) {
+  public boolean test(final Record object) {
     final List<Condition> conditions = (List)getQueryValues();
     if (conditions.isEmpty()) {
       return true;

@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import com.revolsys.equals.Equals;
+import com.revolsys.record.Record;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.RecordStore;
@@ -107,7 +107,7 @@ public class Function extends QueryValue {
     return Collections.unmodifiableList(this.parameters);
   }
 
-  public String getParameterStringValue(final int index, final Map<String, Object> record) {
+  public String getParameterStringValue(final int index, final Record record) {
     final QueryValue parameter = getParameter(index);
     if (parameter == null) {
       return null;
@@ -116,7 +116,7 @@ public class Function extends QueryValue {
     }
   }
 
-  public <V> V getParameterValue(final int index, final Map<String, Object> record) {
+  public <V> V getParameterValue(final int index, final Record record) {
     final QueryValue parameter = getParameter(index);
     if (parameter == null) {
       return null;
@@ -133,7 +133,7 @@ public class Function extends QueryValue {
   }
 
   @Override
-  public <V> V getValue(final Map<String, Object> record) {
+  public <V> V getValue(final Record record) {
     throw new UnsupportedOperationException("Function is not supported" + getName());
   }
 

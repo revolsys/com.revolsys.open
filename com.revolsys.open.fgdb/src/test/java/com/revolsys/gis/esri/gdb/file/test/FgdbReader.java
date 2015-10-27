@@ -21,6 +21,7 @@ import com.revolsys.gis.esri.gdb.file.test.field.ObjectIdField;
 import com.revolsys.gis.esri.gdb.file.test.field.ShortField;
 import com.revolsys.gis.esri.gdb.file.test.field.StringField;
 import com.revolsys.gis.esri.gdb.file.test.field.XmlField;
+import com.revolsys.identifier.Identifier;
 import com.revolsys.io.EndianInput;
 import com.revolsys.io.endian.EndianInputStream;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
@@ -116,7 +117,7 @@ public class FgdbReader {
       final byte[] nullFields = new byte[(int)opt];
       this.in.read(nullFields);
       final Record record = new ArrayRecord(this.recordDefinition);
-      record.setIdValue(objectId++);
+      record.setIdentifier(Identifier.create(objectId++));
       int fieldIndex = 0;
       int optionalFieldIndex = 0;
       final int idIndex = this.recordDefinition.getIdFieldIndex();

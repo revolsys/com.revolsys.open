@@ -45,8 +45,8 @@ public class RecordGeometryFilter<G extends Geometry> implements Predicate<Recor
 
   @Override
   @SuppressWarnings("unchecked")
-  public boolean test(final Record object) {
-    final G geometry = (G)object.getGeometry();
+  public boolean test(final Record record) {
+    final G geometry = (G)record.getGeometry();
     if (this.filter.test(geometry)) {
       return true;
     } else {

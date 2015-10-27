@@ -34,18 +34,18 @@ public class RunnableAction extends AbstractActionMainMenuItemFactory {
     final Runnable runnable) {
     final RunnableAction action = new RunnableAction(name, runnable);
     action.setCheckBox(true);
-    return (JCheckBoxMenuItem)action.createComponent();
+    return (JCheckBoxMenuItem)action.newComponent();
   }
 
   public static JMenuItem createMenuItem(final String name, final Icon icon,
     final Runnable runnable) {
     final RunnableAction action = new RunnableAction(name, icon, runnable);
-    return action.createComponent();
+    return action.newComponent();
   }
 
   public static JMenuItem createMenuItem(final String name, final Runnable runnable) {
     final RunnableAction action = new RunnableAction(name, runnable);
-    return action.createComponent();
+    return action.newComponent();
   }
 
   public static JMenuItem createMenuItem(final String name, final String iconName,
@@ -53,7 +53,7 @@ public class RunnableAction extends AbstractActionMainMenuItemFactory {
     final Icon icon = Icons.getIcon(iconName);
     final RunnableAction action = new RunnableAction(name, icon, runnable);
     action.setIconName(iconName);
-    return action.createComponent();
+    return action.newComponent();
   }
 
   private String iconName;

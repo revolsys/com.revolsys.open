@@ -390,6 +390,13 @@ import com.revolsys.util.OS;
 }
 %include "Table.h"
 
+%typemap(javainterfaces) FileGDBAPI::Row "java.io.Closeable"
+%typemap(javacode) FileGDBAPI::Row %{
+  public void close() {
+    delete();
+  }
+%}
+
 %ignore FileGDBAPI::Row::GetFieldInformation;
 %ignore FileGDBAPI::Row::IsNull;
 %ignore FileGDBAPI::Row::SetNull;
@@ -421,6 +428,7 @@ import com.revolsys.util.OS;
 %ignore FileGDBAPI::Row::SetXML;
 %ignore FileGDBAPI::Row::GetFields;
 %ignore FileGDBAPI::Row::getFields;
+
 %extend FileGDBAPI::Row {
   bool isNull(std::wstring name) {
     bool value;

@@ -22,6 +22,7 @@ package com.revolsys.record.schema;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
@@ -92,6 +93,8 @@ public interface RecordDefinition
    * @return The field names.
    */
   List<String> getFieldNames();
+
+  Set<String> getFieldNamesSet();
 
   List<FieldDefinition> getFields();
 

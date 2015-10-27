@@ -63,8 +63,6 @@ import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
-import com.revolsys.record.filter.RecordGeometryBoundingBoxIntersectsFilter;
-import com.revolsys.record.filter.RecordGeometryDistanceFilter;
 import com.revolsys.record.io.ListRecordReader;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.gpx.GpxWriter;
@@ -204,18 +202,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public static LayerRecord getAndRemoveSame(final Collection<? extends LayerRecord> records,
-    final LayerRecord record) {
-    for (final Iterator<? extends LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
-      final LayerRecord queryRecord = iterator.next();
-      if (queryRecord.isSame(record)) {
-        iterator.remove();
-        return queryRecord;
-      }
-    }
-    return null;
-  }
-
   public static List<AbstractRecordLayer> getVisibleLayers(final LayerGroup group) {
     final List<AbstractRecordLayer> layers = new ArrayList<AbstractRecordLayer>();
     addVisibleLayers(layers, group);
@@ -263,8 +249,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   private Set<AbstractProxyLayerRecord> proxyRecords = MapBackedSet
     .mapBackedSet(new WeakHashMap<AbstractProxyLayerRecord, Object>());
 
-  private Query query = new Query();
-
   private RecordDefinition recordDefinition;
 
   private RecordQuadTree selectedRecordsIndex;
@@ -276,6 +260,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   private Set<String> userReadOnlyFieldNames = new LinkedHashSet<>();
 
   private String where;
+
+  private Condition whereCondition = Condition.ALL;
 
   public AbstractRecordLayer() {
     this("");
@@ -566,7 +552,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     clone.selectedRecordsIndex = null;
     clone.proxyRecords = MapBackedSet
       .mapBackedSet(new WeakHashMap<AbstractProxyLayerRecord, Object>());
-    clone.query = this.query.clone();
+    clone.whereCondition = this.whereCondition.clone();
     clone.sync = new Object();
     clone.editSync = new Object();
     clone.userReadOnlyFieldNames = new LinkedHashSet<>(this.userReadOnlyFieldNames);
@@ -576,7 +562,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   @SuppressWarnings("unchecked")
   public <V extends LayerRecord> V copyRecord(final V record) {
-    final LayerRecord copy = createRecord(record);
+    final LayerRecord copy = newRecord(record);
     return (V)copy;
   }
 
@@ -694,31 +680,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return new SetObjectProperty(record, propertyName, oldValue, newValue);
   }
 
-  public LayerRecord createRecord() {
-    final Map<String, Object> values = Collections.emptyMap();
-    return createRecord(values);
-  }
-
-  public LayerRecord createRecord(final Map<String, Object> values) {
-    if (!isReadOnly() && isEditable() && isCanAddRecords()) {
-      final LayerRecord record = newRecord(getRecordDefinition());
-      record.setState(RecordState.Initalizing);
-      try {
-        if (values != null && !values.isEmpty()) {
-          record.setValuesByPath(values);
-          record.setIdValue(null);
-        }
-      } finally {
-        record.setState(RecordState.New);
-      }
-      addRecordToCache(this.cacheIdNew, record);
-      fireRecordInserted(record);
-      return record;
-    } else {
-      return null;
-    }
-  }
-
   public RecordLayerTablePanel createTablePanel(final Map<String, Object> config) {
     final RecordLayerTable table = RecordLayerTableModel.createTable(this);
     if (table == null) {
@@ -815,14 +776,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     "unchecked", "rawtypes"
   })
   protected List<LayerRecord> doQuery(final BoundingBox boundingBox) {
-    final double width = boundingBox.getWidth();
-    final double height = boundingBox.getHeight();
-    if (boundingBox.isEmpty() || width == 0 || height == 0) {
+    if (boundingBox.isEmpty()) {
       return Collections.emptyList();
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
-      final List<LayerRecord> records = (List)getIndex().queryIntersects(convertedBoundingBox);
+      final RecordQuadTree index = getIndex();
+      final List<LayerRecord> records = (List)index.queryIntersects(convertedBoundingBox);
       return records;
     }
   }
@@ -836,8 +796,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final RecordQuadTree index = getIndex();
     return (List)index.queryDistance(geometry, distance);
   }
-
-  protected abstract List<LayerRecord> doQuery(final Query query);
 
   protected List<LayerRecord> doQueryBackground(final BoundingBox boundingBox) {
     return doQuery(boundingBox);
@@ -915,44 +873,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   }
 
-  @SuppressWarnings("unchecked")
-  protected <V extends LayerRecord> List<V> filterQueryResults(final List<V> results,
-    final Predicate<Map<String, Object>> filter) {
-    final Collection<LayerRecord> modifiedRecords = getModifiedRecords();
-    for (final ListIterator<V> iterator = results.listIterator(); iterator.hasNext();) {
-      final LayerRecord record = iterator.next();
-      if (internalIsDeleted(record)) {
-        iterator.remove();
-      } else {
-        final V modifiedRecord = (V)getAndRemoveSame(modifiedRecords, record);
-        if (modifiedRecord != null) {
-          if (Condition.test(filter, modifiedRecord)) {
-            iterator.set(modifiedRecord);
-          } else {
-            iterator.remove();
-          }
-        }
-      }
-    }
-    for (final LayerRecord record : modifiedRecords) {
-      if (Condition.test(filter, record)) {
-        results.add((V)record);
-      }
-    }
-    for (final LayerRecord record : getNewRecords()) {
-      if (Condition.test(filter, record)) {
-        results.add((V)record);
-      }
-    }
-    return results;
-  }
-
-  protected <V extends LayerRecord> List<V> filterQueryResults(final List<V> results,
-    final Query query) {
-    final Condition filter = query.getWhereCondition();
-    return filterQueryResults(results, filter);
-  }
-
   protected void fireHighlighted() {
     final int highlightedCount = getHighlightedCount();
     final boolean highlighted = highlightedCount > 0;
@@ -984,8 +904,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   @SuppressWarnings("unchecked")
-  public <V extends LayerRecord> V getCachedRecord(final Identifier identifier) {
+  protected <V extends LayerRecord> V getCachedRecord(final Identifier identifier) {
     return (V)getRecordById(identifier);
+  }
+
+  @SuppressWarnings("unchecked")
+  protected <V extends LayerRecord> V getCachedRecord(final Record record) {
+    return (V)record;
   }
 
   public int getCachedRecordCount(final Label cacheId) {
@@ -1374,12 +1299,25 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
+  public int getPersistedRecordCount() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final Query query = new Query(recordDefinition);
+    return getPersistedRecordCount(query);
+  }
+
+  public int getPersistedRecordCount(final Query query) {
+    LoggerFactory.getLogger(getClass()).error("Get row count not implemented");
+    return 0;
+  }
+
   public List<AbstractProxyLayerRecord> getProxyRecords() {
     return new ArrayList<>(this.proxyRecords);
   }
 
-  public Query getQuery() {
-    return this.query.clone();
+  public final Query getQuery() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final Condition whereCondition = getWhereCondition();
+    return new Query(recordDefinition, whereCondition);
   }
 
   public LayerRecord getRecord(final int row) {
@@ -1388,6 +1326,18 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public LayerRecord getRecordById(final Identifier id) {
     return null;
+  }
+
+  /**
+   * Get the record count including any pending changes.
+   * @return
+   */
+  public int getRecordCount() {
+    return getNewRecordCount() + getPersistedRecordCount() - getDeletedRecordCount();
+  }
+
+  public int getRecordCount(final Query query) {
+    return 0;
   }
 
   public RecordDefinition getRecordDefinition() {
@@ -1400,17 +1350,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public RecordStore getRecordStore() {
     return getRecordDefinition().getRecordStore();
-  }
-
-  public int getRowCount() {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    final Query query = new Query(recordDefinition);
-    return getRowCount(query);
-  }
-
-  public int getRowCount(final Query query) {
-    LoggerFactory.getLogger(getClass()).error("Get row count not implemented");
-    return 0;
   }
 
   @Override
@@ -1467,11 +1406,24 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public String getWhere() {
-    return this.query.getWhere();
+    if (this.whereCondition.isEmpty()) {
+      return this.where;
+    } else {
+      return this.whereCondition.toFormattedString();
+    }
   }
 
   public Condition getWhereCondition() {
-    return this.query.getWhereCondition();
+    if (Property.hasValue(this.where)) {
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      if (recordDefinition == null) {
+        return Condition.ALL;
+      } else {
+        this.whereCondition = Condition.parseWhere(recordDefinition, this.where);
+        this.where = null;
+      }
+    }
+    return this.whereCondition;
   }
 
   public boolean hasFieldNamesSet(final String fieldNamesSetName) {
@@ -1660,7 +1612,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public boolean isEmpty() {
-    return getRowCount() + getNewRecordCount() <= 0;
+    return getPersistedRecordCount() + getNewRecordCount() <= 0;
   }
 
   public boolean isFieldUserReadOnly(final String fieldName) {
@@ -1799,6 +1751,31 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
+  public LayerRecord newRecord() {
+    final Map<String, Object> values = Collections.emptyMap();
+    return newRecord(values);
+  }
+
+  public LayerRecord newRecord(final Map<String, Object> values) {
+    if (!isReadOnly() && isEditable() && isCanAddRecords()) {
+      final LayerRecord record = newRecord(getRecordDefinition());
+      record.setState(RecordState.Initializing);
+      try {
+        if (values != null && !values.isEmpty()) {
+          record.setValuesByPath(values);
+          record.setIdentifier(null);
+        }
+      } finally {
+        record.setState(RecordState.New);
+      }
+      addRecordToCache(this.cacheIdNew, record);
+      fireRecordInserted(record);
+      return record;
+    } else {
+      return null;
+    }
+  }
+
   @Override
   public LayerRecord newRecord(final RecordDefinition recordDefinition) {
     if (recordDefinition.equals(getRecordDefinition())) {
@@ -1878,7 +1855,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           if (newValues.isEmpty()) {
             rejectedRecords.add(sourceRecord);
           } else {
-            newRecord = createRecord(newValues);
+            newRecord = newRecord(newValues);
           }
           if (newRecord == null) {
             rejectedRecords.add(sourceRecord);
@@ -1972,39 +1949,33 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
   public final List<LayerRecord> query(BoundingBox boundingBox) {
     if (hasGeometryField()) {
       final GeometryFactory geometryFactory = getGeometryFactory();
       boundingBox = boundingBox.convert(geometryFactory);
       final List<LayerRecord> results = doQuery(boundingBox);
-      final Predicate filter = new RecordGeometryBoundingBoxIntersectsFilter(boundingBox);
-      return filterQueryResults(results, filter);
+      return results;
     } else {
       return Collections.emptyList();
     }
   }
 
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
   public List<LayerRecord> query(final Geometry geometry, final double maxDistance) {
     if (hasGeometryField()) {
       final List<LayerRecord> results = doQuery(geometry, maxDistance);
-      final Predicate predicate = new RecordGeometryDistanceFilter(geometry, maxDistance);
-      return filterQueryResults(results, predicate);
+      return results;
     } else {
       return Collections.emptyList();
     }
   }
 
+  public List<LayerRecord> query(final PathName pathName) {
+    final Query query = new Query(pathName);
+    return query(query);
+  }
+
   public List<LayerRecord> query(final Query query) {
-    final List<LayerRecord> results = doQuery(query);
-    final Condition condition = query.getWhereCondition();
-    // TODO sorting
-    return filterQueryResults(results, condition);
+    return Collections.emptyList();
   }
 
   public final List<LayerRecord> queryBackground(BoundingBox boundingBox) {
@@ -2373,16 +2344,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public void setQuery(Query query) {
-    final Query oldQuery = this.query;
-    if (query == null) {
-      query = this.query.clone();
-      query.setWhereCondition(query.getWhereCondition());
-    }
-    this.query = query;
-    firePropertyChange("query", oldQuery, this.query);
-  }
-
   protected void setRecordDefinition(final RecordDefinition recordDefinition) {
     this.recordDefinition = recordDefinition;
     if (recordDefinition != null) {
@@ -2412,10 +2373,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         allFieldNames = new ArrayList<>(this.fieldNames);
       }
       this.fieldNamesSets.put(ALL.toUpperCase(), allFieldNames);
-      this.query.setRecordDefinition(recordDefinition);
       setWhere(this.where);
     }
-
   }
 
   protected void setSelectedHighlighted(final LayerRecord record, final boolean selected,
@@ -2498,23 +2457,21 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void setWhere(final String where) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
     this.where = where;
-    if (this.query.getRecordDefinition() != null) {
-      final Query query = this.query.clone();
-      query.setWhere(where);
-      setQuery(query);
+    if (recordDefinition != null) {
+      this.whereCondition = Condition.parseWhere(recordDefinition, where);
     }
   }
 
   public void setWhereCondition(final Condition whereCondition) {
-    final Query query = this.query.clone();
-    query.setWhereCondition(whereCondition);
-    setQuery(query);
+    this.where = null;
+    this.whereCondition = whereCondition;
   }
 
   public LayerRecord showAddForm(final Map<String, Object> parameters) {
     if (isCanAddRecords()) {
-      final LayerRecord newRecord = createRecord(parameters);
+      final LayerRecord newRecord = newRecord(parameters);
       final RecordLayerForm form = createForm(newRecord);
       if (form == null) {
         return null;
@@ -2714,12 +2671,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     MapSerializerUtil.add(map, "fieldNamesSets", getFieldNamesSets());
     MapSerializerUtil.add(map, "useFieldTitles", this.useFieldTitles);
     map.remove("filter");
-    if (this.query != null) {
-      final String where = this.query.getWhere();
-      if (Property.hasValue(where)) {
-        final SqlLayerFilter filter = new SqlLayerFilter(this, where);
-        MapSerializerUtil.add(map, "filter", filter);
-      }
+    String where;
+    if (this.whereCondition.isEmpty()) {
+      where = this.where;
+    } else {
+      where = this.whereCondition.toFormattedString();
+    }
+    if (Property.hasValue(where)) {
+      final SqlLayerFilter filter = new SqlLayerFilter(this, where);
+      MapSerializerUtil.add(map, "filter", filter);
     }
     return map;
   }

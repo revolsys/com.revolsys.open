@@ -3,12 +3,12 @@ package com.revolsys.record.query.functions;
 import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.equals.Equals;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.record.Record;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
@@ -79,8 +79,7 @@ public class EnvelopeIntersects extends Condition {
     return false;
   }
 
-  private BoundingBox getBoundingBox(final QueryValue queryValue,
-    final Map<String, Object> record) {
+  private BoundingBox getBoundingBox(final QueryValue queryValue, final Record record) {
     if (queryValue == null) {
       return null;
     } else {
@@ -110,7 +109,7 @@ public class EnvelopeIntersects extends Condition {
   }
 
   @Override
-  public boolean test(final Map<String, Object> record) {
+  public boolean test(final Record record) {
     final BoundingBox boundingBox1 = getBoundingBox(this.boundingBox1Value, record);
     final BoundingBox boundingBox2 = getBoundingBox(this.boundingBox2Value, record);
     if (boundingBox1 == null || boundingBox2 == null) {

@@ -69,7 +69,7 @@ public interface Identifier {
   }
 
   static TreeSet<Identifier> newTreeSet(final Iterable<Identifier> values) {
-    return Sets.tree(comparator(), values);
+    return Sets.newTree(comparator(), values);
   }
 
   static void setIdentifier(final Map<String, Object> record, final List<String> idFieldNames,
@@ -174,5 +174,17 @@ public interface Identifier {
 
   default void setIdentifier(final Record record) {
     setIdentifier(record, record.getRecordDefinition().getFieldNames());
+  }
+
+  default <V> V toSingleValue() {
+    final List<Object> values = getValues();
+    if (values.size() == 0) {
+      return null;
+    } else if (values.size() == 1) {
+      return (V)values.get(0);
+    } else {
+      throw new IllegalArgumentException(
+        "Cannot create value for identifier with multiple parts " + this);
+    }
   }
 }

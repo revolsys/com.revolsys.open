@@ -14,9 +14,8 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.Record;
+import com.revolsys.record.Records;
 import com.revolsys.record.filter.RecordEqualsFilter;
-import com.revolsys.record.filter.RecordGeometryBoundingBoxIntersectsFilter;
-import com.revolsys.record.filter.RecordGeometryDistanceFilter;
 import com.revolsys.record.filter.RecordGeometryIntersectsFilter;
 import com.revolsys.visitor.CreateListVisitor;
 
@@ -88,9 +87,8 @@ public class RecordQuadTree extends QuadTree<Record> {
     } else {
       BoundingBox boundingBox = geometry.getBoundingBox();
       boundingBox = boundingBox.expand(distance);
-      final RecordGeometryDistanceFilter filter = new RecordGeometryDistanceFilter(geometry,
-        distance);
-      return queryList(boundingBox, filter, filter);
+      final Predicate<Record> filter = Records.newFilter(geometry, distance);
+      return queryList(boundingBox, filter);
     }
   }
 
@@ -122,12 +120,12 @@ public class RecordQuadTree extends QuadTree<Record> {
   }
 
   public List<Record> queryIntersects(final BoundingBox boundingBox) {
-
-    final BoundingBox convertedBoundingBox = boundingBox.convert(getGeometryFactory());
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
     if (convertedBoundingBox.isEmpty()) {
       return Arrays.asList();
     } else {
-      final Predicate<Record> filter = new RecordGeometryBoundingBoxIntersectsFilter(boundingBox);
+      final Predicate<Record> filter = Records.newFilter(convertedBoundingBox);
       return queryList(convertedBoundingBox, filter);
     }
   }

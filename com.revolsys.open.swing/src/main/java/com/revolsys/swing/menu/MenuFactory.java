@@ -195,28 +195,28 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
   public void addMenuItem(final String groupName, final int index, final String title,
     final String iconName, final Runnable runnable) {
     final ImageIcon icon = Icons.getIcon(iconName);
-    final RunnableAction menuItem = createMenuItem(title, title, icon, null, runnable);
+    final RunnableAction menuItem = newMenuItem(title, title, icon, null, runnable);
     addComponentFactory(groupName, index, menuItem);
   }
 
   public void addMenuItem(final String groupName, final String title, final String iconName,
     final Runnable runnable) {
     final ImageIcon icon = Icons.getIcon(iconName);
-    final RunnableAction menuItem = createMenuItem(title, title, icon, null, runnable);
+    final RunnableAction menuItem = newMenuItem(title, title, icon, null, runnable);
     addComponentFactory(groupName, menuItem);
   }
 
   public void addMenuItem(final String groupName, final String title, final String toolTip,
     final String iconName, final Runnable runnable) {
     final ImageIcon icon = Icons.getIcon(iconName);
-    final RunnableAction menuItem = createMenuItem(title, toolTip, icon, null, runnable);
+    final RunnableAction menuItem = newMenuItem(title, toolTip, icon, null, runnable);
     addComponentFactory(groupName, menuItem);
   }
 
   public RunnableAction addMenuItemTitleIcon(final String groupName, final CharSequence name,
     final String iconName, final EnableCheck enableCheck, final Runnable runnable) {
     final ImageIcon icon = Icons.getIcon(iconName);
-    final RunnableAction action = createMenuItem(name, null, icon, enableCheck, runnable);
+    final RunnableAction action = newMenuItem(name, null, icon, enableCheck, runnable);
     addComponentFactory(groupName, action);
     return action;
   }
@@ -224,7 +224,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
   public RunnableAction addMenuItemTitleIcon(final String groupName, final CharSequence name,
     final String iconName, final Runnable runnable) {
     final ImageIcon icon = Icons.getIcon(iconName);
-    final RunnableAction action = createMenuItem(name, null, icon, null, runnable);
+    final RunnableAction action = newMenuItem(name, null, icon, null, runnable);
     addComponentFactory(groupName, action);
     return action;
   }
@@ -233,7 +233,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     final CharSequence name, final String iconName, final EnableCheck enableCheck,
     final Runnable runnable) {
     final ImageIcon icon = Icons.getIcon(iconName);
-    final RunnableAction action = createMenuItem(name, null, icon, enableCheck, runnable);
+    final RunnableAction action = newMenuItem(name, null, icon, enableCheck, runnable);
     addComponentFactory(groupName, index, action);
     return action;
   }
@@ -250,20 +250,20 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
   }
 
   @Override
-  public JMenu createComponent() {
-    return createJMenu();
+  public JMenu newComponent() {
+    return newJMenu();
   }
 
-  public JMenu createJMenu() {
-    return createJMenu(false);
+  public JMenu newJMenu() {
+    return newJMenu(false);
   }
 
-  public JMenu createJMenu(final boolean forceEnable) {
+  public JMenu newJMenu(final boolean forceEnable) {
     final String name = this.name;
-    return createJMenu(name, forceEnable);
+    return newJMenu(name, forceEnable);
   }
 
-  public JMenu createJMenu(final String name, final boolean forceEnable) {
+  public JMenu newJMenu(final String name, final boolean forceEnable) {
     final JMenu menu = new JMenu(name);
     if (this.enableCheck != null) {
       final boolean enabled = this.enableCheck.isEnabled();
@@ -279,7 +279,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
           menu.addSeparator();
         }
         for (final ComponentFactory<?> factory : factories) {
-          final Component component = factory.createComponent();
+          final Component component = factory.newComponent();
           if (component != null) {
             if (forceEnable) {
               component.setEnabled(true);
@@ -292,11 +292,11 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     return menu;
   }
 
-  public JPopupMenu createJPopupMenu() {
-    return createJPopupMenu(false);
+  public JPopupMenu newJPopupMenu() {
+    return newJPopupMenu(false);
   }
 
-  public JPopupMenu createJPopupMenu(final boolean forceEnable) {
+  public JPopupMenu newJPopupMenu(final boolean forceEnable) {
     final JPopupMenu menu = new JPopupMenu(this.name);
     if (this.enableCheck != null) {
       final boolean enabled = this.enableCheck.isEnabled();
@@ -310,7 +310,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
 
         for (final ComponentFactory<?> factory : factories) {
 
-          final Component component = factory.createComponent();
+          final Component component = factory.newComponent();
           if (component != null) {
             if (forceEnable) {
               component.setEnabled(true);
@@ -337,7 +337,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     return menu;
   }
 
-  public RunnableAction createMenuItem(final CharSequence name, final String toolTip,
+  public RunnableAction newMenuItem(final CharSequence name, final String toolTip,
     final Icon icon, final EnableCheck enableCheck, final Runnable runnable) {
     final RunnableAction action = new RunnableAction(name, toolTip, icon, runnable);
     action.setEnableCheck(enableCheck);
@@ -456,7 +456,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
 
   public void show(final Object source, final Component component, final int x, final int y) {
     setMenuSource(source);
-    final JPopupMenu menu = createJPopupMenu();
+    final JPopupMenu menu = newJPopupMenu();
     showMenu(menu, component, x, y);
   }
 

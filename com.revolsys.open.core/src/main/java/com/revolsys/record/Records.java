@@ -3,12 +3,14 @@ package com.revolsys.record;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.comparator.StringNumberComparator;
@@ -33,8 +35,8 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
-public final class Records {
-  public static BoundingBox boundingBox(final Iterable<Record> records) {
+public interface Records {
+  static BoundingBox boundingBox(final Iterable<Record> records) {
     BoundingBox boundingBox = BoundingBox.EMPTY;
     for (final Record record : records) {
       boundingBox = boundingBox.expandToInclude(boundingBox(record));
@@ -42,7 +44,7 @@ public final class Records {
     return boundingBox;
   }
 
-  public static BoundingBox boundingBox(final Record record) {
+  static BoundingBox boundingBox(final Record record) {
     if (record != null) {
       final Geometry geometry = record.getGeometry();
       if (geometry != null) {
@@ -52,8 +54,7 @@ public final class Records {
     return BoundingBox.EMPTY;
   }
 
-  public static int compareNullFirst(final Record record1, final Record record2,
-    final String fieldName) {
+  static int compareNullFirst(final Record record1, final Record record2, final String fieldName) {
     final Object value1 = getValue(record1, fieldName);
     final Object value2 = getValue(record2, fieldName);
     if (value1 == value2) {
@@ -69,7 +70,7 @@ public final class Records {
     }
   }
 
-  public static int compareNullFirst(final Record record1, final Record record2,
+  static int compareNullFirst(final Record record1, final Record record2,
     final String... fieldNames) {
     for (final String fieldName : fieldNames) {
       final Object value1 = getValue(record1, fieldName);
@@ -90,8 +91,7 @@ public final class Records {
     return 0;
   }
 
-  public static int compareNullLast(final Record record1, final Record record2,
-    final String fieldName) {
+  static int compareNullLast(final Record record1, final Record record2, final String fieldName) {
     final Object value1 = getValue(record1, fieldName);
     final Object value2 = getValue(record2, fieldName);
     if (value1 == value2) {
@@ -107,7 +107,7 @@ public final class Records {
     }
   }
 
-  public static int compareNullLast(final Record record1, final Record record2,
+  static int compareNullLast(final Record record1, final Record record2,
     final String... fieldNames) {
     for (final String fieldName : fieldNames) {
       final Object value1 = getValue(record1, fieldName);
@@ -128,9 +128,9 @@ public final class Records {
     return 0;
   }
 
-  public static Record copy(final RecordDefinition recordDefinition, final Record record) {
+  static Record copy(final RecordDefinition recordDefinition, final Record record) {
     final Record copy = new ArrayRecord(recordDefinition);
-    copy.setValues(record);
+    copy.setValuesClone(record);
     return copy;
   }
 
@@ -144,7 +144,7 @@ public final class Records {
    * @return The copied record.
    */
   @SuppressWarnings("unchecked")
-  public static <T extends Record> T copy(final T record, final Geometry geometry) {
+  static <T extends Record> T copy(final T record, final Geometry geometry) {
     final Geometry oldGeometry = record.getGeometry();
     final T newObject = (T)record.clone();
     newObject.setGeometryValue(geometry);
@@ -152,7 +152,7 @@ public final class Records {
     return newObject;
   }
 
-  public static double distance(final Record record1, final Record record2) {
+  static double distance(final Record record1, final Record record2) {
     if (record1 == null || record2 == null) {
       return Double.MAX_VALUE;
     } else {
@@ -166,8 +166,8 @@ public final class Records {
     }
   }
 
-  public static <D extends Record> List<D> filter(final Collection<D> records,
-    final Geometry geometry, final double maxDistance) {
+  static <D extends Record> List<D> filter(final Collection<D> records, final Geometry geometry,
+    final double maxDistance) {
     final List<D> results = new ArrayList<D>();
     for (final D record : records) {
       final Geometry recordGeometry = record.getGeometry();
@@ -179,7 +179,7 @@ public final class Records {
     return results;
   }
 
-  public static boolean getBoolean(final Record record, final String fieldName) {
+  static boolean getBoolean(final Record record, final String fieldName) {
     if (record == null) {
       return false;
     } else {
@@ -204,7 +204,7 @@ public final class Records {
     }
   }
 
-  public static Double getDouble(final Record record, final int attributeIndex) {
+  static Double getDouble(final Record record, final int attributeIndex) {
     final Number value = record.getValue(attributeIndex);
     if (value == null) {
       return null;
@@ -215,7 +215,7 @@ public final class Records {
     }
   }
 
-  public static Double getDouble(final Record record, final String fieldName) {
+  static Double getDouble(final Record record, final String fieldName) {
     final Number value = record.getValue(fieldName);
     if (value == null) {
       return null;
@@ -227,7 +227,7 @@ public final class Records {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T getFieldByPath(final Record record, final String path) {
+  static <T> T getFieldByPath(final Record record, final String path) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
 
     final String[] propertyPath = path.split("\\.");
@@ -275,7 +275,7 @@ public final class Records {
     return (T)propertyValue;
   }
 
-  public static List<Geometry> getGeometries(final Collection<?> records) {
+  static List<Geometry> getGeometries(final Collection<?> records) {
     final List<Geometry> geometries = new ArrayList<>();
     for (final Object record : records) {
       final Geometry geometry = unionGeometry(record);
@@ -286,7 +286,7 @@ public final class Records {
     return geometries;
   }
 
-  public static Geometry getGeometry(final Collection<?> records) {
+  static Geometry getGeometry(final Collection<?> records) {
     final List<Geometry> geometries = getGeometries(records);
     if (geometries.isEmpty()) {
       return GeometryFactory.floating3().geometry();
@@ -296,7 +296,7 @@ public final class Records {
     }
   }
 
-  public static <G extends Geometry> G getGeometry(final Record record) {
+  static <G extends Geometry> G getGeometry(final Record record) {
     if (record == null) {
       return null;
     } else {
@@ -304,7 +304,7 @@ public final class Records {
     }
   }
 
-  public static Set<Identifier> getIdentifiers(final Collection<? extends Record> records) {
+  static Set<Identifier> getIdentifiers(final Collection<? extends Record> records) {
     final Set<Identifier> identifiers = Identifier.newTreeSet();
     for (final Record record : records) {
       final Identifier identifier = record.getIdentifier();
@@ -315,8 +315,7 @@ public final class Records {
     return identifiers;
   }
 
-  public static List<Identifier> getIdentifiers(final Record record,
-    final Collection<String> fieldNames) {
+  static List<Identifier> getIdentifiers(final Record record, final Collection<String> fieldNames) {
     final List<Identifier> identifiers = new ArrayList<>();
     for (final String fieldName : fieldNames) {
       final Identifier identifier = record.getIdentifier(fieldName);
@@ -327,11 +326,11 @@ public final class Records {
     return identifiers;
   }
 
-  public static List<Identifier> getIdentifiers(final Record record, final String... fieldNames) {
+  static List<Identifier> getIdentifiers(final Record record, final String... fieldNames) {
     return getIdentifiers(record, Arrays.asList(fieldNames));
   }
 
-  public static Integer getInteger(final Record record, final String fieldName,
+  static Integer getInteger(final Record record, final String fieldName,
     final Integer defaultValue) {
     if (record == null) {
       return null;
@@ -347,7 +346,7 @@ public final class Records {
     }
   }
 
-  public static Long getLong(final Record record, final String fieldName) {
+  static Long getLong(final Record record, final String fieldName) {
     final Number value = record.getValue(fieldName);
     if (value == null) {
       return null;
@@ -358,7 +357,7 @@ public final class Records {
     }
   }
 
-  public static int getMax(final int max, final Record record, final String fieldName) {
+  static int getMax(final int max, final Record record, final String fieldName) {
     if (record != null) {
       final Integer value = record.getInteger(fieldName);
       if (value != null) {
@@ -370,7 +369,7 @@ public final class Records {
     return max;
   }
 
-  public static int getMin(final int min, final Record record, final String fieldName) {
+  static int getMin(final int min, final Record record, final String fieldName) {
     if (record != null) {
       final Integer value = record.getInteger(fieldName);
       if (value != null) {
@@ -382,7 +381,7 @@ public final class Records {
     return min;
   }
 
-  public static Record getObject(final RecordDefinition recordDefinition,
+  static Record getObject(final RecordDefinition recordDefinition,
     final Map<String, Object> values) {
     final Record record = new ArrayRecord(recordDefinition);
     for (final Entry<String, Object> entry : values.entrySet()) {
@@ -412,7 +411,7 @@ public final class Records {
     return record;
   }
 
-  public static List<Record> getObjects(final RecordDefinition recordDefinition,
+  static List<Record> getObjects(final RecordDefinition recordDefinition,
     final Collection<? extends Map<String, Object>> list) {
     final List<Record> records = new ArrayList<Record>();
     for (final Map<String, Object> map : list) {
@@ -422,7 +421,7 @@ public final class Records {
     return records;
   }
 
-  private static Object getValue(final Record record, final String fieldName) {
+  static Object getValue(final Record record, final String fieldName) {
     if (record == null || !Property.hasValue(fieldName)) {
       return null;
     } else {
@@ -430,7 +429,7 @@ public final class Records {
     }
   }
 
-  public static void mergeStringListValue(final Map<String, Object> record, final Record record1,
+  static void mergeStringListValue(final Map<String, Object> record, final Record record1,
     final Record record2, final String fieldName, final String separator) {
     final String value1 = record1.getString(fieldName);
     final String value2 = record2.getString(fieldName);
@@ -450,7 +449,7 @@ public final class Records {
     record.put(fieldName, value);
   }
 
-  public static void mergeValue(final Map<String, Object> record, final Record record1,
+  static void mergeValue(final Map<String, Object> record, final Record record1,
     final Record record2, final String fieldName, final String separator) {
     final String value1 = record1.getString(fieldName);
     final String value2 = record2.getString(fieldName);
@@ -467,12 +466,59 @@ public final class Records {
     record.put(fieldName, value);
   }
 
-  public static RecordDefinition newGeometryRecordDefinition() {
+  static Comparator<Record> newComparatorDistance(final Geometry geometry) {
+    return (record1, record2) -> {
+      if (record1 == record2) {
+        return 0;
+      } else {
+        final double distance1 = record1.distance(geometry);
+        final double distance2 = record2.distance(geometry);
+        int compare = Double.compare(distance1, distance2);
+        if (compare == 0) {
+          compare = record1.compareTo(record2);
+        }
+        return compare;
+      }
+    };
+  }
+
+  static <V extends Record> Predicate<V> newFilter(final BoundingBox boundingBox) {
+    return (record) -> {
+      if (record != null) {
+        try {
+          final Geometry geometry = record.getGeometry();
+          if (geometry != null) {
+            return geometry.intersects(boundingBox);
+          }
+        } catch (final Throwable t) {
+        }
+      }
+      return false;
+    };
+  }
+
+  static <V extends Record> Predicate<V> newFilter(final Geometry geometry,
+    final double maxDistance) {
+    return (record) -> {
+      if (record != null) {
+        final Geometry recordGeometry = record.getGeometry();
+        if (recordGeometry != null) {
+          final double distance = recordGeometry.distance(geometry, maxDistance);
+          if (distance <= maxDistance) {
+            return true;
+          }
+        }
+      }
+      return false;
+    };
+  }
+
+  static RecordDefinition newGeometryRecordDefinition() {
     final FieldDefinition geometryField = new FieldDefinition("geometry", DataTypes.GEOMETRY, true);
     return new RecordDefinitionImpl(PathName.newPathName("/Feature"), geometryField);
   }
 
-  public static void removeDeleted(final Collection<? extends Record> records) {
+  static void removeDeleted(final Collection<? extends Record> records) {
     for (final Iterator<? extends Record> iterator = records.iterator(); iterator.hasNext();) {
       final Record record = iterator.next();
       if (record == null || record.getState() == RecordState.Deleted) {
@@ -481,7 +527,7 @@ public final class Records {
     }
   }
 
-  public static void setValues(final Record target, final Record source,
+  static void setValues(final Record target, final Record source,
     final Collection<String> fieldNames, final Collection<String> ignoreFieldNames) {
     for (final String fieldName : fieldNames) {
       if (!ignoreFieldNames.contains(fieldName)) {
@@ -495,12 +541,12 @@ public final class Records {
     }
   }
 
-  public static Geometry unionGeometry(final Collection<?> records) {
+  static Geometry unionGeometry(final Collection<?> records) {
     final Geometry geometry = getGeometry(records);
     return geometry.union();
   }
 
-  public static Geometry unionGeometry(final Map<?, ?> map) {
+  static Geometry unionGeometry(final Map<?, ?> map) {
     Geometry union = null;
     for (final Entry<?, ?> entry : map.entrySet()) {
       final Object key = entry.getKey();
@@ -517,7 +563,7 @@ public final class Records {
     return union;
   }
 
-  public static Geometry unionGeometry(final Object object) {
+  static Geometry unionGeometry(final Object object) {
     if (object instanceof Geometry) {
       final Geometry geometry = (Geometry)object;
       return geometry;
@@ -528,13 +574,10 @@ public final class Records {
       final Collection<?> objects = (Collection<?>)object;
       return unionGeometry(objects);
     } else if (object instanceof Map) {
-      final Map<?, ?> map = (Map)object;
+      final Map<?, ?> map = (Map<?, ?>)object;
       return unionGeometry(map);
     } else {
       return null;
     }
-  }
-
-  private Records() {
   }
 }

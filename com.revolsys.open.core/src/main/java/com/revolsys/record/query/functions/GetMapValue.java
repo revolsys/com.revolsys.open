@@ -3,6 +3,7 @@ package com.revolsys.record.query.functions;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.record.Record;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.util.Property;
 
@@ -13,7 +14,7 @@ public class GetMapValue extends Function {
   }
 
   @Override
-  public <V> V getValue(final Map<String, Object> record) {
+  public <V> V getValue(final Record record) {
     final Map<String, ?> map = getParameterValue(0, record);
     final String key = getParameterStringValue(1, record);
     if (map == null || !Property.hasValue(key)) {

@@ -112,7 +112,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
   private static final long serialVersionUID = 1L;
 
-  private JButton addOkButton = RunnableAction.createButton("OK", () -> actionAddOk());
+  private JButton addOkButton = RunnableAction.createButton("OK", this::actionAddOk);
 
   private LayerRecord addRecord;
 

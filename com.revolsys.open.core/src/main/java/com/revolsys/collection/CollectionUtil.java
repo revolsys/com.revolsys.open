@@ -5,16 +5,23 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Predicate;
 
-public final class CollectionUtil {
-  public static <V> void addAllIfNotNull(final Collection<V> collection,
-    final Collection<V> values) {
+public interface CollectionUtil {
+  static <V> void addAll(final Collection<V> collection, final Iterable<V> values) {
+    if (values != null) {
+      for (final V value : values) {
+        collection.add(value);
+      }
+    }
+  }
+
+  static <V> void addAllIfNotNull(final Collection<V> collection, final Collection<V> values) {
     if (collection != null && values != null) {
       collection.addAll(values);
     }
 
   }
 
-  public static <V> boolean addIfNotNull(final Collection<V> collection, final V value) {
+  static <V> boolean addIfNotNull(final Collection<V> collection, final V value) {
     if (value == null) {
       return false;
     } else {
@@ -22,8 +29,7 @@ public final class CollectionUtil {
     }
   }
 
-  public static boolean containsAny(final Collection<?> collection1,
-    final Collection<?> collection2) {
+  static boolean containsAny(final Collection<?> collection1, final Collection<?> collection2) {
     for (final Object value : collection1) {
       if (collection2.contains(value)) {
         return true;
@@ -37,7 +43,7 @@ public final class CollectionUtil {
    * @param collection
    * @param filter
    */
-  public static <V, C extends Collection<V>> void filter(final Collection<V> collection,
+  static <V, C extends Collection<V>> void filter(final Collection<V> collection,
     final Predicate<V> filter) {
     for (final Iterator<V> iterator = collection.iterator(); iterator.hasNext();) {
       final V record = iterator.next();
@@ -47,7 +53,7 @@ public final class CollectionUtil {
     }
   }
 
-  public static <T> T get(final Collection<T> collection, final int index) {
+  static <T> T get(final Collection<T> collection, final int index) {
     int i = 0;
     for (final T object : collection) {
       if (i == index) {
@@ -59,8 +65,7 @@ public final class CollectionUtil {
     throw new ArrayIndexOutOfBoundsException(index);
   }
 
-  public static <K, V> int getCollectionSize(final Map<K, ? extends Collection<V>> map,
-    final K key) {
+  static <K, V> int getCollectionSize(final Map<K, ? extends Collection<V>> map, final K key) {
     final Collection<V> values = map.get(key);
     if (values == null) {
       return 0;
@@ -69,8 +74,7 @@ public final class CollectionUtil {
     }
   }
 
-  public static final String replaceProperties(final CharSequence string,
-    final Map<String, Object> properties) {
+  static String replaceProperties(final CharSequence string, final Map<String, Object> properties) {
     if (string == null) {
       return null;
     } else {
@@ -116,7 +120,7 @@ public final class CollectionUtil {
     }
   }
 
-  public static float[] toFloatArray(final double[] doubleArray) {
+  static float[] toFloatArray(final double[] doubleArray) {
     if (doubleArray == null) {
       return null;
     } else {
@@ -129,6 +133,4 @@ public final class CollectionUtil {
     }
   }
 
-  private CollectionUtil() {
-  }
 }

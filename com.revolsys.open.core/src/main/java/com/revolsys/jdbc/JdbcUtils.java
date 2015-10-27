@@ -101,7 +101,7 @@ public final class JdbcUtils {
 
   public static void appendWhere(final StringBuilder sql, final Query query) {
     final Condition where = query.getWhereCondition();
-    if (where != null && !where.isEmpty()) {
+    if (!where.isEmpty()) {
       sql.append(" WHERE ");
       final RecordDefinition recordDefinition = query.getRecordDefinition();
       if (recordDefinition == null) {
@@ -711,7 +711,7 @@ public final class JdbcUtils {
       }
     }
     final Condition where = query.getWhereCondition();
-    if (where != null) {
+    if (!where.isEmpty()) {
       where.appendParameters(index, statement);
     }
   }

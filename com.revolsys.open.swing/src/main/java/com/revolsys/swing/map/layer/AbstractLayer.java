@@ -621,7 +621,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
         final boolean exists = doInitialize();
         setExists(exists);
         if (exists && Property.getBoolean(this, "showTableView")) {
-          Invoke.later(() -> showTableView());
+          Invoke.later(this::showTableView);
         }
       } catch (final Throwable e) {
         Exceptions.log(getClass(), "Unable to initialize layer: " + getPath(), e);
@@ -1046,7 +1046,11 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   @Override
   public <C extends Component> C showTableView(final Map<String, Object> config) {
     final ProjectFrame projectFrame = ProjectFrame.get(this);
-    return projectFrame.addBottomTab(this, config);
+    if (projectFrame == null) {
+      return null;
+    } else {
+      return projectFrame.addBottomTab(this, config);
+    }
   }
 
   public void toggleEditable() {

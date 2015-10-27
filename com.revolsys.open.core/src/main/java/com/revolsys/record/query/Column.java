@@ -1,10 +1,10 @@
 package com.revolsys.record.query;
 
 import java.sql.PreparedStatement;
-import java.util.Map;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.equals.Equals;
+import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
@@ -59,7 +59,7 @@ public class Column extends QueryValue {
   }
 
   @Override
-  public String getStringValue(final Map<String, Object> record) {
+  public String getStringValue(final Record record) {
     final Object value = getValue(record);
     if (this.attribute == null) {
       return StringConverterRegistry.toString(value);
@@ -71,9 +71,9 @@ public class Column extends QueryValue {
 
   @Override
   @SuppressWarnings("unchecked")
-  public <V> V getValue(final Map<String, Object> record) {
+  public <V> V getValue(final Record record) {
     final String name = getName();
-    return (V)record.get(name);
+    return (V)record.getValue(name);
   }
 
   @Override

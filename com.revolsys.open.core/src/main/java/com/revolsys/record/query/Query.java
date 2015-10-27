@@ -123,37 +123,36 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
 
   private String typePathAlias;
 
-  private Condition whereCondition;
+  private Condition whereCondition = Condition.ALL;
 
   public Query() {
   }
 
   public Query(final PathName typePath) {
-    this.typeName = typePath;
+    this(typePath, null);
   }
 
   public Query(final PathName typePath, final Condition whereCondition) {
-    this(typePath);
-    this.whereCondition = whereCondition;
+    this.typeName = typePath;
+    setWhereCondition(whereCondition);
   }
 
   public Query(final RecordDefinition recordDefinition) {
-    this(recordDefinition.getPath());
-    this.recordDefinition = recordDefinition;
+    this(recordDefinition, null);
   }
 
   public Query(final RecordDefinition recordDefinition, final Condition whereCondition) {
-    this(recordDefinition);
+    this(recordDefinition.getPath());
+    this.recordDefinition = recordDefinition;
     setWhereCondition(whereCondition);
   }
 
   public Query(final String typePath) {
-    this.typeName = PathName.newPathName(typePath);
+    this(PathName.newPathName(typePath));
   }
 
-  public Query(final String typeName, final Condition whereCondition) {
-    this(typeName);
-    this.whereCondition = whereCondition;
+  public Query(final String typePath, final Condition whereCondition) {
+    this(PathName.newPathName(typePath), whereCondition);
   }
 
   public Query addOrderBy(final String column) {
@@ -173,7 +172,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
   public void and(final Condition condition) {
     if (condition != null) {
       final Condition whereCondition = getWhereCondition();
-      if (whereCondition == null) {
+      if (whereCondition.isEmpty()) {
         setWhereCondition(condition);
       } else if (whereCondition instanceof And) {
         final And and = (And)whereCondition;
@@ -260,11 +259,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
   }
 
   public String getWhere() {
-    if (this.whereCondition == null) {
-      return null;
-    } else {
-      return this.whereCondition.toFormattedString();
-    }
+    return this.whereCondition.toFormattedString();
   }
 
   public Condition getWhereCondition() {
@@ -277,7 +272,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
 
   public void or(final Condition condition) {
     final Condition whereCondition = getWhereCondition();
-    if (whereCondition == null) {
+    if (whereCondition.isEmpty()) {
       setWhereCondition(condition);
     } else if (whereCondition instanceof Or) {
       final Or or = (Or)whereCondition;
@@ -364,10 +359,14 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
   }
 
   public void setWhereCondition(final Condition whereCondition) {
-    this.whereCondition = whereCondition;
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    if (whereCondition != null && recordDefinition != null) {
-      whereCondition.setRecordDefinition(recordDefinition);
+    if (whereCondition == null) {
+      this.whereCondition = Condition.ALL;
+    } else {
+      this.whereCondition = whereCondition;
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      if (recordDefinition != null) {
+        whereCondition.setRecordDefinition(recordDefinition);
+      }
     }
   }
 

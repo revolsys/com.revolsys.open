@@ -10,6 +10,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStoreFactory;
+import com.revolsys.identifier.Identifier;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;
 import com.revolsys.record.ArrayRecord;
@@ -47,7 +48,7 @@ public class GeometryTest {
     recordStore.initialize();
     recordDefinition = (RecordDefinitionImpl)recordStore.getRecordDefinition(recordDefinition);
     final Record object = new ArrayRecord(recordDefinition);
-    object.setIdValue(1);
+    object.setIdentifier(Identifier.create(1));
     object.setGeometryValue(geometry);
 
     recordStore.insert(object);

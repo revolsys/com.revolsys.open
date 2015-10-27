@@ -5,7 +5,6 @@ import java.util.NoSuchElementException;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
 import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbFieldDefinition;
@@ -41,7 +40,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
   private FileGdbRecordStore recordStore;
 
-  private EnumRows rows;
+  private FileGdbEnumRowsIterator rows;
 
   private String sql;
 
@@ -109,7 +108,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
           this.recordDefinition = null;
           try {
             try {
-              this.recordStore.closeEnumRows(this.rows);
+              this.rows.close();
             } finally {
               this.recordStore.releaseTable(this.catalogPath);
             }
@@ -163,18 +162,13 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
   @Override
   protected synchronized Record getNext() throws NoSuchElementException {
     final FileGdbRecordStore recordStore = this.recordStore;
-    final EnumRows rows = this.rows;
+    final FileGdbEnumRowsIterator rows = this.rows;
     if (rows == null || this.closed) {
       throw new NoSuchElementException();
     } else {
       Row row = null;
       while (this.offset > 0 && this.count < this.offset) {
-        row = recordStore.nextRow(rows);
-        if (row == null) {
-          throw new NoSuchElementException();
-        } else {
-          recordStore.closeRow(row);
-        }
+        row = rows.next();
         this.count++;
         if (this.closed) {
           throw new NoSuchElementException();
@@ -183,36 +177,32 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
       if (this.count - this.offset >= this.limit) {
         throw new NoSuchElementException();
       }
-      row = recordStore.nextRow(rows);
+      row = rows.next();
       this.count++;
-      if (row == null) {
-        throw new NoSuchElementException();
-      } else {
-        try {
-          final Record record = this.recordFactory.newRecord(this.recordDefinition);
-          if (this.statistics == null) {
-            recordStore.addStatistic("query", record);
-          } else {
-            this.statistics.add(record);
-          }
-          record.setState(RecordState.Initalizing);
-          for (final FieldDefinition field : this.recordDefinition.getFields()) {
-            final String name = field.getName();
-            final AbstractFileGdbFieldDefinition esriFieldDefinition = (AbstractFileGdbFieldDefinition)field;
-            final Object value = esriFieldDefinition.getValue(row);
-            record.setValue(name, value);
-            if (this.closed) {
-              throw new NoSuchElementException();
-            }
-          }
-          record.setState(RecordState.Persisted);
+      try {
+        final Record record = this.recordFactory.newRecord(this.recordDefinition);
+        if (this.statistics == null) {
+          recordStore.addStatistic("query", record);
+        } else {
+          this.statistics.add(record);
+        }
+        record.setState(RecordState.Initializing);
+        for (final FieldDefinition field : this.recordDefinition.getFields()) {
+          final String name = field.getName();
+          final AbstractFileGdbFieldDefinition esriFieldDefinition = (AbstractFileGdbFieldDefinition)field;
+          final Object value = esriFieldDefinition.getValue(row);
+          record.setValue(name, value);
           if (this.closed) {
             throw new NoSuchElementException();
           }
-          return record;
-        } finally {
-          recordStore.closeRow(row);
         }
+        record.setState(RecordState.Persisted);
+        if (this.closed) {
+          throw new NoSuchElementException();
+        }
+        return record;
+      } finally {
+        recordStore.closeRow(row);
       }
     }
   }

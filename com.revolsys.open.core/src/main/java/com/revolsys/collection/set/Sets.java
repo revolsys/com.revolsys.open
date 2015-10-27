@@ -1,6 +1,7 @@
 package com.revolsys.collection.set;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -34,48 +35,10 @@ public class Sets {
     return set;
   }
 
-  public static <V> HashSet<V> hash(final Iterable<? extends V> values) {
-    final HashSet<V> set = new HashSet<>();
-    for (final V value : values) {
-      set.add(value);
-    }
-    return set;
-  }
-
-  public static <V> HashSet<V> hash(@SuppressWarnings("unchecked") final V... values) {
-    final HashSet<V> set = new HashSet<>();
-    for (final V value : values) {
-      set.add(value);
-    }
-    return set;
-  }
-
   public static <V> Supplier<Set<V>> hashFactory() {
     return () -> {
       return new HashSet<V>();
     };
-  }
-
-  public static <V> LinkedHashSet<V> linkedHash(final Iterable<? extends V> values) {
-    final LinkedHashSet<V> set = new LinkedHashSet<>();
-    addAll(set, values);
-    return set;
-  }
-
-  public static <V> LinkedHashSet<V> linkedHash(@SuppressWarnings("unchecked") final V... values) {
-    final LinkedHashSet<V> set = new LinkedHashSet<>();
-    for (final V value : values) {
-      set.add(value);
-    }
-    return set;
-  }
-
-  public static <V> LinkedHashSet<V> linkedHash(final V value) {
-    final LinkedHashSet<V> set = new LinkedHashSet<>();
-    if (value != null) {
-      set.add(value);
-    }
-    return set;
   }
 
   public static <V> Supplier<Set<V>> linkedHashFactory() {
@@ -84,13 +47,60 @@ public class Sets {
     };
   }
 
-  public static <V> TreeSet<V> tree(final Comparator<V> comparator, final Iterable<V> values) {
+  public static <V> HashSet<V> newHash() {
+    return new HashSet<>();
+  }
+
+  public static <V> HashSet<V> newHash(final Iterable<? extends V> values) {
+    final HashSet<V> set = new HashSet<>();
+    for (final V value : values) {
+      set.add(value);
+    }
+    return set;
+  }
+
+  public static <V> HashSet<V> newHash(@SuppressWarnings("unchecked") final V... values) {
+    final HashSet<V> set = newHash();
+    for (final V value : values) {
+      set.add(value);
+    }
+    return set;
+  }
+
+  public static <V> LinkedHashSet<V> newLinkedHash() {
+    return new LinkedHashSet<>();
+  }
+
+  public static <V> LinkedHashSet<V> newLinkedHash(final Iterable<? extends V> values) {
+    final LinkedHashSet<V> set = newLinkedHash();
+    addAll(set, values);
+    return set;
+  }
+
+  public static <V> LinkedHashSet<V> newLinkedHash(
+    @SuppressWarnings("unchecked") final V... values) {
+    final LinkedHashSet<V> set = new LinkedHashSet<>();
+    for (final V value : values) {
+      set.add(value);
+    }
+    return set;
+  }
+
+  public static <V> LinkedHashSet<V> newLinkedHash(final V value) {
+    final LinkedHashSet<V> set = new LinkedHashSet<>();
+    if (value != null) {
+      set.add(value);
+    }
+    return set;
+  }
+
+  public static <V> TreeSet<V> newTree(final Comparator<V> comparator, final Iterable<V> values) {
     final TreeSet<V> set = new TreeSet<>(comparator);
     addAll(set, values);
     return set;
   }
 
-  public static <V> TreeSet<V> tree(final V value) {
+  public static <V> TreeSet<V> newTree(final V value) {
     final TreeSet<V> set = new TreeSet<>();
     if (value != null) {
       set.add(value);
@@ -109,5 +119,14 @@ public class Sets {
     return () -> {
       return new TreeSet<V>();
     };
+  }
+
+  public static <V> Set<V> unmodifiableLinked(final Iterable<V> values) {
+    if (values == null) {
+      return Collections.emptySet();
+    } else {
+      final Set<V> set = newLinkedHash(values);
+      return Collections.unmodifiableSet(set);
+    }
   }
 }

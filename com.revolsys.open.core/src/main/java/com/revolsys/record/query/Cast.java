@@ -1,9 +1,9 @@
 package com.revolsys.record.query;
 
 import java.sql.PreparedStatement;
-import java.util.Map;
 
 import com.revolsys.equals.Equals;
+import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordStore;
 
 public class Cast extends QueryValue {
@@ -53,7 +53,7 @@ public class Cast extends QueryValue {
   }
 
   @Override
-  public String getStringValue(final Map<String, Object> record) {
+  public String getStringValue(final Record record) {
     return this.value.getStringValue(record);
   }
 
@@ -62,7 +62,7 @@ public class Cast extends QueryValue {
   }
 
   @Override
-  public <V> V getValue(final Map<String, Object> record) {
+  public <V> V getValue(final Record record) {
     return this.value.getValue(record);
   }
 

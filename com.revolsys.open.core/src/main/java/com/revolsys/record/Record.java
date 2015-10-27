@@ -7,17 +7,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.collection.map.MapDefault;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.datatype.DataType;
 import com.revolsys.equals.Equals;
-import com.revolsys.equals.EqualsInstance;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.identifier.Identifiable;
@@ -33,12 +32,9 @@ import com.revolsys.record.schema.RecordDefinitionFactory;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public interface Record extends Map<String, Object>, Comparable<Record>, Identifiable {
-  /**
-   * Construct a new clone of the data record.
-   *
-   * @return The data record.
-   */
+public interface Record extends MapDefault<String, Object>, Comparable<Record>, Identifiable {
+  String EVENT_RECORD_CHANGED = "_recordChanged";
+
   Record clone();
 
   @Override
@@ -84,6 +80,16 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
 
   default void delete() {
     getRecordDefinition().delete(this);
+  }
+
+  default double distance(final Geometry geometry) {
+    final Geometry recordGeometry = getGeometry();
+    if (Property.isEmpty(geometry) || Property.isEmpty(recordGeometry)) {
+      return Double.NaN;
+    } else {
+      final double distance = recordGeometry.distance(geometry);
+      return distance;
+    }
   }
 
   @Override
@@ -202,6 +208,26 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
   default FieldDefinition getFieldDefinition(final int fieldIndex) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return recordDefinition.getField(fieldIndex);
+  }
+
+  default FieldDefinition getFieldDefinition(final String fieldName) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return recordDefinition.getField(fieldName);
+  }
+
+  default List<FieldDefinition> getFieldDefinitions() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return recordDefinition.getFields();
+  }
+
+  default int getFieldIndex(final String fieldName) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return recordDefinition.getFieldIndex(fieldName);
+  }
+
+  default String getFieldName(final int fieldIndex) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return recordDefinition.getFieldName(fieldIndex);
   }
 
   default String getFieldTitle(final String name) {
@@ -367,7 +393,9 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
     }
   }
 
-  RecordState getState();
+  default RecordState getState() {
+    return RecordState.New;
+  }
 
   default String getString(final CharSequence name) {
     final Object value = getValue(name);
@@ -568,7 +596,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
 
   @Override
   default Set<String> keySet() {
-    return new LinkedHashSet<>(getRecordDefinition().getFieldNames());
+    return getRecordDefinition().getFieldNamesSet();
   }
 
   @Override
@@ -576,6 +604,11 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
     final Object oldValue = getValue(key);
     setValue(key, value);
     return oldValue;
+  }
+
+  @Override
+  default void putAll(final Map<? extends String, ? extends Object> values) {
+    setValues(values);
   }
 
   @Override
@@ -618,7 +651,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
     final RecordDefinition recordDefinition = getRecordDefinition();
     final int index = recordDefinition.getIdFieldIndex();
     final RecordState state = getState();
-    if (state == RecordState.New || state == RecordState.Initalizing) {
+    if (state == RecordState.New || state == RecordState.Initializing) {
       setValue(index, id);
     } else {
       final Object oldId = getValue(index);
@@ -755,40 +788,35 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
   }
 
   default void setValues(final Map<? extends String, ? extends Object> values) {
-    if (values != null) {
-      for (final String name : new ArrayList<>(values.keySet())) {
-        final Object value = values.get(name);
-        setValue(name, value);
-      }
+    if (values instanceof Record) {
+      final Record record = (Record)values;
+      setValues(record);
+    } else if (values != null) {
+      setValues(values, new ArrayList<>(values.keySet()));
     }
   }
 
-  default void setValues(final Map<? extends String, ? extends Object> record,
+  default void setValues(final Map<? extends String, ? extends Object> values,
     final Collection<String> fieldNames) {
     for (final String fieldName : fieldNames) {
-      final Object oldValue = getValue(fieldName);
-      Object newValue = record.get(fieldName);
-      if (!EqualsInstance.INSTANCE.equals(oldValue, newValue)) {
-        newValue = JavaBeanUtil.clone(newValue);
-        setValue(fieldName, newValue);
-      }
+      final Object newValue = values.get(fieldName);
+      final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
+      fieldDefinition.setValue(this, newValue);
     }
   }
 
-  default void setValues(final Map<? extends String, ? extends Object> record,
+  default void setValues(final Map<? extends String, ? extends Object> values,
     final String... fieldNames) {
-    setValues(record, Arrays.asList(fieldNames));
+    setValues(values, Arrays.asList(fieldNames));
   }
 
   default void setValues(final Record record) {
-    for (final FieldDefinition fieldDefintion : getRecordDefinition().getFields()) {
+    final List<FieldDefinition> fields = getFieldDefinitions();
+    for (final FieldDefinition fieldDefintion : fields) {
       final String name = fieldDefintion.getName();
-      Object value = record.getValue(name);
-      value = StringConverterRegistry.toObject(fieldDefintion.getType(), value);
-      value = JavaBeanUtil.clone(value);
-      setValue(name, value);
+      final Object value = record.getValue(name);
+      fieldDefintion.setValue(record, value);
     }
-    setGeometryValue(JavaBeanUtil.clone(record.getGeometry()));
   }
 
   default void setValuesByPath(final Map<? extends String, ? extends Object> values) {
@@ -802,9 +830,19 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
     }
   }
 
+  default void setValuesClone(final Record record) {
+    final List<FieldDefinition> fields = getFieldDefinitions();
+    for (final FieldDefinition fieldDefintion : fields) {
+      final String name = fieldDefintion.getName();
+      final Object value = record.getValue(name);
+      fieldDefintion.setValueClone(record, value);
+    }
+  }
+
   @Override
   default int size() {
-    return getRecordDefinition().getFieldCount();
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return recordDefinition.getFieldCount();
   }
 
   default void validateField(final int fieldIndex) {

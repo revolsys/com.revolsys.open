@@ -3,6 +3,7 @@ package com.revolsys.record;
 import java.util.Arrays;
 import java.util.List;
 
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 
@@ -61,7 +62,7 @@ public class FixedValueRecord extends BaseRecord {
   }
 
   @Override
-  public boolean setValue(final int index, final Object value) {
+  protected boolean setValue(final FieldDefinition fieldDefinition, final Object value) {
     return false;
   }
 }

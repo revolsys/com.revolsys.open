@@ -13,7 +13,6 @@ import org.apache.log4j.Logger;
 import com.revolsys.equals.Equals;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.record.query.Query;
 import com.revolsys.swing.parallel.Invoke;
 
 public class BoundingBoxRecordLayer extends AbstractRecordLayer {
@@ -78,11 +77,6 @@ public class BoundingBoxRecordLayer extends AbstractRecordLayer {
       }
       return (List)getIndex().queryIntersects(boundingBox);
     }
-  }
-
-  @Override
-  protected List<LayerRecord> doQuery(final Query query) {
-    return Collections.emptyList();
   }
 
   @Override

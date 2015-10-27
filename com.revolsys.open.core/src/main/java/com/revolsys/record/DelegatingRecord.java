@@ -1,12 +1,32 @@
 package com.revolsys.record;
 
-import com.revolsys.record.schema.RecordDefinition;
+import java.util.AbstractMap;
+import java.util.Set;
 
-public class DelegatingRecord extends AbstractRecord {
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.util.JavaBeanUtil;
+
+public class DelegatingRecord extends AbstractMap<String, Object>implements Record {
   private final Record record;
 
   public DelegatingRecord(final Record record) {
     this.record = record;
+  }
+
+  @Override
+  public Record clone() {
+    Record clone = JavaBeanUtil.clone(this.record);
+    return new DelegatingRecord(clone);
+  }
+
+  @Override
+  public int compareTo(final Record o) {
+    return this.record.compareTo(o);
+  }
+
+  @Override
+  public Set<java.util.Map.Entry<String, Object>> entrySet() {
+    return this.record.entrySet();
   }
 
   @Override

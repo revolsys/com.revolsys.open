@@ -28,7 +28,7 @@ public class ComponentComponentFactory implements ComponentFactory<Component> {
   }
 
   @Override
-  public Component createComponent() {
+  public Component newComponent() {
     return this.component;
   }
 

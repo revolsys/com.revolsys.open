@@ -503,7 +503,7 @@ public class OgrRecordStore extends AbstractRecordStore {
   protected StringBuilder getWhereClause(final Query query) {
     final StringBuilder whereClause = new StringBuilder();
     final Condition whereCondition = query.getWhereCondition();
-    if (whereCondition != null) {
+    if (!whereCondition.isEmpty()) {
       appendQueryValue(query, whereClause, whereCondition);
     }
     return whereClause;

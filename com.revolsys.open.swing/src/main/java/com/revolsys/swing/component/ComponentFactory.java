@@ -10,7 +10,7 @@ public interface ComponentFactory<T extends Component> extends Cloneable {
 
   void close(Component component);
 
-  T createComponent();
+  T newComponent();
 
   Icon getIcon();
 

@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PreDestroy;
@@ -21,6 +22,7 @@ import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.map.WeakCache;
+import com.revolsys.collection.set.Sets;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -70,6 +72,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   private final Map<String, FieldDefinition> fieldMap = new HashMap<>();
 
   private List<String> fieldNames = Collections.emptyList();
+
+  private Set<String> fieldNamesSet = Collections.emptySet();
 
   private List<FieldDefinition> fields = Collections.emptyList();
 
@@ -208,6 +212,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     }
     this.internalFieldNames.add(name);
     this.fieldNames = Lists.unmodifiable(this.internalFieldNames);
+    this.fieldNamesSet = Sets.unmodifiableLinked(this.internalFieldNames);
     this.internalFields.add(field);
     this.fields = Lists.unmodifiable(this.internalFields);
     this.fieldMap.put(lowerName, field);
@@ -325,6 +330,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     this.fields = Collections.emptyList();
     this.internalFields.clear();
     this.fieldNames = Collections.emptyList();
+    this.fieldNamesSet = Collections.emptySet();
     this.codeTableByFieldNameMap.clear();
     this.recordFactory = null;
     this.recordDefinitionFactory = new RecordDefinitionFactoryImpl();
@@ -448,6 +454,10 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   @Override
   public List<String> getFieldNames() {
     return this.fieldNames;
+  }
+
+  public Set<String> getFieldNamesSet() {
+    return this.fieldNamesSet;
   }
 
   @Override

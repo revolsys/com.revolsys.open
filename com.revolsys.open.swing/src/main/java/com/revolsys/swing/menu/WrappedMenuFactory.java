@@ -27,8 +27,8 @@ public class WrappedMenuFactory implements ComponentFactory<JMenuItem> {
   }
 
   @Override
-  public JMenuItem createComponent() {
-    return this.menuFactory.createJMenu(this.name, false);
+  public JMenuItem newComponent() {
+    return this.menuFactory.newJMenu(this.name, false);
   }
 
   @Override

@@ -4,15 +4,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.PathName;
+import com.revolsys.predicate.Predicates;
+import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.Records;
-import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
@@ -66,17 +68,9 @@ public class ListRecordLayer extends AbstractRecordLayer {
     return clone;
   }
 
-  @Override
-  public LayerRecord createRecord(final Map<String, Object> values) {
-    final LayerRecord record = super.createRecord(values);
-    addToIndex(record);
-    fireEmpty();
-    return record;
-  }
-
   protected void createRecordInternal(final Map<String, Object> values) {
     final LayerRecord record = newRecord(getRecordDefinition());
-    record.setState(RecordState.Initalizing);
+    record.setState(RecordState.Initializing);
     try {
       record.setValues(values);
     } finally {
@@ -115,22 +109,6 @@ public class ListRecordLayer extends AbstractRecordLayer {
     saveChanges(record);
     refreshBoundingBox();
     fireEmpty();
-  }
-
-  @Override
-  protected List<LayerRecord> doQuery(final Query query) {
-    final Condition whereCondition = query.getWhereCondition();
-    if (whereCondition == null) {
-      return new ArrayList<>(this.records);
-    } else {
-      final List<LayerRecord> records = new ArrayList<>();
-      for (final LayerRecord record : new ArrayList<>(this.records)) {
-        if (whereCondition.test(record)) {
-          records.add(record);
-        }
-      }
-      return records;
-    }
   }
 
   @Override
@@ -178,6 +156,19 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
+  public int getPersistedRecordCount() {
+    synchronized (this.records) {
+      return this.records.size();
+    }
+  }
+
+  @Override
+  public int getPersistedRecordCount(final Query query) {
+    final List<LayerRecord> results = query(query);
+    return results.size();
+  }
+
+  @Override
   public LayerRecord getRecord(final int index) {
     if (index < 0) {
       return null;
@@ -186,6 +177,12 @@ public class ListRecordLayer extends AbstractRecordLayer {
         return this.records.get(index);
       }
     }
+  }
+
+  @Override
+  public int getRecordCount(final Query query) {
+    final Predicate<Record> filter = query.getWhereCondition();
+    return Predicates.count(this.records, filter);
   }
 
   @Override
@@ -198,21 +195,28 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public int getRowCount() {
-    synchronized (this.records) {
-      return this.records.size();
-    }
-  }
-
-  @Override
-  public int getRowCount(final Query query) {
-    final List<LayerRecord> results = query(query);
-    return results.size();
-  }
-
-  @Override
   public boolean isEmpty() {
-    return getRowCount() + super.getNewRecordCount() <= 0;
+    return getPersistedRecordCount() + super.getNewRecordCount() <= 0;
+  }
+
+  @Override
+  public LayerRecord newRecord(final Map<String, Object> values) {
+    final LayerRecord record = super.newRecord(values);
+    addToIndex(record);
+    fireEmpty();
+    return record;
+  }
+
+  @Override
+  public List<LayerRecord> query(final Query query) {
+    final List<LayerRecord> records = new ArrayList<>();
+    final Predicate<Record> filter = query.getWhereCondition();
+    for (final LayerRecord record : new ArrayList<>(this.records)) {
+      if (filter.test(record)) {
+        records.add(record);
+      }
+    }
+    return records;
   }
 
   protected void refreshBoundingBox() {

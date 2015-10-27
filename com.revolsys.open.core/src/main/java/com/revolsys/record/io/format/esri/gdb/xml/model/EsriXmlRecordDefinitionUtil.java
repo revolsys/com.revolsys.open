@@ -9,6 +9,7 @@ import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.identifier.Identifier;
 import com.revolsys.io.Path;
 import com.revolsys.io.PathName;
 import com.revolsys.record.ArrayRecord;
@@ -377,7 +378,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
     final List<Record> values = new ArrayList<Record>();
     for (final CodedValue codedValue : domain.getCodedValues()) {
       final Record value = new ArrayRecord(recordDefinition);
-      value.setIdValue(codedValue.getCode());
+      value.setIdentifier(Identifier.create(codedValue.getCode()));
       value.setValue("DESCRIPTION", codedValue.getName());
       values.add(value);
     }

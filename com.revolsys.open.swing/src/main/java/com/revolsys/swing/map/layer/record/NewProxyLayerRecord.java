@@ -18,9 +18,9 @@ public class NewProxyLayerRecord extends AbstractProxyLayerRecord {
   public NewProxyLayerRecord(final RecordStoreLayer layer, final Map<String, Object> values) {
     super(layer);
     this.record = new ArrayLayerRecord(layer, values);
-    this.record.setState(RecordState.Initalizing);
+    this.record.setState(RecordState.Initializing);
     try {
-      this.record.setIdValue(null);
+      this.record.setIdentifier(null);
     } finally {
       this.record.setState(RecordState.New);
     }

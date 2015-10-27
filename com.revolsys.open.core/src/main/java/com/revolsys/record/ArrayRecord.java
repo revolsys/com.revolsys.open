@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.revolsys.equals.EqualsInstance;
 import com.revolsys.identifier.SingleIdentifier;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Property;
 
@@ -107,26 +108,27 @@ public class ArrayRecord extends BaseRecord {
    * @param value The new value.
    */
   @Override
-  public boolean setValue(final int index, Object value) {
+  protected boolean setValue(final FieldDefinition fieldDefinition, Object value) {
     boolean updated = false;
-    if (index >= 0) {
-      if (value instanceof String) {
-        final String string = (String)value;
-        if (!Property.hasValue(string)) {
-          value = null;
-        }
+    if (value instanceof String) {
+      final String string = (String)value;
+      if (!Property.hasValue(string)) {
+        value = null;
       }
-      if (value instanceof SingleIdentifier) {
-        final SingleIdentifier identifier = (SingleIdentifier)value;
-        value = identifier.getValue(0);
-      }
-      final Object oldValue = this.values[index];
-      if (!EqualsInstance.INSTANCE.equals(oldValue, value)) {
-        updated = true;
-        updateState();
-      }
-      this.values[index] = value;
     }
+    if (value instanceof SingleIdentifier) {
+      final SingleIdentifier identifier = (SingleIdentifier)value;
+      value = identifier.getValue(0);
+    }
+    final Object newValue = fieldDefinition.toFieldValue(value);
+    final int index = fieldDefinition.getIndex();
+    final Object oldValue = this.values[index];
+    // TODO change to type equals
+    if (!EqualsInstance.INSTANCE.equals(oldValue, newValue)) {
+      updated = true;
+      updateState();
+    }
+    this.values[index] = newValue;
     return updated;
   }
 }

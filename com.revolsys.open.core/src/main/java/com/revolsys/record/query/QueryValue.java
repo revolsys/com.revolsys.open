@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import com.akiban.sql.parser.BetweenOperatorNode;
 import com.akiban.sql.parser.BinaryArithmeticOperatorNode;
@@ -37,6 +36,7 @@ import com.akiban.sql.parser.ValueNodeList;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.functions.EnvelopeIntersects;
 import com.revolsys.record.query.functions.Function;
@@ -389,12 +389,12 @@ public abstract class QueryValue implements Cloneable {
     return Collections.emptyList();
   }
 
-  public String getStringValue(final Map<String, Object> record) {
+  public String getStringValue(final Record record) {
     final Object value = getValue(record);
     return StringConverterRegistry.toString(value);
   }
 
-  public abstract <V> V getValue(Map<String, Object> record);
+  public abstract <V> V getValue(Record record);
 
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
     for (final QueryValue queryValue : getQueryValues()) {

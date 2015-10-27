@@ -28,11 +28,15 @@ public abstract class AbstractMultipleIterator<T> extends AbstractIterator<T> {
       if (this.iterator == null) {
         this.iterator = getNextIterator();
       }
-      while (!this.iterator.hasNext()) {
-        this.iterator.close();
+      while (this.iterator != null && !this.iterator.hasNext()) {
+        FileUtil.closeSilent(this.iterator);
         this.iterator = getNextIterator();
       }
-      return this.iterator.next();
+      if (this.iterator == null) {
+        throw new NoSuchElementException();
+      } else {
+        return this.iterator.next();
+      }
     } catch (final NoSuchElementException e) {
       this.iterator = null;
       throw e;

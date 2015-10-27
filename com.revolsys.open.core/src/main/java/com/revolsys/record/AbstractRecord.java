@@ -1,12 +1,8 @@
 package com.revolsys.record;
 
-import java.util.AbstractMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import com.revolsys.record.schema.FieldDefinition;
 
-public abstract class AbstractRecord extends AbstractMap<String, Object>
-  implements Record, Cloneable {
+public abstract class AbstractRecord implements Record, Cloneable {
   /**
    * Construct a new clone of the object.
    *
@@ -24,24 +20,8 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   }
 
   @Override
-  public Set<Entry<String, Object>> entrySet() {
-    return new RecordEntrySet(this);
-  }
-
-  @Override
   public boolean equals(final Object o) {
     return this == o;
-  }
-
-  @Override
-  public Object get(final Object key) {
-    // Don't remove this speeds up field access
-    if (key instanceof CharSequence) {
-      final CharSequence name = (String)key;
-      return getValue(name);
-    } else {
-      return null;
-    }
   }
 
   @Override
@@ -49,46 +29,20 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
     return System.identityHashCode(this);
   }
 
-  @Override
-  public Set<String> keySet() {
-    // Don't remove this speeds up field access
-    return new LinkedHashSet<>(getRecordDefinition().getFieldNames());
-  }
+  protected abstract boolean setValue(FieldDefinition fieldDefinition, Object value);
 
   @Override
-  public Object put(final String key, final Object value) {
-    // Don't remove this speeds up field access
-    final Object oldValue = getValue(key);
-    setValue(key, value);
-    return oldValue;
-  }
-
-  @Override
-  public void putAll(final Map<? extends String, ? extends Object> values) {
-    // Don't remove this speeds up field access
-    setValues(values);
-  }
-
-  @Override
-  public Object remove(final Object key) {
-    // Don't remove this speeds up field access
-    if (key instanceof CharSequence) {
-      final CharSequence name = (CharSequence)key;
-      final Object value = getValue(name);
-      setValue(name, null);
-      return value;
+  public final boolean setValue(final int fieldIndex, final Object value) {
+    final FieldDefinition fieldDefinition = getFieldDefinition(fieldIndex);
+    if (fieldDefinition == null) {
+      return false;
+    } else {
+      return setValue(fieldDefinition, value);
     }
-    return null;
-  }
-
-  @Override
-  public int size() {
-    // Don't remove this speeds up field access
-    return getRecordDefinition().getFieldCount();
   }
 
   /**
-   * Return a String representation of the Object. There is no guarantee as to
+   * Return a String representation of the record. There is no guarantee as to
    * the format of this string.
    *
    * @return The string value.

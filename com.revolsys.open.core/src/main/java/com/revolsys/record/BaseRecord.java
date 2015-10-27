@@ -11,7 +11,7 @@ public abstract class BaseRecord extends AbstractRecord implements Serializable 
 
   private transient RecordDefinition recordDefinition;
 
-  protected RecordState state = RecordState.Initalizing;
+  protected RecordState state = RecordState.Initializing;
 
   public BaseRecord(final RecordDefinition recordDefinition) {
     this.recordDefinition = recordDefinition;

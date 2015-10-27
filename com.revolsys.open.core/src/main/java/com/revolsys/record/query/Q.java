@@ -129,40 +129,40 @@ public class Q {
     return new Equal(leftCondition, right);
   }
 
-  public static Condition equalId(final List<?> attributes, final Identifier identifier) {
+  public static Condition equalId(final List<?> fields, final Identifier identifier) {
     final And and = new And();
     List<Object> values;
     if (identifier == null) {
-      values = Arrays.asList(new Object[attributes.size()]);
+      values = Arrays.asList(new Object[fields.size()]);
     } else {
       values = identifier.getValues();
     }
-    if (attributes.size() == values.size()) {
-      for (int i = 0; i < attributes.size(); i++) {
-        final Object attributeKey = attributes.get(i);
+    if (fields.size() == values.size()) {
+      for (int i = 0; i < fields.size(); i++) {
+        final Object fieldKey = fields.get(i);
         Object value = values.get(i);
 
         Condition condition;
         if (value == null) {
-          if (attributeKey instanceof FieldDefinition) {
-            condition = isNull((FieldDefinition)attributeKey);
+          if (fieldKey instanceof FieldDefinition) {
+            condition = isNull((FieldDefinition)fieldKey);
           } else {
-            condition = isNull(attributeKey.toString());
+            condition = isNull(fieldKey.toString());
           }
         } else {
-          if (attributeKey instanceof FieldDefinition) {
-            final FieldDefinition attribute = (FieldDefinition)attributeKey;
-            value = attribute.convert(value);
-            condition = equal(attribute, value);
+          if (fieldKey instanceof FieldDefinition) {
+            final FieldDefinition fieldDefinition = (FieldDefinition)fieldKey;
+            value = fieldDefinition.toFieldValue(value);
+            condition = equal(fieldDefinition, value);
           } else {
-            condition = equal(attributeKey.toString(), value);
+            condition = equal(fieldKey.toString(), value);
           }
         }
         and.add(condition);
       }
     } else {
       throw new IllegalArgumentException(
-        "Field count for " + attributes + " != count for values " + values);
+        "Field count for " + fields + " != count for values " + values);
     }
     return and;
   }

@@ -5,11 +5,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import com.ctc.wstx.util.ExceptionUtil;
 import com.revolsys.equals.Equals;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -115,7 +115,7 @@ public class CollectionValue extends QueryValue {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V> V getValue(final Map<String, Object> record) {
+  public <V> V getValue(final Record record) {
     final List<Object> values = new ArrayList<Object>();
     for (final QueryValue queryValue : this.queryValues) {
       final Object value = queryValue.getValue(record);

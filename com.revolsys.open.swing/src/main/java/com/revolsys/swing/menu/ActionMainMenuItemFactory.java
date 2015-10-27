@@ -49,7 +49,7 @@ public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
   }
 
   @Override
-  public JMenuItem createComponent() {
+  public JMenuItem newComponent() {
     if (this.checkBoxSelectedCheck == null) {
       return this.action.createMenuItem();
     } else {

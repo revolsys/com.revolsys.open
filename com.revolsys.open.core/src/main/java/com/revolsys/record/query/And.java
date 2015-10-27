@@ -3,7 +3,8 @@ package com.revolsys.record.query;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+
+import com.revolsys.record.Record;
 
 public class And extends AbstractMultiCondition {
 
@@ -40,7 +41,7 @@ public class And extends AbstractMultiCondition {
     "unchecked", "rawtypes"
   })
   @Override
-  public boolean test(final Map<String, Object> object) {
+  public boolean test(final Record object) {
     final List<Condition> conditions = (List)getQueryValues();
     for (final Condition condition : conditions) {
       if (!condition.test(object)) {

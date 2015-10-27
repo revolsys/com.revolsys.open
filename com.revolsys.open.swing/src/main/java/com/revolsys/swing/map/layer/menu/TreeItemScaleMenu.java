@@ -77,7 +77,7 @@ public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
   }
 
   @Override
-  public JMenu createComponent() {
+  public JMenu newComponent() {
     final JMenu menu = new JMenu(this.name);
     final T object = MenuFactory.getMenuSource();
     if (this.enableCheck == null || this.enableCheck.test(object)) {

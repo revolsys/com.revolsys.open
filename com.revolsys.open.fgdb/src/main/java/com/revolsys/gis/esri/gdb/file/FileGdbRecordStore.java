@@ -5,7 +5,6 @@ import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -169,7 +168,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   private Map<String, List<String>> domainFieldNames = new HashMap<>();
 
-  private final Set<EnumRows> enumRowsToClose = new HashSet<>();
+  final Set<FileGdbEnumRowsIterator> enumRowsToClose = new HashSet<>();
 
   private boolean exists = false;
 
@@ -389,36 +388,15 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   protected void closeEnumRows() {
-    synchronized (this.apiSync) {
-      for (final Iterator<EnumRows> iterator = this.enumRowsToClose.iterator(); iterator
-        .hasNext();) {
-        final EnumRows rows = iterator.next();
+    synchronized (this.enumRowsToClose) {
+      for (final FileGdbEnumRowsIterator rows : this.enumRowsToClose) {
         try {
-          rows.Close();
+          rows.close();
         } catch (final Throwable e) {
-        } finally {
-          rows.delete();
+          LoggerFactory.getLogger(getClass()).debug("Unable to close enum rows", e);
         }
-        iterator.remove();
       }
       this.enumRowsToClose.clear();
-    }
-  }
-
-  public void closeEnumRows(final EnumRows rows) {
-    synchronized (this.apiSync) {
-      if (isOpen(rows)) {
-        try {
-          rows.Close();
-        } catch (final Throwable e) {
-        } finally {
-          try {
-            rows.delete();
-          } catch (final Throwable t) {
-          }
-        }
-        this.enumRowsToClose.remove(rows);
-      }
     }
   }
 
@@ -542,6 +520,32 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
+  void delete(final Table table, final Record record) {
+    final Integer objectId = record.getInteger("OBJECTID");
+    final PathName typePath = record.getTypePathName();
+    if (Property.hasValuesAll(table, objectId)) {
+      synchronized (table) {
+        final String whereClause = "OBJECTID=" + objectId;
+        try (
+          final FileGdbEnumRowsIterator rows = search(typePath, table, "OBJECTID", whereClause,
+            false)) {
+          for (final Row row : rows) {
+            final boolean loadOnly = isTableLocked(typePath);
+            if (loadOnly) {
+              table.setLoadOnlyMode(false);
+            }
+            table.deleteRow(row);
+            if (loadOnly) {
+              table.setLoadOnlyMode(true);
+            }
+            record.setState(RecordState.Deleted);
+            addStatistic("Delete", record);
+          }
+        }
+      }
+    }
+  }
+
   public void deleteGeodatabase() {
     synchronized (this.apiSync) {
       final String fileName = this.fileName;
@@ -553,21 +557,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             EsriFileGdb.DeleteGeodatabase(fileName);
             return null;
           });
-        }
-      }
-    }
-  }
-
-  protected void deleteRow(final PathName typePath, final Table table, final Row row) {
-    synchronized (this.apiSync) {
-      if (isOpen(table)) {
-        final boolean loadOnly = isTableLocked(typePath);
-        if (loadOnly) {
-          table.setLoadOnlyMode(false);
-        }
-        table.deleteRow(row);
-        if (loadOnly) {
-          table.setLoadOnlyMode(true);
         }
       }
     }
@@ -782,20 +771,14 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                 sql.append(whereClause);
               }
 
-              final EnumRows rows = query(sql.toString(), false);
-              if (rows == null) {
-                return 0;
-              } else {
-                try {
-                  int count = 0;
-                  for (Row row = rows.next(); row != null; row = rows.next()) {
-                    count++;
-                    row.delete();
-                  }
-                  return count;
-                } finally {
-                  closeEnumRows(rows);
+              try (
+                final FileGdbEnumRowsIterator rows = query(sql.toString(), false)) {
+                int count = 0;
+                for (@SuppressWarnings("unused")
+                final Row row : rows) {
+                  count++;
                 }
+                return count;
               }
             } else {
               final GeometryFieldDefinition geometryField = (GeometryFieldDefinition)recordDefinition
@@ -811,10 +794,10 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                   sql.append(whereClause);
                 }
 
-                final EnumRows rows = query(sql.toString(), false);
-                try {
+                try (
+                  final FileGdbEnumRowsIterator rows = query(sql.toString(), false)) {
                   int count = 0;
-                  for (Row row = rows.next(); row != null; row = rows.next()) {
+                  for (final Row row : rows) {
                     final Geometry geometry = (Geometry)geometryField.getValue(row);
                     if (geometry != null) {
                       final BoundingBox geometryBoundingBox = geometry.getBoundingBox();
@@ -822,11 +805,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                         count++;
                       }
                     }
-                    row.delete();
                   }
                   return count;
-                } finally {
-                  closeEnumRows(rows);
                 }
               }
             }
@@ -899,7 +879,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   protected StringBuilder getWhereClause(final Query query) {
     final StringBuilder whereClause = new StringBuilder();
     final Condition whereCondition = query.getWhereCondition();
-    if (whereCondition != null) {
+    if (!whereCondition.isEmpty()) {
       appendQueryValue(query, whereClause, whereCondition);
     }
     return whereClause;
@@ -1028,16 +1008,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   public boolean isNull(final Row row, final String name) {
     synchronized (this.apiSync) {
       return row.isNull(name);
-    }
-  }
-
-  public boolean isOpen(final EnumRows enumRows) {
-    synchronized (this.apiSync) {
-      if (enumRows == null) {
-        return false;
-      } else {
-        return this.enumRowsToClose.contains(enumRows);
-      }
     }
   }
 
@@ -1417,16 +1387,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     return new FileGdbWriter(this);
   }
 
-  protected Row nextRow(final EnumRows rows) {
-    synchronized (this.apiSync) {
-      if (isOpen(rows)) {
-        return rows.next();
-      } else {
-        return null;
-      }
-    }
-  }
-
   @Override
   protected void obtainConnected() {
     getGeodatabase();
@@ -1438,16 +1398,15 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
-  public EnumRows query(final String sql, final boolean recycling) {
+  public FileGdbEnumRowsIterator query(final String sql, final boolean recycling) {
+    EnumRows rows = null;
     synchronized (this.apiSync) {
       final Geodatabase geodatabase = getGeodatabase();
       if (geodatabase == null) {
         return null;
       } else {
         try {
-          final EnumRows enumRows = geodatabase.query(sql, recycling);
-          this.enumRowsToClose.add(enumRows);
-          return enumRows;
+          rows = geodatabase.query(sql, recycling);
         } catch (final Throwable t) {
           throw new RuntimeException("Error running sql: " + sql, t);
         } finally {
@@ -1455,6 +1414,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         }
       }
     }
+    return new FileGdbEnumRowsIterator(this, rows);
   }
 
   @Override
@@ -1621,38 +1581,37 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
-  public EnumRows search(final Object typePath, final Table table, final String fields,
-    final String whereClause, final boolean recycling) {
+  public FileGdbEnumRowsIterator search(final Object typePath, final Table table,
+    final String fields, final String whereClause, final boolean recycling) {
+    EnumRows rows = null;
     synchronized (this.apiSync) {
       if (isOpen(table)) {
         try {
-          final EnumRows rows = table.search(fields, whereClause, recycling);
-          this.enumRowsToClose.add(rows);
-          return rows;
+          rows = table.search(fields, whereClause, recycling);
         } catch (final Throwable t) {
           LoggerFactory.getLogger(getClass()).error(
             "Unable to execute query " + fields + " FROM " + typePath + " WHERE " + whereClause, t);
 
         }
       }
-      return null;
+      return new FileGdbEnumRowsIterator(this, rows);
     }
   }
 
-  public EnumRows search(final Object typePath, final Table table, final String fields,
-    final String whereClause, final Envelope boundingBox, final boolean recycling) {
+  public FileGdbEnumRowsIterator search(final Object typePath, final Table table,
+    final String fields, final String whereClause, final Envelope boundingBox,
+    final boolean recycling) {
+    EnumRows rows = null;
     synchronized (this.apiSync) {
       if (isOpen(table)) {
         try {
-          final EnumRows rows = table.search(fields, whereClause, boundingBox, recycling);
-          this.enumRowsToClose.add(rows);
-          return rows;
+          rows = table.search(fields, whereClause, boundingBox, recycling);
         } catch (final Exception e) {
           LOG.error("ERROR executing query SELECT " + fields + " FROM " + typePath + " WHERE "
             + whereClause + " AND " + boundingBox, e);
         }
       }
-      return null;
+      return new FileGdbEnumRowsIterator(this, rows);
     }
   }
 

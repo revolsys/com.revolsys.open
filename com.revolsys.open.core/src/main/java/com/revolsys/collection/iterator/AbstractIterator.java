@@ -40,6 +40,10 @@ public abstract class AbstractIterator<T> extends BaseObjectWithProperties
 
   protected abstract T getNext() throws NoSuchElementException;
 
+  protected T getObject() {
+    return this.object;
+  }
+
   @Override
   public synchronized final boolean hasNext() {
     if (this.hasNext) {

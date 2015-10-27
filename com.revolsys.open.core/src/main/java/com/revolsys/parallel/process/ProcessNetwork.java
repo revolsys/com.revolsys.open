@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationListener;
@@ -160,8 +161,8 @@ public class ProcessNetwork
             final Process process = new TargetBeanProcess(targetBean);
             addProcess(process);
           } catch (final Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LoggerFactory.getLogger(getClass())
+              .error("Unable to create process for bean " + beanName, e);
           }
 
         }

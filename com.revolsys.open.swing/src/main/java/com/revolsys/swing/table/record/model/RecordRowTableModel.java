@@ -50,7 +50,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     final String groupName, final int index, final CharSequence name, final String toolTip,
     final String iconName, final EnableCheck enableCheck, final Consumer<V> consumer) {
     final Icon icon = Icons.getIcon(iconName);
-    final RunnableAction action = menu.createMenuItem(name, toolTip, icon, enableCheck, () -> {
+    final RunnableAction action = menu.newMenuItem(name, toolTip, icon, enableCheck, () -> {
       final V record = RecordRowTable.getEventRecord();
       if (record != null && consumer != null) {
         consumer.accept(record);
@@ -257,7 +257,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
       final Record record = getRecord(rowIndex);
       if (record == null) {
         return LOADING_VALUE;
-      } else if (record.getState() == RecordState.Initalizing) {
+      } else if (record.getState() == RecordState.Initializing) {
         return LOADING_VALUE;
       } else {
         final String name = getFieldName(columnIndex);
@@ -273,7 +273,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
       final Record record = getRecord(rowIndex);
       if (record != null) {
         final RecordState state = record.getState();
-        if (state != RecordState.Initalizing && state != RecordState.Deleted) {
+        if (state != RecordState.Initializing && state != RecordState.Deleted) {
           final String fieldName = getFieldName(rowIndex, columnIndex);
           if (fieldName != null) {
             if (!isReadOnly(fieldName)) {
@@ -461,7 +461,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
       rowHeight = 1;
       displayValue = null;
     } else {
-      if (record.getState() == RecordState.Initalizing) {
+      if (record.getState() == RecordState.Initializing) {
         displayValue = LOADING_VALUE;
       } else {
         displayValue = toDisplayValueInternal(rowIndex, fieldIndex, objectValue);

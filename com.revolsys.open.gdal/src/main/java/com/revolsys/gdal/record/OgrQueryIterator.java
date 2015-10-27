@@ -154,7 +154,7 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
       } else {
         try {
           final Record record = this.recordFactory.newRecord(this.recordDefinition);
-          record.setState(RecordState.Initalizing);
+          record.setState(RecordState.Initializing);
           if (this.statistics == null) {
             this.recordStore.addStatistic("query", record);
           } else {

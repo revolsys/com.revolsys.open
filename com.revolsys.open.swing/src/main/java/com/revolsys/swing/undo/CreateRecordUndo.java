@@ -45,7 +45,7 @@ public class CreateRecordUndo extends AbstractUndoableEdit {
   @Override
   protected void doRedo() {
     if (this.record != null) {
-      this.layerRecord = this.layer.createRecord(this.record);
+      this.layerRecord = this.layer.newRecord(this.record);
       this.layer.saveChanges(this.layerRecord);
       this.layer.addSelectedRecords(this.layerRecord);
     }

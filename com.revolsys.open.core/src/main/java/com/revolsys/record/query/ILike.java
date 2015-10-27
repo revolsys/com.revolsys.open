@@ -1,8 +1,7 @@
 package com.revolsys.record.query;
 
-import java.util.Map;
-
 import com.revolsys.equals.Equals;
+import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
@@ -39,7 +38,7 @@ public class ILike extends BinaryCondition {
   }
 
   @Override
-  public boolean test(final Map<String, Object> record) {
+  public boolean test(final Record record) {
     final QueryValue left = getLeft();
     String value1 = left.getStringValue(record);
 
