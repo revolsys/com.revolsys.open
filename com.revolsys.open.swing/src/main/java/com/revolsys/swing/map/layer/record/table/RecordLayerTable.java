@@ -9,7 +9,6 @@ import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 
 public class RecordLayerTable extends RecordRowTable {
-
   private static final long serialVersionUID = 1L;
 
   public RecordLayerTable(final RecordLayerTableModel model) {

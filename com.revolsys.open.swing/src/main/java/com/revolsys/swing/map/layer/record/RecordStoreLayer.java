@@ -731,6 +731,49 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     return records;
   }
 
+  public List<LayerRecord> queryPersisted(final Query query) {
+    final List<LayerRecord> records = new ArrayList<>();
+    if (isExists()) {
+      final RecordStore recordStore = getRecordStore();
+      if (recordStore != null) {
+        final Predicate<Record> filter = query.getWhereCondition();
+        try (
+          final Enabled enabled = eventsDisabled()) {
+          final Statistics statistics = query.getProperty("statistics");
+          query.setProperty("recordFactory", this);
+          try (
+            @SuppressWarnings({
+              "rawtypes", "unchecked"
+          })
+          final Reader<LayerRecord> reader = (Reader)recordStore.query(query)) {
+            for (final LayerRecord record : reader) {
+              boolean added = false;
+              final Identifier identifier = getId(record);
+              if (identifier == null) {
+                added = Predicates.add(records, record, filter);
+              } else {
+                synchronized (getSync()) {
+                  LayerRecord cachedRecord = this.recordIdToRecordMap.get(identifier);
+                  if (cachedRecord == null) {
+                    this.recordIdToRecordMap.put(identifier, record);
+                    cachedRecord = record;
+                  }
+                  final LayerRecord proxyRecord = createProxyRecord(identifier);
+                  records.add(proxyRecord);
+                  added = true;
+                }
+              }
+              if (added && statistics != null) {
+                statistics.add(record);
+              }
+            }
+          }
+        }
+      }
+    }
+    return records;
+  }
+
   @Override
   protected void removeForm(final LayerRecord record) {
     synchronized (getSync()) {

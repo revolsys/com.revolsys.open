@@ -207,7 +207,7 @@ public class FieldFilterPanel extends JComponent
         searchField = this.recordDefinition.getFieldNames().get(0);
       }
       setSearchFieldName(searchField);
-      setFilter(null);
+      setFilter(Condition.ALL);
     } finally {
       this.settingFilter = false;
     }
@@ -329,7 +329,7 @@ public class FieldFilterPanel extends JComponent
       this.settingFilter = true;
       setSearchFilter(filter);
       boolean simple = false;
-      if (filter == null) {
+      if (filter.isEmpty()) {
         final Field searchField = (Field)this.searchField;
         if (searchField != null) {
           searchField.setFieldValue(null);

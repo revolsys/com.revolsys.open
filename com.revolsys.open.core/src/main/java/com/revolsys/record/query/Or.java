@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.record.Record;
+import com.revolsys.util.Property;
 
 public class Or extends AbstractMultiCondition {
 
@@ -31,7 +32,9 @@ public class Or extends AbstractMultiCondition {
 
   @Override
   public Or or(final Condition condition) {
-    add(condition);
+    if (!Property.isEmpty(condition)) {
+      add(condition);
+    }
     return this;
   }
 

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.record.Record;
+import com.revolsys.util.Property;
 
 public class And extends AbstractMultiCondition {
 
@@ -18,7 +19,7 @@ public class And extends AbstractMultiCondition {
 
   @Override
   public And and(final Condition condition) {
-    if (condition != null) {
+    if (!Property.isEmpty(condition)) {
       add(condition);
     }
     return this;

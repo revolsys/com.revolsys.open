@@ -12,7 +12,6 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 
 public class RecordLayerTableRowSorter extends TableSortController<RecordLayerTableModel> {
-
   private final AbstractRecordLayer layer;
 
   public RecordLayerTableRowSorter(final AbstractRecordLayer layer,

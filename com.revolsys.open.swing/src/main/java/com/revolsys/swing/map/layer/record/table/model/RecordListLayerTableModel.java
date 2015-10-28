@@ -32,7 +32,7 @@ public class RecordListLayerTableModel extends RecordLayerTableModel
   public RecordListLayerTableModel(final ListRecordLayer layer) {
     super(layer);
     setEditable(false);
-    setSortableModes(MODE_SELECTED, MODE_ALL);
+    setSortableModes(MODE_SELECTED_RECORDS, MODE_ALL);
   }
 
   @Override

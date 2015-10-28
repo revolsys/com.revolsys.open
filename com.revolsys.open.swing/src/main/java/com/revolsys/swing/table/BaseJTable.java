@@ -9,7 +9,9 @@ import java.util.Arrays;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
+import javax.swing.RowFilter;
 import javax.swing.RowSorter;
+import javax.swing.event.RowSorterListener;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
@@ -55,6 +57,10 @@ public class BaseJTable extends JXTable {
       () -> editRelativeCell(1, 0));
 
     putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+  }
+
+  public void addRowSorterListener(final RowSorterListener listener) {
+    super.getRowSorter().addRowSorterListener(listener);
   }
 
   @Override
@@ -205,6 +211,10 @@ public class BaseJTable extends JXTable {
     }
   }
 
+  public void removeRowSorterListener(final RowSorterListener listener) {
+    super.getRowSorter().removeRowSorterListener(listener);
+  }
+
   public void resizeColumnsToContent() {
     final TableModel model = getModel();
     final int columnCount = getColumnCount();
@@ -260,6 +270,13 @@ public class BaseJTable extends JXTable {
       }
     }
     initializeColumnWidths();
+  }
+
+  @Override
+  public <R extends TableModel> void setRowFilter(
+    final RowFilter<? super R, ? super Integer> filter) {
+    super.setRowFilter(filter);
+    firePropertyChange("rowFilterChanged", false, true);
   }
 
   @Override

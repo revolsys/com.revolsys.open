@@ -18,6 +18,7 @@ import com.revolsys.record.query.functions.EnvelopeIntersects;
 import com.revolsys.record.query.functions.F;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.util.Property;
 
 public class Query extends BaseObjectWithProperties implements Cloneable {
   private static void addFilter(final Query query, final RecordDefinition recordDefinition,
@@ -170,16 +171,10 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
   }
 
   public void and(final Condition condition) {
-    if (condition != null) {
-      final Condition whereCondition = getWhereCondition();
-      if (whereCondition.isEmpty()) {
-        setWhereCondition(condition);
-      } else if (whereCondition instanceof And) {
-        final And and = (And)whereCondition;
-        and.add(condition);
-      } else {
-        setWhereCondition(new And(whereCondition, condition));
-      }
+    if (!Property.isEmpty(condition)) {
+      Condition whereCondition = getWhereCondition();
+      whereCondition = whereCondition.and(condition);
+      setWhereCondition(whereCondition);
     }
   }
 

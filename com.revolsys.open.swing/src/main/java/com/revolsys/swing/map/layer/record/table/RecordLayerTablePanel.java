@@ -377,7 +377,7 @@ public class RecordLayerTablePanel extends TablePanel
       toolBar.addButton("layer", "Zoom to Selected", "magnifier_zoom_selected", hasSelectedRecords,
         this.layer::zoomToSelected);
     }
-    toolBar.addComponent("count", new TableRowCount(this.tableModel));
+    toolBar.addComponent("count", new TableRowCount(getTable()));
 
     toolBar.addButtonTitleIcon("table", "Refresh", "table_refresh", () -> refresh());
     toolBar.addButtonTitleIcon("table", "Export Records", "table_save", () -> exportRecords());
@@ -423,10 +423,10 @@ public class RecordLayerTablePanel extends TablePanel
 
     final EnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(this.layer, "editable");
     addFieldFilterToggleButton(toolBar, -1, "Show Only Changed Records", "change_table_filter",
-      RecordLayerTableModel.MODE_EDITS, editableEnableCheck);
+      RecordLayerTableModel.MODE_CHANGED_RECORDS, editableEnableCheck);
 
     addFieldFilterToggleButton(toolBar, -1, "Show Only Selected Records", "filter_selected",
-      RecordLayerTableModel.MODE_SELECTED, null);
+      RecordLayerTableModel.MODE_SELECTED_RECORDS, null);
 
     if (hasGeometry) {
       final JToggleButton showAllGeometries = addGeometryFilterToggleButton(toolBar, -1,
@@ -472,7 +472,7 @@ public class RecordLayerTablePanel extends TablePanel
       repaint();
     } else if (source == this.layer) {
       final String propertyName = event.getPropertyName();
-      if ("recordsChanged".equals(propertyName)) {
+      if (propertyName.endsWith("Changed")) {
         this.tableModel.refresh();
       }
       repaint();

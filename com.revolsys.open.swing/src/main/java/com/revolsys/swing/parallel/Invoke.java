@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
@@ -109,6 +110,28 @@ public class Invoke {
       } else {
         try {
           backgroundTask.call();
+        } catch (final Exception e) {
+          Exceptions.throwUncheckedException(e);
+        }
+      }
+    }
+    return null;
+  }
+
+  public static <V> SwingWorker<V, Void> background(final String description,
+    final Callable<V> backgroundTask, final Consumer<V> doneTask) {
+    if (backgroundTask != null) {
+      if (SwingUtilities.isEventDispatchThread()) {
+        final SwingWorker<V, Void> worker = new CallableSwingWorker<>(description, backgroundTask,
+          doneTask);
+        worker(worker);
+        return worker;
+      } else {
+        try {
+          final V result = backgroundTask.call();
+          later(() -> {
+            doneTask.accept(result);
+          });
         } catch (final Exception e) {
           Exceptions.throwUncheckedException(e);
         }

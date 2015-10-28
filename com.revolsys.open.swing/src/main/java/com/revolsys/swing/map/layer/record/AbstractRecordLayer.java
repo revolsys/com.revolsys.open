@@ -442,7 +442,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       }
       addSelectedRecords(records);
       if (isHasSelectedRecords()) {
-        showRecordsTable(RecordLayerTableModel.MODE_SELECTED);
+        showRecordsTable(RecordLayerTableModel.MODE_SELECTED_RECORDS);
       }
     }
   }
@@ -967,9 +967,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return changeCount;
   }
 
-  public List<LayerRecord> getChanges() {
+  public List<LayerRecord> getChangedRecords() {
     synchronized (getSync()) {
-      final List<LayerRecord> records = new ArrayList<LayerRecord>();
+      final List<LayerRecord> records = new ArrayList<>();
       records.addAll(getNewRecords());
       records.addAll(getModifiedRecords());
       records.addAll(getDeletedRecords());
@@ -1868,7 +1868,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       saveChanges(newRecords);
       if (!newRecords.isEmpty()) {
         zoomToRecords(newRecords);
-        showRecordsTable(RecordLayerTableModel.MODE_SELECTED);
+        showRecordsTable(RecordLayerTableModel.MODE_SELECTED_RECORDS);
       }
     }
     firePropertyChange("recordsInserted", null, newRecords);
@@ -2398,7 +2398,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       }
       setSelectedRecords(records);
       if (isHasSelectedRecords()) {
-        showRecordsTable(RecordLayerTableModel.MODE_SELECTED);
+        showRecordsTable(RecordLayerTableModel.MODE_SELECTED_RECORDS);
       }
     }
   }
@@ -2461,12 +2461,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     this.where = where;
     if (recordDefinition != null) {
       this.whereCondition = Condition.parseWhere(recordDefinition, where);
+      firePropertyChange("filterChanged", false, true);
     }
   }
 
   public void setWhereCondition(final Condition whereCondition) {
     this.where = null;
     this.whereCondition = whereCondition;
+    firePropertyChange("filterChanged", false, true);
   }
 
   public LayerRecord showAddForm(final Map<String, Object> parameters) {
@@ -2704,7 +2706,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       }
       unSelectRecords(records);
       if (isHasSelectedRecords()) {
-        showRecordsTable(RecordLayerTableModel.MODE_SELECTED);
+        showRecordsTable(RecordLayerTableModel.MODE_SELECTED_RECORDS);
       }
     }
   }

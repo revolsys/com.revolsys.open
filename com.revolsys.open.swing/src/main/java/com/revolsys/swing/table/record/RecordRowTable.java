@@ -130,7 +130,7 @@ public class RecordRowTable extends BaseJTable implements MouseListener {
   public ListSelectionModel getSelectionModel() {
     if (getTableModel() instanceof RecordLayerTableModel) {
       final RecordLayerTableModel layerTableModel = (RecordLayerTableModel)getTableModel();
-      if (layerTableModel.getFieldFilterMode().equals(RecordLayerTableModel.MODE_SELECTED)) {
+      if (layerTableModel.getFieldFilterMode().equals(RecordLayerTableModel.MODE_SELECTED_RECORDS)) {
         return layerTableModel.getHighlightedModel();
       }
     }

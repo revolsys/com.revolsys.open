@@ -3,12 +3,20 @@ package com.revolsys.record.query;
 import java.util.function.Predicate;
 
 import com.revolsys.record.Record;
+import com.revolsys.util.Emptyable;
+import com.revolsys.util.Property;
 
-public abstract class Condition extends QueryValue implements Predicate<Record> {
+public abstract class Condition extends QueryValue implements Predicate<Record>, Emptyable {
   public static final AcceptAllCondition ALL = new AcceptAllCondition();
 
   public Condition and(final Condition condition) {
-    return new And(this, condition);
+    if (Property.isEmpty(condition)) {
+      return this;
+    } else if (Property.isEmpty(this)) {
+      return condition;
+    } else {
+      return new And(this, condition);
+    }
   }
 
   @Override
@@ -23,12 +31,19 @@ public abstract class Condition extends QueryValue implements Predicate<Record> 
     return (V)value;
   }
 
+  @Override
   public boolean isEmpty() {
     return false;
   }
 
   public Condition or(final Condition condition) {
-    return new Or(this, condition);
+    if (Property.isEmpty(condition)) {
+      return this;
+    } else if (Property.isEmpty(this)) {
+      return condition;
+    } else {
+      return new Or(this, condition);
+    }
   }
 
   @Override
