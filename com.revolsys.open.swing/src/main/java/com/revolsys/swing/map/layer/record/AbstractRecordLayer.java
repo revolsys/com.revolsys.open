@@ -8,8 +8,6 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,6 +24,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import javax.swing.Icon;
@@ -63,11 +62,14 @@ import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
+import com.revolsys.record.Records;
 import com.revolsys.record.io.ListRecordReader;
+import com.revolsys.record.io.RecordIo;
 import com.revolsys.record.io.RecordReader;
-import com.revolsys.record.io.format.gpx.GpxWriter;
+import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.property.DirectionalFields;
 import com.revolsys.record.query.Condition;
+import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -178,11 +180,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     Menus.addMenuItem(menu, "layer", 0, "Layer Style", "palette",
       AbstractRecordLayer::isHasGeometry,
       (final AbstractRecordLayer layer) -> layer.showProperties("Style"));
-
-    // menu.addMenuItem("edit", 0,
-    // MenuSourceAction.<AbstractRecordLayer>addMenuItem(menu,"",
-    // "Export Records", "disk", new AndEnableCheck(exists, hasSelectedRecords),
-    // "exportRecords"));
   }
 
   public static void addVisibleLayers(final List<AbstractRecordLayer> layers,
@@ -588,6 +585,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
+  public void copyRecordToClipboard(final LayerRecord record) {
+    copyRecordsToClipboard(Collections.singletonList(record));
+  }
+
   public void copySelectedRecords() {
     final List<LayerRecord> selectedRecords = getSelectedRecords();
     copyRecordsToClipboard(selectedRecords);
@@ -854,23 +855,29 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return false;
   }
 
-  public void exportRecords() {
-    final List<LayerRecord> records = getSelectedRecords();
-    if (!records.isEmpty()) {
-      try {
-        try (
-          GpxWriter writer = new GpxWriter(
-            new File("/Users/paustin/Desktop/" + getName() + ".gpx"))) {
-          for (final LayerRecord record : records) {
-            writer.write(record);
-          }
-        }
-      } catch (final IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+  public void exportRecords(final List<LayerRecord> records,
+    final Predicate<? super LayerRecord> filter, final Map<String, Boolean> orderBy,
+    final Object target) {
+    if (Property.hasValue(records) && target != null) {
+      final List<LayerRecord> exportRecords = new ArrayList<>(records);
+
+      Records.filterAndSort(exportRecords, filter, orderBy);
+
+      if (!exportRecords.isEmpty()) {
+        final RecordDefinition recordDefinition = getRecordDefinition();
+        RecordIo.copyRecords(recordDefinition, exportRecords, target);
       }
     }
+  }
 
+  public void exportRecords(final Query query, final Object target) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition != null) {
+      try (
+        RecordWriter writer = RecordWriter.newRecordWriter(recordDefinition, target)) {
+        forEach(query, writer::write);
+      }
+    }
   }
 
   protected void fireHighlighted() {
@@ -901,6 +908,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final boolean selected = selectionCount > 0;
     firePropertyChange("hasSelectedRecords", !selected, selected);
     firePropertyChange("selectionCount", -1, selectionCount);
+  }
+
+  public void forEach(final Query query, final Consumer<LayerRecord> consumer) {
   }
 
   @SuppressWarnings("unchecked")
@@ -1300,14 +1310,21 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public int getPersistedRecordCount() {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    final Query query = new Query(recordDefinition);
-    return getPersistedRecordCount(query);
+    return getRecordCount();
   }
 
   public int getPersistedRecordCount(final Query query) {
-    LoggerFactory.getLogger(getClass()).error("Get row count not implemented");
-    return 0;
+    return getRecordCount(query);
+  }
+
+  /**
+   * Query the underlying record store to return those records that have been saved that match the query.
+   *
+   * @param query
+   * @return The records.
+   */
+  public List<LayerRecord> getPersistedRecords(final Query query) {
+    return query(query);
   }
 
   public List<AbstractProxyLayerRecord> getProxyRecords() {
@@ -1969,13 +1986,33 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
+  public List<LayerRecord> query(final Identifier identifier) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition != null) {
+      final List<FieldDefinition> idFieldDefinitions = recordDefinition.getIdFields();
+      if (idFieldDefinitions.isEmpty()) {
+        final Query query = new Query(recordDefinition, Q.equalId(idFieldDefinitions, identifier));
+        return query(query);
+      }
+    }
+    return Collections.emptyList();
+  }
+
+  public List<LayerRecord> query(final Map<String, ? extends Object> filter) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final Query query = Query.and(recordDefinition, filter);
+    return query(query);
+  }
+
   public List<LayerRecord> query(final PathName pathName) {
     final Query query = new Query(pathName);
     return query(query);
   }
 
   public List<LayerRecord> query(final Query query) {
-    return Collections.emptyList();
+    final List<LayerRecord> records = new ArrayList<>();
+    forEach(query, records::add);
+    return records;
   }
 
   public final List<LayerRecord> queryBackground(BoundingBox boundingBox) {
@@ -2422,7 +2459,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     setSelectedRecords(Arrays.asList(selectedRecords));
   }
 
-  public void setSelectedRecordsById(final Object id) {
+  public void setSelectedRecords(final Query query) {
+    final List<LayerRecord> records = query(query);
+    setSelectedRecords(records);
+  }
+
+  public void setSelectedRecordsById(final Identifier id) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition != null) {
       final String idFieldName = recordDefinition.getIdFieldName();
@@ -2430,8 +2472,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         clearSelectedRecords();
       } else {
         final Query query = Query.equal(recordDefinition, idFieldName, id);
-        final List<LayerRecord> records = query(query);
-        setSelectedRecords(records);
+        setSelectedRecords(query);
       }
     }
   }
@@ -2674,7 +2715,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     MapSerializerUtil.add(map, "useFieldTitles", this.useFieldTitles);
     map.remove("filter");
     String where;
-    if (this.whereCondition.isEmpty()) {
+    if (Property.isEmpty(this.whereCondition)) {
       where = this.where;
     } else {
       where = this.whereCondition.toFormattedString();

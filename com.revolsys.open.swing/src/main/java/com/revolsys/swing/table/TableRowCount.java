@@ -20,6 +20,8 @@ public class TableRowCount extends JLabel implements TableModelListener, Propert
 
   private BaseJTable table;
 
+  private int rowCount;
+
   public TableRowCount(final BaseJTable table) {
     setToolTipText("Record Count");
     setBorder(
@@ -36,6 +38,10 @@ public class TableRowCount extends JLabel implements TableModelListener, Propert
     this.model.addTableModelListener(this);
     this.model.addTableModelListener(table);
     tableChanged(null);
+  }
+
+  public int getRowCount() {
+    return this.rowCount;
   }
 
   @Override
@@ -68,7 +74,8 @@ public class TableRowCount extends JLabel implements TableModelListener, Propert
     final NumberFormat format = new DecimalFormat("#,##0");
     final int tableRowCount = this.table.getRowCount();
     final int modelRowCount = this.model.getRowCount();
-
+    final int oldValue = this.rowCount;
+    this.rowCount = tableRowCount;
     final String text;
     if (tableRowCount == modelRowCount) {
       text = format.format(tableRowCount);
@@ -79,5 +86,6 @@ public class TableRowCount extends JLabel implements TableModelListener, Propert
       setToolTipText("The table is filtered so some records are hidden from view.");
     }
     setText(text);
+    firePropertyChange("rowCount", oldValue, this.rowCount);
   }
 }

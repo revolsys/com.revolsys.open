@@ -127,7 +127,7 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   @Override
   public LayerRecord revertChanges() {
     final LayerRecord layerRecord = getLayerRecord();
-    return layerRecord;
+    return layerRecord.revertChanges();
   }
 
   @Override

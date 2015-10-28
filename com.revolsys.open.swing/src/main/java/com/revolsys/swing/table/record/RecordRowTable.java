@@ -2,7 +2,6 @@ package com.revolsys.swing.table.record;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.List;
 import java.util.function.Predicate;
 
 import javax.swing.ListSelectionModel;
@@ -130,7 +129,8 @@ public class RecordRowTable extends BaseJTable implements MouseListener {
   public ListSelectionModel getSelectionModel() {
     if (getTableModel() instanceof RecordLayerTableModel) {
       final RecordLayerTableModel layerTableModel = (RecordLayerTableModel)getTableModel();
-      if (layerTableModel.getFieldFilterMode().equals(RecordLayerTableModel.MODE_SELECTED_RECORDS)) {
+      if (layerTableModel.getFieldFilterMode()
+        .equals(RecordLayerTableModel.MODE_SELECTED_RECORDS)) {
         return layerTableModel.getHighlightedModel();
       }
     }
@@ -205,10 +205,9 @@ public class RecordRowTable extends BaseJTable implements MouseListener {
       int fieldsOffset = 0;
       if (model instanceof RecordLayerTableModel) {
         final RecordLayerTableModel layerModel = (RecordLayerTableModel)model;
-        final String mode = layerModel.getFieldFilterMode();
-        final List<String> sortableModes = layerModel.getSortableModes();
-        if (sortableModes.contains(mode)) {
+        if (layerModel.isSortable()) {
           setSortable(true);
+          setRowFilter(layerModel.getRowFilter());
         } else {
           setSortable(false);
         }

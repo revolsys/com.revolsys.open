@@ -60,13 +60,14 @@ public interface Predicates {
     return count;
   }
 
-  static <T> List<T> filter(final Collection<T> collection, final Predicate<T> filter) {
+  static <T> List<T> filter(final Collection<T> collection, final Predicate<? super T> filter) {
     final List<T> list = new ArrayList<T>();
     addAll(list, collection, filter);
     return list;
   }
 
-  static <T> List<T> filterAndRemove(final Collection<T> collection, final Predicate<T> filter) {
+  static <T> List<T> filterAndRemove(final Collection<T> collection,
+    final Predicate<? super T> filter) {
     final List<T> list = new ArrayList<T>();
     final Iterator<T> iterator = collection.iterator();
     while (iterator.hasNext()) {
@@ -79,7 +80,7 @@ public interface Predicates {
     return list;
   }
 
-  static <T> boolean matches(final List<T> objects, final Predicate<T> filter) {
+  static <T> boolean matches(final List<T> objects, final Predicate<? super T> filter) {
     for (final T object : objects) {
       if (filter.test(object)) {
         return true;
@@ -88,7 +89,7 @@ public interface Predicates {
     return false;
   }
 
-  static <T> boolean matches(final Predicate<T> filter, final T object) {
+  static <T> boolean matches(final Predicate<? super T> filter, final T object) {
     if (filter == null) {
       return true;
     } else {
@@ -111,7 +112,7 @@ public interface Predicates {
     return new OrPredicate<T>(filters);
   }
 
-  static <T> void remove(final Collection<T> collection, final Predicate<T> filter) {
+  static <T> void remove(final Collection<T> collection, final Predicate<? super T> filter) {
     final Iterator<T> iterator = collection.iterator();
     while (iterator.hasNext()) {
       final T value = iterator.next();
@@ -121,7 +122,7 @@ public interface Predicates {
     }
   }
 
-  static <T> void retain(final Collection<T> collection, final Predicate<T> filter) {
+  static <T> void retain(final Collection<T> collection, final Predicate<? super T> filter) {
     final Iterator<T> iterator = collection.iterator();
     while (iterator.hasNext()) {
       final T value = iterator.next();

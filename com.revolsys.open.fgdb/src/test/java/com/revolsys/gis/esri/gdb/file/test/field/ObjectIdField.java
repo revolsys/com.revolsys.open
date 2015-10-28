@@ -20,4 +20,9 @@ public class ObjectIdField extends FgdbField {
   public boolean setValue(final Record record, final EndianInput in) throws IOException {
     return false;
   }
+
+  @Override
+  public Object validate(final Object value) {
+    return value;
+  }
 }

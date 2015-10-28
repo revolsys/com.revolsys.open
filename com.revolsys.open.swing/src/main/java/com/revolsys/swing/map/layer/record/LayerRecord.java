@@ -19,6 +19,15 @@ public interface LayerRecord extends Record {
   default void clearChanges() {
   }
 
+  default <V extends LayerRecord> boolean contains(final Iterable<V> records) {
+    for (final V record : records) {
+      if (isSame(record)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   default Enabled eventsDisabled() {
     final AbstractRecordLayer layer = getLayer();
     if (layer == null) {
@@ -107,6 +116,17 @@ public interface LayerRecord extends Record {
     } else {
       return layer.getRecordDefinition();
     }
+  }
+
+  default <V extends LayerRecord> int indexOf(final Iterable<V> records) {
+    int index = 0;
+    for (final V record : records) {
+      if (isSame(record)) {
+        return index;
+      }
+      index++;
+    }
+    return -1;
   }
 
   default boolean isDeletable() {

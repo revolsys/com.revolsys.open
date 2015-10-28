@@ -48,4 +48,8 @@ public class OidFieldDefinition extends AbstractFileGdbFieldDefinition {
   public void setValue(final Record record, final Row row, final Object value) {
   }
 
+  @Override
+  public Object validate(final Object value) {
+    return value;
+  }
 }

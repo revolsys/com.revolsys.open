@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.revolsys.datatype.DataType;
@@ -15,12 +16,13 @@ import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.Records;
+import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
-import com.revolsys.swing.map.layer.record.table.model.RecordListLayerTableModel;
+import com.revolsys.swing.map.layer.record.table.model.ListRecordLayerTableModel;
 import com.revolsys.swing.map.layer.record.table.model.RecordSaveErrorTableModel;
 
 public class ListRecordLayer extends AbstractRecordLayer {
@@ -85,7 +87,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
 
   @Override
   public RecordLayerTablePanel createTablePanel(final Map<String, Object> config) {
-    final RecordLayerTable table = RecordListLayerTableModel.createTable(this);
+    final RecordLayerTable table = ListRecordLayerTableModel.createTable(this);
     return new RecordLayerTablePanel(this, table, config);
   }
 
@@ -151,46 +153,76 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
+  public void forEach(final Query query, final Consumer<LayerRecord> consumer) {
+    final List<LayerRecord> records = getPersistedRecords(query);
+    records.forEach(consumer);
+  }
+
+  @Override
   public int getNewRecordCount() {
     return 0;
   }
 
   @Override
   public int getPersistedRecordCount() {
-    synchronized (this.records) {
-      return this.records.size();
-    }
+    return this.records.size();
   }
 
   @Override
   public int getPersistedRecordCount(final Query query) {
-    final List<LayerRecord> results = query(query);
-    return results.size();
-  }
-
-  @Override
-  public LayerRecord getRecord(final int index) {
-    if (index < 0) {
-      return null;
+    final Condition filter = query.getWhereCondition();
+    if (filter.isEmpty()) {
+      return getPersistedRecordCount();
     } else {
-      synchronized (this.records) {
-        return this.records.get(index);
+      int count = 0;
+      final List<LayerRecord> records = getRecords();
+      for (final LayerRecord record : records) {
+        if (filter.test(record)) {
+          count++;
+        }
       }
+      return count;
     }
   }
 
   @Override
+  public List<LayerRecord> getPersistedRecords(final Query query) {
+    final List<LayerRecord> records = getRecords();
+    final Condition filter = query.getWhereCondition();
+    final Map<String, Boolean> orderBy = query.getOrderBy();
+    Records.filterAndSort(records, filter, orderBy);
+    return records;
+  }
+
+  @Override
+  public LayerRecord getRecord(final int index) {
+    if (index >= 0) {
+      synchronized (this.records) {
+        if (index < this.records.size()) {
+          return this.records.get(index);
+        }
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public int getRecordCount() {
+    return this.records.size();
+  }
+
+  @Override
   public int getRecordCount(final Query query) {
-    final Predicate<Record> filter = query.getWhereCondition();
-    return Predicates.count(this.records, filter);
+    synchronized (this.records) {
+      final Predicate<Record> filter = query.getWhereCondition();
+      return Predicates.count(this.records, filter);
+    }
   }
 
   @Override
   public List<LayerRecord> getRecords() {
     synchronized (this.records) {
-      final ArrayList<LayerRecord> records = new ArrayList<>(this.records);
-      records.addAll(getNewRecords());
-      return records;
+      return new ArrayList<>(this.records);
     }
   }
 
@@ -205,18 +237,6 @@ public class ListRecordLayer extends AbstractRecordLayer {
     addToIndex(record);
     fireEmpty();
     return record;
-  }
-
-  @Override
-  public List<LayerRecord> query(final Query query) {
-    final List<LayerRecord> records = new ArrayList<>();
-    final Predicate<Record> filter = query.getWhereCondition();
-    for (final LayerRecord record : new ArrayList<>(this.records)) {
-      if (filter.test(record)) {
-        records.add(record);
-      }
-    }
-    return records;
   }
 
   protected void refreshBoundingBox() {

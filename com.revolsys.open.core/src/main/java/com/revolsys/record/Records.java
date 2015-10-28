@@ -3,6 +3,7 @@ package com.revolsys.record;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +27,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
+import com.revolsys.predicate.Predicates;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -177,6 +179,27 @@ public interface Records {
       }
     }
     return results;
+  }
+
+  /**
+   * Filter and sort the records. The list will be overwritten by the result.
+   *
+   * @param records
+   * @param filter
+   * @param orderBy
+   */
+  static <V extends Record> void filterAndSort(final List<V> records,
+    final Predicate<? super V> filter, final Map<String, Boolean> orderBy) {
+    // Filter records
+    if (!Property.isEmpty(filter)) {
+      Predicates.retain(records, filter);
+    }
+
+    // Sort records
+    if (Property.hasValue(orderBy)) {
+      final Comparator<Record> comparator = newComparatorOrderBy(orderBy);
+      Collections.sort(records, comparator);
+    }
   }
 
   static boolean getBoolean(final Record record, final String fieldName) {
@@ -479,6 +502,30 @@ public interface Records {
         }
         return compare;
       }
+    };
+  }
+
+  static Comparator<Record> newComparatorOrderBy(final Map<String, Boolean> orderBy) {
+    return (record1, record2) -> {
+      if (record1 == record2) {
+        return 0;
+      } else if (Property.hasValue(orderBy)) {
+        for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
+          final String fieldName = entry.getKey();
+          final Boolean ascending = entry.getValue();
+          final Object value1 = record1.getValue(fieldName);
+          final Object value2 = record2.getValue(fieldName);
+          final int compare = CompareUtil.compare(value1, value2);
+          if (compare != 0) {
+            if (ascending) {
+              return compare;
+            } else {
+              return -compare;
+            }
+          }
+        }
+      }
+      return -1;
     };
   }
 

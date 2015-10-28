@@ -25,8 +25,8 @@ public class RecordRowTableCellRenderer extends DefaultTableCellRenderer {
 
     final boolean selected = model.isSelected(isSelected, rowIndex, columnIndex);
     final Object displayValue;
-    final int attributesOffset = model.getFieldsOffset();
-    if (columnIndex < attributesOffset) {
+    final int fieldsOffset = model.getFieldsOffset();
+    if (columnIndex < fieldsOffset) {
       displayValue = value;
     } else {
       displayValue = model.toDisplayValue(rowIndex, columnIndex, value);
