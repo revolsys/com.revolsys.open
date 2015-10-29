@@ -17,7 +17,7 @@ public class LoadingRecord extends AbstractLayerRecord {
 
   @Override
   public RecordState getState() {
-    return RecordState.Initializing;
+    return RecordState.INITIALIZING;
   }
 
   @Override

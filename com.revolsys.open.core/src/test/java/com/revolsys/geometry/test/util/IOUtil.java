@@ -22,7 +22,7 @@ public class IOUtil {
       try (
         GeometryReader reader = GeometryReader
           .newGeometryReader(new FileSystemResource(filename))) {
-        final List<Geometry> geometries = reader.read();
+        final List<Geometry> geometries = reader.toList();
         if (geometries.isEmpty()) {
           return geomFact.geometryCollection();
         } else {

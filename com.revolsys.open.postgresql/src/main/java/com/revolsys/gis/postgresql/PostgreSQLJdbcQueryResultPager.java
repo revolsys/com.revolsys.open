@@ -79,7 +79,7 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
     if (this.numResults == null) {
       final JdbcRecordStore recordStore = getRecordStore();
       final Query query = getQuery();
-      this.numResults = recordStore.getRowCount(query);
+      this.numResults = recordStore.getRecordCount(query);
       updateNumPages();
     }
     return this.numResults;

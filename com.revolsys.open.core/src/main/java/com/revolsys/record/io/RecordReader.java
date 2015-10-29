@@ -6,13 +6,21 @@ import java.nio.file.Path;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Reader;
-import com.revolsys.record.ArrayRecordFactory;
+import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
 public interface RecordReader extends Reader<Record> {
+  static RecordReader empty() {
+    return new ListRecordReader(null);
+  }
+
+  static RecordReader empty(final RecordDefinition recordDefinition) {
+    return new ListRecordReader(recordDefinition);
+  }
+
   static boolean isReadable(final Object source) {
     return IoFactoryRegistry.isAvailable(RecordReaderFactory.class, source);
   }
@@ -31,7 +39,7 @@ public interface RecordReader extends Reader<Record> {
    * @throws IllegalArgumentException If the source is not a supported class.
    */
   static RecordReader newRecordReader(final Object source) {
-    final RecordFactory recordFactory = ArrayRecordFactory.INSTANCE;
+    final RecordFactory<ArrayRecord> recordFactory = ArrayRecord.FACTORY;
     return newRecordReader(source, recordFactory);
   }
 
@@ -49,7 +57,8 @@ public interface RecordReader extends Reader<Record> {
    * @return The reader.
    * @throws IllegalArgumentException If the source is not a supported class.
    */
-  static RecordReader newRecordReader(final Object source, final RecordFactory recordFactory) {
+  static RecordReader newRecordReader(final Object source,
+    final RecordFactory<? extends Record> recordFactory) {
     final RecordReaderFactory readerFactory = IoFactory.factory(RecordReaderFactory.class, source);
     if (readerFactory == null) {
       return null;

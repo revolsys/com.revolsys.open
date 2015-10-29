@@ -478,7 +478,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements RecordWriter
     } else {
       insertSequence(object, typePath, recordDefinition);
     }
-    object.setState(RecordState.Persisted);
+    object.setState(RecordState.PERSISTED);
     this.recordStore.addStatistic("Insert", object);
   }
 
@@ -685,21 +685,21 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements RecordWriter
       final RecordStore recordStore = recordDefinition.getRecordStore();
       final RecordState state = object.getState();
       if (recordStore != this.recordStore) {
-        if (state != RecordState.Deleted) {
+        if (state != RecordState.DELETED) {
           insert(object);
         }
       } else {
         switch (state) {
-          case New:
+          case NEW:
             insert(object);
           break;
-          case Modified:
+          case MODIFIED:
             update(object);
           break;
-          case Persisted:
+          case PERSISTED:
           // No action required
           break;
-          case Deleted:
+          case DELETED:
             delete(object);
           break;
           default:

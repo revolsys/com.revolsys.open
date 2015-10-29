@@ -256,7 +256,7 @@ public class BeanConfigurrer
       }
     }
 
-    // New in Spring 2.5: resolve placeholders in alias target names and aliases
+    // NEW in Spring 2.5: resolve placeholders in alias target names and aliases
     // as well.
     beanFactory.resolveAliases(valueResolver);
   }
@@ -281,7 +281,7 @@ public class BeanConfigurrer
       }
     }
 
-    // New in Spring 2.5: resolve placeholders in alias target names and aliases
+    // NEW in Spring 2.5: resolve placeholders in alias target names and aliases
     // as well.
     beanFactory.resolveAliases(valueResolver);
   }

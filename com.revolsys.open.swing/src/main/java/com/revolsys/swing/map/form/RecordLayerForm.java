@@ -705,7 +705,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
       final Set<String> requiredFieldNames = getRequiredFieldNames();
       if (requiredFieldNames.contains(fieldName)) {
         boolean run = true;
-        if (this.record.getState() == RecordState.New) {
+        if (this.record.getState() == RecordState.NEW) {
           final String idFieldName = getRecordDefinition().getIdFieldName();
           if (fieldName.equals(idFieldName)) {
             run = false;
@@ -1083,7 +1083,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   }
 
   public boolean isNewRecord(final LayerRecord record) {
-    return record.getState() == RecordState.New;
+    return record.getState() == RecordState.NEW;
   }
 
   public boolean isReadOnly(final String fieldName) {
@@ -1146,7 +1146,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
       final LayerRecord record = getRecord();
       if (record != null) {
         final RecordState state = record.getState();
-        if (!state.equals(RecordState.Deleted)) {
+        if (!state.equals(RecordState.DELETED)) {
           final Object source = event.getSource();
 
           if (this.geometryCoordinatesPanel != null
@@ -1181,7 +1181,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
                 }
               }
               if (!equal && layer.isEditable()
-                && (state == RecordState.New && layer.isCanAddRecords()
+                && (state == RecordState.NEW && layer.isCanAddRecords()
                   || layer.isCanEditRecords())) {
                 record.setValueByPath(fieldName, fieldValue);
               }
@@ -1416,7 +1416,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   }
 
   public boolean showAddDialog() {
-    final String title = "Add New " + getName();
+    final String title = "Add NEW " + getName();
     final Window window = SwingUtil.getActiveWindow();
     final JDialog dialog = new JDialog(window, title, ModalityType.APPLICATION_MODAL);
     dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);

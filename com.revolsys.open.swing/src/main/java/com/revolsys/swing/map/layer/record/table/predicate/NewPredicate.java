@@ -44,7 +44,7 @@ public class NewPredicate implements HighlightPredicate {
       final LayerRecord object = this.model.getRecord(rowIndex);
       if (object != null) {
         final RecordState state = object.getState();
-        return state.equals(RecordState.New);
+        return state.equals(RecordState.NEW);
       }
     } catch (final Throwable e) {
     }

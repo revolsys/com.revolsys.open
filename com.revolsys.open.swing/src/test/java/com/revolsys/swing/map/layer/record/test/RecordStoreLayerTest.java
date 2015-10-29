@@ -74,11 +74,11 @@ public class RecordStoreLayerTest {
 
   public void assertRecordCounts(final int newRecordCount, final int persistedRecordCount,
     final int modifiedRecordCount, final int deletedRecordCount) {
-    Assert.assertEquals("Persisted Count", persistedRecordCount,
+    Assert.assertEquals("PERSISTED Count", persistedRecordCount,
       this.layer.getPersistedRecordCount());
-    Assert.assertEquals("New Count", newRecordCount, this.layer.getNewRecordCount());
-    Assert.assertEquals("Modified Count", modifiedRecordCount, this.layer.getModifiedRecordCount());
-    Assert.assertEquals("Deleted Count", deletedRecordCount, this.layer.getDeletedRecordCount());
+    Assert.assertEquals("NEW Count", newRecordCount, this.layer.getNewRecordCount());
+    Assert.assertEquals("MODIFIED Count", modifiedRecordCount, this.layer.getModifiedRecordCount());
+    Assert.assertEquals("DELETED Count", deletedRecordCount, this.layer.getDeletedRecordCount());
     final int layerRecordCount = this.layer.getRecordCount();
     Assert.assertEquals("Record Count", newRecordCount + persistedRecordCount - deletedRecordCount,
       layerRecordCount);
@@ -108,7 +108,7 @@ public class RecordStoreLayerTest {
       .add("NAME", name)
       .add("COUNT", count)
       .add("GEOMETRY", point);
-    final LayerRecord testRecord = this.layer.newRecord(newValues);
+    final LayerRecord testRecord = this.layer.newLayerRecord(newValues);
     return testRecord;
   }
 

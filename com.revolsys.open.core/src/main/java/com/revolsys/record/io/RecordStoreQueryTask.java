@@ -43,7 +43,7 @@ public class RecordStoreQueryTask extends AbstractProcess {
     final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(this.path);
     final Query query = Query.intersects(recordDefinition, this.boundingBox);
     try (
-      final Reader<Record> reader = this.recordStore.query(query)) {
+      final Reader<Record> reader = this.recordStore.getRecords(query)) {
       for (final Record object : reader) {
         try {
           this.objects.add(object);

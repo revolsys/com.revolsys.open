@@ -25,7 +25,7 @@ public class ListRecordLayerTableModel extends RecordLayerTableModel
     super(layer);
     setEditable(false);
     setSortableModes(MODE_SELECTED_RECORDS, MODE_ALL_RECORDS);
-    setFilterModeMethods(MODE_ALL_RECORDS, this::refreshAllRecords, this::getRowCountFieldValue,
+    setFilterModeMethods(MODE_ALL_RECORDS, this::refreshAllRecords, this::getRecordCount,
       this::getRecordCached, this::exportRecordsCached);
   }
 

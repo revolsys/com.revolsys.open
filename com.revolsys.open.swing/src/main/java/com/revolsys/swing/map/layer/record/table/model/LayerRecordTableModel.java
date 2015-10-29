@@ -148,7 +148,7 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
         if (idField != null) {
           final String idFieldName = idField.getName();
           if (fieldName.equals(idFieldName)) {
-            if (this.record != null && this.record.getState() == RecordState.New) {
+            if (this.record != null && this.record.getState() == RecordState.NEW) {
               if (!Number.class.isAssignableFrom(idField.getTypeClass())) {
                 return true;
               }

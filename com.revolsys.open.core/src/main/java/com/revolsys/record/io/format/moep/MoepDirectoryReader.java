@@ -6,7 +6,7 @@ import java.sql.Date;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Reader;
-import com.revolsys.record.ArrayRecordFactory;
+import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordDirectoryReader;
 import com.revolsys.record.schema.RecordDefinition;
@@ -68,7 +68,7 @@ public class MoepDirectoryReader extends RecordDirectoryReader implements Record
    */
   @Override
   protected Reader<Record> newReader(final Resource resource) {
-    return new MoepBinaryReader(this, resource, new ArrayRecordFactory());
+    return new MoepBinaryReader(this, resource, ArrayRecord.FACTORY);
   }
 
   @Override

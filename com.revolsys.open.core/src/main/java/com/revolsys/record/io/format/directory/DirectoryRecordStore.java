@@ -47,8 +47,6 @@ public class DirectoryRecordStore extends AbstractRecordStore {
 
   private final Map<Resource, String> typePathByResource = new HashMap<>();
 
-  private Writer<Record> writer;
-
   private final Map<String, Writer<Record>> writers = new HashMap<>();
 
   public DirectoryRecordStore(final File directory, final Collection<String> fileExtensions) {
@@ -71,19 +69,17 @@ public class DirectoryRecordStore extends AbstractRecordStore {
       }
       this.writers.clear();
     }
-    if (this.writer != null) {
-      this.writer.close();
-      this.writer = null;
-    }
     super.close();
   }
 
   @Override
-  public void delete(final Record record) {
+  public boolean deleteRecord(final Record record) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     final RecordStore recordStore = recordDefinition.getRecordStore();
     if (recordStore == this) {
       throw new UnsupportedOperationException("Deleting records not supported");
+    } else {
+      return false;
     }
   }
 
@@ -97,6 +93,11 @@ public class DirectoryRecordStore extends AbstractRecordStore {
 
   public List<String> getFileExtensions() {
     return this.fileExtensions;
+  }
+
+  @Override
+  public int getRecordCount(final Query query) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -125,6 +126,21 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     return storeRecordDefinition;
   }
 
+  @Override
+  public RecordReader getRecords(final PathName path) {
+    final RecordDefinition recordDefinition = getRecordDefinition(path);
+    final Resource resource = getResource(path.toString(), recordDefinition);
+    final RecordReader reader = RecordReader.newRecordReader(resource);
+    if (reader == null) {
+      throw new IllegalArgumentException("Cannot find reader for: " + path);
+    } else {
+      final String typePath = this.typePathByResource.get(resource);
+      reader.setProperty("schema", recordDefinition.getSchema());
+      reader.setProperty("typePath", typePath);
+      return reader;
+    }
+  }
+
   protected Resource getResource(final String path) {
     final RecordDefinition recordDefinition = getRecordDefinition(path);
     return getResource(path, recordDefinition);
@@ -141,19 +157,6 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     return resource;
   }
 
-  @Override
-  public int getRowCount(final Query query) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public synchronized Writer<Record> getWriter() {
-    if (this.writer == null && this.directory != null) {
-      this.writer = new DirectoryRecordStoreWriter(this);
-    }
-    return this.writer;
-  }
-
   @PostConstruct
   @Override
   public void initialize() {
@@ -164,7 +167,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public synchronized void insert(final Record record) {
+  public synchronized void insertRecord(final Record record) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     final String typePath = recordDefinition.getPath();
     Writer<Record> writer = this.writers.get(typePath);
@@ -214,30 +217,15 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   @Override
   public AbstractIterator<Record> newIterator(final Query query,
     final Map<String, Object> properties) {
-    final String path = query.getTypeName();
-    final RecordReader reader = query(path);
+    final PathName path = query.getTypePath();
+    final RecordReader reader = getRecords(path);
     reader.setProperties(properties);
     return new RecordReaderQueryIterator(reader, query);
   }
 
   @Override
-  public RecordWriter newWriter() {
+  public RecordWriter newRecordWriter() {
     return new DirectoryRecordStoreWriter(this);
-  }
-
-  @Override
-  public RecordReader query(final String path) {
-    final RecordDefinition recordDefinition = getRecordDefinition(path);
-    final Resource resource = getResource(path, recordDefinition);
-    final RecordReader reader = RecordReader.newRecordReader(resource);
-    if (reader == null) {
-      throw new IllegalArgumentException("Cannot find reader for: " + path);
-    } else {
-      final String typePath = this.typePathByResource.get(resource);
-      reader.setProperty("schema", recordDefinition.getSchema());
-      reader.setProperty("typePath", typePath);
-      return reader;
-    }
   }
 
   @Override
@@ -299,11 +287,11 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   }
 
   protected void superDelete(final Record record) {
-    super.delete(record);
+    super.deleteRecord(record);
   }
 
   protected void superUpdate(final Record record) {
-    super.update(record);
+    super.updateRecord(record);
   }
 
   @Override
@@ -313,23 +301,23 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public void update(final Record record) {
+  public void updateRecord(final Record record) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     final RecordStore recordStore = recordDefinition.getRecordStore();
     if (recordStore == this) {
       switch (record.getState()) {
-        case Deleted:
+        case DELETED:
         break;
-        case Persisted:
+        case PERSISTED:
         break;
-        case Modified:
+        case MODIFIED:
           throw new UnsupportedOperationException();
         default:
-          insert(record);
+          insertRecord(record);
         break;
       }
     } else {
-      insert(record);
+      insertRecord(record);
     }
   }
 }

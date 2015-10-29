@@ -576,7 +576,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public Map<String, Object> createDataTableMap(final HttpServletRequest request,
     final RecordStore recordStore, Query query, final String pageName) {
-    final int numRecords = recordStore.getRowCount(query);
+    final int numRecords = recordStore.getRecordCount(query);
     int recordCount = 50;
     final String lengthString = request.getParameter("length");
     if (Property.hasValue(lengthString)) {
@@ -597,7 +597,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
     final List<List<String>> rows = new ArrayList<>();
     try (
-      Reader<Record> reader = recordStore.query(query)) {
+      Reader<Record> reader = recordStore.getRecords(query)) {
       for (Record record : reader) {
         record = convertRecord(record);
         final List<String> row = new ArrayList<String>();

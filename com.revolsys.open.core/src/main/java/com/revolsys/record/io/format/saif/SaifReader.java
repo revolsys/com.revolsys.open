@@ -44,7 +44,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Path;
-import com.revolsys.record.ArrayRecordFactory;
+import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.RecordReader;
@@ -83,7 +83,7 @@ public class SaifReader extends AbstractReader<Record>
   /** The list of exported objects. */
   private Record exportedObjects;
 
-  private RecordFactory factory = new ArrayRecordFactory();
+  private RecordFactory factory = ArrayRecord.FACTORY;
 
   /** The SAIF archive file. */
   private File file;

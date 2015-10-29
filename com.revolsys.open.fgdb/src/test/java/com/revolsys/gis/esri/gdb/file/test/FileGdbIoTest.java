@@ -63,7 +63,7 @@ public class FileGdbIoTest {
       recordDefinition.setGeometryFactory(geometryFactory);
       recordStore.getRecordDefinition(recordDefinition);
       try (
-        Writer<Record> writer = recordStore.newWriter()) {
+        Writer<Record> writer = recordStore.newRecordWriter()) {
         writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
         writer.setProperty(IoConstants.GEOMETRY_TYPE, dataType);
 
@@ -73,8 +73,8 @@ public class FileGdbIoTest {
         writer.write(record);
       }
       try (
-        Reader<Record> reader = recordStore.query(typePath)) {
-        final List<Record> objects = reader.read();
+        Reader<Record> reader = recordStore.getRecords(typePath)) {
+        final List<Record> objects = reader.toList();
         Assert.assertEquals("Geometry Count", 1, objects.size());
         final Geometry actual = objects.get(0).getGeometry();
         Assert.assertEquals("Empty", geometry.isEmpty(), actual.isEmpty());

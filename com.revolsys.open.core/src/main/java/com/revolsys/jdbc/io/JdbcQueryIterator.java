@@ -28,13 +28,12 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 
 public class JdbcQueryIterator extends AbstractIterator<Record>implements RecordReader {
-
   public static Record getNextRecord(final JdbcRecordStore recordStore,
     final RecordDefinition recordDefinition, final List<FieldDefinition> fields,
-    final RecordFactory recordFactory, final ResultSet resultSet) {
+    final RecordFactory<Record> recordFactory, final ResultSet resultSet) {
     final Record record = recordFactory.newRecord(recordDefinition);
     if (record != null) {
-      record.setState(RecordState.Initializing);
+      record.setState(RecordState.INITIALIZING);
       int columnIndex = 1;
       for (final FieldDefinition field : fields) {
         final JdbcFieldDefinition jdbcField = (JdbcFieldDefinition)field;
@@ -45,7 +44,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record>implements Record
             "Unable to get value " + (columnIndex + 1) + " from result set", e);
         }
       }
-      record.setState(RecordState.Persisted);
+      record.setState(RecordState.PERSISTED);
       recordStore.addStatistic("query", record);
     }
     return record;
@@ -72,7 +71,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record>implements Record
 
   private RecordDefinition recordDefinition;
 
-  private RecordFactory recordFactory;
+  private RecordFactory<Record> recordFactory;
 
   private JdbcRecordStore recordStore;
 
@@ -88,7 +87,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record>implements Record
 
     final boolean autoCommit = BooleanStringConverter.getBoolean(properties.get("autoCommit"));
     this.connection = recordStore.getJdbcConnection(autoCommit);
-    this.recordFactory = query.getProperty("recordFactory");
+    this.recordFactory = query.getRecordFactory();
     if (this.recordFactory == null) {
       this.recordFactory = recordStore.getRecordFactory();
     }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,9 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordFactory;
+import com.revolsys.record.Records;
 import com.revolsys.record.query.functions.EnvelopeIntersects;
 import com.revolsys.record.query.functions.F;
 import com.revolsys.record.schema.FieldDefinition;
@@ -99,6 +103,8 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
     query.setOrderByFieldNames(orderBy);
     return query;
   }
+
+  private RecordFactory<Record> recordFactory;
 
   private List<String> fieldNames = Collections.emptyList();
 
@@ -229,6 +235,11 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
     return this.recordDefinition;
   }
 
+  @SuppressWarnings("unchecked")
+  public <V extends Record> RecordFactory<V> getRecordFactory() {
+    return (RecordFactory<V>)this.recordFactory;
+  }
+
   public String getSql() {
     return this.sql;
   }
@@ -332,6 +343,11 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  public void setRecordFactory(final RecordFactory<?> recordFactory) {
+    this.recordFactory = (RecordFactory<Record>)recordFactory;
+  }
+
   public void setSql(final String sql) {
     this.sql = sql;
   }
@@ -362,6 +378,14 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
       if (recordDefinition != null) {
         whereCondition.setRecordDefinition(recordDefinition);
       }
+    }
+  }
+
+  public <V extends Record> void sort(final List<V> records) {
+    final Map<String, Boolean> orderBy = getOrderBy();
+    if (Property.hasValue(orderBy)) {
+      final Comparator<Record> comparator = Records.newComparatorOrderBy(orderBy);
+      records.sort(comparator);
     }
   }
 

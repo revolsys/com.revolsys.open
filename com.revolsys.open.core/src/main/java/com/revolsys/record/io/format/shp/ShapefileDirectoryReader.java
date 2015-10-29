@@ -9,8 +9,9 @@ import java.util.Map.Entry;
 import com.revolsys.io.AbstractDirectoryReader;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
-import com.revolsys.record.ArrayRecordFactory;
+import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
+import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.RecordDirectoryReader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
@@ -59,8 +60,8 @@ public class ShapefileDirectoryReader extends RecordDirectoryReader {
   @Override
   protected Reader<Record> newReader(final Resource resource) {
     try {
-      final ArrayRecordFactory factory = new ArrayRecordFactory();
-      final ShapefileRecordReader iterator = new ShapefileRecordReader(resource, factory);
+      final RecordFactory<ArrayRecord> recordFactory = ArrayRecord.FACTORY;
+      final ShapefileRecordReader iterator = new ShapefileRecordReader(resource, recordFactory);
       final String baseName = resource.getBaseName().toUpperCase();
       iterator.setTypeName(PathName.newPathName(this.fileNameTypeMap.get(baseName)));
       iterator.setRecordDefinition(this.typeNameRecordDefinitionMap.get(iterator.getTypeName()));

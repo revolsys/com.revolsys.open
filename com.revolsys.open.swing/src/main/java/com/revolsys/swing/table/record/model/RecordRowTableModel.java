@@ -257,7 +257,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
       final Record record = getRecord(rowIndex);
       if (record == null) {
         return LOADING_VALUE;
-      } else if (record.getState() == RecordState.Initializing) {
+      } else if (record.getState() == RecordState.INITIALIZING) {
         return LOADING_VALUE;
       } else {
         final String name = getFieldName(columnIndex);
@@ -273,7 +273,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
       final Record record = getRecord(rowIndex);
       if (record != null) {
         final RecordState state = record.getState();
-        if (state != RecordState.Initializing && state != RecordState.Deleted) {
+        if (state != RecordState.INITIALIZING && state != RecordState.DELETED) {
           final String fieldName = getFieldName(rowIndex, columnIndex);
           if (fieldName != null) {
             if (!isReadOnly(fieldName)) {
@@ -461,7 +461,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
       rowHeight = 1;
       displayValue = null;
     } else {
-      if (record.getState() == RecordState.Initializing) {
+      if (record.getState() == RecordState.INITIALIZING) {
         displayValue = LOADING_VALUE;
       } else {
         displayValue = toDisplayValueInternal(rowIndex, fieldIndex, objectValue);

@@ -20,10 +20,10 @@ import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.properties.BaseObjectWithProperties;
-import com.revolsys.record.ArrayRecordFactory;
+import com.revolsys.record.ArrayRecord;
+import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;
-import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordStoreExtension;
 import com.revolsys.record.property.RecordDefinitionProperty;
 import com.revolsys.util.Exceptions;
@@ -48,7 +48,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   private boolean loadFullSchema = true;
 
-  private RecordFactory recordFactory;
+  private RecordFactory<Record> recordFactory;
 
   private final Set<RecordStoreExtension> recordStoreExtensions = new LinkedHashSet<RecordStoreExtension>();
 
@@ -59,11 +59,11 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   private final Map<String, Map<String, Object>> typeRecordDefinitionProperties = new HashMap<>();
 
   public AbstractRecordStore() {
-    this(new ArrayRecordFactory());
+    this(ArrayRecord.FACTORY);
   }
 
-  public AbstractRecordStore(final RecordFactory recordFactory) {
-    this.recordFactory = recordFactory;
+  public AbstractRecordStore(final RecordFactory<? extends Record> recordFactory) {
+    setRecordFactory(recordFactory);
   }
 
   @Override
@@ -208,7 +208,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  public RecordFactory getRecordFactory() {
+  public RecordFactory<Record> getRecordFactory() {
     return this.recordFactory;
   }
 
@@ -253,11 +253,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   protected void obtainConnected() {
-  }
-
-  @Override
-  public RecordReader query(final List<?> queries) {
-    return query((Iterable<?>)queries);
   }
 
   protected RecordDefinition refreshRecordDefinition(final RecordStoreSchema schema,
@@ -317,8 +312,8 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  public void setRecordFactory(final RecordFactory recordFactory) {
-    this.recordFactory = recordFactory;
+  public void setRecordFactory(final RecordFactory<? extends Record> recordFactory) {
+    this.recordFactory = (RecordFactory<Record>)recordFactory;
   }
 
   public void setTypeRecordDefinitionProperties(

@@ -2,6 +2,7 @@ package com.revolsys.jdbc.io;
 
 import java.sql.ResultSetMetaData;
 
+import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.record.schema.RecordDefinition;
@@ -20,9 +21,14 @@ public interface JdbcRecordStore extends RecordStore {
 
   JdbcConnection getJdbcConnection(boolean autoCommit);
 
-  Object getNextPrimaryKey(RecordDefinition recordDefinition);
+  default Identifier getNextPrimaryKey(final RecordDefinition recordDefinition) {
+    final String sequenceName = getSequenceName(recordDefinition);
+    return getNextPrimaryKey(sequenceName);
+  }
 
-  Object getNextPrimaryKey(String typePath);
+  Identifier getNextPrimaryKey(String typePath);
 
   RecordDefinition getRecordDefinition(String tableName, ResultSetMetaData resultSetMetaData);
+
+  String getSequenceName(RecordDefinition recordDefinition);
 }

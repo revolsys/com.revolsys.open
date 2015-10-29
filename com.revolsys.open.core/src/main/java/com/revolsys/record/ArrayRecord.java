@@ -12,19 +12,29 @@ import com.revolsys.util.Property;
 
 /**
  * The ArrayRecord is an implementation of {@link Record} which uses an array of
- * Objects as the storage for the attribute values.
- *
- * @author Paul Austin
+ * Objects as the storage for the field values.
  */
 public class ArrayRecord extends BaseRecord {
+  public static final RecordFactory<ArrayRecord> FACTORY = ArrayRecord::newRecord;
+
   /** Serialization version */
   private static final long serialVersionUID = 1L;
 
-  /** The object's attribute values. */
+  /**
+   * Construct a new ArrayRecord using the record definition
+   *
+   * @param recordDefinition The record definition used to create the instance.
+   * @return The Record instance.
+   */
+  public static ArrayRecord newRecord(final RecordDefinition recordDefinition) {
+    return new ArrayRecord(recordDefinition);
+  }
+
+  /** The object's field values. */
   private Object[] values;
 
   /**
-   * Construct a new ArrayRecord as a deep clone of the attribute values.
+   * Construct a new ArrayRecord as a deep clone of the field values.
    * Objects can only be cloned if they have a publicly accessible
    * {@link #clone()} method.
    *
@@ -55,7 +65,7 @@ public class ArrayRecord extends BaseRecord {
       setValuesByPath(defaultValues);
       setValues(values);
     }
-    setState(RecordState.New);
+    setState(RecordState.NEW);
   }
 
   /**
@@ -71,10 +81,10 @@ public class ArrayRecord extends BaseRecord {
   }
 
   /**
-   * Get the value of the attribute with the specified index.
+   * Get the value of the field with the specified index.
    *
-   * @param index The index of the attribute.
-   * @return The attribute value.
+   * @param index The index of the field.
+   * @return The field value.
    */
   @Override
   @SuppressWarnings("unchecked")
@@ -89,7 +99,7 @@ public class ArrayRecord extends BaseRecord {
   /**
    * Get the values of all values.
    *
-   * @return The attribute value.
+   * @return The field value.
    */
   @Override
   public List<Object> getValues() {
@@ -102,9 +112,9 @@ public class ArrayRecord extends BaseRecord {
   }
 
   /**
-   * Set the value of the attribute with the specified name.
+   * Set the value of the field with the specified name.
    *
-   * @param index The index of the attribute. param value The attribute value.
+   * @param index The index of the field.
    * @param value The new value.
    */
   @Override

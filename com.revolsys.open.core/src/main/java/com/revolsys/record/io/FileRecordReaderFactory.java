@@ -3,13 +3,13 @@ package com.revolsys.record.io;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
-import com.revolsys.record.ArrayRecordFactory;
+import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.spring.resource.Resource;
 
 public class FileRecordReaderFactory extends AbstractFactoryBean<RecordReader> {
 
-  private RecordFactory factory = new ArrayRecordFactory();
+  private RecordFactory factory = ArrayRecord.FACTORY;
 
   private Resource resource;
 

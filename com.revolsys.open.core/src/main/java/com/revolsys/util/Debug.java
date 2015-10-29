@@ -82,7 +82,7 @@ public class Debug {
   }
 
   public static void modified(final Record object) {
-    if (object.getState() == RecordState.Modified) {
+    if (object.getState() == RecordState.MODIFIED) {
       noOp();
     }
   }

@@ -71,12 +71,12 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   protected void createRecordInternal(final Map<String, Object> values) {
-    final LayerRecord record = newRecord(getRecordDefinition());
-    record.setState(RecordState.Initializing);
+    final LayerRecord record = newLayerRecord(getRecordDefinition());
+    record.setState(RecordState.INITIALIZING);
     try {
       record.setValues(values);
     } finally {
-      record.setState(RecordState.Persisted);
+      record.setState(RecordState.PERSISTED);
     }
     synchronized (this.records) {
       this.records.add(record);
@@ -169,23 +169,6 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public int getPersistedRecordCount(final Query query) {
-    final Condition filter = query.getWhereCondition();
-    if (filter.isEmpty()) {
-      return getPersistedRecordCount();
-    } else {
-      int count = 0;
-      final List<LayerRecord> records = getRecords();
-      for (final LayerRecord record : records) {
-        if (filter.test(record)) {
-          count++;
-        }
-      }
-      return count;
-    }
-  }
-
-  @Override
   public List<LayerRecord> getPersistedRecords(final Query query) {
     final List<LayerRecord> records = getRecords();
     final Condition filter = query.getWhereCondition();
@@ -220,6 +203,23 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
+  public int getRecordCountPersisted(final Query query) {
+    final Condition filter = query.getWhereCondition();
+    if (filter.isEmpty()) {
+      return getPersistedRecordCount();
+    } else {
+      int count = 0;
+      final List<LayerRecord> records = getRecords();
+      for (final LayerRecord record : records) {
+        if (filter.test(record)) {
+          count++;
+        }
+      }
+      return count;
+    }
+  }
+
+  @Override
   public List<LayerRecord> getRecords() {
     synchronized (this.records) {
       return new ArrayList<>(this.records);
@@ -232,8 +232,8 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public LayerRecord newRecord(final Map<String, Object> values) {
-    final LayerRecord record = super.newRecord(values);
+  public LayerRecord newLayerRecord(final Map<String, Object> values) {
+    final LayerRecord record = super.newLayerRecord(values);
     addToIndex(record);
     fireEmpty();
     return record;

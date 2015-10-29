@@ -172,7 +172,7 @@ public class RecordIoTestSuite {
     if (GeometryReader.isReadable(resource)) {
       try (
         Reader<Geometry> geometryReader = GeometryReader.newGeometryReader(resource)) {
-        final List<Geometry> geometries = geometryReader.read();
+        final List<Geometry> geometries = geometryReader.toList();
         Assert.assertEquals("Geometry Count", 1, geometries.size());
 
         final Geometry expectedGeometry = record.getGeometry();
@@ -192,7 +192,7 @@ public class RecordIoTestSuite {
         resource);
       try (
         RecordReader geometryReader = RecordReader.newRecordReader(resource)) {
-        final List<Record> records = geometryReader.read();
+        final List<Record> records = geometryReader.toList();
         Assert.assertEquals("Record Count", 1, records.size());
 
         final Record actualRecord = records.get(0);

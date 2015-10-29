@@ -18,11 +18,11 @@ public class NewProxyLayerRecord extends AbstractProxyLayerRecord {
   public NewProxyLayerRecord(final RecordStoreLayer layer, final Map<String, Object> values) {
     super(layer);
     this.record = new ArrayLayerRecord(layer, values);
-    this.record.setState(RecordState.Initializing);
+    this.record.setState(RecordState.INITIALIZING);
     try {
       this.record.setIdentifier(null);
     } finally {
-      this.record.setState(RecordState.New);
+      this.record.setState(RecordState.NEW);
     }
   }
 
@@ -52,7 +52,7 @@ public class NewProxyLayerRecord extends AbstractProxyLayerRecord {
   @Override
   public void postSaveNew() {
     final RecordState state = getState();
-    if (state == RecordState.Persisted) {
+    if (state == RecordState.PERSISTED) {
       if (this.identifier == null) {
         this.identifier = super.getIdentifier();
         if (this.identifier != null) {

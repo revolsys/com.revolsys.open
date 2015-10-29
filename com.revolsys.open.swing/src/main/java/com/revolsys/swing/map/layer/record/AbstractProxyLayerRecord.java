@@ -66,7 +66,7 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   public RecordState getState() {
     final Record record = getRecord();
     if (record == null) {
-      return RecordState.Deleted;
+      return RecordState.DELETED;
     } else {
       return record.getState();
     }

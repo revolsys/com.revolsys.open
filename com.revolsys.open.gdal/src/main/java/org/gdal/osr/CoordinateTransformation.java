@@ -9,7 +9,7 @@
 package org.gdal.osr;
 
 public class CoordinateTransformation {
-  /* New in GDAL 1.10 */
+  /* NEW in GDAL 1.10 */
   public static CoordinateTransformation CreateCoordinateTransformation(final SpatialReference src,
     final SpatialReference dst) {
     return osr.CreateCoordinateTransformation(src, dst);

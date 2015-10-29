@@ -47,11 +47,11 @@ public class GeometryTest {
       final Record record = this.recordStore.newRecord(typePath,
         Collections.singletonMap("GEOMETRY", geometry));
       try (
-        Writer<Record> writer = this.recordStore.newWriter()) {
+        Writer<Record> writer = this.recordStore.newRecordWriter()) {
         writer.write(record);
       }
       final Identifier identifier = record.getIdentifier();
-      final Record savedRecord = this.recordStore.load(typePath, identifier);
+      final Record savedRecord = this.recordStore.getRecord(typePath, identifier);
       Assert.assertNotNull("Saved record", savedRecord);
       final Geometry savedGeometry = savedRecord.getGeometry();
       final GeometryFactory tableGeometryFactory = recordDefinition.getGeometryFactory();

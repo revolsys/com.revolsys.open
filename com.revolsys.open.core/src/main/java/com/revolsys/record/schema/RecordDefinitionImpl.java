@@ -30,7 +30,6 @@ import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.record.ArrayRecord;
-import com.revolsys.record.ArrayRecordFactory;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;
@@ -101,7 +100,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   private RecordDefinitionFactory recordDefinitionFactory;
 
-  private RecordFactory recordFactory = new ArrayRecordFactory();
+  private RecordFactory recordFactory = ArrayRecord.FACTORY;
 
   private final Map<String, Collection<Object>> restrictions = new HashMap<>();
 
@@ -315,7 +314,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     if (recordStore == null) {
       throw new UnsupportedOperationException();
     } else {
-      recordStore.delete(record);
+      recordStore.deleteRecord(record);
     }
   }
 
@@ -456,6 +455,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     return this.fieldNames;
   }
 
+  @Override
   public Set<String> getFieldNamesSet() {
     return this.fieldNamesSet;
   }

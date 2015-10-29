@@ -16,7 +16,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;
-import com.revolsys.record.ArrayRecordFactory;
+import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.RecordReader;
@@ -54,11 +54,11 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
   private Resource resource;
 
   public CsvRecordReader(final Resource resource) {
-    this(resource, new ArrayRecordFactory(), Csv.FIELD_SEPARATOR);
+    this(resource, ArrayRecord.FACTORY, Csv.FIELD_SEPARATOR);
   }
 
   public CsvRecordReader(final Resource resource, final char fieldSeparator) {
-    this(resource, new ArrayRecordFactory(), fieldSeparator);
+    this(resource, ArrayRecord.FACTORY, fieldSeparator);
   }
 
   public CsvRecordReader(final Resource resource, final RecordFactory recordFactory) {

@@ -12,7 +12,7 @@ public abstract class AbstractRecord implements Record, Cloneable {
   public AbstractRecord clone() {
     try {
       final AbstractRecord record = (AbstractRecord)super.clone();
-      record.setState(RecordState.New);
+      record.setState(RecordState.NEW);
       return record;
     } catch (final CloneNotSupportedException e) {
       throw new RuntimeException("Unable to clone", e);
@@ -64,10 +64,10 @@ public abstract class AbstractRecord implements Record, Cloneable {
   @SuppressWarnings("incomplete-switch")
   protected void updateState() {
     switch (getState()) {
-      case Persisted:
-        setState(RecordState.Modified);
+      case PERSISTED:
+        setState(RecordState.MODIFIED);
       break;
-      case Deleted:
+      case DELETED:
         throw new IllegalStateException("Cannot modify an object which has been deleted");
     }
   }

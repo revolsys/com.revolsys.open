@@ -34,13 +34,14 @@ import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.identifier.Identifier;
 import com.revolsys.io.Path;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
-import com.revolsys.record.ArrayRecordFactory;
+import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
@@ -57,6 +58,7 @@ import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
+import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 
 public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
@@ -70,8 +72,6 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   private final Set<String> allSchemaNames = new TreeSet<String>();
 
-  private final Map<String, JdbcFieldAdder> attributeAdders = new HashMap<>();
-
   private int batchSize;
 
   private JdbcDatabaseFactory databaseFactory;
@@ -84,6 +84,8 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   private List<String> excludeTablePatterns = new ArrayList<String>();
 
+  private final Map<String, JdbcFieldAdder> fieldDefinitionAdders = new HashMap<>();
+
   private boolean flushBetweenTypes;
 
   private String hints;
@@ -91,6 +93,8 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   private String primaryKeySql;
 
   private String primaryKeyTableCondition;
+
+  private final Map<PathName, String> qualifiedTableNameMap = new HashMap<>();
 
   private final Map<PathName, String> schemaNameMap = new HashMap<>();
 
@@ -106,8 +110,6 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   private final Map<PathName, String> tableNameMap = new HashMap<>();
 
-  private final Map<PathName, String> qualifiedTableNameMap = new HashMap<>();
-
   private String tablePermissionsSql;
 
   private DataSourceTransactionManager transactionManager;
@@ -115,7 +117,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   private final Object writerKey = new Object();
 
   public AbstractJdbcRecordStore() {
-    this(new ArrayRecordFactory());
+    this(ArrayRecord.FACTORY);
   }
 
   public AbstractJdbcRecordStore(final DataSource dataSource) {
@@ -124,16 +126,16 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   public AbstractJdbcRecordStore(final JdbcDatabaseFactory databaseFactory) {
-    this(databaseFactory, new ArrayRecordFactory());
+    this(databaseFactory, ArrayRecord.FACTORY);
   }
 
   public AbstractJdbcRecordStore(final JdbcDatabaseFactory databaseFactory,
-    final RecordFactory recordFactory) {
+    final RecordFactory<? extends Record> recordFactory) {
     this(recordFactory);
     this.databaseFactory = databaseFactory;
   }
 
-  public AbstractJdbcRecordStore(final RecordFactory recordFactory) {
+  public AbstractJdbcRecordStore(final RecordFactory<? extends Record> recordFactory) {
     super(recordFactory);
     setIteratorFactory(new RecordStoreIteratorFactory(AbstractJdbcRecordStore::newJdbcIterator));
     addRecordStoreExtension(this);
@@ -150,7 +152,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   protected JdbcFieldDefinition addField(final RecordDefinitionImpl recordDefinition,
     final String dbColumnName, final String name, final String dataType, final int sqlType,
     final int length, final int scale, final boolean required, final String description) {
-    JdbcFieldAdder attributeAdder = this.attributeAdders.get(dataType);
+    JdbcFieldAdder attributeAdder = this.fieldDefinitionAdders.get(dataType);
     if (attributeAdder == null) {
       attributeAdder = new JdbcFieldAdder(DataTypes.OBJECT);
     }
@@ -171,7 +173,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   public void addFieldAdder(final String sqlTypeName, final JdbcFieldAdder adder) {
-    this.attributeAdders.put(sqlTypeName, adder);
+    this.fieldDefinitionAdders.put(sqlTypeName, adder);
   }
 
   @Override
@@ -184,7 +186,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
       }
     } finally {
       this.allSchemaNames.clear();
-      this.attributeAdders.clear();
+      this.fieldDefinitionAdders.clear();
       this.transactionManager = null;
       this.databaseFactory = null;
       this.dataSource = null;
@@ -199,25 +201,25 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   protected RecordStoreQueryReader createReader(final Query query) {
-    final RecordStoreQueryReader reader = newReader();
+    final RecordStoreQueryReader reader = newRecordReader();
     reader.addQuery(query);
     return reader;
   }
 
-  public RecordWriter createWriter(final int batchSize) {
-    final JdbcWriterImpl writer = new JdbcWriterImpl(this);
-    writer.setSqlPrefix(this.sqlPrefix);
-    writer.setSqlSuffix(this.sqlSuffix);
-    writer.setBatchSize(batchSize);
-    writer.setHints(this.hints);
-    writer.setLabel(getLabel());
-    writer.setFlushBetweenTypes(this.flushBetweenTypes);
-    writer.setQuoteColumnNames(false);
-    return writer;
+  @Override
+  public boolean deleteRecord(final Record record) {
+    final RecordState state = RecordState.DELETED;
+    write(record, state);
+    return true;
   }
 
   @Override
-  public int delete(final Query query) {
+  public int deleteRecords(final Iterable<? extends Record> records) {
+    return writeAll(records, RecordState.DELETED);
+  }
+
+  @Override
+  public int deleteRecords(final Query query) {
     final String typeName = query.getTypeName();
     RecordDefinition recordDefinition = query.getRecordDefinition();
     if (recordDefinition == null) {
@@ -249,17 +251,6 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
         throw e;
       }
     }
-  }
-
-  @Override
-  public void delete(final Record record) {
-    final RecordState state = RecordState.Deleted;
-    write(record, state);
-  }
-
-  @Override
-  public void deleteAll(final Collection<Record> records) {
-    writeAll(records, RecordState.Deleted);
   }
 
   public Set<String> getAllSchemaNames() {
@@ -370,6 +361,33 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
+  public int getRecordCount(Query query) {
+    query = query.clone();
+    query.setSql(null);
+    query.setFieldNames("count(*)");
+    query.setOrderBy(Collections.<String, Boolean> emptyMap());
+    final String sql = JdbcUtils.getSelectSql(query);
+    try (
+      JdbcConnection connection = getJdbcConnection()) {
+      try (
+        final PreparedStatement statement = connection.prepareStatement(sql)) {
+        JdbcUtils.setPreparedStatementParameters(statement, query);
+        try (
+          final ResultSet resultSet = statement.executeQuery()) {
+          if (resultSet.next()) {
+            final int rowCount = resultSet.getInt(1);
+            return rowCount;
+          } else {
+            return 0;
+          }
+        }
+      } catch (final SQLException e) {
+        throw connection.getException("getRecordCount", sql, e);
+      }
+    }
+  }
+
+  @Override
   public RecordDefinition getRecordDefinition(final String typePath,
     final ResultSetMetaData resultSetMetaData) {
     try {
@@ -392,33 +410,6 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
       return recordDefinition;
     } catch (final SQLException e) {
       throw new IllegalArgumentException("Unable to load metadata for " + typePath);
-    }
-  }
-
-  @Override
-  public int getRowCount(Query query) {
-    query = query.clone();
-    query.setSql(null);
-    query.setFieldNames("count(*)");
-    query.setOrderBy(Collections.<String, Boolean> emptyMap());
-    final String sql = JdbcUtils.getSelectSql(query);
-    try (
-      JdbcConnection connection = getJdbcConnection()) {
-      try (
-        final PreparedStatement statement = connection.prepareStatement(sql)) {
-        JdbcUtils.setPreparedStatementParameters(statement, query);
-        try (
-          final ResultSet resultSet = statement.executeQuery()) {
-          if (resultSet.next()) {
-            final int rowCount = resultSet.getInt(1);
-            return rowCount;
-          } else {
-            return 0;
-          }
-        }
-      } catch (final SQLException e) {
-        throw connection.getException("getRowCount", sql, e);
-      }
     }
   }
 
@@ -480,54 +471,6 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
-  public RecordWriter getWriter() {
-    return getWriter(false);
-  }
-
-  @Override
-  public RecordWriter getWriter(final boolean throwExceptions) {
-    Object writerKey;
-    if (throwExceptions) {
-      writerKey = this.exceptionWriterKey;
-    } else {
-      writerKey = this.writerKey;
-    }
-    JdbcWriterImpl writer;
-    final JdbcWriterResourceHolder resourceHolder = (JdbcWriterResourceHolder)TransactionSynchronizationManager
-      .getResource(writerKey);
-    if (resourceHolder != null
-      && (resourceHolder.hasWriter() || resourceHolder.isSynchronizedWithTransaction())) {
-      resourceHolder.requested();
-      if (resourceHolder.hasWriter()) {
-        writer = resourceHolder.getWriter();
-      } else {
-        writer = (JdbcWriterImpl)createWriter(1);
-        resourceHolder.setWriter(writer);
-      }
-    } else {
-      writer = (JdbcWriterImpl)createWriter(1);
-      writer.setThrowExceptions(throwExceptions);
-      if (TransactionSynchronizationManager.isSynchronizationActive()) {
-        JdbcWriterResourceHolder holderToUse = resourceHolder;
-        if (holderToUse == null) {
-          holderToUse = new JdbcWriterResourceHolder(writer);
-        } else {
-          holderToUse.setWriter(writer);
-        }
-        holderToUse.requested();
-        final JdbcWriterSynchronization synchronization = new JdbcWriterSynchronization(this,
-          holderToUse, writerKey);
-        TransactionSynchronizationManager.registerSynchronization(synchronization);
-        holderToUse.setSynchronizedWithTransaction(true);
-        if (holderToUse != resourceHolder) {
-          TransactionSynchronizationManager.bindResource(writerKey, holderToUse);
-        }
-      }
-    }
-    return new JdbcWriterWrapper(writer);
-  }
-
-  @Override
   @PostConstruct
   public void initialize() {
     super.initialize();
@@ -542,13 +485,13 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
-  public void insert(final Record record) {
-    write(record, RecordState.New);
+  public void insertRecord(final Record record) {
+    write(record, RecordState.NEW);
   }
 
   @Override
-  public void insertAll(final Collection<Record> records) {
-    writeAll(records, RecordState.New);
+  public void insertRecords(final Iterable<? extends Record> records) {
+    writeAll(records, RecordState.NEW);
   }
 
   public boolean isAutoCommit() {
@@ -560,7 +503,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
-  public boolean isEditable(final String typePath) {
+  public boolean isEditable(final PathName typePath) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     return recordDefinition.getIdFieldIndex() != -1;
   }
@@ -704,22 +647,63 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <T> T newPrimaryIdValue(final PathName typePath) {
+  public Identifier newPrimaryIdentifier(final PathName typePath) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     final GlobalIdProperty globalIdProperty = GlobalIdProperty.getProperty(recordDefinition);
     if (globalIdProperty == null) {
-      return (T)getNextPrimaryKey(recordDefinition);
+      return getNextPrimaryKey(recordDefinition);
     } else {
-      return (T)UUID.randomUUID().toString();
+      return Identifier.create(UUID.randomUUID().toString());
     }
   }
 
   @Override
-  public RecordWriter newWriter() {
-    final int size = this.batchSize;
-    return createWriter(size);
+  public RecordWriter newRecordWriter() {
+    return newRecordWriter(false);
+  }
+
+  protected RecordWriter newRecordWriter(final boolean throwExceptions) {
+    if (TransactionSynchronizationManager.isSynchronizationActive()) {
+      Object writerKey;
+      if (throwExceptions) {
+        writerKey = this.exceptionWriterKey;
+      } else {
+        writerKey = this.writerKey;
+      }
+      JdbcWriterResourceHolder resourceHolder = (JdbcWriterResourceHolder)TransactionSynchronizationManager
+        .getResource(writerKey);
+      if (resourceHolder == null) {
+        resourceHolder = new JdbcWriterResourceHolder();
+        TransactionSynchronizationManager.bindResource(writerKey, resourceHolder);
+      }
+      final JdbcWriterWrapper writerWrapped = resourceHolder.getWriterWrapper(this,
+        throwExceptions);
+
+      if (!resourceHolder.isSynchronizedWithTransaction()) {
+        final JdbcWriterSynchronization synchronization = new JdbcWriterSynchronization(this,
+          resourceHolder, writerKey);
+        TransactionSynchronizationManager.registerSynchronization(synchronization);
+        resourceHolder.setSynchronizedWithTransaction(true);
+      }
+
+      return writerWrapped;
+
+    } else {
+      return newRecordWriter(this.batchSize);
+    }
+  }
+
+  protected JdbcWriterImpl newRecordWriter(final int batchSize) {
+    final JdbcWriterImpl writer = new JdbcWriterImpl(this);
+    writer.setSqlPrefix(this.sqlPrefix);
+    writer.setSqlSuffix(this.sqlSuffix);
+    writer.setBatchSize(batchSize);
+    writer.setHints(this.hints);
+    writer.setLabel(getLabel());
+    writer.setFlushBetweenTypes(this.flushBetweenTypes);
+    writer.setQuoteColumnNames(false);
+    return writer;
   }
 
   @Override
@@ -733,8 +717,8 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   @Override
   public void preProcess(final RecordStoreSchema schema) {
-    for (final JdbcFieldAdder attributeAdder : this.attributeAdders.values()) {
-      attributeAdder.initialize(schema);
+    for (final JdbcFieldAdder fieldDefinitionAdder : this.fieldDefinitionAdders.values()) {
+      fieldDefinitionAdder.initialize(schema);
     }
   }
 
@@ -956,12 +940,12 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
-  public void update(final Record record) {
+  public void updateRecord(final Record record) {
     write(record, null);
   }
 
   @Override
-  public void updateAll(final Collection<Record> records) {
+  public void updateRecords(final Iterable<? extends Record> records) {
     writeAll(records, null);
   }
 
@@ -972,7 +956,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
       // won't get caught on closing the writer and the transaction won't get
       // rolled back.
       try (
-        RecordWriter writer = getWriter(true)) {
+        RecordWriter writer = newRecordWriter(true)) {
         write(writer, record, state);
       } catch (final RuntimeException e) {
         transaction.setRollbackOnly();
@@ -985,9 +969,9 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   protected Record write(final RecordWriter writer, Record record, final RecordState state) {
-    if (state == RecordState.New) {
+    if (state == RecordState.NEW) {
       if (record.getState() != state) {
-        record = copy(record);
+        record = newRecord(record);
       }
     } else if (state != null) {
       record.setState(state);
@@ -996,16 +980,18 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     return record;
   }
 
-  protected void writeAll(final Collection<Record> records, final RecordState state) {
+  protected int writeAll(final Iterable<? extends Record> records, final RecordState state) {
+    int count = 0;
     try (
-      Transaction transaction = newTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
+      Transaction transaction = newTransaction(Propagation.REQUIRED)) {
       // It's important to have this in an inner try. Otherwise the exceptions
       // won't get caught on closing the writer and the transaction won't get
       // rolled back.
       try (
-        final RecordWriter writer = getWriter(true)) {
+        final RecordWriter writer = newRecordWriter(true)) {
         for (final Record record : records) {
           write(writer, record, state);
+          count++;
         }
       } catch (final RuntimeException e) {
         transaction.setRollbackOnly();
@@ -1015,5 +1001,6 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
         throw e;
       }
     }
+    return count;
   }
 }

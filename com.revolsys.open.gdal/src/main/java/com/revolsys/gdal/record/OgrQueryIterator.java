@@ -42,7 +42,7 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
 
   private RecordDefinition recordDefinition;
 
-  private RecordFactory recordFactory;
+  private RecordFactory<Record> recordFactory;
 
   private OgrRecordStore recordStore;
 
@@ -51,7 +51,7 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
   protected OgrQueryIterator(final OgrRecordStore recordStore, final Query query) {
     this.recordStore = recordStore;
     this.query = query;
-    RecordFactory recordFactory = query.getProperty("recordFactory");
+    RecordFactory<Record> recordFactory = query.getRecordFactory();
     if (recordFactory == null) {
       recordFactory = recordStore.getRecordFactory();
     }
@@ -154,7 +154,7 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
       } else {
         try {
           final Record record = this.recordFactory.newRecord(this.recordDefinition);
-          record.setState(RecordState.Initializing);
+          record.setState(RecordState.INITIALIZING);
           if (this.statistics == null) {
             this.recordStore.addStatistic("query", record);
           } else {
@@ -219,7 +219,7 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
             final Geometry geometry = toGeometry(ogrGeometry);
             record.setValue(fieldName, geometry);
           }
-          record.setState(RecordState.Persisted);
+          record.setState(RecordState.PERSISTED);
           return record;
         } finally {
           feature.delete();

@@ -1303,7 +1303,7 @@ public class Base64 {
       final int len43 = len * 4 / 3;
       final byte[] outBuff = new byte[len43 // Main 4:3
         + (len % 3 > 0 ? 4 : 0) // Account for padding
-        + (breakLines ? len43 / MAX_LINE_LENGTH : 0)]; // New lines
+        + (breakLines ? len43 / MAX_LINE_LENGTH : 0)]; // NEW lines
       int d = 0;
       int e = 0;
       final int len2 = len - 2;

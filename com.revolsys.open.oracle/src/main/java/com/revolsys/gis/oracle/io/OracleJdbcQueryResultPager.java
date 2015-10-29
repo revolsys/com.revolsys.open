@@ -32,7 +32,7 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
     synchronized (this) {
       final JdbcRecordStore recordStore = getRecordStore();
       final Query query = getQuery();
-      setNumResults(recordStore.getRowCount(query));
+      setNumResults(recordStore.getRecordCount(query));
       updateNumPages();
 
       final ArrayList<Record> results = new ArrayList<Record>();

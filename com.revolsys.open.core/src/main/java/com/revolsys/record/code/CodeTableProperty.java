@@ -135,7 +135,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
         code.setValue(this.modificationTimestampFieldName, now);
       }
 
-      this.recordStore.insert(code);
+      this.recordStore.insertRecord(code);
       return code.getIdentifier();
     } else {
       return null;
@@ -200,7 +200,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
   }
 
   public Record getRecord(final Identifier id) {
-    return this.recordStore.load(this.typePath, id);
+    return this.recordStore.getRecord(this.typePath, id);
   }
 
   @Override
@@ -273,8 +273,8 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
             query.addOrderBy(order, true);
           }
           try (
-            Reader<Record> reader = this.recordStore.query(query)) {
-            final List<Record> codes = reader.read();
+            Reader<Record> reader = this.recordStore.getRecords(query)) {
+            final List<Record> codes = reader.toList();
             this.recordStore.getStatistics().getStatistics("query").add(this.typePath,
               -codes.size());
             Collections.sort(codes, new RecordFieldComparator(this.orderBy));
@@ -316,9 +316,9 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
         }
       }
       query.setWhereCondition(and);
-      final Reader<Record> reader = this.recordStore.query(query);
+      final Reader<Record> reader = this.recordStore.getRecords(query);
       try {
-        final List<Record> codes = reader.read();
+        final List<Record> codes = reader.toList();
         this.recordStore.getStatistics().getStatistics("query").add(this.typePath, -codes.size());
         addValues(codes);
         id = getIdByValue(values);
@@ -343,9 +343,9 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
         final Record code;
         if (id instanceof Identifier) {
           final Identifier identifier = (Identifier)id;
-          code = this.recordStore.load(this.typePath, identifier);
+          code = this.recordStore.getRecord(this.typePath, identifier);
         } else {
-          code = this.recordStore.load(this.typePath, id);
+          code = this.recordStore.getRecord(this.typePath, id);
         }
         if (code != null) {
           addValue(code);

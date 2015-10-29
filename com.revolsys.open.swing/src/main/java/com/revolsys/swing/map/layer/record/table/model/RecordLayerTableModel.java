@@ -140,17 +140,17 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   private final Map<String, Function<Integer, LayerRecord>> getRecordMethodByFilterMode = new HashMap<>();
 
-  private int rowCount;
+  private int recordCount;
 
-  private Callable<Integer> rowCountMethod;
+  private Callable<Integer> recordCountMethod;
 
-  private final Map<String, Callable<Integer>> rowCountMethodByFilterMode = new HashMap<>();
+  private final Map<String, Callable<Integer>> recordCountMethodByFilterMode = new HashMap<>();
 
   private Consumer2<Query, Object> exportRecordsMethod;
 
   private final Map<String, Consumer2<Query, Object>> exportRecordsMethodByFilterMode = new HashMap<>();
 
-  private SwingWorker<?, ?> rowCountWorker;
+  private SwingWorker<?, ?> recordCountWorker;
 
   private RowFilter<RecordRowTableModel, Integer> rowFilter = null;
 
@@ -171,14 +171,14 @@ public class RecordLayerTableModel extends RecordRowTableModel
     setReadOnlyFieldNames(layer.getUserReadOnlyFieldNames());
     this.loadingRecord = new LoadingRecord(layer);
 
-    setFilterModeMethods(MODE_ALL_RECORDS, this::refreshAllRecords, this::getRowCountBackground,
+    setFilterModeMethods(MODE_ALL_RECORDS, this::refreshAllRecords, this::getRecordCountBackground,
       this::loadLayerRecord, layer::exportRecords);
 
-    setFilterModeMethods(MODE_CHANGED_RECORDS, this::refreshChangedRecords,
-      this::getRowCountFieldValue, this::getRecordCached, this::exportRecordsCached);
+    setFilterModeMethods(MODE_CHANGED_RECORDS, this::refreshChangedRecords, this::getRecordCount,
+      this::getRecordCached, this::exportRecordsCached);
 
-    setFilterModeMethods(MODE_SELECTED_RECORDS, this::refreshSelectedRecords,
-      this::getRowCountFieldValue, this::getRecordCached, this::exportRecordsCached);
+    setFilterModeMethods(MODE_SELECTED_RECORDS, this::refreshSelectedRecords, this::getRecordCount,
+      this::getRecordCached, this::exportRecordsCached);
   }
 
   protected void clearLoading() {
@@ -267,24 +267,6 @@ public class RecordLayerTableModel extends RecordRowTableModel
     return this.layer;
   }
 
-  protected List<LayerRecord> getLayerRecords(final Query query) {
-    return this.layer.getPersistedRecords(query);
-  }
-
-  protected int getLayerRowCount() {
-    final Query query = getFilterQuery();
-    if (query == null) {
-      return this.layer.getRecordCount();
-    } else {
-      return this.layer.getRecordCount(query);
-    }
-  }
-
-  protected List<LayerRecord> getLayerSelectedRecords() {
-    final AbstractRecordLayer layer = getLayer();
-    return layer.getSelectedRecords();
-  }
-
   @Override
   public MenuFactory getMenu(final int rowIndex, final int columnIndex) {
     final Record record = getRecord(rowIndex);
@@ -364,37 +346,27 @@ public class RecordLayerTableModel extends RecordRowTableModel
     }
   }
 
-  protected List<LayerRecord> getRecordsCached() {
-    return this.cachedRecords;
+  protected final int getRecordCount() {
+    return this.recordCount;
   }
 
-  @Override
-  public final int getRowCount() {
-    try {
-      return this.rowCountMethod.call();
-    } catch (final Exception e) {
-      LoggerFactory.getLogger(getClass()).error("Unable to get row count", e);
-      return 0;
-    }
-  }
-
-  protected int getRowCountBackground() {
+  protected int getRecordCountBackground() {
     synchronized (getSync()) {
       if (this.countLoaded) {
-        int count = this.rowCount;
+        int count = this.recordCount;
         final AbstractRecordLayer layer = getLayer();
         final int newRecordCount = layer.getNewRecordCount();
         count += newRecordCount;
         return count;
       } else {
-        if (this.rowCountWorker == null) {
+        if (this.recordCountWorker == null) {
           final long refreshIndex = this.refreshIndex.get();
-          this.rowCountWorker = Invoke.background("Query row count " + this.layer.getName(),
-            this::getRowCountInternal, (rowCount) -> {
+          this.recordCountWorker = Invoke.background("Query row count " + this.layer.getName(),
+            this::getRecordCountLayer, (rowCount) -> {
               if (refreshIndex == this.refreshIndex.get()) {
-                this.rowCount = rowCount;
+                this.recordCount = rowCount;
                 this.countLoaded = true;
-                this.rowCountWorker = null;
+                this.recordCountWorker = null;
                 setRowCount(rowCount);
                 fireTableDataChanged();
               }
@@ -405,15 +377,35 @@ public class RecordLayerTableModel extends RecordRowTableModel
     }
   }
 
-  protected final int getRowCountFieldValue() {
-    return this.rowCount;
+  protected int getRecordCountLayer() {
+    final Query query = getFilterQuery();
+    if (query == null) {
+      return this.layer.getRecordCount();
+    } else {
+      return this.layer.getRecordCount(query);
+    }
   }
 
-  protected int getRowCountInternal() {
-    if (this.fieldFilterMode.equals(MODE_CHANGED_RECORDS)) {
-      return this.layer.getChangeCount();
-    } else {
-      return getLayerRowCount();
+  protected List<LayerRecord> getRecordsCached() {
+    return this.cachedRecords;
+  }
+
+  protected List<LayerRecord> getRecordsLayer(final Query query) {
+    return this.layer.getPersistedRecords(query);
+  }
+
+  protected List<LayerRecord> getRecordsSelected() {
+    final AbstractRecordLayer layer = getLayer();
+    return layer.getSelectedRecords();
+  }
+
+  @Override
+  public final int getRowCount() {
+    try {
+      return this.recordCountMethod.call();
+    } catch (final Exception e) {
+      LoggerFactory.getLogger(getClass()).error("Unable to get row count", e);
+      return 0;
     }
   }
 
@@ -481,7 +473,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
     final Query query = getFilterQuery();
     query.setOffset(this.pageSize * pageNumber);
     query.setLimit(this.pageSize);
-    return getLayerRecords(query);
+    return getRecordsLayer(query);
   }
 
   public void loadPages(final long refreshIndex) {
@@ -510,7 +502,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
         "recordDeleted", "recordsChanged").contains(propertyName)) {
         refresh();
       } else if ("recordUpdated".equals(propertyName)) {
-        if (MODE_SELECTED_RECORDS.equals(getFieldFilterMode())) {
+        if (isSortable()) {
           fireTableDataChanged();
         } else {
           repaint();
@@ -576,9 +568,9 @@ public class RecordLayerTableModel extends RecordRowTableModel
           this.loadRecordsWorker.cancel(true);
           this.loadRecordsWorker = null;
         }
-        if (this.rowCountWorker != null) {
-          this.rowCountWorker.cancel(true);
-          this.rowCountWorker = null;
+        if (this.recordCountWorker != null) {
+          this.recordCountWorker.cancel(true);
+          this.recordCountWorker = null;
         }
         clearLoading();
       }
@@ -632,7 +624,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
   public void setFieldFilterMode(final String mode) {
     Invoke.later(() -> {
       if (!mode.equals(this.fieldFilterMode)) {
-        this.rowCount = 0;
+        this.recordCount = 0;
         this.cachedRecords = Collections.emptyList();
         this.fieldFilterMode = mode;
         this.refreshIndex.incrementAndGet();
@@ -712,7 +704,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
     final Callable<Integer> rowCount, final Function<Integer, LayerRecord> getRecordMethod,
     final Consumer2<Query, Object> exportRecordsMethod) {
     this.refreshMethodByFilterMode.put(filterMode, refresh);
-    this.rowCountMethodByFilterMode.put(filterMode, rowCount);
+    this.recordCountMethodByFilterMode.put(filterMode, rowCount);
     this.getRecordMethodByFilterMode.put(filterMode, getRecordMethod);
     this.exportRecordsMethodByFilterMode.put(filterMode, exportRecordsMethod);
     updateMethods();
@@ -761,8 +753,8 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   private void setRowCount(final int rowCount) {
-    final int oldValue = this.rowCount;
-    this.rowCount = rowCount;
+    final int oldValue = this.recordCount;
+    this.recordCount = rowCount;
     firePropertyChange("rowCount", oldValue, rowCount);
   }
 
@@ -813,16 +805,17 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   protected void updateMethods() {
-    this.refreshMethod = Maps.get(this.refreshMethodByFilterMode, this.fieldFilterMode,
+    final String fieldFilterMode = getFieldFilterMode();
+    this.refreshMethod = Maps.get(this.refreshMethodByFilterMode, fieldFilterMode,
       this.defaultRefreshMethod);
 
-    this.rowCountMethod = Maps.get(this.rowCountMethodByFilterMode, this.fieldFilterMode,
-      this::getRowCountFieldValue);
+    this.recordCountMethod = Maps.get(this.recordCountMethodByFilterMode, fieldFilterMode,
+      this::getRecordCount);
 
-    this.getRecordMethod = Maps.get(this.getRecordMethodByFilterMode, this.fieldFilterMode,
+    this.getRecordMethod = Maps.get(this.getRecordMethodByFilterMode, fieldFilterMode,
       this::loadLayerRecord);
 
-    this.exportRecordsMethod = Maps.get(this.exportRecordsMethodByFilterMode, this.fieldFilterMode,
+    this.exportRecordsMethod = Maps.get(this.exportRecordsMethodByFilterMode, fieldFilterMode,
       this.layer::exportRecords);
   }
 }

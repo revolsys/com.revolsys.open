@@ -1,6 +1,6 @@
 package com.revolsys.swing.component;
 
-/** Modified DnDTabbedPane.java
+/** MODIFIED DnDTabbedPane.java
  * http://java-swing-tips.blogspot.com/2008/04/drag-and-drop-tabs-in-jtabbedpane.html
  * originally written by Terai Atsuhiro.
  * so that tabs can be transfered from one pane to another.

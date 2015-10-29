@@ -134,9 +134,9 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
   }
 
   public void deleteObject(final Object id) {
-    final Record object = loadObject(id);
-    if (object != null) {
-      this.recordStore.delete(object);
+    final Record record = loadObject(id);
+    if (record != null) {
+      this.recordStore.deleteRecord(record);
     }
   }
 
@@ -170,7 +170,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
       final Identifier identifier = this.recordStore.newPrimaryIdentifier(this.tableName);
       object.setIdentifier(identifier);
     }
-    this.recordStore.insert(object);
+    this.recordStore.insertRecord(object);
   }
 
   protected boolean isPropertyUnique(final Record object, final String fieldName) {
@@ -181,9 +181,9 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
       return true;
     } else {
       final Query query = Query.equal(recordDefinition, fieldName, value);
-      final Reader<Record> results = recordStore.query(query);
-      final List<Record> objects = results.read();
-      if (object.getState() == RecordState.New) {
+      final Reader<Record> results = recordStore.getRecords(query);
+      final List<Record> objects = results.toList();
+      if (object.getState() == RecordState.NEW) {
         return objects.isEmpty();
       } else {
         final Identifier id = object.getIdentifier();
@@ -205,7 +205,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
   }
 
   public Record loadObject(final PathName typeName, final Object id) {
-    final Record object = this.recordStore.load(typeName, id);
+    final Record object = this.recordStore.getRecord(typeName, id);
     return object;
   }
 
@@ -219,6 +219,6 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
 
   @Override
   protected void updateObject(final Record object) {
-    this.recordStore.update(object);
+    this.recordStore.updateRecord(object);
   }
 }

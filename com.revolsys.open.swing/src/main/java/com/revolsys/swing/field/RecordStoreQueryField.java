@@ -48,7 +48,7 @@ public class RecordStoreQueryField extends AbstractRecordQueryField {
   @Override
   protected Record getRecord(final Identifier identifier) {
     final PathName typePath = getTypePath();
-    return this.recordStore.load(typePath, identifier);
+    return this.recordStore.getRecord(typePath, identifier);
   }
 
   @Override
@@ -59,8 +59,8 @@ public class RecordStoreQueryField extends AbstractRecordQueryField {
   @Override
   protected List<Record> getRecords(final Query query) {
     try (
-      Reader<Record> reader = this.recordStore.query(query)) {
-      return reader.read();
+      Reader<Record> reader = this.recordStore.getRecords(query)) {
+      return reader.toList();
     }
   }
 }

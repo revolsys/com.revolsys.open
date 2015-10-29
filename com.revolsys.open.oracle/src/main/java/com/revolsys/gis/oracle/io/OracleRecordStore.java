@@ -21,12 +21,13 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.oracle.esri.ArcSdeStGeometryFieldDefinition;
 import com.revolsys.gis.oracle.esri.ArcSdeStGeometryRecordStoreExtension;
+import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
-import com.revolsys.record.ArrayRecordFactory;
+import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.property.ShortNameProperty;
@@ -56,7 +57,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   private boolean useSchemaSequencePrefix = true;
 
   public OracleRecordStore() {
-    this(new ArrayRecordFactory());
+    this(ArrayRecord.FACTORY);
   }
 
   public OracleRecordStore(final DataSource dataSource) {
@@ -74,12 +75,13 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
 
   }
 
-  public OracleRecordStore(final RecordFactory recordFactory) {
+  public OracleRecordStore(final RecordFactory<? extends Record> recordFactory) {
     super(recordFactory);
     initSettings();
   }
 
-  public OracleRecordStore(final RecordFactory recordFactory, final DataSource dataSource) {
+  public OracleRecordStore(final RecordFactory<? extends Record> recordFactory,
+    final DataSource dataSource) {
     this(recordFactory);
     setDataSource(dataSource);
   }
@@ -299,17 +301,12 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
-  public Object getNextPrimaryKey(final RecordDefinition recordDefinition) {
-    final String sequenceName = getSequenceName(recordDefinition);
-    return getNextPrimaryKey(sequenceName);
+  public Identifier getNextPrimaryKey(final String sequenceName) {
+    final String sql = "SELECT " + sequenceName + ".NEXTVAL FROM SYS.DUAL";
+    return Identifier.create(JdbcUtils.selectLong(this, sql));
   }
 
   @Override
-  public Object getNextPrimaryKey(final String sequenceName) {
-    final String sql = "SELECT " + sequenceName + ".NEXTVAL FROM SYS.DUAL";
-    return JdbcUtils.selectLong(this, sql);
-  }
-
   public String getSequenceName(final RecordDefinition recordDefinition) {
     if (recordDefinition == null) {
       return null;

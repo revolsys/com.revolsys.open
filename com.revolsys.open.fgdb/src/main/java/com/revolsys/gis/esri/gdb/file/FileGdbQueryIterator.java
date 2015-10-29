@@ -36,7 +36,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
   private RecordDefinition recordDefinition;
 
-  private RecordFactory recordFactory;
+  private RecordFactory<Record> recordFactory;
 
   private FileGdbRecordStore recordStore;
 
@@ -63,9 +63,9 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
     final String whereClause, final BoundingBox boundingBox, final Query query, final int offset,
     final int limit) {
     this(recordStore, catalogPath, "*", whereClause, boundingBox, offset, limit);
-    final RecordFactory factory = query.getProperty("recordFactory");
-    if (factory != null) {
-      this.recordFactory = factory;
+    final RecordFactory<Record> recordFactory = query.getRecordFactory();
+    if (recordFactory != null) {
+      this.recordFactory = recordFactory;
     }
   }
 
@@ -186,7 +186,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
         } else {
           this.statistics.add(record);
         }
-        record.setState(RecordState.Initializing);
+        record.setState(RecordState.INITIALIZING);
         for (final FieldDefinition field : this.recordDefinition.getFields()) {
           final String name = field.getName();
           final AbstractFileGdbFieldDefinition esriFieldDefinition = (AbstractFileGdbFieldDefinition)field;
@@ -196,7 +196,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
             throw new NoSuchElementException();
           }
         }
-        record.setState(RecordState.Persisted);
+        record.setState(RecordState.PERSISTED);
         if (this.closed) {
           throw new NoSuchElementException();
         }

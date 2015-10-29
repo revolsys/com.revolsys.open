@@ -16,6 +16,7 @@ import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.gis.postgresql.type.PostgreSQLBoundingBoxWrapper;
 import com.revolsys.gis.postgresql.type.PostgreSQLGeometryWrapper;
+import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
@@ -23,7 +24,7 @@ import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
-import com.revolsys.record.ArrayRecordFactory;
+import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.property.ShortNameProperty;
@@ -48,7 +49,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   private boolean useSchemaSequencePrefix = true;
 
   public PostgreSQLRecordStore() {
-    this(new ArrayRecordFactory());
+    this(ArrayRecord.FACTORY);
   }
 
   public PostgreSQLRecordStore(final DataSource dataSource) {
@@ -138,15 +139,15 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
-  public Object getNextPrimaryKey(final RecordDefinition recordDefinition) {
+  public Identifier getNextPrimaryKey(final RecordDefinition recordDefinition) {
     final String sequenceName = getSequenceName(recordDefinition);
     return getNextPrimaryKey(sequenceName);
   }
 
   @Override
-  public Object getNextPrimaryKey(final String sequenceName) {
+  public Identifier getNextPrimaryKey(final String sequenceName) {
     final String sql = "SELECT nextval(?)";
-    return JdbcUtils.selectLong(this, sql, sequenceName);
+    return Identifier.create(JdbcUtils.selectLong(this, sql, sequenceName));
   }
 
   public String getSequenceName(final RecordDefinition recordDefinition) {

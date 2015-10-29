@@ -75,14 +75,35 @@ public interface Reader<T> extends Iterable<T>, ObjectWithProperties, Closeable 
    */
   @Override
   default void forEach(final Consumer<? super T> action) {
-    if (iterator() != null) {
-      try {
-        for (final T item : this) {
-          action.accept(item);
+    try (
+      Reader<?> reader = this) {
+      if (iterator() != null) {
+        try {
+          for (final T item : this) {
+            action.accept(item);
+          }
+        } catch (final ExitLoopException e) {
         }
-      } catch (final ExitLoopException e) {
       }
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  default <V extends T> V getFirst() {
+    try (
+      Reader<?> reader = this) {
+      if (iterator() != null) {
+        for (final Object value : this) {
+          return (V)value;
+        }
+      }
+    }
+    return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  default <V extends T> Iterable<V> i() {
+    return (Iterable<V>)this;
   }
 
   /**
@@ -95,22 +116,25 @@ public interface Reader<T> extends Iterable<T>, ObjectWithProperties, Closeable 
     return StreamSupport.stream(spliterator(), true);
   }
 
+  default Stream<T> stream() {
+    return StreamSupport.stream(spliterator(), false);
+  }
+
   /**
    * Read all items and return a List containing the items.
    *
    * @return The list of items.
    */
-  default List<T> read() {
-    final List<T> items = new ArrayList<T>();
-    if (iterator() != null) {
-      for (final T item : this) {
-        items.add(item);
+  default List<T> toList() {
+    final List<T> items = new ArrayList<>();
+    try (
+      Reader<?> reader = this) {
+      if (iterator() != null) {
+        for (final T item : this) {
+          items.add(item);
+        }
       }
     }
     return items;
-  }
-
-  default Stream<T> stream() {
-    return StreamSupport.stream(spliterator(), false);
   }
 }

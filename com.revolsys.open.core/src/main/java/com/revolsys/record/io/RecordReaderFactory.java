@@ -9,7 +9,7 @@ import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.io.Reader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapReaderFactory;
-import com.revolsys.record.ArrayRecordFactory;
+import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.spring.resource.Resource;
@@ -35,7 +35,7 @@ public interface RecordReaderFactory
    * @return The reader for the file.
    */
   default Reader<Record> newDirectoryRecordReader(final File directory) {
-    return newDirectoryRecordReader(directory, ArrayRecordFactory.INSTANCE);
+    return newDirectoryRecordReader(directory, ArrayRecord.FACTORY);
 
   }
 
@@ -76,7 +76,7 @@ public interface RecordReaderFactory
    * @return The reader for the file.
    */
   default RecordReader newRecordReader(final Object object) {
-    return newRecordReader(object, ArrayRecordFactory.INSTANCE);
+    return newRecordReader(object, ArrayRecord.FACTORY);
 
   }
 

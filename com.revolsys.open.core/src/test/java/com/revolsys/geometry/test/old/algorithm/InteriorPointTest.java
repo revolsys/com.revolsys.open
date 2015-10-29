@@ -47,7 +47,7 @@ public class InteriorPointTest extends TestCase {
     final ClassPathResource resource = new ClassPathResource("/com/revolsys/jts/test/data/" + file);
     try (
       Reader<Geometry> reader = GeometryReader.newGeometryReader(resource)) {
-      return reader.read();
+      return reader.toList();
     }
   }
 

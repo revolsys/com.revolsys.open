@@ -30,9 +30,9 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   public ArrayLayerRecord(final AbstractRecordLayer layer,
     final Map<String, ? extends Object> values) {
     super(layer.getRecordDefinition());
-    setState(RecordState.Initializing);
+    setState(RecordState.INITIALIZING);
     setValues(values);
-    setState(RecordState.Persisted);
+    setState(RecordState.PERSISTED);
     this.layer = layer;
   }
 
@@ -47,15 +47,15 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
         final RecordState state = getState();
         if (this.originalValues != null) {
           try {
-            setState(RecordState.Initializing);
+            setState(RecordState.INITIALIZING);
             super.setValues(this.originalValues);
             this.originalValues = null;
           } finally {
             setState(state);
           }
         }
-        if (state != RecordState.New) {
-          setState(RecordState.Persisted);
+        if (state != RecordState.NEW) {
+          setState(RecordState.PERSISTED);
         }
       }
     }
@@ -65,7 +65,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   @Override
   public void clearChanges() {
     final RecordState state = getState();
-    if (state == RecordState.Persisted) {
+    if (state == RecordState.PERSISTED) {
       this.originalValues = null;
     }
   }
@@ -113,11 +113,11 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
   @Override
   public LayerRecord revertChanges() {
-    if (this.originalValues != null || getState() == RecordState.Deleted) {
+    if (this.originalValues != null || getState() == RecordState.DELETED) {
       cancelChanges();
       final AbstractRecordLayer layer = getLayer();
       layer.revertChanges(this);
-      firePropertyChange("state", RecordState.Modified, RecordState.Persisted);
+      firePropertyChange("state", RecordState.MODIFIED, RecordState.PERSISTED);
     }
     return this;
   }
@@ -134,19 +134,19 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
       final AbstractRecordLayer layer = getLayer();
       final RecordState state = getState();
       switch (state) {
-        case Initializing:
+        case INITIALIZING:
         // Allow modification on initialization
         break;
-        case New:
+        case NEW:
           if (!layer.isCanAddRecords()) {
             throw new IllegalStateException(
               "Adding new records is not supported for layer " + layer);
           }
         break;
-        case Deleted:
+        case DELETED:
           throw new IllegalStateException("Cannot edit a deleted record for layer " + layer);
-        case Persisted:
-        case Modified:
+        case PERSISTED:
+        case MODIFIED:
           if (layer.isCanEditRecords()) {
             final Object originalValue = getOriginalValue(fieldName);
             if (Equals.equal(originalValue, newValue)) {
@@ -154,7 +154,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
                 this.originalValues.remove(fieldName);
                 if (this.originalValues.isEmpty()) {
                   this.originalValues = null;
-                  setState(RecordState.Persisted);
+                  setState(RecordState.PERSISTED);
                 }
               }
             } else {
@@ -162,8 +162,8 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
                 this.originalValues = new HashMap<>();
               }
               this.originalValues.put(fieldName, originalValue);
-              if (!RecordState.Initializing.equals(state)) {
-                setState(RecordState.Modified);
+              if (!RecordState.INITIALIZING.equals(state)) {
+                setState(RecordState.MODIFIED);
               }
             }
           } else {
@@ -172,7 +172,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
         break;
       }
       updated |= super.setValue(fieldDefinition, newValue);
-      if (state != RecordState.Initializing) {
+      if (state != RecordState.INITIALIZING) {
         firePropertyChange(fieldName, oldValue, newValue);
         layer.updateRecordState(this);
       }

@@ -27,17 +27,17 @@ public class DirectoryRecordStoreWriter extends AbstractRecordWriter {
       try {
         final RecordState state = record.getState();
         switch (state) {
-          case Modified:
-            this.recordStore.update(record);
+          case MODIFIED:
+            this.recordStore.updateRecord(record);
           break;
-          case Persisted:
-            this.recordStore.update(record);
+          case PERSISTED:
+            this.recordStore.updateRecord(record);
           break;
-          case Deleted:
-            this.recordStore.delete(record);
+          case DELETED:
+            this.recordStore.deleteRecord(record);
           break;
           default:
-            this.recordStore.insert(record);
+            this.recordStore.insertRecord(record);
           break;
         }
       } catch (final RuntimeException e) {

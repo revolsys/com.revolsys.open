@@ -412,7 +412,7 @@ public class OgrRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public int getRowCount(final Query query) {
+  public int getRecordCount(final Query query) {
     if (query == null) {
       return 0;
     } else {
@@ -698,7 +698,7 @@ public class OgrRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public RecordWriter newWriter() {
+  public RecordWriter newRecordWriter() {
     return new OgrRecordWriter(this);
   }
 

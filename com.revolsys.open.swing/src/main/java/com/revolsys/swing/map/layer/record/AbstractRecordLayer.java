@@ -125,7 +125,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.enableable.Enabled;
 
 public abstract class AbstractRecordLayer extends AbstractLayer
-  implements RecordFactory, AddGeometryCompleteAction {
+  implements AddGeometryCompleteAction {
 
   public static final String ALL = "All";
 
@@ -161,7 +161,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     Menus.addMenuItem(menu, "edit", "Cancel Changes", "table_cancel", AbstractLayer::isHasChanges,
       AbstractRecordLayer::cancelChanges);
 
-    Menus.addMenuItem(menu, "edit", "Add New Record", "table_row_insert", canAdd,
+    Menus.addMenuItem(menu, "edit", "Add NEW Record", "table_row_insert", canAdd,
       AbstractRecordLayer::addNewRecord);
 
     Menus.addMenuItem(menu, "edit", "Delete Selected Records", "table_row_delete",
@@ -174,7 +174,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     Menus.addMenuItem(menu, "dnd", "Copy Selected Records", "page_copy", hasSelectedRecords,
       AbstractRecordLayer::copySelectedRecords);
 
-    Menus.addMenuItem(menu, "dnd", "Paste New Records", "paste_plain",
+    Menus.addMenuItem(menu, "dnd", "Paste NEW Records", "paste_plain",
       canAdd.and(AbstractRecordLayer::isCanPaste), AbstractRecordLayer::pasteRecords);
 
     Menus.addMenuItem(menu, "layer", 0, "Layer Style", "palette",
@@ -204,6 +204,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     addVisibleLayers(layers, group);
     return layers;
   }
+
+  private RecordFactory<? extends LayerRecord> recordFactory = this::newLayerRecord;
 
   private final Label cacheIdDeleted = new Label("deleted");
 
@@ -369,7 +371,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   @SuppressWarnings("unchecked")
-  public <V extends LayerRecord> List<V> addRecordsToCache(final Label cacheId,
+  protected <V extends LayerRecord> List<V> addRecordsToCache(final Label cacheId,
     final Collection<? extends LayerRecord> records) {
     synchronized (getSync()) {
       final List<V> results = new ArrayList<>();
@@ -382,9 +384,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public LayerRecord addRecordToCache(final Label cacheId, final LayerRecord record) {
+  protected LayerRecord addRecordToCache(final Label cacheId, final LayerRecord record) {
     if (isLayerRecord(record)) {
-      if (record.getState() == RecordState.Deleted && !isDeleted(record)) {
+      if (record.getState() == RecordState.DELETED && !isDeleted(record)) {
         return record;
       } else {
         synchronized (getSync()) {
@@ -559,7 +561,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   @SuppressWarnings("unchecked")
   public <V extends LayerRecord> V copyRecord(final V record) {
-    final LayerRecord copy = newRecord(record);
+    final LayerRecord copy = newLayerRecord(record);
     return (V)copy;
   }
 
@@ -743,7 +745,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           for (final LayerRecord record : records) {
             if (removeRecordFromCache(this.cacheIdNew, record)) {
               removeRecordFromCache(record);
-              record.setState(RecordState.Deleted);
+              record.setState(RecordState.DELETED);
             }
           }
         }
@@ -768,7 +770,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
       addRecordToCache(this.cacheIdDeleted, record);
 
-      record.setState(RecordState.Deleted);
+      record.setState(RecordState.DELETED);
       clearSelectedRecordsIndex();
     }
   }
@@ -1313,10 +1315,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return getRecordCount();
   }
 
-  public int getPersistedRecordCount(final Query query) {
-    return getRecordCount(query);
-  }
-
   /**
    * Query the underlying record store to return those records that have been saved that match the query.
    *
@@ -1357,8 +1355,17 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return 0;
   }
 
+  public int getRecordCountPersisted(final Query query) {
+    return getRecordCount(query);
+  }
+
   public RecordDefinition getRecordDefinition() {
     return this.recordDefinition;
+  }
+
+  @SuppressWarnings("unchecked")
+  protected <V extends LayerRecord> RecordFactory<V> getRecordFactory() {
+    return (RecordFactory<V>)this.recordFactory;
   }
 
   public List<LayerRecord> getRecords() {
@@ -1487,7 +1494,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         removeRecordFromCache(cacheId, record);
         if (cacheId == this.cacheIdNew) {
           removeRecordFromCache(record);
-          record.setState(RecordState.Deleted);
+          record.setState(RecordState.DELETED);
         } else {
           internalCancelChanges(record);
           addToIndex(record);
@@ -1512,7 +1519,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected boolean internalIsDeleted(final LayerRecord record) {
-    if (record != null && record.getState() == RecordState.Deleted) {
+    if (record != null && record.getState() == RecordState.DELETED) {
       return true;
     } else {
       return isRecordCached(this.cacheIdDeleted, record);
@@ -1768,22 +1775,18 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public LayerRecord newRecord() {
-    final Map<String, Object> values = Collections.emptyMap();
-    return newRecord(values);
-  }
-
-  public LayerRecord newRecord(final Map<String, Object> values) {
+  public LayerRecord newLayerRecord(final Map<String, Object> values) {
     if (!isReadOnly() && isEditable() && isCanAddRecords()) {
-      final LayerRecord record = newRecord(getRecordDefinition());
-      record.setState(RecordState.Initializing);
+      final RecordFactory<LayerRecord> recordFactory = getRecordFactory();
+      final LayerRecord record = recordFactory.newRecord(getRecordDefinition());
+      record.setState(RecordState.INITIALIZING);
       try {
         if (values != null && !values.isEmpty()) {
           record.setValuesByPath(values);
           record.setIdentifier(null);
         }
       } finally {
-        record.setState(RecordState.New);
+        record.setState(RecordState.NEW);
       }
       addRecordToCache(this.cacheIdNew, record);
       fireRecordInserted(record);
@@ -1793,8 +1796,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  @Override
-  public LayerRecord newRecord(final RecordDefinition recordDefinition) {
+  protected LayerRecord newLayerRecord(final RecordDefinition recordDefinition) {
     if (recordDefinition.equals(getRecordDefinition())) {
       return new ArrayLayerRecord(this);
     } else {
@@ -1872,7 +1874,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           if (newValues.isEmpty()) {
             rejectedRecords.add(sourceRecord);
           } else {
-            newRecord = newRecord(newValues);
+            newRecord = newLayerRecord(newValues);
           }
           if (newRecord == null) {
             rejectedRecords.add(sourceRecord);
@@ -2102,7 +2104,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     this.proxyRecords.remove(proxyRecord);
   }
 
-  public boolean removeRecordFromCache(final Label cacheId, final LayerRecord record) {
+  protected boolean removeRecordFromCache(final Label cacheId, final LayerRecord record) {
     if (isLayerRecord(record)) {
       synchronized (getSync()) {
         return Maps.removeFromCollection(this.cacheIdToRecordMap, cacheId, record);
@@ -2111,7 +2113,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return false;
   }
 
-  public boolean removeRecordFromCache(final LayerRecord record) {
+  protected boolean removeRecordFromCache(final LayerRecord record) {
     boolean removed = false;
     synchronized (getSync()) {
       if (isLayerRecord(record)) {
@@ -2154,7 +2156,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         final boolean highlighted = isHighlighted(record);
         postSaveModifiedRecord(record);
         if (removeRecordFromCache(this.cacheIdDeleted, record)) {
-          record.setState(RecordState.Persisted);
+          record.setState(RecordState.PERSISTED);
         }
         removeRecordFromCache(record);
         setSelectedHighlighted(record, selected, highlighted);
@@ -2414,6 +2416,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
+  protected void setRecordFactory(final RecordFactory<? extends LayerRecord> recordFactory) {
+    this.recordFactory = recordFactory;
+  }
+
   protected void setSelectedHighlighted(final LayerRecord record, final boolean selected,
     final boolean highlighted) {
     if (selected) {
@@ -2512,9 +2518,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     firePropertyChange("filterChanged", false, true);
   }
 
-  public LayerRecord showAddForm(final Map<String, Object> parameters) {
+  public LayerRecord showAddForm(final Map<String, Object> values) {
     if (isCanAddRecords()) {
-      final LayerRecord newRecord = newRecord(parameters);
+      final LayerRecord newRecord = newLayerRecord(values);
       final RecordLayerForm form = createForm(newRecord);
       if (form == null) {
         return null;
@@ -2561,7 +2567,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
             return null;
           } else {
             String title;
-            if (record.getState() == RecordState.New) {
+            if (record.getState() == RecordState.NEW) {
               title = "Add NEW " + getName();
             } else if (isCanEditRecords()) {
               title = "Edit " + getName();
@@ -2768,9 +2774,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   protected void updateRecordState(final LayerRecord record) {
     final RecordState state = record.getState();
-    if (state == RecordState.Modified) {
+    if (state == RecordState.MODIFIED) {
       addModifiedRecord(record);
-    } else if (state == RecordState.Persisted) {
+    } else if (state == RecordState.PERSISTED) {
       postSaveModifiedRecord(record);
     }
   }

@@ -14,8 +14,8 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
+import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
-import com.revolsys.io.Writer;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;
@@ -48,8 +48,8 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public void addStatistic(final String statisticName, final Record object) {
-    this.recordStore.addStatistic(statisticName, object);
+  public void addStatistic(final String statisticName, final Record record) {
+    this.recordStore.addStatistic(statisticName, record);
   }
 
   @Override
@@ -69,23 +69,13 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public int delete(final Query query) {
-    return this.recordStore.delete(query);
+  public boolean deleteRecord(final Record record) {
+    return this.recordStore.deleteRecord(record);
   }
 
   @Override
-  public void delete(final Record object) {
-    this.recordStore.delete(object);
-  }
-
-  @Override
-  public void deleteAll(final Collection<Record> objects) {
-    this.recordStore.deleteAll(objects);
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return this.recordStore.equals(obj);
+  public boolean equals(final Object value) {
+    return this.recordStore.equals(value);
   }
 
   @SuppressWarnings("unchecked")
@@ -135,12 +125,17 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
+  public int getRecordCount(final Query query) {
+    return this.recordStore.getRecordCount(query);
+  }
+
+  @Override
   public RecordDefinition getRecordDefinition(final RecordDefinition recordDefinition) {
     return this.recordStore.getRecordDefinition(recordDefinition);
   }
 
   @Override
-  public RecordFactory getRecordFactory() {
+  public RecordFactory<Record> getRecordFactory() {
     return this.recordStore.getRecordFactory();
   }
 
@@ -151,11 +146,6 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   @Override
   public RecordStoreSchema getRootSchema() {
     return this.recordStore.getRootSchema();
-  }
-
-  @Override
-  public int getRowCount(final Query query) {
-    return this.recordStore.getRowCount(query);
   }
 
   @Override
@@ -174,11 +164,6 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public Writer<Record> getWriter() {
-    return this.recordStore.getWriter();
-  }
-
-  @Override
   public int hashCode() {
     return this.recordStore.hashCode();
   }
@@ -190,44 +175,24 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public void insert(final Record record) {
-    this.recordStore.insert(record);
+  public void insertRecord(final Record record) {
+    this.recordStore.insertRecord(record);
   }
 
   @Override
-  public void insertAll(final Collection<Record> objects) {
-    this.recordStore.insertAll(objects);
-  }
-
-  @Override
-  public boolean isEditable(final String typePath) {
+  public boolean isEditable(final PathName typePath) {
     return this.recordStore.isEditable(typePath);
   }
 
   @Override
-  public Record load(final String typePath, final Object... id) {
-    return this.recordStore.load(typePath, id);
-  }
-
-  @Override
-  public Record lock(final String typePath, final Object id) {
-    return this.recordStore.lock(typePath, id);
-  }
-
-  @Override
-  public <T> T newPrimaryIdValue(final PathName typePath) {
-    return this.recordStore.newPrimaryIdValue(typePath);
+  public Identifier newPrimaryIdentifier(final PathName typePath) {
+    return this.recordStore.newPrimaryIdentifier(typePath);
   }
 
   @Override
   public Query newQuery(final String typePath, final String whereClause,
     final BoundingBoxDoubleGf boundingBox) {
     return this.recordStore.newQuery(typePath, whereClause, boundingBox);
-  }
-
-  @Override
-  public RecordStoreQueryReader newReader() {
-    return this.recordStore.newReader();
   }
 
   @Override
@@ -241,8 +206,13 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public RecordWriter newWriter() {
-    return this.recordStore.newWriter();
+  public RecordStoreQueryReader newRecordReader() {
+    return this.recordStore.newRecordReader();
+  }
+
+  @Override
+  public RecordWriter newRecordWriter() {
+    return this.recordStore.newRecordWriter();
   }
 
   @Override
@@ -297,7 +267,7 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public void setRecordFactory(final RecordFactory recordFactory) {
+  public void setRecordFactory(final RecordFactory<? extends Record> recordFactory) {
     this.recordStore.setRecordFactory(recordFactory);
   }
 
@@ -313,12 +283,8 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public void update(final Record object) {
-    this.recordStore.update(object);
+  public void updateRecord(final Record record) {
+    this.recordStore.updateRecord(record);
   }
 
-  @Override
-  public void updateAll(final Collection<Record> objects) {
-    this.recordStore.updateAll(objects);
-  }
 }

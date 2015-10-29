@@ -394,7 +394,7 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
   }
 
   default RecordState getState() {
-    return RecordState.New;
+    return RecordState.NEW;
   }
 
   default String getString(final CharSequence name) {
@@ -576,10 +576,29 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
     return false;
   }
 
-  default boolean isModified() {
-    if (getState() == RecordState.New) {
+  default boolean isChanged() {
+    final RecordState state = getState();
+    if (state == RecordState.PERSISTED) {
+      return false;
+    } else {
       return true;
-    } else if (getState() == RecordState.Modified) {
+    }
+  }
+
+  default boolean isDeleted() {
+    final RecordState state = getState();
+    if (state == RecordState.DELETED) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  default boolean isModified() {
+    final RecordState state = getState();
+    if (state == RecordState.NEW) {
+      return true;
+    } else if (state == RecordState.MODIFIED) {
       return true;
     } else {
       return false;
@@ -651,7 +670,7 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
     final RecordDefinition recordDefinition = getRecordDefinition();
     final int index = recordDefinition.getIdFieldIndex();
     final RecordState state = getState();
-    if (state == RecordState.New || state == RecordState.Initializing) {
+    if (state == RecordState.NEW || state == RecordState.INITIALIZING) {
       setValue(index, id);
     } else {
       final Object oldId = getValue(index);

@@ -148,7 +148,7 @@ public class OsmElement implements Record, OsmConstants {
 
   @Override
   public RecordState getState() {
-    return RecordState.New;
+    return RecordState.NEW;
   }
 
   public String getTag(final String name) {

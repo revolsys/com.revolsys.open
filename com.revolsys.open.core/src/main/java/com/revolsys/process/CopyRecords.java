@@ -5,11 +5,12 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
-import com.revolsys.io.Reader;
-import com.revolsys.io.Writer;
 import com.revolsys.parallel.process.AbstractProcess;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
@@ -73,8 +74,8 @@ public class CopyRecords extends AbstractProcess {
       query.setOrderBy(this.orderBy);
 
       try (
-        final Reader<Record> reader = this.sourceRecordStore.query(query);
-        final Writer<Record> targetWriter = this.targetRecordStore.newWriter();) {
+        final RecordReader reader = this.sourceRecordStore.getRecords(query);
+        final RecordWriter targetWriter = this.targetRecordStore.newRecordWriter();) {
         final RecordDefinition targetRecordDefinition = this.targetRecordStore
           .getRecordDefinition(this.typePath);
         if (targetRecordDefinition == null) {
@@ -82,13 +83,13 @@ public class CopyRecords extends AbstractProcess {
         } else {
           if (this.hasSequence) {
             final String idFieldName = targetRecordDefinition.getIdFieldName();
-            Object maxId = this.targetRecordStore.newPrimaryIdValue(this.typePath);
+            Identifier maxId = this.targetRecordStore.newPrimaryIdentifier(this.typePath);
             for (final Record sourceRecord : reader) {
               final Record targetRecord = this.targetRecordStore.newRecord(this.typePath,
                 sourceRecord);
-              final Object sourceId = sourceRecord.getValue(idFieldName);
+              final Identifier sourceId = sourceRecord.getIdentifier(idFieldName);
               while (CompareUtil.compare(maxId, sourceId) < 0) {
-                maxId = this.targetRecordStore.newPrimaryIdValue(this.typePath);
+                maxId = this.targetRecordStore.newPrimaryIdentifier(this.typePath);
               }
               targetWriter.write(targetRecord);
             }

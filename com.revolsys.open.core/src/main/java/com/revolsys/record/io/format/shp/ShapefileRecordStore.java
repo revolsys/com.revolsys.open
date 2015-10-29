@@ -33,13 +33,13 @@ public class ShapefileRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public int getRowCount(final Query query) {
+  public int getRecordCount(final Query query) {
     // TODO Auto-generated method stub
     return 0;
   }
 
   @Override
-  public void insert(final Record record) {
+  public void insertRecord(final Record record) {
     this.writer.write(record);
   }
 
@@ -55,7 +55,7 @@ public class ShapefileRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public RecordWriter newWriter() {
+  public RecordWriter newRecordWriter() {
     return this.writer;
   }
 

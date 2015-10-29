@@ -137,10 +137,6 @@ public interface LayerRecord extends Record {
     return false;
   }
 
-  default boolean isDeleted() {
-    return getState() == RecordState.Deleted;
-  }
-
   default boolean isGeometryEditable() {
     return true;
   }
@@ -179,7 +175,7 @@ public interface LayerRecord extends Record {
 
   @Override
   default boolean isValid(final int index) {
-    if (getState() == RecordState.Initializing) {
+    if (getState() == RecordState.INITIALIZING) {
       return true;
     } else {
       final RecordDefinition recordDefinition = getRecordDefinition();
@@ -190,7 +186,7 @@ public interface LayerRecord extends Record {
 
   @Override
   default boolean isValid(final String name) {
-    if (getState() == RecordState.Initializing) {
+    if (getState() == RecordState.INITIALIZING) {
       return true;
     } else {
       final FieldDefinition fieldDefinition = getFieldDefinition(name);
@@ -206,7 +202,7 @@ public interface LayerRecord extends Record {
   }
 
   default void postSaveModified() {
-    if (getState() == RecordState.Persisted) {
+    if (getState() == RecordState.PERSISTED) {
       clearChanges();
     }
   }

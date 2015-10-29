@@ -37,7 +37,8 @@ public class GeometryTest {
     final File file = new File("target/test-data/" + name + ".gdb");
     FileUtil.deleteDirectory(file);
 
-    RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(PathName.newPathName(name));
+    final PathName pathName = PathName.newPathName(name);
+    RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(pathName);
     recordDefinition.addField("ID", DataTypes.INT, true);
     final FieldDefinition geometryField = recordDefinition.addField("Geometry", geometryDataType,
       true);
@@ -51,9 +52,9 @@ public class GeometryTest {
     object.setIdentifier(Identifier.create(1));
     object.setGeometryValue(geometry);
 
-    recordStore.insert(object);
+    recordStore.insertRecord(object);
 
-    final Record object2 = recordStore.load(name, 1);
+    final Record object2 = recordStore.getRecord(pathName, Identifier.create(1));
     if (!EqualsInstance.INSTANCE.equals(object, object2)) {
       System.out.println("Not Equal");
       System.out.println(object);

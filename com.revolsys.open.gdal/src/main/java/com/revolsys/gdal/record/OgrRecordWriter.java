@@ -109,7 +109,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
           || OgrRecordStore.GEO_PAKCAGE.equals(driverName)) {
           record.setValue(OgrRecordStore.ROWID, feature.GetFieldAsInteger(OgrRecordStore.ROWID));
         }
-        record.setState(RecordState.Persisted);
+        record.setState(RecordState.PERSISTED);
       } finally {
         feature.delete();
         this.recordStore.addStatistic("Insert", record);
@@ -334,16 +334,16 @@ public class OgrRecordWriter extends AbstractRecordWriter {
       final RecordStore recordStore = recordDefinition.getRecordStore();
       if (recordStore == this.recordStore) {
         switch (record.getState()) {
-          case New:
+          case NEW:
             insert(record);
           break;
-          case Modified:
+          case MODIFIED:
             update(record);
           break;
-          case Persisted:
+          case PERSISTED:
           // No action required
           break;
-          case Deleted:
+          case DELETED:
             delete(record);
           break;
           default:

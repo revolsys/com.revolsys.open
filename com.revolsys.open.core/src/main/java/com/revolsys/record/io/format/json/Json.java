@@ -118,7 +118,7 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
     final StringReader in = new StringReader(string);
     final JsonMapReader reader = new JsonMapReader(in);
     try {
-      return reader.read();
+      return reader.toList();
     } finally {
       reader.close();
     }

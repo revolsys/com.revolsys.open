@@ -395,7 +395,7 @@ public class ProjectFrame extends BaseFrame {
   protected MenuFactory createMenuFile() {
     final MenuFactory file = new MenuFactory("File");
 
-    file.addMenuItemTitleIcon("projectOpen", "New Project", "layout_add", () -> actionNewProject())
+    file.addMenuItemTitleIcon("projectOpen", "NEW Project", "layout_add", () -> actionNewProject())
       .setAcceleratorControlKey(KeyEvent.VK_N);
 
     file.addMenuItemTitleIcon("projectOpen", "Open Project...", "layout_add",

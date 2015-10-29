@@ -17,13 +17,13 @@ import com.revolsys.record.schema.RecordStore;
  * The following actions will be performed based on the state of the object.
  * </p>
  * <dl>
- * <dt>New</dt>
+ * <dt>NEW</dt>
  * <dd>Insert the object into the record store.</dd>
- * <dt>Persisted</dt>
+ * <dt>PERSISTED</dt>
  * <dd>No action performed.</dd>
- * <dt>Modified</dt>
+ * <dt>MODIFIED</dt>
  * <dd>Update the object in the record store.</dd>
- * <dt>Deleted</dt>
+ * <dt>DELETED</dt>
  * <dd>Delete the object from the record store.</dd>
  * </dl>
  */
@@ -56,22 +56,22 @@ public class RecordStoreUpdateProcess extends BaseInProcess<Record> {
    * Process each object from the channel
    *
    * @param in The input channel.
-   * @param object The object to process.
+   * @param record The object to process.
    */
   @Override
-  protected void process(final Channel<Record> in, final Record object) {
-    final RecordState state = object.getState();
+  protected void process(final Channel<Record> in, final Record record) {
+    final RecordState state = record.getState();
     switch (state) {
-      case New:
-        this.recordStore.insert(object);
+      case NEW:
+        this.recordStore.insertRecord(record);
       break;
-      case Persisted:
+      case PERSISTED:
       break;
-      case Modified:
-        this.recordStore.update(object);
+      case MODIFIED:
+        this.recordStore.updateRecord(record);
       break;
-      case Deleted:
-        this.recordStore.delete(object);
+      case DELETED:
+        this.recordStore.deleteRecord(record);
       break;
       default:
       break;

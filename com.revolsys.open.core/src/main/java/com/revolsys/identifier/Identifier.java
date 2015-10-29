@@ -31,6 +31,17 @@ public interface Identifier {
     };
   }
 
+  static Identifier create(final Object... values) {
+    if (values == null || values.length == 0) {
+      return null;
+    } else if (values.length == 1) {
+      final Object value = values[0];
+      return create(value);
+    } else {
+      return new ListIdentifier(values);
+    }
+  }
+
   static Identifier create(final Object value) {
     if (value == null) {
       return null;

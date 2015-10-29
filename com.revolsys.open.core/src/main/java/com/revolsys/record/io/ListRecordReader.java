@@ -12,24 +12,24 @@ import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class ListRecordReader extends AbstractReader<Record>implements RecordReader {
-  private List<Record> objects = new ArrayList<Record>();
+  private List<Record> records = new ArrayList<Record>();
 
   private RecordDefinition recordDefinition;
 
   public ListRecordReader(final RecordDefinition recordDefinition,
-    final Collection<? extends Record> objects) {
+    final Collection<? extends Record> records) {
     this.recordDefinition = recordDefinition;
-    this.objects = new ArrayList<Record>(objects);
+    this.records = new ArrayList<Record>(records);
   }
 
-  public ListRecordReader(final RecordDefinition recordDefinition, final Record... objects) {
-    this(recordDefinition, Arrays.asList(objects));
+  public ListRecordReader(final RecordDefinition recordDefinition, final Record... records) {
+    this(recordDefinition, Arrays.asList(records));
   }
 
   @Override
   public void close() {
     this.recordDefinition = null;
-    this.objects = Collections.emptyList();
+    this.records = Collections.emptyList();
   }
 
   @Override
@@ -39,7 +39,7 @@ public class ListRecordReader extends AbstractReader<Record>implements RecordRea
 
   @Override
   public Iterator<Record> iterator() {
-    return this.objects.iterator();
+    return this.records.iterator();
   }
 
   @Override

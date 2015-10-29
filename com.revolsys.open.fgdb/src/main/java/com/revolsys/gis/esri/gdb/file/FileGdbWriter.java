@@ -129,7 +129,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
                 throw new ObjectPropertyException(record, field.getName(), e);
               }
             }
-            record.setState(RecordState.Persisted);
+            record.setState(RecordState.PERSISTED);
           }
         } finally {
           this.recordStore.closeRow(row);
@@ -214,16 +214,16 @@ public class FileGdbWriter extends AbstractRecordWriter {
     final RecordStore recordStore = recordDefinition.getRecordStore();
     if (recordStore == this.recordStore) {
       switch (record.getState()) {
-        case New:
+        case NEW:
           insert(record);
         break;
-        case Modified:
+        case MODIFIED:
           update(record);
         break;
-        case Persisted:
+        case PERSISTED:
         // No action required
         break;
-        case Deleted:
+        case DELETED:
           delete(record);
         break;
         default:

@@ -489,34 +489,15 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     });
   }
 
-  private void delete(final FileGdbWriter writer, final Record record) {
+  private boolean delete(final FileGdbWriter writer, final Record record) {
     // Don't synchronize to avoid deadlock as that is done lower down in the
     // methods
-    if (record.getState() == RecordState.Persisted || record.getState() == RecordState.Modified) {
-      record.setState(RecordState.Deleted);
+    if (record.getState() == RecordState.PERSISTED || record.getState() == RecordState.MODIFIED) {
+      record.setState(RecordState.DELETED);
       writer.write(record);
-    }
-  }
-
-  @Override
-  public int delete(final Query query) {
-    int i = 0;
-    try (
-      final Reader<Record> reader = query(query);
-      FileGdbWriter writer = newWriter();) {
-      for (final Record record : reader) {
-        delete(writer, record);
-        i++;
-      }
-    }
-    return i;
-  }
-
-  @Override
-  public void delete(final Record record) {
-    try (
-      FileGdbWriter writer = newWriter()) {
-      delete(writer, record);
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -538,7 +519,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             if (loadOnly) {
               table.setLoadOnlyMode(true);
             }
-            record.setState(RecordState.Deleted);
+            record.setState(RecordState.DELETED);
             addStatistic("Delete", record);
           }
         }
@@ -560,6 +541,29 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         }
       }
     }
+  }
+
+  @Override
+  public boolean deleteRecord(final Record record) {
+    try (
+      FileGdbWriter writer = newRecordWriter()) {
+      return delete(writer, record);
+    }
+  }
+
+  @Override
+  public int deleteRecords(final Query query) {
+    int count = 0;
+    try (
+      final Reader<Record> reader = getRecords(query);
+      FileGdbWriter writer = newRecordWriter();) {
+      for (final Record record : reader) {
+        if (delete(writer, record)) {
+          count++;
+        }
+      }
+    }
+    return count;
   }
 
   public void doClose() {
@@ -651,6 +655,110 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
+  @Override
+  public Record getRecord(final PathName typePath, final Object... id) {
+    synchronized (this.apiSync) {
+      final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+      if (recordDefinition == null) {
+        throw new IllegalArgumentException("Unknown type " + typePath);
+      } else {
+        final String catalogPath = getCatalogPath(typePath);
+        final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this, catalogPath,
+          recordDefinition.getIdFieldName() + " = " + id[0]);
+        try {
+          if (iterator.hasNext()) {
+            return iterator.next();
+          } else {
+            return null;
+          }
+        } finally {
+          iterator.close();
+        }
+      }
+    }
+  }
+
+  @Override
+  public int getRecordCount(final Query query) {
+    if (query == null) {
+      return 0;
+    } else {
+      synchronized (this.apiSync) {
+        final Geodatabase geodatabase = getGeodatabase();
+        if (geodatabase == null) {
+          return 0;
+        } else {
+          try {
+            String typePath = query.getTypeName();
+            RecordDefinition recordDefinition = query.getRecordDefinition();
+            if (recordDefinition == null) {
+              typePath = query.getTypeName();
+              recordDefinition = getRecordDefinition(typePath);
+              if (recordDefinition == null) {
+                return 0;
+              }
+            } else {
+              typePath = recordDefinition.getPath();
+            }
+            final StringBuilder whereClause = getWhereClause(query);
+            final BoundingBox boundingBox = QueryValue.getBoundingBox(query);
+
+            if (boundingBox == null) {
+              final StringBuilder sql = new StringBuilder();
+              sql.append("SELECT OBJECTID FROM ");
+              sql.append(JdbcUtils.getTableName(typePath));
+              if (whereClause.length() > 0) {
+                sql.append(" WHERE ");
+                sql.append(whereClause);
+              }
+
+              try (
+                final FileGdbEnumRowsIterator rows = query(sql.toString(), false)) {
+                int count = 0;
+                for (@SuppressWarnings("unused")
+                final Row row : rows) {
+                  count++;
+                }
+                return count;
+              }
+            } else {
+              final GeometryFieldDefinition geometryField = (GeometryFieldDefinition)recordDefinition
+                .getGeometryField();
+              if (geometryField == null || boundingBox.isEmpty()) {
+                return 0;
+              } else {
+                final StringBuilder sql = new StringBuilder();
+                sql.append("SELECT " + geometryField.getName() + " FROM ");
+                sql.append(JdbcUtils.getTableName(typePath));
+                if (whereClause.length() > 0) {
+                  sql.append(" WHERE ");
+                  sql.append(whereClause);
+                }
+
+                try (
+                  final FileGdbEnumRowsIterator rows = query(sql.toString(), false)) {
+                  int count = 0;
+                  for (final Row row : rows) {
+                    final Geometry geometry = (Geometry)geometryField.getValue(row);
+                    if (geometry != null) {
+                      final BoundingBox geometryBoundingBox = geometry.getBoundingBox();
+                      if (geometryBoundingBox.intersects(boundingBox)) {
+                        count++;
+                      }
+                    }
+                  }
+                  return count;
+                }
+              }
+            }
+          } finally {
+            releaseGeodatabase();
+          }
+        }
+      }
+    }
+  }
+
   public RecordDefinitionImpl getRecordDefinition(final PathName schemaName, final String path,
     final String tableDefinition) {
     synchronized (this.apiSync) {
@@ -737,87 +845,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
-  @Override
-  public int getRowCount(final Query query) {
-    if (query == null) {
-      return 0;
-    } else {
-      synchronized (this.apiSync) {
-        final Geodatabase geodatabase = getGeodatabase();
-        if (geodatabase == null) {
-          return 0;
-        } else {
-          try {
-            String typePath = query.getTypeName();
-            RecordDefinition recordDefinition = query.getRecordDefinition();
-            if (recordDefinition == null) {
-              typePath = query.getTypeName();
-              recordDefinition = getRecordDefinition(typePath);
-              if (recordDefinition == null) {
-                return 0;
-              }
-            } else {
-              typePath = recordDefinition.getPath();
-            }
-            final StringBuilder whereClause = getWhereClause(query);
-            final BoundingBox boundingBox = QueryValue.getBoundingBox(query);
-
-            if (boundingBox == null) {
-              final StringBuilder sql = new StringBuilder();
-              sql.append("SELECT OBJECTID FROM ");
-              sql.append(JdbcUtils.getTableName(typePath));
-              if (whereClause.length() > 0) {
-                sql.append(" WHERE ");
-                sql.append(whereClause);
-              }
-
-              try (
-                final FileGdbEnumRowsIterator rows = query(sql.toString(), false)) {
-                int count = 0;
-                for (@SuppressWarnings("unused")
-                final Row row : rows) {
-                  count++;
-                }
-                return count;
-              }
-            } else {
-              final GeometryFieldDefinition geometryField = (GeometryFieldDefinition)recordDefinition
-                .getGeometryField();
-              if (geometryField == null || boundingBox.isEmpty()) {
-                return 0;
-              } else {
-                final StringBuilder sql = new StringBuilder();
-                sql.append("SELECT " + geometryField.getName() + " FROM ");
-                sql.append(JdbcUtils.getTableName(typePath));
-                if (whereClause.length() > 0) {
-                  sql.append(" WHERE ");
-                  sql.append(whereClause);
-                }
-
-                try (
-                  final FileGdbEnumRowsIterator rows = query(sql.toString(), false)) {
-                  int count = 0;
-                  for (final Row row : rows) {
-                    final Geometry geometry = (Geometry)geometryField.getValue(row);
-                    if (geometry != null) {
-                      final BoundingBox geometryBoundingBox = geometry.getBoundingBox();
-                      if (geometryBoundingBox.intersects(boundingBox)) {
-                        count++;
-                      }
-                    }
-                  }
-                  return count;
-                }
-              }
-            }
-          } finally {
-            releaseGeodatabase();
-          }
-        }
-      }
-    }
-  }
-
   private <V> V getSingleThreadResult(final Callable<V> callable) {
     synchronized (API_SYNC) {
       return TASK_EXECUTOR.call(callable);
@@ -883,18 +910,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       appendQueryValue(query, whereClause, whereCondition);
     }
     return whereClause;
-  }
-
-  @Override
-  public FileGdbWriter getWriter() {
-    synchronized (this.apiSync) {
-      FileGdbWriter writer = getThreadProperty("writer");
-      if (writer == null) {
-        writer = newWriter();
-        setThreadProperty("writer", writer);
-      }
-      return writer;
-    }
   }
 
   protected boolean hasCatalogPath(final String path) {
@@ -976,11 +991,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public void insert(final Record record) {
+  public void insertRecord(final Record record) {
     // Don't synchronize to avoid deadlock as that is done lower down in the
     // methods
     try (
-      FileGdbWriter writer = newWriter()) {
+      FileGdbWriter writer = newRecordWriter()) {
       writer.write(record);
     }
   }
@@ -1063,29 +1078,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   private boolean isTableLocked(final PathName typePath) {
     final String path = getCatalogPath(typePath);
     return Maps.getCount(this.tableWriteLockCountsByCatalogPath, path) > 0;
-  }
-
-  @Override
-  public Record load(final PathName typePath, final Object... id) {
-    synchronized (this.apiSync) {
-      final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-      if (recordDefinition == null) {
-        throw new IllegalArgumentException("Unknown type " + typePath);
-      } else {
-        final String catalogPath = getCatalogPath(typePath);
-        final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this, catalogPath,
-          recordDefinition.getIdFieldName() + " = " + id[0]);
-        try {
-          if (iterator.hasNext()) {
-            return iterator.next();
-          } else {
-            return null;
-          }
-        } finally {
-          iterator.close();
-        }
-      }
-    }
   }
 
   protected void loadDomain(final Geodatabase geodatabase, final String domainName) {
@@ -1213,9 +1205,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     return iterator;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <T> T newPrimaryIdValue(final PathName typePath) {
+  public Identifier newPrimaryIdentifier(final PathName typePath) {
     synchronized (this.apiSync) {
       final RecordDefinition recordDefinition = getRecordDefinition(typePath);
       if (recordDefinition == null) {
@@ -1228,7 +1219,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           AtomicLong idGenerator = this.idGenerators.get(typePath);
           if (idGenerator == null) {
             long maxId = 0;
-            for (final Record record : query(typePath)) {
+            for (final Record record : getRecords(typePath)) {
               final Identifier id = record.getIdentifier();
               final Object firstId = id.getValue(0);
               if (firstId instanceof Number) {
@@ -1241,11 +1232,23 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             idGenerator = new AtomicLong(maxId);
             this.idGenerators.put(typePath, idGenerator);
           }
-          return (T)(Object)idGenerator.incrementAndGet();
+          return Identifier.create(idGenerator.incrementAndGet());
         } else {
           return null;
         }
       }
+    }
+  }
+
+  @Override
+  public FileGdbWriter newRecordWriter() {
+    synchronized (this.apiSync) {
+      FileGdbWriter writer = getThreadProperty("writer");
+      if (writer == null) {
+        writer = newRecordWriter();
+        setThreadProperty("writer", writer);
+      }
+      return writer;
     }
   }
 
@@ -1380,11 +1383,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         return tableRecordDefinition;
       }
     }
-  }
-
-  @Override
-  public FileGdbWriter newWriter() {
-    return new FileGdbWriter(this);
   }
 
   @Override
@@ -1671,11 +1669,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public void update(final Record record) {
+  public void updateRecord(final Record record) {
     // Don't synchronize to avoid deadlock as that is done lower down in the
     // methods
     try (
-      FileGdbWriter writer = newWriter()) {
+      FileGdbWriter writer = newRecordWriter()) {
       writer.write(record);
     }
   }

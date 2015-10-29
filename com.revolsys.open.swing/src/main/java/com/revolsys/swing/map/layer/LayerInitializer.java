@@ -75,9 +75,9 @@ public class LayerInitializer extends AbstractSwingWorker<Void, Void>
   @Override
   public String toString() {
     // if (this.layer == null) {
-    // return "Initializing layers";
+    // return "INITIALIZING layers";
     // } else {
-    return "Initializing layer: " + this.layer.getPath();
+    return "INITIALIZING layer: " + this.layer.getPath();
     // }
   }
 }

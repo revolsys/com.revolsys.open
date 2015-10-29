@@ -568,7 +568,7 @@ public interface Records {
   static void removeDeleted(final Collection<? extends Record> records) {
     for (final Iterator<? extends Record> iterator = records.iterator(); iterator.hasNext();) {
       final Record record = iterator.next();
-      if (record == null || record.getState() == RecordState.Deleted) {
+      if (record == null || record.getState() == RecordState.DELETED) {
         iterator.remove();
       }
     }

@@ -106,9 +106,9 @@ public class RecordStoreQueryListModel implements ListModel {
             }
           }
           query.setLimit(this.maxResults);
-          final Reader<Record> reader = this.recordStore.query(query);
+          final Reader<Record> reader = this.recordStore.getRecords(query);
           try {
-            final List<Record> objects = reader.read();
+            final List<Record> objects = reader.toList();
             for (final Record object : objects) {
               if (allObjects.size() < this.maxResults) {
                 final String key = object.getString(this.displayFieldName);

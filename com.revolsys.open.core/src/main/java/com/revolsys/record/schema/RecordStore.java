@@ -2,10 +2,8 @@ package com.revolsys.record.schema;
 
 import java.io.Closeable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -14,14 +12,12 @@ import org.springframework.transaction.PlatformTransactionManager;
 import com.revolsys.collection.ListResultPager;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.iterator.AbstractIterator;
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
-import com.revolsys.io.Writer;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -67,51 +63,45 @@ public interface RecordStore
   @Override
   void close();
 
-  default Record copy(final Record record) {
-    final RecordDefinition recordDefinition = getRecordDefinition(record.getRecordDefinition());
-    final RecordFactory recordFactory = getRecordFactory();
-    if (recordDefinition == null || recordFactory == null) {
-      return null;
-    } else {
-      final Record copy = recordFactory.newRecord(recordDefinition);
-      copy.setValuesClone(record);
-      copy.setIdentifier(null);
-      return copy;
-    }
-  }
-
-  default int delete(final PathName typePath, final Identifier identifier) {
+  default boolean deleteRecord(final PathName typePath, final Identifier identifier) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     if (recordDefinition != null) {
       final String idFieldName = recordDefinition.getIdFieldName();
       if (idFieldName != null) {
         final Query query = Query.equal(recordDefinition, idFieldName, identifier);
-        return delete(query);
+        if (deleteRecords(query) == 1) {
+          return true;
+        }
       }
     }
-    return 0;
+    return false;
   }
 
-  default int delete(final Query query) {
-    int i = 0;
-    try (
-      final RecordReader reader = query(query)) {
-      for (final Record record : reader) {
-        delete(record);
-        i++;
-      }
-    }
-    return i;
-  }
-
-  default void delete(final Record record) {
+  default boolean deleteRecord(final Record record) {
     throw new UnsupportedOperationException("Delete not supported");
   }
 
-  default void deleteAll(final Collection<Record> records) {
+  default int deleteRecords(final Iterable<? extends Record> records) {
+    int count = 0;
     for (final Record record : records) {
-      delete(record);
+      if (deleteRecord(record)) {
+        count++;
+      }
     }
+    return count;
+  }
+
+  default int deleteRecords(final Query query) {
+    int count = 0;
+    try (
+      final RecordReader reader = getRecords(query)) {
+      for (final Record record : reader) {
+        if (deleteRecord(record)) {
+          count++;
+        }
+      }
+    }
+    return count;
   }
 
   default RecordDefinition findRecordDefinition(final PathName typePath) {
@@ -149,6 +139,39 @@ public interface RecordStore
 
   String getLabel();
 
+  default Record getRecord(final PathName typePath, final Identifier id) {
+    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+    if (recordDefinition == null || id == null) {
+      return null;
+    } else {
+      final List<Object> values = id.getValues();
+      final List<String> idFieldNames = recordDefinition.getIdFieldNames();
+      if (idFieldNames.isEmpty()) {
+        throw new IllegalArgumentException(typePath + " does not have a primary key");
+      } else if (values.size() != idFieldNames.size()) {
+        throw new IllegalArgumentException(
+          id + " not a valid id for " + typePath + " requires " + idFieldNames);
+      } else {
+        final Query query = new Query(recordDefinition);
+        for (int i = 0; i < idFieldNames.size(); i++) {
+          final String name = idFieldNames.get(i);
+          final Object value = values.get(i);
+          final FieldDefinition field = recordDefinition.getField(name);
+          query.and(Q.equal(field, value));
+        }
+        final RecordReader records = getRecords(query);
+        return records.getFirst();
+      }
+    }
+  }
+
+  default Record getRecord(final PathName typePath, final Object... id) {
+    final Identifier identifier = Identifier.create(id);
+    return getRecord(typePath, identifier);
+  }
+
+  int getRecordCount(Query query);
+
   default RecordDefinition getRecordDefinition(final PathName path) {
     if (path == null) {
       return null;
@@ -183,11 +206,44 @@ public interface RecordStore
     }
   }
 
-  RecordFactory getRecordFactory();
+  RecordFactory<Record> getRecordFactory();
+
+  default RecordReader getRecords(final Collection<Query> queries) {
+    final RecordStoreQueryReader reader = newRecordReader();
+    for (final Query query : queries) {
+      if (query != null) {
+        reader.addQuery(query);
+      }
+    }
+    return reader;
+  }
+
+  default RecordReader getRecords(final PathName path) {
+    final RecordStoreSchemaElement element = getRootSchema().getElement(path);
+    if (element instanceof RecordDefinition) {
+      final RecordDefinition recordDefinition = (RecordDefinition)element;
+      final Query query = new Query(recordDefinition);
+      return getRecords(query);
+    } else if (element instanceof RecordStoreSchema) {
+      final RecordStoreSchema schema = (RecordStoreSchema)element;
+      final List<Query> queries = new ArrayList<>();
+      for (final RecordDefinition recordDefinition : schema.getRecordDefinitions()) {
+        final Query query = new Query(recordDefinition);
+        queries.add(query);
+      }
+      return getRecords(queries);
+    } else {
+      return new ListRecordReader(null, Collections.emptyList());
+    }
+  }
+
+  default RecordReader getRecords(final Query query) {
+    final RecordStoreQueryReader reader = newRecordReader();
+    reader.addQuery(query);
+    return reader;
+  }
 
   RecordStoreSchema getRootSchema();
-
-  int getRowCount(Query query);
 
   default RecordStoreSchema getSchema(final PathName pathName) {
     final RecordStoreSchema rootSchema = getRootSchema();
@@ -214,27 +270,19 @@ public interface RecordStore
 
   String getUsername();
 
-  default Writer<Record> getWriter() {
-    return newWriter();
-  }
-
-  default Writer<Record> getWriter(final boolean throwExceptions) {
-    return getWriter();
-  }
-
   default boolean hasSchema(final PathName schemaName) {
     return getSchema(schemaName) != null;
   }
 
   void initialize();
 
-  default void insert(final Record record) {
+  default void insertRecord(final Record record) {
     throw new UnsupportedOperationException("Insert not supported");
   }
 
-  default void insertAll(final Collection<Record> records) {
+  default void insertRecords(final Iterable<? extends Record> records) {
     for (final Record record : records) {
-      insert(record);
+      insertRecord(record);
     }
   }
 
@@ -242,125 +290,11 @@ public interface RecordStore
     return false;
   }
 
-  default boolean isEditable(final String typePath) {
+  default boolean isEditable(final PathName typePath) {
     return false;
   }
 
   boolean isLoadFullSchema();
-
-  default Record load(final PathName typePath, final Identifier id) {
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    if (recordDefinition == null || id == null) {
-      return null;
-    } else {
-      final List<Object> values = id.getValues();
-      final List<String> idFieldNames = recordDefinition.getIdFieldNames();
-      if (idFieldNames.isEmpty()) {
-        throw new IllegalArgumentException(typePath + " does not have a primary key");
-      } else if (values.size() != idFieldNames.size()) {
-        throw new IllegalArgumentException(
-          id + " not a valid id for " + typePath + " requires " + idFieldNames);
-      } else {
-        final Query query = new Query(recordDefinition);
-        for (int i = 0; i < idFieldNames.size(); i++) {
-          final String name = idFieldNames.get(i);
-          final Object value = values.get(i);
-          final FieldDefinition field = recordDefinition.getField(name);
-          query.and(Q.equal(field, value));
-        }
-        return queryFirst(query);
-      }
-    }
-  }
-
-  default Record load(final PathName typePath, final Object... id) {
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    if (recordDefinition == null) {
-      return null;
-    } else {
-      final List<String> idFieldNames = recordDefinition.getIdFieldNames();
-      if (idFieldNames.isEmpty()) {
-        throw new IllegalArgumentException(typePath + " does not have a primary key");
-      } else if (id.length != idFieldNames.size()) {
-        throw new IllegalArgumentException(
-          Arrays.toString(id) + " not a valid id for " + typePath + " requires " + idFieldNames);
-      } else {
-        final Query query = new Query(recordDefinition);
-        for (int i = 0; i < idFieldNames.size(); i++) {
-          final String name = idFieldNames.get(i);
-          final Object value = id[i];
-          final FieldDefinition field = recordDefinition.getField(name);
-          query.and(Q.equal(field, value));
-        }
-        return queryFirst(query);
-      }
-    }
-  }
-
-  default Record load(final String typePath, final Identifier id) {
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    if (recordDefinition == null || id == null) {
-      return null;
-    } else {
-      final List<Object> values = id.getValues();
-      final List<String> idFieldNames = recordDefinition.getIdFieldNames();
-      if (idFieldNames.isEmpty()) {
-        throw new IllegalArgumentException(typePath + " does not have a primary key");
-      } else if (values.size() != idFieldNames.size()) {
-        throw new IllegalArgumentException(
-          id + " not a valid id for " + typePath + " requires " + idFieldNames);
-      } else {
-        final Query query = new Query(recordDefinition);
-        for (int i = 0; i < idFieldNames.size(); i++) {
-          final String name = idFieldNames.get(i);
-          final Object value = values.get(i);
-          final FieldDefinition field = recordDefinition.getField(name);
-          query.and(Q.equal(field, value));
-        }
-        return queryFirst(query);
-      }
-    }
-  }
-
-  default Record load(final String typePath, final Object... id) {
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    if (recordDefinition == null) {
-      return null;
-    } else {
-      final List<String> idFieldNames = recordDefinition.getIdFieldNames();
-      if (idFieldNames.isEmpty()) {
-        throw new IllegalArgumentException(typePath + " does not have a primary key");
-      } else if (id.length != idFieldNames.size()) {
-        throw new IllegalArgumentException(
-          Arrays.toString(id) + " not a valid id for " + typePath + " requires " + idFieldNames);
-      } else {
-        final Query query = new Query(recordDefinition);
-        for (int i = 0; i < idFieldNames.size(); i++) {
-          final String name = idFieldNames.get(i);
-          final Object value = id[i];
-          final FieldDefinition field = recordDefinition.getField(name);
-          query.and(Q.equal(field, value));
-        }
-        return queryFirst(query);
-      }
-    }
-  }
-
-  default Record lock(final String typePath, final Object id) {
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    if (recordDefinition == null) {
-      return null;
-    } else {
-      final String idFieldName = recordDefinition.getIdFieldName();
-      if (idFieldName == null) {
-        throw new IllegalArgumentException(typePath + " does not have a primary key");
-      } else {
-        final Query query = Query.equal(recordDefinition, idFieldName, id);
-        query.setLockResults(true);
-        return queryFirst(query);
-      }
-    }
-  }
 
   default AbstractIterator<Record> newIterator(final Query query, Map<String, Object> properties) {
     if (properties == null) {
@@ -387,22 +321,12 @@ public interface RecordStore
   }
 
   default Identifier newPrimaryIdentifier(final PathName typePath) {
-    final Object identifier = newPrimaryIdValue(typePath);
-    return Identifier.create(identifier);
-  }
-
-  default <T> T newPrimaryIdValue(final PathName typePath) {
     return null;
   }
 
   default Query newQuery(final String typePath, final String whereClause,
     final BoundingBoxDoubleGf boundingBox) {
     throw new UnsupportedOperationException();
-  }
-
-  default RecordStoreQueryReader newReader() {
-    final RecordStoreQueryReader reader = new RecordStoreQueryReader(this);
-    return reader;
   }
 
   default Record newRecord(final PathName typePath) {
@@ -434,9 +358,23 @@ public interface RecordStore
     }
   }
 
+  default Record newRecord(final Record record) {
+    final RecordDefinition recordDefinition = record.getRecordDefinition();
+    final RecordDefinition recordStoreRecordDefinition = getRecordDefinition(recordDefinition);
+    final RecordFactory<Record> recordFactory = getRecordFactory();
+    if (recordStoreRecordDefinition == null || recordFactory == null) {
+      return null;
+    } else {
+      final Record copy = recordFactory.newRecord(recordStoreRecordDefinition);
+      copy.setValuesClone(record);
+      copy.setIdentifier(null);
+      return copy;
+    }
+  }
+
   default Record newRecord(final RecordDefinition objectRecordDefinition) {
     final RecordDefinition recordDefinition = getRecordDefinition(objectRecordDefinition);
-    final RecordFactory recordFactory = getRecordFactory();
+    final RecordFactory<Record> recordFactory = getRecordFactory();
     if (recordDefinition == null || recordFactory == null) {
       return null;
     } else {
@@ -467,6 +405,11 @@ public interface RecordStore
     }
   }
 
+  default RecordStoreQueryReader newRecordReader() {
+    final RecordStoreQueryReader reader = new RecordStoreQueryReader(this);
+    return reader;
+  }
+
   default Record newRecordWithIdentifier(final RecordDefinition recordDefinition) {
     final Record record = newRecord(recordDefinition);
     if (record != null) {
@@ -480,120 +423,36 @@ public interface RecordStore
     return record;
   }
 
-  RecordWriter newWriter();
+  RecordWriter newRecordWriter();
 
-  default RecordWriter newWriter(final RecordDefinition recordDefinition) {
-    return newWriter();
+  default RecordWriter newRecordWriter(final RecordDefinition recordDefinition) {
+    return newRecordWriter();
   }
 
   default ResultPager<Record> page(final Query query) {
-    final RecordReader results = query(query);
-    final List<Record> list = results.read();
+    final RecordReader results = getRecords(query);
+    final List<Record> list = results.toList();
     return new ListResultPager<Record>(list);
-  }
-
-  default RecordReader query(final Iterable<?> queries) {
-    final RecordStoreQueryReader reader = newReader();
-    for (final Object queryObject : queries) {
-      if (queryObject instanceof Query) {
-        final Query query = (Query)queryObject;
-        reader.addQuery(query);
-      } else {
-        final Query query = new Query(queryObject.toString());
-        reader.addQuery(query);
-      }
-    }
-    return reader;
-  }
-
-  default RecordReader query(final List<?> queries) {
-    final RecordStoreQueryReader reader = newReader();
-    for (final Object queryObject : queries) {
-      if (queryObject instanceof Query) {
-        final Query query = (Query)queryObject;
-        reader.addQuery(query);
-      } else {
-        final Query query = new Query(queryObject.toString());
-        reader.addQuery(query);
-      }
-    }
-    return reader;
-  }
-
-  default RecordReader query(final PathName path) {
-    final RecordStoreSchemaElement element = getRootSchema().getElement(path);
-    if (element instanceof RecordDefinition) {
-      final RecordDefinition recordDefinition = (RecordDefinition)element;
-      final Query query = new Query(recordDefinition);
-      return query(query);
-    } else if (element instanceof RecordStoreSchema) {
-      final RecordStoreSchema schema = (RecordStoreSchema)element;
-      final List<Query> queries = new ArrayList<>();
-      for (final RecordDefinition recordDefinition : schema.getRecordDefinitions()) {
-        final Query query = new Query(recordDefinition);
-        queries.add(query);
-      }
-      return query(queries);
-    } else {
-      return new ListRecordReader(null, Collections.emptyList());
-    }
-  }
-
-  default RecordReader query(final Query query) {
-    final RecordStoreQueryReader reader = newReader();
-    reader.addQuery(query);
-    return reader;
-  }
-
-  default RecordReader query(final Query... queries) {
-    return query(Arrays.asList(queries));
-  }
-
-  default RecordReader query(final String path) {
-    final PathName pathName = PathName.newPathName(path);
-    return query(pathName);
-  }
-
-  default RecordReader query(final String typePath, final BoundingBox boundingBox) {
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    if (recordDefinition != null && recordDefinition.hasGeometryField()) {
-      final Query query = Query.intersects(recordDefinition, boundingBox);
-      return query(query);
-    }
-    return new ListRecordReader(recordDefinition);
-  }
-
-  default Record queryFirst(final Query query) {
-    try (
-      final RecordReader reader = query(query)) {
-      final Iterator<Record> iterator = reader.iterator();
-      if (iterator.hasNext()) {
-        final Record record = iterator.next();
-        return record;
-      } else {
-        return null;
-      }
-    }
   }
 
   void setLabel(String label);
 
   void setLoadFullSchema(boolean loadFullSchema);
 
-  void setRecordFactory(RecordFactory recordFactory);
+  void setRecordFactory(RecordFactory<? extends Record> recordFactory);
 
   default void setStatistics(final String name, final Statistics statistics) {
     final StatisticsMap statisticsMap = getStatistics();
     statisticsMap.setStatistics(name, statistics);
   }
 
-  default void update(final Record object) {
+  default void updateRecord(final Record record) {
     throw new UnsupportedOperationException("Update not supported");
   }
 
-  default void updateAll(final Collection<Record> records) {
+  default void updateRecords(final Iterable<? extends Record> records) {
     for (final Record record : records) {
-      update(record);
+      updateRecord(record);
     }
   }
 }
