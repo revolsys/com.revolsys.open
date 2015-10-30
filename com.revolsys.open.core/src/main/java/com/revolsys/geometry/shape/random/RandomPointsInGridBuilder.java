@@ -62,7 +62,7 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
 
     final double x0 = centreX + rndX;
     final double y0 = centreY + rndY;
-    return new PointDouble(x0, y0, Point.NULL_ORDINATE);
+    return new PointDouble(x0, y0, Geometry.NULL_ORDINATE);
   }
 
   private double gutterFraction = 0;
@@ -134,7 +134,7 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
     final double yLen) {
     final double x = orgX + xLen * Math.random();
     final double y = orgY + yLen * Math.random();
-    return createCoord(x, y);
+    return newPoint(x, y);
   }
 
   /**

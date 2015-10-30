@@ -35,6 +35,7 @@ package com.revolsys.geometry.triangulate.quadedge;
 
 import com.revolsys.geometry.algorithm.HCoordinate;
 import com.revolsys.geometry.algorithm.NotRepresentableException;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 
@@ -120,7 +121,7 @@ public class Vertex {
   // private int edgeNumber = -1;
 
   public Vertex(final double _x, final double _y) {
-    this.p = new PointDouble(_x, _y, Point.NULL_ORDINATE);
+    this.p = new PointDouble(_x, _y, Geometry.NULL_ORDINATE);
   }
 
   public Vertex(final double _x, final double _y, final double _z) {

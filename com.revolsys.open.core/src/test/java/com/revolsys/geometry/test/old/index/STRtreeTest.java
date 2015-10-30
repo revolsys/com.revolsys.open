@@ -70,8 +70,8 @@ public class STRtreeTest extends TestCase {
   private void doTestCreateParentsFromVerticalSlice(final int childCount, final int nodeCapacity,
     final int expectedChildrenPerParentBoundable, final int expectedChildrenOfLastParent) {
     final STRtreeDemo.TestTree t = new STRtreeDemo.TestTree(nodeCapacity);
-    final List parentBoundables = t
-      .createParentBoundablesFromVerticalSlice(itemWrappers(childCount), 0);
+    final List parentBoundables = t.newParentBoundablesFromVerticalSlice(itemWrappers(childCount),
+      0);
     for (int i = 0; i < parentBoundables.size() - 1; i++) {// -1
       final AbstractNode parentBoundable = (AbstractNode)parentBoundables.get(i);
       assertEquals(expectedChildrenPerParentBoundable, parentBoundable.getChildBoundables().size());
@@ -134,16 +134,16 @@ public class STRtreeTest extends TestCase {
   public void testQuery() throws Throwable {
     final ArrayList geometries = new ArrayList();
     geometries.add(this.factory.lineString(new Point[] {
-      new PointDouble((double)0, 0, Point.NULL_ORDINATE),
-      new PointDouble((double)10, 10, Point.NULL_ORDINATE)
+      new PointDouble((double)0, 0, Geometry.NULL_ORDINATE),
+      new PointDouble((double)10, 10, Geometry.NULL_ORDINATE)
     }));
     geometries.add(this.factory.lineString(new Point[] {
-      new PointDouble((double)20, 20, Point.NULL_ORDINATE),
-      new PointDouble((double)30, 30, Point.NULL_ORDINATE)
+      new PointDouble((double)20, 20, Geometry.NULL_ORDINATE),
+      new PointDouble((double)30, 30, Geometry.NULL_ORDINATE)
     }));
     geometries.add(this.factory.lineString(new Point[] {
-      new PointDouble((double)20, 20, Point.NULL_ORDINATE),
-      new PointDouble((double)30, 30, Point.NULL_ORDINATE)
+      new PointDouble((double)20, 20, Geometry.NULL_ORDINATE),
+      new PointDouble((double)30, 30, Geometry.NULL_ORDINATE)
     }));
     final STRtreeDemo.TestTree t = new STRtreeDemo.TestTree(4);
     for (final Iterator i = geometries.iterator(); i.hasNext();) {

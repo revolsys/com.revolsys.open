@@ -35,7 +35,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
     final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {
     this(recordDefinition, Paths.newWriter(path), fieldSeparator, useQuotes, ewkt);
     final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
-    EsriCoordinateSystems.createPrjFile(path, geometryFactory);
+    EsriCoordinateSystems.writePrjFile(path, geometryFactory);
   }
 
   public CsvRecordWriter(final RecordDefinition recordDefinition, final Writer out,

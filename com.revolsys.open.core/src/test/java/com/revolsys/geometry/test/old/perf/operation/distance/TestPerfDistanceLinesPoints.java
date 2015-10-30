@@ -64,58 +64,6 @@ public class TestPerfDistanceLinesPoints {
     }
   }
 
-  Geometry createDiagonalCircles(final double extent, final int nSegs) {
-    final Polygon[] circles = new Polygon[nSegs];
-    final double inc = extent / nSegs;
-    for (int i = 0; i < nSegs; i++) {
-      final double ord = i * inc;
-      final Point p = new PointDouble(ord, ord, Point.NULL_ORDINATE);
-      final Geometry pt = geomFact.point(p);
-      circles[i] = (Polygon)pt.buffer(inc / 2);
-    }
-    return geomFact.multiPolygon(circles);
-
-  }
-
-  Geometry createDiagonalLine(final double extent, final int nSegs) {
-    final Point[] pts = new Point[nSegs + 1];
-    pts[0] = new PointDouble((double)0, 0, Point.NULL_ORDINATE);
-    final double inc = extent / nSegs;
-    for (int i = 1; i <= nSegs; i++) {
-      final double ord = i * inc;
-      pts[i] = new PointDouble(ord, ord, Point.NULL_ORDINATE);
-    }
-    return geomFact.lineString(pts);
-  }
-
-  Geometry createLine(final double extent, final int nSegs) {
-    final Point[] pts = new Point[] {
-      new PointDouble((double)0, 0, Point.NULL_ORDINATE),
-      new PointDouble((double)0, extent, Point.NULL_ORDINATE),
-      new PointDouble(extent, extent, Point.NULL_ORDINATE),
-      new PointDouble(extent, 0, Point.NULL_ORDINATE)
-
-    };
-    final Geometry outline = geomFact.lineString(pts);
-    final double inc = extent / nSegs;
-    return Densifier.densify(outline, inc);
-
-  }
-
-  Geometry[] createPoints(final BoundingBox extent, final int nPtsSide) {
-    final Geometry[] pts = new Geometry[nPtsSide * nPtsSide];
-    int index = 0;
-    final double xinc = extent.getWidth() / nPtsSide;
-    final double yinc = extent.getHeight() / nPtsSide;
-    for (int i = 0; i < nPtsSide; i++) {
-      for (int j = 0; j < nPtsSide; j++) {
-        pts[index++] = geomFact.point(new PointDouble(extent.getMinX() + i * xinc,
-          extent.getMinY() + j * yinc, Point.NULL_ORDINATE));
-      }
-    }
-    return pts;
-  }
-
   Geometry loadData(final String file) throws Exception {
     final List geoms = InteriorPointTest.getTestGeometries(file);
     return geomFact.buildGeometry(geoms);
@@ -125,6 +73,58 @@ public class TestPerfDistanceLinesPoints {
     final WKTReader rdr = new WKTReader();
     final WKTFileReader fileRdr = new WKTFileReader(filename, rdr);
     return fileRdr.read();
+  }
+
+  Geometry newDiagonalCircles(final double extent, final int nSegs) {
+    final Polygon[] circles = new Polygon[nSegs];
+    final double inc = extent / nSegs;
+    for (int i = 0; i < nSegs; i++) {
+      final double ord = i * inc;
+      final Point p = new PointDouble(ord, ord, Geometry.NULL_ORDINATE);
+      final Geometry pt = geomFact.point(p);
+      circles[i] = (Polygon)pt.buffer(inc / 2);
+    }
+    return geomFact.multiPolygon(circles);
+
+  }
+
+  Geometry newDiagonalLine(final double extent, final int nSegs) {
+    final Point[] pts = new Point[nSegs + 1];
+    pts[0] = new PointDouble((double)0, 0, Geometry.NULL_ORDINATE);
+    final double inc = extent / nSegs;
+    for (int i = 1; i <= nSegs; i++) {
+      final double ord = i * inc;
+      pts[i] = new PointDouble(ord, ord, Geometry.NULL_ORDINATE);
+    }
+    return geomFact.lineString(pts);
+  }
+
+  Geometry newLine(final double extent, final int nSegs) {
+    final Point[] pts = new Point[] {
+      new PointDouble((double)0, 0, Geometry.NULL_ORDINATE),
+      new PointDouble((double)0, extent, Geometry.NULL_ORDINATE),
+      new PointDouble(extent, extent, Geometry.NULL_ORDINATE),
+      new PointDouble(extent, 0, Geometry.NULL_ORDINATE)
+
+    };
+    final Geometry outline = geomFact.lineString(pts);
+    final double inc = extent / nSegs;
+    return Densifier.densify(outline, inc);
+
+  }
+
+  Geometry[] newPoints(final BoundingBox extent, final int nPtsSide) {
+    final Geometry[] pts = new Geometry[nPtsSide * nPtsSide];
+    int index = 0;
+    final double xinc = extent.getWidth() / nPtsSide;
+    final double yinc = extent.getHeight() / nPtsSide;
+    for (int i = 0; i < nPtsSide; i++) {
+      for (int j = 0; j < nPtsSide; j++) {
+        pts[index++] = geomFact.point(new PointDouble(extent.getMinX() + i * xinc,
+          extent.getMinY() + j * yinc, Geometry.NULL_ORDINATE));
+      }
+    }
+    return pts;
   }
 
   public void test() throws Exception {
@@ -170,9 +170,8 @@ public class TestPerfDistanceLinesPoints {
   }
 
   public void test(final int num) throws Exception {
-    // Geometry lines = createLine(EXTENT, num);
-    final Geometry target = createDiagonalCircles(EXTENT, NUM_TARGET_ITEMS);
-    final Geometry[] pts = createPoints(target.getBoundingBox(), num);
+    final Geometry target = newDiagonalCircles(EXTENT, NUM_TARGET_ITEMS);
+    final Geometry[] pts = newPoints(target.getBoundingBox(), num);
 
     test(pts, target);
   }

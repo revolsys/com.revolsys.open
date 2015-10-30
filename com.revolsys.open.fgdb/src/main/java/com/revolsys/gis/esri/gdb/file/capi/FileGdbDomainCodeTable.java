@@ -54,8 +54,8 @@ public class FileGdbDomainCodeTable implements CodeTable {
     } else if (value2 == null) {
       return -1;
     } else {
-      final Object codeValue1 = getValue(Identifier.create(value1));
-      final Object codeValue2 = getValue(Identifier.create(value2));
+      final Object codeValue1 = getValue(Identifier.newIdentifier(value1));
+      final Object codeValue2 = getValue(Identifier.newIdentifier(value2));
       return CompareUtil.compare(codeValue1, codeValue2);
     }
   }
@@ -125,7 +125,7 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   @Override
   public <V> V getValue(final Object id) {
-    return getValue(Identifier.create(id));
+    return getValue(Identifier.newIdentifier(id));
   }
 
   @Override

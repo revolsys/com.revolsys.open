@@ -477,7 +477,7 @@ public class SwingUtil {
         in = process.getInputStream();
         out = process.getOutputStream();
         err = process.getErrorStream();
-        inr = new BufferedReader(FileUtil.createUtf8Reader(in));
+        inr = new BufferedReader(FileUtil.newUtf8Reader(in));
         String line = inr.readLine();
         while (line != null) {
           line = line.toLowerCase().trim();
@@ -523,7 +523,7 @@ public class SwingUtil {
     if (codeTable == null) {
       return null;
     } else {
-      final ComboBox<Identifier> comboBox = CodeTableComboBoxModel.create(fieldName, codeTable,
+      final ComboBox<Identifier> comboBox = CodeTableComboBoxModel.newComboBox(fieldName, codeTable,
         !required);
       if (comboBox.getModel().getSize() > 0) {
         comboBox.setSelectedIndex(0);
@@ -549,7 +549,7 @@ public class SwingUtil {
       for (int i = 0; i < longestLength; i++) {
         value.append("W");
       }
-      comboBox.setPrototypeDisplayValue(Identifier.create(value));
+      comboBox.setPrototypeDisplayValue(Identifier.newIdentifier(value));
 
       final ComboBoxEditor editor = comboBox.getEditor();
       final Component editorComponent = editor.getEditorComponent();

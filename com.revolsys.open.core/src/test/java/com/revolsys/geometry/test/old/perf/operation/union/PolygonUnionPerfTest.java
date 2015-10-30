@@ -33,13 +33,13 @@ public class PolygonUnionPerfTest {
   public PolygonUnionPerfTest() {
   }
 
-  Geometry createPoly(final Point base, final double size, final int nPts) {
+  Geometry newPolygon(final Point base, final double size, final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory(this.factory);
     gsf.setCentre(base);
     gsf.setSize(size);
     gsf.setNumPoints(nPts);
 
-    final Geometry poly = gsf.createCircle();
+    final Geometry poly = gsf.newCircle();
     // Geometry poly = gsf.createRectangle();
 
     // System.out.println(circle);
@@ -61,7 +61,7 @@ public class PolygonUnionPerfTest {
    * @param nPts
    * @return
    */
-  List createPolys(final int nItems, final double size, final int nPts) {
+  List newPolygons(final int nItems, final double size, final int nPts) {
 
     // between 0 and 1
     final double overlapPct = 0.2;
@@ -82,8 +82,8 @@ public class PolygonUnionPerfTest {
     final double yInc = height / nCells;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
-        final Point base = new PointDouble(i * xInc, j * yInc, Point.NULL_ORDINATE);
-        final Geometry poly = createPoly(base, size, nPts);
+        final Point base = new PointDouble(i * xInc, j * yInc, Geometry.NULL_ORDINATE);
+        final Geometry poly = newPolygon(base, size, nPts);
         geoms.add(poly);
         // System.out.println(poly);
       }
@@ -100,7 +100,7 @@ public class PolygonUnionPerfTest {
     // System.out.println("---------------------------------------------------------");
     // System.out.println("# pts/item: " + nPts);
 
-    final List polys = createPolys(nItems, size, nPts);
+    final List polys = newPolygons(nItems, size, nPts);
 
     // System.out.println();
     // System.out.println("Running with " + nPts + " points");

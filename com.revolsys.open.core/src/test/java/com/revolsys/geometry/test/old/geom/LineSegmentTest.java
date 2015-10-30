@@ -32,6 +32,7 @@
  */
 package com.revolsys.geometry.test.old.geom;
 
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
@@ -79,7 +80,7 @@ public class LineSegmentTest extends TestCase {
     final Point p = seg.pointAlongOffset(segFrac, offset);
 
     assertTrue(
-      equalsTolerance(new PointDouble(expectedX, expectedY, Point.NULL_ORDINATE), p, 0.000001));
+      equalsTolerance(new PointDouble(expectedX, expectedY, Geometry.NULL_ORDINATE), p, 0.000001));
   }
 
   void checkOrientationIndex(final double x0, final double y0, final double x1, final double y1,
@@ -97,7 +98,7 @@ public class LineSegmentTest extends TestCase {
 
   void checkOrientationIndex(final LineSegment seg, final double px, final double py,
     final int expectedOrient) {
-    final Point p = new PointDouble(px, py, Point.NULL_ORDINATE);
+    final Point p = new PointDouble(px, py, Geometry.NULL_ORDINATE);
     final int orient = seg.orientationIndex(p);
     assertTrue(orient == expectedOrient);
   }
@@ -147,10 +148,11 @@ public class LineSegmentTest extends TestCase {
   public void testProjectionFactor() {
     // zero-length line
     final LineSegment seg = new LineSegmentDouble(2, 10, 0, 10, 0);
-    assertTrue(Double.isNaN(seg.projectionFactor(new PointDouble(11.0, 0, Point.NULL_ORDINATE))));
+    assertTrue(
+      Double.isNaN(seg.projectionFactor(new PointDouble(11.0, 0, Geometry.NULL_ORDINATE))));
 
     final LineSegment seg2 = new LineSegmentDouble(2, 10, 0, 20, 0);
-    assertTrue(seg2.projectionFactor(new PointDouble(11.0, 0, Point.NULL_ORDINATE)) == 0.1);
+    assertTrue(seg2.projectionFactor(new PointDouble(11.0, 0, Geometry.NULL_ORDINATE)) == 0.1);
 
   }
 

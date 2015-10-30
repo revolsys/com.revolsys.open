@@ -14,7 +14,7 @@ public class GeometryOperationLoader {
    * @param classLoader
    * @param geomOpClassname
    */
-  public static GeometryOperation createGeometryOperation(final ClassLoader classLoader,
+  public static GeometryOperation newGeometryOperation(final ClassLoader classLoader,
     final String geomOpClassname) {
     Class geomOpClass = null;
     try {

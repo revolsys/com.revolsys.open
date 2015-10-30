@@ -17,7 +17,7 @@ public interface MapWriterFactory extends FileIoFactory {
   }
 
   default MapWriter newMapWriter(final OutputStream out) {
-    final Writer writer = FileUtil.createUtf8Writer(out);
+    final Writer writer = FileUtil.newUtf8Writer(out);
     return newMapWriter(writer);
   }
 

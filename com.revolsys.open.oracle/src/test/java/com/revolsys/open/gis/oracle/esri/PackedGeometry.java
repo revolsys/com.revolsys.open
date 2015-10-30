@@ -7,9 +7,9 @@ import java.util.List;
 import com.revolsys.equals.GeometryEqualsExact3d;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.gis.oracle.esri.ArcSdeConstants;
-import com.revolsys.gis.oracle.esri.ArcSdeStGeometryFieldDefinition;
-import com.revolsys.gis.oracle.esri.PackedCoordinateUtil;
+import com.revolsys.oracle.recordstore.esri.ArcSdeConstants;
+import com.revolsys.oracle.recordstore.esri.ArcSdeStGeometryFieldDefinition;
+import com.revolsys.oracle.recordstore.esri.PackedCoordinateUtil;
 import com.revolsys.record.io.format.wkt.WktWriter;
 import com.revolsys.util.WrappedException;
 

@@ -62,7 +62,7 @@ public class IndexTester {
 
   static final int NUM_ITEMS = 2000;
 
-  public static List createGridItems(final int nGridCells) {
+  public static List newGridItems(final int nGridCells) {
     final ArrayList items = new ArrayList();
     int gridSize = (int)Math.sqrt(nGridCells);
     gridSize += 1;

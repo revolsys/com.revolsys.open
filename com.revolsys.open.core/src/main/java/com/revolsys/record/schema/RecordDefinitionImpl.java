@@ -46,10 +46,6 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   private static final Map<Integer, RecordDefinitionImpl> RECORD_DEFINITION_CACHE = new WeakCache<Integer, RecordDefinitionImpl>();
 
-  public static RecordDefinitionImpl create(final Map<String, Object> properties) {
-    return new RecordDefinitionImpl(properties);
-  }
-
   public static void destroy(final RecordDefinitionImpl... recordDefinitionList) {
     for (final RecordDefinitionImpl recordDefinition : recordDefinitionList) {
       recordDefinition.destroy();
@@ -58,6 +54,10 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   public static RecordDefinition getRecordDefinition(final int instanceId) {
     return RECORD_DEFINITION_CACHE.get(instanceId);
+  }
+
+  public static RecordDefinitionImpl newRecordDefinition(final Map<String, Object> properties) {
+    return new RecordDefinitionImpl(properties);
   }
 
   private Map<String, CodeTable> codeTableByFieldNameMap = new HashMap<>();
@@ -100,7 +100,10 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   private RecordDefinitionFactory recordDefinitionFactory;
 
-  private RecordFactory recordFactory = ArrayRecord.FACTORY;
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  private RecordFactory<Record> recordFactory = (RecordFactory)ArrayRecord.FACTORY;
 
   private final Map<String, Collection<Object>> restrictions = new HashMap<>();
 
@@ -120,7 +123,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
         addField(field.clone());
       } else if (object instanceof Map) {
         final Map<String, Object> fieldProperties = (Map<String, Object>)object;
-        final FieldDefinition field = FieldDefinition.create(fieldProperties);
+        final FieldDefinition field = FieldDefinition.newFieldDefinition(fieldProperties);
         addField(field);
       }
     }
@@ -299,17 +302,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   @Override
-  public Record createRecord() {
-    final RecordFactory recordFactory = this.recordFactory;
-    if (recordFactory == null) {
-      return new ArrayRecord(this);
-    } else {
-      return recordFactory.newRecord(this);
-    }
-  }
-
-  @Override
-  public void delete(final Record record) {
+  public void deleteRecord(final Record record) {
     final RecordStore recordStore = getRecordStore();
     if (recordStore == null) {
       throw new UnsupportedOperationException();
@@ -353,6 +346,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
         codeTable = recordStore.getCodeTableByFieldName(fieldName);
       }
       if (codeTable instanceof CodeTableProperty) {
+        @SuppressWarnings("resource")
         final CodeTableProperty property = (CodeTableProperty)codeTable;
         if (property.getRecordDefinition() == this) {
           return null;
@@ -597,7 +591,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   @Override
-  public RecordFactory getRecordFactory() {
+  public RecordFactory<Record> getRecordFactory() {
     return this.recordFactory;
   }
 
@@ -650,6 +644,16 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
       }
     }
     return false;
+  }
+
+  @Override
+  public Record newRecord() {
+    final RecordFactory<Record> recordFactory = this.recordFactory;
+    if (recordFactory == null) {
+      return new ArrayRecord(this);
+    } else {
+      return recordFactory.newRecord(this);
+    }
   }
 
   private void readObject(final ObjectInputStream ois) throws ClassNotFoundException, IOException {

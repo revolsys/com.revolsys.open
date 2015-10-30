@@ -75,7 +75,7 @@ public class MenuItem implements Cloneable, Comparable {
   public void addParameter(final String name, final Object value) throws Exception {
     if (value instanceof String) {
       final String stringValue = (String)value;
-      final Expression expression = JexlUtil.createExpression(stringValue);
+      final Expression expression = JexlUtil.newExpression(stringValue);
       if (expression != null) {
         this.parameters.put(name, expression);
       } else {
@@ -216,7 +216,7 @@ public class MenuItem implements Cloneable, Comparable {
   public void setCondition(final String condition) {
     if (condition != null) {
       try {
-        this.condition = JexlUtil.createExpression(condition);
+        this.condition = JexlUtil.newExpression(condition);
       } catch (final Throwable e) {
         log.error("Invalid Condition", e);
       }
@@ -236,7 +236,7 @@ public class MenuItem implements Cloneable, Comparable {
     if (title != null) {
       Expression titleExpression = null;
       try {
-        titleExpression = JexlUtil.createExpression(title);
+        titleExpression = JexlUtil.newExpression(title);
       } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }
@@ -257,7 +257,7 @@ public class MenuItem implements Cloneable, Comparable {
     if (uri != null) {
       Expression uriExpression = null;
       try {
-        uriExpression = JexlUtil.createExpression(uri.replaceAll(" ", "%20"));
+        uriExpression = JexlUtil.newExpression(uri.replaceAll(" ", "%20"));
       } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }

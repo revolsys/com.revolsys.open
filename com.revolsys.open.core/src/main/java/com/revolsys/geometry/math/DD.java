@@ -159,10 +159,6 @@ public strictfp final class DD implements Serializable, Comparable, Cloneable {
     return new DD(dd);
   }
 
-  private static DD createNaN() {
-    return new DD(Double.NaN, Double.NaN);
-  }
-
   /**
    * Determines the decimal magnitude of a number.
    * The magnitude is the exponent of the greatest power of 10 which is less than
@@ -186,6 +182,10 @@ public strictfp final class DD implements Serializable, Comparable, Cloneable {
     }
 
     return xMag;
+  }
+
+  private static DD newNaN() {
+    return new DD(Double.NaN, Double.NaN);
   }
 
   /**
@@ -535,7 +535,7 @@ public strictfp final class DD implements Serializable, Comparable, Cloneable {
    */
   public final DD divide(final double y) {
     if (Double.isNaN(y)) {
-      return createNaN();
+      return newNaN();
     }
     return copy(this).selfDivide(y, 0.0);
   }
@@ -850,7 +850,7 @@ public strictfp final class DD implements Serializable, Comparable, Cloneable {
    */
   public final DD multiply(final DD y) {
     if (y.isNaN()) {
-      return createNaN();
+      return newNaN();
     }
     return copy(this).selfMultiply(y);
   }
@@ -863,7 +863,7 @@ public strictfp final class DD implements Serializable, Comparable, Cloneable {
    */
   public final DD multiply(final double y) {
     if (Double.isNaN(y)) {
-      return createNaN();
+      return newNaN();
     }
     return copy(this).selfMultiply(y, 0.0);
   }

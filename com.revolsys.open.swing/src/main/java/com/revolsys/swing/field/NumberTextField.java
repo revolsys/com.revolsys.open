@@ -26,8 +26,36 @@ import com.revolsys.util.Property;
 public class NumberTextField extends JXTextField implements Field, DocumentListener, FocusListener {
   private static final long serialVersionUID = 1L;
 
-  public static Number createMaximumValue(final DataType dataType, final int length,
-    final int scale) {
+  private static int getLength(final DataType dataType, int length, final int scale,
+    final BigDecimal minimumValue) {
+    if (length == 0) {
+      final Class<?> javaClass = dataType.getJavaClass();
+      if (javaClass == Byte.class) {
+        length = 3;
+      } else if (javaClass == Short.class) {
+        length = 5;
+      } else if (javaClass == Integer.class) {
+        length = 10;
+      } else if (javaClass == Long.class) {
+        length = 19;
+      } else if (javaClass == Float.class) {
+        length = 10;
+      } else if (javaClass == Double.class) {
+        length = 20;
+      } else {
+        length = 20;
+      }
+    }
+    if (minimumValue == null || new BigDecimal("0").compareTo(minimumValue) > 0) {
+      length++;
+    }
+    if (scale > 0) {
+      length++;
+    }
+    return length;
+  }
+
+  public static Number newMaximumValue(final DataType dataType, final int length, final int scale) {
     final Class<?> javaClass = dataType.getJavaClass();
     final StringBuilder text = new StringBuilder(length);
     for (int i = length - scale + 1; i > 1; i--) {
@@ -96,35 +124,6 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
     }
   }
 
-  private static int getLength(final DataType dataType, int length, final int scale,
-    final BigDecimal minimumValue) {
-    if (length == 0) {
-      final Class<?> javaClass = dataType.getJavaClass();
-      if (javaClass == Byte.class) {
-        length = 3;
-      } else if (javaClass == Short.class) {
-        length = 5;
-      } else if (javaClass == Integer.class) {
-        length = 10;
-      } else if (javaClass == Long.class) {
-        length = 19;
-      } else if (javaClass == Float.class) {
-        length = 10;
-      } else if (javaClass == Double.class) {
-        length = 20;
-      } else {
-        length = 20;
-      }
-    }
-    if (minimumValue == null || new BigDecimal("0").compareTo(minimumValue) > 0) {
-      length++;
-    }
-    if (scale > 0) {
-      length++;
-    }
-    return length;
-  }
-
   private final DataType dataType;
 
   private final int length;
@@ -142,7 +141,7 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
   }
 
   public NumberTextField(final DataType dataType, final int length, final int scale) {
-    this(dataType, length, scale, null, createMaximumValue(dataType, length, scale));
+    this(dataType, length, scale, null, newMaximumValue(dataType, length, scale));
   }
 
   public NumberTextField(final DataType dataType, final int length, final int scale,
@@ -152,7 +151,7 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
 
   public NumberTextField(final String fieldName, final DataType dataType, final int length,
     final int scale) {
-    this(fieldName, dataType, length, scale, null, createMaximumValue(dataType, length, scale));
+    this(fieldName, dataType, length, scale, null, newMaximumValue(dataType, length, scale));
   }
 
   public NumberTextField(final String fieldName, final DataType dataType, final int length,

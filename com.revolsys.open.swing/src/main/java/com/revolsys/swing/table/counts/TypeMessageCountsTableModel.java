@@ -104,10 +104,12 @@ public class TypeMessageCountsTableModel extends AbstractTableModel {
 
   @Override
   public void toTsv(final Writer out) {
-    try (TsvWriter tsv = Tsv.plainWriter(out)) {
+    try (
+      TsvWriter tsv = Tsv.plainWriter(out)) {
       tsv.write((Object[])COLUMN_NAMES);
       long total = 0;
-      for (final Entry<String, Map<String, Integer>> typeEntry : this.indexByTypeAndMessage.entrySet()) {
+      for (final Entry<String, Map<String, Integer>> typeEntry : this.indexByTypeAndMessage
+        .entrySet()) {
         final String type = typeEntry.getKey();
         final Map<String, Integer> indexByMessage = typeEntry.getValue();
         for (final Entry<String, Integer> messageEntry : indexByMessage.entrySet()) {

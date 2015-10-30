@@ -116,16 +116,6 @@ public class Project extends LayerGroup {
   }
 
   @Override
-  protected ValueField createPropertiesTabGeneralPanelSource(final BasePanel parent) {
-    final ValueField panel = super.createPropertiesTabGeneralPanelSource(parent);
-    if (this.resource != null) {
-      SwingUtil.addLabelledReadOnlyTextField(panel, "URL", this.resource.getURL());
-      GroupLayouts.makeColumns(panel, 2, true);
-    }
-    return panel;
-  }
-
-  @Override
   public void delete() {
     super.delete();
     this.baseMapLayers = null;
@@ -137,7 +127,7 @@ public class Project extends LayerGroup {
   protected boolean doSaveSettings(final Path directory) {
     boolean saved = true;
     FileUtil.deleteDirectory(directory.toFile(), false);
-    Paths.createDirectories(directory);
+    Paths.newDirectories(directory);
 
     saved &= super.doSaveSettings(directory);
 
@@ -160,7 +150,7 @@ public class Project extends LayerGroup {
     final Path directory = getProjectDirectory();
     if (directory != null) {
       final Path layersDirectory = directory.resolve("Layers");
-      Paths.createDirectories(layersDirectory);
+      Paths.newDirectories(layersDirectory);
       if (Files.isDirectory(layersDirectory)) {
         return layersDirectory;
       }
@@ -262,6 +252,16 @@ public class Project extends LayerGroup {
 
   public Map<String, BoundingBox> getZoomBookmarks() {
     return this.zoomBookmarks;
+  }
+
+  @Override
+  protected ValueField newPropertiesTabGeneralPanelSource(final BasePanel parent) {
+    final ValueField panel = super.newPropertiesTabGeneralPanelSource(parent);
+    if (this.resource != null) {
+      SwingUtil.addLabelledReadOnlyTextField(panel, "URL", this.resource.getURL());
+      GroupLayouts.makeColumns(panel, 2, true);
+    }
+    return panel;
   }
 
   @Override
@@ -558,7 +558,7 @@ public class Project extends LayerGroup {
       }
     } else if ("viewBoundingBox".equals(name)) {
       if (value != null) {
-        final BoundingBox viewBoundingBox = BoundingBoxDoubleGf.create(value.toString());
+        final BoundingBox viewBoundingBox = BoundingBoxDoubleGf.newBoundingBox(value.toString());
         if (!BoundingBoxUtil.isEmpty(viewBoundingBox)) {
           this.initialBoundingBox = viewBoundingBox;
           setGeometryFactory(viewBoundingBox.getGeometryFactory());
@@ -619,7 +619,7 @@ public class Project extends LayerGroup {
               boundingBox = geometry.getBoundingBox();
             } else if (object != null) {
               final String wkt = object.toString();
-              boundingBox = BoundingBoxDoubleGf.create(wkt);
+              boundingBox = BoundingBoxDoubleGf.newBoundingBox(wkt);
             }
             if (boundingBox != null) {
               bookmarks.put(name, boundingBox);

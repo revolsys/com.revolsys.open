@@ -78,7 +78,7 @@ public class GeometricShapeFactory {
     public Point getCentre() {
       if (this.centre == null) {
         this.centre = new PointDouble(this.base.getX() + this.width / 2,
-          this.base.getY() + this.height / 2, Point.NULL_ORDINATE);
+          this.base.getY() + this.height / 2, Geometry.NULL_ORDINATE);
       }
       return this.centre;
     }
@@ -187,7 +187,7 @@ public class GeometricShapeFactory {
    * @param angExtent size of angle in radians
    * @return an elliptical arc
    */
-  public LineString createArc(final double startAng, final double angExtent) {
+  public LineString newArc(final double startAng, final double angExtent) {
     final BoundingBox env = this.dim.getEnvelope();
     final double xRadius = env.getWidth() / 2.0;
     final double yRadius = env.getHeight() / 2.0;
@@ -222,7 +222,7 @@ public class GeometricShapeFactory {
    * @param angExtent size of angle in radians
    * @return an elliptical arc polygon
    */
-  public Polygon createArcPolygon(final double startAng, final double angExtent) {
+  public Polygon newArcPolygon(final double startAng, final double angExtent) {
     final BoundingBox env = this.dim.getEnvelope();
     final double xRadius = env.getWidth() / 2.0;
     final double yRadius = env.getHeight() / 2.0;
@@ -261,8 +261,8 @@ public class GeometricShapeFactory {
    *
    * @return a circle or ellipse
    */
-  public Polygon createCircle() {
-    return createEllipse();
+  public Polygon newCircle() {
+    return newEllipse();
   }
 
   /**
@@ -272,7 +272,7 @@ public class GeometricShapeFactory {
    *
    * @return an ellipse or circle
    */
-  public Polygon createEllipse() {
+  public Polygon newEllipse() {
 
     final BoundingBox env = this.dim.getEnvelope();
     final double xRadius = env.getWidth() / 2.0;
@@ -302,7 +302,7 @@ public class GeometricShapeFactory {
    * @return a rectangular Polygon
    *
    */
-  public Polygon createRectangle() {
+  public Polygon newRectangle() {
     int i;
     int ipt = 0;
     int nSide = this.nPts / 4;
@@ -350,14 +350,14 @@ public class GeometricShapeFactory {
    *
    * @return a squircle
    */
-  public Polygon createSquircle()
+  public Polygon newSquircle()
   /**
    * Creates a squircular {@link Polygon}.
    *
    * @return a squircle
    */
   {
-    return createSupercircle(4);
+    return newSupercircle(4);
   }
 
   /**
@@ -366,7 +366,7 @@ public class GeometricShapeFactory {
    *
    * @return a supercircle
    */
-  public Polygon createSupercircle(final double power) {
+  public Polygon newSupercircle(final double power) {
     final double recipPow = 1.0 / power;
 
     final double radius = this.dim.getMinSize() / 2;

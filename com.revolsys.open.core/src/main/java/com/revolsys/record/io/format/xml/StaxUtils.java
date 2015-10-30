@@ -53,16 +53,6 @@ public final class StaxUtils {
     }
   }
 
-  public static XMLStreamReader createXmlReader(final InputStream inputStream) {
-    try {
-      final XmlStreamReader reader = new XmlStreamReader(inputStream);
-      return StaxUtils.FACTORY.createXMLStreamReader(reader);
-    } catch (final Throwable e) {
-      Exceptions.throwUncheckedException(e);
-      return null;
-    }
-  }
-
   public static XMLStreamReader createXmlReader(final Reader reader) {
     try {
       return StaxUtils.FACTORY.createXMLStreamReader(reader);
@@ -74,7 +64,7 @@ public final class StaxUtils {
 
   public static XMLStreamReader createXmlReader(final Resource resource) {
     final InputStream inputStream = resource.getInputStream();
-    return createXmlReader(inputStream);
+    return newXmlReader(inputStream);
   }
 
   public static String getAttribute(final XMLStreamReader parser, final QName typePath) {
@@ -207,6 +197,16 @@ public final class StaxUtils {
     final String currentLocalName = parser.getLocalName();
     final String elementLocalName = element.getLocalPart();
     return currentLocalName.equals(elementLocalName);
+  }
+
+  public static XMLStreamReader newXmlReader(final InputStream inputStream) {
+    try {
+      final XmlStreamReader reader = new XmlStreamReader(inputStream);
+      return StaxUtils.FACTORY.createXMLStreamReader(reader);
+    } catch (final Throwable e) {
+      Exceptions.throwUncheckedException(e);
+      return null;
+    }
   }
 
   public static int next(final XMLStreamReader parser) {

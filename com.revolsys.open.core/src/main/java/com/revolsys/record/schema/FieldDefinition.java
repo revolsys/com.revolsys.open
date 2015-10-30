@@ -36,7 +36,7 @@ import com.revolsys.util.Strings;
  * @see RecordDefinition
  */
 public class FieldDefinition extends BaseObjectWithProperties implements Cloneable, MapSerializer {
-  public static FieldDefinition create(final Map<String, Object> properties) {
+  public static FieldDefinition newFieldDefinition(final Map<String, Object> properties) {
     return new FieldDefinition(properties);
   }
 

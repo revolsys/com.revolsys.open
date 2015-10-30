@@ -37,7 +37,7 @@ public class HtmlDocument extends ElementContainer {
   private final List<BufferedReader> styles = new ArrayList<BufferedReader>();
 
   public void addStyle(final InputStream styleIn) {
-    this.styles.add(new BufferedReader(FileUtil.createUtf8Reader(styleIn)));
+    this.styles.add(new BufferedReader(FileUtil.newUtf8Reader(styleIn)));
   }
 
   public void addStyle(final Reader styleIn) {

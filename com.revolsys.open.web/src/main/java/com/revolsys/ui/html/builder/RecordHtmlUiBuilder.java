@@ -52,87 +52,6 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
     super(typePath, title, pluralTitle);
   }
 
-  public Object createDataTableHandler(final HttpServletRequest request, final String pageName) {
-    final Map<String, Object> parameters = Collections.emptyMap();
-    return createDataTableHandler(request, pageName, parameters);
-  }
-
-  public Object createDataTableHandler(final HttpServletRequest request, final String pageName,
-    final Map<String, Object> parameters) {
-    if (isDataTableCallback(request)) {
-      return createDataTableMap(request, pageName, parameters);
-    } else {
-      final TabElementContainer tabs = new TabElementContainer();
-      addTabDataTable(tabs, this, pageName, parameters);
-      return tabs;
-    }
-  }
-
-  public Object createDataTableHandlerOrRedirect(final HttpServletRequest request,
-    final HttpServletResponse response, final String pageName, final Object parentBuilder,
-    final String parentPageName, final Map<String, Object> parameters) {
-    if (isDataTableCallback(request)) {
-      return createDataTableMap(request, pageName, parameters);
-    } else {
-      return redirectToTab(parentBuilder, parentPageName, pageName);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  public Map<String, Object> createDataTableMap(final HttpServletRequest request,
-    final String pageName, final Map<String, Object> parameters) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    Query query = (Query)parameters.get("query");
-    if (query == null) {
-      final Map<String, Object> filter = (Map<String, Object>)parameters.get("filter");
-      query = Query.and(recordDefinition, filter);
-    }
-    final String fromClause = (String)parameters.get("fromClause");
-    query.setFromClause(fromClause);
-
-    return createDataTableMap(request, pageName, query);
-  }
-
-  protected Map<String, Object> createDataTableMap(final HttpServletRequest request,
-    final String pageName, final Query query) {
-    final String search = request.getParameter("search[value]");
-    final List<String> columnNames = new ArrayList<>();
-    final List<KeySerializer> serializers = getSerializers(pageName, "list");
-    final Or or = new Or();
-    for (int i = 0;; i++) {
-      final String name = request.getParameter("columns[" + i + "][name]");
-      if (Property.hasValue(name)) {
-        final KeySerializer serializer = serializers.get(i);
-        final String columnName = JavaBeanUtil.getFirstName(serializer.getKey());
-        columnNames.add(columnName);
-        if (Property.hasValue(search)) {
-          if (HttpServletUtils.getBooleanParameter(request, "columns[" + i + "][searchable]")) {
-            or.add(Q.iLike("T." + columnName, search));
-          }
-        }
-      } else {
-        break;
-      }
-    }
-    if (!or.isEmpty()) {
-      query.and(or);
-    }
-    final Map<String, Boolean> orderBy = getDataTableSortOrder(columnNames, request);
-    query.setOrderBy(orderBy);
-
-    return createDataTableMap(request, getRecordStore(), query, pageName);
-  }
-
-  public Object createDataTableMap(final String pageName, final Map<String, Object> parameters) {
-    final HttpServletRequest request = HttpServletUtils.getRequest();
-    return createDataTableMap(request, pageName, parameters);
-  }
-
-  @Override
-  protected Record createObject() {
-    return this.recordStore.newRecord(this.tableName);
-  }
-
   public void deleteObject(final Object id) {
     final Record record = loadObject(id);
     if (record != null) {
@@ -207,6 +126,87 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
   public Record loadObject(final PathName typeName, final Object id) {
     final Record object = this.recordStore.getRecord(typeName, id);
     return object;
+  }
+
+  public Object newDataTableHandler(final HttpServletRequest request, final String pageName) {
+    final Map<String, Object> parameters = Collections.emptyMap();
+    return newDataTableHandler(request, pageName, parameters);
+  }
+
+  public Object newDataTableHandler(final HttpServletRequest request, final String pageName,
+    final Map<String, Object> parameters) {
+    if (isDataTableCallback(request)) {
+      return newDataTableMap(request, pageName, parameters);
+    } else {
+      final TabElementContainer tabs = new TabElementContainer();
+      addTabDataTable(tabs, this, pageName, parameters);
+      return tabs;
+    }
+  }
+
+  public Object newDataTableHandlerOrRedirect(final HttpServletRequest request,
+    final HttpServletResponse response, final String pageName, final Object parentBuilder,
+    final String parentPageName, final Map<String, Object> parameters) {
+    if (isDataTableCallback(request)) {
+      return newDataTableMap(request, pageName, parameters);
+    } else {
+      return redirectToTab(parentBuilder, parentPageName, pageName);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public Map<String, Object> newDataTableMap(final HttpServletRequest request,
+    final String pageName, final Map<String, Object> parameters) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    Query query = (Query)parameters.get("query");
+    if (query == null) {
+      final Map<String, Object> filter = (Map<String, Object>)parameters.get("filter");
+      query = Query.and(recordDefinition, filter);
+    }
+    final String fromClause = (String)parameters.get("fromClause");
+    query.setFromClause(fromClause);
+
+    return newDataTableMap(request, pageName, query);
+  }
+
+  protected Map<String, Object> newDataTableMap(final HttpServletRequest request,
+    final String pageName, final Query query) {
+    final String search = request.getParameter("search[value]");
+    final List<String> columnNames = new ArrayList<>();
+    final List<KeySerializer> serializers = getSerializers(pageName, "list");
+    final Or or = new Or();
+    for (int i = 0;; i++) {
+      final String name = request.getParameter("columns[" + i + "][name]");
+      if (Property.hasValue(name)) {
+        final KeySerializer serializer = serializers.get(i);
+        final String columnName = JavaBeanUtil.getFirstName(serializer.getKey());
+        columnNames.add(columnName);
+        if (Property.hasValue(search)) {
+          if (HttpServletUtils.getBooleanParameter(request, "columns[" + i + "][searchable]")) {
+            or.add(Q.iLike("T." + columnName, search));
+          }
+        }
+      } else {
+        break;
+      }
+    }
+    if (!or.isEmpty()) {
+      query.and(or);
+    }
+    final Map<String, Boolean> orderBy = getDataTableSortOrder(columnNames, request);
+    query.setOrderBy(orderBy);
+
+    return newDataTableMap(request, getRecordStore(), query, pageName);
+  }
+
+  public Object newDataTableMap(final String pageName, final Map<String, Object> parameters) {
+    final HttpServletRequest request = HttpServletUtils.getRequest();
+    return newDataTableMap(request, pageName, parameters);
+  }
+
+  @Override
+  protected Record newObject() {
+    return this.recordStore.newRecord(this.tableName);
   }
 
   public void setRecordStore(final RecordStore recordStore) {

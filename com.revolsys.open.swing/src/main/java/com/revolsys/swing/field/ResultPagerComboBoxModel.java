@@ -10,17 +10,13 @@ import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.map.LruMap;
 import com.revolsys.swing.list.ResultPagerListCellRenderer;
 
-@SuppressWarnings("serial")
 public class ResultPagerComboBoxModel<T> extends AbstractListModel implements ComboBoxModel {
 
   public static final Object NULL = new Object();
 
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
-  public static <T> ComboBox create(final ResultPager<T> codeTable, final boolean allowNull,
+  public static <T> ComboBox newComboBox(final ResultPager<T> codeTable, final boolean allowNull,
     final String... fieldNames) {
     final ResultPagerComboBoxModel<T> model = new ResultPagerComboBoxModel<T>(codeTable, allowNull);
     final ComboBox comboBox = new ComboBox(model);

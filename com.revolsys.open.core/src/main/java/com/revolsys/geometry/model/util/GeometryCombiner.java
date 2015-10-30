@@ -74,7 +74,7 @@ public class GeometryCombiner {
    * @return the combined geometry
    */
   public static Geometry combine(final Geometry g0, final Geometry g1) {
-    final GeometryCombiner combiner = new GeometryCombiner(createList(g0, g1));
+    final GeometryCombiner combiner = new GeometryCombiner(newList(g0, g1));
     return combiner.combine();
   }
 
@@ -87,38 +87,8 @@ public class GeometryCombiner {
    * @return the combined geometry
    */
   public static Geometry combine(final Geometry g0, final Geometry g1, final Geometry g2) {
-    final GeometryCombiner combiner = new GeometryCombiner(createList(g0, g1, g2));
+    final GeometryCombiner combiner = new GeometryCombiner(newList(g0, g1, g2));
     return combiner.combine();
-  }
-
-  /**
-   * Creates a list from two items
-   *
-   * @param obj0
-   * @param obj1
-   * @return a List containing the two items
-   */
-  private static List<Geometry> createList(final Geometry obj0, final Geometry obj1) {
-    final List<Geometry> list = new ArrayList<Geometry>();
-    list.add(obj0);
-    list.add(obj1);
-    return list;
-  }
-
-  /**
-   * Creates a list from two items
-   *
-   * @param obj0
-   * @param obj1
-   * @return a List containing the two items
-   */
-  private static List<Geometry> createList(final Geometry obj0, final Geometry obj1,
-    final Geometry obj2) {
-    final List<Geometry> list = new ArrayList<Geometry>();
-    list.add(obj0);
-    list.add(obj1);
-    list.add(obj2);
-    return list;
   }
 
   /**
@@ -132,6 +102,36 @@ public class GeometryCombiner {
       return null;
     }
     return ((Geometry)geoms.iterator().next()).getGeometryFactory();
+  }
+
+  /**
+   * Creates a list from two items
+   *
+   * @param obj0
+   * @param obj1
+   * @return a List containing the two items
+   */
+  private static List<Geometry> newList(final Geometry obj0, final Geometry obj1) {
+    final List<Geometry> list = new ArrayList<Geometry>();
+    list.add(obj0);
+    list.add(obj1);
+    return list;
+  }
+
+  /**
+   * Creates a list from two items
+   *
+   * @param obj0
+   * @param obj1
+   * @return a List containing the two items
+   */
+  private static List<Geometry> newList(final Geometry obj0, final Geometry obj1,
+    final Geometry obj2) {
+    final List<Geometry> list = new ArrayList<Geometry>();
+    list.add(obj0);
+    list.add(obj1);
+    list.add(obj2);
+    return list;
   }
 
   private final GeometryFactory geomFactory;

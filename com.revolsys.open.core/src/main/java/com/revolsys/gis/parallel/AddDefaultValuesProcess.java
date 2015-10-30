@@ -151,7 +151,7 @@ public class AddDefaultValuesProcess extends AbstractInOutProcess<Record, Record
 
             final RecordDefinition subClass = this.recordDefinitionFactory
               .getRecordDefinition(dataType.getName());
-            final Record subObject = subClass.createRecord();
+            final Record subObject = subClass.newRecord();
             setDefaultValue(subObject, subKey, value);
             record.setValue(fieldName, subObject);
             process(subObject);

@@ -28,7 +28,7 @@ public class RecordStoreMultipleQueryIterator extends AbstractMultipleIterator<R
     if (this.reader == null) {
       throw new NoSuchElementException();
     } else {
-      final AbstractIterator<Record> iterator = this.reader.createQueryIterator(this.queryIndex);
+      final AbstractIterator<Record> iterator = this.reader.newQueryIterator(this.queryIndex);
       this.queryIndex++;
       return iterator;
     }

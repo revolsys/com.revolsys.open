@@ -20,7 +20,7 @@ public class KmzMapWriter extends AbstractMapWriter {
       this.zipOut = new ZipOutputStream(out);
       final ZipEntry entry = new ZipEntry("doc.kml");
       this.zipOut.putNextEntry(entry);
-      final java.io.Writer writer = FileUtil.createUtf8Writer(this.zipOut);
+      final java.io.Writer writer = FileUtil.newUtf8Writer(this.zipOut);
       this.kmlWriter = new KmlMapWriter(writer);
     } catch (final Throwable e) {
       throw new RuntimeException("Unable to create KMZ file ", e);

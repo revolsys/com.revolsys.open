@@ -33,6 +33,7 @@
 package com.revolsys.geometry.test.old.algorithm;
 
 import com.revolsys.geometry.algorithm.RobustDeterminant;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.wkb.WKTReader;
@@ -55,8 +56,9 @@ public class OrientationIndexTest extends TestCase {
   public static boolean isAllOrientationsEqual(final double p0x, final double p0y, final double p1x,
     final double p1y, final double p2x, final double p2y) {
     final Point[] pts = {
-      new PointDouble(p0x, p0y, Point.NULL_ORDINATE),
-      new PointDouble(p1x, p1y, Point.NULL_ORDINATE), new PointDouble(p2x, p2y, Point.NULL_ORDINATE)
+      new PointDouble(p0x, p0y, Geometry.NULL_ORDINATE),
+      new PointDouble(p1x, p1y, Geometry.NULL_ORDINATE),
+      new PointDouble(p2x, p2y, Geometry.NULL_ORDINATE)
     };
     return isAllOrientationsEqual(pts);
   }
@@ -87,9 +89,9 @@ public class OrientationIndexTest extends TestCase {
   public void testCCW2() throws Exception {
     // experimental case - can't make it fail
     final Point[] pts2 = {
-      new PointDouble(1.0000000000004998, -7.989685402102996, Point.NULL_ORDINATE),
-      new PointDouble(10.0, -7.004368924503866, Point.NULL_ORDINATE),
-      new PointDouble(1.0000000000005, -7.989685402102996, Point.NULL_ORDINATE),
+      new PointDouble(1.0000000000004998, -7.989685402102996, Geometry.NULL_ORDINATE),
+      new PointDouble(10.0, -7.004368924503866, Geometry.NULL_ORDINATE),
+      new PointDouble(1.0000000000005, -7.989685402102996, Geometry.NULL_ORDINATE),
     };
     assertTrue(isAllOrientationsEqual(pts2));
   }

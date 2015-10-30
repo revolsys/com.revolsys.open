@@ -287,7 +287,7 @@ public class GeometryGraph extends PlanarGraph {
     final SegmentIntersector si = new SegmentIntersector(li, includeProper, true);
     si.setBoundaryNodes(this.getBoundaryNodes(), g.getBoundaryNodes());
 
-    final EdgeSetIntersector esi = createEdgeSetIntersector();
+    final EdgeSetIntersector esi = newEdgeSetIntersector();
     esi.computeIntersections(this.edges, g.edges, si);
     /*
      * for (Iterator i = g.edges.iterator(); i.hasNext();) { Edge e = (Edge)
@@ -307,7 +307,7 @@ public class GeometryGraph extends PlanarGraph {
   public SegmentIntersector computeSelfNodes(final LineIntersector li,
     final boolean computeRingSelfNodes) {
     final SegmentIntersector si = new SegmentIntersector(li, true, false);
-    final EdgeSetIntersector esi = createEdgeSetIntersector();
+    final EdgeSetIntersector esi = newEdgeSetIntersector();
     // optimized test for Polygons and Rings
     if (!computeRingSelfNodes && (this.geometry instanceof LinearRing
       || this.geometry instanceof Polygon || this.geometry instanceof MultiPolygon)) {
@@ -325,19 +325,6 @@ public class GeometryGraph extends PlanarGraph {
       final EdgeIntersectionList edgeIntersectionList = edge.getEdgeIntersectionList();
       edgeIntersectionList.addSplitEdges(edgelist);
     }
-  }
-
-  private EdgeSetIntersector createEdgeSetIntersector() {
-    // various options for computing intersections, from slowest to fastest
-
-    // private EdgeSetIntersector esi = new SimpleEdgeSetIntersector();
-    // private EdgeSetIntersector esi = new MonotoneChainIntersector();
-    // private EdgeSetIntersector esi = new NonReversingChainIntersector();
-    // private EdgeSetIntersector esi = new SimpleSweepLineIntersector();
-    // private EdgeSetIntersector esi = new MCSweepLineIntersector();
-
-    // return new SimpleEdgeSetIntersector();
-    return new SimpleMCSweepLineIntersector();
   }
 
   public Edge findEdge(final LineString line) {
@@ -447,5 +434,18 @@ public class GeometryGraph extends PlanarGraph {
       return this.areaPtLocator.locate(pt);
     }
     return this.ptLocator.locate(pt, this.geometry);
+  }
+
+  private EdgeSetIntersector newEdgeSetIntersector() {
+    // various options for computing intersections, from slowest to fastest
+
+    // private EdgeSetIntersector esi = new SimpleEdgeSetIntersector();
+    // private EdgeSetIntersector esi = new MonotoneChainIntersector();
+    // private EdgeSetIntersector esi = new NonReversingChainIntersector();
+    // private EdgeSetIntersector esi = new SimpleSweepLineIntersector();
+    // private EdgeSetIntersector esi = new MCSweepLineIntersector();
+
+    // return new SimpleEdgeSetIntersector();
+    return new SimpleMCSweepLineIntersector();
   }
 }

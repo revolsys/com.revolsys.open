@@ -73,7 +73,7 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
             } else if (codeTable == null) {
               text = StringConverterRegistry.toString(originalValue);
             } else {
-              text = codeTable.getValue(Identifier.create(originalValue));
+              text = codeTable.getValue(Identifier.newIdentifier(originalValue));
               if (text == null) {
                 text = "-";
               }

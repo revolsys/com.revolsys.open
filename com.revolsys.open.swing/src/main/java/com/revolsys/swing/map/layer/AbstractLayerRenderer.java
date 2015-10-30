@@ -83,11 +83,6 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends AbstractPro
   }
 
   @Override
-  public ValueField createStylePanel() {
-    return new BaseStylePanel(this);
-  }
-
-  @Override
   public Icon getIcon() {
     return this.icon;
   }
@@ -192,6 +187,11 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends AbstractPro
       }
     }
     return false;
+  }
+
+  @Override
+  public ValueField newStylePanel() {
+    return new BaseStylePanel(this);
   }
 
   @Override

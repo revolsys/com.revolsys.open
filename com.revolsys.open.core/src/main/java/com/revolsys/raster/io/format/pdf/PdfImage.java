@@ -22,7 +22,7 @@ public class PdfImage extends JaiGeoreferencedImage {
 
   public PdfImage(final Resource imageResource) {
     setImageResource(imageResource);
-    setRenderedImage(createBufferedImage());
+    setRenderedImage(newBufferedImage());
     if (!hasGeometryFactory()) {
       loadProjectionFile();
     }
@@ -31,7 +31,12 @@ public class PdfImage extends JaiGeoreferencedImage {
     }
   }
 
-  protected BufferedImage createBufferedImage() {
+  @Override
+  public String getWorldFileExtension() {
+    return "pfw";
+  }
+
+  protected BufferedImage newBufferedImage() {
     final Resource imageResource = getImageResource();
     try {
       final File file = SpringUtil.getOrDownloadFile(imageResource);
@@ -79,10 +84,5 @@ public class PdfImage extends JaiGeoreferencedImage {
     } catch (final IOException e) {
       throw new RuntimeException("Error loading PDF file " + imageResource, e);
     }
-  }
-
-  @Override
-  public String getWorldFileExtension() {
-    return "pfw";
   }
 }

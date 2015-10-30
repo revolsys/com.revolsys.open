@@ -109,7 +109,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
       RecordStoreSchema schema = getSchema(schemaPath);
       if (schema == null && this.createMissingTables) {
         final RecordStoreSchema rootSchema = getRootSchema();
-        schema = rootSchema.createSchema(schemaPath);
+        schema = rootSchema.newSchema(schemaPath);
       }
       final File schemaDirectory = new File(this.directory, schemaPath.getPath());
       if (!schemaDirectory.exists()) {
@@ -254,7 +254,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
           }
         } else if (file.isDirectory()) {
           final String name = file.getName();
-          final PathName childSchemaPath = schemaPathName.createChild(name);
+          final PathName childSchemaPath = schemaPathName.newChild(name);
           RecordStoreSchema childSchema = schema.getSchema(childSchemaPath);
           if (childSchema == null) {
             childSchema = new RecordStoreSchema(schema, childSchemaPath);

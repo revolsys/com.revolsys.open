@@ -63,7 +63,22 @@ public class BinTreeCorrectTest {
   public BinTreeCorrectTest() {
   }
 
-  void createGrid(final int nGridCells) {
+  void fill() {
+    newGrid(NUM_ITEMS);
+  }
+
+  private List getOverlapping(final List items, final Interval searchInterval) {
+    final List result = new ArrayList();
+    for (int i = 0; i < items.size(); i++) {
+      final Interval interval = (Interval)items.get(i);
+      if (interval.overlaps(searchInterval)) {
+        result.add(interval);
+      }
+    }
+    return result;
+  }
+
+  void newGrid(final int nGridCells) {
     int gridSize = (int)Math.sqrt(nGridCells);
     gridSize += 1;
     final double extent = MAX_EXTENT - MIN_EXTENT;
@@ -76,21 +91,6 @@ public class BinTreeCorrectTest {
       this.btree.insert(interval, interval);
       this.intervalList.add(interval);
     }
-  }
-
-  void fill() {
-    createGrid(NUM_ITEMS);
-  }
-
-  private List getOverlapping(final List items, final Interval searchInterval) {
-    final List result = new ArrayList();
-    for (int i = 0; i < items.size(); i++) {
-      final Interval interval = (Interval)items.get(i);
-      if (interval.overlaps(searchInterval)) {
-        result.add(interval);
-      }
-    }
-    return result;
   }
 
   void queryGrid(final int nGridCells, final double cellSize) {

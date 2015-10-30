@@ -51,12 +51,6 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     menu.addMenuItem("group", new AddFileLayerAction());
   }
 
-  public static LayerGroup create(final Map<String, Object> properties) {
-    final LayerGroup layerGroup = new LayerGroup();
-    layerGroup.loadLayers(properties);
-    return layerGroup;
-  }
-
   private static Layer getLayer(LayerGroup group, final String name) {
     for (final String path : Path.getPathElements(Path.getPath(name))) {
       final Layer layer = getLayerByName(group, path);
@@ -83,6 +77,12 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       }
     }
     return null;
+  }
+
+  public static LayerGroup newLayer(final Map<String, Object> properties) {
+    final LayerGroup layerGroup = new LayerGroup();
+    layerGroup.loadLayers(properties);
+    return layerGroup;
   }
 
   private boolean deleted = false;
@@ -598,7 +598,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     } else if (IoFactory.hasFactory(RecordReaderFactory.class, url)) {
       final FileRecordLayer recordLayer = new FileRecordLayer(properties);
       final GeometryStyleRenderer renderer = recordLayer.getRenderer();
-      renderer.setStyle(GeometryStyle.createStyle());
+      renderer.setStyle(GeometryStyle.newStyle());
       layer = recordLayer;
     } else {
       layer = null;

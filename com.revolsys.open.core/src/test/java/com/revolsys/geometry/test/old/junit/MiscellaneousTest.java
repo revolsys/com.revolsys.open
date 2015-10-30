@@ -97,7 +97,7 @@ public class MiscellaneousTest extends TestCase {
   public void testCoordinateNaN() {
     final Point c1 = new PointDouble();
 
-    final Point c2 = new PointDouble((double)3, 4, Point.NULL_ORDINATE);
+    final Point c2 = new PointDouble((double)3, 4, Geometry.NULL_ORDINATE);
     assertEquals(3, c2.getX(), 1E-10);
     assertEquals(4, c2.getY(), 1E-10);
     assertTrue(Double.isNaN(c2.getZ()));
@@ -105,8 +105,8 @@ public class MiscellaneousTest extends TestCase {
     assertEquals(c1, c1);
     assertEquals(c2, c2);
     assertTrue(!c1.equals(c2));
-    assertEquals(new PointDouble((double)3, 5, Point.NULL_ORDINATE),
-      new PointDouble((double)3, 5, Point.NULL_ORDINATE));
+    assertEquals(new PointDouble((double)3, 5, Geometry.NULL_ORDINATE),
+      new PointDouble((double)3, 5, Geometry.NULL_ORDINATE));
     assertEquals(new PointDouble((double)3, 5, Double.NaN),
       new PointDouble((double)3, 5, Double.NaN));
     assertTrue(new PointDouble((double)3, 5, 0).equals(new PointDouble((double)3, 5, Double.NaN)));
@@ -445,7 +445,7 @@ public class MiscellaneousTest extends TestCase {
   public void testPredicatesReturnFalseForEmptyGeometries() {
     final Point p1 = GeometryFactory.floating3().point((Point)null);
     final Point p2 = GeometryFactory.floating3()
-      .point(new PointDouble((double)5, 5, Point.NULL_ORDINATE));
+      .point(new PointDouble((double)5, 5, Geometry.NULL_ORDINATE));
     assertEquals(false, p1.equals(p2));
     assertEquals(true, p1.disjoint(p2));
     assertEquals(false, p1.intersects(p2));

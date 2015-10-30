@@ -41,7 +41,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.shape.GeometricShapeBuilder;
 
 /**
@@ -75,23 +74,11 @@ public class RandomPointsBuilder extends GeometricShapeBuilder {
   }
 
   @Override
-  protected Point createCoord(final double x, final double y) {
-    return new PointDouble(this.geometryFactory.makePrecise(0, x),
-      this.geometryFactory.makePrecise(1, y));
-  }
-
-  protected Point createRandomCoord(final BoundingBox env) {
-    final double x = env.getMinX() + env.getWidth() * Math.random();
-    final double y = env.getMinY() + env.getHeight() * Math.random();
-    return createCoord(x, y);
-  }
-
-  @Override
   public Geometry getGeometry() {
     final Point[] pts = new Point[this.numPts];
     int i = 0;
     while (i < this.numPts) {
-      final Point p = createRandomCoord(getExtent());
+      final Point p = newRandomPoint(getExtent());
       if (this.extentLocator != null && !isInExtent(p)) {
         continue;
       }
@@ -105,6 +92,17 @@ public class RandomPointsBuilder extends GeometricShapeBuilder {
       return this.extentLocator.locate(p) != Location.EXTERIOR;
     }
     return getExtent().covers(p);
+  }
+
+  @Override
+  protected Point newPoint(final double x, final double y) {
+    return this.geometryFactory.point(x, y);
+  }
+
+  protected Point newRandomPoint(final BoundingBox env) {
+    final double x = env.getMinX() + env.getWidth() * Math.random();
+    final double y = env.getMinY() + env.getHeight() * Math.random();
+    return newPoint(x, y);
   }
 
   /**

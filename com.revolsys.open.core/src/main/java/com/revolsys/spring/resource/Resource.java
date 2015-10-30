@@ -262,7 +262,7 @@ public interface Resource extends org.springframework.core.io.Resource {
 
   default Reader newReader() {
     final InputStream in = getInputStream();
-    return FileUtil.createUtf8Reader(in);
+    return FileUtil.newUtf8Reader(in);
   }
 
   default Resource newResourceAddExtension(final String extension) {
@@ -289,7 +289,7 @@ public interface Resource extends org.springframework.core.io.Resource {
 
   default Writer newWriter() {
     final OutputStream stream = newOutputStream();
-    return FileUtil.createUtf8Writer(stream);
+    return FileUtil.newUtf8Writer(stream);
   }
 
   default Writer newWriter(final Charset charset) {

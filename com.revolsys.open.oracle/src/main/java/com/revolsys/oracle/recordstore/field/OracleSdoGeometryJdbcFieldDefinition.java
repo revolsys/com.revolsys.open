@@ -1,4 +1,4 @@
-package com.revolsys.gis.oracle.io;
+package com.revolsys.oracle.recordstore.field;
 
 import java.math.BigDecimal;
 import java.sql.Connection;

@@ -10,7 +10,7 @@ import com.revolsys.io.page.PageValueManager;
 
 public class BPlusTreePageValueManager<T> implements PageValueManager<T> {
 
-  public static <T> PageValueManager<T> create(final PageManager pageManager,
+  public static <T> PageValueManager<T> newPageValueManager(final PageManager pageManager,
     final PageValueManager<T> valueSerializer) {
     return new BPlusTreePageValueManager<T>(pageManager, valueSerializer);
   }
@@ -59,11 +59,11 @@ public class BPlusTreePageValueManager<T> implements PageValueManager<T> {
 
     int offset = 0;
     final int pageSize = this.pageManager.getPageSize();
-    Page page = this.pageManager.createPage();
+    Page page = this.pageManager.newPage();
     try {
       final int pageIndex = page.getIndex();
       while (valueBytes.length + 3 > offset + pageSize) {
-        final Page nextPage = this.pageManager.createPage();
+        final Page nextPage = this.pageManager.newPage();
         BPlusTreeMap.writePageHeader(page, BPlusTreeMap.EXTENDED);
         page.writeInt(nextPage.getIndex());
         page.writeBytes(valueBytes, offset, pageSize - 7);

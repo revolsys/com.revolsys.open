@@ -48,11 +48,6 @@ public class PathName implements Comparable<PathName>, CharSequence {
     return getUpperPath().compareTo(pathName.getUpperPath());
   }
 
-  public PathName createChild(final String name) {
-    final String childPath = getPath() + "/" + name;
-    return newPathName(childPath);
-  }
-
   @Override
   public boolean equals(final Object object) {
     if (object == null) {
@@ -235,6 +230,11 @@ public class PathName implements Comparable<PathName>, CharSequence {
   @Override
   public int length() {
     return this.path.length();
+  }
+
+  public PathName newChild(final String name) {
+    final String childPath = getPath() + "/" + name;
+    return newPathName(childPath);
   }
 
   @Override

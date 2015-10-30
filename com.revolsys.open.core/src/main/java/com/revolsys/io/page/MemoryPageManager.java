@@ -17,26 +17,6 @@ public class MemoryPageManager implements PageManager {
   int pageSize = 64;
 
   @Override
-  public synchronized Page createPage() {
-    Page page;
-    if (this.freePages.isEmpty()) {
-      page = new ByteArrayPage(this, this.pages.size(), this.pageSize);
-      this.pages.add(page);
-    } else {
-      final Iterator<Page> iterator = this.freePages.iterator();
-      page = iterator.next();
-      iterator.remove();
-    }
-    this.pagesInUse.add(page);
-    return page;
-  }
-
-  @Override
-  public Page createTempPage() {
-    return new ByteArrayPage(this, -1, this.pageSize);
-  }
-
-  @Override
   public synchronized int getNumPages() {
     return this.pages.size() - this.freePages.size();
   }
@@ -58,6 +38,26 @@ public class MemoryPageManager implements PageManager {
   @Override
   public int getPageSize() {
     return this.pageSize;
+  }
+
+  @Override
+  public synchronized Page newPage() {
+    Page page;
+    if (this.freePages.isEmpty()) {
+      page = new ByteArrayPage(this, this.pages.size(), this.pageSize);
+      this.pages.add(page);
+    } else {
+      final Iterator<Page> iterator = this.freePages.iterator();
+      page = iterator.next();
+      iterator.remove();
+    }
+    this.pagesInUse.add(page);
+    return page;
+  }
+
+  @Override
+  public Page newTempPage() {
+    return new ByteArrayPage(this, -1, this.pageSize);
   }
 
   @Override

@@ -10,7 +10,7 @@ import com.revolsys.io.page.PageValueManager;
 
 public class BPlusTreeList<T> extends AbstractList<T> {
 
-  public static <T> BPlusTreeList<T> create(final PageManager pageManager,
+  public static <T> BPlusTreeList<T> newList(final PageManager pageManager,
     final PageValueManager<T> valueManager) {
     return new BPlusTreeList<T>(pageManager, valueManager);
   }
@@ -21,7 +21,7 @@ public class BPlusTreeList<T> extends AbstractList<T> {
 
   public BPlusTreeList(final PageManager pageManager, final PageValueManager<T> valueSerializer) {
     final ComparableComparator<Integer> comparator = new ComparableComparator<Integer>();
-    this.tree = BPlusTreeMap.create(pageManager, comparator, PageValueManager.INT, valueSerializer);
+    this.tree = BPlusTreeMap.newMap(pageManager, comparator, PageValueManager.INT, valueSerializer);
   }
 
   @Override

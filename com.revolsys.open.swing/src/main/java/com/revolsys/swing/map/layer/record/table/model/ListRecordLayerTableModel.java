@@ -12,7 +12,7 @@ public class ListRecordLayerTableModel extends RecordLayerTableModel
   implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
-  public static RecordLayerTable createTable(final ListRecordLayer layer) {
+  public static RecordLayerTable newTable(final ListRecordLayer layer) {
     final RecordLayerTableModel model = new ListRecordLayerTableModel(layer);
     final RecordLayerTable table = new RecordLayerTable(model);
 

@@ -58,39 +58,39 @@ public class TestDataBuilder {
     this.geomFact = geomFact;
   }
 
-  public Geometry createCircle(final int nPts) {
+  public Geometry newCircle(final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(this.origin);
     gsf.setSize(this.size);
     gsf.setNumPoints(nPts);
-    final Geometry circle = gsf.createCircle();
+    final Geometry circle = gsf.newCircle();
     // Polygon gRect = gsf.createRectangle();
     // Geometry g = gRect.getExteriorRing();
     return circle;
   }
 
-  Geometry createLine(final Point base, final double size, final int nPts) {
+  Geometry newLine(final Point base, final double size, final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(base);
     gsf.setSize(size);
     gsf.setNumPoints(nPts);
-    final Geometry circle = gsf.createCircle();
+    final Geometry circle = gsf.newCircle();
     // System.out.println(circle);
     return circle.getBoundary();
   }
 
-  public Geometry createSineStar(final int nPts) {
+  public Geometry newSineStar(final int nPts) {
     final SineStarFactory gsf = new SineStarFactory();
     gsf.setCentre(this.origin);
     gsf.setSize(this.size);
     gsf.setNumPoints(nPts);
     gsf.setArmLengthRatio(0.1);
     gsf.setNumArms(20);
-    final Geometry poly = gsf.createSineStar();
+    final Geometry poly = gsf.newSineStar();
     return poly;
   }
 
-  public List createTestGeoms(final BoundingBox env, final int nItems, final double size,
+  public List newTestGeoms(final BoundingBox env, final int nItems, final double size,
     final int nPts) {
     final int nCells = (int)Math.sqrt(nItems);
 
@@ -101,8 +101,8 @@ public class TestDataBuilder {
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
         final Point base = new PointDouble(env.getMinX() + i * xInc, env.getMinY() + j * yInc,
-          Point.NULL_ORDINATE);
-        final Geometry line = createLine(base, size, nPts);
+          Geometry.NULL_ORDINATE);
+        final Geometry line = newLine(base, size, nPts);
         geoms.add(line);
       }
     }

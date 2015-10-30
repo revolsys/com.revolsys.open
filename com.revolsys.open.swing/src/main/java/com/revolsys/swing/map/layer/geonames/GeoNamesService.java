@@ -145,7 +145,7 @@ public class GeoNamesService {
     final List<Record> results = new ArrayList<Record>();
     final List<Map<String, Object>> names = (List<Map<String, Object>>)result.get("geonames");
     for (final Map<String, Object> name : names) {
-      final Record record = recordDefinition.createRecord();
+      final Record record = recordDefinition.newRecord();
       for (final String fieldName : recordDefinition.getFieldNames()) {
         final Object value = name.get(fieldName);
         if (value != null) {

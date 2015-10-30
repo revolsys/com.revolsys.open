@@ -32,7 +32,7 @@ public class RecordSaveErrorTableModel extends RecordListTableModel
   implements SortableTableModel, ListSelectionListener {
   private static final long serialVersionUID = 1L;
 
-  public static TablePanel createPanel(final RecordSaveErrorTableModel model) {
+  public static TablePanel newPanel(final RecordSaveErrorTableModel model) {
     final RecordRowTable table = new RecordRowTable(model);
     table.setVisibleRowCount(model.getRowCount() + 1);
     table.setSortable(true);
@@ -126,7 +126,7 @@ public class RecordSaveErrorTableModel extends RecordListTableModel
         final BasePanel panel = new BasePanel(new VerticalLayout(),
           new JLabel("<html><p><b style=\"color:red\">Error saving changes for layer:</b></p><p>"
             + layerPath + "</p>"),
-          RecordSaveErrorTableModel.createPanel(this));
+          RecordSaveErrorTableModel.newPanel(this));
         final Rectangle screenBounds = SwingUtil.getScreenBounds();
         panel.setPreferredSize(new Dimension(screenBounds.width - 300, getRowCount() * 22 + 75));
 

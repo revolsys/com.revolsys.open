@@ -36,26 +36,13 @@ public class AddFileLayerAction extends AbstractAction {
 
   private static final long serialVersionUID = 1L;
 
-  public static FileNameExtensionFilter createFileFilter(final String description,
-    final Collection<String> fileExtensions) {
-    final String[] array = fileExtensions.toArray(new String[0]);
-    return new FileNameExtensionFilter(description, array);
-  }
-
-  public static FileNameExtensionFilter createFilter(final IoFactory factory) {
-    final List<String> fileExtensions = factory.getFileExtensions();
-    String description = factory.getName();
-    description += " (" + Strings.toString(fileExtensions) + ")";
-    return createFileFilter(description, fileExtensions);
-  }
-
   public static List<FileNameExtensionFilter> getFileFilters(final Set<String> allExtensions,
     final Class<? extends IoFactory> factoryClass) {
     final List<FileNameExtensionFilter> filters = new ArrayList<>();
     final Set<IoFactory> factories = IoFactoryRegistry.getInstance().getFactories(factoryClass);
     for (final IoFactory factory : factories) {
       final List<String> fileExtensions = factory.getFileExtensions();
-      final FileNameExtensionFilter filter = createFilter(factory);
+      final FileNameExtensionFilter filter = newFilter(factory);
       filters.add(filter);
       if (allExtensions != null) {
         allExtensions.addAll(fileExtensions);
@@ -63,6 +50,19 @@ public class AddFileLayerAction extends AbstractAction {
     }
     sortFilters(filters);
     return filters;
+  }
+
+  public static FileNameExtensionFilter newFileFilter(final String description,
+    final Collection<String> fileExtensions) {
+    final String[] array = fileExtensions.toArray(new String[0]);
+    return new FileNameExtensionFilter(description, array);
+  }
+
+  public static FileNameExtensionFilter newFilter(final IoFactory factory) {
+    final List<String> fileExtensions = factory.getFileExtensions();
+    String description = factory.getName();
+    description += " (" + Strings.toString(fileExtensions) + ")";
+    return newFileFilter(description, fileExtensions);
   }
 
   public static void sortFilters(final List<FileNameExtensionFilter> filters) {
@@ -105,14 +105,13 @@ public class AddFileLayerAction extends AbstractAction {
     final Set<String> allExtensions = new TreeSet<String>();
     allExtensions.addAll(allRecordExtensions);
     allExtensions.addAll(allImageExtensions);
-    final FileNameExtensionFilter allFilter = createFileFilter("All Supported Files",
-      allExtensions);
+    final FileNameExtensionFilter allFilter = newFileFilter("All Supported Files", allExtensions);
     fileChooser.addChoosableFileFilter(allFilter);
 
     fileChooser
-      .addChoosableFileFilter(createFileFilter("All Vector/Record Files", allRecordExtensions));
+      .addChoosableFileFilter(newFileFilter("All Vector/Record Files", allRecordExtensions));
 
-    fileChooser.addChoosableFileFilter(createFileFilter("All Image Files", allImageExtensions));
+    fileChooser.addChoosableFileFilter(newFileFilter("All Image Files", allImageExtensions));
 
     for (final FileFilter fileFilter : recordFileFilters) {
       fileChooser.addChoosableFileFilter(fileFilter);

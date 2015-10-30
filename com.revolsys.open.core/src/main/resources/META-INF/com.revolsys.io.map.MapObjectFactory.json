@@ -4,19 +4,19 @@
       "typeName": "geometryFactory",
       "description": "Geometry Factory",
       "typeClass": "com.revolsys.geometry.model.GeometryFactory",
-      "methodName": "create"
+      "methodName": "newGeometryFactory"
     },
     {
       "typeName": "recordDefinition",
       "description": "Data Record Definition",
       "typeClass": "com.revolsys.record.schema.RecordDefinitionImpl",
-      "methodName": "create"
+      "methodName": "newRecordDefinition"
     },
     {
       "typeName": "field",
       "description": "Data Record Field",
       "typeClass": "com.revolsys.record.schema.FieldDefinition",
-      "methodName": "create"
+      "methodName": "newFieldDefinition"
     }
   ]
 }

@@ -135,155 +135,11 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
     table.addIndex(field, true, "FDO_OBJECTID");
   }
 
-  public static DEFeatureDataset createDEFeatureDataset(final String schemaName,
-    final SpatialReference spatialReference) {
-    final DEFeatureDataset dataset = new DEFeatureDataset();
-    String name;
-    final int slashIndex = schemaName.lastIndexOf('\\');
-    if (slashIndex == -1) {
-      name = schemaName;
-    } else {
-      name = schemaName.substring(slashIndex + 1);
-    }
-    dataset.setCatalogPath("\\" + schemaName);
-    dataset.setName(name);
-
-    final EnvelopeN envelope = new EnvelopeN(spatialReference);
-    dataset.setExtent(envelope);
-    dataset.setSpatialReference(spatialReference);
-    return dataset;
-  }
-
-  public static List<DEFeatureDataset> createDEFeatureDatasets(final DETable table) {
-    final String parentPath = table.getParentCatalogPath();
-    if (parentPath.equals("\\")) {
-      return Collections.emptyList();
-    } else if (table instanceof DEFeatureClass) {
-      final DEFeatureClass featureClass = (DEFeatureClass)table;
-      final String schemaName = parentPath.substring(1);
-      final SpatialReference spatialReference = featureClass.getSpatialReference();
-      return createDEFeatureDatasets(schemaName, spatialReference);
-    } else {
-      throw new IllegalArgumentException("Expected a " + DEFeatureClass.class.getName());
-    }
-  }
-
-  public static List<DEFeatureDataset> createDEFeatureDatasets(final String schemaName,
-    final SpatialReference spatialReference) {
-    final List<DEFeatureDataset> datasets = new ArrayList<DEFeatureDataset>();
-    String path = "";
-    for (final String name : schemaName.split("\\\\")) {
-      path += name;
-      final DEFeatureDataset dataset = createDEFeatureDataset(path, spatialReference);
-      datasets.add(dataset);
-      path += "\\";
-    }
-    return datasets;
-  }
-
-  public static DETable createDETable(final RecordDefinition recordDefinition,
-    final SpatialReference spatialReference) {
-    final String typePath = recordDefinition.getPath();
-    final String schemaPath = Path.getPath(typePath).replaceAll("/", "\\\\");
-
-    return createDETable(schemaPath, recordDefinition, spatialReference);
-  }
-
-  public static DETable createDETable(String schemaPath, final RecordDefinition recordDefinition,
-    final SpatialReference spatialReference) {
-    DETable table;
-    final FieldDefinition geometryField = recordDefinition.getGeometryField();
-    boolean hasGeometry = false;
-    DataType geometryDataType = null;
-    GeometryType shapeType = null;
-    if (geometryField != null) {
-      if (spatialReference == null) {
-        throw new IllegalArgumentException(
-          "A Geometry Factory with a coordinate system must be specified.");
-      }
-      geometryDataType = geometryField.getType();
-      if (FIELD_TYPES.getFieldType(geometryDataType) != null) {
-        hasGeometry = true;
-        // TODO Z,m
-        if (geometryDataType.equals(DataTypes.POINT)) {
-          shapeType = GeometryType.esriGeometryPoint;
-        } else if (geometryDataType.equals(DataTypes.MULTI_POINT)) {
-          shapeType = GeometryType.esriGeometryMultipoint;
-        } else if (geometryDataType.equals(DataTypes.LINE_STRING)) {
-          shapeType = GeometryType.esriGeometryPolyline;
-        } else if (geometryDataType.equals(DataTypes.LINEAR_RING)) {
-          shapeType = GeometryType.esriGeometryPolyline;
-        } else if (geometryDataType.equals(DataTypes.MULTI_LINE_STRING)) {
-          shapeType = GeometryType.esriGeometryPolyline;
-        } else if (geometryDataType.equals(DataTypes.POLYGON)) {
-          shapeType = GeometryType.esriGeometryPolygon;
-        } else if (geometryDataType.equals(DataTypes.MULTI_POLYGON)) {
-          shapeType = GeometryType.esriGeometryPolygon;
-        } else {
-          throw new IllegalArgumentException("Unable to detect geometry type");
-        }
-      }
-    }
-
-    final String path = recordDefinition.getPath();
-    final String name = Path.getName(path);
-    if (hasGeometry) {
-      final DEFeatureClass featureClass = new DEFeatureClass();
-      table = featureClass;
-      featureClass.setShapeType(shapeType);
-      featureClass.setShapeFieldName(geometryField.getName());
-      final GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
-      featureClass.setSpatialReference(spatialReference);
-      featureClass.setHasM(geometryFactory.hasM());
-      featureClass.setHasZ(geometryFactory.hasZ());
-      final EnvelopeN envelope = new EnvelopeN(spatialReference);
-      featureClass.setExtent(envelope);
-
-    } else {
-      table = new DETable();
-      schemaPath = "\\";
-    }
-
-    String oidFieldName = recordDefinition
-      .getProperty(EsriGeodatabaseXmlConstants.ESRI_OBJECT_ID_FIELD_NAME);
-    if (!Property.hasValue(oidFieldName)) {
-      oidFieldName = "OBJECTID";
-    }
-    final String catalogPath;
-    if (schemaPath.equals("\\")) {
-      catalogPath = "\\" + name;
-    } else {
-      catalogPath = schemaPath + "\\" + name;
-    }
-    table.setCatalogPath(catalogPath);
-    table.setName(name);
-    table.setHasOID(true);
-    table.setOIDFieldName(oidFieldName);
-
-    addObjectIdField(table);
-    final FieldDefinition idField = recordDefinition.getIdField();
-    for (final FieldDefinition attribute : recordDefinition.getFields()) {
-      if (attribute == geometryField) {
-        addGeometryField(shapeType, table, attribute);
-      } else {
-        final String fieldName = attribute.getName();
-        if (!fieldName.equals(oidFieldName)) {
-          final Field field = addField(table, attribute);
-          if (idField == attribute) {
-            table.addIndex(field, true, fieldName + "_PK");
-          }
-        }
-      }
-    }
-    table.setAliasName(name);
-    return table;
-  }
-
   public static DETable getDETable(final RecordDefinition recordDefinition,
     final SpatialReference spatialReference) {
     DETable table = recordDefinition.getProperty(DE_TABLE_PROPERTY);
     if (table == null) {
-      table = createDETable(recordDefinition, spatialReference);
+      table = newDETable(recordDefinition, spatialReference);
     }
     return table;
   }
@@ -378,10 +234,154 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
     final List<Record> values = new ArrayList<Record>();
     for (final CodedValue codedValue : domain.getCodedValues()) {
       final Record value = new ArrayRecord(recordDefinition);
-      value.setIdentifier(Identifier.create(codedValue.getCode()));
+      value.setIdentifier(Identifier.newIdentifier(codedValue.getCode()));
       value.setValue("DESCRIPTION", codedValue.getName());
       values.add(value);
     }
     return values;
+  }
+
+  public static DEFeatureDataset newDEFeatureDataset(final String schemaName,
+    final SpatialReference spatialReference) {
+    final DEFeatureDataset dataset = new DEFeatureDataset();
+    String name;
+    final int slashIndex = schemaName.lastIndexOf('\\');
+    if (slashIndex == -1) {
+      name = schemaName;
+    } else {
+      name = schemaName.substring(slashIndex + 1);
+    }
+    dataset.setCatalogPath("\\" + schemaName);
+    dataset.setName(name);
+
+    final EnvelopeN envelope = new EnvelopeN(spatialReference);
+    dataset.setExtent(envelope);
+    dataset.setSpatialReference(spatialReference);
+    return dataset;
+  }
+
+  public static List<DEFeatureDataset> newDEFeatureDatasets(final DETable table) {
+    final String parentPath = table.getParentCatalogPath();
+    if (parentPath.equals("\\")) {
+      return Collections.emptyList();
+    } else if (table instanceof DEFeatureClass) {
+      final DEFeatureClass featureClass = (DEFeatureClass)table;
+      final String schemaName = parentPath.substring(1);
+      final SpatialReference spatialReference = featureClass.getSpatialReference();
+      return newDEFeatureDatasets(schemaName, spatialReference);
+    } else {
+      throw new IllegalArgumentException("Expected a " + DEFeatureClass.class.getName());
+    }
+  }
+
+  public static List<DEFeatureDataset> newDEFeatureDatasets(final String schemaName,
+    final SpatialReference spatialReference) {
+    final List<DEFeatureDataset> datasets = new ArrayList<DEFeatureDataset>();
+    String path = "";
+    for (final String name : schemaName.split("\\\\")) {
+      path += name;
+      final DEFeatureDataset dataset = newDEFeatureDataset(path, spatialReference);
+      datasets.add(dataset);
+      path += "\\";
+    }
+    return datasets;
+  }
+
+  public static DETable newDETable(final RecordDefinition recordDefinition,
+    final SpatialReference spatialReference) {
+    final String typePath = recordDefinition.getPath();
+    final String schemaPath = Path.getPath(typePath).replaceAll("/", "\\\\");
+
+    return newDETable(schemaPath, recordDefinition, spatialReference);
+  }
+
+  public static DETable newDETable(String schemaPath, final RecordDefinition recordDefinition,
+    final SpatialReference spatialReference) {
+    DETable table;
+    final FieldDefinition geometryField = recordDefinition.getGeometryField();
+    boolean hasGeometry = false;
+    DataType geometryDataType = null;
+    GeometryType shapeType = null;
+    if (geometryField != null) {
+      if (spatialReference == null) {
+        throw new IllegalArgumentException(
+          "A Geometry Factory with a coordinate system must be specified.");
+      }
+      geometryDataType = geometryField.getType();
+      if (FIELD_TYPES.getFieldType(geometryDataType) != null) {
+        hasGeometry = true;
+        // TODO Z,m
+        if (geometryDataType.equals(DataTypes.POINT)) {
+          shapeType = GeometryType.esriGeometryPoint;
+        } else if (geometryDataType.equals(DataTypes.MULTI_POINT)) {
+          shapeType = GeometryType.esriGeometryMultipoint;
+        } else if (geometryDataType.equals(DataTypes.LINE_STRING)) {
+          shapeType = GeometryType.esriGeometryPolyline;
+        } else if (geometryDataType.equals(DataTypes.LINEAR_RING)) {
+          shapeType = GeometryType.esriGeometryPolyline;
+        } else if (geometryDataType.equals(DataTypes.MULTI_LINE_STRING)) {
+          shapeType = GeometryType.esriGeometryPolyline;
+        } else if (geometryDataType.equals(DataTypes.POLYGON)) {
+          shapeType = GeometryType.esriGeometryPolygon;
+        } else if (geometryDataType.equals(DataTypes.MULTI_POLYGON)) {
+          shapeType = GeometryType.esriGeometryPolygon;
+        } else {
+          throw new IllegalArgumentException("Unable to detect geometry type");
+        }
+      }
+    }
+
+    final String path = recordDefinition.getPath();
+    final String name = Path.getName(path);
+    if (hasGeometry) {
+      final DEFeatureClass featureClass = new DEFeatureClass();
+      table = featureClass;
+      featureClass.setShapeType(shapeType);
+      featureClass.setShapeFieldName(geometryField.getName());
+      final GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
+      featureClass.setSpatialReference(spatialReference);
+      featureClass.setHasM(geometryFactory.hasM());
+      featureClass.setHasZ(geometryFactory.hasZ());
+      final EnvelopeN envelope = new EnvelopeN(spatialReference);
+      featureClass.setExtent(envelope);
+
+    } else {
+      table = new DETable();
+      schemaPath = "\\";
+    }
+
+    String oidFieldName = recordDefinition
+      .getProperty(EsriGeodatabaseXmlConstants.ESRI_OBJECT_ID_FIELD_NAME);
+    if (!Property.hasValue(oidFieldName)) {
+      oidFieldName = "OBJECTID";
+    }
+    final String catalogPath;
+    if (schemaPath.equals("\\")) {
+      catalogPath = "\\" + name;
+    } else {
+      catalogPath = schemaPath + "\\" + name;
+    }
+    table.setCatalogPath(catalogPath);
+    table.setName(name);
+    table.setHasOID(true);
+    table.setOIDFieldName(oidFieldName);
+
+    addObjectIdField(table);
+    final FieldDefinition idField = recordDefinition.getIdField();
+    for (final FieldDefinition attribute : recordDefinition.getFields()) {
+      if (attribute == geometryField) {
+        addGeometryField(shapeType, table, attribute);
+      } else {
+        final String fieldName = attribute.getName();
+        if (!fieldName.equals(oidFieldName)) {
+          final Field field = addField(table, attribute);
+          if (idField == attribute) {
+            table.addIndex(field, true, fieldName + "_PK");
+          }
+        }
+      }
+    }
+    table.setAliasName(name);
+    return table;
   }
 }

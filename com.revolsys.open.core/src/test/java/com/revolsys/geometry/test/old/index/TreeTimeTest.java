@@ -123,7 +123,7 @@ public class TreeTimeTest {
   public static void main(final String[] args) throws Exception {
     final int n = 10000;
     final TreeTimeTest test = new TreeTimeTest();
-    final List items = IndexTester.createGridItems(n);
+    final List items = IndexTester.newGridItems(n);
     // System.out.println("----------------------------------------------");
     // System.out.println("Dummy run to ensure classes are loaded before real
     // run");

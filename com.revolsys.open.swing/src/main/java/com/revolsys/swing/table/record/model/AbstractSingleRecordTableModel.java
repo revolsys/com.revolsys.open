@@ -26,7 +26,7 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
 
   private static final long serialVersionUID = 1L;
 
-  public static BaseJTable createTable(final AbstractSingleRecordTableModel model) {
+  public static BaseJTable newTable(final AbstractSingleRecordTableModel model) {
     final BaseJTable table = new BaseJTable(model);
     table.setModel(model);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -231,7 +231,7 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
       if (codeTable == null) {
         text = StringConverterRegistry.toString(objectValue);
       } else {
-        final List<Object> values = codeTable.getValues(Identifier.create(objectValue));
+        final List<Object> values = codeTable.getValues(Identifier.newIdentifier(objectValue));
         if (values == null || values.isEmpty()) {
           return null;
         } else {

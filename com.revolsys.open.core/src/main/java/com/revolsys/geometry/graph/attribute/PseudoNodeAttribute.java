@@ -37,17 +37,6 @@ public class PseudoNodeAttribute {
     init(node, edgesByLine);
   }
 
-  private EdgePair<Record> createEdgePair(final Node<Record> node, final Edge<Record> edge1,
-    final Edge<Record> edge2) {
-    final Record object1 = edge1.getObject();
-    final Record object2 = edge2.getObject();
-    if (DirectionalFields.canMergeRecords(node, object1, object2, this.equalExcludeFieldNames)) {
-      return new EdgePair<Record>(edge1, edge2);
-    } else {
-      return null;
-    }
-  }
-
   public List<EdgePair<Record>> getEdgePairs() {
     return this.edgePairs;
   }
@@ -80,7 +69,7 @@ public class PseudoNodeAttribute {
           if (size1 == 1) {
             final Edge<Record> edge1 = edges1.iterator().next();
             final Edge<Record> edge2 = edges2.iterator().next();
-            final EdgePair<Record> edgePair = createEdgePair(node, edge1, edge2);
+            final EdgePair<Record> edgePair = newEdgePair(node, edge1, edge2);
             if (edgePair != null) {
               if (edge1.getEnd(node) == edge2.getEnd(node)) {
                 this.reversedEdgePairs.add(edgePair);
@@ -127,7 +116,7 @@ public class PseudoNodeAttribute {
           match = !reversed;
         }
         if (match) {
-          final EdgePair<Record> edgePair = createEdgePair(node, edge1, edge2);
+          final EdgePair<Record> edgePair = newEdgePair(node, edge1, edge2);
           if (edgePair != null) {
             matched = true;
             edgeIter1.remove();
@@ -136,6 +125,17 @@ public class PseudoNodeAttribute {
           }
         }
       }
+    }
+  }
+
+  private EdgePair<Record> newEdgePair(final Node<Record> node, final Edge<Record> edge1,
+    final Edge<Record> edge2) {
+    final Record object1 = edge1.getObject();
+    final Record object2 = edge2.getObject();
+    if (DirectionalFields.canMergeRecords(node, object1, object2, this.equalExcludeFieldNames)) {
+      return new EdgePair<Record>(edge1, edge2);
+    } else {
+      return null;
     }
   }
 }

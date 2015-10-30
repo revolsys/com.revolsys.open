@@ -63,11 +63,6 @@ public class BasicSegmentString implements SegmentString {
     this.data = data;
   }
 
-  @Override
-  public Point getPoint(final int i) {
-    return this.points.getPoint(i);
-  }
-
   /**
    * Gets the user-defined data for this segment string.
    *
@@ -76,6 +71,11 @@ public class BasicSegmentString implements SegmentString {
   @Override
   public Object getData() {
     return this.data;
+  }
+
+  @Override
+  public Point getPoint(final int i) {
+    return this.points.getPoint(i);
   }
 
   @Override

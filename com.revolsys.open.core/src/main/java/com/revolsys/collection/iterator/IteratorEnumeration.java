@@ -4,18 +4,17 @@ import java.util.Enumeration;
 import java.util.Iterator;
 
 public class IteratorEnumeration<T> implements Enumeration<T> {
-
   @SuppressWarnings("unchecked")
-  public static <V> Enumeration<V> create(final Iterable<V> iterable) {
+  public static <V> Enumeration<V> newEnumeration(final Iterable<V> iterable) {
     if (iterable instanceof Enumeration) {
       return (Enumeration<V>)iterable;
     } else {
-      return create(iterable.iterator());
+      return newEnumeration(iterable.iterator());
     }
   }
 
   @SuppressWarnings("unchecked")
-  public static <V> Enumeration<V> create(final Iterator<V> iterator) {
+  public static <V> Enumeration<V> newEnumeration(final Iterator<V> iterator) {
     if (iterator instanceof Enumeration) {
       return (Enumeration<V>)iterator;
     } else {

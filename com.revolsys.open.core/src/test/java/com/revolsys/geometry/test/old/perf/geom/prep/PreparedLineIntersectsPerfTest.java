@@ -95,9 +95,9 @@ public class PreparedLineIntersectsPerfTest {
 
   public void test(final int nPts) {
     this.builder.setTestDimension(1);
-    final Geometry target = this.builder.createSineStar(nPts).getBoundary();
+    final Geometry target = this.builder.newSineStar(nPts).getBoundary();
 
-    final List lines = this.builder.createTestGeoms(target.getBoundingBox(), NUM_LINES, 1.0,
+    final List lines = this.builder.newTestGeoms(target.getBoundingBox(), NUM_LINES, 1.0,
       NUM_LINE_PTS);
 
     // System.out.println();

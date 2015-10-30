@@ -22,7 +22,7 @@ public class MergedRecordsTableModel extends RecordListTableModel
   implements SortableTableModel, ListSelectionListener {
   private static final long serialVersionUID = 1L;
 
-  public static TablePanel createPanel(final AbstractRecordLayer layer, final Record mergedObject,
+  public static TablePanel newPanel(final AbstractRecordLayer layer, final Record mergedObject,
     final Collection<LayerRecord> objects) {
     final MergedRecordsTableModel model = new MergedRecordsTableModel(layer, mergedObject, objects);
     final RecordRowTable table = new RecordRowTable(model);

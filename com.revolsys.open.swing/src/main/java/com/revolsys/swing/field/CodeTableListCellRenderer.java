@@ -25,7 +25,7 @@ public class CodeTableListCellRenderer extends DefaultListCellRenderer {
     if (value == null || value == Identifier.NULL) {
       value = "-";
     } else if (index >= 0) {
-      final List<Object> values = this.codeTable.getValues(Identifier.create(value));
+      final List<Object> values = this.codeTable.getValues(Identifier.newIdentifier(value));
       if (values == null || values.isEmpty()) {
         value = "-";
       } else {

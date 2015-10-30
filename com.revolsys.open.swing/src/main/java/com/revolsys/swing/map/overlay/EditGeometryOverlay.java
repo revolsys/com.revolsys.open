@@ -499,10 +499,10 @@ public class EditGeometryOverlay extends AbstractOverlay
 
       final List<LineString> lines = new ArrayList<LineString>();
       if (previousPoint != null && !previousPoint.isEmpty()) {
-        lines.add(createXorLine(geometryFactory, previousPoint, point));
+        lines.add(newXorLine(geometryFactory, previousPoint, point));
       }
       if (nextPoint != null && !nextPoint.isEmpty()) {
-        lines.add(createXorLine(geometryFactory, nextPoint, point));
+        lines.add(newXorLine(geometryFactory, nextPoint, point));
       }
       if (!lines.isEmpty()) {
         return geometryFactory.multiLineString(lines);
@@ -692,8 +692,7 @@ public class EditGeometryOverlay extends AbstractOverlay
             if (this.addGeometry.isEmpty()) {
               setAddGeometry(point);
             } else {
-              final int[] toVertexId = Geometry.createVertexId(this.addGeometryPartIndex,
-                0);
+              final int[] toVertexId = Geometry.newVertexId(this.addGeometryPartIndex, 0);
               final Point previousPoint = this.addGeometry.getToVertex(toVertexId);
               if (!point.equals(previousPoint)) {
                 final Geometry newGeometry = appendVertex(point);
@@ -729,7 +728,7 @@ public class EditGeometryOverlay extends AbstractOverlay
           setXorGeometry(null);
           event.consume();
           if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
-            final int[] toVertexId = Geometry.createVertexId(this.addGeometryPartIndex, 0);
+            final int[] toVertexId = Geometry.newVertexId(this.addGeometryPartIndex, 0);
             final Point previousPoint = this.addGeometry.getToVertex(toVertexId);
             if (!point.equals(previousPoint)) {
               final Geometry newGeometry = appendVertex(point);
@@ -875,7 +874,7 @@ public class EditGeometryOverlay extends AbstractOverlay
     if (!hasSnapPoint(boundingBox)) {
       setMapCursor(CURSOR_NODE_ADD);
     }
-    final int[] firstVertexId = Geometry.createVertexId(this.addGeometryPartIndex, 0);
+    final int[] firstVertexId = Geometry.newVertexId(this.addGeometryPartIndex, 0);
     Geometry xorGeometry = null;
 
     if (DataTypes.POINT.equals(this.addGeometryPartDataType)) {
@@ -892,10 +891,10 @@ public class EditGeometryOverlay extends AbstractOverlay
       final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
       if (toVertex != null && !toVertex.isEmpty()) {
         if (DataTypes.LINE_STRING.equals(this.addGeometryPartDataType)) {
-          xorGeometry = createXorLine(geometryFactory, toVertex, point);
+          xorGeometry = newXorLine(geometryFactory, toVertex, point);
         } else if (DataTypes.POLYGON.equals(this.addGeometryPartDataType)) {
           if (toVertex.equals(firstVertex)) {
-            xorGeometry = createXorLine(geometryFactory, toVertex, point);
+            xorGeometry = newXorLine(geometryFactory, toVertex, point);
           } else {
             final Point p1 = geometryFactory.point(toVertex);
             final Point p3 = geometryFactory.point(firstVertex);

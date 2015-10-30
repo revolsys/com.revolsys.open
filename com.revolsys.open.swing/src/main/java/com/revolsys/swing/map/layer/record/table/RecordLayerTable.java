@@ -23,14 +23,14 @@ public class RecordLayerTable extends RecordRowTable {
     return new RecordLayerTableRowSorter(layer, model);
   }
 
-  @Override
-  protected RecordTableCellEditor createTableCellEditor() {
-    return new RecordLayerTableCellEditor(this);
-  }
-
   @SuppressWarnings("unchecked")
   public <V extends AbstractRecordLayer> V getLayer() {
     final RecordLayerTableModel model = (RecordLayerTableModel)getTableModel();
     return (V)model.getLayer();
+  }
+
+  @Override
+  protected RecordTableCellEditor newTableCellEditor() {
+    return new RecordLayerTableCellEditor(this);
   }
 }

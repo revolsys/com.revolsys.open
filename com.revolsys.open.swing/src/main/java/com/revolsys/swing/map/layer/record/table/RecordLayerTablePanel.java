@@ -120,7 +120,7 @@ public class RecordLayerTablePanel extends TablePanel
     for (final RecordWriterFactory factory : IoFactoryRegistry.getInstance()
       .getFactories(RecordWriterFactory.class)) {
       if (recordDefinition.hasGeometryField() || factory.isCustomFieldsSupported()) {
-        recordFileFilters.add(AddFileLayerAction.createFilter(factory));
+        recordFileFilters.add(AddFileLayerAction.newFilter(factory));
       }
     }
     AddFileLayerAction.sortFilters(recordFileFilters);
@@ -177,7 +177,7 @@ public class RecordLayerTablePanel extends TablePanel
   private void actionShowFieldSetsMenu() {
     final JPopupMenu menu = new JPopupMenu();
 
-    final JMenuItem editMenuItem = RunnableAction.createMenuItem("Edit Field Sets",
+    final JMenuItem editMenuItem = RunnableAction.newMenuItem("Edit Field Sets",
       "fields_filter_edit", () -> {
         final String fieldNamesSetName = FieldNamesSetPanel.showDialog(this.layer);
         if (Property.hasValue(fieldNamesSetName)) {
@@ -191,7 +191,7 @@ public class RecordLayerTablePanel extends TablePanel
     final AbstractRecordLayer layer = getLayer();
     final String selectedFieldSetName = layer.getFieldNamesSetName();
     for (final String fieldSetName : layer.getFieldNamesSetNames()) {
-      final JCheckBoxMenuItem menuItem = RunnableAction.createCheckBoxMenuItem(fieldSetName,
+      final JCheckBoxMenuItem menuItem = RunnableAction.newCheckBoxMenuItem(fieldSetName,
         () -> this.tableModel.setFieldNamesSetName(fieldSetName));
       if (fieldSetName.equalsIgnoreCase(selectedFieldSetName)) {
         menuItem.setSelected(true);

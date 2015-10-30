@@ -79,22 +79,14 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
   public LinearRingDoubleGf(final GeometryFactory factory, final int axisCount,
     final double... points) {
     super(factory, axisCount, points);
-    if (isClosed()) {
-      final int vertexCount = getVertexCount();
-      if (vertexCount >= 1 && vertexCount < MINIMUM_VALID_SIZE) {
-        throw new IllegalArgumentException(
-          "Invalid number of points in LinearRing (found " + vertexCount + " - must be 0 or >= 4)");
-      }
-    } else {
-      throw new IllegalArgumentException("Points of LinearRing do not form a closed linestring");
-    }
+    validate();
   }
 
   public LinearRingDoubleGf(final GeometryFactory geometryFactory, final int axisCount,
     final int vertexCount, final double... coordinates) {
     super(geometryFactory, axisCount,
       getNewCoordinates(geometryFactory, axisCount, vertexCount, coordinates));
-
+    validate();
   }
 
   /**
@@ -109,15 +101,7 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
    */
   public LinearRingDoubleGf(final GeometryFactory factory, final LineString points) {
     super(factory, points);
-    if (isClosed()) {
-      final int vertexCount = getVertexCount();
-      if (vertexCount >= 1 && vertexCount < MINIMUM_VALID_SIZE) {
-        throw new IllegalArgumentException(
-          "Invalid number of points in LinearRing (found " + vertexCount + " - must be 0 or >= 4)");
-      }
-    } else {
-      throw new IllegalArgumentException("Points of LinearRing do not form a closed linestring");
-    }
+    validate();
   }
 
   @SuppressWarnings("unchecked")
@@ -325,5 +309,17 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
     GeometryProperties.copyUserData(this, reverseLine);
     return reverseLine;
 
+  }
+
+  private void validate() {
+    if (isClosed()) {
+      final int vertexCount = getVertexCount();
+      if (vertexCount >= 1 && vertexCount < MINIMUM_VALID_SIZE) {
+        throw new IllegalArgumentException(
+          "Invalid number of points in LinearRing (found " + vertexCount + " - must be 0 or >= 4)");
+      }
+    } else {
+      throw new IllegalArgumentException("Points of LinearRing do not form a closed linestring");
+    }
   }
 }

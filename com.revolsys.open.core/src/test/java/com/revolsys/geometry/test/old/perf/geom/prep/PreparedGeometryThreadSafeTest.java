@@ -31,17 +31,6 @@ public class PreparedGeometryThreadSafeTest extends ThreadTestCase {
 
   }
 
-  Geometry createSineStar(final Point origin, final double size, final int nPts) {
-    final SineStarFactory gsf = new SineStarFactory(this.factory);
-    gsf.setCentre(origin);
-    gsf.setSize(size);
-    gsf.setNumPoints(nPts);
-    gsf.setArmLengthRatio(0.1);
-    gsf.setNumArms(20);
-    final Geometry poly = gsf.createSineStar();
-    return poly;
-  }
-
   @Override
   public Runnable getRunnable(final int threadIndex) {
     return new Runnable() {
@@ -57,11 +46,22 @@ public class PreparedGeometryThreadSafeTest extends ThreadTestCase {
     };
   }
 
+  Geometry newSineStar(final Point origin, final double size, final int nPts) {
+    final SineStarFactory gsf = new SineStarFactory(this.factory);
+    gsf.setCentre(origin);
+    gsf.setSize(size);
+    gsf.setNumPoints(nPts);
+    gsf.setArmLengthRatio(0.1);
+    gsf.setNumArms(20);
+    final Geometry poly = gsf.newSineStar();
+    return poly;
+  }
+
   @Override
   public void setup() {
-    final Geometry sinePoly = createSineStar(new PointDouble((double)0, 0, Point.NULL_ORDINATE),
+    final Geometry sinePoly = newSineStar(new PointDouble((double)0, 0, Geometry.NULL_ORDINATE),
       100000.0, this.nPts);
     this.pg = sinePoly.prepare();
-    this.g = createSineStar(new PointDouble((double)10, 10, Point.NULL_ORDINATE), 100000.0, 100);
+    this.g = newSineStar(new PointDouble((double)10, 10, Geometry.NULL_ORDINATE), 100000.0, 100);
   }
 }

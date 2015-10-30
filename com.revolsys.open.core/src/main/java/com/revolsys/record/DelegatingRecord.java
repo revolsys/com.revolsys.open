@@ -15,7 +15,7 @@ public class DelegatingRecord extends AbstractMap<String, Object>implements Reco
 
   @Override
   public Record clone() {
-    Record clone = JavaBeanUtil.clone(this.record);
+    final Record clone = JavaBeanUtil.clone(this.record);
     return new DelegatingRecord(clone);
   }
 
@@ -29,11 +29,6 @@ public class DelegatingRecord extends AbstractMap<String, Object>implements Reco
     return this.record.entrySet();
   }
 
-  @Override
-  public RecordFactory getFactory() {
-    return this.record.getFactory();
-  }
-
   public Record getRecord() {
     return this.record;
   }
@@ -41,6 +36,11 @@ public class DelegatingRecord extends AbstractMap<String, Object>implements Reco
   @Override
   public RecordDefinition getRecordDefinition() {
     return this.record.getRecordDefinition();
+  }
+
+  @Override
+  public RecordFactory getRecordFactory() {
+    return this.record.getRecordFactory();
   }
 
   @Override

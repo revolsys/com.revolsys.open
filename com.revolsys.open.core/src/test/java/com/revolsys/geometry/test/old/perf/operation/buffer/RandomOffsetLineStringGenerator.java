@@ -84,16 +84,6 @@ public class RandomOffsetLineStringGenerator {
     }
   }
 
-  private void createRandomOffsets(final int interval) {
-    // for (int i = 0; i )
-    int inc = pow2(this.exponent2);
-
-    while (inc > 1) {
-      computeRandomOffsets(inc);
-      inc /= 2;
-    }
-  }
-
   public Geometry generate(final GeometryFactory fact) {
     this.pts = new Point[this.numPts];
 
@@ -101,15 +91,25 @@ public class RandomOffsetLineStringGenerator {
 
     final double ang = Math.PI * Math.random();
     this.endPoint = new PointDouble(this.maxSegLen * Math.cos(ang), this.maxSegLen * Math.sin(ang),
-      Point.NULL_ORDINATE);
+      Geometry.NULL_ORDINATE);
     this.pts[this.numPts - 1] = this.endPoint;
 
     int interval = this.numPts / 2;
     while (interval >= 1) {
-      createRandomOffsets(interval);
+      newRandomOffsets(interval);
       interval /= 2;
     }
     return fact.lineString(this.pts);
+  }
+
+  private void newRandomOffsets(final int interval) {
+    // for (int i = 0; i )
+    int inc = pow2(this.exponent2);
+
+    while (inc > 1) {
+      computeRandomOffsets(inc);
+      inc /= 2;
+    }
   }
 
   private double randomFractionPerturbation() {

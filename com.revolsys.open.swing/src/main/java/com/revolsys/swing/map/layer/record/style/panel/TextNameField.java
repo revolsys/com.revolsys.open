@@ -45,8 +45,8 @@ public class TextNameField extends ValueField {
     this.fieldNamesField = new ComboBox<String>(converter, false, fieldNames);
     this.fieldNamesField.setRenderer(converter);
 
-    final JButton addButton = RunnableAction.createButton(null, "Add field name",
-      Icons.getIcon("add"), this::addFieldName);
+    final JButton addButton = RunnableAction.newButton(null, "Add field name", Icons.getIcon("add"),
+      this::addFieldName);
     addButton.setIcon(Icons.getIcon("add"));
     addButton.setToolTipText("Add field Name");
 

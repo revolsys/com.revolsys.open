@@ -50,12 +50,6 @@ public class BingClient {
     }
   }
 
-  private Map<String, Object> createParameterMap() {
-    final Map<String, Object> parameters = new TreeMap<String, Object>();
-    parameters.put("key", this.bingMapsKey);
-    return parameters;
-  }
-
   public BoundingBox getBoundingBox(final int zoomLevel, final int tileX, final int tileY) {
     final double y1 = getLatitude(zoomLevel, tileY);
     final double y2 = getLatitude(zoomLevel, tileY + 1);
@@ -79,7 +73,7 @@ public class BingClient {
     if (imagerySet == null) {
       imagerySet = ImagerySet.Aerial;
     }
-    final Map<String, Object> parameters = createParameterMap();
+    final Map<String, Object> parameters = newParameterMap();
     parameters.put("output", "json");
     return UrlUtil.getUrl("http://dev.virtualearth.net/REST/V1/Imagery/Metadata/" + imagerySet,
       parameters);
@@ -152,8 +146,8 @@ public class BingClient {
       final UriTemplate uriTemplate = new UriTemplate(imageUrl);
 
       // http://ecn.{subdomain}.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=1173&mkt={culture}&shading=hill
-      final Map<String, Object> parameters = createParameterMap();
-      final Map<String, Object> templateParameters = createParameterMap();
+      final Map<String, Object> parameters = newParameterMap();
+      final Map<String, Object> templateParameters = newParameterMap();
       if (mapLayer == null) {
         templateParameters.put("culture", "");
       } else {
@@ -187,7 +181,7 @@ public class BingClient {
     }
     final double centreX = minX + (maxX - minX) / 2;
     final double centreY = minY + (maxY - minY) / 2;
-    final Map<String, Object> parameters = createParameterMap();
+    final Map<String, Object> parameters = newParameterMap();
     parameters.put("mapArea",
       StringConverterRegistry.toString(minY) + "," + StringConverterRegistry.toString(minX) + ","
         + StringConverterRegistry.toString(maxY) + "," + StringConverterRegistry.toString(maxX));
@@ -247,5 +241,11 @@ public class BingClient {
       }
     }
     return METRES_PER_PIXEL.length;
+  }
+
+  private Map<String, Object> newParameterMap() {
+    final Map<String, Object> parameters = new TreeMap<String, Object>();
+    parameters.put("key", this.bingMapsKey);
+    return parameters;
   }
 }

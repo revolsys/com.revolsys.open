@@ -1,4 +1,4 @@
-package com.revolsys.gis.oracle.esri;
+package com.revolsys.oracle.recordstore.esri;
 
 import java.math.BigDecimal;
 import java.sql.Connection;

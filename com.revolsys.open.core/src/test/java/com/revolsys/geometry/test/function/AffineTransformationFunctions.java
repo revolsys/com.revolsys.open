@@ -61,7 +61,7 @@ public class AffineTransformationFunctions {
     final Point[] destPts = CoordinatesListUtil.getCoordinateArray(destBaseline);
     final Point dest0 = destPts[0];
     final Point dest1 = destPts[1];
-    final AffineTransformation trans = AffineTransformationFactory.createFromBaseLines(src0, src1,
+    final AffineTransformation trans = AffineTransformationFactory.newFromBaseLines(src0, src1,
       dest0, dest1);
     return trans.transform(g);
   }
@@ -76,8 +76,7 @@ public class AffineTransformationFunctions {
       src[i] = pts[0];
       dest[i] = pts[1];
     }
-    final AffineTransformation trans = AffineTransformationFactory.createFromControlVectors(src,
-      dest);
+    final AffineTransformation trans = AffineTransformationFactory.newFromControlVectors(src, dest);
     System.out.println(trans);
     return trans.transform(g);
   }

@@ -138,10 +138,10 @@ public class SaifWriter extends AbstractRecordWriter {
         if (log.isInfoEnabled()) {
           log.info("Closing SAIF archive '" + this.file.getCanonicalPath() + "'");
         }
-        createExports();
-        createMissingDirObject("InternallyReferencedObjects", "internal.dir");
-        createMissingDirObject("ImportedObjects", "imports.dir");
-        createMissingGlobalMetadata();
+        writeExports();
+        writeMissingDirObject("InternallyReferencedObjects", "internal.dir");
+        writeMissingDirObject("ImportedObjects", "imports.dir");
+        writeMissingGlobalMetadata();
         if (log.isInfoEnabled()) {
           log.info("  Closing serializers");
         }
@@ -180,101 +180,6 @@ public class SaifWriter extends AbstractRecordWriter {
         this.tempDirectory = null;
       }
     }
-  }
-
-  private void createExports() throws IOException {
-    final File exportsFile = new File(this.tempDirectory, "exports.dir");
-    final OsnSerializer exportsSerializer = createSerializer("/ExportedObject", exportsFile,
-      Long.MAX_VALUE);
-    exportsSerializer.startObject("/ExportedObjects");
-    exportsSerializer.fieldName("handles");
-    exportsSerializer.startCollection("Set");
-    writeExport(exportsSerializer, "GlobalMetadata", "GlobalMetadata", "globmeta.osn");
-    for (final Map<String, Object> export : this.exports.values()) {
-      final String compositeType = (String)export.get("compositeType");
-      final String referenceId = (String)export.get("referenceId");
-      final String objectSubset = (String)export.get("objectSubset");
-      String compositeTypeName = Path.getName(compositeType);
-      final String compositeNamespace = Path.getPath(compositeType).replaceAll("/", "");
-      if (Property.hasValue(compositeNamespace)) {
-        compositeTypeName += "::" + compositeNamespace;
-      }
-      writeExport(exportsSerializer, referenceId, compositeTypeName, objectSubset);
-    }
-    exportsSerializer.close();
-  }
-
-  private void createMissingDirObject(final String typePath, final String fileName)
-    throws IOException {
-    if (!this.serializers.containsKey(typePath)) {
-      final File file = new File(this.tempDirectory, fileName);
-      final PrintStream out = new PrintStream(new FileOutputStream(file));
-      try {
-        out.print(typePath);
-        out.print("(handles:Set{})");
-      } finally {
-        out.close();
-      }
-    }
-  }
-
-  private void createMissingGlobalMetadata() {
-    if (!this.exports.containsKey(GLOBAL_METADATA)) {
-      try {
-        addExport(GLOBAL_METADATA, GLOBAL_METADATA, "globmeta.osn");
-        final File metaFile = new File(this.tempDirectory, "globmeta.osn");
-        final OsnSerializer serializer = createSerializer(GLOBAL_METADATA, metaFile,
-          Long.MAX_VALUE);
-        serializer.startObject("/GlobalMetadata");
-        serializer.attribute("objectIdentifier", "GlobalMetadata", true);
-
-        serializer.fieldName("creationTime");
-        serializer.startObject("/TimeStamp");
-        final Date creationTimestamp = new Date(System.currentTimeMillis());
-        serializer.attribute("year", new BigDecimal(creationTimestamp.getYear() + 1900), true);
-        serializer.attribute("month", new BigDecimal(creationTimestamp.getMonth() + 1), true);
-        serializer.attribute("day", new BigDecimal(creationTimestamp.getDate()), true);
-        serializer.attribute("hour", new BigDecimal(creationTimestamp.getHours()), true);
-        serializer.attribute("minute", new BigDecimal(creationTimestamp.getMinutes()), true);
-        serializer.attribute("second", new BigDecimal(creationTimestamp.getSeconds()), true);
-        serializer.endObject();
-
-        serializer.fieldName("saifProfile");
-        serializer.startObject("/Profile");
-        serializer.attribute("authority", "Government of British Columbia", true);
-        serializer.attribute("idName", "SAIFLite", true);
-        serializer.attribute("version", "Release 1.1", true);
-        serializer.endObject();
-
-        serializer.attribute("saifRelease", "SAIF 3.2", true);
-        serializer.attribute("toolkitVersion", "SAIF Toolkit Version 1.4.0 (May 05, 1997)", true);
-
-        serializer.fieldName("userProfile");
-        serializer.startObject("/UserProfile");
-
-        serializer.fieldName("coordDefs");
-        serializer.startObject("/LocationalDefinitions");
-        serializer.attributeEnum("c1", "real32", true);
-        serializer.attributeEnum("c2", "real32", true);
-        serializer.attributeEnum("c3", "real32", true);
-        serializer.endObject();
-
-        serializer.attribute("organization", new BigDecimal("4"), true);
-        serializer.endObject();
-
-        serializer.endObject();
-        serializer.close();
-      } catch (final IOException e) {
-        throw new RuntimeException(e.getMessage(), e);
-      }
-    }
-  }
-
-  protected OsnSerializer createSerializer(final String typePath, final File file,
-    final long maxSize) throws IOException {
-    final OsnSerializer serializer = new OsnSerializer(typePath, file, maxSize, this.converters);
-    serializer.setIndentEnabled(this.indentEnabled);
-    return serializer;
   }
 
   @Override
@@ -359,10 +264,10 @@ public class SaifWriter extends AbstractRecordWriter {
           if (this.maxSubsetSize != Long.MAX_VALUE) {
             FileUtil.deleteFiles(this.tempDirectory,
               ObjectSetUtil.getObjectSubsetPrefix(objectSubsetName) + "...osn");
-            serializer = createSerializer(typePath, new File(this.tempDirectory, objectSubsetName),
+            serializer = newSerializer(typePath, new File(this.tempDirectory, objectSubsetName),
               this.maxSubsetSize);
           } else {
-            serializer = createSerializer(typePath, new File(this.tempDirectory, objectSubsetName),
+            serializer = newSerializer(typePath, new File(this.tempDirectory, objectSubsetName),
               Long.MAX_VALUE);
           }
           if (compositeType.isInstanceOf(this.annotatedSpatialDataSetType)) {
@@ -387,16 +292,16 @@ public class SaifWriter extends AbstractRecordWriter {
           addExport(typePath, compositeType.getPath(), objectSubsetName);
           this.serializers.put(typePath, serializer);
         } else if (typePath.equals("/ImportedObjects")) {
-          serializer = createSerializer("/ImportedObject",
-            new File(this.tempDirectory, "imports.dir"), Long.MAX_VALUE);
+          serializer = newSerializer("/ImportedObject", new File(this.tempDirectory, "imports.dir"),
+            Long.MAX_VALUE);
           this.serializers.put(typePath, serializer);
         } else if (Path.getName(typePath).endsWith("InternallyReferencedObjects")) {
-          serializer = createSerializer("/InternallyReferencedObject",
+          serializer = newSerializer("/InternallyReferencedObject",
             new File(this.tempDirectory, "internal.dir"), Long.MAX_VALUE);
           this.serializers.put(typePath, serializer);
         } else if (Path.getName(typePath).endsWith("GlobalMetadata")) {
-          serializer = createSerializer(GLOBAL_METADATA,
-            new File(this.tempDirectory, "globmeta.osn"), Long.MAX_VALUE);
+          serializer = newSerializer(GLOBAL_METADATA, new File(this.tempDirectory, "globmeta.osn"),
+            Long.MAX_VALUE);
           addExport(typePath, typePath, "globmeta.osn");
           this.serializers.put(typePath, serializer);
         }
@@ -449,6 +354,13 @@ public class SaifWriter extends AbstractRecordWriter {
     return this.indentEnabled;
   }
 
+  protected OsnSerializer newSerializer(final String typePath, final File file, final long maxSize)
+    throws IOException {
+    final OsnSerializer serializer = new OsnSerializer(typePath, file, maxSize, this.converters);
+    serializer.setIndentEnabled(this.indentEnabled);
+    return serializer;
+  }
+
   public void setCompositeTypeNames(final Map<String, String> compositeTypeNames) {
     for (final Entry<String, String> entry : compositeTypeNames.entrySet()) {
       final String key = entry.getKey();
@@ -479,7 +391,7 @@ public class SaifWriter extends AbstractRecordWriter {
       if (log.isInfoEnabled()) {
         log.info("Creating SAIF archive '" + file.getAbsolutePath() + "'");
       }
-      this.tempDirectory = FileUtil.createTempDirectory(filePrefix, ".saf");
+      this.tempDirectory = FileUtil.newTempDirectory(filePrefix, ".saf");
       FileUtil.deleteFileOnExit(this.tempDirectory);
     } else {
       this.file = file;
@@ -584,6 +496,93 @@ public class SaifWriter extends AbstractRecordWriter {
     exportsSerializer.attribute("offset", new BigDecimal("0"), true);
     exportsSerializer.attribute("sharable", Boolean.FALSE, true);
     exportsSerializer.endObject();
+  }
+
+  private void writeExports() throws IOException {
+    final File exportsFile = new File(this.tempDirectory, "exports.dir");
+    final OsnSerializer exportsSerializer = newSerializer("/ExportedObject", exportsFile,
+      Long.MAX_VALUE);
+    exportsSerializer.startObject("/ExportedObjects");
+    exportsSerializer.fieldName("handles");
+    exportsSerializer.startCollection("Set");
+    writeExport(exportsSerializer, "GlobalMetadata", "GlobalMetadata", "globmeta.osn");
+    for (final Map<String, Object> export : this.exports.values()) {
+      final String compositeType = (String)export.get("compositeType");
+      final String referenceId = (String)export.get("referenceId");
+      final String objectSubset = (String)export.get("objectSubset");
+      String compositeTypeName = Path.getName(compositeType);
+      final String compositeNamespace = Path.getPath(compositeType).replaceAll("/", "");
+      if (Property.hasValue(compositeNamespace)) {
+        compositeTypeName += "::" + compositeNamespace;
+      }
+      writeExport(exportsSerializer, referenceId, compositeTypeName, objectSubset);
+    }
+    exportsSerializer.close();
+  }
+
+  private void writeMissingDirObject(final String typePath, final String fileName)
+    throws IOException {
+    if (!this.serializers.containsKey(typePath)) {
+      final File file = new File(this.tempDirectory, fileName);
+      final PrintStream out = new PrintStream(new FileOutputStream(file));
+      try {
+        out.print(typePath);
+        out.print("(handles:Set{})");
+      } finally {
+        out.close();
+      }
+    }
+  }
+
+  private void writeMissingGlobalMetadata() {
+    if (!this.exports.containsKey(GLOBAL_METADATA)) {
+      try {
+        addExport(GLOBAL_METADATA, GLOBAL_METADATA, "globmeta.osn");
+        final File metaFile = new File(this.tempDirectory, "globmeta.osn");
+        final OsnSerializer serializer = newSerializer(GLOBAL_METADATA, metaFile, Long.MAX_VALUE);
+        serializer.startObject("/GlobalMetadata");
+        serializer.attribute("objectIdentifier", "GlobalMetadata", true);
+
+        serializer.fieldName("creationTime");
+        serializer.startObject("/TimeStamp");
+        final Date creationTimestamp = new Date(System.currentTimeMillis());
+        serializer.attribute("year", new BigDecimal(creationTimestamp.getYear() + 1900), true);
+        serializer.attribute("month", new BigDecimal(creationTimestamp.getMonth() + 1), true);
+        serializer.attribute("day", new BigDecimal(creationTimestamp.getDate()), true);
+        serializer.attribute("hour", new BigDecimal(creationTimestamp.getHours()), true);
+        serializer.attribute("minute", new BigDecimal(creationTimestamp.getMinutes()), true);
+        serializer.attribute("second", new BigDecimal(creationTimestamp.getSeconds()), true);
+        serializer.endObject();
+
+        serializer.fieldName("saifProfile");
+        serializer.startObject("/Profile");
+        serializer.attribute("authority", "Government of British Columbia", true);
+        serializer.attribute("idName", "SAIFLite", true);
+        serializer.attribute("version", "Release 1.1", true);
+        serializer.endObject();
+
+        serializer.attribute("saifRelease", "SAIF 3.2", true);
+        serializer.attribute("toolkitVersion", "SAIF Toolkit Version 1.4.0 (May 05, 1997)", true);
+
+        serializer.fieldName("userProfile");
+        serializer.startObject("/UserProfile");
+
+        serializer.fieldName("coordDefs");
+        serializer.startObject("/LocationalDefinitions");
+        serializer.attributeEnum("c1", "real32", true);
+        serializer.attributeEnum("c2", "real32", true);
+        serializer.attributeEnum("c3", "real32", true);
+        serializer.endObject();
+
+        serializer.attribute("organization", new BigDecimal("4"), true);
+        serializer.endObject();
+
+        serializer.endObject();
+        serializer.close();
+      } catch (final IOException e) {
+        throw new RuntimeException(e.getMessage(), e);
+      }
+    }
   }
 
 }

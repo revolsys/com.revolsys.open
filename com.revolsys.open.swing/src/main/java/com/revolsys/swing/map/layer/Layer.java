@@ -21,8 +21,6 @@ public interface Layer
   extends GeometryFactoryProxy, PropertyChangeSupportProxy, ObjectWithProperties,
   PropertyChangeListener, Comparable<Layer>, MapSerializer, Child<LayerGroup>, Cloneable {
 
-  TabbedValuePanel createPropertiesPanel();
-
   void delete();
 
   BoundingBox getBoundingBox();
@@ -96,6 +94,8 @@ public interface Layer
   boolean isVisible();
 
   boolean isVisible(double scale);
+
+  TabbedValuePanel newPropertiesPanel();
 
   void refresh();
 

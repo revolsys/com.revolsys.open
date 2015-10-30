@@ -79,7 +79,7 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
   }
 
   default void delete() {
-    getRecordDefinition().delete(this);
+    getRecordDefinition().deleteRecord(this);
   }
 
   default double distance(final Geometry geometry) {
@@ -190,21 +190,6 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
     }
   }
 
-  /**
-   * Get the factory which created the instance.
-   *
-   * @return The factory.
-   */
-
-  default RecordFactory getFactory() {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    if (recordDefinition == null) {
-      return null;
-    } else {
-      return recordDefinition.getRecordFactory();
-    }
-  }
-
   default FieldDefinition getFieldDefinition(final int fieldIndex) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return recordDefinition.getField(fieldIndex);
@@ -279,7 +264,7 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
       if (idValue == null) {
         return null;
       } else {
-        return Identifier.create(idValue);
+        return Identifier.newIdentifier(idValue);
       }
     } else {
       boolean notNull = false;
@@ -310,7 +295,7 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
       if (idValue == null) {
         return null;
       } else {
-        return Identifier.create(idValue);
+        return Identifier.newIdentifier(idValue);
       }
     } else {
       boolean notNull = false;
@@ -379,6 +364,21 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
    */
   RecordDefinition getRecordDefinition();
 
+  /**
+   * Get the factory which created the instance.
+   *
+   * @return The factory.
+   */
+
+  default RecordFactory<Record> getRecordFactory() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      return recordDefinition.getRecordFactory();
+    }
+  }
+
   default Short getShort(final CharSequence name) {
     final Object value = getValue(name);
     if (Property.hasValue(value)) {
@@ -426,7 +426,7 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
 
   default TypedIdentifier getTypedIdentifier(final String type) {
     final Identifier identifier = getIdentifier();
-    return TypedIdentifier.create(type, identifier);
+    return TypedIdentifier.newIdentifier(type, identifier);
   }
 
   default String getTypePath() {

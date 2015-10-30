@@ -1,13 +1,13 @@
-package com.revolsys.gis.oracle.io;
+package com.revolsys.oracle.recordstore.field;
 
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 
-public class OracleClobFieldAdder extends JdbcFieldAdder {
+public class OracleBlobFieldAdder extends JdbcFieldAdder {
 
-  public OracleClobFieldAdder() {
+  public OracleBlobFieldAdder() {
   }
 
   @Override
@@ -15,7 +15,7 @@ public class OracleClobFieldAdder extends JdbcFieldAdder {
     final RecordDefinitionImpl recordDefinition, final String dbName, final String name,
     final String dataTypeName, final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
-    final OracleJdbcClobFieldDefinition attribute = new OracleJdbcClobFieldDefinition(dbName, name,
+    final OracleJdbcBlobFieldDefinition attribute = new OracleJdbcBlobFieldDefinition(dbName, name,
       sqlType, length, required, description);
     recordDefinition.addField(attribute);
     return attribute;

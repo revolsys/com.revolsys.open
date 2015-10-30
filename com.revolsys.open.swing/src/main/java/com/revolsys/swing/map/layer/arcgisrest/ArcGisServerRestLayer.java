@@ -16,7 +16,7 @@ import com.revolsys.swing.map.layer.MapTile;
 
 public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
 
-  public static ArcGisServerRestLayer create(final Map<String, Object> properties) {
+  public static ArcGisServerRestLayer newLayer(final Map<String, Object> properties) {
     return new ArcGisServerRestLayer(properties);
   }
 

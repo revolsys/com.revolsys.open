@@ -71,12 +71,12 @@ public class PlanarPolygon3D {
   private static Point project(final Point p, final int facingPlane) {
     switch (facingPlane) {
       case Plane3D.XY_PLANE:
-        return new PointDouble(p.getX(), p.getY(), Point.NULL_ORDINATE);
+        return new PointDouble(p.getX(), p.getY(), Geometry.NULL_ORDINATE);
       case Plane3D.XZ_PLANE:
-        return new PointDouble(p.getX(), p.getZ(), Point.NULL_ORDINATE);
+        return new PointDouble(p.getX(), p.getZ(), Geometry.NULL_ORDINATE);
       // Plane3D.YZ
       default:
-        return new PointDouble(p.getY(), p.getZ(), Point.NULL_ORDINATE);
+        return new PointDouble(p.getY(), p.getZ(), Geometry.NULL_ORDINATE);
     }
   }
 
@@ -119,7 +119,7 @@ public class PlanarPolygon3D {
     sum[0] /= n;
     sum[1] /= n;
     sum[2] /= n;
-    final Vector3D norm = Vector3D.create(new PointDouble(sum)).normalize();
+    final Vector3D norm = Vector3D.newVector(new PointDouble(sum)).normalize();
     return norm;
   }
 

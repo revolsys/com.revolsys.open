@@ -53,34 +53,6 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
     }
   }
 
-  public JButton createButton() {
-    final Button button = new Button(this);
-    return button;
-  }
-
-  public CheckBoxMenuItem createCheckboxMenuItem() {
-    final CheckBoxMenuItem menuItem = new CheckBoxMenuItem(this);
-    final Icon disabledIcon = getDisabledIcon();
-    menuItem.setDisabledIcon(disabledIcon);
-    menuItem.setEnabled(isEnabled());
-    return menuItem;
-  }
-
-  public JMenuItem createMenuItem() {
-    final JMenuItem menuItem = new JMenuItem(this);
-
-    final Icon disabledIcon = getDisabledIcon();
-    menuItem.setDisabledIcon(disabledIcon);
-    final boolean enabled = isEnabled();
-    menuItem.setEnabled(enabled);
-    return menuItem;
-  }
-
-  public JToggleButton createToggleButton() {
-    final ToggleButton button = new ToggleButton(this);
-    return button;
-  }
-
   public Icon getDisabledIcon() {
     final Icon icon = getIcon();
     return Icons.getDisabledIcon(icon);
@@ -120,6 +92,34 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
       return this.enableCheck.isEnabled();
     }
     return super.isEnabled();
+  }
+
+  public JButton newButton() {
+    final Button button = new Button(this);
+    return button;
+  }
+
+  public CheckBoxMenuItem newCheckboxMenuItem() {
+    final CheckBoxMenuItem menuItem = new CheckBoxMenuItem(this);
+    final Icon disabledIcon = getDisabledIcon();
+    menuItem.setDisabledIcon(disabledIcon);
+    menuItem.setEnabled(isEnabled());
+    return menuItem;
+  }
+
+  public JMenuItem newMenuItem() {
+    final JMenuItem menuItem = new JMenuItem(this);
+
+    final Icon disabledIcon = getDisabledIcon();
+    menuItem.setDisabledIcon(disabledIcon);
+    final boolean enabled = isEnabled();
+    menuItem.setEnabled(enabled);
+    return menuItem;
+  }
+
+  public JToggleButton newToggleButton() {
+    final ToggleButton button = new ToggleButton(this);
+    return button;
   }
 
   public void setAcceleratorControlKey(final int keyCode) {

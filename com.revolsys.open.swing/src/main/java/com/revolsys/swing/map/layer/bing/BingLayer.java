@@ -24,7 +24,7 @@ public class BingLayer extends AbstractTiledImageLayer {
   private static final BoundingBox MAX_BOUNDING_BOX = new BoundingBoxDoubleGf(GEOMETRY_FACTORY, 2,
     -180, -85, 180, 85);
 
-  public static BingLayer create(final Map<String, Object> properties) {
+  public static BingLayer newLayer(final Map<String, Object> properties) {
     return new BingLayer(properties);
   }
 

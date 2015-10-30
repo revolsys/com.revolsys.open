@@ -27,26 +27,6 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
     this.out = out;
   }
 
-  protected ChannelValueStore<I> createInValueStore() {
-    if (this.inBufferSize == 0) {
-      return new ZeroBuffer<I>();
-    } else if (this.inBufferSize < 0) {
-      return new Buffer<I>();
-    } else {
-      return new Buffer<I>(this.inBufferSize);
-    }
-  }
-
-  protected ChannelValueStore<O> createOutValueStore() {
-    if (this.outBufferSize == 0) {
-      return new ZeroBuffer<O>();
-    } else if (this.outBufferSize < 0) {
-      return new Buffer<O>();
-    } else {
-      return new Buffer<O>(this.outBufferSize);
-    }
-  }
-
   protected void destroy() {
   }
 
@@ -57,7 +37,7 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
   public Channel<I> getIn() {
     if (this.in == null) {
       final String channelName = getBeanName() + ".in";
-      final ChannelValueStore<I> buffer = createInValueStore();
+      final ChannelValueStore<I> buffer = newInValueStore();
       final Channel<I> channel = new Channel<I>(channelName, buffer);
       setIn(channel);
     }
@@ -75,7 +55,7 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
   public Channel<O> getOut() {
     if (this.out == null) {
       final String channelName = getBeanName() + ".out";
-      final ChannelValueStore<O> buffer = createOutValueStore();
+      final ChannelValueStore<O> buffer = newOutValueStore();
       final Channel<O> channel = new Channel<O>(channelName, buffer);
       setOut(channel);
     }
@@ -87,6 +67,26 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
   }
 
   protected void init() {
+  }
+
+  protected ChannelValueStore<I> newInValueStore() {
+    if (this.inBufferSize == 0) {
+      return new ZeroBuffer<I>();
+    } else if (this.inBufferSize < 0) {
+      return new Buffer<I>();
+    } else {
+      return new Buffer<I>(this.inBufferSize);
+    }
+  }
+
+  protected ChannelValueStore<O> newOutValueStore() {
+    if (this.outBufferSize == 0) {
+      return new ZeroBuffer<O>();
+    } else if (this.outBufferSize < 0) {
+      return new Buffer<O>();
+    } else {
+      return new Buffer<O>(this.outBufferSize);
+    }
   }
 
   @Override

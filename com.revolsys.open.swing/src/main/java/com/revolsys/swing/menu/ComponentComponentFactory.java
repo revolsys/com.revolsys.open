@@ -28,11 +28,6 @@ public class ComponentComponentFactory implements ComponentFactory<Component> {
   }
 
   @Override
-  public Component newComponent() {
-    return this.component;
-  }
-
-  @Override
   public Icon getIcon() {
     return null;
   }
@@ -50,6 +45,11 @@ public class ComponentComponentFactory implements ComponentFactory<Component> {
   @Override
   public String getToolTip() {
     return null;
+  }
+
+  @Override
+  public Component newComponent() {
+    return this.component;
   }
 
 }

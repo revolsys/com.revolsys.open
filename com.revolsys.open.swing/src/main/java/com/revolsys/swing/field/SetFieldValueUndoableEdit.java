@@ -9,8 +9,8 @@ import com.revolsys.swing.undo.UndoManager;
 public class SetFieldValueUndoableEdit extends AbstractUndoableEdit {
   private static final long serialVersionUID = 1L;
 
-  public static SetFieldValueUndoableEdit create(final UndoManager undoManager, final Field field,
-    final Object oldValue, final Object newValue) {
+  public static SetFieldValueUndoableEdit newUndoableEdit(final UndoManager undoManager,
+    final Field field, final Object oldValue, final Object newValue) {
     if (undoManager == null) {
       return null;
     } else {

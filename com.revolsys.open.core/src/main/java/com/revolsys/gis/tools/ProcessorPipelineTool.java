@@ -111,10 +111,10 @@ public class ProcessorPipelineTool {
   private File targetFile;
 
   public ProcessorPipelineTool() {
-    createOptions();
+    newOptions();
   }
 
-  private void createOptions() {
+  private void newOptions() {
     final Option script = new Option(SCRIPT_OPTION, SCRIPT, true,
       "the script file that defines the processor pipeline");
     script.setRequired(true);

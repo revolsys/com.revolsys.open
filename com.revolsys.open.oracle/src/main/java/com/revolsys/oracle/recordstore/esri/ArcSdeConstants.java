@@ -1,4 +1,4 @@
-package com.revolsys.gis.oracle.esri;
+package com.revolsys.oracle.recordstore.esri;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,7 +7,7 @@ import java.util.Set;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.gis.oracle.io.OracleRecordStore;
+import com.revolsys.oracle.recordstore.OracleRecordStore;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.RecordStoreSchema;
 

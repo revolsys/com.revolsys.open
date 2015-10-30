@@ -111,36 +111,7 @@ public class ScriptTool {
   private String scriptFileName;
 
   public ScriptTool() {
-    createOptions();
-  }
-
-  private void createOptions() {
-    final Option script = new Option(SCRIPT_OPTION, SCRIPT, true,
-      "the script file that defines the processor pipeline");
-    script.setRequired(false);
-    this.options.addOption(script);
-
-    final Option logFile = new Option(LOG_FILE_OPTION, LOG_FILE, true,
-      "The file to write log messages to");
-    logFile.setRequired(false);
-    this.options.addOption(logFile);
-
-    final Option properties = new Option(PROPERTIES_OPTION, PROPERTIES, true,
-      "The file to load properties from");
-    properties.setRequired(false);
-    this.options.addOption(properties);
-
-    final Option version = new Option(VERSION_OPTION, VERSION, false, "Display the version number");
-    properties.setRequired(false);
-    this.options.addOption(version);
-
-    OptionBuilder.withDescription("use value for given property");
-    OptionBuilder.withArgName("property=value");
-    OptionBuilder.withValueSeparator();
-    OptionBuilder.hasArgs(2);
-    final Option property = OptionBuilder.create("D");
-
-    this.options.addOption(property);
+    newOptions();
   }
 
   private void displayVersion() {
@@ -185,6 +156,35 @@ public class ScriptTool {
     } else {
       return false;
     }
+  }
+
+  private void newOptions() {
+    final Option script = new Option(SCRIPT_OPTION, SCRIPT, true,
+      "the script file that defines the processor pipeline");
+    script.setRequired(false);
+    this.options.addOption(script);
+
+    final Option logFile = new Option(LOG_FILE_OPTION, LOG_FILE, true,
+      "The file to write log messages to");
+    logFile.setRequired(false);
+    this.options.addOption(logFile);
+
+    final Option properties = new Option(PROPERTIES_OPTION, PROPERTIES, true,
+      "The file to load properties from");
+    properties.setRequired(false);
+    this.options.addOption(properties);
+
+    final Option version = new Option(VERSION_OPTION, VERSION, false, "Display the version number");
+    properties.setRequired(false);
+    this.options.addOption(version);
+
+    OptionBuilder.withDescription("use value for given property");
+    OptionBuilder.withArgName("property=value");
+    OptionBuilder.withValueSeparator();
+    OptionBuilder.hasArgs(2);
+    final Option property = OptionBuilder.create("D");
+
+    this.options.addOption(property);
   }
 
   public boolean processArguments(final String[] args) {
@@ -248,7 +248,7 @@ public class ScriptTool {
         if (logFileName != null) {
           try {
             while (logFileName.contains("${")) {
-              final Expression expression = JexlUtil.createExpression(logFileName);
+              final Expression expression = JexlUtil.newExpression(logFileName);
               final HashMapContext context = new HashMapContext();
               context.setVars(ThreadSharedAttributes.getAttributes());
               logFileName = (String)JexlUtil.evaluateExpression(context, expression);

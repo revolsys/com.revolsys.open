@@ -42,17 +42,17 @@ public class TestPerfDistanceGeomPair {
     }
   }
 
-  Geometry[] createCircles(final int nPts) {
+  Geometry[] newCircles(final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
-    gsf.setCentre(new PointDouble((double)0, 0, Point.NULL_ORDINATE));
+    gsf.setCentre(new PointDouble((double)0, 0, Geometry.NULL_ORDINATE));
     gsf.setSize(100);
     gsf.setNumPoints(nPts);
 
-    final Polygon gRect = gsf.createCircle();
+    final Polygon gRect = gsf.newCircle();
 
-    gsf.setCentre(new PointDouble((double)0, this.separationDist, Point.NULL_ORDINATE));
+    gsf.setCentre(new PointDouble((double)0, this.separationDist, Geometry.NULL_ORDINATE));
 
-    final Polygon gRect2 = gsf.createCircle();
+    final Polygon gRect2 = gsf.newCircle();
 
     return new Geometry[] {
       gRect, gRect2
@@ -60,17 +60,17 @@ public class TestPerfDistanceGeomPair {
 
   }
 
-  Geometry[] createSineStars(final int nPts) {
+  Geometry[] newSineStars(final int nPts) {
     final SineStarFactory gsf = new SineStarFactory();
-    gsf.setCentre(new PointDouble((double)0, 0, Point.NULL_ORDINATE));
+    gsf.setCentre(new PointDouble((double)0, 0, Geometry.NULL_ORDINATE));
     gsf.setSize(100);
     gsf.setNumPoints(nPts);
 
-    final Geometry g = gsf.createSineStar().getBoundary();
+    final Geometry g = gsf.newSineStar().getBoundary();
 
-    gsf.setCentre(new PointDouble((double)0, this.separationDist, Point.NULL_ORDINATE));
+    gsf.setCentre(new PointDouble((double)0, this.separationDist, Geometry.NULL_ORDINATE));
 
-    final Geometry g2 = gsf.createSineStar().getBoundary();
+    final Geometry g2 = gsf.newSineStar().getBoundary();
 
     return new Geometry[] {
       g, g2
@@ -118,8 +118,8 @@ public class TestPerfDistanceGeomPair {
 
   public void test(final int nPts) {
 
-    // Geometry[] geom = createCircles(nPts);
-    final Geometry[] geom = createSineStars(nPts);
+    // Geometry[] geom = newCircles(nPts);
+    final Geometry[] geom = newSineStars(nPts);
 
     if (this.verbose) {
       // System.out.println("Running with " + nPts + " points");

@@ -91,7 +91,7 @@ public class RecordCodeTableValueFilter implements Predicate<Record> {
       final RecordDefinition recordDefinition = object.getRecordDefinition();
       final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(this.fieldName);
       if (codeTable != null) {
-        final Object codeValue = codeTable.getValue(Identifier.create(propertyValue));
+        final Object codeValue = codeTable.getValue(Identifier.newIdentifier(propertyValue));
         if (this.values.contains(codeValue)) {
           this.values.add(propertyValue);
           return true;

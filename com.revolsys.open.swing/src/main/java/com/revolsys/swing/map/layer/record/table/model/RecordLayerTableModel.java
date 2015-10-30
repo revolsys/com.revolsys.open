@@ -70,7 +70,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   private static final long serialVersionUID = 1L;
 
-  public static RecordLayerTable createTable(final AbstractRecordLayer layer) {
+  public static RecordLayerTable newTable(final AbstractRecordLayer layer) {
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
     if (recordDefinition == null) {
       return null;

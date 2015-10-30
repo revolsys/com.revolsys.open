@@ -39,7 +39,7 @@ public class ShapefileZip extends AbstractRecordIoFactory implements RecordWrite
     final Charset charset) {
     File directory;
     try {
-      directory = FileUtil.createTempDirectory(baseName, "zipDir");
+      directory = FileUtil.newTempDirectory(baseName, "zipDir");
     } catch (final Throwable e) {
       throw new RuntimeException("Unable to create temporary directory", e);
     }

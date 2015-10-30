@@ -249,6 +249,108 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
   public void close(final Component component) {
   }
 
+  public void deleteMenuItem(final String groupName, final String menuTitle) {
+    final List<ComponentFactory<?>> items = this.groups.get(groupName);
+    if (items != null) {
+      for (final ComponentFactory<?> item : items) {
+        boolean delete = false;
+        if (item instanceof MenuFactory) {
+          final MenuFactory menuFactory = (MenuFactory)item;
+          if (menuTitle.equals(menuFactory.getName())) {
+            delete = true;
+          }
+        } else if (item instanceof ActionMainMenuItemFactory) {
+          final ActionMainMenuItemFactory actionFactory = (ActionMainMenuItemFactory)item;
+          if (menuTitle.equals(actionFactory.getName())) {
+            delete = true;
+          }
+        } else if (item instanceof Action) {
+          final Action action = (Action)item;
+          if (menuTitle.equals(action.getValue(Action.NAME))) {
+            delete = true;
+          }
+        }
+        if (delete) {
+          items.remove(item);
+          return;
+        }
+      }
+    }
+  }
+
+  public EnableCheck getEnableCheck() {
+    return this.enableCheck;
+  }
+
+  public MenuFactory getFactory(final String name) {
+    for (final List<ComponentFactory<?>> group : this.groups.values()) {
+      for (final ComponentFactory<?> factory : group) {
+        if (factory instanceof MenuFactory) {
+          final MenuFactory menuFactory = (MenuFactory)factory;
+          final String factoryName = menuFactory.getName();
+          if (name.equals(factoryName)) {
+            return menuFactory;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  public List<ComponentFactory<?>> getGroup(final String groupName) {
+    List<ComponentFactory<?>> factories = this.groups.get(groupName);
+    if (factories == null) {
+      factories = new ArrayList<ComponentFactory<?>>();
+      this.groups.put(groupName, factories);
+      if (!this.groupNames.contains(groupName)) {
+        this.groupNames.add(groupName);
+      }
+    }
+    return factories;
+  }
+
+  public List<String> getGroupNames() {
+    return this.groupNames;
+  }
+
+  public Map<String, List<ComponentFactory<?>>> getGroups() {
+    return this.groups;
+  }
+
+  @Override
+  public Icon getIcon() {
+    return null;
+  }
+
+  @Override
+  public String getIconName() {
+    return null;
+  }
+
+  /*
+   * public void setGroupEnabled(final String groupName, final boolean enabled)
+   * { final List<Component> components = getGroup(groupName); for (final
+   * Component component : components) { component.setEnabled(enabled); } }
+   */
+
+  public int getItemCount() {
+    int count = 0;
+    for (final List<ComponentFactory<?>> factories : this.groups.values()) {
+      count += factories.size();
+    }
+    return count;
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
+  }
+
+  @Override
+  public String getToolTip() {
+    return null;
+  }
+
   @Override
   public JMenu newComponent() {
     return newJMenu();
@@ -337,113 +439,11 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     return menu;
   }
 
-  public RunnableAction newMenuItem(final CharSequence name, final String toolTip,
-    final Icon icon, final EnableCheck enableCheck, final Runnable runnable) {
+  public RunnableAction newMenuItem(final CharSequence name, final String toolTip, final Icon icon,
+    final EnableCheck enableCheck, final Runnable runnable) {
     final RunnableAction action = new RunnableAction(name, toolTip, icon, runnable);
     action.setEnableCheck(enableCheck);
     return action;
-  }
-
-  public void deleteMenuItem(final String groupName, final String menuTitle) {
-    final List<ComponentFactory<?>> items = this.groups.get(groupName);
-    if (items != null) {
-      for (final ComponentFactory<?> item : items) {
-        boolean delete = false;
-        if (item instanceof MenuFactory) {
-          final MenuFactory menuFactory = (MenuFactory)item;
-          if (menuTitle.equals(menuFactory.getName())) {
-            delete = true;
-          }
-        } else if (item instanceof ActionMainMenuItemFactory) {
-          final ActionMainMenuItemFactory actionFactory = (ActionMainMenuItemFactory)item;
-          if (menuTitle.equals(actionFactory.getName())) {
-            delete = true;
-          }
-        } else if (item instanceof Action) {
-          final Action action = (Action)item;
-          if (menuTitle.equals(action.getValue(Action.NAME))) {
-            delete = true;
-          }
-        }
-        if (delete) {
-          items.remove(item);
-          return;
-        }
-      }
-    }
-  }
-
-  /*
-   * public void setGroupEnabled(final String groupName, final boolean enabled)
-   * { final List<Component> components = getGroup(groupName); for (final
-   * Component component : components) { component.setEnabled(enabled); } }
-   */
-
-  public EnableCheck getEnableCheck() {
-    return this.enableCheck;
-  }
-
-  public MenuFactory getFactory(final String name) {
-    for (final List<ComponentFactory<?>> group : this.groups.values()) {
-      for (final ComponentFactory<?> factory : group) {
-        if (factory instanceof MenuFactory) {
-          final MenuFactory menuFactory = (MenuFactory)factory;
-          final String factoryName = menuFactory.getName();
-          if (name.equals(factoryName)) {
-            return menuFactory;
-          }
-        }
-      }
-    }
-    return null;
-  }
-
-  public List<ComponentFactory<?>> getGroup(final String groupName) {
-    List<ComponentFactory<?>> factories = this.groups.get(groupName);
-    if (factories == null) {
-      factories = new ArrayList<ComponentFactory<?>>();
-      this.groups.put(groupName, factories);
-      if (!this.groupNames.contains(groupName)) {
-        this.groupNames.add(groupName);
-      }
-    }
-    return factories;
-  }
-
-  public List<String> getGroupNames() {
-    return this.groupNames;
-  }
-
-  public Map<String, List<ComponentFactory<?>>> getGroups() {
-    return this.groups;
-  }
-
-  @Override
-  public Icon getIcon() {
-    return null;
-  }
-
-  @Override
-  public String getIconName() {
-    return null;
-  }
-
-  public int getItemCount() {
-    int count = 0;
-    for (final List<ComponentFactory<?>> factories : this.groups.values()) {
-      count += factories.size();
-    }
-    return count;
-  }
-
-  @Override
-  public String getName() {
-    return this.name;
-  }
-
-  @Override
-  public String getToolTip() {
-    return null;
   }
 
   public void setEnableCheck(final EnableCheck enableCheck) {

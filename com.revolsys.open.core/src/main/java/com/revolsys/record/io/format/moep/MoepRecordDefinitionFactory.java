@@ -16,7 +16,7 @@ public class MoepRecordDefinitionFactory extends BaseObjectWithProperties
     synchronized (RECORD_DEFINITION_CACHE) {
       RecordDefinition recordDefinition = RECORD_DEFINITION_CACHE.get(typePath);
       if (recordDefinition == null) {
-        recordDefinition = MoepConstants.createRecordDefinition(typePath);
+        recordDefinition = MoepConstants.newRecordDefinition(typePath);
         RECORD_DEFINITION_CACHE.put(typePath, recordDefinition);
       }
       return recordDefinition;

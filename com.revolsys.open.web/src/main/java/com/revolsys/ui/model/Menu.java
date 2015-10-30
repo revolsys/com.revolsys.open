@@ -100,7 +100,7 @@ public class Menu implements Cloneable, BeanNameAware {
       this.parameters.put(name, value);
       Expression expression = null;
       try {
-        expression = JexlUtil.createExpression(value.toString());
+        expression = JexlUtil.newExpression(value.toString());
       } catch (final Exception e) {
         LOG.error("Invalid Jexl Expression '" + value + "': " + e.getMessage(), e);
       }
@@ -324,7 +324,7 @@ public class Menu implements Cloneable, BeanNameAware {
     if (title != null) {
       this.title = title;
       try {
-        this.titleExpression = JexlUtil.createExpression(this.title);
+        this.titleExpression = JexlUtil.newExpression(this.title);
       } catch (final Exception e) {
         LOG.error("Error creating expression '" + this.title + "': " + e.getMessage(), e);
         this.titleExpression = null;
@@ -342,7 +342,7 @@ public class Menu implements Cloneable, BeanNameAware {
     if (uri != null) {
       this.uri = uri.replaceAll(" ", "%20");
       try {
-        this.uriExpression = JexlUtil.createExpression(this.uri);
+        this.uriExpression = JexlUtil.newExpression(this.uri);
       } catch (final Exception e) {
         LOG.error("Error creating expression '" + this.uri + "': " + e.getMessage(), e);
         this.uriExpression = null;

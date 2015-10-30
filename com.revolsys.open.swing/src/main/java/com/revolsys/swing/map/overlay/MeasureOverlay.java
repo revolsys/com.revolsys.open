@@ -176,10 +176,10 @@ public class MeasureOverlay extends AbstractOverlay {
 
       final List<LineString> lines = new ArrayList<LineString>();
       if (previousPoint != null && !previousPoint.isEmpty()) {
-        lines.add(createXorLine(geometryFactory, previousPoint, point));
+        lines.add(newXorLine(geometryFactory, previousPoint, point));
       }
       if (nextPoint != null && !nextPoint.isEmpty()) {
-        lines.add(createXorLine(geometryFactory, nextPoint, point));
+        lines.add(newXorLine(geometryFactory, nextPoint, point));
       }
       if (!lines.isEmpty()) {
         return geometryFactory.multiLineString(lines);
@@ -389,7 +389,7 @@ public class MeasureOverlay extends AbstractOverlay {
           xorGeometry = geometryFactory.lineString(toVertex, point);
         } else {
           if (toVertex.equals(firstVertex)) {
-            xorGeometry = createXorLine(geometryFactory, toVertex, point);
+            xorGeometry = newXorLine(geometryFactory, toVertex, point);
           } else {
             final Point p1 = geometryFactory.point(toVertex);
             final Point p3 = geometryFactory.point(firstVertex);

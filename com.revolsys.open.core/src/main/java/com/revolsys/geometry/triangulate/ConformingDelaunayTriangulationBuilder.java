@@ -59,21 +59,21 @@ import com.revolsys.geometry.triangulate.quadedge.Vertex;
  *
  */
 public class ConformingDelaunayTriangulationBuilder {
-  private static List createConstraintSegments(final Geometry geom) {
+  private static List newConstraintSegments(final Geometry geom) {
     final List lines = geom.getGeometryComponents(LineString.class);
     final List constraintSegs = new ArrayList();
     for (final Iterator i = lines.iterator(); i.hasNext();) {
       final LineString line = (LineString)i.next();
-      createConstraintSegments(line, constraintSegs);
+      newConstraintSegments(line, constraintSegs);
     }
     return constraintSegs;
   }
 
-  private static void createConstraintSegments(final LineString line,
+  private static void newConstraintSegments(final LineString line,
     final List<Segment> constraintSegs) {
     for (final com.revolsys.geometry.model.segment.Segment segment : line.segments()) {
-      constraintSegs
-        .add(new Segment(segment.getPoint(0).newPointDouble(), segment.getPoint(1).newPointDouble()));
+      constraintSegs.add(
+        new Segment(segment.getPoint(0).newPointDouble(), segment.getPoint(1).newPointDouble()));
     }
   }
 
@@ -90,49 +90,6 @@ public class ConformingDelaunayTriangulationBuilder {
   public ConformingDelaunayTriangulationBuilder() {
   }
 
-  private void create() {
-    if (this.subdiv != null) {
-      return;
-    }
-
-    final BoundingBoxDoubleGf siteEnv = DelaunayTriangulationBuilder.envelope(this.siteCoords);
-
-    List segments = new ArrayList();
-    if (this.constraintLines != null) {
-      siteEnv.expandToInclude(this.constraintLines.getBoundingBox());
-      createVertices(this.constraintLines);
-      segments = createConstraintSegments(this.constraintLines);
-    }
-    final List sites = createSiteVertices(this.siteCoords);
-
-    final ConformingDelaunayTriangulator cdt = new ConformingDelaunayTriangulator(sites,
-      this.tolerance);
-
-    cdt.setConstraints(segments, new ArrayList(this.constraintVertexMap.values()));
-
-    cdt.formInitialDelaunay();
-    cdt.enforceConstraints();
-    this.subdiv = cdt.getSubdivision();
-  }
-
-  private List<ConstraintVertex> createSiteVertices(final Collection<Point> coords) {
-    final List<ConstraintVertex> verts = new ArrayList<>();
-    for (final Point coord : coords) {
-      if (this.constraintVertexMap.containsKey(coord)) {
-        continue;
-      }
-      verts.add(new ConstraintVertex(coord));
-    }
-    return verts;
-  }
-
-  private void createVertices(final Geometry geom) {
-    for (final Point coordinate : geom.vertices()) {
-      final Vertex v = new ConstraintVertex(coordinate);
-      this.constraintVertexMap.put(v.getCoordinate(), v);
-    }
-  }
-
   /**
    * Gets the edges of the computed triangulation as a {@link MultiLineString}.
    *
@@ -140,7 +97,7 @@ public class ConformingDelaunayTriangulationBuilder {
    * @return the edges of the triangulation
    */
   public Geometry getEdges(final GeometryFactory geomFact) {
-    create();
+    init();
     return this.subdiv.getEdges(geomFact);
   }
 
@@ -150,7 +107,7 @@ public class ConformingDelaunayTriangulationBuilder {
    * @return the subdivision containing the triangulation
    */
   public QuadEdgeSubdivision getSubdivision() {
-    create();
+    init();
     return this.subdiv;
   }
 
@@ -162,8 +119,51 @@ public class ConformingDelaunayTriangulationBuilder {
    * @return the faces of the triangulation
    */
   public Geometry getTriangles(final GeometryFactory geomFact) {
-    create();
+    init();
     return this.subdiv.getTriangles(geomFact);
+  }
+
+  private void init() {
+    if (this.subdiv != null) {
+      return;
+    }
+
+    final BoundingBoxDoubleGf siteEnv = DelaunayTriangulationBuilder.envelope(this.siteCoords);
+
+    List segments = new ArrayList();
+    if (this.constraintLines != null) {
+      siteEnv.expandToInclude(this.constraintLines.getBoundingBox());
+      initVertices(this.constraintLines);
+      segments = newConstraintSegments(this.constraintLines);
+    }
+    final List sites = newSiteVertices(this.siteCoords);
+
+    final ConformingDelaunayTriangulator cdt = new ConformingDelaunayTriangulator(sites,
+      this.tolerance);
+
+    cdt.setConstraints(segments, new ArrayList(this.constraintVertexMap.values()));
+
+    cdt.formInitialDelaunay();
+    cdt.enforceConstraints();
+    this.subdiv = cdt.getSubdivision();
+  }
+
+  private void initVertices(final Geometry geom) {
+    for (final Point coordinate : geom.vertices()) {
+      final Vertex v = new ConstraintVertex(coordinate);
+      this.constraintVertexMap.put(v.getCoordinate(), v);
+    }
+  }
+
+  private List<ConstraintVertex> newSiteVertices(final Collection<Point> coords) {
+    final List<ConstraintVertex> verts = new ArrayList<>();
+    for (final Point coord : coords) {
+      if (this.constraintVertexMap.containsKey(coord)) {
+        continue;
+      }
+      verts.add(new ConstraintVertex(coord));
+    }
+    return verts;
   }
 
   /**

@@ -101,7 +101,7 @@ public class PathRecordStoreTreeNode extends PathTreeNode
       final Map<String, Object> config = new HashMap<>();
       config.put("name", connectionName);
       config.put("connection", connection);
-      registry.createConnection(config);
+      registry.newConnection(config);
     }
   }
 

@@ -104,44 +104,6 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     return clone;
   }
 
-  protected synchronized Identifier createId(final List<Object> values) {
-    if (this.createMissingCodes) {
-      // TODO prevent duplicates from other threads/processes
-      final Record code = this.recordStore.newRecord(this.typePath);
-      final RecordDefinition recordDefinition = code.getRecordDefinition();
-      Identifier id = this.recordStore.newPrimaryIdentifier(this.typePath);
-      if (id == null) {
-        final FieldDefinition idField = recordDefinition.getIdField();
-        if (idField != null) {
-          if (Number.class.isAssignableFrom(idField.getType().getJavaClass())) {
-            id = Identifier.create(getNextId());
-          } else {
-            id = Identifier.create(UUID.randomUUID().toString());
-          }
-        }
-      }
-      code.setIdentifier(id);
-      for (int i = 0; i < this.valueFieldNames.size(); i++) {
-        final String name = this.valueFieldNames.get(i);
-        final Object value = values.get(i);
-        code.setValue(name, value);
-      }
-
-      final Timestamp now = new Timestamp(System.currentTimeMillis());
-      if (this.creationTimestampFieldName != null) {
-        code.setValue(this.creationTimestampFieldName, now);
-      }
-      if (this.modificationTimestampFieldName != null) {
-        code.setValue(this.modificationTimestampFieldName, now);
-      }
-
-      this.recordStore.insertRecord(code);
-      return code.getIdentifier();
-    } else {
-      return null;
-    }
-  }
-
   @Override
   public Map<Identifier, List<Object>> getCodes() {
     refreshIfNeeded();
@@ -224,7 +186,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
       final List list = (List)id;
       return getValue(new ListIdentifier(list));
     } else {
-      return getValue(Identifier.create(id));
+      return getValue(Identifier.newIdentifier(id));
     }
   }
 
@@ -328,7 +290,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
       }
     }
     if (createId && id == null) {
-      return createId(values);
+      return newIdentifier(values);
     } else {
       return id;
     }
@@ -355,6 +317,44 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
       }
     }
     return getValueById(id);
+  }
+
+  protected synchronized Identifier newIdentifier(final List<Object> values) {
+    if (this.createMissingCodes) {
+      // TODO prevent duplicates from other threads/processes
+      final Record code = this.recordStore.newRecord(this.typePath);
+      final RecordDefinition recordDefinition = code.getRecordDefinition();
+      Identifier id = this.recordStore.newPrimaryIdentifier(this.typePath);
+      if (id == null) {
+        final FieldDefinition idField = recordDefinition.getIdField();
+        if (idField != null) {
+          if (Number.class.isAssignableFrom(idField.getType().getJavaClass())) {
+            id = Identifier.newIdentifier(getNextId());
+          } else {
+            id = Identifier.newIdentifier(UUID.randomUUID().toString());
+          }
+        }
+      }
+      code.setIdentifier(id);
+      for (int i = 0; i < this.valueFieldNames.size(); i++) {
+        final String name = this.valueFieldNames.get(i);
+        final Object value = values.get(i);
+        code.setValue(name, value);
+      }
+
+      final Timestamp now = new Timestamp(System.currentTimeMillis());
+      if (this.creationTimestampFieldName != null) {
+        code.setValue(this.creationTimestampFieldName, now);
+      }
+      if (this.modificationTimestampFieldName != null) {
+        code.setValue(this.modificationTimestampFieldName, now);
+      }
+
+      this.recordStore.insertRecord(code);
+      return code.getIdentifier();
+    } else {
+      return null;
+    }
   }
 
   @Override

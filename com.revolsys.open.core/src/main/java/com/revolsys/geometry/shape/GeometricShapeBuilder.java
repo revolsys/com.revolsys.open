@@ -38,7 +38,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 
@@ -50,12 +49,7 @@ public abstract class GeometricShapeBuilder {
   protected int numPts = 0;
 
   public GeometricShapeBuilder(final GeometryFactory geomFactory) {
-    this.geometryFactory = geomFactory;
-  }
-
-  protected Point createCoord(final double x, final double y) {
-    return new PointDouble(this.geometryFactory.makePrecise(0, x),
-      this.geometryFactory.makePrecise(1, y));
+    this.geometryFactory = geomFactory.convertScales(1);
   }
 
   public Point getCentre() {
@@ -80,11 +74,10 @@ public abstract class GeometricShapeBuilder {
     final double radius = getRadius();
 
     final Point centre = getCentre();
-    final Point p0 = new PointDouble(centre.getX() - radius, centre.getY() - radius,
-      Point.NULL_ORDINATE);
-    final Point p1 = new PointDouble(centre.getX() + radius, centre.getY() - radius,
-      Point.NULL_ORDINATE);
-    return new LineSegmentDouble(p0, p1);
+    final double x1 = centre.getX() - radius;
+    final double y1 = centre.getY() - radius;
+    final double x2 = centre.getX() + radius;
+    return new LineSegmentDouble(2, x1, y1, x2, y1);
   }
 
   public BoundingBox getSquareExtent() {
@@ -93,6 +86,10 @@ public abstract class GeometricShapeBuilder {
     final Point centre = getCentre();
     return new BoundingBoxDoubleGf(2, centre.getX() - radius, centre.getY() - radius,
       centre.getX() + radius, centre.getY() + radius);
+  }
+
+  protected Point newPoint(final double x, final double y) {
+    return this.geometryFactory.point(x, y);
   }
 
   public void setExtent(final BoundingBox extent) {

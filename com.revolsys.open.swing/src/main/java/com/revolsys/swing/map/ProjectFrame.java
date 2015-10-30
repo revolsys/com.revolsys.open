@@ -246,7 +246,7 @@ public class ProjectFrame extends BaseFrame {
       }
     }
     if (component == null) {
-      component = panel.createPanelComponent(config);
+      component = panel.newPanelComponent(config);
 
       if (component != null) {
         final Component panelComponent = component;
@@ -292,7 +292,7 @@ public class ProjectFrame extends BaseFrame {
   }
 
   protected void addLogPanel() {
-    final TablePanel panel = Log4jTableModel.createPanel();
+    final TablePanel panel = Log4jTableModel.newPanel();
 
     final Log4jTableModel tableModel = panel.getTableModel();
 
@@ -343,7 +343,7 @@ public class ProjectFrame extends BaseFrame {
 
   protected void addTableOfContents() {
     final Project project = getProject();
-    this.tocTree = ProjectTreeNode.createTree(project);
+    this.tocTree = ProjectTreeNode.newTree(project);
 
     Property.addListener(this.project, "layers", this::expandLayers);
 
@@ -352,11 +352,11 @@ public class ProjectFrame extends BaseFrame {
   }
 
   protected void addTasksPanel() {
-    final JPanel panel = SwingWorkerTableModel.createPanel();
+    final JPanel panel = SwingWorkerTableModel.newPanel();
     final int tabIndex = addTabIcon(this.bottomTabs, "time", "Background Tasks", panel, false);
 
     final SwingWorkerProgressBar progressBar = this.mapPanel.getProgressBar();
-    final JButton viewTasksAction = RunnableAction.createButton(null, "View Running Tasks",
+    final JButton viewTasksAction = RunnableAction.newButton(null, "View Running Tasks",
       Icons.getIcon("time_go"), () -> this.bottomTabs.setSelectedIndex(tabIndex));
     viewTasksAction.setBorderPainted(false);
     viewTasksAction.setBorder(null);
@@ -375,68 +375,6 @@ public class ProjectFrame extends BaseFrame {
       recentProjects);
     OS.setPreference("com.revolsys.gis", "/com/revolsys/gis/project", "recentProject", filePath);
     updateRecentMenu();
-  }
-
-  @Override
-  protected JMenuBar createMenuBar() {
-    final JMenuBar menuBar = super.createMenuBar();
-    addMenu(menuBar, createMenuFile());
-
-    final MenuFactory tools = createMenuTools();
-
-    if (OS.isWindows()) {
-      tools.addMenuItem("options", "Options...", "Options...", null,
-        () -> PreferencesDialog.get().showPanel());
-    }
-    addMenu(menuBar, tools);
-    return menuBar;
-  }
-
-  protected MenuFactory createMenuFile() {
-    final MenuFactory file = new MenuFactory("File");
-
-    file.addMenuItemTitleIcon("projectOpen", "NEW Project", "layout_add", () -> actionNewProject())
-      .setAcceleratorControlKey(KeyEvent.VK_N);
-
-    file.addMenuItemTitleIcon("projectOpen", "Open Project...", "layout_add",
-      () -> actionOpenProject()).setAcceleratorControlKey(KeyEvent.VK_O);
-
-    file.addComponent("projectOpen", this.openRecentMenu);
-    updateRecentMenu();
-
-    file.addMenuItemTitleIcon("projectSave", "Save Project", "layout_save",
-      () -> this.project.saveAllSettings()).setAcceleratorControlKey(KeyEvent.VK_S);
-
-    file.addMenuItemTitleIcon("projectSave", "Save Project As...", "layout_save",
-      () -> actionSaveProjectAs()).setAcceleratorShiftControlKey(KeyEvent.VK_S);
-
-    file.addMenuItemTitleIcon("save", "Save as PDF", "save_pdf", () -> SaveAsPdf.save());
-
-    file.addMenuItemTitleIcon("print", "Print", "printer", () -> SinglePage.print())
-      .setAcceleratorControlKey(KeyEvent.VK_P);
-
-    if (OS.isWindows()) {
-      file.addMenuItemTitleIcon("exit", "Exit", null, () -> exit())
-        .setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
-    } else if (OS.isUnix()) {
-      file.addMenuItemTitleIcon("exit", "Exit", null, () -> exit())
-        .setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_MASK));
-    }
-
-    return file;
-  }
-
-  protected MenuFactory createMenuTools() {
-    final MenuFactory tools = new MenuFactory("Tools");
-    final MapPanel map = getMapPanel();
-    tools.addCheckboxMenuItem("map",
-      new RunnableAction("Measure", Icons.getIcon("ruler"),
-        () -> map.toggleMode(MeasureOverlay.MEASURE)),
-      new ObjectPropertyEnableCheck(map, "overlayAction", MeasureOverlay.MEASURE));
-
-    tools.addMenuItemTitleIcon("script", "Run Script...", "script_go", () -> actionRunScript());
-    ConvertFileTool.addMenuItem(tools);
-    return tools;
   }
 
   @Override
@@ -521,6 +459,18 @@ public class ProjectFrame extends BaseFrame {
     return 0.20;
   }
 
+  protected BoundingBox getDefaultBoundingBox() {
+    return BoundingBox.EMPTY;
+  }
+
+  public JTabbedPane getLeftTabs() {
+    return this.leftTabs;
+  }
+
+  public MapPanel getMapPanel() {
+    return this.mapPanel;
+  }
+
   // public void expandConnectionManagers(final PropertyChangeEvent event) {
   // final Object newValue = event.getNewValue();
   // if (newValue instanceof ConnectionRegistry) {
@@ -537,18 +487,6 @@ public class ProjectFrame extends BaseFrame {
   // }
   // }
   // }
-
-  protected BoundingBox getDefaultBoundingBox() {
-    return BoundingBox.EMPTY;
-  }
-
-  public JTabbedPane getLeftTabs() {
-    return this.leftTabs;
-  }
-
-  public MapPanel getMapPanel() {
-    return this.mapPanel;
-  }
 
   public Project getProject() {
     return this.project;
@@ -668,6 +606,68 @@ public class ProjectFrame extends BaseFrame {
     viewport.setInitialized(true);
   }
 
+  @Override
+  protected JMenuBar newMenuBar() {
+    final JMenuBar menuBar = super.newMenuBar();
+    addMenu(menuBar, newMenuFile());
+
+    final MenuFactory tools = newMenuTools();
+
+    if (OS.isWindows()) {
+      tools.addMenuItem("options", "Options...", "Options...", null,
+        () -> PreferencesDialog.get().showPanel());
+    }
+    addMenu(menuBar, tools);
+    return menuBar;
+  }
+
+  protected MenuFactory newMenuFile() {
+    final MenuFactory file = new MenuFactory("File");
+
+    file.addMenuItemTitleIcon("projectOpen", "NEW Project", "layout_add", () -> actionNewProject())
+      .setAcceleratorControlKey(KeyEvent.VK_N);
+
+    file.addMenuItemTitleIcon("projectOpen", "Open Project...", "layout_add",
+      () -> actionOpenProject()).setAcceleratorControlKey(KeyEvent.VK_O);
+
+    file.addComponent("projectOpen", this.openRecentMenu);
+    updateRecentMenu();
+
+    file.addMenuItemTitleIcon("projectSave", "Save Project", "layout_save",
+      () -> this.project.saveAllSettings()).setAcceleratorControlKey(KeyEvent.VK_S);
+
+    file.addMenuItemTitleIcon("projectSave", "Save Project As...", "layout_save",
+      () -> actionSaveProjectAs()).setAcceleratorShiftControlKey(KeyEvent.VK_S);
+
+    file.addMenuItemTitleIcon("save", "Save as PDF", "save_pdf", () -> SaveAsPdf.save());
+
+    file.addMenuItemTitleIcon("print", "Print", "printer", () -> SinglePage.print())
+      .setAcceleratorControlKey(KeyEvent.VK_P);
+
+    if (OS.isWindows()) {
+      file.addMenuItemTitleIcon("exit", "Exit", null, () -> exit())
+        .setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
+    } else if (OS.isUnix()) {
+      file.addMenuItemTitleIcon("exit", "Exit", null, () -> exit())
+        .setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_MASK));
+    }
+
+    return file;
+  }
+
+  protected MenuFactory newMenuTools() {
+    final MenuFactory tools = new MenuFactory("Tools");
+    final MapPanel map = getMapPanel();
+    tools.addCheckboxMenuItem("map",
+      new RunnableAction("Measure", Icons.getIcon("ruler"),
+        () -> map.toggleMode(MeasureOverlay.MEASURE)),
+      new ObjectPropertyEnableCheck(map, "overlayAction", MeasureOverlay.MEASURE));
+
+    tools.addMenuItemTitleIcon("script", "Run Script...", "script_go", () -> actionRunScript());
+    ConvertFileTool.addMenuItem(tools);
+    return tools;
+  }
+
   public void openProject(final Path projectPath) {
     if (Files.exists(projectPath)) {
       try {
@@ -770,8 +770,8 @@ public class ProjectFrame extends BaseFrame {
       final Path file = Paths.getPath(filePath);
       final String fileName = Paths.getFileName(file);
       final String path = file.getParent().toString();
-      this.openRecentMenu.add(RunnableAction.createMenuItem(fileName + " - " + path, "layout_add",
-        () -> openProject(file)));
+      this.openRecentMenu.add(
+        RunnableAction.newMenuItem(fileName + " - " + path, "layout_add", () -> openProject(file)));
     }
   }
 

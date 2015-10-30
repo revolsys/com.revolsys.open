@@ -72,28 +72,28 @@ public class PreparedPolygonIntersectsPerfTest {
   public PreparedPolygonIntersectsPerfTest() {
   }
 
-  Geometry createCircle(final Point origin, final double size, final int nPts) {
+  Geometry newCircle(final Point origin, final double size, final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(origin);
     gsf.setSize(size);
     gsf.setNumPoints(nPts);
-    final Geometry circle = gsf.createCircle();
+    final Geometry circle = gsf.newCircle();
     // Polygon gRect = gsf.createRectangle();
     // Geometry g = gRect.getExteriorRing();
     return circle;
   }
 
-  Geometry createLine(final Point base, final double size, final int nPts) {
+  Geometry newLine(final Point base, final double size, final int nPts) {
     final SineStarFactory gsf = new SineStarFactory();
     gsf.setCentre(base);
     gsf.setSize(size);
     gsf.setNumPoints(nPts);
-    final Geometry circle = gsf.createSineStar();
+    final Geometry circle = gsf.newSineStar();
     // System.out.println(circle);
     return circle.getBoundary();
   }
 
-  List createLines(final BoundingBox env, final int nItems, final double size, final int nPts) {
+  List newLines(final BoundingBox env, final int nItems, final double size, final int nPts) {
     final int nCells = (int)Math.sqrt(nItems);
 
     final List geoms = new ArrayList();
@@ -103,22 +103,22 @@ public class PreparedPolygonIntersectsPerfTest {
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
         final Point base = new PointDouble(env.getMinX() + i * xInc, env.getMinY() + j * yInc,
-          Point.NULL_ORDINATE);
-        final Geometry line = createLine(base, size, nPts);
+          Geometry.NULL_ORDINATE);
+        final Geometry line = newLine(base, size, nPts);
         geoms.add(line);
       }
     }
     return geoms;
   }
 
-  Geometry createSineStar(final Point origin, final double size, final int nPts) {
+  Geometry newSineStar(final Point origin, final double size, final int nPts) {
     final SineStarFactory gsf = new SineStarFactory();
     gsf.setCentre(origin);
     gsf.setSize(size);
     gsf.setNumPoints(nPts);
     gsf.setArmLengthRatio(0.1);
     gsf.setNumArms(50);
-    final Geometry poly = gsf.createSineStar();
+    final Geometry poly = gsf.newSineStar();
     return poly;
   }
 
@@ -150,14 +150,14 @@ public class PreparedPolygonIntersectsPerfTest {
   }
 
   public void test(final int nPts) {
-    // Geometry poly = createCircle(new PointDouble((double)0, 0), 100, nPts);
-    final Geometry sinePoly = createSineStar(new PointDouble((double)0, 0, Point.NULL_ORDINATE),
+    // Geometry poly = newCircle(new PointDouble((double)0, 0), 100, nPts);
+    final Geometry sinePoly = newSineStar(new PointDouble((double)0, 0, Geometry.NULL_ORDINATE),
       100, nPts);
     // System.out.println(poly);
     // Geometry target = sinePoly.getBoundary();
     final Geometry target = sinePoly;
 
-    final List lines = createLines(target.getBoundingBox(), NUM_LINES, 1.0, NUM_LINE_PTS);
+    final List lines = newLines(target.getBoundingBox(), NUM_LINES, 1.0, NUM_LINE_PTS);
 
     // System.out.println();
     // System.out.println("Running with " + nPts + " points");

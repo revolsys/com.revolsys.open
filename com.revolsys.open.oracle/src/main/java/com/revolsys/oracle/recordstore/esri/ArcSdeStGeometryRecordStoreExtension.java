@@ -1,4 +1,4 @@
-package com.revolsys.gis.oracle.esri;
+package com.revolsys.oracle.recordstore.esri;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,11 +9,11 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.gis.oracle.io.OracleRecordStore;
 import com.revolsys.io.Path;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
+import com.revolsys.oracle.recordstore.OracleRecordStore;
 import com.revolsys.record.io.RecordStoreExtension;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;

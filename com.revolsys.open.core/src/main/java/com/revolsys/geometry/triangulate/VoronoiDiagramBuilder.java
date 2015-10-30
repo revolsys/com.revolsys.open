@@ -96,7 +96,32 @@ public class VoronoiDiagramBuilder {
   public VoronoiDiagramBuilder() {
   }
 
-  private void create() {
+  /**
+   * Gets the faces of the computed diagram as a {@link GeometryCollection}
+   * of {@link Polygon}s, clipped as specified.
+   *
+   * @param geomFact the geometry factory to use to create the output
+   * @return the faces of the diagram
+   */
+  public Geometry getDiagram(final GeometryFactory geomFact) {
+    init();
+    final Geometry polys = this.subdiv.getVoronoiDiagram(geomFact);
+
+    // clip polys to diagramEnv
+    return clipGeometryCollection(polys, this.diagramEnv);
+  }
+
+  /**
+   * Gets the {@link QuadEdgeSubdivision} which models the computed diagram.
+   *
+   * @return the subdivision containing the triangulation
+   */
+  public QuadEdgeSubdivision getSubdivision() {
+    init();
+    return this.subdiv;
+  }
+
+  private void init() {
     if (this.subdiv != null) {
       return;
     }
@@ -115,31 +140,6 @@ public class VoronoiDiagramBuilder {
     final IncrementalDelaunayTriangulator triangulator = new IncrementalDelaunayTriangulator(
       this.subdiv);
     triangulator.insertSites(vertices);
-  }
-
-  /**
-   * Gets the faces of the computed diagram as a {@link GeometryCollection}
-   * of {@link Polygon}s, clipped as specified.
-   *
-   * @param geomFact the geometry factory to use to create the output
-   * @return the faces of the diagram
-   */
-  public Geometry getDiagram(final GeometryFactory geomFact) {
-    create();
-    final Geometry polys = this.subdiv.getVoronoiDiagram(geomFact);
-
-    // clip polys to diagramEnv
-    return clipGeometryCollection(polys, this.diagramEnv);
-  }
-
-  /**
-   * Gets the {@link QuadEdgeSubdivision} which models the computed diagram.
-   *
-   * @return the subdivision containing the triangulation
-   */
-  public QuadEdgeSubdivision getSubdivision() {
-    create();
-    return this.subdiv;
   }
 
   /**

@@ -149,44 +149,6 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
     super(nodeCapacity);
   }
 
-  @Override
-  protected AbstractNode createNode(final int level) {
-    return new STRtreeNode(level);
-  }
-
-  /**
-   * Creates the parent level for the given child level. First, orders the items
-   * by the x-values of the midpoints, and groups them into vertical slices.
-   * For each slice, orders the items by the y-values of the midpoints, and
-   * group them into runs of size M (the node capacity). For each run, creates
-   * a new (parent) node.
-   */
-  @Override
-  protected List createParentBoundables(final List childBoundables, final int newLevel) {
-    Assert.isTrue(!childBoundables.isEmpty());
-    final int minLeafCount = (int)Math.ceil(childBoundables.size() / (double)getNodeCapacity());
-    final ArrayList sortedChildBoundables = new ArrayList(childBoundables);
-    Collections.sort(sortedChildBoundables, xComparator);
-    final List[] verticalSlices = verticalSlices(sortedChildBoundables,
-      (int)Math.ceil(Math.sqrt(minLeafCount)));
-    return createParentBoundablesFromVerticalSlices(verticalSlices, newLevel);
-  }
-
-  protected List createParentBoundablesFromVerticalSlice(final List childBoundables,
-    final int newLevel) {
-    return super.createParentBoundables(childBoundables, newLevel);
-  }
-
-  private List createParentBoundablesFromVerticalSlices(final List[] verticalSlices,
-    final int newLevel) {
-    Assert.isTrue(verticalSlices.length > 0);
-    final List parentBoundables = new ArrayList();
-    for (final List verticalSlice : verticalSlices) {
-      parentBoundables.addAll(createParentBoundablesFromVerticalSlice(verticalSlice, newLevel));
-    }
-    return parentBoundables;
-  }
-
   /**
    * Returns the number of items in the tree.
    *
@@ -336,6 +298,44 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
   public Object[] nearestNeighbour(final STRtree tree, final ItemDistance itemDist) {
     final BoundablePair bp = new BoundablePair(this.getRoot(), tree.getRoot(), itemDist);
     return nearestNeighbour(bp);
+  }
+
+  @Override
+  protected AbstractNode newNode(final int level) {
+    return new STRtreeNode(level);
+  }
+
+  /**
+   * Creates the parent level for the given child level. First, orders the items
+   * by the x-values of the midpoints, and groups them into vertical slices.
+   * For each slice, orders the items by the y-values of the midpoints, and
+   * group them into runs of size M (the node capacity). For each run, creates
+   * a new (parent) node.
+   */
+  @Override
+  protected List newParentBoundables(final List childBoundables, final int newLevel) {
+    Assert.isTrue(!childBoundables.isEmpty());
+    final int minLeafCount = (int)Math.ceil(childBoundables.size() / (double)getNodeCapacity());
+    final ArrayList sortedChildBoundables = new ArrayList(childBoundables);
+    Collections.sort(sortedChildBoundables, xComparator);
+    final List[] verticalSlices = verticalSlices(sortedChildBoundables,
+      (int)Math.ceil(Math.sqrt(minLeafCount)));
+    return newParentBoundablesFromVerticalSlices(verticalSlices, newLevel);
+  }
+
+  protected List newParentBoundablesFromVerticalSlice(final List childBoundables,
+    final int newLevel) {
+    return super.newParentBoundables(childBoundables, newLevel);
+  }
+
+  private List newParentBoundablesFromVerticalSlices(final List[] verticalSlices,
+    final int newLevel) {
+    Assert.isTrue(verticalSlices.length > 0);
+    final List parentBoundables = new ArrayList();
+    for (final List verticalSlice : verticalSlices) {
+      parentBoundables.addAll(newParentBoundablesFromVerticalSlice(verticalSlice, newLevel));
+    }
+    return parentBoundables;
   }
 
   /**

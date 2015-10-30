@@ -396,6 +396,9 @@ public abstract class QueryValue implements Cloneable {
 
   public abstract <V> V getValue(Record record);
 
+  public void setFieldDefinition(final FieldDefinition fieldDefinition) {
+  }
+
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
     for (final QueryValue queryValue : getQueryValues()) {
       if (queryValue != null) {

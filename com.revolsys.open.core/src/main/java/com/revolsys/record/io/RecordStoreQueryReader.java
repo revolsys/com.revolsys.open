@@ -56,24 +56,6 @@ public class RecordStoreQueryReader extends IteratorReader<Record>implements Rec
     this.whereClause = null;
   }
 
-  protected AbstractIterator<Record> createQueryIterator(final int i) {
-    if (i < this.queries.size()) {
-      final Query query = this.queries.get(i);
-      if (Property.hasValue(this.whereClause)) {
-        query.and(new SqlCondition(this.whereClause));
-      }
-      if (this.boundingBox != null) {
-        final FieldDefinition geometryField = query.getRecordDefinition().getGeometryField();
-        query.and(F.envelopeIntersects(geometryField, this.boundingBox));
-      }
-
-      final AbstractIterator<Record> iterator = this.recordStore.newIterator(query,
-        getProperties());
-      return iterator;
-    }
-    throw new NoSuchElementException();
-  }
-
   public BoundingBox getBoundingBox() {
     return this.boundingBox;
   }
@@ -98,6 +80,24 @@ public class RecordStoreQueryReader extends IteratorReader<Record>implements Rec
   @Override
   public RecordStoreMultipleQueryIterator iterator() {
     return (RecordStoreMultipleQueryIterator)super.iterator();
+  }
+
+  protected AbstractIterator<Record> newQueryIterator(final int i) {
+    if (i < this.queries.size()) {
+      final Query query = this.queries.get(i);
+      if (Property.hasValue(this.whereClause)) {
+        query.and(new SqlCondition(this.whereClause));
+      }
+      if (this.boundingBox != null) {
+        final FieldDefinition geometryField = query.getRecordDefinition().getGeometryField();
+        query.and(F.envelopeIntersects(geometryField, this.boundingBox));
+      }
+
+      final AbstractIterator<Record> iterator = this.recordStore.newIterator(query,
+        getProperties());
+      return iterator;
+    }
+    throw new NoSuchElementException();
   }
 
   @Override

@@ -71,6 +71,7 @@ import com.revolsys.record.property.DirectionalFields;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
@@ -273,7 +274,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     setRenderer(new GeometryStyleRenderer(this));
     if (!properties.containsKey("style")) {
       final GeometryStyleRenderer renderer = getRenderer();
-      renderer.setStyle(GeometryStyle.createStyle());
+      renderer.setStyle(GeometryStyle.newStyle());
     }
     setProperties(properties);
     final Predicate<Record> predicate = AbstractRecordLayerRenderer.getFilter(this, properties);
@@ -596,105 +597,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     copyRecordsToClipboard(selectedRecords);
   }
 
-  protected RecordLayerForm createDefaultForm(final LayerRecord record) {
-    return new RecordLayerForm(this, record);
-  }
-
-  public RecordLayerForm createForm(final LayerRecord record) {
-    final String formFactoryExpression = getProperty(FORM_FACTORY_EXPRESSION);
-    if (Property.hasValue(formFactoryExpression)) {
-      try {
-        final SpelExpressionParser parser = new SpelExpressionParser();
-        final Expression expression = parser.parseExpression(formFactoryExpression);
-        final EvaluationContext context = new StandardEvaluationContext(this);
-        context.setVariable("object", record);
-        return expression.getValue(context, RecordLayerForm.class);
-      } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error("Unable to create form for " + this, e);
-        return null;
-      }
-    } else {
-      return createDefaultForm(record);
-    }
-  }
-
-  @Override
-  public TabbedValuePanel createPropertiesPanel() {
-    final TabbedValuePanel propertiesPanel = super.createPropertiesPanel();
-    createPropertiesPanelFields(propertiesPanel);
-    createPropertiesPanelFieldNamesSet(propertiesPanel);
-    createPropertiesPanelStyle(propertiesPanel);
-    createPropertiesPanelSnapping(propertiesPanel);
-    return propertiesPanel;
-  }
-
-  protected void createPropertiesPanelFieldNamesSet(final TabbedValuePanel propertiesPanel) {
-    final FieldNamesSetPanel panel = new FieldNamesSetPanel(this);
-    propertiesPanel.addTab("Field Sets", panel);
-  }
-
-  protected void createPropertiesPanelFields(final TabbedValuePanel propertiesPanel) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    final BaseJTable fieldTable = RecordDefinitionTableModel.createTable(recordDefinition);
-
-    final BasePanel fieldPanel = new BasePanel(new BorderLayout());
-    fieldPanel.setPreferredSize(new Dimension(500, 400));
-    final JScrollPane fieldScroll = new JScrollPane(fieldTable);
-    fieldPanel.add(fieldScroll, BorderLayout.CENTER);
-    propertiesPanel.addTab("Fields", fieldPanel);
-  }
-
-  protected void createPropertiesPanelSnapping(final TabbedValuePanel propertiesPanel) {
-    final SnapLayersPanel panel = new SnapLayersPanel(this);
-    propertiesPanel.addTab("Snapping", panel);
-  }
-
-  protected void createPropertiesPanelStyle(final TabbedValuePanel propertiesPanel) {
-    if (getRenderer() != null) {
-      final LayerStylePanel stylePanel = new LayerStylePanel(this);
-      propertiesPanel.addTab("Style", stylePanel);
-    }
-  }
-
-  @Override
-  protected BasePanel createPropertiesTabGeneral(final TabbedValuePanel tabPanel) {
-    final BasePanel generalPanel = super.createPropertiesTabGeneral(tabPanel);
-    createPropertiesTabGeneralPanelFilter(generalPanel);
-    return generalPanel;
-  }
-
-  protected ValueField createPropertiesTabGeneralPanelFilter(final BasePanel parent) {
-    final ValueField filterPanel = new ValueField(this);
-    Borders.titled(filterPanel, "Filter");
-
-    final QueryFilterField field = new QueryFilterField(this, "where", getWhere());
-    SwingUtil.addLabel(filterPanel, "Filter");
-    filterPanel.add(field);
-    Property.addListener(field, "where", getBeanPropertyListener());
-
-    GroupLayouts.makeColumns(filterPanel, 2, true);
-
-    parent.add(filterPanel);
-    return filterPanel;
-  }
-
   public UndoableEdit createPropertyEdit(final LayerRecord record, final String propertyName,
     final Object oldValue, final Object newValue) {
     return new SetObjectProperty(record, propertyName, oldValue, newValue);
-  }
-
-  public RecordLayerTablePanel createTablePanel(final Map<String, Object> config) {
-    final RecordLayerTable table = RecordLayerTableModel.createTable(this);
-    if (table == null) {
-      return null;
-    } else {
-      return new RecordLayerTablePanel(this, table, config);
-    }
-  }
-
-  @Override
-  protected Component createTableViewComponent(final Map<String, Object> config) {
-    return createTablePanel(config);
   }
 
   @Override
@@ -1430,7 +1335,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public String getWhere() {
-    if (this.whereCondition.isEmpty()) {
+    if (Property.isEmpty(this.whereCondition)) {
       return this.where;
     } else {
       return this.whereCondition.toFormattedString();
@@ -1443,7 +1348,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       if (recordDefinition == null) {
         return Condition.ALL;
       } else {
-        this.whereCondition = Condition.parseWhere(recordDefinition, this.where);
+        this.whereCondition = QueryValue.parseWhere(recordDefinition, this.where);
         this.where = null;
       }
     }
@@ -1775,6 +1680,28 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
+  protected RecordLayerForm newDefaultForm(final LayerRecord record) {
+    return new RecordLayerForm(this, record);
+  }
+
+  public RecordLayerForm newForm(final LayerRecord record) {
+    final String formFactoryExpression = getProperty(FORM_FACTORY_EXPRESSION);
+    if (Property.hasValue(formFactoryExpression)) {
+      try {
+        final SpelExpressionParser parser = new SpelExpressionParser();
+        final Expression expression = parser.parseExpression(formFactoryExpression);
+        final EvaluationContext context = new StandardEvaluationContext(this);
+        context.setVariable("object", record);
+        return expression.getValue(context, RecordLayerForm.class);
+      } catch (final Throwable e) {
+        LoggerFactory.getLogger(getClass()).error("Unable to create form for " + this, e);
+        return null;
+      }
+    } else {
+      return newDefaultForm(record);
+    }
+  }
+
   public LayerRecord newLayerRecord(final Map<String, Object> values) {
     if (!isReadOnly() && isEditable() && isCanAddRecords()) {
       final RecordFactory<LayerRecord> recordFactory = getRecordFactory();
@@ -1802,6 +1729,80 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     } else {
       throw new IllegalArgumentException("Cannot create records for " + recordDefinition);
     }
+  }
+
+  @Override
+  public TabbedValuePanel newPropertiesPanel() {
+    final TabbedValuePanel propertiesPanel = super.newPropertiesPanel();
+    newPropertiesPanelFields(propertiesPanel);
+    newPropertiesPanelFieldNamesSet(propertiesPanel);
+    newPropertiesPanelStyle(propertiesPanel);
+    newPropertiesPanelSnapping(propertiesPanel);
+    return propertiesPanel;
+  }
+
+  protected void newPropertiesPanelFieldNamesSet(final TabbedValuePanel propertiesPanel) {
+    final FieldNamesSetPanel panel = new FieldNamesSetPanel(this);
+    propertiesPanel.addTab("Field Sets", panel);
+  }
+
+  protected void newPropertiesPanelFields(final TabbedValuePanel propertiesPanel) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final BaseJTable fieldTable = RecordDefinitionTableModel.newTable(recordDefinition);
+
+    final BasePanel fieldPanel = new BasePanel(new BorderLayout());
+    fieldPanel.setPreferredSize(new Dimension(500, 400));
+    final JScrollPane fieldScroll = new JScrollPane(fieldTable);
+    fieldPanel.add(fieldScroll, BorderLayout.CENTER);
+    propertiesPanel.addTab("Fields", fieldPanel);
+  }
+
+  protected void newPropertiesPanelSnapping(final TabbedValuePanel propertiesPanel) {
+    final SnapLayersPanel panel = new SnapLayersPanel(this);
+    propertiesPanel.addTab("Snapping", panel);
+  }
+
+  protected void newPropertiesPanelStyle(final TabbedValuePanel propertiesPanel) {
+    if (getRenderer() != null) {
+      final LayerStylePanel stylePanel = new LayerStylePanel(this);
+      propertiesPanel.addTab("Style", stylePanel);
+    }
+  }
+
+  @Override
+  protected BasePanel newPropertiesTabGeneral(final TabbedValuePanel tabPanel) {
+    final BasePanel generalPanel = super.newPropertiesTabGeneral(tabPanel);
+    newPropertiesTabGeneralPanelFilter(generalPanel);
+    return generalPanel;
+  }
+
+  protected ValueField newPropertiesTabGeneralPanelFilter(final BasePanel parent) {
+    final ValueField filterPanel = new ValueField(this);
+    Borders.titled(filterPanel, "Filter");
+
+    final QueryFilterField field = new QueryFilterField(this, "where", getWhere());
+    SwingUtil.addLabel(filterPanel, "Filter");
+    filterPanel.add(field);
+    Property.addListener(field, "where", getBeanPropertyListener());
+
+    GroupLayouts.makeColumns(filterPanel, 2, true);
+
+    parent.add(filterPanel);
+    return filterPanel;
+  }
+
+  public RecordLayerTablePanel newTablePanel(final Map<String, Object> config) {
+    final RecordLayerTable table = RecordLayerTableModel.newTable(this);
+    if (table == null) {
+      return null;
+    } else {
+      return new RecordLayerTablePanel(this, table, config);
+    }
+  }
+
+  @Override
+  protected Component newTableViewComponent(final Map<String, Object> config) {
+    return newTablePanel(config);
   }
 
   public void pasteRecordGeometry(final LayerRecord record) {
@@ -2507,7 +2508,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final RecordDefinition recordDefinition = getRecordDefinition();
     this.where = where;
     if (recordDefinition != null) {
-      this.whereCondition = Condition.parseWhere(recordDefinition, where);
+      this.whereCondition = QueryValue.parseWhere(recordDefinition, where);
       firePropertyChange("filterChanged", false, true);
     }
   }
@@ -2521,7 +2522,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public LayerRecord showAddForm(final Map<String, Object> values) {
     if (isCanAddRecords()) {
       final LayerRecord newRecord = newLayerRecord(values);
-      final RecordLayerForm form = createForm(newRecord);
+      final RecordLayerForm form = newForm(newRecord);
       if (form == null) {
         return null;
       } else {
@@ -2561,7 +2562,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           window = this.formWindows.get(index);
         }
         if (window == null) {
-          final Component form = createForm(record);
+          final Component form = newForm(record);
           final Identifier id = record.getIdentifier();
           if (form == null) {
             return null;

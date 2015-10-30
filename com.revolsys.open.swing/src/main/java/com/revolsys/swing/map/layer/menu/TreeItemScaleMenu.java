@@ -77,6 +77,26 @@ public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
   }
 
   @Override
+  public Icon getIcon() {
+    return null;
+  }
+
+  @Override
+  public String getIconName() {
+    return null;
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
+  }
+
+  @Override
+  public String getToolTip() {
+    return null;
+  }
+
+  @Override
   public JMenu newComponent() {
     final JMenu menu = new JMenu(this.name);
     final T object = MenuFactory.getMenuSource();
@@ -105,25 +125,5 @@ public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
       menu.setEnabled(false);
     }
     return menu;
-  }
-
-  @Override
-  public Icon getIcon() {
-    return null;
-  }
-
-  @Override
-  public String getIconName() {
-    return null;
-  }
-
-  @Override
-  public String getName() {
-    return this.name;
-  }
-
-  @Override
-  public String getToolTip() {
-    return null;
   }
 }

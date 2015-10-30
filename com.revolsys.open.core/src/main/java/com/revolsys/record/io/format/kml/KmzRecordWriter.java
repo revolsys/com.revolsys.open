@@ -24,7 +24,7 @@ public class KmzRecordWriter extends AbstractRecordWriter {
       this.zipOut = new ZipOutputStream(bufferedOutputStream);
       final ZipEntry entry = new ZipEntry("doc.kml");
       this.zipOut.putNextEntry(entry);
-      final OutputStreamWriter writer = FileUtil.createUtf8Writer(this.zipOut);
+      final OutputStreamWriter writer = FileUtil.newUtf8Writer(this.zipOut);
       this.kmlWriter = new KmlRecordWriter(writer);
     } catch (final Throwable e) {
       throw new RuntimeException("Unable to create KMZ file", e);

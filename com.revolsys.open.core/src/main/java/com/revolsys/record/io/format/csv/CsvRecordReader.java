@@ -108,7 +108,7 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
         this.geometryType = geometryType;
       }
 
-      this.in = new BufferedReader(FileUtil.createUtf8Reader(this.resource.getInputStream()));
+      this.in = new BufferedReader(FileUtil.newUtf8Reader(this.resource.getInputStream()));
       final String[] line = readNextRecord();
       newRecordDefinition(line);
     } catch (final IOException e) {

@@ -200,7 +200,7 @@ public class SegmentNodeList implements Iterable<SegmentNode> {
     SegmentNode eiPrev = it.next();
     while (it.hasNext()) {
       final SegmentNode ei = it.next();
-      final SegmentString newEdge = createSplitEdge(eiPrev, ei);
+      final SegmentString newEdge = newSplitEdge(eiPrev, ei);
       /*
        * if (newEdge.size() < 2) throw new RuntimeException(
        * "created single point edge: " + newEdge.toString());
@@ -209,43 +209,6 @@ public class SegmentNodeList implements Iterable<SegmentNode> {
       eiPrev = ei;
     }
     // checkSplitEdgesCorrectness(testingSplitEdges);
-  }
-
-  /**
-   * Construct a new new "split edge" with the section of points between
-   * (and including) the two intersections.
-   * The label for the new edge is the same as the label for the parent edge.
-   */
-  SegmentString createSplitEdge(final SegmentNode ei0, final SegmentNode ei1) {
-    // Debug.println("\ncreateSplitEdge"); Debug.print(ei0); Debug.print(ei1);
-    int npts = ei1.getSegmentIndex() - ei0.getSegmentIndex() + 2;
-
-    final Point lastSegStartPt = this.edge.getPoint(ei1.getSegmentIndex());
-    // if the last intersection point is not equal to the its segment start pt,
-    // add it to the points list as well.
-    // (This check is needed because the distance metric is not totally
-    // reliable!)
-    // The check for point equality is 2D only - Z values are ignored
-    final boolean useIntPt1 = ei1.isInterior() || !ei1.equals(2, lastSegStartPt);
-    if (!useIntPt1) {
-      npts--;
-    }
-
-    final int axisCount = this.edge.getPoints().getAxisCount();
-    final double[] coordinates = new double[npts * axisCount];
-
-    int ipt = 0;
-    CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, ei0);
-    for (int i = ei0.getSegmentIndex() + 1; i <= ei1.getSegmentIndex(); i++) {
-      final Point point = this.edge.getPoint(i);
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, point);
-    }
-    if (useIntPt1) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, ei1);
-    }
-
-    final LineStringDouble points = new LineStringDouble(axisCount, coordinates);
-    return new NodedSegmentString(points, this.edge.getData());
   }
 
   private boolean findCollapseIndex(final SegmentNode ei0, final SegmentNode ei1,
@@ -318,6 +281,43 @@ public class SegmentNodeList implements Iterable<SegmentNode> {
   @Override
   public Iterator<SegmentNode> iterator() {
     return this.nodeMap.values().iterator();
+  }
+
+  /**
+   * Construct a new new "split edge" with the section of points between
+   * (and including) the two intersections.
+   * The label for the new edge is the same as the label for the parent edge.
+   */
+  SegmentString newSplitEdge(final SegmentNode ei0, final SegmentNode ei1) {
+    // Debug.println("\ncreateSplitEdge"); Debug.print(ei0); Debug.print(ei1);
+    int npts = ei1.getSegmentIndex() - ei0.getSegmentIndex() + 2;
+
+    final Point lastSegStartPt = this.edge.getPoint(ei1.getSegmentIndex());
+    // if the last intersection point is not equal to the its segment start pt,
+    // add it to the points list as well.
+    // (This check is needed because the distance metric is not totally
+    // reliable!)
+    // The check for point equality is 2D only - Z values are ignored
+    final boolean useIntPt1 = ei1.isInterior() || !ei1.equals(2, lastSegStartPt);
+    if (!useIntPt1) {
+      npts--;
+    }
+
+    final int axisCount = this.edge.getPoints().getAxisCount();
+    final double[] coordinates = new double[npts * axisCount];
+
+    int ipt = 0;
+    CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, ei0);
+    for (int i = ei0.getSegmentIndex() + 1; i <= ei1.getSegmentIndex(); i++) {
+      final Point point = this.edge.getPoint(i);
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, point);
+    }
+    if (useIntPt1) {
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, ei1);
+    }
+
+    final LineStringDouble points = new LineStringDouble(axisCount, coordinates);
+    return new NodedSegmentString(points, this.edge.getData());
   }
 
   public void print(final PrintStream out) {

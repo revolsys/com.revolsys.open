@@ -56,7 +56,7 @@ import junit.framework.TestSuite;
  */
 public class GeometryImplTest extends TestCase {
   private interface CollectionFactory {
-    Geometry createCollection(Geometry... geometries);
+    Geometry newCollection(Geometry... geometries);
   }
 
   public static void main(final String[] args) throws Exception {
@@ -122,7 +122,7 @@ public class GeometryImplTest extends TestCase {
     final Geometry somethingEqualButNotExactly = this.geometryFactory
       .geometryCollection(Arrays.asList(x));
 
-    doTestEqualsExact(x, somethingExactlyEqual, collectionFactory.createCollection(x),
+    doTestEqualsExact(x, somethingExactlyEqual, collectionFactory.newCollection(x),
       somethingNotEqualButSameClass);
 
     doTestEqualsExact(sameClassButEmpty, anotherSameClassButEmpty, emptyDifferentClass, x);
@@ -132,9 +132,9 @@ public class GeometryImplTest extends TestCase {
      */
     doTestEqualsExact(x, somethingExactlyEqual, sameClassButEmpty, sameClassButEmpty);
 
-    doTestEqualsExact(collectionFactory.createCollection(x, x),
-      collectionFactory.createCollection(x, somethingExactlyEqual), somethingEqualButNotExactly,
-      collectionFactory.createCollection(x, somethingNotEqualButSameClass));
+    doTestEqualsExact(collectionFactory.newCollection(x, x),
+      collectionFactory.newCollection(x, somethingExactlyEqual), somethingEqualButNotExactly,
+      collectionFactory.newCollection(x, somethingNotEqualButSameClass));
   }
 
   private void doTestFromCommcast2003AtYahooDotCa(final WKTReader reader) throws ParseException {
@@ -197,7 +197,7 @@ public class GeometryImplTest extends TestCase {
     final GeometryCollection anotherSameClassButEmpty = this.geometryFactory.geometryCollection();
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
-      public Geometry createCollection(final Geometry... geometries) {
+      public Geometry newCollection(final Geometry... geometries) {
         return GeometryImplTest.this.geometryFactory.geometryCollection(geometries);
       }
     };
@@ -226,7 +226,7 @@ public class GeometryImplTest extends TestCase {
     final LinearRing anotherSameClassButEmpty = this.geometryFactory.linearRing((LineString)null);
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
-      public Geometry createCollection(final Geometry... geometries) {
+      public Geometry newCollection(final Geometry... geometries) {
         return GeometryImplTest.this.geometryFactory.multiLineString(geometries);
       }
     };
@@ -254,7 +254,7 @@ public class GeometryImplTest extends TestCase {
     final LineString anotherSameClassButEmpty = this.geometryFactory.lineString();
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
-      public Geometry createCollection(final Geometry... geometries) {
+      public Geometry newCollection(final Geometry... geometries) {
         return GeometryImplTest.this.geometryFactory.multiLineString(geometries);
       }
     };
@@ -264,7 +264,7 @@ public class GeometryImplTest extends TestCase {
 
     final CollectionFactory collectionFactory2 = new CollectionFactory() {
       @Override
-      public Geometry createCollection(final Geometry... geometries) {
+      public Geometry newCollection(final Geometry... geometries) {
         return GeometryImplTest.this.geometryFactory.multiLineString(geometries);
       }
     };
@@ -281,7 +281,7 @@ public class GeometryImplTest extends TestCase {
     final Point anotherSameClassButEmpty = this.geometryFactory.point((Point)null);
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
-      public Geometry createCollection(final Geometry... geometries) {
+      public Geometry newCollection(final Geometry... geometries) {
         return GeometryImplTest.this.geometryFactory.multiPoint(geometries);
       }
     };
@@ -300,7 +300,7 @@ public class GeometryImplTest extends TestCase {
     final Polygon anotherSameClassButEmpty = (Polygon)this.reader.read("POLYGON EMPTY");
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
-      public Geometry createCollection(final Geometry... geometries) {
+      public Geometry newCollection(final Geometry... geometries) {
         return GeometryImplTest.this.geometryFactory.multiPolygon((Object[])geometries);
       }
     };

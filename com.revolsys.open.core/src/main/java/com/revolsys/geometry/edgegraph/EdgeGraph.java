@@ -14,7 +14,7 @@ import com.revolsys.geometry.model.Point;
  * <p>
  * This class may be subclassed to use a
  * different subclass of HalfEdge,
- * by overriding {@link #createEdge(Point)}.
+ * by overriding {@link #newHalfEdge(Point)}.
  * If additional logic is required to initialize
  * edges then {@link EdgeGraph#addEdge(Coordinates, Point)}
  * can be overridden as well.
@@ -61,24 +61,6 @@ public class EdgeGraph {
     return e;
   }
 
-  private HalfEdge create(final Point p0, final Point p1) {
-    final HalfEdge e0 = createEdge(p0);
-    final HalfEdge e1 = createEdge(p1);
-    HalfEdge.init(e0, e1);
-    return e0;
-  }
-
-  /**
-   * Creates a single HalfEdge.
-   * Override to use a different HalfEdge subclass.
-   *
-   * @param orig the origin location
-   * @return a new HalfEdge with the given origin
-   */
-  protected HalfEdge createEdge(final Point orig) {
-    return new HalfEdge(orig);
-  }
-
   /**
    * Finds an edge in this graph with the given origin
    * and destination, if one exists.
@@ -109,7 +91,7 @@ public class EdgeGraph {
    */
   private HalfEdge insert(final Point orig, final Point dest, final HalfEdge eAdj) {
     // edge does not exist, so create it and insert in graph
-    final HalfEdge e = create(orig, dest);
+    final HalfEdge e = newHalfEdge(orig, dest);
     if (eAdj != null) {
       eAdj.insert(e);
     } else {
@@ -124,5 +106,23 @@ public class EdgeGraph {
       this.vertexMap.put(dest, e.sym());
     }
     return e;
+  }
+
+  /**
+   * Creates a single HalfEdge.
+   * Override to use a different HalfEdge subclass.
+   *
+   * @param orig the origin location
+   * @return a new HalfEdge with the given origin
+   */
+  protected HalfEdge newHalfEdge(final Point orig) {
+    return new HalfEdge(orig);
+  }
+
+  private HalfEdge newHalfEdge(final Point p0, final Point p1) {
+    final HalfEdge e0 = newHalfEdge(p0);
+    final HalfEdge e1 = newHalfEdge(p1);
+    HalfEdge.init(e0, e1);
+    return e0;
   }
 }

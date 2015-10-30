@@ -19,7 +19,7 @@ import com.revolsys.util.Property;
 
 public class OsmDocument implements OsmConstants {
 
-  public static OsmDocument create(final String serverUrl, BoundingBox boundingBox) {
+  public static OsmDocument newDocument(final String serverUrl, BoundingBox boundingBox) {
     if (boundingBox != null) {
       boundingBox = boundingBox.convert(OsmConstants.WGS84_2D);
       if (!boundingBox.isEmpty()) {

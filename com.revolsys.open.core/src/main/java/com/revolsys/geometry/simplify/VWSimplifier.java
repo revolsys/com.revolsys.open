@@ -89,7 +89,7 @@ public class VWSimplifier {
      *          an area geometry possibly containing self-intersections
      * @return a valid area geometry
      */
-    private Geometry createValidArea(final Geometry rawAreaGeom) {
+    private Geometry newValidArea(final Geometry rawAreaGeom) {
       if (this.isEnsureValidTopology) {
         return rawAreaGeom.buffer(0.0);
       }
@@ -130,7 +130,7 @@ public class VWSimplifier {
     @Override
     protected Geometry transformMultiPolygon(final MultiPolygon geom, final Geometry parent) {
       final Geometry rawGeom = super.transformMultiPolygon(geom, parent);
-      return createValidArea(rawGeom);
+      return newValidArea(rawGeom);
     }
 
     @Override
@@ -152,7 +152,7 @@ public class VWSimplifier {
       if (parent instanceof MultiPolygon) {
         return rawGeom;
       }
-      return createValidArea(rawGeom);
+      return newValidArea(rawGeom);
     }
   }
 

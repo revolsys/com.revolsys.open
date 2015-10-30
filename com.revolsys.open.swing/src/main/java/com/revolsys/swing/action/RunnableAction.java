@@ -19,36 +19,34 @@ public class RunnableAction extends AbstractActionMainMenuItemFactory {
 
   private static final long serialVersionUID = -5339626097125548212L;
 
-  public static JButton createButton(final CharSequence name, final String toolTip, final Icon icon,
+  public static JButton newButton(final CharSequence name, final String toolTip, final Icon icon,
     final Runnable runnable) {
     final RunnableAction action = new RunnableAction(name, toolTip, icon, true, runnable);
-    return action.createButton();
+    return action.newButton();
   }
 
-  public static JButton createButton(final String name, final Runnable runnable) {
+  public static JButton newButton(final String name, final Runnable runnable) {
     final RunnableAction action = new RunnableAction(name, runnable);
-    return action.createButton();
+    return action.newButton();
   }
 
-  public static JCheckBoxMenuItem createCheckBoxMenuItem(final String name,
-    final Runnable runnable) {
+  public static JCheckBoxMenuItem newCheckBoxMenuItem(final String name, final Runnable runnable) {
     final RunnableAction action = new RunnableAction(name, runnable);
     action.setCheckBox(true);
     return (JCheckBoxMenuItem)action.newComponent();
   }
 
-  public static JMenuItem createMenuItem(final String name, final Icon icon,
-    final Runnable runnable) {
+  public static JMenuItem newMenuItem(final String name, final Icon icon, final Runnable runnable) {
     final RunnableAction action = new RunnableAction(name, icon, runnable);
     return action.newComponent();
   }
 
-  public static JMenuItem createMenuItem(final String name, final Runnable runnable) {
+  public static JMenuItem newMenuItem(final String name, final Runnable runnable) {
     final RunnableAction action = new RunnableAction(name, runnable);
     return action.newComponent();
   }
 
-  public static JMenuItem createMenuItem(final String name, final String iconName,
+  public static JMenuItem newMenuItem(final String name, final String iconName,
     final Runnable runnable) {
     final Icon icon = Icons.getIcon(iconName);
     final RunnableAction action = new RunnableAction(name, icon, runnable);

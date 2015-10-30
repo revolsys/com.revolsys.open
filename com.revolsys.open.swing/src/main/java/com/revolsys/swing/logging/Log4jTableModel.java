@@ -28,12 +28,12 @@ public class Log4jTableModel extends AbstractTableModel {
 
   private static final long serialVersionUID = 1L;
 
-  public static TablePanel createPanel() {
-    final BaseJTable table = createTable();
+  public static TablePanel newPanel() {
+    final BaseJTable table = newTable();
     return new TablePanel(table);
   }
 
-  public static BaseJTable createTable() {
+  public static BaseJTable newTable() {
     final Log4jTableModel model = new Log4jTableModel();
     final BaseJTable table = new BaseJTable(model);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);

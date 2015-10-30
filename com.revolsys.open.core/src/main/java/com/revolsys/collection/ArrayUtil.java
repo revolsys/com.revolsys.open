@@ -6,11 +6,11 @@ import java.util.List;
 
 public class ArrayUtil {
   @SuppressWarnings("unchecked")
-  public static <T> T[] create(final Class<T> clazz, final int size) {
+  public static <T> T[] newArray(final Class<T> clazz, final int size) {
     return (T[])Array.newInstance(clazz, size);
   }
 
-  public static <T> T[] create(final Collection<T> list) {
+  public static <T> T[] newArray(final Collection<T> list) {
     if (list == null) {
       return null;
     } else {
@@ -20,11 +20,11 @@ public class ArrayUtil {
     }
   }
 
-  public static <T> T[] create(final T... o) {
+  public static <T> T[] newArray(final T... o) {
     return o;
   }
 
-  public static int[] createDoubleArray(final List<Integer> list) {
+  public static int[] newDoubleArray(final List<Integer> list) {
     if (list == null) {
       return null;
     } else {
@@ -36,7 +36,7 @@ public class ArrayUtil {
     }
   }
 
-  public static int[] createIntArray(final List<Integer> list) {
+  public static int[] newIntArray(final List<Integer> list) {
     if (list == null) {
       return null;
     } else {

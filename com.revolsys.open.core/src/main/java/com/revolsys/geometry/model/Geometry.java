@@ -269,13 +269,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     return 0;
   }
 
-  static int[] createVertexId(final int[] partId, final int vertexIndex) {
-    final int[] vertexId = new int[partId.length + 1];
-    System.arraycopy(partId, 0, vertexId, 0, partId.length);
-    vertexId[partId.length] = vertexIndex;
-    return vertexId;
-  }
-
   static GeometryFactory getNonZeroGeometryFactory(final Geometry geometry,
     GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
@@ -350,6 +343,13 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
       }
     }
     return false;
+  }
+
+  static int[] newVertexId(final int[] partId, final int vertexIndex) {
+    final int[] vertexId = new int[partId.length + 1];
+    System.arraycopy(partId, 0, vertexId, 0, partId.length);
+    vertexId[partId.length] = vertexIndex;
+    return vertexId;
   }
 
   static int[] setVertexIndex(final int[] vertexId, final int vertexIndex) {
@@ -855,7 +855,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   default Geometry difference(final Geometry other) {
     // special case: if A.isEmpty ==> empty; if B.isEmpty ==> A
     if (this.isEmpty()) {
-      return OverlayOp.createEmptyResult(OverlayOp.DIFFERENCE, this, other, getGeometryFactory());
+      return OverlayOp.newEmptyResult(OverlayOp.DIFFERENCE, this, other, getGeometryFactory());
     }
     if (other.isEmpty()) {
       return clone();
@@ -1488,8 +1488,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
      */
     // special case: if one input is empty ==> empty
     if (this.isEmpty() || geometry.isEmpty()) {
-      return OverlayOp.createEmptyResult(OverlayOp.INTERSECTION, this, geometry,
-        getGeometryFactory());
+      return OverlayOp.newEmptyResult(OverlayOp.INTERSECTION, this, geometry, getGeometryFactory());
     }
 
     // compute for GCs
@@ -1845,8 +1844,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     if (this.isEmpty() || other.isEmpty()) {
       // both empty - check dimensions
       if (this.isEmpty() && other.isEmpty()) {
-        return OverlayOp.createEmptyResult(OverlayOp.SYMDIFFERENCE, this, other,
-          getGeometryFactory());
+        return OverlayOp.newEmptyResult(OverlayOp.SYMDIFFERENCE, this, other, getGeometryFactory());
       }
 
       // special case: if either input is empty ==> result = other arg
@@ -1987,7 +1985,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
       return this;
     } else if (isEmpty()) {
       if (other.isEmpty()) {
-        return OverlayOp.createEmptyResult(OverlayOp.UNION, this, other, getGeometryFactory());
+        return OverlayOp.newEmptyResult(OverlayOp.UNION, this, other, getGeometryFactory());
       } else {
         return other;
       }

@@ -17,7 +17,7 @@ import com.revolsys.swing.layout.SpringLayoutUtil;
 public class DashField extends ValueField implements ItemListener {
   private static final long serialVersionUID = -1435164163638312884L;
 
-  private static List<Double> createDash(final Double... dashArray) {
+  private static List<Double> newDash(final Double... dashArray) {
     return Arrays.asList(dashArray);
   }
 
@@ -31,11 +31,11 @@ public class DashField extends ValueField implements ItemListener {
     for (final double i : new double[] {
       2, 5, 10, 15
     }) {
-      dashes.add(createDash(i));
+      dashes.add(newDash(i));
     }
 
-    dashes.add(createDash(8.0, 3.0, 3.0, 3.0));
-    dashes.add(createDash(8.0, 3.0, 3.0, 3.0, 3.0, 3.0));
+    dashes.add(newDash(8.0, 3.0, 3.0, 3.0));
+    dashes.add(newDash(8.0, 3.0, 3.0, 3.0, 3.0, 3.0));
 
     this.dashField = new JComboBox<List<Double>>(dashes);
     this.dashField.setEditable(false);

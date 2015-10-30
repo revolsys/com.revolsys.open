@@ -6,11 +6,11 @@ import com.revolsys.io.endian.LittleEndianRandomAccessFile;
 
 public class FgdbUtil {
 
-  public void createFileGdb(final File directory) {
+  public void newFileGdb(final File directory) {
 
   }
 
-  public LittleEndianRandomAccessFile createGdbTable(final File file) {
+  public LittleEndianRandomAccessFile newGdbTable(final File file) {
     final LittleEndianRandomAccessFile out = new LittleEndianRandomAccessFile(file, "rw");
     // Magic
     out.write(0x03);

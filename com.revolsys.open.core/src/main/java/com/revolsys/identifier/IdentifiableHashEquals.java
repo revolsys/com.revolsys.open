@@ -21,7 +21,7 @@ public class IdentifiableHashEquals implements HashEquals {
       final Identifier identifier = idenifiable.getIdentifier();
       return identifier;
     } else {
-      return Identifier.create(value);
+      return Identifier.newIdentifier(value);
     }
   }
 

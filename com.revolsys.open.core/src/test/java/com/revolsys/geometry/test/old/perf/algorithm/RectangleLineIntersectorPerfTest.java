@@ -73,23 +73,23 @@ public class RectangleLineIntersectorPerfTest {
 
   }
 
-  private BoundingBox createRectangle() {
+  public void init(final int nPts) {
+    this.rectEnv = newRectangle();
+    this.pts = newTestPoints(nPts);
+  }
+
+  private BoundingBox newRectangle() {
     final BoundingBox rectEnv = new BoundingBoxDoubleGf(
-      new PointDouble(this.baseX, this.baseY, Point.NULL_ORDINATE),
-      new PointDouble(this.baseX + this.rectSize, this.baseY + this.rectSize, Point.NULL_ORDINATE));
+      new PointDouble(this.baseX, this.baseY, Geometry.NULL_ORDINATE), new PointDouble(
+        this.baseX + this.rectSize, this.baseY + this.rectSize, Geometry.NULL_ORDINATE));
     return rectEnv;
   }
 
-  private Point[] createTestPoints(final int nPts) {
+  private Point[] newTestPoints(final int nPts) {
     final Point pt = this.geomFact
-      .point(new PointDouble(this.baseX, this.baseY, Point.NULL_ORDINATE));
+      .point(new PointDouble(this.baseX, this.baseY, Geometry.NULL_ORDINATE));
     final Geometry circle = pt.buffer(2 * this.rectSize, nPts / 4);
     return CoordinatesListUtil.getCoordinateArray(circle);
-  }
-
-  public void init(final int nPts) {
-    this.rectEnv = createRectangle();
-    this.pts = createTestPoints(nPts);
   }
 
   public void run(final boolean useSegInt, final boolean useSideInt) {
@@ -168,10 +168,10 @@ class SimpleRectangleIntersector {
   }
 
   private void initCorners(final BoundingBox rectEnv) {
-    this.corner[0] = new PointDouble(rectEnv.getMaxX(), rectEnv.getMaxY(), Point.NULL_ORDINATE);
-    this.corner[1] = new PointDouble(rectEnv.getMinX(), rectEnv.getMaxY(), Point.NULL_ORDINATE);
-    this.corner[2] = new PointDouble(rectEnv.getMinX(), rectEnv.getMinY(), Point.NULL_ORDINATE);
-    this.corner[3] = new PointDouble(rectEnv.getMaxX(), rectEnv.getMinY(), Point.NULL_ORDINATE);
+    this.corner[0] = new PointDouble(rectEnv.getMaxX(), rectEnv.getMaxY(), Geometry.NULL_ORDINATE);
+    this.corner[1] = new PointDouble(rectEnv.getMinX(), rectEnv.getMaxY(), Geometry.NULL_ORDINATE);
+    this.corner[2] = new PointDouble(rectEnv.getMinX(), rectEnv.getMinY(), Geometry.NULL_ORDINATE);
+    this.corner[3] = new PointDouble(rectEnv.getMaxX(), rectEnv.getMinY(), Geometry.NULL_ORDINATE);
   }
 
   public boolean intersects(final Point p0, final Point p1) {

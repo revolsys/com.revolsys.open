@@ -59,7 +59,7 @@ public class Element implements Cloneable {
   }
 
   public void serialize(final OutputStream outputStream) {
-    serialize(FileUtil.createUtf8Writer(outputStream));
+    serialize(FileUtil.newUtf8Writer(outputStream));
   }
 
   public final void serialize(final Writer out) {

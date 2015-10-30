@@ -7,16 +7,16 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Writer;
 
 public interface MapWriter extends Writer<Map<String, ? extends Object>> {
-  static MapWriter create(final Object source) {
+  static boolean isWritable(final Object source) {
+    return IoFactoryRegistry.isAvailable(MapWriterFactory.class, source);
+  }
+
+  static MapWriter newMapWriter(final Object source) {
     final MapWriterFactory factory = IoFactory.factory(MapWriterFactory.class, source);
     if (factory == null) {
       return null;
     } else {
       return factory.newMapWriter(source);
     }
-  }
-
-  static boolean isWritable(final Object source) {
-    return IoFactoryRegistry.isAvailable(MapWriterFactory.class, source);
   }
 }

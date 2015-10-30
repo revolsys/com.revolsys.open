@@ -2,7 +2,6 @@ package com.revolsys.swing.table.record.model;
 
 import java.util.Map;
 
-import javax.swing.JComponent;
 import javax.swing.table.JTableHeader;
 
 import com.revolsys.record.Record;
@@ -11,9 +10,9 @@ import com.revolsys.swing.table.BaseJTable;
 public class SingleRecordTableModel extends AbstractSingleRecordTableModel {
   private static final long serialVersionUID = 1L;
 
-  public static JComponent create(final Record object, final boolean editable) {
+  public static BaseJTable newTable(final Record object, final boolean editable) {
     final SingleRecordTableModel model = new SingleRecordTableModel(object, editable);
-    final BaseJTable table = createTable(model);
+    final BaseJTable table = newTable(model);
     final JTableHeader tableHeader = table.getTableHeader();
     tableHeader.setReorderingAllowed(false);
     return table;

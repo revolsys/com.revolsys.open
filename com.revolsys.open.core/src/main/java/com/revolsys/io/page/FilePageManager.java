@@ -26,7 +26,7 @@ public class FilePageManager implements PageManager {
   private RandomAccessFile randomAccessFile;
 
   public FilePageManager() {
-    this(FileUtil.createTempFile("pages", ".pf"));
+    this(FileUtil.newTempFile("pages", ".pf"));
   }
 
   public FilePageManager(final File file) {
@@ -35,35 +35,6 @@ public class FilePageManager implements PageManager {
     } catch (final FileNotFoundException e) {
       throw new IllegalArgumentException("Unable to open file " + file.getAbsolutePath(), e);
     }
-  }
-
-  @Override
-  public synchronized Page createPage() {
-    synchronized (this.pages) {
-      Page page;
-      if (this.freePageIndexes.isEmpty()) {
-        try {
-          final int index = (int)(this.randomAccessFile.length() / this.pageSize);
-          page = new ByteArrayPage(this, index, this.pageSize);
-          this.pages.put(page.getIndex(), page);
-          write(page);
-        } catch (final IOException e) {
-          throw new RuntimeException(e);
-        }
-      } else {
-        final Iterator<Integer> iterator = this.freePageIndexes.iterator();
-        final Integer pageIndex = iterator.next();
-        iterator.remove();
-        page = loadPage(pageIndex);
-      }
-      this.pagesInUse.add(page);
-      return page;
-    }
-  }
-
-  @Override
-  public Page createTempPage() {
-    return new ByteArrayPage(this, -1, this.pageSize);
   }
 
   @Override
@@ -108,6 +79,35 @@ public class FilePageManager implements PageManager {
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public synchronized Page newPage() {
+    synchronized (this.pages) {
+      Page page;
+      if (this.freePageIndexes.isEmpty()) {
+        try {
+          final int index = (int)(this.randomAccessFile.length() / this.pageSize);
+          page = new ByteArrayPage(this, index, this.pageSize);
+          this.pages.put(page.getIndex(), page);
+          write(page);
+        } catch (final IOException e) {
+          throw new RuntimeException(e);
+        }
+      } else {
+        final Iterator<Integer> iterator = this.freePageIndexes.iterator();
+        final Integer pageIndex = iterator.next();
+        iterator.remove();
+        page = loadPage(pageIndex);
+      }
+      this.pagesInUse.add(page);
+      return page;
+    }
+  }
+
+  @Override
+  public Page newTempPage() {
+    return new ByteArrayPage(this, -1, this.pageSize);
   }
 
   @Override

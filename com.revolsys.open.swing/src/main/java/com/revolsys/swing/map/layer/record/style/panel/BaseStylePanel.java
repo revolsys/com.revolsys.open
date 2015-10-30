@@ -139,7 +139,7 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
     } else {
       final Object value = Property.get(object, fieldName);
       SwingUtil.addLabel(container, fieldName);
-      final Field field = createField(fieldName, fieldClass, value);
+      final Field field = newField(fieldName, fieldClass, value);
 
       if (this.readOnlyFieldNames.contains(fieldName)) {
         field.setEditable(false);
@@ -230,9 +230,22 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
     container.add(field);
   }
 
+  protected void doPropertyChange(final PropertyChangeEvent event) {
+  }
+
   @SuppressWarnings("unchecked")
-  protected Field createField(final String fieldName, final Class<?> fieldClass,
-    final Object value) {
+  public <L extends Layer> L getLayer() {
+    final LayerRenderer<Layer> renderer = getRenderer();
+    return (L)renderer.getLayer();
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends LayerRenderer<Layer>> T getRenderer() {
+    return (T)getFieldValue();
+  }
+
+  @SuppressWarnings("unchecked")
+  protected Field newField(final String fieldName, final Class<?> fieldClass, final Object value) {
     Field field;
     if (fieldName.equals("visible")) {
       this.visibleField = new CheckBox(fieldName, value);
@@ -240,13 +253,13 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
     } else if (fieldName.equals("textFaceName")) {
       field = new FontChooserField(fieldName, (String)value);
     } else if (fieldName.endsWith("HorizontalAlignment")) {
-      field = createHorizontalAlignmentField(fieldName, (String)value);
+      field = newHorizontalAlignmentField(fieldName, (String)value);
     } else if (fieldName.endsWith("VerticalAlignment")) {
-      field = createVerticalAlignmentField(fieldName, (String)value);
+      field = newVerticalAlignmentField(fieldName, (String)value);
     } else if (fieldName.equals("lineCap")) {
-      field = createLineCapField((LineCap)value);
+      field = newLineCapField((LineCap)value);
     } else if (fieldName.equals("lineJoin")) {
-      field = createLineJoinField((LineJoin)value);
+      field = newLineJoinField((LineJoin)value);
     } else if (fieldName.equals("lineDashArray")) {
       field = new DashField(fieldName, (List<Measure<Length>>)value);
     } else if (fieldName.equals("queryFilter")) {
@@ -270,7 +283,7 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
       placementField.setFieldValue(value);
       field = placementField;
     } else if (fieldName.endsWith("Scale")) {
-      field = createScaleField(fieldName, (Long)value);
+      field = newScaleField(fieldName, (Long)value);
     } else if (Color.class.equals(fieldClass)) {
       field = new ColorChooserField(fieldName, (Color)value);
     } else if (Boolean.TYPE.equals(fieldClass) || Boolean.class.equals(fieldClass)) {
@@ -283,7 +296,7 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
     return field;
   }
 
-  protected TogglePanel createHorizontalAlignmentField(final String fieldName, String aligment) {
+  protected TogglePanel newHorizontalAlignmentField(final String fieldName, String aligment) {
     if (!"left".equalsIgnoreCase(aligment) && !"right".equalsIgnoreCase(aligment)) {
       aligment = "center";
     }
@@ -291,17 +304,17 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
       HORIZONTAL_ALIGNMENT_ACTIONS);
   }
 
-  protected TogglePanel createLineCapField(final LineCap lineCap) {
+  protected TogglePanel newLineCapField(final LineCap lineCap) {
     return new TogglePanel("lineCap", lineCap.toString(), new Dimension(28, 28), LINE_CAP_ACTIONS);
 
   }
 
-  protected TogglePanel createLineJoinField(final LineJoin lineJoin) {
+  protected TogglePanel newLineJoinField(final LineJoin lineJoin) {
     return new TogglePanel("lineJoin", lineJoin.toString(), new Dimension(28, 28),
       LINE_JOIN_ACTIONS);
   }
 
-  private Field createScaleField(final String fieldName, final Long value) {
+  private Field newScaleField(final String fieldName, final Long value) {
     final Vector<Long> scales = new Vector<Long>();
     scales.add(Long.MAX_VALUE);
     scales.addAll(MapPanel.SCALES);
@@ -316,25 +329,11 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
     return field;
   }
 
-  protected TogglePanel createVerticalAlignmentField(final String fieldName, String aligment) {
+  protected TogglePanel newVerticalAlignmentField(final String fieldName, String aligment) {
     if (!"top".equalsIgnoreCase(aligment) && !"middle".equalsIgnoreCase(aligment)) {
       aligment = "bottom";
     }
     return new TogglePanel(fieldName, aligment, new Dimension(28, 28), VERTICAL_ALIGNMENT_ACTIONS);
-  }
-
-  protected void doPropertyChange(final PropertyChangeEvent event) {
-  }
-
-  @SuppressWarnings("unchecked")
-  public <L extends Layer> L getLayer() {
-    final LayerRenderer<Layer> renderer = getRenderer();
-    return (L)renderer.getLayer();
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T extends LayerRenderer<Layer>> T getRenderer() {
-    return (T)getFieldValue();
   }
 
   @Override

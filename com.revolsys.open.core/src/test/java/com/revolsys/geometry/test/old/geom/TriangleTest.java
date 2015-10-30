@@ -68,7 +68,7 @@ public class TriangleTest extends TestCase {
 
   public void checkAcute(final String wkt, final boolean expectedValue) throws Exception {
     final Polygon g = (Polygon)this.reader.read(wkt);
-    final TriangleImpl t = createTriangle(g);
+    final TriangleImpl t = newTriangle(g);
     final boolean isAcute = t.isAcute();
     // System.out.println("isAcute = " + isAcute);
     assertEquals(expectedValue, isAcute);
@@ -77,7 +77,7 @@ public class TriangleTest extends TestCase {
   public void checkArea(final String wkt, final double expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
 
-    final TriangleImpl t = createTriangle(g);
+    final TriangleImpl t = newTriangle(g);
     final double signedArea = t.signedArea();
     // System.out.println("signed area = " + signedArea);
     assertEquals(expectedValue, signedArea, TOLERANCE);
@@ -89,7 +89,7 @@ public class TriangleTest extends TestCase {
 
   public void checkArea3D(final String wkt, final double expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final TriangleImpl t = createTriangle(g);
+    final TriangleImpl t = newTriangle(g);
     final double area3D = t.area3D();
     // System.out.println("area3D = " + area3D);
     assertEquals(expectedValue, area3D, TOLERANCE);
@@ -98,7 +98,7 @@ public class TriangleTest extends TestCase {
   public void checkCentroid(final String wkt, final Point expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
 
-    final TriangleImpl t = createTriangle(g);
+    final TriangleImpl t = newTriangle(g);
     Point centroid = Triangles.centroid(t.p0, t.p1, t.p2);
     // System.out.println("(Static) centroid = " + centroid);
     assertEquals(expectedValue.toString(), centroid.toString());
@@ -113,7 +113,7 @@ public class TriangleTest extends TestCase {
   public void checkCircumCentre(final String wkt, final Point expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
 
-    final TriangleImpl t = createTriangle(g);
+    final TriangleImpl t = newTriangle(g);
     Point circumcentre = Triangles.circumcentre(t.p0, t.p1, t.p2);
     // System.out.println("(Static) circumcentre = " + circumcentre);
     assertEquals(expectedValue.toString(), circumcentre.toString());
@@ -130,7 +130,7 @@ public class TriangleTest extends TestCase {
     throws Exception {
     final Geometry g = this.reader.read(wkt);
 
-    final TriangleImpl t = createTriangle(g);
+    final TriangleImpl t = newTriangle(g);
     final double z = t.interpolateZ(p);
     // System.out.println("Z = " + z);
     assertEquals(expectedValue, z, 0.000001);
@@ -140,7 +140,7 @@ public class TriangleTest extends TestCase {
     throws Exception {
     final Geometry g = this.reader.read(wkt);
 
-    final TriangleImpl t = createTriangle(g);
+    final TriangleImpl t = newTriangle(g);
     double length = Triangles.longestSideLength(t.p0, t.p1, t.p2);
     // System.out.println("(Static) longestSideLength = " + length);
     assertEquals(expectedValue, length, 0.00000001);
@@ -152,27 +152,27 @@ public class TriangleTest extends TestCase {
     assertEquals(expectedValue, length, 0.00000001);
   }
 
-  public TriangleImpl createTriangle(final Geometry g) {
+  public TriangleImpl newTriangle(final Geometry g) {
     if (g instanceof Polygon) {
       final Polygon polygon = (Polygon)g;
-      return createTriangle(polygon);
+      return newTriangle(polygon);
     } else if (g instanceof LineString) {
       final LineString line = (LineString)g;
-      return createTriangle(line);
+      return newTriangle(line);
     } else {
       return null;
     }
   }
 
-  public TriangleImpl createTriangle(final LineString line) {
-    final TriangleImpl t = new TriangleImpl(line.getVertex(0).newPointDouble(), line.getVertex(1).newPointDouble(),
-      line.getVertex(2).newPointDouble());
+  public TriangleImpl newTriangle(final LineString line) {
+    final TriangleImpl t = new TriangleImpl(line.getVertex(0).newPointDouble(),
+      line.getVertex(1).newPointDouble(), line.getVertex(2).newPointDouble());
     return t;
   }
 
-  public TriangleImpl createTriangle(final Polygon g) {
+  public TriangleImpl newTriangle(final Polygon g) {
     final LineString line = g.getShell();
-    final TriangleImpl t = createTriangle(line);
+    final TriangleImpl t = newTriangle(line);
     return t;
   }
 
@@ -203,35 +203,35 @@ public class TriangleTest extends TestCase {
 
   public void testCentroid() throws Exception {
     // right triangle
-    checkCentroid("POLYGON((10 10, 20 20, 20 10, 10 10))",
-      new PointDouble((10.0 + 20.0 + 20.0) / 3.0, (10.0 + 20.0 + 10.0) / 3.0, Point.NULL_ORDINATE));
+    checkCentroid("POLYGON((10 10, 20 20, 20 10, 10 10))", new PointDouble(
+      (10.0 + 20.0 + 20.0) / 3.0, (10.0 + 20.0 + 10.0) / 3.0, Geometry.NULL_ORDINATE));
     // CCW right tri
-    checkCentroid("POLYGON((10 10, 20 10, 20 20, 10 10))",
-      new PointDouble((10.0 + 20.0 + 20.0) / 3.0, (10.0 + 10.0 + 20.0) / 3.0, Point.NULL_ORDINATE));
+    checkCentroid("POLYGON((10 10, 20 10, 20 20, 10 10))", new PointDouble(
+      (10.0 + 20.0 + 20.0) / 3.0, (10.0 + 10.0 + 20.0) / 3.0, Geometry.NULL_ORDINATE));
     // acute
-    checkCentroid("POLYGON((10 10, 20 10, 15 20, 10 10))",
-      new PointDouble((10.0 + 20.0 + 15.0) / 3.0, (10.0 + 10.0 + 20.0) / 3.0, Point.NULL_ORDINATE));
+    checkCentroid("POLYGON((10 10, 20 10, 15 20, 10 10))", new PointDouble(
+      (10.0 + 20.0 + 15.0) / 3.0, (10.0 + 10.0 + 20.0) / 3.0, Geometry.NULL_ORDINATE));
   }
 
   public void testCircumCentre() throws Exception {
     // right triangle
     checkCircumCentre("POLYGON((10 10, 20 20, 20 10, 10 10))",
-      new PointDouble(15.0, 15.0, Point.NULL_ORDINATE));
+      new PointDouble(15.0, 15.0, Geometry.NULL_ORDINATE));
     // CCW right tri
     checkCircumCentre("POLYGON((10 10, 20 10, 20 20, 10 10))",
-      new PointDouble(15.0, 15.0, Point.NULL_ORDINATE));
+      new PointDouble(15.0, 15.0, Geometry.NULL_ORDINATE));
     // acute
     checkCircumCentre("POLYGON((10 10, 20 10, 15 20, 10 10))",
-      new PointDouble(15.0, 13.75, Point.NULL_ORDINATE));
+      new PointDouble(15.0, 13.75, Geometry.NULL_ORDINATE));
   }
 
   public void testInterpolateZ() throws Exception {
     checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)",
-      new PointDouble(1.5, 1.5, Point.NULL_ORDINATE), 5);
+      new PointDouble(1.5, 1.5, Geometry.NULL_ORDINATE), 5);
     checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)",
-      new PointDouble(1.2, 1.2, Point.NULL_ORDINATE), 2);
+      new PointDouble(1.2, 1.2, Geometry.NULL_ORDINATE), 2);
     checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)",
-      new PointDouble(0.0, 0, Point.NULL_ORDINATE), -10);
+      new PointDouble(0.0, 0, Geometry.NULL_ORDINATE), -10);
   }
 
   public void testLongestSideLength() throws Exception {

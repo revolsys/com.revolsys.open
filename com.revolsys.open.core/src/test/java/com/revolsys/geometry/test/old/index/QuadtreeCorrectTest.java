@@ -72,7 +72,22 @@ public class QuadtreeCorrectTest {
   public QuadtreeCorrectTest() {
   }
 
-  void createGrid(final int nGridCells) {
+  void fill() {
+    newGrid(NUM_ITEMS);
+  }
+
+  private List getOverlapping(final List items, final BoundingBoxDoubleGf searchEnv) {
+    final List result = new ArrayList();
+    for (int i = 0; i < items.size(); i++) {
+      final BoundingBoxDoubleGf env = (BoundingBoxDoubleGf)items.get(i);
+      if (env.intersects(searchEnv)) {
+        result.add(env);
+      }
+    }
+    return result;
+  }
+
+  void newGrid(final int nGridCells) {
     int gridSize = (int)Math.sqrt(nGridCells);
     gridSize += 1;
     final double extent = MAX_EXTENT - MIN_EXTENT;
@@ -89,21 +104,6 @@ public class QuadtreeCorrectTest {
         this.envList.add(env);
       }
     }
-  }
-
-  void fill() {
-    createGrid(NUM_ITEMS);
-  }
-
-  private List getOverlapping(final List items, final BoundingBoxDoubleGf searchEnv) {
-    final List result = new ArrayList();
-    for (int i = 0; i < items.size(); i++) {
-      final BoundingBoxDoubleGf env = (BoundingBoxDoubleGf)items.get(i);
-      if (env.intersects(searchEnv)) {
-        result.add(env);
-      }
-    }
-    return result;
   }
 
   void queryGrid(final int nGridCells, final double cellSize) {

@@ -41,7 +41,7 @@ public class NodeFactory {
   /**
    * The basic node constructor does not allow for incident edges
    */
-  public Node createNode(final Point coord) {
+  public Node newNode(final Point coord) {
     return new Node(coord, null);
   }
 }

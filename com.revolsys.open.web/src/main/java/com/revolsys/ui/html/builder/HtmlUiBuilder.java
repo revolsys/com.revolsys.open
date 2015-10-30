@@ -292,7 +292,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         throw new PageNotFoundException("Page not found " + pageName);
       } else {
         final List<KeySerializer> serializers = getSerializers(pageName, "view");
-        final Element detailView = createDetailView(object, serializers);
+        final Element detailView = newDetailView(object, serializers);
 
         setPageTitle(request, pageName);
 
@@ -318,7 +318,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       parameters.put("scrollYPercent", 1);
 
       final HttpServletRequest request = getRequest();
-      final ElementContainer element = builder.createDataTable(request, pageName, parameters);
+      final ElementContainer element = builder.newDataTable(request, pageName, parameters);
       if (element != null) {
         final String tabId = builder.getTypeName() + "_" + pageName;
         final String title = builder.getPageTitle(pageName);
@@ -329,452 +329,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   protected Record convertRecord(final Record record) {
     return record;
-  }
-
-  public ElementContainer createDataTable(final HttpServletRequest request, final String pageName,
-    final Map<String, ? extends Object> parameters) {
-    final String pageUrl = getPageUrl(pageName);
-    if (Property.hasValue(pageUrl)) {
-      final Map<String, Object> params = new HashMap<>();
-      params.putAll(parameters);
-      params.put("ajaxSource", pageUrl.replaceAll("/+$", ".json"));
-      final List<T> rows = Collections.emptyList();
-      final ElementContainer table = createDataTable(request, pageName, params, rows);
-
-      return table;
-    } else {
-      return null;
-    }
-  }
-
-  public ElementContainer createDataTable(final HttpServletRequest request, final String pageName,
-    Map<String, ? extends Object> parameters, final Collection<? extends Object> rows) {
-    parameters = new HashMap<>(parameters);
-    final List<KeySerializer> serializers = getSerializers(pageName, "list");
-    final RowsTableSerializer model = new KeySerializerTableSerializer(serializers, rows);
-    final String typeName = getTypeName();
-    final TableView tableView = new TableView(model, typeName);
-    tableView.setWidth("100%");
-    final String tableId = typeName + "_" + pageName + "_table";
-    tableView.setId(tableId);
-    tableView.setNoRecordsMessgae(null);
-
-    final Map<String, Object> tableParams = new LinkedHashMap<>();
-    tableParams.put("stateSave", true);
-    tableParams.put("autoWidth", true);
-    tableParams.put("dom", Maps.getString(parameters, "dom", "frtiS"));
-    final Boolean ordering = Maps.getBoolean(parameters, "ordering");
-    if (ordering != null) {
-      tableParams.put("ordering", ordering);
-    }
-    final String scrollY = (String)parameters.get("scrollY");
-    if (scrollY == null) {
-      tableParams.put("scrollY", "300px");
-    } else {
-      tableParams.put("scrollY", scrollY);
-    }
-    final String scrollX = (String)parameters.get("scrollX");
-    if (scrollX == null) {
-      tableParams.put("scrollX", "true");
-    } else {
-      tableParams.put("scrollX", scrollX);
-    }
-    tableParams.put("order", getListSortOrder(pageName));
-
-    Boolean serverSide = (Boolean)parameters.get("serverSide");
-    final String ajaxSource = (String)parameters.get("ajaxSource");
-    if (Property.hasValue(ajaxSource)) {
-      if (serverSide == null) {
-        serverSide = true;
-      }
-
-      tableParams.put("serverSide", serverSide);
-      tableParams.put("ajax", ajaxSource);
-    } else if (serverSide == null) {
-      serverSide = false;
-    }
-
-    tableParams.put("scroller", Collections.singletonMap("loadingIndicator", true));
-    final List<Map<String, Object>> columnDefs = new ArrayList<Map<String, Object>>();
-    int i = 0;
-    for (final KeySerializer serializer : serializers) {
-      final Map<String, Object> columnDef = new LinkedHashMap<>();
-      columnDef.put("targets", Arrays.asList(i));
-      columnDef.put("name", serializer.getKey());
-      columnDef.put("className", serializer.getKey().replaceAll("[^A-Za-z0-9]", "_"));
-      columnDef.put("title", serializer.getLabel());
-
-      final Boolean sortable = serializer.getProperty("sortable");
-      if (sortable != null) {
-        columnDef.put("orderable", sortable);
-      }
-
-      final Boolean searchable = serializer.getProperty("searchable");
-      if (searchable != null) {
-        columnDef.put("searchable", searchable);
-      }
-
-      final Boolean visible = serializer.getProperty("visible");
-      if (visible != null) {
-        columnDef.put("visible", visible);
-      }
-      final String width = serializer.getWidth();
-      if (width != null) {
-        columnDef.put("width", width);
-      }
-
-      columnDefs.add(columnDef);
-      i++;
-    }
-    if (!columnDefs.isEmpty()) {
-      tableParams.put("columnDefs", columnDefs);
-    }
-    Number scrollYPercent = (Number)parameters.get("scrollYPercent");
-    if (scrollYPercent == null) {
-      if (scrollY == null) {
-        scrollYPercent = 0;
-      } else {
-        scrollYPercent = 0.98;
-      }
-    }
-    final Script script = new Script();
-    String jsonMap = Json.toString(tableParams);
-    jsonMap = jsonMap.substring(0, jsonMap.length() - 1)
-      + ",\"createdRow\": function( row, data, dataIndex ) {refreshButtons(row);}"
-      + ",\"initComplete\": function() {$(this).DataTable().columns.adjust();}";
-    jsonMap += "}";
-    final StringBuffer scriptBody = new StringBuffer();
-    scriptBody.append("$(document).ready(function() {\n");
-    scriptBody.append("  var tableDiv = $('#");
-    scriptBody.append(tableId);
-    scriptBody.append(" table');\n");
-    scriptBody.append("  var table = tableDiv.dataTable(");
-    scriptBody.append(jsonMap);
-    scriptBody.append("\n );\n");
-    scriptBody.append("  tableShowEvents(table,");
-    scriptBody.append(scrollYPercent);
-    scriptBody.append(");\n");
-    scriptBody
-      .append("$(window).bind('resize', function () {$(table).DataTable().columns.adjust();} );");
-    scriptBody.append("});");
-    script.setContent(scriptBody.toString());
-    final ElementContainer container = new ElementContainer(tableView, script);
-
-    final String prefix = pageName.replaceAll("[lL]ist$", "");
-    final Menu actionMenu = new Menu();
-    addMenuItem(actionMenu, prefix, "add", "Add", "_top");
-    addListMenuItems(actionMenu, prefix);
-    addMenuElement(container, actionMenu);
-
-    return container;
-  }
-
-  public Object createDataTableHandler(final HttpServletRequest request, final String pageName,
-    final Callable<Collection<? extends Object>> rowsCallable) {
-    final Map<String, Object> parameters = new HashMap<>();
-    return createDataTableHandler(request, pageName, parameters, rowsCallable);
-  }
-
-  public Object createDataTableHandler(final HttpServletRequest request, final String pageName,
-    final Collection<? extends Object> rows) {
-    final Map<String, Object> parameters = new HashMap<>();
-    return createDataTableHandler(request, pageName, parameters, rows);
-  }
-
-  public Object createDataTableHandler(final HttpServletRequest request, final String pageName,
-    final Map<String, Object> parameters,
-    final Callable<Collection<? extends Object>> rowsCallable) {
-    parameters.put("serverSide", false);
-    if (isDataTableCallback(request)) {
-      try {
-        final Collection<? extends Object> rows = rowsCallable.call();
-        return createDataTableMap(request, rows, pageName);
-      } catch (final Exception e) {
-        throw new RuntimeException("Unable to get rows", e);
-      }
-    } else {
-      final TabElementContainer tabs = new TabElementContainer();
-      addTabDataTable(tabs, this, pageName, parameters);
-      return tabs;
-    }
-  }
-
-  public Object createDataTableHandler(final HttpServletRequest request, final String pageName,
-    final Map<String, Object> parameters, final Collection<? extends Object> rows) {
-    if (isDataTableCallback(request)) {
-      return createDataTableMap(request, rows, pageName);
-    } else {
-      parameters.put("serverSide", false);
-      final TabElementContainer tabs = new TabElementContainer();
-      addTabDataTable(tabs, this, pageName, parameters);
-      return tabs;
-    }
-  }
-
-  public Object createDataTableHandler(final String pageName,
-    final Collection<? extends Object> rows) {
-    final HttpServletRequest request = HttpServletUtils.getRequest();
-    return createDataTableHandler(request, pageName, rows);
-  }
-
-  public Object createDataTableHandlerOrRedirect(final HttpServletRequest request,
-    final HttpServletResponse response, final String pageName,
-    final Callable<Collection<? extends Object>> rowsCallable, final Object parentBuilder,
-    final String parentPageName) {
-    if (isDataTableCallback(request)) {
-      try {
-        final Collection<? extends Object> rows = rowsCallable.call();
-        return createDataTableMap(request, rows, pageName);
-      } catch (final Exception e) {
-        throw new RuntimeException("Unable to get rows", e);
-      }
-    } else {
-      return redirectToTab(parentBuilder, parentPageName, pageName);
-    }
-  }
-
-  public Object createDataTableHandlerOrRedirect(final HttpServletRequest request,
-    final HttpServletResponse response, final String pageName,
-    final Collection<? extends Object> rows, final Object parentBuilder,
-    final String parentPageName) {
-    if (isDataTableCallback(request)) {
-      try {
-        return createDataTableMap(request, rows, pageName);
-      } catch (final Exception e) {
-        throw new RuntimeException("Unable to get rows", e);
-      }
-    } else {
-      return redirectToTab(parentBuilder, parentPageName, pageName);
-    }
-  }
-
-  public Map<String, Object> createDataTableMap(final Collection<? extends Object> records,
-    final String pageName) {
-    final HttpServletRequest request = HttpServletUtils.getRequest();
-    return createDataTableMap(request, records, pageName);
-  }
-
-  public Map<String, Object> createDataTableMap(final HttpServletRequest request,
-    final Collection<? extends Object> records, final String pageName) {
-    final List<KeySerializer> serializers = getSerializers(pageName, "list");
-
-    final List<List<String>> rows = new ArrayList<List<String>>();
-    for (final Object object : records) {
-      final List<String> row = new ArrayList<String>();
-      for (final KeySerializer serializer : serializers) {
-        final String html = serializer.toString(object);
-        row.add(html);
-      }
-      rows.add(row);
-    }
-
-    final Map<String, Object> response = new LinkedHashMap<>();
-    response.put("data", rows);
-    return response;
-
-  }
-
-  public Map<String, Object> createDataTableMap(final HttpServletRequest request,
-    final RecordStore recordStore, Query query, final String pageName) {
-    final int numRecords = recordStore.getRecordCount(query);
-    int recordCount = 50;
-    final String lengthString = request.getParameter("length");
-    if (Property.hasValue(lengthString)) {
-      if (!"NAN".equalsIgnoreCase(lengthString)) {
-        try {
-          recordCount = Integer.valueOf(lengthString);
-        } catch (final Throwable e) {
-        }
-      }
-    }
-
-    final int offset = HttpServletUtils.getIntegerParameter(request, "start");
-    query = query.clone();
-    query.setOffset(offset);
-    query.setLimit(recordCount);
-
-    final List<KeySerializer> serializers = getSerializers(pageName, "list");
-
-    final List<List<String>> rows = new ArrayList<>();
-    try (
-      Reader<Record> reader = recordStore.getRecords(query)) {
-      for (Record record : reader) {
-        record = convertRecord(record);
-        final List<String> row = new ArrayList<String>();
-        for (final KeySerializer serializer : serializers) {
-          final String html = serializer.toString(record);
-          row.add(html);
-        }
-        rows.add(row);
-      }
-    }
-    final Map<String, Object> response = new LinkedHashMap<>();
-    response.put("draw", HttpServletUtils.getIntegerParameter(request, "draw"));
-    response.put("recordsTotal", numRecords);
-    response.put("recordsFiltered", numRecords);
-    response.put("data", rows);
-    return response;
-  }
-
-  public ElementContainer createDetailView(final Object object,
-    final List<KeySerializer> serializers) {
-    final KeySerializerDetailSerializer model = new KeySerializerDetailSerializer(serializers);
-    model.setObject(object);
-    final DetailView detailView = new DetailView(model, "objectView " + this.typeName);
-    return new ElementContainer(detailView);
-  }
-
-  /**
-   * Construct a new form for the object using the specified list of fields keys. The
-   * form is created without the form title.
-   *
-   * @param <T> The type of form to return.
-   * @param object The object to create the form for.
-   * @param keyListName The name of the list of keys for the fields to include
-   * on the form.
-   * @return The generated form.
-   */
-  @SuppressWarnings("unchecked")
-  public <F extends Form> F createForm(final Object object, final String keyListName) {
-    final HtmlUiBuilderObjectForm form = createForm(object, getTypeName(), getKeyList(keyListName));
-    return (F)form;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <F extends Form> F createForm(final Object object, final String formName,
-    final List<String> keys) {
-    final HtmlUiBuilderObjectForm form = new HtmlUiBuilderObjectForm(object, this, formName, keys);
-    return (F)form;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <F extends Form> F createForm(final Object object, final String formName,
-    final String keyList) {
-    final List<String> keys = getKeyList(keyList);
-
-    return (F)createForm(object, formName, keys);
-  }
-
-  protected T createObject() {
-    return null;
-  }
-
-  public Element createObjectAddPage(final Map<String, Object> defaultValues, final String prefix,
-    final String preInsertMethod) throws IOException, ServletException {
-    final T object = createObject();
-    final HttpServletRequest request = HttpServletUtils.getRequest();
-    Property.set(object, defaultValues);
-
-    // if (!canAddObject(request)) {
-    // response.sendError(HttpServletResponse.SC_FORBIDDEN,
-    // "No permission to edit " + getTypeName() + " #" + getId());
-    // return null;
-    // }
-    final Map<String, Object> parameters = new HashMap<>();
-
-    final String pageName = getName(prefix, "add");
-    final Set<String> parameterNamesToSave = new HashSet<String>();
-
-    final Form form = createTableForm(object, pageName);
-    for (final String param : parameterNamesToSave) {
-      form.addSavedParameter(param, request.getParameter(param));
-    }
-    form.initialize(request);
-
-    if (form.isPosted() && form.isMainFormTask()) {
-      if (form.isValid()) {
-        if ((Boolean)JavaBeanUtil.method(this, preInsertMethod, form, object)) {
-          insertObject(object);
-          parameters.put("message", "Saved");
-          final Object id = Property.get(object, getIdPropertyName());
-          parameters.put(getIdParameterName(), id);
-
-          postInsert(object);
-          final String viewName = getName(prefix, "view");
-          final String url = getPageUrl(viewName, parameters);
-          redirectAfterCommit(url);
-          return new ElementContainer();
-        }
-      }
-    }
-
-    final Page page = getPage(pageName);
-    final String title = page.getExpandedTitle();
-    request.setAttribute("title", title);
-
-    final Menu actionMenu = new Menu();
-    addMenuItem(actionMenu, prefix, "list", "Cancel", "_top");
-    addMenuItem(actionMenu, prefix, "add", "Clear Fields");
-    final String name = form.getName();
-    actionMenu.addMenuItem(new Menu("Save", "javascript:$('#" + name + "').submit()"));
-
-    final ButtonsToolbarElement actionMenuElement = new ButtonsToolbarElement(actionMenu);
-    final ElementContainer view = new ElementContainer(form, actionMenuElement);
-    final TabElementContainer tabs = new TabElementContainer();
-    tabs.add(title, view);
-    return tabs;
-  }
-
-  public Element createObjectEditPage(final T object, final String prefix)
-    throws IOException, ServletException {
-    if (object == null) {
-      throw new PageNotFoundException();
-    } else {
-      final HttpServletRequest request = HttpServletUtils.getRequest();
-      final Set<String> parameterNamesToSave = new HashSet<String>();
-      parameterNamesToSave.add(getIdParameterName());
-
-      final String pageName = getName(prefix, "edit");
-      final Form form = createTableForm(object, pageName);
-      for (final String param : parameterNamesToSave) {
-        form.addSavedParameter(param, request.getParameter(param));
-      }
-      form.initialize(request);
-
-      if (form.isPosted() && form.isMainFormTask()) {
-        if (form.isValid() && preUpdate(form, object)) {
-          updateObject(object);
-          postUpdate(object);
-
-          final Map<String, Object> parameters = new HashMap<>();
-          // Get after object has changed
-          final Object id = Property.get(object, getIdPropertyName());
-          parameters.put(getIdParameterName(), id);
-
-          final Page viewPage = getPage(prefix, "view");
-          final String url = viewPage.getFullUrl(parameters);
-          redirectAfterCommit(url);
-          return new ElementContainer();
-        } else {
-          setRollbackOnly(object);
-        }
-      } else {
-        setRollbackOnly(object);
-      }
-
-      final Page page = getPage(prefix, "edit");
-      final String title = page.getExpandedTitle();
-      request.setAttribute("title", title);
-
-      final Menu actionMenu = new Menu();
-      addMenuItem(actionMenu, prefix, "view", "Cancel", "_top");
-      addMenuItem(actionMenu, prefix, "edit", "Revert to Saved", "_top");
-      final String name = form.getName();
-      actionMenu.addMenuItem(new Menu("Save", "javascript:$('#" + name + "').submit()"));
-
-      final ButtonsToolbarElement actionMenuElement = new ButtonsToolbarElement(actionMenu);
-      final ElementContainer view = new ElementContainer(form, actionMenuElement);
-      final TabElementContainer tabs = new TabElementContainer();
-      tabs.add(title, view);
-      return tabs;
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  public <F extends Form> F createTableForm(final Object object, final String keyListName) {
-    final List<String> keyList = getKeyList(keyListName);
-    final UiBuilderObjectForm form = new UiBuilderObjectForm(object, this, getTypeName(), keyList);
-    return (F)form;
   }
 
   @PreDestroy
@@ -1121,7 +675,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final String message = getMessage(messageName);
     if (message != null) {
       try {
-        final Expression expression = JexlUtil.createExpression(message);
+        final Expression expression = JexlUtil.newExpression(message);
         if (expression != null) {
           final JexlContext context = new HashMapContext();
           context.setVars(variables);
@@ -1287,6 +841,452 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public T loadObject(final Object id) {
     throw new UnsupportedOperationException();
+  }
+
+  public ElementContainer newDataTable(final HttpServletRequest request, final String pageName,
+    final Map<String, ? extends Object> parameters) {
+    final String pageUrl = getPageUrl(pageName);
+    if (Property.hasValue(pageUrl)) {
+      final Map<String, Object> params = new HashMap<>();
+      params.putAll(parameters);
+      params.put("ajaxSource", pageUrl.replaceAll("/+$", ".json"));
+      final List<T> rows = Collections.emptyList();
+      final ElementContainer table = newDataTable(request, pageName, params, rows);
+
+      return table;
+    } else {
+      return null;
+    }
+  }
+
+  public ElementContainer newDataTable(final HttpServletRequest request, final String pageName,
+    Map<String, ? extends Object> parameters, final Collection<? extends Object> rows) {
+    parameters = new HashMap<>(parameters);
+    final List<KeySerializer> serializers = getSerializers(pageName, "list");
+    final RowsTableSerializer model = new KeySerializerTableSerializer(serializers, rows);
+    final String typeName = getTypeName();
+    final TableView tableView = new TableView(model, typeName);
+    tableView.setWidth("100%");
+    final String tableId = typeName + "_" + pageName + "_table";
+    tableView.setId(tableId);
+    tableView.setNoRecordsMessgae(null);
+
+    final Map<String, Object> tableParams = new LinkedHashMap<>();
+    tableParams.put("stateSave", true);
+    tableParams.put("autoWidth", true);
+    tableParams.put("dom", Maps.getString(parameters, "dom", "frtiS"));
+    final Boolean ordering = Maps.getBoolean(parameters, "ordering");
+    if (ordering != null) {
+      tableParams.put("ordering", ordering);
+    }
+    final String scrollY = (String)parameters.get("scrollY");
+    if (scrollY == null) {
+      tableParams.put("scrollY", "300px");
+    } else {
+      tableParams.put("scrollY", scrollY);
+    }
+    final String scrollX = (String)parameters.get("scrollX");
+    if (scrollX == null) {
+      tableParams.put("scrollX", "true");
+    } else {
+      tableParams.put("scrollX", scrollX);
+    }
+    tableParams.put("order", getListSortOrder(pageName));
+
+    Boolean serverSide = (Boolean)parameters.get("serverSide");
+    final String ajaxSource = (String)parameters.get("ajaxSource");
+    if (Property.hasValue(ajaxSource)) {
+      if (serverSide == null) {
+        serverSide = true;
+      }
+
+      tableParams.put("serverSide", serverSide);
+      tableParams.put("ajax", ajaxSource);
+    } else if (serverSide == null) {
+      serverSide = false;
+    }
+
+    tableParams.put("scroller", Collections.singletonMap("loadingIndicator", true));
+    final List<Map<String, Object>> columnDefs = new ArrayList<Map<String, Object>>();
+    int i = 0;
+    for (final KeySerializer serializer : serializers) {
+      final Map<String, Object> columnDef = new LinkedHashMap<>();
+      columnDef.put("targets", Arrays.asList(i));
+      columnDef.put("name", serializer.getKey());
+      columnDef.put("className", serializer.getKey().replaceAll("[^A-Za-z0-9]", "_"));
+      columnDef.put("title", serializer.getLabel());
+
+      final Boolean sortable = serializer.getProperty("sortable");
+      if (sortable != null) {
+        columnDef.put("orderable", sortable);
+      }
+
+      final Boolean searchable = serializer.getProperty("searchable");
+      if (searchable != null) {
+        columnDef.put("searchable", searchable);
+      }
+
+      final Boolean visible = serializer.getProperty("visible");
+      if (visible != null) {
+        columnDef.put("visible", visible);
+      }
+      final String width = serializer.getWidth();
+      if (width != null) {
+        columnDef.put("width", width);
+      }
+
+      columnDefs.add(columnDef);
+      i++;
+    }
+    if (!columnDefs.isEmpty()) {
+      tableParams.put("columnDefs", columnDefs);
+    }
+    Number scrollYPercent = (Number)parameters.get("scrollYPercent");
+    if (scrollYPercent == null) {
+      if (scrollY == null) {
+        scrollYPercent = 0;
+      } else {
+        scrollYPercent = 0.98;
+      }
+    }
+    final Script script = new Script();
+    String jsonMap = Json.toString(tableParams);
+    jsonMap = jsonMap.substring(0, jsonMap.length() - 1)
+      + ",\"createdRow\": function( row, data, dataIndex ) {refreshButtons(row);}"
+      + ",\"initComplete\": function() {$(this).DataTable().columns.adjust();}";
+    jsonMap += "}";
+    final StringBuffer scriptBody = new StringBuffer();
+    scriptBody.append("$(document).ready(function() {\n");
+    scriptBody.append("  var tableDiv = $('#");
+    scriptBody.append(tableId);
+    scriptBody.append(" table');\n");
+    scriptBody.append("  var table = tableDiv.dataTable(");
+    scriptBody.append(jsonMap);
+    scriptBody.append("\n );\n");
+    scriptBody.append("  tableShowEvents(table,");
+    scriptBody.append(scrollYPercent);
+    scriptBody.append(");\n");
+    scriptBody
+      .append("$(window).bind('resize', function () {$(table).DataTable().columns.adjust();} );");
+    scriptBody.append("});");
+    script.setContent(scriptBody.toString());
+    final ElementContainer container = new ElementContainer(tableView, script);
+
+    final String prefix = pageName.replaceAll("[lL]ist$", "");
+    final Menu actionMenu = new Menu();
+    addMenuItem(actionMenu, prefix, "add", "Add", "_top");
+    addListMenuItems(actionMenu, prefix);
+    addMenuElement(container, actionMenu);
+
+    return container;
+  }
+
+  public Object newDataTableHandler(final HttpServletRequest request, final String pageName,
+    final Callable<Collection<? extends Object>> rowsCallable) {
+    final Map<String, Object> parameters = new HashMap<>();
+    return newDataTableHandler(request, pageName, parameters, rowsCallable);
+  }
+
+  public Object newDataTableHandler(final HttpServletRequest request, final String pageName,
+    final Collection<? extends Object> rows) {
+    final Map<String, Object> parameters = new HashMap<>();
+    return newDataTableHandler(request, pageName, parameters, rows);
+  }
+
+  public Object newDataTableHandler(final HttpServletRequest request, final String pageName,
+    final Map<String, Object> parameters,
+    final Callable<Collection<? extends Object>> rowsCallable) {
+    parameters.put("serverSide", false);
+    if (isDataTableCallback(request)) {
+      try {
+        final Collection<? extends Object> rows = rowsCallable.call();
+        return newDataTableMap(request, rows, pageName);
+      } catch (final Exception e) {
+        throw new RuntimeException("Unable to get rows", e);
+      }
+    } else {
+      final TabElementContainer tabs = new TabElementContainer();
+      addTabDataTable(tabs, this, pageName, parameters);
+      return tabs;
+    }
+  }
+
+  public Object newDataTableHandler(final HttpServletRequest request, final String pageName,
+    final Map<String, Object> parameters, final Collection<? extends Object> rows) {
+    if (isDataTableCallback(request)) {
+      return newDataTableMap(request, rows, pageName);
+    } else {
+      parameters.put("serverSide", false);
+      final TabElementContainer tabs = new TabElementContainer();
+      addTabDataTable(tabs, this, pageName, parameters);
+      return tabs;
+    }
+  }
+
+  public Object newDataTableHandler(final String pageName,
+    final Collection<? extends Object> rows) {
+    final HttpServletRequest request = HttpServletUtils.getRequest();
+    return newDataTableHandler(request, pageName, rows);
+  }
+
+  public Object newDataTableHandlerOrRedirect(final HttpServletRequest request,
+    final HttpServletResponse response, final String pageName,
+    final Callable<Collection<? extends Object>> rowsCallable, final Object parentBuilder,
+    final String parentPageName) {
+    if (isDataTableCallback(request)) {
+      try {
+        final Collection<? extends Object> rows = rowsCallable.call();
+        return newDataTableMap(request, rows, pageName);
+      } catch (final Exception e) {
+        throw new RuntimeException("Unable to get rows", e);
+      }
+    } else {
+      return redirectToTab(parentBuilder, parentPageName, pageName);
+    }
+  }
+
+  public Object newDataTableHandlerOrRedirect(final HttpServletRequest request,
+    final HttpServletResponse response, final String pageName,
+    final Collection<? extends Object> rows, final Object parentBuilder,
+    final String parentPageName) {
+    if (isDataTableCallback(request)) {
+      try {
+        return newDataTableMap(request, rows, pageName);
+      } catch (final Exception e) {
+        throw new RuntimeException("Unable to get rows", e);
+      }
+    } else {
+      return redirectToTab(parentBuilder, parentPageName, pageName);
+    }
+  }
+
+  public Map<String, Object> newDataTableMap(final Collection<? extends Object> records,
+    final String pageName) {
+    final HttpServletRequest request = HttpServletUtils.getRequest();
+    return newDataTableMap(request, records, pageName);
+  }
+
+  public Map<String, Object> newDataTableMap(final HttpServletRequest request,
+    final Collection<? extends Object> records, final String pageName) {
+    final List<KeySerializer> serializers = getSerializers(pageName, "list");
+
+    final List<List<String>> rows = new ArrayList<List<String>>();
+    for (final Object object : records) {
+      final List<String> row = new ArrayList<String>();
+      for (final KeySerializer serializer : serializers) {
+        final String html = serializer.toString(object);
+        row.add(html);
+      }
+      rows.add(row);
+    }
+
+    final Map<String, Object> response = new LinkedHashMap<>();
+    response.put("data", rows);
+    return response;
+
+  }
+
+  public Map<String, Object> newDataTableMap(final HttpServletRequest request,
+    final RecordStore recordStore, Query query, final String pageName) {
+    final int numRecords = recordStore.getRecordCount(query);
+    int recordCount = 50;
+    final String lengthString = request.getParameter("length");
+    if (Property.hasValue(lengthString)) {
+      if (!"NAN".equalsIgnoreCase(lengthString)) {
+        try {
+          recordCount = Integer.valueOf(lengthString);
+        } catch (final Throwable e) {
+        }
+      }
+    }
+
+    final int offset = HttpServletUtils.getIntegerParameter(request, "start");
+    query = query.clone();
+    query.setOffset(offset);
+    query.setLimit(recordCount);
+
+    final List<KeySerializer> serializers = getSerializers(pageName, "list");
+
+    final List<List<String>> rows = new ArrayList<>();
+    try (
+      Reader<Record> reader = recordStore.getRecords(query)) {
+      for (Record record : reader) {
+        record = convertRecord(record);
+        final List<String> row = new ArrayList<String>();
+        for (final KeySerializer serializer : serializers) {
+          final String html = serializer.toString(record);
+          row.add(html);
+        }
+        rows.add(row);
+      }
+    }
+    final Map<String, Object> response = new LinkedHashMap<>();
+    response.put("draw", HttpServletUtils.getIntegerParameter(request, "draw"));
+    response.put("recordsTotal", numRecords);
+    response.put("recordsFiltered", numRecords);
+    response.put("data", rows);
+    return response;
+  }
+
+  public ElementContainer newDetailView(final Object object,
+    final List<KeySerializer> serializers) {
+    final KeySerializerDetailSerializer model = new KeySerializerDetailSerializer(serializers);
+    model.setObject(object);
+    final DetailView detailView = new DetailView(model, "objectView " + this.typeName);
+    return new ElementContainer(detailView);
+  }
+
+  /**
+   * Construct a new form for the object using the specified list of fields keys. The
+   * form is created without the form title.
+   *
+   * @param <T> The type of form to return.
+   * @param object The object to create the form for.
+   * @param keyListName The name of the list of keys for the fields to include
+   * on the form.
+   * @return The generated form.
+   */
+  @SuppressWarnings("unchecked")
+  public <F extends Form> F newForm(final Object object, final String keyListName) {
+    final HtmlUiBuilderObjectForm form = newForm(object, getTypeName(), getKeyList(keyListName));
+    return (F)form;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <F extends Form> F newForm(final Object object, final String formName,
+    final List<String> keys) {
+    final HtmlUiBuilderObjectForm form = new HtmlUiBuilderObjectForm(object, this, formName, keys);
+    return (F)form;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <F extends Form> F newForm(final Object object, final String formName,
+    final String keyList) {
+    final List<String> keys = getKeyList(keyList);
+
+    return (F)newForm(object, formName, keys);
+  }
+
+  protected T newObject() {
+    return null;
+  }
+
+  public Element newObjectAddPage(final Map<String, Object> defaultValues, final String prefix,
+    final String preInsertMethod) throws IOException, ServletException {
+    final T object = newObject();
+    final HttpServletRequest request = HttpServletUtils.getRequest();
+    Property.set(object, defaultValues);
+
+    // if (!canAddObject(request)) {
+    // response.sendError(HttpServletResponse.SC_FORBIDDEN,
+    // "No permission to edit " + getTypeName() + " #" + getId());
+    // return null;
+    // }
+    final Map<String, Object> parameters = new HashMap<>();
+
+    final String pageName = getName(prefix, "add");
+    final Set<String> parameterNamesToSave = new HashSet<String>();
+
+    final Form form = newTableForm(object, pageName);
+    for (final String param : parameterNamesToSave) {
+      form.addSavedParameter(param, request.getParameter(param));
+    }
+    form.initialize(request);
+
+    if (form.isPosted() && form.isMainFormTask()) {
+      if (form.isValid()) {
+        if ((Boolean)JavaBeanUtil.method(this, preInsertMethod, form, object)) {
+          insertObject(object);
+          parameters.put("message", "Saved");
+          final Object id = Property.get(object, getIdPropertyName());
+          parameters.put(getIdParameterName(), id);
+
+          postInsert(object);
+          final String viewName = getName(prefix, "view");
+          final String url = getPageUrl(viewName, parameters);
+          redirectAfterCommit(url);
+          return new ElementContainer();
+        }
+      }
+    }
+
+    final Page page = getPage(pageName);
+    final String title = page.getExpandedTitle();
+    request.setAttribute("title", title);
+
+    final Menu actionMenu = new Menu();
+    addMenuItem(actionMenu, prefix, "list", "Cancel", "_top");
+    addMenuItem(actionMenu, prefix, "add", "Clear Fields");
+    final String name = form.getName();
+    actionMenu.addMenuItem(new Menu("Save", "javascript:$('#" + name + "').submit()"));
+
+    final ButtonsToolbarElement actionMenuElement = new ButtonsToolbarElement(actionMenu);
+    final ElementContainer view = new ElementContainer(form, actionMenuElement);
+    final TabElementContainer tabs = new TabElementContainer();
+    tabs.add(title, view);
+    return tabs;
+  }
+
+  public Element newObjectEditPage(final T object, final String prefix)
+    throws IOException, ServletException {
+    if (object == null) {
+      throw new PageNotFoundException();
+    } else {
+      final HttpServletRequest request = HttpServletUtils.getRequest();
+      final Set<String> parameterNamesToSave = new HashSet<String>();
+      parameterNamesToSave.add(getIdParameterName());
+
+      final String pageName = getName(prefix, "edit");
+      final Form form = newTableForm(object, pageName);
+      for (final String param : parameterNamesToSave) {
+        form.addSavedParameter(param, request.getParameter(param));
+      }
+      form.initialize(request);
+
+      if (form.isPosted() && form.isMainFormTask()) {
+        if (form.isValid() && preUpdate(form, object)) {
+          updateObject(object);
+          postUpdate(object);
+
+          final Map<String, Object> parameters = new HashMap<>();
+          // Get after object has changed
+          final Object id = Property.get(object, getIdPropertyName());
+          parameters.put(getIdParameterName(), id);
+
+          final Page viewPage = getPage(prefix, "view");
+          final String url = viewPage.getFullUrl(parameters);
+          redirectAfterCommit(url);
+          return new ElementContainer();
+        } else {
+          setRollbackOnly(object);
+        }
+      } else {
+        setRollbackOnly(object);
+      }
+
+      final Page page = getPage(prefix, "edit");
+      final String title = page.getExpandedTitle();
+      request.setAttribute("title", title);
+
+      final Menu actionMenu = new Menu();
+      addMenuItem(actionMenu, prefix, "view", "Cancel", "_top");
+      addMenuItem(actionMenu, prefix, "edit", "Revert to Saved", "_top");
+      final String name = form.getName();
+      actionMenu.addMenuItem(new Menu("Save", "javascript:$('#" + name + "').submit()"));
+
+      final ButtonsToolbarElement actionMenuElement = new ButtonsToolbarElement(actionMenu);
+      final ElementContainer view = new ElementContainer(form, actionMenuElement);
+      final TabElementContainer tabs = new TabElementContainer();
+      tabs.add(title, view);
+      return tabs;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <F extends Form> F newTableForm(final Object object, final String keyListName) {
+    final List<String> keyList = getKeyList(keyListName);
+    final UiBuilderObjectForm form = new UiBuilderObjectForm(object, this, getTypeName(), keyList);
+    return (F)form;
   }
 
   protected void notFound(final HttpServletResponse response, final String message)

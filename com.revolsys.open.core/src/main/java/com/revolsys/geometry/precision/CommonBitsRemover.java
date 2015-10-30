@@ -107,7 +107,7 @@ public class CommonBitsRemover {
 
     }
     this.commonCoord = new PointDouble(this.commonBitsX.getCommon(), this.commonBitsY.getCommon(),
-      Point.NULL_ORDINATE);
+      Geometry.NULL_ORDINATE);
   }
 
   /**

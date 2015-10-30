@@ -76,7 +76,7 @@ public class ClasspathNativeLibraryUtil {
       }
     } else {
       try {
-        final File directory = FileUtil.createTempDirectory("jni", "name");
+        final File directory = FileUtil.newTempDirectory("jni", "name");
         final File file = new File(directory, name + ".dll");
         file.deleteOnExit();
         FileUtil.copy(url.openStream(), file);
@@ -110,7 +110,7 @@ public class ClasspathNativeLibraryUtil {
       }
     } else {
       try {
-        final File directory = FileUtil.createTempDirectory("jni", "name");
+        final File directory = FileUtil.newTempDirectory("jni", "name");
         final File file = new File(directory, fileName);
         file.deleteOnExit();
         FileUtil.copy(url.openStream(), file);

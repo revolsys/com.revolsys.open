@@ -37,7 +37,7 @@ public class Html extends AbstractIoFactoryWithCoordinateSystem
   public RecordWriter newRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
-    final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
+    final OutputStreamWriter writer = FileUtil.newUtf8Writer(outputStream);
     return new XhtmlRecordWriter(recordDefinition, writer);
   }
 }

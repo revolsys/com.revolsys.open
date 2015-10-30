@@ -159,7 +159,7 @@ public class Buffer {
       final List<Edge> edges = edgeList.getEdges();
       graph.addEdges(edges);
 
-      final List<BufferSubgraph> subgraphList = createSubgraphs(graph);
+      final List<BufferSubgraph> subgraphList = newSubgraphs(graph);
       final PolygonBuilder polyBuilder = new PolygonBuilder(geometryFactory);
       buildSubgraphs(subgraphList, polyBuilder);
       final List<Polygon> polygons = polyBuilder.getPolygons();
@@ -239,25 +239,6 @@ public class Buffer {
         insertUniqueEdge(edges, edge);
       }
     }
-  }
-
-  private static List<BufferSubgraph> createSubgraphs(final PlanarGraph graph) {
-    final List<BufferSubgraph> subgraphList = new ArrayList<>();
-    for (final Node node : graph.getNodes()) {
-      if (!node.isVisited()) {
-        final BufferSubgraph subgraph = new BufferSubgraph();
-        subgraph.create(node);
-        subgraphList.add(subgraph);
-      }
-    }
-    /**
-     * Sort the subgraphs in descending order of their rightmost coordinate.
-     * This ensures that when the Polygons for the subgraphs are built,
-     * subgraphs for shells will have been built before the subgraphs for
-     * any holes they contain.
-     */
-    Collections.sort(subgraphList, Collections.reverseOrder());
-    return subgraphList;
   }
 
   /**
@@ -403,6 +384,25 @@ public class Buffer {
       edgeList.add(edge);
       edge.setDepthDelta(depthDelta(edge.getLabel()));
     }
+  }
+
+  private static List<BufferSubgraph> newSubgraphs(final PlanarGraph graph) {
+    final List<BufferSubgraph> subgraphList = new ArrayList<>();
+    for (final Node node : graph.getNodes()) {
+      if (!node.isVisited()) {
+        final BufferSubgraph subgraph = new BufferSubgraph();
+        subgraph.newNode(node);
+        subgraphList.add(subgraph);
+      }
+    }
+    /**
+     * Sort the subgraphs in descending order of their rightmost coordinate.
+     * This ensures that when the Polygons for the subgraphs are built,
+     * subgraphs for shells will have been built before the subgraphs for
+     * any holes they contain.
+     */
+    Collections.sort(subgraphList, Collections.reverseOrder());
+    return subgraphList;
   }
 
   /**

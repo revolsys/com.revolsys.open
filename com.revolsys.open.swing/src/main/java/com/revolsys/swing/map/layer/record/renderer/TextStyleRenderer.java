@@ -402,13 +402,13 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
     return clone;
   }
 
-  @Override
-  public ValueField createStylePanel() {
-    return new TextStylePanel(this);
-  }
-
   public TextStyle getStyle() {
     return this.style;
+  }
+
+  @Override
+  public ValueField newStylePanel() {
+    return new TextStylePanel(this);
   }
 
   @Override

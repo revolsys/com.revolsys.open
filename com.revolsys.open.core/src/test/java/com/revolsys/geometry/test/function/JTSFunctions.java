@@ -24,7 +24,22 @@ public class JTSFunctions {
 
   private static final double T_WIDTH = WIDTH - 2 * S_RADIUS - J_WIDTH;
 
-  private static Geometry create_J(final Geometry g) {
+  public static String jtsVersion(final Geometry g) {
+    return "";
+  }
+
+  public static Geometry logoBuffer(final Geometry g, final double distance) {
+    final Geometry lines = logoLines(g);
+    final BufferParameters bufParams = new BufferParameters();
+    bufParams.setEndCapStyle(LineCap.SQUARE);
+    return lines.buffer(distance, bufParams);
+  }
+
+  public static Geometry logoLines(final Geometry g) {
+    return newJ(g).union(newT(g)).union(newS(g));
+  }
+
+  private static Geometry newJ(final Geometry g) {
     final GeometryFactory gf = FunctionsUtil.getFactoryOrDefault(g);
 
     final Point[] jTop = new Point[] {
@@ -39,7 +54,7 @@ public class JTSFunctions {
     gsf.setBase(new PointDouble(J_WIDTH - 2 * J_RADIUS, 0));
     gsf.setSize(2 * J_RADIUS);
     gsf.setNumPoints(10);
-    final LineString jArc = gsf.createArc(1.5 * Math.PI, 0.5 * Math.PI);
+    final LineString jArc = gsf.newArc(1.5 * Math.PI, 0.5 * Math.PI);
 
     final CoordinateList coordList = new CoordinateList();
     coordList.add(jTop, false);
@@ -50,7 +65,7 @@ public class JTSFunctions {
     return gf.lineString(coordList.toCoordinateArray());
   }
 
-  private static Geometry create_S(final Geometry g) {
+  private static Geometry newS(final Geometry g) {
     final GeometryFactory gf = FunctionsUtil.getFactoryOrDefault(g);
 
     final double centreX = WIDTH - S_RADIUS;
@@ -66,13 +81,13 @@ public class JTSFunctions {
     gsf.setCentre(new PointDouble(centreX, HEIGHT - S_RADIUS));
     gsf.setSize(2 * S_RADIUS);
     gsf.setNumPoints(10);
-    final LineString arcTop = gsf.createArc(0.5 * Math.PI, Math.PI);
+    final LineString arcTop = gsf.newArc(0.5 * Math.PI, Math.PI);
 
     final GeometricShapeFactory gsf2 = new GeometricShapeFactory(gf);
     gsf2.setCentre(new PointDouble(centreX, S_RADIUS));
     gsf2.setSize(2 * S_RADIUS);
     gsf2.setNumPoints(10);
-    final LineString arcBottom = gsf2.createArc(1.5 * Math.PI, Math.PI).reverse();
+    final LineString arcBottom = gsf2.newArc(1.5 * Math.PI, Math.PI).reverse();
 
     final CoordinateList coordList = new CoordinateList();
     coordList.add(top, false);
@@ -86,7 +101,7 @@ public class JTSFunctions {
     return gf.lineString(coordList.toCoordinateArray());
   }
 
-  private static Geometry create_T(final Geometry g) {
+  private static Geometry newT(final Geometry g) {
     final GeometryFactory gf = FunctionsUtil.getFactoryOrDefault(g);
 
     final Point[] tTop = new Point[] {
@@ -99,21 +114,6 @@ public class JTSFunctions {
       gf.lineString(tTop), gf.lineString(tBottom)
     };
     return gf.multiLineString(lines);
-  }
-
-  public static String jtsVersion(final Geometry g) {
-    return "";
-  }
-
-  public static Geometry logoBuffer(final Geometry g, final double distance) {
-    final Geometry lines = logoLines(g);
-    final BufferParameters bufParams = new BufferParameters();
-    bufParams.setEndCapStyle(LineCap.SQUARE);
-    return lines.buffer(distance, bufParams);
-  }
-
-  public static Geometry logoLines(final Geometry g) {
-    return create_J(g).union(create_T(g)).union(create_S(g));
   }
 
 }

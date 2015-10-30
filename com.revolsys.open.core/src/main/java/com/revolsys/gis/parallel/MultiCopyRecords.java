@@ -32,8 +32,26 @@ public class MultiCopyRecords implements Process {
 
   private RecordStore targetRecordStore;
 
+  @Override
+  public String getBeanName() {
+    return this.name;
+  }
+
+  @Override
+  public ProcessNetwork getProcessNetwork() {
+    return this.processNetwork;
+  }
+
+  public RecordStore getSourceRecordStore() {
+    return this.sourceRecordStore;
+  }
+
+  public RecordStore getTargetRecordStore() {
+    return this.targetRecordStore;
+  }
+
   @SuppressWarnings("unchecked")
-  protected Process createProcess(final Map<String, Object> processDefinition) {
+  protected Process newProcess(final Map<String, Object> processDefinition) {
     if (processDefinition == null) {
       return null;
     } else {
@@ -59,7 +77,7 @@ public class MultiCopyRecords implements Process {
             .error("Parameter 'processes' required for type='sequential'");
         } else {
           final Sequential processes = new Sequential();
-          createProcesses(processes, processList);
+          newProcesses(processes, processList);
           return processes;
         }
       } else if ("parallel".equals(type)) {
@@ -70,7 +88,7 @@ public class MultiCopyRecords implements Process {
             .error("Parameter 'processes' required for type='parallel'");
         } else {
           final Parallel processes = new Parallel();
-          createProcesses(processes, processList);
+          newProcesses(processes, processList);
           return processes;
         }
 
@@ -82,10 +100,10 @@ public class MultiCopyRecords implements Process {
     }
   }
 
-  private void createProcesses(final AbstractMultipleProcess processes,
+  private void newProcesses(final AbstractMultipleProcess processes,
     final List<Map<String, Object>> processDefinitions) {
     for (final Map<String, Object> processDefinition : processDefinitions) {
-      final Process process = createProcess(processDefinition);
+      final Process process = newProcess(processDefinition);
       if (process != null) {
         processes.addProcess(process);
       }
@@ -93,26 +111,8 @@ public class MultiCopyRecords implements Process {
   }
 
   @Override
-  public String getBeanName() {
-    return this.name;
-  }
-
-  @Override
-  public ProcessNetwork getProcessNetwork() {
-    return this.processNetwork;
-  }
-
-  public RecordStore getSourceRecordStore() {
-    return this.sourceRecordStore;
-  }
-
-  public RecordStore getTargetRecordStore() {
-    return this.targetRecordStore;
-  }
-
-  @Override
   public void run() {
-    this.process = createProcess(this.processDefinition);
+    this.process = newProcess(this.processDefinition);
     if (this.process != null) {
       if (this.processNetwork != null) {
         this.processNetwork.addProcess(this.process);

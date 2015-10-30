@@ -100,44 +100,11 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
     EdgeIntersection eiPrev = (EdgeIntersection)it.next();
     while (it.hasNext()) {
       final EdgeIntersection ei = (EdgeIntersection)it.next();
-      final Edge newEdge = createSplitEdge(eiPrev, ei);
+      final Edge newEdge = newSplitEdge(eiPrev, ei);
       edgeList.add(newEdge);
 
       eiPrev = ei;
     }
-  }
-
-  /**
-   * Construct a new new "split edge" with the section of points between
-   * (and including) the two intersections.
-   * The label for the new edge is the same as the label for the parent edge.
-   */
-  Edge createSplitEdge(final EdgeIntersection ei0, final EdgeIntersection ei1) {
-    // Debug.print("\ncreateSplitEdge"); Debug.print(ei0); Debug.print(ei1);
-    int npts = ei1.segmentIndex - ei0.segmentIndex + 2;
-
-    final Point lastSegStartPt = this.edge.getCoordinate(ei1.segmentIndex);
-    // if the last intersection point is not equal to the its segment start pt,
-    // add it to the points list as well.
-    // (This check is needed because the distance metric is not totally
-    // reliable!)
-    // The check for point equality is 2D only - Z values are ignored
-    final boolean useIntPt1 = ei1.dist > 0.0 || !ei1.coord.equals(2, lastSegStartPt);
-    if (!useIntPt1) {
-      npts--;
-    }
-
-    final Point[] pts = new Point[npts];
-    int ipt = 0;
-    pts[ipt++] = new PointDouble(ei0.coord);
-    for (int i = ei0.segmentIndex + 1; i <= ei1.segmentIndex; i++) {
-      pts[ipt++] = this.edge.getCoordinate(i);
-    }
-    if (useIntPt1) {
-      pts[ipt] = ei1.coord;
-    }
-    final LineStringDouble points = new LineStringDouble(pts);
-    return new Edge(points, new Label(this.edge.label));
   }
 
   /**
@@ -164,6 +131,39 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
   @Override
   public Iterator<EdgeIntersection> iterator() {
     return this.nodeMap.values().iterator();
+  }
+
+  /**
+   * Construct a new new "split edge" with the section of points between
+   * (and including) the two intersections.
+   * The label for the new edge is the same as the label for the parent edge.
+   */
+  Edge newSplitEdge(final EdgeIntersection ei0, final EdgeIntersection ei1) {
+    // Debug.print("\ncreateSplitEdge"); Debug.print(ei0); Debug.print(ei1);
+    int npts = ei1.segmentIndex - ei0.segmentIndex + 2;
+
+    final Point lastSegStartPt = this.edge.getCoordinate(ei1.segmentIndex);
+    // if the last intersection point is not equal to the its segment start pt,
+    // add it to the points list as well.
+    // (This check is needed because the distance metric is not totally
+    // reliable!)
+    // The check for point equality is 2D only - Z values are ignored
+    final boolean useIntPt1 = ei1.dist > 0.0 || !ei1.coord.equals(2, lastSegStartPt);
+    if (!useIntPt1) {
+      npts--;
+    }
+
+    final Point[] pts = new Point[npts];
+    int ipt = 0;
+    pts[ipt++] = new PointDouble(ei0.coord);
+    for (int i = ei0.segmentIndex + 1; i <= ei1.segmentIndex; i++) {
+      pts[ipt++] = this.edge.getCoordinate(i);
+    }
+    if (useIntPt1) {
+      pts[ipt] = ei1.coord;
+    }
+    final LineStringDouble points = new LineStringDouble(pts);
+    return new Edge(points, new Label(this.edge.label));
   }
 
   public void print(final PrintStream out) {

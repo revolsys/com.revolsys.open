@@ -33,7 +33,7 @@ public class FileRecordLayer extends ListRecordLayer {
       Icons.getIconWithBadge("page", "refresh"), FileRecordLayer::revert);
   }
 
-  public static FileRecordLayer create(final Map<String, Object> properties) {
+  public static FileRecordLayer newLayer(final Map<String, Object> properties) {
     return new FileRecordLayer(properties);
   }
 
@@ -47,8 +47,26 @@ public class FileRecordLayer extends ListRecordLayer {
   }
 
   @Override
-  protected ValueField createPropertiesTabGeneralPanelSource(final BasePanel parent) {
-    final ValueField panel = super.createPropertiesTabGeneralPanelSource(parent);
+  protected boolean doInitialize() {
+    this.url = getProperty("url");
+    if (Property.hasValue(this.url)) {
+      this.resource = Resource.getResource(this.url);
+      return revert();
+    } else {
+      LoggerFactory.getLogger(getClass())
+        .error("Layer definition does not contain a 'url' property: " + getName());
+      return false;
+    }
+
+  }
+
+  public String getUrl() {
+    return this.url;
+  }
+
+  @Override
+  protected ValueField newPropertiesTabGeneralPanelSource(final BasePanel parent) {
+    final ValueField panel = super.newPropertiesTabGeneralPanelSource(parent);
 
     final String url = getUrl();
     if (url.startsWith("file:")) {
@@ -68,24 +86,6 @@ public class FileRecordLayer extends ListRecordLayer {
     }
     GroupLayouts.makeColumns(panel, 2, true);
     return panel;
-  }
-
-  @Override
-  protected boolean doInitialize() {
-    this.url = getProperty("url");
-    if (Property.hasValue(this.url)) {
-      this.resource = Resource.getResource(this.url);
-      return revert();
-    } else {
-      LoggerFactory.getLogger(getClass())
-        .error("Layer definition does not contain a 'url' property: " + getName());
-      return false;
-    }
-
-  }
-
-  public String getUrl() {
-    return this.url;
   }
 
   public boolean revert() {
@@ -118,7 +118,7 @@ public class FileRecordLayer extends ListRecordLayer {
                 }
               }
 
-              createRecordInternal(record);
+              newRecordInternal(record);
             }
             refreshBoundingBox();
             return true;

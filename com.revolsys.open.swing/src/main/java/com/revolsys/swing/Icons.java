@@ -90,7 +90,7 @@ public class Icons {
     final String resourceName = RESOURCE_FOLDER + imageFileName;
     URL url = clazz.getResource(resourceName);
     if (url == null) {
-      ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+      final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
       url = classLoader.getResource("images/" + imageFileName);
       if (url == null) {
         url = classLoader.getResource("icons/" + imageFileName);

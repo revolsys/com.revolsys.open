@@ -31,18 +31,18 @@ public interface Identifier {
     };
   }
 
-  static Identifier create(final Object... values) {
+  static Identifier newIdentifier(final Object... values) {
     if (values == null || values.length == 0) {
       return null;
     } else if (values.length == 1) {
       final Object value = values[0];
-      return create(value);
+      return newIdentifier(value);
     } else {
       return new ListIdentifier(values);
     }
   }
 
-  static Identifier create(final Object value) {
+  static Identifier newIdentifier(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Long) {

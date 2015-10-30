@@ -38,7 +38,7 @@ public class RecordStoreLayerTest {
 
   @BeforeClass
   public static void beforeSuite() {
-    testDirectory = FileUtil.createTempDirectory(RecordStoreLayerTest.class.getName(), ".test");
+    testDirectory = FileUtil.newTempDirectory(RecordStoreLayerTest.class.getName(), ".test");
   }
 
   private RecordStoreLayer layer;

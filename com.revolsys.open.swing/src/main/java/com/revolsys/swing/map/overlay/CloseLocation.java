@@ -93,7 +93,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
       id = this.record.getIdentifier();
     }
     if (id == null) {
-      id = Identifier.create("NEW");
+      id = Identifier.newIdentifier("NEW");
     }
     return id;
   }

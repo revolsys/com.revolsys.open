@@ -104,7 +104,7 @@ public class JavaComponent extends Component {
         Object value = this.properties.get(propertyName);
         final WebUiContext niceContext = WebUiContext.get();
         try {
-          final Expression expression = JexlUtil.createExpression(value.toString());
+          final Expression expression = JexlUtil.newExpression(value.toString());
           if (expression != null) {
             value = niceContext.evaluateExpression(expression);
           }

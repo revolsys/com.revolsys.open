@@ -42,12 +42,6 @@ import java.util.TreeSet;
 public class DoubleKeyMap {
   private final Map topMap = new TreeMap();
 
-  private Map createKeyMap(final Object key1) {
-    final Map map = new TreeMap();
-    this.topMap.put(key1, map);
-    return map;
-  }
-
   public Object get(final Object key1, final Object key2) {
     final Map keyMap = (Map)this.topMap.get(key1);
     if (keyMap == null) {
@@ -68,10 +62,16 @@ public class DoubleKeyMap {
     return keyMap.keySet();
   }
 
+  private Map newKeyMap(final Object key1) {
+    final Map map = new TreeMap();
+    this.topMap.put(key1, map);
+    return map;
+  }
+
   public void put(final Object key1, final Object key2, final Object value) {
     Map keyMap = (Map)this.topMap.get(key1);
     if (keyMap == null) {
-      keyMap = createKeyMap(key1);
+      keyMap = newKeyMap(key1);
     }
     keyMap.put(key2, value);
   }

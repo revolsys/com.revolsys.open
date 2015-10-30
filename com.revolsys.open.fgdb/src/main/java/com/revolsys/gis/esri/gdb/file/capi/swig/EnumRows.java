@@ -9,47 +9,50 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public class EnumRows implements java.io.Closeable {
+  protected static long getCPtr(final EnumRows obj) {
+    return obj == null ? 0 : obj.swigCPtr;
+  }
+
   private transient long swigCPtr;
+
   protected transient boolean swigCMemOwn;
 
-  protected EnumRows(long cPtr, boolean cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = cPtr;
+  public EnumRows() {
+    this(EsriFileGdbJNI.new_EnumRows(), true);
   }
 
-  protected static long getCPtr(EnumRows obj) {
-    return (obj == null) ? 0 : obj.swigCPtr;
+  protected EnumRows(final long cPtr, final boolean cMemoryOwn) {
+    this.swigCMemOwn = cMemoryOwn;
+    this.swigCPtr = cPtr;
   }
 
-   protected void finalize() {
-   }
-
-  public synchronized void delete() {
-    if (swigCPtr != 0) {
-      if (swigCMemOwn) {
-        swigCMemOwn = false;
-        EsriFileGdbJNI.delete_EnumRows(swigCPtr);
-      }
-      swigCPtr = 0;
-    }
-  }
-
+  @Override
   public void close() {
     Close();
     delete();
   }
 
   public void Close() {
-    EsriFileGdbJNI.EnumRows_Close(swigCPtr, this);
+    EsriFileGdbJNI.EnumRows_Close(this.swigCPtr, this);
   }
 
-  public EnumRows() {
-    this(EsriFileGdbJNI.new_EnumRows(), true);
+  public synchronized void delete() {
+    if (this.swigCPtr != 0) {
+      if (this.swigCMemOwn) {
+        this.swigCMemOwn = false;
+        EsriFileGdbJNI.delete_EnumRows(this.swigCPtr);
+      }
+      this.swigCPtr = 0;
+    }
+  }
+
+  @Override
+  protected void finalize() {
   }
 
   public Row next() {
-    long cPtr = EsriFileGdbJNI.EnumRows_next(swigCPtr, this);
-    return (cPtr == 0) ? null : new Row(cPtr, true);
+    final long cPtr = EsriFileGdbJNI.EnumRows_next(this.swigCPtr, this);
+    return cPtr == 0 ? null : new Row(cPtr, true);
   }
 
 }

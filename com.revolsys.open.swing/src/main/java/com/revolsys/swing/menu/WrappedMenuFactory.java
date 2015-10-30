@@ -27,11 +27,6 @@ public class WrappedMenuFactory implements ComponentFactory<JMenuItem> {
   }
 
   @Override
-  public JMenuItem newComponent() {
-    return this.menuFactory.newJMenu(this.name, false);
-  }
-
-  @Override
   public Icon getIcon() {
     return null;
   }
@@ -49,6 +44,11 @@ public class WrappedMenuFactory implements ComponentFactory<JMenuItem> {
   @Override
   public String getToolTip() {
     return null;
+  }
+
+  @Override
+  public JMenuItem newComponent() {
+    return this.menuFactory.newJMenu(this.name, false);
   }
 
   @Override

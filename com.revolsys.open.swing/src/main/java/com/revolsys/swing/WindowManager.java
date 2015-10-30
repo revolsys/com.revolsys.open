@@ -46,7 +46,7 @@ public class WindowManager implements WindowFocusListener {
       } else {
         title = window.getName();
       }
-      final JCheckBoxMenuItem menuItem = RunnableAction.createCheckBoxMenuItem(title,
+      final JCheckBoxMenuItem menuItem = RunnableAction.newCheckBoxMenuItem(title,
         () -> requestFocus(window));
       menuItem.setSelected(true);
       menu.add(menuItem);

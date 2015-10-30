@@ -54,7 +54,7 @@ public class ConsumerAction extends AbstractActionMainMenuItemFactory {
     final EnableCheck enableCheck, final boolean invokeLater, final Consumer<ActionEvent> handler) {
     final ConsumerAction action = new ConsumerAction(name, toolTip, icon, enableCheck, invokeLater,
       handler);
-    return action.createButton();
+    return action.newButton();
   }
 
   public static JButton button(final Icon icon, final String toolTip,
@@ -71,7 +71,7 @@ public class ConsumerAction extends AbstractActionMainMenuItemFactory {
     final Consumer<ActionEvent> handler) {
     final ConsumerAction action = new ConsumerAction(name, toolTip, icon, enableCheck, invokeLater,
       handler);
-    return action.createCheckboxMenuItem();
+    return action.newCheckboxMenuItem();
   }
 
   public static JCheckBoxMenuItem checkBoxMenuItem(final String name,
@@ -83,7 +83,7 @@ public class ConsumerAction extends AbstractActionMainMenuItemFactory {
     final EnableCheck enableCheck, final boolean invokeLater, final Consumer<ActionEvent> handler) {
     final ConsumerAction action = new ConsumerAction(name, toolTip, icon, enableCheck, invokeLater,
       handler);
-    return action.createMenuItem();
+    return action.newMenuItem();
   }
 
   public static JMenuItem menuItem(final String name, final Consumer<ActionEvent> handler) {

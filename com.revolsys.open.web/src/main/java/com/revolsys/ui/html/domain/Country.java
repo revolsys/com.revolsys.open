@@ -123,7 +123,7 @@ public final class Country implements Serializable {
       countries = new ArrayList<Country>();
       final InputStream in = Country.class.getResourceAsStream("CountryCodes.txt");
       if (in != null) {
-        final BufferedReader lineReader = new BufferedReader(FileUtil.createUtf8Reader(in));
+        final BufferedReader lineReader = new BufferedReader(FileUtil.newUtf8Reader(in));
         try {
           String line = lineReader.readLine();
           for (line = lineReader.readLine(); line != null; line = lineReader.readLine()) {

@@ -291,8 +291,8 @@ public class OffsetCurveSetBuilder {
    */
   private boolean isTriangleErodedCompletely(final LinearRing triangleCoord,
     final double bufferDistance) {
-    final TriangleImpl tri = new TriangleImpl(triangleCoord.getVertex(0), triangleCoord.getVertex(1),
-      triangleCoord.getVertex(2));
+    final TriangleImpl tri = new TriangleImpl(triangleCoord.getVertex(0),
+      triangleCoord.getVertex(1), triangleCoord.getVertex(2));
     final Point inCentre = tri.inCentre();
     final double distToCentre = LineSegmentUtil.distanceLinePoint(tri.p0, tri.p1, inCentre);
     return distToCentre < Math.abs(bufferDistance);

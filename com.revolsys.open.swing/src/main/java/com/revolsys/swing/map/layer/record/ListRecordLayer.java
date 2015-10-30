@@ -27,7 +27,7 @@ import com.revolsys.swing.map.layer.record.table.model.RecordSaveErrorTableModel
 
 public class ListRecordLayer extends AbstractRecordLayer {
 
-  public static RecordDefinitionImpl createRecordDefinition(final String name,
+  public static RecordDefinitionImpl newRecordDefinition(final String name,
     final GeometryFactory geometryFactory, final DataType geometryType) {
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
       PathName.newPathName(name));
@@ -53,7 +53,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   public ListRecordLayer(final String name, final GeometryFactory geometryFactory,
     final DataType geometryType) {
     super(name);
-    final RecordDefinitionImpl recordDefinition = createRecordDefinition(name, geometryFactory,
+    final RecordDefinitionImpl recordDefinition = newRecordDefinition(name, geometryFactory,
       geometryType);
     setRecordDefinition(recordDefinition);
   }
@@ -68,27 +68,6 @@ public class ListRecordLayer extends AbstractRecordLayer {
     final ListRecordLayer clone = (ListRecordLayer)super.clone();
     clone.records = new ArrayList<LayerRecord>();
     return clone;
-  }
-
-  protected void createRecordInternal(final Map<String, Object> values) {
-    final LayerRecord record = newLayerRecord(getRecordDefinition());
-    record.setState(RecordState.INITIALIZING);
-    try {
-      record.setValues(values);
-    } finally {
-      record.setState(RecordState.PERSISTED);
-    }
-    synchronized (this.records) {
-      this.records.add(record);
-      expandBoundingBox(record);
-    }
-    addToIndex(record);
-  }
-
-  @Override
-  public RecordLayerTablePanel createTablePanel(final Map<String, Object> config) {
-    final RecordLayerTable table = ListRecordLayerTableModel.createTable(this);
-    return new RecordLayerTablePanel(this, table, config);
   }
 
   @Override
@@ -237,6 +216,27 @@ public class ListRecordLayer extends AbstractRecordLayer {
     addToIndex(record);
     fireEmpty();
     return record;
+  }
+
+  protected void newRecordInternal(final Map<String, Object> values) {
+    final LayerRecord record = newLayerRecord(getRecordDefinition());
+    record.setState(RecordState.INITIALIZING);
+    try {
+      record.setValues(values);
+    } finally {
+      record.setState(RecordState.PERSISTED);
+    }
+    synchronized (this.records) {
+      this.records.add(record);
+      expandBoundingBox(record);
+    }
+    addToIndex(record);
+  }
+
+  @Override
+  public RecordLayerTablePanel newTablePanel(final Map<String, Object> config) {
+    final RecordLayerTable table = ListRecordLayerTableModel.newTable(this);
+    return new RecordLayerTablePanel(this, table, config);
   }
 
   protected void refreshBoundingBox() {

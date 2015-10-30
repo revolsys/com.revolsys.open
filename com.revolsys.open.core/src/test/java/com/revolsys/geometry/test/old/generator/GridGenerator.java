@@ -43,7 +43,7 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
  * This class should be used to generate a grid of bounding boxes,
  * most useful when creating multiple geometries.
  *
- * Successive calls to create() will walk the user though the grid.
+ * Successive calls to newGeometry() will walk the user though the grid.
  * Use canCreate() and reset() to control the walk through the grid.
  *
  * @see #canCreate()
@@ -74,28 +74,29 @@ public class GridGenerator extends GeometryGenerator {
   }
 
   /**
-   *
-   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#create()
-   *
-   * @throws NoSuchElementException when all the grids have been created (@see #create())
-   * @throws NullPointerException when either the Geometry Factory, or the Bounding Box are undefined.
+   * @return Returns the numberColumns.
    */
-  @Override
-  public Geometry create() {
-    final GeometryFactory r = this.geometryFactory;
-    return createEnv().toGeometry();
+  public int getNumberColumns() {
+    return this.numberColumns;
+  }
+
+  /**
+   * @return Returns the numberRows.
+   */
+  public int getNumberRows() {
+    return this.numberRows;
   }
 
   /**
    *
    * @return BoundingBoxDoubleGf
    *
-   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#create()
+   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#newIterator()
    *
-   * @throws NoSuchElementException when all the grids have been created (@see #create())
+   * @throws NoSuchElementException when all the grids have been created
    * @throws NullPointerException when either the Geometry Factory, or the Bounding Box are undefined.
    */
-  public BoundingBox createEnv() {
+  public BoundingBox newBoundingBox() {
     if (!canCreate()) {
       throw new NoSuchElementException("There are not any grids left to create.");
     }
@@ -132,17 +133,16 @@ public class GridGenerator extends GeometryGenerator {
   }
 
   /**
-   * @return Returns the numberColumns.
+   *
+   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#newIterator()
+   *
+   * @throws NoSuchElementException when all the grids have been created
+   * @throws NullPointerException when either the Geometry Factory, or the Bounding Box are undefined.
    */
-  public int getNumberColumns() {
-    return this.numberColumns;
-  }
-
-  /**
-   * @return Returns the numberRows.
-   */
-  public int getNumberRows() {
-    return this.numberRows;
+  @Override
+  public Geometry newGeometry() {
+    final GeometryFactory r = this.geometryFactory;
+    return newBoundingBox().toGeometry();
   }
 
   /**

@@ -1,11 +1,8 @@
 package com.revolsys.geometry.cs.esri;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,10 +19,8 @@ import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.WktCsParser;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.Paths;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.WrappedException;
 
 public class EsriCoordinateSystems {
   private static Map<CoordinateSystem, CoordinateSystem> coordinateSystems = new HashMap<CoordinateSystem, CoordinateSystem>();
@@ -52,48 +47,6 @@ public class EsriCoordinateSystems {
       coordinateSystemsById.put(id, cs);
       coordinateSystemsByName.put(cs.getCoordinateSystemName(), cs);
       coordinateSystems.put(cs, cs);
-    }
-  }
-
-  public static void createPrjFile(final File file, final GeometryFactory geometryFactory) {
-    final Path path = file.toPath();
-    createPrjFile(path, geometryFactory);
-  }
-
-  public static void createPrjFile(final Path path, final GeometryFactory geometryFactory) {
-    if (path != null) {
-      final Path prjPath = Paths.withExtension(path, "prj");
-      try (
-        final Writer writer = Files.newBufferedWriter(prjPath, StandardCharsets.ISO_8859_1)) {
-        createPrjFile(writer, geometryFactory);
-      } catch (final IOException e) {
-        throw new WrappedException(e);
-      }
-    }
-  }
-
-  public static void createPrjFile(final Resource resource, final GeometryFactory geometryFactory) {
-    final Resource prjResource = resource.newResourceChangeExtension("prj");
-    if (prjResource != null) {
-      try (
-        final Writer writer = prjResource.newWriter(StandardCharsets.ISO_8859_1)) {
-        createPrjFile(writer, geometryFactory);
-      } catch (final Throwable e) {
-        LoggerFactory.getLogger(EsriCoordinateSystems.class).error("Unable to create: " + resource,
-          e);
-      }
-    }
-  }
-
-  protected static void createPrjFile(final Writer writer, final GeometryFactory geometryFactory) {
-    if (geometryFactory != null) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      if (coordinateSystem != null) {
-        final int srid = coordinateSystem.getCoordinateSystemId();
-        final CoordinateSystem esriCoordinateSystem = CoordinateSystems
-          .getCoordinateSystem(new QName("ESRI", String.valueOf(srid)));
-        EsriCsWktWriter.write(writer, esriCoordinateSystem, -1);
-      }
     }
   }
 
@@ -171,6 +124,34 @@ public class EsriCoordinateSystems {
       }
     }
     return null;
+  }
+
+  public static void writePrjFile(final Object target, final GeometryFactory geometryFactory) {
+    final Resource resource = Resource.getResource(target);
+    if (resource != null) {
+      final Resource prjResource = resource.newResourceChangeExtension("prj");
+      if (prjResource != null) {
+        try (
+          final Writer writer = prjResource.newWriter(StandardCharsets.ISO_8859_1)) {
+          writePrjFile(writer, geometryFactory);
+        } catch (final Throwable e) {
+          LoggerFactory.getLogger(EsriCoordinateSystems.class)
+            .error("Unable to create: " + resource, e);
+        }
+      }
+    }
+  }
+
+  protected static void writePrjFile(final Writer writer, final GeometryFactory geometryFactory) {
+    if (geometryFactory != null) {
+      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      if (coordinateSystem != null) {
+        final int srid = coordinateSystem.getCoordinateSystemId();
+        final CoordinateSystem esriCoordinateSystem = CoordinateSystems
+          .getCoordinateSystem(new QName("ESRI", String.valueOf(srid)));
+        EsriCsWktWriter.write(writer, esriCoordinateSystem, -1);
+      }
+    }
   }
 
 }

@@ -40,26 +40,26 @@ import com.revolsys.geometry.util.Assert;
  * @version 1.7
  */
 public class Node extends NodeBase {
-  public static Node createExpanded(final Node node, final Interval addInterval) {
-    final Interval expandInt = new Interval(addInterval);
-    if (node != null) {
-      expandInt.expandToInclude(node.interval);
-    }
-
-    final Node largerNode = createNode(expandInt);
-    if (node != null) {
-      largerNode.insert(node);
-    }
-    return largerNode;
-  }
-
-  public static Node createNode(final Interval itemInterval) {
+  public static Node newNode(final Interval itemInterval) {
     final Key key = new Key(itemInterval);
 
     // System.out.println("input: " + env + " binaryEnv: " +
     // key.getEnvelope());
     final Node node = new Node(key.getInterval(), key.getLevel());
     return node;
+  }
+
+  public static Node newNodeExpanded(final Node node, final Interval addInterval) {
+    final Interval expandInt = new Interval(addInterval);
+    if (node != null) {
+      expandInt.expandToInclude(node.interval);
+    }
+
+    final Node largerNode = newNode(expandInt);
+    if (node != null) {
+      largerNode.insert(node);
+    }
+    return largerNode;
   }
 
   private final double centre;
@@ -72,27 +72,6 @@ public class Node extends NodeBase {
     this.interval = interval;
     this.level = level;
     this.centre = (interval.getMin() + interval.getMax()) / 2;
-  }
-
-  private Node createSubnode(final int index) {
-    // Construct a new new subnode in the appropriate interval
-
-    double min = 0.0;
-    double max = 0.0;
-
-    switch (index) {
-      case 0:
-        min = this.interval.getMin();
-        max = this.centre;
-      break;
-      case 1:
-        min = this.centre;
-        max = this.interval.getMax();
-      break;
-    }
-    final Interval subInt = new Interval(min, max);
-    final Node node = new Node(subInt, this.level - 1);
-    return node;
   }
 
   /**
@@ -141,7 +120,7 @@ public class Node extends NodeBase {
    */
   private Node getSubnode(final int index) {
     if (this.subnode[index] == null) {
-      this.subnode[index] = createSubnode(index);
+      this.subnode[index] = newSubnode(index);
     }
     return this.subnode[index];
   }
@@ -154,7 +133,7 @@ public class Node extends NodeBase {
     } else {
       // the node is not a direct child, so make a new child node to contain it
       // and recursively insert the node
-      final Node childNode = createSubnode(index);
+      final Node childNode = newSubnode(index);
       childNode.insert(node);
       this.subnode[index] = childNode;
     }
@@ -165,6 +144,27 @@ public class Node extends NodeBase {
     // System.out.println(itemInterval + " overlaps " + interval + " : "
     // + itemInterval.overlaps(interval));
     return itemInterval.overlaps(this.interval);
+  }
+
+  private Node newSubnode(final int index) {
+    // Construct a new new subnode in the appropriate interval
+
+    double min = 0.0;
+    double max = 0.0;
+
+    switch (index) {
+      case 0:
+        min = this.interval.getMin();
+        max = this.centre;
+      break;
+      case 1:
+        min = this.centre;
+        max = this.interval.getMax();
+      break;
+    }
+    final Interval subInt = new Interval(min, max);
+    final Node node = new Node(subInt, this.level - 1);
+    return node;
   }
 
 }

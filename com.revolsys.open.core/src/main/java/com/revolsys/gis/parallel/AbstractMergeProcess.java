@@ -172,7 +172,7 @@ public abstract class AbstractMergeProcess extends AbstractInOutProcess<Record, 
     try {
       RecordDefinition currentType = null;
       String currentTypeName = null;
-      final Channel<Record>[] channels = ArrayUtil.create(in, this.otherIn);
+      final Channel<Record>[] channels = ArrayUtil.newArray(in, this.otherIn);
 
       final boolean[] guard = new boolean[] {
         true, true

@@ -78,17 +78,7 @@ public class SierpinskiCarpetBuilder extends GeometricShapeBuilder {
     addHoles(n2, originX + 2 * widthThird, originY + 2 * widthThird, widthThird, holeList);
 
     // add the centre hole
-    holeList.add(createSquareHole(originX + widthThird, originY + widthThird, widthThird));
-  }
-
-  private LinearRing createSquareHole(final double x, final double y, final double width) {
-    final Point[] pts = new Point[] {
-      new PointDouble(x, y, Point.NULL_ORDINATE),
-      new PointDouble(x + width, y, Point.NULL_ORDINATE),
-      new PointDouble(x + width, y + width, Point.NULL_ORDINATE),
-      new PointDouble(x, y + width, Point.NULL_ORDINATE), new PointDouble(x, y, Point.NULL_ORDINATE)
-    };
-    return this.geometryFactory.linearRing(pts);
+    holeList.add(newSquareHole(originX + widthThird, originY + widthThird, widthThird));
   }
 
   @Override
@@ -101,6 +91,17 @@ public class SierpinskiCarpetBuilder extends GeometricShapeBuilder {
     rings.add(shell);
     addHoles(level, origin.getX(), origin.getY(), getDiameter(), rings);
     return this.geometryFactory.polygon(shell);
+  }
+
+  private LinearRing newSquareHole(final double x, final double y, final double width) {
+    final Point[] pts = new Point[] {
+      new PointDouble(x, y, Geometry.NULL_ORDINATE),
+      new PointDouble(x + width, y, Geometry.NULL_ORDINATE),
+      new PointDouble(x + width, y + width, Geometry.NULL_ORDINATE),
+      new PointDouble(x, y + width, Geometry.NULL_ORDINATE),
+      new PointDouble(x, y, Geometry.NULL_ORDINATE)
+    };
+    return this.geometryFactory.linearRing(pts);
   }
 
 }

@@ -35,7 +35,7 @@ public class TestDirectory extends TestSuite {
         if (FileUtil.getFileNameExtension(file).equals("json")) {
           testRun = MapObjectFactoryRegistry.toObject(file);
         } else {
-          testRun = testReader.createTestRun(this, file, runIndex);
+          testRun = testReader.newTestRun(this, file, runIndex);
         }
         addTest(testRun);
       }

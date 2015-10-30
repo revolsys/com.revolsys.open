@@ -71,7 +71,7 @@ public class Root extends NodeBase {
      */
 
     if (node == null || !node.getInterval().contains(itemInterval)) {
-      final Node largerNode = Node.createExpanded(node, itemInterval);
+      final Node largerNode = Node.newNodeExpanded(node, itemInterval);
       this.subnode[index] = largerNode;
     }
     /**

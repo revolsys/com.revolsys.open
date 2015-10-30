@@ -36,7 +36,7 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
     if (file == null) {
       throw new NullPointerException("File must not be null");
     } else {
-      final Writer writer = FileUtil.createUtf8Writer(file);
+      final Writer writer = FileUtil.newUtf8Writer(file);
       return plainWriter(writer);
     }
   }

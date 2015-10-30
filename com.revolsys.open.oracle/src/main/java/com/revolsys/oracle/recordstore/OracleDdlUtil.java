@@ -1,4 +1,4 @@
-package com.revolsys.gis.oracle.io;
+package com.revolsys.oracle.recordstore;
 
 import java.io.PrintWriter;
 
@@ -10,7 +10,8 @@ import com.revolsys.record.schema.RecordDefinition;
 
 public class OracleDdlUtil {
 
-  public static void createTable(final PrintWriter out, final RecordDefinition recordDefinition) {
+  public static void writeCreateTable(final PrintWriter out,
+    final RecordDefinition recordDefinition) {
     final String typePath = recordDefinition.getPath();
     out.println();
     out.print("CREATE TABLE ");

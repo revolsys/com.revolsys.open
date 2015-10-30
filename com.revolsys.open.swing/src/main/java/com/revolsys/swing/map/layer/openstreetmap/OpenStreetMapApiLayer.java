@@ -28,7 +28,7 @@ public class OpenStreetMapApiLayer extends AbstractRecordLayer {
 
   private static final double TILE_WIDTH = 1.0 / TILE_SCALE_X;
 
-  public static AbstractLayer create(final Map<String, Object> properties) {
+  public static AbstractLayer newLayer(final Map<String, Object> properties) {
     return new OpenStreetMapApiLayer(properties);
   }
 
@@ -82,7 +82,7 @@ public class OpenStreetMapApiLayer extends AbstractRecordLayer {
   private synchronized OsmDocument getTile(final BoundingBox boundingBox) {
     OsmDocument document = this.boundingBoxTileMap.get(boundingBox);
     if (document == null) {
-      document = OsmDocument.create(this.serverUrl, boundingBox);
+      document = OsmDocument.newDocument(this.serverUrl, boundingBox);
       this.boundingBoxTileMap.put(boundingBox, document);
     }
     return document;

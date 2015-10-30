@@ -56,7 +56,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   private static final UIDefaults DEFAULTS = UIManager.getDefaults();
 
-  public static final Icon ICON_FILE = CHOOSER.getIcon(FileUtil.createTempFile("xxxx", "6z4gsdj"));
+  public static final Icon ICON_FILE = CHOOSER.getIcon(FileUtil.newTempFile("xxxx", "6z4gsdj"));
 
   public static final Icon ICON_FILE_DATABASE = Icons.getIconWithBadge(ICON_FILE, "database");
 
@@ -128,7 +128,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
           return ICON_FOLDER;
         }
         final String fileNameExtension = Paths.getFileNameExtension(path);
-        file = FileUtil.createTempFile("1234567890", fileNameExtension);
+        file = FileUtil.newTempFile("1234567890", fileNameExtension);
         final Icon icon = CHOOSER.getIcon(file);
         file.delete();
         return icon;
@@ -141,7 +141,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       return path.toFile();
     } catch (final UnsupportedOperationException e) {
       final String fileNameExtension = Paths.getFileNameExtension(path);
-      final File file = FileUtil.createTempFile("1234567890", fileNameExtension);
+      final File file = FileUtil.newTempFile("1234567890", fileNameExtension);
       file.delete();
       return file;
     }

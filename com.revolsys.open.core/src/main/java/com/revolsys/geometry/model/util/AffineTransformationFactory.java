@@ -33,6 +33,7 @@
 
 package com.revolsys.geometry.model.util;
 
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.math.Angle;
@@ -45,6 +46,27 @@ import com.revolsys.math.Angle;
  *
  */
 public class AffineTransformationFactory {
+  /**
+   * Creates a tranformation from a set of three control vectors. A control
+   * vector consists of a source point and a destination point, which is the
+   * image of the source point under the desired transformation. Three control
+   * vectors allows defining a fully general affine transformation.
+   *
+   * @param src0
+   * @param src1
+   * @param src2
+   * @param dest0
+   * @param dest1
+   * @param dest2
+   * @return the computed transformation
+   */
+  public static AffineTransformation mnewFromControlVectors(final Point src0, final Point src1,
+    final Point src2, final Point dest0, final Point dest1, final Point dest2) {
+    final AffineTransformationBuilder builder = new AffineTransformationBuilder(src0, src1, src2,
+      dest0, dest1, dest2);
+    return builder.getTransformation();
+  }
+
   /**
    * Creates an AffineTransformation defined by a maping between two baselines.
    * The computed transformation consists of:
@@ -62,10 +84,10 @@ public class AffineTransformationFactory {
    * @param dest1 the end point of the destination baseline
    * @return the computed transformation
    */
-  public static AffineTransformation createFromBaseLines(final Point src0, final Point src1,
+  public static AffineTransformation newFromBaseLines(final Point src0, final Point src1,
     final Point dest0, final Point dest1) {
     final Point rotPt = new PointDouble(src0.getX() + dest1.getX() - dest0.getX(),
-      src0.getY() + dest1.getY() - dest0.getY(), Point.NULL_ORDINATE);
+      src0.getY() + dest1.getY() - dest0.getY(), Geometry.NULL_ORDINATE);
 
     final double ang = Angle.angleBetweenOriented(src1, src0, rotPt);
 
@@ -99,7 +121,7 @@ public class AffineTransformationFactory {
    *          the end point of the control vector
    * @return the computed transformation
    */
-  public static AffineTransformation createFromControlVectors(final Point src0, final Point dest0) {
+  public static AffineTransformation newFromControlVectors(final Point src0, final Point dest0) {
     final double dx = dest0.getX() - src0.getX();
     final double dy = dest0.getY() - src0.getY();
     return AffineTransformation.translationInstance(dx, dy);
@@ -120,10 +142,10 @@ public class AffineTransformationFactory {
    * @return the computed transformation
    * @return null if the control vectors do not determine a well-defined transformation
    */
-  public static AffineTransformation createFromControlVectors(final Point src0, final Point src1,
+  public static AffineTransformation newFromControlVectors(final Point src0, final Point src1,
     final Point dest0, final Point dest1) {
     final Point rotPt = new PointDouble(dest1.getX() - dest0.getX(), dest1.getY() - dest0.getY(),
-      Point.NULL_ORDINATE);
+      Geometry.NULL_ORDINATE);
 
     final double ang = Angle.angleBetweenOriented(src1, src0, rotPt);
 
@@ -145,27 +167,6 @@ public class AffineTransformationFactory {
   }
 
   /**
-   * Creates a tranformation from a set of three control vectors. A control
-   * vector consists of a source point and a destination point, which is the
-   * image of the source point under the desired transformation. Three control
-   * vectors allows defining a fully general affine transformation.
-   *
-   * @param src0
-   * @param src1
-   * @param src2
-   * @param dest0
-   * @param dest1
-   * @param dest2
-   * @return the computed transformation
-   */
-  public static AffineTransformation createFromControlVectors(final Point src0, final Point src1,
-    final Point src2, final Point dest0, final Point dest1, final Point dest2) {
-    final AffineTransformationBuilder builder = new AffineTransformationBuilder(src0, src1, src2,
-      dest0, dest1, dest2);
-    return builder.getTransformation();
-  }
-
-  /**
    * Creates an AffineTransformation defined by a set of control vectors.
    * Between one and three vectors must be supplied.
    *
@@ -178,8 +179,7 @@ public class AffineTransformationFactory {
    *           if the control vector arrays are too short, long or of different
    *           lengths
    */
-  public static AffineTransformation createFromControlVectors(final Point[] src,
-    final Point[] dest) {
+  public static AffineTransformation newFromControlVectors(final Point[] src, final Point[] dest) {
     if (src.length != dest.length) {
       throw new IllegalArgumentException("Src and Dest arrays are not the same length");
     }
@@ -191,13 +191,13 @@ public class AffineTransformationFactory {
     }
 
     if (src.length == 1) {
-      return createFromControlVectors(src[0], dest[0]);
+      return newFromControlVectors(src[0], dest[0]);
     }
     if (src.length == 2) {
-      return createFromControlVectors(src[0], src[1], dest[0], dest[1]);
+      return newFromControlVectors(src[0], src[1], dest[0], dest[1]);
     }
 
-    return createFromControlVectors(src[0], src[1], src[2], dest[0], dest[1], dest[2]);
+    return mnewFromControlVectors(src[0], src[1], src[2], dest[0], dest[1], dest[2]);
   }
 
 }

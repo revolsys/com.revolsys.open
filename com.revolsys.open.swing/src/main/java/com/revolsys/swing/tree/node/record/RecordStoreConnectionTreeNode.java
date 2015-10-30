@@ -39,8 +39,8 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
 
     final Predicate<RecordStoreConnectionTreeNode> editableFilter = RecordStoreConnectionTreeNode::isEditable;
     if (OS.isMac()) {
-      TreeNodes.addMenuItem(MENU, "default", "Edit Connection", "database_edit",
-        editableFilter, RecordStoreConnectionTreeNode::editConnection);
+      TreeNodes.addMenuItem(MENU, "default", "Edit Connection", "database_edit", editableFilter,
+        RecordStoreConnectionTreeNode::editConnection);
     }
     TreeNodes.addMenuItem(MENU, "default", "Delete Record Store Connection", "database_delete",
       editableFilter, RecordStoreConnectionTreeNode::deleteConnection);

@@ -17,7 +17,7 @@ public interface Menus {
   static <V> MenuSourceAction addCheckboxMenuItem(final MenuFactory menu, final String groupName,
     final CharSequence name, final String iconName, final Predicate<V> enableCheck,
     final Consumer<V> consumer, final Predicate<V> itemChecked) {
-    final MenuSourceAction action = Menus.createAction(name, iconName, enableCheck, consumer);
+    final MenuSourceAction action = Menus.newAction(name, iconName, enableCheck, consumer);
     final EnableCheck itemCheckedEnableCheck = enableCheck(itemChecked);
     menu.addCheckboxMenuItem(groupName, action, itemCheckedEnableCheck);
     return action;
@@ -42,7 +42,7 @@ public interface Menus {
   static <V> MenuSourceAction addMenuItem(final MenuFactory menu, final String groupName,
     final int index, final CharSequence name, final Icon icon, final Predicate<V> enabledFilter,
     final Consumer<V> consumer) {
-    final MenuSourceAction action = Menus.createAction(name, icon, enabledFilter, consumer);
+    final MenuSourceAction action = Menus.newAction(name, icon, enabledFilter, consumer);
     menu.addMenuItem(groupName, index, action);
     return action;
   }
@@ -55,24 +55,8 @@ public interface Menus {
   static <V> MenuSourceAction addMenuItem(final MenuFactory menu, final String groupName,
     final int index, final CharSequence name, final String iconName, final Predicate<V> enableCheck,
     final Consumer<V> consumer) {
-    final MenuSourceAction action = Menus.createAction(name, iconName, enableCheck, consumer);
+    final MenuSourceAction action = Menus.newAction(name, iconName, enableCheck, consumer);
     menu.addMenuItem(groupName, index, action);
-    return action;
-  }
-
-  static <V> MenuSourceAction createAction(final CharSequence name, final Icon icon,
-    final Predicate<V> enabledFilter, final Consumer<V> consumer) {
-    final EnableCheck enableCheck = enableCheck(enabledFilter);
-    final MenuSourceAction action = new MenuSourceAction(name, null, icon, consumer);
-    action.setEnableCheck(enableCheck);
-    return action;
-  }
-
-  static <V> MenuSourceAction createAction(final CharSequence name, final String iconName,
-    final Predicate<V> enabledFilter, final Consumer<V> consumer) {
-    final ImageIcon icon = Icons.getIcon(iconName);
-    final MenuSourceAction action = createAction(name, icon, enabledFilter, consumer);
-    action.setIconName(iconName);
     return action;
   }
 
@@ -94,5 +78,21 @@ public interface Menus {
         }
       };
     }
+  }
+
+  static <V> MenuSourceAction newAction(final CharSequence name, final Icon icon,
+    final Predicate<V> enabledFilter, final Consumer<V> consumer) {
+    final EnableCheck enableCheck = enableCheck(enabledFilter);
+    final MenuSourceAction action = new MenuSourceAction(name, null, icon, consumer);
+    action.setEnableCheck(enableCheck);
+    return action;
+  }
+
+  static <V> MenuSourceAction newAction(final CharSequence name, final String iconName,
+    final Predicate<V> enabledFilter, final Consumer<V> consumer) {
+    final ImageIcon icon = Icons.getIcon(iconName);
+    final MenuSourceAction action = newAction(name, icon, enabledFilter, consumer);
+    action.setIconName(iconName);
+    return action;
   }
 }

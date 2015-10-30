@@ -124,7 +124,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
           if (paramObject instanceof BoundingBox) {
             return paramObject;
           } else {
-            return create(paramObject.toString());
+            return newBoundingBox(paramObject.toString());
           }
         }
         return null;
@@ -132,7 +132,17 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     }, BoundingBox.class);
   }
 
-  public static BoundingBox create(final String wkt) {
+  public static boolean isEmpty(final double minX, final double maxX) {
+    if (Double.isNaN(minX)) {
+      return true;
+    } else if (Double.isNaN(maxX)) {
+      return true;
+    } else {
+      return maxX < minX;
+    }
+  }
+
+  public static BoundingBox newBoundingBox(final String wkt) {
     if (Property.hasValue(wkt)) {
       GeometryFactory geometryFactory = null;
       final StringBuilder text = new StringBuilder(wkt);
@@ -167,16 +177,6 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     return BoundingBox.EMPTY;
   }
 
-  public static boolean isEmpty(final double minX, final double maxX) {
-    if (Double.isNaN(minX)) {
-      return true;
-    } else if (Double.isNaN(maxX)) {
-      return true;
-    } else {
-      return maxX < minX;
-    }
-  }
-
   private final double[] bounds;
 
   private GeometryFactory geometryFactory;
@@ -201,7 +201,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     if (bounds == null || bounds.length == 0 || axisCount < 1) {
       this.bounds = null;
     } else if (bounds.length % axisCount == 0) {
-      this.bounds = BoundingBoxUtil.createBounds(axisCount);
+      this.bounds = BoundingBoxUtil.newBounds(axisCount);
       BoundingBoxUtil.expand(geometryFactory, this.bounds, bounds);
     } else {
       throw new IllegalArgumentException(
@@ -217,7 +217,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
       for (final Point point : points) {
         if (point != null) {
           if (bounds == null) {
-            bounds = BoundingBoxUtil.createBounds(geometryFactory, point);
+            bounds = BoundingBoxUtil.newBounds(geometryFactory, point);
           } else {
             BoundingBoxUtil.expand(geometryFactory, bounds, point);
           }
@@ -234,7 +234,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
       for (int i = 0; i < points.getVertexCount(); i++) {
         final Point point = points.getPoint(0);
         if (bounds == null) {
-          bounds = BoundingBoxUtil.createBounds(geometryFactory, point);
+          bounds = BoundingBoxUtil.newBounds(geometryFactory, point);
         } else {
           BoundingBoxUtil.expand(geometryFactory, bounds, point);
         }
@@ -247,7 +247,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     this.geometryFactory = geometryFactory;
     double[] bounds = null;
     if (point != null) {
-      bounds = BoundingBoxUtil.createBounds(geometryFactory, point);
+      bounds = BoundingBoxUtil.newBounds(geometryFactory, point);
     }
     this.bounds = bounds;
   }
@@ -1233,6 +1233,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     }
   }
 
+  @Override
   public boolean intersects(final Geometry geometry) {
     return geometry.intersects(this);
   }

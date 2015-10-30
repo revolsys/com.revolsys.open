@@ -28,7 +28,7 @@ public class CollectionValue extends QueryValue {
   }
 
   public CollectionValue(final FieldDefinition field, final Collection<? extends Object> values) {
-    setField(field);
+    setFieldDefinition(field);
     for (final Object value : values) {
       QueryValue queryValue;
       if (value instanceof QueryValue) {
@@ -151,7 +151,8 @@ public class CollectionValue extends QueryValue {
     return values;
   }
 
-  public void setField(final FieldDefinition field) {
+  @Override
+  public void setFieldDefinition(final FieldDefinition field) {
     this.field = field;
     if (field == null) {
       this.jdbcField = null;
@@ -164,7 +165,7 @@ public class CollectionValue extends QueryValue {
       for (final QueryValue queryValue : this.queryValues) {
         if (queryValue instanceof Value) {
           final Value value = (Value)queryValue;
-          value.setField(field);
+          value.setFieldDefinition(field);
         }
       }
     }

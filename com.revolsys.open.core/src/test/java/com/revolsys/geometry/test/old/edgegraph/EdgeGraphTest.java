@@ -5,6 +5,7 @@ import java.util.List;
 import com.revolsys.geometry.edgegraph.EdgeGraph;
 import com.revolsys.geometry.edgegraph.EdgeGraphBuilder;
 import com.revolsys.geometry.edgegraph.HalfEdge;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.test.old.junit.GeometryUtils;
@@ -53,13 +54,13 @@ public class EdgeGraphTest extends TestCase {
 
   public void testNode() throws Exception {
     final EdgeGraph graph = build("MULTILINESTRING((0 0, 1 0), (0 0, 0 1), (0 0, -1 0))");
-    checkEdgeRing(graph, new PointDouble((double)0, 0, Point.NULL_ORDINATE), new Point[] {
-      new PointDouble((double)1, 0, Point.NULL_ORDINATE),
-      new PointDouble((double)0, 1, Point.NULL_ORDINATE),
-      new PointDouble((double)-1, 0, Point.NULL_ORDINATE)
+    checkEdgeRing(graph, new PointDouble((double)0, 0, Geometry.NULL_ORDINATE), new Point[] {
+      new PointDouble((double)1, 0, Geometry.NULL_ORDINATE),
+      new PointDouble((double)0, 1, Geometry.NULL_ORDINATE),
+      new PointDouble((double)-1, 0, Geometry.NULL_ORDINATE)
     });
-    checkEdge(graph, new PointDouble((double)0, 0, Point.NULL_ORDINATE),
-      new PointDouble((double)1, 0, Point.NULL_ORDINATE));
+    checkEdge(graph, new PointDouble((double)0, 0, Geometry.NULL_ORDINATE),
+      new PointDouble((double)1, 0, Geometry.NULL_ORDINATE));
   }
 
 }

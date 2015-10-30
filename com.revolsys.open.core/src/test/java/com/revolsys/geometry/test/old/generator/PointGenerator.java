@@ -46,11 +46,11 @@ import com.revolsys.geometry.model.Point;
 public class PointGenerator extends GeometryGenerator {
 
   /**
-   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#create()
+   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#newIterator()
    * @throws NullPointerException when either the Geometry Factory, or the Bounding Box are undefined.
    */
   @Override
-  public Geometry create() {
+  public Geometry newGeometry() {
     if (this.geometryFactory == null) {
       throw new NullPointerException("GeometryFactoryI is not declared");
     }

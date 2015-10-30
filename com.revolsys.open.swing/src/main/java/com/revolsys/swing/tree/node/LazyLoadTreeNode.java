@@ -44,12 +44,6 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
     }
   }
 
-  private List<BaseTreeNode> createLoadingNodes() {
-    final List<BaseTreeNode> nodes = new ArrayList<>();
-    nodes.add(new LoadingTreeNode(this));
-    return nodes;
-  }
-
   @Override
   protected void doClose() {
     setLoading();
@@ -92,12 +86,18 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
     }
   }
 
+  private List<BaseTreeNode> newLoadingNodes() {
+    final List<BaseTreeNode> nodes = new ArrayList<>();
+    nodes.add(new LoadingTreeNode(this));
+    return nodes;
+  }
+
   @Override
   public void nodeCollapsed(final BaseTreeNode treeNode) {
     super.nodeCollapsed(treeNode);
     if (treeNode != this) {
       final int updateIndex = getUpdateIndex();
-      setChildren(updateIndex, createLoadingNodes());
+      setChildren(updateIndex, newLoadingNodes());
     }
   }
 
@@ -161,7 +161,7 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
   }
 
   private void setLoading() {
-    this.children = createLoadingNodes();
+    this.children = newLoadingNodes();
     this.loaded = false;
   }
 }

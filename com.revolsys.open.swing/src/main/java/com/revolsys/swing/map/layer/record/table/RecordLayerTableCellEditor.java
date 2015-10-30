@@ -16,7 +16,7 @@ public class RecordLayerTableCellEditor extends RecordTableCellEditor {
   }
 
   @Override
-  protected Field createField(final String fieldName) {
-    return RecordLayerFields.createCompactField(this.layer, fieldName, true);
+  protected Field newField(final String fieldName) {
+    return RecordLayerFields.newCompactField(this.layer, fieldName, true);
   }
 }

@@ -30,7 +30,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
   private XMLStreamReader in;
 
   public KmlGeometryIterator(final InputStream in) {
-    this.in = StaxUtils.createXmlReader(in);
+    this.in = StaxUtils.newXmlReader(in);
   }
 
   public KmlGeometryIterator(final Resource resource) {

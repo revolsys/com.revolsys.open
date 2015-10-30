@@ -363,7 +363,7 @@ public class WKBWriter {
     if (this.outputDimension >= 3) {
       // if 3rd dim is requested, only write it if the LineString provides
       // it
-      double ordVal = Point.NULL_ORDINATE;
+      double ordVal = Geometry.NULL_ORDINATE;
       if (seq.getAxisCount() >= 3) {
         ordVal = seq.getCoordinate(index, 2);
       }
@@ -383,7 +383,7 @@ public class WKBWriter {
     if (this.outputDimension >= 3) {
       // if 3rd dim is requested, only write it if the LineString provides
       // it
-      double ordVal = Point.NULL_ORDINATE;
+      double ordVal = Geometry.NULL_ORDINATE;
       if (seq.getAxisCount() >= 3) {
         ordVal = seq.getCoordinate(2);
       }

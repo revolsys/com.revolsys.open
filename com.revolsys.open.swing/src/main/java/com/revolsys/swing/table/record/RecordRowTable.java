@@ -83,7 +83,7 @@ public class RecordRowTable extends BaseJTable implements MouseListener {
     final JTableHeader tableHeader = getTableHeader();
 
     final TableColumnModel columnModel = getColumnModel();
-    this.tableCellEditor = createTableCellEditor();
+    this.tableCellEditor = newTableCellEditor();
     this.tableCellEditor.addCellEditorListener(model);
     for (int columnIndex = 0; columnIndex < model.getColumnCount(); columnIndex++) {
       final TableColumn column = columnModel.getColumn(columnIndex);
@@ -97,10 +97,6 @@ public class RecordRowTable extends BaseJTable implements MouseListener {
 
     ModifiedAttributePredicate.add(this);
     ErrorPredicate.add(this);
-  }
-
-  protected RecordTableCellEditor createTableCellEditor() {
-    return new RecordTableCellEditor(this);
   }
 
   @Override
@@ -196,6 +192,10 @@ public class RecordRowTable extends BaseJTable implements MouseListener {
 
   @Override
   public void mouseReleased(final MouseEvent e) {
+  }
+
+  protected RecordTableCellEditor newTableCellEditor() {
+    return new RecordTableCellEditor(this);
   }
 
   @Override

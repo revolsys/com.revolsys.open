@@ -42,9 +42,7 @@ import com.revolsys.geometry.util.Triangles;
  *
  * @version 1.7
  */
-public class TriangleImpl  {
-
-  
+public class TriangleImpl {
 
   /**
    * Computes the circumcentre of a triangle. The circumcentre is the centre of

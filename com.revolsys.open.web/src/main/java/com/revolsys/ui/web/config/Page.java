@@ -152,7 +152,7 @@ public class Page extends Component {
     } else {
       try {
         final EvaluationContext securityEvaluationContext = SpringExpressionUtil
-          .createSecurityEvaluationContext();
+          .newSecurityEvaluationContext();
         for (final Entry<String, ? extends Object> entry : parameters.entrySet()) {
           final String name = entry.getKey();
           final Object value = entry.getValue();
@@ -442,7 +442,7 @@ public class Page extends Component {
         this.titleTemplate = null;
       }
       try {
-        this.titleExpression = JexlUtil.createExpression(title);
+        this.titleExpression = JexlUtil.newExpression(title);
       } catch (final Exception e) {
         LOG.error(e.getMessage(), e);
       }

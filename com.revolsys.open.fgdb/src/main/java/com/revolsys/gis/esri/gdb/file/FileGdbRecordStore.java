@@ -483,12 +483,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
-  private Geodatabase createGeodatabase() {
-    return getSingleThreadResult(() -> {
-      return EsriFileGdb.createGeodatabase(this.fileName);
-    });
-  }
-
   private boolean delete(final FileGdbWriter writer, final Record record) {
     // Don't synchronize to avoid deadlock as that is done lower down in the
     // methods
@@ -767,7 +761,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           final XmlProcessor parser = new EsriGdbXmlParser();
           final DETable deTable = parser.process(tableDefinition);
           final String tableName = deTable.getName();
-          final PathName typePath = PathName.newPathName(schemaName.createChild(tableName));
+          final PathName typePath = PathName.newPathName(schemaName.newChild(tableName));
           final RecordStoreSchema schema = getSchema(schemaName);
           final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema, typePath);
           for (final Field field : deTable.getFields()) {
@@ -963,7 +957,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                   FileUtil.getCanonicalPath(file) + " ESRI File Geodatabase must be a directory");
               }
             } else if (this.createMissingRecordStore) {
-              geodatabase = createGeodatabase();
+              geodatabase = newGeodatabase();
             } else {
               throw new IllegalArgumentException(
                 "ESRI file geodatabase not found " + this.fileName);
@@ -1135,6 +1129,12 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     return schema;
   }
 
+  private Geodatabase newGeodatabase() {
+    return getSingleThreadResult(() -> {
+      return EsriFileGdb.createGeodatabase(this.fileName);
+    });
+  }
+
   @Override
   public AbstractIterator<Record> newIterator(final Query query,
     final Map<String, Object> properties) {
@@ -1232,7 +1232,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             idGenerator = new AtomicLong(maxId);
             this.idGenerators.put(typePath, idGenerator);
           }
-          return Identifier.create(idGenerator.incrementAndGet());
+          return Identifier.newIdentifier(idGenerator.incrementAndGet());
         } else {
           return null;
         }
@@ -1281,7 +1281,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                   childCatalogPath)) {
                   if (spatialReference != null) {
                     final DEFeatureDataset dataset = EsriXmlRecordDefinitionUtil
-                      .createDEFeatureDataset(childCatalogPath, spatialReference);
+                      .newDEFeatureDataset(childCatalogPath, spatialReference);
                     final String datasetDefinition = EsriGdbXmlSerializer.toString(dataset);
                     try {
                       geodatabase.createFeatureDataset(datasetDefinition);

@@ -96,40 +96,6 @@ public class TestReader {
     return absoluteWktFile;
   }
 
-  private double createPrecisionModel(final Element precisionModelElement)
-    throws TestParseException {
-    final Attribute scaleAttribute = precisionModelElement.getAttribute("scale");
-    if (scaleAttribute == null) {
-      throw new TestParseException("Missing scale attribute in <precisionModel>");
-    }
-    double scale;
-    try {
-      scale = scaleAttribute.getDoubleValue();
-    } catch (final DataConversionException e) {
-      throw new TestParseException(
-        "Could not convert scale attribute to double: " + scaleAttribute.getValue());
-    }
-    return scale;
-  }
-
-  public TestFile createTestRun(final TestDirectory parent, final File testFile, final int runIndex)
-    throws Throwable {
-    try {
-      final SAXBuilder builder = new LineNumberSAXBuilder();
-      final Document document = builder.build(new FileInputStream(testFile));
-      final Element runElement = document.getRootElement();
-      if (!runElement.getName().equalsIgnoreCase("run")) {
-        throw new TestParseException(
-          "Expected <run> but encountered <" + runElement.getName() + ">");
-      }
-      return parseTestRun(parent, runElement, testFile, runIndex);
-    } catch (final IllegalArgumentException e) {
-      throw e;
-    } catch (final Exception e) {
-      throw new IllegalArgumentException("Error parsing " + testFile, e);
-    }
-  }
-
   public GeometryOperation getGeometryOperation() {
     return this.geomOp;
   }
@@ -173,6 +139,39 @@ public class TestReader {
 
   public boolean isIntegerFunction(final String name) {
     return getGeometryOperation().getReturnType(name) == int.class;
+  }
+
+  private double newPrecisionModel(final Element precisionModelElement) throws TestParseException {
+    final Attribute scaleAttribute = precisionModelElement.getAttribute("scale");
+    if (scaleAttribute == null) {
+      throw new TestParseException("Missing scale attribute in <precisionModel>");
+    }
+    double scale;
+    try {
+      scale = scaleAttribute.getDoubleValue();
+    } catch (final DataConversionException e) {
+      throw new TestParseException(
+        "Could not convert scale attribute to double: " + scaleAttribute.getValue());
+    }
+    return scale;
+  }
+
+  public TestFile newTestRun(final TestDirectory parent, final File testFile, final int runIndex)
+    throws Throwable {
+    try {
+      final SAXBuilder builder = new LineNumberSAXBuilder();
+      final Document document = builder.build(new FileInputStream(testFile));
+      final Element runElement = document.getRootElement();
+      if (!runElement.getName().equalsIgnoreCase("run")) {
+        throw new TestParseException(
+          "Expected <run> but encountered <" + runElement.getName() + ">");
+      }
+      return parseTestRun(parent, runElement, testFile, runIndex);
+    } catch (final IllegalArgumentException e) {
+      throw e;
+    } catch (final Exception e) {
+      throw new IllegalArgumentException("Error parsing " + testFile, e);
+    }
   }
 
   /**
@@ -223,7 +222,7 @@ public class TestReader {
       if (typeAttribute != null && typeAttribute.getValue().trim().equalsIgnoreCase("FLOATING")) {
         throw new TestParseException("scale attribute not allowed in floating <precisionModel>");
       }
-      return createPrecisionModel(precisionModelElement);
+      return newPrecisionModel(precisionModelElement);
     }
     return 0;
   }

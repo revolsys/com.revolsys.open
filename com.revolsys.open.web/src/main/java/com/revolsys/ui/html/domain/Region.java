@@ -110,7 +110,7 @@ public final class Region {
       regions = new ArrayList<>();
       regionMap = new HashMap<>();
       regionNameMap = new HashMap<>();
-      final BufferedReader lineReader = new BufferedReader(FileUtil.createUtf8Reader(in));
+      final BufferedReader lineReader = new BufferedReader(FileUtil.newUtf8Reader(in));
       try {
         for (String line = lineReader.readLine(); line != null; line = lineReader.readLine()) {
           final StringTokenizer columns = new StringTokenizer(line, "\t");

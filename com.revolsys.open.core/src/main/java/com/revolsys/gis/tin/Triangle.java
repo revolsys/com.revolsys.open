@@ -26,7 +26,7 @@ public class Triangle extends AbstractLineString {
 
   private static final long serialVersionUID = -4513931832875328029L;
 
-  public static Triangle createClockwiseTriangle(final Point c0, final Point c1, final Point c2) {
+  public static Triangle newClockwiseTriangle(final Point c0, final Point c1, final Point c2) {
     try {
       if (CoordinatesUtil.orientationIndex(c0, c1, c2) == CGAlgorithms.CLOCKWISE) {
         return new Triangle(c0, c1, c2);
@@ -137,7 +137,7 @@ public class Triangle extends AbstractLineString {
       final double x = getX(i);
       final double y = getY(i);
       if (bounds == null) {
-        bounds = BoundingBoxUtil.createBounds(2, x, y);
+        bounds = BoundingBoxUtil.newBounds(2, x, y);
       } else {
         BoundingBoxUtil.expand(null, bounds, 2, x, y);
       }

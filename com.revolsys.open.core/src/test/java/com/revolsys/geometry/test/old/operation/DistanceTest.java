@@ -93,14 +93,14 @@ public class DistanceTest extends TestCase {
   public void testClosestPoints2() throws Exception {
     doNearestPointsTest("POLYGON ((200 180, 60 140, 60 260, 200 180))",
       "MULTIPOINT ((140 280), (140 320))", 57.05597791103589,
-      new PointDouble(111.6923076923077, 230.46153846153845, Point.NULL_ORDINATE),
-      new PointDouble((double)140, 280, Point.NULL_ORDINATE));
+      new PointDouble(111.6923076923077, 230.46153846153845, Geometry.NULL_ORDINATE),
+      new PointDouble((double)140, 280, Geometry.NULL_ORDINATE));
   }
 
   public void testClosestPoints3() throws Exception {
     doNearestPointsTest("LINESTRING (100 100, 200 100, 200 200, 100 200, 100 100)", "POINT (10 10)",
-      127.27922061357856, new PointDouble((double)100, 100, Point.NULL_ORDINATE),
-      new PointDouble((double)10, 10, Point.NULL_ORDINATE));
+      127.27922061357856, new PointDouble((double)100, 100, Geometry.NULL_ORDINATE),
+      new PointDouble((double)10, 10, Geometry.NULL_ORDINATE));
   }
 
   public void testClosestPoints4() throws Exception {
@@ -110,8 +110,8 @@ public class DistanceTest extends TestCase {
 
   public void testClosestPoints5() throws Exception {
     doNearestPointsTest("LINESTRING (100 100, 200 200)", "LINESTRING (150 121, 200 0)",
-      20.506096654409877, new PointDouble(135.5, 135.5, Point.NULL_ORDINATE),
-      new PointDouble((double)150, 121, Point.NULL_ORDINATE));
+      20.506096654409877, new PointDouble(135.5, 135.5, Geometry.NULL_ORDINATE),
+      new PointDouble((double)150, 121, Geometry.NULL_ORDINATE));
   }
 
   public void testClosestPoints6() throws Exception {
@@ -126,8 +126,8 @@ public class DistanceTest extends TestCase {
     doNearestPointsTest(
       "POLYGON ((76 185, 125 283, 331 276, 324 122, 177 70, 184 155, 69 123, 76 185), (267 237, 148 248, 135 185, 223 189, 251 151, 286 183, 267 237))",
       "LINESTRING (120 215, 185 224, 209 207, 238 222, 254 186)", 0.0,
-      new PointDouble((double)120, 215, Point.NULL_ORDINATE),
-      new PointDouble((double)120, 215, Point.NULL_ORDINATE));
+      new PointDouble((double)120, 215, Geometry.NULL_ORDINATE),
+      new PointDouble((double)120, 215, Geometry.NULL_ORDINATE));
   }
 
   public void testDisjointCollinearSegments() throws Exception {

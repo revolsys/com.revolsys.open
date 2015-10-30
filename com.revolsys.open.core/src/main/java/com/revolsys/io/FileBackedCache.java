@@ -72,7 +72,7 @@ public class FileBackedCache implements Closeable {
 
   public synchronized Writer getWriter() {
     if (this.writer == null) {
-      this.writer = FileUtil.createUtf8Writer(this.outputStream);
+      this.writer = FileUtil.newUtf8Writer(this.outputStream);
     }
     return this.writer;
   }

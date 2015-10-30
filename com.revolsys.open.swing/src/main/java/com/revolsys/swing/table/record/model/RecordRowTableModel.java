@@ -436,7 +436,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
         if (codeTable == null) {
           text = StringConverterRegistry.toString(recordValue);
         } else {
-          final List<Object> values = codeTable.getValues(Identifier.create(recordValue));
+          final List<Object> values = codeTable.getValues(Identifier.newIdentifier(recordValue));
           if (values == null || values.isEmpty()) {
             return null;
           } else {

@@ -17,45 +17,6 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.util.WrappedException;
 
 public class RecordLayerFields {
-  public static <T extends Field> T createCompactField(final AbstractRecordLayer layer,
-    final String fieldName, final boolean editable) {
-    T field = createField((ObjectWithProperties)layer, "fieldFactories", fieldName, editable);
-    if (field == null) {
-      final RecordDefinition recordDefinition = layer.getRecordDefinition();
-      field = createField(recordDefinition, "fieldFactories", fieldName, editable);
-      if (field == null) {
-        field = SwingUtil.newField(recordDefinition, fieldName, editable);
-      }
-    }
-    field.setEditable(editable);
-    return field;
-  }
-
-  @SuppressWarnings("unchecked")
-  private static <T extends Field> T createField(final ObjectWithProperties properties,
-    final String propertyName, final String fieldName, final boolean editable) {
-    final Supplier<Field> factory = getFactory(properties, propertyName, fieldName);
-    if (factory == null) {
-      return null;
-    } else {
-      return (T)factory.get();
-    }
-  }
-
-  public static <T extends Field> T createFormField(final AbstractRecordLayer layer,
-    final String fieldName, final boolean editable) {
-    T field = createField((ObjectWithProperties)layer, "formFieldFactories", fieldName, editable);
-    if (field == null) {
-      final RecordDefinition recordDefinition = layer.getRecordDefinition();
-      field = createField(recordDefinition, "formFieldFactories", fieldName, editable);
-      if (field == null) {
-        field = createCompactField(layer, fieldName, editable);
-      }
-    }
-    field.setEditable(editable);
-    return field;
-  }
-
   @SuppressWarnings("unchecked")
   private static Supplier<Field> getFactory(final ObjectWithProperties properties,
     final String propertyName, final String fieldName) {
@@ -91,5 +52,44 @@ public class RecordLayerFields {
       }
       return factories;
     }
+  }
+
+  public static <T extends Field> T newCompactField(final AbstractRecordLayer layer,
+    final String fieldName, final boolean editable) {
+    T field = newField((ObjectWithProperties)layer, "fieldFactories", fieldName, editable);
+    if (field == null) {
+      final RecordDefinition recordDefinition = layer.getRecordDefinition();
+      field = newField(recordDefinition, "fieldFactories", fieldName, editable);
+      if (field == null) {
+        field = SwingUtil.newField(recordDefinition, fieldName, editable);
+      }
+    }
+    field.setEditable(editable);
+    return field;
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <T extends Field> T newField(final ObjectWithProperties properties,
+    final String propertyName, final String fieldName, final boolean editable) {
+    final Supplier<Field> factory = getFactory(properties, propertyName, fieldName);
+    if (factory == null) {
+      return null;
+    } else {
+      return (T)factory.get();
+    }
+  }
+
+  public static <T extends Field> T newFormField(final AbstractRecordLayer layer,
+    final String fieldName, final boolean editable) {
+    T field = newField((ObjectWithProperties)layer, "formFieldFactories", fieldName, editable);
+    if (field == null) {
+      final RecordDefinition recordDefinition = layer.getRecordDefinition();
+      field = newField(recordDefinition, "formFieldFactories", fieldName, editable);
+      if (field == null) {
+        field = newCompactField(layer, fieldName, editable);
+      }
+    }
+    field.setEditable(editable);
+    return field;
   }
 }

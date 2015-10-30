@@ -59,7 +59,7 @@ public class SerializabilityTest extends TestCase {
     final ObjectOutputStream oos = new ObjectOutputStream(baos);
 
     final GeometricShapeFactory gsf = new GeometricShapeFactory(fact);
-    final Geometry g = gsf.createCircle();
+    final Geometry g = gsf.newCircle();
     oos.writeObject(g);
   }
 }

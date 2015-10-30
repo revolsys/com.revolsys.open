@@ -27,7 +27,7 @@ public class CodedValueDomain extends Domain implements CodeTable {
   private Map<String, Identifier> valueIdMap = new HashMap<>();
 
   public synchronized void addCodedValue(final Object code, final String name) {
-    final Identifier identifier = Identifier.create(code);
+    final Identifier identifier = Identifier.newIdentifier(code);
     final CodedValue value = new CodedValue(code, name);
     this.codedValues.add(value);
     final List<Object> values = Collections.<Object> singletonList(name);
@@ -56,7 +56,7 @@ public class CodedValueDomain extends Domain implements CodeTable {
         throw new RuntimeException("Cannot generate code for field type " + getFieldType());
     }
     addCodedValue(id, name);
-    return Identifier.create(id);
+    return Identifier.newIdentifier(id);
   }
 
   @Override
@@ -83,8 +83,8 @@ public class CodedValueDomain extends Domain implements CodeTable {
     } else if (value2 == null) {
       return -1;
     } else {
-      final Object codeValue1 = getValue(Identifier.create(value1));
-      final Object codeValue2 = getValue(Identifier.create(value2));
+      final Object codeValue1 = getValue(Identifier.newIdentifier(value1));
+      final Object codeValue2 = getValue(Identifier.newIdentifier(value2));
       return CompareUtil.compare(codeValue1, codeValue2);
     }
   }
@@ -110,7 +110,7 @@ public class CodedValueDomain extends Domain implements CodeTable {
       if (value == null) {
         return null;
       } else if (this.idValueMap.containsKey(value)) {
-        return Identifier.create(value);
+        return Identifier.newIdentifier(value);
       } else if (this.stringIdMap.containsKey(value.toString())) {
         return this.stringIdMap.get(value.toString());
       } else {
@@ -173,7 +173,7 @@ public class CodedValueDomain extends Domain implements CodeTable {
 
   @Override
   public <V> V getValue(final Object id) {
-    return getValue(Identifier.create(id));
+    return getValue(Identifier.newIdentifier(id));
   }
 
   @Override

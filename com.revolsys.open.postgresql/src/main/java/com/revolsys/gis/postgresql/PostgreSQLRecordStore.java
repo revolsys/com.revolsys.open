@@ -16,6 +16,8 @@ import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.gis.postgresql.type.PostgreSQLBoundingBoxWrapper;
 import com.revolsys.gis.postgresql.type.PostgreSQLGeometryWrapper;
+import com.revolsys.gis.postgresql.type.PostgreSQLOidFiedDefinition;
+import com.revolsys.gis.postgresql.type.PostgreSQLTidWrapper;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcConnection;
@@ -66,12 +68,13 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
     setConnectionProperties(connectionProperties);
   }
 
-  public PostgreSQLRecordStore(final RecordFactory recordFactory) {
+  public PostgreSQLRecordStore(final RecordFactory<? extends Record> recordFactory) {
     super(recordFactory);
     initSettings();
   }
 
-  public PostgreSQLRecordStore(final RecordFactory recordFactory, final DataSource dataSource) {
+  public PostgreSQLRecordStore(final RecordFactory<? extends Record> recordFactory,
+    final DataSource dataSource) {
     this(recordFactory);
     setDataSource(dataSource);
   }
@@ -131,6 +134,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
       pgConnection.addDataType("geometry", PostgreSQLGeometryWrapper.class);
       pgConnection.addDataType("box2d", PostgreSQLBoundingBoxWrapper.class);
       pgConnection.addDataType("box3d", PostgreSQLBoundingBoxWrapper.class);
+      pgConnection.addDataType("tid", PostgreSQLTidWrapper.class);
     } catch (final SQLException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -147,9 +151,10 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   @Override
   public Identifier getNextPrimaryKey(final String sequenceName) {
     final String sql = "SELECT nextval(?)";
-    return Identifier.create(JdbcUtils.selectLong(this, sql, sequenceName));
+    return Identifier.newIdentifier(JdbcUtils.selectLong(this, sql, sequenceName));
   }
 
+  @Override
   public String getSequenceName(final RecordDefinition recordDefinition) {
     final PathName typePath = recordDefinition.getPathName();
     final PathName schemaPath = typePath.getParent();
@@ -249,6 +254,11 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
 
   public boolean isUseSchemaSequencePrefix() {
     return this.useSchemaSequencePrefix;
+  }
+
+  @Override
+  protected JdbcFieldDefinition newRowIdFieldDefinition() {
+    return new PostgreSQLOidFiedDefinition();
   }
 
   @Override

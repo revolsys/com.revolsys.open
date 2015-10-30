@@ -64,7 +64,7 @@ public class PolygonGenerator extends GeometryGenerator {
 
   private static final int RUNS = 5;
 
-  private static Polygon createArc(final double x, final double dx, final double y, final double dy,
+  private static Polygon newArc(final double x, final double dx, final double y, final double dy,
     final int nholes, final int npoints, final GeometryFactory gf) {
     // make outer ring first
     double radius = dx < dy ? dx / 3 : dy / 3;
@@ -72,7 +72,7 @@ public class PolygonGenerator extends GeometryGenerator {
     final double cx = x + dx / 2; // center
     final double cy = y + dy / 2; // center
 
-    final LinearRing outer = createArc(cx, cy, radius, npoints, gf);
+    final LinearRing outer = newArc(cx, cy, radius, npoints, gf);
 
     if (nholes == 0) {
       return gf.polygon(outer);
@@ -94,13 +94,13 @@ public class PolygonGenerator extends GeometryGenerator {
     for (int i = 0; i < nholes; i++) {
       final int st = start + i * (degreesPerHole + degreesPerGap); // start
       // angle
-      rings.add(createTri(cx, cy, st, st + degreesPerHole, radius, gf));
+      rings.add(newTri(cx, cy, st, st + degreesPerHole, radius, gf));
     }
 
     return gf.polygon(rings);
   }
 
-  private static LinearRing createArc(final double cx, final double cy, final double radius,
+  private static LinearRing newArc(final double cx, final double cy, final double radius,
     final int npoints, final GeometryFactory gf) {
 
     final Point[] coords = new Point[npoints + 1];
@@ -121,8 +121,8 @@ public class PolygonGenerator extends GeometryGenerator {
     return gf.linearRing(coords);
   }
 
-  private static LinearRing createBox(final double x, final double dx, final double y,
-    final double dy, final int npoints, final GeometryFactory gf) {
+  private static LinearRing newBox(final double x, final double dx, final double y, final double dy,
+    final int npoints, final GeometryFactory gf) {
 
     // figure out the number of points per side
     final int ptsPerSide = npoints / 4;
@@ -166,10 +166,10 @@ public class PolygonGenerator extends GeometryGenerator {
     return gf.linearRing(coords);
   }
 
-  private static Polygon createBox(final double x, final double dx, final double y, final double dy,
+  private static Polygon newBox(final double x, final double dx, final double y, final double dy,
     final int nholes, final int npoints, final GeometryFactory gf) {
     // make outer ring first
-    final LinearRing outer = createBox(x, dx, y, dy, npoints, gf);
+    final LinearRing outer = newBox(x, dx, y, dy, npoints, gf);
 
     if (nholes == 0) {
       return gf.polygon(outer);
@@ -196,8 +196,8 @@ public class PolygonGenerator extends GeometryGenerator {
           int pts = npoints / 2;
           pts = pts < 4 ? 4 : pts;
           cindex++;
-          rings.add(
-            createBox(spx + x + j * (ddx + spx), ddx, spy + y + i * (ddy + spy), ddy, pts, gf));
+          rings
+            .add(newBox(spx + x + j * (ddx + spx), ddx, spy + y + i * (ddy + spy), ddy, pts, gf));
         }
       }
     }
@@ -205,7 +205,7 @@ public class PolygonGenerator extends GeometryGenerator {
     return gf.polygon(rings);
   }
 
-  private static LinearRing createTri(final double cx, final double cy, final int startAngle,
+  private static LinearRing newTri(final double cx, final double cy, final int startAngle,
     final int endAngle, final double radius, final GeometryFactory gf) {
 
     final Point[] coords = new Point[4];
@@ -232,6 +232,27 @@ public class PolygonGenerator extends GeometryGenerator {
   protected int numberPoints = 4;
 
   /**
+   * @return Returns the generationAlgorithm.
+   */
+  public int getGenerationAlgorithm() {
+    return this.generationAlgorithm;
+  }
+
+  /**
+   * @return Returns the numberHoles.
+   */
+  public int getNumberHoles() {
+    return this.numberHoles;
+  }
+
+  /**
+   * @return Returns the numberPoints.
+   */
+  public int getNumberPoints() {
+    return this.numberPoints;
+  }
+
+  /**
    * As the user increases the number of points, the probability of creating a random valid polygon decreases.
    * Please take not of this when selecting the generation style, and the number of points.
    *
@@ -245,13 +266,13 @@ public class PolygonGenerator extends GeometryGenerator {
    * @see #BOX
    * @see #ARC
    *
-   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#create()
+   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#newIterator()
    *
    * @throws IllegalStateException When the alg is not valid or the number of points is invalid
    * @throws NullPointerException when either the Geometry Factory, or the Bounding Box are undefined.
    */
   @Override
-  public Geometry create() {
+  public Geometry newGeometry() {
 
     if (this.geometryFactory == null) {
       throw new NullPointerException("GeometryFactoryI is not declared");
@@ -274,10 +295,10 @@ public class PolygonGenerator extends GeometryGenerator {
     for (int i = 0; i < RUNS; i++) {
       switch (getGenerationAlgorithm()) {
         case BOX:
-          p = createBox(x, dx, y, dy, this.numberHoles, this.numberPoints, this.geometryFactory);
+          p = newBox(x, dx, y, dy, this.numberHoles, this.numberPoints, this.geometryFactory);
         break;
         case ARC:
-          p = createArc(x, dx, y, dy, this.numberHoles, this.numberPoints, this.geometryFactory);
+          p = newArc(x, dx, y, dy, this.numberHoles, this.numberPoints, this.geometryFactory);
         break;
         default:
           throw new IllegalStateException("Invalid Alg. Specified");
@@ -289,27 +310,6 @@ public class PolygonGenerator extends GeometryGenerator {
       }
     }
     return null;
-  }
-
-  /**
-   * @return Returns the generationAlgorithm.
-   */
-  public int getGenerationAlgorithm() {
-    return this.generationAlgorithm;
-  }
-
-  /**
-   * @return Returns the numberHoles.
-   */
-  public int getNumberHoles() {
-    return this.numberHoles;
-  }
-
-  /**
-   * @return Returns the numberPoints.
-   */
-  public int getNumberPoints() {
-    return this.numberPoints;
   }
 
   /**

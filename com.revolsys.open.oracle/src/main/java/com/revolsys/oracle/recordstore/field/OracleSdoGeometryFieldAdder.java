@@ -1,4 +1,4 @@
-package com.revolsys.gis.oracle.io;
+package com.revolsys.oracle.recordstore.field;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,6 +17,7 @@ import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
+import com.revolsys.oracle.recordstore.OracleRecordStore;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
@@ -178,7 +179,7 @@ public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
           while (resultSet.next()) {
             final String tableName = resultSet.getString(1);
             final String columnName = resultSet.getString(2);
-            final PathName typePath = schema.getPathName().createChild(tableName);
+            final PathName typePath = schema.getPathName().newChild(tableName);
 
             int srid = resultSet.getInt(3);
             if (resultSet.wasNull() || srid < 0) {

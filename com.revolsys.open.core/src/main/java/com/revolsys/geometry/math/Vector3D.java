@@ -45,32 +45,6 @@ import com.revolsys.geometry.model.impl.PointDouble;
 public class Vector3D {
 
   /**
-   * Creates a new vector with given X and Y components.
-   *
-   * @param x
-   *            the x component
-   * @param y
-   *            the y component
-   * @param z
-   *            the z component
-   * @return a new vector
-   */
-  public static Vector3D create(final double x, final double y, final double z) {
-    return new Vector3D(x, y, z);
-  }
-
-  /**
-   * Creates a vector from a {@link Coordinates}.
-   *
-   * @param coord
-   *            the Point to copy
-   * @return a new vector
-   */
-  public static Vector3D create(final Point coord) {
-    return new Vector3D(coord);
-  }
-
-  /**
    * Computes the 3D dot-product of two {@link Coordinates}s.
    *
    * @param v1 the first vector
@@ -104,6 +78,32 @@ public class Vector3D {
     return Math.sqrt(v.getX() * v.getX() + v.getY() * v.getY() + v.getZ() * v.getZ());
   }
 
+  /**
+   * Creates a new vector with given X and Y components.
+   *
+   * @param x
+   *            the x component
+   * @param y
+   *            the y component
+   * @param z
+   *            the z component
+   * @return a new vector
+   */
+  public static Vector3D newVector(final double x, final double y, final double z) {
+    return new Vector3D(x, y, z);
+  }
+
+  /**
+   * Creates a vector from a {@link Coordinates}.
+   *
+   * @param coord
+   *            the Point to copy
+   * @return a new vector
+   */
+  public static Vector3D newVector(final Point coord) {
+    return new Vector3D(coord);
+  }
+
   public static Point normalize(final Point v) {
     final double len = length(v);
     return new PointDouble(v.getX() / len, v.getY() / len, v.getZ() / len);
@@ -134,7 +134,7 @@ public class Vector3D {
   }
 
   private Vector3D divide(final double d) {
-    return create(this.x / d, this.y / d, this.z / d);
+    return newVector(this.x / d, this.y / d, this.z / d);
   }
 
   /**
@@ -169,7 +169,7 @@ public class Vector3D {
     if (length > 0.0) {
       return divide(length());
     }
-    return create(0.0, 0.0, 0.0);
+    return newVector(0.0, 0.0, 0.0);
   }
 
   /**

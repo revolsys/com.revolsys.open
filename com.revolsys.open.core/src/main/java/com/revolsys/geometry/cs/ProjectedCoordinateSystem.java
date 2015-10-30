@@ -179,7 +179,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   @Override
   public synchronized CoordinatesProjection getCoordinatesProjection() {
     if (this.coordinatesProjection == null) {
-      this.coordinatesProjection = ProjectionFactory.createCoordinatesProjection(this);
+      this.coordinatesProjection = ProjectionFactory.newCoordinatesProjection(this);
     }
     return this.coordinatesProjection;
   }

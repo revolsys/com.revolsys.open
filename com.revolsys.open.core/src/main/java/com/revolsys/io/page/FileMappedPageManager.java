@@ -31,7 +31,7 @@ public class FileMappedPageManager implements PageManager {
   private RandomAccessFile randomAccessFile;
 
   public FileMappedPageManager() {
-    this(FileUtil.createTempFile("pages", ".pf"));
+    this(FileUtil.newTempFile("pages", ".pf"));
   }
 
   public FileMappedPageManager(final File file) {
@@ -41,39 +41,6 @@ public class FileMappedPageManager implements PageManager {
     } catch (final FileNotFoundException e) {
       throw new IllegalArgumentException("Unable to open file " + file.getAbsolutePath(), e);
     }
-  }
-
-  @Override
-  public synchronized Page createPage() {
-    synchronized (this.pages) {
-      Page page;
-      if (this.freePageIndexes.isEmpty()) {
-        try {
-          final int index = (int)(this.randomAccessFile.length() / this.pageSize);
-          final long offset = (long)index * this.pageSize;
-          this.randomAccessFile.setLength(offset + this.pageSize);
-          final FileChannel channel = this.randomAccessFile.getChannel();
-          final MappedByteBuffer buffer = channel.map(MapMode.READ_WRITE, offset, this.pageSize);
-          page = new FileMappedPage(this, index, buffer);
-
-          this.pages.put(page.getIndex(), page);
-        } catch (final IOException e) {
-          throw new RuntimeException(e);
-        }
-      } else {
-        final Iterator<Integer> iterator = this.freePageIndexes.iterator();
-        final Integer pageIndex = iterator.next();
-        iterator.remove();
-        page = loadPage(pageIndex);
-      }
-      this.pagesInUse.add(page);
-      return page;
-    }
-  }
-
-  @Override
-  public Page createTempPage() {
-    return new ByteArrayPage(this, -1, this.pageSize);
   }
 
   @Override
@@ -117,6 +84,39 @@ public class FileMappedPageManager implements PageManager {
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public synchronized Page newPage() {
+    synchronized (this.pages) {
+      Page page;
+      if (this.freePageIndexes.isEmpty()) {
+        try {
+          final int index = (int)(this.randomAccessFile.length() / this.pageSize);
+          final long offset = (long)index * this.pageSize;
+          this.randomAccessFile.setLength(offset + this.pageSize);
+          final FileChannel channel = this.randomAccessFile.getChannel();
+          final MappedByteBuffer buffer = channel.map(MapMode.READ_WRITE, offset, this.pageSize);
+          page = new FileMappedPage(this, index, buffer);
+
+          this.pages.put(page.getIndex(), page);
+        } catch (final IOException e) {
+          throw new RuntimeException(e);
+        }
+      } else {
+        final Iterator<Integer> iterator = this.freePageIndexes.iterator();
+        final Integer pageIndex = iterator.next();
+        iterator.remove();
+        page = loadPage(pageIndex);
+      }
+      this.pagesInUse.add(page);
+      return page;
+    }
+  }
+
+  @Override
+  public Page newTempPage() {
+    return new ByteArrayPage(this, -1, this.pageSize);
   }
 
   @Override

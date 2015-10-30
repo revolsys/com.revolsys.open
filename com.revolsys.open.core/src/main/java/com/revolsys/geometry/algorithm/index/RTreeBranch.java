@@ -22,7 +22,7 @@ public class RTreeBranch<T> extends RTreeNode<T>implements Iterable<RTreeNode<T>
 
   @SuppressWarnings("unchecked")
   public RTreeBranch(final int size) {
-    this.nodes = ArrayUtil.create(RTreeNode.class, size);
+    this.nodes = ArrayUtil.newArray(RTreeNode.class, size);
   }
 
   protected RTreeBranch(final int size, final List<RTreeNode<T>> nodes) {

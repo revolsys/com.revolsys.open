@@ -23,7 +23,7 @@ import com.revolsys.geometry.noding.snapround.MCIndexSnapRounder;
 public class NodingFunctions {
 
   public static Geometry checkNoding(final Geometry geom) {
-    final List segs = createSegmentStrings(geom);
+    final List segs = newSegmentStrings(geom);
     final FastNodingValidator nv = new FastNodingValidator(segs);
     nv.setFindAllIntersections(true);
     nv.isValid();
@@ -35,24 +35,6 @@ public class NodingFunctions {
       pts[i] = FunctionsUtil.getFactoryOrDefault(null).point(coord);
     }
     return FunctionsUtil.getFactoryOrDefault(null).multiPoint(pts);
-  }
-
-  private static List<NodedSegmentString> createNodedSegmentStrings(final Geometry geom) {
-    final List<NodedSegmentString> segs = new ArrayList<>();
-    final List<LineString> lines = geom.getGeometries(LineString.class);
-    for (final LineString line : lines) {
-      segs.add(new NodedSegmentString(line, null));
-    }
-    return segs;
-  }
-
-  private static List<SegmentString> createSegmentStrings(final Geometry geom) {
-    final List<SegmentString> segs = new ArrayList<>();
-    final List<LineString> lines = geom.getGeometries(LineString.class);
-    for (final LineString line : lines) {
-      segs.add(new BasicSegmentString(line, null));
-    }
-    return segs;
   }
 
   private static Geometry fromSegmentStrings(final Collection segStrings) {
@@ -67,7 +49,7 @@ public class NodingFunctions {
   }
 
   public static Geometry MCIndexNoding(final Geometry geom) {
-    final List segs = createNodedSegmentStrings(geom);
+    final List segs = newNodedSegmentStrings(geom);
     final Noder noder = new MCIndexNoder(new IntersectionAdder(new RobustLineIntersector()));
     noder.computeNodes(segs);
     final Collection nodedSegStrings = noder.getNodedSubstrings();
@@ -75,7 +57,7 @@ public class NodingFunctions {
   }
 
   public static Geometry MCIndexNodingWithPrecision(final Geometry geom, final double scaleFactor) {
-    final List segs = createNodedSegmentStrings(geom);
+    final List segs = newNodedSegmentStrings(geom);
 
     final LineIntersector li = new RobustLineIntersector(scaleFactor);
 
@@ -83,6 +65,24 @@ public class NodingFunctions {
     noder.computeNodes(segs);
     final Collection nodedSegStrings = noder.getNodedSubstrings();
     return fromSegmentStrings(nodedSegStrings);
+  }
+
+  private static List<NodedSegmentString> newNodedSegmentStrings(final Geometry geom) {
+    final List<NodedSegmentString> segs = new ArrayList<>();
+    final List<LineString> lines = geom.getGeometries(LineString.class);
+    for (final LineString line : lines) {
+      segs.add(new NodedSegmentString(line, null));
+    }
+    return segs;
+  }
+
+  private static List<SegmentString> newSegmentStrings(final Geometry geom) {
+    final List<SegmentString> segs = new ArrayList<>();
+    final List<LineString> lines = geom.getGeometries(LineString.class);
+    for (final LineString line : lines) {
+      segs.add(new BasicSegmentString(line, null));
+    }
+    return segs;
   }
 
   /**
@@ -94,7 +94,7 @@ public class NodingFunctions {
    * @return the noded geometry
    */
   public static Geometry scaledNoding(final Geometry geom, final double scaleFactor) {
-    final List segs = createSegmentStrings(geom);
+    final List segs = newSegmentStrings(geom);
     final Noder noder = new ScaledNoder(new MCIndexSnapRounder(1.0), scaleFactor);
     noder.computeNodes(segs);
     final Collection nodedSegStrings = noder.getNodedSubstrings();

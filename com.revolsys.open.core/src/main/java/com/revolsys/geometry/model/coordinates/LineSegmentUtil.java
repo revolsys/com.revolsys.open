@@ -7,6 +7,7 @@ import com.revolsys.equals.NumberEquals;
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.RobustDeterminant;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -335,10 +336,10 @@ public class LineSegmentUtil {
    */
   public static LineString getIntersection(final GeometryFactory geometryFactory, Point line1Start,
     Point line1End, Point line2Start, Point line2End) {
-    line1Start = geometryFactory.createCoordinates(line1Start);
-    line1End = geometryFactory.createCoordinates(line1End);
-    line2Start = geometryFactory.createCoordinates(line2Start);
-    line2End = geometryFactory.createCoordinates(line2End);
+    line1Start = line1Start.convert(geometryFactory);
+    line1End = line1End.convert(geometryFactory);
+    line2Start = line2Start.convert(geometryFactory);
+    line2End = line2End.convert(geometryFactory);
     if (BoundingBoxUtil.intersects(line1Start, line1End, line2Start, line2End)) {
       final Set<Point> intersections = new TreeSet<Point>(
         new CoordinatesDistanceComparator(line1Start));
@@ -392,7 +393,7 @@ public class LineSegmentUtil {
               detLine2StartLine2End, line2y1 - line2y2)
               / LineSegmentUtil.det(line1x1 - line1x2, line1y1 - line1y2, line2x1 - line2x2,
                 line2y1 - line2y2);
-            Point intersection = geometryFactory.createCoordinates(x, y);
+            Point intersection = geometryFactory.point(x, y);
             intersection = getElevation(geometryFactory, line1Start, line1End, intersection);
             final LineStringDouble points = new LineStringDouble(geometryFactory.getAxisCount(),
               intersection);
@@ -400,7 +401,7 @@ public class LineSegmentUtil {
           }
         }
       } else {
-        return geometryFactory.createCoordinatesList(intersections);
+        return geometryFactory.lineString(intersections);
       }
     }
     return geometryFactory.lineString();
@@ -553,7 +554,7 @@ public class LineSegmentUtil {
     final double y2 = p1.getY();
     final double x = x1 + segmentLengthFraction * (x2 - x1);
     final double y = y1 + segmentLengthFraction * (y2 - y1);
-    final Point coord = new PointDouble(x, y, Point.NULL_ORDINATE);
+    final Point coord = new PointDouble(x, y, Geometry.NULL_ORDINATE);
     return coord;
   }
 

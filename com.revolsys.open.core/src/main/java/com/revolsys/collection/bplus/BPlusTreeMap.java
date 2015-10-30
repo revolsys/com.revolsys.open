@@ -57,48 +57,37 @@ public class BPlusTreeMap<K, V> extends AbstractMap<K, V> {
 
   public static final byte LEAF = 1;
 
-  public static <K, V> Map<K, V> create(final PageManager pages, final Comparator<K> comparator,
-    final PageValueManager<K> keyManager, final PageValueManager<V> valueManager) {
-    return new BPlusTreeMap<K, V>(pages, comparator, keyManager, valueManager);
-  }
-
-  public static <K extends Comparable<K>, V> Map<K, V> create(final PageManager pages,
-    final PageValueManager<K> keyManager, final PageValueManager<V> valueManager) {
-    final Comparator<K> comparator = new ComparableComparator<K>();
-    return new BPlusTreeMap<K, V>(pages, comparator, keyManager, valueManager);
-  }
-
-  public static <K, V> Map<K, V> createInMemory(final Comparator<K> comparator,
+  public static <K, V> Map<K, V> newInMemory(final Comparator<K> comparator,
     final PageValueManager<K> keyManager, final PageValueManager<V> valueManager) {
     final MemoryPageManager pages = new MemoryPageManager();
     return new BPlusTreeMap<K, V>(pages, comparator, keyManager, valueManager);
   }
 
-  public static <K extends Comparable<K>, V> Map<K, V> createInMemory(
+  public static <K extends Comparable<K>, V> Map<K, V> newInMemory(
     final PageValueManager<K> keyManager, final PageValueManager<V> valueManager) {
     final MemoryPageManager pages = new MemoryPageManager();
     final Comparator<K> comparator = new ComparableComparator<K>();
     return new BPlusTreeMap<K, V>(pages, comparator, keyManager, valueManager);
   }
 
-  public static <V> Map<Integer, V> createIntSeralizableTempDisk() {
-    final File file = FileUtil.createTempFile("int", ".btree");
+  public static <V> Map<Integer, V> newIntSeralizableTempDisk() {
+    final File file = FileUtil.newTempFile("int", ".btree");
     final PageManager pageManager = new FilePageManager(file);
     final PageValueManager<Integer> keyManager = PageValueManager.INT;
     final SerializablePageValueManager<V> valueSerializer = new SerializablePageValueManager<V>();
-    final PageValueManager<V> valueManager = BPlusTreePageValueManager.create(pageManager,
-      valueSerializer);
+    final PageValueManager<V> valueManager = BPlusTreePageValueManager
+      .newPageValueManager(pageManager, valueSerializer);
     final Comparator<Integer> comparator = new ComparableComparator<Integer>();
     return new BPlusTreeMap<Integer, V>(pageManager, comparator, keyManager, valueManager);
   }
 
-  public static <V> Map<Integer, V> createIntSeralizableTempDisk(final Map<Integer, V> values) {
-    final File file = FileUtil.createTempFile("int", ".btree");
+  public static <V> Map<Integer, V> newIntSeralizableTempDisk(final Map<Integer, V> values) {
+    final File file = FileUtil.newTempFile("int", ".btree");
     final PageManager pageManager = new FilePageManager(file);
     final PageValueManager<Integer> keyManager = PageValueManager.INT;
     final SerializablePageValueManager<V> valueSerializer = new SerializablePageValueManager<V>();
-    final PageValueManager<V> valueManager = BPlusTreePageValueManager.create(pageManager,
-      valueSerializer);
+    final PageValueManager<V> valueManager = BPlusTreePageValueManager
+      .newPageValueManager(pageManager, valueSerializer);
     final Comparator<Integer> comparator = new ComparableComparator<Integer>();
     final BPlusTreeMap<Integer, V> map = new BPlusTreeMap<Integer, V>(pageManager, comparator,
       keyManager, valueManager);
@@ -106,19 +95,31 @@ public class BPlusTreeMap<K, V> extends AbstractMap<K, V> {
     return map;
   }
 
-  public static <K extends Comparable<?>, V> Map<K, V> createTempDisk(final Map<K, V> values,
+  public static <K, V> Map<K, V> newMap(final PageManager pages, final Comparator<K> comparator,
+    final PageValueManager<K> keyManager, final PageValueManager<V> valueManager) {
+    return new BPlusTreeMap<K, V>(pages, comparator, keyManager, valueManager);
+  }
+
+  public static <K extends Comparable<K>, V> Map<K, V> newMap(final PageManager pages,
+    final PageValueManager<K> keyManager, final PageValueManager<V> valueManager) {
+    final Comparator<K> comparator = new ComparableComparator<K>();
+    return new BPlusTreeMap<K, V>(pages, comparator, keyManager, valueManager);
+  }
+
+  public static <K extends Comparable<?>, V> Map<K, V> newTempDisk(final Map<K, V> values,
     PageValueManager<K> keyManager, PageValueManager<V> valueManager) {
-    final File file = FileUtil.createTempFile("temp", ".bplustree");
+    final File file = FileUtil.newTempFile("temp", ".bplustree");
     final PageManager pageManager = new FilePageManager(file);
 
     if (keyManager instanceof SerializablePageValueManager) {
       final SerializablePageValueManager<K> serializeableManager = (SerializablePageValueManager<K>)keyManager;
-      keyManager = BPlusTreePageValueManager.create(pageManager, serializeableManager);
+      keyManager = BPlusTreePageValueManager.newPageValueManager(pageManager, serializeableManager);
     }
 
     if (valueManager instanceof SerializablePageValueManager) {
       final SerializablePageValueManager<V> serializeableManager = (SerializablePageValueManager<V>)valueManager;
-      valueManager = BPlusTreePageValueManager.create(pageManager, serializeableManager);
+      valueManager = BPlusTreePageValueManager.newPageValueManager(pageManager,
+        serializeableManager);
     }
 
     final Comparator<K> comparator = new ComparableComparator();
@@ -128,19 +129,20 @@ public class BPlusTreeMap<K, V> extends AbstractMap<K, V> {
     return map;
   }
 
-  public static <K extends Comparable<K>, V> Map<K, V> createTempDisk(
-    PageValueManager<K> keyManager, PageValueManager<V> valueManager) {
-    final File file = FileUtil.createTempFile("temp", ".bplustree");
+  public static <K extends Comparable<K>, V> Map<K, V> newTempDisk(PageValueManager<K> keyManager,
+    PageValueManager<V> valueManager) {
+    final File file = FileUtil.newTempFile("temp", ".bplustree");
     final PageManager pageManager = new FileMappedPageManager(file);
 
     if (keyManager instanceof SerializablePageValueManager) {
       final SerializablePageValueManager<K> serializeableManager = (SerializablePageValueManager<K>)keyManager;
-      keyManager = BPlusTreePageValueManager.create(pageManager, serializeableManager);
+      keyManager = BPlusTreePageValueManager.newPageValueManager(pageManager, serializeableManager);
     }
 
     if (valueManager instanceof SerializablePageValueManager) {
       final SerializablePageValueManager<V> serializeableManager = (SerializablePageValueManager<V>)valueManager;
-      valueManager = BPlusTreePageValueManager.create(pageManager, serializeableManager);
+      valueManager = BPlusTreePageValueManager.newPageValueManager(pageManager,
+        serializeableManager);
     }
 
     final Comparator<K> comparator = new ComparableComparator<K>();
@@ -202,7 +204,7 @@ public class BPlusTreeMap<K, V> extends AbstractMap<K, V> {
     this.valueManager = valueManager;
     this.minSize = (int)(this.fillFactor * pages.getPageSize());
     if (pages.getNumPages() == 0) {
-      final Page rootPage = pages.createPage();
+      final Page rootPage = pages.newPage();
       writeLeafHeader(rootPage, LEAF, -1);
       pages.releasePage(rootPage);
     }
@@ -392,7 +394,7 @@ public class BPlusTreeMap<K, V> extends AbstractMap<K, V> {
     final PutResult result = put(this.rootPageIndex, -1, key, value);
     if (result.wasSplit()) {
       final Page rootPage = this.pages.getPage(this.rootPageIndex);
-      final Page leftPage = this.pages.createPage();
+      final Page leftPage = this.pages.newPage();
       leftPage.setContent(rootPage);
 
       rootPage.clear();
@@ -628,7 +630,7 @@ public class BPlusTreeMap<K, V> extends AbstractMap<K, V> {
       setInteriorKeyAndValueBytes(page, keysBytes, pageIndexBytes, 0, keysBytes.size());
     } else {
       setInteriorKeyAndValueBytes(page, keysBytes, pageIndexBytes, 0, splitIndex);
-      final Page rightPage = this.pages.createPage();
+      final Page rightPage = this.pages.newPage();
       setInteriorKeyAndValueBytes(rightPage, keysBytes, pageIndexBytes, splitIndex,
         keysBytes.size());
 
@@ -658,7 +660,7 @@ public class BPlusTreeMap<K, V> extends AbstractMap<K, V> {
     if (numBytes < page.getSize()) {
       setLeafKeyAndValueBytes(page, keysBytes, valuesBytes, 0, keysBytes.size(), nextPageIndex);
     } else {
-      final Page rightPage = this.pages.createPage();
+      final Page rightPage = this.pages.newPage();
       final int rightPageIndex = rightPage.getIndex();
       setLeafKeyAndValueBytes(page, keysBytes, valuesBytes, 0, splitIndex, rightPageIndex);
       setLeafKeyAndValueBytes(rightPage, keysBytes, valuesBytes, splitIndex, keysBytes.size(),

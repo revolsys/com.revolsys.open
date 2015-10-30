@@ -81,7 +81,7 @@ public class SineStarFactory extends GeometricShapeFactory {
    *
    * @return the geometry representing the sine star
    */
-  public Geometry createSineStar() {
+  public Geometry newSineStar() {
     final BoundingBox env = this.dim.getEnvelope();
     final double radius = env.getWidth() / 2.0;
 

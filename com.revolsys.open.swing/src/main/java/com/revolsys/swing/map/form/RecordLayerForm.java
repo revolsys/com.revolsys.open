@@ -112,7 +112,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
   private static final long serialVersionUID = 1L;
 
-  private JButton addOkButton = RunnableAction.createButton("OK", this::actionAddOk);
+  private JButton addOkButton = RunnableAction.newButton("OK", this::actionAddOk);
 
   private LayerRecord addRecord;
 
@@ -329,7 +329,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
   protected void addPanel(final JPanel container, final String title,
     final List<String> fieldNames) {
-    final JPanel panel = createPanel(container, title);
+    final JPanel panel = newPanel(container, title);
 
     for (final String fieldName : fieldNames) {
       addLabelledField(panel, fieldName);
@@ -558,12 +558,6 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
         layer.copyRecordGeometry(record);
       }
     }
-  }
-
-  protected JPanel createPanel(final JPanel container, final String title) {
-    final JPanel panel = Panels.titledTransparentBorderLayout(title);
-    container.add(panel);
-    return panel;
   }
 
   public void dataTransferCopy() {
@@ -824,7 +818,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
       if (field == null) {
         final boolean editable = !this.readOnlyFieldNames.contains(fieldName);
         try {
-          field = RecordLayerFields.createFormField(this.layer, fieldName, editable);
+          field = RecordLayerFields.newFormField(this.layer, fieldName, editable);
           addField(fieldName, field);
         } catch (final IllegalArgumentException e) {
         }
@@ -1105,6 +1099,12 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
   protected boolean isTabValid(final int tabIndex) {
     return this.tabInvalidFieldMap.get(tabIndex) == null;
+  }
+
+  protected JPanel newPanel(final JPanel container, final String title) {
+    final JPanel panel = Panels.titledTransparentBorderLayout(title);
+    container.add(panel);
+    return panel;
   }
 
   public void pasteGeometry() {
@@ -1426,7 +1426,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
     final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     dialog.add(buttons, BorderLayout.SOUTH);
-    final JButton addCancelButton = RunnableAction.createButton("Cancel", () -> actionAddCancel());
+    final JButton addCancelButton = RunnableAction.newButton("Cancel", () -> actionAddCancel());
     buttons.add(addCancelButton);
     buttons.add(this.addOkButton);
 

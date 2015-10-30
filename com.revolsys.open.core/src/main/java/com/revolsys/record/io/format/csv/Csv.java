@@ -72,7 +72,7 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
     if (file == null) {
       throw new NullPointerException("File must not be null");
     } else {
-      final java.io.Writer writer = FileUtil.createUtf8Writer(file);
+      final java.io.Writer writer = FileUtil.newUtf8Writer(file);
       return plainWriter(writer);
     }
   }

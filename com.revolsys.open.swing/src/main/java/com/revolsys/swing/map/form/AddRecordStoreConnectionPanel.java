@@ -81,6 +81,6 @@ public class AddRecordStoreConnectionPanel extends ValueField {
 
     final String password = this.passwordField.getText();
     connectionParameters.put("password", PasswordUtil.encrypt(password));
-    this.registry.createConnection(properties);
+    this.registry.newConnection(properties);
   }
 }

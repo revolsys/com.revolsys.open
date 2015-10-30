@@ -5,98 +5,98 @@
       "typeName": "layerGroup",
       "description": "Layer Group",
       "typeClass": "com.revolsys.swing.map.layer.LayerGroup",
-      "methodName": "create"
+      "methodName": "newLayer"
     },
     {
       "typeName": "baseMapLayerGroup",
       "description": "Base Map Layer Group",
       "typeClass": "com.revolsys.swing.map.layer.BaseMapLayerGroup",
-      "methodName": "create"
+      "methodName": "newLayer"
     },
     {
       "typeName": "recordStoreLayer",
       "description": "Record Store Layer",
       "typeClass": "com.revolsys.swing.map.layer.record.RecordStoreLayer",
-      "methodName": "create"
+      "methodName": "newLayer"
     },
     {
       "typeName": "dataStore",
       "description": "Record Store Layer",
       "typeClass": "com.revolsys.swing.map.layer.record.RecordStoreLayer",
-      "methodName": "create"
+      "methodName": "newLayer"
     },
     {
       "typeName": "recordFileLayer",
       "description": "File",
       "typeClass": "com.revolsys.swing.map.layer.record.FileRecordLayer",
-      "methodName": "create"
+      "methodName": "newLayer"
     },
     {
       "typeName": "dataObjectFile",
       "description": "File",
       "typeClass": "com.revolsys.swing.map.layer.record.FileRecordLayer",
-      "methodName": "create"
+      "methodName": "newLayer"
     },
     {
       "typeName": "arcgisServerRest",
       "description": "Arc GIS Server REST",
       "typeClass": "com.revolsys.swing.map.layer.arcgisrest.ArcGisServerRestLayer",
-      "methodName": "create"
+      "methodName": "newLayer"
     },
     {
       "typeName": "bing",
       "description": "Bing Tiles",
       "typeClass": "com.revolsys.swing.map.layer.bing.BingLayer",
-      "methodName": "create"
+      "methodName": "newLayer"
     },
     {
       "typeName": "openStreetMap",
       "description": "Open Street Map Tiles",
       "typeClass": "com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapLayer",
-      "methodName": "create"
+      "methodName": "newLayer"
     },
 
     {
       "typeName": "openStreetMapVectorApi",
       "description": "Open Street Map (Vector API)",
       "typeClass": "com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapApiLayer",
-      "methodName": "create"
+      "methodName": "newLayer"
     },
     {
       "typeName": "grid",
       "description": "Grid",
       "typeClass": "com.revolsys.swing.map.layer.grid.GridLayer",
-      "methodName": "create"
+      "methodName": "newLayer"
     },
     {
       "typeName": "gridLayer",
       "description": "Grid Layer",
       "typeClass": "com.revolsys.swing.map.layer.grid.GridLayer",
-      "methodName": "create"
+      "methodName": "newLayer"
     },
     {
       "typeName": "wikipedia",
       "description": "Wikipedia Articles",
       "typeClass": "com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker",
-      "methodName": "create"
+      "methodName": "newLayer"
     },
     {
       "typeName": "geoname",
       "description": "Geoname.org",
       "typeClass": "com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker",
-      "methodName": "create"
+      "methodName": "newLayer"
     },
     {
       "typeName": "geoReferencedImage",
       "description": "Geo-referenced Image Layer",
       "typeClass": "com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer",
-      "methodName": "create"
+      "methodName": "newLayer"
     },
     {
       "typeName": "geoReferencedImageLayer",
       "description": "Geo-referenced Image Layer",
       "typeClass": "com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer",
-      "methodName": "create"
+      "methodName": "newLayer"
     }
   ]
 }

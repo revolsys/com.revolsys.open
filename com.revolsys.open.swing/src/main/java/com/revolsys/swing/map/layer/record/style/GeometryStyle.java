@@ -126,18 +126,6 @@ public class GeometryStyle extends MarkerStyle {
 
   }
 
-  public static GeometryStyle createStyle() {
-    final GeometryStyle style = new GeometryStyle();
-    Color color;
-    synchronized (COLORS) {
-      colorIndex = (colorIndex + 1) % COLORS.size();
-      color = COLORS.get(colorIndex);
-    }
-    style.setLineColor(color);
-    style.setPolygonFill(WebColors.setAlpha(color, 127));
-    return style;
-  }
-
   public static GeometryStyle line(final Color color) {
     final GeometryStyle style = new GeometryStyle();
     style.setLineColor(color);
@@ -148,6 +136,18 @@ public class GeometryStyle extends MarkerStyle {
     final GeometryStyle style = new GeometryStyle();
     style.setLineColor(color);
     style.setLineWidth(Measure.valueOf(lineWidth, NonSI.PIXEL));
+    return style;
+  }
+
+  public static GeometryStyle newStyle() {
+    final GeometryStyle style = new GeometryStyle();
+    Color color;
+    synchronized (COLORS) {
+      colorIndex = (colorIndex + 1) % COLORS.size();
+      color = COLORS.get(colorIndex);
+    }
+    style.setLineColor(color);
+    style.setPolygonFill(WebColors.setAlpha(color, 127));
     return style;
   }
 

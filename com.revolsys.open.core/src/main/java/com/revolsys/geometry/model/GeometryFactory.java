@@ -61,7 +61,6 @@ import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.GeometryCollectionImpl;
-import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.LineStringDoubleGf;
 import com.revolsys.geometry.model.impl.LinearRingDoubleGf;
 import com.revolsys.geometry.model.impl.MultiLineStringImpl;
@@ -103,14 +102,6 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public static void clear() {
     factoriesBySrid.clear();
-  }
-
-  public static GeometryFactory create(final Map<String, Object> properties) {
-    final int coordinateSystemId = Maps.getInteger(properties, "srid", 0);
-    final int axisCount = Maps.getInteger(properties, "axisCount", 2);
-    final double scaleXY = Maps.getDouble(properties, "scaleXy", 0.0);
-    final double scaleZ = Maps.getDouble(properties, "scaleZ", 0.0);
-    return GeometryFactory.fixed(coordinateSystemId, axisCount, scaleXY, scaleZ);
   }
 
   public static GeometryFactory fixed(final CoordinateSystem coordinateSystem, final int axisCount,
@@ -295,7 +286,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     } else if (factory instanceof Map) {
       @SuppressWarnings("unchecked")
       final Map<String, Object> properties = (Map<String, Object>)factory;
-      return create(properties);
+      return newGeometryFactory(properties);
     } else {
       return null;
     }
@@ -364,6 +355,14 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       }
     }
     return newScales;
+  }
+
+  public static GeometryFactory newGeometryFactory(final Map<String, Object> properties) {
+    final int coordinateSystemId = Maps.getInteger(properties, "srid", 0);
+    final int axisCount = Maps.getInteger(properties, "axisCount", 2);
+    final double scaleXY = Maps.getDouble(properties, "scaleXy", 0.0);
+    final double scaleZ = Maps.getDouble(properties, "scaleZ", 0.0);
+    return GeometryFactory.fixed(coordinateSystemId, axisCount, scaleXY, scaleZ);
   }
 
   public static GeometryFactory wgs84() {
@@ -520,51 +519,6 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     final double[] valuesPrecise = new double[values.length];
     makePrecise(values, valuesPrecise);
     return valuesPrecise;
-  }
-
-  public Point createCoordinates(final double... coordinates) {
-    for (int i = 0; i < coordinates.length; i++) {
-      coordinates[i] = makePrecise(i, coordinates[i]);
-    }
-    final Point newPoint = new PointDouble(this.axisCount, coordinates);
-    return newPoint;
-  }
-
-  public Point createCoordinates(final Point point) {
-    return getPreciseCoordinates(point);
-  }
-
-  public LineString createCoordinatesList(final Collection<?> points) {
-    if (points == null || points.isEmpty()) {
-      return null;
-    } else {
-      final int numPoints = points.size();
-      final int axisCount = getAxisCount();
-      final double[] coordinates = new double[numPoints * axisCount];
-      int i = 0;
-      for (final Object object : points) {
-        Point point;
-        if (object == null) {
-          point = null;
-        } else if (object instanceof Point) {
-          final Point projectedPoint = ((Point)object).convert(this);
-          point = projectedPoint;
-        } else if (object instanceof double[]) {
-          point = new PointDouble((double[])object);
-        } else if (object instanceof LineString) {
-          final LineString LineString = (LineString)object;
-          point = LineString.getPoint(0);
-        } else {
-          throw new IllegalArgumentException("Unexepected data type: " + object);
-        }
-
-        if (point != null && point.getAxisCount() > 1) {
-          CoordinatesListUtil.setCoordinates(this, coordinates, axisCount, i, point);
-          i++;
-        }
-      }
-      return new LineStringDouble(axisCount, i, coordinates);
-    }
   }
 
   public Geometry geometry() {
@@ -1127,11 +1081,39 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public LinearRing linearRing(final Collection<?> points) {
-    if (points == null || points.isEmpty()) {
+    if (points.isEmpty()) {
       return linearRing();
     } else {
-      final LineString coordinatesList = createCoordinatesList(points);
-      return linearRing(coordinatesList);
+      if (points == null || points.isEmpty()) {
+        return null;
+      } else {
+        final int numPoints = points.size();
+        final int axisCount = getAxisCount();
+        final double[] coordinates = new double[numPoints * axisCount];
+        int vertexCount = 0;
+        for (final Object object : points) {
+          Point point;
+          if (object == null) {
+            point = null;
+          } else if (object instanceof Point) {
+            final Point projectedPoint = ((Point)object).convert(this);
+            point = projectedPoint;
+          } else if (object instanceof double[]) {
+            point = new PointDouble((double[])object);
+          } else if (object instanceof LineString) {
+            final LineString LineString = (LineString)object;
+            point = LineString.getPoint(0);
+          } else {
+            throw new IllegalArgumentException("Unexepected data type: " + object);
+          }
+
+          if (point != null && point.getAxisCount() > 1) {
+            CoordinatesListUtil.setCoordinates(this, coordinates, axisCount, vertexCount, point);
+            vertexCount++;
+          }
+        }
+        return linearRing(axisCount, vertexCount, coordinates);
+      }
     }
   }
 
@@ -1185,8 +1167,36 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     if (points.isEmpty()) {
       return lineString();
     } else {
-      final LineString coordinatesList = createCoordinatesList(points);
-      return lineString(coordinatesList);
+      if (points == null || points.isEmpty()) {
+        return null;
+      } else {
+        final int numPoints = points.size();
+        final int axisCount = getAxisCount();
+        final double[] coordinates = new double[numPoints * axisCount];
+        int vertexCount = 0;
+        for (final Object object : points) {
+          Point point;
+          if (object == null) {
+            point = null;
+          } else if (object instanceof Point) {
+            final Point projectedPoint = ((Point)object).convert(this);
+            point = projectedPoint;
+          } else if (object instanceof double[]) {
+            point = new PointDouble((double[])object);
+          } else if (object instanceof LineString) {
+            final LineString LineString = (LineString)object;
+            point = LineString.getPoint(0);
+          } else {
+            throw new IllegalArgumentException("Unexepected data type: " + object);
+          }
+
+          if (point != null && point.getAxisCount() > 1) {
+            CoordinatesListUtil.setCoordinates(this, coordinates, axisCount, vertexCount, point);
+            vertexCount++;
+          }
+        }
+        return lineString(axisCount, vertexCount, coordinates);
+      }
     }
   }
 

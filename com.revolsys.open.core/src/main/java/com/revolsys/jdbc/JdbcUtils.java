@@ -153,35 +153,6 @@ public final class JdbcUtils {
     }
   }
 
-  public static String createSelectSql(final RecordDefinition recordDefinition,
-    final String tablePrefix, final String fromClause, final boolean lockResults,
-    final List<String> fieldNames, final Query query, final Map<String, Boolean> orderBy) {
-    final String typePath = recordDefinition.getPath();
-    final StringBuilder sql = new StringBuilder();
-    sql.append("SELECT ");
-    boolean hasColumns = false;
-    if (fieldNames.isEmpty() || fieldNames.remove("*")) {
-      addColumnNames(sql, recordDefinition, tablePrefix);
-      hasColumns = true;
-    }
-    addColumnNames(sql, recordDefinition, tablePrefix, fieldNames, hasColumns);
-    sql.append(" FROM ");
-    if (Property.hasValue(fromClause)) {
-      sql.append(fromClause);
-    } else {
-      final String tableName = getQualifiedTableName(typePath);
-      sql.append(tableName);
-      sql.append(" ");
-      sql.append(tablePrefix);
-    }
-    appendWhere(sql, query);
-    addOrderBy(sql, orderBy);
-    if (lockResults) {
-      sql.append(" FOR UPDATE");
-    }
-    return sql.toString();
-  }
-
   public static void delete(final Connection connection, final String tableName,
     final String idColumn, final Object id) {
 
@@ -340,7 +311,7 @@ public final class JdbcUtils {
       }
       final String fromClause = query.getFromClause();
       final boolean lockResults = query.isLockResults();
-      sql = createSelectSql(recordDefinition, "T", fromClause, lockResults, fieldNames, query,
+      sql = newSelectSql(recordDefinition, "T", fromClause, lockResults, fieldNames, query,
         orderBy);
     } else {
       if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
@@ -388,6 +359,35 @@ public final class JdbcUtils {
       }
     }
 
+  }
+
+  public static String newSelectSql(final RecordDefinition recordDefinition,
+    final String tablePrefix, final String fromClause, final boolean lockResults,
+    final List<String> fieldNames, final Query query, final Map<String, Boolean> orderBy) {
+    final String typePath = recordDefinition.getPath();
+    final StringBuilder sql = new StringBuilder();
+    sql.append("SELECT ");
+    boolean hasColumns = false;
+    if (fieldNames.isEmpty() || fieldNames.remove("*")) {
+      addColumnNames(sql, recordDefinition, tablePrefix);
+      hasColumns = true;
+    }
+    addColumnNames(sql, recordDefinition, tablePrefix, fieldNames, hasColumns);
+    sql.append(" FROM ");
+    if (Property.hasValue(fromClause)) {
+      sql.append(fromClause);
+    } else {
+      final String tableName = getQualifiedTableName(typePath);
+      sql.append(tableName);
+      sql.append(" ");
+      sql.append(tablePrefix);
+    }
+    appendWhere(sql, query);
+    addOrderBy(sql, orderBy);
+    if (lockResults) {
+      sql.append(" FOR UPDATE");
+    }
+    return sql.toString();
   }
 
   public static Map<String, Object> readMap(final ResultSet rs) throws SQLException {

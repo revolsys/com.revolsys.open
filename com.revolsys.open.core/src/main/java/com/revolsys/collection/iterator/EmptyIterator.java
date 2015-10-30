@@ -3,7 +3,7 @@ package com.revolsys.collection.iterator;
 import java.util.NoSuchElementException;
 
 public class EmptyIterator<T> extends AbstractIterator<T> {
-  public static <V> EmptyIterator<V> create() {
+  public static <V> EmptyIterator<V> newIterator() {
     return new EmptyIterator<>();
   }
 

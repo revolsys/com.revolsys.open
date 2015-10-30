@@ -11,13 +11,13 @@ import com.revolsys.record.schema.RecordStore;
 
 public class Column extends QueryValue {
 
-  private FieldDefinition attribute;
+  private FieldDefinition fieldDefinition;
 
   private final String name;
 
-  public Column(final FieldDefinition attribute) {
-    this.name = attribute.getName();
-    this.attribute = attribute;
+  public Column(final FieldDefinition fieldDefinition) {
+    this.name = fieldDefinition.getName();
+    this.fieldDefinition = fieldDefinition;
   }
 
   public Column(final String name) {
@@ -50,8 +50,8 @@ public class Column extends QueryValue {
     }
   }
 
-  public FieldDefinition getField() {
-    return this.attribute;
+  public FieldDefinition getFieldDefinition() {
+    return this.fieldDefinition;
   }
 
   public String getName() {
@@ -61,10 +61,10 @@ public class Column extends QueryValue {
   @Override
   public String getStringValue(final Record record) {
     final Object value = getValue(record);
-    if (this.attribute == null) {
+    if (this.fieldDefinition == null) {
       return StringConverterRegistry.toString(value);
     } else {
-      final Class<?> typeClass = this.attribute.getTypeClass();
+      final Class<?> typeClass = this.fieldDefinition.getTypeClass();
       return StringConverterRegistry.toString(typeClass, value);
     }
   }
@@ -78,7 +78,7 @@ public class Column extends QueryValue {
 
   @Override
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
-    this.attribute = recordDefinition.getField(getName());
+    this.fieldDefinition = recordDefinition.getField(getName());
   }
 
   @Override

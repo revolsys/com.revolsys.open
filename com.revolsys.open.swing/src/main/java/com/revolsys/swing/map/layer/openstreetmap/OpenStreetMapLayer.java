@@ -22,7 +22,7 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
   private static final BoundingBox MAX_BOUNDING_BOX = new BoundingBoxDoubleGf(GEOMETRY_FACTORY, 2,
     -180, -85, 180, 85);
 
-  public static OpenStreetMapLayer create(final Map<String, Object> properties) {
+  public static OpenStreetMapLayer newLayer(final Map<String, Object> properties) {
     return new OpenStreetMapLayer(properties);
   }
 

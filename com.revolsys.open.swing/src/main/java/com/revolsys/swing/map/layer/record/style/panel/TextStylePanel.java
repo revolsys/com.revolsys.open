@@ -68,19 +68,6 @@ public class TextStylePanel extends BaseStylePanel implements PropertyChangeList
   }
 
   @Override
-  protected Field createField(final String fieldName, final Class<?> fieldClass,
-    final Object value) {
-    if (fieldName.equals("textName")) {
-      final AbstractRecordLayer layer = getLayer();
-      final TextNameField textNameField = new TextNameField(layer, fieldName, value);
-      Property.addListener(textNameField, fieldName, this);
-      return textNameField;
-    } else {
-      return super.createField(fieldName, fieldClass, value);
-    }
-  }
-
-  @Override
   public void doPropertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();
     if (source instanceof Field) {
@@ -91,6 +78,18 @@ public class TextStylePanel extends BaseStylePanel implements PropertyChangeList
     }
     for (final Component preview : this.previews.getComponents()) {
       preview.repaint();
+    }
+  }
+
+  @Override
+  protected Field newField(final String fieldName, final Class<?> fieldClass, final Object value) {
+    if (fieldName.equals("textName")) {
+      final AbstractRecordLayer layer = getLayer();
+      final TextNameField textNameField = new TextNameField(layer, fieldName, value);
+      Property.addListener(textNameField, fieldName, this);
+      return textNameField;
+    } else {
+      return super.newField(fieldName, fieldClass, value);
     }
   }
 

@@ -129,7 +129,7 @@ public class CsnIterator {
   }
 
   public CsnIterator(final String fileName, final InputStream in) throws IOException {
-    this(fileName, FileUtil.createUtf8Reader(in));
+    this(fileName, FileUtil.newUtf8Reader(in));
   }
 
   public CsnIterator(final String fileName, final Reader reader) throws IOException {

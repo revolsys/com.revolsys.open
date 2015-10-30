@@ -70,14 +70,14 @@ public class CoordinateSequenceExperiment2 {
     final double armLen = 50.0;
     final int nArms = 10;
     long startTime = System.currentTimeMillis();
-    final Polygon poly = GeometryTestFactory.createSineStar(this.fact, 0.0, 0.0, size, armLen,
-      nArms, nPts);
+    final Polygon poly = GeometryTestFactory.newSineStar(this.fact, 0.0, 0.0, size, armLen, nArms,
+      nPts);
     long endTime = System.currentTimeMillis();
     long totalTime = endTime - startTime;
     String totalTimeStr = totalTime < 10000 ? totalTime + " ms" : totalTime / 1000.0 + " s";
     // System.out.println("Sine Star Creation Executed in " + totalTimeStr);
 
-    final Polygon box = GeometryTestFactory.createBox(this.fact, 0, 0, 1, 100.0);
+    final Polygon box = GeometryTestFactory.newBox(this.fact, 0, 0, 1, 100.0);
 
     startTime = System.currentTimeMillis();
     poly.intersects(box);
@@ -93,9 +93,9 @@ public class CoordinateSequenceExperiment2 {
     final double armLen = 50.0;
     final int nArms = 10;
     long startTime = System.currentTimeMillis();
-    final Polygon poly = GeometryTestFactory.createSineStar(this.fact, 0.0, 0.0, size, armLen,
-      nArms, nPts);
-    final Polygon box = GeometryTestFactory.createSineStar(this.fact, 0.0, size / 2, size, armLen,
+    final Polygon poly = GeometryTestFactory.newSineStar(this.fact, 0.0, 0.0, size, armLen, nArms,
+      nPts);
+    final Polygon box = GeometryTestFactory.newSineStar(this.fact, 0.0, size / 2, size, armLen,
       nArms, nPts);
     long endTime = System.currentTimeMillis();
     long totalTime = endTime - startTime;

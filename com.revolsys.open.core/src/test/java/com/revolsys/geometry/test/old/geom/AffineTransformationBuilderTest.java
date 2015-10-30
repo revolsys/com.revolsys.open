@@ -35,8 +35,7 @@ public class AffineTransformationBuilderTest extends TestCase {
 
     final Point pp0 = new PointDouble(pp0x, pp0y);
 
-    final AffineTransformation trans = AffineTransformationFactory.createFromControlVectors(p0,
-      pp0);
+    final AffineTransformation trans = AffineTransformationFactory.newFromControlVectors(p0, pp0);
 
     assertEqualPoint(pp0, trans.transform(p0));
   }
@@ -49,7 +48,7 @@ public class AffineTransformationBuilderTest extends TestCase {
     final Point pp0 = new PointDouble(pp0x, pp0y);
     final Point pp1 = new PointDouble(pp1x, pp1y);
 
-    final AffineTransformation trans = AffineTransformationFactory.createFromControlVectors(p0, p1,
+    final AffineTransformation trans = AffineTransformationFactory.newFromControlVectors(p0, p1,
       pp0, pp1);
 
     assertEqualPoint(pp0, trans.transform(p0));

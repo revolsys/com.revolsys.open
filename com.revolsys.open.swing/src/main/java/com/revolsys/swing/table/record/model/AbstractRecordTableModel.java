@@ -134,7 +134,7 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel
         text = StringConverterRegistry.toString(objectValue);
       } else {
         if (codeTable.isLoaded()) {
-          final List<Object> values = codeTable.getValues(Identifier.create(objectValue));
+          final List<Object> values = codeTable.getValues(Identifier.newIdentifier(objectValue));
           if (values == null || values.isEmpty()) {
             text = StringConverterRegistry.toString(objectValue);
           } else {

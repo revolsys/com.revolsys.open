@@ -108,13 +108,13 @@ public class QueryWhereConditionField extends ValueField
 
   private static final long serialVersionUID = 1L;
 
-  public static JComponent createSearchField(final AbstractRecordLayer layer,
+  public static JComponent newSearchField(final AbstractRecordLayer layer,
     final FieldDefinition fieldDefinition, final CodeTable codeTable) {
     if (fieldDefinition == null) {
       return new TextField(20);
     } else {
       final String fieldName = fieldDefinition.getName();
-      return RecordLayerFields.createCompactField(layer, fieldName, true);
+      return RecordLayerFields.newCompactField(layer, fieldName, true);
     }
   }
 
@@ -186,7 +186,7 @@ public class QueryWhereConditionField extends ValueField
     this.likePanel = new JPanel(new VerticalLayout());
     this.likePanel.setOpaque(false);
     this.likePanel.add(this.likeField, BorderLayout.NORTH);
-    this.likeAddButton = RunnableAction.createButton("", "Add Unary Condition", ICON,
+    this.likeAddButton = RunnableAction.newButton("", "Add Unary Condition", ICON,
       this::actionAddLikeCondition);
 
     final ObjectPropertyEnableCheck hasSearchText = new ObjectPropertyEnableCheck(this,
@@ -339,7 +339,8 @@ public class QueryWhereConditionField extends ValueField
             return;
           }
         } else {
-          final List<Object> values = this.codeTable.getValues(Identifier.create(fieldValue));
+          final List<Object> values = this.codeTable
+            .getValues(Identifier.newIdentifier(fieldValue));
           if (values.size() == 1) {
             fieldValue = values.get(0);
           } else {
@@ -389,7 +390,7 @@ public class QueryWhereConditionField extends ValueField
               return;
             }
           } else {
-            fieldValue = this.codeTable.getValue(Identifier.create(fieldValue));
+            fieldValue = this.codeTable.getValue(Identifier.newIdentifier(fieldValue));
             if (fieldValue != null) {
               fieldClass = fieldValue.getClass();
             }
@@ -673,7 +674,7 @@ public class QueryWhereConditionField extends ValueField
     this.searchFieldPanel.removeAll();
     final String fieldName = fieldDefinition.getName();
     this.codeTable = this.recordDefinition.getCodeTableByFieldName(fieldName);
-    this.searchField = createSearchField(this.layer, fieldDefinition, this.codeTable);
+    this.searchField = newSearchField(this.layer, fieldDefinition, this.codeTable);
 
     boolean likeVisible = true;
     if (this.codeTable == null) {

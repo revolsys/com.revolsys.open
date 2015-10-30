@@ -66,17 +66,6 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
     }
   }
 
-  @Override
-  public void createConnection(final Map<String, ? extends Object> connectionParameters) {
-    final String name = Maps.getString(connectionParameters, "name");
-    final File file = getConnectionFile(name);
-    if (file != null && (!file.exists() || file.canRead())) {
-      final FileSystemResource resource = new FileSystemResource(file);
-      Json.write(connectionParameters, resource, true);
-      loadConnection(file);
-    }
-  }
-
   protected void doInit() {
     if (this.directory != null && this.directory.isDirectory()) {
       for (final File connectionFile : FileUtil.getFilesByExtension(this.directory,
@@ -163,6 +152,17 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
   }
 
   protected abstract T loadConnection(final File connectionFile);
+
+  @Override
+  public void newConnection(final Map<String, ? extends Object> connectionParameters) {
+    final String name = Maps.getString(connectionParameters, "name");
+    final File file = getConnectionFile(name);
+    if (file != null && (!file.exists() || file.canRead())) {
+      final FileSystemResource resource = new FileSystemResource(file);
+      Json.write(connectionParameters, resource, true);
+      loadConnection(file);
+    }
+  }
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {

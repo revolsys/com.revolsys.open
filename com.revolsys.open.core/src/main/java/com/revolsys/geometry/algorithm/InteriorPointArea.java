@@ -142,7 +142,7 @@ public class InteriorPointArea {
    */
   public static Point centre(final BoundingBox envelope) {
     return new PointDouble(avg(envelope.getMinX(), envelope.getMaxX()),
-      avg(envelope.getMinY(), envelope.getMaxY()), Point.NULL_ORDINATE);
+      avg(envelope.getMinY(), envelope.getMaxY()), Geometry.NULL_ORDINATE);
   }
 
   private final GeometryFactory factory;
@@ -229,8 +229,8 @@ public class InteriorPointArea {
 
     final double bisectY = SafeBisectorFinder.getBisectorY((Polygon)geometry);
     return this.factory.lineString(new Point[] {
-      new PointDouble(envelope.getMinX(), bisectY, Point.NULL_ORDINATE),
-      new PointDouble(envelope.getMaxX(), bisectY, Point.NULL_ORDINATE)
+      new PointDouble(envelope.getMinX(), bisectY, Geometry.NULL_ORDINATE),
+      new PointDouble(envelope.getMaxX(), bisectY, Geometry.NULL_ORDINATE)
     });
   }
 

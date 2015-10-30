@@ -75,8 +75,8 @@ public class OverlayNodingStressTest extends TestCase {
   public Geometry[] generateGeometryAccum(final double angle1, final double angle2) {
     final RotatedRectangleFactory rrFact = new RotatedRectangleFactory();
     final double basex = angle2 * MAX_DISPLACEMENT - MAX_DISPLACEMENT / 2;
-    final Point base = new PointDouble(basex, basex, Point.NULL_ORDINATE);
-    final Polygon rr1 = rrFact.createRectangle(100, 20, angle1, base);
+    final Point base = new PointDouble(basex, basex, Geometry.NULL_ORDINATE);
+    final Polygon rr1 = rrFact.newRectangle(100, 20, angle1, base);
 
     // limit size of accumulated star
     this.geomCount++;
@@ -102,8 +102,8 @@ public class OverlayNodingStressTest extends TestCase {
 
   public Geometry[] generateGeometryStar(final double angle1, final double angle2) {
     final RotatedRectangleFactory rrFact = new RotatedRectangleFactory();
-    final Polygon rr1 = rrFact.createRectangle(100, 20, angle1);
-    final Polygon rr2 = rrFact.createRectangle(100, 20, angle2);
+    final Polygon rr1 = rrFact.newRectangle(100, 20, angle1);
+    final Polygon rr2 = rrFact.newRectangle(100, 20, angle2);
 
     // this line can be used to test for the presence of noding failures for
     // non-tricky cases
@@ -144,12 +144,12 @@ class RotatedRectangleFactory {
 
   }
 
-  public Polygon createRectangle(final double length, final double width, final double angle) {
-    return createRectangle(length, width, angle,
-      new PointDouble((double)0, 0, Point.NULL_ORDINATE));
+  public Polygon newRectangle(final double length, final double width, final double angle) {
+    return newRectangle(length, width, angle,
+      new PointDouble((double)0, 0, Geometry.NULL_ORDINATE));
   }
 
-  public Polygon createRectangle(final double length, final double width, final double angle,
+  public Polygon newRectangle(final double length, final double width, final double angle,
     final Point base) {
     final double posx = length / 2 * Math.cos(angle);
     final double posy = length / 2 * Math.sin(angle);
@@ -160,14 +160,14 @@ class RotatedRectangleFactory {
 
     final Point[] pts = new Point[] {
       new PointDouble(base.getX() + posx + widthOffsetx, base.getY() + posy + widthOffsety,
-        Point.NULL_ORDINATE),
+        Geometry.NULL_ORDINATE),
       new PointDouble(base.getX() + posx - widthOffsetx, base.getY() + posy - widthOffsety,
-        Point.NULL_ORDINATE),
+        Geometry.NULL_ORDINATE),
       new PointDouble(base.getX() + negx - widthOffsetx, base.getY() + negy - widthOffsety,
-        Point.NULL_ORDINATE),
+        Geometry.NULL_ORDINATE),
       new PointDouble(base.getX() + negx + widthOffsetx, base.getY() + negy + widthOffsety,
-        Point.NULL_ORDINATE),
-      new PointDouble(0.0, 0, Point.NULL_ORDINATE),
+        Geometry.NULL_ORDINATE),
+      new PointDouble(0.0, 0, Geometry.NULL_ORDINATE),
     };
     // close polygon
     pts[4] = new PointDouble(pts[0]);

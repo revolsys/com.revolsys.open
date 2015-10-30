@@ -20,7 +20,7 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 
 public class BaseTreeNodeLoadingIcon implements ImageObserver {
-  private static final ImageIcon ICON = createIcon();
+  private static final ImageIcon ICON = newIcon();
 
   private static final BaseTreeNodeLoadingIcon INSTANCE = new BaseTreeNodeLoadingIcon();
 
@@ -35,19 +35,19 @@ public class BaseTreeNodeLoadingIcon implements ImageObserver {
     }
   }
 
-  private static ImageIcon createIcon() {
-    final Class<?> clazz = Icons.class;
-    final String resourceName = Icons.RESOURCE_FOLDER + "loading.gif";
-    final URL resource = clazz.getResource(resourceName);
-    return new ImageIcon(resource);
-  }
-
   public static Icon getIcon() {
     return ICON;
   }
 
   private static synchronized List<BaseTreeNode> getNodes() {
     return new ArrayList<>(NODES);
+  }
+
+  private static ImageIcon newIcon() {
+    final Class<?> clazz = Icons.class;
+    final String resourceName = Icons.RESOURCE_FOLDER + "loading.gif";
+    final URL resource = clazz.getResource(resourceName);
+    return new ImageIcon(resource);
   }
 
   public static synchronized void removeNode(final BaseTreeNode node) {

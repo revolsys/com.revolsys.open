@@ -151,11 +151,6 @@ public class NodedSegmentString implements NodableSegmentString {
     }
   }
 
-  @Override
-  public Point getPoint(final int i) {
-    return this.points.getPoint(i);
-  }
-
   /**
    * Gets the user-defined data for this segment string.
    *
@@ -168,6 +163,11 @@ public class NodedSegmentString implements NodableSegmentString {
 
   public SegmentNodeList getNodeList() {
     return this.nodeList;
+  }
+
+  @Override
+  public Point getPoint(final int i) {
+    return this.points.getPoint(i);
   }
 
   @Override

@@ -44,7 +44,7 @@ import com.revolsys.geometry.model.Point;
  */
 public class RelateNodeFactory extends NodeFactory {
   @Override
-  public Node createNode(final Point coord) {
+  public Node newNode(final Point coord) {
     return new RelateNode(coord, new EdgeEndBundleStar());
   }
 }

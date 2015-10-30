@@ -551,7 +551,7 @@ public class FieldFilterPanel extends JComponent
           }
           this.codeTable = null;
         } else {
-          searchField = QueryWhereConditionField.createSearchField(this.layer, this.field,
+          searchField = QueryWhereConditionField.newSearchField(this.layer, this.field,
             this.codeTable);
         }
 

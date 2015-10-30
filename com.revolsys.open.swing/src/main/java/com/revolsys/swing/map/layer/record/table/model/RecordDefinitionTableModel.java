@@ -18,7 +18,7 @@ public class RecordDefinitionTableModel extends AbstractTableModel {
 
   private static final long serialVersionUID = 1L;
 
-  public static BaseJTable createTable(final RecordDefinition recordDefinition) {
+  public static BaseJTable newTable(final RecordDefinition recordDefinition) {
     if (recordDefinition == null) {
       return null;
     } else {

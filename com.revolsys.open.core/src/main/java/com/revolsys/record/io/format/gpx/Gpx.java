@@ -20,14 +20,14 @@ public class Gpx extends AbstractRecordIoFactory implements RecordWriterFactory 
     addMediaTypeAndFileExtension("application/gpx+xml", "gpx");
   }
 
-  public RecordReader createRecordReader(final RecordDefinition recordDefinition,
-    final Resource resource, final RecordFactory factory) {
-    throw new UnsupportedOperationException();
-  }
-
   @Override
   public boolean isCustomFieldsSupported() {
     return false;
+  }
+
+  public RecordReader newRecordReader(final RecordDefinition recordDefinition,
+    final Resource resource, final RecordFactory factory) {
+    throw new UnsupportedOperationException();
   }
 
   /**
@@ -50,7 +50,7 @@ public class Gpx extends AbstractRecordIoFactory implements RecordWriterFactory 
   public RecordWriter newRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
-    final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
+    final OutputStreamWriter writer = FileUtil.newUtf8Writer(outputStream);
     return new GpxWriter(writer);
   }
 }

@@ -467,7 +467,7 @@ public abstract class AbstractRecordQueryField extends ValueField
 
   @Override
   public void setFieldValue(final Object value) {
-    final Identifier identifier = Identifier.create(value);
+    final Identifier identifier = Identifier.newIdentifier(value);
     super.setFieldValue(identifier);
     final String displayText = getDisplayText(identifier);
     if (this.searchField != null) {

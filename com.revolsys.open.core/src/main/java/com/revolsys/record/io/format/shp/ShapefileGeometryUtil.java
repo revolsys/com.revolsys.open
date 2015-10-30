@@ -135,42 +135,6 @@ public final class ShapefileGeometryUtil {
     this.writeLength = shpFile;
   }
 
-  public List<double[]> createCoordinatesLists(final int[] partIndex, final int axisCount) {
-    final List<double[]> parts = new ArrayList<>(partIndex.length);
-    for (final int partNumPoints : partIndex) {
-      final double[] coordinates = new double[partNumPoints * axisCount];
-      parts.add(coordinates);
-    }
-    return parts;
-  }
-
-  public Geometry createPolygonGeometryFromParts(final GeometryFactory geometryFactory,
-    final List<double[]> parts, final int axisCount) {
-    final List<Polygon> polygons = new ArrayList<Polygon>();
-    final List<LinearRing> currentParts = new ArrayList<>();
-    for (final double[] coordinates : parts) {
-      final LinearRing ring = geometryFactory.linearRing(axisCount, coordinates);
-      final boolean ringClockwise = !ring.isCounterClockwise();
-      if (ringClockwise == this.clockwise) {
-        if (!currentParts.isEmpty()) {
-          final Polygon polygon = geometryFactory.polygon(currentParts);
-          polygons.add(polygon);
-          currentParts.clear();
-        }
-      }
-      currentParts.add(ring);
-    }
-    if (!currentParts.isEmpty()) {
-      final Polygon polygon = geometryFactory.polygon(currentParts);
-      polygons.add(polygon);
-    }
-    if (polygons.size() == 1) {
-      return polygons.get(0);
-    } else {
-      return geometryFactory.multiPolygon(polygons);
-    }
-  }
-
   public int getShapeType(final Geometry geometry) {
     if (geometry != null) {
       final GeometryFactory geometryFactory = geometry.getGeometryFactory();
@@ -241,6 +205,42 @@ public final class ShapefileGeometryUtil {
 
   public boolean isShpFile() {
     return this.shpFile;
+  }
+
+  public List<double[]> newCoordinatesLists(final int[] partIndex, final int axisCount) {
+    final List<double[]> parts = new ArrayList<>(partIndex.length);
+    for (final int partNumPoints : partIndex) {
+      final double[] coordinates = new double[partNumPoints * axisCount];
+      parts.add(coordinates);
+    }
+    return parts;
+  }
+
+  public Geometry newPolygonGeometryFromParts(final GeometryFactory geometryFactory,
+    final List<double[]> parts, final int axisCount) {
+    final List<Polygon> polygons = new ArrayList<Polygon>();
+    final List<LinearRing> currentParts = new ArrayList<>();
+    for (final double[] coordinates : parts) {
+      final LinearRing ring = geometryFactory.linearRing(axisCount, coordinates);
+      final boolean ringClockwise = !ring.isCounterClockwise();
+      if (ringClockwise == this.clockwise) {
+        if (!currentParts.isEmpty()) {
+          final Polygon polygon = geometryFactory.polygon(currentParts);
+          polygons.add(polygon);
+          currentParts.clear();
+        }
+      }
+      currentParts.add(ring);
+    }
+    if (!currentParts.isEmpty()) {
+      final Polygon polygon = geometryFactory.polygon(currentParts);
+      polygons.add(polygon);
+    }
+    if (polygons.size() == 1) {
+      return polygons.get(0);
+    } else {
+      return geometryFactory.multiPolygon(polygons);
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -398,11 +398,11 @@ public final class ShapefileGeometryUtil {
     final int vertexCount = in.readLEInt();
     final int[] partIndex = readPartIndex(in, numParts, vertexCount);
 
-    final List<double[]> parts = createCoordinatesLists(partIndex, 2);
+    final List<double[]> parts = newCoordinatesLists(partIndex, 2);
 
     readPoints(in, partIndex, parts, 2);
 
-    return createPolygonGeometryFromParts(geometryFactory, parts, 2);
+    return newPolygonGeometryFromParts(geometryFactory, parts, 2);
 
   }
 
@@ -414,10 +414,10 @@ public final class ShapefileGeometryUtil {
     final int axisCount = 4;
     final int[] partIndex = readPartIndex(in, partCount, vertexCount);
 
-    final List<double[]> parts = createCoordinatesLists(partIndex, axisCount);
+    final List<double[]> parts = newCoordinatesLists(partIndex, axisCount);
     readPoints(in, partIndex, parts, axisCount);
     readCoordinates(in, partIndex, parts, 3, axisCount);
-    return createPolygonGeometryFromParts(geometryFactory, parts, axisCount);
+    return newPolygonGeometryFromParts(geometryFactory, parts, axisCount);
 
   }
 
@@ -429,10 +429,10 @@ public final class ShapefileGeometryUtil {
     final int axisCount = 3;
     final int[] partIndex = readPartIndex(in, numParts, vertexCount);
 
-    final List<double[]> parts = createCoordinatesLists(partIndex, axisCount);
+    final List<double[]> parts = newCoordinatesLists(partIndex, axisCount);
     readPoints(in, partIndex, parts, axisCount);
     readCoordinates(in, partIndex, parts, 2, axisCount);
-    return createPolygonGeometryFromParts(geometryFactory, parts, axisCount);
+    return newPolygonGeometryFromParts(geometryFactory, parts, axisCount);
   }
 
   public Geometry readPolygonZM(GeometryFactory geometryFactory, final EndianInput in,
@@ -448,13 +448,13 @@ public final class ShapefileGeometryUtil {
     } else {
       axisCount = 4;
     }
-    final List<double[]> parts = createCoordinatesLists(partIndex, axisCount);
+    final List<double[]> parts = newCoordinatesLists(partIndex, axisCount);
     readPoints(in, partIndex, parts, axisCount);
     readCoordinates(in, partIndex, parts, 2, axisCount);
     if (axisCount == 4) {
       readCoordinates(in, partIndex, parts, 3, axisCount);
     }
-    return createPolygonGeometryFromParts(geometryFactory, parts, axisCount);
+    return newPolygonGeometryFromParts(geometryFactory, parts, axisCount);
   }
 
   public Geometry readPolyline(final GeometryFactory geometryFactory, final EndianInput in,

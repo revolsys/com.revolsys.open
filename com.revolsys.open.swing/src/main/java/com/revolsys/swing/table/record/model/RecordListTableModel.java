@@ -25,17 +25,16 @@ import com.revolsys.util.Reorderable;
 public class RecordListTableModel extends RecordRowTableModel implements Reorderable {
   private static final long serialVersionUID = 1L;
 
-  public static TablePanel createPanel(final AbstractRecordLayer layer) {
-    return createPanel(layer.getRecordDefinition(), new ArrayList<Record>(),
-      layer.getFieldNamesSet());
+  public static TablePanel newPanel(final AbstractRecordLayer layer) {
+    return newPanel(layer.getRecordDefinition(), new ArrayList<Record>(), layer.getFieldNamesSet());
   }
 
-  public static TablePanel createPanel(final AbstractRecordLayer layer,
+  public static TablePanel newPanel(final AbstractRecordLayer layer,
     final Collection<? extends Record> records) {
-    return createPanel(layer.getRecordDefinition(), records, layer.getFieldNames());
+    return newPanel(layer.getRecordDefinition(), records, layer.getFieldNames());
   }
 
-  public static TablePanel createPanel(final RecordDefinition recordDefinition,
+  public static TablePanel newPanel(final RecordDefinition recordDefinition,
     final Collection<? extends Record> records, final Collection<String> fieldNames) {
     final RecordListTableModel model = new RecordListTableModel(recordDefinition, records,
       fieldNames);
@@ -43,9 +42,9 @@ public class RecordListTableModel extends RecordRowTableModel implements Reorder
     return new TablePanel(table);
   }
 
-  public static TablePanel createPanel(final RecordDefinition recordDefinition,
+  public static TablePanel newPanel(final RecordDefinition recordDefinition,
     final List<? extends Record> records, final String... fieldNames) {
-    return createPanel(recordDefinition, records, Arrays.asList(fieldNames));
+    return newPanel(recordDefinition, records, Arrays.asList(fieldNames));
   }
 
   private final List<Record> records = new ArrayList<>();

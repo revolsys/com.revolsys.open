@@ -52,7 +52,7 @@ public class LoggingEventPanel extends JPanel {
     dialog.setLayout(new BorderLayout());
     dialog.add(new LoggingEventPanel(event), BorderLayout.CENTER);
     final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    buttons.add(RunnableAction.createButton("OK", () -> dialog.setVisible(false)));
+    buttons.add(RunnableAction.newButton("OK", () -> dialog.setVisible(false)));
     dialog.add(buttons, BorderLayout.SOUTH);
     dialog.pack();
     dialog.setVisible(true);

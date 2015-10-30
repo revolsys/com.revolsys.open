@@ -221,27 +221,6 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     getMap().getUndoManager().discardAllEdits();
   }
 
-  protected void createPropertyUndo(final Object object, final String propertyName,
-    final Object oldValue, final Object newValue) {
-    final SetObjectProperty edit = new SetObjectProperty(object, propertyName, oldValue, newValue);
-    addUndo(edit);
-  }
-
-  protected LineString createXorLine(final GeometryFactory geometryFactory, final Point c0,
-    final Point p1) {
-    final Viewport2D viewport = getViewport();
-    final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
-    final LineSegment line = viewportGeometryFactory.lineSegment(c0, p1);
-    final double length = line.getLength();
-    if (length > 0) {
-      final double cursorRadius = viewport.getModelUnitsPerViewUnit() * 6;
-      final Point newC1 = line.pointAlongOffset((length - cursorRadius) / length, 0);
-      return geometryFactory.lineString(c0, newC1);
-    } else {
-      return null;
-    }
-  }
-
   public void destroy() {
     this.map = null;
     this.snapEventPoint = null;
@@ -629,6 +608,27 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
 
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
+  }
+
+  protected void newPropertyUndo(final Object object, final String propertyName,
+    final Object oldValue, final Object newValue) {
+    final SetObjectProperty edit = new SetObjectProperty(object, propertyName, oldValue, newValue);
+    addUndo(edit);
+  }
+
+  protected LineString newXorLine(final GeometryFactory geometryFactory, final Point c0,
+    final Point p1) {
+    final Viewport2D viewport = getViewport();
+    final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
+    final LineSegment line = viewportGeometryFactory.lineSegment(c0, p1);
+    final double length = line.getLength();
+    if (length > 0) {
+      final double cursorRadius = viewport.getModelUnitsPerViewUnit() * 6;
+      final Point newC1 = line.pointAlongOffset((length - cursorRadius) / length, 0);
+      return geometryFactory.lineString(c0, newC1);
+    } else {
+      return null;
+    }
   }
 
   @Override

@@ -240,18 +240,6 @@ class BufferSubgraph implements Comparable {
   }
 
   /**
-   * Creates the subgraph consisting of all edges reachable from this node.
-   * Finds the edges in the graph and the rightmost coordinate.
-   *
-   * @param node a node to start the graph traversal from
-   */
-  public void create(final Node node) {
-    addReachable(node);
-    this.finder.findEdge(this.dirEdgeList);
-    this.rightMostCoord = this.finder.getCoordinate();
-  }
-
-  /**
    * Find all edges whose depths indicates that they are in the result area(s).
    * Since we want polygon shells to be
    * oriented CW, choose dirEdges with the interior of the result on the RHS.
@@ -301,7 +289,7 @@ class BufferSubgraph implements Comparable {
         for (int i = 0; i < points.getVertexCount(); i++) {
           final Point point = points.getPoint(i);
           if (bounds == null) {
-            bounds = BoundingBoxUtil.createBounds(2, point);
+            bounds = BoundingBoxUtil.newBounds(2, point);
           } else {
             BoundingBoxUtil.expand(bounds, 2, point);
           }
@@ -321,5 +309,17 @@ class BufferSubgraph implements Comparable {
    */
   public Point getRightmostCoordinate() {
     return this.rightMostCoord;
+  }
+
+  /**
+   * Creates the subgraph consisting of all edges reachable from this node.
+   * Finds the edges in the graph and the rightmost coordinate.
+   *
+   * @param node a node to start the graph traversal from
+   */
+  public void newNode(final Node node) {
+    addReachable(node);
+    this.finder.findEdge(this.dirEdgeList);
+    this.rightMostCoord = this.finder.getCoordinate();
   }
 }

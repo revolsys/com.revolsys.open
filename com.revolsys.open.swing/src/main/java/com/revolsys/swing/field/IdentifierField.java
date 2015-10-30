@@ -18,14 +18,14 @@ public class IdentifierField extends TextField {
   @Override
   public <T> T getFieldValue() {
     final String text = getText();
-    final Identifier id = TypedIdentifier.create(text);
+    final Identifier id = TypedIdentifier.newIdentifier(text);
     return (T)id;
   }
 
   @Override
   public void updateFieldValue() {
     final String text = getText();
-    final Identifier id = TypedIdentifier.create(text);
+    final Identifier id = TypedIdentifier.newIdentifier(text);
     setFieldValue(id);
   }
 }

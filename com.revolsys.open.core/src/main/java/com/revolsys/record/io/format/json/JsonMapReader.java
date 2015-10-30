@@ -18,7 +18,7 @@ public class JsonMapReader extends AbstractReader<Map<String, Object>>implements
   private boolean single = false;
 
   public JsonMapReader(final InputStream in) {
-    this.in = FileUtil.createUtf8Reader(in);
+    this.in = FileUtil.newUtf8Reader(in);
   }
 
   public JsonMapReader(final java.io.Reader in) {

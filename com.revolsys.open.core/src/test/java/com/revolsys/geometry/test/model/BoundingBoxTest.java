@@ -218,7 +218,7 @@ public class BoundingBoxTest implements TestConstants {
     for (int axisCount = 2; axisCount < 6; axisCount++) {
       for (int valueCount = 1; valueCount < 10; valueCount++) {
         Point[] points = new Point[valueCount];
-        final double[] bounds = BoundingBoxUtil.createBounds(axisCount);
+        final double[] bounds = BoundingBoxUtil.newBounds(axisCount);
         for (int i = 0; i < valueCount; i++) {
           final double[] values = new double[axisCount];
           for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
@@ -264,7 +264,7 @@ public class BoundingBoxTest implements TestConstants {
     for (int axisCount = 1; axisCount < 6; axisCount++) {
       for (int valueCount = 1; valueCount < 10; valueCount++) {
         final double[] values = new double[axisCount * valueCount];
-        final double[] bounds = BoundingBoxUtil.createBounds(axisCount);
+        final double[] bounds = BoundingBoxUtil.newBounds(axisCount);
         for (int i = 0; i < valueCount; i++) {
           for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
             final double value = Math.random() * 360 - 180;
@@ -331,7 +331,7 @@ public class BoundingBoxTest implements TestConstants {
     for (int axisCount = 2; axisCount < 6; axisCount++) {
       for (int valueCount = 1; valueCount < 10; valueCount++) {
         final List<Point> points = new ArrayList<>();
-        final double[] bounds = BoundingBoxUtil.createBounds(axisCount);
+        final double[] bounds = BoundingBoxUtil.newBounds(axisCount);
         for (int i = 0; i < valueCount; i++) {
           final double[] values = new double[axisCount];
           for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {

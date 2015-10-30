@@ -3,6 +3,11 @@ package com.revolsys.geometry.model.segment;
 import com.revolsys.geometry.model.impl.AbstractLineString;
 
 public abstract class AbstractLineSegment extends AbstractLineString implements LineSegment {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   @Override
   public LineSegment clone() {
     return (LineSegment)super.clone();

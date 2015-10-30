@@ -49,13 +49,6 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
 
     T value;
 
-    /**
-     * Create new entry.
-     *
-     * @param k
-     * @param v
-     * @param n
-     */
     Entry(final long k, final T v, final Entry<T> n) {
       this.value = v;
       this.next = n;
@@ -440,7 +433,7 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
   public LongHashMap() {
     this.loadFactor = DEFAULT_LOAD_FACTOR;
     this.threshold = (int)(DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
-    this.table = ArrayUtil.create(Entry.class, DEFAULT_INITIAL_CAPACITY);
+    this.table = ArrayUtil.newArray(Entry.class, DEFAULT_INITIAL_CAPACITY);
     init();
   }
 
@@ -486,7 +479,7 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
 
     this.loadFactor = loadFactor;
     this.threshold = (int)(capacity * loadFactor);
-    this.table = ArrayUtil.create(Entry.class, this.size);
+    this.table = ArrayUtil.newArray(Entry.class, this.size);
     init();
   }
 
@@ -537,7 +530,7 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
     LongHashMap<T> result = null;
     try {
       result = (LongHashMap<T>)super.clone();
-      result.table = ArrayUtil.create(Entry.class, this.table.length);
+      result.table = ArrayUtil.newArray(Entry.class, this.table.length);
       result.entrySet = null;
       result.modCount = 0;
       result.size = 0;
@@ -617,22 +610,6 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
       }
     }
     return false;
-  }
-
-  /**
-   * Like addEntry<T> except that this version is used when creating entries as
-   * part of Map construction or "pseudo-construction" (cloning,
-   * deserialization). This version needn't worry about resizing the table.
-   * Subclass overrides this to alter the behavior of HashMap(Map), clone, and
-   * readObject.
-   *
-   * @param key
-   * @param value
-   * @param bucketIndex
-   */
-  void createEntry(final long key, final T value, final int bucketIndex) {
-    this.table[bucketIndex] = new Entry<T>(key, value, this.table[bucketIndex]);
-    this.size++;
   }
 
   public Set<Entry<T>> entryIntSet() {
@@ -758,6 +735,22 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
     return this.loadFactor;
   }
 
+  /**
+   * Like addEntry<T> except that this version is used when creating entries as
+   * part of Map construction or "pseudo-construction" (cloning,
+   * deserialization). This version needn't worry about resizing the table.
+   * Subclass overrides this to alter the behavior of HashMap(Map), clone, and
+   * readObject.
+   *
+   * @param key
+   * @param value
+   * @param bucketIndex
+   */
+  void newEntry(final long key, final T value, final int bucketIndex) {
+    this.table[bucketIndex] = new Entry<T>(key, value, this.table[bucketIndex]);
+    this.size++;
+  }
+
   Iterator<Entry<T>> newEntryIterator() {
     return new EntryIterator();
   }
@@ -854,7 +847,7 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
   /**
    * This method is used instead of put by constructors and pseudoconstructors
    * (clone, readObject). It does not resize the table, check for
-   * comodification, etc. It calls createEntry<T> rather than addEntry.
+   * comodification, etc. It calls  newEntry<T> rather than addEntry.
    *
    * @param key
    * @param value
@@ -874,7 +867,7 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
       }
     }
 
-    createEntry(key, value, i);
+    newEntry(key, value, i);
   }
 
   /**
@@ -920,7 +913,7 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
 
     // Read in number of buckets and allocate the bucket array;
     final int numBuckets = s.readInt();
-    this.table = ArrayUtil.create(Entry.class, numBuckets);
+    this.table = ArrayUtil.newArray(Entry.class, numBuckets);
 
     init(); // Give subclass a chance to do its thing.
 
@@ -1051,7 +1044,7 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    final Entry<T>[] newTable = ArrayUtil.create(Entry.class, newCapacity);
+    final Entry<T>[] newTable = ArrayUtil.newArray(Entry.class, newCapacity);
     transfer(newTable);
     this.table = newTable;
     this.threshold = (int)(newCapacity * this.loadFactor);

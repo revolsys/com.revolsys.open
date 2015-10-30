@@ -69,19 +69,19 @@ public class STRtreeDemo {
     }
 
     @Override
-    public List createParentBoundables(final List verticalSlice, final int newLevel) {
-      return super.createParentBoundables(verticalSlice, newLevel);
-    }
-
-    @Override
-    public List createParentBoundablesFromVerticalSlice(final List childBoundables,
-      final int newLevel) {
-      return super.createParentBoundablesFromVerticalSlice(childBoundables, newLevel);
-    }
-
-    @Override
     public AbstractNode getRoot() {
       return this.root;
+    }
+
+    @Override
+    public List newParentBoundables(final List verticalSlice, final int newLevel) {
+      return super.newParentBoundables(verticalSlice, newLevel);
+    }
+
+    @Override
+    public List newParentBoundablesFromVerticalSlice(final List childBoundables,
+      final int newLevel) {
+      return super.newParentBoundablesFromVerticalSlice(childBoundables, newLevel);
     }
 
     @Override
@@ -153,11 +153,11 @@ public class STRtreeDemo {
     for (final Iterator i = sourceEnvelopes.iterator(); i.hasNext();) {
       final BoundingBox e = (BoundingBox)i.next();
       final Geometry g = factory.polygon(factory.linearRing(new Point[] {
-        new PointDouble(e.getMinX(), e.getMinY(), Point.NULL_ORDINATE),
-        new PointDouble(e.getMinX(), e.getMaxY(), Point.NULL_ORDINATE),
-        new PointDouble(e.getMaxX(), e.getMaxY(), Point.NULL_ORDINATE),
-        new PointDouble(e.getMaxX(), e.getMinY(), Point.NULL_ORDINATE),
-        new PointDouble(e.getMinX(), e.getMinY(), Point.NULL_ORDINATE)
+        new PointDouble(e.getMinX(), e.getMinY(), Geometry.NULL_ORDINATE),
+        new PointDouble(e.getMinX(), e.getMaxY(), Geometry.NULL_ORDINATE),
+        new PointDouble(e.getMaxX(), e.getMaxY(), Geometry.NULL_ORDINATE),
+        new PointDouble(e.getMaxX(), e.getMinY(), Geometry.NULL_ORDINATE),
+        new PointDouble(e.getMinX(), e.getMinY(), Geometry.NULL_ORDINATE)
       }));
       if (first) {
         first = false;
@@ -177,11 +177,11 @@ public class STRtreeDemo {
     final double top = bottom + height;
     final double right = left + width;
     return factory.polygon(factory.linearRing(new Point[] {
-      new PointDouble(left, bottom, Point.NULL_ORDINATE),
-      new PointDouble(right, bottom, Point.NULL_ORDINATE),
-      new PointDouble(right, top, Point.NULL_ORDINATE),
-      new PointDouble(left, top, Point.NULL_ORDINATE),
-      new PointDouble(left, bottom, Point.NULL_ORDINATE)
+      new PointDouble(left, bottom, Geometry.NULL_ORDINATE),
+      new PointDouble(right, bottom, Geometry.NULL_ORDINATE),
+      new PointDouble(right, top, Geometry.NULL_ORDINATE),
+      new PointDouble(left, top, Geometry.NULL_ORDINATE),
+      new PointDouble(left, bottom, Geometry.NULL_ORDINATE)
     }));
   }
 

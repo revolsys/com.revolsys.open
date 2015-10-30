@@ -40,16 +40,16 @@ public abstract class AbstractActionMainMenuItemFactory extends AbstractAction
   }
 
   @Override
-  public JMenuItem newComponent() {
-    if (isCheckBox()) {
-      return createCheckboxMenuItem();
-    } else {
-      return createMenuItem();
-    }
+  public String getIconName() {
+    return null;
   }
 
   @Override
-  public String getIconName() {
-    return null;
+  public JMenuItem newComponent() {
+    if (isCheckBox()) {
+      return newCheckboxMenuItem();
+    } else {
+      return newMenuItem();
+    }
   }
 }

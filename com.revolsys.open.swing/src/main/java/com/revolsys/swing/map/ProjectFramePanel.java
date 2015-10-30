@@ -10,12 +10,12 @@ import com.revolsys.properties.ObjectWithProperties;
 public interface ProjectFramePanel extends ObjectWithProperties {
   void activatePanelComponent(Component component, Map<String, Object> config);
 
-  Component createPanelComponent(Map<String, Object> config);
-
   default void deletePanelComponent(final Component component) {
   }
 
   Icon getIcon();
 
   String getName();
+
+  Component newPanelComponent(Map<String, Object> config);
 }

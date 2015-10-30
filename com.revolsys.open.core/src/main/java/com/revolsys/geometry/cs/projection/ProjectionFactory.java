@@ -56,43 +56,6 @@ public final class ProjectionFactory {
     }
   }
 
-  public static CoordinatesProjection createCoordinatesProjection(
-    final ProjectedCoordinateSystem coordinateSystem) {
-    final Projection projection = coordinateSystem.getProjection();
-    final String projectionName = projection.getNormalizedName();
-    synchronized (projectionClasses) {
-      final Class<? extends CoordinatesProjection> projectionClass = projectionClasses
-        .get(projectionName);
-      if (projectionClass == null) {
-        return null;
-      } else {
-        try {
-          final Constructor<? extends CoordinatesProjection> constructor = projectionClass
-            .getConstructor(ProjectedCoordinateSystem.class);
-          final CoordinatesProjection coordinateProjection = constructor
-            .newInstance(coordinateSystem);
-          return coordinateProjection;
-        } catch (final NoSuchMethodException e) {
-          throw new IllegalArgumentException("Constructor " + projectionClass + "("
-            + ProjectedCoordinateSystem.class.getName() + ") does not exist");
-        } catch (final InstantiationException e) {
-          throw new IllegalArgumentException(projectionClass + " cannot be instantiated", e);
-        } catch (final IllegalAccessException e) {
-          throw new IllegalArgumentException(projectionClass + " cannot be instantiated", e);
-        } catch (final InvocationTargetException e) {
-          final Throwable cause = e.getCause();
-          if (cause instanceof RuntimeException) {
-            throw (RuntimeException)cause;
-          } else if (cause instanceof Error) {
-            throw (Error)cause;
-          } else {
-            throw new IllegalArgumentException(projectionClass + " cannot be instantiated", cause);
-          }
-        }
-      }
-    }
-  }
-
   public static CoordinatesOperation getCoordinatesOperation(final CoordinateSystem cs1,
     final CoordinateSystem cs2) {
     if (cs1 == null || cs2 == null || cs1 == cs2) {
@@ -207,6 +170,43 @@ public final class ProjectionFactory {
       return new CopyOperation();
     } else {
       return projection.getProjectOperation();
+    }
+  }
+
+  public static CoordinatesProjection newCoordinatesProjection(
+    final ProjectedCoordinateSystem coordinateSystem) {
+    final Projection projection = coordinateSystem.getProjection();
+    final String projectionName = projection.getNormalizedName();
+    synchronized (projectionClasses) {
+      final Class<? extends CoordinatesProjection> projectionClass = projectionClasses
+        .get(projectionName);
+      if (projectionClass == null) {
+        return null;
+      } else {
+        try {
+          final Constructor<? extends CoordinatesProjection> constructor = projectionClass
+            .getConstructor(ProjectedCoordinateSystem.class);
+          final CoordinatesProjection coordinateProjection = constructor
+            .newInstance(coordinateSystem);
+          return coordinateProjection;
+        } catch (final NoSuchMethodException e) {
+          throw new IllegalArgumentException("Constructor " + projectionClass + "("
+            + ProjectedCoordinateSystem.class.getName() + ") does not exist");
+        } catch (final InstantiationException e) {
+          throw new IllegalArgumentException(projectionClass + " cannot be instantiated", e);
+        } catch (final IllegalAccessException e) {
+          throw new IllegalArgumentException(projectionClass + " cannot be instantiated", e);
+        } catch (final InvocationTargetException e) {
+          final Throwable cause = e.getCause();
+          if (cause instanceof RuntimeException) {
+            throw (RuntimeException)cause;
+          } else if (cause instanceof Error) {
+            throw (Error)cause;
+          } else {
+            throw new IllegalArgumentException(projectionClass + " cannot be instantiated", cause);
+          }
+        }
+      }
     }
   }
 

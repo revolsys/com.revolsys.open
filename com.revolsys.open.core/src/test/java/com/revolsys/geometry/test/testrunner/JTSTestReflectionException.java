@@ -12,7 +12,7 @@ public class JTSTestReflectionException extends Exception {
    */
   private static final long serialVersionUID = 1L;
 
-  private static String createMessage(final String opName, final Object[] args) {
+  private static String newMessage(final String opName, final Object[] args) {
     String msg = "Could not find Geometry method: " + opName + "(";
     for (int j = 0; j < args.length; j++) {
       if (j > 0) {
@@ -29,7 +29,7 @@ public class JTSTestReflectionException extends Exception {
   }
 
   public JTSTestReflectionException(final String opName, final Object[] args) {
-    super(createMessage(opName, args));
+    super(newMessage(opName, args));
   }
 
 }

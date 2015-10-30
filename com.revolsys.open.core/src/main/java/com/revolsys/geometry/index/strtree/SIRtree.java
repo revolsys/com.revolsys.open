@@ -83,7 +83,24 @@ public class SIRtree extends AbstractSTRtree {
   }
 
   @Override
-  protected AbstractNode createNode(final int level) {
+  protected Comparator getComparator() {
+    return this.comparator;
+  }
+
+  @Override
+  protected IntersectsOp getIntersectsOp() {
+    return this.intersectsOp;
+  }
+
+  /**
+   * Inserts an item having the given bounds into the tree.
+   */
+  public void insert(final double x1, final double x2, final Object item) {
+    super.insert(new Interval(Math.min(x1, x2), Math.max(x1, x2)), item);
+  }
+
+  @Override
+  protected AbstractNode newNode(final int level) {
     return new AbstractNode(level) {
       /**
        *
@@ -104,23 +121,6 @@ public class SIRtree extends AbstractSTRtree {
         return bounds;
       }
     };
-  }
-
-  @Override
-  protected Comparator getComparator() {
-    return this.comparator;
-  }
-
-  @Override
-  protected IntersectsOp getIntersectsOp() {
-    return this.intersectsOp;
-  }
-
-  /**
-   * Inserts an item having the given bounds into the tree.
-   */
-  public void insert(final double x1, final double x2, final Object item) {
-    super.insert(new Interval(Math.min(x1, x2), Math.max(x1, x2)), item);
   }
 
   /**

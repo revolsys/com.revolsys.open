@@ -74,7 +74,7 @@ public class KochSnowflakeBuilder extends GeometricShapeBuilder {
     if (level == 0) {
       addSegment(p0, p1);
     } else {
-      final Vector2D base = Vector2D.create(p0, p1);
+      final Vector2D base = Vector2D.newVector(p0, p1);
       final Point midPt = base.multiply(0.5).translate(p0);
 
       final Vector2D heightVec = base.multiply(THIRD_HEIGHT);
@@ -101,10 +101,10 @@ public class KochSnowflakeBuilder extends GeometricShapeBuilder {
       y += THIRD_HEIGHT * width;
     }
 
-    final Point p0 = new PointDouble(origin.getX(), y, Point.NULL_ORDINATE);
+    final Point p0 = new PointDouble(origin.getX(), y, Geometry.NULL_ORDINATE);
     final Point p1 = new PointDouble(origin.getX() + width / 2, y + width * HEIGHT_FACTOR,
-      Point.NULL_ORDINATE);
-    final Point p2 = new PointDouble(origin.getX() + width, y, Point.NULL_ORDINATE);
+      Geometry.NULL_ORDINATE);
+    final Point p2 = new PointDouble(origin.getX() + width, y, Geometry.NULL_ORDINATE);
     addSide(level, p0, p1);
     addSide(level, p1, p2);
     addSide(level, p2, p0);

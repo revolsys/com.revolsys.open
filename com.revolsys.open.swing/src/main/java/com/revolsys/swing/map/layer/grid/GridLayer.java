@@ -29,11 +29,11 @@ public class GridLayer extends AbstractLayer {
     menu.deleteMenuItem("zoom", "Zoom to Layer");
     menu.deleteMenuItem("refresh", "Refresh");
 
-    Menus.<GridLayer> addMenuItem(menu, "zoom", "Zoom to Mapsheet",
-      "magnifier_zoom_grid", GridLayer::zoomToSheet);
+    Menus.<GridLayer> addMenuItem(menu, "zoom", "Zoom to Mapsheet", "magnifier_zoom_grid",
+      GridLayer::zoomToSheet);
   }
 
-  public static GridLayer create(final Map<String, Object> properties) {
+  public static GridLayer newLayer(final Map<String, Object> properties) {
     return new GridLayer(properties);
   }
 

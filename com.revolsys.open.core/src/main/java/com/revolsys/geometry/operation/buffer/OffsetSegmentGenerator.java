@@ -39,6 +39,7 @@ import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.NotRepresentableException;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.geomgraph.Position;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.geometry.model.LineString;
@@ -145,8 +146,7 @@ class OffsetSegmentGenerator {
      * them. In any case, non-round joins only really make sense for relatively
      * small buffer distances.
      */
-    if (bufParams.getQuadrantSegments() >= 8
-      && bufParams.getJoinStyle() == LineJoin.ROUND) {
+    if (bufParams.getQuadrantSegments() >= 8 && bufParams.getJoinStyle() == LineJoin.ROUND) {
       this.closingSegLengthFactor = MAX_CLOSING_SEG_LEN_FACTOR;
     }
     init(distance);
@@ -333,14 +333,14 @@ class OffsetSegmentGenerator {
               / (this.closingSegLengthFactor + 1),
             (this.closingSegLengthFactor * this.offset0.getP1().getY() + this.s1.getY())
               / (this.closingSegLengthFactor + 1),
-            Point.NULL_ORDINATE);
+            Geometry.NULL_ORDINATE);
           this.segList.addPt(mid0);
           final Point mid1 = new PointDouble(
             (this.closingSegLengthFactor * this.offset1.getP0().getX() + this.s1.getX())
               / (this.closingSegLengthFactor + 1),
             (this.closingSegLengthFactor * this.offset1.getP0().getY() + this.s1.getY())
               / (this.closingSegLengthFactor + 1),
-            Point.NULL_ORDINATE);
+            Geometry.NULL_ORDINATE);
           this.segList.addPt(mid1);
         } else {
           /**
@@ -401,7 +401,7 @@ class OffsetSegmentGenerator {
     // compute the midpoint of the bevel segment
     final double bevelMidX = basePt.getX() + mitreDist * Math.cos(mitreMidAng);
     final double bevelMidY = basePt.getY() + mitreDist * Math.sin(mitreMidAng);
-    final Point bevelMidPt = new PointDouble(bevelMidX, bevelMidY, Point.NULL_ORDINATE);
+    final Point bevelMidPt = new PointDouble(bevelMidX, bevelMidY, Geometry.NULL_ORDINATE);
 
     // compute the mitre midline segment from the corner point to the bevel
     // segment midpoint
@@ -429,8 +429,8 @@ class OffsetSegmentGenerator {
   public void addLineEndCap(final Point p0, final Point p1) {
     final LineSegment seg = new LineSegmentDouble(p0, p1);
 
-    final LineSegment offsetL = createOffsetSegment(seg, Position.LEFT, this.distance);
-    final LineSegment offsetR = createOffsetSegment(seg, Position.RIGHT, this.distance);
+    final LineSegment offsetL = newOffsetSegment(seg, Position.LEFT, this.distance);
+    final LineSegment offsetR = newOffsetSegment(seg, Position.RIGHT, this.distance);
 
     final double dx = p1.getX() - p0.getX();
     final double dy = p1.getY() - p0.getY();
@@ -496,7 +496,7 @@ class OffsetSegmentGenerator {
         isMitreWithinLimit = false;
       }
     } catch (final NotRepresentableException ex) {
-      intPt = new PointDouble(0.0, 0.0, Point.NULL_ORDINATE);
+      intPt = new PointDouble(0.0, 0.0, Geometry.NULL_ORDINATE);
       isMitreWithinLimit = false;
     }
 
@@ -513,8 +513,8 @@ class OffsetSegmentGenerator {
     this.s0 = this.s1;
     this.s1 = this.s2;
     this.s2 = p;
-    this.offset0 = createOffsetSegment(this.s0, this.s1, this.side, this.distance);
-    this.offset1 = createOffsetSegment(this.s1, this.s2, this.side, this.distance);
+    this.offset0 = newOffsetSegment(this.s0, this.s1, this.side, this.distance);
+    this.offset1 = newOffsetSegment(this.s1, this.s2, this.side, this.distance);
 
     // do nothing if points are equal
     if (this.s1.equals(this.s2)) {
@@ -577,79 +577,6 @@ class OffsetSegmentGenerator {
     this.segList.closeRing();
   }
 
-  /**
-   * Creates a CW circle around a point
-   */
-  public void createCircle(final Point point) {
-    if (point != null) {
-      // add start point
-      final double x = point.getX() + this.distance;
-      final double y = point.getY();
-      this.segList.addPt(x, y);
-      addFillet(point, 0.0, 2.0 * Math.PI, -1, this.distance);
-      this.segList.closeRing();
-    }
-  }
-
-  /**
-   * Compute an offset segment for an input segment on a given side and at a given distance.
-   * The offset points are computed in full double precision, for accuracy.
-   *
-   * @param seg the segment to offset
-   * @param side the side of the segment ({@link Position}) the offset lies on
-   * @param distance the offset distance
-   * @param offset the points computed for the offset segment
-   */
-  private LineSegment createOffsetSegment(final LineSegment seg, final int side,
-    final double distance) {
-    final int sideSign = side == Position.LEFT ? 1 : -1;
-    final double dx = seg.getX(1) - seg.getX(0);
-    final double dy = seg.getY(1) - seg.getY(0);
-    final double len = Math.sqrt(dx * dx + dy * dy);
-    // u is the vector that is the length of the offset, in the direction of the
-    // segment
-    final double ux = sideSign * distance * dx / len;
-    final double uy = sideSign * distance * dy / len;
-    final double x1 = this.precisionModel.makePrecise(0, seg.getX(0) - uy);
-    final double y1 = this.precisionModel.makePrecise(1, seg.getY(0) + ux);
-    final double x2 = this.precisionModel.makePrecise(0, seg.getX(1) - uy);
-    final double y2 = this.precisionModel.makePrecise(1, seg.getY(1) + ux);
-    return new LineSegmentDouble(2, x1, y1, x2, y2);
-  }
-
-  private LineSegment createOffsetSegment(final Point p1, final Point p2, final int side,
-    final double distance) {
-    final int sideSign = side == Position.LEFT ? 1 : -1;
-    final double p1x = p1.getX();
-    final double p1y = p1.getY();
-    final double p2x = p2.getX();
-    final double p2Y = p2.getY();
-    final double dx = p2x - p1x;
-    final double dy = p2Y - p1y;
-    final double len = Math.sqrt(dx * dx + dy * dy);
-    // u is the vector that is the length of the offset, in the direction of the
-    // segment
-    final double ux = sideSign * distance * dx / len;
-    final double uy = sideSign * distance * dy / len;
-    final double x1 = this.precisionModel.makePrecise(0, p1x - uy);
-    final double y1 = this.precisionModel.makePrecise(1, p1y + ux);
-    final double x2 = this.precisionModel.makePrecise(0, p2x - uy);
-    final double y2 = this.precisionModel.makePrecise(1, p2Y + ux);
-    final LineSegmentDouble line = new LineSegmentDouble(2, x1, y1, x2, y2);
-    return line;
-  }
-
-  /**
-   * Creates a CW square around a point
-   */
-  public void createSquare(final Point p) {
-    this.segList.addPt(p.getX() + this.distance, p.getY() + this.distance);
-    this.segList.addPt(p.getX() + this.distance, p.getY() - this.distance);
-    this.segList.addPt(p.getX() - this.distance, p.getY() - this.distance);
-    this.segList.addPt(p.getX() - this.distance, p.getY() + this.distance);
-    this.segList.closeRing();
-  }
-
   public LineString getPoints() {
     return this.segList.getPoints();
   }
@@ -684,7 +611,80 @@ class OffsetSegmentGenerator {
     this.s1 = s1;
     this.s2 = s2;
     this.side = side;
-    this.offset1 = createOffsetSegment(s1, s2, side, this.distance);
+    this.offset1 = newOffsetSegment(s1, s2, side, this.distance);
+  }
+
+  /**
+   * Creates a CW circle around a point
+   */
+  public void newCircle(final Point point) {
+    if (point != null) {
+      // add start point
+      final double x = point.getX() + this.distance;
+      final double y = point.getY();
+      this.segList.addPt(x, y);
+      addFillet(point, 0.0, 2.0 * Math.PI, -1, this.distance);
+      this.segList.closeRing();
+    }
+  }
+
+  /**
+   * Compute an offset segment for an input segment on a given side and at a given distance.
+   * The offset points are computed in full double precision, for accuracy.
+   *
+   * @param seg the segment to offset
+   * @param side the side of the segment ({@link Position}) the offset lies on
+   * @param distance the offset distance
+   * @param offset the points computed for the offset segment
+   */
+  private LineSegment newOffsetSegment(final LineSegment seg, final int side,
+    final double distance) {
+    final int sideSign = side == Position.LEFT ? 1 : -1;
+    final double dx = seg.getX(1) - seg.getX(0);
+    final double dy = seg.getY(1) - seg.getY(0);
+    final double len = Math.sqrt(dx * dx + dy * dy);
+    // u is the vector that is the length of the offset, in the direction of the
+    // segment
+    final double ux = sideSign * distance * dx / len;
+    final double uy = sideSign * distance * dy / len;
+    final double x1 = this.precisionModel.makePrecise(0, seg.getX(0) - uy);
+    final double y1 = this.precisionModel.makePrecise(1, seg.getY(0) + ux);
+    final double x2 = this.precisionModel.makePrecise(0, seg.getX(1) - uy);
+    final double y2 = this.precisionModel.makePrecise(1, seg.getY(1) + ux);
+    return new LineSegmentDouble(2, x1, y1, x2, y2);
+  }
+
+  private LineSegment newOffsetSegment(final Point p1, final Point p2, final int side,
+    final double distance) {
+    final int sideSign = side == Position.LEFT ? 1 : -1;
+    final double p1x = p1.getX();
+    final double p1y = p1.getY();
+    final double p2x = p2.getX();
+    final double p2Y = p2.getY();
+    final double dx = p2x - p1x;
+    final double dy = p2Y - p1y;
+    final double len = Math.sqrt(dx * dx + dy * dy);
+    // u is the vector that is the length of the offset, in the direction of the
+    // segment
+    final double ux = sideSign * distance * dx / len;
+    final double uy = sideSign * distance * dy / len;
+    final double x1 = this.precisionModel.makePrecise(0, p1x - uy);
+    final double y1 = this.precisionModel.makePrecise(1, p1y + ux);
+    final double x2 = this.precisionModel.makePrecise(0, p2x - uy);
+    final double y2 = this.precisionModel.makePrecise(1, p2Y + ux);
+    final LineSegmentDouble line = new LineSegmentDouble(2, x1, y1, x2, y2);
+    return line;
+  }
+
+  /**
+   * Creates a CW square around a point
+   */
+  public void newSquare(final Point p) {
+    this.segList.addPt(p.getX() + this.distance, p.getY() + this.distance);
+    this.segList.addPt(p.getX() + this.distance, p.getY() - this.distance);
+    this.segList.addPt(p.getX() - this.distance, p.getY() - this.distance);
+    this.segList.addPt(p.getX() - this.distance, p.getY() + this.distance);
+    this.segList.closeRing();
   }
 
   @Override

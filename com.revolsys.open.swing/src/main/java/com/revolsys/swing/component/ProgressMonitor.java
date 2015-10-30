@@ -65,7 +65,7 @@ public class ProgressMonitor extends JDialog implements WindowListener {
     }
     final String cancelText = UIManager.getString("OptionPane.cancelButtonText");
     final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    this.cancelButton = RunnableAction.createButton(cancelText, this::cancel);
+    this.cancelButton = RunnableAction.newButton(cancelText, this::cancel);
     this.cancelButton.setEnabled(canCancel);
     buttonPanel.add(this.cancelButton);
     add(this.progressBar);

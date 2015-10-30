@@ -74,15 +74,6 @@ public class MavenPom extends LinkedHashMap<String, Object> {
     return hasChildren;
   }
 
-  public ClassLoader createClassLoader() {
-    return this.mavenRepository.createClassLoader(getMavenId());
-  }
-
-  public ClassLoader createClassLoader(final Collection<String> exclusionIds) {
-    final String id = getMavenId();
-    return this.mavenRepository.createClassLoader(id, exclusionIds);
-  }
-
   public Set<String> getDependencies() {
     final Set<String> exclusionIds = Collections.emptySet();
     return getDependencies(exclusionIds);
@@ -330,6 +321,15 @@ public class MavenPom extends LinkedHashMap<String, Object> {
       }
     }
     return false;
+  }
+
+  public ClassLoader newClassLoader() {
+    return this.mavenRepository.newClassLoader(getMavenId());
+  }
+
+  public ClassLoader newClassLoader(final Collection<String> exclusionIds) {
+    final String id = getMavenId();
+    return this.mavenRepository.newClassLoader(id, exclusionIds);
   }
 
 }

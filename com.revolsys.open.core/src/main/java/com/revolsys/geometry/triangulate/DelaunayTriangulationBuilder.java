@@ -119,19 +119,6 @@ public class DelaunayTriangulationBuilder {
   public DelaunayTriangulationBuilder() {
   }
 
-  private void create() {
-    if (this.subdiv != null) {
-      return;
-    }
-
-    final BoundingBox siteEnv = envelope(this.siteCoords);
-    final List vertices = toVertices(this.siteCoords);
-    this.subdiv = new QuadEdgeSubdivision(siteEnv, this.tolerance);
-    final IncrementalDelaunayTriangulator triangulator = new IncrementalDelaunayTriangulator(
-      this.subdiv);
-    triangulator.insertSites(vertices);
-  }
-
   /**
    * Gets the edges of the computed triangulation as a {@link MultiLineString}.
    *
@@ -139,7 +126,7 @@ public class DelaunayTriangulationBuilder {
    * @return the edges of the triangulation
    */
   public Geometry getEdges(final GeometryFactory geomFact) {
-    create();
+    init();
     return this.subdiv.getEdges(geomFact);
   }
 
@@ -149,7 +136,7 @@ public class DelaunayTriangulationBuilder {
    * @return the subdivision containing the triangulation
    */
   public QuadEdgeSubdivision getSubdivision() {
-    create();
+    init();
     return this.subdiv;
   }
 
@@ -161,8 +148,21 @@ public class DelaunayTriangulationBuilder {
    * @return the faces of the triangulation
    */
   public Geometry getTriangles(final GeometryFactory geomFact) {
-    create();
+    init();
     return this.subdiv.getTriangles(geomFact);
+  }
+
+  private void init() {
+    if (this.subdiv != null) {
+      return;
+    }
+
+    final BoundingBox siteEnv = envelope(this.siteCoords);
+    final List vertices = toVertices(this.siteCoords);
+    this.subdiv = new QuadEdgeSubdivision(siteEnv, this.tolerance);
+    final IncrementalDelaunayTriangulator triangulator = new IncrementalDelaunayTriangulator(
+      this.subdiv);
+    triangulator.insertSites(vertices);
   }
 
   /**

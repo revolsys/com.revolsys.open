@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.equals.Equals;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
 
 public class BinaryCondition extends Condition {
@@ -46,10 +47,15 @@ public class BinaryCondition extends Condition {
 
   @Override
   public int appendParameters(int index, final PreparedStatement statement) {
+    FieldDefinition fieldDefinition = null;
     if (this.left != null) {
       index = this.left.appendParameters(index, statement);
+      if (this.left instanceof Column) {
+        fieldDefinition = ((Column)this.left).getFieldDefinition();
+      }
     }
     if (this.right != null) {
+      this.right.setFieldDefinition(fieldDefinition);
       index = this.right.appendParameters(index, statement);
     }
     return index;

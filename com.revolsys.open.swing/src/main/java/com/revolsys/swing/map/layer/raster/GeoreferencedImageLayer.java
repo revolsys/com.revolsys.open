@@ -67,7 +67,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     menu.deleteMenuItem("refresh", "Refresh");
   }
 
-  public static GeoreferencedImageLayer create(final Map<String, Object> properties) {
+  public static GeoreferencedImageLayer newLayer(final Map<String, Object> properties) {
     return new GeoreferencedImageLayer(properties);
   }
 
@@ -116,44 +116,6 @@ public class GeoreferencedImageLayer extends AbstractLayer {
       this.image.cancelChanges();
     }
     firePropertyChange("hasChanges", true, false);
-  }
-
-  @Override
-  public TabbedValuePanel createPropertiesPanel() {
-    final TabbedValuePanel propertiesPanel = super.createPropertiesPanel();
-    final TiePointsPanel tiePointsPanel = createTableViewComponent(null);
-    Borders.titled(tiePointsPanel, "Tie Points");
-
-    propertiesPanel.addTab("Geo-Referencing", tiePointsPanel);
-    return propertiesPanel;
-  }
-
-  @Override
-  protected ValueField createPropertiesTabGeneralPanelSource(final BasePanel parent) {
-    final ValueField panel = super.createPropertiesTabGeneralPanelSource(parent);
-
-    if (this.url.startsWith("file:")) {
-      final String fileName = this.url.replaceFirst("file:(//)?", "");
-      SwingUtil.addLabelledReadOnlyTextField(panel, "File", fileName);
-    } else {
-      SwingUtil.addLabelledReadOnlyTextField(panel, "URL", this.url);
-    }
-    final String fileNameExtension = FileUtil.getFileNameExtension(this.url);
-    if (Property.hasValue(fileNameExtension)) {
-      SwingUtil.addLabelledReadOnlyTextField(panel, "File Extension", fileNameExtension);
-      final GeoreferencedImageFactory factory = IoFactoryRegistry.getInstance()
-        .getFactoryByFileExtension(GeoreferencedImageFactory.class, fileNameExtension);
-      if (factory != null) {
-        SwingUtil.addLabelledReadOnlyTextField(panel, "File Type", factory.getName());
-      }
-    }
-    GroupLayouts.makeColumns(panel, 2, true);
-    return panel;
-  }
-
-  @Override
-  protected TiePointsPanel createTableViewComponent(final Map<String, Object> config) {
-    return new TiePointsPanel(this);
   }
 
   public void deleteTiePoint(final MappedLocation tiePoint) {
@@ -268,6 +230,44 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   @Override
   public boolean isVisible() {
     return super.isVisible() || isEditable();
+  }
+
+  @Override
+  public TabbedValuePanel newPropertiesPanel() {
+    final TabbedValuePanel propertiesPanel = super.newPropertiesPanel();
+    final TiePointsPanel tiePointsPanel = newTableViewComponent(null);
+    Borders.titled(tiePointsPanel, "Tie Points");
+
+    propertiesPanel.addTab("Geo-Referencing", tiePointsPanel);
+    return propertiesPanel;
+  }
+
+  @Override
+  protected ValueField newPropertiesTabGeneralPanelSource(final BasePanel parent) {
+    final ValueField panel = super.newPropertiesTabGeneralPanelSource(parent);
+
+    if (this.url.startsWith("file:")) {
+      final String fileName = this.url.replaceFirst("file:(//)?", "");
+      SwingUtil.addLabelledReadOnlyTextField(panel, "File", fileName);
+    } else {
+      SwingUtil.addLabelledReadOnlyTextField(panel, "URL", this.url);
+    }
+    final String fileNameExtension = FileUtil.getFileNameExtension(this.url);
+    if (Property.hasValue(fileNameExtension)) {
+      SwingUtil.addLabelledReadOnlyTextField(panel, "File Extension", fileNameExtension);
+      final GeoreferencedImageFactory factory = IoFactoryRegistry.getInstance()
+        .getFactoryByFileExtension(GeoreferencedImageFactory.class, fileNameExtension);
+      if (factory != null) {
+        SwingUtil.addLabelledReadOnlyTextField(panel, "File Type", factory.getName());
+      }
+    }
+    GroupLayouts.makeColumns(panel, 2, true);
+    return panel;
+  }
+
+  @Override
+  protected TiePointsPanel newTableViewComponent(final Map<String, Object> config) {
+    return new TiePointsPanel(this);
   }
 
   @Override

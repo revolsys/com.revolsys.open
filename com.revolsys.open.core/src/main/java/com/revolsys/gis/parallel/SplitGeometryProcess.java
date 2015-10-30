@@ -29,10 +29,6 @@ public class SplitGeometryProcess extends BaseInOutProcess<Record, Record> {
 
   private double tolerance = 2.0;
 
-  protected Record createSplitObject(final Record object, final LineString newLine) {
-    return Records.copy(object, newLine);
-  }
-
   /**
    * Get the statistics to record the number new observations created.
    *
@@ -62,6 +58,10 @@ public class SplitGeometryProcess extends BaseInOutProcess<Record, Record> {
 
   public double getTolerance() {
     return this.tolerance;
+  }
+
+  protected Record newSplitRecord(final Record object, final LineString newLine) {
+    return Records.copy(object, newLine);
   }
 
   @Override
@@ -148,12 +148,12 @@ public class SplitGeometryProcess extends BaseInOutProcess<Record, Record> {
       if (newLine == line) {
         newObjects.add(object);
       } else {
-        final Record newObject = createSplitObject(object, newLine);
+        final Record newObject = newSplitRecord(object, newLine);
         newObjects.add(newObject);
       }
     } else {
       for (final LineString newLine : newLines) {
-        final Record newObject = createSplitObject(object, newLine);
+        final Record newObject = newSplitRecord(object, newLine);
         newObjects.add(newObject);
       }
     }

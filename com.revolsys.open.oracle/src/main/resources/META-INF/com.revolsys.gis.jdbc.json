@@ -1,5 +1,5 @@
 [
   {
-    "jdbcFactoryClassName" : "com.revolsys.gis.oracle.io.OracleDatabaseFactory"
+    "jdbcFactoryClassName" : "com.revolsys.oracle.recordstore.OracleDatabaseFactory"
   }
 ]

@@ -1,9 +1,9 @@
-package com.revolsys.gis.oracle.io;
+package com.revolsys.oracle.recordstore.field;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.Reader;
-import java.io.StringReader;
-import java.sql.Clob;
+import java.io.InputStream;
+import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,17 +15,17 @@ import com.revolsys.record.Record;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 
-public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
-  public OracleJdbcClobFieldDefinition(final String dbName, final String name, final int sqlType,
+public class OracleJdbcBlobFieldDefinition extends JdbcFieldDefinition {
+  public OracleJdbcBlobFieldDefinition(final String dbName, final String name, final int sqlType,
     final int length, final boolean required, final String description) {
-    super(dbName, name, DataTypes.STRING, sqlType, length, 0, required, description,
+    super(dbName, name, DataTypes.BLOB, sqlType, length, 0, required, description,
       Collections.<String, Object> emptyMap());
   }
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
     final Record object) throws SQLException {
-    final Clob value = resultSet.getClob(columnIndex);
+    final Blob value = resultSet.getBlob(columnIndex);
     object.setValue(getIndex(), value);
     return columnIndex + 1;
   }
@@ -37,28 +37,28 @@ public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
       final int sqlType = getSqlType();
       statement.setNull(parameterIndex, sqlType);
     } else {
-      if (value instanceof Clob) {
-        final Clob clob = (Clob)value;
-        statement.setClob(parameterIndex, clob);
+      if (value instanceof Blob) {
+        final Blob blob = (Blob)value;
+        statement.setBlob(parameterIndex, blob);
       } else {
-        Reader in;
+        InputStream in;
         if (value instanceof Resource) {
           final Resource resource = (Resource)value;
-          in = resource.newReader();
-        } else if (value instanceof Clob) {
-          final Clob clob = (Clob)value;
-          in = clob.getCharacterStream();
-        } else if (value instanceof String) {
-          final String string = (String)value;
-          in = new StringReader(string);
+          in = resource.getInputStream();
+        } else if (value instanceof Blob) {
+          final Blob blob = (Blob)value;
+          in = blob.getBinaryStream();
+        } else if (value instanceof byte[]) {
+          final byte[] bytes = (byte[])value;
+          in = new ByteArrayInputStream(bytes);
         } else if (value instanceof File) {
           final File file = (File)value;
           final FileSystemResource resource = new FileSystemResource(file);
-          in = resource.newReader();
+          in = resource.getInputStream();
         } else {
-          throw new IllegalArgumentException("Not valid for a clob column");
+          throw new IllegalArgumentException("Not valid for a blob column");
         }
-        statement.setCharacterStream(parameterIndex, in);
+        statement.setBinaryStream(parameterIndex, in);
       }
     }
     return parameterIndex + 1;

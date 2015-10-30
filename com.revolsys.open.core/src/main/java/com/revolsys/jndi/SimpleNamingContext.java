@@ -73,7 +73,7 @@ public class SimpleNamingContext implements Context {
           if (!contents.containsKey(strippedName)) {
             try {
               contents.put(strippedName,
-                createObject(strippedName, context.lookup(proot + strippedName)));
+                newObject(strippedName, context.lookup(proot + strippedName)));
             } catch (final NameNotFoundException ex) {
               // cannot happen
             }
@@ -90,8 +90,6 @@ public class SimpleNamingContext implements Context {
     public void close() {
     }
 
-    protected abstract T createObject(String strippedName, Object obj);
-
     @Override
     public boolean hasMore() {
       return this.iterator.hasNext();
@@ -101,6 +99,8 @@ public class SimpleNamingContext implements Context {
     public boolean hasMoreElements() {
       return this.iterator.hasNext();
     }
+
+    protected abstract T newObject(String strippedName, Object obj);
 
     @Override
     public T next() {
@@ -121,7 +121,7 @@ public class SimpleNamingContext implements Context {
     }
 
     @Override
-    protected Binding createObject(final String strippedName, final Object obj) {
+    protected Binding newObject(final String strippedName, final Object obj) {
       return new Binding(strippedName, obj);
     }
   }
@@ -134,7 +134,7 @@ public class SimpleNamingContext implements Context {
     }
 
     @Override
-    protected NameClassPair createObject(final String strippedName, final Object obj) {
+    protected NameClassPair newObject(final String strippedName, final Object obj) {
       return new NameClassPair(strippedName, obj.getClass().getName());
     }
   }

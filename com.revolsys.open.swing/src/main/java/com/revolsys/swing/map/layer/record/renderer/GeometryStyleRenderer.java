@@ -189,11 +189,6 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   @Override
-  public GeometryStylePanel createStylePanel() {
-    return new GeometryStylePanel(this);
-  }
-
-  @Override
   public Icon getIcon() {
     final AbstractRecordLayer layer = getLayer();
     if (layer == null) {
@@ -235,6 +230,11 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
 
   public GeometryStyle getStyle() {
     return this.style;
+  }
+
+  @Override
+  public GeometryStylePanel newStylePanel() {
+    return new GeometryStylePanel(this);
   }
 
   @Override

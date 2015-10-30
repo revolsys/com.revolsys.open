@@ -39,13 +39,6 @@ public class BaseFrame extends JFrame implements WindowListener {
     }
   }
 
-  protected JMenuBar createMenuBar() {
-    final JMenuBar menuBar = new JMenuBar();
-    setJMenuBar(menuBar);
-    WindowManager.addMenu(menuBar);
-    return menuBar;
-  }
-
   @Override
   public void dispose() {
     removeWindowListener(this);
@@ -56,7 +49,14 @@ public class BaseFrame extends JFrame implements WindowListener {
   protected void init() {
     setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     addWindowListener(this);
-    createMenuBar();
+    newMenuBar();
+  }
+
+  protected JMenuBar newMenuBar() {
+    final JMenuBar menuBar = new JMenuBar();
+    setJMenuBar(menuBar);
+    WindowManager.addMenu(menuBar);
+    return menuBar;
   }
 
   @Override

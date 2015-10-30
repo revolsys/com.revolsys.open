@@ -57,7 +57,7 @@ public class PointInAreaPerfTest {
     ssFact.setArmLengthRatio(0.1);
     ssFact.setNumArms(100);
 
-    final Geometry area = ssFact.createSineStar();
+    final Geometry area = ssFact.newSineStar();
     // System.out.println(area);
 
     final Stopwatch sw = new Stopwatch();

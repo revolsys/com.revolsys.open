@@ -46,7 +46,7 @@ public abstract class GeometryGenerator {
    * @see GridGenerator
    * @return A new GridGenerator
    */
-  public static GridGenerator createGridGenerator() {
+  public static GridGenerator newGridGenerator() {
     return new GridGenerator();
   }
 
@@ -54,7 +54,7 @@ public abstract class GeometryGenerator {
    * @see LineStringGenerator
    * @return A new LineStringGenerator
    */
-  public static LineStringGenerator createLineStringGenerator() {
+  public static LineStringGenerator newLineStringGenerator() {
     final LineStringGenerator lsg = new LineStringGenerator();
     lsg.setGenerationAlgorithm(LineStringGenerator.ARC);
     lsg.setNumberPoints(10);
@@ -66,8 +66,8 @@ public abstract class GeometryGenerator {
    * @see MultiGenerator
    * @return A new PointGenerator
    */
-  public static MultiGenerator createMultiLineStringGenerator() {
-    final MultiGenerator mg = new MultiGenerator(createLineStringGenerator());
+  public static MultiGenerator newMultiLineStringGenerator() {
+    final MultiGenerator mg = new MultiGenerator(newLineStringGenerator());
     mg.setNumberGeometries(4);
     return mg;
   }
@@ -77,8 +77,8 @@ public abstract class GeometryGenerator {
    * @see MultiGenerator
    * @return A new MultiGenerator
    */
-  public static MultiGenerator createMultiPointGenerator() {
-    final MultiGenerator mg = new MultiGenerator(createPointGenerator());
+  public static MultiGenerator newMultiPointGenerator() {
+    final MultiGenerator mg = new MultiGenerator(newPointGenerator());
     mg.setNumberGeometries(4);
     return mg;
   }
@@ -88,8 +88,8 @@ public abstract class GeometryGenerator {
    * @see MultiGenerator
    * @return A new PointGenerator
    */
-  public static MultiGenerator createMultiPolygonGenerator() {
-    final MultiGenerator mg = new MultiGenerator(createPolygonGenerator());
+  public static MultiGenerator newMultiPolygonGenerator() {
+    final MultiGenerator mg = new MultiGenerator(newPolygonGenerator());
     mg.setNumberGeometries(4);
     return mg;
   }
@@ -98,7 +98,7 @@ public abstract class GeometryGenerator {
    * @see PointGenerator
    * @return A new PointGenerator
    */
-  public static PointGenerator createPointGenerator() {
+  public static PointGenerator newPointGenerator() {
     return new PointGenerator();
   }
 
@@ -106,7 +106,7 @@ public abstract class GeometryGenerator {
    * @see PolygonGenerator
    * @return A new PolygonGenerator
    */
-  public static PolygonGenerator createPolygonGenerator() {
+  public static PolygonGenerator newPolygonGenerator() {
     final PolygonGenerator pg = new PolygonGenerator();
     pg.setGenerationAlgorithm(PolygonGenerator.ARC);
     pg.setNumberPoints(10);
@@ -119,11 +119,6 @@ public abstract class GeometryGenerator {
   protected int dimensions = 2;
 
   protected GeometryFactory geometryFactory; // includes srid
-
-  /**
-   * @return A Geometry which uses some or all of the Bounding Box specified.
-   */
-  public abstract Geometry create();
 
   /**
    * @return Returns the boundingBox.
@@ -145,6 +140,11 @@ public abstract class GeometryGenerator {
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
+
+  /**
+   * @return A Geometry which uses some or all of the Bounding Box specified.
+   */
+  public abstract Geometry newGeometry();
 
   /**
    * @param boundingBox The boundingBox to set.

@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.record.schema.RecordStore;
 
 public class DelegatingRecordStoreHandler implements InvocationHandler {
-  public static <T extends RecordStore> T create(final String label, final Class<T> interfaceClass,
-    final T recordStore) {
+  public static <T extends RecordStore> T newRecordStore(final String label,
+    final Class<T> interfaceClass, final T recordStore) {
     final ClassLoader classLoader = recordStore.getClass().getClassLoader();
     final Class<?>[] interfaces = new Class<?>[] {
       interfaceClass
@@ -25,7 +25,7 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T extends RecordStore> T create(final String label,
+  public static <T extends RecordStore> T newRecordStore(final String label,
     final Map<String, ? extends Object> config) {
     final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     final Class<?>[] interfaces = new Class<?>[] {

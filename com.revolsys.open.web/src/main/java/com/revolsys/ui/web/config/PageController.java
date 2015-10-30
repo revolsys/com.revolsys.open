@@ -495,7 +495,7 @@ public class PageController implements SiteNodeController {
     if (title != null) {
       this.title = title;
       try {
-        this.titleExpression = JexlUtil.createExpression(title);
+        this.titleExpression = JexlUtil.newExpression(title);
       } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }

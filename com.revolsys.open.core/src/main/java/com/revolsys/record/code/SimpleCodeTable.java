@@ -10,12 +10,12 @@ import com.revolsys.spring.resource.Resource;
 
 public class SimpleCodeTable extends AbstractCodeTable {
 
-  public static CodeTable create(final String name, final Resource resource) {
+  public static CodeTable newCodeTable(final String name, final Resource resource) {
     final SimpleCodeTable codeTable = new SimpleCodeTable(name);
     try (
       final RecordReader reader = RecordReader.newRecordReader(resource)) {
       for (final Record record : reader) {
-        final Identifier id = Identifier.create(record.getValue(0));
+        final Identifier id = Identifier.newIdentifier(record.getValue(0));
         final List<Object> values = new ArrayList<>();
         final int fieldCount = record.getRecordDefinition().getFieldCount();
         for (int i = 1; i < fieldCount; i++) {
@@ -38,7 +38,7 @@ public class SimpleCodeTable extends AbstractCodeTable {
   }
 
   public void addValue(final Object id, final Object... values) {
-    super.addValue(Identifier.create(id), values);
+    super.addValue(Identifier.newIdentifier(id), values);
   }
 
   @Override

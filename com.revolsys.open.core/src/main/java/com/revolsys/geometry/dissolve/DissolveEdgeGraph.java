@@ -12,7 +12,7 @@ import com.revolsys.geometry.model.Point;
  */
 class DissolveEdgeGraph extends EdgeGraph {
   @Override
-  protected HalfEdge createEdge(final Point p0) {
+  protected HalfEdge newHalfEdge(final Point p0) {
     return new DissolveHalfEdge(p0);
   }
 

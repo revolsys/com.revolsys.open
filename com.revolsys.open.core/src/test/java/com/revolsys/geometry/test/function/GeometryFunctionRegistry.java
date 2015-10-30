@@ -51,7 +51,11 @@ import com.revolsys.geometry.model.Geometry;
  *
  */
 public class GeometryFunctionRegistry {
-  public static GeometryFunctionRegistry createTestBuilderRegistry() {
+  public static boolean hasGeometryResult(final GeometryFunction func) {
+    return Geometry.class.isAssignableFrom(func.getReturnType());
+  }
+
+  public static GeometryFunctionRegistry newTestBuilderRegistry() {
     final GeometryFunctionRegistry funcRegistry = new GeometryFunctionRegistry();
 
     funcRegistry.add(GeometryFunctions.class);
@@ -85,10 +89,6 @@ public class GeometryFunctionRegistry {
     return funcRegistry;
   }
 
-  public static boolean hasGeometryResult(final GeometryFunction func) {
-    return Geometry.class.isAssignableFrom(func.getReturnType());
-  }
-
   private final DoubleKeyMap categorizedFunctions = new DoubleKeyMap();
 
   private final DoubleKeyMap categorizedGeometryFunctions = new DoubleKeyMap();
@@ -110,7 +110,7 @@ public class GeometryFunctionRegistry {
    * @param geomFuncClass
    */
   public void add(final Class geomFuncClass) {
-    final List funcs = createFunctions(geomFuncClass);
+    final List funcs = newFunctions(geomFuncClass);
     // sort list of functions so they appear nicely in the UI list
     Collections.sort(funcs);
     add(funcs);
@@ -148,25 +148,6 @@ public class GeometryFunctionRegistry {
     Class geomFuncClass = null;
     geomFuncClass = this.getClass().getClassLoader().loadClass(geomFuncClassname);
     add(geomFuncClass);
-  }
-
-  /**
-   * Create {@link GeometryFunction}s for all the static
-   * methods in the given class
-   *
-   * @param functionClass
-   * @return a list of the functions created
-   */
-  public List createFunctions(final Class functionClass) {
-    final List funcs = new ArrayList();
-    final Method[] method = functionClass.getMethods();
-    for (final Method element : method) {
-      final int mod = element.getModifiers();
-      if (Modifier.isStatic(mod) && Modifier.isPublic(mod)) {
-        funcs.add(StaticMethodGeometryFunction.createFunction(element));
-      }
-    }
-    return funcs;
   }
 
   /**
@@ -226,15 +207,15 @@ public class GeometryFunctionRegistry {
     return this.functions;
   }
 
+  public Collection getFunctions(final String category) {
+    return this.categorizedFunctions.values(category);
+  }
+
   /*
    * int index = functions.indexOf(func); if (index == -1) {
    * sortedFunctions.put(func.getName(), func); } else { functions.set(index,
    * func); } }
    */
-
-  public Collection getFunctions(final String category) {
-    return this.categorizedFunctions.values(category);
-  }
 
   public List getGeometryFunctions() {
     final List funList = new ArrayList();
@@ -256,5 +237,24 @@ public class GeometryFunctionRegistry {
       }
     }
     return scalarFun;
+  }
+
+  /**
+   * Create {@link GeometryFunction}s for all the static
+   * methods in the given class
+   *
+   * @param functionClass
+   * @return a list of the functions created
+   */
+  public List newFunctions(final Class functionClass) {
+    final List funcs = new ArrayList();
+    final Method[] method = functionClass.getMethods();
+    for (final Method element : method) {
+      final int mod = element.getModifiers();
+      if (Modifier.isStatic(mod) && Modifier.isPublic(mod)) {
+        funcs.add(StaticMethodGeometryFunction.newFunction(element));
+      }
+    }
+    return funcs;
   }
 }

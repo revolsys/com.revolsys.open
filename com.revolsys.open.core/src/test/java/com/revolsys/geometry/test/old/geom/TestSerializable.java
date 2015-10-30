@@ -86,13 +86,13 @@ public class TestSerializable {
     return true;
   }
 
-  List createData() {
+  List newData() {
     final List objList = new ArrayList();
 
     final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(2, 123, 123, 456, 456);
     objList.add(env);
 
-    objList.add(GeometryTestFactory.createBox(fact, 0.0, 100.0, 10, 10.0));
+    objList.add(GeometryTestFactory.newBox(fact, 0.0, 100.0, 10, 10.0));
 
     return objList;
 
@@ -133,7 +133,7 @@ public class TestSerializable {
   }
 
   public void run() {
-    final List objList = createData();
+    final List objList = newData();
     writeData(objList);
     readData(objList);
   }

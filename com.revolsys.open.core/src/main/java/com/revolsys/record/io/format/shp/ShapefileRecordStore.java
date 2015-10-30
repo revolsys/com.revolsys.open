@@ -28,14 +28,14 @@ public class ShapefileRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public RecordDefinition getRecordDefinition(final String typePath) {
-    return this.writer.getRecordDefinition(typePath);
-  }
-
-  @Override
   public int getRecordCount(final Query query) {
     // TODO Auto-generated method stub
     return 0;
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition(final String typePath) {
+    return this.writer.getRecordDefinition(typePath);
   }
 
   @Override

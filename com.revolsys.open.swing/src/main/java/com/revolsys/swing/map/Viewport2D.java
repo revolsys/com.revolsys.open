@@ -47,7 +47,19 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
 
   public static final Geometry EMPTY_GEOMETRY = GeometryFactory.floating3().geometry();
 
-  public static AffineTransform createScreenToModelTransform(final BoundingBox boundingBox,
+  public static double getScale(final Measurable<Length> viewWidth,
+    final Measurable<Length> modelWidth) {
+    final double width1 = viewWidth.doubleValue(SI.METRE);
+    final double width2 = modelWidth.doubleValue(SI.METRE);
+    if (width1 == 0 || width2 == 0) {
+      return Double.NaN;
+    } else {
+      final double scale = width2 / width1;
+      return scale;
+    }
+  }
+
+  public static AffineTransform newScreenToModelTransform(final BoundingBox boundingBox,
     final double viewWidth, final double viewHeight) {
     final AffineTransform transform = new AffineTransform();
     final double mapWidth = boundingBox.getWidth();
@@ -61,18 +73,6 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     transform.concatenate(AffineTransform.getTranslateInstance(originX, originY));
     transform.concatenate(AffineTransform.getScaleInstance(xUnitsPerPixel, -yUnitsPerPixel));
     return transform;
-  }
-
-  public static double getScale(final Measurable<Length> viewWidth,
-    final Measurable<Length> modelWidth) {
-    final double width1 = viewWidth.doubleValue(SI.METRE);
-    final double width2 = modelWidth.doubleValue(SI.METRE);
-    if (width1 == 0 || width2 == 0) {
-      return Double.NaN;
-    } else {
-      final double scale = width2 / width1;
-      return scale;
-    }
   }
 
   public static double toDisplayValue(final Viewport2D viewport, final Measure<Length> measure) {
@@ -158,25 +158,6 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     }
     setGeometryFactory(geometryFactory);
     setBoundingBox(boundingBox);
-  }
-
-  public AffineTransform createModelToScreenTransform(final BoundingBox boundingBox,
-    final double viewWidth, final double viewHeight) {
-    final AffineTransform modelToScreenTransform = new AffineTransform();
-    final double mapWidth = boundingBox.getWidth();
-    this.pixelsPerXUnit = viewWidth / mapWidth;
-
-    final double mapHeight = boundingBox.getHeight();
-    this.pixelsPerYUnit = getPixelsPerYUnit(viewHeight, mapHeight);
-
-    this.originX = boundingBox.getMinX();
-    this.originY = boundingBox.getMaxY();
-
-    modelToScreenTransform
-      .concatenate(AffineTransform.getScaleInstance(this.pixelsPerXUnit, this.pixelsPerYUnit));
-    modelToScreenTransform
-      .concatenate(AffineTransform.getTranslateInstance(-this.originX, -this.originY));
-    return modelToScreenTransform;
   }
 
   public void drawGeometry(final Geometry geometry, final GeometryStyle style) {
@@ -441,9 +422,9 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
         this.scale = 0;
       } else {
         this.unitsPerPixel = unitsPerPixel;
-        this.modelToScreenTransform = createModelToScreenTransform(boundingBox, viewWidthPixels,
+        this.modelToScreenTransform = newModelToScreenTransform(boundingBox, viewWidthPixels,
           viewHeightPixels);
-        this.screenToModelTransform = createScreenToModelTransform(boundingBox, viewWidthPixels,
+        this.screenToModelTransform = newScreenToModelTransform(boundingBox, viewWidthPixels,
           viewHeightPixels);
         this.scale = getScale(viewWidthLength, modelWidthLength);
       }
@@ -461,6 +442,25 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
 
   public boolean isInitialized() {
     return this.initialized;
+  }
+
+  public AffineTransform newModelToScreenTransform(final BoundingBox boundingBox,
+    final double viewWidth, final double viewHeight) {
+    final AffineTransform modelToScreenTransform = new AffineTransform();
+    final double mapWidth = boundingBox.getWidth();
+    this.pixelsPerXUnit = viewWidth / mapWidth;
+
+    final double mapHeight = boundingBox.getHeight();
+    this.pixelsPerYUnit = getPixelsPerYUnit(viewHeight, mapHeight);
+
+    this.originX = boundingBox.getMinX();
+    this.originY = boundingBox.getMaxY();
+
+    modelToScreenTransform
+      .concatenate(AffineTransform.getScaleInstance(this.pixelsPerXUnit, this.pixelsPerYUnit));
+    modelToScreenTransform
+      .concatenate(AffineTransform.getTranslateInstance(-this.originX, -this.originY));
+    return modelToScreenTransform;
   }
 
   public void render(final Layer layer) {

@@ -182,13 +182,6 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     return lines.isEmpty();
   }
 
-  private void createLine(final List<LineString> lines, final List<Point> coordinates) {
-    if (!coordinates.isEmpty()) {
-      final LineString line = this.geometryFactory.lineString(coordinates);
-      lines.add(line);
-    }
-  }
-
   public MultiLineString getCurrentMatchedLines() {
     return getMatchedLines(this.startNodes.size() - 1);
   }
@@ -278,7 +271,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
               final Point toCoordinate = toNode;
               coordinates.add(toCoordinate);
             } else {
-              createLine(lines, coordinates);
+              newLine(lines, coordinates);
               coordinates.clear();
             }
             processedEdges.add(edge);
@@ -287,7 +280,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
         }
         currentNode = nextNode;
       }
-      createLine(lines, coordinates);
+      newLine(lines, coordinates);
     }
     return this.geometryFactory.multiLineString(lines);
   }
@@ -318,7 +311,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
               final Point toCoordinate = toNode;
               coordinates.add(toCoordinate);
             } else {
-              createLine(lines, coordinates);
+              newLine(lines, coordinates);
               coordinates.clear();
             }
             processedEdges.add(edge);
@@ -327,7 +320,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
         }
         currentNode = nextNode;
       }
-      createLine(lines, coordinates);
+      newLine(lines, coordinates);
     }
     return lines;
   }
@@ -381,7 +374,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
               }
               coordinates.add(toNode);
             } else {
-              createLine(lines, coordinates);
+              newLine(lines, coordinates);
               coordinates.clear();
             }
             processedEdges.add(edge);
@@ -390,7 +383,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
         }
         currentNode = nextNode;
       }
-      createLine(lines, coordinates);
+      newLine(lines, coordinates);
     }
     return this.geometryFactory.multiLineString(lines);
   }
@@ -416,7 +409,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
               final Point toCoordinate = toNode;
               coordinates.add(toCoordinate);
             } else {
-              createLine(lines, coordinates);
+              newLine(lines, coordinates);
               coordinates.clear();
             }
             processedEdges.add(edge);
@@ -425,7 +418,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
         }
         currentNode = nextNode;
       }
-      createLine(lines, coordinates);
+      newLine(lines, coordinates);
     }
     return this.geometryFactory.multiLineString(lines);
 
@@ -665,6 +658,13 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
       return true;
     } else {
       return false;
+    }
+  }
+
+  private void newLine(final List<LineString> lines, final List<Point> coordinates) {
+    if (!coordinates.isEmpty()) {
+      final LineString line = this.geometryFactory.lineString(coordinates);
+      lines.add(line);
     }
   }
 

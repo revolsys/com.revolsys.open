@@ -168,7 +168,7 @@ public class LayerStylePanel extends ValueField implements MouseListener, Proper
   public void setEditStylePanel(final LayerRenderer<? extends Layer> renderer) {
     saveStylePanel();
     if (renderer != null) {
-      final ValueField stylePanel = renderer.createStylePanel();
+      final ValueField stylePanel = renderer.newStylePanel();
       this.editStyleContainer.setViewportView(stylePanel);
     }
   }

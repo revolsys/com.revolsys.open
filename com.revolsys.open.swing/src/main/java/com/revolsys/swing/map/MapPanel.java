@@ -197,7 +197,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     }
     Property.addListener(this.viewport, this);
 
-    createScales();
+    initScales();
     this.viewport.setScales(getScales());
 
     final MapRulerBorder border = new MapRulerBorder(this.viewport);
@@ -470,18 +470,6 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     firePropertyChange("zoomNextEnabled", true, false);
   }
 
-  public void createScales() {
-    // double multiplier = 0.001;
-    // for (int i = 0; i < 9; i++) {
-    // addScale(1 * multiplier);
-    // addScale(2 * multiplier);
-    // addScale(5 * multiplier);
-    // multiplier *= 10;
-    // }
-    // Collections.reverse(this.scales);
-    this.scales = SCALES;
-  }
-
   public void destroy() {
     Property.removeAllListeners(this);
     setDropTarget(null);
@@ -662,6 +650,18 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   public boolean hasOverlayAction(final String overlayAction) {
     return this.overlayActionStack.contains(overlayAction);
+  }
+
+  public void initScales() {
+    // double multiplier = 0.001;
+    // for (int i = 0; i < 9; i++) {
+    // addScale(1 * multiplier);
+    // addScale(2 * multiplier);
+    // addScale(5 * multiplier);
+    // multiplier *= 10;
+    // }
+    // Collections.reverse(this.scales);
+    this.scales = SCALES;
   }
 
   public boolean isOverlayAction(final String overlayAction) {

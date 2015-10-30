@@ -12,11 +12,6 @@ public class MoepBinary extends AbstractRecordIoFactory {
     addMediaTypeAndFileExtension("application/x-bcgov-moep-bin", "bin");
   }
 
-  public RecordReader createRecordReader(final RecordDefinition recordDefinition,
-    final Resource resource, final RecordFactory recordFactory) {
-    throw new UnsupportedOperationException();
-  }
-
   @Override
   public boolean isBinary() {
     return true;
@@ -25,6 +20,11 @@ public class MoepBinary extends AbstractRecordIoFactory {
   @Override
   public boolean isCustomFieldsSupported() {
     return false;
+  }
+
+  public RecordReader newRecordReader(final RecordDefinition recordDefinition,
+    final Resource resource, final RecordFactory recordFactory) {
+    throw new UnsupportedOperationException();
   }
 
   @Override

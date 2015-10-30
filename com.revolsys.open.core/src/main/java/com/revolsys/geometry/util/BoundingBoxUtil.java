@@ -12,83 +12,6 @@ public class BoundingBoxUtil {
     return minX2 >= minX1 && maxX2 <= maxX1 && minY2 >= minY1 && maxY2 <= maxY1;
   }
 
-  public static double[] createBounds(final double... bounds) {
-    final int axisCount = bounds.length;
-    final double[] newBounds = createBounds(axisCount);
-    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      final double coordinate = bounds[axisIndex];
-      if (!MathUtil.isNanOrInfinite(coordinate)) {
-        newBounds[axisIndex] = coordinate;
-        newBounds[axisCount + axisCount] = coordinate;
-      }
-    }
-    return newBounds;
-  }
-
-  public static double[] createBounds(final GeometryFactory geometryFactory,
-    final double... bounds) {
-    final int axisCount = bounds.length;
-    final double[] newBounds = createBounds(axisCount);
-    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      double coordinate = bounds[axisIndex];
-      if (geometryFactory != null) {
-        coordinate = geometryFactory.makePrecise(axisIndex, coordinate);
-      }
-      if (!MathUtil.isNanOrInfinite(coordinate)) {
-        newBounds[axisIndex] = coordinate;
-        newBounds[axisCount + axisIndex] = coordinate;
-      }
-    }
-    return newBounds;
-  }
-
-  public static double[] createBounds(final GeometryFactory geometryFactory, final int axisCount,
-    Point point) {
-    point = point.convert(geometryFactory, axisCount);
-    final double[] bounds = createBounds(axisCount);
-    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      double coordinate = point.getCoordinate(axisIndex);
-      if (geometryFactory != null) {
-        coordinate = geometryFactory.makePrecise(axisIndex, coordinate);
-      }
-      if (!MathUtil.isNanOrInfinite(coordinate)) {
-        bounds[axisIndex] = coordinate;
-        bounds[axisCount + axisIndex] = coordinate;
-      }
-    }
-    return bounds;
-  }
-
-  public static double[] createBounds(final GeometryFactory geometryFactory, final Point point) {
-    final int axisCount = point.getAxisCount();
-    return createBounds(geometryFactory, axisCount, point);
-  }
-
-  public static double[] createBounds(final int axisCount) {
-    final double[] newBounds = new double[axisCount * 2];
-    for (int i = 0; i < newBounds.length; i++) {
-      newBounds[i] = Double.NaN;
-    }
-    return newBounds;
-  }
-
-  public static double[] createBounds(final int axisCount, final Point point) {
-    final double[] bounds = createBounds(axisCount);
-    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      final double coordinate = point.getCoordinate(axisIndex);
-      if (!MathUtil.isNanOrInfinite(coordinate)) {
-        bounds[axisIndex] = coordinate;
-        bounds[axisCount + axisIndex] = coordinate;
-      }
-    }
-    return bounds;
-  }
-
-  public static double[] createBounds(final Point point) {
-    final int axisCount = point.getAxisCount();
-    return createBounds(axisCount, point);
-  }
-
   public static void expand(final double[] bounds, final int axisCount,
     final double... coordinates) {
     for (int axisIndex = 0; axisIndex < axisCount && axisIndex < coordinates.length; axisIndex++) {
@@ -333,5 +256,81 @@ public class BoundingBoxUtil {
     } else {
       return boundingBox.isEmpty();
     }
+  }
+
+  public static double[] newBounds(final double... bounds) {
+    final int axisCount = bounds.length;
+    final double[] newBounds = newBounds(axisCount);
+    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+      final double coordinate = bounds[axisIndex];
+      if (!MathUtil.isNanOrInfinite(coordinate)) {
+        newBounds[axisIndex] = coordinate;
+        newBounds[axisCount + axisCount] = coordinate;
+      }
+    }
+    return newBounds;
+  }
+
+  public static double[] newBounds(final GeometryFactory geometryFactory, final double... bounds) {
+    final int axisCount = bounds.length;
+    final double[] newBounds = newBounds(axisCount);
+    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+      double coordinate = bounds[axisIndex];
+      if (geometryFactory != null) {
+        coordinate = geometryFactory.makePrecise(axisIndex, coordinate);
+      }
+      if (!MathUtil.isNanOrInfinite(coordinate)) {
+        newBounds[axisIndex] = coordinate;
+        newBounds[axisCount + axisIndex] = coordinate;
+      }
+    }
+    return newBounds;
+  }
+
+  public static double[] newBounds(final GeometryFactory geometryFactory, final int axisCount,
+    Point point) {
+    point = point.convert(geometryFactory, axisCount);
+    final double[] bounds = newBounds(axisCount);
+    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+      double coordinate = point.getCoordinate(axisIndex);
+      if (geometryFactory != null) {
+        coordinate = geometryFactory.makePrecise(axisIndex, coordinate);
+      }
+      if (!MathUtil.isNanOrInfinite(coordinate)) {
+        bounds[axisIndex] = coordinate;
+        bounds[axisCount + axisIndex] = coordinate;
+      }
+    }
+    return bounds;
+  }
+
+  public static double[] newBounds(final GeometryFactory geometryFactory, final Point point) {
+    final int axisCount = point.getAxisCount();
+    return newBounds(geometryFactory, axisCount, point);
+  }
+
+  public static double[] newBounds(final int axisCount) {
+    final double[] newBounds = new double[axisCount * 2];
+    for (int i = 0; i < newBounds.length; i++) {
+      newBounds[i] = Double.NaN;
+    }
+    return newBounds;
+  }
+
+  public static double[] newBounds(final int axisCount, final Point point) {
+    final double[] bounds = newBounds(axisCount);
+    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+      final double coordinate = point.getCoordinate(axisIndex);
+      if (!MathUtil.isNanOrInfinite(coordinate)) {
+        bounds[axisIndex] = coordinate;
+        bounds[axisCount + axisIndex] = coordinate;
+      }
+    }
+    return bounds;
+  }
+
+  public static double[] newBounds(final Point point) {
+    final int axisCount = point.getAxisCount();
+    return newBounds(axisCount, point);
   }
 }

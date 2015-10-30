@@ -32,6 +32,7 @@
  */
 package com.revolsys.geometry.test.old.geom;
 
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
@@ -43,7 +44,7 @@ import com.revolsys.geometry.model.impl.PointDouble;
  */
 public class GeometryTestFactory {
 
-  public static Point[] createBox(final double minx, final double miny, final int nSide,
+  public static Point[] newBox(final double minx, final double miny, final int nSide,
     final double segLen) {
     int i;
     int ipt = 0;
@@ -55,31 +56,31 @@ public class GeometryTestFactory {
     for (i = 0; i < nSide; i++) {
       final double x = minx + i * segLen;
       final double y = miny;
-      pts[ipt++] = new PointDouble(x, y, Point.NULL_ORDINATE);
+      pts[ipt++] = new PointDouble(x, y, Geometry.NULL_ORDINATE);
     }
     for (i = 0; i < nSide; i++) {
       final double x = maxx;
       final double y = miny + i * segLen;
-      pts[ipt++] = new PointDouble(x, y, Point.NULL_ORDINATE);
+      pts[ipt++] = new PointDouble(x, y, Geometry.NULL_ORDINATE);
     }
     for (i = 0; i < nSide; i++) {
       final double x = maxx - i * segLen;
       final double y = maxy;
-      pts[ipt++] = new PointDouble(x, y, Point.NULL_ORDINATE);
+      pts[ipt++] = new PointDouble(x, y, Geometry.NULL_ORDINATE);
     }
     for (i = 0; i < nSide; i++) {
       final double x = minx;
       final double y = maxy - i * segLen;
-      pts[ipt++] = new PointDouble(x, y, Point.NULL_ORDINATE);
+      pts[ipt++] = new PointDouble(x, y, Geometry.NULL_ORDINATE);
     }
     pts[ipt++] = new PointDouble(pts[0]);
 
     return pts;
   }
 
-  public static Polygon createBox(final GeometryFactory fact, final double minx, final double miny,
+  public static Polygon newBox(final GeometryFactory fact, final double minx, final double miny,
     final int nSide, final double segLen) {
-    final Point[] pts = createBox(minx, minx, nSide, segLen);
+    final Point[] pts = newBox(minx, minx, nSide, segLen);
     final LinearRing ring = fact.linearRing(pts);
     final Polygon poly = fact.polygon(ring);
     return poly;
@@ -92,7 +93,7 @@ public class GeometryTestFactory {
    * @param size the size of the envelope of the star
    * @param nPts the number of points in the star
    */
-  public static Point[] createCircle(final double basex, final double basey, final double size,
+  public static Point[] newCircle(final double basex, final double basey, final double size,
     final int nPts) {
     final Point[] pts = new Point[nPts + 1];
 
@@ -103,16 +104,16 @@ public class GeometryTestFactory {
       final double ang = i * (2 * Math.PI / nPts);
       final double x = len * Math.cos(ang) + basex;
       final double y = len * Math.sin(ang) + basey;
-      final Point pt = new PointDouble(x, y, Point.NULL_ORDINATE);
+      final Point pt = new PointDouble(x, y, Geometry.NULL_ORDINATE);
       pts[iPt++] = pt;
     }
     pts[iPt] = pts[0];
     return pts;
   }
 
-  public static Polygon createCircle(final GeometryFactory fact, final double basex,
+  public static Polygon newCircle(final GeometryFactory fact, final double basex,
     final double basey, final double size, final int nPts) {
-    final Point[] pts = createCircle(basex, basey, size, nPts);
+    final Point[] pts = newCircle(basex, basey, size, nPts);
     final LinearRing ring = fact.linearRing(pts);
     final Polygon poly = fact.polygon(ring);
     return poly;
@@ -127,7 +128,7 @@ public class GeometryTestFactory {
    * @param nArms the number of arms of the star
    * @param nPts the number of points in the star
    */
-  public static Point[] createSineStar(final double basex, final double basey, final double size,
+  public static Point[] newSineStar(final double basex, final double basey, final double size,
     final double armLen, final int nArms, final int nPts) {
     double armBaseLen = size / 2 - armLen;
     if (armBaseLen < 0) {
@@ -152,7 +153,7 @@ public class GeometryTestFactory {
         final double len = armLen * (1 - Math.cos(ang) / 2) + armBaseLen;
         final double x = len * Math.cos(starAng + iArmPt * angInc / nArmPt) + basex;
         final double y = len * Math.sin(starAng + iArmPt * angInc / nArmPt) + basey;
-        final Point pt = new PointDouble(x, y, Point.NULL_ORDINATE);
+        final Point pt = new PointDouble(x, y, Geometry.NULL_ORDINATE);
         pts[iPt++] = pt;
       }
       starAng += angInc;
@@ -161,9 +162,9 @@ public class GeometryTestFactory {
     return pts;
   }
 
-  public static Polygon createSineStar(final GeometryFactory fact, final double basex,
+  public static Polygon newSineStar(final GeometryFactory fact, final double basex,
     final double basey, final double size, final double armLen, final int nArms, final int nPts) {
-    final Point[] pts = createSineStar(basex, basey, size, armLen, nArms, nPts);
+    final Point[] pts = newSineStar(basex, basey, size, armLen, nArms, nPts);
     final LinearRing ring = fact.linearRing(pts);
     final Polygon poly = fact.polygon(ring);
     return poly;

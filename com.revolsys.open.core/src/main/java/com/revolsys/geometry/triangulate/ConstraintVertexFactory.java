@@ -41,5 +41,5 @@ import com.revolsys.geometry.model.Point;
  * @author Martin Davis
  */
 public interface ConstraintVertexFactory {
-  ConstraintVertex createVertex(Point p, Segment constraintSeg);
+  ConstraintVertex newVertex(Point p, Segment constraintSeg);
 }

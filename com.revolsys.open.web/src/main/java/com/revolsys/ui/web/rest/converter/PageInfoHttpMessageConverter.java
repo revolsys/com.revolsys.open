@@ -426,7 +426,7 @@ public class PageInfoHttpMessageConverter extends AbstractHttpMessageConverter<P
 
   private void writeUriList(final OutputStream out, final String url, final PageInfo pageInfo)
     throws IOException {
-    final Writer writer = FileUtil.createUtf8Writer(out);
+    final Writer writer = FileUtil.newUtf8Writer(out);
 
     try {
       for (final String childPath : pageInfo.getPages().keySet()) {

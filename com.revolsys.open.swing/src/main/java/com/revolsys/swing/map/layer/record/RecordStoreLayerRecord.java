@@ -23,7 +23,7 @@ public class RecordStoreLayerRecord extends ArrayLayerRecord {
       return this;
     } else {
       final RecordStoreLayer layer = getLayer();
-      return layer.createProxyRecord(identifier);
+      return layer.newProxyRecord(identifier);
     }
   }
 

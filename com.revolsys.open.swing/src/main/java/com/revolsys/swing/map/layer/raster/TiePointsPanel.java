@@ -69,8 +69,8 @@ public class TiePointsPanel extends TablePanel implements PropertyChangeListener
         () -> menuFactory.show(layer, this, 10, 10));
     }
 
-    Menus.<GeoreferencedImageLayer> addMenuItem(menu, "zoom", "Zoom to Layer",
-      "magnifier", GeoreferencedImageLayer::zoomToLayer);
+    Menus.<GeoreferencedImageLayer> addMenuItem(menu, "zoom", "Zoom to Layer", "magnifier",
+      GeoreferencedImageLayer::zoomToLayer);
 
     toolBar.addButton("zoom", "Zoom to Layer", "magnifier", (EnableCheck)null, layer::zoomToLayer);
 

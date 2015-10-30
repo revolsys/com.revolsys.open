@@ -101,81 +101,6 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     this.nodes = null;
   }
 
-  public AbstractNode<T> createExpanded(final AbstractNode<T> node, double[] bounds) {
-    bounds = bounds.clone();
-    if (node != null) {
-      BoundingBoxUtil.expand(bounds, 2, 0, node.minX);
-      BoundingBoxUtil.expand(bounds, 2, 0, node.maxX);
-      BoundingBoxUtil.expand(bounds, 2, 1, node.minY);
-      BoundingBoxUtil.expand(bounds, 2, 1, node.maxY);
-    }
-
-    final AbstractNode<T> largerNode = createNode(bounds);
-    if (node != null) {
-      largerNode.insertNode(node);
-    }
-    return largerNode;
-  }
-
-  protected AbstractNode<T> createNode(final double[] bounds) {
-    final double[] newBounds = new double[4];
-    final double minX = bounds[0];
-    final double minY = bounds[1];
-    final double maxX = bounds[2];
-    final double maxY = bounds[3];
-    int level = computeQuadLevel(bounds);
-    setBounds(minX, minY, newBounds, level);
-    while (!BoundingBoxUtil.covers(newBounds[0], newBounds[1], newBounds[2], newBounds[3], minX,
-      minY, maxX, maxY)) {
-      level++;
-      setBounds(minX, minY, newBounds, level);
-    }
-
-    return createNode(level, newBounds);
-  }
-
-  protected abstract AbstractNode<T> createNode(int level, double... newBounds);
-
-  private AbstractNode<T> createSubnode(final int index) {
-    // Construct a new new subquad in the appropriate quadrant
-
-    double minX = 0.0;
-    double maxX = 0.0;
-    double minY = 0.0;
-    double maxY = 0.0;
-
-    final double centreX = getCentreX();
-    final double centreY = getCentreY();
-    switch (index) {
-      case 0:
-        minX = this.minX;
-        maxX = centreX;
-        minY = this.minY;
-        maxY = centreY;
-      break;
-      case 1:
-        minX = centreX;
-        maxX = this.maxX;
-        minY = this.minY;
-        maxY = centreY;
-      break;
-      case 2:
-        minX = this.minX;
-        maxX = centreX;
-        minY = centreY;
-        maxY = this.maxY;
-      break;
-      case 3:
-        minX = centreX;
-        maxX = this.maxX;
-        minY = centreY;
-        maxY = this.maxY;
-      break;
-    }
-    final AbstractNode<T> node = createNode(this.level - 1, minX, minY, maxX, maxY);
-    return node;
-  }
-
   public int depth() {
     int depth = 0;
     for (int i = 0; i < 4; i++) {
@@ -293,7 +218,7 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
 
   private AbstractNode<T> getSubnode(final int index) {
     if (getNode(index) == null) {
-      setNode(index, createSubnode(index));
+      setNode(index, newSubnode(index));
     }
     return getNode(index);
   }
@@ -331,7 +256,7 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     if (node.level == this.level - 1) {
       setNode(index, node);
     } else {
-      final AbstractNode<T> childNode = createSubnode(index);
+      final AbstractNode<T> childNode = newSubnode(index);
       childNode.insertNode(node);
       setNode(index, childNode);
     }
@@ -349,7 +274,7 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
       AbstractNode<T> node = getNode(index);
       if (node == null || !BoundingBoxUtil.covers(node.minX, node.minY, node.maxX, node.maxY, minX2,
         minY2, maxX2, maxY2)) {
-        final AbstractNode<T> largerNode = createExpanded(node, bounds);
+        final AbstractNode<T> largerNode = newNodeExpanded(node, bounds);
         setNode(index, largerNode);
         node = largerNode;
       }
@@ -391,6 +316,81 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
       final double maxY2 = bounds[3];
       return !(minX2 > this.maxX || maxX2 < this.minX || minY2 > this.maxY || maxY2 < this.minY);
     }
+  }
+
+  protected AbstractNode<T> newNode(final double[] bounds) {
+    final double[] newBounds = new double[4];
+    final double minX = bounds[0];
+    final double minY = bounds[1];
+    final double maxX = bounds[2];
+    final double maxY = bounds[3];
+    int level = computeQuadLevel(bounds);
+    setBounds(minX, minY, newBounds, level);
+    while (!BoundingBoxUtil.covers(newBounds[0], newBounds[1], newBounds[2], newBounds[3], minX,
+      minY, maxX, maxY)) {
+      level++;
+      setBounds(minX, minY, newBounds, level);
+    }
+
+    return newNode(level, newBounds);
+  }
+
+  protected abstract AbstractNode<T> newNode(int level, double... newBounds);
+
+  public AbstractNode<T> newNodeExpanded(final AbstractNode<T> node, double[] bounds) {
+    bounds = bounds.clone();
+    if (node != null) {
+      BoundingBoxUtil.expand(bounds, 2, 0, node.minX);
+      BoundingBoxUtil.expand(bounds, 2, 0, node.maxX);
+      BoundingBoxUtil.expand(bounds, 2, 1, node.minY);
+      BoundingBoxUtil.expand(bounds, 2, 1, node.maxY);
+    }
+
+    final AbstractNode<T> largerNode = newNode(bounds);
+    if (node != null) {
+      largerNode.insertNode(node);
+    }
+    return largerNode;
+  }
+
+  private AbstractNode<T> newSubnode(final int index) {
+    // Construct a new new subquad in the appropriate quadrant
+
+    double minX = 0.0;
+    double maxX = 0.0;
+    double minY = 0.0;
+    double maxY = 0.0;
+
+    final double centreX = getCentreX();
+    final double centreY = getCentreY();
+    switch (index) {
+      case 0:
+        minX = this.minX;
+        maxX = centreX;
+        minY = this.minY;
+        maxY = centreY;
+      break;
+      case 1:
+        minX = centreX;
+        maxX = this.maxX;
+        minY = this.minY;
+        maxY = centreY;
+      break;
+      case 2:
+        minX = this.minX;
+        maxX = centreX;
+        minY = centreY;
+        maxY = this.maxY;
+      break;
+      case 3:
+        minX = centreX;
+        maxX = this.maxX;
+        minY = centreY;
+        maxY = this.maxY;
+      break;
+    }
+    final AbstractNode<T> node = newNode(this.level - 1, minX, minY, maxX, maxY);
+    return node;
   }
 
   public boolean remove(final QuadTree<T> tree, final double[] bounds, final T item) {

@@ -1,5 +1,6 @@
 package com.revolsys.geometry.test.old.noding;
 
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
@@ -48,8 +49,8 @@ public class SegmentPointComparatorFullTest extends TestCase {
   }
 
   private void checkSegment(final double x, final double y) {
-    final Point seg0 = new PointDouble((double)0, 0, Point.NULL_ORDINATE);
-    final Point seg1 = new PointDouble(x, y, Point.NULL_ORDINATE);
+    final Point seg0 = new PointDouble((double)0, 0, Geometry.NULL_ORDINATE);
+    final Point seg1 = new PointDouble(x, y, Geometry.NULL_ORDINATE);
     final LineSegment seg = new LineSegmentDouble(seg0, seg1);
 
     for (int i = 0; i < 4; i++) {

@@ -35,7 +35,7 @@ import com.revolsys.spring.resource.Resource;
 
 public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware, DisposableBean {
 
-  public static GenericBeanDefinition createTargetBeanDefinition(
+  public static GenericBeanDefinition newTargetBeanDefinition(
     final BeanDefinitionRegistry beanFactory, final String beanName) {
 
     if (beanFactory.containsBeanDefinition(beanName)) {
@@ -64,7 +64,7 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware, Di
   public static void registerTargetBeanDefinition(final BeanDefinitionRegistry registry,
     final BeanFactory beanFactory, final String beanName, final String alias) {
 
-    final BeanDefinition beanDefinition = createTargetBeanDefinition(
+    final BeanDefinition beanDefinition = newTargetBeanDefinition(
       (BeanDefinitionRegistry)beanFactory, beanName);
     if (beanDefinition != null) {
       registry.registerBeanDefinition(alias, beanDefinition);

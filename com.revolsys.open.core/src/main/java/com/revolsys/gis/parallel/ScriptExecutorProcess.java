@@ -164,7 +164,7 @@ public class ScriptExecutorProcess extends BaseInProcess<Record>implements BeanF
       final String key = param.getKey();
       final String value = param.getValue();
       try {
-        final Expression expression = JexlUtil.createExpression(value, "#\\{([^\\}]+)\\}");
+        final Expression expression = JexlUtil.newExpression(value, "#\\{([^\\}]+)\\}");
         this.expressions.put(key, expression);
       } catch (final Exception e) {
         throw new IllegalArgumentException("Expression not valid " + key + "=" + value);

@@ -252,134 +252,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   @Override
-  public Component createPanelComponent(final Map<String, Object> config) {
-    return createTableViewComponent(config);
-  }
-
-  @Override
-  public TabbedValuePanel createPropertiesPanel() {
-    final TabbedValuePanel tabPanel = new TabbedValuePanel("Layer " + this + " Properties", this);
-    createPropertiesTabGeneral(tabPanel);
-    createPropertiesTabCoordinateSystem(tabPanel);
-    return tabPanel;
-  }
-
-  protected JPanel createPropertiesTabCoordinateSystem(final TabbedValuePanel tabPanel) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (geometryFactory != null) {
-      final JPanel panel = new JPanel(new VerticalLayout(5));
-      tabPanel.addTab("Spatial", panel);
-
-      final JPanel extentPanel = Panels.titledTransparent("Extent");
-      final BoundingBox boundingBox = getBoundingBox();
-      if (boundingBox == null || boundingBox.isEmpty()) {
-        extentPanel.add(new JLabel("Unknown"));
-
-      } else {
-        final JLabel extentLabel = new JLabel("<html><table cellspacing=\"3\" style=\"margin:0px\">"
-          + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
-          + StringConverterRegistry.toString(boundingBox.getMaximum(1))
-          + "</td><td>&nbsp;</td></tr><tr>" + "<td><b>Left</b>: "
-          + StringConverterRegistry.toString(boundingBox.getMinimum(0))
-          + "</td><td>&nbsp;</td><td>&nbsp;</td>" + "<td><b>Right</b>: "
-          + StringConverterRegistry.toString(boundingBox.getMaximum(0)) + "</td></tr>"
-          + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
-          + StringConverterRegistry.toString(boundingBox.getMinimum(1))
-          + "</td><td>&nbsp;</td></tr><tr>" + "</tr></table></html>");
-        extentLabel.setFont(SwingUtil.FONT);
-        extentPanel.add(extentLabel);
-
-      }
-      GroupLayouts.makeColumns(extentPanel, 1, true);
-      panel.add(extentPanel);
-
-      final JPanel coordinateSystemPanel = Panels.titledTransparent("Coordinate System");
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      if (coordinateSystem == null) {
-        coordinateSystemPanel.add(new JLabel("Unknown"));
-      } else {
-        final int axisCount = geometryFactory.getAxisCount();
-        SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "ID",
-          coordinateSystem.getCoordinateSystemId(), 10);
-        SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "axisCount", axisCount, 10);
-
-        final double scaleXY = geometryFactory.getScaleXY();
-        if (scaleXY > 0) {
-          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleXy", scaleXY, 10);
-        } else {
-          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleXy", "Floating", 10);
-        }
-
-        if (axisCount > 2) {
-          final double scaleZ = geometryFactory.getScaleZ();
-          if (scaleZ > 0) {
-            SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleZ", scaleZ, 10);
-          } else {
-            SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleZ", "Floating", 10);
-          }
-        }
-
-        final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
-          .getCoordinateSystem(coordinateSystem);
-        SwingUtil.addLabel(coordinateSystemPanel, "ESRI WKT");
-        final TextArea wktTextArea = new TextArea(EsriCsWktWriter.toString(esriCoordinateSystem),
-          10, 80);
-        wktTextArea.setEditable(false);
-        wktTextArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
-        coordinateSystemPanel.add(wktTextArea);
-
-        GroupLayouts.makeColumns(coordinateSystemPanel, 2, true);
-      }
-      panel.add(coordinateSystemPanel);
-
-      return panel;
-    }
-    return null;
-  }
-
-  protected BasePanel createPropertiesTabGeneral(final TabbedValuePanel tabPanel) {
-    final BasePanel generalPanel = new BasePanel(new VerticalLayout(5));
-    generalPanel.setScrollableHeightHint(ScrollableSizeHint.FIT);
-
-    tabPanel.addTab("General", generalPanel);
-
-    createPropertiesTabGeneralPanelGeneral(generalPanel);
-    final ValueField sourcePanel = createPropertiesTabGeneralPanelSource(generalPanel);
-    if (sourcePanel.getComponentCount() == 0) {
-      generalPanel.remove(sourcePanel);
-    }
-    return generalPanel;
-  }
-
-  protected ValueField createPropertiesTabGeneralPanelGeneral(final BasePanel parent) {
-    final ValueField panel = new ValueField(this);
-    Borders.titled(panel, "General");
-    final Field nameField = (Field)SwingUtil.addObjectField(panel, this, "name");
-    Property.addListener(nameField, "name", this.beanPropertyListener);
-
-    final String type = Property.get(this, "type");
-    final String typeLabel = CaseConverter.toCapitalizedWords(type);
-    SwingUtil.addLabelledReadOnlyTextField(panel, "Type", typeLabel);
-
-    GroupLayouts.makeColumns(panel, 2, true);
-
-    parent.add(panel);
-    return panel;
-  }
-
-  protected ValueField createPropertiesTabGeneralPanelSource(final BasePanel parent) {
-    final ValueField panel = new ValueField(this);
-    Borders.titled(panel, "Source");
-
-    parent.add(panel);
-    return panel;
-  }
-
-  protected Component createTableViewComponent(final Map<String, Object> config) {
-    return null;
-  }
-
-  @Override
   public void delete() {
     setExists(false);
     this.beanPropertyListener = null;
@@ -741,6 +613,134 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   @Override
+  public Component newPanelComponent(final Map<String, Object> config) {
+    return newTableViewComponent(config);
+  }
+
+  @Override
+  public TabbedValuePanel newPropertiesPanel() {
+    final TabbedValuePanel tabPanel = new TabbedValuePanel("Layer " + this + " Properties", this);
+    newPropertiesTabGeneral(tabPanel);
+    newPropertiesTabCoordinateSystem(tabPanel);
+    return tabPanel;
+  }
+
+  protected JPanel newPropertiesTabCoordinateSystem(final TabbedValuePanel tabPanel) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (geometryFactory != null) {
+      final JPanel panel = new JPanel(new VerticalLayout(5));
+      tabPanel.addTab("Spatial", panel);
+
+      final JPanel extentPanel = Panels.titledTransparent("Extent");
+      final BoundingBox boundingBox = getBoundingBox();
+      if (boundingBox == null || boundingBox.isEmpty()) {
+        extentPanel.add(new JLabel("Unknown"));
+
+      } else {
+        final JLabel extentLabel = new JLabel("<html><table cellspacing=\"3\" style=\"margin:0px\">"
+          + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
+          + StringConverterRegistry.toString(boundingBox.getMaximum(1))
+          + "</td><td>&nbsp;</td></tr><tr>" + "<td><b>Left</b>: "
+          + StringConverterRegistry.toString(boundingBox.getMinimum(0))
+          + "</td><td>&nbsp;</td><td>&nbsp;</td>" + "<td><b>Right</b>: "
+          + StringConverterRegistry.toString(boundingBox.getMaximum(0)) + "</td></tr>"
+          + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
+          + StringConverterRegistry.toString(boundingBox.getMinimum(1))
+          + "</td><td>&nbsp;</td></tr><tr>" + "</tr></table></html>");
+        extentLabel.setFont(SwingUtil.FONT);
+        extentPanel.add(extentLabel);
+
+      }
+      GroupLayouts.makeColumns(extentPanel, 1, true);
+      panel.add(extentPanel);
+
+      final JPanel coordinateSystemPanel = Panels.titledTransparent("Coordinate System");
+      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      if (coordinateSystem == null) {
+        coordinateSystemPanel.add(new JLabel("Unknown"));
+      } else {
+        final int axisCount = geometryFactory.getAxisCount();
+        SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "ID",
+          coordinateSystem.getCoordinateSystemId(), 10);
+        SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "axisCount", axisCount, 10);
+
+        final double scaleXY = geometryFactory.getScaleXY();
+        if (scaleXY > 0) {
+          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleXy", scaleXY, 10);
+        } else {
+          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleXy", "Floating", 10);
+        }
+
+        if (axisCount > 2) {
+          final double scaleZ = geometryFactory.getScaleZ();
+          if (scaleZ > 0) {
+            SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleZ", scaleZ, 10);
+          } else {
+            SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleZ", "Floating", 10);
+          }
+        }
+
+        final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
+          .getCoordinateSystem(coordinateSystem);
+        SwingUtil.addLabel(coordinateSystemPanel, "ESRI WKT");
+        final TextArea wktTextArea = new TextArea(EsriCsWktWriter.toString(esriCoordinateSystem),
+          10, 80);
+        wktTextArea.setEditable(false);
+        wktTextArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
+        coordinateSystemPanel.add(wktTextArea);
+
+        GroupLayouts.makeColumns(coordinateSystemPanel, 2, true);
+      }
+      panel.add(coordinateSystemPanel);
+
+      return panel;
+    }
+    return null;
+  }
+
+  protected BasePanel newPropertiesTabGeneral(final TabbedValuePanel tabPanel) {
+    final BasePanel generalPanel = new BasePanel(new VerticalLayout(5));
+    generalPanel.setScrollableHeightHint(ScrollableSizeHint.FIT);
+
+    tabPanel.addTab("General", generalPanel);
+
+    newPropertiesTabGeneralPanelGeneral(generalPanel);
+    final ValueField sourcePanel = newPropertiesTabGeneralPanelSource(generalPanel);
+    if (sourcePanel.getComponentCount() == 0) {
+      generalPanel.remove(sourcePanel);
+    }
+    return generalPanel;
+  }
+
+  protected ValueField newPropertiesTabGeneralPanelGeneral(final BasePanel parent) {
+    final ValueField panel = new ValueField(this);
+    Borders.titled(panel, "General");
+    final Field nameField = (Field)SwingUtil.addObjectField(panel, this, "name");
+    Property.addListener(nameField, "name", this.beanPropertyListener);
+
+    final String type = Property.get(this, "type");
+    final String typeLabel = CaseConverter.toCapitalizedWords(type);
+    SwingUtil.addLabelledReadOnlyTextField(panel, "Type", typeLabel);
+
+    GroupLayouts.makeColumns(panel, 2, true);
+
+    parent.add(panel);
+    return panel;
+  }
+
+  protected ValueField newPropertiesTabGeneralPanelSource(final BasePanel parent) {
+    final ValueField panel = new ValueField(this);
+    Borders.titled(panel, "Source");
+
+    parent.add(panel);
+    return panel;
+  }
+
+  protected Component newTableViewComponent(final Map<String, Object> config) {
+    return null;
+  }
+
+  @Override
   public void propertyChange(final PropertyChangeEvent event) {
     if (this.propertyChangeSupport != null && this.eventsEnabled.isEnabled()) {
       this.propertyChangeSupport.firePropertyChange(event);
@@ -1004,7 +1004,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
         if (checkShowProperties()) {
           try {
             final Window window = SwingUtilities.getWindowAncestor(map);
-            final TabbedValuePanel panel = createPropertiesPanel();
+            final TabbedValuePanel panel = newPropertiesPanel();
             panel.setSelectdTab(tabName);
             panel.showDialog(window);
             refresh();
@@ -1024,7 +1024,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
         if (checkShowProperties()) {
           try {
             final Window window = SwingUtilities.getWindowAncestor(map);
-            final TabbedValuePanel panel = createPropertiesPanel();
+            final TabbedValuePanel panel = newPropertiesPanel();
             panel.setSelectdTab("Style");
             final LayerStylePanel stylePanel = panel.getTab("Style");
             stylePanel.setSelectedRenderer(renderer);

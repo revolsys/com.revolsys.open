@@ -347,63 +347,6 @@ public final class FileUtil {
     copy(new StringReader(text), file);
   }
 
-  public static OutputStream createOutputStream(final File file) {
-    try {
-      return new FileOutputStream(file);
-    } catch (final FileNotFoundException e) {
-      throw new WrappedException(e);
-    }
-  }
-
-  /**
-   * Construct a new new temporary directory.
-   *
-   * @param prefix The file name prefix.
-   * @param suffix The file name suffix.
-   * @return The temportary directory.
-   * @throws IOException If there was an exception creating the directory.
-   */
-  public static File createTempDirectory(final String prefix, final String suffix) {
-    try {
-      final File file = File.createTempFile(prefix, suffix);
-      if (!file.delete()) {
-        throw new IOException("Cannot delete temporary file");
-      }
-      if (!file.mkdirs()) {
-        throw new IOException("Cannot create temporary directory");
-      }
-      file.deleteOnExit();
-      return file;
-    } catch (final Exception e) {
-      return Exceptions.throwUncheckedException(e);
-    }
-  }
-
-  public static File createTempFile(final String prefix, final String suffix) {
-    try {
-      final File file = File.createTempFile(prefix, suffix);
-      return file;
-    } catch (final IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  public static InputStreamReader createUtf8Reader(final InputStream in) {
-    return new InputStreamReader(in, StandardCharsets.UTF_8);
-  }
-
-  public static OutputStreamWriter createUtf8Writer(final File file) {
-    try {
-      return new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
-    } catch (final FileNotFoundException e) {
-      return Exceptions.throwUncheckedException(e);
-    }
-  }
-
-  public static OutputStreamWriter createUtf8Writer(final OutputStream out) {
-    return new OutputStreamWriter(out, StandardCharsets.UTF_8);
-  }
-
   public static boolean delete(final File file) {
     if (file == null) {
       return false;
@@ -907,7 +850,7 @@ public final class FileUtil {
   }
 
   public static String getString(final InputStream in) {
-    final Reader reader = FileUtil.createUtf8Reader(in);
+    final Reader reader = FileUtil.newUtf8Reader(in);
     return getString(reader);
   }
 
@@ -980,6 +923,63 @@ public final class FileUtil {
       return visibleFiles;
     }
     return Collections.emptyList();
+  }
+
+  public static OutputStream newOutputStream(final File file) {
+    try {
+      return new FileOutputStream(file);
+    } catch (final FileNotFoundException e) {
+      throw new WrappedException(e);
+    }
+  }
+
+  /**
+   * Construct a new new temporary directory.
+   *
+   * @param prefix The file name prefix.
+   * @param suffix The file name suffix.
+   * @return The temportary directory.
+   * @throws IOException If there was an exception creating the directory.
+   */
+  public static File newTempDirectory(final String prefix, final String suffix) {
+    try {
+      final File file = File.createTempFile(prefix, suffix);
+      if (!file.delete()) {
+        throw new IOException("Cannot delete temporary file");
+      }
+      if (!file.mkdirs()) {
+        throw new IOException("Cannot create temporary directory");
+      }
+      file.deleteOnExit();
+      return file;
+    } catch (final Exception e) {
+      return Exceptions.throwUncheckedException(e);
+    }
+  }
+
+  public static File newTempFile(final String prefix, final String suffix) {
+    try {
+      final File file = File.createTempFile(prefix, suffix);
+      return file;
+    } catch (final IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public static InputStreamReader newUtf8Reader(final InputStream in) {
+    return new InputStreamReader(in, StandardCharsets.UTF_8);
+  }
+
+  public static OutputStreamWriter newUtf8Writer(final File file) {
+    try {
+      return new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
+    } catch (final FileNotFoundException e) {
+      return Exceptions.throwUncheckedException(e);
+    }
+  }
+
+  public static OutputStreamWriter newUtf8Writer(final OutputStream out) {
+    return new OutputStreamWriter(out, StandardCharsets.UTF_8);
   }
 
   public static String toSafeName(final String host) {

@@ -33,6 +33,7 @@
 
 package com.revolsys.geometry.triangulate;
 
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 
@@ -58,7 +59,7 @@ public class MidpointSplitPointFinder implements ConstraintSplitPointFinder {
     final Point p0 = seg.getStart();
     final Point p1 = seg.getEnd();
     return new PointDouble((p0.getX() + p1.getX()) / 2, (p0.getY() + p1.getY()) / 2,
-      Point.NULL_ORDINATE);
+      Geometry.NULL_ORDINATE);
   }
 
 }

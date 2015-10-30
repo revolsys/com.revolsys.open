@@ -43,7 +43,7 @@ public class Value extends QueryValue {
   public Value(final FieldDefinition field, final Object value) {
     setQueryValue(value);
     this.displayValue = this.queryValue;
-    setField(field);
+    setFieldDefinition(field);
   }
 
   public Value(final Object value) {
@@ -137,9 +137,10 @@ public class Value extends QueryValue {
     return (V)this.queryValue;
   }
 
-  public void setField(final FieldDefinition field) {
-    this.field = field;
+  @Override
+  public void setFieldDefinition(final FieldDefinition field) {
     if (field != null) {
+      this.field = field;
       if (field instanceof JdbcFieldDefinition) {
         this.jdbcField = (JdbcFieldDefinition)field;
       } else {
@@ -186,7 +187,7 @@ public class Value extends QueryValue {
     final String fieldName = this.field.getName();
     if (Property.hasValue(fieldName)) {
       final FieldDefinition field = recordDefinition.getField(fieldName);
-      setField(field);
+      setFieldDefinition(field);
     }
   }
 

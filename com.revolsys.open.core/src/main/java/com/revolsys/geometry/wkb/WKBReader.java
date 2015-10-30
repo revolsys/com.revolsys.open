@@ -72,18 +72,6 @@ import com.revolsys.geometry.model.impl.LineStringDouble;
 public class WKBReader {
   private static final String INVALID_GEOM_TYPE_MSG = "Invalid geometry type encountered in ";
 
-  public static LineString createClosedRing(final LineString seq, final int size) {
-    final int axisCount = seq.getAxisCount();
-    final double[] coordinates = new double[size * axisCount];
-    final int n = seq.getVertexCount();
-    CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, seq, 0, n);
-    // fill remaining coordinates with start point
-    for (int i = n; i < size; i++) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, i, seq, 0, 1);
-    }
-    return new LineStringDouble(axisCount, coordinates);
-  }
-
   /**
    * Ensures that a LineString forms a valid ring,
    * returning a new closed sequence of the correct length if required.
@@ -104,7 +92,7 @@ public class WKBReader {
     }
     // too short - make a new one
     if (n <= 3) {
-      return createClosedRing(seq, 4);
+      return newClosedRing(seq, 4);
     }
 
     final boolean isClosed = seq.getCoordinate(0, Geometry.X) == seq.getCoordinate(n - 1,
@@ -113,7 +101,7 @@ public class WKBReader {
       return seq;
     }
     // make a new closed ring
-    return createClosedRing(seq, n + 1);
+    return newClosedRing(seq, n + 1);
   }
 
   public static LineString extend(final LineString seq, final int size) {
@@ -222,6 +210,18 @@ public class WKBReader {
     // test if closed
     return seq.getCoordinate(0, Geometry.X) == seq.getCoordinate(n - 1, Geometry.X)
       && seq.getCoordinate(0, Geometry.Y) == seq.getCoordinate(n - 1, Geometry.Y);
+  }
+
+  public static LineString newClosedRing(final LineString seq, final int size) {
+    final int axisCount = seq.getAxisCount();
+    final double[] coordinates = new double[size * axisCount];
+    final int n = seq.getVertexCount();
+    CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, seq, 0, n);
+    // fill remaining coordinates with start point
+    for (int i = n; i < size; i++) {
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, i, seq, 0, 1);
+    }
+    return new LineStringDouble(axisCount, coordinates);
   }
 
   private final ByteOrderDataInStream dis = new ByteOrderDataInStream();

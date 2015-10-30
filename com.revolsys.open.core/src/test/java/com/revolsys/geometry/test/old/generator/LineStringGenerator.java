@@ -127,6 +127,20 @@ public class LineStringGenerator extends GeometryGenerator {
   protected int numberPoints = 2;
 
   /**
+   * @return Returns the generationAlgorithm.
+   */
+  public int getGenerationAlgorithm() {
+    return this.generationAlgorithm;
+  }
+
+  /**
+   * @return Returns the numberPoints.
+   */
+  public int getNumberPoints() {
+    return this.numberPoints;
+  }
+
+  /**
    * As the user increases the number of points, the probability of creating a random valid linestring decreases.
    * Please take not of this when selecting the generation style, and the number of points.
    *
@@ -141,13 +155,13 @@ public class LineStringGenerator extends GeometryGenerator {
    * @see #HORZ
    * @see #ARC
    *
-   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#create()
+   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#newIterator()
    *
    * @throws IllegalStateException When the alg is not valid or the number of points is invalid
    * @throws NullPointerException when either the Geometry Factory, or the Bounding Box are undefined.
    */
   @Override
-  public Geometry create() {
+  public Geometry newGeometry() {
 
     if (this.geometryFactory == null) {
       throw new NullPointerException("GeometryFactoryI is not declared");
@@ -189,20 +203,6 @@ public class LineStringGenerator extends GeometryGenerator {
       }
     }
     return null;
-  }
-
-  /**
-   * @return Returns the generationAlgorithm.
-   */
-  public int getGenerationAlgorithm() {
-    return this.generationAlgorithm;
-  }
-
-  /**
-   * @return Returns the numberPoints.
-   */
-  public int getNumberPoints() {
-    return this.numberPoints;
   }
 
   /**

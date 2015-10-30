@@ -163,7 +163,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
         this.geometryWriteMethod = ShapefileGeometryUtil.getWriteMethod(this.geometryFactory,
           this.geometryDataType);
       }
-      EsriCoordinateSystems.createPrjFile(this.resource, this.geometryFactory);
+      EsriCoordinateSystems.writePrjFile(this.resource, this.geometryFactory);
     }
   }
 

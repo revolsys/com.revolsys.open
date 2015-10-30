@@ -1,4 +1,4 @@
-package com.revolsys.gis.oracle.esri;
+package com.revolsys.oracle.recordstore.esri;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

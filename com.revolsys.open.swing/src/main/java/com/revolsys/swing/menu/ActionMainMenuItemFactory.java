@@ -49,17 +49,6 @@ public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
   }
 
   @Override
-  public JMenuItem newComponent() {
-    if (this.checkBoxSelectedCheck == null) {
-      return this.action.createMenuItem();
-    } else {
-      final CheckBoxMenuItem menuItem = this.action.createCheckboxMenuItem();
-      menuItem.setSelectedCheck(this.checkBoxSelectedCheck);
-      return menuItem;
-    }
-  }
-
-  @Override
   public final Icon getIcon() {
     return (Icon)this.action.getValue(Action.SMALL_ICON);
   }
@@ -77,6 +66,17 @@ public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
   @Override
   public String getToolTip() {
     return (String)this.action.getValue(Action.SHORT_DESCRIPTION);
+  }
+
+  @Override
+  public JMenuItem newComponent() {
+    if (this.checkBoxSelectedCheck == null) {
+      return this.action.newMenuItem();
+    } else {
+      final CheckBoxMenuItem menuItem = this.action.newCheckboxMenuItem();
+      menuItem.setSelectedCheck(this.checkBoxSelectedCheck);
+      return menuItem;
+    }
   }
 
   @Override

@@ -6,8 +6,6 @@ import java.util.Map;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 
 public interface ConnectionRegistry<T> extends PropertyChangeSupportProxy {
-  void createConnection(Map<String, ? extends Object> connectionParameters);
-
   List<T> getConections();
 
   T getConnection(final String connectionName);
@@ -19,6 +17,8 @@ public interface ConnectionRegistry<T> extends PropertyChangeSupportProxy {
   String getName();
 
   boolean isVisible();
+
+  void newConnection(Map<String, ? extends Object> connectionParameters);
 
   void setConnectionManager(
     ConnectionRegistryManager<? extends ConnectionRegistry<T>> connectionManager);

@@ -163,10 +163,10 @@ public class OffsetCurveBuilder {
   private void computePointCurve(final Point point, final OffsetSegmentGenerator segGen) {
     switch (this.bufParams.getEndCapStyle()) {
       case ROUND:
-        segGen.createCircle(point);
+        segGen.newCircle(point);
       break;
       case SQUARE:
-        segGen.createSquare(point);
+        segGen.newSquare(point);
       break;
       case BUTT:
       break;

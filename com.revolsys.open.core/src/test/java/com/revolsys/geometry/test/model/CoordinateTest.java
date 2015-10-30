@@ -3,6 +3,7 @@ package com.revolsys.geometry.test.model;
 import java.util.Arrays;
 
 import com.revolsys.equals.NumberEquals;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 
@@ -135,9 +136,9 @@ public class CoordinateTest extends TestCase {
 
   public void testGetOrdinate() {
     final Point c = new PointDouble(350.2, 4566.8, 5266.3);
-    assertEquals(c.getCoordinate(Point.X), 350.2);
-    assertEquals(c.getCoordinate(Point.Y), 4566.8);
-    assertEquals(c.getCoordinate(Point.Z), 5266.3);
+    assertEquals(c.getCoordinate(Geometry.X), 350.2);
+    assertEquals(c.getCoordinate(Geometry.Y), 4566.8);
+    assertEquals(c.getCoordinate(Geometry.Z), 5266.3);
   }
 
   public void testToString() {

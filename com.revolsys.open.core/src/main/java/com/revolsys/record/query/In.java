@@ -25,9 +25,9 @@ public class In extends Condition {
     this.left = left;
     if (left instanceof Column) {
       final Column column = (Column)left;
-      final FieldDefinition field = column.getField();
+      final FieldDefinition field = column.getFieldDefinition();
       if (field != null) {
-        values.setField(field);
+        values.setFieldDefinition(field);
       }
     }
     this.values = values;

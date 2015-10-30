@@ -45,6 +45,16 @@ public final class JexlUtil {
     jexlExpression.append("'").append(text.replaceAll("'", "' + \"'\" + '")).append("'");
   }
 
+  public static Object evaluateExpression(final JexlContext context, final Expression expression) {
+    try {
+      return expression.evaluate(context);
+    } catch (final Exception e) {
+      LOG.error(
+        "Unable to evaluate expression '" + expression.getExpression() + "': " + e.getMessage(), e);
+      return null;
+    }
+  }
+
   /**
    * Convert expressions into valid JexlExpressions, if the string does not
    * contain any expressions in the form ${el} then null will be returned and
@@ -54,8 +64,8 @@ public final class JexlUtil {
    * @return The expression object for the string expression.
    * @throws Exception If there was an error creating the expression.
    */
-  public static Expression createExpression(final String expression) throws Exception {
-    return createExpression(expression, DEFAULT_EXPRESSION_PATTERN);
+  public static Expression newExpression(final String expression) throws Exception {
+    return newExpression(expression, DEFAULT_EXPRESSION_PATTERN);
   }
 
   /**
@@ -80,7 +90,7 @@ public final class JexlUtil {
    * @return The expression object for the string expression.
    * @throws Exception If there was an error creating the expression.
    */
-  public static Expression createExpression(final String expression, final String expressionPattern)
+  public static Expression newExpression(final String expression, final String expressionPattern)
     throws Exception {
     final String newExpression = expression.replaceAll("\n", "");
     // Wrap the entires expression in '' and replace the expressions in the
@@ -111,16 +121,6 @@ public final class JexlUtil {
       expr = expr.replaceAll("\\+ ''$", "");
       return ExpressionFactory.createExpression(expr);
     } else {
-      return null;
-    }
-  }
-
-  public static Object evaluateExpression(final JexlContext context, final Expression expression) {
-    try {
-      return expression.evaluate(context);
-    } catch (final Exception e) {
-      LOG.error(
-        "Unable to evaluate expression '" + expression.getExpression() + "': " + e.getMessage(), e);
       return null;
     }
   }

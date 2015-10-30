@@ -34,6 +34,7 @@ package com.revolsys.geometry.test.old.perf.algorithm;
 
 import java.util.Random;
 
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
@@ -58,10 +59,10 @@ public class DistanceLineLineStressTest extends TestCase {
     final double x1 = 10;
     final double x2 = x1 + gap;
     final double x3 = x1 + gap + 10;
-    seg[0] = new PointDouble((double)0, 0, Point.NULL_ORDINATE);
-    seg[1] = new PointDouble(x1, slope * x1, Point.NULL_ORDINATE);
-    seg[2] = new PointDouble(x2, slope * x2, Point.NULL_ORDINATE);
-    seg[3] = new PointDouble(x3, slope * x3, Point.NULL_ORDINATE);
+    seg[0] = new PointDouble((double)0, 0, Geometry.NULL_ORDINATE);
+    seg[1] = new PointDouble(x1, slope * x1, Geometry.NULL_ORDINATE);
+    seg[2] = new PointDouble(x2, slope * x2, Geometry.NULL_ORDINATE);
+    seg[3] = new PointDouble(x3, slope * x3, Geometry.NULL_ORDINATE);
 
     return seg;
   }

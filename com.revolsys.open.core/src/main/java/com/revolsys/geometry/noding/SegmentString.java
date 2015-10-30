@@ -43,14 +43,14 @@ import com.revolsys.geometry.model.Point;
  * @version 1.7
  */
 public interface SegmentString {
-  Point getPoint(int i);
-
   /**
    * Gets the user-defined data for this segment string.
    *
    * @return the user-defined data
    */
   Object getData();
+
+  Point getPoint(int i);
 
   LineString getPoints();
 

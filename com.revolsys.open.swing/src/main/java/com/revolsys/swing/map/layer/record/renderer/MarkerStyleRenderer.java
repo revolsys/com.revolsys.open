@@ -339,11 +339,6 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   @Override
-  public ValueField createStylePanel() {
-    return new MarkerStylePanel(this);
-  }
-
-  @Override
   public Icon getIcon() {
     final Marker marker = this.style.getMarker();
     final Icon icon = marker.getIcon(this.style);
@@ -356,6 +351,11 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
 
   public MarkerStyle getStyle() {
     return this.style;
+  }
+
+  @Override
+  public ValueField newStylePanel() {
+    return new MarkerStylePanel(this);
   }
 
   @Override

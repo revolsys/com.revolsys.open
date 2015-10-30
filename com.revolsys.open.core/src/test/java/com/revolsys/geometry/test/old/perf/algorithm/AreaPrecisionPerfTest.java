@@ -1,5 +1,6 @@
 package com.revolsys.geometry.test.old.perf.algorithm;
 
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
@@ -37,7 +38,7 @@ public class AreaPrecisionPerfTest {
         vertex = new PointDouble(
           originX + (1 + Math.sin((float)i / (float)nrVertices * 2 * Math.PI)),
           originY + (1 + Math.cos((float)i / (float)nrVertices * 2 * Math.PI)),
-          Point.NULL_ORDINATE);
+          Geometry.NULL_ORDINATE);
         coordinates[i] = vertex;
       }
       // close ring

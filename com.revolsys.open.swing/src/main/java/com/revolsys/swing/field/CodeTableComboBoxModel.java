@@ -17,7 +17,7 @@ public class CodeTableComboBoxModel extends AbstractListModel<Identifier>
   implements ComboBoxModel<Identifier>, PropertyChangeListener, Closeable {
   private static final long serialVersionUID = 1L;
 
-  public static ComboBox<Identifier> create(final String fieldName, final CodeTable codeTable,
+  public static ComboBox<Identifier> newComboBox(final String fieldName, final CodeTable codeTable,
     final boolean allowNull) {
     final CodeTableComboBoxModel model = new CodeTableComboBoxModel(codeTable, allowNull);
     final CodeTableObjectToStringConverter stringConverter = new CodeTableObjectToStringConverter(

@@ -9,7 +9,7 @@ import com.revolsys.util.JavaBeanUtil;
 
 public class DelegatingMap<K, V> implements Map<K, V>, Cloneable {
 
-  public static <K2, V2> Map<K2, V2> create(final Map<K2, V2> map) {
+  public static <K2, V2> Map<K2, V2> newMap(final Map<K2, V2> map) {
     return new DelegatingMap<>(map);
   }
 

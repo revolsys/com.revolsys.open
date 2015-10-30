@@ -46,7 +46,7 @@ import com.revolsys.geometry.model.Point;
  */
 public class OverlayNodeFactory extends NodeFactory {
   @Override
-  public Node createNode(final Point coord) {
+  public Node newNode(final Point coord) {
     return new Node(coord, new DirectedEdgeStar());
   }
 }

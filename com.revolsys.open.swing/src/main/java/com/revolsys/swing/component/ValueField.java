@@ -177,8 +177,8 @@ public class ValueField extends JPanel implements Field {
     dialog.add(this, BorderLayout.CENTER);
 
     final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    buttons.add(RunnableAction.createButton("Cancel", () -> cancel(dialog)));
-    buttons.add(RunnableAction.createButton("OK", () -> save(dialog)));
+    buttons.add(RunnableAction.newButton("Cancel", () -> cancel(dialog)));
+    buttons.add(RunnableAction.newButton("OK", () -> save(dialog)));
     dialog.add(buttons, BorderLayout.SOUTH);
 
     dialog.pack();

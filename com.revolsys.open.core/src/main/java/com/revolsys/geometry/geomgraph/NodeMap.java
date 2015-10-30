@@ -81,7 +81,7 @@ public class NodeMap implements Iterable<Node> {
    * Factory function - subclasses can override to create their own types of nodes
    */
   /*
-   * protected Node createNode(Point coord) { return new Node(coord); }
+   * protected Node newNode(Point coord) { return new Node(coord); }
    */
   /**
    * This method expects that a node has a coordinate value.
@@ -89,7 +89,7 @@ public class NodeMap implements Iterable<Node> {
   public Node addNode(final Point coord) {
     Node node = this.nodeMap.get(coord);
     if (node == null) {
-      node = this.nodeFact.createNode(coord);
+      node = this.nodeFact.newNode(coord);
       this.nodeMap.put(coord, node);
     }
     return node;

@@ -80,11 +80,6 @@ public class RecordTableCellEditor extends AbstractCellEditor
     }
   }
 
-  protected Field createField(final String fieldName) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    return SwingUtil.newField(recordDefinition, fieldName, true);
-  }
-
   @Override
   public Object getCellEditorValue() {
     final Object value = SwingUtil.getValue(this.editorComponent);
@@ -129,7 +124,7 @@ public class RecordTableCellEditor extends AbstractCellEditor
     this.fieldName = model.getFieldName(rowIndex, columnIndex);
     final RecordDefinition recordDefinition = model.getRecordDefinition();
     this.dataType = recordDefinition.getFieldType(this.fieldName);
-    final Field field = createField(this.fieldName);
+    final Field field = newField(this.fieldName);
     this.editorComponent = (JComponent)field;
     if (this.editorComponent instanceof JTextField) {
       final JTextField textField = (JTextField)this.editorComponent;
@@ -239,6 +234,11 @@ public class RecordTableCellEditor extends AbstractCellEditor
   @Override
   public void mouseReleased(final MouseEvent e) {
     Listeners.mouseEvent(this.mouseListener, e);
+  }
+
+  protected Field newField(final String fieldName) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return SwingUtil.newField(recordDefinition, fieldName, true);
   }
 
   public synchronized void removeMouseListener(final MouseListener l) {

@@ -33,6 +33,7 @@
 package com.revolsys.geometry.math;
 
 import com.revolsys.geometry.algorithm.RobustDeterminant;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.Assert;
@@ -53,7 +54,7 @@ public class Vector2D {
    * @param y the y component
    * @return a new vector
    */
-  public static Vector2D create(final double x, final double y) {
+  public static Vector2D newVector(final double x, final double y) {
     return new Vector2D(x, y);
   }
 
@@ -63,7 +64,7 @@ public class Vector2D {
    * @param coord the Point to copy
    * @return a new vector
    */
-  public static Vector2D create(final Point coord) {
+  public static Vector2D newVector(final Point coord) {
     return new Vector2D(coord);
   }
 
@@ -76,7 +77,7 @@ public class Vector2D {
    * @param to the destination Coordinate
    * @return a new vector
    */
-  public static Vector2D create(final Point from, final Point to) {
+  public static Vector2D newVector(final Point from, final Point to) {
     return new Vector2D(from, to);
   }
 
@@ -86,7 +87,7 @@ public class Vector2D {
    * @param v the vector to copy
    * @return a new vector
    */
-  public static Vector2D create(final Vector2D v) {
+  public static Vector2D newVector(final Vector2D v) {
     return new Vector2D(v);
   }
 
@@ -125,7 +126,7 @@ public class Vector2D {
   }
 
   public Vector2D add(final Vector2D v) {
-    return create(this.x + v.x, this.y + v.y);
+    return newVector(this.x + v.x, this.y + v.y);
   }
 
   public double angle() {
@@ -183,7 +184,7 @@ public class Vector2D {
    * @return a new vector with the value v / d
    */
   public Vector2D divide(final double d) {
-    return create(this.x / d, this.y / d);
+    return newVector(this.x / d, this.y / d);
   }
 
   /**
@@ -262,11 +263,11 @@ public class Vector2D {
    * @return a new vector with the value v * d
    */
   public Vector2D multiply(final double d) {
-    return create(this.x * d, this.y * d);
+    return newVector(this.x * d, this.y * d);
   }
 
   public Vector2D negate() {
-    return create(-this.x, -this.y);
+    return newVector(-this.x, -this.y);
   }
 
   public Vector2D normalize() {
@@ -274,13 +275,13 @@ public class Vector2D {
     if (length > 0.0) {
       return divide(length);
     }
-    return create(0.0, 0.0);
+    return newVector(0.0, 0.0);
   }
 
   public Vector2D rotate(final double angle) {
     final double cos = Math.cos(angle);
     final double sin = Math.sin(angle);
-    return create(this.x * cos - this.y * sin, this.x * sin + this.y * cos);
+    return newVector(this.x * cos - this.y * sin, this.x * sin + this.y * cos);
   }
 
   /**
@@ -301,24 +302,24 @@ public class Vector2D {
     }
     switch (nQuad) {
       case 0:
-        return create(this.x, this.y);
+        return newVector(this.x, this.y);
       case 1:
-        return create(-this.y, this.x);
+        return newVector(-this.y, this.x);
       case 2:
-        return create(-this.x, -this.y);
+        return newVector(-this.x, -this.y);
       case 3:
-        return create(this.y, -this.x);
+        return newVector(this.y, -this.x);
     }
     Assert.shouldNeverReachHere();
     return null;
   }
 
   public Vector2D subtract(final Vector2D v) {
-    return create(this.x - v.x, this.y - v.y);
+    return newVector(this.x - v.x, this.y - v.y);
   }
 
   public Point toCoordinate() {
-    return new PointDouble(this.x, this.y, Point.NULL_ORDINATE);
+    return new PointDouble(this.x, this.y, Geometry.NULL_ORDINATE);
   }
 
   /**
@@ -332,7 +333,7 @@ public class Vector2D {
   }
 
   public Point translate(final Point coord) {
-    return new PointDouble(this.x + coord.getX(), this.y + coord.getY(), Point.NULL_ORDINATE);
+    return new PointDouble(this.x + coord.getX(), this.y + coord.getY(), Geometry.NULL_ORDINATE);
   }
 
   /**
@@ -351,7 +352,7 @@ public class Vector2D {
    * @return the weighted sum of the two vectors
    */
   public Vector2D weightedSum(final Vector2D v, final double frac) {
-    return create(frac * this.x + (1.0 - frac) * v.x, frac * this.y + (1.0 - frac) * v.y);
+    return newVector(frac * this.x + (1.0 - frac) * v.x, frac * this.y + (1.0 - frac) * v.y);
   }
 
 }

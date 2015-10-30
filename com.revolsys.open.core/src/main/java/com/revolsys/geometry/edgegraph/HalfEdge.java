@@ -32,21 +32,6 @@ import com.revolsys.geometry.util.Assert;
 public class HalfEdge {
 
   /**
-   * Creates a HalfEdge pair representing an edge
-   * between two vertices located at coordinates p0 and p1.
-   *
-   * @param p0 a vertex coordinate
-   * @param p1 a vertex coordinate
-   * @return the HalfEdge with origin at p0
-   */
-  public static HalfEdge create(final Point p0, final Point p1) {
-    final HalfEdge e0 = new HalfEdge(p0);
-    final HalfEdge e1 = new HalfEdge(p1);
-    e0.init(e1);
-    return e0;
-  }
-
-  /**
    * Initialize a symmetric pair of halfedges.
    * Intended for use by {@link EdgeGraph} subclasses.
    * The edges are initialized to have each other
@@ -64,6 +49,21 @@ public class HalfEdge {
     if (e0.sym != null || e1.sym != null || e0.next != null || e1.next != null) {
       throw new IllegalStateException("Edges are already initialized");
     }
+    e0.init(e1);
+    return e0;
+  }
+
+  /**
+   * Creates a HalfEdge pair representing an edge
+   * between two vertices located at coordinates p0 and p1.
+   *
+   * @param p0 a vertex coordinate
+   * @param p1 a vertex coordinate
+   * @return the HalfEdge with origin at p0
+   */
+  public static HalfEdge newHalfEdge(final Point p0, final Point p1) {
+    final HalfEdge e0 = new HalfEdge(p0);
+    final HalfEdge e1 = new HalfEdge(p1);
     e0.init(e1);
     return e0;
   }

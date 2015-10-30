@@ -27,7 +27,8 @@ public class WindowOpener extends JFrame implements WindowListener {
    */
   private static final long serialVersionUID = 1L;
 
-  public static WindowOpener create(final Window window, final String title, final String message) {
+  public static WindowOpener newWindowOpener(final Window window, final String title,
+    final String message) {
     return new WindowOpener(window, title, message);
   }
 

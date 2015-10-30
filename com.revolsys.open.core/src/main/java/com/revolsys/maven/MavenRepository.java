@@ -72,24 +72,6 @@ public class MavenRepository implements URLStreamHandlerFactory {
     setRoot(root);
   }
 
-  public URLClassLoader createClassLoader(final String id) {
-    final Set<String> exclusionIds = Collections.emptySet();
-    return createClassLoader(id, exclusionIds);
-  }
-
-  public URLClassLoader createClassLoader(final String id, final Collection<String> exclusionIds) {
-    final MavenPom pom = getPom(id);
-    final Set<String> dependencies = pom.getDependencies(exclusionIds);
-    final URL[] urls = new URL[dependencies.size() + 1];
-    urls[0] = getURL(pom.getMavenId());
-    int i = 1;
-    for (final String dependencyId : dependencies) {
-      urls[i++] = getURL(dependencyId);
-    }
-    final ClassLoader parentClassLoader = getClass().getClassLoader();
-    return new URLClassLoader(urls, parentClassLoader, this);
-  }
-
   @Override
   public URLStreamHandler createURLStreamHandler(final String protocol) {
     return this.urlHandler;
@@ -288,6 +270,24 @@ public class MavenRepository implements URLStreamHandlerFactory {
       }
     }
     return resource;
+  }
+
+  public URLClassLoader newClassLoader(final String id) {
+    final Set<String> exclusionIds = Collections.emptySet();
+    return newClassLoader(id, exclusionIds);
+  }
+
+  public URLClassLoader newClassLoader(final String id, final Collection<String> exclusionIds) {
+    final MavenPom pom = getPom(id);
+    final Set<String> dependencies = pom.getDependencies(exclusionIds);
+    final URL[] urls = new URL[dependencies.size() + 1];
+    urls[0] = getURL(pom.getMavenId());
+    int i = 1;
+    for (final String dependencyId : dependencies) {
+      urls[i++] = getURL(dependencyId);
+    }
+    final ClassLoader parentClassLoader = getClass().getClassLoader();
+    return new URLClassLoader(urls, parentClassLoader, this);
   }
 
   public void setRoot(final Resource root) {

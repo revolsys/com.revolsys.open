@@ -117,7 +117,7 @@ public class FgdbReader {
       final byte[] nullFields = new byte[(int)opt];
       this.in.read(nullFields);
       final Record record = new ArrayRecord(this.recordDefinition);
-      record.setIdentifier(Identifier.create(objectId++));
+      record.setIdentifier(Identifier.newIdentifier(objectId++));
       int fieldIndex = 0;
       int optionalFieldIndex = 0;
       final int idIndex = this.recordDefinition.getIdFieldIndex();

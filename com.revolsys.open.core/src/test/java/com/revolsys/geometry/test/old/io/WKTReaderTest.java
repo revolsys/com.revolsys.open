@@ -98,7 +98,7 @@ public class WKTReaderTest extends TestCase {
     final WKTReader reader = new WKTReader(geometryFactory);
     final Geometry point1 = reader.read("POINT(123456789.01234567890 10)");
     final Point point2 = geometryFactory
-      .point(new PointDouble(123456789.01234567890, 10, Point.NULL_ORDINATE));
+      .point(new PointDouble(123456789.01234567890, 10, Geometry.NULL_ORDINATE));
     assertEquals(point1.getPoint().getX(), point2.getPoint().getX(), 1E-7);
     assertEquals(point1.getPoint().getY(), point2.getPoint().getY(), 1E-7);
   }

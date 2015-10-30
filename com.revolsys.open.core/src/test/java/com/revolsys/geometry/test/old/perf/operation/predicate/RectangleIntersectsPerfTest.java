@@ -72,12 +72,12 @@ public class RectangleIntersectsPerfTest {
   public RectangleIntersectsPerfTest() {
   }
 
-  Geometry createRectangle(final Point origin, final double size) {
+  Geometry newRectangle(final Point origin, final double size) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(origin);
     gsf.setSize(size);
     gsf.setNumPoints(4);
-    final Geometry g = gsf.createRectangle();
+    final Geometry g = gsf.newRectangle();
     // Polygon gRect = gsf.createRectangle();
     // Geometry g = gRect.getExteriorRing();
     return g;
@@ -94,7 +94,7 @@ public class RectangleIntersectsPerfTest {
    * @param rectSize
    * @return
    */
-  List<Geometry> createRectangles(final BoundingBox env, final int nRect, final double rectSize) {
+  List<Geometry> newRectangles(final BoundingBox env, final int nRect, final double rectSize) {
     final int nSide = 1 + (int)Math.sqrt(nRect);
     final double dx = env.getWidth() / nSide;
     final double dy = env.getHeight() / nSide;
@@ -113,14 +113,14 @@ public class RectangleIntersectsPerfTest {
     return rectList;
   }
 
-  Geometry createSineStar(final Point origin, final double size, final int nPts) {
+  Geometry newSineStar(final Point origin, final double size, final int nPts) {
     final SineStarFactory gsf = new SineStarFactory();
     gsf.setCentre(origin);
     gsf.setSize(size);
     gsf.setNumPoints(nPts);
     gsf.setArmLengthRatio(2);
     gsf.setNumArms(20);
-    final Geometry poly = gsf.createSineStar();
+    final Geometry poly = gsf.newSineStar();
     return poly;
   }
 
@@ -155,8 +155,8 @@ public class RectangleIntersectsPerfTest {
 
   void test(final int nPts) {
     final double size = 100;
-    final Point origin = new PointDouble((double)0, 0, Point.NULL_ORDINATE);
-    final Geometry sinePoly = createSineStar(origin, size, nPts).getBoundary();
+    final Point origin = new PointDouble((double)0, 0, Geometry.NULL_ORDINATE);
+    final Geometry sinePoly = newSineStar(origin, size, nPts).getBoundary();
     GeometryFactory geometryFactory = sinePoly.getGeometryFactory();
     geometryFactory = GeometryFactory.fixed(geometryFactory.getCoordinateSystemId(),
       geometryFactory.getAxisCount(), size / 10, geometryFactory.getScaleZ());
@@ -169,14 +169,14 @@ public class RectangleIntersectsPerfTest {
     final Geometry sinePolyCrinkly = newGeometry;
     final Geometry target = sinePolyCrinkly;
 
-    final Geometry rect = createRectangle(origin, 5);
+    final Geometry rect = newRectangle(origin, 5);
     // System.out.println(target);
     // System.out.println("Running with " + nPts + " points");
     testRectangles(target, 100, 5);
   }
 
   void testRectangles(final Geometry target, final int nRect, final double rectSize) {
-    final Collection<Geometry> rects = createRectangles(target.getBoundingBox(), nRect, rectSize);
+    final Collection<Geometry> rects = newRectangles(target.getBoundingBox(), nRect, rectSize);
     test(rects, target);
   }
 

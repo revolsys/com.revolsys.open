@@ -31,7 +31,7 @@ public class ExpressionMeasurable<Q extends Quantity> extends Measure<Q> {
 
   public ExpressionMeasurable(final String expression, final Unit<Q> unit) {
     try {
-      this.expression = JexlUtil.createExpression(expression);
+      this.expression = JexlUtil.newExpression(expression);
     } catch (final Exception e) {
       throw new IllegalArgumentException("Expression " + expression + " is not valid", e);
     }

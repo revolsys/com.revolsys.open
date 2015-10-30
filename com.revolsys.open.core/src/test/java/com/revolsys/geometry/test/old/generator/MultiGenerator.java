@@ -75,10 +75,24 @@ public class MultiGenerator extends GeometryGenerator {
   }
 
   /**
+   * @return Returns the generator.
+   */
+  public GeometryGenerator getGenerator() {
+    return this.generator;
+  }
+
+  /**
+   * @return Returns the numberGeometries.
+   */
+  public int getNumberGeometries() {
+    return this.numberGeometries;
+  }
+
+  /**
    * Creates a geometry collection representing the set of child geometries created.
    *
    * @see #setNumberGeometries(int)
-   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#create()
+   * @see com.revolsys.geometry.testold.generator.GeometryGenerator#newIterator()
    *
    * @see #BOX
    * @see #VERT
@@ -89,7 +103,7 @@ public class MultiGenerator extends GeometryGenerator {
    * @throws IllegalStateException when the selected alg. is invalid
    */
   @Override
-  public Geometry create() {
+  public Geometry newGeometry() {
     if (this.generator == null) {
       throw new NullPointerException("Missing child generator");
     }
@@ -100,7 +114,7 @@ public class MultiGenerator extends GeometryGenerator {
 
     final ArrayList geoms = new ArrayList(this.numberGeometries);
 
-    final GridGenerator grid = GeometryGenerator.createGridGenerator();
+    final GridGenerator grid = GeometryGenerator.newGridGenerator();
     grid.setBoundingBox(this.boundingBox);
     grid.setGeometryFactory(this.geometryFactory);
 
@@ -130,8 +144,8 @@ public class MultiGenerator extends GeometryGenerator {
     }
 
     while (grid.canCreate()) {
-      this.generator.setBoundingBox(grid.createEnv());
-      geoms.add(this.generator.create());
+      this.generator.setBoundingBox(grid.newBoundingBox());
+      geoms.add(this.generator.newGeometry());
     }
 
     // yes ... there are better ways
@@ -149,20 +163,6 @@ public class MultiGenerator extends GeometryGenerator {
         }
       }
     }
-  }
-
-  /**
-   * @return Returns the generator.
-   */
-  public GeometryGenerator getGenerator() {
-    return this.generator;
-  }
-
-  /**
-   * @return Returns the numberGeometries.
-   */
-  public int getNumberGeometries() {
-    return this.numberGeometries;
   }
 
   @Override

@@ -15,8 +15,6 @@ public interface LayerRenderer<T extends Layer>
 
   LayerRenderer<T> clone();
 
-  ValueField createStylePanel();
-
   Icon getIcon();
 
   T getLayer();
@@ -34,6 +32,8 @@ public interface LayerRenderer<T extends Layer>
   boolean isEditing();
 
   boolean isVisible();
+
+  ValueField newStylePanel();
 
   void render(Viewport2D viewport);
 

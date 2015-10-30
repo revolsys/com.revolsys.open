@@ -10,8 +10,6 @@ public interface ComponentFactory<T extends Component> extends Cloneable {
 
   void close(Component component);
 
-  T newComponent();
-
   Icon getIcon();
 
   String getIconName();
@@ -19,4 +17,6 @@ public interface ComponentFactory<T extends Component> extends Cloneable {
   String getName();
 
   String getToolTip();
+
+  T newComponent();
 }

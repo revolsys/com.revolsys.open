@@ -90,47 +90,6 @@ public class OverlayOp extends GeometryGraphOperation {
   public static final int UNION = 2;
 
   /**
-   * Creates an empty result geometry of the appropriate dimension,
-   * based on the given overlay operation and the dimensions of the inputs.
-   * The created geometry is always an atomic geometry,
-   * not a collection.
-   * <p>
-   * The empty result is constructed using the following rules:
-   * <ul>
-   * <li>{@link #INTERSECTION} - result has the dimension of the lowest input dimension
-   * <li>{@link #UNION} - result has the dimension of the highest input dimension
-   * <li>{@link #DIFFERENCE} - result has the dimension of the left-hand input
-   * <li>{@link #SYMDIFFERENCE} - result has the dimension of the highest input dimension
-   * (since the symmetric Difference is the union of the differences).
-   * <li>
-   *
-   * @param overlayOpCode the code for the overlay operation being performed
-   * @param a an input geometry
-   * @param b an input geometry
-   * @param geomFact the geometry factory being used for the operation
-   * @return an empty atomic geometry of the appropriate dimension
-   */
-  public static Geometry createEmptyResult(final int overlayOpCode, final Geometry a,
-    final Geometry b, final GeometryFactory geomFact) {
-    Geometry result = null;
-    switch (resultDimension(overlayOpCode, a, b)) {
-      case -1:
-        result = geomFact.geometryCollection();
-      break;
-      case 0:
-        result = geomFact.point();
-      break;
-      case 1:
-        result = geomFact.lineString();
-      break;
-      case 2:
-        result = geomFact.polygon();
-      break;
-    }
-    return result;
-  }
-
-  /**
    * Tests whether a point with a given topological {@link Label}
    * relative to two geometries is contained in
    * the result of overlaying the geometries using
@@ -180,6 +139,47 @@ public class OverlayOp extends GeometryGraphOperation {
           || loc0 != Location.INTERIOR && loc1 == Location.INTERIOR;
     }
     return false;
+  }
+
+  /**
+   * Creates an empty result geometry of the appropriate dimension,
+   * based on the given overlay operation and the dimensions of the inputs.
+   * The created geometry is always an atomic geometry,
+   * not a collection.
+   * <p>
+   * The empty result is constructed using the following rules:
+   * <ul>
+   * <li>{@link #INTERSECTION} - result has the dimension of the lowest input dimension
+   * <li>{@link #UNION} - result has the dimension of the highest input dimension
+   * <li>{@link #DIFFERENCE} - result has the dimension of the left-hand input
+   * <li>{@link #SYMDIFFERENCE} - result has the dimension of the highest input dimension
+   * (since the symmetric Difference is the union of the differences).
+   * <li>
+   *
+   * @param overlayOpCode the code for the overlay operation being performed
+   * @param a an input geometry
+   * @param b an input geometry
+   * @param geomFact the geometry factory being used for the operation
+   * @return an empty atomic geometry of the appropriate dimension
+   */
+  public static Geometry newEmptyResult(final int overlayOpCode, final Geometry a, final Geometry b,
+    final GeometryFactory geomFact) {
+    Geometry result = null;
+    switch (resultDimension(overlayOpCode, a, b)) {
+      case -1:
+        result = geomFact.geometryCollection();
+      break;
+      case 0:
+        result = geomFact.point();
+      break;
+      case 1:
+        result = geomFact.lineString();
+      break;
+      case 2:
+        result = geomFact.polygon();
+      break;
+    }
+    return result;
   }
 
   /**
@@ -286,7 +286,7 @@ public class OverlayOp extends GeometryGraphOperation {
     geometries.addAll(resultPolyList);
 
     if (geometries.isEmpty()) {
-      return createEmptyResult(opcode, this.arg[0].getGeometry(), this.arg[1].getGeometry(),
+      return newEmptyResult(opcode, this.arg[0].getGeometry(), this.arg[1].getGeometry(),
         this.geomFact);
       // */
     } else {

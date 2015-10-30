@@ -30,14 +30,14 @@ public class ClassLoaderFactoryBean extends AbstractFactoryBean<ClassLoader> {
     }
   }
 
-  public static URLClassLoader createClassLoader(final ClassLoader parentClassLoader,
+  public static URLClassLoader newClassLoader(final ClassLoader parentClassLoader,
     final Collection<URL> urls) {
     URL[] urlArray = new URL[urls.size()];
     urlArray = urls.toArray(urlArray);
     return new URLClassLoader(urlArray, parentClassLoader);
   }
 
-  public static URLClassLoader createClassLoader(final ClassLoader parentClassLoader,
+  public static URLClassLoader newClassLoader(final ClassLoader parentClassLoader,
     final File file) {
     final Collection<URL> urls = new LinkedHashSet<URL>();
     if (file.isDirectory()) {
@@ -45,7 +45,7 @@ public class ClassLoaderFactoryBean extends AbstractFactoryBean<ClassLoader> {
     } else if (JAR_FILTER.accept(file.getParentFile(), FileUtil.getFileName(file))) {
       urls.add(FileUtil.toUrl(file));
     }
-    return createClassLoader(parentClassLoader, urls);
+    return newClassLoader(parentClassLoader, urls);
   }
 
   private Collection<File> libDirectories = new LinkedHashSet<File>();
@@ -58,7 +58,7 @@ public class ClassLoaderFactoryBean extends AbstractFactoryBean<ClassLoader> {
   protected ClassLoader createInstance() throws Exception {
     final Class<? extends ClassLoaderFactoryBean> clazz = getClass();
     final ClassLoader parentClassLoader = clazz.getClassLoader();
-    final URLClassLoader classLoader = createClassLoader(parentClassLoader, this.mergedUrls);
+    final URLClassLoader classLoader = newClassLoader(parentClassLoader, this.mergedUrls);
     return classLoader;
   }
 

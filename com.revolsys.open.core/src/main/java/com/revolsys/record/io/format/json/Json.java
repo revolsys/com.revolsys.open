@@ -57,7 +57,7 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
       return new LinkedHashMap<>();
     } else {
       try {
-        final java.io.Reader reader = FileUtil.createUtf8Reader(in);
+        final java.io.Reader reader = FileUtil.newUtf8Reader(in);
         try (
           final JsonMapIterator iterator = new JsonMapIterator(reader, true)) {
           if (iterator.hasNext()) {

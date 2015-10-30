@@ -21,7 +21,7 @@ public class CodeTableObjectToStringConverter extends ObjectToStringConverter {
     if (value == null || value == Identifier.NULL) {
       return null;
     } else {
-      final List<Object> values = this.codeTable.getValues(Identifier.create(value));
+      final List<Object> values = this.codeTable.getValues(Identifier.newIdentifier(value));
       if (values == null || values.isEmpty()) {
         return null;
       } else {

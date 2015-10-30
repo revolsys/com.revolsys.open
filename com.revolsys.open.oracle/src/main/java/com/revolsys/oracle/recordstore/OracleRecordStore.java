@@ -1,4 +1,4 @@
-package com.revolsys.gis.oracle.io;
+package com.revolsys.oracle.recordstore;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,14 +19,20 @@ import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.gis.oracle.esri.ArcSdeStGeometryFieldDefinition;
-import com.revolsys.gis.oracle.esri.ArcSdeStGeometryRecordStoreExtension;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
+import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
+import com.revolsys.oracle.recordstore.esri.ArcSdeStGeometryFieldDefinition;
+import com.revolsys.oracle.recordstore.esri.ArcSdeStGeometryRecordStoreExtension;
+import com.revolsys.oracle.recordstore.field.OracleBlobFieldAdder;
+import com.revolsys.oracle.recordstore.field.OracleClobFieldAdder;
+import com.revolsys.oracle.recordstore.field.OracleJdbcRowIdFieldDefinition;
+import com.revolsys.oracle.recordstore.field.OracleSdoGeometryFieldAdder;
+import com.revolsys.oracle.recordstore.field.OracleSdoGeometryJdbcFieldDefinition;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -212,7 +218,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       sql.append(") = 'TRUE'");
     } else if (geometryField instanceof ArcSdeStGeometryFieldDefinition) {
       final Column column = (Column)withinDistance.getGeometry1Value();
-      final GeometryFactory geometryFactory = column.getField()
+      final GeometryFactory geometryFactory = column.getFieldDefinition()
         .getRecordDefinition()
         .getGeometryFactory();
       final Value geometry2Value = (Value)withinDistance.getGeometry2Value();
@@ -303,7 +309,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   @Override
   public Identifier getNextPrimaryKey(final String sequenceName) {
     final String sql = "SELECT " + sequenceName + ".NEXTVAL FROM SYS.DUAL";
-    return Identifier.create(JdbcUtils.selectLong(this, sql));
+    return Identifier.newIdentifier(JdbcUtils.selectLong(this, sql));
   }
 
   @Override
@@ -404,6 +410,11 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   private AbstractIterator<Record> newOracleIterator(final RecordStore recordStore,
     final Query query, final Map<String, Object> properties) {
     return new OracleJdbcQueryIterator((OracleRecordStore)recordStore, query, properties);
+  }
+
+  @Override
+  protected JdbcFieldDefinition newRowIdFieldDefinition() {
+    return new OracleJdbcRowIdFieldDefinition();
   }
 
   @Override

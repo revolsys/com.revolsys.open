@@ -25,7 +25,7 @@ public class WktCsParser {
   private final String value;
 
   public WktCsParser(final InputStream in) {
-    this(FileUtil.createUtf8Reader(in));
+    this(FileUtil.newUtf8Reader(in));
   }
 
   public WktCsParser(final Reader reader) {

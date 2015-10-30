@@ -72,21 +72,6 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
     super.close();
   }
 
-  public RecordStoreSchema createSchema(final PathName path) {
-    final RecordStoreSchemaElement element = getElement(path);
-    if (element == null) {
-      final RecordStoreSchema schema = new RecordStoreSchema(this, path);
-      addElement(schema);
-      return schema;
-    } else if (element instanceof RecordStoreSchema) {
-      final RecordStoreSchema schema = (RecordStoreSchema)element;
-      return schema;
-    } else {
-      throw new IllegalArgumentException(
-        "Non schema element with path " + path + " already exists");
-    }
-  }
-
   public synchronized RecordDefinition findRecordDefinition(final PathName path) {
     refreshIfNeeded();
     final RecordDefinition recordDefinition = this.recordDefinitionsByPath.get(path);
@@ -275,6 +260,21 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
 
   public boolean isInitialized() {
     return this.initialized;
+  }
+
+  public RecordStoreSchema newSchema(final PathName path) {
+    final RecordStoreSchemaElement element = getElement(path);
+    if (element == null) {
+      final RecordStoreSchema schema = new RecordStoreSchema(this, path);
+      addElement(schema);
+      return schema;
+    } else if (element instanceof RecordStoreSchema) {
+      final RecordStoreSchema schema = (RecordStoreSchema)element;
+      return schema;
+    } else {
+      throw new IllegalArgumentException(
+        "Non schema element with path " + path + " already exists");
+    }
   }
 
   public synchronized void refresh() {

@@ -70,13 +70,6 @@ public class ThreadLocalFileAppender extends FileAppender {
     }
   }
 
-  private FileAppender createLocalAppender() {
-    final String file = getLocalFile();
-    final FileAppender fileAppender = getFileAppender(file);
-    this.localAppender.set(fileAppender);
-    return fileAppender;
-  }
-
   @Override
   public boolean getAppend() {
     if (hasLocalAppender()) {
@@ -194,6 +187,13 @@ public class ThreadLocalFileAppender extends FileAppender {
     return this.localAppender.get() != null;
   }
 
+  private FileAppender newLocalAppender() {
+    final String file = getLocalFile();
+    final FileAppender fileAppender = getFileAppender(file);
+    this.localAppender.set(fileAppender);
+    return fileAppender;
+  }
+
   public void removeLocalFile() {
     final String localFileName = this.localFile.get();
     if (localFileName != null) {
@@ -287,7 +287,7 @@ public class ThreadLocalFileAppender extends FileAppender {
   public void setLocalFile(final String file) {
     this.localFile.set(file);
     if (file != null) {
-      createLocalAppender();
+      newLocalAppender();
     }
   }
 

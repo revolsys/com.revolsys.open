@@ -106,7 +106,7 @@ public class ZipUtil {
     while (filename.length() < 3) {
       filename += "x";
     }
-    final File directory = FileUtil.createTempDirectory(filename, ".zip");
+    final File directory = FileUtil.newTempDirectory(filename, ".zip");
     final InputStream in = resource.getInputStream();
     final ZipInputStream zipIn = new ZipInputStream(in);
     try {

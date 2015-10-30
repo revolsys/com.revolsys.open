@@ -17,11 +17,6 @@ public class IdObjectNode<T> extends AbstractNode<T> {
   }
 
   @Override
-  protected AbstractNode<T> createNode(final int level, final double... newBounds) {
-    return new IdObjectNode<T>(level, newBounds);
-  }
-
-  @Override
   protected void doAdd(final QuadTree<T> tree, final double[] bounds, final T item) {
     final Object id = ((IdObjectQuadTree<T>)tree).getId(item);
     if (this.ids == null) {
@@ -82,6 +77,11 @@ public class IdObjectNode<T> extends AbstractNode<T> {
     } else {
       return this.ids.length;
     }
+  }
+
+  @Override
+  protected AbstractNode<T> newNode(final int level, final double... newBounds) {
+    return new IdObjectNode<T>(level, newBounds);
   }
 
 }

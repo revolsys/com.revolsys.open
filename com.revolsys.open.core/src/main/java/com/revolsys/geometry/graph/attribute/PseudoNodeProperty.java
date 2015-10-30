@@ -38,10 +38,6 @@ public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {
   public PseudoNodeProperty() {
   }
 
-  public PseudoNodeAttribute createProperty(final Node<Record> node) {
-    return new PseudoNodeAttribute(node, getTypePath(), this.equalExcludeFieldNames);
-  }
-
   public Collection<String> getEqualExcludeFieldNames() {
     return this.equalExcludeFieldNames;
   }
@@ -50,7 +46,7 @@ public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {
     final String fieldName = PseudoNodeProperty.PROPERTY_NAME;
     if (!node.hasProperty(fieldName)) {
       final ObjectPropertyProxy<PseudoNodeAttribute, Node<Record>> proxy = new FunctionObjectPropertyProxy<>(
-        this::createProperty);
+        this::newProperty);
       node.setProperty(fieldName, proxy);
     }
     final PseudoNodeAttribute value = node.getProperty(fieldName);
@@ -60,6 +56,10 @@ public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {
   @Override
   public String getPropertyName() {
     return PROPERTY_NAME;
+  }
+
+  public PseudoNodeAttribute newProperty(final Node<Record> node) {
+    return new PseudoNodeAttribute(node, getTypePath(), this.equalExcludeFieldNames);
   }
 
   public void setEqualExcludeFieldNames(final Collection<String> equalExcludeFieldNames) {

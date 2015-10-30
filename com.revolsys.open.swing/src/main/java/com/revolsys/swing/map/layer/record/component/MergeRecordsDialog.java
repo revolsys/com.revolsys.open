@@ -130,10 +130,10 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
     final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     add(buttonsPanel, BorderLayout.SOUTH);
 
-    final JButton cancelButton = RunnableAction.createButton("Cancel", this::cancel);
+    final JButton cancelButton = RunnableAction.newButton("Cancel", this::cancel);
     buttonsPanel.add(cancelButton);
 
-    this.okButton = RunnableAction.createButton("OK", this::finish);
+    this.okButton = RunnableAction.newButton("OK", this::finish);
     this.okButton.setEnabled(false);
     buttonsPanel.add(this.okButton);
 
@@ -222,7 +222,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
     this.okButton.setEnabled(true);
 
-    final TablePanel tablePanel = MergedRecordsTableModel.createPanel(this.layer, mergedObject,
+    final TablePanel tablePanel = MergedRecordsTableModel.newPanel(this.layer, mergedObject,
       objects);
 
     final JPanel panel = Panels
@@ -255,7 +255,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
           records.add(originalRecord);
         }
       }
-      final TablePanel tablePanel = RecordListTableModel.createPanel(this.layer, records);
+      final TablePanel tablePanel = RecordListTableModel.newPanel(this.layer, records);
       final RecordListTableModel tableModel = tablePanel.getTableModel();
       tableModel.setEditable(false);
       tablePanel.setPreferredSize(new Dimension(100, 50 + unMergeableRecords.size() * 22));

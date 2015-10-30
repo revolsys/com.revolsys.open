@@ -24,7 +24,7 @@ public class JsonRecordIterator extends AbstractIterator<Record>implements Recor
   private RecordDefinition recordDefinition;
 
   public JsonRecordIterator(final RecordDefinition recordDefinition, final InputStream in) {
-    this(recordDefinition, FileUtil.createUtf8Reader(in));
+    this(recordDefinition, FileUtil.newUtf8Reader(in));
   }
 
   public JsonRecordIterator(final RecordDefinition recordDefinition, final Reader in) {

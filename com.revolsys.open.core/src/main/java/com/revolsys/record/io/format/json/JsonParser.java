@@ -177,7 +177,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
 
   @SuppressWarnings("unchecked")
   public static <V> V read(final InputStream in) {
-    return (V)read(FileUtil.createUtf8Reader(in));
+    return (V)read(FileUtil.newUtf8Reader(in));
   }
 
   @SuppressWarnings("unchecked")
@@ -307,7 +307,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
   private final Reader reader;
 
   public JsonParser(final InputStream in) {
-    this(FileUtil.createUtf8Reader(in));
+    this(FileUtil.newUtf8Reader(in));
   }
 
   public JsonParser(final Reader reader) {

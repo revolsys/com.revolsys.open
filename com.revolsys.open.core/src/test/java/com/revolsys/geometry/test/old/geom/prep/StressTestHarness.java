@@ -56,55 +56,55 @@ public abstract class StressTestHarness {
 
   public abstract boolean checkResult(Geometry target, Geometry test);
 
-  Geometry createCircle(final Point origin, final double size, final int nPts) {
+  Geometry newCircle(final Point origin, final double size, final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(origin);
     gsf.setSize(size);
     gsf.setNumPoints(nPts);
-    final Geometry circle = gsf.createCircle();
+    final Geometry circle = gsf.newCircle();
     // Polygon gRect = gsf.createRectangle();
     // Geometry g = gRect.getExteriorRing();
     return circle;
   }
 
-  Geometry createRandomTestGeometry(final BoundingBox env, final double size, final int nPts) {
+  Geometry newRandomTestGeometry(final BoundingBox env, final double size, final int nPts) {
     final double width = env.getWidth();
     final double xOffset = width * Math.random();
     final double yOffset = env.getHeight() * Math.random();
     final Point basePt = new PointDouble(env.getMinX() + xOffset, env.getMinY() + yOffset,
-      Point.NULL_ORDINATE);
-    Geometry test = createTestCircle(basePt, size, nPts);
+      Geometry.NULL_ORDINATE);
+    Geometry test = newTestCircle(basePt, size, nPts);
     if (test instanceof Polygon && Math.random() > 0.5) {
       test = test.getBoundary();
     }
     return test;
   }
 
-  Geometry createSineStar(final Point origin, final double size, final int nPts) {
+  Geometry newSineStar(final Point origin, final double size, final int nPts) {
     final SineStarFactory gsf = new SineStarFactory();
     gsf.setCentre(origin);
     gsf.setSize(size);
     gsf.setNumPoints(nPts);
     gsf.setArmLengthRatio(0.1);
     gsf.setNumArms(20);
-    final Geometry poly = gsf.createSineStar();
+    final Geometry poly = gsf.newSineStar();
     return poly;
   }
 
-  Geometry createTestCircle(final Point base, final double size, final int nPts) {
+  Geometry newTestCircle(final Point base, final double size, final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(base);
     gsf.setSize(size);
     gsf.setNumPoints(nPts);
-    final Geometry circle = gsf.createCircle();
+    final Geometry circle = gsf.newCircle();
     // System.out.println(circle);
     return circle;
   }
 
   public void run(final int nIter) {
     // System.out.println("Running " + nIter + " tests");
-    // Geometry poly = createCircle(new PointDouble((double)0, 0), 100, nPts);
-    final Geometry poly = createSineStar(new PointDouble((double)0, 0, Point.NULL_ORDINATE), 100,
+    // Geometry poly = newCircle(new PointDouble((double)0, 0), 100, nPts);
+    final Geometry poly = newSineStar(new PointDouble((double)0, 0, Geometry.NULL_ORDINATE), 100,
       this.numTargetPts);
       // System.out.println(poly);
 
@@ -117,7 +117,7 @@ public abstract class StressTestHarness {
     int count = 0;
     while (count < nIter) {
       count++;
-      final Geometry test = createRandomTestGeometry(target.getBoundingBox(), 10, 20);
+      final Geometry test = newRandomTestGeometry(target.getBoundingBox(), 10, 20);
 
       // System.out.println("Test # " + count);
       // System.out.println(line);

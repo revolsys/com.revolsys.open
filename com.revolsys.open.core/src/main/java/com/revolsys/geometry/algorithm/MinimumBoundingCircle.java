@@ -182,7 +182,7 @@ public class MinimumBoundingCircle {
       case 2:
         this.centre = new PointDouble(
           (this.extremalPts[0].getX() + this.extremalPts[1].getX()) / 2.0,
-          (this.extremalPts[0].getY() + this.extremalPts[1].getY()) / 2.0, Point.NULL_ORDINATE);
+          (this.extremalPts[0].getY() + this.extremalPts[1].getY()) / 2.0, Geometry.NULL_ORDINATE);
       break;
       case 3:
         this.centre = Triangles.circumcentre(this.extremalPts[0], this.extremalPts[1],

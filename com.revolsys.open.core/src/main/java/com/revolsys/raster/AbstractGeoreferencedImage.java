@@ -362,7 +362,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
         final Map<String, Object> settings = Json.toMap(settingsFile);
         final String boundingBoxWkt = (String)settings.get("boundingBox");
         if (Property.hasValue(boundingBoxWkt)) {
-          final BoundingBox boundingBox = BoundingBoxDoubleGf.create(boundingBoxWkt);
+          final BoundingBox boundingBox = BoundingBoxDoubleGf.newBoundingBox(boundingBoxWkt);
           if (!boundingBox.isEmpty()) {
             setBoundingBox(boundingBox);
           }

@@ -1,4 +1,4 @@
-package com.revolsys.gis.oracle.io;
+package com.revolsys.oracle.recordstore;
 
 import java.io.PrintWriter;
 import java.util.List;
@@ -12,6 +12,7 @@ import com.revolsys.identifier.Identifier;
 import com.revolsys.io.Path;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.JdbcDdlWriter;
+import com.revolsys.oracle.recordstore.field.OracleSdoGeometryFieldAdder;
 import com.revolsys.record.Record;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.property.ShortNameProperty;

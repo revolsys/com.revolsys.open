@@ -90,7 +90,7 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
   @SuppressWarnings("rawtypes")
   @Override
   public Enumeration children() {
-    return IteratorEnumeration.create(getChildren());
+    return IteratorEnumeration.newEnumeration(getChildren());
   }
 
   public void collapse() {

@@ -81,7 +81,7 @@ public class SpringUtil {
       if (resource.exists()) {
         final String baseName = resource.getBaseName();
         final String fileNameExtension = resource.getFileNameExtension();
-        final File file = FileUtil.createTempFile(baseName, fileNameExtension);
+        final File file = FileUtil.newTempFile(baseName, fileNameExtension);
         FileUtil.copy(resource.getInputStream(), file);
         return file;
       } else {

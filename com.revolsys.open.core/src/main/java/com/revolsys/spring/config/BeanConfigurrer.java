@@ -39,7 +39,7 @@ public class BeanConfigurrer
 
   protected static final Logger LOG = LoggerFactory.getLogger(BeanConfigurrer.class);
 
-  public static void createParameterBeanDefinition(final ConfigurableListableBeanFactory factory,
+  public static void newParameterBeanDefinition(final ConfigurableListableBeanFactory factory,
     final String beanName, final Object value) {
     final GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
     beanDefinition.setBeanClass(Parameter.class);
@@ -191,7 +191,7 @@ public class BeanConfigurrer
                 LOG.error("Unable to set " + beanName + ".value=" + value, e);
               }
             } else if (value != null) {
-              createParameterBeanDefinition(factory, beanName, value);
+              newParameterBeanDefinition(factory, beanName, value);
             }
           } else {
             setAttributeValue(factory, beanName, propertyName, value);

@@ -166,7 +166,7 @@ public interface RecordStore
   }
 
   default Record getRecord(final PathName typePath, final Object... id) {
-    final Identifier identifier = Identifier.create(id);
+    final Identifier identifier = Identifier.newIdentifier(id);
     return getRecord(typePath, identifier);
   }
 

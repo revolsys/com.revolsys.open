@@ -138,7 +138,7 @@ public final class PhoneNumber {
         }
         Expression expression;
         try {
-          expression = JexlUtil.createExpression(format);
+          expression = JexlUtil.newExpression(format);
         } catch (final Exception e) {
           throw new IllegalArgumentException(
             regex + " is not a valid regular expression: " + e.getMessage());

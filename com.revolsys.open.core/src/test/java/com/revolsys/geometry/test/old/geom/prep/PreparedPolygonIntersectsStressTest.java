@@ -70,51 +70,51 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
     super(name);
   }
 
-  Geometry createCircle(final Point origin, final double size, final int nPts) {
+  Geometry newCircle(final Point origin, final double size, final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(origin);
     gsf.setSize(size);
     gsf.setNumPoints(nPts);
-    final Geometry circle = gsf.createCircle();
+    final Geometry circle = gsf.newCircle();
     // Polygon gRect = gsf.createRectangle();
     // Geometry g = gRect.getExteriorRing();
     return circle;
   }
 
-  Geometry createSineStar(final Point origin, final double size, final int nPts) {
+  Geometry newSineStar(final Point origin, final double size, final int nPts) {
     final SineStarFactory gsf = new SineStarFactory();
     gsf.setCentre(origin);
     gsf.setSize(size);
     gsf.setNumPoints(nPts);
     gsf.setArmLengthRatio(0.1);
     gsf.setNumArms(20);
-    final Geometry poly = gsf.createSineStar();
+    final Geometry poly = gsf.newSineStar();
     return poly;
   }
 
-  LineString createTestLine(final BoundingBox env, final double size, final int nPts) {
+  LineString newTestLine(final BoundingBox env, final double size, final int nPts) {
     final double width = env.getWidth();
     final double xOffset = width * Math.random();
     final double yOffset = env.getHeight() * Math.random();
     final Point basePt = new PointDouble(env.getMinX() + xOffset, env.getMinY() + yOffset,
-      Point.NULL_ORDINATE);
-    final LineString line = createTestLine(basePt, size, nPts);
+      Geometry.NULL_ORDINATE);
+    final LineString line = newTestLine(basePt, size, nPts);
     return line;
   }
 
-  LineString createTestLine(final Point base, final double size, final int nPts) {
+  LineString newTestLine(final Point base, final double size, final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(base);
     gsf.setSize(size);
     gsf.setNumPoints(nPts);
-    final Geometry circle = gsf.createCircle();
+    final Geometry circle = gsf.newCircle();
     // System.out.println(circle);
     return (LineString)circle.getBoundary();
   }
 
   public void run(final int nPts) {
-    // Geometry poly = createCircle(new PointDouble((double)0, 0), 100, nPts);
-    final Geometry poly = createSineStar(new PointDouble((double)0, 0, Point.NULL_ORDINATE), 100,
+    // Geometry poly = newCircle(new PointDouble((double)0, 0), 100, nPts);
+    final Geometry poly = newSineStar(new PointDouble((double)0, 0, Geometry.NULL_ORDINATE), 100,
       nPts);
     // System.out.println(poly);
     //
@@ -131,7 +131,7 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
     int count = 0;
     while (count < MAX_ITER) {
       count++;
-      final LineString line = createTestLine(g.getBoundingBox(), 10, 20);
+      final LineString line = newTestLine(g.getBoundingBox(), 10, 20);
 
       // System.out.println("Test # " + count);
       // System.out.println(line);

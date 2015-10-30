@@ -6,7 +6,7 @@ import com.revolsys.util.Property;
 
 public class ProjectTreeNode extends LayerGroupTreeNode {
 
-  public static BaseTree createTree(final Project project) {
+  public static BaseTree newTree(final Project project) {
     final ProjectTreeNode root = new ProjectTreeNode(project);
 
     final BaseTree tree = new BaseTree(root);

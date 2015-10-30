@@ -157,52 +157,11 @@ public abstract class AbstractSTRtree implements Emptyable, Serializable {
     if (this.built) {
       return;
     }
-    this.root = this.itemBoundables.isEmpty() ? createNode(0)
-      : createHigherLevels(this.itemBoundables, -1);
+    this.root = this.itemBoundables.isEmpty() ? newNode(0)
+      : newNodeHigherLevels(this.itemBoundables, -1);
     // the item list is no longer needed
     this.itemBoundables = null;
     this.built = true;
-  }
-
-  /**
-   * Creates the levels higher than the given level
-   *
-   * @param boundablesOfALevel
-   *            the level to build on
-   * @param level
-   *            the level of the Boundables, or -1 if the boundables are item
-   *            boundables (that is, below level 0)
-   * @return the root, which may be a ParentNode or a LeafNode
-   */
-  private AbstractNode createHigherLevels(final List boundablesOfALevel, final int level) {
-    Assert.isTrue(!boundablesOfALevel.isEmpty());
-    final List parentBoundables = createParentBoundables(boundablesOfALevel, level + 1);
-    if (parentBoundables.size() == 1) {
-      return (AbstractNode)parentBoundables.get(0);
-    }
-    return createHigherLevels(parentBoundables, level + 1);
-  }
-
-  protected abstract AbstractNode createNode(int level);
-
-  /**
-   * Sorts the childBoundables then divides them into groups of size M, where
-   * M is the node capacity.
-   */
-  protected List createParentBoundables(final List childBoundables, final int newLevel) {
-    Assert.isTrue(!childBoundables.isEmpty());
-    final ArrayList parentBoundables = new ArrayList();
-    parentBoundables.add(createNode(newLevel));
-    final ArrayList sortedChildBoundables = new ArrayList(childBoundables);
-    Collections.sort(sortedChildBoundables, getComparator());
-    for (final Iterator i = sortedChildBoundables.iterator(); i.hasNext();) {
-      final Boundable childBoundable = (Boundable)i.next();
-      if (lastNode(parentBoundables).getChildBoundables().size() == getNodeCapacity()) {
-        parentBoundables.add(createNode(newLevel));
-      }
-      lastNode(parentBoundables).addChildBoundable(childBoundable);
-    }
-    return parentBoundables;
   }
 
   protected int depth() {
@@ -315,6 +274,47 @@ public abstract class AbstractSTRtree implements Emptyable, Serializable {
 
   protected AbstractNode lastNode(final List nodes) {
     return (AbstractNode)nodes.get(nodes.size() - 1);
+  }
+
+  protected abstract AbstractNode newNode(int level);
+
+  /**
+   * Creates the levels higher than the given level
+   *
+   * @param boundablesOfALevel
+   *            the level to build on
+   * @param level
+   *            the level of the Boundables, or -1 if the boundables are item
+   *            boundables (that is, below level 0)
+   * @return the root, which may be a ParentNode or a LeafNode
+   */
+  private AbstractNode newNodeHigherLevels(final List boundablesOfALevel, final int level) {
+    Assert.isTrue(!boundablesOfALevel.isEmpty());
+    final List parentBoundables = newParentBoundables(boundablesOfALevel, level + 1);
+    if (parentBoundables.size() == 1) {
+      return (AbstractNode)parentBoundables.get(0);
+    }
+    return newNodeHigherLevels(parentBoundables, level + 1);
+  }
+
+  /**
+   * Sorts the childBoundables then divides them into groups of size M, where
+   * M is the node capacity.
+   */
+  protected List newParentBoundables(final List childBoundables, final int newLevel) {
+    Assert.isTrue(!childBoundables.isEmpty());
+    final ArrayList parentBoundables = new ArrayList();
+    parentBoundables.add(newNode(newLevel));
+    final ArrayList sortedChildBoundables = new ArrayList(childBoundables);
+    Collections.sort(sortedChildBoundables, getComparator());
+    for (final Iterator i = sortedChildBoundables.iterator(); i.hasNext();) {
+      final Boundable childBoundable = (Boundable)i.next();
+      if (lastNode(parentBoundables).getChildBoundables().size() == getNodeCapacity()) {
+        parentBoundables.add(newNode(newLevel));
+      }
+      lastNode(parentBoundables).addChildBoundable(childBoundable);
+    }
+    return parentBoundables;
   }
 
   /**

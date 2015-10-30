@@ -397,21 +397,6 @@ public class OgrRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public RecordDefinition getRecordDefinition(final RecordDefinition sourceRecordDefinition) {
-    final DataSource dataSource = getDataSource();
-    synchronized (dataSource) {
-      if (getGeometryFactory() == null) {
-        setGeometryFactory(sourceRecordDefinition.getGeometryFactory());
-      }
-      RecordDefinition recordDefinition = super.getRecordDefinition(sourceRecordDefinition);
-      if (this.createMissingTables && recordDefinition == null) {
-        recordDefinition = newLayerRecordDefinition(dataSource, sourceRecordDefinition);
-      }
-      return recordDefinition;
-    }
-  }
-
-  @Override
   public int getRecordCount(final Query query) {
     if (query == null) {
       return 0;
@@ -459,6 +444,21 @@ public class OgrRecordStore extends AbstractRecordStore {
       }
     }
     return 0;
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition(final RecordDefinition sourceRecordDefinition) {
+    final DataSource dataSource = getDataSource();
+    synchronized (dataSource) {
+      if (getGeometryFactory() == null) {
+        setGeometryFactory(sourceRecordDefinition.getGeometryFactory());
+      }
+      RecordDefinition recordDefinition = super.getRecordDefinition(sourceRecordDefinition);
+      if (this.createMissingTables && recordDefinition == null) {
+        recordDefinition = newLayerRecordDefinition(dataSource, sourceRecordDefinition);
+      }
+      return recordDefinition;
+    }
   }
 
   protected String getSql(final Query query) {

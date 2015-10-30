@@ -34,11 +34,11 @@ public class CascadedPolygonUnionTest extends TestCase {
     super(name);
   }
 
-  private Collection createDiscs(final int num, final double radius) {
+  private Collection newDiscs(final int num, final double radius) {
     final List geoms = new ArrayList();
     for (int i = 0; i < num; i++) {
       for (int j = 0; j < num; j++) {
-        final Point pt = new PointDouble((double)i, j, Point.NULL_ORDINATE);
+        final Point pt = new PointDouble((double)i, j, Geometry.NULL_ORDINATE);
         final Geometry ptGeom = this.geomFact.point(pt);
         final Geometry disc = ptGeom.buffer(radius);
         geoms.add(disc);
@@ -62,7 +62,7 @@ public class CascadedPolygonUnionTest extends TestCase {
   }
 
   public void testDiscs1() throws Exception {
-    final Collection geoms = createDiscs(5, 0.7);
+    final Collection geoms = newDiscs(5, 0.7);
 
     // System.out.println(this.geomFact.buildGeometry(geoms));
 
@@ -70,7 +70,7 @@ public class CascadedPolygonUnionTest extends TestCase {
   }
 
   public void testDiscs2() throws Exception {
-    final Collection geoms = createDiscs(5, 0.55);
+    final Collection geoms = newDiscs(5, 0.55);
 
     // System.out.println(this.geomFact.buildGeometry(geoms));
 

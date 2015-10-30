@@ -155,17 +155,17 @@ public class Graph<T> implements GeometryFactoryProxy {
   protected Edge<T> addEdge(final T object, final LineString line, final Point from,
     final Point to) {
     if (this.inMemory && getEdgeCount() >= this.maxEdgesInMemory) {
-      this.edgePropertiesById = BPlusTreeMap.createIntSeralizableTempDisk(this.edgePropertiesById);
+      this.edgePropertiesById = BPlusTreeMap.newIntSeralizableTempDisk(this.edgePropertiesById);
       // TODO edgIds
       // TODO edgeIndex
-      this.edgeLinesById = BPlusTreeMap.createIntSeralizableTempDisk(this.edgeLinesById);
-      this.edgeObjectsById = BPlusTreeMap.createIntSeralizableTempDisk(this.edgeObjectsById);
-      this.edgesById = BPlusTreeMap.createIntSeralizableTempDisk(this.edgesById);
+      this.edgeLinesById = BPlusTreeMap.newIntSeralizableTempDisk(this.edgeLinesById);
+      this.edgeObjectsById = BPlusTreeMap.newIntSeralizableTempDisk(this.edgeObjectsById);
+      this.edgesById = BPlusTreeMap.newIntSeralizableTempDisk(this.edgesById);
 
       // TODO nodeIndex
-      this.nodePropertiesById = BPlusTreeMap.createIntSeralizableTempDisk(this.nodePropertiesById);
-      this.nodesById = BPlusTreeMap.createIntSeralizableTempDisk(this.nodesById);
-      this.nodesIdsByCoordinates = BPlusTreeMap.createTempDisk(this.nodesIdsByCoordinates,
+      this.nodePropertiesById = BPlusTreeMap.newIntSeralizableTempDisk(this.nodePropertiesById);
+      this.nodesById = BPlusTreeMap.newIntSeralizableTempDisk(this.nodesById);
+      this.nodesIdsByCoordinates = BPlusTreeMap.newTempDisk(this.nodesIdsByCoordinates,
         new SerializablePageValueManager<Point>(), PageValueManager.INT);
       this.inMemory = false;
     }
@@ -236,14 +236,6 @@ public class Graph<T> implements GeometryFactoryProxy {
       return this.edgesById.containsKey(id);
     }
     return false;
-  }
-
-  public Edge<T> createEdge(final GeometryFactory geometryFactory, final T object,
-    final LineString points) {
-    final LineString newLine = geometryFactory.lineString(points);
-    final T newObject = clone(object, newLine);
-    final Edge<T> newEdge = addEdge(newObject, newLine);
-    return newEdge;
   }
 
   public void deleteEdges(final Predicate<Edge<T>> filter) {
@@ -1033,6 +1025,14 @@ public class Graph<T> implements GeometryFactoryProxy {
     }
   }
 
+  public Edge<T> newEdge(final GeometryFactory geometryFactory, final T object,
+    final LineString points) {
+    final LineString newLine = geometryFactory.lineString(points);
+    final T newObject = clone(object, newLine);
+    final Edge<T> newEdge = addEdge(newObject, newLine);
+    return newEdge;
+  }
+
   public void nodeMoved(final Node<T> node, final Node<T> newNode) {
   }
 
@@ -1292,7 +1292,7 @@ public class Graph<T> implements GeometryFactoryProxy {
         if (newLines.size() > 1) {
           final List<Edge<T>> newEdges = new ArrayList<Edge<T>>();
           for (final LineString edgePoints : newLines) {
-            final Edge<T> newEdge = createEdge(geometryFactory, object, edgePoints);
+            final Edge<T> newEdge = newEdge(geometryFactory, object, edgePoints);
             newEdges.add(newEdge);
           }
           edge.remove();

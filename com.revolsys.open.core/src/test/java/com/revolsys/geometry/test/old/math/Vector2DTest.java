@@ -27,22 +27,22 @@ public class Vector2DTest extends TestCase {
   }
 
   public void testIsParallel() throws Exception {
-    assertTrue(Vector2D.create(0, 1).isParallel(Vector2D.create(0, 2)));
-    assertTrue(Vector2D.create(1, 1).isParallel(Vector2D.create(2, 2)));
-    assertTrue(Vector2D.create(-1, -1).isParallel(Vector2D.create(2, 2)));
+    assertTrue(Vector2D.newVector(0, 1).isParallel(Vector2D.newVector(0, 2)));
+    assertTrue(Vector2D.newVector(1, 1).isParallel(Vector2D.newVector(2, 2)));
+    assertTrue(Vector2D.newVector(-1, -1).isParallel(Vector2D.newVector(2, 2)));
 
-    assertTrue(!Vector2D.create(1, -1).isParallel(Vector2D.create(2, 2)));
+    assertTrue(!Vector2D.newVector(1, -1).isParallel(Vector2D.newVector(2, 2)));
   }
 
   public void testLength() {
-    assertEquals(Vector2D.create(0, 1).length(), 1.0, TOLERANCE);
-    assertEquals(Vector2D.create(0, -1).length(), 1.0, TOLERANCE);
-    assertEquals(Vector2D.create(1, 1).length(), Math.sqrt(2.0), TOLERANCE);
-    assertEquals(Vector2D.create(3, 4).length(), 5, TOLERANCE);
+    assertEquals(Vector2D.newVector(0, 1).length(), 1.0, TOLERANCE);
+    assertEquals(Vector2D.newVector(0, -1).length(), 1.0, TOLERANCE);
+    assertEquals(Vector2D.newVector(1, 1).length(), Math.sqrt(2.0), TOLERANCE);
+    assertEquals(Vector2D.newVector(3, 4).length(), 5, TOLERANCE);
   }
 
   public void testToCoordinate() {
-    assertEquals(Vector2D.create(Vector2D.create(1, 2).toCoordinate()), Vector2D.create(1, 2),
-      TOLERANCE);
+    assertEquals(Vector2D.newVector(Vector2D.newVector(1, 2).toCoordinate()),
+      Vector2D.newVector(1, 2), TOLERANCE);
   }
 }

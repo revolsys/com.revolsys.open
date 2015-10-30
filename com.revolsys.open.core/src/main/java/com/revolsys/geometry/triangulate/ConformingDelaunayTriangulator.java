@@ -169,34 +169,6 @@ public class ConformingDelaunayTriangulator {
     this.convexHull = hull.getConvexHull();
   }
 
-  private ConstraintVertex createVertex(final Point p) {
-    ConstraintVertex v = null;
-    if (this.vertexFactory != null) {
-      v = this.vertexFactory.createVertex(p, null);
-    } else {
-      v = new ConstraintVertex(p);
-    }
-    return v;
-  }
-
-  /**
-   * Creates a vertex on a constraint segment
-   *
-   * @param p the location of the vertex to create
-   * @param seg the constraint segment it lies on
-   * @return the new constraint vertex
-   */
-  private ConstraintVertex createVertex(final Point p, final Segment seg) {
-    ConstraintVertex v = null;
-    if (this.vertexFactory != null) {
-      v = this.vertexFactory.createVertex(p, seg);
-    } else {
-      v = new ConstraintVertex(p);
-    }
-    v.setOnConstraint(true);
-    return v;
-  }
-
   /**
    * Enforces the supplied constraints into the triangulation.
    *
@@ -244,7 +216,7 @@ public class ConformingDelaunayTriangulator {
 
       // compute split point
       this.splitPt = this.splitFinder.findSplitPoint(seg, encroachPt);
-      final ConstraintVertex splitVertex = createVertex(this.splitPt, seg);
+      final ConstraintVertex splitVertex = newVertex(this.splitPt, seg);
 
       // DebugFeature.addLineSegment(DEBUG_SEG_SPLIT, encroachPt, splitPt, "");
       // Debug.println(WKTWriter.toLineString(encroachPt, splitPt));
@@ -309,7 +281,7 @@ public class ConformingDelaunayTriangulator {
     final Point q = seg.getEnd();
     // Find the mid point on the line and compute the radius of enclosing circle
     final Point midPt = new PointDouble((p.getX() + q.getX()) / 2.0, (p.getY() + q.getY()) / 2.0,
-      Point.NULL_ORDINATE);
+      Geometry.NULL_ORDINATE);
     final double segRadius = p.distance(midPt);
 
     // compute envelope of circumcircle
@@ -353,8 +325,6 @@ public class ConformingDelaunayTriangulator {
     insertSites(this.initialVertices);
   }
 
-  // ==================================================================
-
   /**
    * Gets the {@link Segment}s which represent the constraints.
    *
@@ -373,6 +343,26 @@ public class ConformingDelaunayTriangulator {
    */
   public Geometry getConvexHull() {
     return this.convexHull;
+  }
+
+  // ==================================================================
+
+  /**
+   * Gets the sites (vertices) used to initialize the triangulation.
+   *
+   * @return a List of Vertex
+   */
+  public List getInitialVertices() {
+    return this.initialVertices;
+  }
+
+  /**
+   * Gets the {@link KdTree} which contains the vertices of the triangulation.
+   *
+   * @return a KdTree
+   */
+  public KdTree getKDT() {
+    return this.kdt;
   }
 
   // /**
@@ -408,24 +398,6 @@ public class ConformingDelaunayTriangulator {
   // segments.add((Object) r);
   // }
   // }
-
-  /**
-   * Gets the sites (vertices) used to initialize the triangulation.
-   *
-   * @return a List of Vertex
-   */
-  public List getInitialVertices() {
-    return this.initialVertices;
-  }
-
-  /**
-   * Gets the {@link KdTree} which contains the vertices of the triangulation.
-   *
-   * @return a KdTree
-   */
-  public KdTree getKDT() {
-    return this.kdt;
-  }
 
   private Point[] getPointArray() {
     final Point[] pts = new Point[this.initialVertices.size() + this.segVertices.size()];
@@ -468,8 +440,6 @@ public class ConformingDelaunayTriangulator {
     return this.vertexFactory;
   }
 
-  // ==================================================================
-
   private ConstraintVertex insertSite(final ConstraintVertex v) {
     final KdNode kdnode = this.kdt.insert(v.getCoordinate(), v);
     if (!kdnode.isRepeated()) {
@@ -486,8 +456,6 @@ public class ConformingDelaunayTriangulator {
     return v;
   }
 
-  // ==================================================================
-
   /**
    * Inserts a site into the triangulation, maintaining the conformal Delaunay property.
    * This can be used to further refine the triangulation if required
@@ -497,8 +465,10 @@ public class ConformingDelaunayTriangulator {
    * @param p the location of the site to insert
    */
   public void insertSite(final Point p) {
-    insertSite(createVertex(p));
+    insertSite(newVertex(p));
   }
+
+  // ==================================================================
 
   /**
    * Inserts all sites in a collection
@@ -510,6 +480,36 @@ public class ConformingDelaunayTriangulator {
       final ConstraintVertex v = (ConstraintVertex)i.next();
       insertSite(v);
     }
+  }
+
+  // ==================================================================
+
+  private ConstraintVertex newVertex(final Point p) {
+    ConstraintVertex v = null;
+    if (this.vertexFactory != null) {
+      v = this.vertexFactory.newVertex(p, null);
+    } else {
+      v = new ConstraintVertex(p);
+    }
+    return v;
+  }
+
+  /**
+   * Creates a vertex on a constraint segment
+   *
+   * @param p the location of the vertex to create
+   * @param seg the constraint segment it lies on
+   * @return the new constraint vertex
+   */
+  private ConstraintVertex newVertex(final Point p, final Segment seg) {
+    ConstraintVertex v = null;
+    if (this.vertexFactory != null) {
+      v = this.vertexFactory.newVertex(p, seg);
+    } else {
+      v = new ConstraintVertex(p);
+    }
+    v.setOnConstraint(true);
+    return v;
   }
 
   /**

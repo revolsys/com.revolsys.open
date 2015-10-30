@@ -229,7 +229,7 @@ public class QuadEdgeSubdivision {
     this.tolerance = tolerance;
     this.edgeCoincidenceTolerance = tolerance / EDGE_COINCIDENCE_TOL_FACTOR;
 
-    createFrame(env);
+    newFrame(env);
 
     this.startingEdge = initSubdiv();
     this.locator = new LastFoundQuadEdgeLocator(this);
@@ -248,24 +248,6 @@ public class QuadEdgeSubdivision {
     final QuadEdge q = QuadEdge.connect(a, b);
     this.quadEdges.add(q);
     return q;
-  }
-
-  private void createFrame(final BoundingBox env) {
-    final double deltaX = env.getWidth();
-    final double deltaY = env.getHeight();
-    double offset = 0.0;
-    if (deltaX > deltaY) {
-      offset = deltaX * 10.0;
-    } else {
-      offset = deltaY * 10.0;
-    }
-
-    this.frameVertex[0] = new Vertex((env.getMaxX() + env.getMinX()) / 2.0, env.getMaxY() + offset);
-    this.frameVertex[1] = new Vertex(env.getMinX() - offset, env.getMinY() - offset);
-    this.frameVertex[2] = new Vertex(env.getMaxX() + offset, env.getMinY() - offset);
-
-    this.frameEnv = new BoundingBoxDoubleGf(this.frameVertex[0].getCoordinate(),
-      this.frameVertex[1].getCoordinate(), this.frameVertex[2].getCoordinate());
   }
 
   /**
@@ -926,6 +908,24 @@ public class QuadEdgeSubdivision {
     final QuadEdge q = QuadEdge.makeEdge(o, d);
     this.quadEdges.add(q);
     return q;
+  }
+
+  private void newFrame(final BoundingBox env) {
+    final double deltaX = env.getWidth();
+    final double deltaY = env.getHeight();
+    double offset = 0.0;
+    if (deltaX > deltaY) {
+      offset = deltaX * 10.0;
+    } else {
+      offset = deltaY * 10.0;
+    }
+
+    this.frameVertex[0] = new Vertex((env.getMaxX() + env.getMinX()) / 2.0, env.getMaxY() + offset);
+    this.frameVertex[1] = new Vertex(env.getMinX() - offset, env.getMinY() - offset);
+    this.frameVertex[2] = new Vertex(env.getMaxX() + offset, env.getMinY() - offset);
+
+    this.frameEnv = new BoundingBoxDoubleGf(this.frameVertex[0].getCoordinate(),
+      this.frameVertex[1].getCoordinate(), this.frameVertex[2].getCoordinate());
   }
 
   /**

@@ -19,16 +19,6 @@ import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
 
 public interface Paths {
-  static void createDirectories(final Path path) {
-    if (!Paths.exists(path)) {
-      try {
-        Files.createDirectories(path);
-      } catch (final IOException e) {
-        throw new WrappedException(e);
-      }
-    }
-  }
-
   static boolean deleteDirectories(final Path path) {
     if (Paths.exists(path)) {
       try {
@@ -84,7 +74,7 @@ public interface Paths {
   }
 
   static Path getDirectoryPath(final Path path) {
-    createDirectories(path);
+    newDirectories(path);
     return getPath(path);
   }
 
@@ -160,6 +150,16 @@ public interface Paths {
       return false;
     }
     return false;
+  }
+
+  static void newDirectories(final Path path) {
+    if (!Paths.exists(path)) {
+      try {
+        Files.createDirectories(path);
+      } catch (final IOException e) {
+        throw new WrappedException(e);
+      }
+    }
   }
 
   static Writer newWriter(final Path path) {

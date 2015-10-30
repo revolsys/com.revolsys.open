@@ -178,7 +178,7 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
 
   public TablePanel newTablePanel() {
     final RecordLayerForm form = this.form.get();
-    final BaseJTable table = AbstractSingleRecordTableModel.createTable(this);
+    final BaseJTable table = AbstractSingleRecordTableModel.newTable(this);
 
     FormAllFieldsModifiedPredicate.add(form, table);
     FormAllFieldsErrorPredicate.add(form, table);

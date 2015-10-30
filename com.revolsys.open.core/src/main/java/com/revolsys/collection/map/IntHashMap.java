@@ -177,13 +177,6 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
 
     T value;
 
-    /**
-     * Create new entry.
-     *
-     * @param k
-     * @param v
-     * @param n
-     */
     IntEntry(final int k, final T v, final IntEntry<T> n) {
       this.value = v;
       this.next = n;
@@ -440,7 +433,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
   public IntHashMap() {
     this.loadFactor = DEFAULT_LOAD_FACTOR;
     this.threshold = (int)(DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
-    this.table = ArrayUtil.create(IntEntry.class, DEFAULT_INITIAL_CAPACITY);
+    this.table = ArrayUtil.newArray(IntEntry.class, DEFAULT_INITIAL_CAPACITY);
     init();
   }
 
@@ -486,7 +479,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
 
     this.loadFactor = loadFactor;
     this.threshold = (int)(capacity * loadFactor);
-    this.table = ArrayUtil.create(IntEntry.class, this.size);
+    this.table = ArrayUtil.newArray(IntEntry.class, this.size);
     init();
   }
 
@@ -537,7 +530,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
     IntHashMap<T> result = null;
     try {
       result = (IntHashMap<T>)super.clone();
-      result.table = ArrayUtil.create(IntEntry.class, this.table.length);
+      result.table = ArrayUtil.newArray(IntEntry.class, this.table.length);
       result.entrySet = null;
       result.modCount = 0;
       result.size = 0;
@@ -617,22 +610,6 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
       }
     }
     return false;
-  }
-
-  /**
-   * Like addEntry<T> except that this version is used when creating entries as
-   * part of Map construction or "pseudo-construction" (cloning,
-   * deserialization). This version needn't worry about resizing the table.
-   * Subclass overrides this to alter the behavior of HashMap(Map), clone, and
-   * readObject.
-   *
-   * @param key
-   * @param value
-   * @param bucketIndex
-   */
-  void createEntry(final int key, final T value, final int bucketIndex) {
-    this.table[bucketIndex] = new IntEntry<T>(key, value, this.table[bucketIndex]);
-    this.size++;
   }
 
   public Set<IntEntry<T>> entryIntSet() {
@@ -758,6 +735,22 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
     return this.loadFactor;
   }
 
+  /**
+   * Like addEntry<T> except that this version is used when creating entries as
+   * part of Map construction or "pseudo-construction" (cloning,
+   * deserialization). This version needn't worry about resizing the table.
+   * Subclass overrides this to alter the behavior of HashMap(Map), clone, and
+   * readObject.
+   *
+   * @param key
+   * @param value
+   * @param bucketIndex
+   */
+  void newEntry(final int key, final T value, final int bucketIndex) {
+    this.table[bucketIndex] = new IntEntry<T>(key, value, this.table[bucketIndex]);
+    this.size++;
+  }
+
   Iterator<IntEntry<T>> newEntryIterator() {
     return new EntryIterator();
   }
@@ -854,7 +847,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
   /**
    * This method is used instead of put by constructors and pseudoconstructors
    * (clone, readObject). It does not resize the table, check for
-   * comodification, etc. It calls createEntry<T> rather than addEntry.
+   * comodification, etc. It calls newEntry<T> rather than addEntry.
    *
    * @param key
    * @param value
@@ -874,7 +867,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
       }
     }
 
-    createEntry(key, value, i);
+    newEntry(key, value, i);
   }
 
   /**
@@ -920,7 +913,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
 
     // Read in number of buckets and allocate the bucket array;
     final int numBuckets = s.readInt();
-    this.table = ArrayUtil.create(IntEntry.class, numBuckets);
+    this.table = ArrayUtil.newArray(IntEntry.class, numBuckets);
 
     init(); // Give subclass a chance to do its thing.
 
@@ -1051,7 +1044,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    final IntEntry<T>[] newTable = ArrayUtil.create(IntEntry.class, newCapacity);
+    final IntEntry<T>[] newTable = ArrayUtil.newArray(IntEntry.class, newCapacity);
     transfer(newTable);
     this.table = newTable;
     this.threshold = (int)(newCapacity * this.loadFactor);

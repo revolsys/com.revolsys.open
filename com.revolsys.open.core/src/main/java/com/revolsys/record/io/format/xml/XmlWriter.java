@@ -179,7 +179,7 @@ public class XmlWriter extends Writer {
    *          should be ignored.
    */
   public XmlWriter(final OutputStream out, final boolean useNamespaces) {
-    this(FileUtil.createUtf8Writer(out), useNamespaces);
+    this(FileUtil.newUtf8Writer(out), useNamespaces);
   }
 
   /**

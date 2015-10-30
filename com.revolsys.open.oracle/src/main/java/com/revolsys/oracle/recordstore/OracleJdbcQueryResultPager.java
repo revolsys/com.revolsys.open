@@ -1,4 +1,4 @@
-package com.revolsys.gis.oracle.io;
+package com.revolsys.oracle.recordstore;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

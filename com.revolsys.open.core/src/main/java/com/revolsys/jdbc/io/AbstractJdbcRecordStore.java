@@ -60,6 +60,7 @@ import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
+import com.revolsys.util.Property;
 
 public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   implements JdbcRecordStore, RecordStoreExtension {
@@ -176,6 +177,20 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     this.fieldDefinitionAdders.put(sqlTypeName, adder);
   }
 
+  /**
+   * Add a new field definition for record definitions that don't have a primary key.
+   *
+   * @param recordDefinition
+   */
+  protected void addRowIdFieldDefinition(final RecordDefinitionImpl recordDefinition) {
+    final JdbcFieldDefinition idFieldDefinition = newRowIdFieldDefinition();
+    if (idFieldDefinition != null) {
+      recordDefinition.addField(idFieldDefinition);
+      final String idFieldName = idFieldDefinition.getName();
+      recordDefinition.setIdFieldName(idFieldName);
+    }
+  }
+
   @Override
   @PreDestroy
   public synchronized void close() {
@@ -198,12 +213,6 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
       this.sqlSuffix = null;
       this.tableNameMap.clear();
     }
-  }
-
-  protected RecordStoreQueryReader createReader(final Query query) {
-    final RecordStoreQueryReader reader = newRecordReader();
-    reader.addQuery(query);
-    return reader;
   }
 
   @Override
@@ -654,8 +663,14 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     if (globalIdProperty == null) {
       return getNextPrimaryKey(recordDefinition);
     } else {
-      return Identifier.create(UUID.randomUUID().toString());
+      return Identifier.newIdentifier(UUID.randomUUID().toString());
     }
+  }
+
+  protected RecordStoreQueryReader newRecordReader(final Query query) {
+    final RecordStoreQueryReader reader = newRecordReader();
+    reader.addQuery(query);
+    return reader;
   }
 
   @Override
@@ -706,6 +721,14 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     return writer;
   }
 
+  /**
+   * Create the field definition for the row identifier column for tables that don't have a primary key.
+   * @return
+   */
+  protected JdbcFieldDefinition newRowIdFieldDefinition() {
+    return null;
+  }
+
   @Override
   public ResultPager<Record> page(final Query query) {
     return new JdbcQueryResultPager(this, getProperties(), query);
@@ -752,6 +775,9 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
               typePath);
             recordDefinition.setDescription(tableDescription);
             recordDefinition.setProperty("permissions", tablePermissions);
+            if (idFieldNames.isEmpty()) {
+              addRowIdFieldDefinition(recordDefinition);
+            }
             try (
               final ResultSet columnsRs = databaseMetaData.getColumns(null, dbSchemaName, tableName,
                 "%")) {
@@ -792,7 +818,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
       final Map<PathName, RecordStoreSchemaElement> schemas = new TreeMap<>();
       final Set<String> databaseSchemaNames = getDatabaseSchemaNames();
       for (final String dbSchemaName : databaseSchemaNames) {
-        final PathName childSchemaPath = schemaPath.createChild(dbSchemaName.toUpperCase());
+        final PathName childSchemaPath = schemaPath.newChild(dbSchemaName.toUpperCase());
         this.schemaNameMap.put(childSchemaPath, dbSchemaName);
         RecordStoreSchema childSchema = schema.getSchema(childSchemaPath);
         if (childSchema == null) {
@@ -823,12 +849,17 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
           final Set<String> tableNames = tablePermissionsMap.keySet();
           for (final String dbTableName : tableNames) {
             final String tableName = dbTableName.toUpperCase();
-            final PathName typePath = schemaPath.createChild(tableName);
+            final PathName typePath = schemaPath.newChild(tableName);
             removedPaths.remove(typePath);
             this.tableNameMap.put(typePath, dbTableName);
             this.qualifiedTableNameMap.put(typePath, dbSchemaName + "." + dbTableName);
             final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema,
               typePath);
+            final List<String> idFieldNames = idFieldNameMap.get(typePath);
+            if (Property.isEmpty(idFieldNames)) {
+              addRowIdFieldDefinition(recordDefinition);
+
+            }
             final String description = tableDescriptionMap.get(dbTableName);
             recordDefinition.setDescription(description);
             final List<String> permissions = Maps.get(tablePermissionsMap, dbTableName,
@@ -841,7 +872,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
             final ResultSet columnsRs = databaseMetaData.getColumns(null, dbSchemaName, "%", "%")) {
             while (columnsRs.next()) {
               final String tableName = columnsRs.getString("TABLE_NAME").toUpperCase();
-              final PathName typePath = schemaPath.createChild(tableName);
+              final PathName typePath = schemaPath.newChild(tableName);
               final RecordDefinitionImpl recordDefinition = (RecordDefinitionImpl)recordDefinitionMap
                 .get(typePath);
               if (recordDefinition != null) {
@@ -864,7 +895,9 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
             for (final RecordDefinition recordDefinition : recordDefinitionMap.values()) {
               final String typePath = recordDefinition.getPath();
               final List<String> idFieldNames = idFieldNameMap.get(typePath);
-              ((RecordDefinitionImpl)recordDefinition).setIdFieldNames(idFieldNames);
+              if (!Property.isEmpty(idFieldNames)) {
+                ((RecordDefinitionImpl)recordDefinition).setIdFieldNames(idFieldNames);
+              }
             }
 
           }

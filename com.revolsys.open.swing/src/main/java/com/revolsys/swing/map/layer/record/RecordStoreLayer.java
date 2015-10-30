@@ -63,7 +63,7 @@ import com.revolsys.util.enableable.Enabled;
 
 public class RecordStoreLayer extends AbstractRecordLayer {
 
-  public static AbstractLayer create(final Map<String, Object> properties) {
+  public static AbstractLayer newLayer(final Map<String, Object> properties) {
     return new RecordStoreLayer(properties);
   }
 
@@ -121,7 +121,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
               proxyRecord = record;
             } else {
               getCachedRecord(identifier, record);
-              proxyRecord = createProxyRecord(identifier);
+              proxyRecord = newProxyRecord(identifier);
             }
             Maps.addToSet(this.cacheIdToRecordIdMap, cacheId, identifier);
             return proxyRecord;
@@ -186,50 +186,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     clone.loadingWorker = null;
     clone.recordIdToRecordMap = new WeakHashMap<>();
     return clone;
-  }
-
-  protected LoadingWorker createLoadingWorker(final BoundingBox boundingBox) {
-    return new LoadingWorker(this, boundingBox);
-  }
-
-  @Override
-  protected ValueField createPropertiesTabGeneralPanelSource(final BasePanel parent) {
-    final ValueField panel = super.createPropertiesTabGeneralPanelSource(parent);
-    final Map<String, String> connectionProperties = getProperty("connection");
-    String connectionName = null;
-    String url = null;
-    String username = null;
-    if (isExists()) {
-      final RecordStore recordStore = getRecordStore();
-      url = recordStore.getUrl();
-      username = recordStore.getUsername();
-    }
-    if (connectionProperties != null) {
-      connectionName = connectionProperties.get("name");
-      if (!isExists()) {
-        url = connectionProperties.get("url");
-        username = connectionProperties.get("username");
-
-      }
-    }
-    if (connectionName != null) {
-      SwingUtil.addLabelledReadOnlyTextField(panel, "Record Store Name", connectionName);
-    }
-    if (url != null) {
-      SwingUtil.addLabelledReadOnlyTextField(panel, "Record Store URL", url);
-    }
-    if (username != null) {
-      SwingUtil.addLabelledReadOnlyTextField(panel, "Record Store Username", username);
-    }
-    SwingUtil.addLabelledReadOnlyTextField(panel, "Type Path", this.typePath);
-
-    GroupLayouts.makeColumns(panel, 2, true);
-    return panel;
-  }
-
-  @SuppressWarnings("unchecked")
-  protected <V extends LayerRecord> V createProxyRecord(final Identifier identifier) {
-    return (V)new IdentifierProxyLayerRecord(this, identifier);
   }
 
   @Override
@@ -352,7 +308,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
             this.loadingWorker.cancel(true);
           }
           this.loadingBoundingBox = loadBoundingBox;
-          this.loadingWorker = createLoadingWorker(loadBoundingBox);
+          this.loadingWorker = newLoadingWorker(loadBoundingBox);
           Invoke.worker(this.loadingWorker);
         }
       }
@@ -623,7 +579,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
               synchronized (getSync()) {
                 final LayerRecord cachedRecord = getCachedRecord(identifier, record);
                 if (!cachedRecord.isDeleted()) {
-                  final LayerRecord proxyRecord = createProxyRecord(identifier);
+                  final LayerRecord proxyRecord = newProxyRecord(identifier);
                   records.add(proxyRecord);
                 }
               }
@@ -644,7 +600,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     if (record == null) {
       return record;
     } else {
-      return createProxyRecord(identifier);
+      return newProxyRecord(identifier);
     }
   }
 
@@ -736,6 +692,50 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     } else {
       throw new IllegalArgumentException("Cannot create records for " + recordDefinition);
     }
+  }
+
+  protected LoadingWorker newLoadingWorker(final BoundingBox boundingBox) {
+    return new LoadingWorker(this, boundingBox);
+  }
+
+  @Override
+  protected ValueField newPropertiesTabGeneralPanelSource(final BasePanel parent) {
+    final ValueField panel = super.newPropertiesTabGeneralPanelSource(parent);
+    final Map<String, String> connectionProperties = getProperty("connection");
+    String connectionName = null;
+    String url = null;
+    String username = null;
+    if (isExists()) {
+      final RecordStore recordStore = getRecordStore();
+      url = recordStore.getUrl();
+      username = recordStore.getUsername();
+    }
+    if (connectionProperties != null) {
+      connectionName = connectionProperties.get("name");
+      if (!isExists()) {
+        url = connectionProperties.get("url");
+        username = connectionProperties.get("username");
+
+      }
+    }
+    if (connectionName != null) {
+      SwingUtil.addLabelledReadOnlyTextField(panel, "Record Store Name", connectionName);
+    }
+    if (url != null) {
+      SwingUtil.addLabelledReadOnlyTextField(panel, "Record Store URL", url);
+    }
+    if (username != null) {
+      SwingUtil.addLabelledReadOnlyTextField(panel, "Record Store Username", username);
+    }
+    SwingUtil.addLabelledReadOnlyTextField(panel, "Type Path", this.typePath);
+
+    GroupLayouts.makeColumns(panel, 2, true);
+    return panel;
+  }
+
+  @SuppressWarnings("unchecked")
+  protected <V extends LayerRecord> V newProxyRecord(final Identifier identifier) {
+    return (V)new IdentifierProxyLayerRecord(this, identifier);
   }
 
   protected RecordReader newRecordStoreRecordReader(final Query query) {

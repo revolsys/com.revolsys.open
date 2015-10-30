@@ -33,32 +33,32 @@ public class TestPerfDistanceGeomSet {
   public TestPerfDistanceGeomSet() {
   }
 
-  Geometry createCircleRandomLocation(final int nPts) {
+  Geometry newCircleRandomLocation(final int nPts) {
     final SineStarFactory gsf = new SineStarFactory();
     gsf.setCentre(randomLocation());
     gsf.setSize(GEOM_SIZE);
     gsf.setNumPoints(nPts);
 
-    final Polygon g = gsf.createCircle();
+    final Polygon g = gsf.newCircle();
     // Geometry g = gsf.createSineStar();
 
     return g;
   }
 
-  Geometry[] createRandomCircles(final int nPts) {
+  Geometry[] newRandomCircles(final int nPts) {
     final Geometry[] geoms = new Geometry[NUM_GEOM];
     for (int i = 0; i < NUM_GEOM; i++) {
-      geoms[i] = createCircleRandomLocation(nPts);
+      geoms[i] = newCircleRandomLocation(nPts);
     }
     return geoms;
   }
 
-  Geometry[] createRandomCircles(final int numGeom, final int nPtsMin, final int nPtsMax) {
+  Geometry[] newRandomCircles(final int numGeom, final int nPtsMin, final int nPtsMax) {
     final int nPtsRange = nPtsMax - nPtsMin + 1;
     final Geometry[] geoms = new Geometry[numGeom];
     for (int i = 0; i < numGeom; i++) {
       final int nPts = (int)(nPtsRange * Math.random()) + nPtsMin;
-      geoms[i] = createCircleRandomLocation(nPts);
+      geoms[i] = newCircleRandomLocation(nPts);
     }
     return geoms;
   }
@@ -66,7 +66,7 @@ public class TestPerfDistanceGeomSet {
   Point randomLocation() {
     final double x = Math.random() * MAX_X;
     final double y = Math.random() * MAX_X;
-    return new PointDouble(x, y, Point.NULL_ORDINATE);
+    return new PointDouble(x, y, Geometry.NULL_ORDINATE);
   }
 
   public void test() {
@@ -111,9 +111,7 @@ public class TestPerfDistanceGeomSet {
 
   public void test(final int num) {
 
-    // Geometry[] geom = createRandomCircles(nPts);
-    final Geometry[] geom = createRandomCircles(100, 5, num);
-    // Geometry[] geom = createSineStarsRandomLocation(nPts);
+    final Geometry[] geom = newRandomCircles(100, 5, num);
 
     if (this.verbose) {
       // System.out.println("Running with " + num + " points");

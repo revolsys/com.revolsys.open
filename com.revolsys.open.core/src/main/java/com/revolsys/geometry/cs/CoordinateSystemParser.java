@@ -17,7 +17,7 @@ public class CoordinateSystemParser {
     final String authorityName, final InputStream in) {
     final Map<String, AngularUnit> angularUnitsByName = new TreeMap<String, AngularUnit>();
     final List<GeographicCoordinateSystem> coordinateSystems = new ArrayList<GeographicCoordinateSystem>();
-    final BufferedReader reader = new BufferedReader(FileUtil.createUtf8Reader(in));
+    final BufferedReader reader = new BufferedReader(FileUtil.newUtf8Reader(in));
     try {
       for (String line = reader.readLine(); line != null; line = reader.readLine()) {
         final String[] fields = line.split("\t");
@@ -64,7 +64,7 @@ public class CoordinateSystemParser {
     final InputStream in) {
     final Map<String, LinearUnit> linearUnitsByName = new TreeMap<String, LinearUnit>();
     final List<ProjectedCoordinateSystem> coordinateSystems = new ArrayList<ProjectedCoordinateSystem>();
-    final BufferedReader reader = new BufferedReader(FileUtil.createUtf8Reader(in));
+    final BufferedReader reader = new BufferedReader(FileUtil.newUtf8Reader(in));
     try {
       for (String line = reader.readLine(); line != null; line = reader.readLine()) {
         final String[] fields = line.split("\t");

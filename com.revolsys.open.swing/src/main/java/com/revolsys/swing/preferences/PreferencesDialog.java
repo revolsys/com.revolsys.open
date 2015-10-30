@@ -34,8 +34,8 @@ public class PreferencesDialog extends JDialog {
     add(this.tabs, BorderLayout.CENTER);
 
     final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    buttonsPanel.add(RunnableAction.createButton("Cancel", this::cancel));
-    buttonsPanel.add(RunnableAction.createButton("Save", this::save));
+    buttonsPanel.add(RunnableAction.newButton("Cancel", this::cancel));
+    buttonsPanel.add(RunnableAction.newButton("Save", this::save));
     add(buttonsPanel, BorderLayout.SOUTH);
   }
 

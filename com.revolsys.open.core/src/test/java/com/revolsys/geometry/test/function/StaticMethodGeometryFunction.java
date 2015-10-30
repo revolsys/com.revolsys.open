@@ -58,42 +58,6 @@ public class StaticMethodGeometryFunction extends BaseGeometryFunction {
 
   private static final String PARAMETERS_SUFFIX = "Parameters";
 
-  /**
-   * Creates an arg array which includes the target geometry as the first argument
-   *
-   * @param g
-   * @param arg
-   * @return
-   */
-  private static Object[] createFullArgs(final Geometry g, final Object[] arg) {
-    int fullArgLen = 1;
-    if (arg != null) {
-      fullArgLen = arg.length + 1;
-    }
-    final Object[] fullArg = new Object[fullArgLen];
-    fullArg[0] = g;
-    for (int i = 1; i < fullArgLen; i++) {
-      fullArg[i] = arg[i - 1];
-    }
-    return fullArg;
-  }
-
-  public static StaticMethodGeometryFunction createFunction(final Method method) {
-    Assert.assertTrue(Geometry.class.isAssignableFrom(method.getParameterTypes()[0]));
-
-    final Class clz = method.getDeclaringClass();
-
-    final String category = extractCategory(Classes.className(clz));
-    final String funcName = method.getName();
-    final String description = extractDescription(method);
-    final String[] paramNames = extractParamNames(method);
-    final Class[] paramTypes = extractParamTypes(method);
-    final Class returnType = method.getReturnType();
-
-    return new StaticMethodGeometryFunction(category, funcName, description, paramNames, paramTypes,
-      returnType, method);
-  }
-
   public static Object dynamicCall(final String clzName, final String methodName,
     final Class[] methodParamTypes, final Object[] methodArgs) throws ClassNotFoundException,
       SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
@@ -206,6 +170,42 @@ public class StaticMethodGeometryFunction extends BaseGeometryFunction {
     return result;
   }
 
+  /**
+   * Creates an arg array which includes the target geometry as the first argument
+   *
+   * @param g
+   * @param arg
+   * @return
+   */
+  private static Object[] newFullArgs(final Geometry g, final Object[] arg) {
+    int fullArgLen = 1;
+    if (arg != null) {
+      fullArgLen = arg.length + 1;
+    }
+    final Object[] fullArg = new Object[fullArgLen];
+    fullArg[0] = g;
+    for (int i = 1; i < fullArgLen; i++) {
+      fullArg[i] = arg[i - 1];
+    }
+    return fullArg;
+  }
+
+  public static StaticMethodGeometryFunction newFunction(final Method method) {
+    Assert.assertTrue(Geometry.class.isAssignableFrom(method.getParameterTypes()[0]));
+
+    final Class clz = method.getDeclaringClass();
+
+    final String category = extractCategory(Classes.className(clz));
+    final String funcName = method.getName();
+    final String description = extractDescription(method);
+    final String[] paramNames = extractParamNames(method);
+    final Class[] paramTypes = extractParamTypes(method);
+    final Class returnType = method.getReturnType();
+
+    return new StaticMethodGeometryFunction(category, funcName, description, paramNames, paramTypes,
+      returnType, method);
+  }
+
   private final Method method;
 
   public StaticMethodGeometryFunction(final String category, final String name,
@@ -217,6 +217,6 @@ public class StaticMethodGeometryFunction extends BaseGeometryFunction {
 
   @Override
   public Object invoke(final Geometry g, final Object[] arg) {
-    return invoke(this.method, null, createFullArgs(g, arg));
+    return invoke(this.method, null, newFullArgs(g, arg));
   }
 }

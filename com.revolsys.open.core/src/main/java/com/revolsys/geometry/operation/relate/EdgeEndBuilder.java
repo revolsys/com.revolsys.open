@@ -87,8 +87,8 @@ public class EdgeEndBuilder {
       }
 
       if (eiCurr != null) {
-        createEdgeEndForPrev(edge, l, eiCurr, eiPrev);
-        createEdgeEndForNext(edge, l, eiCurr, eiNext);
+        newEdgeEndForPrev(edge, l, eiCurr, eiPrev);
+        newEdgeEndForNext(edge, l, eiCurr, eiNext);
       }
 
     } while (eiCurr != null);
@@ -112,7 +112,7 @@ public class EdgeEndBuilder {
    * <br>
    * eiCurr will always be an EdgeIntersection, but eiNext may be null.
    */
-  void createEdgeEndForNext(final Edge edge, final List l, final EdgeIntersection eiCurr,
+  void newEdgeEndForNext(final Edge edge, final List l, final EdgeIntersection eiCurr,
     final EdgeIntersection eiNext) {
 
     final int iNext = eiCurr.segmentIndex + 1;
@@ -142,7 +142,7 @@ public class EdgeEndBuilder {
    * <br>
    * eiCurr will always be an EdgeIntersection, but eiPrev may be null.
    */
-  void createEdgeEndForPrev(final Edge edge, final List l, final EdgeIntersection eiCurr,
+  void newEdgeEndForPrev(final Edge edge, final List l, final EdgeIntersection eiCurr,
     final EdgeIntersection eiPrev) {
 
     int iPrev = eiCurr.segmentIndex;

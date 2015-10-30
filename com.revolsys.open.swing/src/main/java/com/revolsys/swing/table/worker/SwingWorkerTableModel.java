@@ -24,15 +24,15 @@ public class SwingWorkerTableModel extends AbstractTableModel implements Propert
 
   private static final List<String> COLUMN_TITLES = Arrays.asList("Description", "Status");
 
-  public static JPanel createPanel() {
+  public static JPanel newPanel() {
     final JPanel taskPanel = new JPanel(new BorderLayout());
-    final BaseJTable table = SwingWorkerTableModel.createTable();
+    final BaseJTable table = SwingWorkerTableModel.newTable();
     final JScrollPane scrollPane = new JScrollPane(table);
     taskPanel.add(scrollPane, BorderLayout.CENTER);
     return taskPanel;
   }
 
-  public static BaseJTable createTable() {
+  public static BaseJTable newTable() {
     final SwingWorkerTableModel model = new SwingWorkerTableModel();
     final BaseJTable table = new BaseJTable(model);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);

@@ -34,7 +34,7 @@ public class BoundingBoxStringConverter implements StringConverter<BoundingBox> 
 
   @Override
   public BoundingBox toObject(final String string) {
-    return BoundingBoxDoubleGf.create(string);
+    return BoundingBoxDoubleGf.newBoundingBox(string);
   }
 
   @Override
