@@ -266,7 +266,7 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
   }
 
   @Override
-  public void setFieldValue(final Object value) {
+  public boolean setFieldValue(final Object value) {
     Invoke.later(() -> {
       final Object newValue = getTypedValue(value);
       final Object oldValue = getFieldValue();
@@ -296,6 +296,7 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
         this.fieldSupport.setValue(newValue);
       }
     });
+    return false;
   }
 
   public void setMaximumValue(final Number maximumValue) {

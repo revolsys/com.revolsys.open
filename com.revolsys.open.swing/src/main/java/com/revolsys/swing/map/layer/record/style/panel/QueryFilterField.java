@@ -108,8 +108,8 @@ public class QueryFilterField extends ValueField implements PropertyChangeListen
   }
 
   @Override
-  public void setFieldValue(final Object value) {
-    this.queryField.setFieldValue(value);
+  public boolean setFieldValue(final Object value) {
+    return this.queryField.setFieldValue(value);
   }
 
   @Override

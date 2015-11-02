@@ -102,6 +102,7 @@ public class StringConverterRegistry {
   private final Map<Class<?>, StringConverter<?>> classConverterMap = new HashMap<Class<?>, StringConverter<?>>();
 
   public StringConverterRegistry() {
+    addConverter(new IdentifierStringConverter());
     addConverter(new BigDecimalStringConverter());
     addConverter(new BigIntegerStringConverter());
     addConverter(new BooleanStringConverter());

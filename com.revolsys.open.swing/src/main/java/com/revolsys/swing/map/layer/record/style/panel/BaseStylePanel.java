@@ -10,14 +10,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
 import javax.swing.Action;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -270,16 +268,11 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
     } else if (fieldName.equals("marker")) {
       field = new MarkerField(fieldName, value);
     } else if (fieldName.endsWith("OrientationType")) {
-      final ComboBox orientationTypeField = new ComboBox(fieldName,
-        new DefaultComboBoxModel<>(new String[] {
-          "auto", "none"
-      }));
+      final ComboBox<String> orientationTypeField = ComboBox.newComboBox(fieldName, "auto", "none");
       field = orientationTypeField;
     } else if (fieldName.endsWith("PlacementType")) {
-      final ComboBox placementField = new ComboBox(fieldName,
-        new DefaultComboBoxModel<>(new String[] {
-          "auto", "center", "point(0)", "point(n)", "vertices"
-      }));
+      final ComboBox<String> placementField = ComboBox.newComboBox(fieldName, "auto", "center",
+        "point(0)", "point(n)", "vertices");
       placementField.setFieldValue(value);
       field = placementField;
     } else if (fieldName.endsWith("Scale")) {
@@ -315,13 +308,11 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
   }
 
   private Field newScaleField(final String fieldName, final Long value) {
-    final Vector<Long> scales = new Vector<Long>();
+    final List<Long> scales = new ArrayList<>();
     scales.add(Long.MAX_VALUE);
     scales.addAll(MapPanel.SCALES);
-    final FunctionStringConverter converter = new FunctionStringConverter(MapScale::formatScale);
-    converter.setHorizontalAlignment(SwingConstants.RIGHT);
-    final ComboBox field = new ComboBox(fieldName, new DefaultComboBoxModel(scales), converter,
-      converter);
+    final ComboBox<Long> field = ComboBox.newComboBox(fieldName, scales, MapScale::formatScale);
+    ((FunctionStringConverter<?>)field.getRenderer()).setHorizontalAlignment(SwingConstants.RIGHT);
     ((JTextField)field.getEditor().getEditorComponent())
       .setHorizontalAlignment(SwingConstants.RIGHT);
     field.setSelectedItem(value);

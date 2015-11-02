@@ -308,7 +308,7 @@ public class FieldNamesSetPanel extends ValueField
             index = i;
           } else if (newName.equalsIgnoreCase(name)) {
             JOptionPane.showMessageDialog(SwingUtil.getActiveWindow(),
-              "NEW name already in use: " + newName, "Rename Field Set", JOptionPane.ERROR_MESSAGE);
+              "New name already in use: " + newName, "Rename Field Set", JOptionPane.ERROR_MESSAGE);
             return;
           }
         }

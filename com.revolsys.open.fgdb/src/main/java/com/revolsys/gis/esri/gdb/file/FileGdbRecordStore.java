@@ -1245,7 +1245,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     synchronized (this.apiSync) {
       FileGdbWriter writer = getThreadProperty("writer");
       if (writer == null) {
-        writer = newRecordWriter();
+        writer = new FileGdbWriter(this);
         setThreadProperty("writer", writer);
       }
       return writer;

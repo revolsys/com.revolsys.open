@@ -101,9 +101,9 @@ public interface Field extends Cloneable {
     fieldSupport.setFieldValid();
   }
 
-  default void setFieldValue(final Object value) {
+  default boolean setFieldValue(final Object value) {
     final FieldSupport fieldSupport = getFieldSupport();
-    fieldSupport.setValue(value);
+    return fieldSupport.setValue(value);
   }
 
   default void setShowErrorIcon(final boolean showErrorIcon) {

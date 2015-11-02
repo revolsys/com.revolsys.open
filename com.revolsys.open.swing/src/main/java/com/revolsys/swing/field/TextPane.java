@@ -122,12 +122,12 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
   }
 
   @Override
-  public void setFieldValue(final Object value) {
+  public boolean setFieldValue(final Object value) {
     final String newValue = StringConverterRegistry.toString(value);
     if (!Equals.equal(getText(), newValue)) {
       setText(newValue);
     }
-    this.fieldSupport.setValue(newValue);
+    return this.fieldSupport.setValue(newValue);
   }
 
   protected void setRowsAndColumns(final int rows, final int columns) {

@@ -82,7 +82,7 @@ public class GeometryCoordinatesPanel extends ValueField implements TableModelLi
   }
 
   @Override
-  public void setFieldValue(final Object value) {
+  public boolean setFieldValue(final Object value) {
     if (value instanceof Geometry) {
       final Geometry geometry = (Geometry)value;
       this.model.setGeometry(geometry);
@@ -93,7 +93,7 @@ public class GeometryCoordinatesPanel extends ValueField implements TableModelLi
         column.setCellRenderer(this.cellRenderer);
       }
     }
-    super.setFieldValue(value);
+    return super.setFieldValue(value);
   }
 
   @Override

@@ -1,7 +1,6 @@
 package com.revolsys.swing.map.form;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.util.HashMap;
@@ -26,9 +25,6 @@ import com.revolsys.swing.list.renderer.IconListCellRenderer;
 import com.revolsys.swing.map.border.FullSizeLayoutManager;
 
 public class RecordStoreConnectionDialog extends BaseDialog {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private final JXList buttons;
@@ -47,8 +43,6 @@ public class RecordStoreConnectionDialog extends BaseDialog {
       setTitle("Edit Record Store Connection " + connection.getName());
     }
     this.panels = new JLayeredPane();
-    this.panels.setOpaque(true);
-    this.panels.setBackground(Color.WHITE);
     this.panels.setVisible(true);
     this.panels.setLayout(new FullSizeLayoutManager());
 
@@ -57,15 +51,15 @@ public class RecordStoreConnectionDialog extends BaseDialog {
     final OracleRecordStoreConnectionPanel oraclePanel = new OracleRecordStoreConnectionPanel(
       registry, connection);
     Borders.titled(oraclePanel, "Oracle");
-    this.panels.add(oraclePanel, 0);
+    SwingUtil.addLayer(this.panels, oraclePanel, index++);
 
     final AddRecordStoreConnectionPanel postgresPanel = new AddRecordStoreConnectionPanel(registry);
     Borders.titled(postgresPanel, "PostgreSQL/PostGIS");
-    this.panels.add(postgresPanel, new Integer(index++));
+    SwingUtil.addLayer(this.panels, postgresPanel, index++);
 
     final AddRecordStoreConnectionPanel filePanel = new AddRecordStoreConnectionPanel(registry);
     Borders.titled(filePanel, "File");
-    this.panels.add(filePanel, new Integer(index++));
+    SwingUtil.addLayer(this.panels, filePanel, index++);
 
     this.buttons = new JXList(new Object[] {
       "Oracle", "PostgreSQL/PostGIS"
@@ -86,17 +80,19 @@ public class RecordStoreConnectionDialog extends BaseDialog {
     buttonScroll.setPreferredSize(new Dimension(150, 400));
 
     add(buttonScroll, BorderLayout.WEST);
-    add(new JScrollPane(this.panels), BorderLayout.CENTER);
+    final JScrollPane scrollPane = new JScrollPane(this.panels);
+    scrollPane.setOpaque(false);
+    add(scrollPane, BorderLayout.CENTER);
     pack();
     this.buttons.setSelectedIndex(0);
   }
 
-  public void selectionChangeType() {
+  private void selectionChangeType() {
     final int index = this.buttons.getSelectedIndex();
     final int componentCount = this.panels.getComponentCount();
     if (index > -1 && index < componentCount) {
       for (int i = 0; i < componentCount; i++) {
-        final Component component = this.panels.getComponent(i);
+        final Component component = this.panels.getComponentsInLayer(i)[0];
         if (i == index) {
           component.setVisible(true);
         } else {

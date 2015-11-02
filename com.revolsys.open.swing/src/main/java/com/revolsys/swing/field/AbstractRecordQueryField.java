@@ -466,7 +466,7 @@ public abstract class AbstractRecordQueryField extends ValueField
   }
 
   @Override
-  public void setFieldValue(final Object value) {
+  public boolean setFieldValue(final Object value) {
     final Identifier identifier = Identifier.newIdentifier(value);
     super.setFieldValue(identifier);
     final String displayText = getDisplayText(identifier);
@@ -487,6 +487,7 @@ public abstract class AbstractRecordQueryField extends ValueField
       this.oldValueItem.setIcon(icon);
       this.oldValueItem.setText(originalText);
     }
+    return true;
   }
 
   public void setMaxResults(final int maxResults) {

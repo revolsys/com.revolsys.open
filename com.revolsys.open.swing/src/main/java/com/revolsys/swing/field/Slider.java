@@ -105,7 +105,7 @@ public class Slider extends JSlider implements Field, FocusListener, ChangeListe
   }
 
   @Override
-  public void setFieldValue(final Object value) {
+  public boolean setFieldValue(final Object value) {
     final Integer newValue = Numbers.toInteger(value);
     final Integer fieldValue = getValue();
     getUndoManager().discardAllEdits();
@@ -113,8 +113,7 @@ public class Slider extends JSlider implements Field, FocusListener, ChangeListe
       setValue(newValue);
       getUndoManager().discardAllEdits();
     }
-    this.fieldSupport.setValue(newValue);
-
+    return this.fieldSupport.setValue(newValue);
   }
 
   @Override

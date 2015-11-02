@@ -163,7 +163,7 @@ public class FileField extends ValueField implements Field {
   }
 
   @Override
-  public void setFieldValue(final Object fieldValue) {
+  public boolean setFieldValue(final Object fieldValue) {
     final String fileName;
     if (fieldValue == null) {
       fileName = "";
@@ -171,6 +171,7 @@ public class FileField extends ValueField implements Field {
       fileName = fieldValue.toString();
     }
     setPath(fileName);
+    return true;
   }
 
   public void setPath(final String directoryPath) {

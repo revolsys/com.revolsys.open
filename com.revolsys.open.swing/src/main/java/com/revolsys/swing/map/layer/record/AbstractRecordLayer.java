@@ -162,7 +162,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     Menus.addMenuItem(menu, "edit", "Cancel Changes", "table_cancel", AbstractLayer::isHasChanges,
       AbstractRecordLayer::cancelChanges);
 
-    Menus.addMenuItem(menu, "edit", "Add NEW Record", "table_row_insert", canAdd,
+    Menus.addMenuItem(menu, "edit", "Add New Record", "table_row_insert", canAdd,
       AbstractRecordLayer::addNewRecord);
 
     Menus.addMenuItem(menu, "edit", "Delete Selected Records", "table_row_delete",
@@ -175,7 +175,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     Menus.addMenuItem(menu, "dnd", "Copy Selected Records", "page_copy", hasSelectedRecords,
       AbstractRecordLayer::copySelectedRecords);
 
-    Menus.addMenuItem(menu, "dnd", "Paste NEW Records", "paste_plain",
+    Menus.addMenuItem(menu, "dnd", "Paste New Records", "paste_plain",
       canAdd.and(AbstractRecordLayer::isCanPaste), AbstractRecordLayer::pasteRecords);
 
     Menus.addMenuItem(menu, "layer", 0, "Layer Style", "palette",
@@ -558,12 +558,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     clone.userReadOnlyFieldNames = new LinkedHashSet<>(this.userReadOnlyFieldNames);
 
     return clone;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <V extends LayerRecord> V copyRecord(final V record) {
-    final LayerRecord copy = newLayerRecord(record);
-    return (V)copy;
   }
 
   public void copyRecordGeometry(final LayerRecord record) {
@@ -1702,7 +1696,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public LayerRecord newLayerRecord(final Map<String, Object> values) {
+  public LayerRecord newLayerRecord(final Map<String, ? extends Object> values) {
     if (!isReadOnly() && isEditable() && isCanAddRecords()) {
       final RecordFactory<LayerRecord> recordFactory = getRecordFactory();
       final LayerRecord record = recordFactory.newRecord(getRecordDefinition());
@@ -2569,7 +2563,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           } else {
             String title;
             if (record.getState() == RecordState.NEW) {
-              title = "Add NEW " + getName();
+              title = "Add New " + getName();
             } else if (isCanEditRecords()) {
               title = "Edit " + getName();
               if (id != null) {
@@ -2681,8 +2675,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final Point point, final LineString line1, final LineString line2) {
     final DirectionalFields property = DirectionalFields.getProperty(record);
 
-    final LayerRecord record1 = copyRecord(record);
-    final LayerRecord record2 = copyRecord(record);
+    final LayerRecord record1 = newLayerRecord(record);
+    final LayerRecord record2 = newLayerRecord(record);
     record1.setGeometryValue(line1);
     record2.setGeometryValue(line2);
 

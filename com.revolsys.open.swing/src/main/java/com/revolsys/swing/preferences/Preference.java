@@ -53,7 +53,9 @@ public class Preference {
   }
 
   public void cancelChanges() {
-    this.field.setFieldValue(StringConverterRegistry.toObject(this.valueClass, this.savedValue));
+    final Object convertedValue = StringConverterRegistry.toObject(this.valueClass,
+      this.savedValue);
+    this.field.setFieldValue(convertedValue);
   }
 
   @Override

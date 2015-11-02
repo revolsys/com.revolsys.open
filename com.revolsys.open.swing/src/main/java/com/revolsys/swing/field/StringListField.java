@@ -153,7 +153,7 @@ public class StringListField extends ValueField {
   }
 
   @Override
-  public void setFieldValue(final Object value) {
+  public boolean setFieldValue(final Object value) {
     if (!Equals.equal(value, getFieldValue())) {
       if (this.values != null) {
         if (value == null) {
@@ -179,9 +179,10 @@ public class StringListField extends ValueField {
             }
           }
         }
-        super.setFieldValue(Strings.toString(this.values));
+        return super.setFieldValue(Strings.toString(this.values));
       }
     }
+    return false;
   }
 
   private void setSelectedButtonsEnabled(final boolean editable) {

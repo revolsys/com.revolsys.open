@@ -285,6 +285,11 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
     }
   }
 
+  default Identifier getIdentifier(final int index) {
+    final Object value = getValue(index);
+    return Identifier.newIdentifier(value);
+  }
+
   default Identifier getIdentifier(final List<String> fieldNames) {
     final int idCount = fieldNames.size();
     if (idCount == 0) {
@@ -316,8 +321,9 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
     }
   }
 
-  default Identifier getIdentifier(final String... fieldNames) {
-    return getIdentifier(Arrays.asList(fieldNames));
+  default Identifier getIdentifier(final String fieldName) {
+    final Object value = getValue(fieldName);
+    return Identifier.newIdentifier(value);
   }
 
   default Integer getInteger(final CharSequence name) {

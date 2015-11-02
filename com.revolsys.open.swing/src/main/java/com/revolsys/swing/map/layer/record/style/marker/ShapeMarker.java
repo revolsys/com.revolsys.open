@@ -85,8 +85,8 @@ public class ShapeMarker extends AbstractMarker {
     return path;
   }
 
-  public static List<Marker> getMarkers() {
-    final List<Marker> markers = new ArrayList<Marker>();
+  public static List<ShapeMarker> getMarkers() {
+    final List<ShapeMarker> markers = new ArrayList<>();
     for (final String markerName : SHAPES.keySet()) {
       final ShapeMarker marker = new ShapeMarker(markerName);
       markers.add(marker);

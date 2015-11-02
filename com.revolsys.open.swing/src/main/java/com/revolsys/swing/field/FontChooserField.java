@@ -8,24 +8,19 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
-
 import com.revolsys.converter.string.StringConverterRegistry;
 
-public class FontChooserField extends ComboBox {
+public class FontChooserField extends ComboBox<String> {
   private static final String[] FONT_NAMES = getFontNames();
 
   private static final Map<String, Reference<Font>> fontCache = new HashMap<>();
 
+  @SuppressWarnings("rawtypes")
   private static final ListCellRenderer RENDERER = new DefaultListCellRenderer() {
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -61,9 +56,9 @@ public class FontChooserField extends ComboBox {
     return GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
   }
 
+  @SuppressWarnings("unchecked")
   public FontChooserField(final String fieldName, final String fontName) {
-    super(fieldName, new DefaultComboBoxModel(FONT_NAMES),
-      ObjectToStringConverter.DEFAULT_IMPLEMENTATION, RENDERER);
+    super(fieldName, newModel(FONT_NAMES), null, RENDERER);
     setSelectedItem(fontName);
   }
 }

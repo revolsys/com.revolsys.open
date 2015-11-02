@@ -251,7 +251,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
     final LayerGroupListModel baseMapLayersModel = new LayerGroupListModel(this.baseMapLayers,
       true);
-    this.baseMapLayerField = new ComboBox<Layer>(baseMapLayersModel);
+    this.baseMapLayerField = ComboBox.newComboBox("baseMapLayer", baseMapLayersModel);
     this.baseMapLayerField.setMaximumSize(new Dimension(200, 22));
     ConsumerSelectedItemListener.addItemListener(this.baseMapLayerField, this::setBaseMapLayer);
     if (this.baseMapLayers.getLayerCount() > 0) {

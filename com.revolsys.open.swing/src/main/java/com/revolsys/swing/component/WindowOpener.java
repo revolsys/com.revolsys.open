@@ -15,16 +15,11 @@ import javax.swing.WindowConstants;
 
 import org.jdesktop.swingx.JXBusyLabel;
 
-import com.revolsys.awt.WebColors;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.parallel.Invoke;
 
 public class WindowOpener extends JFrame implements WindowListener {
-
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   public static WindowOpener newWindowOpener(final Window window, final String title,
@@ -39,7 +34,6 @@ public class WindowOpener extends JFrame implements WindowListener {
       final JFrame frame = (JFrame)window;
       frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     }
-    setBackground(WebColors.White);
 
     final JPanel panel = new JPanel(new BorderLayout());
     setContentPane(panel);

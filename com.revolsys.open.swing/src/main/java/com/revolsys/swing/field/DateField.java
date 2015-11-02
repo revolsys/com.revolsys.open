@@ -101,12 +101,12 @@ public class DateField extends JXDatePicker implements Field, PropertyChangeList
   }
 
   @Override
-  public void setFieldValue(final Object value) {
+  public boolean setFieldValue(final Object value) {
     final Date date = StringConverterRegistry.toObject(Date.class, value);
     if (!Equals.equal(getDate(), date)) {
       setDate(date);
     }
-    this.fieldSupport.setValue(date);
+    return this.fieldSupport.setValue(date);
   }
 
   @Override

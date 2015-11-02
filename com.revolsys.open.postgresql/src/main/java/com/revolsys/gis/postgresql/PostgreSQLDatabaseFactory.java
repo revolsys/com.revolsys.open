@@ -11,11 +11,11 @@ import javax.sql.DataSource;
 
 import org.postgresql.Driver;
 
-import com.revolsys.jdbc.io.AbstractJdbcDatabaseFactory;
+import com.revolsys.jdbc.io.JdbcDatabaseFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.schema.RecordStore;
 
-public class PostgreSQLDatabaseFactory extends AbstractJdbcDatabaseFactory {
+public class PostgreSQLDatabaseFactory implements JdbcDatabaseFactory {
   private static final String URL_REGEX = "jdbc:postgresql:(?://([^:]+)(?::(\\d+))?/)?(.+)";
 
   private static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX);

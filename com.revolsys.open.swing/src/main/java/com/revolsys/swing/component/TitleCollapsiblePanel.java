@@ -16,10 +16,6 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.util.Exceptions;
 
 public class TitleCollapsiblePanel extends BasePanel implements MouseListener {
-
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private final JXCollapsiblePane collapsible;

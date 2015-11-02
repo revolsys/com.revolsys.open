@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 import javax.swing.JComponent;
 
@@ -30,9 +31,10 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.equals.Equals;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.Record;
+import com.revolsys.util.function.Function2;
 
-public final class Property {
-  public static void addListener(final Object source, final Object listener) {
+public interface Property {
+  static void addListener(final Object source, final Object listener) {
     if (source != null) {
       final PropertyChangeListener propertyChangeListener = getPropertyChangeListener(listener);
       if (propertyChangeListener != null) {
@@ -49,12 +51,11 @@ public final class Property {
     }
   }
 
-  public static void addListener(final Object source, final PropertyChangeListener listener) {
+  static void addListener(final Object source, final PropertyChangeListener listener) {
     addListener(source, (Object)listener);
   }
 
-  public static void addListener(final Object source, final String propertyName,
-    final Object listener) {
+  static void addListener(final Object source, final String propertyName, final Object listener) {
     final PropertyChangeListener propertyChangeListener = getPropertyChangeListener(listener);
     if (propertyChangeListener != null) {
       if (source != null) {
@@ -71,12 +72,12 @@ public final class Property {
     }
   }
 
-  public static void addListener(final Object source, final String propertyName,
+  static void addListener(final Object source, final String propertyName,
     final PropertyChangeListener listener) {
     addListener(source, propertyName, (Object)listener);
   }
 
-  public static PropertyDescriptor descriptor(final Class<?> beanClass, final String name) {
+  static PropertyDescriptor descriptor(final Class<?> beanClass, final String name) {
     if (beanClass != null && Property.hasValue(name)) {
       try {
         final BeanInfo beanInfo = Introspector.getBeanInfo(beanClass);
@@ -93,8 +94,7 @@ public final class Property {
     return null;
   }
 
-  public static boolean equals(final Object object1, final Object object2,
-    final String propertyName) {
+  static boolean equals(final Object object1, final Object object2, final String propertyName) {
     if (object1 == object2) {
       return true;
     } else if (object1 != null && object2 != null) {
@@ -105,22 +105,22 @@ public final class Property {
     return false;
   }
 
-  public static void firePropertyChange(final Object source, final PropertyChangeEvent event) {
+  static void firePropertyChange(final Object source, final PropertyChangeEvent event) {
     final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
     if (propertyChangeSupport != null) {
       propertyChangeSupport.firePropertyChange(event);
     }
   }
 
-  public static void firePropertyChange(final Object source, final String propertyName,
-    final int index, final Object oldValue, final Object newValue) {
+  static void firePropertyChange(final Object source, final String propertyName, final int index,
+    final Object oldValue, final Object newValue) {
     final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
     if (propertyChangeSupport != null) {
       propertyChangeSupport.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
     }
   }
 
-  public static void firePropertyChange(final Object source, final String propertyName,
+  static void firePropertyChange(final Object source, final String propertyName,
     final Object oldValue, final Object newValue) {
     final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
     if (propertyChangeSupport != null) {
@@ -129,7 +129,7 @@ public final class Property {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T get(final Object object, final String key) {
+  static <T> T get(final Object object, final String key) {
     if (object == null) {
       return null;
     } else {
@@ -155,7 +155,7 @@ public final class Property {
     }
   }
 
-  public static boolean getBoolean(final Map<String, Object> map, final String key) {
+  static boolean getBoolean(final Map<String, Object> map, final String key) {
     if (map == null) {
       return false;
     } else {
@@ -180,7 +180,7 @@ public final class Property {
     }
   }
 
-  public static boolean getBoolean(final ObjectWithProperties object, final String key) {
+  static boolean getBoolean(final ObjectWithProperties object, final String key) {
     if (object == null) {
       return false;
     } else {
@@ -205,7 +205,7 @@ public final class Property {
     }
   }
 
-  public static Class<?> getClass(final Class<?> beanClass, final String name) {
+  static Class<?> getClass(final Class<?> beanClass, final String name) {
     final PropertyDescriptor propertyDescriptor = descriptor(beanClass, name);
     if (propertyDescriptor == null) {
       return null;
@@ -214,7 +214,7 @@ public final class Property {
     }
   }
 
-  public static Class<?> getClass(final Object object, final String fieldName) {
+  static Class<?> getClass(final Object object, final String fieldName) {
     if (object == null) {
       return null;
     } else {
@@ -224,7 +224,7 @@ public final class Property {
     }
   }
 
-  public static Double getDouble(final ObjectWithProperties object, final String key) {
+  static Double getDouble(final ObjectWithProperties object, final String key) {
     if (object == null) {
       return null;
     } else {
@@ -233,7 +233,7 @@ public final class Property {
     }
   }
 
-  public static double getDouble(final ObjectWithProperties object, final String key,
+  static double getDouble(final ObjectWithProperties object, final String key,
     final double defaultValue) {
     if (object == null) {
       return defaultValue;
@@ -247,7 +247,7 @@ public final class Property {
     }
   }
 
-  public static Integer getInteger(final ObjectWithProperties object, final String key) {
+  static Integer getInteger(final ObjectWithProperties object, final String key) {
     if (object == null) {
       return null;
     } else {
@@ -256,7 +256,7 @@ public final class Property {
     }
   }
 
-  public static int getInteger(final ObjectWithProperties object, final String key,
+  static int getInteger(final ObjectWithProperties object, final String key,
     final int defaultValue) {
     if (object == null) {
       return defaultValue;
@@ -270,7 +270,8 @@ public final class Property {
     }
   }
 
-  public static PropertyChangeListener getPropertyChangeListener(final Object listener) {
+  @SuppressWarnings("unchecked")
+  static PropertyChangeListener getPropertyChangeListener(final Object listener) {
     if (listener instanceof PropertyChangeListener) {
       final PropertyChangeListener propertyChangeListener = (PropertyChangeListener)listener;
       if (propertyChangeListener instanceof NonWeakListener) {
@@ -280,13 +281,19 @@ public final class Property {
           propertyChangeListener);
         return weakListener;
       }
+    } else if (listener instanceof Consumer) {
+      final Consumer<Object> consumer = (Consumer<Object>)listener;
+      return (e) -> {
+        final Object object = e.getNewValue();
+        consumer.accept(object);
+      };
     } else {
       return null;
     }
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T getSimple(final Object object, final String key) {
+  static <T> T getSimple(final Object object, final String key) {
     if (object == null) {
       return null;
     } else {
@@ -306,7 +313,7 @@ public final class Property {
     }
   }
 
-  public static String getString(final ObjectWithProperties object, final String key) {
+  static String getString(final ObjectWithProperties object, final String key) {
     if (object == null) {
       return null;
     } else {
@@ -315,7 +322,7 @@ public final class Property {
     }
   }
 
-  public static String getString(final ObjectWithProperties object, final String key,
+  static String getString(final ObjectWithProperties object, final String key,
     final String defaultValue) {
     if (object == null) {
       return defaultValue;
@@ -329,7 +336,7 @@ public final class Property {
     }
   }
 
-  private static boolean hasText(final CharSequence string) {
+  static boolean hasText(final CharSequence string) {
     final int length = string.length();
     for (int i = 0; i < length; i++) {
       final char character = string.charAt(i);
@@ -340,7 +347,7 @@ public final class Property {
     return false;
   }
 
-  public static boolean hasValue(final CharSequence string) {
+  static boolean hasValue(final CharSequence string) {
     if (string == null) {
       return false;
     } else {
@@ -348,7 +355,7 @@ public final class Property {
     }
   }
 
-  public static boolean hasValue(final Collection<?> collection) {
+  static boolean hasValue(final Collection<?> collection) {
     if (collection == null || collection.isEmpty()) {
       return false;
     } else {
@@ -356,7 +363,7 @@ public final class Property {
     }
   }
 
-  public static boolean hasValue(final Emptyable value) {
+  static boolean hasValue(final Emptyable value) {
     if (value == null) {
       return false;
     } else {
@@ -364,7 +371,7 @@ public final class Property {
     }
   }
 
-  public static boolean hasValue(final Object value) {
+  static boolean hasValue(final Object value) {
     if (value == null) {
       return false;
     } else if (value instanceof CharSequence) {
@@ -384,7 +391,7 @@ public final class Property {
     }
   }
 
-  public static boolean hasValue(final Object[] array) {
+  static boolean hasValue(final Object[] array) {
     if (array == null || array.length > 1) {
       return false;
     } else {
@@ -392,7 +399,7 @@ public final class Property {
     }
   }
 
-  public static boolean hasValuesAll(final Object... values) {
+  static boolean hasValuesAll(final Object... values) {
     if (values == null || values.length == 0) {
       return false;
     } else {
@@ -405,7 +412,7 @@ public final class Property {
     }
   }
 
-  public static boolean hasValuesAny(final Object... values) {
+  static boolean hasValuesAny(final Object... values) {
     if (values == null || values.length == 0) {
       return false;
     } else {
@@ -419,7 +426,7 @@ public final class Property {
   }
 
   @SuppressWarnings("unchecked")
-  public static <V> V invoke(final Object object, final String methodName,
+  static <V> V invoke(final Object object, final String methodName,
     final Object... parameterArray) {
     try {
       if (object instanceof Class<?>) {
@@ -436,7 +443,7 @@ public final class Property {
     }
   }
 
-  public static boolean isChanged(final Object oldValue, final Object newValue) {
+  static boolean isChanged(final Object oldValue, final Object newValue) {
     final boolean oldHasValue = Property.hasValue(oldValue);
     final boolean newHasValue = Property.hasValue(newValue);
     if (oldHasValue) {
@@ -458,7 +465,7 @@ public final class Property {
     }
   }
 
-  public static boolean isEmpty(final Emptyable value) {
+  static boolean isEmpty(final Emptyable value) {
     if (value == null) {
       return true;
     } else {
@@ -466,7 +473,7 @@ public final class Property {
     }
   }
 
-  public static boolean isEmpty(final Object value) {
+  static boolean isEmpty(final Object value) {
     if (value == null) {
       return true;
     } else if (value instanceof CharSequence) {
@@ -486,7 +493,7 @@ public final class Property {
     }
   }
 
-  public static boolean isEmpty(final Object[] value) {
+  static boolean isEmpty(final Object[] value) {
     if (value == null || value.length == 0) {
       return true;
     } else {
@@ -494,7 +501,24 @@ public final class Property {
     }
   }
 
-  public static PropertyChangeSupport propertyChangeSupport(final Object object) {
+  static <V> PropertyChangeListener newListener(final Consumer<V> consumer) {
+    return (event) -> {
+      @SuppressWarnings("unchecked")
+      final V value = (V)event.getNewValue();
+      consumer.accept(value);
+    };
+  }
+
+  static <V> PropertyChangeListener newListener(final Function2<String, V, ?> function) {
+    return (event) -> {
+      final String propertyName = event.getPropertyName();
+      @SuppressWarnings("unchecked")
+      final V value = (V)event.getNewValue();
+      function.apply(propertyName, value);
+    };
+  }
+
+  static PropertyChangeSupport propertyChangeSupport(final Object object) {
     if (object instanceof PropertyChangeSupport) {
       return (PropertyChangeSupport)object;
     } else if (object instanceof PropertyChangeSupportProxy) {
@@ -505,7 +529,7 @@ public final class Property {
     }
   }
 
-  public static Method readMethod(final Class<?> beanClass, final String name) {
+  static Method readMethod(final Class<?> beanClass, final String name) {
     final PropertyDescriptor descriptor = descriptor(beanClass, name);
     if (descriptor != null) {
       return descriptor.getReadMethod();
@@ -514,11 +538,11 @@ public final class Property {
     }
   }
 
-  public static Method readMethod(final Object object, final String name) {
+  static Method readMethod(final Object object, final String name) {
     return readMethod(object.getClass(), name);
   }
 
-  public static void removeAllListeners(final Component component) {
+  static void removeAllListeners(final Component component) {
     for (final PropertyChangeListener listener : component.getPropertyChangeListeners()) {
       if (listener instanceof PropertyChangeListenerProxy) {
         final PropertyChangeListenerProxy proxy = (PropertyChangeListenerProxy)listener;
@@ -529,7 +553,7 @@ public final class Property {
     }
   }
 
-  public static void removeAllListeners(final Object object) {
+  static void removeAllListeners(final Object object) {
     if (object instanceof Component) {
       final Component component = (Component)object;
       removeAllListeners(component);
@@ -551,7 +575,7 @@ public final class Property {
 
   }
 
-  public static void removeAllListeners(final PropertyChangeSupport propertyChangeSupport) {
+  static void removeAllListeners(final PropertyChangeSupport propertyChangeSupport) {
     for (final PropertyChangeListener listener : propertyChangeSupport
       .getPropertyChangeListeners()) {
       if (listener instanceof PropertyChangeListenerProxy) {
@@ -563,7 +587,7 @@ public final class Property {
     }
   }
 
-  public static void removeListener(final Object source, final Object listener) {
+  static void removeListener(final Object source, final Object listener) {
     if (source != null && listener instanceof PropertyChangeListener) {
       final PropertyChangeListener propertyChangeListener = (PropertyChangeListener)listener;
       final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
@@ -598,7 +622,7 @@ public final class Property {
     }
   }
 
-  public static void removeListener(final Object source, final String propertyName,
+  static void removeListener(final Object source, final String propertyName,
     final Object listener) {
     if (listener instanceof PropertyChangeListener) {
       final PropertyChangeListener propertyChangeListener = (PropertyChangeListener)listener;
@@ -653,7 +677,7 @@ public final class Property {
     }
   }
 
-  public static void set(final Object object, final Map<String, ? extends Object> properties) {
+  static void set(final Object object, final Map<String, ? extends Object> properties) {
     if (properties != null) {
       for (final Entry<String, ? extends Object> property : properties.entrySet()) {
         final String propertyName = property.getKey();
@@ -667,7 +691,7 @@ public final class Property {
     }
   }
 
-  public static void set(final Object object, final String propertyName, final Object value) {
+  static void set(final Object object, final String propertyName, final Object value) {
     if (object != null) {
       if (object instanceof Record) {
         final Record record = (Record)object;
@@ -682,7 +706,7 @@ public final class Property {
     }
   }
 
-  public static String toString(final Object object, final String methodName,
+  static String toString(final Object object, final String methodName,
     final List<Object> parameters) {
     final StringBuilder string = new StringBuilder();
 
@@ -714,12 +738,7 @@ public final class Property {
     return string.toString();
   }
 
-  public static String toString(final Object object, final String methodName,
-    final Object... parameters) {
+  static String toString(final Object object, final String methodName, final Object... parameters) {
     return toString(object, methodName, Arrays.asList(parameters));
   }
-
-  private Property() {
-  }
-
 }

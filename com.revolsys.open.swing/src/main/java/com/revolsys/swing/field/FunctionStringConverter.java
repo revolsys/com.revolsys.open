@@ -10,15 +10,16 @@ import javax.swing.ListCellRenderer;
 
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
-public class FunctionStringConverter extends ObjectToStringConverter implements ListCellRenderer {
+public class FunctionStringConverter<T> extends ObjectToStringConverter
+  implements ListCellRenderer<T> {
 
   private int horizontalAlignment = JLabel.LEFT;
 
   private final DefaultListCellRenderer renderer = new DefaultListCellRenderer();
 
-  private final Function<Object, String> function;
+  private final Function<T, String> function;
 
-  public FunctionStringConverter(final Function<Object, String> function) {
+  public FunctionStringConverter(final Function<T, String> function) {
     this.function = function;
   }
 
@@ -27,10 +28,10 @@ public class FunctionStringConverter extends ObjectToStringConverter implements 
   }
 
   @Override
-  public Component getListCellRendererComponent(final JList list, final Object value,
+  public Component getListCellRendererComponent(final JList<? extends T> list, final T value,
     final int index, final boolean isSelected, final boolean cellHasFocus) {
-    this.renderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
     final String text = getPreferredStringForItem(value);
+    this.renderer.getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
     this.renderer.setText(text);
     this.renderer.setHorizontalAlignment(this.horizontalAlignment);
     return this.renderer;
@@ -41,7 +42,7 @@ public class FunctionStringConverter extends ObjectToStringConverter implements 
     if (item == null) {
       return "";
     } else {
-      return this.function.apply(item);
+      return this.function.apply((T)item);
     }
   }
 

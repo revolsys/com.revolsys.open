@@ -12,6 +12,7 @@ import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public class CodeTableComboBoxModel extends AbstractListModel<Identifier>
   implements ComboBoxModel<Identifier>, PropertyChangeListener, Closeable {
@@ -20,12 +21,19 @@ public class CodeTableComboBoxModel extends AbstractListModel<Identifier>
   public static ComboBox<Identifier> newComboBox(final String fieldName, final CodeTable codeTable,
     final boolean allowNull) {
     final CodeTableComboBoxModel model = new CodeTableComboBoxModel(codeTable, allowNull);
-    final CodeTableObjectToStringConverter stringConverter = new CodeTableObjectToStringConverter(
-      codeTable);
 
-    final CodeTableListCellRenderer renderer = new CodeTableListCellRenderer(codeTable);
-    final ComboBox<Identifier> comboBox = new ComboBox<>(fieldName, model, stringConverter,
-      renderer);
+    final ComboBox<Identifier> comboBox = ComboBox.newComboBox(fieldName, model, (value) -> {
+      if (value == null || value == Identifier.NULL) {
+        return null;
+      } else {
+        final List<Object> values = codeTable.getValues(value);
+        if (values == null || values.isEmpty()) {
+          return null;
+        } else {
+          return Strings.toString(":", values);
+        }
+      }
+    });
     return comboBox;
   }
 

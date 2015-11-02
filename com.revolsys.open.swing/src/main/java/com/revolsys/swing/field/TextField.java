@@ -154,7 +154,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
   }
 
   @Override
-  public void setFieldValue(final Object value) {
+  public boolean setFieldValue(final Object value) {
     final String newText = getDisplayText(value);
     final String text = getText();
     this.fieldSupport.discardAllEdits();
@@ -168,7 +168,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
       }
       this.fieldSupport.discardAllEdits();
     }
-    this.fieldSupport.setValue(value);
+    return this.fieldSupport.setValue(value);
   }
 
   @Override

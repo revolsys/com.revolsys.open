@@ -27,11 +27,11 @@ public class ColorChooserField extends ValueField {
   }
 
   @Override
-  public void setFieldValue(final Object color) {
-    super.setFieldValue(color);
+  public boolean setFieldValue(final Object color) {
     if (this.colorButton != null) {
       this.colorButton.setBackground((Color)color);
     }
+    return super.setFieldValue(color);
   }
 
   @Override

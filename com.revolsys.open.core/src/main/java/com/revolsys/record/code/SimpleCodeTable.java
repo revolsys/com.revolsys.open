@@ -15,7 +15,7 @@ public class SimpleCodeTable extends AbstractCodeTable {
     try (
       final RecordReader reader = RecordReader.newRecordReader(resource)) {
       for (final Record record : reader) {
-        final Identifier id = Identifier.newIdentifier(record.getValue(0));
+        final Identifier id = record.getIdentifier(0);
         final List<Object> values = new ArrayList<>();
         final int fieldCount = record.getRecordDefinition().getFieldCount();
         for (int i = 1; i < fieldCount; i++) {

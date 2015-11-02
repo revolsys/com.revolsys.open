@@ -22,7 +22,6 @@ import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.TextArea;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
-import com.revolsys.swing.map.layer.record.component.FieldTitleStringConveter;
 import com.revolsys.util.Property;
 
 public class TextNameField extends ValueField {
@@ -38,12 +37,10 @@ public class TextNameField extends ValueField {
     this.textNameField = new TextArea(fieldName, fieldValue, 3, 30);
     add(new JScrollPane(this.textNameField), BorderLayout.NORTH);
 
-    final List<String> fieldNames = new ArrayList<String>(layer.getFieldNames());
+    final List<String> fieldNames = new ArrayList<>(layer.getFieldNames());
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
     fieldNames.remove(recordDefinition.getGeometryFieldName());
-    final FieldTitleStringConveter converter = new FieldTitleStringConveter(layer);
-    this.fieldNamesField = new ComboBox<String>(converter, false, fieldNames);
-    this.fieldNamesField.setRenderer(converter);
+    this.fieldNamesField = ComboBox.newComboBox("fieldNames", fieldNames, layer::getFieldTitle);
 
     final JButton addButton = RunnableAction.newButton(null, "Add field name", Icons.getIcon("add"),
       this::addFieldName);
@@ -118,8 +115,8 @@ public class TextNameField extends ValueField {
   }
 
   @Override
-  public void setFieldValue(final Object value) {
-    this.textNameField.setFieldValue(value);
+  public boolean setFieldValue(final Object value) {
+    return this.textNameField.setFieldValue(value);
   }
 
   @Override

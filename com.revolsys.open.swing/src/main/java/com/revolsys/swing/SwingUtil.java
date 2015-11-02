@@ -41,6 +41,7 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -135,6 +136,11 @@ public class SwingUtil {
     final Object value, final int length) {
     addLabel(container, fieldName);
     addReadOnlyTextField(container, fieldName, value, length);
+  }
+
+  public static void addLayer(final JLayeredPane layeredPane, final JComponent component,
+    final Integer layerIndex) {
+    layeredPane.add(component, layerIndex);
   }
 
   public static JComponent addObjectField(final Container container, final Object object,
@@ -623,6 +629,11 @@ public class SwingUtil {
     field.setFont(FONT);
 
     return (T)field;
+  }
+
+  public static <T extends JComponent> T newField(final DataType dataType, final String fieldName,
+    final Object fieldValue) {
+    return newField(dataType.getJavaClass(), fieldName, fieldValue);
   }
 
   @SuppressWarnings("unchecked")

@@ -3,12 +3,11 @@ package com.revolsys.swing.map.component;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Vector;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -23,22 +22,25 @@ public class MarkerField extends ValueField implements PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
-  private final ComboBox comboBox = new ComboBox("marker",
-    new DefaultComboBoxModel(new Vector<Marker>(ShapeMarker.getMarkers())), null,
-    new DefaultListCellRenderer() {
-      private static final long serialVersionUID = 1L;
+  private static final ListCellRenderer<ShapeMarker> renderer = new ListCellRenderer<ShapeMarker>() {
+    private static final long serialVersionUID = 1L;
 
-      @Override
-      public Component getListCellRendererComponent(final JList list, final Object value,
-        final int index, final boolean isSelected, final boolean cellHasFocus) {
-        final Component component = super.getListCellRendererComponent(list, value, index,
-          isSelected, cellHasFocus);
-        setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5));
-        final ShapeMarker marker = (ShapeMarker)value;
-        setIcon(new ShapeIcon(marker.getShape(), 16, 16));
-        return component;
-      }
-    });
+    DefaultListCellRenderer renderer = new DefaultListCellRenderer();
+
+    @Override
+    public Component getListCellRendererComponent(final JList<? extends ShapeMarker> list,
+      final ShapeMarker marker, final int index, final boolean isSelected,
+      final boolean cellHasFocus) {
+      final Component component = this.renderer.getListCellRendererComponent(list, marker, index,
+        isSelected, cellHasFocus);
+      this.renderer.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5));
+      this.renderer.setIcon(new ShapeIcon(marker.getShape(), 16, 16));
+      return component;
+    }
+  };
+
+  private final ComboBox<ShapeMarker> comboBox = ComboBox.newComboBox("marker",
+    ShapeMarker.getMarkers(), renderer);
 
   public MarkerField(final String fieldName, final Object fieldValue) {
     super(fieldName, fieldValue);

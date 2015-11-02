@@ -64,7 +64,7 @@ public class CheckBox extends JCheckBox implements Field, ActionListener {
   }
 
   @Override
-  public void setFieldValue(final Object value) {
+  public boolean setFieldValue(final Object value) {
     final boolean newValue = BooleanStringConverter.getBoolean(value);
     final boolean selected = isSelected();
     getUndoManager().discardAllEdits();
@@ -72,7 +72,7 @@ public class CheckBox extends JCheckBox implements Field, ActionListener {
       setSelected(newValue);
       getUndoManager().discardAllEdits();
     }
-    Field.super.setFieldValue(newValue);
+    return Field.super.setFieldValue(newValue);
   }
 
   @Override

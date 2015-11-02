@@ -57,7 +57,6 @@ public class AddRecordStoreConnectionPanel extends ValueField {
     this.passwordField = new JTextField("", 20);
     add(this.passwordField);
     GroupLayouts.makeColumns(this, 2, true);
-
   }
 
   @Override

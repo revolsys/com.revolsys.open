@@ -211,7 +211,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public LayerRecord newLayerRecord(final Map<String, Object> values) {
+  public LayerRecord newLayerRecord(final Map<String, ? extends Object> values) {
     final LayerRecord record = super.newLayerRecord(values);
     addToIndex(record);
     fireEmpty();

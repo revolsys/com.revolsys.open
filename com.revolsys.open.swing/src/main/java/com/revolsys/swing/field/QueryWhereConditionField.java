@@ -95,7 +95,6 @@ import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
-import com.revolsys.swing.map.layer.record.component.FieldTitleStringConveter;
 import com.revolsys.swing.map.layer.record.component.RecordLayerFields;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
@@ -171,8 +170,8 @@ public class QueryWhereConditionField extends ValueField
     this.recordDefinition = layer.getRecordDefinition();
     final List<FieldDefinition> fieldDefinitions = this.recordDefinition.getFields();
 
-    this.fieldNamesList = new ComboBox<FieldDefinition>(new FieldTitleStringConveter(layer), false,
-      fieldDefinitions);
+    this.fieldNamesList = ComboBox.newComboBox("fieldNames", fieldDefinitions,
+      FieldDefinition::getTitle);
     this.fieldNamesList.setShowErrorIcon(false);
     this.fieldNamesList.addItemListener(this);
     this.fieldNamesList.addMouseListener(this);
@@ -637,9 +636,11 @@ public class QueryWhereConditionField extends ValueField
   }
 
   @Override
-  public void setFieldValue(final Object value) {
+  public boolean setFieldValue(final Object value) {
     if (value instanceof Condition) {
-      super.setFieldValue(value);
+      return super.setFieldValue(value);
+    } else {
+      return false;
     }
   }
 

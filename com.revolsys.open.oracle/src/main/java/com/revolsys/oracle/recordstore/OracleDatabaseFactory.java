@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.datatype.DataType;
-import com.revolsys.jdbc.io.AbstractJdbcDatabaseFactory;
+import com.revolsys.jdbc.io.JdbcDatabaseFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.schema.RecordStore;
 
@@ -31,7 +32,7 @@ jdbc:oracle:oci:@<tnsname>
 jdbc:oracle:oci:@<host>:<port>:<sid>
 jdbc:oracle:oci:@<host>:<port>/<service>
  */
-public class OracleDatabaseFactory extends AbstractJdbcDatabaseFactory {
+public class OracleDatabaseFactory implements JdbcDatabaseFactory {
   public static final String URL_REGEX = "jdbc:oracle:thin:(.+)";
 
   private static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX);
@@ -90,6 +91,16 @@ public class OracleDatabaseFactory extends AbstractJdbcDatabaseFactory {
   public boolean canHandleUrl(final String url) {
     final Matcher urlMatcher = URL_PATTERN.matcher(url);
     return urlMatcher.matches();
+  }
+
+  @Override
+  public Map<String, String> getConnectionUrlMap() {
+    final Map<String, String> connectionMap = new TreeMap<>();
+    for (final String connectionName : getTnsConnectionNames()) {
+      final String connectionUrl = "jdbc:oracle:thin:@" + connectionName;
+      connectionMap.put(connectionName, connectionUrl);
+    }
+    return Collections.emptyMap();
   }
 
   @Override

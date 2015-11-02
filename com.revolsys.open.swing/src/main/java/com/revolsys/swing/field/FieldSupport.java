@@ -179,13 +179,16 @@ public class FieldSupport {
     this.undoManager.setParent(undoManager);
   }
 
-  public void setValue(final Object value) {
+  public boolean setValue(final Object value) {
     final Object oldValue = this.value;
-    if (!Equals.equal(oldValue, value)) {
+    if (Equals.equal(oldValue, value)) {
+      return false;
+    } else {
       this.value = value;
       this.field.firePropertyChange(this.name, oldValue, value);
       final UndoManager parent = this.undoManager.getParent();
       SetFieldValueUndoableEdit.newUndoableEdit(parent, this.field, oldValue, value);
+      return true;
     }
   }
 }

@@ -1416,7 +1416,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   }
 
   public boolean showAddDialog() {
-    final String title = "Add NEW " + getName();
+    final String title = "Add New " + getName();
     final Window window = SwingUtil.getActiveWindow();
     final JDialog dialog = new JDialog(window, title, ModalityType.APPLICATION_MODAL);
     dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);

@@ -359,13 +359,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
                 writeDelete(writer, record);
               } else {
                 final RecordDefinition recordDefinition = getRecordDefinition();
-                final int fieldCount = recordDefinition.getFieldCount();
-                for (int fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++) {
-                  record.validateField(fieldIndex);
-                }
-                if (super.isModified(record)) {
-                  writeUpdate(writer, record);
-                } else if (super.isNew(record)) {
+                if (super.isNew(record)) {
                   Identifier identifier = record.getIdentifier();
                   final List<String> idFieldNames = recordDefinition.getIdFieldNames();
                   if (identifier == null && !idFieldNames.isEmpty()) {
@@ -374,6 +368,14 @@ public class RecordStoreLayer extends AbstractRecordLayer {
                       identifier.setIdentifier(record, idFieldNames);
                     }
                   }
+                }
+                final int fieldCount = recordDefinition.getFieldCount();
+                for (int fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++) {
+                  record.validateField(fieldIndex);
+                }
+                if (super.isModified(record)) {
+                  writeUpdate(writer, record);
+                } else if (super.isNew(record)) {
                   writer.write(record);
                 }
               }
@@ -671,7 +673,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public LayerRecord newLayerRecord(final Map<String, Object> values) {
+  public LayerRecord newLayerRecord(final Map<String, ? extends Object> values) {
     if (!isReadOnly() && isEditable() && isCanAddRecords()) {
       final LayerRecord record = new NewProxyLayerRecord(this, values);
       addRecordToCache(getCacheIdNew(), record);
