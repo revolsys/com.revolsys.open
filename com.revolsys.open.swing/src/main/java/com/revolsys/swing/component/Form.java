@@ -1,18 +1,25 @@
 package com.revolsys.swing.component;
 
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import org.slf4j.LoggerFactory;
+
+import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
+import com.revolsys.util.function.Consumer2;
 
 public class Form extends JPanel {
   private static final long serialVersionUID = 1L;
@@ -22,9 +29,39 @@ public class Form extends JPanel {
   private final PropertyChangeListener propertyChangeSetValue = Property
     .newListener(this::setFieldValue);
 
+  private final List<Consumer2<String, Object>> fieldValueListeners = new ArrayList<>();
+
+  private final Map<String, List<Consumer2<String, Object>>> fieldValueListenersByFieldName = new HashMap<>();
+
   public void addField(final Field field) {
     setField(field);
     add((JComponent)field);
+  }
+
+  public boolean addFieldValueListener(final Consumer2<String, Object> listener) {
+    if (this.fieldValueListeners.contains(listener)) {
+      return false;
+    } else {
+      return this.fieldValueListeners.add(listener);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V> boolean addFieldValueListener(final String fieldName, final Consumer<V> listener) {
+    return addFieldValueListener(fieldName, (name, value) -> {
+      listener.accept((V)value);
+    });
+  }
+
+  public boolean addFieldValueListener(final String fieldName,
+    final Consumer2<String, Object> listener) {
+    final List<Consumer2<String, Object>> listeners = Maps
+      .getList(this.fieldValueListenersByFieldName, fieldName);
+    if (listeners.contains(listener)) {
+      return false;
+    } else {
+      return listeners.add(listener);
+    }
   }
 
   public void addLabelAndField(final Field field) {
@@ -77,6 +114,10 @@ public class Form extends JPanel {
     return (F)SwingUtil.newField(dataType, fieldName, null);
   }
 
+  public boolean removeFieldValueListener(final Consumer2<String, Object> listener) {
+    return this.fieldValueListeners.remove(listener);
+  }
+
   @Override
   public void removeNotify() {
     super.addNotify();
@@ -105,12 +146,31 @@ public class Form extends JPanel {
     }
   }
 
-  public boolean setFieldValue(final String name, final Object value) {
-    final Field field = getField(name);
+  public boolean setFieldValue(final String fieldName, final Object value) {
+    final Field field = getField(fieldName);
     if (field == null) {
       return false;
     } else {
-      return field.setFieldValue(value);
+      final boolean modified = field.setFieldValue(value);
+      for (final Consumer2<String, Object> listener : this.fieldValueListeners) {
+        try {
+          listener.accept(fieldName, field.getFieldValue());
+        } catch (final Throwable e) {
+          LoggerFactory.getLogger(getClass()).error("Cannot set " + field + "=" + value, e);
+        }
+      }
+      final List<Consumer2<String, Object>> listeners = this.fieldValueListenersByFieldName
+        .get(fieldName);
+      if (listeners != null) {
+        for (final Consumer2<String, Object> listener : listeners) {
+          try {
+            listener.accept(fieldName, field.getFieldValue());
+          } catch (final Throwable e) {
+            LoggerFactory.getLogger(getClass()).error("Cannot set " + field + "=" + value, e);
+          }
+        }
+      }
+      return modified;
     }
 
   }

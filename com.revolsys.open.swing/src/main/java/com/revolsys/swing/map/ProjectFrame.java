@@ -11,7 +11,6 @@ import java.awt.event.ContainerListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.net.ResponseCache;
 import java.nio.file.Files;
@@ -345,7 +344,15 @@ public class ProjectFrame extends BaseFrame {
     final Project project = getProject();
     this.tocTree = ProjectTreeNode.newTree(project);
 
-    Property.addListener(this.project, "layers", this::expandLayers);
+    // Property.addListener(this.project, "layers", (event) -> {
+    // Invoke.later(() -> {
+    // final boolean open = this.project.isOpen();
+    // this.tocTree.collapseRow(0);
+    // if (open) {
+    // this.tocTree.expandRow(0);
+    // }
+    // });
+    // });
 
     addTabIcon(this.leftTabs, "tree_layers", "TOC", this.tocTree, true);
 
@@ -379,36 +386,33 @@ public class ProjectFrame extends BaseFrame {
 
   @Override
   public void dispose() {
-    Invoke.later(() -> {
-      Property.removeAllListeners(this);
-      setVisible(false);
-      super.dispose();
-      setRootPane(new JRootPane());
-      removeAll();
-      setMenuBar(null);
-      if (this.project != null) {
-        final RecordStoreConnectionRegistry recordStores = this.project.getRecordStores();
-        RecordStoreConnectionManager.get().removeConnectionRegistry(recordStores);
-        if (Project.get() == this.project) {
-          Project.set(null);
-        }
+    Property.removeAllListeners(this);
+    setVisible(false);
+    super.dispose();
+    setRootPane(new JRootPane());
+    removeAll();
+    setMenuBar(null);
+    if (this.project != null) {
+      final RecordStoreConnectionRegistry recordStores = this.project.getRecordStores();
+      RecordStoreConnectionManager.get().removeConnectionRegistry(recordStores);
+      if (Project.get() == this.project) {
+        Project.set(null);
       }
-      this.tocTree = null;
-      this.project = null;
-      this.leftTabs = null;
-      this.leftRightSplit = null;
-      this.bottomTabs = null;
-      this.topBottomSplit = null;
+    }
+    this.tocTree = null;
+    this.project = null;
+    this.leftTabs = null;
+    this.leftRightSplit = null;
+    this.bottomTabs = null;
+    this.topBottomSplit = null;
 
-      if (this.mapPanel != null) {
-        this.mapPanel.destroy();
-        this.mapPanel = null;
-      }
-      final ActionMap actionMap = getRootPane().getActionMap();
-      actionMap.put(SAVE_PROJECT_KEY, null);
-      actionMap.put(SAVE_CHANGES_KEY, null);
-
-    });
+    if (this.mapPanel != null) {
+      this.mapPanel.destroy();
+      this.mapPanel = null;
+    }
+    final ActionMap actionMap = getRootPane().getActionMap();
+    actionMap.put(SAVE_PROJECT_KEY, null);
+    actionMap.put(SAVE_CHANGES_KEY, null);
   }
 
   public void exit() {
@@ -437,18 +441,6 @@ public class ProjectFrame extends BaseFrame {
         }
       });
     }
-  }
-
-  public void expandLayers(final PropertyChangeEvent event) {
-    Invoke.later(() -> {
-      final Object source = event.getSource();
-      if (source instanceof LayerGroup) {
-        final Object newValue = event.getNewValue();
-        if (newValue instanceof LayerGroup) {
-          expandLayers((LayerGroup)newValue);
-        }
-      }
-    });
   }
 
   public JTabbedPane getBottomTabs() {

@@ -43,6 +43,8 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends AbstractPro
 
   private boolean visible = true;
 
+  private boolean open = false;
+
   public AbstractLayerRenderer(final String type, String name, final T layer,
     final LayerRenderer<?> parent, final Map<String, Object> style) {
     this(type, layer);
@@ -64,6 +66,10 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends AbstractPro
     }
     setName(name);
     setParent(parent);
+    final Boolean open = getValue(style, "open");
+    if (open != null) {
+      this.open = open;
+    }
   }
 
   public AbstractLayerRenderer(final String type, final T layer) {
@@ -173,6 +179,11 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends AbstractPro
   }
 
   @Override
+  public boolean isOpen() {
+    return this.open;
+  }
+
+  @Override
   public boolean isVisible() {
     return this.visible;
   }
@@ -261,6 +272,14 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends AbstractPro
     firePropertyChange("name", oldName, this.name);
   }
 
+  @Override
+  public void setOpen(final boolean open) {
+    this.open = open;
+    final boolean oldValue = this.open;
+    this.open = open;
+    firePropertyChange("open", oldValue, this.open);
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public void setParent(final LayerRenderer<?> parent) {
@@ -296,6 +315,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends AbstractPro
     MapSerializerUtil.add(map, "visible", this.visible);
     MapSerializerUtil.add(map, "maximumScale", this.maximumScale);
     MapSerializerUtil.add(map, "minimumScale", this.minimumScale);
+    MapSerializerUtil.add(map, "open", this.open);
     return map;
   }
 

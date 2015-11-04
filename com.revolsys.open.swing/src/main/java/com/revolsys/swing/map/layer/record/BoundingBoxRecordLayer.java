@@ -14,6 +14,7 @@ import com.revolsys.equals.Equals;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.util.Property;
 
 public class BoundingBoxRecordLayer extends AbstractRecordLayer {
   private static final Logger LOG = Logger.getLogger(BoundingBoxRecordLayer.class);
@@ -41,47 +42,49 @@ public class BoundingBoxRecordLayer extends AbstractRecordLayer {
     return clone;
   }
 
+  @Override
+  public BoundingBox getBoundingBox() {
+    return this.boundingBox;
+  }
+
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
   @Override
-  public List<LayerRecord> doQuery(final BoundingBox boundingBox) {
-    if (boundingBox.isEmpty()) {
-      return Collections.emptyList();
-    } else {
-      synchronized (getSync()) {
-        if (this.loading) {
-          if (!boundingBox.equals(this.boundingBox)) {
-            this.boundingBox = null;
-            this.worker.cancel(true);
-            this.loading = false;
+  public List<LayerRecord> getRecords(BoundingBox boundingBox) {
+    if (hasGeometryField()) {
+      boundingBox = convertBoundingBox(boundingBox);
+      if (Property.hasValue(boundingBox)) {
+        synchronized (getSync()) {
+          if (this.loading) {
+            if (!boundingBox.equals(this.boundingBox)) {
+              this.boundingBox = null;
+              this.worker.cancel(true);
+              this.loading = false;
+            }
+          }
+          if (this.boundingBox == null || !boundingBox.equals(this.boundingBox) && !this.loading) {
+            this.loading = true;
+            this.boundingBox = boundingBox;
+            firePropertyChange("visible", super.isVisible(), false);
+            try {
+              final Constructor<?> constructor = this.workerClass
+                .getConstructor(BoundingBoxRecordLayer.class, BoundingBox.class);
+              this.worker = (SwingWorker)constructor.newInstance(this, boundingBox);
+              Invoke.worker(this.worker);
+            } catch (final NoSuchMethodException e) {
+              LOG.error("Worker Constructor not found", e);
+            } catch (final InvocationTargetException e) {
+              LOG.error("Unable to construct loader class", e.getTargetException());
+            } catch (final Throwable e) {
+              LOG.error("Unable to construct loader class", e);
+            }
           }
         }
-        if (this.boundingBox == null || !boundingBox.equals(this.boundingBox) && !this.loading) {
-          this.loading = true;
-          this.boundingBox = boundingBox;
-          firePropertyChange("visible", super.isVisible(), false);
-          try {
-            final Constructor<?> constructor = this.workerClass
-              .getConstructor(BoundingBoxRecordLayer.class, BoundingBox.class);
-            this.worker = (SwingWorker)constructor.newInstance(this, boundingBox);
-            Invoke.worker(this.worker);
-          } catch (final NoSuchMethodException e) {
-            LOG.error("Worker Constructor not found", e);
-          } catch (final InvocationTargetException e) {
-            LOG.error("Unable to construct loader class", e.getTargetException());
-          } catch (final Throwable e) {
-            LOG.error("Unable to construct loader class", e);
-          }
-        }
+        return (List)getIndex().queryIntersects(boundingBox);
       }
-      return (List)getIndex().queryIntersects(boundingBox);
     }
-  }
-
-  @Override
-  public BoundingBox getBoundingBox() {
-    return this.boundingBox;
+    return Collections.emptyList();
   }
 
   @Override

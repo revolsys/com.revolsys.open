@@ -132,23 +132,23 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public void forEach(final Query query, final Consumer<LayerRecord> consumer) {
-    final List<LayerRecord> records = getPersistedRecords(query);
+  public void forEachRecord(final Query query, final Consumer<LayerRecord> consumer) {
+    final List<LayerRecord> records = getRecordsPersisted(query);
     records.forEach(consumer);
   }
 
   @Override
-  public int getNewRecordCount() {
+  public int getRecordCountNew() {
     return 0;
   }
 
   @Override
-  public int getPersistedRecordCount() {
+  public int getRecordCountPersisted() {
     return this.records.size();
   }
 
   @Override
-  public List<LayerRecord> getPersistedRecords(final Query query) {
+  public List<LayerRecord> getRecordsPersisted(final Query query) {
     final List<LayerRecord> records = getRecords();
     final Condition filter = query.getWhereCondition();
     final Map<String, Boolean> orderBy = query.getOrderBy();
@@ -185,7 +185,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   public int getRecordCountPersisted(final Query query) {
     final Condition filter = query.getWhereCondition();
     if (filter.isEmpty()) {
-      return getPersistedRecordCount();
+      return getRecordCountPersisted();
     } else {
       int count = 0;
       final List<LayerRecord> records = getRecords();
@@ -207,7 +207,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
 
   @Override
   public boolean isEmpty() {
-    return getPersistedRecordCount() + super.getNewRecordCount() <= 0;
+    return getRecordCountPersisted() + super.getRecordCountNew() <= 0;
   }
 
   @Override

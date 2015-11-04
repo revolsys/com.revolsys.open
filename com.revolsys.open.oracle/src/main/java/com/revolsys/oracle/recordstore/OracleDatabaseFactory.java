@@ -42,12 +42,19 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
   public static List<String> getTnsConnectionNames() {
     File tnsFile = new File(System.getProperty("oracle.net.tns_admin"), "tnsnames.ora");
     if (!tnsFile.exists()) {
-      tnsFile = new File(System.getenv("TNS_ADMIN"), "tnsnames.ora");
+      final String tnsAdmin = System.getenv("TNS_ADMIN");
+      if (tnsAdmin != null) {
+        tnsFile = new File(tnsAdmin, "tnsnames.ora");
+      }
       if (!tnsFile.exists()) {
-        tnsFile = new File(System.getenv("ORACLE_HOME") + "/network/admin", "tnsnames.ora");
+        final String oracleHome = System.getenv("ORACLE_HOME");
+        if (oracleHome != null) {
+          tnsFile = new File(oracleHome + "/network/admin", "tnsnames.ora");
+        }
         if (!tnsFile.exists()) {
-          tnsFile = new File(System.getenv("ORACLE_HOME") + "/NETWORK/ADMIN", "tnsnames.ora");
-
+          if (oracleHome != null) {
+            tnsFile = new File(oracleHome + "/NETWORK/ADMIN", "tnsnames.ora");
+          }
         }
       }
     }
@@ -100,7 +107,7 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
       final String connectionUrl = "jdbc:oracle:thin:@" + connectionName;
       connectionMap.put(connectionName, connectionUrl);
     }
-    return Collections.emptyMap();
+    return connectionMap;
   }
 
   @Override

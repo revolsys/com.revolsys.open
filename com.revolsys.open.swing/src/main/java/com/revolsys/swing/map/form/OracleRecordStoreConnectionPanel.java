@@ -17,11 +17,10 @@ import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.util.PasswordUtil;
+import com.revolsys.util.PatternToMap;
 
 public class OracleRecordStoreConnectionPanel extends Form {
   private static final long serialVersionUID = 2750736040832727823L;
-
-  private String name;
 
   @SuppressWarnings("unchecked")
   public OracleRecordStoreConnectionPanel(final ConnectionRegistry<RecordStoreConnection> registry,
@@ -44,7 +43,7 @@ public class OracleRecordStoreConnectionPanel extends Form {
 
     final JdbcDatabaseFactory databaseFactory = JdbcFactoryRegistry.databaseFactory("Oracle");
     final Map<String, String> connectionUrlMap = databaseFactory.getConnectionUrlMap();
-    final ComboBox<String> connectionNames = ComboBox.newComboBox("Tns Connections",
+    final ComboBox<String> connectionNames = ComboBox.newComboBox("tnsname",
       connectionUrlMap.keySet());
     connectionNames.addItemListener((e) -> {
       if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -66,6 +65,14 @@ public class OracleRecordStoreConnectionPanel extends Form {
     }
 
     setPreferredSize(new Dimension(400, 300));
+    addFieldValueListener("url", (final String url) -> {
+      final PatternToMap pattern = new PatternToMap("jdbc:oracle:thin:@([a-zA-Z0-9.\\-]+)",
+        "tnsname");
+      final Map<String, String> values = pattern.toMap(url);
+      if (!values.isEmpty()) {
+        setFieldValues(values);
+      }
+    });
   }
 
   @Override

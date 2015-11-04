@@ -1,9 +1,10 @@
 package com.revolsys.swing.map.layer;
 
+import java.util.Map;
+
 import com.revolsys.swing.menu.MenuFactory;
 
 public class BaseMapLayerGroup extends LayerGroup {
-
   static {
     final MenuFactory menu = MenuFactory.getMenu(BaseMapLayerGroup.class);
     menu.addGroup(0, "group");
@@ -11,8 +12,15 @@ public class BaseMapLayerGroup extends LayerGroup {
     menu.deleteMenuItem("group", "Open File Layer");
   }
 
+  public static LayerGroup newLayer(final Map<String, Object> properties) {
+    final BaseMapLayerGroup layerGroup = new BaseMapLayerGroup();
+    layerGroup.loadLayers(properties);
+    return layerGroup;
+  }
+
   public BaseMapLayerGroup() {
     setType("baseMapLayerGroup");
+    setOpen(false);
   }
 
   @Override
@@ -34,5 +42,10 @@ public class BaseMapLayerGroup extends LayerGroup {
   @Override
   public String getName() {
     return "Base Maps";
+  }
+
+  @Override
+  public boolean isSingleLayerVisible() {
+    return true;
   }
 }

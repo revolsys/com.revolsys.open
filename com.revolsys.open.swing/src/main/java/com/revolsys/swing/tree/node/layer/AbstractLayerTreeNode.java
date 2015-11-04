@@ -9,8 +9,9 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.tree.node.ListTreeNode;
+import com.revolsys.swing.tree.node.OpenStateTreeNode;
 
-public abstract class AbstractLayerTreeNode extends ListTreeNode {
+public abstract class AbstractLayerTreeNode extends ListTreeNode implements OpenStateTreeNode {
 
   public AbstractLayerTreeNode(final Layer layer) {
     super(layer);
@@ -71,8 +72,19 @@ public abstract class AbstractLayerTreeNode extends ListTreeNode {
   }
 
   @Override
+  public boolean isOpen() {
+    final Layer layer = getLayer();
+    return layer.isOpen();
+  }
+
+  @Override
   public boolean isUserObjectInitialized() {
     return getLayer().isInitialized();
   }
 
+  @Override
+  public void setOpen(final boolean open) {
+    final Layer layer = getLayer();
+    layer.setOpen(open);
+  }
 }

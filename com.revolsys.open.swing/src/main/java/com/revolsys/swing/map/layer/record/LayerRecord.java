@@ -150,6 +150,10 @@ public interface LayerRecord extends Record {
     return false;
   }
 
+  default boolean isProxy() {
+    return false;
+  }
+
   default boolean isSame(final Record record) {
     if (record == null) {
       return false;

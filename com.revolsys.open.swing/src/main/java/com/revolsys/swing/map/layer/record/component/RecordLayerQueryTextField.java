@@ -46,6 +46,6 @@ public class RecordLayerQueryTextField extends AbstractRecordQueryField {
   })
   @Override
   protected List<Record> getRecords(final Query query) {
-    return (List)this.layer.query(query);
+    return (List)this.layer.getRecords(query);
   }
 }

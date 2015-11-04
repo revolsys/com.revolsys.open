@@ -31,6 +31,8 @@ public interface LayerRenderer<T extends Layer>
 
   boolean isEditing();
 
+  boolean isOpen();
+
   boolean isVisible();
 
   ValueField newStylePanel();
@@ -40,6 +42,8 @@ public interface LayerRenderer<T extends Layer>
   void setEditing(boolean editing);
 
   void setLayer(T layer);
+
+  void setOpen(boolean open);
 
   void setParent(LayerRenderer<?> parent);
 

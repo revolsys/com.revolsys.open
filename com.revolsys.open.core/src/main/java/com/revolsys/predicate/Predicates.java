@@ -60,7 +60,7 @@ public interface Predicates {
     return count;
   }
 
-  static <T> List<T> filter(final Collection<T> collection, final Predicate<? super T> filter) {
+  static <T> List<T> filter(final Iterable<T> collection, final Predicate<? super T> filter) {
     final List<T> list = new ArrayList<T>();
     addAll(list, collection, filter);
     return list;

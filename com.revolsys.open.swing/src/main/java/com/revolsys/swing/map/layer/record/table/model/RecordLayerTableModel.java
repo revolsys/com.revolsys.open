@@ -355,7 +355,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
       if (this.countLoaded) {
         int count = this.recordCount;
         final AbstractRecordLayer layer = getLayer();
-        final int newRecordCount = layer.getNewRecordCount();
+        final int newRecordCount = layer.getRecordCountNew();
         count += newRecordCount;
         return count;
       } else {
@@ -391,7 +391,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   protected List<LayerRecord> getRecordsLayer(final Query query) {
-    return this.layer.getPersistedRecords(query);
+    return this.layer.getRecordsPersisted(query);
   }
 
   protected List<LayerRecord> getRecordsSelected() {
@@ -457,9 +457,9 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   protected LayerRecord loadLayerRecord(int row) {
     final AbstractRecordLayer layer = getLayer();
-    final int newRecordCount = layer.getNewRecordCount();
+    final int newRecordCount = layer.getRecordCountNew();
     if (row < newRecordCount) {
-      return layer.getNewRecords().get(row);
+      return layer.getRecordsNew().get(row);
     } else {
       row -= newRecordCount;
     }
@@ -595,7 +595,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   protected void refreshChangedRecords(final long index) {
-    refreshCachedRecords(index, this.layer::getChangedRecords);
+    refreshCachedRecords(index, this.layer::getRecordsChanged);
   }
 
   protected void refreshSelectedRecords(final long index) {

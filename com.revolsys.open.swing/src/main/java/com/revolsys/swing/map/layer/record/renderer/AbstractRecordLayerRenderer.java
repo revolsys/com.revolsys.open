@@ -204,7 +204,7 @@ public abstract class AbstractRecordLayerRenderer
   public void render(final Viewport2D viewport, final AbstractRecordLayer layer) {
     if (layer.hasGeometryField()) {
       final BoundingBox boundingBox = viewport.getBoundingBox();
-      final List<LayerRecord> records = layer.queryBackground(boundingBox);
+      final List<LayerRecord> records = layer.getRecordsBackground(boundingBox);
       renderRecords(viewport, layer, records);
     }
   }

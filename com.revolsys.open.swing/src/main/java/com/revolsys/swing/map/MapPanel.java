@@ -724,6 +724,16 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
           }
         }
       }
+    } else if (source instanceof Layer) {
+      final Layer layer = (Layer)source;
+      if (layer.getParent() == this.baseMapLayers) {
+        if ("visible".equals(propertyName)) {
+          final boolean visible = layer.isVisible();
+          if (visible) {
+            this.baseMapLayerField.setSelectedItem(layer);
+          }
+        }
+      }
     }
     repaint();
   }

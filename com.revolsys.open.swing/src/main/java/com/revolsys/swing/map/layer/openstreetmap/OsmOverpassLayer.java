@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.openstreetmap;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.Property;
 
 public class OsmOverpassLayer extends AbstractRecordLayer {
   private static final int TILE_SCALE_X = 50;
@@ -48,30 +50,37 @@ public class OsmOverpassLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected List<LayerRecord> doQuery(final BoundingBox boundingBox) {
-    final Map<Identifier, LayerRecord> recordMap = new HashMap<>();
-    final List<BoundingBox> boundingBoxes = getTileBoundingBoxes(boundingBox);
-    for (final BoundingBox tileBoundingBox : boundingBoxes) {
-      final OsmDocument document = getTile(tileBoundingBox);
-      for (final OsmElement record : document.getRecords()) {
-        final Geometry geometry = record.getGeometry();
-        if (geometry != null && !geometry.isEmpty()) {
-          if (boundingBox.intersects(geometry.getBoundingBox())) {
-            final Identifier identifier = record.getIdentifier();
-            // final OsmProxyLayerRecord layerRecord = new OsmProxyLayerRecord(
-            // this, document, identifier);
-            // recordMap.put(identifier, layerRecord);
-          }
-        }
-      }
-    }
-    this.boundingBoxTileMap.keySet().retainAll(boundingBoxes);
-    return new ArrayList<>(recordMap.values());
+  public RecordDefinition getRecordDefinition() {
+    return OsmElement.RECORD_DEFINITION;
   }
 
   @Override
-  public RecordDefinition getRecordDefinition() {
-    return OsmElement.RECORD_DEFINITION;
+  public List<LayerRecord> getRecords(BoundingBox boundingBox) {
+    if (hasGeometryField()) {
+      boundingBox = convertBoundingBox(boundingBox);
+      if (Property.hasValue(boundingBox)) {
+        final Map<Identifier, LayerRecord> recordMap = new HashMap<>();
+        final List<BoundingBox> boundingBoxes = getTileBoundingBoxes(boundingBox);
+        for (final BoundingBox tileBoundingBox : boundingBoxes) {
+          final OsmDocument document = getTile(tileBoundingBox);
+          for (final OsmElement record : document.getRecords()) {
+            final Geometry geometry = record.getGeometry();
+            if (geometry != null && !geometry.isEmpty()) {
+              if (boundingBox.intersects(geometry.getBoundingBox())) {
+                final Identifier identifier = record.getIdentifier();
+                // final OsmProxyLayerRecord layerRecord = new
+                // OsmProxyLayerRecord(
+                // this, document, identifier);
+                // recordMap.put(identifier, layerRecord);
+              }
+            }
+          }
+        }
+        this.boundingBoxTileMap.keySet().retainAll(boundingBoxes);
+        return new ArrayList<>(recordMap.values());
+      }
+    }
+    return Collections.emptyList();
   }
 
   public String getServerUrl() {

@@ -1,7 +1,5 @@
 package com.revolsys.swing.map.layer.record;
 
-import java.util.Map;
-
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.RecordState;
 
@@ -10,21 +8,9 @@ public class NewProxyLayerRecord extends AbstractProxyLayerRecord {
 
   private LayerRecord record;
 
-  public NewProxyLayerRecord(final RecordStoreLayer layer) {
+  public NewProxyLayerRecord(final RecordStoreLayer layer, final LayerRecord record) {
     super(layer);
-    this.record = new ArrayLayerRecord(layer);
-  }
-
-  public NewProxyLayerRecord(final RecordStoreLayer layer,
-    final Map<String, ? extends Object> values) {
-    super(layer);
-    this.record = new ArrayLayerRecord(layer, values);
-    this.record.setState(RecordState.INITIALIZING);
-    try {
-      this.record.setIdentifier(null);
-    } finally {
-      this.record.setState(RecordState.NEW);
-    }
+    this.record = record;
   }
 
   @Override
@@ -33,12 +19,19 @@ public class NewProxyLayerRecord extends AbstractProxyLayerRecord {
   }
 
   @Override
-  protected LayerRecord getLayerRecord() {
-    if (this.identifier == null) {
-      return this.record;
-    } else {
-      return super.getLayerRecord();
+  protected synchronized LayerRecord getProxiedRecord() {
+    if (this.record != null) {
+      final RecordState state = this.record.getState();
+      if (state == RecordState.PERSISTED) {
+        this.identifier = this.record.getIdentifier();
+        if (this.identifier != null) {
+          this.record = null;
+        }
+      } else {
+        return this.record;
+      }
     }
+    return super.getProxiedRecord();
   }
 
   @Override
@@ -47,19 +40,6 @@ public class NewProxyLayerRecord extends AbstractProxyLayerRecord {
       return 0;
     } else {
       return this.identifier.hashCode();
-    }
-  }
-
-  @Override
-  public void postSaveNew() {
-    final RecordState state = getState();
-    if (state == RecordState.PERSISTED) {
-      if (this.identifier == null) {
-        this.identifier = super.getIdentifier();
-        if (this.identifier != null) {
-          this.record = null;
-        }
-      }
     }
   }
 }

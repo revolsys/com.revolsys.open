@@ -385,7 +385,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  protected LayerRecord addRecordToCache(final Label cacheId, final LayerRecord record) {
+  protected LayerRecord addRecordToCache(final Label cacheId, LayerRecord record) {
+    record = getProxiedRecord(record);
     if (isLayerRecord(record)) {
       if (record.getState() == RecordState.DELETED && !isDeleted(record)) {
         return record;
@@ -433,7 +434,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void addSelectedRecords(final BoundingBox boundingBox) {
     if (isSelectable()) {
-      final List<LayerRecord> records = query(boundingBox);
+      final List<LayerRecord> records = getRecords(boundingBox);
       for (final Iterator<LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
         final LayerRecord layerRecord = iterator.next();
         if (!isVisible(layerRecord) || internalIsDeleted(layerRecord)) {
@@ -488,9 +489,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       boolean cancelled = true;
       try (
         Enabled eventsEnabled = eventsDisabled()) {
-        cancelled &= internalCancelChanges(this.cacheIdNew, getNewRecords());
-        cancelled &= internalCancelChanges(this.cacheIdDeleted, getDeletedRecords());
-        cancelled &= internalCancelChanges(this.cacheIdModified, getModifiedRecords());
+        cancelled &= internalCancelChanges(this.cacheIdNew, getRecordsNew());
+        cancelled &= internalCancelChanges(this.cacheIdDeleted, getRecordsDeleted());
+        cancelled &= internalCancelChanges(this.cacheIdModified, getRecordsModified());
         clearSelectedRecordsIndex();
         cleanCachedRecords();
       } finally {
@@ -553,7 +554,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     clone.proxyRecords = MapBackedSet
       .mapBackedSet(new WeakHashMap<AbstractProxyLayerRecord, Object>());
     clone.whereCondition = this.whereCondition.clone();
-    clone.sync = new Object();
     clone.editSync = new Object();
     clone.userReadOnlyFieldNames = new LinkedHashSet<>(this.userReadOnlyFieldNames);
 
@@ -674,35 +674,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
-  protected List<LayerRecord> doQuery(final BoundingBox boundingBox) {
-    if (boundingBox.isEmpty()) {
-      return Collections.emptyList();
-    } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
-      final RecordQuadTree index = getIndex();
-      final List<LayerRecord> records = (List)index.queryIntersects(convertedBoundingBox);
-      return records;
-    }
-  }
-
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
-  public List<LayerRecord> doQuery(Geometry geometry, final double distance) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    geometry = geometry.convert(geometryFactory);
-    final RecordQuadTree index = getIndex();
-    return (List)index.queryDistance(geometry, distance);
-  }
-
-  protected List<LayerRecord> doQueryBackground(final BoundingBox boundingBox) {
-    return doQuery(boundingBox);
-  }
-
   @Override
   protected void doRefresh() {
     setIndexRecords(null);
@@ -718,13 +689,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (isExists()) {
       boolean saved = true;
       try {
-        final Collection<LayerRecord> deletedRecords = getDeletedRecords();
+        final Collection<LayerRecord> deletedRecords = getRecordsDeleted();
         saved &= doSaveChanges(errors, deletedRecords);
 
-        final Collection<LayerRecord> modifiedRecords = getModifiedRecords();
+        final Collection<LayerRecord> modifiedRecords = getRecordsModified();
         saved &= doSaveChanges(errors, modifiedRecords);
 
-        final List<LayerRecord> newRecords = getNewRecords();
+        final List<LayerRecord> newRecords = getRecordsNew();
         saved &= doSaveChanges(errors, newRecords);
       } finally {
         fireRecordsChanged();
@@ -776,7 +747,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (recordDefinition != null) {
       try (
         RecordWriter writer = RecordWriter.newRecordWriter(recordDefinition, target)) {
-        forEach(query, writer::write);
+        forEachRecord(query, writer::write);
       }
     }
   }
@@ -811,7 +782,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     firePropertyChange("selectionCount", -1, selectionCount);
   }
 
-  public void forEach(final Query query, final Consumer<LayerRecord> consumer) {
+  public void forEachRecord(final Query query, final Consumer<LayerRecord> consumer) {
+  }
+
+  public void forEachRecordChanged(final Query query, final Consumer<LayerRecord> consumer) {
+    final List<LayerRecord> records = getRecordsChanged();
+    query.forEachRecord(records, consumer);
   }
 
   @SuppressWarnings("unchecked")
@@ -833,12 +809,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public List<LayerRecord> getCachedRecords(final Label cacheId) {
+  public <L extends LayerRecord> List<L> getCachedRecords(final Label cacheId) {
     synchronized (getSync()) {
-      final List<LayerRecord> records = new ArrayList<>();
+      final List<L> records = new ArrayList<>();
       final Collection<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
       if (cachedRecords != null) {
-        records.addAll(cachedRecords);
+        for (final LayerRecord record : cachedRecords) {
+          final L proxyRecord = newProxyLayerRecord(record);
+          records.add(proxyRecord);
+        }
       }
       return records;
     }
@@ -868,26 +847,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return this.cacheIdSelected;
   }
 
-  public int getChangeCount() {
-    int changeCount = 0;
-    synchronized (getSync()) {
-      changeCount += getNewRecordCount();
-      changeCount += getModifiedRecordCount();
-      changeCount += getDeletedRecordCount();
-    }
-    return changeCount;
-  }
-
-  public List<LayerRecord> getChangedRecords() {
-    synchronized (getSync()) {
-      final List<LayerRecord> records = new ArrayList<>();
-      records.addAll(getNewRecords());
-      records.addAll(getModifiedRecords());
-      records.addAll(getDeletedRecords());
-      return records;
-    }
-  }
-
   @Override
   public Collection<Class<?>> getChildClasses() {
     return Collections.<Class<?>> singleton(AbstractRecordLayerRenderer.class);
@@ -901,14 +860,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     } else {
       return geometryFactory.getCoordinateSystem();
     }
-  }
-
-  public int getDeletedRecordCount() {
-    return getCachedRecordCount(this.cacheIdDeleted);
-  }
-
-  public Collection<LayerRecord> getDeletedRecords() {
-    return getCachedRecords(this.cacheIdDeleted);
   }
 
   public synchronized Object getEditSync() {
@@ -1099,22 +1050,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public int getModifiedRecordCount() {
-    return getCachedRecordCount(this.cacheIdModified);
-  }
-
-  public Collection<LayerRecord> getModifiedRecords() {
-    return getCachedRecords(this.cacheIdModified);
-  }
-
-  public int getNewRecordCount() {
-    return getCachedRecordCount(this.cacheIdNew);
-  }
-
-  public List<LayerRecord> getNewRecords() {
-    return getCachedRecords(this.cacheIdNew);
-  }
-
   protected Geometry getPasteRecordGeometry(final LayerRecord record, final boolean alert) {
     try {
       if (record == null) {
@@ -1210,18 +1145,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public int getPersistedRecordCount() {
-    return getRecordCount();
-  }
-
-  /**
-   * Query the underlying record store to return those records that have been saved that match the query.
-   *
-   * @param query
-   * @return The records.
-   */
-  public List<LayerRecord> getPersistedRecords(final Query query) {
-    return query(query);
+  protected LayerRecord getProxiedRecord(LayerRecord record) {
+    if (record instanceof AbstractProxyLayerRecord) {
+      final AbstractProxyLayerRecord proxy = (AbstractProxyLayerRecord)record;
+      record = proxy.getProxiedRecord();
+    }
+    return record;
   }
 
   public List<AbstractProxyLayerRecord> getProxyRecords() {
@@ -1247,11 +1176,37 @@ public abstract class AbstractRecordLayer extends AbstractLayer
    * @return
    */
   public int getRecordCount() {
-    return getNewRecordCount() + getPersistedRecordCount() - getDeletedRecordCount();
+    return getRecordCountNew() + getRecordCountPersisted() - getRecordCountDeleted();
   }
 
   public int getRecordCount(final Query query) {
     return 0;
+  }
+
+  public int getRecordCountChanged() {
+    int changeCount = 0;
+    synchronized (getSync()) {
+      changeCount += getRecordCountNew();
+      changeCount += getRecordCountModified();
+      changeCount += getRecordCountDeleted();
+    }
+    return changeCount;
+  }
+
+  public int getRecordCountDeleted() {
+    return getCachedRecordCount(this.cacheIdDeleted);
+  }
+
+  public int getRecordCountModified() {
+    return getCachedRecordCount(this.cacheIdModified);
+  }
+
+  public int getRecordCountNew() {
+    return getCachedRecordCount(this.cacheIdNew);
+  }
+
+  public int getRecordCountPersisted() {
+    return getRecordCount();
   }
 
   public int getRecordCountPersisted(final Query query) {
@@ -1269,6 +1224,99 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public List<LayerRecord> getRecords() {
     throw new UnsupportedOperationException();
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  public List<LayerRecord> getRecords(BoundingBox boundingBox) {
+    if (hasGeometryField()) {
+      boundingBox = convertBoundingBox(boundingBox);
+      if (Property.hasValue(boundingBox)) {
+        final RecordQuadTree index = getIndex();
+        final List<LayerRecord> records = (List)index.queryIntersects(boundingBox);
+        return records;
+      }
+    }
+    return Collections.emptyList();
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  public List<LayerRecord> getRecords(Geometry geometry, final double distance) {
+    if (geometry == null || !hasGeometryField()) {
+      return Collections.emptyList();
+    } else {
+      geometry = convertGeometry(geometry);
+      final RecordQuadTree index = getIndex();
+      return (List)index.queryDistance(geometry, distance);
+    }
+  }
+
+  public List<LayerRecord> getRecords(final Identifier identifier) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition != null) {
+      final List<FieldDefinition> idFieldDefinitions = recordDefinition.getIdFields();
+      if (idFieldDefinitions.isEmpty()) {
+        final Query query = new Query(recordDefinition, Q.equalId(idFieldDefinitions, identifier));
+        return getRecords(query);
+      }
+    }
+    return Collections.emptyList();
+  }
+
+  public List<LayerRecord> getRecords(final Map<String, ? extends Object> filter) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final Query query = Query.and(recordDefinition, filter);
+    return getRecords(query);
+  }
+
+  public List<LayerRecord> getRecords(final PathName pathName) {
+    final Query query = new Query(pathName);
+    return getRecords(query);
+  }
+
+  public List<LayerRecord> getRecords(final Query query) {
+    final List<LayerRecord> records = new ArrayList<>();
+    forEachRecord(query, records::add);
+    return records;
+  }
+
+  public List<LayerRecord> getRecordsBackground(final BoundingBox boundingBox) {
+    return getRecords(boundingBox);
+  }
+
+  public <L extends LayerRecord> List<L> getRecordsChanged() {
+    synchronized (getSync()) {
+      final List<L> records = new ArrayList<>();
+      records.addAll(getRecordsNew());
+      records.addAll(getRecordsModified());
+      records.addAll(getRecordsDeleted());
+      return records;
+    }
+  }
+
+  public <L extends LayerRecord> List<L> getRecordsDeleted() {
+    return getCachedRecords(this.cacheIdDeleted);
+  }
+
+  public <L extends LayerRecord> Collection<L> getRecordsModified() {
+    return getCachedRecords(this.cacheIdModified);
+  }
+
+  public <L extends LayerRecord> List<L> getRecordsNew() {
+    return getCachedRecords(this.cacheIdNew);
+  }
+
+  /**
+   * Query the underlying record store to return those records that have been saved that match the query.
+   *
+   * @param query
+   * @return The records.
+   */
+  public List<LayerRecord> getRecordsPersisted(final Query query) {
+    return getRecords(query);
   }
 
   public RecordStore getRecordStore() {
@@ -1535,7 +1583,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public boolean isEmpty() {
-    return getPersistedRecordCount() + getNewRecordCount() <= 0;
+    return getRecordCountPersisted() + getRecordCountNew() <= 0;
   }
 
   public boolean isFieldUserReadOnly(final String fieldName) {
@@ -1634,7 +1682,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public boolean isRecordCached(final Label cacheId, final LayerRecord record) {
+  public boolean isRecordCached(final Label cacheId, LayerRecord record) {
+    record = getProxiedRecord(record);
     if (isLayerRecord(record)) {
       synchronized (getSync()) {
         final Collection<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
@@ -1783,6 +1832,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
     parent.add(filterPanel);
     return filterPanel;
+  }
+
+  @SuppressWarnings("unchecked")
+  protected <L extends LayerRecord> L newProxyLayerRecord(final LayerRecord record) {
+    return (L)record;
   }
 
   public RecordLayerTablePanel newTablePanel(final Map<String, Object> config) {
@@ -1963,66 +2017,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public final List<LayerRecord> query(BoundingBox boundingBox) {
-    if (hasGeometryField()) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      boundingBox = boundingBox.convert(geometryFactory);
-      final List<LayerRecord> results = doQuery(boundingBox);
-      return results;
-    } else {
-      return Collections.emptyList();
-    }
-  }
-
-  public List<LayerRecord> query(final Geometry geometry, final double maxDistance) {
-    if (hasGeometryField()) {
-      final List<LayerRecord> results = doQuery(geometry, maxDistance);
-      return results;
-    } else {
-      return Collections.emptyList();
-    }
-  }
-
-  public List<LayerRecord> query(final Identifier identifier) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    if (recordDefinition != null) {
-      final List<FieldDefinition> idFieldDefinitions = recordDefinition.getIdFields();
-      if (idFieldDefinitions.isEmpty()) {
-        final Query query = new Query(recordDefinition, Q.equalId(idFieldDefinitions, identifier));
-        return query(query);
-      }
-    }
-    return Collections.emptyList();
-  }
-
-  public List<LayerRecord> query(final Map<String, ? extends Object> filter) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    final Query query = Query.and(recordDefinition, filter);
-    return query(query);
-  }
-
-  public List<LayerRecord> query(final PathName pathName) {
-    final Query query = new Query(pathName);
-    return query(query);
-  }
-
-  public List<LayerRecord> query(final Query query) {
-    final List<LayerRecord> records = new ArrayList<>();
-    forEach(query, records::add);
-    return records;
-  }
-
-  public final List<LayerRecord> queryBackground(BoundingBox boundingBox) {
-    if (hasGeometryField()) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      boundingBox = boundingBox.convert(geometryFactory);
-      final List<LayerRecord> results = doQueryBackground(boundingBox);
-      return results;
-    } else {
-      return Collections.emptyList();
-    }
-  }
-
   protected void recordPasted(final LayerRecord newRecord) {
   }
 
@@ -2099,7 +2093,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     this.proxyRecords.remove(proxyRecord);
   }
 
-  protected boolean removeRecordFromCache(final Label cacheId, final LayerRecord record) {
+  protected boolean removeRecordFromCache(final Label cacheId, LayerRecord record) {
+    record = getProxiedRecord(record);
     if (isLayerRecord(record)) {
       synchronized (getSync()) {
         return Maps.removeFromCollection(this.cacheIdToRecordMap, cacheId, record);
@@ -2108,8 +2103,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return false;
   }
 
-  protected boolean removeRecordFromCache(final LayerRecord record) {
+  protected boolean removeRecordFromCache(LayerRecord record) {
     boolean removed = false;
+    record = getProxiedRecord(record);
     synchronized (getSync()) {
       if (isLayerRecord(record)) {
         for (final Label cacheId : new ArrayList<>(this.cacheIdToRecordMap.keySet())) {
@@ -2355,7 +2351,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         }
       }
       cleanCachedRecords();
-      final List<LayerRecord> newRecords = getNewRecords();
+      final List<LayerRecord> newRecords = getRecordsNew();
       index.addAll(newRecords);
       this.index = index;
     }
@@ -2427,7 +2423,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void setSelectedRecords(final BoundingBox boundingBox) {
     if (isSelectable()) {
-      final List<LayerRecord> records = query(boundingBox);
+      final List<LayerRecord> records = getRecords(boundingBox);
       for (final Iterator<LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
         final LayerRecord layerRecord = iterator.next();
         if (!isVisible(layerRecord) || internalIsDeleted(layerRecord)) {
@@ -2461,7 +2457,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void setSelectedRecords(final Query query) {
-    final List<LayerRecord> records = query(query);
+    final List<LayerRecord> records = getRecords(query);
     setSelectedRecords(records);
   }
 
@@ -2739,7 +2735,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void unSelectRecords(final BoundingBox boundingBox) {
     if (isSelectable()) {
-      final List<LayerRecord> records = query(boundingBox);
+      final List<LayerRecord> records = getRecords(boundingBox);
       for (final Iterator<LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
         final LayerRecord record = iterator.next();
         if (!isVisible(record) || internalIsDeleted(record)) {

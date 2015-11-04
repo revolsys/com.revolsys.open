@@ -472,13 +472,13 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     }
   }
 
-  public BoundingBox setBoundingBox(final BoundingBox boundingBox) {
+  public BoundingBox setBoundingBox(BoundingBox boundingBox) {
     if (boundingBox != null && !boundingBox.isEmpty()) {
       double unitsPerPixel = 0;
       final GeometryFactory geometryFactory = getGeometryFactory();
-      final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
-      if (!convertedBoundingBox.isEmpty()) {
-        BoundingBox newBoundingBox = convertedBoundingBox;
+      boundingBox = boundingBox.convert(geometryFactory);
+      if (!boundingBox.isEmpty()) {
+        BoundingBox newBoundingBox = boundingBox;
 
         final int viewWidthPixels = getViewWidthPixels();
         final int viewHeightPixels = getViewHeightPixels();

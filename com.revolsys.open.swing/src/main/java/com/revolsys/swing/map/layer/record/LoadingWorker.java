@@ -41,7 +41,7 @@ public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> 
       if (geometryField != null && !queryBoundingBox.isEmpty()) {
         query = query.clone();
         query.and(F.envelopeIntersects(geometryField, queryBoundingBox));
-        final List<LayerRecord> records = this.layer.query(query);
+        final List<LayerRecord> records = this.layer.getRecords(query);
         return records;
       }
       return Collections.emptyList();

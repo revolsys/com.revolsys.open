@@ -75,10 +75,10 @@ public class RecordStoreLayerTest {
   public void assertRecordCounts(final int newRecordCount, final int persistedRecordCount,
     final int modifiedRecordCount, final int deletedRecordCount) {
     Assert.assertEquals("PERSISTED Count", persistedRecordCount,
-      this.layer.getPersistedRecordCount());
-    Assert.assertEquals("NEW Count", newRecordCount, this.layer.getNewRecordCount());
-    Assert.assertEquals("MODIFIED Count", modifiedRecordCount, this.layer.getModifiedRecordCount());
-    Assert.assertEquals("DELETED Count", deletedRecordCount, this.layer.getDeletedRecordCount());
+      this.layer.getRecordCountPersisted());
+    Assert.assertEquals("NEW Count", newRecordCount, this.layer.getRecordCountNew());
+    Assert.assertEquals("MODIFIED Count", modifiedRecordCount, this.layer.getRecordCountModified());
+    Assert.assertEquals("DELETED Count", deletedRecordCount, this.layer.getRecordCountDeleted());
     final int layerRecordCount = this.layer.getRecordCount();
     Assert.assertEquals("Record Count", newRecordCount + persistedRecordCount - deletedRecordCount,
       layerRecordCount);
@@ -118,7 +118,7 @@ public class RecordStoreLayerTest {
     final LayerRecord testRecord = newTestRecord("CANCEL", 10,
       GEOMETRY_FACTORY.point(12222000.001, 467000.999));
     assertRecordCounts(1, 0, 0, 0);
-    final List<LayerRecord> records = this.layer.query(TEST);
+    final List<LayerRecord> records = this.layer.getRecords(TEST);
     assertRecordAtIndex(1, records, 0, testRecord);
     this.layer.cancelChanges();
     assertRecordCounts(0, 0, 0, 0);

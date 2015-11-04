@@ -1,8 +1,6 @@
 package com.revolsys.swing.tree;
 
 import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
@@ -10,24 +8,20 @@ import java.util.List;
 
 import javax.swing.DropMode;
 import javax.swing.JTree;
-import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeExpansionListener;
-import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultTreeSelectionModel;
-import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import com.revolsys.collection.EmptyReference;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.dnd.TreeTransferHandler;
 import com.revolsys.swing.tree.node.BaseTreeNode;
-import com.revolsys.swing.tree.node.LazyLoadTreeNode;
+import com.revolsys.swing.tree.node.OpenStateTreeNode;
 
-public class BaseTree extends JTree
-  implements MouseListener, TreeWillExpandListener, TreeExpansionListener {
+public class BaseTree extends JTree {
   private static Reference<BaseTreeNode> menuNode = new EmptyReference<>();
 
   private static final long serialVersionUID = 1L;
@@ -37,14 +31,17 @@ public class BaseTree extends JTree
     return (V)menuNode.get();
   }
 
+  protected static void setMenuNode(final BaseTreeNode menuNode) {
+    BaseTree.menuNode = new WeakReference<>(menuNode);
+  }
+
   private boolean menuEnabled = true;
+
+  private BaseTreeListener treeListener = new BaseTreeListener(this);
 
   public BaseTree(final BaseTreeNode root) {
     super(new DefaultTreeModel(root, true));
     root.setTree(this);
-    addTreeWillExpandListener(this);
-    addTreeExpansionListener(this);
-    addMouseListener(this);
     setRootVisible(true);
     setShowsRootHandles(true);
     setLargeModel(true);
@@ -58,6 +55,7 @@ public class BaseTree extends JTree
     final DefaultTreeSelectionModel selectionModel = new DefaultTreeSelectionModel();
     selectionModel.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     setSelectionModel(selectionModel);
+    expandPath(root);
   }
 
   public void collapsePath(final List<Object> items) {
@@ -140,19 +138,6 @@ public class BaseTree extends JTree
     return root;
   }
 
-  // private void initializePath(final TreePath path) {
-  // final TreePath parent = path.getParentPath();
-  // if (parent != null) {
-  // initializePath(parent);
-  // }
-  // final Object object = BaseTreeNode.getUserData(path);
-  // synchronized (this.objectPathMap) {
-  // if (!this.objectPathMap.containsKey(object)) {
-  // this.objectPathMap.put(object, path);
-  // }
-  // }
-  // }
-
   public TreePath getTreePath(final List<?> items) {
     final BaseTreeNode root = getRootNode();
     if (root == null) {
@@ -168,80 +153,31 @@ public class BaseTree extends JTree
   }
 
   @Override
-  public void mouseClicked(final MouseEvent e) {
-    final int x = e.getX();
-    final int y = e.getY();
-    final TreePath path = getPathForLocation(x, y);
-    if (path != null) {
-      final Object node = path.getLastPathComponent();
-      if (node instanceof MouseListener) {
-        final MouseListener listener = (MouseListener)node;
-        Object userObject = null;
+  protected void setExpandedState(final TreePath path, final boolean state) {
+    Invoke.later(() -> {
+      super.setExpandedState(path, state);
+      if (isExpanded(path) == state) {
+        final Object node = path.getLastPathComponent();
+        if (node instanceof OpenStateTreeNode) {
+          final OpenStateTreeNode openState = (OpenStateTreeNode)node;
+          openState.setOpen(state);
+        }
         if (node instanceof BaseTreeNode) {
           final BaseTreeNode treeNode = (BaseTreeNode)node;
-          userObject = treeNode.getUserObject();
-        }
-        if (userObject == null) {
-          MenuFactory.setMenuSource(userObject);
-        } else {
-          MenuFactory.setMenuSource(node);
-        }
-        listener.mouseClicked(e);
-      }
-    }
-  }
-
-  @Override
-  public void mouseEntered(final MouseEvent e) {
-  }
-
-  @Override
-  public void mouseExited(final MouseEvent e) {
-  }
-
-  @Override
-  public void mousePressed(final MouseEvent e) {
-    if (e.isPopupTrigger()) {
-      popup(e);
-      repaint();
-    }
-  }
-
-  @Override
-  public void mouseReleased(final MouseEvent e) {
-    if (e.isPopupTrigger()) {
-      popup(e);
-      repaint();
-    }
-  }
-
-  private void popup(final MouseEvent e) {
-    if (this.menuEnabled) {
-      final int x = e.getX() + 5;
-      final int y = e.getY();
-      final TreePath path = getPathForLocation(x, y);
-      if (path != null) {
-
-        TreePath[] selectionPaths = getSelectionPaths();
-        if (selectionPaths == null || !Arrays.asList(selectionPaths).contains(path)) {
-          selectionPaths = new TreePath[] {
-            path
-          };
-          setSelectionPaths(selectionPaths);
-        }
-
-        final MenuFactory menu = getMenuFactory(path);
-        final BaseTreeNode node = (BaseTreeNode)path.getLastPathComponent();
-        menuNode = new WeakReference<BaseTreeNode>(node);
-        Object userObject = node.getUserObject();
-        if (userObject == null) {
-          userObject = node;
-        }
-        if (menu != null) {
-          menu.show(userObject, this, x, y);
+          if (treeNode.isAllowsChildren()) {
+            for (final BaseTreeNode childNode : treeNode.getChildren()) {
+              if (childNode instanceof OpenStateTreeNode) {
+                final OpenStateTreeNode childState = (OpenStateTreeNode)childNode;
+                if (childState.isOpen()) {
+                  final TreePath childPath = childNode.getTreePath();
+                  setExpandedState(childPath, true);
+                }
+              }
+            }
+          }
         }
       }
-    }
+    });
   }
 
   public void setMenuEnabled(final boolean menuEnabled) {
@@ -253,26 +189,10 @@ public class BaseTree extends JTree
     model.setRoot(root);
   }
 
-  @Override
-  public void treeCollapsed(final TreeExpansionEvent event) {
-
-  }
-
-  @Override
-  public void treeExpanded(final TreeExpansionEvent event) {
-  }
-
-  @Override
-  public void treeWillCollapse(final TreeExpansionEvent event) throws ExpandVetoException {
-  }
-
-  @Override
-  public void treeWillExpand(final TreeExpansionEvent event) throws ExpandVetoException {
-    final TreePath path = event.getPath();
-    final Object node = path.getLastPathComponent();
-    if (node instanceof LazyLoadTreeNode) {
-      final LazyLoadTreeNode lazyLoadTreeNode = (LazyLoadTreeNode)node;
-      lazyLoadTreeNode.loadChildren();
+  public void setTreeListener(final BaseTreeListener treeListener) {
+    if (this.treeListener != treeListener) {
+      this.treeListener.close();
     }
+    this.treeListener = treeListener;
   }
 }

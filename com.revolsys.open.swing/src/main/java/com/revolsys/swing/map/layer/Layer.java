@@ -79,6 +79,8 @@ public interface Layer
 
   boolean isInitialized();
 
+  boolean isOpen();
+
   boolean isQueryable();
 
   boolean isQuerySupported();
@@ -126,6 +128,8 @@ public interface Layer
   long setMinimumScale(long minimumScale);
 
   void setName(String name);
+
+  void setOpen(boolean open);
 
   void setQueryable(boolean b);
 

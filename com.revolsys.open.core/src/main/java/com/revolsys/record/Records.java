@@ -505,7 +505,7 @@ public interface Records {
     };
   }
 
-  static Comparator<Record> newComparatorOrderBy(final Map<String, Boolean> orderBy) {
+  static <R extends Record> Comparator<R> newComparatorOrderBy(final Map<String, Boolean> orderBy) {
     return (record1, record2) -> {
       if (record1 == record2) {
         return 0;

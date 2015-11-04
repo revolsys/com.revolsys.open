@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.Icon;
-import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.UIDefaults;
@@ -38,6 +37,7 @@ import com.revolsys.swing.Borders;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
@@ -246,7 +246,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
           registries.add(registry);
         }
       }
-      final JComboBox<FolderConnectionRegistry> registryField = new JComboBox<FolderConnectionRegistry>(
+      final ComboBox<FolderConnectionRegistry> registryField = ComboBox.newComboBox("registry",
         new Vector<>(registries));
 
       panel.add(registryField);

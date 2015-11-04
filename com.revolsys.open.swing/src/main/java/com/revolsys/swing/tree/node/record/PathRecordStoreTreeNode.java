@@ -8,10 +8,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import javax.swing.Icon;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
 import com.revolsys.io.Paths;
@@ -23,6 +21,7 @@ import com.revolsys.record.schema.RecordStore;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeNodes;
@@ -48,9 +47,6 @@ public class PathRecordStoreTreeNode extends PathTreeNode
     super.setIcon(PathTreeNode.ICON_FILE_DATABASE);
   }
 
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
   public void addRecordStoreConnection() {
     final Path path = getPath();
     final String fileName = Paths.getBaseName(path);
@@ -77,8 +73,8 @@ public class PathRecordStoreTreeNode extends PathTreeNode
         registries.add(registry);
       }
     }
-    final JComboBox registryField = new JComboBox(
-      new Vector<RecordStoreConnectionRegistry>(registries));
+    final ComboBox<RecordStoreConnectionRegistry> registryField = ComboBox.newComboBox("registry",
+      registries);
 
     panel.add(registryField);
 

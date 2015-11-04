@@ -108,6 +108,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       AbstractLayer::showProperties);
   }
 
+  private boolean open = false;
+
   private PropertyChangeListener beanPropertyListener = new BeanPropertyListener(this);
 
   private BoundingBox boundingBox = BoundingBox.EMPTY;
@@ -150,7 +152,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   private boolean selectSupported = true;
 
-  protected Object sync = new Object();
+  private Object sync = new Object();
 
   private String type;
 
@@ -240,6 +242,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       if (clone.renderer != null) {
         clone.renderer = clone.renderer.clone();
       }
+      clone.sync = new Object();
       return clone;
     } catch (final CloneNotSupportedException e) {
       return null;
@@ -551,6 +554,11 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   @Override
   public boolean isInitialized() {
     return this.initialized;
+  }
+
+  @Override
+  public boolean isOpen() {
+    return this.open;
   }
 
   @Override
@@ -890,6 +898,13 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     firePropertyChange("name", oldValue, this.name);
   }
 
+  @Override
+  public void setOpen(final boolean open) {
+    final boolean oldValue = this.open;
+    this.open = open;
+    firePropertyChange("open", oldValue, this.open);
+  }
+
   public void setPluginConfig(final Map<String, Map<String, Object>> pluginConfig) {
     this.pluginConfigByName = pluginConfig;
   }
@@ -917,6 +932,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     if (name.equals("type")) {
     } else if (name.equals("minimumScale")) {
       setMinimumScale(((Number)value).longValue());
+    } else if (name.equals("open")) {
+      setOpen((Boolean)value);
     } else if (name.equals("maximumScale")) {
       setMaximumScale(((Number)value).longValue());
     } else {
@@ -1065,6 +1082,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     MapSerializerUtil.add(map, "type", this.type);
     MapSerializerUtil.add(map, "name", this.name);
     MapSerializerUtil.add(map, "visible", this.visible);
+    MapSerializerUtil.add(map, "open", this.open);
     MapSerializerUtil.add(map, "querySupported", this.querySupported);
     if (this.querySupported) {
       MapSerializerUtil.add(map, "queryable", this.queryable);

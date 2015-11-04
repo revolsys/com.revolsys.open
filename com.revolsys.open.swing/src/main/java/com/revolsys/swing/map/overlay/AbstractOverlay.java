@@ -534,7 +534,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     final Map<Point, Set<CloseLocation>> snapLocations = new HashMap<>();
     this.snapPoint = null;
     for (final AbstractRecordLayer layer : layers) {
-      final List<LayerRecord> records = layer.queryBackground(boundingBox);
+      final List<LayerRecord> records = layer.getRecordsBackground(boundingBox);
       for (final LayerRecord record : records) {
         if (layer.isVisible(record)) {
           final CloseLocation closeLocation = findCloseLocation(record, boundingBox);

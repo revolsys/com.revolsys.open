@@ -3,6 +3,26 @@ package com.revolsys.geometry.model;
 import com.revolsys.geometry.cs.CoordinateSystem;
 
 public interface GeometryFactoryProxy {
+  default BoundingBox convertBoundingBox(final BoundingBox boundingBox) {
+    if (boundingBox != null) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      if (geometryFactory != null) {
+        return boundingBox.convert(geometryFactory);
+      }
+    }
+    return boundingBox;
+  }
+
+  default <G extends Geometry> G convertGeometry(final G geometry) {
+    if (geometry != null) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      if (geometryFactory != null) {
+        return geometry.convert(geometryFactory);
+      }
+    }
+    return geometry;
+  }
+
   default CoordinateSystem getCoordinateSystem() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory == null) {

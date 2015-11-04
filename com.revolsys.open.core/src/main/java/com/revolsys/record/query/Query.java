@@ -9,11 +9,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
+import com.revolsys.predicate.Predicates;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -200,6 +203,29 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
       return clone;
     } catch (final CloneNotSupportedException e) {
       throw new IllegalArgumentException(e.getMessage());
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <R extends Record> void forEachRecord(final Iterable<R> records,
+    final Consumer<R> consumer) {
+    final Map<String, Boolean> orderBy = getOrderBy();
+    final Predicate<R> filter = (Predicate<R>)getWhereCondition();
+    if (orderBy == null) {
+      if (filter == null) {
+        records.forEach(consumer);
+      } else {
+        records.forEach((record) -> {
+          if (filter.test(record)) {
+            consumer.accept(record);
+          }
+        });
+      }
+    } else {
+      final Comparator<R> comparator = Records.newComparatorOrderBy(orderBy);
+      final List<R> results = Predicates.filter(records, filter);
+      results.sort(comparator);
+      results.forEach(consumer);
     }
   }
 

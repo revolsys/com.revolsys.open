@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer;
 
+import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
@@ -85,6 +86,8 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     return layerGroup;
   }
 
+  private boolean singleLayerVisible = false;
+
   private boolean deleted = false;
 
   private List<Layer> layers = new ArrayList<Layer>();
@@ -98,6 +101,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     setType("layerGroup");
     setRenderer(new LayerGroupRenderer(this));
     setInitialized(true);
+    setOpen(true);
   }
 
   protected <V extends Layer> void addDescendants(final List<V> layers, final Class<V> layerClass) {
@@ -505,6 +509,10 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     return false;
   }
 
+  public boolean isSingleLayerVisible() {
+    return this.singleLayerVisible;
+  }
+
   @Override
   public boolean isZoomToLayerEnabled() {
     if (!getBoundingBox().isEmpty()) {
@@ -628,6 +636,25 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     openFiles(-1, files);
   }
 
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    super.propertyChange(event);
+    final Object source = event.getSource();
+    final String propertyName = event.getPropertyName();
+    if ("visible".equals(propertyName)) {
+      if (isSingleLayerVisible()) {
+        final boolean visible = (Boolean)event.getNewValue();
+        if (visible) {
+          for (final Layer layer : getLayers()) {
+            if (layer != source) {
+              layer.setVisible(false);
+            }
+          }
+        }
+      }
+    }
+  }
+
   public Layer removeLayer(final int index) {
     synchronized (this.layers) {
       final Layer layer = this.layers.remove(index);
@@ -684,6 +711,10 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     return saved;
   }
 
+  public void setSingleLayerVisible(final boolean singleLayerVisible) {
+    this.singleLayerVisible = singleLayerVisible;
+  }
+
   public void sort() {
     synchronized (this.layers) {
       Collections.sort(this.layers);
@@ -698,6 +729,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     map.remove("editable");
     map.remove("selectable");
     map.remove("selectSupported");
+    map.put("singleLayerVisible", isSingleLayerVisible());
 
     final List<String> layerFiles = new ArrayList<String>();
     final List<Layer> layers = getLayers();
@@ -714,5 +746,4 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     map.put("layers", layerFiles);
     return map;
   }
-
 }

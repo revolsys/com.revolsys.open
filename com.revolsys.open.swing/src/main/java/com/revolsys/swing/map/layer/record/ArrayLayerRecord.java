@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.record;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.revolsys.equals.Equals;
@@ -11,10 +12,42 @@ import com.revolsys.identifier.Identifier;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.enableable.Enabled;
 
 public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   private static final long serialVersionUID = 1L;
+
+  public static ArrayLayerRecord newRecordNew(final AbstractRecordLayer layer,
+    final Map<String, ? extends Object> values) {
+    final ArrayLayerRecord record = new ArrayLayerRecord(layer);
+    final RecordDefinition recordDefinition = layer.getRecordDefinition();
+    record.setState(RecordState.INITIALIZING);
+    final List<FieldDefinition> idFields = recordDefinition.getIdFields();
+    for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
+      if (!idFields.contains(fieldDefinition)) {
+        final String fieldName = fieldDefinition.getName();
+        final Object value = values.get(fieldName);
+        fieldDefinition.setValue(record, value);
+      }
+    }
+    record.setState(RecordState.NEW);
+    return record;
+  }
+
+  public static ArrayLayerRecord newRecordPersisted(final AbstractRecordLayer layer,
+    final Map<String, ? extends Object> values) {
+    final ArrayLayerRecord record = new ArrayLayerRecord(layer);
+    final RecordDefinition recordDefinition = layer.getRecordDefinition();
+    record.setState(RecordState.INITIALIZING);
+    for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
+      final String fieldName = fieldDefinition.getName();
+      final Object value = values.get(fieldName);
+      fieldDefinition.setValue(record, value);
+    }
+    record.setState(RecordState.PERSISTED);
+    return record;
+  }
 
   private Reference<Identifier> identifier = new WeakReference<>(null);
 

@@ -25,9 +25,11 @@ import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.ListTreeNode;
+import com.revolsys.swing.tree.node.OpenStateTreeNode;
 import com.revolsys.util.Property;
 
-public class LayerRendererTreeNode extends ListTreeNode implements MouseListener {
+public class LayerRendererTreeNode extends ListTreeNode
+  implements MouseListener, OpenStateTreeNode {
   public LayerRendererTreeNode(final LayerRenderer<?> renderer) {
     super(renderer);
     setName(renderer.getName());
@@ -158,6 +160,12 @@ public class LayerRendererTreeNode extends ListTreeNode implements MouseListener
   }
 
   @Override
+  public boolean isOpen() {
+    final LayerRenderer<?> renderer = getRenderer();
+    return renderer.isOpen();
+  }
+
+  @Override
   public void mouseClicked(final MouseEvent e) {
     final Object source = e.getSource();
     final JTree tree = getTree();
@@ -194,5 +202,11 @@ public class LayerRendererTreeNode extends ListTreeNode implements MouseListener
       }
     }
     return false;
+  }
+
+  @Override
+  public void setOpen(final boolean open) {
+    final LayerRenderer<?> renderer = getRenderer();
+    renderer.setOpen(open);
   }
 }

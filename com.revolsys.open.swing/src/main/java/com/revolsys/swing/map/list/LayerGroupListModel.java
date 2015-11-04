@@ -97,7 +97,11 @@ public class LayerGroupListModel extends AbstractListModel<Layer>
   public void setSelectedItem(final Object selectedItem) {
     if (selectedItem instanceof Layer) {
       final Layer layer = (Layer)selectedItem;
-      this.selectedItem = layer;
+      if (this.selectedItem != layer) {
+        this.selectedItem = layer;
+        final int index = this.group.indexOf(layer);
+        fireContentsChanged(layer, index, index);
+      }
     }
   }
 }

@@ -166,6 +166,11 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
         final DefaultTreeModel defaultModel = (DefaultTreeModel)model;
         defaultModel.nodeChanged(this);
       }
+      if ("open".equals(e.getPropertyName())) {
+        if ((Boolean)e.getNewValue()) {
+          expand();
+        }
+      }
     }
   }
 
@@ -547,6 +552,10 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
   @Override
   public boolean isLeaf() {
     return getChildCount() == 0;
+  }
+
+  public boolean isOpen() {
+    return false;
   }
 
   public boolean isUserObjectInitialized() {
