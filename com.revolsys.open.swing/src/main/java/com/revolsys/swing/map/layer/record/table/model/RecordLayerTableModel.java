@@ -165,6 +165,8 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   private Comparator<Record> orderByComparatorIdentifier = null;
 
+  private int notMatchingFilterCount;
+
   public RecordLayerTableModel(final AbstractRecordLayer layer) {
     super(layer.getRecordDefinition());
     this.layer = layer;
@@ -354,9 +356,9 @@ public class RecordLayerTableModel extends RecordRowTableModel
     synchronized (getSync()) {
       if (this.countLoaded) {
         int count = this.recordCount;
-        final AbstractRecordLayer layer = getLayer();
-        final int newRecordCount = layer.getRecordCountNew();
+        final int newRecordCount = getRecordCountPageChanges();
         count += newRecordCount;
+        count -= this.notMatchingFilterCount;
         return count;
       } else {
         if (this.recordCountWorker == null) {
@@ -395,11 +397,21 @@ public class RecordLayerTableModel extends RecordRowTableModel
     if (row < recordCountChanges) {
       return getRecordPageChange(row);
     } else {
-      row -= recordCountChanges;
-      final int pageSize = getPageSize();
-      final int pageNumber = row / pageSize;
-      final int recordNumber = row % pageSize;
-      return getRecordPagePersisted(pageNumber, recordNumber);
+      final int persistedRow = row - recordCountChanges;
+      final int recordCount = getRecordCount() + this.notMatchingFilterCount;
+      while (row < recordCount) {
+        final int pageSize = getPageSize();
+        final int pageNumber = persistedRow / pageSize;
+        final int recordNumber = persistedRow % pageSize;
+        final LayerRecord record = getRecordPagePersisted(pageNumber, recordNumber);
+        if (record != null) {
+          return record;
+        }
+        // If the record was deleted or modified differently from the filter or
+        // order by move to show the next record
+        row = (pageNumber + 1) * pageSize;
+      }
+      return null;
     }
   }
 
@@ -407,7 +419,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
     return this.cachedRecords.get(index);
   }
 
-  protected LayerRecord getRecordPagePersisted(final int pageNumber, final int recordNumber) {
+  protected LayerRecord getRecordPagePersisted(final int pageNumber, int recordNumber) {
     synchronized (getSync()) {
       final List<LayerRecord> page = this.pageCache.get(pageNumber);
       if (page == null) {
@@ -421,11 +433,15 @@ public class RecordLayerTableModel extends RecordRowTableModel
         }
         return this.loadingRecord;
       } else {
-        if (recordNumber < page.size()) {
+        while (recordNumber < page.size()) {
           final LayerRecord record = page.get(recordNumber);
-          if (!isRecordPageQueryChanged(record)) {
+          if (this.filter.test(record) && !isRecordPageQueryChanged(record)
+            && !this.layer.isDeleted(record)) {
             return record;
           }
+          // If the record was deleted or modified differently from the filter
+          // or order by move to show the next record
+          recordNumber++;
         }
         return null;
       }
@@ -441,20 +457,33 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   private List<LayerRecord> getRecordsPageChanged() {
+    this.notMatchingFilterCount = 0;
     final List<LayerRecord> records = new ArrayList<>();
     for (final LayerRecord record : this.layer.getRecordsChanged()) {
       if (this.layer.isNew(record)) {
-        records.add(record);
+        if (this.filter.test(record)) {
+          records.add(record);
+        }
       } else if (this.layer.isModified(record)) {
         if (isRecordPageQueryChanged(record)) {
           records.add(record);
+          this.notMatchingFilterCount++;
+        } else {
+          if (!this.filter.isEmpty()) {
+            final Record originalRecord = record.getOriginalRecord();
+            if (this.filter.test(record) && !this.filter.test(originalRecord)) {
+              this.notMatchingFilterCount++;
+            }
+          }
         }
       }
+
     }
     if (this.orderByComparatorIdentifier != null) {
       records.sort(this.orderByComparatorIdentifier);
     }
     return records;
+
   }
 
   protected List<LayerRecord> getRecordsSelected() {
@@ -515,14 +544,19 @@ public class RecordLayerTableModel extends RecordRowTableModel
     if (this.orderByComparatorIdentifier != null) {
       final Record orginialRecord = record.getOriginalRecord();
       final int compare = this.orderByComparatorIdentifier.compare(record, orginialRecord);
-      if (compare == 0) {
-        return false;
-      } else {
+      if (compare != 0) {
         return true;
       }
-    } else {
-      return false;
     }
+    if (!this.filter.isEmpty()) {
+      if (this.filter.test(record)) {
+        final Record orginialRecord = record.getOriginalRecord();
+        if (!this.filter.test(orginialRecord)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   @Override
