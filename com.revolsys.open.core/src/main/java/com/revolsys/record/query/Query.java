@@ -33,8 +33,8 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
     if (filter != null && !filter.isEmpty()) {
       for (final Entry<String, ?> entry : filter.entrySet()) {
         final String name = entry.getKey();
-        final FieldDefinition attribute = recordDefinition.getField(name);
-        if (attribute == null) {
+        final FieldDefinition fieldDefinition = recordDefinition.getField(name);
+        if (fieldDefinition == null) {
           final Object value = entry.getValue();
           if (value == null) {
             multipleCondition.add(Q.isNull(name));
@@ -50,9 +50,9 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
             multipleCondition.add(Q.isNull(name));
           } else if (value instanceof Collection) {
             final Collection<?> values = (Collection<?>)value;
-            multipleCondition.add(new In(attribute, values));
+            multipleCondition.add(new In(fieldDefinition, values));
           } else {
-            multipleCondition.add(Q.equal(attribute, value));
+            multipleCondition.add(Q.equal(fieldDefinition, value));
           }
         }
       }
@@ -69,12 +69,12 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
 
   public static Query equal(final RecordDefinition recordDefinition, final String name,
     final Object value) {
-    final FieldDefinition attribute = recordDefinition.getField(name);
-    if (attribute == null) {
+    final FieldDefinition fieldDefinition = recordDefinition.getField(name);
+    if (fieldDefinition == null) {
       return null;
     } else {
       final Query query = new Query(recordDefinition);
-      final Value valueCondition = new Value(attribute, value);
+      final Value valueCondition = new Value(fieldDefinition, value);
       final BinaryCondition equal = Q.equal(name, valueCondition);
       query.setWhereCondition(equal);
       return query;
@@ -179,12 +179,13 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
     this.parameters.add(value);
   }
 
-  public void and(final Condition condition) {
+  public Query and(final Condition condition) {
     if (!Property.isEmpty(condition)) {
       Condition whereCondition = getWhereCondition();
       whereCondition = whereCondition.and(condition);
       setWhereCondition(whereCondition);
     }
+    return this;
   }
 
   @Override
@@ -208,7 +209,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
 
   @SuppressWarnings("unchecked")
   public <R extends Record> void forEachRecord(final Iterable<R> records,
-    final Consumer<R> consumer) {
+    final Consumer<? super R> consumer) {
     final Map<String, Boolean> orderBy = getOrderBy();
     final Predicate<R> filter = (Predicate<R>)getWhereCondition();
     if (orderBy == null) {
@@ -300,6 +301,12 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
 
   public boolean isLockResults() {
     return this.lockResults;
+  }
+
+  public Query newQuery(final RecordDefinition recordDefinition) {
+    final Query query = clone();
+    query.setRecordDefinition(recordDefinition);
+    return query;
   }
 
   public void or(final Condition condition) {

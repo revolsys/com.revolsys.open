@@ -398,15 +398,15 @@ public class RecordLayerTablePanel extends TablePanel
     // Filter buttons
 
     final JToggleButton clearFilter = addFieldFilterToggleButton(toolBar, -1, "Show All Records",
-      "table_filter", RecordLayerTableModel.MODE_ALL_RECORDS, null);
+      "table_filter", RecordLayerTableModel.MODE_RECORDS_ALL, null);
     clearFilter.doClick();
 
     final EnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(this.layer, "editable");
     addFieldFilterToggleButton(toolBar, -1, "Show Only Changed Records", "change_table_filter",
-      RecordLayerTableModel.MODE_CHANGED_RECORDS, editableEnableCheck);
+      RecordLayerTableModel.MODE_RECORDS_CHANGED, editableEnableCheck);
 
     addFieldFilterToggleButton(toolBar, -1, "Show Only Selected Records", "filter_selected",
-      RecordLayerTableModel.MODE_SELECTED_RECORDS, null);
+      RecordLayerTableModel.MODE_RECORDS_SELECTED, null);
 
     if (hasGeometry) {
       final JToggleButton showAllGeometries = addGeometryFilterToggleButton(toolBar, -1,

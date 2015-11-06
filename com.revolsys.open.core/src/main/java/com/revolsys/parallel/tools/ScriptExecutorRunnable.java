@@ -18,7 +18,7 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 
 import com.revolsys.beans.propertyeditor.ResourceEditorRegistrar;
-import com.revolsys.collection.map.ThreadSharedAttributes;
+import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.logging.log4j.ThreadLocalFileAppender;
 import com.revolsys.parallel.AbstractRunnable;
 import com.revolsys.parallel.process.ProcessNetwork;
@@ -105,7 +105,7 @@ public class ScriptExecutorRunnable extends AbstractRunnable {
         }
         LOG.info(message.toString());
       }
-      ThreadSharedAttributes.setAttributes(this.attributes);
+      ThreadSharedProperties.setProperties(this.attributes);
 
       final GenericApplicationContext applicationContext = new GenericApplicationContext();
       applicationContext.getBeanFactory().addPropertyEditorRegistrar(new ResourceEditorRegistrar());

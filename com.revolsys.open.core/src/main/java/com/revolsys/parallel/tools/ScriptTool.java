@@ -37,7 +37,7 @@ import org.springframework.context.annotation.AnnotationConfigUtils;
 import org.springframework.context.support.GenericApplicationContext;
 
 import com.revolsys.beans.propertyeditor.ResourceEditorRegistrar;
-import com.revolsys.collection.map.ThreadSharedAttributes;
+import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.logging.log4j.ThreadLocalFileAppender;
 import com.revolsys.parallel.process.ProcessNetwork;
 import com.revolsys.util.JexlUtil;
@@ -144,7 +144,7 @@ public class ScriptTool {
         for (final Entry<Object, Object> parameter : props.entrySet()) {
           final String key = (String)parameter.getKey();
           final String value = (String)parameter.getValue();
-          ThreadSharedAttributes.setAttribute(key, value);
+          ThreadSharedProperties.setProperty(key, value);
           System.setProperty(key, value);
         }
         return true;
@@ -202,7 +202,7 @@ public class ScriptTool {
             final String value = (String)property.getValue();
             this.parameters.put(key, value);
             System.setProperty(key, value);
-            ThreadSharedAttributes.setAttribute(key, value);
+            ThreadSharedProperties.setProperty(key, value);
           }
         }
 
@@ -250,7 +250,7 @@ public class ScriptTool {
             while (logFileName.contains("${")) {
               final Expression expression = JexlUtil.newExpression(logFileName);
               final HashMapContext context = new HashMapContext();
-              context.setVars(ThreadSharedAttributes.getAttributes());
+              context.setVars(ThreadSharedProperties.getProperties());
               logFileName = (String)JexlUtil.evaluateExpression(context, expression);
             }
           } catch (final Exception e) {
@@ -334,7 +334,7 @@ public class ScriptTool {
     System.out.println(message);
 
     if (System.getProperty("applicationHome") == null) {
-      ThreadSharedAttributes.setAttribute("applicationHome", ".");
+      ThreadSharedProperties.setProperty("applicationHome", ".");
       System.setProperty("applicationHome", ".");
     }
     try {

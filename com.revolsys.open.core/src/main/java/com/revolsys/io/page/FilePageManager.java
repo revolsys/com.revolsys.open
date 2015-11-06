@@ -10,14 +10,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.revolsys.collection.map.WeakCache;
+import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.io.FileUtil;
 
 public class FilePageManager implements PageManager {
   private final Set<Integer> freePageIndexes = new TreeSet<Integer>();
 
   // TODO
-  private final Map<Integer, Page> pages = new WeakCache<Integer, Page>();
+  private final Map<Integer, Page> pages = new WeakKeyValueMap<Integer, Page>();
 
   private final Set<Page> pagesInUse = new HashSet<Page>();
 

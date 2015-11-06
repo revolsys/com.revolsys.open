@@ -29,9 +29,8 @@ import com.revolsys.util.Strings;
 
 /**
  * The FieldDefinition class defines the name, type and other properties about each
- * attribute on a {@link Record} in the {@link RecordDefinition}.
+ * field on a {@link Record} in the {@link RecordDefinition}.
  *
- * @author Paul Austin
  * @see Record
  * @see RecordDefinition
  */
@@ -46,24 +45,24 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
 
   private Object defaultValue;
 
-  /** The description of the attribute. */
+  /** The description of the field. */
   private String description;
 
   private int index;
 
-  /** The maximum length of an attribute value. */
+  /** The maximum length of an field value. */
   private int length;
 
   private Object maxValue;
 
   private Object minValue;
 
-  /** The name of the attribute. */
+  /** The name of the field. */
   private String name;
 
   private Reference<RecordDefinition> recordDefinition;
 
-  /** The flag indicating if a value is required for the attribute. */
+  /** The flag indicating if a value is required for the field. */
   private boolean required;
 
   /** The maximum number of decimal places. */
@@ -71,7 +70,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
 
   private String title;
 
-  /** The data type of the attribute value. */
+  /** The data type of the field value. */
   private DataType type;
 
   public FieldDefinition() {
@@ -120,26 +119,26 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
   }
 
   /**
-   * Construct a new attribute.
+   * Construct a new field.
    *
-   * @param name The name of the attribute.
-   * @param type The data type of the attribute value.
+   * @param name The name of the field.
+   * @param type The data type of the field value.
    * @param required The flag indicating if a value is required for the
-   *          attribute.
+   *          field.
    */
   public FieldDefinition(final String name, final DataType type, final boolean required) {
     this(name, type, 0, 0, required, null, null);
   }
 
   /**
-   * Construct a new attribute.
+   * Construct a new field.
    *
-   * @param name The name of the attribute.
-   * @param type The data type of the attribute value.
-   * @param length The maximum length of an attribute value, 0 for no maximum.
+   * @param name The name of the field.
+   * @param type The data type of the field value.
+   * @param length The maximum length of an field value, 0 for no maximum.
    * @param required The flag indicating if a value is required for the
-   *          attribute.
-   * @param properties The meta data properties about the attribute.
+   *          field.
+   * @param properties The meta data properties about the field.
    */
   public FieldDefinition(final String name, final DataType type, final boolean required,
     final Map<String, Object> properties) {
@@ -152,13 +151,13 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
   }
 
   /**
-   * Construct a new attribute.
+   * Construct a new field.
    *
-   * @param name The name of the attribute.
-   * @param type The data type of the attribute value.
-   * @param length The maximum length of an attribute value, 0 for no maximum.
+   * @param name The name of the field.
+   * @param type The data type of the field value.
+   * @param length The maximum length of an field value, 0 for no maximum.
    * @param required The flag indicating if a value is required for the
-   *          attribute.
+   *          field.
    */
   public FieldDefinition(final String name, final DataType type, final int length,
     final boolean required) {
@@ -166,15 +165,15 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
   }
 
   /**
-   * Construct a new attribute.
+   * Construct a new field.
    *
-   * @param name The name of the attribute.
-   * @param type The data type of the attribute value.
-   * @param length The maximum length of an attribute value, 0 for no maximum.
+   * @param name The name of the field.
+   * @param type The data type of the field value.
+   * @param length The maximum length of an field value, 0 for no maximum.
    * @param scale The maximum number of decimal places.
    * @param required The flag indicating if a value is required for the
-   *          attribute.
-   * @param properties The meta data properties about the attribute.
+   *          field.
+   * @param properties The meta data properties about the field.
    */
   public FieldDefinition(final String name, final DataType type, final int length,
     final boolean required, final Map<String, Object> properties) {
@@ -187,13 +186,13 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
   }
 
   /**
-   * Construct a new attribute.
+   * Construct a new field.
    *
-   * @param name The name of the attribute.
-   * @param type The data type of the attribute value.
+   * @param name The name of the field.
+   * @param type The data type of the field value.
    * @param required The flag indicating if a value is required for the
-   *          attribute.
-   * @param properties The meta data properties about the attribute.
+   *          field.
+   * @param properties The meta data properties about the field.
    */
   public FieldDefinition(final String name, final DataType type, final Integer length,
     final Integer scale, final Boolean required) {
@@ -201,15 +200,15 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
   }
 
   /**
-   * Construct a new attribute.
+   * Construct a new field.
    *
-   * @param name The name of the attribute.
-   * @param type The data type of the attribute value.
-   * @param length The maximum length of an attribute value, 0 for no maximum.
+   * @param name The name of the field.
+   * @param type The data type of the field value.
+   * @param length The maximum length of an field value, 0 for no maximum.
    * @param scale The maximum number of decimal places.
    * @param required The flag indicating if a value is required for the
-   *          attribute.
-   * @param properties The meta data properties about the attribute.
+   *          field.
+   * @param properties The meta data properties about the field.
    */
   public FieldDefinition(final String name, final DataType type, final Integer length,
     final Integer scale, final Boolean required, final Map<String, Object> properties) {
@@ -218,15 +217,15 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
   }
 
   /**
-   * Construct a new attribute.
+   * Construct a new field.
    *
-   * @param name The name of the attribute.
-   * @param type The data type of the attribute value.
-   * @param length The maximum length of an attribute value, 0 for no maximum.
+   * @param name The name of the field.
+   * @param type The data type of the field value.
+   * @param length The maximum length of an field value, 0 for no maximum.
    * @param scale The maximum number of decimal places.
    * @param required The flag indicating if a value is required for the
-   *          attribute.
-   * @param properties The meta data properties about the attribute.
+   *          field.
+   * @param properties The meta data properties about the field.
    */
   public FieldDefinition(final String name, final DataType type, final Integer length,
     final Integer scale, final Boolean required, final String description) {
@@ -249,15 +248,15 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
   }
 
   /**
-   * Construct a new attribute.
+   * Construct a new field.
    *
-   * @param name The name of the attribute.
-   * @param type The data type of the attribute value.
-   * @param length The maximum length of an attribute value, 0 for no maximum.
+   * @param name The name of the field.
+   * @param type The data type of the field value.
+   * @param length The maximum length of an field value, 0 for no maximum.
    * @param scale The maximum number of decimal places.
    * @param required The flag indicating if a value is required for the
-   *          attribute.
-   * @param properties The meta data properties about the attribute.
+   *          field.
+   * @param properties The meta data properties about the field.
    */
   public FieldDefinition(final String name, final DataType type, final Integer length,
     final Integer scale, final Boolean required, final String description,
@@ -306,8 +305,8 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
   @Override
   public boolean equals(final Object object) {
     if (object instanceof FieldDefinition) {
-      final FieldDefinition attribute = (FieldDefinition)object;
-      return this.name.equals(attribute.getName());
+      final FieldDefinition fieldDefinition = (FieldDefinition)object;
+      return this.name.equals(fieldDefinition.getName());
     } else {
       return false;
     }
@@ -335,10 +334,10 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
   }
 
   /**
-   * Get the maximum length of the attribute value. The length 0 should be used
+   * Get the maximum length of the field value. The length 0 should be used
    * if there is no maximum.
    *
-   * @return The maximum length of an attribute value.
+   * @return The maximum length of an field value.
    */
   public int getLength() {
     return this.length;
@@ -369,9 +368,9 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
   }
 
   /**
-   * Get the name of the attribute.
+   * Get the name of the field.
    *
-   * @return The name of the attribute.
+   * @return The name of the field.
    */
   public String getName() {
     return this.name;
@@ -386,7 +385,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
   }
 
   /**
-   * Get the maximum number of decimal places of the attribute value.
+   * Get the maximum number of decimal places of the field value.
    *
    * @return The maximum number of decimal places.
    */
@@ -422,18 +421,18 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
   }
 
   /**
-   * Get the data type of the attribute value.
+   * Get the data type of the field value.
    *
-   * @return The data type of the attribute value.
+   * @return The data type of the field value.
    */
   public DataType getType() {
     return this.type;
   }
 
   /**
-   * Get the data type class of the attribute value.
+   * Get the data type class of the field value.
    *
-   * @return The data type of the attribute value.
+   * @return The data type of the field value.
    */
   public Class<?> getTypeClass() {
     if (this.type == null) {
@@ -444,9 +443,9 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
   }
 
   /**
-   * Get the data type of the attribute value.
+   * Get the data type of the field value.
    *
-   * @return The data type of the attribute value.
+   * @return The data type of the field value.
    */
   public String getTypeDescription() {
     final StringBuilder typeDescription = new StringBuilder();
@@ -455,7 +454,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
   }
 
   /**
-   * Return the hash code of the attribute.
+   * Return the hash code of the field.
    *
    * @return The hash code.
    */
@@ -465,7 +464,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
   }
 
   /**
-   * Get the flag indicating if a value is required for the attribute.
+   * Get the flag indicating if a value is required for the field.
    *
    * @return True if a value is required, false otherwise.
    */

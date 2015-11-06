@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.revolsys.util.CompareUtil;
 import com.revolsys.util.Property;
 
-public class TypedIdentifier extends AbstractIdentifier {
+public class TypedIdentifier extends AbstractIdentifier implements Comparable<Object> {
 
   public static Identifier newIdentifier(final Object id) {
     if (id instanceof String) {
@@ -59,6 +60,28 @@ public class TypedIdentifier extends AbstractIdentifier {
   public TypedIdentifier(final String type, final Identifier id) {
     this.type = type;
     this.id = id;
+  }
+
+  @Override
+  public int compareTo(final Object o) {
+    if (o instanceof TypedIdentifier) {
+      final TypedIdentifier typedIdentifier = (TypedIdentifier)o;
+      final String type1 = getType();
+      final String type2 = typedIdentifier.getType();
+      int compare = type1.compareTo(type2);
+      if (compare == 0) {
+        final Identifier identifier1 = getIdentifier();
+        final Identifier identifier2 = typedIdentifier.getIdentifier();
+        compare = CompareUtil.compare(identifier1, identifier2);
+      }
+      return compare;
+    } else {
+      return 1;
+    }
+  }
+
+  public boolean equalsType(final String type) {
+    return this.type.equals(type);
   }
 
   @SuppressWarnings("unchecked")

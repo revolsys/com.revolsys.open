@@ -1,14 +1,10 @@
 package com.revolsys.swing.map.layer.record;
 
-import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.record.query.Query;
-import com.revolsys.record.query.functions.F;
-import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 
@@ -34,17 +30,10 @@ public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> 
   @Override
   protected List<LayerRecord> handleBackground() throws Exception {
     try {
-      final GeometryFactory geometryFactory = this.layer.getGeometryFactory();
-      final BoundingBox queryBoundingBox = this.viewportBoundingBox.convert(geometryFactory);
-      Query query = this.layer.getQuery();
-      final FieldDefinition geometryField = this.layer.getGeometryField();
-      if (geometryField != null && !queryBoundingBox.isEmpty()) {
-        query = query.clone();
-        query.and(F.envelopeIntersects(geometryField, queryBoundingBox));
-        final List<LayerRecord> records = this.layer.getRecords(query);
-        return records;
-      }
-      return Collections.emptyList();
+      final Query query = this.layer.newBoundingBoxQuery(this.viewportBoundingBox);
+      // TODO cancellable
+      final List<LayerRecord> records = this.layer.getRecords(query);
+      return records;
     } catch (final Exception e) {
       if (this.layer.isDeleted()) {
         return null;

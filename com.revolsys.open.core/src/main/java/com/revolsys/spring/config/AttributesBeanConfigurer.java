@@ -13,7 +13,7 @@ import org.springframework.beans.factory.config.MapFactoryBean;
 import org.springframework.context.ApplicationContext;
 
 import com.revolsys.collection.map.AttributeMap;
-import com.revolsys.collection.map.ThreadSharedAttributes;
+import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.spring.TargetBeanFactoryBean;
 
 public class AttributesBeanConfigurer extends BeanConfigurrer {
@@ -65,7 +65,7 @@ public class AttributesBeanConfigurer extends BeanConfigurrer {
   public void postProcessBeanFactory(final ConfigurableListableBeanFactory beanFactory)
     throws BeansException {
     final Map<String, Object> allAttributes = new LinkedHashMap<>();
-    final Map<String, Object> threadAttributes = ThreadSharedAttributes.getAttributes();
+    final Map<String, Object> threadAttributes = ThreadSharedProperties.getProperties();
     allAttributes.putAll(threadAttributes);
     processPlaceholderAttributes(beanFactory, threadAttributes);
     final Map<String, Object> attributes = getFields();

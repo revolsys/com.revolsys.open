@@ -68,39 +68,8 @@ public interface LayerRecord extends Record {
 
   AbstractRecordLayer getLayer();
 
-  default LayerRecord getOriginalRecord() {
-    return new LayerRecord() {
-      @Override
-      public LayerRecord clone() {
-        return this;
-      }
-
-      @Override
-      public AbstractRecordLayer getLayer() {
-        return LayerRecord.this.getLayer();
-      }
-
-      @Override
-      public RecordDefinition getRecordDefinition() {
-        return LayerRecord.this.getRecordDefinition();
-      }
-
-      @Override
-      public <T> T getValue(final int index) {
-        final String fieldName = getFieldName(index);
-        return LayerRecord.this.getOriginalValue(fieldName);
-      }
-
-      @Override
-      public void setState(final RecordState state) {
-        throw new UnsupportedOperationException();
-      }
-
-      @Override
-      public boolean setValue(final int index, final Object value) {
-        throw new UnsupportedOperationException();
-      }
-    };
+  default Record getOriginalRecord() {
+    return new OriginalRecord(this);
   }
 
   @SuppressWarnings("unchecked")
@@ -160,54 +129,56 @@ public interface LayerRecord extends Record {
     } else if (this == record) {
       return true;
     } else {
-      final AbstractRecordLayer layer = getLayer();
-      if (layer.isLayerRecord(record)) {
-        final Identifier id = getIdentifier();
-        final Identifier otherId = record.getIdentifier();
-        if (id == null || otherId == null) {
-          return false;
-        } else if (Equals.equal(id, otherId)) {
-          return true;
+      synchronized (this) {
+        final AbstractRecordLayer layer = getLayer();
+        if (layer.isLayerRecord(record)) {
+          final Identifier id = getIdentifier();
+          final Identifier otherId = record.getIdentifier();
+          if (id == null || otherId == null) {
+            return false;
+          } else if (Equals.equal(id, otherId)) {
+            return true;
+          } else {
+            return false;
+          }
         } else {
           return false;
         }
-      } else {
-        return false;
       }
     }
   }
 
   @Override
   default boolean isValid(final int index) {
-    if (getState() == RecordState.INITIALIZING) {
-      return true;
-    } else {
-      final RecordDefinition recordDefinition = getRecordDefinition();
-      final String name = recordDefinition.getFieldName(index);
-      return isValid(name);
+    synchronized (this) {
+      if (getState() == RecordState.INITIALIZING) {
+        return true;
+      } else {
+        final FieldDefinition fieldDefinition = getFieldDefinition(index);
+        if (fieldDefinition != null) {
+          final Object value = getValue(index);
+          return fieldDefinition.isValid(value);
+        }
+        return true;
+      }
     }
   }
 
   @Override
-  default boolean isValid(final String name) {
-    if (getState() == RecordState.INITIALIZING) {
-      return true;
-    } else {
-      final FieldDefinition fieldDefinition = getFieldDefinition(name);
-      if (fieldDefinition != null && fieldDefinition.isRequired()) {
-        final Object value = getValue(name);
-        return fieldDefinition.isValid(value);
-      }
-      return true;
-    }
+  default boolean isValid(final String fieldName) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final int index = recordDefinition.getFieldIndex(fieldName);
+    return isValid(index);
   }
 
   default void postSaveDeleted() {
   }
 
   default void postSaveModified() {
-    if (getState() == RecordState.PERSISTED) {
-      clearChanges();
+    synchronized (this) {
+      if (getState() == RecordState.PERSISTED) {
+        clearChanges();
+      }
     }
   }
 
@@ -219,14 +190,16 @@ public interface LayerRecord extends Record {
   }
 
   default void revertEmptyFields() {
-    final AbstractRecordLayer layer = getLayer();
-    for (final String fieldName : getRecordDefinition().getFieldNames()) {
-      final Object value = getValue(fieldName);
-      if (Property.isEmpty(value)) {
-        if (!layer.isFieldUserReadOnly(fieldName)) {
-          final Object originalValue = getOriginalValue(fieldName);
-          if (!Property.isEmpty(originalValue)) {
-            setValue(fieldName, originalValue);
+    synchronized (this) {
+      final AbstractRecordLayer layer = getLayer();
+      for (final String fieldName : getRecordDefinition().getFieldNames()) {
+        final Object value = getValue(fieldName);
+        if (Property.isEmpty(value)) {
+          if (!layer.isFieldUserReadOnly(fieldName)) {
+            final Object originalValue = getOriginalValue(fieldName);
+            if (!Property.isEmpty(originalValue)) {
+              setValue(fieldName, originalValue);
+            }
           }
         }
       }

@@ -132,28 +132,9 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public void forEachRecord(final Query query, final Consumer<LayerRecord> consumer) {
+  protected void forEachRecord(final Query query, final Consumer<? super LayerRecord> consumer) {
     final List<LayerRecord> records = getRecordsPersisted(query);
     records.forEach(consumer);
-  }
-
-  @Override
-  public int getRecordCountNew() {
-    return 0;
-  }
-
-  @Override
-  public int getRecordCountPersisted() {
-    return this.records.size();
-  }
-
-  @Override
-  public List<LayerRecord> getRecordsPersisted(final Query query) {
-    final List<LayerRecord> records = getRecords();
-    final Condition filter = query.getWhereCondition();
-    final Map<String, Boolean> orderBy = query.getOrderBy();
-    Records.filterAndSort(records, filter, orderBy);
-    return records;
   }
 
   @Override
@@ -182,6 +163,16 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
+  public int getRecordCountNew() {
+    return 0;
+  }
+
+  @Override
+  public int getRecordCountPersisted() {
+    return this.records.size();
+  }
+
+  @Override
   public int getRecordCountPersisted(final Query query) {
     final Condition filter = query.getWhereCondition();
     if (filter.isEmpty()) {
@@ -206,6 +197,15 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
+  public List<LayerRecord> getRecordsPersisted(final Query query) {
+    final List<LayerRecord> records = getRecords();
+    final Condition filter = query.getWhereCondition();
+    final Map<String, Boolean> orderBy = query.getOrderBy();
+    Records.filterAndSort(records, filter, orderBy);
+    return records;
+  }
+
+  @Override
   public boolean isEmpty() {
     return getRecordCountPersisted() + super.getRecordCountNew() <= 0;
   }
@@ -213,6 +213,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   @Override
   public LayerRecord newLayerRecord(final Map<String, ? extends Object> values) {
     final LayerRecord record = super.newLayerRecord(values);
+    this.records.add(record);
     addToIndex(record);
     fireEmpty();
     return record;

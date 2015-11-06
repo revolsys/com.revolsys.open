@@ -127,7 +127,10 @@ public class FieldFilterPanel extends JComponent
 
     this.fieldNames = new ArrayList<>(this.layer.getFieldNamesSet());
     this.fieldNames.remove(this.recordDefinition.getGeometryFieldName());
-    this.nameField = ComboBox.newComboBox("fieldNames", this.fieldNames, this.layer::getFieldTitle);
+    this.nameField = ComboBox.newComboBox("fieldNames", this.fieldNames,
+      (final Object fieldName) -> {
+        return this.layer.getFieldTitle((String)fieldName);
+      });
     this.nameField.addActionListener(this);
     add(this.nameField);
 

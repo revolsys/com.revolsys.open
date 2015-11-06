@@ -10,70 +10,70 @@ import java.util.WeakHashMap;
 import com.revolsys.collection.ReferenceEntrySet;
 import com.revolsys.collection.ReferenceSet;
 
-public class WeakCache<K, V> implements Map<K, V> {
-  private final Map<K, Reference<V>> cache = new WeakHashMap<>();
+public class WeakKeyValueMap<K, V> implements Map<K, V> {
+  private final Map<K, Reference<V>> map = new WeakHashMap<>();
 
-  public WeakCache() {
+  public WeakKeyValueMap() {
   }
 
   @Override
   public void clear() {
-    this.cache.clear();
+    this.map.clear();
   }
 
   @Override
   public boolean containsKey(final Object key) {
-    return this.cache.containsKey(key);
+    return this.map.containsKey(key);
   }
 
   @Override
   public boolean containsValue(final Object value) {
-    return this.cache.containsKey(value);
+    return this.map.containsValue(value);
   }
 
   @Override
   public Set<Entry<K, V>> entrySet() {
-    return new ReferenceEntrySet<K, V>(this.cache.entrySet());
+    return new ReferenceEntrySet<K, V>(this.map.entrySet());
   }
 
   public void evict(final K key) {
-    this.cache.remove(key);
+    this.map.remove(key);
   }
 
   @Override
   public V get(final Object key) {
     V value = null;
-    final Reference<V> reference = this.cache.get(key);
+    final Reference<V> reference = this.map.get(key);
     if (reference != null) {
       value = reference.get();
     }
     if (value == null) {
-      this.cache.remove(key);
+      this.map.remove(key);
     }
     return value;
   }
 
   @Override
   public boolean isEmpty() {
-    return this.cache.isEmpty();
+    return this.map.isEmpty();
   }
 
   @Override
   public Set<K> keySet() {
-    return this.cache.keySet();
+    return this.map.keySet();
   }
 
   @Override
   public V put(final K key, final V value) {
     V oldValue = null;
     if (value == null) {
-      final Reference<V> oldReference = this.cache.remove(key);
+      final Reference<V> oldReference = this.map.remove(key);
 
       if (oldReference != null) {
         oldValue = oldReference.get();
       }
     } else {
-      final Reference<V> oldReference = this.cache.put(key, new WeakReference<V>(value));
+      final Reference<V> oldReference = this.map.put(key, new WeakReference<V>(value));
       if (oldReference != null) {
         oldValue = oldReference.get();
       }
@@ -92,7 +92,7 @@ public class WeakCache<K, V> implements Map<K, V> {
 
   @Override
   public V remove(final Object obj) {
-    final Reference<V> oldReference = this.cache.remove(obj);
+    final Reference<V> oldReference = this.map.remove(obj);
     if (oldReference == null) {
       return null;
     } else {
@@ -102,11 +102,11 @@ public class WeakCache<K, V> implements Map<K, V> {
 
   @Override
   public int size() {
-    return this.cache.size();
+    return this.map.size();
   }
 
   @Override
   public Collection<V> values() {
-    return new ReferenceSet<V>(this.cache.values());
+    return new ReferenceSet<V>(this.map.values());
   }
 }

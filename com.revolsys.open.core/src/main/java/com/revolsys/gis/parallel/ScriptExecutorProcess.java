@@ -21,7 +21,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 
-import com.revolsys.collection.map.ThreadSharedAttributes;
+import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.parallel.ThreadInterruptedException;
 import com.revolsys.parallel.ThreadUtil;
 import com.revolsys.parallel.channel.Channel;
@@ -143,7 +143,7 @@ public class ScriptExecutorProcess extends BaseInProcess<Record>implements BeanF
 
   @Override
   public void setBeanFactory(final BeanFactory beanFactory) throws BeansException {
-    this.attributes.putAll(ThreadSharedAttributes.getAttributes());
+    this.attributes.putAll(ThreadSharedProperties.getProperties());
   }
 
   public void setExecutor(final ExecutorService executor) {

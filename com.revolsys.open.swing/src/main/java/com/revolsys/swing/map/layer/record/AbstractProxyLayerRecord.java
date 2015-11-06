@@ -11,14 +11,27 @@ import com.revolsys.record.schema.FieldDefinition;
 public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   public AbstractProxyLayerRecord(final AbstractRecordLayer layer) {
     super(layer);
-    layer.addProxyRecord(this);
+  }
+
+  protected <R extends LayerRecord> R addProxiedRecord(final R record) {
+    final AbstractRecordLayer layer = getLayer();
+    layer.addProxiedRecord(record);
+    return record;
+  }
+
+  protected Identifier addProxiedRecordIdentifier(final Identifier identifier) {
+    final AbstractRecordLayer layer = getLayer();
+    layer.addProxiedRecordIdentifier(identifier);
+    return identifier;
   }
 
   @Override
   public void cancelChanges() {
     final LayerRecord layerRecord = getProxiedRecord();
     if (layerRecord != null) {
-      layerRecord.cancelChanges();
+      synchronized (layerRecord) {
+        layerRecord.cancelChanges();
+      }
     }
   }
 
@@ -26,14 +39,10 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   public void clearChanges() {
     final LayerRecord layerRecord = getProxiedRecord();
     if (layerRecord != null) {
-      layerRecord.clearChanges();
+      synchronized (layerRecord) {
+        layerRecord.clearChanges();
+      }
     }
-  }
-
-  @Override
-  protected void finalize() throws Throwable {
-    final AbstractRecordLayer layer = getLayer();
-    layer.removeProxyRecord(this);
   }
 
   @Override
@@ -120,13 +129,29 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   }
 
   @Override
-  public boolean isSame(final Record record) {
+  public boolean isSame(Record record) {
     if (record == this) {
       return true;
     } else {
+      if (record instanceof AbstractProxyLayerRecord) {
+        final AbstractProxyLayerRecord proxyRecord = (AbstractProxyLayerRecord)record;
+        record = proxyRecord.getProxiedRecord();
+      }
       final LayerRecord layerRecord = getProxiedRecord();
       return layerRecord.isSame(record);
     }
+  }
+
+  protected <R extends LayerRecord> R removeProxiedRecord(final R record) {
+    final AbstractRecordLayer layer = getLayer();
+    layer.removeProxiedRecord(record);
+    return null;
+  }
+
+  protected Identifier removeProxiedRecordIdentifier(final Identifier identifier) {
+    final AbstractRecordLayer layer = getLayer();
+    layer.removeProxiedRecordIdentifier(identifier);
+    return null;
   }
 
   @Override

@@ -175,7 +175,7 @@ public interface Identifier {
       }
     } else {
       throw new IllegalArgumentException(
-        "Attribute names count for " + fieldNames + " != count for values " + values);
+        "Field names count for " + fieldNames + " != count for values " + values);
     }
   }
 

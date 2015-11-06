@@ -406,19 +406,19 @@ public class SaifSchemaReader {
         if (attribute != null) {
           if (!typePaths.isEmpty()) {
             Map<String, List<String>> allowedValues = attribute
-              .getProperty(FieldProperties.ATTRIBUTE_ALLOWED_TYPE_NAMES);
+              .getProperty(FieldProperties.FIELD_ALLOWED_TYPE_NAMES);
             if (allowedValues == null) {
               allowedValues = new HashMap<String, List<String>>();
-              attribute.setProperty(FieldProperties.ATTRIBUTE_ALLOWED_TYPE_NAMES, allowedValues);
+              attribute.setProperty(FieldProperties.FIELD_ALLOWED_TYPE_NAMES, allowedValues);
             }
             allowedValues.put(subKey, typePaths);
           }
           if (!values.isEmpty()) {
             Map<String, List<Object>> allowedValues = attribute
-              .getProperty(FieldProperties.ATTRIBUTE_ALLOWED_VALUES);
+              .getProperty(FieldProperties.FIELD_ALLOWED_VALUES);
             if (allowedValues == null) {
               allowedValues = new HashMap<String, List<Object>>();
-              attribute.setProperty(FieldProperties.ATTRIBUTE_ALLOWED_VALUES, allowedValues);
+              attribute.setProperty(FieldProperties.FIELD_ALLOWED_VALUES, allowedValues);
             }
             allowedValues.put(subKey, values);
           }

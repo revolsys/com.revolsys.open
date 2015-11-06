@@ -33,7 +33,7 @@ public class ComboBox<T> extends JComboBox<T>implements Field, KeyListener {
   }
 
   public static <V> ComboBox<V> newComboBox(final String fieldName, final Collection<V> items,
-    final Function<V, String> converter) {
+    final Function<Object, String> converter) {
     final ComboBoxModel<V> model = newModel(items);
     return newComboBox(fieldName, model, converter);
   }
@@ -45,11 +45,11 @@ public class ComboBox<T> extends JComboBox<T>implements Field, KeyListener {
   }
 
   public static <V> ComboBox<V> newComboBox(final String fieldName, final ComboBoxModel<V> model) {
-    return newComboBox(fieldName, model, (Function<V, String>)null);
+    return newComboBox(fieldName, model, (Function<Object, String>)null);
   }
 
   public static <V> ComboBox<V> newComboBox(final String fieldName, final ComboBoxModel<V> model,
-    final Function<V, String> converter) {
+    final Function<Object, String> converter) {
     return new ComboBox<>(fieldName, model, converter, null);
   }
 
@@ -75,7 +75,7 @@ public class ComboBox<T> extends JComboBox<T>implements Field, KeyListener {
   private final FieldSupport fieldSupport;
 
   public ComboBox(final String fieldName, final ComboBoxModel<T> model,
-    Function<T, String> converter, final ListCellRenderer<T> renderer) {
+    Function<Object, String> converter, final ListCellRenderer<T> renderer) {
     super(model);
     setEditable(false);
     if (renderer != null) {

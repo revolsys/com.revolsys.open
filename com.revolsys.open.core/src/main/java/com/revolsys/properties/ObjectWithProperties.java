@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 
 import javax.annotation.PreDestroy;
 
-import com.revolsys.collection.map.ThreadSharedAttributes;
+import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.util.Property;
 
 public interface ObjectWithProperties {
@@ -68,10 +68,10 @@ public interface ObjectWithProperties {
   }
 
   default Map<String, Object> getThreadProperties() {
-    Map<String, Object> properties = ThreadSharedAttributes.getAttribute(this);
+    Map<String, Object> properties = ThreadSharedProperties.getProperty(this);
     if (properties == null) {
       properties = new HashMap<>();
-      ThreadSharedAttributes.setAttribute(this, properties);
+      ThreadSharedProperties.setProperty(this, properties);
     }
     return properties;
   }

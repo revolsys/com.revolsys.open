@@ -22,16 +22,18 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
     final Map<String, ? extends Object> values) {
     final ArrayLayerRecord record = new ArrayLayerRecord(layer);
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
-    record.setState(RecordState.INITIALIZING);
-    final List<FieldDefinition> idFields = recordDefinition.getIdFields();
-    for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
-      if (!idFields.contains(fieldDefinition)) {
-        final String fieldName = fieldDefinition.getName();
-        final Object value = values.get(fieldName);
-        fieldDefinition.setValue(record, value);
+    if (values != null) {
+      record.setState(RecordState.INITIALIZING);
+      final List<FieldDefinition> idFields = recordDefinition.getIdFields();
+      for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
+        if (!idFields.contains(fieldDefinition)) {
+          final String fieldName = fieldDefinition.getName();
+          final Object value = values.get(fieldName);
+          fieldDefinition.setValue(record, value);
+        }
       }
+      record.setState(RecordState.NEW);
     }
-    record.setState(RecordState.NEW);
     return record;
   }
 
@@ -66,6 +68,12 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
     setState(RecordState.INITIALIZING);
     setValues(values);
     setState(RecordState.PERSISTED);
+    this.layer = layer;
+  }
+
+  protected ArrayLayerRecord(final RecordStoreLayer layer,
+    final RecordDefinition recordDefinition) {
+    super(recordDefinition);
     this.layer = layer;
   }
 

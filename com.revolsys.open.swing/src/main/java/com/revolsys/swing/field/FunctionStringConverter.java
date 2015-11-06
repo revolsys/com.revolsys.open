@@ -17,9 +17,9 @@ public class FunctionStringConverter<T> extends ObjectToStringConverter
 
   private final DefaultListCellRenderer renderer = new DefaultListCellRenderer();
 
-  private final Function<T, String> function;
+  private final Function<Object, String> function;
 
-  public FunctionStringConverter(final Function<T, String> function) {
+  public FunctionStringConverter(final Function<Object, String> function) {
     this.function = function;
   }
 
@@ -42,7 +42,7 @@ public class FunctionStringConverter<T> extends ObjectToStringConverter
     if (item == null) {
       return "";
     } else {
-      return this.function.apply((T)item);
+      return this.function.apply(item);
     }
   }
 

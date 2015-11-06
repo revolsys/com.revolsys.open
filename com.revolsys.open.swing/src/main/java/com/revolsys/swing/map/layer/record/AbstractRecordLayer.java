@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -23,7 +24,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.WeakHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -34,7 +34,6 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.undo.UndoableEdit;
 
-import org.apache.commons.collections4.set.MapBackedSet;
 import org.slf4j.LoggerFactory;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
@@ -206,6 +205,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return layers;
   }
 
+  private final Set<Identifier> proxiedRecordIdentifiers = new HashSet<>();
+
   private RecordFactory<? extends LayerRecord> recordFactory = this::newLayerRecord;
 
   private final Label cacheIdDeleted = new Label("deleted");
@@ -246,8 +247,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   private RecordQuadTree index = new RecordQuadTree();
 
-  private Set<AbstractProxyLayerRecord> proxyRecords = MapBackedSet
-    .mapBackedSet(new WeakHashMap<AbstractProxyLayerRecord, Object>());
+  private Set<LayerRecord> proxiedRecords = new HashSet<>();
 
   private RecordDefinition recordDefinition;
 
@@ -367,21 +367,43 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  protected void addProxyRecord(final AbstractProxyLayerRecord record) {
-    this.proxyRecords.add(record);
+  protected void addProxiedRecord(final LayerRecord record) {
+    if (record != null) {
+      synchronized (this.proxiedRecords) {
+        this.proxiedRecords.add(record);
+      }
+    }
   }
 
-  @SuppressWarnings("unchecked")
-  protected <V extends LayerRecord> List<V> addRecordsToCache(final Label cacheId,
+  protected void addProxiedRecordIdentifier(final Identifier identifier) {
+    if (identifier != null) {
+      synchronized (this.proxiedRecordIdentifiers) {
+        this.proxiedRecordIdentifiers.add(identifier);
+      }
+    }
+  }
+
+  protected void addProxiedRecordIdsToCollection(final Collection<Identifier> identifiers) {
+    synchronized (this.proxiedRecords) {
+      for (final LayerRecord record : this.proxiedRecords) {
+        final Identifier identifier = record.getIdentifier();
+        if (identifier != null) {
+          identifiers.add(identifier);
+        }
+      }
+    }
+    synchronized (this.proxiedRecordIdentifiers) {
+      identifiers.addAll(this.proxiedRecordIdentifiers);
+    }
+  }
+
+  protected void addRecordsToCache(final Label cacheId,
     final Collection<? extends LayerRecord> records) {
     synchronized (getSync()) {
-      final List<V> results = new ArrayList<>();
       for (final LayerRecord record : records) {
-        final LayerRecord cachedRecord = addRecordToCache(cacheId, record);
-        results.add((V)cachedRecord);
+        addRecordToCache(cacheId, record);
       }
       cleanCachedRecords();
-      return results;
     }
   }
 
@@ -443,7 +465,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       }
       addSelectedRecords(records);
       if (isHasSelectedRecords()) {
-        showRecordsTable(RecordLayerTableModel.MODE_SELECTED_RECORDS);
+        showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
       }
     }
   }
@@ -551,8 +573,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     clone.formWindows = new LinkedList<>();
     clone.index = new RecordQuadTree();
     clone.selectedRecordsIndex = null;
-    clone.proxyRecords = MapBackedSet
-      .mapBackedSet(new WeakHashMap<AbstractProxyLayerRecord, Object>());
+    clone.proxiedRecords = new HashSet<>();
     clone.whereCondition = this.whereCondition.clone();
     clone.editSync = new Object();
     clone.userReadOnlyFieldNames = new LinkedHashSet<>(this.userReadOnlyFieldNames);
@@ -664,11 +685,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   protected void doDeleteRecord(final LayerRecord record) {
     if (isLayerRecord(record)) {
+      final boolean isNew = isNew(record);
       removeFromIndex(record);
       removeRecordFromCache(record);
 
-      addRecordToCache(this.cacheIdDeleted, record);
-
+      if (!isNew) {
+        addRecordToCache(this.cacheIdDeleted, record);
+      }
       record.setState(RecordState.DELETED);
       clearSelectedRecordsIndex();
     }
@@ -782,12 +805,21 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     firePropertyChange("selectionCount", -1, selectionCount);
   }
 
-  public void forEachRecord(final Query query, final Consumer<LayerRecord> consumer) {
+  protected void forEachRecord(final Query query, final Consumer<? super LayerRecord> consumer) {
   }
 
-  public void forEachRecordChanged(final Query query, final Consumer<LayerRecord> consumer) {
+  public void forEachRecordChanged(final Query query,
+    final Consumer<? super LayerRecord> consumer) {
     final List<LayerRecord> records = getRecordsChanged();
     query.forEachRecord(records, consumer);
+  }
+
+  protected void forEachRecordProxy(final Query query,
+    final Consumer<? super LayerRecord> consumer) {
+    forEachRecord(query, (record) -> {
+      final LayerRecord proxyRecord = newProxyLayerRecord(record);
+      consumer.accept(proxyRecord);
+    });
   }
 
   @SuppressWarnings("unchecked")
@@ -798,29 +830,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   @SuppressWarnings("unchecked")
   protected <V extends LayerRecord> V getCachedRecord(final Record record) {
     return (V)record;
-  }
-
-  public int getCachedRecordCount(final Label cacheId) {
-    final Collection<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
-    if (cachedRecords == null) {
-      return 0;
-    } else {
-      return cachedRecords.size();
-    }
-  }
-
-  public <L extends LayerRecord> List<L> getCachedRecords(final Label cacheId) {
-    synchronized (getSync()) {
-      final List<L> records = new ArrayList<>();
-      final Collection<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
-      if (cachedRecords != null) {
-        for (final LayerRecord record : cachedRecords) {
-          final L proxyRecord = newProxyLayerRecord(record);
-          records.add(proxyRecord);
-        }
-      }
-      return records;
-    }
   }
 
   protected final Label getCacheIdDeleted() {
@@ -950,11 +959,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public int getHighlightedCount() {
-    return getCachedRecordCount(this.cacheIdHighlighted);
+    return getRecordCountCached(this.cacheIdHighlighted);
   }
 
   public Collection<LayerRecord> getHighlightedRecords() {
-    return getCachedRecords(this.cacheIdHighlighted);
+    return getRecordsCached(this.cacheIdHighlighted);
   }
 
   public String getIdFieldName() {
@@ -1153,8 +1162,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return record;
   }
 
-  public List<AbstractProxyLayerRecord> getProxyRecords() {
-    return new ArrayList<>(this.proxyRecords);
+  public List<LayerRecord> getProxiedRecords() {
+    return new ArrayList<>(this.proxiedRecords);
   }
 
   public final Query getQuery() {
@@ -1163,11 +1172,35 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return new Query(recordDefinition, whereCondition);
   }
 
+  public LayerRecord getRecord(final Identifier identifier) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition != null) {
+      final List<FieldDefinition> idFieldDefinitions = recordDefinition.getIdFields();
+      if (idFieldDefinitions.isEmpty()) {
+        final Query query = new Query(recordDefinition, Q.equalId(idFieldDefinitions, identifier));
+        for (final LayerRecord record : getRecords(query)) {
+          return record;
+        }
+      }
+    }
+    return null;
+  }
+
   public LayerRecord getRecord(final int row) {
     throw new UnsupportedOperationException();
   }
 
-  public LayerRecord getRecordById(final Identifier id) {
+  public LayerRecord getRecordById(final Identifier identifier) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition != null) {
+      final List<FieldDefinition> idFieldDefinitions = recordDefinition.getIdFields();
+      if (!idFieldDefinitions.isEmpty()) {
+        final Query query = new Query(recordDefinition, Q.equalId(idFieldDefinitions, identifier));
+        for (final LayerRecord record : getRecords(query)) {
+          return record;
+        }
+      }
+    }
     return null;
   }
 
@@ -1183,6 +1216,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return 0;
   }
 
+  public int getRecordCountCached(final Label cacheId) {
+    final Collection<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
+    if (cachedRecords == null) {
+      return 0;
+    } else {
+      return cachedRecords.size();
+    }
+  }
+
   public int getRecordCountChanged() {
     int changeCount = 0;
     synchronized (getSync()) {
@@ -1194,15 +1236,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public int getRecordCountDeleted() {
-    return getCachedRecordCount(this.cacheIdDeleted);
+    return getRecordCountCached(this.cacheIdDeleted);
   }
 
   public int getRecordCountModified() {
-    return getCachedRecordCount(this.cacheIdModified);
+    return getRecordCountCached(this.cacheIdModified);
   }
 
   public int getRecordCountNew() {
-    return getCachedRecordCount(this.cacheIdNew);
+    return getRecordCountCached(this.cacheIdNew);
   }
 
   public int getRecordCountPersisted() {
@@ -1229,12 +1271,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   @SuppressWarnings({
     "unchecked", "rawtypes"
   })
-  public List<LayerRecord> getRecords(BoundingBox boundingBox) {
+  public <R extends LayerRecord> List<R> getRecords(BoundingBox boundingBox) {
     if (hasGeometryField()) {
       boundingBox = convertBoundingBox(boundingBox);
       if (Property.hasValue(boundingBox)) {
         final RecordQuadTree index = getIndex();
-        final List<LayerRecord> records = (List)index.queryIntersects(boundingBox);
+        final List<R> records = (List)index.queryIntersects(boundingBox);
         return records;
       }
     }
@@ -1244,7 +1286,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   @SuppressWarnings({
     "unchecked", "rawtypes"
   })
-  public List<LayerRecord> getRecords(Geometry geometry, final double distance) {
+  public <R extends LayerRecord> List<R> getRecords(Geometry geometry, final double distance) {
     if (geometry == null || !hasGeometryField()) {
       return Collections.emptyList();
     } else {
@@ -1254,32 +1296,23 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public List<LayerRecord> getRecords(final Identifier identifier) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    if (recordDefinition != null) {
-      final List<FieldDefinition> idFieldDefinitions = recordDefinition.getIdFields();
-      if (idFieldDefinitions.isEmpty()) {
-        final Query query = new Query(recordDefinition, Q.equalId(idFieldDefinitions, identifier));
-        return getRecords(query);
-      }
-    }
-    return Collections.emptyList();
-  }
-
-  public List<LayerRecord> getRecords(final Map<String, ? extends Object> filter) {
+  public <R extends LayerRecord> List<R> getRecords(final Map<String, ? extends Object> filter) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     final Query query = Query.and(recordDefinition, filter);
     return getRecords(query);
   }
 
-  public List<LayerRecord> getRecords(final PathName pathName) {
+  public <R extends LayerRecord> List<R> getRecords(final PathName pathName) {
     final Query query = new Query(pathName);
     return getRecords(query);
   }
 
-  public List<LayerRecord> getRecords(final Query query) {
-    final List<LayerRecord> records = new ArrayList<>();
-    forEachRecord(query, records::add);
+  public <R extends LayerRecord> List<R> getRecords(final Query query) {
+    final List<R> records = new ArrayList<>();
+    forEachRecord(query, (final LayerRecord record) -> {
+      final R proxyRecord = newProxyLayerRecord(record);
+      records.add(proxyRecord);
+    });
     return records;
   }
 
@@ -1287,9 +1320,23 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return getRecords(boundingBox);
   }
 
-  public <L extends LayerRecord> List<L> getRecordsChanged() {
+  public <R extends LayerRecord> List<R> getRecordsCached(final Label cacheId) {
     synchronized (getSync()) {
-      final List<L> records = new ArrayList<>();
+      final List<R> records = new ArrayList<>();
+      final Collection<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
+      if (cachedRecords != null) {
+        for (final LayerRecord record : cachedRecords) {
+          final R proxyRecord = newProxyLayerRecord(record);
+          records.add(proxyRecord);
+        }
+      }
+      return records;
+    }
+  }
+
+  public <R extends LayerRecord> List<R> getRecordsChanged() {
+    synchronized (getSync()) {
+      final List<R> records = new ArrayList<>();
       records.addAll(getRecordsNew());
       records.addAll(getRecordsModified());
       records.addAll(getRecordsDeleted());
@@ -1297,16 +1344,16 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public <L extends LayerRecord> List<L> getRecordsDeleted() {
-    return getCachedRecords(this.cacheIdDeleted);
+  public <R extends LayerRecord> List<R> getRecordsDeleted() {
+    return getRecordsCached(this.cacheIdDeleted);
   }
 
-  public <L extends LayerRecord> Collection<L> getRecordsModified() {
-    return getCachedRecords(this.cacheIdModified);
+  public <R extends LayerRecord> Collection<R> getRecordsModified() {
+    return getRecordsCached(this.cacheIdModified);
   }
 
-  public <L extends LayerRecord> List<L> getRecordsNew() {
-    return getCachedRecords(this.cacheIdNew);
+  public <R extends LayerRecord> List<R> getRecordsNew() {
+    return getRecordsCached(this.cacheIdNew);
   }
 
   /**
@@ -1315,7 +1362,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
    * @param query
    * @return The records.
    */
-  public List<LayerRecord> getRecordsPersisted(final Query query) {
+  public <R extends LayerRecord> List<R> getRecordsPersisted(final Query query) {
     return getRecords(query);
   }
 
@@ -1334,7 +1381,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public List<LayerRecord> getSelectedRecords() {
-    return getCachedRecords(this.cacheIdSelected);
+    return getRecordsCached(this.cacheIdSelected);
   }
 
   @SuppressWarnings({
@@ -1356,7 +1403,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public int getSelectionCount() {
-    return getCachedRecordCount(this.cacheIdSelected);
+    return getRecordCountCached(this.cacheIdSelected);
   }
 
   public Collection<String> getSnapLayerPaths() {
@@ -1489,9 +1536,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   protected boolean internalSaveChanges(final RecordSaveErrorTableModel errors,
     final LayerRecord record) {
     final RecordState originalState = record.getState();
-    final boolean saved = doSaveChanges(errors, record);
+    final LayerRecord layerRecord = getProxiedRecord(record);
+    final boolean saved = doSaveChanges(errors, layerRecord);
     if (saved) {
-      postSaveChanges(originalState, record);
+      postSaveChanges(originalState, layerRecord);
     }
     return saved;
   }
@@ -1591,7 +1639,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public boolean isHasCachedRecords(final Label cacheId) {
-    return getCachedRecordCount(cacheId) > 0;
+    return getRecordCountCached(cacheId) > 0;
   }
 
   @Override
@@ -1835,8 +1883,18 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   @SuppressWarnings("unchecked")
-  protected <L extends LayerRecord> L newProxyLayerRecord(final LayerRecord record) {
-    return (L)record;
+  protected <R extends LayerRecord> R newProxyLayerRecord(final LayerRecord record) {
+    return (R)record;
+  }
+
+  protected <R extends LayerRecord> List<R> newProxyLayerRecords(
+    final Iterable<? extends LayerRecord> records) {
+    final List<R> proxyRecords = new ArrayList<>();
+    for (final LayerRecord record : records) {
+      final R proxyRecord = newProxyLayerRecord(record);
+      proxyRecords.add(proxyRecord);
+    }
+    return proxyRecords;
   }
 
   public RecordLayerTablePanel newTablePanel(final Map<String, Object> config) {
@@ -1936,7 +1994,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       saveChanges(newRecords);
       if (!newRecords.isEmpty()) {
         zoomToRecords(newRecords);
-        showRecordsTable(RecordLayerTableModel.MODE_SELECTED_RECORDS);
+        showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
       }
     }
     firePropertyChange("recordsInserted", null, newRecords);
@@ -2089,8 +2147,20 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     removeRecordFromCache(this.cacheIdHighlighted, record);
   }
 
-  public void removeProxyRecord(final AbstractProxyLayerRecord proxyRecord) {
-    this.proxyRecords.remove(proxyRecord);
+  protected void removeProxiedRecord(final LayerRecord proxyRecord) {
+    if (proxyRecord != null) {
+      synchronized (proxyRecord) {
+        this.proxiedRecords.remove(proxyRecord);
+      }
+    }
+  }
+
+  protected void removeProxiedRecordIdentifier(final Identifier identifier) {
+    if (identifier != null) {
+      synchronized (this.proxiedRecordIdentifiers) {
+        this.proxiedRecordIdentifiers.remove(identifier);
+      }
+    }
   }
 
   protected boolean removeRecordFromCache(final Label cacheId, LayerRecord record) {
@@ -2432,7 +2502,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       }
       setSelectedRecords(records);
       if (isHasSelectedRecords()) {
-        showRecordsTable(RecordLayerTableModel.MODE_SELECTED_RECORDS);
+        showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
       }
     }
   }
@@ -2744,7 +2814,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       }
       unSelectRecords(records);
       if (isHasSelectedRecords()) {
-        showRecordsTable(RecordLayerTableModel.MODE_SELECTED_RECORDS);
+        showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
       }
     }
   }

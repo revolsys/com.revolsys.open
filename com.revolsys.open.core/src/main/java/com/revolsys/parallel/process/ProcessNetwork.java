@@ -19,7 +19,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
-import com.revolsys.collection.map.ThreadSharedAttributes;
+import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.logging.log4j.ThreadLocalAppenderRunnable;
 import com.revolsys.parallel.ThreadUtil;
 import com.revolsys.spring.TargetBeanFactoryBean;
@@ -134,7 +134,7 @@ public class ProcessNetwork
   public void init() {
     if (this.parent == null) {
       this.threadGroup = new ThreadGroup(this.name);
-      ThreadSharedAttributes.initialiseThreadGroup(this.threadGroup);
+      ThreadSharedProperties.initialiseThreadGroup(this.threadGroup);
     }
   }
 

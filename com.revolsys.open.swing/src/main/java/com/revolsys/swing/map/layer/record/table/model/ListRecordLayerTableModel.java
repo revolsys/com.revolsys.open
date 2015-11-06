@@ -24,16 +24,16 @@ public class ListRecordLayerTableModel extends RecordLayerTableModel
   public ListRecordLayerTableModel(final ListRecordLayer layer) {
     super(layer);
     setEditable(false);
-    setSortableModes(MODE_SELECTED_RECORDS, MODE_ALL_RECORDS);
-    setFilterModeMethods(MODE_ALL_RECORDS, this::refreshAllRecords, this::getRecordCount,
-      this::getRecordCached, this::exportRecordsCached);
+    setSortableModes(MODE_RECORDS_SELECTED, MODE_RECORDS_ALL);
+    addFieldFilterMode(MODE_RECORDS_ALL, true, this::refreshRecordsAll,
+      this::getRecordCount, this::getRecordCached, this::exportRecordsCached);
   }
 
   @Override
-  protected void refreshAllRecords(final long index) {
+  protected void refreshRecordsAll(final long index) {
     final AbstractRecordLayer layer = getLayer();
     if (layer != null) {
-      refreshCachedRecords(index, layer::getRecords);
+      refreshRecordsCached(index, layer::getRecords);
     }
   }
 

@@ -6,7 +6,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.collection.map.ThreadSharedAttributes;
+import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.Path;
 import com.revolsys.io.PathName;
@@ -34,7 +34,7 @@ public class RecordLog {
   }
 
   public static RecordLog getForThread() {
-    final RecordLog recordLog = ThreadSharedAttributes.getAttribute(KEY);
+    final RecordLog recordLog = ThreadSharedProperties.getProperty(KEY);
     return recordLog;
   }
 
@@ -56,7 +56,7 @@ public class RecordLog {
     RecordLog recordLog = getForThread();
     if (recordLog == null) {
       recordLog = new RecordLog();
-      ThreadSharedAttributes.setAttribute(KEY, recordLog);
+      ThreadSharedProperties.setProperty(KEY, recordLog);
     }
     return recordLog;
   }

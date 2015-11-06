@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.collection.map.WeakCache;
+import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.collection.set.Sets;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.Geometry;
@@ -44,7 +44,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   implements RecordDefinition {
   private static final AtomicInteger INSTANCE_IDS = new AtomicInteger(0);
 
-  private static final Map<Integer, RecordDefinitionImpl> RECORD_DEFINITION_CACHE = new WeakCache<Integer, RecordDefinitionImpl>();
+  private static final Map<Integer, RecordDefinitionImpl> RECORD_DEFINITION_CACHE = new WeakKeyValueMap<Integer, RecordDefinitionImpl>();
 
   public static void destroy(final RecordDefinitionImpl... recordDefinitionList) {
     for (final RecordDefinitionImpl recordDefinition : recordDefinitionList) {

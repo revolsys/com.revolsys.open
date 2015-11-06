@@ -221,7 +221,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     final LayerRecord record = getRecord();
     layer.saveChanges(record);
     layer.setSelectedRecords(record);
-    layer.showRecordsTable(RecordLayerTableModel.MODE_SELECTED_RECORDS);
+    layer.showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
     closeWindow();
   }
 

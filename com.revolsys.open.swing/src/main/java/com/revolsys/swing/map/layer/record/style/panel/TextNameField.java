@@ -40,7 +40,9 @@ public class TextNameField extends ValueField {
     final List<String> fieldNames = new ArrayList<>(layer.getFieldNames());
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
     fieldNames.remove(recordDefinition.getGeometryFieldName());
-    this.fieldNamesField = ComboBox.newComboBox("fieldNames", fieldNames, layer::getFieldTitle);
+    this.fieldNamesField = ComboBox.newComboBox("fieldNames", fieldNames, (final Object name) -> {
+      return layer.getFieldTitle((String)name);
+    });
 
     final JButton addButton = RunnableAction.newButton(null, "Add field name", Icons.getIcon("add"),
       this::addFieldName);

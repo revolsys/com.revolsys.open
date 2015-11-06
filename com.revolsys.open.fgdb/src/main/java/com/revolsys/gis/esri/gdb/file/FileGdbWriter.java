@@ -147,6 +147,10 @@ public class FileGdbWriter extends AbstractRecordWriter {
     }
   }
 
+  public boolean isClosed() {
+    return this.recordStore == null;
+  }
+
   public synchronized void openTable(final PathName typePath) {
     getTable(typePath);
   }

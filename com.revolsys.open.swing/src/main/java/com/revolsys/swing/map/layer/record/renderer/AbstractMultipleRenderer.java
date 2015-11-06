@@ -256,10 +256,10 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
   }
 
   @Override
-  public boolean isVisible(final LayerRecord object) {
-    if (super.isVisible() && super.isVisible(object)) {
+  public boolean isVisible(final LayerRecord record) {
+    if (super.isVisible() && super.isVisible(record)) {
       for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
-        if (renderer.isVisible(object)) {
+        if (renderer.isVisible(record)) {
           return true;
         }
       }

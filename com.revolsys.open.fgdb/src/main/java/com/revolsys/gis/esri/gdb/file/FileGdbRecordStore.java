@@ -105,7 +105,7 @@ import com.revolsys.util.StringBuilders;
 public class FileGdbRecordStore extends AbstractRecordStore {
   private static final Object API_SYNC = new Object();
 
-  private static final Map<FieldType, Constructor<? extends AbstractFileGdbFieldDefinition>> ESRI_FIELD_TYPE_ATTRIBUTE_MAP = new HashMap<FieldType, Constructor<? extends AbstractFileGdbFieldDefinition>>();
+  private static final Map<FieldType, Constructor<? extends AbstractFileGdbFieldDefinition>> ESRI_FIELD_TYPE_FIELD_DEFINITION_MAP = new HashMap<FieldType, Constructor<? extends AbstractFileGdbFieldDefinition>>();
 
   private static final Logger LOG = LoggerFactory.getLogger(FileGdbRecordStore.class);
 
@@ -134,7 +134,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     try {
       final Constructor<? extends AbstractFileGdbFieldDefinition> constructor = fieldClass
         .getConstructor(Field.class);
-      ESRI_FIELD_TYPE_ATTRIBUTE_MAP.put(fieldType, constructor);
+      ESRI_FIELD_TYPE_FIELD_DEFINITION_MAP.put(fieldType, constructor);
     } catch (final SecurityException e) {
       LOG.error("No public constructor for ESRI type " + fieldType, e);
     } catch (final NoSuchMethodException e) {
@@ -767,7 +767,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           for (final Field field : deTable.getFields()) {
             final String fieldName = field.getName();
             final FieldType type = field.getType();
-            final Constructor<? extends AbstractFileGdbFieldDefinition> fieldConstructor = ESRI_FIELD_TYPE_ATTRIBUTE_MAP
+            final Constructor<? extends AbstractFileGdbFieldDefinition> fieldConstructor = ESRI_FIELD_TYPE_FIELD_DEFINITION_MAP
               .get(type);
             if (fieldConstructor != null) {
               try {
@@ -1244,7 +1244,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   public FileGdbWriter newRecordWriter() {
     synchronized (this.apiSync) {
       FileGdbWriter writer = getThreadProperty("writer");
-      if (writer == null) {
+      if (writer == null || writer.isClosed()) {
         writer = new FileGdbWriter(this);
         setThreadProperty("writer", writer);
       }

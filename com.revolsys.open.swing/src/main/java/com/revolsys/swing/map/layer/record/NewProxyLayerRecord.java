@@ -11,6 +11,13 @@ public class NewProxyLayerRecord extends AbstractProxyLayerRecord {
   public NewProxyLayerRecord(final RecordStoreLayer layer, final LayerRecord record) {
     super(layer);
     this.record = record;
+    addProxiedRecord(record);
+  }
+
+  @Override
+  protected void finalize() throws Throwable {
+    this.identifier = removeProxiedRecordIdentifier(this.identifier);
+    super.finalize();
   }
 
   @Override
@@ -25,7 +32,8 @@ public class NewProxyLayerRecord extends AbstractProxyLayerRecord {
       if (state == RecordState.PERSISTED) {
         this.identifier = this.record.getIdentifier();
         if (this.identifier != null) {
-          this.record = null;
+          addProxiedRecordIdentifier(this.identifier);
+          this.record = removeProxiedRecord(this.record);
         }
       } else {
         return this.record;

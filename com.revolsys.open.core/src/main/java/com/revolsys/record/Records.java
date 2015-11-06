@@ -227,8 +227,8 @@ public interface Records {
     }
   }
 
-  static Double getDouble(final Record record, final int attributeIndex) {
-    final Number value = record.getValue(attributeIndex);
+  static Double getDouble(final Record record, final int fieldIndex) {
+    final Number value = record.getValue(fieldIndex);
     if (value == null) {
       return null;
     } else if (value instanceof Double) {
@@ -409,11 +409,11 @@ public interface Records {
     final Record record = new ArrayRecord(recordDefinition);
     for (final Entry<String, Object> entry : values.entrySet()) {
       final String name = entry.getKey();
-      final FieldDefinition attribute = recordDefinition.getField(name);
-      if (attribute != null) {
+      final FieldDefinition fieldDefinition = recordDefinition.getField(name);
+      if (fieldDefinition != null) {
         final Object value = entry.getValue();
         if (value != null) {
-          final DataType dataType = attribute.getType();
+          final DataType dataType = fieldDefinition.getType();
           @SuppressWarnings("unchecked")
           final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
           if (dataTypeClass.isAssignableFrom(value.getClass())) {
@@ -509,23 +509,58 @@ public interface Records {
     return (record1, record2) -> {
       if (record1 == record2) {
         return 0;
-      } else if (Property.hasValue(orderBy)) {
-        for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
-          final String fieldName = entry.getKey();
-          final Boolean ascending = entry.getValue();
-          final Object value1 = record1.getValue(fieldName);
-          final Object value2 = record2.getValue(fieldName);
-          final int compare = CompareUtil.compare(value1, value2);
-          if (compare != 0) {
-            if (ascending) {
-              return compare;
-            } else {
-              return -compare;
+      } else {
+        if (Property.hasValue(orderBy)) {
+          for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
+            final String fieldName = entry.getKey();
+            final Boolean ascending = entry.getValue();
+            final Object value1 = record1.getValue(fieldName);
+            final Object value2 = record2.getValue(fieldName);
+            final int compare = CompareUtil.compare(value1, value2);
+            if (compare != 0) {
+              if (ascending) {
+                return compare;
+              } else {
+                return -compare;
+              }
             }
           }
+          return -1;
+        } else {
+          return -1;
         }
       }
-      return -1;
+    };
+  }
+
+  static <R extends Record> Comparator<R> newComparatorOrderByIdentifier(
+    final Map<String, Boolean> orderBy) {
+    return (record1, record2) -> {
+      if (record1 == record2) {
+        return 0;
+      } else {
+        if (Property.hasValue(orderBy)) {
+          for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
+            final String fieldName = entry.getKey();
+            final Boolean ascending = entry.getValue();
+            final Object value1 = record1.getValue(fieldName);
+            final Object value2 = record2.getValue(fieldName);
+            final int compare = CompareUtil.compare(value1, value2);
+            if (compare != 0) {
+              if (ascending) {
+                return compare;
+              } else {
+                return -compare;
+              }
+            }
+          }
+          final Identifier identifier1 = record1.getIdentifier();
+          final Identifier identifier2 = record2.getIdentifier();
+          return CompareUtil.compare(identifier1, identifier2);
+        } else {
+          return -1;
+        }
+      }
     };
   }
 
@@ -555,6 +590,16 @@ public interface Records {
             return true;
           }
         }
+      }
+      return false;
+    };
+  }
+
+  static <V extends Record> Predicate<V> newFilter(final String fieldName, final Object value) {
+    return (record) -> {
+      if (record != null) {
+        final Object fieldValue = record.getValue(fieldName);
+        return Equals.equal(fieldValue, value);
       }
       return false;
     };

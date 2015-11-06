@@ -14,7 +14,7 @@ import com.revolsys.record.Records;
  *
  * @author Paul Austin
  */
-public class AttributeValuesFilter implements Predicate<Record> {
+public class FieldValuesFilter implements Predicate<Record> {
   private boolean allowNulls;
 
   /** The fieldName name, or path to match. */
@@ -24,18 +24,18 @@ public class AttributeValuesFilter implements Predicate<Record> {
   private List<Object> values = new ArrayList<Object>();
 
   /**
-   * Construct a new AttributeValuesFilter.
+   * Construct a new FieldValuesFilter.
    */
-  public AttributeValuesFilter() {
+  public FieldValuesFilter() {
   }
 
   /**
-   * Construct a new AttributeValuesFilter.
+   * Construct a new FieldValuesFilter.
    *
    * @param fieldName The attribute name.
    * @param values The list of values.
    */
-  public AttributeValuesFilter(final String fieldName, final boolean allowNulls,
+  public FieldValuesFilter(final String fieldName, final boolean allowNulls,
     final List<Object> values) {
     this.fieldName = fieldName;
     this.values = values;
@@ -43,23 +43,23 @@ public class AttributeValuesFilter implements Predicate<Record> {
   }
 
   /**
-   * Construct a new AttributeValuesFilter.
+   * Construct a new FieldValuesFilter.
    *
    * @param fieldName The attribute name.
    * @param values The array of values.
    */
-  public AttributeValuesFilter(final String fieldName, final boolean allowNulls,
+  public FieldValuesFilter(final String fieldName, final boolean allowNulls,
     final Object... values) {
     this(fieldName, allowNulls, Arrays.asList(values));
   }
 
   /**
-   * Construct a new AttributeValuesFilter.
+   * Construct a new FieldValuesFilter.
    *
    * @param fieldName The attribute name.
    * @param values The list of values.
    */
-  public AttributeValuesFilter(final String fieldName, final List<Object> values) {
+  public FieldValuesFilter(final String fieldName, final List<Object> values) {
     this.fieldName = fieldName;
     this.values = values;
   }
